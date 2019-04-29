@@ -2,262 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 035F0DE9A
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2019 11:03:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10E85DEB5
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2019 11:10:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727271AbfD2JDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Apr 2019 05:03:05 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:40017 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727200AbfD2JDF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Apr 2019 05:03:05 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 44szFy3qLkz9sCJ; Mon, 29 Apr 2019 19:03:02 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1556528582; bh=qf4761kTIePZBgJphDQX6ZIJc5NLwCPm2CD+O8zVfUE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZXtLwr+gPy0HVWqA2UswFu88QPngnd2Tg4u620Mu35RcVIUBsMC6mL43dx1EQhPXr
-         SmlW5FcdkiUxLuguX4ae2MIUHAownL21PaBkAHk98Qmyh+jo61CCOYacDBDLf2H00g
-         eCrQDhovGdNChMgdUBcN+r7W2kAq8Mpy2mS7V6oO7Hv59mYE8AG43268Kpvyp34CDj
-         6fq8YBb2ir+lwcv6GRqDuRSb4zLKOHpKibdPMfm3THaj5j+2sqrjMB3Yf+1MNErV3a
-         q5yo573m6vBhcj9YY2daxgrQR8M1iHuVx4LxmbWKHq2seacwR5HNe6uFIidY2GIqyH
-         0f1rdwXwCdg5Q==
-Date:   Mon, 29 Apr 2019 19:02:58 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org, Nick Piggin <npiggin@au1.ibm.com>
-Subject: [PATCH 2/2] KVM: PPC: Book3S HV: Flush TLB on secondary radix threads
-Message-ID: <20190429090258.GB18822@blackberry>
-References: <20190429090040.GA18822@blackberry>
+        id S1727470AbfD2JKL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Apr 2019 05:10:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38976 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727259AbfD2JKL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 29 Apr 2019 05:10:11 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3T99wfN042138
+        for <kvm@vger.kernel.org>; Mon, 29 Apr 2019 05:10:10 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2s5w7uavx5-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 29 Apr 2019 05:10:09 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Mon, 29 Apr 2019 10:10:07 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 29 Apr 2019 10:10:04 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3T9A3uD48955596
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 29 Apr 2019 09:10:03 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3406A4C071;
+        Mon, 29 Apr 2019 09:10:03 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 29C664C06E;
+        Mon, 29 Apr 2019 09:10:03 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 29 Apr 2019 09:10:03 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id C7EF320F5D4; Mon, 29 Apr 2019 11:10:02 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>
+Subject: [GIT PULL 00/12] KVM: s390: Features and fixes for kvm/next
+Date:   Mon, 29 Apr 2019 11:09:50 +0200
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190429090040.GA18822@blackberry>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19042909-0028-0000-0000-00000368691D
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19042909-0029-0000-0000-00002427C958
+Message-Id: <20190429091002.71164-1-borntraeger@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-29_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1904290067
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When running on POWER9 with kvm_hv.indep_threads_mode = N and the host
-in SMT1 mode, KVM will run guest VCPUs on offline secondary threads.
-If those guests are in radix mode, we fail to load the LPID and flush
-the TLB if necessary, leading to the guest crashing with an
-unsupported MMU fault.  This arises from commit 9a4506e11b97 ("KVM:
-PPC: Book3S HV: Make radix handle process scoped LPID flush in C,
-with relocation on", 2018-05-17), which didn't consider the case
-where indep_threads_mode = N.
+Paolo, Radim,
 
-For simplicity, this makes the real-mode guest entry path flush the
-TLB in the same place for both radix and hash guests, as we did before
-9a4506e11b97, though the code is now C code rather than assembly code.
-We also have the radix TLB flush open-coded rather than calling
-radix__local_flush_tlb_lpid_guest(), because the TLB flush can be
-called in real mode, and in real mode we don't want to invoke the
-tracepoint code.
+Nothing big this time. Some fixes and new hardware features.
+Please pull
 
-Fixes: 9a4506e11b97 ("KVM: PPC: Book3S HV: Make radix handle process scoped LPID flush in C, with relocation on")
-Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
----
- arch/powerpc/include/asm/kvm_ppc.h      |  3 +-
- arch/powerpc/kvm/book3s_hv.c            | 55 +++++----------------------------
- arch/powerpc/kvm/book3s_hv_builtin.c    | 52 ++++++++++++++++++++++++-------
- arch/powerpc/kvm/book3s_hv_rmhandlers.S |  6 ++--
- 4 files changed, 53 insertions(+), 63 deletions(-)
+The following changes since commit 79a3aaa7b82e3106be97842dedfd8429248896e6:
 
-diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
-index f8f7d76..27e5478 100644
---- a/arch/powerpc/include/asm/kvm_ppc.h
-+++ b/arch/powerpc/include/asm/kvm_ppc.h
-@@ -481,7 +481,8 @@ extern void kvm_hv_vm_activated(void);
- extern void kvm_hv_vm_deactivated(void);
- extern bool kvm_hv_mode_active(void);
- 
--extern void kvmppc_hpt_check_need_tlb_flush(struct kvm *kvm);
-+extern void kvmppc_check_need_tlb_flush(struct kvm *kvm, int pcpu,
-+					struct kvm_nested_guest *nested);
- 
- #else
- static inline void __init kvm_cma_reserve(void)
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 0fab0a2..c26acbe 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -2505,37 +2505,6 @@ static void kvmppc_prepare_radix_vcpu(struct kvm_vcpu *vcpu, int pcpu)
- 	}
- }
- 
--static void kvmppc_radix_check_need_tlb_flush(struct kvm *kvm, int pcpu,
--					      struct kvm_nested_guest *nested)
--{
--	cpumask_t *need_tlb_flush;
--	int lpid;
--
--	if (!cpu_has_feature(CPU_FTR_HVMODE))
--		return;
--
--	if (cpu_has_feature(CPU_FTR_ARCH_300))
--		pcpu &= ~0x3UL;
--
--	if (nested) {
--		lpid = nested->shadow_lpid;
--		need_tlb_flush = &nested->need_tlb_flush;
--	} else {
--		lpid = kvm->arch.lpid;
--		need_tlb_flush = &kvm->arch.need_tlb_flush;
--	}
--
--	mtspr(SPRN_LPID, lpid);
--	isync();
--	smp_mb();
--
--	if (cpumask_test_cpu(pcpu, need_tlb_flush)) {
--		radix__local_flush_tlb_lpid_guest(lpid);
--		/* Clear the bit after the TLB flush */
--		cpumask_clear_cpu(pcpu, need_tlb_flush);
--	}
--}
--
- static void kvmppc_start_thread(struct kvm_vcpu *vcpu, struct kvmppc_vcore *vc)
- {
- 	int cpu;
-@@ -3229,20 +3198,6 @@ static noinline void kvmppc_run_core(struct kvmppc_vcore *vc)
- 	for (sub = 0; sub < core_info.n_subcores; ++sub)
- 		spin_unlock(&core_info.vc[sub]->lock);
- 
--	if (kvm_is_radix(vc->kvm)) {
--		/*
--		 * Do we need to flush the process scoped TLB for the LPAR?
--		 *
--		 * On POWER9, individual threads can come in here, but the
--		 * TLB is shared between the 4 threads in a core, hence
--		 * invalidating on one thread invalidates for all.
--		 * Thus we make all 4 threads use the same bit here.
--		 *
--		 * Hash must be flushed in realmode in order to use tlbiel.
--		 */
--		kvmppc_radix_check_need_tlb_flush(vc->kvm, pcpu, NULL);
--	}
--
- 	/*
- 	 * Interrupts will be enabled once we get into the guest,
- 	 * so tell lockdep that we're about to enable interrupts.
-@@ -3968,7 +3923,7 @@ int kvmhv_run_single_vcpu(struct kvm_run *kvm_run,
- 			  unsigned long lpcr)
- {
- 	int trap, r, pcpu;
--	int srcu_idx;
-+	int srcu_idx, lpid;
- 	struct kvmppc_vcore *vc;
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_nested_guest *nested = vcpu->arch.nested;
-@@ -4044,8 +3999,12 @@ int kvmhv_run_single_vcpu(struct kvm_run *kvm_run,
- 	vc->vcore_state = VCORE_RUNNING;
- 	trace_kvmppc_run_core(vc, 0);
- 
--	if (cpu_has_feature(CPU_FTR_HVMODE))
--		kvmppc_radix_check_need_tlb_flush(kvm, pcpu, nested);
-+	if (cpu_has_feature(CPU_FTR_HVMODE)) {
-+		lpid = nested ? nested->shadow_lpid : kvm->arch.lpid;
-+		mtspr(SPRN_LPID, lpid);
-+		isync();
-+		kvmppc_check_need_tlb_flush(kvm, pcpu, nested);
-+	}
- 
- 	trace_hardirqs_on();
- 	guest_enter_irqoff();
-diff --git a/arch/powerpc/kvm/book3s_hv_builtin.c b/arch/powerpc/kvm/book3s_hv_builtin.c
-index 489abe5..6035d24 100644
---- a/arch/powerpc/kvm/book3s_hv_builtin.c
-+++ b/arch/powerpc/kvm/book3s_hv_builtin.c
-@@ -806,11 +806,40 @@ void kvmppc_guest_entry_inject_int(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--void kvmppc_hpt_check_need_tlb_flush(struct kvm *kvm)
-+static void flush_guest_tlb(struct kvm *kvm)
- {
--	int pcpu = raw_smp_processor_id();
- 	unsigned long rb, set;
- 
-+	rb = PPC_BIT(52);	/* IS = 2 */
-+	if (kvm_is_radix(kvm)) {
-+		/* R=1 PRS=1 RIC=2 */
-+		asm volatile(PPC_TLBIEL(%0, %4, %3, %2, %1)
-+			     : : "r" (rb), "i" (1), "i" (1), "i" (2),
-+			       "r" (0) : "memory");
-+		for (set = 1; set < kvm->arch.tlb_sets; ++set) {
-+			rb += PPC_BIT(51);	/* increment set number */
-+			/* R=1 PRS=1 RIC=0 */
-+			asm volatile(PPC_TLBIEL(%0, %4, %3, %2, %1)
-+				     : : "r" (rb), "i" (1), "i" (1), "i" (0),
-+				       "r" (0) : "memory");
-+		}
-+	} else {
-+		for (set = 0; set < kvm->arch.tlb_sets; ++set) {
-+			/* R=0 PRS=0 RIC=0 */
-+			asm volatile(PPC_TLBIEL(%0, %4, %3, %2, %1)
-+				     : : "r" (rb), "i" (0), "i" (0), "i" (0),
-+				       "r" (0) : "memory");
-+			rb += PPC_BIT(51);	/* increment set number */
-+		}
-+	}
-+	asm volatile("ptesync": : :"memory");
-+}
-+
-+void kvmppc_check_need_tlb_flush(struct kvm *kvm, int pcpu,
-+				 struct kvm_nested_guest *nested)
-+{
-+	cpumask_t *need_tlb_flush;
-+
- 	/*
- 	 * On POWER9, individual threads can come in here, but the
- 	 * TLB is shared between the 4 threads in a core, hence
-@@ -820,17 +849,16 @@ void kvmppc_hpt_check_need_tlb_flush(struct kvm *kvm)
- 	if (cpu_has_feature(CPU_FTR_ARCH_300))
- 		pcpu = cpu_first_thread_sibling(pcpu);
- 
--	if (cpumask_test_cpu(pcpu, &kvm->arch.need_tlb_flush)) {
--		rb = PPC_BIT(52);	/* IS = 2 */
--		for (set = 0; set < kvm->arch.tlb_sets; ++set) {
--			asm volatile(PPC_TLBIEL(%0, %4, %3, %2, %1)
--				     : : "r" (rb), "i" (0), "i" (0), "i" (0),
--				       "r" (0) : "memory");
--			rb += PPC_BIT(51);	/* increment set number */
--		}
--		asm volatile("ptesync": : :"memory");
-+	if (nested)
-+		need_tlb_flush = &nested->need_tlb_flush;
-+	else
-+		need_tlb_flush = &kvm->arch.need_tlb_flush;
-+
-+	if (cpumask_test_cpu(pcpu, need_tlb_flush)) {
-+		flush_guest_tlb(kvm);
- 
- 		/* Clear the bit after the TLB flush */
--		cpumask_clear_cpu(pcpu, &kvm->arch.need_tlb_flush);
-+		cpumask_clear_cpu(pcpu, need_tlb_flush);
- 	}
- }
-+EXPORT_SYMBOL_GPL(kvmppc_check_need_tlb_flush);
-diff --git a/arch/powerpc/kvm/book3s_hv_rmhandlers.S b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-index 6bfa0c1..5df137d 100644
---- a/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-+++ b/arch/powerpc/kvm/book3s_hv_rmhandlers.S
-@@ -622,9 +622,11 @@ END_FTR_SECTION_IFCLR(CPU_FTR_ARCH_300)
- 	mtspr	SPRN_LPID,r7
- 	isync
- 
--	/* See if we need to flush the TLB. Hash has to be done in RM */
-+	/* See if we need to flush the TLB. */
- 	mr	r3, r9			/* kvm pointer */
--	bl	kvmppc_hpt_check_need_tlb_flush
-+	lhz	r4, PACAPACAINDEX(r13)	/* physical cpu number */
-+	li	r5, 0			/* nested vcpu pointer */
-+	bl	kvmppc_check_need_tlb_flush
- 	nop
- 	ld	r5, HSTATE_KVM_VCORE(r13)
- 
--- 
-2.7.4
+  Linux 5.1-rc3 (2019-03-31 14:39:29 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.2-1
+
+for you to fetch changes up to b2d0371d2e374facd45e115d3668086df13730ff:
+
+  KVM: s390: vsie: Return correct values for Invalid CRYCB format (2019-04-29 09:01:22 +0200)
+
+----------------------------------------------------------------
+KVM: s390: Features and fixes for 5.2
+
+- VSIE crypto fixes
+- new guest features for gen15
+- disable halt polling for nested virtualization with overcommit
+
+----------------------------------------------------------------
+Christian Borntraeger (9):
+      KVM: s390: add vector enhancements facility 2 to cpumodel
+      KVM: s390: add vector BCD enhancements facility to cpumodel
+      KVM: s390: add MSA9 to cpumodel
+      KVM: s390: provide query function for instructions returning 32 byte
+      KVM: s390: add enhanced sort facilty to cpu model
+      KVM: s390: add deflate conversion facilty to cpu model
+      KVM: s390: enable MSA9 keywrapping functions depending on cpu model
+      KVM: polling: add architecture backend to disable polling
+      KVM: s390: provide kvm_arch_no_poll function
+
+Eric Farman (1):
+      KVM: s390: Fix potential spectre warnings
+
+Pierre Morel (2):
+      KVM: s390: vsie: Do not shadow CRYCB when no AP and no keys
+      KVM: s390: vsie: Return correct values for Invalid CRYCB format
+
+ Documentation/virtual/kvm/devices/vm.txt |   3 +-
+ arch/s390/include/asm/cpacf.h            |   1 +
+ arch/s390/include/asm/kvm_host.h         |   2 +
+ arch/s390/include/uapi/asm/kvm.h         |   5 +-
+ arch/s390/kvm/Kconfig                    |   1 +
+ arch/s390/kvm/interrupt.c                |  11 ++-
+ arch/s390/kvm/kvm-s390.c                 | 117 ++++++++++++++++++++++++++++++-
+ arch/s390/kvm/vsie.c                     |  13 ++--
+ arch/s390/tools/gen_facilities.c         |   3 +
+ include/linux/kvm_host.h                 |  10 +++
+ tools/arch/s390/include/uapi/asm/kvm.h   |   3 +-
+ virt/kvm/Kconfig                         |   3 +
+ virt/kvm/kvm_main.c                      |   2 +-
+ 13 files changed, 163 insertions(+), 11 deletions(-)
 
