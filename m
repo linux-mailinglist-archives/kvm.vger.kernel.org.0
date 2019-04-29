@@ -2,42 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0501DED3
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2019 11:11:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D32CBDEB9
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2019 11:10:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727786AbfD2JLJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Apr 2019 05:11:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50652 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727454AbfD2JLI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 29 Apr 2019 05:11:08 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3T9Awtg031397
-        for <kvm@vger.kernel.org>; Mon, 29 Apr 2019 05:11:07 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2s5w2bk68x-1
+        id S1727773AbfD2JKQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Apr 2019 05:10:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53130 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727723AbfD2JKN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 29 Apr 2019 05:10:13 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3T99uw4043161
+        for <kvm@vger.kernel.org>; Mon, 29 Apr 2019 05:10:12 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2s5wg0j84a-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 29 Apr 2019 05:11:01 -0400
+        for <kvm@vger.kernel.org>; Mon, 29 Apr 2019 05:10:12 -0400
 Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
         Mon, 29 Apr 2019 10:10:10 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 29 Apr 2019 10:10:06 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3T9A5q060227810
+        Mon, 29 Apr 2019 10:10:07 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3T9A5JR50790448
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Mon, 29 Apr 2019 09:10:05 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5C32652073;
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A18E711C050;
+        Mon, 29 Apr 2019 09:10:05 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9153111C054;
         Mon, 29 Apr 2019 09:10:05 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 4B5365206D;
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
         Mon, 29 Apr 2019 09:10:05 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id 0CFCB20F606; Mon, 29 Apr 2019 11:10:05 +0200 (CEST)
+        id 501EF20F5D4; Mon, 29 Apr 2019 11:10:05 +0200 (CEST)
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
@@ -48,18 +51,18 @@ Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         David Hildenbrand <david@redhat.com>,
         Eric Farman <farman@linux.ibm.com>,
         Pierre Morel <pmorel@linux.ibm.com>
-Subject: [GIT PULL 07/12] KVM: s390: add deflate conversion facilty to cpu model
-Date:   Mon, 29 Apr 2019 11:09:57 +0200
+Subject: [GIT PULL 08/12] KVM: s390: enable MSA9 keywrapping functions depending on cpu model
+Date:   Mon, 29 Apr 2019 11:09:58 +0200
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190429091002.71164-1-borntraeger@de.ibm.com>
 References: <20190429091002.71164-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 19042909-0020-0000-0000-000003376725
+x-cbid: 19042909-4275-0000-0000-0000032F7819
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19042909-0021-0000-0000-00002189DF16
-Message-Id: <20190429091002.71164-8-borntraeger@de.ibm.com>
+x-cbparentid: 19042909-4276-0000-0000-0000383ECCC0
+Message-Id: <20190429091002.71164-9-borntraeger@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-29_05:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
@@ -72,107 +75,112 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This enables stfle.151 and adds the subfunctions for DFLTCC. Bit 151 is
-added to the list of facilities that will be enabled when there is no
-cpu model involved as DFLTCC requires no additional handling from
-userspace, e.g. for migration.
-
-Please note that a cpu model enabled user space can and will have the
-final decision on the facility bits for a guests.
+Instead of adding a new machine option to disable/enable the keywrapping
+options of pckmo (like for AES and DEA) we can now use the CPU model to
+decide. As ECC is also wrapped with the AES key we need that to be
+enabled.
 
 Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Reviewed-by: Collin Walling <walling@linux.ibm.com>
 Reviewed-by: David Hildenbrand <david@redhat.com>
 ---
- arch/s390/include/uapi/asm/kvm.h |  3 ++-
- arch/s390/kvm/kvm-s390.c         | 19 +++++++++++++++++++
- arch/s390/tools/gen_facilities.c |  1 +
- 3 files changed, 22 insertions(+), 1 deletion(-)
+ arch/s390/include/asm/kvm_host.h |  1 +
+ arch/s390/kvm/kvm-s390.c         | 27 ++++++++++++++++++++++++++-
+ arch/s390/kvm/vsie.c             |  5 ++++-
+ 3 files changed, 31 insertions(+), 2 deletions(-)
 
-diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
-index eba5bac08348..47104e5b47fd 100644
---- a/arch/s390/include/uapi/asm/kvm.h
-+++ b/arch/s390/include/uapi/asm/kvm.h
-@@ -154,7 +154,8 @@ struct kvm_s390_vm_cpu_subfunc {
- 	__u8 kma[16];		/* with MSA8 */
- 	__u8 kdsa[16];		/* with MSA9 */
- 	__u8 sortl[32];		/* with STFLE.150 */
--	__u8 reserved[1760];
-+	__u8 dfltcc[32];	/* with STFLE.151 */
-+	__u8 reserved[1728];
- };
- 
- /* kvm attributes for crypto */
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index c47e22bba87f..e224246ff93c 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -278,6 +278,7 @@ struct kvm_s390_sie_block {
+ #define ECD_HOSTREGMGMT	0x20000000
+ #define ECD_MEF		0x08000000
+ #define ECD_ETOKENF	0x02000000
++#define ECD_ECC		0x00200000
+ 	__u32	ecd;			/* 0x01c8 */
+ 	__u8	reserved1cc[18];	/* 0x01cc */
+ 	__u64	pp;			/* 0x01de */
 diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 757f76bba9ea..38ca8324a91a 100644
+index 38ca8324a91a..eb68ada1334b 100644
 --- a/arch/s390/kvm/kvm-s390.c
 +++ b/arch/s390/kvm/kvm-s390.c
-@@ -335,6 +335,7 @@ static inline void __insn32_query(unsigned int opcode, u8 query[32])
+@@ -2890,6 +2890,25 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.enabled_gmap = vcpu->arch.gmap;
  }
  
- #define INSN_SORTL 0xb938
-+#define INSN_DFLTCC 0xb939
- 
- static void kvm_s390_cpu_feat_init(void)
- {
-@@ -390,6 +391,9 @@ static void kvm_s390_cpu_feat_init(void)
- 	if (test_facility(150)) /* SORTL */
- 		__insn32_query(INSN_SORTL, kvm_s390_available_subfunc.sortl);
- 
-+	if (test_facility(151)) /* DFLTCC */
-+		__insn32_query(INSN_DFLTCC, kvm_s390_available_subfunc.dfltcc);
++static bool kvm_has_pckmo_subfunc(struct kvm *kvm, unsigned long nr)
++{
++	if (test_bit_inv(nr, (unsigned long *)&kvm->arch.model.subfuncs.pckmo) &&
++	    test_bit_inv(nr, (unsigned long *)&kvm_s390_available_subfunc.pckmo))
++		return true;
++	return false;
++}
 +
- 	if (MACHINE_HAS_ESOP)
- 		allow_cpu_feat(KVM_S390_VM_CPU_FEAT_ESOP);
++static bool kvm_has_pckmo_ecc(struct kvm *kvm)
++{
++	/* At least one ECC subfunction must be present */
++	return kvm_has_pckmo_subfunc(kvm, 32) ||
++	       kvm_has_pckmo_subfunc(kvm, 33) ||
++	       kvm_has_pckmo_subfunc(kvm, 34) ||
++	       kvm_has_pckmo_subfunc(kvm, 40) ||
++	       kvm_has_pckmo_subfunc(kvm, 41);
++
++}
++
+ static void kvm_s390_vcpu_crypto_setup(struct kvm_vcpu *vcpu)
+ {
  	/*
-@@ -1361,6 +1365,11 @@ static int kvm_s390_set_processor_subfunc(struct kvm *kvm,
- 		 ((unsigned long *) &kvm->arch.model.subfuncs.sortl)[1],
- 		 ((unsigned long *) &kvm->arch.model.subfuncs.sortl)[2],
- 		 ((unsigned long *) &kvm->arch.model.subfuncs.sortl)[3]);
-+	VM_EVENT(kvm, 3, "SET: guest DFLTCC subfunc 0x%16.16lx.%16.16lx.%16.16lx.%16.16lx",
-+		 ((unsigned long *) &kvm->arch.model.subfuncs.dfltcc)[0],
-+		 ((unsigned long *) &kvm->arch.model.subfuncs.dfltcc)[1],
-+		 ((unsigned long *) &kvm->arch.model.subfuncs.dfltcc)[2],
-+		 ((unsigned long *) &kvm->arch.model.subfuncs.dfltcc)[3]);
+@@ -2902,13 +2921,19 @@ static void kvm_s390_vcpu_crypto_setup(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.sie_block->crycbd = vcpu->kvm->arch.crypto.crycbd;
+ 	vcpu->arch.sie_block->ecb3 &= ~(ECB3_AES | ECB3_DEA);
+ 	vcpu->arch.sie_block->eca &= ~ECA_APIE;
++	vcpu->arch.sie_block->ecd &= ~ECD_ECC;
  
- 	return 0;
- }
-@@ -1537,6 +1546,11 @@ static int kvm_s390_get_processor_subfunc(struct kvm *kvm,
- 		 ((unsigned long *) &kvm->arch.model.subfuncs.sortl)[1],
- 		 ((unsigned long *) &kvm->arch.model.subfuncs.sortl)[2],
- 		 ((unsigned long *) &kvm->arch.model.subfuncs.sortl)[3]);
-+	VM_EVENT(kvm, 3, "GET: guest DFLTCC subfunc 0x%16.16lx.%16.16lx.%16.16lx.%16.16lx",
-+		 ((unsigned long *) &kvm->arch.model.subfuncs.dfltcc)[0],
-+		 ((unsigned long *) &kvm->arch.model.subfuncs.dfltcc)[1],
-+		 ((unsigned long *) &kvm->arch.model.subfuncs.dfltcc)[2],
-+		 ((unsigned long *) &kvm->arch.model.subfuncs.dfltcc)[3]);
+ 	if (vcpu->kvm->arch.crypto.apie)
+ 		vcpu->arch.sie_block->eca |= ECA_APIE;
  
- 	return 0;
+ 	/* Set up protected key support */
+-	if (vcpu->kvm->arch.crypto.aes_kw)
++	if (vcpu->kvm->arch.crypto.aes_kw) {
+ 		vcpu->arch.sie_block->ecb3 |= ECB3_AES;
++		/* ecc is also wrapped with AES key */
++		if (kvm_has_pckmo_ecc(vcpu->kvm))
++			vcpu->arch.sie_block->ecd |= ECD_ECC;
++	}
++
+ 	if (vcpu->kvm->arch.crypto.dea_kw)
+ 		vcpu->arch.sie_block->ecb3 |= ECB3_DEA;
  }
-@@ -1600,6 +1614,11 @@ static int kvm_s390_get_machine_subfunc(struct kvm *kvm,
- 		 ((unsigned long *) &kvm_s390_available_subfunc.sortl)[1],
- 		 ((unsigned long *) &kvm_s390_available_subfunc.sortl)[2],
- 		 ((unsigned long *) &kvm_s390_available_subfunc.sortl)[3]);
-+	VM_EVENT(kvm, 3, "GET: host  DFLTCC subfunc 0x%16.16lx.%16.16lx.%16.16lx.%16.16lx",
-+		 ((unsigned long *) &kvm_s390_available_subfunc.dfltcc)[0],
-+		 ((unsigned long *) &kvm_s390_available_subfunc.dfltcc)[1],
-+		 ((unsigned long *) &kvm_s390_available_subfunc.dfltcc)[2],
-+		 ((unsigned long *) &kvm_s390_available_subfunc.dfltcc)[3]);
+diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+index d62fa148558b..c6983d962abf 100644
+--- a/arch/s390/kvm/vsie.c
++++ b/arch/s390/kvm/vsie.c
+@@ -288,6 +288,7 @@ static int shadow_crycb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+ 	const u32 crycb_addr = crycbd_o & 0x7ffffff8U;
+ 	unsigned long *b1, *b2;
+ 	u8 ecb3_flags;
++	u32 ecd_flags;
+ 	int apie_h;
+ 	int key_msk = test_kvm_facility(vcpu->kvm, 76);
+ 	int fmt_o = crycbd_o & CRYCB_FORMAT_MASK;
+@@ -320,7 +321,8 @@ static int shadow_crycb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+ 	/* we may only allow it if enabled for guest 2 */
+ 	ecb3_flags = scb_o->ecb3 & vcpu->arch.sie_block->ecb3 &
+ 		     (ECB3_AES | ECB3_DEA);
+-	if (!ecb3_flags)
++	ecd_flags = scb_o->ecd & vcpu->arch.sie_block->ecd & ECD_ECC;
++	if (!ecb3_flags && !ecd_flags)
+ 		goto end;
  
- 	return 0;
- }
-diff --git a/arch/s390/tools/gen_facilities.c b/arch/s390/tools/gen_facilities.c
-index 1ec6bed785e8..cead9e0dcffb 100644
---- a/arch/s390/tools/gen_facilities.c
-+++ b/arch/s390/tools/gen_facilities.c
-@@ -94,6 +94,7 @@ static struct facility_def facility_defs[] = {
- 			139, /* multiple epoch facility */
- 			146, /* msa extension 8 */
- 			150, /* enhanced sort */
-+			151, /* deflate conversion */
- 			155, /* msa extension 9 */
- 			-1  /* END */
- 		}
+ 	/* copy only the wrapping keys */
+@@ -329,6 +331,7 @@ static int shadow_crycb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+ 		return set_validity_icpt(scb_s, 0x0035U);
+ 
+ 	scb_s->ecb3 |= ecb3_flags;
++	scb_s->ecd |= ecd_flags;
+ 
+ 	/* xor both blocks in one run */
+ 	b1 = (unsigned long *) vsie_page->crycb.dea_wrapping_key_mask;
 -- 
 2.19.1
 
