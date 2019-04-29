@@ -2,152 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 16544E819
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2019 18:50:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA091E82A
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2019 18:54:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728829AbfD2QuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Apr 2019 12:50:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45548 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728621AbfD2QuM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 29 Apr 2019 12:50:12 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3TGhnxG122996
-        for <kvm@vger.kernel.org>; Mon, 29 Apr 2019 12:50:10 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2s62dh7ek4-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 29 Apr 2019 12:50:10 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
-        Mon, 29 Apr 2019 17:50:08 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 29 Apr 2019 17:50:05 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3TGo4rD38994060
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 29 Apr 2019 16:50:04 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 27AF011C052;
-        Mon, 29 Apr 2019 16:50:04 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AAE7611C04A;
-        Mon, 29 Apr 2019 16:50:03 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.152.224.116])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 29 Apr 2019 16:50:03 +0000 (GMT)
-Date:   Mon, 29 Apr 2019 18:50:02 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     borntraeger@de.ibm.com, alex.williamson@redhat.com,
-        cohuck@redhat.com, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        frankja@linux.ibm.com, akrowiak@linux.ibm.com, david@redhat.com,
-        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
-        freude@linux.ibm.com, mimu@linux.ibm.com
-Subject: Re: [PATCH v7 3/4] s390: ap: implement PAPQ AQIC interception in
- kernel
-In-Reply-To: <1556283688-556-4-git-send-email-pmorel@linux.ibm.com>
-References: <1556283688-556-1-git-send-email-pmorel@linux.ibm.com>
-        <1556283688-556-4-git-send-email-pmorel@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1728803AbfD2QyM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Apr 2019 12:54:12 -0400
+Received: from mail-eopbgr750051.outbound.protection.outlook.com ([40.107.75.51]:64223
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728520AbfD2QyM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Apr 2019 12:54:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2cS2Tbwu5wABgFx0DVz1/x77dFfsdmtrFruoRp8B/4w=;
+ b=Di1LCS3UX5gmP54Vvo90HrLKB2MsVQXglntN3QkDijA+1I6lrYVkSJGYwKjdd0Qe8ZyEbEoIeoYU2UJ2euHrtVUlx9y1avuYOuoo6pl/V8Sta3THuW1okLpYGabi8y2/7N3tcaUCCcErP6y+SRNhlg1NVvDhzFE2jVPMb+kjJxM=
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.116.31) by
+ DM6PR12MB3354.namprd12.prod.outlook.com (20.178.31.225) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1835.15; Mon, 29 Apr 2019 16:54:08 +0000
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::9183:846f:a93e:9a43]) by DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::9183:846f:a93e:9a43%5]) with mapi id 15.20.1835.016; Mon, 29 Apr 2019
+ 16:54:08 +0000
+From:   "Singh, Brijesh" <brijesh.singh@amd.com>
+To:     "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>, Borislav Petkov <bp@suse.de>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH v1 02/10] KVM: SVM: Add KVM_SEND_UPDATE_DATA command
+Thread-Topic: [RFC PATCH v1 02/10] KVM: SVM: Add KVM_SEND_UPDATE_DATA command
+Thread-Index: AQHU+rgr5ZWFEHS1e0SVdIqZ4Ix/v6ZO6KyAgAR6MoA=
+Date:   Mon, 29 Apr 2019 16:54:08 +0000
+Message-ID: <0883651a-ac95-022a-1a16-978ddb2cc35d@amd.com>
+References: <20190424160942.13567-1-brijesh.singh@amd.com>
+ <20190424160942.13567-3-brijesh.singh@amd.com>
+ <c0cf8d9b-4b47-f578-bc51-29739a3c2f8d@amd.com>
+In-Reply-To: <c0cf8d9b-4b47-f578-bc51-29739a3c2f8d@amd.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN2PR01CA0002.prod.exchangelabs.com (2603:10b6:804:2::12)
+ To DM6PR12MB2682.namprd12.prod.outlook.com (2603:10b6:5:4a::31)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brijesh.singh@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [165.204.77.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 41c6f68c-7ab1-49bd-870b-08d6ccc34baf
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:DM6PR12MB3354;
+x-ms-traffictypediagnostic: DM6PR12MB3354:
+x-microsoft-antispam-prvs: <DM6PR12MB3354911405F54EB45C998513E5390@DM6PR12MB3354.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 0022134A87
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(396003)(39860400002)(366004)(136003)(346002)(376002)(189003)(199004)(43544003)(14454004)(186003)(2906002)(110136005)(478600001)(11346002)(2616005)(81166006)(6506007)(53546011)(386003)(8676002)(81156014)(446003)(7416002)(8936002)(76176011)(102836004)(36756003)(26005)(6116002)(3846002)(54906003)(316002)(5660300002)(2501003)(68736007)(66066001)(229853002)(4326008)(86362001)(6246003)(31686004)(476003)(97736004)(31696002)(256004)(6486002)(14444005)(53936002)(6436002)(6512007)(25786009)(73956011)(66946007)(66446008)(64756008)(66556008)(66476007)(71190400001)(305945005)(71200400001)(7736002)(52116002)(99286004)(486006);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3354;H:DM6PR12MB2682.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: cIYiNpj+sh30PnY0uxvSpRgiQuNu+gOitxpV5wRvpFMM6yMugvxkiq2wV9JKlIrLKW73hztg0v/C05yGOE7uzYF0wzvqkHmh/gXsep3P3ddKza6wxQYlTvOmWkoiT012tRF1KNjjEjvO+asiPH9JDpx8ssb7FR6dmHcR6UlDvDI2cY85SzIywzcmzgPr0cFKciPvju7/EMT18V2ophTUmvWzkH+qmdOB1ULVvrPAkWvt50xSaEWbVqGD2od61hm6TivoATjn571ZYylzIGeGtdaYrK4g1OiuFn28Gq9a2t1JEA/81EY47KkrTmQbrc/U1dzLH2otjsf63q9MCCE+V/HFeIRsq9dwsJ2bWEI5QdCmPLTY+gwZelbyTfMKZjI7TxHDFowpn2X4FqaoMIQ/SgWt8eM8f6whMS0kyC9dCRc=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <ED6640A095C20241AFFA51CB3FF8F15E@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19042916-4275-0000-0000-0000032F9E92
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19042916-4276-0000-0000-0000383EF4DA
-Message-Id: <20190429185002.6041eecc.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-29_09:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=877 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1904290114
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41c6f68c-7ab1-49bd-870b-08d6ccc34baf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Apr 2019 16:54:08.3670
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3354
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 26 Apr 2019 15:01:27 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
-
-> +static struct ap_queue_status vfio_ap_setirq(struct vfio_ap_queue *q)
-> +{
-> +	struct ap_qirq_ctrl aqic_gisa = {};
-> +	struct ap_queue_status status = {};
-> +	struct kvm_s390_gisa *gisa;
-> +	struct kvm *kvm;
-> +	unsigned long h_nib, h_pfn;
-> +	int ret;
-> +
-> +	q->a_pfn = q->a_nib >> PAGE_SHIFT;
-> +	ret = vfio_pin_pages(mdev_dev(q->matrix_mdev->mdev), &q->a_pfn, 1,
-> +			     IOMMU_READ | IOMMU_WRITE, &h_pfn);
-> +	switch (ret) {
-> +	case 1:
-> +		break;
-> +	case -EINVAL:
-> +	case -E2BIG:
-> +		status.response_code = AP_RESPONSE_INVALID_ADDRESS;
-> +		/* Fallthrough */
-> +	default:
-> +		return status;
-
-Can we actually hit the default label? AFICT you would return an
-all-zero status, i.e. status.response_code == 0 'Normal completion'.
-
-> +	}
-> +
-> +	kvm = q->matrix_mdev->kvm;
-> +	gisa = kvm->arch.gisa_int.origin;
-> +
-> +	h_nib = (h_pfn << PAGE_SHIFT) | (q->a_nib & ~PAGE_MASK);
-> +	aqic_gisa.gisc = q->a_isc;
-> +	aqic_gisa.isc = kvm_s390_gisc_register(kvm, q->a_isc);
-> +	aqic_gisa.ir = 1;
-> +	aqic_gisa.gisa = gisa->next_alert >> 4;
-
-Why gisa->next_alert? Isn't this supposed to get set to gisa origin
-(without some bits on the left)?
-
-> +
-> +	status = ap_aqic(q->apqn, aqic_gisa, (void *)h_nib);
-> +	switch (status.response_code) {
-> +	case AP_RESPONSE_NORMAL:
-> +		/* See if we did clear older IRQ configuration */
-> +		if (q->p_pfn)
-> +			vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
-> +					 &q->p_pfn, 1);
-> +		if (q->p_isc != VFIO_AP_ISC_INVALID)
-> +			kvm_s390_gisc_unregister(kvm, q->p_isc);
-> +		q->p_pfn = q->a_pfn;
-> +		q->p_isc = q->a_isc;
-> +		break;
-> +	case AP_RESPONSE_OTHERWISE_CHANGED:
-> +		/* We could not modify IRQ setings: clear new configuration */
-> +		vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev), &q->a_pfn, 1);
-> +		kvm_s390_gisc_unregister(kvm, q->a_isc);
-
-Hm, see below. Wouldn't you want to set a_isc to VFIO_AP_ISC_INVALID?
-
-> +		break;
-> +	default:	/* Fall Through */
-
-Is it 'break' or is it 'Fall Through'?
-
-> +		pr_warn("%s: apqn %04x: response: %02x\n", __func__, q->apqn,
-> +			status.response_code);
-> +		vfio_ap_free_irq_data(q);
-> +		break;
-> +	}
-> +
-> +	return status;
-> +}
-
+DQoNCk9uIDQvMjYvMTkgMzozMSBQTSwgTGVuZGFja3ksIFRob21hcyB3cm90ZToNCi4uLg0KDQo+
+PiAgIA0KPj4gICBzdGF0aWMgdW5zaWduZWQgaW50IG1heF9zZXZfYXNpZDsNCj4+ICAgc3RhdGlj
+IHVuc2lnbmVkIGludCBtaW5fc2V2X2FzaWQ7DQo+PiArc3RhdGljIHVuc2lnbmVkIGxvbmcgbWVf
+bWFzazsNCj4gDQo+IHNldl9tZV9tYXNrID8NCj4gDQoNCkFncmVlZC4NCg0KPj4gICBzdGF0aWMg
+dW5zaWduZWQgbG9uZyAqc2V2X2FzaWRfYml0bWFwOw0KPj4gICAjZGVmaW5lIF9fc21lX3BhZ2Vf
+cGEoeCkgX19zbWVfc2V0KHBhZ2VfdG9fcGZuKHgpIDw8IFBBR0VfU0hJRlQpDQo+PiAgIA0KPj4g
+QEAgLTEyMTYsMTUgKzEyMTcsMjEgQEAgc3RhdGljIGludCBhdmljX2dhX2xvZ19ub3RpZmllcih1
+MzIgZ2FfdGFnKQ0KPj4gICBzdGF0aWMgX19pbml0IGludCBzZXZfaGFyZHdhcmVfc2V0dXAodm9p
+ZCkNCj4+ICAgew0KPj4gICAJc3RydWN0IHNldl91c2VyX2RhdGFfc3RhdHVzICpzdGF0dXM7DQo+
+PiArCWludCBlYXgsIGVieDsNCj4+ICAgCWludCByYzsNCj4+ICAgDQo+PiAtCS8qIE1heGltdW0g
+bnVtYmVyIG9mIGVuY3J5cHRlZCBndWVzdHMgc3VwcG9ydGVkIHNpbXVsdGFuZW91c2x5ICovDQo+
+PiAtCW1heF9zZXZfYXNpZCA9IGNwdWlkX2VjeCgweDgwMDAwMDFGKTsNCj4+ICsJLyoNCj4+ICsJ
+ICogUXVlcnkgdGhlIG1lbW9yeSBlbmNyeXB0aW9uIGluZm9ybWF0aW9uLg0KPj4gKwkgKiAgRUJY
+OiAgQml0IDA6NSBQYWdldGFibGUgYml0IHBvc2l0aW9uIHVzZWQgdG8gaW5kaWNhdGUgZW5jcnlw
+dGlvbiAoYWthIENiaXQpLg0KPj4gKwkgKiAgRUNYOiAgTWF4aW11bSBudW1iZXIgb2YgZW5jcnlw
+dGVkIGd1ZXN0cyBzdXBwb3J0ZWQgc2ltdWx0YW5lb3VzbHkuDQo+PiArCSAqICBFRFg6ICBNaW5p
+bXVtIEFTSUQgdmFsdWUgdGhhdCBzaG91bGQgYmUgdXNlZCBmb3IgU0VWIGd1ZXN0Lg0KPj4gKwkg
+Ki8NCj4+ICsJY3B1aWQoMHg4MDAwMDAxZiwgJmVheCwgJmVieCwgJm1heF9zZXZfYXNpZCwgJm1p
+bl9zZXZfYXNpZCk7DQo+PiAgIA0KPj4gICAJaWYgKCFtYXhfc2V2X2FzaWQpDQo+PiAgIAkJcmV0
+dXJuIDE7DQo+PiAgIA0KPj4gLQkvKiBNaW5pbXVtIEFTSUQgdmFsdWUgdGhhdCBzaG91bGQgYmUg
+dXNlZCBmb3IgU0VWIGd1ZXN0ICovDQo+PiArCW1lX21hc2sgPSAxVUwgPDwgKGVieCAmIDB4M2Yp
+Ow0KPj4gICAJbWluX3Nldl9hc2lkID0gY3B1aWRfZWR4KDB4ODAwMDAwMUYpOw0KPiANCj4gWW91
+IGNhbiByZW1vdmUgdGhpcyBzaW5jZSB5b3Ugb2J0YWluZWQgaXQgd2l0aCB0aGUgY3B1aWQoKSBj
+YWxsIGFib3ZlLg0KPiANCg0KSSB0aG91Z2h0IEkgcmVtb3ZlZCBpdCBidXQuLiBJIHdpbGwgdGFr
+ZSBjYXJlIGluIG5leHQgcmV2Lg0KDQo+PiAgIA0KPj4gICAJLyogSW5pdGlhbGl6ZSBTRVYgQVNJ
+RCBiaXRtYXAgKi8NCj4+IEBAIC03MDUzLDYgKzcwNjAsMTE4IEBAIHN0YXRpYyBpbnQgc2V2X3Nl
+bmRfc3RhcnQoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3Qga3ZtX3Nldl9jbWQgKmFyZ3ApDQo+PiAg
+IAlyZXR1cm4gcmV0Ow0KPj4gICB9DQo+PiAgIA0KPj4gK3N0YXRpYyBpbnQgc2V2X3NlbmRfdXBk
+YXRlX2RhdGEoc3RydWN0IGt2bSAqa3ZtLCBzdHJ1Y3Qga3ZtX3Nldl9jbWQgKmFyZ3ApDQo+PiAr
+ew0KPj4gKwlzdHJ1Y3Qga3ZtX3Nldl9pbmZvICpzZXYgPSAmdG9fa3ZtX3N2bShrdm0pLT5zZXZf
+aW5mbzsNCj4+ICsJc3RydWN0IHNldl9kYXRhX3NlbmRfdXBkYXRlX2RhdGEgKmRhdGE7DQo+PiAr
+CXN0cnVjdCBrdm1fc2V2X3NlbmRfdXBkYXRlX2RhdGEgcGFyYW1zOw0KPj4gKwl2b2lkICpoZHIg
+PSBOVUxMLCAqdHJhbnNfZGF0YSA9IE5VTEw7DQo+PiArCXN0cnVjdCBwYWdlICoqZ3Vlc3RfcGFn
+ZSA9IE5VTEw7DQo+PiArCXVuc2lnbmVkIGxvbmcgbjsNCj4+ICsJaW50IHJldCwgb2Zmc2V0Ow0K
+Pj4gKw0KPj4gKwlpZiAoIXNldl9ndWVzdChrdm0pKQ0KPj4gKwkJcmV0dXJuIC1FTk9UVFk7DQo+
+PiArDQo+PiArCWlmIChjb3B5X2Zyb21fdXNlcigmcGFyYW1zLCAodm9pZCBfX3VzZXIgKikodWlu
+dHB0cl90KWFyZ3AtPmRhdGEsDQo+PiArCQkJc2l6ZW9mKHN0cnVjdCBrdm1fc2V2X3NlbmRfdXBk
+YXRlX2RhdGEpKSkNCj4+ICsJCXJldHVybiAtRUZBVUxUOw0KPj4gKw0KPj4gKwlkYXRhID0ga3ph
+bGxvYyhzaXplb2YoKmRhdGEpLCBHRlBfS0VSTkVMKTsNCj4+ICsJaWYgKCFkYXRhKQ0KPj4gKwkJ
+cmV0dXJuIC1FTk9NRU07DQo+PiArDQo+PiArCS8qIHVzZXJzcGFjZSB3YW50cyB0byBxdWVyeSBl
+aXRoZXIgaGVhZGVyIG9yIHRyYW5zIGxlbmd0aCAqLw0KPj4gKwlpZiAoIXBhcmFtcy50cmFuc19s
+ZW4gfHwgIXBhcmFtcy5oZHJfbGVuKQ0KPj4gKwkJZ290byBjbWQ7DQo+PiArDQo+PiArCXJldCA9
+IC1FSU5WQUw7DQo+PiArCWlmICghcGFyYW1zLnRyYW5zX3VhZGRyIHx8ICFwYXJhbXMuZ3Vlc3Rf
+dWFkZHIgfHwNCj4+ICsJICAgICFwYXJhbXMuZ3Vlc3RfbGVuIHx8ICFwYXJhbXMuaGRyX3VhZGRy
+KQ0KPj4gKwkJZ290byBlX2ZyZWU7DQo+PiArDQo+PiArCS8qIENoZWNrIGlmIHdlIGFyZSBjcm9z
+c2luZyB0aGUgcGFnZSBib3VuZHJ5ICovDQo+PiArCXJldCA9IC1FSU5WQUw7DQo+PiArCW9mZnNl
+dCA9IHBhcmFtcy5ndWVzdF91YWRkciAmIChQQUdFX1NJWkUgLSAxKTsNCj4+ICsJaWYgKChwYXJh
+bXMuZ3Vlc3RfbGVuICsgb2Zmc2V0ID4gUEFHRV9TSVpFKSkNCj4+ICsJCWdvdG8gZV9mcmVlOw0K
+Pj4gKw0KPj4gKwlyZXQgPSAtRU5PTUVNOw0KPj4gKwloZHIgPSBrbWFsbG9jKHBhcmFtcy5oZHJf
+bGVuLCBHRlBfS0VSTkVMKTsNCj4+ICsJaWYgKCFoZHIpDQo+PiArCQlnb3RvIGVfZnJlZTsNCj4+
+ICsNCj4+ICsJZGF0YS0+aGRyX2FkZHJlc3MgPSBfX3BzcF9wYShoZHIpOw0KPj4gKwlkYXRhLT5o
+ZHJfbGVuID0gcGFyYW1zLmhkcl9sZW47DQo+PiArDQo+PiArCXJldCA9IC1FTk9NRU07DQo+PiAr
+CXRyYW5zX2RhdGEgPSBrbWFsbG9jKHBhcmFtcy50cmFuc19sZW4sIEdGUF9LRVJORUwpOw0KPj4g
+KwlpZiAoIXRyYW5zX2RhdGEpDQo+PiArCQlnb3RvIGVfZnJlZTsNCj4+ICsNCj4+ICsJZGF0YS0+
+dHJhbnNfYWRkcmVzcyA9IF9fcHNwX3BhKHRyYW5zX2RhdGEpOw0KPj4gKwlkYXRhLT50cmFuc19s
+ZW4gPSBwYXJhbXMudHJhbnNfbGVuOw0KPj4gKw0KPj4gKwkvKiBQaW4gZ3Vlc3QgbWVtb3J5ICov
+DQo+PiArCXJldCA9IC1FRkFVTFQ7DQo+PiArCWd1ZXN0X3BhZ2UgPSBzZXZfcGluX21lbW9yeShr
+dm0sIHBhcmFtcy5ndWVzdF91YWRkciAmIFBBR0VfTUFTSywNCj4+ICsJCQkJICAgIFBBR0VfU0la
+RSwgJm4sIDApOw0KPj4gKwlpZiAoIWd1ZXN0X3BhZ2UpDQo+PiArCQlnb3RvIGVfZnJlZTsNCj4+
+ICsNCj4+ICsJZGF0YS0+Z3Vlc3RfYWRkcmVzcyA9IF9fc21lX3BhZ2VfcGEoZ3Vlc3RfcGFnZVsw
+XSkgKyBvZmZzZXQ7DQo+IA0KPiBJZiB0aGUgQy1iaXQgbmVlZHMgdG8gYmUgc2V0IHJlZ2FyZGxl
+c3MgYmVsb3csIHRoZW4geW91IGRvbid0IG5lZWQgdGhlDQo+IF9fc21lIHZlcnNpb24gb2YgdGhp
+cy4NCj4gDQoNCk5vdGVkLg0KDQo=
