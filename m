@@ -2,176 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 69875EA85
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2019 20:52:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2118ED33
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 01:14:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729125AbfD2Sw3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Apr 2019 14:52:29 -0400
-Received: from terminus.zytor.com ([198.137.202.136]:55089 "EHLO
-        terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729027AbfD2Sw2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Apr 2019 14:52:28 -0400
-Received: from terminus.zytor.com (localhost [127.0.0.1])
-        by terminus.zytor.com (8.15.2/8.15.2) with ESMTPS id x3TIq3m01032703
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-        Mon, 29 Apr 2019 11:52:03 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 terminus.zytor.com x3TIq3m01032703
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2019041745; t=1556563924;
-        bh=xrDkEfZHqOrpJnGdbeTXyzFwzlz6S9jYWqO5Soq4z6g=;
-        h=Date:From:Cc:Reply-To:In-Reply-To:References:To:Subject:From;
-        b=uWs5FBirevUZWCNC6P0DPhaAl4R5GQuoYxWZeYKBq1JlU01ZBMtkqVcQ7cb+Yhm0W
-         eheN2psQahNsb+YIBzs8CR6tXojw5QmMREoMO/qV6XfcVSf4ynvc3Z5A7vDcpbodo2
-         yRUP3QQf5ovj8M9xe07c7V/o6JQXCtZHYnJOJYj7hl2ZlWYblfyMWyfMSOvLu0MVhj
-         3h3qxFRQK2FBooBjKzsoLD7KukLXjb4ftzXyyZ6V1jP8mTGkUgojfS+q1dD9dMgRy7
-         hCEr06qroyzjf4guJukpfc0evIln2Vy7t8wNETcKgGt9S27fnXMYfmcZJluASgi37F
-         GH0hxP1XNrvBg==
-Received: (from tipbot@localhost)
-        by terminus.zytor.com (8.15.2/8.15.2/Submit) id x3TIq25r1032698;
-        Mon, 29 Apr 2019 11:52:02 -0700
-Date:   Mon, 29 Apr 2019 11:52:02 -0700
-X-Authentication-Warning: terminus.zytor.com: tipbot set sender to tipbot@zytor.com using -f
-From:   tip-bot for Sebastian Andrzej Siewior <tipbot@zytor.com>
-Message-ID: <tip-eeec00d73be2e92ebce16c89154726250f2c80ef@git.kernel.org>
-Cc:     jannh@google.com, bp@suse.de, dave.hansen@intel.com,
-        linux-kernel@vger.kernel.org, hpa@zytor.com, bigeasy@linutronix.de,
-        riel@surriel.com, kurt.kanzenbach@linutronix.de,
-        luto@amacapital.net, tglx@linutronix.de, pbonzini@redhat.com,
-        kvm@vger.kernel.org, mingo@kernel.org, x86@kernel.org
-Reply-To: jannh@google.com, bp@suse.de, riel@surriel.com,
-          bigeasy@linutronix.de, linux-kernel@vger.kernel.org,
-          hpa@zytor.com, dave.hansen@intel.com, pbonzini@redhat.com,
-          tglx@linutronix.de, kvm@vger.kernel.org, luto@amacapital.net,
-          kurt.kanzenbach@linutronix.de, x86@kernel.org, mingo@kernel.org
-In-Reply-To: <20190429163953.gqxgsc5okqxp4olv@linutronix.de>
-References: <20190429163953.gqxgsc5okqxp4olv@linutronix.de>
-To:     linux-tip-commits@vger.kernel.org
-Subject: [tip:x86/fpu] x86/fpu: Fault-in user stack if
- copy_fpstate_to_sigframe() fails
-Git-Commit-ID: eeec00d73be2e92ebce16c89154726250f2c80ef
-X-Mailer: tip-git-log-daemon
-Robot-ID: <tip-bot.git.kernel.org>
-Robot-Unsubscribe: Contact <mailto:hpa@kernel.org> to get blacklisted from
- these emails
+        id S1729702AbfD2XOI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Apr 2019 19:14:08 -0400
+Received: from ip27.imatronix.com ([200.63.97.108]:56510 "EHLO
+        cpanel.imatronix.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729661AbfD2XOI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Apr 2019 19:14:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=imatronix.cl; s=default; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:References:Cc:To:Subject:From:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=68m7uT0bHosMUfaa1X4LgSKvrOkaYFrivyDHYBkavc4=; b=UF+cCNLhfl7bwjq3/OTfzbcjmX
+        y0RvE39BR00Ln7RBBsfgHPdNbExKemT60ct7AWuZx+iUn2NvkyMx4D9/+AHBW3K8nKjGyKoPVXBJ4
+        /5LpNQA2QUw4gCr2zDa1VPi6escw95+s/QNBuIQoaQL2+nK4dSYkOeKd/qdDkNFpq7a9eejn04peP
+        R49F5JBvWuiRywkOhf5uH2s3Zt4RgeaIM1E1a0WJzg76LvZTm+SuLrYQH4qsZei5wCtATvKWat3tl
+        hPNsb98dqbWb0lvinIOjPA7bvcJaiU3oDmX0kJpaJSG+9+kCS7qanEdCwkdCWepEb4dvkdD+xLxdS
+        ahz09XBg==;
+Received:    from [200.73.112.45]
+           by cpanel.imatronix.com    with esmtpsa    (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+           (Exim 4.91)
+           (envelope-from <kripper@imatronix.cl>)
+           id 1hLFTG-0000Ig-89   ; Mon, 29 Apr 2019 19:14:02 -0400
+From:   Christopher Pereira <kripper@imatronix.cl>
+Subject: Re: "BUG: soft lockup" and frozen guest
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <1798334f-3083-bb4d-410c-849dc306e6b2@imatronix.cl>
+ <87muk958jn.fsf@vitty.brq.redhat.com>
+Organization: IMATRONIX S.A.
+Message-ID: <ba7deff9-6a29-9514-642f-99b3f7cd8fe1@imatronix.cl>
+Date:   Mon, 29 Apr 2019 19:14:05 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-X-Spam-Status: No, score=-3.1 required=5.0 tests=ALL_TRUSTED,BAYES_00,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        T_DATE_IN_FUTURE_96_Q autolearn=ham autolearn_force=no version=3.4.2
-X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on terminus.zytor.com
+In-Reply-To: <87muk958jn.fsf@vitty.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: de-DE
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - cpanel.imatronix.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - imatronix.cl
+X-Get-Message-Sender-Via: cpanel.imatronix.com: authenticated_id: kripper@imatronix.cl
+X-Authenticated-Sender: cpanel.imatronix.com: kripper@imatronix.cl
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit-ID:  eeec00d73be2e92ebce16c89154726250f2c80ef
-Gitweb:     https://git.kernel.org/tip/eeec00d73be2e92ebce16c89154726250f2c80ef
-Author:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-AuthorDate: Mon, 29 Apr 2019 18:39:53 +0200
-Committer:  Borislav Petkov <bp@suse.de>
-CommitDate: Mon, 29 Apr 2019 20:25:45 +0200
 
-x86/fpu: Fault-in user stack if copy_fpstate_to_sigframe() fails
+On April 29, 2019 7:56:44 AM AST, Vitaly Kuznetsov <vkuznets@redhat.com> 
+wrote:
 
-In the compacted form, XSAVES may save only the XMM+SSE state but skip
-FP (x87 state).
+    Christopher Pereira <kripper@imatronix.cl> writes:
 
-This is denoted by header->xfeatures = 6. The fastpath
-(copy_fpregs_to_sigframe()) does that but _also_ initialises the FP
-state (cwd to 0x37f, mxcsr as we do, remaining fields to 0).
+        Hi, I have been experiencing some random guest crashes in the
+        last years and would like to invest some time in trying to debug
+        them with your help. Symptom is: 1) "BUG: soft lockup" & "CPU#*
+        stuck for *s!" messages during high load on the guest 2) At some
+        point later (eg. 12 hours later), the guest just hangs without
+        any message and must be destroyed / rebooted. I attached the
+        relevant kernel messages. Host (spec: Intel(R) Xeon(R) CPU
+        E5645) is running: kernel-3.10.0-327.el7.x86_64
+        libvirt-daemon-kvm-1.2.17-13.el7_2.5.x86_64
+        qemu-kvm-ev-2.3.0-31.el7_2.10.1.x86_64
+        qemu-kvm-common-ev-2.3.0-31.el7_2.10.1.x86_64 
 
-The slowpath (copy_xstate_to_user()) leaves most of the FP
-state untouched. Only mxcsr and mxcsr_flags are set due to
-xfeatures_mxcsr_quirk(). Now that XFEATURE_MASK_FP is set
-unconditionally, see
 
-  04944b793e18 ("x86: xsave: set FP, SSE bits in the xsave header in the user sigcontext"),
+    This is pretty old stuff, e.g. kernel-3.10.0-327.el7 was release with
+    RHEL-7.2 (Nov 2015). As this is upstream mailing list, it would be great
+    if you could build an upstream kernel (should work with EL7 userspace)
+    and try to reproduce.
 
-on return from the signal, random garbage is loaded as the FP state.
+Hi Vitaly,
 
-Instead of utilizing copy_xstate_to_user(), fault-in the user memory
-and retry the fast path. Ideally, the fast path succeeds on the second
-attempt but may be retried again if the memory is swapped out due
-to memory pressure. If the user memory can not be faulted-in then
-get_user_pages() returns an error so we don't loop forever.
+Yes, but it's a critical production environment and I haven't seen any 
+related patch in the kernel changelog since 3.10. We will try to upgrade 
+whenever possible.
 
-Fault in memory via get_user_pages() so copy_fpregs_to_sigframe()
-succeeds without a fault.
+I believe this bug could be related to overcommitting resources. Does 
+qemu-kvm throw any log message when resources are overcommited? Is there 
+some way to enable this?
 
-Fixes: 69277c98f5eef ("x86/fpu: Always store the registers in copy_fpstate_to_sigframe()")
-Reported-by: Kurt Kanzenbach <kurt.kanzenbach@linutronix.de>
-Suggested-by: Dave Hansen <dave.hansen@intel.com>
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Signed-off-by: Borislav Petkov <bp@suse.de>
-Acked-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Andy Lutomirski <luto@amacapital.net>
-Cc: Dave Hansen <dave.hansen@intel.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Ingo Molnar <mingo@kernel.org>
-Cc: Jann Horn <jannh@google.com>
-Cc: Jason@zx2c4.com
-Cc: kvm ML <kvm@vger.kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Rik van Riel <riel@surriel.com>
-Cc: rkrcmar@redhat.com
-Cc: x86-ml <x86@kernel.org>
-Link: https://lkml.kernel.org/r/20190429163953.gqxgsc5okqxp4olv@linutronix.de
----
- arch/x86/kernel/fpu/signal.c | 25 ++++++++++++++-----------
- 1 file changed, 14 insertions(+), 11 deletions(-)
+We have seen this happening one in a while in the last 4 years on 
+different production hardware and wanted to ask if this is a common 
+issue and how to address/debug this issue.
 
-diff --git a/arch/x86/kernel/fpu/signal.c b/arch/x86/kernel/fpu/signal.c
-index 7026f1c4e5e3..6d6c2d6afde4 100644
---- a/arch/x86/kernel/fpu/signal.c
-+++ b/arch/x86/kernel/fpu/signal.c
-@@ -158,7 +158,6 @@ static inline int copy_fpregs_to_sigframe(struct xregs_state __user *buf)
- int copy_fpstate_to_sigframe(void __user *buf, void __user *buf_fx, int size)
- {
- 	struct fpu *fpu = &current->thread.fpu;
--	struct xregs_state *xsave = &fpu->state.xsave;
- 	struct task_struct *tsk = current;
- 	int ia32_fxstate = (buf != buf_fx);
- 	int ret = -EFAULT;
-@@ -174,11 +173,12 @@ int copy_fpstate_to_sigframe(void __user *buf, void __user *buf_fx, int size)
- 			sizeof(struct user_i387_ia32_struct), NULL,
- 			(struct _fpstate_32 __user *) buf) ? -1 : 1;
- 
-+retry:
- 	/*
- 	 * Load the FPU registers if they are not valid for the current task.
- 	 * With a valid FPU state we can attempt to save the state directly to
--	 * userland's stack frame which will likely succeed. If it does not, do
--	 * the slowpath.
-+	 * userland's stack frame which will likely succeed. If it does not,
-+	 * resolve the fault in the user memory and try again.
- 	 */
- 	fpregs_lock();
- 	if (test_thread_flag(TIF_NEED_FPU_LOAD))
-@@ -193,14 +193,17 @@ int copy_fpstate_to_sigframe(void __user *buf, void __user *buf_fx, int size)
- 	fpregs_unlock();
- 
- 	if (ret) {
--		if (using_compacted_format()) {
--			if (copy_xstate_to_user(buf_fx, xsave, 0, size))
--				return -1;
--		} else {
--			fpstate_sanitize_xstate(fpu);
--			if (__copy_to_user(buf_fx, xsave, fpu_user_xstate_size))
--				return -1;
--		}
-+		int aligned_size;
-+		int nr_pages;
-+
-+		aligned_size = offset_in_page(buf_fx) + fpu_user_xstate_size;
-+		nr_pages = DIV_ROUND_UP(aligned_size, PAGE_SIZE);
-+
-+		ret = get_user_pages((unsigned long)buf_fx, nr_pages,
-+				     FOLL_WRITE, NULL, NULL);
-+		if (ret == nr_pages)
-+			goto retry;
-+		return -EFAULT;
- 	}
- 
- 	/* Save the fsave header for the 32-bit frames. */
+Best regards.
+
