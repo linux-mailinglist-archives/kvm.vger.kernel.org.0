@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 20278DC77
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2019 09:01:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBB48DCA5
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2019 09:10:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727425AbfD2HBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Apr 2019 03:01:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60416 "EHLO
+        id S1727318AbfD2HKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Apr 2019 03:10:24 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59656 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726589AbfD2HBq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 29 Apr 2019 03:01:46 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3T6spnN040648
-        for <kvm@vger.kernel.org>; Mon, 29 Apr 2019 03:01:44 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2s5t1avxrb-1
+        by vger.kernel.org with ESMTP id S1726764AbfD2HKY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 29 Apr 2019 03:10:24 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3T75ACu108226
+        for <kvm@vger.kernel.org>; Mon, 29 Apr 2019 03:10:23 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2s5rq67esy-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 29 Apr 2019 03:01:43 -0400
+        for <kvm@vger.kernel.org>; Mon, 29 Apr 2019 03:10:23 -0400
 Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 29 Apr 2019 08:01:41 +0100
+        Mon, 29 Apr 2019 08:10:20 +0100
 Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 29 Apr 2019 08:01:38 +0100
+        Mon, 29 Apr 2019 08:10:19 +0100
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3T71bn944105944
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3T7AHVi33357914
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 29 Apr 2019 07:01:37 GMT
+        Mon, 29 Apr 2019 07:10:17 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4CB8452057;
-        Mon, 29 Apr 2019 07:01:37 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 8E7895204F;
+        Mon, 29 Apr 2019 07:10:17 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.49])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id DF2325204E;
-        Mon, 29 Apr 2019 07:01:36 +0000 (GMT)
-Subject: Re: [PATCH] KVM: s390: vsie: Return correct values for Invalid CRYCB
- format
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3B62752050;
+        Mon, 29 Apr 2019 07:10:17 +0000 (GMT)
+Subject: Re: [PATCH] KVM: s390: vsie: Do not shadow CRYCB when no AP and no
+ keys
 To:     Pierre Morel <pmorel@linux.ibm.com>, david@redhat.com
 Cc:     linux-kernel@vger.kernel.org, cohuck@redhat.com,
         linux-s390@vger.kernel.org, kvm@vger.kernel.org,
         frankja@linux.ibm.com, akrowiak@linux.ibm.com,
         schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com
-References: <1556269201-22918-1-git-send-email-pmorel@linux.ibm.com>
+References: <1556269010-22258-1-git-send-email-pmorel@linux.ibm.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
@@ -89,56 +89,81 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
  oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
  syiRa+UVlsKmx1hsEg==
-Date:   Mon, 29 Apr 2019 09:01:36 +0200
+Date:   Mon, 29 Apr 2019 09:10:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <1556269201-22918-1-git-send-email-pmorel@linux.ibm.com>
+In-Reply-To: <1556269010-22258-1-git-send-email-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 19042907-0016-0000-0000-000002765F71
+x-cbid: 19042907-0020-0000-0000-000003375C30
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19042907-0017-0000-0000-000032D2E346
-Message-Id: <50d14c28-1042-7654-dd4e-cbc45d1a2b66@de.ibm.com>
+x-cbparentid: 19042907-0021-0000-0000-00002189D358
+Message-Id: <a3abdcf3-9237-0754-9449-990c8bb9d3b1@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-29_04:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1904290052
+ mlxlogscore=964 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1904290053
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26.04.19 11:00, Pierre Morel wrote:
-> Let's use the correct validity number.
+
+
+On 26.04.19 10:56, Pierre Morel wrote:
+> When the guest do not have AP instructions nor Key management
+> we should return without shadowing the CRYCB.
 > 
-> Fixes: 55ded154b43 "KVM: s390: vsie: Allow CRYCB FORMAT-2"
+> We did not check correctly in the past.
+> 
+> Fixes: b10bd9a256ae ("s390: vsie: Use effective CRYCBD.31 to check CRYCBD
+> validity")
+> Fixes: 6ee74098201b ("KVM: s390: vsie: allow CRYCB FORMAT-0")
 > 
 > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  arch/s390/kvm/vsie.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/s390/kvm/vsie.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
 > diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-> index ac411e9..076090f 100644
+> index c6983d9..ac411e9 100644
 > --- a/arch/s390/kvm/vsie.c
 > +++ b/arch/s390/kvm/vsie.c
-> @@ -344,7 +344,7 @@ static int shadow_crycb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
->  end:
->  	switch (ret) {
->  	case -EINVAL:
-> -		return set_validity_icpt(scb_s, 0x0020U);
-> +		return set_validity_icpt(scb_s, 0x0022U);
->  	case -EFAULT:
->  		return set_validity_icpt(scb_s, 0x0035U);
->  	case -EACCES:
+> @@ -290,6 +290,7 @@ static int shadow_crycb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>  	u8 ecb3_flags;
+>  	u32 ecd_flags;
+>  	int apie_h;
+> +	int apie_s;
+>  	int key_msk = test_kvm_facility(vcpu->kvm, 76);
+>  	int fmt_o = crycbd_o & CRYCB_FORMAT_MASK;
+>  	int fmt_h = vcpu->arch.sie_block->crycbd & CRYCB_FORMAT_MASK;
+> @@ -298,7 +299,8 @@ static int shadow_crycb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>  	scb_s->crycbd = 0;
+>  
+>  	apie_h = vcpu->arch.sie_block->eca & ECA_APIE;
+> -	if (!apie_h && (!key_msk || fmt_o == CRYCB_FORMAT0))
+> +	apie_s = apie_h & scb_o->eca;
+> +	if (!apie_s && (!key_msk || (fmt_o == CRYCB_FORMAT0)))
+>  		return 0;
+>  
+>  	if (!crycb_addr)
+> @@ -309,7 +311,7 @@ static int shadow_crycb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
+>  		    ((crycb_addr + 128) & PAGE_MASK))
+>  			return set_validity_icpt(scb_s, 0x003CU);
+>  
+> -	if (apie_h && (scb_o->eca & ECA_APIE)) {
+> +	if (apie_s) {
+>  		ret = setup_apcb(vcpu, &vsie_page->crycb, crycb_addr,
+>  				 vcpu->kvm->arch.crypto.crycb,
+>  				 fmt_o, fmt_h);
 > 
 
-Thanks applied. 
+thanks applied.
 
