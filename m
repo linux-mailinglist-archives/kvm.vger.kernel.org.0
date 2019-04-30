@@ -2,28 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B6BE10017
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 21:10:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A4DD1001B
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 21:11:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726974AbfD3TJz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 15:09:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56776 "EHLO mx1.redhat.com"
+        id S1727264AbfD3TLG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 15:11:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40324 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726115AbfD3TJz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 15:09:55 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        id S1726115AbfD3TLG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 15:11:06 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D76A533027E;
-        Tue, 30 Apr 2019 19:09:54 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9E726307D851;
+        Tue, 30 Apr 2019 19:11:05 +0000 (UTC)
 Received: from [10.36.112.20] (ovpn-112-20.ams2.redhat.com [10.36.112.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E262F4D5;
-        Tue, 30 Apr 2019 19:09:52 +0000 (UTC)
-Subject: Re: [PATCH v2] kvm_main: fix some comments
-To:     Jiang Biao <benbjiang@tencent.com>, rkrcmar@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cohuck@redhat.com
-References: <20190423114030.75631-1-benbjiang@tencent.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D6A2438A;
+        Tue, 30 Apr 2019 19:11:01 +0000 (UTC)
+Subject: Re: [PATCH] KVM: vmx: clean up some debug output
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        kvm@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <20190424101508.GA23656@mwanda>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
@@ -81,59 +84,53 @@ Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
  DduC0U3xYkfbGAUvbxeepjgzp0uEnBXfPTy09JGpgWbg0w91GyfT/ujKaGd4vxG2Ei+MMNDm
  S1SMx7wu0evvQ5kT9NPzyq8R2GIhVSiAd2jioGuTjX6AZCFv3ToO53DliFMkVTecLptsXaes
  uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <fe0b88fe-d716-48ff-70b4-d5640e4c4ffa@redhat.com>
-Date:   Tue, 30 Apr 2019 21:09:50 +0200
+Message-ID: <d4a2791c-37f9-68e6-2701-45057d7ac202@redhat.com>
+Date:   Tue, 30 Apr 2019 21:10:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190423114030.75631-1-benbjiang@tencent.com>
+In-Reply-To: <20190424101508.GA23656@mwanda>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Tue, 30 Apr 2019 19:09:54 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 30 Apr 2019 19:11:05 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/04/19 13:40, Jiang Biao wrote:
-> is_dirty has been renamed to flush, but the comment for it is
-> outdated. And the description about @flush parameter for
-> kvm_clear_dirty_log_protect() is missing, add it in this patch
-> as well.
+On 24/04/19 12:15, Dan Carpenter wrote:
+> Smatch complains about this:
 > 
-> Signed-off-by: Jiang Biao <benbjiang@tencent.com>
+>     arch/x86/kvm/vmx/vmx.c:5730 dump_vmcs()
+>     warn: KERN_* level not at start of string
+> 
+> The code should be using pr_cont() instead of pr_err().
+> 
+> Fixes: 9d609649bb29 ("KVM: vmx: print more APICv fields in dump_vmcs")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 > ---
->  virt/kvm/kvm_main.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  arch/x86/kvm/vmx/vmx.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index dc8edc97ba85..6cf7e99e6003 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1134,11 +1134,11 @@ EXPORT_SYMBOL_GPL(kvm_get_dirty_log);
->  
->  #ifdef CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
->  /**
-> - * kvm_get_dirty_log_protect - get a snapshot of dirty pages, and if any pages
-> + * kvm_get_dirty_log_protect - get a snapshot of dirty pages
->   *	and reenable dirty page tracking for the corresponding pages.
->   * @kvm:	pointer to kvm instance
->   * @log:	slot id and address to which we copy the log
-> - * @is_dirty:	flag set if any page is dirty
-> + * @flush:	true if TLB flush is needed by caller
->   *
->   * We need to keep it in mind that VCPU threads can write to the bitmap
->   * concurrently. So, to avoid losing track of dirty pages we keep the
-> @@ -1223,6 +1223,7 @@ EXPORT_SYMBOL_GPL(kvm_get_dirty_log_protect);
->   *	and reenable dirty page tracking for the corresponding pages.
->   * @kvm:	pointer to kvm instance
->   * @log:	slot id and address from which to fetch the bitmap of dirty pages
-> + * @flush:	true if TLB flush is needed by caller
->   */
->  int kvm_clear_dirty_log_protect(struct kvm *kvm,
->  				struct kvm_clear_dirty_log *log, bool *flush)
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 574250e566d3..1e677d95a92c 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5727,10 +5727,10 @@ void dump_vmcs(void)
+>  			u16 status = vmcs_read16(GUEST_INTR_STATUS);
+>  			pr_err("SVI|RVI = %02x|%02x ", status >> 8, status & 0xff);
+>  		}
+> -		pr_err(KERN_CONT "TPR Threshold = 0x%02x\n", vmcs_read32(TPR_THRESHOLD));
+> +		pr_cont("TPR Threshold = 0x%02x\n", vmcs_read32(TPR_THRESHOLD));
+>  		if (secondary_exec_control & SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)
+>  			pr_err("APIC-access addr = 0x%016llx ", vmcs_read64(APIC_ACCESS_ADDR));
+> -		pr_err(KERN_CONT "virt-APIC addr = 0x%016llx\n", vmcs_read64(VIRTUAL_APIC_PAGE_ADDR));
+> +		pr_cont("virt-APIC addr = 0x%016llx\n", vmcs_read64(VIRTUAL_APIC_PAGE_ADDR));
+>  	}
+>  	if (pin_based_exec_ctrl & PIN_BASED_POSTED_INTR)
+>  		pr_err("PostedIntrVec = 0x%02x\n", vmcs_read16(POSTED_INTR_NV));
 > 
 
 Queued, thanks.
