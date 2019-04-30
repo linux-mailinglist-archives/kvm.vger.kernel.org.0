@@ -2,28 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D07510041
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 21:23:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9106E1004C
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 21:30:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726048AbfD3TXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 15:23:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38048 "EHLO mx1.redhat.com"
+        id S1726220AbfD3TaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 15:30:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37132 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725996AbfD3TXc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 15:23:32 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        id S1725996AbfD3TaL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 15:30:11 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 00A8B30842A1;
-        Tue, 30 Apr 2019 19:23:32 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7EF6B308623A;
+        Tue, 30 Apr 2019 19:30:10 +0000 (UTC)
 Received: from [10.36.112.20] (ovpn-112-20.ams2.redhat.com [10.36.112.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A33D1001DC8;
-        Tue, 30 Apr 2019 19:23:30 +0000 (UTC)
-Subject: Re: [PATCH] KVM: selftests: make hyperv_cpuid test pass on AMD
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 403D418A3A;
+        Tue, 30 Apr 2019 19:29:59 +0000 (UTC)
+Subject: Re: [GIT PULL 00/12] KVM: s390: Features and fixes for kvm/next
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-References: <20190426132711.26710-1-vkuznets@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>
+References: <20190429091002.71164-1-borntraeger@de.ibm.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
@@ -81,60 +86,25 @@ Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
  DduC0U3xYkfbGAUvbxeepjgzp0uEnBXfPTy09JGpgWbg0w91GyfT/ujKaGd4vxG2Ei+MMNDm
  S1SMx7wu0evvQ5kT9NPzyq8R2GIhVSiAd2jioGuTjX6AZCFv3ToO53DliFMkVTecLptsXaes
  uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <94b42cba-0bc2-01b5-a0b8-d793b518b743@redhat.com>
-Date:   Tue, 30 Apr 2019 21:23:28 +0200
+Message-ID: <d7ef98dc-8f0d-9833-1ca2-1b675a7c374f@redhat.com>
+Date:   Tue, 30 Apr 2019 21:29:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190426132711.26710-1-vkuznets@redhat.com>
+In-Reply-To: <20190429091002.71164-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Tue, 30 Apr 2019 19:23:32 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Tue, 30 Apr 2019 19:30:10 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/04/19 15:27, Vitaly Kuznetsov wrote:
-> Enlightened VMCS is only supported on Intel CPUs but the test shouldn't
-> fail completely.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> index 264425f75806..9a21e912097c 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> @@ -141,7 +141,13 @@ int main(int argc, char *argv[])
->  
->  	free(hv_cpuid_entries);
->  
-> -	vcpu_ioctl(vm, VCPU_ID, KVM_ENABLE_CAP, &enable_evmcs_cap);
-> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_ENABLE_CAP, &enable_evmcs_cap);
-> +
-> +	if (rv) {
-> +		fprintf(stderr,
-> +			"Enlightened VMCS is unsupported, skip related test\n");
-> +		goto vm_free;
-> +	}
->  
->  	hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
->  	if (!hv_cpuid_entries)
-> @@ -151,6 +157,7 @@ int main(int argc, char *argv[])
->  
->  	free(hv_cpuid_entries);
->  
-> +vm_free:
->  	kvm_vm_free(vm);
->  
->  	return 0;
-> 
+On 29/04/19 11:09, Christian Borntraeger wrote:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.2-1
 
-Queued, thanks.
+Pulled, thanks.
 
 Paolo
