@@ -2,182 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DCC40FA0D
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 15:27:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40211FA10
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 15:27:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728813AbfD3N0T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 09:26:19 -0400
-Received: from mail-qt1-f202.google.com ([209.85.160.202]:37602 "EHLO
-        mail-qt1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728762AbfD3N0M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 09:26:12 -0400
-Received: by mail-qt1-f202.google.com with SMTP id o17so2983158qtf.4
-        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 06:26:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=CUfyrLNe/T3EcKv5qduPdE7e3xDRgpU9AlrvCv3qwqI=;
-        b=ACzTueebTGZuzKKoCgKBIgO56T+v/kmKwHjurWtS7UbHoL/8XDJlDb5ck/BSEBSEkL
-         L/cpQLHEpHyLmFxTqXzMv0MYxpPJ/tdSuF6iSO5LSNmbylvOUvYffcEQgPGf+AHIVemF
-         X7c/hUL69n/uOjY+uNJSNPAVfbcNbVaSMzD0uei9BaIXpxtVKCRwsIlHAcYOHL9EFavB
-         iCJAtq03WGCgnaX+tP7fN2qD5Hnfneud42YH1gQK4xFPHVYPeqPOAqGnfhU4Bvx5JZ4h
-         WVQJpJkjflxIoXEbOmqcqlW6kZy64vV5a1g9LW1u4aQq8hQq2UTluPLfVENOwe2MSfHQ
-         GaaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=CUfyrLNe/T3EcKv5qduPdE7e3xDRgpU9AlrvCv3qwqI=;
-        b=DlvIgw9O9hkO1+cb+imUv+HzxhidsS4kMGjreTSCLBSBHrvZfcTX1gyaDQFGjQL5x8
-         S5dFmlYrAQsGor5QxZRSep9KyQYQZ4oVHzRWFLo6ildBzxWy78eEYR3Z9bNtFtgIKqrd
-         frnbL15NgNRpOIU+DAOxC/8WJB54kqx9pa7NWl4TKTjZutDNZr72HNtDzMQqpnU7TRAI
-         FGmlz5f6oqXH/r/Z4DnmkIJsk/ZPfiSvTpz9fJFN6PemJcAsiqMTi6lpofIRWoANkgq+
-         Vu3bvf3AXGKuyQ0fJ/Y1BhtGaR3LGVsHAPPSYQGl+hAhiuV0jz0ZUYvOW3RqsTk3DDLU
-         3FSg==
-X-Gm-Message-State: APjAAAWUXLmk8OjiF8KneqPiqw22aN9QwZQAIT+iDS/+mGYMKqm19jEX
-        4MSkbtlZmd8uAza483sx6mGaHpD6OBNwl2it
-X-Google-Smtp-Source: APXvYqysB3GTYMj0WGj5xIZkllIRnPABiLNbQUXAXOCL1Y4t6SI5ksxcGzuX1TZYAhDJVUrbxfYKc2E7kTYKjt+4
-X-Received: by 2002:a05:620a:482:: with SMTP id 2mr43219855qkr.323.1556630770597;
- Tue, 30 Apr 2019 06:26:10 -0700 (PDT)
-Date:   Tue, 30 Apr 2019 15:25:13 +0200
-In-Reply-To: <cover.1556630205.git.andreyknvl@google.com>
-Message-Id: <d8f017e7ab36f698d05e6cc775115730c917ca77.1556630205.git.andreyknvl@google.com>
-Mime-Version: 1.0
-References: <cover.1556630205.git.andreyknvl@google.com>
-X-Mailer: git-send-email 2.21.0.593.g511ec345e18-goog
-Subject: [PATCH v14 17/17] selftests, arm64: add a selftest for passing tagged
- pointers to kernel
-From:   Andrey Konovalov <andreyknvl@google.com>
-To:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>, Kuehling@google.com,
-        Felix <Felix.Kuehling@amd.com>, Deucher@google.com,
-        Alexander <Alexander.Deucher@amd.com>, Koenig@google.com,
-        Christian <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Chintan Pandya <cpandya@codeaurora.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Andrey Konovalov <andreyknvl@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1728739AbfD3N0W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 09:26:22 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57068 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728737AbfD3N0R (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 30 Apr 2019 09:26:17 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3UDHXQa016184
+        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 09:26:16 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2s6pa6awwn-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 09:26:15 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Tue, 30 Apr 2019 14:26:12 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 30 Apr 2019 14:26:08 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3UDQ7Lh45940956
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 Apr 2019 13:26:07 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0B13052050;
+        Tue, 30 Apr 2019 13:26:07 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.116])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 7C5575204F;
+        Tue, 30 Apr 2019 13:26:06 +0000 (GMT)
+Date:   Tue, 30 Apr 2019 15:26:05 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     borntraeger@de.ibm.com, alex.williamson@redhat.com,
+        cohuck@redhat.com, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        frankja@linux.ibm.com, akrowiak@linux.ibm.com, david@redhat.com,
+        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
+        freude@linux.ibm.com, mimu@linux.ibm.com
+Subject: Re: [PATCH v7 3/4] s390: ap: implement PAPQ AQIC interception in
+ kernel
+In-Reply-To: <1556283688-556-4-git-send-email-pmorel@linux.ibm.com>
+References: <1556283688-556-1-git-send-email-pmorel@linux.ibm.com>
+        <1556283688-556-4-git-send-email-pmorel@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19043013-0028-0000-0000-00000368E2DA
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19043013-0029-0000-0000-00002428482B
+Message-Id: <20190430152605.3bb21f31.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-30_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=827 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1904300086
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch is a part of a series that extends arm64 kernel ABI to allow to
-pass tagged user pointers (with the top byte set to something else other
-than 0x00) as syscall arguments.
+On Fri, 26 Apr 2019 15:01:27 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-This patch adds a simple test, that calls the uname syscall with a
-tagged user pointer as an argument. Without the kernel accepting tagged
-user pointers the test fails with EFAULT.
+> +/**
+> + * vfio_ap_clrirq: Disable Interruption for a APQN
+> + *
+> + * @dev: the device associated with the ap_queue
+> + * @q:   the vfio_ap_queue holding AQIC parameters
+> + *
+> + * Issue the host side PQAP/AQIC
+> + * On success: unpin the NIB saved in *q and unregister from GIB
+> + * interface
+> + *
+> + * Return the ap_queue_status returned by the ap_aqic()
+> + */
+> +static struct ap_queue_status vfio_ap_clrirq(struct vfio_ap_queue *q)
+> +{
+> +	struct ap_qirq_ctrl aqic_gisa = {};
+> +	struct ap_queue_status status;
+> +	int checks = 10;
+> +
+> +	status = ap_aqic(q->apqn, aqic_gisa, NULL);
+> +	if (!status.response_code) {
+> +		while (status.irq_enabled && checks--) {
+> +			msleep(20);
 
-Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
----
- tools/testing/selftests/arm64/.gitignore      |  1 +
- tools/testing/selftests/arm64/Makefile        | 11 ++++++++++
- .../testing/selftests/arm64/run_tags_test.sh  | 12 +++++++++++
- tools/testing/selftests/arm64/tags_test.c     | 21 +++++++++++++++++++
- 4 files changed, 45 insertions(+)
- create mode 100644 tools/testing/selftests/arm64/.gitignore
- create mode 100644 tools/testing/selftests/arm64/Makefile
- create mode 100755 tools/testing/selftests/arm64/run_tags_test.sh
- create mode 100644 tools/testing/selftests/arm64/tags_test.c
+Hm, that seems like a lot of time to me. And I suppose we are holding the
+kvm lock: e.g. no other instruction can be interpreted by kvm in the
+meantime.
 
-diff --git a/tools/testing/selftests/arm64/.gitignore b/tools/testing/selftests/arm64/.gitignore
-new file mode 100644
-index 000000000000..e8fae8d61ed6
---- /dev/null
-+++ b/tools/testing/selftests/arm64/.gitignore
-@@ -0,0 +1 @@
-+tags_test
-diff --git a/tools/testing/selftests/arm64/Makefile b/tools/testing/selftests/arm64/Makefile
-new file mode 100644
-index 000000000000..a61b2e743e99
---- /dev/null
-+++ b/tools/testing/selftests/arm64/Makefile
-@@ -0,0 +1,11 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# ARCH can be overridden by the user for cross compiling
-+ARCH ?= $(shell uname -m 2>/dev/null || echo not)
-+
-+ifneq (,$(filter $(ARCH),aarch64 arm64))
-+TEST_GEN_PROGS := tags_test
-+TEST_PROGS := run_tags_test.sh
-+endif
-+
-+include ../lib.mk
-diff --git a/tools/testing/selftests/arm64/run_tags_test.sh b/tools/testing/selftests/arm64/run_tags_test.sh
-new file mode 100755
-index 000000000000..745f11379930
---- /dev/null
-+++ b/tools/testing/selftests/arm64/run_tags_test.sh
-@@ -0,0 +1,12 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+
-+echo "--------------------"
-+echo "running tags test"
-+echo "--------------------"
-+./tags_test
-+if [ $? -ne 0 ]; then
-+	echo "[FAIL]"
-+else
-+	echo "[PASS]"
-+fi
-diff --git a/tools/testing/selftests/arm64/tags_test.c b/tools/testing/selftests/arm64/tags_test.c
-new file mode 100644
-index 000000000000..2bd1830a7ebe
---- /dev/null
-+++ b/tools/testing/selftests/arm64/tags_test.c
-@@ -0,0 +1,21 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <stdint.h>
-+#include <sys/utsname.h>
-+
-+#define SHIFT_TAG(tag)		((uint64_t)(tag) << 56)
-+#define SET_TAG(ptr, tag)	(((uint64_t)(ptr) & ~SHIFT_TAG(0xff)) | \
-+					SHIFT_TAG(tag))
-+
-+int main(void)
-+{
-+	struct utsname *ptr = (struct utsname *)malloc(sizeof(*ptr));
-+	void *tagged_ptr = (void *)SET_TAG(ptr, 0x42);
-+	int err = uname(tagged_ptr);
-+
-+	free(ptr);
-+	return err;
-+}
--- 
-2.21.0.593.g511ec345e18-goog
+> +			status = ap_tapq(q->apqn, NULL);
+> +		}
+> +		if (checks >= 0)
+> +			vfio_ap_free_irq_data(q);
+
+Actually we don't have to wait for the async part to do it's magic
+(indicated by the status.irq_enabled --> !status.irq_enabled transition)
+in the instruction handler. We have to wait so we can unpin the NIB but
+that could be done async (e.g. workqueue).
+
+BTW do you have any measurements here? How many msleep(20) do we
+experience for one clear on average?
+
+If linux is not using clear (you told so offline, and I also remember
+something similar), we can probably get away with something like this,
+and do it properly (from performance standpoint) later.
+
+Regards,
+Halil
+
+> +		else
+> +			WARN_ONCE("%s: failed disabling IRQ", __func__);
+> +	}
+> +
+> +	return status;
+> +}
 
