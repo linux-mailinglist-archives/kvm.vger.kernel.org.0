@@ -2,143 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 03462100B3
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 22:21:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FBF2100C4
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 22:27:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726683AbfD3UVA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 16:21:00 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:40486 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726263AbfD3UVA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 16:21:00 -0400
-Received: by mail-wr1-f68.google.com with SMTP id h4so22477301wre.7
-        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 13:20:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=ceeJHtBSX1MGFU9AqEWWLclIY/g0BpWdLn7l5cHsF8k=;
-        b=YzcPW/KPKYSOeNbw+Fvz8644+JslkkAZJw0BIht0bYTOSDaGq9I3brdEM2FvL4PxA5
-         xT533nXRRneF4lEvRbt24ugeCepNe8n+ugt+pUmQh1dutJ/ne2+tJ1x3MhUZIZYEIs2G
-         1Emzsdt5ssJRwciLO6avMbxLrb9+/jazgBaqF7zYNaUE/qRx/PRBexCpsaOm9diLLHDS
-         KlKCcUv1XNj4GzvyQOK2p1tYsGE7M0EERVPqoy0vPoE7dYMeXRDhuYx1RCYG1BAnApZc
-         RMNqAXv9li98/J478kaKHsvJyCaUgOa86uI5DGg9CktPeljoMocEbO1uoQqxwNa+PyL7
-         XIFg==
-X-Gm-Message-State: APjAAAVDRLiNWngynOWGhZBB7Z6JCj39i11Kz3EywRIvfXwSg5+X3hxc
-        KCOMIv5sTw8FXGxPXiRYCJDqrA==
-X-Google-Smtp-Source: APXvYqwTxAXUn7QjPin6Lc7zF8EdF/QJVAvEi0DbtZhFyzvdDKU9RPyk7JSRSnFlUTAz0oSe4AWr2Q==
-X-Received: by 2002:adf:dc08:: with SMTP id t8mr43540656wri.220.1556655658538;
-        Tue, 30 Apr 2019 13:20:58 -0700 (PDT)
-Received: from vitty.brq.redhat.com (ip-62-245-115-84.net.upcbroadband.cz. [62.245.115.84])
-        by smtp.gmail.com with ESMTPSA id r6sm3403663wmc.11.2019.04.30.13.20.57
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 30 Apr 2019 13:20:57 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH] x86/kvm/mmu: reset MMU context when 32-bit guest switches PAE
-In-Reply-To: <20190430184229.GE32170@linux.intel.com>
-References: <20190430173326.1956-1-vkuznets@redhat.com> <20190430184229.GE32170@linux.intel.com>
-Date:   Tue, 30 Apr 2019 22:20:56 +0200
-Message-ID: <87v9yv8ct3.fsf@vitty.brq.redhat.com>
+        id S1726086AbfD3U1F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 16:27:05 -0400
+Received: from mga17.intel.com ([192.55.52.151]:12882 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726006AbfD3U1F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 16:27:05 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Apr 2019 13:27:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,414,1549958400"; 
+   d="scan'208";a="295904727"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.181])
+  by orsmga004.jf.intel.com with ESMTP; 30 Apr 2019 13:27:04 -0700
+Date:   Tue, 30 Apr 2019 13:27:04 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     nadav.amit@gmail.com
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] x86: Disable cache before relocating
+ local APIC
+Message-ID: <20190430202704.GB4523@linux.intel.com>
+References: <20190430122701.41069-1-nadav.amit@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190430122701.41069-1-nadav.amit@gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <sean.j.christopherson@intel.com> writes:
+On Tue, Apr 30, 2019 at 05:27:01AM -0700, nadav.amit@gmail.com wrote:
+> From: Nadav Amit <nadav.amit@gmail.com>
+> 
+> According to the SDM, during initialization, the BSP "Switches to
+> protected mode and ensures that the APIC address space is mapped to the
+> strong uncacheable (UC) memory type."
+> 
+> This requirement is not followed when the tests relocate the APIC. Set
+> the cache-disable flag while the APIC base is reprogrammed. According
+> to the SDM, the MTRRs should be modified as well, but it seems somewhat
+> complicated to do that and probably unnecessary.
 
-> On Tue, Apr 30, 2019 at 07:33:26PM +0200, Vitaly Kuznetsov wrote:
->> Commit 47c42e6b4192 ("KVM: x86: fix handling of role.cr4_pae and rename it
->> to 'gpte_size'") introduced a regression: 32-bit PAE guests stopped
->
-> "gpte_is_8_bytes" is really confusing in this case. :-(  Unfortunately I
-> can't think I can't think of a better name that isn't ridiculously verbose.
->
->> working. The issue appears to be: when guest switches (enables) PAE we need
->> to re-initialize MMU context (set context->root_level, do
->> reset_rsvds_bits_mask(), ...) but init_kvm_tdp_mmu() doesn't do that
->> because we threw away is_pae(vcpu) flag from mmu role. Restore it to
->> kvm_mmu_extended_role (as we now don't need it in base role) to fix
->> the issue.
->
-> The change makes sense, but I'm amazed that there's a kernel that can
-> actually trigger the bug.  The extended role tracks CR0.PG, so I'm pretty
-> sure hitting this bug requires toggling CR4.PAE *while paging is enabled*.
-> Which is legal, but crazy.  E.g. my 32-bit Linux VM runs fine with and
-> without PAE enabled.
+Alternatively, what about defining ALTERNATE_APIC_BASE to a sane value
+that is guaranteed to be UC (assuming BIOS isn't being mean)?  Maybe a
+use well-known address, e.g. 0xfed40000 from the TPM, so as to avoid any
+other unwanted side effects.
 
-Once upon a time the was an operating system called "RHEL5". Some people
-think it's long gone but you know, "no one's ever really gone" :-)
-
->
->> Fixes: 47c42e6b4192 ("KVM: x86: fix handling of role.cr4_pae and rename it to 'gpte_size'")
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->
-> Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
-
-Thanks!
-
->
->> ---
->> - RFC: it was proven multiple times that mmu code is more complex than it
->>   appears (at least to me) :-)
->
-> LOL, maybe you're just more optimistic than most people.  Every time I
-> look at the code I say something along the lines of "holy $&*#".
->
-
-:-)
-
->> ---
->>  arch/x86/include/asm/kvm_host.h | 1 +
->>  arch/x86/kvm/mmu.c              | 1 +
->>  2 files changed, 2 insertions(+)
->> 
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index a9d03af34030..c79abe7ca093 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -295,6 +295,7 @@ union kvm_mmu_extended_role {
->>  		unsigned int valid:1;
->>  		unsigned int execonly:1;
->>  		unsigned int cr0_pg:1;
->> +		unsigned int cr4_pae:1;
->>  		unsigned int cr4_pse:1;
->>  		unsigned int cr4_pke:1;
->>  		unsigned int cr4_smap:1;
->> diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
->> index e10962dfc203..d9c7b45d231f 100644
->> --- a/arch/x86/kvm/mmu.c
->> +++ b/arch/x86/kvm/mmu.c
->> @@ -4781,6 +4781,7 @@ static union kvm_mmu_extended_role kvm_calc_mmu_role_ext(struct kvm_vcpu *vcpu)
->>  	union kvm_mmu_extended_role ext = {0};
->>  
->>  	ext.cr0_pg = !!is_paging(vcpu);
->> +	ext.cr4_pae = !!is_pae(vcpu);
->
-> This got me thinking, I wonder if we can/should leave the CR4 bits clear
-> if !is_paging().  Technically I think we're unnecessarily purging the MMU
-> when the guest is toggling CR4 bits with CR0.PG==0.
-
-Yes, probably. Not sure I know any performance critical use-cases with
-CR0.PG==0 but who knows, maybe running hundreds of 8086 emulators IS a
-thing :-)
-
-> And I think we can
-> also git rid of the oddball nx flag in struct kvm_mmu.  I'll play around
-> with the code and hopefully send a patch or two.
->
->>  	ext.cr4_smep = !!kvm_read_cr4_bits(vcpu, X86_CR4_SMEP);
->>  	ext.cr4_smap = !!kvm_read_cr4_bits(vcpu, X86_CR4_SMAP);
->>  	ext.cr4_pse = !!is_pse(vcpu);
->> -- 
->> 2.20.1
->> 
-
--- 
-Vitaly
+> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+> ---
+>  lib/x86/processor.h | 1 +
+>  x86/apic.c          | 7 +++++++
+>  2 files changed, 8 insertions(+)
+> 
+> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+> index 916e67d..59137da 100644
+> --- a/lib/x86/processor.h
+> +++ b/lib/x86/processor.h
+> @@ -29,6 +29,7 @@
+>  #define X86_CR0_TS     0x00000008
+>  #define X86_CR0_WP     0x00010000
+>  #define X86_CR0_AM     0x00040000
+> +#define X86_CR0_CD     0x40000000
+>  #define X86_CR0_PG     0x80000000
+>  #define X86_CR3_PCID_MASK 0x00000fff
+>  #define X86_CR4_TSD    0x00000004
+> diff --git a/x86/apic.c b/x86/apic.c
+> index de5990c..de4a181 100644
+> --- a/x86/apic.c
+> +++ b/x86/apic.c
+> @@ -165,8 +165,13 @@ static void test_apicbase(void)
+>  {
+>      u64 orig_apicbase = rdmsr(MSR_IA32_APICBASE);
+>      u32 lvr = apic_read(APIC_LVR);
+> +    u64 cr0 = read_cr0();
+>      u64 value;
+>  
+> +    /* Disable caching to prevent the APIC from being cacheable */
+> +    write_cr0(cr0 | X86_CR0_CD);
+> +    asm volatile ("wbinvd" ::: "memory");
+> +
+>      wrmsr(MSR_IA32_APICBASE, orig_apicbase & ~(APIC_EN | APIC_EXTD));
+>      wrmsr(MSR_IA32_APICBASE, ALTERNATE_APIC_BASE | APIC_BSP | APIC_EN);
+>  
+> @@ -186,6 +191,8 @@ static void test_apicbase(void)
+>      wrmsr(MSR_IA32_APICBASE, orig_apicbase);
+>      apic_write(APIC_SPIV, 0x1ff);
+>  
+> +    write_cr0(cr0);
+> +
+>      report_prefix_pop();
+>  }
+>  
+> -- 
+> 2.17.1
+> 
