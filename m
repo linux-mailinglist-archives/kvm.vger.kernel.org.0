@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C3E76F9E8
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 15:25:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A1C6F9F8
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 15:27:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728454AbfD3NZr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 09:25:47 -0400
-Received: from mail-qt1-f202.google.com ([209.85.160.202]:40288 "EHLO
+        id S1728487AbfD3NZv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 09:25:51 -0400
+Received: from mail-qt1-f202.google.com ([209.85.160.202]:53257 "EHLO
         mail-qt1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727099AbfD3NZq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 09:25:46 -0400
-Received: by mail-qt1-f202.google.com with SMTP id g28so13049120qtk.7
-        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 06:25:45 -0700 (PDT)
+        with ESMTP id S1728456AbfD3NZt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 09:25:49 -0400
+Received: by mail-qt1-f202.google.com with SMTP id 18so13382697qtw.20
+        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 06:25:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=XhTfun6kQ0RRzRGxeYV1Lxl9M9fvGqRUvmzO5QW1/Iw=;
-        b=wJdQ1UGK5yN+4uNr4h/B5QAZg4CL5PwyVx/Pw0wXlRL/1oGZsU8xxjXpZhWnko4SRI
-         fd58gicIFCILzVPy4t7gpYBYkZYkBR3FmblDk49rQtqjc+3RWgZP2PESfhPKYuSabBw/
-         B0hXw+/teu1vbGfMkq/9KC8ilccnVzEvxDboYdIBbHp/DJQFCI0D5tDe+o/VISE54DyV
-         St7L+ZfiWURBvKb49SaxC44tIWiHtqDmkV/TM32oplri8v6dnEdHN+6rXyhwe32Swezt
-         x0OHZZDCsWZFgoiC74TFCi6OtAop9i/h8/+cUKSH3r+foqub7XosNX+XNvDEf+4uDkZz
-         /4Vg==
+        bh=pQaENO1QgY/e9MwQ0ENVfJipTlkpkaPmrD1twTVYLJ0=;
+        b=DQlymDAakXGN/s4aLv8FvnKDxFM3vFWe0ntwkbEht00uRZJyqzxLv2z+v+0YWcHIgB
+         sKEjfbgI8NGPishfLFVkzFtit1j8To4k9tOzAqlClb7eaOmN2puCzEFRoWDOow3x6abM
+         kF5rtq7WeiaNC1bvr93O8cSv4wiLQYr7p1i1gibkW3E+uyrFOpeeQawgxMfeq7+k8NA+
+         lhqPJjcIYupZYzc0GZblGzb4ejeI2t/6j/U8CyZxFUtArO4WewVdwtuEJHeP7D/0QDFm
+         3J0WxXCQ6Yi/AJW67UTm3sBwIOkc0wcf7BPZUgJdkZ1LyiC4qY/JaOc6zgNq+gGsc78b
+         WDtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=XhTfun6kQ0RRzRGxeYV1Lxl9M9fvGqRUvmzO5QW1/Iw=;
-        b=EGTre8O7cPXcW07j7rWP1Hv/UTB50x2ZEZY3UVkY34fOcj4QNl00fPHFmQ21sOrZMm
-         T11mz9YK2P0npfVPEmDS3wBoJIYyDtRTdJE9s0hc76P79f73RrNK3aoxlKoX2SLDC2iR
-         MXbQ+e2FufnGyyosVXzLk4kmkLVek4joZ0Sv5TYB4d6H0D9i603AZ5QYlbGBYDypZyRx
-         V85R5EOWTFEzsNWaZ92lRfQqt78Ch+W92uq466pKwrh/PcAGe1V/CpdMpBT7J0hiHqA7
-         RCBfdb6zbRpQ/4ziGGme3bxL2U3waUayYPXj079HunfreZMecRkg2SyzrV1GxEwup5BI
-         zcTQ==
-X-Gm-Message-State: APjAAAXpq1BJTM7Twc44X69xXB68ixhh6wl6+eLukC2mQ782jkYKAL90
-        6G5xHxsjiDzId9tj1tW1d/oHsoCWkMhdVxrF
-X-Google-Smtp-Source: APXvYqznoxmsWRf0TRsMetoUzYzE4dAnT0nzUuom4UB8P1UAcmj3+/tm6hiTUWLYkHc/SM6nPM/1vvtkZ4BWAaOU
-X-Received: by 2002:a37:b683:: with SMTP id g125mr147309qkf.249.1556630745179;
- Tue, 30 Apr 2019 06:25:45 -0700 (PDT)
-Date:   Tue, 30 Apr 2019 15:25:05 +0200
+        bh=pQaENO1QgY/e9MwQ0ENVfJipTlkpkaPmrD1twTVYLJ0=;
+        b=RSpQcuy71IO5nWCXhYEf4qqauer2h9lVGQmYbnbkUvtllxB2no1pOyxalFqUrzKi6R
+         ZzDQKfHzk9m5i6PJjX+MGBQ9zHxCKqLzCqDTIrhc3Ed+hU44FjT0krrTMMA0KkvriBPF
+         sSz/jMRn/QV1mh6RE2OIfgjY2TtdfIw8jyD0E3HXlWNWeaG/hKhh75pRTlB56E+Id6ra
+         BMs6b0Noq2wEB6kfOrRPLl2LpEdHAiRWbnY+fHQNyjRgKH6ZJV2jHxMd/mMLeT29tUEt
+         ZSVCGXq05yLQN32nKeQCfNcT74iU2mI7o8Mj0PWqdrxBMOUu4NJxS2RYV8F/5yTrjLN9
+         TMMw==
+X-Gm-Message-State: APjAAAXrVnM9WSbtgKJCZfctcQM0C084NusBTgQ6lDkztgg1ftN7aXSX
+        2L7l7jqnvhq3fuQxOwp4J4xFzw2JH/70sHk2
+X-Google-Smtp-Source: APXvYqzXVakUsCoJZt28GHuUY2fVSxrYrmmdkh7uTay5rLBg9HnfxGjKEfUnDj0v5eIkWQX2umWuPHIlib2dmYL6
+X-Received: by 2002:aed:2a0c:: with SMTP id c12mr9957100qtd.232.1556630748252;
+ Tue, 30 Apr 2019 06:25:48 -0700 (PDT)
+Date:   Tue, 30 Apr 2019 15:25:06 +0200
 In-Reply-To: <cover.1556630205.git.andreyknvl@google.com>
-Message-Id: <f7a89f69f95e471f161e4000d0e13f57364bc90d.1556630205.git.andreyknvl@google.com>
+Message-Id: <7d3b28689d47c0fa1b80628f248dbf78548da25f.1556630205.git.andreyknvl@google.com>
 Mime-Version: 1.0
 References: <cover.1556630205.git.andreyknvl@google.com>
 X-Mailer: git-send-email 2.21.0.593.g511ec345e18-goog
-Subject: [PATCH v14 09/17] fs, arm64: untag user pointers in copy_mount_options
+Subject: [PATCH v14 10/17] fs, arm64: untag user pointers in fs/userfaultfd.c
 From:   Andrey Konovalov <andreyknvl@google.com>
 To:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
@@ -92,32 +92,39 @@ This patch is a part of a series that extends arm64 kernel ABI to allow to
 pass tagged user pointers (with the top byte set to something else other
 than 0x00) as syscall arguments.
 
-In copy_mount_options a user address is being subtracted from TASK_SIZE.
-If the address is lower than TASK_SIZE, the size is calculated to not
-allow the exact_copy_from_user() call to cross TASK_SIZE boundary.
-However if the address is tagged, then the size will be calculated
-incorrectly.
+userfaultfd_register() and userfaultfd_unregister() use provided user
+pointers for vma lookups, which can only by done with untagged pointers.
 
-Untag the address before subtracting.
+Untag user pointers in these functions.
 
 Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
- fs/namespace.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/userfaultfd.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/fs/namespace.c b/fs/namespace.c
-index c9cab307fa77..c27e5713bf04 100644
---- a/fs/namespace.c
-+++ b/fs/namespace.c
-@@ -2825,7 +2825,7 @@ void *copy_mount_options(const void __user * data)
- 	 * the remainder of the page.
- 	 */
- 	/* copy_from_user cannot cross TASK_SIZE ! */
--	size = TASK_SIZE - (unsigned long)data;
-+	size = TASK_SIZE - (unsigned long)untagged_addr(data);
- 	if (size > PAGE_SIZE)
- 		size = PAGE_SIZE;
+diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
+index f5de1e726356..fdee0db0e847 100644
+--- a/fs/userfaultfd.c
++++ b/fs/userfaultfd.c
+@@ -1325,6 +1325,9 @@ static int userfaultfd_register(struct userfaultfd_ctx *ctx,
+ 		goto out;
+ 	}
  
++	uffdio_register.range.start =
++		untagged_addr(uffdio_register.range.start);
++
+ 	ret = validate_range(mm, uffdio_register.range.start,
+ 			     uffdio_register.range.len);
+ 	if (ret)
+@@ -1514,6 +1517,8 @@ static int userfaultfd_unregister(struct userfaultfd_ctx *ctx,
+ 	if (copy_from_user(&uffdio_unregister, buf, sizeof(uffdio_unregister)))
+ 		goto out;
+ 
++	uffdio_unregister.start = untagged_addr(uffdio_unregister.start);
++
+ 	ret = validate_range(mm, uffdio_unregister.start,
+ 			     uffdio_unregister.len);
+ 	if (ret)
 -- 
 2.21.0.593.g511ec345e18-goog
 
