@@ -2,111 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F581F47B
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 12:49:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE2EEF4E9
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 13:01:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726793AbfD3KtT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 06:49:19 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45127 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726436AbfD3KtT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 06:49:19 -0400
-Received: by mail-wr1-f67.google.com with SMTP id s15so20401912wra.12
-        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 03:49:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=97TD+Q9Krb1tplLkNXM736KxS03CDwsZjp1RvZz2GVM=;
-        b=FjKr6PUQ9jT85/B1ITKxf9AblSHVW0Jq9rpYIOUHFpNFTggWsltWrWByy7vD4GnKj+
-         Uw6wUbr11+z/vFpPhCylWYx+Zbzysw1SSIbNHLg7yOwxAvA3CnrHTqo7+ObYt3mOl8lM
-         uSATwqAgjAGFZ+O6A/fgwbx3c7zrQS5uRr4kh6HfZ2I8ys79c5zwRshTh5tzWMaXAxbu
-         JPotoN9pt8KFu34TPxCnvxvBrDCgH13dgQSxWpO7PrI3X4TcGwRD8Wex/98spw//9eSv
-         NrsRRakGP5Br8ORFxSK3XFxatgnpj6fjiqYYFHezQXyXgXNYXrz8V/eIsanO8aIU7YeJ
-         1KIQ==
-X-Gm-Message-State: APjAAAW2Xmu/l1qqg7cUlQwQYCYasO8/T+673sSmE6WstZGh/zbaD34W
-        RJIKzTuzZ0NpzpMqsJITmFJNB6NkuGU=
-X-Google-Smtp-Source: APXvYqy0WBnKLPsfdyTxu71kPcAAr0FhHvuvYa1anOSxeOn0Z/EMQU7w9v1Y5OMlMZyg0p+qDNo8Ow==
-X-Received: by 2002:a5d:5092:: with SMTP id a18mr2360805wrt.112.1556621357060;
-        Tue, 30 Apr 2019 03:49:17 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id b11sm3993839wmh.29.2019.04.30.03.49.16
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 30 Apr 2019 03:49:16 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Christopher Pereira <kripper@imatronix.cl>
-Cc:     kvm@vger.kernel.org
-Subject: Re: "BUG: soft lockup" and frozen guest
-In-Reply-To: <ba7deff9-6a29-9514-642f-99b3f7cd8fe1@imatronix.cl>
-References: <1798334f-3083-bb4d-410c-849dc306e6b2@imatronix.cl> <87muk958jn.fsf@vitty.brq.redhat.com> <ba7deff9-6a29-9514-642f-99b3f7cd8fe1@imatronix.cl>
-Date:   Tue, 30 Apr 2019 12:49:15 +0200
-Message-ID: <874l6f6a50.fsf@vitty.brq.redhat.com>
+        id S1727368AbfD3LBE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 07:01:04 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50226 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726436AbfD3LBE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 30 Apr 2019 07:01:04 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3UAv2Lh135966
+        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 07:01:03 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2s6m27jyf3-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 07:01:03 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Tue, 30 Apr 2019 12:01:01 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 30 Apr 2019 12:00:58 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3UB0uuh39911646
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 Apr 2019 11:00:56 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 882ED11C06C;
+        Tue, 30 Apr 2019 11:00:56 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0333111C054;
+        Tue, 30 Apr 2019 11:00:56 +0000 (GMT)
+Received: from [9.152.222.31] (unknown [9.152.222.31])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 30 Apr 2019 11:00:55 +0000 (GMT)
+Reply-To: pmorel@linux.ibm.com
+Subject: Re: [PATCH v7 3/4] s390: ap: implement PAPQ AQIC interception in
+ kernel
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     borntraeger@de.ibm.com, alex.williamson@redhat.com,
+        cohuck@redhat.com, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        frankja@linux.ibm.com, akrowiak@linux.ibm.com, david@redhat.com,
+        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
+        freude@linux.ibm.com, mimu@linux.ibm.com
+References: <1556283688-556-1-git-send-email-pmorel@linux.ibm.com>
+ <1556283688-556-4-git-send-email-pmorel@linux.ibm.com>
+ <20190429185002.6041eecc.pasic@linux.ibm.com>
+ <14453f04-f13f-f63c-fd8a-d9d8834182e0@linux.ibm.com>
+ <efa8840b-35b1-2823-697f-ab56d4898854@linux.ibm.com>
+ <20190430113718.426392f0.pasic@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Tue, 30 Apr 2019 13:00:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20190430113718.426392f0.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19043011-0020-0000-0000-00000337D102
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19043011-0021-0000-0000-0000218A4F4D
+Message-Id: <e000d0b8-c5fa-bdc1-10f3-2bebae7ccdfe@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-30_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=840 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1904300072
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Christopher Pereira <kripper@imatronix.cl> writes:
+On 30/04/2019 11:37, Halil Pasic wrote:
+> On Tue, 30 Apr 2019 10:32:52 +0200
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>>>>> +    aqic_gisa.gisa = gisa->next_alert >> 4;
+>>>>
+>>>> Why gisa->next_alert? Isn't this supposed to get set to gisa origin
+>>>> (without some bits on the left)?
+> 
+> s/left/right/
+> 
+>>>
+>>> Someone already asked this question.
+> 
+> It must have been in some previous iteration... Can you give me a
+> pointer?
+> 
+>>> The answer is: look at the ap_qirq_ctrl structure, you will see that the
+>>> gisa field is 27 bits wide.
+> 
+> My question was not about the width, but about gisa->next_alert being
+> used.
+> 
+> Regards,
+> Halil
+> 
 
-> On April 29, 2019 7:56:44 AM AST, Vitaly Kuznetsov <vkuznets@redhat.com> 
-> wrote:
->
->     Christopher Pereira <kripper@imatronix.cl> writes:
->
->         Hi, I have been experiencing some random guest crashes in the
->         last years and would like to invest some time in trying to debug
->         them with your help. Symptom is: 1) "BUG: soft lockup" & "CPU#*
->         stuck for *s!" messages during high load on the guest 2) At some
->         point later (eg. 12 hours later), the guest just hangs without
->         any message and must be destroyed / rebooted. I attached the
->         relevant kernel messages. Host (spec: Intel(R) Xeon(R) CPU
->         E5645) is running: kernel-3.10.0-327.el7.x86_64
->         libvirt-daemon-kvm-1.2.17-13.el7_2.5.x86_64
->         qemu-kvm-ev-2.3.0-31.el7_2.10.1.x86_64
->         qemu-kvm-common-ev-2.3.0-31.el7_2.10.1.x86_64 
->
->
->     This is pretty old stuff, e.g. kernel-3.10.0-327.el7 was release with
->     RHEL-7.2 (Nov 2015). As this is upstream mailing list, it would be great
->     if you could build an upstream kernel (should work with EL7 userspace)
->     and try to reproduce.
->
-> Hi Vitaly,
->
-> Yes, but it's a critical production environment and I haven't seen any 
-> related patch in the kernel changelog since 3.10. We will try to upgrade 
-> whenever possible.
+Ah, OK, I understand.
+it is inherited from the time I allocated the GISA myself, before the 
+Mimu GISA/GIB patches.
 
-It's hard to tell which changes may be related here (as, for example, I
-also see nf_conntrack_* in your trace and the bug may as well be there)
-but even in RHEL-7.2 updates (kernel-3.10.0-327.*) I can see several
-dozed KVM commits (and there's several hundred between 7.2 and 7.6).
+So now indeed I must use the GISA origin for the case next_alert is used 
+by GIB alert queue.
 
->
-> I believe this bug could be related to overcommitting resources. Does 
-> qemu-kvm throw any log message when resources are overcommited? Is there 
-> some way to enable this?
->
-> We have seen this happening one in a while in the last 4 years on 
-> different production hardware and wanted to ask if this is a common 
-> issue and how to address/debug this issue.
-
-
-Define "resources" and "overcommit" ;-) In case you overcommit
-CPUs/memory severily (like dozens/hundereds of vCPUs per pCPU, host
-constantly swapping) guests may, of course, start to misbehave. In case
-it is just a couple of vCPU per pCPU and the host is not swapping
-guest softlockups are not normal.
-
-In case there's no way to trigger the issue you may want to enable kdump
-and set
-
-sysctl -w kernel.softlockup_panic=1
-sysctl -w kernel.softlockup_all_cpu_backtrace=1
-
-and then inspect the crash dump.
 
 -- 
-Vitaly
+Pierre Morel
+Linux/KVM/QEMU in Böblingen - Germany
+
