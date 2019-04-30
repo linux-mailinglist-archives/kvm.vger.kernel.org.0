@@ -2,487 +2,281 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D0C2DF046
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 08:08:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D912AF05C
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 08:14:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726291AbfD3GHC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 02:07:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:65088 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725554AbfD3GHC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 02:07:02 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 14CD8307D90D;
-        Tue, 30 Apr 2019 06:07:01 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E4B47179CB;
-        Tue, 30 Apr 2019 06:07:00 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id B7C2641F3C;
-        Tue, 30 Apr 2019 06:06:59 +0000 (UTC)
-Date:   Tue, 30 Apr 2019 02:06:59 -0400 (EDT)
-From:   Pankaj Gupta <pagupta@redhat.com>
-To:     Yuval Shaia <yuval.shaia@oracle.com>
-Cc:     cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org,
-        mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
-        qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
-        adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
-        aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
-        linux-nvdimm@lists.01.org,
-        vishal l verma <vishal.l.verma@intel.com>, david@redhat.com,
-        willy@infradead.org, hch@infradead.org, linux-acpi@vger.kernel.org,
-        jmoyer@redhat.com, linux-ext4@vger.kernel.org, lenb@kernel.org,
-        kilobyte@angband.pl, riel@surriel.com, stefanha@redhat.com,
-        imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>,
-        lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-        tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-        darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
-        linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, pbonzini@redhat.com
-Message-ID: <3322630.24640048.1556604419234.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190430055318.GA5108@lap1>
-References: <20190426050039.17460-1-pagupta@redhat.com> <20190426050039.17460-3-pagupta@redhat.com> <20190430055318.GA5108@lap1>
-Subject: Re: [Qemu-devel] [PATCH v7 2/6] virtio-pmem: Add virtio pmem driver
+        id S1725942AbfD3GOo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 02:14:44 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:39405 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725769AbfD3GOn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 02:14:43 -0400
+Received: by mail-pl1-f193.google.com with SMTP id e92so6241837plb.6
+        for <kvm@vger.kernel.org>; Mon, 29 Apr 2019 23:14:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=6OnqqAYq2y9I/Sv4S4GHmJJEGS4WFLJ3f7efuuglpEQ=;
+        b=H0wXuuGGMjL1UyFYqleWlOQqU1mEKI74UZmR8Xw2I/CcJLigyu1P2GH2ayALJ52nq0
+         12bQsjewdRPXRMgMkZbDbJMIXe9P5KG/wEg2slkgss1GZxhGZgMfhFC9LRheipEUvbPE
+         hBzGyI0Fpj8id6oDgi68tFn0Ie7giFnPqtOEyZb1G1R/10QSZw/CJpoHHGc7vBsYRoUa
+         LIymAHiNcxO8aDaSPtQFp9/sZ1pm4+kMR/BBWfztue9yqJBgIQjntz+jkEGfdPIPzal7
+         2zzg3N9y88io228YR+WCTTVO56nQmw2/I1MyargNoLlPVIZsGrgK0D2mqO9adQhrvbKI
+         sXsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=6OnqqAYq2y9I/Sv4S4GHmJJEGS4WFLJ3f7efuuglpEQ=;
+        b=Xe9sdrN/8GmVZh7Y2FpzxzT9VEifO6MQ6gfO0ce9S7DwYVSrZuDHHoMmNE/UBfbZlO
+         X2UJ67raOZskLWiOUxxbA0E83eHcWW09zWXOil/J4Pho8Y6LTc88BOsowlmgGoERZg7L
+         sD2x8sI1wttNnBiViQMIf9dMsLXqKAG3oxrcfaawG3Dl5eOV+08P/1E0zI0JiabvrtGs
+         uglaWZ/Nto5R1Cc5VJ7Lq/JX6ADy1lvT75AcVZy6/kLxnAp+Mm4pR9yVB6QxeBI5qzBr
+         DIDKJIMhQsJRXOWvxEdmp7hy8DCtLpWrlqj2foAR+9cmNFDpOdVpvpGihkgzdogiD/70
+         wacw==
+X-Gm-Message-State: APjAAAX5U9RW2nB8lnOzD5PrZYiq/tiGsCKSOWL0L40eBPen5+TfRKlu
+        VKDlG3eJaxrkq4wHkt8syhBTJA==
+X-Google-Smtp-Source: APXvYqwCU3cskrIE+xIqbrIVN+Q64hjBi49B00qCuEgXCe0WsMTWIKSg1DUHoU4un3c69LZLSTORWA==
+X-Received: by 2002:a17:902:9686:: with SMTP id n6mr68461248plp.282.1556604882775;
+        Mon, 29 Apr 2019 23:14:42 -0700 (PDT)
+Received: from [10.61.2.175] ([122.99.82.10])
+        by smtp.gmail.com with ESMTPSA id r138sm28115792pfr.2.2019.04.29.23.14.37
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 29 Apr 2019 23:14:41 -0700 (PDT)
+Subject: Re: [PATCH kernel v3] powerpc/powernv: Isolate NVLinks between
+ GV100GL on Witherspoon
+To:     Alistair Popple <alistair@popple.id.au>,
+        linuxppc-dev@lists.ozlabs.org
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Jose Ricardo Ziviani <joserz@linux.ibm.com>,
+        kvm@vger.kernel.org, Sam Bobroff <sbobroff@linux.ibm.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        kvm-ppc@vger.kernel.org,
+        Piotr Jaroszynski <pjaroszynski@nvidia.com>,
+        =?UTF-8?Q?Leonardo_Augusto_Guimar=c3=a3es_Garcia?= 
+        <lagarcia@br.ibm.com>, Reza Arbab <arbab@linux.ibm.com>,
+        David Gibson <david@gibson.dropbear.id.au>
+References: <20190411064844.8241-1-aik@ozlabs.ru>
+ <4f7069cf-8c25-6fe1-42df-3b4af2d52172@ozlabs.ru>
+ <da41cd35-32f6-043e-13ab-9a225c4e910a@ozlabs.ru>
+ <5149814.2BROG1NTNO@townsend>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+Openpgp: preference=signencrypt
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <cf35d5be-d0a3-aef3-d5eb-c2318ef7d92b@ozlabs.ru>
+Date:   Tue, 30 Apr 2019 16:14:35 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <5149814.2BROG1NTNO@townsend>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.65.16.97, 10.4.195.12]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: +SzkNZuLcN6G4o5b/Bde3Y74k8dk7A==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 30 Apr 2019 06:07:01 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-> 
-> On Fri, Apr 26, 2019 at 10:30:35AM +0530, Pankaj Gupta wrote:
-> > This patch adds virtio-pmem driver for KVM guest.
-> > 
-> > Guest reads the persistent memory range information from
-> > Qemu over VIRTIO and registers it on nvdimm_bus. It also
-> > creates a nd_region object with the persistent memory
-> > range information so that existing 'nvdimm/pmem' driver
-> > can reserve this into system memory map. This way
-> > 'virtio-pmem' driver uses existing functionality of pmem
-> > driver to register persistent memory compatible for DAX
-> > capable filesystems.
-> > 
-> > This also provides function to perform guest flush over
-> > VIRTIO from 'pmem' driver when userspace performs flush
-> > on DAX memory range.
-> > 
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > ---
-> >  drivers/nvdimm/virtio_pmem.c     | 114 +++++++++++++++++++++++++++++
-> >  drivers/virtio/Kconfig           |  10 +++
-> >  drivers/virtio/Makefile          |   1 +
-> >  drivers/virtio/pmem.c            | 118 +++++++++++++++++++++++++++++++
-> >  include/linux/virtio_pmem.h      |  60 ++++++++++++++++
-> >  include/uapi/linux/virtio_ids.h  |   1 +
-> >  include/uapi/linux/virtio_pmem.h |  10 +++
-> >  7 files changed, 314 insertions(+)
-> >  create mode 100644 drivers/nvdimm/virtio_pmem.c
-> >  create mode 100644 drivers/virtio/pmem.c
-> >  create mode 100644 include/linux/virtio_pmem.h
-> >  create mode 100644 include/uapi/linux/virtio_pmem.h
-> > 
-> > diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
-> > new file mode 100644
-> > index 000000000000..66b582f751a3
-> > --- /dev/null
-> > +++ b/drivers/nvdimm/virtio_pmem.c
-> > @@ -0,0 +1,114 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * virtio_pmem.c: Virtio pmem Driver
-> > + *
-> > + * Discovers persistent memory range information
-> > + * from host and provides a virtio based flushing
-> > + * interface.
-> > + */
-> > +#include <linux/virtio_pmem.h>
-> > +#include "nd.h"
-> > +
-> > + /* The interrupt handler */
-> > +void host_ack(struct virtqueue *vq)
-> > +{
-> > +	unsigned int len;
-> > +	unsigned long flags;
-> > +	struct virtio_pmem_request *req, *req_buf;
-> > +	struct virtio_pmem *vpmem = vq->vdev->priv;
-> > +
-> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
-> > +		req->done = true;
-> > +		wake_up(&req->host_acked);
-> > +
-> > +		if (!list_empty(&vpmem->req_list)) {
-> > +			req_buf = list_first_entry(&vpmem->req_list,
-> > +					struct virtio_pmem_request, list);
-> > +			list_del(&vpmem->req_list);
-> > +			req_buf->wq_buf_avail = true;
-> > +			wake_up(&req_buf->wq_buf);
-> > +		}
-> > +	}
-> > +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +}
-> > +EXPORT_SYMBOL_GPL(host_ack);
-> > +
-> > + /* The request submission function */
-> > +int virtio_pmem_flush(struct nd_region *nd_region)
-> > +{
-> > +	int err;
-> > +	unsigned long flags;
-> > +	struct scatterlist *sgs[2], sg, ret;
-> > +	struct virtio_device *vdev = nd_region->provider_data;
-> > +	struct virtio_pmem *vpmem = vdev->priv;
-> > +	struct virtio_pmem_request *req;
-> > +
-> > +	might_sleep();
-> > +	req = kmalloc(sizeof(*req), GFP_KERNEL);
-> > +	if (!req)
-> > +		return -ENOMEM;
-> > +
-> > +	req->done = req->wq_buf_avail = false;
-> > +	strcpy(req->name, "FLUSH");
-> > +	init_waitqueue_head(&req->host_acked);
-> > +	init_waitqueue_head(&req->wq_buf);
-> > +	sg_init_one(&sg, req->name, strlen(req->name));
-> > +	sgs[0] = &sg;
-> > +	sg_init_one(&ret, &req->ret, sizeof(req->ret));
-> > +	sgs[1] = &ret;
-> > +
-> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
-> > +	if (err) {
-> > +		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
-> > +
-> > +		list_add_tail(&vpmem->req_list, &req->list);
-> > +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +
-> > +		/* When host has read buffer, this completes via host_ack */
-> > +		wait_event(req->wq_buf, req->wq_buf_avail);
-> > +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	}
-> > +	err = virtqueue_kick(vpmem->req_vq);
-> > +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +
-> > +	if (!err) {
-> > +		err = -EIO;
-> > +		goto ret;
-> > +	}
-> > +	/* When host has read buffer, this completes via host_ack */
-> > +	wait_event(req->host_acked, req->done);
-> > +	err = req->ret;
-> > +ret:
-> > +	kfree(req);
-> > +	return err;
-> > +};
-> > +
-> > + /* The asynchronous flush callback function */
-> > +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
-> > +{
-> > +	int rc = 0;
-> > +
-> > +	/* Create child bio for asynchronous flush and chain with
-> > +	 * parent bio. Otherwise directly call nd_region flush.
-> > +	 */
-> > +	if (bio && bio->bi_iter.bi_sector != -1) {
-> > +		struct bio *child = bio_alloc(GFP_ATOMIC, 0);
-> > +
-> > +		if (!child)
-> > +			return -ENOMEM;
-> > +		bio_copy_dev(child, bio);
-> > +		child->bi_opf = REQ_PREFLUSH;
-> > +		child->bi_iter.bi_sector = -1;
-> > +		bio_chain(child, bio);
-> > +		submit_bio(child);
-> > +	} else {
-> > +		if (virtio_pmem_flush(nd_region))
-> > +			rc = -EIO;
-> > +	}
-> > +
-> > +	return rc;
-> > +};
-> > +EXPORT_SYMBOL_GPL(async_pmem_flush);
-> > +MODULE_LICENSE("GPL");
-> > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> > index 35897649c24f..9f634a2ed638 100644
-> > --- a/drivers/virtio/Kconfig
-> > +++ b/drivers/virtio/Kconfig
-> > @@ -42,6 +42,16 @@ config VIRTIO_PCI_LEGACY
-> >  
-> >  	  If unsure, say Y.
-> >  
-> > +config VIRTIO_PMEM
-> > +	tristate "Support for virtio pmem driver"
-> > +	depends on VIRTIO
-> > +	depends on LIBNVDIMM
-> > +	help
-> > +	This driver provides support for virtio based flushing interface
-> > +	for persistent memory range.
-> > +
-> > +	If unsure, say M.
-> > +
-> >  config VIRTIO_BALLOON
-> >  	tristate "Virtio balloon driver"
-> >  	depends on VIRTIO
-> > diff --git a/drivers/virtio/Makefile b/drivers/virtio/Makefile
-> > index 3a2b5c5dcf46..143ce91eabe9 100644
-> > --- a/drivers/virtio/Makefile
-> > +++ b/drivers/virtio/Makefile
-> > @@ -6,3 +6,4 @@ virtio_pci-y := virtio_pci_modern.o virtio_pci_common.o
-> >  virtio_pci-$(CONFIG_VIRTIO_PCI_LEGACY) += virtio_pci_legacy.o
-> >  obj-$(CONFIG_VIRTIO_BALLOON) += virtio_balloon.o
-> >  obj-$(CONFIG_VIRTIO_INPUT) += virtio_input.o
-> > +obj-$(CONFIG_VIRTIO_PMEM) += pmem.o ../nvdimm/virtio_pmem.o
-> > diff --git a/drivers/virtio/pmem.c b/drivers/virtio/pmem.c
-> > new file mode 100644
-> > index 000000000000..309788628e41
-> > --- /dev/null
-> > +++ b/drivers/virtio/pmem.c
-> > @@ -0,0 +1,118 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * virtio_pmem.c: Virtio pmem Driver
-> > + *
-> > + * Discovers persistent memory range information
-> > + * from host and registers the virtual pmem device
-> > + * with libnvdimm core.
-> > + */
-> > +#include <linux/virtio_pmem.h>
-> > +#include <../../drivers/nvdimm/nd.h>
-> > +
-> > +static struct virtio_device_id id_table[] = {
-> > +	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
-> > +	{ 0 },
-> > +};
-> > +
-> > + /* Initialize virt queue */
-> > +static int init_vq(struct virtio_pmem *vpmem)
-> > +{
-> > +	/* single vq */
-> > +	vpmem->req_vq = virtio_find_single_vq(vpmem->vdev,
-> > +				host_ack, "flush_queue");
-> > +	if (IS_ERR(vpmem->req_vq))
-> > +		return PTR_ERR(vpmem->req_vq);
-> > +
-> > +	spin_lock_init(&vpmem->pmem_lock);
-> > +	INIT_LIST_HEAD(&vpmem->req_list);
-> > +
-> > +	return 0;
-> > +};
-> > +
-> > +static int virtio_pmem_probe(struct virtio_device *vdev)
-> > +{
-> > +	int err = 0;
-> > +	struct resource res;
-> > +	struct virtio_pmem *vpmem;
-> > +	struct nd_region_desc ndr_desc = {};
-> > +	int nid = dev_to_node(&vdev->dev);
-> > +	struct nd_region *nd_region;
-> > +
-> > +	if (!vdev->config->get) {
-> > +		dev_err(&vdev->dev, "%s failure: config access disabled\n",
-> > +			__func__);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem), GFP_KERNEL);
-> > +	if (!vpmem) {
-> > +		err = -ENOMEM;
-> > +		goto out_err;
-> > +	}
-> > +
-> > +	vpmem->vdev = vdev;
-> > +	vdev->priv = vpmem;
-> > +	err = init_vq(vpmem);
-> > +	if (err)
-> > +		goto out_err;
-> > +
-> > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> > +			start, &vpmem->start);
-> > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> > +			size, &vpmem->size);
-> > +
-> > +	res.start = vpmem->start;
-> > +	res.end   = vpmem->start + vpmem->size-1;
-> > +	vpmem->nd_desc.provider_name = "virtio-pmem";
-> > +	vpmem->nd_desc.module = THIS_MODULE;
-> > +
-> > +	vpmem->nvdimm_bus = nvdimm_bus_register(&vdev->dev,
-> > +						&vpmem->nd_desc);
-> > +	if (!vpmem->nvdimm_bus)
-> > +		goto out_vq;
-> > +
-> > +	dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
-> > +
-> > +	ndr_desc.res = &res;
-> > +	ndr_desc.numa_node = nid;
-> > +	ndr_desc.flush = async_pmem_flush;
-> > +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
-> > +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
-> > +	nd_region = nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_desc);
-> > +
-> > +	if (!nd_region)
-> > +		goto out_nd;
-> > +	nd_region->provider_data =  dev_to_virtio
-> 
-> Delete extra space here ----------^^
 
-ah. Sure. 
+On 30/04/2019 15:45, Alistair Popple wrote:
+> Alexey,
+> 
+>>>>> +void pnv_try_isolate_nvidia_v100(struct pci_dev *bridge)
+>>>>> +{
+>>>>> +	u32 mask, val;
+>>>>> +	void __iomem *bar0_0, *bar0_120000, *bar0_a00000;
+>>>>> +	struct pci_dev *pdev;
+>>>>> +	u16 cmd = 0, cmdmask = PCI_COMMAND_MEMORY;
+>>>>> +
+>>>>> +	if (!bridge->subordinate)
+>>>>> +		return;
+>>>>> +
+>>>>> +	pdev = list_first_entry_or_null(&bridge->subordinate->devices,
+>>>>> +			struct pci_dev, bus_list);
+>>>>> +	if (!pdev)
+>>>>> +		return;
+>>>>> +
+>>>>> +	if (pdev->vendor != PCI_VENDOR_ID_NVIDIA)
+> 
+> Don't you also need to check the PCIe devid to match only [PV]100 devices as 
+> well? I doubt there's any guarantee these registers will remain the same for 
+> all future (or older) NVIDIA devices.
 
-> I think this will let you join the two lines.
-> 
-> > +					(nd_region->dev.parent->parent);
-> > +	return 0;
-> > +out_nd:
-> > +	err = -ENXIO;
-> > +	nvdimm_bus_unregister(vpmem->nvdimm_bus);
-> > +out_vq:
-> > +	vdev->config->del_vqs(vdev);
-> > +out_err:
-> > +	dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
-> > +	return err;
-> > +}
-> > +
-> > +static void virtio_pmem_remove(struct virtio_device *vdev)
-> > +{
-> > +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
-> > +
-> > +	nvdimm_bus_unregister(nvdimm_bus);
-> > +	vdev->config->del_vqs(vdev);
-> > +	vdev->config->reset(vdev);
-> > +}
-> > +
-> > +static struct virtio_driver virtio_pmem_driver = {
-> > +	.driver.name		= KBUILD_MODNAME,
-> > +	.driver.owner		= THIS_MODULE,
-> > +	.id_table		= id_table,
-> > +	.probe			= virtio_pmem_probe,
-> > +	.remove			= virtio_pmem_remove,
-> > +};
-> > +
-> > +module_virtio_driver(virtio_pmem_driver);
-> > +MODULE_DEVICE_TABLE(virtio, id_table);
-> > +MODULE_DESCRIPTION("Virtio pmem driver");
-> > +MODULE_LICENSE("GPL");
-> > diff --git a/include/linux/virtio_pmem.h b/include/linux/virtio_pmem.h
-> > new file mode 100644
-> > index 000000000000..ab1da877575d
-> > --- /dev/null
-> > +++ b/include/linux/virtio_pmem.h
-> > @@ -0,0 +1,60 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +/*
-> > + * virtio_pmem.h: virtio pmem Driver
-> > + *
-> > + * Discovers persistent memory range information
-> > + * from host and provides a virtio based flushing
-> > + * interface.
-> > + **/
-> > +
-> > +#ifndef _LINUX_VIRTIO_PMEM_H
-> > +#define _LINUX_VIRTIO_PMEM_H
-> > +
-> > +#include <linux/virtio_ids.h>
-> > +#include <linux/module.h>
-> > +#include <linux/virtio_config.h>
-> > +#include <uapi/linux/virtio_pmem.h>
-> > +#include <linux/libnvdimm.h>
-> > +#include <linux/spinlock.h>
-> > +
-> > +struct virtio_pmem_request {
-> > +	/* Host return status corresponding to flush request */
-> > +	int ret;
-> > +
-> > +	/* command name*/
-> > +	char name[16];
-> > +
-> > +	/* Wait queue to process deferred work after ack from host */
-> > +	wait_queue_head_t host_acked;
-> > +	bool done;
-> > +
-> > +	/* Wait queue to process deferred work after virt queue buffer avail */
-> > +	wait_queue_head_t wq_buf;
-> > +	bool wq_buf_avail;
-> > +	struct list_head list;
-> > +};
-> > +
-> > +struct virtio_pmem {
-> > +	struct virtio_device *vdev;
-> > +
-> > +	/* Virtio pmem request queue */
-> > +	struct virtqueue *req_vq;
-> > +
-> > +	/* nvdimm bus registers virtio pmem device */
-> > +	struct nvdimm_bus *nvdimm_bus;
-> > +	struct nvdimm_bus_descriptor nd_desc;
-> > +
-> > +	/* List to store deferred work if virtqueue is full */
-> > +	struct list_head req_list;
-> > +
-> > +	/* Synchronize virtqueue data */
-> > +	spinlock_t pmem_lock;
-> > +
-> > +	/* Memory region information */
-> > +	uint64_t start;
-> > +	uint64_t size;
-> > +};
-> > +
-> > +void host_ack(struct virtqueue *vq);
-> > +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio);
-> > +#endif
-> > diff --git a/include/uapi/linux/virtio_ids.h
-> > b/include/uapi/linux/virtio_ids.h
-> > index 6d5c3b2d4f4d..32b2f94d1f58 100644
-> > --- a/include/uapi/linux/virtio_ids.h
-> > +++ b/include/uapi/linux/virtio_ids.h
-> > @@ -43,5 +43,6 @@
-> >  #define VIRTIO_ID_INPUT        18 /* virtio input */
-> >  #define VIRTIO_ID_VSOCK        19 /* virtio vsock transport */
-> >  #define VIRTIO_ID_CRYPTO       20 /* virtio crypto */
-> > +#define VIRTIO_ID_PMEM         27 /* virtio pmem */
-> >  
-> >  #endif /* _LINUX_VIRTIO_IDS_H */
-> > diff --git a/include/uapi/linux/virtio_pmem.h
-> > b/include/uapi/linux/virtio_pmem.h
-> > new file mode 100644
-> > index 000000000000..fa3f7d52717a
-> > --- /dev/null
-> > +++ b/include/uapi/linux/virtio_pmem.h
-> > @@ -0,0 +1,10 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +
-> > +#ifndef _UAPI_LINUX_VIRTIO_PMEM_H
-> > +#define _UAPI_LINUX_VIRTIO_PMEM_H
-> > +
-> > +struct virtio_pmem_config {
-> > +	__le64 start;
-> > +	__le64 size;
-> > +};
-> > +#endif
-> 
-> Suggesting to fix the above minor formatting error.
-> 
-> With this:
-> 
-> Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
 
-Thank You!
+I do not have the complete list of IDs and I already saw 3 different
+device ids and this only works for machines with ibm,npu/gpu/nvlinks
+properties so for now it works and for the future we are hoping to
+either have an open source nvidia driver or some small minidriver (also
+from nvidia, or may be a spec allowing us to write one) to allow
+topology discovery on the host so we would not depend on the skiboot's
+powernv DT.
 
-Best regards,
-Pankaj
+> IMHO this should really be done in the device driver in the guest. A malcious 
+> guest could load a modified driver that doesn't do this, but that should not 
+> compromise other guests which presumably load a non-compromised driver that 
+> disables the links on that guests GPU. However I guess in practice what you 
+> have here should work equally well.
 
+Doing it in the guest means a good guest needs to have an updated
+driver, we do not really want to depend on this. The idea of IOMMU
+groups is that the hypervisor provides isolation irrespective to what
+the guest does.
+
+Also vfio+qemu+slof needs to convey the nvlink topology to the guest,
+seems like an unnecessary complication.
+
+
+
+> - Alistair
 > 
-> > --
-> > 2.20.1
-> > 
-> > 
+>>>>> +		return;
+>>>>> +
+>>>>> +	mask = nvlinkgpu_get_disable_mask(&pdev->dev);
+>>>>> +	if (!mask)
+>>>>> +		return;
+>>>>> +
+>>>>> +	bar0_0 = pci_iomap_range(pdev, 0, 0, 0x10000);
+>>>>> +	if (!bar0_0) {
+>>>>> +		pci_err(pdev, "Error mapping BAR0 @0\n");
+>>>>> +		return;
+>>>>> +	}
+>>>>> +	bar0_120000 = pci_iomap_range(pdev, 0, 0x120000, 0x10000);
+>>>>> +	if (!bar0_120000) {
+>>>>> +		pci_err(pdev, "Error mapping BAR0 @120000\n");
+>>>>> +		goto bar0_0_unmap;
+>>>>> +	}
+>>>>> +	bar0_a00000 = pci_iomap_range(pdev, 0, 0xA00000, 0x10000);
+>>>>> +	if (!bar0_a00000) {
+>>>>> +		pci_err(pdev, "Error mapping BAR0 @A00000\n");
+>>>>> +		goto bar0_120000_unmap;
+>>>>> +	}
+>>>>
+>>>> Is it really necessary to do three separate ioremaps vs one that would
+>>>> cover them all here?  I suspect you're just sneaking in PAGE_SIZE with
+>>>> the 0x10000 size mappings anyway.  Seems like it would simplify setup,
+>>>> error reporting, and cleanup to to ioremap to the PAGE_ALIGN'd range
+>>>> of the highest register accessed. Thanks,
+>>>
+>>> Sure I can map it once, I just do not see the point in mapping/unmapping
+>>> all 0xa10000>>16=161 system pages for a very short period of time while
+>>> we know precisely that we need just 3 pages.
+>>>
+>>> Repost?
+>>
+>> Ping?
+>>
+>> Can this go in as it is (i.e. should I ping Michael) or this needs
+>> another round? It would be nice to get some formal acks. Thanks,
+>>
+>>>> Alex
+>>>>
+>>>>> +
+>>>>> +	pci_restore_state(pdev);
+>>>>> +	pci_read_config_word(pdev, PCI_COMMAND, &cmd);
+>>>>> +	if ((cmd & cmdmask) != cmdmask)
+>>>>> +		pci_write_config_word(pdev, PCI_COMMAND, cmd | cmdmask);
+>>>>> +
+>>>>> +	/*
+>>>>> +	 * The sequence is from "Tesla P100 and V100 SXM2 NVLink Isolation on
+>>>>> +	 * Multi-Tenant Systems".
+>>>>> +	 * The register names are not provided there either, hence raw values.
+>>>>> +	 */
+>>>>> +	iowrite32(0x4, bar0_120000 + 0x4C);
+>>>>> +	iowrite32(0x2, bar0_120000 + 0x2204);
+>>>>> +	val = ioread32(bar0_0 + 0x200);
+>>>>> +	val |= 0x02000000;
+>>>>> +	iowrite32(val, bar0_0 + 0x200);
+>>>>> +	val = ioread32(bar0_a00000 + 0x148);
+>>>>> +	val |= mask;
+>>>>> +	iowrite32(val, bar0_a00000 + 0x148);
+>>>>> +
+>>>>> +	if ((cmd | cmdmask) != cmd)
+>>>>> +		pci_write_config_word(pdev, PCI_COMMAND, cmd);
+>>>>> +
+>>>>> +	pci_iounmap(pdev, bar0_a00000);
+>>>>> +bar0_120000_unmap:
+>>>>> +	pci_iounmap(pdev, bar0_120000);
+>>>>> +bar0_0_unmap:
+>>>>> +	pci_iounmap(pdev, bar0_0);
+>>>>> +}
 > 
 > 
+
+-- 
+Alexey
