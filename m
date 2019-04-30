@@ -2,200 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 803B4FCE4
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 17:29:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4B7FFEE1
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 19:33:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726049AbfD3P3W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 11:29:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41612 "EHLO mx1.redhat.com"
+        id S1726102AbfD3Rdb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 13:33:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52750 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725906AbfD3P3W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 11:29:22 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        id S1725930AbfD3Rdb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 13:33:31 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D5F2C309264B;
-        Tue, 30 Apr 2019 15:29:20 +0000 (UTC)
-Received: from gondolin (dhcp-192-187.str.redhat.com [10.33.192.187])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 04D0A10013D9;
-        Tue, 30 Apr 2019 15:29:10 +0000 (UTC)
-Date:   Tue, 30 Apr 2019 17:29:08 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     "cjia@nvidia.com" <cjia@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>
-Subject: Re: [PATCH 1/2] vfio/mdev: add version field as mandatory attribute
- for mdev device
-Message-ID: <20190430172908.2ae77fa9.cohuck@redhat.com>
-In-Reply-To: <20190424081558.GE26247@joy-OptiPlex-7040>
-References: <20190419083258.19580-1-yan.y.zhao@intel.com>
-        <20190419083505.19654-1-yan.y.zhao@intel.com>
-        <20190423115932.42619422.cohuck@redhat.com>
-        <20190424031036.GB26247@joy-OptiPlex-7040>
-        <20190424095624.0ce97328.cohuck@redhat.com>
-        <20190424081558.GE26247@joy-OptiPlex-7040>
-Organization: Red Hat GmbH
+        by mx1.redhat.com (Postfix) with ESMTPS id 01AFC3087945;
+        Tue, 30 Apr 2019 17:33:31 +0000 (UTC)
+Received: from vitty.brq.redhat.com (ovpn-204-104.brq.redhat.com [10.40.204.104])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 69A8662926;
+        Tue, 30 Apr 2019 17:33:29 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH] x86/kvm/mmu: reset MMU context when 32-bit guest switches PAE
+Date:   Tue, 30 Apr 2019 19:33:26 +0200
+Message-Id: <20190430173326.1956-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Tue, 30 Apr 2019 15:29:21 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Tue, 30 Apr 2019 17:33:31 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 24 Apr 2019 04:15:58 -0400
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+Commit 47c42e6b4192 ("KVM: x86: fix handling of role.cr4_pae and rename it
+to 'gpte_size'") introduced a regression: 32-bit PAE guests stopped
+working. The issue appears to be: when guest switches (enables) PAE we need
+to re-initialize MMU context (set context->root_level, do
+reset_rsvds_bits_mask(), ...) but init_kvm_tdp_mmu() doesn't do that
+because we threw away is_pae(vcpu) flag from mmu role. Restore it to
+kvm_mmu_extended_role (as we now don't need it in base role) to fix
+the issue.
 
-> On Wed, Apr 24, 2019 at 03:56:24PM +0800, Cornelia Huck wrote:
-> > On Tue, 23 Apr 2019 23:10:37 -0400
-> > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> >   
-> > > On Tue, Apr 23, 2019 at 05:59:32PM +0800, Cornelia Huck wrote:  
-> > > > On Fri, 19 Apr 2019 04:35:04 -0400
-> > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+Fixes: 47c42e6b4192 ("KVM: x86: fix handling of role.cr4_pae and rename it to 'gpte_size'")
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+- RFC: it was proven multiple times that mmu code is more complex than it
+  appears (at least to me) :-)
+---
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/mmu.c              | 1 +
+ 2 files changed, 2 insertions(+)
 
-> > > > > @@ -225,6 +228,8 @@ Directories and files under the sysfs for Each Physical Device
-> > > > >    [<type-id>], device_api, and available_instances are mandatory attributes
-> > > > >    that should be provided by vendor driver.
-> > > > >
-> > > > > +  version is a mandatory attribute if a mdev device supports live migration.    
-> > > > 
-> > > > What about "An mdev device wishing to support live migration must
-> > > > provide the version attribute."?    
-> > > yes, I just want to keep consistent with the line above it 
-> > > " [<type-id>], device_api, and available_instances are mandatory attributes
-> > >   that should be provided by vendor driver."
-> > > what about below one?
-> > >   "version is a mandatory attribute if a mdev device wishing to support live
-> > >   migration."  
-> > 
-> > My point is that an attribute is not mandatory if it can be left out :)
-> > (I'm not a native speaker, though; maybe this makes perfect sense
-> > after all?)
-> > 
-> > Maybe "version is a required attribute if live migration is supported
-> > for an mdev device"?
-> >   
-> you are right, "mandatory" may bring some confusion.
-> Maybe
-> "vendor driver must provide version attribute for an mdev device wishing to
-> support live migration." ?
-> based on your first version :)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index a9d03af34030..c79abe7ca093 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -295,6 +295,7 @@ union kvm_mmu_extended_role {
+ 		unsigned int valid:1;
+ 		unsigned int execonly:1;
+ 		unsigned int cr0_pg:1;
++		unsigned int cr4_pae:1;
+ 		unsigned int cr4_pse:1;
+ 		unsigned int cr4_pke:1;
+ 		unsigned int cr4_smap:1;
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index e10962dfc203..d9c7b45d231f 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -4781,6 +4781,7 @@ static union kvm_mmu_extended_role kvm_calc_mmu_role_ext(struct kvm_vcpu *vcpu)
+ 	union kvm_mmu_extended_role ext = {0};
+ 
+ 	ext.cr0_pg = !!is_paging(vcpu);
++	ext.cr4_pae = !!is_pae(vcpu);
+ 	ext.cr4_smep = !!kvm_read_cr4_bits(vcpu, X86_CR4_SMEP);
+ 	ext.cr4_smap = !!kvm_read_cr4_bits(vcpu, X86_CR4_SMAP);
+ 	ext.cr4_pse = !!is_pse(vcpu);
+-- 
+2.20.1
 
-"The vendor driver must provide the version attribute for any mdev
-device it wishes to support live migration for." ?
-
-> 
-> > > 
-> > >   
-> > > > > +
-> > > > >  * [<type-id>]
-> > > > >
-> > > > >    The [<type-id>] name is created by adding the device driver string as a prefix
-> > > > > @@ -246,6 +251,35 @@ Directories and files under the sysfs for Each Physical Device
-> > > > >    This attribute should show the number of devices of type <type-id> that can be
-> > > > >    created.
-> > > > >
-> > > > > +* version
-> > > > > +
-> > > > > +  This attribute is rw. It is used to check whether two devices are compatible
-> > > > > +  for live migration. If this attribute is missing, then the corresponding mdev
-> > > > > +  device is regarded as not supporting live migration.
-> > > > > +
-> > > > > +  It consists of two parts: common part and vendor proprietary part.
-> > > > > +  common part: 32 bit. lower 16 bits is vendor id and higher 16 bits identifies
-> > > > > +               device type. e.g., for pci device, it is
-> > > > > +               "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
-> > > > > +  vendor proprietary part: this part is varied in length. vendor driver can
-> > > > > +               specify any string to identify a device.
-> > > > > +
-> > > > > +  When reading this attribute, it should show device version string of the device
-> > > > > +  of type <type-id>. If a device does not support live migration, it should
-> > > > > +  return errno.
-> > > > > +  When writing a string to this attribute, it returns errno for incompatibility
-> > > > > +  or returns written string length in compatibility case. If a device does not
-> > > > > +  support live migration, it always returns errno.    
-> > > > 
-> > > > I'm not sure whether a device that does not support live migration
-> > > > should expose this attribute in the first place. Or is that to cover
-> > > > cases where a driver supports live migration only for some of the
-> > > > devices it supports?    
-> > > yes, driver returning error code is to cover the cases where only part of devices it
-> > > supports can be migrated.
-> > > 
-> > >   
-> > > > Also, I'm not sure if a string that has to be parsed is a good idea...
-> > > > is this 'version' attribute supposed to convey some human-readable
-> > > > information as well? The procedure you describe for compatibility
-> > > > checking does the checking within the vendor driver which I would
-> > > > expect to have a table/rules for that anyway.    
-> > > right. if a vendor driver has the confidence to migrate between devices of
-> > > diffent platform or mdev types, it can maintain a compatibility table for that
-> > > purpose. That's the reason why we would leave the compatibility check to vendor
-> > > driver. vendor driver can freely choose its own complicated way to decide
-> > > which device is migratable to which device.  
-> > 
-> > I think there are two scenarios here:
-> > - Migrating between different device types, which is unlikely to work,
-> >   except in special cases.
-> > - Migrating between different versions of the same device type, which
-> >   may work for some drivers/devices (and at least migrating to a newer
-> >   version looks quite reasonable).
-> > 
-> > But both should be something that is decided by the individual driver;
-> > I hope we don't want to support migration between different drivers :-O
-> > 
-> > Can we make this a driver-defined format?
-> >  
-> yes, this is indeed driver-defined format.
-> Actually we define it into two parts: common part and vendor proprietary part.
-> common part: 32 bit. lower 16 bits is vendor id and higher 16 bits
->              identifies device type. e.g., for pci device, it is
->              "pci vendor id" | (VFIO_DEVICE_FLAGS_PCI << 16).
-> vendor proprietary part: this part is varied in length. vendor driver can
->              specify any string to identify a device.
-> 
-> vendor proprietary part is defined by vendor driver. vendor driver can
-> define any format it wishes to use. Also it is its own responsibility to
-> ensure backward compatibility if it wants to update format definition in this
-> part.
-> 
-> So user space only needs to get source side's version string, and asks
-> target side whether the two are compatible. The decision maker is the
-> vendor driver:)
-
-If I followed the discussion correctly, I think you plan to drop this
-format, don't you? I'd be happy if a vendor driver can use a simple
-number without any prefixes if it so chooses.
-
-I also like the idea of renaming this "migration_version" so that it is
-clear we're dealing with versioning of the migration capability (and
-not a version of the device or so).
