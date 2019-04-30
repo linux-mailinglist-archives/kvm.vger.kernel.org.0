@@ -2,31 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A4DD1001B
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 21:11:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02A361001F
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 21:13:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727264AbfD3TLG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 15:11:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40324 "EHLO mx1.redhat.com"
+        id S1726916AbfD3TNK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 15:13:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41312 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726115AbfD3TLG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 15:11:06 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S1726006AbfD3TNK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 15:13:10 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9E726307D851;
-        Tue, 30 Apr 2019 19:11:05 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 209CFC05569A;
+        Tue, 30 Apr 2019 19:13:10 +0000 (UTC)
 Received: from [10.36.112.20] (ovpn-112-20.ams2.redhat.com [10.36.112.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D6A2438A;
-        Tue, 30 Apr 2019 19:11:01 +0000 (UTC)
-Subject: Re: [PATCH] KVM: vmx: clean up some debug output
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <20190424101508.GA23656@mwanda>
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C63F54148;
+        Tue, 30 Apr 2019 19:13:08 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] x86: Allow xapic ID writes to silently
+ fail
+To:     nadav.amit@gmail.com
+Cc:     kvm@vger.kernel.org,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20190424212218.15230-1-nadav.amit@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
@@ -84,53 +82,50 @@ Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
  DduC0U3xYkfbGAUvbxeepjgzp0uEnBXfPTy09JGpgWbg0w91GyfT/ujKaGd4vxG2Ei+MMNDm
  S1SMx7wu0evvQ5kT9NPzyq8R2GIhVSiAd2jioGuTjX6AZCFv3ToO53DliFMkVTecLptsXaes
  uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <d4a2791c-37f9-68e6-2701-45057d7ac202@redhat.com>
-Date:   Tue, 30 Apr 2019 21:10:59 +0200
+Message-ID: <ce8e71f8-bbec-9324-39cd-ec0f0ad72297@redhat.com>
+Date:   Tue, 30 Apr 2019 21:13:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190424101508.GA23656@mwanda>
+In-Reply-To: <20190424212218.15230-1-nadav.amit@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 30 Apr 2019 19:11:05 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 30 Apr 2019 19:13:10 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/04/19 12:15, Dan Carpenter wrote:
-> Smatch complains about this:
+On 24/04/19 23:22, nadav.amit@gmail.com wrote:
+> From: Nadav Amit <nadav.amit@gmail.com>
 > 
->     arch/x86/kvm/vmx/vmx.c:5730 dump_vmcs()
->     warn: KERN_* level not at start of string
+> According to Intel SDM: "Some processors permit software to modify the
+> APIC ID.  However, the ability of software to modify the APIC ID is
+> processor model specific."
 > 
-> The code should be using pr_cont() instead of pr_err().
+> Allow this behavior not to cause failures.
 > 
-> Fixes: 9d609649bb29 ("KVM: vmx: print more APICv fields in dump_vmcs")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
 > ---
->  arch/x86/kvm/vmx/vmx.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  x86/apic.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 574250e566d3..1e677d95a92c 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -5727,10 +5727,10 @@ void dump_vmcs(void)
->  			u16 status = vmcs_read16(GUEST_INTR_STATUS);
->  			pr_err("SVI|RVI = %02x|%02x ", status >> 8, status & 0xff);
->  		}
-> -		pr_err(KERN_CONT "TPR Threshold = 0x%02x\n", vmcs_read32(TPR_THRESHOLD));
-> +		pr_cont("TPR Threshold = 0x%02x\n", vmcs_read32(TPR_THRESHOLD));
->  		if (secondary_exec_control & SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)
->  			pr_err("APIC-access addr = 0x%016llx ", vmcs_read64(APIC_ACCESS_ADDR));
-> -		pr_err(KERN_CONT "virt-APIC addr = 0x%016llx\n", vmcs_read64(VIRTUAL_APIC_PAGE_ADDR));
-> +		pr_cont("virt-APIC addr = 0x%016llx\n", vmcs_read64(VIRTUAL_APIC_PAGE_ADDR));
->  	}
->  	if (pin_based_exec_ctrl & PIN_BASED_POSTED_INTR)
->  		pr_err("PostedIntrVec = 0x%02x\n", vmcs_read16(POSTED_INTR_NV));
+> diff --git a/x86/apic.c b/x86/apic.c
+> index d1ed5ea..6772f3f 100644
+> --- a/x86/apic.c
+> +++ b/x86/apic.c
+> @@ -210,7 +210,7 @@ static void __test_apic_id(void * unused)
+>      newid = (id + 1) << 24;
+>      report("writeable xapic id",
+>              !test_for_exception(GP_VECTOR, do_write_apic_id, &newid) &&
+> -            id + 1 == apic_id());
+> +	    (id == apic_id() || id + 1 == apic_id()));
+>  
+>      if (!enable_x2apic())
+>          goto out;
 > 
 
 Queued, thanks.
