@@ -2,181 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B6361F663
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 13:47:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FCD710068
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 21:47:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730644AbfD3LrB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 07:47:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60246 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730629AbfD3Lq7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 07:46:59 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CE3F721783;
-        Tue, 30 Apr 2019 11:46:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1556624818;
-        bh=5vTVgx5rzCtrmNgVqwNFZgnPXSr7nJIQmp1UOJVDO8k=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=P8Ac3gQbGy5DiDnBGzU+/5EWIR/r4U8IxNCZNkFWT15Swl99WRIvNCauXpLsOmoXZ
-         +sEJ+vxUioE6wnCCWMryl+bDdn9pxn04fwnJRrbwGqFbWSMS6TDSmapM0GH1Dp7XVA
-         iUViE3wPrFBYlLEofzZiZoL18/qgjDVqgiNZk07Q=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Borislav Petkov <bp@suse.de>, Rik van Riel <riel@surriel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Nicolai Stange <nstange@suse.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        kvm ML <kvm@vger.kernel.org>,
-        linux-efi <linux-efi@vger.kernel.org>, x86-ml <x86@kernel.org>
-Subject: [PATCH 4.19 083/100] x86/fpu: Dont export __kernel_fpu_{begin,end}()
-Date:   Tue, 30 Apr 2019 13:38:52 +0200
-Message-Id: <20190430113612.682532449@linuxfoundation.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190430113608.616903219@linuxfoundation.org>
-References: <20190430113608.616903219@linuxfoundation.org>
-User-Agent: quilt/0.66
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        id S1726048AbfD3TrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 15:47:22 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:42986 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725996AbfD3TrW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 15:47:22 -0400
+Received: by mail-pg1-f195.google.com with SMTP id p6so7315373pgh.9
+        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 12:47:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=mBbomRt4Uelgetgzv4Py/lnS89qT0a6o14TEXaMdcqA=;
+        b=HM6kLzzJ9WFxDb6LoHClGEe3D0K0kO0jOsd96WuchhBYODwNc4W/yDj1KmE3Q+pKTm
+         COOhPQmzDMiUQCyDtjK5ui34AOtwm5/WlhGAedr3h0Z4FVqBIs03AxeGWLJQ6A1kZnpG
+         EQCiurm5wh+/hSdm70IkstDEbIPpl12m06VX7ukPdFlKwsivNFM9wBLSdvNpTqtR58cv
+         97WM3Z9oVcSIG/+mUVb0el4ZNsR14Fz3SRD4o9x2Ab7Ugl9Ry/MSPRUyGxROhTNWEvfM
+         wJoj9VlTZP5zFGdTfGY0YY+oQZj9UmbBUZd2dXKbVOZbbHtdNpwOHccCHjvpVUSkwCFP
+         68DA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=mBbomRt4Uelgetgzv4Py/lnS89qT0a6o14TEXaMdcqA=;
+        b=qDxfUMku4ClfNDFwoTKaOjsEjRuRFNEjtTOWRQHoWQnr71VicD+Oo/pB65wUuGRHXv
+         50Dw0YZCi+fKds939vYlL5/pRjHvnnrxy03MBMlHXllzK+wmNlYpIn78t8fP0jhZaJXs
+         +O0JPHF9glweIZvhd7RGAZb22kqTEocUZ2aiE3CDsY0gH9vQOO1h9oQrDqsEPvsDDKm+
+         AgnC2Dl6s5Ex5PV7oAJ+EJ780EKqXL+JxrL/H5rYIIMrQx6+jUqL18JmTKNkNa1wn3BK
+         v0xD/pACSYy+d/b/yhefXK7Je7tobX2cnvWgqsnRvdIAhznLtYc50ck8zak0imlJyRVP
+         Ce5Q==
+X-Gm-Message-State: APjAAAWQhI8m01/xEMGxnBrnhoGPLDy/ekMuLZgsr3vzw3nIKKJqbrQ3
+        2UGFofqZDvTqxfe6mTfkcDE=
+X-Google-Smtp-Source: APXvYqzkD88kZzjQfwBEoDth44lLZGbkhLXCxwMA1gVF7yDRlgMT4DgGusQ6UoOmmh1azJGg25Xoqw==
+X-Received: by 2002:a65:6205:: with SMTP id d5mr22902158pgv.61.1556653641349;
+        Tue, 30 Apr 2019 12:47:21 -0700 (PDT)
+Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id a3sm58703961pfn.182.2019.04.30.12.47.19
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 30 Apr 2019 12:47:20 -0700 (PDT)
+From:   nadav.amit@gmail.com
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [kvm-unit-tests PATCH] x86: Disable cache before relocating local APIC
+Date:   Tue, 30 Apr 2019 05:27:01 -0700
+Message-Id: <20190430122701.41069-1-nadav.amit@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+From: Nadav Amit <nadav.amit@gmail.com>
 
-commit 12209993e98c5fa1855c467f22a24e3d5b8be205 upstream.
+According to the SDM, during initialization, the BSP "Switches to
+protected mode and ensures that the APIC address space is mapped to the
+strong uncacheable (UC) memory type."
 
-There is one user of __kernel_fpu_begin() and before invoking it,
-it invokes preempt_disable(). So it could invoke kernel_fpu_begin()
-right away. The 32bit version of arch_efi_call_virt_setup() and
-arch_efi_call_virt_teardown() does this already.
+This requirement is not followed when the tests relocate the APIC. Set
+the cache-disable flag while the APIC base is reprogrammed. According
+to the SDM, the MTRRs should be modified as well, but it seems somewhat
+complicated to do that and probably unnecessary.
 
-The comment above *kernel_fpu*() claims that before invoking
-__kernel_fpu_begin() preemption should be disabled and that KVM is a
-good example of doing it. Well, KVM doesn't do that since commit
-
-  f775b13eedee2 ("x86,kvm: move qemu/guest FPU switching out to vcpu_run")
-
-so it is not an example anymore.
-
-With EFI gone as the last user of __kernel_fpu_{begin|end}(), both can
-be made static and not exported anymore.
-
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Signed-off-by: Borislav Petkov <bp@suse.de>
-Reviewed-by: Rik van Riel <riel@surriel.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Andy Lutomirski <luto@kernel.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Nicolai Stange <nstange@suse.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: kvm ML <kvm@vger.kernel.org>
-Cc: linux-efi <linux-efi@vger.kernel.org>
-Cc: x86-ml <x86@kernel.org>
-Link: https://lkml.kernel.org/r/20181129150210.2k4mawt37ow6c2vq@linutronix.de
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
+Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
 ---
- arch/x86/include/asm/efi.h     |    6 ++----
- arch/x86/include/asm/fpu/api.h |   15 +++++----------
- arch/x86/kernel/fpu/core.c     |    6 ++----
- 3 files changed, 9 insertions(+), 18 deletions(-)
+ lib/x86/processor.h | 1 +
+ x86/apic.c          | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
---- a/arch/x86/include/asm/efi.h
-+++ b/arch/x86/include/asm/efi.h
-@@ -82,8 +82,7 @@ struct efi_scratch {
- #define arch_efi_call_virt_setup()					\
- ({									\
- 	efi_sync_low_kernel_mappings();					\
--	preempt_disable();						\
--	__kernel_fpu_begin();						\
-+	kernel_fpu_begin();						\
- 	firmware_restrict_branch_speculation_start();			\
- 									\
- 	if (!efi_enabled(EFI_OLD_MEMMAP))				\
-@@ -99,8 +98,7 @@ struct efi_scratch {
- 		efi_switch_mm(efi_scratch.prev_mm);			\
- 									\
- 	firmware_restrict_branch_speculation_end();			\
--	__kernel_fpu_end();						\
--	preempt_enable();						\
-+	kernel_fpu_end();						\
- })
- 
- extern void __iomem *__init efi_ioremap(unsigned long addr, unsigned long size,
---- a/arch/x86/include/asm/fpu/api.h
-+++ b/arch/x86/include/asm/fpu/api.h
-@@ -12,17 +12,12 @@
- #define _ASM_X86_FPU_API_H
- 
- /*
-- * Careful: __kernel_fpu_begin/end() must be called with preempt disabled
-- * and they don't touch the preempt state on their own.
-- * If you enable preemption after __kernel_fpu_begin(), preempt notifier
-- * should call the __kernel_fpu_end() to prevent the kernel/user FPU
-- * state from getting corrupted. KVM for example uses this model.
-- *
-- * All other cases use kernel_fpu_begin/end() which disable preemption
-- * during kernel FPU usage.
-+ * Use kernel_fpu_begin/end() if you intend to use FPU in kernel context. It
-+ * disables preemption so be careful if you intend to use it for long periods
-+ * of time.
-+ * If you intend to use the FPU in softirq you need to check first with
-+ * irq_fpu_usable() if it is possible.
-  */
--extern void __kernel_fpu_begin(void);
--extern void __kernel_fpu_end(void);
- extern void kernel_fpu_begin(void);
- extern void kernel_fpu_end(void);
- extern bool irq_fpu_usable(void);
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -93,7 +93,7 @@ bool irq_fpu_usable(void)
- }
- EXPORT_SYMBOL(irq_fpu_usable);
- 
--void __kernel_fpu_begin(void)
-+static void __kernel_fpu_begin(void)
+diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+index 916e67d..59137da 100644
+--- a/lib/x86/processor.h
++++ b/lib/x86/processor.h
+@@ -29,6 +29,7 @@
+ #define X86_CR0_TS     0x00000008
+ #define X86_CR0_WP     0x00010000
+ #define X86_CR0_AM     0x00040000
++#define X86_CR0_CD     0x40000000
+ #define X86_CR0_PG     0x80000000
+ #define X86_CR3_PCID_MASK 0x00000fff
+ #define X86_CR4_TSD    0x00000004
+diff --git a/x86/apic.c b/x86/apic.c
+index de5990c..de4a181 100644
+--- a/x86/apic.c
++++ b/x86/apic.c
+@@ -165,8 +165,13 @@ static void test_apicbase(void)
  {
- 	struct fpu *fpu = &current->thread.fpu;
+     u64 orig_apicbase = rdmsr(MSR_IA32_APICBASE);
+     u32 lvr = apic_read(APIC_LVR);
++    u64 cr0 = read_cr0();
+     u64 value;
  
-@@ -111,9 +111,8 @@ void __kernel_fpu_begin(void)
- 		__cpu_invalidate_fpregs_state();
- 	}
++    /* Disable caching to prevent the APIC from being cacheable */
++    write_cr0(cr0 | X86_CR0_CD);
++    asm volatile ("wbinvd" ::: "memory");
++
+     wrmsr(MSR_IA32_APICBASE, orig_apicbase & ~(APIC_EN | APIC_EXTD));
+     wrmsr(MSR_IA32_APICBASE, ALTERNATE_APIC_BASE | APIC_BSP | APIC_EN);
+ 
+@@ -186,6 +191,8 @@ static void test_apicbase(void)
+     wrmsr(MSR_IA32_APICBASE, orig_apicbase);
+     apic_write(APIC_SPIV, 0x1ff);
+ 
++    write_cr0(cr0);
++
+     report_prefix_pop();
  }
--EXPORT_SYMBOL(__kernel_fpu_begin);
  
--void __kernel_fpu_end(void)
-+static void __kernel_fpu_end(void)
- {
- 	struct fpu *fpu = &current->thread.fpu;
- 
-@@ -122,7 +121,6 @@ void __kernel_fpu_end(void)
- 
- 	kernel_fpu_enable();
- }
--EXPORT_SYMBOL(__kernel_fpu_end);
- 
- void kernel_fpu_begin(void)
- {
-
+-- 
+2.17.1
 
