@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D9FFCFA4A
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 15:28:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 853DCF9DD
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 15:25:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726894AbfD3NZW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 09:25:22 -0400
-Received: from mail-yw1-f74.google.com ([209.85.161.74]:44470 "EHLO
-        mail-yw1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727555AbfD3NZV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 09:25:21 -0400
-Received: by mail-yw1-f74.google.com with SMTP id g128so12774902ywf.11
-        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 06:25:20 -0700 (PDT)
+        id S1727981AbfD3NZZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 09:25:25 -0400
+Received: from mail-pf1-f202.google.com ([209.85.210.202]:44796 "EHLO
+        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727852AbfD3NZY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 09:25:24 -0400
+Received: by mail-pf1-f202.google.com with SMTP id f64so9064188pfb.11
+        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 06:25:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=Yt+PWI13/w7NMYz3zwPrNGqq+ReXtpTWddPqmKmBKgk=;
-        b=jG67MQO6uSTq+PQJ7NLS3u3pGPqYxBD6j6Z7zSYau7uP7jvgt3bFEq3faUxv1qOiIb
-         Lhjg89Y6A0R/eNow3E4oC26RwU4x5nya0AVoMdWDIBSbYBBhFLCViwOATovkHqYFgw83
-         hOVUMM4j6unbJMoC5S4qfPmdZGJuwasxoQN5pLBzNoODYCmMWIdN+DK/0OhTFTFrX99t
-         6EDwehqEld5biejrj0QAkLSZAfR6m8nobezuReC4ugk/eXbqiTH4l+ivloQAzM7wUwIe
-         NZAar432hbtNkfGtL2tuOjYFn681Ww9UC8SmNz4UpJpUm1tSs7E6peMLsrX4yxW2SbA8
-         caHA==
+        bh=IkuD9zPPDPrNqKOg+1EuZo5HlTMskU88lY/hO73XGBQ=;
+        b=cjAZo1bevEgDG9f0Gp0lCqBUDVGf7WH9HfahHvPYK3yXKOMpkTJl6c0Qs/+BaViS4F
+         SVbEHv0pbmF0M0fXn45Xz+XZ5NA51A6Q84gce81tqYq+4vQ4fSd4Vfr74XM9VMTqpEUn
+         hpbIVHi0Y6E4lGzikQQHuG5LSWrNkshsuGLGjPRywGWJWT4PFmQUF2llhQi6ncC/Vlfh
+         XyXZ2xzPVmh+mASSDoCOMBPHpUNh2v+x16jbihEdr4DI6v1V/jUL7ilAE/v54hqYIVN8
+         AFB4b6bLnE3ptsM0NTOpxh1giv5Af/8Vei/jZ/b9XgJhABJa8DnBXyZnippbFF98erxD
+         64TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=Yt+PWI13/w7NMYz3zwPrNGqq+ReXtpTWddPqmKmBKgk=;
-        b=Y7ygI3gm17Ja6Zjiz8DkcqE+9jmCM1+z8xBvJLPGv2T15+IgVByLBnoc0AV+nfV+vk
-         RNcR7hLQj9/wHc+R+rcKLqYVLigPATzV1f/AHUtTc7bN+Pgh1gCAqQC8dNiADh64e5df
-         KL5/24VHLWrbnf8L9vcrlo00AdbsgmMOgCnzv+6M3LiYFfzcVO055CcgKktwW/WFpfAU
-         H1pa4/2g4CQqz8pooPVGiu51GFFoohXvzrvHKcTLwwRyB9Bzljk2zXI381vy3TY3+BpI
-         cA4FzfU/KnrnMJxBPy9jw0U14P1QSPrINk7P0bJJYaJh/vyz70LeYc/rgacu1UMWwYh1
-         CDIg==
-X-Gm-Message-State: APjAAAU933wKERdIw4FL4MinpsjAHHjtG6XbNp/5QY3pHA9T1MWLWxDq
-        0GhKhYxrTTy5R04TxAsF05K0rQdKxXePkvHN
-X-Google-Smtp-Source: APXvYqzn+VCXcz3/MPYUKI1STEW4oOzSku7o6dMmFF+1zuaxsiuVuMrbdGrvK+1IRDapYK9+TGfb+TbRJGhClYr2
-X-Received: by 2002:a81:3d51:: with SMTP id k78mr56599045ywa.106.1556630720203;
- Tue, 30 Apr 2019 06:25:20 -0700 (PDT)
-Date:   Tue, 30 Apr 2019 15:24:57 +0200
+        bh=IkuD9zPPDPrNqKOg+1EuZo5HlTMskU88lY/hO73XGBQ=;
+        b=fHPHPaZ4tBrmIdJLa2niFqL+PaIhuQb9yc7nT4R1/s8dGRsEd28CTU4QcmZdu9I9+k
+         1abtunNzxcraJx95jWwApcHT3BAXtheYV6RJuRzEF7X6FAhVzEt+x4G9IWtRNTPiFvWA
+         4D+mWp6AxlJYtQ2chLONfOBRo0Xm2mefOq2oFqc0lKjRjrzp1B0FaGvGdVZzqciOpGES
+         0CApzaukB5Uz4myM5Zck+/V0OSBQoZLF9Hm9VMPZ6f0BVmnTR2N5vQDuywA8MSoEVu46
+         ppeiv3KBOM4szfF4ZBi6VbaL85NkPKKM60g0Rah086euO0hRQ3gT1+RYAmEsPPObZprK
+         k1eA==
+X-Gm-Message-State: APjAAAXUJBzJ1AOAau4Xql57uDusNyFcF1VyKMTcimeM/94eYNEHbRQn
+        2ePBdOlTlgD/tWoGUWAJLOUQU6jeYcA8OGX2
+X-Google-Smtp-Source: APXvYqxwzeO4aaEq5t7dlXsyLEMZLxNA1xUAM/PWlhFhSshLHzTvKlXrQBr9Il+4R5AJQuOw/QR46XMvR3q8fhhC
+X-Received: by 2002:a65:534b:: with SMTP id w11mr7522791pgr.210.1556630723459;
+ Tue, 30 Apr 2019 06:25:23 -0700 (PDT)
+Date:   Tue, 30 Apr 2019 15:24:58 +0200
 In-Reply-To: <cover.1556630205.git.andreyknvl@google.com>
-Message-Id: <c66c15554ff43b09aa97595907d4231be3fb7b31.1556630205.git.andreyknvl@google.com>
+Message-Id: <29b7234f48a282037bdfc23e07ff167756fca0df.1556630205.git.andreyknvl@google.com>
 Mime-Version: 1.0
 References: <cover.1556630205.git.andreyknvl@google.com>
 X-Mailer: git-send-email 2.21.0.593.g511ec345e18-goog
-Subject: [PATCH v14 01/17] uaccess: add untagged_addr definition for other arches
+Subject: [PATCH v14 02/17] arm64: untag user pointers in access_ok and __uaccess_mask_ptr
 From:   Andrey Konovalov <andreyknvl@google.com>
 To:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
@@ -88,34 +88,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To allow arm64 syscalls to accept tagged pointers from userspace, we must
-untag them when they are passed to the kernel. Since untagging is done in
-generic parts of the kernel, the untagged_addr macro needs to be defined
-for all architectures.
+This patch is a part of a series that extends arm64 kernel ABI to allow to
+pass tagged user pointers (with the top byte set to something else other
+than 0x00) as syscall arguments.
 
-Define it as a noop for architectures other than arm64.
+copy_from_user (and a few other similar functions) are used to copy data
+from user memory into the kernel memory or vice versa. Since a user can
+provided a tagged pointer to one of the syscalls that use copy_from_user,
+we need to correctly handle such pointers.
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Do this by untagging user pointers in access_ok and in __uaccess_mask_ptr,
+before performing access validity checks.
+
+Note, that this patch only temporarily untags the pointers to perform the
+checks, but then passes them as is into the kernel internals.
+
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
- include/linux/mm.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm64/include/asm/uaccess.h | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 6b10c21630f5..44041df804a6 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -99,6 +99,10 @@ extern int mmap_rnd_compat_bits __read_mostly;
- #include <asm/pgtable.h>
- #include <asm/processor.h>
+diff --git a/arch/arm64/include/asm/uaccess.h b/arch/arm64/include/asm/uaccess.h
+index e5d5f31c6d36..9164ecb5feca 100644
+--- a/arch/arm64/include/asm/uaccess.h
++++ b/arch/arm64/include/asm/uaccess.h
+@@ -94,7 +94,7 @@ static inline unsigned long __range_ok(const void __user *addr, unsigned long si
+ 	return ret;
+ }
  
-+#ifndef untagged_addr
-+#define untagged_addr(addr) (addr)
-+#endif
-+
- #ifndef __pa_symbol
- #define __pa_symbol(x)  __pa(RELOC_HIDE((unsigned long)(x), 0))
- #endif
+-#define access_ok(addr, size)	__range_ok(addr, size)
++#define access_ok(addr, size)	__range_ok(untagged_addr(addr), size)
+ #define user_addr_max			get_fs
+ 
+ #define _ASM_EXTABLE(from, to)						\
+@@ -226,7 +226,8 @@ static inline void uaccess_enable_not_uao(void)
+ 
+ /*
+  * Sanitise a uaccess pointer such that it becomes NULL if above the
+- * current addr_limit.
++ * current addr_limit. In case the pointer is tagged (has the top byte set),
++ * untag the pointer before checking.
+  */
+ #define uaccess_mask_ptr(ptr) (__typeof__(ptr))__uaccess_mask_ptr(ptr)
+ static inline void __user *__uaccess_mask_ptr(const void __user *ptr)
+@@ -234,10 +235,11 @@ static inline void __user *__uaccess_mask_ptr(const void __user *ptr)
+ 	void __user *safe_ptr;
+ 
+ 	asm volatile(
+-	"	bics	xzr, %1, %2\n"
++	"	bics	xzr, %3, %2\n"
+ 	"	csel	%0, %1, xzr, eq\n"
+ 	: "=&r" (safe_ptr)
+-	: "r" (ptr), "r" (current_thread_info()->addr_limit)
++	: "r" (ptr), "r" (current_thread_info()->addr_limit),
++	  "r" (untagged_addr(ptr))
+ 	: "cc");
+ 
+ 	csdb();
 -- 
 2.21.0.593.g511ec345e18-goog
 
