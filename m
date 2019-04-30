@@ -2,121 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B1FF10204
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 23:46:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C903C10226
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2019 00:01:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726155AbfD3VqY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 17:46:24 -0400
-Received: from mail-it1-f195.google.com ([209.85.166.195]:52658 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726048AbfD3VqY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 17:46:24 -0400
-Received: by mail-it1-f195.google.com with SMTP id x132so7273352itf.2
-        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 14:46:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7bQcz8FoYvg9mJFoOP2lVK1DpNHgAzYCofMzCYfDAIQ=;
-        b=IP2wDUp+RaAoSw421TcXEUm/Ed/IdRTg4wlocL/eyutFNPdgtBbagmgi56m+Rgfol9
-         UeLElwH096gnaqqKA/2TJ69N1qylRCeJMRKbl+Hj5zX2gFn/4hIug7QwIYkQYIylCxNN
-         uNRZjaDbiJIOMlKhHYsBiPiyOdfrDamt/Ecx/RgtII8++YPyZYox/Qnw2vZft//MvcgO
-         TAN0MzpCpXIX3ImUzxgi5N/9sJv3FH65RVlf3UpkezC9NSc/p/yxnJe1jOYct48xZfKO
-         S2bz3t5nzaFQDsqpmz9EuzdRXSi4HHQ1UWA/yhLCyx8mR1WlG2tC9XOQarf1QTujDoQ9
-         f5UQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7bQcz8FoYvg9mJFoOP2lVK1DpNHgAzYCofMzCYfDAIQ=;
-        b=AIM0+LenT1LjZD989LiEcsLHVUwRPDBtWWXXtqvmxZJxhbWNZYfnf+/MjdbDXqROku
-         wk8+G2zeQy4qBlk71V19YI3Q2z6cCqPwRe6evmdnTtlbq6KtfrD4D18P4XGBWaMdDT1P
-         eZUnZ9fyGm7jNdZbbW58kbWvqq6PIqFsa5wdz88Ih3MFs8or09LTPx5vH0wlfNVYMYrz
-         b4lO1Hz9IuGSrwHQ2G9UkjomK0dxe9aa0qxmzQ8po5Xb4c3o2g90EAwAjjWVVZP9YVNH
-         JN97Tnwz5v3Go2i9cOUQYr+dBDrUZeA1I7Jg4GBVC4PYCssoobo0qkhzjlNPb7efyBDo
-         fwSw==
-X-Gm-Message-State: APjAAAX+pDJ7Tu0pnF1+XEHOGhAa+BHVhl9a4YvQ4cfZIJSy2+swLf77
-        QhoSD38uhtzSaCKt1MwDPTYSkM/GNHddHLbqoH24Ww==
-X-Google-Smtp-Source: APXvYqyGGptNFu7dZbUKg0QVAvInrlxQ/BeC7H9S2BycYJ6yaEhWjNcjBsMb7ao3RSDKcvQbC2rc8T66lXxpn52eHYA=
-X-Received: by 2002:a24:7f93:: with SMTP id r141mr199154itc.132.1556660783403;
- Tue, 30 Apr 2019 14:46:23 -0700 (PDT)
+        id S1727200AbfD3WBy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 18:01:54 -0400
+Received: from ozlabs.org ([203.11.71.1]:38681 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726048AbfD3WBy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 18:01:54 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 44twV72Frxz9sNd;
+        Wed,  1 May 2019 08:01:51 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1556661711;
+        bh=5xzSzJd6P+awFz45jW2IFDLAXiVYATqaN0Pky21fDdM=;
+        h=Date:From:To:Cc:Subject:From;
+        b=h7UQQnn1QRDMOuvQHgZiuIq5AOKry0AfxxtHJJDmi+uyER+DGnrfS7uMQGOYHlHM+
+         4RlnFQNzX15lKj9mzqmJIP5gTZf/A18NAVRhTMRNAqJwVFcD0C/2M/bFKbqFKn9PNm
+         ncwXVs8uJVBpf5oJBvRtjodfTxsgUJRNpUCG/0uSuBx6Pc9H9k3ldWEeA8LvsIiDP1
+         nrXvEXUB9Uu9H6KpOn1pqi4euRkU2pK3TZzvrQ0zt0RtN9b3EBhZosKueuqnceeEDX
+         TJTt7UXSHP/C0DZwu8nvceOghqGKYruax8db9YausxDNtcUYVBBv4QwcTSxV6rt7Wp
+         Wmr/u8Io0Ggpg==
+Date:   Wed, 1 May 2019 08:01:44 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        KVM <kvm@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the kvm-fixes tree
+Message-ID: <20190501080144.639ed144@canb.auug.org.au>
 MIME-Version: 1.0
-References: <20190117195558.110516-1-jmattson@google.com> <CALMp9eT9=rXr38KG8_TmpG-FDHWZ6vGKiiAxKXfKHwZ=nyhDmQ@mail.gmail.com>
- <CALMp9eSiML06n+zoWoeArfXaTiP6tiWwqg4UVXSc=_sTjUE0jA@mail.gmail.com>
- <067f780a-5811-913c-2f24-a4053acb63b8@oracle.com> <CALMp9eQriJMW-xx3PcGSFMPTwbpaPQ7Fe_YzAJ1uHiGsRat84Q@mail.gmail.com>
- <CALMp9eQcLALJZgpnYfhRCLa4bYxskLHLHWXV2+p6uQKZyOXXxQ@mail.gmail.com>
-In-Reply-To: <CALMp9eQcLALJZgpnYfhRCLa4bYxskLHLHWXV2+p6uQKZyOXXxQ@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 30 Apr 2019 14:46:12 -0700
-Message-ID: <CALMp9eSyDz=ZcNbnt=iqnuuYrWb7AekYeveCkDc6rAeKJJma_Q@mail.gmail.com>
-Subject: Re: [PATCH] KVM: nVMX: Fix size checks in vmx_set_nested_state
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Felix Wilhelm <fwilhelm@google.com>,
-        Drew Schmitt <dasch@google.com>, Marc Orr <marcorr@google.com>,
-        Peter Shier <pshier@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/aZ/E_6A3AqwvrrjhIZx4R.0"; protocol="application/pgp-signature"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Mar 22, 2019 at 9:53 AM Jim Mattson <jmattson@google.com> wrote:
->
-> On Tue, Mar 12, 2019 at 8:42 PM Jim Mattson <jmattson@google.com> wrote:
-> >
-> > On Tue, Feb 12, 2019 at 10:43 AM Krish Sadhukhan
-> > <krish.sadhukhan@oracle.com> wrote:
-> > >
-> > >
-> > >
-> > > On 02/12/2019 10:09 AM, Jim Mattson wrote:
-> > > > On Wed, Jan 30, 2019 at 11:52 AM Jim Mattson <jmattson@google.com> wrote:
-> > > >> On Thu, Jan 17, 2019 at 11:56 AM Jim Mattson <jmattson@google.com> wrote:
-> > > >>> The size checks in vmx_nested_state are wrong because the calculations
-> > > >>> are made based on the size of a pointer to a struct kvm_nested_state
-> > > >>> rather than the size of a struct kvm_nested_state.
-> > > >>>
-> > > >>> Reported-by: Felix Wilhelm  <fwilhelm@google.com>
-> > > >>> Signed-off-by: Jim Mattson <jmattson@google.com>
-> > > >>> Reviewed-by: Drew Schmitt <dasch@google.com>
-> > > >>> Reviewed-by: Marc Orr <marcorr@google.com>
-> > > >>> Reviewed-by: Peter Shier <pshier@google.com>
-> > > >>> ---
-> > > >>>   arch/x86/kvm/vmx/nested.c | 4 ++--
-> > > >>>   1 file changed, 2 insertions(+), 2 deletions(-)
-> > > >>>
-> > > >>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > > >>> index 2616bd2c7f2c..3bb49ad91d0c 100644
-> > > >>> --- a/arch/x86/kvm/vmx/nested.c
-> > > >>> +++ b/arch/x86/kvm/vmx/nested.c
-> > > >>> @@ -5351,7 +5351,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
-> > > >>>                  return ret;
-> > > >>>
-> > > >>>          /* Empty 'VMXON' state is permitted */
-> > > >>> -       if (kvm_state->size < sizeof(kvm_state) + sizeof(*vmcs12))
-> > > >>> +       if (kvm_state->size < sizeof(*kvm_state) + sizeof(*vmcs12))
-> > > >>>                  return 0;
-> > > >>>
-> > > >>>          if (kvm_state->vmx.vmcs_pa != -1ull) {
-> > > >>> @@ -5395,7 +5395,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
-> > > >>>              vmcs12->vmcs_link_pointer != -1ull) {
-> > > >>>                  struct vmcs12 *shadow_vmcs12 = get_shadow_vmcs12(vcpu);
-> > > >>>
-> > > >>> -               if (kvm_state->size < sizeof(kvm_state) + 2 * sizeof(*vmcs12))
-> > > >>> +               if (kvm_state->size < sizeof(*kvm_state) + 2 * sizeof(*vmcs12))
-> > > >>>                          return -EINVAL;
-> > > >>>
-> > > >>>                  if (copy_from_user(shadow_vmcs12,
-> > > >>> --
-> > > >>> 2.20.1.97.g81188d93c3-goog
-> > > >> Ping.
-> > > > Ping again?
-> > > Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> >
-> > Ping again, just for grins.
->
-> Ping.
+--Sig_/aZ/E_6A3AqwvrrjhIZx4R.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This seems pretty straightforward. Am I missing something?
+Hi all,
+
+In commit
+
+  76d58e0f07ec ("KVM: fix KVM_CLEAR_DIRTY_LOG for memory slots of unaligned=
+ size")
+
+Fixes tag
+
+  Fixes: 98938aa8edd6 ("KVM: validate userspace input in kvm_clear_dirty_lo=
+g_protect()", 2019-01-02)
+
+has these problem(s):
+
+  - The trailing date ine the fixes tag is unexpected
+    Just use
+	git log -1 --format=3D'Fixes: %h ("%s")'
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/aZ/E_6A3AqwvrrjhIZx4R.0
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlzIxcgACgkQAVBC80lX
+0Gz04gf+OOlOZJQ0JfEk03Rm/muVUhLvu5k7kUeDkdbeAl4krsvvg+XghkAm/s+q
+qP66SXi9c3ANrFgBhZ2lycwWyGW9vStBAsCJRN0OvfB2Bj0F4ebEJNTYKl5tc+ja
+8qWpNdPkOUlnJR+TIoIW8+c2wV2olI6w4lb1Dm4r3HIK+tmAWmXx/12boXKSLwiH
+iz6G3nC4VGD3mbuY7lww4S8DD2AsFllTa1IzGm14RvSGgjn4/peMWkEE2vU64Jz4
+Yi1xF7RJUbUg24tGRwve8vmR7Dv20Uqv4G1apd+E+jqnF7FQKbeQx8rwlq8WHDoR
+WfntJQ/wmnWfzCtTw+frXNt2F95uyA==
+=pFs9
+-----END PGP SIGNATURE-----
+
+--Sig_/aZ/E_6A3AqwvrrjhIZx4R.0--
