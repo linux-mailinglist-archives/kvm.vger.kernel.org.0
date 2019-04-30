@@ -2,170 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 945BE10294
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2019 00:45:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D186102D0
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2019 00:52:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726155AbfD3WpN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 18:45:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60218 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726086AbfD3WpN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 18:45:13 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4154F308622E;
-        Tue, 30 Apr 2019 22:45:13 +0000 (UTC)
-Received: from [10.36.112.20] (ovpn-112-20.ams2.redhat.com [10.36.112.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 542B26298F;
-        Tue, 30 Apr 2019 22:45:08 +0000 (UTC)
-Subject: Re: [PATCH] KVM: nVMX: Fix size checks in vmx_set_nested_state
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Felix Wilhelm <fwilhelm@google.com>,
-        Drew Schmitt <dasch@google.com>, Marc Orr <marcorr@google.com>,
-        Peter Shier <pshier@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-References: <20190117195558.110516-1-jmattson@google.com>
- <CALMp9eT9=rXr38KG8_TmpG-FDHWZ6vGKiiAxKXfKHwZ=nyhDmQ@mail.gmail.com>
- <CALMp9eSiML06n+zoWoeArfXaTiP6tiWwqg4UVXSc=_sTjUE0jA@mail.gmail.com>
- <067f780a-5811-913c-2f24-a4053acb63b8@oracle.com>
- <CALMp9eQriJMW-xx3PcGSFMPTwbpaPQ7Fe_YzAJ1uHiGsRat84Q@mail.gmail.com>
- <CALMp9eQcLALJZgpnYfhRCLa4bYxskLHLHWXV2+p6uQKZyOXXxQ@mail.gmail.com>
- <CALMp9eSyDz=ZcNbnt=iqnuuYrWb7AekYeveCkDc6rAeKJJma_Q@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <df0596ac-9096-4ac4-5759-8abdee0232d0@redhat.com>
-Date:   Wed, 1 May 2019 00:45:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1727368AbfD3Wto (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 18:49:44 -0400
+Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:45848 "EHLO
+        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726105AbfD3Wtn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 18:49:43 -0400
+Received: from Internal Mail-Server by MTLPINE2 (envelope-from parav@mellanox.com)
+        with ESMTPS (AES256-SHA encrypted); 1 May 2019 01:49:40 +0300
+Received: from sw-mtx-036.mtx.labs.mlnx (sw-mtx-036.mtx.labs.mlnx [10.12.150.149])
+        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x3UMncnU009688;
+        Wed, 1 May 2019 01:49:39 +0300
+From:   Parav Pandit <parav@mellanox.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kwankhede@nvidia.com, alex.williamson@redhat.com
+Cc:     cjia@nvidia.com, parav@mellanox.com
+Subject: [PATCHv2 00/10] vfio/mdev: Improve vfio/mdev core module
+Date:   Tue, 30 Apr 2019 17:49:27 -0500
+Message-Id: <20190430224937.57156-1-parav@mellanox.com>
+X-Mailer: git-send-email 2.19.2
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eSyDz=ZcNbnt=iqnuuYrWb7AekYeveCkDc6rAeKJJma_Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Tue, 30 Apr 2019 22:45:13 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/04/19 23:46, Jim Mattson wrote:
-> On Fri, Mar 22, 2019 at 9:53 AM Jim Mattson <jmattson@google.com> wrote:
->>
->> On Tue, Mar 12, 2019 at 8:42 PM Jim Mattson <jmattson@google.com> wrote:
->>>
->>> On Tue, Feb 12, 2019 at 10:43 AM Krish Sadhukhan
->>> <krish.sadhukhan@oracle.com> wrote:
->>>>
->>>>
->>>>
->>>> On 02/12/2019 10:09 AM, Jim Mattson wrote:
->>>>> On Wed, Jan 30, 2019 at 11:52 AM Jim Mattson <jmattson@google.com> wrote:
->>>>>> On Thu, Jan 17, 2019 at 11:56 AM Jim Mattson <jmattson@google.com> wrote:
->>>>>>> The size checks in vmx_nested_state are wrong because the calculations
->>>>>>> are made based on the size of a pointer to a struct kvm_nested_state
->>>>>>> rather than the size of a struct kvm_nested_state.
->>>>>>>
->>>>>>> Reported-by: Felix Wilhelm  <fwilhelm@google.com>
->>>>>>> Signed-off-by: Jim Mattson <jmattson@google.com>
->>>>>>> Reviewed-by: Drew Schmitt <dasch@google.com>
->>>>>>> Reviewed-by: Marc Orr <marcorr@google.com>
->>>>>>> Reviewed-by: Peter Shier <pshier@google.com>
->>>>>>> ---
->>>>>>>   arch/x86/kvm/vmx/nested.c | 4 ++--
->>>>>>>   1 file changed, 2 insertions(+), 2 deletions(-)
->>>>>>>
->>>>>>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->>>>>>> index 2616bd2c7f2c..3bb49ad91d0c 100644
->>>>>>> --- a/arch/x86/kvm/vmx/nested.c
->>>>>>> +++ b/arch/x86/kvm/vmx/nested.c
->>>>>>> @@ -5351,7 +5351,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->>>>>>>                  return ret;
->>>>>>>
->>>>>>>          /* Empty 'VMXON' state is permitted */
->>>>>>> -       if (kvm_state->size < sizeof(kvm_state) + sizeof(*vmcs12))
->>>>>>> +       if (kvm_state->size < sizeof(*kvm_state) + sizeof(*vmcs12))
->>>>>>>                  return 0;
->>>>>>>
->>>>>>>          if (kvm_state->vmx.vmcs_pa != -1ull) {
->>>>>>> @@ -5395,7 +5395,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->>>>>>>              vmcs12->vmcs_link_pointer != -1ull) {
->>>>>>>                  struct vmcs12 *shadow_vmcs12 = get_shadow_vmcs12(vcpu);
->>>>>>>
->>>>>>> -               if (kvm_state->size < sizeof(kvm_state) + 2 * sizeof(*vmcs12))
->>>>>>> +               if (kvm_state->size < sizeof(*kvm_state) + 2 * sizeof(*vmcs12))
->>>>>>>                          return -EINVAL;
->>>>>>>
->>>>>>>                  if (copy_from_user(shadow_vmcs12,
->>>>>>> --
->>>>>>> 2.20.1.97.g81188d93c3-goog
->>>>>> Ping.
->>>>> Ping again?
->>>> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
->>>
->>> Ping again, just for grins.
->>
->> Ping.
-> 
-> This seems pretty straightforward. Am I missing something?
+As we would like to use mdev subsystem for wider use case as
+discussed in [1], [2] apart from an offline discussion.
+This use case is also discussed with wider forum in [4] in track
+'Lightweight NIC HW functions for container offload use cases'.
 
-Nope, I just missed it again and again.  I've queued it now.
+This series is prep-work and improves vfio/mdev module in following ways.
 
-Paolo
+Patch-1 Fixes releasing parent dev reference during error unwinding
+        mdev parent registration.
+Patch-2 Simplifies mdev device for unused kref.
+Patch-3 Drops redundant extern prefix of exported symbols.
+Patch-4 Returns right error code from vendor driver.
+Patch-5 Fixes to use right sysfs remove sequence.
+Patch-6 Fixes removing all child devices if one of them fails.
+Patch-7 Remove unnecessary inline
+Patch-8 Improve the mdev create/remove sequence to match Linux
+        bus, device model
+Patch-9 Avoid recreating remove file on stale device to
+        eliminate call trace
+Patch-10 Fix race conditions of create/remove with parent removal
+This is improved version than using srcu as srcu can take
+seconds to minutes.
+
+This series is tested using
+(a) mtty with VM using vfio_mdev driver for positive tests and
+device removal while device in use by VM using vfio_mdev driver
+
+(b) mlx5 core driver using RFC patches [3] and internal patches.
+Internal patches are large and cannot be combined with this
+prep-work patches. It will posted once prep-work completes.
+
+[1] https://www.spinics.net/lists/netdev/msg556978.html
+[2] https://lkml.org/lkml/2019/3/7/696
+[3] https://lkml.org/lkml/2019/3/8/819
+[4] https://netdevconf.org/0x13/session.html?workshop-hardware-offload
+
+---
+Changelog:
+---
+v1->v2:
+ - Addressed comments from Alex
+ - Rebased
+ - Inserted the device checking loop in Patch-6 as original code
+ - Added patch 7 to 10
+ - Added fixes for race condition in create/remove with parent removal
+   Patch-10 uses simplified refcount and completion, instead of srcu
+   which might take seconds to minutes on busy system.
+ - Added fix for device create/remove sequence to match
+   Linux device, bus model
+v0->v1:
+ - Dropped device placement on bus sequence patch for this series
+ - Addressed below comments from Alex, Kirti, Maxim.
+ - Added Review-by tag for already reviewed patches.
+ - Dropped incorrect patch of put_device().
+ - Corrected Fixes commit tag for sysfs remove sequence fix
+ - Split last 8th patch to smaller refactor and fixes patch
+ - Following coding style commenting format
+ - Fixed accidental delete of mutex_lock in mdev_unregister_device
+ - Renamed remove helped to mdev_device_remove_common().
+ - Rebased for uuid/guid change
+
+Parav Pandit (10):
+  vfio/mdev: Avoid release parent reference during error path
+  vfio/mdev: Removed unused kref
+  vfio/mdev: Drop redundant extern for exported symbols
+  vfio/mdev: Avoid masking error code to EBUSY
+  vfio/mdev: Follow correct remove sequence
+  vfio/mdev: Fix aborting mdev child device removal if one fails
+  vfio/mdev: Avoid inline get and put parent helpers
+  vfio/mdev: Improve the create/remove sequence
+  vfio/mdev: Avoid creating sysfs remove file on stale device removal
+  vfio/mdev: Synchronize device create/remove with parent removal
+
+ drivers/vfio/mdev/mdev_core.c    | 162 +++++++++++++------------------
+ drivers/vfio/mdev/mdev_private.h |   9 +-
+ drivers/vfio/mdev/mdev_sysfs.c   |   8 +-
+ include/linux/mdev.h             |  21 ++--
+ 4 files changed, 89 insertions(+), 111 deletions(-)
+
+-- 
+2.19.2
+
