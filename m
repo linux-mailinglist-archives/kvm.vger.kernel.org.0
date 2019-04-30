@@ -2,134 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A49D2FAF8
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 16:05:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3790F101D1
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 23:31:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727939AbfD3OEa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 10:04:30 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45936 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726294AbfD3OEa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 30 Apr 2019 10:04:30 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3UE2xXh040684
-        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 10:04:27 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2s6n48rmeh-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 10:04:19 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Tue, 30 Apr 2019 15:03:36 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 30 Apr 2019 15:03:33 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3UE3VGY45088966
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 30 Apr 2019 14:03:31 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C7224A4066;
-        Tue, 30 Apr 2019 14:03:31 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1D45BA405B;
-        Tue, 30 Apr 2019 14:03:31 +0000 (GMT)
-Received: from [9.145.13.117] (unknown [9.145.13.117])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 30 Apr 2019 14:03:31 +0000 (GMT)
-Reply-To: pmorel@linux.ibm.com
-Subject: Re: [PATCH v7 3/4] s390: ap: implement PAPQ AQIC interception in
- kernel
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     borntraeger@de.ibm.com, alex.williamson@redhat.com,
-        cohuck@redhat.com, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        frankja@linux.ibm.com, akrowiak@linux.ibm.com, david@redhat.com,
-        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
-        freude@linux.ibm.com, mimu@linux.ibm.com
-References: <1556283688-556-1-git-send-email-pmorel@linux.ibm.com>
- <1556283688-556-4-git-send-email-pmorel@linux.ibm.com>
- <20190430160031.198b83c1.pasic@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Tue, 30 Apr 2019 16:03:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190430160031.198b83c1.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19043014-0008-0000-0000-000002E1E0CC
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19043014-0009-0000-0000-0000224E48F5
-Message-Id: <40c7e3a5-06b1-8ab9-e32d-c0305c60d63f@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-30_07:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1904300089
+        id S1726086AbfD3VbS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 17:31:18 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:33615 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726048AbfD3VbS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 17:31:18 -0400
+Received: by mail-pf1-f196.google.com with SMTP id z28so2397562pfk.0
+        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 14:31:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=lzdC3PAF+ZIqCxXoKrUHIuggauok8E1eEYLCvrw/QZU=;
+        b=vIkjqPa6gP33u5/DJboq+5iy+kNxSCADS8n2IyyghsGLU0HfGGIRqSAlHmYr1DJ2j4
+         TVMWX0qSngov/LoARBwF30o12qGE6JARo4Xoe+hNjn0zFk1YCac9nmVbAutU/PNO0pNJ
+         sEkg9TdN3MlYRWuFxPFKA/LB1MFpK4LTiA2sjhkGihm+vufN9pTRiaNtKQrw27tp+h0f
+         1YrgrDCJxABXDHFb7NGe1tp80XZFRwYZNIPXnBOPq8QfhRqndvztXcVFIHDtTvTm7Fgd
+         KgRkvj7hHNv33PIIXbFUEKeEi5tHXG35a0cjtKoBOG/gsZI20o8DvgEgSSarlJORj5uJ
+         c5rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=lzdC3PAF+ZIqCxXoKrUHIuggauok8E1eEYLCvrw/QZU=;
+        b=Le/hFdGpxo2b2Tk7UWsYPcW6bPqDXPCQw+reI6vE1RL2j3r9pwyRhOwq5g9BM56u/R
+         TAwd8iX5szIwng4G16WUWrzm6BQi3NqQ+DQ3AIT7TX+dUl2jhol9JNuq2o/aKWzMUTrO
+         G1sCKT+4oW1/9ZPNdrZ/pwSorKjRYvQpQBXwk8pa4ThwNb6d0bj15RVz6e7YsQ9zD0Kl
+         MxHiGjGTLmGfZ+uZvjbcj+dK5ss9ZoSo8oxijvW2T70zWLDQzJM1fkSvGkDNJRA+FGVy
+         coMjDvGfq6ZmPVPRWdnZMVEp6p1TzVdd2wZxiE7rlqgBTYbQAbTavu4kPZRiB9iRNrjl
+         1kHg==
+X-Gm-Message-State: APjAAAXQA0wjbOof/lr/d349tk6mnQpX0Qc1w1+E3/ImHWvoUcOhQmTu
+        8ULK40uxH+z/BBTZZNrKU2o=
+X-Google-Smtp-Source: APXvYqyAZS6W6En2s7dnNrzHc/YGsftqUtgZ8G6q7JoGy3uz66LQuvxBoA7yu89PVFgrgzgfafZPSA==
+X-Received: by 2002:a63:db55:: with SMTP id x21mr18928535pgi.219.1556659877337;
+        Tue, 30 Apr 2019 14:31:17 -0700 (PDT)
+Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id b9sm45606779pfd.32.2019.04.30.14.31.16
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 30 Apr 2019 14:31:16 -0700 (PDT)
+From:   nadav.amit@gmail.com
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [kvm-unit-tests PATCH] x86: Change ALTERNATE_APIC_BASE to saner value
+Date:   Tue, 30 Apr 2019 07:09:26 -0700
+Message-Id: <20190430140926.3204-1-nadav.amit@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/04/2019 16:00, Halil Pasic wrote:
-> On Fri, 26 Apr 2019 15:01:27 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
->> index 18dcc4d..7cc02ff 100644
->> --- a/drivers/s390/crypto/vfio_ap_private.h
->> +++ b/drivers/s390/crypto/vfio_ap_private.h
->> @@ -4,6 +4,7 @@
->>    *
->>    * Author(s): Tony Krowiak <akrowiak@linux.ibm.com>
->>    *	      Halil Pasic <pasic@linux.ibm.com>
->> + *	      Pierre Morel <pmorel@linux.ibm.com>
->>    *
->>    * Copyright IBM Corp. 2018
->>    */
->> @@ -90,4 +91,14 @@ struct ap_matrix_mdev {
->>   extern int vfio_ap_mdev_register(void);
->>   extern void vfio_ap_mdev_unregister(void);
->>   
->> +struct vfio_ap_queue {
->> +	struct ap_matrix_mdev *matrix_mdev;
->> +	unsigned long a_nib;
->> +	unsigned long a_pfn;
->> +	unsigned long p_pfn;
->> +	int	apqn;
->> +#define VFIO_AP_ISC_INVALID 0xff
-> 
-> How about -1?
-> 
->> +	unsigned char a_isc;
->> +	unsigned char p_isc;
->> +};
->>   #endif /* _VFIO_AP_PRIVATE_H_ */
-> 
-> I assume a_ and p_ are for argument and private, or? Anyway it would be
-> nice to have nicer names for these.
-> 
-> If the a_ members are really just arguments, we could probably live
-> without the. I'm fine either way.
-> 
-> Regards,
-> Halil
-> 
+From: Nadav Amit <nadav.amit@gmail.com>
 
-Since there will be another iteration to modify other part of this patch
-I will simplify this handling and make the names clearer.
+According to the SDM, during initialization, the BSP "Switches to
+protected mode and ensures that the APIC address space is mapped to the
+strong uncacheable (UC) memory type." This requirement is not followed
+when the tests that relocate the APIC.
 
-Thanks
-Pierre
+Use the TPM base address for the alternate local-APIC base, as it is
+expected to be set as uncacheable by the BIOS.
 
+Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+---
+ x86/apic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/x86/apic.c b/x86/apic.c
+index de4a181..173b8b1 100644
+--- a/x86/apic.c
++++ b/x86/apic.c
+@@ -159,7 +159,7 @@ static void test_apic_disable(void)
+     report_prefix_pop();
+ }
+ 
+-#define ALTERNATE_APIC_BASE	0x42000000
++#define ALTERNATE_APIC_BASE	0xfed40000
+ 
+ static void test_apicbase(void)
+ {
 -- 
-Pierre Morel
-Linux/KVM/QEMU in Böblingen - Germany
+2.17.1
 
