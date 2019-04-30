@@ -2,121 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AE2EEF4E9
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 13:01:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6361F663
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 13:47:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727368AbfD3LBE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 07:01:04 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50226 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726436AbfD3LBE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 30 Apr 2019 07:01:04 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3UAv2Lh135966
-        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 07:01:03 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2s6m27jyf3-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 07:01:03 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Tue, 30 Apr 2019 12:01:01 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 30 Apr 2019 12:00:58 +0100
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3UB0uuh39911646
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 30 Apr 2019 11:00:56 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 882ED11C06C;
-        Tue, 30 Apr 2019 11:00:56 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0333111C054;
-        Tue, 30 Apr 2019 11:00:56 +0000 (GMT)
-Received: from [9.152.222.31] (unknown [9.152.222.31])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 30 Apr 2019 11:00:55 +0000 (GMT)
-Reply-To: pmorel@linux.ibm.com
-Subject: Re: [PATCH v7 3/4] s390: ap: implement PAPQ AQIC interception in
- kernel
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     borntraeger@de.ibm.com, alex.williamson@redhat.com,
-        cohuck@redhat.com, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        frankja@linux.ibm.com, akrowiak@linux.ibm.com, david@redhat.com,
-        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
-        freude@linux.ibm.com, mimu@linux.ibm.com
-References: <1556283688-556-1-git-send-email-pmorel@linux.ibm.com>
- <1556283688-556-4-git-send-email-pmorel@linux.ibm.com>
- <20190429185002.6041eecc.pasic@linux.ibm.com>
- <14453f04-f13f-f63c-fd8a-d9d8834182e0@linux.ibm.com>
- <efa8840b-35b1-2823-697f-ab56d4898854@linux.ibm.com>
- <20190430113718.426392f0.pasic@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Tue, 30 Apr 2019 13:00:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1730644AbfD3LrB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 07:47:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60246 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730629AbfD3Lq7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 07:46:59 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CE3F721783;
+        Tue, 30 Apr 2019 11:46:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1556624818;
+        bh=5vTVgx5rzCtrmNgVqwNFZgnPXSr7nJIQmp1UOJVDO8k=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=P8Ac3gQbGy5DiDnBGzU+/5EWIR/r4U8IxNCZNkFWT15Swl99WRIvNCauXpLsOmoXZ
+         +sEJ+vxUioE6wnCCWMryl+bDdn9pxn04fwnJRrbwGqFbWSMS6TDSmapM0GH1Dp7XVA
+         iUViE3wPrFBYlLEofzZiZoL18/qgjDVqgiNZk07Q=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Borislav Petkov <bp@suse.de>, Rik van Riel <riel@surriel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Nicolai Stange <nstange@suse.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        kvm ML <kvm@vger.kernel.org>,
+        linux-efi <linux-efi@vger.kernel.org>, x86-ml <x86@kernel.org>
+Subject: [PATCH 4.19 083/100] x86/fpu: Dont export __kernel_fpu_{begin,end}()
+Date:   Tue, 30 Apr 2019 13:38:52 +0200
+Message-Id: <20190430113612.682532449@linuxfoundation.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190430113608.616903219@linuxfoundation.org>
+References: <20190430113608.616903219@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-In-Reply-To: <20190430113718.426392f0.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19043011-0020-0000-0000-00000337D102
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19043011-0021-0000-0000-0000218A4F4D
-Message-Id: <e000d0b8-c5fa-bdc1-10f3-2bebae7ccdfe@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-30_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=840 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1904300072
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/04/2019 11:37, Halil Pasic wrote:
-> On Tue, 30 Apr 2019 10:32:52 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->>>>> +    aqic_gisa.gisa = gisa->next_alert >> 4;
->>>>
->>>> Why gisa->next_alert? Isn't this supposed to get set to gisa origin
->>>> (without some bits on the left)?
-> 
-> s/left/right/
-> 
->>>
->>> Someone already asked this question.
-> 
-> It must have been in some previous iteration... Can you give me a
-> pointer?
-> 
->>> The answer is: look at the ap_qirq_ctrl structure, you will see that the
->>> gisa field is 27 bits wide.
-> 
-> My question was not about the width, but about gisa->next_alert being
-> used.
-> 
-> Regards,
-> Halil
-> 
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-Ah, OK, I understand.
-it is inherited from the time I allocated the GISA myself, before the 
-Mimu GISA/GIB patches.
+commit 12209993e98c5fa1855c467f22a24e3d5b8be205 upstream.
 
-So now indeed I must use the GISA origin for the case next_alert is used 
-by GIB alert queue.
+There is one user of __kernel_fpu_begin() and before invoking it,
+it invokes preempt_disable(). So it could invoke kernel_fpu_begin()
+right away. The 32bit version of arch_efi_call_virt_setup() and
+arch_efi_call_virt_teardown() does this already.
 
+The comment above *kernel_fpu*() claims that before invoking
+__kernel_fpu_begin() preemption should be disabled and that KVM is a
+good example of doing it. Well, KVM doesn't do that since commit
 
--- 
-Pierre Morel
-Linux/KVM/QEMU in Böblingen - Germany
+  f775b13eedee2 ("x86,kvm: move qemu/guest FPU switching out to vcpu_run")
+
+so it is not an example anymore.
+
+With EFI gone as the last user of __kernel_fpu_{begin|end}(), both can
+be made static and not exported anymore.
+
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Reviewed-by: Rik van Riel <riel@surriel.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Nicolai Stange <nstange@suse.de>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: kvm ML <kvm@vger.kernel.org>
+Cc: linux-efi <linux-efi@vger.kernel.org>
+Cc: x86-ml <x86@kernel.org>
+Link: https://lkml.kernel.org/r/20181129150210.2k4mawt37ow6c2vq@linutronix.de
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+---
+ arch/x86/include/asm/efi.h     |    6 ++----
+ arch/x86/include/asm/fpu/api.h |   15 +++++----------
+ arch/x86/kernel/fpu/core.c     |    6 ++----
+ 3 files changed, 9 insertions(+), 18 deletions(-)
+
+--- a/arch/x86/include/asm/efi.h
++++ b/arch/x86/include/asm/efi.h
+@@ -82,8 +82,7 @@ struct efi_scratch {
+ #define arch_efi_call_virt_setup()					\
+ ({									\
+ 	efi_sync_low_kernel_mappings();					\
+-	preempt_disable();						\
+-	__kernel_fpu_begin();						\
++	kernel_fpu_begin();						\
+ 	firmware_restrict_branch_speculation_start();			\
+ 									\
+ 	if (!efi_enabled(EFI_OLD_MEMMAP))				\
+@@ -99,8 +98,7 @@ struct efi_scratch {
+ 		efi_switch_mm(efi_scratch.prev_mm);			\
+ 									\
+ 	firmware_restrict_branch_speculation_end();			\
+-	__kernel_fpu_end();						\
+-	preempt_enable();						\
++	kernel_fpu_end();						\
+ })
+ 
+ extern void __iomem *__init efi_ioremap(unsigned long addr, unsigned long size,
+--- a/arch/x86/include/asm/fpu/api.h
++++ b/arch/x86/include/asm/fpu/api.h
+@@ -12,17 +12,12 @@
+ #define _ASM_X86_FPU_API_H
+ 
+ /*
+- * Careful: __kernel_fpu_begin/end() must be called with preempt disabled
+- * and they don't touch the preempt state on their own.
+- * If you enable preemption after __kernel_fpu_begin(), preempt notifier
+- * should call the __kernel_fpu_end() to prevent the kernel/user FPU
+- * state from getting corrupted. KVM for example uses this model.
+- *
+- * All other cases use kernel_fpu_begin/end() which disable preemption
+- * during kernel FPU usage.
++ * Use kernel_fpu_begin/end() if you intend to use FPU in kernel context. It
++ * disables preemption so be careful if you intend to use it for long periods
++ * of time.
++ * If you intend to use the FPU in softirq you need to check first with
++ * irq_fpu_usable() if it is possible.
+  */
+-extern void __kernel_fpu_begin(void);
+-extern void __kernel_fpu_end(void);
+ extern void kernel_fpu_begin(void);
+ extern void kernel_fpu_end(void);
+ extern bool irq_fpu_usable(void);
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -93,7 +93,7 @@ bool irq_fpu_usable(void)
+ }
+ EXPORT_SYMBOL(irq_fpu_usable);
+ 
+-void __kernel_fpu_begin(void)
++static void __kernel_fpu_begin(void)
+ {
+ 	struct fpu *fpu = &current->thread.fpu;
+ 
+@@ -111,9 +111,8 @@ void __kernel_fpu_begin(void)
+ 		__cpu_invalidate_fpregs_state();
+ 	}
+ }
+-EXPORT_SYMBOL(__kernel_fpu_begin);
+ 
+-void __kernel_fpu_end(void)
++static void __kernel_fpu_end(void)
+ {
+ 	struct fpu *fpu = &current->thread.fpu;
+ 
+@@ -122,7 +121,6 @@ void __kernel_fpu_end(void)
+ 
+ 	kernel_fpu_enable();
+ }
+-EXPORT_SYMBOL(__kernel_fpu_end);
+ 
+ void kernel_fpu_begin(void)
+ {
+
 
