@@ -2,32 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6142C1002E
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 21:18:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D07510041
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 21:23:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726303AbfD3TR6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 15:17:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43858 "EHLO mx1.redhat.com"
+        id S1726048AbfD3TXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 15:23:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38048 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727286AbfD3TRn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 15:17:43 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        id S1725996AbfD3TXc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 15:23:32 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 03547C4EAC;
-        Tue, 30 Apr 2019 19:17:43 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 00A8B30842A1;
+        Tue, 30 Apr 2019 19:23:32 +0000 (UTC)
 Received: from [10.36.112.20] (ovpn-112-20.ams2.redhat.com [10.36.112.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A55D17B18;
-        Tue, 30 Apr 2019 19:17:40 +0000 (UTC)
-Subject: Re: [PATCH] KVM: lapic: Check for in-kernel LAPIC before deferencing
- apic pointer
-To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org,
-        syzbot+f7e65445a40d3e0e4ebf@syzkaller.appspotmail.com
-References: <20190426020109.32319-1-sean.j.christopherson@intel.com>
- <20190426031543.GB22801@char.us.oracle.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A33D1001DC8;
+        Tue, 30 Apr 2019 19:23:30 +0000 (UTC)
+Subject: Re: [PATCH] KVM: selftests: make hyperv_cpuid test pass on AMD
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+References: <20190426132711.26710-1-vkuznets@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
@@ -85,24 +81,59 @@ Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
  DduC0U3xYkfbGAUvbxeepjgzp0uEnBXfPTy09JGpgWbg0w91GyfT/ujKaGd4vxG2Ei+MMNDm
  S1SMx7wu0evvQ5kT9NPzyq8R2GIhVSiAd2jioGuTjX6AZCFv3ToO53DliFMkVTecLptsXaes
  uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <dd4019dd-06f2-f9ac-a021-ad05acb06458@redhat.com>
-Date:   Tue, 30 Apr 2019 21:17:37 +0200
+Message-ID: <94b42cba-0bc2-01b5-a0b8-d793b518b743@redhat.com>
+Date:   Tue, 30 Apr 2019 21:23:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190426031543.GB22801@char.us.oracle.com>
+In-Reply-To: <20190426132711.26710-1-vkuznets@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Tue, 30 Apr 2019 19:17:43 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Tue, 30 Apr 2019 19:23:32 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/04/19 05:15, Konrad Rzeszutek Wilk wrote:
-> Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+On 26/04/19 15:27, Vitaly Kuznetsov wrote:
+> Enlightened VMCS is only supported on Intel CPUs but the test shouldn't
+> fail completely.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> index 264425f75806..9a21e912097c 100644
+> --- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> @@ -141,7 +141,13 @@ int main(int argc, char *argv[])
+>  
+>  	free(hv_cpuid_entries);
+>  
+> -	vcpu_ioctl(vm, VCPU_ID, KVM_ENABLE_CAP, &enable_evmcs_cap);
+> +	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_ENABLE_CAP, &enable_evmcs_cap);
+> +
+> +	if (rv) {
+> +		fprintf(stderr,
+> +			"Enlightened VMCS is unsupported, skip related test\n");
+> +		goto vm_free;
+> +	}
+>  
+>  	hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
+>  	if (!hv_cpuid_entries)
+> @@ -151,6 +157,7 @@ int main(int argc, char *argv[])
+>  
+>  	free(hv_cpuid_entries);
+>  
+> +vm_free:
+>  	kvm_vm_free(vm);
+>  
+>  	return 0;
+> 
 
 Queued, thanks.
 
