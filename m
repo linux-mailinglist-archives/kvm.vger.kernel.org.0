@@ -2,36 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D6B1510011
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 21:06:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B6BE10017
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 21:10:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727121AbfD3TGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 15:06:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50378 "EHLO mx1.redhat.com"
+        id S1726974AbfD3TJz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 15:09:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56776 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726733AbfD3TGw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 15:06:52 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S1726115AbfD3TJz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 15:09:55 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6874630832CC;
-        Tue, 30 Apr 2019 19:06:51 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id D76A533027E;
+        Tue, 30 Apr 2019 19:09:54 +0000 (UTC)
 Received: from [10.36.112.20] (ovpn-112-20.ams2.redhat.com [10.36.112.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DE0A66CDCB;
-        Tue, 30 Apr 2019 19:06:41 +0000 (UTC)
-Subject: Re: [PATCH 0/5] KVM/ARM updates for 5.1-rc7
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Heyi Guo <guoheyi@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Wei Huang <wei@redhat.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-References: <20190425134857.26109-1-marc.zyngier@arm.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E262F4D5;
+        Tue, 30 Apr 2019 19:09:52 +0000 (UTC)
+Subject: Re: [PATCH v2] kvm_main: fix some comments
+To:     Jiang Biao <benbjiang@tencent.com>, rkrcmar@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cohuck@redhat.com
+References: <20190423114030.75631-1-benbjiang@tencent.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
@@ -89,25 +81,61 @@ Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
  DduC0U3xYkfbGAUvbxeepjgzp0uEnBXfPTy09JGpgWbg0w91GyfT/ujKaGd4vxG2Ei+MMNDm
  S1SMx7wu0evvQ5kT9NPzyq8R2GIhVSiAd2jioGuTjX6AZCFv3ToO53DliFMkVTecLptsXaes
  uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <e7dda1d2-f2b3-127c-98d3-8d22c5ee7684@redhat.com>
-Date:   Tue, 30 Apr 2019 21:06:39 +0200
+Message-ID: <fe0b88fe-d716-48ff-70b4-d5640e4c4ffa@redhat.com>
+Date:   Tue, 30 Apr 2019 21:09:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190425134857.26109-1-marc.zyngier@arm.com>
+In-Reply-To: <20190423114030.75631-1-benbjiang@tencent.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Tue, 30 Apr 2019 19:06:51 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Tue, 30 Apr 2019 19:09:54 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/04/19 15:48, Marc Zyngier wrote:
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-for-5.1-2
+On 23/04/19 13:40, Jiang Biao wrote:
+> is_dirty has been renamed to flush, but the comment for it is
+> outdated. And the description about @flush parameter for
+> kvm_clear_dirty_log_protect() is missing, add it in this patch
+> as well.
+> 
+> Signed-off-by: Jiang Biao <benbjiang@tencent.com>
+> ---
+>  virt/kvm/kvm_main.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index dc8edc97ba85..6cf7e99e6003 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1134,11 +1134,11 @@ EXPORT_SYMBOL_GPL(kvm_get_dirty_log);
+>  
+>  #ifdef CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>  /**
+> - * kvm_get_dirty_log_protect - get a snapshot of dirty pages, and if any pages
+> + * kvm_get_dirty_log_protect - get a snapshot of dirty pages
+>   *	and reenable dirty page tracking for the corresponding pages.
+>   * @kvm:	pointer to kvm instance
+>   * @log:	slot id and address to which we copy the log
+> - * @is_dirty:	flag set if any page is dirty
+> + * @flush:	true if TLB flush is needed by caller
+>   *
+>   * We need to keep it in mind that VCPU threads can write to the bitmap
+>   * concurrently. So, to avoid losing track of dirty pages we keep the
+> @@ -1223,6 +1223,7 @@ EXPORT_SYMBOL_GPL(kvm_get_dirty_log_protect);
+>   *	and reenable dirty page tracking for the corresponding pages.
+>   * @kvm:	pointer to kvm instance
+>   * @log:	slot id and address from which to fetch the bitmap of dirty pages
+> + * @flush:	true if TLB flush is needed by caller
+>   */
+>  int kvm_clear_dirty_log_protect(struct kvm *kvm,
+>  				struct kvm_clear_dirty_log *log, bool *flush)
+> 
 
-Pulled, thanks.
+Queued, thanks.
 
 Paolo
