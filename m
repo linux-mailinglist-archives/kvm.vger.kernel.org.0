@@ -2,111 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 22F231005E
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 21:34:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC92F10089
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 22:04:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726681AbfD3Tea (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 15:34:30 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:41799 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726115AbfD3Tea (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 15:34:30 -0400
-Received: by mail-pf1-f193.google.com with SMTP id 188so7555707pfd.8
-        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 12:34:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=QiXn4xRoEve5QTiQnhqL5X9oVseDAypikFFfuPJXnU4=;
-        b=eSml1lzrdipd8s5iVFyZ3YLOlnYQcuiN0zAhILrrzeed4uqzIYjWJ4IRLWrqozTukn
-         mTJH/YXja7kZhwu26iw0DE7H/IeGgv1lZa90eEMhk1GfBAqYPW7q3PAnovhM2wl6wPhG
-         U8HjOTlXS4KP2KidR7W6Ro11+SotfD0Lmv5djNhQNaSBiS2hDBs3ZTvQmndVdPvXChvl
-         JI7K5tllOkPFKpg1YinCzUnDZhtgo2jEcnq2svfQvX5+ywKnSIW4KWgvTzt3dmn8JxWV
-         e4RpdpOSGsEf8frfjHerY1OoCdxFTeYDPvFr9OzgdBDDBTP4+cQMERxK24ud6w3BBMud
-         hGNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=QiXn4xRoEve5QTiQnhqL5X9oVseDAypikFFfuPJXnU4=;
-        b=aA4WZut4GVu+Kz3nsog55B1OwjxUBc76Jm1tTaV4DxlfiA1KqKPx9JUoEUlP1MTbqP
-         bBQTCabeXXLMw0e1w4DClSC8UMN/3yE1l9jN6chItHvBTj7f1A0EoZ7qqA0nzfveWD+v
-         ZZidyzclmnsO/Ng/cExPVurGI51MWuchcYwcZMjDS3fmQBRkNkid2yXGyBdD7FYtphsU
-         QTAF/giBaKcNZrXFz2sfxAAcO+HpBnVNpP3ZMpL5JEQRRsmqLpCNLmpXEa/B7/LMqsM7
-         T4Ku5KkOslEK7pJIG7n7fcKHJm7abP7L7Vx7D2M4C7CU9PQ6O1Re148QNk+ZTlWKmRdw
-         Adaw==
-X-Gm-Message-State: APjAAAVT8c/RO3z6Y2jDcHDcFsjHkOuFmaCSQI33OXIZp8ZZw64/Bb02
-        Hq5EF4VrNzrbw2ANxUy/fQE=
-X-Google-Smtp-Source: APXvYqw+/RaK3R2evvL8GAop7vFUXvl5uezXMnOEyRAXhGCN1Uau4kPU7QsCQeiRsbKQjjypZfJhNQ==
-X-Received: by 2002:a63:2c06:: with SMTP id s6mr69049562pgs.245.1556652868915;
-        Tue, 30 Apr 2019 12:34:28 -0700 (PDT)
-Received: from [10.33.115.113] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id p66sm73433884pfb.4.2019.04.30.12.34.27
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Apr 2019 12:34:27 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [kvm-unit-tests PATCH] x86: Allow xapic ID writes to silently
- fail
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <ce8e71f8-bbec-9324-39cd-ec0f0ad72297@redhat.com>
-Date:   Tue, 30 Apr 2019 12:34:26 -0700
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <FA7E59EA-64FA-430F-99EF-8FD45D1A63A7@gmail.com>
-References: <20190424212218.15230-1-nadav.amit@gmail.com>
- <ce8e71f8-bbec-9324-39cd-ec0f0ad72297@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+        id S1726181AbfD3UEF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 16:04:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40956 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725996AbfD3UEE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 16:04:04 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 96AF3307D971;
+        Tue, 30 Apr 2019 20:04:04 +0000 (UTC)
+Received: from [10.36.112.20] (ovpn-112-20.ams2.redhat.com [10.36.112.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E79439CD0;
+        Tue, 30 Apr 2019 20:04:01 +0000 (UTC)
+Subject: Re: [PATCH 0/3] KVM: x86: Drop "caching" of always-available GPRs
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>
+Cc:     kvm@vger.kernel.org
+References: <20190430173619.15774-1-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
+Message-ID: <e61c4c2f-867a-131d-b59e-0e54970b2f90@redhat.com>
+Date:   Tue, 30 Apr 2019 22:03:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190430173619.15774-1-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 30 Apr 2019 20:04:04 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Apr 30, 2019, at 12:13 PM, Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->=20
-> On 24/04/19 23:22, nadav.amit@gmail.com wrote:
->> From: Nadav Amit <nadav.amit@gmail.com>
->>=20
->> According to Intel SDM: "Some processors permit software to modify =
-the
->> APIC ID.  However, the ability of software to modify the APIC ID is
->> processor model specific."
->>=20
->> Allow this behavior not to cause failures.
->>=20
->> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
->> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
->> ---
->> x86/apic.c | 2 +-
->> 1 file changed, 1 insertion(+), 1 deletion(-)
->>=20
->> diff --git a/x86/apic.c b/x86/apic.c
->> index d1ed5ea..6772f3f 100644
->> --- a/x86/apic.c
->> +++ b/x86/apic.c
->> @@ -210,7 +210,7 @@ static void __test_apic_id(void * unused)
->>     newid =3D (id + 1) << 24;
->>     report("writeable xapic id",
->>             !test_for_exception(GP_VECTOR, do_write_apic_id, &newid) =
-&&
->> -            id + 1 =3D=3D apic_id());
->> +	    (id =3D=3D apic_id() || id + 1 =3D=3D apic_id()));
->>=20
->>     if (!enable_x2apic())
->>         goto out;
->=20
-> Queued, thanks.
+On 30/04/19 19:36, Sean Christopherson wrote:
+> KVM's GPR caching logic is unconditionally emitted for all GPR accesses
+> (that go through the accessors), even when the register being accessed
+> is fixed and always available.  This bloats KVM due to the instructions
+> needed to test and set the available/dirty bitmaps, and to conditionally
+> invoke the .cache_reg() callback.  The latter is especially painful when
+> compiling with retpolines.
+> 
+> Eliminate the unnecessary overhead by:
+> 
+>  - Adding dedicated accessors for every GPR
+>  - Omitting the caching logic for GPRs that are always available
+>  - Preventing use of the unoptimized versions for fixed accesses
+> 
+> The last patch is an opportunistic clean up of VMX, which has gradually
+> acquired a bad habit of sprinkling in direct access to GPRs.
 
-Thanks. Silly question - when you say =E2=80=9Cqueued=E2=80=9D, what do =
-you mean exactly?
+Another related cleanup is to replace these with the direct accessors:
 
-In other words, when will it be reflected on the kvm-unit-tests =
-repository?
-I want to send a few more fixes, but I lost track which ones I sent, so =
-I
-want to rebase first.
+arch/x86/kvm/vmx/nested.c:	vmcs12->guest_rsp = kvm_register_read(vcpu, VCPU_REGS_RSP);
+arch/x86/kvm/vmx/nested.c:	vmcs12->guest_rip = kvm_register_read(vcpu, VCPU_REGS_RIP);
+arch/x86/kvm/x86.c:	regs->rsp = kvm_register_read(vcpu, VCPU_REGS_RSP);
+arch/x86/kvm/svm.c:	kvm_register_write(&svm->vcpu, VCPU_REGS_RSP, hsave->save.rsp);
+arch/x86/kvm/svm.c:	kvm_register_write(&svm->vcpu, VCPU_REGS_RIP, hsave->save.rip);
+arch/x86/kvm/svm.c:	kvm_register_write(&svm->vcpu, VCPU_REGS_RSP, nested_vmcb->save.rsp);
+arch/x86/kvm/svm.c:	kvm_register_write(&svm->vcpu, VCPU_REGS_RIP, nested_vmcb->save.rip);
+arch/x86/kvm/vmx/nested.c:	kvm_register_write(vcpu, VCPU_REGS_RSP, vmcs12->guest_rsp);
+arch/x86/kvm/vmx/nested.c:	kvm_register_write(vcpu, VCPU_REGS_RIP, vmcs12->guest_rip);
+arch/x86/kvm/vmx/nested.c:	kvm_register_write(vcpu, VCPU_REGS_RSP, vmcs12->host_rsp);
+arch/x86/kvm/vmx/nested.c:	kvm_register_write(vcpu, VCPU_REGS_RIP, vmcs12->host_rip);
+arch/x86/kvm/x86.c:	kvm_register_write(vcpu, VCPU_REGS_RSP, regs->rsp);
 
+I can take care of this.  I have applied patches 1 and 3.  I didn't apply
+patch 2 for the reasons I mentioned in my reply, and because I am not sure
+if it works properly---it should have flagged the above occurrences,
+shouldn't it?
+
+Paolo
