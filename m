@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 02A361001F
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 21:13:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6602910020
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2019 21:13:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726916AbfD3TNK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 15:13:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41312 "EHLO mx1.redhat.com"
+        id S1726974AbfD3TNc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 15:13:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58610 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726006AbfD3TNK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 15:13:10 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        id S1726671AbfD3TNc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 15:13:32 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 209CFC05569A;
-        Tue, 30 Apr 2019 19:13:10 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 545AF81DF0;
+        Tue, 30 Apr 2019 19:13:31 +0000 (UTC)
 Received: from [10.36.112.20] (ovpn-112-20.ams2.redhat.com [10.36.112.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C63F54148;
-        Tue, 30 Apr 2019 19:13:08 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH] x86: Allow xapic ID writes to silently
- fail
-To:     nadav.amit@gmail.com
-Cc:     kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20190424212218.15230-1-nadav.amit@gmail.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 75F526D0A9;
+        Tue, 30 Apr 2019 19:13:29 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] x86: APIC: Add test for pending NMIs while
+ NMIs are blocked
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>
+References: <20190424222032.26437-1-sean.j.christopherson@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
@@ -82,50 +82,88 @@ Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
  DduC0U3xYkfbGAUvbxeepjgzp0uEnBXfPTy09JGpgWbg0w91GyfT/ujKaGd4vxG2Ei+MMNDm
  S1SMx7wu0evvQ5kT9NPzyq8R2GIhVSiAd2jioGuTjX6AZCFv3ToO53DliFMkVTecLptsXaes
  uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <ce8e71f8-bbec-9324-39cd-ec0f0ad72297@redhat.com>
-Date:   Tue, 30 Apr 2019 21:13:06 +0200
+Message-ID: <4ae54da7-f976-d7a7-7fb9-6861a14a674c@redhat.com>
+Date:   Tue, 30 Apr 2019 21:13:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190424212218.15230-1-nadav.amit@gmail.com>
+In-Reply-To: <20190424222032.26437-1-sean.j.christopherson@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 30 Apr 2019 19:13:10 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Tue, 30 Apr 2019 19:13:31 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/04/19 23:22, nadav.amit@gmail.com wrote:
-> From: Nadav Amit <nadav.amit@gmail.com>
+On 25/04/19 00:20, Sean Christopherson wrote:
+> Though explicit documentation is difficult to unearth, x86 guarantees
+> that exactly one NMI will be pended when NMIs are blocked.  The SDM
+> essentially calls this out in its section on handling NMIs in SMM:
 > 
-> According to Intel SDM: "Some processors permit software to modify the
-> APIC ID.  However, the ability of software to modify the APIC ID is
-> processor model specific."
+>   NMI interrupts are blocked upon entry to the SMI handler. If an NMI
+>   request occurs during the SMI handler, it is latched and serviced
+>   after the processor exits SMM. Only one NMI request will be latched
+>   during the SMI handler.
 > 
-> Allow this behavior not to cause failures.
+> Add a test to send multiple NMIs from within an NMI handler to verify
+> that KVM correctly pends exactly *one* NMI when NMIs are blocked.
 > 
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+> Cc: Nadav Amit <nadav.amit@gmail.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
->  x86/apic.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  x86/apic.c | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
 > 
 > diff --git a/x86/apic.c b/x86/apic.c
-> index d1ed5ea..6772f3f 100644
+> index 51744cf..9b78288 100644
 > --- a/x86/apic.c
 > +++ b/x86/apic.c
-> @@ -210,7 +210,7 @@ static void __test_apic_id(void * unused)
->      newid = (id + 1) << 24;
->      report("writeable xapic id",
->              !test_for_exception(GP_VECTOR, do_write_apic_id, &newid) &&
-> -            id + 1 == apic_id());
-> +	    (id == apic_id() || id + 1 == apic_id()));
+> @@ -403,6 +403,34 @@ static void test_multiple_nmi(void)
+>      report("multiple nmi", ok);
+>  }
 >  
->      if (!enable_x2apic())
->          goto out;
+> +static void pending_nmi_handler(isr_regs_t *regs)
+> +{
+> +    int i;
+> +
+> +    if (++nmi_received == 1) {
+> +        for (i = 0; i < 10; ++i)
+> +            apic_icr_write(APIC_DEST_PHYSICAL | APIC_DM_NMI, 0);
+> +    }
+> +}
+> +
+> +static void test_pending_nmi(void)
+> +{
+> +    int i;
+> +
+> +    handle_irq(2, pending_nmi_handler);
+> +    for (i = 0; i < 100000; ++i) {
+> +	    nmi_received = 0;
+> +
+> +        apic_icr_write(APIC_DEST_PHYSICAL | APIC_DM_NMI, 0);
+> +        while (nmi_received < 2)
+> +            pause();
+> +
+> +        if (nmi_received != 2)
+> +            break;
+> +    }
+> +    report("pending nmi", nmi_received == 2);
+> +}
+> +
+>  static volatile int lvtt_counter = 0;
+>  
+>  static void lvtt_handler(isr_regs_t *regs)
+> @@ -615,6 +643,7 @@ int main(void)
+>  
+>      test_sti_nmi();
+>      test_multiple_nmi();
+> +    test_pending_nmi();
+>  
+>      test_apic_timer_one_shot();
+>      test_apic_change_mode();
 > 
 
 Queued, thanks.
