@@ -2,75 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BE9C10F24
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 00:46:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0DBE10F68
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 00:54:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726400AbfEAWqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 May 2019 18:46:12 -0400
-Received: from mail-io1-f44.google.com ([209.85.166.44]:44000 "EHLO
-        mail-io1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726383AbfEAWqK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 May 2019 18:46:10 -0400
-Received: by mail-io1-f44.google.com with SMTP id v9so356610iol.10
-        for <kvm@vger.kernel.org>; Wed, 01 May 2019 15:46:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ucla-edu.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=Fkw9oi3VL0oqq24xfC1kx9KZ48Ufxss4HZgXsunjCfE=;
-        b=fHG9rnXm13sOP6xGC0Nqw1ZqhBb1Ze9NS6HdQQwHQvAk7VaBwhA8GMMbeap+Z7WL2S
-         AIgi7/hbwBcQ8C6jQ+mkirlw6kWSqStIPqbwEBDPNfFx803ijbc8Vkom1YgRoiggWmSB
-         qoR8YxF+WkwLFf+9w6c3U77wsPs5yEOwQXbGOtZQOEoJA0fCZ2EhK6761mTA10C9izfC
-         s68v0JlGOKFcKyyY2wps7Me8h8eN/svIvbubG6Tf8LJkA4bT70W4eo5QrxxKEpIFQVBk
-         bMe0qNNKFFyXVrjwYK5/2y8T4EjIQKd2Tn5Km7QV+M/Bu/J0K5/c6LWoPYzWCphI+g8y
-         QWbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=Fkw9oi3VL0oqq24xfC1kx9KZ48Ufxss4HZgXsunjCfE=;
-        b=BORl/UKVywwAI/TJ9kyatJ7rGUNgx4M06tRRTVZmVcCj7e+em/I0lwjZLmb1LHuXby
-         CAcAStPBn2CK5S/K56K0SLK2Oo8Tfd7WTs8NFgla1GVlXCqQyOLUlA5TXgWwme3yoLyB
-         /ZIjVk0TWkXGCUaHSjGPCzH4AlkjFZoxtChKTFUUhtJovwvwWXAKJULEN66MHMhpVonX
-         jvT+s9UPKiOULcTIsSWx/FYVWbEiuOKpxb7YnoyhjkchpK9H38hOX9NjMz/vcQMASt8B
-         rVEzX1k+cs7ePwgEbex5X0qLs3JRYMQncPqq2Wjkoevh8JKprGKU4/hOC9GOTduXK6ii
-         /8CA==
-X-Gm-Message-State: APjAAAWXWtCyO6WrZ5D2Ow5kXODBIgU3x4kr6POl3o0oAzD7uihORbNi
-        g2iJMiuM71nLQlvHlQ+WKAGlOVzdepsff+79darZsMdzLW7yKw==
-X-Google-Smtp-Source: APXvYqxwqNJiKO50hV6cxuo/i3Cj7Rl7SJZy7vzSbSUMRcInJ6oXqQxqdXOgKKuz0++IU2kRGDSP1wCLhbyI5bwxYP4=
-X-Received: by 2002:a5d:83d7:: with SMTP id u23mr307343ior.56.1556750768823;
- Wed, 01 May 2019 15:46:08 -0700 (PDT)
-MIME-Version: 1.0
-From:   ivo welch <ivo.welch@ucla.edu>
-Date:   Wed, 1 May 2019 15:45:58 -0700
-Message-ID: <CAJrNScT9i3jGY9DDGUHjtHZKJQ_RLsHM3j90Tzjpxfx0+XXV8Q@mail.gmail.com>
-Subject: developer intro
-To:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        id S1726145AbfEAWyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 May 2019 18:54:21 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34356 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726125AbfEAWyU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 May 2019 18:54:20 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x41MsFBX070825;
+        Wed, 1 May 2019 18:54:18 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2s7k1tjkhs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 May 2019 18:54:17 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x41GsCTx029328;
+        Wed, 1 May 2019 16:56:33 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma01dal.us.ibm.com with ESMTP id 2s4eq3ut8a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 May 2019 16:56:33 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x41MpLha27263158
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 1 May 2019 22:51:21 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B8723AC05F;
+        Wed,  1 May 2019 22:51:21 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AAF28AC05B;
+        Wed,  1 May 2019 22:51:21 +0000 (GMT)
+Received: from collin-T470p.pok.ibm.com (unknown [9.56.58.88])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed,  1 May 2019 22:51:21 +0000 (GMT)
+From:   Collin Walling <walling@linux.ibm.com>
+To:     cohuck@redhat.com, david@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [PATCH v4 0/2] Use DIAG318 to set Control Program Name & Version Codes
+Date:   Wed,  1 May 2019 18:51:01 -0400
+Message-Id: <1556751063-21835-1-git-send-email-walling@linux.ibm.com>
+X-Mailer: git-send-email 2.7.4
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-01_10:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905010141
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ladies and Gents--- I want to learn how to write a pseudo-storage
-device, where the host can observe and potentially intercept read and
-write requests to LBAs by the guest(s).  I am looking for a starter
-docs, tutorials, examples, general docs, etc.  (Or perhaps is someone
-interested in helping me set this up for pay, especially if such docs
-are hard to find?)
+Changelog:
 
-My first source was https://www.linux-kvm.org/.  I am not sure whether
-it is maintained or not.  For example,
+    v4
+        - removed setup.c changes introduced in bullet 1 of v3
+        - kept diag318_info struct cleanup
+        - analogous QEMU patches:
+            https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00164.html
 
-On https://www.linux-kvm.org/page/Lists,_IRC, the subscribe archives
-links are not working.
-Under "About", the "Book qemu-kvm & libvirt" (http://qemu-buch.de/) is broken.
+    v3
+        - kernel patch for diag 0x318 instruction call fixup [removed in v4]
+        - removed CPU model code
+        - cleaned up diag318_info struct
+        - cpnc is no longer unshadowed as it was not needed
+        - rebased on 5.1.0-rc3
 
-advice appreciated.
+This instruction call is executed once-and-only-once during Kernel setup.
+The availability of this instruction depends on Read SCP Info byte 134, bit 0.
+Diagnose318's functionality is also emulated by KVM, which means we can 
+enable this feature for a guest even if the host kernel cannot support it.
 
-regards,
+The CPNC and CPVC are used for problem diagnosis and allows IBM to identify 
+control program information by answering the following question:
 
-/ivo welch
-ucla
+    "What environment is this guest running in?" (CPNC)
+    "What are more details regarding the OS?" (CPVC)
 
---
-Ivo Welch (ivo.welch@ucla.edu)
-http://www.ivo-welch.info/
+In the future, we will implement the Control Program Version Code (CPVC) to
+convey more information about the OS. For now, we set this field to 0 until
+we come up with a solid plan.
+
+Collin Walling (2):
+  s390/setup: diag318: refactor struct
+  s390/kvm: diagnose 318 handling
+
+ Documentation/virtual/kvm/devices/vm.txt | 14 ++++++
+ arch/s390/include/asm/diag.h             |  6 +--
+ arch/s390/include/asm/kvm_host.h         |  7 ++-
+ arch/s390/include/uapi/asm/kvm.h         |  4 ++
+ arch/s390/kernel/setup.c                 |  3 +-
+ arch/s390/kvm/diag.c                     | 17 +++++++
+ arch/s390/kvm/kvm-s390.c                 | 83 ++++++++++++++++++++++++++++++++
+ arch/s390/kvm/kvm-s390.h                 |  1 +
+ arch/s390/kvm/vsie.c                     |  2 +
+ 9 files changed, 129 insertions(+), 8 deletions(-)
+
+-- 
+2.7.4
+
