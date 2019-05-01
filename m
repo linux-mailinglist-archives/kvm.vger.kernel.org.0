@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B84C10692
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2019 11:49:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12F491068B
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2019 11:48:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726276AbfEAJsR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 May 2019 05:48:17 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:55028 "EHLO huawei.com"
+        id S1726363AbfEAJsW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 May 2019 05:48:22 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:37752 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726193AbfEAJsR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 May 2019 05:48:17 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id CCCB721BE0C0F1547E36;
-        Wed,  1 May 2019 17:48:14 +0800 (CST)
+        id S1726351AbfEAJsW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 May 2019 05:48:22 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id CEDEF9F163E2777B5360;
+        Wed,  1 May 2019 17:48:19 +0800 (CST)
 Received: from HGHY2Y004646261.china.huawei.com (10.184.12.158) by
  DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 1 May 2019 17:48:08 +0800
+ 14.3.439.0; Wed, 1 May 2019 17:48:09 +0800
 From:   Zenghui Yu <yuzenghui@huawei.com>
 To:     <linux-arm-kernel@lists.infradead.org>,
         <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>,
@@ -27,9 +27,9 @@ CC:     <marc.zyngier@arm.com>, <christoffer.dall@arm.com>,
         <julien.thierry@arm.com>, <suzuki.poulose@arm.com>,
         <steve.capper@arm.com>, <wanghaibin.wang@huawei.com>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 2/5] KVM: arm/arm64: Re-factor building the stage2 page table entries
-Date:   Wed, 1 May 2019 09:44:24 +0000
-Message-ID: <1556703867-22396-3-git-send-email-yuzenghui@huawei.com>
+Subject: [PATCH 3/5] KVM: arm/arm64: Support dirty page tracking for contiguous hugepages
+Date:   Wed, 1 May 2019 09:44:25 +0000
+Message-ID: <1556703867-22396-4-git-send-email-yuzenghui@huawei.com>
 X-Mailer: git-send-email 2.6.4.windows.1
 In-Reply-To: <1556703867-22396-1-git-send-email-yuzenghui@huawei.com>
 References: <1556703867-22396-1-git-send-email-yuzenghui@huawei.com>
@@ -42,126 +42,145 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As we're going to support creating CONT_{PTE,PMD}_SIZE huge mappings in
-user_mem_abort(), the logic to check vma_pagesize and build page table
-entries will become longer, and looks almost the same (but actually they
-dont). Refactor this part to make it a bit cleaner.
+When logging is enabled, we should keep tracking of normal size pages.
+If the memslot is backed by contiguous hugepages, we should dissolve
+the contiguous hugepages - clear the whole contiguous range and flush
+corresponding TLB entry.
 
-Add contiguous as a parameter of stage2_build_{pmd,pte}, to indicate
-if we're creating contiguous huge mappings.
+Move kvm_set_{pte,pmd} to the front of stage2_dissolve_cont_{pte,pmd}s
+to avoid one more declaration.
 
 Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
 ---
- virt/kvm/arm/mmu.c | 81 ++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 57 insertions(+), 24 deletions(-)
+ arch/arm/include/asm/pgtable-hwdef.h |  8 ++++
+ virt/kvm/arm/mmu.c                   | 76 ++++++++++++++++++++++++++++++------
+ 2 files changed, 72 insertions(+), 12 deletions(-)
 
+diff --git a/arch/arm/include/asm/pgtable-hwdef.h b/arch/arm/include/asm/pgtable-hwdef.h
+index 8426229..41f4633 100644
+--- a/arch/arm/include/asm/pgtable-hwdef.h
++++ b/arch/arm/include/asm/pgtable-hwdef.h
+@@ -16,4 +16,12 @@
+ #include <asm/pgtable-2level-hwdef.h>
+ #endif
+ 
++/* dummy definition */
++#define CONT_PTES		(0)
++#define CONT_PTE_SIZE		(0)
++#define CONT_PTE_MASK		(0)
++#define CONT_PMDS		(0)
++#define CONT_PMD_SIZE		(0)
++#define CONT_PMD_MASK		(0)
++
+ #endif
 diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 27c9583..cf8b035 100644
+index cf8b035..36c863f 100644
 --- a/virt/kvm/arm/mmu.c
 +++ b/virt/kvm/arm/mmu.c
-@@ -1616,6 +1616,56 @@ static void kvm_send_hwpoison_signal(unsigned long address,
- 	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, lsb, current);
+@@ -96,6 +96,58 @@ static bool kvm_is_device_pfn(unsigned long pfn)
+ 	return !pfn_valid(pfn);
  }
  
-+static pud_t stage2_build_pud(kvm_pfn_t pfn, pgprot_t mem_type, bool writable,
-+			      bool needs_exec)
++static inline void kvm_set_pte(pte_t *ptep, pte_t new_pte)
 +{
-+	pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
-+
-+	new_pud = kvm_pud_mkhuge(new_pud);
-+	if (writable)
-+		new_pud = kvm_s2pud_mkwrite(new_pud);
-+
-+	if (needs_exec)
-+		new_pud = kvm_s2pud_mkexec(new_pud);
-+
-+	return new_pud;
++	WRITE_ONCE(*ptep, new_pte);
++	dsb(ishst);
 +}
 +
-+static pmd_t stage2_build_pmd(kvm_pfn_t pfn, pgprot_t mem_type, bool writable,
-+			      bool needs_exec, bool contiguous)
++static inline void kvm_set_pmd(pmd_t *pmdp, pmd_t new_pmd)
 +{
-+	pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
-+
-+	new_pmd = kvm_pmd_mkhuge(new_pmd);
-+	if (writable)
-+		new_pmd = kvm_s2pmd_mkwrite(new_pmd);
-+
-+	if (needs_exec)
-+		new_pmd = kvm_s2pmd_mkexec(new_pmd);
-+
-+	if (contiguous)
-+		new_pmd = kvm_s2pmd_mkcont(new_pmd);
-+
-+	return new_pmd;
++	WRITE_ONCE(*pmdp, new_pmd);
++	dsb(ishst);
 +}
 +
-+static pte_t stage2_build_pte(kvm_pfn_t pfn, pgprot_t mem_type, bool writable,
-+			      bool needs_exec, bool contiguous)
++static void stage2_dissolve_cont_ptes(struct kvm *kvm, phys_addr_t addr,
++				      pte_t *pte)
 +{
-+	pte_t new_pte = kvm_pfn_pte(pfn, mem_type);
++	phys_addr_t addrp;
++	pte_t *ptep;
++	int i;
 +
-+	if (writable)
-+		new_pte = kvm_s2pte_mkwrite(new_pte);
++	if (!kvm_s2pte_cont(*pte))
++		return;
 +
-+	if (needs_exec)
-+		new_pte = kvm_s2pte_mkexec(new_pte);
++	/* Start with the first pte */
++	addrp = addr & CONT_PTE_MASK;
++	ptep = pte - (addr - addrp) / PAGE_SIZE;
 +
-+	if (contiguous)
-+		new_pte = kvm_s2pte_mkcont(new_pte);
-+
-+	return new_pte;
++	for (i = 0; i < CONT_PTES; i++, ptep++, addrp += PAGE_SIZE) {
++		kvm_set_pte(ptep, __pte(0));
++		kvm_tlb_flush_vmid_ipa(kvm, addrp);
++		put_page(virt_to_page(ptep));
++	}
 +}
 +
- static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
- 					       unsigned long hva,
- 					       unsigned long map_size)
-@@ -1807,38 +1857,21 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		(fault_status == FSC_PERM && stage2_is_exec(kvm, fault_ipa));
++static void stage2_dissolve_cont_pmds(struct kvm *kvm, phys_addr_t addr,
++				      pmd_t *pmd)
++{
++	phys_addr_t addrp;
++	pmd_t *pmdp;
++	int i;
++
++	/* Start with the first pmd */
++	addr &= PMD_MASK;
++	addrp = addr & CONT_PMD_MASK;
++	pmdp = pmd - (addr - addrp) / PMD_SIZE;
++
++	for (i = 0; i < CONT_PMDS; i++, pmdp++, addrp += PMD_SIZE) {
++		pmd_clear(pmdp);
++		kvm_tlb_flush_vmid_ipa(kvm, addrp);
++		put_page(virt_to_page(pmdp));
++	}
++}
++
+ /**
+  * stage2_dissolve_pmd() - clear and flush huge PMD entry
+  * @kvm:	pointer to kvm structure.
+@@ -109,6 +161,11 @@ static void stage2_dissolve_pmd(struct kvm *kvm, phys_addr_t addr, pmd_t *pmd)
+ 	if (!pmd_thp_or_huge(*pmd))
+ 		return;
  
- 	if (vma_pagesize == PUD_SIZE) {
--		pud_t new_pud = kvm_pfn_pud(pfn, mem_type);
--
--		new_pud = kvm_pud_mkhuge(new_pud);
--		if (writable)
--			new_pud = kvm_s2pud_mkwrite(new_pud);
--
--		if (needs_exec)
--			new_pud = kvm_s2pud_mkexec(new_pud);
-+		pud_t new_pud = stage2_build_pud(pfn, mem_type, writable,
-+						 needs_exec);
++	if (kvm_s2pmd_cont(*pmd)) {
++		stage2_dissolve_cont_pmds(kvm, addr, pmd);
++		return;
++	}
++
+ 	pmd_clear(pmd);
+ 	kvm_tlb_flush_vmid_ipa(kvm, addr);
+ 	put_page(virt_to_page(pmd));
+@@ -193,18 +250,6 @@ static void clear_stage2_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr
+ 	put_page(virt_to_page(pmd));
+ }
  
- 		ret = stage2_set_pud_huge(kvm, memcache, fault_ipa, &new_pud);
- 	} else if (vma_pagesize == PMD_SIZE) {
--		pmd_t new_pmd = kvm_pfn_pmd(pfn, mem_type);
+-static inline void kvm_set_pte(pte_t *ptep, pte_t new_pte)
+-{
+-	WRITE_ONCE(*ptep, new_pte);
+-	dsb(ishst);
+-}
 -
--		new_pmd = kvm_pmd_mkhuge(new_pmd);
+-static inline void kvm_set_pmd(pmd_t *pmdp, pmd_t new_pmd)
+-{
+-	WRITE_ONCE(*pmdp, new_pmd);
+-	dsb(ishst);
+-}
 -
--		if (writable)
--			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
--
--		if (needs_exec)
--			new_pmd = kvm_s2pmd_mkexec(new_pmd);
-+		pmd_t new_pmd = stage2_build_pmd(pfn, mem_type, writable,
-+						 needs_exec, false);
+ static inline void kvm_pmd_populate(pmd_t *pmdp, pte_t *ptep)
+ {
+ 	kvm_set_pmd(pmdp, kvm_mk_pmd(ptep));
+@@ -1289,6 +1334,13 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
  
- 		ret = stage2_set_pmd_huge(kvm, memcache, fault_ipa, &new_pmd);
- 	} else {
--		pte_t new_pte = kvm_pfn_pte(pfn, mem_type);
-+		pte_t new_pte = stage2_build_pte(pfn, mem_type, writable,
-+						 needs_exec, false);
+ 	pte = pte_offset_kernel(pmd, addr);
  
--		if (writable) {
--			new_pte = kvm_s2pte_mkwrite(new_pte);
-+		if (writable)
- 			mark_page_dirty(kvm, gfn);
--		}
--
--		if (needs_exec)
--			new_pte = kvm_s2pte_mkexec(new_pte);
++	/*
++	 * While dirty page logging - dissolve contiguous PTE pages, then
++	 * continue on to allocate page.
++	 */
++	if (logging_active)
++		stage2_dissolve_cont_ptes(kvm, addr, pte);
++
+ 	if (iomap && pte_present(*pte))
+ 		return -EFAULT;
  
- 		ret = stage2_set_pte(kvm, memcache, fault_ipa, &new_pte, flags);
- 	}
 -- 
 1.8.3.1
 
