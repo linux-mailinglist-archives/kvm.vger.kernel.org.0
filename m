@@ -2,93 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DDB4E107C8
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2019 14:06:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D2CF1091F
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2019 16:32:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726338AbfEAMGS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 May 2019 08:06:18 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:55957 "EHLO ozlabs.org"
+        id S1726724AbfEAOcO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 May 2019 10:32:14 -0400
+Received: from mga04.intel.com ([192.55.52.120]:52078 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725923AbfEAMGS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 May 2019 08:06:18 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 44vHDQ6w2kz9sNQ;
-        Wed,  1 May 2019 22:06:14 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1556712375;
-        bh=L4xIXdsKIOlYQtIGuIRuPLfaYR8V1c0iZE8OTmuXKkA=;
-        h=Date:From:To:Cc:Subject:From;
-        b=WsQ5tCPxvP6YMHDc+pzNUP4lgYdEuGKs/YgHJLZkW6wW2WFlcMOabinBuJPxIgMsq
-         4XuQ5BqGoxeM/aEoGEQgAo5xvNZeWo9eOjD+vY0/GUp7SwCD+R6i18/iVQ014FUkaw
-         knh5re4uaFghK3tUx0pTFjz6X3UF/BqHJd7ZLxhsfsDLIgheuNLrlZqjo1HPriEESk
-         yv+vLTm2oab5jCrM+eCTmIar1iWY2tjSK86tyqgofVVRNOmGkR9eZdGEoBECm9ejMS
-         58+fWYUbWxN73KTKxs7K44oYDpX1sFcyGnshlvYzP+H/LAz5yMaGONzCE81XdXOSkk
-         ACPoAid5kubfg==
-Date:   Wed, 1 May 2019 22:06:13 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        KVM <kvm@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Jim Mattson <jmattson@google.com>
-Subject: linux-next: Fixes tag needs some work in the kvm-fixes tree
-Message-ID: <20190501220613.635a5bf8@canb.auug.org.au>
+        id S1726555AbfEAOcO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 May 2019 10:32:14 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 May 2019 07:32:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,418,1549958400"; 
+   d="scan'208";a="147376659"
+Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 01 May 2019 07:32:13 -0700
+Received: from kbuild by lkp-server01 with local (Exim 4.89)
+        (envelope-from <lkp@intel.com>)
+        id 1hLqHM-00012y-Lt; Wed, 01 May 2019 22:32:12 +0800
+Date:   Wed, 1 May 2019 22:31:18 +0800
+From:   kbuild test robot <lkp@intel.com>
+To:     KarimAllah Ahmed <karahmed@amazon.de>
+Cc:     kbuild-all@01.org, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [kvm:queue 62/65] arch/x86/kernel/e820.c:88:9-10: WARNING: return of
+ 0/1 in function '_e820__mapped_any' with return type bool
+Message-ID: <201905012215.o7C9GJrG%lkp@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/Uxctia6sdY12mvb7htqdSoi"; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Patchwork-Hint: ignore
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/Uxctia6sdY12mvb7htqdSoi
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+head:   e9c16c78503dd0482b876761d60a3d2f50ac4d86
+commit: 0c55671f84fffe591e8435c93a8c83286fd6b8eb [62/65] kvm, x86: Properly check whether a pfn is an MMIO or not
 
-Hi all,
+If you fix the issue, kindly add following tag
+Reported-by: kbuild test robot <lkp@intel.com>
 
-In commit
 
-  e8ab8d24b488 ("KVM: nVMX: Fix size checks in vmx_set_nested_state")
+coccinelle warnings: (new ones prefixed by >>)
 
-Fixes tag
+>> arch/x86/kernel/e820.c:88:9-10: WARNING: return of 0/1 in function '_e820__mapped_any' with return type bool
 
-  Fixes: 8fcc4b5923af5de58b80b53a069453b135693304
+Please review and possibly fold the followup patch.
 
-has these problem(s):
-
-  - missing subject
-
-Did you mean
-
-Fixes: 8fcc4b5923af ("kvm: nVMX: Introduce KVM_CAP_NESTED_STATE")
-
-You can just use:
-
-  git log -1 --format=3D'Fixes: %h ("%s")' <commit>
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/Uxctia6sdY12mvb7htqdSoi
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlzJi7UACgkQAVBC80lX
-0GxOngf+PrnVpQsVNa+lQCveDJpr1DxQwBxQwnH6T+Z5BAKNbEhVa0YhGcB8Kv+I
-WrHRP/9+Y2xk1k6T9qaWTWU7DtG7bUuS+CQCf3MpHjAg4oMJ34rrl5muW/8x8Fgs
-8jdISLjNuRUZplcilZ+l0CmEOY2OuyMwDQ+IAq/0wwVmG3W9KViwLq764SqAnmbw
-n87vfS+9hUB5jo50pWW7TMaAKTkfhvBSm5XsudZZ97g4M/ABMaXFqjXVlJFug3IX
-3AF0fYzS1Y5vbJ08NCPG72FQd/VZTqpQftT6bO0sZDSRKj0M7H6zEGcrKAutob/Z
-E1Z8aXcfTO7sEBtI4mKKjeZIO0xaUg==
-=kmKd
------END PGP SIGNATURE-----
-
---Sig_/Uxctia6sdY12mvb7htqdSoi--
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
