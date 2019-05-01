@@ -2,292 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B9925102A2
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2019 00:50:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A90551037F
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2019 02:30:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727680AbfD3WuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Apr 2019 18:50:03 -0400
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:45950 "EHLO
-        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727639AbfD3WuA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Apr 2019 18:50:00 -0400
-Received: from Internal Mail-Server by MTLPINE2 (envelope-from parav@mellanox.com)
-        with ESMTPS (AES256-SHA encrypted); 1 May 2019 01:49:56 +0300
-Received: from sw-mtx-036.mtx.labs.mlnx (sw-mtx-036.mtx.labs.mlnx [10.12.150.149])
-        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x3UMncne009688;
-        Wed, 1 May 2019 01:49:55 +0300
-From:   Parav Pandit <parav@mellanox.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kwankhede@nvidia.com, alex.williamson@redhat.com
-Cc:     cjia@nvidia.com, parav@mellanox.com
-Subject: [PATCHv2 10/10] vfio/mdev: Synchronize device create/remove with parent removal
-Date:   Tue, 30 Apr 2019 17:49:37 -0500
-Message-Id: <20190430224937.57156-11-parav@mellanox.com>
-X-Mailer: git-send-email 2.19.2
-In-Reply-To: <20190430224937.57156-1-parav@mellanox.com>
-References: <20190430224937.57156-1-parav@mellanox.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1727177AbfEAAaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Apr 2019 20:30:05 -0400
+Received: from mail-vk1-f201.google.com ([209.85.221.201]:33585 "EHLO
+        mail-vk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726328AbfEAAaF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Apr 2019 20:30:05 -0400
+Received: by mail-vk1-f201.google.com with SMTP id u7so2229716vke.0
+        for <kvm@vger.kernel.org>; Tue, 30 Apr 2019 17:30:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=rvnnbDmsOgJ3xr/PffPc0gbHg8YSZc9QHWS8F5/zrz0=;
+        b=ouhDZAWcHKtKyngvM68oiibCChzMbcqbVGPz4YuQdwYUPFM4ynjce1cPHtBKp+HrJh
+         SHEg0bopCTTpmijYzKAlX8Hcvt4WTS9mmBRQwZ7OrOC4nW18Hc8PgqA88LbKdWg67BtN
+         22pvwxMyiNDPQkTaWYwf3FnpZXnWVlDML2Inls7H2lUgAccqN5vm2Ya7DA8PVn9h21Ui
+         zEvGZzs13JPe3YwreavZZvdN4kH5gkrMGNsTmYTqYOKpf1gFMDSlKxTfZvtf/bwAXEBG
+         lGz9Vp/KNDxebfL8M2UvekoKUhgIq86pq8LiZF629VUUGzYosazpZdvAB0/NWRarQ9aI
+         QFgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=rvnnbDmsOgJ3xr/PffPc0gbHg8YSZc9QHWS8F5/zrz0=;
+        b=tFYxtm8SylShOJho9JktZ7h9uKkAvuo8rTVueIS6mQ3rWdRbYSouQZ0QiYHvpNJ5/8
+         02gG2FLj3L1PIYelTIC1me0cYk6jPynrzMSsUVAv/v06dDwqmTT9VpfnBfzpoW0ANdKn
+         4Y+lTZX8a6Wy6kQLsiDP1DfBGffENiLKytpwSEjHkn6fjTOWec2rOf972DeH6HGpYItm
+         J9VNtp54pn63xYKZf4kNOS1w6K/SKGseKYaNYtTP0YuxrYoJxUjL2lyOmv4HG/uR/bS5
+         fHQlQq+XcPWIZV4VsURWMVp6d37o0OB4K2aaQaOl89oDcFtbeuE84vBkuS/HJ9NaIaTM
+         lzHg==
+X-Gm-Message-State: APjAAAVeLCq5QqaHaAODcPvjD7TVjEw0UYv3dfbmW7RmvoDsJ2A7rKX+
+        BhS59BGXQ/ZLcKwK4O/r1t2PIq/WDISEagw=
+X-Google-Smtp-Source: APXvYqxS/RD69FJkWFky/f1r4LGDC/KcN/ZgqbnWKDp6CV3L9ulYeepm2htYaXuH9V02y1lY6qy0VpnQ+LgxkHE=
+X-Received: by 2002:a67:f695:: with SMTP id n21mr2835367vso.19.1556670604001;
+ Tue, 30 Apr 2019 17:30:04 -0700 (PDT)
+Date:   Tue, 30 Apr 2019 17:30:01 -0700
+Message-Id: <20190501003001.186239-1-jemoreira@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.21.0.593.g511ec345e18-goog
+Subject: [PATCH] vsock/virtio: Initialize core virtio vsock before registering
+ the driver
+From:   "Jorge E. Moreira" <jemoreira@google.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kernel-team@android.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In following sequences, child devices created while removing mdev parent
-device can be left out, or it may lead to race of removing half
-initialized child mdev devices.
+Avoid a race in which static variables in net/vmw_vsock/af_vsock.c are
+accessed (while handling interrupts) before they are initialized.
 
-issue-1:
---------
-       cpu-0                         cpu-1
-       -----                         -----
-                                  mdev_unregister_device()
-                                    device_for_each_child()
-                                      mdev_device_remove_cb()
-                                        mdev_device_remove()
-create_store()
-  mdev_device_create()                   [...]
-    device_add()
-                                  parent_remove_sysfs_files()
+[    4.201410] BUG: unable to handle kernel paging request at ffffffffffffffe8
+[    4.207829] IP: vsock_addr_equals_addr+0x3/0x20
+[    4.211379] PGD 28210067 P4D 28210067 PUD 28212067 PMD 0
+[    4.211379] Oops: 0000 [#1] PREEMPT SMP PTI
+[    4.211379] Modules linked in:
+[    4.211379] CPU: 1 PID: 30 Comm: kworker/1:1 Not tainted 4.14.106-419297-gd7e28cc1f241 #1
+[    4.211379] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+[    4.211379] Workqueue: virtio_vsock virtio_transport_rx_work
+[    4.211379] task: ffffa3273d175280 task.stack: ffffaea1800e8000
+[    4.211379] RIP: 0010:vsock_addr_equals_addr+0x3/0x20
+[    4.211379] RSP: 0000:ffffaea1800ebd28 EFLAGS: 00010286
+[    4.211379] RAX: 0000000000000002 RBX: 0000000000000000 RCX: ffffffffb94e42f0
+[    4.211379] RDX: 0000000000000400 RSI: ffffffffffffffe0 RDI: ffffaea1800ebdd0
+[    4.211379] RBP: ffffaea1800ebd58 R08: 0000000000000001 R09: 0000000000000001
+[    4.211379] R10: 0000000000000000 R11: ffffffffb89d5d60 R12: ffffaea1800ebdd0
+[    4.211379] R13: 00000000828cbfbf R14: 0000000000000000 R15: ffffaea1800ebdc0
+[    4.211379] FS:  0000000000000000(0000) GS:ffffa3273fd00000(0000) knlGS:0000000000000000
+[    4.211379] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    4.211379] CR2: ffffffffffffffe8 CR3: 000000002820e001 CR4: 00000000001606e0
+[    4.211379] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[    4.211379] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[    4.211379] Call Trace:
+[    4.211379]  ? vsock_find_connected_socket+0x6c/0xe0
+[    4.211379]  virtio_transport_recv_pkt+0x15f/0x740
+[    4.211379]  ? detach_buf+0x1b5/0x210
+[    4.211379]  virtio_transport_rx_work+0xb7/0x140
+[    4.211379]  process_one_work+0x1ef/0x480
+[    4.211379]  worker_thread+0x312/0x460
+[    4.211379]  kthread+0x132/0x140
+[    4.211379]  ? process_one_work+0x480/0x480
+[    4.211379]  ? kthread_destroy_worker+0xd0/0xd0
+[    4.211379]  ret_from_fork+0x35/0x40
+[    4.211379] Code: c7 47 08 00 00 00 00 66 c7 07 28 00 c7 47 08 ff ff ff ff c7 47 04 ff ff ff ff c3 0f 1f 00 66 2e 0f 1f 84 00 00 00 00 00 8b 47 08 <3b> 46 08 75 0a 8b 47 04 3b 46 04 0f 94 c0 c3 31 c0 c3 90 66 2e
+[    4.211379] RIP: vsock_addr_equals_addr+0x3/0x20 RSP: ffffaea1800ebd28
+[    4.211379] CR2: ffffffffffffffe8
+[    4.211379] ---[ end trace f31cc4a2e6df3689 ]---
+[    4.211379] Kernel panic - not syncing: Fatal exception in interrupt
+[    4.211379] Kernel Offset: 0x37000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+[    4.211379] Rebooting in 5 seconds..
 
-/* BUG: device added by cpu-0
- * whose parent is getting removed
- * and it won't process this mdev.
- */
-
-issue-2:
---------
-Below crash is observed when user initiated remove is in progress
-and mdev_unregister_driver() completes parent unregistration.
-
-       cpu-0                         cpu-1
-       -----                         -----
-remove_store()
-   mdev_device_remove()
-   active = false;
-                                  mdev_unregister_device()
-                                  parent device removed.
-   [...]
-   parents->ops->remove()
- /*
-  * BUG: Accessing invalid parent.
-  */
-
-This is similar race like create() racing with mdev_unregister_device().
-
-BUG: unable to handle kernel paging request at ffffffffc0585668
-PGD e8f618067 P4D e8f618067 PUD e8f61a067 PMD 85adca067 PTE 0
-Oops: 0000 [#1] SMP PTI
-CPU: 41 PID: 37403 Comm: bash Kdump: loaded Not tainted 5.1.0-rc6-vdevbus+ #6
-Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS 2.0b 08/09/2016
-RIP: 0010:mdev_device_remove+0xfa/0x140 [mdev]
-Call Trace:
- remove_store+0x71/0x90 [mdev]
- kernfs_fop_write+0x113/0x1a0
- vfs_write+0xad/0x1b0
- ksys_write+0x5a/0xe0
- do_syscall_64+0x5a/0x210
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Therefore, mdev core is improved as below to overcome above issues.
-
-Wait for any ongoing mdev create() and remove() to finish before
-unregistering parent device using refcount and completion.
-This continues to allow multiple create and remove to progress in
-parallel for different mdev devices as most common case.
-At the same time guard parent removal while parent is being access by
-create() and remove callbacks.
-
-Code is simplified from kref to use refcount as unregister_device() has
-to wait anyway for all create/remove to finish.
-
-While removing mdev devices during parent unregistration, there isn't
-need to acquire refcount of parent device, hence code is restructured
-using mdev_device_remove_common() to avoid it.
-
-Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
-Signed-off-by: Parav Pandit <parav@mellanox.com>
+Fixes: 22b5c0b63f32 ("vsock/virtio: fix kernel panic after device hot-unplug")
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: kvm@vger.kernel.org
+Cc: virtualization@lists.linux-foundation.org
+Cc: netdev@vger.kernel.org
+Cc: kernel-team@android.com
+Cc: stable@vger.kernel.org [4.9+]
+Signed-off-by: Jorge E. Moreira <jemoreira@google.com>
 ---
- drivers/vfio/mdev/mdev_core.c    | 86 ++++++++++++++++++++------------
- drivers/vfio/mdev/mdev_private.h |  6 ++-
- 2 files changed, 60 insertions(+), 32 deletions(-)
+ net/vmw_vsock/virtio_transport.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index 2b98da2ee361..a5da24d662f4 100644
---- a/drivers/vfio/mdev/mdev_core.c
-+++ b/drivers/vfio/mdev/mdev_core.c
-@@ -78,34 +78,41 @@ static struct mdev_parent *__find_parent_device(struct device *dev)
- 	return NULL;
- }
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 15eb5d3d4750..96ab344f17bb 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -702,28 +702,27 @@ static int __init virtio_vsock_init(void)
+ 	if (!virtio_vsock_workqueue)
+ 		return -ENOMEM;
  
--static void mdev_release_parent(struct kref *kref)
-+static bool mdev_try_get_parent(struct mdev_parent *parent)
- {
--	struct mdev_parent *parent = container_of(kref, struct mdev_parent,
--						  ref);
--	struct device *dev = parent->dev;
--
--	kfree(parent);
--	put_device(dev);
-+	if (parent)
-+		return refcount_inc_not_zero(&parent->refcount);
-+	return false;
- }
+-	ret = register_virtio_driver(&virtio_vsock_driver);
++	ret = vsock_core_init(&virtio_transport.transport);
+ 	if (ret)
+ 		goto out_wq;
  
--static struct mdev_parent *mdev_get_parent(struct mdev_parent *parent)
-+static void mdev_put_parent(struct mdev_parent *parent)
- {
--	if (parent)
--		kref_get(&parent->ref);
--
--	return parent;
-+	if (parent && refcount_dec_and_test(&parent->refcount))
-+		complete(&parent->unreg_completion);
- }
- 
--static void mdev_put_parent(struct mdev_parent *parent)
-+static void mdev_device_remove_common(struct mdev_device *mdev)
- {
--	if (parent)
--		kref_put(&parent->ref, mdev_release_parent);
-+	struct mdev_parent *parent;
-+	struct mdev_type *type;
-+	int ret;
-+
-+	type = to_mdev_type(mdev->type_kobj);
-+	mdev_remove_sysfs_files(&mdev->dev, type);
-+	device_del(&mdev->dev);
-+	parent = mdev->parent;
-+	ret = parent->ops->remove(mdev);
-+	if (ret)
-+		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
-+
-+	/* Balances with device_initialize() */
-+	put_device(&mdev->dev);
- }
- 
- static int mdev_device_remove_cb(struct device *dev, void *data)
- {
- 	if (dev_is_mdev(dev))
--		mdev_device_remove(dev);
-+		mdev_device_remove_common(to_mdev_device(dev));
- 
- 	return 0;
- }
-@@ -147,7 +154,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
- 		goto add_dev_err;
- 	}
- 
--	kref_init(&parent->ref);
-+	refcount_set(&parent->refcount, 1);
-+	init_completion(&parent->unreg_completion);
- 
- 	parent->dev = dev;
- 	parent->ops = ops;
-@@ -206,14 +214,27 @@ void mdev_unregister_device(struct device *dev)
- 	dev_info(dev, "MDEV: Unregistering\n");
- 
- 	list_del(&parent->next);
-+	mutex_unlock(&parent_list_lock);
-+
-+	/* Release the initial reference so that new create cannot start */
-+	mdev_put_parent(parent);
-+
-+	/*
-+	 * Wait for all the create and remove references to drop.
-+	 */
-+	wait_for_completion(&parent->unreg_completion);
-+
-+	/*
-+	 * New references cannot be taken and all users are done
-+	 * using the parent. So it is safe to unregister parent.
-+	 */
- 	class_compat_remove_link(mdev_bus_compat_class, dev, NULL);
- 
- 	device_for_each_child(dev, NULL, mdev_device_remove_cb);
- 
- 	parent_remove_sysfs_files(parent);
--
--	mutex_unlock(&parent_list_lock);
--	mdev_put_parent(parent);
-+	kfree(parent);
-+	put_device(dev);
- }
- EXPORT_SYMBOL(mdev_unregister_device);
- 
-@@ -237,10 +258,11 @@ int mdev_device_create(struct kobject *kobj,
- 	struct mdev_parent *parent;
- 	struct mdev_type *type = to_mdev_type(kobj);
- 
--	parent = mdev_get_parent(type->parent);
--	if (!parent)
-+	if (!mdev_try_get_parent(type->parent))
- 		return -EINVAL;
- 
-+	parent = type->parent;
-+
- 	mutex_lock(&mdev_list_lock);
- 
- 	/* Check for duplicate */
-@@ -287,6 +309,7 @@ int mdev_device_create(struct kobject *kobj,
- 
- 	mdev->active = true;
- 	dev_dbg(&mdev->dev, "MDEV: created\n");
-+	mdev_put_parent(parent);
+-	ret = vsock_core_init(&virtio_transport.transport);
++	ret = register_virtio_driver(&virtio_vsock_driver);
+ 	if (ret)
+-		goto out_vdr;
++		goto out_vci;
  
  	return 0;
  
-@@ -306,7 +329,6 @@ int mdev_device_remove(struct device *dev)
- 	struct mdev_device *mdev, *tmp;
- 	struct mdev_parent *parent;
- 	struct mdev_type *type;
--	int ret;
+-out_vdr:
+-	unregister_virtio_driver(&virtio_vsock_driver);
++out_vci:
++	vsock_core_exit();
+ out_wq:
+ 	destroy_workqueue(virtio_vsock_workqueue);
+ 	return ret;
+-
+ }
  
- 	mdev = to_mdev_device(dev);
+ static void __exit virtio_vsock_exit(void)
+ {
+-	vsock_core_exit();
+ 	unregister_virtio_driver(&virtio_vsock_driver);
++	vsock_core_exit();
+ 	destroy_workqueue(virtio_vsock_workqueue);
+ }
  
-@@ -330,15 +352,17 @@ int mdev_device_remove(struct device *dev)
- 	mutex_unlock(&mdev_list_lock);
- 
- 	type = to_mdev_type(mdev->type_kobj);
--	mdev_remove_sysfs_files(dev, type);
--	device_del(&mdev->dev);
--	parent = mdev->parent;
--	ret = parent->ops->remove(mdev);
--	if (ret)
--		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
-+	if (!mdev_try_get_parent(type->parent)) {
-+		/*
-+		 * Parent unregistration have started.
-+		 * No need to remove here.
-+		 */
-+		mutex_unlock(&mdev_list_lock);
-+		return -ENODEV;
-+	}
- 
--	/* Balances with device_initialize() */
--	put_device(&mdev->dev);
-+	parent = mdev->parent;
-+	mdev_device_remove_common(mdev);
- 	mdev_put_parent(parent);
- 
- 	return 0;
-diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
-index 067dc5d8c5de..781f111d66d2 100644
---- a/drivers/vfio/mdev/mdev_private.h
-+++ b/drivers/vfio/mdev/mdev_private.h
-@@ -19,7 +19,11 @@ void mdev_bus_unregister(void);
- struct mdev_parent {
- 	struct device *dev;
- 	const struct mdev_parent_ops *ops;
--	struct kref ref;
-+	/* Protects unregistration to wait until create/remove
-+	 * are completed.
-+	 */
-+	refcount_t refcount;
-+	struct completion unreg_completion;
- 	struct list_head next;
- 	struct kset *mdev_types_kset;
- 	struct list_head type_list;
 -- 
-2.19.2
+2.21.0.593.g511ec345e18-goog
 
