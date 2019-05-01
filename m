@@ -2,81 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 15DAF107B1
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2019 13:59:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 162E7107B4
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2019 14:00:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726405AbfEAL7e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 May 2019 07:59:34 -0400
-Received: from bmailout1.hostsharing.net ([83.223.95.100]:55325 "EHLO
-        bmailout1.hostsharing.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726083AbfEAL7d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 May 2019 07:59:33 -0400
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (Client CN "*.hostsharing.net", Issuer "COMODO RSA Domain Validation Secure Server CA" (not verified))
-        by bmailout1.hostsharing.net (Postfix) with ESMTPS id 31CB530000F2A;
-        Wed,  1 May 2019 13:59:31 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-        id EE4CF233EA5; Wed,  1 May 2019 13:59:30 +0200 (CEST)
-Date:   Wed, 1 May 2019 13:59:30 +0200
-From:   Lukas Wunner <lukas@wunner.de>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Borislav Petkov <bp@suse.de>, Rik van Riel <riel@surriel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Nicolai Stange <nstange@suse.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?iso-8859-1?B?S3I/P23hPz8=?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        kvm ML <kvm@vger.kernel.org>,
-        linux-efi <linux-efi@vger.kernel.org>, x86-ml <x86@kernel.org>
-Subject: Re: [PATCH 4.19 083/100] x86/fpu: Dont export
- __kernel_fpu_{begin,end}()
-Message-ID: <20190501115930.wa7ubea67rmsoqo7@wunner.de>
-References: <20190430113608.616903219@linuxfoundation.org>
- <20190430113612.682532449@linuxfoundation.org>
+        id S1726425AbfEAMAB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 May 2019 08:00:01 -0400
+Received: from mail-qt1-f177.google.com ([209.85.160.177]:40646 "EHLO
+        mail-qt1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726083AbfEAMAB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 May 2019 08:00:01 -0400
+Received: by mail-qt1-f177.google.com with SMTP id y49so13992783qta.7
+        for <kvm@vger.kernel.org>; Wed, 01 May 2019 05:00:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=2m773Wta5X4RVdWMQzg9kBuxmqtOLE9JAjLNEPsUkV8=;
+        b=ei8mZCuRyAC/Ap/U4zi80oCWg+6V8rSYhZECIIkfOO9/UkSGhkmVA+WilcnVL5+PVw
+         JH+SDhFyJgUNfukefHGQO20d9NyOBiN91xYOGzXSAuP65ErCloGCEh7Z4NGT++HCXEQb
+         +vFWNC3y/tEIkWpCbUSOgom8cq6/T4gpWBELrQuO/tTJKNbsp5L3Yfkh+j48PapqVe4I
+         1568Usdl7u90QQZyp5hnqb58mcvsES9goA6a4Xy4h69wubFDjRPIERl3Q56i5kwJxD+v
+         q8Mq5jZO1zLSigqRq2ABALRVqwwLNXuxSUYMKydvXM+/SnIetWeJd/G69CoIUybuZ358
+         Ui1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=2m773Wta5X4RVdWMQzg9kBuxmqtOLE9JAjLNEPsUkV8=;
+        b=YWJDJBsh0yNxr9NJU56/ctyPYtiCo6lZqz0QSoRsM6SaG92kD8oNOsfslx3lGbj9dC
+         HdCMG7qpj7FOqs6W3ciEWwKG3uVroxREEV+rgRQWmrnmwXGTCBeAHnTgAJTxTS9RrlCj
+         ufjGaCGMB042gJOizGQWB9PVF6+qeJnwFteKnqgncrRlvNfiq60PmjTk1rotBswcdUUS
+         qQ/vl/coTlVagI6J5ohPTvtlOPeuw77TA1VTYyiKOrjM/omq0gfzC3VxZbGBWrdJ0tj9
+         8yEnRqBq5/pRxCSHrPyeNo6twkZ+E5xDWmbeFdxMLj+1n5AEdfDygvT8BbDa79XDFEta
+         FVhQ==
+X-Gm-Message-State: APjAAAWAWSpoSm3U9r9yYsMAAeMWZYsqkdUurqHFhlBC8iDlDHnfebvZ
+        ahs7Zxrws/EoTEDPayiTxz5RwhodsLH2haqbhgNBMvMAlwhteA==
+X-Google-Smtp-Source: APXvYqy670oe1IlL9a+5eNH+TMHElExPlD+Lhr21wYY4JK9jINdYsv+GKApw+et1ERxX5EpeUr8uTpbHHjgCGWLvgeU=
+X-Received: by 2002:aed:3e58:: with SMTP id m24mr40682232qtf.364.1556712000398;
+ Wed, 01 May 2019 05:00:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190430113612.682532449@linuxfoundation.org>
-User-Agent: NeoMutt/20170113 (1.7.2)
+From:   Bryan Muir <conlaoch@gmail.com>
+Date:   Wed, 1 May 2019 07:59:49 -0400
+Message-ID: <CALf=aXWYfNV1aULiD8KUPMn3Xng9upVRpj_LzTYDPMRFiT-J=w@mail.gmail.com>
+Subject: Speeding up VM Startup
+To:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Apr 30, 2019 at 01:38:52PM +0200, Greg Kroah-Hartman wrote:
-> commit 12209993e98c5fa1855c467f22a24e3d5b8be205 upstream.
-> 
-> There is one user of __kernel_fpu_begin() and before invoking it,
-> it invokes preempt_disable(). So it could invoke kernel_fpu_begin()
-> right away. The 32bit version of arch_efi_call_virt_setup() and
-> arch_efi_call_virt_teardown() does this already.
-> 
-> The comment above *kernel_fpu*() claims that before invoking
-> __kernel_fpu_begin() preemption should be disabled and that KVM is a
-> good example of doing it. Well, KVM doesn't do that since commit
-> 
->   f775b13eedee2 ("x86,kvm: move qemu/guest FPU switching out to vcpu_run")
-> 
-> so it is not an example anymore.
-> 
-> With EFI gone as the last user of __kernel_fpu_{begin|end}(), both can
-> be made static and not exported anymore.
+I've been tasked with speeding up our VM usage.  At the moment it
+takes an individual instance of our VM about 30 seconds to totally
+boot to a logon screen that a user an interact with.  We are using
+qemu/kvm on a Centos7 infrastructure.
 
-This is just a cleanup and therefore doesn't seem to satisfy the rules
-for stable patches per Documentation/process/stable-kernel-rules.rst
-("It must fix a real bug that bothers people / fix a problem that causes
-a build error").
+rpm-qa shows:
+qemu-kvm 1.5.3
+qemu 2.0.0.1
+and all the supporting packages from yum
 
-Why is it being queued up for stable and why are the rules disregarded here?
+What I am looking to be able to do is to take our guest OS to the
+logon screen, suspend the VM, and save the VM image with state.  That
+way when I need to spin up a new VM it would begin by resuming at the
+logon state.
 
-Thanks,
+So far I've tried the following
 
-Lukas
+1.  suspend at logon screen, qemu-img to newfile , virsh start newfile
+  (can see kvm go through boot/post)
+2.  suspend at logon, virt-clone to new file, virsh start   (os boots/post)
+3.  take running snapshot at logon, revert to snapshot (kvm appears to
+boot machine then apply snapshot, more like an overlay, plus file size
+goes up by 1/3)
+
+Is there a method I can use then to save a VM with its memory/file
+state, clone the file, and spin up a new instance with the saved
+state?
+
+There doesn't need to be any networking an hostname is immaterial so
+I'm not worried about network/hostname conflicts.
+
+Thanks for reading and any help.
