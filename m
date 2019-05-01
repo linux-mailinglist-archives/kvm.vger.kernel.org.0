@@ -2,83 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 162E7107B4
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2019 14:00:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDB4E107C8
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2019 14:06:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726425AbfEAMAB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 May 2019 08:00:01 -0400
-Received: from mail-qt1-f177.google.com ([209.85.160.177]:40646 "EHLO
-        mail-qt1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726083AbfEAMAB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 May 2019 08:00:01 -0400
-Received: by mail-qt1-f177.google.com with SMTP id y49so13992783qta.7
-        for <kvm@vger.kernel.org>; Wed, 01 May 2019 05:00:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=2m773Wta5X4RVdWMQzg9kBuxmqtOLE9JAjLNEPsUkV8=;
-        b=ei8mZCuRyAC/Ap/U4zi80oCWg+6V8rSYhZECIIkfOO9/UkSGhkmVA+WilcnVL5+PVw
-         JH+SDhFyJgUNfukefHGQO20d9NyOBiN91xYOGzXSAuP65ErCloGCEh7Z4NGT++HCXEQb
-         +vFWNC3y/tEIkWpCbUSOgom8cq6/T4gpWBELrQuO/tTJKNbsp5L3Yfkh+j48PapqVe4I
-         1568Usdl7u90QQZyp5hnqb58mcvsES9goA6a4Xy4h69wubFDjRPIERl3Q56i5kwJxD+v
-         q8Mq5jZO1zLSigqRq2ABALRVqwwLNXuxSUYMKydvXM+/SnIetWeJd/G69CoIUybuZ358
-         Ui1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=2m773Wta5X4RVdWMQzg9kBuxmqtOLE9JAjLNEPsUkV8=;
-        b=YWJDJBsh0yNxr9NJU56/ctyPYtiCo6lZqz0QSoRsM6SaG92kD8oNOsfslx3lGbj9dC
-         HdCMG7qpj7FOqs6W3ciEWwKG3uVroxREEV+rgRQWmrnmwXGTCBeAHnTgAJTxTS9RrlCj
-         ufjGaCGMB042gJOizGQWB9PVF6+qeJnwFteKnqgncrRlvNfiq60PmjTk1rotBswcdUUS
-         qQ/vl/coTlVagI6J5ohPTvtlOPeuw77TA1VTYyiKOrjM/omq0gfzC3VxZbGBWrdJ0tj9
-         8yEnRqBq5/pRxCSHrPyeNo6twkZ+E5xDWmbeFdxMLj+1n5AEdfDygvT8BbDa79XDFEta
-         FVhQ==
-X-Gm-Message-State: APjAAAWAWSpoSm3U9r9yYsMAAeMWZYsqkdUurqHFhlBC8iDlDHnfebvZ
-        ahs7Zxrws/EoTEDPayiTxz5RwhodsLH2haqbhgNBMvMAlwhteA==
-X-Google-Smtp-Source: APXvYqy670oe1IlL9a+5eNH+TMHElExPlD+Lhr21wYY4JK9jINdYsv+GKApw+et1ERxX5EpeUr8uTpbHHjgCGWLvgeU=
-X-Received: by 2002:aed:3e58:: with SMTP id m24mr40682232qtf.364.1556712000398;
- Wed, 01 May 2019 05:00:00 -0700 (PDT)
+        id S1726338AbfEAMGS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 May 2019 08:06:18 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:55957 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725923AbfEAMGS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 May 2019 08:06:18 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 44vHDQ6w2kz9sNQ;
+        Wed,  1 May 2019 22:06:14 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1556712375;
+        bh=L4xIXdsKIOlYQtIGuIRuPLfaYR8V1c0iZE8OTmuXKkA=;
+        h=Date:From:To:Cc:Subject:From;
+        b=WsQ5tCPxvP6YMHDc+pzNUP4lgYdEuGKs/YgHJLZkW6wW2WFlcMOabinBuJPxIgMsq
+         4XuQ5BqGoxeM/aEoGEQgAo5xvNZeWo9eOjD+vY0/GUp7SwCD+R6i18/iVQ014FUkaw
+         knh5re4uaFghK3tUx0pTFjz6X3UF/BqHJd7ZLxhsfsDLIgheuNLrlZqjo1HPriEESk
+         yv+vLTm2oab5jCrM+eCTmIar1iWY2tjSK86tyqgofVVRNOmGkR9eZdGEoBECm9ejMS
+         58+fWYUbWxN73KTKxs7K44oYDpX1sFcyGnshlvYzP+H/LAz5yMaGONzCE81XdXOSkk
+         ACPoAid5kubfg==
+Date:   Wed, 1 May 2019 22:06:13 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        KVM <kvm@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Jim Mattson <jmattson@google.com>
+Subject: linux-next: Fixes tag needs some work in the kvm-fixes tree
+Message-ID: <20190501220613.635a5bf8@canb.auug.org.au>
 MIME-Version: 1.0
-From:   Bryan Muir <conlaoch@gmail.com>
-Date:   Wed, 1 May 2019 07:59:49 -0400
-Message-ID: <CALf=aXWYfNV1aULiD8KUPMn3Xng9upVRpj_LzTYDPMRFiT-J=w@mail.gmail.com>
-Subject: Speeding up VM Startup
-To:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/Uxctia6sdY12mvb7htqdSoi"; protocol="application/pgp-signature"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I've been tasked with speeding up our VM usage.  At the moment it
-takes an individual instance of our VM about 30 seconds to totally
-boot to a logon screen that a user an interact with.  We are using
-qemu/kvm on a Centos7 infrastructure.
+--Sig_/Uxctia6sdY12mvb7htqdSoi
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-rpm-qa shows:
-qemu-kvm 1.5.3
-qemu 2.0.0.1
-and all the supporting packages from yum
+Hi all,
 
-What I am looking to be able to do is to take our guest OS to the
-logon screen, suspend the VM, and save the VM image with state.  That
-way when I need to spin up a new VM it would begin by resuming at the
-logon state.
+In commit
 
-So far I've tried the following
+  e8ab8d24b488 ("KVM: nVMX: Fix size checks in vmx_set_nested_state")
 
-1.  suspend at logon screen, qemu-img to newfile , virsh start newfile
-  (can see kvm go through boot/post)
-2.  suspend at logon, virt-clone to new file, virsh start   (os boots/post)
-3.  take running snapshot at logon, revert to snapshot (kvm appears to
-boot machine then apply snapshot, more like an overlay, plus file size
-goes up by 1/3)
+Fixes tag
 
-Is there a method I can use then to save a VM with its memory/file
-state, clone the file, and spin up a new instance with the saved
-state?
+  Fixes: 8fcc4b5923af5de58b80b53a069453b135693304
 
-There doesn't need to be any networking an hostname is immaterial so
-I'm not worried about network/hostname conflicts.
+has these problem(s):
 
-Thanks for reading and any help.
+  - missing subject
+
+Did you mean
+
+Fixes: 8fcc4b5923af ("kvm: nVMX: Introduce KVM_CAP_NESTED_STATE")
+
+You can just use:
+
+  git log -1 --format=3D'Fixes: %h ("%s")' <commit>
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/Uxctia6sdY12mvb7htqdSoi
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlzJi7UACgkQAVBC80lX
+0GxOngf+PrnVpQsVNa+lQCveDJpr1DxQwBxQwnH6T+Z5BAKNbEhVa0YhGcB8Kv+I
+WrHRP/9+Y2xk1k6T9qaWTWU7DtG7bUuS+CQCf3MpHjAg4oMJ34rrl5muW/8x8Fgs
+8jdISLjNuRUZplcilZ+l0CmEOY2OuyMwDQ+IAq/0wwVmG3W9KViwLq764SqAnmbw
+n87vfS+9hUB5jo50pWW7TMaAKTkfhvBSm5XsudZZ97g4M/ABMaXFqjXVlJFug3IX
+3AF0fYzS1Y5vbJ08NCPG72FQd/VZTqpQftT6bO0sZDSRKj0M7H6zEGcrKAutob/Z
+E1Z8aXcfTO7sEBtI4mKKjeZIO0xaUg==
+=kmKd
+-----END PGP SIGNATURE-----
+
+--Sig_/Uxctia6sdY12mvb7htqdSoi--
