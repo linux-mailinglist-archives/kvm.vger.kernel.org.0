@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 91B7911864
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 13:49:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BA4611867
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 13:49:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726544AbfEBLsw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 May 2019 07:48:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43082 "EHLO mx1.redhat.com"
+        id S1726564AbfEBLs5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 May 2019 07:48:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49208 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726473AbfEBLsw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 May 2019 07:48:52 -0400
+        id S1726473AbfEBLs5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 May 2019 07:48:57 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id AE9B581224;
-        Thu,  2 May 2019 11:48:51 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id C60D73082E8E;
+        Thu,  2 May 2019 11:48:56 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EAC608AD86;
-        Thu,  2 May 2019 11:48:46 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 13D2417DDF;
+        Thu,  2 May 2019 11:48:51 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     linux-nvme@lists.infradead.org
 Cc:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
@@ -39,80 +39,51 @@ Cc:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
         Liu Changpeng <changpeng.liu@intel.com>,
         Fam Zheng <fam@euphon.net>, Amnon Ilan <ailan@redhat.com>,
         John Ferlan <jferlan@redhat.com>
-Subject: [PATCH v2 04/10] nvme/core: add NVME_CTRL_SUSPENDED controller state
-Date:   Thu,  2 May 2019 14:47:55 +0300
-Message-Id: <20190502114801.23116-5-mlevitsk@redhat.com>
+Subject: [PATCH v2 05/10] nvme/pci: use the NVME_CTRL_SUSPENDED state
+Date:   Thu,  2 May 2019 14:47:56 +0300
+Message-Id: <20190502114801.23116-6-mlevitsk@redhat.com>
 In-Reply-To: <20190502114801.23116-1-mlevitsk@redhat.com>
 References: <20190502114801.23116-1-mlevitsk@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Thu, 02 May 2019 11:48:51 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Thu, 02 May 2019 11:48:57 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This state will be used by a controller that is going to
-suspended state, and will later be used by mdev
-framework to detect this and flush its queues
+When enteriing low power state, the nvme
+driver will now inform the core with the NVME_CTRL_SUSPENDED state
+which will allow mdev driver to act on this information
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- drivers/nvme/host/core.c | 15 +++++++++++++++
- drivers/nvme/host/nvme.h |  1 +
- 2 files changed, 16 insertions(+)
+ drivers/nvme/host/pci.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 2e11d014d514..22db0c51a0bf 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -317,6 +317,19 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
- 		switch (old_state) {
- 		case NVME_CTRL_NEW:
- 		case NVME_CTRL_RESETTING:
-+		case NVME_CTRL_CONNECTING:
-+		case NVME_CTRL_SUSPENDED:
-+			changed = true;
-+			/* FALLTHRU */
-+		default:
-+			break;
-+		}
-+		break;
-+	case NVME_CTRL_SUSPENDED:
-+		switch (old_state) {
-+		case NVME_CTRL_NEW:
-+		case NVME_CTRL_LIVE:
-+		case NVME_CTRL_RESETTING:
- 		case NVME_CTRL_CONNECTING:
- 			changed = true;
- 			/* FALLTHRU */
-@@ -329,6 +342,7 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
- 		case NVME_CTRL_NEW:
- 		case NVME_CTRL_LIVE:
- 		case NVME_CTRL_ADMIN_ONLY:
-+		case NVME_CTRL_SUSPENDED:
- 			changed = true;
- 			/* FALLTHRU */
- 		default:
-@@ -351,6 +365,7 @@ bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
- 		case NVME_CTRL_ADMIN_ONLY:
- 		case NVME_CTRL_RESETTING:
- 		case NVME_CTRL_CONNECTING:
-+		case NVME_CTRL_SUSPENDED:
- 			changed = true;
- 			/* FALLTHRU */
- 		default:
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 527d64545023..d040eb00e880 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -139,6 +139,7 @@ static inline u16 nvme_req_qid(struct request *req)
- enum nvme_ctrl_state {
- 	NVME_CTRL_NEW,
- 	NVME_CTRL_LIVE,
-+	NVME_CTRL_SUSPENDED,
- 	NVME_CTRL_ADMIN_ONLY,    /* Only admin queue live */
- 	NVME_CTRL_RESETTING,
- 	NVME_CTRL_CONNECTING,
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 1c844c66ecaa..282f28c851c1 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -2406,7 +2406,8 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
+ 		u32 csts = readl(dev->bar + NVME_REG_CSTS);
+ 
+ 		if (dev->ctrl.state == NVME_CTRL_LIVE ||
+-		    dev->ctrl.state == NVME_CTRL_RESETTING)
++		    dev->ctrl.state == NVME_CTRL_RESETTING ||
++		    dev->ctrl.state == NVME_CTRL_SUSPENDED)
+ 			nvme_start_freeze(&dev->ctrl);
+ 		dead = !!((csts & NVME_CSTS_CFS) || !(csts & NVME_CSTS_RDY) ||
+ 			pdev->error_state  != pci_channel_io_normal);
+@@ -2852,6 +2853,9 @@ static int nvme_suspend(struct device *dev)
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct nvme_dev *ndev = pci_get_drvdata(pdev);
+ 
++	if (!nvme_change_ctrl_state(&ndev->ctrl, NVME_CTRL_SUSPENDED))
++		WARN_ON(1);
++
+ 	nvme_dev_disable(ndev, true);
+ 	return 0;
+ }
 -- 
 2.17.2
 
