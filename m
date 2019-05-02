@@ -2,166 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 924561120F
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 06:06:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AEAD81124D
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 06:35:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725681AbfEBEGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 May 2019 00:06:52 -0400
-Received: from ozlabs.org ([203.11.71.1]:60797 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725497AbfEBEGw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 May 2019 00:06:52 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 44vhXn3dR6z9s9N; Thu,  2 May 2019 14:06:49 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1556770009; bh=KBz8JufENYoc55MOsz8Y5biZIZifiCFA8c/hJJKeMWA=;
-        h=Date:From:To:Cc:Subject:From;
-        b=uB7aA3QcRi4IoeFwrhJxMKAZQaDUm24MxfCYtpgB1JyTIpKtonu2DwEciU+abK3la
-         eljWnVTBeBpOyHnnx5HLS12Z5MOiFdwUr0iMDOMdzuUbfOmSr6Dlku5KHZNYA96VU2
-         L4WIllboqyzlp1HbrF+NSfUR39V68w+ncs3D9p8pMmmPldnKJW6UjzYI94py96h4XS
-         8qWQ+/N1Bqijph2rFPnzzfiNO+XdvWtb2hcqamKzwjlBrdoDCDOrJNKlodKEy+7g33
-         ux3KJRrKO2uc2ZCkmtEs8yMI8/owBdedK4/FFKI+Yunmb95+gZBXl1LSD4/tA42t4m
-         BTN8jIFt25mTg==
-Date:   Thu, 2 May 2019 14:06:46 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org
-Subject: [GIT PULL] Please pull my kvm-ppc-next-5.2-1 tag
-Message-ID: <20190502040646.GA3661@blackberry>
+        id S1725601AbfEBEbC convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 2 May 2019 00:31:02 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:50166 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725372AbfEBEbC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 May 2019 00:31:02 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id B01BD28FCE
+        for <kvm@vger.kernel.org>; Thu,  2 May 2019 04:31:00 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id A47C728FF0; Thu,  2 May 2019 04:31:00 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+        pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.9 required=2.0 tests=BAYES_00,NO_RECEIVED,
+        NO_RELAYS autolearn=unavailable version=3.3.1
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 203477] New: [AMD][KVM] Windows L1 guest becomes extremely slow
+ and unusable after enabling Hyper-V
+Date:   Thu, 02 May 2019 04:30:59 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: hjc@hjc.im
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-203477-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-User-Agent: Mutt/1.5.24 (2015-08-30)
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo or Radim,
+https://bugzilla.kernel.org/show_bug.cgi?id=203477
 
-Please do a pull from my kvm-ppc-next-5.2-1 tag to get a PPC update
-for 5.2.  The main new feature here is that we can now let guests
-access the POWER9 XIVE interrupt controller directly for things like
-acknowledge, EOI, enable and disable on interrupts, rather than
-requiring guests to do hypercalls for these operations.
+            Bug ID: 203477
+           Summary: [AMD][KVM] Windows L1 guest becomes extremely slow and
+                    unusable after enabling Hyper-V
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: Debian 4.19.28-2~bpo9+1
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: hjc@hjc.im
+        Regression: No
 
-I have merged in the topic/ppc-kvm branch from the powerpc tree
-because one of the patches there is a prerequisite for the XIVE patch
-series.  That's why there are changes to arch/powerpc/kernel in the
-diffstat.
+Created attachment 282583
+  --> https://bugzilla.kernel.org/attachment.cgi?id=282583&action=edit
+libvirt XML
 
-Stephen Rothwell noted a conflict between my tree and the kvm-arm tree
-because we have both allocated new capability numbers.
+I'm not sure if it is a supported scenario to run Hyper-V inside KVM, however
+this worked for me on Intel platform, and I only have this issue on AMD Ryzen.
 
-The XIVE patch series also modifies generic KVM code to add mmap and
-release methods on KVM devices.
+After enabling Hyper-V feature in Windows guest, I could successfully boot into
+Windows L1 guest desktop, however after that the L1 guest system consumes all
+available CPU cores, freezes and becomes unusable. 
 
-Thanks,
-Paul.
+Hardware platform:  
+CPU: AMD Ryzen Threadripper 2950X
+Board: ASUS Prime X399-A (SVM, IOMMU related settings enabled in BIOS)
 
-The following changes since commit 345077c8e172c255ea0707214303ccd099e5656b:
 
-  KVM: PPC: Book3S: Protect memslots while validating user address (2019-04-05 14:37:24 +1100)
+Linux boot command line: BOOT_IMAGE=/boot/vmlinuz-4.19.0-0.bpo.4-amd64
+root=UUID=<guid> ro quiet apparmor=0 amd_iommu=pt nopti noibrs noibpb
+nospectre_v2 nospec_store_bypass_disable pcie_aspm=off apparmor=0
 
-are available in the git repository at:
+KVM module parameters:
+options kvm ignore_msrs=1
+options kvm report_ignored_msrs=0
+options kvm allow_unsafe_assigned_interrupts=1
+options vfio_iommu_type1 allow_unsafe_interrupts=1
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.2-1
 
-for you to fetch changes up to 0caecf5b00199636eb2d32201199ecd6be52558d:
+QEMU: QEMU emulator version 4.0.0 built with ./configure
+--target-list=x86_64-softmmu --audio-drv-list=pa,alsa,sdl,oss --enable-attr
+--enable-bluez --enable-brlapi --enable-virtfs --enable-cap-ng --enable-curl
+--enable-fdt --enable-gnutls --disable-gtk --disable-vte --enable-libiscsi
+--enable-libnfs --enable-curses --enable-numa --enable-rbd --enable-glusterfs
+--enable-vnc-sasl --enable-sdl --enable-seccomp --enable-spice --enable-libusb
+--enable-usb-redir --enable-libssh2 --enable-vde --enable-xfsctl --enable-vnc
+--enable-vnc-jpeg --enable-vnc-png --enable-kvm --enable-vhost-net
+--enable-opengl --enable-virglrenderer --enable-avx2 --enable-tpm
+--enable-vhost-kernel --enable-virtfs
 
-  KVM: PPC: Book3S HV: XIVE: Clear escalation interrupt pointers on device close (2019-04-30 19:41:01 +1000)
+libvirt XML is attached
 
-----------------------------------------------------------------
-PPC KVM update for 5.2
+L1 Guest OS: Windows Server 2016, 2019 and Windows 10
+L2 Guest OS: (Not ever had a chance to start one)
 
-* Support for guests to access the new POWER9 XIVE interrupt controller
-  hardware directly, reducing interrupt latency and overhead for guests.
 
-* In-kernel implementation of the H_PAGE_INIT hypercall.
+`perf kvm stat live` shows unusual numbers of vmrun and msr, comparing to
+normal VMs:
+             VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time    
+    Avg time 
 
-* Reduce memory usage of sparsely-populated IOMMU tables.
+               vmrun      71298    47.13%     2.61%      1.07us  46197.83us    
+19.09us ( +-   9.11% )
+                 msr      71217    47.08%     1.24%      0.61us  31213.68us    
+ 9.04us ( +-  10.45% )
+                 hlt       3465     2.29%    95.58%      0.70us  78318.83us 
+14370.28us ( +-   0.93% )
+                 npf       2053     1.36%     0.38%      0.64us  15532.20us    
+96.25us ( +-  26.48% )
+             invlpga       1514     1.00%     0.00%      0.28us     60.25us    
+ 1.06us ( +-  10.58% )
+           interrupt        740     0.49%     0.04%      0.22us  15289.36us    
+25.67us ( +-  80.62% )
+               vintr        328     0.22%     0.12%      0.37us  31341.32us   
+194.65us ( +-  59.60% )
+                stgi        134     0.09%     0.00%      0.32us     49.18us    
+ 1.34us ( +-  31.81% )
+                iret        133     0.09%     0.00%      0.28us      1.52us    
+ 0.58us ( +-   3.36% )
+                  io        119     0.08%     0.00%      2.37us     51.02us    
+14.38us ( +-   4.98% )
+           hypercall        104     0.07%     0.03%      0.77us  15522.73us   
+152.12us ( +-  98.10% )
+                 nmi         96     0.06%     0.00%      0.67us     40.84us    
+ 2.89us ( +-  20.49% )
+           write_cr8         66     0.04%     0.00%      0.72us      3.09us    
+ 1.77us ( +-   3.19% )
 
-* Several bug fixes.
+There are also a few number of errors in kmsg after L1 guest boots:
+[755580.533587] svm_set_msr: 2 callbacks suppressed
+[755580.533588] SVM: kvm [14227]: vcpu0, guest rIP: 0xfffff986014dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755581.191889] SVM: kvm [14227]: vcpu1, guest rIP: 0xfffff986014dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755581.323561] SVM: kvm [14227]: vcpu2, guest rIP: 0xfffff986014dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755581.482291] SVM: kvm [14227]: vcpu3, guest rIP: 0xfffff986014dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755581.642842] SVM: kvm [14227]: vcpu4, guest rIP: 0xfffff986014dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755581.803020] SVM: kvm [14227]: vcpu5, guest rIP: 0xfffff986014dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755581.963498] SVM: kvm [14227]: vcpu6, guest rIP: 0xfffff986014dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755582.123565] SVM: kvm [14227]: vcpu7, guest rIP: 0xfffff986014dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755616.107080] SVM: kvm [14227]: vcpu0, guest rIP: 0xfffffb735a8dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755616.778183] SVM: kvm [14227]: vcpu1, guest rIP: 0xfffffb735a8dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755616.910078] SVM: kvm [14227]: vcpu2, guest rIP: 0xfffffb735a8dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755617.047056] SVM: kvm [14227]: vcpu3, guest rIP: 0xfffffb735a8dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755617.180127] SVM: kvm [14227]: vcpu4, guest rIP: 0xfffffb735a8dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755617.327040] SVM: kvm [14227]: vcpu5, guest rIP: 0xfffffb735a8dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755617.487152] SVM: kvm [14227]: vcpu6, guest rIP: 0xfffffb735a8dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
+[755617.626337] SVM: kvm [14227]: vcpu7, guest rIP: 0xfffffb735a8dca0c
+unimplemented wrmsr: 0xc0010115 data 0x0
 
-----------------------------------------------------------------
-Alexey Kardashevskiy (3):
-      KVM: PPC: Book3S HV: Fix lockdep warning when entering the guest
-      KVM: PPC: Book3S HV: Avoid lockdep debugging in TCE realmode handlers
-      KVM: PPC: Book3S: Allocate guest TCEs on demand too
-
-Cédric Le Goater (17):
-      powerpc/xive: add OPAL extensions for the XIVE native exploitation support
-      KVM: PPC: Book3S HV: Add a new KVM device for the XIVE native exploitation mode
-      KVM: PPC: Book3S HV: XIVE: Introduce a new capability KVM_CAP_PPC_IRQ_XIVE
-      KVM: PPC: Book3S HV: XIVE: add a control to initialize a source
-      KVM: PPC: Book3S HV: XIVE: Add a control to configure a source
-      KVM: PPC: Book3S HV: XIVE: Add controls for the EQ configuration
-      KVM: PPC: Book3S HV: XIVE: Add a global reset control
-      KVM: PPC: Book3S HV: XIVE: Add a control to sync the sources
-      KVM: PPC: Book3S HV: XIVE: Add a control to dirty the XIVE EQ pages
-      KVM: PPC: Book3S HV: XIVE: Add get/set accessors for the VP XIVE state
-      KVM: Introduce a 'mmap' method for KVM devices
-      KVM: PPC: Book3S HV: XIVE: Add a TIMA mapping
-      KVM: PPC: Book3S HV: XIVE: Add a mapping for the source ESB pages
-      KVM: PPC: Book3S HV: XIVE: Add passthrough support
-      KVM: PPC: Book3S HV: XIVE: Activate XIVE exploitation mode
-      KVM: Introduce a 'release' method for KVM devices
-      KVM: PPC: Book3S HV: XIVE: Replace the 'destroy' method by a 'release' method
-
-Michael Neuling (1):
-      powerpc: Add force enable of DAWR on P9 option
-
-Palmer Dabbelt (1):
-      KVM: PPC: Book3S HV: smb->smp comment fixup
-
-Paul Mackerras (6):
-      KVM: PPC: Book3S HV: Fix XICS-on-XIVE H_IPI when priority = 0
-      KVM: PPC: Book3S HV: Move HPT guest TLB flushing to C code
-      KVM: PPC: Book3S HV: Flush TLB on secondary radix threads
-      Merge remote-tracking branch 'remotes/powerpc/topic/ppc-kvm' into kvm-ppc-next
-      KVM: PPC: Book3S HV: XIVE: Prevent races when releasing device
-      KVM: PPC: Book3S HV: XIVE: Clear escalation interrupt pointers on device close
-
-Suraj Jitindar Singh (4):
-      KVM: PPC: Book3S HV: Implement virtual mode H_PAGE_INIT handler
-      KVM: PPC: Book3S HV: Implement real mode H_PAGE_INIT handler
-      KVM: PPC: Book3S HV: Handle virtual mode in XIVE VCPU push code
-      KVM: PPC: Book3S HV: Save/restore vrsave register in kvmhv_p9_guest_entry()
-
- Documentation/powerpc/DAWR-POWER9.txt      |   32 +
- Documentation/virtual/kvm/api.txt          |   10 +
- Documentation/virtual/kvm/devices/xive.txt |  197 +++++
- arch/powerpc/include/asm/hw_breakpoint.h   |    8 +
- arch/powerpc/include/asm/kvm_host.h        |   11 +-
- arch/powerpc/include/asm/kvm_ppc.h         |   41 +-
- arch/powerpc/include/asm/opal-api.h        |    7 +-
- arch/powerpc/include/asm/opal.h            |    7 +
- arch/powerpc/include/asm/xive.h            |   17 +
- arch/powerpc/include/uapi/asm/kvm.h        |   46 +
- arch/powerpc/kernel/hw_breakpoint.c        |   62 +-
- arch/powerpc/kernel/process.c              |    9 +-
- arch/powerpc/kernel/ptrace.c               |    3 +-
- arch/powerpc/kvm/Makefile                  |    2 +-
- arch/powerpc/kvm/book3s.c                  |   42 +-
- arch/powerpc/kvm/book3s_64_vio.c           |   96 ++-
- arch/powerpc/kvm/book3s_64_vio_hv.c        |  105 ++-
- arch/powerpc/kvm/book3s_hv.c               |  155 ++--
- arch/powerpc/kvm/book3s_hv_builtin.c       |   57 ++
- arch/powerpc/kvm/book3s_hv_rm_mmu.c        |  144 ++++
- arch/powerpc/kvm/book3s_hv_rmhandlers.S    |  103 +--
- arch/powerpc/kvm/book3s_xive.c             |  250 ++++--
- arch/powerpc/kvm/book3s_xive.h             |   37 +
- arch/powerpc/kvm/book3s_xive_native.c      | 1249 ++++++++++++++++++++++++++++
- arch/powerpc/kvm/book3s_xive_template.c    |   78 +-
- arch/powerpc/kvm/powerpc.c                 |   37 +
- arch/powerpc/platforms/powernv/opal-call.c |    3 +
- arch/powerpc/sysdev/xive/native.c          |  110 +++
- include/linux/kvm_host.h                   |   10 +
- include/uapi/linux/kvm.h                   |    3 +
- virt/kvm/kvm_main.c                        |   24 +
- 31 files changed, 2670 insertions(+), 285 deletions(-)
- create mode 100644 Documentation/virtual/kvm/devices/xive.txt
- create mode 100644 arch/powerpc/kvm/book3s_xive_native.c
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
