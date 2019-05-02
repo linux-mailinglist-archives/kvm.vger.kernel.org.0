@@ -2,140 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A644211AFD
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 16:13:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 981AC11B41
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 16:20:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726308AbfEBONF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 May 2019 10:13:05 -0400
-Received: from mga09.intel.com ([134.134.136.24]:22038 "EHLO mga09.intel.com"
+        id S1726380AbfEBOUn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 May 2019 10:20:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51520 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726197AbfEBONF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 May 2019 10:13:05 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 May 2019 07:13:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,421,1549958400"; 
-   d="scan'208";a="139296728"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.181])
-  by orsmga008.jf.intel.com with ESMTP; 02 May 2019 07:13:05 -0700
-Date:   Thu, 2 May 2019 07:13:04 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
-        marcorr@google.com, Riku Voipio <riku.voipio@linaro.org>,
-        Alan Bennett <alan.bennett@linaro.org>,
-        lkft-triage@lists.linaro.org
-Subject: Re: [kvm-unit-tests ] results on stable-rc-5.0
-Message-ID: <20190502141304.GA26138@linux.intel.com>
-References: <CA+G9fYu_dLNiGJyeDxgr1kRSAHcKmyAjjUjEuSj5Qkw8=wbxYA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+G9fYu_dLNiGJyeDxgr1kRSAHcKmyAjjUjEuSj5Qkw8=wbxYA@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1726203AbfEBOUn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 May 2019 10:20:43 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B380530ADBC3;
+        Thu,  2 May 2019 14:20:42 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.58])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EA761827BC;
+        Thu,  2 May 2019 14:20:32 +0000 (UTC)
+Message-ID: <be56bf51cebb7f373c279adf3e9a46e6df5dfe76.camel@redhat.com>
+Subject: Re: [PATCH v2 08/10] nvme/pci: implement the mdev external queue
+ allocation interface
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     linux-nvme@lists.infradead.org
+Cc:     Fam Zheng <fam@euphon.net>, Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>, kvm@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Liang Cunming <cunming.liang@intel.com>,
+        Wolfram Sang <wsa@the-dreams.de>, linux-kernel@vger.kernel.org,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Jens Axboe <axboe@fb.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        John Ferlan <jferlan@redhat.com>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Liu Changpeng <changpeng.liu@intel.com>,
+        "Paul E . McKenney" <paulmck@linux.ibm.com>,
+        Amnon Ilan <ailan@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>
+Date:   Thu, 02 May 2019 17:20:31 +0300
+In-Reply-To: <20190502114801.23116-9-mlevitsk@redhat.com>
+References: <20190502114801.23116-1-mlevitsk@redhat.com>
+         <20190502114801.23116-9-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Thu, 02 May 2019 14:20:43 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 02, 2019 at 12:54:14PM +0530, Naresh Kamboju wrote:
-> Linaro test farm is validating each stable rc releases and reporting
-> results to upstream. kvm-unit-tests also included in Linux Kernel
-> Functional test plan and we see below results so please comment on
-> reason for test failures and skip and suggest Kconfig or any userland
-> tools for improve test coverage.
+On Thu, 2019-05-02 at 14:47 +0300, Maxim Levitsky wrote:
+> Note that currently the number of hw queues reserved for mdev,
+> has to be pre determined on module load.
+> 
+> (I used to allocate the queues dynamicaly on demand, but
+> recent changes to allocate polled/read queues made
+> this somewhat difficult, so I dropped this for now)
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  drivers/nvme/host/pci.c  | 375 ++++++++++++++++++++++++++++++++++++++-
+>  drivers/nvme/mdev/host.c |  46 ++---
+>  drivers/nvme/mdev/io.c   |  46 +++--
+>  drivers/nvme/mdev/mmio.c |   3 -
+>  4 files changed, 421 insertions(+), 49 deletions(-)
 
-The test environment needs to load a KVM module, e.g. kvm_intel or kvm_amd.
-The unit tests don't require KVM to be loaded and will happily test Qemu
-emulation when possible (not sure if this is a bug or feature).
+The changes in drivers/nvme/mdev aren't supposed to be here, this was some code
+moving around to reduce the diff in the generic block layer support code,
+it supposed to go to the main mdev commit.
 
-Lack of KVM is why you see
+Best regards,
+	Maxim Levitsky
 
-  SKIP ... (qemu-system-x86_64: CPU model 'host' requires KVM)
-
-and is likely why other tests are failing, e.g. apic timeouts.
-
-
-> 
-> kvm unit tests results summary.
-> PASS 23
-> SKIP 18
-> FAIL 14
-> 
-> Test results output log,
-> --------------------------------
-> FAIL apic-split (timeout; duration=90s)
-> PASS ioapic-split (19 tests)
-> FAIL apic (timeout; duration=30)
-> PASS ioapic (19 tests)
-> PASS smptest (1 tests)
-> PASS smptest3 (1 tests)
-> PASS vmexit_cpuid
-> FAIL vmexit_vmcall
-> PASS vmexit_mov_from_cr8
-> PASS vmexit_mov_to_cr8
-> PASS vmexit_inl_pmtimer
-> PASS vmexit_ipi
-> PASS vmexit_ipi_halt
-> PASS vmexit_ple_round_robin
-> PASS vmexit_tscdeadline
-> PASS vmexit_tscdeadline_immed
-> SKIP access (qemu-system-x86_64: CPU model 'host' requires KVM)
-> SKIP smap (qemu-system-x86_64: CPU model 'host' requires KVM)
-> SKIP pku (qemu-system-x86_64: CPU model 'host' requires KVM)
-> FAIL emulator (timeout; duration=90s)
-> PASS eventinj (13 tests)
-> FAIL hypercall (timeout; duration=90s)
-> FAIL idt_test (timeout; duration=90s)
-> SKIP memory (qemu-system-x86_64: CPU model 'host' requires KVM)
-> PASS msr (12 tests)
-> cat: /proc/sys/kernel/nmi_watchdog: No such file or directory
-> SKIP pmu (/proc/sys/kernel/nmi_watchdog not equal to 0)
-> FAIL vmware_backdoors
-> PASS port80
-> FAIL realmode
-> FAIL s3
-> PASS sieve
-> PASS syscall (2 tests)
-> PASS tsc (3 tests)
-> SKIP tsc_adjust (qemu-system-x86_64: CPU model 'host' requires KVM)
-> SKIP xsave (qemu-system-x86_64: CPU model 'host' requires KVM)
-> PASS rmap_chain
-> FAIL svm (timeout; duration=90s)
-> SKIP taskswitch (i386 only)
-> SKIP taskswitch2 (i386 only)
-> FAIL kvmclock_test
-> FAIL pcid (3 tests, 1 unexpected failures)
-> PASS umip (11 tests)
-> SKIP vmx (qemu-system-x86_64: CPU model 'host' requires KVM)
-> SKIP ept (qemu-system-x86_64: CPU model 'host' requires KVM)
-> SKIP vmx_eoi_bitmap_ioapic_scan (qemu-system-x86_64: CPU model 'host'
-> requires KVM)
-> SKIP vmx_hlt_with_rvi_test (qemu-system-x86_64: CPU model 'host' requires KVM)
-> SKIP vmx_apicv_test (qemu-system-x86_64: CPU model 'host' requires KVM)
-> SKIP vmx_apic_passthrough_thread (qemu-system-x86_64: CPU model 'host'
-> requires KVM)
-> SKIP vmx_vmcs_shadow_test (qemu-system-x86_64: CPU model 'host' requires KVM)
-> FAIL debug
-> SKIP hyperv_synic
-> SKIP hyperv_connections (1 tests, 1 skipped)
-> PASS hyperv_stimer (1 tests)
-> FAIL hyperv_clock (timeout; duration=90s)
-> PASS intel_iommu (11 tests)
-> 
-> Kernel version,
-> 5.0.11-rc1
-> 
-> x86_64 kernel config,
-> http://snapshots.linaro.org/openembedded/lkft/lkft/sumo/intel-corei7-64/lkft/linux-stable-rc-5.0/39/config
-> 
-> Test full results log,
-> https://lkft.validation.linaro.org/scheduler/job/696689#L1415
-> 
-> Reference link for all test plans running on x86_64, i386, arm and arm64.
-> https://qa-reports.linaro.org/lkft/linux-stable-rc-5.0-oe/
-> 
-> Best regards
-> Naresh Kamboju
