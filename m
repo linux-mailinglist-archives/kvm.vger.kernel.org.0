@@ -2,106 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4335C12487
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 00:20:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 225A111C1C
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 17:03:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726145AbfEBWUY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 May 2019 18:20:24 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:33108 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726022AbfEBWUY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 May 2019 18:20:24 -0400
-Received: by mail-pl1-f196.google.com with SMTP id y3so1685820plp.0
-        for <kvm@vger.kernel.org>; Thu, 02 May 2019 15:20:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=PCto+tor/Funw84FDK4f/C6mYnGfPxUusytNY/M0v8E=;
-        b=eAT043FuBp3mi4krOIRkaTWf8pphOCzVeycqzBgC1h2at1nU+VBxVWWBdNC7ONwGdW
-         iyCjcUEBZWQsgkwYlL83O/SxQ51/gE+MdDwNu0/GvePKT7zY11uNCPMGZH0doNZnUS0p
-         TivFJp7LViUbxED/lu6AUnXVNw3uxq+NuzzUeqWkw1S4b3Wu+EiSDL8R2GDFQ2/T9U/k
-         jaUmV/bIjLBuNYZKNbP9nVL1/9MtAVLwhnAhOgK+Hvp7W8QnEyaflaO6eqdBslM74tvY
-         N+HdhTGEIydGiLoT/2OqUE9OpVuoXKOXFVvQH+BySIn+1O/tHAA1beUBB0ticBnGOOKX
-         22CA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=PCto+tor/Funw84FDK4f/C6mYnGfPxUusytNY/M0v8E=;
-        b=ACYL/NGqnS/fEz9PbDlnNTaYzUtm7rsuP26omwnQ+qUTjUt1UrzHhShxhS33dth869
-         BdusYvWyDYlnqtlDCSztJ4arbyxX3mbyU2ivTIrRl2z8UukvvnH3gESQ+hBGK1OHT05U
-         Brfy1GU7fzy4Bww9VDIgCCtyWHVRvOK+nPe/iIWPC3aoBRGWLTDB8C9hASlDxMZeWvn+
-         W20tKd7pBVFZnPYhViYBYlwlPP4cbcDNGZR2iMjCyV2vVn45AjdLO1W1gCH/gseHQ7a8
-         XO07CVyW2fGg6ZjZUpsEzKsJgDWK081uyi0hAyVUvceT6/C0SrWjZmWI8gZSgnok4KUU
-         jyeA==
-X-Gm-Message-State: APjAAAWMFTKNTJLoX4qEaSP2fkavoDVu0YwyqzfmwrMpL9i1x60vbAfv
-        5PMGJjaqkR+qlP7+/zhgSy4=
-X-Google-Smtp-Source: APXvYqwoGq65aufpUX/mKYr86ZX/8fnSpMAEHV+3n8PoBUQvfttW0HxgzkLBfX8LROoXu9AoeQWe6A==
-X-Received: by 2002:a17:902:8345:: with SMTP id z5mr6398466pln.255.1556835623484;
-        Thu, 02 May 2019 15:20:23 -0700 (PDT)
-Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id y17sm201167pfb.161.2019.05.02.15.20.22
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 02 May 2019 15:20:22 -0700 (PDT)
-From:   nadav.amit@gmail.com
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>
-Subject: [kvm-unit-tests PATCH] x86: Restore VMCS state when test_vmcs_addr() is done
-Date:   Thu,  2 May 2019 07:57:41 -0700
-Message-Id: <20190502145741.7863-1-nadav.amit@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        id S1726439AbfEBPDT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 May 2019 11:03:19 -0400
+Received: from mga06.intel.com ([134.134.136.31]:5377 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726197AbfEBPDT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 May 2019 11:03:19 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 May 2019 08:03:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,422,1549958400"; 
+   d="scan'208";a="169964558"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.181])
+  by fmsmga001.fm.intel.com with ESMTP; 02 May 2019 08:03:16 -0700
+Date:   Thu, 2 May 2019 08:03:15 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Jintack Lim <jintack@cs.columbia.edu>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH] KVM: nVMX: Set msr bitmap correctly for MSR_FS_BASE in
+ vmcs02
+Message-ID: <20190502150315.GB26138@linux.intel.com>
+References: <1556762959-31705-1-git-send-email-jintack@cs.columbia.edu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1556762959-31705-1-git-send-email-jintack@cs.columbia.edu>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nadav Amit <nadav.amit@gmail.com>
++Cc Jim
 
-The VMCS fields of APIC_VIRT_ADDR and TPR_THRESHOLD are modified by
-test_vmcs_addr() but are not restored to their original value. Save and
-restore them.
+On Wed, May 01, 2019 at 10:09:19PM -0400, Jintack Lim wrote:
+> Even when neither L0 nor L1 configured to trap MSR_FS_BASE writes from
+> its own VMs, the current KVM L0 always traps MSR_FS_BASE writes from L2.
+> Let's check if both L0 and L1 disabled trap for MSR_FS_BASE for its VMs
+> respectively, and let L2 write to MSR_FS_BASE without trap if that's the
+> case.
+> 
+> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 0c601d0..ab85aea 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -537,6 +537,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
+>  	 */
+>  	bool pred_cmd = !msr_write_intercepted_l01(vcpu, MSR_IA32_PRED_CMD);
+>  	bool spec_ctrl = !msr_write_intercepted_l01(vcpu, MSR_IA32_SPEC_CTRL);
+> +	bool fs_base = !msr_write_intercepted_l01(vcpu, MSR_FS_BASE);
 
-Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
----
- x86/vmx_tests.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+This isn't sufficient as we only fall into this code if L2 is in x2APIC
+mode or has accessed the speculation MSRs.  The quick fix is to check if
+we want to pass through MSR_FS_BASE, but if we're going to open up the
+floodgates then we should pass through as many MSRs as possible, e.g.
+GS_BASE, KERNEL_GS_BASE, TSC, SYSENTER_*, etc..., and do so using a
+generic mechanism.
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index e9010af..2d6b12d 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -4432,6 +4432,8 @@ static void test_tpr_threshold_values(void)
- static void test_tpr_threshold(void)
- {
- 	u32 primary = vmcs_read(CPU_EXEC_CTRL0);
-+	u64 apic_virt_addr = vmcs_read(APIC_VIRT_ADDR);
-+	u64 threshold = vmcs_read(TPR_THRESHOLD);
- 	void *virtual_apic_page;
- 
- 	if (!(ctrl_cpu_rev[0].clr & CPU_TPR_SHADOW))
-@@ -4451,11 +4453,8 @@ static void test_tpr_threshold(void)
- 	report_prefix_pop();
- 
- 	if (!((ctrl_cpu_rev[0].clr & CPU_SECONDARY) &&
--	    (ctrl_cpu_rev[1].clr & (CPU_VINTD  | CPU_VIRT_APIC_ACCESSES)))) {
--		vmcs_write(CPU_EXEC_CTRL0, primary);
--		return;
--	}
--
-+	    (ctrl_cpu_rev[1].clr & (CPU_VINTD  | CPU_VIRT_APIC_ACCESSES))))
-+		goto out;
- 	u32 secondary = vmcs_read(CPU_EXEC_CTRL1);
- 
- 	if (ctrl_cpu_rev[1].clr & CPU_VINTD) {
-@@ -4505,6 +4504,9 @@ static void test_tpr_threshold(void)
- 	}
- 
- 	vmcs_write(CPU_EXEC_CTRL1, secondary);
-+out:
-+	vmcs_write(TPR_THRESHOLD, threshold);
-+	vmcs_write(APIC_VIRT_ADDR, apic_virt_addr);
- 	vmcs_write(CPU_EXEC_CTRL0, primary);
- }
- 
--- 
-2.17.1
+That being said, I think there are other reasons why KVM doesn't pass
+through MSRs to L2.  Unfortunately, I'm struggling to recall what those
+reasons are.
 
+Jim, I'm pretty sure you've looked at this code a lot, do you happen to
+know off hand?  Is it purely a performance thing to avoid merging bitmaps
+on every nested entry, is there a subtle bug/security hole, or is it
+simply that no one has ever gotten around to writing the code?
+
+>  
+>  	/* Nothing to do if the MSR bitmap is not in use.  */
+>  	if (!cpu_has_vmx_msr_bitmap() ||
+> @@ -592,6 +593,12 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
+>  		}
+>  	}
+>  
+> +	if (fs_base)
+> +		nested_vmx_disable_intercept_for_msr(
+> +					msr_bitmap_l1, msr_bitmap_l0,
+> +					MSR_FS_BASE,
+> +					MSR_TYPE_W);
+
+This should be MSR_TYPE_RW.
+
+> +
+>  	if (spec_ctrl)
+>  		nested_vmx_disable_intercept_for_msr(
+>  					msr_bitmap_l1, msr_bitmap_l0,
+> -- 
+> 1.9.1
+> 
+> 
