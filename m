@@ -2,112 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FE1A113A5
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 09:04:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4657C113B4
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 09:09:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726186AbfEBHEN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 May 2019 03:04:13 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:37314 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725795AbfEBHEN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 May 2019 03:04:13 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x426x4ov077595;
-        Thu, 2 May 2019 07:04:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type :
- content-transfer-encoding; s=corp-2018-07-02;
- bh=A60QWLinX2B6/JLwfGxKN/s9kZ54SgkNOck1R9AcbB0=;
- b=PzIbPyAB7ZEWAYboNqv4u30zZ3ZFODv0JgNeS7aNGwE5oOPZDO3jhPaoMEvgTj3NUai7
- G/e4ZXvj5jwwFR+gqTU896RRsK534QqLBrX6BkashGYrHZj/joTqBJh5g1V9/HLGin+V
- vipErcmnmyqTRQb6SWQOXgo3b3h33ZyyzX4BLOMybEF6oxuz23VkiS6dYwONTHgRfj9O
- dGQ3ncmj0Fu7YJNv80k+avcKLRlvrORQQPfjRmXkErMJeoaBzyNevhwhXdSaAhS6YZnC
- Trd6Ax6EJOtlDD7Q+0RIQKXeHbpgMPROIbsB6lZkD+tfAWN80BzyIAtgB7aVQYFrqQ9d LA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2s6xhyektj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 02 May 2019 07:04:03 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4273JS7190246;
-        Thu, 2 May 2019 07:04:02 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2s6xhgn4fy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 02 May 2019 07:04:02 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x42741HP031724;
-        Thu, 2 May 2019 07:04:01 GMT
-Received: from mwanda (/196.97.155.240)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 02 May 2019 00:04:00 -0700
-Date:   Thu, 2 May 2019 10:03:53 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     clg@kaod.org
+        id S1726302AbfEBHJg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 May 2019 03:09:36 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:38528 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726231AbfEBHJg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 May 2019 03:09:36 -0400
+Received: by mail-pg1-f193.google.com with SMTP id j26so646190pgl.5
+        for <kvm@vger.kernel.org>; Thu, 02 May 2019 00:09:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XZ9tRx7jvU9TcyjQkdHw+YsrzsYYZz4cauhIND/XcPI=;
+        b=G8ULSI5FulvjULibvJbx8WmrStcvNH4T5T4pgVgz+adNbDqPE+Ve41Cb3Ccwdk2rWT
+         mpbFpcDcUeNv0eMFXeCOD7nWWHmpNiJHk2L3LZs8Gajh++CyBdbRwSS97U+3uyZdEWaN
+         LIvlH9Ed42O5bBG1mvbCpGW8yP/nCb826hvXMk0vPdLz55QiBHSSOyBk2OyjSGLM9SaR
+         3kLWPZPjahC8lX/xADPG4lnPusCgEHWKjeweVeSdaAqmDjrv/QyfhKpUg8TUvRJUn1kB
+         NeoDp2iiWCowASXkA5gbT6kmIvjw0t9vD5FY/MjIQ7QlvDXtRdKS+WXlnqGxbN1p0ifB
+         DfuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=XZ9tRx7jvU9TcyjQkdHw+YsrzsYYZz4cauhIND/XcPI=;
+        b=ORkoDk1J1/fenRAL9cJDsq+UZ/NI1XiLB1KS46QLH7Ie3xNPqprk4bMr2INzembyXv
+         u784a4G/rk/hqy1xnuxhkQa63gh0jp979izQ7qkgYwwg+wATRFGQvAsOdMGyu7gIMnvD
+         XoKSsF74FQCZ7IPBb2CNVf+QHx8IQIuRJQ4knULpYd7nxjtSJcUsgKowgvWqfuFE+HXs
+         ynF6vK3Uchrn85nLM6E6MR35qvkh8Ej0xITrR36oXxF9Lek9H5aRH1MfLSGYxtCOQVzu
+         JTSZPXgbrprky0xzo3dTeLowZjQFXU4askTCBoqz4Lcw3YbfTok27GzVqtPYXarFNojs
+         mq4A==
+X-Gm-Message-State: APjAAAW98NgJDQPi/geT0JtYxH/7Ih1Pf+L3rtPOqhV55x/ucylb2RTE
+        7cZ01aX0etZlfWcuH2F6f/gOzTZZHBY=
+X-Google-Smtp-Source: APXvYqwVPaG9SltXNm6kuxMJ5HZDCxUPI40JkO/tjRznHvTCE9yRHzKa/ONKPo301FcfyU2bwhRZBQ==
+X-Received: by 2002:a63:db10:: with SMTP id e16mr2423605pgg.142.1556780975164;
+        Thu, 02 May 2019 00:09:35 -0700 (PDT)
+Received: from [10.61.2.175] ([122.99.82.10])
+        by smtp.gmail.com with ESMTPSA id e29sm7659055pgb.37.2019.05.02.00.09.32
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 02 May 2019 00:09:34 -0700 (PDT)
+Subject: Re: [bug report] KVM: Introduce a 'release' method for KVM devices
+To:     Dan Carpenter <dan.carpenter@oracle.com>, clg@kaod.org
 Cc:     kvm@vger.kernel.org
-Subject: [bug report] KVM: Introduce a 'release' method for KVM devices
-Message-ID: <20190502070353.GA10616@mwanda>
+References: <20190502070353.GA10616@mwanda>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+Openpgp: preference=signencrypt
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <bb128b1f-8492-146c-3b08-1dffceac65f3@ozlabs.ru>
+Date:   Thu, 2 May 2019 17:09:30 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <20190502070353.GA10616@mwanda>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9244 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=581
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905020055
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9244 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=607 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905020054
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Cédric Le Goater,
 
-This is a semi-automatic email about new static checker warnings.
 
-The patch 2bde9b3ec8bd: "KVM: Introduce a 'release' method for KVM 
-devices" from Apr 18, 2019, leads to the following Smatch complaint:
+On 02/05/2019 17:03, Dan Carpenter wrote:
+> Hello CÃ©dric Le Goater,
+> 
+> This is a semi-automatic email about new static checker warnings.
+> 
+> The patch 2bde9b3ec8bd: "KVM: Introduce a 'release' method for KVM 
+> devices" from Apr 18, 2019, leads to the following Smatch complaint:
 
-    arch/x86/kvm/../../../virt/kvm/kvm_main.c:2943 kvm_device_release()
-    warn: variable dereferenced before check 'dev' (see line 2941)
 
-arch/x86/kvm/../../../virt/kvm/kvm_main.c
-  2938  static int kvm_device_release(struct inode *inode, struct file *filp)
-  2939  {
-  2940		struct kvm_device *dev = filp->private_data;
-  2941		struct kvm *kvm = dev->kvm;
-                                  ^^^^^^^^
-Dereference.
+Already reported https://lkml.org/lkml/2019/5/1/235
 
-  2942	
-  2943		if (!dev)
-                    ^^^^
-Checked too late.
 
-  2944			return -ENODEV;
-  2945	
-  2946          if (dev->kvm != kvm)
-                    ^^^^^^^^^^^^^^^
-What is this testing?  We just set "kvm = dev->kvm;" at the start.
+> 
+>     arch/x86/kvm/../../../virt/kvm/kvm_main.c:2943 kvm_device_release()
+>     warn: variable dereferenced before check 'dev' (see line 2941)
+> 
+> arch/x86/kvm/../../../virt/kvm/kvm_main.c
+>   2938  static int kvm_device_release(struct inode *inode, struct file *filp)
+>   2939  {
+>   2940		struct kvm_device *dev = filp->private_data;
+>   2941		struct kvm *kvm = dev->kvm;
+>                                   ^^^^^^^^
+> Dereference.
+> 
+>   2942	
+>   2943		if (!dev)
+>                     ^^^^
+> Checked too late.
+> 
+>   2944			return -ENODEV;
+>   2945	
+>   2946          if (dev->kvm != kvm)
+>                     ^^^^^^^^^^^^^^^
+> What is this testing?  We just set "kvm = dev->kvm;" at the start.
+> 
+>   2947                  return -EPERM;
+>   2948  
+>   2949          if (dev->ops->release) {
+>   2950                  mutex_lock(&kvm->lock);
+>   2951                  list_del(&dev->vm_node);
+>   2952                  dev->ops->release(dev);
+>   2953                  mutex_unlock(&kvm->lock);
+>   2954          }
+>   2955  
+>   2956          kvm_put_kvm(kvm);
+>   2957          return 0;
+>   2958  }
+> 
+> regards,
+> dan carpenter
+> 
 
-  2947                  return -EPERM;
-  2948  
-  2949          if (dev->ops->release) {
-  2950                  mutex_lock(&kvm->lock);
-  2951                  list_del(&dev->vm_node);
-  2952                  dev->ops->release(dev);
-  2953                  mutex_unlock(&kvm->lock);
-  2954          }
-  2955  
-  2956          kvm_put_kvm(kvm);
-  2957          return 0;
-  2958  }
-
-regards,
-dan carpenter
+-- 
+Alexey
