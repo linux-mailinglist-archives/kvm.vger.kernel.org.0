@@ -2,196 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4657C113B4
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 09:09:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B11C11417
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 09:24:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726302AbfEBHJg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 May 2019 03:09:36 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:38528 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726231AbfEBHJg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 May 2019 03:09:36 -0400
-Received: by mail-pg1-f193.google.com with SMTP id j26so646190pgl.5
-        for <kvm@vger.kernel.org>; Thu, 02 May 2019 00:09:35 -0700 (PDT)
+        id S1726197AbfEBHY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 May 2019 03:24:28 -0400
+Received: from mail-lj1-f171.google.com ([209.85.208.171]:43720 "EHLO
+        mail-lj1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726159AbfEBHY2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 May 2019 03:24:28 -0400
+Received: by mail-lj1-f171.google.com with SMTP id t1so1209642lje.10
+        for <kvm@vger.kernel.org>; Thu, 02 May 2019 00:24:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=XZ9tRx7jvU9TcyjQkdHw+YsrzsYYZz4cauhIND/XcPI=;
-        b=G8ULSI5FulvjULibvJbx8WmrStcvNH4T5T4pgVgz+adNbDqPE+Ve41Cb3Ccwdk2rWT
-         mpbFpcDcUeNv0eMFXeCOD7nWWHmpNiJHk2L3LZs8Gajh++CyBdbRwSS97U+3uyZdEWaN
-         LIvlH9Ed42O5bBG1mvbCpGW8yP/nCb826hvXMk0vPdLz55QiBHSSOyBk2OyjSGLM9SaR
-         3kLWPZPjahC8lX/xADPG4lnPusCgEHWKjeweVeSdaAqmDjrv/QyfhKpUg8TUvRJUn1kB
-         NeoDp2iiWCowASXkA5gbT6kmIvjw0t9vD5FY/MjIQ7QlvDXtRdKS+WXlnqGxbN1p0ifB
-         DfuA==
+        d=linaro.org; s=google;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=ghFNzOb61UFVqL/XSwKbwaqYhv0lw7MSasmWuDDEF2U=;
+        b=v7hjG2/bb84Xw2nz3GV0oO2Aa4FFFX9f2pyw+sEGzGz0awb4WiMIKIwFcMJXCF/Hte
+         CNeAvdNr4Fa4iWvcm3d9z6pdTAeLS1DwFgLQkuqxF/EEVm2s5gonW610ljglVpW/UjW0
+         zKjOthmpbYABQ7DurpBQaHCI1fQXPJluJUyf9gF/DEPGAZdzfPXPul0k7J9xvrfDTFG+
+         EtLK1hXSmMyWLyrpfISXpO1qTJpOvZtq8Lam8D+0Qp3pUQwCmTZ8CikUzjlwJ1RL28oC
+         mPx5sS03eou2lNLyxh49YTLMqBi28NiOh23C7gdAFuhyO3rroKfbd/nzkNoZqAng56IW
+         fryA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=XZ9tRx7jvU9TcyjQkdHw+YsrzsYYZz4cauhIND/XcPI=;
-        b=ORkoDk1J1/fenRAL9cJDsq+UZ/NI1XiLB1KS46QLH7Ie3xNPqprk4bMr2INzembyXv
-         u784a4G/rk/hqy1xnuxhkQa63gh0jp979izQ7qkgYwwg+wATRFGQvAsOdMGyu7gIMnvD
-         XoKSsF74FQCZ7IPBb2CNVf+QHx8IQIuRJQ4knULpYd7nxjtSJcUsgKowgvWqfuFE+HXs
-         ynF6vK3Uchrn85nLM6E6MR35qvkh8Ej0xITrR36oXxF9Lek9H5aRH1MfLSGYxtCOQVzu
-         JTSZPXgbrprky0xzo3dTeLowZjQFXU4askTCBoqz4Lcw3YbfTok27GzVqtPYXarFNojs
-         mq4A==
-X-Gm-Message-State: APjAAAW98NgJDQPi/geT0JtYxH/7Ih1Pf+L3rtPOqhV55x/ucylb2RTE
-        7cZ01aX0etZlfWcuH2F6f/gOzTZZHBY=
-X-Google-Smtp-Source: APXvYqwVPaG9SltXNm6kuxMJ5HZDCxUPI40JkO/tjRznHvTCE9yRHzKa/ONKPo301FcfyU2bwhRZBQ==
-X-Received: by 2002:a63:db10:: with SMTP id e16mr2423605pgg.142.1556780975164;
-        Thu, 02 May 2019 00:09:35 -0700 (PDT)
-Received: from [10.61.2.175] ([122.99.82.10])
-        by smtp.gmail.com with ESMTPSA id e29sm7659055pgb.37.2019.05.02.00.09.32
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 02 May 2019 00:09:34 -0700 (PDT)
-Subject: Re: [bug report] KVM: Introduce a 'release' method for KVM devices
-To:     Dan Carpenter <dan.carpenter@oracle.com>, clg@kaod.org
-Cc:     kvm@vger.kernel.org
-References: <20190502070353.GA10616@mwanda>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-Openpgp: preference=signencrypt
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <bb128b1f-8492-146c-3b08-1dffceac65f3@ozlabs.ru>
-Date:   Thu, 2 May 2019 17:09:30 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=ghFNzOb61UFVqL/XSwKbwaqYhv0lw7MSasmWuDDEF2U=;
+        b=UgyGA51E0pBM+nRGBoprO16DW6rF3ORszLStJvecETFIuV4Lc40xDVbml7fAoEBgRB
+         9PBnn56XQd58nnnW0EgVxbEsXHdi+r0kEt8N2anMd40zVXejn7bY6JHcFCsTIf9VhVZF
+         klHMQwkV135Uz81Jp2PdG3Mme7WNcLWMGf2mjtKgqn+9ghHxb/lbo0+iiJwU+4oMMIMh
+         xwK/jdvQ2iQGUI8EkDsQlAAuwU1cxdvjTwjVA9nIs9dftIDRJJYVMoCrMFh6W3CFVdzR
+         alTvRYljAX+viyPJGQf7BH4qiJ269rfhwGcD/OS/baiaIOSP5kk/9F8zbmDnFLOpJyft
+         4Opg==
+X-Gm-Message-State: APjAAAWwP7LGuy7MGHGurVmAfwErSnMHIT+piAYYNWuc++v6yVgt8ede
+        TuWyPqF9l2PE/XmgrJyAY16f27rOnobEyKY6RNPUjxeFrENCMw==
+X-Google-Smtp-Source: APXvYqx+IPehC0kPnSGMPpmoJdv0vtOPR5z3WWCk7KBaZaBxU2AQ00ebqFedPJgbqlXyVRzBtLkTrMY4oJuzxx2avh8=
+X-Received: by 2002:a2e:9689:: with SMTP id q9mr857641lji.194.1556781865773;
+ Thu, 02 May 2019 00:24:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190502070353.GA10616@mwanda>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Thu, 2 May 2019 12:54:14 +0530
+Message-ID: <CA+G9fYu_dLNiGJyeDxgr1kRSAHcKmyAjjUjEuSj5Qkw8=wbxYA@mail.gmail.com>
+Subject: [kvm-unit-tests ] results on stable-rc-5.0
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, drjones@redhat.com, marcorr@google.com,
+        Riku Voipio <riku.voipio@linaro.org>,
+        Alan Bennett <alan.bennett@linaro.org>,
+        lkft-triage@lists.linaro.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Linaro test farm is validating each stable rc releases and reporting
+results to upstream. kvm-unit-tests also included in Linux Kernel
+Functional test plan and we see below results so please comment on
+reason for test failures and skip and suggest Kconfig or any userland
+tools for improve test coverage.
 
+kvm unit tests results summary.
+PASS 23
+SKIP 18
+FAIL 14
 
-On 02/05/2019 17:03, Dan Carpenter wrote:
-> Hello Cédric Le Goater,
-> 
-> This is a semi-automatic email about new static checker warnings.
-> 
-> The patch 2bde9b3ec8bd: "KVM: Introduce a 'release' method for KVM 
-> devices" from Apr 18, 2019, leads to the following Smatch complaint:
+Test results output log,
+--------------------------------
+FAIL apic-split (timeout; duration=90s)
+PASS ioapic-split (19 tests)
+FAIL apic (timeout; duration=30)
+PASS ioapic (19 tests)
+PASS smptest (1 tests)
+PASS smptest3 (1 tests)
+PASS vmexit_cpuid
+FAIL vmexit_vmcall
+PASS vmexit_mov_from_cr8
+PASS vmexit_mov_to_cr8
+PASS vmexit_inl_pmtimer
+PASS vmexit_ipi
+PASS vmexit_ipi_halt
+PASS vmexit_ple_round_robin
+PASS vmexit_tscdeadline
+PASS vmexit_tscdeadline_immed
+SKIP access (qemu-system-x86_64: CPU model 'host' requires KVM)
+SKIP smap (qemu-system-x86_64: CPU model 'host' requires KVM)
+SKIP pku (qemu-system-x86_64: CPU model 'host' requires KVM)
+FAIL emulator (timeout; duration=90s)
+PASS eventinj (13 tests)
+FAIL hypercall (timeout; duration=90s)
+FAIL idt_test (timeout; duration=90s)
+SKIP memory (qemu-system-x86_64: CPU model 'host' requires KVM)
+PASS msr (12 tests)
+cat: /proc/sys/kernel/nmi_watchdog: No such file or directory
+SKIP pmu (/proc/sys/kernel/nmi_watchdog not equal to 0)
+FAIL vmware_backdoors
+PASS port80
+FAIL realmode
+FAIL s3
+PASS sieve
+PASS syscall (2 tests)
+PASS tsc (3 tests)
+SKIP tsc_adjust (qemu-system-x86_64: CPU model 'host' requires KVM)
+SKIP xsave (qemu-system-x86_64: CPU model 'host' requires KVM)
+PASS rmap_chain
+FAIL svm (timeout; duration=90s)
+SKIP taskswitch (i386 only)
+SKIP taskswitch2 (i386 only)
+FAIL kvmclock_test
+FAIL pcid (3 tests, 1 unexpected failures)
+PASS umip (11 tests)
+SKIP vmx (qemu-system-x86_64: CPU model 'host' requires KVM)
+SKIP ept (qemu-system-x86_64: CPU model 'host' requires KVM)
+SKIP vmx_eoi_bitmap_ioapic_scan (qemu-system-x86_64: CPU model 'host'
+requires KVM)
+SKIP vmx_hlt_with_rvi_test (qemu-system-x86_64: CPU model 'host' requires KVM)
+SKIP vmx_apicv_test (qemu-system-x86_64: CPU model 'host' requires KVM)
+SKIP vmx_apic_passthrough_thread (qemu-system-x86_64: CPU model 'host'
+requires KVM)
+SKIP vmx_vmcs_shadow_test (qemu-system-x86_64: CPU model 'host' requires KVM)
+FAIL debug
+SKIP hyperv_synic
+SKIP hyperv_connections (1 tests, 1 skipped)
+PASS hyperv_stimer (1 tests)
+FAIL hyperv_clock (timeout; duration=90s)
+PASS intel_iommu (11 tests)
 
+Kernel version,
+5.0.11-rc1
 
-Already reported https://lkml.org/lkml/2019/5/1/235
+x86_64 kernel config,
+http://snapshots.linaro.org/openembedded/lkft/lkft/sumo/intel-corei7-64/lkft/linux-stable-rc-5.0/39/config
 
+Test full results log,
+https://lkft.validation.linaro.org/scheduler/job/696689#L1415
 
-> 
->     arch/x86/kvm/../../../virt/kvm/kvm_main.c:2943 kvm_device_release()
->     warn: variable dereferenced before check 'dev' (see line 2941)
-> 
-> arch/x86/kvm/../../../virt/kvm/kvm_main.c
->   2938  static int kvm_device_release(struct inode *inode, struct file *filp)
->   2939  {
->   2940		struct kvm_device *dev = filp->private_data;
->   2941		struct kvm *kvm = dev->kvm;
->                                   ^^^^^^^^
-> Dereference.
-> 
->   2942	
->   2943		if (!dev)
->                     ^^^^
-> Checked too late.
-> 
->   2944			return -ENODEV;
->   2945	
->   2946          if (dev->kvm != kvm)
->                     ^^^^^^^^^^^^^^^
-> What is this testing?  We just set "kvm = dev->kvm;" at the start.
-> 
->   2947                  return -EPERM;
->   2948  
->   2949          if (dev->ops->release) {
->   2950                  mutex_lock(&kvm->lock);
->   2951                  list_del(&dev->vm_node);
->   2952                  dev->ops->release(dev);
->   2953                  mutex_unlock(&kvm->lock);
->   2954          }
->   2955  
->   2956          kvm_put_kvm(kvm);
->   2957          return 0;
->   2958  }
-> 
-> regards,
-> dan carpenter
-> 
+Reference link for all test plans running on x86_64, i386, arm and arm64.
+https://qa-reports.linaro.org/lkft/linux-stable-rc-5.0-oe/
 
--- 
-Alexey
+Best regards
+Naresh Kamboju
