@@ -2,107 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 12D3B12423
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 23:31:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A644211AFD
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2019 16:13:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726126AbfEBVbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 May 2019 17:31:17 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:35108 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725962AbfEBVbR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 May 2019 17:31:17 -0400
-Received: by mail-pg1-f194.google.com with SMTP id h1so1653480pgs.2
-        for <kvm@vger.kernel.org>; Thu, 02 May 2019 14:31:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=kRgByrXycqdM1M15nLlf2KBo+chiXOfH1fCUeiWFamk=;
-        b=IB6vB3FcEKMO2tz50VgGyzrBtZMalWIMGECGJABNUiGIiF4HAo+NTjeGWgpmYtPOa1
-         4+Ma+mOOB/7cFCg7aXwzUGlRnVuNwKh6AX4AwWnzGvTqXl7dHmsDJkRJ29Fmn517/9k/
-         sMw75Kfe9QaZMqT71HiV6+rEW1DBhPNRoC0t/GBKH5JWhNqfJtxDpRSJe9yd2dcj3Dsc
-         fcyL1+Ksyh5vaM0xWTa9VMI3kson5N4WxFOOxIhcmW1ZL4Td3lr2iwb43OnpRL4oqHCK
-         aTgoeiXsL3vWVXWOtQNfDnnGs/83xnjlRyPxfcN6p13pNhbekPysPf2Vkw5v2ooFMnkk
-         pJwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=kRgByrXycqdM1M15nLlf2KBo+chiXOfH1fCUeiWFamk=;
-        b=LZx++RT5HMIiL3yPL9Zhjo3aSDVOPIzntVwFGu8AkyK2on8b30PveUS70Vdpa1IVEh
-         6TfKNRpgM/pihp66B4yZ5Z7nFbjKsGiQeF6kiMiRCKyJONGm72UuDqY5jSVV5bILiRtq
-         dCxHMgEx3+dx6C/1xRmaQmfNkvmDtSE29ZDgqdpyzZWbaHDx/YikG9yWOq2DFmf/D9Nh
-         xNhrg60UGyKfCEju3L0hU/L2jg7Il/nOCIjolGlOh2Uvo0h8WJfquYfdO4TNnlfFp03N
-         8ICJ+TutSStV+iyTnHuf8FkrLF5MsoHVzTDPmIQ41yI4ZLnM/rpI1Hy2rgDCZEjLxV2m
-         Oe/A==
-X-Gm-Message-State: APjAAAVR4N6QmFyOy4yYcam/kuW1Fi521Z0/9QZe8UQJdrpSrSe37lPd
-        sSvjOItjRH1jk2f3lyQUj6mPsv5Oq7Q=
-X-Google-Smtp-Source: APXvYqzPrvlCDN3tPKoZWMIeu94VTX43ShlfIv2/42nM0TCUhoak2wMc8ycorb1O8jZ8vhCD+BOBrQ==
-X-Received: by 2002:aa7:9089:: with SMTP id i9mr6559654pfa.115.1556832675561;
-        Thu, 02 May 2019 14:31:15 -0700 (PDT)
-Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id c17sm116546pfn.173.2019.05.02.14.31.13
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 02 May 2019 14:31:14 -0700 (PDT)
-From:   nadav.amit@gmail.com
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [kvm-unit-tests PATCH] x86: Set "APIC Software Enable" after APIC reset
-Date:   Thu,  2 May 2019 07:08:56 -0700
-Message-Id: <20190502140856.4136-1-nadav.amit@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        id S1726308AbfEBONF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 May 2019 10:13:05 -0400
+Received: from mga09.intel.com ([134.134.136.24]:22038 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726197AbfEBONF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 May 2019 10:13:05 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 May 2019 07:13:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,421,1549958400"; 
+   d="scan'208";a="139296728"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.181])
+  by orsmga008.jf.intel.com with ESMTP; 02 May 2019 07:13:05 -0700
+Date:   Thu, 2 May 2019 07:13:04 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
+        marcorr@google.com, Riku Voipio <riku.voipio@linaro.org>,
+        Alan Bennett <alan.bennett@linaro.org>,
+        lkft-triage@lists.linaro.org
+Subject: Re: [kvm-unit-tests ] results on stable-rc-5.0
+Message-ID: <20190502141304.GA26138@linux.intel.com>
+References: <CA+G9fYu_dLNiGJyeDxgr1kRSAHcKmyAjjUjEuSj5Qkw8=wbxYA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+G9fYu_dLNiGJyeDxgr1kRSAHcKmyAjjUjEuSj5Qkw8=wbxYA@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nadav Amit <nadav.amit@gmail.com>
+On Thu, May 02, 2019 at 12:54:14PM +0530, Naresh Kamboju wrote:
+> Linaro test farm is validating each stable rc releases and reporting
+> results to upstream. kvm-unit-tests also included in Linux Kernel
+> Functional test plan and we see below results so please comment on
+> reason for test failures and skip and suggest Kconfig or any userland
+> tools for improve test coverage.
 
-After the APIC is reset, some of its registers might be reset. As the
-SDM says: "When IA32_APIC_BASE[11] is set to 0, prior initialization to
-the APIC may be lost and the APIC may return to the state described in
-Section 10.4.7.1". The SDM also says that after APIC reset "the
-spurious-interrupt vector register is initialized to 000000FFH". This
-means that after the APIC is reset it needs to be software-enabled
-through the SPIV.
+The test environment needs to load a KVM module, e.g. kvm_intel or kvm_amd.
+The unit tests don't require KVM to be loaded and will happily test Qemu
+emulation when possible (not sure if this is a bug or feature).
 
-This is done one occasion, but there are (at least) two occasions that
-do not software-enable the APIC after reset (__test_apic_id() and main()
-in vmx.c).
+Lack of KVM is why you see
 
-Move APIC SPIV reinitialization into reset_apic(). Remove SPIV settings
-which are unnecessary after reset_apic() is modified.
+  SKIP ... (qemu-system-x86_64: CPU model 'host' requires KVM)
 
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
----
- lib/x86/apic.c | 1 +
- x86/apic.c     | 1 -
- 2 files changed, 1 insertion(+), 1 deletion(-)
+and is likely why other tests are failing, e.g. apic timeouts.
 
-diff --git a/lib/x86/apic.c b/lib/x86/apic.c
-index 2aeffbd..4e7d43c 100644
---- a/lib/x86/apic.c
-+++ b/lib/x86/apic.c
-@@ -161,6 +161,7 @@ void reset_apic(void)
- {
-     disable_apic();
-     wrmsr(MSR_IA32_APICBASE, rdmsr(MSR_IA32_APICBASE) | APIC_EN);
-+    apic_write(APIC_SPIV, 0x1ff);
- }
- 
- u32 ioapic_read_reg(unsigned reg)
-diff --git a/x86/apic.c b/x86/apic.c
-index 3eff588..7ef4a27 100644
---- a/x86/apic.c
-+++ b/x86/apic.c
-@@ -148,7 +148,6 @@ static void test_apic_disable(void)
-     verify_disabled_apic_mmio();
- 
-     reset_apic();
--    apic_write(APIC_SPIV, 0x1ff);
-     report("Local apic enabled in xAPIC mode",
- 	   (rdmsr(MSR_IA32_APICBASE) & (APIC_EN | APIC_EXTD)) == APIC_EN);
-     report("CPUID.1H:EDX.APIC[bit 9] is set", cpuid(1).d & (1 << 9));
--- 
-2.17.1
 
+> 
+> kvm unit tests results summary.
+> PASS 23
+> SKIP 18
+> FAIL 14
+> 
+> Test results output log,
+> --------------------------------
+> FAIL apic-split (timeout; duration=90s)
+> PASS ioapic-split (19 tests)
+> FAIL apic (timeout; duration=30)
+> PASS ioapic (19 tests)
+> PASS smptest (1 tests)
+> PASS smptest3 (1 tests)
+> PASS vmexit_cpuid
+> FAIL vmexit_vmcall
+> PASS vmexit_mov_from_cr8
+> PASS vmexit_mov_to_cr8
+> PASS vmexit_inl_pmtimer
+> PASS vmexit_ipi
+> PASS vmexit_ipi_halt
+> PASS vmexit_ple_round_robin
+> PASS vmexit_tscdeadline
+> PASS vmexit_tscdeadline_immed
+> SKIP access (qemu-system-x86_64: CPU model 'host' requires KVM)
+> SKIP smap (qemu-system-x86_64: CPU model 'host' requires KVM)
+> SKIP pku (qemu-system-x86_64: CPU model 'host' requires KVM)
+> FAIL emulator (timeout; duration=90s)
+> PASS eventinj (13 tests)
+> FAIL hypercall (timeout; duration=90s)
+> FAIL idt_test (timeout; duration=90s)
+> SKIP memory (qemu-system-x86_64: CPU model 'host' requires KVM)
+> PASS msr (12 tests)
+> cat: /proc/sys/kernel/nmi_watchdog: No such file or directory
+> SKIP pmu (/proc/sys/kernel/nmi_watchdog not equal to 0)
+> FAIL vmware_backdoors
+> PASS port80
+> FAIL realmode
+> FAIL s3
+> PASS sieve
+> PASS syscall (2 tests)
+> PASS tsc (3 tests)
+> SKIP tsc_adjust (qemu-system-x86_64: CPU model 'host' requires KVM)
+> SKIP xsave (qemu-system-x86_64: CPU model 'host' requires KVM)
+> PASS rmap_chain
+> FAIL svm (timeout; duration=90s)
+> SKIP taskswitch (i386 only)
+> SKIP taskswitch2 (i386 only)
+> FAIL kvmclock_test
+> FAIL pcid (3 tests, 1 unexpected failures)
+> PASS umip (11 tests)
+> SKIP vmx (qemu-system-x86_64: CPU model 'host' requires KVM)
+> SKIP ept (qemu-system-x86_64: CPU model 'host' requires KVM)
+> SKIP vmx_eoi_bitmap_ioapic_scan (qemu-system-x86_64: CPU model 'host'
+> requires KVM)
+> SKIP vmx_hlt_with_rvi_test (qemu-system-x86_64: CPU model 'host' requires KVM)
+> SKIP vmx_apicv_test (qemu-system-x86_64: CPU model 'host' requires KVM)
+> SKIP vmx_apic_passthrough_thread (qemu-system-x86_64: CPU model 'host'
+> requires KVM)
+> SKIP vmx_vmcs_shadow_test (qemu-system-x86_64: CPU model 'host' requires KVM)
+> FAIL debug
+> SKIP hyperv_synic
+> SKIP hyperv_connections (1 tests, 1 skipped)
+> PASS hyperv_stimer (1 tests)
+> FAIL hyperv_clock (timeout; duration=90s)
+> PASS intel_iommu (11 tests)
+> 
+> Kernel version,
+> 5.0.11-rc1
+> 
+> x86_64 kernel config,
+> http://snapshots.linaro.org/openembedded/lkft/lkft/sumo/intel-corei7-64/lkft/linux-stable-rc-5.0/39/config
+> 
+> Test full results log,
+> https://lkft.validation.linaro.org/scheduler/job/696689#L1415
+> 
+> Reference link for all test plans running on x86_64, i386, arm and arm64.
+> https://qa-reports.linaro.org/lkft/linux-stable-rc-5.0-oe/
+> 
+> Best regards
+> Naresh Kamboju
