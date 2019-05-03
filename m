@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4415912E27
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 14:46:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F123012E29
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 14:46:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727997AbfECMqc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 May 2019 08:46:32 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:60658 "EHLO
+        id S1728041AbfECMqf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 May 2019 08:46:35 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:60676 "EHLO
         foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727737AbfECMqb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 May 2019 08:46:31 -0400
+        id S1727737AbfECMqf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 May 2019 08:46:35 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3B7E16A3;
-        Fri,  3 May 2019 05:46:31 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 299B1374;
+        Fri,  3 May 2019 05:46:35 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B8B53F220;
-        Fri,  3 May 2019 05:46:28 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E6A2B3F220;
+        Fri,  3 May 2019 05:46:31 -0700 (PDT)
 From:   Marc Zyngier <marc.zyngier@arm.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
@@ -36,9 +36,9 @@ Cc:     =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         "zhang . lei" <zhang.lei@jp.fujitsu.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
-Subject: [PATCH 31/56] KVM: arm: Make vcpu finalization stubs into inline functions
-Date:   Fri,  3 May 2019 13:44:02 +0100
-Message-Id: <20190503124427.190206-32-marc.zyngier@arm.com>
+Subject: [PATCH 32/56] KVM: arm64/sve: sys_regs: Demote redundant vcpu_has_sve() checks to WARNs
+Date:   Fri,  3 May 2019 13:44:03 +0100
+Message-Id: <20190503124427.190206-33-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190503124427.190206-1-marc.zyngier@arm.com>
 References: <20190503124427.190206-1-marc.zyngier@arm.com>
@@ -51,51 +51,48 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Dave Martin <Dave.Martin@arm.com>
 
-The vcpu finalization stubs kvm_arm_vcpu_finalize() and
-kvm_arm_vcpu_is_finalized() are currently #defines for ARM, which
-limits the type-checking that the compiler can do at runtime.
+Because of the logic in kvm_arm_sys_reg_{get,set}_reg() and
+sve_id_visibility(), we should never call
+{get,set}_id_aa64zfr0_el1() for a vcpu where !vcpu_has_sve(vcpu).
 
-The only reason for them to be #defines was to avoid reliance on
-the definition of struct kvm_vcpu, which is not available here due
-to circular #include problems.  However, because these are stubs
-containing no code, they don't need the definition of struct
-kvm_vcpu after all; only a declaration is needed (which is
-available already).
+To avoid the code giving the impression that it is valid for these
+functions to be called in this situation, and to help the compiler
+make the right optimisation decisions, this patch adds WARN_ON()
+for these cases.
 
-So in the interests of cleanliness, this patch converts them to
-inline functions.
-
-No functional change.
+Given the way the logic is spread out, this seems preferable to
+dropping the checks altogether.
 
 Suggested-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index d95627393353..7feddacbc207 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -412,7 +412,14 @@ static inline int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
- 	return 0;
- }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 09e9b0625911..7046c7686321 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1144,7 +1144,7 @@ static int get_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+ {
+ 	u64 val;
  
--#define kvm_arm_vcpu_finalize(vcpu, what) (-EINVAL)
--#define kvm_arm_vcpu_is_finalized(vcpu) true
-+static inline int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int what)
-+{
-+	return -EINVAL;
-+}
-+
-+static inline bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
-+{
-+	return true;
-+}
+-	if (!vcpu_has_sve(vcpu))
++	if (WARN_ON(!vcpu_has_sve(vcpu)))
+ 		return -ENOENT;
  
- #endif /* __ARM_KVM_HOST_H__ */
+ 	val = guest_id_aa64zfr0_el1(vcpu);
+@@ -1159,7 +1159,7 @@ static int set_id_aa64zfr0_el1(struct kvm_vcpu *vcpu,
+ 	int err;
+ 	u64 val;
+ 
+-	if (!vcpu_has_sve(vcpu))
++	if (WARN_ON(!vcpu_has_sve(vcpu)))
+ 		return -ENOENT;
+ 
+ 	err = reg_from_user(&val, uaddr, id);
 -- 
 2.20.1
 
