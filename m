@@ -2,106 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C1A5813335
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 19:38:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D3DF13342
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 19:45:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728487AbfECRi5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 May 2019 13:38:57 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:38156 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727173AbfECRi4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 May 2019 13:38:56 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x43HYGqx190388;
-        Fri, 3 May 2019 17:38:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=BPK+mmNadEMzrxKAsc0F67yELFWfIMgBesMwTZMObRM=;
- b=JncBPmGfiFIedxxuD92giSFULgQ7yX29EgQj4/G3ri3bgpwz1FgwN4aaA9SnSgYypIx6
- iXrkEkBrlxLNalzKwh4/9DqcWV561JT3BOWdhaUZct0ioqnRwszd6EuKAGmbyXNI2YJI
- F2lOur4dCOqLqSx4WRHhaLagkHoCkn206KOjijQLvGpDt2wdrfFs6o7hg1Kp+S97lkum
- +b3/D8c826Rs2Q0EeKKBeZnbF64RNDwyNrXBRaTPafFWJmFsFdF7wjDaz34ndiRUhfqn
- OETMQEdzDSiMI1Mdi9CILoJ7eoADPxlCCddvyi0RNGIDwvCaifPj0SgP0qWHd7Ir0Yiq PA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2s6xj0094r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 03 May 2019 17:38:40 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x43HaqCn104449;
-        Fri, 3 May 2019 17:38:39 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2s6xhhgbsr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 03 May 2019 17:38:39 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x43HccWi021136;
-        Fri, 3 May 2019 17:38:38 GMT
-Received: from [10.159.140.243] (/10.159.140.243)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 03 May 2019 10:38:38 -0700
+        id S1728672AbfECRpH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 May 2019 13:45:07 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:44413 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726480AbfECRpH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 May 2019 13:45:07 -0400
+Received: by mail-pf1-f194.google.com with SMTP id y13so3217504pfm.11
+        for <kvm@vger.kernel.org>; Fri, 03 May 2019 10:45:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=x1vHwidVW2iqiue6QlEO7msowRc4CzTmFAfk84+WEko=;
+        b=O1uJU6qzYXEysdJuN16Ez2JagPGxNLSKaeFOA8N6C+RZr/kAJxKmdHHSVsmxHwfxSS
+         +I98Ce1dOJo46f6DyY4/3kCO2abMffY2guC/k6LTw16ALGUV5Gok+ZYEpw3Uf99A3gKn
+         daRzFamSkcvycYYx47ofe5EuoCTHpFhk/BK9arSVg5NuEZwS9hPSqhYlMZ48FDQe7rlZ
+         5P2W+lx1YuZtWK9pWdPmSEfggq4KwQzEbz4dbXNpzYVzfegr9GaLk+01y5viGqU3YDMK
+         P/YTINpGHD/PZjEgzaNoAlQdVSwe0EGg+wiziw9AEQyMCkrQWF4Xby3ph4QNEkVNnoDx
+         ILgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=x1vHwidVW2iqiue6QlEO7msowRc4CzTmFAfk84+WEko=;
+        b=JyawrGh4rlwDsh27R1BTr1AutnPO3cg5khJZLQp9TtPS56aCFVO1b9RoE7aN8uploV
+         TjU8UWbaA3A9TgBbqf4jpD18kG6ladk4yPGbxisrYGiP+hAWUEQ8ImDj8TlD2bS823/K
+         BhVxBLLE3KiZ2IG+c2IJHqkhfkBAdE2GX+Cxh6OwIoK+2A9YoOrF4wS1i8L+TXX2IVK7
+         LvseIMIo/MqV5DRlZSOlfPrl/Cbat3Wv/oZOJZYKK++4yGeZRUSTRBDD41qe63ZRjC5W
+         oGWERkzfiCAm7xiNbqMNPjDWtA7w3hso8q0UMguW8Teq2RHqFVvEj4Iw8SWNRV6qz6jY
+         HONg==
+X-Gm-Message-State: APjAAAWFd8V+gGxyhfWu6nS2b5pfM5ESryHpn2EQq9DhemxU7eSKnWyR
+        nlExB7HyVyvuxqsK73Q9jQF33KYp4XE=
+X-Google-Smtp-Source: APXvYqyHEbvjexXhN0M7ri48TWLWic7VzyZAKj/mL7AAa/T3QRlCwGEmIf0Qmoi1bocI61Tkb5dkyA==
+X-Received: by 2002:a63:2ad3:: with SMTP id q202mr12100492pgq.423.1556905506258;
+        Fri, 03 May 2019 10:45:06 -0700 (PDT)
+Received: from [10.33.115.113] ([66.170.99.2])
+        by smtp.gmail.com with ESMTPSA id p81sm6072349pfa.26.2019.05.03.10.45.04
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 03 May 2019 10:45:05 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
 Subject: Re: [kvm-unit-tests PATCH] x86: eventinj: Do a real io_delay()
-To:     nadav.amit@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <57fcfc11-ec47-8f54-a6d2-e40a706e3a71@oracle.com>
+Date:   Fri, 3 May 2019 10:45:03 -0700
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <2D0191F2-105B-4446-89DB-38CC9A3B0527@gmail.com>
 References: <20190502184913.10138-1-nadav.amit@gmail.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <57fcfc11-ec47-8f54-a6d2-e40a706e3a71@oracle.com>
-Date:   Fri, 3 May 2019 10:38:37 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20190502184913.10138-1-nadav.amit@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9245 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905030114
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9245 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905030114
+ <57fcfc11-ec47-8f54-a6d2-e40a706e3a71@oracle.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+> On May 3, 2019, at 10:38 AM, Krish Sadhukhan =
+<krish.sadhukhan@oracle.com> wrote:
+>=20
+>=20
+> On 5/2/19 11:49 AM, nadav.amit@gmail.com wrote:
+>> From: Nadav Amit <nadav.amit@gmail.com>
+>>=20
+>> There is no guarantee that a self-IPI would be delivered immediately.
+>> io_delay() is called after self-IPI is generated but does nothing.
+>> Instead, change io_delay() to wait for 10000 cycles, which should be
+>> enough on any system whatsoever.
+>>=20
+>> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+>> ---
+>>  x86/eventinj.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>=20
+>> diff --git a/x86/eventinj.c b/x86/eventinj.c
+>> index 8064eb9..250537b 100644
+>> --- a/x86/eventinj.c
+>> +++ b/x86/eventinj.c
+>> @@ -18,6 +18,11 @@ void do_pf_tss(void);
+>>    static inline void io_delay(void)
+>>  {
+>> +	u64 start =3D rdtsc();
+>> +
+>> +	do {
+>> +		pause();
+>> +	} while (rdtsc() - start < 10000);
+>>  }
+>>    static void apic_self_ipi(u8 v)
+>=20
+> Perhaps call delay() (in delay.c) inside of io_delay() OR perhaps =
+replace
+> all instances of io_delay() with delay() ?
 
-On 5/2/19 11:49 AM, nadav.amit@gmail.com wrote:
-> From: Nadav Amit <nadav.amit@gmail.com>
->
-> There is no guarantee that a self-IPI would be delivered immediately.
-> io_delay() is called after self-IPI is generated but does nothing.
-> Instead, change io_delay() to wait for 10000 cycles, which should be
-> enough on any system whatsoever.
->
-> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
-> ---
->   x86/eventinj.c | 5 +++++
->   1 file changed, 5 insertions(+)
->
-> diff --git a/x86/eventinj.c b/x86/eventinj.c
-> index 8064eb9..250537b 100644
-> --- a/x86/eventinj.c
-> +++ b/x86/eventinj.c
-> @@ -18,6 +18,11 @@ void do_pf_tss(void);
->   
->   static inline void io_delay(void)
->   {
-> +	u64 start = rdtsc();
-> +
-> +	do {
-> +		pause();
-> +	} while (rdtsc() - start < 10000);
->   }
->   
->   static void apic_self_ipi(u8 v)
+There is such a mess with this delay(). It times stuff based on number =
+of
+pause() invocations. There is an additional implementation in ioapic.c
+(which by itself is broken, since there is no compiler barrier).
 
-Perhaps call delay() (in delay.c)  inside of io_delay() OR perhaps 
-replace all instances of io_delay() with delay() ?
-
-
+Let me see what I can do...=
