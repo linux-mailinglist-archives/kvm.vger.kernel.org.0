@@ -2,153 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0552B12566
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 02:22:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAE551274A
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 07:49:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726376AbfECAWD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 May 2019 20:22:03 -0400
-Received: from outprodmail01.cc.columbia.edu ([128.59.72.39]:59360 "EHLO
-        outprodmail01.cc.columbia.edu" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726128AbfECAWC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 May 2019 20:22:02 -0400
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
-        by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id x430K9DQ013442
-        for <kvm@vger.kernel.org>; Thu, 2 May 2019 20:22:00 -0400
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
-        by hazelnut (Postfix) with ESMTP id C2C636D
-        for <kvm@vger.kernel.org>; Thu,  2 May 2019 20:22:00 -0400 (EDT)
-Received: from sendprodmail04.cc.columbia.edu (sendprodmail04.cc.columbia.edu [128.59.72.16])
-        by hazelnut (Postfix) with ESMTP id AD4926D
-        for <kvm@vger.kernel.org>; Thu,  2 May 2019 20:22:00 -0400 (EDT)
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com [209.85.208.71])
-        by sendprodmail04.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id x430LxFN051654
-        (version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 2 May 2019 20:22:00 -0400
-Received: by mail-ed1-f71.google.com with SMTP id t58so2063406edb.22
-        for <kvm@vger.kernel.org>; Thu, 02 May 2019 17:22:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mvpBSDDZkU5E9pNRCk0/jzMdoiPAGZAIwA7s43th+4c=;
-        b=g4lmwZvJivf6iB6I0wa8YBhb0oAHnfJ7n0ZUvnckI9YtxysgQ0pvdYdbGYJGTxStOF
-         krln1d4cUliEIgJNwCg/9ouHKwFJ3aFvrowScmFDcvzcghHfKjnt9y/y/f7HTceVTRW9
-         ZN3tCtLqjwp12okW5DOfBr3S+UpvxoS+Vu3B1uaLKtUQICjYNTL3cTIsYz6ZvUfKo/h7
-         9oblhzj5MAkaOUHW98Y+VsVzvTvmAkIB+d/BuXUVrrw16fkLWUVxVsbH3RQnesEjI9rH
-         YU+xRtiYnrFDSUyCWRG+ewYCh6V9Mi1qvo0O70d0cSZGj9CG62AXTyiPIoKrmtYxxRmc
-         FUUg==
-X-Gm-Message-State: APjAAAXkt8hIFTt3cyPVlDHeh3GoYbrdt8QzIWkHhOGjAN+Z8VXeZb3I
-        l2RDweQjkBVj3s/OF+LhVWtw4tOBnlPOp3Ork1HwgyG9T+wOcY6ANfED2RWHofG5ZyC8uCwofpU
-        hI59HMyF3BFdKrWXEdDM0
-X-Received: by 2002:a50:9007:: with SMTP id b7mr3976561eda.194.1556842919200;
-        Thu, 02 May 2019 17:21:59 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxHyyly0rEkGFceJzlTv2oqAcU7uwzcuyjUL1lsmTlt3Yi9IOLsTEBsk0SIz2f9Ewhq6bwExw==
-X-Received: by 2002:a50:9007:: with SMTP id b7mr3976550eda.194.1556842919061;
-        Thu, 02 May 2019 17:21:59 -0700 (PDT)
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com. [209.85.221.44])
-        by smtp.gmail.com with ESMTPSA id x18sm117128ejd.66.2019.05.02.17.21.57
-        for <kvm@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 02 May 2019 17:21:58 -0700 (PDT)
-Received: by mail-wr1-f44.google.com with SMTP id k16so5653083wrn.5
-        for <kvm@vger.kernel.org>; Thu, 02 May 2019 17:21:57 -0700 (PDT)
-X-Received: by 2002:adf:ef8c:: with SMTP id d12mr1257712wro.320.1556842917771;
- Thu, 02 May 2019 17:21:57 -0700 (PDT)
+        id S1726632AbfECFtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 May 2019 01:49:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57798 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726621AbfECFtc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 May 2019 01:49:32 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D3DB5307DAAA;
+        Fri,  3 May 2019 05:49:31 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-70.ams2.redhat.com [10.36.116.70])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 62986423D;
+        Fri,  3 May 2019 05:49:30 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH] powerpc: Allow for a custom decr value to
+ be specified to load on decr excp
+To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
+        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, dgibson@redhat.com
+References: <20190501070039.2903-1-sjitindarsingh@gmail.com>
+ <ec8d1a58-e066-f61a-ad28-92b82fccdbff@redhat.com>
+ <1556837714.1887.3.camel@gmail.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <02ba90f9-df08-c696-1913-1ebb80f00bad@redhat.com>
+Date:   Fri, 3 May 2019 07:49:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <1556762959-31705-1-git-send-email-jintack@cs.columbia.edu> <20190502150315.GB26138@linux.intel.com>
-In-Reply-To: <20190502150315.GB26138@linux.intel.com>
-From:   Jintack Lim <jintack@cs.columbia.edu>
-Date:   Thu, 2 May 2019 20:21:46 -0400
-X-Gmail-Original-Message-ID: <CAHyh4xihsS6xhGdVQPmNHt3Ugp3pM0oMdio2rr-WFaGeTLj5Hg@mail.gmail.com>
-Message-ID: <CAHyh4xihsS6xhGdVQPmNHt3Ugp3pM0oMdio2rr-WFaGeTLj5Hg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: nVMX: Set msr bitmap correctly for MSR_FS_BASE in vmcs02
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     KVM General <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-No-Spam-Score: Local
-X-Scanned-By: MIMEDefang 2.84 on 128.59.72.16
+In-Reply-To: <1556837714.1887.3.camel@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Fri, 03 May 2019 05:49:31 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 2, 2019 at 11:03 AM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> +Cc Jim
->
-> On Wed, May 01, 2019 at 10:09:19PM -0400, Jintack Lim wrote:
-> > Even when neither L0 nor L1 configured to trap MSR_FS_BASE writes from
-> > its own VMs, the current KVM L0 always traps MSR_FS_BASE writes from L2.
-> > Let's check if both L0 and L1 disabled trap for MSR_FS_BASE for its VMs
-> > respectively, and let L2 write to MSR_FS_BASE without trap if that's the
-> > case.
-> >
-> > Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
-> > ---
-> >  arch/x86/kvm/vmx/nested.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 0c601d0..ab85aea 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -537,6 +537,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
-> >        */
-> >       bool pred_cmd = !msr_write_intercepted_l01(vcpu, MSR_IA32_PRED_CMD);
-> >       bool spec_ctrl = !msr_write_intercepted_l01(vcpu, MSR_IA32_SPEC_CTRL);
-> > +     bool fs_base = !msr_write_intercepted_l01(vcpu, MSR_FS_BASE);
->
-> This isn't sufficient as we only fall into this code if L2 is in x2APIC
-> mode or has accessed the speculation MSRs.  The quick fix is to check if
-> we want to pass through MSR_FS_BASE, but if we're going to open up the
-> floodgates then we should pass through as many MSRs as possible, e.g.
-> GS_BASE, KERNEL_GS_BASE, TSC, SYSENTER_*, etc..., and do so using a
-> generic mechanism.
->
-> That being said, I think there are other reasons why KVM doesn't pass
-> through MSRs to L2.  Unfortunately, I'm struggling to recall what those
-> reasons are.
->
-> Jim, I'm pretty sure you've looked at this code a lot, do you happen to
-> know off hand?  Is it purely a performance thing to avoid merging bitmaps
-> on every nested entry, is there a subtle bug/security hole, or is it
-> simply that no one has ever gotten around to writing the code?
->
-> >
-> >       /* Nothing to do if the MSR bitmap is not in use.  */
-> >       if (!cpu_has_vmx_msr_bitmap() ||
-> > @@ -592,6 +593,12 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
-> >               }
-> >       }
-> >
-> > +     if (fs_base)
-> > +             nested_vmx_disable_intercept_for_msr(
-> > +                                     msr_bitmap_l1, msr_bitmap_l0,
-> > +                                     MSR_FS_BASE,
-> > +                                     MSR_TYPE_W);
->
-> This should be MSR_TYPE_RW.
+On 03/05/2019 00.55, Suraj Jitindar Singh wrote:
+> On Thu, 2019-05-02 at 10:01 +0200, Laurent Vivier wrote:
+>> On 01/05/2019 09:00, Suraj Jitindar Singh wrote:
+>>> Currently the handler for a decrementer exception will simply
+>>> reload the
+>>> maximum value (0x7FFFFFFF), which will take ~4 seconds to expire
+>>> again.
+>>> This means that if a vcpu cedes, it will be ~4 seconds between
+>>> wakeups.
+>>>
+>>> The h_cede_tm test is testing a known breakage when a guest cedes
+>>> while
+>>> suspended. To be sure we cede 500 times to check for the bug.
+>>> However
+>>> since it takes ~4 seconds to be woken up once we've ceded, we only
+>>> get
+>>> through ~20 iterations before we reach the 90 seconds timeout and
+>>> the
+>>> test appears to fail.
+>>>
+>>> Add an option when registering the decrementer handler to specify
+>>> the
+>>> value which should be reloaded by the handler, allowing the timeout
+>>> to be
+>>> chosen.
+>>>
+>>> Modify the spr test to use the max timeout to preserve existing
+>>> behaviour.
+>>> Modify the h_cede_tm test to use a 10ms timeout to ensure we can
+>>> perform
+>>> 500 iterations before hitting the 90 second time limit for a test.
+>>>
+>>> This means the h_cede_tm test now succeeds rather than timing out.
+>>>
+>>> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+>>> ---
+>>>   lib/powerpc/handlers.c | 7 ++++---
+>>>   powerpc/sprs.c         | 3 ++-
+>>>   powerpc/tm.c           | 3 ++-
+>>>   3 files changed, 8 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/lib/powerpc/handlers.c b/lib/powerpc/handlers.c
+>>> index be8226a..c8721e0 100644
+>>> --- a/lib/powerpc/handlers.c
+>>> +++ b/lib/powerpc/handlers.c
+>>> @@ -12,11 +12,12 @@
+>>>   
+>>>   /*
+>>>    * Generic handler for decrementer exceptions (0x900)
+>>> - * Just reset the decrementer back to its maximum value
+>>> (0x7FFFFFFF)
+>>> + * Just reset the decrementer back to the value specified when
+>>> registering the
+>>> + * handler
+>>>    */
+>>> -void dec_except_handler(struct pt_regs *regs __unused, void *data
+>>> __unused)
+>>> +void dec_except_handler(struct pt_regs *regs __unused, void *data)
+>>>   {
+>>> -	uint32_t dec = 0x7FFFFFFF;
+>>> +	uint64_t dec = *((uint64_t *) data);
+>>>   
+>>>   	asm volatile ("mtdec %0" : : "r" (dec));
+>>>   }
+>>> diff --git a/powerpc/sprs.c b/powerpc/sprs.c
+>>> index 6744bd8..3bd6ac7 100644
+>>> --- a/powerpc/sprs.c
+>>> +++ b/powerpc/sprs.c
+>>> @@ -253,6 +253,7 @@ int main(int argc, char **argv)
+>>>   		0x1234567890ABCDEFULL, 0xFEDCBA0987654321ULL,
+>>>   		-1ULL,
+>>>   	};
+>>> +	uint64_t decr = 0x7FFFFFFF;
 
-Should I explicitly check if L1 disabled intercept for read operations
-along with write operations?
+Declare the variable as "static", please, otherwise the pointer to it
+might get invalid at the end of the function.
 
-It seems like the current code only checks write operations for
-spec_ctrl while it disables intercept for RW. This is not the case for
-pred_cmd, though. I might be missing something here. Could you explain
-it?
+>>>   	for (i = 1; i < argc; i++) {
+>>>   		if (!strcmp(argv[i], "-w")) {
+>>> @@ -288,7 +289,7 @@ int main(int argc, char **argv)
+>>>   		(void) getchar();
+>>>   	} else {
+>>>   		puts("Sleeping...\n");
+>>> -		handle_exception(0x900, &dec_except_handler,
+>>> NULL);
+>>> +		handle_exception(0x900, &dec_except_handler,
+>>> &decr);
+>>>   		asm volatile ("mtdec %0" : : "r" (0x3FFFFFFF));
+>>>   		hcall(H_CEDE);
+>>>   	}
+>>> diff --git a/powerpc/tm.c b/powerpc/tm.c
+>>> index bd56baa..0f3f543 100644
+>>> --- a/powerpc/tm.c
+>>> +++ b/powerpc/tm.c
+>>> @@ -95,11 +95,12 @@ static bool enable_tm(void)
+>>>   static void test_h_cede_tm(int argc, char **argv)
+>>>   {
+>>>   	int i;
+>>> +	uint64_t decr = 0x3FFFFF;
 
->
-> > +
-> >       if (spec_ctrl)
-> >               nested_vmx_disable_intercept_for_msr(
-> >                                       msr_bitmap_l1, msr_bitmap_l0,
-> > --
-> > 1.9.1
-> >
-> >
->
+"static" please.
 
+>>>   	if (argc > 2)
+>>>   		report_abort("Unsupported argument: '%s'",
+>>> argv[2]);
+>>>   
+>>> -	handle_exception(0x900, &dec_except_handler, NULL);
+>>> +	handle_exception(0x900, &dec_except_handler, &decr);
+>>
+>> Maybe you should also need here:
+>>
+>>      asm volatile ("mtdec %0" : : "r" (decr));
+>>
+>> To set the first one to the same values as the following ones?
+> 
+> I guess we could get a case where the decrementer is really large (if
+> large decrementer is enabled for example) and otherwise we just don't
+> wake up...
+> 
+> In practise I'm not sure. But I'll add it if you like
+
+I think I agree with Laurent - it's likely better to add the mtdec here.
+
+Also, while you're at it, could/should we maybe remove the "nodefault"
+in unittests.cfg again (or rather the whole "groups" line)? I'm really
+afraid that this test does not get enough test coverage due to this...
+
+ Thomas
