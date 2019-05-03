@@ -2,383 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B33F134B9
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 23:15:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2B9A134FC
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 23:46:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727327AbfECVPG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 May 2019 17:15:06 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48286 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727323AbfECVOt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 May 2019 17:14:49 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x43LC59E125831
-        for <kvm@vger.kernel.org>; Fri, 3 May 2019 17:14:48 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2s8sxbr0qv-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 03 May 2019 17:14:47 -0400
-Received: from localhost
-        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <akrowiak@linux.ibm.com>;
-        Fri, 3 May 2019 22:14:46 +0100
-Received: from b01cxnp22035.gho.pok.ibm.com (9.57.198.25)
-        by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 3 May 2019 22:14:43 +0100
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x43LEfXw23330858
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 May 2019 21:14:41 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0CE01124053;
-        Fri,  3 May 2019 21:14:41 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6D70A124052;
-        Fri,  3 May 2019 21:14:40 +0000 (GMT)
-Received: from akrowiak-ThinkPad-P50.ibm.com (unknown [9.85.193.92])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Fri,  3 May 2019 21:14:40 +0000 (GMT)
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        id S1726402AbfECVqS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 May 2019 17:46:18 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:36037 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726150AbfECVqS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 May 2019 17:46:18 -0400
+Received: by mail-oi1-f195.google.com with SMTP id l203so5576959oia.3;
+        Fri, 03 May 2019 14:46:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Bo6sBLi3JhZAeEGfciYpjSPPKO3J0vi9Fr74oujyIxM=;
+        b=dXmPRn8cGAUoI3psj7jsrfYRmNyQlr9nugok5pw67O96fswh4EZKHlSCd5l2t3mxDW
+         GIIx+NsacBXQIHSvOv6nxChU2gnE/1xuLI9a4I031+0/oRmeeKVHDBuCG1kfa+7ll8/i
+         1fMYG1RnaJ64ONwWeSYfIzWW3W7q6ld6WIAtpwp01wiu9T+UDLOyrEBr53EE1ZEUhVS4
+         Pp70k443jj/lsuDKVWoIrakwT9QDzsBYZZpg0HQulVUPNrajWD/iv2ES7027bn2wTG/B
+         lQub0R0n7U/z7jtsUnq//ie8qptebqLLlF3mL6PDNVPSWiAiHTagNulxB7bIEPnI71Ga
+         ah2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=Bo6sBLi3JhZAeEGfciYpjSPPKO3J0vi9Fr74oujyIxM=;
+        b=a+TAy9TwEqQOTKbo4JYoNcSp7OVuRf/Is3tjrbj8uDoobFNJrBiGuMCfCE/mS8DnbR
+         h0jFiHGj2rrpRk6VaWOVDSYDikeO7vrngBDQlAcWknTdi7zEx/0GDbyJCZ9V+eMsF3WZ
+         WNX1OxoFVtOdfDnRaSi4RWivdVGDxPCUNsCSUCbE86woQeKDGB6mfTKbdzEHnuuCLwO8
+         xEbBBlJz9cc3Y/Hjc/p19GH/JXS7CXjAegxIiXunZ1FW1Cbva+VR/R4HTGAR6fm4DxBH
+         JIUEF3Q4PKGaN1IfHTbt7YKpiFSPp8EYJ4FA/eC4Ge9AGOl3h1SQsaEvFN0vohELtbOF
+         WoKg==
+X-Gm-Message-State: APjAAAVHT9gQBGhI8eujUEvOCdbcxP3Zr0XhrcsMGEIy0OXs1HW84g3y
+        mu2pobXxlkxqPw+HK2TYHLc=
+X-Google-Smtp-Source: APXvYqzovcMs75Fs3FQhGnu/IWyqyV5NiI8nTjwqxe3xd3H8UcGq6HBR7Ex64AkJiwwIBnIG4cdwzg==
+X-Received: by 2002:aca:5046:: with SMTP id e67mr600074oib.115.1556919976896;
+        Fri, 03 May 2019 14:46:16 -0700 (PDT)
+Received: from localhost.localdomain ([23.92.204.198])
+        by smtp.gmail.com with ESMTPSA id h129sm1388633oia.12.2019.05.03.14.46.16
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 03 May 2019 14:46:16 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, rkrcmar@kernel.org,
         kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        frankja@linux.ibm.com, david@redhat.com, schwidefsky@de.ibm.com,
-        heiko.carstens@de.ibm.com, pmorel@linux.ibm.com,
-        pasic@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: [PATCH v2 7/7] s390: vfio-ap: update documentation
-Date:   Fri,  3 May 2019 17:14:33 -0400
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1556918073-13171-1-git-send-email-akrowiak@linux.ibm.com>
-References: <1556918073-13171-1-git-send-email-akrowiak@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19050321-0052-0000-0000-000003B7AE48
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011043; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000285; SDB=6.01198143; UDB=6.00628477; IPR=6.00979004;
- MB=3.00026720; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-03 21:14:45
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050321-0053-0000-0000-000060BDD90A
-Message-Id: <1556918073-13171-8-git-send-email-akrowiak@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-03_13:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905030137
+Subject: [GIT PULL] KVM fixes for 5.1-rc8 or final
+Date:   Fri,  3 May 2019 15:46:14 -0600
+Message-Id: <20190503214614.21250-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch updates the vfio-ap documentation to include the information
-below.
+Linus,
 
-Changes made to the mdev matrix assignment interfaces:
+The following changes since commit 7a223e06b1a411cef6c4cd7a9b9a33c8d225b10e:
 
-* We now allow assignment of APQNs that are not bound to the vfio-ap
-  device driver
+  KVM: x86: avoid misreporting level-triggered irqs as edge-triggered in tracing (2019-04-16 15:38:08 +0200)
 
-* We now use assignment interfaces to hot plug AP resources into a
-  a running guest using the mdev matrix device assignment interfaces
+are available in the Git repository at:
 
-* We now use unassignment interfaces to hot unplug AP resources from
-  a running guest using the mdev matrix device unassignment interfaces
+  git://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-Changes made to the vfio_ap device driver probe and remove callbacks:
+for you to fetch changes up to e8ab8d24b488632d07ce5ddb261f1d454114415b:
 
-* We now plug the queue being bound to the vfio_ap into the running
-  guest if the APQN of the queue is assigned to the mdev matrix device
-  in use by the guest.
+  KVM: nVMX: Fix size checks in vmx_set_nested_state (2019-05-01 00:43:44 +0200)
 
-* If a guest is using the queue being unbound from the vfio_ap device
-  driver, we now unplug the adapter card with the APID of the queue being
-  unbound from the guest.
+----------------------------------------------------------------
+* PPC and ARM bugfixes from submaintainers
+* Fix old Windows versions on AMD (recent regression)
+* Fix old Linux versions on processors without EPT
+* Fixes for LAPIC timer optimizations
 
-This patch also clarifies the section on configuring the AP bus's apmask
-and aqmask.
+----------------------------------------------------------------
+Alexey Kardashevskiy (1):
+      KVM: PPC: Book3S: Protect memslots while validating user address
 
-Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
----
- Documentation/s390/vfio-ap.txt | 191 +++++++++++++++++++++++++++--------------
- 1 file changed, 127 insertions(+), 64 deletions(-)
+Andrew Jones (2):
+      KVM: arm/arm64: Ensure vcpu target is unset on reset failure
+      Documentation: kvm: fix dirty log ioctl arch lists
 
-diff --git a/Documentation/s390/vfio-ap.txt b/Documentation/s390/vfio-ap.txt
-index 65167cfe4485..ca6aa8eeff8a 100644
---- a/Documentation/s390/vfio-ap.txt
-+++ b/Documentation/s390/vfio-ap.txt
-@@ -81,10 +81,19 @@ definitions:
-   which the AP command is to be sent for processing.
- 
-   The AP bus will create a sysfs device for each APQN that can be derived from
--  the cross product of the AP adapter and usage domain numbers detected when the
--  AP bus module is loaded. For example, if adapters 4 and 10 (0x0a) and usage
--  domains 6 and 71 (0x47) are assigned to the LPAR, the AP bus will create the
--  following sysfs entries:
-+  the Cartesian product of the AP adapter and usage domain numbers detected when
-+  the AP bus module is loaded. For example, if adapters 4 and 10 (0x0a) and
-+  usage domains 6 and 71 (0x47) are assigned to the LPAR, the Cartesian product
-+  would be defined by the following table:
-+
-+		        06           71
-+		   +-----------+-----------+
-+		04 |  (04,06)  |  (04,47)  |
-+		   +-----------|-----------+
-+		10 |  (0a,06)  |  (0a,47)  |
-+		   +-----------|-----------+
-+
-+  The AP bus will create the following sysfs entries:
- 
-     /sys/devices/ap/card04/04.0006
-     /sys/devices/ap/card04/04.0047
-@@ -146,10 +155,20 @@ If you recall from the description of an AP Queue, AP instructions include
- an APQN to identify the AP queue to which an AP command-request message is to be
- sent (NQAP and PQAP instructions), or from which a command-reply message is to
- be received (DQAP instruction). The validity of an APQN is defined by the matrix
--calculated from the APM and AQM; it is the cross product of all assigned adapter
--numbers (APM) with all assigned queue indexes (AQM). For example, if adapters 1
--and 2 and usage domains 5 and 6 are assigned to a guest, the APQNs (1,5), (1,6),
--(2,5) and (2,6) will be valid for the guest.
-+calculated from the APM and AQM; it is the Cartesian product of all assigned
-+adapter numbers (APM) with all assigned queue indexes (AQM). For example, if
-+adapters 1 and 2 and usage domains 5 and 6 are assigned to a guest:
-+
-+
-+		        05           06
-+		   +-----------+-----------+
-+		01 |  (01,05)  |  (01,06)  |
-+		   +-----------|-----------+
-+		02 |  (02,05)  |  (02,06)  |
-+		   +-----------|-----------+
-+
-+
-+APQNs (01,05), (01,06), (02,05) and (02,06) will be valid for the guest.
- 
- The APQNs can provide secure key functionality - i.e., a private key is stored
- on the adapter card for each of its domains - so each APQN must be assigned to
-@@ -349,8 +368,9 @@ matrix device.
-       number of the the usage domain is echoed to the respective attribute
-       file.
-     * matrix:
--      A read-only file for displaying the APQNs derived from the cross product
--      of the adapter and domain numbers assigned to the mediated matrix device.
-+      A read-only file for displaying the APQNs derived from the Caresian
-+      product of the adapter and domain numbers assigned to the mediated matrix
-+      device.
-     * assign_control_domain:
-     * unassign_control_domain:
-       Write-only attributes for assigning/unassigning an AP control domain
-@@ -513,35 +533,44 @@ These are the steps:
-    /sys/bus/ap/aqmask
- 
-    The 'apmask' is a 256-bit mask that identifies a set of AP adapter IDs
--   (APID). Each bit in the mask, from left to right (i.e., from most significant
--   to least significant bit in big endian order), corresponds to an APID from
--   0-255. If a bit is set, the APID is marked as usable only by the default AP
--   queue device drivers; otherwise, the APID is usable by the vfio_ap
--   device driver.
-+   (APID). Each bit in the mask, from left to right, corresponds to an APID from
-+   0-255.
- 
-    The 'aqmask' is a 256-bit mask that identifies a set of AP queue indexes
--   (APQI). Each bit in the mask, from left to right (i.e., from most significant
--   to least significant bit in big endian order), corresponds to an APQI from
--   0-255. If a bit is set, the APQI is marked as usable only by the default AP
--   queue device drivers; otherwise, the APQI is usable by the vfio_ap device
--   driver.
-+   (APQI). Each bit in the mask, from left to right, corresponds to an APQI from
-+   0-255.
- 
--   Take, for example, the following mask:
-+   The Cartesian product of the APIDs set in the apmask and the APQIs set in
-+   the aqmask identify the APQNs of AP queue devices owned by the zcrypt
-+   device drivers.
- 
--      0x7dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-+   Take, for example, the following masks:
- 
--    It indicates:
-+     apmask: 0x0700000000000000000000000000000000000000000000000000000000000000
- 
--      1, 2, 3, 4, 5, and 7-255 belong to the default drivers' pool, and 0 and 6
--      belong to the vfio_ap device driver's pool.
-+     aqmask: 0x0180000000000000000000000000000000000000000000000000000000000000
- 
--   The APQN of each AP queue device assigned to the linux host is checked by the
--   AP bus against the set of APQNs derived from the cross product of APIDs
--   and APQIs marked as usable only by the default AP queue device drivers. If a
--   match is detected,  only the default AP queue device drivers will be probed;
--   otherwise, the vfio_ap device driver will be probed.
-+   The bits set in apmask are bits 1, 2 and 3. The bits set in aqmask are bits
-+   7 and 8. The Cartesian product of the bits set in the two masks is:
- 
--   By default, the two masks are set to reserve all APQNs for use by the default
-+             07           08
-+        +-----------+-----------+
-+     01 |  (01,07)  |  (01,08)  |
-+        +-----------|-----------+
-+     02 |  (02,07)  |  (02,08)  |
-+        +-----------|-----------+
-+     03 |  (03,07)  |  (03,08)  |
-+        +-----------|-----------+
-+
-+   The masks indicate that the queues with APQNs (01,07), (01,08), (02,07),
-+   (02,08), (03,07) and (03,08) are owned by the zcrypt drivers. When the AP bus
-+   detects an AP queue device, its APQN is checked against the set of APQNs
-+   derived from the apmask and aqmask. If a match is detected, the zcrypt
-+   device driver registered for the device type of the queue will be probed. If
-+   a match is not detected and the device type of the queue is CEX4 or newer,
-+   the vfio_ap device driver will be probed.
-+
-+   By default, the two masks are set to reserve all APQNs for use by the zcrypt
-    AP queue device drivers. There are two ways the default masks can be changed:
- 
-    1. The sysfs mask files can be edited by echoing a string into the
-@@ -554,8 +583,7 @@ These are the steps:
- 
-            0x4100000000000000000000000000000000000000000000000000000000000000
- 
--        Keep in mind that the mask reads from left to right (i.e., most
--        significant to least significant bit in big endian order), so the mask
-+        Keep in mind that the mask reads from left to right, so the mask
-         above identifies device numbers 1 and 7 (01000001).
- 
-         If the string is longer than the mask, the operation is terminated with
-@@ -563,7 +591,7 @@ These are the steps:
- 
-       * Individual bits in the mask can be switched on and off by specifying
-         each bit number to be switched in a comma separated list. Each bit
--        number string must be prepended with a ('+') or minus ('-') to indicate
-+        number string must be prefixed with a ('+') or minus ('-') to indicate
-         the corresponding bit is to be switched on ('+') or off ('-'). Some
-         valid values are:
- 
-@@ -594,11 +622,6 @@ These are the steps:
-             aqmask:
-             0x4000000000000000000000000000000000000000000000000000000000000000
- 
--         Resulting in these two pools:
--
--            default drivers pool:    adapter 0-15, domain 1
--            alternate drivers pool:  adapter 16-255, domains 0, 2-255
--
-    Securing the APQNs for our example:
-    ----------------------------------
-    To secure the AP queues 05.0004, 05.0047, 05.00ab, 05.00ff, 06.0004, 06.0047,
-@@ -747,14 +770,13 @@ These are the steps:
-      higher than the maximum is specified, the operation will terminate with
-      an error (ENODEV).
- 
--   * All APQNs that can be derived from the adapter ID and the IDs of
--     the previously assigned domains must be bound to the vfio_ap device
--     driver. If no domains have yet been assigned, then there must be at least
--     one APQN with the specified APID bound to the vfio_ap driver. If no such
--     APQNs are bound to the driver, the operation will terminate with an
--     error (EADDRNOTAVAIL).
-+   * Each APQN that can be derived from the adapter ID and the IDs of
-+     the previously assigned domains must not be reserved for use by the
-+     zcrypt device drivers as specified by the /sys/bus/ap/apmask and
-+     /sys/bus/ap/aqmask syfs interfaces. If any APQN is reserved, the operation
-+     will terminate with an error (EADDRNOTAVAIL).
- 
--     No APQN that can be derived from the adapter ID and the IDs of the
-+   * No APQN that can be derived from the adapter ID and the IDs of the
-      previously assigned domains can be assigned to another mediated matrix
-      device. If an APQN is assigned to another mediated matrix device, the
-      operation will terminate with an error (EADDRINUSE).
-@@ -766,14 +788,13 @@ These are the steps:
-      higher than the maximum is specified, the operation will terminate with
-      an error (ENODEV).
- 
--   * All APQNs that can be derived from the domain ID and the IDs of
--     the previously assigned adapters must be bound to the vfio_ap device
--     driver. If no domains have yet been assigned, then there must be at least
--     one APQN with the specified APQI bound to the vfio_ap driver. If no such
--     APQNs are bound to the driver, the operation will terminate with an
--     error (EADDRNOTAVAIL).
-+   * Each APQN that can be derived from the domain ID and the IDs of
-+     the previously assigned adapters must not be reserved for use by the
-+     zcrypt device drivers as specified by the /sys/bus/ap/apmask and
-+     /sys/bus/ap/aqmask syfs interfaces. If any APQN is reserved, the operation
-+     will terminate with an error (EADDRNOTAVAIL).
- 
--     No APQN that can be derived from the domain ID and the IDs of the
-+   * No APQN that can be derived from the domain ID and the IDs of the
-      previously assigned adapters can be assigned to another mediated matrix
-      device. If an APQN is assigned to another mediated matrix device, the
-      operation will terminate with an error (EADDRINUSE).
-@@ -822,16 +843,58 @@ Using our example again, to remove the mediated matrix device $uuid1:
-    host. If the mdev matrix device is removed, one may want to also reconfigure
-    the pool of adapters and queues reserved for use by the default drivers.
- 
--Limitations
--===========
--* The KVM/kernel interfaces do not provide a way to prevent restoring an APQN
--  to the default drivers pool of a queue that is still assigned to a mediated
--  device in use by a guest. It is incumbent upon the administrator to
--  ensure there is no mediated device in use by a guest to which the APQN is
--  assigned lest the host be given access to the private data of the AP queue
--  device such as a private key configured specifically for the guest.
-+Hot plug/unplug via mdev matrix device sysfs interfaces:
-+=======================================================
-+If an mdev matrix device is in use by a running guest, AP resources can be
-+plugged into or unplugged from the guest via the mdev device's sysfs
-+assignment interfaces. Below are some examples.
-+
-+   To plug adapter 10 into a running guest:
-+
-+      echo 0xa > assign_adapter
-+
-+   To unplug domain 5 from a running guest:
-+
-+      echo 5 > unassign_domain
-+
-+To display the matrix of a guest using the mdev matrix device:
-+
-+   cat guest_matrix
-+
-+If you attempt to display the guest matrix when a guest is not using the
-+mdev matrix device, an error will be displayed (ENODEV).
-+
-+Considerations for binding and unbinding AP queue devices:
-+=========================================================
-+There are considerations for binding AP queue devices to and unbinding AP queue
-+devices from the vfio_ap device driver. Keep in mind that binding/unbinding of
-+AP queue devices is controlled by the two AP bus sysfs interfaces:
-+
-+   /sys/bus/ap/apmask
-+   /sys/bus/ap/aqmask
- 
--* Dynamically modifying the AP matrix for a running guest (which would amount to
--  hot(un)plug of AP devices for the guest) is currently not supported
-+Binding considerations:
-+----------------------
-+When an AP queue device is bound to the vfio_ap device driver and its APQN is
-+assigned to an mdev matrix device in use by a running guest, the driver will
-+hot plug the queue into the guest as long as each APQN that can be derived from
-+the APID of the queue device and the APQIs of the queues already in use by the
-+guest are bound to the vfio_ap device driver.
-+
-+Unbinding considerations:
-+------------------------
-+When an AP queue device being used by a running guest is unbound from the
-+vfio_ap device driver, the adapter card to which the queue is connected will
-+be unplugged from the guest.
-+
-+Note: The AP architecture does not provide a way to unplug an individual queue.
-+
-+Live migration:
-+==============
-+Live guest migration is not supported for guests using AP devices. All AP
-+devices in use by the guest must be unplugged prior to initiating live
-+migration (see "Hot plug/unplug via mdev matrix device sysfs interfaces" section
-+above). If you are using QEMU to run your guest and it supports hot plug/unplug
-+of the vfio-ap device, this would be another option (consult the QEMU
-+documentation for details).
- 
--* Live guest migration is not supported for guests using AP devices.
--- 
-2.7.4
+Christoffer Dall (1):
+      KVM: arm/arm64: Don't emulate virtual timers on userspace ioctls
 
+Jim Mattson (1):
+      KVM: nVMX: Fix size checks in vmx_set_nested_state
+
+Liran Alon (1):
+      KVM: x86: Consider LAPIC TSC-Deadline timer expired if deadline too short
+
+Marc Zyngier (1):
+      KVM: arm/arm64: vgic-v3: Retire pending interrupts on disabling LPIs
+
+Paolo Bonzini (3):
+      Merge tag 'kvm-ppc-fixes-5.1-1' of git://git.kernel.org/.../paulus/powerpc into HEAD
+      KVM: fix KVM_CLEAR_DIRTY_LOG for memory slots of unaligned size
+      Merge tag 'kvmarm-fixes-for-5.1-2' of git://git.kernel.org/.../kvmarm/kvmarm into kvm-master
+
+Rick Edgecombe (1):
+      KVM: VMX: Move RSB stuffing to before the first RET after VM-Exit
+
+Sean Christopherson (6):
+      KVM: lapic: Disable timer advancement if adaptive tuning goes haywire
+      KVM: lapic: Track lapic timer advance per vCPU
+      KVM: lapic: Allow user to disable adaptive tuning of timer advancement
+      KVM: lapic: Convert guest TSC to host time domain if necessary
+      KVM: x86: Whitelist port 0x7e for pre-incrementing %rip
+      KVM: lapic: Check for in-kernel LAPIC before deferencing apic pointer
+
+Suraj Jitindar Singh (1):
+      KVM: PPC: Book3S HV: Perserve PSSCR FAKE_SUSPEND bit on guest exit
+
+Suzuki K Poulose (1):
+      kvm: arm: Skip stage2 huge mappings for unaligned ipa backed by THP
+
+Vitaly Kuznetsov (3):
+      x86: kvm: hyper-v: deal with buggy TLB flush requests from WS2012
+      x86/kvm/mmu: reset MMU context when 32-bit guest switches PAE
+      KVM: selftests: make hyperv_cpuid test pass on AMD
+
+Wei Huang (1):
+      KVM: arm/arm64: arch_timer: Fix CNTP_TVAL calculation
+
+ Documentation/virtual/kvm/api.txt                 | 11 ++--
+ arch/powerpc/kvm/book3s_64_vio.c                  |  6 +-
+ arch/powerpc/kvm/book3s_hv.c                      |  4 +-
+ arch/x86/include/asm/kvm_host.h                   |  1 +
+ arch/x86/include/uapi/asm/kvm.h                   |  1 +
+ arch/x86/kvm/hyperv.c                             | 11 +++-
+ arch/x86/kvm/lapic.c                              | 73 ++++++++++++++++-------
+ arch/x86/kvm/lapic.h                              |  4 +-
+ arch/x86/kvm/mmu.c                                |  1 +
+ arch/x86/kvm/vmx/nested.c                         |  4 +-
+ arch/x86/kvm/vmx/vmenter.S                        | 12 ++++
+ arch/x86/kvm/vmx/vmx.c                            |  7 +--
+ arch/x86/kvm/x86.c                                | 36 ++++++++---
+ arch/x86/kvm/x86.h                                |  2 -
+ tools/testing/selftests/kvm/dirty_log_test.c      |  9 ++-
+ tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c |  9 ++-
+ virt/kvm/arm/arch_timer.c                         | 17 +++---
+ virt/kvm/arm/arm.c                                | 11 +++-
+ virt/kvm/arm/mmu.c                                |  6 +-
+ virt/kvm/arm/vgic/vgic-mmio-v3.c                  |  3 +
+ virt/kvm/arm/vgic/vgic.c                          | 21 +++++++
+ virt/kvm/arm/vgic/vgic.h                          |  1 +
+ virt/kvm/kvm_main.c                               |  7 ++-
+ 23 files changed, 192 insertions(+), 65 deletions(-)
