@@ -2,99 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F39F12F5D
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 15:39:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 365BA12F8A
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 15:49:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727740AbfECNi4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 May 2019 09:38:56 -0400
-Received: from mail-eopbgr820058.outbound.protection.outlook.com ([40.107.82.58]:44546
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727555AbfECNi4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 May 2019 09:38:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QX0mxNmMULoy1wbPafJqreKrFu7S8vjBu7HZe7ruSmk=;
- b=GApNbBNA00sgcrc5pKhIC6PkNYdXJP4BHbsnLkf51MZnCKCTO0cEilxYu9fGxQ4e+pkB40zrNRJl+5JXzRfwTHdwijX+3llbD4nfuxPYjuYCtEduyHJYv73zETE5yGhNJhJNrH5R/3wbCbmjzw7+U5kWggJ2gUxKgoVnZxIMfD8=
-Received: from DM6PR12MB2844.namprd12.prod.outlook.com (20.176.117.96) by
- DM6PR12MB2812.namprd12.prod.outlook.com (20.176.117.93) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1835.15; Fri, 3 May 2019 13:38:53 +0000
-Received: from DM6PR12MB2844.namprd12.prod.outlook.com
- ([fe80::d119:23e5:be33:4ac6]) by DM6PR12MB2844.namprd12.prod.outlook.com
- ([fe80::d119:23e5:be33:4ac6%2]) with mapi id 15.20.1856.008; Fri, 3 May 2019
- 13:38:53 +0000
-From:   "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>
-To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>
-Subject: [PATCH] svm/avic: Do not send AVIC doorbell to self
-Thread-Topic: [PATCH] svm/avic: Do not send AVIC doorbell to self
-Thread-Index: AQHVAbWM1dd1RWWcW0KGDe4yNBolwg==
-Date:   Fri, 3 May 2019 13:38:53 +0000
-Message-ID: <1556890721-9613-1-git-send-email-suravee.suthikulpanit@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [165.204.78.1]
-x-clientproxiedby: SN6PR01CA0003.prod.exchangelabs.com (2603:10b6:805:b6::16)
- To DM6PR12MB2844.namprd12.prod.outlook.com (2603:10b6:5:45::32)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Suravee.Suthikulpanit@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 1.8.3.1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: dd69f81e-f692-4292-e725-08d6cfccaec4
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:DM6PR12MB2812;
-x-ms-traffictypediagnostic: DM6PR12MB2812:
-x-microsoft-antispam-prvs: <DM6PR12MB28120CFA050FC3EA923EE910F3350@DM6PR12MB2812.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3044;
-x-forefront-prvs: 0026334A56
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(376002)(396003)(346002)(366004)(39860400002)(189003)(199004)(66066001)(52116002)(2501003)(81166006)(81156014)(2906002)(4720700003)(8676002)(25786009)(68736007)(6506007)(386003)(5660300002)(102836004)(316002)(54906003)(110136005)(486006)(36756003)(256004)(3846002)(6116002)(2616005)(99286004)(72206003)(478600001)(14454004)(73956011)(86362001)(66946007)(66476007)(66556008)(64756008)(6512007)(66446008)(8936002)(6486002)(53936002)(7736002)(50226002)(186003)(4326008)(26005)(476003)(71200400001)(71190400001)(305945005)(6436002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB2812;H:DM6PR12MB2844.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: x0gm3pCBeYSagw5yeezPtjltir0ZOC554qPxl5IxDqr4FhNxxbrsA+TCtCWb8Rfpg0LKLCwogV23hqDop1b0XEa0VjeEsLo++5pSuMCP8DzCT+2FM/NHzX/RJY71kN/HuolJYbH/NqZ4MhMy14ZUtOVarIEXfd6PXAcdgWrQD9efTJJGbJKEqeAr6F6lAAme3ANvKvlVzq3xfFx6tyUknUIIucz2rb0uvJxH7DNgnu38ZU40lTNTpk043mfjm64V6/JQNILs9QaQzdHl1qVJqYNNQXE9QeSGpMVjGvtZUfuyv3Tp88RiWtk9vP+W6ejlnlB9HB7Ji2t7xB2wTQeWmJiytKf7PswbjwrPDM9/KjXOpAHBv8fnPbWOcM7sXCeET1T6IpPYIUl6xMCcRqCe80OCmbjU2m1LrWcBzUnZuuk=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dd69f81e-f692-4292-e725-08d6cfccaec4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 May 2019 13:38:53.5164
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2812
+        id S1727975AbfECNt2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 May 2019 09:49:28 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48662 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727926AbfECNtV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 May 2019 09:49:21 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x43Dlbnm010700
+        for <kvm@vger.kernel.org>; Fri, 3 May 2019 09:49:20 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2s8n1xn589-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 03 May 2019 09:49:19 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <farman@linux.ibm.com>;
+        Fri, 3 May 2019 14:49:16 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 3 May 2019 14:49:15 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x43DnDsJ46006520
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 3 May 2019 13:49:13 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B64A54C058;
+        Fri,  3 May 2019 13:49:13 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A2CFB4C04A;
+        Fri,  3 May 2019 13:49:13 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri,  3 May 2019 13:49:13 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+        id 5066620F638; Fri,  3 May 2019 15:49:13 +0200 (CEST)
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>, Farhan Ali <alifm@linux.ibm.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        Eric Farman <farman@linux.ibm.com>
+Subject: [PATCH v1 0/7] s390: vfio-ccw fixes
+Date:   Fri,  3 May 2019 15:49:05 +0200
+X-Mailer: git-send-email 2.16.4
+X-TM-AS-GCONF: 00
+x-cbid: 19050313-0008-0000-0000-000002E2EE9D
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050313-0009-0000-0000-0000224F60C7
+Message-Id: <20190503134912.39756-1-farman@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-03_07:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=565 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905030087
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-QVZJQyBkb29yYmVsbCBpcyB1c2VkIHRvIG5vdGlmeSBhIHJ1bm5pbmcgdkNQVSB0aGF0IGludGVy
-cnVwdHMNCmhhcyBiZWVuIGluamVjdGVkIGludG8gdGhlIHZDUFUgQVZJQyBiYWNraW5nIHBhZ2Uu
-IEN1cnJlbnQgbG9naWMNCmNoZWNrcyBvbmx5IGlmIGEgVkNQVSBpcyBydW5uaW5nIGJlZm9yZSBz
-ZW5kaW5nIGEgZG9vcmJlbGwuDQpIb3dldmVyLCB0aGUgZG9vcmJlbGwgaXMgbm90IG5lY2Vzc2Fy
-eSBpZiB0aGUgZGVzdGluYXRpb24NCkNQVSBpcyBpdHNlbGYuDQoNCkFkZCBsb2dpYyB0byBjaGVj
-ayBjdXJyZW50bHkgcnVubmluZyBDUFUgYmVmb3JlIHNlbmRpbmcgZG9vcmJlbGwuDQoNClNpZ25l
-ZC1vZmYtYnk6IFN1cmF2ZWUgU3V0aGlrdWxwYW5pdCA8c3VyYXZlZS5zdXRoaWt1bHBhbml0QGFt
-ZC5jb20+DQotLS0NCiBhcmNoL3g4Ni9rdm0vc3ZtLmMgfCAxMSArKysrKysrLS0tLQ0KIDEgZmls
-ZSBjaGFuZ2VkLCA3IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQg
-YS9hcmNoL3g4Ni9rdm0vc3ZtLmMgYi9hcmNoL3g4Ni9rdm0vc3ZtLmMNCmluZGV4IDEyMjc4OGYu
-LjRiYmY2ZmMgMTAwNjQ0DQotLS0gYS9hcmNoL3g4Ni9rdm0vc3ZtLmMNCisrKyBiL2FyY2gveDg2
-L2t2bS9zdm0uYw0KQEAgLTUyODMsMTAgKzUyODMsMTMgQEAgc3RhdGljIHZvaWQgc3ZtX2RlbGl2
-ZXJfYXZpY19pbnRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgaW50IHZlYykNCiAJa3ZtX2xhcGlj
-X3NldF9pcnIodmVjLCB2Y3B1LT5hcmNoLmFwaWMpOw0KIAlzbXBfbWJfX2FmdGVyX2F0b21pYygp
-Ow0KIA0KLQlpZiAoYXZpY192Y3B1X2lzX3J1bm5pbmcodmNwdSkpDQotCQl3cm1zcmwoU1ZNX0FW
-SUNfRE9PUkJFTEwsDQotCQkgICAgICAga3ZtX2NwdV9nZXRfYXBpY2lkKHZjcHUtPmNwdSkpOw0K
-LQllbHNlDQorCWlmIChhdmljX3ZjcHVfaXNfcnVubmluZyh2Y3B1KSkgew0KKwkJaW50IGNwdWlk
-ID0gdmNwdS0+Y3B1Ow0KKw0KKwkJaWYgKGNwdWlkICE9IGdldF9jcHUoKSkNCisJCQl3cm1zcmwo
-U1ZNX0FWSUNfRE9PUkJFTEwsIGt2bV9jcHVfZ2V0X2FwaWNpZChjcHVpZCkpOw0KKwkJcHV0X2Nw
-dSgpOw0KKwl9IGVsc2UNCiAJCWt2bV92Y3B1X3dha2VfdXAodmNwdSk7DQogfQ0KIA0KLS0gDQox
-LjguMy4xDQoNCg==
+The attached are a few fixes to the vfio-ccw kernel code for potential
+errors or architecture anomalies.  Under normal usage, and even most
+abnormal usage, they don't expose any problems to a well-behaved guest
+and its devices.  But, they are deficiencies just the same and could
+cause some weird behavior if they ever popped up in real life.
+
+I have tried to arrange these patches in a "solves a noticeable problem
+with existing workloads" to "solves a theoretical problem with
+hypothetical workloads" order.  This way, the bigger ones at the end
+can be discussed without impeding the smaller and more impactful ones
+at the start.
+
+They are based on today's master, not Conny's vfio-ccw tree even though
+there are some good fixes pending there.  I've run this series both with
+and without that code, but couldn't decide which base would provide an
+easier time applying patches.  "I think" they should apply fine to both,
+but I apologize in advance if I guessed wrong!  :)
+
+Eric Farman (7):
+  s390/cio: Update SCSW if it points to the end of the chain
+  s390/cio: Set vfio-ccw FSM state before ioeventfd
+  s390/cio: Split pfn_array_alloc_pin into pieces
+  s390/cio: Initialize the host addresses in pfn_array
+  s390/cio: Allow zero-length CCWs in vfio-ccw
+  s390/cio: Don't pin vfio pages for empty transfers
+  s390/cio: Remove vfio-ccw checks of command codes
+
+ drivers/s390/cio/vfio_ccw_cp.c  | 163 ++++++++++++++++++++++++++++------------
+ drivers/s390/cio/vfio_ccw_drv.c |   6 +-
+ 2 files changed, 116 insertions(+), 53 deletions(-)
+
+-- 
+2.16.4
+
