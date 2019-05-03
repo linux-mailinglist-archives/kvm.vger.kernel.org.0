@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 142AE12E0E
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 14:45:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3904612E0F
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 14:45:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728004AbfECMpx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 May 2019 08:45:53 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:60408 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727997AbfECMpx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 May 2019 08:45:53 -0400
+        id S1728005AbfECMp5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 May 2019 08:45:57 -0400
+Received: from foss.arm.com ([217.140.101.70]:60432 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727640AbfECMp5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 May 2019 08:45:57 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 229B8374;
-        Fri,  3 May 2019 05:45:53 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9D4DC80D;
+        Fri,  3 May 2019 05:45:56 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DF6DD3F220;
-        Fri,  3 May 2019 05:45:49 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 661F63F220;
+        Fri,  3 May 2019 05:45:53 -0700 (PDT)
 From:   Marc Zyngier <marc.zyngier@arm.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
@@ -36,14 +36,13 @@ Cc:     =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         "zhang . lei" <zhang.lei@jp.fujitsu.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
-Subject: [PATCH 20/56] arm64/sve: In-kernel vector length availability query interface
-Date:   Fri,  3 May 2019 13:43:51 +0100
-Message-Id: <20190503124427.190206-21-marc.zyngier@arm.com>
+Subject: [PATCH 21/56] KVM: arm/arm64: Add hook for arch-specific KVM initialisation
+Date:   Fri,  3 May 2019 13:43:52 +0100
+Message-Id: <20190503124427.190206-22-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190503124427.190206-1-marc.zyngier@arm.com>
 References: <20190503124427.190206-1-marc.zyngier@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -52,166 +51,65 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Dave Martin <Dave.Martin@arm.com>
 
-KVM will need to interrogate the set of SVE vector lengths
-available on the system.
+This patch adds a kvm_arm_init_arch_resources() hook to perform
+subarch-specific initialisation when starting up KVM.
 
-This patch exposes the relevant bits to the kernel, along with a
-sve_vq_available() helper to check whether a particular vector
-length is supported.
+This will be used in a subsequent patch for global SVE-related
+setup on arm64.
 
-__vq_to_bit() and __bit_to_vq() are not intended for use outside
-these functions: now that these are exposed outside fpsimd.c, they
-are prefixed with __ in order to provide an extra hint that they
-are not intended for general-purpose use.
+No functional change.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Julien Thierry <julien.thierry@arm.com>
 Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/fpsimd.h | 29 +++++++++++++++++++++++++++
- arch/arm64/kernel/fpsimd.c      | 35 ++++++++-------------------------
- 2 files changed, 37 insertions(+), 27 deletions(-)
+ arch/arm/include/asm/kvm_host.h   | 2 ++
+ arch/arm64/include/asm/kvm_host.h | 2 ++
+ virt/kvm/arm/arm.c                | 4 ++++
+ 3 files changed, 8 insertions(+)
 
-diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-index df7a14305222..ad6d2e41eb37 100644
---- a/arch/arm64/include/asm/fpsimd.h
-+++ b/arch/arm64/include/asm/fpsimd.h
-@@ -24,10 +24,13 @@
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 770d73257ad9..a49ee01242ff 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -53,6 +53,8 @@
  
- #ifndef __ASSEMBLY__
+ DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
  
-+#include <linux/bitmap.h>
- #include <linux/build_bug.h>
-+#include <linux/bug.h>
- #include <linux/cache.h>
- #include <linux/init.h>
- #include <linux/stddef.h>
-+#include <linux/types.h>
- 
- #if defined(__KERNEL__) && defined(CONFIG_COMPAT)
- /* Masks for extracting the FPSR and FPCR from the FPSCR */
-@@ -89,6 +92,32 @@ extern u64 read_zcr_features(void);
- 
- extern int __ro_after_init sve_max_vl;
- extern int __ro_after_init sve_max_virtualisable_vl;
-+/* Set of available vector lengths, as vq_to_bit(vq): */
-+extern __ro_after_init DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
++static inline int kvm_arm_init_arch_resources(void) { return 0; }
 +
-+/*
-+ * Helpers to translate bit indices in sve_vq_map to VQ values (and
-+ * vice versa).  This allows find_next_bit() to be used to find the
-+ * _maximum_ VQ not exceeding a certain value.
-+ */
-+static inline unsigned int __vq_to_bit(unsigned int vq)
-+{
-+	return SVE_VQ_MAX - vq;
-+}
+ u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
+ int __attribute_const__ kvm_target_cpu(void);
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 205438a108f6..3e8950942591 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -58,6 +58,8 @@
+ 
+ DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+ 
++static inline int kvm_arm_init_arch_resources(void) { return 0; }
 +
-+static inline unsigned int __bit_to_vq(unsigned int bit)
-+{
-+	if (WARN_ON(bit >= SVE_VQ_MAX))
-+		bit = SVE_VQ_MAX - 1;
+ int __attribute_const__ kvm_target_cpu(void);
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext);
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 99c37384ba7b..c69e1370a5dc 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -1664,6 +1664,10 @@ int kvm_arch_init(void *opaque)
+ 	if (err)
+ 		return err;
+ 
++	err = kvm_arm_init_arch_resources();
++	if (err)
++		return err;
 +
-+	return SVE_VQ_MAX - bit;
-+}
-+
-+/* Ensure vq >= SVE_VQ_MIN && vq <= SVE_VQ_MAX before calling this function */
-+static inline bool sve_vq_available(unsigned int vq)
-+{
-+	return test_bit(__vq_to_bit(vq), sve_vq_map);
-+}
- 
- #ifdef CONFIG_ARM64_SVE
- 
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 8a93afa78600..577296bba730 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -136,7 +136,7 @@ static int sve_default_vl = -1;
- int __ro_after_init sve_max_vl = SVE_VL_MIN;
- int __ro_after_init sve_max_virtualisable_vl = SVE_VL_MIN;
- /* Set of available vector lengths, as vq_to_bit(vq): */
--static __ro_after_init DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
-+__ro_after_init DECLARE_BITMAP(sve_vq_map, SVE_VQ_MAX);
- /* Set of vector lengths present on at least one cpu: */
- static __ro_after_init DECLARE_BITMAP(sve_vq_partial_map, SVE_VQ_MAX);
- static void __percpu *efi_sve_state;
-@@ -269,25 +269,6 @@ void fpsimd_save(void)
- 	}
- }
- 
--/*
-- * Helpers to translate bit indices in sve_vq_map to VQ values (and
-- * vice versa).  This allows find_next_bit() to be used to find the
-- * _maximum_ VQ not exceeding a certain value.
-- */
--
--static unsigned int vq_to_bit(unsigned int vq)
--{
--	return SVE_VQ_MAX - vq;
--}
--
--static unsigned int bit_to_vq(unsigned int bit)
--{
--	if (WARN_ON(bit >= SVE_VQ_MAX))
--		bit = SVE_VQ_MAX - 1;
--
--	return SVE_VQ_MAX - bit;
--}
--
- /*
-  * All vector length selection from userspace comes through here.
-  * We're on a slow path, so some sanity-checks are included.
-@@ -309,8 +290,8 @@ static unsigned int find_supported_vector_length(unsigned int vl)
- 		vl = max_vl;
- 
- 	bit = find_next_bit(sve_vq_map, SVE_VQ_MAX,
--			    vq_to_bit(sve_vq_from_vl(vl)));
--	return sve_vl_from_vq(bit_to_vq(bit));
-+			    __vq_to_bit(sve_vq_from_vl(vl)));
-+	return sve_vl_from_vq(__bit_to_vq(bit));
- }
- 
- #ifdef CONFIG_SYSCTL
-@@ -648,7 +629,7 @@ static void sve_probe_vqs(DECLARE_BITMAP(map, SVE_VQ_MAX))
- 		write_sysreg_s(zcr | (vq - 1), SYS_ZCR_EL1); /* self-syncing */
- 		vl = sve_get_vl();
- 		vq = sve_vq_from_vl(vl); /* skip intervening lengths */
--		set_bit(vq_to_bit(vq), map);
-+		set_bit(__vq_to_bit(vq), map);
- 	}
- }
- 
-@@ -717,7 +698,7 @@ int sve_verify_vq_map(void)
- 	 * Mismatches above sve_max_virtualisable_vl are fine, since
- 	 * no guest is allowed to configure ZCR_EL2.LEN to exceed this:
- 	 */
--	if (sve_vl_from_vq(bit_to_vq(b)) <= sve_max_virtualisable_vl) {
-+	if (sve_vl_from_vq(__bit_to_vq(b)) <= sve_max_virtualisable_vl) {
- 		pr_warn("SVE: cpu%d: Unsupported vector length(s) present\n",
- 			smp_processor_id());
- 		return -EINVAL;
-@@ -801,8 +782,8 @@ void __init sve_setup(void)
- 	 * so sve_vq_map must have at least SVE_VQ_MIN set.
- 	 * If something went wrong, at least try to patch it up:
- 	 */
--	if (WARN_ON(!test_bit(vq_to_bit(SVE_VQ_MIN), sve_vq_map)))
--		set_bit(vq_to_bit(SVE_VQ_MIN), sve_vq_map);
-+	if (WARN_ON(!test_bit(__vq_to_bit(SVE_VQ_MIN), sve_vq_map)))
-+		set_bit(__vq_to_bit(SVE_VQ_MIN), sve_vq_map);
- 
- 	zcr = read_sanitised_ftr_reg(SYS_ZCR_EL1);
- 	sve_max_vl = sve_vl_from_vq((zcr & ZCR_ELx_LEN_MASK) + 1);
-@@ -831,7 +812,7 @@ void __init sve_setup(void)
- 		/* No virtualisable VLs?  This is architecturally forbidden. */
- 		sve_max_virtualisable_vl = SVE_VQ_MIN;
- 	else /* b + 1 < SVE_VQ_MAX */
--		sve_max_virtualisable_vl = sve_vl_from_vq(bit_to_vq(b + 1));
-+		sve_max_virtualisable_vl = sve_vl_from_vq(__bit_to_vq(b + 1));
- 
- 	if (sve_max_virtualisable_vl > sve_max_vl)
- 		sve_max_virtualisable_vl = sve_max_vl;
+ 	if (!in_hyp_mode) {
+ 		err = init_hyp_mode();
+ 		if (err)
 -- 
 2.20.1
 
