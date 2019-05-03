@@ -2,106 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D3DF13342
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 19:45:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B1F8136D4
+	for <lists+kvm@lfdr.de>; Sat,  4 May 2019 03:15:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728672AbfECRpH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 May 2019 13:45:07 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:44413 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726480AbfECRpH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 May 2019 13:45:07 -0400
-Received: by mail-pf1-f194.google.com with SMTP id y13so3217504pfm.11
-        for <kvm@vger.kernel.org>; Fri, 03 May 2019 10:45:06 -0700 (PDT)
+        id S1726451AbfEDBLT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 May 2019 21:11:19 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:32951 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726402AbfEDBLS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 May 2019 21:11:18 -0400
+Received: by mail-wr1-f66.google.com with SMTP id e28so9938169wra.0
+        for <kvm@vger.kernel.org>; Fri, 03 May 2019 18:11:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=x1vHwidVW2iqiue6QlEO7msowRc4CzTmFAfk84+WEko=;
-        b=O1uJU6qzYXEysdJuN16Ez2JagPGxNLSKaeFOA8N6C+RZr/kAJxKmdHHSVsmxHwfxSS
-         +I98Ce1dOJo46f6DyY4/3kCO2abMffY2guC/k6LTw16ALGUV5Gok+ZYEpw3Uf99A3gKn
-         daRzFamSkcvycYYx47ofe5EuoCTHpFhk/BK9arSVg5NuEZwS9hPSqhYlMZ48FDQe7rlZ
-         5P2W+lx1YuZtWK9pWdPmSEfggq4KwQzEbz4dbXNpzYVzfegr9GaLk+01y5viGqU3YDMK
-         P/YTINpGHD/PZjEgzaNoAlQdVSwe0EGg+wiziw9AEQyMCkrQWF4Xby3ph4QNEkVNnoDx
-         ILgA==
+        h=from:to:cc:subject:date:message-id;
+        bh=X1twO1Q1L2oynVMIl2wzQZk14bzPOH9N24HDJtgP+uw=;
+        b=plCMoa5/Hv0/W1Cqzs++iefq/F3xjEIe9SzDFlZnnHw7SlyqTArpA1QVF117YK3B2f
+         YgS+mtM6YV5syACyYUN0nfWZYPmkRu8F3g/Hhv+ndMw1wcFrwMhvAfIfeC9JXmOHbx0w
+         CcmOQowvjs+84MFSyawFs12gNqyGiiBXKI22J3BHhzf0QirqW/jqKI7SfMeN0ovC0uYd
+         7UEaKKiEytkvaua3e4Tj3Ixiq+7sMuBcjnDPUzCb3vaX7mK06SYFhd50kR7lFmJicJXf
+         sJd19HvyTvINWpdR9E51hBI0CS5XS3npyEPnI1TLOOoskAVn4/8VEbQFM0XrNPfiBNAv
+         W0Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=x1vHwidVW2iqiue6QlEO7msowRc4CzTmFAfk84+WEko=;
-        b=JyawrGh4rlwDsh27R1BTr1AutnPO3cg5khJZLQp9TtPS56aCFVO1b9RoE7aN8uploV
-         TjU8UWbaA3A9TgBbqf4jpD18kG6ladk4yPGbxisrYGiP+hAWUEQ8ImDj8TlD2bS823/K
-         BhVxBLLE3KiZ2IG+c2IJHqkhfkBAdE2GX+Cxh6OwIoK+2A9YoOrF4wS1i8L+TXX2IVK7
-         LvseIMIo/MqV5DRlZSOlfPrl/Cbat3Wv/oZOJZYKK++4yGeZRUSTRBDD41qe63ZRjC5W
-         oGWERkzfiCAm7xiNbqMNPjDWtA7w3hso8q0UMguW8Teq2RHqFVvEj4Iw8SWNRV6qz6jY
-         HONg==
-X-Gm-Message-State: APjAAAWFd8V+gGxyhfWu6nS2b5pfM5ESryHpn2EQq9DhemxU7eSKnWyR
-        nlExB7HyVyvuxqsK73Q9jQF33KYp4XE=
-X-Google-Smtp-Source: APXvYqyHEbvjexXhN0M7ri48TWLWic7VzyZAKj/mL7AAa/T3QRlCwGEmIf0Qmoi1bocI61Tkb5dkyA==
-X-Received: by 2002:a63:2ad3:: with SMTP id q202mr12100492pgq.423.1556905506258;
-        Fri, 03 May 2019 10:45:06 -0700 (PDT)
-Received: from [10.33.115.113] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id p81sm6072349pfa.26.2019.05.03.10.45.04
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=X1twO1Q1L2oynVMIl2wzQZk14bzPOH9N24HDJtgP+uw=;
+        b=l/LwHuMdYrcQTqx28Z1Ib0WAPzO9+PZYtlS0ZsPBEsj/jUqD3tHDGKPw8U1Z51ANii
+         1egJXTNRorcr6dEezlCcBLsPXFLhkJvLmMXFRlHlWTyP/ECBfZ8HFrTPY8TFc8WAz5SK
+         OquDysohFvHQR+MNHcqglLWTTgH+J7KJp8jWf/YQpys3jISb5RSCHCc1ffxAO/oXZc+H
+         KgrHWKhk3/emIPbpD9O3iYymChUX2mct9hKxISsixp0ezattMbgZBNX5PjB4qNIwIe9F
+         DmDTtmZ11UsdI2zKVSW6Oh+0I9nrbJVdeESkcuIUzdD6g94x1lxFQFPc365iv0PnFFVS
+         caCw==
+X-Gm-Message-State: APjAAAVshPsZpgSJz0MSamtaJozf7FFNmmLMRVPmvi9Nj3u5aCwjzOJQ
+        HP/VxLAtGnlPTenfE5zCvek=
+X-Google-Smtp-Source: APXvYqyKEwse0u0Mdo0/q08DQ5iaPxXM81uSbvg3lcaIo3U3H69ztUOb7D4I5kZV5+zhlIpJq8pgng==
+X-Received: by 2002:a5d:624d:: with SMTP id m13mr9009415wrv.305.1556932276934;
+        Fri, 03 May 2019 18:11:16 -0700 (PDT)
+Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id e5sm2409098wrh.79.2019.05.03.18.11.14
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 03 May 2019 10:45:05 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [kvm-unit-tests PATCH] x86: eventinj: Do a real io_delay()
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <57fcfc11-ec47-8f54-a6d2-e40a706e3a71@oracle.com>
-Date:   Fri, 3 May 2019 10:45:03 -0700
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <2D0191F2-105B-4446-89DB-38CC9A3B0527@gmail.com>
-References: <20190502184913.10138-1-nadav.amit@gmail.com>
- <57fcfc11-ec47-8f54-a6d2-e40a706e3a71@oracle.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+        Fri, 03 May 2019 18:11:15 -0700 (PDT)
+From:   nadav.amit@gmail.com
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>
+Subject: [kvm-unit-tests PATCH] x86: vmx: Mask undefined bits in exit qualifications
+Date:   Fri,  3 May 2019 10:49:19 -0700
+Message-Id: <20190503174919.13846-1-nadav.amit@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On May 3, 2019, at 10:38 AM, Krish Sadhukhan =
-<krish.sadhukhan@oracle.com> wrote:
->=20
->=20
-> On 5/2/19 11:49 AM, nadav.amit@gmail.com wrote:
->> From: Nadav Amit <nadav.amit@gmail.com>
->>=20
->> There is no guarantee that a self-IPI would be delivered immediately.
->> io_delay() is called after self-IPI is generated but does nothing.
->> Instead, change io_delay() to wait for 10000 cycles, which should be
->> enough on any system whatsoever.
->>=20
->> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
->> ---
->>  x86/eventinj.c | 5 +++++
->>  1 file changed, 5 insertions(+)
->>=20
->> diff --git a/x86/eventinj.c b/x86/eventinj.c
->> index 8064eb9..250537b 100644
->> --- a/x86/eventinj.c
->> +++ b/x86/eventinj.c
->> @@ -18,6 +18,11 @@ void do_pf_tss(void);
->>    static inline void io_delay(void)
->>  {
->> +	u64 start =3D rdtsc();
->> +
->> +	do {
->> +		pause();
->> +	} while (rdtsc() - start < 10000);
->>  }
->>    static void apic_self_ipi(u8 v)
->=20
-> Perhaps call delay() (in delay.c) inside of io_delay() OR perhaps =
-replace
-> all instances of io_delay() with delay() ?
+From: Nadav Amit <nadav.amit@gmail.com>
 
-There is such a mess with this delay(). It times stuff based on number =
-of
-pause() invocations. There is an additional implementation in ioapic.c
-(which by itself is broken, since there is no compiler barrier).
+On EPT violation, the exit qualifications may have some undefined bits.
 
-Let me see what I can do...=
+Bit 6 is undefined if "mode-based execute control" is 0.
+
+Bits 9-11 are undefined unless the processor supports advanced VM-exit
+information for EPT violations.
+
+Right now on KVM these bits are always undefined inside the VM (i.e., in
+an emulated VM-exit). Mask these bits to avoid potential false
+indication of failures.
+
+Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+---
+ x86/vmx.h       | 20 ++++++++++++--------
+ x86/vmx_tests.c |  4 ++++
+ 2 files changed, 16 insertions(+), 8 deletions(-)
+
+diff --git a/x86/vmx.h b/x86/vmx.h
+index cc377ef..5053d6f 100644
+--- a/x86/vmx.h
++++ b/x86/vmx.h
+@@ -603,16 +603,20 @@ enum vm_instruction_error_number {
+ #define EPT_ADDR_MASK		GENMASK_ULL(51, 12)
+ #define PAGE_MASK_2M		(~(PAGE_SIZE_2M-1))
+ 
+-#define EPT_VLT_RD		1
+-#define EPT_VLT_WR		(1 << 1)
+-#define EPT_VLT_FETCH		(1 << 2)
+-#define EPT_VLT_PERM_RD		(1 << 3)
+-#define EPT_VLT_PERM_WR		(1 << 4)
+-#define EPT_VLT_PERM_EX		(1 << 5)
++#define EPT_VLT_RD		(1ull << 0)
++#define EPT_VLT_WR		(1ull << 1)
++#define EPT_VLT_FETCH		(1ull << 2)
++#define EPT_VLT_PERM_RD		(1ull << 3)
++#define EPT_VLT_PERM_WR		(1ull << 4)
++#define EPT_VLT_PERM_EX		(1ull << 5)
++#define EPT_VLT_PERM_USER_EX	(1ull << 6)
+ #define EPT_VLT_PERMS		(EPT_VLT_PERM_RD | EPT_VLT_PERM_WR | \
+ 				 EPT_VLT_PERM_EX)
+-#define EPT_VLT_LADDR_VLD	(1 << 7)
+-#define EPT_VLT_PADDR		(1 << 8)
++#define EPT_VLT_LADDR_VLD	(1ull << 7)
++#define EPT_VLT_PADDR		(1ull << 8)
++#define EPT_VLT_GUEST_USER	(1ull << 9)
++#define EPT_VLT_GUEST_WR	(1ull << 10)
++#define EPT_VLT_GUEST_EX	(1ull << 11)
+ 
+ #define MAGIC_VAL_1		0x12345678ul
+ #define MAGIC_VAL_2		0x87654321ul
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index c52ebc6..b4129e1 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -2365,6 +2365,10 @@ static void do_ept_violation(bool leaf, enum ept_access_op op,
+ 
+ 	qual = vmcs_read(EXI_QUALIFICATION);
+ 
++	/* Mask undefined bits (which may later be defined in certain cases). */
++	qual &= ~(EPT_VLT_GUEST_USER | EPT_VLT_GUEST_WR | EPT_VLT_GUEST_EX |
++		 EPT_VLT_PERM_USER_EX);
++
+ 	diagnose_ept_violation_qual(expected_qual, qual);
+ 	TEST_EXPECT_EQ(expected_qual, qual);
+ 
+-- 
+2.17.1
+
