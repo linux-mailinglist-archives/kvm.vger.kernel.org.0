@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FAF812E42
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 14:47:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96AD812E43
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 14:47:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728065AbfECMrL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 May 2019 08:47:11 -0400
-Received: from foss.arm.com ([217.140.101.70]:60900 "EHLO foss.arm.com"
+        id S1728067AbfECMrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 May 2019 08:47:14 -0400
+Received: from foss.arm.com ([217.140.101.70]:60918 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728051AbfECMrK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 May 2019 08:47:10 -0400
+        id S1727733AbfECMrO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 May 2019 08:47:14 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 30B9C15AD;
-        Fri,  3 May 2019 05:47:10 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD16B15AD;
+        Fri,  3 May 2019 05:47:13 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ED90D3F220;
-        Fri,  3 May 2019 05:47:06 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 73F7B3F220;
+        Fri,  3 May 2019 05:47:10 -0700 (PDT)
 From:   Marc Zyngier <marc.zyngier@arm.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
@@ -36,9 +36,9 @@ Cc:     =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         "zhang . lei" <zhang.lei@jp.fujitsu.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
-Subject: [PATCH 42/56] KVM: arm64: Clarify access behaviour for out-of-range SVE register slice IDs
-Date:   Fri,  3 May 2019 13:44:13 +0100
-Message-Id: <20190503124427.190206-43-marc.zyngier@arm.com>
+Subject: [PATCH 43/56] KVM: arm64: Add a vcpu flag to control ptrauth for guest
+Date:   Fri,  3 May 2019 13:44:14 +0100
+Message-Id: <20190503124427.190206-44-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190503124427.190206-1-marc.zyngier@arm.com>
 References: <20190503124427.190206-1-marc.zyngier@arm.com>
@@ -49,41 +49,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Dave Martin <Dave.Martin@arm.com>
+From: Amit Daniel Kachhap <amit.kachhap@arm.com>
 
-The existing documentation for which SVE register slice IDs are
-considered out-of-range, and what happens when userspace tries to
-access them, is cryptic.
+A per vcpu flag is added to check if pointer authentication is
+enabled for the vcpu or not. This flag may be enabled according to
+the necessary user policies and host capabilities.
 
-This patch rewords the text with the aim of making it a bit easier to
-understand.
+This patch also adds a helper to check the flag.
 
-No functional change.
-
-Suggested-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Dave Martin <Dave.Martin@arm.com>
+Signed-off-by: Amit Daniel Kachhap <amit.kachhap@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- Documentation/virtual/kvm/api.txt | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index 818ac97fdabc..e410a9f0f0d4 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -2159,8 +2159,9 @@ arm64 SVE registers have the following bit patterns:
-   0x6050 0000 0015 060 <slice:5>        FFR bits[256*slice + 255 : 256*slice]
-   0x6060 0000 0015 ffff                 KVM_REG_ARM64_SVE_VLS pseudo-register
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7a096fdb333d..7ccac42a91a6 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -355,10 +355,15 @@ struct kvm_vcpu_arch {
+ #define KVM_ARM64_HOST_SVE_ENABLED	(1 << 4) /* SVE enabled for EL0 */
+ #define KVM_ARM64_GUEST_HAS_SVE		(1 << 5) /* SVE exposed to guest */
+ #define KVM_ARM64_VCPU_SVE_FINALIZED	(1 << 6) /* SVE config completed */
++#define KVM_ARM64_GUEST_HAS_PTRAUTH	(1 << 7) /* PTRAUTH exposed to guest */
  
--Access to slices beyond the maximum vector length configured for the
--vcpu (i.e., where 16 * slice >= max_vq (**)) will fail with ENOENT.
-+Access to register IDs where 2048 * slice >= 128 * max_vq will fail with
-+ENOENT.  max_vq is the vcpu's maximum supported vector length in 128-bit
-+quadwords: see (**) below.
+ #define vcpu_has_sve(vcpu) (system_supports_sve() && \
+ 			    ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_SVE))
  
- These registers are only accessible on vcpus for which SVE is enabled.
- See KVM_ARM_VCPU_INIT for details.
++#define vcpu_has_ptrauth(vcpu)	((system_supports_address_auth() || \
++				  system_supports_generic_auth()) && \
++				 ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_PTRAUTH))
++
+ #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.gp_regs)
+ 
+ /*
 -- 
 2.20.1
 
