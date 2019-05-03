@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8ABE412E19
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 14:46:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B3FD12E1B
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 14:46:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727640AbfECMqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 May 2019 08:46:11 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:60528 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728008AbfECMqL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 May 2019 08:46:11 -0400
+        id S1728024AbfECMqP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 May 2019 08:46:15 -0400
+Received: from foss.arm.com ([217.140.101.70]:60556 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727726AbfECMqO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 May 2019 08:46:14 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A22D716A3;
-        Fri,  3 May 2019 05:46:10 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2801D169E;
+        Fri,  3 May 2019 05:46:14 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A44B3F220;
-        Fri,  3 May 2019 05:46:07 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E53323F220;
+        Fri,  3 May 2019 05:46:10 -0700 (PDT)
 From:   Marc Zyngier <marc.zyngier@arm.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
@@ -36,13 +36,14 @@ Cc:     =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         "zhang . lei" <zhang.lei@jp.fujitsu.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
-Subject: [PATCH 25/56] KVM: arm64: Add a capability to advertise SVE support
-Date:   Fri,  3 May 2019 13:43:56 +0100
-Message-Id: <20190503124427.190206-26-marc.zyngier@arm.com>
+Subject: [PATCH 26/56] KVM: Document errors for KVM_GET_ONE_REG and KVM_SET_ONE_REG
+Date:   Fri,  3 May 2019 13:43:57 +0100
+Message-Id: <20190503124427.190206-27-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190503124427.190206-1-marc.zyngier@arm.com>
 References: <20190503124427.190206-1-marc.zyngier@arm.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
@@ -51,45 +52,41 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Dave Martin <Dave.Martin@arm.com>
 
-To provide a uniform way to check for KVM SVE support amongst other
-features, this patch adds a suitable capability KVM_CAP_ARM_SVE,
-and reports it as present when SVE is available.
+KVM_GET_ONE_REG and KVM_SET_ONE_REG return some error codes that
+are not documented (but hopefully not surprising either).  To give
+an indication of what these may mean, this patch adds brief
+documentation.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-Reviewed-by: Julien Thierry <julien.thierry@arm.com>
-Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/reset.c   | 3 +++
- include/uapi/linux/kvm.h | 1 +
- 2 files changed, 4 insertions(+)
+ Documentation/virtual/kvm/api.txt | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 32c5ac0a3872..f13378d0a0ad 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -98,6 +98,9 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_VM_IPA_SIZE:
- 		r = kvm_ipa_limit;
- 		break;
-+	case KVM_CAP_ARM_SVE:
-+		r = system_supports_sve();
-+		break;
- 	default:
- 		r = 0;
- 	}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index c3b8e7a31315..1d564445b515 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -988,6 +988,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_VM_IPA_SIZE 165
- #define KVM_CAP_MANUAL_DIRTY_LOG_PROTECT 166
- #define KVM_CAP_HYPERV_CPUID 167
-+#define KVM_CAP_ARM_SVE 168
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index 2d4f7ce5e967..cd920dd1195c 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -1871,6 +1871,9 @@ Architectures: all
+ Type: vcpu ioctl
+ Parameters: struct kvm_one_reg (in)
+ Returns: 0 on success, negative value on failure
++Errors:
++  ENOENT:   no such register
++  EINVAL:   other errors, such as bad size encoding for a known register
  
- #ifdef KVM_CAP_IRQ_ROUTING
+ struct kvm_one_reg {
+        __u64 id;
+@@ -2192,6 +2195,9 @@ Architectures: all
+ Type: vcpu ioctl
+ Parameters: struct kvm_one_reg (in and out)
+ Returns: 0 on success, negative value on failure
++Errors:
++  ENOENT:   no such register
++  EINVAL:   other errors, such as bad size encoding for a known register
  
+ This ioctl allows to receive the value of a single register implemented
+ in a vcpu. The register to read is indicated by the "id" field of the
 -- 
 2.20.1
 
