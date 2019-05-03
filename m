@@ -2,91 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B6D6129C7
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 10:19:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97CFB129FA
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 10:40:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727179AbfECITM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 May 2019 04:19:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38900 "EHLO mx1.redhat.com"
+        id S1726572AbfECIkr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 May 2019 04:40:47 -0400
+Received: from mga01.intel.com ([192.55.52.88]:5280 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727175AbfECITL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 May 2019 04:19:11 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 35BEF330247;
-        Fri,  3 May 2019 08:19:11 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6DF825C23A;
-        Fri,  3 May 2019 08:19:07 +0000 (UTC)
-Date:   Fri, 3 May 2019 10:19:05 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     nadav.amit@gmail.com
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH] lib/alloc_page: Zero allocated pages
-Message-ID: <20190503081905.ua4htmjpqrhsqgn3@kamzik.brq.redhat.com>
-References: <20190502154038.8267-1-nadav.amit@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190502154038.8267-1-nadav.amit@gmail.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Fri, 03 May 2019 08:19:11 +0000 (UTC)
+        id S1725777AbfECIkq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 May 2019 04:40:46 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 May 2019 01:40:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,425,1549958400"; 
+   d="scan'208";a="296632863"
+Received: from khuang2-desk.gar.corp.intel.com ([10.254.24.58])
+  by orsmga004.jf.intel.com with ESMTP; 03 May 2019 01:40:43 -0700
+From:   Kai Huang <kai.huang@linux.intel.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com
+Cc:     sean.j.christopherson@intel.com, junaids@google.com,
+        thomas.lendacky@amd.com, brijesh.singh@amd.com, tglx@linutronix.de,
+        bp@alien8.de, hpa@zytor.com, kai.huang@intel.com,
+        Kai Huang <kai.huang@linux.intel.com>
+Subject: [PATCH] kvm: x86: Fix L1TF mitigation for shadow MMU
+Date:   Fri,  3 May 2019 20:40:25 +1200
+Message-Id: <20190503084025.24549-1-kai.huang@linux.intel.com>
+X-Mailer: git-send-email 2.13.6
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 02, 2019 at 08:40:38AM -0700, nadav.amit@gmail.com wrote:
-> From: Nadav Amit <nadav.amit@gmail.com>
-> 
-> One of the most important properties of tests is reproducibility. For
-> tests to be reproducible, the same environment should be set on each
-> test invocation.
-> 
-> When it comes to memory content, this is not exactly the case in
-> kvm-unit-tests. The tests might, mistakenly or intentionally, assume
-> that memory is zeroed, which apparently is the case after seabios runs.
-> However, failures might not be reproducible if this assumption is
-> broken.
-> 
-> As an example, consider x86 do_iret(), which mistakenly does not push
-> SS:RSP onto the stack on 64-bit mode, although they are popped
-> unconditionally.
-> 
-> Do not assume that memory is zeroed. Clear it once it is allocated to
-> allow tests to easily be reproducible.
-> 
-> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
-> ---
->  lib/alloc_page.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/lib/alloc_page.c b/lib/alloc_page.c
-> index 730f2b5..b0f4515 100644
-> --- a/lib/alloc_page.c
-> +++ b/lib/alloc_page.c
-> @@ -65,6 +65,7 @@ void *alloc_page()
->  	freelist = *(void **)freelist;
->  	spin_unlock(&lock);
->  
-> +	memset(p, 0, PAGE_SIZE);
->  	return p;
->  }
->  
-> -- 
-> 2.17.1
->
+Currently KVM sets 5 most significant bits of physical address bits
+reported by CPUID (boot_cpu_data.x86_phys_bits) for nonpresent or
+reserved bits SPTE to mitigate L1TF attack from guest when using shadow
+MMU. However for some particular Intel CPUs the physical address bits
+of internal cache is greater than physical address bits reported by
+CPUID.
 
-I think this is reasonable, but if we make this change then we should
-remove the now redundant page zeroing too. A quick grep shows 20
-instances
+Use the kernel's existing boot_cpu_data.x86_cache_bits to determine the
+five most significant bits. Doing so improves KVM's L1TF mitigation in
+the unlikely scenario that system RAM overlaps the high order bits of
+the "real" physical address space as reported by CPUID. This aligns with
+the kernel's warnings regarding L1TF mitigation, e.g. in the above
+scenario the kernel won't warn the user about lack of L1TF mitigation
+if x86_cache_bits is greater than x86_phys_bits.
 
- $ git grep -A1 alloc_page | grep memset | grep 0, | wc -l
- 20
+Also initialize shadow_nonpresent_or_rsvd_mask explicitly to make it
+consistent with other 'shadow_{xxx}_mask', and opportunistically add a
+WARN once if KVM's L1TF mitigation cannot be applied on a system that
+is marked as being susceptible to L1TF.
 
-There may be more.
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Kai Huang <kai.huang@linux.intel.com>
+---
 
-Thanks,
-drew
+This patch was splitted from old patch I sent out around 2 weeks ago:
+
+kvm: x86: Fix several SPTE mask calculation errors caused by MKTME
+
+After reviewing with Sean Christopherson it's better to split this out,
+since the logic in this patch is independent. And maybe this patch should
+also be into stable.
+
+---
+ arch/x86/kvm/mmu.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index b0899f175db9..1b2380e0060f 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -511,16 +511,24 @@ static void kvm_mmu_reset_all_pte_masks(void)
+ 	 * If the CPU has 46 or less physical address bits, then set an
+ 	 * appropriate mask to guard against L1TF attacks. Otherwise, it is
+ 	 * assumed that the CPU is not vulnerable to L1TF.
++	 *
++	 * Some Intel CPUs address the L1 cache using more PA bits than are
++	 * reported by CPUID. Use the PA width of the L1 cache when possible
++	 * to achieve more effective mitigation, e.g. if system RAM overlaps
++	 * the most significant bits of legal physical address space.
+ 	 */
+-	low_phys_bits = boot_cpu_data.x86_phys_bits;
+-	if (boot_cpu_data.x86_phys_bits <
++	shadow_nonpresent_or_rsvd_mask = 0;
++	low_phys_bits = boot_cpu_data.x86_cache_bits;
++	if (boot_cpu_data.x86_cache_bits <
+ 	    52 - shadow_nonpresent_or_rsvd_mask_len) {
+ 		shadow_nonpresent_or_rsvd_mask =
+-			rsvd_bits(boot_cpu_data.x86_phys_bits -
++			rsvd_bits(boot_cpu_data.x86_cache_bits -
+ 				  shadow_nonpresent_or_rsvd_mask_len,
+-				  boot_cpu_data.x86_phys_bits - 1);
++				  boot_cpu_data.x86_cache_bits - 1);
+ 		low_phys_bits -= shadow_nonpresent_or_rsvd_mask_len;
+-	}
++	} else
++		WARN_ON_ONCE(boot_cpu_has_bug(X86_BUG_L1TF));
++
+ 	shadow_nonpresent_or_rsvd_lower_gfn_mask =
+ 		GENMASK_ULL(low_phys_bits - 1, PAGE_SHIFT);
+ }
+-- 
+2.13.6
+
