@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8051812DE6
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 14:44:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA23F12DE9
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2019 14:44:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727958AbfECMoy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 May 2019 08:44:54 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:60030 "EHLO
+        id S1727960AbfECMo5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 May 2019 08:44:57 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:60050 "EHLO
         foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727955AbfECMox (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 May 2019 08:44:53 -0400
+        id S1727956AbfECMo5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 May 2019 08:44:57 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 51D3580D;
-        Fri,  3 May 2019 05:44:53 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CB8D1374;
+        Fri,  3 May 2019 05:44:56 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1B1493F220;
-        Fri,  3 May 2019 05:44:49 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 94B493F220;
+        Fri,  3 May 2019 05:44:53 -0700 (PDT)
 From:   Marc Zyngier <marc.zyngier@arm.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
@@ -36,9 +36,9 @@ Cc:     =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         "zhang . lei" <zhang.lei@jp.fujitsu.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
-Subject: [PATCH 03/56] KVM: arm64: Delete orphaned declaration for __fpsimd_enabled()
-Date:   Fri,  3 May 2019 13:43:34 +0100
-Message-Id: <20190503124427.190206-4-marc.zyngier@arm.com>
+Subject: [PATCH 04/56] KVM: arm64: Refactor kvm_arm_num_regs() for easier maintenance
+Date:   Fri,  3 May 2019 13:43:35 +0100
+Message-Id: <20190503124427.190206-5-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190503124427.190206-1-marc.zyngier@arm.com>
 References: <20190503124427.190206-1-marc.zyngier@arm.com>
@@ -52,31 +52,43 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Dave Martin <Dave.Martin@arm.com>
 
-__fpsimd_enabled() no longer exists, but a dangling declaration has
-survived in kvm_hyp.h.
+kvm_arm_num_regs() adds together various partial register counts in
+a freeform sum expression, which makes it harder than necessary to
+read diffs that add, modify or remove a single term in the sum
+(which is expected to the common case under maintenance).
 
-This patch gets rid of it.
+This patch refactors the code to add the term one per line, for
+maximum readability.
 
 Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Tested-by: zhang.lei <zhang.lei@jp.fujitsu.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_hyp.h | 1 -
- 1 file changed, 1 deletion(-)
+ arch/arm64/kvm/guest.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 4da765f2cca5..ef8b8394d3d1 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -149,7 +149,6 @@ void __debug_switch_to_host(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index dd436a50fce7..62514cba95ca 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -258,8 +258,14 @@ static int get_timer_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+  */
+ unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu)
+ {
+-	return num_core_regs() + kvm_arm_num_sys_reg_descs(vcpu)
+-		+ kvm_arm_get_fw_num_regs(vcpu)	+ NUM_TIMER_REGS;
++	unsigned long res = 0;
++
++	res += num_core_regs();
++	res += kvm_arm_num_sys_reg_descs(vcpu);
++	res += kvm_arm_get_fw_num_regs(vcpu);
++	res += NUM_TIMER_REGS;
++
++	return res;
+ }
  
- void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
- void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
--bool __fpsimd_enabled(void);
- 
- void activate_traps_vhe_load(struct kvm_vcpu *vcpu);
- void deactivate_traps_vhe_put(void);
+ /**
 -- 
 2.20.1
 
