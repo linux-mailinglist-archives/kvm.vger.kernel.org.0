@@ -2,147 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C481C1362A
-	for <lists+kvm@lfdr.de>; Sat,  4 May 2019 01:28:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69A9D13678
+	for <lists+kvm@lfdr.de>; Sat,  4 May 2019 02:10:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726521AbfECX2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 May 2019 19:28:30 -0400
-Received: from mail-eopbgr70049.outbound.protection.outlook.com ([40.107.7.49]:10055
-        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726150AbfECX23 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 May 2019 19:28:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eMqWUI2G/ksOaJmStmpjJCrxAv/NkatFY6m2td/HHaE=;
- b=hn6dY7g7Ps9UCNFhsY1boaR3VUt/n7cy460xSr+3PAwdvL0zzHqQ1JbPNoK8xhKIV2fM+mF+b7Lq4bRKmrTmlqXa0MQKyc5mU59HdywJ4/6f5aKrNIC6S9GV+PucrqLLkRecvIbiXz3M3c+bGZSCH5Fym7aWjP0NVQ7utHKg1pk=
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com (10.171.182.144) by
- VI1PR05MB3357.eurprd05.prod.outlook.com (10.170.238.146) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1856.12; Fri, 3 May 2019 23:28:22 +0000
-Received: from VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::711b:c0d6:eece:f044]) by VI1PR05MB4141.eurprd05.prod.outlook.com
- ([fe80::711b:c0d6:eece:f044%5]) with mapi id 15.20.1856.008; Fri, 3 May 2019
- 23:28:22 +0000
-From:   Jason Gunthorpe <jgg@mellanox.com>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-CC:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        Alan Tull <atull@kernel.org>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christoph Lameter <cl@linux.com>,
-        Christophe Leroy <christophe.leroy@c-s.fr>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Moritz Fischer <mdf@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        Wu Hao <hao.wu@intel.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "linux-fpga@vger.kernel.org" <linux-fpga@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] mm: add account_locked_vm utility function
-Thread-Topic: [PATCH] mm: add account_locked_vm utility function
-Thread-Index: AQHVAe2ZLngO8JYpNki+X4vS/Cz1vqZaC+sA
-Date:   Fri, 3 May 2019 23:28:22 +0000
-Message-ID: <20190503232818.GA5182@mellanox.com>
-References: <20190503201629.20512-1-daniel.m.jordan@oracle.com>
-In-Reply-To: <20190503201629.20512-1-daniel.m.jordan@oracle.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: MN2PR04CA0003.namprd04.prod.outlook.com
- (2603:10b6:208:d4::16) To VI1PR05MB4141.eurprd05.prod.outlook.com
- (2603:10a6:803:4d::16)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=jgg@mellanox.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [65.119.211.164]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: cbafa94b-6447-4be8-56b3-08d6d01f0818
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:VI1PR05MB3357;
-x-ms-traffictypediagnostic: VI1PR05MB3357:
-x-microsoft-antispam-prvs: <VI1PR05MB33578A2BC54EF9B341D8F7FDCF350@VI1PR05MB3357.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-forefront-prvs: 0026334A56
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(396003)(346002)(39860400002)(376002)(366004)(189003)(199004)(186003)(8936002)(6916009)(53936002)(11346002)(446003)(316002)(2906002)(2616005)(6246003)(386003)(7736002)(305945005)(6506007)(26005)(66946007)(66446008)(1076003)(33656002)(5660300002)(66476007)(66556008)(64756008)(73956011)(15650500001)(4326008)(102836004)(81156014)(36756003)(25786009)(3846002)(6116002)(99286004)(6486002)(66066001)(86362001)(52116002)(7416002)(14454004)(6436002)(486006)(68736007)(71200400001)(54906003)(476003)(229853002)(71190400001)(6512007)(81166006)(76176011)(14444005)(478600001)(256004)(8676002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR05MB3357;H:VI1PR05MB4141.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 9MggK/iMBpnv+TQWX1Y6xFTS5HHusO1C0bnxQyn7vZkFZN8dPKUOJIgFo1LMg2KiSdlVm3+U697HF0tSDf0Y17UeKgOKYd8UFLsizzRP7FxW4JzMD7jl4Wnj7gtZHqG6M7RigUH1tIHPMa48M/V3ENKTCWYrrNqKODknwq2+en4Y44Cdn50yhM8stLsiKRDaE40HKhXlMlxzDgtgyJE0UgPHQ1oW2z2MlzBhdBQlLg54fr/TNvn8Z8xOOmjwVb9FYypHcfiKt83xiQO6SwqPhMK49lWiFmgh7561E55Wqv4nDpj7YIn6c9UxWwMI/dpwqVvXnsoKUfNRXxCGgj9ouQIm5UEH0rhZPqvhfHoOEyfqkLEXCCXuo+9/QYi7kmvytl85Kgih04VuzfSUJgFA/DQJYi2wupIPY1g136PN0ss=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <6BC684B50DAD6D4A8D031B0B8F7E32C4@eurprd05.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cbafa94b-6447-4be8-56b3-08d6d01f0818
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 May 2019 23:28:22.2133
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR05MB3357
+        id S1726326AbfEDAKD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 May 2019 20:10:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57862 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726041AbfEDAKD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 May 2019 20:10:03 -0400
+Subject: Re: [GIT PULL] KVM fixes for 5.1-rc8 or final
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1556928602;
+        bh=nsZC0USU0psqXiLgGlN+iWonkITiOE1mFKRnJulUJaY=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=kD30eDf/18ex/fkL1b2c+zwAazR0GDfR4wL3CNG3rM/IqUyI5PoxBcBIkBHPNNZKh
+         ts6E7lHd2+H1QRrr8B0CtVtssl1QPInDmEaS78iRaqKVnKuVoecmCb01b5DvSzu2do
+         tvzGLMDrfRpRHeIZKa/giw71rgRO51q2QFl+bI48=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20190503214614.21250-1-pbonzini@redhat.com>
+References: <20190503214614.21250-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20190503214614.21250-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/virt/kvm/kvm.git
+ tags/for-linus
+X-PR-Tracked-Commit-Id: e8ab8d24b488632d07ce5ddb261f1d454114415b
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: aa1be08f52585fe36ecfaf5bddfdc784eb4c94cf
+Message-Id: <155692860261.31859.12161279767404451309.pr-tracker-bot@kernel.org>
+Date:   Sat, 04 May 2019 00:10:02 +0000
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        rkrcmar@kernel.org, kvm@vger.kernel.org
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 03, 2019 at 01:16:30PM -0700, Daniel Jordan wrote:
-> locked_vm accounting is done roughly the same way in five places, so
-> unify them in a helper.  Standardize the debug prints, which vary
-> slightly.  Error codes stay the same, so user-visible behavior does too.
->=20
-> Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-> Cc: Alan Tull <atull@kernel.org>
-> Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Cc: Christoph Lameter <cl@linux.com>
-> Cc: Christophe Leroy <christophe.leroy@c-s.fr>
-> Cc: Davidlohr Bueso <dave@stgolabs.net>
-> Cc: Jason Gunthorpe <jgg@mellanox.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Michael Ellerman <mpe@ellerman.id.au>
-> Cc: Moritz Fischer <mdf@kernel.org>
-> Cc: Paul Mackerras <paulus@ozlabs.org>
-> Cc: Steve Sistare <steven.sistare@oracle.com>
-> Cc: Wu Hao <hao.wu@intel.com>
-> Cc: linux-mm@kvack.org
-> Cc: kvm@vger.kernel.org
-> Cc: kvm-ppc@vger.kernel.org
-> Cc: linuxppc-dev@lists.ozlabs.org
-> Cc: linux-fpga@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
->=20
-> Based on v5.1-rc7.  Tested with the vfio type1 driver.  Any feedback
-> welcome.
->=20
-> Andrew, this one patch replaces these six from [1]:
->=20
->     mm-change-locked_vms-type-from-unsigned-long-to-atomic64_t.patch
->     vfio-type1-drop-mmap_sem-now-that-locked_vm-is-atomic.patch
->     vfio-spapr_tce-drop-mmap_sem-now-that-locked_vm-is-atomic.patch
->     fpga-dlf-afu-drop-mmap_sem-now-that-locked_vm-is-atomic.patch
->     kvm-book3s-drop-mmap_sem-now-that-locked_vm-is-atomic.patch
->     powerpc-mmu-drop-mmap_sem-now-that-locked_vm-is-atomic.patch
->=20
-> That series converts locked_vm to an atomic, but on closer inspection cau=
-ses at
-> least one accounting race in mremap, and fixing it just for this type
-> conversion came with too much ugly in the core mm to justify, especially =
-when
-> the right long-term fix is making these drivers use pinned_vm instead.
+The pull request you sent on Fri,  3 May 2019 15:46:14 -0600:
 
-Did we ever decide what to do here? Should all these drivers be
-switched to pinned_vm anyhow?
+> git://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-Jason
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/aa1be08f52585fe36ecfaf5bddfdc784eb4c94cf
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
