@@ -2,358 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 12A1113D16
-	for <lists+kvm@lfdr.de>; Sun,  5 May 2019 06:20:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93D2F13E88
+	for <lists+kvm@lfdr.de>; Sun,  5 May 2019 10:56:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727404AbfEEEUc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 May 2019 00:20:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54576 "EHLO mx1.redhat.com"
+        id S1727325AbfEEI4u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 May 2019 04:56:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52850 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726895AbfEEEUb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 May 2019 00:20:31 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        id S1726359AbfEEI4u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 May 2019 04:56:50 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3572430832CB;
-        Sun,  5 May 2019 04:20:31 +0000 (UTC)
-Received: from [10.72.12.197] (ovpn-12-197.pek2.redhat.com [10.72.12.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5ACA51001E80;
-        Sun,  5 May 2019 04:20:26 +0000 (UTC)
-Subject: Re: [PATCH net] vhost_net: fix possible infinite loop
-From:   Jason Wang <jasowang@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ppandit@redhat.com
-References: <1556177599-56248-1-git-send-email-jasowang@redhat.com>
- <20190425131021-mutt-send-email-mst@kernel.org>
- <f4b4ff70-d64f-c3fb-fe2e-97ef6c55bda0@redhat.com>
-Message-ID: <999ef863-2994-e0c0-fbb1-a6e92de3fd24@redhat.com>
-Date:   Sun, 5 May 2019 12:20:24 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        by mx1.redhat.com (Postfix) with ESMTPS id C0381309265C
+        for <kvm@vger.kernel.org>; Sun,  5 May 2019 08:56:49 +0000 (UTC)
+Received: from xz-x1.nay.redhat.com (dhcp-14-116.nay.redhat.com [10.66.14.116])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 83DF15C231;
+        Sun,  5 May 2019 08:56:43 +0000 (UTC)
+From:   Peter Xu <peterx@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: [PATCH] kvm: Check irqchip mode before assign irqfd
+Date:   Sun,  5 May 2019 16:56:42 +0800
+Message-Id: <20190505085642.6773-1-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f4b4ff70-d64f-c3fb-fe2e-97ef6c55bda0@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Sun, 05 May 2019 04:20:31 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Sun, 05 May 2019 08:56:49 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+When assigning kvm irqfd we didn't check the irqchip mode but we allow
+KVM_IRQFD to succeed with all the irqchip modes.  However it does not
+make much sense to create irqfd even without the kernel chips.  Let's
+provide a arch-dependent helper to check whether a specific irqfd is
+allowed by the arch.  At least for x86, it should make sense to check:
 
-On 2019/4/26 下午3:35, Jason Wang wrote:
->
-> On 2019/4/26 上午1:52, Michael S. Tsirkin wrote:
->> On Thu, Apr 25, 2019 at 03:33:19AM -0400, Jason Wang wrote:
->>> When the rx buffer is too small for a packet, we will discard the vq
->>> descriptor and retry it for the next packet:
->>>
->>> while ((sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
->>>                           &busyloop_intr))) {
->>> ...
->>>     /* On overrun, truncate and discard */
->>>     if (unlikely(headcount > UIO_MAXIOV)) {
->>>         iov_iter_init(&msg.msg_iter, READ, vq->iov, 1, 1);
->>>         err = sock->ops->recvmsg(sock, &msg,
->>>                      1, MSG_DONTWAIT | MSG_TRUNC);
->>>         pr_debug("Discarded rx packet: len %zd\n", sock_len);
->>>         continue;
->>>     }
->>> ...
->>> }
->>>
->>> This makes it possible to trigger a infinite while..continue loop
->>> through the co-opreation of two VMs like:
->>>
->>> 1) Malicious VM1 allocate 1 byte rx buffer and try to slow down the
->>>     vhost process as much as possible e.g using indirect descriptors or
->>>     other.
->>> 2) Malicious VM2 generate packets to VM1 as fast as possible
->>>
->>> Fixing this by checking against weight at the end of RX and TX
->>> loop. This also eliminate other similar cases when:
->>>
->>> - userspace is consuming the packets in the meanwhile
->>> - theoretical TOCTOU attack if guest moving avail index back and forth
->>>    to hit the continue after vhost find guest just add new buffers
->>>
->>> This addresses CVE-2019-3900.
->>>
->>> Fixes: d8316f3991d20 ("vhost: fix total length when packets are too 
->>> short")
->> I agree this is the real issue.
->>
->>> Fixes: 3a4d5c94e9593 ("vhost_net: a kernel-level virtio server")
->> This is just a red herring imho. We can stick this on any vhost patch :)
->>
->>> Signed-off-by: Jason Wang <jasowang@redhat.com>
->>> ---
->>>   drivers/vhost/net.c | 41 +++++++++++++++++++++--------------------
->>>   1 file changed, 21 insertions(+), 20 deletions(-)
->>>
->>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->>> index df51a35..fb46e6b 100644
->>> --- a/drivers/vhost/net.c
->>> +++ b/drivers/vhost/net.c
->>> @@ -778,8 +778,9 @@ static void handle_tx_copy(struct vhost_net 
->>> *net, struct socket *sock)
->>>       int err;
->>>       int sent_pkts = 0;
->>>       bool sock_can_batch = (sock->sk->sk_sndbuf == INT_MAX);
->>> +    bool next_round = false;
->>>   -    for (;;) {
->>> +    do {
->>>           bool busyloop_intr = false;
->>>             if (nvq->done_idx == VHOST_NET_BATCH)
->>> @@ -845,11 +846,10 @@ static void handle_tx_copy(struct vhost_net 
->>> *net, struct socket *sock)
->>>           vq->heads[nvq->done_idx].id = cpu_to_vhost32(vq, head);
->>>           vq->heads[nvq->done_idx].len = 0;
->>>           ++nvq->done_idx;
->>> -        if (vhost_exceeds_weight(++sent_pkts, total_len)) {
->>> -            vhost_poll_queue(&vq->poll);
->>> -            break;
->>> -        }
->>> -    }
->>> +    } while (!(next_round = vhost_exceeds_weight(++sent_pkts, 
->>> total_len)));
->>> +
->>> +    if (next_round)
->>> +        vhost_poll_queue(&vq->poll);
->>>         vhost_tx_batch(net, nvq, sock, &msg);
->>>   }
->>> @@ -873,8 +873,9 @@ static void handle_tx_zerocopy(struct vhost_net 
->>> *net, struct socket *sock)
->>>       struct vhost_net_ubuf_ref *uninitialized_var(ubufs);
->>>       bool zcopy_used;
->>>       int sent_pkts = 0;
->>> +    bool next_round = false;
->>>   -    for (;;) {
->>> +    do {
->>>           bool busyloop_intr;
->>>             /* Release DMAs done buffers first */
->>> @@ -951,11 +952,10 @@ static void handle_tx_zerocopy(struct 
->>> vhost_net *net, struct socket *sock)
->>>           else
->>>               vhost_zerocopy_signal_used(net, vq);
->>>           vhost_net_tx_packet(net);
->>> -        if (unlikely(vhost_exceeds_weight(++sent_pkts, total_len))) {
->>> -            vhost_poll_queue(&vq->poll);
->>> -            break;
->>> -        }
->>> -    }
->>> +    } while (!(next_round = vhost_exceeds_weight(++sent_pkts, 
->>> total_len)));
->>> +
->>> +    if (next_round)
->>> +        vhost_poll_queue(&vq->poll);
->>>   }
->>>     /* Expects to be always run from workqueue - which acts as
->>> @@ -1134,6 +1134,7 @@ static void handle_rx(struct vhost_net *net)
->>>       struct iov_iter fixup;
->>>       __virtio16 num_buffers;
->>>       int recv_pkts = 0;
->>> +    bool next_round = false;
->>>         mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
->>>       sock = vq->private_data;
->>> @@ -1153,8 +1154,11 @@ static void handle_rx(struct vhost_net *net)
->>>           vq->log : NULL;
->>>       mergeable = vhost_has_feature(vq, VIRTIO_NET_F_MRG_RXBUF);
->>>   -    while ((sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
->>> -                              &busyloop_intr))) {
->>> +    do {
->>> +        sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
->>> +                              &busyloop_intr);
->>> +        if (!sock_len)
->>> +            break;
->>>           sock_len += sock_hlen;
->>>           vhost_len = sock_len + vhost_hlen;
->>>           headcount = get_rx_bufs(vq, vq->heads + nvq->done_idx,
->>> @@ -1239,12 +1243,9 @@ static void handle_rx(struct vhost_net *net)
->>>               vhost_log_write(vq, vq_log, log, vhost_len,
->>>                       vq->iov, in);
->>>           total_len += vhost_len;
->>> -        if (unlikely(vhost_exceeds_weight(++recv_pkts, total_len))) {
->>> -            vhost_poll_queue(&vq->poll);
->>> -            goto out;
->>> -        }
->>> -    }
->>> -    if (unlikely(busyloop_intr))
->>> +    } while (!(next_round = vhost_exceeds_weight(++recv_pkts, 
->>> total_len)));
->>> +
->>> +    if (unlikely(busyloop_intr || next_round))
->>>           vhost_poll_queue(&vq->poll);
->>>       else
->>>           vhost_net_enable_vq(net, vq);
->>
->> I'm afraid with this addition the code is too much like spagetty. What
->> does next_round mean?  Just that we are breaking out of loop?
->
->
-> Yes, we can have a better name of course.
->
->
->> That is
->> what goto is for...  Either let's have for(;;) with goto/break to get
->> outside or a while loop with a condition.  Both is just unreadable.
->>
->> All these checks in 3 places are exactly the same on all paths and they
->> are slow path. Why don't we put this in a function?
->
->
-> The point I think is, we want the weight to be checked in both fast 
-> path and slow path.
->
->
->> E.g. like the below.
->> Warning: completely untested.
->>
->> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>
->> ---
->>
->> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->> index df51a35cf537..a0f89a504cd9 100644
->> --- a/drivers/vhost/net.c
->> +++ b/drivers/vhost/net.c
->> @@ -761,6 +761,23 @@ static int vhost_net_build_xdp(struct 
->> vhost_net_virtqueue *nvq,
->>       return 0;
->>   }
->>   +/* Returns true if caller needs to go back and re-read the ring. */
->> +static bool empty_ring(struct vhost_net *net, struct vhost_virtqueue 
->> *vq,
->> +               int pkts, size_t total_len, bool busyloop_intr)
->> +{
->> +    if (unlikely(busyloop_intr)) {
->> +        vhost_poll_queue(&vq->poll);
->> +    } else if (unlikely(vhost_enable_notify(&net->dev, vq))) {
->> +        /* They have slipped one in meanwhile: check again. */
->> +        vhost_disable_notify(&net->dev, vq);
->> +        if (!vhost_exceeds_weight(pkts, total_len))
->> +            return true;
->> +        vhost_poll_queue(&vq->poll);
->> +    }
->> +    /* Nothing new?  Wait for eventfd to tell us they refilled. */
->> +    return false;
->> +}
->
->
-> Ring empy is not the only places that needs care. E.g for RX, we need 
-> care about overrun and when userspace is consuming the packet in the 
-> same time. So there's no need to toggle vq notification in those two.
->
->
->> +
->>   static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
->>   {
->>       struct vhost_net_virtqueue *nvq = &net->vqs[VHOST_NET_VQ_TX];
->> @@ -790,15 +807,10 @@ static void handle_tx_copy(struct vhost_net 
->> *net, struct socket *sock)
->>           /* On error, stop handling until the next kick. */
->>           if (unlikely(head < 0))
->>               break;
->> -        /* Nothing new?  Wait for eventfd to tell us they refilled. */
->>           if (head == vq->num) {
->> -            if (unlikely(busyloop_intr)) {
->> -                vhost_poll_queue(&vq->poll);
->> -            } else if (unlikely(vhost_enable_notify(&net->dev,
->> -                                vq))) {
->> -                vhost_disable_notify(&net->dev, vq);
->> +            if (unlikely(empty_ring(net, vq, ++sent_pkts,
->> +                        total_len, busyloop_intr)))
->>                   continue;
->> -            }
->>               break;
->>           }
->>   @@ -886,14 +898,10 @@ static void handle_tx_zerocopy(struct 
->> vhost_net *net, struct socket *sock)
->>           /* On error, stop handling until the next kick. */
->>           if (unlikely(head < 0))
->>               break;
->> -        /* Nothing new?  Wait for eventfd to tell us they refilled. */
->>           if (head == vq->num) {
->> -            if (unlikely(busyloop_intr)) {
->> -                vhost_poll_queue(&vq->poll);
->> -            } else if (unlikely(vhost_enable_notify(&net->dev, vq))) {
->> -                vhost_disable_notify(&net->dev, vq);
->> +            if (unlikely(empty_ring(net, vq, ++sent_pkts,
->> +                        total_len, busyloop_intr)))
->>                   continue;
->> -            }
->>               break;
->>           }
->>   @@ -1163,18 +1171,10 @@ static void handle_rx(struct vhost_net *net)
->>           /* On error, stop handling until the next kick. */
->>           if (unlikely(headcount < 0))
->>               goto out;
->> -        /* OK, now we need to know about added descriptors. */
->>           if (!headcount) {
->> -            if (unlikely(busyloop_intr)) {
->> -                vhost_poll_queue(&vq->poll);
->> -            } else if (unlikely(vhost_enable_notify(&net->dev, vq))) {
->> -                /* They have slipped one in as we were
->> -                 * doing that: check again. */
->> -                vhost_disable_notify(&net->dev, vq);
->> -                continue;
->> -            }
->> -            /* Nothing new?  Wait for eventfd to tell us
->> -             * they refilled. */
->> +            if (unlikely(empty_ring(net, vq, ++recv_pkts,
->> +                        total_len, busyloop_intr)))
->> +                    continue;
->>               goto out;
->>           }
->>           busyloop_intr = false;
->
-> The patch misses several other continue that need cares and there's 
-> another call of vhost_exceeds_weight() at the end of the loop.
->
-> So instead of duplicating check everywhere like:
->
-> for (;;) {
->     if (condition_x) {
->         if (empty_ring())
->             continue;
->         break;
->     }
->     if (condition_y) {
->         if (empty_ring());
->             continue;
->         break;
->     }
->     if (condition_z) {
->         if (empty_ring())
->             continue;
->         break;
->     }
->
-> }
->
-> What this patch did:
->
-> do {
->    if (condition_x)
->     continue;
->    if (condition_y)
->     continue;
->    if (condition_z)
->     continue;
-> } while(!need_break())
->
-> is much more compact and easier to read?
->
-> Thanks
+- when irqchip mode is NONE, all irqfds should be disallowed, and,
 
+- when irqchip mode is SPLIT, irqfds that are with resamplefd should
+  be disallowed.
 
-Hi Michael:
+For either of the case, previously we'll silently ignore the irq or
+the irq ack event if the irqchip mode is incorrect.  However that can
+cause misterious guest behaviors and it can be hard to triage.  Let's
+fail KVM_IRQFD even earlier to detect these incorrect configurations.
 
-Any more comments?
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: Radim Krčmář <rkrcmar@redhat.com>
+CC: Alex Williamson <alex.williamson@redhat.com>
+CC: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ arch/x86/kvm/irq.c | 7 +++++++
+ arch/x86/kvm/irq.h | 1 +
+ virt/kvm/eventfd.c | 9 +++++++++
+ 3 files changed, 17 insertions(+)
 
-Thanks
+diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
+index faa264822cee..007bc654f928 100644
+--- a/arch/x86/kvm/irq.c
++++ b/arch/x86/kvm/irq.c
+@@ -172,3 +172,10 @@ void __kvm_migrate_timers(struct kvm_vcpu *vcpu)
+ 	__kvm_migrate_apic_timer(vcpu);
+ 	__kvm_migrate_pit_timer(vcpu);
+ }
++
++bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
++{
++	bool resample = args->flags & KVM_IRQFD_FLAG_RESAMPLE;
++
++	return resample ? irqchip_kernel(kvm) : irqchip_in_kernel(kvm);
++}
+diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
+index d5005cc26521..fd210cdd4983 100644
+--- a/arch/x86/kvm/irq.h
++++ b/arch/x86/kvm/irq.h
+@@ -114,6 +114,7 @@ static inline int irqchip_in_kernel(struct kvm *kvm)
+ 	return mode != KVM_IRQCHIP_NONE;
+ }
+ 
++bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
+ void kvm_inject_pending_timer_irqs(struct kvm_vcpu *vcpu);
+ void kvm_inject_apic_timer_irqs(struct kvm_vcpu *vcpu);
+ void kvm_apic_nmi_wd_deliver(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+index 001aeda4c154..3972a9564c76 100644
+--- a/virt/kvm/eventfd.c
++++ b/virt/kvm/eventfd.c
+@@ -44,6 +44,12 @@
+ 
+ static struct workqueue_struct *irqfd_cleanup_wq;
+ 
++bool __attribute__((weak))
++kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
++{
++	return true;
++}
++
+ static void
+ irqfd_inject(struct work_struct *work)
+ {
+@@ -297,6 +303,9 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
+ 	if (!kvm_arch_intc_initialized(kvm))
+ 		return -EAGAIN;
+ 
++	if (!kvm_arch_irqfd_allowed(kvm, args))
++		return -EINVAL;
++
+ 	irqfd = kzalloc(sizeof(*irqfd), GFP_KERNEL_ACCOUNT);
+ 	if (!irqfd)
+ 		return -ENOMEM;
+-- 
+2.17.1
 
