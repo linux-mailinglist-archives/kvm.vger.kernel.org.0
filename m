@@ -2,167 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E29313D9C
-	for <lists+kvm@lfdr.de>; Sun,  5 May 2019 07:58:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1466213C72
+	for <lists+kvm@lfdr.de>; Sun,  5 May 2019 02:42:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727259AbfEEF6L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 May 2019 01:58:11 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:36192 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725814AbfEEF6K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 May 2019 01:58:10 -0400
-Received: by mail-pl1-f194.google.com with SMTP id cb4so805104plb.3
-        for <kvm@vger.kernel.org>; Sat, 04 May 2019 22:58:10 -0700 (PDT)
+        id S1727363AbfEEAmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 May 2019 20:42:42 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:37902 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727097AbfEEAmm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 May 2019 20:42:42 -0400
+Received: by mail-ot1-f66.google.com with SMTP id b1so8538028otp.5
+        for <kvm@vger.kernel.org>; Sat, 04 May 2019 17:42:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=nBaAaZbmRcdZVOUAKNjhL5fk7tl5aUZlBDobzpQRnpY=;
-        b=C5XxHHYDWbRTkbnG9sf2ivuEXDMQiWiDiBl3yhU8brdPf1zdd7tlX8kFYXsZGHLRyS
-         mmN2/eKSmGeaVHSpmyJvFUbLfUqMtaZJt87oyLm5LC9WUql6/OD1bGo7lfw2rb1yTaD+
-         H/FgGg+o3kVrckGJd9QbNZrh7SJepl8pQCR3iKRjN29Nj5pyrlidLgINiGdDaswm1v/z
-         Uab/lELuuC1ThoKtjItRBBA936FR1ghVakVcQupQ+QxdZux1UuFkilRkdoatLxeHohbO
-         VldTJpfo7p8V0+BO2Y/5CS01VOokSvd1R8h78O3q7L9PzNo7JESyDeqAQpcqT3AI8w34
-         60TQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jeQ0HZPBCt2G/YlOyC7w06hA9OEWaOr8t0jhlCW28Uk=;
+        b=Ph9PvZjqS5ZEvJQwjLwVpbLCwjyDwXns1oIO24T8CXwpImZa8If9RvZgqTxJ9EVyAT
+         O6mctlsjywvjCmcz9ecQ4hiqmMoNkC5hul9v4FAv+u65IynNAXUTjDcTnBBwIDBWaBSt
+         5jyd/6LqtClgb3KHm0eUMXHXbmcfJYq+A2dXnArPqtU3VFq531Rccsn3cNG+uFbipqje
+         xz0MH2nZOxatpjiSdWqA0blBFHsmo607n7Xpt4kSO/GBOq0/JaiaNuF7+ADHeAjG2K8q
+         ly0PTXJiGARy/KJtMYbJlXd07chhS/qD8AqI9vwrp96a9PxzP+S/whmyUvWrNY3M8O7h
+         BpHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=nBaAaZbmRcdZVOUAKNjhL5fk7tl5aUZlBDobzpQRnpY=;
-        b=rYpFA3s+q2d3FJvY3KYUBTr/uXhjwclAIUlVsNY7lfbQXJZIJbnmBo9I/p8+O+BZG3
-         tn8qNRX7mGJzOV2KlHhoWw7mLXIyMJ2Y8a4M87IWtu7xyibWUS0CbSVxTUoRC4P5YAev
-         aBgJp52P5cU+zl37stWIEW6bXRkCxO37pxTRWEGQ3a0x56xzaI4eEWABcOjOcE6EBPJT
-         pnj2CcUOTdWcywETBhdpUGikXkoQa4WySrp5cmOpOtyLCmqSKp6UTAIQPIc0+hIjsOWu
-         jaFXTYN8mdL65AWKdVCkve57GuL8LTxGaI5waa+FE9ryIZth77VV2oK1SPTEcbLv5O92
-         5vFw==
-X-Gm-Message-State: APjAAAUH0GCgD+Gis4RmBbX+XVNWbY2v/slfzf9vxZIhIVdmWozRMAhT
-        7AvGEP1jkDq9Hb3Z4+oQlHS8yi+bBXA=
-X-Google-Smtp-Source: APXvYqwcYEFuKxOoNuVJpHPpkulchUWcuwaq+jWaW5eugHt0xSArRC759A8u3ESAuB06j6OXo9WOfQ==
-X-Received: by 2002:a17:902:2cc1:: with SMTP id n59mr23561549plb.22.1557035890171;
-        Sat, 04 May 2019 22:58:10 -0700 (PDT)
-Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id f5sm7474018pgo.75.2019.05.04.22.58.08
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 04 May 2019 22:58:09 -0700 (PDT)
-From:   Nadav Amit <nadav.amit@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: [kvm-unit-tests PATCH v3] x86: Incorporate timestamp in delay() and call the latter in io_delay()
-Date:   Sat,  4 May 2019 15:36:18 -0700
-Message-Id: <20190504223618.26742-1-nadav.amit@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jeQ0HZPBCt2G/YlOyC7w06hA9OEWaOr8t0jhlCW28Uk=;
+        b=ZweSTzFfupUuZGastyjtNnMfqpDim56pAo93ypp+P054Ec0pY64JKqZ8/f3NRW0WDZ
+         Ow/cZkTzB8yXdhl6eE0b2UrOH2iDKmeQHC0H2e/7T3hD+HqGTjkz2ZLkg4c3JKmiGFOa
+         UKpZSE7ucfmGqiNPoB+29tmwsubF0W2aUWDMLqvw1JgmGsOGU2CSwRDK/bTZh+GwkCnR
+         e2q7n9z2BC+WfVFBtbX0lWSn0VCFFHEgtJV/YKm6/oTMKmIVV/Enb5JgA7RpP1ubNfA3
+         POo7+3NVY8tJ25rm5uUo1F1nr/sv++jPnEKWvYuchguDMDL03TEUv9sTwr8UVBmWcXxW
+         6q7g==
+X-Gm-Message-State: APjAAAVdFujr5omEiMdRve5fLBpecMkexX+e8hvj7L7B/uh45gABkbJG
+        JHhxq9zDZJQr+hWRAJxJ1OW7FHPaDmKdS1RsQY4=
+X-Google-Smtp-Source: APXvYqxMyi5OnlHeKlsFNSXNoHVn6A75E+mjycI9iKvAU1a1YxAgUeouvpuuuMnyTDcXk3OlNVhAypmAiid+d0q7+zI=
+X-Received: by 2002:a9d:5882:: with SMTP id x2mr8513002otg.49.1557016961473;
+ Sat, 04 May 2019 17:42:41 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190417171534.10385-1-sean.j.christopherson@intel.com>
+ <CANRm+CxcmjzV_6q-nf59dZ+4nbifM389kqQy514XFDQSKjxZvg@mail.gmail.com> <20190430193102.GA4523@linux.intel.com>
+In-Reply-To: <20190430193102.GA4523@linux.intel.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Sun, 5 May 2019 08:43:24 +0800
+Message-ID: <CANRm+CyUbJM8syuF1FGhrM4nSQgB_KUYsLNg3nr7RT2vzbuxfw@mail.gmail.com>
+Subject: Re: [PATCH v4 0/4] KVM: lapic: Fix a variety of timer adv issues
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm <kvm@vger.kernel.org>, Liran Alon <liran.alon@oracle.com>,
+        Wanpeng Li <wanpengli@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There is no guarantee that a self-IPI would be delivered immediately.
-In eventinj, io_delay() is called after self-IPI is generated but does
-nothing.
+On Wed, 1 May 2019 at 03:31, Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Sun, Apr 28, 2019 at 08:54:30AM +0800, Wanpeng Li wrote:
+> > Hi Sean,
+> > On Thu, 18 Apr 2019 at 01:18, Sean Christopherson
+> > <sean.j.christopherson@intel.com> wrote:
+> > >
+> > > KVM's recently introduced adaptive tuning of lapic_timer_advance_ns has
+> > > several critical flaws:
+> > [.../...]
+> > >
+> > >   - TSC scaling is done on a per-vCPU basis, while the advancement value
+> > >     is global.  This issue is also present without adaptive tuning, but
+> > >     is now more pronounced.
+> >
+> > Did you test this against overcommit scenario? Your per-vCPU variable
+> > can be a large number(yeah, below your 5000ns) when neighbour VMs on
+> > the same host consume cpu heavily, however, kvm will wast a lot of
+> > time to wait when the neighbour VMs are idle. My original patch
+> > evaluate the conservative hypervisor overhead when the first VM is
+> > deployed on the host. It doesn't matter whether or not the VMs on this
+> > host alter their workload behaviors later. Unless you tune the
+> > per-vCPU variable always, however, I think it will introduce more
+> > overhead. So Liran's patch "Consider LAPIC TSC-Deadline Timer expired
+> > if deadline too short" also can't depend on this.
+>
+> I didn't test it in overcommit scenarios.  I wasn't aware of how the
 
-In general, there is mess in regard to delay() and io_delay(). There are
-two definitions of delay() and they do not really look on the timestamp
-counter and instead count invocations of "pause" (or even "nop"), which
-might be different on different CPUs/setups, for example due to
-different pause-loop-exiting configurations.
+I think it should be considered.
 
-To address these issues change io_delay() to really do a delay, based on
-timestamp counter, and move common functions into delay.[hc].
+> automatic adjustments were being used in real deployments.
+>
+> The best option I can think of is to expose a vCPU's advance time to
+> userspace (not sure what mechanism would be best).  This would allow
+> userspace to run a single vCPU VM with auto-tuning enabled, snapshot
+> the final adjusted advancment, and then update KVM's parameter to set
+> an explicit advancement and effectively disable auto-tuning.
 
-Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
----
- lib/x86/delay.c | 9 ++++++---
- lib/x86/delay.h | 7 +++++++
- x86/eventinj.c  | 5 +----
- x86/ioapic.c    | 8 +-------
- 4 files changed, 15 insertions(+), 14 deletions(-)
+This step is too complex to deploy in real environment, the same as
+w/o auto-tuning. My auto-tuning patch evaluates the conservative
+hypervisor overhead when the first VM is deployed on the host, and
+auto-tuning it only once for the whole machine.
 
-diff --git a/lib/x86/delay.c b/lib/x86/delay.c
-index 595ad24..e7d2717 100644
---- a/lib/x86/delay.c
-+++ b/lib/x86/delay.c
-@@ -1,8 +1,11 @@
- #include "delay.h"
-+#include "processor.h"
- 
- void delay(u64 count)
- {
--	while (count--)
--		asm volatile("pause");
--}
-+	u64 start = rdtsc();
- 
-+	do {
-+		pause();
-+	} while (rdtsc() - start < count);
-+}
-diff --git a/lib/x86/delay.h b/lib/x86/delay.h
-index a9bf894..a51eb34 100644
---- a/lib/x86/delay.h
-+++ b/lib/x86/delay.h
-@@ -3,6 +3,13 @@
- 
- #include "libcflat.h"
- 
-+#define IPI_DELAY 1000000
-+
- void delay(u64 count);
- 
-+static inline void io_delay(void)
-+{
-+	delay(IPI_DELAY);
-+}
-+
- #endif
-diff --git a/x86/eventinj.c b/x86/eventinj.c
-index d2dfc40..901b9db 100644
---- a/x86/eventinj.c
-+++ b/x86/eventinj.c
-@@ -7,6 +7,7 @@
- #include "apic-defs.h"
- #include "vmalloc.h"
- #include "alloc_page.h"
-+#include "delay.h"
- 
- #ifdef __x86_64__
- #  define R "r"
-@@ -16,10 +17,6 @@
- 
- void do_pf_tss(void);
- 
--static inline void io_delay(void)
--{
--}
--
- static void apic_self_ipi(u8 v)
- {
- 	apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_FIXED |
-diff --git a/x86/ioapic.c b/x86/ioapic.c
-index 2ac4ac6..c32dabd 100644
---- a/x86/ioapic.c
-+++ b/x86/ioapic.c
-@@ -4,6 +4,7 @@
- #include "smp.h"
- #include "desc.h"
- #include "isr.h"
-+#include "delay.h"
- 
- static void toggle_irq_line(unsigned line)
- {
-@@ -165,13 +166,6 @@ static void test_ioapic_level_tmr(bool expected_tmr_before)
- 	       expected_tmr_before ? "true" : "false");
- }
- 
--#define IPI_DELAY 1000000
--
--static void delay(int count)
--{
--	while(count--) asm("");
--}
--
- static void toggle_irq_line_0x0e(void *data)
- {
- 	irq_disable();
--- 
-2.17.1
-
+Regards,
+Wanpeng Li
