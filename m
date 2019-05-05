@@ -2,106 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1466213C72
-	for <lists+kvm@lfdr.de>; Sun,  5 May 2019 02:42:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66A0013C99
+	for <lists+kvm@lfdr.de>; Sun,  5 May 2019 03:26:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727363AbfEEAmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 May 2019 20:42:42 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:37902 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727097AbfEEAmm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 May 2019 20:42:42 -0400
-Received: by mail-ot1-f66.google.com with SMTP id b1so8538028otp.5
-        for <kvm@vger.kernel.org>; Sat, 04 May 2019 17:42:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jeQ0HZPBCt2G/YlOyC7w06hA9OEWaOr8t0jhlCW28Uk=;
-        b=Ph9PvZjqS5ZEvJQwjLwVpbLCwjyDwXns1oIO24T8CXwpImZa8If9RvZgqTxJ9EVyAT
-         O6mctlsjywvjCmcz9ecQ4hiqmMoNkC5hul9v4FAv+u65IynNAXUTjDcTnBBwIDBWaBSt
-         5jyd/6LqtClgb3KHm0eUMXHXbmcfJYq+A2dXnArPqtU3VFq531Rccsn3cNG+uFbipqje
-         xz0MH2nZOxatpjiSdWqA0blBFHsmo607n7Xpt4kSO/GBOq0/JaiaNuF7+ADHeAjG2K8q
-         ly0PTXJiGARy/KJtMYbJlXd07chhS/qD8AqI9vwrp96a9PxzP+S/whmyUvWrNY3M8O7h
-         BpHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jeQ0HZPBCt2G/YlOyC7w06hA9OEWaOr8t0jhlCW28Uk=;
-        b=ZweSTzFfupUuZGastyjtNnMfqpDim56pAo93ypp+P054Ec0pY64JKqZ8/f3NRW0WDZ
-         Ow/cZkTzB8yXdhl6eE0b2UrOH2iDKmeQHC0H2e/7T3hD+HqGTjkz2ZLkg4c3JKmiGFOa
-         UKpZSE7ucfmGqiNPoB+29tmwsubF0W2aUWDMLqvw1JgmGsOGU2CSwRDK/bTZh+GwkCnR
-         e2q7n9z2BC+WfVFBtbX0lWSn0VCFFHEgtJV/YKm6/oTMKmIVV/Enb5JgA7RpP1ubNfA3
-         POo7+3NVY8tJ25rm5uUo1F1nr/sv++jPnEKWvYuchguDMDL03TEUv9sTwr8UVBmWcXxW
-         6q7g==
-X-Gm-Message-State: APjAAAVdFujr5omEiMdRve5fLBpecMkexX+e8hvj7L7B/uh45gABkbJG
-        JHhxq9zDZJQr+hWRAJxJ1OW7FHPaDmKdS1RsQY4=
-X-Google-Smtp-Source: APXvYqxMyi5OnlHeKlsFNSXNoHVn6A75E+mjycI9iKvAU1a1YxAgUeouvpuuuMnyTDcXk3OlNVhAypmAiid+d0q7+zI=
-X-Received: by 2002:a9d:5882:: with SMTP id x2mr8513002otg.49.1557016961473;
- Sat, 04 May 2019 17:42:41 -0700 (PDT)
+        id S1727343AbfEEB0U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 May 2019 21:26:20 -0400
+Received: from mga02.intel.com ([134.134.136.20]:59955 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726965AbfEEB0U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 May 2019 21:26:20 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 May 2019 18:26:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,431,1549958400"; 
+   d="scan'208";a="146319205"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.136]) ([10.239.159.136])
+  by fmsmga008.fm.intel.com with ESMTP; 04 May 2019 18:26:14 -0700
+Cc:     baolu.lu@linux.intel.com, Heiko Stuebner <heiko@sntech.de>,
+        kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>,
+        David Brown <david.brown@linaro.org>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        linux-s390@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        linux-rockchip@lists.infradead.org, Kukjin Kim <kgene@kernel.org>,
+        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
+        Andy Gross <andy.gross@linaro.org>,
+        linux-tegra@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
+        linux-arm-msm@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-mediatek@lists.infradead.org,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-arm-kernel@lists.infradead.org,
+        Robin Murphy <robin.murphy@arm.com>,
+        linux-kernel@vger.kernel.org, murphyt7@tcd.ie,
+        David Woodhouse <dwmw2@infradead.org>
+Subject: Re: [RFC 2/7] iommu/vt-d: Remove iova handling code from non-dma ops
+ path
+To:     Tom Murphy <tmurphy@arista.com>, iommu@lists.linux-foundation.org
+References: <20190504132327.27041-1-tmurphy@arista.com>
+ <20190504132327.27041-3-tmurphy@arista.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <bf35694d-3ff4-0df7-0802-b0e87a9a0d47@linux.intel.com>
+Date:   Sun, 5 May 2019 09:19:51 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190417171534.10385-1-sean.j.christopherson@intel.com>
- <CANRm+CxcmjzV_6q-nf59dZ+4nbifM389kqQy514XFDQSKjxZvg@mail.gmail.com> <20190430193102.GA4523@linux.intel.com>
-In-Reply-To: <20190430193102.GA4523@linux.intel.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Sun, 5 May 2019 08:43:24 +0800
-Message-ID: <CANRm+CyUbJM8syuF1FGhrM4nSQgB_KUYsLNg3nr7RT2vzbuxfw@mail.gmail.com>
-Subject: Re: [PATCH v4 0/4] KVM: lapic: Fix a variety of timer adv issues
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm <kvm@vger.kernel.org>, Liran Alon <liran.alon@oracle.com>,
-        Wanpeng Li <wanpengli@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190504132327.27041-3-tmurphy@arista.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 1 May 2019 at 03:31, Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Sun, Apr 28, 2019 at 08:54:30AM +0800, Wanpeng Li wrote:
-> > Hi Sean,
-> > On Thu, 18 Apr 2019 at 01:18, Sean Christopherson
-> > <sean.j.christopherson@intel.com> wrote:
-> > >
-> > > KVM's recently introduced adaptive tuning of lapic_timer_advance_ns has
-> > > several critical flaws:
-> > [.../...]
-> > >
-> > >   - TSC scaling is done on a per-vCPU basis, while the advancement value
-> > >     is global.  This issue is also present without adaptive tuning, but
-> > >     is now more pronounced.
-> >
-> > Did you test this against overcommit scenario? Your per-vCPU variable
-> > can be a large number(yeah, below your 5000ns) when neighbour VMs on
-> > the same host consume cpu heavily, however, kvm will wast a lot of
-> > time to wait when the neighbour VMs are idle. My original patch
-> > evaluate the conservative hypervisor overhead when the first VM is
-> > deployed on the host. It doesn't matter whether or not the VMs on this
-> > host alter their workload behaviors later. Unless you tune the
-> > per-vCPU variable always, however, I think it will introduce more
-> > overhead. So Liran's patch "Consider LAPIC TSC-Deadline Timer expired
-> > if deadline too short" also can't depend on this.
->
-> I didn't test it in overcommit scenarios.  I wasn't aware of how the
+Hi,
 
-I think it should be considered.
+On 5/4/19 9:23 PM, Tom Murphy via iommu wrote:
+> @@ -4181,58 +4168,37 @@ static int intel_iommu_memory_notifier(struct notifier_block *nb,
+>   				       unsigned long val, void *v)
+>   {
+>   	struct memory_notify *mhp = v;
+> -	unsigned long long start, end;
+> -	unsigned long start_vpfn, last_vpfn;
+> +	unsigned long start_vpfn = mm_to_dma_pfn(mhp->start_pfn);
+> +	unsigned long last_vpfn = mm_to_dma_pfn(mhp->start_pfn +
+> +			mhp->nr_pages - 1);
+>   
+>   	switch (val) {
+>   	case MEM_GOING_ONLINE:
+> -		start = mhp->start_pfn << PAGE_SHIFT;
+> -		end = ((mhp->start_pfn + mhp->nr_pages) << PAGE_SHIFT) - 1;
+> -		if (iommu_domain_identity_map(si_domain, start, end)) {
+> -			pr_warn("Failed to build identity map for [%llx-%llx]\n",
+> -				start, end);
+> +		if (iommu_domain_identity_map(si_domain, start_vpfn,
+> +					last_vpfn)) {
+> +			pr_warn("Failed to build identity map for [%lx-%lx]\n",
+> +				start_vpfn, last_vpfn);
+>   			return NOTIFY_BAD;
+>   		}
+>   		break;
 
-> automatic adjustments were being used in real deployments.
->
-> The best option I can think of is to expose a vCPU's advance time to
-> userspace (not sure what mechanism would be best).  This would allow
-> userspace to run a single vCPU VM with auto-tuning enabled, snapshot
-> the final adjusted advancment, and then update KVM's parameter to set
-> an explicit advancement and effectively disable auto-tuning.
+Actually we don't need to update the si_domain if iommu hardware
+supports pass-through mode. This should be made in a separated patch
+anyway.
 
-This step is too complex to deploy in real environment, the same as
-w/o auto-tuning. My auto-tuning patch evaluates the conservative
-hypervisor overhead when the first VM is deployed on the host, and
-auto-tuning it only once for the whole machine.
-
-Regards,
-Wanpeng Li
+Best regards,
+Lu Baolu
