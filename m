@@ -2,76 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B92F915506
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 22:43:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BF021550D
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 22:47:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726638AbfEFUnx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 May 2019 16:43:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56376 "EHLO
+        id S1726438AbfEFUrq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 May 2019 16:47:46 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54918 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726602AbfEFUnx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 May 2019 16:43:53 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x46KCXEs055497
-        for <kvm@vger.kernel.org>; Mon, 6 May 2019 16:43:52 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2sauje1n0p-1
+        by vger.kernel.org with ESMTP id S1726160AbfEFUrp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 May 2019 16:47:45 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x46KlKEv056378
+        for <kvm@vger.kernel.org>; Mon, 6 May 2019 16:47:44 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sauwu8rm8-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 06 May 2019 16:43:51 -0400
+        for <kvm@vger.kernel.org>; Mon, 06 May 2019 16:47:44 -0400
 Received: from localhost
-        by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <akrowiak@linux.ibm.com>;
-        Mon, 6 May 2019 21:43:50 +0100
-Received: from b01cxnp22035.gho.pok.ibm.com (9.57.198.25)
-        by e17.ny.us.ibm.com (146.89.104.204) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <farman@linux.ibm.com>;
+        Mon, 6 May 2019 21:47:43 +0100
+Received: from b03cxnp08027.gho.boulder.ibm.com (9.17.130.19)
+        by e32.co.us.ibm.com (192.168.1.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 6 May 2019 21:43:47 +0100
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x46KhjiQ36241492
+        Mon, 6 May 2019 21:47:42 +0100
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x46KleMJ56819760
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 May 2019 20:43:45 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5727FAC05E;
-        Mon,  6 May 2019 20:43:45 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F0248AC059;
-        Mon,  6 May 2019 20:43:44 +0000 (GMT)
-Received: from [9.60.75.251] (unknown [9.60.75.251])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  6 May 2019 20:43:44 +0000 (GMT)
-Subject: Re: [PATCH v2 6/7] s390: vfio-ap: handle bind and unbind of AP queue
- device
-To:     pmorel@linux.ibm.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        frankja@linux.ibm.com, david@redhat.com, schwidefsky@de.ibm.com,
-        heiko.carstens@de.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com
-References: <1556918073-13171-1-git-send-email-akrowiak@linux.ibm.com>
- <1556918073-13171-7-git-send-email-akrowiak@linux.ibm.com>
- <acf4e2fe-7b91-718c-f1f7-f4678eda52e0@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Date:   Mon, 6 May 2019 16:43:44 -0400
+        Mon, 6 May 2019 20:47:40 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9EF27BE054;
+        Mon,  6 May 2019 20:47:40 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A9DB5BE04F;
+        Mon,  6 May 2019 20:47:39 +0000 (GMT)
+Received: from [9.85.216.218] (unknown [9.85.216.218])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Mon,  6 May 2019 20:47:39 +0000 (GMT)
+Subject: Re: [PATCH 7/7] s390/cio: Remove vfio-ccw checks of command codes
+From:   Eric Farman <farman@linux.ibm.com>
+To:     pmorel@linux.ibm.com, Cornelia Huck <cohuck@redhat.com>,
+        Farhan Ali <alifm@linux.ibm.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20190503134912.39756-1-farman@linux.ibm.com>
+ <20190503134912.39756-8-farman@linux.ibm.com>
+ <8625f759-0a2d-09af-c8b5-5b312d854ba1@linux.ibm.com>
+ <7c897993-d146-bf8e-48ad-11a914a04716@linux.ibm.com>
+Date:   Mon, 6 May 2019 16:47:38 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <acf4e2fe-7b91-718c-f1f7-f4678eda52e0@linux.ibm.com>
+In-Reply-To: <7c897993-d146-bf8e-48ad-11a914a04716@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 19050620-0040-0000-0000-000004EC0CA3
+x-cbid: 19050620-0004-0000-0000-0000150AD0DD
 X-IBM-SpamModules-Scores: 
 X-IBM-SpamModules-Versions: BY=3.00011061; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000285; SDB=6.01199558; UDB=6.00629330; IPR=6.00980434;
- MB=3.00026760; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-06 20:43:50
+ PH=3.00000004; SC=3.00000285; SDB=6.01199559; UDB=6.00629331; IPR=6.00980436;
+ MB=3.00026760; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-06 20:47:43
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050620-0041-0000-0000-000008F814C7
-Message-Id: <33201b9c-0479-d675-e265-c09b24695f1c@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-06_11:,,
+x-cbparentid: 19050620-0005-0000-0000-00008B8DD532
+Message-Id: <bba6c0a8-2346-cd99-b8ad-f316daac010b@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-06_12:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1810050000 definitions=main-1905060164
@@ -80,219 +78,124 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/6/19 6:55 AM, Pierre Morel wrote:
-> On 03/05/2019 23:14, Tony Krowiak wrote:
->> There is nothing preventing a root user from inadvertently unbinding an
->> AP queue device that is in use by a guest from the vfio_ap device driver
->> and binding it to a zcrypt driver. This can result in a queue being
->> accessible from both the host and a guest.
+
+
+On 5/6/19 11:39 AM, Eric Farman wrote:
+> 
+> 
+> On 5/6/19 8:56 AM, Pierre Morel wrote:
+>> On 03/05/2019 15:49, Eric Farman wrote:
+>>> If the CCW being processed is a No-Operation, then by definition no
+>>> data is being transferred.  Let's fold those checks into the normal
+>>> CCW processors, rather than skipping out early.
+>>>
+>>> Likewise, if the CCW being processed is a "test" (an invented
+>>> definition to simply mean it ends in a zero), let's permit that to go
+>>> through to the hardware.  There's nothing inherently unique about
+>>> those command codes versus one that ends in an eight [1], or any other
+>>> otherwise valid command codes that are undefined for the device type
+>>> in question.
+>>>
+>>> [1] POPS states that a x08 is a TIC CCW, and that having any high-order
+>>> bits enabled is invalid for format-1 CCWs.  For format-0 CCWs, the
+>>> high-order bits are ignored.
+>>>
+>>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+>>> ---
+>>>   drivers/s390/cio/vfio_ccw_cp.c | 11 +++++------
+>>>   1 file changed, 5 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/drivers/s390/cio/vfio_ccw_cp.c 
+>>> b/drivers/s390/cio/vfio_ccw_cp.c
+>>> index 36d76b821209..c0a52025bf06 100644
+>>> --- a/drivers/s390/cio/vfio_ccw_cp.c
+>>> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+>>> @@ -289,8 +289,6 @@ static long copy_ccw_from_iova(struct 
+>>> channel_program *cp,
+>>>   #define ccw_is_read_backward(_ccw) (((_ccw)->cmd_code & 0x0F) == 0x0C)
+>>>   #define ccw_is_sense(_ccw) (((_ccw)->cmd_code & 0x0F) == 
+>>> CCW_CMD_BASIC_SENSE)
+>>> -#define ccw_is_test(_ccw) (((_ccw)->cmd_code & 0x0F) == 0)
+>>> -
+>>>   #define ccw_is_noop(_ccw) ((_ccw)->cmd_code == CCW_CMD_NOOP)
+>>>   #define ccw_is_tic(_ccw) ((_ccw)->cmd_code == CCW_CMD_TIC)
+>>> @@ -314,6 +312,10 @@ static inline int ccw_does_data_transfer(struct 
+>>> ccw1 *ccw)
+>>>       if (ccw->count == 0)
+>>>           return 0;
+>>> +    /* If the command is a NOP, then no data will be transferred */
+>>> +    if (ccw_is_noop(ccw))
+>>> +        return 0;
+>>> +
+>>>       /* If the skip flag is off, then data will be transferred */
+>>>       if (!ccw_is_skip(ccw))
+>>>           return 1;
+>>> @@ -398,7 +400,7 @@ static void ccwchain_cda_free(struct ccwchain 
+>>> *chain, int idx)
+>>>   {
+>>>       struct ccw1 *ccw = chain->ch_ccw + idx;
+>>> -    if (ccw_is_test(ccw) || ccw_is_noop(ccw) || ccw_is_tic(ccw))
+>>> +    if (ccw_is_tic(ccw))
 >>
->> This patch introduces safeguards that prevent sharing of an AP queue
->> between the host when a queue device is unbound from the vfio_ap device
->> driver. In addition, this patch restores guest access to AP queue devices
->> bound to the vfio_ap driver if the queue's APQN is assigned to an mdev
->> device in use by a guest.
 >>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>   drivers/s390/crypto/vfio_ap_drv.c     |  12 +++-
->>   drivers/s390/crypto/vfio_ap_ops.c     | 100 
->> +++++++++++++++++++++++++++++++++-
->>   drivers/s390/crypto/vfio_ap_private.h |   2 +
->>   3 files changed, 111 insertions(+), 3 deletions(-)
+>> AFAIR, we introduced this code to protect against noop and test with a 
+>> non zero CDA.
+>> This could go away only if there is somewhere the guaranty that noop 
+>> have always a null CDA (same for test).
+> 
+> What was generating either the null or "test" command codes?  I can 
+> provide plenty of examples for both these command codes and how they 
+> look coming out of vfio-ccw now.
+
+I've sent both x00 and x03 (NOP) CCWs with zero and non-zero CDAs to 
+hardware without this patch.  I don't see anything particuarly 
+surpising, so I'm not sure what the original code was attempting to protect.
+
+Maybe, since you question this in ccwchain_cda_free(), you're referring 
+to commit 408358b50dea ("s390: vfio-ccw: Do not attempt to free no-op, 
+test and tic cda."), which fixed up our attempt to clean things up that 
+weren't allocated on the transmit side?  With this series, that is 
+reverted, but the cda is indeed set to something that needs to be free'd 
+(see below).  So maybe I should at least mention that commit here.
+
+Regardless, while the I/Os work/fail as I expect, the cda addresses 
+themselves are wrong in much the same way I describe in patch 4.  Yes, 
+without this patch we don't convert them to an IDAL so certain program 
+checks aren't applicable.  But the addresses that we end up sending to 
+the hardware are nonsensical, though potentially valid, locations.
+
+> 
+> The noop check is moved up into the "does data transfer" routine, to 
+> determine whether the pages should be pinned or not.  Regardless of 
+> whether or not the input CDA is null, we'll end up with a CCW pointing 
+> to a valid IDAL of invalid addresses.
+> 
+> The "test" command codes always struck me as funky, because x18 and xF8 
+> and everything in between that ends in x8 is architecturally invalid 
+> too, but we don't check for them like we do for things that end in x0. 
+> And there's a TON of other opcodes that are invalid for today's ECKD 
+> devices, or perhaps were valid for older DASD but have since been 
+> deprecated, or are only valid for non-DASD device types.  We have no 
+> logic to permit them, either.  If those CCWs had a non-zero CDA, we 
+> either pin it successfully and let the targeted device sort it out or an 
+> error occurs and we fail at that point.  (QEMU will see a "wirte" region 
+> error of -EINVAL because of vfio_pin_pages())
+> 
 >>
->> diff --git a/drivers/s390/crypto/vfio_ap_drv.c 
->> b/drivers/s390/crypto/vfio_ap_drv.c
->> index e9824c35c34f..c215978daf39 100644
->> --- a/drivers/s390/crypto/vfio_ap_drv.c
->> +++ b/drivers/s390/crypto/vfio_ap_drv.c
->> @@ -42,12 +42,22 @@ MODULE_DEVICE_TABLE(vfio_ap, ap_queue_ids);
->>   static int vfio_ap_queue_dev_probe(struct ap_device *apdev)
->>   {
->> +    struct ap_queue *queue = to_ap_queue(&apdev->device);
->> +
->> +    mutex_lock(&matrix_dev->lock);
->> +    vfio_ap_mdev_probe_queue(queue);
->> +    mutex_unlock(&matrix_dev->lock);
->> +
->>       return 0;
->>   }
->>   static void vfio_ap_queue_dev_remove(struct ap_device *apdev)
->>   {
->> -    /* Nothing to do yet */
->> +    struct ap_queue *queue = to_ap_queue(&apdev->device);
->> +
->> +    mutex_lock(&matrix_dev->lock);
->> +    vfio_ap_mdev_remove_queue(queue);
->> +    mutex_unlock(&matrix_dev->lock);
->>   }
->>   static void vfio_ap_matrix_dev_release(struct device *dev)
->> diff --git a/drivers/s390/crypto/vfio_ap_ops.c 
->> b/drivers/s390/crypto/vfio_ap_ops.c
->> index ede45184eb67..40324951bd37 100644
->> --- a/drivers/s390/crypto/vfio_ap_ops.c
->> +++ b/drivers/s390/crypto/vfio_ap_ops.c
->> @@ -226,8 +226,6 @@ static struct device 
->> *vfio_ap_get_queue_dev(unsigned long apid,
->>                     &apqn, match_apqn);
->>   }
->> -
->> -
->>   static int vfio_ap_mdev_validate_masks(unsigned long *apm, unsigned 
->> long *aqm)
->>   {
->>       int ret;
->> @@ -259,6 +257,27 @@ static bool vfio_ap_queues_on_drv(unsigned long 
->> *apm, unsigned long *aqm)
->>       return true;
->>   }
->> +static bool vfio_ap_card_on_drv(struct ap_queue *queue, unsigned long 
->> *aqm)
->> +{
->> +    unsigned long apid, apqi;
->> +    struct device *dev;
->> +
->> +    apid = AP_QID_CARD(queue->qid);
->> +
->> +    for_each_set_bit_inv(apqi, aqm, AP_DOMAINS) {
->> +        if (queue->qid == AP_MKQID(apid, apqi))
->> +            continue;
->> +
->> +        dev = vfio_ap_get_queue_dev(apid, apqi);
->> +        if (!dev)
->> +            return false;
->> +
->> +        put_device(dev);
->> +    }
->> +
->> +    return true;
->> +}
->> +
->>   /**
->>    * assign_adapter_store
->>    *
->> @@ -1017,3 +1036,80 @@ void vfio_ap_mdev_unregister(void)
->>   {
->>       mdev_unregister_device(&matrix_dev->device);
->>   }
->> +
->> +static struct ap_matrix_mdev *vfio_ap_mdev_find_matrix_mdev(unsigned 
->> long apid,
->> +                                unsigned long apqi)
->> +{
->> +    struct ap_matrix_mdev *matrix_mdev;
->> +
->> +    list_for_each_entry(matrix_mdev, &matrix_dev->mdev_list, node) {
->> +        if (test_bit_inv(apid, matrix_mdev->matrix.apm) &&
->> +            test_bit_inv(apqi, matrix_mdev->matrix.aqm))
->> +            return matrix_mdev;
->> +    }
->> +
->> +    return NULL;
->> +}
->> +
->> +void vfio_ap_mdev_probe_queue(struct ap_queue *queue)
->> +{
->> +    struct ap_matrix_mdev *matrix_mdev;
->> +    unsigned long *shadow_apm, *shadow_aqm;
->> +    unsigned long apid = AP_QID_CARD(queue->qid);
->> +    unsigned long apqi = AP_QID_QUEUE(queue->qid);
->> +
->> +    /*
->> +     * Find the mdev device to which the APQN of the queue device being
->> +     * probed is assigned
->> +     */
->> +    matrix_mdev = vfio_ap_mdev_find_matrix_mdev(apid, apqi);
->> +
->> +    /* Check whether we found an mdev device and it is in use by a 
->> guest */
->> +    if (matrix_mdev && matrix_mdev->kvm) {
->> +        shadow_apm = matrix_mdev->shadow_crycb->apm;
->> +        shadow_aqm = matrix_mdev->shadow_crycb->aqm;
->> +        /*
->> +         * If the guest already has access to the adapter card
->> +         * referenced by APID or does not have access to the queues
->> +         * referenced by APQI, there is nothing to do here.
->> +         */
->> +        if (test_bit_inv(apid, shadow_apm) ||
->> +            !test_bit_inv(apqi, shadow_aqm))
->> +            return;
->> +
->> +        /*
->> +         * If each APQN with the APID of the queue being probed and an
->> +         * APQI in the shadow CRYCB references a queue device that is
->> +         * bound to the vfio_ap driver, then plug the adapter into the
->> +         * guest.
->> +         */
->> +        if (vfio_ap_card_on_drv(queue, shadow_aqm)) {
->> +            set_bit_inv(apid, shadow_apm);
->> +            vfio_ap_mdev_update_crycb(matrix_mdev);
->> +        }
->> +    }
->> +}
->> +
->> +void vfio_ap_mdev_remove_queue(struct ap_queue *queue)
->> +{
->> +    struct ap_matrix_mdev *matrix_mdev;
->> +    unsigned long apid = AP_QID_CARD(queue->qid);
->> +    unsigned long apqi = AP_QID_QUEUE(queue->qid);
->> +
->> +    matrix_mdev = vfio_ap_mdev_find_matrix_mdev(apid, apqi);
->> +
->> +    /*
->> +     * If the queue is assigned to the mdev device and the mdev device
->> +     * is in use by a guest, unplug the adapter referred to by the APID
->> +     * of the APQN of the queue being removed.
->> +     */
->> +    if (matrix_mdev && matrix_mdev->kvm) {
->> +        if (!test_bit_inv(apid, matrix_mdev->shadow_crycb->apm))
->> +            return;
->> +
->> +        clear_bit_inv(apid, matrix_mdev->shadow_crycb->apm);
->> +        vfio_ap_mdev_update_crycb(matrix_mdev);
->> +    }
->> +
->> +    vfio_ap_mdev_reset_queue(apid, apqi);
->> +}
->> diff --git a/drivers/s390/crypto/vfio_ap_private.h 
->> b/drivers/s390/crypto/vfio_ap_private.h
->> index e8457aa61976..6b1f7df5b979 100644
->> --- a/drivers/s390/crypto/vfio_ap_private.h
->> +++ b/drivers/s390/crypto/vfio_ap_private.h
->> @@ -87,5 +87,7 @@ struct ap_matrix_mdev {
->>   extern int vfio_ap_mdev_register(void);
->>   extern void vfio_ap_mdev_unregister(void);
->> +void vfio_ap_mdev_remove_queue(struct ap_queue *queue);
->> +void vfio_ap_mdev_probe_queue(struct ap_queue *queue);
->>   #endif /* _VFIO_AP_PRIVATE_H_ */
 >>
-> 
-> 
-> AFAIU the apmask/aqmask of the AP_BUS are replacing bind/unbind for the 
-> admin. Don't they?
-
-Yes, these interfaces are used to bind/unbind.
-
-> Then why not suppress bind/unbind for ap_queues?
-
-I did suppress them in a previous version, but I believe Harald
-objected. I don't recall the reason. If any other maintainers
-agree with this, I can reinstate that change. I personally would
-prefer that. I think leaving the bind/unbind interfaces confuses
-the issue.
-
-> 
-> Otherwise, it seems to me to handle correctly the disappearance of a 
-> card, which is the only thing that can happen from out of the firmware 
-> queue change requires configuration change and re-IPL.
-
-You are correct.
-
-> 
-> Even still need testing, LGTM
-
-I would welcome and appreciate additional testing, thanks in advance.
-
-> 
-> 
+>>
+>>>           return;
+>>>       kfree((void *)(u64)ccw->cda);
+>>> @@ -723,9 +725,6 @@ static int ccwchain_fetch_one(struct ccwchain 
+>>> *chain,
+>>>   {
+>>>       struct ccw1 *ccw = chain->ch_ccw + idx;
+>>> -    if (ccw_is_test(ccw) || ccw_is_noop(ccw))
+>>> -        return 0;
+>>> -
+>>>       if (ccw_is_tic(ccw))
+>>>           return ccwchain_fetch_tic(chain, idx, cp);
+>>>
+>>
+>>
 
