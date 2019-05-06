@@ -2,158 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B03FD15107
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 18:18:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4095215122
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 18:22:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726468AbfEFQS5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 May 2019 12:18:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35182 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726442AbfEFQS4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 May 2019 12:18:56 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 33270308FEE0;
-        Mon,  6 May 2019 16:18:55 +0000 (UTC)
-Received: from gondolin (unknown [10.40.205.81])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 766A560C44;
-        Mon,  6 May 2019 16:18:53 +0000 (UTC)
-Date:   Mon, 6 May 2019 18:18:50 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Farhan Ali <alifm@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 7/7] s390/cio: Remove vfio-ccw checks of command codes
-Message-ID: <20190506181850.4b1b8300.cohuck@redhat.com>
-In-Reply-To: <65313674-09be-88c0-4b5e-c99527f26532@linux.ibm.com>
-References: <20190503134912.39756-1-farman@linux.ibm.com>
-        <20190503134912.39756-8-farman@linux.ibm.com>
-        <20190506173707.40216e76.cohuck@redhat.com>
-        <65313674-09be-88c0-4b5e-c99527f26532@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1726593AbfEFQWJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 May 2019 12:22:09 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:36839 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726270AbfEFQWJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 May 2019 12:22:09 -0400
+Received: by mail-pg1-f193.google.com with SMTP id 85so6701321pgc.3
+        for <kvm@vger.kernel.org>; Mon, 06 May 2019 09:22:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=40wSFiuSnxDz381aUfzuDl5Kav43yI7Ct1/keTyO3F8=;
+        b=DVotpDP1BfYOu9EIG5sO2py/kG385U8+4RKehRk0tC71Vfe/y8Dohrbwudfghmv4gC
+         V1LDKukVm8TPgSIGKPKH/+AzQnvMn07KhJn3HSkyadIn3jlSJ5ClUm6UwCAwkx5Lj2ec
+         jTZ+KF06FbPmw0HHf3CBeQEfXVzStv1Mct1AUlW1wy4NJfE7vbBjZ0bMdocNxT2oB1CS
+         9lHhKeWSjQzqoRHwiiBianLagL8GKIjs0O4OySI/oLm6QzImAzv5mMB4tTPiN7x1FtTU
+         rnBUs5QzACe456XBtVa1RIzVbxerlIOvNFz0tCOCg55SYKbtj/SOkAkOVG3enaPf58Zc
+         SNbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=40wSFiuSnxDz381aUfzuDl5Kav43yI7Ct1/keTyO3F8=;
+        b=dQZpgdlQLWZLFTXCpbxvWWpY7g2vdjTvM7SPR0pGCGq0uq5BSx8rXJXAK3kY7Z8zaL
+         Kxa0r+jql2otDfnGE73xZe699xzKjmQUdTjBIXSG63mCgR11BGXGXZm4uD0U2FMID+vL
+         nj8EJ6p56RfXCIZGoFYTQYskqc1quMkdeP3qVZjzRCSrxnS9WL1M76PUwW5sbxVaNvpi
+         2GpUYX/RTdAeFn3+5sFcZu1vMvMasuIdzTM/Jtbtie6BTiSP6w2FgTB4bvv+b+upxFGP
+         xfsqJyOgZOJ8WZPaLQOK1T9jm3WBocsyWb8Qc6f5nRKkhUSKLfHw7Z8Z63qKMyJN5KKG
+         oHOg==
+X-Gm-Message-State: APjAAAVUlFTssft3oLZ5USjZJdA5Rk+tWkgc4XLNTpYIHBI5IpTek1wh
+        mHpyz6TXkJEtzvD0Bl39oK14PVczfqHJD9UvEHhvaw==
+X-Google-Smtp-Source: APXvYqw0KbWeRobzhAngWvuw0v+iBDWRKwDC2xGNXHO8L4kdi1iOFuLP64D72WK0vtdzu/2x0qr2r6kf9SEmu6uA3nY=
+X-Received: by 2002:aa7:90ce:: with SMTP id k14mr30343128pfk.239.1557159727868;
+ Mon, 06 May 2019 09:22:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Mon, 06 May 2019 16:18:55 +0000 (UTC)
+References: <cover.1556630205.git.andreyknvl@google.com> <05c0c078b8b5984af4cc3b105a58c711dcd83342.1556630205.git.andreyknvl@google.com>
+ <20190503170310.GL55449@arrakis.emea.arm.com>
+In-Reply-To: <20190503170310.GL55449@arrakis.emea.arm.com>
+From:   Andrey Konovalov <andreyknvl@google.com>
+Date:   Mon, 6 May 2019 18:21:56 +0200
+Message-ID: <CAAeHK+weVYv4Tgj8DXv0ZTFZzGEpLYsn-3wxxmQN+ZW88MXbMw@mail.gmail.com>
+Subject: Re: [PATCH v14 13/17] IB/mlx4, arm64: untag user pointers in mlx4_get_umem_mr
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>, Kuehling@google.com,
+        Felix <Felix.Kuehling@amd.com>, Deucher@google.com,
+        Alexander <Alexander.Deucher@amd.com>, Koenig@google.com,
+        Christian <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Chintan Pandya <cpandya@codeaurora.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Leon Romanovsky <leonro@mellanox.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 6 May 2019 11:46:59 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
+On Fri, May 3, 2019 at 7:03 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
+>
+> On Tue, Apr 30, 2019 at 03:25:09PM +0200, Andrey Konovalov wrote:
+> > This patch is a part of a series that extends arm64 kernel ABI to allow to
+> > pass tagged user pointers (with the top byte set to something else other
+> > than 0x00) as syscall arguments.
+> >
+> > mlx4_get_umem_mr() uses provided user pointers for vma lookups, which can
+> > only by done with untagged pointers.
+> >
+> > Untag user pointers in this function.
+> >
+> > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> > Reviewed-by: Leon Romanovsky <leonro@mellanox.com>
+> > ---
+> >  drivers/infiniband/hw/mlx4/mr.c | 7 ++++---
+> >  1 file changed, 4 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/infiniband/hw/mlx4/mr.c b/drivers/infiniband/hw/mlx4/mr.c
+> > index 395379a480cb..9a35ed2c6a6f 100644
+> > --- a/drivers/infiniband/hw/mlx4/mr.c
+> > +++ b/drivers/infiniband/hw/mlx4/mr.c
+> > @@ -378,6 +378,7 @@ static struct ib_umem *mlx4_get_umem_mr(struct ib_udata *udata, u64 start,
+> >        * again
+> >        */
+> >       if (!ib_access_writable(access_flags)) {
+> > +             unsigned long untagged_start = untagged_addr(start);
+> >               struct vm_area_struct *vma;
+> >
+> >               down_read(&current->mm->mmap_sem);
+> > @@ -386,9 +387,9 @@ static struct ib_umem *mlx4_get_umem_mr(struct ib_udata *udata, u64 start,
+> >                * cover the memory, but for now it requires a single vma to
+> >                * entirely cover the MR to support RO mappings.
+> >                */
+> > -             vma = find_vma(current->mm, start);
+> > -             if (vma && vma->vm_end >= start + length &&
+> > -                 vma->vm_start <= start) {
+> > +             vma = find_vma(current->mm, untagged_start);
+> > +             if (vma && vma->vm_end >= untagged_start + length &&
+> > +                 vma->vm_start <= untagged_start) {
+> >                       if (vma->vm_flags & VM_WRITE)
+> >                               access_flags |= IB_ACCESS_LOCAL_WRITE;
+> >               } else {
+>
+> Discussion ongoing on the previous version of the patch but I'm more
+> inclined to do this in ib_uverbs_(re)reg_mr() on cmd.start.
 
-> On 5/6/19 11:37 AM, Cornelia Huck wrote:
-> > On Fri,  3 May 2019 15:49:12 +0200
-> > Eric Farman <farman@linux.ibm.com> wrote:
-> >   
-> >> If the CCW being processed is a No-Operation, then by definition no
-> >> data is being transferred.  Let's fold those checks into the normal
-> >> CCW processors, rather than skipping out early.
-> >>
-> >> Likewise, if the CCW being processed is a "test" (an invented
-> >> definition to simply mean it ends in a zero),  
-> > 
-> > The "Common I/O Device Commands" document actually defines this :)  
-> 
-> Blech, okay so I didn't look early enough in that document.  Section 1.5 
-> it is.  :)
-> 
-> >   
-> >> let's permit that to go
-> >> through to the hardware.  There's nothing inherently unique about
-> >> those command codes versus one that ends in an eight [1], or any other
-> >> otherwise valid command codes that are undefined for the device type
-> >> in question.  
-> > 
-> > But I agree that everything possible should be sent to the hardware.
-> >   
-> >>
-> >> [1] POPS states that a x08 is a TIC CCW, and that having any high-order
-> >> bits enabled is invalid for format-1 CCWs.  For format-0 CCWs, the
-> >> high-order bits are ignored.
-> >>
-> >> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> >> ---
-> >>   drivers/s390/cio/vfio_ccw_cp.c | 11 +++++------
-> >>   1 file changed, 5 insertions(+), 6 deletions(-)
-> >>
-> >> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-> >> index 36d76b821209..c0a52025bf06 100644
-> >> --- a/drivers/s390/cio/vfio_ccw_cp.c
-> >> +++ b/drivers/s390/cio/vfio_ccw_cp.c
-> >> @@ -289,8 +289,6 @@ static long copy_ccw_from_iova(struct channel_program *cp,
-> >>   #define ccw_is_read_backward(_ccw) (((_ccw)->cmd_code & 0x0F) == 0x0C)
-> >>   #define ccw_is_sense(_ccw) (((_ccw)->cmd_code & 0x0F) == CCW_CMD_BASIC_SENSE)
-> >>   
-> >> -#define ccw_is_test(_ccw) (((_ccw)->cmd_code & 0x0F) == 0)
-> >> -
-> >>   #define ccw_is_noop(_ccw) ((_ccw)->cmd_code == CCW_CMD_NOOP)
-> >>   
-> >>   #define ccw_is_tic(_ccw) ((_ccw)->cmd_code == CCW_CMD_TIC)
-> >> @@ -314,6 +312,10 @@ static inline int ccw_does_data_transfer(struct ccw1 *ccw)
-> >>   	if (ccw->count == 0)
-> >>   		return 0;
-> >>   
-> >> +	/* If the command is a NOP, then no data will be transferred */
-> >> +	if (ccw_is_noop(ccw))
-> >> +		return 0;
-> >> +  
-> > 
-> > Don't you need to return 0 here for any test command as well?
-> > 
-> > (If I read the doc correctly, we'll just get a unit check in any case,
-> > as there are no parallel I/O interfaces on modern s390 boxes. Even if
-> > we had a parallel I/O interface, we'd just collect the status, and not
-> > get any data transfer. FWIW, the QEMU ccw interpreter for emulated
-> > devices rejects test ccws with a channel program check, which looks
-> > wrong; should be a command reject instead.)  
-> 
-> I will go back and look.  I thought when I sent a test command with an 
-> address that wasn't translated I got an unhappy result, which is why I 
-> ripped this check out.
+OK, I want to publish v15 sooner to fix the issue with emails
+addresses, so I'll implement this approach there for now.
 
-Ugh, I just looked at the current PoP and that specifies ccws[1] of test
-type as 'invalid' (generating a channel program check). So, the current
-PoP and the (old) I/O device commands seem to disagree :/ Do you know
-if there's any update to the latter? I think I'll just leave QEMU as it
-is, as that at least agrees with the current PoP...
 
-> 
-> I was trying to use test CCWs as a safety valve for Halil's Status 
-> Modifier concern, so maybe I had something else wrong on that pile. 
-> (The careful observer would note that that code was not included here.  :)
 
-:)
-
-> 
-> >   
-> >>   	/* If the skip flag is off, then data will be transferred */
-> >>   	if (!ccw_is_skip(ccw))
-> >>   		return 1;
-> >> @@ -398,7 +400,7 @@ static void ccwchain_cda_free(struct ccwchain *chain, int idx)
-> >>   {
-> >>   	struct ccw1 *ccw = chain->ch_ccw + idx;
-> >>   
-> >> -	if (ccw_is_test(ccw) || ccw_is_noop(ccw) || ccw_is_tic(ccw))
-> >> +	if (ccw_is_tic(ccw))
-> >>   		return;
-> >>   
-> >>   	kfree((void *)(u64)ccw->cda);
-> >> @@ -723,9 +725,6 @@ static int ccwchain_fetch_one(struct ccwchain *chain,
-> >>   {
-> >>   	struct ccw1 *ccw = chain->ch_ccw + idx;
-> >>   
-> >> -	if (ccw_is_test(ccw) || ccw_is_noop(ccw))
-> >> -		return 0;
-> >> -
-> >>   	if (ccw_is_tic(ccw))
-> >>   		return ccwchain_fetch_tic(chain, idx, cp);
-> >>     
-> >   
-
-[1] tcws are a bit different; but we don't support them anyway.
+>
+> --
+> Catalin
