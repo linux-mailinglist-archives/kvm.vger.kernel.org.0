@@ -2,165 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DF0EE15027
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 17:27:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 627481505E
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 17:37:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726511AbfEFP1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 May 2019 11:27:22 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:38683 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726516AbfEFP1W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 May 2019 11:27:22 -0400
-Received: by mail-wr1-f67.google.com with SMTP id k16so17823972wrn.5
-        for <kvm@vger.kernel.org>; Mon, 06 May 2019 08:27:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=googlenew;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GuMSdmXl0z53dDi0xhlaU7BU2n/bLw/DBUWaPvlO+dc=;
-        b=C/d9PWiZ7kbJC0oH7zo5Ibhtjb0LJxg5WGRhk2z22dgXTR0ahak265kLVZyGYOhfje
-         aEtSmh42RRvz8bCCBZRBFOn7uv5XCF0ECqKL0Hb338d0yPodqMwGb1L0gvRyJgITkaxQ
-         Ki1y61sbdbPypKRjDCxUR8MH0zfn/bbro9LPpFVyLBByJZzEOqelQf5tS81MK2FkUIP3
-         sLhve+NsmP0dlDX03w14Qjs93JrqJwcC/r4yHUZhJhCv/72E7VCM80drfYcNtln/9ipb
-         cKIyK6t7ROv023pVx/00hbtubgQCmfBlIjzs3E6R48gtIILod1LUINjWV6UVWZ8tSjxH
-         BBpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GuMSdmXl0z53dDi0xhlaU7BU2n/bLw/DBUWaPvlO+dc=;
-        b=IcOA2E1arFQi721TAMgWcMBA/onui1COObV1q8SJdzxoExc0BzLvuxXuQ4T/ZQDv7t
-         vjsIPnb4urTRgais/19o2IfiWlORFSfLvJOM/YN8BPcaMF2bP26GOh7BmE4zTiIeQ4JI
-         EVtyxd8lRA+dVkifk4emh1pExaHKdviGedSjThBqg3BUS2OGLno0dX6QzouFc6SMYAXq
-         iQPPUh7V6rbmmUQkTPkRRCwF7E38OBW5Q3YsBWNsMy0hNCPEXvy37zy1r5zYBmaHT4pS
-         Lz1s5Ybuq8kngfWZimw17XPsh8hBiOM8e32wXmu+W1KGGXo+Uk2s6C/HTOz2CFGwBf6B
-         SqNA==
-X-Gm-Message-State: APjAAAX7vatDEcubX9zV7I32Mc1qlNoLw8oOPCypw5ZQP2cfHDoXPp7X
-        7BNJvqZ4RlB+bWTzxJmBH//sSimE/bmfk//SKkX7xQ==
-X-Google-Smtp-Source: APXvYqzdYjq2KzNwXSYRUYk147h4YL+JNa0zWfymURRoAL7aXQogilrHn37rwl9PoIS46ayzMGu+Ikwm2tOs7SUKN4Y=
-X-Received: by 2002:a5d:5551:: with SMTP id g17mr20082024wrw.50.1557156440752;
- Mon, 06 May 2019 08:27:20 -0700 (PDT)
+        id S1726501AbfEFPhN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 May 2019 11:37:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52092 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725994AbfEFPhN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 May 2019 11:37:13 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C4B2E3060350;
+        Mon,  6 May 2019 15:37:12 +0000 (UTC)
+Received: from gondolin (unknown [10.40.205.81])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 209B653E2C;
+        Mon,  6 May 2019 15:37:10 +0000 (UTC)
+Date:   Mon, 6 May 2019 17:37:07 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Farhan Ali <alifm@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 7/7] s390/cio: Remove vfio-ccw checks of command codes
+Message-ID: <20190506173707.40216e76.cohuck@redhat.com>
+In-Reply-To: <20190503134912.39756-8-farman@linux.ibm.com>
+References: <20190503134912.39756-1-farman@linux.ibm.com>
+        <20190503134912.39756-8-farman@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20190504132327.27041-1-tmurphy@arista.com> <20190504132327.27041-2-tmurphy@arista.com>
- <8fef18f5-773c-e1c9-2537-c9dff5bfd35e@linux.intel.com>
-In-Reply-To: <8fef18f5-773c-e1c9-2537-c9dff5bfd35e@linux.intel.com>
-From:   Tom Murphy <tmurphy@arista.com>
-Date:   Mon, 6 May 2019 16:27:09 +0100
-Message-ID: <CAPL0++4_Qa+dxzQ2k6BJi_o+VSSrHEtomYgVmRqjtjsOfHbGew@mail.gmail.com>
-Subject: Re: [RFC 1/7] iommu/vt-d: Set the dma_ops per device so we can remove
- the iommu_no_mapping code
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     iommu@lists.linux-foundation.org, Tom Murphy <murphyt7@tcd.ie>,
-        Joerg Roedel <joro@8bytes.org>,
-        Will Deacon <will.deacon@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Kukjin Kim <kgene@kernel.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Andy Gross <andy.gross@linaro.org>,
-        David Brown <david.brown@linaro.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Rob Clark <robdclark@gmail.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-mediatek@lists.infradead.org,
-        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-tegra@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Mon, 06 May 2019 15:37:12 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 6, 2019 at 2:48 AM Lu Baolu <baolu.lu@linux.intel.com> wrote:
->
-> Hi,
->
-> On 5/4/19 9:23 PM, Tom Murphy wrote:
-> > Set the dma_ops per device so we can remove the iommu_no_mapping code.
-> >
-> > Signed-off-by: Tom Murphy<tmurphy@arista.com>
-> > ---
-> >   drivers/iommu/intel-iommu.c | 85 +++----------------------------------
-> >   1 file changed, 6 insertions(+), 79 deletions(-)
-> >
-> > diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
-> > index eace915602f0..2db1dc47e7e4 100644
-> > --- a/drivers/iommu/intel-iommu.c
-> > +++ b/drivers/iommu/intel-iommu.c
-> > @@ -2622,17 +2622,6 @@ static int __init si_domain_init(int hw)
-> >       return 0;
-> >   }
-> >
-> > -static int identity_mapping(struct device *dev)
-> > -{
-> > -     struct device_domain_info *info;
-> > -
-> > -     info = dev->archdata.iommu;
-> > -     if (info && info != DUMMY_DEVICE_DOMAIN_INFO)
-> > -             return (info->domain == si_domain);
-> > -
-> > -     return 0;
-> > -}
-> > -
-> >   static int domain_add_dev_info(struct dmar_domain *domain, struct device *dev)
-> >   {
-> >       struct dmar_domain *ndomain;
-> > @@ -3270,43 +3259,6 @@ static unsigned long intel_alloc_iova(struct device *dev,
-> >       return iova_pfn;
-> >   }
-> >
-> > -/* Check if the dev needs to go through non-identity map and unmap process.*/
-> > -static int iommu_no_mapping(struct device *dev)
-> > -{
-> > -     int found;
-> > -
-> > -     if (iommu_dummy(dev))
-> > -             return 1;
-> > -
-> > -     found = identity_mapping(dev);
-> > -     if (found) {
-> > -             /*
-> > -              * If the device's dma_mask is less than the system's memory
-> > -              * size then this is not a candidate for identity mapping.
-> > -              */
-> > -             u64 dma_mask = *dev->dma_mask;
-> > -
-> > -             if (dev->coherent_dma_mask &&
-> > -                 dev->coherent_dma_mask < dma_mask)
-> > -                     dma_mask = dev->coherent_dma_mask;
-> > -
-> > -             if (dma_mask < dma_get_required_mask(dev)) {
-> > -                     /*
-> > -                      * 32 bit DMA is removed from si_domain and fall back
-> > -                      * to non-identity mapping.
-> > -                      */
-> > -                     dmar_remove_one_dev_info(dev);
-> > -                     dev_warn(dev, "32bit DMA uses non-identity mapping\n");
-> > -
-> > -                     return 0;
-> > -             }
->
-> The iommu_no_mapping() also checks whether any 32bit DMA device uses
-> identity mapping. The device might not work if the system memory space
-> is bigger than 4G.
+On Fri,  3 May 2019 15:49:12 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
 
-It looks like their is actually a bug in the v3 of the "iommu/vt-d:
-Delegate DMA domain to generic iommu" patch set. I will leave a
-message in that email thread. Fixing that bug should also fix this
-issue.
+> If the CCW being processed is a No-Operation, then by definition no
+> data is being transferred.  Let's fold those checks into the normal
+> CCW processors, rather than skipping out early.
+> 
+> Likewise, if the CCW being processed is a "test" (an invented
+> definition to simply mean it ends in a zero), 
 
+The "Common I/O Device Commands" document actually defines this :)
 
->
-> Will you add this to other place, or it's unnecessary?
->
-> Best regards,
-> Lu Baolu
+> let's permit that to go
+> through to the hardware.  There's nothing inherently unique about
+> those command codes versus one that ends in an eight [1], or any other
+> otherwise valid command codes that are undefined for the device type
+> in question.
+
+But I agree that everything possible should be sent to the hardware.
+
+> 
+> [1] POPS states that a x08 is a TIC CCW, and that having any high-order
+> bits enabled is invalid for format-1 CCWs.  For format-0 CCWs, the
+> high-order bits are ignored.
+> 
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>  drivers/s390/cio/vfio_ccw_cp.c | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index 36d76b821209..c0a52025bf06 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -289,8 +289,6 @@ static long copy_ccw_from_iova(struct channel_program *cp,
+>  #define ccw_is_read_backward(_ccw) (((_ccw)->cmd_code & 0x0F) == 0x0C)
+>  #define ccw_is_sense(_ccw) (((_ccw)->cmd_code & 0x0F) == CCW_CMD_BASIC_SENSE)
+>  
+> -#define ccw_is_test(_ccw) (((_ccw)->cmd_code & 0x0F) == 0)
+> -
+>  #define ccw_is_noop(_ccw) ((_ccw)->cmd_code == CCW_CMD_NOOP)
+>  
+>  #define ccw_is_tic(_ccw) ((_ccw)->cmd_code == CCW_CMD_TIC)
+> @@ -314,6 +312,10 @@ static inline int ccw_does_data_transfer(struct ccw1 *ccw)
+>  	if (ccw->count == 0)
+>  		return 0;
+>  
+> +	/* If the command is a NOP, then no data will be transferred */
+> +	if (ccw_is_noop(ccw))
+> +		return 0;
+> +
+
+Don't you need to return 0 here for any test command as well?
+
+(If I read the doc correctly, we'll just get a unit check in any case,
+as there are no parallel I/O interfaces on modern s390 boxes. Even if
+we had a parallel I/O interface, we'd just collect the status, and not
+get any data transfer. FWIW, the QEMU ccw interpreter for emulated
+devices rejects test ccws with a channel program check, which looks
+wrong; should be a command reject instead.)
+
+>  	/* If the skip flag is off, then data will be transferred */
+>  	if (!ccw_is_skip(ccw))
+>  		return 1;
+> @@ -398,7 +400,7 @@ static void ccwchain_cda_free(struct ccwchain *chain, int idx)
+>  {
+>  	struct ccw1 *ccw = chain->ch_ccw + idx;
+>  
+> -	if (ccw_is_test(ccw) || ccw_is_noop(ccw) || ccw_is_tic(ccw))
+> +	if (ccw_is_tic(ccw))
+>  		return;
+>  
+>  	kfree((void *)(u64)ccw->cda);
+> @@ -723,9 +725,6 @@ static int ccwchain_fetch_one(struct ccwchain *chain,
+>  {
+>  	struct ccw1 *ccw = chain->ch_ccw + idx;
+>  
+> -	if (ccw_is_test(ccw) || ccw_is_noop(ccw))
+> -		return 0;
+> -
+>  	if (ccw_is_tic(ccw))
+>  		return ccwchain_fetch_tic(chain, idx, cp);
+>  
+
