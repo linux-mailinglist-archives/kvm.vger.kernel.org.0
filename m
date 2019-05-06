@@ -2,133 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B80AA1500A
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 17:24:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF0EE15027
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 17:27:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726415AbfEFPX7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 May 2019 11:23:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36744 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726401AbfEFPX7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 May 2019 11:23:59 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x46FIG5G043231
-        for <kvm@vger.kernel.org>; Mon, 6 May 2019 11:23:58 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2sap6qm0xj-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 06 May 2019 11:23:58 -0400
-Received: from localhost
-        by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <farman@linux.ibm.com>;
-        Mon, 6 May 2019 16:23:57 +0100
-Received: from b03cxnp08026.gho.boulder.ibm.com (9.17.130.18)
-        by e31.co.us.ibm.com (192.168.1.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 6 May 2019 16:23:55 +0100
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x46FNrJ019071030
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 May 2019 15:23:53 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 77968C605B;
-        Mon,  6 May 2019 15:23:53 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8F9D5C6055;
-        Mon,  6 May 2019 15:23:52 +0000 (GMT)
-Received: from [9.85.230.129] (unknown [9.85.230.129])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon,  6 May 2019 15:23:52 +0000 (GMT)
-Subject: Re: [PATCH 1/7] s390/cio: Update SCSW if it points to the end of the
- chain
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Farhan Ali <alifm@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-References: <20190503134912.39756-1-farman@linux.ibm.com>
- <20190503134912.39756-2-farman@linux.ibm.com>
- <20190506164710.5fe0b6c8.cohuck@redhat.com>
-From:   Eric Farman <farman@linux.ibm.com>
-Date:   Mon, 6 May 2019 11:23:51 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726511AbfEFP1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 May 2019 11:27:22 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:38683 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726516AbfEFP1W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 May 2019 11:27:22 -0400
+Received: by mail-wr1-f67.google.com with SMTP id k16so17823972wrn.5
+        for <kvm@vger.kernel.org>; Mon, 06 May 2019 08:27:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=googlenew;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GuMSdmXl0z53dDi0xhlaU7BU2n/bLw/DBUWaPvlO+dc=;
+        b=C/d9PWiZ7kbJC0oH7zo5Ibhtjb0LJxg5WGRhk2z22dgXTR0ahak265kLVZyGYOhfje
+         aEtSmh42RRvz8bCCBZRBFOn7uv5XCF0ECqKL0Hb338d0yPodqMwGb1L0gvRyJgITkaxQ
+         Ki1y61sbdbPypKRjDCxUR8MH0zfn/bbro9LPpFVyLBByJZzEOqelQf5tS81MK2FkUIP3
+         sLhve+NsmP0dlDX03w14Qjs93JrqJwcC/r4yHUZhJhCv/72E7VCM80drfYcNtln/9ipb
+         cKIyK6t7ROv023pVx/00hbtubgQCmfBlIjzs3E6R48gtIILod1LUINjWV6UVWZ8tSjxH
+         BBpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GuMSdmXl0z53dDi0xhlaU7BU2n/bLw/DBUWaPvlO+dc=;
+        b=IcOA2E1arFQi721TAMgWcMBA/onui1COObV1q8SJdzxoExc0BzLvuxXuQ4T/ZQDv7t
+         vjsIPnb4urTRgais/19o2IfiWlORFSfLvJOM/YN8BPcaMF2bP26GOh7BmE4zTiIeQ4JI
+         EVtyxd8lRA+dVkifk4emh1pExaHKdviGedSjThBqg3BUS2OGLno0dX6QzouFc6SMYAXq
+         iQPPUh7V6rbmmUQkTPkRRCwF7E38OBW5Q3YsBWNsMy0hNCPEXvy37zy1r5zYBmaHT4pS
+         Lz1s5Ybuq8kngfWZimw17XPsh8hBiOM8e32wXmu+W1KGGXo+Uk2s6C/HTOz2CFGwBf6B
+         SqNA==
+X-Gm-Message-State: APjAAAX7vatDEcubX9zV7I32Mc1qlNoLw8oOPCypw5ZQP2cfHDoXPp7X
+        7BNJvqZ4RlB+bWTzxJmBH//sSimE/bmfk//SKkX7xQ==
+X-Google-Smtp-Source: APXvYqzdYjq2KzNwXSYRUYk147h4YL+JNa0zWfymURRoAL7aXQogilrHn37rwl9PoIS46ayzMGu+Ikwm2tOs7SUKN4Y=
+X-Received: by 2002:a5d:5551:: with SMTP id g17mr20082024wrw.50.1557156440752;
+ Mon, 06 May 2019 08:27:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190506164710.5fe0b6c8.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19050615-8235-0000-0000-00000E90143C
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011060; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000285; SDB=6.01199451; UDB=6.00629266; IPR=6.00980327;
- MB=3.00026754; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-06 15:23:56
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050615-8236-0000-0000-000045728D08
-Message-Id: <d879574f-176f-1403-54dd-08911cbfc90a@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-06_09:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905060131
+References: <20190504132327.27041-1-tmurphy@arista.com> <20190504132327.27041-2-tmurphy@arista.com>
+ <8fef18f5-773c-e1c9-2537-c9dff5bfd35e@linux.intel.com>
+In-Reply-To: <8fef18f5-773c-e1c9-2537-c9dff5bfd35e@linux.intel.com>
+From:   Tom Murphy <tmurphy@arista.com>
+Date:   Mon, 6 May 2019 16:27:09 +0100
+Message-ID: <CAPL0++4_Qa+dxzQ2k6BJi_o+VSSrHEtomYgVmRqjtjsOfHbGew@mail.gmail.com>
+Subject: Re: [RFC 1/7] iommu/vt-d: Set the dma_ops per device so we can remove
+ the iommu_no_mapping code
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     iommu@lists.linux-foundation.org, Tom Murphy <murphyt7@tcd.ie>,
+        Joerg Roedel <joro@8bytes.org>,
+        Will Deacon <will.deacon@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Andy Gross <andy.gross@linaro.org>,
+        David Brown <david.brown@linaro.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Rob Clark <robdclark@gmail.com>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-mediatek@lists.infradead.org,
+        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-tegra@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, May 6, 2019 at 2:48 AM Lu Baolu <baolu.lu@linux.intel.com> wrote:
+>
+> Hi,
+>
+> On 5/4/19 9:23 PM, Tom Murphy wrote:
+> > Set the dma_ops per device so we can remove the iommu_no_mapping code.
+> >
+> > Signed-off-by: Tom Murphy<tmurphy@arista.com>
+> > ---
+> >   drivers/iommu/intel-iommu.c | 85 +++----------------------------------
+> >   1 file changed, 6 insertions(+), 79 deletions(-)
+> >
+> > diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
+> > index eace915602f0..2db1dc47e7e4 100644
+> > --- a/drivers/iommu/intel-iommu.c
+> > +++ b/drivers/iommu/intel-iommu.c
+> > @@ -2622,17 +2622,6 @@ static int __init si_domain_init(int hw)
+> >       return 0;
+> >   }
+> >
+> > -static int identity_mapping(struct device *dev)
+> > -{
+> > -     struct device_domain_info *info;
+> > -
+> > -     info = dev->archdata.iommu;
+> > -     if (info && info != DUMMY_DEVICE_DOMAIN_INFO)
+> > -             return (info->domain == si_domain);
+> > -
+> > -     return 0;
+> > -}
+> > -
+> >   static int domain_add_dev_info(struct dmar_domain *domain, struct device *dev)
+> >   {
+> >       struct dmar_domain *ndomain;
+> > @@ -3270,43 +3259,6 @@ static unsigned long intel_alloc_iova(struct device *dev,
+> >       return iova_pfn;
+> >   }
+> >
+> > -/* Check if the dev needs to go through non-identity map and unmap process.*/
+> > -static int iommu_no_mapping(struct device *dev)
+> > -{
+> > -     int found;
+> > -
+> > -     if (iommu_dummy(dev))
+> > -             return 1;
+> > -
+> > -     found = identity_mapping(dev);
+> > -     if (found) {
+> > -             /*
+> > -              * If the device's dma_mask is less than the system's memory
+> > -              * size then this is not a candidate for identity mapping.
+> > -              */
+> > -             u64 dma_mask = *dev->dma_mask;
+> > -
+> > -             if (dev->coherent_dma_mask &&
+> > -                 dev->coherent_dma_mask < dma_mask)
+> > -                     dma_mask = dev->coherent_dma_mask;
+> > -
+> > -             if (dma_mask < dma_get_required_mask(dev)) {
+> > -                     /*
+> > -                      * 32 bit DMA is removed from si_domain and fall back
+> > -                      * to non-identity mapping.
+> > -                      */
+> > -                     dmar_remove_one_dev_info(dev);
+> > -                     dev_warn(dev, "32bit DMA uses non-identity mapping\n");
+> > -
+> > -                     return 0;
+> > -             }
+>
+> The iommu_no_mapping() also checks whether any 32bit DMA device uses
+> identity mapping. The device might not work if the system memory space
+> is bigger than 4G.
+
+It looks like their is actually a bug in the v3 of the "iommu/vt-d:
+Delegate DMA domain to generic iommu" patch set. I will leave a
+message in that email thread. Fixing that bug should also fix this
+issue.
 
 
-On 5/6/19 10:47 AM, Cornelia Huck wrote:
-> On Fri,  3 May 2019 15:49:06 +0200
-> Eric Farman <farman@linux.ibm.com> wrote:
-> 
->> Per the POPs [1], when processing an interrupt the SCSW.CPA field of an
->> IRB generally points to 8 bytes after the last CCW that was executed
->> (there are exceptions, but this is the most common behavior).
->>
->> In the case of an error, this points us to the first un-executed CCW
->> in the chain.  But in the case of normal I/O, the address points beyond
->> the end of the chain.  While the guest generally only cares about this
->> when possibly restarting a channel program after error recovery, we
->> should convert the address even in the good scenario so that we provide
->> a consistent, valid, response upon I/O completion.
->>
->> [1] Figure 16-6 in SA22-7832-11.  The footnotes in that table also state
->> that this is true even if the resulting address is invalid or protected,
->> but moving to the end of the guest chain should not be a surprise.
->>
->> Signed-off-by: Eric Farman <farman@linux.ibm.com>
->> ---
->>   drivers/s390/cio/vfio_ccw_cp.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
->> index 384b3987eeb4..f86da78eaeaa 100644
->> --- a/drivers/s390/cio/vfio_ccw_cp.c
->> +++ b/drivers/s390/cio/vfio_ccw_cp.c
->> @@ -870,7 +870,7 @@ void cp_update_scsw(struct channel_program *cp, union scsw *scsw)
->>   	 */
->>   	list_for_each_entry(chain, &cp->ccwchain_list, next) {
->>   		ccw_head = (u32)(u64)chain->ch_ccw;
->> -		if (is_cpa_within_range(cpa, ccw_head, chain->ch_len)) {
->> +		if (is_cpa_within_range(cpa, ccw_head, chain->ch_len + 1)) {
-> 
-> Maybe add a comment
-> 
-> /* On successful execution, cpa points just beyond the end of the chain. */
-> 
-> or so, to avoid head-scratching and PoP-reading in the future?
-
-And deny future visitors the confusion?  :)
-
-Good point; added.
-
-> 
->>   			/*
->>   			 * (cpa - ccw_head) is the offset value of the host
->>   			 * physical ccw to its chain head.
-> 
-
+>
+> Will you add this to other place, or it's unnecessary?
+>
+> Best regards,
+> Lu Baolu
