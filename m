@@ -2,175 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 80C6F154B5
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 21:55:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FC8F154D7
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 22:20:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726376AbfEFTzQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 May 2019 15:55:16 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33228 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726241AbfEFTzQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 May 2019 15:55:16 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x46Jm0G8126373;
-        Mon, 6 May 2019 15:55:13 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2saudar5tr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 May 2019 15:55:12 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x46DmK52003133;
-        Mon, 6 May 2019 13:59:18 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com [9.57.198.27])
-        by ppma01dal.us.ibm.com with ESMTP id 2s92c3vgtv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 May 2019 13:59:18 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x46Jt9Wh29753468
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 May 2019 19:55:09 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7A42BAC060;
-        Mon,  6 May 2019 19:55:09 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2C944AC05B;
-        Mon,  6 May 2019 19:55:09 +0000 (GMT)
-Received: from [9.60.75.251] (unknown [9.60.75.251])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  6 May 2019 19:55:09 +0000 (GMT)
-Subject: Re: [PATCH v2 3/7] s390: vfio-ap: sysfs interface to display guest
- CRYCB
-To:     pmorel@linux.ibm.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        frankja@linux.ibm.com, david@redhat.com, schwidefsky@de.ibm.com,
-        heiko.carstens@de.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com
-References: <1556918073-13171-1-git-send-email-akrowiak@linux.ibm.com>
- <1556918073-13171-4-git-send-email-akrowiak@linux.ibm.com>
- <a2361365-050e-dfdd-ccd2-0167ccfcdfbf@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <b0770195-c016-c661-4ca4-dabbffacf332@linux.ibm.com>
-Date:   Mon, 6 May 2019 15:55:08 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726434AbfEFUUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 May 2019 16:20:09 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:50717 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726190AbfEFUUJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 May 2019 16:20:09 -0400
+Received: by mail-wm1-f65.google.com with SMTP id p21so17390829wmc.0
+        for <kvm@vger.kernel.org>; Mon, 06 May 2019 13:20:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5KVj2cIFo4sf42IOvLasjrLGxhKPAN71ZeOyGOXbgEg=;
+        b=cmUNiJ98WYG7sItDJoJr3sz3tx87o4/cseKFyRTB6KPblTqcD6p2X4Cl9Dt7uhRrbX
+         hwg3vsZ07HYU/TiXZVulJMltTrF/i8J+DlWJ8kYkqKoW3peDCioHiWUYbjftKe6qPglk
+         +yDK+zpMcVMUEQBzOIhOI3WfpIT6a5+4NO1/0EUR7vAT5tyU2DdWvP3oWcTcWKXeX+YG
+         C6Q7Hq5oLAY6JvccnQw8frAjd7/cZts981BUwUlJrmEuKmxiAeJ9UADewVtE7o06DJu9
+         8etmdNoNdE/3u5DC1DPp9fes9/FTjtks4PT0YKvOg69TSeWpiw1vKegIHhwPwDgriAPk
+         EYsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5KVj2cIFo4sf42IOvLasjrLGxhKPAN71ZeOyGOXbgEg=;
+        b=sGb20qz7+4h9F7ZxzCRTxWQ5YBr3MjO2CWXw0APx/GPdnHouXp3BNMgjBWHdkcnSy8
+         wEVb9JmnvQATG7Dt0SBu8LaOU1GEgqT5frRqTGQKgIKIc8me9Pu5+j1gckqMd1ylqEpM
+         nUNiJgEQ4kknJh5LRdJe3HrYgoZTrjpCOZgPQQphxB86HwOVfEMibm9H2F3sfAE/FLzO
+         Famd9JGc7ZTRgRjddyl8NzhdUpwo04FVeXqPnN4rtUXMW0yoS620ldJIyXf4Y9AKO9Hl
+         jn0fuiBsz9tW6WM9sJjXYjp7W+g8TrKRsGwbzaUftBhw+4OoZ0Y7dUwSC1IhczTIGNit
+         U59g==
+X-Gm-Message-State: APjAAAUcaK8GE68OfCJO4HKwKCyrJxCxiTJ1MGsa1gZ6erEJvvCVO8iP
+        BGybRJqXNCkUuKq9cT3oj08eadMIEw9o73gyMS5BJw==
+X-Google-Smtp-Source: APXvYqw6YN+mxes4KsRlBEwg0TxslCYp4jV8sOumNLnEbdftzDK/6jIQfDvI0cZj8kywJzf8b7wnJVv8SPDDt1cLFo8=
+X-Received: by 2002:a05:600c:2248:: with SMTP id a8mr18696267wmm.75.1557174006447;
+ Mon, 06 May 2019 13:20:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <a2361365-050e-dfdd-ccd2-0167ccfcdfbf@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-06_11:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905060162
+References: <20190501003001.186239-1-jemoreira@google.com> <20190501190831.GF22391@stefanha-x1.localdomain>
+ <20190502082045.u3xypjbac5npbhtc@steredhat.homenet.telecomitalia.it>
+In-Reply-To: <20190502082045.u3xypjbac5npbhtc@steredhat.homenet.telecomitalia.it>
+From:   Jorge Moreira Broche <jemoreira@google.com>
+Date:   Mon, 6 May 2019 13:19:55 -0700
+Message-ID: <CAJi--POaVsfprbp5na5BvR=VNONKGfFya_BnmTzzcWmOQ1DM2Q@mail.gmail.com>
+Subject: Re: [PATCH] vsock/virtio: Initialize core virtio vsock before
+ registering the driver
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kernel-team@android.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/6/19 2:54 AM, Pierre Morel wrote:
-> On 03/05/2019 23:14, Tony Krowiak wrote:
->> Introduces a sysfs interface on the matrix mdev device to display the
->> contents of the shadow of the guest's CRYCB
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>   drivers/s390/crypto/vfio_ap_ops.c | 59 
->> +++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 59 insertions(+)
->>
->> diff --git a/drivers/s390/crypto/vfio_ap_ops.c 
->> b/drivers/s390/crypto/vfio_ap_ops.c
->> index 44a04b4aa9ae..1021466cb661 100644
->> --- a/drivers/s390/crypto/vfio_ap_ops.c
->> +++ b/drivers/s390/crypto/vfio_ap_ops.c
->> @@ -771,6 +771,64 @@ static ssize_t matrix_show(struct device *dev, 
->> struct device_attribute *attr,
->>   }
->>   static DEVICE_ATTR_RO(matrix);
->> +static ssize_t guest_matrix_show(struct device *dev,
->> +                 struct device_attribute *attr, char *buf)
->> +{
->> +    struct mdev_device *mdev = mdev_from_dev(dev);
->> +    struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->> +    char *bufpos = buf;
->> +    unsigned long apid;
->> +    unsigned long apqi;
->> +    unsigned long apid1;
->> +    unsigned long apqi1;
->> +    unsigned long napm_bits;
->> +    unsigned long naqm_bits;
->> +    int nchars = 0;
->> +    int n;
->> +
->> +    if (!matrix_mdev->shadow_crycb)
->> +        return -ENODEV;
->> +
->> +    mutex_lock(&matrix_dev->lock);
->> +    napm_bits = matrix_mdev->shadow_crycb->apm_max + 1;
->> +    naqm_bits = matrix_mdev->shadow_crycb->aqm_max + 1;
->> +    apid1 = find_first_bit_inv(matrix_mdev->shadow_crycb->apm, 
->> napm_bits);
->> +    apqi1 = find_first_bit_inv(matrix_mdev->shadow_crycb->aqm, 
->> naqm_bits);
->> +
->> +    if ((apid1 < napm_bits) && (apqi1 < naqm_bits)) {
->> +        for_each_set_bit_inv(apid, matrix_mdev->shadow_crycb->apm,
->> +                     napm_bits) {
->> +            for_each_set_bit_inv(apqi,
->> +                         matrix_mdev->shadow_crycb->aqm,
->> +                         naqm_bits) {
->> +                n = sprintf(bufpos, "%02lx.%04lx\n", apid,
->> +                        apqi);
->> +                bufpos += n;
->> +                nchars += n;
->> +            }
->> +        }
->> +    } else if (apid1 < napm_bits) {
->> +        for_each_set_bit_inv(apid, matrix_mdev->shadow_crycb->apm,
->> +                     napm_bits) {
->> +            n = sprintf(bufpos, "%02lx.\n", apid);
->> +            bufpos += n;
->> +            nchars += n;
->> +        }
->> +    } else if (apqi1 < naqm_bits) {
->> +        for_each_set_bit_inv(apqi, matrix_mdev->shadow_crycb->aqm,
->> +                     naqm_bits) {
->> +            n = sprintf(bufpos, ".%04lx\n", apqi);
->> +            bufpos += n;
->> +            nchars += n;
->> +        }
->> +    }
->> +
->> +    mutex_unlock(&matrix_dev->lock);
->> +
->> +    return nchars;
->> +}
->> +static DEVICE_ATTR_RO(guest_matrix);
->> +
->>   static struct attribute *vfio_ap_mdev_attrs[] = {
->>       &dev_attr_assign_adapter.attr,
->>       &dev_attr_unassign_adapter.attr,
->> @@ -780,6 +838,7 @@ static struct attribute *vfio_ap_mdev_attrs[] = {
->>       &dev_attr_unassign_control_domain.attr,
->>       &dev_attr_control_domains.attr,
->>       &dev_attr_matrix.attr,
->> +    &dev_attr_guest_matrix.attr,
->>       NULL,
->>   };
->>
-> 
-> Code seems very similar to matrix_show, can't you share the code?
+> On Wed, May 01, 2019 at 03:08:31PM -0400, Stefan Hajnoczi wrote:
+> > On Tue, Apr 30, 2019 at 05:30:01PM -0700, Jorge E. Moreira wrote:
+> > > Avoid a race in which static variables in net/vmw_vsock/af_vsock.c are
+> > > accessed (while handling interrupts) before they are initialized.
+> > >
+> > >
+> > > [    4.201410] BUG: unable to handle kernel paging request at ffffffffffffffe8
+> > > [    4.207829] IP: vsock_addr_equals_addr+0x3/0x20
+> > > [    4.211379] PGD 28210067 P4D 28210067 PUD 28212067 PMD 0
+> > > [    4.211379] Oops: 0000 [#1] PREEMPT SMP PTI
+> > > [    4.211379] Modules linked in:
+> > > [    4.211379] CPU: 1 PID: 30 Comm: kworker/1:1 Not tainted 4.14.106-419297-gd7e28cc1f241 #1
+> > > [    4.211379] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+> > > [    4.211379] Workqueue: virtio_vsock virtio_transport_rx_work
+> > > [    4.211379] task: ffffa3273d175280 task.stack: ffffaea1800e8000
+> > > [    4.211379] RIP: 0010:vsock_addr_equals_addr+0x3/0x20
+> > > [    4.211379] RSP: 0000:ffffaea1800ebd28 EFLAGS: 00010286
+> > > [    4.211379] RAX: 0000000000000002 RBX: 0000000000000000 RCX: ffffffffb94e42f0
+> > > [    4.211379] RDX: 0000000000000400 RSI: ffffffffffffffe0 RDI: ffffaea1800ebdd0
+> > > [    4.211379] RBP: ffffaea1800ebd58 R08: 0000000000000001 R09: 0000000000000001
+> > > [    4.211379] R10: 0000000000000000 R11: ffffffffb89d5d60 R12: ffffaea1800ebdd0
+> > > [    4.211379] R13: 00000000828cbfbf R14: 0000000000000000 R15: ffffaea1800ebdc0
+> > > [    4.211379] FS:  0000000000000000(0000) GS:ffffa3273fd00000(0000) knlGS:0000000000000000
+> > > [    4.211379] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > [    4.211379] CR2: ffffffffffffffe8 CR3: 000000002820e001 CR4: 00000000001606e0
+> > > [    4.211379] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > > [    4.211379] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > > [    4.211379] Call Trace:
+> > > [    4.211379]  ? vsock_find_connected_socket+0x6c/0xe0
+> > > [    4.211379]  virtio_transport_recv_pkt+0x15f/0x740
+> > > [    4.211379]  ? detach_buf+0x1b5/0x210
+> > > [    4.211379]  virtio_transport_rx_work+0xb7/0x140
+> > > [    4.211379]  process_one_work+0x1ef/0x480
+> > > [    4.211379]  worker_thread+0x312/0x460
+> > > [    4.211379]  kthread+0x132/0x140
+> > > [    4.211379]  ? process_one_work+0x480/0x480
+> > > [    4.211379]  ? kthread_destroy_worker+0xd0/0xd0
+> > > [    4.211379]  ret_from_fork+0x35/0x40
+> > > [    4.211379] Code: c7 47 08 00 00 00 00 66 c7 07 28 00 c7 47 08 ff ff ff ff c7 47 04 ff ff ff ff c3 0f 1f 00 66 2e 0f 1f 84 00 00 00 00 00 8b 47 08 <3b> 46 08 75 0a 8b 47 04 3b 46 04 0f 94 c0 c3 31 c0 c3 90 66 2e
+> > > [    4.211379] RIP: vsock_addr_equals_addr+0x3/0x20 RSP: ffffaea1800ebd28
+> > > [    4.211379] CR2: ffffffffffffffe8
+> > > [    4.211379] ---[ end trace f31cc4a2e6df3689 ]---
+> > > [    4.211379] Kernel panic - not syncing: Fatal exception in interrupt
+> > > [    4.211379] Kernel Offset: 0x37000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> > > [    4.211379] Rebooting in 5 seconds..
+> > >
+> > > Fixes: 22b5c0b63f32 ("vsock/virtio: fix kernel panic after device hot-unplug")
+> > > Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> > > Cc: "David S. Miller" <davem@davemloft.net>
+> > > Cc: kvm@vger.kernel.org
+> > > Cc: virtualization@lists.linux-foundation.org
+> > > Cc: netdev@vger.kernel.org
+> > > Cc: kernel-team@android.com
+> > > Cc: stable@vger.kernel.org [4.9+]
+> > > Signed-off-by: Jorge E. Moreira <jemoreira@google.com>
+> > > ---
+> > >  net/vmw_vsock/virtio_transport.c | 13 ++++++-------
+> > >  1 file changed, 6 insertions(+), 7 deletions(-)
+> > >
+> > > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> > > index 15eb5d3d4750..96ab344f17bb 100644
+> > > --- a/net/vmw_vsock/virtio_transport.c
+> > > +++ b/net/vmw_vsock/virtio_transport.c
+> > > @@ -702,28 +702,27 @@ static int __init virtio_vsock_init(void)
+> > >     if (!virtio_vsock_workqueue)
+> > >             return -ENOMEM;
+> > >
+> > > -   ret = register_virtio_driver(&virtio_vsock_driver);
+> > > +   ret = vsock_core_init(&virtio_transport.transport);
+> >
+> > Have you checked that all transport callbacks are safe even if another
+> > CPU calls them while virtio_vsock_probe() is executing on another CPU?
+> >
+>
+> I have the same doubt.
+>
+> What do you think to take the 'the_virtio_vsock_mutex' in the
+> virtio_vsock_init(), keeping the previous order?
+>
+> This should prevent this issue because the virtio_vsock_probe() remains
+> blocked in the mutex until the end of vsock_core_init().
+>
+> Cheers,
+> Stefano
 
-It is, I suppose I could write a function that both can call.
+Hi Stefan, Stefano,
+Sorry for the late reply.
 
-> 
-> 
-> 
-> 
-> 
+@Stefan
+The order of vsock_core_exit() does not need to be changed to fix the
+bug I found, but not changing it means the exit function is not
+symmetric to the init function.
 
+@Stefano
+Taking the mutex from virtio_vsock_init() could work too (I haven't
+tried it yet), but it's unnecessary, all that needs to be done is
+properly initialize vsock_core before attempting to use it.
+
+I would prefer to change the order in virtio_vsock_init, while leaving
+virtio_vsock_exit unchanged, but I'll leave the final decision to you
+since I am not very familiar with the inner workings of these modules.
