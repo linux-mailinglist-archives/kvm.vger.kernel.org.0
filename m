@@ -2,144 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2466714338
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 02:29:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1ECB1435D
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 03:41:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727740AbfEFA3g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 May 2019 20:29:36 -0400
-Received: from mga06.intel.com ([134.134.136.31]:15298 "EHLO mga06.intel.com"
+        id S1726156AbfEFBla (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 May 2019 21:41:30 -0400
+Received: from mga04.intel.com ([192.55.52.120]:62134 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727285AbfEFA3f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 May 2019 20:29:35 -0400
-X-Amp-Result: UNSCANNABLE
+        id S1725786AbfEFBl3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 May 2019 21:41:29 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 May 2019 17:29:35 -0700
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 May 2019 18:41:29 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.60,435,1549958400"; 
-   d="scan'208";a="140299105"
-Received: from romley-ivt3.sc.intel.com ([172.25.110.60])
-  by orsmga008.jf.intel.com with ESMTP; 05 May 2019 17:29:34 -0700
-Date:   Sun, 5 May 2019 17:21:08 -0700
-From:   Fenghua Yu <fenghua.yu@intel.com>
-To:     Ingo Molnar <mingo@kernel.org>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        H Peter Anvin <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ravi V Shankar <ravi.v.shankar@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Christopherson Sean J <sean.j.christopherson@intel.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Michael Chan <michael.chan@broadcom.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        x86 <x86@kernel.org>, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: Re: [PATCH v8 15/15] x86/split_lock: Add a sysfs interface to
- enable/disable split lock detection during run time
-Message-ID: <20190506002108.GB110479@romley-ivt3.sc.intel.com>
-References: <1556134382-58814-1-git-send-email-fenghua.yu@intel.com>
- <1556134382-58814-16-git-send-email-fenghua.yu@intel.com>
- <20190425063115.GD40105@gmail.com>
+   d="scan'208";a="146639249"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.136]) ([10.239.159.136])
+  by fmsmga008.fm.intel.com with ESMTP; 05 May 2019 18:41:24 -0700
+Cc:     baolu.lu@linux.intel.com, iommu@lists.linux-foundation.org,
+        Tom Murphy <murphyt7@tcd.ie>, Joerg Roedel <joro@8bytes.org>,
+        Will Deacon <will.deacon@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Andy Gross <andy.gross@linaro.org>,
+        David Brown <david.brown@linaro.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Rob Clark <robdclark@gmail.com>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-mediatek@lists.infradead.org,
+        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-tegra@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC 6/7] iommu/vt-d: convert the intel iommu driver to the
+ dma-iommu ops api
+To:     Tom Murphy <tmurphy@arista.com>
+References: <20190504132327.27041-1-tmurphy@arista.com>
+ <20190504132327.27041-7-tmurphy@arista.com>
+ <602b77a2-9c68-ad14-b64f-904a7ff27a15@linux.intel.com>
+ <CAPL0++57nyLYP1fq=-6zvNS0z_iCqjWLbQ1MsG5F60ODkmRCQQ@mail.gmail.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <2419e94d-bfdb-e70d-bbfd-425671886e99@linux.intel.com>
+Date:   Mon, 6 May 2019 09:34:59 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190425063115.GD40105@gmail.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+In-Reply-To: <CAPL0++57nyLYP1fq=-6zvNS0z_iCqjWLbQ1MsG5F60ODkmRCQQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Apr 25, 2019 at 08:31:15AM +0200, Ingo Molnar wrote:
-> 
-> * Fenghua Yu <fenghua.yu@intel.com> wrote:
-> 
-> > +		disabled if split lock operation in kernel code happens on
-> > +		the CPU. The interface doesn't show or control split lock
-> > +		detection on individual CPU.
-> 
-> I.e. implementation and possible actual state are out of sync. Why?
-> 
-> Also, if it's a global flag, why waste memory on putting a sysfs knob 
-> into every CPU's sysfs file?
-> 
-> Finally, why is a debugging facility in sysfs, why not a debugfs knob? 
-> Using a sysctl would solve the percpu vs. global confusion as well ...
+Hi,
 
-Can I put the interface in /sys/kernel/debug/x86/split_lock_detect?
-
+On 5/6/19 1:03 AM, Tom Murphy wrote:
+> On Sun, May 5, 2019 at 3:44 AM Lu Baolu<baolu.lu@linux.intel.com>  wrote:
+>> Hi,
+>>
+>> On 5/4/19 9:23 PM, Tom Murphy wrote:
+>>> static int intel_iommu_add_device(struct device *dev)
+>>>    {
+>>> +     struct dmar_domain *dmar_domain;
+>>> +     struct iommu_domain *domain;
+>>>        struct intel_iommu *iommu;
+>>>        struct iommu_group *group;
+>>> -     struct iommu_domain *domain;
+>>> +     dma_addr_t base;
+>>>        u8 bus, devfn;
+>>>
+>>>        iommu = device_to_iommu(dev, &bus, &devfn);
+>>> @@ -4871,9 +4514,12 @@ static int intel_iommu_add_device(struct device *dev)
+>>>        if (IS_ERR(group))
+>>>                return PTR_ERR(group);
+>>>
+>>> +     base = IOVA_START_PFN << VTD_PAGE_SHIFT;
+>>>        domain = iommu_get_domain_for_dev(dev);
+>>> +     dmar_domain = to_dmar_domain(domain);
+>>>        if (domain->type == IOMMU_DOMAIN_DMA)
+>>> -             dev->dma_ops = &intel_dma_ops;
+>>> +             iommu_setup_dma_ops(dev, base,
+>>> +                             __DOMAIN_MAX_ADDR(dmar_domain->gaw) - base);
+>> I didn't find the implementation of iommu_setup_dma_ops() in this
+>> series. Will the iova resource be initialized in this function?
+> Ah sorry, I should've mentioned this is based on the
+> http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/dma-iommu-ops.3
+> branch with the "iommu/vt-d: Delegate DMA domain to generic iommu" and
+> "iommu/amd: Convert the AMD iommu driver to the dma-iommu api" patch
+> sets applied.
 > 
-> > --- a/arch/x86/kernel/cpu/intel.c
-> > +++ b/arch/x86/kernel/cpu/intel.c
-> > @@ -35,6 +35,7 @@
-> >  DEFINE_PER_CPU(u64, msr_test_ctl_cache);
-> >  EXPORT_PER_CPU_SYMBOL_GPL(msr_test_ctl_cache);
-> >  
-> > +static DEFINE_MUTEX(split_lock_detect_mutex);
-> >  static bool split_lock_detect_enable;
+>> If so, will this block iommu_group_create_direct_mappings() which
+>> reserves and maps the reserved iova ranges.
+> The reserved regions will be reserved by the
+> iova_reserve_iommu_regions function instead:
+> (https://github.com/torvalds/linux/blob/6203838dec05352bc357625b1e9ba0a10d3bca35/drivers/iommu/dma-iommu.c#L238
+> )
+> iommu_setup_dma_ops calls iommu_dma_init_domain which calls
+> iova_reserve_iommu_regions.
+> iommu_group_create_direct_mappings will still execute normally but it
+> won't be able to call the intel_iommu_apply_resv_region function
+> because it's been removed in this patchset.
+> This shouldn't change any behavior and the same regions should be reserved.
 > 
-> 'enable' is a verb in plain form - which we use for function names.
-> 
-> For variable names that denotes current state we typically use past 
-> tense, i.e. 'enabled'.
-> 
-> (The only case where we'd us the split_lock_detect_enable name for a flag 
-> if it's a flag to trigger some sort of enabling action - which this 
-> isn't.)
-> 
-> Please review the whole series for various naming mishaps.
-OK.
 
-> 
-> > +	mutex_lock(&split_lock_detect_mutex);
-> > +
-> > +	split_lock_detect_enable = val;
-> > +
-> > +	/* Update the split lock detection setting in MSR on all online CPUs. */
-> > +	on_each_cpu(split_lock_update_msr, NULL, 1);
-> > +
-> > +	if (split_lock_detect_enable)
-> > +		pr_info("enabled\n");
-> > +	else
-> > +		pr_info("disabled\n");
-> > +
-> > +	mutex_unlock(&split_lock_detect_mutex);
-> 
-> Instead of a mutex, please just use the global atomic debug flag which 
-> controls the warning printout. By using that flag both for the WARN()ing 
-> and for controlling MSR state all the races are solved and the code is 
-> simplified.
+Okay, I understand it now. Thanks for the explanation.
 
-So is it OK to define split_lock_debug and use it in #AC handler and in
-here?
-
-static atomic_t split_lock_debug;
-
-in #AC handler:
-
-+       if (atomic_cmpxchg(&split_lock_debug, 0, 1) == 0) {
-+               /* Only warn split lock once */
-+               WARN_ONCE(1, "split lock operation detected\n");
-+               atomic_set(&split_lock_debug, 0);
-+       }
-
-And in split_lock_detect_store(), replace the mutex with split_lock_debug
-like this:
- 
--       mutex_lock(&split_lock_detect_mutex);
-+       while (atomic_cmpxchg(&split_lock_debug, 1, 0))
-+              cpu_relax();
-.... 
--       mutex_unlock(&split_lock_detect_mutex);
-+       atomic_set(&split_lock_debug, 0);
- 
-Is this right code for sync in both #AC handler and in
-split_lock_detect_store()?
-
-Thanks.
-
--Fenghua
+Best regards,
+Lu Baolu
