@@ -2,89 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EF7C914D86
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 16:53:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D1BB14EBD
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 17:05:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729049AbfEFOwI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 May 2019 10:52:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33634 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726990AbfEFOwE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 May 2019 10:52:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0BB8D3082E57;
-        Mon,  6 May 2019 14:52:04 +0000 (UTC)
-Received: from gondolin (unknown [10.40.205.81])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 12B665DA96;
-        Mon,  6 May 2019 14:52:01 +0000 (UTC)
-Date:   Mon, 6 May 2019 16:51:58 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Farhan Ali <alifm@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 2/7] s390/cio: Set vfio-ccw FSM state before ioeventfd
-Message-ID: <20190506165158.5da82576.cohuck@redhat.com>
-In-Reply-To: <20190503134912.39756-3-farman@linux.ibm.com>
-References: <20190503134912.39756-1-farman@linux.ibm.com>
-        <20190503134912.39756-3-farman@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1727386AbfEFPE1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 May 2019 11:04:27 -0400
+Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:59365 "EHLO
+        3.mo178.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727862AbfEFPE0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 May 2019 11:04:26 -0400
+Received: from player730.ha.ovh.net (unknown [10.109.160.232])
+        by mo178.mail-out.ovh.net (Postfix) with ESMTP id 25C765BF9D
+        for <kvm@vger.kernel.org>; Mon,  6 May 2019 17:04:25 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+        (Authenticated sender: clg@kaod.org)
+        by player730.ha.ovh.net (Postfix) with ESMTPSA id 6E57255802CD;
+        Mon,  6 May 2019 15:04:18 +0000 (UTC)
+Subject: Re: [PATCH] KVM: PPC: Book3S HV: XIVE: Clear escalation interrupt
+ pointers on device close
+To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
+Cc:     David Gibson <david@gibson.dropbear.id.au>, kvm-ppc@vger.kernel.org
+References: <20190426065414.GC12768@blackberry>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <4d9e4296-2004-265c-9eb6-748d2f71e98e@kaod.org>
+Date:   Mon, 6 May 2019 17:04:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Mon, 06 May 2019 14:52:04 +0000 (UTC)
+In-Reply-To: <20190426065414.GC12768@blackberry>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 5546464419197586391
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrjeejgdekiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri,  3 May 2019 15:49:07 +0200
-Eric Farman <farman@linux.ibm.com> wrote:
+On 4/26/19 8:54 AM, Paul Mackerras wrote:
+> This adds code to ensure that after a XIVE or XICS-on-XIVE KVM device
+> is closed, KVM will not try to enable or disable any of the escalation
+> interrupts for the VCPUs.  
 
-> Otherwise, the guest can believe it's okay to start another I/O
-> and bump into the non-idle state.  This results in a cc=3
-> (or cc=2 with the pending async CSCH/HSCH code [1]) to the guest,
+Yes. This is a required cleanup.
 
-I think you can now refer to cc=2, as the csch/hsch is on its way in :)
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 
-> which is unfortunate since everything is otherwise working normally.
+Thanks,
+
+C.
+
+
+> We don't have to worry about races between
+> clearing the pointers and use of the pointers by the XIVE context
+> push/pull code, because the callers hold the vcpu->mutex, which is
+> also taken by the KVM_RUN code.  Therefore the vcpu cannot be entering
+> or exiting the guest concurrently.
 > 
-> [1] https://patchwork.kernel.org/comment/22588563/
-> 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> 
+> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
 > ---
+>  arch/powerpc/kvm/book3s_xive.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
 > 
-> I think this might've been part of Pierre's FSM cleanup?
-
-Not sure if I saw this before, but there have been quite a number of
-patches going around...
-
-> ---
->  drivers/s390/cio/vfio_ccw_drv.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-> index 0b3b9de45c60..ddd21b6149fd 100644
-> --- a/drivers/s390/cio/vfio_ccw_drv.c
-> +++ b/drivers/s390/cio/vfio_ccw_drv.c
-> @@ -86,11 +86,11 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
+> index 4280cd8..4953957 100644
+> --- a/arch/powerpc/kvm/book3s_xive.c
+> +++ b/arch/powerpc/kvm/book3s_xive.c
+> @@ -1096,6 +1096,21 @@ void kvmppc_xive_disable_vcpu_interrupts(struct kvm_vcpu *vcpu)
+>  			arch_spin_unlock(&sb->lock);
+>  		}
 >  	}
->  	memcpy(private->io_region->irb_area, irb, sizeof(*irb));
->  
-> -	if (private->io_trigger)
-> -		eventfd_signal(private->io_trigger, 1);
-> -
->  	if (private->mdev && is_final)
->  		private->state = VFIO_CCW_STATE_IDLE;
 > +
-> +	if (private->io_trigger)
-> +		eventfd_signal(private->io_trigger, 1);
+> +	/* Disable vcpu's escalation interrupt */
+> +	if (vcpu->arch.xive_esc_on) {
+> +		__raw_readq((void __iomem *)(vcpu->arch.xive_esc_vaddr +
+> +					     XIVE_ESB_SET_PQ_01));
+> +		vcpu->arch.xive_esc_on = false;
+> +	}
+> +
+> +	/*
+> +	 * Clear pointers to escalation interrupt ESB.
+> +	 * This is safe because the vcpu->mutex is held, preventing
+> +	 * any other CPU from concurrently executing a KVM_RUN ioctl.
+> +	 */
+> +	vcpu->arch.xive_esc_vaddr = 0;
+> +	vcpu->arch.xive_esc_raddr = 0;
 >  }
 >  
->  /*
+>  void kvmppc_xive_cleanup_vcpu(struct kvm_vcpu *vcpu)
+> 
 
