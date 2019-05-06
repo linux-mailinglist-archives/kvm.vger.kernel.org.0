@@ -2,84 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BFA9714BAA
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 16:19:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3204314D9F
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 16:53:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726128AbfEFOTP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 May 2019 10:19:15 -0400
-Received: from mail-vs1-f73.google.com ([209.85.217.73]:47413 "EHLO
-        mail-vs1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726037AbfEFOTP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 May 2019 10:19:15 -0400
-Received: by mail-vs1-f73.google.com with SMTP id h23so2566337vsp.14
-        for <kvm@vger.kernel.org>; Mon, 06 May 2019 07:19:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=DW5TEc9dftjGwF3cHqm/Wd7O5YYKpwazUd03pdv4LAE=;
-        b=J9d5OXAM9dtxJ6tX+POujBS2d/BqFrFpsD/6PF7+7huItzfX5515ckZ1RRobVIibVo
-         TrIrNulQg/W9e2BMdTisZUEcG2n9CCatLUchMSumkD8bcZ3fVTlfO/hF4bGQ+OcNaR0n
-         542Uql4W9+6ANOyN58yzqf/cyNHvEixi2/KhIoDvxsawMOACqa5ivtB5Bi75QlyZeGuM
-         eHzAsNQdfSwD0/qtVA7kI1g3WZ74HSgC8joWZIPxKNDXRvqG5scl295w6Pvn2A/3FaDN
-         wWGviKvLeOay2d2A+fMV0IdpJ6ahwyT8ew9fxBTfYJSpd2Sbd5M/aTU+/vs3Ww2zJ1a5
-         ov7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=DW5TEc9dftjGwF3cHqm/Wd7O5YYKpwazUd03pdv4LAE=;
-        b=qcWjYXsSPR6TYx3FxMVHO6KHrRonXkt2wXQwOC6nj8cDuE9Bx0LKvNYuMSLXzRyTNn
-         WAuLPjvmI5aP21DcAIkMI3TsvKXPLH6uMEn05ShCPf1kzeT9oJwUyNIXpqL7mI3SD946
-         aZUsgZQtNt1zlRvlf99i+o1N3g60haGSKXxqC8ZvYysWLI6ckEjAiK/TeWeg27+g+C4O
-         i1vVhwTiybF7tcKfniNDdIyankjknZiJ+nbN+kHYSB0qc3U4EcBSn5jND68NgkLlp/Qn
-         a4nzeZRCaR4oVvSDEVTb2pS6GOhYedMb/GAs7V5QOI0CPPnxD0pVwT5in0qpF0bHSAFJ
-         yPFg==
-X-Gm-Message-State: APjAAAVqHPqKqaYJCYB//0MmO2xDD55OdgrCJZTNgZz6q8vnaN4j+zme
-        /A41f2eDeD14KW6vZ77czE7TWxzzI/jzGQDy
-X-Google-Smtp-Source: APXvYqxm09bGPVc073hJ/l7Ai97H86OzOiUKIomhZCkabvtIVCfWHrSIT1E1IEFxRMA2qBwE171vvGO4Zn3saGDQ
-X-Received: by 2002:ab0:1646:: with SMTP id l6mr13112138uae.75.1557152353871;
- Mon, 06 May 2019 07:19:13 -0700 (PDT)
-Date:   Mon,  6 May 2019 07:19:10 -0700
-Message-Id: <20190506141910.197288-1-aaronlewis@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.21.0.1020.gf2820cf01a-goog
-Subject: [PATCH v2] tests: kvm: Add tests to .gitignore
-From:   Aaron Lewis <aaronlewis@google.com>
-To:     pbonzini@redhat.com, rkrcmar@redhat.com, jmattson@google.com,
-        pshier@google.com, marcorr@google.com, kvm@vger.kernel.org
-Cc:     Aaron Lewis <aaronlewis@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1727769AbfEFOrS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 May 2019 10:47:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48846 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728883AbfEFOrQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 May 2019 10:47:16 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C299681DFA;
+        Mon,  6 May 2019 14:47:15 +0000 (UTC)
+Received: from gondolin (unknown [10.40.205.81])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 078B210021B2;
+        Mon,  6 May 2019 14:47:13 +0000 (UTC)
+Date:   Mon, 6 May 2019 16:47:10 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Farhan Ali <alifm@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 1/7] s390/cio: Update SCSW if it points to the end of
+ the chain
+Message-ID: <20190506164710.5fe0b6c8.cohuck@redhat.com>
+In-Reply-To: <20190503134912.39756-2-farman@linux.ibm.com>
+References: <20190503134912.39756-1-farman@linux.ibm.com>
+        <20190503134912.39756-2-farman@linux.ibm.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Mon, 06 May 2019 14:47:15 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-Reviewed-by: Peter Shier <pshier@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- tools/testing/selftests/kvm/.gitignore | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+On Fri,  3 May 2019 15:49:06 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 2689d1ea6d7a..6027b5f3d72d 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -1,9 +1,12 @@
- /x86_64/cr4_cpuid_sync_test
- /x86_64/evmcs_test
-+/x86_64/hyperv_cpuid
- /x86_64/platform_info_test
- /x86_64/set_sregs_test
-+/x86_64/smm_test
-+/x86_64/state_test
- /x86_64/sync_regs_test
- /x86_64/vmx_close_while_nested_test
- /x86_64/vmx_tsc_adjust_test
--/x86_64/state_test
-+/clear_dirty_log_test
- /dirty_log_test
--- 
-2.21.0.1020.gf2820cf01a-goog
+> Per the POPs [1], when processing an interrupt the SCSW.CPA field of an
+> IRB generally points to 8 bytes after the last CCW that was executed
+> (there are exceptions, but this is the most common behavior).
+> 
+> In the case of an error, this points us to the first un-executed CCW
+> in the chain.  But in the case of normal I/O, the address points beyond
+> the end of the chain.  While the guest generally only cares about this
+> when possibly restarting a channel program after error recovery, we
+> should convert the address even in the good scenario so that we provide
+> a consistent, valid, response upon I/O completion.
+> 
+> [1] Figure 16-6 in SA22-7832-11.  The footnotes in that table also state
+> that this is true even if the resulting address is invalid or protected,
+> but moving to the end of the guest chain should not be a surprise.
+> 
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>  drivers/s390/cio/vfio_ccw_cp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index 384b3987eeb4..f86da78eaeaa 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -870,7 +870,7 @@ void cp_update_scsw(struct channel_program *cp, union scsw *scsw)
+>  	 */
+>  	list_for_each_entry(chain, &cp->ccwchain_list, next) {
+>  		ccw_head = (u32)(u64)chain->ch_ccw;
+> -		if (is_cpa_within_range(cpa, ccw_head, chain->ch_len)) {
+> +		if (is_cpa_within_range(cpa, ccw_head, chain->ch_len + 1)) {
+
+Maybe add a comment
+
+/* On successful execution, cpa points just beyond the end of the chain. */
+
+or so, to avoid head-scratching and PoP-reading in the future?
+
+>  			/*
+>  			 * (cpa - ccw_head) is the offset value of the host
+>  			 * physical ccw to its chain head.
 
