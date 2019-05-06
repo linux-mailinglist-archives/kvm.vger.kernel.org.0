@@ -2,102 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FBA014724
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 11:04:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC5AC147C8
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 11:50:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726506AbfEFJES (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 May 2019 05:04:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45308 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726085AbfEFJER (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 May 2019 05:04:17 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7DD605945B;
-        Mon,  6 May 2019 09:04:17 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D03F55F9D4;
-        Mon,  6 May 2019 09:04:04 +0000 (UTC)
-Message-ID: <e8f6981863bdbba89adcba1c430083e68546ac1a.camel@redhat.com>
-Subject: Re: [PATCH v2 00/10] RFC: NVME MDEV
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Fam Zheng <fam@euphon.net>, Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>, kvm@vger.kernel.org,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Liang Cunming <cunming.liang@intel.com>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        "David S . Miller" <davem@davemloft.net>,
-        Jens Axboe <axboe@fb.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        id S1725981AbfEFJuO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 May 2019 05:50:14 -0400
+Received: from 6.mo1.mail-out.ovh.net ([46.105.43.205]:55888 "EHLO
+        6.mo1.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725883AbfEFJuO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 May 2019 05:50:14 -0400
+Received: from player763.ha.ovh.net (unknown [10.108.42.88])
+        by mo1.mail-out.ovh.net (Postfix) with ESMTP id 3EEC416E092
+        for <kvm@vger.kernel.org>; Mon,  6 May 2019 11:50:12 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+        (Authenticated sender: clg@kaod.org)
+        by player763.ha.ovh.net (Postfix) with ESMTPSA id CAF4E5725A26;
+        Mon,  6 May 2019 09:50:03 +0000 (UTC)
+Subject: Re: KVM: Introduce a 'release' method for KVM devices
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Colin Ian King <colin.king@canonical.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Liu Changpeng <changpeng.liu@intel.com>,
-        "Paul E . McKenney" <paulmck@linux.ibm.com>,
-        Amnon Ilan <ailan@redhat.com>, John Ferlan <jferlan@redhat.com>
-Date:   Mon, 06 May 2019 12:04:06 +0300
-In-Reply-To: <20190503121838.GA21041@lst.de>
-References: <20190502114801.23116-1-mlevitsk@redhat.com>
-         <20190503121838.GA21041@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Mon, 06 May 2019 09:04:17 +0000 (UTC)
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <5a34a77e-d1bf-c630-ef9b-4f94c2c0c221@canonical.com>
+ <2e7890d2-e433-8553-c466-5b42f7d7776e@ozlabs.ru>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <457f6636-35da-1cb6-4763-2d717bcc421e@kaod.org>
+Date:   Mon, 6 May 2019 11:50:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <2e7890d2-e433-8553-c466-5b42f7d7776e@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 239816684356733719
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrjeejgddvfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2019-05-03 at 14:18 +0200, Christoph Hellwig wrote:
-> I simply don't get the point of this series.
+On 5/2/19 4:35 AM, Alexey Kardashevskiy wrote:
 > 
-> MDEV is an interface for exposing parts of a device to a userspace
-> program / VM.  But that this series appears to do is to expose a
-> purely software defined nvme controller to userspace.  Which in
-> principle is a good idea, but we have a much better framework for that,
-> which is called vhost.
+> 
+> On 02/05/2019 00:42, Colin Ian King wrote:
+>> Hi,
+>>
+>> Static analysis with Coverity picked up an issue in the following commit:
+>>
+>> commit 2bde9b3ec8bdf60788e9e2ce8c07a2f8d6003dbd
+>> Author: Cédric Le Goater <clg@kaod.org>
+>> Date:   Thu Apr 18 12:39:41 2019 +0200
+>>
+>>     KVM: Introduce a 'release' method for KVM devices
+>>
+>>
+>>         struct kvm *kvm = dev->kvm;
+>>
+>> +       if (!dev)
+>> +               return -ENODEV;
+>>
+>> If dev is null then the dereference of dev->kvm when assigning pointer
+>> kvm will cause an null pointer dereference.  This is easily fixed by
+>> assigning kvm after the dev null check.
+> 
+> Yes, this is a bug.
 
-Let me explain the reasons for choosing the IO interfaces as I did:
+Clearly.
 
-1. Frontend interface (the interface that faces the guest/userspace/etc):
+>>
+>> +
+>> +       if (dev->kvm != kvm)
+>> +               return -EPERM;
+>>
+>> I don't understand the logic of the above check. kvm is the same
+>> dev->kvm on the earlier assignment, so dev->kvm != kvm seems to be
+>> always false, so this check seems to be redundant. Am I missing
+>> something more fundamental here?
+> 
+> Nope. This looks like unfortunate cut-n-paste which slipped through out
+> reviewing process :-D
 
-VFIO/mdev is just way to expose a (partially) software defined PCIe device to a
-guest.
+Yes. My bad :/ I will send a cleanup patch for 5.2
 
-Vhost on the other hand is an interface that is hardcoded and optimized for
-virtio. It can be extended to be pci generic, but why to do so if we already
-have VFIO.
+Thanks,
 
-So the biggest advantage of using VFIO _currently_ is that I don't add any new
-API/ABI to the kernel, and neither the userspace (qemu) needs to learn to use a
-new API. 
-
-It also worth noting that VFIO supports nesting out of box, so I don't need to
-worry about it (vhost has to deal with that on the protocol level using its
-IOTLB facility).
-
-On top of that, it is expected that newer hardware will support the PASID based
-device subdivision, which will allow us to _directly_ pass through the
-submission queues of the device and _force_ us to use the NVME protocol for the
-frontend.
-
-2. Backend interface (the connection to the real nvme device):
-
-Currently the backend interface _doesn't have_ to allocate a dedicated queue and
-bypass the block layer. It can use the block submit_bio/blk_poll as I
-demonstrate in the last patch in the series. Its 2x slower though.
-
-However, similar to the (1), when the driver will support the devices with
-hardware based passthrough, it will have to dedicate a bunch of queues to the
-guest, configure them with the appropriate PASID, and then let the guest use
-these queues directly.
-
-
-Best regards,
-	Maxim Levitsky
+C.
+ 
 
