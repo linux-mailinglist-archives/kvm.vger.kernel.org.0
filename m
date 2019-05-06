@@ -2,163 +2,304 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FC8F154D7
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 22:20:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6FCE154F2
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 22:35:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726434AbfEFUUJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 May 2019 16:20:09 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:50717 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726190AbfEFUUJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 May 2019 16:20:09 -0400
-Received: by mail-wm1-f65.google.com with SMTP id p21so17390829wmc.0
-        for <kvm@vger.kernel.org>; Mon, 06 May 2019 13:20:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5KVj2cIFo4sf42IOvLasjrLGxhKPAN71ZeOyGOXbgEg=;
-        b=cmUNiJ98WYG7sItDJoJr3sz3tx87o4/cseKFyRTB6KPblTqcD6p2X4Cl9Dt7uhRrbX
-         hwg3vsZ07HYU/TiXZVulJMltTrF/i8J+DlWJ8kYkqKoW3peDCioHiWUYbjftKe6qPglk
-         +yDK+zpMcVMUEQBzOIhOI3WfpIT6a5+4NO1/0EUR7vAT5tyU2DdWvP3oWcTcWKXeX+YG
-         C6Q7Hq5oLAY6JvccnQw8frAjd7/cZts981BUwUlJrmEuKmxiAeJ9UADewVtE7o06DJu9
-         8etmdNoNdE/3u5DC1DPp9fes9/FTjtks4PT0YKvOg69TSeWpiw1vKegIHhwPwDgriAPk
-         EYsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5KVj2cIFo4sf42IOvLasjrLGxhKPAN71ZeOyGOXbgEg=;
-        b=sGb20qz7+4h9F7ZxzCRTxWQ5YBr3MjO2CWXw0APx/GPdnHouXp3BNMgjBWHdkcnSy8
-         wEVb9JmnvQATG7Dt0SBu8LaOU1GEgqT5frRqTGQKgIKIc8me9Pu5+j1gckqMd1ylqEpM
-         nUNiJgEQ4kknJh5LRdJe3HrYgoZTrjpCOZgPQQphxB86HwOVfEMibm9H2F3sfAE/FLzO
-         Famd9JGc7ZTRgRjddyl8NzhdUpwo04FVeXqPnN4rtUXMW0yoS620ldJIyXf4Y9AKO9Hl
-         jn0fuiBsz9tW6WM9sJjXYjp7W+g8TrKRsGwbzaUftBhw+4OoZ0Y7dUwSC1IhczTIGNit
-         U59g==
-X-Gm-Message-State: APjAAAUcaK8GE68OfCJO4HKwKCyrJxCxiTJ1MGsa1gZ6erEJvvCVO8iP
-        BGybRJqXNCkUuKq9cT3oj08eadMIEw9o73gyMS5BJw==
-X-Google-Smtp-Source: APXvYqw6YN+mxes4KsRlBEwg0TxslCYp4jV8sOumNLnEbdftzDK/6jIQfDvI0cZj8kywJzf8b7wnJVv8SPDDt1cLFo8=
-X-Received: by 2002:a05:600c:2248:: with SMTP id a8mr18696267wmm.75.1557174006447;
- Mon, 06 May 2019 13:20:06 -0700 (PDT)
+        id S1726386AbfEFUfl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 May 2019 16:35:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47970 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726304AbfEFUfl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 May 2019 16:35:41 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x46KCk5X005968
+        for <kvm@vger.kernel.org>; Mon, 6 May 2019 16:35:40 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2saurmguc9-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 06 May 2019 16:35:39 -0400
+Received: from localhost
+        by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <akrowiak@linux.ibm.com>;
+        Mon, 6 May 2019 21:35:38 +0100
+Received: from b01cxnp23033.gho.pok.ibm.com (9.57.198.28)
+        by e17.ny.us.ibm.com (146.89.104.204) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 6 May 2019 21:35:34 +0100
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x46KZW5Z28639356
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 6 May 2019 20:35:32 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 21EF8AC059;
+        Mon,  6 May 2019 20:35:32 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B4706AC05F;
+        Mon,  6 May 2019 20:35:31 +0000 (GMT)
+Received: from [9.60.75.251] (unknown [9.60.75.251])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon,  6 May 2019 20:35:31 +0000 (GMT)
+Subject: Re: [PATCH v2 4/7] s390: vfio-ap: allow assignment of unavailable AP
+ resources to mdev device
+To:     pmorel@linux.ibm.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        frankja@linux.ibm.com, david@redhat.com, schwidefsky@de.ibm.com,
+        heiko.carstens@de.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com
+References: <1556918073-13171-1-git-send-email-akrowiak@linux.ibm.com>
+ <1556918073-13171-5-git-send-email-akrowiak@linux.ibm.com>
+ <2ba0aa01-e043-0013-4e2e-ea17bf9eea05@linux.ibm.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Date:   Mon, 6 May 2019 16:35:31 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-References: <20190501003001.186239-1-jemoreira@google.com> <20190501190831.GF22391@stefanha-x1.localdomain>
- <20190502082045.u3xypjbac5npbhtc@steredhat.homenet.telecomitalia.it>
-In-Reply-To: <20190502082045.u3xypjbac5npbhtc@steredhat.homenet.telecomitalia.it>
-From:   Jorge Moreira Broche <jemoreira@google.com>
-Date:   Mon, 6 May 2019 13:19:55 -0700
-Message-ID: <CAJi--POaVsfprbp5na5BvR=VNONKGfFya_BnmTzzcWmOQ1DM2Q@mail.gmail.com>
-Subject: Re: [PATCH] vsock/virtio: Initialize core virtio vsock before
- registering the driver
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kernel-team@android.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <2ba0aa01-e043-0013-4e2e-ea17bf9eea05@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19050620-0040-0000-0000-000004EC0B96
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011061; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000285; SDB=6.01199555; UDB=6.00629329; IPR=6.00980431;
+ MB=3.00026760; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-06 20:35:37
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050620-0041-0000-0000-000008F813B8
+Message-Id: <e0ce0d24-a732-d92a-3c3c-81204425d9b7@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-06_11:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905060164
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Wed, May 01, 2019 at 03:08:31PM -0400, Stefan Hajnoczi wrote:
-> > On Tue, Apr 30, 2019 at 05:30:01PM -0700, Jorge E. Moreira wrote:
-> > > Avoid a race in which static variables in net/vmw_vsock/af_vsock.c are
-> > > accessed (while handling interrupts) before they are initialized.
-> > >
-> > >
-> > > [    4.201410] BUG: unable to handle kernel paging request at ffffffffffffffe8
-> > > [    4.207829] IP: vsock_addr_equals_addr+0x3/0x20
-> > > [    4.211379] PGD 28210067 P4D 28210067 PUD 28212067 PMD 0
-> > > [    4.211379] Oops: 0000 [#1] PREEMPT SMP PTI
-> > > [    4.211379] Modules linked in:
-> > > [    4.211379] CPU: 1 PID: 30 Comm: kworker/1:1 Not tainted 4.14.106-419297-gd7e28cc1f241 #1
-> > > [    4.211379] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
-> > > [    4.211379] Workqueue: virtio_vsock virtio_transport_rx_work
-> > > [    4.211379] task: ffffa3273d175280 task.stack: ffffaea1800e8000
-> > > [    4.211379] RIP: 0010:vsock_addr_equals_addr+0x3/0x20
-> > > [    4.211379] RSP: 0000:ffffaea1800ebd28 EFLAGS: 00010286
-> > > [    4.211379] RAX: 0000000000000002 RBX: 0000000000000000 RCX: ffffffffb94e42f0
-> > > [    4.211379] RDX: 0000000000000400 RSI: ffffffffffffffe0 RDI: ffffaea1800ebdd0
-> > > [    4.211379] RBP: ffffaea1800ebd58 R08: 0000000000000001 R09: 0000000000000001
-> > > [    4.211379] R10: 0000000000000000 R11: ffffffffb89d5d60 R12: ffffaea1800ebdd0
-> > > [    4.211379] R13: 00000000828cbfbf R14: 0000000000000000 R15: ffffaea1800ebdc0
-> > > [    4.211379] FS:  0000000000000000(0000) GS:ffffa3273fd00000(0000) knlGS:0000000000000000
-> > > [    4.211379] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > [    4.211379] CR2: ffffffffffffffe8 CR3: 000000002820e001 CR4: 00000000001606e0
-> > > [    4.211379] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > > [    4.211379] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > > [    4.211379] Call Trace:
-> > > [    4.211379]  ? vsock_find_connected_socket+0x6c/0xe0
-> > > [    4.211379]  virtio_transport_recv_pkt+0x15f/0x740
-> > > [    4.211379]  ? detach_buf+0x1b5/0x210
-> > > [    4.211379]  virtio_transport_rx_work+0xb7/0x140
-> > > [    4.211379]  process_one_work+0x1ef/0x480
-> > > [    4.211379]  worker_thread+0x312/0x460
-> > > [    4.211379]  kthread+0x132/0x140
-> > > [    4.211379]  ? process_one_work+0x480/0x480
-> > > [    4.211379]  ? kthread_destroy_worker+0xd0/0xd0
-> > > [    4.211379]  ret_from_fork+0x35/0x40
-> > > [    4.211379] Code: c7 47 08 00 00 00 00 66 c7 07 28 00 c7 47 08 ff ff ff ff c7 47 04 ff ff ff ff c3 0f 1f 00 66 2e 0f 1f 84 00 00 00 00 00 8b 47 08 <3b> 46 08 75 0a 8b 47 04 3b 46 04 0f 94 c0 c3 31 c0 c3 90 66 2e
-> > > [    4.211379] RIP: vsock_addr_equals_addr+0x3/0x20 RSP: ffffaea1800ebd28
-> > > [    4.211379] CR2: ffffffffffffffe8
-> > > [    4.211379] ---[ end trace f31cc4a2e6df3689 ]---
-> > > [    4.211379] Kernel panic - not syncing: Fatal exception in interrupt
-> > > [    4.211379] Kernel Offset: 0x37000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-> > > [    4.211379] Rebooting in 5 seconds..
-> > >
-> > > Fixes: 22b5c0b63f32 ("vsock/virtio: fix kernel panic after device hot-unplug")
-> > > Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> > > Cc: "David S. Miller" <davem@davemloft.net>
-> > > Cc: kvm@vger.kernel.org
-> > > Cc: virtualization@lists.linux-foundation.org
-> > > Cc: netdev@vger.kernel.org
-> > > Cc: kernel-team@android.com
-> > > Cc: stable@vger.kernel.org [4.9+]
-> > > Signed-off-by: Jorge E. Moreira <jemoreira@google.com>
-> > > ---
-> > >  net/vmw_vsock/virtio_transport.c | 13 ++++++-------
-> > >  1 file changed, 6 insertions(+), 7 deletions(-)
-> > >
-> > > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> > > index 15eb5d3d4750..96ab344f17bb 100644
-> > > --- a/net/vmw_vsock/virtio_transport.c
-> > > +++ b/net/vmw_vsock/virtio_transport.c
-> > > @@ -702,28 +702,27 @@ static int __init virtio_vsock_init(void)
-> > >     if (!virtio_vsock_workqueue)
-> > >             return -ENOMEM;
-> > >
-> > > -   ret = register_virtio_driver(&virtio_vsock_driver);
-> > > +   ret = vsock_core_init(&virtio_transport.transport);
-> >
-> > Have you checked that all transport callbacks are safe even if another
-> > CPU calls them while virtio_vsock_probe() is executing on another CPU?
-> >
->
-> I have the same doubt.
->
-> What do you think to take the 'the_virtio_vsock_mutex' in the
-> virtio_vsock_init(), keeping the previous order?
->
-> This should prevent this issue because the virtio_vsock_probe() remains
-> blocked in the mutex until the end of vsock_core_init().
->
-> Cheers,
-> Stefano
+On 5/6/19 3:05 AM, Pierre Morel wrote:
+> On 03/05/2019 23:14, Tony Krowiak wrote:
+>> The AP architecture does not preclude assignment of AP resources that are
+>> not yet in the AP configuration (i.e., not available or not online).
+>> Let's go ahead and implement this facet of the AP architecture for linux
+>> guests.
+>>
+>> The current implementation does not allow assignment of AP resources to
+>> an mdev device if the AP queue devices identified by the assignment are
+>> not bound to the vfio_ap device driver. This patch allows assignment 
+>> of AP
+>> resources to the mdev device even if the AP queue devices are not 
+>> bound to
+>> the vfio_ap device driver, as long as the AP queue devices are not
+>> reserved by the AP BUS for use by the zcrypt device drivers.
+> 
+> or another mediated device.
 
-Hi Stefan, Stefano,
-Sorry for the late reply.
+Right you are!!
 
-@Stefan
-The order of vsock_core_exit() does not need to be changed to fix the
-bug I found, but not changing it means the exit function is not
-symmetric to the init function.
+> 
+> 
+>>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> ---
+>>   drivers/s390/crypto/vfio_ap_ops.c | 231 
+>> ++++++++------------------------------
+>>   1 file changed, 44 insertions(+), 187 deletions(-)
+>>
+>> diff --git a/drivers/s390/crypto/vfio_ap_ops.c 
+>> b/drivers/s390/crypto/vfio_ap_ops.c
+>> index 1021466cb661..ea24caf17a16 100644
+>> --- a/drivers/s390/crypto/vfio_ap_ops.c
+>> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+>> @@ -113,122 +113,6 @@ static struct attribute_group 
+>> *vfio_ap_mdev_type_groups[] = {
+>>       NULL,
+>>   };
+>> -struct vfio_ap_queue_reserved {
+>> -    unsigned long *apid;
+>> -    unsigned long *apqi;
+>> -    bool reserved;
+>> -};
+>> -
+>> -/**
+>> - * vfio_ap_has_queue
+>> - *
+>> - * @dev: an AP queue device
+>> - * @data: a struct vfio_ap_queue_reserved reference
+>> - *
+>> - * Flags whether the AP queue device (@dev) has a queue ID containing 
+>> the APQN,
+>> - * apid or apqi specified in @data:
+>> - *
+>> - * - If @data contains both an apid and apqi value, then @data will 
+>> be flagged
+>> - *   as reserved if the APID and APQI fields for the AP queue device 
+>> matches
+>> - *
+>> - * - If @data contains only an apid value, @data will be flagged as
+>> - *   reserved if the APID field in the AP queue device matches
+>> - *
+>> - * - If @data contains only an apqi value, @data will be flagged as
+>> - *   reserved if the APQI field in the AP queue device matches
+>> - *
+>> - * Returns 0 to indicate the input to function succeeded. Returns 
+>> -EINVAL if
+>> - * @data does not contain either an apid or apqi.
+>> - */
+>> -static int vfio_ap_has_queue(struct device *dev, void *data)
+>> -{
+>> -    struct vfio_ap_queue_reserved *qres = data;
+>> -    struct ap_queue *ap_queue = to_ap_queue(dev);
+>> -    ap_qid_t qid;
+>> -    unsigned long id;
+>> -
+>> -    if (qres->apid && qres->apqi) {
+>> -        qid = AP_MKQID(*qres->apid, *qres->apqi);
+>> -        if (qid == ap_queue->qid)
+>> -            qres->reserved = true;
+>> -    } else if (qres->apid && !qres->apqi) {
+>> -        id = AP_QID_CARD(ap_queue->qid);
+>> -        if (id == *qres->apid)
+>> -            qres->reserved = true;
+>> -    } else if (!qres->apid && qres->apqi) {
+>> -        id = AP_QID_QUEUE(ap_queue->qid);
+>> -        if (id == *qres->apqi)
+>> -            qres->reserved = true;
+>> -    } else {
+>> -        return -EINVAL;
+>> -    }
+>> -
+>> -    return 0;
+>> -}
+>> -
+>> -/**
+>> - * vfio_ap_verify_queue_reserved
+>> - *
+>> - * @matrix_dev: a mediated matrix device
+>> - * @apid: an AP adapter ID
+>> - * @apqi: an AP queue index
+>> - *
+>> - * Verifies that the AP queue with @apid/@apqi is reserved by the 
+>> VFIO AP device
+>> - * driver according to the following rules:
+>> - *
+>> - * - If both @apid and @apqi are not NULL, then there must be an AP 
+>> queue
+>> - *   device bound to the vfio_ap driver with the APQN identified by 
+>> @apid and
+>> - *   @apqi
+>> - *
+>> - * - If only @apid is not NULL, then there must be an AP queue device 
+>> bound
+>> - *   to the vfio_ap driver with an APQN containing @apid
+>> - *
+>> - * - If only @apqi is not NULL, then there must be an AP queue device 
+>> bound
+>> - *   to the vfio_ap driver with an APQN containing @apqi
+>> - *
+>> - * Returns 0 if the AP queue is reserved; otherwise, returns 
+>> -EADDRNOTAVAIL.
+>> - */
+>> -static int vfio_ap_verify_queue_reserved(unsigned long *apid,
+>> -                     unsigned long *apqi)
+>> -{
+>> -    int ret;
+>> -    struct vfio_ap_queue_reserved qres;
+>> -
+>> -    qres.apid = apid;
+>> -    qres.apqi = apqi;
+>> -    qres.reserved = false;
+>> -
+>> -    ret = driver_for_each_device(&matrix_dev->vfio_ap_drv->driver, NULL,
+>> -                     &qres, vfio_ap_has_queue);
+>> -    if (ret)
+>> -        return ret;
+>> -
+>> -    if (qres.reserved)
+>> -        return 0;
+>> -
+>> -    return -EADDRNOTAVAIL;
+>> -}
+>> -
+>> -static int
+>> -vfio_ap_mdev_verify_queues_reserved_for_apid(struct ap_matrix_mdev 
+>> *matrix_mdev,
+>> -                         unsigned long apid)
+>> -{
+>> -    int ret;
+>> -    unsigned long apqi;
+>> -    unsigned long nbits = matrix_mdev->matrix.aqm_max + 1;
+>> -
+>> -    if (find_first_bit_inv(matrix_mdev->matrix.aqm, nbits) >= nbits)
+>> -        return vfio_ap_verify_queue_reserved(&apid, NULL);
+>> -
+>> -    for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm, nbits) {
+>> -        ret = vfio_ap_verify_queue_reserved(&apid, &apqi);
+>> -        if (ret)
+>> -            return ret;
+>> -    }
+>> -
+>> -    return 0;
+>> -}
+>> -
+>>   /**
+>>    * vfio_ap_mdev_verify_no_sharing
+>>    *
+>> @@ -236,18 +120,26 @@ 
+>> vfio_ap_mdev_verify_queues_reserved_for_apid(struct ap_matrix_mdev 
+>> *matrix_mdev,
+>>    * and AP queue indexes comprising the AP matrix are not configured 
+>> for another
+>>    * mediated device. AP queue sharing is not allowed.
+>>    *
+>> - * @matrix_mdev: the mediated matrix device
+>> + * @mdev_apm: the mask identifying the adapters assigned to mdev
+>> + * @mdev_apm: the mask identifying the adapters assigned to mdev
+>>    *
+>>    * Returns 0 if the APQNs are not shared, otherwise; returns 
+>> -EADDRINUSE.
+>>    */
+>> -static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev 
+>> *matrix_mdev)
+>> +static int vfio_ap_mdev_verify_no_sharing(unsigned long *mdev_apm,
+>> +                      unsigned long *mdev_aqm)
+>>   {
+>>       struct ap_matrix_mdev *lstdev;
+>>       DECLARE_BITMAP(apm, AP_DEVICES);
+>>       DECLARE_BITMAP(aqm, AP_DOMAINS);
+>>       list_for_each_entry(lstdev, &matrix_dev->mdev_list, node) {
+>> -        if (matrix_mdev == lstdev)
+>> +        /*
+>> +         * If either of the input masks belongs to the mdev to which an
+>> +         * AP resource is being assigned, then we don't need to verify
+>> +         * that mdev's masks.
+>> +         */
+>> +        if ((mdev_apm == lstdev->matrix.apm) ||
+>> +            (mdev_aqm == lstdev->matrix.aqm))
+>>               continue;
+> 
+> Is it possible that mdev_apm and mdev_aqm do not belong to the same 
+> mediated device?
 
-@Stefano
-Taking the mutex from virtio_vsock_init() could work too (I haven't
-tried it yet), but it's unnecessary, all that needs to be done is
-properly initialize vsock_core before attempting to use it.
+The mdev_apm and the mdev_aqm will not both belong to the same mdev
+device. Either the mdev_apm OR the mdev_aqm will belong to the mdev
+device to which the adapter or domain is being assigned.
 
-I would prefer to change the order in virtio_vsock_init, while leaving
-virtio_vsock_exit unchanged, but I'll leave the final decision to you
-since I am not very familiar with the inner workings of these modules.
+When an adapter is assigned, the mdev_apm is allocated in the
+assign_adapter_store function setting only the bit corresponding to
+the APID of the adapter being assigned. The mdev_aqm address is the
+address of the matrix_mdev->matrix.aqm.
+
+When a domain is assigned, the mdev_aqm is allocated in the
+assign_adapter_store function setting only the bit corresponding to
+the APQI of the domain being assigned. The mdev_apm address is the
+address of the matrix_mdev->matrix.apm.
+
+> 
+> ...snip...
+> 
+> 
+
