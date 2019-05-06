@@ -2,158 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0173E14A9D
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 15:11:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DF6114B34
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 15:50:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726296AbfEFNLW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 May 2019 09:11:22 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51446 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726282AbfEFNLV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 May 2019 09:11:21 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x46D75Xq001105
-        for <kvm@vger.kernel.org>; Mon, 6 May 2019 09:11:21 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2samgeu3n8-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 06 May 2019 09:11:21 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Mon, 6 May 2019 14:11:19 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 6 May 2019 14:11:13 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x46DBCX252035588
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 May 2019 13:11:12 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1CB43A4055;
-        Mon,  6 May 2019 13:11:12 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C523CA405E;
-        Mon,  6 May 2019 13:11:11 +0000 (GMT)
-Received: from morel-ThinkPad-W530.numericable.fr (unknown [9.145.46.119])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  6 May 2019 13:11:11 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     cohuck@redhat.com
-Cc:     pasic@linux.vnet.ibm.com, farman@linux.ibm.com,
-        alifm@linux.ibm.com, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH v1 2/2] vfio-ccw: rework sch_event
-Date:   Mon,  6 May 2019 15:11:10 +0200
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1557148270-19901-1-git-send-email-pmorel@linux.ibm.com>
-References: <1557148270-19901-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19050613-4275-0000-0000-00000331E776
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050613-4276-0000-0000-000038414EB5
-Message-Id: <1557148270-19901-3-git-send-email-pmorel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-06_08:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=5 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=565 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905060114
+        id S1726383AbfEFNui (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 May 2019 09:50:38 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:46976 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726220AbfEFNui (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 May 2019 09:50:38 -0400
+Received: by mail-pl1-f193.google.com with SMTP id bi2so6396418plb.13
+        for <kvm@vger.kernel.org>; Mon, 06 May 2019 06:50:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=bQJbdD3DpYVGAJMB4xHT/wsaNr2EFZ6QKX73vdaXiy8=;
+        b=DRQ6yKsX6G++7lU4Zg5s3BYR0P9dOtDVRdgDq4OTKtqnFzdHr5mrU+eAH8m/xaAqq9
+         GjaGvUS7mkeRr5xpwetie72lE61cQQyZApscmN4YS70y1VIT4NWv/M48lKerfm627Th7
+         gjcuK1BYAbSf4nXxfiio5m7d5spLpXCCTDKGcC2aVAdeBFYRKrP8Z7bE2tG9DZ2rIsGu
+         CwljSWmdU9qHLtd/Gz+syQE0KKMpSKrEQoJTqd9Mdkk5tKa5G5tK8eI5XA5KcbzqPu4t
+         Lq4Z4U34+8CqteCsW5OMIEDaAHJ5orfzvcPcniCK32BPqiOxrEh1Ln7swqpgKcat4g3N
+         37Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=bQJbdD3DpYVGAJMB4xHT/wsaNr2EFZ6QKX73vdaXiy8=;
+        b=NyLFX1PKQh9gxxfKNG6ifLDCcbFPoF/8BRlh7la+4FK+MRTcsUA4QCoTmU52ht0EiG
+         sUMcg2XaOoqOSmOe/k7DndmnyTcKCjcTg9dry94J33fl6aZ2ILr2E/3BW/NtRVH3OJNv
+         PPublN2DoBL42NyASqYiOKgRZdE7z0YlBBLZUdBH/Au0mR0EYTHEPRm8++sgeDHOMIjN
+         qoq1W7MJI5299yGqE8zcK5F1Mz8ttm/swTCKBrd9r1Xfp3FEP6td8OQxd2a1Xw/nbJfZ
+         Kt8jikj6W5TEFcX85Kc11B0SGpZAcD7gXyBbWg6fF0NP1nUk/Dbky2s7vRowl8BtP/qD
+         1Aew==
+X-Gm-Message-State: APjAAAVx45/Wg/H2QsyMSqJgyeefzjyXZOE9BU+hWIVTAvQQWu9cOQws
+        IcO4EtmpmcgkIj9e4PwKhQflxii+W9ZHGk9z2o00YA==
+X-Google-Smtp-Source: APXvYqwbKSvVTOpuC9GERGa4zYi/56mC1YqRSuljrXhiTGgFzKxKxPy7xquJMcd52Z/Xw9GWuZtYyS77z4awlmXBnWo=
+X-Received: by 2002:a17:902:7783:: with SMTP id o3mr32208910pll.159.1557150636780;
+ Mon, 06 May 2019 06:50:36 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.1556630205.git.andreyknvl@google.com> <2e827b5c484be14044933049fec180cd6acb054b.1556630205.git.andreyknvl@google.com>
+ <3108d33e-8e18-a73e-5e1a-f0db64f02ab3@amd.com>
+In-Reply-To: <3108d33e-8e18-a73e-5e1a-f0db64f02ab3@amd.com>
+From:   Andrey Konovalov <andreyknvl@google.com>
+Date:   Mon, 6 May 2019 15:50:25 +0200
+Message-ID: <CAAeHK+zDScw-aYpQFVG=JKartDqCF+ZWnq3-6PuaYgMiBphcJA@mail.gmail.com>
+Subject: Re: [PATCH v14 11/17] drm/amdgpu, arm64: untag user pointers
+To:     "Kuehling, Felix" <Felix.Kuehling@amd.com>
+Cc:     "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        "Deucher, Alexander" <Alexander.Deucher@amd.com>,
+        "Koenig, Christian" <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Chintan Pandya <cpandya@codeaurora.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set the mediated device as non operational when the
-subchannel went non operational.
-Otherwise keep the current state.
+On Tue, Apr 30, 2019 at 8:03 PM Kuehling, Felix <Felix.Kuehling@amd.com> wrote:
+>
+> On 2019-04-30 9:25 a.m., Andrey Konovalov wrote:
+> > [CAUTION: External Email]
+> >
+> > This patch is a part of a series that extends arm64 kernel ABI to allow to
+> > pass tagged user pointers (with the top byte set to something else other
+> > than 0x00) as syscall arguments.
+> >
+> > amdgpu_ttm_tt_get_user_pages() uses provided user pointers for vma
+> > lookups, which can only by done with untagged pointers. This patch
+> > untag user pointers when they are being set in
+> > amdgpu_ttm_tt_set_userptr().
+> >
+> > In amdgpu_gem_userptr_ioctl() and amdgpu_amdkfd_gpuvm.c/init_user_pages()
+> > an MMU notifier is set up with a (tagged) userspace pointer. The untagged
+> > address should be used so that MMU notifiers for the untagged address get
+> > correctly matched up with the right BO. This patch untag user pointers in
+> > amdgpu_gem_userptr_ioctl() for the GEM case and in
+> > amdgpu_amdkfd_gpuvm_alloc_memory_of_gpu() for the KFD case.
+> >
+> > Suggested-by: Kuehling, Felix <Felix.Kuehling@amd.com>
+> > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> > ---
+> >   drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd_gpuvm.c | 2 +-
+> >   drivers/gpu/drm/amd/amdgpu/amdgpu_gem.c          | 2 ++
+> >   drivers/gpu/drm/amd/amdgpu/amdgpu_ttm.c          | 2 +-
+> >   3 files changed, 4 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd_gpuvm.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd_gpuvm.c
+> > index 1921dec3df7a..20cac44ed449 100644
+> > --- a/drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd_gpuvm.c
+> > +++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd_gpuvm.c
+> > @@ -1121,7 +1121,7 @@ int amdgpu_amdkfd_gpuvm_alloc_memory_of_gpu(
+> >                  alloc_flags = 0;
+> >                  if (!offset || !*offset)
+> >                          return -EINVAL;
+> > -               user_addr = *offset;
+> > +               user_addr = untagged_addr(*offset);
+> >          } else if (flags & ALLOC_MEM_FLAGS_DOORBELL) {
+> >                  domain = AMDGPU_GEM_DOMAIN_GTT;
+> >                  alloc_domain = AMDGPU_GEM_DOMAIN_CPU;
+> > diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_gem.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_gem.c
+> > index d21dd2f369da..985cb82b2aa6 100644
+> > --- a/drivers/gpu/drm/amd/amdgpu/amdgpu_gem.c
+> > +++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_gem.c
+> > @@ -286,6 +286,8 @@ int amdgpu_gem_userptr_ioctl(struct drm_device *dev, void *data,
+> >          uint32_t handle;
+> >          int r;
+> >
+> > +       args->addr = untagged_addr(args->addr);
+> > +
+> >          if (offset_in_page(args->addr | args->size))
+> >                  return -EINVAL;
+> >
+> > diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_ttm.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_ttm.c
+> > index 73e71e61dc99..1d30e97ac2c4 100644
+> > --- a/drivers/gpu/drm/amd/amdgpu/amdgpu_ttm.c
+> > +++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_ttm.c
+> > @@ -1248,7 +1248,7 @@ int amdgpu_ttm_tt_set_userptr(struct ttm_tt *ttm, uint64_t addr,
+> >          if (gtt == NULL)
+> >                  return -EINVAL;
+> >
+> > -       gtt->userptr = addr;
+> > +       gtt->userptr = untagged_addr(addr);
+>
+> Doing this here seems unnecessary. You already untagged the address in
+> both callers of this function. Untagging in the two callers ensures that
+> the userptr and MMU notifier are in sync, using the same untagged
+> address. Doing it again here is redundant.
 
-Since we removed the last use of VFIO_CCW_STATE_STANDBY
-remove this state from the state machine.
+ Will fix in v15, thanks!
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- drivers/s390/cio/vfio_ccw_drv.c     | 11 +----------
- drivers/s390/cio/vfio_ccw_fsm.c     |  7 +------
- drivers/s390/cio/vfio_ccw_ops.c     |  2 +-
- drivers/s390/cio/vfio_ccw_private.h |  1 -
- 4 files changed, 3 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index a95b6c7..2f6140d5 100644
---- a/drivers/s390/cio/vfio_ccw_drv.c
-+++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -210,17 +210,8 @@ static int vfio_ccw_sch_event(struct subchannel *sch, int process)
- 	if (work_pending(&sch->todo_work))
- 		goto out_unlock;
- 
--	if (cio_update_schib(sch)) {
-+	if (cio_update_schib(sch))
- 		vfio_ccw_fsm_event(private, VFIO_CCW_EVENT_NOT_OPER);
--		rc = 0;
--		goto out_unlock;
--	}
--
--	private = dev_get_drvdata(&sch->dev);
--	if (private->state == VFIO_CCW_STATE_NOT_OPER) {
--		private->state = private->mdev ? VFIO_CCW_STATE_IDLE :
--				 VFIO_CCW_STATE_STANDBY;
--	}
- 	rc = 0;
- 
- out_unlock:
-diff --git a/drivers/s390/cio/vfio_ccw_fsm.c b/drivers/s390/cio/vfio_ccw_fsm.c
-index 49d9d3d..a6524ca 100644
---- a/drivers/s390/cio/vfio_ccw_fsm.c
-+++ b/drivers/s390/cio/vfio_ccw_fsm.c
-@@ -88,6 +88,7 @@ static int fsm_do_halt(struct vfio_ccw_private *private)
- 
- 	/* Issue "Halt Subchannel" */
- 	ccode = hsch(sch->schid);
-+	pr_warn("ccode = hsch(sch->schid);\n");
- 
- 	switch (ccode) {
- 	case 0:
-@@ -326,12 +327,6 @@ fsm_func_t *vfio_ccw_jumptable[NR_VFIO_CCW_STATES][NR_VFIO_CCW_EVENTS] = {
- 		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
- 		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_disabled_irq,
- 	},
--	[VFIO_CCW_STATE_STANDBY] = {
--		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
--		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_error,
--		[VFIO_CCW_EVENT_ASYNC_REQ]	= fsm_async_error,
--		[VFIO_CCW_EVENT_INTERRUPT]	= fsm_irq,
--	},
- 	[VFIO_CCW_STATE_IDLE] = {
- 		[VFIO_CCW_EVENT_NOT_OPER]	= fsm_notoper,
- 		[VFIO_CCW_EVENT_IO_REQ]		= fsm_io_request,
-diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-index 497419c..35445ca 100644
---- a/drivers/s390/cio/vfio_ccw_ops.c
-+++ b/drivers/s390/cio/vfio_ccw_ops.c
-@@ -162,7 +162,7 @@ static int vfio_ccw_mdev_open(struct mdev_device *mdev)
- 	if (cio_enable_subchannel(sch, (u32)(unsigned long)sch))
- 		goto error;
- 
--	private->state = VFIO_CCW_STATE_STANDBY;
-+	private->state = VFIO_CCW_STATE_IDLE;
- 	spin_unlock_irq(sch->lock);
- 	return 0;
- 
-diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
-index f1092c3..ece6a75 100644
---- a/drivers/s390/cio/vfio_ccw_private.h
-+++ b/drivers/s390/cio/vfio_ccw_private.h
-@@ -105,7 +105,6 @@ extern int vfio_ccw_sch_quiesce(struct subchannel *sch);
-  */
- enum vfio_ccw_state {
- 	VFIO_CCW_STATE_NOT_OPER,
--	VFIO_CCW_STATE_STANDBY,
- 	VFIO_CCW_STATE_IDLE,
- 	VFIO_CCW_STATE_CP_PROCESSING,
- 	VFIO_CCW_STATE_CP_PENDING,
--- 
-2.7.4
-
+>
+> Regards,
+>    Felix
+>
+>
+> >          gtt->userflags = flags;
+> >
+> >          if (gtt->usertask)
+> > --
+> > 2.21.0.593.g511ec345e18-goog
+> >
