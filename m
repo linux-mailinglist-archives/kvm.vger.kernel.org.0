@@ -2,51 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C2A11515F
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 18:32:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0908415162
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 18:32:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727414AbfEFQb7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 May 2019 12:31:59 -0400
-Received: from mail-yw1-f73.google.com ([209.85.161.73]:39317 "EHLO
-        mail-yw1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727402AbfEFQb6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 May 2019 12:31:58 -0400
-Received: by mail-yw1-f73.google.com with SMTP id w191so17662936ywa.6
-        for <kvm@vger.kernel.org>; Mon, 06 May 2019 09:31:57 -0700 (PDT)
+        id S1727372AbfEFQcC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 May 2019 12:32:02 -0400
+Received: from mail-ua1-f74.google.com ([209.85.222.74]:32797 "EHLO
+        mail-ua1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727432AbfEFQcB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 May 2019 12:32:01 -0400
+Received: by mail-ua1-f74.google.com with SMTP id h6so1555355uab.0
+        for <kvm@vger.kernel.org>; Mon, 06 May 2019 09:32:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=40kxRsKyA2BTdfRG/8ycbW9cjWXHDWQTNAmN4QMp2Tc=;
-        b=CbTDaybxwiO68FYaqEU987JbmTIWC/O/zmn5u4LAT2NjIg4zrx3ZZpTdEat2IZI7Zr
-         UMjh3JrD6tSSJSHiA2J1SvwKqxkOFH9jD5t4pSSsFkT8XO0YzO5s2D93y2Fvv558QDT8
-         PC2RKfy08bb/yMf67M9jkhQd5jNijh0tU+IEPR6RStdwOkRtKLjro1177XiqKVVA8CKn
-         7nvBlr71nBnQ+GeGRfOaL9uXIjXsWpEFZPxFZ6iufv0v5siPwgW5vA64wYvStilJ/+ml
-         T4dkOygYLm3ryZPhfxVQJsF9+4XGOGyyv3U3USZs8bMzVBnZRwvcMGmsqol00hqY8fWp
-         TxbQ==
+        bh=SWVsw2knEHBiqwTje+QZ95uhvJ0Eq8KQC+Uh3mHLIrs=;
+        b=RgL6sD0qMVVBo2W6IqHUBM5jj9VtirOB0KEMhgfz8sMUxbZ1FQX2voyY3kT1G83YUB
+         c2NHug1MaUbvaiT2/kwsYJcX1LID/13F0wNOf2AHICLEHy5XvFyjYislt0SYk+XJ6yKP
+         649zRPJ+NdSdXSoussFiI5QFPPYrqQUh3ojhtBNMt1d4e4tKjAnQkQjx5Eh1zuXQvQIM
+         JcTGFQAzGxQj9nG+dHgIo2BfMYCnSXgaj1ghPhO7L6oN78p0fysyobcM96NyuviAQaqi
+         YZLFqu1hahvJ559CgByQZZLzdRPUlocjvpj3Ingemtoy/aM5Di1UnW6jML/TVEYZ07jc
+         pviA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=40kxRsKyA2BTdfRG/8ycbW9cjWXHDWQTNAmN4QMp2Tc=;
-        b=FiAaGulp/0LGj7pcUak72XJFc8ICGJ3im5cJO6W+GZqVIWd/3KdUiCmNTeUZahK046
-         0fzjoi5x6CWKvUuHvGUV02pYYN48JKic0rO5PP6uGdOdTejG5fiEd+coy9m6V091hu3/
-         XWQwiGnZ8jyRfNTX+XB4N/4rVguj6hdsxTn1AlO/TEJCdqqnhx4BRYl6gUV/ARHtz3BG
-         LcfnVzyhzhqFrazEgPhQd2WxCpZAc0fyc6jcVdPkoC27ItekzbR0oYYz6DAxVjA6Ylsz
-         RXlIZe7b4upo29sStVYe5xnu1Rjc0scgkRwYi+bunzIABTCJjiatQ/g4cKnrwVX7UxCI
-         oHSg==
-X-Gm-Message-State: APjAAAVvB9A7J+/gDPlVkDvLnOZ+DS9+LbX6gnOtt370HvFyzvdmu7wY
-        fl8BupIWKZ6gikc2QCbJvFycUwKFOUpTnzVB
-X-Google-Smtp-Source: APXvYqy7sMh67zqP2gW9MSWmQP0vNhHkuufaU8XQ9cxxJZb1a1Qrmr7t2Ui4wSymuQ40ovJdWXqcMvlrm4Ub8jqq
-X-Received: by 2002:a25:c5c8:: with SMTP id v191mr18795942ybe.52.1557160316771;
- Mon, 06 May 2019 09:31:56 -0700 (PDT)
-Date:   Mon,  6 May 2019 18:31:02 +0200
+        bh=SWVsw2knEHBiqwTje+QZ95uhvJ0Eq8KQC+Uh3mHLIrs=;
+        b=AZSrQcNRfkaFGnpi/8HSgSzVu0R+mTYgRRa0ik/pkYKRBQkyT/F1vRhmSU/jMPVOWQ
+         RDjp65dNde+KN4tRBcknSwlDE7X9RhRgMN01sPAsnBJ2zhPV6L7G3/lVp47C3G2taNSE
+         SjQ87+RrajuzyqHJvR0vgabweMNNiwKdzGZtkbbx8rRHNIHyzQeZh37UN6VfkoqZtX1S
+         yTT94kFDwLkjgZH/xbeNiWHwQpaRu+GIqL+wFgCLTucHvabqthK+HUBtWwbInBtHkhZP
+         yWqRzGwiFpR/ygB6ln3VXVdm/oHLvpnotmqli1ZOygr0sKOJ0fZn1EdizyDZfPznF847
+         y07w==
+X-Gm-Message-State: APjAAAWKwBgVDox4oCfIVh9noDrAG6sUX0TQcl3e++gAd9+6ANDniGFM
+        184zwm9PhfLWjI1MEkrcDuwNdBH2RSL/jBIp
+X-Google-Smtp-Source: APXvYqzqHfit8S9j9GkAK338RCzBXfh/l/pOO+ozkZWr4c4UHEKzTSoAg+io9ZiclURMXMIijYhqt5pgUoOVGv8c
+X-Received: by 2002:a67:f6c4:: with SMTP id v4mr13696595vso.182.1557160319808;
+ Mon, 06 May 2019 09:31:59 -0700 (PDT)
+Date:   Mon,  6 May 2019 18:31:03 +0200
 In-Reply-To: <cover.1557160186.git.andreyknvl@google.com>
-Message-Id: <69a675a5c48fa2572162338c51a1bfa2a3ced27d.1557160186.git.andreyknvl@google.com>
+Message-Id: <e31d9364eb0c2eba8ce246a558422e811d82d21b.1557160186.git.andreyknvl@google.com>
 Mime-Version: 1.0
 References: <cover.1557160186.git.andreyknvl@google.com>
 X-Mailer: git-send-email 2.21.0.1020.gf2820cf01a-goog
-Subject: [PATCH v15 16/17] vfio/type1, arm64: untag user pointers in vaddr_get_pfn
+Subject: [PATCH v15 17/17] selftests, arm64: add a selftest for passing tagged
+ pointers to kernel
 From:   Andrey Konovalov <andreyknvl@google.com>
 To:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
@@ -91,29 +92,91 @@ This patch is a part of a series that extends arm64 kernel ABI to allow to
 pass tagged user pointers (with the top byte set to something else other
 than 0x00) as syscall arguments.
 
-vaddr_get_pfn() uses provided user pointers for vma lookups, which can
-only by done with untagged pointers.
-
-Untag user pointers in this function.
+This patch adds a simple test, that calls the uname syscall with a
+tagged user pointer as an argument. Without the kernel accepting tagged
+user pointers the test fails with EFAULT.
 
 Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 2 ++
- 1 file changed, 2 insertions(+)
+ tools/testing/selftests/arm64/.gitignore      |  1 +
+ tools/testing/selftests/arm64/Makefile        | 11 ++++++++++
+ .../testing/selftests/arm64/run_tags_test.sh  | 12 +++++++++++
+ tools/testing/selftests/arm64/tags_test.c     | 21 +++++++++++++++++++
+ 4 files changed, 45 insertions(+)
+ create mode 100644 tools/testing/selftests/arm64/.gitignore
+ create mode 100644 tools/testing/selftests/arm64/Makefile
+ create mode 100755 tools/testing/selftests/arm64/run_tags_test.sh
+ create mode 100644 tools/testing/selftests/arm64/tags_test.c
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index d0f731c9920a..5daa966d799e 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -382,6 +382,8 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
- 
- 	down_read(&mm->mmap_sem);
- 
-+	vaddr = untagged_addr(vaddr);
+diff --git a/tools/testing/selftests/arm64/.gitignore b/tools/testing/selftests/arm64/.gitignore
+new file mode 100644
+index 000000000000..e8fae8d61ed6
+--- /dev/null
++++ b/tools/testing/selftests/arm64/.gitignore
+@@ -0,0 +1 @@
++tags_test
+diff --git a/tools/testing/selftests/arm64/Makefile b/tools/testing/selftests/arm64/Makefile
+new file mode 100644
+index 000000000000..a61b2e743e99
+--- /dev/null
++++ b/tools/testing/selftests/arm64/Makefile
+@@ -0,0 +1,11 @@
++# SPDX-License-Identifier: GPL-2.0
 +
- 	vma = find_vma_intersection(mm, vaddr, vaddr + 1);
- 
- 	if (vma && vma->vm_flags & VM_PFNMAP) {
++# ARCH can be overridden by the user for cross compiling
++ARCH ?= $(shell uname -m 2>/dev/null || echo not)
++
++ifneq (,$(filter $(ARCH),aarch64 arm64))
++TEST_GEN_PROGS := tags_test
++TEST_PROGS := run_tags_test.sh
++endif
++
++include ../lib.mk
+diff --git a/tools/testing/selftests/arm64/run_tags_test.sh b/tools/testing/selftests/arm64/run_tags_test.sh
+new file mode 100755
+index 000000000000..745f11379930
+--- /dev/null
++++ b/tools/testing/selftests/arm64/run_tags_test.sh
+@@ -0,0 +1,12 @@
++#!/bin/sh
++# SPDX-License-Identifier: GPL-2.0
++
++echo "--------------------"
++echo "running tags test"
++echo "--------------------"
++./tags_test
++if [ $? -ne 0 ]; then
++	echo "[FAIL]"
++else
++	echo "[PASS]"
++fi
+diff --git a/tools/testing/selftests/arm64/tags_test.c b/tools/testing/selftests/arm64/tags_test.c
+new file mode 100644
+index 000000000000..2bd1830a7ebe
+--- /dev/null
++++ b/tools/testing/selftests/arm64/tags_test.c
+@@ -0,0 +1,21 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <stdint.h>
++#include <sys/utsname.h>
++
++#define SHIFT_TAG(tag)		((uint64_t)(tag) << 56)
++#define SET_TAG(ptr, tag)	(((uint64_t)(ptr) & ~SHIFT_TAG(0xff)) | \
++					SHIFT_TAG(tag))
++
++int main(void)
++{
++	struct utsname *ptr = (struct utsname *)malloc(sizeof(*ptr));
++	void *tagged_ptr = (void *)SET_TAG(ptr, 0x42);
++	int err = uname(tagged_ptr);
++
++	free(ptr);
++	return err;
++}
 -- 
 2.21.0.1020.gf2820cf01a-goog
 
