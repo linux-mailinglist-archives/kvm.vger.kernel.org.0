@@ -2,220 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A6F21547C
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 21:37:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6D441549C
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 21:50:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726450AbfEFThq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 May 2019 15:37:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56876 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726435AbfEFThp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 May 2019 15:37:45 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x46Jb4iP007096
-        for <kvm@vger.kernel.org>; Mon, 6 May 2019 15:37:44 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2satqqsabc-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 06 May 2019 15:37:44 -0400
-Received: from localhost
-        by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <akrowiak@linux.ibm.com>;
-        Mon, 6 May 2019 20:37:44 +0100
-Received: from b01cxnp22036.gho.pok.ibm.com (9.57.198.26)
-        by e11.ny.us.ibm.com (146.89.104.198) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 6 May 2019 20:37:40 +0100
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x46JbcWa34930920
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 May 2019 19:37:38 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 546E9AC05B;
-        Mon,  6 May 2019 19:37:38 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 09562AC059;
-        Mon,  6 May 2019 19:37:38 +0000 (GMT)
-Received: from [9.60.75.251] (unknown [9.60.75.251])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon,  6 May 2019 19:37:37 +0000 (GMT)
-Subject: Re: [PATCH v2 1/7] s390: vfio-ap: wait for queue empty on queue reset
-To:     pmorel@linux.ibm.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        frankja@linux.ibm.com, david@redhat.com, schwidefsky@de.ibm.com,
-        heiko.carstens@de.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com
-References: <1556918073-13171-1-git-send-email-akrowiak@linux.ibm.com>
- <1556918073-13171-2-git-send-email-akrowiak@linux.ibm.com>
- <0bdb1655-4c4e-1982-a842-9dfc7c02a576@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Date:   Mon, 6 May 2019 15:37:37 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726477AbfEFTuX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 May 2019 15:50:23 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:35283 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726190AbfEFTuX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 May 2019 15:50:23 -0400
+Received: by mail-qk1-f194.google.com with SMTP id c15so1302237qkl.2
+        for <kvm@vger.kernel.org>; Mon, 06 May 2019 12:50:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=ESsJ96JGC0CvnjgihpL/0kogE+VQksbbiyHqcPsgGyM=;
+        b=mAg8m7rSPAxM5D+1qNjO71dhsXUrQSGF8zaXxmrvN1W1e7B7fEhL/nFNC4QmlTH5S/
+         9FjLthJrMSnJTSlBNmAzOuj+WEEEHBw1j3jchmVO404WkT8GTT4n4WekZCWvQcvu4KOF
+         mx0V5cfxdymPVb2Ruxoza7w5KItB51NAJ5xivBL7H4fj5rRig8CXPXI75f55CKvkZyYC
+         Gs093sJb6bHKcKo1jSkGyp2Pk8c68+e+QijlfKiUVNZuBsCjguF+Uc/8jtTaC+sffP6g
+         22gO2vicgInFZL3gRZwFvB6M65AQIPZr/G+9s6iQjRuVRTS6fQK5LrCRIMT4SjvjNieX
+         MViA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=ESsJ96JGC0CvnjgihpL/0kogE+VQksbbiyHqcPsgGyM=;
+        b=fiCINFXPsU7Nx27HTywmT7KT5XsV9/Qnf2IW6ZgmCbSfUjHvfTdUg9bwRxLGkhhMS0
+         fhlpgSoWErqT/Dh7E0Nu6RxMwgs+Oa1v45lCz2d1viLuoILIfIDXICSBKM0XxgAwSkBS
+         oLhoSk2jJNKdh2y8arVfByCgIJoJ05v0ldAxitY8AGN6+5tsTHLGJzxrIJg2F5Fn1zWB
+         i/q/xZDiPl7N4VBpPxywGe+gGUmXul1asMLYIwX2jWUdba7BI5iMoJ6P/ekjFtJ2pIvG
+         sJw+RTXKVjvbWugW43hy8OvtAV1rhZggXJnbjIZ51DmiEaAGqcmO00K98DW9N9XP7D6+
+         uQkA==
+X-Gm-Message-State: APjAAAUuCestk6+nOo8AKb7t/8ZiDlTebHjZ2s2lhSyHyFTu0uRqUV5o
+        8WqzY+YPHJntTDJbLFaB/mbNPA==
+X-Google-Smtp-Source: APXvYqweK3T+QR6CpnWc0KpWvE878/YztoCohPUsZDawCWkz4P9i6ckWrJvxSZLqhWTPckszjgD1bg==
+X-Received: by 2002:a05:620a:16b4:: with SMTP id s20mr10803976qkj.34.1557172222493;
+        Mon, 06 May 2019 12:50:22 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-49-251.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.49.251])
+        by smtp.gmail.com with ESMTPSA id o44sm9303175qto.36.2019.05.06.12.50.21
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 06 May 2019 12:50:21 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1hNjcy-0007kq-Cs; Mon, 06 May 2019 16:50:20 -0300
+Date:   Mon, 6 May 2019 16:50:20 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Andrey Konovalov <andreyknvl@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+        linux-media@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Subject: Re: [PATCH v15 13/17] IB, arm64: untag user pointers in
+ ib_uverbs_(re)reg_mr()
+Message-ID: <20190506195020.GD6201@ziepe.ca>
+References: <cover.1557160186.git.andreyknvl@google.com>
+ <66d044ab9445dcf36a96205a109458ac23f38b73.1557160186.git.andreyknvl@google.com>
 MIME-Version: 1.0
-In-Reply-To: <0bdb1655-4c4e-1982-a842-9dfc7c02a576@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19050619-2213-0000-0000-00000389BF5B
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011061; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000285; SDB=6.01199536; UDB=6.00629317; IPR=6.00980412;
- MB=3.00026760; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-06 19:37:42
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050619-2214-0000-0000-00005E548F93
-Message-Id: <ecc5d1d5-a1ea-64ed-2af0-b2a6ca00d748@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-06_11:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905060161
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <66d044ab9445dcf36a96205a109458ac23f38b73.1557160186.git.andreyknvl@google.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/6/19 2:41 AM, Pierre Morel wrote:
-> On 03/05/2019 23:14, Tony Krowiak wrote:
->> Refactors the AP queue reset function to wait until the queue is empty
->> after the PQAP(ZAPQ) instruction is executed to zero out the queue as
->> required by the AP architecture.
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>   drivers/s390/crypto/vfio_ap_ops.c | 35 
->> ++++++++++++++++++++++++++++++++---
->>   1 file changed, 32 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/s390/crypto/vfio_ap_ops.c 
->> b/drivers/s390/crypto/vfio_ap_ops.c
->> index 900b9cf20ca5..b88a2a2ba075 100644
->> --- a/drivers/s390/crypto/vfio_ap_ops.c
->> +++ b/drivers/s390/crypto/vfio_ap_ops.c
->> @@ -271,6 +271,32 @@ static int vfio_ap_mdev_verify_no_sharing(struct 
->> ap_matrix_mdev *matrix_mdev)
->>       return 0;
->>   }
->> +static void vfio_ap_mdev_wait_for_qempty(unsigned long apid, unsigned 
->> long apqi)
->> +{
->> +    struct ap_queue_status status;
->> +    ap_qid_t qid = AP_MKQID(apid, apqi);
->> +    int retry = 5;
->> +
->> +    do {
->> +        status = ap_tapq(qid, NULL);
->> +        switch (status.response_code) {
->> +        case AP_RESPONSE_NORMAL:
->> +            if (status.queue_empty)
->> +                return;
->> +            msleep(20);
+On Mon, May 06, 2019 at 06:30:59PM +0200, Andrey Konovalov wrote:
+> This patch is a part of a series that extends arm64 kernel ABI to allow to
+> pass tagged user pointers (with the top byte set to something else other
+> than 0x00) as syscall arguments.
 > 
-> NIT:     Fall through ?
+> ib_uverbs_(re)reg_mr() use provided user pointers for vma lookups (through
+> e.g. mlx4_get_umem_mr()), which can only by done with untagged pointers.
+> 
+> Untag user pointers in these functions.
+> 
+> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> ---
+>  drivers/infiniband/core/uverbs_cmd.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 
-Yes
+I think this is OK.. We should really get it tested though.. Leon?
 
-> 
->> +            break;
->> +        case AP_RESPONSE_RESET_IN_PROGRESS:
->> +        case AP_RESPONSE_BUSY:
->> +            msleep(20);
->> +            break;
->> +        default:
->> +            pr_warn("%s: tapq err %02x: %04lx.%02lx may not be empty\n",
->> +                __func__, status.response_code, apid, apqi);
-> 
-> I do not thing the warning sentence is appropriate:
-> The only possible errors here are if the AP is not available due to AP 
-> checkstop, deconfigured AP or invalid APQN.
-
-Right you are! I'll work on a new message.
-
-> 
-> 
->> +            return;
->> +        }
->> +    } while (--retry);
->> +}
->> +
->>   /**
->>    * assign_adapter_store
->>    *
->> @@ -790,15 +816,18 @@ static int vfio_ap_mdev_group_notifier(struct 
->> notifier_block *nb,
->>       return NOTIFY_OK;
->>   }
->> -static int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int 
->> apqi,
->> -                    unsigned int retry)
->> +int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi)
->>   {
->>       struct ap_queue_status status;
->> +    int retry = 5;
->>       do {
->>           status = ap_zapq(AP_MKQID(apid, apqi));
->>           switch (status.response_code) {
->>           case AP_RESPONSE_NORMAL:
->> +            vfio_ap_mdev_wait_for_qempty(apid, apqi);
->> +            return 0;
->> +        case AP_RESPONSE_DECONFIGURED:
-> 
-> Since you modify the switch, you can return for all the following cases:
-> AP_RESPONSE_DECONFIGURE
-> ..._CHECKSTOP
-> ..._INVALID_APQN
-> 
-> 
-> And you should wait for qempty on AP_RESET_IN_PROGRESS along with 
-> AP_RESPONSE_NORMAL
-
-If a queue reset is in progress, we retry the zapq. Are you saying we
-should wait for qempty then reissue the zapq?
-
-> 
->>               return 0;
->>           case AP_RESPONSE_RESET_IN_PROGRESS:
->>           case AP_RESPONSE_BUSY:
-> 
-> While at modifying this function, the AP_RESPONSE_BUSY is not a valid 
-> code for ZAPQ, you can remove this.
-
-Okay
-
-> 
->> @@ -824,7 +853,7 @@ static int vfio_ap_mdev_reset_queues(struct 
->> mdev_device *mdev)
->>                    matrix_mdev->matrix.apm_max + 1) {
->>           for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm,
->>                        matrix_mdev->matrix.aqm_max + 1) {
->> -            ret = vfio_ap_mdev_reset_queue(apid, apqi, 1);
->> +            ret = vfio_ap_mdev_reset_queue(apid, apqi);
-> 
-> IMHO, since you are at changing this call, passing the apqn as parameter 
-> would be a good simplification.
-
-Okay.
-
-> 
-> 
-> 
->>               /*
->>                * Regardless whether a queue turns out to be busy, or
->>                * is not operational, we need to continue resetting
-> 
-> Depends on why the reset failed, but this is out of scope.
-
-I'm not sure what you mean by out of scope here, but you do make a valid
-point. If the response code for the zapq is AP_RESPONSE_DECONFIGURED,
-there is probably no sense in continuing to reset queues for that
-particular adapter. I'll consider a change here.
-
-> 
->>
-> 
-> 
-
+Jason
