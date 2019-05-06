@@ -2,200 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BF021550D
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 22:47:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70AFC155D2
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 23:48:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726438AbfEFUrq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 May 2019 16:47:46 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54918 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726160AbfEFUrp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 May 2019 16:47:45 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x46KlKEv056378
-        for <kvm@vger.kernel.org>; Mon, 6 May 2019 16:47:44 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2sauwu8rm8-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 06 May 2019 16:47:44 -0400
-Received: from localhost
-        by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <farman@linux.ibm.com>;
-        Mon, 6 May 2019 21:47:43 +0100
-Received: from b03cxnp08027.gho.boulder.ibm.com (9.17.130.19)
-        by e32.co.us.ibm.com (192.168.1.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 6 May 2019 21:47:42 +0100
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x46KleMJ56819760
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 May 2019 20:47:40 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9EF27BE054;
-        Mon,  6 May 2019 20:47:40 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A9DB5BE04F;
-        Mon,  6 May 2019 20:47:39 +0000 (GMT)
-Received: from [9.85.216.218] (unknown [9.85.216.218])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon,  6 May 2019 20:47:39 +0000 (GMT)
-Subject: Re: [PATCH 7/7] s390/cio: Remove vfio-ccw checks of command codes
-From:   Eric Farman <farman@linux.ibm.com>
-To:     pmorel@linux.ibm.com, Cornelia Huck <cohuck@redhat.com>,
-        Farhan Ali <alifm@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20190503134912.39756-1-farman@linux.ibm.com>
- <20190503134912.39756-8-farman@linux.ibm.com>
- <8625f759-0a2d-09af-c8b5-5b312d854ba1@linux.ibm.com>
- <7c897993-d146-bf8e-48ad-11a914a04716@linux.ibm.com>
-Date:   Mon, 6 May 2019 16:47:38 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726454AbfEFVsR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 May 2019 17:48:17 -0400
+Received: from mga06.intel.com ([134.134.136.31]:9220 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725994AbfEFVsR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 May 2019 17:48:17 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 May 2019 14:48:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,439,1549958400"; 
+   d="scan'208";a="148968542"
+Received: from romley-ivt3.sc.intel.com ([172.25.110.60])
+  by orsmga003.jf.intel.com with ESMTP; 06 May 2019 14:48:15 -0700
+Date:   Mon, 6 May 2019 14:39:49 -0700
+From:   Fenghua Yu <fenghua.yu@intel.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        H Peter Anvin <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ravi V Shankar <ravi.v.shankar@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Christopherson Sean J <sean.j.christopherson@intel.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Michael Chan <michael.chan@broadcom.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        x86 <x86@kernel.org>, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: [PATCH v8 13/15] x86/split_lock: Enable split lock detection by
+ default
+Message-ID: <20190506213948.GA124959@romley-ivt3.sc.intel.com>
+References: <1556134382-58814-1-git-send-email-fenghua.yu@intel.com>
+ <1556134382-58814-14-git-send-email-fenghua.yu@intel.com>
+ <alpine.DEB.2.21.1904250943160.1762@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <7c897993-d146-bf8e-48ad-11a914a04716@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19050620-0004-0000-0000-0000150AD0DD
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011061; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000285; SDB=6.01199559; UDB=6.00629331; IPR=6.00980436;
- MB=3.00026760; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-06 20:47:43
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050620-0005-0000-0000-00008B8DD532
-Message-Id: <bba6c0a8-2346-cd99-b8ad-f316daac010b@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-06_12:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905060164
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.21.1904250943160.1762@nanos.tec.linutronix.de>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 5/6/19 11:39 AM, Eric Farman wrote:
+On Thu, Apr 25, 2019 at 09:50:20AM +0200, Thomas Gleixner wrote:
+> On Wed, 24 Apr 2019, Fenghua Yu wrote:
+> >  
+> > +static void split_lock_update_msr(void)
+> > +{
+> > +	/* Enable split lock detection */
+> > +	msr_set_bit(MSR_TEST_CTL, TEST_CTL_SPLIT_LOCK_DETECT_SHIFT);
+> > +	this_cpu_or(msr_test_ctl_cache, TEST_CTL_SPLIT_LOCK_DETECT);
 > 
+> I'm pretty sure, that I told you to utilize the cache proper. Again:
 > 
-> On 5/6/19 8:56 AM, Pierre Morel wrote:
->> On 03/05/2019 15:49, Eric Farman wrote:
->>> If the CCW being processed is a No-Operation, then by definition no
->>> data is being transferred.  Let's fold those checks into the normal
->>> CCW processors, rather than skipping out early.
->>>
->>> Likewise, if the CCW being processed is a "test" (an invented
->>> definition to simply mean it ends in a zero), let's permit that to go
->>> through to the hardware.  There's nothing inherently unique about
->>> those command codes versus one that ends in an eight [1], or any other
->>> otherwise valid command codes that are undefined for the device type
->>> in question.
->>>
->>> [1] POPS states that a x08 is a TIC CCW, and that having any high-order
->>> bits enabled is invalid for format-1 CCWs.  For format-0 CCWs, the
->>> high-order bits are ignored.
->>>
->>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
->>> ---
->>>   drivers/s390/cio/vfio_ccw_cp.c | 11 +++++------
->>>   1 file changed, 5 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/drivers/s390/cio/vfio_ccw_cp.c 
->>> b/drivers/s390/cio/vfio_ccw_cp.c
->>> index 36d76b821209..c0a52025bf06 100644
->>> --- a/drivers/s390/cio/vfio_ccw_cp.c
->>> +++ b/drivers/s390/cio/vfio_ccw_cp.c
->>> @@ -289,8 +289,6 @@ static long copy_ccw_from_iova(struct 
->>> channel_program *cp,
->>>   #define ccw_is_read_backward(_ccw) (((_ccw)->cmd_code & 0x0F) == 0x0C)
->>>   #define ccw_is_sense(_ccw) (((_ccw)->cmd_code & 0x0F) == 
->>> CCW_CMD_BASIC_SENSE)
->>> -#define ccw_is_test(_ccw) (((_ccw)->cmd_code & 0x0F) == 0)
->>> -
->>>   #define ccw_is_noop(_ccw) ((_ccw)->cmd_code == CCW_CMD_NOOP)
->>>   #define ccw_is_tic(_ccw) ((_ccw)->cmd_code == CCW_CMD_TIC)
->>> @@ -314,6 +312,10 @@ static inline int ccw_does_data_transfer(struct 
->>> ccw1 *ccw)
->>>       if (ccw->count == 0)
->>>           return 0;
->>> +    /* If the command is a NOP, then no data will be transferred */
->>> +    if (ccw_is_noop(ccw))
->>> +        return 0;
->>> +
->>>       /* If the skip flag is off, then data will be transferred */
->>>       if (!ccw_is_skip(ccw))
->>>           return 1;
->>> @@ -398,7 +400,7 @@ static void ccwchain_cda_free(struct ccwchain 
->>> *chain, int idx)
->>>   {
->>>       struct ccw1 *ccw = chain->ch_ccw + idx;
->>> -    if (ccw_is_test(ccw) || ccw_is_noop(ccw) || ccw_is_tic(ccw))
->>> +    if (ccw_is_tic(ccw))
->>
->>
->> AFAIR, we introduced this code to protect against noop and test with a 
->> non zero CDA.
->> This could go away only if there is somewhere the guaranty that noop 
->> have always a null CDA (same for test).
+> > > Nothing in this file initializes msr_test_ctl_cache explicitely. Register
+> > > caching always requires to read the register and store it in the cache
+> > > before doing anything with it. Nothing guarantees that all bits in that MSR
+> > > are 0 by default forever.
+> > >
+> > > And once you do that _before_ calling split_lock_update_msr() then you can
+> > > spare the RMW in that function.
 > 
-> What was generating either the null or "test" command codes?  I can 
-> provide plenty of examples for both these command codes and how they 
-> look coming out of vfio-ccw now.
+> So you managed to fix the initializaiton part, but then you still do a
+> pointless RMW.
 
-I've sent both x00 and x03 (NOP) CCWs with zero and non-zero CDAs to 
-hardware without this patch.  I don't see anything particuarly 
-surpising, so I'm not sure what the original code was attempting to protect.
+Ok. I see. msr_set_bit() is a RMW operation.
 
-Maybe, since you question this in ccwchain_cda_free(), you're referring 
-to commit 408358b50dea ("s390: vfio-ccw: Do not attempt to free no-op, 
-test and tic cda."), which fixed up our attempt to clean things up that 
-weren't allocated on the transmit side?  With this series, that is 
-reverted, but the cda is indeed set to something that needs to be free'd 
-(see below).  So maybe I should at least mention that commit here.
+So is the following the right code to update msr and cache variable?
 
-Regardless, while the I/Os work/fail as I expect, the cda addresses 
-themselves are wrong in much the same way I describe in patch 4.  Yes, 
-without this patch we don't convert them to an IDAL so certain program 
-checks aren't applicable.  But the addresses that we end up sending to 
-the hardware are nonsensical, though potentially valid, locations.
++static void split_lock_update_msr(void)
++{
++   /* Enable split lock detection */
++   this_cpu_or(msr_test_ctl_cache, TEST_CTL_SPLIT_LOCK_DETECT);
++   wrmsrl(MSR_TEST_CTL, msr_test_ctl_cache);
 
-> 
-> The noop check is moved up into the "does data transfer" routine, to 
-> determine whether the pages should be pinned or not.  Regardless of 
-> whether or not the input CDA is null, we'll end up with a CCW pointing 
-> to a valid IDAL of invalid addresses.
-> 
-> The "test" command codes always struck me as funky, because x18 and xF8 
-> and everything in between that ends in x8 is architecturally invalid 
-> too, but we don't check for them like we do for things that end in x0. 
-> And there's a TON of other opcodes that are invalid for today's ECKD 
-> devices, or perhaps were valid for older DASD but have since been 
-> deprecated, or are only valid for non-DASD device types.  We have no 
-> logic to permit them, either.  If those CCWs had a non-zero CDA, we 
-> either pin it successfully and let the targeted device sort it out or an 
-> error occurs and we fail at that point.  (QEMU will see a "wirte" region 
-> error of -EINVAL because of vfio_pin_pages())
-> 
->>
->>
->>
->>>           return;
->>>       kfree((void *)(u64)ccw->cda);
->>> @@ -723,9 +725,6 @@ static int ccwchain_fetch_one(struct ccwchain 
->>> *chain,
->>>   {
->>>       struct ccw1 *ccw = chain->ch_ccw + idx;
->>> -    if (ccw_is_test(ccw) || ccw_is_noop(ccw))
->>> -        return 0;
->>> -
->>>       if (ccw_is_tic(ccw))
->>>           return ccwchain_fetch_tic(chain, idx, cp);
->>>
->>
->>
+Thanks.
 
+-Fenghua
