@@ -2,174 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0093214143
-	for <lists+kvm@lfdr.de>; Sun,  5 May 2019 19:03:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BA2F14331
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2019 02:20:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727840AbfEERDQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 May 2019 13:03:16 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:38555 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727367AbfEERDQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 May 2019 13:03:16 -0400
-Received: by mail-wr1-f68.google.com with SMTP id k16so14226965wrn.5
-        for <kvm@vger.kernel.org>; Sun, 05 May 2019 10:03:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=googlenew;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=S14+Saw50db8S99Z7u2shrBLJtQSP1RkJXIAVw5pLBQ=;
-        b=jugLcBXRtPNuiKygehBn3dRh5gv2O3n+6CZdR9c0ZkktI0CvjyoksEeeH2FfA1Q8xH
-         SqTElONPKWQBKsU0uJQu8/4wptVHk0j3GxZWG+CA0HjhrepIVFXHP29zNbjhuDeaonnN
-         97d3CBboz5W+phNi8nRbOR+m5GoULw/MmeCEZ5EltfZbRHRsDTLjuCw4WWTkYy3yUqZI
-         EIDwHmihhNOllL5cqFRBllZpxOUcacxfDAaI+HPZMWZaZhGbjI2/tay2jJLP/i4RqR4o
-         vlUd0iNLLI5u8lL4HvT+QCdV2M59SHV6zxPaQcTE1z1/Kw5EFI5DZr9zemt+AgWD44KI
-         OF3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=S14+Saw50db8S99Z7u2shrBLJtQSP1RkJXIAVw5pLBQ=;
-        b=UZ7cGt/T7KHmXhxAC5P/1R7AlXWpVZ3kjLdHrEQymZVIIO3VWwn9w9H88Agvp+b+AD
-         XmL2On4rTeursy1Wc5VD14MBr5763Y31qxZKa1zTvkyYSl+DyvjMWtxSksoFNxq3tdfa
-         iFs5ESB8HRWtd5XOsw8qsSpKlvt3xj30mWuiaOKwsq6pwxyZPhznEUrGDAksUWjtHruc
-         Oxni8i/tpicmImmmx47J6rNUBxsNYhYi8aDhGospd+xNtirGXSMB+l9RYqF26azPtetS
-         ID68ToACWVO2vEH3o8vZk93iLF5m9K0sv0sK638ODJ2V6+jTkNw4VG8PQuJr/cZoSPT6
-         VPPA==
-X-Gm-Message-State: APjAAAVqWnw9d1FJGsaAAT7H48frgwzayX6qyrA8Xfa7ODbb4PcSsooO
-        6DauFftyEPBGoFZLGCWs30KJrdCGgbcpRMK6JFwduw==
-X-Google-Smtp-Source: APXvYqwrz/neemWb9vnz/FkpTRyXsq1RpflAc1+fcvk/jy/wtfTvsXtCkcfhMT+x+U7qMUUGE6g6BzjVgXI0vnlcixI=
-X-Received: by 2002:a5d:4942:: with SMTP id r2mr14362363wrs.159.1557075793556;
- Sun, 05 May 2019 10:03:13 -0700 (PDT)
+        id S1728035AbfEFAUt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 May 2019 20:20:49 -0400
+Received: from mga18.intel.com ([134.134.136.126]:43916 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727373AbfEFAUt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 May 2019 20:20:49 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 May 2019 17:20:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,435,1549958400"; 
+   d="scan'208";a="140297852"
+Received: from romley-ivt3.sc.intel.com ([172.25.110.60])
+  by orsmga008.jf.intel.com with ESMTP; 05 May 2019 17:20:47 -0700
+Date:   Sun, 5 May 2019 17:12:21 -0700
+From:   Fenghua Yu <fenghua.yu@intel.com>
+To:     Ingo Molnar <mingo@kernel.org>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        H Peter Anvin <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ravi V Shankar <ravi.v.shankar@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Christopherson Sean J <sean.j.christopherson@intel.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Michael Chan <michael.chan@broadcom.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        x86 <x86@kernel.org>, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: [PATCH v8 05/15] x86/msr-index: Define MSR_IA32_CORE_CAPABILITY
+ and split lock detection bit
+Message-ID: <20190506001219.GA110479@romley-ivt3.sc.intel.com>
+References: <1556134382-58814-1-git-send-email-fenghua.yu@intel.com>
+ <1556134382-58814-6-git-send-email-fenghua.yu@intel.com>
+ <20190425054511.GA40105@gmail.com>
+ <20190425190148.GA64477@romley-ivt3.sc.intel.com>
+ <20190425194714.GA58719@gmail.com>
+ <20190425195154.GC64477@romley-ivt3.sc.intel.com>
+ <20190425200830.GD58719@gmail.com>
+ <20190425202226.GD64477@romley-ivt3.sc.intel.com>
+ <20190426060010.GB122831@gmail.com>
 MIME-Version: 1.0
-References: <20190504132327.27041-1-tmurphy@arista.com> <20190504132327.27041-7-tmurphy@arista.com>
- <602b77a2-9c68-ad14-b64f-904a7ff27a15@linux.intel.com>
-In-Reply-To: <602b77a2-9c68-ad14-b64f-904a7ff27a15@linux.intel.com>
-From:   Tom Murphy <tmurphy@arista.com>
-Date:   Sun, 5 May 2019 18:03:02 +0100
-Message-ID: <CAPL0++57nyLYP1fq=-6zvNS0z_iCqjWLbQ1MsG5F60ODkmRCQQ@mail.gmail.com>
-Subject: Re: [RFC 6/7] iommu/vt-d: convert the intel iommu driver to the
- dma-iommu ops api
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     iommu@lists.linux-foundation.org, Tom Murphy <murphyt7@tcd.ie>,
-        Joerg Roedel <joro@8bytes.org>,
-        Will Deacon <will.deacon@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Kukjin Kim <kgene@kernel.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Andy Gross <andy.gross@linaro.org>,
-        David Brown <david.brown@linaro.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Rob Clark <robdclark@gmail.com>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Gerald Schaefer <gerald.schaefer@de.ibm.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-mediatek@lists.infradead.org,
-        linux-rockchip@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-tegra@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190426060010.GB122831@gmail.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, May 5, 2019 at 3:44 AM Lu Baolu <baolu.lu@linux.intel.com> wrote:
->
-> Hi,
->
-> On 5/4/19 9:23 PM, Tom Murphy wrote:
-> > static int intel_iommu_add_device(struct device *dev)
-> >   {
-> > +     struct dmar_domain *dmar_domain;
-> > +     struct iommu_domain *domain;
-> >       struct intel_iommu *iommu;
-> >       struct iommu_group *group;
-> > -     struct iommu_domain *domain;
-> > +     dma_addr_t base;
-> >       u8 bus, devfn;
-> >
-> >       iommu = device_to_iommu(dev, &bus, &devfn);
-> > @@ -4871,9 +4514,12 @@ static int intel_iommu_add_device(struct device *dev)
-> >       if (IS_ERR(group))
-> >               return PTR_ERR(group);
-> >
-> > +     base = IOVA_START_PFN << VTD_PAGE_SHIFT;
-> >       domain = iommu_get_domain_for_dev(dev);
-> > +     dmar_domain = to_dmar_domain(domain);
-> >       if (domain->type == IOMMU_DOMAIN_DMA)
-> > -             dev->dma_ops = &intel_dma_ops;
-> > +             iommu_setup_dma_ops(dev, base,
-> > +                             __DOMAIN_MAX_ADDR(dmar_domain->gaw) - base);
->
-> I didn't find the implementation of iommu_setup_dma_ops() in this
-> series. Will the iova resource be initialized in this function?
+On Fri, Apr 26, 2019 at 08:00:10AM +0200, Ingo Molnar wrote:
+> 
+> * Fenghua Yu <fenghua.yu@intel.com> wrote:
+> 
+> > On Thu, Apr 25, 2019 at 10:08:30PM +0200, Ingo Molnar wrote:
+> > > 
+> > > * Fenghua Yu <fenghua.yu@intel.com> wrote:
+> > > 
+> > > > On Thu, Apr 25, 2019 at 09:47:14PM +0200, Ingo Molnar wrote:
+> > > > > 
+> > > > > * Fenghua Yu <fenghua.yu@intel.com> wrote:
+> > > > > 
+> > > > > > On Thu, Apr 25, 2019 at 07:45:11AM +0200, Ingo Molnar wrote:
+> > > > > > > 
+> > > > > > > * Fenghua Yu <fenghua.yu@intel.com> wrote:
+> > > > > > > 
+> > > > > > > > A new MSR_IA32_CORE_CAPABILITY (0xcf) is defined. Each bit in the MSR
+> > > > > > > > enumerates a model specific feature. Currently bit 5 enumerates split
+> > > > > > > > lock detection. When bit 5 is 1, split lock detection is supported.
+> > > > > > > > When the bit is 0, split lock detection is not supported.
+> > > > > > > > 
+> > > > > > > > Please check the latest Intel 64 and IA-32 Architectures Software
+> > > > > > > > Developer's Manual for more detailed information on the MSR and the
+> > > > > > > > split lock detection bit.
+> > > > > > > > 
+> > > > > > > > Signed-off-by: Fenghua Yu <fenghua.yu@intel.com>
+> > > > > > > > ---
+> > > > > > > >  arch/x86/include/asm/msr-index.h | 3 +++
+> > > > > > > >  1 file changed, 3 insertions(+)
+> > > > > > > > 
+> > > > > > > > diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+> > > > > > > > index ca5bc0eacb95..f65ef6f783d2 100644
+> > > > > > > > --- a/arch/x86/include/asm/msr-index.h
+> > > > > > > > +++ b/arch/x86/include/asm/msr-index.h
+> > > > > > > > @@ -59,6 +59,9 @@
+> > > > > > > >  #define MSR_PLATFORM_INFO_CPUID_FAULT_BIT	31
+> > > > > > > >  #define MSR_PLATFORM_INFO_CPUID_FAULT		BIT_ULL(MSR_PLATFORM_INFO_CPUID_FAULT_BIT)
+> > > > > > > >  
+> > > > > > > > +#define MSR_IA32_CORE_CAPABILITY	0x000000cf
+> > > > > > > > +#define CORE_CAP_SPLIT_LOCK_DETECT	BIT(5)     /* Detect split lock */
+> > > > > > > 
+> > > > > > > Please don't put comments into definitions.
+> > > > > > 
+> > > > > > I'll remove the comment and change definitions of the MSR and the split lock
+> > > > > > detection bit as following:
+> > > > > > 
+> > > > > > +#define MSR_IA32_CORE_CAPABILITY                       0x000000cf
+> > > > > > +#define MSR_IA32_CORE_CAPABILITY_SPLIT_LOCK_DETECT_BIT 5
+> > > > > > +#define MSR_IA32_CORE_CAPABILITY_SPLIT_LOCK_DETECT     BIT(MSR_IA32_CORE_CAPABILITY_SPLIT_LOCK_DETECT_BIT)
+> > > > > > 
+> > > > > > Are these right changes?
+> > > > > 
+> > > > > I suspect it could be shortened to CORE_CAP as you (partly) did it 
+> > > > > originally.
+> > > > 
+> > > > IA32_CORE_CAPABILITY is the MSR's exact name in the latest SDM (in Table 2-14):
+> > > > https://software.intel.com/en-us/download/intel-64-and-ia-32-architectures-sdm-combined-volumes-1-2a-2b-2c-2d-3a-3b-3c-3d-and-4
+> > > > 
+> > > > So can I define the MSR and the bits as follows?
+> > > > 
+> > > > +#define MSR_IA32_CORE_CAP                       0x000000cf
+> > > > +#define MSR_IA32_CORE_CAP_SPLIT_LOCK_DETECT_BIT 5
+> > > > +#define MSR_IA32_CORE_CAP_SPLIT_LOCK_DETECT     BIT(MSR_IA32_CORE_CAP_SPLIT_LOCK_DETECT_BIT)
+> > > 
+> > > Yeah, I suppose that looks OK.
+> > 
+> > Should I also change the feature definition 'X86_FEATURE_CORE_CAPABILITY' to
+> > 'X86_FEATURE_CORE_CAP' in cpufeatures.h in patch #0006 to match the
+> > MSR definition here? Or should I still keep the current feature definition?
+> > 
+> > Thanks.
+> 
+> Hm, no, for CPU features it's good to follow the vendor convention.
+> 
+> So I guess the long-form CPU_CAPABILITY for all of these is the best 
+> after all.
 
-Ah sorry, I should've mentioned this is based on the
-http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/dma-iommu-ops.3
-branch with the "iommu/vt-d: Delegate DMA domain to generic iommu" and
-"iommu/amd: Convert the AMD iommu driver to the dma-iommu api" patch
-sets applied.
+Since MSR_IA32_CORE_CAP_SPLIT_LOCK_DETECT_BIT is not used anywhere else
+except in this patch, is it OK not to define this macro?
 
->
-> If so, will this block iommu_group_create_direct_mappings() which
-> reserves and maps the reserved iova ranges.
+So this patch will only has two shorter lines:
 
-The reserved regions will be reserved by the
-iova_reserve_iommu_regions function instead:
-( https://github.com/torvalds/linux/blob/6203838dec05352bc357625b1e9ba0a10d3bca35/drivers/iommu/dma-iommu.c#L238
-)
-iommu_setup_dma_ops calls iommu_dma_init_domain which calls
-iova_reserve_iommu_regions.
-iommu_group_create_direct_mappings will still execute normally but it
-won't be able to call the intel_iommu_apply_resv_region function
-because it's been removed in this patchset.
-This shouldn't change any behavior and the same regions should be reserved.
++#define MSR_IA32_CORE_CAP                      0x000000cf
++#define MSR_IA32_CORE_CAP_SPLIT_LOCK_DETECT	BIT(5)
 
->
-> >
-> >       iommu_group_put(group);
-> >       return 0;
-> > @@ -5002,19 +4648,6 @@ int intel_iommu_enable_pasid(struct intel_iommu *iommu, struct intel_svm_dev *sd
-> >       return ret;
-> >   }
-> >
-> > -static void intel_iommu_apply_resv_region(struct device *dev,
-> > -                                       struct iommu_domain *domain,
-> > -                                       struct iommu_resv_region *region)
-> > -{
-> > -     struct dmar_domain *dmar_domain = to_dmar_domain(domain);
-> > -     unsigned long start, end;
-> > -
-> > -     start = IOVA_PFN(region->start);
-> > -     end   = IOVA_PFN(region->start + region->length - 1);
-> > -
-> > -     WARN_ON_ONCE(!reserve_iova(&dmar_domain->iovad, start, end));
-> > -}
-> > -
-> >   struct intel_iommu *intel_svm_device_to_iommu(struct device *dev)
-> >   {
-> >       struct intel_iommu *iommu;
-> > @@ -5050,13 +4683,13 @@ const struct iommu_ops intel_iommu_ops = {
-> >       .detach_dev             = intel_iommu_detach_device,
-> >       .map                    = intel_iommu_map,
-> >       .unmap                  = intel_iommu_unmap,
-> > +     .flush_iotlb_all        = iommu_flush_iova,
-> >       .flush_iotlb_range      = intel_iommu_flush_iotlb_range,
-> >       .iova_to_phys           = intel_iommu_iova_to_phys,
-> >       .add_device             = intel_iommu_add_device,
-> >       .remove_device          = intel_iommu_remove_device,
-> >       .get_resv_regions       = intel_iommu_get_resv_regions,
-> >       .put_resv_regions       = intel_iommu_put_resv_regions,
-> > -     .apply_resv_region      = intel_iommu_apply_resv_region,
->
-> With this removed, how will iommu_group_create_direct_mappings() work?
->
-> Best regards,
-> Lu Baolu
+Is this OK for this patch to only define these two macros?
+
+Thanks.
+
+-Fenghua
