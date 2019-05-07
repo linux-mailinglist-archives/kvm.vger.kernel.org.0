@@ -2,96 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B0A631672A
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 17:48:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DBDB016762
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 18:06:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726426AbfEGPr5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 May 2019 11:47:57 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:51544 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726000AbfEGPr4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 May 2019 11:47:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding
-        :Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:References:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=AEfE8EIktfS0Ycd7e0jTJYMFc8dseypamAWIWa0rG3o=; b=bd6vFoKNSwXSMajhrl2bD5JXa+
-        949BQ9H3YwErJYagV4BhjxunsD2ny5YZ0430G0I+pOJn8YnxFkqxI9nKJYRGwM//vtTKOkzCjs4rt
-        8TespmFYFe4vdW6nb5LVXQproTVdS9nrkUy/1PbZCuB1gLukj8cQUktlRUmkmkhaefaGP/NglLqyi
-        AVoWhX6pf3805cm1K0+Z2sNFHotDwCWTEu6ZZJZDN/BD8+8d78uQYfs3UsaanMReFlxTUu8abglXo
-        PTUk5GNo/+qm4w1zaI/WrjI6RAH7axxHFyGbCE1v/JcMmsxF4NQuIm4cg+/nTaM2z+2dxlCG9JvOm
-        ptbq054Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hO2Jt-0004Hj-Su; Tue, 07 May 2019 15:47:53 +0000
-Date:   Tue, 7 May 2019 08:47:53 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Darren Hart <dvhart@infradead.org>
-Subject: Re: [PATCH RFC] vhost: don't use kmap() to log dirty pages
-Message-ID: <20190507154753.GA8809@infradead.org>
+        id S1726593AbfEGQGo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 May 2019 12:06:44 -0400
+Received: from mga02.intel.com ([134.134.136.20]:42085 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726197AbfEGQGo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 May 2019 12:06:44 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 May 2019 09:06:42 -0700
+X-ExtLoop1: 1
+Received: from sjchrist-coffee.jf.intel.com ([10.54.74.181])
+  by orsmga008.jf.intel.com with ESMTP; 07 May 2019 09:06:42 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Subject: [PATCH 00/15] KVM: nVMX: Optimize nested VM-Entry
+Date:   Tue,  7 May 2019 09:06:25 -0700
+Message-Id: <20190507160640.4812-1-sean.j.christopherson@intel.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1557195809-12373-1-git-send-email-jasowang@redhat.com>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 06, 2019 at 10:23:29PM -0400, Jason Wang wrote:
-> Note: there're archs (few non popular ones) that don't implement
-> futex helper, we can't log dirty pages. We can fix them on top or
-> simply disable LOG_ALL features of vhost.
+The majority of patches in this series are loosely related optimizations
+to pick off low(ish) hanging fruit in nested VM-Entry, e.g. there are
+many VMREADs and VMWRITEs that can be optimized away without too much
+effort.
 
-That means vhost now has to depend on HAVE_FUTEX_CMPXCHG to make
-sure we have a working implementation.
+The major change (in terms of performance) is to not "put" the vCPU
+state when switching between vmcs01 and vmcs02, which can reudce the
+latency of a nested VM-Entry by upwards of 1000 cycles.
 
+A few bug fixes are prepended as they touch code that happens to be
+modified by the various optimizations.
 
->  #include <linux/sched/signal.h>
->  #include <linux/interval_tree_generic.h>
->  #include <linux/nospec.h>
-> +#include <asm/futex.h>
+Sean Christopherson (15):
+  KVM: nVMX: Don't dump VMCS if virtual APIC page can't be mapped
+  KVM: VMX: Always signal #GP on WRMSR to MSR_IA32_CR_PAT with bad value
+  KVM: nVMX: Always sync GUEST_BNDCFGS when it comes from vmcs01
+  KVM: nVMX: Write ENCLS-exiting bitmap once per vmcs02
+  KVM: nVMX: Don't rewrite GUEST_PML_INDEX during nested VM-Entry
+  KVM: nVMX: Don't "put" vCPU or host state when switching VMCS
+  KVM: nVMX: Don't reread VMCS-agnostic state when switching VMCS
+  KVM: nVMX: Don't speculatively write virtual-APIC page address
+  KVM: nVMX: Don't speculatively write APIC-access page address
+  KVM: nVMX: Update vmcs12 for MSR_IA32_CR_PAT when it's written
+  KVM: nVMX: Update vmcs12 for SYSENTER MSRs when they're written
+  KVM: nVMX: Update vmcs12 for MSR_IA32_DEBUGCTLMSR when it's written
+  KVM: nVMX: Update vmcs02 GUEST_IA32_DEBUGCTL only when vmcs12 is dirty
+  KVM: nVMX: Don't update GUEST_BNDCFGS if it's clean in HV eVMCS
+  KVM: nVMX: Copy PDPTRs to/from vmcs12 only when necessary
 
-Also please include the futex maintainers to make sure they are fine
-with this first usage of <asm/futex.h> outside of kernel/futex.c.
+ arch/x86/kvm/vmx/nested.c | 142 +++++++++++++++++++-------------------
+ arch/x86/kvm/vmx/vmx.c    |  93 +++++++++++++++++--------
+ arch/x86/kvm/vmx/vmx.h    |   5 +-
+ 3 files changed, 136 insertions(+), 104 deletions(-)
 
+-- 
+2.21.0
 
-> +static int set_bit_to_user(int nr, u32 __user *addr)
->  {
->  	unsigned long log = (unsigned long)addr;
->  	struct page *page;
-> +	u32 old_log;
->  	int r;
->  
->  	r = get_user_pages_fast(log, 1, 1, &page);
->  	if (r < 0)
->  		return r;
->  	BUG_ON(r != 1);
-> +
-> +	r = futex_atomic_cmpxchg_inatomic(&old_log, addr, 0, 0);
-> +	if (r < 0)
-> +		return r;
-> +
-> +	old_log |= 1 << nr;
-> +	r = put_user(old_log, addr);
-> +	if (r < 0)
-> +		return r;
-
-And this just looks odd to me.  Why do we need the futex call to
-replace a 0 value with 0?  Why does it still duplicate the
-put_user?  This doesn't look like actually working code to me.
-
-Also don't we need a pagefault_disable() around
-futex_atomic_cmpxchg_inatomic?
