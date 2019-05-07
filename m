@@ -2,15 +2,15 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 575451676F
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 18:07:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC50F16772
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 18:07:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727024AbfEGQG6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 May 2019 12:06:58 -0400
-Received: from mga02.intel.com ([134.134.136.20]:42087 "EHLO mga02.intel.com"
+        id S1727161AbfEGQG7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 May 2019 12:06:59 -0400
+Received: from mga02.intel.com ([134.134.136.20]:42085 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726197AbfEGQGr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 May 2019 12:06:47 -0400
+        id S1726847AbfEGQGq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 May 2019 12:06:46 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
@@ -24,9 +24,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
         Liran Alon <liran.alon@oracle.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH 07/15] KVM: nVMX: Don't reread VMCS-agnostic state when switching VMCS
-Date:   Tue,  7 May 2019 09:06:32 -0700
-Message-Id: <20190507160640.4812-8-sean.j.christopherson@intel.com>
+Subject: [PATCH 08/15] KVM: nVMX: Don't speculatively write virtual-APIC page address
+Date:   Tue,  7 May 2019 09:06:33 -0700
+Message-Id: <20190507160640.4812-9-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190507160640.4812-1-sean.j.christopherson@intel.com>
 References: <20190507160640.4812-1-sean.j.christopherson@intel.com>
@@ -37,85 +37,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When switching between vmcs01 and vmcs02, there is no need to update
-state tracking for values that aren't tied to any particular VMCS as
-the per-vCPU values are already up-to-date (vmx_switch_vmcs() can only
-be called when the vCPU is loaded).
-
-Avoiding the update eliminates a RDMSR, and potentially a RDPKRU and
-posted-interrupt updated (cmpxchg64() and more).
+The VIRTUAL_APIC_PAGE_ADDR in vmcs02 is guaranteed to be updated before
+it is consumed by hardware, either in nested_vmx_enter_non_root_mode()
+or via the KVM_REQ_GET_VMCS12_PAGES callback.  Avoid an extra VMWRITE
+and only stuff a bad value into vmcs02 when mapping vmcs12's address
+fails.  This also eliminates the need for extra comments to connect the
+dots between prepare_vmcs02_early() and nested_get_vmcs12_pages().
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/nested.c |  2 +-
- arch/x86/kvm/vmx/vmx.c    | 18 +++++++++++++-----
- arch/x86/kvm/vmx/vmx.h    |  2 +-
- 3 files changed, 15 insertions(+), 7 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 21 ++++++++-------------
+ 1 file changed, 8 insertions(+), 13 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 4651d3462df4..99164d054922 100644
+index 99164d054922..32d233dee067 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -251,7 +251,7 @@ static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, struct loaded_vmcs *vmcs)
- 	cpu = get_cpu();
- 	prev = vmx->loaded_cpu_state;
- 	vmx->loaded_vmcs = vmcs;
--	vmx_vcpu_load(vcpu, cpu);
-+	__vmx_vcpu_load(vcpu, cpu);
+@@ -2038,20 +2038,13 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+ 	exec_control &= ~CPU_BASED_TPR_SHADOW;
+ 	exec_control |= vmcs12->cpu_based_vm_exec_control;
  
- 	if (likely(prev)) {
- 		src = &prev->host_state;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b97666731425..0c48dee4159b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1231,11 +1231,7 @@ static void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 		pi_set_on(pi_desc);
- }
+-	/*
+-	 * Write an illegal value to VIRTUAL_APIC_PAGE_ADDR. Later, if
+-	 * nested_get_vmcs12_pages can't fix it up, the illegal value
+-	 * will result in a VM entry failure.
+-	 */
+-	if (exec_control & CPU_BASED_TPR_SHADOW) {
+-		vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, -1ull);
++	if (exec_control & CPU_BASED_TPR_SHADOW)
+ 		vmcs_write32(TPR_THRESHOLD, vmcs12->tpr_threshold);
+-	} else {
+ #ifdef CONFIG_X86_64
++	else
+ 		exec_control |= CPU_BASED_CR8_LOAD_EXITING |
+ 				CPU_BASED_CR8_STORE_EXITING;
+ #endif
+-	}
  
--/*
-- * Switches to specified vcpu, until a matching vcpu_put(), but assumes
-- * vcpu mutex is already taken.
-- */
--void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-+void __vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	bool already_loaded = vmx->loaded_vmcs->cpu == cpu;
-@@ -1296,8 +1292,20 @@ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	if (kvm_has_tsc_control &&
- 	    vmx->current_tsc_ratio != vcpu->arch.tsc_scaling_ratio)
- 		decache_tsc_multiplier(vmx);
-+}
-+
-+/*
-+ * Switches to specified vcpu, until a matching vcpu_put(), but assumes
-+ * vcpu mutex is already taken.
-+ */
-+static void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-+{
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+
-+	__vmx_vcpu_load(vcpu, cpu);
+ 	/*
+ 	 * A vmexit (to either L1 hypervisor or L0 userspace) is always needed
+@@ -2869,10 +2862,6 @@ static void nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 	if (nested_cpu_has(vmcs12, CPU_BASED_TPR_SHADOW)) {
+ 		map = &vmx->nested.virtual_apic_map;
  
- 	vmx_vcpu_pi_load(vcpu, cpu);
-+
- 	vmx->host_pkru = read_pkru();
- 	vmx->host_debugctlmsr = get_debugctlmsr();
- }
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index f81b32ae1822..f62a008c9227 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -292,7 +292,7 @@ struct kvm_vmx {
- };
+-		/*
+-		 * If translation failed, VM entry will fail because
+-		 * prepare_vmcs02 set VIRTUAL_APIC_PAGE_ADDR to -1ull.
+-		 */
+ 		if (!kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->virtual_apic_page_addr), map)) {
+ 			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, pfn_to_hpa(map->pfn));
+ 		} else if (nested_cpu_has(vmcs12, CPU_BASED_CR8_LOAD_EXITING) &&
+@@ -2888,6 +2877,12 @@ static void nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 			 */
+ 			vmcs_clear_bits(CPU_BASED_VM_EXEC_CONTROL,
+ 					CPU_BASED_TPR_SHADOW);
++		} else {
++			/*
++			 * Write an illegal value to VIRTUAL_APIC_PAGE_ADDR to
++			 * force VM-Entry to fail.
++			 */
++			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, -1ull);
+ 		}
+ 	}
  
- bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
--void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
-+void __vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
- int allocate_vpid(void);
- void free_vpid(int vpid);
- void vmx_set_constant_host_state(struct vcpu_vmx *vmx);
 -- 
 2.21.0
 
