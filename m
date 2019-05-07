@@ -2,148 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DCD1A15F6C
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 10:33:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7088215FC7
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 10:51:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726732AbfEGIdC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 May 2019 04:33:02 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48916 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726313AbfEGIdC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 May 2019 04:33:02 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x478RkPf075064
-        for <kvm@vger.kernel.org>; Tue, 7 May 2019 04:33:00 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2sb4t4n3t2-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 07 May 2019 04:32:59 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Tue, 7 May 2019 09:32:58 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 7 May 2019 09:32:55 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x478Wr1953674192
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 May 2019 08:32:53 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BF6B7A4068;
-        Tue,  7 May 2019 08:32:53 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6DB32A4065;
-        Tue,  7 May 2019 08:32:53 +0000 (GMT)
-Received: from [9.152.222.136] (unknown [9.152.222.136])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  7 May 2019 08:32:53 +0000 (GMT)
-Reply-To: pmorel@linux.ibm.com
-Subject: Re: [PATCH 2/7] s390/cio: Set vfio-ccw FSM state before ioeventfd
-To:     Eric Farman <farman@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     Farhan Ali <alifm@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20190503134912.39756-1-farman@linux.ibm.com>
- <20190503134912.39756-3-farman@linux.ibm.com>
- <20190506165158.5da82576.cohuck@redhat.com>
- <39a1efa5-5298-97b9-21fa-e9ed70a2b892@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Tue, 7 May 2019 10:32:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726492AbfEGIvm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 May 2019 04:51:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33114 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725780AbfEGIvm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 May 2019 04:51:42 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7E04966993;
+        Tue,  7 May 2019 08:51:41 +0000 (UTC)
+Received: from gondolin (dhcp-192-187.str.redhat.com [10.33.192.187])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DB47C171C5;
+        Tue,  7 May 2019 08:51:28 +0000 (UTC)
+Date:   Tue, 7 May 2019 10:51:26 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>
+Subject: Re: [PATCH 1/2] vfio/mdev: add version field as mandatory attribute
+ for mdev device
+Message-ID: <20190507105126.4be3a6da.cohuck@redhat.com>
+In-Reply-To: <20190507053913.GA14284@joy-OptiPlex-7040>
+References: <20190419083258.19580-1-yan.y.zhao@intel.com>
+        <20190419083505.19654-1-yan.y.zhao@intel.com>
+        <20190423115932.42619422.cohuck@redhat.com>
+        <20190424031036.GB26247@joy-OptiPlex-7040>
+        <20190424095624.0ce97328.cohuck@redhat.com>
+        <20190424081558.GE26247@joy-OptiPlex-7040>
+        <20190430172908.2ae77fa9.cohuck@redhat.com>
+        <20190507053913.GA14284@joy-OptiPlex-7040>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <39a1efa5-5298-97b9-21fa-e9ed70a2b892@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19050708-0012-0000-0000-000003191766
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050708-0013-0000-0000-00002151936F
-Message-Id: <c9b55b66-59b4-639c-aad6-764346d6f4de@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-07_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905070056
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Tue, 07 May 2019 08:51:41 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/05/2019 18:36, Eric Farman wrote:
+On Tue, 7 May 2019 01:39:13 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
+
+> On Tue, Apr 30, 2019 at 11:29:08PM +0800, Cornelia Huck wrote:
+
+> > If I followed the discussion correctly, I think you plan to drop this
+> > format, don't you? I'd be happy if a vendor driver can use a simple
+> > number without any prefixes if it so chooses.
+> > 
+> > I also like the idea of renaming this "migration_version" so that it is
+> > clear we're dealing with versioning of the migration capability (and
+> > not a version of the device or so).  
+> hi Cornelia,
+> sorry I just saw this mail after sending v2 of this patch set...
+> yes, I dropped the common part and vendor driver now can define whatever it
+> wishes to identify a device version.
+
+Ok, I'll look at v2.
+
+> However, I don't agree to rename it to "migration_version", as it still may
+> bring some kind of confusing with the migration version a vendor driver is
+> using, e.g. vendor driver changes migration code and increases that migration
+> version.
+> In fact, what info we want to get from this attribute is whether this mdev
+> device is compatible with another mdev device, which is tied to device, and not
+> necessarily bound to migration.
 > 
-> 
-> On 5/6/19 10:51 AM, Cornelia Huck wrote:
->> On Fri,  3 May 2019 15:49:07 +0200
->> Eric Farman <farman@linux.ibm.com> wrote:
->>
->>> Otherwise, the guest can believe it's okay to start another I/O
->>> and bump into the non-idle state.  This results in a cc=3
->>> (or cc=2 with the pending async CSCH/HSCH code [1]) to the guest,
->>
->> I think you can now refer to cc=2, as the csch/hsch is on its way in :)
-> 
-> Woohoo!  :)
-> 
->>
->>> which is unfortunate since everything is otherwise working normally.
->>>
->>> [1] https://patchwork.kernel.org/comment/22588563/
->>>
->>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
->>>
->>> ---
->>>
->>> I think this might've been part of Pierre's FSM cleanup?
->>
->> Not sure if I saw this before, but there have been quite a number of
->> patches going around...
-> 
-> I guess I should have said his original cleanup from last year.  I 
-> didn't find it, but it also seems familiar to me.
+> do you think so?
 
-May be, I am not sure, but does not mater.
-It looks good to me to change the state before to send the IRQ signal to 
-the guest, just in case we get asynchronism sometime.
-
-> 
->>
->>> ---
->>>   drivers/s390/cio/vfio_ccw_drv.c | 6 +++---
->>>   1 file changed, 3 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/drivers/s390/cio/vfio_ccw_drv.c 
->>> b/drivers/s390/cio/vfio_ccw_drv.c
->>> index 0b3b9de45c60..ddd21b6149fd 100644
->>> --- a/drivers/s390/cio/vfio_ccw_drv.c
->>> +++ b/drivers/s390/cio/vfio_ccw_drv.c
->>> @@ -86,11 +86,11 @@ static void vfio_ccw_sch_io_todo(struct 
->>> work_struct *work)
->>>       }
->>>       memcpy(private->io_region->irb_area, irb, sizeof(*irb));
->>> -    if (private->io_trigger)
->>> -        eventfd_signal(private->io_trigger, 1);
->>> -
->>>       if (private->mdev && is_final)
->>>           private->state = VFIO_CCW_STATE_IDLE;
->>> +
->>> +    if (private->io_trigger)
->>> +        eventfd_signal(private->io_trigger, 1);
->>>   }
->>>   /*
->>
-
-Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
-
-
-
--- 
-Pierre Morel
-Linux/KVM/QEMU in Böblingen - Germany
-
+I'm not 100% convinced; but we can continue the discussion on v2.
