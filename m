@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 52F83160B0
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 11:20:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3794160E2
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 11:28:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726495AbfEGJUR convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 7 May 2019 05:20:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53924 "EHLO mx1.redhat.com"
+        id S1726831AbfEGJ2L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 May 2019 05:28:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49342 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726063AbfEGJUR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 May 2019 05:20:17 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S1726394AbfEGJ2L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 May 2019 05:28:11 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D4031309703F;
-        Tue,  7 May 2019 09:20:15 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 09086C057F32;
+        Tue,  7 May 2019 09:28:10 +0000 (UTC)
 Received: from gondolin (dhcp-192-187.str.redhat.com [10.33.192.187])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C7803611DC;
-        Tue,  7 May 2019 09:19:56 +0000 (UTC)
-Date:   Tue, 7 May 2019 11:19:54 +0200
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D4E651001DDE;
+        Tue,  7 May 2019 09:27:55 +0000 (UTC)
+Date:   Tue, 7 May 2019 11:27:53 +0200
 From:   Cornelia Huck <cohuck@redhat.com>
 To:     Yan Zhao <yan.y.zhao@intel.com>
 Cc:     intel-gvt-dev@lists.freedesktop.org, arei.gonglei@huawei.com,
@@ -34,86 +34,67 @@ Cc:     intel-gvt-dev@lists.freedesktop.org, arei.gonglei@huawei.com,
         eskultet@redhat.com, dgilbert@redhat.com, kevin.tian@intel.com,
         zhenyuw@linux.intel.com, zhi.a.wang@intel.com, cjia@nvidia.com,
         kwankhede@nvidia.com, berrange@redhat.com, dinechin@redhat.com
-Subject: Re: [PATCH v2 1/2] vfio/mdev: add version attribute for mdev device
-Message-ID: <20190507111954.43d477c3.cohuck@redhat.com>
-In-Reply-To: <20190506014904.3621-1-yan.y.zhao@intel.com>
+Subject: Re: [PATCH v2 2/2] drm/i915/gvt: export mdev device version to
+ sysfs for Intel vGPU
+Message-ID: <20190507112753.2699d0b5.cohuck@redhat.com>
+In-Reply-To: <20190506015102.3691-1-yan.y.zhao@intel.com>
 References: <20190506014514.3555-1-yan.y.zhao@intel.com>
-        <20190506014904.3621-1-yan.y.zhao@intel.com>
+        <20190506015102.3691-1-yan.y.zhao@intel.com>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Tue, 07 May 2019 09:20:16 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 07 May 2019 09:28:10 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun,  5 May 2019 21:49:04 -0400
+On Sun,  5 May 2019 21:51:02 -0400
 Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-> version attribute is used to check two mdev devices' compatibility.
+> This feature implements the version attribute for Intel's vGPU mdev
+> devices.
 > 
-> The key point of this version attribute is that it's rw.
-> User space has no need to understand internal of device version and no
-> need to compare versions by itself.
-> Compared to reading version strings from both two mdev devices being
-> checked, user space only reads from one mdev device's version attribute.
-> After getting its version string, user space writes this string into the
-> other mdev device's version attribute. Vendor driver of mdev device
-> whose version attribute being written will check device compatibility of
-> the two mdev devices for user space and return success for compatibility
-> or errno for incompatibility.
-
-I'm still missing a bit _what_ is actually supposed to be
-compatible/incompatible. I'd assume some internal state descriptions
-(even if this is not actually limited to migration).
-
-> So two readings of version attributes + checking in user space are now
-> changed to one reading + one writing of version attributes + checking in
-> vendor driver.
-
-I'm not sure that needs to go into the patch description (sounds like
-it is rather a change log?)
-
-> Format and length of version strings are now private to vendor driver
-> who can define them freely.
-
-Same here; simply drop the 'now'?
-
+> version attribute is rw.
+> It's used to check device compatibility for two mdev devices.
+> version string format and length are private for vendor driver. vendor
+> driver is able to define them freely.
 > 
->              __ user space
->               /\          \
->              /             \write
->             / read          \
->      ______/__           ___\|/___
->     | version |         | version |-->check compatibility
->     -----------         -----------
->     mdev device A       mdev device B
+> For Intel vGPU of gen8 and gen9, the mdev device version
+> consists of 3 fields: "vendor id" + "device id" + "mdev type".
 > 
-> This version attribute is optional. If a mdev device does not provide
-> with a version attribute, this mdev device is incompatible to all other
-> mdev devices.
-
-Again, I'd like an explanation here what kind of compatibility we're
-talking about.
-
+> Reading from a vGPU's version attribute, a string is returned in below
+> format: <vendor id>-<device id>-<mdev type>. e.g.
+> 8086-193b-i915-GVTg_V5_2.
 > 
-> Live migration is able to take advantage of this version attribute.
-> Before user space actually starts live migration, it can first check
-> whether two mdev devices are compatible.
+> Writing a string to a vGPU's version attribute will trigger GVT to check
+> whether a vGPU identified by the written string is compatible with
+> current vGPU owning this version attribute. errno is returned if the two
+> vGPUs are incompatible. The length of written string is returned in
+> compatible case.
+> 
+> For other platforms, and for GVT not supporting vGPU live migration
+> feature, errnos are returned when read/write of mdev devices' version
+> attributes.
+> 
+> For old GVT versions where no version attributes exposed in sysfs, it is
+> regarded as not supporting vGPU live migration.
+> 
+> For future platforms, besides the current 2 fields in vendor proprietary
+> part, more fields may be added to identify Intel vGPU well for live
+> migration purpose.
 > 
 > v2:
-> 1. added detailed intent and usage
-> 2. made definition of version string completely private to vendor driver
->    (Alex Williamson)
-> 3. abandoned changes to sample mdev drivers (Alex Williamson)
-> 4. mandatory --> optional (Cornelia Huck)
-> 5. added description for errno (Cornelia Huck)
+> 1. removed 32 common part of version string
+> (Alex Williamson)
+> 2. do not register version attribute for GVT not supporting live
+> migration.(Cornelia Huck)
+> 3. for platforms out of gen8, gen9, return -EINVAL --> -ENODEV for
+> incompatible. (Cornelia Huck)
 
-This changelog should go below the ---, so that it does not actually
-show up in the patch description later :)
+Should go below '---'.
 
 > 
 > Cc: Alex Williamson <alex.williamson@redhat.com>
@@ -123,136 +104,119 @@ show up in the patch description later :)
 > Cc: "Tian, Kevin" <kevin.tian@intel.com>
 > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
 > Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
-> Cc: Neo Jia <cjia@nvidia.com>
+> c: Neo Jia <cjia@nvidia.com>
 > Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> Cc: Daniel P. Berrangé <berrange@redhat.com>
-> Cc: Christophe de Dinechin <dinechin@redhat.com>
 > 
 > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 > ---
->  Documentation/vfio-mediated-device.txt | 140 +++++++++++++++++++++++++
->  1 file changed, 140 insertions(+)
+>  drivers/gpu/drm/i915/gvt/Makefile         |  2 +-
+>  drivers/gpu/drm/i915/gvt/device_version.c | 87 +++++++++++++++++++++++
+>  drivers/gpu/drm/i915/gvt/gvt.c            | 51 +++++++++++++
+>  drivers/gpu/drm/i915/gvt/gvt.h            |  6 ++
+>  4 files changed, 145 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/gpu/drm/i915/gvt/device_version.c
 > 
-> diff --git a/Documentation/vfio-mediated-device.txt b/Documentation/vfio-mediated-device.txt
-> index c3f69bcaf96e..013a764968eb 100644
-> --- a/Documentation/vfio-mediated-device.txt
-> +++ b/Documentation/vfio-mediated-device.txt
-> @@ -202,6 +202,7 @@ Directories and files under the sysfs for Each Physical Device
->    |     |   |--- available_instances
->    |     |   |--- device_api
->    |     |   |--- description
-> +  |     |   |--- version
->    |     |   |--- [devices]
->    |     |--- [<type-id>]
->    |     |   |--- create
-> @@ -209,6 +210,7 @@ Directories and files under the sysfs for Each Physical Device
->    |     |   |--- available_instances
->    |     |   |--- device_api
->    |     |   |--- description
-> +  |     |   |--- version
->    |     |   |--- [devices]
->    |     |--- [<type-id>]
->    |          |--- create
-> @@ -216,6 +218,7 @@ Directories and files under the sysfs for Each Physical Device
->    |          |--- available_instances
->    |          |--- device_api
->    |          |--- description
-> +  |          |--- version
->    |          |--- [devices]
->  
->  * [mdev_supported_types]
-> @@ -246,6 +249,143 @@ Directories and files under the sysfs for Each Physical Device
->    This attribute should show the number of devices of type <type-id> that can be
->    created.
->  
-> +* version
-> +
-> +  This attribute is rw, and is optional.
-> +  It is used to check device compatibility between two mdev devices and is
-> +  accessed in pairs between the two mdev devices being checked.
-> +  The intent of this attribute is to make an mdev device's version opaque to
-> +  user space, so instead of reading two mdev devices' version strings and
-> +  comparing in userspace, user space should only read one mdev device's version
-> +  attribute, and writes this version string into the other mdev device's version
-> +  attribute. Then vendor driver of mdev device whose version attribute being
-> +  written would check the incoming version string and tell user space whether
-> +  the two mdev devices are compatible via return value. That's why this
-> +  attribute is writable.
-
-I would reword this a bit:
-
-"This attribute provides a way to check device compatibility between
-two mdev devices from userspace. The intended usage is for userspace to
-read the version attribute from one mdev device and then writing that
-value to the version attribute of the other mdev device. The second
-mdev device indicates compatibility via the return code of the write
-operation. This makes compatibility between mdev devices completely
-vendor-defined and opaque to userspace."
-
-We still should explain _what_ compatibility we're talking about here,
-though.
-
-> +
-> +  when reading this attribute, it should show device version string of
-> +  the device of type <type-id>.
-> +
-> +  This string is private to vendor driver itself. Vendor driver is able to
-> +  freely define format and length of device version string.
-> +  e.g. It can use a combination of pciid of parent device + mdev type.
-> +
-> +  When writing a string to this attribute, vendor driver should analyze this
-> +  string and check whether the mdev device being identified by this string is
-> +  compatible with the mdev device for this attribute. vendor driver should then
-> +  return written string's length if it regards the two mdev devices are
-> +  compatible; vendor driver should return negative errno if it regards the two
-> +  mdev devices are not compatible.
-> +
-> +  User space should treat ANY of below conditions as two mdev devices not
-> +  compatible:
-> +  (1) any one of the two mdev devices does not have a version attribute
-> +  (2) error when read from one mdev device's version attribute
-
-s/read/reading/
-
-> +  (3) error when write one mdev device's version string to the other mdev
-
-s/write/writing/
-
-> +  device's version attribute
-> +
-> +  User space should regard two mdev devices compatible when ALL of below
-> +  conditions are met:
-> +  (1) success when read from one mdev device's version attribute.
-
-s/read/reading/
-
-> +  (2) success when write one mdev device's version string to the other mdev
-
-s/write/writing/
-
-> +  device's version attribute
-> +
-> +  Errno:
-> +  If vendor driver wants to claim a mdev device incompatible to all other mdev
-
-"If the vendor driver wants to designate a mdev device..."
-
-> +  devices, it should not register version attribute for this mdev device. But if
-> +  a vendor driver has already registered version attribute and it wants to claim
-> +  a mdev device incompatible to all other mdev devices, it needs to return
-> +  -ENODEV on access to this mdev device's version attribute.
-> +  If a mdev device is only incompatible to certain mdev devices, write of
-> +  incompatible mdev devices's version strings to its version attribute should
-> +  return -EINVAL;
-
-
-Maybe put the defined return code into a bulleted list instead? But
-this looks reasonable as well.
-
-> +
-> +  This attribute can be taken advantage of by live migration.
-> +  If user space detects two mdev devices are compatible through version
-> +  attribute, it can start migration between the two mdev devices, otherwise it
-> +  should abort its migration attempts between the two mdev devices.
 
 (...)
+
+> diff --git a/drivers/gpu/drm/i915/gvt/device_version.c b/drivers/gpu/drm/i915/gvt/device_version.c
+> new file mode 100644
+> index 000000000000..bd4cdcbdba95
+> --- /dev/null
+> +++ b/drivers/gpu/drm/i915/gvt/device_version.c
+> @@ -0,0 +1,87 @@
+> +/*
+> + * Copyright(c) 2011-2017 Intel Corporation. All rights reserved.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a
+> + * copy of this software and associated documentation files (the "Software"),
+> + * to deal in the Software without restriction, including without limitation
+> + * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+> + * and/or sell copies of the Software, and to permit persons to whom the
+> + * Software is furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice (including the next
+> + * paragraph) shall be included in all copies or substantial portions of the
+> + * Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+> + * SOFTWARE.
+> + *
+> + * Authors:
+> + *    Yan Zhao <yan.y.zhao@intel.com>
+> + */
+> +#include <linux/vfio.h>
+> +#include "i915_drv.h"
+> +
+> +static bool is_compatible(const char *self, const char *remote)
+> +{
+> +	if (strlen(remote) != strlen(self))
+> +		return false;
+> +
+> +	return (strncmp(self, remote, strlen(self))) ? false : true;
+> +}
+> +
+> +ssize_t intel_gvt_get_vfio_device_version_len(struct drm_i915_private *dev_priv)
+> +{
+> +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
+> +		return -ENODEV;
+> +
+> +	return PAGE_SIZE;
+> +}
+> +
+> +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *dev_priv,
+> +		char *buf, const char *mdev_type)
+> +{
+> +	int cnt = 0, ret = 0;
+> +	const char *str = NULL;
+> +
+> +	/* currently only gen8 & gen9 are supported */
+> +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
+> +		return -ENODEV;
+> +
+> +	/* vendor id + device id + mdev type */
+> +	/* vendor id */
+> +	cnt = snprintf(buf, 5, "%04x", PCI_VENDOR_ID_INTEL);
+> +	buf += cnt;
+> +	ret += cnt;
+> +
+> +	/* device id */
+> +	cnt = snprintf(buf, 6, "-%04x", INTEL_DEVID(dev_priv));
+> +	buf += cnt;
+> +	ret += cnt;
+> +
+> +	/* mdev type */
+> +	str = mdev_type;
+> +	cnt = snprintf(buf, strlen(str) + 3, "-%s\n", mdev_type);
+> +	buf += cnt;
+> +	ret += cnt;
+> +
+> +	return ret;
+
+I'm not familiar with this driver; but would it make sense to pre-build
+the version on init? It does not look to me like the values could
+change dynamically.
+
+> +}
+> +
+> +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *dev_priv,
+> +		const char *self, const char *remote)
+> +{
+> +
+> +	/* currently only gen8 & gen9 are supported */
+> +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
+> +		return -ENODEV;
+> +
+> +	if (!is_compatible(self, remote))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+
+Return values look reasonable to me. I'll leave discussions regarding
+where the attribute should go to folks familiar with this driver.
