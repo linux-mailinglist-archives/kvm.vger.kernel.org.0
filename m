@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7634715A41
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 07:44:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01E6C15A18
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 07:43:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729620AbfEGFmh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 May 2019 01:42:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33500 "EHLO mail.kernel.org"
+        id S1729700AbfEGFnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 May 2019 01:43:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33782 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729614AbfEGFmg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 May 2019 01:42:36 -0400
+        id S1729688AbfEGFnB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 May 2019 01:43:01 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2D1E9205ED;
-        Tue,  7 May 2019 05:42:35 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1EDA120675;
+        Tue,  7 May 2019 05:43:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1557207755;
-        bh=7wkk1vZ2abeMSIJJ70JqNDlLC5lgQx5sWi8Cvheh+sY=;
+        s=default; t=1557207780;
+        bh=rVSya5QCW5mY+ThgI+l4OR8ZblKeKEonGB7uEyCGGgM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=NmINgI8OLfPkHpaFsLTeI0dqZk6PRlJk3vOqWZRTYvqs17929fOMK1qLPLBZBNA+L
-         8ol3DF5wRXmZPjTQsETFr/3ZjU7lW9Q9rK1P9gpguttEynU20wqM7RTYCk/xDnPEZ3
-         fJZ0SSq4Xyv5crtZf/LzfG5tCDVY+yiJU4Vy7MVc=
+        b=OUZd8sxIa9GuBxslYle7iB7BaHFMfhpukXfMWEmm09UFZosUX3PsIupCXt52yL+ff
+         L6f2r0jZs7n0yNwMKERXKthiPyjCjEQoLAYvTSP55IQ8L13YioONyEdqpey4Gk+BtQ
+         PLPFJVOQjhJEIyyn2JP2ag9kaIvFlcBO9ivPMNhE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 08/14] KVM: x86: avoid misreporting level-triggered irqs as edge-triggered in tracing
-Date:   Tue,  7 May 2019 01:42:10 -0400
-Message-Id: <20190507054218.340-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 3.18 05/10] KVM: x86: avoid misreporting level-triggered irqs as edge-triggered in tracing
+Date:   Tue,  7 May 2019 01:42:41 -0400
+Message-Id: <20190507054247.537-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190507054218.340-1-sashal@kernel.org>
-References: <20190507054218.340-1-sashal@kernel.org>
+In-Reply-To: <20190507054247.537-1-sashal@kernel.org>
+References: <20190507054247.537-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -68,10 +68,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index ab9ae67a80e4..0ec94c6b4757 100644
+index 6b06ab8748dd..005a5b8d5628 100644
 --- a/arch/x86/kvm/trace.h
 +++ b/arch/x86/kvm/trace.h
-@@ -434,13 +434,13 @@ TRACE_EVENT(kvm_apic_ipi,
+@@ -415,13 +415,13 @@ TRACE_EVENT(kvm_apic_ipi,
  );
  
  TRACE_EVENT(kvm_apic_accept_irq,
