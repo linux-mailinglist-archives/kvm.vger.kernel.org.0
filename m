@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A469F166EA
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 17:36:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8ED43166EC
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 17:36:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726944AbfEGPge (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 May 2019 11:36:34 -0400
-Received: from mga11.intel.com ([192.55.52.93]:51035 "EHLO mga11.intel.com"
+        id S1726948AbfEGPgh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 May 2019 11:36:37 -0400
+Received: from mga11.intel.com ([192.55.52.93]:51040 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726000AbfEGPgd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726546AbfEGPgd (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 7 May 2019 11:36:33 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -23,9 +23,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
 Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
         Liran Alon <liran.alon@oracle.com>
-Subject: [PATCH 5/7] KVM: nVMX: Use descriptive names for VMCS sync functions and flags
-Date:   Tue,  7 May 2019 08:36:27 -0700
-Message-Id: <20190507153629.3681-6-sean.j.christopherson@intel.com>
+Subject: [PATCH 6/7] KVM: nVMX: Add helpers to identify shadowed VMCS fields
+Date:   Tue,  7 May 2019 08:36:28 -0700
+Message-Id: <20190507153629.3681-7-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190507153629.3681-1-sean.j.christopherson@intel.com>
 References: <20190507153629.3681-1-sean.j.christopherson@intel.com>
@@ -36,178 +36,124 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Nested virtualization involves copying data between many different types
-of VMCSes, e.g. vmcs02, vmcs12, shadow VMCS and eVMCS.  Rename a variety
-of functions and flags to document both the source and destination of
-each sync.
+So that future optimizations related to shadowed fields don't need to
+define their own switch statement.
+
+Add a BUILD_BUG_ON() to ensure at least one of the types (RW vs RO) is
+defined when including vmcs_shadow_fields.h (guess who keeps mistyping
+SHADOW_FIELD_RO as SHADOW_FIELD_R0).
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/nested.c | 28 ++++++++++++++--------------
- arch/x86/kvm/vmx/nested.h |  2 +-
- arch/x86/kvm/vmx/vmx.c    |  4 ++--
- arch/x86/kvm/vmx/vmx.h    |  2 +-
- 4 files changed, 18 insertions(+), 18 deletions(-)
+ arch/x86/kvm/vmx/nested.c             | 71 +++++++++++++++------------
+ arch/x86/kvm/vmx/vmcs_shadow_fields.h |  4 ++
+ 2 files changed, 44 insertions(+), 31 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 0eee7894b453..632e7e4324f3 100644
+index 632e7e4324f3..279961a63db2 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -1612,7 +1612,7 @@ static int copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
- 	 * evmcs->host_gdtr_base = vmcs12->host_gdtr_base;
- 	 * evmcs->host_idtr_base = vmcs12->host_idtr_base;
- 	 * evmcs->host_rsp = vmcs12->host_rsp;
--	 * sync_vmcs12() doesn't read these:
-+	 * sync_vmcs02_to_vmcs12() doesn't read these:
- 	 * evmcs->io_bitmap_a = vmcs12->io_bitmap_a;
- 	 * evmcs->io_bitmap_b = vmcs12->io_bitmap_b;
- 	 * evmcs->msr_bitmap = vmcs12->msr_bitmap;
-@@ -1836,7 +1836,7 @@ static int nested_vmx_handle_enlightened_vmptrld(struct kvm_vcpu *vcpu,
- 	return 1;
+@@ -4415,6 +4415,29 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
+ 	return nested_vmx_succeed(vcpu);
  }
  
--void nested_sync_from_vmcs12(struct kvm_vcpu *vcpu)
-+void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu)
++static bool is_shadow_field_rw(unsigned long field)
++{
++	switch (field) {
++#define SHADOW_FIELD_RW(x, y) case x:
++#include "vmcs_shadow_fields.h"
++		return true;
++	default:
++		break;
++	}
++	return false;
++}
++
++static bool is_shadow_field_ro(unsigned long field)
++{
++	switch (field) {
++#define SHADOW_FIELD_RO(x, y) case x:
++#include "vmcs_shadow_fields.h"
++		return true;
++	default:
++		break;
++	}
++	return false;
++}
+ 
+ static int handle_vmwrite(struct kvm_vcpu *vcpu)
  {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
-@@ -1857,7 +1857,7 @@ void nested_sync_from_vmcs12(struct kvm_vcpu *vcpu)
- 		copy_vmcs12_to_shadow(vmx);
- 	}
- 
--	vmx->nested.need_vmcs12_sync = false;
-+	vmx->nested.need_vmcs12_to_shadow_sync = false;
- }
- 
- static enum hrtimer_restart vmx_preemption_timer_fn(struct hrtimer *timer)
-@@ -3039,7 +3039,7 @@ int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry)
- 	vmcs12->vm_exit_reason = exit_reason | VMX_EXIT_REASONS_FAILED_VMENTRY;
- 	vmcs12->exit_qualification = exit_qual;
- 	if (enable_shadow_vmcs || vmx->nested.hv_evmcs)
--		vmx->nested.need_vmcs12_sync = true;
-+		vmx->nested.need_vmcs12_to_shadow_sync = true;
- 	return 1;
- }
- 
-@@ -3379,7 +3379,7 @@ static u32 vmx_get_preemption_timer_value(struct kvm_vcpu *vcpu)
-  * VM-entry controls is also updated, since this is really a guest
-  * state bit.)
-  */
--static void sync_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
-+static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
- {
- 	vmcs12->guest_cr0 = vmcs12_guest_cr0(vcpu, vmcs12);
- 	vmcs12->guest_cr4 = vmcs12_guest_cr4(vcpu, vmcs12);
-@@ -3858,14 +3858,14 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
- 		vcpu->arch.tsc_offset -= vmcs12->tsc_offset;
- 
- 	if (likely(!vmx->fail)) {
--		sync_vmcs12(vcpu, vmcs12);
-+		sync_vmcs02_to_vmcs12(vcpu, vmcs12);
- 
- 		if (exit_reason != -1)
- 			prepare_vmcs12(vcpu, vmcs12, exit_reason, exit_intr_info,
- 				       exit_qualification);
- 
- 		/*
--		 * Must happen outside of sync_vmcs12() as it will
-+		 * Must happen outside of sync_vmcs02_to_vmcs12() as it will
- 		 * also be used to capture vmcs12 cache as part of
- 		 * capturing nVMX state for snapshot (migration).
- 		 *
-@@ -3921,7 +3921,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
- 	kvm_make_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu);
- 
- 	if ((exit_reason != -1) && (enable_shadow_vmcs || vmx->nested.hv_evmcs))
--		vmx->nested.need_vmcs12_sync = true;
-+		vmx->nested.need_vmcs12_to_shadow_sync = true;
- 
- 	/* in case we halted in L2 */
- 	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-@@ -4280,7 +4280,7 @@ static inline void nested_release_vmcs12(struct kvm_vcpu *vcpu)
- 		/* copy to memory all shadowed fields in case
- 		   they were modified */
- 		copy_shadow_to_vmcs12(vmx);
--		vmx->nested.need_vmcs12_sync = false;
-+		vmx->nested.need_vmcs12_to_shadow_sync = false;
- 		vmx_disable_shadow_vmcs(vmx);
- 	}
- 	vmx->nested.posted_intr_nv = -1;
-@@ -4545,7 +4545,7 @@ static void set_current_vmptr(struct vcpu_vmx *vmx, gpa_t vmptr)
- 			      SECONDARY_EXEC_SHADOW_VMCS);
- 		vmcs_write64(VMCS_LINK_POINTER,
- 			     __pa(vmx->vmcs01.shadow_vmcs));
--		vmx->nested.need_vmcs12_sync = true;
-+		vmx->nested.need_vmcs12_to_shadow_sync = true;
- 	}
- 	vmx->nested.dirty_vmcs12 = true;
- }
-@@ -5296,12 +5296,12 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
- 	 * When running L2, the authoritative vmcs12 state is in the
- 	 * vmcs02. When running L1, the authoritative vmcs12 state is
- 	 * in the shadow or enlightened vmcs linked to vmcs01, unless
--	 * need_vmcs12_sync is set, in which case, the authoritative
-+	 * need_vmcs12_to_shadow_sync is set, in which case, the authoritative
- 	 * vmcs12 state is in the vmcs12 already.
- 	 */
- 	if (is_guest_mode(vcpu)) {
--		sync_vmcs12(vcpu, vmcs12);
--	} else if (!vmx->nested.need_vmcs12_sync) {
-+		sync_vmcs02_to_vmcs12(vcpu, vmcs12);
-+	} else if (!vmx->nested.need_vmcs12_to_shadow_sync) {
- 		if (vmx->nested.hv_evmcs)
- 			copy_enlightened_to_vmcs12(vmx);
- 		else if (enable_shadow_vmcs)
-@@ -5414,7 +5414,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
- 		 * Sync eVMCS upon entry as we may not have
- 		 * HV_X64_MSR_VP_ASSIST_PAGE set up yet.
- 		 */
--		vmx->nested.need_vmcs12_sync = true;
-+		vmx->nested.need_vmcs12_to_shadow_sync = true;
- 	} else {
- 		return -EINVAL;
- 	}
-diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-index e847ff1019a2..8688262a15ed 100644
---- a/arch/x86/kvm/vmx/nested.h
-+++ b/arch/x86/kvm/vmx/nested.h
-@@ -17,7 +17,7 @@ int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry);
- bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 exit_reason);
- void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
- 		       u32 exit_intr_info, unsigned long exit_qualification);
--void nested_sync_from_vmcs12(struct kvm_vcpu *vcpu);
-+void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu);
- int vmx_set_vmx_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 data);
- int vmx_get_vmx_msr(struct nested_vmx_msrs *msrs, u32 msr_index, u64 *pdata);
- int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 60306f19105d..91f55ff65345 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6392,8 +6392,8 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 		vmcs_write32(PLE_WINDOW, vmx->ple_window);
- 	}
- 
--	if (vmx->nested.need_vmcs12_sync)
--		nested_sync_from_vmcs12(vcpu);
-+	if (vmx->nested.need_vmcs12_to_shadow_sync)
-+		nested_sync_vmcs12_to_shadow(vcpu);
- 
- 	if (test_bit(VCPU_REGS_RSP, (unsigned long *)&vcpu->arch.regs_dirty))
- 		vmcs_writel(GUEST_RSP, vcpu->arch.regs[VCPU_REGS_RSP]);
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 63d37ccce3dc..16210dde0374 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -113,7 +113,7 @@ struct nested_vmx {
- 	 * Indicates if the shadow vmcs or enlightened vmcs must be updated
- 	 * with the data held by struct vmcs12.
- 	 */
--	bool need_vmcs12_sync;
-+	bool need_vmcs12_to_shadow_sync;
- 	bool dirty_vmcs12;
+@@ -4497,41 +4520,27 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
+ 	vmcs12_write_any(vmcs12, field, offset, field_value);
  
  	/*
+-	 * Do not track vmcs12 dirty-state if in guest-mode
+-	 * as we actually dirty shadow vmcs12 instead of vmcs12.
++	 * Do not track vmcs12 dirty-state if in guest-mode as we actually
++	 * dirty shadow vmcs12 instead of vmcs12.  Fields that can be updated
++	 * by L1 without a vmexit are always updated in the vmcs02, i.e' don't
++	 * "dirty" vmcs12, all others go down the prepare_vmcs02() slow path.
+ 	 */
+-	if (!is_guest_mode(vcpu)) {
+-		switch (field) {
+-#define SHADOW_FIELD_RW(x, y) case x:
+-#include "vmcs_shadow_fields.h"
+-			/*
+-			 * The fields that can be updated by L1 without a vmexit are
+-			 * always updated in the vmcs02, the others go down the slow
+-			 * path of prepare_vmcs02.
+-			 */
+-			break;
++	if (!is_guest_mode(vcpu) && !is_shadow_field_rw(field)) {
++		/*
++		 * L1 can read these fields without exiting, ensure the
++		 * shadow VMCS is up-to-date.
++		 */
++		if (enable_shadow_vmcs && is_shadow_field_ro(field)) {
++			preempt_disable();
++			vmcs_load(vmx->vmcs01.shadow_vmcs);
+ 
+-#define SHADOW_FIELD_RO(x, y) case x:
+-#include "vmcs_shadow_fields.h"
+-			/*
+-			 * L1 can read these fields without exiting, ensure the
+-			 * shadow VMCS is up-to-date.
+-			 */
+-			if (enable_shadow_vmcs) {
+-				preempt_disable();
+-				vmcs_load(vmx->vmcs01.shadow_vmcs);
++			__vmcs_writel(field, field_value);
+ 
+-				__vmcs_writel(field, field_value);
+-
+-				vmcs_clear(vmx->vmcs01.shadow_vmcs);
+-				vmcs_load(vmx->loaded_vmcs->vmcs);
+-				preempt_enable();
+-			}
+-			/* fall through */
+-		default:
+-			vmx->nested.dirty_vmcs12 = true;
+-			break;
++			vmcs_clear(vmx->vmcs01.shadow_vmcs);
++			vmcs_load(vmx->loaded_vmcs->vmcs);
++			preempt_enable();
+ 		}
++		vmx->nested.dirty_vmcs12 = true;
+ 	}
+ 
+ 	return nested_vmx_succeed(vcpu);
+diff --git a/arch/x86/kvm/vmx/vmcs_shadow_fields.h b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
+index 2cfa19ca158e..4cea018ba285 100644
+--- a/arch/x86/kvm/vmx/vmcs_shadow_fields.h
++++ b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
+@@ -1,3 +1,7 @@
++#if !defined(SHADOW_FIELD_RO) && !defined(SHADOW_FIELD_RW)
++BUILD_BUG_ON(1)
++#endif
++
+ #ifndef SHADOW_FIELD_RO
+ #define SHADOW_FIELD_RO(x, y)
+ #endif
 -- 
 2.21.0
 
