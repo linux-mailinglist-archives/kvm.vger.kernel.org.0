@@ -2,15 +2,15 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8085516B17
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 21:18:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75E0D16B19
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 21:18:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726486AbfEGTSI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 May 2019 15:18:08 -0400
-Received: from mga06.intel.com ([134.134.136.31]:55700 "EHLO mga06.intel.com"
+        id S1726526AbfEGTSK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 May 2019 15:18:10 -0400
+Received: from mga06.intel.com ([134.134.136.31]:55701 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726438AbfEGTSH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 May 2019 15:18:07 -0400
+        id S1726513AbfEGTSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 May 2019 15:18:09 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
@@ -22,10 +22,12 @@ From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
 Cc:     kvm@vger.kernel.org
-Subject: [PATCH 00/13]  KVM: VMX: Reduce VMWRITEs to VMCS controls
-Date:   Tue,  7 May 2019 12:17:52 -0700
-Message-Id: <20190507191805.9932-1-sean.j.christopherson@intel.com>
+Subject: [PATCH 01/13] KVM: nVMX: Use adjusted pin controls for vmcs02
+Date:   Tue,  7 May 2019 12:17:53 -0700
+Message-Id: <20190507191805.9932-2-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190507191805.9932-1-sean.j.christopherson@intel.com>
+References: <20190507191805.9932-1-sean.j.christopherson@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -33,54 +35,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The overarching theme of this series is to reduce the number of VMWRITEs
-to VMCS controls.  VMWRITEs to the major VMCS controls, i.e. vm_entry,
-vm_exit, pin, exec and sec_exec, are deceptively expensive.  CPUs with
-VMCS caching (Westmere and later) also optimize away consistency checks
-on VM-Entry, i.e. skip consistency checks if the relevant fields haven't
-changed since the last successful VM-Entry (of the cached VMCS).
-Because uops are a precious commodity, uCode's dirty VMCS field tracking
-isn't as precise as software would prefer.  Notably, writing any of the
-major VMCS fields effectively marks the entire VMCS dirty, i.e. causes
-the next VM-Entry to perform all consistency checks, which consumes
-several hundred cycles.
+KVM provides a module parameter to allow disabling virtual NMI support
+to simplify testing (hardware *without* virtual NMI support is virtually
+non-existent, pun intended).  When preparing vmcs02, use the accessor
+for pin controls to ensure that the module param is respected for nested
+guests.
 
-The majority of this series is technically vanilla VMX, but the end goal
-of nearly every patch is to eliminate VMWRITEs to controls when running
-nested guests, e.g. much of the series resolves around shadowing the
-various controls so that they don't need to be rewritten to vmcs02 on
-every nested VM-Entry.
+Opportunistically swap the order of applying L0's and L1's pin controls
+to better align with other controls and to prepare for a future patche
+that will ignore L1's, but not L0's, preemption timer flag.
 
-The sole patch that is purely vanilla VMX is to avoid writing pin
-controls when disabling/enabling the preemption timer.  This is the
-last known known case where semi-frequent writes to control fields
-can be avoided (in non-nested operation).  E.g. detecting IRQ windows
-frequently toggles VIRTUAL_INTR_PENDING, but at this juncture that
-behavior is effectively unavoidable.  Resolving the preemption timer
-case takes a somewhat adventurous approach of leaving the timer running
-even when it's not in use.
+Fixes: d02fcf50779ec ("kvm: vmx: Allow disabling virtual NMI support")
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+---
+ arch/x86/kvm/vmx/nested.c | 5 ++---
+ arch/x86/kvm/vmx/vmx.c    | 2 +-
+ arch/x86/kvm/vmx/vmx.h    | 1 +
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-Sean Christopherson (13):
-  KVM: nVMX: Use adjusted pin controls for vmcs02
-  KVM: VMX: Add builder macros for shadowing controls
-  KVM: VMX: Shadow VMCS pin controls
-  KVM: VMX: Shadow VMCS primary execution controls
-  KVM: VMX: Shadow VMCS secondary execution controls
-  KVM: nVMX: Shadow VMCS controls on a per-VMCS basis
-  KVM: nVMX: Don't reset VMCS controls shadow on VMCS switch
-  KVM: VMX: Explicitly initialize controls shadow at VMCS allocation
-  KVM: nVMX: Preserve last USE_MSR_BITMAPS when preparing vmcs02
-  KVM: nVMX: Preset *DT exiting in vmcs02 when emulating UMIP
-  KVM: VMX: Drop hv_timer_armed from 'struct loaded_vmcs'
-  KVM: nVMX: Don't mark vmcs12 as dirty when L1 writes pin controls
-  KVM: VMX: Leave preemption timer running when it's disabled
-
- arch/x86/kvm/vmx/nested.c |  54 ++++++-------
- arch/x86/kvm/vmx/vmcs.h   |  11 ++-
- arch/x86/kvm/vmx/vmx.c    | 156 +++++++++++++++++++-------------------
- arch/x86/kvm/vmx/vmx.h    |  92 +++++++---------------
- 4 files changed, 145 insertions(+), 168 deletions(-)
-
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 04b40a98f60b..2a98d92f955b 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1986,10 +1986,9 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+ 	/*
+ 	 * PIN CONTROLS
+ 	 */
+-	exec_control = vmcs12->pin_based_vm_exec_control;
+-
++	exec_control = vmx_pin_based_exec_ctrl(vmx);
++	exec_control |= vmcs12->pin_based_vm_exec_control;
+ 	/* Preemption timer setting is computed directly in vmx_vcpu_run.  */
+-	exec_control |= vmcs_config.pin_based_exec_ctrl;
+ 	exec_control &= ~PIN_BASED_VMX_PREEMPTION_TIMER;
+ 	vmx->loaded_vmcs->hv_timer_armed = false;
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 60306f19105d..08f36881473f 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3798,7 +3798,7 @@ void set_cr4_guest_host_mask(struct vcpu_vmx *vmx)
+ 	vmcs_writel(CR4_GUEST_HOST_MASK, ~vmx->vcpu.arch.cr4_guest_owned_bits);
+ }
+ 
+-static u32 vmx_pin_based_exec_ctrl(struct vcpu_vmx *vmx)
++u32 vmx_pin_based_exec_ctrl(struct vcpu_vmx *vmx)
+ {
+ 	u32 pin_based_exec_ctrl = vmcs_config.pin_based_exec_ctrl;
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 63d37ccce3dc..181acd906c75 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -467,6 +467,7 @@ static inline u32 vmx_vmexit_ctrl(void)
+ }
+ 
+ u32 vmx_exec_control(struct vcpu_vmx *vmx);
++u32 vmx_pin_based_exec_ctrl(struct vcpu_vmx *vmx);
+ 
+ static inline struct kvm_vmx *to_kvm_vmx(struct kvm *kvm)
+ {
 -- 
 2.21.0
 
