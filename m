@@ -2,15 +2,15 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3394E16765
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 18:06:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 575451676F
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 18:07:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726885AbfEGQGr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 May 2019 12:06:47 -0400
-Received: from mga02.intel.com ([134.134.136.20]:42085 "EHLO mga02.intel.com"
+        id S1727024AbfEGQG6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 May 2019 12:06:58 -0400
+Received: from mga02.intel.com ([134.134.136.20]:42087 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726799AbfEGQGq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 May 2019 12:06:46 -0400
+        id S1726197AbfEGQGr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 May 2019 12:06:47 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
@@ -24,9 +24,9 @@ To:     Paolo Bonzini <pbonzini@redhat.com>,
 Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
         Liran Alon <liran.alon@oracle.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH 06/15] KVM: nVMX: Don't "put" vCPU or host state when switching VMCS
-Date:   Tue,  7 May 2019 09:06:31 -0700
-Message-Id: <20190507160640.4812-7-sean.j.christopherson@intel.com>
+Subject: [PATCH 07/15] KVM: nVMX: Don't reread VMCS-agnostic state when switching VMCS
+Date:   Tue,  7 May 2019 09:06:32 -0700
+Message-Id: <20190507160640.4812-8-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190507160640.4812-1-sean.j.christopherson@intel.com>
 References: <20190507160640.4812-1-sean.j.christopherson@intel.com>
@@ -37,155 +37,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When switching between vmcs01 and vmcs02, KVM isn't actually switching
-between guest and host.  If guest state is already loaded (the likely,
-if not guaranteed, case), keep the guest state loaded and manually swap
-the loaded_cpu_state pointer after propagating saved host state to the
-new vmcs0{1,2}.
+When switching between vmcs01 and vmcs02, there is no need to update
+state tracking for values that aren't tied to any particular VMCS as
+the per-vCPU values are already up-to-date (vmx_switch_vmcs() can only
+be called when the vCPU is loaded).
 
-Avoiding the switch between guest and host reduces the latency of
-switching between vmcs01 and vmcs02 by several hundred cycles, and
-reduces the roundtrip time of a nested VM by upwards of 1000 cycles.
+Avoiding the update eliminates a RDMSR, and potentially a RDPKRU and
+posted-interrupt updated (cmpxchg64() and more).
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- arch/x86/kvm/vmx/nested.c | 18 +++++++++++++-
- arch/x86/kvm/vmx/vmx.c    | 52 ++++++++++++++++++++++-----------------
- arch/x86/kvm/vmx/vmx.h    |  3 ++-
- 3 files changed, 48 insertions(+), 25 deletions(-)
+ arch/x86/kvm/vmx/nested.c |  2 +-
+ arch/x86/kvm/vmx/vmx.c    | 18 +++++++++++++-----
+ arch/x86/kvm/vmx/vmx.h    |  2 +-
+ 3 files changed, 15 insertions(+), 7 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index a30d53823b2e..4651d3462df4 100644
+index 4651d3462df4..99164d054922 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -241,15 +241,31 @@ static void free_nested(struct kvm_vcpu *vcpu)
- static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, struct loaded_vmcs *vmcs)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	struct vmcs_host_state *src;
-+	struct loaded_vmcs *prev;
- 	int cpu;
- 
- 	if (vmx->loaded_vmcs == vmcs)
- 		return;
- 
+@@ -251,7 +251,7 @@ static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, struct loaded_vmcs *vmcs)
  	cpu = get_cpu();
--	vmx_vcpu_put(vcpu);
-+	prev = vmx->loaded_cpu_state;
+ 	prev = vmx->loaded_cpu_state;
  	vmx->loaded_vmcs = vmcs;
- 	vmx_vcpu_load(vcpu, cpu);
-+
-+	if (likely(prev)) {
-+		src = &prev->host_state;
-+
-+		vmx_set_host_fs_gs(&vmcs->host_state, src->fs_sel, src->gs_sel,
-+				   src->fs_base, src->gs_base);
-+
-+		vmcs->host_state.ldt_sel = src->ldt_sel;
-+#ifdef CONFIG_X86_64
-+		vmcs->host_state.ds_sel = src->ds_sel;
-+		vmcs->host_state.es_sel = src->es_sel;
-+#endif
-+		vmx->loaded_cpu_state = vmcs;
-+	}
- 	put_cpu();
+-	vmx_vcpu_load(vcpu, cpu);
++	__vmx_vcpu_load(vcpu, cpu);
  
- 	vm_entry_controls_reset_shadow(vmx);
+ 	if (likely(prev)) {
+ 		src = &prev->host_state;
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index f3b0f4445af7..b97666731425 100644
+index b97666731425..0c48dee4159b 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1035,6 +1035,33 @@ static void pt_guest_exit(struct vcpu_vmx *vmx)
- 	wrmsrl(MSR_IA32_RTIT_CTL, vmx->pt_desc.host.ctl);
+@@ -1231,11 +1231,7 @@ static void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+ 		pi_set_on(pi_desc);
  }
  
-+void vmx_set_host_fs_gs(struct vmcs_host_state *host, u16 fs_sel, u16 gs_sel,
-+			unsigned long fs_base, unsigned long gs_base)
-+{
-+	if (unlikely(fs_sel != host->fs_sel)) {
-+		if (!(fs_sel & 7))
-+			vmcs_write16(HOST_FS_SELECTOR, fs_sel);
-+		else
-+			vmcs_write16(HOST_FS_SELECTOR, 0);
-+		host->fs_sel = fs_sel;
-+	}
-+	if (unlikely(gs_sel != host->gs_sel)) {
-+		if (!(gs_sel & 7))
-+			vmcs_write16(HOST_GS_SELECTOR, gs_sel);
-+		else
-+			vmcs_write16(HOST_GS_SELECTOR, 0);
-+		host->gs_sel = gs_sel;
-+	}
-+	if (unlikely(fs_base != host->fs_base)) {
-+		vmcs_writel(HOST_FS_BASE, fs_base);
-+		host->fs_base = fs_base;
-+	}
-+	if (unlikely(gs_base != host->gs_base)) {
-+		vmcs_writel(HOST_GS_BASE, gs_base);
-+		host->gs_base = gs_base;
-+	}
-+}
-+
- void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
+-/*
+- * Switches to specified vcpu, until a matching vcpu_put(), but assumes
+- * vcpu mutex is already taken.
+- */
+-void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
++void __vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
  {
  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-@@ -1100,28 +1127,7 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
- 	gs_base = segment_base(gs_sel);
- #endif
+ 	bool already_loaded = vmx->loaded_vmcs->cpu == cpu;
+@@ -1296,8 +1292,20 @@ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	if (kvm_has_tsc_control &&
+ 	    vmx->current_tsc_ratio != vcpu->arch.tsc_scaling_ratio)
+ 		decache_tsc_multiplier(vmx);
++}
++
++/*
++ * Switches to specified vcpu, until a matching vcpu_put(), but assumes
++ * vcpu mutex is already taken.
++ */
++static void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
++{
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++
++	__vmx_vcpu_load(vcpu, cpu);
  
--	if (unlikely(fs_sel != host_state->fs_sel)) {
--		if (!(fs_sel & 7))
--			vmcs_write16(HOST_FS_SELECTOR, fs_sel);
--		else
--			vmcs_write16(HOST_FS_SELECTOR, 0);
--		host_state->fs_sel = fs_sel;
--	}
--	if (unlikely(gs_sel != host_state->gs_sel)) {
--		if (!(gs_sel & 7))
--			vmcs_write16(HOST_GS_SELECTOR, gs_sel);
--		else
--			vmcs_write16(HOST_GS_SELECTOR, 0);
--		host_state->gs_sel = gs_sel;
--	}
--	if (unlikely(fs_base != host_state->fs_base)) {
--		vmcs_writel(HOST_FS_BASE, fs_base);
--		host_state->fs_base = fs_base;
--	}
--	if (unlikely(gs_base != host_state->gs_base)) {
--		vmcs_writel(HOST_GS_BASE, gs_base);
--		host_state->gs_base = gs_base;
--	}
-+	vmx_set_host_fs_gs(host_state, fs_sel, gs_sel, fs_base, gs_base);
+ 	vmx_vcpu_pi_load(vcpu, cpu);
++
+ 	vmx->host_pkru = read_pkru();
+ 	vmx->host_debugctlmsr = get_debugctlmsr();
  }
- 
- static void vmx_prepare_switch_to_host(struct vcpu_vmx *vmx)
-@@ -1310,7 +1316,7 @@ static void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
- 		pi_set_sn(pi_desc);
- }
- 
--void vmx_vcpu_put(struct kvm_vcpu *vcpu)
-+static void vmx_vcpu_put(struct kvm_vcpu *vcpu)
- {
- 	vmx_vcpu_pi_put(vcpu);
- 
 diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 63d37ccce3dc..f81b32ae1822 100644
+index f81b32ae1822..f62a008c9227 100644
 --- a/arch/x86/kvm/vmx/vmx.h
 +++ b/arch/x86/kvm/vmx/vmx.h
-@@ -293,11 +293,12 @@ struct kvm_vmx {
+@@ -292,7 +292,7 @@ struct kvm_vmx {
+ };
  
  bool nested_vmx_allowed(struct kvm_vcpu *vcpu);
- void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
--void vmx_vcpu_put(struct kvm_vcpu *vcpu);
+-void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
++void __vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
  int allocate_vpid(void);
  void free_vpid(int vpid);
  void vmx_set_constant_host_state(struct vcpu_vmx *vmx);
- void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu);
-+void vmx_set_host_fs_gs(struct vmcs_host_state *host, u16 fs_sel, u16 gs_sel,
-+			unsigned long fs_base, unsigned long gs_base);
- int vmx_get_cpl(struct kvm_vcpu *vcpu);
- unsigned long vmx_get_rflags(struct kvm_vcpu *vcpu);
- void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
 -- 
 2.21.0
 
