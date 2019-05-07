@@ -2,250 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DF3FD16819
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 18:43:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 688581681F
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 18:43:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726353AbfEGQnj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 May 2019 12:43:39 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58348 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726403AbfEGQnj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 May 2019 12:43:39 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x47GgB75132540
-        for <kvm@vger.kernel.org>; Tue, 7 May 2019 12:43:38 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2sbbj5xt3g-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 07 May 2019 12:43:37 -0400
-Received: from localhost
-        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <farman@linux.ibm.com>;
-        Tue, 7 May 2019 17:43:37 +0100
-Received: from b01cxnp22035.gho.pok.ibm.com (9.57.198.25)
-        by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 7 May 2019 17:43:35 +0100
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x47GhYfv26411192
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 May 2019 16:43:34 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7FABEAE062;
-        Tue,  7 May 2019 16:43:34 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 294BEAE05F;
-        Tue,  7 May 2019 16:43:34 +0000 (GMT)
-Received: from [9.80.218.140] (unknown [9.80.218.140])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue,  7 May 2019 16:43:34 +0000 (GMT)
-Subject: Re: [PATCH 7/7] s390/cio: Remove vfio-ccw checks of command codes
-To:     pmorel@linux.ibm.com, Cornelia Huck <cohuck@redhat.com>,
-        Farhan Ali <alifm@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20190503134912.39756-1-farman@linux.ibm.com>
- <20190503134912.39756-8-farman@linux.ibm.com>
- <8625f759-0a2d-09af-c8b5-5b312d854ba1@linux.ibm.com>
- <7c897993-d146-bf8e-48ad-11a914a04716@linux.ibm.com>
- <bba6c0a8-2346-cd99-b8ad-f316daac010b@linux.ibm.com>
- <7ac9fb43-8d7a-9e04-8cba-fa4c63dfc413@linux.ibm.com>
-From:   Eric Farman <farman@linux.ibm.com>
-Date:   Tue, 7 May 2019 12:43:33 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <7ac9fb43-8d7a-9e04-8cba-fa4c63dfc413@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        id S1727144AbfEGQnv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 May 2019 12:43:51 -0400
+Received: from mail-eopbgr730061.outbound.protection.outlook.com ([40.107.73.61]:6061
+        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726399AbfEGQnu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 May 2019 12:43:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=M6VFbky3ymyVMrcNdfwd/tdxQTzdcc3pSaBPWG3vy6A=;
+ b=HjfFqM3UsXrd+Qok5En8MfdyZFNJ8bFZ/ag7iiAfSDoMlfaD2HVd8/vk2e886DFRBtJ+TT3XpBuvCWBJJa6jui9ZWygx9dU0JxWxGtJbUwcCiT+3Wj2iSHV0mYir9iaE8nwBWblnb2Bx71JtVjg1/XOjlANN7eigqBFyYAGn6gM=
+Received: from BYAPR12MB3176.namprd12.prod.outlook.com (20.179.92.82) by
+ BYAPR12MB3544.namprd12.prod.outlook.com (20.179.94.154) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1856.11; Tue, 7 May 2019 16:43:44 +0000
+Received: from BYAPR12MB3176.namprd12.prod.outlook.com
+ ([fe80::9118:73f2:809c:22c7]) by BYAPR12MB3176.namprd12.prod.outlook.com
+ ([fe80::9118:73f2:809c:22c7%4]) with mapi id 15.20.1856.012; Tue, 7 May 2019
+ 16:43:44 +0000
+From:   "Kuehling, Felix" <Felix.Kuehling@amd.com>
+To:     Andrey Konovalov <andreyknvl@google.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+CC:     Catalin Marinas <catalin.marinas@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        "Deucher, Alexander" <Alexander.Deucher@amd.com>,
+        "Koenig, Christian" <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        "Kuehling@google.com" <Kuehling@google.com>
+Subject: Re: [PATCH v15 11/17] drm/amdgpu, arm64: untag user pointers
+Thread-Topic: [PATCH v15 11/17] drm/amdgpu, arm64: untag user pointers
+Thread-Index: AQHVBCkwhlWrfC6yEUGolKUQ2UvD0qZf37iA
+Date:   Tue, 7 May 2019 16:43:44 +0000
+Message-ID: <f452d003-157d-c307-3a27-fe5c3394e34e@amd.com>
+References: <cover.1557160186.git.andreyknvl@google.com>
+ <84676a97cec129eb7a10559ceae2bec526160ad6.1557160186.git.andreyknvl@google.com>
+In-Reply-To: <84676a97cec129eb7a10559ceae2bec526160ad6.1557160186.git.andreyknvl@google.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19050716-0052-0000-0000-000003BBEE89
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011066; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000285; SDB=6.01199952; UDB=6.00629570; IPR=6.00980834;
- MB=3.00026771; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-07 16:43:36
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050716-0053-0000-0000-000060CE5EBB
-Message-Id: <1f2e4272-8570-f93f-9d67-a43dcb00fc55@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-07_09:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905070109
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [165.204.55.251]
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+x-clientproxiedby: YTXPR0101CA0068.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b00:1::45) To BYAPR12MB3176.namprd12.prod.outlook.com
+ (2603:10b6:a03:133::18)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Felix.Kuehling@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 09e7b200-0034-47ca-9971-08d6d30b2b1a
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:BYAPR12MB3544;
+x-ms-traffictypediagnostic: BYAPR12MB3544:
+x-microsoft-antispam-prvs: <BYAPR12MB3544ED1AEDC3F608873090EF92310@BYAPR12MB3544.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 0030839EEE
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(396003)(376002)(366004)(346002)(136003)(39860400002)(189003)(199004)(72206003)(71190400001)(2501003)(316002)(76176011)(386003)(36756003)(81166006)(53546011)(66066001)(476003)(81156014)(6506007)(14454004)(8936002)(478600001)(52116002)(102836004)(486006)(2906002)(8676002)(65956001)(31696002)(65806001)(68736007)(25786009)(5660300002)(186003)(2616005)(6116002)(6246003)(66446008)(73956011)(11346002)(86362001)(446003)(66476007)(64756008)(2201001)(66946007)(26005)(4326008)(31686004)(71200400001)(6512007)(66556008)(53936002)(229853002)(64126003)(58126008)(54906003)(305945005)(6486002)(7406005)(7416002)(256004)(14444005)(99286004)(65826007)(7736002)(110136005)(6436002)(3846002)(921003)(1121003);DIR:OUT;SFP:1101;SCL:1;SRVR:BYAPR12MB3544;H:BYAPR12MB3176.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: fHcoZnbq9hf2cYkyJCy1IaiD/PM1Vj0DJH3jKfi+aVbuz0nKby+qIya9Jvj61fxNkWgd6wJ2TZFhOMWgIRoBLMBanxM859JGflQ59K+s8RFNIct8hJsIwJ6VE53EniVRTEiOJ71+THdgKc4UuaglK/w1gwDkEDO7Sz49xcdNMo+B6a1Kwr99TuQBUx3qSeFHEqTixIo1etZTz3A69eG9Ssn5u7UWxbSNv847Lm/d0RBKzL7aXwFTQKty6oCOW3GeQJo76qimZ4rrx1r9hK9R4O+yyTEBt8IJttn3Qr0DA58jGDFXtmL/ImI4mjiXUDqyGS6xQ/i5qRjq1gb0r/8PxTNgenUEyN8djedX6sU93fV22s1Ch5Wxi6pvsOW9dF1SwO5fO/xjwavNzjJfY3hmjA==
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D2B88B58BE4D1C41BB18133F73BDE5B9@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 09e7b200-0034-47ca-9971-08d6d30b2b1a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2019 16:43:44.3320
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3544
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 5/7/19 4:52 AM, Pierre Morel wrote:
-> On 06/05/2019 22:47, Eric Farman wrote:
->>
->>
->> On 5/6/19 11:39 AM, Eric Farman wrote:
->>>
->>>
->>> On 5/6/19 8:56 AM, Pierre Morel wrote:
->>>> On 03/05/2019 15:49, Eric Farman wrote:
->>>>> If the CCW being processed is a No-Operation, then by definition no
->>>>> data is being transferred.  Let's fold those checks into the normal
->>>>> CCW processors, rather than skipping out early.
->>>>>
->>>>> Likewise, if the CCW being processed is a "test" (an invented
->>>>> definition to simply mean it ends in a zero), let's permit that to go
->>>>> through to the hardware.  There's nothing inherently unique about
->>>>> those command codes versus one that ends in an eight [1], or any other
->>>>> otherwise valid command codes that are undefined for the device type
->>>>> in question.
->>>>>
->>>>> [1] POPS states that a x08 is a TIC CCW, and that having any 
->>>>> high-order
->>>>> bits enabled is invalid for format-1 CCWs.  For format-0 CCWs, the
->>>>> high-order bits are ignored.
->>>>>
->>>>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
->>>>> ---
->>>>>   drivers/s390/cio/vfio_ccw_cp.c | 11 +++++------
->>>>>   1 file changed, 5 insertions(+), 6 deletions(-)
->>>>>
->>>>> diff --git a/drivers/s390/cio/vfio_ccw_cp.c 
->>>>> b/drivers/s390/cio/vfio_ccw_cp.c
->>>>> index 36d76b821209..c0a52025bf06 100644
->>>>> --- a/drivers/s390/cio/vfio_ccw_cp.c
->>>>> +++ b/drivers/s390/cio/vfio_ccw_cp.c
->>>>> @@ -289,8 +289,6 @@ static long copy_ccw_from_iova(struct 
->>>>> channel_program *cp,
->>>>>   #define ccw_is_read_backward(_ccw) (((_ccw)->cmd_code & 0x0F) == 
->>>>> 0x0C)
->>>>>   #define ccw_is_sense(_ccw) (((_ccw)->cmd_code & 0x0F) == 
->>>>> CCW_CMD_BASIC_SENSE)
->>>>> -#define ccw_is_test(_ccw) (((_ccw)->cmd_code & 0x0F) == 0)
->>>>> -
->>>>>   #define ccw_is_noop(_ccw) ((_ccw)->cmd_code == CCW_CMD_NOOP)
->>>>>   #define ccw_is_tic(_ccw) ((_ccw)->cmd_code == CCW_CMD_TIC)
->>>>> @@ -314,6 +312,10 @@ static inline int 
->>>>> ccw_does_data_transfer(struct ccw1 *ccw)
->>>>>       if (ccw->count == 0)
->>>>>           return 0;
->>>>> +    /* If the command is a NOP, then no data will be transferred */
->>>>> +    if (ccw_is_noop(ccw))
->>>>> +        return 0;
->>>>> +
->>>>>       /* If the skip flag is off, then data will be transferred */
->>>>>       if (!ccw_is_skip(ccw))
->>>>>           return 1;
->>>>> @@ -398,7 +400,7 @@ static void ccwchain_cda_free(struct ccwchain 
->>>>> *chain, int idx)
->>>>>   {
->>>>>       struct ccw1 *ccw = chain->ch_ccw + idx;
->>>>> -    if (ccw_is_test(ccw) || ccw_is_noop(ccw) || ccw_is_tic(ccw))
->>>>> +    if (ccw_is_tic(ccw))
->>>>
->>>>
->>>> AFAIR, we introduced this code to protect against noop and test with 
->>>> a non zero CDA.
->>>> This could go away only if there is somewhere the guaranty that noop 
->>>> have always a null CDA (same for test).
->>>
->>> What was generating either the null or "test" command codes?  I can 
->>> provide plenty of examples for both these command codes and how they 
->>> look coming out of vfio-ccw now.
->>
->> I've sent both x00 and x03 (NOP) CCWs with zero and non-zero CDAs to 
->> hardware without this patch.  I don't see anything particuarly 
->> surpising, so I'm not sure what the original code was attempting to 
->> protect.
->>
->> Maybe, since you question this in ccwchain_cda_free(), you're 
->> referring to commit 408358b50dea ("s390: vfio-ccw: Do not attempt to 
->> free no-op, test and tic cda."), which fixed up our attempt to clean 
->> things up that weren't allocated on the transmit side?  With this 
->> series, that is reverted, but the cda is indeed set to something that 
->> needs to be free'd (see below).  So maybe I should at least mention 
->> that commit here.
->>
->> Regardless, while the I/Os work/fail as I expect, the cda addresses 
->> themselves are wrong in much the same way I describe in patch 4.  Yes, 
->> without this patch we don't convert them to an IDAL so certain program 
->> checks aren't applicable.  But the addresses that we end up sending to 
->> the hardware are nonsensical, though potentially valid, locations.
->>
-> 
-> I am not comfortable with this.
-> with NOOP no data transfer take place and the role of VFIO is to take 
-> care about data transfer.
-> So in my logic better do nothing and send the original CCW to the hardware.
-> 
->>>
->>> The noop check is moved up into the "does data transfer" routine, to 
->>> determine whether the pages should be pinned or not.  Regardless of 
->>> whether or not the input CDA is null, we'll end up with a CCW 
->>> pointing to a valid IDAL of invalid addresses.
->>>
->>> The "test" command codes always struck me as funky, because x18 and 
->>> xF8 and everything in between that ends in x8 is architecturally 
->>> invalid too, but we don't check for them like we do for things that 
->>> end in x0. And there's a TON of other opcodes that are invalid for 
->>> today's ECKD devices, or perhaps were valid for older DASD but have 
->>> since been deprecated, or are only valid for non-DASD device types. 
->>> We have no logic to permit them, either.  If those CCWs had a 
->>> non-zero CDA, we either pin it successfully and let the targeted 
->>> device sort it out or an error occurs and we fail at that point.  
->>> (QEMU will see a "wirte" region error of -EINVAL because of 
->>> vfio_pin_pages())
-> 
-> The test command is AFAIU even more sensible that the NOOP command and 
-> in my opinion should never be modified since it is highly device 
-> dependent and do not induce data transfer anyway.
-> 
-> We even do not know how the CDA field may be used by the device.
-
-Exactly, which is why I think sending an unpinned, non-translated, guest 
-address to the hardware (which is what happens today) is a Bad Idea.  If 
-the associated command code WERE going to cause the channel to modify 
-any memory, the provided address from the guest would (best case) cause 
-a program check if the address were not available, or some data 
-corruption if it were.
-
-> May be I am a little dramatic with this.
-> Just to say that I would feel more comfortable if the test command reach 
-> the device unchanged.
-> 
-
-As I say above, I disagree.  I'd rather that the command (test or 
-otherwise) hit the channel (and the device if applicable) with a valid 
-host address in ccw.cda, so that if any data transfer occurs we're not 
-exposed.
-
-If there's an application that wants to send a test CCW with an invalid 
-CDA (and thus would fail the pin, as I have seen with NOP), then I guess 
-I can add ccw_is_test() to ccw_does_data_transfer(), but since I still 
-don't see the use case for test CCWs I'm not as thrilled about it.
-
-Do you recall what caused them to be added originally?
-
->>>
->>>>
->>>>
->>>>
->>>>>           return;
->>>>>       kfree((void *)(u64)ccw->cda);
->>>>> @@ -723,9 +725,6 @@ static int ccwchain_fetch_one(struct ccwchain 
->>>>> *chain,
->>>>>   {
->>>>>       struct ccw1 *ccw = chain->ch_ccw + idx;
->>>>> -    if (ccw_is_test(ccw) || ccw_is_noop(ccw))
->>>>> -        return 0;
->>>>> -
->>>>>       if (ccw_is_tic(ccw))
->>>>>           return ccwchain_fetch_tic(chain, idx, cp);
->>>>>
->>>>
->>>>
-> 
-> 
-
+T24gMjAxOS0wNS0wNiAxMjozMCBwLm0uLCBBbmRyZXkgS29ub3ZhbG92IHdyb3RlOg0KPiBbQ0FV
+VElPTjogRXh0ZXJuYWwgRW1haWxdDQo+DQo+IFRoaXMgcGF0Y2ggaXMgYSBwYXJ0IG9mIGEgc2Vy
+aWVzIHRoYXQgZXh0ZW5kcyBhcm02NCBrZXJuZWwgQUJJIHRvIGFsbG93IHRvDQo+IHBhc3MgdGFn
+Z2VkIHVzZXIgcG9pbnRlcnMgKHdpdGggdGhlIHRvcCBieXRlIHNldCB0byBzb21ldGhpbmcgZWxz
+ZSBvdGhlcg0KPiB0aGFuIDB4MDApIGFzIHN5c2NhbGwgYXJndW1lbnRzLg0KPg0KPiBJbiBhbWRn
+cHVfZ2VtX3VzZXJwdHJfaW9jdGwoKSBhbmQgYW1kZ3B1X2FtZGtmZF9ncHV2bS5jL2luaXRfdXNl
+cl9wYWdlcygpDQo+IGFuIE1NVSBub3RpZmllciBpcyBzZXQgdXAgd2l0aCBhICh0YWdnZWQpIHVz
+ZXJzcGFjZSBwb2ludGVyLiBUaGUgdW50YWdnZWQNCj4gYWRkcmVzcyBzaG91bGQgYmUgdXNlZCBz
+byB0aGF0IE1NVSBub3RpZmllcnMgZm9yIHRoZSB1bnRhZ2dlZCBhZGRyZXNzIGdldA0KPiBjb3Jy
+ZWN0bHkgbWF0Y2hlZCB1cCB3aXRoIHRoZSByaWdodCBCTy4gVGhpcyBwYXRjaCB1bnRhZyB1c2Vy
+IHBvaW50ZXJzIGluDQo+IGFtZGdwdV9nZW1fdXNlcnB0cl9pb2N0bCgpIGZvciB0aGUgR0VNIGNh
+c2UgYW5kIGluIGFtZGdwdV9hbWRrZmRfZ3B1dm1fDQo+IGFsbG9jX21lbW9yeV9vZl9ncHUoKSBm
+b3IgdGhlIEtGRCBjYXNlLiBUaGlzIGFsc28gbWFrZXMgc3VyZSB0aGF0IGFuDQo+IHVudGFnZ2Vk
+IHBvaW50ZXIgaXMgcGFzc2VkIHRvIGFtZGdwdV90dG1fdHRfZ2V0X3VzZXJfcGFnZXMoKSwgd2hp
+Y2ggdXNlcw0KPiBpdCBmb3Igdm1hIGxvb2t1cHMuDQo+DQo+IFN1Z2dlc3RlZC1ieTogS3VlaGxp
+bmcsIEZlbGl4IDxGZWxpeC5LdWVobGluZ0BhbWQuY29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBBbmRy
+ZXkgS29ub3ZhbG92IDxhbmRyZXlrbnZsQGdvb2dsZS5jb20+DQoNCkFja2VkLWJ5OiBGZWxpeCBL
+dWVobGluZyA8RmVsaXguS3VlaGxpbmdAYW1kLmNvbT4NCg0KDQo+IC0tLQ0KPiAgIGRyaXZlcnMv
+Z3B1L2RybS9hbWQvYW1kZ3B1L2FtZGdwdV9hbWRrZmRfZ3B1dm0uYyB8IDIgKy0NCj4gICBkcml2
+ZXJzL2dwdS9kcm0vYW1kL2FtZGdwdS9hbWRncHVfZ2VtLmMgICAgICAgICAgfCAyICsrDQo+ICAg
+MiBmaWxlcyBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4NCj4gZGlm
+ZiAtLWdpdCBhL2RyaXZlcnMvZ3B1L2RybS9hbWQvYW1kZ3B1L2FtZGdwdV9hbWRrZmRfZ3B1dm0u
+YyBiL2RyaXZlcnMvZ3B1L2RybS9hbWQvYW1kZ3B1L2FtZGdwdV9hbWRrZmRfZ3B1dm0uYw0KPiBp
+bmRleCAxOTIxZGVjM2RmN2EuLjIwY2FjNDRlZDQ0OSAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9n
+cHUvZHJtL2FtZC9hbWRncHUvYW1kZ3B1X2FtZGtmZF9ncHV2bS5jDQo+ICsrKyBiL2RyaXZlcnMv
+Z3B1L2RybS9hbWQvYW1kZ3B1L2FtZGdwdV9hbWRrZmRfZ3B1dm0uYw0KPiBAQCAtMTEyMSw3ICsx
+MTIxLDcgQEAgaW50IGFtZGdwdV9hbWRrZmRfZ3B1dm1fYWxsb2NfbWVtb3J5X29mX2dwdSgNCj4g
+ICAgICAgICAgICAgICAgICBhbGxvY19mbGFncyA9IDA7DQo+ICAgICAgICAgICAgICAgICAgaWYg
+KCFvZmZzZXQgfHwgISpvZmZzZXQpDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICByZXR1cm4g
+LUVJTlZBTDsNCj4gLSAgICAgICAgICAgICAgIHVzZXJfYWRkciA9ICpvZmZzZXQ7DQo+ICsgICAg
+ICAgICAgICAgICB1c2VyX2FkZHIgPSB1bnRhZ2dlZF9hZGRyKCpvZmZzZXQpOw0KPiAgICAgICAg
+ICB9IGVsc2UgaWYgKGZsYWdzICYgQUxMT0NfTUVNX0ZMQUdTX0RPT1JCRUxMKSB7DQo+ICAgICAg
+ICAgICAgICAgICAgZG9tYWluID0gQU1ER1BVX0dFTV9ET01BSU5fR1RUOw0KPiAgICAgICAgICAg
+ICAgICAgIGFsbG9jX2RvbWFpbiA9IEFNREdQVV9HRU1fRE9NQUlOX0NQVTsNCj4gZGlmZiAtLWdp
+dCBhL2RyaXZlcnMvZ3B1L2RybS9hbWQvYW1kZ3B1L2FtZGdwdV9nZW0uYyBiL2RyaXZlcnMvZ3B1
+L2RybS9hbWQvYW1kZ3B1L2FtZGdwdV9nZW0uYw0KPiBpbmRleCBkMjFkZDJmMzY5ZGEuLjk4NWNi
+ODJiMmFhNiAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9ncHUvZHJtL2FtZC9hbWRncHUvYW1kZ3B1
+X2dlbS5jDQo+ICsrKyBiL2RyaXZlcnMvZ3B1L2RybS9hbWQvYW1kZ3B1L2FtZGdwdV9nZW0uYw0K
+PiBAQCAtMjg2LDYgKzI4Niw4IEBAIGludCBhbWRncHVfZ2VtX3VzZXJwdHJfaW9jdGwoc3RydWN0
+IGRybV9kZXZpY2UgKmRldiwgdm9pZCAqZGF0YSwNCj4gICAgICAgICAgdWludDMyX3QgaGFuZGxl
+Ow0KPiAgICAgICAgICBpbnQgcjsNCj4NCj4gKyAgICAgICBhcmdzLT5hZGRyID0gdW50YWdnZWRf
+YWRkcihhcmdzLT5hZGRyKTsNCj4gKw0KPiAgICAgICAgICBpZiAob2Zmc2V0X2luX3BhZ2UoYXJn
+cy0+YWRkciB8IGFyZ3MtPnNpemUpKQ0KPiAgICAgICAgICAgICAgICAgIHJldHVybiAtRUlOVkFM
+Ow0KPg0KPiAtLQ0KPiAyLjIxLjAuMTAyMC5nZjI4MjBjZjAxYS1nb29nDQo+DQo=
