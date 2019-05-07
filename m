@@ -2,99 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E8E2615D6F
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 08:34:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8097615D8B
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 08:35:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726542AbfEGGdn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 May 2019 02:33:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57196 "EHLO mail.kernel.org"
+        id S1726536AbfEGGfw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 May 2019 02:35:52 -0400
+Received: from mxhk.zte.com.cn ([63.217.80.70]:41708 "EHLO mxhk.zte.com.cn"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726349AbfEGGdn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 May 2019 02:33:43 -0400
-Received: from localhost (unknown [37.142.3.125])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D6C092087F;
-        Tue,  7 May 2019 06:33:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1557210822;
-        bh=oBFyk7fpihJdB0jCxegQVyX+6vGmLC1DK9IvU35itFk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=RyPsl6lmqvcCnKl41VkY/GHW2+ETy7nDPo8Tpqc6bp7gDCBLdqWePFxG5B2Wa9vwT
-         R3/WlBSqCc8Bj3KtWz9uGTPPZS6ordaRPlQ/fveMibMSWfgfc4tq1AglaAlmwW4kMa
-         oMxOIvxG2cStHRR+RV/gLi/uVrPbQ27CrKcpR2aA=
-Date:   Tue, 7 May 2019 09:33:37 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Andrey Konovalov <andreyknvl@google.com>,
-        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v15 13/17] IB, arm64: untag user pointers in
- ib_uverbs_(re)reg_mr()
-Message-ID: <20190507063337.GP6938@mtr-leonro.mtl.com>
-References: <cover.1557160186.git.andreyknvl@google.com>
- <66d044ab9445dcf36a96205a109458ac23f38b73.1557160186.git.andreyknvl@google.com>
- <20190506195020.GD6201@ziepe.ca>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190506195020.GD6201@ziepe.ca>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+        id S1726313AbfEGGfw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 May 2019 02:35:52 -0400
+Received: from mse-fl1.zte.com.cn (unknown [10.30.14.238])
+        by Forcepoint Email with ESMTPS id 2B8AFE1BE5E61E24B8E3;
+        Tue,  7 May 2019 14:35:50 +0800 (CST)
+Received: from notes_smtp.zte.com.cn ([10.30.1.239])
+        by mse-fl1.zte.com.cn with ESMTP id x476ZbcW041399;
+        Tue, 7 May 2019 14:35:37 +0800 (GMT-8)
+        (envelope-from wang.yi59@zte.com.cn)
+Received: from fox-host8.localdomain ([10.74.120.8])
+          by szsmtp06.zte.com.cn (Lotus Domino Release 8.5.3FP6)
+          with ESMTP id 2019050714354990-10077385 ;
+          Tue, 7 May 2019 14:35:49 +0800 
+From:   Yi Wang <wang.yi59@zte.com.cn>
+To:     pbonzini@redhat.com
+Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, wang.yi59@zte.com.cn
+Subject: [PATCH] [next] KVM: lapic: allow setting apic debug dynamically
+Date:   Tue, 7 May 2019 14:37:33 +0800
+Message-Id: <1557211053-17275-1-git-send-email-wang.yi59@zte.com.cn>
+X-Mailer: git-send-email 1.8.3.1
+X-MIMETrack: Itemize by SMTP Server on SZSMTP06/server/zte_ltd(Release 8.5.3FP6|November
+ 21, 2013) at 2019-05-07 14:35:49,
+        Serialize by Router on notes_smtp/zte_ltd(Release 9.0.1FP7|August  17, 2016) at
+ 2019-05-07 14:35:32,
+        Serialize complete at 2019-05-07 14:35:32
+X-MAIL: mse-fl1.zte.com.cn x476ZbcW041399
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 06, 2019 at 04:50:20PM -0300, Jason Gunthorpe wrote:
-> On Mon, May 06, 2019 at 06:30:59PM +0200, Andrey Konovalov wrote:
-> > This patch is a part of a series that extends arm64 kernel ABI to allow to
-> > pass tagged user pointers (with the top byte set to something else other
-> > than 0x00) as syscall arguments.
-> >
-> > ib_uverbs_(re)reg_mr() use provided user pointers for vma lookups (through
-> > e.g. mlx4_get_umem_mr()), which can only by done with untagged pointers.
-> >
-> > Untag user pointers in these functions.
-> >
-> > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> > ---
-> >  drivers/infiniband/core/uverbs_cmd.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
->
-> I think this is OK.. We should really get it tested though.. Leon?
+There are many functions invoke apic_debug(), which is defined
+as a null function by default, and that's incovenient for debuging
+lapic.
 
-It can be done after v5.2-rc1.
+This patch allows setting apic debug according to add a apic_dbg
+parameter of kvm.
 
-Thanks
+Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+---
+ arch/x86/kvm/lapic.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
->
-> Jason
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 9bf70cf..4d8f10f 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -54,8 +54,13 @@
+ #define PRIu64 "u"
+ #define PRIo64 "o"
+ 
++static int apic_dbg;
++module_param(apic_dbg, bool, 0644);
++
+ /* #define apic_debug(fmt,arg...) printk(KERN_WARNING fmt,##arg) */
+-#define apic_debug(fmt, arg...) do {} while (0)
++#define apic_debug(fmt, arg...) do {  if (apic_dbg)   \
++	printk(KERN_DEBUG fmt, ##arg);    \
++} while (0)
+ 
+ /* 14 is the version for Xeon and Pentium 8.4.8*/
+ #define APIC_VERSION			(0x14UL | ((KVM_APIC_LVT_NUM - 1) << 16))
+-- 
+1.8.3.1
+
