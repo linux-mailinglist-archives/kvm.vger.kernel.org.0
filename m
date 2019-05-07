@@ -2,83 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EE4816DD2
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 01:29:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F4CC16DEB
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 01:45:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726329AbfEGX3m convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 7 May 2019 19:29:42 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:49142 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726091AbfEGX3l (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 May 2019 19:29:41 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 26D892896A
-        for <kvm@vger.kernel.org>; Tue,  7 May 2019 23:29:41 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 19CEF28927; Tue,  7 May 2019 23:29:41 +0000 (UTC)
-X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
-        pdx-wl-mail.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-1.9 required=2.0 tests=BAYES_00,NO_RECEIVED,
-        NO_RELAYS autolearn=unavailable version=3.3.1
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 203543] Starting with kernel 5.1.0-rc6,  kvm_intel can no
- longer be loaded in nested kvm/guests
-Date:   Tue, 07 May 2019 23:29:40 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: liran.alon@oracle.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-203543-28872-cDEgoWAWBm@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-203543-28872@https.bugzilla.kernel.org/>
-References: <bug-203543-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1726362AbfEGXpJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 May 2019 19:45:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58426 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726091AbfEGXpJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 May 2019 19:45:09 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E966F8764B;
+        Tue,  7 May 2019 23:45:08 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E05921001E99;
+        Tue,  7 May 2019 23:45:04 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id 5A2AA10517B;
+        Tue,  7 May 2019 20:44:49 -0300 (BRT)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id x47Nij80006291;
+        Tue, 7 May 2019 20:44:45 -0300
+Date:   Tue, 7 May 2019 20:44:45 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     kvm-devel <kvm@vger.kernel.org>, linux-kernel@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Bandan Das <bsd@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] sched: introduce configurable delay before entering idle
+Message-ID: <20190507234445.GA6185@amt.cnet>
+References: <20190507185647.GA29409@amt.cnet>
+ <20190507221519.GE2677@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190507221519.GE2677@hirez.programming.kicks-ass.net>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 07 May 2019 23:45:09 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=203543
+On Wed, May 08, 2019 at 12:15:19AM +0200, Peter Zijlstra wrote:
+> On Tue, May 07, 2019 at 03:56:49PM -0300, Marcelo Tosatti wrote:
+> > 
+> > Certain workloads perform poorly on KVM compared to baremetal
+> > due to baremetal's ability to perform mwait on NEED_RESCHED
+> > bit of task flags (therefore skipping the IPI).
+> > 
+> > This patch introduces a configurable busy-wait delay before entering the
+> > architecture delay routine, allowing wakeup IPIs to be skipped 
+> > (if the IPI happens in that window).
+> > 
+> > The real-life workload which this patch improves performance
+> > is SAP HANA (by 5-10%) (for which case setting idle_spin to 30 
+> > is sufficient).
+> > 
+> > This patch improves the attached server.py and client.py example 
+> > as follows:
+> > 
+> > Host:                           31.814230202231556
+> > Guest:                          38.17718765199993       (83 %)
+> > Guest, idle_spin=50us:          33.317709898000004      (95 %)
+> > Guest, idle_spin=220us:         32.27826551499999       (98 %)
+> > 
+> > Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+> 
+> Thanks for the CC..
+> 
+> NAK, this is something that should live in a virt idle governor or
+> something along those lines.
 
-Liran Alon (liran.alon@oracle.com) changed:
+Ok, makes sense, will rework the patch!
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |liran.alon@oracle.com
 
---- Comment #1 from Liran Alon (liran.alon@oracle.com) ---
-If I would have to guess, I would blame my own commit:
-e51bfdb68725 ("KVM: nVMX: Expose RDPMC-exiting only when guest supports PMU”)
-
-As in kvm_intel’s setup_vmcs_config() it can be seen that
-CPU_BASED_RDPMC_EXITING is required in order for KVM to load.
-Therefore, I assume the issue is that now L1 guest is not exposed with
-CPU_BASED_RDPMC_EXITING.
-
-My patch is suppose to hide CPU_BASED_RDPMC_EXITING from L1 only in case L1
-vCPU is not exposed with PMU.
-
-Can you provide more details on the vCPU your setup expose to L1?
-Have you explicitly disabled PMU from L1 vCPU?
-Can you run “cpuid -r” on shell and post here it’s output?
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
