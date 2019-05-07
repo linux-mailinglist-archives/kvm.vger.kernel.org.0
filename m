@@ -2,38 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 000A715CA6
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 08:05:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D363115BCD
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 07:59:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726497AbfEGGFe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 May 2019 02:05:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54002 "EHLO mail.kernel.org"
+        id S1728229AbfEGFhD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 May 2019 01:37:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56828 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727426AbfEGFeH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 May 2019 01:34:07 -0400
+        id S1728215AbfEGFhC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 May 2019 01:37:02 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6D53D206A3;
-        Tue,  7 May 2019 05:34:05 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id A1E7A214AE;
+        Tue,  7 May 2019 05:37:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1557207246;
-        bh=Zw9fc+VOZQLTTWQMnDrEn3mdTEmZTLmdRm2mZTjIAPI=;
+        s=default; t=1557207421;
+        bh=7/mtC7Ba7ycSvP1hl8RMihDYeDNslaXhlLtrjI31ik0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hKdILhbmTFopoq3W9WgYW8fV/DYVhFpGQX0Tf2pcqFpCLJbDKnhs+RUbNLQdslqOH
-         hwP4rJhFRNmLuxSwL6XXRl8CtQ5flTmJcVl9DVjxKss7oHGT0oVMERHAN0F9s/pJ88
-         CJYHDK51/ia7Vp0GTqtgyZNURollkyedvnh3Cov8=
+        b=oL6aIWi2Ky7gcmqXbycJKpRHlYbLRiwU/wlWPR/Bh632R74u7HNN9a+TWBIQ+GE9T
+         QUBHmNcMdkH/OFmoh5Z1beddLGxz170XPokmyR6/93crs6zsz4KgNjwGVGbLKtoBTQ
+         al1/FMJUl/3T+BlD7lFRo5TGcSGOXRan2T/Cs/KE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+Cc:     Liran Alon <liran.alon@oracle.com>,
+        Mihai Carabas <mihai.carabas@oracle.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.0 48/99] KVM: x86: avoid misreporting level-triggered irqs as edge-triggered in tracing
-Date:   Tue,  7 May 2019 01:31:42 -0400
-Message-Id: <20190507053235.29900-48-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 33/81] KVM: x86: Raise #GP when guest vCPU do not support PMU
+Date:   Tue,  7 May 2019 01:35:04 -0400
+Message-Id: <20190507053554.30848-33-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190507053235.29900-1-sashal@kernel.org>
-References: <20190507053235.29900-1-sashal@kernel.org>
+In-Reply-To: <20190507053554.30848-1-sashal@kernel.org>
+References: <20190507053554.30848-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -43,49 +44,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+From: Liran Alon <liran.alon@oracle.com>
 
-[ Upstream commit 7a223e06b1a411cef6c4cd7a9b9a33c8d225b10e ]
+[ Upstream commit 672ff6cff80ca43bf3258410d2b887036969df5f ]
 
-In __apic_accept_irq() interface trig_mode is int and actually on some code
-paths it is set above u8:
+Before this change, reading a VMware pseduo PMC will succeed even when
+PMU is not supported by guest. This can easily be seen by running
+kvm-unit-test vmware_backdoors with "-cpu host,-pmu" option.
 
-kvm_apic_set_irq() extracts it from 'struct kvm_lapic_irq' where trig_mode
-is u16. This is done on purpose as e.g. kvm_set_msi_irq() sets it to
-(1 << 15) & e->msi.data
-
-kvm_apic_local_deliver sets it to reg & (1 << 15).
-
-Fix the immediate issue by making 'tm' into u16. We may also want to adjust
-__apic_accept_irq() interface and use proper sizes for vector, level,
-trig_mode but this is not urgent.
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Reviewed-by: Mihai Carabas <mihai.carabas@oracle.com>
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/x86/kvm/trace.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/pmu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 6432d08c7de7..4d47a2631d1f 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -438,13 +438,13 @@ TRACE_EVENT(kvm_apic_ipi,
- );
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 58ead7db71a3..e39741997893 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -281,9 +281,13 @@ static int kvm_pmu_rdpmc_vmware(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
+ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
+ {
+ 	bool fast_mode = idx & (1u << 31);
++	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+ 	struct kvm_pmc *pmc;
+ 	u64 ctr_val;
  
- TRACE_EVENT(kvm_apic_accept_irq,
--	    TP_PROTO(__u32 apicid, __u16 dm, __u8 tm, __u8 vec),
-+	    TP_PROTO(__u32 apicid, __u16 dm, __u16 tm, __u8 vec),
- 	    TP_ARGS(apicid, dm, tm, vec),
- 
- 	TP_STRUCT__entry(
- 		__field(	__u32,		apicid		)
- 		__field(	__u16,		dm		)
--		__field(	__u8,		tm		)
-+		__field(	__u16,		tm		)
- 		__field(	__u8,		vec		)
- 	),
++	if (!pmu->version)
++		return 1;
++
+ 	if (is_vmware_backdoor_pmc(idx))
+ 		return kvm_pmu_rdpmc_vmware(vcpu, idx, data);
  
 -- 
 2.20.1
