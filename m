@@ -2,189 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 22C56163AF
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 14:26:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 68CF716460
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 15:16:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726508AbfEGMZs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 May 2019 08:25:48 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:52758 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726348AbfEGMZs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 May 2019 08:25:48 -0400
-Received: by mail-wm1-f67.google.com with SMTP id o25so9071582wmf.2
-        for <kvm@vger.kernel.org>; Tue, 07 May 2019 05:25:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=RgWL/g6Ctb6576iEJfmm/zOjyy44S59/CosNUjRdC94=;
-        b=rwgpqDI4fy3EqyjyXSnV6R/d/Ls0f8uwYPTmqj8uKBinQuwySKkdyJry3i1sSCXaof
-         rkWq2ZstwFlSCCuN00vFIIfrF+Qwe4XR3rf0dh+gJnDIeG9+3pjLsO6PawMcs6VtO6+5
-         Kvnx4rcOfjAeROR37GEbh+4oz4JqsrslZlkrwwIP3F1X3xbWycMMdkininMRe3gast8F
-         ScQ4ibQsQ6Te0Vhn4gyJ8NSj/1hB3pHktxk7dKf1pNfp75U2h7Z2bEjzyBKxVumEr5M5
-         K5AqpmDZ5J9MKVAd82nOBqyPiaxsbwomXX1H2qhaGM6OYAfMTe++NsJTs01SN5zQwIqM
-         briQ==
-X-Gm-Message-State: APjAAAU+Cp2HsypfhgZ0KLbTlTgvWzgfz7PaYr+1JBiFLcTU8r2X6STT
-        sBG2aWRsKMecuO9gMaZeBgzmgQ==
-X-Google-Smtp-Source: APXvYqztk3D6FfQCag9V/IMayhuu5K++rq1Y1HFSbHtcWI7a6N2/K8T/6FbFqS0eSiDEbqlaP89Edg==
-X-Received: by 2002:a05:600c:2506:: with SMTP id d6mr21690818wma.106.1557231946828;
-        Tue, 07 May 2019 05:25:46 -0700 (PDT)
-Received: from steredhat (host151-251-static.12-87-b.business.telecomitalia.it. [87.12.251.151])
-        by smtp.gmail.com with ESMTPSA id c20sm14679885wre.28.2019.05.07.05.25.45
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 07 May 2019 05:25:45 -0700 (PDT)
-Date:   Tue, 7 May 2019 14:25:43 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jorge Moreira Broche <jemoreira@google.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kernel-team@android.com, stable@vger.kernel.org
-Subject: Re: [PATCH] vsock/virtio: Initialize core virtio vsock before
- registering the driver
-Message-ID: <20190507122543.kgh44rvaw7nwlhjn@steredhat>
-References: <20190501003001.186239-1-jemoreira@google.com>
- <20190501190831.GF22391@stefanha-x1.localdomain>
- <20190502082045.u3xypjbac5npbhtc@steredhat.homenet.telecomitalia.it>
- <CAJi--POaVsfprbp5na5BvR=VNONKGfFya_BnmTzzcWmOQ1DM2Q@mail.gmail.com>
+        id S1726656AbfEGNQ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 May 2019 09:16:26 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:42890 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726406AbfEGNQZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 May 2019 09:16:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1557234985; x=1588770985;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=vtM2skgsxi9Gv7Bo3dFoB+dFGHiVfYzMzSQu+Q1/iEY=;
+  b=XIclaN92i4i1HYfoLPff3hCKUjN0G/sounJcyEAH/9t/5MKaEB1918F2
+   H637Ky9Na3j6WCKKXBazk5FgFNDEaSd9jhj1kJmiABc7HdPOjVrbbH7DI
+   6n1IAUP5h6+3j2KR+ZCAmFaHbOlsm2fyrAT458gaPJM6Q0Q/0V+ATZLwL
+   A=;
+X-IronPort-AV: E=Sophos;i="5.60,441,1549929600"; 
+   d="scan'208";a="673044317"
+Received: from sea3-co-svc-lb6-vlan3.sea.amazon.com (HELO email-inbound-relay-1a-16acd5e0.us-east-1.amazon.com) ([10.47.22.38])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 07 May 2019 13:16:22 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1a-16acd5e0.us-east-1.amazon.com (8.14.7/8.14.7) with ESMTP id x47DGELP025809
+        (version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=FAIL);
+        Tue, 7 May 2019 13:16:20 GMT
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Tue, 7 May 2019 13:16:19 +0000
+Received: from 38f9d35ad2cf.ant.amazon.com (10.28.86.127) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Tue, 7 May 2019 13:16:17 +0000
+Subject: Re: [PATCH] svm/avic: Do not send AVIC doorbell to self
+To:     "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>
+References: <1556890721-9613-1-git-send-email-suravee.suthikulpanit@amd.com>
+From:   "Graf, Alexander" <graf@amazon.com>
+Message-ID: <ca64dd06-df77-050a-92ff-5d5448382390@amazon.com>
+Date:   Tue, 7 May 2019 15:16:15 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJi--POaVsfprbp5na5BvR=VNONKGfFya_BnmTzzcWmOQ1DM2Q@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <1556890721-9613-1-git-send-email-suravee.suthikulpanit@amd.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.28.86.127]
+X-ClientProxiedBy: EX13MTAUEA001.ant.amazon.com (10.43.61.82) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jorge,
-
-On Mon, May 06, 2019 at 01:19:55PM -0700, Jorge Moreira Broche wrote:
-> > On Wed, May 01, 2019 at 03:08:31PM -0400, Stefan Hajnoczi wrote:
-> > > On Tue, Apr 30, 2019 at 05:30:01PM -0700, Jorge E. Moreira wrote:
-> > > > Avoid a race in which static variables in net/vmw_vsock/af_vsock.c are
-> > > > accessed (while handling interrupts) before they are initialized.
-> > > >
-> > > >
-> > > > [    4.201410] BUG: unable to handle kernel paging request at ffffffffffffffe8
-> > > > [    4.207829] IP: vsock_addr_equals_addr+0x3/0x20
-> > > > [    4.211379] PGD 28210067 P4D 28210067 PUD 28212067 PMD 0
-> > > > [    4.211379] Oops: 0000 [#1] PREEMPT SMP PTI
-> > > > [    4.211379] Modules linked in:
-> > > > [    4.211379] CPU: 1 PID: 30 Comm: kworker/1:1 Not tainted 4.14.106-419297-gd7e28cc1f241 #1
-> > > > [    4.211379] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
-> > > > [    4.211379] Workqueue: virtio_vsock virtio_transport_rx_work
-> > > > [    4.211379] task: ffffa3273d175280 task.stack: ffffaea1800e8000
-> > > > [    4.211379] RIP: 0010:vsock_addr_equals_addr+0x3/0x20
-> > > > [    4.211379] RSP: 0000:ffffaea1800ebd28 EFLAGS: 00010286
-> > > > [    4.211379] RAX: 0000000000000002 RBX: 0000000000000000 RCX: ffffffffb94e42f0
-> > > > [    4.211379] RDX: 0000000000000400 RSI: ffffffffffffffe0 RDI: ffffaea1800ebdd0
-> > > > [    4.211379] RBP: ffffaea1800ebd58 R08: 0000000000000001 R09: 0000000000000001
-> > > > [    4.211379] R10: 0000000000000000 R11: ffffffffb89d5d60 R12: ffffaea1800ebdd0
-> > > > [    4.211379] R13: 00000000828cbfbf R14: 0000000000000000 R15: ffffaea1800ebdc0
-> > > > [    4.211379] FS:  0000000000000000(0000) GS:ffffa3273fd00000(0000) knlGS:0000000000000000
-> > > > [    4.211379] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > > [    4.211379] CR2: ffffffffffffffe8 CR3: 000000002820e001 CR4: 00000000001606e0
-> > > > [    4.211379] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > > > [    4.211379] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > > > [    4.211379] Call Trace:
-> > > > [    4.211379]  ? vsock_find_connected_socket+0x6c/0xe0
-> > > > [    4.211379]  virtio_transport_recv_pkt+0x15f/0x740
-> > > > [    4.211379]  ? detach_buf+0x1b5/0x210
-> > > > [    4.211379]  virtio_transport_rx_work+0xb7/0x140
-> > > > [    4.211379]  process_one_work+0x1ef/0x480
-> > > > [    4.211379]  worker_thread+0x312/0x460
-> > > > [    4.211379]  kthread+0x132/0x140
-> > > > [    4.211379]  ? process_one_work+0x480/0x480
-> > > > [    4.211379]  ? kthread_destroy_worker+0xd0/0xd0
-> > > > [    4.211379]  ret_from_fork+0x35/0x40
-> > > > [    4.211379] Code: c7 47 08 00 00 00 00 66 c7 07 28 00 c7 47 08 ff ff ff ff c7 47 04 ff ff ff ff c3 0f 1f 00 66 2e 0f 1f 84 00 00 00 00 00 8b 47 08 <3b> 46 08 75 0a 8b 47 04 3b 46 04 0f 94 c0 c3 31 c0 c3 90 66 2e
-> > > > [    4.211379] RIP: vsock_addr_equals_addr+0x3/0x20 RSP: ffffaea1800ebd28
-> > > > [    4.211379] CR2: ffffffffffffffe8
-> > > > [    4.211379] ---[ end trace f31cc4a2e6df3689 ]---
-> > > > [    4.211379] Kernel panic - not syncing: Fatal exception in interrupt
-> > > > [    4.211379] Kernel Offset: 0x37000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-> > > > [    4.211379] Rebooting in 5 seconds..
-> > > >
-> > > > Fixes: 22b5c0b63f32 ("vsock/virtio: fix kernel panic after device hot-unplug")
-> > > > Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> > > > Cc: "David S. Miller" <davem@davemloft.net>
-> > > > Cc: kvm@vger.kernel.org
-> > > > Cc: virtualization@lists.linux-foundation.org
-> > > > Cc: netdev@vger.kernel.org
-> > > > Cc: kernel-team@android.com
-> > > > Cc: stable@vger.kernel.org [4.9+]
-> > > > Signed-off-by: Jorge E. Moreira <jemoreira@google.com>
-> > > > ---
-> > > >  net/vmw_vsock/virtio_transport.c | 13 ++++++-------
-> > > >  1 file changed, 6 insertions(+), 7 deletions(-)
-> > > >
-> > > > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> > > > index 15eb5d3d4750..96ab344f17bb 100644
-> > > > --- a/net/vmw_vsock/virtio_transport.c
-> > > > +++ b/net/vmw_vsock/virtio_transport.c
-> > > > @@ -702,28 +702,27 @@ static int __init virtio_vsock_init(void)
-> > > >     if (!virtio_vsock_workqueue)
-> > > >             return -ENOMEM;
-> > > >
-> > > > -   ret = register_virtio_driver(&virtio_vsock_driver);
-> > > > +   ret = vsock_core_init(&virtio_transport.transport);
-> > >
-> > > Have you checked that all transport callbacks are safe even if another
-> > > CPU calls them while virtio_vsock_probe() is executing on another CPU?
-> > >
-> >
-> > I have the same doubt.
-> >
-> > What do you think to take the 'the_virtio_vsock_mutex' in the
-> > virtio_vsock_init(), keeping the previous order?
-> >
-> > This should prevent this issue because the virtio_vsock_probe() remains
-> > blocked in the mutex until the end of vsock_core_init().
-> >
-> > Cheers,
-> > Stefano
+On 03.05.19 15:38, Suthikulpanit, Suravee wrote:
+> AVIC doorbell is used to notify a running vCPU that interrupts
+> has been injected into the vCPU AVIC backing page. Current logic
+> checks only if a VCPU is running before sending a doorbell.
+> However, the doorbell is not necessary if the destination
+> CPU is itself.
 > 
-> Hi Stefan, Stefano,
-> Sorry for the late reply.
-
-Don't worry :)
-
+> Add logic to check currently running CPU before sending doorbell.
 > 
-> @Stefan
-> The order of vsock_core_exit() does not need to be changed to fix the
-> bug I found, but not changing it means the exit function is not
-> symmetric to the init function.
+> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+
+Reviewed-by: Alexander Graf <graf@amazon.com>
+
+> ---
+>   arch/x86/kvm/svm.c | 11 +++++++----
+>   1 file changed, 7 insertions(+), 4 deletions(-)
 > 
-> @Stefano
-> Taking the mutex from virtio_vsock_init() could work too (I haven't
-> tried it yet), but it's unnecessary, all that needs to be done is
-> properly initialize vsock_core before attempting to use it.
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index 122788f..4bbf6fc 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -5283,10 +5283,13 @@ static void svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
+>   	kvm_lapic_set_irr(vec, vcpu->arch.apic);
+>   	smp_mb__after_atomic();
+>   
+> -	if (avic_vcpu_is_running(vcpu))
+> -		wrmsrl(SVM_AVIC_DOORBELL,
+> -		       kvm_cpu_get_apicid(vcpu->cpu));
+> -	else
+> +	if (avic_vcpu_is_running(vcpu)) { > +		int cpuid = vcpu->cpu;
+> +
+> +		if (cpuid != get_cpu())
+
+Tiny nitpick: What would keep you from checking vcpu->cpu directly here?
+
+Alex
+
+> +			wrmsrl(SVM_AVIC_DOORBELL, kvm_cpu_get_apicid(cpuid));
+> +		put_cpu();
+> +	} else
+>   		kvm_vcpu_wake_up(vcpu);
+>   }
+>   
 > 
-> I would prefer to change the order in virtio_vsock_init, while leaving
-> virtio_vsock_exit unchanged, but I'll leave the final decision to you
-> since I am not very familiar with the inner workings of these modules.
 
-In order to fix your issue, IMO changing the order in virtio_vsock_init(),
-is enough.
-
-I think also that is correct to change the order in the virtio_vsock_exit(),
-otherwise, we should have the same issue if an interrupt comes while we
-are removing the module.
-This should not lead to the problem that I tried to solve in 22b5c0b63f32,
-because the vsock_core_exit() should not be called if there are open sockets,
-since the virtio-vsock driver become the owner of AF_VSOCK protocol
-family.
-
-Not related to this patch, maybe there are some issues in the
-virtio_vsock_probe(). I'd check better if it is correct to set
-'the_virtio_vsock' before the end of the initialization (e.g. spinlocks
-are initialized later).
-
-Accordingly,
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
-Thanks,
-Stefano
