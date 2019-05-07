@@ -2,144 +2,252 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A7EB116831
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 18:45:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23E7C16ACB
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 20:57:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727198AbfEGQoI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 May 2019 12:44:08 -0400
-Received: from mail-eopbgr730065.outbound.protection.outlook.com ([40.107.73.65]:13792
-        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726476AbfEGQoH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 May 2019 12:44:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XDmUxc0I3Vs06iUOv0mgYhYfmxdHxaW2JnGAm6xmlv4=;
- b=Uo8Nv1i3+69R/LhIxA3soBtXJ2s46HvlJdQoCtBNkfjEGnuoOXrCeXEd+f+FmlnJA0QmasVRB7BYDnk2uCZy86IWpuo418YVAzko+51ZBkfaRJKMicVW0XR7xHG8dD8Ngc8gbJnMxuTKKQmrt3wxM4zHz376fEGgZ9IuvR64H8E=
-Received: from BYAPR12MB3176.namprd12.prod.outlook.com (20.179.92.82) by
- BYAPR12MB3544.namprd12.prod.outlook.com (20.179.94.154) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1856.11; Tue, 7 May 2019 16:44:02 +0000
-Received: from BYAPR12MB3176.namprd12.prod.outlook.com
- ([fe80::9118:73f2:809c:22c7]) by BYAPR12MB3176.namprd12.prod.outlook.com
- ([fe80::9118:73f2:809c:22c7%4]) with mapi id 15.20.1856.012; Tue, 7 May 2019
- 16:44:02 +0000
-From:   "Kuehling, Felix" <Felix.Kuehling@amd.com>
-To:     Andrey Konovalov <andreyknvl@google.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-CC:     Catalin Marinas <catalin.marinas@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        "Deucher, Alexander" <Alexander.Deucher@amd.com>,
-        "Koenig, Christian" <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v15 12/17] drm/radeon, arm64: untag user pointers in
- radeon_gem_userptr_ioctl
-Thread-Topic: [PATCH v15 12/17] drm/radeon, arm64: untag user pointers in
- radeon_gem_userptr_ioctl
-Thread-Index: AQHVBCkzLfkJvfOc9kqyclyg05ajP6Zf386A
-Date:   Tue, 7 May 2019 16:44:02 +0000
-Message-ID: <7568118b-ad57-156c-464f-54fb3f90a783@amd.com>
-References: <cover.1557160186.git.andreyknvl@google.com>
- <03fe9d923db75cf72678f3ce103838e67390751a.1557160186.git.andreyknvl@google.com>
-In-Reply-To: <03fe9d923db75cf72678f3ce103838e67390751a.1557160186.git.andreyknvl@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [165.204.55.251]
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-x-clientproxiedby: YTXPR0101CA0058.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b00:1::35) To BYAPR12MB3176.namprd12.prod.outlook.com
- (2603:10b6:a03:133::18)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Felix.Kuehling@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 93eca1e0-2a8f-45ef-5051-08d6d30b35d1
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:BYAPR12MB3544;
-x-ms-traffictypediagnostic: BYAPR12MB3544:
-x-microsoft-antispam-prvs: <BYAPR12MB35449D43230F5246FFBE6D1892310@BYAPR12MB3544.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0030839EEE
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(396003)(376002)(366004)(346002)(136003)(39860400002)(189003)(199004)(72206003)(71190400001)(2501003)(316002)(76176011)(386003)(36756003)(81166006)(53546011)(66066001)(476003)(81156014)(6506007)(14454004)(8936002)(478600001)(52116002)(102836004)(486006)(2906002)(8676002)(65956001)(31696002)(65806001)(68736007)(25786009)(5660300002)(186003)(2616005)(6116002)(6246003)(66446008)(73956011)(11346002)(86362001)(446003)(66476007)(64756008)(2201001)(66946007)(26005)(4326008)(31686004)(71200400001)(6512007)(66556008)(53936002)(229853002)(64126003)(58126008)(54906003)(305945005)(6486002)(7406005)(7416002)(256004)(99286004)(65826007)(7736002)(110136005)(6436002)(3846002)(921003)(1121003);DIR:OUT;SFP:1101;SCL:1;SRVR:BYAPR12MB3544;H:BYAPR12MB3176.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Lq5pCPDcPNLU5X+6HbKKo8uqlLH+qh1zPjC6a8jGCekQNZW/q3Uz5M5mILQQpOHPKm6yY7nVRSZkwb1aqbixPMKXDgRTrUEtSJc3P0fPdeVOAWwqkgoD6CXrw1+YnroUVESXWCnoWejM1WWWmtHHXP/3jLhJBO+0owXMBvH5Zjj7+nHCSozrJ++KKAP4ZRiPdoDmJVdEjPv4cM/2d8TBRHXO/Qd6GZcvYkcHUd1Nd9wYO+vrqFTuHiSZXQIUA+091XhYfn/pTZ5FbYAGZQFJZGCdA4KlegQuZPs2ughkxoW92Z9qq4w/pVD1i2tJKBOKsXs+vssL9Jfc4LWT0XHg5u6nA1YN4UpzQZ4b7EHBx37e00LlGJc2ZkMXVBMWO3RFqCccp5ZFyrsn9YtusagfI81mN78mXr3VKrVHTnKLwGY=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <AC55AB809D9E174784D2867A22094BC5@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S1727013AbfEGS5V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 May 2019 14:57:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56344 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726321AbfEGS5V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 May 2019 14:57:21 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A0C2A3082E51;
+        Tue,  7 May 2019 18:57:20 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-11.gru2.redhat.com [10.97.112.11])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0C41F1837C;
+        Tue,  7 May 2019 18:57:18 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id 53394105182;
+        Tue,  7 May 2019 15:56:59 -0300 (BRT)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id x47IusZB029563;
+        Tue, 7 May 2019 15:56:54 -0300
+Date:   Tue, 7 May 2019 15:56:49 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     kvm-devel <kvm@vger.kernel.org>, linux-kernel@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Bandan Das <bsd@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH] sched: introduce configurable delay before entering idle
+Message-ID: <20190507185647.GA29409@amt.cnet>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 93eca1e0-2a8f-45ef-5051-08d6d30b35d1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 May 2019 16:44:02.5248
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR12MB3544
+Content-Type: multipart/mixed; boundary="lrZ03NoBR/3+SXJZ"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 07 May 2019 18:57:20 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMjAxOS0wNS0wNiAxMjozMCBwLm0uLCBBbmRyZXkgS29ub3ZhbG92IHdyb3RlOg0KPiBbQ0FV
-VElPTjogRXh0ZXJuYWwgRW1haWxdDQo+DQo+IFRoaXMgcGF0Y2ggaXMgYSBwYXJ0IG9mIGEgc2Vy
-aWVzIHRoYXQgZXh0ZW5kcyBhcm02NCBrZXJuZWwgQUJJIHRvIGFsbG93IHRvDQo+IHBhc3MgdGFn
-Z2VkIHVzZXIgcG9pbnRlcnMgKHdpdGggdGhlIHRvcCBieXRlIHNldCB0byBzb21ldGhpbmcgZWxz
-ZSBvdGhlcg0KPiB0aGFuIDB4MDApIGFzIHN5c2NhbGwgYXJndW1lbnRzLg0KPg0KPiBJbiByYWRl
-b25fZ2VtX3VzZXJwdHJfaW9jdGwoKSBhbiBNTVUgbm90aWZpZXIgaXMgc2V0IHVwIHdpdGggYSAo
-dGFnZ2VkKQ0KPiB1c2Vyc3BhY2UgcG9pbnRlci4gVGhlIHVudGFnZ2VkIGFkZHJlc3Mgc2hvdWxk
-IGJlIHVzZWQgc28gdGhhdCBNTVUNCj4gbm90aWZpZXJzIGZvciB0aGUgdW50YWdnZWQgYWRkcmVz
-cyBnZXQgY29ycmVjdGx5IG1hdGNoZWQgdXAgd2l0aCB0aGUgcmlnaHQNCj4gQk8uIFRoaXMgZnVu
-Y2F0aW9uIGFsc28gY2FsbHMgcmFkZW9uX3R0bV90dF9waW5fdXNlcnB0cigpLCB3aGljaCB1c2Vz
-DQo+IHByb3ZpZGVkIHVzZXIgcG9pbnRlcnMgZm9yIHZtYSBsb29rdXBzLCB3aGljaCBjYW4gb25s
-eSBieSBkb25lIHdpdGgNCj4gdW50YWdnZWQgcG9pbnRlcnMuDQo+DQo+IFRoaXMgcGF0Y2ggdW50
-YWdzIHVzZXIgcG9pbnRlcnMgaW4gcmFkZW9uX2dlbV91c2VycHRyX2lvY3RsKCkuDQo+DQo+IFNp
-Z25lZC1vZmYtYnk6IEFuZHJleSBLb25vdmFsb3YgPGFuZHJleWtudmxAZ29vZ2xlLmNvbT4NCkFj
-a2VkLWJ5OiBGZWxpeCBLdWVobGluZyA8RmVsaXguS3VlaGxpbmdAYW1kLmNvbT4NCg0KDQo+IC0t
-LQ0KPiAgIGRyaXZlcnMvZ3B1L2RybS9yYWRlb24vcmFkZW9uX2dlbS5jIHwgMiArKw0KPiAgIDEg
-ZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKykNCj4NCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMv
-Z3B1L2RybS9yYWRlb24vcmFkZW9uX2dlbS5jIGIvZHJpdmVycy9ncHUvZHJtL3JhZGVvbi9yYWRl
-b25fZ2VtLmMNCj4gaW5kZXggNDQ2MTdkZWM4MTgzLi45MGViNzhmYjVlYjIgMTAwNjQ0DQo+IC0t
-LSBhL2RyaXZlcnMvZ3B1L2RybS9yYWRlb24vcmFkZW9uX2dlbS5jDQo+ICsrKyBiL2RyaXZlcnMv
-Z3B1L2RybS9yYWRlb24vcmFkZW9uX2dlbS5jDQo+IEBAIC0yOTEsNiArMjkxLDggQEAgaW50IHJh
-ZGVvbl9nZW1fdXNlcnB0cl9pb2N0bChzdHJ1Y3QgZHJtX2RldmljZSAqZGV2LCB2b2lkICpkYXRh
-LA0KPiAgICAgICAgICB1aW50MzJfdCBoYW5kbGU7DQo+ICAgICAgICAgIGludCByOw0KPg0KPiAr
-ICAgICAgIGFyZ3MtPmFkZHIgPSB1bnRhZ2dlZF9hZGRyKGFyZ3MtPmFkZHIpOw0KPiArDQo+ICAg
-ICAgICAgIGlmIChvZmZzZXRfaW5fcGFnZShhcmdzLT5hZGRyIHwgYXJncy0+c2l6ZSkpDQo+ICAg
-ICAgICAgICAgICAgICAgcmV0dXJuIC1FSU5WQUw7DQo+DQo+IC0tDQo+IDIuMjEuMC4xMDIwLmdm
-MjgyMGNmMDFhLWdvb2cNCj4NCg==
+
+--lrZ03NoBR/3+SXJZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+
+Certain workloads perform poorly on KVM compared to baremetal
+due to baremetal's ability to perform mwait on NEED_RESCHED
+bit of task flags (therefore skipping the IPI).
+
+This patch introduces a configurable busy-wait delay before entering the
+architecture delay routine, allowing wakeup IPIs to be skipped 
+(if the IPI happens in that window).
+
+The real-life workload which this patch improves performance
+is SAP HANA (by 5-10%) (for which case setting idle_spin to 30 
+is sufficient).
+
+This patch improves the attached server.py and client.py example 
+as follows:
+
+Host:                           31.814230202231556
+Guest:                          38.17718765199993       (83 %)
+Guest, idle_spin=50us:          33.317709898000004      (95 %)
+Guest, idle_spin=220us:         32.27826551499999       (98 %)
+
+Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+
+---
+ kernel/sched/idle.c |   86 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 86 insertions(+)
+
+diff --git a/kernel/sched/idle.c b/kernel/sched/idle.c
+index f5516bae0c1b..bca7656a7ea0 100644
+--- a/kernel/sched/idle.c
++++ b/kernel/sched/idle.c
+@@ -216,6 +216,29 @@ static void cpuidle_idle_call(void)
+ 	rcu_idle_exit();
+ }
+ 
++static unsigned int spin_before_idle_us;
+
++static void do_spin_before_idle(void)
++{
++	ktime_t now, end_spin;
++
++	now = ktime_get();
++	end_spin = ktime_add_ns(now, spin_before_idle_us*1000);
++
++	rcu_idle_enter();
++	local_irq_enable();
++	stop_critical_timings();
++
++	do {
++		cpu_relax();
++		now = ktime_get();
++	} while (!tif_need_resched() && ktime_before(now, end_spin));
++
++	start_critical_timings();
++	rcu_idle_exit();
++	local_irq_disable();
++}
++
+ /*
+  * Generic idle loop implementation
+  *
+@@ -259,6 +282,8 @@ static void do_idle(void)
+ 			tick_nohz_idle_restart_tick();
+ 			cpu_idle_poll();
+ 		} else {
++			if (spin_before_idle_us)
++				do_spin_before_idle();
+ 			cpuidle_idle_call();
+ 		}
+ 		arch_cpu_idle_exit();
+@@ -465,3 +490,64 @@ const struct sched_class idle_sched_class = {
+ 	.switched_to		= switched_to_idle,
+ 	.update_curr		= update_curr_idle,
+ };
++
++
++static ssize_t store_idle_spin(struct kobject *kobj,
++			       struct kobj_attribute *attr,
++			       const char *buf, size_t count)
++{
++	unsigned int val;
++
++	if (kstrtouint(buf, 10, &val) < 0)
++		return -EINVAL;
++
++	if (val > USEC_PER_SEC)
++		return -EINVAL;
++
++	spin_before_idle_us = val;
++	return count;
++}
++
++static ssize_t show_idle_spin(struct kobject *kobj,
++			      struct kobj_attribute *attr,
++			      char *buf)
++{
++	ssize_t ret;
++
++	ret = sprintf(buf, "%d\n", spin_before_idle_us);
++
++	return ret;
++}
++
++static struct kobj_attribute idle_spin_attr =
++	__ATTR(idle_spin, 0644, show_idle_spin, store_idle_spin);
++
++static struct attribute *sched_attrs[] = {
++	&idle_spin_attr.attr,
++	NULL,
++};
++
++static const struct attribute_group sched_attr_group = {
++	.attrs = sched_attrs,
++};
++
++static struct kobject *sched_kobj;
++
++static int __init sched_sysfs_init(void)
++{
++	int error;
++
++	sched_kobj = kobject_create_and_add("sched", kernel_kobj);
++	if (!sched_kobj)
++		return -ENOMEM;
++
++	error = sysfs_create_group(sched_kobj, &sched_attr_group);
++	if (error)
++		goto err;
++	return 0;
++
++err:
++	kobject_put(sched_kobj);
++	return error;
++}
++postcore_initcall(sched_sysfs_init);
+
+--lrZ03NoBR/3+SXJZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="client.py"
+
+#!/bin/python3
+
+import socket
+import sys
+import struct, fcntl, os
+import os, errno, time
+import time
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+server_address = ('127.0.0.1', 999)
+print ("connecting to 127.0.0.1")
+sock.connect(server_address)
+
+nr_writes = 0
+
+start_time = time.clock_gettime(time.CLOCK_MONOTONIC)
+
+while nr_writes < 90000:
+	data = sock.recv(4096)
+	if len(data) == 0:
+		print("connection closed!\n");
+		exit(0);
+	# sleep 20us
+	time.sleep(20/1000000)
+	sock.send(data)
+	nr_writes = nr_writes+1
+
+end_time = time.clock_gettime(time.CLOCK_MONOTONIC)
+delta = end_time - start_time
+print(delta)
+
+--lrZ03NoBR/3+SXJZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="server.py"
+
+#!/bin/python3
+
+import socket
+import sys
+import struct, fcntl, os
+import os, errno, time
+import time
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.bind(('127.0.0.1', 999))
+sock.listen(10)
+conn, addr = sock.accept()
+
+nr_written=0
+while 1:
+	conn.sendall(b"a response line of text")
+	data = conn.recv(1024)
+	if not data:
+        	break
+	# sleep 200us
+	time.sleep(200/1000000)
+	nr_written = nr_written+1
+
+--lrZ03NoBR/3+SXJZ--
