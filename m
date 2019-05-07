@@ -2,124 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E7DC31578E
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 04:23:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A480157E7
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2019 05:11:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726448AbfEGCXg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 May 2019 22:23:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41082 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726145AbfEGCXg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 May 2019 22:23:36 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id F155D81127;
-        Tue,  7 May 2019 02:23:35 +0000 (UTC)
-Received: from hp-dl380pg8-02.lab.eng.pek2.redhat.com (hp-dl380pg8-02.lab.eng.pek2.redhat.com [10.73.8.12])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5C87160BEC;
-        Tue,  7 May 2019 02:23:30 +0000 (UTC)
-From:   Jason Wang <jasowang@redhat.com>
-To:     mst@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Andrea Arcangeli <aarcange@redhat.com>
-Subject: [PATCH RFC] vhost: don't use kmap() to log dirty pages
-Date:   Mon,  6 May 2019 22:23:29 -0400
-Message-Id: <1557195809-12373-1-git-send-email-jasowang@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Tue, 07 May 2019 02:23:36 +0000 (UTC)
+        id S1726882AbfEGDLE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 May 2019 23:11:04 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:52210 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726346AbfEGDLD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 May 2019 23:11:03 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4738uBG073685;
+        Tue, 7 May 2019 03:10:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=Sa+cOJtJx0K5ZUTspQzVWRaHsaM72rSdt2S6cah8KqE=;
+ b=qPZyJEvFwNkpPyu498f2W9cJG3cwo3YzJHpJuUkM4qNXyo0XdOQ9+2nBbN/aGX6t9k1U
+ wHeLMsyAc1cE1N+uTUZnW/Iyw54XcN6jiBEm0jAv/cQLsff/0gr7PXOraCv+40U7PJWD
+ R/9Fkc7FCq8Z9qdqoT6DH83+M46p62s329nBRNiN69nX2PhdQ2dCEdLOHXuJEXE0hF3p
+ GLmiF0TCkWeY+nB04qmMqqK6u9J8x9umk/1yUcK+AKwwac5NjQpKLneDVrp7r8yIEyQW
+ 1GH7C9dCib2+z68OBCyWe+2gDeM+qGNzSX60HntCF330GSmcl5vC0+RL01+Q5LaL4Rk4 Og== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2s94b0j77m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 07 May 2019 03:10:22 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x473A5lN185360;
+        Tue, 7 May 2019 03:10:22 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2s94af7xxr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 07 May 2019 03:10:22 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x473A6JU021461;
+        Tue, 7 May 2019 03:10:07 GMT
+Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 06 May 2019 20:10:06 -0700
+Date:   Mon, 6 May 2019 23:09:57 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Jason Gunthorpe <jgg@mellanox.com>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        Alan Tull <atull@kernel.org>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christoph Lameter <cl@linux.com>,
+        Christophe Leroy <christophe.leroy@c-s.fr>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Moritz Fischer <mdf@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Steve Sistare <steven.sistare@oracle.com>,
+        Wu Hao <hao.wu@intel.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-fpga@vger.kernel.org" <linux-fpga@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] mm: add account_locked_vm utility function
+Message-ID: <20190507030957.3qp7yflco6ckcj5q@ca-dmjordan1.us.oracle.com>
+References: <20190503201629.20512-1-daniel.m.jordan@oracle.com>
+ <20190503232818.GA5182@mellanox.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190503232818.GA5182@mellanox.com>
+User-Agent: NeoMutt/20180323-268-5a959c
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9249 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905070018
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9249 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905070018
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vhost log dirty pages directly to a userspace bitmap through GUP and
-kmap_atomic() since kernel doesn't have a set_bit_to_user()
-helper. This will cause issues for the arch that has virtually tagged
-caches. The way to fix is to keep using userspace virtual address.
+On Fri, May 03, 2019 at 11:28:22PM +0000, Jason Gunthorpe wrote:
+> On Fri, May 03, 2019 at 01:16:30PM -0700, Daniel Jordan wrote:
+> > Andrew, this one patch replaces these six from [1]:
+> > 
+> >     mm-change-locked_vms-type-from-unsigned-long-to-atomic64_t.patch
+> >     vfio-type1-drop-mmap_sem-now-that-locked_vm-is-atomic.patch
+> >     vfio-spapr_tce-drop-mmap_sem-now-that-locked_vm-is-atomic.patch
+> >     fpga-dlf-afu-drop-mmap_sem-now-that-locked_vm-is-atomic.patch
+> >     kvm-book3s-drop-mmap_sem-now-that-locked_vm-is-atomic.patch
+> >     powerpc-mmu-drop-mmap_sem-now-that-locked_vm-is-atomic.patch
+> > 
+> > That series converts locked_vm to an atomic, but on closer inspection causes at
+> > least one accounting race in mremap, and fixing it just for this type
+> > conversion came with too much ugly in the core mm to justify, especially when
+> > the right long-term fix is making these drivers use pinned_vm instead.
+> 
+> Did we ever decide what to do here? Should all these drivers be
+> switched to pinned_vm anyhow?
 
-Fortunately, futex has a cmpxchg to userspace memory helper
-futex_atomic_cmpxchg_inatomic(). So switch to use it to exchange the
-userspace bitmap with zero, set the bit and then write it back through
-put_user().
+Well, there were the concerns about switching in [1].  Alex, is there an
+example of an application or library that would break or be exploitable?  If
+there were particular worries (qemu for vfio type1, for example), perhaps some
+coordinated changes across the kernel and userspace would be possible,
+especially given the amount of effort it's likely going to take to get the
+locked_vm/pinned_vm accounting sorted out.
 
-Note: there're archs (few non popular ones) that don't implement
-futex helper, we can't log dirty pages. We can fix them on top or
-simply disable LOG_ALL features of vhost.
-
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: Andrea Arcangeli <aarcange@redhat.com>
-Fixes: 3a4d5c94e9593 ("vhost_net: a kernel-level virtio server")
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- drivers/vhost/vhost.c | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 351af88..9c94c41 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -31,6 +31,7 @@
- #include <linux/sched/signal.h>
- #include <linux/interval_tree_generic.h>
- #include <linux/nospec.h>
-+#include <asm/futex.h>
- 
- #include "vhost.h"
- 
-@@ -1692,25 +1693,27 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
- }
- EXPORT_SYMBOL_GPL(vhost_dev_ioctl);
- 
--/* TODO: This is really inefficient.  We need something like get_user()
-- * (instruction directly accesses the data, with an exception table entry
-- * returning -EFAULT). See Documentation/x86/exception-tables.txt.
-- */
--static int set_bit_to_user(int nr, void __user *addr)
-+static int set_bit_to_user(int nr, u32 __user *addr)
- {
- 	unsigned long log = (unsigned long)addr;
- 	struct page *page;
--	void *base;
--	int bit = nr + (log % PAGE_SIZE) * 8;
-+	u32 old_log;
- 	int r;
- 
- 	r = get_user_pages_fast(log, 1, 1, &page);
- 	if (r < 0)
- 		return r;
- 	BUG_ON(r != 1);
--	base = kmap_atomic(page);
--	set_bit(bit, base);
--	kunmap_atomic(base);
-+
-+	r = futex_atomic_cmpxchg_inatomic(&old_log, addr, 0, 0);
-+	if (r < 0)
-+		return r;
-+
-+	old_log |= 1 << nr;
-+	r = put_user(old_log, addr);
-+	if (r < 0)
-+		return r;
-+
- 	set_page_dirty_lock(page);
- 	put_page(page);
- 	return 0;
-@@ -1727,8 +1730,8 @@ static int log_write(void __user *log_base,
- 	write_length += write_address % VHOST_PAGE_SIZE;
- 	for (;;) {
- 		u64 base = (u64)(unsigned long)log_base;
--		u64 log = base + write_page / 8;
--		int bit = write_page % 8;
-+		u64 log = base + write_page / 32;
-+		int bit = write_page % 32;
- 		if ((u64)(unsigned long)log != log)
- 			return -EFAULT;
- 		r = set_bit_to_user(bit, (void __user *)(unsigned long)log);
--- 
-1.8.3.1
-
+[1] https://lore.kernel.org/linux-mm/20190213130330.76ef1987@w520.home/
