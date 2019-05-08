@@ -2,26 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A113217BCD
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:44:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3187217C89
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:52:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728292AbfEHOop (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:44:45 -0400
-Received: from mga06.intel.com ([134.134.136.31]:57649 "EHLO mga06.intel.com"
+        id S1728284AbfEHOwB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:52:01 -0400
+Received: from mga11.intel.com ([192.55.52.93]:7358 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728176AbfEHOom (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 10:44:42 -0400
+        id S1728142AbfEHOok (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 10:44:40 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:39 -0700
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:39 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,446,1549958400"; 
-   d="scan'208";a="169656527"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga002.fm.intel.com with ESMTP; 08 May 2019 07:44:35 -0700
+  by fmsmga004.fm.intel.com with ESMTP; 08 May 2019 07:44:35 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id 4C59F79C; Wed,  8 May 2019 17:44:29 +0300 (EEST)
+        id 58DEC858; Wed,  8 May 2019 17:44:29 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -38,9 +36,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 13/62] x86/mm: Add hooks to allocate and free encrypted pages
-Date:   Wed,  8 May 2019 17:43:33 +0300
-Message-Id: <20190508144422.13171-14-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 14/62] x86/mm: Map zero pages into encrypted mappings correctly
+Date:   Wed,  8 May 2019 17:43:34 +0300
+Message-Id: <20190508144422.13171-15-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -51,115 +49,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hook up into page allocator to allocate and free encrypted page
-properly.
-
-The hardware/CPU does not enforce coherency between mappings of the same
-physical page with different KeyIDs or encryption keys.
-We are responsible for cache management.
-
-Flush cache on allocating encrypted page and on returning the page to
-the free pool.
-
-prep_encrypted_page() also takes care about zeroing the page. We have to
-do this after KeyID is set for the page.
+Zero pages are never encrypted. Keep KeyID-0 for them.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- arch/x86/include/asm/mktme.h | 17 +++++++++++++
- arch/x86/mm/mktme.c          | 49 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 66 insertions(+)
+ arch/x86/include/asm/pgtable.h | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/arch/x86/include/asm/mktme.h b/arch/x86/include/asm/mktme.h
-index b5afa31b4526..6e604126f0bc 100644
---- a/arch/x86/include/asm/mktme.h
-+++ b/arch/x86/include/asm/mktme.h
-@@ -40,6 +40,23 @@ static inline int vma_keyid(struct vm_area_struct *vma)
- 	return __vma_keyid(vma);
- }
+diff --git a/arch/x86/include/asm/pgtable.h b/arch/x86/include/asm/pgtable.h
+index 50b3e2d963c9..59c3dd50b8d5 100644
+--- a/arch/x86/include/asm/pgtable.h
++++ b/arch/x86/include/asm/pgtable.h
+@@ -803,6 +803,19 @@ static inline unsigned long pmd_index(unsigned long address)
+  */
+ #define mk_pte(page, pgprot)   pfn_pte(page_to_pfn(page), (pgprot))
  
-+#define prep_encrypted_page prep_encrypted_page
-+void __prep_encrypted_page(struct page *page, int order, int keyid, bool zero);
-+static inline void prep_encrypted_page(struct page *page, int order,
-+		int keyid, bool zero)
++#define mk_zero_pte mk_zero_pte
++static inline pte_t mk_zero_pte(unsigned long addr, pgprot_t prot)
 +{
-+	if (keyid)
-+		__prep_encrypted_page(page, order, keyid, zero);
++	extern unsigned long zero_pfn;
++	pte_t entry;
++
++	prot.pgprot &= ~mktme_keyid_mask;
++	entry = pfn_pte(zero_pfn, prot);
++	entry = pte_mkspecial(entry);
++
++	return entry;
 +}
 +
-+#define HAVE_ARCH_FREE_PAGE
-+void free_encrypted_page(struct page *page, int order);
-+static inline void arch_free_page(struct page *page, int order)
-+{
-+	if (page_keyid(page))
-+		free_encrypted_page(page, order);
-+}
-+
- #else
- #define mktme_keyid_mask	((phys_addr_t)0)
- #define mktme_nr_keyids		0
-diff --git a/arch/x86/mm/mktme.c b/arch/x86/mm/mktme.c
-index d4a1a9e9b1c0..43489c098e60 100644
---- a/arch/x86/mm/mktme.c
-+++ b/arch/x86/mm/mktme.c
-@@ -1,4 +1,5 @@
- #include <linux/mm.h>
-+#include <linux/highmem.h>
- #include <asm/mktme.h>
+ /*
+  * the pte page can be thought of an array like this: pte_t[PTRS_PER_PTE]
+  *
+@@ -1133,6 +1146,12 @@ static inline void ptep_set_wrprotect(struct mm_struct *mm,
  
- /* Mask to extract KeyID from physical address. */
-@@ -37,3 +38,51 @@ int __vma_keyid(struct vm_area_struct *vma)
- 	pgprotval_t prot = pgprot_val(vma->vm_page_prot);
- 	return (prot & mktme_keyid_mask) >> mktme_keyid_shift;
- }
+ #define mk_pmd(page, pgprot)   pfn_pmd(page_to_pfn(page), (pgprot))
+ 
++#define mk_zero_pmd(zero_page, prot)					\
++({									\
++	prot.pgprot &= ~mktme_keyid_mask;				\
++	pmd_mkhuge(mk_pmd(zero_page, prot));				\
++})
 +
-+/* Prepare page to be used for encryption. Called from page allocator. */
-+void __prep_encrypted_page(struct page *page, int order, int keyid, bool zero)
-+{
-+	int i;
-+
-+	/*
-+	 * The hardware/CPU does not enforce coherency between mappings
-+	 * of the same physical page with different KeyIDs or
-+	 * encryption keys. We are responsible for cache management.
-+	 */
-+	clflush_cache_range(page_address(page), PAGE_SIZE * (1UL << order));
-+
-+	for (i = 0; i < (1 << order); i++) {
-+		/* All pages coming out of the allocator should have KeyID 0 */
-+		WARN_ON_ONCE(lookup_page_ext(page)->keyid);
-+		lookup_page_ext(page)->keyid = keyid;
-+
-+		/* Clear the page after the KeyID is set. */
-+		if (zero)
-+			clear_highpage(page);
-+
-+		page++;
-+	}
-+}
-+
-+/*
-+ * Handles freeing of encrypted page.
-+ * Called from page allocator on freeing encrypted page.
-+ */
-+void free_encrypted_page(struct page *page, int order)
-+{
-+	int i;
-+
-+	/*
-+	 * The hardware/CPU does not enforce coherency between mappings
-+	 * of the same physical page with different KeyIDs or
-+	 * encryption keys. We are responsible for cache management.
-+	 */
-+	clflush_cache_range(page_address(page), PAGE_SIZE * (1UL << order));
-+
-+	for (i = 0; i < (1 << order); i++) {
-+		/* Check if the page has reasonable KeyID */
-+		WARN_ON_ONCE(lookup_page_ext(page)->keyid > mktme_nr_keyids);
-+		lookup_page_ext(page)->keyid = 0;
-+		page++;
-+	}
-+}
+ #define  __HAVE_ARCH_PMDP_SET_ACCESS_FLAGS
+ extern int pmdp_set_access_flags(struct vm_area_struct *vma,
+ 				 unsigned long address, pmd_t *pmdp,
 -- 
 2.20.1
 
