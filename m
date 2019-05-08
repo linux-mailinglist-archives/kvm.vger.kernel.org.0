@@ -2,74 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 574DC17EEE
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 19:15:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F33317EEF
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 19:15:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728753AbfEHRO5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 13:14:57 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:54892 "EHLO mail.skyhub.de"
+        id S1728819AbfEHRPm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 13:15:42 -0400
+Received: from mga05.intel.com ([192.55.52.43]:35640 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728376AbfEHRO5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 13:14:57 -0400
-Received: from zn.tnic (p200300EC2F0F5800A4469260603C8E24.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:5800:a446:9260:603c:8e24])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DA17B1EC027A;
-        Wed,  8 May 2019 19:14:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1557335696;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=qfc81kpXJcD0kZBxSWIYwIoKQZBpvRTR4z46Qw5UiZU=;
-        b=FCzvq9/8m8fHtA38lqOwB6h58NCCCnrZ96YwqQxoKZlMTaDBuhP1GkHKO+ta6u51rv/Oc0
-        gsJI86aoA3A86kGRjO6JbHW1yKKPjFVD9aicqZK4WKKGEZPDHiNix/nDc1t8xFNnZ81o0d
-        QvtfrLwhgtxXkVZZS1ZRNRvFCyJHV9A=
-Date:   Wed, 8 May 2019 19:14:50 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        "Natarajan, Janakarajan" <Janakarajan.Natarajan@amd.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Liran Alon <liran.alon@oracle.com>,
-        Mihai Carabas <mihai.carabas@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
+        id S1728512AbfEHRPl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 13:15:41 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 10:15:41 -0700
+X-ExtLoop1: 1
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
+  by fmsmga005.fm.intel.com with ESMTP; 08 May 2019 10:15:40 -0700
+Date:   Wed, 8 May 2019 10:15:40 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH] x86/kvm/pmu: Set AMD's virt PMU version to 1
-Message-ID: <20190508171450.GG19015@zn.tnic>
-References: <20190508170248.15271-1-bp@alien8.de>
- <aba3fd5b-e1ba-df66-2414-3f1109b68bbb@amd.com>
+        kvm@vger.kernel.org, David Hill <hilld@binarystorm.net>,
+        Saar Amar <saaramar@microsoft.com>,
+        Mihai Carabas <mihai.carabas@oracle.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH] Revert "KVM: nVMX: Expose RDPMC-exiting only when guest
+ supports PMU"
+Message-ID: <20190508171540.GB19656@linux.intel.com>
+References: <20190508160819.19603-1-sean.j.christopherson@intel.com>
+ <EF5B3191-09E8-488E-8748-CA9F6FAC9D7A@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aba3fd5b-e1ba-df66-2414-3f1109b68bbb@amd.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <EF5B3191-09E8-488E-8748-CA9F6FAC9D7A@oracle.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 08, 2019 at 05:08:44PM +0000, Lendacky, Thomas wrote:
-> On 5/8/19 12:02 PM, Borislav Petkov wrote:
-> > From: Borislav Petkov <bp@suse.de>
-> > 
-> > After commit:
-> > 
-> >   672ff6cff80c ("KVM: x86: Raise #GP when guest vCPU do not support PMU")
+On Wed, May 08, 2019 at 07:55:13PM +0300, Liran Alon wrote:
 > 
-> You should add this commit as a fixes tag. Since that commit went into 5.1
-> it would be worth this fix going into the 5.1 stable tree.
+> 
+> > On 8 May 2019, at 19:08, Sean Christopherson <sean.j.christopherson@intel.com> wrote:
+> > 
+> > The RDPMC-exiting control is dependent on the existence of the RDPMC
+> > instruction itself, i.e. is not tied to the "Architectural Performance
+> > Monitoring" feature.  For all intents and purposes, the control exists
+> > on all CPUs with VMX support since RDPMC also exists on all VCPUs with
+> > VMX supported.  Per Intel's SDM:
+> > 
+> > The RDPMC instruction was introduced into the IA-32 Architecture in
+> > the Pentium Pro processor and the Pentium processor with MMX technology.
+> > The earlier Pentium processors have performance-monitoring counters, but
+> > they must be read with the RDMSR instruction.
+> > 
+> > Because RDPMC-exiting always exists, KVM requires the control and refuses
+> > to load if it's not available.  As a result, hiding the PMU from a guest
+> > breaks nested virtualization if the guest attemts to use KVM.
+> > 
+> 
+> If I understand correctly, you mean that there were CPUs at the past that had
+> performance-counters but without PMU and could have been read by RDMSR
+> instead of RDPMC?
 
-Paolo, Radim, can you do that pls, when applying?
+That's a true statement, but not what I meant.  To try and reword, there
+are CPUs that have a PMU and RDPMC, and thus RDPMC-exiting, but do NOT
+report their PMU capabilities via CPUID 0xA.  The kernel code to init the
+PMU is probably the best example (X86_FEATURE_ARCH_PERFMON is effectively
+a reflection of the existence of CPUID 0xA).
 
-Thx.
+__init int intel_pmu_init(void)
+{
+	if (!cpu_has(&boot_cpu_data, X86_FEATURE_ARCH_PERFMON)) {
+		switch (boot_cpu_data.x86) {
+		case 0x6:
+			return p6_pmu_init();
+		case 0xb:
+			return knc_pmu_init();
+		case 0xf:
+			return p4_pmu_init();
+		}
+		return -ENODEV;
+	}
+} 
 
--- 
-Regards/Gruss,
-    Boris.
+> And there is no CPUID bit that expose if performance-counters even exists?
+> You just need to try to RDPMC and see if it #GP?
 
-Good mailing practices for 400: avoid top-posting and trim the reply.
+AFAIK the non-architectural perfmons aren't enumerated via CPUID.  I'm
+pretty most of them don't have any enumeration beyond the CPU model,
+i.e. software needs to essentially hardcode support based on the CPU model
+and maybe some topology info.
+
+So from a unit test perspective, the most compatible approach is to just
+eat the #GP, but I think it's also completely reasonable to test RDPMC
+without interception if and only if architectural perfmons are supported.
+
+> If the answer to all above questions is “yes” to all questions above then I’m
+> sorry for my misunderstanding with this original commit and: Reviewed-by:
+> Liran Alon <liran.alon@oracle.com>
