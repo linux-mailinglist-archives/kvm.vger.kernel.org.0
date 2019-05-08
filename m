@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BD46B17C2A
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:49:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A70DA17C2C
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:49:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728370AbfEHOor (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:44:47 -0400
-Received: from mga03.intel.com ([134.134.136.65]:59520 "EHLO mga03.intel.com"
+        id S1726163AbfEHOos (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:44:48 -0400
+Received: from mga07.intel.com ([134.134.136.100]:33085 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728301AbfEHOop (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 10:44:45 -0400
+        id S1728305AbfEHOoq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 10:44:46 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:44 -0700
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:45 -0700
 X-ExtLoop1: 1
 Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga005.fm.intel.com with ESMTP; 08 May 2019 07:44:40 -0700
+  by orsmga002.jf.intel.com with ESMTP; 08 May 2019 07:44:40 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id 11A32AF7; Wed,  8 May 2019 17:44:30 +0300 (EEST)
+        id 1BE06B26; Wed,  8 May 2019 17:44:30 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -36,9 +36,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 28/62] keys/mktme: Set up PCONFIG programming targets for MKTME keys
-Date:   Wed,  8 May 2019 17:43:48 +0300
-Message-Id: <20190508144422.13171-29-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 29/62] keys/mktme: Program MKTME keys into the platform hardware
+Date:   Wed,  8 May 2019 17:43:49 +0300
+Message-Id: <20190508144422.13171-30-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -51,103 +51,132 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alison Schofield <alison.schofield@intel.com>
 
-MKTME Key service maintains the hardware key tables. These key tables
-are package scoped per the MKTME hardware definition. This means that
-each physical package on the system needs its key table programmed.
+Finally, the keys are programmed into the hardware via each
+lead CPU. Every package has to be programmed successfully.
+There is no partial success allowed here.
 
-These physical packages are the targets of the new PCONFIG programming
-command. So, introduce a PCONFIG targets bitmap as well as a CPU mask
-that includes the lead CPUs capable of programming the targets.
-
-The lead CPU mask will be used every time a new key is programmed into
-the hardware.
-
-Keep the PCONFIG targets bit map around for future use during hotplug
-events.
+Here a retry scheme is included for two errors that may succeed
+on retry: MKTME_DEVICE_BUSY and MKTME_ENTROPY_ERROR.
+However, it's not clear if even those errors should be retried
+at this level. Perhaps they too, should be returned to user space
+for handling.
 
 Signed-off-by: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- security/keys/mktme_keys.c | 42 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ security/keys/mktme_keys.c | 92 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 91 insertions(+), 1 deletion(-)
 
 diff --git a/security/keys/mktme_keys.c b/security/keys/mktme_keys.c
-index 9fdf482ea3e6..b5b44decfd3e 100644
+index b5b44decfd3e..f70533b1a7fd 100644
 --- a/security/keys/mktme_keys.c
 +++ b/security/keys/mktme_keys.c
-@@ -2,6 +2,7 @@
- 
- /* Documentation/x86/mktme_keys.rst */
- 
-+#include <linux/cpu.h>
- #include <linux/init.h>
- #include <linux/key.h>
- #include <linux/key-type.h>
-@@ -17,6 +18,8 @@
- 
- static DEFINE_SPINLOCK(mktme_lock);
- struct kmem_cache *mktme_prog_cache;	/* Hardware programming cache */
-+unsigned long *mktme_target_map;	/* Pconfig programming targets */
-+cpumask_var_t mktme_leadcpus;		/* One lead CPU per pconfig target */
- 
- /* 1:1 Mapping between Userspace Keys (struct key) and Hardware KeyIDs */
- struct mktme_mapping {
-@@ -303,6 +306,33 @@ struct key_type key_type_mktme = {
- 	.destroy	= mktme_destroy_key,
+@@ -102,6 +102,96 @@ struct mktme_payload {
+ 	u8		tweak_key[MKTME_AES_XTS_SIZE];
  };
  
-+static void mktme_update_pconfig_targets(void)
++struct mktme_hw_program_info {
++	struct mktme_key_program *key_program;
++	int *status;
++};
++
++struct mktme_err_table {
++	const char *msg;
++	bool retry;
++};
++
++static const struct mktme_err_table mktme_error[] = {
++/* MKTME_PROG_SUCCESS     */ {"KeyID was successfully programmed",   false},
++/* MKTME_INVALID_PROG_CMD */ {"Invalid KeyID programming command",   false},
++/* MKTME_ENTROPY_ERROR    */ {"Insufficient entropy",		      true},
++/* MKTME_INVALID_KEYID    */ {"KeyID not valid",		     false},
++/* MKTME_INVALID_ENC_ALG  */ {"Invalid encryption algorithm chosen", false},
++/* MKTME_DEVICE_BUSY      */ {"Failure to access key table",	      true},
++};
++
++static int mktme_parse_program_status(int status[])
 +{
-+	int cpu, target_id;
++	int cpu, sum = 0;
 +
-+	cpumask_clear(mktme_leadcpus);
-+	bitmap_clear(mktme_target_map, 0, sizeof(mktme_target_map));
++	/* Success: all CPU(s) programmed all key table(s) */
++	for_each_cpu(cpu, mktme_leadcpus)
++		sum += status[cpu];
++	if (!sum)
++		return MKTME_PROG_SUCCESS;
 +
-+	for_each_online_cpu(cpu) {
-+		target_id = topology_physical_package_id(cpu);
-+		if (!__test_and_set_bit(target_id, mktme_target_map))
-+			__cpumask_set_cpu(cpu, mktme_leadcpus);
++	/* Invalid Parameters: log the error and return the error. */
++	for_each_cpu(cpu, mktme_leadcpus) {
++		switch (status[cpu]) {
++		case MKTME_INVALID_KEYID:
++		case MKTME_INVALID_PROG_CMD:
++		case MKTME_INVALID_ENC_ALG:
++			pr_err("mktme: %s\n", mktme_error[status[cpu]].msg);
++			return status[cpu];
++
++		default:
++			break;
++		}
 +	}
++	/*
++	 * Device Busy or Insufficient Entropy: do not log the
++	 * error. These will be retried and if retries (time or
++	 * count runs out) caller will log the error.
++	 */
++	for_each_cpu(cpu, mktme_leadcpus) {
++		if (status[cpu] == MKTME_DEVICE_BUSY)
++			return status[cpu];
++	}
++	return MKTME_ENTROPY_ERROR;
 +}
 +
-+static int mktme_alloc_pconfig_targets(void)
++/* Program a single key using one CPU. */
++static void mktme_do_program(void *hw_program_info)
 +{
-+	if (!alloc_cpumask_var(&mktme_leadcpus, GFP_KERNEL))
-+		return -ENOMEM;
++	struct mktme_hw_program_info *info = hw_program_info;
++	int cpu;
 +
-+	mktme_target_map = bitmap_alloc(topology_max_packages(), GFP_KERNEL);
-+	if (!mktme_target_map) {
-+		free_cpumask_var(mktme_leadcpus);
-+		return -ENOMEM;
-+	}
-+	return 0;
++	cpu = smp_processor_id();
++	info->status[cpu] = mktme_key_program(info->key_program);
 +}
 +
- static int __init init_mktme(void)
++static int mktme_program_all_keytables(struct mktme_key_program *key_program)
++{
++	struct mktme_hw_program_info info;
++	int err, retries = 10; /* Maybe users should handle retries */
++
++	info.key_program = key_program;
++	info.status = kcalloc(num_possible_cpus(), sizeof(info.status[0]),
++			      GFP_KERNEL);
++
++	while (retries--) {
++		get_online_cpus();
++		on_each_cpu_mask(mktme_leadcpus, mktme_do_program,
++				 &info, 1);
++		put_online_cpus();
++
++		err = mktme_parse_program_status(info.status);
++		if (!err)			   /* Success */
++			return err;
++		else if (!mktme_error[err].retry)  /* Error no retry */
++			return -ENOKEY;
++	}
++	/* Ran out of retries */
++	pr_err("mktme: %s\n", mktme_error[err].msg);
++	return err;
++}
++
+ /* Copy the payload to the HW programming structure and program this KeyID */
+ static int mktme_program_keyid(int keyid, struct mktme_payload *payload)
  {
- 	int ret;
-@@ -320,9 +350,21 @@ static int __init init_mktme(void)
- 	if (!mktme_prog_cache)
- 		goto free_map;
- 
-+	/* Hardware programming targets */
-+	if (mktme_alloc_pconfig_targets())
-+		goto free_cache;
-+
-+	/* Initialize first programming targets */
-+	mktme_update_pconfig_targets();
-+
- 	ret = register_key_type(&key_type_mktme);
- 	if (!ret)
- 		return ret;			/* SUCCESS */
-+
-+	free_cpumask_var(mktme_leadcpus);
-+	bitmap_free(mktme_target_map);
-+free_cache:
-+	kmem_cache_destroy(mktme_prog_cache);
- free_map:
- 	kvfree(mktme_map);
- 
+@@ -127,7 +217,7 @@ static int mktme_program_keyid(int keyid, struct mktme_payload *payload)
+ 			kprog->key_field_2[i] ^= kern_entropy[i];
+ 		}
+ 	}
+-	ret = MKTME_PROG_SUCCESS;	/* Future programming call */
++	ret = mktme_program_all_keytables(kprog);
+ 	kmem_cache_free(mktme_prog_cache, kprog);
+ 	return ret;
+ }
 -- 
 2.20.1
 
