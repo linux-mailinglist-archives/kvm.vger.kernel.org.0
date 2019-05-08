@@ -2,104 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3EF8717F53
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 19:47:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D438D17627
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 12:43:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726999AbfEHRrm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 13:47:42 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:46302 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726545AbfEHRrm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 13:47:42 -0400
-Received: by mail-pf1-f194.google.com with SMTP id y11so376785pfm.13
-        for <kvm@vger.kernel.org>; Wed, 08 May 2019 10:47:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=c8UNygLBqbuxTHtNnAkZZpldUtji1ooOZFn9hGJjKHw=;
-        b=S0NWK4Djq4kBt28IgPOaqBaho/ctZ52vbx8hocuwleH2soe8ZyBLOWlVxXuYvB9aSU
-         tcLOc1DMIFk36vcjJo1Ycf44tYXjZvVBkXagVcekZFYh9m2CHuTNFrCjrknS2G5C5WAx
-         BnacxW5TGHqCUC8OKXkxuxlTwmyKdXW8AfS4XpXiwlk2YHK4FTzBfKJ40Xg5mbFsHL87
-         JdvvjOd2BjSrWBAYtsJOftDHk0L6Dr34GCdWCUXupQCRzxp9A7BQvVjTFBt9oQMi5Osj
-         F7rO2idiHJT7YoOQrpCdfefhJ9w9OOtn5D4V0lElsMwnjHsHUAOZK/0Vq2OcwFhHSWX5
-         MVTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=c8UNygLBqbuxTHtNnAkZZpldUtji1ooOZFn9hGJjKHw=;
-        b=sLVzE2CkZPj5jUbbjK7lSir5yVui7Gp/CxXMYV9YVRSRV0xuHmz86WLvKof+Hbyd5c
-         BXj954XvwroJcmVyIcugcC2KMUzkj4ruCAgJlm86zJ43P1SG53/elbWuqELTq8XGbW/b
-         MEJjpKcPoD2e0x0WGYM5fDIvVCX44Oc981ugw8J5ia7bbc1TVtsBPAy0Sp1ftfz8QPXQ
-         vDBFQmN2wpGNUgiTXiYZ1z/crpZwu8rB3c8BM5ij6q1HpAzoUlVd401A0h8dZRSUgb2p
-         ViV3jFcw2U9w6jpeiEXHu9Q45NAxfJ0VxCciFp9Rhg9C7iGjnGWkY1fne9iO9WKYje0+
-         E2ag==
-X-Gm-Message-State: APjAAAW3AjSrN9OHcUQ1U5XgxTEwHaKa3ZGNVgm8LZkoZDuJwzFMTotq
-        GAlk98lEXq3r3m3Ro94opCk=
-X-Google-Smtp-Source: APXvYqzSrfKZxI0MNBT1yFtqIZx7Dd1TVYsHILklTwQigWtPZAQ2jqntrTP13PBVUF++2EV5kqSlcg==
-X-Received: by 2002:a62:2e46:: with SMTP id u67mr10496111pfu.206.1557337661203;
-        Wed, 08 May 2019 10:47:41 -0700 (PDT)
-Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id q14sm10097189pgg.10.2019.05.08.10.47.39
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 08 May 2019 10:47:40 -0700 (PDT)
-From:   Nadav Amit <nadav.amit@gmail.com>
-X-Google-Original-From: Nadav Amit <namit@vmware.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [kvm-unit-tests PATCH 2/2] x86: nVMX: Set guest as active after NMI/INTR-window tests
-Date:   Wed,  8 May 2019 03:27:15 -0700
-Message-Id: <20190508102715.685-3-namit@vmware.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190508102715.685-1-namit@vmware.com>
-References: <20190508102715.685-1-namit@vmware.com>
+        id S1727205AbfEHKne (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 06:43:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54802 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726986AbfEHKne (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 06:43:34 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 645F1C060200;
+        Wed,  8 May 2019 10:43:33 +0000 (UTC)
+Received: from gondolin (ovpn-204-161.brq.redhat.com [10.40.204.161])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B3FD7600D4;
+        Wed,  8 May 2019 10:43:31 +0000 (UTC)
+Date:   Wed, 8 May 2019 12:43:27 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Farhan Ali <alifm@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 3/7] s390/cio: Split pfn_array_alloc_pin into pieces
+Message-ID: <20190508124327.5c496c8a.cohuck@redhat.com>
+In-Reply-To: <20190503134912.39756-4-farman@linux.ibm.com>
+References: <20190503134912.39756-1-farman@linux.ibm.com>
+        <20190503134912.39756-4-farman@linux.ibm.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Wed, 08 May 2019 10:43:33 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nadav Amit <nadav.amit@gmail.com>
+On Fri,  3 May 2019 15:49:08 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
 
-Intel SDM 26.6.5 says regarding interrupt-window exiting that: "These
-events wake the logical processor if it just entered the HLT state
-because of a VM entry." A similar statement is told about NMI-window
-exiting.
+> The pfn_array_alloc_pin routine is doing too much.  Today, it does the
+> alloc of the pfn_array struct and its member arrays, builds the iova
+> address lists out of a contiguous piece of guest memory, and asks vfio
+> to pin the resulting pages.
+> 
+> Let's effectively revert a significant portion of commit 5c1cfb1c3948
+> ("vfio: ccw: refactor and improve pfn_array_alloc_pin()") such that we
+> break pfn_array_alloc_pin() into its component pieces, and have one
+> routine that allocates/populates the pfn_array structs, and another
+> that actually pins the memory.  In the future, we will be able to
+> handle scenarios where pinning memory isn't actually appropriate.
+> 
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>  drivers/s390/cio/vfio_ccw_cp.c | 72 +++++++++++++++++++++++++++---------------
+>  1 file changed, 47 insertions(+), 25 deletions(-)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index f86da78eaeaa..b70306c06150 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -50,28 +50,25 @@ struct ccwchain {
+>  };
+>  
+>  /*
+> - * pfn_array_alloc_pin() - alloc memory for PFNs, then pin user pages in memory
+> + * pfn_array_alloc() - alloc memory for PFNs
+>   * @pa: pfn_array on which to perform the operation
+> - * @mdev: the mediated device to perform pin/unpin operations
+>   * @iova: target guest physical address
+>   * @len: number of bytes that should be pinned from @iova
+>   *
+> - * Attempt to allocate memory for PFNs, and pin user pages in memory.
+> + * Attempt to allocate memory for PFN.
 
-However, running tests which are similar to verify_nmi_window_exit() and
-verify_intr_window_exit() on bare-metal suggests that real CPUs do not
-wake up. Until someone figures what the correct behavior is, just reset
-the activity state to "active" after each test to prevent the whole
-test-suite from getting stuck.
+s/PFN/PFNs/
 
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
----
- x86/vmx_tests.c | 2 ++
- 1 file changed, 2 insertions(+)
+>   *
+>   * Usage of pfn_array:
+>   * We expect (pa_nr == 0) and (pa_iova_pfn == NULL), any field in
+>   * this structure will be filled in by this function.
+>   *
+>   * Returns:
+> - *   Number of pages pinned on success.
+> - *   If @pa->pa_nr is not 0, or @pa->pa_iova_pfn is not NULL initially,
+> - *   returns -EINVAL.
+> - *   If no pages were pinned, returns -errno.
+> + *         0 if PFNs are allocated
+> + *   -EINVAL if pa->pa_nr is not initially zero, or pa->pa_iova_pfn is not NULL
+> + *   -ENOMEM if alloc failed
+>   */
+> -static int pfn_array_alloc_pin(struct pfn_array *pa, struct device *mdev,
+> -			       u64 iova, unsigned int len)
+> +static int pfn_array_alloc(struct pfn_array *pa, u64 iova, unsigned int len)
+>  {
+> -	int i, ret = 0;
+> +	int i;
+>  
+>  	if (!len)
+>  		return 0;
+> @@ -97,23 +94,33 @@ static int pfn_array_alloc_pin(struct pfn_array *pa, struct device *mdev,
+>  	for (i = 1; i < pa->pa_nr; i++)
+>  		pa->pa_iova_pfn[i] = pa->pa_iova_pfn[i - 1] + 1;
+>  
+> +	return 0;
+> +}
+> +
+> +/*
+> + * pfn_array_pin() - Pin user pages in memory
+> + * @pa: pfn_array on which to perform the operation
+> + * @mdev: the mediated device to perform pin operations
+> + *
+> + * Returns:
+> + *   Number of pages pinned on success.
+> + *   If fewer pages than requested were pinned, returns -EINVAL
+> + *   If no pages were pinned, returns -errno.
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index f921286..2d6b12d 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -7063,6 +7063,7 @@ static void verify_nmi_window_exit(u64 rip)
- 	report("Activity state (%ld) is 'ACTIVE'",
- 	       vmcs_read(GUEST_ACTV_STATE) == ACTV_ACTIVE,
- 	       vmcs_read(GUEST_ACTV_STATE));
-+	vmcs_write(GUEST_ACTV_STATE, ACTV_ACTIVE);
- }
- 
- static void vmx_nmi_window_test(void)
-@@ -7199,6 +7200,7 @@ static void verify_intr_window_exit(u64 rip)
- 	report("Activity state (%ld) is 'ACTIVE'",
- 	       vmcs_read(GUEST_ACTV_STATE) == ACTV_ACTIVE,
- 	       vmcs_read(GUEST_ACTV_STATE));
-+	vmcs_write(GUEST_ACTV_STATE, ACTV_ACTIVE);
- }
- 
- static void vmx_intr_window_test(void)
--- 
-2.17.1
+I don't really like the 'returns -errno' :) It's actually the return
+code of vfio_pin_pages(), and that might include -EINVAL as well.
 
+So, what about mentioning in the function description that
+pfn_array_pin() only succeeds if it coult pin all pages, and simply
+stating that it returns a negative error value on failure?
+
+> + */
+> +static int pfn_array_pin(struct pfn_array *pa, struct device *mdev)
+> +{
+> +	int ret = 0;
+> +
+>  	ret = vfio_pin_pages(mdev, pa->pa_iova_pfn, pa->pa_nr,
+>  			     IOMMU_READ | IOMMU_WRITE, pa->pa_pfn);
+>  
+> -	if (ret < 0) {
+> -		goto err_out;
+> -	} else if (ret > 0 && ret != pa->pa_nr) {
+> +	if (ret > 0 && ret != pa->pa_nr) {
+>  		vfio_unpin_pages(mdev, pa->pa_iova_pfn, ret);
+>  		ret = -EINVAL;
+> -		goto err_out;
+>  	}
+>  
+> -	return ret;
+> -
+> -err_out:
+> -	pa->pa_nr = 0;
+> -	kfree(pa->pa_iova_pfn);
+> -	pa->pa_iova_pfn = NULL;
+> +	if (ret < 0)
+> +		pa->pa_iova = 0;
+>  
+>  	return ret;
+>  }
+
+(...)
