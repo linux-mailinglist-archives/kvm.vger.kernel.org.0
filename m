@@ -2,26 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B594817C61
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:51:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E2B717C58
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:50:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728407AbfEHOuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:50:40 -0400
-Received: from mga06.intel.com ([134.134.136.31]:57654 "EHLO mga06.intel.com"
+        id S1728261AbfEHOuS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:50:18 -0400
+Received: from mga12.intel.com ([192.55.52.136]:8559 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728267AbfEHOoo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 10:44:44 -0400
+        id S1728269AbfEHOop (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 10:44:45 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:44 -0700
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:44 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,446,1549958400"; 
-   d="scan'208";a="169656541"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga002.fm.intel.com with ESMTP; 08 May 2019 07:44:40 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 08 May 2019 07:44:39 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id E5276ABE; Wed,  8 May 2019 17:44:29 +0300 (EEST)
+        id EFE6EAC1; Wed,  8 May 2019 17:44:29 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -38,9 +36,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 25/62] keys/mktme: Instantiate and destroy MKTME keys
-Date:   Wed,  8 May 2019 17:43:45 +0300
-Message-Id: <20190508144422.13171-26-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 26/62] keys/mktme: Move the MKTME payload into a cache aligned structure
+Date:   Wed,  8 May 2019 17:43:46 +0300
+Message-Id: <20190508144422.13171-27-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -53,72 +51,99 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alison Schofield <alison.schofield@intel.com>
 
-Instantiating and destroying are two Kernel Key Service methods
-that are invoked by the kernel key service when a key is added
-(add_key, request_key) or removed (invalidate, revoke, timeout).
+In preparation for programming the key into the hardware, move
+the key payload into a cache aligned structure. This alignment
+is a requirement of the MKTME hardware.
 
-During instantiation, MKTME needs to allocate an available hardware
-KeyID and map it to the Userspace Key.
-
-During destroy, MKTME wil returned the hardware KeyID to the pool of
-available keys.
+Use the slab allocator to have this structure readily available.
 
 Signed-off-by: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- security/keys/mktme_keys.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ security/keys/mktme_keys.c | 39 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 37 insertions(+), 2 deletions(-)
 
 diff --git a/security/keys/mktme_keys.c b/security/keys/mktme_keys.c
-index 92a047caa829..14bc4e600978 100644
+index 14bc4e600978..a7ca32865a1c 100644
 --- a/security/keys/mktme_keys.c
 +++ b/security/keys/mktme_keys.c
-@@ -14,6 +14,8 @@
- 
+@@ -15,6 +15,7 @@
  #include "internal.h"
  
-+static DEFINE_SPINLOCK(mktme_lock);
-+
+ static DEFINE_SPINLOCK(mktme_lock);
++struct kmem_cache *mktme_prog_cache;	/* Hardware programming cache */
+ 
  /* 1:1 Mapping between Userspace Keys (struct key) and Hardware KeyIDs */
  struct mktme_mapping {
- 	unsigned int	mapped_keyids;
-@@ -95,6 +97,26 @@ struct mktme_payload {
+@@ -97,6 +98,27 @@ struct mktme_payload {
  	u8		tweak_key[MKTME_AES_XTS_SIZE];
  };
  
-+/* Key Service Method called when a Userspace Key is garbage collected. */
-+static void mktme_destroy_key(struct key *key)
++/* Copy the payload to the HW programming structure and program this KeyID */
++static int mktme_program_keyid(int keyid, struct mktme_payload *payload)
 +{
-+	mktme_release_keyid(mktme_keyid_from_key(key));
++	struct mktme_key_program *kprog = NULL;
++	int ret;
++
++	kprog = kmem_cache_zalloc(mktme_prog_cache, GFP_ATOMIC);
++	if (!kprog)
++		return -ENOMEM;
++
++	/* Hardware programming requires cached aligned struct */
++	kprog->keyid = keyid;
++	kprog->keyid_ctrl = payload->keyid_ctrl;
++	memcpy(kprog->key_field_1, payload->data_key, MKTME_AES_XTS_SIZE);
++	memcpy(kprog->key_field_2, payload->tweak_key, MKTME_AES_XTS_SIZE);
++
++	ret = MKTME_PROG_SUCCESS;	/* Future programming call */
++	kmem_cache_free(mktme_prog_cache, kprog);
++	return ret;
 +}
 +
-+/* Key Service Method to create a new key. Payload is preparsed. */
-+int mktme_instantiate_key(struct key *key, struct key_preparsed_payload *prep)
-+{
-+	unsigned long flags;
-+	int keyid;
+ /* Key Service Method called when a Userspace Key is garbage collected. */
+ static void mktme_destroy_key(struct key *key)
+ {
+@@ -106,6 +128,7 @@ static void mktme_destroy_key(struct key *key)
+ /* Key Service Method to create a new key. Payload is preparsed. */
+ int mktme_instantiate_key(struct key *key, struct key_preparsed_payload *prep)
+ {
++	struct mktme_payload *payload = prep->payload.data[0];
+ 	unsigned long flags;
+ 	int keyid;
+ 
+@@ -114,7 +137,14 @@ int mktme_instantiate_key(struct key *key, struct key_preparsed_payload *prep)
+ 	spin_unlock_irqrestore(&mktme_lock, flags);
+ 	if (!keyid)
+ 		return -ENOKEY;
+-	return 0;
++
++	if (!mktme_program_keyid(keyid, payload))
++		return MKTME_PROG_SUCCESS;
 +
 +	spin_lock_irqsave(&mktme_lock, flags);
-+	keyid = mktme_reserve_keyid(key);
++	mktme_release_keyid(keyid);
 +	spin_unlock_irqrestore(&mktme_lock, flags);
-+	if (!keyid)
-+		return -ENOKEY;
-+	return 0;
-+}
-+
- /* Make sure arguments are correct for the TYPE of key requested */
- static int mktme_check_options(struct mktme_payload *payload,
- 			       unsigned long token_mask, enum mktme_type type)
-@@ -236,7 +258,9 @@ struct key_type key_type_mktme = {
- 	.name		= "mktme",
- 	.preparse	= mktme_preparse_payload,
- 	.free_preparse	= mktme_free_preparsed_payload,
-+	.instantiate	= mktme_instantiate_key,
- 	.describe	= user_describe,
-+	.destroy	= mktme_destroy_key,
- };
++	return -ENOKEY;
+ }
  
- static int __init init_mktme(void)
+ /* Make sure arguments are correct for the TYPE of key requested */
+@@ -275,10 +305,15 @@ static int __init init_mktme(void)
+ 	if (mktme_map_alloc())
+ 		return -ENOMEM;
+ 
++	/* Used to program the hardware key tables */
++	mktme_prog_cache = KMEM_CACHE(mktme_key_program, SLAB_PANIC);
++	if (!mktme_prog_cache)
++		goto free_map;
++
+ 	ret = register_key_type(&key_type_mktme);
+ 	if (!ret)
+ 		return ret;			/* SUCCESS */
+-
++free_map:
+ 	kvfree(mktme_map);
+ 
+ 	return -ENOMEM;
 -- 
 2.20.1
 
