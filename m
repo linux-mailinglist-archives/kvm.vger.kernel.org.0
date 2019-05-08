@@ -2,51 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 161BC18297
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 01:11:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2398182A6
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 01:21:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727026AbfEHXL4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 19:11:56 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:46320 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726906AbfEHXL4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 19:11:56 -0400
-Received: by mail-io1-f65.google.com with SMTP id m14so107617ion.13
-        for <kvm@vger.kernel.org>; Wed, 08 May 2019 16:11:55 -0700 (PDT)
+        id S1727623AbfEHXVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 19:21:21 -0400
+Received: from mail-it1-f182.google.com ([209.85.166.182]:54329 "EHLO
+        mail-it1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726163AbfEHXVV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 19:21:21 -0400
+Received: by mail-it1-f182.google.com with SMTP id a190so460847ite.4
+        for <kvm@vger.kernel.org>; Wed, 08 May 2019 16:21:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=JgcGkH9zIchXryBzpe+vAmJYy9gUucLQHyUH47Okfhc=;
-        b=izikx642ZFpaCMsNwj++KlELmWJ6wOMBZV/AUbWWs030GAcC6W9++3jJ+tO6S9bURZ
-         5c07ScsZRTqivYYSW6Wwq1L5w/M0mohMziNNVxHTHHmM9w00czhr2j+HbKqzTdWr4i/a
-         OBO/e0cLhQr9MZ/dPU2JmaAyn9u3GnKzCOMusdd+a8XPGQRaJbhj9AHzWr2ITCgV9U/u
-         pg9Ql1g/5uLpqxjKxjKuEcf6v+VxmSnFHyslxo4f2neufMFnV1SefEwDmy2fuHjHMdYV
-         CS1TipHO1j2Fz+3bNU+lCaBiQ856lwLmKcV4Y+58vv6WnmKqREm0tWQ1hoREuzKwwGsp
-         BZTA==
+        bh=2G/qPyOLlddrXZzJkN3Q3iXVgoS23yR8dAbQAMl7uH0=;
+        b=wFJAtQmaWIxIY8ee0TtVxC5pYEKhSFQUknspDYunT0XNFolWSFGzULzhvEPUp5jYUN
+         DST52XcL8TwK65CDBSfANAexVFO6US9fPdrEy8YmtdWdGgOmHqXzKuR76Sd6qLP2DeN+
+         LEiL8mdwLbgtaBpHN9uMihA4vO+HincMCU7W1lnaihbFFoKVyrOxra4Gx9ck4s/sNrvr
+         ji9l5OZ5FqEEiwudK9eVmyzPv8Ky5Dx4Ccb+dvEjlhkSve0MfvUx4XMkNClifcZLe22A
+         ywVoSAhXS46SKSKfJdiBnxmhEkDHv+3JGzriFJLGgaqainLwkLuh6WRFUZJUSjhLG4uB
+         y+sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=JgcGkH9zIchXryBzpe+vAmJYy9gUucLQHyUH47Okfhc=;
-        b=czJDoitkRctHj6QRAi7++Z9yE1dKYU5fkRWSDGNwpprUtGN8xC5WrqBitpulBdyJpk
-         mR3CSrpOkbQO2HtfEvp+BHTohgEVnspmqXfvjgLAuqfHoWTlz2eMJwLDAgjyWhZfo+Ib
-         L0/CQvIFUZhNJT9gPpKW4VTzWKUMOF6m/X6k7tFawReUIPl08jsAtzKQWeFpNxXjBgoW
-         wjDKYObuaXeo67MnvXklcgJM2qi+AYkzBjHMWr/0axuFFac8ryZFn/ga4aL6H0sCz9po
-         4i6JQiH/XLUFneMgulYqPsQFUttW53TGtE77ryXfGCDNnSGbdvhHkPXF2lILGt/f8jrh
-         bgVA==
-X-Gm-Message-State: APjAAAU5mAWq236wzsh+/m0Iw+HL5rG8WXK6lyNQ/pG6OBPjaAafaURT
-        3UY1E9CBvlpdO8pNWghi3Br/FgYhttSxQPIYseIHFw==
-X-Google-Smtp-Source: APXvYqw3vYLlWb6O1yDP+aZchFjjoNEu2tM9c8q/nZkZtNs/pDDTgyXrRTx1J6o8OoqJD6ltlXk7bSsXNUNZiKs8BnU=
-X-Received: by 2002:a5d:9616:: with SMTP id w22mr478999iol.40.1557357115231;
- Wed, 08 May 2019 16:11:55 -0700 (PDT)
+        bh=2G/qPyOLlddrXZzJkN3Q3iXVgoS23yR8dAbQAMl7uH0=;
+        b=NG/Z/81KUAndqPbEJnjN3JGEVUI6cG6tvgGqCf+HDRLLlJfLFHHodlTYly3kf5gS9D
+         slcGB+u6u8/k8azJFUV8dYNislqQltyZTqomq6UVNyyu997MAaQeMLwGvT4S+F1ZyjkV
+         QFd3upaGiJsPbAbaWN2nuyjAY5GpiT0wTEedzNeVbPwpEIpCp5yfl4cayH+kSz4oCIhi
+         dST3RvgyzJi9XVb85Ft1+Cbfq7DiTPrllTEa3GpDh3d7WNgqxGDYuNGJBa5qObXwDTIs
+         OElyeKbmHeWJ2ZgPXANF3fAc+bH5oYubjWhcBGW+ET5wFGr/p/xpMOiMR+WdhWBHJcAE
+         zZ9w==
+X-Gm-Message-State: APjAAAXZV+3wnTPPu9zMirmWRbVKq2W3TDqC+PjBydzksObupnfV63u3
+        EZE+XaNTG5VGBhg9F/lo4NJ0VLxFrKrAhr1lGauftA==
+X-Google-Smtp-Source: APXvYqytjwNExZw3cx6ijFEVE1rNal/6mXNs5IEJYS/dBzhjSIj4wTI2yLv5RD1lSVoUS0ostlzGgEs2aescpAjs+kM=
+X-Received: by 2002:a02:1384:: with SMTP id 126mr598921jaz.72.1557357680065;
+ Wed, 08 May 2019 16:21:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190508102715.685-1-namit@vmware.com> <20190508102715.685-2-namit@vmware.com>
-In-Reply-To: <20190508102715.685-2-namit@vmware.com>
+References: <20190508102715.685-1-namit@vmware.com> <20190508102715.685-3-namit@vmware.com>
+In-Reply-To: <20190508102715.685-3-namit@vmware.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 8 May 2019 16:11:44 -0700
-Message-ID: <CALMp9eRnqn6Jrd762UZGZ9cQSMBFaxvNFsOkqYryP8ngG7dUEw@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH 1/2] x86: nVMX: Use #DB in nmi and intr tests
+Date:   Wed, 8 May 2019 16:21:08 -0700
+Message-ID: <CALMp9eTE8vsrSC0K7KVArT_KFA_NGBZ5t6eW_Gh8cdJ_88JM+Q@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 2/2] x86: nVMX: Set guest as active after
+ NMI/INTR-window tests
 To:     Nadav Amit <nadav.amit@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         kvm list <kvm@vger.kernel.org>,
@@ -64,25 +65,22 @@ Cc: <kvm@vger.kernel.org>, Nadav Amit, Jim Mattson, Sean Christopherson
 
 > From: Nadav Amit <nadav.amit@gmail.com>
 >
-> According to Intel SDM 26.3.1.5 "Checks on Guest Non-Register State", if
-> the activity state is HLT, the only events that can be injected are NMI,
-> MTF and "Those with interruption type hardware exception and vector 1
-> (debug exception) or vector 18 (machine-check exception)."
+> Intel SDM 26.6.5 says regarding interrupt-window exiting that: "These
+> events wake the logical processor if it just entered the HLT state
+> because of a VM entry." A similar statement is told about NMI-window
+> exiting.
 >
-> Two tests, verify_nmi_window_exit() and verify_intr_window_exit(), try
-> to do something that real hardware disallows (i.e., fail the VM-entry)
-> by injecting #UD in HLT-state.  Inject #DB instead as the injection
-> should succeed in these tests.
+> However, running tests which are similar to verify_nmi_window_exit() and
+> verify_intr_window_exit() on bare-metal suggests that real CPUs do not
+> wake up. Until someone figures what the correct behavior is, just reset
+> the activity state to "active" after each test to prevent the whole
+> test-suite from getting stuck.
 >
 > Cc: Jim Mattson <jmattson@google.com>
 > Cc: Sean Christopherson <sean.j.christopherson@intel.com>
 > Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
 Reviewed-by: Jim Mattson <jmattson@google.com>
 
-Thanks for the fix!
-
-It has always bothered me that there is no easy way to validate a
-kvm-unit-test on physical hardware. Do you have a mechanism for doing
-so? If so, would you be willing to share?
-
-I don't suppose you have a patch for kvm to fail the VM-entry in this case?
+I think I have been assuming that "wake the logical processor" means
+"causes the logical processor to enter the 'active' activity state."
+Maybe that's not what "wake" means?
