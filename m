@@ -2,24 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A38417BD2
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:44:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66F5517C07
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:47:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728520AbfEHOox (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:44:53 -0400
-Received: from mga03.intel.com ([134.134.136.65]:59536 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728433AbfEHOov (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1728466AbfEHOov (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Wed, 8 May 2019 10:44:51 -0400
+Received: from mga02.intel.com ([134.134.136.20]:19918 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728395AbfEHOou (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 10:44:50 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:48 -0700
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:49 -0700
 X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,446,1549958400"; 
+   d="scan'208";a="169656563"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by FMSMGA003.fm.intel.com with ESMTP; 08 May 2019 07:44:44 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 08 May 2019 07:44:44 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id 9F78EC1D; Wed,  8 May 2019 17:44:30 +0300 (EEST)
+        id B16F3D2B; Wed,  8 May 2019 17:44:30 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -36,9 +38,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 39/62] keys/mktme: Find new PCONFIG targets during memory hotplug
-Date:   Wed,  8 May 2019 17:43:59 +0300
-Message-Id: <20190508144422.13171-40-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 40/62] keys/mktme: Program new PCONFIG targets with MKTME keys
+Date:   Wed,  8 May 2019 17:44:00 +0300
+Message-Id: <20190508144422.13171-41-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -51,62 +53,81 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alison Schofield <alison.schofield@intel.com>
 
-Introduce a helper function that detects a newly added PCONFIG
-target. This will be used in the MKTME memory hotplug notifier
-to determine if a new PCONFIG target has been added that needs
-to have its Key Table programmed.
+When a new PCONFIG target is added to an MKTME platform, its
+key table needs to be programmed to match the key tables across
+the entire platform. This type of newly added PCONFIG target
+may appear during a memory hotplug event.
+
+This key programming path will differ from the normal key
+programming path in that it will only program a single PCONFIG
+target, AND, it will only do that programming if allowed.
+
+Allowed means that either user type keys are stored, or, no
+user type keys are currently programmed.
+
+So, after checking if programming is allowable, this helper
+function will program the one new PCONFIG target, with all
+the currently programmed keys.
+
+This will be used in MKTME's memory notifier callback supporting
+MEM_GOING_ONLINE events.
 
 Signed-off-by: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- security/keys/mktme_keys.c | 39 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ security/keys/mktme_keys.c | 44 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
 diff --git a/security/keys/mktme_keys.c b/security/keys/mktme_keys.c
-index 3dfc0647f1e5..2c975c48fe44 100644
+index 2c975c48fe44..489dddb8c623 100644
 --- a/security/keys/mktme_keys.c
 +++ b/security/keys/mktme_keys.c
-@@ -543,6 +543,45 @@ static int mktme_cpu_teardown(unsigned int cpu)
- 	return ret;
+@@ -582,6 +582,50 @@ static int mktme_get_new_pconfig_target(void)
+ 	return new_target;
  }
  
-+static int mktme_get_new_pconfig_target(void)
++static int mktme_program_new_pconfig_target(int new_pkg)
 +{
-+	unsigned long *prev_map, *tmp_map;
-+	int new_target;		/* New PCONFIG target to program */
++	struct mktme_payload *payload;
++	int cpu, keyid, ret;
 +
-+	/* Save the current mktme_target_map bitmap */
-+	prev_map = bitmap_alloc(topology_max_packages(), GFP_KERNEL);
-+	bitmap_copy(prev_map, mktme_target_map, sizeof(mktme_target_map));
++	/*
++	 * Only program new target when user type keys are stored or,
++	 * no user type keys are currently programmed.
++	 */
++	if (!mktme_storekeys &&
++	    (bitmap_weight(mktme_bitmap_user_type, mktme_nr_keyids)))
++		return -EPERM;
 +
-+	/* Update the global targets - includes mktme_target_map */
-+	mktme_update_pconfig_targets();
-+
-+	/* Nothing to do if the target bitmap is unchanged */
-+	if (bitmap_equal(prev_map, mktme_target_map, sizeof(prev_map))) {
-+		new_target = -1;
-+		goto free_prev;
++	/* Set mktme_leadcpus to only include new target */
++	cpumask_clear(mktme_leadcpus);
++	for_each_online_cpu(cpu) {
++		if (topology_physical_package_id(cpu) == new_pkg) {
++			__cpumask_set_cpu(cpu, mktme_leadcpus);
++			break;
++		}
 +	}
++	/* Program the stored keys into the new key table */
++	for (keyid = 1; keyid <= mktme_nr_keyids; keyid++) {
++		/*
++		 * When a KeyID slot is not in use, the corresponding key
++		 * pointer is 0. '-1' is an intermediate state where the
++		 * key is on it's way out, but not gone yet. Program '-1's.
++		 */
++		if (mktme_map->key[keyid] == 0)
++			continue;
 +
-+	/* Find the change in the target bitmap */
-+	tmp_map = bitmap_alloc(topology_max_packages(), GFP_KERNEL);
-+	bitmap_andnot(tmp_map, prev_map, mktme_target_map,
-+		      sizeof(prev_map));
-+
-+	/* There should only be one new target */
-+	if (bitmap_weight(tmp_map, sizeof(tmp_map)) != 1) {
-+		pr_err("%s: expected %d new target, got %d\n", __func__, 1,
-+		       bitmap_weight(tmp_map, sizeof(tmp_map)));
-+		new_target = -1;
-+		goto free_tmp;
++		payload = &mktme_key_store[keyid];
++		ret = mktme_program_keyid(keyid, payload);
++		if (ret != MKTME_PROG_SUCCESS) {
++			/* Quit on first failure to program key table */
++			pr_debug("mktme: %s\n", mktme_error[ret].msg);
++			ret = -ENOKEY;
++			break;
++		}
 +	}
-+	new_target = find_first_bit(tmp_map, sizeof(tmp_map));
-+
-+free_tmp:
-+	bitmap_free(tmp_map);
-+free_prev:
-+	bitmap_free(prev_map);
-+	return new_target;
++	mktme_update_pconfig_targets();		/* Restore mktme_leadcpus */
++	return ret;
 +}
 +
  static int __init init_mktme(void)
