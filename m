@@ -2,103 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7858C1793A
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 14:16:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2083A17956
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 14:22:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728450AbfEHMQp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 08:16:45 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:39679 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728031AbfEHMQp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 08:16:45 -0400
-Received: by mail-wm1-f67.google.com with SMTP id n25so2970944wmk.4;
-        Wed, 08 May 2019 05:16:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=+uSM2xfSQ11lGMP7BGRPKgpGed0cJqoT69USPPkz3jU=;
-        b=Ks8R50PmLH8B3wYlvGWd9xR78gXMG+K3RiXZmZt7IJD12HkAxPr+weWGElt2Pq+Oiq
-         6EHpYkYVNUldyBbIZgLFhgOmtmS1lGe+c9GmDXIkor1o/YKw6xVHI8Sge4HeT7Tz/rV3
-         pR28gQOzdSUa9+yUpzqGx6q6PlCNGjIjixJDSaBoHnvNNdkAwq23nu7EFHBSF4Eha/Eb
-         IvR/KLR1mfqxUM1oXCNLB4BPdN8PEucgB6GlmYyzZo6X/gWWn5S8FRxJ0Kc8QQ+cNbku
-         HRusIXxlJcTdO5OS/y1URHtWkC0tJ9KOPZZ1vgfTkHgmlJg8TBG1ZF7Avp9fuvLUVySE
-         BHWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=+uSM2xfSQ11lGMP7BGRPKgpGed0cJqoT69USPPkz3jU=;
-        b=mgLxjNRLmAF9eLTsXYWtPmArTk8zMLzPQQj2qxmf1KUbx1/ApDSOeoLZY3RG3fgHmo
-         Ucc+tl25krPFhrQv4J/fpJRBMdCX9b75V4zLDys+puU3V5q/k5XTjrebEdMXJSzZZ10o
-         8zTP1UJcWN3uCGA4qbjrOZVs+SIy3oE5Rr2+L/yItDeuy5NxHtKIu8uQ3liqtYzLCBu2
-         Yky6Pvdiq6FnOS6/taZYKL/4XZ+QdZXkQnhYhBgWJ+MSdOGA8DlAaDj7Uf/Y/PJJXhM0
-         IH3lPvOZSq4v4owurwjBLSOnOt11RuLT2JcdmSqJU4Bo4uqXn5qU+FSBGaDtBa7FMKEn
-         NWwg==
-X-Gm-Message-State: APjAAAUDsgdHmcja567XTzLJ+AXIHROZYsfSsAxl1rvQyHlNMhe1DUX3
-        Bbu4IEIuliICwMLUwxS86ZuVB7Id
-X-Google-Smtp-Source: APXvYqxQtVrDyVQTPETlefWXQ8Z0BnDc1dfeAnKn9pDyxLpMFspzLm3H8P5D9WhnPS9zWn6dt551/A==
-X-Received: by 2002:a1c:c7c8:: with SMTP id x191mr2860289wmf.146.1557317803365;
-        Wed, 08 May 2019 05:16:43 -0700 (PDT)
-Received: from 640k.localdomain.com ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id p24sm1509368wma.18.2019.05.08.05.16.42
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 08 May 2019 05:16:42 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Peter Shier <pshier@google.com>,
-        Aaron Lewis <aaronlewis@google.com>
-Subject: [PATCH v2] kvm: nVMX: Set nested_run_pending in vmx_set_nested_state after checks complete
-Date:   Wed,  8 May 2019 14:16:39 +0200
-Message-Id: <1557317799-39866-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1728454AbfEHMWH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 08:22:07 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:46886 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726751AbfEHMWG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 08:22:06 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x48CJBEV086953;
+        Wed, 8 May 2019 12:20:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=Vy0vJPC+R/qK4BTy9W8k2EK+1DkuBwwYmX4Im7RV/1I=;
+ b=rwrtMH5vFY76MnriFuwWJRty7cv6d48ndLvoH9qa0iSpe18cQhaRn84K+EEAZ1el4f/y
+ JYXzNPHiRG6Um3c2LeXmrh0vIUgokB68rrApoaQDWIhQiq3xdWk5gSEBW5t2CsNm+NQD
+ vMj6o0elaMb6F0MU58KC4FWtRSn89CRe22TBfRL7zCGITD8/HSnJoDvmL6xh8b//HGVN
+ 0/+i+9yb5Er16ot7xGaUWYdgVLnSKYTBDh5U+VgaaiAGanyy3YqtlO3+pRPaxxQxAHqK
+ Taf9LSC6aD/fmeyve7zi016PT3fCR2HgfwqDVjH/4iBaBbfLBHPj+ptzQwZZXQN8uHEa Qg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2130.oracle.com with ESMTP id 2s94b63etg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 08 May 2019 12:20:31 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x48CJL8V107697;
+        Wed, 8 May 2019 12:20:30 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2s94ag20en-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 08 May 2019 12:20:30 +0000
+Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x48CKNew007185;
+        Wed, 8 May 2019 12:20:24 GMT
+Received: from kadam (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 08 May 2019 05:20:22 -0700
+Date:   Wed, 8 May 2019 15:20:10 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Alexandru Ardelean <alexandru.ardelean@analog.com>
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-clk@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-rockchip@lists.infradead.org, linux-pm@vger.kernel.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-omap@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-tegra@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-usb@vger.kernel.org, kvm@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-mtd@lists.infradead.org,
+        cgroups@vger.kernel.org, linux-mm@kvack.org,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org, alsa-devel@alsa-project.org,
+        gregkh@linuxfoundation.org, andriy.shevchenko@linux.intel.com
+Subject: Re: [PATCH 09/16] mmc: sdhci-xenon: use new match_string()
+ helper/macro
+Message-ID: <20190508122010.GC21059@kadam>
+References: <20190508112842.11654-1-alexandru.ardelean@analog.com>
+ <20190508112842.11654-11-alexandru.ardelean@analog.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190508112842.11654-11-alexandru.ardelean@analog.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9250 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=644
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905080079
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9250 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=665 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905080079
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Aaron Lewis <aaronlewis@google.com>
+On Wed, May 08, 2019 at 02:28:35PM +0300, Alexandru Ardelean wrote:
+> -static const char * const phy_types[] = {
+> -	"emmc 5.0 phy",
+> -	"emmc 5.1 phy"
+> -};
+> -
+>  enum xenon_phy_type_enum {
+>  	EMMC_5_0_PHY,
+>  	EMMC_5_1_PHY,
+>  	NR_PHY_TYPES
 
-nested_run_pending=1 implies we have successfully entered guest mode.
-Move setting from external state in vmx_set_nested_state() until after
-all other checks are complete.
+There is no need for NR_PHY_TYPES now so you could remove that as well.
 
-Based on a patch by Aaron Lewis.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx/nested.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index cec77f30f61c..e58caff92694 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -5420,9 +5420,6 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
- 	if (!(kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE))
- 		return 0;
- 
--	vmx->nested.nested_run_pending =
--		!!(kvm_state->flags & KVM_STATE_NESTED_RUN_PENDING);
--
- 	if (nested_cpu_has_shadow_vmcs(vmcs12) &&
- 	    vmcs12->vmcs_link_pointer != -1ull) {
- 		struct vmcs12 *shadow_vmcs12 = get_shadow_vmcs12(vcpu);
-@@ -5446,9 +5443,14 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
- 		return -EINVAL;
- 
- 	vmx->nested.dirty_vmcs12 = true;
-+	vmx->nested.nested_run_pending =
-+		!!(kvm_state->flags & KVM_STATE_NESTED_RUN_PENDING);
-+
- 	ret = nested_vmx_enter_non_root_mode(vcpu, false);
--	if (ret)
-+	if (ret) {
-+		vmx->nested.nested_run_pending = 0;
- 		return -EINVAL;
-+	}
- 
- 	return 0;
- }
--- 
-1.8.3.1
+regards,
+dan carpenter
 
