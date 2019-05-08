@@ -2,229 +2,427 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1330117BAD
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:38:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53F1217C7A
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:52:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728017AbfEHOiU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:38:20 -0400
-Received: from foss.arm.com ([217.140.101.70]:36400 "EHLO foss.arm.com"
+        id S1728122AbfEHOoh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:44:37 -0400
+Received: from mga14.intel.com ([192.55.52.115]:48394 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727354AbfEHOiT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 10:38:19 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F32DFA78;
-        Wed,  8 May 2019 07:38:18 -0700 (PDT)
-Received: from [10.1.196.75] (e110467-lin.cambridge.arm.com [10.1.196.75])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 830FF3F238;
-        Wed,  8 May 2019 07:38:14 -0700 (PDT)
-Subject: Re: [PATCH v7 13/23] iommu/smmuv3: Implement
- attach/detach_pasid_table
-To:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
-        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
-        yi.l.liu@intel.com, jean-philippe.brucker@arm.com,
-        will.deacon@arm.com
-Cc:     kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com,
-        christoffer.dall@arm.com, peter.maydell@linaro.org,
-        vincent.stehle@arm.com
-References: <20190408121911.24103-1-eric.auger@redhat.com>
- <20190408121911.24103-14-eric.auger@redhat.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-Message-ID: <acde8b95-9cbc-c5e6-eb28-37bff7431e40@arm.com>
-Date:   Wed, 8 May 2019 15:38:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1728088AbfEHOog (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 10:44:36 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:34 -0700
+X-ExtLoop1: 1
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orsmga002.jf.intel.com with ESMTP; 08 May 2019 07:44:29 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1000)
+        id 7AD4C26B; Wed,  8 May 2019 17:44:28 +0300 (EEST)
+From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@amacapital.net>,
+        David Howells <dhowells@redhat.com>
+Cc:     Kees Cook <keescook@chromium.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Kai Huang <kai.huang@linux.intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 00/62] Intel MKTME enabling
+Date:   Wed,  8 May 2019 17:43:20 +0300
+Message-Id: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190408121911.24103-14-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/04/2019 13:19, Eric Auger wrote:
-> On attach_pasid_table() we program STE S1 related info set
-> by the guest into the actual physical STEs. At minimum
-> we need to program the context descriptor GPA and compute
-> whether the stage1 is translated/bypassed or aborted.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> v6 -> v7:
-> - check versions and comment the fact we don't need to take
->    into account s1dss and s1fmt
-> v3 -> v4:
-> - adapt to changes in iommu_pasid_table_config
-> - different programming convention at s1_cfg/s2_cfg/ste.abort
-> 
-> v2 -> v3:
-> - callback now is named set_pasid_table and struct fields
->    are laid out differently.
-> 
-> v1 -> v2:
-> - invalidate the STE before changing them
-> - hold init_mutex
-> - handle new fields
-> ---
->   drivers/iommu/arm-smmu-v3.c | 121 ++++++++++++++++++++++++++++++++++++
->   1 file changed, 121 insertions(+)
-> 
-> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-> index e22e944ffc05..1486baf53425 100644
-> --- a/drivers/iommu/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm-smmu-v3.c
-> @@ -2207,6 +2207,125 @@ static void arm_smmu_put_resv_regions(struct device *dev,
->   		kfree(entry);
->   }
->   
-> +static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
-> +				       struct iommu_pasid_table_config *cfg)
-> +{
-> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> +	struct arm_smmu_master_data *entry;
-> +	struct arm_smmu_s1_cfg *s1_cfg;
-> +	struct arm_smmu_device *smmu;
-> +	unsigned long flags;
-> +	int ret = -EINVAL;
-> +
-> +	if (cfg->format != IOMMU_PASID_FORMAT_SMMUV3)
-> +		return -EINVAL;
-> +
-> +	if (cfg->version != PASID_TABLE_CFG_VERSION_1 ||
-> +	    cfg->smmuv3.version != PASID_TABLE_SMMUV3_CFG_VERSION_1)
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&smmu_domain->init_mutex);
-> +
-> +	smmu = smmu_domain->smmu;
-> +
-> +	if (!smmu)
-> +		goto out;
-> +
-> +	if (!((smmu->features & ARM_SMMU_FEAT_TRANS_S1) &&
-> +	      (smmu->features & ARM_SMMU_FEAT_TRANS_S2))) {
-> +		dev_info(smmu_domain->smmu->dev,
-> +			 "does not implement two stages\n");
-> +		goto out;
-> +	}
+= Intro =
 
-That check is redundant (and frankly looks a little bit spammy). If the 
-one below is not enough, there is a problem elsewhere - if it's possible 
-for smmu_domain->stage to ever get set to ARM_SMMU_DOMAIN_NESTED without 
-both stages of translation present, we've already gone fundamentally wrong.
+The patchset brings enabling of Intel Multi-Key Total Memory Encryption.
+It consists of changes into multiple subsystems:
 
-> +
-> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-> +		goto out;
-> +
-> +	switch (cfg->config) {
-> +	case IOMMU_PASID_CONFIG_ABORT:
-> +		spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-> +		list_for_each_entry(entry, &smmu_domain->devices, list) {
-> +			entry->ste.s1_cfg = NULL;
-> +			entry->ste.abort = true;
-> +			arm_smmu_install_ste_for_dev(entry->dev->iommu_fwspec);
-> +		}
-> +		spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
-> +		ret = 0;
-> +		break;
-> +	case IOMMU_PASID_CONFIG_BYPASS:
-> +		spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-> +		list_for_each_entry(entry, &smmu_domain->devices, list) {
-> +			entry->ste.s1_cfg = NULL;
-> +			entry->ste.abort = false;
-> +			arm_smmu_install_ste_for_dev(entry->dev->iommu_fwspec);
-> +		}
-> +		spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
-> +		ret = 0;
-> +		break;
-> +	case IOMMU_PASID_CONFIG_TRANSLATE:
-> +		/*
-> +		 * we currently support a single CD so s1fmt and s1dss
-> +		 * fields are also ignored
-> +		 */
-> +		if (cfg->pasid_bits)
-> +			goto out;
-> +
-> +		s1_cfg = &smmu_domain->s1_cfg;
-> +		s1_cfg->cdptr_dma = cfg->base_ptr;
-> +
-> +		spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-> +		list_for_each_entry(entry, &smmu_domain->devices, list) {
-> +			entry->ste.s1_cfg = s1_cfg;
+ * Core MM: infrastructure for allocation pages, dealing with encrypted VMAs
+   and providing API setup encrypted mappings.
+ * arch/x86: feature enumeration, program keys into hardware, setup
+   page table entries for encrypted pages and more.
+ * Key management service: setup and management of encryption keys.
+ * DMA/IOMMU: dealing with encrypted memory on IO side.
+ * KVM: interaction with virtualization side.
+ * Documentation: description of APIs and usage examples.
 
-Either we reject valid->valid transitions outright, or we need to remove 
-and invalidate the existing S1 context from the STE at this point, no?
+The patchset is huge. This submission aims to give view to the full picture and
+get feedback on the overall design. The patchset will be split into more
+digestible pieces later.
 
-> +			entry->ste.abort = false;
-> +			arm_smmu_install_ste_for_dev(entry->dev->iommu_fwspec);
-> +		}
-> +		spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
-> +		ret = 0;
-> +		break;
-> +	default:
-> +		break;
-> +	}
-> +out:
-> +	mutex_unlock(&smmu_domain->init_mutex);
-> +	return ret;
-> +}
-> +
-> +static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
-> +{
-> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> +	struct arm_smmu_master_data *entry;
-> +	struct arm_smmu_device *smmu;
-> +	unsigned long flags;
-> +
-> +	mutex_lock(&smmu_domain->init_mutex);
-> +
-> +	smmu = smmu_domain->smmu;
-> +
-> +	if (!smmu)
-> +		return;
-> +
-> +	if (!((smmu->features & ARM_SMMU_FEAT_TRANS_S1) &&
-> +	      (smmu->features & ARM_SMMU_FEAT_TRANS_S2))) {
-> +		dev_info(smmu_domain->smmu->dev,
-> +			 "does not implement two stages\n");
-> +		return;
-> +	}
+Please review. Any feedback is welcome.
 
-Same comment as before.
+= Overview =
 
-Robin.
+Multi-Key Total Memory Encryption (MKTME)[1] is a technology that allows
+transparent memory encryption in upcoming Intel platforms.  It uses a new
+instruction (PCONFIG) for key setup and selects a key for individual pages by
+repurposing physical address bits in the page tables.
 
-> +
-> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-> +		return;
-> +
-> +	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
-> +	list_for_each_entry(entry, &smmu_domain->devices, list) {
-> +		entry->ste.s1_cfg = NULL;
-> +		entry->ste.abort = true;
-> +		arm_smmu_install_ste_for_dev(entry->dev->iommu_fwspec);
-> +	}
-> +	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
-> +
-> +	memset(&smmu_domain->s1_cfg, 0, sizeof(struct arm_smmu_s1_cfg));
-> +	mutex_unlock(&smmu_domain->init_mutex);
-> +}
-> +
->   static struct iommu_ops arm_smmu_ops = {
->   	.capable		= arm_smmu_capable,
->   	.domain_alloc		= arm_smmu_domain_alloc,
-> @@ -2225,6 +2344,8 @@ static struct iommu_ops arm_smmu_ops = {
->   	.of_xlate		= arm_smmu_of_xlate,
->   	.get_resv_regions	= arm_smmu_get_resv_regions,
->   	.put_resv_regions	= arm_smmu_put_resv_regions,
-> +	.attach_pasid_table	= arm_smmu_attach_pasid_table,
-> +	.detach_pasid_table	= arm_smmu_detach_pasid_table,
->   	.pgsize_bitmap		= -1UL, /* Restricted during device attach */
->   };
->   
-> 
+These patches add support for MKTME into the existing kernel keyring subsystem
+and add a new mprotect_encrypt() system call that can be used by applications
+to encrypt anonymous memory with keys obtained from the keyring.
+
+This architecture supports encrypting both normal, volatile DRAM and persistent
+memory.  However, these patches do not implement persistent memory support.  We
+anticipate adding that support next.
+
+== Hardware Background ==
+
+MKTME is built on top of an existing single-key technology called TME.  TME
+encrypts all system memory using a single key generated by the CPU on every
+boot of the system. TME provides mitigation against physical attacks, such as
+physically removing a DIMM or watching memory bus traffic.
+
+MKTME enables the use of multiple encryption keys[2], allowing selection of the
+encryption key per-page using the page tables.  Encryption keys are programmed
+into each memory controller and the same set of keys is available to all
+entities on the system with access to that memory (all cores, DMA engines,
+etc...).
+
+MKTME inherits many of the mitigations against hardware attacks from TME.  Like
+TME, MKTME does not mitigate vulnerable or malicious operating systems or
+virtual machine managers.  MKTME offers additional mitigations when compared to
+TME.
+
+TME and MKTME use the AES encryption algorithm in the AES-XTS mode.  This mode,
+typically used for block-based storage devices, takes the physical address of
+the data into account when encrypting each block.  This ensures that the
+effective key is different for each block of memory. Moving encrypted content
+across physical address results in garbage on read, mitigating block-relocation
+attacks.  This property is the reason many of the discussed attacks require
+control of a shared physical page to be handed from the victim to the attacker.
+
+== MKTME-Provided Mitigations ==
+
+MKTME adds a few mitigations against attacks that are not mitigated when using
+TME alone.  The first set are mitigations against software attacks that are
+familiar today:
+
+ * Kernel Mapping Attacks: information disclosures that leverage the
+   kernel direct map are mitigated against disclosing user data.
+ * Freed Data Leak Attacks: removing an encryption key from the
+   hardware mitigates future user information disclosure.
+
+The next set are attacks that depend on specialized hardware, such as an “evil
+DIMM” or a DDR interposer:
+
+ * Cross-Domain Replay Attack: data is captured from one domain
+   (guest) and replayed to another at a later time.
+ * Cross-Domain Capture and Delayed Compare Attack: data is captured
+   and later analyzed to discover secrets.
+ * Key Wear-out Attack: data is captured and analyzed in order to
+   Weaken the AES encryption itself.
+
+More details on these attacks are below.
+
+=== Kernel Mapping Attacks ===
+
+Information disclosure vulnerabilities leverage the kernel direct map because
+many vulnerabilities involve manipulation of kernel data structures (examples:
+CVE-2017-7277, CVE-2017-9605).  We normally think of these bugs as leaking
+valuable *kernel* data, but they can leak application data when application
+pages are recycled for kernel use.
+
+With this MKTME implementation, there is a direct map created for each MKTME
+KeyID which is used whenever the kernel needs to access plaintext.  But, all
+kernel data structures are accessed via the direct map for KeyID-0.  Thus,
+memory reads which are not coordinated with the KeyID get garbage (for example,
+accessing KeyID-4 data with the KeyID-0 mapping).
+
+This means that if sensitive data encrypted using MKTME is leaked via the
+KeyID-0 direct map, ciphertext decrypted with the wrong key will be disclosed.
+To disclose plaintext, an attacker must “pivot” to the correct direct mapping,
+which is non-trivial because there are no kernel data structures in the
+KeyID!=0 direct mapping.
+
+=== Freed Data Leak Attack ===
+
+The kernel has a history of bugs around uninitialized data.  Usually, we think
+of these bugs as leaking sensitive kernel data, but they can also be used to
+leak application secrets.
+
+MKTME can help mitigate the case where application secrets are leaked:
+
+ * App (or VM) places a secret in a page
+ * App exits or frees memory to kernel allocator
+ * Page added to allocator free list
+ * Attacker reallocates page to a purpose where it can read the page
+
+Now, imagine MKTME was in use on the memory being leaked.  The data can only be
+leaked as long as the key is programmed in the hardware.  If the key is
+de-programmed, like after all pages are freed after a guest is shut down, any
+future reads will just see ciphertext.
+
+Basically, the key is a convenient choke-point: you can be more confident that
+data encrypted with it is inaccessible once the key is removed.
+
+=== Cross-Domain Replay Attack ===
+
+MKTME mitigates cross-domain replay attacks where an attacker replaces an
+encrypted block owned by one domain with a block owned by another domain.
+MKTME does not prevent this replacement from occurring, but it does mitigate
+plaintext from being disclosed if the domains use different keys.
+
+With TME, the attack could be executed by:
+ * A victim places secret in memory, at a given physical address.
+   Note: AES-XTS is what restricts the attack to being performed at a
+   single physical address instead of across different physical
+   addresses
+ * Attacker captures victim secret’s ciphertext
+ * Later on, after victim frees the physical address, attacker gains
+   ownership
+ * Attacker puts the ciphertext at the address and get the secret
+   plaintext
+
+But, due to the presumably different keys used by the attacker and the victim,
+the attacker can not successfully decrypt old ciphertext.
+
+=== Cross-Domain Capture and Delayed Compare Attack ===
+
+This is also referred to as a kind of dictionary attack.
+
+Similarly, MKTME protects against cross-domain capture-and-compare attacks.
+Consider the following scenario:
+ * A victim places a secret in memory, at a known physical address
+ * Attacker captures victim’s ciphertext
+ * Attacker gains control of the target physical address, perhaps
+   after the victim’s VM is shut down or its memory reclaimed.
+ * Attacker computes and writes many possible plaintexts until new
+   ciphertext matches content captured previously.
+
+Secrets which have low (plaintext) entropy are more vulnerable to this attack
+because they reduce the number of possible plaintexts an attacker has to
+compute and write.
+
+The attack will not work if attacker and victim uses different keys.
+
+=== Key Wear-out Attack ===
+
+Repeated use of an encryption key might be used by an attacker to infer
+information about the key or the plaintext, weakening the encryption.  The
+higher the bandwidth of the encryption engine, the more vulnerable the key is
+to wear-out.  The MKTME memory encryption hardware works at the speed of the
+memory bus, which has high bandwidth.
+
+Such a weakness has been demonstrated[3] on a theoretical cipher with similar
+properties as AES-XTS.
+
+An attack would take the following steps:
+ * Victim system is using TME with AES-XTS-128
+ * Attacker repeatedly captures ciphertext/plaintext pairs (can be
+   Performed with online hardware attack like an interposer).
+ * Attacker compels repeated use of the key under attack for a
+   sustained time period without a system reboot[4].
+ * Attacker discovers a cipertext collision (two plaintexts
+   translating to the same ciphertext)
+ * Attacker can induce controlled modifications to the targeted
+   plaintext by modifying the colliding ciphertext
+
+MKTME mitigates key wear-out in two ways:
+ * Keys can be rotated periodically to mitigate wear-out.  Since TME
+   keys are generated at boot, rotation of TME keys requires a
+   reboot.  In contrast, MKTME allows rotation while the system is
+   booted.  An application could implement a policy to rotate keys at
+   a frequency which is not feasible to attack.
+ * In the case that MKTME is used to encrypt two guests’ memory with
+   two different keys, an attack on one guest’s key would not weaken
+   the key used in the second guest.
+
+--
+
+[1] https://software.intel.com/sites/default/files/managed/a5/16/Multi-Key-Total-Memory-Encryption-Spec.pdf
+[2] The MKTME architecture supports up to 16 bits of KeyIDs, so a
+    maximum of 65535 keys on top of the “TME key” at KeyID-0.  The
+    first implementation is expected to support 5 bits, making 63 keys
+    available to applications.  However, this is not guaranteed.  The
+    number of available keys could be reduced if, for instance,
+    additional physical address space is desired over additional
+    KeyIDs.
+[3] http://web.cs.ucdavis.edu/~rogaway/papers/offsets.pdf
+[4] This sustained time required for an attack could vary from days
+    to years depending on the attacker’s goals.
+
+Alison Schofield (33):
+  x86/pconfig: Set a valid encryption algorithm for all MKTME commands
+  keys/mktme: Introduce a Kernel Key Service for MKTME
+  keys/mktme: Preparse the MKTME key payload
+  keys/mktme: Instantiate and destroy MKTME keys
+  keys/mktme: Move the MKTME payload into a cache aligned structure
+  keys/mktme: Strengthen the entropy of CPU generated MKTME keys
+  keys/mktme: Set up PCONFIG programming targets for MKTME keys
+  keys/mktme: Program MKTME keys into the platform hardware
+  keys/mktme: Set up a percpu_ref_count for MKTME keys
+  keys/mktme: Require CAP_SYS_RESOURCE capability for MKTME keys
+  keys/mktme: Store MKTME payloads if cmdline parameter allows
+  acpi: Remove __init from acpi table parsing functions
+  acpi/hmat: Determine existence of an ACPI HMAT
+  keys/mktme: Require ACPI HMAT to register the MKTME Key Service
+  acpi/hmat: Evaluate topology presented in ACPI HMAT for MKTME
+  keys/mktme: Do not allow key creation in unsafe topologies
+  keys/mktme: Support CPU hotplug for MKTME key service
+  keys/mktme: Find new PCONFIG targets during memory hotplug
+  keys/mktme: Program new PCONFIG targets with MKTME keys
+  keys/mktme: Support memory hotplug for MKTME keys
+  mm: Generalize the mprotect implementation to support extensions
+  syscall/x86: Wire up a system call for MKTME encryption keys
+  x86/mm: Set KeyIDs in encrypted VMAs for MKTME
+  mm: Add the encrypt_mprotect() system call for MKTME
+  x86/mm: Keep reference counts on encrypted VMAs for MKTME
+  mm: Restrict MKTME memory encryption to anonymous VMAs
+  selftests/x86/mktme: Test the MKTME APIs
+  x86/mktme: Overview of Multi-Key Total Memory Encryption
+  x86/mktme: Document the MKTME provided security mitigations
+  x86/mktme: Document the MKTME kernel configuration requirements
+  x86/mktme: Document the MKTME Key Service API
+  x86/mktme: Document the MKTME API for anonymous memory encryption
+  x86/mktme: Demonstration program using the MKTME APIs
+
+Jacob Pan (3):
+  iommu/vt-d: Support MKTME in DMA remapping
+  x86/mm: introduce common code for mem encryption
+  x86/mm: Use common code for DMA memory encryption
+
+Kai Huang (2):
+  mm, x86: export several MKTME variables
+  kvm, x86, mmu: setup MKTME keyID to spte for given PFN
+
+Kirill A. Shutemov (24):
+  mm: Do no merge VMAs with different encryption KeyIDs
+  mm: Add helpers to setup zero page mappings
+  mm/ksm: Do not merge pages with different KeyIDs
+  mm/page_alloc: Unify alloc_hugepage_vma()
+  mm/page_alloc: Handle allocation for encrypted memory
+  mm/khugepaged: Handle encrypted pages
+  x86/mm: Mask out KeyID bits from page table entry pfn
+  x86/mm: Introduce variables to store number, shift and mask of KeyIDs
+  x86/mm: Preserve KeyID on pte_modify() and pgprot_modify()
+  x86/mm: Detect MKTME early
+  x86/mm: Add a helper to retrieve KeyID for a page
+  x86/mm: Add a helper to retrieve KeyID for a VMA
+  x86/mm: Add hooks to allocate and free encrypted pages
+  x86/mm: Map zero pages into encrypted mappings correctly
+  x86/mm: Rename CONFIG_RANDOMIZE_MEMORY_PHYSICAL_PADDING
+  x86/mm: Allow to disable MKTME after enumeration
+  x86/mm: Calculate direct mapping size
+  x86/mm: Implement syncing per-KeyID direct mappings
+  x86/mm: Handle encrypted memory in page_to_virt() and __pa()
+  mm/page_ext: Export lookup_page_ext() symbol
+  mm/rmap: Clear vma->anon_vma on unlink_anon_vmas()
+  x86/mm: Disable MKTME on incompatible platform configurations
+  x86/mm: Disable MKTME if not all system memory supports encryption
+  x86: Introduce CONFIG_X86_INTEL_MKTME
+
+ .../admin-guide/kernel-parameters.rst         |   1 +
+ .../admin-guide/kernel-parameters.txt         |  11 +
+ Documentation/x86/mktme/index.rst             |  13 +
+ .../x86/mktme/mktme_configuration.rst         |  17 +
+ Documentation/x86/mktme/mktme_demo.rst        |  53 ++
+ Documentation/x86/mktme/mktme_encrypt.rst     |  57 ++
+ Documentation/x86/mktme/mktme_keys.rst        |  96 +++
+ Documentation/x86/mktme/mktme_mitigations.rst | 150 ++++
+ Documentation/x86/mktme/mktme_overview.rst    |  57 ++
+ Documentation/x86/x86_64/mm.txt               |   4 +
+ arch/alpha/include/asm/page.h                 |   2 +-
+ arch/x86/Kconfig                              |  29 +-
+ arch/x86/entry/syscalls/syscall_32.tbl        |   1 +
+ arch/x86/entry/syscalls/syscall_64.tbl        |   1 +
+ arch/x86/include/asm/intel-family.h           |   2 +
+ arch/x86/include/asm/intel_pconfig.h          |  14 +-
+ arch/x86/include/asm/mem_encrypt.h            |  29 +
+ arch/x86/include/asm/mktme.h                  |  93 +++
+ arch/x86/include/asm/page.h                   |   4 +
+ arch/x86/include/asm/page_32.h                |   1 +
+ arch/x86/include/asm/page_64.h                |   4 +-
+ arch/x86/include/asm/pgtable.h                |  19 +
+ arch/x86/include/asm/pgtable_types.h          |  23 +-
+ arch/x86/include/asm/setup.h                  |   6 +
+ arch/x86/kernel/cpu/intel.c                   |  58 +-
+ arch/x86/kernel/head64.c                      |   4 +
+ arch/x86/kernel/setup.c                       |   3 +
+ arch/x86/kvm/mmu.c                            |  18 +-
+ arch/x86/mm/Makefile                          |   3 +
+ arch/x86/mm/init_64.c                         |  68 ++
+ arch/x86/mm/kaslr.c                           |  11 +-
+ arch/x86/mm/mem_encrypt_common.c              |  28 +
+ arch/x86/mm/mktme.c                           | 630 ++++++++++++++
+ drivers/acpi/hmat/hmat.c                      |  67 ++
+ drivers/acpi/tables.c                         |  10 +-
+ drivers/firmware/efi/efi.c                    |  25 +-
+ drivers/iommu/intel-iommu.c                   |  29 +-
+ fs/dax.c                                      |   3 +-
+ fs/exec.c                                     |   4 +-
+ fs/userfaultfd.c                              |   7 +-
+ include/asm-generic/pgtable.h                 |   8 +
+ include/keys/mktme-type.h                     |  39 +
+ include/linux/acpi.h                          |   9 +-
+ include/linux/dma-direct.h                    |   4 +-
+ include/linux/efi.h                           |   1 +
+ include/linux/gfp.h                           |  51 +-
+ include/linux/intel-iommu.h                   |   9 +-
+ include/linux/mem_encrypt.h                   |  23 +-
+ include/linux/migrate.h                       |  14 +-
+ include/linux/mm.h                            |  27 +-
+ include/linux/page_ext.h                      |  11 +-
+ include/linux/syscalls.h                      |   2 +
+ include/uapi/asm-generic/unistd.h             |   4 +-
+ kernel/fork.c                                 |   2 +
+ kernel/sys_ni.c                               |   2 +
+ mm/compaction.c                               |   3 +
+ mm/huge_memory.c                              |   6 +-
+ mm/khugepaged.c                               |  10 +
+ mm/ksm.c                                      |  17 +
+ mm/madvise.c                                  |   2 +-
+ mm/memory.c                                   |   3 +-
+ mm/mempolicy.c                                |  30 +-
+ mm/migrate.c                                  |   4 +-
+ mm/mlock.c                                    |   2 +-
+ mm/mmap.c                                     |  31 +-
+ mm/mprotect.c                                 |  98 ++-
+ mm/page_alloc.c                               |  50 ++
+ mm/page_ext.c                                 |   5 +
+ mm/rmap.c                                     |   4 +-
+ mm/userfaultfd.c                              |   3 +-
+ security/keys/Makefile                        |   1 +
+ security/keys/mktme_keys.c                    | 768 ++++++++++++++++++
+ .../selftests/x86/mktme/encrypt_tests.c       | 433 ++++++++++
+ .../testing/selftests/x86/mktme/flow_tests.c  | 266 ++++++
+ tools/testing/selftests/x86/mktme/key_tests.c | 526 ++++++++++++
+ .../testing/selftests/x86/mktme/mktme_test.c  | 300 +++++++
+ 76 files changed, 4301 insertions(+), 122 deletions(-)
+ create mode 100644 Documentation/x86/mktme/index.rst
+ create mode 100644 Documentation/x86/mktme/mktme_configuration.rst
+ create mode 100644 Documentation/x86/mktme/mktme_demo.rst
+ create mode 100644 Documentation/x86/mktme/mktme_encrypt.rst
+ create mode 100644 Documentation/x86/mktme/mktme_keys.rst
+ create mode 100644 Documentation/x86/mktme/mktme_mitigations.rst
+ create mode 100644 Documentation/x86/mktme/mktme_overview.rst
+ create mode 100644 arch/x86/include/asm/mktme.h
+ create mode 100644 arch/x86/mm/mem_encrypt_common.c
+ create mode 100644 arch/x86/mm/mktme.c
+ create mode 100644 include/keys/mktme-type.h
+ create mode 100644 security/keys/mktme_keys.c
+ create mode 100644 tools/testing/selftests/x86/mktme/encrypt_tests.c
+ create mode 100644 tools/testing/selftests/x86/mktme/flow_tests.c
+ create mode 100644 tools/testing/selftests/x86/mktme/key_tests.c
+ create mode 100644 tools/testing/selftests/x86/mktme/mktme_test.c
+
+-- 
+2.20.1
+
