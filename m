@@ -2,26 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 66F5517C07
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:47:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3331717C21
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:48:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728466AbfEHOov (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:44:51 -0400
-Received: from mga02.intel.com ([134.134.136.20]:19918 "EHLO mga02.intel.com"
+        id S1727530AbfEHOsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:48:25 -0400
+Received: from mga02.intel.com ([134.134.136.20]:19899 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728395AbfEHOou (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1728423AbfEHOou (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 8 May 2019 10:44:50 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:49 -0700
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:50 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.60,446,1549958400"; 
-   d="scan'208";a="169656563"
+   d="scan'208";a="169656569"
 Received: from black.fi.intel.com ([10.237.72.28])
   by fmsmga002.fm.intel.com with ESMTP; 08 May 2019 07:44:44 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id B16F3D2B; Wed,  8 May 2019 17:44:30 +0300 (EEST)
+        id BF156D4A; Wed,  8 May 2019 17:44:30 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -38,9 +38,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 40/62] keys/mktme: Program new PCONFIG targets with MKTME keys
-Date:   Wed,  8 May 2019 17:44:00 +0300
-Message-Id: <20190508144422.13171-41-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 41/62] keys/mktme: Support memory hotplug for MKTME keys
+Date:   Wed,  8 May 2019 17:44:01 +0300
+Message-Id: <20190508144422.13171-42-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -53,86 +53,115 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alison Schofield <alison.schofield@intel.com>
 
-When a new PCONFIG target is added to an MKTME platform, its
-key table needs to be programmed to match the key tables across
-the entire platform. This type of newly added PCONFIG target
-may appear during a memory hotplug event.
+Newly added memory may mean that there is a newly added physical
+package.  Intel platforms supporting MKTME need to know about the
+new physical packages that may appear during MEM_GOING_ONLINE
+events.
 
-This key programming path will differ from the normal key
-programming path in that it will only program a single PCONFIG
-target, AND, it will only do that programming if allowed.
+Add a memory notifier for MEM_GOING_ONLINE events where MKTME
+can evaluate this new memory before it goes online.
 
-Allowed means that either user type keys are stored, or, no
-user type keys are currently programmed.
+MKTME will quickly NOTIFY_OK in MEM_GOING_ONLINE events if no MKTME
+keys are currently programmed. If the newly added memory presents
+an unsafe MKTME topology, that will be found and reported during the
+next key creation attempt. (User can repair and retry.)
 
-So, after checking if programming is allowable, this helper
-function will program the one new PCONFIG target, with all
-the currently programmed keys.
-
-This will be used in MKTME's memory notifier callback supporting
-MEM_GOING_ONLINE events.
+When MKTME keys are currently programmed, MKTME will evaluate the
+platform topology, detect if a new PCONFIG target has been added,
+and program that new pconfig target if allowable.
 
 Signed-off-by: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- security/keys/mktme_keys.c | 44 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+ security/keys/mktme_keys.c | 57 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
 diff --git a/security/keys/mktme_keys.c b/security/keys/mktme_keys.c
-index 2c975c48fe44..489dddb8c623 100644
+index 489dddb8c623..904748b540c6 100644
 --- a/security/keys/mktme_keys.c
 +++ b/security/keys/mktme_keys.c
-@@ -582,6 +582,50 @@ static int mktme_get_new_pconfig_target(void)
- 	return new_target;
+@@ -8,6 +8,7 @@
+ #include <linux/init.h>
+ #include <linux/key.h>
+ #include <linux/key-type.h>
++#include <linux/memory.h>
+ #include <linux/mm.h>
+ #include <linux/parser.h>
+ #include <linux/percpu-refcount.h>
+@@ -626,6 +627,56 @@ static int mktme_program_new_pconfig_target(int new_pkg)
+ 	return ret;
  }
  
-+static int mktme_program_new_pconfig_target(int new_pkg)
++static int mktme_memory_callback(struct notifier_block *nb,
++				 unsigned long action, void *arg)
 +{
-+	struct mktme_payload *payload;
-+	int cpu, keyid, ret;
++	unsigned long flags;
++	int ret, new_target;
++
++	/* MEM_GOING_ONLINE is the only mem event of interest to MKTME */
++	if (action != MEM_GOING_ONLINE)
++		return NOTIFY_OK;
++
++	/* Do not allow key programming during hotplug event */
++	spin_lock_irqsave(&mktme_lock, flags);
 +
 +	/*
-+	 * Only program new target when user type keys are stored or,
-+	 * no user type keys are currently programmed.
++	 * If no keys are actually programmed let this event proceed.
++	 * The topology will be checked on the next key creation attempt.
 +	 */
-+	if (!mktme_storekeys &&
-+	    (bitmap_weight(mktme_bitmap_user_type, mktme_nr_keyids)))
-+		return -EPERM;
-+
-+	/* Set mktme_leadcpus to only include new target */
-+	cpumask_clear(mktme_leadcpus);
-+	for_each_online_cpu(cpu) {
-+		if (topology_physical_package_id(cpu) == new_pkg) {
-+			__cpumask_set_cpu(cpu, mktme_leadcpus);
-+			break;
-+		}
++	if (!mktme_map->mapped_keyids) {
++		mktme_allow_keys = false;
++		ret = NOTIFY_OK;
++		goto out;
 +	}
-+	/* Program the stored keys into the new key table */
-+	for (keyid = 1; keyid <= mktme_nr_keyids; keyid++) {
-+		/*
-+		 * When a KeyID slot is not in use, the corresponding key
-+		 * pointer is 0. '-1' is an intermediate state where the
-+		 * key is on it's way out, but not gone yet. Program '-1's.
-+		 */
-+		if (mktme_map->key[keyid] == 0)
-+			continue;
-+
-+		payload = &mktme_key_store[keyid];
-+		ret = mktme_program_keyid(keyid, payload);
-+		if (ret != MKTME_PROG_SUCCESS) {
-+			/* Quit on first failure to program key table */
-+			pr_debug("mktme: %s\n", mktme_error[ret].msg);
-+			ret = -ENOKEY;
-+			break;
-+		}
++	/* Do not allow this event if it creates an unsafe MKTME topology */
++	if (!mktme_hmat_evaluate()) {
++		ret = NOTIFY_BAD;
++		goto out;
 +	}
-+	mktme_update_pconfig_targets();		/* Restore mktme_leadcpus */
++	/* Topology is safe. Is there a new pconfig target? */
++	new_target = mktme_get_new_pconfig_target();
++
++	/* No new target to program */
++	if (new_target < 0) {
++		ret = NOTIFY_OK;
++		goto out;
++	}
++	if (mktme_program_new_pconfig_target(new_target))
++		ret = NOTIFY_BAD;
++	else
++		ret = NOTIFY_OK;
++
++out:
++	spin_unlock_irqrestore(&mktme_lock, flags);
 +	return ret;
 +}
++
++static struct notifier_block mktme_memory_nb = {
++	.notifier_call = mktme_memory_callback,
++	.priority = 99,				/* priority ? */
++};
 +
  static int __init init_mktme(void)
  {
  	int ret, cpuhp;
+@@ -679,10 +730,16 @@ static int __init init_mktme(void)
+ 	if (cpuhp < 0)
+ 		goto free_store;
+ 
++	/* Memory hotplug */
++	if (register_memory_notifier(&mktme_memory_nb))
++		goto remove_cpuhp;
++
+ 	ret = register_key_type(&key_type_mktme);
+ 	if (!ret)
+ 		return ret;			/* SUCCESS */
+ 
++	unregister_memory_notifier(&mktme_memory_nb);
++remove_cpuhp:
+ 	cpuhp_remove_state_nocalls(cpuhp);
+ free_store:
+ 	kfree(mktme_key_store);
 -- 
 2.20.1
 
