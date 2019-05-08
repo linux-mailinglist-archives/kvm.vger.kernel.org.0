@@ -2,94 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E299175D3
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 12:18:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26F3217F51
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 19:47:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726727AbfEHKSE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 06:18:04 -0400
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:50151 "EHLO
-        7.mo2.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725778AbfEHKSE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 06:18:04 -0400
-X-Greylist: delayed 151951 seconds by postgrey-1.27 at vger.kernel.org; Wed, 08 May 2019 06:18:02 EDT
-Received: from player734.ha.ovh.net (unknown [10.109.160.230])
-        by mo2.mail-out.ovh.net (Postfix) with ESMTP id A7445191317
-        for <kvm@vger.kernel.org>; Wed,  8 May 2019 12:18:01 +0200 (CEST)
-Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
-        (Authenticated sender: clg@kaod.org)
-        by player734.ha.ovh.net (Postfix) with ESMTPSA id F204157A1D76;
-        Wed,  8 May 2019 10:17:54 +0000 (UTC)
-Subject: Re: [PATCH] KVM: fix 'release' method of KVM device
-To:     David Hildenbrand <david@redhat.com>, kvm-ppc@vger.kernel.org
-Cc:     Paul Mackerras <paulus@samba.org>,
-        David Gibson <david@gibson.dropbear.id.au>, kvm@vger.kernel.org
-References: <20190507162047.17152-1-clg@kaod.org>
- <2d3bb5ca-65fe-96ff-5a4e-2ba050c41713@redhat.com>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <79107e6e-8562-0b39-9dec-d163ab158a47@kaod.org>
-Date:   Wed, 8 May 2019 12:17:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <2d3bb5ca-65fe-96ff-5a4e-2ba050c41713@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 12454986248125516679
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrkeefgddvhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+        id S1726506AbfEHRrj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 13:47:39 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:40501 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726545AbfEHRrj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 13:47:39 -0400
+Received: by mail-pl1-f193.google.com with SMTP id b3so10262881plr.7
+        for <kvm@vger.kernel.org>; Wed, 08 May 2019 10:47:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=PFlfinL4QrH6+E0rbK20t90kmF3LL+L0LytJ6mzGHQI=;
+        b=R7UIKb1Vw92WlTOAb+YpulW36qj6DEUfI7u662d4lqpl11Kv4ufl05J09Q3A+tXnuL
+         VsD4kkhNX6QLJmlJhcfCxnMkk1xKqREbFS5uhEa7hA1UZHU6bX7QVBh6ApX5qmDmBp5d
+         LwW5oHtc1/4EChXGg5SBHmbn07sqvvbj5Ckwsbvn8/pqQVuxpasDwpBkjnrHsuCNRZiB
+         5cfp9dtyG6fE0ykxrZP106ZKVx4zftL0Y2kXTbDpZhPty0OP36C84aAT89oetlC0wn/M
+         gCSsGlE9ArRHG2oBgXJuAbpqBT/nvkfnlU+TWDTi38417QV/tcnPm2JrdG3xHaDXyO6f
+         zZrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=PFlfinL4QrH6+E0rbK20t90kmF3LL+L0LytJ6mzGHQI=;
+        b=YImMdfYduxyAanl8KuJFcVWq+4YkEBDCjUmnsZwZ+6SVoj/ly9cANbvfqBEcYyCoMf
+         8PiWGaD1MriDTvERn+tddAhVJ46acMPWtxLIHFgfJd7WZlb0s+ilG6BX9HxQ/SX60kbJ
+         4sol5i+rC5EVlrv9NTY8mK2S6ade8JFg70r08z6pQ3TF/bxKEDkhMxCx5V6Bf5jlLGhC
+         t9BZfEWPhZ/eXVa6nNFb/r/iHc6+aa/x176hZxXwsgwUJ1ZSL2rVIxZHDj/Mip60/a7y
+         aAzzvRLONwNio7t5t4KcXIT6bWrTI9j81NVGk11NJ/KrM8MnKmNeNxIYrOTjMx2PhcAV
+         Sdqw==
+X-Gm-Message-State: APjAAAWluVpaUSPSfb5A0NDW+nVJaoJbGuipQ2/KyTPaGVl99HJclvDl
+        TGIRS9xxPH58D56zeeCz2jQ=
+X-Google-Smtp-Source: APXvYqyxIZXCvVoLniUi5d45oaxPcNz2wgjGjZU0arqFitekTZj0cA06y5bJEDuU/HJElw+mIXPN7g==
+X-Received: by 2002:a17:902:6843:: with SMTP id f3mr48669302pln.218.1557337658480;
+        Wed, 08 May 2019 10:47:38 -0700 (PDT)
+Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id q14sm10097189pgg.10.2019.05.08.10.47.37
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 08 May 2019 10:47:37 -0700 (PDT)
+From:   Nadav Amit <nadav.amit@gmail.com>
+X-Google-Original-From: Nadav Amit <namit@vmware.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [kvm-unit-tests PATCH 0/2] x86: nVMX: Fix NMI/INTR-window tests
+Date:   Wed,  8 May 2019 03:27:13 -0700
+Message-Id: <20190508102715.685-1-namit@vmware.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/7/19 9:32 PM, David Hildenbrand wrote:
-> On 07.05.19 18:20, Cédric Le Goater wrote:
->> There is no need to test for the device pointer validity when releasing
->> a KVM device. The file descriptor should identify it safely.
-> 
-> "Fix" implies it is broken. Is it broken?
+From: Nadav Amit <nadav.amit@gmail.com>
 
-no, it's not broken indeed. The changes are removing useless 
-checks leftover from a previous patch. A title such as : 
+The NMI/INTR-window test in VMX have a couple of bugs. The first bug is
+clearly a test issue (and a KVM bug), and is fixed by the first patch.
 
-   remove useless checks in 'release' method of KVM device
+The second bug is more interesting, and looks as a silicon bug (or
+documentation bug, as Intel likes to call them). The second patch just
+ensures that a failure of the test would allow the next tests to run.
 
-would be more appropriate. I can send a v2 with Alexey's rb.
+Cc: Jim Mattson <jmattson@google.com>
+Cc: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Thanks,
+Nadav Amit (2):
+  x86: nVMX: Use #DB in nmi and intr tests
+  x86: nVMX: Set guest as active after NMI/INTR-window tests
 
-C.
+ x86/vmx_tests.c | 74 +++++++++++++++++++++++++------------------------
+ 1 file changed, 38 insertions(+), 36 deletions(-)
 
->>
->> Signed-off-by: Cédric Le Goater <clg@kaod.org>
->> ---
->>
->>  Fixes http://patchwork.ozlabs.org/patch/1087506/
->>  https://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc.git/commit/?h=kvm-ppc-next&id=2bde9b3ec8bdf60788e9e2ce8c07a2f8d6003dbd
->>
->>  virt/kvm/kvm_main.c | 6 ------
->>  1 file changed, 6 deletions(-)
->>
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index 161830ec0aa5..ac15b8fd8399 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -2939,12 +2939,6 @@ static int kvm_device_release(struct inode *inode, struct file *filp)
->>  	struct kvm_device *dev = filp->private_data;
->>  	struct kvm *kvm = dev->kvm;
->>  
->> -	if (!dev)
->> -		return -ENODEV;
->> -
->> -	if (dev->kvm != kvm)
->> -		return -EPERM;
->> -
->>  	if (dev->ops->release) {
->>  		mutex_lock(&kvm->lock);
->>  		list_del(&dev->vm_node);
->>
-> 
-> 
+-- 
+2.17.1
 
