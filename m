@@ -2,144 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 110D018034
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 21:05:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E319218044
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 21:10:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727328AbfEHTFn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 15:05:43 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:37255 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727331AbfEHTFn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 15:05:43 -0400
-Received: by mail-pg1-f193.google.com with SMTP id e6so10556380pgc.4
-        for <kvm@vger.kernel.org>; Wed, 08 May 2019 12:05:43 -0700 (PDT)
+        id S1727681AbfEHTJP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 15:09:15 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:43867 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726687AbfEHTJO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 15:09:14 -0400
+Received: by mail-pl1-f194.google.com with SMTP id n8so10367816plp.10
+        for <kvm@vger.kernel.org>; Wed, 08 May 2019 12:09:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=from:subject:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Xx1nBdwm/fMIaQ+XRMTVvJx4homKW8vOYVCrjJQah8c=;
-        b=u2CwdPBWUhvunu491lhDVH7O10yitnzRdNYTDcNKNGaaMw+pYsmkpn0J9MsT99d39Y
-         Q/Wk7PGyXcjoc1tha4UuyE89T0rOnD72kAWNnjYRKkjCa0DELX1ElQVVB5fGF3jmFGkX
-         uLZw9HuRYb+PEeZ/PPFrro1K3Iw9vCnd+ELZuZL2OKCDNAb8u9QKbTbbytR8kbwE4FBI
-         Zo/dlYVRRbaMO0EpBIfmHWL9EiKzdxDQc7t8r9e2EKWR9k2JLXoh6H4LfMbZMUTXsaF+
-         muQoMtmzSSBP8hE/rlSXFu27Me96rPxVPBbMGgvYpGy27lg+hjZKYMbf9BMngu5WO2ck
-         kXNg==
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=1u1hPl/qFt03mb/D28lmazA0h5tpYZGyorQTHBrh5GU=;
+        b=YVbqA8pEZxkKYOPsgpVm/AxaSnneIgfsGew5mgmu0L5BFrxUjoP9SlfabKNK8tdB40
+         gMKA++vBrx/AY8AbzM9H3unXTPcRczl9U27uVs3747mvcfi0NNdoC0SZB3Tmqa0IByuA
+         qXJxu2to4LBj1UtksXJq+OliL7YrJESDjhePp09CN8TOqOuwLFyY8mbePyQOYx+zz6jt
+         wDbzjXpW5x6TMiE++IF60IESjcnX4ptLIxd3+HZ7K2k72u02AcRameobdA3H+TsoIrMI
+         P2Sd9HsRW4arrY3i/OoJDwJXoHoB9z8Jfdz08ivv/tMhctJH4gedZ67jqFD41i3nghBx
+         EuWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Xx1nBdwm/fMIaQ+XRMTVvJx4homKW8vOYVCrjJQah8c=;
-        b=lvwgtNGoAq8Yzaec9QyWWHpyqzTADaF0MOE1ei8Grg4aJbA5XcoLlGa4uKdUZ3yWiH
-         MRZ9oyJP9LHy41HQHB2lMrsz5HNSshqtnBNY+JlMZqgacOV/bjBTsNuBMj2MksK655wo
-         yXssYQLyO9e7PEe8xyPakipMcoQ64Gi64XN04wQBqTaNITFYfoUHiZfwpN4zLiQu8I54
-         sHWdG4/STuqsd6dEsWSNDze0tuUgmrtEzl2hH7UkahPCorQBVv6WE0EI6KCcE5+Hhzaj
-         sUuRq47/QecbdPpUe+XVZ6xwm9JU5GQskYuFZusul1TS0jN10Zv8MsYsl544noyfQr6s
-         XGCQ==
-X-Gm-Message-State: APjAAAXfH5i1MWpnvSaC0LTkiWbO7merEyWwj2Bl0xbSes56IR9tVi1p
-        5pTF536f8vNacjBXeDfew5cgSw==
-X-Google-Smtp-Source: APXvYqzypNLQt7uc54cFtZOQcJp0DaX+ClanYsAzKwneRj68EqOnfHTAe97HizrDj+ZvHjUmPOl5NA==
-X-Received: by 2002:a65:5cc8:: with SMTP id b8mr47363166pgt.36.1557342342253;
-        Wed, 08 May 2019 12:05:42 -0700 (PDT)
-Received: from jstaron2.mtv.corp.google.com ([2620:15c:202:201:b94f:2527:c39f:ca2d])
-        by smtp.gmail.com with ESMTPSA id 129sm23470533pff.140.2019.05.08.12.05.40
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 08 May 2019 12:05:41 -0700 (PDT)
-From:   =?UTF-8?Q?Jakub_Staro=c5=84?= <jstaron@google.com>
-Subject: Re: [Qemu-devel] [PATCH v7 2/6] virtio-pmem: Add virtio pmem driver
-To:     Pankaj Gupta <pagupta@redhat.com>
-Cc:     linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, jack@suse.cz, mst@redhat.com,
-        jasowang@redhat.com, david@fromorbit.com, lcapitulino@redhat.com,
-        adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
-        aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
-        darrick wong <darrick.wong@oracle.com>,
-        vishal l verma <vishal.l.verma@intel.com>, david@redhat.com,
-        willy@infradead.org, hch@infradead.org, jmoyer@redhat.com,
-        nilal@redhat.com, lenb@kernel.org, kilobyte@angband.pl,
-        riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
-        stefanha@redhat.com, pbonzini@redhat.com,
-        dan j williams <dan.j.williams@intel.com>, kwolf@redhat.com,
-        tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-        cohuck@redhat.com, rjw@rjwysocki.net, imammedo@redhat.com,
-        smbarber@google.com
-References: <20190426050039.17460-1-pagupta@redhat.com>
- <20190426050039.17460-3-pagupta@redhat.com>
- <3d6479ae-6c39-d614-f1d9-aa1978e2e438@google.com>
- <1555943483.27247564.1557313967518.JavaMail.zimbra@redhat.com>
-Message-ID: <3d643ac5-ea1b-efba-9f42-31b2ed3ab5b0@google.com>
-Date:   Wed, 8 May 2019 12:05:39 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <1555943483.27247564.1557313967518.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=1u1hPl/qFt03mb/D28lmazA0h5tpYZGyorQTHBrh5GU=;
+        b=rnL97ihZNe+9E3H+nwAVBLwBSMuyWRPgV3cI/ea0uPvDpnRF8jqz7hJ8Ckk/Qgi15w
+         eQQBNHaSzRzckla8S3CmA9y3GvoV+4oE/OrG+5m48viCKJhygwLERIE97B+sBlIvSdvW
+         TGhQViI3wgGK7aA3LXln/PqEdFxQcWtvqDrTw41L+18o/d/7VdwaryYrPYyfoCWJlu6x
+         vzgzJYm5HZ95t5mJO3nbG6Yk6UQVK3nDOZKKQfMs2AftfHqvLNsqEK6QoEZHiD75GL+L
+         h86iKwqHOYujAhHhSFgTAILRSIjcl8tGwc2sEmHU5uCAT31s9P3mSMaHhmisx31+ARhz
+         j19w==
+X-Gm-Message-State: APjAAAXDnmoZ2RjpBezMdfNYJG0u2MPgYrYqUGWL6yAjBvEoI4Z0awMi
+        fBvyFmqPkBmOKq9IM1HlTVsH+5ffL5s=
+X-Google-Smtp-Source: APXvYqwDzpjgwRBb94miav+muyG3UBQdNqJ5WpGztsdZRmB9wiotASQunWsmAMU7lfkFwQHdUwrk3w==
+X-Received: by 2002:a17:902:4183:: with SMTP id f3mr41668725pld.63.1557342553836;
+        Wed, 08 May 2019 12:09:13 -0700 (PDT)
+Received: from [10.33.115.113] ([66.170.99.2])
+        by smtp.gmail.com with ESMTPSA id g3sm18946555pgh.69.2019.05.08.12.09.11
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 08 May 2019 12:09:12 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: [PATCH] Revert "KVM: nVMX: Expose RDPMC-exiting only when guest
+ supports PMU"
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20190508173623.GC19656@linux.intel.com>
+Date:   Wed, 8 May 2019 12:09:10 -0700
+Cc:     Jim Mattson <jmattson@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        David Hill <hilld@binarystorm.net>,
+        Saar Amar <saaramar@microsoft.com>,
+        Mihai Carabas <mihai.carabas@oracle.com>,
+        Liran Alon <liran.alon@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <AB6487D4-4B9B-488E-9FDC-54C42B6631A5@gmail.com>
+References: <20190508160819.19603-1-sean.j.christopherson@intel.com>
+ <CALMp9eSrpi=Pagdt_3UhcWpDpHcVc6c2t0HAszZz105kN+ehsA@mail.gmail.com>
+ <20190508173623.GC19656@linux.intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/8/19 4:12 AM, Pankaj Gupta wrote:
-> 
->>
->> On 4/25/19 10:00 PM, Pankaj Gupta wrote:
->>
->>> +void host_ack(struct virtqueue *vq)
->>> +{
->>> +	unsigned int len;
->>> +	unsigned long flags;
->>> +	struct virtio_pmem_request *req, *req_buf;
->>> +	struct virtio_pmem *vpmem = vq->vdev->priv;
->>> +
->>> +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
->>> +	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
->>> +		req->done = true;
->>> +		wake_up(&req->host_acked);
->>> +
->>> +		if (!list_empty(&vpmem->req_list)) {
->>> +			req_buf = list_first_entry(&vpmem->req_list,
->>> +					struct virtio_pmem_request, list);
->>> +			list_del(&vpmem->req_list);
->>
->> Shouldn't it be rather `list_del(vpmem->req_list.next)`? We are trying to
->> unlink
->> first element of the list and `vpmem->req_list` is just the list head.
-> 
-> This looks correct. We are not deleting head but first entry in 'req_list'
-> which is device corresponding list of pending requests.
-> 
-> Please see below:
-> 
-> /**
->  * Retrieve the first list entry for the given list pointer.
->  *
->  * Example:
->  * struct foo *first;
->  * first = list_first_entry(&bar->list_of_foos, struct foo, list_of_foos);
->  *
->  * @param ptr The list head
->  * @param type Data type of the list element to retrieve
->  * @param member Member name of the struct list_head field in the list element.
->  * @return A pointer to the first list element.
->  */
-> #define list_first_entry(ptr, type, member) \
->     list_entry((ptr)->next, type, member)
+> On May 8, 2019, at 10:36 AM, Sean Christopherson =
+<sean.j.christopherson@intel.com> wrote:
+>=20
+> On Wed, May 08, 2019 at 09:57:11AM -0700, Jim Mattson wrote:
+>> On Wed, May 8, 2019 at 9:08 AM Sean Christopherson
+>> <sean.j.christopherson@intel.com> wrote:
+>>> The RDPMC-exiting control is dependent on the existence of the RDPMC
+>>> instruction itself, i.e. is not tied to the "Architectural =
+Performance
+>>> Monitoring" feature.  For all intents and purposes, the control =
+exists
+>>> on all CPUs with VMX support since RDPMC also exists on all VCPUs =
+with
+>>> VMX supported.  Per Intel's SDM:
+>>>=20
+>>>  The RDPMC instruction was introduced into the IA-32 Architecture in
+>>>  the Pentium Pro processor and the Pentium processor with MMX =
+technology.
+>>>  The earlier Pentium processors have performance-monitoring =
+counters, but
+>>>  they must be read with the RDMSR instruction.
+>>>=20
+>>> Because RDPMC-exiting always exists, KVM requires the control and =
+refuses
+>>> to load if it's not available.  As a result, hiding the PMU from a =
+guest
+>>> breaks nested virtualization if the guest attemts to use KVM.
+>>=20
+>> Is it true that the existence of instruction <X> implies the
+>> availaibility of the VM-execution control <X>-exiting (if such a
+>> VM-execution control exists)? What about WBINVD? That instruction has
+>> certainly been around forever, but there were VMX-capable processors
+>> that did not support WBINVD-exiting.
+>=20
+> Technically no, but 99% of the time yes.  It's kind of similar to =
+KVM's
+> live migration requirements: new features with "dangerous" =
+instructions
+> need an associated VMCS control, but there are some legacy cases where
+> a VMCS control was added after the fact, WBINVD being the obvious =
+example.
+>=20
+>> Having said that, I think our hands are tied by the assumptions made
+>> by existing hypervisors, whether or not those assumptions are true.
+>> (VMware's VMM, for instance, requires MONITOR-exiting and
+>> MWAIT-exiting even when MONITOR/MWAIT are not enumerated by CPUID.)
+>=20
+> I'd say it's more of a requirement than an assumption, e.g. KVM
+> *requires* RDPMC-exiting so that the guest can't glean info about the
+> host.  I guess technically KVM is assuming RDPMC itself exists, but
+> it's existence is effectively guaranteed by the SDM.
+>=20
+> I can't speak to the VMWare behavior, e.g. it might be nothing more
+> than a simple oversight that isn't worth fixing, or maybe it's =
+paranoid
+> and really wants to ensure the guest can't execute MONITOR/MWAIT :-)
 
-Please look at this StackOverflow question:
-https://stackoverflow.com/questions/19675419/deleting-first-element-of-a-list-h-list
+I am sure Jim is more knowledgable than I am to talk about the reasons =
+for
+VMware behavior. But I would send somewhen later a patch for
+kvm-unit-tests/vmx, since they assume the MONITOR/MWAIT are supported if =
+the
+execution-control is supported. This is, as Jim indicated, not true on
+VMware.
 
-Author asks about deleting first element of the queue. In our case
-(and also in the question's author case), `vpmem->req_list` is not element
-of any request struct and not an element of the list. It's just a list head storing 
-`next` and `prev` pointers which are then pointing to respectively first and
-last element of the list. We want to unlink the first element of the list,
-so we need to pass pointer to the first element of the list to
-the `list_del` function - that is, the `vpmem->req_list.next`.
-
-Thank you,
-Jakub Staron
