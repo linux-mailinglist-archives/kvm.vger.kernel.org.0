@@ -2,52 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CA252178D7
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 13:49:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CAF12178EC
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 13:55:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727969AbfEHLty (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 07:49:54 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:40380 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727855AbfEHLty (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 07:49:54 -0400
-Received: by mail-wr1-f65.google.com with SMTP id h4so7542692wre.7
-        for <kvm@vger.kernel.org>; Wed, 08 May 2019 04:49:53 -0700 (PDT)
+        id S1727849AbfEHLzs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 07:55:48 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:53140 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726751AbfEHLzs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 07:55:48 -0400
+Received: by mail-wm1-f66.google.com with SMTP id o25so2921683wmf.2
+        for <kvm@vger.kernel.org>; Wed, 08 May 2019 04:55:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=sRy1srPfJjIkh3DYfosMemnXUEoKdSSQQuJvgkHRhEQ=;
-        b=qO4jezgMkJSlYlcr/RCeoRJ3dLb6lnGDTlp7IGkfXem6czaRA/Znm7le0+aOapnmbs
-         TG/FwjpiglmnAgmt0ctV0RiqBrO2TgLozTKsRBQG6hZlXMztJW7zZPPzW6tpe23ptk3k
-         M8WDiOjqkXDgZPGlE2p9jCPU4lsDteYV5xBDjfTk/o/IjqNLs1wGU5j3TyR3aKwuDuJ1
-         2S18rj9UREke+pPPjpLHD9N4uVhLs4abw1Hsl6/kVB5f4kLVXhR8fMW44TYIcl+KF+X9
-         aW9cC8NmVYKAMO1N9nh5SzEPFb3ikIyQRikTbUdZoEy3OgbpiT+LN7WGSR+zyW6aF7wR
-         1Sng==
-X-Gm-Message-State: APjAAAWssXqhx3TOXtz+HOiXnJkggqIfa86S+L1T1BIKZgsoA6xIJe4o
-        eiKpV+YRpMx16zW08Rh08ArZ4QFonCf9QQ==
-X-Google-Smtp-Source: APXvYqyeoQQP2TcLyPOcdLeTSDTPsJPOx7VXVbxRJwgmSxG6uuBkoSYkqmH0pfQQaYNL26zw99e5Xw==
-X-Received: by 2002:adf:ebd0:: with SMTP id v16mr20565857wrn.175.1557316192718;
-        Wed, 08 May 2019 04:49:52 -0700 (PDT)
+        bh=wsyniKEEHJ0IkIvec+SHSVgCT+tLWu4G0EqejkQMQBg=;
+        b=EFDIeYA0kAZvcu4pQoLNp+OVvCVkZDbMhKz5dmtFtjNG5//qF44HYnAEBnr+3NjRpH
+         yxb0Uf1N3h7/S28V5HUK9TkDnhsZaO+wFP5rPwHlEPO5FDyHf85zl7BhkfzkCvIVJR7Q
+         IDzQ3rMZZQKQOXd8wPy4cXSvSpHGXsxErxGSnq8Qbc9g30dVJlvCu7NrXycGWAAzfdy6
+         nSc8dOUeDztSx05+wfc0NFs4OtfYeHei4onCopJ8+mni7OijTsnFACc4LTBShMV+g2KJ
+         YK1kz7lt0PD1Pfac+1b0AIOk52XxaCBCeSsz71s6k3RTjOTWZGwFs3QQ0vBejyaYex9F
+         t68Q==
+X-Gm-Message-State: APjAAAVICTJIGw+qzgMBYWjIA8iPwX7wvjSBeSZzie6SYmajtAI+qV4q
+        aAFc8y6Op54pyHZw9IV/kFoywg==
+X-Google-Smtp-Source: APXvYqzea7CrHJstRp+CWVKwN+fnT+ols6b0zCOnsSm0NaMs5zAKJ117LpLEU2+uHhRwFwUcfjrwXA==
+X-Received: by 2002:a05:600c:40f:: with SMTP id q15mr1736422wmb.92.1557316546161;
+        Wed, 08 May 2019 04:55:46 -0700 (PDT)
 Received: from [10.201.49.229] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-        by smtp.gmail.com with ESMTPSA id w2sm11670352wrm.74.2019.05.08.04.49.51
+        by smtp.gmail.com with ESMTPSA id h16sm33180021wrb.31.2019.05.08.04.55.44
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 08 May 2019 04:49:52 -0700 (PDT)
-Subject: Re: [PATCH v2 3/3] KVM: Introduce KVM_CAP_MANUAL_DIRTY_LOG_PROTECT_2
-To:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org
-Cc:     Juan Quintela <quintela@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-References: <20190508091547.11963-1-peterx@redhat.com>
- <20190508091547.11963-4-peterx@redhat.com>
+        Wed, 08 May 2019 04:55:45 -0700 (PDT)
+Subject: Re: [PATCH v2] tests: kvm: Add tests to .gitignore
+To:     Aaron Lewis <aaronlewis@google.com>, rkrcmar@redhat.com,
+        jmattson@google.com, pshier@google.com, marcorr@google.com,
+        kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20190506141910.197288-1-aaronlewis@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0075d39c-ed38-8289-062c-acde86869a4b@redhat.com>
-Date:   Wed, 8 May 2019 13:49:48 +0200
+Message-ID: <c1825cc1-c2fc-4c71-6b2f-737e8619b29b@redhat.com>
+Date:   Wed, 8 May 2019 13:55:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190508091547.11963-4-peterx@redhat.com>
+In-Reply-To: <20190506141910.197288-1-aaronlewis@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -56,28 +55,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/05/19 04:15, Peter Xu wrote:
-> The previous KVM_CAP_MANUAL_DIRTY_LOG_PROTECT has some problem which
-> blocks the correct usage from userspace.  Obsolete the old one and
-> introduce a new capability bit for it.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 06/05/19 09:19, Aaron Lewis wrote:
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> Reviewed-by: Peter Shier <pshier@google.com>
+> Reviewed-by: Jim Mattson <jmattson@google.com>
+> Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > ---
+>  tools/testing/selftests/kvm/.gitignore | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 2689d1ea6d7a..6027b5f3d72d 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -1,9 +1,12 @@
+>  /x86_64/cr4_cpuid_sync_test
+>  /x86_64/evmcs_test
+> +/x86_64/hyperv_cpuid
+>  /x86_64/platform_info_test
+>  /x86_64/set_sregs_test
+> +/x86_64/smm_test
+> +/x86_64/state_test
+>  /x86_64/sync_regs_test
+>  /x86_64/vmx_close_while_nested_test
+>  /x86_64/vmx_tsc_adjust_test
+> -/x86_64/state_test
+> +/clear_dirty_log_test
+>  /dirty_log_test
+> 
 
-I renamed it to KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2.  Also, this paragraph
-
-+The old name of KVM_CAP_MANUAL_DIRTY_LOG_PROTECT_2 is
-+KVM_CAP_MANUAL_DIRTY_LOG_PROTECT but it was obsolete now.
-
-should be under the description of the capability, and perhaps can be
-expanded like this:
-
-+KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 was previously available under the name
-+KVM_CAP_MANUAL_DIRTY_LOG_PROTECT, but the implementation had bugs that make
-+it hard or impossible to use it correctly.  The availability of
-+KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 signals that those bugs are fixed.
-+Userspace should not try to use KVM_CAP_MANUAL_DIRTY_LOG_PROTECT.
-
-No need to do anything on your part.
+Queued, thanks.
 
 Paolo
