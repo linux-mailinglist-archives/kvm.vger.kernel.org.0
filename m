@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DD0BE17C79
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:52:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6612B17C90
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:52:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728083AbfEHOof (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:44:35 -0400
+        id S1727553AbfEHOwV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:52:21 -0400
 Received: from mga14.intel.com ([192.55.52.115]:48394 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728004AbfEHOof (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727315AbfEHOof (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 8 May 2019 10:44:35 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
   by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:34 -0700
 X-ExtLoop1: 1
 Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga002.jf.intel.com with ESMTP; 08 May 2019 07:44:29 -0700
+  by orsmga004.jf.intel.com with ESMTP; 08 May 2019 07:44:29 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id A94D92DA; Wed,  8 May 2019 17:44:28 +0300 (EEST)
+        id C283D3D1; Wed,  8 May 2019 17:44:28 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -36,9 +36,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 03/62] mm/ksm: Do not merge pages with different KeyIDs
-Date:   Wed,  8 May 2019 17:43:23 +0300
-Message-Id: <20190508144422.13171-4-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 04/62] mm/page_alloc: Unify alloc_hugepage_vma()
+Date:   Wed,  8 May 2019 17:43:24 +0300
+Message-Id: <20190508144422.13171-5-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -49,74 +49,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KeyID indicates what key to use to encrypt and decrypt page's content.
-Depending on the implementation a cipher text may be tied to physical
-address of the page. It means that pages with an identical plain text
-would appear different if KSM would look at a cipher text. It effectively
-disables KSM for encrypted pages.
+We don't need to have separate implementations of alloc_hugepage_vma()
+for NUMA and non-NUMA. Using variant based on alloc_pages_vma() we would
+cover both cases.
 
-In addition, some implementations may not allow to read cipher text at all.
+This is preparation patch for allocation encrypted pages.
 
-KSM compares plain text instead (transparently to KSM code).
+alloc_pages_vma() will handle allocation of encrypted pages. With this
+change we don' t need to cover alloc_hugepage_vma() separately.
 
-But we still need to make sure that pages with identical plain text will
-not be merged together if they are encrypted with different keys.
-
-To make it work kernel only allows merging pages with the same KeyID.
-The approach guarantees that the merged page can be read by all users.
+The change makes typo in Alpha's implementation of
+__alloc_zeroed_user_highpage() visible. Fix it too.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- include/linux/mm.h |  7 +++++++
- mm/ksm.c           | 17 +++++++++++++++++
- 2 files changed, 24 insertions(+)
+ arch/alpha/include/asm/page.h | 2 +-
+ include/linux/gfp.h           | 6 ++----
+ 2 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 13c40c43ce00..07c36f4673f6 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1606,6 +1606,13 @@ static inline int vma_keyid(struct vm_area_struct *vma)
- }
+diff --git a/arch/alpha/include/asm/page.h b/arch/alpha/include/asm/page.h
+index f3fb2848470a..9a6fbb5269f3 100644
+--- a/arch/alpha/include/asm/page.h
++++ b/arch/alpha/include/asm/page.h
+@@ -18,7 +18,7 @@ extern void clear_page(void *page);
+ #define clear_user_page(page, vaddr, pg)	clear_page(page)
+ 
+ #define __alloc_zeroed_user_highpage(movableflags, vma, vaddr) \
+-	alloc_page_vma(GFP_HIGHUSER | __GFP_ZERO | movableflags, vma, vmaddr)
++	alloc_page_vma(GFP_HIGHUSER | __GFP_ZERO | movableflags, vma, vaddr)
+ #define __HAVE_ARCH_ALLOC_ZEROED_USER_HIGHPAGE
+ 
+ extern void copy_page(void * _to, void * _from);
+diff --git a/include/linux/gfp.h b/include/linux/gfp.h
+index fdab7de7490d..b101aa294157 100644
+--- a/include/linux/gfp.h
++++ b/include/linux/gfp.h
+@@ -511,21 +511,19 @@ alloc_pages(gfp_t gfp_mask, unsigned int order)
+ extern struct page *alloc_pages_vma(gfp_t gfp_mask, int order,
+ 			struct vm_area_struct *vma, unsigned long addr,
+ 			int node, bool hugepage);
+-#define alloc_hugepage_vma(gfp_mask, vma, addr, order) \
+-	alloc_pages_vma(gfp_mask, order, vma, addr, numa_node_id(), true)
+ #else
+ #define alloc_pages(gfp_mask, order) \
+ 		alloc_pages_node(numa_node_id(), gfp_mask, order)
+ #define alloc_pages_vma(gfp_mask, order, vma, addr, node, false)\
+ 	alloc_pages(gfp_mask, order)
+-#define alloc_hugepage_vma(gfp_mask, vma, addr, order) \
+-	alloc_pages(gfp_mask, order)
  #endif
+ #define alloc_page(gfp_mask) alloc_pages(gfp_mask, 0)
+ #define alloc_page_vma(gfp_mask, vma, addr)			\
+ 	alloc_pages_vma(gfp_mask, 0, vma, addr, numa_node_id(), false)
+ #define alloc_page_vma_node(gfp_mask, vma, addr, node)		\
+ 	alloc_pages_vma(gfp_mask, 0, vma, addr, node, false)
++#define alloc_hugepage_vma(gfp_mask, vma, addr, order) \
++	alloc_pages_vma(gfp_mask, order, vma, addr, numa_node_id(), true)
  
-+#ifndef page_keyid
-+static inline int page_keyid(struct page *page)
-+{
-+	return 0;
-+}
-+#endif
-+
- #ifdef CONFIG_SHMEM
- /*
-  * The vma_is_shmem is not inline because it is used only by slow
-diff --git a/mm/ksm.c b/mm/ksm.c
-index fc64874dc6f4..91bce4799c45 100644
---- a/mm/ksm.c
-+++ b/mm/ksm.c
-@@ -1227,6 +1227,23 @@ static int try_to_merge_one_page(struct vm_area_struct *vma,
- 	if (!PageAnon(page))
- 		goto out;
- 
-+	/*
-+	 * KeyID indicates what key to use to encrypt and decrypt page's
-+	 * content.
-+	 *
-+	 * KSM compares plain text instead (transparently to KSM code).
-+	 *
-+	 * But we still need to make sure that pages with identical plain
-+	 * text will not be merged together if they are encrypted with
-+	 * different keys.
-+	 *
-+	 * To make it work kernel only allows merging pages with the same KeyID.
-+	 * The approach guarantees that the merged page can be read by all
-+	 * users.
-+	 */
-+	if (kpage && page_keyid(page) != page_keyid(kpage))
-+		goto out;
-+
- 	/*
- 	 * We need the page lock to read a stable PageSwapCache in
- 	 * write_protect_page().  We use trylock_page() instead of
+ extern unsigned long __get_free_pages(gfp_t gfp_mask, unsigned int order);
+ extern unsigned long get_zeroed_page(gfp_t gfp_mask);
 -- 
 2.20.1
 
