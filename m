@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 46E3217C28
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:48:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83E0317C30
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:49:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727639AbfEHOsk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1727465AbfEHOsk (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Wed, 8 May 2019 10:48:40 -0400
-Received: from mga09.intel.com ([134.134.136.24]:1393 "EHLO mga09.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:59536 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728413AbfEHOot (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1728377AbfEHOot (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 8 May 2019 10:44:49 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:49 -0700
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:48 -0700
 X-ExtLoop1: 1
 Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga006.jf.intel.com with ESMTP; 08 May 2019 07:44:44 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 08 May 2019 07:44:44 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id CCCC7D8A; Wed,  8 May 2019 17:44:30 +0300 (EEST)
+        id D81CDEA8; Wed,  8 May 2019 17:44:30 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -36,9 +36,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 42/62] mm: Generalize the mprotect implementation to support extensions
-Date:   Wed,  8 May 2019 17:44:02 +0300
-Message-Id: <20190508144422.13171-43-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 43/62] syscall/x86: Wire up a system call for MKTME encryption keys
+Date:   Wed,  8 May 2019 17:44:03 +0300
+Message-Id: <20190508144422.13171-44-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -51,63 +51,85 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alison Schofield <alison.schofield@intel.com>
 
-Today mprotect is implemented to support legacy mprotect behavior
-plus an extension for memory protection keys. Make it more generic
-so that it can support additional extensions in the future.
+encrypt_mprotect() is a new system call to support memory encryption.
 
-This is done is preparation for adding a new system call for memory
-encyption keys. The intent is that the new encrypted mprotect will be
-another extension to legacy mprotect.
+It takes the same parameters as legacy mprotect, plus an additional
+key serial number that is mapped to an encryption keyid.
 
 Signed-off-by: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- mm/mprotect.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ arch/x86/entry/syscalls/syscall_32.tbl | 1 +
+ arch/x86/entry/syscalls/syscall_64.tbl | 1 +
+ include/linux/syscalls.h               | 2 ++
+ include/uapi/asm-generic/unistd.h      | 4 +++-
+ kernel/sys_ni.c                        | 2 ++
+ 5 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/mm/mprotect.c b/mm/mprotect.c
-index e768cd656a48..23e680f4b1d5 100644
---- a/mm/mprotect.c
-+++ b/mm/mprotect.c
-@@ -35,6 +35,8 @@
+diff --git a/arch/x86/entry/syscalls/syscall_32.tbl b/arch/x86/entry/syscalls/syscall_32.tbl
+index 1f9607ed087c..dbcd4c28d743 100644
+--- a/arch/x86/entry/syscalls/syscall_32.tbl
++++ b/arch/x86/entry/syscalls/syscall_32.tbl
+@@ -433,3 +433,4 @@
+ 425	i386	io_uring_setup		sys_io_uring_setup		__ia32_sys_io_uring_setup
+ 426	i386	io_uring_enter		sys_io_uring_enter		__ia32_sys_io_uring_enter
+ 427	i386	io_uring_register	sys_io_uring_register		__ia32_sys_io_uring_register
++428	i386	encrypt_mprotect	sys_encrypt_mprotect		__ia32_sys_encrypt_mprotect
+diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
+index 92ee0b4378d4..d01bd132e9ee 100644
+--- a/arch/x86/entry/syscalls/syscall_64.tbl
++++ b/arch/x86/entry/syscalls/syscall_64.tbl
+@@ -349,6 +349,7 @@
+ 425	common	io_uring_setup		__x64_sys_io_uring_setup
+ 426	common	io_uring_enter		__x64_sys_io_uring_enter
+ 427	common	io_uring_register	__x64_sys_io_uring_register
++428	common	encrypt_mprotect	__x64_sys_encrypt_mprotect
  
- #include "internal.h"
- 
-+#define NO_KEY	-1
-+
- static unsigned long change_pte_range(struct vm_area_struct *vma, pmd_t *pmd,
- 		unsigned long addr, unsigned long end, pgprot_t newprot,
- 		int dirty_accountable, int prot_numa)
-@@ -452,9 +454,9 @@ mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
- }
+ #
+ # x32-specific system call numbers start at 512 to avoid cache impact
+diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+index e446806a561f..38a2d7b95397 100644
+--- a/include/linux/syscalls.h
++++ b/include/linux/syscalls.h
+@@ -988,6 +988,8 @@ asmlinkage long sys_rseq(struct rseq __user *rseq, uint32_t rseq_len,
+ asmlinkage long sys_pidfd_send_signal(int pidfd, int sig,
+ 				       siginfo_t __user *info,
+ 				       unsigned int flags);
++asmlinkage long sys_encrypt_mprotect(unsigned long start, size_t len,
++				     unsigned long prot, key_serial_t serial);
  
  /*
-- * pkey==-1 when doing a legacy mprotect()
-+ * When pkey==NO_KEY we get legacy mprotect behavior here.
-  */
--static int do_mprotect_pkey(unsigned long start, size_t len,
-+static int do_mprotect_ext(unsigned long start, size_t len,
- 		unsigned long prot, int pkey)
- {
- 	unsigned long nstart, end, tmp, reqprot;
-@@ -578,7 +580,7 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
- SYSCALL_DEFINE3(mprotect, unsigned long, start, size_t, len,
- 		unsigned long, prot)
- {
--	return do_mprotect_pkey(start, len, prot, -1);
-+	return do_mprotect_ext(start, len, prot, NO_KEY);
- }
+  * Architecture-specific system calls
+diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
+index dee7292e1df6..86f942f54b1b 100644
+--- a/include/uapi/asm-generic/unistd.h
++++ b/include/uapi/asm-generic/unistd.h
+@@ -832,9 +832,11 @@ __SYSCALL(__NR_io_uring_setup, sys_io_uring_setup)
+ __SYSCALL(__NR_io_uring_enter, sys_io_uring_enter)
+ #define __NR_io_uring_register 427
+ __SYSCALL(__NR_io_uring_register, sys_io_uring_register)
++#define __NR_encrypt_mprotect 428
++__SYSCALL(__NR_encrypt_mprotect, sys_encrypt_mprotect)
  
- #ifdef CONFIG_ARCH_HAS_PKEYS
-@@ -586,7 +588,7 @@ SYSCALL_DEFINE3(mprotect, unsigned long, start, size_t, len,
- SYSCALL_DEFINE4(pkey_mprotect, unsigned long, start, size_t, len,
- 		unsigned long, prot, int, pkey)
- {
--	return do_mprotect_pkey(start, len, prot, pkey);
-+	return do_mprotect_ext(start, len, prot, pkey);
- }
+ #undef __NR_syscalls
+-#define __NR_syscalls 428
++#define __NR_syscalls 429
  
- SYSCALL_DEFINE2(pkey_alloc, unsigned long, flags, unsigned long, init_val)
+ /*
+  * 32 bit systems traditionally used different
+diff --git a/kernel/sys_ni.c b/kernel/sys_ni.c
+index d21f4befaea4..80da8d9ac8b1 100644
+--- a/kernel/sys_ni.c
++++ b/kernel/sys_ni.c
+@@ -350,6 +350,8 @@ COND_SYSCALL(pkey_mprotect);
+ COND_SYSCALL(pkey_alloc);
+ COND_SYSCALL(pkey_free);
+ 
++/* multi-key total memory encryption keys */
++COND_SYSCALL(encrypt_mprotect);
+ 
+ /*
+  * Architecture specific weak syscall entries.
 -- 
 2.20.1
 
