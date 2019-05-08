@@ -2,164 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AE6416F8E
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 05:43:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FF5F16FCF
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 06:08:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727021AbfEHDn0 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 7 May 2019 23:43:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45134 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726516AbfEHDnZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 May 2019 23:43:25 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 94D853087944;
-        Wed,  8 May 2019 03:43:25 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 82EFC60C4E;
-        Wed,  8 May 2019 03:43:25 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 28F5E65D13;
-        Wed,  8 May 2019 03:43:25 +0000 (UTC)
-Date:   Tue, 7 May 2019 23:43:24 -0400 (EDT)
-From:   Jason Wang <jasowang@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     mst@redhat.com, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Darren Hart <dvhart@infradead.org>
-Message-ID: <1430527294.27174562.1557287004441.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190507154753.GA8809@infradead.org>
-References: <20190507154753.GA8809@infradead.org>
-Subject: Re: [PATCH RFC] vhost: don't use kmap() to log dirty pages
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        id S1725860AbfEHEIM convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 8 May 2019 00:08:12 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:47914 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725812AbfEHEIM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 May 2019 00:08:12 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id E9A5C289FC
+        for <kvm@vger.kernel.org>; Wed,  8 May 2019 04:08:10 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id DE01F28A01; Wed,  8 May 2019 04:08:10 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+        pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.9 required=2.0 tests=BAYES_00,NO_RECEIVED,
+        NO_RELAYS autolearn=unavailable version=3.3.1
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 203543] Starting with kernel 5.1.0-rc6,  kvm_intel can no
+ longer be loaded in nested kvm/guests
+Date:   Wed, 08 May 2019 04:08:10 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: liran.alon@oracle.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-203543-28872-IJcrSG5TnW@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-203543-28872@https.bugzilla.kernel.org/>
+References: <bug-203543-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
-X-Originating-IP: [10.68.5.20, 10.4.195.23]
-Thread-Topic: vhost: don't use kmap() to log dirty pages
-Thread-Index: K7z0d3UL1bhTV/QW5Sb3gPqIWKhUvg==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Wed, 08 May 2019 03:43:25 +0000 (UTC)
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019/5/7 下午11:47, Christoph Hellwig wrote:
-> On Mon, May 06, 2019 at 10:23:29PM -0400, Jason Wang wrote:
->> Note: there're archs (few non popular ones) that don't implement
->> futex helper, we can't log dirty pages. We can fix them on top or
->> simply disable LOG_ALL features of vhost.
+https://bugzilla.kernel.org/show_bug.cgi?id=203543
+
+--- Comment #2 from Liran Alon (liran.alon@oracle.com) ---
+If I would have to guess, I would blame my own commit:
+e51bfdb68725 ("KVM: nVMX: Expose RDPMC-exiting only when guest supports PMU”)
+
+As in kvm_intel’s setup_vmcs_config() it can be seen that
+CPU_BASED_RDPMC_EXITING is required in order for KVM to load.
+Therefore, I assume the issue is that now L1 guest is not exposed with
+CPU_BASED_RDPMC_EXITING.
+
+My patch is suppose to hide CPU_BASED_RDPMC_EXITING from L1 only in case L1
+vCPU is not exposed with PMU.
+
+Can you provide more details on the vCPU your setup expose to L1?
+Have you explicitly disabled PMU from L1 vCPU?
+Can you run “cpuid -r” on shell and post here it’s output?
+
+-Liran
+
+> On 7 May 2019, at 23:45, bugzilla-daemon@bugzilla.kernel.org wrote:
+> 
 >
-> That means vhost now has to depend on HAVE_FUTEX_CMPXCHG to make
-> sure we have a working implementation.
+> https://urldefense.proofpoint.com/v2/url?u=https-3A__bugzilla.kernel.org_show-5Fbug.cgi-3Fid-3D203543&d=DwIDaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=Jk6Q8nNzkQ6LJ6g42qARkg6ryIDGQr-yKXPNGZbpTx0&m=cB5pEya2zKbSTvVpkeIHKYlQ1F9qW__mnLe0hXnlBCM&s=O2zSR2K1fTcD1Ps40Q_i-ZmS9tVsPYjupbQmw-LCMPk&e=
+> 
+>            Bug ID: 203543
+>           Summary: Starting with kernel 5.1.0-rc6,  kvm_intel can no
+>                    longer be loaded in nested kvm/guests
+>           Product: Virtualization
+>           Version: unspecified
+>    Kernel Version: 5.1.0-rc6
+>          Hardware: Intel
+>                OS: Linux
+>              Tree: Mainline
+>            Status: NEW
+>          Severity: blocking
+>          Priority: P1
+>         Component: kvm
+>          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+>          Reporter: hilld@binarystorm.net
+>        Regression: No
+> 
+> 1. Please describe the problem:
+> Starting with kernel 5.1.0-rc6,  kvm_intel can no longer be loaded in nested
+> kvm/guests
+> 
+> [root@undercloud-0-rhosp10 ~]# modprobe kvm_intel
+> modprobe: ERROR: could not insert 'kvm_intel': Input/output error
+> 
+> 
+> 2. What is the Version-Release number of the kernel:
+> 5.1.0-rc7
+> 
+> 3. Did it work previously in Fedora? If so, what kernel version did the issue
+>   *first* appear?  Old kernels are available for download at
+>  
+>   https://urldefense.proofpoint.com/v2/url?u=https-3A__koji.fedoraproject.org_koji_packageinfo-3FpackageID-3D8&d=DwIDaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=Jk6Q8nNzkQ6LJ6g42qARkg6ryIDGQr-yKXPNGZbpTx0&m=cB5pEya2zKbSTvVpkeIHKYlQ1F9qW__mnLe0hXnlBCM&s=1wtgL9MEqhN6ZwOZRMKlcW6LYP3zCgz4-1lh8aXyTWo&e=
+>   :
+> Yes it seems to have appearded between 5.1.0-rc4 (it worked) and 5.1.0-rc6
+> (it
+> no longer worked)
+> 
+> 4. Can you reproduce this issue? If so, please provide the steps to reproduce
+>   the issue below:
+> Yes, update to 5.1.0-rc6 and try to modprobe kvm_intel inside a guest where
+> the
+> VMX capabilities has been exposted
+> 
+> 
+> 5. Does this problem occur with the latest Rawhide kernel? To install the
+>   Rawhide kernel, run ``sudo dnf install fedora-repos-rawhide`` followed by
+>   ``sudo dnf update --enablerepo=rawhide kernel``:
+> Yes
+> 
+> 
+> 6. Are you running any modules that not shipped with directly Fedora's
+> kernel?:
+> No
+> 
+> 7. Please attach the kernel logs. You can get the complete kernel log
+>   for a boot with ``journalctl --no-hostname -k > dmesg.txt``. If the
+>   issue occurred on a previous boot, use the journalctl ``-b`` flag.
+> 
+> -- 
+> You are receiving this mail because:
+> You are watching the assignee of the bug.
 
-I found HAVE_FUTEX_CMPXCHG is not a must for arch that has the
-implementation and futex does some kind of runtime detection like:
-
-static void __init futex_detect_cmpxchg(void)
-{
-#ifndef CONFIG_HAVE_FUTEX_CMPXCHG
-	u32 curval;
-
-	/*
-	 * This will fail and we want it. Some arch implementations do
-	 * runtime detection of the futex_atomic_cmpxchg_inatomic()
-	 * functionality. We want to know that before we call in any
-	 * of the complex code paths. Also we want to prevent
-	 * registration of robust lists in that case. NULL is
-	 * guaranteed to fault and we get -EFAULT on functional
-	 * implementation, the non-functional ones will return
-	 * -ENOSYS.
-	 */
-	if (cmpxchg_futex_value_locked(&curval, NULL, 0, 0) == -EFAULT)
-		futex_cmpxchg_enabled = 1;
-#endif
-}
-
-
->
->
->>  #include <linux/sched/signal.h>
->>  #include <linux/interval_tree_generic.h>
->>  #include <linux/nospec.h>
->> +#include <asm/futex.h>
->
-> Also please include the futex maintainers to make sure they are fine
-> with this first usage of <asm/futex.h> outside of kernel/futex.c.
->
-
-Thanks for ccing them. Will do for next version.
-
-If we decide to go this way, we probably need to move it to uaccess
-for a more generic helper.
-
->
->> +static int set_bit_to_user(int nr, u32 __user *addr)
->>  {
->>  	unsigned long log = (unsigned long)addr;
->>  	struct page *page;
->> +	u32 old_log;
->>  	int r;
->>  
->>  	r = get_user_pages_fast(log, 1, 1, &page);
->>  	if (r < 0)
->>  		return r;
->>  	BUG_ON(r != 1);
->> +
->> +	r = futex_atomic_cmpxchg_inatomic(&old_log, addr, 0, 0);
->> +	if (r < 0)
->> +		return r;
->> +
->> +	old_log |= 1 << nr;
->> +	r = put_user(old_log, addr);
->> +	if (r < 0)
->> +		return r;
->
-> And this just looks odd to me.  Why do we need the futex call to
-> replace a 0 value with 0?  Why does it still duplicate the
-> put_user?  This doesn't look like actually working code to me.
-
-Yes, this is a bug. Should be something like:
-
-static int set_bit_to_user(int nr, u32 __user *addr)
-{
-        unsigned long log = (unsigned long)addr;
-        struct page *page;
-        u32 old_log, new_log, l;
-        int r;
-
-        r = get_user_pages_fast(log, 1, 1, &page);
-        if (r < 0)
-                return r;
-	BUG_ON(r != 1);
-
-        do {
-                r = get_user(old_log, addr);
-                if (r < 0)
-                        return r;
-                new_log = old_log | (1 << nr);
-		r = futex_atomic_cmpxchg_inatomic(&l, addr, old_log, new_log);
-                if (r < 0)
-                        return r;
-        } while(l != new_log);
-
-	set_page_dirty_lock(page);
-        put_page(page);
-        return 0;
-}
-
->
-> Also don't we need a pagefault_disable() around
-> futex_atomic_cmpxchg_inatomic?
-
-Since we don't want to deal with pagefault, so the page has been
-pinned before futex_atomic_cmpxchg_inatomic().
-
-Thanks
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
