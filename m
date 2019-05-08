@@ -2,14 +2,14 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B540E17C98
+	by mail.lfdr.de (Postfix) with ESMTP id 412AA17C97
 	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:53:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727795AbfEHOwc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:52:32 -0400
+        id S1727812AbfEHOoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:44:34 -0400
 Received: from mga04.intel.com ([192.55.52.120]:61857 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727324AbfEHOoe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1727315AbfEHOoe (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 8 May 2019 10:44:34 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -19,7 +19,7 @@ X-ExtLoop1: 1
 Received: from black.fi.intel.com ([10.237.72.28])
   by fmsmga008.fm.intel.com with ESMTP; 08 May 2019 07:44:29 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id 88ED5146; Wed,  8 May 2019 17:44:28 +0300 (EEST)
+        id 9AE752E5; Wed,  8 May 2019 17:44:28 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -36,9 +36,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 01/62] mm: Do no merge VMAs with different encryption KeyIDs
-Date:   Wed,  8 May 2019 17:43:21 +0300
-Message-Id: <20190508144422.13171-2-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 02/62] mm: Add helpers to setup zero page mappings
+Date:   Wed,  8 May 2019 17:43:22 +0300
+Message-Id: <20190508144422.13171-3-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -49,246 +49,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VMAs with different KeyID do not mix together. Only VMAs with the same
-KeyID are compatible.
+When kernel setups an encrypted page mapping, encryption KeyID is
+derived from a VMA. KeyID is going to be part of vma->vm_page_prot and
+it will be propagated transparently to page table entry on mk_pte().
+
+But there is an exception: zero page is never encrypted and its mapping
+must use KeyID-0, regardless VMA's KeyID.
+
+Introduce helpers that create a page table entry for zero page.
+
+The generic implementation will be overridden by architecture-specific
+code that takes care about using correct KeyID.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- fs/userfaultfd.c   |  7 ++++---
- include/linux/mm.h |  9 ++++++++-
- mm/madvise.c       |  2 +-
- mm/mempolicy.c     |  3 ++-
- mm/mlock.c         |  2 +-
- mm/mmap.c          | 31 +++++++++++++++++++------------
- mm/mprotect.c      |  2 +-
- 7 files changed, 36 insertions(+), 20 deletions(-)
+ fs/dax.c                      | 3 +--
+ include/asm-generic/pgtable.h | 8 ++++++++
+ mm/huge_memory.c              | 6 ++----
+ mm/memory.c                   | 3 +--
+ mm/userfaultfd.c              | 3 +--
+ 5 files changed, 13 insertions(+), 10 deletions(-)
 
-diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
-index f5de1e726356..6032aecda4ed 100644
---- a/fs/userfaultfd.c
-+++ b/fs/userfaultfd.c
-@@ -901,7 +901,7 @@ static int userfaultfd_release(struct inode *inode, struct file *file)
- 				 new_flags, vma->anon_vma,
- 				 vma->vm_file, vma->vm_pgoff,
- 				 vma_policy(vma),
--				 NULL_VM_UFFD_CTX);
-+				 NULL_VM_UFFD_CTX, vma_keyid(vma));
- 		if (prev)
- 			vma = prev;
- 		else
-@@ -1451,7 +1451,8 @@ static int userfaultfd_register(struct userfaultfd_ctx *ctx,
- 		prev = vma_merge(mm, prev, start, vma_end, new_flags,
- 				 vma->anon_vma, vma->vm_file, vma->vm_pgoff,
- 				 vma_policy(vma),
--				 ((struct vm_userfaultfd_ctx){ ctx }));
-+				 ((struct vm_userfaultfd_ctx){ ctx }),
-+				 vma_keyid(vma));
- 		if (prev) {
- 			vma = prev;
- 			goto next;
-@@ -1613,7 +1614,7 @@ static int userfaultfd_unregister(struct userfaultfd_ctx *ctx,
- 		prev = vma_merge(mm, prev, start, vma_end, new_flags,
- 				 vma->anon_vma, vma->vm_file, vma->vm_pgoff,
- 				 vma_policy(vma),
--				 NULL_VM_UFFD_CTX);
-+				 NULL_VM_UFFD_CTX, vma_keyid(vma));
- 		if (prev) {
- 			vma = prev;
- 			goto next;
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 6b10c21630f5..13c40c43ce00 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1599,6 +1599,13 @@ static inline bool vma_is_anonymous(struct vm_area_struct *vma)
- 	return !vma->vm_ops;
+diff --git a/fs/dax.c b/fs/dax.c
+index e5e54da1715f..6d609bff53b9 100644
+--- a/fs/dax.c
++++ b/fs/dax.c
+@@ -1441,8 +1441,7 @@ static vm_fault_t dax_pmd_load_hole(struct xa_state *xas, struct vm_fault *vmf,
+ 		pgtable_trans_huge_deposit(vma->vm_mm, vmf->pmd, pgtable);
+ 		mm_inc_nr_ptes(vma->vm_mm);
+ 	}
+-	pmd_entry = mk_pmd(zero_page, vmf->vma->vm_page_prot);
+-	pmd_entry = pmd_mkhuge(pmd_entry);
++	pmd_entry = mk_zero_pmd(zero_page, vmf->vma->vm_page_prot);
+ 	set_pmd_at(vmf->vma->vm_mm, pmd_addr, vmf->pmd, pmd_entry);
+ 	spin_unlock(ptl);
+ 	trace_dax_pmd_load_hole(inode, vmf, zero_page, *entry);
+diff --git a/include/asm-generic/pgtable.h b/include/asm-generic/pgtable.h
+index fa782fba51ee..cde8b81f6f2b 100644
+--- a/include/asm-generic/pgtable.h
++++ b/include/asm-generic/pgtable.h
+@@ -879,8 +879,16 @@ static inline unsigned long my_zero_pfn(unsigned long addr)
  }
+ #endif
  
-+#ifndef vma_keyid
-+static inline int vma_keyid(struct vm_area_struct *vma)
-+{
-+	return 0;
-+}
++#ifndef mk_zero_pte
++#define mk_zero_pte(addr, prot) pte_mkspecial(pfn_pte(my_zero_pfn(addr), prot))
 +#endif
 +
- #ifdef CONFIG_SHMEM
- /*
-  * The vma_is_shmem is not inline because it is used only by slow
-@@ -2275,7 +2282,7 @@ static inline int vma_adjust(struct vm_area_struct *vma, unsigned long start,
- extern struct vm_area_struct *vma_merge(struct mm_struct *,
- 	struct vm_area_struct *prev, unsigned long addr, unsigned long end,
- 	unsigned long vm_flags, struct anon_vma *, struct file *, pgoff_t,
--	struct mempolicy *, struct vm_userfaultfd_ctx);
-+	struct mempolicy *, struct vm_userfaultfd_ctx, int keyid);
- extern struct anon_vma *find_mergeable_anon_vma(struct vm_area_struct *);
- extern int __split_vma(struct mm_struct *, struct vm_area_struct *,
- 	unsigned long addr, int new_below);
-diff --git a/mm/madvise.c b/mm/madvise.c
-index 21a7881a2db4..e9925a512b15 100644
---- a/mm/madvise.c
-+++ b/mm/madvise.c
-@@ -138,7 +138,7 @@ static long madvise_behavior(struct vm_area_struct *vma,
- 	pgoff = vma->vm_pgoff + ((start - vma->vm_start) >> PAGE_SHIFT);
- 	*prev = vma_merge(mm, *prev, start, end, new_flags, vma->anon_vma,
- 			  vma->vm_file, pgoff, vma_policy(vma),
--			  vma->vm_userfaultfd_ctx);
-+			  vma->vm_userfaultfd_ctx, vma_keyid(vma));
- 	if (*prev) {
- 		vma = *prev;
- 		goto success;
-diff --git a/mm/mempolicy.c b/mm/mempolicy.c
-index 2219e747df49..14b18449c623 100644
---- a/mm/mempolicy.c
-+++ b/mm/mempolicy.c
-@@ -731,7 +731,8 @@ static int mbind_range(struct mm_struct *mm, unsigned long start,
- 			((vmstart - vma->vm_start) >> PAGE_SHIFT);
- 		prev = vma_merge(mm, prev, vmstart, vmend, vma->vm_flags,
- 				 vma->anon_vma, vma->vm_file, pgoff,
--				 new_pol, vma->vm_userfaultfd_ctx);
-+				 new_pol, vma->vm_userfaultfd_ctx,
-+				 vma_keyid(vma));
- 		if (prev) {
- 			vma = prev;
- 			next = vma->vm_next;
-diff --git a/mm/mlock.c b/mm/mlock.c
-index 080f3b36415b..d44cb0c9e9ca 100644
---- a/mm/mlock.c
-+++ b/mm/mlock.c
-@@ -535,7 +535,7 @@ static int mlock_fixup(struct vm_area_struct *vma, struct vm_area_struct **prev,
- 	pgoff = vma->vm_pgoff + ((start - vma->vm_start) >> PAGE_SHIFT);
- 	*prev = vma_merge(mm, *prev, start, end, newflags, vma->anon_vma,
- 			  vma->vm_file, pgoff, vma_policy(vma),
--			  vma->vm_userfaultfd_ctx);
-+			  vma->vm_userfaultfd_ctx, vma_keyid(vma));
- 	if (*prev) {
- 		vma = *prev;
- 		goto success;
-diff --git a/mm/mmap.c b/mm/mmap.c
-index bd7b9f293b39..de0bdf4d8f90 100644
---- a/mm/mmap.c
-+++ b/mm/mmap.c
-@@ -1007,7 +1007,8 @@ int __vma_adjust(struct vm_area_struct *vma, unsigned long start,
-  */
- static inline int is_mergeable_vma(struct vm_area_struct *vma,
- 				struct file *file, unsigned long vm_flags,
--				struct vm_userfaultfd_ctx vm_userfaultfd_ctx)
-+				struct vm_userfaultfd_ctx vm_userfaultfd_ctx,
-+				int keyid)
- {
- 	/*
- 	 * VM_SOFTDIRTY should not prevent from VMA merging, if we
-@@ -1021,6 +1022,8 @@ static inline int is_mergeable_vma(struct vm_area_struct *vma,
- 		return 0;
- 	if (vma->vm_file != file)
- 		return 0;
-+	if (vma_keyid(vma) != keyid)
-+		return 0;
- 	if (vma->vm_ops && vma->vm_ops->close)
- 		return 0;
- 	if (!is_mergeable_vm_userfaultfd_ctx(vma, vm_userfaultfd_ctx))
-@@ -1057,9 +1060,10 @@ static int
- can_vma_merge_before(struct vm_area_struct *vma, unsigned long vm_flags,
- 		     struct anon_vma *anon_vma, struct file *file,
- 		     pgoff_t vm_pgoff,
--		     struct vm_userfaultfd_ctx vm_userfaultfd_ctx)
-+		     struct vm_userfaultfd_ctx vm_userfaultfd_ctx,
-+		     int keyid)
- {
--	if (is_mergeable_vma(vma, file, vm_flags, vm_userfaultfd_ctx) &&
-+	if (is_mergeable_vma(vma, file, vm_flags, vm_userfaultfd_ctx, keyid) &&
- 	    is_mergeable_anon_vma(anon_vma, vma->anon_vma, vma)) {
- 		if (vma->vm_pgoff == vm_pgoff)
- 			return 1;
-@@ -1078,9 +1082,10 @@ static int
- can_vma_merge_after(struct vm_area_struct *vma, unsigned long vm_flags,
- 		    struct anon_vma *anon_vma, struct file *file,
- 		    pgoff_t vm_pgoff,
--		    struct vm_userfaultfd_ctx vm_userfaultfd_ctx)
-+		    struct vm_userfaultfd_ctx vm_userfaultfd_ctx,
-+		    int keyid)
- {
--	if (is_mergeable_vma(vma, file, vm_flags, vm_userfaultfd_ctx) &&
-+	if (is_mergeable_vma(vma, file, vm_flags, vm_userfaultfd_ctx, keyid) &&
- 	    is_mergeable_anon_vma(anon_vma, vma->anon_vma, vma)) {
- 		pgoff_t vm_pglen;
- 		vm_pglen = vma_pages(vma);
-@@ -1135,7 +1140,8 @@ struct vm_area_struct *vma_merge(struct mm_struct *mm,
- 			unsigned long end, unsigned long vm_flags,
- 			struct anon_vma *anon_vma, struct file *file,
- 			pgoff_t pgoff, struct mempolicy *policy,
--			struct vm_userfaultfd_ctx vm_userfaultfd_ctx)
-+			struct vm_userfaultfd_ctx vm_userfaultfd_ctx,
-+			int keyid)
- {
- 	pgoff_t pglen = (end - addr) >> PAGE_SHIFT;
- 	struct vm_area_struct *area, *next;
-@@ -1168,7 +1174,7 @@ struct vm_area_struct *vma_merge(struct mm_struct *mm,
- 			mpol_equal(vma_policy(prev), policy) &&
- 			can_vma_merge_after(prev, vm_flags,
- 					    anon_vma, file, pgoff,
--					    vm_userfaultfd_ctx)) {
-+					    vm_userfaultfd_ctx, keyid)) {
- 		/*
- 		 * OK, it can.  Can we now merge in the successor as well?
- 		 */
-@@ -1177,7 +1183,8 @@ struct vm_area_struct *vma_merge(struct mm_struct *mm,
- 				can_vma_merge_before(next, vm_flags,
- 						     anon_vma, file,
- 						     pgoff+pglen,
--						     vm_userfaultfd_ctx) &&
-+						     vm_userfaultfd_ctx,
-+						     keyid) &&
- 				is_mergeable_anon_vma(prev->anon_vma,
- 						      next->anon_vma, NULL)) {
- 							/* cases 1, 6 */
-@@ -1200,7 +1207,7 @@ struct vm_area_struct *vma_merge(struct mm_struct *mm,
- 			mpol_equal(policy, vma_policy(next)) &&
- 			can_vma_merge_before(next, vm_flags,
- 					     anon_vma, file, pgoff+pglen,
--					     vm_userfaultfd_ctx)) {
-+					     vm_userfaultfd_ctx, keyid)) {
- 		if (prev && addr < prev->vm_end)	/* case 4 */
- 			err = __vma_adjust(prev, prev->vm_start,
- 					 addr, prev->vm_pgoff, NULL, next);
-@@ -1745,7 +1752,7 @@ unsigned long mmap_region(struct file *file, unsigned long addr,
- 	 * Can we just expand an old mapping?
- 	 */
- 	vma = vma_merge(mm, prev, addr, addr + len, vm_flags,
--			NULL, file, pgoff, NULL, NULL_VM_UFFD_CTX);
-+			NULL, file, pgoff, NULL, NULL_VM_UFFD_CTX, 0);
- 	if (vma)
- 		goto out;
+ #ifdef CONFIG_MMU
  
-@@ -3023,7 +3030,7 @@ static int do_brk_flags(unsigned long addr, unsigned long len, unsigned long fla
++#ifndef mk_zero_pmd
++#define mk_zero_pmd(zero_page, prot) pmd_mkhuge(mk_pmd(zero_page, prot))
++#endif
++
+ #ifndef CONFIG_TRANSPARENT_HUGEPAGE
+ static inline int pmd_trans_huge(pmd_t pmd)
+ {
+diff --git a/mm/huge_memory.c b/mm/huge_memory.c
+index 165ea46bf149..26c3503824ba 100644
+--- a/mm/huge_memory.c
++++ b/mm/huge_memory.c
+@@ -675,8 +675,7 @@ static bool set_huge_zero_page(pgtable_t pgtable, struct mm_struct *mm,
+ 	pmd_t entry;
+ 	if (!pmd_none(*pmd))
+ 		return false;
+-	entry = mk_pmd(zero_page, vma->vm_page_prot);
+-	entry = pmd_mkhuge(entry);
++	entry = mk_zero_pmd(zero_page, vma->vm_page_prot);
+ 	if (pgtable)
+ 		pgtable_trans_huge_deposit(mm, pmd, pgtable);
+ 	set_pmd_at(mm, haddr, pmd, entry);
+@@ -2101,8 +2100,7 @@ static void __split_huge_zero_page_pmd(struct vm_area_struct *vma,
  
- 	/* Can we just expand an old private anonymous mapping? */
- 	vma = vma_merge(mm, prev, addr, addr + len, flags,
--			NULL, NULL, pgoff, NULL, NULL_VM_UFFD_CTX);
-+			NULL, NULL, pgoff, NULL, NULL_VM_UFFD_CTX, 0);
- 	if (vma)
- 		goto out;
+ 	for (i = 0; i < HPAGE_PMD_NR; i++, haddr += PAGE_SIZE) {
+ 		pte_t *pte, entry;
+-		entry = pfn_pte(my_zero_pfn(haddr), vma->vm_page_prot);
+-		entry = pte_mkspecial(entry);
++		entry = mk_zero_pte(haddr, vma->vm_page_prot);
+ 		pte = pte_offset_map(&_pmd, haddr);
+ 		VM_BUG_ON(!pte_none(*pte));
+ 		set_pte_at(mm, haddr, pte, entry);
+diff --git a/mm/memory.c b/mm/memory.c
+index ab650c21bccd..c5e0c87a12b7 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -2927,8 +2927,7 @@ static vm_fault_t do_anonymous_page(struct vm_fault *vmf)
+ 	/* Use the zero-page for reads */
+ 	if (!(vmf->flags & FAULT_FLAG_WRITE) &&
+ 			!mm_forbids_zeropage(vma->vm_mm)) {
+-		entry = pte_mkspecial(pfn_pte(my_zero_pfn(vmf->address),
+-						vma->vm_page_prot));
++		entry = mk_zero_pte(vmf->address, vma->vm_page_prot);
+ 		vmf->pte = pte_offset_map_lock(vma->vm_mm, vmf->pmd,
+ 				vmf->address, &vmf->ptl);
+ 		if (!pte_none(*vmf->pte))
+diff --git a/mm/userfaultfd.c b/mm/userfaultfd.c
+index d59b5a73dfb3..ac1ce3866036 100644
+--- a/mm/userfaultfd.c
++++ b/mm/userfaultfd.c
+@@ -122,8 +122,7 @@ static int mfill_zeropage_pte(struct mm_struct *dst_mm,
+ 	pgoff_t offset, max_off;
+ 	struct inode *inode;
  
-@@ -3221,7 +3228,7 @@ struct vm_area_struct *copy_vma(struct vm_area_struct **vmap,
- 		return NULL;	/* should never get here */
- 	new_vma = vma_merge(mm, prev, addr, addr + len, vma->vm_flags,
- 			    vma->anon_vma, vma->vm_file, pgoff, vma_policy(vma),
--			    vma->vm_userfaultfd_ctx);
-+			    vma->vm_userfaultfd_ctx, vma_keyid(vma));
- 	if (new_vma) {
- 		/*
- 		 * Source vma may have been merged into new_vma
-diff --git a/mm/mprotect.c b/mm/mprotect.c
-index 028c724dcb1a..e768cd656a48 100644
---- a/mm/mprotect.c
-+++ b/mm/mprotect.c
-@@ -399,7 +399,7 @@ mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
- 	pgoff = vma->vm_pgoff + ((start - vma->vm_start) >> PAGE_SHIFT);
- 	*pprev = vma_merge(mm, *pprev, start, end, newflags,
- 			   vma->anon_vma, vma->vm_file, pgoff, vma_policy(vma),
--			   vma->vm_userfaultfd_ctx);
-+			   vma->vm_userfaultfd_ctx, vma_keyid(vma));
- 	if (*pprev) {
- 		vma = *pprev;
- 		VM_WARN_ON((vma->vm_flags ^ newflags) & ~VM_SOFTDIRTY);
+-	_dst_pte = pte_mkspecial(pfn_pte(my_zero_pfn(dst_addr),
+-					 dst_vma->vm_page_prot));
++	_dst_pte = mk_zero_pte(dst_addr, dst_vma->vm_page_prot);
+ 	dst_pte = pte_offset_map_lock(dst_mm, dst_pmd, dst_addr, &ptl);
+ 	if (dst_vma->vm_file) {
+ 		/* the shmem MAP_PRIVATE case requires checking the i_size */
 -- 
 2.20.1
 
