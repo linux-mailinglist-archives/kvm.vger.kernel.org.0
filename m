@@ -2,249 +2,436 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CC55517914
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 14:08:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F37B17908
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 14:05:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728379AbfEHMIi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 08:08:38 -0400
-Received: from mga01.intel.com ([192.55.52.88]:62605 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726751AbfEHMIh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 08:08:37 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 05:08:37 -0700
-X-ExtLoop1: 1
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.9])
-  by fmsmga004.fm.intel.com with ESMTP; 08 May 2019 05:08:32 -0700
-Date:   Wed, 8 May 2019 08:02:55 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "berrange@redhat.com" <berrange@redhat.com>,
-        "dinechin@redhat.com" <dinechin@redhat.com>
-Subject: Re: [PATCH v2 2/2] drm/i915/gvt: export mdev device version to sysfs
- for Intel vGPU
-Message-ID: <20190508120255.GC24397@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20190506014514.3555-1-yan.y.zhao@intel.com>
- <20190506015102.3691-1-yan.y.zhao@intel.com>
- <20190507112753.2699d0b5.cohuck@redhat.com>
+        id S1728453AbfEHMFh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 08:05:37 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:55559 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727614AbfEHMFg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 08:05:36 -0400
+Received: by mail-wm1-f65.google.com with SMTP id y2so2934358wmi.5
+        for <kvm@vger.kernel.org>; Wed, 08 May 2019 05:05:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=r/i9MCe8LG0OrtGGjdrG1mtwjsf3GeVWNo1SHB2AHe0=;
+        b=Nw1U9Il9IreGFf4gmTXEP4zt0QCNs6YFkBavNNejcYOx3liEDUepfXg79bSKOb5uZM
+         GUFnEUb++ZDupt8ZkwWLuPW+/hKgQA0v4KGK8Qin0gtRNEede7iwL7o8klz9QtxEFYLd
+         yZavUE4SfP6DUuWBZJSZt/VHtMWShNu4lUXdrUIDeLjGxsThCHeeejetxSCu6Zje20c2
+         BkFIvpzo/CTG8b4AqVGSgfyGNR/Nq3/4eCStgixlP1cMAvHnTodVSPWeztZ+fs651Abl
+         IO3l4dS/HD9v8fWq0FVOs536wWDfUYrdD198z5GsE6laefGmXafx/5WGp+0Wjw3cJtBW
+         8ymA==
+X-Gm-Message-State: APjAAAWoTYXO52v8NZE2QJ9lZ+QD9LjeNc+316Sm2PwsfZdtrj4FHTlN
+        wEyNZSsuwjtxEgf4wF4jXwUO6A==
+X-Google-Smtp-Source: APXvYqzW0B3n7iyUSNgR9SA5jPTUWUhc3Mmpv2svyQzOVPuqpBubG1G/k60F0A+7hhzjef77ffH/hg==
+X-Received: by 2002:a1c:c004:: with SMTP id q4mr2629632wmf.131.1557317134120;
+        Wed, 08 May 2019 05:05:34 -0700 (PDT)
+Received: from [10.201.49.229] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
+        by smtp.gmail.com with ESMTPSA id a15sm2457782wru.88.2019.05.08.05.05.25
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 08 May 2019 05:05:33 -0700 (PDT)
+Subject: Re: [PATCH 3/3] tests: kvm: Add tests for KVM_SET_NESTED_STATE
+To:     Aaron Lewis <aaronlewis@google.com>, rkrcmar@redhat.com,
+        jmattson@google.com, marcorr@google.com, kvm@vger.kernel.org
+Cc:     Peter Shier <pshier@google.com>
+References: <20190502183141.258667-1-aaronlewis@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <120edfea-4200-8ab9-981b-d49cfea02d5d@redhat.com>
+Date:   Wed, 8 May 2019 14:05:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190507112753.2699d0b5.cohuck@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20190502183141.258667-1-aaronlewis@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 07, 2019 at 05:27:53PM +0800, Cornelia Huck wrote:
-> On Sun,  5 May 2019 21:51:02 -0400
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
+On 02/05/19 13:31, Aaron Lewis wrote:
+> Add tests for KVM_SET_NESTED_STATE and for various code paths in its implementation in vmx_set_nested_state().
 > 
-> > This feature implements the version attribute for Intel's vGPU mdev
-> > devices.
-> > 
-> > version attribute is rw.
-> > It's used to check device compatibility for two mdev devices.
-> > version string format and length are private for vendor driver. vendor
-> > driver is able to define them freely.
-> > 
-> > For Intel vGPU of gen8 and gen9, the mdev device version
-> > consists of 3 fields: "vendor id" + "device id" + "mdev type".
-> > 
-> > Reading from a vGPU's version attribute, a string is returned in below
-> > format: <vendor id>-<device id>-<mdev type>. e.g.
-> > 8086-193b-i915-GVTg_V5_2.
-> > 
-> > Writing a string to a vGPU's version attribute will trigger GVT to check
-> > whether a vGPU identified by the written string is compatible with
-> > current vGPU owning this version attribute. errno is returned if the two
-> > vGPUs are incompatible. The length of written string is returned in
-> > compatible case.
-> > 
-> > For other platforms, and for GVT not supporting vGPU live migration
-> > feature, errnos are returned when read/write of mdev devices' version
-> > attributes.
-> > 
-> > For old GVT versions where no version attributes exposed in sysfs, it is
-> > regarded as not supporting vGPU live migration.
-> > 
-> > For future platforms, besides the current 2 fields in vendor proprietary
-> > part, more fields may be added to identify Intel vGPU well for live
-> > migration purpose.
-> > 
-> > v2:
-> > 1. removed 32 common part of version string
-> > (Alex Williamson)
-> > 2. do not register version attribute for GVT not supporting live
-> > migration.(Cornelia Huck)
-> > 3. for platforms out of gen8, gen9, return -EINVAL --> -ENODEV for
-> > incompatible. (Cornelia Huck)
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> Reviewed-by: Marc Orr <marcorr@google.com>
+> Reviewed-by: Peter Shier <pshier@google.com>
+> ---
+>  tools/testing/selftests/kvm/.gitignore        |   1 +
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../testing/selftests/kvm/include/kvm_util.h  |   4 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |  32 ++
+>  .../kvm/x86_64/vmx_set_nested_state_test.c    | 275 ++++++++++++++++++
+>  5 files changed, 313 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
 > 
-> Should go below '---'.
->
-got it. will change it in next revision.
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 2689d1ea6d7a..bbaa97dbd19e 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -6,4 +6,5 @@
+>  /x86_64/vmx_close_while_nested_test
+>  /x86_64/vmx_tsc_adjust_test
+>  /x86_64/state_test
+> +/x86_64/vmx_set_nested_state_test
+>  /dirty_log_test
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index f8588cca2bef..10eff4317226 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -20,6 +20,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
+>  TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
+>  TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+> +TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
+>  TEST_GEN_PROGS_x86_64 += dirty_log_test
+>  TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
+>  
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 07b71ad9734a..8c6b9619797d 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -118,6 +118,10 @@ void vcpu_events_get(struct kvm_vm *vm, uint32_t vcpuid,
+>  		     struct kvm_vcpu_events *events);
+>  void vcpu_events_set(struct kvm_vm *vm, uint32_t vcpuid,
+>  		     struct kvm_vcpu_events *events);
+> +void vcpu_nested_state_get(struct kvm_vm *vm, uint32_t vcpuid,
+> +			   struct kvm_nested_state *state);
+> +int vcpu_nested_state_set(struct kvm_vm *vm, uint32_t vcpuid,
+> +			  struct kvm_nested_state *state, bool ignore_error);
+>  
+>  const char *exit_reason_str(unsigned int exit_reason);
+>  
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 4ca96b228e46..e9113857f44e 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1250,6 +1250,38 @@ void vcpu_events_set(struct kvm_vm *vm, uint32_t vcpuid,
+>  		ret, errno);
+>  }
+>  
+> +void vcpu_nested_state_get(struct kvm_vm *vm, uint32_t vcpuid,
+> +			   struct kvm_nested_state *state)
+> +{
+> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+> +	int ret;
+> +
+> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
+> +
+> +	ret = ioctl(vcpu->fd, KVM_GET_NESTED_STATE, state);
+> +	TEST_ASSERT(ret == 0,
+> +		"KVM_SET_NESTED_STATE failed, ret: %i errno: %i",
+> +		ret, errno);
+> +}
+> +
+> +int vcpu_nested_state_set(struct kvm_vm *vm, uint32_t vcpuid,
+> +			  struct kvm_nested_state *state, bool ignore_error)
+> +{
+> +	struct vcpu *vcpu = vcpu_find(vm, vcpuid);
+> +	int ret;
+> +
+> +	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
+> +
+> +	ret = ioctl(vcpu->fd, KVM_SET_NESTED_STATE, state);
+> +	if (!ignore_error) {
+> +		TEST_ASSERT(ret == 0,
+> +			"KVM_SET_NESTED_STATE failed, ret: %i errno: %i",
+> +			ret, errno);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+>  /*
+>   * VM VCPU System Regs Get
+>   *
+> diff --git a/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c b/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
+> new file mode 100644
+> index 000000000000..5eea24087d19
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
+> @@ -0,0 +1,275 @@
+> +/*
+> + * vmx_set_nested_state_test
+> + *
+> + * Copyright (C) 2019, Google LLC.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.
+> + *
+> + * This test verifies the integrity of calling the ioctl KVM_SET_NESTED_STATE.
+> + */
+> +
+> +#include "test_util.h"
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +#include "vmx.h"
+> +
+> +#include <errno.h>
+> +#include <linux/kvm.h>
+> +#include <string.h>
+> +#include <sys/ioctl.h>
+> +#include <unistd.h>
+> +
+> +/*
+> + * Mirror of VMCS12_REVISION in arch/x86/kvm/vmx/vmcs12.h. If that value
+> + * changes this should be updated.
+> + */
+> +#define VMCS12_REVISION 0x11e57ed0
+> +#define VCPU_ID 5
+> +
+> +void test_nested_state(struct kvm_vm *vm, struct kvm_nested_state *state)
+> +{
+> +	volatile struct kvm_run *run;
+> +
+> +	vcpu_nested_state_set(vm, VCPU_ID, state, false);
+> +	run = vcpu_state(vm, VCPU_ID);
+> +	vcpu_run(vm, VCPU_ID);
+> +	TEST_ASSERT(run->exit_reason == KVM_EXIT_SHUTDOWN,
+> +		"Got exit_reason other than KVM_EXIT_SHUTDOWN: %u (%s),\n",
+> +		run->exit_reason,
+> +		exit_reason_str(run->exit_reason));
+> +}
+> +
+> +void test_nested_state_expect_errno(struct kvm_vm *vm,
+> +				    struct kvm_nested_state *state,
+> +				    int expected_errno)
+> +{
+> +	volatile struct kvm_run *run;
+> +	int rv;
+> +
+> +	rv = vcpu_nested_state_set(vm, VCPU_ID, state, true);
+> +	TEST_ASSERT(rv == -1 && errno == expected_errno,
+> +		"Expected %s (%d) from vcpu_nested_state_set but got rv: %i errno: %s (%d)",
+> +		strerror(expected_errno), expected_errno, rv, strerror(errno),
+> +		errno);
+> +	run = vcpu_state(vm, VCPU_ID);
+> +	vcpu_run(vm, VCPU_ID);
+> +	TEST_ASSERT(run->exit_reason == KVM_EXIT_SHUTDOWN,
+> +		"Got exit_reason other than KVM_EXIT_SHUTDOWN: %u (%s),\n",
+> +		run->exit_reason,
+> +		exit_reason_str(run->exit_reason));
+> +}
+> +
+> +void test_nested_state_expect_einval(struct kvm_vm *vm,
+> +				     struct kvm_nested_state *state)
+> +{
+> +	test_nested_state_expect_errno(vm, state, EINVAL);
+> +}
+> +
+> +void test_nested_state_expect_efault(struct kvm_vm *vm,
+> +				     struct kvm_nested_state *state)
+> +{
+> +	test_nested_state_expect_errno(vm, state, EFAULT);
+> +}
+> +
+> +void set_revision_id_for_vmcs12(struct kvm_nested_state *state,
+> +				u32 vmcs12_revision)
+> +{
+> +	/* Set revision_id in vmcs12 to vmcs12_revision. */
+> +	*(u32 *)(state->data) = vmcs12_revision;
+> +}
+> +
+> +void set_default_state(struct kvm_nested_state *state)
+> +{
+> +	memset(state, 0, sizeof(*state));
+> +	state->flags = KVM_STATE_NESTED_RUN_PENDING |
+> +		       KVM_STATE_NESTED_GUEST_MODE;
+> +	state->format = 0;
+> +	state->size = sizeof(*state);
+> +}
+> +
+> +void set_default_vmx_state(struct kvm_nested_state *state, int size)
+> +{
+> +	memset(state, 0, size);
+> +	state->flags = KVM_STATE_NESTED_GUEST_MODE  |
+> +			KVM_STATE_NESTED_RUN_PENDING |
+> +			KVM_STATE_NESTED_EVMCS;
+> +	state->format = 0;
+> +	state->size = size;
+> +	state->vmx.vmxon_pa = 0x1000;
+> +	state->vmx.vmcs_pa = 0x2000;
+> +	state->vmx.smm.flags = 0;
+> +	set_revision_id_for_vmcs12(state, VMCS12_REVISION);
+> +}
+> +
+> +void test_vmx_nested_state(struct kvm_vm *vm)
+> +{
+> +	/* Add a page for VMCS12. */
+> +	const int state_sz = sizeof(struct kvm_nested_state) + getpagesize();
+> +	struct kvm_nested_state *state =
+> +		(struct kvm_nested_state *)malloc(state_sz);
+> +
+> +	/* The format must be set to 0. 0 for VMX, 1 for SVM. */
+> +	set_default_vmx_state(state, state_sz);
+> +	state->format = 1;
+> +	test_nested_state_expect_einval(vm, state);
+> +
+> +	/*
+> +	 * We cannot virtualize anything if the guest does not have VMX
+> +	 * enabled.
+> +	 */
+> +	set_default_vmx_state(state, state_sz);
+> +	test_nested_state_expect_einval(vm, state);
+> +
+> +	/*
+> +	 * We cannot virtualize anything if the guest does not have VMX
+> +	 * enabled.  We expect KVM_SET_NESTED_STATE to return 0 if vmxon_pa
+> +	 * is set to -1ull.
+> +	 */
+> +	set_default_vmx_state(state, state_sz);
+> +	state->vmx.vmxon_pa = -1ull;
+> +	test_nested_state(vm, state);
+> +
+> +	/* Enable VMX in the guest CPUID. */
+> +	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
+> +
+> +	/* It is invalid to have vmxon_pa == -1ull and SMM flags non-zero. */
+> +	set_default_vmx_state(state, state_sz);
+> +	state->vmx.vmxon_pa = -1ull;
+> +	state->vmx.smm.flags = 1;
+> +	test_nested_state_expect_einval(vm, state);
+> +
+> +	/* It is invalid to have vmxon_pa == -1ull and vmcs_pa != -1ull. */
+> +	set_default_vmx_state(state, state_sz);
+> +	state->vmx.vmxon_pa = -1ull;
+> +	state->vmx.vmcs_pa = 0;
+> +	test_nested_state_expect_einval(vm, state);
+> +
+> +	/*
+> +	 * Setting vmxon_pa == -1ull and vmcs_pa == -1ull exits early without
+> +	 * setting the nested state.
+> +	 */
+> +	set_default_vmx_state(state, state_sz);
+> +	state->vmx.vmxon_pa = -1ull;
+> +	state->vmx.vmcs_pa = -1ull;
+> +	test_nested_state(vm, state);
+> +
+> +	/* It is invalid to have vmxon_pa set to a non-page aligned address. */
+> +	set_default_vmx_state(state, state_sz);
+> +	state->vmx.vmxon_pa = 1;
+> +	test_nested_state_expect_einval(vm, state);
+> +
+> +	/*
+> +	 * It is invalid to have KVM_STATE_NESTED_SMM_GUEST_MODE and
+> +	 * KVM_STATE_NESTED_GUEST_MODE set together.
+> +	 */
+> +	set_default_vmx_state(state, state_sz);
+> +	state->flags = KVM_STATE_NESTED_GUEST_MODE  |
+> +		      KVM_STATE_NESTED_RUN_PENDING;
+> +	state->vmx.smm.flags = KVM_STATE_NESTED_SMM_GUEST_MODE;
+> +	test_nested_state_expect_einval(vm, state);
+> +
+> +	/*
+> +	 * It is invalid to have any of the SMM flags set besides:
+> +	 *	KVM_STATE_NESTED_SMM_GUEST_MODE
+> +	 *	KVM_STATE_NESTED_SMM_VMXON
+> +	 */
+> +	set_default_vmx_state(state, state_sz);
+> +	state->vmx.smm.flags = ~(KVM_STATE_NESTED_SMM_GUEST_MODE |
+> +				KVM_STATE_NESTED_SMM_VMXON);
+> +	test_nested_state_expect_einval(vm, state);
+> +
+> +	/* Outside SMM, SMM flags must be zero. */
+> +	set_default_vmx_state(state, state_sz);
+> +	state->flags = 0;
+> +	state->vmx.smm.flags = KVM_STATE_NESTED_SMM_GUEST_MODE;
+> +	test_nested_state_expect_einval(vm, state);
+> +
+> +	/* Size must be large enough to fit kvm_nested_state and vmcs12. */
+> +	set_default_vmx_state(state, state_sz);
+> +	state->size = sizeof(*state);
+> +	test_nested_state(vm, state);
+> +
+> +	/* vmxon_pa cannot be the same address as vmcs_pa. */
+> +	set_default_vmx_state(state, state_sz);
+> +	state->vmx.vmxon_pa = 0;
+> +	state->vmx.vmcs_pa = 0;
+> +	test_nested_state_expect_einval(vm, state);
+> +
+> +	/* The revision id for vmcs12 must be VMCS12_REVISION. */
+> +	set_default_vmx_state(state, state_sz);
+> +	set_revision_id_for_vmcs12(state, 0);
+> +	test_nested_state_expect_einval(vm, state);
+> +
+> +	/*
+> +	 * Test that if we leave nesting the state reflects that when we get
+> +	 * it again.
+> +	 */
+> +	set_default_vmx_state(state, state_sz);
+> +	state->vmx.vmxon_pa = -1ull;
+> +	state->vmx.vmcs_pa = -1ull;
+> +	state->flags = 0;
+> +	test_nested_state(vm, state);
+> +	vcpu_nested_state_get(vm, VCPU_ID, state);
+> +	TEST_ASSERT(state->size >= sizeof(*state) && state->size <= state_sz,
+> +		    "Size must be between %d and %d.  The size returned was %d.",
+> +		    sizeof(*state), state_sz, state->size);
+> +	TEST_ASSERT(state->vmx.vmxon_pa == -1ull, "vmxon_pa must be -1ull.");
+> +	TEST_ASSERT(state->vmx.vmcs_pa == -1ull, "vmcs_pa must be -1ull.");
+> +
+> +	free(state);
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	struct kvm_vm *vm;
+> +	struct kvm_nested_state state;
+> +	struct kvm_cpuid_entry2 *entry = kvm_get_supported_cpuid_entry(1);
+> +
+> +	/*
+> +	 * AMD currently does not implement set_nested_state, so for now we
+> +	 * just early out.
+> +	 */
+> +	if (!(entry->ecx & CPUID_VMX)) {
+> +		fprintf(stderr, "nested VMX not enabled, skipping test\n");
+> +		exit(KSFT_SKIP);
+> +	}
+> +
+> +	vm = vm_create_default(VCPU_ID, 0, 0);
+> +
+> +	/* Passing a NULL kvm_nested_state causes a EFAULT. */
+> +	test_nested_state_expect_efault(vm, NULL);
+> +
+> +	/* 'size' cannot be smaller than sizeof(kvm_nested_state). */
+> +	set_default_state(&state);
+> +	state.size = 0;
+> +	test_nested_state_expect_einval(vm, &state);
+> +
+> +	/*
+> +	 * Setting the flags 0xf fails the flags check.  The only flags that
+> +	 * can be used are:
+> +	 *     KVM_STATE_NESTED_GUEST_MODE
+> +	 *     KVM_STATE_NESTED_RUN_PENDING
+> +	 *     KVM_STATE_NESTED_EVMCS
+> +	 */
+> +	set_default_state(&state);
+> +	state.flags = 0xf;
+> +	test_nested_state_expect_einval(vm, &state);
+> +
+> +	/*
+> +	 * If KVM_STATE_NESTED_RUN_PENDING is set then
+> +	 * KVM_STATE_NESTED_GUEST_MODE has to be set as well.
+> +	 */
+> +	set_default_state(&state);
+> +	state.flags = KVM_STATE_NESTED_RUN_PENDING;
+> +	test_nested_state_expect_einval(vm, &state);
+> +
+> +	/*
+> +	 * TODO: When SVM support is added for KVM_SET_NESTED_STATE
+> +	 *       add tests here to support it like VMX.
+> +	 */
+> +	if (entry->ecx & CPUID_VMX)
+> +		test_vmx_nested_state(vm);
+> +
+> +	kvm_vm_free(vm);
+> +	return 0;
+> +}
+> 
 
-> > 
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Cc: Erik Skultety <eskultet@redhat.com>
-> > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > Cc: Cornelia Huck <cohuck@redhat.com>
-> > Cc: "Tian, Kevin" <kevin.tian@intel.com>
-> > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> > Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
-> > c: Neo Jia <cjia@nvidia.com>
-> > Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> > 
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > ---
-> >  drivers/gpu/drm/i915/gvt/Makefile         |  2 +-
-> >  drivers/gpu/drm/i915/gvt/device_version.c | 87 +++++++++++++++++++++++
-> >  drivers/gpu/drm/i915/gvt/gvt.c            | 51 +++++++++++++
-> >  drivers/gpu/drm/i915/gvt/gvt.h            |  6 ++
-> >  4 files changed, 145 insertions(+), 1 deletion(-)
-> >  create mode 100644 drivers/gpu/drm/i915/gvt/device_version.c
-> > 
-> 
-> (...)
-> 
-> > diff --git a/drivers/gpu/drm/i915/gvt/device_version.c b/drivers/gpu/drm/i915/gvt/device_version.c
-> > new file mode 100644
-> > index 000000000000..bd4cdcbdba95
-> > --- /dev/null
-> > +++ b/drivers/gpu/drm/i915/gvt/device_version.c
-> > @@ -0,0 +1,87 @@
-> > +/*
-> > + * Copyright(c) 2011-2017 Intel Corporation. All rights reserved.
-> > + *
-> > + * Permission is hereby granted, free of charge, to any person obtaining a
-> > + * copy of this software and associated documentation files (the "Software"),
-> > + * to deal in the Software without restriction, including without limitation
-> > + * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-> > + * and/or sell copies of the Software, and to permit persons to whom the
-> > + * Software is furnished to do so, subject to the following conditions:
-> > + *
-> > + * The above copyright notice and this permission notice (including the next
-> > + * paragraph) shall be included in all copies or substantial portions of the
-> > + * Software.
-> > + *
-> > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-> > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-> > + * SOFTWARE.
-> > + *
-> > + * Authors:
-> > + *    Yan Zhao <yan.y.zhao@intel.com>
-> > + */
-> > +#include <linux/vfio.h>
-> > +#include "i915_drv.h"
-> > +
-> > +static bool is_compatible(const char *self, const char *remote)
-> > +{
-> > +	if (strlen(remote) != strlen(self))
-> > +		return false;
-> > +
-> > +	return (strncmp(self, remote, strlen(self))) ? false : true;
-> > +}
-> > +
-> > +ssize_t intel_gvt_get_vfio_device_version_len(struct drm_i915_private *dev_priv)
-> > +{
-> > +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> > +		return -ENODEV;
-> > +
-> > +	return PAGE_SIZE;
-> > +}
-> > +
-> > +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *dev_priv,
-> > +		char *buf, const char *mdev_type)
-> > +{
-> > +	int cnt = 0, ret = 0;
-> > +	const char *str = NULL;
-> > +
-> > +	/* currently only gen8 & gen9 are supported */
-> > +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> > +		return -ENODEV;
-> > +
-> > +	/* vendor id + device id + mdev type */
-> > +	/* vendor id */
-> > +	cnt = snprintf(buf, 5, "%04x", PCI_VENDOR_ID_INTEL);
-> > +	buf += cnt;
-> > +	ret += cnt;
-> > +
-> > +	/* device id */
-> > +	cnt = snprintf(buf, 6, "-%04x", INTEL_DEVID(dev_priv));
-> > +	buf += cnt;
-> > +	ret += cnt;
-> > +
-> > +	/* mdev type */
-> > +	str = mdev_type;
-> > +	cnt = snprintf(buf, strlen(str) + 3, "-%s\n", mdev_type);
-> > +	buf += cnt;
-> > +	ret += cnt;
-> > +
-> > +	return ret;
-> 
-> I'm not familiar with this driver; but would it make sense to pre-build
-> the version on init? It does not look to me like the values could
-> change dynamically.
->
-yes. I intended to save some memory by not pre-building the version on init, as
-migration is a rare event. but as these version strings are not big, moving them
-to init is also good. I'll do it in next revision.
-thanks:)
+Queued all three, thanks.
 
-
-> > +}
-> > +
-> > +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *dev_priv,
-> > +		const char *self, const char *remote)
-> > +{
-> > +
-> > +	/* currently only gen8 & gen9 are supported */
-> > +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> > +		return -ENODEV;
-> > +
-> > +	if (!is_compatible(self, remote))
-> > +		return -EINVAL;
-> > +
-> > +	return 0;
-> > +}
-> 
-> Return values look reasonable to me. I'll leave discussions regarding
-> where the attribute should go to folks familiar with this driver.
-ok. thanks :)
+Paolo
