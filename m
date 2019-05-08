@@ -2,314 +2,227 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A173217643
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 12:51:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CC6317685
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 13:12:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726836AbfEHKuv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 06:50:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57648 "EHLO mx1.redhat.com"
+        id S1727409AbfEHLMu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 07:12:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55142 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726544AbfEHKuu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 06:50:50 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S1727345AbfEHLMt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 07:12:49 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2CFAA89C36;
-        Wed,  8 May 2019 10:50:49 +0000 (UTC)
-Received: from work-vm (ovpn-117-175.ams2.redhat.com [10.36.117.175])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3588A6013B;
-        Wed,  8 May 2019 10:50:36 +0000 (UTC)
-Date:   Wed, 8 May 2019 11:50:33 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     intel-gvt-dev@lists.freedesktop.org, arei.gonglei@huawei.com,
-        aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com,
-        shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org,
-        eauger@redhat.com, yi.l.liu@intel.com, ziye.yang@intel.com,
-        mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
-        changpeng.liu@intel.com, Ken.Xue@amd.com,
-        jonathan.davies@nutanix.com, shaopeng.he@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        libvir-list@redhat.com, alex.williamson@redhat.com,
-        eskultet@redhat.com, cohuck@redhat.com, kevin.tian@intel.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, cjia@nvidia.com,
-        kwankhede@nvidia.com, berrange@redhat.com, dinechin@redhat.com
-Subject: Re: [PATCH v2 2/2] drm/i915/gvt: export mdev device version to sysfs
- for Intel vGPU
-Message-ID: <20190508105032.GE2718@work-vm>
-References: <20190506014514.3555-1-yan.y.zhao@intel.com>
- <20190506015102.3691-1-yan.y.zhao@intel.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id CD27530842B2;
+        Wed,  8 May 2019 11:12:48 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 80D2960C67;
+        Wed,  8 May 2019 11:12:48 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id F3F3D41F3C;
+        Wed,  8 May 2019 11:12:47 +0000 (UTC)
+Date:   Wed, 8 May 2019 07:12:47 -0400 (EDT)
+From:   Pankaj Gupta <pagupta@redhat.com>
+To:     Jakub =?utf-8?Q?Staro=C5=84?= <jstaron@google.com>
+Cc:     linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org, jack@suse.cz, mst@redhat.com,
+        jasowang@redhat.com, david@fromorbit.com, lcapitulino@redhat.com,
+        adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
+        aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
+        darrick wong <darrick.wong@oracle.com>,
+        vishal l verma <vishal.l.verma@intel.com>, david@redhat.com,
+        willy@infradead.org, hch@infradead.org, jmoyer@redhat.com,
+        nilal@redhat.com, lenb@kernel.org, kilobyte@angband.pl,
+        riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
+        stefanha@redhat.com, pbonzini@redhat.com,
+        dan j williams <dan.j.williams@intel.com>, kwolf@redhat.com,
+        tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
+        cohuck@redhat.com, rjw@rjwysocki.net, imammedo@redhat.com,
+        smbarber@google.com
+Message-ID: <1555943483.27247564.1557313967518.JavaMail.zimbra@redhat.com>
+In-Reply-To: <3d6479ae-6c39-d614-f1d9-aa1978e2e438@google.com>
+References: <20190426050039.17460-1-pagupta@redhat.com> <20190426050039.17460-3-pagupta@redhat.com> <3d6479ae-6c39-d614-f1d9-aa1978e2e438@google.com>
+Subject: Re: [Qemu-devel] [PATCH v7 2/6] virtio-pmem: Add virtio pmem driver
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190506015102.3691-1-yan.y.zhao@intel.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Wed, 08 May 2019 10:50:49 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.97, 10.4.195.7]
+Thread-Topic: virtio-pmem: Add virtio pmem driver
+Thread-Index: PGqRBxt7ac04jwyhY+CEFoY6aRdKvA==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Wed, 08 May 2019 11:12:49 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Yan Zhao (yan.y.zhao@intel.com) wrote:
-> This feature implements the version attribute for Intel's vGPU mdev
-> devices.
+
 > 
-> version attribute is rw.
-> It's used to check device compatibility for two mdev devices.
-> version string format and length are private for vendor driver. vendor
-> driver is able to define them freely.
+> On 4/25/19 10:00 PM, Pankaj Gupta wrote:
 > 
-> For Intel vGPU of gen8 and gen9, the mdev device version
-> consists of 3 fields: "vendor id" + "device id" + "mdev type".
+> > +void host_ack(struct virtqueue *vq)
+> > +{
+> > +	unsigned int len;
+> > +	unsigned long flags;
+> > +	struct virtio_pmem_request *req, *req_buf;
+> > +	struct virtio_pmem *vpmem = vq->vdev->priv;
+> > +
+> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> > +	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
+> > +		req->done = true;
+> > +		wake_up(&req->host_acked);
+> > +
+> > +		if (!list_empty(&vpmem->req_list)) {
+> > +			req_buf = list_first_entry(&vpmem->req_list,
+> > +					struct virtio_pmem_request, list);
+> > +			list_del(&vpmem->req_list);
 > 
-> Reading from a vGPU's version attribute, a string is returned in below
-> format: <vendor id>-<device id>-<mdev type>. e.g.
-> 8086-193b-i915-GVTg_V5_2.
+> Shouldn't it be rather `list_del(vpmem->req_list.next)`? We are trying to
+> unlink
+> first element of the list and `vpmem->req_list` is just the list head.
+
+This looks correct. We are not deleting head but first entry in 'req_list'
+which is device corresponding list of pending requests.
+
+Please see below:
+
+/**
+ * Retrieve the first list entry for the given list pointer.
+ *
+ * Example:
+ * struct foo *first;
+ * first = list_first_entry(&bar->list_of_foos, struct foo, list_of_foos);
+ *
+ * @param ptr The list head
+ * @param type Data type of the list element to retrieve
+ * @param member Member name of the struct list_head field in the list element.
+ * @return A pointer to the first list element.
+ */
+#define list_first_entry(ptr, type, member) \
+    list_entry((ptr)->next, type, member)
+
 > 
-> Writing a string to a vGPU's version attribute will trigger GVT to check
-> whether a vGPU identified by the written string is compatible with
-> current vGPU owning this version attribute. errno is returned if the two
-> vGPUs are incompatible. The length of written string is returned in
-> compatible case.
+> > +int virtio_pmem_flush(struct nd_region *nd_region)
+> > +{
+> > +	int err;
+> > +	unsigned long flags;
+> > +	struct scatterlist *sgs[2], sg, ret;
+> > +	struct virtio_device *vdev = nd_region->provider_data;
+> > +	struct virtio_pmem *vpmem = vdev->priv;
+> > +	struct virtio_pmem_request *req;
+> > +
+> > +	might_sleep();
+> > +	req = kmalloc(sizeof(*req), GFP_KERNEL);
+> > +	if (!req)
+> > +		return -ENOMEM;
+> > +
+> > +	req->done = req->wq_buf_avail = false;
+> > +	strcpy(req->name, "FLUSH");
+> > +	init_waitqueue_head(&req->host_acked);
+> > +	init_waitqueue_head(&req->wq_buf);
+> > +	sg_init_one(&sg, req->name, strlen(req->name));
+> > +	sgs[0] = &sg;
+> > +	sg_init_one(&ret, &req->ret, sizeof(req->ret));
+> > +	sgs[1] = &ret;
+> > +
+> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> > +	err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
+> > +	if (err) {
+> > +		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
+> > +
+> > +		list_add_tail(&vpmem->req_list, &req->list);
+> > +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> > +
+> > +		/* When host has read buffer, this completes via host_ack */
+> > +		wait_event(req->wq_buf, req->wq_buf_avail);
+> > +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> > +	}
 > 
-> For other platforms, and for GVT not supporting vGPU live migration
-> feature, errnos are returned when read/write of mdev devices' version
-> attributes.
+> Aren't the arguments in `list_add_tail` swapped? The element we are adding
+
+No, this is intentional. 'vpmem->req_list' maintains a list of pending requests
+for entire pmem device.  'req->list'is per request list and maintains pending
+request on virtio queue add failure. I think we don't need this list.
+
+> should
+> be first, the list should be second. Also, shouldn't we resubmit the request
+> after
+> waking up from `wait_event(req->wq_buf, req->wq_buf_avail)`?
+
+Yes. we should. Good point.
+
 > 
-> For old GVT versions where no version attributes exposed in sysfs, it is
-> regarded as not supporting vGPU live migration.
+> I propose rewriting it like that:
 > 
-> For future platforms, besides the current 2 fields in vendor proprietary
-> part, more fields may be added to identify Intel vGPU well for live
-> migration purpose.
-> 
-> v2:
-> 1. removed 32 common part of version string
-> (Alex Williamson)
-> 2. do not register version attribute for GVT not supporting live
-> migration.(Cornelia Huck)
-> 3. for platforms out of gen8, gen9, return -EINVAL --> -ENODEV for
-> incompatible. (Cornelia Huck)
-> 
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Erik Skultety <eskultet@redhat.com>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: "Tian, Kevin" <kevin.tian@intel.com>
-> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
-> c: Neo Jia <cjia@nvidia.com>
-> Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> 
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> ---
->  drivers/gpu/drm/i915/gvt/Makefile         |  2 +-
->  drivers/gpu/drm/i915/gvt/device_version.c | 87 +++++++++++++++++++++++
->  drivers/gpu/drm/i915/gvt/gvt.c            | 51 +++++++++++++
->  drivers/gpu/drm/i915/gvt/gvt.h            |  6 ++
->  4 files changed, 145 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/gpu/drm/i915/gvt/device_version.c
-> 
-> diff --git a/drivers/gpu/drm/i915/gvt/Makefile b/drivers/gpu/drm/i915/gvt/Makefile
-> index 271fb46d4dd0..54e209a23899 100644
-> --- a/drivers/gpu/drm/i915/gvt/Makefile
-> +++ b/drivers/gpu/drm/i915/gvt/Makefile
-> @@ -3,7 +3,7 @@ GVT_DIR := gvt
->  GVT_SOURCE := gvt.o aperture_gm.o handlers.o vgpu.o trace_points.o firmware.o \
->  	interrupt.o gtt.o cfg_space.o opregion.o mmio.o display.o edid.o \
->  	execlist.o scheduler.o sched_policy.o mmio_context.o cmd_parser.o debugfs.o \
-> -	fb_decoder.o dmabuf.o page_track.o
-> +	fb_decoder.o dmabuf.o page_track.o device_version.o
+> diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
+> index 66b582f751a3..ff0556b04e86 100644
+> --- a/drivers/nvdimm/virtio_pmem.c
+> +++ b/drivers/nvdimm/virtio_pmem.c
+> @@ -25,7 +25,7 @@ void host_ack(struct virtqueue *vq)
+>  		if (!list_empty(&vpmem->req_list)) {
+>  			req_buf = list_first_entry(&vpmem->req_list,
+>  					struct virtio_pmem_request, list);
+> -			list_del(&vpmem->req_list);
+> +			list_del(vpmem->req_list.next);
+
+Don't think its correct.
+
+>  			req_buf->wq_buf_avail = true;
+>  			wake_up(&req_buf->wq_buf);
+>  		}
+> @@ -59,17 +59,33 @@ int virtio_pmem_flush(struct nd_region *nd_region)
+>  	sgs[1] = &ret;
 >  
->  ccflags-y				+= -I$(src) -I$(src)/$(GVT_DIR)
->  i915-y					+= $(addprefix $(GVT_DIR)/, $(GVT_SOURCE))
-> diff --git a/drivers/gpu/drm/i915/gvt/device_version.c b/drivers/gpu/drm/i915/gvt/device_version.c
-> new file mode 100644
-> index 000000000000..bd4cdcbdba95
-> --- /dev/null
-> +++ b/drivers/gpu/drm/i915/gvt/device_version.c
-> @@ -0,0 +1,87 @@
-> +/*
-> + * Copyright(c) 2011-2017 Intel Corporation. All rights reserved.
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a
-> + * copy of this software and associated documentation files (the "Software"),
-> + * to deal in the Software without restriction, including without limitation
-> + * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-> + * and/or sell copies of the Software, and to permit persons to whom the
-> + * Software is furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice (including the next
-> + * paragraph) shall be included in all copies or substantial portions of the
-> + * Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-> + * SOFTWARE.
-> + *
-> + * Authors:
-> + *    Yan Zhao <yan.y.zhao@intel.com>
-> + */
-> +#include <linux/vfio.h>
-> +#include "i915_drv.h"
-> +
-> +static bool is_compatible(const char *self, const char *remote)
-> +{
-> +	if (strlen(remote) != strlen(self))
-> +		return false;
-> +
-> +	return (strncmp(self, remote, strlen(self))) ? false : true;
-> +}
-> +
-> +ssize_t intel_gvt_get_vfio_device_version_len(struct drm_i915_private *dev_priv)
-> +{
-> +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> +		return -ENODEV;
-> +
-> +	return PAGE_SIZE;
-> +}
-> +
-> +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *dev_priv,
-> +		char *buf, const char *mdev_type)
-> +{
-> +	int cnt = 0, ret = 0;
-> +	const char *str = NULL;
-> +
-> +	/* currently only gen8 & gen9 are supported */
-> +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> +		return -ENODEV;
-> +
-> +	/* vendor id + device id + mdev type */
-> +	/* vendor id */
-> +	cnt = snprintf(buf, 5, "%04x", PCI_VENDOR_ID_INTEL);
-> +	buf += cnt;
-> +	ret += cnt;
-> +
-> +	/* device id */
-> +	cnt = snprintf(buf, 6, "-%04x", INTEL_DEVID(dev_priv));
-> +	buf += cnt;
-> +	ret += cnt;
-> +
-> +	/* mdev type */
-> +	str = mdev_type;
-> +	cnt = snprintf(buf, strlen(str) + 3, "-%s\n", mdev_type);
-> +	buf += cnt;
-> +	ret += cnt;
-
-Why not just one big snprintf?
-
-Dave
-
-> +	return ret;
-> +}
-> +
-> +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *dev_priv,
-> +		const char *self, const char *remote)
-> +{
-> +
-> +	/* currently only gen8 & gen9 are supported */
-> +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9))
-> +		return -ENODEV;
-> +
-> +	if (!is_compatible(self, remote))
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> diff --git a/drivers/gpu/drm/i915/gvt/gvt.c b/drivers/gpu/drm/i915/gvt/gvt.c
-> index 43f4242062dd..19f16eec5a4c 100644
-> --- a/drivers/gpu/drm/i915/gvt/gvt.c
-> +++ b/drivers/gpu/drm/i915/gvt/gvt.c
-> @@ -105,14 +105,65 @@ static ssize_t description_show(struct kobject *kobj, struct device *dev,
->  		       type->weight);
->  }
+>  	spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> -	err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
+> -	if (err) {
+> -		dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
+> +	/*
+> +	 * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual queue does not
+> +	 * have free descriptor slots. We add the request to req_list and wait
+> +	 * for host_ack to wake us up when free slots are available.
+> +	 */
+> +	while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC))
+> == -ENOSPC) {
+> +		dev_err(&vdev->dev, "failed to send command to virtio pmem device, no free
+> slots in the virtqueue, postponing request\n");
+> +		req->wq_buf_avail = false;
 >  
-> +#ifdef GVT_MIGRATION_VERSION
-> +static ssize_t version_show(struct kobject *kobj, struct device *dev,
-> +		char *buf)
-> +{
-> +	struct drm_i915_private *i915 = kdev_to_i915(dev);
-> +	const char *mdev_type = kobject_name(kobj);
+> -		list_add_tail(&vpmem->req_list, &req->list);
+> +		list_add_tail(&req->list, &vpmem->req_list);
+>  		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+>  
+>  		/* When host has read buffer, this completes via host_ack */
+>  		wait_event(req->wq_buf, req->wq_buf_avail);
+>  		spin_lock_irqsave(&vpmem->pmem_lock, flags);
+>  	}
 > +
-> +	return intel_gvt_get_vfio_device_version(i915, buf, mdev_type);
-> +}
-> +
-> +static ssize_t version_store(struct kobject *kobj, struct device *dev,
-> +		const char *buf, size_t count)
-> +{
-> +	char *remote = NULL, *self = NULL;
-> +	int len, ret = 0;
-> +	struct drm_i915_private *i915 = kdev_to_i915(dev);
-> +	const char *mdev_type = kobject_name(kobj);
-> +
-> +	len = intel_gvt_get_vfio_device_version_len(i915);
-> +	if (len < 0)
-> +		return len;
-> +
-> +	self = kmalloc(len, GFP_KERNEL);
-> +	if (!self)
-> +		return -ENOMEM;
-> +
-> +	ret = intel_gvt_get_vfio_device_version(i915, self, mdev_type);
-> +	if (ret < 0)
-> +		goto out;
-> +
-> +	remote = kstrndup(buf, count, GFP_KERNEL);
-> +	if (!remote) {
-> +		ret = -ENOMEM;
-> +		goto out;
+> +	/*
+> +	 * virtqueue_add_sgs failed with error different than -ENOSPC, we can't
+> +	 * do anything about that.
+> +	 */
+> +	if (err) {
+> +		dev_info(&vdev->dev, "failed to send command to virtio pmem device, error
+> code %d\n", err);
+> +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> +		err = -EIO;
+> +		goto ret;
 > +	}
-> +
-> +	ret = intel_gvt_check_vfio_device_version(i915, self, remote);
-> +
-> +out:
-> +	kfree(self);
-> +	kfree(remote);
-> +	return (ret < 0 ? ret : count);
-> +}
-> +#endif
-> +
->  static MDEV_TYPE_ATTR_RO(available_instances);
->  static MDEV_TYPE_ATTR_RO(device_api);
->  static MDEV_TYPE_ATTR_RO(description);
-> +#ifdef GVT_MIGRATION_VERSION
-> +static MDEV_TYPE_ATTR_RW(version);
-> +#endif
->  
->  static struct attribute *gvt_type_attrs[] = {
->  	&mdev_type_attr_available_instances.attr,
->  	&mdev_type_attr_device_api.attr,
->  	&mdev_type_attr_description.attr,
-> +#ifdef GVT_MIGRATION_VERSION
-> +	&mdev_type_attr_version.attr,
-> +#endif
->  	NULL,
->  };
->  
-> diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gvt.h
-> index f5a328b5290a..4062f6b26acf 100644
-> --- a/drivers/gpu/drm/i915/gvt/gvt.h
-> +++ b/drivers/gpu/drm/i915/gvt/gvt.h
-> @@ -687,6 +687,12 @@ void intel_gvt_debugfs_remove_vgpu(struct intel_vgpu *vgpu);
->  int intel_gvt_debugfs_init(struct intel_gvt *gvt);
->  void intel_gvt_debugfs_clean(struct intel_gvt *gvt);
->  
-> +ssize_t intel_gvt_get_vfio_device_version(struct drm_i915_private *i915,
-> +		char *buf, const char *mdev_type);
-> +ssize_t intel_gvt_check_vfio_device_version(struct drm_i915_private *dev_priv,
-> +		const char *self, const char *remote);
-> +ssize_t
-> +intel_gvt_get_vfio_device_version_len(struct drm_i915_private *dev_priv);
->  
->  #include "trace.h"
->  #include "mpt.h"
-> -- 
-> 2.17.1
+>  	err = virtqueue_kick(vpmem->req_vq);
+>  	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> Let me know if it looks reasonable to you.
+
+Don't think this is fulfilling entire logic correctly. But thanks, I spotted a bug in my code :)
+Will fix it. 
+
+> 
+> Thank you,
+> Jakub Staron
+> 
+> 
