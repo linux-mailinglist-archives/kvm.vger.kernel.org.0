@@ -2,122 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 47A2D18065
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 21:21:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E4F618095
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 21:38:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727369AbfEHTVW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 15:21:22 -0400
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:40455 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726687AbfEHTVW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 15:21:22 -0400
-Received: by mail-lf1-f67.google.com with SMTP id h13so224564lfc.7
-        for <kvm@vger.kernel.org>; Wed, 08 May 2019 12:21:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IinFytKQ0XqvKhSVy8stzb9zoK+hMY6QgVRofywqRa4=;
-        b=GbaIqS287zTqpvP7AR4WDV9ezkFTJa2mJ8IdeDljI1LoAqIcqs3KYUIFNiLQNwaadV
-         dOUQtfgcszSr8/Ufm1wlBK4/w57EehacWCpNdhG+4MjrYwy/zxaDP/fkDyqYoi3g3/I/
-         cZFvhBQRpucdxoEmjO5fRD4iedRYfCa7dWRkfHrmfU0HCDzq45I07fdVbsaqxlDDnRbL
-         2wwttQIMCX+5i7xsuCURvKzTi8aXWzVQMcbghMQ92hVGqgdZzHBzfsAxHpvnvOQ5uplm
-         WUnWP4DwBUyLOp14rzV1ytdH3zRRoNpRDzxoFM/h2eoIV7PxUErsD1Uj5u/C2elOP8zZ
-         PgGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IinFytKQ0XqvKhSVy8stzb9zoK+hMY6QgVRofywqRa4=;
-        b=o3H6lKouCobo6MINND/dEpEFVi5Ofnu0gWTvh4belrSShfMEr9FBCHUmaZAZXgAQpu
-         PWDos2owhW5V7kgmnBOmtOMXYKXPwxodFK2ZyBboKfATFViL3Ojg0TLgFYTxwjDiMcoG
-         3zTTclxZluHPwTObxuWAd/cINx9qFLP2gcvk/zZnAeOQemN8bHfcsau+CPN6F7wFO6ni
-         7ALfAVM9k4vTdF4D8EA76G2Pko4EeRQV6CSUEZKSm3l3HME2vgEzjy2z/bAcB3yIkqOO
-         y1Gp18nHMjwaw0GqUAaSCLzswz9mUxv2yMirVklBD9BJkWIJeiZsvbhk1s7jQ16aCh3S
-         N6cw==
-X-Gm-Message-State: APjAAAUbBwSuxN1tObUGeMc8n6lGfsZCiFZ6LAYo7Qy1S8pKzNkEZI7I
-        qMdO7pFvCCCLklQsb/sqL/ihqxWL9bbKaNXIQeOmQg==
-X-Google-Smtp-Source: APXvYqxqf0lhjktArHozBH/aLfmzCnUDu8a2kAPq8xwHm8gQem3+EKnqhzdbmSuTt6jsKwvPMYdabxql6uOpk/3EJbM=
-X-Received: by 2002:ac2:483c:: with SMTP id 28mr11422681lft.93.1557343279681;
- Wed, 08 May 2019 12:21:19 -0700 (PDT)
+        id S1728177AbfEHTir (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 15:38:47 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33130 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727026AbfEHTir (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 May 2019 15:38:47 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x48JWR1A067036
+        for <kvm@vger.kernel.org>; Wed, 8 May 2019 15:38:46 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sc211hs2t-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 08 May 2019 15:38:45 -0400
+Received: from localhost
+        by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <farman@linux.ibm.com>;
+        Wed, 8 May 2019 20:38:44 +0100
+Received: from b03cxnp08027.gho.boulder.ibm.com (9.17.130.19)
+        by e33.co.us.ibm.com (192.168.1.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 8 May 2019 20:38:41 +0100
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x48JceZu65077384
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 May 2019 19:38:40 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0D5EA6A04D;
+        Wed,  8 May 2019 19:38:40 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 294896A04F;
+        Wed,  8 May 2019 19:38:38 +0000 (GMT)
+Received: from [9.85.183.31] (unknown [9.85.183.31])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed,  8 May 2019 19:38:38 +0000 (GMT)
+Subject: Re: [PATCH 7/7] s390/cio: Remove vfio-ccw checks of command codes
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Pierre Morel <pmorel@linux.ibm.com>
+Cc:     Farhan Ali <alifm@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20190503134912.39756-1-farman@linux.ibm.com>
+ <20190503134912.39756-8-farman@linux.ibm.com>
+ <8625f759-0a2d-09af-c8b5-5b312d854ba1@linux.ibm.com>
+ <7c897993-d146-bf8e-48ad-11a914a04716@linux.ibm.com>
+ <bba6c0a8-2346-cd99-b8ad-f316daac010b@linux.ibm.com>
+ <7ac9fb43-8d7a-9e04-8cba-fa4c63dfc413@linux.ibm.com>
+ <1f2e4272-8570-f93f-9d67-a43dcb00fc55@linux.ibm.com>
+ <5c2b74a9-e1d9-cd63-1284-6544fa4376d9@linux.ibm.com>
+ <20190508120648.6c40231d.cohuck@redhat.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Date:   Wed, 8 May 2019 15:38:37 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190502183133.258026-1-aaronlewis@google.com> <87zho37s2h.fsf@vitty.brq.redhat.com>
-In-Reply-To: <87zho37s2h.fsf@vitty.brq.redhat.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Wed, 8 May 2019 12:21:08 -0700
-Message-ID: <CAAAPnDHJ=ZC+CoKYkYkRsv+WJJjHJ66iN6jU72spL3+LckUpvA@mail.gmail.com>
-Subject: Re: [PATCH 2/3] KVM: nVMX: KVM_SET_NESTED_STATE - Tear down old EVMCS
- state before setting new state
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Peter Shier <pshier@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com,
-        Jim Mattson <jmattson@google.com>,
-        Marc Orr <marcorr@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190508120648.6c40231d.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19050819-0036-0000-0000-00000AB6CA7F
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011072; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000285; SDB=6.01200486; UDB=6.00629893; IPR=6.00981372;
+ MB=3.00026797; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-08 19:38:42
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050819-0037-0000-0000-00004BB5930B
+Message-Id: <abb996d4-4f3d-f10d-7ced-e27ca72a92f0@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-08_11:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=888 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905080119
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Fri, May 3, 2019 at 3:25 AM
-To: Aaron Lewis
-Cc: Peter Shier, <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
-<jmattson@google.com>, <marcorr@google.com>, <kvm@vger.kernel.org>
 
-> Aaron Lewis <aaronlewis@google.com> writes:
->
-> > Move call to nested_enable_evmcs until after free_nested() is complete.
-> >
-> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> > Reviewed-by: Marc Orr <marcorr@google.com>
-> > Reviewed-by: Peter Shier <pshier@google.com>
-> > ---
-> >  arch/x86/kvm/vmx/nested.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 081dea6e211a..3b39c60951ac 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -5373,9 +5373,6 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
-> >       if (kvm_state->format != 0)
-> >               return -EINVAL;
-> >
-> > -     if (kvm_state->flags & KVM_STATE_NESTED_EVMCS)
-> > -             nested_enable_evmcs(vcpu, NULL);
-> > -
-> >       if (!nested_vmx_allowed(vcpu))
-> >               return kvm_state->vmx.vmxon_pa == -1ull ? 0 : -EINVAL;
-> >
-> > @@ -5417,6 +5414,9 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
-> >       if (kvm_state->vmx.vmxon_pa == -1ull)
-> >               return 0;
-> >
-> > +     if (kvm_state->flags & KVM_STATE_NESTED_EVMCS)
-> > +             nested_enable_evmcs(vcpu, NULL);
-> > +
-> >       vmx->nested.vmxon_ptr = kvm_state->vmx.vmxon_pa;
-> >       ret = enter_vmx_operation(vcpu);
-> >       if (ret)
->
-> nested_enable_evmcs() doesn't do much, actually, in case it was
-> previously enabled it doesn't do anything and in case it wasn't ordering
-> with free_nested() (where you're aiming at nested_release_evmcs() I
-> would guess) shouldn't matter. So could you please elaborate (better in
-> the commit message) why do we need this re-ordered? My guess is that
-> you'd like to perform checks for e.g. 'vmx.vmxon_pa == -1ull' before
-> we actually start doing any changes but let's clarify that.
->
-> Thanks!
->
-> --
-> Vitaly
 
-There are two reasons for doing this:
-1. We don't want to set new state if we are going to leave nesting and
-exit the function (ie: vmx.vmxon_pa = -1), like you pointed out.
-2. To be more future proof, we don't want to set new state before
-tearing down state.  This could cause conflicts down the road.
+On 5/8/19 6:06 AM, Cornelia Huck wrote:
+> On Wed, 8 May 2019 11:22:07 +0200
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>> The TEST command is used to retrieve the status of the I/O-device
+>> __path__ and do not go up to the device.
+>> I did not find clearly that it does not start a data transfer but I
+>> really do not think it does.
+>> May be we should ask people from hardware.
+>> I only found that test I/O (a specific test command) do not initiate an
+>> operation.
+> 
+> FWIW, I'm not sure about what we should do with the test command in any
+> case.
+> 
+> Currently, I see it defined as a proper command in the rather ancient
+> "Common I/O Device Commands" (I don't know of any newer public
+> version), 
 
-I can add this to the commit message if there are no objections to these points.
+Nor I.  I had to rummage around a few dumpsters to find a copy of this 
+one, even.
+
+> which states that it retrieves the status on the parallel
+> interface _only_ (and generates a command reject on the serial
+> interface). IIRC, the parallel interface has been phased out quite some
+> time ago.
+
+The current POPs, towards the bottom left side of page 13-3, has this 
+statement:
+
+---
+The term “serial-I/O interface” is used to refer the ESCON I/O 
+interface, the FICON I/O interface, and the FICON-converted I/O 
+interface. The term “parallel-I/O interface” is used to refer to the IBM 
+System/360 and System/370 I/O interface.
+---
+
+So, yes it was phased out some time ago.  :)
+
+> 
+> The current PoP, in contrast, defines this as an _invalid_ command
+> (generating a channel program check).
+
+Ditto the ESA/390 POPs (SA22-7201-08).
+
+> 
+> So, while the test command originally was designed to never initiate a
+> data transfer, we now have an invalid command in its place, and we
+> don't know if something else might change in the future (for transfer
+> mode, a test-like command is already defined in the PoP).
+
+Indeed, the ccw_is_test() check would need to be reworked if we ever 
+want to support transport mode anyway.  :shudder:
+
+> 
+> So, the safest course would probably be to handle the ->cda portion and
+> send the command down. We'll get a check condition on current hardware,
+> but it should be safe if something changes in the future.
+> 
+> Of course, asking some hardware folks is not a bad idea, either :)
+> 
+
+I'll shoot a quick note (and cc Pierre) just for the sake of sanity, but 
+I'm still convinced this patch is fine as-is.  :)
+
