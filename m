@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 83E0317C30
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:49:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A42D617BF7
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:47:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727465AbfEHOsk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:48:40 -0400
-Received: from mga03.intel.com ([134.134.136.65]:59536 "EHLO mga03.intel.com"
+        id S1728532AbfEHOoy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:44:54 -0400
+Received: from mga03.intel.com ([134.134.136.65]:59540 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728377AbfEHOot (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 10:44:49 -0400
+        id S1728452AbfEHOow (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 10:44:52 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:48 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:49 -0700
 X-ExtLoop1: 1
 Received: from black.fi.intel.com ([10.237.72.28])
   by fmsmga005.fm.intel.com with ESMTP; 08 May 2019 07:44:44 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id D81CDEA8; Wed,  8 May 2019 17:44:30 +0300 (EEST)
+        id E5DBEEAA; Wed,  8 May 2019 17:44:30 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -36,9 +36,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 43/62] syscall/x86: Wire up a system call for MKTME encryption keys
-Date:   Wed,  8 May 2019 17:44:03 +0300
-Message-Id: <20190508144422.13171-44-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 44/62] x86/mm: Set KeyIDs in encrypted VMAs for MKTME
+Date:   Wed,  8 May 2019 17:44:04 +0300
+Message-Id: <20190508144422.13171-45-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -51,85 +51,98 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alison Schofield <alison.schofield@intel.com>
 
-encrypt_mprotect() is a new system call to support memory encryption.
+MKTME architecture requires the KeyID to be placed in PTE bits 51:46.
+To create an encrypted VMA, place the KeyID in the upper bits of
+vm_page_prot that matches the position of those PTE bits.
 
-It takes the same parameters as legacy mprotect, plus an additional
-key serial number that is mapped to an encryption keyid.
+When the VMA is assigned a KeyID it is always considered a KeyID
+change. The VMA is either going from not encrypted to encrypted,
+or from encrypted with any KeyID to encrypted with any other KeyID.
+To make the change safely, remove the user pages held by the VMA
+and unlink the VMA's anonymous chain.
 
 Signed-off-by: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- arch/x86/entry/syscalls/syscall_32.tbl | 1 +
- arch/x86/entry/syscalls/syscall_64.tbl | 1 +
- include/linux/syscalls.h               | 2 ++
- include/uapi/asm-generic/unistd.h      | 4 +++-
- kernel/sys_ni.c                        | 2 ++
- 5 files changed, 9 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/mktme.h |  4 ++++
+ arch/x86/mm/mktme.c          | 26 ++++++++++++++++++++++++++
+ include/linux/mm.h           |  6 ++++++
+ 3 files changed, 36 insertions(+)
 
-diff --git a/arch/x86/entry/syscalls/syscall_32.tbl b/arch/x86/entry/syscalls/syscall_32.tbl
-index 1f9607ed087c..dbcd4c28d743 100644
---- a/arch/x86/entry/syscalls/syscall_32.tbl
-+++ b/arch/x86/entry/syscalls/syscall_32.tbl
-@@ -433,3 +433,4 @@
- 425	i386	io_uring_setup		sys_io_uring_setup		__ia32_sys_io_uring_setup
- 426	i386	io_uring_enter		sys_io_uring_enter		__ia32_sys_io_uring_enter
- 427	i386	io_uring_register	sys_io_uring_register		__ia32_sys_io_uring_register
-+428	i386	encrypt_mprotect	sys_encrypt_mprotect		__ia32_sys_encrypt_mprotect
-diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
-index 92ee0b4378d4..d01bd132e9ee 100644
---- a/arch/x86/entry/syscalls/syscall_64.tbl
-+++ b/arch/x86/entry/syscalls/syscall_64.tbl
-@@ -349,6 +349,7 @@
- 425	common	io_uring_setup		__x64_sys_io_uring_setup
- 426	common	io_uring_enter		__x64_sys_io_uring_enter
- 427	common	io_uring_register	__x64_sys_io_uring_register
-+428	common	encrypt_mprotect	__x64_sys_encrypt_mprotect
+diff --git a/arch/x86/include/asm/mktme.h b/arch/x86/include/asm/mktme.h
+index bd6707e73219..0e6df07f1921 100644
+--- a/arch/x86/include/asm/mktme.h
++++ b/arch/x86/include/asm/mktme.h
+@@ -12,6 +12,10 @@ extern phys_addr_t mktme_keyid_mask;
+ extern int mktme_nr_keyids;
+ extern int mktme_keyid_shift;
  
- #
- # x32-specific system call numbers start at 512 to avoid cache impact
-diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
-index e446806a561f..38a2d7b95397 100644
---- a/include/linux/syscalls.h
-+++ b/include/linux/syscalls.h
-@@ -988,6 +988,8 @@ asmlinkage long sys_rseq(struct rseq __user *rseq, uint32_t rseq_len,
- asmlinkage long sys_pidfd_send_signal(int pidfd, int sig,
- 				       siginfo_t __user *info,
- 				       unsigned int flags);
-+asmlinkage long sys_encrypt_mprotect(unsigned long start, size_t len,
-+				     unsigned long prot, key_serial_t serial);
++/* Set the encryption keyid bits in a VMA */
++extern void mprotect_set_encrypt(struct vm_area_struct *vma, int newkeyid,
++				unsigned long start, unsigned long end);
++
+ DECLARE_STATIC_KEY_FALSE(mktme_enabled_key);
+ static inline bool mktme_enabled(void)
+ {
+diff --git a/arch/x86/mm/mktme.c b/arch/x86/mm/mktme.c
+index 024165c9c7f3..91b49e88ca3f 100644
+--- a/arch/x86/mm/mktme.c
++++ b/arch/x86/mm/mktme.c
+@@ -1,5 +1,6 @@
+ #include <linux/mm.h>
+ #include <linux/highmem.h>
++#include <linux/rmap.h>
+ #include <asm/mktme.h>
+ #include <asm/pgalloc.h>
+ #include <asm/tlbflush.h>
+@@ -53,6 +54,31 @@ int __vma_keyid(struct vm_area_struct *vma)
+ 	return (prot & mktme_keyid_mask) >> mktme_keyid_shift;
+ }
  
- /*
-  * Architecture-specific system calls
-diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
-index dee7292e1df6..86f942f54b1b 100644
---- a/include/uapi/asm-generic/unistd.h
-+++ b/include/uapi/asm-generic/unistd.h
-@@ -832,9 +832,11 @@ __SYSCALL(__NR_io_uring_setup, sys_io_uring_setup)
- __SYSCALL(__NR_io_uring_enter, sys_io_uring_enter)
- #define __NR_io_uring_register 427
- __SYSCALL(__NR_io_uring_register, sys_io_uring_register)
-+#define __NR_encrypt_mprotect 428
-+__SYSCALL(__NR_encrypt_mprotect, sys_encrypt_mprotect)
++/* Set the encryption keyid bits in a VMA */
++void mprotect_set_encrypt(struct vm_area_struct *vma, int newkeyid,
++			  unsigned long start, unsigned long end)
++{
++	int oldkeyid = vma_keyid(vma);
++	pgprotval_t newprot;
++
++	/* Unmap pages with old KeyID if there's any. */
++	zap_page_range(vma, start, end - start);
++
++	if (oldkeyid == newkeyid)
++		return;
++
++	newprot = pgprot_val(vma->vm_page_prot);
++	newprot &= ~mktme_keyid_mask;
++	newprot |= (unsigned long)newkeyid << mktme_keyid_shift;
++	vma->vm_page_prot = __pgprot(newprot);
++
++	/*
++	 * The VMA doesn't have any inherited pages.
++	 * Start anon VMA tree from scratch.
++	 */
++	unlink_anon_vmas(vma);
++}
++
+ /* Prepare page to be used for encryption. Called from page allocator. */
+ void __prep_encrypted_page(struct page *page, int order, int keyid, bool zero)
+ {
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 2684245f8503..c027044de9bf 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -2825,5 +2825,11 @@ void __init setup_nr_node_ids(void);
+ static inline void setup_nr_node_ids(void) {}
+ #endif
  
- #undef __NR_syscalls
--#define __NR_syscalls 428
-+#define __NR_syscalls 429
- 
- /*
-  * 32 bit systems traditionally used different
-diff --git a/kernel/sys_ni.c b/kernel/sys_ni.c
-index d21f4befaea4..80da8d9ac8b1 100644
---- a/kernel/sys_ni.c
-+++ b/kernel/sys_ni.c
-@@ -350,6 +350,8 @@ COND_SYSCALL(pkey_mprotect);
- COND_SYSCALL(pkey_alloc);
- COND_SYSCALL(pkey_free);
- 
-+/* multi-key total memory encryption keys */
-+COND_SYSCALL(encrypt_mprotect);
- 
- /*
-  * Architecture specific weak syscall entries.
++#ifndef CONFIG_X86_INTEL_MKTME
++static inline void mprotect_set_encrypt(struct vm_area_struct *vma,
++					int newkeyid,
++					unsigned long start,
++					unsigned long end) {}
++#endif /* CONFIG_X86_INTEL_MKTME */
+ #endif /* __KERNEL__ */
+ #endif /* _LINUX_MM_H */
 -- 
 2.20.1
 
