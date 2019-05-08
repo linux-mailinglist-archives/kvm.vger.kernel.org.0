@@ -2,51 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C28E1797D
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 14:31:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 089291798D
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 14:39:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728526AbfEHMbF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 08:31:05 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43965 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728472AbfEHMbF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 08:31:05 -0400
-Received: by mail-wr1-f65.google.com with SMTP id r4so11673275wro.10
-        for <kvm@vger.kernel.org>; Wed, 08 May 2019 05:31:04 -0700 (PDT)
+        id S1728607AbfEHMjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 08:39:22 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:44049 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726515AbfEHMjV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 08:39:21 -0400
+Received: by mail-wr1-f67.google.com with SMTP id c5so1774031wrs.11
+        for <kvm@vger.kernel.org>; Wed, 08 May 2019 05:39:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=BgIIgUo8SNujj25JLnLQhi2lKd0zr0m85elohA1jRVQ=;
-        b=S3b5TLVN+DK5/zDEQWd0rnjCC6d1ipYnvtGC3We1ZUsi0+2SEfPBNuXLTcnuajmm4w
-         35WqEb21qq+OctDErGxkNxO0dIIyHrth9TKvgg35bAqnZe+/Bv/i6uZKMkFLD+e9rpow
-         RGmKW42oCfWpKG0ozOoTNV4Bb+fbWm9LiLbu118pJAD4tkC4XhMOh8xQJF2o8ftzQerM
-         nuB4LCbQEA/PtsSqFNruceTu08qbn0L1hQ9JIhhirOYo+/1lEz9Qk3CUljfICLiIGjkK
-         IhKe0IYKSLfOt0eNepr/0O1yL+/kpYqw9/FN8AF0FfXlAC7x3dZ6K6F9fLQvReCNRHmv
-         uKkw==
-X-Gm-Message-State: APjAAAWDXgR3U9aWrxJPjk//94gbflPJEnhAhKXUZSe9NASzaDRSMIyt
-        fNVS+P6XaJLiaIdmufT/CcEwJQ==
-X-Google-Smtp-Source: APXvYqwBMYQ7YCc0YwVJn89R/5hmILedssPCeUlYac5IiEvt4iI1qcSpu6743IWhLrfBKhSYItDV+g==
-X-Received: by 2002:a05:6000:1201:: with SMTP id e1mr10686885wrx.136.1557318663418;
-        Wed, 08 May 2019 05:31:03 -0700 (PDT)
+        bh=4Rmas8gcFMGufmlR3c5DQmI8ZQrCroMRQQbwgTv6K0o=;
+        b=W9Z4LWnY4a1ElppfrNA4VALiFVMisNlfo39aDauSiw2ZXu1wCWDQPW3MsW8lP0FScV
+         gA8bysTbAfXpc5jzI+gY72k2dhVy1xSImqi5cMxQCZqqpvLW3uGoqAAAMQNYoSOv2r+o
+         qWBl28HEfK1BSX5eRwUIkRb71OMFH8Fs4E30z8V0Fg4KNV5RtHTPGSgkp7hDnnQsnfY7
+         NZWsluhS10DRRhgWf9Af60ZtOV2idP/mHtXJRc86kkMCXDWpdV+pslKwq8CbTqx9uhZs
+         zlj6lBH+dARhFi3DTZAUmX+Oqajy0EBJEfut3HB4oAHa0hQ8BeP8cm7UBctYM9hvBo5c
+         3fHg==
+X-Gm-Message-State: APjAAAXF+l1phXfw4yF316KxWkT6Sv+40tuaZ8N0KEspZkaP3eW4+Ze5
+        9rKbjkjEdafpcbQUQHo64/d2nA==
+X-Google-Smtp-Source: APXvYqwuyoFh7G+bUNBJPQbUYqVHJhmvLVup6b4hVfQDP/ku/Jv9N/UUoJIUxNspRHbGoU418ffKdw==
+X-Received: by 2002:adf:dc8a:: with SMTP id r10mr10988770wrj.15.1557319160335;
+        Wed, 08 May 2019 05:39:20 -0700 (PDT)
 Received: from [10.201.49.229] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-        by smtp.gmail.com with ESMTPSA id o4sm2920575wmo.20.2019.05.08.05.31.02
+        by smtp.gmail.com with ESMTPSA id a9sm2110131wmm.48.2019.05.08.05.39.16
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 08 May 2019 05:31:02 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: nVMX: Disable intercept for *_BASE MSR in vmcs02
- when possible
-To:     Jintack Lim <jintack@cs.columbia.edu>, kvm@vger.kernel.org
-Cc:     rkrcmar@redhat.com, sean.j.christopherson@intel.com,
-        jmattson@google.com
-References: <1557158359-6865-1-git-send-email-jintack@cs.columbia.edu>
+        Wed, 08 May 2019 05:39:19 -0700 (PDT)
+Subject: Re: [PATCH v2 00/10] RFC: NVME MDEV
+To:     Christoph Hellwig <hch@lst.de>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Fam Zheng <fam@euphon.net>, Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>, kvm@vger.kernel.org,
+        Wolfram Sang <wsa@the-dreams.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Liang Cunming <cunming.liang@intel.com>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        "David S . Miller" <davem@davemloft.net>,
+        Jens Axboe <axboe@fb.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Liu Changpeng <changpeng.liu@intel.com>,
+        "Paul E . McKenney" <paulmck@linux.ibm.com>,
+        Amnon Ilan <ailan@redhat.com>, John Ferlan <jferlan@redhat.com>
+References: <20190502114801.23116-1-mlevitsk@redhat.com>
+ <20190503121838.GA21041@lst.de>
+ <e8f6981863bdbba89adcba1c430083e68546ac1a.camel@redhat.com>
+ <20190506125752.GA5288@lst.de>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f6e474db-e40a-20cc-951e-2386a11a6ef8@redhat.com>
-Date:   Wed, 8 May 2019 14:31:02 +0200
+Message-ID: <a789d935-e665-c339-d7ae-3d23997b92d9@redhat.com>
+Date:   Wed, 8 May 2019 14:39:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <1557158359-6865-1-git-send-email-jintack@cs.columbia.edu>
+In-Reply-To: <20190506125752.GA5288@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -55,76 +71,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/05/19 10:59, Jintack Lim wrote:
-> Even when neither L0 nor L1 configured to trap *_BASE MSR accesses from
-> its own VMs, the current KVM L0 always traps *_BASE MSR accesses from
-> L2.  Let's check if both L0 and L1 disabled trap for *_BASE MSR for its
-> VMs respectively, and let L2 access to*_BASE MSR without trap if that's
-> the case.
+On 06/05/19 07:57, Christoph Hellwig wrote:
 > 
-> Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
-> 
-> ---
-> 
-> Changes since v1:
-> - Added GS_BASE and KENREL_GS_BASE (Jim, Sean)
-> - Changed to allow reads as well as writes (Sean)
-> ---
->  arch/x86/kvm/vmx/nested.c | 24 +++++++++++++++++++++++-
->  1 file changed, 23 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 0c601d0..d167bb6 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -537,6 +537,10 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
->  	 */
->  	bool pred_cmd = !msr_write_intercepted_l01(vcpu, MSR_IA32_PRED_CMD);
->  	bool spec_ctrl = !msr_write_intercepted_l01(vcpu, MSR_IA32_SPEC_CTRL);
-> +	bool fs_base = !msr_write_intercepted_l01(vcpu, MSR_FS_BASE);
-> +	bool gs_base = !msr_write_intercepted_l01(vcpu, MSR_GS_BASE);
-> +	bool kernel_gs_base = !msr_write_intercepted_l01(vcpu,
-> +							 MSR_KERNEL_GS_BASE);
->  
->  	/* Nothing to do if the MSR bitmap is not in use.  */
->  	if (!cpu_has_vmx_msr_bitmap() ||
-> @@ -544,7 +548,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
->  		return false;
->  
->  	if (!nested_cpu_has_virt_x2apic_mode(vmcs12) &&
-> -	    !pred_cmd && !spec_ctrl)
-> +	    !pred_cmd && !spec_ctrl && !fs_base && !gs_base && !kernel_gs_base)
->  		return false;
->  
->  	page = kvm_vcpu_gpa_to_page(vcpu, vmcs12->msr_bitmap);
-> @@ -592,6 +596,24 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
->  		}
->  	}
->  
-> +	if (fs_base)
-> +		nested_vmx_disable_intercept_for_msr(
-> +					msr_bitmap_l1, msr_bitmap_l0,
-> +					MSR_FS_BASE,
-> +					MSR_TYPE_RW);
-> +
-> +	if (gs_base)
-> +		nested_vmx_disable_intercept_for_msr(
-> +					msr_bitmap_l1, msr_bitmap_l0,
-> +					MSR_GS_BASE,
-> +					MSR_TYPE_RW);
-> +
-> +	if (kernel_gs_base)
-> +		nested_vmx_disable_intercept_for_msr(
-> +					msr_bitmap_l1, msr_bitmap_l0,
-> +					MSR_KERNEL_GS_BASE,
-> +					MSR_TYPE_RW);
-> +
->  	if (spec_ctrl)
->  		nested_vmx_disable_intercept_for_msr(
->  					msr_bitmap_l1, msr_bitmap_l0,
-> 
+> Or to put it into another way:  unless your paravirt interface requires
+> zero specific changes to the core nvme code it is not acceptable at all.
 
-Queued, thanks.  (It may take a couple days until I finish testing
-everything for the merge window, but it will be in 5.2).
+I'm not sure it's possible to attain that goal, however I agree that
+putting the control plane in the kernel is probably not a good idea, so
+the vhost model is better than mdev for this usecase.
+
+In addition, unless it is possible for the driver to pass the queue
+directly to the guests, there probably isn't much advantage in putting
+the driver in the kernel at all.  Maxim, do you have numbers for 1) QEMU
+with aio 2) QEMU with VFIO-based userspace nvme driver 3) nvme-mdev?
 
 Paolo
