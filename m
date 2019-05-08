@@ -2,227 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9486417BE8
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:46:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F65F17BEE
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:46:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727221AbfEHOqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:46:12 -0400
-Received: from mga04.intel.com ([192.55.52.120]:61895 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728647AbfEHOpG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 10:45:06 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP; 08 May 2019 07:45:06 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by orsmga008.jf.intel.com with ESMTP; 08 May 2019 07:45:05 -0700
-Date:   Wed, 8 May 2019 07:45:06 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jintack Lim <jintack@cs.columbia.edu>, kvm@vger.kernel.org,
-        rkrcmar@redhat.com, jmattson@google.com
-Subject: Re: [PATCH v2] KVM: nVMX: Disable intercept for *_BASE MSR in vmcs02
- when possible
-Message-ID: <20190508144505.GB13834@linux.intel.com>
-References: <1557158359-6865-1-git-send-email-jintack@cs.columbia.edu>
- <f6e474db-e40a-20cc-951e-2386a11a6ef8@redhat.com>
+        id S1727399AbfEHOqV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:46:21 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51016 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727367AbfEHOqU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 May 2019 10:46:20 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x48Ebgr4020110
+        for <kvm@vger.kernel.org>; Wed, 8 May 2019 10:46:20 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sc0kfj511-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 08 May 2019 10:46:19 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Wed, 8 May 2019 15:46:17 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 8 May 2019 15:46:14 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x48EkDeY61341860
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 May 2019 14:46:13 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 00ACC42041;
+        Wed,  8 May 2019 14:46:13 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3D32042047;
+        Wed,  8 May 2019 14:46:12 +0000 (GMT)
+Received: from [9.145.42.10] (unknown [9.145.42.10])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  8 May 2019 14:46:12 +0000 (GMT)
+Reply-To: pmorel@linux.ibm.com
+Subject: Re: [PATCH 09/10] virtio/s390: use DMA memory for ccw I/O and classic
+ notifiers
+To:     Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+ <20190426183245.37939-10-pasic@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Wed, 8 May 2019 16:46:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="liOOAslEiF7prFVr"
-Content-Disposition: inline
-In-Reply-To: <f6e474db-e40a-20cc-951e-2386a11a6ef8@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190426183245.37939-10-pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19050814-0020-0000-0000-0000033A9497
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050814-0021-0000-0000-0000218D3642
+Message-Id: <a873909a-9846-d6d3-f03e-e86d53fd9c75@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-08_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905080092
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---liOOAslEiF7prFVr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Wed, May 08, 2019 at 02:31:02PM +0200, Paolo Bonzini wrote:
-> On 06/05/19 10:59, Jintack Lim wrote:
-> > Even when neither L0 nor L1 configured to trap *_BASE MSR accesses from
-> > its own VMs, the current KVM L0 always traps *_BASE MSR accesses from
-> > L2.  Let's check if both L0 and L1 disabled trap for *_BASE MSR for its
-> > VMs respectively, and let L2 access to*_BASE MSR without trap if that's
-> > the case.
-> > 
-> > Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
-> > 
-> > ---
-> > 
-> > Changes since v1:
-> > - Added GS_BASE and KENREL_GS_BASE (Jim, Sean)
-> > - Changed to allow reads as well as writes (Sean)
-> > ---
-> >  arch/x86/kvm/vmx/nested.c | 24 +++++++++++++++++++++++-
-> >  1 file changed, 23 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 0c601d0..d167bb6 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -537,6 +537,10 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
-> >  	 */
-> >  	bool pred_cmd = !msr_write_intercepted_l01(vcpu, MSR_IA32_PRED_CMD);
-> >  	bool spec_ctrl = !msr_write_intercepted_l01(vcpu, MSR_IA32_SPEC_CTRL);
-> > +	bool fs_base = !msr_write_intercepted_l01(vcpu, MSR_FS_BASE);
-> > +	bool gs_base = !msr_write_intercepted_l01(vcpu, MSR_GS_BASE);
-> > +	bool kernel_gs_base = !msr_write_intercepted_l01(vcpu,
-> > +							 MSR_KERNEL_GS_BASE);
-> >  
-> >  	/* Nothing to do if the MSR bitmap is not in use.  */
-> >  	if (!cpu_has_vmx_msr_bitmap() ||
-> > @@ -544,7 +548,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
-> >  		return false;
-> >  
-> >  	if (!nested_cpu_has_virt_x2apic_mode(vmcs12) &&
-> > -	    !pred_cmd && !spec_ctrl)
-> > +	    !pred_cmd && !spec_ctrl && !fs_base && !gs_base && !kernel_gs_base)
-> >  		return false;
-> >  
-> >  	page = kvm_vcpu_gpa_to_page(vcpu, vmcs12->msr_bitmap);
-> > @@ -592,6 +596,24 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
-> >  		}
-> >  	}
-> >  
-> > +	if (fs_base)
-> > +		nested_vmx_disable_intercept_for_msr(
-> > +					msr_bitmap_l1, msr_bitmap_l0,
-> > +					MSR_FS_BASE,
-> > +					MSR_TYPE_RW);
-> > +
-> > +	if (gs_base)
-> > +		nested_vmx_disable_intercept_for_msr(
-> > +					msr_bitmap_l1, msr_bitmap_l0,
-> > +					MSR_GS_BASE,
-> > +					MSR_TYPE_RW);
-> > +
-> > +	if (kernel_gs_base)
-> > +		nested_vmx_disable_intercept_for_msr(
-> > +					msr_bitmap_l1, msr_bitmap_l0,
-> > +					MSR_KERNEL_GS_BASE,
-> > +					MSR_TYPE_RW);
-> > +
-> >  	if (spec_ctrl)
-> >  		nested_vmx_disable_intercept_for_msr(
-> >  					msr_bitmap_l1, msr_bitmap_l0,
-> > 
+On 26/04/2019 20:32, Halil Pasic wrote:
+> Before virtio-ccw could get away with not using DMA API for the pieces of
+> memory it does ccw I/O with. With protected virtualization this has to
+> change, since the hypervisor needs to read and sometimes also write these
+> pieces of memory.
 > 
-> Queued, thanks.  (It may take a couple days until I finish testing
-> everything for the merge window, but it will be in 5.2).
+> The hypervisor is supposed to poke the classic notifiers, if these are
+> used, out of band with regards to ccw I/O. So these need to be allocated
+> as DMA memory (which is shared memory for protected virtualization
+> guests).
+> 
+> Let us factor out everything from struct virtio_ccw_device that needs to
+> be DMA memory in a satellite that is allocated as such.
+> 
+> Note: The control blocks of I/O instructions do not need to be shared.
+> These are marshalled by the ultravisor.
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> ---
+>   drivers/s390/virtio/virtio_ccw.c | 177 +++++++++++++++++++++------------------
+>   1 file changed, 96 insertions(+), 81 deletions(-)
+> 
+> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> index 1f3e7d56924f..613b18001a0c 100644
+> --- a/drivers/s390/virtio/virtio_ccw.c
+> +++ b/drivers/s390/virtio/virtio_ccw.c
+> @@ -46,9 +46,15 @@ struct vq_config_block {
+>   #define VIRTIO_CCW_CONFIG_SIZE 0x100
+>   /* same as PCI config space size, should be enough for all drivers */
+>   
+> +struct vcdev_dma_area {
+> +	unsigned long indicators;
+> +	unsigned long indicators2;
+> +	struct vq_config_block config_block;
+> +	__u8 status;
+> +};
+> +
+>   struct virtio_ccw_device {
+>   	struct virtio_device vdev;
+> -	__u8 *status;
+>   	__u8 config[VIRTIO_CCW_CONFIG_SIZE];
+>   	struct ccw_device *cdev;
+>   	__u32 curr_io;
+> @@ -58,24 +64,22 @@ struct virtio_ccw_device {
+>   	spinlock_t lock;
+>   	struct mutex io_lock; /* Serializes I/O requests */
+>   	struct list_head virtqueues;
+> -	unsigned long indicators;
+> -	unsigned long indicators2;
+> -	struct vq_config_block *config_block;
+>   	bool is_thinint;
+>   	bool going_away;
+>   	bool device_lost;
+>   	unsigned int config_ready;
+>   	void *airq_info;
+> +	struct vcdev_dma_area *dma_area;
+>   };
+>   
+>   static inline unsigned long *indicators(struct virtio_ccw_device *vcdev)
+>   {
+> -	return &vcdev->indicators;
+> +	return &vcdev->dma_area->indicators;
+>   }
+>   
+>   static inline unsigned long *indicators2(struct virtio_ccw_device *vcdev)
+>   {
+> -	return &vcdev->indicators2;
+> +	return &vcdev->dma_area->indicators2;
+>   }
+>   
+>   struct vq_info_block_legacy {
+> @@ -176,6 +180,22 @@ static struct virtio_ccw_device *to_vc_device(struct virtio_device *vdev)
+>   	return container_of(vdev, struct virtio_ccw_device, vdev);
+>   }
+>   
+> +static inline void *__vc_dma_alloc(struct virtio_device *vdev, size_t size)
+> +{
+> +	return ccw_device_dma_zalloc(to_vc_device(vdev)->cdev, size);
+> +}
+> +
+> +static inline void __vc_dma_free(struct virtio_device *vdev, size_t size,
+> +				 void *cpu_addr)
+> +{
+> +	return ccw_device_dma_free(to_vc_device(vdev)->cdev, cpu_addr, size);
+> +}
+> +
+> +#define vc_dma_alloc_struct(vdev, ptr) \
+> +	({ptr = __vc_dma_alloc(vdev, sizeof(*(ptr))); })
+> +#define vc_dma_free_struct(vdev, ptr) \
+> +	__vc_dma_free(vdev, sizeof(*(ptr)), (ptr))
+> +
+>   static void drop_airq_indicator(struct virtqueue *vq, struct airq_info *info)
+>   {
+>   	unsigned long i, flags;
+> @@ -335,8 +355,7 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
+>   	struct airq_info *airq_info = vcdev->airq_info;
+>   
+>   	if (vcdev->is_thinint) {
+> -		thinint_area = kzalloc(sizeof(*thinint_area),
+> -				       GFP_DMA | GFP_KERNEL);
+> +		vc_dma_alloc_struct(&vcdev->vdev, thinint_area);
+>   		if (!thinint_area)
+>   			return;
+>   		thinint_area->summary_indicator =
+> @@ -347,8 +366,8 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
+>   		ccw->cda = (__u32)(unsigned long) thinint_area;
+>   	} else {
+>   		/* payload is the address of the indicators */
+> -		indicatorp = kmalloc(sizeof(indicators(vcdev)),
+> -				     GFP_DMA | GFP_KERNEL);
+> +		indicatorp = __vc_dma_alloc(&vcdev->vdev,
+> +					   sizeof(indicators(vcdev)));
 
-Hold up, this patch is misleading and unoptimized.  KVM unconditionally
-exposes the MSRs to L1, i.e. checking msr_write_intercepted_l01() is
-unnecessary.  I missed this the first time through, I read it as checking
-vmcs12.  I think the attached patch is what we want.
+should be sizeof(long) ?
 
---liOOAslEiF7prFVr
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment; filename="0001-KVM-nVMX-Disable-intercept-for-FS-GS-base-MSRs-in-vm.patch"
+This is a recurrent error, but it is not an issue because the size of
+the indicators is unsigned long as the size of the pointer.
 
-From ef3d95da738eadaad71a7fb650a6846c3a35b884 Mon Sep 17 00:00:00 2001
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-Date: Wed, 8 May 2019 07:32:15 -0700
-Subject: [PATCH] KVM: nVMX: Disable intercept for FS/GS base MSRs in vmcs02
- when possible
+Regards,
+Pierre
 
-If L1 is using an MSR bitmap, unconditionally merge the MSR bitmaps from
-L0 and L1 for MSR_{KERNEL,}_{FS,GS}_BASE.  KVM unconditionally exposes
-MSRs L1.  If KVM is also running in L1 then it's highly likely L1 is
-also exposing the MSRs to L2, i.e. KVM doesn't need to intercept L2
-accesses.
-
-Based on code from Jintack Lim.
-
-Cc: Jintack Lim <jintack@cs.columbia.edu>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/vmx/nested.c | 47 +++++++++++++++++++++------------------
- 1 file changed, 25 insertions(+), 22 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 04b40a98f60b..f423c5593964 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -514,31 +514,11 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 	unsigned long *msr_bitmap_l0 = to_vmx(vcpu)->nested.vmcs02.msr_bitmap;
- 	struct kvm_host_map *map = &to_vmx(vcpu)->nested.msr_bitmap_map;
- 
--	/*
--	 * pred_cmd & spec_ctrl are trying to verify two things:
--	 *
--	 * 1. L0 gave a permission to L1 to actually passthrough the MSR. This
--	 *    ensures that we do not accidentally generate an L02 MSR bitmap
--	 *    from the L12 MSR bitmap that is too permissive.
--	 * 2. That L1 or L2s have actually used the MSR. This avoids
--	 *    unnecessarily merging of the bitmap if the MSR is unused. This
--	 *    works properly because we only update the L01 MSR bitmap lazily.
--	 *    So even if L0 should pass L1 these MSRs, the L01 bitmap is only
--	 *    updated to reflect this when L1 (or its L2s) actually write to
--	 *    the MSR.
--	 */
--	bool pred_cmd = !msr_write_intercepted_l01(vcpu, MSR_IA32_PRED_CMD);
--	bool spec_ctrl = !msr_write_intercepted_l01(vcpu, MSR_IA32_SPEC_CTRL);
--
- 	/* Nothing to do if the MSR bitmap is not in use.  */
- 	if (!cpu_has_vmx_msr_bitmap() ||
- 	    !nested_cpu_has(vmcs12, CPU_BASED_USE_MSR_BITMAPS))
- 		return false;
- 
--	if (!nested_cpu_has_virt_x2apic_mode(vmcs12) &&
--	    !pred_cmd && !spec_ctrl)
--		return false;
--
- 	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->msr_bitmap), map))
- 		return false;
- 
-@@ -583,13 +563,36 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 		}
- 	}
- 
--	if (spec_ctrl)
-+	/* KVM unconditionally exposes the FS/GS base MSRs to L1. */
-+	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
-+					     MSR_FS_BASE, MSR_TYPE_RW);
-+
-+	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
-+					     MSR_GS_BASE, MSR_TYPE_RW);
-+
-+	nested_vmx_disable_intercept_for_msr(msr_bitmap_l1, msr_bitmap_l0,
-+					     MSR_KERNEL_GS_BASE, MSR_TYPE_RW);
-+
-+	/*
-+	 * Checking the L0->L1 bitmap is trying to verify two things:
-+	 *
-+	 * 1. L0 gave a permission to L1 to actually passthrough the MSR. This
-+	 *    ensures that we do not accidentally generate an L02 MSR bitmap
-+	 *    from the L12 MSR bitmap that is too permissive.
-+	 * 2. That L1 or L2s have actually used the MSR. This avoids
-+	 *    unnecessarily merging of the bitmap if the MSR is unused. This
-+	 *    works properly because we only update the L01 MSR bitmap lazily.
-+	 *    So even if L0 should pass L1 these MSRs, the L01 bitmap is only
-+	 *    updated to reflect this when L1 (or its L2s) actually write to
-+	 *    the MSR.
-+	 */
-+	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_SPEC_CTRL))
- 		nested_vmx_disable_intercept_for_msr(
- 					msr_bitmap_l1, msr_bitmap_l0,
- 					MSR_IA32_SPEC_CTRL,
- 					MSR_TYPE_R | MSR_TYPE_W);
- 
--	if (pred_cmd)
-+	if (!msr_write_intercepted_l01(vcpu, MSR_IA32_PRED_CMD))
- 		nested_vmx_disable_intercept_for_msr(
- 					msr_bitmap_l1, msr_bitmap_l0,
- 					MSR_IA32_PRED_CMD,
 -- 
-2.21.0
+Pierre Morel
+Linux/KVM/QEMU in Böblingen - Germany
 
-
---liOOAslEiF7prFVr--
