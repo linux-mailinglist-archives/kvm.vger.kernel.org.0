@@ -2,66 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 22AAC17930
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 14:11:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7858C1793A
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 14:16:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728351AbfEHMLw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 08:11:52 -0400
-Received: from mail-wr1-f45.google.com ([209.85.221.45]:42101 "EHLO
-        mail-wr1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727612AbfEHMLw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 08:11:52 -0400
-Received: by mail-wr1-f45.google.com with SMTP id l2so26911542wrb.9
-        for <kvm@vger.kernel.org>; Wed, 08 May 2019 05:11:51 -0700 (PDT)
+        id S1728450AbfEHMQp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 08:16:45 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:39679 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728031AbfEHMQp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 08:16:45 -0400
+Received: by mail-wm1-f67.google.com with SMTP id n25so2970944wmk.4;
+        Wed, 08 May 2019 05:16:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=+uSM2xfSQ11lGMP7BGRPKgpGed0cJqoT69USPPkz3jU=;
+        b=Ks8R50PmLH8B3wYlvGWd9xR78gXMG+K3RiXZmZt7IJD12HkAxPr+weWGElt2Pq+Oiq
+         6EHpYkYVNUldyBbIZgLFhgOmtmS1lGe+c9GmDXIkor1o/YKw6xVHI8Sge4HeT7Tz/rV3
+         pR28gQOzdSUa9+yUpzqGx6q6PlCNGjIjixJDSaBoHnvNNdkAwq23nu7EFHBSF4Eha/Eb
+         IvR/KLR1mfqxUM1oXCNLB4BPdN8PEucgB6GlmYyzZo6X/gWWn5S8FRxJ0Kc8QQ+cNbku
+         HRusIXxlJcTdO5OS/y1URHtWkC0tJ9KOPZZ1vgfTkHgmlJg8TBG1ZF7Avp9fuvLUVySE
+         BHWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dpPTghQfTOfW+kj++bkMDQMA39u0jojiNITdhZwYorw=;
-        b=oBuHSuGqE4VLCc3fWQBPficcnZzOcL6a6CHruSbhsZHo3MmusfUJwKAKYxw90cu0qc
-         U7zjadba8G792TsgIVT1el+reDewlaKh9Usvyq9wul6blAZzf9WHLGIxzLyHi/h7loXW
-         xFNtM9II9gvaV0xM1D7rvSziA/fn49j6k9Kh4+Z8rzpuMz036juFTO7yjobK7+9ljpsV
-         tYUhfFewI2qbqc+5b/mDvPGFu36D2aYrbnvHELO7mQCDZbnpq9sZLztyn4E2tbP6frvu
-         i+umV2qAWFBxwGJ1issn3Ym9duMAkjoUVbB6MEpMYTotiBB1hADvPKpWKHAZGz7gibs0
-         LbTQ==
-X-Gm-Message-State: APjAAAU+kM9ONfzm0/pPlOGov0KS6IFaDNh8DvVZiQURAx2ovuQk0BTp
-        25qm2gI9vfhwfbyh2zI9MSPAEQ==
-X-Google-Smtp-Source: APXvYqzXWRGG+O4sPacm10H5YRs3rwm2eU9TBEyuSh+36xB3K+X9I8BBJVgoMpepEFtFSSqB9VpsSQ==
-X-Received: by 2002:a5d:62cf:: with SMTP id o15mr8029292wrv.45.1557317511102;
-        Wed, 08 May 2019 05:11:51 -0700 (PDT)
-Received: from [10.201.49.229] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-        by smtp.gmail.com with ESMTPSA id v189sm4261198wma.3.2019.05.08.05.11.49
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=+uSM2xfSQ11lGMP7BGRPKgpGed0cJqoT69USPPkz3jU=;
+        b=mgLxjNRLmAF9eLTsXYWtPmArTk8zMLzPQQj2qxmf1KUbx1/ApDSOeoLZY3RG3fgHmo
+         Ucc+tl25krPFhrQv4J/fpJRBMdCX9b75V4zLDys+puU3V5q/k5XTjrebEdMXJSzZZ10o
+         8zTP1UJcWN3uCGA4qbjrOZVs+SIy3oE5Rr2+L/yItDeuy5NxHtKIu8uQ3liqtYzLCBu2
+         Yky6Pvdiq6FnOS6/taZYKL/4XZ+QdZXkQnhYhBgWJ+MSdOGA8DlAaDj7Uf/Y/PJJXhM0
+         IH3lPvOZSq4v4owurwjBLSOnOt11RuLT2JcdmSqJU4Bo4uqXn5qU+FSBGaDtBa7FMKEn
+         NWwg==
+X-Gm-Message-State: APjAAAUDsgdHmcja567XTzLJ+AXIHROZYsfSsAxl1rvQyHlNMhe1DUX3
+        Bbu4IEIuliICwMLUwxS86ZuVB7Id
+X-Google-Smtp-Source: APXvYqxQtVrDyVQTPETlefWXQ8Z0BnDc1dfeAnKn9pDyxLpMFspzLm3H8P5D9WhnPS9zWn6dt551/A==
+X-Received: by 2002:a1c:c7c8:: with SMTP id x191mr2860289wmf.146.1557317803365;
+        Wed, 08 May 2019 05:16:43 -0700 (PDT)
+Received: from 640k.localdomain.com ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id p24sm1509368wma.18.2019.05.08.05.16.42
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 08 May 2019 05:11:49 -0700 (PDT)
-Subject: Re: [PATCH 1/3] kvm: nVMX: Set nested_run_pending in
- vmx_set_nested_state after checks complete
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Aaron Lewis <aaronlewis@google.com>
-Cc:     rkrcmar@redhat.com, jmattson@google.com, marcorr@google.com,
-        kvm@vger.kernel.org, Peter Shier <pshier@google.com>
-References: <20190502183125.257005-1-aaronlewis@google.com>
- <20190503163524.GB32628@linux.intel.com>
+        Wed, 08 May 2019 05:16:42 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <10e1bbf8-ffa6-2b4f-25b2-9a17148ec19d@redhat.com>
-Date:   Wed, 8 May 2019 14:11:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190503163524.GB32628@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Peter Shier <pshier@google.com>,
+        Aaron Lewis <aaronlewis@google.com>
+Subject: [PATCH v2] kvm: nVMX: Set nested_run_pending in vmx_set_nested_state after checks complete
+Date:   Wed,  8 May 2019 14:16:39 +0200
+Message-Id: <1557317799-39866-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/05/19 11:35, Sean Christopherson wrote:
-> @nested_run_pending is consumed by nested_vmx_enter_non_root_mode(),
-> e.g. prepare_vmcs02().  I'm guessing its current location is deliberate.
+From: Aaron Lewis <aaronlewis@google.com>
 
-Right.  If nested_run_pending is false, for example, GUEST_BNDCFGS must
-not be taken from the vmcs12.
+nested_run_pending=1 implies we have successfully entered guest mode.
+Move setting from external state in vmx_set_nested_state() until after
+all other checks are complete.
 
-Paolo
+Based on a patch by Aaron Lewis.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/vmx/nested.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index cec77f30f61c..e58caff92694 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -5420,9 +5420,6 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+ 	if (!(kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE))
+ 		return 0;
+ 
+-	vmx->nested.nested_run_pending =
+-		!!(kvm_state->flags & KVM_STATE_NESTED_RUN_PENDING);
+-
+ 	if (nested_cpu_has_shadow_vmcs(vmcs12) &&
+ 	    vmcs12->vmcs_link_pointer != -1ull) {
+ 		struct vmcs12 *shadow_vmcs12 = get_shadow_vmcs12(vcpu);
+@@ -5446,9 +5443,14 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+ 		return -EINVAL;
+ 
+ 	vmx->nested.dirty_vmcs12 = true;
++	vmx->nested.nested_run_pending =
++		!!(kvm_state->flags & KVM_STATE_NESTED_RUN_PENDING);
++
+ 	ret = nested_vmx_enter_non_root_mode(vcpu, false);
+-	if (ret)
++	if (ret) {
++		vmx->nested.nested_run_pending = 0;
+ 		return -EINVAL;
++	}
+ 
+ 	return 0;
+ }
+-- 
+1.8.3.1
+
