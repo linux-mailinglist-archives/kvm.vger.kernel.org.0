@@ -2,109 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E1FAB17D1A
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 17:23:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CFC11857E
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 08:46:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728257AbfEHPXf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 11:23:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39216 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726842AbfEHPXe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 11:23:34 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 924EB3007149;
-        Wed,  8 May 2019 15:23:33 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BE972E09B;
-        Wed,  8 May 2019 15:23:33 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id B6B4B41F56;
-        Wed,  8 May 2019 15:23:32 +0000 (UTC)
-Date:   Wed, 8 May 2019 11:23:32 -0400 (EDT)
-From:   Pankaj Gupta <pagupta@redhat.com>
-To:     Jakub =?utf-8?Q?Staro=C5=84?= <jstaron@google.com>
-Cc:     linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, jack@suse.cz, mst@redhat.com,
-        jasowang@redhat.com, david@fromorbit.com, lcapitulino@redhat.com,
-        adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
-        aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
-        darrick wong <darrick.wong@oracle.com>,
-        vishal l verma <vishal.l.verma@intel.com>, david@redhat.com,
-        willy@infradead.org, hch@infradead.org, jmoyer@redhat.com,
-        nilal@redhat.com, lenb@kernel.org, kilobyte@angband.pl,
-        riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
-        stefanha@redhat.com, pbonzini@redhat.com,
-        dan j williams <dan.j.williams@intel.com>, kwolf@redhat.com,
-        tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-        cohuck@redhat.com, rjw@rjwysocki.net, imammedo@redhat.com,
-        smbarber@google.com
-Message-ID: <1482604497.27348783.1557329012320.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1555943483.27247564.1557313967518.JavaMail.zimbra@redhat.com>
-References: <20190426050039.17460-1-pagupta@redhat.com> <20190426050039.17460-3-pagupta@redhat.com> <3d6479ae-6c39-d614-f1d9-aa1978e2e438@google.com> <1555943483.27247564.1557313967518.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 2/6] virtio-pmem: Add virtio pmem driver
+        id S1726411AbfEIGp5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 02:45:57 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34966 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726087AbfEIGp5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 May 2019 02:45:57 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x496aaRM118187
+        for <kvm@vger.kernel.org>; Thu, 9 May 2019 02:45:56 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2scej19n7n-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 09 May 2019 02:45:56 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <fiuczy@linux.ibm.com>;
+        Thu, 9 May 2019 07:45:53 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 9 May 2019 07:45:45 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x496jhIf55050456
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 May 2019 06:45:43 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5F056A4065;
+        Thu,  9 May 2019 06:45:43 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 534D2A4054;
+        Thu,  9 May 2019 06:45:42 +0000 (GMT)
+Received: from [10.0.2.15] (unknown [9.152.222.56])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 May 2019 06:45:42 +0000 (GMT)
+Subject: Re: [libvirt] [PATCH v2 1/2] vfio/mdev: add version attribute for
+ mdev device
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>
+Cc:     "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "dinechin@redhat.com" <dinechin@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>
+References: <20190506014514.3555-1-yan.y.zhao@intel.com>
+ <20190506014904.3621-1-yan.y.zhao@intel.com>
+ <20190507151826.502be009@x1.home> <20190508112740.GA24397@joy-OptiPlex-7040>
+ <20190508152242.4b54a5e7@x1.home>
+From:   Boris Fiuczynski <fiuczy@linux.ibm.com>
+Date:   Wed, 8 May 2019 17:27:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.32, 10.4.195.26]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: PGqRBxt7ac04jwyhY+CEFoY6aRdKvNGTIbxd
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 08 May 2019 15:23:33 +0000 (UTC)
+In-Reply-To: <20190508152242.4b54a5e7@x1.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19050906-0008-0000-0000-000002E4CB1B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050906-0009-0000-0000-000022514FBA
+Message-Id: <5eac912c-e753-b5f6-83a4-b646f991d858@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-09_02:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905090043
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-> > 
-> > > +int virtio_pmem_flush(struct nd_region *nd_region)
-> > > +{
-> > > +        int err;
-> > > +        unsigned long flags;
-> > > +        struct scatterlist *sgs[2], sg, ret;
-> > > +        struct virtio_device *vdev = nd_region->provider_data;
-> > > +        struct virtio_pmem *vpmem = vdev->priv;
-> > > +        struct virtio_pmem_request *req;
-> > > +
-> > > +        might_sleep();
-> > > +        req = kmalloc(sizeof(*req), GFP_KERNEL);
-> > > +        if (!req)
-> > > +                return -ENOMEM;
-> > > +
-> > > +        req->done = req->wq_buf_avail = false;
-> > > +        strcpy(req->name, "FLUSH");
-> > > +        init_waitqueue_head(&req->host_acked);
-> > > +        init_waitqueue_head(&req->wq_buf);
-> > > +        sg_init_one(&sg, req->name, strlen(req->name));
-> > > +        sgs[0] = &sg;
-> > > +        sg_init_one(&ret, &req->ret, sizeof(req->ret));
-> > > +        sgs[1] = &ret;
-> > > +
-> > > +        spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > > +        err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req, GFP_ATOMIC);
-> > > +        if (err) {
-> > > +                dev_err(&vdev->dev, "failed to send command to virtio pmem device\n");
-> > > +
-> > > +                list_add_tail(&vpmem->req_list, &req->list);
-> > > +                spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > > +
-> > > +                /* When host has read buffer, this completes via host_ack */
-> > > +                wait_event(req->wq_buf, req->wq_buf_avail);
-> > > +                spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > > +        }
-> > 
-> > Aren't the arguments in `list_add_tail` swapped? The element we are adding
+On 5/8/19 11:22 PM, Alex Williamson wrote:
+>>> I thought there was a request to make this more specific to migration
+>>> by renaming it to something like migration_version.  Also, as an
+>>>   
+>> so this attribute may not only include a mdev device's parent device info and
+>> mdev type, but also include numeric software version of vendor specific
+>> migration code, right?
+> It's a vendor defined string, it should be considered opaque to the
+> user, the vendor can include whatever they feel is relevant.
 > 
+Would a vendor also be allowed to provide a string expressing required 
+features as well as containing backend resource requirements which need 
+to be compatible for a successful migration? Somehow a bit like a cpu 
+model... maybe even as json or xml...
+I am asking this with vfio-ap in mind. In that context checking 
+compatibility of two vfio-ap mdev devices is not as simple as checking 
+if version A is smaller or equal to version B.
 
-Yes, arguments for 'list_add_tail' should be swapped.
+-- 
+Mit freundlichen Grüßen/Kind regards
+    Boris Fiuczynski
 
-list_add_tail(&req->list, &vpmem->req_list);
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Matthias Hartmann
+Geschäftsführung: Dirk Wittkopp
+Sitz der Gesellschaft: Böblingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
 
-
-Thank you,
-Pankaj
