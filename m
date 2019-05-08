@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 96DBD17C69
+	by mail.lfdr.de (Postfix) with ESMTP id 2345417C68
 	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:51:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727535AbfEHOvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1727638AbfEHOvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Wed, 8 May 2019 10:51:10 -0400
-Received: from mga01.intel.com ([192.55.52.88]:9094 "EHLO mga01.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:19899 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728217AbfEHOon (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1728136AbfEHOon (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 8 May 2019 10:44:43 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:43 -0700
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:43 -0700
 X-ExtLoop1: 1
 Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga006.fm.intel.com with ESMTP; 08 May 2019 07:44:39 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 08 May 2019 07:44:39 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id 6629B926; Wed,  8 May 2019 17:44:29 +0300 (EEST)
+        id 74047949; Wed,  8 May 2019 17:44:29 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -36,9 +36,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 15/62] x86/mm: Rename CONFIG_RANDOMIZE_MEMORY_PHYSICAL_PADDING
-Date:   Wed,  8 May 2019 17:43:35 +0300
-Message-Id: <20190508144422.13171-16-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 16/62] x86/mm: Allow to disable MKTME after enumeration
+Date:   Wed,  8 May 2019 17:43:36 +0300
+Message-Id: <20190508144422.13171-17-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -49,41 +49,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename the option to CONFIG_MEMORY_PHYSICAL_PADDING. It will be used
-not only for KASLR.
+The new helper mktme_disable() allows to disable MKTME even if it's
+enumerated successfully. MKTME initialization may fail and this
+functionality allows system to boot regardless of the failure.
+
+MKTME needs per-KeyID direct mapping. It requires a lot more virtual
+address space which may be a problem in 4-level paging mode. If the
+system has more physical memory than we can handle with MKTME the
+feature allows to fail MKTME, but boot the system successfully.
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- arch/x86/Kconfig    | 2 +-
- arch/x86/mm/kaslr.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/mktme.h |  5 +++++
+ arch/x86/kernel/cpu/intel.c  |  5 +----
+ arch/x86/mm/mktme.c          | 10 ++++++++++
+ 3 files changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 62fc3fda1a05..62cfb381fee3 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -2201,7 +2201,7 @@ config RANDOMIZE_MEMORY
+diff --git a/arch/x86/include/asm/mktme.h b/arch/x86/include/asm/mktme.h
+index 6e604126f0bc..454d6d7c791d 100644
+--- a/arch/x86/include/asm/mktme.h
++++ b/arch/x86/include/asm/mktme.h
+@@ -18,6 +18,8 @@ static inline bool mktme_enabled(void)
+ 	return static_branch_unlikely(&mktme_enabled_key);
+ }
  
- 	   If unsure, say Y.
++void mktme_disable(void);
++
+ extern struct page_ext_operations page_mktme_ops;
  
--config RANDOMIZE_MEMORY_PHYSICAL_PADDING
-+config MEMORY_PHYSICAL_PADDING
- 	hex "Physical memory mapping padding" if EXPERT
- 	depends on RANDOMIZE_MEMORY
- 	default "0xa" if MEMORY_HOTPLUG
-diff --git a/arch/x86/mm/kaslr.c b/arch/x86/mm/kaslr.c
-index d669c5e797e0..2228cc7d6b42 100644
---- a/arch/x86/mm/kaslr.c
-+++ b/arch/x86/mm/kaslr.c
-@@ -103,7 +103,7 @@ void __init kernel_randomize_memory(void)
- 	 */
- 	BUG_ON(kaslr_regions[0].base != &page_offset_base);
- 	memory_tb = DIV_ROUND_UP(max_pfn << PAGE_SHIFT, 1UL << TB_SHIFT) +
--		CONFIG_RANDOMIZE_MEMORY_PHYSICAL_PADDING;
-+		CONFIG_MEMORY_PHYSICAL_PADDING;
+ #define page_keyid page_keyid
+@@ -68,6 +70,9 @@ static inline bool mktme_enabled(void)
+ {
+ 	return false;
+ }
++
++static inline void mktme_disable(void) {}
++
+ #endif
  
- 	/* Adapt phyiscal memory region size based on available memory */
- 	if (memory_tb < kaslr_regions[0].size_tb)
+ #endif
+diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
+index 4c9fadb57a13..f402a74c00a1 100644
+--- a/arch/x86/kernel/cpu/intel.c
++++ b/arch/x86/kernel/cpu/intel.c
+@@ -618,10 +618,7 @@ static void detect_tme(struct cpuinfo_x86 *c)
+ 		 * We must not allow onlining secondary CPUs with non-matching
+ 		 * configuration.
+ 		 */
+-		physical_mask = (1ULL << __PHYSICAL_MASK_SHIFT) - 1;
+-		mktme_keyid_mask = 0;
+-		mktme_keyid_shift = 0;
+-		mktme_nr_keyids = 0;
++		mktme_disable();
+ 	}
+ #endif
+ 
+diff --git a/arch/x86/mm/mktme.c b/arch/x86/mm/mktme.c
+index 43489c098e60..9221c894e8e9 100644
+--- a/arch/x86/mm/mktme.c
++++ b/arch/x86/mm/mktme.c
+@@ -15,6 +15,16 @@ int mktme_keyid_shift;
+ DEFINE_STATIC_KEY_FALSE(mktme_enabled_key);
+ EXPORT_SYMBOL_GPL(mktme_enabled_key);
+ 
++void mktme_disable(void)
++{
++	physical_mask = (1ULL << __PHYSICAL_MASK_SHIFT) - 1;
++	mktme_keyid_mask = 0;
++	mktme_keyid_shift = 0;
++	mktme_nr_keyids = 0;
++	if (mktme_enabled())
++		static_branch_disable(&mktme_enabled_key);
++}
++
+ static bool need_page_mktme(void)
+ {
+ 	/* Make sure keyid doesn't collide with extended page flags */
 -- 
 2.20.1
 
