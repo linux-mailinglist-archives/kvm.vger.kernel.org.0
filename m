@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 13D8C17BF0
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:46:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6844417BFB
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:47:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727367AbfEHOq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:46:28 -0400
-Received: from mga03.intel.com ([134.134.136.65]:59551 "EHLO mga03.intel.com"
+        id S1728554AbfEHOqk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:46:40 -0400
+Received: from mga06.intel.com ([134.134.136.31]:57687 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728176AbfEHOo4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 10:44:56 -0400
+        id S1728541AbfEHOoz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 10:44:55 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:53 -0700
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:54 -0700
 X-ExtLoop1: 1
 Received: from black.fi.intel.com ([10.237.72.28])
-  by FMSMGA003.fm.intel.com with ESMTP; 08 May 2019 07:44:49 -0700
+  by orsmga006.jf.intel.com with ESMTP; 08 May 2019 07:44:49 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id AF33E11CE; Wed,  8 May 2019 17:44:31 +0300 (EEST)
+        id BCB7F11CF; Wed,  8 May 2019 17:44:31 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -36,9 +36,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 60/62] x86/mktme: Document the MKTME Key Service API
-Date:   Wed,  8 May 2019 17:44:20 +0300
-Message-Id: <20190508144422.13171-61-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 61/62] x86/mktme: Document the MKTME API for anonymous memory encryption
+Date:   Wed,  8 May 2019 17:44:21 +0300
+Message-Id: <20190508144422.13171-62-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -54,122 +54,83 @@ From: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- Documentation/x86/mktme/index.rst      |  1 +
- Documentation/x86/mktme/mktme_keys.rst | 96 ++++++++++++++++++++++++++
- 2 files changed, 97 insertions(+)
- create mode 100644 Documentation/x86/mktme/mktme_keys.rst
+ Documentation/x86/mktme/index.rst         |  1 +
+ Documentation/x86/mktme/mktme_encrypt.rst | 57 +++++++++++++++++++++++
+ 2 files changed, 58 insertions(+)
+ create mode 100644 Documentation/x86/mktme/mktme_encrypt.rst
 
 diff --git a/Documentation/x86/mktme/index.rst b/Documentation/x86/mktme/index.rst
-index 0f021cc4a2db..8cf2b7d62091 100644
+index 8cf2b7d62091..ca3c76adc596 100644
 --- a/Documentation/x86/mktme/index.rst
 +++ b/Documentation/x86/mktme/index.rst
-@@ -8,3 +8,4 @@ Multi-Key Total Memory Encryption (MKTME)
-    mktme_overview
+@@ -9,3 +9,4 @@ Multi-Key Total Memory Encryption (MKTME)
     mktme_mitigations
     mktme_configuration
-+   mktme_keys
-diff --git a/Documentation/x86/mktme/mktme_keys.rst b/Documentation/x86/mktme/mktme_keys.rst
+    mktme_keys
++   mktme_encrypt
+diff --git a/Documentation/x86/mktme/mktme_encrypt.rst b/Documentation/x86/mktme/mktme_encrypt.rst
 new file mode 100644
-index 000000000000..161871dee0dc
+index 000000000000..5cdffabc610f
 --- /dev/null
-+++ b/Documentation/x86/mktme/mktme_keys.rst
-@@ -0,0 +1,96 @@
-+MKTME Key Service API
-+=====================
-+MKTME is a new key service type added to the Linux Kernel Key Service.
++++ b/Documentation/x86/mktme/mktme_encrypt.rst
+@@ -0,0 +1,57 @@
++MKTME API: system call encrypt_mprotect()
++=========================================
 +
-+The MKTME Key Service type is available when CONFIG_X86_INTEL_MKTME is
-+turned on in Intel platforms that support the MKTME feature.
-+
-+The MKTME Key Service type manages the allocation of hardware encryption
-+keys. Users can request an MKTME type key and then use that key to
-+encrypt memory with the encrypt_mprotect() system call.
-+
-+Usage
-+-----
-+    When using the Kernel Key Service to request an *mktme* key,
-+    specify the *payload* as follows:
-+
-+    type=
-+        *user*	User will supply the encryption key data. Use this
-+                type to directly program a hardware encryption key.
-+
-+        *cpu*	User requests a CPU generated encryption key.
-+                The CPU generates and assigns an ephemeral key.
-+
-+        *no-encrypt*
-+                 User requests that hardware does not encrypt
-+                 memory when this key is in use.
-+
-+    algorithm=
-+        When type=user or type=cpu the algorithm field must be
-+        *aes-xts-128*
-+
-+        When type=clear or type=no-encrypt the algorithm field
-+        must not be present in the payload.
-+
-+    key=
-+        When type=user the user must supply a 128 bit encryption
-+        key as exactly 32 ASCII hexadecimal characters.
-+
-+	When type=cpu the user may optionally supply 128 bits of
-+        entropy for the CPU generated encryption key in this field.
-+        It must be exactly 32 ASCII hexadecimal characters.
-+
-+	When type=no-encrypt this key field must not be present
-+        in the payload.
-+
-+    tweak=
-+	When type=user the user must supply a 128 bit tweak key
-+        as exactly 32 ASCII hexadecimal characters.
-+
-+	When type=cpu the user may optionally supply 128 bits of
-+        entropy for the CPU generated tweak key in this field.
-+        It must be exactly 32 ASCII hexadecimal characters.
-+
-+        When type=no-encrypt the tweak field must not be present
-+        in the payload.
-+
-+ERRORS
-+------
-+    In addition to the Errors returned from the Kernel Key Service,
-+    add_key(2) or keyctl(1) commands, the MKTME Key Service type may
-+    return the following errors:
-+
-+    EINVAL for any payload specification that does not match the
-+           MKTME type payload as defined above.
-+
-+    EACCES for access denied. The MKTME key type uses capabilities
-+           to restrict the allocation of keys to privileged users.
-+           CAP_SYS_RESOURCE is required, but it will accept the
-+           broader capability of CAP_SYS_ADMIN. See capabilities(7).
-+
-+    ENOKEY if a hardware key cannot be allocated. Additional error
-+           messages will describe the hardware programming errors.
-+
-+EXAMPLES
++Synopsis
 +--------
-+    Add a 'user' type key::
++int encrypt_mprotect(void \*addr, size_t len, int prot, key_serial_t serial);
 +
-+        char \*options_USER = "type=user
-+                               algorithm=aes-xts-128
-+                               key=12345678912345671234567891234567
-+                               tweak=12345678912345671234567891234567";
++Where *key_serial_t serial* is the serial number of a key allocated
++using the MKTME Key Service.
 +
-+        key = add_key("mktme", "name", options_USER, strlen(options_USER),
-+                      KEY_SPEC_THREAD_KEYRING);
++Description
++-----------
++    encrypt_mprotect() encrypts the memory pages containing any part
++    of the address range in the interval specified by addr and len.
 +
-+    Add a 'cpu' type key::
++    encrypt_mprotect() supports the legacy mprotect() behavior plus
++    the enabling of memory encryption. That means that in addition
++    to encrypting the memory, the protection flags will be updated
++    as requested in the call.
 +
-+        char \*options_USER = "type=cpu algorithm=aes-xts-128";
++    The *addr* and *len* must be aligned to a page boundary.
 +
-+        key = add_key("mktme", "name", options_CPU, strlen(options_CPU),
-+                      KEY_SPEC_THREAD_KEYRING);
++    The caller must have *KEY_NEED_VIEW* permission on the key.
 +
-+    Add a "no-encrypt' type key::
++    The range of memory that is to be protected must be mapped as
++    *ANONYMOUS*.
 +
-+	key = add_key("mktme", "name", "no-encrypt", strlen(options_CPU),
-+		      KEY_SPEC_THREAD_KEYRING);
++Errors
++------
++    In addition to the Errors returned from legacy mprotect()
++    encrypt_mprotect will return:
++
++    ENOKEY *serial* parameter does not represent a valid key.
++
++    EINVAL *len* parameter is not page aligned.
++
++    EACCES Caller does not have *KEY_NEED_VIEW* permission on the key.
++
++EXAMPLE
++--------
++  Allocate an MKTME Key::
++        serial = add_key("mktme", "name", "type=cpu algorithm=aes-xts-128" @u
++
++  Map ANONYMOUS memory::
++        ptr = mmap(NULL, size, PROT_NONE, MAP_ANONYMOUS|MAP_PRIVATE, -1, 0);
++
++  Protect memory::
++        ret = syscall(SYS_encrypt_mprotect, ptr, size, PROT_READ|PROT_WRITE,
++                      serial);
++
++  Use the encrypted memory
++
++  Free memory::
++        ret = munmap(ptr, size);
++
++  Free the key resource::
++        ret = keyctl(KEYCTL_INVALIDATE, serial);
 -- 
 2.20.1
 
