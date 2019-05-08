@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F44617C1B
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:48:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 241F417C11
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:48:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727804AbfEHOrt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:47:49 -0400
-Received: from mga05.intel.com ([192.55.52.43]:24016 "EHLO mga05.intel.com"
+        id S1727578AbfEHOrT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:47:19 -0400
+Received: from mga07.intel.com ([134.134.136.100]:33094 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728430AbfEHOov (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 10:44:51 -0400
+        id S1728451AbfEHOow (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 10:44:52 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:50 -0700
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:50 -0700
 X-ExtLoop1: 1
 Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga001.jf.intel.com with ESMTP; 08 May 2019 07:44:45 -0700
+  by orsmga007.jf.intel.com with ESMTP; 08 May 2019 07:44:46 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id 311E210A5; Wed,  8 May 2019 17:44:31 +0300 (EEST)
+        id 3BB8410AA; Wed,  8 May 2019 17:44:31 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -36,9 +36,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 49/62] mm, x86: export several MKTME variables
-Date:   Wed,  8 May 2019 17:44:09 +0300
-Message-Id: <20190508144422.13171-50-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 50/62] kvm, x86, mmu: setup MKTME keyID to spte for given PFN
+Date:   Wed,  8 May 2019 17:44:10 +0300
+Message-Id: <20190508144422.13171-51-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -51,35 +51,56 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Kai Huang <kai.huang@linux.intel.com>
 
-KVM needs those variables to get/set memory encryption mask.
+Setup keyID to SPTE, which will be eventually programmed to shadow MMU
+or EPT table, according to page's associated keyID, so that guest is
+able to use correct keyID to access guest memory.
+
+Note current shadow_me_mask doesn't suit MKTME's needs, since for MKTME
+there's no fixed memory encryption mask, but can vary from keyID 1 to
+maximum keyID, therefore shadow_me_mask remains 0 for MKTME.
 
 Signed-off-by: Kai Huang <kai.huang@linux.intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- arch/x86/mm/mktme.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/x86/kvm/mmu.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/mm/mktme.c b/arch/x86/mm/mktme.c
-index df70651816a1..12f4266cf7ea 100644
---- a/arch/x86/mm/mktme.c
-+++ b/arch/x86/mm/mktme.c
-@@ -7,13 +7,16 @@
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index d9c7b45d231f..bfee0c194161 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -2899,6 +2899,22 @@ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
+ #define SET_SPTE_WRITE_PROTECTED_PT	BIT(0)
+ #define SET_SPTE_NEED_REMOTE_TLB_FLUSH	BIT(1)
  
- /* Mask to extract KeyID from physical address. */
- phys_addr_t mktme_keyid_mask;
-+EXPORT_SYMBOL_GPL(mktme_keyid_mask);
- /*
-  * Number of KeyIDs available for MKTME.
-  * Excludes KeyID-0 which used by TME. MKTME KeyIDs start from 1.
-  */
- int mktme_nr_keyids;
-+EXPORT_SYMBOL_GPL(mktme_nr_keyids);
- /* Shift of KeyID within physical address. */
- int mktme_keyid_shift;
-+EXPORT_SYMBOL_GPL(mktme_keyid_shift);
++static u64 get_phys_encryption_mask(kvm_pfn_t pfn)
++{
++#ifdef CONFIG_X86_INTEL_MKTME
++	struct page *page;
++
++	if (!pfn_valid(pfn))
++		return 0;
++
++	page = pfn_to_page(pfn);
++
++	return ((u64)page_keyid(page)) << mktme_keyid_shift;
++#else
++	return shadow_me_mask;
++#endif
++}
++
+ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 		    unsigned pte_access, int level,
+ 		    gfn_t gfn, kvm_pfn_t pfn, bool speculative,
+@@ -2945,7 +2961,7 @@ static int set_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 		pte_access &= ~ACC_WRITE_MASK;
  
- DEFINE_STATIC_KEY_FALSE(mktme_enabled_key);
- EXPORT_SYMBOL_GPL(mktme_enabled_key);
+ 	if (!kvm_is_mmio_pfn(pfn))
+-		spte |= shadow_me_mask;
++		spte |= get_phys_encryption_mask(pfn);
+ 
+ 	spte |= (u64)pfn << PAGE_SHIFT;
+ 
 -- 
 2.20.1
 
