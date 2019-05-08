@@ -2,130 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 53CEA181BE
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 23:47:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65299181DD
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 23:59:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727476AbfEHVrF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 17:47:05 -0400
-Received: from mga03.intel.com ([134.134.136.65]:22962 "EHLO mga03.intel.com"
+        id S1728600AbfEHV7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 17:59:44 -0400
+Received: from mga02.intel.com ([134.134.136.20]:48603 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726875AbfEHVrE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 17:47:04 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
+        id S1726837AbfEHV7o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 17:59:44 -0400
+X-Amp-Result: UNSCANNABLE
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 14:47:04 -0700
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 14:59:31 -0700
 X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.36])
-  by orsmga002.jf.intel.com with ESMTP; 08 May 2019 14:47:03 -0700
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
+  by orsmga003.jf.intel.com with ESMTP; 08 May 2019 14:59:31 -0700
+Date:   Wed, 8 May 2019 14:59:31 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <kernellwp@gmail.com>
-Subject: [PATCH] KVM: lapic: Reuse auto-adjusted timer advance of first stable vCPU
-Date:   Wed,  8 May 2019 14:47:02 -0700
-Message-Id: <20190508214702.25317-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.21.0
+To:     Yi Wang <wang.yi59@zte.com.cn>
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [next] KVM: lapic: allow setting apic debug dynamically
+Message-ID: <20190508215931.GG19656@linux.intel.com>
+References: <1557211053-17275-1-git-send-email-wang.yi59@zte.com.cn>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1557211053-17275-1-git-send-email-wang.yi59@zte.com.cn>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Wanpeng pointed out that auto-tuning the advancement time for every vCPU
-can lead to inaccurate wait times, e.g. if the advancement is calculated
-while an overcommitted host is under heavy load, then KVM will waste a
-lot of time busy waiting if the load decreases, e.g. when neighbour VMs
-are idle.
+On Tue, May 07, 2019 at 02:37:33PM +0800, Yi Wang wrote:
+> There are many functions invoke apic_debug(), which is defined
+> as a null function by default, and that's incovenient for debuging
+> lapic.
+> 
+> This patch allows setting apic debug according to add a apic_dbg
+> parameter of kvm.
+> 
+> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+> ---
+>  arch/x86/kvm/lapic.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 9bf70cf..4d8f10f 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -54,8 +54,13 @@
+>  #define PRIu64 "u"
+>  #define PRIo64 "o"
+>  
+> +static int apic_dbg;
 
-Sidestep this issue and reduce time spent adjusting the advancement by
-saving the first stable advancement value and reusing that value for all
-*new* vCPUs.  This provides a safe way to auto-adjust the advancement,
-minimizes the potential for a poor calculation due to system load, and
-preserves the ability for userspace to change the advancement on the fly
-(the module parameter is writable when KVM is loaded), as the value set
-by userspace takes priority.
+s/int/bool to get this to compile.  And module params of this nature
+should be tagged __read_mostly.
 
-Regarding changing the advancement on the fly, doing so is likely less
-useful with auto-adjusting, especially now that recognizing a change
-requires restarting the VM.  Allowing the two concepts to coexist is
-theoretically possible, but would be ugly and slow.  Auto-tuning needs
-to track advancement time on a per-vCPU basis (because adjusments are
-done relative to the last advancement), so supporting both approaches
-would require additional code and conditionals, i.e. overhead, but would
-only provide marginal value.  That being said, keep the ability to
-change the module param without a reload as it's useful for debug and
-testing.
+> +module_param(apic_dbg, bool, 0644);
+> +
+>  /* #define apic_debug(fmt,arg...) printk(KERN_WARNING fmt,##arg) */
+> -#define apic_debug(fmt, arg...) do {} while (0)
+> +#define apic_debug(fmt, arg...) do {  if (apic_dbg)   \
+> +	printk(KERN_DEBUG fmt, ##arg);    \
+> +} while (0)
 
-Note, the comment from commit 39497d7660d9 ("KVM: lapic: Track lapic
-timer advance per vCPU") about TSC scaling:
+I don't think we want to do this unless there is a very, very strong
+argument to do so.  The reason debug messages like this are #ifdef'd
+out is because they add conditional branches all over the place and
+measurably increase the code size.  E.g.: this patch would increase
+KVM's code footprint by 1100+ bytes:
 
-  And because virtual_tsc_khz and tsc_scaling_ratio are per-vCPU, the
-  correct calibration for a given vCPU may not apply to all vCPUs.
+ [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al
+  [ 2] .text             PROGBITS        0000000000000000 000070 04c282 00  AX  0   0 16
 
-was effectively resolved by commit b6aa57c69cb2 ("KVM: lapic: Convert
-guest TSC to host time domain if necessary").  The timer advancement is
-calculated and stored in nanoseconds, and operates in the host time
-domain, i.e. calculates *host* overhead.  In short, reusing an
-advancement time for vCPUs with different TSC scaling is ok.
+vs.
 
-Fixes: 39497d7660d9 ("KVM: lapic: Track lapic timer advance per vCPU")
-Cc: Wanpeng Li <kernellwp@gmail.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/lapic.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+  [ 2] .text             PROGBITS        0000000000000000 000070 04c6d2 00  AX  0   0 16
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index bd13fdddbdc4..4f234df11078 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -70,6 +70,8 @@
- #define APIC_BROADCAST			0xFF
- #define X2APIC_BROADCAST		0xFFFFFFFFul
- 
-+static u32 adjusted_timer_advance_ns = -1;
-+
- #define LAPIC_TIMER_ADVANCE_ADJUST_DONE 100
- /* step-by-step approximation to mitigate fluctuation */
- #define LAPIC_TIMER_ADVANCE_ADJUST_STEP 8
-@@ -1542,6 +1544,15 @@ void wait_lapic_expire(struct kvm_vcpu *vcpu)
- 			apic->lapic_timer.timer_advance_adjust_done = true;
- 		}
- 		apic->lapic_timer.timer_advance_ns = timer_advance_ns;
-+
-+		/*
-+		 * The first vCPU to get a stable advancement time "wins" and
-+		 * sets the advancement time that is used for *new* vCPUS that
-+		 * are created with auto-adjusting enabled.
-+		 */
-+		if (apic->lapic_timer.timer_advance_adjust_done)
-+			(void)cmpxchg(&adjusted_timer_advance_ns, -1,
-+				      timer_advance_ns);
- 	}
- }
- 
-@@ -2302,12 +2313,15 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
- 	hrtimer_init(&apic->lapic_timer.timer, CLOCK_MONOTONIC,
- 		     HRTIMER_MODE_ABS_PINNED);
- 	apic->lapic_timer.timer.function = apic_timer_fn;
--	if (timer_advance_ns == -1) {
-+	if (timer_advance_ns != -1) {
-+		apic->lapic_timer.timer_advance_ns = timer_advance_ns;
-+		apic->lapic_timer.timer_advance_adjust_done = true;
-+	} else if (adjusted_timer_advance_ns != -1) {
-+		apic->lapic_timer.timer_advance_ns = adjusted_timer_advance_ns;
-+		apic->lapic_timer.timer_advance_adjust_done = true;
-+	} else {
- 		apic->lapic_timer.timer_advance_ns = 1000;
- 		apic->lapic_timer.timer_advance_adjust_done = false;
--	} else {
--		apic->lapic_timer.timer_advance_ns = timer_advance_ns;
--		apic->lapic_timer.timer_advance_adjust_done = true;
- 	}
- 
- 
--- 
-2.21.0
 
+>  
+>  /* 14 is the version for Xeon and Pentium 8.4.8*/
+>  #define APIC_VERSION			(0x14UL | ((KVM_APIC_LVT_NUM - 1) << 16))
+> -- 
+> 1.8.3.1
+> 
