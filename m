@@ -2,73 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7794A17DE3
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 18:11:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6860717E00
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 18:22:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728351AbfEHQK0 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 8 May 2019 12:10:26 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:56968 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727054AbfEHQKZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 May 2019 12:10:25 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 9016828A16
-        for <kvm@vger.kernel.org>; Wed,  8 May 2019 16:10:24 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 842B6287AB; Wed,  8 May 2019 16:10:24 +0000 (UTC)
-X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
-        pdx-wl-mail.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-1.9 required=2.0 tests=BAYES_00,NO_RECEIVED,
-        NO_RELAYS autolearn=unavailable version=3.3.1
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 203543] Starting with kernel 5.1.0-rc6,  kvm_intel can no
+        id S1727515AbfEHQWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 12:22:15 -0400
+Received: from mga01.intel.com ([192.55.52.88]:17199 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727150AbfEHQWP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 12:22:15 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 09:21:59 -0700
+X-ExtLoop1: 1
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
+  by fmsmga006.fm.intel.com with ESMTP; 08 May 2019 09:21:59 -0700
+Date:   Wed, 8 May 2019 09:21:59 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     bugzilla-daemon@bugzilla.kernel.org,
+        kvm list <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [Bug 203543] Starting with kernel 5.1.0-rc6,  kvm_intel can no
  longer be loaded in nested kvm/guests
-Date:   Wed, 08 May 2019 16:10:24 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: sean.j.christopherson@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-203543-28872-4BmVOWAdsJ@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-203543-28872@https.bugzilla.kernel.org/>
+Message-ID: <20190508162158.GA19656@linux.intel.com>
 References: <bug-203543-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+ <bug-203543-28872-daKc1aTVTb@https.bugzilla.kernel.org/>
+ <CFB6AAEE-1B47-4D1D-9083-68F138964B68@oracle.com>
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CFB6AAEE-1B47-4D1D-9083-68F138964B68@oracle.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=203543
+On Wed, May 08, 2019 at 07:00:54PM +0300, Liran Alon wrote:
+> +Paolo
+> 
+> What are your thoughts on this?  What is the reason that KVM relies on
+> CPU_BASED_RDPMC_EXITING to be exposed from underlying CPU? How is it critical
+> for it’s functionality?  If it’s because we want to make sure that we hide
+> host PMCs, we should condition this to be a min requirement of kvm_intel only
+> in case underlying CPU exposes PMU to begin with.  Do you agree? If yes, I
+> can create the patch to fix this.
 
-Sean Christopherson (sean.j.christopherson@intel.com) changed:
+I sent a revert of the change to hide CPU_BASED_RDPMC_EXITING, KVM's
+previous behavior is correct.  The RDPMC instruction was introduced long
+before Architctural Perf Mon and so the existence of the exiting control
+is dependent only on the instruction, e.g. P4 (Prescott), Core (Yonah)
+and Core2 (Merom) all support VMX and RDPMC with non-archictectural
+perf mon capabilities.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |sean.j.christopherson@intel
-                   |                            |.com
-
---- Comment #6 from Sean Christopherson (sean.j.christopherson@intel.com) ---
-Revert sent, the previous KVM behavior is correct.  The failing unit test that
-motivated the change needs to be modified to gracefully handle the #GP or avoid
-it entirely.
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+The KVM unit test first execute RDPMC with interception disabled in the
+unit test host, i.e. the #GP is the correct architectural behavior and
+needs to be handled by the unit test.  The most robust fix would be to
+eat any #GP on RDPMC in the unit test, though it's likely much simpler
+to only execute RDPMC with interception disabled if arch perf mon is
+supported.
