@@ -2,34 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 167CF17B1C
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 15:55:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A493217B23
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 15:58:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726732AbfEHNy6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 09:54:58 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:35984 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726481AbfEHNy6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 09:54:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=fZD1MoMGqALYimoOBuM5A+SPAn0BauM3Ob0ObHySi70=; b=pfRLPHPlacy/hp+n76u0JY6mI
-        4m/hLoi6Ly6wgCX9gzT/2uhT5icYsNiZlBWeITMyrvRQKQntRWXQeRKSkpe+ubcd3uyG0VpPhUHaP
-        erhVHjXyRW63sPrezzVBV02W1sfIJMHmHc+vRqO/rodmHdurhZ0jUHdixYksIlEM5AcUd6RgIq4VK
-        mKNRe3/rCaX87BOFT831OPunNTQXZaHoVpYjeFby0CXQSfqYQK8tURT96pv3goljdkqbUoobfpzfI
-        scvnAZa72YPcwtFJcMA8y/I77+bzHQYYShKF6odr+B4W9bNP8lppWiZ00cDZ/tNxPH1WoLjP1VL+6
-        e37RamlHA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hON29-0000xX-Uj; Wed, 08 May 2019 13:54:57 +0000
-Date:   Wed, 8 May 2019 06:54:57 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sebastian Ott <sebott@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        id S1726690AbfEHN66 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 09:58:58 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52180 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726515AbfEHN65 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 May 2019 09:58:57 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x48Dt7s9044791
+        for <kvm@vger.kernel.org>; Wed, 8 May 2019 09:58:56 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sby19mxvc-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 08 May 2019 09:58:55 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <sebott@linux.ibm.com>;
+        Wed, 8 May 2019 14:58:54 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 8 May 2019 14:58:50 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x48Dwnjx56950914
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 May 2019 13:58:49 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0F907A4062;
+        Wed,  8 May 2019 13:58:49 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7F890A4060;
+        Wed,  8 May 2019 13:58:48 +0000 (GMT)
+Received: from dyn-9-152-212-30.boeblingen.de.ibm.com (unknown [9.152.212.30])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed,  8 May 2019 13:58:48 +0000 (GMT)
+Date:   Wed, 8 May 2019 15:58:48 +0200 (CEST)
+From:   Sebastian Ott <sebott@linux.ibm.com>
+X-X-Sender: sebott@schleppi
+To:     Halil Pasic <pasic@linux.ibm.com>
+cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>,
         Martin Schwidefsky <schwidefsky@de.ibm.com>,
         virtualization@lists.linux-foundation.org,
         "Michael S. Tsirkin" <mst@redhat.com>,
@@ -42,31 +57,51 @@ Cc:     Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Farhan Ali <alifm@linux.ibm.com>,
         Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH 06/10] s390/cio: add basic protected virtualization
- support
-Message-ID: <20190508135457.GA3530@infradead.org>
-References: <20190426183245.37939-1-pasic@linux.ibm.com>
- <20190426183245.37939-7-pasic@linux.ibm.com>
- <alpine.LFD.2.21.1905081522300.1773@schleppi>
+Subject: Re: [PATCH 07/10] s390/airq: use DMA memory for adapter interrupts
+In-Reply-To: <20190426183245.37939-8-pasic@linux.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com> <20190426183245.37939-8-pasic@linux.ibm.com>
+User-Agent: Alpine 2.21 (LFD 202 2017-01-01)
+Organization: =?ISO-8859-15?Q?=22IBM_Deutschland_Research_&_Development_GmbH?=
+ =?ISO-8859-15?Q?_=2F_Vorsitzende_des_Aufsichtsrats=3A_Matthias?=
+ =?ISO-8859-15?Q?_Hartmann_Gesch=E4ftsf=FChrung=3A_Dirk_Wittkopp?=
+ =?ISO-8859-15?Q?_Sitz_der_Gesellschaft=3A_B=F6blingen_=2F_Reg?=
+ =?ISO-8859-15?Q?istergericht=3A_Amtsgericht_Stuttgart=2C_HRB_2432?=
+ =?ISO-8859-15?Q?94=22?=
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LFD.2.21.1905081522300.1773@schleppi>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=US-ASCII
+X-TM-AS-GCONF: 00
+x-cbid: 19050813-0016-0000-0000-000002799573
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050813-0017-0000-0000-000032D6452D
+Message-Id: <alpine.LFD.2.21.1905081553580.1773@schleppi>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-08_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=11 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=490 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905080086
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 08, 2019 at 03:46:42PM +0200, Sebastian Ott wrote:
-> > +	io_priv->dma_area = dma_alloc_coherent(&sch->dev,
-> > +				sizeof(*io_priv->dma_area),
-> > +				&io_priv->dma_area_dma, GFP_KERNEL);
-> 
-> This needs GFP_DMA.
-> You use a genpool for ccw_private->dma and not for iopriv->dma - looks
-> kinda inconsistent.
 
-dma_alloc_* never needs GFP_DMA.  It selects the zone to allocate
-from based on the dma_coherent_mask of the device.
+On Fri, 26 Apr 2019, Halil Pasic wrote:
+> @@ -182,6 +190,8 @@ void airq_iv_release(struct airq_iv *iv)
+>  	kfree(iv->ptr);
+>  	kfree(iv->bitlock);
+>  	kfree(iv->vector);
+
+-  	kfree(iv->vector);
+
+> +	dma_free_coherent(cio_get_dma_css_dev(), iv_size(iv->bits),
+> +			  iv->vector, iv->vector_dma);
+>  	kfree(iv->avail);
+>  	kfree(iv);
+>  }
+
+Looks good to me but needs adaption to current code. Probably you can just
+revert my changes introducing cacheline aligned vectors since we now use
+a whole page.
+
