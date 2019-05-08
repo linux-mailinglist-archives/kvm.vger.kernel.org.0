@@ -2,160 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BA87317CBA
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 17:01:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E40717CE0
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 17:11:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726928AbfEHPBV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 11:01:21 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:37402 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726163AbfEHPBV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 11:01:21 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5BBEFA78;
-        Wed,  8 May 2019 08:01:20 -0700 (PDT)
-Received: from [10.1.196.75] (e110467-lin.cambridge.arm.com [10.1.196.75])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 744F03F238;
-        Wed,  8 May 2019 08:01:16 -0700 (PDT)
-Subject: Re: [PATCH v7 14/23] iommu/smmuv3: Implement cache_invalidate
-To:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
-        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
-        yi.l.liu@intel.com, jean-philippe.brucker@arm.com,
-        will.deacon@arm.com
-Cc:     kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com,
-        christoffer.dall@arm.com, peter.maydell@linaro.org,
-        vincent.stehle@arm.com
-References: <20190408121911.24103-1-eric.auger@redhat.com>
- <20190408121911.24103-15-eric.auger@redhat.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-Message-ID: <a53d72f5-c8a2-a9e9-eb0b-2fac65964caf@arm.com>
-Date:   Wed, 8 May 2019 16:01:14 +0100
+        id S1727540AbfEHPLY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 11:11:24 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47048 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727367AbfEHPLX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 May 2019 11:11:23 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x48F7RJ7121465
+        for <kvm@vger.kernel.org>; Wed, 8 May 2019 11:11:22 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sbyqn6nmj-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 08 May 2019 11:11:22 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Wed, 8 May 2019 16:11:20 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 8 May 2019 16:11:17 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x48FBFWJ48037982
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 May 2019 15:11:15 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 239CD42049;
+        Wed,  8 May 2019 15:11:15 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5D2C142041;
+        Wed,  8 May 2019 15:11:14 +0000 (GMT)
+Received: from [9.145.42.10] (unknown [9.145.42.10])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  8 May 2019 15:11:14 +0000 (GMT)
+Reply-To: pmorel@linux.ibm.com
+Subject: Re: [PATCH 10/10] virtio/s390: make airq summary indicators DMA
+To:     Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+ <20190426183245.37939-11-pasic@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Wed, 8 May 2019 17:11:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190408121911.24103-15-eric.auger@redhat.com>
+In-Reply-To: <20190426183245.37939-11-pasic@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19050815-0008-0000-0000-000002E493AF
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050815-0009-0000-0000-0000225115A0
+Message-Id: <74ff9a63-891a-7e24-0865-8cc91a95cada@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-08_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905080095
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/04/2019 13:19, Eric Auger wrote:
-> Implement domain-selective and page-selective IOTLB invalidations.
+On 26/04/2019 20:32, Halil Pasic wrote:
+> Hypervisor needs to interact with the summary indicators, so these
+> need to be DMA memory as well (at least for protected virtualization
+> guests).
 > 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
+> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
 > ---
-> v6 -> v7
-> - check the uapi version
+>   drivers/s390/virtio/virtio_ccw.c | 24 +++++++++++++++++-------
+>   1 file changed, 17 insertions(+), 7 deletions(-)
 > 
-> v3 -> v4:
-> - adapt to changes in the uapi
-> - add support for leaf parameter
-> - do not use arm_smmu_tlb_inv_range_nosync or arm_smmu_tlb_inv_context
->    anymore
-> 
-> v2 -> v3:
-> - replace __arm_smmu_tlb_sync by arm_smmu_cmdq_issue_sync
-> 
-> v1 -> v2:
-> - properly pass the asid
-> ---
->   drivers/iommu/arm-smmu-v3.c | 60 +++++++++++++++++++++++++++++++++++++
->   1 file changed, 60 insertions(+)
-> 
-> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-> index 1486baf53425..4366921d8318 100644
-> --- a/drivers/iommu/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm-smmu-v3.c
-> @@ -2326,6 +2326,65 @@ static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
->   	mutex_unlock(&smmu_domain->init_mutex);
+> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> index 613b18001a0c..6058b07fea08 100644
+> --- a/drivers/s390/virtio/virtio_ccw.c
+> +++ b/drivers/s390/virtio/virtio_ccw.c
+> @@ -140,11 +140,17 @@ static int virtio_ccw_use_airq = 1;
+>   
+>   struct airq_info {
+>   	rwlock_t lock;
+> -	u8 summary_indicator;
+> +	u8 summary_indicator_idx;
+>   	struct airq_struct airq;
+>   	struct airq_iv *aiv;
+>   };
+>   static struct airq_info *airq_areas[MAX_AIRQ_AREAS];
+> +static u8 *summary_indicators;
+> +
+> +static inline u8 *get_summary_indicator(struct airq_info *info)
+> +{
+> +	return summary_indicators + info->summary_indicator_idx;
+> +}
+>   
+>   #define CCW_CMD_SET_VQ 0x13
+>   #define CCW_CMD_VDEV_RESET 0x33
+> @@ -225,7 +231,7 @@ static void virtio_airq_handler(struct airq_struct *airq)
+>   			break;
+>   		vring_interrupt(0, (void *)airq_iv_get_ptr(info->aiv, ai));
+>   	}
+> -	info->summary_indicator = 0;
+> +	*(get_summary_indicator(info)) = 0;
+>   	smp_wmb();
+>   	/* Walk through indicators field, summary indicator not active. */
+>   	for (ai = 0;;) {
+> @@ -237,7 +243,8 @@ static void virtio_airq_handler(struct airq_struct *airq)
+>   	read_unlock(&info->lock);
 >   }
 >   
-> +static int
-> +arm_smmu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
-> +			  struct iommu_cache_invalidate_info *inv_info)
-> +{
-> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-> +	struct arm_smmu_device *smmu = smmu_domain->smmu;
-> +
-> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
-> +		return -EINVAL;
-> +
-> +	if (!smmu)
-> +		return -EINVAL;
-> +
-> +	if (inv_info->version != IOMMU_CACHE_INVALIDATE_INFO_VERSION_1)
-> +		return -EINVAL;
-> +
-> +	if (inv_info->cache & IOMMU_CACHE_INV_TYPE_IOTLB) {
-> +		if (inv_info->granularity == IOMMU_INV_GRANU_PASID) {
-> +			struct arm_smmu_cmdq_ent cmd = {
-> +				.opcode = CMDQ_OP_TLBI_NH_ASID,
-> +				.tlbi = {
-> +					.vmid = smmu_domain->s2_cfg.vmid,
-> +					.asid = inv_info->pasid,
-> +				},
-> +			};
-> +
-> +			arm_smmu_cmdq_issue_cmd(smmu, &cmd);
-> +			arm_smmu_cmdq_issue_sync(smmu);
-
-I'd much rather make arm_smmu_tlb_inv_context() understand nested 
-domains than open-code commands all over the place.
-
-> +
-> +		} else if (inv_info->granularity == IOMMU_INV_GRANU_ADDR) {
-> +			struct iommu_inv_addr_info *info = &inv_info->addr_info;
-> +			size_t size = info->nb_granules * info->granule_size;
-> +			bool leaf = info->flags & IOMMU_INV_ADDR_FLAGS_LEAF;
-> +			struct arm_smmu_cmdq_ent cmd = {
-> +				.opcode = CMDQ_OP_TLBI_NH_VA,
-> +				.tlbi = {
-> +					.addr = info->addr,
-> +					.vmid = smmu_domain->s2_cfg.vmid,
-> +					.asid = info->pasid,
-> +					.leaf = leaf,
-> +				},
-> +			};
-> +
-> +			do {
-> +				arm_smmu_cmdq_issue_cmd(smmu, &cmd);
-> +				cmd.tlbi.addr += info->granule_size;
-> +			} while (size -= info->granule_size);
-> +			arm_smmu_cmdq_issue_sync(smmu);
-
-An this in particular I would really like to go all the way through 
-io_pgtable_tlb_add_flush()/io_pgtable_sync() if at all possible. Hooking 
-up range-based invalidations is going to be a massive headache if the 
-abstraction isn't solid.
-
-Robin.
-
-> +		} else {
-> +			return -EINVAL;
-> +		}
-> +	}
-> +	if (inv_info->cache & IOMMU_CACHE_INV_TYPE_PASID ||
-> +	    inv_info->cache & IOMMU_CACHE_INV_TYPE_DEV_IOTLB) {
-> +		return -ENOENT;
-> +	}
-> +	return 0;
-> +}
-> +
->   static struct iommu_ops arm_smmu_ops = {
->   	.capable		= arm_smmu_capable,
->   	.domain_alloc		= arm_smmu_domain_alloc,
-> @@ -2346,6 +2405,7 @@ static struct iommu_ops arm_smmu_ops = {
->   	.put_resv_regions	= arm_smmu_put_resv_regions,
->   	.attach_pasid_table	= arm_smmu_attach_pasid_table,
->   	.detach_pasid_table	= arm_smmu_detach_pasid_table,
-> +	.cache_invalidate	= arm_smmu_cache_invalidate,
->   	.pgsize_bitmap		= -1UL, /* Restricted during device attach */
->   };
+> -static struct airq_info *new_airq_info(void)
+> +/* call with airq_areas_lock held */
+> +static struct airq_info *new_airq_info(int index)
+>   {
+>   	struct airq_info *info;
+>   	int rc;
+> @@ -252,7 +259,8 @@ static struct airq_info *new_airq_info(void)
+>   		return NULL;
+>   	}
+>   	info->airq.handler = virtio_airq_handler;
+> -	info->airq.lsi_ptr = &info->summary_indicator;
+> +	info->summary_indicator_idx = index;
+> +	info->airq.lsi_ptr = get_summary_indicator(info);
+>   	info->airq.lsi_mask = 0xff;
+>   	info->airq.isc = VIRTIO_AIRQ_ISC;
+>   	rc = register_adapter_interrupt(&info->airq);
+> @@ -273,8 +281,9 @@ static unsigned long get_airq_indicator(struct virtqueue *vqs[], int nvqs,
+>   	unsigned long bit, flags;
 >   
+>   	for (i = 0; i < MAX_AIRQ_AREAS && !indicator_addr; i++) {
+> +		/* TODO: this seems to be racy */
+
+yes, my opinions too, was already racy, in my opinion, we need another 
+patch in another series to fix this.
+
+However, not sure about the comment.
+
+>   		if (!airq_areas[i])
+> -			airq_areas[i] = new_airq_info();
+> +			airq_areas[i] = new_airq_info(i);
+>   		info = airq_areas[i];
+>   		if (!info)
+>   			return 0;
+> @@ -359,7 +368,7 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
+>   		if (!thinint_area)
+>   			return;
+>   		thinint_area->summary_indicator =
+> -			(unsigned long) &airq_info->summary_indicator;
+> +			(unsigned long) get_summary_indicator(airq_info);
+>   		thinint_area->isc = VIRTIO_AIRQ_ISC;
+>   		ccw->cmd_code = CCW_CMD_SET_IND_ADAPTER;
+>   		ccw->count = sizeof(*thinint_area);
+> @@ -624,7 +633,7 @@ static int virtio_ccw_register_adapter_ind(struct virtio_ccw_device *vcdev,
+>   	}
+>   	info = vcdev->airq_info;
+>   	thinint_area->summary_indicator =
+> -		(unsigned long) &info->summary_indicator;
+> +		(unsigned long) get_summary_indicator(info);
+>   	thinint_area->isc = VIRTIO_AIRQ_ISC;
+>   	ccw->cmd_code = CCW_CMD_SET_IND_ADAPTER;
+>   	ccw->flags = CCW_FLAG_SLI;
+> @@ -1500,6 +1509,7 @@ static int __init virtio_ccw_init(void)
+>   {
+>   	/* parse no_auto string before we do anything further */
+>   	no_auto_parse();
+> +	summary_indicators = cio_dma_zalloc(MAX_AIRQ_AREAS);
+>   	return ccw_driver_register(&virtio_ccw_driver);
+>   }
+>   device_initcall(virtio_ccw_init);
 > 
+
+
+
+-- 
+Pierre Morel
+Linux/KVM/QEMU in Böblingen - Germany
+
