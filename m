@@ -2,24 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 249A917C1A
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:48:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E0CE17C32
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:49:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727335AbfEHOrs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:47:48 -0400
-Received: from mga06.intel.com ([134.134.136.31]:57660 "EHLO mga06.intel.com"
+        id S1727129AbfEHOs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:48:59 -0400
+Received: from mga02.intel.com ([134.134.136.20]:19899 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728425AbfEHOov (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 10:44:51 -0400
+        id S1728402AbfEHOot (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 10:44:49 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:50 -0700
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:48 -0700
 X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,446,1549958400"; 
+   d="scan'208";a="169656560"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga006.fm.intel.com with ESMTP; 08 May 2019 07:44:43 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 08 May 2019 07:44:44 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id 78815BD3; Wed,  8 May 2019 17:44:30 +0300 (EEST)
+        id 8506EBF5; Wed,  8 May 2019 17:44:30 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -36,9 +38,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 36/62] acpi/hmat: Evaluate topology presented in ACPI HMAT for MKTME
-Date:   Wed,  8 May 2019 17:43:56 +0300
-Message-Id: <20190508144422.13171-37-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 37/62] keys/mktme: Do not allow key creation in unsafe topologies
+Date:   Wed,  8 May 2019 17:43:57 +0300
+Message-Id: <20190508144422.13171-38-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -51,95 +53,103 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alison Schofield <alison.schofield@intel.com>
 
-MKTME, Multi-Key Total Memory Encryption, is a feature on Intel
-platforms. The ACPI HMAT table can be used to verify that the
-platform topology is safe for the usage of MKTME.
+MKTME feature depends upon at least one online CPU capable of
+programming each memory controller in the platform.
 
-The kernel must be capable of programming every memory controller
-on the platform. This means that there must be a CPU online, in
-the same proximity domain of each memory controller.
+An unsafe topology for MKTME is a memory only package or a package
+with no online CPUs. Key creation with unsafe topologies will fail
+with EINVAL and a warning will be logged one time.
+For example:
+	[ ] MKTME: no online CPU in proximity domain
+	[ ] MKTME: topology does not support key creation
+
+These are recoverable errors. CPUs may be brought online that are
+capable of programming a previously unprogrammable memory controller,
+or an unprogrammable memory controller may be removed from the
+platform.
 
 Signed-off-by: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/acpi/hmat/hmat.c | 54 ++++++++++++++++++++++++++++++++++++++++
- include/linux/acpi.h     |  1 +
- 2 files changed, 55 insertions(+)
+ security/keys/mktme_keys.c | 39 ++++++++++++++++++++++++++++++--------
+ 1 file changed, 31 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/acpi/hmat/hmat.c b/drivers/acpi/hmat/hmat.c
-index 38e3341f569f..936a403c0694 100644
---- a/drivers/acpi/hmat/hmat.c
-+++ b/drivers/acpi/hmat/hmat.c
-@@ -677,3 +677,57 @@ bool acpi_hmat_present(void)
- 	acpi_put_table(tbl);
- 	return true;
+diff --git a/security/keys/mktme_keys.c b/security/keys/mktme_keys.c
+index f5fc6cccc81b..734e1d28eb24 100644
+--- a/security/keys/mktme_keys.c
++++ b/security/keys/mktme_keys.c
+@@ -26,6 +26,7 @@ cpumask_var_t mktme_leadcpus;		/* One lead CPU per pconfig target */
+ static bool mktme_storekeys;		/* True if key payloads may be stored */
+ unsigned long *mktme_bitmap_user_type;	/* Shows presence of user type keys */
+ struct mktme_payload *mktme_key_store;	/* Payload storage if allowed */
++bool mktme_allow_keys;			/* True when topology supports keys */
+ 
+ /* 1:1 Mapping between Userspace Keys (struct key) and Hardware KeyIDs */
+ struct mktme_mapping {
+@@ -278,33 +279,55 @@ static void mktme_destroy_key(struct key *key)
+ 	percpu_ref_kill(&encrypt_count[keyid]);
  }
+ 
++static void mktme_update_pconfig_targets(void);
+ /* Key Service Method to create a new key. Payload is preparsed. */
+ int mktme_instantiate_key(struct key *key, struct key_preparsed_payload *prep)
+ {
+ 	struct mktme_payload *payload = prep->payload.data[0];
+ 	unsigned long flags;
++	int ret = -ENOKEY;
+ 	int keyid;
+ 
+ 	spin_lock_irqsave(&mktme_lock, flags);
 +
-+static int mktme_parse_proximity_domains(union acpi_subtable_headers *header,
-+					 const unsigned long end)
-+{
-+	struct acpi_hmat_proximity_domain *mar = (void *)header;
-+	struct acpi_hmat_structure *hdr = (void *)header;
++	/* Topology supports key creation */
++	if (mktme_allow_keys)
++		goto get_key;
 +
-+	const struct cpumask *tmp_mask;
-+
-+	if (!hdr || hdr->type != ACPI_HMAT_TYPE_PROXIMITY)
-+		return -EINVAL;
-+
-+	if (mar->header.length != sizeof(*mar)) {
-+		pr_warn("MKTME: invalid header length in HMAT\n");
-+		return -1;
++	/* Topology unknown, check it. */
++	if (!mktme_hmat_evaluate()) {
++		ret = -EINVAL;
++		goto out_unlock;
 +	}
-+	/*
-+	 * Require a valid processor proximity domain.
-+	 * This will catch memory only physical packages with
-+	 * no processor capable of programming the key table.
-+	 */
-+	if (!(mar->flags & ACPI_HMAT_PROCESSOR_PD_VALID)) {
-+		pr_warn("MKTME: no valid processor proximity domain\n");
-+		return -1;
-+	}
-+	/* Require an online CPU in the processor proximity domain. */
-+	tmp_mask = cpumask_of_node(pxm_to_node(mar->processor_PD));
-+	if (!cpumask_intersects(tmp_mask, cpu_online_mask)) {
-+		pr_warn("MKTME: no online CPU in proximity domain\n");
-+		return -1;
-+	}
-+	return 0;
-+}
 +
-+/* Returns true if topology is safe for MKTME key creation */
-+bool mktme_hmat_evaluate(void)
-+{
-+	struct acpi_table_header *tbl;
-+	bool ret = true;
-+	acpi_status status;
++	/* Keys are now allowed. Update the programming targets. */
++	mktme_update_pconfig_targets();
++	mktme_allow_keys = true;
 +
-+	status = acpi_get_table(ACPI_SIG_HMAT, 0, &tbl);
-+	if (ACPI_FAILURE(status))
-+		return -EINVAL;
++get_key:
+ 	keyid = mktme_reserve_keyid(key);
+ 	spin_unlock_irqrestore(&mktme_lock, flags);
+ 	if (!keyid)
+-		return -ENOKEY;
++		goto out;
+ 
+ 	if (percpu_ref_init(&encrypt_count[keyid], mktme_percpu_ref_release,
+ 			    0, GFP_KERNEL))
+-		goto err_out;
++		goto out_free_key;
+ 
+-	if (!mktme_program_keyid(keyid, payload)) {
+-		mktme_store_payload(keyid, payload);
+-		return MKTME_PROG_SUCCESS;
+-	}
++	ret = mktme_program_keyid(keyid, payload);
++	if (ret == MKTME_PROG_SUCCESS)
++		goto out;
 +
-+	if (acpi_table_parse_entries(ACPI_SIG_HMAT,
-+				     sizeof(struct acpi_table_hmat),
-+				     ACPI_HMAT_TYPE_PROXIMITY,
-+				     mktme_parse_proximity_domains, 0) < 0) {
-+		ret = false;
-+	}
-+	acpi_put_table(tbl);
++	/* Key programming failed */
+ 	percpu_ref_exit(&encrypt_count[keyid]);
+-err_out:
++
++out_free_key:
+ 	spin_lock_irqsave(&mktme_lock, flags);
+ 	mktme_release_keyid(keyid);
++out_unlock:
+ 	spin_unlock_irqrestore(&mktme_lock, flags);
+-	return -ENOKEY;
++out:
 +	return ret;
-+}
-diff --git a/include/linux/acpi.h b/include/linux/acpi.h
-index fe3ad4ca5bb3..82b270dfb785 100644
---- a/include/linux/acpi.h
-+++ b/include/linux/acpi.h
-@@ -1341,6 +1341,7 @@ acpi_platform_notify(struct device *dev, enum kobject_action action)
+ }
  
- #ifdef CONFIG_X86_INTEL_MKTME
- extern bool acpi_hmat_present(void);
-+extern bool mktme_hmat_evaluate(void);
- #endif /* CONFIG_X86_INTEL_MKTME */
- 
- #endif	/*_LINUX_ACPI_H*/
+ /* Make sure arguments are correct for the TYPE of key requested */
 -- 
 2.20.1
 
