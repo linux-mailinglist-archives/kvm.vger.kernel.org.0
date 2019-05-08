@@ -2,188 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BA0717FAF
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 20:13:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92D2617FE1
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 20:36:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727771AbfEHSNk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 14:13:40 -0400
-Received: from mga02.intel.com ([134.134.136.20]:34688 "EHLO mga02.intel.com"
+        id S1729178AbfEHSbm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 14:31:42 -0400
+Received: from foss.arm.com ([217.140.101.70]:42916 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726559AbfEHSNk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 14:13:40 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 11:13:39 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by orsmga003.jf.intel.com with ESMTP; 08 May 2019 11:13:40 -0700
-Date:   Wed, 8 May 2019 11:13:39 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Peter Shier <pshier@google.com>
-Subject: Re: [PATCH v2] kvm: nVMX: Set nested_run_pending in
- vmx_set_nested_state after checks complete
-Message-ID: <20190508181339.GD19656@linux.intel.com>
-References: <1557317799-39866-1-git-send-email-pbonzini@redhat.com>
- <20190508142023.GA13834@linux.intel.com>
- <CAAAPnDE0ujH4eTX=4umTTEmUMyaZ7M0B3qxWa7oUUD-Ls7Ta+A@mail.gmail.com>
+        id S1728836AbfEHSbm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 14:31:42 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BD66F80D;
+        Wed,  8 May 2019 11:31:41 -0700 (PDT)
+Received: from [10.1.196.129] (ostrya.cambridge.arm.com [10.1.196.129])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A02F23F575;
+        Wed,  8 May 2019 11:31:38 -0700 (PDT)
+Subject: Re: [PATCH v7 11/23] iommu/arm-smmu-v3: Maintain a SID->device
+ structure
+To:     Robin Murphy <robin.murphy@arm.com>,
+        Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
+        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
+        yi.l.liu@intel.com, will.deacon@arm.com
+Cc:     peter.maydell@linaro.org, kevin.tian@intel.com,
+        vincent.stehle@arm.com, ashok.raj@intel.com, marc.zyngier@arm.com,
+        christoffer.dall@arm.com
+References: <20190408121911.24103-1-eric.auger@redhat.com>
+ <20190408121911.24103-12-eric.auger@redhat.com>
+ <e3b417b7-b69f-0121-fb72-6b6450e1b2f2@arm.com>
+From:   Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Message-ID: <ecb3725c-27c4-944b-b42c-f4e293521f94@arm.com>
+Date:   Wed, 8 May 2019 19:31:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="zYM0uCDKw75PZbzx"
-Content-Disposition: inline
-In-Reply-To: <CAAAPnDE0ujH4eTX=4umTTEmUMyaZ7M0B3qxWa7oUUD-Ls7Ta+A@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <e3b417b7-b69f-0121-fb72-6b6450e1b2f2@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---zYM0uCDKw75PZbzx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Wed, May 08, 2019 at 10:53:12AM -0700, Aaron Lewis wrote:
-> nested_run_pending is also checked in
-> nested_vmx_check_vmentry_postreqs
-> (https://elixir.bootlin.com/linux/v5.1/source/arch/x86/kvm/vmx/nested.c#L2709)
-> so I think the setting needs to be moved to just prior to that call
-> with Paolo's rollback along with another for if the prereqs and
-> postreqs fail.  I put a patch together below:
-
-Gah, I missed that usage (also, it's now nested_vmx_check_guest_state()).
-
-Side topic, I think the VM_ENTRY_LOAD_BNDCFGS check should be gated by
-nested_run_pending, a la the EFER check.'
-
-> ------------------------------------
+On 08/05/2019 15:05, Robin Murphy wrote:
+> On 08/04/2019 13:18, Eric Auger wrote:
+>> From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+>>
+>> When handling faults from the event or PRI queue, we need to find the
+>> struct device associated to a SID. Add a rb_tree to keep track of SIDs.
 > 
-> nested_run_pending=1 implies we have successfully entered guest mode.
-> Move setting from external state in vmx_set_nested_state() until after
-> all other checks are complete.
-> 
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 6401eb7ef19c..cf1f810223d2 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -5460,9 +5460,6 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->   if (!(kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE))
->   return 0;
-> 
-> - vmx->nested.nested_run_pending =
-> - !!(kvm_state->flags & KVM_STATE_NESTED_RUN_PENDING);
+> Out of curiosity, have you looked at whether an xarray might now be a
+> more efficient option for this?
 
-Alternatively, it might be better to leave nested_run_pending where it
-is and instead add a label to handle clearing the flag on error.  IIUC,
-the real issue is that nested_run_pending is left set after a failed
-vmx_set_nested_state(), not that its shouldn't be set in the shadow
-VMCS handling.
+I hadn't looked into it yet, but it's a welcome distraction.
 
-Patch attached, though it's completely untested.  The KVM selftests are
-broken for me right now, grrr.
+* Searching by SID will be more efficient with xarray (which still is a
+radix tree, with a better API). Rather than O(log2(n)) we walk
+O(log_c(n)) nodes in the worst case, with c = XA_CHUNK_SIZE = 64. We
+don't care about insertion/deletion time.
 
-> -
->   if (nested_cpu_has_shadow_vmcs(vmcs12) &&
->       vmcs12->vmcs_link_pointer != -1ull) {
->   struct vmcs12 *shadow_vmcs12 = get_shadow_vmcs12(vcpu);
-> @@ -5480,14 +5477,21 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->   return -EINVAL;
->   }
-> 
-> + vmx->nested.nested_run_pending =
-> + !!(kvm_state->flags & KVM_STATE_NESTED_RUN_PENDING);
-> +
->   if (nested_vmx_check_vmentry_prereqs(vcpu, vmcs12) ||
-> -     nested_vmx_check_vmentry_postreqs(vcpu, vmcs12, &exit_qual))
-> +     nested_vmx_check_vmentry_postreqs(vcpu, vmcs12, &exit_qual)) {
-> +     vmx->nested.nested_run_pending = 0;
->   return -EINVAL;
-> + }
-> 
->   vmx->nested.dirty_vmcs12 = true;
->   ret = nested_vmx_enter_non_root_mode(vcpu, false);
-> - if (ret)
-> + if (ret) {
-> + vmx->nested.nested_run_pending = 0;
->   return -EINVAL;
-> + }
-> 
->   return 0;
->  }
+* Memory consumption is worse than rb-tree, when the SID space is a
+little sparse. For PCI devices the three LSBs (function number) might
+not be in use, meaning that 88% of the leaf slots would be unused. And
+it gets worse if the system has lots of bridges, as each bus number
+requires its own xa slot, ie. 98% unused.
 
---zYM0uCDKw75PZbzx
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment; filename="0001-KVM-nVMX-Clear-nested_run_pending-if-setting-nested-.patch"
+  It's not too bad though, and in general I think the distribution of
+SIDs would be good enough to justify using xarray. Plugging in more
+devices would increase the memory consumption fast, but creating virtual
+functions wouldn't. On one machine (TX2, a few discrete PCI cards) I
+need 16 xa slots to store 42 device IDs. That's 16 * 576 bytes = 9 kB,
+versus 42 * 40 bytes = 1.6 kB for the rb-tree. On another machine (x86,
+lots of RC integrated endpoints) I need 18 slots to store 181 device
+IDs, 10 kB vs. 7 kB with the rb-tree.
 
-From 279ce1be96d74aee41e93b597572e612a143cf3c Mon Sep 17 00:00:00 2001
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-Date: Wed, 8 May 2019 11:04:32 -0700
-Subject: [PATCH] KVM: nVMX: Clear nested_run_pending if setting nested state
- fails
+* Using xa would make this code a lot nicer.
 
-VMX's nested_run_pending flag is subtly consumed when stuffing state to
-enter guest mode, i.e. needs to be set according before KVM knows if
-setting guest state is successful.  If setting guest state fails, clear
-the flag as a nested run is obviously not pending.
+Shame that we can't store the device pointer directly in the STE though,
+there is already plenty of unused space in there.
 
-Reported-by: Aaron Lewis <aaronlewis@google.com>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/kvm/vmx/nested.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 04b40a98f60b..1a2a2f91b7e0 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -5428,29 +5428,33 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
- 		struct vmcs12 *shadow_vmcs12 = get_shadow_vmcs12(vcpu);
- 
- 		if (kvm_state->size < sizeof(kvm_state) + 2 * sizeof(*vmcs12))
--			return -EINVAL;
-+			goto error_guest_mode;
- 
- 		if (copy_from_user(shadow_vmcs12,
- 				   user_kvm_nested_state->data + VMCS12_SIZE,
- 				   sizeof(*vmcs12)))
--			return -EFAULT;
-+			goto error_guest_mode;
- 
- 		if (shadow_vmcs12->hdr.revision_id != VMCS12_REVISION ||
- 		    !shadow_vmcs12->hdr.shadow_vmcs)
--			return -EINVAL;
-+			goto error_guest_mode;
- 	}
- 
- 	if (nested_vmx_check_controls(vcpu, vmcs12) ||
- 	    nested_vmx_check_host_state(vcpu, vmcs12) ||
- 	    nested_vmx_check_guest_state(vcpu, vmcs12, &exit_qual))
--		return -EINVAL;
-+		goto error_guest_mode;
- 
- 	vmx->nested.dirty_vmcs12 = true;
- 	ret = nested_vmx_enter_non_root_mode(vcpu, false);
- 	if (ret)
--		return -EINVAL;
-+		goto error_guest_mode;
- 
- 	return 0;
-+
-+error_guest_mode:
-+	vmx->nested.nested_run_pending = 0;
-+	return -EINVAL;
- }
- 
- void nested_vmx_vcpu_setup(void)
--- 
-2.21.0
-
-
---zYM0uCDKw75PZbzx--
+Thanks,
+Jean
