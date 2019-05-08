@@ -2,26 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A318017C67
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:51:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9CB717C81
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:52:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728238AbfEHOon (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:44:43 -0400
-Received: from mga06.intel.com ([134.134.136.31]:57649 "EHLO mga06.intel.com"
+        id S1728358AbfEHOvd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:51:33 -0400
+Received: from mga02.intel.com ([134.134.136.20]:19899 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728159AbfEHOok (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 10:44:40 -0400
+        id S1728115AbfEHOom (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 10:44:42 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:39 -0700
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:39 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,446,1549958400"; 
-   d="scan'208";a="169656525"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga002.fm.intel.com with ESMTP; 08 May 2019 07:44:35 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 08 May 2019 07:44:35 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id 15EF358A; Wed,  8 May 2019 17:44:29 +0300 (EEST)
+        id 243E9709; Wed,  8 May 2019 17:44:29 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -38,9 +36,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 09/62] x86/mm: Preserve KeyID on pte_modify() and pgprot_modify()
-Date:   Wed,  8 May 2019 17:43:29 +0300
-Message-Id: <20190508144422.13171-10-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 10/62] x86/mm: Detect MKTME early
+Date:   Wed,  8 May 2019 17:43:30 +0300
+Message-Id: <20190508144422.13171-11-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -51,58 +49,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-An encrypted VMA will have KeyID stored in vma->vm_page_prot. This way
-we don't need to do anything special to setup encrypted page table
-entries and don't need to reserve space for KeyID in a VMA.
+We need to know the number of KeyIDs before page_ext is initialized.
+We are going to use page_ext to store KeyID and it would be handly to
+avoid page_ext allocation if there's no MKMTE in the system.
 
-This patch changes _PAGE_CHG_MASK to include KeyID bits. Otherwise they
-are going to be stripped from vm_page_prot on the first pgprot_modify().
-
-Define PTE_PFN_MASK_MAX similar to PTE_PFN_MASK but based on
-__PHYSICAL_MASK_SHIFT. This way we include whole range of bits
-architecturally available for PFN without referencing physical_mask and
-mktme_keyid_mask variables.
+page_ext initialization happens before full CPU initizliation is complete.
+Move detect_tme() call to early_init_intel().
 
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- arch/x86/include/asm/pgtable_types.h | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ arch/x86/kernel/cpu/intel.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/pgtable_types.h b/arch/x86/include/asm/pgtable_types.h
-index d6ff0bbdb394..7d6f68431538 100644
---- a/arch/x86/include/asm/pgtable_types.h
-+++ b/arch/x86/include/asm/pgtable_types.h
-@@ -117,12 +117,25 @@
- 				 _PAGE_ACCESSED | _PAGE_DIRTY)
+diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
+index e271264e238a..4c9fadb57a13 100644
+--- a/arch/x86/kernel/cpu/intel.c
++++ b/arch/x86/kernel/cpu/intel.c
+@@ -161,6 +161,8 @@ static bool bad_spectre_microcode(struct cpuinfo_x86 *c)
+ 	return false;
+ }
  
- /*
-- * Set of bits not changed in pte_modify.  The pte's
-- * protection key is treated like _PAGE_RW, for
-- * instance, and is *not* included in this mask since
-- * pte_modify() does modify it.
-+ * Set of bits not changed in pte_modify.
-+ *
-+ * The pte's protection key is treated like _PAGE_RW, for instance, and is
-+ * *not* included in this mask since pte_modify() does modify it.
-+ *
-+ * They include the physical address and the memory encryption keyID.
-+ * The paddr and the keyID never occupy the same bits at the same time.
-+ * But, a given bit might be used for the keyID on one system and used for
-+ * the physical address on another. As an optimization, we manage them in
-+ * one unit here since their combination always occupies the same hardware
-+ * bits. PTE_PFN_MASK_MAX stores combined mask.
-+ *
-+ * Cast PAGE_MASK to a signed type so that it is sign-extended if
-+ * virtual addresses are 32-bits but physical addresses are larger
-+ * (ie, 32-bit PAE).
-  */
--#define _PAGE_CHG_MASK	(PTE_PFN_MASK | _PAGE_PCD | _PAGE_PWT |		\
-+#define PTE_PFN_MASK_MAX \
-+	(((signed long)PAGE_MASK) & ((1ULL << __PHYSICAL_MASK_SHIFT) - 1))
-+#define _PAGE_CHG_MASK	(PTE_PFN_MASK_MAX | _PAGE_PCD | _PAGE_PWT |		\
- 			 _PAGE_SPECIAL | _PAGE_ACCESSED | _PAGE_DIRTY |	\
- 			 _PAGE_SOFT_DIRTY | _PAGE_DEVMAP)
- #define _HPAGE_CHG_MASK (_PAGE_CHG_MASK | _PAGE_PSE)
++static void detect_tme(struct cpuinfo_x86 *c);
++
+ static void early_init_intel(struct cpuinfo_x86 *c)
+ {
+ 	u64 misc_enable;
+@@ -311,6 +313,9 @@ static void early_init_intel(struct cpuinfo_x86 *c)
+ 	 */
+ 	if (detect_extended_topology_early(c) < 0)
+ 		detect_ht_early(c);
++
++	if (cpu_has(c, X86_FEATURE_TME))
++		detect_tme(c);
+ }
+ 
+ #ifdef CONFIG_X86_32
+@@ -791,9 +796,6 @@ static void init_intel(struct cpuinfo_x86 *c)
+ 	if (cpu_has(c, X86_FEATURE_VMX))
+ 		detect_vmx_virtcap(c);
+ 
+-	if (cpu_has(c, X86_FEATURE_TME))
+-		detect_tme(c);
+-
+ 	init_intel_energy_perf(c);
+ 
+ 	init_intel_misc_features(c);
 -- 
 2.20.1
 
