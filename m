@@ -2,224 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A3BD17B8A
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:31:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1330117BAD
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:38:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727474AbfEHObp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:31:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34520 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727081AbfEHObp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 May 2019 10:31:45 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x48EV0WH139828
-        for <kvm@vger.kernel.org>; Wed, 8 May 2019 10:31:44 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2sbya7nx73-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 08 May 2019 10:31:44 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Wed, 8 May 2019 15:31:42 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 8 May 2019 15:31:38 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x48EVbFn45547764
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 8 May 2019 14:31:37 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 20DA14204C;
-        Wed,  8 May 2019 14:31:37 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3F1D942042;
-        Wed,  8 May 2019 14:31:36 +0000 (GMT)
-Received: from [9.145.42.10] (unknown [9.145.42.10])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  8 May 2019 14:31:36 +0000 (GMT)
-Reply-To: pmorel@linux.ibm.com
-Subject: Re: [PATCH 08/10] virtio/s390: add indirection to indicators access
-To:     Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        Sebastian Ott <sebott@linux.ibm.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>
-References: <20190426183245.37939-1-pasic@linux.ibm.com>
- <20190426183245.37939-9-pasic@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Wed, 8 May 2019 16:31:35 +0200
+        id S1728017AbfEHOiU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:38:20 -0400
+Received: from foss.arm.com ([217.140.101.70]:36400 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727354AbfEHOiT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 10:38:19 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F32DFA78;
+        Wed,  8 May 2019 07:38:18 -0700 (PDT)
+Received: from [10.1.196.75] (e110467-lin.cambridge.arm.com [10.1.196.75])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 830FF3F238;
+        Wed,  8 May 2019 07:38:14 -0700 (PDT)
+Subject: Re: [PATCH v7 13/23] iommu/smmuv3: Implement
+ attach/detach_pasid_table
+To:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
+        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
+        yi.l.liu@intel.com, jean-philippe.brucker@arm.com,
+        will.deacon@arm.com
+Cc:     kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com,
+        christoffer.dall@arm.com, peter.maydell@linaro.org,
+        vincent.stehle@arm.com
+References: <20190408121911.24103-1-eric.auger@redhat.com>
+ <20190408121911.24103-14-eric.auger@redhat.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+Message-ID: <acde8b95-9cbc-c5e6-eb28-37bff7431e40@arm.com>
+Date:   Wed, 8 May 2019 15:38:13 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190426183245.37939-9-pasic@linux.ibm.com>
+In-Reply-To: <20190408121911.24103-14-eric.auger@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19050814-0016-0000-0000-0000027998FA
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050814-0017-0000-0000-000032D6491B
-Message-Id: <716d47ca-016f-e8f4-6d78-7746a7d9f6ba@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-08_08:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905080090
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/04/2019 20:32, Halil Pasic wrote:
-> This will come in handy soon when we pull out the indicators from
-> virtio_ccw_device to a memory area that is shared with the hypervisor
-> (in particular for protected virtualization guests).
+On 08/04/2019 13:19, Eric Auger wrote:
+> On attach_pasid_table() we program STE S1 related info set
+> by the guest into the actual physical STEs. At minimum
+> we need to program the context descriptor GPA and compute
+> whether the stage1 is translated/bypassed or aborted.
 > 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
 > ---
->   drivers/s390/virtio/virtio_ccw.c | 40 +++++++++++++++++++++++++---------------
->   1 file changed, 25 insertions(+), 15 deletions(-)
+> v6 -> v7:
+> - check versions and comment the fact we don't need to take
+>    into account s1dss and s1fmt
+> v3 -> v4:
+> - adapt to changes in iommu_pasid_table_config
+> - different programming convention at s1_cfg/s2_cfg/ste.abort
 > 
-> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> index bb7a92316fc8..1f3e7d56924f 100644
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -68,6 +68,16 @@ struct virtio_ccw_device {
->   	void *airq_info;
->   };
->   
-> +static inline unsigned long *indicators(struct virtio_ccw_device *vcdev)
-> +{
-> +	return &vcdev->indicators;
-> +}
-> +
-> +static inline unsigned long *indicators2(struct virtio_ccw_device *vcdev)
-> +{
-> +	return &vcdev->indicators2;
-> +}
-> +
->   struct vq_info_block_legacy {
->   	__u64 queue;
->   	__u32 align;
-> @@ -337,17 +347,17 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
->   		ccw->cda = (__u32)(unsigned long) thinint_area;
->   	} else {
->   		/* payload is the address of the indicators */
-> -		indicatorp = kmalloc(sizeof(&vcdev->indicators),
-> +		indicatorp = kmalloc(sizeof(indicators(vcdev)),
->   				     GFP_DMA | GFP_KERNEL);
->   		if (!indicatorp)
->   			return;
->   		*indicatorp = 0;
->   		ccw->cmd_code = CCW_CMD_SET_IND;
-> -		ccw->count = sizeof(&vcdev->indicators);
-> +		ccw->count = sizeof(indicators(vcdev));
-
-This looks strange to me. Was already weird before.
-Lucky we are indicators are long...
-may be just sizeof(long)
-
->   		ccw->cda = (__u32)(unsigned long) indicatorp;
->   	}
->   	/* Deregister indicators from host. */
-> -	vcdev->indicators = 0;
-> +	*indicators(vcdev) = 0;
->   	ccw->flags = 0;
->   	ret = ccw_io_helper(vcdev, ccw,
->   			    vcdev->is_thinint ?
-> @@ -656,10 +666,10 @@ static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
->   	 * We need a data area under 2G to communicate. Our payload is
->   	 * the address of the indicators.
->   	*/
-> -	indicatorp = kmalloc(sizeof(&vcdev->indicators), GFP_DMA | GFP_KERNEL);
-> +	indicatorp = kmalloc(sizeof(indicators(vcdev)), GFP_DMA | GFP_KERNEL);
->   	if (!indicatorp)
->   		goto out;
-> -	*indicatorp = (unsigned long) &vcdev->indicators;
-> +	*indicatorp = (unsigned long) indicators(vcdev);
->   	if (vcdev->is_thinint) {
->   		ret = virtio_ccw_register_adapter_ind(vcdev, vqs, nvqs, ccw);
->   		if (ret)
-> @@ -668,21 +678,21 @@ static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
->   	}
->   	if (!vcdev->is_thinint) {
->   		/* Register queue indicators with host. */
-> -		vcdev->indicators = 0;
-> +		*indicators(vcdev) = 0;
->   		ccw->cmd_code = CCW_CMD_SET_IND;
->   		ccw->flags = 0;
-> -		ccw->count = sizeof(&vcdev->indicators);
-> +		ccw->count = sizeof(indicators(vcdev));
-
-same as before
-
->   		ccw->cda = (__u32)(unsigned long) indicatorp;
->   		ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_SET_IND);
->   		if (ret)
->   			goto out;
->   	}
->   	/* Register indicators2 with host for config changes */
-> -	*indicatorp = (unsigned long) &vcdev->indicators2;
-> -	vcdev->indicators2 = 0;
-> +	*indicatorp = (unsigned long) indicators2(vcdev);
-> +	*indicators2(vcdev) = 0;
->   	ccw->cmd_code = CCW_CMD_SET_CONF_IND;
->   	ccw->flags = 0;
-> -	ccw->count = sizeof(&vcdev->indicators2);
-> +	ccw->count = sizeof(indicators2(vcdev));
-
-here too
-
->   	ccw->cda = (__u32)(unsigned long) indicatorp;
->   	ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_SET_CONF_IND);
->   	if (ret)
-> @@ -1092,17 +1102,17 @@ static void virtio_ccw_int_handler(struct ccw_device *cdev,
->   			vcdev->err = -EIO;
->   	}
->   	virtio_ccw_check_activity(vcdev, activity);
-> -	for_each_set_bit(i, &vcdev->indicators,
-> -			 sizeof(vcdev->indicators) * BITS_PER_BYTE) {
-> +	for_each_set_bit(i, indicators(vcdev),
-> +			 sizeof(*indicators(vcdev)) * BITS_PER_BYTE) {
->   		/* The bit clear must happen before the vring kick. */
-> -		clear_bit(i, &vcdev->indicators);
-> +		clear_bit(i, indicators(vcdev));
->   		barrier();
->   		vq = virtio_ccw_vq_by_ind(vcdev, i);
->   		vring_interrupt(0, vq);
->   	}
-> -	if (test_bit(0, &vcdev->indicators2)) {
-> +	if (test_bit(0, indicators2(vcdev))) {
->   		virtio_config_changed(&vcdev->vdev);
-> -		clear_bit(0, &vcdev->indicators2);
-> +		clear_bit(0, indicators2(vcdev));
->   	}
+> v2 -> v3:
+> - callback now is named set_pasid_table and struct fields
+>    are laid out differently.
+> 
+> v1 -> v2:
+> - invalidate the STE before changing them
+> - hold init_mutex
+> - handle new fields
+> ---
+>   drivers/iommu/arm-smmu-v3.c | 121 ++++++++++++++++++++++++++++++++++++
+>   1 file changed, 121 insertions(+)
+> 
+> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
+> index e22e944ffc05..1486baf53425 100644
+> --- a/drivers/iommu/arm-smmu-v3.c
+> +++ b/drivers/iommu/arm-smmu-v3.c
+> @@ -2207,6 +2207,125 @@ static void arm_smmu_put_resv_regions(struct device *dev,
+>   		kfree(entry);
 >   }
 >   
+> +static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
+> +				       struct iommu_pasid_table_config *cfg)
+> +{
+> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+> +	struct arm_smmu_master_data *entry;
+> +	struct arm_smmu_s1_cfg *s1_cfg;
+> +	struct arm_smmu_device *smmu;
+> +	unsigned long flags;
+> +	int ret = -EINVAL;
+> +
+> +	if (cfg->format != IOMMU_PASID_FORMAT_SMMUV3)
+> +		return -EINVAL;
+> +
+> +	if (cfg->version != PASID_TABLE_CFG_VERSION_1 ||
+> +	    cfg->smmuv3.version != PASID_TABLE_SMMUV3_CFG_VERSION_1)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&smmu_domain->init_mutex);
+> +
+> +	smmu = smmu_domain->smmu;
+> +
+> +	if (!smmu)
+> +		goto out;
+> +
+> +	if (!((smmu->features & ARM_SMMU_FEAT_TRANS_S1) &&
+> +	      (smmu->features & ARM_SMMU_FEAT_TRANS_S2))) {
+> +		dev_info(smmu_domain->smmu->dev,
+> +			 "does not implement two stages\n");
+> +		goto out;
+> +	}
+
+That check is redundant (and frankly looks a little bit spammy). If the 
+one below is not enough, there is a problem elsewhere - if it's possible 
+for smmu_domain->stage to ever get set to ARM_SMMU_DOMAIN_NESTED without 
+both stages of translation present, we've already gone fundamentally wrong.
+
+> +
+> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
+> +		goto out;
+> +
+> +	switch (cfg->config) {
+> +	case IOMMU_PASID_CONFIG_ABORT:
+> +		spin_lock_irqsave(&smmu_domain->devices_lock, flags);
+> +		list_for_each_entry(entry, &smmu_domain->devices, list) {
+> +			entry->ste.s1_cfg = NULL;
+> +			entry->ste.abort = true;
+> +			arm_smmu_install_ste_for_dev(entry->dev->iommu_fwspec);
+> +		}
+> +		spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
+> +		ret = 0;
+> +		break;
+> +	case IOMMU_PASID_CONFIG_BYPASS:
+> +		spin_lock_irqsave(&smmu_domain->devices_lock, flags);
+> +		list_for_each_entry(entry, &smmu_domain->devices, list) {
+> +			entry->ste.s1_cfg = NULL;
+> +			entry->ste.abort = false;
+> +			arm_smmu_install_ste_for_dev(entry->dev->iommu_fwspec);
+> +		}
+> +		spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
+> +		ret = 0;
+> +		break;
+> +	case IOMMU_PASID_CONFIG_TRANSLATE:
+> +		/*
+> +		 * we currently support a single CD so s1fmt and s1dss
+> +		 * fields are also ignored
+> +		 */
+> +		if (cfg->pasid_bits)
+> +			goto out;
+> +
+> +		s1_cfg = &smmu_domain->s1_cfg;
+> +		s1_cfg->cdptr_dma = cfg->base_ptr;
+> +
+> +		spin_lock_irqsave(&smmu_domain->devices_lock, flags);
+> +		list_for_each_entry(entry, &smmu_domain->devices, list) {
+> +			entry->ste.s1_cfg = s1_cfg;
+
+Either we reject valid->valid transitions outright, or we need to remove 
+and invalidate the existing S1 context from the STE at this point, no?
+
+> +			entry->ste.abort = false;
+> +			arm_smmu_install_ste_for_dev(entry->dev->iommu_fwspec);
+> +		}
+> +		spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
+> +		ret = 0;
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +out:
+> +	mutex_unlock(&smmu_domain->init_mutex);
+> +	return ret;
+> +}
+> +
+> +static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
+> +{
+> +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+> +	struct arm_smmu_master_data *entry;
+> +	struct arm_smmu_device *smmu;
+> +	unsigned long flags;
+> +
+> +	mutex_lock(&smmu_domain->init_mutex);
+> +
+> +	smmu = smmu_domain->smmu;
+> +
+> +	if (!smmu)
+> +		return;
+> +
+> +	if (!((smmu->features & ARM_SMMU_FEAT_TRANS_S1) &&
+> +	      (smmu->features & ARM_SMMU_FEAT_TRANS_S2))) {
+> +		dev_info(smmu_domain->smmu->dev,
+> +			 "does not implement two stages\n");
+> +		return;
+> +	}
+
+Same comment as before.
+
+Robin.
+
+> +
+> +	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
+> +		return;
+> +
+> +	spin_lock_irqsave(&smmu_domain->devices_lock, flags);
+> +	list_for_each_entry(entry, &smmu_domain->devices, list) {
+> +		entry->ste.s1_cfg = NULL;
+> +		entry->ste.abort = true;
+> +		arm_smmu_install_ste_for_dev(entry->dev->iommu_fwspec);
+> +	}
+> +	spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
+> +
+> +	memset(&smmu_domain->s1_cfg, 0, sizeof(struct arm_smmu_s1_cfg));
+> +	mutex_unlock(&smmu_domain->init_mutex);
+> +}
+> +
+>   static struct iommu_ops arm_smmu_ops = {
+>   	.capable		= arm_smmu_capable,
+>   	.domain_alloc		= arm_smmu_domain_alloc,
+> @@ -2225,6 +2344,8 @@ static struct iommu_ops arm_smmu_ops = {
+>   	.of_xlate		= arm_smmu_of_xlate,
+>   	.get_resv_regions	= arm_smmu_get_resv_regions,
+>   	.put_resv_regions	= arm_smmu_put_resv_regions,
+> +	.attach_pasid_table	= arm_smmu_attach_pasid_table,
+> +	.detach_pasid_table	= arm_smmu_detach_pasid_table,
+>   	.pgsize_bitmap		= -1UL, /* Restricted during device attach */
+>   };
+>   
 > 
-
-Here again just a fast check.
-I will go in the functional later.
-
-Regards,
-Pierre
-
-
--- 
-Pierre Morel
-Linux/KVM/QEMU in Böblingen - Germany
-
