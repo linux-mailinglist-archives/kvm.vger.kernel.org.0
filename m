@@ -2,210 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C214117B7B
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:24:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A3BD17B8A
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:31:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727064AbfEHOYG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:24:06 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:35932 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726914AbfEHOYG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 10:24:06 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C235CA78;
-        Wed,  8 May 2019 07:24:05 -0700 (PDT)
-Received: from [10.1.196.75] (e110467-lin.cambridge.arm.com [10.1.196.75])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DBF313F238;
-        Wed,  8 May 2019 07:24:02 -0700 (PDT)
-Subject: Re: [PATCH v7 12/23] iommu/smmuv3: Get prepared for nested stage
- support
-To:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
-        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
-        yi.l.liu@intel.com, jean-philippe.brucker@arm.com,
-        will.deacon@arm.com
-Cc:     kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com,
-        christoffer.dall@arm.com, peter.maydell@linaro.org,
-        vincent.stehle@arm.com
-References: <20190408121911.24103-1-eric.auger@redhat.com>
- <20190408121911.24103-13-eric.auger@redhat.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-Message-ID: <66f873eb-35c0-d1e9-794e-9150dbdb13fe@arm.com>
-Date:   Wed, 8 May 2019 15:24:01 +0100
+        id S1727474AbfEHObp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:31:45 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34520 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727081AbfEHObp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 May 2019 10:31:45 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x48EV0WH139828
+        for <kvm@vger.kernel.org>; Wed, 8 May 2019 10:31:44 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sbya7nx73-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 08 May 2019 10:31:44 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Wed, 8 May 2019 15:31:42 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 8 May 2019 15:31:38 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x48EVbFn45547764
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 May 2019 14:31:37 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 20DA14204C;
+        Wed,  8 May 2019 14:31:37 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3F1D942042;
+        Wed,  8 May 2019 14:31:36 +0000 (GMT)
+Received: from [9.145.42.10] (unknown [9.145.42.10])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  8 May 2019 14:31:36 +0000 (GMT)
+Reply-To: pmorel@linux.ibm.com
+Subject: Re: [PATCH 08/10] virtio/s390: add indirection to indicators access
+To:     Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+ <20190426183245.37939-9-pasic@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Wed, 8 May 2019 16:31:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190408121911.24103-13-eric.auger@redhat.com>
+In-Reply-To: <20190426183245.37939-9-pasic@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19050814-0016-0000-0000-0000027998FA
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050814-0017-0000-0000-000032D6491B
+Message-Id: <716d47ca-016f-e8f4-6d78-7746a7d9f6ba@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-08_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905080090
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/04/2019 13:19, Eric Auger wrote:
-> To allow nested stage support, we need to store both
-> stage 1 and stage 2 configurations (and remove the former
-> union).
+On 26/04/2019 20:32, Halil Pasic wrote:
+> This will come in handy soon when we pull out the indicators from
+> virtio_ccw_device to a memory area that is shared with the hypervisor
+> (in particular for protected virtualization guests).
 > 
-> A nested setup is characterized by both s1_cfg and s2_cfg
-> set.
-> 
-> We introduce a new ste.abort field that will be set upon
-> guest stage1 configuration passing. If s1_cfg is NULL and
-> ste.abort is set, traffic can't pass. If ste.abort is not set,
-> S1 is bypassed.
-> 
-> arm_smmu_write_strtab_ent() is modified to write both stage
-> fields in the STE and deal with the abort field.
-> 
-> In nested mode, only stage 2 is "finalized" as the host does
-> not own/configure the stage 1 context descriptor, guest does.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
+> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
 > ---
+>   drivers/s390/virtio/virtio_ccw.c | 40 +++++++++++++++++++++++++---------------
+>   1 file changed, 25 insertions(+), 15 deletions(-)
 > 
-> v4 -> v5:
-> - reset ste.abort on detach
-> 
-> v3 -> v4:
-> - s1_cfg.nested_abort and nested_bypass removed.
-> - s/ste.nested/ste.abort
-> - arm_smmu_write_strtab_ent modifications with introduction
->    of local abort, bypass and translate local variables
-> - comment updated
-> 
-> v1 -> v2:
-> - invalidate the STE before moving from a live STE config to another
-> - add the nested_abort and nested_bypass fields
-> ---
->   drivers/iommu/arm-smmu-v3.c | 35 ++++++++++++++++++++---------------
->   1 file changed, 20 insertions(+), 15 deletions(-)
-> 
-> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-> index 21d027695181..e22e944ffc05 100644
-> --- a/drivers/iommu/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm-smmu-v3.c
-> @@ -211,6 +211,7 @@
->   #define STRTAB_STE_0_CFG_BYPASS		4
->   #define STRTAB_STE_0_CFG_S1_TRANS	5
->   #define STRTAB_STE_0_CFG_S2_TRANS	6
-> +#define STRTAB_STE_0_CFG_NESTED		7
->   
->   #define STRTAB_STE_0_S1FMT		GENMASK_ULL(5, 4)
->   #define STRTAB_STE_0_S1FMT_LINEAR	0
-> @@ -514,6 +515,7 @@ struct arm_smmu_strtab_ent {
->   	 * configured according to the domain type.
->   	 */
->   	bool				assigned;
-> +	bool				abort;
->   	struct arm_smmu_s1_cfg		*s1_cfg;
->   	struct arm_smmu_s2_cfg		*s2_cfg;
+> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> index bb7a92316fc8..1f3e7d56924f 100644
+> --- a/drivers/s390/virtio/virtio_ccw.c
+> +++ b/drivers/s390/virtio/virtio_ccw.c
+> @@ -68,6 +68,16 @@ struct virtio_ccw_device {
+>   	void *airq_info;
 >   };
-> @@ -628,10 +630,8 @@ struct arm_smmu_domain {
->   	bool				non_strict;
 >   
->   	enum arm_smmu_domain_stage	stage;
-> -	union {
-> -		struct arm_smmu_s1_cfg	s1_cfg;
-> -		struct arm_smmu_s2_cfg	s2_cfg;
-> -	};
-> +	struct arm_smmu_s1_cfg	s1_cfg;
-> +	struct arm_smmu_s2_cfg	s2_cfg;
->   
->   	struct iommu_domain		domain;
->   
-> @@ -1108,12 +1108,13 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
->   				      __le64 *dst, struct arm_smmu_strtab_ent *ste)
->   {
->   	/*
-> -	 * This is hideously complicated, but we only really care about
-> -	 * three cases at the moment:
-> +	 * We care about the following transitions:
->   	 *
->   	 * 1. Invalid (all zero) -> bypass/fault (init)
-> -	 * 2. Bypass/fault -> translation/bypass (attach)
-> -	 * 3. Translation/bypass -> bypass/fault (detach)
-> +	 * 2. Bypass/fault -> single stage translation/bypass (attach)
-> +	 * 3. single stage Translation/bypass -> bypass/fault (detach)
-> +	 * 4. S2 -> S1 + S2 (attach_pasid_table)
-> +	 * 5. S1 + S2 -> S2 (detach_pasid_table)
->   	 *
->   	 * Given that we can't update the STE atomically and the SMMU
->   	 * doesn't read the thing in a defined order, that leaves us
-> @@ -1124,7 +1125,7 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
->   	 * 3. Update Config, sync
->   	 */
->   	u64 val = le64_to_cpu(dst[0]);
-> -	bool ste_live = false;
-> +	bool abort, bypass, translate, ste_live = false;
->   	struct arm_smmu_cmdq_ent prefetch_cmd = {
->   		.opcode		= CMDQ_OP_PREFETCH_CFG,
->   		.prefetch	= {
-> @@ -1138,11 +1139,11 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
->   			break;
->   		case STRTAB_STE_0_CFG_S1_TRANS:
->   		case STRTAB_STE_0_CFG_S2_TRANS:
-> +		case STRTAB_STE_0_CFG_NESTED:
->   			ste_live = true;
->   			break;
->   		case STRTAB_STE_0_CFG_ABORT:
-> -			if (disable_bypass)
-> -				break;
-> +			break;
->   		default:
->   			BUG(); /* STE corruption */
->   		}
-> @@ -1152,8 +1153,13 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
->   	val = STRTAB_STE_0_V;
->   
->   	/* Bypass/fault */
-> -	if (!ste->assigned || !(ste->s1_cfg || ste->s2_cfg)) {
-> -		if (!ste->assigned && disable_bypass)
+> +static inline unsigned long *indicators(struct virtio_ccw_device *vcdev)
+> +{
+> +	return &vcdev->indicators;
+> +}
 > +
-> +	abort = (!ste->assigned && disable_bypass) || ste->abort;
-> +	translate = ste->s1_cfg || ste->s2_cfg;
-> +	bypass = !abort && !translate;
+> +static inline unsigned long *indicators2(struct virtio_ccw_device *vcdev)
+> +{
+> +	return &vcdev->indicators2;
+> +}
 > +
-> +	if (abort || bypass) {
-> +		if (abort)
->   			val |= FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_ABORT);
->   		else
->   			val |= FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_BYPASS);
-> @@ -1172,7 +1178,6 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
->   	}
->   
->   	if (ste->s1_cfg) {
-> -		BUG_ON(ste_live);
+>   struct vq_info_block_legacy {
+>   	__u64 queue;
+>   	__u32 align;
+> @@ -337,17 +347,17 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
+>   		ccw->cda = (__u32)(unsigned long) thinint_area;
+>   	} else {
+>   		/* payload is the address of the indicators */
+> -		indicatorp = kmalloc(sizeof(&vcdev->indicators),
+> +		indicatorp = kmalloc(sizeof(indicators(vcdev)),
+>   				     GFP_DMA | GFP_KERNEL);
+>   		if (!indicatorp)
+>   			return;
+>   		*indicatorp = 0;
+>   		ccw->cmd_code = CCW_CMD_SET_IND;
+> -		ccw->count = sizeof(&vcdev->indicators);
+> +		ccw->count = sizeof(indicators(vcdev));
 
-Hmm, I'm a little uneasy about just removing these checks altogether, as 
-there are still cases where rewriting a live entry is bogus, that we'd 
-really like to keep catching. Is the problem that it's hard to tell when 
-you're 'rewriting' the S2 config of a nested entry with the same thing 
-on attaching/detaching its S1 context?
+This looks strange to me. Was already weird before.
+Lucky we are indicators are long...
+may be just sizeof(long)
 
-Robin.
+>   		ccw->cda = (__u32)(unsigned long) indicatorp;
+>   	}
+>   	/* Deregister indicators from host. */
+> -	vcdev->indicators = 0;
+> +	*indicators(vcdev) = 0;
+>   	ccw->flags = 0;
+>   	ret = ccw_io_helper(vcdev, ccw,
+>   			    vcdev->is_thinint ?
+> @@ -656,10 +666,10 @@ static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
+>   	 * We need a data area under 2G to communicate. Our payload is
+>   	 * the address of the indicators.
+>   	*/
+> -	indicatorp = kmalloc(sizeof(&vcdev->indicators), GFP_DMA | GFP_KERNEL);
+> +	indicatorp = kmalloc(sizeof(indicators(vcdev)), GFP_DMA | GFP_KERNEL);
+>   	if (!indicatorp)
+>   		goto out;
+> -	*indicatorp = (unsigned long) &vcdev->indicators;
+> +	*indicatorp = (unsigned long) indicators(vcdev);
+>   	if (vcdev->is_thinint) {
+>   		ret = virtio_ccw_register_adapter_ind(vcdev, vqs, nvqs, ccw);
+>   		if (ret)
+> @@ -668,21 +678,21 @@ static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
+>   	}
+>   	if (!vcdev->is_thinint) {
+>   		/* Register queue indicators with host. */
+> -		vcdev->indicators = 0;
+> +		*indicators(vcdev) = 0;
+>   		ccw->cmd_code = CCW_CMD_SET_IND;
+>   		ccw->flags = 0;
+> -		ccw->count = sizeof(&vcdev->indicators);
+> +		ccw->count = sizeof(indicators(vcdev));
 
->   		dst[1] = cpu_to_le64(
->   			 FIELD_PREP(STRTAB_STE_1_S1CIR, STRTAB_STE_1_S1C_CACHE_WBRA) |
->   			 FIELD_PREP(STRTAB_STE_1_S1COR, STRTAB_STE_1_S1C_CACHE_WBRA) |
-> @@ -1191,7 +1196,6 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_device *smmu, u32 sid,
+same as before
+
+>   		ccw->cda = (__u32)(unsigned long) indicatorp;
+>   		ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_SET_IND);
+>   		if (ret)
+>   			goto out;
 >   	}
->   
->   	if (ste->s2_cfg) {
-> -		BUG_ON(ste_live);
->   		dst[2] = cpu_to_le64(
->   			 FIELD_PREP(STRTAB_STE_2_S2VMID, ste->s2_cfg->vmid) |
->   			 FIELD_PREP(STRTAB_STE_2_VTCR, ste->s2_cfg->vtcr) |
-> @@ -1773,6 +1777,7 @@ static void arm_smmu_detach_dev(struct device *dev)
+>   	/* Register indicators2 with host for config changes */
+> -	*indicatorp = (unsigned long) &vcdev->indicators2;
+> -	vcdev->indicators2 = 0;
+> +	*indicatorp = (unsigned long) indicators2(vcdev);
+> +	*indicators2(vcdev) = 0;
+>   	ccw->cmd_code = CCW_CMD_SET_CONF_IND;
+>   	ccw->flags = 0;
+> -	ccw->count = sizeof(&vcdev->indicators2);
+> +	ccw->count = sizeof(indicators2(vcdev));
+
+here too
+
+>   	ccw->cda = (__u32)(unsigned long) indicatorp;
+>   	ret = ccw_io_helper(vcdev, ccw, VIRTIO_CCW_DOING_SET_CONF_IND);
+>   	if (ret)
+> @@ -1092,17 +1102,17 @@ static void virtio_ccw_int_handler(struct ccw_device *cdev,
+>   			vcdev->err = -EIO;
 >   	}
->   
->   	master->ste.assigned = false;
-> +	master->ste.abort = false;
->   	arm_smmu_install_ste_for_dev(fwspec);
+>   	virtio_ccw_check_activity(vcdev, activity);
+> -	for_each_set_bit(i, &vcdev->indicators,
+> -			 sizeof(vcdev->indicators) * BITS_PER_BYTE) {
+> +	for_each_set_bit(i, indicators(vcdev),
+> +			 sizeof(*indicators(vcdev)) * BITS_PER_BYTE) {
+>   		/* The bit clear must happen before the vring kick. */
+> -		clear_bit(i, &vcdev->indicators);
+> +		clear_bit(i, indicators(vcdev));
+>   		barrier();
+>   		vq = virtio_ccw_vq_by_ind(vcdev, i);
+>   		vring_interrupt(0, vq);
+>   	}
+> -	if (test_bit(0, &vcdev->indicators2)) {
+> +	if (test_bit(0, indicators2(vcdev))) {
+>   		virtio_config_changed(&vcdev->vdev);
+> -		clear_bit(0, &vcdev->indicators2);
+> +		clear_bit(0, indicators2(vcdev));
+>   	}
 >   }
 >   
 > 
+
+Here again just a fast check.
+I will go in the functional later.
+
+Regards,
+Pierre
+
+
+-- 
+Pierre Morel
+Linux/KVM/QEMU in Böblingen - Germany
+
