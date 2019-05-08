@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AE02517C19
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:48:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B0AD17C14
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:48:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726889AbfEHOrr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:47:47 -0400
-Received: from mga06.intel.com ([134.134.136.31]:57670 "EHLO mga06.intel.com"
+        id S1727341AbfEHOri (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:47:38 -0400
+Received: from mga03.intel.com ([134.134.136.65]:59536 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728449AbfEHOov (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1728453AbfEHOov (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 8 May 2019 10:44:51 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:51 -0700
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:51 -0700
 X-ExtLoop1: 1
 Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga003.jf.intel.com with ESMTP; 08 May 2019 07:44:46 -0700
+  by orsmga005.jf.intel.com with ESMTP; 08 May 2019 07:44:46 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id 474571101; Wed,  8 May 2019 17:44:31 +0300 (EEST)
+        id 51F061123; Wed,  8 May 2019 17:44:31 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -36,9 +36,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 51/62] iommu/vt-d: Support MKTME in DMA remapping
-Date:   Wed,  8 May 2019 17:44:11 +0300
-Message-Id: <20190508144422.13171-52-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 52/62] x86/mm: introduce common code for mem encryption
+Date:   Wed,  8 May 2019 17:44:12 +0300
+Message-Id: <20190508144422.13171-53-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -51,109 +51,82 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jacob Pan <jacob.jun.pan@linux.intel.com>
 
-When MKTME is enabled, keyid is stored in the high order bits of physical
-address. For DMA transactions targeting encrypted physical memory, keyid
-must be included in the IOVA to physical address translation.
-
-This patch appends page keyid when setting up the IOMMU PTEs. On the
-reverse direction, keyid bits are cleared in the physical address lookup.
-Mapping functions of both DMA ops and IOMMU ops are covered.
+Both Intel MKTME and AMD SME have needs to support DMA address
+translation with encryption related bits. Common functions are
+introduced in this patch to keep DMA generic code abstracted.
 
 Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- drivers/iommu/intel-iommu.c | 29 +++++++++++++++++++++++++++--
- include/linux/intel-iommu.h |  9 ++++++++-
- 2 files changed, 35 insertions(+), 3 deletions(-)
+ arch/x86/Kconfig                 |  4 ++++
+ arch/x86/mm/Makefile             |  1 +
+ arch/x86/mm/mem_encrypt_common.c | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 33 insertions(+)
+ create mode 100644 arch/x86/mm/mem_encrypt_common.c
 
-diff --git a/drivers/iommu/intel-iommu.c b/drivers/iommu/intel-iommu.c
-index 28cb713d728c..1ff7e87e25f1 100644
---- a/drivers/iommu/intel-iommu.c
-+++ b/drivers/iommu/intel-iommu.c
-@@ -862,6 +862,28 @@ static void free_context_table(struct intel_iommu *iommu)
- 	spin_unlock_irqrestore(&iommu->lock, flags);
- }
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 62cfb381fee3..ce9642e2c31b 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -1505,11 +1505,15 @@ config X86_CPA_STATISTICS
+ config ARCH_HAS_MEM_ENCRYPT
+ 	def_bool y
  
-+static inline void set_pte_mktme_keyid(unsigned long phys_pfn,
-+		phys_addr_t *pteval)
++config X86_MEM_ENCRYPT_COMMON
++	def_bool n
++
+ config AMD_MEM_ENCRYPT
+ 	bool "AMD Secure Memory Encryption (SME) support"
+ 	depends on X86_64 && CPU_SUP_AMD
+ 	select DYNAMIC_PHYSICAL_MASK
+ 	select ARCH_USE_MEMREMAP_PROT
++	select X86_MEM_ENCRYPT_COMMON
+ 	---help---
+ 	  Say yes to enable support for the encryption of system memory.
+ 	  This requires an AMD processor that supports Secure Memory
+diff --git a/arch/x86/mm/Makefile b/arch/x86/mm/Makefile
+index 4ebee899c363..89dddbc01b1b 100644
+--- a/arch/x86/mm/Makefile
++++ b/arch/x86/mm/Makefile
+@@ -55,3 +55,4 @@ obj-$(CONFIG_AMD_MEM_ENCRYPT)	+= mem_encrypt_identity.o
+ obj-$(CONFIG_AMD_MEM_ENCRYPT)	+= mem_encrypt_boot.o
+ 
+ obj-$(CONFIG_X86_INTEL_MKTME)	+= mktme.o
++obj-$(CONFIG_X86_MEM_ENCRYPT_COMMON)	+= mem_encrypt_common.o
+diff --git a/arch/x86/mm/mem_encrypt_common.c b/arch/x86/mm/mem_encrypt_common.c
+new file mode 100644
+index 000000000000..2adee65eec46
+--- /dev/null
++++ b/arch/x86/mm/mem_encrypt_common.c
+@@ -0,0 +1,28 @@
++#include <linux/mm.h>
++#include <linux/mem_encrypt.h>
++#include <asm/mktme.h>
++
++/*
++ * Encryption bits need to be set and cleared for both Intel MKTME and
++ * AMD SME when converting between DMA address and physical address.
++ */
++dma_addr_t __mem_encrypt_dma_set(dma_addr_t daddr, phys_addr_t paddr)
 +{
 +	unsigned long keyid;
 +
-+	if (!pfn_valid(phys_pfn))
-+		return;
++	if (sme_active())
++		return __sme_set(daddr);
++	keyid = page_keyid(pfn_to_page(__phys_to_pfn(paddr)));
 +
-+	keyid = page_keyid(pfn_to_page(phys_pfn));
-+
-+#ifdef CONFIG_X86_INTEL_MKTME
-+	/*
-+	 * When MKTME is enabled, set keyid in PTE such that DMA
-+	 * remapping will include keyid in the translation from IOVA
-+	 * to physical address. This applies to both user and kernel
-+	 * allocated DMA memory.
-+	 */
-+	*pteval &= ~mktme_keyid_mask;
-+	*pteval |= keyid << mktme_keyid_shift;
-+#endif
++	return (daddr & ~mktme_keyid_mask) | (keyid << mktme_keyid_shift);
 +}
++EXPORT_SYMBOL_GPL(__mem_encrypt_dma_set);
 +
- static struct dma_pte *pfn_to_dma_pte(struct dmar_domain *domain,
- 				      unsigned long pfn, int *target_level)
- {
-@@ -888,7 +910,7 @@ static struct dma_pte *pfn_to_dma_pte(struct dmar_domain *domain,
- 			break;
- 
- 		if (!dma_pte_present(pte)) {
--			uint64_t pteval;
-+			phys_addr_t pteval;
- 
- 			tmp_page = alloc_pgtable_page(domain->nid);
- 
-@@ -896,7 +918,8 @@ static struct dma_pte *pfn_to_dma_pte(struct dmar_domain *domain,
- 				return NULL;
- 
- 			domain_flush_cache(domain, tmp_page, VTD_PAGE_SIZE);
--			pteval = ((uint64_t)virt_to_dma_pfn(tmp_page) << VTD_PAGE_SHIFT) | DMA_PTE_READ | DMA_PTE_WRITE;
-+			pteval = (virt_to_dma_pfn(tmp_page) << VTD_PAGE_SHIFT) | DMA_PTE_READ | DMA_PTE_WRITE;
-+			set_pte_mktme_keyid(virt_to_dma_pfn(tmp_page), &pteval);
- 			if (cmpxchg64(&pte->val, 0ULL, pteval))
- 				/* Someone else set it while we were thinking; use theirs. */
- 				free_pgtable_page(tmp_page);
-@@ -2289,6 +2312,8 @@ static int __domain_mapping(struct dmar_domain *domain, unsigned long iov_pfn,
- 			}
- 
- 		}
-+		set_pte_mktme_keyid(phys_pfn, &pteval);
++phys_addr_t __mem_encrypt_dma_clear(phys_addr_t paddr)
++{
++	if (sme_active())
++		return __sme_clr(paddr);
 +
- 		/* We don't need lock here, nobody else
- 		 * touches the iova range
- 		 */
-diff --git a/include/linux/intel-iommu.h b/include/linux/intel-iommu.h
-index fa364de9db18..48a377a2b896 100644
---- a/include/linux/intel-iommu.h
-+++ b/include/linux/intel-iommu.h
-@@ -34,6 +34,8 @@
- 
- #include <asm/cacheflush.h>
- #include <asm/iommu.h>
-+#include <asm/page.h>
-+
- 
- /*
-  * VT-d hardware uses 4KiB page size regardless of host page size.
-@@ -603,7 +605,12 @@ static inline void dma_clear_pte(struct dma_pte *pte)
- static inline u64 dma_pte_addr(struct dma_pte *pte)
- {
- #ifdef CONFIG_64BIT
--	return pte->val & VTD_PAGE_MASK;
-+	u64 addr = pte->val;
-+	addr &= VTD_PAGE_MASK;
-+#ifdef CONFIG_X86_INTEL_MKTME
-+	addr &= ~mktme_keyid_mask;
-+#endif
-+	return addr;
- #else
- 	/* Must have a full atomic 64-bit read */
- 	return  __cmpxchg64(&pte->val, 0ULL, 0ULL) & VTD_PAGE_MASK;
++	return paddr & ~mktme_keyid_mask;
++}
++EXPORT_SYMBOL_GPL(__mem_encrypt_dma_clear);
 -- 
 2.20.1
 
