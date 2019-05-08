@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1610E17BF6
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:47:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05A5517C1C
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2019 16:48:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728507AbfEHOow (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 May 2019 10:44:52 -0400
-Received: from mga14.intel.com ([192.55.52.115]:48407 "EHLO mga14.intel.com"
+        id S1727690AbfEHOrt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 May 2019 10:47:49 -0400
+Received: from mga03.intel.com ([134.134.136.65]:59540 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728420AbfEHOou (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 May 2019 10:44:50 -0400
+        id S1728435AbfEHOov (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 May 2019 10:44:51 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga103.fm.intel.com with ESMTP; 08 May 2019 07:44:49 -0700
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 May 2019 07:44:49 -0700
 X-ExtLoop1: 1
 Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga008.jf.intel.com with ESMTP; 08 May 2019 07:44:44 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 08 May 2019 07:44:45 -0700
 Received: by black.fi.intel.com (Postfix, from userid 1000)
-        id F254AF65; Wed,  8 May 2019 17:44:30 +0300 (EEST)
+        id 0BEE5F6B; Wed,  8 May 2019 17:44:31 +0300 (EEST)
 From:   "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 To:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -36,9 +36,9 @@ Cc:     Kees Cook <keescook@chromium.org>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH, RFC 45/62] mm: Add the encrypt_mprotect() system call for MKTME
-Date:   Wed,  8 May 2019 17:44:05 +0300
-Message-Id: <20190508144422.13171-46-kirill.shutemov@linux.intel.com>
+Subject: [PATCH, RFC 46/62] x86/mm: Keep reference counts on encrypted VMAs for MKTME
+Date:   Wed,  8 May 2019 17:44:06 +0300
+Message-Id: <20190508144422.13171-47-kirill.shutemov@linux.intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
@@ -51,195 +51,158 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alison Schofield <alison.schofield@intel.com>
 
-Implement memory encryption for MKTME (Multi-Key Total Memory
-Encryption) with a new system call that is an extension of the
-legacy mprotect() system call.
+The MKTME (Multi-Key Total Memory Encryption) Key Service needs
+a reference count on encrypted VMAs. This reference count is used
+to determine when a hardware encryption KeyID is no longer in use
+and can be freed and reassigned to another Userspace Key.
 
-In encrypt_mprotect the caller must pass a handle to a previously
-allocated and programmed MKTME encryption key. The key can be
-obtained through the kernel key service type "mktme". The caller
-must have KEY_NEED_VIEW permission on the key.
+The MKTME Key service does the percpu_ref_init and _kill, so
+these gets/puts on encrypted VMA's can be considered the
+intermediaries in the lifetime of the key.
 
-MKTME places an additional restriction on the protected data:
-The length of the data must be page aligned. This is in addition
-to the existing mprotect restriction that the addr must be page
-aligned.
+Increment/decrement the reference count during encrypt_mprotect()
+system call for initial or updated encryption on a VMA.
 
-encrypt_mprotect() will lookup the hardware keyid for the given
-userspace key. It will use previously defined helpers to insert
-that keyid in the VMAs during legacy mprotect() execution.
+Piggy back on the vm_area_dup/free() helpers. If the VMAs being
+duplicated, or freed are encrypted, adjust the reference count.
 
 Signed-off-by: Alison Schofield <alison.schofield@intel.com>
 Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- fs/exec.c          |  4 +--
- include/linux/mm.h |  3 +-
- mm/mprotect.c      | 68 +++++++++++++++++++++++++++++++++++++++++-----
- 3 files changed, 65 insertions(+), 10 deletions(-)
+ arch/x86/include/asm/mktme.h |  5 +++++
+ arch/x86/mm/mktme.c          | 37 ++++++++++++++++++++++++++++++++++--
+ include/linux/mm.h           |  2 ++
+ kernel/fork.c                |  2 ++
+ 4 files changed, 44 insertions(+), 2 deletions(-)
 
-diff --git a/fs/exec.c b/fs/exec.c
-index 2e0033348d8e..695c121b34b3 100644
---- a/fs/exec.c
-+++ b/fs/exec.c
-@@ -755,8 +755,8 @@ int setup_arg_pages(struct linux_binprm *bprm,
- 	vm_flags |= mm->def_flags;
- 	vm_flags |= VM_STACK_INCOMPLETE_SETUP;
+diff --git a/arch/x86/include/asm/mktme.h b/arch/x86/include/asm/mktme.h
+index 0e6df07f1921..14da002d2e85 100644
+--- a/arch/x86/include/asm/mktme.h
++++ b/arch/x86/include/asm/mktme.h
+@@ -16,6 +16,11 @@ extern int mktme_keyid_shift;
+ extern void mprotect_set_encrypt(struct vm_area_struct *vma, int newkeyid,
+ 				unsigned long start, unsigned long end);
  
--	ret = mprotect_fixup(vma, &prev, vma->vm_start, vma->vm_end,
--			vm_flags);
-+	ret = mprotect_fixup(vma, &prev, vma->vm_start, vma->vm_end, vm_flags,
-+			     -1);
- 	if (ret)
- 		goto out_unlock;
- 	BUG_ON(prev != vma);
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index c027044de9bf..a7f52d053826 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1634,7 +1634,8 @@ extern unsigned long change_protection(struct vm_area_struct *vma, unsigned long
- 			      int dirty_accountable, int prot_numa);
- extern int mprotect_fixup(struct vm_area_struct *vma,
- 			  struct vm_area_struct **pprev, unsigned long start,
--			  unsigned long end, unsigned long newflags);
-+			  unsigned long end, unsigned long newflags,
-+			  int newkeyid);
- 
- /*
-  * doesn't attempt to fault and will return short.
-diff --git a/mm/mprotect.c b/mm/mprotect.c
-index 23e680f4b1d5..38d766b5cc20 100644
---- a/mm/mprotect.c
-+++ b/mm/mprotect.c
-@@ -28,6 +28,7 @@
- #include <linux/ksm.h>
- #include <linux/uaccess.h>
- #include <linux/mm_inline.h>
-+#include <linux/key.h>
- #include <asm/pgtable.h>
- #include <asm/cacheflush.h>
- #include <asm/mmu_context.h>
-@@ -347,7 +348,8 @@ static int prot_none_walk(struct vm_area_struct *vma, unsigned long start,
- 
- int
- mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
--	unsigned long start, unsigned long end, unsigned long newflags)
-+	       unsigned long start, unsigned long end, unsigned long newflags,
-+	       int newkeyid)
++/* MTKME encrypt_count for VMAs */
++extern struct percpu_ref *encrypt_count;
++extern void vma_get_encrypt_ref(struct vm_area_struct *vma);
++extern void vma_put_encrypt_ref(struct vm_area_struct *vma);
++
+ DECLARE_STATIC_KEY_FALSE(mktme_enabled_key);
+ static inline bool mktme_enabled(void)
  {
- 	struct mm_struct *mm = vma->vm_mm;
- 	unsigned long oldflags = vma->vm_flags;
-@@ -357,7 +359,14 @@ mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
- 	int error;
- 	int dirty_accountable = 0;
+diff --git a/arch/x86/mm/mktme.c b/arch/x86/mm/mktme.c
+index 91b49e88ca3f..df70651816a1 100644
+--- a/arch/x86/mm/mktme.c
++++ b/arch/x86/mm/mktme.c
+@@ -66,11 +66,12 @@ void mprotect_set_encrypt(struct vm_area_struct *vma, int newkeyid,
  
--	if (newflags == oldflags) {
-+	/*
-+	 * Flags match and Keyids match or we have NO_KEY.
-+	 * This _fixup is usually called from do_mprotect_ext() except
-+	 * for one special case: caller fs/exec.c/setup_arg_pages()
-+	 * In that case, newkeyid is passed as -1 (NO_KEY).
-+	 */
-+	if (newflags == oldflags &&
-+	    (newkeyid == vma_keyid(vma) || newkeyid == NO_KEY)) {
- 		*pprev = vma;
- 		return 0;
- 	}
-@@ -423,6 +432,8 @@ mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
- 	}
+ 	if (oldkeyid == newkeyid)
+ 		return;
+-
++	vma_put_encrypt_ref(vma);
+ 	newprot = pgprot_val(vma->vm_page_prot);
+ 	newprot &= ~mktme_keyid_mask;
+ 	newprot |= (unsigned long)newkeyid << mktme_keyid_shift;
+ 	vma->vm_page_prot = __pgprot(newprot);
++	vma_get_encrypt_ref(vma);
  
- success:
-+	if (newkeyid != NO_KEY)
-+		mprotect_set_encrypt(vma, newkeyid, start, end);
  	/*
- 	 * vm_flags and vm_page_prot are protected by the mmap_sem
- 	 * held in write mode.
-@@ -454,10 +465,15 @@ mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
+ 	 * The VMA doesn't have any inherited pages.
+@@ -79,6 +80,18 @@ void mprotect_set_encrypt(struct vm_area_struct *vma, int newkeyid,
+ 	unlink_anon_vmas(vma);
  }
  
- /*
-- * When pkey==NO_KEY we get legacy mprotect behavior here.
-+ * do_mprotect_ext() supports the legacy mprotect behavior plus extensions
-+ * for Protection Keys and Memory Encryption Keys. These extensions are
-+ * mutually exclusive and the behavior is:
-+ *	(pkey==NO_KEY && keyid==NO_KEY) ==> legacy mprotect
-+ *	(pkey is valid)  ==> legacy mprotect plus Protection Key extensions
-+ *	(keyid is valid) ==> legacy mprotect plus Encryption Key extensions
-  */
- static int do_mprotect_ext(unsigned long start, size_t len,
--		unsigned long prot, int pkey)
-+			   unsigned long prot, int pkey, int keyid)
- {
- 	unsigned long nstart, end, tmp, reqprot;
- 	struct vm_area_struct *vma, *prev;
-@@ -555,7 +571,8 @@ static int do_mprotect_ext(unsigned long start, size_t len,
- 		tmp = vma->vm_end;
- 		if (tmp > end)
- 			tmp = end;
--		error = mprotect_fixup(vma, &prev, nstart, tmp, newflags);
-+		error = mprotect_fixup(vma, &prev, nstart, tmp, newflags,
-+				       keyid);
- 		if (error)
- 			goto out;
- 		nstart = tmp;
-@@ -580,7 +597,7 @@ static int do_mprotect_ext(unsigned long start, size_t len,
- SYSCALL_DEFINE3(mprotect, unsigned long, start, size_t, len,
- 		unsigned long, prot)
- {
--	return do_mprotect_ext(start, len, prot, NO_KEY);
-+	return do_mprotect_ext(start, len, prot, NO_KEY, NO_KEY);
- }
- 
- #ifdef CONFIG_ARCH_HAS_PKEYS
-@@ -588,7 +605,7 @@ SYSCALL_DEFINE3(mprotect, unsigned long, start, size_t, len,
- SYSCALL_DEFINE4(pkey_mprotect, unsigned long, start, size_t, len,
- 		unsigned long, prot, int, pkey)
- {
--	return do_mprotect_ext(start, len, prot, pkey);
-+	return do_mprotect_ext(start, len, prot, pkey, NO_KEY);
- }
- 
- SYSCALL_DEFINE2(pkey_alloc, unsigned long, flags, unsigned long, init_val)
-@@ -637,3 +654,40 @@ SYSCALL_DEFINE1(pkey_free, int, pkey)
- }
- 
- #endif /* CONFIG_ARCH_HAS_PKEYS */
-+
-+#ifdef CONFIG_X86_INTEL_MKTME
-+
-+extern int mktme_keyid_from_key(struct key *key);
-+
-+SYSCALL_DEFINE4(encrypt_mprotect, unsigned long, start, size_t, len,
-+		unsigned long, prot, key_serial_t, serial)
++void vma_get_encrypt_ref(struct vm_area_struct *vma)
 +{
-+	key_ref_t key_ref;
-+	struct key *key;
-+	int ret, keyid;
-+
-+	/* MKTME restriction */
-+	if (!PAGE_ALIGNED(len))
-+		return -EINVAL;
-+
-+	/*
-+	 * key_ref prevents the destruction of the key
-+	 * while the memory encryption is being set up.
-+	 */
-+
-+	key_ref = lookup_user_key(serial, 0, KEY_NEED_VIEW);
-+	if (IS_ERR(key_ref))
-+		return PTR_ERR(key_ref);
-+
-+	key = key_ref_to_ptr(key_ref);
-+	keyid = mktme_keyid_from_key(key);
-+	if (!keyid) {
-+		key_ref_put(key_ref);
-+		return -EINVAL;
-+	}
-+	ret = do_mprotect_ext(start, len, prot, NO_KEY, keyid);
-+	key_ref_put(key_ref);
-+	return ret;
++	if (vma_keyid(vma))
++		percpu_ref_get(&encrypt_count[vma_keyid(vma)]);
 +}
 +
-+#endif /* CONFIG_X86_INTEL_MKTME */
++void vma_put_encrypt_ref(struct vm_area_struct *vma)
++{
++	if (vma_keyid(vma))
++		percpu_ref_put(&encrypt_count[vma_keyid(vma)]);
++}
++
+ /* Prepare page to be used for encryption. Called from page allocator. */
+ void __prep_encrypted_page(struct page *page, int order, int keyid, bool zero)
+ {
+@@ -102,6 +115,22 @@ void __prep_encrypted_page(struct page *page, int order, int keyid, bool zero)
+ 
+ 		page++;
+ 	}
++
++	/*
++	 * Make sure the KeyID cannot be freed until the last page that
++	 * uses the KeyID is gone.
++	 *
++	 * This is required because the page may live longer than VMA it
++	 * is mapped into (i.e. in get_user_pages() case) and having
++	 * refcounting per-VMA is not enough.
++	 *
++	 * Taking a reference per-4K helps in case if the page will be
++	 * split after the allocation. free_encrypted_page() will balance
++	 * out the refcount even if the page was split and freed as bunch
++	 * of 4K pages.
++	 */
++
++	percpu_ref_get_many(&encrypt_count[keyid], 1 << order);
+ }
+ 
+ /*
+@@ -110,7 +139,9 @@ void __prep_encrypted_page(struct page *page, int order, int keyid, bool zero)
+  */
+ void free_encrypted_page(struct page *page, int order)
+ {
+-	int i;
++	int i, keyid;
++
++	keyid = page_keyid(page);
+ 
+ 	/*
+ 	 * The hardware/CPU does not enforce coherency between mappings
+@@ -125,6 +156,8 @@ void free_encrypted_page(struct page *page, int order)
+ 		lookup_page_ext(page)->keyid = 0;
+ 		page++;
+ 	}
++
++	percpu_ref_put_many(&encrypt_count[keyid], 1 << order);
+ }
+ 
+ static int sync_direct_mapping_pte(unsigned long keyid,
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index a7f52d053826..00c0fd70816b 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -2831,6 +2831,8 @@ static inline void mprotect_set_encrypt(struct vm_area_struct *vma,
+ 					int newkeyid,
+ 					unsigned long start,
+ 					unsigned long end) {}
++static inline void vma_get_encrypt_ref(struct vm_area_struct *vma) {}
++static inline void vma_put_encrypt_ref(struct vm_area_struct *vma) {}
+ #endif /* CONFIG_X86_INTEL_MKTME */
+ #endif /* __KERNEL__ */
+ #endif /* _LINUX_MM_H */
+diff --git a/kernel/fork.c b/kernel/fork.c
+index 9dcd18aa210b..f0e35ed76f5a 100644
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -342,12 +342,14 @@ struct vm_area_struct *vm_area_dup(struct vm_area_struct *orig)
+ 	if (new) {
+ 		*new = *orig;
+ 		INIT_LIST_HEAD(&new->anon_vma_chain);
++		vma_get_encrypt_ref(new);
+ 	}
+ 	return new;
+ }
+ 
+ void vm_area_free(struct vm_area_struct *vma)
+ {
++	vma_put_encrypt_ref(vma);
+ 	kmem_cache_free(vm_area_cachep, vma);
+ }
+ 
 -- 
 2.20.1
 
