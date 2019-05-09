@@ -2,159 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D14F918798
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 11:18:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4F27187FC
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 11:49:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726718AbfEIJSY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 05:18:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37742 "EHLO mx1.redhat.com"
+        id S1726546AbfEIJtY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 05:49:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40856 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725991AbfEIJSX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 May 2019 05:18:23 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        id S1725826AbfEIJtX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 May 2019 05:49:23 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3779FC05E76E;
-        Thu,  9 May 2019 09:18:23 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 951B83084212;
+        Thu,  9 May 2019 09:49:23 +0000 (UTC)
 Received: from gondolin (dhcp-192-213.str.redhat.com [10.33.192.213])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C24049084;
-        Thu,  9 May 2019 09:18:19 +0000 (UTC)
-Date:   Thu, 9 May 2019 11:18:17 +0200
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F80F60C6F;
+        Thu,  9 May 2019 09:49:20 +0000 (UTC)
+Date:   Thu, 9 May 2019 11:49:17 +0200
 From:   Cornelia Huck <cohuck@redhat.com>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>
-Subject: Re: [PATCHv2 09/10] vfio/mdev: Avoid creating sysfs remove file on
- stale device removal
-Message-ID: <20190509111817.36ff1791.cohuck@redhat.com>
-In-Reply-To: <VI1PR0501MB2271E76A8B5E8D00AFEA8D97D1320@VI1PR0501MB2271.eurprd05.prod.outlook.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Parav Pandit <parav@mellanox.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kwankhede@nvidia.com, cjia@nvidia.com
+Subject: Re: [PATCHv2 10/10] vfio/mdev: Synchronize device create/remove
+ with parent removal
+Message-ID: <20190509114917.5e80e88d.cohuck@redhat.com>
+In-Reply-To: <20190508204605.17294a7d@x1.home>
 References: <20190430224937.57156-1-parav@mellanox.com>
-        <20190430224937.57156-10-parav@mellanox.com>
-        <20190508191635.05a0f277.cohuck@redhat.com>
-        <VI1PR0501MB2271E76A8B5E8D00AFEA8D97D1320@VI1PR0501MB2271.eurprd05.prod.outlook.com>
+        <20190430224937.57156-11-parav@mellanox.com>
+        <20190508204605.17294a7d@x1.home>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Thu, 09 May 2019 09:18:23 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Thu, 09 May 2019 09:49:23 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 8 May 2019 22:13:28 +0000
-Parav Pandit <parav@mellanox.com> wrote:
+On Wed, 8 May 2019 20:46:05 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-> > -----Original Message-----
-> > From: Cornelia Huck <cohuck@redhat.com>
-> > Sent: Wednesday, May 8, 2019 12:17 PM
-> > To: Parav Pandit <parav@mellanox.com>
-> > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > kwankhede@nvidia.com; alex.williamson@redhat.com; cjia@nvidia.com
-> > Subject: Re: [PATCHv2 09/10] vfio/mdev: Avoid creating sysfs remove file on
-> > stale device removal
+> On Tue, 30 Apr 2019 17:49:37 -0500
+> Parav Pandit <parav@mellanox.com> wrote:
+> 
+> > In following sequences, child devices created while removing mdev parent
+> > device can be left out, or it may lead to race of removing half
+> > initialized child mdev devices.
 > > 
-> > On Tue, 30 Apr 2019 17:49:36 -0500
-> > Parav Pandit <parav@mellanox.com> wrote:
-> >   
-> > > If device is removal is initiated by two threads as below, mdev core
-> > > attempts to create a syfs remove file on stale device.
-> > > During this flow, below [1] call trace is observed.
-> > >
-> > >      cpu-0                                    cpu-1
-> > >      -----                                    -----
-> > >   mdev_unregister_device()
-> > >     device_for_each_child
-> > >        mdev_device_remove_cb
-> > >           mdev_device_remove
-> > >                                        user_syscall
-> > >                                          remove_store()
-> > >                                            mdev_device_remove()
-> > >                                         [..]
-> > >    unregister device();
-> > >                                        /* not found in list or
-> > >                                         * active=false.
-> > >                                         */
-> > >                                           sysfs_create_file()
-> > >                                           ..Call trace
-> > >
-> > > Now that mdev core follows correct device removal system of the linux
-> > > bus model, remove shouldn't fail in normal cases. If it fails, there
-> > > is no point of creating a stale file or checking for specific error status.  
+> > issue-1:
+> > --------
+> >        cpu-0                         cpu-1
+> >        -----                         -----
+> >                                   mdev_unregister_device()
+> >                                     device_for_each_child()
+> >                                       mdev_device_remove_cb()
+> >                                         mdev_device_remove()
+> > create_store()
+> >   mdev_device_create()                   [...]
+> >     device_add()
+> >                                   parent_remove_sysfs_files()
 > > 
-> > Which error cases are left? Is there anything that does not indicate that
-> > something got terribly messed up internally?
-> >   
-> Few reasons I can think of that can fail remove are:
-> 
-> 1. Some device removal requires allocating memory too as it needs to issue commands to device.
-> If on the path, such allocation fails, remove can fail. However such fail to allocate memory will probably result into more serious warnings before this.
-
-Nod. If we're OOM, we probably have some bigger problems anyway.
-
-> 2. if the device firmware has crashed, device removal commands will likely timeout and return such error upto user.
-
-In that case, I'd consider the device pretty much unusable in any case.
-
-> 3. If user tries to remove a device, while parent is already in removal path, this call will eventually fail as it won't find the device in the internal list.
-
-This should be benign, I think.
-
-> 
-> > >
-> > > kernel: WARNING: CPU: 2 PID: 9348 at fs/sysfs/file.c:327
-> > > sysfs_create_file_ns+0x7f/0x90
-> > > kernel: CPU: 2 PID: 9348 Comm: bash Kdump: loaded Not tainted
-> > > 5.1.0-rc6-vdevbus+ #6
-> > > kernel: Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS 2.0b
-> > > 08/09/2016
-> > > kernel: RIP: 0010:sysfs_create_file_ns+0x7f/0x90
-> > > kernel: Call Trace:
-> > > kernel: remove_store+0xdc/0x100 [mdev]
-> > > kernel: kernfs_fop_write+0x113/0x1a0
-> > > kernel: vfs_write+0xad/0x1b0
-> > > kernel: ksys_write+0x5a/0xe0
-> > > kernel: do_syscall_64+0x5a/0x210
-> > > kernel: entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> > >
-> > > Signed-off-by: Parav Pandit <parav@mellanox.com>
-> > > ---
-> > >  drivers/vfio/mdev/mdev_sysfs.c | 4 +---
-> > >  1 file changed, 1 insertion(+), 3 deletions(-)
-> > >
-> > > diff --git a/drivers/vfio/mdev/mdev_sysfs.c
-> > > b/drivers/vfio/mdev/mdev_sysfs.c index 9f774b91d275..ffa3dcebf201
-> > > 100644
-> > > --- a/drivers/vfio/mdev/mdev_sysfs.c
-> > > +++ b/drivers/vfio/mdev/mdev_sysfs.c
-> > > @@ -237,10 +237,8 @@ static ssize_t remove_store(struct device *dev,  
-> > struct device_attribute *attr,  
-> > >  		int ret;
-> > >
-> > >  		ret = mdev_device_remove(dev);
-> > > -		if (ret) {
-> > > -			device_create_file(dev, attr);
-> > > +		if (ret)  
+> > /* BUG: device added by cpu-0
+> >  * whose parent is getting removed
+> >  * and it won't process this mdev.
+> >  */
 > > 
-> > Should you merge this into the previous patch?
-> >   
-> I am not sure. Previous patch changes the sequence. I think that deserved an own patch by itself.
-> This change is making use of that sequence.
-> So its easier to review? Alex had comment in v0 to split into more logical patches, so...
-> Specially to capture a different call trace, I cut into different patch.
-> Otherwise previous patch's commit message is too long.
+> > issue-2:
+> > --------
+> > Below crash is observed when user initiated remove is in progress
+> > and mdev_unregister_driver() completes parent unregistration.
+> > 
+> >        cpu-0                         cpu-1
+> >        -----                         -----
+> > remove_store()
+> >    mdev_device_remove()
+> >    active = false;
+> >                                   mdev_unregister_device()
+> >                                   parent device removed.
+> >    [...]
+> >    parents->ops->remove()
+> >  /*
+> >   * BUG: Accessing invalid parent.
+> >   */
+> > 
+> > This is similar race like create() racing with mdev_unregister_device().
+> > 
+> > BUG: unable to handle kernel paging request at ffffffffc0585668
+> > PGD e8f618067 P4D e8f618067 PUD e8f61a067 PMD 85adca067 PTE 0
+> > Oops: 0000 [#1] SMP PTI
+> > CPU: 41 PID: 37403 Comm: bash Kdump: loaded Not tainted 5.1.0-rc6-vdevbus+ #6
+> > Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS 2.0b 08/09/2016
+> > RIP: 0010:mdev_device_remove+0xfa/0x140 [mdev]
+> > Call Trace:
+> >  remove_store+0x71/0x90 [mdev]
+> >  kernfs_fop_write+0x113/0x1a0
+> >  vfs_write+0xad/0x1b0
+> >  ksys_write+0x5a/0xe0
+> >  do_syscall_64+0x5a/0x210
+> >  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> > 
+> > Therefore, mdev core is improved as below to overcome above issues.
+> > 
+> > Wait for any ongoing mdev create() and remove() to finish before
+> > unregistering parent device using refcount and completion.
+> > This continues to allow multiple create and remove to progress in
+> > parallel for different mdev devices as most common case.
+> > At the same time guard parent removal while parent is being access by
+> > create() and remove callbacks.
+> > 
+> > Code is simplified from kref to use refcount as unregister_device() has
+> > to wait anyway for all create/remove to finish.
+> > 
+> > While removing mdev devices during parent unregistration, there isn't
+> > need to acquire refcount of parent device, hence code is restructured
+> > using mdev_device_remove_common() to avoid it.  
+> 
+> Did you consider calling parent_remove_sysfs_files() earlier in
+> mdev_unregister_device() and adding srcu support to know there are no
+> in-flight callers of the create path?  I think that would address
+> issue-1.
+> 
+> Issue-2 suggests a bug in our handling of the parent device krefs, the
+> parent object should exist until all child devices which have a kref
+> reference to the parent are removed, but clearly
+> mdev_unregister_device() is not blocking for that to occur allowing the
+> parent driver .remove callback to finish.  This seems similar to
+> vfio_del_group_dev() where we need to block a vfio bus driver from
+> removing a device until it becomes unused, could a similar solution
+> with a wait_queue and wait_woken be used here?
+> 
+> I'm not immediately sold on the idea that removing a kref to solve this
+> problem is a good thing, it seems odd to me that mdevs don't hold a
+> reference to the parent throughout their life with this change, and the
+> remove_store path branch to exit if we find we're racing the parent
+> remove path is rather ugly.  BTW, why is the sanitization loop in
+> mdev_device_remove() still here, wasn't that fixed by the previous two
+> patches?  Thanks,
 
-I'm not sure if splitting out this one is worth it... your call.
+Agreed, I think not holding a reference to the parent is rather odd.
 
 > 
-> > >  			return ret;
-> > > -		}
-> > >  	}
-> > >
-> > >  	return count;  
+> Alex
 > 
+> > Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
+> > Signed-off-by: Parav Pandit <parav@mellanox.com>
+> > ---
+> >  drivers/vfio/mdev/mdev_core.c    | 86 ++++++++++++++++++++------------
+> >  drivers/vfio/mdev/mdev_private.h |  6 ++-
+> >  2 files changed, 60 insertions(+), 32 deletions(-)
 
+(...)
+
+> > @@ -206,14 +214,27 @@ void mdev_unregister_device(struct device *dev)
+> >  	dev_info(dev, "MDEV: Unregistering\n");
+> >  
+> >  	list_del(&parent->next);
+> > +	mutex_unlock(&parent_list_lock);
+> > +
+> > +	/* Release the initial reference so that new create cannot start */
+> > +	mdev_put_parent(parent);
+> > +
+> > +	/*
+> > +	 * Wait for all the create and remove references to drop.
+> > +	 */
+> > +	wait_for_completion(&parent->unreg_completion);
+> > +
+> > +	/*
+> > +	 * New references cannot be taken and all users are done
+> > +	 * using the parent. So it is safe to unregister parent.
+> > +	 */
+> >  	class_compat_remove_link(mdev_bus_compat_class, dev, NULL);
+> >  
+> >  	device_for_each_child(dev, NULL, mdev_device_remove_cb);
+> >  
+> >  	parent_remove_sysfs_files(parent);
+> > -
+> > -	mutex_unlock(&parent_list_lock);
+> > -	mdev_put_parent(parent);
+> > +	kfree(parent);
+
+Such a kfree() is usually a big, flashing warning sign to me, even
+though it probably isn't strictly broken in this case.
+
+> > +	put_device(dev);
+> >  }
+> >  EXPORT_SYMBOL(mdev_unregister_device);
+> >  
+
+I think one problem I'm having here is that two things are conflated
+with that approach:
+
+- Structures holding a reference to another structure, where they need
+  to be sure that it isn't pulled out from under them.
+- Structures being hooked up and discoverable from somewhere else.
+
+I think what we actually need is that the code possibly creating a new
+mdev device is not able to look up the parent device if removal has
+been already triggered for it. Same for triggering mdev device removal.
+
+Do we need to somehow tie getting an extra reference to looking up the
+device? Any extra reference does not hurt, as long as we remember to
+drop it again :)
