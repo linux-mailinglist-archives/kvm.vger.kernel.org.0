@@ -2,107 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 89326189B2
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 14:24:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C485E189CC
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 14:31:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726546AbfEIMY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 08:24:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33290 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726438AbfEIMY0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 May 2019 08:24:26 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2D91C307D98F;
-        Thu,  9 May 2019 12:24:26 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AA6435C226;
-        Thu,  9 May 2019 12:24:25 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 257BD41F58;
-        Thu,  9 May 2019 12:24:25 +0000 (UTC)
-Date:   Thu, 9 May 2019 08:24:24 -0400 (EDT)
-From:   Pankaj Gupta <pagupta@redhat.com>
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     linux-nvdimm <linux-nvdimm@lists.01.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        KVM list <kvm@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux ACPI <linux-acpi@vger.kernel.org>,
-        Qemu Developers <qemu-devel@nongnu.org>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        Ross Zwisler <zwisler@kernel.org>,
-        Vishal L Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Christoph Hellwig <hch@infradead.org>,
-        Len Brown <lenb@kernel.org>, Jan Kara <jack@suse.cz>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        lcapitulino@redhat.com, Kevin Wolf <kwolf@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        jmoyer <jmoyer@redhat.com>,
-        Nitesh Narayan Lal <nilal@redhat.com>,
-        Rik van Riel <riel@surriel.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        david <david@fromorbit.com>, cohuck@redhat.com,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kilobyte@angband.pl,
-        yuval shaia <yuval.shaia@oracle.com>
-Message-ID: <511098535.27565704.1557404664499.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CAPcyv4hRdvypEj4LBTMfUFm80BdpRYbOugrkkj-3Kk_LErXPqQ@mail.gmail.com>
-References: <20190426050039.17460-1-pagupta@redhat.com> <20190426050039.17460-4-pagupta@redhat.com> <CAPcyv4hRdvypEj4LBTMfUFm80BdpRYbOugrkkj-3Kk_LErXPqQ@mail.gmail.com>
-Subject: Re: [PATCH v7 3/6] libnvdimm: add dax_dev sync flag
+        id S1726710AbfEIMbz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 08:31:55 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:40102 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726426AbfEIMbz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 May 2019 08:31:55 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CE3BBA78;
+        Thu,  9 May 2019 05:31:54 -0700 (PDT)
+Received: from [10.1.196.69] (e112269-lin.cambridge.arm.com [10.1.196.69])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7464E3F7BD;
+        Thu,  9 May 2019 05:31:53 -0700 (PDT)
+Subject: Re: [PATCH v6 1/3] arm64: KVM: Propagate full Spectre v2 workaround
+ state to KVM guests
+To:     Andre Przywara <andre.przywara@arm.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Eric Auger <eric.auger@redhat.com>,
+        Jeremy Linton <jeremy.linton@arm.com>
+References: <20190503142750.252793-1-andre.przywara@arm.com>
+ <20190503142750.252793-2-andre.przywara@arm.com>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <af5cc288-57f9-d103-13b1-37d1a0794c5f@arm.com>
+Date:   Thu, 9 May 2019 13:31:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190503142750.252793-2-andre.przywara@arm.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.88, 10.4.195.16]
-Thread-Topic: libnvdimm: add dax_dev sync flag
-Thread-Index: ojaRi4mgEPnvOvl3Gx+91mTiXiceZg==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Thu, 09 May 2019 12:24:26 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-> >
-> > This patch adds 'DAXDEV_SYNC' flag which is set
-> > for nd_region doing synchronous flush. This later
-> > is used to disable MAP_SYNC functionality for
-> > ext4 & xfs filesystem for devices don't support
-> > synchronous flush.
-> >
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> [..]
-> > diff --git a/include/linux/dax.h b/include/linux/dax.h
-> > index 0dd316a74a29..c97fc0cc7167 100644
-> > --- a/include/linux/dax.h
-> > +++ b/include/linux/dax.h
-> > @@ -7,6 +7,9 @@
-> >  #include <linux/radix-tree.h>
-> >  #include <asm/pgtable.h>
-> >
-> > +/* Flag for synchronous flush */
-> > +#define DAXDEV_F_SYNC true
+On 03/05/2019 15:27, Andre Przywara wrote:
+> Recent commits added the explicit notion of "workaround not required" to
+> the state of the Spectre v2 (aka. BP_HARDENING) workaround, where we
+> just had "needed" and "unknown" before.
 > 
-> I'd feel better, i.e. it reads more canonically, if this was defined
-> as (1UL << 0) and the argument to alloc_dax() was changed to 'unsigned
-> long flags' rather than a bool.
-
-Sure, Will send a v8 with suggested changes.
-
-Thank You,
-Pankaj
-
+> Export this knowledge to the rest of the kernel and enhance the existing
+> kvm_arm_harden_branch_predictor() to report this new state as well.
+> Export this new state to guests when they use KVM's firmware interface
+> emulation.
 > 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+
+Reviewed-by: Steven Price <steven.price@arm.com>
