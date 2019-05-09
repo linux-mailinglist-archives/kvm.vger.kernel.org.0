@@ -2,149 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C059518E00
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 18:27:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03BDC18E66
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 18:48:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727110AbfEIQ1J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 12:27:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55804 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726682AbfEIQ1J (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 May 2019 12:27:09 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x49GO59g062615
-        for <kvm@vger.kernel.org>; Thu, 9 May 2019 12:27:08 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2scq0ssxjf-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 09 May 2019 12:27:07 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Thu, 9 May 2019 17:27:05 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 9 May 2019 17:27:02 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x49GR0CL34930696
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 May 2019 16:27:00 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 847CC42047;
-        Thu,  9 May 2019 16:27:00 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CB53542042;
-        Thu,  9 May 2019 16:26:59 +0000 (GMT)
-Received: from [9.145.47.201] (unknown [9.145.47.201])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  9 May 2019 16:26:59 +0000 (GMT)
-Reply-To: pmorel@linux.ibm.com
-Subject: Re: [PATCHv2 08/10] vfio/mdev: Improve the create/remove sequence
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Parav Pandit <parav@mellanox.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-References: <20190430224937.57156-1-parav@mellanox.com>
- <20190430224937.57156-9-parav@mellanox.com>
- <20190508190957.673dd948.cohuck@redhat.com>
- <VI1PR0501MB2271CFAFF2ACF145FDFD8E2ED1320@VI1PR0501MB2271.eurprd05.prod.outlook.com>
- <20190509110600.5354463c.cohuck@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Thu, 9 May 2019 18:26:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726803AbfEIQsn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 12:48:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48374 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726620AbfEIQsn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 May 2019 12:48:43 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0DCCA3B712;
+        Thu,  9 May 2019 16:48:42 +0000 (UTC)
+Received: from work-vm (ovpn-116-174.ams2.redhat.com [10.36.116.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 95FF11710E;
+        Thu,  9 May 2019 16:48:28 +0000 (UTC)
+Date:   Thu, 9 May 2019 17:48:26 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        intel-gvt-dev@lists.freedesktop.org, arei.gonglei@huawei.com,
+        aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com,
+        shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org,
+        eauger@redhat.com, yi.l.liu@intel.com, ziye.yang@intel.com,
+        mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
+        changpeng.liu@intel.com, Ken.Xue@amd.com,
+        jonathan.davies@nutanix.com, shaopeng.he@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        libvir-list@redhat.com, eskultet@redhat.com, kevin.tian@intel.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, cjia@nvidia.com,
+        kwankhede@nvidia.com, berrange@redhat.com, dinechin@redhat.com
+Subject: Re: [PATCH v2 1/2] vfio/mdev: add version attribute for mdev device
+Message-ID: <20190509164825.GG2868@work-vm>
+References: <20190506014514.3555-1-yan.y.zhao@intel.com>
+ <20190506014904.3621-1-yan.y.zhao@intel.com>
+ <20190507151826.502be009@x1.home>
+ <20190509173839.2b9b2b46.cohuck@redhat.com>
+ <20190509154857.GF2868@work-vm>
+ <20190509175404.512ae7aa.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190509110600.5354463c.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19050916-0008-0000-0000-000002E4FA37
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050916-0009-0000-0000-0000225181AA
-Message-Id: <eb34e9a3-32a3-98fe-e871-7d541d620b6e@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-09_02:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905090093
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190509175404.512ae7aa.cohuck@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Thu, 09 May 2019 16:48:43 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/05/2019 11:06, Cornelia Huck wrote:
-> [vfio-ap folks: find a question regarding removal further down]
+* Cornelia Huck (cohuck@redhat.com) wrote:
+> On Thu, 9 May 2019 16:48:57 +0100
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 > 
-> On Wed, 8 May 2019 22:06:48 +0000
-> Parav Pandit <parav@mellanox.com> wrote:
+> > * Cornelia Huck (cohuck@redhat.com) wrote:
+> > > On Tue, 7 May 2019 15:18:26 -0600
+> > > Alex Williamson <alex.williamson@redhat.com> wrote:
+> > >   
+> > > > On Sun,  5 May 2019 21:49:04 -0400
+> > > > Yan Zhao <yan.y.zhao@intel.com> wrote:  
+> > >   
+> > > > > +  Errno:
+> > > > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev
+> > > > > +  devices, it should not register version attribute for this mdev device. But if
+> > > > > +  a vendor driver has already registered version attribute and it wants to claim
+> > > > > +  a mdev device incompatible to all other mdev devices, it needs to return
+> > > > > +  -ENODEV on access to this mdev device's version attribute.
+> > > > > +  If a mdev device is only incompatible to certain mdev devices, write of
+> > > > > +  incompatible mdev devices's version strings to its version attribute should
+> > > > > +  return -EINVAL;    
+> > > > 
+> > > > I think it's best not to define the specific errno returned for a
+> > > > specific situation, let the vendor driver decide, userspace simply
+> > > > needs to know that an errno on read indicates the device does not
+> > > > support migration version comparison and that an errno on write
+> > > > indicates the devices are incompatible or the target doesn't support
+> > > > migration versions.  
+> > > 
+> > > I think I have to disagree here: It's probably valuable to have an
+> > > agreed error for 'cannot migrate at all' vs 'cannot migrate between
+> > > those two particular devices'. Userspace might want to do different
+> > > things (e.g. trying with different device pairs).  
+> > 
+> > Trying to stuff these things down an errno seems a bad idea; we can't
+> > get much information that way.
 > 
->>> -----Original Message-----
->>> From: Cornelia Huck <cohuck@redhat.com>
->>> Sent: Wednesday, May 8, 2019 12:10 PM
->>> To: Parav Pandit <parav@mellanox.com>
->>> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
->>> kwankhede@nvidia.com; alex.williamson@redhat.com; cjia@nvidia.com
->>> Subject: Re: [PATCHv2 08/10] vfio/mdev: Improve the create/remove
->>> sequence
->>>
->>> On Tue, 30 Apr 2019 17:49:35 -0500
->>> Parav Pandit <parav@mellanox.com> wrote:
->>>    
-
-...snip...
-
->>>> @@ -373,16 +330,15 @@ int mdev_device_remove(struct device *dev,
->>> bool force_remove)
->>>>   	mutex_unlock(&mdev_list_lock);
->>>>
->>>>   	type = to_mdev_type(mdev->type_kobj);
->>>> +	mdev_remove_sysfs_files(dev, type);
->>>> +	device_del(&mdev->dev);
->>>>   	parent = mdev->parent;
->>>> +	ret = parent->ops->remove(mdev);
->>>> +	if (ret)
->>>> +		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
->>>
->>> I think carrying on with removal regardless of the return code of the
->>> ->remove callback makes sense, as it simply matches usual practice.
->>> However, are we sure that every vendor driver works well with that? I think
->>> it should, as removal from bus unregistration (vs. from the sysfs
->>> file) was always something it could not veto, but have you looked at the
->>> individual drivers?
->>>    
->> I looked at following drivers a little while back.
->> Looked again now.
->>
->> drivers/gpu/drm/i915/gvt/kvmgt.c which clears the handle valid in intel_vgpu_release(), which should finish first before remove() is invoked.
->>
->> s390 vfio_ccw_mdev_remove() driver drivers/s390/cio/vfio_ccw_ops.c remove() always returns 0.
->> s39 crypo fails the remove() once vfio_ap_mdev_release marks kvm null, which should finish before remove() is invoked.
+> So, what would be a reasonable approach? Userspace should first read
+> the version attributes on both devices (to find out whether migration
+> is supported at all), and only then figure out via writing whether they
+> are compatible?
 > 
-> That one is giving me a bit of a headache (the ->kvm reference is
-> supposed to keep us from detaching while a vm is running), so let's cc:
-> the vfio-ap maintainers to see whether they have any concerns.
-> 
+> (Or just go ahead and try, if it does not care about the reason.)
 
-We are aware of this race and we did correct this in the IRQ patches for 
-which it would have become a real issue.
-We now increment/decrement the KVM reference counter inside open and 
-release.
-Should be right after this.
+Well, I'm OK with something like writing to test whether it's
+compatible, it's just we need a better way of saying 'no'.
+I'm not sure if that involves reading back from somewhere after
+the write or what.
 
-Thanks for the cc,
-Pierre
+Dave
 
-
--- 
-Pierre Morel
-Linux/KVM/QEMU in Böblingen - Germany
-
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
