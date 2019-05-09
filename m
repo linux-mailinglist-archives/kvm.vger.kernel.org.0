@@ -2,106 +2,277 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E4FB1873D
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 10:59:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AE031876A
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 11:06:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726858AbfEII7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 04:59:41 -0400
-Received: from foss.arm.com ([217.140.101.70]:34836 "EHLO foss.arm.com"
+        id S1725892AbfEIJGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 05:06:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56730 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726798AbfEII71 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 May 2019 04:59:27 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1BAFF374;
-        Thu,  9 May 2019 01:59:27 -0700 (PDT)
-Received: from [10.1.215.53] (e121566-lin.cambridge.arm.com [10.1.215.53])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4D0233F575;
-        Thu,  9 May 2019 01:59:26 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH v2 4/4] arm: Remove redeundant page zeroing
-To:     nadav.amit@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>
-References: <20190503103207.9021-1-nadav.amit@gmail.com>
- <20190503103207.9021-5-nadav.amit@gmail.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <bef927bd-6326-4f4c-6426-403179102e95@arm.com>
-Date:   Thu, 9 May 2019 09:59:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1725847AbfEIJGd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 May 2019 05:06:33 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id BCAF63001800;
+        Thu,  9 May 2019 09:06:32 +0000 (UTC)
+Received: from gondolin (dhcp-192-213.str.redhat.com [10.33.192.213])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9B70E5B681;
+        Thu,  9 May 2019 09:06:28 +0000 (UTC)
+Date:   Thu, 9 May 2019 11:06:00 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCHv2 08/10] vfio/mdev: Improve the create/remove sequence
+Message-ID: <20190509110600.5354463c.cohuck@redhat.com>
+In-Reply-To: <VI1PR0501MB2271CFAFF2ACF145FDFD8E2ED1320@VI1PR0501MB2271.eurprd05.prod.outlook.com>
+References: <20190430224937.57156-1-parav@mellanox.com>
+        <20190430224937.57156-9-parav@mellanox.com>
+        <20190508190957.673dd948.cohuck@redhat.com>
+        <VI1PR0501MB2271CFAFF2ACF145FDFD8E2ED1320@VI1PR0501MB2271.eurprd05.prod.outlook.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20190503103207.9021-5-nadav.amit@gmail.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Thu, 09 May 2019 09:06:32 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/3/19 11:32 AM, nadav.amit@gmail.com wrote:
-> From: Nadav Amit <nadav.amit@gmail.com>
+[vfio-ap folks: find a question regarding removal further down]
 
-Documentation/process/submitting-patches.rst says that the "From" tag is only
-needed if you're submitting the patches on behalf of someone else (line 632).
+On Wed, 8 May 2019 22:06:48 +0000
+Parav Pandit <parav@mellanox.com> wrote:
 
->
-> Now that alloc_page() zeros the page, remove the redundant page zeroing.
->
-> Suggested-by: Andrew Jones <drjones@redhat.com>
-> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
-> ---
->  lib/arm/asm/pgtable.h   | 2 --
->  lib/arm/mmu.c           | 1 -
->  lib/arm64/asm/pgtable.h | 1 -
->  3 files changed, 4 deletions(-)
->
-> diff --git a/lib/arm/asm/pgtable.h b/lib/arm/asm/pgtable.h
-> index b614bce..241dff6 100644
-> --- a/lib/arm/asm/pgtable.h
-> +++ b/lib/arm/asm/pgtable.h
-> @@ -53,7 +53,6 @@ static inline pmd_t *pmd_alloc_one(void)
->  {
->  	assert(PTRS_PER_PMD * sizeof(pmd_t) == PAGE_SIZE);
->  	pmd_t *pmd = alloc_page();
-> -	memset(pmd, 0, PTRS_PER_PMD * sizeof(pmd_t));
->  	return pmd;
->  }
->  static inline pmd_t *pmd_alloc(pgd_t *pgd, unsigned long addr)
-> @@ -80,7 +79,6 @@ static inline pte_t *pte_alloc_one(void)
->  {
->  	assert(PTRS_PER_PTE * sizeof(pte_t) == PAGE_SIZE);
->  	pte_t *pte = alloc_page();
-> -	memset(pte, 0, PTRS_PER_PTE * sizeof(pte_t));
->  	return pte;
->  }
->  static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
-> diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-> index 03f6622..3d38c83 100644
-> --- a/lib/arm/mmu.c
-> +++ b/lib/arm/mmu.c
-> @@ -166,7 +166,6 @@ void *setup_mmu(phys_addr_t phys_end)
->  #endif
->  
->  	mmu_idmap = alloc_page();
-> -	memset(mmu_idmap, 0, PAGE_SIZE);
->  
->  	/*
->  	 * mach-virt I/O regions:
-> diff --git a/lib/arm64/asm/pgtable.h b/lib/arm64/asm/pgtable.h
-> index 5860abe..ee0a2c8 100644
-> --- a/lib/arm64/asm/pgtable.h
-> +++ b/lib/arm64/asm/pgtable.h
-> @@ -61,7 +61,6 @@ static inline pte_t *pte_alloc_one(void)
->  {
->  	assert(PTRS_PER_PTE * sizeof(pte_t) == PAGE_SIZE);
->  	pte_t *pte = alloc_page();
-> -	memset(pte, 0, PTRS_PER_PTE * sizeof(pte_t));
->  	return pte;
->  }
->  static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
-In the subject line: s/redeundant/redundant (this also applies to patches 2 and 3).
+> > -----Original Message-----
+> > From: Cornelia Huck <cohuck@redhat.com>
+> > Sent: Wednesday, May 8, 2019 12:10 PM
+> > To: Parav Pandit <parav@mellanox.com>
+> > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > kwankhede@nvidia.com; alex.williamson@redhat.com; cjia@nvidia.com
+> > Subject: Re: [PATCHv2 08/10] vfio/mdev: Improve the create/remove
+> > sequence
+> > 
+> > On Tue, 30 Apr 2019 17:49:35 -0500
+> > Parav Pandit <parav@mellanox.com> wrote:
+> >   
+> > > This patch addresses below two issues and prepares the code to address
+> > > 3rd issue listed below.
+> > >
+> > > 1. mdev device is placed on the mdev bus before it is created in the
+> > > vendor driver. Once a device is placed on the mdev bus without
+> > > creating its supporting underlying vendor device, mdev driver's probe()  
+> > gets triggered.  
+> > > However there isn't a stable mdev available to work on.
+> > >
+> > >    create_store()
+> > >      mdev_create_device()
+> > >        device_register()
+> > >           ...
+> > >          vfio_mdev_probe()
+> > >         [...]
+> > >         parent->ops->create()
+> > >           vfio_ap_mdev_create()
+> > >             mdev_set_drvdata(mdev, matrix_mdev);
+> > >             /* Valid pointer set above */
+> > >
+> > > Due to this way of initialization, mdev driver who want to use the
 
-The patch looks reasonable, it removes the calls to memset only when we're
-certain that the address came from alloc_page. So with the above minor changes:
+s/want/wants/
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > mdev, doesn't have a valid mdev to work on.
+> > >
+> > > 2. Current creation sequence is,
+> > >    parent->ops_create()
+> > >    groups_register()
+> > >
+> > > Remove sequence is,
+> > >    parent->ops->remove()
+> > >    groups_unregister()
+> > >
+> > > However, remove sequence should be exact mirror of creation sequence.
+> > > Once this is achieved, all users of the mdev will be terminated first
+> > > before removing underlying vendor device.
+> > > (Follow standard linux driver model).
+> > > At that point vendor's remove() ops shouldn't failed because device is
 
+s/failed/fail/
+
+> > > taken off the bus that should terminate the users.
+
+"because taking the device off the bus should terminate any usage" ?
+
+> > >
+> > > 3. When remove operation fails, mdev sysfs removal attempts to add the
+> > > file back on already removed device. Following call trace [1] is observed.
+> > >
+> > > [1] call trace:
+> > > kernel: WARNING: CPU: 2 PID: 9348 at fs/sysfs/file.c:327
+> > > sysfs_create_file_ns+0x7f/0x90
+> > > kernel: CPU: 2 PID: 9348 Comm: bash Kdump: loaded Not tainted
+> > > 5.1.0-rc6-vdevbus+ #6
+> > > kernel: Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS 2.0b
+> > > 08/09/2016
+> > > kernel: RIP: 0010:sysfs_create_file_ns+0x7f/0x90
+> > > kernel: Call Trace:
+> > > kernel: remove_store+0xdc/0x100 [mdev]
+> > > kernel: kernfs_fop_write+0x113/0x1a0
+> > > kernel: vfs_write+0xad/0x1b0
+> > > kernel: ksys_write+0x5a/0xe0
+> > > kernel: do_syscall_64+0x5a/0x210
+> > > kernel: entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> > >
+> > > Therefore, mdev core is improved in following ways.
+> > >
+> > > 1. Before placing mdev devices on the bus, perform vendor drivers
+> > > creation which supports the mdev creation.
+
+"invoke the vendor driver ->create callback" ?
+
+> > > This ensures that mdev specific all necessary fields are initialized
+
+"that all necessary mdev specific fields are initialized" ?
+
+> > > before a given mdev can be accessed by bus driver.
+> > > This follows standard Linux kernel bus and device model similar to
+> > > other widely used PCI bus.
+
+"This follows standard practice on other Linux device model buses." ?
+
+> > >
+> > > 2. During remove flow, first remove the device from the bus. This
+> > > ensures that any bus specific devices and data is cleared.
+> > > Once device is taken of the mdev bus, perform remove() of mdev from
+
+s/of/off/
+
+> > > the vendor driver.
+> > >
+> > > 3. Linux core device model provides way to register and auto
+> > > unregister the device sysfs attribute groups at dev->groups.
+
+"The driver core provides a way to automatically register and
+unregister sysfs attributes via dev->groups." ?
+
+> > > Make use of this groups to let core create the groups and simplify
+> > > code to avoid explicit groups creation and removal.
+> > >
+> > > A below stack dump of a mdev device remove process also ensures that
+> > > vfio driver guards against device removal already in use.
+> > >
+> > >  cat /proc/21962/stack
+> > > [<0>] vfio_del_group_dev+0x216/0x3c0 [vfio] [<0>]
+> > > mdev_remove+0x21/0x40 [mdev] [<0>]
+> > > device_release_driver_internal+0xe8/0x1b0
+> > > [<0>] bus_remove_device+0xf9/0x170
+> > > [<0>] device_del+0x168/0x350
+> > > [<0>] mdev_device_remove_common+0x1d/0x50 [mdev] [<0>]
+> > > mdev_device_remove+0x8c/0xd0 [mdev] [<0>] remove_store+0x71/0x90
+> > > [mdev] [<0>] kernfs_fop_write+0x113/0x1a0 [<0>] vfs_write+0xad/0x1b0
+> > > [<0>] ksys_write+0x5a/0xe0 [<0>] do_syscall_64+0x5a/0x210 [<0>]
+> > > entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> > > [<0>] 0xffffffffffffffff
+> > >
+> > > This prepares the code to eliminate calling device_create_file() in
+> > > subsquent patch.  
+
+I find this stack dump and explanation more confusing than
+enlightening. Maybe just drop it?
+
+> > 
+> > I'm afraid I have a bit of a problem following this explanation, so let me try
+> > to summarize what the patch does to make sure that I understand it
+> > correctly:
+> > 
+> > - Add the sysfs groups to device->groups so that the driver core deals
+> >   with proper registration/deregistration.
+> > - Split the device registration/deregistration sequence so that some
+> >   things can be done between initialization of the device and hooking
+> >   it up to the infrastructure respectively after deregistering it from
+> >   the infrastructure but before giving up our final reference. In
+> >   particular, this means invoking the ->create and ->remove callback in
+> >   those new windows. This gives the vendor driver an initialized mdev
+> >   device to work with during creation.
+> > - Don't allow ->remove to fail, as the device is already removed from
+> >   the infrastructure at that point in time.
+> >   
+> You got all the points pretty accurate.
+
+Ok, good.
+
+> 
+> > >
+> > > Signed-off-by: Parav Pandit <parav@mellanox.com>
+> > > ---
+> > >  drivers/vfio/mdev/mdev_core.c    | 94 +++++++++-----------------------
+> > >  drivers/vfio/mdev/mdev_private.h |  2 +-
+> > >  drivers/vfio/mdev/mdev_sysfs.c   |  2 +-
+> > >  3 files changed, 27 insertions(+), 71 deletions(-)  
+> > 
+> > (...)
+
+> > > @@ -373,16 +330,15 @@ int mdev_device_remove(struct device *dev,  
+> > bool force_remove)  
+> > >  	mutex_unlock(&mdev_list_lock);
+> > >
+> > >  	type = to_mdev_type(mdev->type_kobj);
+> > > +	mdev_remove_sysfs_files(dev, type);
+> > > +	device_del(&mdev->dev);
+> > >  	parent = mdev->parent;
+> > > +	ret = parent->ops->remove(mdev);
+> > > +	if (ret)
+> > > +		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);  
+> > 
+> > I think carrying on with removal regardless of the return code of the  
+> > ->remove callback makes sense, as it simply matches usual practice.  
+> > However, are we sure that every vendor driver works well with that? I think
+> > it should, as removal from bus unregistration (vs. from the sysfs
+> > file) was always something it could not veto, but have you looked at the
+> > individual drivers?
+> >   
+> I looked at following drivers a little while back.
+> Looked again now.
+> 
+> drivers/gpu/drm/i915/gvt/kvmgt.c which clears the handle valid in intel_vgpu_release(), which should finish first before remove() is invoked.
+> 
+> s390 vfio_ccw_mdev_remove() driver drivers/s390/cio/vfio_ccw_ops.c remove() always returns 0.
+> s39 crypo fails the remove() once vfio_ap_mdev_release marks kvm null, which should finish before remove() is invoked.
+
+That one is giving me a bit of a headache (the ->kvm reference is
+supposed to keep us from detaching while a vm is running), so let's cc:
+the vfio-ap maintainers to see whether they have any concerns.
+
+> samples/vfio-mdev/mbochs.c mbochs_remove() always returns 0.
+> 
+> > >
+> > > -	ret = mdev_device_remove_ops(mdev, force_remove);
+> > > -	if (ret) {
+> > > -		mdev->active = true;
+> > > -		return ret;
+> > > -	}
+> > > -
+> > > -	mdev_remove_sysfs_files(dev, type);
+> > > -	device_unregister(dev);
+> > > +	/* Balances with device_initialize() */
+> > > +	put_device(&mdev->dev);
+> > >  	mdev_put_parent(parent);
+> > >
+> > >  	return 0;  
+> > 
+> > I think that looks sane in general, but the commit message might benefit
+> > from tweaking.  
+> Part of your description is more crisp than my commit message, I can probably take snippet from it to improve?
+> Or any specific entries in commit message that I should address?
+
+I have added some comments inline (mostly some wording tweaks).
+
+Feel free to take anything from my summary as well.
