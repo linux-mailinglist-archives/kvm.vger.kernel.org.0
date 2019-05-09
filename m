@@ -2,191 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 17B9A18A75
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 15:18:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AAC218AB3
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 15:30:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726590AbfEINSd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 09:18:33 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:40387 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726192AbfEINSc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 May 2019 09:18:32 -0400
-Received: by mail-qt1-f194.google.com with SMTP id k24so1647695qtq.7
-        for <kvm@vger.kernel.org>; Thu, 09 May 2019 06:18:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uCSIDRtIChXyP2xLf4vlTl4TN+QeSJxgQq5xMSigZ5w=;
-        b=MZGDvv8FEtUdICDoltQq7B6owSpF37Aog8+kpxyPrSegTUgG3uUQt5SD8X3RgMxXjY
-         Dj2cI1hMDhG4RJHeeaiohW10EItInaZVd9BDAM1jHyNU1Px2Vit9squQQYpLd/VZyOcM
-         01tef6Prh73MKoQaguTXJZ6fw2cdrrHNoxnwBxR391MhhSt/5JXoLDkXmTnrvj7KEpDC
-         7JOoZJBH+8XwNRr53mIsVNAV4pfCnuaOWUZUVJvlOqg1OZYbJ+kcYCr7Sqt12zaPQ77k
-         x+7WE1K/xsQAWYV4WGb3bdfSpRay9UYY5LFDkM84iUBbAsP6jdI0fcBBd5iNAvux4Ksg
-         5Hmw==
-X-Gm-Message-State: APjAAAVfoBwpK3DyAkPPITfMkCRoSKpSj57bB9LYBz0bYc6mFHy8Vf9Y
-        sinBL+bXyH0Zk8zJyhGGOmKw/g==
-X-Google-Smtp-Source: APXvYqzuWDrp1vNxFhHyIepZh0BlL6Sk73vH5vDNAOlEraLrudzljNETMnRhgraKr8XDV4OMSkjv+w==
-X-Received: by 2002:ac8:610f:: with SMTP id a15mr3462116qtm.257.1557407911523;
-        Thu, 09 May 2019 06:18:31 -0700 (PDT)
-Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net. [173.76.105.71])
-        by smtp.gmail.com with ESMTPSA id x3sm1232202qtk.75.2019.05.09.06.18.29
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 09 May 2019 06:18:30 -0700 (PDT)
-Date:   Thu, 9 May 2019 09:18:22 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        id S1726776AbfEINaT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 09:30:19 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36774 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726054AbfEINaT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 May 2019 09:30:19 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x49DNOFO024614
+        for <kvm@vger.kernel.org>; Thu, 9 May 2019 09:30:17 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2scjnfy374-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 09 May 2019 09:30:17 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Thu, 9 May 2019 14:30:15 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 9 May 2019 14:30:11 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x49DU9wK33882182
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 May 2019 13:30:09 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8827E4204D;
+        Thu,  9 May 2019 13:30:09 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 98F5242054;
+        Thu,  9 May 2019 13:30:08 +0000 (GMT)
+Received: from [9.145.47.201] (unknown [9.145.47.201])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 May 2019 13:30:08 +0000 (GMT)
+Reply-To: pmorel@linux.ibm.com
+Subject: Re: [PATCH 09/10] virtio/s390: use DMA memory for ccw I/O and classic
+ notifiers
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
         Christoph Hellwig <hch@infradead.org>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Darren Hart <dvhart@infradead.org>
-Subject: Re: [RFC PATCH V2] vhost: don't use kmap() to log dirty pages
-Message-ID: <20190509090433-mutt-send-email-mst@kernel.org>
-References: <1557406680-4087-1-git-send-email-jasowang@redhat.com>
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+ <20190426183245.37939-10-pasic@linux.ibm.com>
+ <a873909a-9846-d6d3-f03e-e86d53fd9c75@linux.ibm.com>
+Date:   Thu, 9 May 2019 15:30:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1557406680-4087-1-git-send-email-jasowang@redhat.com>
+In-Reply-To: <a873909a-9846-d6d3-f03e-e86d53fd9c75@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19050913-0016-0000-0000-00000279F49B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050913-0017-0000-0000-000032D6A9C4
+Message-Id: <db036887-c238-9795-5f47-cfeb475074e4@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-09_02:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905090081
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 09, 2019 at 08:58:00AM -0400, Jason Wang wrote:
-> Vhost log dirty pages directly to a userspace bitmap through GUP and
-> kmap_atomic() since kernel doesn't have a set_bit_to_user()
-> helper. This will cause issues for the arch that has virtually tagged
-> caches. The way to fix is to keep using userspace virtual
-> address. Fortunately, futex has arch_futex_atomic_op_inuser() which
-> could be used for setting a bit to user.
+On 08/05/2019 16:46, Pierre Morel wrote:
+> On 26/04/2019 20:32, Halil Pasic wrote:
+>> Before virtio-ccw could get away with not using DMA API for the pieces of
+>> memory it does ccw I/O with. With protected virtualization this has to
+>> change, since the hypervisor needs to read and sometimes also write these
+>> pieces of memory.
+>>
+>> The hypervisor is supposed to poke the classic notifiers, if these are
+>> used, out of band with regards to ccw I/O. So these need to be allocated
+>> as DMA memory (which is shared memory for protected virtualization
+>> guests).
+>>
+>> Let us factor out everything from struct virtio_ccw_device that needs to
+>> be DMA memory in a satellite that is allocated as such.
+>>
+...
+>> +                       sizeof(indicators(vcdev)));
 > 
-> Note:
-> - There're archs (few non popular ones) that don't implement futex
->   helper, we can't log dirty pages. We can fix them e.g for non
->   virtually tagged archs implement a kmap fallback on top or simply
->   disable LOG_ALL features of vhost.
-> - The helper also requires userspace pointer is located at 4-byte
->   boundary, need to check during dirty log setting
-
-Why check? Round it down.
-
-> Cc: Christoph Hellwig <hch@infradead.org>
-> Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
-> Cc: Andrea Arcangeli <aarcange@redhat.com>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Darren Hart <dvhart@infradead.org>
-> Fixes: 3a4d5c94e9593 ("vhost_net: a kernel-level virtio server")
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
-> Changes from V1:
-> - switch to use arch_futex_atomic_op_inuser()
-> ---
->  drivers/vhost/vhost.c | 35 +++++++++++++++++------------------
->  1 file changed, 17 insertions(+), 18 deletions(-)
+> should be sizeof(long) ?
 > 
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index 351af88..4e5a004 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -31,6 +31,7 @@
->  #include <linux/sched/signal.h>
->  #include <linux/interval_tree_generic.h>
->  #include <linux/nospec.h>
-> +#include <asm/futex.h>
->  
->  #include "vhost.h"
->  
-> @@ -1652,6 +1653,10 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
->  			r = -EFAULT;
->  			break;
->  		}
-> +		if (p & 0x3) {
-> +			r = -EINVAL;
-> +			break;
-> +		}
->  		for (i = 0; i < d->nvqs; ++i) {
->  			struct vhost_virtqueue *vq;
->  			void __user *base = (void __user *)(unsigned long)p;
+> This is a recurrent error, but it is not an issue because the size of
+> the indicators is unsigned long as the size of the pointer.
+> 
+> Regards,
+> Pierre
+> 
 
-That's an ABI change and might break some userspace. I don't think
-it's necessary: you are changing individual bits anyway.
-
-> @@ -1692,31 +1697,27 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
->  }
->  EXPORT_SYMBOL_GPL(vhost_dev_ioctl);
->  
-> -/* TODO: This is really inefficient.  We need something like get_user()
-> - * (instruction directly accesses the data, with an exception table entry
-> - * returning -EFAULT). See Documentation/x86/exception-tables.txt.
-> - */
-> -static int set_bit_to_user(int nr, void __user *addr)
-> +static int set_bit_to_user(int nr, u32 __user *addr)
->  {
->  	unsigned long log = (unsigned long)addr;
->  	struct page *page;
-> -	void *base;
-> -	int bit = nr + (log % PAGE_SIZE) * 8;
-> +	u32 old;
->  	int r;
->  
->  	r = get_user_pages_fast(log, 1, 1, &page);
-
-OK so the trick is that page is pinned so you don't expect
-arch_futex_atomic_op_inuser below to fail.  get_user_pages_fast
-guarantees page is not going away but does it guarantee PTE won't be
-invaidated or write protected?
-
->  	if (r < 0)
->  		return r;
->  	BUG_ON(r != 1);
-> -	base = kmap_atomic(page);
-> -	set_bit(bit, base);
-> -	kunmap_atomic(base);
-> +
-> +	r = arch_futex_atomic_op_inuser(FUTEX_OP_ADD, 1 << nr, &old, addr);
-> +	/* TODO: fallback to kmap() when -ENOSYS? */
-> +
-
-Add a comment why this won't fail? Maybe warn on EFAULT?
-
-Also down the road a variant that does not need tricks like this is
-still nice to have.
+Here too, with the problem of the indicator size handled:
+Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
 
 
->  	set_page_dirty_lock(page);
->  	put_page(page);
-> -	return 0;
-> +	return r;
->  }
->  
-> -static int log_write(void __user *log_base,
-> +static int log_write(u32 __user *log_base,
->  		     u64 write_address, u64 write_length)
->  {
->  	u64 write_page = write_address / VHOST_PAGE_SIZE;
-> @@ -1726,12 +1727,10 @@ static int log_write(void __user *log_base,
->  		return 0;
->  	write_length += write_address % VHOST_PAGE_SIZE;
->  	for (;;) {
-> -		u64 base = (u64)(unsigned long)log_base;
-> -		u64 log = base + write_page / 8;
-> -		int bit = write_page % 8;
-> -		if ((u64)(unsigned long)log != log)
-> -			return -EFAULT;
-> -		r = set_bit_to_user(bit, (void __user *)(unsigned long)log);
-> +		u32 __user *log = log_base + write_page / 32;
-> +		int bit = write_page % 32;
-> +
-> +		r = set_bit_to_user(bit, log);
->  		if (r < 0)
->  			return r;
->  		if (write_length <= VHOST_PAGE_SIZE)
-> -- 
-> 1.8.3.1
+-- 
+Pierre Morel
+Linux/KVM/QEMU in Böblingen - Germany
+
