@@ -2,101 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E791B1871E
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 10:55:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E4FB1873D
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 10:59:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725992AbfEIIzs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 04:55:48 -0400
-Received: from mail-wr1-f51.google.com ([209.85.221.51]:36864 "EHLO
-        mail-wr1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725821AbfEIIzs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 May 2019 04:55:48 -0400
-Received: by mail-wr1-f51.google.com with SMTP id a12so1863947wrn.4
-        for <kvm@vger.kernel.org>; Thu, 09 May 2019 01:55:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=wQu5Z2gL0wK+NXfAxHh2EB1/dvUjUq3b6ED7tJb6JLw=;
-        b=Wlvv4JgOyd18z441uvcLZXT9T5pRuM/+ucM4L1IguXAICCy76Ug7W6CMESuamEk7+x
-         AYkXNv9OxZLJ0IyZWd+MgTzGv2DNkdMQ+MfoPjtCAV6bxzDVcAo0POF4gjNdD8GL8zs7
-         W1H8OWhOzy7Bg6wldR5bZiUW0Y5d9UfAPdD8VBbh96UIL5H35IdsCdABB27p5cNw2VDw
-         BfkvWouNT4C0Uv03CYKGSdZOjTqvK7flgaRPIGQELClkGnNVrb998nsgJCCgCmFxeox5
-         Qigi4SRdHceXAch/y/ZQOo30aX+CznhsTGYQPMEpvb756ktfxo2n0v28OR9DPBv2xIlZ
-         SaCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=wQu5Z2gL0wK+NXfAxHh2EB1/dvUjUq3b6ED7tJb6JLw=;
-        b=JgytLJQecpA0ydUyV8kj2ZcMePI4F/AfFAQhjADZ42Cb2+44dyiLycZ/PuxfCgSeQc
-         /eDzD5noTZM6mARvCwkqnTYfTFaIRsPLd9CnFCTIlSRGv9RrRS5SrWh55UaNknbzEblU
-         kgXRhE2ZJydojC5vKzok/T/lYfrTWKFxgdOjPbktVYMg0fsVI+rv37SE55iQWM4Es+Iv
-         TtYEErb8pgVpBNJDcNJBp1MROBsf0oLE42JAib/giEbC9xe1TrYAudgMMR9IUTnurQA9
-         5txc+kxYfSdU9BZq1ksOQjUdHvXJqHGvLIwbghP5BJh12HFHoG8WhuTaF58X1EJwhauA
-         6f0g==
-X-Gm-Message-State: APjAAAVkhEPtZVYUpZrkL+s40HuKz6Im+8gRpR+8gUpvL3nZtzgyoeEo
-        CxRELXKmELYyNNvtIUtU316Oic1VvFA=
-X-Google-Smtp-Source: APXvYqy95q8ZmqWtQ+vAS/k9IdTt5uWkPaXYwEM3RKRebmZHEBaToqkzhMTbOgrF7Q7qNP9fE654vA==
-X-Received: by 2002:adf:f90c:: with SMTP id b12mr1995289wrr.63.1557392146242;
-        Thu, 09 May 2019 01:55:46 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id e8sm4704062wrc.34.2019.05.09.01.55.45
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 09 May 2019 01:55:45 -0700 (PDT)
-Date:   Thu, 9 May 2019 09:55:44 +0100
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     ivo welch <ivo.welch@ucla.edu>
-Cc:     kvm@vger.kernel.org
-Subject: Re: developer intro
-Message-ID: <20190509085544.GA15331@stefanha-x1.localdomain>
-References: <CAJrNScT9i3jGY9DDGUHjtHZKJQ_RLsHM3j90Tzjpxfx0+XXV8Q@mail.gmail.com>
+        id S1726858AbfEII7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 04:59:41 -0400
+Received: from foss.arm.com ([217.140.101.70]:34836 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726798AbfEII71 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 May 2019 04:59:27 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1BAFF374;
+        Thu,  9 May 2019 01:59:27 -0700 (PDT)
+Received: from [10.1.215.53] (e121566-lin.cambridge.arm.com [10.1.215.53])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4D0233F575;
+        Thu,  9 May 2019 01:59:26 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH v2 4/4] arm: Remove redeundant page zeroing
+To:     nadav.amit@gmail.com, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>
+References: <20190503103207.9021-1-nadav.amit@gmail.com>
+ <20190503103207.9021-5-nadav.amit@gmail.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <bef927bd-6326-4f4c-6426-403179102e95@arm.com>
+Date:   Thu, 9 May 2019 09:59:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="0F1p//8PRICkK4MW"
-Content-Disposition: inline
-In-Reply-To: <CAJrNScT9i3jGY9DDGUHjtHZKJQ_RLsHM3j90Tzjpxfx0+XXV8Q@mail.gmail.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <20190503103207.9021-5-nadav.amit@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 5/3/19 11:32 AM, nadav.amit@gmail.com wrote:
+> From: Nadav Amit <nadav.amit@gmail.com>
 
---0F1p//8PRICkK4MW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Documentation/process/submitting-patches.rst says that the "From" tag is only
+needed if you're submitting the patches on behalf of someone else (line 632).
 
-On Wed, May 01, 2019 at 03:45:58PM -0700, ivo welch wrote:
-> Ladies and Gents--- I want to learn how to write a pseudo-storage
-> device, where the host can observe and potentially intercept read and
-> write requests to LBAs by the guest(s).  I am looking for a starter
-> docs, tutorials, examples, general docs, etc.  (Or perhaps is someone
-> interested in helping me set this up for pay, especially if such docs
-> are hard to find?)
+>
+> Now that alloc_page() zeros the page, remove the redundant page zeroing.
+>
+> Suggested-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+> ---
+>  lib/arm/asm/pgtable.h   | 2 --
+>  lib/arm/mmu.c           | 1 -
+>  lib/arm64/asm/pgtable.h | 1 -
+>  3 files changed, 4 deletions(-)
+>
+> diff --git a/lib/arm/asm/pgtable.h b/lib/arm/asm/pgtable.h
+> index b614bce..241dff6 100644
+> --- a/lib/arm/asm/pgtable.h
+> +++ b/lib/arm/asm/pgtable.h
+> @@ -53,7 +53,6 @@ static inline pmd_t *pmd_alloc_one(void)
+>  {
+>  	assert(PTRS_PER_PMD * sizeof(pmd_t) == PAGE_SIZE);
+>  	pmd_t *pmd = alloc_page();
+> -	memset(pmd, 0, PTRS_PER_PMD * sizeof(pmd_t));
+>  	return pmd;
+>  }
+>  static inline pmd_t *pmd_alloc(pgd_t *pgd, unsigned long addr)
+> @@ -80,7 +79,6 @@ static inline pte_t *pte_alloc_one(void)
+>  {
+>  	assert(PTRS_PER_PTE * sizeof(pte_t) == PAGE_SIZE);
+>  	pte_t *pte = alloc_page();
+> -	memset(pte, 0, PTRS_PER_PTE * sizeof(pte_t));
+>  	return pte;
+>  }
+>  static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
+> diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
+> index 03f6622..3d38c83 100644
+> --- a/lib/arm/mmu.c
+> +++ b/lib/arm/mmu.c
+> @@ -166,7 +166,6 @@ void *setup_mmu(phys_addr_t phys_end)
+>  #endif
+>  
+>  	mmu_idmap = alloc_page();
+> -	memset(mmu_idmap, 0, PAGE_SIZE);
+>  
+>  	/*
+>  	 * mach-virt I/O regions:
+> diff --git a/lib/arm64/asm/pgtable.h b/lib/arm64/asm/pgtable.h
+> index 5860abe..ee0a2c8 100644
+> --- a/lib/arm64/asm/pgtable.h
+> +++ b/lib/arm64/asm/pgtable.h
+> @@ -61,7 +61,6 @@ static inline pte_t *pte_alloc_one(void)
+>  {
+>  	assert(PTRS_PER_PTE * sizeof(pte_t) == PAGE_SIZE);
+>  	pte_t *pte = alloc_page();
+> -	memset(pte, 0, PTRS_PER_PTE * sizeof(pte_t));
+>  	return pte;
+>  }
+>  static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
+In the subject line: s/redeundant/redundant (this also applies to patches 2 and 3).
 
-Writing a new emulated device is not necessary.
+The patch looks reasonable, it removes the calls to memset only when we're
+certain that the address came from alloc_page. So with the above minor changes:
 
-You can configure an NBD server or iSCSI target.  QEMU sends I/O
-requests your custom server so you can do anything you want.  Writing an
-NBD server is fairly simple or you can use existing code like nbdkit
-(https://github.com/libguestfs/nbdkit).
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Stefan
-
---0F1p//8PRICkK4MW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzT6u4ACgkQnKSrs4Gr
-c8gNTQf/WiOnX127U0SujoaPzpGgvi4AXT5XaGraygW/pCpNBUTBR5SpMORBxoGP
-N85d0p6YLRb7/S29cn7hH6T4icZHMcte54Q9nUeZTzWMR7vHDXihzhNvsWK6bxQ7
-5yDTOjQMRd1dQBKRNDAQqdsz9kTjaQINbu+CcOFN8ta2oaPHDT0lIBtYe0PMnG/o
-GDdzG3JdTjWlDWfSsb27kCcvn3xPwMRYWmzSkwd7D17I9oYgMn9WmaqY+9cCdSoQ
-n/RUsaBd/K2Au70iuSuG6O4kSXKOQ6hxlPLNv+R/6SNCp/hFOnosY3FxxR+Bq+TP
-mYU6Z1FXkmKIzbqs8+llrcf7kgcR7g==
-=4RoY
------END PGP SIGNATURE-----
-
---0F1p//8PRICkK4MW--
