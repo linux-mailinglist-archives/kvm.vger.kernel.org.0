@@ -2,261 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 43AA518FDC
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 20:05:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F6E51902B
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 20:26:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726714AbfEISF3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 14:05:29 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41668 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726683AbfEISF2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 May 2019 14:05:28 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x49I0tie039828
-        for <kvm@vger.kernel.org>; Thu, 9 May 2019 14:05:27 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2scr0hjrcs-1
+        id S1726764AbfEIS0L convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 9 May 2019 14:26:11 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37706 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726632AbfEIS0L (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 May 2019 14:26:11 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x49ILclA121496
+        for <kvm@vger.kernel.org>; Thu, 9 May 2019 14:26:10 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2scqnw4f3h-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 09 May 2019 14:05:27 -0400
+        for <kvm@vger.kernel.org>; Thu, 09 May 2019 14:26:09 -0400
 Received: from localhost
-        by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <jjherne@linux.ibm.com>;
-        Thu, 9 May 2019 19:05:26 +0100
-Received: from b01cxnp22034.gho.pok.ibm.com (9.57.198.24)
-        by e12.ny.us.ibm.com (146.89.104.199) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Thu, 9 May 2019 19:26:07 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 9 May 2019 19:05:24 +0100
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x49I5L1X34144330
+        Thu, 9 May 2019 19:26:04 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x49IQ32C59441336
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 May 2019 18:05:21 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 80CF228066;
-        Thu,  9 May 2019 18:05:21 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2287428060;
-        Thu,  9 May 2019 18:05:21 +0000 (GMT)
-Received: from [9.60.75.213] (unknown [9.60.75.213])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu,  9 May 2019 18:05:21 +0000 (GMT)
-Reply-To: jjherne@linux.ibm.com
-Subject: Re: [PATCH 04/10] s390/mm: force swiotlb for protected virtualization
-To:     Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, "Cornelia Huck ," <cohuck@redhat.com>,
+        Thu, 9 May 2019 18:26:03 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E4E1311C052;
+        Thu,  9 May 2019 18:26:02 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1560811C050;
+        Thu,  9 May 2019 18:26:02 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.181.188])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 May 2019 18:26:02 +0000 (GMT)
+Date:   Thu, 9 May 2019 20:26:00 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>,
         Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        Sebastian Ott <sebott@linux.ibm.com>
-References: <20190426183245.37939-5-pasic@linux.ibm.com>
- <ad23f5e7-dc78-04af-c892-47bbc65134c6@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
         virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin ," <mst@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
         Christoph Hellwig <hch@infradead.org>,
-        "Thomas Huth ," <thuth@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        "Vasily Gorbik ," <gor@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Farhan Ali <alifm@linux.ibm.com>,
         Eric Farman <farman@linux.ibm.com>
-From:   "Jason J. Herne" <jjherne@linux.ibm.com>
+Subject: Re: [PATCH 08/10] virtio/s390: add indirection to indicators access
+In-Reply-To: <a4bf1976-8037-63bb-2cf6-c389edbd2e89@linux.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+        <20190426183245.37939-9-pasic@linux.ibm.com>
+        <716d47ca-016f-e8f4-6d78-7746a7d9f6ba@linux.ibm.com>
+        <a4bf1976-8037-63bb-2cf6-c389edbd2e89@linux.ibm.com>
 Organization: IBM
-Date:   Thu, 9 May 2019 14:05:20 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <ad23f5e7-dc78-04af-c892-47bbc65134c6@linux.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 X-TM-AS-GCONF: 00
-x-cbid: 19050918-0060-0000-0000-0000033E0CE0
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011078; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000285; SDB=6.01200929; UDB=6.00630161; IPR=6.00981820;
- MB=3.00026815; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-09 18:05:26
+x-cbid: 19050918-0028-0000-0000-0000036C075D
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050918-0061-0000-0000-000049494241
-Message-Id: <4c7a990a-7f11-17f3-2024-18acaf7ceb06@linux.ibm.com>
+x-cbparentid: 19050918-0029-0000-0000-0000242B8A0E
+Message-Id: <20190509202600.4fd6aebe.pasic@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-09_02:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905090103
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905090105
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Subject: [PATCH 04/10] s390/mm: force swiotlb for protected virtualization
-> Date: Fri, 26 Apr 2019 20:32:39 +0200
-> From: Halil Pasic <pasic@linux.ibm.com>
-> To: kvm@vger.kernel.org, linux-s390@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>, 
-> Martin Schwidefsky <schwidefsky@de.ibm.com>, Sebastian Ott <sebott@linux.ibm.com>
-> CC: Halil Pasic <pasic@linux.ibm.com>, virtualization@lists.linux-foundation.org, Michael 
-> S. Tsirkin <mst@redhat.com>, Christoph Hellwig <hch@infradead.org>, Thomas Huth 
-> <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Viktor Mihajlovski 
-> <mihajlov@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Janosch Frank 
-> <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, Farhan Ali 
-> <alifm@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>
-> 
-> On s390, protected virtualization guests have to use bounced I/O
-> buffers.  That requires some plumbing.
-> 
-> Let us make sure, any device that uses DMA API with direct ops correctly
-> is spared from the problems, that a hypervisor attempting I/O to a
-> non-shared page would bring.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> ---
->   arch/s390/Kconfig                   |  4 +++
->   arch/s390/include/asm/mem_encrypt.h | 18 +++++++++++++
->   arch/s390/mm/init.c                 | 50 +++++++++++++++++++++++++++++++++++++
->   3 files changed, 72 insertions(+)
->   create mode 100644 arch/s390/include/asm/mem_encrypt.h
-> 
-> diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
-> index 1c3fcf19c3af..5500d05d4d53 100644
-> --- a/arch/s390/Kconfig
-> +++ b/arch/s390/Kconfig
-> @@ -1,4 +1,7 @@
->   # SPDX-License-Identifier: GPL-2.0
-> +config ARCH_HAS_MEM_ENCRYPT
-> +        def_bool y
-> +
->   config MMU
->       def_bool y
->   @@ -191,6 +194,7 @@ config S390
->       select ARCH_HAS_SCALED_CPUTIME
->       select VIRT_TO_BUS
->       select HAVE_NMI
-> +    select SWIOTLB
->     config SCHED_OMIT_FRAME_POINTER
-> diff --git a/arch/s390/include/asm/mem_encrypt.h b/arch/s390/include/asm/mem_encrypt.h
-> new file mode 100644
-> index 000000000000..0898c09a888c
-> --- /dev/null
-> +++ b/arch/s390/include/asm/mem_encrypt.h
-> @@ -0,0 +1,18 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef S390_MEM_ENCRYPT_H__
-> +#define S390_MEM_ENCRYPT_H__
-> +
-> +#ifndef __ASSEMBLY__
-> +
-> +#define sme_me_mask    0ULL
-> +
-> +static inline bool sme_active(void) { return false; }
-> +extern bool sev_active(void);
-> +
+On Thu, 9 May 2019 14:01:01 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-I noticed this patch always returns false for sme_active. Is it safe to assume that 
-whatever fixups are required on x86 to deal with sme do not apply to s390?
-
-> +int set_memory_encrypted(unsigned long addr, int numpages);
-> +int set_memory_decrypted(unsigned long addr, int numpages);
-> +
-> +#endif    /* __ASSEMBLY__ */
-> +
-> +#endif    /* S390_MEM_ENCRYPT_H__ */
-> +
-> diff --git a/arch/s390/mm/init.c b/arch/s390/mm/init.c
-> index 3e82f66d5c61..7e3cbd15dcfa 100644
-> --- a/arch/s390/mm/init.c
-> +++ b/arch/s390/mm/init.c
-> @@ -18,6 +18,7 @@
->   #include <linux/mman.h>
->   #include <linux/mm.h>
->   #include <linux/swap.h>
-> +#include <linux/swiotlb.h>
->   #include <linux/smp.h>
->   #include <linux/init.h>
->   #include <linux/pagemap.h>
-> @@ -29,6 +30,7 @@
->   #include <linux/export.h>
->   #include <linux/cma.h>
->   #include <linux/gfp.h>
-> +#include <linux/dma-mapping.h>
->   #include <asm/processor.h>
->   #include <linux/uaccess.h>
->   #include <asm/pgtable.h>
-> @@ -42,6 +44,8 @@
->   #include <asm/sclp.h>
->   #include <asm/set_memory.h>
->   #include <asm/kasan.h>
-> +#include <asm/dma-mapping.h>
-> +#include <asm/uv.h>
->    pgd_t swapper_pg_dir[PTRS_PER_PGD] __section(.bss..swapper_pg_dir);
->   @@ -126,6 +130,50 @@ void mark_rodata_ro(void)
->       pr_info("Write protected read-only-after-init data: %luk\n", size >> 10);
->   }
->   +int set_memory_encrypted(unsigned long addr, int numpages)
-> +{
-> +    int i;
-> +
-> +    /* make all pages shared, (swiotlb, dma_free) */
-
-This comment should be "make all pages unshared"?
-
-> +    for (i = 0; i < numpages; ++i) {
-> +        uv_remove_shared(addr);
-> +        addr += PAGE_SIZE;
-> +    }
-> +    return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(set_memory_encrypted);
-> +
-> +int set_memory_decrypted(unsigned long addr, int numpages)
-> +{
-> +    int i;
-> +    /* make all pages shared (swiotlb, dma_alloca) */
-> +    for (i = 0; i < numpages; ++i) {
-> +        uv_set_shared(addr);
-> +        addr += PAGE_SIZE;
-> +    }
-> +    return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(set_memory_decrypted);
-
-The addr arguments for the above functions appear to be referring to virtual addresses. 
-Would vaddr be a better name?
-
-> +
-> +/* are we a protected virtualization guest? */
-> +bool sev_active(void)
-> +{
-> +    return is_prot_virt_guest();
-> +}
-> +EXPORT_SYMBOL_GPL(sev_active);
-> +
-> +/* protected virtualization */
-> +static void pv_init(void)
-> +{
-> +    if (!sev_active())
-> +        return;
-> +
-> +    /* make sure bounce buffers are shared */
-> +    swiotlb_init(1);
-> +    swiotlb_update_mem_attributes();
-> +    swiotlb_force = SWIOTLB_FORCE;
-> +}
-> +
->   void __init mem_init(void)
->   {
->       cpumask_set_cpu(0, &init_mm.context.cpu_attach_mask);
-> @@ -134,6 +182,8 @@ void __init mem_init(void)
->       set_max_mapnr(max_low_pfn);
->           high_memory = (void *) __va(max_low_pfn * PAGE_SIZE);
->   +    pv_init();
-> +
->       /* Setup guest page hinting */
->       cmma_init();
->   -- 2.16.4
-> 
+> On 08/05/2019 16:31, Pierre Morel wrote:
+> > On 26/04/2019 20:32, Halil Pasic wrote:
+> >> This will come in handy soon when we pull out the indicators from
+> >> virtio_ccw_device to a memory area that is shared with the hypervisor
+> >> (in particular for protected virtualization guests).
+> >>
+> >> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> >> ---
+> >> Â  drivers/s390/virtio/virtio_ccw.c | 40 
+> >> +++++++++++++++++++++++++---------------
+> >> Â  1 file changed, 25 insertions(+), 15 deletions(-)
+> >>
+> >> diff --git a/drivers/s390/virtio/virtio_ccw.c 
+> >> b/drivers/s390/virtio/virtio_ccw.c
+> >> index bb7a92316fc8..1f3e7d56924f 100644
+> >> --- a/drivers/s390/virtio/virtio_ccw.c
+> >> +++ b/drivers/s390/virtio/virtio_ccw.c
+> >> @@ -68,6 +68,16 @@ struct virtio_ccw_device {
+> >> Â Â Â Â Â  void *airq_info;
+> >> Â  };
+> >> +static inline unsigned long *indicators(struct virtio_ccw_device *vcdev)
+> >> +{
+> >> +Â Â Â  return &vcdev->indicators;
+> >> +}
+> >> +
+> >> +static inline unsigned long *indicators2(struct virtio_ccw_device 
+> >> *vcdev)
+> >> +{
+> >> +Â Â Â  return &vcdev->indicators2;
+> >> +}
+> >> +
+> >> Â  struct vq_info_block_legacy {
+> >> Â Â Â Â Â  __u64 queue;
+> >> Â Â Â Â Â  __u32 align;
+> >> @@ -337,17 +347,17 @@ static void virtio_ccw_drop_indicator(struct 
+> >> virtio_ccw_device *vcdev,
+> >> Â Â Â Â Â Â Â Â Â  ccw->cda = (__u32)(unsigned long) thinint_area;
+> >> Â Â Â Â Â  } else {
+> >> Â Â Â Â Â Â Â Â Â  /* payload is the address of the indicators */
+> >> -Â Â Â Â Â Â Â  indicatorp = kmalloc(sizeof(&vcdev->indicators),
+> >> +Â Â Â Â Â Â Â  indicatorp = kmalloc(sizeof(indicators(vcdev)),
+> >> Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  GFP_DMA | GFP_KERNEL);
+> >> Â Â Â Â Â Â Â Â Â  if (!indicatorp)
+> >> Â Â Â Â Â Â Â Â Â Â Â Â Â  return;
+> >> Â Â Â Â Â Â Â Â Â  *indicatorp = 0;
+> >> Â Â Â Â Â Â Â Â Â  ccw->cmd_code = CCW_CMD_SET_IND;
+> >> -Â Â Â Â Â Â Â  ccw->count = sizeof(&vcdev->indicators);
+> >> +Â Â Â Â Â Â Â  ccw->count = sizeof(indicators(vcdev));
+> > 
+> > This looks strange to me. Was already weird before.
+> > Lucky we are indicators are long...
+> > may be just sizeof(long)
 > 
 
--- 
--- Jason J. Herne (jjherne@linux.ibm.com)
+I'm not sure I understand where are you coming from...
+
+With CCW_CMD_SET_IND we tell the hypervisor the guest physical address
+at which the so called classic indicators. There is a comment that
+makes this obvious. The argument of the sizeof was and remained a
+pointer type. AFAIU this is what bothers you. 
+> 
+> AFAIK the size of the indicators (AIV/AIS) is not restricted by the 
+> architecture.
+
+The size of vcdev->indicators is restricted or defined by the virtio
+specification. Please have a look at '4.3.2.6.1 Setting Up Classic Queue
+Indicators' here:
+https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-1630002
+
+Since with Linux on s390 only 64 bit is supported, both the sizes are in
+line with the specification. Using u64 would semantically match the spec
+better, modulo pre virtio 1.0 which ain't specified. I did not want to
+do changes that are not necessary for what I'm trying to accomplish. If
+we want we can change these to u64 with a patch on top.
+
+> However we never use more than 64 bits, do we ever have an adapter 
+> having more than 64 different interrupts?
+
+These are one per queue. The number of queues used to be limited to 64
+but it ain't no more. If the driver uses classic notifiers, only the
+first 64 can be used.
+
+> 
+> May be we can state than we use a maximal number of AISB of 64 and 
+> therefor use indicators with a size of unsigned long, or __u64 or 
+> whatever is appropriate. Please clear this.
+> 
+
+I think you are mixing up adapter interrupts as defined by the
+architecture, with virtio indicators which are kind of a special case
+at best: the two stage stuff is modeled after AISB and AIBV.  
+
+> With this cleared:
+
+I hope, I managed to clear this up a bit. If not please try to re-state
+your concern in different words.
+
+> Reviewed-by: Pierre Morel<pmorel@linux.ibm.com>
+> 
+
+Thanks for your review!
+
+Halil
+ 
 
