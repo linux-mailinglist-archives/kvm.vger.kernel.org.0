@@ -2,78 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6369E18830
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 12:11:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16DDA1887F
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 12:47:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726452AbfEIKLO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 06:11:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49516 "EHLO mx1.redhat.com"
+        id S1726491AbfEIKrI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 06:47:08 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:44464 "EHLO mxct.zte.com.cn"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725847AbfEIKLO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 May 2019 06:11:14 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0F1E77DCC1;
-        Thu,  9 May 2019 10:11:14 +0000 (UTC)
-Received: from gondolin (dhcp-192-213.str.redhat.com [10.33.192.213])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F1B6B1001E64;
-        Thu,  9 May 2019 10:11:08 +0000 (UTC)
-Date:   Thu, 9 May 2019 12:11:06 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Sebastian Ott <sebott@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Michael Mueller <mimu@linux.ibm.com>
-Subject: Re: [PATCH 05/10] s390/cio: introduce DMA pools to cio
-Message-ID: <20190509121106.48aa04db.cohuck@redhat.com>
-In-Reply-To: <20190508232210.5a555caa.pasic@linux.ibm.com>
-References: <20190426183245.37939-1-pasic@linux.ibm.com>
-        <20190426183245.37939-6-pasic@linux.ibm.com>
-        <alpine.LFD.2.21.1905081447280.1773@schleppi>
-        <20190508232210.5a555caa.pasic@linux.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Thu, 09 May 2019 10:11:14 +0000 (UTC)
+        id S1726078AbfEIKrH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 May 2019 06:47:07 -0400
+Received: from mse-fl1.zte.com.cn (unknown [10.30.14.238])
+        by Forcepoint Email with ESMTPS id 12BAC9BBD87513C55F72;
+        Thu,  9 May 2019 18:47:03 +0800 (CST)
+Received: from notes_smtp.zte.com.cn ([10.30.1.239])
+        by mse-fl1.zte.com.cn with ESMTP id x49AktYE044383;
+        Thu, 9 May 2019 18:46:55 +0800 (GMT-8)
+        (envelope-from wang.yi59@zte.com.cn)
+Received: from fox-host8.localdomain ([10.74.120.8])
+          by szsmtp06.zte.com.cn (Lotus Domino Release 8.5.3FP6)
+          with ESMTP id 2019050918471900-10203318 ;
+          Thu, 9 May 2019 18:47:19 +0800 
+From:   Yi Wang <wang.yi59@zte.com.cn>
+To:     pbonzini@redhat.com
+Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, x86@kernel.org,
+        sean.j.christopherson@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, wang.yi59@zte.com.cn
+Subject: [PATCH v2] [next] KVM: lapic: allow set apic debug dynamically
+Date:   Thu, 9 May 2019 18:47:57 +0800
+Message-Id: <1557398877-32750-1-git-send-email-wang.yi59@zte.com.cn>
+X-Mailer: git-send-email 1.8.3.1
+X-MIMETrack: Itemize by SMTP Server on SZSMTP06/server/zte_ltd(Release 8.5.3FP6|November
+ 21, 2013) at 2019-05-09 18:47:19,
+        Serialize by Router on notes_smtp/zte_ltd(Release 9.0.1FP7|August  17, 2016) at
+ 2019-05-09 18:46:41,
+        Serialize complete at 2019-05-09 18:46:41
+X-MAIL: mse-fl1.zte.com.cn x49AktYE044383
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 8 May 2019 23:22:10 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+There are many functions invoke apic_debug(), which is defined
+a null function by default, and that's incovenient for debuging
+lapic.
 
-> On Wed, 8 May 2019 15:18:10 +0200 (CEST)
-> Sebastian Ott <sebott@linux.ibm.com> wrote:
+This patch allows setting apic debug according to add a apic_dbg
+parameter of kvm.
 
-> > > @@ -1063,6 +1163,7 @@ static int __init css_bus_init(void)
-> > >  		unregister_reboot_notifier(&css_reboot_notifier);
-> > >  		goto out_unregister;
-> > >  	}
-> > > +	cio_dma_pool_init();    
-> > 
-> > This is too late for early devices (ccw console!).  
-> 
-> You have already raised concern about this last time (thanks). I think,
-> I've addressed this issue: tje cio_dma_pool is only used by the airq
-> stuff. I don't think the ccw console needs it. Please have an other look
-> at patch #6, and explain your concern in more detail if it persists.
+Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+---
+v2: change apic_dbg to bool and tag __read_mostly. Thanks to Sean.
 
-What about changing the naming/adding comments here, so that (1) folks
-aren't confused by the same thing in the future and (2) folks don't try
-to use that pool for something needed for the early ccw consoles?
+ arch/x86/kvm/lapic.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 9bf70cf..0827e7c 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -54,8 +54,13 @@
+ #define PRIu64 "u"
+ #define PRIo64 "o"
+ 
++static bool apic_dbg __read_mostly;
++module_param(apic_dbg, bool, 0644);
++
+ /* #define apic_debug(fmt,arg...) printk(KERN_WARNING fmt,##arg) */
+-#define apic_debug(fmt, arg...) do {} while (0)
++#define apic_debug(fmt, arg...) do {  if (apic_dbg)   \
++	printk(KERN_DEBUG fmt, ##arg);    \
++} while (0)
+ 
+ /* 14 is the version for Xeon and Pentium 8.4.8*/
+ #define APIC_VERSION			(0x14UL | ((KVM_APIC_LVT_NUM - 1) << 16))
+-- 
+1.8.3.1
+
