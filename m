@@ -2,151 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4D911950C
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 00:12:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CC5C19540
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 00:34:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726865AbfEIWMX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 18:12:23 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37328 "EHLO
+        id S1726714AbfEIWeL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 18:34:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58974 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726795AbfEIWMW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 May 2019 18:12:22 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x49MCKCB114958
-        for <kvm@vger.kernel.org>; Thu, 9 May 2019 18:12:21 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2scv5x17pk-1
+        by vger.kernel.org with ESMTP id S1726686AbfEIWeL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 May 2019 18:34:11 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x49MW2IF141894
+        for <kvm@vger.kernel.org>; Thu, 9 May 2019 18:34:09 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2sctp253dn-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 09 May 2019 18:12:21 -0400
+        for <kvm@vger.kernel.org>; Thu, 09 May 2019 18:34:09 -0400
 Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
-        Thu, 9 May 2019 23:12:18 +0100
+        Thu, 9 May 2019 23:34:08 +0100
 Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 9 May 2019 23:12:16 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x49MCFFK61145188
+        Thu, 9 May 2019 23:34:05 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x49MY3iO46071960
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 May 2019 22:12:15 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 30B3FA4054;
-        Thu,  9 May 2019 22:12:15 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A1BB9A405B;
-        Thu,  9 May 2019 22:12:14 +0000 (GMT)
+        Thu, 9 May 2019 22:34:03 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9CA9FA407E;
+        Thu,  9 May 2019 22:34:03 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D2842A4076;
+        Thu,  9 May 2019 22:34:02 +0000 (GMT)
 Received: from oc2783563651 (unknown [9.145.181.188])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  9 May 2019 22:12:14 +0000 (GMT)
-Date:   Fri, 10 May 2019 00:12:12 +0200
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 May 2019 22:34:02 +0000 (GMT)
+Date:   Fri, 10 May 2019 00:34:01 +0200
 From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Parav Pandit <parav@mellanox.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: Re: [PATCHv2 08/10] vfio/mdev: Improve the create/remove sequence
-In-Reply-To: <eb34e9a3-32a3-98fe-e871-7d541d620b6e@linux.ibm.com>
-References: <20190430224937.57156-1-parav@mellanox.com>
-        <20190430224937.57156-9-parav@mellanox.com>
-        <20190508190957.673dd948.cohuck@redhat.com>
-        <VI1PR0501MB2271CFAFF2ACF145FDFD8E2ED1320@VI1PR0501MB2271.eurprd05.prod.outlook.com>
-        <20190509110600.5354463c.cohuck@redhat.com>
-        <eb34e9a3-32a3-98fe-e871-7d541d620b6e@linux.ibm.com>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>
+Subject: Re: [PATCH 04/10] s390/mm: force swiotlb for protected
+ virtualization
+In-Reply-To: <20190508151540.14ba1d90@p-imbrenda.boeblingen.de.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+        <20190426183245.37939-5-pasic@linux.ibm.com>
+        <20190508151540.14ba1d90@p-imbrenda.boeblingen.de.ibm.com>
 Organization: IBM
 X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19050922-0016-0000-0000-0000027A1961
+x-cbid: 19050922-0020-0000-0000-0000033B1532
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19050922-0017-0000-0000-000032D6D0DD
-Message-Id: <20190510001212.3e2bf5ea.pasic@linux.ibm.com>
+x-cbparentid: 19050922-0021-0000-0000-0000218DBE2D
+Message-Id: <20190510003401.4254f200.pasic@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-09_02:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905090126
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905090128
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 9 May 2019 18:26:59 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+On Wed, 8 May 2019 15:15:40 +0200
+Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
 
-> On 09/05/2019 11:06, Cornelia Huck wrote:
-> > [vfio-ap folks: find a question regarding removal further down]
-> > 
-> > On Wed, 8 May 2019 22:06:48 +0000
-> > Parav Pandit <parav@mellanox.com> wrote:
-> > 
-> >>> -----Original Message-----
-> >>> From: Cornelia Huck <cohuck@redhat.com>
-> >>> Sent: Wednesday, May 8, 2019 12:10 PM
-> >>> To: Parav Pandit <parav@mellanox.com>
-> >>> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> >>> kwankhede@nvidia.com; alex.williamson@redhat.com; cjia@nvidia.com
-> >>> Subject: Re: [PATCHv2 08/10] vfio/mdev: Improve the create/remove
-> >>> sequence
-> >>>
-> >>> On Tue, 30 Apr 2019 17:49:35 -0500
-> >>> Parav Pandit <parav@mellanox.com> wrote:
-> >>>    
+> On Fri, 26 Apr 2019 20:32:39 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
 > 
-> ...snip...
-> 
-> >>>> @@ -373,16 +330,15 @@ int mdev_device_remove(struct device *dev,
-> >>> bool force_remove)
-> >>>>   	mutex_unlock(&mdev_list_lock);
-> >>>>
-> >>>>   	type = to_mdev_type(mdev->type_kobj);
-> >>>> +	mdev_remove_sysfs_files(dev, type);
-> >>>> +	device_del(&mdev->dev);
-> >>>>   	parent = mdev->parent;
-> >>>> +	ret = parent->ops->remove(mdev);
-> >>>> +	if (ret)
-> >>>> +		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
-> >>>
-> >>> I think carrying on with removal regardless of the return code of the
-> >>> ->remove callback makes sense, as it simply matches usual practice.
-> >>> However, are we sure that every vendor driver works well with that? I think
-> >>> it should, as removal from bus unregistration (vs. from the sysfs
-> >>> file) was always something it could not veto, but have you looked at the
-> >>> individual drivers?
-> >>>    
-> >> I looked at following drivers a little while back.
-> >> Looked again now.
-> >>
-> >> drivers/gpu/drm/i915/gvt/kvmgt.c which clears the handle valid in intel_vgpu_release(), which should finish first before remove() is invoked.
-> >>
-> >> s390 vfio_ccw_mdev_remove() driver drivers/s390/cio/vfio_ccw_ops.c remove() always returns 0.
-> >> s39 crypo fails the remove() once vfio_ap_mdev_release marks kvm null, which should finish before remove() is invoked.
+> > On s390, protected virtualization guests have to use bounced I/O
+> > buffers.  That requires some plumbing.
 > > 
-> > That one is giving me a bit of a headache (the ->kvm reference is
-> > supposed to keep us from detaching while a vm is running), so let's cc:
-> > the vfio-ap maintainers to see whether they have any concerns.
+> > Let us make sure, any device that uses DMA API with direct ops
+> > correctly is spared from the problems, that a hypervisor attempting
+> > I/O to a non-shared page would bring.
 > > 
+> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> > ---
+> >  arch/s390/Kconfig                   |  4 +++
+> >  arch/s390/include/asm/mem_encrypt.h | 18 +++++++++++++
+> >  arch/s390/mm/init.c                 | 50
+> > +++++++++++++++++++++++++++++++++++++ 3 files changed, 72
+> > insertions(+) create mode 100644 arch/s390/include/asm/mem_encrypt.h
+> > 
+> > diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+> > index 1c3fcf19c3af..5500d05d4d53 100644
+> > --- a/arch/s390/Kconfig
+> > +++ b/arch/s390/Kconfig
+> > @@ -1,4 +1,7 @@
+> >  # SPDX-License-Identifier: GPL-2.0
+> > +config ARCH_HAS_MEM_ENCRYPT
+> > +        def_bool y
+> > +
+> >  config MMU
+> >  	def_bool y
+> >  
+> > @@ -191,6 +194,7 @@ config S390
+> >  	select ARCH_HAS_SCALED_CPUTIME
+> >  	select VIRT_TO_BUS
+> >  	select HAVE_NMI
+> > +	select SWIOTLB
+> >  
+> >  
+> >  config SCHED_OMIT_FRAME_POINTER
+> > diff --git a/arch/s390/include/asm/mem_encrypt.h
+> > b/arch/s390/include/asm/mem_encrypt.h new file mode 100644
+> > index 000000000000..0898c09a888c
+> > --- /dev/null
+> > +++ b/arch/s390/include/asm/mem_encrypt.h
+> > @@ -0,0 +1,18 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +#ifndef S390_MEM_ENCRYPT_H__
+> > +#define S390_MEM_ENCRYPT_H__
+> > +
+> > +#ifndef __ASSEMBLY__
+> > +
+> > +#define sme_me_mask	0ULL
 > 
-> We are aware of this race and we did correct this in the IRQ patches for 
-> which it would have become a real issue.
-> We now increment/decrement the KVM reference counter inside open and 
-> release.
-> Should be right after this.
+> This is rather ugly, but I understand why it's there
 > 
 
-Tony, what is your take on this? I don't have the bandwidth to think
-this through properly, but my intuition tells me: this might be more
-complicated than what Pierre's response suggests.
+Nod.
+
+> > +
+> > +static inline bool sme_active(void) { return false; }
+> > +extern bool sev_active(void);
+> > +
+> > +int set_memory_encrypted(unsigned long addr, int numpages);
+> > +int set_memory_decrypted(unsigned long addr, int numpages);
+> > +
+> > +#endif	/* __ASSEMBLY__ */
+> > +
+> > +#endif	/* S390_MEM_ENCRYPT_H__ */
+> > +
+> > diff --git a/arch/s390/mm/init.c b/arch/s390/mm/init.c
+> > index 3e82f66d5c61..7e3cbd15dcfa 100644
+> > --- a/arch/s390/mm/init.c
+> > +++ b/arch/s390/mm/init.c
+> > @@ -18,6 +18,7 @@
+> >  #include <linux/mman.h>
+> >  #include <linux/mm.h>
+> >  #include <linux/swap.h>
+> > +#include <linux/swiotlb.h>
+> >  #include <linux/smp.h>
+> >  #include <linux/init.h>
+> >  #include <linux/pagemap.h>
+> > @@ -29,6 +30,7 @@
+> >  #include <linux/export.h>
+> >  #include <linux/cma.h>
+> >  #include <linux/gfp.h>
+> > +#include <linux/dma-mapping.h>
+> >  #include <asm/processor.h>
+> >  #include <linux/uaccess.h>
+> >  #include <asm/pgtable.h>
+> > @@ -42,6 +44,8 @@
+> >  #include <asm/sclp.h>
+> >  #include <asm/set_memory.h>
+> >  #include <asm/kasan.h>
+> > +#include <asm/dma-mapping.h>
+> > +#include <asm/uv.h>
+> >  
+> >  pgd_t swapper_pg_dir[PTRS_PER_PGD] __section(.bss..swapper_pg_dir);
+> >  
+> > @@ -126,6 +130,50 @@ void mark_rodata_ro(void)
+> >  	pr_info("Write protected read-only-after-init data: %luk\n",
+> > size >> 10); }
+> >  
+> > +int set_memory_encrypted(unsigned long addr, int numpages)
+> > +{
+> > +	int i;
+> > +
+> > +	/* make all pages shared, (swiotlb, dma_free) */
+> 
+> this is a copypaste typo, I think? (should be UNshared?)
+> also, it doesn't make ALL pages unshared, but only those specified in
+> the parameters
+
+Right a copy paste error. Needs correction. The all was meant like all
+pages in the range specified by the arguments. But it is better changed
+since it turned out to be confusing.
+
+> 
+> with this fixed:
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> 
+
+Thanks!
+
+> > +	for (i = 0; i < numpages; ++i) {
+> > +		uv_remove_shared(addr);
+> > +		addr += PAGE_SIZE;
+> > +	}
+> > +	return 0;
+> > +}
+> > +EXPORT_SYMBOL_GPL(set_memory_encrypted);
+> > +
+> > +int set_memory_decrypted(unsigned long addr, int numpages)
+> > +{
+> > +	int i;
+> > +	/* make all pages shared (swiotlb, dma_alloca) */
+> 
+> same here with ALL
+> 
+> > +	for (i = 0; i < numpages; ++i) {
+> > +		uv_set_shared(addr);
+> > +		addr += PAGE_SIZE;
+> > +	}
+> > +	return 0;
+> > +}
+> > +EXPORT_SYMBOL_GPL(set_memory_decrypted);
+> > +
+> > +/* are we a protected virtualization guest? */
+> > +bool sev_active(void)
+> 
+> this is also ugly. the correct solution would be probably to refactor
+> everything, including all the AMD SEV code.... let's not go there
+> 
+
+Nod. Maybe later.
+
+> > +{
+> > +	return is_prot_virt_guest();
+> > +}
+> > +EXPORT_SYMBOL_GPL(sev_active);
+> > +
+> > +/* protected virtualization */
+> > +static void pv_init(void)
+> > +{
+> > +	if (!sev_active())
+> 
+> can't you just use is_prot_virt_guest here?
+> 
+
+Sure! I guess it would be less confusing. It is something I did not
+remember to change when the interface for this provided by uv.h went
+from sketchy to nice.
+
+Thanks again!
 
 Regards,
-Halil 
+Halil
+
+> > +		return;
+> > +
+> > +	/* make sure bounce buffers are shared */
+> > +	swiotlb_init(1);
+> > +	swiotlb_update_mem_attributes();
+> > +	swiotlb_force = SWIOTLB_FORCE;
+> > +}
+> > +
+> >  void __init mem_init(void)
+> >  {
+> >  	cpumask_set_cpu(0, &init_mm.context.cpu_attach_mask);
+> > @@ -134,6 +182,8 @@ void __init mem_init(void)
+> >  	set_max_mapnr(max_low_pfn);
+> >          high_memory = (void *) __va(max_low_pfn * PAGE_SIZE);
+> >  
+> > +	pv_init();
+> > +
+> >  	/* Setup guest page hinting */
+> >  	cmma_init();
+> >  
+> 
 
