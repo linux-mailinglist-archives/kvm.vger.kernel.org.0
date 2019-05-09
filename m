@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D7DF194E2
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 23:47:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5495F194DF
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 23:47:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727032AbfEIVrU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 17:47:20 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:48968 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726989AbfEIVrT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 May 2019 17:47:19 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x49LihxY185862;
-        Thu, 9 May 2019 21:46:58 GMT
+        id S1726874AbfEIVrP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 17:47:15 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:55152 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726219AbfEIVrP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 May 2019 17:47:15 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x49LiP2Q167641;
+        Thu, 9 May 2019 21:46:59 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2018-07-02;
- bh=ILnW0wsBivAJkm1XbUoPFgltWm+r7j/kZDMAfDd4L/Y=;
- b=miM7XTI63VOOmlnSechjN9cAWV2t/f0lXkAgxEg3Thyw4I5ebUNbH7f4pb0aPeMpfh4Y
- i3beZSLA4iDaQMh1bCxm/zfcO/KsrLeSA8PEncjhvvIruHkkpvGOfGc1NzFCYziuiqL2
- xsKu6oMgIdTseljXLz3K2Z9W6WlOpr5H4P9EOO+bIlxcygVWwU2kCIPl4g7yOBwi9NqJ
- lOZdPiLPxtFK2Z8kFhQ0pta+PHmLKdml+ZoFcIuH1Jkgq877aXorZB4Dd7pTUeVFKHUP
- qafDZPBayDIYuTesi9ja/BJLSyDnOwT++Bbd/86RCylIda/oThC6Js/7kmOZHlT3klee Eg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2s94b15nka-1
+ bh=hd70tYlMcjdgM84KL5FEKIqbP+hq+PffgStFpNuCJwI=;
+ b=43Xi/4JMWWTUUV02XhV/Mk3Xnmbug4lCcDcBH9wfLMAd91yLIWMvsUYvQ0qCZqCt+GWW
+ dOQOc9EAg2DZE+TeJypJibVj4jfFUykqN8yP2BokejrWEt+Kg/noJWuQIHao/35I04fN
+ FsPFVLzPPUNQN9ZY8lex6kIdzrfUfuOTUjPW5A/CvrltRccZ0mQUnm6tKu9jxH0nmZC6
+ 1zkFV7B2+WpC22V0RvS/40ocLEq1zBp4OiEI4hVxG4mPerQkBS1yIbvFcIsjRrCqOp7y
+ YRtGI2hcGyjbjoLDG2xFcRAbn/jhFsKS8QZq/70YoBMmWQXsr5WucqY5DcNOjtfp/emI rg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2s94bgdp0k-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Thu, 09 May 2019 21:46:58 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x49LjC9r191548;
-        Thu, 9 May 2019 21:46:57 GMT
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x49Lj6YZ159159;
+        Thu, 9 May 2019 21:46:58 GMT
 Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 2schw032jp-1
+        by aserp3030.oracle.com with ESMTP id 2scpy5wvjk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Thu, 09 May 2019 21:46:57 +0000
 Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x49Lkv1Z032089;
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x49LkvOd032092;
         Thu, 9 May 2019 21:46:57 GMT
 Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
         by default (Oracle Beehive Gateway v4.0)
@@ -43,9 +43,9 @@ Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
 From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
 To:     kvm@vger.kernel.org
 Cc:     rkrcmar@redhat.com, pbonzini@redhat.com, jmattson@google.com
-Subject: [PATCH 1/4][kvm-unit-test nVMX]: Rename guest_pat_main to guest_state_test_main
-Date:   Thu,  9 May 2019 17:20:52 -0400
-Message-Id: <20190509212055.29933-2-krish.sadhukhan@oracle.com>
+Subject: [PATCH 2/4][kvm-unit-test nVMX]: Rename report_guest_pat_test to report_guest_state_test
+Date:   Thu,  9 May 2019 17:20:53 -0400
+Message-Id: <20190509212055.29933-3-krish.sadhukhan@oracle.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190509212055.29933-1-krish.sadhukhan@oracle.com>
 References: <20190509212055.29933-1-krish.sadhukhan@oracle.com>
@@ -72,31 +72,67 @@ X-Mailing-List: kvm@vger.kernel.org
 Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
 Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
 ---
- x86/vmx_tests.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ x86/vmx_tests.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
 diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index c01fa9d..ee96596 100644
+index ee96596..a339bb3 100644
 --- a/x86/vmx_tests.c
 +++ b/x86/vmx_tests.c
-@@ -4995,7 +4995,7 @@ static void test_sysenter_field(u32 field, const char *name)
- 	vmcs_write(field, addr_saved);
+@@ -5007,13 +5007,14 @@ static void guest_state_test_main(void)
+ 	asm volatile("fnop");
  }
  
--static void guest_pat_main(void)
-+static void guest_state_test_main(void)
+-static void report_guest_pat_test(const char *test, u32 xreason, u64 guest_pat)
++static void report_guest_state_test(const char *test, u32 xreason,
++				    u64 field, const char * field_name)
  {
- 	while (1) {
- 		if (vmx_get_test_stage() != 2)
-@@ -5097,7 +5097,7 @@ static void test_pat(u32 fld, const char * fld_name, u32 ctrl_fld, u64 ctrl_bit)
- 	vmcs_clear_bits(ctrl_fld, ctrl_bit);
- 	if (fld == GUEST_PAT) {
- 		vmx_set_test_stage(1);
--		test_set_guest(guest_pat_main);
-+		test_set_guest(guest_state_test_main);
- 	}
+ 	u32 reason = vmcs_read(EXI_REASON);
+ 	u64 guest_rip;
+ 	u32 insn_len;
  
- 	for (i = 0; i < 256; i = (i < PAT_VAL_LIMIT) ? i + 1 : i * 2) {
+-	report("%s, GUEST_PAT %lx", reason == xreason, test, guest_pat);
++	report("%s, %s %lx", reason == xreason, test, field_name, field);
+ 
+ 	guest_rip = vmcs_read(GUEST_RIP);
+ 	insn_len = vmcs_read(EXI_INST_LEN);
+@@ -5112,8 +5113,9 @@ static void test_pat(u32 fld, const char * fld_name, u32 ctrl_fld, u64 ctrl_bit)
+ 
+ 			} else {	// GUEST_PAT
+ 				__enter_guest(ABORT_ON_EARLY_VMENTRY_FAIL);
+-				report_guest_pat_test("ENT_LOAD_PAT enabled",
+-						       VMX_VMCALL, val);
++				report_guest_state_test("ENT_LOAD_PAT enabled",
++							VMX_VMCALL, val,
++							"GUEST_PAT");
+ 			}
+ 		}
+ 	}
+@@ -5139,17 +5141,19 @@ static void test_pat(u32 fld, const char * fld_name, u32 ctrl_fld, u64 ctrl_bit)
+ 			} else {	// GUEST_PAT
+ 				if (i == 0x2 || i == 0x3 || i == 0x8) {
+ 					__enter_guest(ABORT_ON_EARLY_VMENTRY_FAIL);
+-					report_guest_pat_test("ENT_LOAD_PAT "
+-								"enabled",
++					report_guest_state_test("ENT_LOAD_PAT "
++							     "enabled",
+ 							     VMX_FAIL_STATE |
+ 							     VMX_ENTRY_FAILURE,
+-							     val);
++							     val,
++							     "GUEST_PAT");
+ 				} else {
+ 					__enter_guest(ABORT_ON_EARLY_VMENTRY_FAIL);
+-					report_guest_pat_test("ENT_LOAD_PAT "
++					report_guest_state_test("ENT_LOAD_PAT "
+ 							      "enabled",
+ 							      VMX_VMCALL,
+-							      val);
++							      val,
++							      "GUEST_PAT");
+ 				}
+ 			}
+ 
 -- 
 2.20.1
 
