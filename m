@@ -2,230 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F97D18DD4
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 18:16:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C059518E00
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 18:27:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726686AbfEIQQc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 12:16:32 -0400
-Received: from mail-eopbgr130089.outbound.protection.outlook.com ([40.107.13.89]:15734
-        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726561AbfEIQQc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 May 2019 12:16:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Lil6KSikLDLuafqh6xgS8aOiOBaWOhOvKXjzkKBXk2U=;
- b=FqdUwE3FzNokYxsUhUx3TlZuYO42FbAUodJUBty8sh2DII8RK0AToAXqljnVPlvbu6F2vKRXWOEHxPzZZ6ly/2LjSIYUrqQpAsnqIrjX2oBpbhB4+VxAhkeisEexcNlIy3Vb5I6T0D4c5M/gCeNlC8yCGEobyJB72iFg3eBV3ZI=
-Received: from VI1PR0501MB2271.eurprd05.prod.outlook.com (10.169.134.149) by
- VI1PR0501MB2864.eurprd05.prod.outlook.com (10.172.12.9) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1856.12; Thu, 9 May 2019 16:16:26 +0000
-Received: from VI1PR0501MB2271.eurprd05.prod.outlook.com
- ([fe80::8810:9799:ab77:9494]) by VI1PR0501MB2271.eurprd05.prod.outlook.com
- ([fe80::8810:9799:ab77:9494%2]) with mapi id 15.20.1878.022; Thu, 9 May 2019
- 16:16:26 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        id S1727110AbfEIQ1J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 12:27:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55804 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726682AbfEIQ1J (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 May 2019 12:27:09 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x49GO59g062615
+        for <kvm@vger.kernel.org>; Thu, 9 May 2019 12:27:08 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2scq0ssxjf-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 09 May 2019 12:27:07 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Thu, 9 May 2019 17:27:05 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 9 May 2019 17:27:02 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x49GR0CL34930696
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 May 2019 16:27:00 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 847CC42047;
+        Thu,  9 May 2019 16:27:00 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CB53542042;
+        Thu,  9 May 2019 16:26:59 +0000 (GMT)
+Received: from [9.145.47.201] (unknown [9.145.47.201])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 May 2019 16:26:59 +0000 (GMT)
+Reply-To: pmorel@linux.ibm.com
+Subject: Re: [PATCHv2 08/10] vfio/mdev: Improve the create/remove sequence
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Parav Pandit <parav@mellanox.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
         "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>
-Subject: RE: [PATCHv2 09/10] vfio/mdev: Avoid creating sysfs remove file on
- stale device removal
-Thread-Topic: [PATCHv2 09/10] vfio/mdev: Avoid creating sysfs remove file on
- stale device removal
-Thread-Index: AQHU/6cN2gCBUIHpe0O+UYvmhXR8xKZhhEWAgABRkCCAALsigIAAdH9w
-Date:   Thu, 9 May 2019 16:16:26 +0000
-Message-ID: <VI1PR0501MB22716911D19CBC718B4FEF07D1330@VI1PR0501MB2271.eurprd05.prod.outlook.com>
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
 References: <20190430224937.57156-1-parav@mellanox.com>
-        <20190430224937.57156-10-parav@mellanox.com>
-        <20190508191635.05a0f277.cohuck@redhat.com>
-        <VI1PR0501MB2271E76A8B5E8D00AFEA8D97D1320@VI1PR0501MB2271.eurprd05.prod.outlook.com>
- <20190509111817.36ff1791.cohuck@redhat.com>
-In-Reply-To: <20190509111817.36ff1791.cohuck@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [208.176.44.194]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 32205a9e-5479-4974-498e-08d6d499afbd
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:VI1PR0501MB2864;
-x-ms-traffictypediagnostic: VI1PR0501MB2864:
-x-microsoft-antispam-prvs: <VI1PR0501MB28641E8747B16E1F71FA93BDD1330@VI1PR0501MB2864.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:913;
-x-forefront-prvs: 003245E729
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(396003)(136003)(39860400002)(376002)(346002)(51444003)(199004)(189003)(13464003)(7736002)(74316002)(6916009)(2906002)(305945005)(186003)(33656002)(256004)(102836004)(26005)(11346002)(25786009)(14444005)(68736007)(14454004)(316002)(99286004)(53546011)(54906003)(446003)(3846002)(6116002)(6506007)(52536014)(6436002)(81166006)(86362001)(81156014)(4326008)(476003)(486006)(71200400001)(71190400001)(5660300002)(7696005)(66066001)(478600001)(229853002)(64756008)(66446008)(8676002)(66556008)(8936002)(66476007)(9686003)(73956011)(66946007)(76116006)(55016002)(53936002)(6246003)(76176011);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0501MB2864;H:VI1PR0501MB2271.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: RVt5fSQ+aqg5iUpWHC/43g4u4BPsJJ5B/aq9RPexPYHxH/oxeByyIqdLGGbzupLKANLVEMZDo/aSM6C0ooC8Tssp6pjraqEnxt8yLOq450rhBenZZ1dCC8zVxnD7di/gDHatiapo+dcE8Ot7Q8V4fMjlaEaSXEEulw8C4/TCcil9Jv9Wxp+5RUR8LYavyhVpFUCtM9Yku1uPOxMTsbGIULjEx6/h7OyFvF2kZTrdfRP3gamh2aAJq7HvKaoLQYvXXselQMmxJe70EbYFgx+RvBdn2Mv45iNRpJQ2cS0+KTus6C5siaPhsB8x6LZi5YL6QhhzNql0E233ckCUEHUr9t4bsYrYoviAFvNK5z1OkV5yXuxHbMW8ejJnM/coQ1HpsQJVeL7FuWxRN1OdVjs1uo3uPYX4PYrmOC5GfVvdgVg=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ <20190430224937.57156-9-parav@mellanox.com>
+ <20190508190957.673dd948.cohuck@redhat.com>
+ <VI1PR0501MB2271CFAFF2ACF145FDFD8E2ED1320@VI1PR0501MB2271.eurprd05.prod.outlook.com>
+ <20190509110600.5354463c.cohuck@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Thu, 9 May 2019 18:26:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 32205a9e-5479-4974-498e-08d6d499afbd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 May 2019 16:16:26.1475
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0501MB2864
+In-Reply-To: <20190509110600.5354463c.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19050916-0008-0000-0000-000002E4FA37
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050916-0009-0000-0000-0000225181AA
+Message-Id: <eb34e9a3-32a3-98fe-e871-7d541d620b6e@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-09_02:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905090093
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: Cornelia Huck <cohuck@redhat.com>
-> Sent: Thursday, May 9, 2019 4:18 AM
-> To: Parav Pandit <parav@mellanox.com>
-> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> kwankhede@nvidia.com; alex.williamson@redhat.com; cjia@nvidia.com
-> Subject: Re: [PATCHv2 09/10] vfio/mdev: Avoid creating sysfs remove file =
-on
-> stale device removal
->=20
-> On Wed, 8 May 2019 22:13:28 +0000
+On 09/05/2019 11:06, Cornelia Huck wrote:
+> [vfio-ap folks: find a question regarding removal further down]
+> 
+> On Wed, 8 May 2019 22:06:48 +0000
 > Parav Pandit <parav@mellanox.com> wrote:
->=20
-> > > -----Original Message-----
-> > > From: Cornelia Huck <cohuck@redhat.com>
-> > > Sent: Wednesday, May 8, 2019 12:17 PM
-> > > To: Parav Pandit <parav@mellanox.com>
-> > > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > > kwankhede@nvidia.com; alex.williamson@redhat.com; cjia@nvidia.com
-> > > Subject: Re: [PATCHv2 09/10] vfio/mdev: Avoid creating sysfs remove
-> > > file on stale device removal
-> > >
-> > > On Tue, 30 Apr 2019 17:49:36 -0500
-> > > Parav Pandit <parav@mellanox.com> wrote:
-> > >
-> > > > If device is removal is initiated by two threads as below, mdev
-> > > > core attempts to create a syfs remove file on stale device.
-> > > > During this flow, below [1] call trace is observed.
-> > > >
-> > > >      cpu-0                                    cpu-1
-> > > >      -----                                    -----
-> > > >   mdev_unregister_device()
-> > > >     device_for_each_child
-> > > >        mdev_device_remove_cb
-> > > >           mdev_device_remove
-> > > >                                        user_syscall
-> > > >                                          remove_store()
-> > > >                                            mdev_device_remove()
-> > > >                                         [..]
-> > > >    unregister device();
-> > > >                                        /* not found in list or
-> > > >                                         * active=3Dfalse.
-> > > >                                         */
-> > > >                                           sysfs_create_file()
-> > > >                                           ..Call trace
-> > > >
-> > > > Now that mdev core follows correct device removal system of the
-> > > > linux bus model, remove shouldn't fail in normal cases. If it
-> > > > fails, there is no point of creating a stale file or checking for s=
-pecific
-> error status.
-> > >
-> > > Which error cases are left? Is there anything that does not indicate
-> > > that something got terribly messed up internally?
-> > >
-> > Few reasons I can think of that can fail remove are:
-> >
-> > 1. Some device removal requires allocating memory too as it needs to is=
-sue
-> commands to device.
-> > If on the path, such allocation fails, remove can fail. However such fa=
-il to
-> allocate memory will probably result into more serious warnings before th=
-is.
->=20
-> Nod. If we're OOM, we probably have some bigger problems anyway.
->=20
-> > 2. if the device firmware has crashed, device removal commands will lik=
-ely
-> timeout and return such error upto user.
->=20
-> In that case, I'd consider the device pretty much unusable in any case.
->=20
-Right.
+> 
+>>> -----Original Message-----
+>>> From: Cornelia Huck <cohuck@redhat.com>
+>>> Sent: Wednesday, May 8, 2019 12:10 PM
+>>> To: Parav Pandit <parav@mellanox.com>
+>>> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+>>> kwankhede@nvidia.com; alex.williamson@redhat.com; cjia@nvidia.com
+>>> Subject: Re: [PATCHv2 08/10] vfio/mdev: Improve the create/remove
+>>> sequence
+>>>
+>>> On Tue, 30 Apr 2019 17:49:35 -0500
+>>> Parav Pandit <parav@mellanox.com> wrote:
+>>>    
 
-> > 3. If user tries to remove a device, while parent is already in removal=
- path,
-> this call will eventually fail as it won't find the device in the interna=
-l list.
->=20
-> This should be benign, I think.
->=20
-Right.
+...snip...
 
-> >
-> > > >
-> > > > kernel: WARNING: CPU: 2 PID: 9348 at fs/sysfs/file.c:327
-> > > > sysfs_create_file_ns+0x7f/0x90
-> > > > kernel: CPU: 2 PID: 9348 Comm: bash Kdump: loaded Not tainted
-> > > > 5.1.0-rc6-vdevbus+ #6
-> > > > kernel: Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS
-> > > > 2.0b
-> > > > 08/09/2016
-> > > > kernel: RIP: 0010:sysfs_create_file_ns+0x7f/0x90
-> > > > kernel: Call Trace:
-> > > > kernel: remove_store+0xdc/0x100 [mdev]
-> > > > kernel: kernfs_fop_write+0x113/0x1a0
-> > > > kernel: vfs_write+0xad/0x1b0
-> > > > kernel: ksys_write+0x5a/0xe0
-> > > > kernel: do_syscall_64+0x5a/0x210
-> > > > kernel: entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> > > >
-> > > > Signed-off-by: Parav Pandit <parav@mellanox.com>
-> > > > ---
-> > > >  drivers/vfio/mdev/mdev_sysfs.c | 4 +---
-> > > >  1 file changed, 1 insertion(+), 3 deletions(-)
-> > > >
-> > > > diff --git a/drivers/vfio/mdev/mdev_sysfs.c
-> > > > b/drivers/vfio/mdev/mdev_sysfs.c index 9f774b91d275..ffa3dcebf201
-> > > > 100644
-> > > > --- a/drivers/vfio/mdev/mdev_sysfs.c
-> > > > +++ b/drivers/vfio/mdev/mdev_sysfs.c
-> > > > @@ -237,10 +237,8 @@ static ssize_t remove_store(struct device
-> > > > *dev,
-> > > struct device_attribute *attr,
-> > > >  		int ret;
-> > > >
-> > > >  		ret =3D mdev_device_remove(dev);
-> > > > -		if (ret) {
-> > > > -			device_create_file(dev, attr);
-> > > > +		if (ret)
-> > >
-> > > Should you merge this into the previous patch?
-> > >
-> > I am not sure. Previous patch changes the sequence. I think that deserv=
-ed
-> an own patch by itself.
-> > This change is making use of that sequence.
-> > So its easier to review? Alex had comment in v0 to split into more logi=
-cal
-> patches, so...
-> > Specially to capture a different call trace, I cut into different patch=
-.
-> > Otherwise previous patch's commit message is too long.
->=20
-> I'm not sure if splitting out this one is worth it... your call.
->=20
-Ok. either ways...
-> >
-> > > >  			return ret;
-> > > > -		}
-> > > >  	}
-> > > >
-> > > >  	return count;
-> >
+>>>> @@ -373,16 +330,15 @@ int mdev_device_remove(struct device *dev,
+>>> bool force_remove)
+>>>>   	mutex_unlock(&mdev_list_lock);
+>>>>
+>>>>   	type = to_mdev_type(mdev->type_kobj);
+>>>> +	mdev_remove_sysfs_files(dev, type);
+>>>> +	device_del(&mdev->dev);
+>>>>   	parent = mdev->parent;
+>>>> +	ret = parent->ops->remove(mdev);
+>>>> +	if (ret)
+>>>> +		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
+>>>
+>>> I think carrying on with removal regardless of the return code of the
+>>> ->remove callback makes sense, as it simply matches usual practice.
+>>> However, are we sure that every vendor driver works well with that? I think
+>>> it should, as removal from bus unregistration (vs. from the sysfs
+>>> file) was always something it could not veto, but have you looked at the
+>>> individual drivers?
+>>>    
+>> I looked at following drivers a little while back.
+>> Looked again now.
+>>
+>> drivers/gpu/drm/i915/gvt/kvmgt.c which clears the handle valid in intel_vgpu_release(), which should finish first before remove() is invoked.
+>>
+>> s390 vfio_ccw_mdev_remove() driver drivers/s390/cio/vfio_ccw_ops.c remove() always returns 0.
+>> s39 crypo fails the remove() once vfio_ap_mdev_release marks kvm null, which should finish before remove() is invoked.
+> 
+> That one is giving me a bit of a headache (the ->kvm reference is
+> supposed to keep us from detaching while a vm is running), so let's cc:
+> the vfio-ap maintainers to see whether they have any concerns.
+> 
+
+We are aware of this race and we did correct this in the IRQ patches for 
+which it would have become a real issue.
+We now increment/decrement the KVM reference counter inside open and 
+release.
+Should be right after this.
+
+Thanks for the cc,
+Pierre
+
+
+-- 
+Pierre Morel
+Linux/KVM/QEMU in Böblingen - Germany
 
