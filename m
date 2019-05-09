@@ -2,119 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F356518784
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 11:13:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D14F918798
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 11:18:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726078AbfEIJNA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 05:13:00 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:52184 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725821AbfEIJNA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 May 2019 05:13:00 -0400
-Received: by mail-wm1-f65.google.com with SMTP id o189so2268800wmb.1;
-        Thu, 09 May 2019 02:12:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=UcO77C1d2oPlXYkp6CkiRlKtVOMkq5wxTIYeAm1syxo=;
-        b=CDkwyiO65SSVbxmKPkBw+7CcNdsw7cmG/lXhK57rnCu5hWuqjioqvSYy2l9aUikO5M
-         /nW8VgaATNCzJhdIcK9nIZxH0TZfYz86n0vwCqqh1C//E0g2pG660CNOtzmxqm6EqpgK
-         ZWIpx5vT9WYGFEmAXUpEgd/buHjfmaAOtX6UH2Bw+XR37DkBzqcVhOmXL2ZHV4oI4jxf
-         Q6v6TKLWoy9BL+/a+HF5QnTS14Sj1q9oOGmb1RYruBTgAgXTxEzipUKxBtN49pQAYrNG
-         4uZj/gIv9bT4vK48zVMSQsSJ5yDQ1b2WgQORXIz4ZaauynohR8iJft+JXpAWii7StqKO
-         1cXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=UcO77C1d2oPlXYkp6CkiRlKtVOMkq5wxTIYeAm1syxo=;
-        b=GHbMDfYvEaa6C85q8xjApQegAkKhNKpwdC6JFwukJP2D41N3ADfvFSiMwiftpU/ygr
-         dLYpYxEnSca9u0vi66vbWGvoDKqsVyeThGPIR03kQD/CGLY5w4MGmTulB5MjGCxF2Gla
-         ljcySJ0VOnSWMm4vEDeCukIvofeQTZd3ilhOOxk8s8JGWkNcC859OcfM54ZHSskaH5WA
-         jwJnUC3zsiy0HYpbnjicb+GnVje5Lr4GZFK/K7p+AkbCLCy8qFhd4kM0oRWYVtmPbkf+
-         P6TvvNujlFahf63BlUDRRGOr3NnnSdPlmdV0s1BMDCaqUAlUMOY3qIpgK0Yogdff0VQd
-         ytPw==
-X-Gm-Message-State: APjAAAX1QshsvAAJyC1SghQ8O+4OlEpkBzNraqZVk6jqHAYEmvp3PICF
-        fDGYMpB/NdnioOKjYXfDtYo=
-X-Google-Smtp-Source: APXvYqw0VKhI0WziMTaFb1wtWXZnzZOn5XxmOI7BEJXN6voxMBVpcjaeQu+MCIZq24v6HE7IT31/cQ==
-X-Received: by 2002:a1c:b756:: with SMTP id h83mr1888506wmf.64.1557393177619;
-        Thu, 09 May 2019 02:12:57 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id e8sm4815404wrc.34.2019.05.09.02.12.56
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 09 May 2019 02:12:56 -0700 (PDT)
-Date:   Thu, 9 May 2019 10:12:55 +0100
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Fam Zheng <fam@euphon.net>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>, kvm@vger.kernel.org,
-        Wolfram Sang <wsa@the-dreams.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Liang Cunming <cunming.liang@intel.com>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        "David S . Miller" <davem@davemloft.net>,
-        Jens Axboe <axboe@fb.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Liu Changpeng <changpeng.liu@intel.com>,
-        "Paul E . McKenney" <paulmck@linux.ibm.com>,
-        Amnon Ilan <ailan@redhat.com>, John Ferlan <jferlan@redhat.com>
-Subject: Re: [PATCH v2 00/10] RFC: NVME MDEV
-Message-ID: <20190509091255.GB15331@stefanha-x1.localdomain>
-References: <20190502114801.23116-1-mlevitsk@redhat.com>
- <20190503121838.GA21041@lst.de>
- <e8f6981863bdbba89adcba1c430083e68546ac1a.camel@redhat.com>
+        id S1726718AbfEIJSY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 05:18:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37742 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725991AbfEIJSX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 May 2019 05:18:23 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3779FC05E76E;
+        Thu,  9 May 2019 09:18:23 +0000 (UTC)
+Received: from gondolin (dhcp-192-213.str.redhat.com [10.33.192.213])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C24049084;
+        Thu,  9 May 2019 09:18:19 +0000 (UTC)
+Date:   Thu, 9 May 2019 11:18:17 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>
+Subject: Re: [PATCHv2 09/10] vfio/mdev: Avoid creating sysfs remove file on
+ stale device removal
+Message-ID: <20190509111817.36ff1791.cohuck@redhat.com>
+In-Reply-To: <VI1PR0501MB2271E76A8B5E8D00AFEA8D97D1320@VI1PR0501MB2271.eurprd05.prod.outlook.com>
+References: <20190430224937.57156-1-parav@mellanox.com>
+        <20190430224937.57156-10-parav@mellanox.com>
+        <20190508191635.05a0f277.cohuck@redhat.com>
+        <VI1PR0501MB2271E76A8B5E8D00AFEA8D97D1320@VI1PR0501MB2271.eurprd05.prod.outlook.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="qlTNgmc+xy1dBmNv"
-Content-Disposition: inline
-In-Reply-To: <e8f6981863bdbba89adcba1c430083e68546ac1a.camel@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Thu, 09 May 2019 09:18:23 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 8 May 2019 22:13:28 +0000
+Parav Pandit <parav@mellanox.com> wrote:
 
---qlTNgmc+xy1dBmNv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> > -----Original Message-----
+> > From: Cornelia Huck <cohuck@redhat.com>
+> > Sent: Wednesday, May 8, 2019 12:17 PM
+> > To: Parav Pandit <parav@mellanox.com>
+> > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > kwankhede@nvidia.com; alex.williamson@redhat.com; cjia@nvidia.com
+> > Subject: Re: [PATCHv2 09/10] vfio/mdev: Avoid creating sysfs remove file on
+> > stale device removal
+> > 
+> > On Tue, 30 Apr 2019 17:49:36 -0500
+> > Parav Pandit <parav@mellanox.com> wrote:
+> >   
+> > > If device is removal is initiated by two threads as below, mdev core
+> > > attempts to create a syfs remove file on stale device.
+> > > During this flow, below [1] call trace is observed.
+> > >
+> > >      cpu-0                                    cpu-1
+> > >      -----                                    -----
+> > >   mdev_unregister_device()
+> > >     device_for_each_child
+> > >        mdev_device_remove_cb
+> > >           mdev_device_remove
+> > >                                        user_syscall
+> > >                                          remove_store()
+> > >                                            mdev_device_remove()
+> > >                                         [..]
+> > >    unregister device();
+> > >                                        /* not found in list or
+> > >                                         * active=false.
+> > >                                         */
+> > >                                           sysfs_create_file()
+> > >                                           ..Call trace
+> > >
+> > > Now that mdev core follows correct device removal system of the linux
+> > > bus model, remove shouldn't fail in normal cases. If it fails, there
+> > > is no point of creating a stale file or checking for specific error status.  
+> > 
+> > Which error cases are left? Is there anything that does not indicate that
+> > something got terribly messed up internally?
+> >   
+> Few reasons I can think of that can fail remove are:
+> 
+> 1. Some device removal requires allocating memory too as it needs to issue commands to device.
+> If on the path, such allocation fails, remove can fail. However such fail to allocate memory will probably result into more serious warnings before this.
 
-On Mon, May 06, 2019 at 12:04:06PM +0300, Maxim Levitsky wrote:
-> On top of that, it is expected that newer hardware will support the PASID based
-> device subdivision, which will allow us to _directly_ pass through the
-> submission queues of the device and _force_ us to use the NVME protocol for the
-> frontend.
+Nod. If we're OOM, we probably have some bigger problems anyway.
 
-I don't understand the PASID argument.  The data path will be 100%
-passthrough and this driver won't be necessary.
+> 2. if the device firmware has crashed, device removal commands will likely timeout and return such error upto user.
 
-In the meantime there is already SPDK for users who want polling.  This
-driver's main feature is that the host can still access the device at
-the same time as VMs, but I'm not sure that's useful in
-performance-critical use cases and for non-performance use cases this
-driver isn't necessary.
+In that case, I'd consider the device pretty much unusable in any case.
 
-Stefan
+> 3. If user tries to remove a device, while parent is already in removal path, this call will eventually fail as it won't find the device in the internal list.
 
---qlTNgmc+xy1dBmNv
-Content-Type: application/pgp-signature; name="signature.asc"
+This should be benign, I think.
 
------BEGIN PGP SIGNATURE-----
+> 
+> > >
+> > > kernel: WARNING: CPU: 2 PID: 9348 at fs/sysfs/file.c:327
+> > > sysfs_create_file_ns+0x7f/0x90
+> > > kernel: CPU: 2 PID: 9348 Comm: bash Kdump: loaded Not tainted
+> > > 5.1.0-rc6-vdevbus+ #6
+> > > kernel: Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS 2.0b
+> > > 08/09/2016
+> > > kernel: RIP: 0010:sysfs_create_file_ns+0x7f/0x90
+> > > kernel: Call Trace:
+> > > kernel: remove_store+0xdc/0x100 [mdev]
+> > > kernel: kernfs_fop_write+0x113/0x1a0
+> > > kernel: vfs_write+0xad/0x1b0
+> > > kernel: ksys_write+0x5a/0xe0
+> > > kernel: do_syscall_64+0x5a/0x210
+> > > kernel: entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> > >
+> > > Signed-off-by: Parav Pandit <parav@mellanox.com>
+> > > ---
+> > >  drivers/vfio/mdev/mdev_sysfs.c | 4 +---
+> > >  1 file changed, 1 insertion(+), 3 deletions(-)
+> > >
+> > > diff --git a/drivers/vfio/mdev/mdev_sysfs.c
+> > > b/drivers/vfio/mdev/mdev_sysfs.c index 9f774b91d275..ffa3dcebf201
+> > > 100644
+> > > --- a/drivers/vfio/mdev/mdev_sysfs.c
+> > > +++ b/drivers/vfio/mdev/mdev_sysfs.c
+> > > @@ -237,10 +237,8 @@ static ssize_t remove_store(struct device *dev,  
+> > struct device_attribute *attr,  
+> > >  		int ret;
+> > >
+> > >  		ret = mdev_device_remove(dev);
+> > > -		if (ret) {
+> > > -			device_create_file(dev, attr);
+> > > +		if (ret)  
+> > 
+> > Should you merge this into the previous patch?
+> >   
+> I am not sure. Previous patch changes the sequence. I think that deserved an own patch by itself.
+> This change is making use of that sequence.
+> So its easier to review? Alex had comment in v0 to split into more logical patches, so...
+> Specially to capture a different call trace, I cut into different patch.
+> Otherwise previous patch's commit message is too long.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzT7xcACgkQnKSrs4Gr
-c8h67Qf/cCzGWh6iM657Q87QZaDIfXuEdFC5VBJt+JUTAJrD1K+vJeppmlITSNe9
-7i6nrm+Y7G2icJW5PZmv7Ym7Pl9na4VDNU+G13f/ErGEniwuY8YdvW5VyO7v8Ilo
-ShnXoNT6DY0yhSi7TZalmpq/o9GAw/i0A/QEoMs89A1jQgcnbYZjXemlRTuy+RaT
-NcXQxGSVvjW3QXT/qSiwD2GgeNVWbGTp5pCFME/GBY5tlad9blpJJIKkQQLHyhdW
-U/UqokQr4hAbb1C1W+Y4nzQsGaHxB8AN+mQoD3luyDs0qqYNeHLiQCAm3mXdRna5
-A/tkfOjwvZxT/OhJqWDcjIHB9NsWmA==
-=YaAX
------END PGP SIGNATURE-----
+I'm not sure if splitting out this one is worth it... your call.
 
---qlTNgmc+xy1dBmNv--
+> 
+> > >  			return ret;
+> > > -		}
+> > >  	}
+> > >
+> > >  	return count;  
+> 
+
