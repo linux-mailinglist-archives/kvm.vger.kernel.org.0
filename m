@@ -2,171 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BADDD18B9F
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 16:23:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 008CC18CE9
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 17:25:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726780AbfEIOXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 10:23:10 -0400
-Received: from mail-it1-f193.google.com ([209.85.166.193]:51957 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726772AbfEIOXK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 May 2019 10:23:10 -0400
-Received: by mail-it1-f193.google.com with SMTP id s3so3861742itk.1
-        for <kvm@vger.kernel.org>; Thu, 09 May 2019 07:23:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=CJAJWMSbDRtZTT/lyH5+TR+lDyhkoQaqVk/vcm0z2Ao=;
-        b=Eh/JkVUpHB0z8bi9m3gkPcO82KpSIWF8E64gJiNt7GJbvEsn28SE6m7w1Al7JQ1PoV
-         VenQwAENtE7CyAHXvIK0JNFTnA7wp7FVEh2ihJSwLC4jhWMv95qLlsMziISprMSiOk6C
-         V8O/bD0lfn2AcmxtZNufi8B+skOcjemCRrFQ5In63YPA2op4xEUxm3n/DIP71xUilWg8
-         Nc+lz/lSy04aFkf9W078jbaarYlPWXx+vpKbNRbANDPjHd/dnrIzmwUwGozs9W3JHW6U
-         qy9EgmbVDCf7a2tRHcgDzNeIRzV+fAYyimV+8eMeKgk2FnGoE9kELfZw/86gONFRXIuQ
-         KuwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=CJAJWMSbDRtZTT/lyH5+TR+lDyhkoQaqVk/vcm0z2Ao=;
-        b=BfVY7ICEFz0+EdHtBcU90FyRnGuv7O+OhlZu0AgBWtYVcBxWfc7bwAmtaO7o07f9Cz
-         ieiOJf1w21YZFmg7OOIO0YL1iBRGAGlO+pylsHjDFcgEgpAe0nz/sYhmlXc7x5ZQGKjN
-         EKjWMN5JyIH+QX1JINb+c+ULQaJThW7h9q21AaN9CFrt16FXmfkH5OXqNPisxoN/keHJ
-         zSK05DvpSeZjL2JJys/jO9Nznse3nNPqaTAoTpQipqiuX1eIrqmtb9WFACmcBpvZRUxw
-         Gf/qyPxR8qrLoFvZzv9fRFxyxvoI+g4CqPnVH2uYToTjwL53sEcx6odZAgyaHCO6nGB6
-         MS3Q==
-X-Gm-Message-State: APjAAAVYtRRI+OvMndnd2isscj5+lr2xK82eQ5uth+fYaMWtE1ZcX3Uu
-        dYXd4ketYVp27nMFfhxs1j8C2Gbb18z61yb45aI2jw==
-X-Google-Smtp-Source: APXvYqxA41KpQLDZwMiuRZvoLLjanStXSNAuvVQvtDhC5A8eLBEix9KyEuJYsIQQW75bJz2uPEpO1bcu3xil346SB+g=
-X-Received: by 2002:a02:b88b:: with SMTP id p11mr3324967jam.82.1557411788929;
- Thu, 09 May 2019 07:23:08 -0700 (PDT)
+        id S1726658AbfEIPZI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 11:25:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54156 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726187AbfEIPZI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 May 2019 11:25:08 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id BD6A081F35;
+        Thu,  9 May 2019 15:25:04 +0000 (UTC)
+Received: from gondolin (dhcp-192-213.str.redhat.com [10.33.192.213])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C11C5DE78;
+        Thu,  9 May 2019 15:24:51 +0000 (UTC)
+Date:   Thu, 9 May 2019 17:24:49 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Yan Zhao <yan.y.zhao@intel.com>
+Cc:     "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "dinechin@redhat.com" <dinechin@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "berrange@redhat.com" <berrange@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>
+Subject: Re: [PATCH v2 1/2] vfio/mdev: add version attribute for mdev device
+Message-ID: <20190509172449.723a048b.cohuck@redhat.com>
+In-Reply-To: <20190508115704.GB24397@joy-OptiPlex-7040>
+References: <20190506014514.3555-1-yan.y.zhao@intel.com>
+        <20190506014904.3621-1-yan.y.zhao@intel.com>
+        <20190507111954.43d477c3.cohuck@redhat.com>
+        <20190508115704.GB24397@joy-OptiPlex-7040>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <000000000000fb78720587d46fe9@google.com> <20190502023426.GA804@sol.localdomain>
- <CACT4Y+YHFH8GAhDaNdNNTVFFx6YfKSL19cLPx2vpP-YngzS6kQ@mail.gmail.com>
- <CACT4Y+biO9GEN16Rak_1F+UdvhTe3fUwVf_VWRup2xrgvr9WKA@mail.gmail.com> <20190509031849.GC693@sol.localdomain>
-In-Reply-To: <20190509031849.GC693@sol.localdomain>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Thu, 9 May 2019 16:22:56 +0200
-Message-ID: <CACT4Y+bz-aFJ2PbqJKL7veWavZkLw5nq+RFnnTveXMowRMVY4Q@mail.gmail.com>
-Subject: Re: BUG: soft lockup in kvm_vm_ioctl
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     syzbot <syzbot+8d9bb6157e7b379f740e@syzkaller.appspotmail.com>,
-        KVM list <kvm@vger.kernel.org>, adrian.hunter@intel.com,
-        David Miller <davem@davemloft.net>,
-        Artem Bityutskiy <dedekind1@gmail.com>, jbaron@redhat.com,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-mtd@lists.infradead.org, Andy Lutomirski <luto@kernel.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Richard Weinberger <richard@nod.at>,
-        Rik van Riel <riel@surriel.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        syzkaller <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Thu, 09 May 2019 15:25:08 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > > Can the KVM maintainers take a look at this?  This doesn't have anything to do
-> > > > with my commit that syzbot bisected it to.
-> > > >
-> > > > +Dmitry, statistics lession: if a crash occurs only 1 in 10 times, as was the
-> > > > case here, then often it will happen 0 in 10 times by chance.  syzbot needs to
-> > > > run the reproducer more times if it isn't working reliably.  Otherwise it ends
-> > > > up blaming some random commit.
-> > >
-> > > Added a note to https://github.com/google/syzkaller/issues/1051
-> > > Thanks
-> >
-> > As we increase number of instances, we increase chances of hitting
-> > unrelated bugs. E.g. take a look at the bisection log for:
-> > https://syzkaller.appspot.com/bug?extid=f14868630901fc6151d3
-> > What is the optimum number of tests is a good question. I suspect that
-> > the current 10 instances is close to optimum. If we use significantly
-> > more we may break every other bisection on unrelated bugs...
-> >
->
-> Only because syzbot is being super dumb in how it does the bisection.  AFAICS,
-> in the example you linked to, buggy kernels reliably crashed 10 out of 10 times
-> with the original crash signature, "WARNING in cgroup_exit".  Then at some point
-> it tested some kernel without the bug and got a different crash just 1 in 10
-> times, "WARNING: ODEBUG bug in netdev_freemem".
->
-> The facts that the crash frequency was very different, and the crash signature
-> was different, should be taken as a very strong signal that it's not the bug
-> being bisected for.  And this is something easily checked for in code.
->
-> BTW, I hope you're treating fixing this as a high priority, given that syzbot is
-> now sending bug reports to kernel developers literally selected at random.  This
-> is a great way to teach people to ignore syzbot reports.  (When I suggested
-> bisection originally, I had assumed you'd implement some basic sanity checks so
-> that only bisection results likely to be reliable would be mailed out.)
+On Wed, 8 May 2019 07:57:05 -0400
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
+> On Tue, May 07, 2019 at 05:19:54PM +0800, Cornelia Huck wrote:
+> > On Sun,  5 May 2019 21:49:04 -0400
+> > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> >   
+> > > version attribute is used to check two mdev devices' compatibility.
+> > > 
+> > > The key point of this version attribute is that it's rw.
+> > > User space has no need to understand internal of device version and no
+> > > need to compare versions by itself.
+> > > Compared to reading version strings from both two mdev devices being
+> > > checked, user space only reads from one mdev device's version attribute.
+> > > After getting its version string, user space writes this string into the
+> > > other mdev device's version attribute. Vendor driver of mdev device
+> > > whose version attribute being written will check device compatibility of
+> > > the two mdev devices for user space and return success for compatibility
+> > > or errno for incompatibility.  
+> > 
+> > I'm still missing a bit _what_ is actually supposed to be
+> > compatible/incompatible. I'd assume some internal state descriptions
+> > (even if this is not actually limited to migration).
+> >  
+> right.
+> originally, I thought this attribute should only contain a device's hardware
+> compatibility info. But seems also including vendor specific software migration
+> version is more reasonable, because general VFIO migration code cannot know
+> version of vendor specific software migration code until migration data is
+> transferring to the target vm. Then renaming it to migration_version is more
+> appropriate.
+> :)
 
+Nod.
 
-While I believe we can get some quality improvement by shuffling
-numbers. I don't think we can get significant improvement overall and
-definitely not eliminate wrong bisection results entirely. It's easy
-to take a single wrong bisection and design a system around this
-scenario, but it's very hard to design a system that will handle all
-of them in all generality. For example, look at these bisection logs
-for cases where reproduction frequency varies from 1 to all, but
-that's still the same bug:
-https://syzkaller.appspot.com/x/bisect.txt?x=12df1ba3200000
-https://syzkaller.appspot.com/x/bisect.txt?x=10daff1b200000
-https://syzkaller.appspot.com/x/bisect.txt?x=1592b037200000
-https://syzkaller.appspot.com/x/bisect.txt?x=11c610a7200000
-https://syzkaller.appspot.com/x/bisect.txt?x=17affd1b200000
-You also refer to "a different crash". But that's not a predicate we
-can have. And definitely not something that is "easily checked for in
-code". Consider, a function rename anywhere in the range will lead to
-as if a different crash. If you look at all bisection logs you find
-lots of amusing cases where something that a program may consider a
-different bugs is actually the same bug, or the other way around. So
-if we increase number of tests and we don't have a way to distinguish
-crashes (which we don't), we will necessary increase incorrect results
-due to unrelated bugs.
+(...)
 
-Bisection is a subtle process and the predicate, whatever logic it
-does internally, in the end need to produce a single yes/no. And a
-single wrong answer in the chain leads to a completely incorrect
-result. There are some fundamental reasons for wrong results:
- - hard to reproduce bugs (not fixable)
- - unrelated bugs/broken builds (fixable)
-While tuning numbers can pepper over these to some degree (maybe),
-these reasons will stay and will lead to incorrect results. Also I
-don't this tuning as something that is trivially to do as you suggest.
-For example, how exactly do you assess a crash as reliably happening
-vs episodically? How exactly do you choose number of tests for each
-case? Choosing too few tests will lead to incorrect results, choosing
-too many will lead to incorrect results. How exactly do you assess
-that something that was happening reliably now does not happen
-reliably? How do you assess that a crash is very different? Each of
-the choices have chances of producing more bad results, so one would
-need to rerun hundreds of bisections with old/new version, and then
-manually mark results and then estimate quality change (which most
-likely will be flaky or inconclusive in lots of cases). Tuning quality
-of heuristics-based algorithms is very time consuming, especially if
-each experiment takes weeks.
+> > > @@ -246,6 +249,143 @@ Directories and files under the sysfs for Each Physical Device
+> > >    This attribute should show the number of devices of type <type-id> that can be
+> > >    created.
+> > >  
+> > > +* version
+> > > +
+> > > +  This attribute is rw, and is optional.
+> > > +  It is used to check device compatibility between two mdev devices and is
+> > > +  accessed in pairs between the two mdev devices being checked.
+> > > +  The intent of this attribute is to make an mdev device's version opaque to
+> > > +  user space, so instead of reading two mdev devices' version strings and
+> > > +  comparing in userspace, user space should only read one mdev device's version
+> > > +  attribute, and writes this version string into the other mdev device's version
+> > > +  attribute. Then vendor driver of mdev device whose version attribute being
+> > > +  written would check the incoming version string and tell user space whether
+> > > +  the two mdev devices are compatible via return value. That's why this
+> > > +  attribute is writable.  
+> > 
+> > I would reword this a bit:
+> > 
+> > "This attribute provides a way to check device compatibility between
+> > two mdev devices from userspace. The intended usage is for userspace to
+> > read the version attribute from one mdev device and then writing that
+> > value to the version attribute of the other mdev device. The second
+> > mdev device indicates compatibility via the return code of the write
+> > operation. This makes compatibility between mdev devices completely
+> > vendor-defined and opaque to userspace."
+> > 
+> > We still should explain _what_ compatibility we're talking about here,
+> > though.
+> >   
+> Thanks. It's much better than mine:) 
+> Then I'll change compatibility --> migration compatibility.
 
-There is another down-side for not "super dumb" algorithms. Which is
-explaining results. Consider that syzbot now mails a bisection where
-the crash happened and a developer sees that it's the same crash, but
-syzbot says "nope. did not crash". That will cause reasonable
-questions and somebody (who would that be?) will need to come and
-explain what happens and why, and how that counter-intuitive local
-result was shown to improve quality overall. Simpler algorithms are
-much easier to explain.
+Ok, with that it should be clear enough.
 
-I consider bisection as high priority, but unfortunately only among
-other high priority and very high priority work.
-Besides work on the fuzzer itself and bug detection tools, we now test
-15 kernels across 6 different OSes. Operational work can't be
-deprioritized because then nothing will work at all. Change reviews
-can't be deprioritized. Overseeing bug flow can't be deprioritized.
-Updating crash parsing in response to new kernel output can't be
-deprioritized. Answering all human emails can't be deprioritized.
+> 
+> > > +
+> > > +  when reading this attribute, it should show device version string of
+> > > +  the device of type <type-id>.
+> > > +
+> > > +  This string is private to vendor driver itself. Vendor driver is able to
+> > > +  freely define format and length of device version string.
+> > > +  e.g. It can use a combination of pciid of parent device + mdev type.
+> > > +
+> > > +  When writing a string to this attribute, vendor driver should analyze this
+> > > +  string and check whether the mdev device being identified by this string is
+> > > +  compatible with the mdev device for this attribute. vendor driver should then
+> > > +  return written string's length if it regards the two mdev devices are
+> > > +  compatible; vendor driver should return negative errno if it regards the two
+> > > +  mdev devices are not compatible.
+> > > +
+> > > +  User space should treat ANY of below conditions as two mdev devices not
+> > > +  compatible:
+> > > +  (1) any one of the two mdev devices does not have a version attribute
+> > > +  (2) error when read from one mdev device's version attribute  
+> > 
+> > s/read/reading/
+> >   
+> > > +  (3) error when write one mdev device's version string to the other mdev  
+> > 
+> > s/write/writing/
+> >   
+> > > +  device's version attribute
+> > > +
+> > > +  User space should regard two mdev devices compatible when ALL of below
+> > > +  conditions are met:
+> > > +  (1) success when read from one mdev device's version attribute.  
+> > 
+> > s/read/reading/
+> >   
+> > > +  (2) success when write one mdev device's version string to the other mdev  
+> > 
+> > s/write/writing/  
+> got it. thanks for pointing them out:)
+> >   
+> > > +  device's version attribute
+> > > +
+> > > +  Errno:
+> > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev  
+> > 
+> > "If the vendor driver wants to designate a mdev device..."
+> >   
+> ok. thanks:)
+> > > +  devices, it should not register version attribute for this mdev device. But if
+> > > +  a vendor driver has already registered version attribute and it wants to claim
+> > > +  a mdev device incompatible to all other mdev devices, it needs to return
+> > > +  -ENODEV on access to this mdev device's version attribute.
+> > > +  If a mdev device is only incompatible to certain mdev devices, write of
+> > > +  incompatible mdev devices's version strings to its version attribute should
+> > > +  return -EINVAL;  
+> > 
+> > 
+> > Maybe put the defined return code into a bulleted list instead? But
+> > this looks reasonable as well.
+> >   
+> as user space have no idea of those errno and only gets 0/1 as return code from
+> read/write. maybe I can move this description of errno to patch 2/2 as an
+> example?
+
+Confused. They should get -EINVAL/-ENODEV/... all right, shouldn't they?
+
+> 
+> > > +
+> > > +  This attribute can be taken advantage of by live migration.
+> > > +  If user space detects two mdev devices are compatible through version
+> > > +  attribute, it can start migration between the two mdev devices, otherwise it
+> > > +  should abort its migration attempts between the two mdev devices.  
+> > 
+> > (...)
+> > _______________________________________________
+> > intel-gvt-dev mailing list
+> > intel-gvt-dev@lists.freedesktop.org
+> > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev  
+
