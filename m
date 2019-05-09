@@ -2,122 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6406F18F5C
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 19:39:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FF6718FA5
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2019 19:52:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726874AbfEIRjJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 13:39:09 -0400
-Received: from mail-eopbgr700041.outbound.protection.outlook.com ([40.107.70.41]:60162
-        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726736AbfEIRjJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 May 2019 13:39:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Xgt3Eo6om+aRkbGrjNNACgVS3HMUFsIYY1qHRdQZ4jY=;
- b=RbR/FmZYwRDq7m+WXbZcABMWFlFof/D6qGxVCaWtfZoWU4XtGGsrxmhEspREAhCZI2M1LGTUI/Yz7AbL/ua6c2N4AxfVGFU1SlE3sHBYgy7ewgGKevpTx07OaWR8S/ye6wUh16TG5jvH5yFbLqw6r+1x4TKubL3TabwSqyZ43sI=
-Received: from DM6PR12MB2844.namprd12.prod.outlook.com (20.176.117.96) by
- DM6PR12MB2649.namprd12.prod.outlook.com (20.176.116.22) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1856.15; Thu, 9 May 2019 17:39:06 +0000
-Received: from DM6PR12MB2844.namprd12.prod.outlook.com
- ([fe80::d119:23e5:be33:4ac6]) by DM6PR12MB2844.namprd12.prod.outlook.com
- ([fe80::d119:23e5:be33:4ac6%2]) with mapi id 15.20.1856.012; Thu, 9 May 2019
- 17:39:06 +0000
-From:   "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>
-To:     "Graf, Alexander" <graf@amazon.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>
-Subject: Re: [PATCH] svm/avic: Allow avic_vcpu_load logic to support host APIC
- ID 255
-Thread-Topic: [PATCH] svm/avic: Allow avic_vcpu_load logic to support host
- APIC ID 255
-Thread-Index: AQHVAbVYshI13bVJeUaA1Du2DOEuS6Zfu3aAgANdToA=
-Date:   Thu, 9 May 2019 17:39:06 +0000
-Message-ID: <da74be11-1278-3b0f-db19-459f2f50e2ad@amd.com>
-References: <1556890631-9561-1-git-send-email-suravee.suthikulpanit@amd.com>
- <49a27e83-a83e-5d2d-9b11-bb09c15776d2@amazon.com>
-In-Reply-To: <49a27e83-a83e-5d2d-9b11-bb09c15776d2@amazon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.6.1
-x-originating-ip: [165.204.77.11]
-x-clientproxiedby: SN6PR04CA0014.namprd04.prod.outlook.com
- (2603:10b6:805:3e::27) To DM6PR12MB2844.namprd12.prod.outlook.com
- (2603:10b6:5:45::32)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Suravee.Suthikulpanit@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0e696d50-d3d3-401c-46f9-08d6d4a53bf8
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:DM6PR12MB2649;
-x-ms-traffictypediagnostic: DM6PR12MB2649:
-x-microsoft-antispam-prvs: <DM6PR12MB2649C13F25331A86F474A47DF3330@DM6PR12MB2649.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
-x-forefront-prvs: 003245E729
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(396003)(39860400002)(366004)(346002)(136003)(376002)(189003)(199004)(2616005)(64126003)(53546011)(229853002)(6506007)(53936002)(6486002)(7736002)(305945005)(316002)(6436002)(5660300002)(65806001)(65956001)(11346002)(76176011)(476003)(386003)(99286004)(2906002)(66066001)(26005)(65826007)(14444005)(256004)(486006)(186003)(66946007)(102836004)(66446008)(73956011)(66476007)(6512007)(66556008)(64756008)(2201001)(25786009)(52116002)(4326008)(86362001)(81156014)(81166006)(8676002)(54906003)(58126008)(110136005)(8936002)(446003)(31696002)(6116002)(14454004)(478600001)(2501003)(71200400001)(71190400001)(72206003)(36756003)(68736007)(31686004)(3846002)(6246003);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB2649;H:DM6PR12MB2844.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: t5Py5kj0hAtg21WA3UKDAiRgX9A8HmQrwF2QVHi9baVRAEaw+HDulr50wWPGS+9l1aUwliCJF3/rz9PbNP0BjSeJXiNP37H9/vnhLX6QscEAKmhmdSeTJ5VGHXGbdm0UMV6QNREG61HAlqYAde/BlZGTw4RJEBFaDHeP936OroPti+8CXM3JhRuSPL1iN8ZAEyb2RCWSMj5IMiFbiXhbM8hsz58fXcT5PTtiOWZBrhAfHnVxoC/R0BDrKXPoH4I/eJpOOaKg7VlSZZ87ZMyNOzTi7UDyNComs3Adlwr+/LHkvqWrjcpzYVL2vWwVKaPEcTmBY4YeJCKgyfzonZqpWSscWRw340Y4DWqTJEmXw3NhKO/9++PoPL2A7ILYnjfwaiVppy9MuW7kpguMmlbIfrRPPQc8jSEueCUkegHlLCQ=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <ACBC78EBDC856D41923BEE77CE679440@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S1726694AbfEIRwM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 13:52:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42806 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726656AbfEIRwM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 May 2019 13:52:12 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 394A22089E;
+        Thu,  9 May 2019 17:52:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1557424330;
+        bh=Q+NEUhEfesdtpbm997jYCs46930hctabkdnGWE26v/I=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QdWshXc1IKQ3jOa/reEouhy0vBf7qUNuNhtYUSpRy9xhiwp3m5iX87nBkwRxpOQRD
+         0fI1jvsLUCsOZlAEZoGnUt49Jfo7nzu9/aVpPTfB6f26TUpbY2VbIngqR3IN1vcpsx
+         Ukj+yokejJzjx/zaw8dCU5x4cJzzgNKWUb4w23/M=
+Date:   Thu, 9 May 2019 10:52:08 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Dmitry Vyukov <dvyukov@google.com>
+Cc:     syzbot <syzbot+8d9bb6157e7b379f740e@syzkaller.appspotmail.com>,
+        KVM list <kvm@vger.kernel.org>, adrian.hunter@intel.com,
+        David Miller <davem@davemloft.net>,
+        Artem Bityutskiy <dedekind1@gmail.com>, jbaron@redhat.com,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-mtd@lists.infradead.org, Andy Lutomirski <luto@kernel.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Richard Weinberger <richard@nod.at>,
+        Rik van Riel <riel@surriel.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        syzkaller <syzkaller@googlegroups.com>
+Subject: Re: BUG: soft lockup in kvm_vm_ioctl
+Message-ID: <20190509175207.GA12602@gmail.com>
+References: <000000000000fb78720587d46fe9@google.com>
+ <20190502023426.GA804@sol.localdomain>
+ <CACT4Y+YHFH8GAhDaNdNNTVFFx6YfKSL19cLPx2vpP-YngzS6kQ@mail.gmail.com>
+ <CACT4Y+biO9GEN16Rak_1F+UdvhTe3fUwVf_VWRup2xrgvr9WKA@mail.gmail.com>
+ <20190509031849.GC693@sol.localdomain>
+ <CACT4Y+bz-aFJ2PbqJKL7veWavZkLw5nq+RFnnTveXMowRMVY4Q@mail.gmail.com>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0e696d50-d3d3-401c-46f9-08d6d4a53bf8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 May 2019 17:39:06.3525
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2649
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACT4Y+bz-aFJ2PbqJKL7veWavZkLw5nq+RFnnTveXMowRMVY4Q@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-QWxleCwNCg0KT24gNS83LzE5IDk6MTYgQU0sIEdyYWYsIEFsZXhhbmRlciB3cm90ZToNCj4gW0NB
-VVRJT046IEV4dGVybmFsIEVtYWlsXQ0KPiANCj4gT24gMDMuMDUuMTkgMTU6MzcsIFN1dGhpa3Vs
-cGFuaXQsIFN1cmF2ZWUgd3JvdGU6DQo+PiBDdXJyZW50IGxvZ2ljIGRvZXMgbm90IGFsbG93IFZD
-UFUgdG8gYmUgbG9hZGVkIG9udG8gQ1BVIHdpdGgNCj4+IEFQSUMgSUQgMjU1LiBUaGlzIHNob3Vs
-ZCBiZSBhbGxvd2VkIHNpbmNlIHRoZSBob3N0IHBoeXNpY2FsIEFQSUMgSUQNCj4+IGZpZWxkIGlu
-IHRoZSBBVklDIFBoeXNpY2FsIEFQSUMgdGFibGUgZW50cnkgaXMgYW4gOC1iaXQgdmFsdWUsDQo+
-PiBhbmQgQVBJQyBJRCAyNTUgaXMgdmFsaWQgaW4gc3lzdGVtIHdpdGggeDJBUElDIGVuYWJsZWQu
-DQo+Pg0KPj4gSW5zdGVhZCwgZG8gbm90IGFsbG93IFZDUFUgbG9hZCBpZiB0aGUgaG9zdCBBUElD
-IElEIGNhbm5vdCBiZQ0KPj4gcmVwcmVzZW50ZWQgYnkgYW4gOC1iaXQgdmFsdWUuDQo+Pg0KPj4g
-U2lnbmVkLW9mZi1ieTogU3VyYXZlZSBTdXRoaWt1bHBhbml0IDxzdXJhdmVlLnN1dGhpa3VscGFu
-aXRAYW1kLmNvbT4NCj4gDQo+IFlvdXIgY29tbWVudCBmb3IgQVZJQ19NQVhfUEhZU0lDQUxfSURf
-Q09VTlQgc2F5cyB0aGF0IDB4ZmYgKDI1NSkgaXMNCj4gYnJvYWRjYXN0IGhlbmNlIHlvdSBkaXNh
-bGxvdyB0aGF0IHZhbHVlLiBJbiBmYWN0LCBldmVuIHRoZSBjb21tZW50IGEgZmV3DQo+IGxpbmVz
-IGFib3ZlIHRoZSBwYXRjaCBodW5rIGRvZXMgc2F5IHRoYXQuIFdoeSB0aGUgY2hhbmdlIG9mIG1p
-bmQ/DQoNCkFjdHVhbGx5LCBJIHdvdWxkIG5lZWQgdG8gbWFrZSBjaGFuZ2UgdG8gdGhhdCBjb21t
-ZW50IHRvIHJlbW92ZSB0aGUgbWVudGlvbmluZw0Kb2YgMjU1IGFzIGJyb2FkY2FzdC4gSSB3aWxs
-IHNlbmQgb3V0IFYyIHdpdGggcHJvcGVyIGNvbW1lbnQgZml4Lg0KDQpUaGUgcmVhc29uIGlzIGJl
-Y2F1c2Ugb24gc3lzdGVtIHcvIHgyQVBJQywgdGhlIEFQSUMgSUQgMjU1IGlzIGFjdHVhbGx5DQpu
-b24tYnJvYWRjYXN0LCBhbmQgdGhpcyBzaG91bGQgYmUgYWxsb3dlZC4gVGhlIGNvZGUgaGVyZSBz
-aG91bGQgbm90IG5lZWQNCnRvIGNoZWNrIGZvciBicm9hZGNhc3QuDQoNClRoYW5rcywNClN1cmF2
-ZWUNCg0KPiBBbGV4DQo+IA0KPj4gLS0tDQo+PiDCoCBhcmNoL3g4Ni9rdm0vc3ZtLmMgfCA2ICsr
-KysrLQ0KPj4gwqAgMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigt
-KQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vc3ZtLmMgYi9hcmNoL3g4Ni9rdm0v
-c3ZtLmMNCj4+IGluZGV4IDI5NDQ0OGUuLjEyMjc4OGYgMTAwNjQ0DQo+PiAtLS0gYS9hcmNoL3g4
-Ni9rdm0vc3ZtLmMNCj4+ICsrKyBiL2FyY2gveDg2L2t2bS9zdm0uYw0KPj4gQEAgLTIwNzEsNyAr
-MjA3MSwxMSBAQCBzdGF0aWMgdm9pZCBhdmljX3ZjcHVfbG9hZChzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
-cHUsIGludCBjcHUpDQo+PiDCoMKgwqDCoMKgIGlmICgha3ZtX3ZjcHVfYXBpY3ZfYWN0aXZlKHZj
-cHUpKQ0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuOw0KPj4NCj4+IC3CoMKg
-wqDCoCBpZiAoV0FSTl9PTihoX3BoeXNpY2FsX2lkID49IEFWSUNfTUFYX1BIWVNJQ0FMX0lEX0NP
-VU5UKSkNCj4+ICvCoMKgwqDCoCAvKg0KPj4gK8KgwqDCoMKgwqAgKiBTaW5jZSB0aGUgaG9zdCBw
-aHlzaWNhbCBBUElDIGlkIGlzIDggYml0cywNCj4+ICvCoMKgwqDCoMKgICogd2UgY2FuIHN1cHBv
-cnQgaG9zdCBBUElDIElEIHVwdG8gMjU1Lg0KPj4gK8KgwqDCoMKgwqAgKi8NCj4+ICvCoMKgwqDC
-oCBpZiAoV0FSTl9PTihoX3BoeXNpY2FsX2lkID4gQVZJQ19NQVhfUEhZU0lDQUxfSURfQ09VTlQp
-KQ0KPj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuOw0KPj4NCj4+IMKgwqDCoMKg
-wqAgZW50cnkgPSBSRUFEX09OQ0UoKihzdm0tPmF2aWNfcGh5c2ljYWxfaWRfY2FjaGUpKTsNCj4+
-DQo+IA0K
+On Thu, May 09, 2019 at 04:22:56PM +0200, 'Dmitry Vyukov' via syzkaller wrote:
+> > > > > Can the KVM maintainers take a look at this?  This doesn't have anything to do
+> > > > > with my commit that syzbot bisected it to.
+> > > > >
+> > > > > +Dmitry, statistics lession: if a crash occurs only 1 in 10 times, as was the
+> > > > > case here, then often it will happen 0 in 10 times by chance.  syzbot needs to
+> > > > > run the reproducer more times if it isn't working reliably.  Otherwise it ends
+> > > > > up blaming some random commit.
+> > > >
+> > > > Added a note to https://github.com/google/syzkaller/issues/1051
+> > > > Thanks
+> > >
+> > > As we increase number of instances, we increase chances of hitting
+> > > unrelated bugs. E.g. take a look at the bisection log for:
+> > > https://syzkaller.appspot.com/bug?extid=f14868630901fc6151d3
+> > > What is the optimum number of tests is a good question. I suspect that
+> > > the current 10 instances is close to optimum. If we use significantly
+> > > more we may break every other bisection on unrelated bugs...
+> > >
+> >
+> > Only because syzbot is being super dumb in how it does the bisection.  AFAICS,
+> > in the example you linked to, buggy kernels reliably crashed 10 out of 10 times
+> > with the original crash signature, "WARNING in cgroup_exit".  Then at some point
+> > it tested some kernel without the bug and got a different crash just 1 in 10
+> > times, "WARNING: ODEBUG bug in netdev_freemem".
+> >
+> > The facts that the crash frequency was very different, and the crash signature
+> > was different, should be taken as a very strong signal that it's not the bug
+> > being bisected for.  And this is something easily checked for in code.
+> >
+> > BTW, I hope you're treating fixing this as a high priority, given that syzbot is
+> > now sending bug reports to kernel developers literally selected at random.  This
+> > is a great way to teach people to ignore syzbot reports.  (When I suggested
+> > bisection originally, I had assumed you'd implement some basic sanity checks so
+> > that only bisection results likely to be reliable would be mailed out.)
+> 
+> 
+> 
+> While I believe we can get some quality improvement by shuffling
+> numbers. I don't think we can get significant improvement overall and
+> definitely not eliminate wrong bisection results entirely. It's easy
+> to take a single wrong bisection and design a system around this
+> scenario, but it's very hard to design a system that will handle all
+> of them in all generality. For example, look at these bisection logs
+> for cases where reproduction frequency varies from 1 to all, but
+> that's still the same bug:
+> https://syzkaller.appspot.com/x/bisect.txt?x=12df1ba3200000
+> https://syzkaller.appspot.com/x/bisect.txt?x=10daff1b200000
+> https://syzkaller.appspot.com/x/bisect.txt?x=1592b037200000
+> https://syzkaller.appspot.com/x/bisect.txt?x=11c610a7200000
+> https://syzkaller.appspot.com/x/bisect.txt?x=17affd1b200000
+
+In all those, the bisection either blamed the wrong commit or failed entirely.
+So rather than supporting your argument, they're actually examples of how a
+reproduction frequency of 1 causes the result to be unreliable.
+
+> You also refer to "a different crash". But that's not a predicate we
+> can have. And definitely not something that is "easily checked for in
+> code". Consider, a function rename anywhere in the range will lead to
+> as if a different crash. If you look at all bisection logs you find
+> lots of amusing cases where something that a program may consider a
+> different bugs is actually the same bug, or the other way around. So
+> if we increase number of tests and we don't have a way to distinguish
+> crashes (which we don't), we will necessary increase incorrect results
+> due to unrelated bugs.
+> 
+> Bisection is a subtle process and the predicate, whatever logic it
+> does internally, in the end need to produce a single yes/no. And a
+> single wrong answer in the chain leads to a completely incorrect
+> result. There are some fundamental reasons for wrong results:
+>  - hard to reproduce bugs (not fixable)
+>  - unrelated bugs/broken builds (fixable)
+> While tuning numbers can pepper over these to some degree (maybe),
+> these reasons will stay and will lead to incorrect results. Also I
+> don't this tuning as something that is trivially to do as you suggest.
+> For example, how exactly do you assess a crash as reliably happening
+> vs episodically? How exactly do you choose number of tests for each
+> case? Choosing too few tests will lead to incorrect results, choosing
+> too many will lead to incorrect results. How exactly do you assess
+> that something that was happening reliably now does not happen
+> reliably? How do you assess that a crash is very different? Each of
+> the choices have chances of producing more bad results, so one would
+> need to rerun hundreds of bisections with old/new version, and then
+> manually mark results and then estimate quality change (which most
+> likely will be flaky or inconclusive in lots of cases). Tuning quality
+> of heuristics-based algorithms is very time consuming, especially if
+> each experiment takes weeks.
+> 
+> There is another down-side for not "super dumb" algorithms. Which is
+> explaining results. Consider that syzbot now mails a bisection where
+> the crash happened and a developer sees that it's the same crash, but
+> syzbot says "nope. did not crash". That will cause reasonable
+> questions and somebody (who would that be?) will need to come and
+> explain what happens and why, and how that counter-intuitive local
+> result was shown to improve quality overall. Simpler algorithms are
+> much easier to explain.
+
+What I have in mind is that syzbot would assign a confidence level to each
+bisection log.
+
+Start at 100% confident.
+
+If multiple different crash signatures were seen, decrease the confidence level.
+
+If the crash is probabilistic (sometimes occurred n/10 times where 1 <= n <= 9),
+decrease the confidence level again.  If it ever occurred just 1 time, decrease
+it a lot more.  OFC it could be a smarter, more complex calculation using some
+formula, but this would be the minimum.
+
+If bisection ended on merge commit, release commit, or is obviously a non-code
+change (e.g. only modified Documentation/), decrease the confidence level again.
+
+Then:
+
+- If bisection result is very confident, mail out the result as-is.
+- If bisection result is somewhat confident, mail out the result with a warning
+  that syzbot detected that it may be unreliable.
+- Otherwise don't mail out the result, just keep it on the syzbot dashboard.
+
+Yes, these are heuristics.  Yes, they will sometimes be wrong and cause false
+negatives.  I don't need you to go into multi page explanation of all the
+theoretical edge cases.  But they should reduce false positive rate massively,
+which will encourage people to actually look at the reports...
+
+It seems you don't want to be "responsible" for a false negative, so you just
+send out every result.  But that just makes the reports low quality so people
+ignore them, which is much worse.  The status quo of sending reports to authors
+of kernel commits selected at random is really not acceptable.
+
+> 
+> I consider bisection as high priority, but unfortunately only among
+> other high priority and very high priority work.
+> Besides work on the fuzzer itself and bug detection tools, we now test
+> 15 kernels across 6 different OSes. Operational work can't be
+> deprioritized because then nothing will work at all. Change reviews
+> can't be deprioritized. Overseeing bug flow can't be deprioritized.
+> Updating crash parsing in response to new kernel output can't be
+> deprioritized. Answering all human emails can't be deprioritized.
+> 
+
+So don't be surprised when people ignore syzbot reports for the same reason.
+
+- Eric
