@@ -2,246 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 289E219F5C
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 16:35:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E48D19F7D
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 16:45:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727828AbfEJOfj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 May 2019 10:35:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46302 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727384AbfEJOfj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 May 2019 10:35:39 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 826AF308A106;
-        Fri, 10 May 2019 14:35:38 +0000 (UTC)
-Received: from [10.36.116.17] (ovpn-116-17.ams2.redhat.com [10.36.116.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B2D75E7C1;
-        Fri, 10 May 2019 14:35:30 +0000 (UTC)
-Subject: Re: [PATCH v7 13/23] iommu/smmuv3: Implement
- attach/detach_pasid_table
-To:     Robin Murphy <robin.murphy@arm.com>, eric.auger.pro@gmail.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
-        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
-        yi.l.liu@intel.com, jean-philippe.brucker@arm.com,
-        will.deacon@arm.com
-Cc:     kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com,
-        christoffer.dall@arm.com, peter.maydell@linaro.org,
-        vincent.stehle@arm.com
-References: <20190408121911.24103-1-eric.auger@redhat.com>
- <20190408121911.24103-14-eric.auger@redhat.com>
- <acde8b95-9cbc-c5e6-eb28-37bff7431e40@arm.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <30020e0d-2164-5b39-f1ca-04a85263b7f3@redhat.com>
-Date:   Fri, 10 May 2019 16:35:28 +0200
+        id S1727258AbfEJOpZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 May 2019 10:45:25 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44942 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727144AbfEJOpZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 May 2019 10:45:25 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4AEhG1x011730
+        for <kvm@vger.kernel.org>; Fri, 10 May 2019 10:45:24 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sdb468sub-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 10 May 2019 10:45:23 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Fri, 10 May 2019 15:45:21 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 10 May 2019 15:45:18 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4AEjHIQ56688666
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 May 2019 14:45:17 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F0692A40F2;
+        Fri, 10 May 2019 14:45:16 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 38372A40C1;
+        Fri, 10 May 2019 14:45:16 +0000 (GMT)
+Received: from [9.145.187.238] (unknown [9.145.187.238])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 10 May 2019 14:45:16 +0000 (GMT)
+Reply-To: pmorel@linux.ibm.com
+Subject: Re: [PATCH 1/4] s390: pci: Exporting access to CLP PCI function and
+ PCI group
+To:     Robin Murphy <robin.murphy@arm.com>, sebott@linux.vnet.ibm.com
+Cc:     linux-s390@vger.kernel.org, pasic@linux.vnet.ibm.com,
+        alex.williamson@redhat.com, kvm@vger.kernel.org,
+        heiko.carstens@de.ibm.com, walling@linux.ibm.com,
+        linux-kernel@vger.kernel.org, borntraeger@de.ibm.com,
+        iommu@lists.linux-foundation.org, schwidefsky@de.ibm.com,
+        gerald.schaefer@de.ibm.com
+References: <1557476555-20256-1-git-send-email-pmorel@linux.ibm.com>
+ <1557476555-20256-2-git-send-email-pmorel@linux.ibm.com>
+ <a06ffd83-5fde-8c6e-b25b-bd4163d4cd5f@arm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Fri, 10 May 2019 16:45:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <acde8b95-9cbc-c5e6-eb28-37bff7431e40@arm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <a06ffd83-5fde-8c6e-b25b-bd4163d4cd5f@arm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Fri, 10 May 2019 14:35:38 +0000 (UTC)
+X-TM-AS-GCONF: 00
+x-cbid: 19051014-0016-0000-0000-0000027A60B1
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051014-0017-0000-0000-000032D71C91
+Message-Id: <289bdf82-75ba-4ba4-9362-dd8fc721cfc8@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-09_02:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905100102
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Robin,
-
-On 5/8/19 4:38 PM, Robin Murphy wrote:
-> On 08/04/2019 13:19, Eric Auger wrote:
->> On attach_pasid_table() we program STE S1 related info set
->> by the guest into the actual physical STEs. At minimum
->> we need to program the context descriptor GPA and compute
->> whether the stage1 is translated/bypassed or aborted.
+On 10/05/2019 12:21, Robin Murphy wrote:
+> On 10/05/2019 09:22, Pierre Morel wrote:
+>> For the generic implementation of VFIO PCI we need to retrieve
+>> the hardware configuration for the PCI functions and the
+>> PCI function groups.
 >>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> We modify the internal function using CLP Query PCI function and
+>> CLP query PCI function group so that they can be called from
+>> outside the S390 architecture PCI code and prefix the two
+>> functions with "zdev" to make clear that they can be called
+>> knowing only the associated zdevice.
 >>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Reviewed-by: Sebastian Ott <sebott@linux.ibm.com>
 >> ---
->> v6 -> v7:
->> - check versions and comment the fact we don't need to take
->>    into account s1dss and s1fmt
->> v3 -> v4:
->> - adapt to changes in iommu_pasid_table_config
->> - different programming convention at s1_cfg/s2_cfg/ste.abort
+>>   arch/s390/include/asm/pci.h |  3 ++
+>>   arch/s390/pci/pci_clp.c     | 72 
+>> ++++++++++++++++++++++++---------------------
+>>   2 files changed, 41 insertions(+), 34 deletions(-)
 >>
->> v2 -> v3:
->> - callback now is named set_pasid_table and struct fields
->>    are laid out differently.
->>
->> v1 -> v2:
->> - invalidate the STE before changing them
->> - hold init_mutex
->> - handle new fields
->> ---
->>   drivers/iommu/arm-smmu-v3.c | 121 ++++++++++++++++++++++++++++++++++++
->>   1 file changed, 121 insertions(+)
->>
->> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
->> index e22e944ffc05..1486baf53425 100644
->> --- a/drivers/iommu/arm-smmu-v3.c
->> +++ b/drivers/iommu/arm-smmu-v3.c
->> @@ -2207,6 +2207,125 @@ static void arm_smmu_put_resv_regions(struct
->> device *dev,
->>           kfree(entry);
+>> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
+>> index 305befd..e66b246 100644
+>> --- a/arch/s390/include/asm/pci.h
+>> +++ b/arch/s390/include/asm/pci.h
+>> @@ -261,4 +261,7 @@ cpumask_of_pcibus(const struct pci_bus *bus)
+>>   #endif /* CONFIG_NUMA */
+>> +int zdev_query_pci_fngrp(struct zpci_dev *zdev,
+>> +             struct clp_req_rsp_query_pci_grp *rrb);
+>> +int zdev_query_pci_fn(struct zpci_dev *zdev, struct 
+>> clp_req_rsp_query_pci *rrb);
+>>   #endif
+>> diff --git a/arch/s390/pci/pci_clp.c b/arch/s390/pci/pci_clp.c
+>> index 3a36b07..4ae5d77 100644
+>> --- a/arch/s390/pci/pci_clp.c
+>> +++ b/arch/s390/pci/pci_clp.c
+>> @@ -113,32 +113,18 @@ static void clp_store_query_pci_fngrp(struct 
+>> zpci_dev *zdev,
+>>       }
 >>   }
->>   +static int arm_smmu_attach_pasid_table(struct iommu_domain *domain,
->> +                       struct iommu_pasid_table_config *cfg)
->> +{
->> +    struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
->> +    struct arm_smmu_master_data *entry;
->> +    struct arm_smmu_s1_cfg *s1_cfg;
->> +    struct arm_smmu_device *smmu;
->> +    unsigned long flags;
->> +    int ret = -EINVAL;
->> +
->> +    if (cfg->format != IOMMU_PASID_FORMAT_SMMUV3)
->> +        return -EINVAL;
->> +
->> +    if (cfg->version != PASID_TABLE_CFG_VERSION_1 ||
->> +        cfg->smmuv3.version != PASID_TABLE_SMMUV3_CFG_VERSION_1)
->> +        return -EINVAL;
->> +
->> +    mutex_lock(&smmu_domain->init_mutex);
->> +
->> +    smmu = smmu_domain->smmu;
->> +
->> +    if (!smmu)
->> +        goto out;
->> +
->> +    if (!((smmu->features & ARM_SMMU_FEAT_TRANS_S1) &&
->> +          (smmu->features & ARM_SMMU_FEAT_TRANS_S2))) {
->> +        dev_info(smmu_domain->smmu->dev,
->> +             "does not implement two stages\n");
->> +        goto out;
->> +    }
+>> -static int clp_query_pci_fngrp(struct zpci_dev *zdev, u8 pfgid)
+>> +int zdev_query_pci_fngrp(struct zpci_dev *zdev,
+>> +             struct clp_req_rsp_query_pci_grp *rrb)
+>>   {
+>> -    struct clp_req_rsp_query_pci_grp *rrb;
+>> -    int rc;
+>> -
+>> -    rrb = clp_alloc_block(GFP_KERNEL);
+>> -    if (!rrb)
+>> -        return -ENOMEM;
+>> -
+>>       memset(rrb, 0, sizeof(*rrb));
+>>       rrb->request.hdr.len = sizeof(rrb->request);
+>>       rrb->request.hdr.cmd = CLP_QUERY_PCI_FNGRP;
+>>       rrb->response.hdr.len = sizeof(rrb->response);
+>> -    rrb->request.pfgid = pfgid;
+>> +    rrb->request.pfgid = zdev->pfgid;
+>> -    rc = clp_req(rrb, CLP_LPS_PCI);
+>> -    if (!rc && rrb->response.hdr.rsp == CLP_RC_OK)
+>> -        clp_store_query_pci_fngrp(zdev, &rrb->response);
+>> -    else {
+>> -        zpci_err("Q PCI FGRP:\n");
+>> -        zpci_err_clp(rrb->response.hdr.rsp, rc);
+>> -        rc = -EIO;
+>> -    }
+>> -    clp_free_block(rrb);
+>> -    return rc;
+>> +    return clp_req(rrb, CLP_LPS_PCI);
+>>   }
+>> +EXPORT_SYMBOL(zdev_query_pci_fngrp);
 > 
-> That check is redundant (and frankly looks a little bit spammy). If the
-> one below is not enough, there is a problem elsewhere - if it's possible
-> for smmu_domain->stage to ever get set to ARM_SMMU_DOMAIN_NESTED without
-> both stages of translation present, we've already gone fundamentally wrong.
-
-Makes sense. Moved that check to arm_smmu_domain_finalise() instead and
-remove redundant ones.
-> 
->> +
->> +    if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
->> +        goto out;
->> +
->> +    switch (cfg->config) {
->> +    case IOMMU_PASID_CONFIG_ABORT:
->> +        spin_lock_irqsave(&smmu_domain->devices_lock, flags);
->> +        list_for_each_entry(entry, &smmu_domain->devices, list) {
->> +            entry->ste.s1_cfg = NULL;
->> +            entry->ste.abort = true;
->> +            arm_smmu_install_ste_for_dev(entry->dev->iommu_fwspec);
->> +        }
->> +        spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
->> +        ret = 0;
->> +        break;
->> +    case IOMMU_PASID_CONFIG_BYPASS:
->> +        spin_lock_irqsave(&smmu_domain->devices_lock, flags);
->> +        list_for_each_entry(entry, &smmu_domain->devices, list) {
->> +            entry->ste.s1_cfg = NULL;
->> +            entry->ste.abort = false;
->> +            arm_smmu_install_ste_for_dev(entry->dev->iommu_fwspec);
->> +        }
->> +        spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
->> +        ret = 0;
->> +        break;
->> +    case IOMMU_PASID_CONFIG_TRANSLATE:
->> +        /*
->> +         * we currently support a single CD so s1fmt and s1dss
->> +         * fields are also ignored
->> +         */
->> +        if (cfg->pasid_bits)
->> +            goto out;
->> +
->> +        s1_cfg = &smmu_domain->s1_cfg;
->> +        s1_cfg->cdptr_dma = cfg->base_ptr;
->> +
->> +        spin_lock_irqsave(&smmu_domain->devices_lock, flags);
->> +        list_for_each_entry(entry, &smmu_domain->devices, list) {
->> +            entry->ste.s1_cfg = s1_cfg;
-> 
-> Either we reject valid->valid transitions outright, or we need to remove
-> and invalidate the existing S1 context from the STE at this point, no?
-I agree. I added this in arm_smmu_write_strtab_ent().
-
-> 
->> +            entry->ste.abort = false;
->> +            arm_smmu_install_ste_for_dev(entry->dev->iommu_fwspec);
->> +        }
->> +        spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
->> +        ret = 0;
->> +        break;
->> +    default:
->> +        break;
->> +    }
->> +out:
->> +    mutex_unlock(&smmu_domain->init_mutex);
->> +    return ret;
->> +}
->> +
->> +static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
->> +{
->> +    struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
->> +    struct arm_smmu_master_data *entry;
->> +    struct arm_smmu_device *smmu;
->> +    unsigned long flags;
->> +
->> +    mutex_lock(&smmu_domain->init_mutex);
->> +
->> +    smmu = smmu_domain->smmu;
->> +
->> +    if (!smmu)
->> +        return;
->> +
->> +    if (!((smmu->features & ARM_SMMU_FEAT_TRANS_S1) &&
->> +          (smmu->features & ARM_SMMU_FEAT_TRANS_S2))) {
->> +        dev_info(smmu_domain->smmu->dev,
->> +             "does not implement two stages\n");
->> +        return;
->> +    }
-> 
-> Same comment as before.
-OK
-
-Thanks
-
-Eric
+> AFAICS it's only the IOMMU driver itself which needs to call these. That 
+> can't be built as a module, so you shouldn't need explicit exports - the 
+> header declaration is enough.
 > 
 > Robin.
+
+This is right and seeing the pointer type only zPCI and s390iommu can 
+make use of it.
+If nobody has another point of view I will remove the export on the
+next iteration.
+
+Thanks,
+Pierre
+
 > 
+>>   static int clp_store_query_pci_fn(struct zpci_dev *zdev,
+>>                     struct clp_rsp_query_pci *response)
+>> @@ -174,32 +160,50 @@ static int clp_store_query_pci_fn(struct 
+>> zpci_dev *zdev,
+>>       return 0;
+>>   }
+>> -static int clp_query_pci_fn(struct zpci_dev *zdev, u32 fh)
+>> +int zdev_query_pci_fn(struct zpci_dev *zdev, struct 
+>> clp_req_rsp_query_pci *rrb)
+>> +{
 >> +
->> +    if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
->> +        return;
+>> +    memset(rrb, 0, sizeof(*rrb));
+>> +    rrb->request.hdr.len = sizeof(rrb->request);
+>> +    rrb->request.hdr.cmd = CLP_QUERY_PCI_FN;
+>> +    rrb->response.hdr.len = sizeof(rrb->response);
+>> +    rrb->request.fh = zdev->fh;
 >> +
->> +    spin_lock_irqsave(&smmu_domain->devices_lock, flags);
->> +    list_for_each_entry(entry, &smmu_domain->devices, list) {
->> +        entry->ste.s1_cfg = NULL;
->> +        entry->ste.abort = true;
->> +        arm_smmu_install_ste_for_dev(entry->dev->iommu_fwspec);
->> +    }
->> +    spin_unlock_irqrestore(&smmu_domain->devices_lock, flags);
->> +
->> +    memset(&smmu_domain->s1_cfg, 0, sizeof(struct arm_smmu_s1_cfg));
->> +    mutex_unlock(&smmu_domain->init_mutex);
+>> +    return clp_req(rrb, CLP_LPS_PCI);
 >> +}
+>> +EXPORT_SYMBOL(zdev_query_pci_fn);
 >> +
->>   static struct iommu_ops arm_smmu_ops = {
->>       .capable        = arm_smmu_capable,
->>       .domain_alloc        = arm_smmu_domain_alloc,
->> @@ -2225,6 +2344,8 @@ static struct iommu_ops arm_smmu_ops = {
->>       .of_xlate        = arm_smmu_of_xlate,
->>       .get_resv_regions    = arm_smmu_get_resv_regions,
->>       .put_resv_regions    = arm_smmu_put_resv_regions,
->> +    .attach_pasid_table    = arm_smmu_attach_pasid_table,
->> +    .detach_pasid_table    = arm_smmu_detach_pasid_table,
->>       .pgsize_bitmap        = -1UL, /* Restricted during device attach */
->>   };
->>  
+>> +static int clp_query_pci(struct zpci_dev *zdev)
+>>   {
+>>       struct clp_req_rsp_query_pci *rrb;
+>> +    struct clp_req_rsp_query_pci_grp *grrb;
+>>       int rc;
+>>       rrb = clp_alloc_block(GFP_KERNEL);
+>>       if (!rrb)
+>>           return -ENOMEM;
+>> -    memset(rrb, 0, sizeof(*rrb));
+>> -    rrb->request.hdr.len = sizeof(rrb->request);
+>> -    rrb->request.hdr.cmd = CLP_QUERY_PCI_FN;
+>> -    rrb->response.hdr.len = sizeof(rrb->response);
+>> -    rrb->request.fh = fh;
+>> -
+>> -    rc = clp_req(rrb, CLP_LPS_PCI);
+>> -    if (!rc && rrb->response.hdr.rsp == CLP_RC_OK) {
+>> -        rc = clp_store_query_pci_fn(zdev, &rrb->response);
+>> -        if (rc)
+>> -            goto out;
+>> -        rc = clp_query_pci_fngrp(zdev, rrb->response.pfgid);
+>> -    } else {
+>> +    rc = zdev_query_pci_fn(zdev, rrb);
+>> +    if (rc || rrb->response.hdr.rsp != CLP_RC_OK) {
+>>           zpci_err("Q PCI FN:\n");
+>>           zpci_err_clp(rrb->response.hdr.rsp, rc);
+>>           rc = -EIO;
+>> +        goto out;
+>>       }
+>> +    rc = clp_store_query_pci_fn(zdev, &rrb->response);
+>> +    if (rc)
+>> +        goto out;
+>> +
+>> +    grrb = (struct clp_req_rsp_query_pci_grp *)rrb;
+>> +    rc = zdev_query_pci_fngrp(zdev, grrb);
+>> +    if (rc || grrb->response.hdr.rsp != CLP_RC_OK) {
+>> +        zpci_err("Q PCI FGRP:\n");
+>> +        zpci_err_clp(grrb->response.hdr.rsp, rc);
+>> +        rc = -EIO;
+>> +        goto out;
+>> +    }
+>> +    clp_store_query_pci_fngrp(zdev, &grrb->response);
+>> +
+>>   out:
+>>       clp_free_block(rrb);
+>>       return rc;
+>> @@ -219,7 +223,7 @@ int clp_add_pci_device(u32 fid, u32 fh, int 
+>> configured)
+>>       zdev->fid = fid;
+>>       /* Query function properties and update zdev */
+>> -    rc = clp_query_pci_fn(zdev, fh);
+>> +    rc = clp_query_pci(zdev);
+>>       if (rc)
+>>           goto error;
+>>
+> 
+
+
+-- 
+Pierre Morel
+Linux/KVM/QEMU in Böblingen - Germany
+
