@@ -2,94 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 809C919729
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 05:34:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BC25197C3
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 06:48:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726976AbfEJDeV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 23:34:21 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:33712 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726882AbfEJDeV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 May 2019 23:34:21 -0400
-Received: by mail-pl1-f196.google.com with SMTP id y3so2142043plp.0
-        for <kvm@vger.kernel.org>; Thu, 09 May 2019 20:34:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=2pgIIrZLViJSh9vPMPRmSqDmfvSvjM7wWRo99KAjncA=;
-        b=ho+rzJzyK1nDC6L97bjxWL/BcUmJElB/HNzksPX2/dht0cQi/Ewri1j+HJW8bXC6OU
-         jwL88tyB1+DhPjrox0kWryeRzu+aza/yKcvA086Q4xpfOEUpO90twThsr56JpGcrqEB/
-         TSFpR7enW+n6mklcpCoqT28VL7DtIwd94Mfi2q82CG5QG+uaifGHM25fhJqBfKavTY/l
-         iRBgpu6vbNjr0uX4wEGVFviPfAwpYKpseRL93I4Dq9+huY0/YpY4d53WvC8qBYK6RJv9
-         IjRQfm8slR3Ez4IDY+G+SH3tWDa4ENT+B+3TI2lFxpwF3oFie03c7Z5+ehquZmhmEqPd
-         ubCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=2pgIIrZLViJSh9vPMPRmSqDmfvSvjM7wWRo99KAjncA=;
-        b=f3TEJqnYmNF3IDfBmMev02/8410+sMFZRP9ZY/w8x+WebJXT/2nvWln8PjFWXsem3D
-         xaibBSSHeQprqj5IhLiYXbeZLEf7bvPIGGy3HPiEcott8qtvt5np2BqGdYJ6vIu7etTY
-         IgXifyhsNAJDbymG1S/8zjmlgDu3tLb9LeMraCInRfBEPPD57xD0/ZwywCqK12+dSf0a
-         +8Vw0HIa+PV9B15GvKRDm/fRgKX3zqf0RbUouTTM0Ihdu5av/VnN4nw57pTkTCn6dunu
-         GCF0u3+wY8U4svR2RJqZoS4tbui3jXN9cycIRuhNIr7lWc6ejjVJS/FJlFhSFZS3NzvU
-         j2ww==
-X-Gm-Message-State: APjAAAXQwzdU7r3OXZe3yR1U8Qx6QHicOL9p0/DvfiBlTlCGWBBWDyEZ
-        iqaM+NNF9fjswSF1YrOaTkQ=
-X-Google-Smtp-Source: APXvYqxnFSwsJBmlf6Bb+sipdrKPSaDiipOpshW1T0m7QU3DFn+TIYetw7KQTfVEImU/81nNt27ykg==
-X-Received: by 2002:a17:902:5e1:: with SMTP id f88mr9985300plf.226.1557459260817;
-        Thu, 09 May 2019 20:34:20 -0700 (PDT)
-Received: from [10.2.189.129] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id 15sm4698445pfy.88.2019.05.09.20.34.19
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 09 May 2019 20:34:20 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH] x86: Halt on exit
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20190509195023.11933-1-nadav.amit@gmail.com>
-Date:   Thu, 9 May 2019 20:34:18 -0700
-Cc:     kvm@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <6A5B897E-FF0F-4CD9-85D8-2C071CEF59CC@gmail.com>
-References: <20190509195023.11933-1-nadav.amit@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+        id S1726996AbfEJEsR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 May 2019 00:48:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53178 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725904AbfEJEsQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 May 2019 00:48:16 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A5604308339A;
+        Fri, 10 May 2019 04:48:16 +0000 (UTC)
+Received: from [10.72.12.54] (ovpn-12-54.pek2.redhat.com [10.72.12.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7CE635C296;
+        Fri, 10 May 2019 04:48:10 +0000 (UTC)
+Subject: Re: [RFC PATCH V2] vhost: don't use kmap() to log dirty pages
+From:   Jason Wang <jasowang@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Darren Hart <dvhart@infradead.org>
+References: <1557406680-4087-1-git-send-email-jasowang@redhat.com>
+ <20190509090433-mutt-send-email-mst@kernel.org>
+ <d6d69a36-9a3a-2a21-924e-97fdcc6e6733@redhat.com>
+Message-ID: <fa6444aa-9c46-22f0-204a-c7592dc5bd51@redhat.com>
+Date:   Fri, 10 May 2019 12:48:12 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <d6d69a36-9a3a-2a21-924e-97fdcc6e6733@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Fri, 10 May 2019 04:48:16 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Err=E2=80=A6 kvm-unit-tests patch if there is any doubt.
 
-> On May 9, 2019, at 12:50 PM, Nadav Amit <nadav.amit@gmail.com> wrote:
->=20
-> In some cases, shutdown through the test device and Bochs might fail.
-> Just hang in a loop that executes halt in such cases.
->=20
-> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
-> ---
-> lib/x86/io.c | 4 ++++
-> 1 file changed, 4 insertions(+)
->=20
-> diff --git a/lib/x86/io.c b/lib/x86/io.c
-> index f3e01f7..e6372c6 100644
-> --- a/lib/x86/io.c
-> +++ b/lib/x86/io.c
-> @@ -99,6 +99,10 @@ void exit(int code)
-> #else
->         asm volatile("out %0, %1" : : "a"(code), "d"((short)0xf4));
-> #endif
-> +	/* Fallback */
-> +	while (1) {
-> +		asm volatile ("hlt" ::: "memory");
-> +	}
-> 	__builtin_unreachable();
-> }
->=20
-> --=20
-> 2.17.1
+On 2019/5/10 上午10:59, Jason Wang wrote:
+>>>
+>>>         r = get_user_pages_fast(log, 1, 1, &page);
+>> OK so the trick is that page is pinned so you don't expect
+>> arch_futex_atomic_op_inuser below to fail.  get_user_pages_fast
+>> guarantees page is not going away but does it guarantee PTE won't be
+>> invaidated or write protected?
+>
+>
+> Good point, then I think we probably need to do manual fixup through 
+> fixup_user_fault() if arch_futex_atomic_op_in_user() fail. 
 
+
+This looks like a overkill, we don't need to atomic environment here 
+actually. Instead, just keep pagefault enabled should work. So just 
+introduce arch_futex_atomic_op_inuser_inatomic() variant with pagefault 
+disabled there just for futex should be sufficient.
+
+Thanks
 
