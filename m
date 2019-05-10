@@ -2,25 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9119219F4A
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 16:34:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8B9819F58
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 16:35:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728023AbfEJOej (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 May 2019 10:34:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55356 "EHLO mx1.redhat.com"
+        id S1727660AbfEJOfY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 May 2019 10:35:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36100 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727248AbfEJOej (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 May 2019 10:34:39 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S1727384AbfEJOfY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 May 2019 10:35:24 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8D5E3285CC;
-        Fri, 10 May 2019 14:34:34 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5CCE6C0586DD;
+        Fri, 10 May 2019 14:35:23 +0000 (UTC)
 Received: from [10.36.116.17] (ovpn-116-17.ams2.redhat.com [10.36.116.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A7AD5DE85;
-        Fri, 10 May 2019 14:34:24 +0000 (UTC)
-Subject: Re: [PATCH v7 12/23] iommu/smmuv3: Get prepared for nested stage
- support
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EB38260126;
+        Fri, 10 May 2019 14:35:16 +0000 (UTC)
+Subject: Re: [PATCH v7 06/23] iommu: Introduce bind/unbind_guest_msi
 To:     Robin Murphy <robin.murphy@arm.com>, eric.auger.pro@gmail.com,
         iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
@@ -31,196 +30,192 @@ Cc:     kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com,
         christoffer.dall@arm.com, peter.maydell@linaro.org,
         vincent.stehle@arm.com
 References: <20190408121911.24103-1-eric.auger@redhat.com>
- <20190408121911.24103-13-eric.auger@redhat.com>
- <66f873eb-35c0-d1e9-794e-9150dbdb13fe@arm.com>
+ <20190408121911.24103-7-eric.auger@redhat.com>
+ <a11e6535-9e9e-ed8d-9d19-1f9d895effa6@arm.com>
 From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <a1099cec-a8ad-6efa-b7e8-77388814f7e2@redhat.com>
-Date:   Fri, 10 May 2019 16:34:23 +0200
+Message-ID: <af36c889-8405-6de6-0256-4c157dc17aea@redhat.com>
+Date:   Fri, 10 May 2019 16:35:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <66f873eb-35c0-d1e9-794e-9150dbdb13fe@arm.com>
+In-Reply-To: <a11e6535-9e9e-ed8d-9d19-1f9d895effa6@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Fri, 10 May 2019 14:34:38 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Fri, 10 May 2019 14:35:23 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 Hi Robin,
-
-On 5/8/19 4:24 PM, Robin Murphy wrote:
-> On 08/04/2019 13:19, Eric Auger wrote:
->> To allow nested stage support, we need to store both
->> stage 1 and stage 2 configurations (and remove the former
->> union).
+On 5/8/19 3:59 PM, Robin Murphy wrote:
+> On 08/04/2019 13:18, Eric Auger wrote:
+>> On ARM, MSI are translated by the SMMU. An IOVA is allocated
+>> for each MSI doorbell. If both the host and the guest are exposed
+>> with SMMUs, we end up with 2 different IOVAs allocated by each.
+>> guest allocates an IOVA (gIOVA) to map onto the guest MSI
+>> doorbell (gDB). The Host allocates another IOVA (hIOVA) to map
+>> onto the physical doorbell (hDB).
 >>
->> A nested setup is characterized by both s1_cfg and s2_cfg
->> set.
+>> So we end up with 2 untied mappings:
+>>           S1            S2
+>> gIOVA    ->    gDB
+>>                hIOVA    ->    hDB
 >>
->> We introduce a new ste.abort field that will be set upon
->> guest stage1 configuration passing. If s1_cfg is NULL and
->> ste.abort is set, traffic can't pass. If ste.abort is not set,
->> S1 is bypassed.
+>> Currently the PCI device is programmed by the host with hIOVA
+>> as MSI doorbell. So this does not work.
 >>
->> arm_smmu_write_strtab_ent() is modified to write both stage
->> fields in the STE and deal with the abort field.
+>> This patch introduces an API to pass gIOVA/gDB to the host so
+>> that gIOVA can be reused by the host instead of re-allocating
+>> a new IOVA. So the goal is to create the following nested mapping:
 >>
->> In nested mode, only stage 2 is "finalized" as the host does
->> not own/configure the stage 1 context descriptor, guest does.
+>>           S1            S2
+>> gIOVA    ->    gDB     ->    hDB
+>>
+>> and program the PCI device with gIOVA MSI doorbell.
+>>
+>> In case we have several devices attached to this nested domain
+>> (devices belonging to the same group), they cannot be isolated
+>> on guest side either. So they should also end up in the same domain
+>> on guest side. We will enforce that all the devices attached to
+>> the host iommu domain use the same physical doorbell and similarly
+>> a single virtual doorbell mapping gets registered (1 single
+>> virtual doorbell is used on guest as well).
 >>
 >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 >>
 >> ---
->>
->> v4 -> v5:
->> - reset ste.abort on detach
+>> v6 -> v7:
+>> - remove the device handle parameter.
+>> - Add comments saying there can only be a single MSI binding
+>>    registered per iommu_domain
+>> v5 -> v6:
+>> -fix compile issue when IOMMU_API is not set
 >>
 >> v3 -> v4:
->> - s1_cfg.nested_abort and nested_bypass removed.
->> - s/ste.nested/ste.abort
->> - arm_smmu_write_strtab_ent modifications with introduction
->>    of local abort, bypass and translate local variables
->> - comment updated
+>> - add unbind
 >>
->> v1 -> v2:
->> - invalidate the STE before moving from a live STE config to another
->> - add the nested_abort and nested_bypass fields
+>> v2 -> v3:
+>> - add a struct device handle
 >> ---
->>   drivers/iommu/arm-smmu-v3.c | 35 ++++++++++++++++++++---------------
->>   1 file changed, 20 insertions(+), 15 deletions(-)
+>>   drivers/iommu/iommu.c | 37 +++++++++++++++++++++++++++++++++++++
+>>   include/linux/iommu.h | 23 +++++++++++++++++++++++
+>>   2 files changed, 60 insertions(+)
 >>
->> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
->> index 21d027695181..e22e944ffc05 100644
->> --- a/drivers/iommu/arm-smmu-v3.c
->> +++ b/drivers/iommu/arm-smmu-v3.c
->> @@ -211,6 +211,7 @@
->>   #define STRTAB_STE_0_CFG_BYPASS        4
->>   #define STRTAB_STE_0_CFG_S1_TRANS    5
->>   #define STRTAB_STE_0_CFG_S2_TRANS    6
->> +#define STRTAB_STE_0_CFG_NESTED        7
->>     #define STRTAB_STE_0_S1FMT        GENMASK_ULL(5, 4)
->>   #define STRTAB_STE_0_S1FMT_LINEAR    0
->> @@ -514,6 +515,7 @@ struct arm_smmu_strtab_ent {
->>        * configured according to the domain type.
->>        */
->>       bool                assigned;
->> +    bool                abort;
->>       struct arm_smmu_s1_cfg        *s1_cfg;
->>       struct arm_smmu_s2_cfg        *s2_cfg;
->>   };
->> @@ -628,10 +630,8 @@ struct arm_smmu_domain {
->>       bool                non_strict;
->>         enum arm_smmu_domain_stage    stage;
->> -    union {
->> -        struct arm_smmu_s1_cfg    s1_cfg;
->> -        struct arm_smmu_s2_cfg    s2_cfg;
->> -    };
->> +    struct arm_smmu_s1_cfg    s1_cfg;
->> +    struct arm_smmu_s2_cfg    s2_cfg;
->>         struct iommu_domain        domain;
->>   @@ -1108,12 +1108,13 @@ static void arm_smmu_write_strtab_ent(struct
->> arm_smmu_device *smmu, u32 sid,
->>                         __le64 *dst, struct arm_smmu_strtab_ent *ste)
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index 6d6cb4005ca5..0d160bbd6f81 100644
+>> --- a/drivers/iommu/iommu.c
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -1575,6 +1575,43 @@ static void __iommu_detach_device(struct
+>> iommu_domain *domain,
+>>       trace_detach_device_from_domain(dev);
+>>   }
+>>   +/**
+>> + * iommu_bind_guest_msi - Passes the stage1 GIOVA/GPA mapping of a
+>> + * virtual doorbell
+>> + *
+>> + * @domain: iommu domain the stage 1 mapping will be attached to
+>> + * @iova: iova allocated by the guest
+>> + * @gpa: guest physical address of the virtual doorbell
+>> + * @size: granule size used for the mapping
+>> + *
+>> + * The associated IOVA can be reused by the host to create a nested
+>> + * stage2 binding mapping translating into the physical doorbell used
+>> + * by the devices attached to the domain.
+>> + *
+>> + * All devices within the domain must share the same physical doorbell.
+>> + * A single MSI GIOVA/GPA mapping can be attached to an iommu_domain.
+>> + */
+>> +
+>> +int iommu_bind_guest_msi(struct iommu_domain *domain,
+>> +             dma_addr_t giova, phys_addr_t gpa, size_t size)
+>> +{
+>> +    if (unlikely(!domain->ops->bind_guest_msi))
+>> +        return -ENODEV;
+>> +
+>> +    return domain->ops->bind_guest_msi(domain, giova, gpa, size);
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_bind_guest_msi);
+>> +
+>> +void iommu_unbind_guest_msi(struct iommu_domain *domain,
+>> +                dma_addr_t iova)
+>> +{
+>> +    if (unlikely(!domain->ops->unbind_guest_msi))
+>> +        return;
+>> +
+>> +    domain->ops->unbind_guest_msi(domain, iova);
+>> +}
+>> +EXPORT_SYMBOL_GPL(iommu_unbind_guest_msi);
+>> +
+>>   void iommu_detach_device(struct iommu_domain *domain, struct device
+>> *dev)
 >>   {
->>       /*
->> -     * This is hideously complicated, but we only really care about
->> -     * three cases at the moment:
->> +     * We care about the following transitions:
->>        *
->>        * 1. Invalid (all zero) -> bypass/fault (init)
->> -     * 2. Bypass/fault -> translation/bypass (attach)
->> -     * 3. Translation/bypass -> bypass/fault (detach)
->> +     * 2. Bypass/fault -> single stage translation/bypass (attach)
->> +     * 3. single stage Translation/bypass -> bypass/fault (detach)
->> +     * 4. S2 -> S1 + S2 (attach_pasid_table)
->> +     * 5. S1 + S2 -> S2 (detach_pasid_table)
->>        *
->>        * Given that we can't update the STE atomically and the SMMU
->>        * doesn't read the thing in a defined order, that leaves us
->> @@ -1124,7 +1125,7 @@ static void arm_smmu_write_strtab_ent(struct
->> arm_smmu_device *smmu, u32 sid,
->>        * 3. Update Config, sync
->>        */
->>       u64 val = le64_to_cpu(dst[0]);
->> -    bool ste_live = false;
->> +    bool abort, bypass, translate, ste_live = false;
->>       struct arm_smmu_cmdq_ent prefetch_cmd = {
->>           .opcode        = CMDQ_OP_PREFETCH_CFG,
->>           .prefetch    = {
->> @@ -1138,11 +1139,11 @@ static void arm_smmu_write_strtab_ent(struct
->> arm_smmu_device *smmu, u32 sid,
->>               break;
->>           case STRTAB_STE_0_CFG_S1_TRANS:
->>           case STRTAB_STE_0_CFG_S2_TRANS:
->> +        case STRTAB_STE_0_CFG_NESTED:
->>               ste_live = true;
->>               break;
->>           case STRTAB_STE_0_CFG_ABORT:
->> -            if (disable_bypass)
->> -                break;
->> +            break;
->>           default:
->>               BUG(); /* STE corruption */
->>           }
->> @@ -1152,8 +1153,13 @@ static void arm_smmu_write_strtab_ent(struct
->> arm_smmu_device *smmu, u32 sid,
->>       val = STRTAB_STE_0_V;
->>         /* Bypass/fault */
->> -    if (!ste->assigned || !(ste->s1_cfg || ste->s2_cfg)) {
->> -        if (!ste->assigned && disable_bypass)
+>>       struct iommu_group *group;
+>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>> index 7c7c6bad1420..a2f3f964ead2 100644
+>> --- a/include/linux/iommu.h
+>> +++ b/include/linux/iommu.h
+>> @@ -192,6 +192,8 @@ struct iommu_resv_region {
+>>    * @attach_pasid_table: attach a pasid table
+>>    * @detach_pasid_table: detach the pasid table
+>>    * @cache_invalidate: invalidate translation caches
+>> + * @bind_guest_msi: provides a stage1 giova/gpa MSI doorbell mapping
+>> + * @unbind_guest_msi: withdraw a stage1 giova/gpa MSI doorbell mapping
+>>    * @pgsize_bitmap: bitmap of all possible supported page sizes
+>>    */
+>>   struct iommu_ops {
+>> @@ -243,6 +245,10 @@ struct iommu_ops {
+>>       int (*cache_invalidate)(struct iommu_domain *domain, struct
+>> device *dev,
+>>                   struct iommu_cache_invalidate_info *inv_info);
+>>   +    int (*bind_guest_msi)(struct iommu_domain *domain,
+>> +                  dma_addr_t giova, phys_addr_t gpa, size_t size);
+>> +    void (*unbind_guest_msi)(struct iommu_domain *domain, dma_addr_t
+>> giova);
 >> +
->> +    abort = (!ste->assigned && disable_bypass) || ste->abort;
->> +    translate = ste->s1_cfg || ste->s2_cfg;
->> +    bypass = !abort && !translate;
+>>       unsigned long pgsize_bitmap;
+>>   };
+>>   @@ -356,6 +362,11 @@ extern void iommu_detach_pasid_table(struct
+>> iommu_domain *domain);
+>>   extern int iommu_cache_invalidate(struct iommu_domain *domain,
+>>                     struct device *dev,
+>>                     struct iommu_cache_invalidate_info *inv_info);
+>> +extern int iommu_bind_guest_msi(struct iommu_domain *domain,
+>> +                dma_addr_t giova, phys_addr_t gpa, size_t size);
+>> +extern void iommu_unbind_guest_msi(struct iommu_domain *domain,
+>> +                   dma_addr_t giova);
 >> +
->> +    if (abort || bypass) {
->> +        if (abort)
->>               val |= FIELD_PREP(STRTAB_STE_0_CFG,
->> STRTAB_STE_0_CFG_ABORT);
->>           else
->>               val |= FIELD_PREP(STRTAB_STE_0_CFG,
->> STRTAB_STE_0_CFG_BYPASS);
->> @@ -1172,7 +1178,6 @@ static void arm_smmu_write_strtab_ent(struct
->> arm_smmu_device *smmu, u32 sid,
->>       }
->>         if (ste->s1_cfg) {
->> -        BUG_ON(ste_live);
+>>   extern struct iommu_domain *iommu_get_domain_for_dev(struct device
+>> *dev);
+>>   extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
+>>   extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
+>> @@ -812,6 +823,18 @@ iommu_cache_invalidate(struct iommu_domain *domain,
+>>       return -ENODEV;
+>>   }
+>>   +static inline
+>> +int iommu_bind_guest_msi(struct iommu_domain *domain,
+>> +             dma_addr_t giova, phys_addr_t gpa, size_t size)
+>> +{
+>> +    return -ENODEV;
+>> +}
+>> +static inline
+>> +int iommu_unbind_guest_msi(struct iommu_domain *domain, dma_addr_t
+>> giova)
+>> +{
+>> +    return -ENODEV;
 > 
-> Hmm, I'm a little uneasy about just removing these checks altogether, as
-> there are still cases where rewriting a live entry is bogus, that we'd
-> really like to keep catching. Is the problem that it's hard to tell when
-> you're 'rewriting' the S2 config of a nested entry with the same thing
-> on attaching/detaching its S1 context?
-No, I restored the original checks in !nested mode and added a new check
-to make sure we never update a live S1 in nested mode. Only S2 can be live.
-
-Thanks
+> It's less of a problem than mismatching the other way round, but for
+> consistency this should return void like the real version.
+thank you for spotting this.
 
 Eric
 > 
 > Robin.
 > 
->>           dst[1] = cpu_to_le64(
->>                FIELD_PREP(STRTAB_STE_1_S1CIR,
->> STRTAB_STE_1_S1C_CACHE_WBRA) |
->>                FIELD_PREP(STRTAB_STE_1_S1COR,
->> STRTAB_STE_1_S1C_CACHE_WBRA) |
->> @@ -1191,7 +1196,6 @@ static void arm_smmu_write_strtab_ent(struct
->> arm_smmu_device *smmu, u32 sid,
->>       }
->>         if (ste->s2_cfg) {
->> -        BUG_ON(ste_live);
->>           dst[2] = cpu_to_le64(
->>                FIELD_PREP(STRTAB_STE_2_S2VMID, ste->s2_cfg->vmid) |
->>                FIELD_PREP(STRTAB_STE_2_VTCR, ste->s2_cfg->vtcr) |
->> @@ -1773,6 +1777,7 @@ static void arm_smmu_detach_dev(struct device *dev)
->>       }
->>         master->ste.assigned = false;
->> +    master->ste.abort = false;
->>       arm_smmu_install_ste_for_dev(fwspec);
->>   }
->>  
+>> +}
+>> +
+>>   #endif /* CONFIG_IOMMU_API */
+>>     #ifdef CONFIG_IOMMU_DEBUGFS
+>>
