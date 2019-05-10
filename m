@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FBD0199A7
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 10:24:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04AE3199AD
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 10:25:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727152AbfEJIXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 May 2019 04:23:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57804 "EHLO
+        id S1727021AbfEJIZR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 May 2019 04:25:17 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41858 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727112AbfEJIXS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 May 2019 04:23:18 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4A8NDbO084855
-        for <kvm@vger.kernel.org>; Fri, 10 May 2019 04:23:17 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2sd4q9attq-1
+        by vger.kernel.org with ESMTP id S1726992AbfEJIZR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 May 2019 04:25:17 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4A8P6xD140435
+        for <kvm@vger.kernel.org>; Fri, 10 May 2019 04:25:15 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2sd4vrt62n-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 10 May 2019 04:23:15 -0400
+        for <kvm@vger.kernel.org>; Fri, 10 May 2019 04:25:13 -0400
 Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Fri, 10 May 2019 09:22:42 +0100
+        Fri, 10 May 2019 09:22:44 +0100
 Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 10 May 2019 09:22:39 +0100
+        Fri, 10 May 2019 09:22:40 +0100
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4A8Mcx553870696
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4A8McNk58851378
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Fri, 10 May 2019 08:22:38 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2523EAE04D;
+        by IMSVA (Postfix) with ESMTP id C1D2DAE051;
         Fri, 10 May 2019 08:22:38 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 912F0AE045;
-        Fri, 10 May 2019 08:22:37 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 3AA27AE045;
+        Fri, 10 May 2019 08:22:38 +0000 (GMT)
 Received: from morel-ThinkPad-W530.boeblingen.de.ibm.com (unknown [9.145.187.238])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 10 May 2019 08:22:37 +0000 (GMT)
+        Fri, 10 May 2019 08:22:38 +0000 (GMT)
 From:   Pierre Morel <pmorel@linux.ibm.com>
 To:     sebott@linux.vnet.ibm.com
 Cc:     gerald.schaefer@de.ibm.com, pasic@linux.vnet.ibm.com,
@@ -47,146 +47,166 @@ Cc:     gerald.schaefer@de.ibm.com, pasic@linux.vnet.ibm.com,
         joro@8bytes.org, linux-kernel@vger.kernel.org,
         alex.williamson@redhat.com, kvm@vger.kernel.org,
         schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com
-Subject: [PATCH 3/4] s390: iommu: Adding get attributes for s390_iommu
-Date:   Fri, 10 May 2019 10:22:34 +0200
+Subject: [PATCH 4/4] vfio: vfio_iommu_type1: implement VFIO_IOMMU_INFO_CAPABILITIES
+Date:   Fri, 10 May 2019 10:22:35 +0200
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1557476555-20256-1-git-send-email-pmorel@linux.ibm.com>
 References: <1557476555-20256-1-git-send-email-pmorel@linux.ibm.com>
 X-TM-AS-GCONF: 00
-x-cbid: 19051008-0008-0000-0000-000002E53738
+x-cbid: 19051008-0016-0000-0000-0000027A405B
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051008-0009-0000-0000-00002251C19E
-Message-Id: <1557476555-20256-4-git-send-email-pmorel@linux.ibm.com>
+x-cbparentid: 19051008-0017-0000-0000-000032D6F9DC
+Message-Id: <1557476555-20256-5-git-send-email-pmorel@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-09_02:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ mlxlogscore=950 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1810050000 definitions=main-1905100059
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We add "get attributes" to the S390 iommu operations to retrieve the S390
-specific attributes through the call of zPCI dedicated CLP functions.
+We implement a capability intercafe for VFIO_IOMMU_GET_INFO and add the
+first capability: VFIO_IOMMU_INFO_CAPABILITIES.
+
+When calling the ioctl, the user must specify
+VFIO_IOMMU_INFO_CAPABILITIES to retrieve the capabilities and must check
+in the answer if capabilities are supported.
+Older kernel will not check nor set the VFIO_IOMMU_INFO_CAPABILITIES in
+the flags of vfio_iommu_type1_info.
+
+The iommu get_attr callback will be called to retrieve the specific
+attributes and fill the capabilities, VFIO_IOMMU_INFO_CAP_QFN for the
+PCI query function attributes and VFIO_IOMMU_INFO_CAP_QGRP for the
+PCI query function group.
 
 Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 ---
- drivers/iommu/s390-iommu.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/iommu.h      |  4 +++
- 2 files changed, 81 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 95 ++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 94 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/iommu/s390-iommu.c b/drivers/iommu/s390-iommu.c
-index 22d4db3..98082f0 100644
---- a/drivers/iommu/s390-iommu.c
-+++ b/drivers/iommu/s390-iommu.c
-@@ -363,6 +363,82 @@ void zpci_destroy_iommu(struct zpci_dev *zdev)
- 	iommu_device_sysfs_remove(&zdev->iommu_dev);
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index d0f731c..f7f8120 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -1658,6 +1658,70 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+ 	return ret;
  }
  
-+struct zpci_dev *get_zpci(struct s390_domain *s390_domain)
++int vfio_iommu_type1_caps(struct vfio_iommu *iommu, struct vfio_info_cap *caps,
++			  size_t size)
 +{
-+	struct s390_domain_device *domain_device;
++	struct vfio_domain *d;
++	struct vfio_iommu_type1_info_block *info_fn;
++	struct vfio_iommu_type1_info_block *info_grp;
++	unsigned long total_size, fn_size, grp_size;
++	int ret;
 +
-+	domain_device = list_first_entry(&s390_domain->devices,
-+					 struct s390_domain_device, list);
-+	if (!domain_device)
-+		return NULL;
-+	return domain_device->zdev;
-+}
-+
-+static int s390_domain_get_fn(struct iommu_domain *domain, void *data)
-+{
-+	struct zpci_dev *zdev;
-+	struct clp_req_rsp_query_pci *rrb;
-+	int rc;
-+
-+	zdev = get_zpci(to_s390_domain(domain));
-+	if (!zdev)
++	d = list_first_entry(&iommu->domain_list, struct vfio_domain, next);
++	if (!d)
 +		return -ENODEV;
-+	rrb = (struct clp_req_rsp_query_pci *)
-+	      __get_free_pages(GFP_KERNEL, get_order(CLP_BLK_SIZE));
-+	if (!rrb)
-+		return -ENOMEM;
-+	rc = zdev_query_pci_fn(zdev, rrb);
++	/* The size of these capabilities are device dependent */
++	fn_size = iommu_domain_get_attr(d->domain,
++					DOMAIN_ATTR_ZPCI_FN_SIZE, NULL);
++	if (fn_size < 0)
++		return fn_size;
++	fn_size +=  sizeof(struct vfio_info_cap_header);
++	total_size = fn_size;
 +
-+	if (!rc && rrb->response.hdr.rsp == CLP_RC_OK)
-+		memcpy(data, &rrb->response, sizeof(struct clp_rsp_query_pci));
-+	else
-+		rc = -EIO;
-+	free_pages((unsigned long) rrb, get_order(CLP_BLK_SIZE));
-+	return rc;
-+}
++	grp_size = iommu_domain_get_attr(d->domain,
++					 DOMAIN_ATTR_ZPCI_GRP_SIZE, NULL);
++	if (grp_size < 0)
++		return grp_size;
++	grp_size +=  sizeof(struct vfio_info_cap_header);
++	total_size += grp_size;
 +
-+static int s390_domain_get_grp(struct iommu_domain *domain, void *data)
-+{
-+	struct zpci_dev *zdev;
-+	struct clp_req_rsp_query_pci_grp *rrb;
-+	int rc;
-+
-+	zdev = get_zpci(to_s390_domain(domain));
-+	if (!zdev)
-+		return -ENODEV;
-+	rrb = (struct clp_req_rsp_query_pci_grp *)
-+	      __get_free_pages(GFP_KERNEL, get_order(CLP_BLK_SIZE));
-+	if (!rrb)
-+		return -ENOMEM;
-+
-+	rc = zdev_query_pci_fngrp(zdev, rrb);
-+	if (!rc && rrb->response.hdr.rsp == CLP_RC_OK)
-+		memcpy(data, &rrb->response,
-+		       sizeof(struct clp_rsp_query_pci_grp));
-+	else
-+		rc = -EIO;
-+
-+	free_pages((unsigned long) rrb, get_order(CLP_BLK_SIZE));
-+	return rc;
-+}
-+
-+static int s390_domain_get_attr(struct iommu_domain *domain,
-+				enum iommu_attr attr, void *data)
-+{
-+	switch (attr) {
-+	case DOMAIN_ATTR_ZPCI_FN_SIZE:
-+		return sizeof(struct clp_rsp_query_pci);
-+	case DOMAIN_ATTR_ZPCI_GRP_SIZE:
-+		return sizeof(struct clp_rsp_query_pci_grp);
-+	case DOMAIN_ATTR_ZPCI_FN:
-+		return s390_domain_get_fn(domain, data);
-+	case DOMAIN_ATTR_ZPCI_GRP:
-+		return s390_domain_get_grp(domain, data);
-+	default:
-+		return -ENODEV;
++	/* Tell caller to call us with a greater buffer */
++	if (total_size > size) {
++		caps->size = total_size;
++		return 0;
 +	}
++
++	info_fn = kzalloc(fn_size, GFP_KERNEL);
++	if (!info_fn)
++		return -ENOMEM;
++	ret = iommu_domain_get_attr(d->domain,
++				    DOMAIN_ATTR_ZPCI_FN, &info_fn->data);
++	if (ret < 0)
++		return ret;
++
++	info_fn->header.id = VFIO_IOMMU_INFO_CAP_QFN;
++
++	ret = vfio_info_add_capability(caps, &info_fn->header, fn_size);
++	if (ret)
++		goto err_fn;
++
++	info_grp = kzalloc(grp_size, GFP_KERNEL);
++	if (!info_grp)
++		goto err_fn;
++	ret = iommu_domain_get_attr(d->domain,
++				    DOMAIN_ATTR_ZPCI_GRP, &info_grp->data);
++	if (ret < 0)
++		goto err_grp;
++	info_grp->header.id = VFIO_IOMMU_INFO_CAP_QGRP;
++	ret = vfio_info_add_capability(caps, &info_grp->header, grp_size);
++
++err_grp:
++	kfree(info_grp);
++err_fn:
++	kfree(info_fn);
++	return ret;
 +}
 +
- static const struct iommu_ops s390_iommu_ops = {
- 	.capable = s390_iommu_capable,
- 	.domain_alloc = s390_domain_alloc,
-@@ -376,6 +452,7 @@ static const struct iommu_ops s390_iommu_ops = {
- 	.remove_device = s390_iommu_remove_device,
- 	.device_group = generic_device_group,
- 	.pgsize_bitmap = S390_IOMMU_PGSIZES,
-+	.domain_get_attr = s390_domain_get_attr,
- };
+ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 				   unsigned int cmd, unsigned long arg)
+ {
+@@ -1679,6 +1743,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 		}
+ 	} else if (cmd == VFIO_IOMMU_GET_INFO) {
+ 		struct vfio_iommu_type1_info info;
++		struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
++		int ret;
  
- static int __init s390_iommu_init(void)
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index ffbbc7e..ebdcac4 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -125,6 +125,10 @@ enum iommu_attr {
- 	DOMAIN_ATTR_FSL_PAMUV1,
- 	DOMAIN_ATTR_NESTING,	/* two stages of translation */
- 	DOMAIN_ATTR_DMA_USE_FLUSH_QUEUE,
-+	DOMAIN_ATTR_ZPCI_FN_SIZE,
-+	DOMAIN_ATTR_ZPCI_GRP_SIZE,
-+	DOMAIN_ATTR_ZPCI_FN,
-+	DOMAIN_ATTR_ZPCI_GRP,
- 	DOMAIN_ATTR_MAX,
- };
+ 		minsz = offsetofend(struct vfio_iommu_type1_info, iova_pgsizes);
+ 
+@@ -1688,7 +1754,34 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 		if (info.argsz < minsz)
+ 			return -EINVAL;
+ 
+-		info.flags = VFIO_IOMMU_INFO_PGSIZES;
++		if (info.flags & VFIO_IOMMU_INFO_CAPABILITIES) {
++			minsz = offsetofend(struct vfio_iommu_type1_info,
++					    cap_offset);
++			if (info.argsz < minsz)
++				return -EINVAL;
++			ret = vfio_iommu_type1_caps(iommu, &caps,
++						    info.argsz - sizeof(info));
++			if (ret)
++				return ret;
++		}
++		if (caps.size) {
++			if (info.argsz < sizeof(info) + caps.size) {
++				info.argsz = sizeof(info) + caps.size;
++				info.cap_offset = 0;
++			} else {
++				if (copy_to_user((void __user *)arg +
++						 sizeof(info), caps.buf,
++						 caps.size)) {
++					kfree(caps.buf);
++					return -EFAULT;
++				}
++
++				info.cap_offset = sizeof(info);
++			}
++			kfree(caps.buf);
++		}
++
++		info.flags |= VFIO_IOMMU_INFO_PGSIZES;
+ 
+ 		info.iova_pgsizes = vfio_pgsize_bitmap(iommu);
  
 -- 
 2.7.4
