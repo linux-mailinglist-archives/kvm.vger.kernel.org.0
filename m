@@ -2,113 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2478919F43
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 16:34:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9119219F4A
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 16:34:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727949AbfEJOeT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 May 2019 10:34:19 -0400
-Received: from mga14.intel.com ([192.55.52.115]:32461 "EHLO mga14.intel.com"
+        id S1728023AbfEJOej (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 May 2019 10:34:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55356 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727248AbfEJOeT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 May 2019 10:34:19 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 May 2019 07:34:16 -0700
-X-ExtLoop1: 1
-Received: from smile.fi.intel.com (HELO smile) ([10.237.72.86])
-  by orsmga002.jf.intel.com with ESMTP; 10 May 2019 07:34:08 -0700
-Received: from andy by smile with local (Exim 4.92)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1hP6b9-0004Sg-Pc; Fri, 10 May 2019 17:34:07 +0300
-Date:   Fri, 10 May 2019 17:34:07 +0300
-From:   "andriy.shevchenko@linux.intel.com" 
-        <andriy.shevchenko@linux.intel.com>
-To:     "Ardelean, Alexandru" <alexandru.Ardelean@analog.com>
-Cc:     "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
-        "linux-gpio@vger.kernel.org" <linux-gpio@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "linux-rpi-kernel@lists.infradead.org" 
-        <linux-rpi-kernel@lists.infradead.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
-        "linux-rockchip@lists.infradead.org" 
-        <linux-rockchip@lists.infradead.org>,
-        "linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
-        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-Subject: Re: [PATCH 03/16] lib,treewide: add new match_string() helper/macro
-Message-ID: <20190510143407.GA9224@smile.fi.intel.com>
-References: <20190508112842.11654-1-alexandru.ardelean@analog.com>
- <20190508112842.11654-5-alexandru.ardelean@analog.com>
- <20190508131128.GL9224@smile.fi.intel.com>
- <20190508131856.GB10138@kroah.com>
- <b2440bc9485456a7a90a488c528997587b22088b.camel@analog.com>
- <4df165bc4247e60aa4952fd55cb0c77e60712767.camel@analog.com>
+        id S1727248AbfEJOej (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 May 2019 10:34:39 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8D5E3285CC;
+        Fri, 10 May 2019 14:34:34 +0000 (UTC)
+Received: from [10.36.116.17] (ovpn-116-17.ams2.redhat.com [10.36.116.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A7AD5DE85;
+        Fri, 10 May 2019 14:34:24 +0000 (UTC)
+Subject: Re: [PATCH v7 12/23] iommu/smmuv3: Get prepared for nested stage
+ support
+To:     Robin Murphy <robin.murphy@arm.com>, eric.auger.pro@gmail.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
+        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
+        yi.l.liu@intel.com, jean-philippe.brucker@arm.com,
+        will.deacon@arm.com
+Cc:     kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com,
+        christoffer.dall@arm.com, peter.maydell@linaro.org,
+        vincent.stehle@arm.com
+References: <20190408121911.24103-1-eric.auger@redhat.com>
+ <20190408121911.24103-13-eric.auger@redhat.com>
+ <66f873eb-35c0-d1e9-794e-9150dbdb13fe@arm.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <a1099cec-a8ad-6efa-b7e8-77388814f7e2@redhat.com>
+Date:   Fri, 10 May 2019 16:34:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4df165bc4247e60aa4952fd55cb0c77e60712767.camel@analog.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <66f873eb-35c0-d1e9-794e-9150dbdb13fe@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Fri, 10 May 2019 14:34:38 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 10, 2019 at 09:15:27AM +0000, Ardelean, Alexandru wrote:
-> On Wed, 2019-05-08 at 16:22 +0300, Alexandru Ardelean wrote:
-> > On Wed, 2019-05-08 at 15:18 +0200, Greg KH wrote:
-> > > On Wed, May 08, 2019 at 04:11:28PM +0300, Andy Shevchenko wrote:
-> > > > On Wed, May 08, 2019 at 02:28:29PM +0300, Alexandru Ardelean wrote:
+Hi Robin,
 
-> > > > Can you split include/linux/ change from the rest?
-> > > 
-> > > That would break the build, why do you want it split out?  This makes
-> > > sense all as a single patch to me.
-> > > 
-> > 
-> > Not really.
-> > It would be just be the new match_string() helper/macro in a new commit.
-> > And the conversions of the simple users of match_string() (the ones using
-> > ARRAY_SIZE()) in another commit.
-> > 
+On 5/8/19 4:24 PM, Robin Murphy wrote:
+> On 08/04/2019 13:19, Eric Auger wrote:
+>> To allow nested stage support, we need to store both
+>> stage 1 and stage 2 configurations (and remove the former
+>> union).
+>>
+>> A nested setup is characterized by both s1_cfg and s2_cfg
+>> set.
+>>
+>> We introduce a new ste.abort field that will be set upon
+>> guest stage1 configuration passing. If s1_cfg is NULL and
+>> ste.abort is set, traffic can't pass. If ste.abort is not set,
+>> S1 is bypassed.
+>>
+>> arm_smmu_write_strtab_ent() is modified to write both stage
+>> fields in the STE and deal with the abort field.
+>>
+>> In nested mode, only stage 2 is "finalized" as the host does
+>> not own/configure the stage 1 context descriptor, guest does.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v4 -> v5:
+>> - reset ste.abort on detach
+>>
+>> v3 -> v4:
+>> - s1_cfg.nested_abort and nested_bypass removed.
+>> - s/ste.nested/ste.abort
+>> - arm_smmu_write_strtab_ent modifications with introduction
+>>    of local abort, bypass and translate local variables
+>> - comment updated
+>>
+>> v1 -> v2:
+>> - invalidate the STE before moving from a live STE config to another
+>> - add the nested_abort and nested_bypass fields
+>> ---
+>>   drivers/iommu/arm-smmu-v3.c | 35 ++++++++++++++++++++---------------
+>>   1 file changed, 20 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
+>> index 21d027695181..e22e944ffc05 100644
+>> --- a/drivers/iommu/arm-smmu-v3.c
+>> +++ b/drivers/iommu/arm-smmu-v3.c
+>> @@ -211,6 +211,7 @@
+>>   #define STRTAB_STE_0_CFG_BYPASS        4
+>>   #define STRTAB_STE_0_CFG_S1_TRANS    5
+>>   #define STRTAB_STE_0_CFG_S2_TRANS    6
+>> +#define STRTAB_STE_0_CFG_NESTED        7
+>>     #define STRTAB_STE_0_S1FMT        GENMASK_ULL(5, 4)
+>>   #define STRTAB_STE_0_S1FMT_LINEAR    0
+>> @@ -514,6 +515,7 @@ struct arm_smmu_strtab_ent {
+>>        * configured according to the domain type.
+>>        */
+>>       bool                assigned;
+>> +    bool                abort;
+>>       struct arm_smmu_s1_cfg        *s1_cfg;
+>>       struct arm_smmu_s2_cfg        *s2_cfg;
+>>   };
+>> @@ -628,10 +630,8 @@ struct arm_smmu_domain {
+>>       bool                non_strict;
+>>         enum arm_smmu_domain_stage    stage;
+>> -    union {
+>> -        struct arm_smmu_s1_cfg    s1_cfg;
+>> -        struct arm_smmu_s2_cfg    s2_cfg;
+>> -    };
+>> +    struct arm_smmu_s1_cfg    s1_cfg;
+>> +    struct arm_smmu_s2_cfg    s2_cfg;
+>>         struct iommu_domain        domain;
+>>   @@ -1108,12 +1108,13 @@ static void arm_smmu_write_strtab_ent(struct
+>> arm_smmu_device *smmu, u32 sid,
+>>                         __le64 *dst, struct arm_smmu_strtab_ent *ste)
+>>   {
+>>       /*
+>> -     * This is hideously complicated, but we only really care about
+>> -     * three cases at the moment:
+>> +     * We care about the following transitions:
+>>        *
+>>        * 1. Invalid (all zero) -> bypass/fault (init)
+>> -     * 2. Bypass/fault -> translation/bypass (attach)
+>> -     * 3. Translation/bypass -> bypass/fault (detach)
+>> +     * 2. Bypass/fault -> single stage translation/bypass (attach)
+>> +     * 3. single stage Translation/bypass -> bypass/fault (detach)
+>> +     * 4. S2 -> S1 + S2 (attach_pasid_table)
+>> +     * 5. S1 + S2 -> S2 (detach_pasid_table)
+>>        *
+>>        * Given that we can't update the STE atomically and the SMMU
+>>        * doesn't read the thing in a defined order, that leaves us
+>> @@ -1124,7 +1125,7 @@ static void arm_smmu_write_strtab_ent(struct
+>> arm_smmu_device *smmu, u32 sid,
+>>        * 3. Update Config, sync
+>>        */
+>>       u64 val = le64_to_cpu(dst[0]);
+>> -    bool ste_live = false;
+>> +    bool abort, bypass, translate, ste_live = false;
+>>       struct arm_smmu_cmdq_ent prefetch_cmd = {
+>>           .opcode        = CMDQ_OP_PREFETCH_CFG,
+>>           .prefetch    = {
+>> @@ -1138,11 +1139,11 @@ static void arm_smmu_write_strtab_ent(struct
+>> arm_smmu_device *smmu, u32 sid,
+>>               break;
+>>           case STRTAB_STE_0_CFG_S1_TRANS:
+>>           case STRTAB_STE_0_CFG_S2_TRANS:
+>> +        case STRTAB_STE_0_CFG_NESTED:
+>>               ste_live = true;
+>>               break;
+>>           case STRTAB_STE_0_CFG_ABORT:
+>> -            if (disable_bypass)
+>> -                break;
+>> +            break;
+>>           default:
+>>               BUG(); /* STE corruption */
+>>           }
+>> @@ -1152,8 +1153,13 @@ static void arm_smmu_write_strtab_ent(struct
+>> arm_smmu_device *smmu, u32 sid,
+>>       val = STRTAB_STE_0_V;
+>>         /* Bypass/fault */
+>> -    if (!ste->assigned || !(ste->s1_cfg || ste->s2_cfg)) {
+>> -        if (!ste->assigned && disable_bypass)
+>> +
+>> +    abort = (!ste->assigned && disable_bypass) || ste->abort;
+>> +    translate = ste->s1_cfg || ste->s2_cfg;
+>> +    bypass = !abort && !translate;
+>> +
+>> +    if (abort || bypass) {
+>> +        if (abort)
+>>               val |= FIELD_PREP(STRTAB_STE_0_CFG,
+>> STRTAB_STE_0_CFG_ABORT);
+>>           else
+>>               val |= FIELD_PREP(STRTAB_STE_0_CFG,
+>> STRTAB_STE_0_CFG_BYPASS);
+>> @@ -1172,7 +1178,6 @@ static void arm_smmu_write_strtab_ent(struct
+>> arm_smmu_device *smmu, u32 sid,
+>>       }
+>>         if (ste->s1_cfg) {
+>> -        BUG_ON(ste_live);
 > 
-> I should have asked in my previous reply.
-> Leave this as-is or re-formulate in 2 patches ?
+> Hmm, I'm a little uneasy about just removing these checks altogether, as
+> there are still cases where rewriting a live entry is bogus, that we'd
+> really like to keep catching. Is the problem that it's hard to tell when
+> you're 'rewriting' the S2 config of a nested entry with the same thing
+> on attaching/detaching its S1 context?
+No, I restored the original checks in !nested mode and added a new check
+to make sure we never update a live S1 in nested mode. Only S2 can be live.
 
-Depends on on what you would like to spend your time: collecting Acks for all
-pieces in treewide patch or send new API first followed up by per driver /
-module update in next cycle.
+Thanks
 
-I also have no strong preference.
-And I think it's good to add Heikki Krogerus to Cc list for both patch series,
-since he is the author of sysfs variant and may have something to comment on
-the rest.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Eric
+> 
+> Robin.
+> 
+>>           dst[1] = cpu_to_le64(
+>>                FIELD_PREP(STRTAB_STE_1_S1CIR,
+>> STRTAB_STE_1_S1C_CACHE_WBRA) |
+>>                FIELD_PREP(STRTAB_STE_1_S1COR,
+>> STRTAB_STE_1_S1C_CACHE_WBRA) |
+>> @@ -1191,7 +1196,6 @@ static void arm_smmu_write_strtab_ent(struct
+>> arm_smmu_device *smmu, u32 sid,
+>>       }
+>>         if (ste->s2_cfg) {
+>> -        BUG_ON(ste_live);
+>>           dst[2] = cpu_to_le64(
+>>                FIELD_PREP(STRTAB_STE_2_S2VMID, ste->s2_cfg->vmid) |
+>>                FIELD_PREP(STRTAB_STE_2_VTCR, ste->s2_cfg->vtcr) |
+>> @@ -1773,6 +1777,7 @@ static void arm_smmu_detach_dev(struct device *dev)
+>>       }
+>>         master->ste.assigned = false;
+>> +    master->ste.abort = false;
+>>       arm_smmu_install_ste_for_dev(fwspec);
+>>   }
+>>  
