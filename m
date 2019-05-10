@@ -2,212 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 04AE3199AD
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 10:25:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 972FF19A3E
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 11:09:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727021AbfEJIZR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 May 2019 04:25:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41858 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726992AbfEJIZR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 May 2019 04:25:17 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4A8P6xD140435
-        for <kvm@vger.kernel.org>; Fri, 10 May 2019 04:25:15 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2sd4vrt62n-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 10 May 2019 04:25:13 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Fri, 10 May 2019 09:22:44 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 10 May 2019 09:22:40 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4A8McNk58851378
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 May 2019 08:22:38 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C1D2DAE051;
-        Fri, 10 May 2019 08:22:38 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3AA27AE045;
-        Fri, 10 May 2019 08:22:38 +0000 (GMT)
-Received: from morel-ThinkPad-W530.boeblingen.de.ibm.com (unknown [9.145.187.238])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 10 May 2019 08:22:38 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     sebott@linux.vnet.ibm.com
-Cc:     gerald.schaefer@de.ibm.com, pasic@linux.vnet.ibm.com,
-        borntraeger@de.ibm.com, walling@linux.ibm.com,
-        linux-s390@vger.kernel.org, iommu@lists.linux-foundation.org,
-        joro@8bytes.org, linux-kernel@vger.kernel.org,
-        alex.williamson@redhat.com, kvm@vger.kernel.org,
-        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com
-Subject: [PATCH 4/4] vfio: vfio_iommu_type1: implement VFIO_IOMMU_INFO_CAPABILITIES
-Date:   Fri, 10 May 2019 10:22:35 +0200
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1557476555-20256-1-git-send-email-pmorel@linux.ibm.com>
-References: <1557476555-20256-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19051008-0016-0000-0000-0000027A405B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051008-0017-0000-0000-000032D6F9DC
-Message-Id: <1557476555-20256-5-git-send-email-pmorel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-09_02:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=950 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905100059
+        id S1727119AbfEJJI4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 May 2019 05:08:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51790 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726992AbfEJJI4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 May 2019 05:08:56 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 23BC3C058CAF;
+        Fri, 10 May 2019 09:08:55 +0000 (UTC)
+Received: from gondolin (dhcp-192-213.str.redhat.com [10.33.192.213])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0C3A35D962;
+        Fri, 10 May 2019 09:08:40 +0000 (UTC)
+Date:   Fri, 10 May 2019 11:08:38 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        intel-gvt-dev@lists.freedesktop.org, arei.gonglei@huawei.com,
+        aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com,
+        shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org,
+        eauger@redhat.com, yi.l.liu@intel.com, ziye.yang@intel.com,
+        mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
+        changpeng.liu@intel.com, Ken.Xue@amd.com,
+        jonathan.davies@nutanix.com, shaopeng.he@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        libvir-list@redhat.com, eskultet@redhat.com, kevin.tian@intel.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, cjia@nvidia.com,
+        kwankhede@nvidia.com, berrange@redhat.com, dinechin@redhat.com
+Subject: Re: [PATCH v2 1/2] vfio/mdev: add version attribute for mdev device
+Message-ID: <20190510110838.2df4c4d0.cohuck@redhat.com>
+In-Reply-To: <20190509164825.GG2868@work-vm>
+References: <20190506014514.3555-1-yan.y.zhao@intel.com>
+        <20190506014904.3621-1-yan.y.zhao@intel.com>
+        <20190507151826.502be009@x1.home>
+        <20190509173839.2b9b2b46.cohuck@redhat.com>
+        <20190509154857.GF2868@work-vm>
+        <20190509175404.512ae7aa.cohuck@redhat.com>
+        <20190509164825.GG2868@work-vm>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Fri, 10 May 2019 09:08:55 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We implement a capability intercafe for VFIO_IOMMU_GET_INFO and add the
-first capability: VFIO_IOMMU_INFO_CAPABILITIES.
+On Thu, 9 May 2019 17:48:26 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-When calling the ioctl, the user must specify
-VFIO_IOMMU_INFO_CAPABILITIES to retrieve the capabilities and must check
-in the answer if capabilities are supported.
-Older kernel will not check nor set the VFIO_IOMMU_INFO_CAPABILITIES in
-the flags of vfio_iommu_type1_info.
+> * Cornelia Huck (cohuck@redhat.com) wrote:
+> > On Thu, 9 May 2019 16:48:57 +0100
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >   
+> > > * Cornelia Huck (cohuck@redhat.com) wrote:  
+> > > > On Tue, 7 May 2019 15:18:26 -0600
+> > > > Alex Williamson <alex.williamson@redhat.com> wrote:
+> > > >     
+> > > > > On Sun,  5 May 2019 21:49:04 -0400
+> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:    
+> > > >     
+> > > > > > +  Errno:
+> > > > > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev
+> > > > > > +  devices, it should not register version attribute for this mdev device. But if
+> > > > > > +  a vendor driver has already registered version attribute and it wants to claim
+> > > > > > +  a mdev device incompatible to all other mdev devices, it needs to return
+> > > > > > +  -ENODEV on access to this mdev device's version attribute.
+> > > > > > +  If a mdev device is only incompatible to certain mdev devices, write of
+> > > > > > +  incompatible mdev devices's version strings to its version attribute should
+> > > > > > +  return -EINVAL;      
+> > > > > 
+> > > > > I think it's best not to define the specific errno returned for a
+> > > > > specific situation, let the vendor driver decide, userspace simply
+> > > > > needs to know that an errno on read indicates the device does not
+> > > > > support migration version comparison and that an errno on write
+> > > > > indicates the devices are incompatible or the target doesn't support
+> > > > > migration versions.    
+> > > > 
+> > > > I think I have to disagree here: It's probably valuable to have an
+> > > > agreed error for 'cannot migrate at all' vs 'cannot migrate between
+> > > > those two particular devices'. Userspace might want to do different
+> > > > things (e.g. trying with different device pairs).    
+> > > 
+> > > Trying to stuff these things down an errno seems a bad idea; we can't
+> > > get much information that way.  
+> > 
+> > So, what would be a reasonable approach? Userspace should first read
+> > the version attributes on both devices (to find out whether migration
+> > is supported at all), and only then figure out via writing whether they
+> > are compatible?
+> > 
+> > (Or just go ahead and try, if it does not care about the reason.)  
+> 
+> Well, I'm OK with something like writing to test whether it's
+> compatible, it's just we need a better way of saying 'no'.
+> I'm not sure if that involves reading back from somewhere after
+> the write or what.
 
-The iommu get_attr callback will be called to retrieve the specific
-attributes and fill the capabilities, VFIO_IOMMU_INFO_CAP_QFN for the
-PCI query function attributes and VFIO_IOMMU_INFO_CAP_QGRP for the
-PCI query function group.
+Hm, so I basically see two ways of doing that:
+- standardize on some error codes... problem: error codes can be hard
+  to fit to reasons
+- make the error available in some attribute that can be read
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- drivers/vfio/vfio_iommu_type1.c | 95 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 94 insertions(+), 1 deletion(-)
+I'm not sure how we can serialize the readback with the last write,
+though (this looks inherently racy).
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index d0f731c..f7f8120 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -1658,6 +1658,70 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
- 	return ret;
- }
- 
-+int vfio_iommu_type1_caps(struct vfio_iommu *iommu, struct vfio_info_cap *caps,
-+			  size_t size)
-+{
-+	struct vfio_domain *d;
-+	struct vfio_iommu_type1_info_block *info_fn;
-+	struct vfio_iommu_type1_info_block *info_grp;
-+	unsigned long total_size, fn_size, grp_size;
-+	int ret;
-+
-+	d = list_first_entry(&iommu->domain_list, struct vfio_domain, next);
-+	if (!d)
-+		return -ENODEV;
-+	/* The size of these capabilities are device dependent */
-+	fn_size = iommu_domain_get_attr(d->domain,
-+					DOMAIN_ATTR_ZPCI_FN_SIZE, NULL);
-+	if (fn_size < 0)
-+		return fn_size;
-+	fn_size +=  sizeof(struct vfio_info_cap_header);
-+	total_size = fn_size;
-+
-+	grp_size = iommu_domain_get_attr(d->domain,
-+					 DOMAIN_ATTR_ZPCI_GRP_SIZE, NULL);
-+	if (grp_size < 0)
-+		return grp_size;
-+	grp_size +=  sizeof(struct vfio_info_cap_header);
-+	total_size += grp_size;
-+
-+	/* Tell caller to call us with a greater buffer */
-+	if (total_size > size) {
-+		caps->size = total_size;
-+		return 0;
-+	}
-+
-+	info_fn = kzalloc(fn_size, GFP_KERNEL);
-+	if (!info_fn)
-+		return -ENOMEM;
-+	ret = iommu_domain_get_attr(d->domain,
-+				    DOMAIN_ATTR_ZPCI_FN, &info_fn->data);
-+	if (ret < 0)
-+		return ret;
-+
-+	info_fn->header.id = VFIO_IOMMU_INFO_CAP_QFN;
-+
-+	ret = vfio_info_add_capability(caps, &info_fn->header, fn_size);
-+	if (ret)
-+		goto err_fn;
-+
-+	info_grp = kzalloc(grp_size, GFP_KERNEL);
-+	if (!info_grp)
-+		goto err_fn;
-+	ret = iommu_domain_get_attr(d->domain,
-+				    DOMAIN_ATTR_ZPCI_GRP, &info_grp->data);
-+	if (ret < 0)
-+		goto err_grp;
-+	info_grp->header.id = VFIO_IOMMU_INFO_CAP_QGRP;
-+	ret = vfio_info_add_capability(caps, &info_grp->header, grp_size);
-+
-+err_grp:
-+	kfree(info_grp);
-+err_fn:
-+	kfree(info_fn);
-+	return ret;
-+}
-+
- static long vfio_iommu_type1_ioctl(void *iommu_data,
- 				   unsigned int cmd, unsigned long arg)
- {
-@@ -1679,6 +1743,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 		}
- 	} else if (cmd == VFIO_IOMMU_GET_INFO) {
- 		struct vfio_iommu_type1_info info;
-+		struct vfio_info_cap caps = { .buf = NULL, .size = 0 };
-+		int ret;
- 
- 		minsz = offsetofend(struct vfio_iommu_type1_info, iova_pgsizes);
- 
-@@ -1688,7 +1754,34 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 		if (info.argsz < minsz)
- 			return -EINVAL;
- 
--		info.flags = VFIO_IOMMU_INFO_PGSIZES;
-+		if (info.flags & VFIO_IOMMU_INFO_CAPABILITIES) {
-+			minsz = offsetofend(struct vfio_iommu_type1_info,
-+					    cap_offset);
-+			if (info.argsz < minsz)
-+				return -EINVAL;
-+			ret = vfio_iommu_type1_caps(iommu, &caps,
-+						    info.argsz - sizeof(info));
-+			if (ret)
-+				return ret;
-+		}
-+		if (caps.size) {
-+			if (info.argsz < sizeof(info) + caps.size) {
-+				info.argsz = sizeof(info) + caps.size;
-+				info.cap_offset = 0;
-+			} else {
-+				if (copy_to_user((void __user *)arg +
-+						 sizeof(info), caps.buf,
-+						 caps.size)) {
-+					kfree(caps.buf);
-+					return -EFAULT;
-+				}
-+
-+				info.cap_offset = sizeof(info);
-+			}
-+			kfree(caps.buf);
-+		}
-+
-+		info.flags |= VFIO_IOMMU_INFO_PGSIZES;
- 
- 		info.iova_pgsizes = vfio_pgsize_bitmap(iommu);
- 
--- 
-2.7.4
-
+How important is detailed error reporting here?
