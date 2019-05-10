@@ -2,234 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 23C73196C9
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 04:49:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3D4C196DD
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 04:59:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726992AbfEJCs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 May 2019 22:48:59 -0400
-Received: from mga09.intel.com ([134.134.136.24]:15469 "EHLO mga09.intel.com"
+        id S1727032AbfEJC7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 May 2019 22:59:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52712 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726963AbfEJCs6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 May 2019 22:48:58 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 May 2019 19:48:58 -0700
-X-ExtLoop1: 1
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.9])
-  by fmsmga005.fm.intel.com with ESMTP; 09 May 2019 19:48:53 -0700
-Date:   Thu, 9 May 2019 22:43:15 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     "cjia@nvidia.com" <cjia@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "berrange@redhat.com" <berrange@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "dinechin@redhat.com" <dinechin@redhat.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>
-Subject: Re: [PATCH v2 1/2] vfio/mdev: add version attribute for mdev device
-Message-ID: <20190510024315.GH24397@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20190506014514.3555-1-yan.y.zhao@intel.com>
- <20190506014904.3621-1-yan.y.zhao@intel.com>
- <20190507111954.43d477c3.cohuck@redhat.com>
- <20190508115704.GB24397@joy-OptiPlex-7040>
- <20190509172449.723a048b.cohuck@redhat.com>
+        id S1726882AbfEJC7J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 May 2019 22:59:09 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7A06920260;
+        Fri, 10 May 2019 02:59:09 +0000 (UTC)
+Received: from [10.72.12.54] (ovpn-12-54.pek2.redhat.com [10.72.12.54])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D2B524F89;
+        Fri, 10 May 2019 02:59:00 +0000 (UTC)
+Subject: Re: [RFC PATCH V2] vhost: don't use kmap() to log dirty pages
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Darren Hart <dvhart@infradead.org>
+References: <1557406680-4087-1-git-send-email-jasowang@redhat.com>
+ <20190509090433-mutt-send-email-mst@kernel.org>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <d6d69a36-9a3a-2a21-924e-97fdcc6e6733@redhat.com>
+Date:   Fri, 10 May 2019 10:59:01 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190509172449.723a048b.cohuck@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <20190509090433-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Fri, 10 May 2019 02:59:09 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 09, 2019 at 11:24:49PM +0800, Cornelia Huck wrote:
-> On Wed, 8 May 2019 07:57:05 -0400
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > On Tue, May 07, 2019 at 05:19:54PM +0800, Cornelia Huck wrote:
-> > > On Sun,  5 May 2019 21:49:04 -0400
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >   
-> > > > version attribute is used to check two mdev devices' compatibility.
-> > > > 
-> > > > The key point of this version attribute is that it's rw.
-> > > > User space has no need to understand internal of device version and no
-> > > > need to compare versions by itself.
-> > > > Compared to reading version strings from both two mdev devices being
-> > > > checked, user space only reads from one mdev device's version attribute.
-> > > > After getting its version string, user space writes this string into the
-> > > > other mdev device's version attribute. Vendor driver of mdev device
-> > > > whose version attribute being written will check device compatibility of
-> > > > the two mdev devices for user space and return success for compatibility
-> > > > or errno for incompatibility.  
-> > > 
-> > > I'm still missing a bit _what_ is actually supposed to be
-> > > compatible/incompatible. I'd assume some internal state descriptions
-> > > (even if this is not actually limited to migration).
-> > >  
-> > right.
-> > originally, I thought this attribute should only contain a device's hardware
-> > compatibility info. But seems also including vendor specific software migration
-> > version is more reasonable, because general VFIO migration code cannot know
-> > version of vendor specific software migration code until migration data is
-> > transferring to the target vm. Then renaming it to migration_version is more
-> > appropriate.
-> > :)
-> 
-> Nod.
-> 
-> (...)
-> 
-> > > > @@ -246,6 +249,143 @@ Directories and files under the sysfs for Each Physical Device
-> > > >    This attribute should show the number of devices of type <type-id> that can be
-> > > >    created.
-> > > >  
-> > > > +* version
-> > > > +
-> > > > +  This attribute is rw, and is optional.
-> > > > +  It is used to check device compatibility between two mdev devices and is
-> > > > +  accessed in pairs between the two mdev devices being checked.
-> > > > +  The intent of this attribute is to make an mdev device's version opaque to
-> > > > +  user space, so instead of reading two mdev devices' version strings and
-> > > > +  comparing in userspace, user space should only read one mdev device's version
-> > > > +  attribute, and writes this version string into the other mdev device's version
-> > > > +  attribute. Then vendor driver of mdev device whose version attribute being
-> > > > +  written would check the incoming version string and tell user space whether
-> > > > +  the two mdev devices are compatible via return value. That's why this
-> > > > +  attribute is writable.  
-> > > 
-> > > I would reword this a bit:
-> > > 
-> > > "This attribute provides a way to check device compatibility between
-> > > two mdev devices from userspace. The intended usage is for userspace to
-> > > read the version attribute from one mdev device and then writing that
-> > > value to the version attribute of the other mdev device. The second
-> > > mdev device indicates compatibility via the return code of the write
-> > > operation. This makes compatibility between mdev devices completely
-> > > vendor-defined and opaque to userspace."
-> > > 
-> > > We still should explain _what_ compatibility we're talking about here,
-> > > though.
-> > >   
-> > Thanks. It's much better than mine:) 
-> > Then I'll change compatibility --> migration compatibility.
-> 
-> Ok, with that it should be clear enough.
-> 
-> > 
-> > > > +
-> > > > +  when reading this attribute, it should show device version string of
-> > > > +  the device of type <type-id>.
-> > > > +
-> > > > +  This string is private to vendor driver itself. Vendor driver is able to
-> > > > +  freely define format and length of device version string.
-> > > > +  e.g. It can use a combination of pciid of parent device + mdev type.
-> > > > +
-> > > > +  When writing a string to this attribute, vendor driver should analyze this
-> > > > +  string and check whether the mdev device being identified by this string is
-> > > > +  compatible with the mdev device for this attribute. vendor driver should then
-> > > > +  return written string's length if it regards the two mdev devices are
-> > > > +  compatible; vendor driver should return negative errno if it regards the two
-> > > > +  mdev devices are not compatible.
-> > > > +
-> > > > +  User space should treat ANY of below conditions as two mdev devices not
-> > > > +  compatible:
-> > > > +  (1) any one of the two mdev devices does not have a version attribute
-> > > > +  (2) error when read from one mdev device's version attribute  
-> > > 
-> > > s/read/reading/
-> > >   
-> > > > +  (3) error when write one mdev device's version string to the other mdev  
-> > > 
-> > > s/write/writing/
-> > >   
-> > > > +  device's version attribute
-> > > > +
-> > > > +  User space should regard two mdev devices compatible when ALL of below
-> > > > +  conditions are met:
-> > > > +  (1) success when read from one mdev device's version attribute.  
-> > > 
-> > > s/read/reading/
-> > >   
-> > > > +  (2) success when write one mdev device's version string to the other mdev  
-> > > 
-> > > s/write/writing/  
-> > got it. thanks for pointing them out:)
-> > >   
-> > > > +  device's version attribute
-> > > > +
-> > > > +  Errno:
-> > > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev  
-> > > 
-> > > "If the vendor driver wants to designate a mdev device..."
-> > >   
-> > ok. thanks:)
-> > > > +  devices, it should not register version attribute for this mdev device. But if
-> > > > +  a vendor driver has already registered version attribute and it wants to claim
-> > > > +  a mdev device incompatible to all other mdev devices, it needs to return
-> > > > +  -ENODEV on access to this mdev device's version attribute.
-> > > > +  If a mdev device is only incompatible to certain mdev devices, write of
-> > > > +  incompatible mdev devices's version strings to its version attribute should
-> > > > +  return -EINVAL;  
-> > > 
-> > > 
-> > > Maybe put the defined return code into a bulleted list instead? But
-> > > this looks reasonable as well.
-> > >   
-> > as user space have no idea of those errno and only gets 0/1 as return code from
-> > read/write. maybe I can move this description of errno to patch 2/2 as an
-> > example?
-> 
-> Confused. They should get -EINVAL/-ENODEV/... all right, shouldn't they?
+
+On 2019/5/9 下午9:18, Michael S. Tsirkin wrote:
+> On Thu, May 09, 2019 at 08:58:00AM -0400, Jason Wang wrote:
+>> Vhost log dirty pages directly to a userspace bitmap through GUP and
+>> kmap_atomic() since kernel doesn't have a set_bit_to_user()
+>> helper. This will cause issues for the arch that has virtually tagged
+>> caches. The way to fix is to keep using userspace virtual
+>> address. Fortunately, futex has arch_futex_atomic_op_inuser() which
+>> could be used for setting a bit to user.
+>>
+>> Note:
+>> - There're archs (few non popular ones) that don't implement futex
+>>    helper, we can't log dirty pages. We can fix them e.g for non
+>>    virtually tagged archs implement a kmap fallback on top or simply
+>>    disable LOG_ALL features of vhost.
+>> - The helper also requires userspace pointer is located at 4-byte
+>>    boundary, need to check during dirty log setting
+> Why check? Round it down.
+
+
+Will do this.
+
+
 >
-sorry. my previous statement is not right.
-read(2)/write(2) return -1 on error, error cause is returned through errno.
-So, it's also fine if we can get an agreement in this doc that
--ENODEV meaning a mdev device is not compatible to all devices,
--EINVAL meaning a mdev device is not compatible to specified device.
+>> Cc: Christoph Hellwig <hch@infradead.org>
+>> Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
+>> Cc: Andrea Arcangeli <aarcange@redhat.com>
+>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>> Cc: Ingo Molnar <mingo@redhat.com>
+>> Cc: Peter Zijlstra <peterz@infradead.org>
+>> Cc: Darren Hart <dvhart@infradead.org>
+>> Fixes: 3a4d5c94e9593 ("vhost_net: a kernel-level virtio server")
+>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>> ---
+>> Changes from V1:
+>> - switch to use arch_futex_atomic_op_inuser()
+>> ---
+>>   drivers/vhost/vhost.c | 35 +++++++++++++++++------------------
+>>   1 file changed, 17 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>> index 351af88..4e5a004 100644
+>> --- a/drivers/vhost/vhost.c
+>> +++ b/drivers/vhost/vhost.c
+>> @@ -31,6 +31,7 @@
+>>   #include <linux/sched/signal.h>
+>>   #include <linux/interval_tree_generic.h>
+>>   #include <linux/nospec.h>
+>> +#include <asm/futex.h>
+>>   
+>>   #include "vhost.h"
+>>   
+>> @@ -1652,6 +1653,10 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
+>>   			r = -EFAULT;
+>>   			break;
+>>   		}
+>> +		if (p & 0x3) {
+>> +			r = -EINVAL;
+>> +			break;
+>> +		}
+>>   		for (i = 0; i < d->nvqs; ++i) {
+>>   			struct vhost_virtqueue *vq;
+>>   			void __user *base = (void __user *)(unsigned long)p;
+> That's an ABI change and might break some userspace. I don't think
+> it's necessary: you are changing individual bits anyway.
 
 
-> > 
-> > > > +
-> > > > +  This attribute can be taken advantage of by live migration.
-> > > > +  If user space detects two mdev devices are compatible through version
-> > > > +  attribute, it can start migration between the two mdev devices, otherwise it
-> > > > +  should abort its migration attempts between the two mdev devices.  
-> > > 
-> > > (...)
-> > > _______________________________________________
-> > > intel-gvt-dev mailing list
-> > > intel-gvt-dev@lists.freedesktop.org
-> > > https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev  
-> 
-> _______________________________________________
-> intel-gvt-dev mailing list
-> intel-gvt-dev@lists.freedesktop.org
-> https://lists.freedesktop.org/mailman/listinfo/intel-gvt-dev
+Right.
+
+
+>
+>> @@ -1692,31 +1697,27 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
+>>   }
+>>   EXPORT_SYMBOL_GPL(vhost_dev_ioctl);
+>>   
+>> -/* TODO: This is really inefficient.  We need something like get_user()
+>> - * (instruction directly accesses the data, with an exception table entry
+>> - * returning -EFAULT). See Documentation/x86/exception-tables.txt.
+>> - */
+>> -static int set_bit_to_user(int nr, void __user *addr)
+>> +static int set_bit_to_user(int nr, u32 __user *addr)
+>>   {
+>>   	unsigned long log = (unsigned long)addr;
+>>   	struct page *page;
+>> -	void *base;
+>> -	int bit = nr + (log % PAGE_SIZE) * 8;
+>> +	u32 old;
+>>   	int r;
+>>   
+>>   	r = get_user_pages_fast(log, 1, 1, &page);
+> OK so the trick is that page is pinned so you don't expect
+> arch_futex_atomic_op_inuser below to fail.  get_user_pages_fast
+> guarantees page is not going away but does it guarantee PTE won't be
+> invaidated or write protected?
+
+
+Good point, then I think we probably need to do manual fixup through 
+fixup_user_fault() if arch_futex_atomic_op_in_user() fail.
+
+
+>
+>>   	if (r < 0)
+>>   		return r;
+>>   	BUG_ON(r != 1);
+>> -	base = kmap_atomic(page);
+>> -	set_bit(bit, base);
+>> -	kunmap_atomic(base);
+>> +
+>> +	r = arch_futex_atomic_op_inuser(FUTEX_OP_ADD, 1 << nr, &old, addr);
+>> +	/* TODO: fallback to kmap() when -ENOSYS? */
+>> +
+> Add a comment why this won't fail? Maybe warn on EFAULT?
+>
+> Also down the road a variant that does not need tricks like this is
+> still nice to have.
+
+
+Ok. Let me post a V3.
+
+Thanks
+
+
+>
+>
+>>   	set_page_dirty_lock(page);
+>>   	put_page(page);
+>> -	return 0;
+>> +	return r;
+>>   }
+>>   
+>> -static int log_write(void __user *log_base,
+>> +static int log_write(u32 __user *log_base,
+>>   		     u64 write_address, u64 write_length)
+>>   {
+>>   	u64 write_page = write_address / VHOST_PAGE_SIZE;
+>> @@ -1726,12 +1727,10 @@ static int log_write(void __user *log_base,
+>>   		return 0;
+>>   	write_length += write_address % VHOST_PAGE_SIZE;
+>>   	for (;;) {
+>> -		u64 base = (u64)(unsigned long)log_base;
+>> -		u64 log = base + write_page / 8;
+>> -		int bit = write_page % 8;
+>> -		if ((u64)(unsigned long)log != log)
+>> -			return -EFAULT;
+>> -		r = set_bit_to_user(bit, (void __user *)(unsigned long)log);
+>> +		u32 __user *log = log_base + write_page / 32;
+>> +		int bit = write_page % 32;
+>> +
+>> +		r = set_bit_to_user(bit, log);
+>>   		if (r < 0)
+>>   			return r;
+>>   		if (write_length <= VHOST_PAGE_SIZE)
+>> -- 
+>> 1.8.3.1
