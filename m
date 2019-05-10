@@ -2,215 +2,252 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0261F1A04A
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 17:36:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D8FC1A08E
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2019 17:52:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727471AbfEJPgO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 May 2019 11:36:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37832 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727374AbfEJPgO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 May 2019 11:36:14 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4AFNGV7035566
-        for <kvm@vger.kernel.org>; Fri, 10 May 2019 11:36:13 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2sdaqm45xb-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 10 May 2019 11:36:13 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Fri, 10 May 2019 16:36:11 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 10 May 2019 16:36:08 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4AFa64H54198464
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 May 2019 15:36:06 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BDC5D5207D;
-        Fri, 10 May 2019 15:36:06 +0000 (GMT)
-Received: from [9.145.187.238] (unknown [9.145.187.238])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 0A2BB52063;
-        Fri, 10 May 2019 15:36:06 +0000 (GMT)
-Reply-To: pmorel@linux.ibm.com
-Subject: Re: [PATCH 08/10] virtio/s390: add indirection to indicators access
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>
-References: <20190426183245.37939-1-pasic@linux.ibm.com>
- <20190426183245.37939-9-pasic@linux.ibm.com>
- <716d47ca-016f-e8f4-6d78-7746a7d9f6ba@linux.ibm.com>
- <a4bf1976-8037-63bb-2cf6-c389edbd2e89@linux.ibm.com>
- <20190509202600.4fd6aebe.pasic@linux.ibm.com>
- <c1e03cf0-3773-de00-10ae-d092ffe7ccc5@linux.ibm.com>
- <20190510135421.5363f14a.pasic@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Fri, 10 May 2019 17:36:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1727665AbfEJPwc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 May 2019 11:52:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55770 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727531AbfEJPwc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 May 2019 11:52:32 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8867EA404A;
+        Fri, 10 May 2019 15:52:30 +0000 (UTC)
+Received: from dhcp201-121.englab.pnq.redhat.com (unknown [10.65.16.148])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7C85160BFB;
+        Fri, 10 May 2019 15:52:03 +0000 (UTC)
+From:   Pankaj Gupta <pagupta@redhat.com>
+To:     linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org
+Cc:     dan.j.williams@intel.com, zwisler@kernel.org,
+        vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com,
+        jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net,
+        hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu,
+        adilger.kernel@dilger.ca, darrick.wong@oracle.com,
+        lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com,
+        jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com,
+        stefanha@redhat.com, aarcange@redhat.com, david@redhat.com,
+        david@fromorbit.com, cohuck@redhat.com,
+        xiaoguangrong.eric@gmail.com, pbonzini@redhat.com,
+        kilobyte@angband.pl, yuval.shaia@oracle.com, jstaron@google.com,
+        pagupta@redhat.com
+Subject: [PATCH v8 0/6] virtio pmem driver 
+Date:   Fri, 10 May 2019 21:21:56 +0530
+Message-Id: <20190510155202.14737-1-pagupta@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190510135421.5363f14a.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051015-4275-0000-0000-00000333765B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051015-4276-0000-0000-00003842ED6D
-Message-Id: <89074bc5-78ee-a2e3-0546-791a465f83bd@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-09_02:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905100106
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Fri, 10 May 2019 15:52:31 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/05/2019 13:54, Halil Pasic wrote:
-> On Fri, 10 May 2019 09:43:08 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->> On 09/05/2019 20:26, Halil Pasic wrote:
->>> On Thu, 9 May 2019 14:01:01 +0200
->>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>
->>>> On 08/05/2019 16:31, Pierre Morel wrote:
->>>>> On 26/04/2019 20:32, Halil Pasic wrote:
->>>>>> This will come in handy soon when we pull out the indicators from
->>>>>> virtio_ccw_device to a memory area that is shared with the hypervisor
->>>>>> (in particular for protected virtualization guests).
->>>>>>
->>>>>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
->>>>>> ---
->>>>>>     drivers/s390/virtio/virtio_ccw.c | 40
->>>>>> +++++++++++++++++++++++++---------------
->>>>>>     1 file changed, 25 insertions(+), 15 deletions(-)
->>>>>>
->>>>>> diff --git a/drivers/s390/virtio/virtio_ccw.c
->>>>>> b/drivers/s390/virtio/virtio_ccw.c
->>>>>> index bb7a92316fc8..1f3e7d56924f 100644
->>>>>> --- a/drivers/s390/virtio/virtio_ccw.c
->>>>>> +++ b/drivers/s390/virtio/virtio_ccw.c
->>>>>> @@ -68,6 +68,16 @@ struct virtio_ccw_device {
->>>>>>         void *airq_info;
->>>>>>     };
->>>>>> +static inline unsigned long *indicators(struct virtio_ccw_device *vcdev)
->>>>>> +{
->>>>>> +    return &vcdev->indicators;
->>>>>> +}
->>>>>> +
->>>>>> +static inline unsigned long *indicators2(struct virtio_ccw_device
->>>>>> *vcdev)
->>>>>> +{
->>>>>> +    return &vcdev->indicators2;
->>>>>> +}
->>>>>> +
->>>>>>     struct vq_info_block_legacy {
->>>>>>         __u64 queue;
->>>>>>         __u32 align;
->>>>>> @@ -337,17 +347,17 @@ static void virtio_ccw_drop_indicator(struct
->>>>>> virtio_ccw_device *vcdev,
->>>>>>             ccw->cda = (__u32)(unsigned long) thinint_area;
->>>>>>         } else {
->>>>>>             /* payload is the address of the indicators */
->>>>>> -        indicatorp = kmalloc(sizeof(&vcdev->indicators),
->>>>>> +        indicatorp = kmalloc(sizeof(indicators(vcdev)),
->>>>>>                          GFP_DMA | GFP_KERNEL);
->>>>>>             if (!indicatorp)
->>>>>>                 return;
->>>>>>             *indicatorp = 0;
->>>>>>             ccw->cmd_code = CCW_CMD_SET_IND;
->>>>>> -        ccw->count = sizeof(&vcdev->indicators);
->>>>>> +        ccw->count = sizeof(indicators(vcdev));
->>>>>
->>>>> This looks strange to me. Was already weird before.
->>>>> Lucky we are indicators are long...
->>>>> may be just sizeof(long)
->>>>
->>>
->>> I'm not sure I understand where are you coming from...
->>>
->>> With CCW_CMD_SET_IND we tell the hypervisor the guest physical address
->>> at which the so called classic indicators. There is a comment that
->>> makes this obvious. The argument of the sizeof was and remained a
->>> pointer type. AFAIU this is what bothers you.
->>>>
->>>> AFAIK the size of the indicators (AIV/AIS) is not restricted by the
->>>> architecture.
->>>
->>> The size of vcdev->indicators is restricted or defined by the virtio
->>> specification. Please have a look at '4.3.2.6.1 Setting Up Classic Queue
->>> Indicators' here:
->>> https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-1630002
->>>
->>> Since with Linux on s390 only 64 bit is supported, both the sizes are in
->>> line with the specification. Using u64 would semantically match the spec
->>> better, modulo pre virtio 1.0 which ain't specified. I did not want to
->>> do changes that are not necessary for what I'm trying to accomplish. If
->>> we want we can change these to u64 with a patch on top.
->>
->> I mean you are changing these line already, so why not doing it right
->> while at it?
->>
-> 
-> This patch is about adding the indirection so we can move the member
-> painlessly. Mixing in different stuff would be a bad practice.
-> 
-> BTW I just explained that it ain't wrong, so I really do not understand
-> what do you mean by  'why not doing it right'. Can you please explain?
-> 
+ Hi Michael & Dan,
 
-I did not wanted to discuss a long time on this and gave my R-B, so 
-meaning that I am OK with this patch.
+ Please review/ack the patch series from LIBNVDIMM & VIRTIO side.
+ We have ack on ext4, xfs patches(4, 5 & 6) patch 2. Still need
+ your ack on nvdimm patches(1 & 3) & virtio patch 2. 
 
-But if you ask, yes I can, it seems quite obvious.
-When you build a CCW you give the pointer to CCW->cda and you give the 
-size of the transfer in CCW->count.
+ Changes done from v7 are only in patch(2 & 3) and not
+ affecting existing reviews. Request to please review.
+ ----
 
-Here the count is initialized with the sizeof of the pointer used to 
-initialize CCW->cda with.
-Lukily we work on a 64 bits machine with 64 bits pointers and the size 
-of the pointed object is 64 bits wide so... the resulting count is right.
-But it is not the correct way to do it.
-That is all. Not a big concern, you do not need to change it, as you 
-said it can be done in another patch.
+ This patch series has implementation for "virtio pmem". 
+ "virtio pmem" is fake persistent memory(nvdimm) in guest 
+ which allows to bypass the guest page cache. This also
+ implements a VIRTIO based asynchronous flush mechanism.  
+ 
+ Sharing guest kernel driver in this patchset with the 
+ changes suggested in v4. Tested with Qemu side device 
+ emulation [6] for virtio-pmem. Documented the impact of
+ possible page cache side channel attacks with suggested
+ countermeasures.
 
-> Did you agree with the rest of my comment? I mean there was more to it.
-> 
+ Details of project idea for 'virtio pmem' flushing interface 
+ is shared [3] & [4].
 
-I understood from your comments that the indicators in Linux are 64bits 
-wide so all OK.
+ Implementation is divided into two parts:
+ New virtio pmem guest driver and qemu code changes for new 
+ virtio pmem paravirtualized device.
 
-Regards
-Pierre
+1. Guest virtio-pmem kernel driver
+---------------------------------
+   - Reads persistent memory range from paravirt device and 
+     registers with 'nvdimm_bus'.  
+   - 'nvdimm/pmem' driver uses this information to allocate 
+     persistent memory region and setup filesystem operations 
+     to the allocated memory. 
+   - virtio pmem driver implements asynchronous flushing 
+     interface to flush from guest to host.
 
+2. Qemu virtio-pmem device
+---------------------------------
+   - Creates virtio pmem device and exposes a memory range to 
+     KVM guest. 
+   - At host side this is file backed memory which acts as 
+     persistent memory. 
+   - Qemu side flush uses aio thread pool API's and virtio 
+     for asynchronous guest multi request handling. 
 
+   David Hildenbrand CCed also posted a modified version[7] of 
+   qemu virtio-pmem code based on updated Qemu memory device API. 
 
+ Virtio-pmem security implications and countermeasures:
+ -----------------------------------------------------
 
+ In previous posting of kernel driver, there was discussion [9]
+ on possible implications of page cache side channel attacks with 
+ virtio pmem. After thorough analysis of details of known side 
+ channel attacks, below are the suggestions:
 
+ - Depends entirely on how host backing image file is mapped 
+   into guest address space. 
 
--- 
-Pierre Morel
-Linux/KVM/QEMU in Böblingen - Germany
+ - virtio-pmem device emulation, by default shared mapping is used
+   to map host backing file. It is recommended to use separate
+   backing file at host side for every guest. This will prevent
+   any possibility of executing common code from multiple guests
+   and any chance of inferring guest local data based based on 
+   execution time.
 
+ - If backing file is required to be shared among multiple guests 
+   it is recommended to don't support host page cache eviction 
+   commands from the guest driver. This will avoid any possibility
+   of inferring guest local data or host data from another guest. 
+
+ - Proposed device specification [8] for virtio-pmem device with 
+   details of possible security implications and suggested 
+   countermeasures for device emulation.
+
+ Virtio-pmem errors handling:
+ ----------------------------------------
+  Checked behaviour of virtio-pmem for below types of errors
+  Need suggestions on expected behaviour for handling these errors?
+
+  - Hardware Errors: Uncorrectable recoverable Errors: 
+  a] virtio-pmem: 
+    - As per current logic if error page belongs to Qemu process, 
+      host MCE handler isolates(hwpoison) that page and send SIGBUS. 
+      Qemu SIGBUS handler injects exception to KVM guest. 
+    - KVM guest then isolates the page and send SIGBUS to guest 
+      userspace process which has mapped the page. 
+  
+  b] Existing implementation for ACPI pmem driver: 
+    - Handles such errors with MCE notifier and creates a list 
+      of bad blocks. Read/direct access DAX operation return EIO 
+      if accessed memory page fall in bad block list.
+    - It also starts backgound scrubbing.  
+    - Similar functionality can be reused in virtio-pmem with MCE 
+      notifier but without scrubbing(no ACPI/ARS)? Need inputs to 
+      confirm if this behaviour is ok or needs any change?
+
+Changes from PATCH v7: [1]
+ - Corrected pending request queue logic (patch 2) - Jakub Staroń
+ - Used unsigned long flags for passing DAXDEV_F_SYNC (patch 3) - Dan
+ - Fixed typo =>  vma 'flag' to 'vm_flag' (patch 4)
+ - Added rob in patch 6 & patch 2
+
+Changes from PATCH v6: [1]
+ - Corrected comment format in patch 5 & patch 6. [Dave]
+ - Changed variable declaration indentation in patch 6 [Darrick]
+ - Add Reviewed-by tag by 'Jan Kara' in patch 4 & patch 5
+
+Changes from PATCH v5: [2]
+  Changes suggested in by - [Cornelia, Yuval]
+- Remove assignment chaining in virtio driver
+- Better error message and remove not required free
+- Check nd_region before use
+
+  Changes suggested by - [Jan Kara]
+- dax_synchronous() for !CONFIG_DAX
+- Correct 'daxdev_mapping_supported' comment and non-dax implementation
+
+  Changes suggested by - [Dan Williams]
+- Pass meaningful flag 'DAXDEV_F_SYNC' to alloc_dax
+- Gate nvdimm_flush instead of additional async parameter
+- Move block chaining logic to flush callback than common nvdimm_flush
+- Use NULL flush callback for generic flush for better readability [Dan, Jan]
+
+- Use virtio device id 27 from 25(already used) - [MST]
+
+Changes from PATCH v4:
+- Factor out MAP_SYNC supported functionality to a common helper
+				[Dave, Darrick, Jan]
+- Comment, indentation and virtqueue_kick failure handle - Yuval Shaia
+
+Changes from PATCH v3: 
+- Use generic dax_synchronous() helper to check for DAXDEV_SYNC 
+  flag - [Dan, Darrick, Jan]
+- Add 'is_nvdimm_async' function
+- Document page cache side channel attacks implications & 
+  countermeasures - [Dave Chinner, Michael]
+
+Changes from PATCH v2: 
+- Disable MAP_SYNC for ext4 & XFS filesystems - [Dan] 
+- Use name 'virtio pmem' in place of 'fake dax' 
+
+Changes from PATCH v1: 
+- 0-day build test for build dependency on libnvdimm 
+
+ Changes suggested by - [Dan Williams]
+- Split the driver into two parts virtio & pmem  
+- Move queuing of async block request to block layer
+- Add "sync" parameter in nvdimm_flush function
+- Use indirect call for nvdimm_flush
+- Don’t move declarations to common global header e.g nd.h
+- nvdimm_flush() return 0 or -EIO if it fails
+- Teach nsio_rw_bytes() that the flush can fail
+- Rename nvdimm_flush() to generic_nvdimm_flush()
+- Use 'nd_region->provider_data' for long dereferencing
+- Remove virtio_pmem_freeze/restore functions
+- Remove BSD license text with SPDX license text
+
+- Add might_sleep() in virtio_pmem_flush - [Luiz]
+- Make spin_lock_irqsave() narrow
+
+Pankaj Gupta (6):
+   libnvdimm: nd_region flush callback support
+   virtio-pmem: Add virtio-pmem guest driver
+   libnvdimm: add nd_region buffered dax_dev flag
+   dax: check synchronous mapping is supported
+   ext4: disable map_sync for virtio pmem
+   xfs: disable map_sync for virtio pmem
+
+[1] https://lkml.org/lkml/2019/4/26/36
+[2] https://lkml.org/lkml/2019/4/23/1092
+[3] https://www.spinics.net/lists/kvm/msg149761.html
+[4] https://www.spinics.net/lists/kvm/msg153095.html  
+[5] https://lkml.org/lkml/2018/8/31/413
+[6] https://marc.info/?l=linux-kernel&m=153572228719237&w=2 
+[7] https://marc.info/?l=qemu-devel&m=153555721901824&w=2
+[8] https://lists.oasis-open.org/archives/virtio-dev/201903/msg00083.html
+[9] https://lkml.org/lkml/2019/1/9/1191
+
+ drivers/acpi/nfit/core.c         |    4 -
+ drivers/dax/bus.c                |    2 
+ drivers/dax/super.c              |   13 +++
+ drivers/md/dm.c                  |    3 
+ drivers/nvdimm/Makefile          |    1 
+ drivers/nvdimm/claim.c           |    6 +
+ drivers/nvdimm/nd.h              |    1 
+ drivers/nvdimm/nd_virtio.c       |  129 +++++++++++++++++++++++++++++++++++++++
+ drivers/nvdimm/pmem.c            |   18 +++--
+ drivers/nvdimm/region_devs.c     |   33 +++++++++
+ drivers/nvdimm/virtio_pmem.c     |  117 +++++++++++++++++++++++++++++++++++
+ drivers/virtio/Kconfig           |   10 +++
+ fs/ext4/file.c                   |   10 +--
+ fs/xfs/xfs_file.c                |    9 +-
+ include/linux/dax.h              |   25 ++++++-
+ include/linux/libnvdimm.h        |    9 ++
+ include/linux/virtio_pmem.h      |   60 ++++++++++++++++++
+ include/uapi/linux/virtio_ids.h  |    1 
+ include/uapi/linux/virtio_pmem.h |   10 +++
+ 19 files changed, 436 insertions(+), 25 deletions(-)
