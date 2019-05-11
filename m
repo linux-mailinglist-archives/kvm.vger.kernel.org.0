@@ -2,123 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 68DE91A5A3
-	for <lists+kvm@lfdr.de>; Sat, 11 May 2019 01:54:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AF761A5E8
+	for <lists+kvm@lfdr.de>; Sat, 11 May 2019 02:46:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728064AbfEJXyD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 May 2019 19:54:03 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:37164 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728011AbfEJXyD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 May 2019 19:54:03 -0400
-Received: by mail-pg1-f194.google.com with SMTP id e6so3725244pgc.4
-        for <kvm@vger.kernel.org>; Fri, 10 May 2019 16:54:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Svi2hY/4Fr3G+7H1zc/Iy6stZcJ5hnOIc4eke2F0YMc=;
-        b=CQt1NUC0+UVisWj0aeqS3HCMh2e83MdQI41pf8vNM4fq1FhpAbKhv4NKg7azOmeAXY
-         QOiouY/yoXP6DMT9PJBPoNyffyDcpjP63WC1rwnr0N9YNWB0OEFB//Gt3Om7myH3gyJx
-         DXyEwzkUMqpf2CpK5+V6fIehNLhqQ+SzFm6N7V9s1SGMBC3ktk+7ZqP+pdP59xLXRoKy
-         MgTgca4/UQzSU2ZGfPG8ZQRXmSBo+FMYFKDHwBa4WbpEmycLJRTUAo3L5HavGr45iN5V
-         7zouGkCUIT7XRuGNgHzlRxFIe7NpXgNapYXDEFLc1c7P7G5BxRp++d0ggbYp162PUYAu
-         0s+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Svi2hY/4Fr3G+7H1zc/Iy6stZcJ5hnOIc4eke2F0YMc=;
-        b=WByM2QfTLpBTkkF15SC+OgPN+TaR9UDkEUVzVH/UYhaS4vE5dqLY/SsKHmE6j2wh3c
-         n5LNlSjT31ClpszTMVdnVHELc6viFPa8l8XpyiWfnEptXDrQ5GsabTw5PsMmGRkJJBJa
-         e3j4LKVu28FZms6XpY1F7af5Z0tjT9zjJCL4Jvkrwpqvu7eRnWES4ZJp98EXl5j9ecWz
-         oVzwsjNLIQg21oB2LEJ3WlL+59QnvSwJ6Nqz9Ji6rfzo9PK//cRSFIVh4ru43v0a1khl
-         wYZm+AzaCB6BlwmJiPx+Bdnv/aUAIglm1tSv6FKXW5d78Vc6GHBjwHVMsM7Iwh/pGna+
-         HF+Q==
-X-Gm-Message-State: APjAAAUIoY2Em4UpnXGKIY2pEurOsuTEDITZ176eq0T47bCPYxZcl4MI
-        BCsMCpotLJPShEjorchawK4AX9bP9iE=
-X-Google-Smtp-Source: APXvYqwLNez1XAfarTfYFIM3vz6KnBdktgEO7WpE6cPRknW43q9HSd1Gd1C7PgxuYvk0ligGUaXUvQ==
-X-Received: by 2002:a63:224a:: with SMTP id t10mr16957032pgm.271.1557532442666;
-        Fri, 10 May 2019 16:54:02 -0700 (PDT)
-Received: from [10.2.189.129] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id f87sm10091410pff.56.2019.05.10.16.54.01
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 10 May 2019 16:54:01 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [kvm-unit-tests PATCH] x86: Restore VMCS state when
- test_vmcs_addr() is done
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <a9417280-db71-4e24-02d6-abc00f96c402@oracle.com>
-Date:   Fri, 10 May 2019 16:54:00 -0700
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <4296149D-7351-48E4-B9F9-EA358AAE1D63@gmail.com>
-References: <20190502145741.7863-1-nadav.amit@gmail.com>
- <a9417280-db71-4e24-02d6-abc00f96c402@oracle.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-X-Mailer: Apple Mail (2.3445.104.8)
+        id S1728198AbfEKApw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 May 2019 20:45:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38628 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727961AbfEKApv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 May 2019 20:45:51 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 264E2DF23;
+        Sat, 11 May 2019 00:45:51 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D99122CFE6;
+        Sat, 11 May 2019 00:45:50 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 3309B41F56;
+        Sat, 11 May 2019 00:45:50 +0000 (UTC)
+Date:   Fri, 10 May 2019 20:45:49 -0400 (EDT)
+From:   Pankaj Gupta <pagupta@redhat.com>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     linux-nvdimm <linux-nvdimm@lists.01.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        KVM list <kvm@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux ACPI <linux-acpi@vger.kernel.org>,
+        Qemu Developers <qemu-devel@nongnu.org>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        Ross Zwisler <zwisler@kernel.org>,
+        Vishal L Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Christoph Hellwig <hch@infradead.org>,
+        Len Brown <lenb@kernel.org>, Jan Kara <jack@suse.cz>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        lcapitulino@redhat.com, Kevin Wolf <kwolf@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        jmoyer <jmoyer@redhat.com>,
+        Nitesh Narayan Lal <nilal@redhat.com>,
+        Rik van Riel <riel@surriel.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        david <david@fromorbit.com>, cohuck@redhat.com,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Adam Borowski <kilobyte@angband.pl>,
+        yuval shaia <yuval.shaia@oracle.com>, jstaron@google.com
+Message-ID: <864186878.28040999.1557535549792.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CAPcyv4hbVNRFSyS2CTbmO88uhnbeH4eiukAng2cxgbDzLfizwg@mail.gmail.com>
+References: <20190510155202.14737-1-pagupta@redhat.com> <20190510155202.14737-4-pagupta@redhat.com> <CAPcyv4hbVNRFSyS2CTbmO88uhnbeH4eiukAng2cxgbDzLfizwg@mail.gmail.com>
+Subject: Re: [PATCH v8 3/6] libnvdimm: add dax_dev sync flag
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.14, 10.4.195.12]
+Thread-Topic: libnvdimm: add dax_dev sync flag
+Thread-Index: gVGO0BoaDll3U20KXC407XNgj3ThLg==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Sat, 11 May 2019 00:45:51 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On May 10, 2019, at 4:49 PM, Krish Sadhukhan =
-<krish.sadhukhan@oracle.com> wrote:
->=20
->=20
->=20
-> On 05/02/2019 07:57 AM, nadav.amit@gmail.com wrote:
->> From: Nadav Amit <nadav.amit@gmail.com>
->>=20
->> The VMCS fields of APIC_VIRT_ADDR and TPR_THRESHOLD are modified by
->> test_vmcs_addr() but are not restored to their original value. Save =
-and
->> restore them.
->>=20
->> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
->> ---
->>  x86/vmx_tests.c | 12 +++++++-----
->>  1 file changed, 7 insertions(+), 5 deletions(-)
->>=20
->> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
->> index e9010af..2d6b12d 100644
->> --- a/x86/vmx_tests.c
->> +++ b/x86/vmx_tests.c
->> @@ -4432,6 +4432,8 @@ static void test_tpr_threshold_values(void)
->>  static void test_tpr_threshold(void)
->>  {
->>  	u32 primary =3D vmcs_read(CPU_EXEC_CTRL0);
->> +	u64 apic_virt_addr =3D vmcs_read(APIC_VIRT_ADDR);
->> +	u64 threshold =3D vmcs_read(TPR_THRESHOLD);
->>  	void *virtual_apic_page;
->>    	if (!(ctrl_cpu_rev[0].clr & CPU_TPR_SHADOW))
->> @@ -4451,11 +4453,8 @@ static void test_tpr_threshold(void)
->>  	report_prefix_pop();
->>    	if (!((ctrl_cpu_rev[0].clr & CPU_SECONDARY) &&
->> -	    (ctrl_cpu_rev[1].clr & (CPU_VINTD  | =
-CPU_VIRT_APIC_ACCESSES)))) {
->> -		vmcs_write(CPU_EXEC_CTRL0, primary);
->> -		return;
->> -	}
->> -
->> +	    (ctrl_cpu_rev[1].clr & (CPU_VINTD  | =
-CPU_VIRT_APIC_ACCESSES))))
->> +		goto out;
->>  	u32 secondary =3D vmcs_read(CPU_EXEC_CTRL1);
->>    	if (ctrl_cpu_rev[1].clr & CPU_VINTD) {
->> @@ -4505,6 +4504,9 @@ static void test_tpr_threshold(void)
->>  	}
->>    	vmcs_write(CPU_EXEC_CTRL1, secondary);
->> +out:
->> +	vmcs_write(TPR_THRESHOLD, threshold);
->> +	vmcs_write(APIC_VIRT_ADDR, apic_virt_addr);
->>  	vmcs_write(CPU_EXEC_CTRL0, primary);
->>  }
->> =20
->=20
-> The function name in the commit message (both header and body) is
-> incorrect. It should be =E2=80=9Ctest_tpr_threshold=E2=80=9D.
 
-Too many patches=E2=80=A6 Will fix.=
+
+> >
+> > This patch adds 'DAXDEV_SYNC' flag which is set
+> > for nd_region doing synchronous flush. This later
+> > is used to disable MAP_SYNC functionality for
+> > ext4 & xfs filesystem for devices don't support
+> > synchronous flush.
+> >
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > ---
+> >  drivers/dax/bus.c            |  2 +-
+> >  drivers/dax/super.c          | 13 ++++++++++++-
+> >  drivers/md/dm.c              |  3 ++-
+> >  drivers/nvdimm/pmem.c        |  5 ++++-
+> >  drivers/nvdimm/region_devs.c |  7 +++++++
+> >  include/linux/dax.h          |  8 ++++++--
+> >  include/linux/libnvdimm.h    |  1 +
+> >  7 files changed, 33 insertions(+), 6 deletions(-)
+> [..]
+> > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> > index 043f0761e4a0..ee007b75d9fd 100644
+> > --- a/drivers/md/dm.c
+> > +++ b/drivers/md/dm.c
+> > @@ -1969,7 +1969,8 @@ static struct mapped_device *alloc_dev(int minor)
+> >         sprintf(md->disk->disk_name, "dm-%d", minor);
+> >
+> >         if (IS_ENABLED(CONFIG_DAX_DRIVER)) {
+> > -               dax_dev = alloc_dax(md, md->disk->disk_name, &dm_dax_ops);
+> > +               dax_dev = alloc_dax(md, md->disk->disk_name, &dm_dax_ops,
+> > +                                                        DAXDEV_F_SYNC);
+> 
+> Apologies for not realizing this until now, but this is broken.
+> Imaging a device-mapper configuration composed of both 'async'
+> virtio-pmem and 'sync' pmem. The 'sync' flag needs to be unified
+> across all members. I would change this argument to '0' and then
+> arrange for it to be set at dm_table_supports_dax() time after
+> validating that all components support synchronous dax.
+
+o.k. Need to set 'DAXDEV_F_SYNC' flag after verifying all the target
+components support synchronous DAX.
+
+Just a question, If device mapper configuration have composed of both 
+virtio-pmem or pmem devices, we want to configure device mapper for async flush?
+
+Thank you,
+Pankaj 
+> 
