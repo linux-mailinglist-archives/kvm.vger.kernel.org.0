@@ -2,406 +2,268 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EDB391AD71
-	for <lists+kvm@lfdr.de>; Sun, 12 May 2019 19:10:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E851E1ADC2
+	for <lists+kvm@lfdr.de>; Sun, 12 May 2019 20:23:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726785AbfELRKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 May 2019 13:10:36 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:40024 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726531AbfELRKg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 May 2019 13:10:36 -0400
-Received: by mail-qk1-f193.google.com with SMTP id w20so6652197qka.7
-        for <kvm@vger.kernel.org>; Sun, 12 May 2019 10:10:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=dGkusROmRVTxifYPLi0Ky7Gg3CaeREE3G18dOX0eiu0=;
-        b=R1E3VHs8yfMrfsTHpdlTkM7EvZ4AbA4EfZt9rqJhGZ1g81ej4yaQz+/RKlf+6SyVmR
-         /fh6qFordRTREVl/IDUXivrDQ78dURNgeadXUDrWyM5U1lXU0Jmyj9lxSjMRbVrOQyHU
-         F1aiI9wBoSyoTc6xKk+FCE6I+VntYMJjrLAW/ADjfQA9jDsl1F5nSbzNaE+CJMo5Qytd
-         qGfpx9OdCa20XaPjptQZifOnimRmhIpkrr0iLOppuXk2X+M2zClXKHhc1hlfR9IzklB1
-         ZxLKstPEimD6u1RNh0UsGXqWJStzwHxytIIYK2729fiuG6mCCSehkgoPXlSaAxT6OMpD
-         QJJw==
-X-Gm-Message-State: APjAAAX/gVFsWjNJf1iftZhmAwk+CAKqadrbbdB3wYZ0pk+J5TFBvYmN
-        yGrBcv2BOnd50j+J5cuI3YKb+Bl6u1E=
-X-Google-Smtp-Source: APXvYqx+dnJlu9/WHsWE/MV7DH2MGKju7AgCjrcx17FOCrkBNLPSiNeThomPAvDUqz1LbPxO6QZG2Q==
-X-Received: by 2002:a37:59c7:: with SMTP id n190mr18462302qkb.24.1557681034785;
-        Sun, 12 May 2019 10:10:34 -0700 (PDT)
-Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net. [173.76.105.71])
-        by smtp.gmail.com with ESMTPSA id p8sm5181296qta.24.2019.05.12.10.10.32
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Sun, 12 May 2019 10:10:33 -0700 (PDT)
-Date:   Sun, 12 May 2019 13:10:31 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ppandit@redhat.com
-Subject: Re: [PATCH net] vhost_net: fix possible infinite loop
-Message-ID: <20190512125959-mutt-send-email-mst@kernel.org>
-References: <1556177599-56248-1-git-send-email-jasowang@redhat.com>
- <20190425131021-mutt-send-email-mst@kernel.org>
- <f4b4ff70-d64f-c3fb-fe2e-97ef6c55bda0@redhat.com>
- <999ef863-2994-e0c0-fbb1-a6e92de3fd24@redhat.com>
+        id S1726937AbfELSXJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 May 2019 14:23:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37456 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726933AbfELSXI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 12 May 2019 14:23:08 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4CIM6TO133127
+        for <kvm@vger.kernel.org>; Sun, 12 May 2019 14:23:07 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sebyv24nf-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Sun, 12 May 2019 14:23:07 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Sun, 12 May 2019 19:23:05 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Sun, 12 May 2019 19:23:02 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4CIN0LK53543052
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 12 May 2019 18:23:00 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D794FAE04D;
+        Sun, 12 May 2019 18:23:00 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EFC27AE045;
+        Sun, 12 May 2019 18:22:59 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.145.232])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Sun, 12 May 2019 18:22:59 +0000 (GMT)
+Date:   Sun, 12 May 2019 20:22:56 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Sebastian Ott <sebott@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Michael Mueller <mimu@linux.ibm.com>
+Subject: Re: [PATCH 05/10] s390/cio: introduce DMA pools to cio
+In-Reply-To: <20190510161013.7e697337.cohuck@redhat.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+ <20190426183245.37939-6-pasic@linux.ibm.com>
+ <alpine.LFD.2.21.1905081447280.1773@schleppi>
+ <20190508232210.5a555caa.pasic@linux.ibm.com>
+ <20190509121106.48aa04db.cohuck@redhat.com>
+ <20190510001112.479b2fd7.pasic@linux.ibm.com>
+ <20190510161013.7e697337.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <999ef863-2994-e0c0-fbb1-a6e92de3fd24@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19051218-0028-0000-0000-0000036CDC71
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051218-0029-0000-0000-0000242C66BB
+Message-Id: <20190512202256.5517592d.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-12_12:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905120138
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, May 05, 2019 at 12:20:24PM +0800, Jason Wang wrote:
+On Fri, 10 May 2019 16:10:13 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Fri, 10 May 2019 00:11:12 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
 > 
-> On 2019/4/26 下午3:35, Jason Wang wrote:
+> > On Thu, 9 May 2019 12:11:06 +0200
+> > Cornelia Huck <cohuck@redhat.com> wrote:
 > > 
-> > On 2019/4/26 上午1:52, Michael S. Tsirkin wrote:
-> > > On Thu, Apr 25, 2019 at 03:33:19AM -0400, Jason Wang wrote:
-> > > > When the rx buffer is too small for a packet, we will discard the vq
-> > > > descriptor and retry it for the next packet:
+> > > On Wed, 8 May 2019 23:22:10 +0200
+> > > Halil Pasic <pasic@linux.ibm.com> wrote:
+> > >   
+> > > > On Wed, 8 May 2019 15:18:10 +0200 (CEST)
+> > > > Sebastian Ott <sebott@linux.ibm.com> wrote:  
+> > >   
+> > > > > > @@ -1063,6 +1163,7 @@ static int __init css_bus_init(void)
+> > > > > >  		unregister_reboot_notifier(&css_reboot_notifier);
+> > > > > >  		goto out_unregister;
+> > > > > >  	}
+> > > > > > +	cio_dma_pool_init();      
+> > > > > 
+> > > > > This is too late for early devices (ccw console!).    
 > > > > 
-> > > > while ((sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
-> > > >                           &busyloop_intr))) {
-> > > > ...
-> > > >     /* On overrun, truncate and discard */
-> > > >     if (unlikely(headcount > UIO_MAXIOV)) {
-> > > >         iov_iter_init(&msg.msg_iter, READ, vq->iov, 1, 1);
-> > > >         err = sock->ops->recvmsg(sock, &msg,
-> > > >                      1, MSG_DONTWAIT | MSG_TRUNC);
-> > > >         pr_debug("Discarded rx packet: len %zd\n", sock_len);
-> > > >         continue;
-> > > >     }
-> > > > ...
-> > > > }
-> > > > 
-> > > > This makes it possible to trigger a infinite while..continue loop
-> > > > through the co-opreation of two VMs like:
-> > > > 
-> > > > 1) Malicious VM1 allocate 1 byte rx buffer and try to slow down the
-> > > >     vhost process as much as possible e.g using indirect descriptors or
-> > > >     other.
-> > > > 2) Malicious VM2 generate packets to VM1 as fast as possible
-> > > > 
-> > > > Fixing this by checking against weight at the end of RX and TX
-> > > > loop. This also eliminate other similar cases when:
-> > > > 
-> > > > - userspace is consuming the packets in the meanwhile
-> > > > - theoretical TOCTOU attack if guest moving avail index back and forth
-> > > >    to hit the continue after vhost find guest just add new buffers
-> > > > 
-> > > > This addresses CVE-2019-3900.
-> > > > 
-> > > > Fixes: d8316f3991d20 ("vhost: fix total length when packets are
-> > > > too short")
-> > > I agree this is the real issue.
+> > > > You have already raised concern about this last time (thanks). I think,
+> > > > I've addressed this issue: the cio_dma_pool is only used by the airq
+> > > > stuff. I don't think the ccw console needs it. Please have an other look
+> > > > at patch #6, and explain your concern in more detail if it persists.  
 > > > 
-> > > > Fixes: 3a4d5c94e9593 ("vhost_net: a kernel-level virtio server")
-> > > This is just a red herring imho. We can stick this on any vhost patch :)
-> > > 
-> > > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > > > ---
-> > > >   drivers/vhost/net.c | 41 +++++++++++++++++++++--------------------
-> > > >   1 file changed, 21 insertions(+), 20 deletions(-)
-> > > > 
-> > > > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > > > index df51a35..fb46e6b 100644
-> > > > --- a/drivers/vhost/net.c
-> > > > +++ b/drivers/vhost/net.c
-> > > > @@ -778,8 +778,9 @@ static void handle_tx_copy(struct vhost_net
-> > > > *net, struct socket *sock)
-> > > >       int err;
-> > > >       int sent_pkts = 0;
-> > > >       bool sock_can_batch = (sock->sk->sk_sndbuf == INT_MAX);
-> > > > +    bool next_round = false;
-> > > >   -    for (;;) {
-> > > > +    do {
-> > > >           bool busyloop_intr = false;
-> > > >             if (nvq->done_idx == VHOST_NET_BATCH)
-> > > > @@ -845,11 +846,10 @@ static void handle_tx_copy(struct
-> > > > vhost_net *net, struct socket *sock)
-> > > >           vq->heads[nvq->done_idx].id = cpu_to_vhost32(vq, head);
-> > > >           vq->heads[nvq->done_idx].len = 0;
-> > > >           ++nvq->done_idx;
-> > > > -        if (vhost_exceeds_weight(++sent_pkts, total_len)) {
-> > > > -            vhost_poll_queue(&vq->poll);
-> > > > -            break;
-> > > > -        }
-> > > > -    }
-> > > > +    } while (!(next_round = vhost_exceeds_weight(++sent_pkts,
-> > > > total_len)));
-> > > > +
-> > > > +    if (next_round)
-> > > > +        vhost_poll_queue(&vq->poll);
-> > > >         vhost_tx_batch(net, nvq, sock, &msg);
-> > > >   }
-> > > > @@ -873,8 +873,9 @@ static void handle_tx_zerocopy(struct
-> > > > vhost_net *net, struct socket *sock)
-> > > >       struct vhost_net_ubuf_ref *uninitialized_var(ubufs);
-> > > >       bool zcopy_used;
-> > > >       int sent_pkts = 0;
-> > > > +    bool next_round = false;
-> > > >   -    for (;;) {
-> > > > +    do {
-> > > >           bool busyloop_intr;
-> > > >             /* Release DMAs done buffers first */
-> > > > @@ -951,11 +952,10 @@ static void handle_tx_zerocopy(struct
-> > > > vhost_net *net, struct socket *sock)
-> > > >           else
-> > > >               vhost_zerocopy_signal_used(net, vq);
-> > > >           vhost_net_tx_packet(net);
-> > > > -        if (unlikely(vhost_exceeds_weight(++sent_pkts, total_len))) {
-> > > > -            vhost_poll_queue(&vq->poll);
-> > > > -            break;
-> > > > -        }
-> > > > -    }
-> > > > +    } while (!(next_round = vhost_exceeds_weight(++sent_pkts,
-> > > > total_len)));
-> > > > +
-> > > > +    if (next_round)
-> > > > +        vhost_poll_queue(&vq->poll);
-> > > >   }
-> > > >     /* Expects to be always run from workqueue - which acts as
-> > > > @@ -1134,6 +1134,7 @@ static void handle_rx(struct vhost_net *net)
-> > > >       struct iov_iter fixup;
-> > > >       __virtio16 num_buffers;
-> > > >       int recv_pkts = 0;
-> > > > +    bool next_round = false;
-> > > >         mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
-> > > >       sock = vq->private_data;
-> > > > @@ -1153,8 +1154,11 @@ static void handle_rx(struct vhost_net *net)
-> > > >           vq->log : NULL;
-> > > >       mergeable = vhost_has_feature(vq, VIRTIO_NET_F_MRG_RXBUF);
-> > > >   -    while ((sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
-> > > > -                              &busyloop_intr))) {
-> > > > +    do {
-> > > > +        sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
-> > > > +                              &busyloop_intr);
-> > > > +        if (!sock_len)
-> > > > +            break;
-> > > >           sock_len += sock_hlen;
-> > > >           vhost_len = sock_len + vhost_hlen;
-> > > >           headcount = get_rx_bufs(vq, vq->heads + nvq->done_idx,
-> > > > @@ -1239,12 +1243,9 @@ static void handle_rx(struct vhost_net *net)
-> > > >               vhost_log_write(vq, vq_log, log, vhost_len,
-> > > >                       vq->iov, in);
-> > > >           total_len += vhost_len;
-> > > > -        if (unlikely(vhost_exceeds_weight(++recv_pkts, total_len))) {
-> > > > -            vhost_poll_queue(&vq->poll);
-> > > > -            goto out;
-> > > > -        }
-> > > > -    }
-> > > > -    if (unlikely(busyloop_intr))
-> > > > +    } while (!(next_round = vhost_exceeds_weight(++recv_pkts,
-> > > > total_len)));
-> > > > +
-> > > > +    if (unlikely(busyloop_intr || next_round))
-> > > >           vhost_poll_queue(&vq->poll);
-> > > >       else
-> > > >           vhost_net_enable_vq(net, vq);
-> > > 
-> > > I'm afraid with this addition the code is too much like spagetty. What
-> > > does next_round mean?  Just that we are breaking out of loop?
+> > > What about changing the naming/adding comments here, so that (1) folks
+> > > aren't confused by the same thing in the future and (2) folks don't try
+> > > to use that pool for something needed for the early ccw consoles?
+> > >   
 > > 
-> > 
-> > Yes, we can have a better name of course.
-> > 
-> > 
-> > > That is
-> > > what goto is for...  Either let's have for(;;) with goto/break to get
-> > > outside or a while loop with a condition.  Both is just unreadable.
-> > > 
-> > > All these checks in 3 places are exactly the same on all paths and they
-> > > are slow path. Why don't we put this in a function?
-> > 
-> > 
-> > The point I think is, we want the weight to be checked in both fast path
-> > and slow path.
-> > 
-> > 
-> > > E.g. like the below.
-> > > Warning: completely untested.
-> > > 
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > 
-> > > ---
-> > > 
-> > > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > > index df51a35cf537..a0f89a504cd9 100644
-> > > --- a/drivers/vhost/net.c
-> > > +++ b/drivers/vhost/net.c
-> > > @@ -761,6 +761,23 @@ static int vhost_net_build_xdp(struct
-> > > vhost_net_virtqueue *nvq,
-> > >       return 0;
-> > >   }
-> > >   +/* Returns true if caller needs to go back and re-read the ring. */
-> > > +static bool empty_ring(struct vhost_net *net, struct
-> > > vhost_virtqueue *vq,
-> > > +               int pkts, size_t total_len, bool busyloop_intr)
-> > > +{
-> > > +    if (unlikely(busyloop_intr)) {
-> > > +        vhost_poll_queue(&vq->poll);
-> > > +    } else if (unlikely(vhost_enable_notify(&net->dev, vq))) {
-> > > +        /* They have slipped one in meanwhile: check again. */
-> > > +        vhost_disable_notify(&net->dev, vq);
-> > > +        if (!vhost_exceeds_weight(pkts, total_len))
-> > > +            return true;
-> > > +        vhost_poll_queue(&vq->poll);
-> > > +    }
-> > > +    /* Nothing new?  Wait for eventfd to tell us they refilled. */
-> > > +    return false;
-> > > +}
-> > 
-> > 
-> > Ring empy is not the only places that needs care. E.g for RX, we need
-> > care about overrun and when userspace is consuming the packet in the
-> > same time. So there's no need to toggle vq notification in those two.
-
-Well I just factored out code that looked exactly the same.
-You can add more common code and rename the function
-if it turns out to be worth while.
-
-
-> > 
-> > 
-> > > +
-> > >   static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
-> > >   {
-> > >       struct vhost_net_virtqueue *nvq = &net->vqs[VHOST_NET_VQ_TX];
-> > > @@ -790,15 +807,10 @@ static void handle_tx_copy(struct vhost_net
-> > > *net, struct socket *sock)
-> > >           /* On error, stop handling until the next kick. */
-> > >           if (unlikely(head < 0))
-> > >               break;
-> > > -        /* Nothing new?  Wait for eventfd to tell us they refilled. */
-> > >           if (head == vq->num) {
-> > > -            if (unlikely(busyloop_intr)) {
-> > > -                vhost_poll_queue(&vq->poll);
-> > > -            } else if (unlikely(vhost_enable_notify(&net->dev,
-> > > -                                vq))) {
-> > > -                vhost_disable_notify(&net->dev, vq);
-> > > +            if (unlikely(empty_ring(net, vq, ++sent_pkts,
-> > > +                        total_len, busyloop_intr)))
-> > >                   continue;
-> > > -            }
-> > >               break;
-> > >           }
-> > >   @@ -886,14 +898,10 @@ static void handle_tx_zerocopy(struct
-> > > vhost_net *net, struct socket *sock)
-> > >           /* On error, stop handling until the next kick. */
-> > >           if (unlikely(head < 0))
-> > >               break;
-> > > -        /* Nothing new?  Wait for eventfd to tell us they refilled. */
-> > >           if (head == vq->num) {
-> > > -            if (unlikely(busyloop_intr)) {
-> > > -                vhost_poll_queue(&vq->poll);
-> > > -            } else if (unlikely(vhost_enable_notify(&net->dev, vq))) {
-> > > -                vhost_disable_notify(&net->dev, vq);
-> > > +            if (unlikely(empty_ring(net, vq, ++sent_pkts,
-> > > +                        total_len, busyloop_intr)))
-> > >                   continue;
-> > > -            }
-> > >               break;
-> > >           }
-> > >   @@ -1163,18 +1171,10 @@ static void handle_rx(struct vhost_net *net)
-> > >           /* On error, stop handling until the next kick. */
-> > >           if (unlikely(headcount < 0))
-> > >               goto out;
-> > > -        /* OK, now we need to know about added descriptors. */
-> > >           if (!headcount) {
-> > > -            if (unlikely(busyloop_intr)) {
-> > > -                vhost_poll_queue(&vq->poll);
-> > > -            } else if (unlikely(vhost_enable_notify(&net->dev, vq))) {
-> > > -                /* They have slipped one in as we were
-> > > -                 * doing that: check again. */
-> > > -                vhost_disable_notify(&net->dev, vq);
-> > > -                continue;
-> > > -            }
-> > > -            /* Nothing new?  Wait for eventfd to tell us
-> > > -             * they refilled. */
-> > > +            if (unlikely(empty_ring(net, vq, ++recv_pkts,
-> > > +                        total_len, busyloop_intr)))
-> > > +                    continue;
-> > >               goto out;
-> > >           }
-> > >           busyloop_intr = false;
-> > 
-> > The patch misses several other continue that need cares and there's
-> > another call of vhost_exceeds_weight() at the end of the loop.
-> > 
-> > So instead of duplicating check everywhere like:
-> > 
-> > for (;;) {
-> >     if (condition_x) {
-> >         if (empty_ring())
-> >             continue;
-> >         break;
-> >     }
-> >     if (condition_y) {
-> >         if (empty_ring());
-> >             continue;
-> >         break;
-> >     }
-> >     if (condition_z) {
-> >         if (empty_ring())
-> >             continue;
-> >         break;
-> >     }
-> > 
-> > }
-> > 
-> > What this patch did:
-> > 
-> > do {
-> >    if (condition_x)
-> >     continue;
-> >    if (condition_y)
-> >     continue;
-> >    if (condition_z)
-> >     continue;
-> > } while(!need_break())
-> > 
-> > is much more compact and easier to read?
-> > 
-> > Thanks
+> > I'm all for clarity! Suggestions for better names?
 > 
+> css_aiv_dma_pool, maybe? Or is there other cross-device stuff that may
+> need it?
 > 
-> Hi Michael:
-> 
-> Any more comments?
-> 
-> Thanks
 
-Jason the actual code in e.g. handle_tx_copy is nowhere close to the
-neat example you provide below. Yes new parts are like this but we
-kept all the old code around and that works differently.
+Ouch! I was considering to use cio_dma_zalloc() for the adapter
+interruption vectors but I ended up between the two chairs in the end.
+So with this series there are no uses for cio_dma pool.
 
+I don't feel strongly about this going one way the other.
 
-Look at handle_tx_copy for example.
-With your patch applied one can exit the loop:
+Against getting rid of the cio_dma_pool and sticking with the speaks
+dma_alloc_coherent() that we waste a DMA page per vector, which is a
+non obvious side effect.
 
+What speaks against cio_dma_pool is that it is slightly more code, and
+this currently can not be used for very early stuff, which I don't
+think is relevant. What also used to speak against it is that
+allocations asking for more than a page would just fail, but I addressed
+that in the patch I've hacked up on top of the series, and I'm going to
+paste below. While at it I addressed some other issues as well.
 
-	with a break
-	with continue and condition false
-	get to end of loop and condition false
+I've also got code that deals with AIRQ_IV_CACHELINE by turning the
+kmem_cache into a dma_pool.
 
-	and we have a goto there which now can get us to
-	end of loop and then exit.
-
-previously at least we would only exit
-on a break.
-
-Frankly trying to review it I get lost now.
-I also think repeated checking of empty_ring is not that
-problematic.
-But I don't insist on this specific splitup
-just pls make the code regular by
-moving stuff to sub-function.
+Cornelia, Sebastian which approach do you prefer:
+1) get rid of cio_dma_pool and AIRQ_IV_CACHELINE, and waste a page per
+vector, or
+2) go with the approach taken by the patch below?
 
 
+Regards,
+Halil
+-----------------------8<---------------------------------------------
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Sun, 12 May 2019 18:08:05 +0200
+Subject: [PATCH] WIP: use cio dma pool for airqs
+
+Let's not waste a DMA page per adapter interrupt bit vector.
+---
+Lightly tested...
+---
+ arch/s390/include/asm/airq.h |  1 -
+ drivers/s390/cio/airq.c      | 10 +++-------
+ drivers/s390/cio/css.c       | 18 +++++++++++++++---
+ 3 files changed, 18 insertions(+), 11 deletions(-)
+
+diff --git a/arch/s390/include/asm/airq.h b/arch/s390/include/asm/airq.h
+index 1492d48..981a3eb 100644
+--- a/arch/s390/include/asm/airq.h
++++ b/arch/s390/include/asm/airq.h
+@@ -30,7 +30,6 @@ void unregister_adapter_interrupt(struct airq_struct *airq);
+ /* Adapter interrupt bit vector */
+ struct airq_iv {
+ 	unsigned long *vector;	/* Adapter interrupt bit vector */
+-	dma_addr_t vector_dma; /* Adapter interrupt bit vector dma */
+ 	unsigned long *avail;	/* Allocation bit mask for the bit vector */
+ 	unsigned long *bitlock;	/* Lock bit mask for the bit vector */
+ 	unsigned long *ptr;	/* Pointer associated with each bit */
+diff --git a/drivers/s390/cio/airq.c b/drivers/s390/cio/airq.c
+index 7a5c0a0..f11f437 100644
+--- a/drivers/s390/cio/airq.c
++++ b/drivers/s390/cio/airq.c
+@@ -136,8 +136,7 @@ struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags)
+ 		goto out;
+ 	iv->bits = bits;
+ 	size = iv_size(bits);
+-	iv->vector = dma_alloc_coherent(cio_get_dma_css_dev(), size,
+-						 &iv->vector_dma, GFP_KERNEL);
++	iv->vector = cio_dma_zalloc(size);
+ 	if (!iv->vector)
+ 		goto out_free;
+ 	if (flags & AIRQ_IV_ALLOC) {
+@@ -172,8 +171,7 @@ struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags)
+ 	kfree(iv->ptr);
+ 	kfree(iv->bitlock);
+ 	kfree(iv->avail);
+-	dma_free_coherent(cio_get_dma_css_dev(), size, iv->vector,
+-			  iv->vector_dma);
++	cio_dma_free(iv->vector, size);
+ 	kfree(iv);
+ out:
+ 	return NULL;
+@@ -189,9 +187,7 @@ void airq_iv_release(struct airq_iv *iv)
+ 	kfree(iv->data);
+ 	kfree(iv->ptr);
+ 	kfree(iv->bitlock);
+-	kfree(iv->vector);
+-	dma_free_coherent(cio_get_dma_css_dev(), iv_size(iv->bits),
+-			  iv->vector, iv->vector_dma);
++	cio_dma_free(iv->vector, iv_size(iv->bits));
+ 	kfree(iv->avail);
+ 	kfree(iv);
+ }
+diff --git a/drivers/s390/cio/css.c b/drivers/s390/cio/css.c
+index 7087cc3..88d9c92 100644
+--- a/drivers/s390/cio/css.c
++++ b/drivers/s390/cio/css.c
+@@ -1063,7 +1063,10 @@ struct gen_pool *cio_gp_dma_create(struct device *dma_dev, int nr_pages)
+ static void __gp_dma_free_dma(struct gen_pool *pool,
+ 			      struct gen_pool_chunk *chunk, void *data)
+ {
+-	dma_free_coherent((struct device *) data, PAGE_SIZE,
++
++	size_t chunk_size = chunk->end_addr - chunk->start_addr + 1;
++
++	dma_free_coherent((struct device *) data, chunk_size,
+ 			 (void *) chunk->start_addr,
+ 			 (dma_addr_t) chunk->phys_addr);
+ }
+@@ -1088,13 +1091,15 @@ void *cio_gp_dma_zalloc(struct gen_pool *gp_dma, struct device *dma_dev,
+ {
+ 	dma_addr_t dma_addr;
+ 	unsigned long addr = gen_pool_alloc(gp_dma, size);
++	size_t chunk_size;
+ 
+ 	if (!addr) {
++		chunk_size = round_up(size, PAGE_SIZE);
+ 		addr = (unsigned long) dma_alloc_coherent(dma_dev,
+-					PAGE_SIZE, &dma_addr, CIO_DMA_GFP);
++					 chunk_size, &dma_addr, CIO_DMA_GFP);
+ 		if (!addr)
+ 			return NULL;
+-		gen_pool_add_virt(gp_dma, addr, dma_addr, PAGE_SIZE, -1);
++		gen_pool_add_virt(gp_dma, addr, dma_addr, chunk_size, -1);
+ 		addr = gen_pool_alloc(gp_dma, size);
+ 	}
+ 	return (void *) addr;
+@@ -1108,6 +1113,13 @@ void cio_gp_dma_free(struct gen_pool *gp_dma, void *cpu_addr, size_t size)
+ 	gen_pool_free(gp_dma, (unsigned long) cpu_addr, size);
+ }
+ 
++/**
++ * Allocate dma memory from the css global pool. Intended for memory not
++ * specific to any single device within the css.
++ *
++ * Caution: Not suitable for early stuff like console.
++ *
++ */
+ void *cio_dma_zalloc(size_t size)
+ {
+ 	return cio_gp_dma_zalloc(cio_dma_pool, cio_get_dma_css_dev(), size);
 -- 
-MST
+2.5.5
+
