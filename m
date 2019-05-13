@@ -2,315 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EB2211B170
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 09:46:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D05F81B270
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 11:12:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728135AbfEMHqe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 03:46:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38486 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727726AbfEMHqe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 03:46:34 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0D11D86671;
-        Mon, 13 May 2019 07:46:33 +0000 (UTC)
-Received: from [10.36.116.17] (ovpn-116-17.ams2.redhat.com [10.36.116.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C6DB35D71E;
-        Mon, 13 May 2019 07:46:28 +0000 (UTC)
-From:   Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH v7 18/23] iommu/smmuv3: Report non recoverable faults
-To:     Robin Murphy <robin.murphy@arm.com>, eric.auger.pro@gmail.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
-        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
-        yi.l.liu@intel.com, jean-philippe.brucker@arm.com,
-        will.deacon@arm.com
-Cc:     kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com,
-        christoffer.dall@arm.com, peter.maydell@linaro.org,
-        vincent.stehle@arm.com
-References: <20190408121911.24103-1-eric.auger@redhat.com>
- <20190408121911.24103-19-eric.auger@redhat.com>
- <52dd9de0-67a9-0316-cfe1-83d855d26c66@arm.com>
-Message-ID: <46f39a8e-a909-5493-b1eb-f8f082b0bb20@redhat.com>
-Date:   Mon, 13 May 2019 09:46:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1728594AbfEMJMU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 05:12:20 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:46335 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727576AbfEMJMP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 05:12:15 -0400
+Received: by mail-ot1-f66.google.com with SMTP id j49so3393906otc.13
+        for <kvm@vger.kernel.org>; Mon, 13 May 2019 02:12:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zNwmz7t6PBFmt5YGiQO+xKffu0RcO5OiBU8nsC1V0bQ=;
+        b=bDk+mRKf1bhPVKobiF94W6w0jIYFs2nKILDbLzROMuQflfYxvHldwHhCaWN2iV7XxH
+         f/EwqHFJuOdfJribj2X5FHGbCG/FEIaV4rmpf9Qz+K5xS5ZiOEalVC4JC31S2OycN1xq
+         B11RH/MfgSZ9JR0q0MZVRBbs2hE7/etR9EtgPqCdD2XDDipDPBhU1n/YXzVD8xRaSCf0
+         dzP1dn+qqjLOw0xzjkfZAm12TFIvv0eXdYzpI3BQLoNnagdo8hsQ8ZpoJ2/wqA4nWJzX
+         QrdInrJvp1Ysll/+rl3F8FxqbdXICNWj13M/W1lFtuIomFuKirx10x4WCyU7X+/jq3Lc
+         3dxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zNwmz7t6PBFmt5YGiQO+xKffu0RcO5OiBU8nsC1V0bQ=;
+        b=lw8Vj181BbY3B5ivosvJ0ktZVDLuDzaNK0a3GSi++VvqjU4y1jVIn+HVQlu+LDvaY0
+         soSnQUDGppPWPpDa3Sfyvmb4cYbso5UBom0s18lHOEUpOztjqO5I08YeahGkDuJ1bTWe
+         K5Q6YYTAfYKNtBSh2x1qX9rhPfQFkShg4bf8pErc20s8MbuWbf0iqWHBL+cl8c1BDkRz
+         GLw/hrAnnNRTRkLKDhc9kttlgZJgTDhjV1/mc5wP76SI81yOCOMDs1W935WGO26vT1MQ
+         bR4O3IfsLItb775qLF0G0Zr0k8t7cBlHLXbuPcqMDRdOUj8eXrpC5UxzRasAV2Yv54DC
+         X7sg==
+X-Gm-Message-State: APjAAAWM9Zz+toaR8asY9hRkxJ6n1sjQkeQLdkWW0iRI8fzCEPgGJCNx
+        ApFNnf0MF4PwPPmDEmNGrBdXaFvOk1TJTG62gE3uIsD1
+X-Google-Smtp-Source: APXvYqwdwJCrvJIP/W9yVSMtFA+NF9tBUYgk2J8U2GT4DSFQbNkT5fpPQSiEF2tZWvMJ3BeIFBkO3PAVwcVeFjJQzso=
+X-Received: by 2002:a05:6830:1389:: with SMTP id d9mr13718otq.329.1557738735013;
+ Mon, 13 May 2019 02:12:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <52dd9de0-67a9-0316-cfe1-83d855d26c66@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Mon, 13 May 2019 07:46:33 +0000 (UTC)
+References: <20190415154526.64709-1-liran.alon@oracle.com> <20190415181702.GH24010@linux.intel.com>
+ <AD81166E-0C42-49FD-AC37-E6F385C23B13@oracle.com> <4848D424-F852-4E1C-8A86-6AA1A26D2E90@oracle.com>
+ <2dad36e7-a0e5-9670-c902-819c5200466f@oracle.com> <CANRm+CyYkjFaLZMOHP3sMYVjFNo1P7uKbrRr7U3FfRHhG5jVkA@mail.gmail.com>
+ <d930e87a-fbe3-cf63-b8a0-26e9f012442a@oracle.com> <20190510171733.GA16852@linux.intel.com>
+In-Reply-To: <20190510171733.GA16852@linux.intel.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Mon, 13 May 2019 17:13:29 +0800
+Message-ID: <CANRm+Cy4GKvNpJN0ORfMGXC=BfPHZ+khKZhJQzeWvFYVmTGVfA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: VMX: Nop emulation of MSR_IA32_POWER_CTL
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Joao Martins <joao.m.martins@oracle.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Robin,
+On Sat, 11 May 2019 at 01:17, Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
+>
+> On Fri, May 10, 2019 at 11:34:41AM +0100, Joao Martins wrote:
+> > On 5/10/19 10:54 AM, Wanpeng Li wrote:
+> > > It is weird that we can observe intel_idle driver in the guest
+> > > executes mwait eax=0x20, and the corresponding pCPU enters C3 on HSW
+> > > server, however, we can't observe this on SKX/CLX server, it just
+> > > enters maximal C1.
+> >
+> > I assume you refer to the case where you pass the host mwait substates to the
+> > guests as is, right? Or are you zeroing/filtering out the mwait cpuid leaf EDX
+> > like my patch (attached in the previous message) suggests?
+> >
+> > Interestingly, hints set to 0x20 actually corresponds to C6 on HSW (based on
+> > intel_idle driver). IIUC From the SDM (see Vol 2B, "MWAIT for Power Management"
+> > in instruction set reference M-U) the hints register, doesn't necessarily
+> > guarantee the specified C-state depicted in the hints will be used. The manual
+> > makes it sound like it is tentative, and implementation-specific condition may
+> > either ignore it or enter a different one. It appears to be only guaranteed that
+> > it won't enter a C-{sub,}state deeper than the one depicted.
+>
+> Yep, section "MWAIT EXTENSIONS FOR ADVANCED POWER MANAGEMENT" is more
+> explicit on this point:
+>
+>   At CPL=0, system software can specify desired C-state and sub C-state by
+>   using the MWAIT hints register (EAX).  Processors will not go to C-state
+>   and sub C-state deeper than what is specified by the hint register.
+>
+> As for why SKX/CLX only enters C1, AFAICT SKX isn't configured to support
+> C3, e.g. skx_cstates in drivers/idle/intel_idle.c shows C1, C1E and C6.
+> A quick search brings up a variety of docs that confirm this.  My guess is
+> that C1E provides better power/performance than C3 for the majority of
+> server workloads, e.g. C3 doesn't provide enough power savings to justify
+> its higher latency and TLB flush.
 
-On 5/8/19 7:20 PM, Robin Murphy wrote:
-> On 08/04/2019 13:19, Eric Auger wrote:
->> When a stage 1 related fault event is read from the event queue,
->> let's propagate it to potential external fault listeners, ie. users
->> who registered a fault handler.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> v4 -> v5:
->> - s/IOMMU_FAULT_PERM_INST/IOMMU_FAULT_PERM_EXEC
->> ---
->>   drivers/iommu/arm-smmu-v3.c | 169 +++++++++++++++++++++++++++++++++---
->>   1 file changed, 158 insertions(+), 11 deletions(-)
->>
->> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
->> index 8044445bc32a..1fd320788dcb 100644
->> --- a/drivers/iommu/arm-smmu-v3.c
->> +++ b/drivers/iommu/arm-smmu-v3.c
->> @@ -167,6 +167,26 @@
->>   #define ARM_SMMU_PRIQ_IRQ_CFG1        0xd8
->>   #define ARM_SMMU_PRIQ_IRQ_CFG2        0xdc
->>   +/* Events */
->> +#define ARM_SMMU_EVT_F_UUT        0x01
->> +#define ARM_SMMU_EVT_C_BAD_STREAMID    0x02
->> +#define ARM_SMMU_EVT_F_STE_FETCH    0x03
->> +#define ARM_SMMU_EVT_C_BAD_STE        0x04
->> +#define ARM_SMMU_EVT_F_BAD_ATS_TREQ    0x05
->> +#define ARM_SMMU_EVT_F_STREAM_DISABLED    0x06
->> +#define ARM_SMMU_EVT_F_TRANSL_FORBIDDEN    0x07
->> +#define ARM_SMMU_EVT_C_BAD_SUBSTREAMID    0x08
->> +#define ARM_SMMU_EVT_F_CD_FETCH        0x09
->> +#define ARM_SMMU_EVT_C_BAD_CD        0x0a
->> +#define ARM_SMMU_EVT_F_WALK_EABT    0x0b
->> +#define ARM_SMMU_EVT_F_TRANSLATION    0x10
->> +#define ARM_SMMU_EVT_F_ADDR_SIZE    0x11
->> +#define ARM_SMMU_EVT_F_ACCESS        0x12
->> +#define ARM_SMMU_EVT_F_PERMISSION    0x13
->> +#define ARM_SMMU_EVT_F_TLB_CONFLICT    0x20
->> +#define ARM_SMMU_EVT_F_CFG_CONFLICT    0x21
->> +#define ARM_SMMU_EVT_E_PAGE_REQUEST    0x24
->> +
->>   /* Common MSI config fields */
->>   #define MSI_CFG0_ADDR_MASK        GENMASK_ULL(51, 2)
->>   #define MSI_CFG2_SH            GENMASK(5, 4)
->> @@ -332,6 +352,15 @@
->>   #define EVTQ_MAX_SZ_SHIFT        7
->>     #define EVTQ_0_ID            GENMASK_ULL(7, 0)
->> +#define EVTQ_0_SSV            GENMASK_ULL(11, 11)
->> +#define EVTQ_0_SUBSTREAMID        GENMASK_ULL(31, 12)
->> +#define EVTQ_0_STREAMID            GENMASK_ULL(63, 32)
->> +#define EVTQ_1_PNU            GENMASK_ULL(33, 33)
->> +#define EVTQ_1_IND            GENMASK_ULL(34, 34)
->> +#define EVTQ_1_RNW            GENMASK_ULL(35, 35)
->> +#define EVTQ_1_S2            GENMASK_ULL(39, 39)
->> +#define EVTQ_1_CLASS            GENMASK_ULL(40, 41)
->> +#define EVTQ_3_FETCH_ADDR        GENMASK_ULL(51, 3)
->>     /* PRI queue */
->>   #define PRIQ_ENT_DWORDS            2
->> @@ -639,6 +668,64 @@ struct arm_smmu_domain {
->>       spinlock_t            devices_lock;
->>   };
->>   +/* fault propagation */
->> +
->> +#define IOMMU_FAULT_F_FIELDS    (IOMMU_FAULT_UNRECOV_PASID_VALID | \
->> +                 IOMMU_FAULT_UNRECOV_PERM_VALID | \
->> +                 IOMMU_FAULT_UNRECOV_ADDR_VALID)
->> +
->> +struct arm_smmu_fault_propagation_data {
->> +    enum iommu_fault_reason reason;
->> +    bool s1_check;
->> +    u32 fields; /* IOMMU_FAULT_UNRECOV_*_VALID bits */
->> +};
->> +
->> +/*
->> + * Describes how SMMU faults translate into generic IOMMU faults
->> + * and if they need to be reported externally
->> + */
->> +static const struct arm_smmu_fault_propagation_data
->> fault_propagation[] = {
->> +[ARM_SMMU_EVT_F_UUT]            = { },
->> +[ARM_SMMU_EVT_C_BAD_STREAMID]        = { },
->> +[ARM_SMMU_EVT_F_STE_FETCH]        = { },
->> +[ARM_SMMU_EVT_C_BAD_STE]        = { },
->> +[ARM_SMMU_EVT_F_BAD_ATS_TREQ]        = { },
->> +[ARM_SMMU_EVT_F_STREAM_DISABLED]    = { },
->> +[ARM_SMMU_EVT_F_TRANSL_FORBIDDEN]    = { },
->> +[ARM_SMMU_EVT_C_BAD_SUBSTREAMID]    = {IOMMU_FAULT_REASON_PASID_INVALID,
->> +                       false,
->> +                       IOMMU_FAULT_UNRECOV_PASID_VALID
->> +                      },
->> +[ARM_SMMU_EVT_F_CD_FETCH]        = {IOMMU_FAULT_REASON_PASID_FETCH,
->> +                       false,
->> +                       IOMMU_FAULT_UNRECOV_PASID_VALID |
-> 
-> It doesn't make sense to presume validity here, or in any of the faults
-> below...
+You are right, I figure this out by referring to the SKX/CLX EDS, the
+Core C-States of these two generations just support CC0/CC1/CC1E/CC6.
+The issue here is after exposing mwait to the guest, SKX/CLX guest
+can't enter CC6, however, HSW guest can enter CC3/CC6. Both HSW and
+SKX/CLX hosts can enter CC6. We observe SKX/CLX guests execute mwait
+eax 0x20, however, we can't observe the corresponding pCPU enter CC6
+by turbostat or reading MSR_CORE_C6_RESIDENCY directly.
 
-
-> 
->> +                       IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID
->> +                      },
->> +[ARM_SMMU_EVT_C_BAD_CD]            =
->> {IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
->> +                       false,
->> +                       IOMMU_FAULT_UNRECOV_PASID_VALID
->> +                      },
->> +[ARM_SMMU_EVT_F_WALK_EABT]        = {IOMMU_FAULT_REASON_WALK_EABT, true,
->> +                       IOMMU_FAULT_F_FIELDS |
->> +                       IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID
->> +                      },
->> +[ARM_SMMU_EVT_F_TRANSLATION]        = {IOMMU_FAULT_REASON_PTE_FETCH,
->> true,
->> +                       IOMMU_FAULT_F_FIELDS
->> +                      },
->> +[ARM_SMMU_EVT_F_ADDR_SIZE]        = {IOMMU_FAULT_REASON_OOR_ADDRESS,
->> true,
->> +                       IOMMU_FAULT_F_FIELDS
->> +                      },
->> +[ARM_SMMU_EVT_F_ACCESS]            = {IOMMU_FAULT_REASON_ACCESS, true,
->> +                       IOMMU_FAULT_F_FIELDS
->> +                      },
->> +[ARM_SMMU_EVT_F_PERMISSION]        = {IOMMU_FAULT_REASON_PERMISSION,
->> true,
->> +                       IOMMU_FAULT_F_FIELDS
->> +                      },
->> +[ARM_SMMU_EVT_F_TLB_CONFLICT]        = { },
->> +[ARM_SMMU_EVT_F_CFG_CONFLICT]        = { },
->> +[ARM_SMMU_EVT_E_PAGE_REQUEST]        = { },
->> +};
->> +
->>   struct arm_smmu_option_prop {
->>       u32 opt;
->>       const char *prop;
->> @@ -1258,7 +1345,6 @@ static int arm_smmu_init_l2_strtab(struct
->> arm_smmu_device *smmu, u32 sid)
->>       return 0;
->>   }
->>   -__maybe_unused
->>   static struct arm_smmu_master_data *
->>   arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
->>   {
->> @@ -1284,24 +1370,85 @@ arm_smmu_find_master(struct arm_smmu_device
->> *smmu, u32 sid)
->>       return master;
->>   }
->>   +/* Populates the record fields according to the input SMMU event */
->> +static bool arm_smmu_transcode_fault(u64 *evt, u8 type,
->> +                     struct iommu_fault_unrecoverable *record)
->> +{
->> +    const struct arm_smmu_fault_propagation_data *data;
->> +    u32 fields;
->> +
->> +    if (type >= ARRAY_SIZE(fault_propagation))
->> +        return false;
->> +
->> +    data = &fault_propagation[type];
->> +    if (!data->reason)
->> +        return false;
->> +
->> +    fields = data->fields;
->> +
->> +    if (data->s1_check & FIELD_GET(EVTQ_1_S2, evt[1]))
->> +        return false; /* S2 related fault, don't propagate */
->> +
->> +    if (fields & IOMMU_FAULT_UNRECOV_PASID_VALID) {
->> +        if (FIELD_GET(EVTQ_0_SSV, evt[0]))
->> +            record->pasid = FIELD_GET(EVTQ_0_SUBSTREAMID, evt[0]);
->> +        else
->> +            fields &= ~IOMMU_FAULT_UNRECOV_PASID_VALID;
-> 
-> ...because this logic then breaks for C_BAD_SUBSTREAMID, which ends up
-> coming out of here *without* reporting the offending PASID.
-Correct.
-> 
->> +    }
->> +    if (fields & IOMMU_FAULT_UNRECOV_PERM_VALID) {
->> +        if (!FIELD_GET(EVTQ_1_RNW, evt[1]))
->> +            record->perm |= IOMMU_FAULT_PERM_WRITE;
->> +        if (FIELD_GET(EVTQ_1_PNU, evt[1]))
->> +            record->perm |= IOMMU_FAULT_PERM_PRIV;
->> +        if (FIELD_GET(EVTQ_1_IND, evt[1]))
->> +            record->perm |= IOMMU_FAULT_PERM_EXEC;
->> +    }
->> +    if (fields & IOMMU_FAULT_UNRECOV_ADDR_VALID)
->> +        record->addr = evt[2];
->> +
->> +    if (fields & IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID)
->> +        record->fetch_addr = FIELD_GET(EVTQ_3_FETCH_ADDR, evt[3]);
->> +
->> +    record->flags = fields;
->> +    return true;
->> +}
->> +
->> +static void arm_smmu_report_event(struct arm_smmu_device *smmu, u64
->> *evt)
->> +{
->> +    u32 sid = FIELD_GET(EVTQ_0_STREAMID, evt[0]);
->> +    u8 type = FIELD_GET(EVTQ_0_ID, evt[0]);
->> +    struct arm_smmu_master_data *master;
->> +    struct iommu_fault_event event = {};
->> +    int i;
->> +
->> +    master = arm_smmu_find_master(smmu, sid);
->> +    if (WARN_ON(!master))
->> +        return;
-> 
-> NAK. If I'm getting global faults like C_BAD_STE where a device almost
-> certainly *isn't* configured (because hey, we would have initialised its
-> STEs if we knew), then I sure as hell want to see the actual faults.
-> Spamming a constant stream of stack traces *instead* of showing them is
-> worse than useless.
-Sure, if !master I will output the original traces.
-> 
->> +
->> +    event.fault.type = IOMMU_FAULT_DMA_UNRECOV;
->> +
->> +    if (arm_smmu_transcode_fault(evt, type, &event.fault.event)) {
->> +        iommu_report_device_fault(master->dev, &event);
->> +        return;
-> 
-> And again, the vast majority of the time, there won't be a fault handler
-> registered, so unconditionally suppressing the most common and useful
-> stuff like translation and permission faults is very much not OK.
-Going to test whether we are in nested mode before entering that path.
-
-Thanks!
-
-Eric
-> 
-> Robin.
-> 
->> +    }
->> +
->> +    dev_info(smmu->dev, "event 0x%02x received:\n", type);
->> +    for (i = 0; i < EVTQ_ENT_DWORDS; ++i) {
->> +        dev_info(smmu->dev, "\t0x%016llx\n",
->> +             (unsigned long long)evt[i]);
->> +    }
->> +}
->> +
->>   /* IRQ and event handlers */
->>   static irqreturn_t arm_smmu_evtq_thread(int irq, void *dev)
->>   {
->> -    int i;
->>       struct arm_smmu_device *smmu = dev;
->>       struct arm_smmu_queue *q = &smmu->evtq.q;
->>       u64 evt[EVTQ_ENT_DWORDS];
->>         do {
->> -        while (!queue_remove_raw(q, evt)) {
->> -            u8 id = FIELD_GET(EVTQ_0_ID, evt[0]);
->> -
->> -            dev_info(smmu->dev, "event 0x%02x received:\n", id);
->> -            for (i = 0; i < ARRAY_SIZE(evt); ++i)
->> -                dev_info(smmu->dev, "\t0x%016llx\n",
->> -                     (unsigned long long)evt[i]);
->> -
->> -        }
->> +        while (!queue_remove_raw(q, evt))
->> +            arm_smmu_report_event(smmu, evt);
->>             /*
->>            * Not much we can do on overflow, so scream and pretend we're
->>
+Regards,
+Wanpeng Li
