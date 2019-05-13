@@ -2,136 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F189A1B663
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 14:50:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 983C31B668
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 14:52:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730003AbfEMMuw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 08:50:52 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56516 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729557AbfEMMuv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 13 May 2019 08:50:51 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4DCcBmn047169
-        for <kvm@vger.kernel.org>; Mon, 13 May 2019 08:50:50 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2sf8g09f2h-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 13 May 2019 08:50:50 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
-        Mon, 13 May 2019 13:50:48 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 13 May 2019 13:50:45 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4DCohaK52101178
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 May 2019 12:50:43 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D0EB942045;
-        Mon, 13 May 2019 12:50:43 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2DDB542049;
-        Mon, 13 May 2019 12:50:43 +0000 (GMT)
-Received: from [9.152.97.147] (unknown [9.152.97.147])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 13 May 2019 12:50:43 +0000 (GMT)
-Reply-To: mimu@linux.ibm.com
-Subject: Re: [PATCH 04/10] s390/mm: force swiotlb for protected virtualization
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>
-References: <20190426183245.37939-1-pasic@linux.ibm.com>
- <20190426183245.37939-5-pasic@linux.ibm.com>
- <20190426192711.GA31463@infradead.org>
- <20190429155951.3175fef5.pasic@linux.ibm.com>
- <3b9956a5-d8da-65fa-a2f7-4f54087d91d6@de.ibm.com>
-From:   Michael Mueller <mimu@linux.ibm.com>
-Organization: IBM
-Date:   Mon, 13 May 2019 14:50:42 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.6.1
+        id S1729962AbfEMMwT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 08:52:19 -0400
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:38665 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729572AbfEMMwT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 08:52:19 -0400
+Received: by mail-ot1-f68.google.com with SMTP id s19so11584994otq.5
+        for <kvm@vger.kernel.org>; Mon, 13 May 2019 05:52:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/h7YDU+P6MUHl6sVj0WLp+MoxyBRTBEzmvX8oGYQxPw=;
+        b=HIV6Xgt0hlwXHD88KEhJy0PqeRJraTxBfxR2EpWUqn7bD/MeMl+qPLfovJYIfQlXUH
+         BKJMP7+97uiq3Sr1Jp5kVTSvFBqmtBv8vKN9ijEX0gtHlHTaOPcxijD/NevmbmDRkp54
+         hsj5T93JiqUv5kV0a2dNDqrk7iUOHjoOYjT36htvtDJUwnyrqR2ew0OiHD7YtdZSQ0o/
+         NVC+WITkg5D1YjYGKsfgnWdj9YvqukCY4z4QKhdpKiaLiekXV1oc07yjdUahfPkf2N08
+         Y9ojpNQiS5gvxBxhv+ysFu3dXqPbJddhbNScx/bcQ70HfiU0IfoCQcBhQSb24S4Pg0BH
+         BGyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/h7YDU+P6MUHl6sVj0WLp+MoxyBRTBEzmvX8oGYQxPw=;
+        b=Sf+xVch3yezck0oM0qzD9LoRy8cMLKhUd7Lj/uD3gX0+mRcF6dThksxx+vQwKaSO7X
+         +aG4/GwzUibVZWDwdf6FjSB5/ZXvBbRYN/N+CunD5hK6iN3iuq1yUsybHC59Vm5votf3
+         SwxuT/UaaQtzrEFcEQZdp2zpQiRTQkvd/5GpbcdUB7/xo5orDUm3JB9jOpcrQc8pxEck
+         hT6rAokMPWvM+N9d5S/4o95cu23m1yhNGDfWyfaQNp4MCOJrbyY7WIzWPrNll6r/Dx/t
+         RYD/H8wQ8untTw0ieNx3fpOvbi6xBLoGb9dLUL9IJqSAd7l5nzM0vKP5rI1o3GBUMFt4
+         7LVQ==
+X-Gm-Message-State: APjAAAXN4I9HGiXMcyItM9kpBpOeMJ2OoQzwWgVg4uTZ5eQF1yXqBz/9
+        hTnYpKJ6VbmkEk8Ai1cJCQsGhT7d5lg6QkoxgWGvOw==
+X-Google-Smtp-Source: APXvYqzU1KagDuT8cYSQvW6nJUrBFKBgehNsCEbpnaW4NclGbCz1NWGRZC8o9SUsmJnUBwuuLvv5/OMp+Rgu8aGJhEM=
+X-Received: by 2002:a9d:4793:: with SMTP id b19mr12407690otf.238.1557751938700;
+ Mon, 13 May 2019 05:52:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <3b9956a5-d8da-65fa-a2f7-4f54087d91d6@de.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051312-0016-0000-0000-0000027B266B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051312-0017-0000-0000-000032D7EB0E
-Message-Id: <b80f9f39-73a9-de29-9b7a-c720bb7f215f@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-13_07:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=875 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905130090
+References: <1557751388-27063-1-git-send-email-gengdongjiu@huawei.com> <1557751388-27063-11-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <1557751388-27063-11-git-send-email-gengdongjiu@huawei.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Mon, 13 May 2019 13:52:07 +0100
+Message-ID: <CAFEAcA81nMkHdCvQTcv2ixNB7sg+3Qx+9mpNgF0XLaBPY7-PNQ@mail.gmail.com>
+Subject: Re: [PATCH v16 10/10] target-arm: kvm64: handle SIGBUS signal from
+ kernel or KVM
+To:     Dongjiu Geng <gengdongjiu@huawei.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Shannon Zhao <shannon.zhaosl@gmail.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Zheng Xiang <zhengxiang9@huawei.com>,
+        Jonathan Cameron <jonathan.cameron@huawei.com>,
+        "xuwei (O)" <xuwei5@huawei.com>, kvm-devel <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 13 May 2019 at 13:46, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+>
+> Add SIGBUS signal handler. In this handler, it checks the SIGBUS type,
+> translates the host VA delivered by host to guest PA, then fill this PA
+> to guest APEI GHES memory, then notify guest according to the SIGBUS type.
+>
+> If guest accesses the poisoned memory, it generates Synchronous External
+> Abort(SEA). Then host kernel gets an APEI notification and call memory_failure()
+> to unmapped the affected page for the guest's stage 2, finally return
+> to guest.
+>
+> Guest continues to access PG_hwpoison page, it will trap to KVM as stage2 fault,
+> then a SIGBUS_MCEERR_AR synchronous signal is delivered to Qemu, Qemu record this
+> error address into guest APEI GHES memory and notify guest using
+> Synchronous-External-Abort(SEA).
+>
+> Suggested-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 
 
-On 29.04.19 16:05, Christian Borntraeger wrote:
-> 
-> 
-> On 29.04.19 15:59, Halil Pasic wrote:
->> On Fri, 26 Apr 2019 12:27:11 -0700
->> Christoph Hellwig <hch@infradead.org> wrote:
->>
->>> On Fri, Apr 26, 2019 at 08:32:39PM +0200, Halil Pasic wrote:
->>>> +EXPORT_SYMBOL_GPL(set_memory_encrypted);
->>>
->>>> +EXPORT_SYMBOL_GPL(set_memory_decrypted);
->>>
->>>> +EXPORT_SYMBOL_GPL(sev_active);
->>>
->>> Why do you export these?  I know x86 exports those as well, but
->>> it shoudn't be needed there either.
->>>
->>
->> I export these to be in line with the x86 implementation (which
->> is the original and seems to be the only one at the moment). I assumed
->> that 'exported or not' is kind of a part of the interface definition.
->> Honestly, I did not give it too much thought.
->>
->> For x86 set_memory(en|de)crypted got exported by 95cf9264d5f3 "x86, drm,
->> fbdev: Do not specify encrypted memory for video mappings" (Tom
->> Lendacky, 2017-07-17). With CONFIG_FB_VGA16=m seems to be necessary for x84.
->>
->> If the consensus is don't export: I won't. I'm fine one way or the other.
->> @Christian, what is your take on this?
-> 
-> If we do not need it today for anything (e.g. virtio-gpu) then we can get rid
-> of the exports (and introduce them when necessary).
+> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(c);
+> +    CPUARMState *env = &cpu->env;
+> +    ram_addr_t ram_addr;
+> +    hwaddr paddr;
+> +
+> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
+> +
+> +    if (addr) {
+> +        ram_addr = qemu_ram_addr_from_host(addr);
+> +        if (ram_addr != RAM_ADDR_INVALID &&
+> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+> +            kvm_hwpoison_page_add(ram_addr);
+> +            /* Asynchronous signal will be masked by main thread, so
+> +             * only handle synchronous signal.
+> +             */
+> +            if (code == BUS_MCEERR_AR) {
+> +                kvm_cpu_synchronize_state(c);
+> +                if (GHES_CPER_FAIL != ghes_record_errors(ACPI_HEST_NOTIFY_SEA, paddr)) {
+> +                    kvm_inject_arm_sea(c);
+> +                } else {
+> +                    fprintf(stderr, "failed to record the error\n");
+> +                }
+> +            }
+> +            return;
+> +        }
+> +        fprintf(stderr, "Hardware memory error for memory used by "
+> +                "QEMU itself instead of guest system!\n");
+> +    }
+> +
+> +    if (code == BUS_MCEERR_AR) {
+> +        fprintf(stderr, "Hardware memory error!\n");
+> +        exit(1);
+> +    }
+> +}
 
-I'll take them out then.
+This code appears to still be unconditionally trying to
+notify the guest of the error via the ACPI tables without
+checking whether those ACPI tables even exist. I told you
+about this in a previous round of review :-(
 
->>
->> Thank you very much!
->>
->> Regards,
->> Halil
->>
->>
-> 
-
+thanks
+-- PMM
