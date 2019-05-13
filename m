@@ -2,98 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B34951B31D
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 11:44:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2F1E1B329
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 11:46:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728203AbfEMJoR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 05:44:17 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:45682 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727857AbfEMJoR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 05:44:17 -0400
-Received: by mail-ot1-f66.google.com with SMTP id t24so2416715otl.12
-        for <kvm@vger.kernel.org>; Mon, 13 May 2019 02:44:17 -0700 (PDT)
+        id S1728559AbfEMJqp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 05:46:45 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:37618 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727848AbfEMJqp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 05:46:45 -0400
+Received: by mail-pl1-f196.google.com with SMTP id p15so6203927pll.4;
+        Mon, 13 May 2019 02:46:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TXYVyM1elY/e/gwr441pJoxadHFYtIz0EH7uksaUA00=;
-        b=GQawiz8mlWxh/yf7/DiecVKQmIl48uHHnfbDs6NwSWdi9y+D4Kf5bCLwsxaGnEIUZf
-         nrUE6T/lrxJFWLvhe10ToW17PX+6WZ7PWEf4xSPOXb8k1DSLt7O2Juet2Lgt5lC759eq
-         g1/2yARQtJwd9CIw7tB136d5woqAAOHI8bNZLOCKr92a6YDS5/J3WlNpe+gEZ05/VpR8
-         xBK5t6xm5FLjWabkFaYeqqAUPHhVrHYsN5daplbQKzmXrU6omOOpWIp9oBDSDKGEQLEE
-         NVXTCZ3tJt/VjAwmPbgBz0t9AjLNN3OsPpyEBbIDeOrWVTKi2ZQkX7y2xbus1kqxTGmq
-         bnZQ==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vsdiDk6Zs+VFH2JCv9rnfu5G+QrChkqRIl4npyicJBc=;
+        b=sJoehUkfTIPBjdwCA842y47ItVU7i0/ozJqcI7HD7rahSFSwiOjxdqnTRMDQd1uexP
+         za3Eg0f9RS6Kzy5IiE2/Nkm1DorV2mAJ8ViCldtmBh7rBAcSnVECvo89Hctg3MLkE0YK
+         eKiayAvWMeIdj8VBlREE32aOwQJ1n87rjCWKH+RT8vLP37vPDoIf7NPl4CYCtHHp94Zc
+         6L1u26+hHZDbmC/iqjqXTOvQXjL9GbHtHw5KOPNYs4Bz+X3SShCdO/3rWE+WayNACl5o
+         N2x3LRMNlb0/R9jmXBGXUVpFBc26kjYzK8JPXOl6YKcStk5I4KegNc9VstS5vPltVn7v
+         dB/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TXYVyM1elY/e/gwr441pJoxadHFYtIz0EH7uksaUA00=;
-        b=kECd70MkxEK88lyqbpBeViXw4ErMi5MoaSA2QFrfZjQTPD2/rgSCLqzvIwr090m+rA
-         UZEj00cVB7kgOTQBgfhtoPIvY0IjmcunM6NMTyRTK1D/wdryeqjcqmfBW5yOv4xqD3TK
-         1S2KwZ4lHbVRTunuGhV5gV+pxu0+zaAu23zhEO+R+0Hau4knz965nlnJwrjtzE52mdgd
-         ENopqYSOz0zg5milyBoMDxSnWYaNGgCBtOVwtQtS+sSAiF6USn7S5DWTULA9ZbpKn3Ml
-         lShfhhqrM2UnEmk6MKSU7eDVux/fGpZrKQfj1QYEJtMaiCsGEe+Hi0kRmCQTBPWjTr8Q
-         V78w==
-X-Gm-Message-State: APjAAAVv+EgwxHnZsT5R28bzfbOZfK7IuhVNkrJ8h6s52YYpHZHPynEy
-        KHivUxhJ9NXQC8R8OvjJS0jsTHk5z1Qhkd3iMRNgJw==
-X-Google-Smtp-Source: APXvYqzaNT+TgVDjenXnFHOeex93upzugiVccOLalDaA6Ieg0c7UGMs4NUZH4TszrKklUoDkyyO8dIHeKn7h76sHRXU=
-X-Received: by 2002:a9d:6855:: with SMTP id c21mr14592075oto.151.1557740656833;
- Mon, 13 May 2019 02:44:16 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vsdiDk6Zs+VFH2JCv9rnfu5G+QrChkqRIl4npyicJBc=;
+        b=l7AHoQ2fnTakytdumQI6jTj/yAiu9xj8lUciTAcl5WiMOQHTpt9jsKvB3zhVPaeM91
+         /t46Hkt8lGX2XllLPXBmClnjFinui6FsfUpg0y4uVXgRKnM1tkRI+dezPjgk87s9jRdN
+         FfTkI67kqfkni6lhc/tUvlxQtvFKsO3dmu5DDNJwNvkW+9BAuY+Eg4BMbVuG4Rs6olbK
+         AW9uPkzSw3zL4Uh3zwzydAfySHz14lRZGGrwdRSnpQzV/YaHMGOqL9yuIQGYVT6KP+Sj
+         SC3/xiGSEDRHpfiZxIdQIYIYqZKWvRug0ulFrXj4KQIYjLn++9d8taFWi8cPXQT3KBvm
+         463Q==
+X-Gm-Message-State: APjAAAUq3+BP6aChx+ewkvOLe1RCOFrIu5+jJJVg9fnrDIqE8pH9YZOa
+        FkY416m3yVeEeEKV5ERn99CadRMx
+X-Google-Smtp-Source: APXvYqyjKly6u6Z18VoqWMjZrdaPbwKxYzIuM4bmXIZ5zBMTRUS+DzhCU9T/OQxjUb1Yzygw0Kk3Og==
+X-Received: by 2002:a17:902:f215:: with SMTP id gn21mr29293861plb.194.1557740804275;
+        Mon, 13 May 2019 02:46:44 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+        by smtp.googlemail.com with ESMTPSA id r64sm44584748pfa.25.2019.05.13.02.46.42
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Mon, 13 May 2019 02:46:43 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Liran Alon <liran.alon@oracle.com>
+Subject: [PATCH] KVM: X86: Enable IA32_MSIC_ENABLE MONITOR bit when exposing mwait/monitor
+Date:   Mon, 13 May 2019 17:46:39 +0800
+Message-Id: <1557740799-5792-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-References: <1557728917-49079-1-git-send-email-gengdongjiu@huawei.com>
-In-Reply-To: <1557728917-49079-1-git-send-email-gengdongjiu@huawei.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Mon, 13 May 2019 10:44:05 +0100
-Message-ID: <CAFEAcA-S6Kh8yUqVZVA8gtDdRscgVaTfC4CwxngoS2ZPt6K9ww@mail.gmail.com>
-Subject: Re: [RFC PATCH V2] kvm: arm64: export memory error recovery
- capability to user space
-To:     Dongjiu Geng <gengdongjiu@huawei.com>
-Cc:     Christoffer Dall <christoffer.dall@arm.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        James Morse <james.morse@arm.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        arm-mail-list <linux-arm-kernel@lists.infradead.org>,
-        kvmarm@lists.cs.columbia.edu, Zheng Xiang <zhengxiang9@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 13 May 2019 at 07:32, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->
-> When user space do memory recovery, it will check whether KVM and
-> guest support the error recovery, only when both of them support,
-> user space will do the error recovery. This patch exports this
-> capability of KVM to user space.
->
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> ---
-> v1->v2:
-> 1. check whether host support memory failure instead of RAS capability
->    https://patchwork.kernel.org/patch/10730827/
->
-> v1:
-> 1. User space needs to check this capability of host is suggested by Peter[1],
-> this patch as RFC tag because user space patches are still under review,
-> so this kernel patch is firstly sent out for review.
->
-> [1]: https://patchwork.codeaurora.org/patch/652261/
-> ---
+From: Wanpeng Li <wanpengli@tencent.com>
 
-I thought the conclusion of the thread on the v1 patch was that
-userspace doesn't need to specifically ask the host kernel if
-it has support for this -- if it does not, then the host kernel
-will just never deliver userspace any SIGBUS with MCEERR code,
-which is fine. Or am I still confused?
+MSR IA32_MSIC_ENABLE bit 18, according to SDM:
 
-thanks
--- PMM
+ | When this bit is set to 0, the MONITOR feature flag is not set (CPUID.01H:ECX[bit 3] = 0). 
+ | This indicates that MONITOR/MWAIT are not supported.
+ | 
+ | Software attempts to execute MONITOR/MWAIT will cause #UD when this bit is 0.
+ | 
+ | When this bit is set to 1 (default), MONITOR/MWAIT are supported (CPUID.01H:ECX[bit 3] = 1). 
+
+This bit should be set to 1, if BIOS enables MONITOR/MWAIT support on host and 
+we intend to expose mwait/monitor to the guest.
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+Cc: Liran Alon <liran.alon@oracle.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/x86.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 1d89cb9..664449e 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2723,6 +2723,13 @@ static int get_msr_mce(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata, bool host)
+ 	return 0;
+ }
+ 
++static inline bool kvm_can_mwait_in_guest(void)
++{
++	return boot_cpu_has(X86_FEATURE_MWAIT) &&
++		!boot_cpu_has_bug(X86_BUG_MONITOR) &&
++		boot_cpu_has(X86_FEATURE_ARAT);
++}
++
+ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ {
+ 	switch (msr_info->index) {
+@@ -2801,6 +2808,8 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		msr_info->data = (u64)vcpu->arch.ia32_tsc_adjust_msr;
+ 		break;
+ 	case MSR_IA32_MISC_ENABLE:
++		if (kvm_can_mwait_in_guest() && kvm_mwait_in_guest(vcpu->kvm))
++			vcpu->arch.ia32_misc_enable_msr |= MSR_IA32_MISC_ENABLE_MWAIT;
+ 		msr_info->data = vcpu->arch.ia32_misc_enable_msr;
+ 		break;
+ 	case MSR_IA32_SMBASE:
+@@ -2984,13 +2993,6 @@ static int msr_io(struct kvm_vcpu *vcpu, struct kvm_msrs __user *user_msrs,
+ 	return r;
+ }
+ 
+-static inline bool kvm_can_mwait_in_guest(void)
+-{
+-	return boot_cpu_has(X86_FEATURE_MWAIT) &&
+-		!boot_cpu_has_bug(X86_BUG_MONITOR) &&
+-		boot_cpu_has(X86_FEATURE_ARAT);
+-}
+-
+ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ {
+ 	int r = 0;
+-- 
+2.7.4
+
