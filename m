@@ -2,104 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D9041B9C4
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 17:18:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A53421BA50
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 17:46:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731211AbfEMPSm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 11:18:42 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:49060 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728783AbfEMPSm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 11:18:42 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4DF9oxF029760;
-        Mon, 13 May 2019 15:17:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2018-07-02; bh=7dwMUJzRttDvJYwhnTS2pvQini1VnZvpMgmhpc63TNI=;
- b=s+iOIvIzPv8p+qdn5Lp87nwsGe8piEJpWQ3OZW90Gqa7nfhqwc5jki1ocfhV8tfSYzyW
- ERQWmQkk0Drp6M39yqnyF2g5hWg8ckFsDEpZVMimRtrkJrFmN42X06Mw0JuVxtOyFXFQ
- ZM3y1OBAffh3lZwD1UORvYQyqw2FVoBLsR/ICZWoOVz30V9X8ZVIhod3gTSiGDDdcVAE
- BIDNG0vWG0mrq+wPCV1tkOBE/AwOEA2iQNd9Wj0ltYBVmaSz96NorsvT640eIhHYb7gR
- dKR2h7IcfhTPGL9nD1ygG8RWeV0LY/JCpb8KY+qu5uHfxDcfChNM5u9rLq4YgfLdHDAE yw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2sdq1q7m9k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 May 2019 15:17:53 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4DFHYQU140196;
-        Mon, 13 May 2019 15:17:53 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2sdnqj1a07-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 May 2019 15:17:53 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4DFHo3J020928;
-        Mon, 13 May 2019 15:17:50 GMT
-Received: from [10.30.3.22] (/213.57.127.2)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 13 May 2019 08:17:49 -0700
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [RFC KVM 01/27] kernel: Export memory-management symbols required
- for KVM address space isolation
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20190513151550.GZ2589@hirez.programming.kicks-ass.net>
-Date:   Mon, 13 May 2019 18:17:42 +0300
-Cc:     Alexandre Chartre <alexandre.chartre@oracle.com>,
-        pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        dave.hansen@linux.intel.com, luto@kernel.org, kvm@vger.kernel.org,
-        x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
-        jwadams@google.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <6CAE8F45-E2C0-453F-B2C8-12D9BBE6B8D7@oracle.com>
-References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
- <1557758315-12667-2-git-send-email-alexandre.chartre@oracle.com>
- <20190513151550.GZ2589@hirez.programming.kicks-ass.net>
-To:     Peter Zijlstra <peterz@infradead.org>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9255 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905130105
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9255 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905130105
+        id S1728523AbfEMPp7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 11:45:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33658 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728142AbfEMPp7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 11:45:59 -0400
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 480F62147A
+        for <kvm@vger.kernel.org>; Mon, 13 May 2019 15:45:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1557762358;
+        bh=BABeuTSqBcwBR4EDIoxeTc9kWB/TDj6EfW9QIQhsYNY=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=Os4/hJwWSkAdbGceMgGRjKFt8j+/6lOvqEBDCCCNQBIVuwuamTCRkhBSqlKoOIc3B
+         bKg4d8F9EV+vF3Ma9/80M5RXduvPhjC/zADKDy9UjeOXh0Lpprw9DYBC66fJ2hbnW8
+         5AX19NgZ7HW2pLeO0tk2CRUtry4EHPrNeSrw6c9k=
+Received: by mail-wr1-f42.google.com with SMTP id e15so3452456wrs.4
+        for <kvm@vger.kernel.org>; Mon, 13 May 2019 08:45:58 -0700 (PDT)
+X-Gm-Message-State: APjAAAV3MnbNzIzFrD+PfYh2RXmfpFqkyie4JlHB2vDawG0Dq+dqY7QC
+        pe/VreO2Wul96w3CahWVz5mVblUX3hDEMc0mZ5z6iw==
+X-Google-Smtp-Source: APXvYqxB6/LB0zVU0LguK5JO/EJiDHXHRv1uRsxvAKFR9W6Hhrd6sfPq7nawtOobZtwjm1N+m8f5YKFBHh33AnBCP3c=
+X-Received: by 2002:a5d:45c7:: with SMTP id b7mr5830508wrs.176.1557762356875;
+ Mon, 13 May 2019 08:45:56 -0700 (PDT)
+MIME-Version: 1.0
+References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com> <1557758315-12667-4-git-send-email-alexandre.chartre@oracle.com>
+In-Reply-To: <1557758315-12667-4-git-send-email-alexandre.chartre@oracle.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Mon, 13 May 2019 08:45:44 -0700
+X-Gmail-Original-Message-ID: <CALCETrV9-VAMS2K3pmkqM--pr0AYcb38ASETvwsZ5YhLtLq-9w@mail.gmail.com>
+Message-ID: <CALCETrV9-VAMS2K3pmkqM--pr0AYcb38ASETvwsZ5YhLtLq-9w@mail.gmail.com>
+Subject: Re: [RFC KVM 03/27] KVM: x86: Introduce KVM separate virtual address space
+To:     Alexandre Chartre <alexandre.chartre@oracle.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andrew Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        kvm list <kvm@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        jan.setjeeilers@oracle.com, Liran Alon <liran.alon@oracle.com>,
+        Jonathan Adams <jwadams@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, May 13, 2019 at 7:39 AM Alexandre Chartre
+<alexandre.chartre@oracle.com> wrote:
+>
+> From: Liran Alon <liran.alon@oracle.com>
+>
+> Create a separate mm for KVM that will be active when KVM #VMExit
+> handlers run. Up until the point which we architectully need to
+> access host (or other VM) sensitive data.
+>
+> This patch just create kvm_mm but never makes it active yet.
+> This will be done by next commits.
 
+NAK to this whole pile of code.  KVM is not so special that it can
+duplicate core infrastructure like this.  Use copy_init_mm() or
+improve it as needed.
 
-> On 13 May 2019, at 18:15, Peter Zijlstra <peterz@infradead.org> wrote:
->=20
-> On Mon, May 13, 2019 at 04:38:09PM +0200, Alexandre Chartre wrote:
->> From: Liran Alon <liran.alon@oracle.com>
->>=20
->> Export symbols needed to create, manage, populate and switch
->> a mm from a kernel module (kvm in this case).
->>=20
->> This is a hacky way for now to start.
->> This should be changed to some suitable memory-management API.
->=20
-> This should not be exported at all, ever, end of story.
->=20
-> Modules do not get to play with address spaces like that.
-
-I agree=E2=80=A6 No doubt about that. This should never be merged like =
-this.
-It=E2=80=99s just to have an initial PoC of the concept so we can:
-1) Messure performance impact of concept.
-2) Get feedback on appropriate design and APIs from community.
-
--Liran
-
+--Andy
