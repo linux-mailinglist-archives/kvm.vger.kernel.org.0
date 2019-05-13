@@ -2,150 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 334791B5D8
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 14:29:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 585421B5F7
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 14:31:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728993AbfEMM3y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 08:29:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53394 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727132AbfEMM3x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 08:29:53 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 114487E427;
-        Mon, 13 May 2019 12:29:53 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E8E5319C67;
-        Mon, 13 May 2019 12:29:47 +0000 (UTC)
-Date:   Mon, 13 May 2019 14:29:45 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Michael Mueller <mimu@linux.ibm.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH 01/10] virtio/s390: use vring_create_virtqueue
-Message-ID: <20190513142945.27e5921f.cohuck@redhat.com>
-In-Reply-To: <f2e52c29-ed4e-cf49-0fbf-e3bac97124e9@linux.ibm.com>
-References: <20190426183245.37939-1-pasic@linux.ibm.com>
-        <20190426183245.37939-2-pasic@linux.ibm.com>
-        <20190503111724.70c6ec37.cohuck@redhat.com>
-        <20190503160421-mutt-send-email-mst@kernel.org>
-        <20190504160340.29f17b98.pasic@linux.ibm.com>
-        <20190505131523.159bec7c.cohuck@redhat.com>
-        <ed6cbf63-f2ff-f259-ccb0-3b9ba60f2b35@de.ibm.com>
-        <20190510160744.00285367.cohuck@redhat.com>
-        <20190512124730-mutt-send-email-mst@kernel.org>
-        <20190513115227.1d316ec8.cohuck@redhat.com>
-        <f2e52c29-ed4e-cf49-0fbf-e3bac97124e9@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1729902AbfEMMbp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 08:31:45 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:55268 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729140AbfEMMbo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 08:31:44 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4DCTFUW068753;
+        Mon, 13 May 2019 12:31:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=trywllJuyMUSDUd/KFmVmzVk7hZTOQk+7wVdh+3PFZ8=;
+ b=h1wck4F1cbF7/cQembwws2+voxzX0ysYzEIIIIxtKgtC5BSrDE717NkR7mJTIFVVsOtc
+ BI+9/UpgAW1cVU+z1A+BB/MQbs/wagEjmD0kWLytPaVqHsrkXgNH/ZyPudL8uS3jOak8
+ DR7GVJmXeNIpCinFOlceeaIlm203119Z5Mrj9XDJP+uqAg/PjyZkztN11nJutu6WWc+2
+ sZno0WcUO1+xrcZ1Ue2jz1wBredATbRZGqtIgu8szGd5jTLXrwJHSBbULs1Okw9H5xt4
+ 00ISJd5vGT12nquZNvtBfTiNxE88+Q89/0/b22Th1HdOkz4zm7wSnloKXZ0YR1jn3/Xu LA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2130.oracle.com with ESMTP id 2sdkwdeqya-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 13 May 2019 12:31:09 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4DCTbh3050875;
+        Mon, 13 May 2019 12:31:08 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2sdnqhx6rf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 13 May 2019 12:31:08 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4DCV7Ac022447;
+        Mon, 13 May 2019 12:31:07 GMT
+Received: from bostrovs-us.us.oracle.com (/10.152.32.65)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 13 May 2019 05:31:06 -0700
+Subject: Re: [PATCH] sched: introduce configurable delay before entering idle
+To:     "Raslan, KarimAllah" <karahmed@amazon.de>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+        "kernellwp@gmail.com" <kernellwp@gmail.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "mingo@kernel.org" <mingo@kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "bsd@redhat.com" <bsd@redhat.com>,
+        "aarcange@redhat.com" <aarcange@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "ankur.a.arora@oracle.com" <ankur.a.arora@oracle.com>
+References: <20190507185647.GA29409@amt.cnet>
+ <CANRm+Cx8zCDG6Oz1m9eukkmx_uVFYcQOdMwZrHwsQcbLm_kuPA@mail.gmail.com>
+ <D655C66D-8C52-4CE3-A00B-697735CFA51D@oracle.com>
+ <1557748312.17635.17.camel@amazon.de>
+From:   Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=boris.ostrovsky@oracle.com; prefer-encrypt=mutual; keydata=
+ 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
+ Jg6OxFYd01z+a+oL
+Message-ID: <03ff5f00-d3ab-2c13-77e8-1ceec094f3fd@oracle.com>
+Date:   Mon, 13 May 2019 08:30:36 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Mon, 13 May 2019 12:29:53 +0000 (UTC)
+In-Reply-To: <1557748312.17635.17.camel@amazon.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9255 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=765
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905130089
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9255 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=798 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905130089
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 13 May 2019 14:27:35 +0200
-Michael Mueller <mimu@linux.ibm.com> wrote:
+On 5/13/19 7:51 AM, Raslan, KarimAllah wrote:
+> On Mon, 2019-05-13 at 07:31 -0400, Konrad Rzeszutek Wilk wrote:
+>> On May 13, 2019 5:20:37 AM EDT, Wanpeng Li <kernellwp@gmail.com> wrote:
+>>> On Wed, 8 May 2019 at 02:57, Marcelo Tosatti <mtosatti@redhat.com>
+>>> wrote:
+>>>>
+>>>>
+>>>> Certain workloads perform poorly on KVM compared to baremetal
+>>>> due to baremetal's ability to perform mwait on NEED_RESCHED
+>>>> bit of task flags (therefore skipping the IPI).
+>>> KVM supports expose mwait to the guest, if it can solve this?
+>>>
+>>
+>> There is a bit of problem with that. The host will see 100% CPU utilization even if the guest is idle and taking long naps..
+>>
+>> Which depending on your dashboard can look like the machine is on fire.
+> This can also be fixed. I have a patch that kind of expose proper information 
+> about the *real* utilization here if that would be help.
 
-> On 13.05.19 11:52, Cornelia Huck wrote:
-> > On Sun, 12 May 2019 12:47:39 -0400
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> >> On Fri, May 10, 2019 at 04:07:44PM +0200, Cornelia Huck wrote:  
-> >>> On Tue, 7 May 2019 15:58:12 +0200
-> >>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >>>      
-> >>>> On 05.05.19 13:15, Cornelia Huck wrote:  
-> >>>>> On Sat, 4 May 2019 16:03:40 +0200
-> >>>>> Halil Pasic <pasic@linux.ibm.com> wrote:
-> >>>>>        
-> >>>>>> On Fri, 3 May 2019 16:04:48 -0400
-> >>>>>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >>>>>>       
-> >>>>>>> On Fri, May 03, 2019 at 11:17:24AM +0200, Cornelia Huck wrote:  
-> >>>>>>>> On Fri, 26 Apr 2019 20:32:36 +0200
-> >>>>>>>> Halil Pasic <pasic@linux.ibm.com> wrote:
-> >>>>>>>>          
-> >>>>>>>>> The commit 2a2d1382fe9d ("virtio: Add improved queue allocation API")
-> >>>>>>>>> establishes a new way of allocating virtqueues (as a part of the effort
-> >>>>>>>>> that taught DMA to virtio rings).
-> >>>>>>>>>
-> >>>>>>>>> In the future we will want virtio-ccw to use the DMA API as well.
-> >>>>>>>>>
-> >>>>>>>>> Let us switch from the legacy method of allocating virtqueues to
-> >>>>>>>>> vring_create_virtqueue() as the first step into that direction.
-> >>>>>>>>>
-> >>>>>>>>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> >>>>>>>>> ---
-> >>>>>>>>>   drivers/s390/virtio/virtio_ccw.c | 30 +++++++++++-------------------
-> >>>>>>>>>   1 file changed, 11 insertions(+), 19 deletions(-)  
-> >>>>>>>>
-> >>>>>>>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> >>>>>>>>
-> >>>>>>>> I'd vote for merging this patch right away for 5.2.  
-> >>>>>>>
-> >>>>>>> So which tree is this going through? mine?
-> >>>>>>>          
-> >>>>>>
-> >>>>>> Christian, what do you think? If the whole series is supposed to go in
-> >>>>>> in one go (which I hope it is), via Martin's tree could be the simplest
-> >>>>>> route IMHO.  
-> >>>>>
-> >>>>>
-> >>>>> The first three patches are virtio(-ccw) only and the those are the ones
-> >>>>> that I think are ready to go.
-> >>>>>
-> >>>>> I'm not feeling comfortable going forward with the remainder as it
-> >>>>> stands now; waiting for some other folks to give feedback. (They are
-> >>>>> touching/interacting with code parts I'm not so familiar with, and lack
-> >>>>> of documentation, while not the developers' fault, does not make it
-> >>>>> easier.)
-> >>>>>
-> >>>>> Michael, would you like to pick up 1-3 for your tree directly? That
-> >>>>> looks like the easiest way.  
-> >>>>
-> >>>> Agreed. Michael please pick 1-3.
-> >>>> We will continue to review 4- first and then see which tree is best.  
-> >>>
-> >>> Michael, please let me know if you'll pick directly or whether I should
-> >>> post a series.
-> >>>
-> >>> [Given that the patches are from one virtio-ccw maintainer and reviewed
-> >>> by the other, picking directly would eliminate an unnecessary
-> >>> indirection :)]  
-> >>
-> >> picked them  
-> > 
-> > Thanks!
-> >   
-> 
-> Connie,
-> 
-> if I get you right here, you don't need a v2 for the
-> patches 1 through 3?
+Yes, that would certainly be interesting to see. Thanks.
 
-Exactly, they are all queued in Michael's tree.
 
-> 
-> Thanks,
-> Michael
-> 
+--boris
 
