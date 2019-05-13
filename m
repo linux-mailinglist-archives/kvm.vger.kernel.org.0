@@ -2,220 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 977A71B7BF
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 16:05:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 706791B7C9
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 16:07:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730401AbfEMOFH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 10:05:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:15053 "EHLO mx1.redhat.com"
+        id S1729416AbfEMOHQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 10:07:16 -0400
+Received: from mga02.intel.com ([134.134.136.20]:33097 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729401AbfEMOFG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 10:05:06 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6E30E7FD6C;
-        Mon, 13 May 2019 14:05:00 +0000 (UTC)
-Received: from [10.36.116.17] (ovpn-116-17.ams2.redhat.com [10.36.116.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C655F608C3;
-        Mon, 13 May 2019 14:04:49 +0000 (UTC)
-Subject: Re: [PATCH v7 14/23] iommu/smmuv3: Implement cache_invalidate
-To:     Robin Murphy <robin.murphy@arm.com>, eric.auger.pro@gmail.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
-        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
-        yi.l.liu@intel.com, jean-philippe.brucker@arm.com,
-        will.deacon@arm.com
-Cc:     kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com,
-        christoffer.dall@arm.com, peter.maydell@linaro.org,
-        vincent.stehle@arm.com
-References: <20190408121911.24103-1-eric.auger@redhat.com>
- <20190408121911.24103-15-eric.auger@redhat.com>
- <a53d72f5-c8a2-a9e9-eb0b-2fac65964caf@arm.com>
- <edff2a6f-66e6-6d7e-49ca-3065e93a41a4@redhat.com>
- <a181689b-94b5-5ff6-9fec-66b3f319cbc4@arm.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <405002b2-5663-7c03-d5df-b9da6499a238@redhat.com>
-Date:   Mon, 13 May 2019 16:04:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1728500AbfEMOHQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 10:07:16 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 May 2019 07:07:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,465,1549958400"; 
+   d="scan'208";a="171201036"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
+  by fmsmga002.fm.intel.com with ESMTP; 13 May 2019 07:07:15 -0700
+Date:   Mon, 13 May 2019 07:07:15 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Marc Haber <mh+linux-kernel@zugschlus.de>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Linux in KVM guest segfaults when hosts runs Linux 5.1
+Message-ID: <20190513140715.GB28561@linux.intel.com>
+References: <20190512115302.GM3835@torres.zugschlus.de>
 MIME-Version: 1.0
-In-Reply-To: <a181689b-94b5-5ff6-9fec-66b3f319cbc4@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Mon, 13 May 2019 14:05:06 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190512115302.GM3835@torres.zugschlus.de>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Robin,
+On Sun, May 12, 2019 at 01:53:02PM +0200, Marc Haber wrote:
+> Hi,
+> 
+> since updating my home desktop machine to kernel 5.1.1, KVM guests
+> started on that machine segfault after booting:
+> general protection fault: 0000 [#1] PREEMPT SMP NOPTI
+> CPU: 0 PID: 13 Comm: kworker/0:1 Not tainted 5.0.13-zgsrv20080 #5.0.13.20190505.0
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.12.0-1 04/01/2014
+> Workqueue: events once_deferred
+> RIP: 0010:native_read_pmc+0x2/0x10
+> Code: e2 20 89 3e 48 09 d0 c3 89 f9 89 f0 0f 30 c3 66 0f 1f 84 00 00 00 00 00 89 f0 89 f9 0f 30 31 c0 c3 0f 1f 80 00 00 00 00 89 f9 <0f> 33 48 c1 e2 20 48 09 d0 c3 0f 1f 40 00 0f 20 c0 c3 66 66 2e 0f
+> RSP: 0018:ffff8881b9a03e50 EFLAGS: 00010083
+> RAX: 0000000000000001 RBX: ffff800000000001 RCX: 0000000000000000
+> RDX: 000000000000002f RSI: 0000000000000000 RDI: 0000000000000000
+> RBP: ffff8881b590e400 R08: ffff8881b590e400 R09: 0000000000000003
+> R10: ffffe8ffffc05440 R11: 0000000000000000 R12: ffff8881b590e5d8
+> R13: 0000000000000010 R14: ffff8881b590e420 R15: ffffe8ffffc05400
+> FS:  0000000000000000(0000) GS:ffff8881b9a00000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f9bcc5c61f8 CR3: 00000001b6a24000 CR4: 00000000000006f0
+> Call Trace:
+>  <IRQ>
+>  x86_perf_event_update+0x3b/0x80
+>  x86_pmu_stop+0x84/0xa0
+>  x86_pmu_del+0x52/0x160
+>  event_sched_out.isra.59+0x95/0x190
+>  group_sched_out.part.61+0x51/0xc0
+>  ctx_sched_out+0xf2/0x220
+>  ctx_resched+0xb8/0xc0
+>  __perf_install_in_context+0x175/0x1f0
+>  remote_function+0x3e/0x50
+>  flush_smp_call_function_queue+0x30/0xe0
+>  smp_call_function_interrupt+0x2f/0x40
+>  call_function_single_interrupt+0xf/0x20
+>  </IRQ>
 
-On 5/13/19 4:01 PM, Robin Murphy wrote:
-> On 13/05/2019 13:16, Auger Eric wrote:
->> Hi Robin,
->> On 5/8/19 5:01 PM, Robin Murphy wrote:
->>> On 08/04/2019 13:19, Eric Auger wrote:
->>>> Implement domain-selective and page-selective IOTLB invalidations.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>
->>>> ---
->>>> v6 -> v7
->>>> - check the uapi version
->>>>
->>>> v3 -> v4:
->>>> - adapt to changes in the uapi
->>>> - add support for leaf parameter
->>>> - do not use arm_smmu_tlb_inv_range_nosync or arm_smmu_tlb_inv_context
->>>>     anymore
->>>>
->>>> v2 -> v3:
->>>> - replace __arm_smmu_tlb_sync by arm_smmu_cmdq_issue_sync
->>>>
->>>> v1 -> v2:
->>>> - properly pass the asid
->>>> ---
->>>>    drivers/iommu/arm-smmu-v3.c | 60
->>>> +++++++++++++++++++++++++++++++++++++
->>>>    1 file changed, 60 insertions(+)
->>>>
->>>> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
->>>> index 1486baf53425..4366921d8318 100644
->>>> --- a/drivers/iommu/arm-smmu-v3.c
->>>> +++ b/drivers/iommu/arm-smmu-v3.c
->>>> @@ -2326,6 +2326,65 @@ static void arm_smmu_detach_pasid_table(struct
->>>> iommu_domain *domain)
->>>>        mutex_unlock(&smmu_domain->init_mutex);
->>>>    }
->>>>    +static int
->>>> +arm_smmu_cache_invalidate(struct iommu_domain *domain, struct device
->>>> *dev,
->>>> +              struct iommu_cache_invalidate_info *inv_info)
->>>> +{
->>>> +    struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
->>>> +    struct arm_smmu_device *smmu = smmu_domain->smmu;
->>>> +
->>>> +    if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
->>>> +        return -EINVAL;
->>>> +
->>>> +    if (!smmu)
->>>> +        return -EINVAL;
->>>> +
->>>> +    if (inv_info->version != IOMMU_CACHE_INVALIDATE_INFO_VERSION_1)
->>>> +        return -EINVAL;
->>>> +
->>>> +    if (inv_info->cache & IOMMU_CACHE_INV_TYPE_IOTLB) {
->>>> +        if (inv_info->granularity == IOMMU_INV_GRANU_PASID) {
->>>> +            struct arm_smmu_cmdq_ent cmd = {
->>>> +                .opcode = CMDQ_OP_TLBI_NH_ASID,
->>>> +                .tlbi = {
->>>> +                    .vmid = smmu_domain->s2_cfg.vmid,
->>>> +                    .asid = inv_info->pasid,
->>>> +                },
->>>> +            };
->>>> +
->>>> +            arm_smmu_cmdq_issue_cmd(smmu, &cmd);
->>>> +            arm_smmu_cmdq_issue_sync(smmu);
->>>
->>> I'd much rather make arm_smmu_tlb_inv_context() understand nested
->>> domains than open-code commands all over the place.
->>
->>
->>>
->>>> +
->>>> +        } else if (inv_info->granularity == IOMMU_INV_GRANU_ADDR) {
->>>> +            struct iommu_inv_addr_info *info = &inv_info->addr_info;
->>>> +            size_t size = info->nb_granules * info->granule_size;
->>>> +            bool leaf = info->flags & IOMMU_INV_ADDR_FLAGS_LEAF;
->>>> +            struct arm_smmu_cmdq_ent cmd = {
->>>> +                .opcode = CMDQ_OP_TLBI_NH_VA,
->>>> +                .tlbi = {
->>>> +                    .addr = info->addr,
->>>> +                    .vmid = smmu_domain->s2_cfg.vmid,
->>>> +                    .asid = info->pasid,
->>>> +                    .leaf = leaf,
->>>> +                },
->>>> +            };
->>>> +
->>>> +            do {
->>>> +                arm_smmu_cmdq_issue_cmd(smmu, &cmd);
->>>> +                cmd.tlbi.addr += info->granule_size;
->>>> +            } while (size -= info->granule_size);
->>>> +            arm_smmu_cmdq_issue_sync(smmu);
->>>
->>> An this in particular I would really like to go all the way through
->>> io_pgtable_tlb_add_flush()/io_pgtable_sync() if at all possible. Hooking
->>> up range-based invalidations is going to be a massive headache if the
->>> abstraction isn't solid.
->>
->> The concern is the host does not "own" the s1 config asid
->> (smmu_domain->s1_cfg.cd.asid is not set, practically). In our case the
->> asid only is passed by the userspace on CACHE_INVALIDATE ioctl call.
->>
->> arm_smmu_tlb_inv_context and arm_smmu_tlb_inv_range_nosync use this field
-> 
-> Right, but that's not exactly hard to solve. Even just something like
-> the (untested, purely illustrative) refactoring below would be beneficial.
-Sure I can go this way.
+...
 
-Thank you for detailing
+> The host seems to be running fine, the KVM guest crash is reproducible.
+> Both host and guest are running Debian unstable with a locally built
+> kernel; the host runs 5.1.1, the guest 5.0.13. The crash also happens
+> when the host is running 5.1.0; going back to 5.0.13 with the host
+> allows the guest to finish bootup and run fine.
+> 
+> Please note that my kernel 5.1.1 image is not fully broken in KVM, I
+> have update my APU machine which runs firewall and other infrastructure
+> services and the guests run fine there.
+> 
+> The machine in question is an older box with an AMD Phenom(tm) II X6
+> 1090T Processor. I guess that the issue is related to the Phenom CPU.
+> 
+> Any idea short of bisecting?
 
-Eric
-> 
-> Robin.
-> 
-> ----->8-----
-> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-> index d3880010c6cf..31ef703cf671 100644
-> --- a/drivers/iommu/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm-smmu-v3.c
-> @@ -1423,11 +1423,9 @@ static void arm_smmu_tlb_inv_context(void *cookie)
->      arm_smmu_cmdq_issue_sync(smmu);
->  }
-> 
-> -static void arm_smmu_tlb_inv_range_nosync(unsigned long iova, size_t size,
-> -                      size_t granule, bool leaf, void *cookie)
-> +static void __arm_smmu_tlb_inv_range(struct arm_smmu_domain
-> *smmu_domain, u16 asid,
-> +        unsigned long iova, size_t size, size_t granule, bool leaf)
->  {
-> -    struct arm_smmu_domain *smmu_domain = cookie;
-> -    struct arm_smmu_device *smmu = smmu_domain->smmu;
->      struct arm_smmu_cmdq_ent cmd = {
->          .tlbi = {
->              .leaf    = leaf,
-> @@ -1437,18 +1435,27 @@ static void
-> arm_smmu_tlb_inv_range_nosync(unsigned long iova, size_t size,
-> 
->      if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
->          cmd.opcode    = CMDQ_OP_TLBI_NH_VA;
-> -        cmd.tlbi.asid    = smmu_domain->s1_cfg.cd.asid;
-> +        cmd.tlbi.asid    = asid;
->      } else {
->          cmd.opcode    = CMDQ_OP_TLBI_S2_IPA;
->          cmd.tlbi.vmid    = smmu_domain->s2_cfg.vmid;
->      }
-> 
->      do {
-> -        arm_smmu_cmdq_issue_cmd(smmu, &cmd);
-> +        arm_smmu_cmdq_issue_cmd(smmu_domain->smmu, &cmd);
->          cmd.tlbi.addr += granule;
->      } while (size -= granule);
->  }
-> 
-> +static void arm_smmu_tlb_inv_range_nosync(unsigned long iova, size_t size,
-> +                      size_t granule, bool leaf, void *cookie)
-> +{
-> +    struct arm_smmu_domain *smmu_domain = cookie;
-> +
-> +    __arm_smmu_tlb_inv_range(smmu_domain, smmu_domain->s1_cfg.cd.asid,
-> iova,
-> +            size, granule, leaf);
-> +}
-> +
->  static const struct iommu_gather_ops arm_smmu_gather_ops = {
->      .tlb_flush_all    = arm_smmu_tlb_inv_context,
->      .tlb_add_flush    = arm_smmu_tlb_inv_range_nosync,
+It's a regression introduced by commit 672ff6cff80c ("KVM: x86: Raise
+#GP when guest vCPU do not support PMU").  A fix has been submitted.
+
+https://lkml.kernel.org/r/20190508170248.15271-1-bp@alien8.de
