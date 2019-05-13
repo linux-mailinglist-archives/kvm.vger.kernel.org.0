@@ -2,43 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BA1D1BA53
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 17:46:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4735B1BA60
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 17:49:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728727AbfEMPqg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 11:46:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34154 "EHLO mail.kernel.org"
+        id S1729354AbfEMPtV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 11:49:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35878 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728224AbfEMPqg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 11:46:36 -0400
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+        id S1727590AbfEMPtV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 11:49:21 -0400
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7CAEC21537
-        for <kvm@vger.kernel.org>; Mon, 13 May 2019 15:46:35 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0A26F2166E
+        for <kvm@vger.kernel.org>; Mon, 13 May 2019 15:49:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1557762395;
-        bh=OcS05eqt08syOJc9XJ+Dq4To3jKF7QcT29fpWx88obU=;
+        s=default; t=1557762560;
+        bh=iu0DvAJjkMh0MqQjI1Y4OdDJERot1b1WNhATGWADuGY=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=mImlR6Is3TMf8fni+IDHdVAZsE7/1M0GTnfOaMuLRGfn1j1/BDu3RGxid6M+0vEiu
-         TFTwQ6jlT+YHrBRxipQ8awjHA/fJy38yEvFDnls8nlN4k82xHuQ7q8V28aXBH0UBQe
-         sppUfQgNAihbuliOSVH+T+E061V8MR3QzVezRa2w=
-Received: by mail-wm1-f46.google.com with SMTP id f2so14229117wmj.3
-        for <kvm@vger.kernel.org>; Mon, 13 May 2019 08:46:35 -0700 (PDT)
-X-Gm-Message-State: APjAAAUlfN2JJ0sLwMHzO/5Ls5+Ro1cCPfgxYLpDIExmvKLosgPsUFVi
-        44eSGwgBRevazNllsTFa6ry+lrw4TlNPI0wrXm61og==
-X-Google-Smtp-Source: APXvYqy0TwclFLqOX6RpVV3KoKOlZdQ8RNcD/rtLCLdFTmws6W80DbiuXvJEyd8KUstfYJ7nC31kdBiSQSFUT51LIs4=
-X-Received: by 2002:a1c:eb18:: with SMTP id j24mr16973110wmh.32.1557762394127;
- Mon, 13 May 2019 08:46:34 -0700 (PDT)
+        b=rp9du5MO21nSayjZvEV1P+McQzueie510+aXWIwZDusr/NFBMwc8rezLPKhgqr32X
+         3bpPFK2yS1j9w8/gk2ZvrdLIpltbrgs5fP6MQ8XfN0XLNE6B/el429ftLpgsiSQPsv
+         LdGX/qAGGgoG1klNvY2ITJvDZvWta9cbZAHn6heo=
+Received: by mail-wm1-f51.google.com with SMTP id n25so14153730wmk.4
+        for <kvm@vger.kernel.org>; Mon, 13 May 2019 08:49:19 -0700 (PDT)
+X-Gm-Message-State: APjAAAWPVMY4PPgs8ZaESuQ0ID54IHAjfAXI1kXMJcaMDEnhVnuc7We+
+        wyl5GCXEpsOIkyDq4nMl2AAF7xBExMTl+tvlx0h+bg==
+X-Google-Smtp-Source: APXvYqyggSeuJFq1Eke91tNtR4SA4B4i+YkaoSBUhYCtCAsL8+cTTl0ofap3IWQH83A63l00cYsKpyKbuDbIwRau26E=
+X-Received: by 2002:a1c:486:: with SMTP id 128mr15280833wme.83.1557762558612;
+ Mon, 13 May 2019 08:49:18 -0700 (PDT)
 MIME-Version: 1.0
-References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com> <1557758315-12667-3-git-send-email-alexandre.chartre@oracle.com>
-In-Reply-To: <1557758315-12667-3-git-send-email-alexandre.chartre@oracle.com>
+References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com> <1557758315-12667-6-git-send-email-alexandre.chartre@oracle.com>
+In-Reply-To: <1557758315-12667-6-git-send-email-alexandre.chartre@oracle.com>
 From:   Andy Lutomirski <luto@kernel.org>
-Date:   Mon, 13 May 2019 08:46:22 -0700
-X-Gmail-Original-Message-ID: <CALCETrUjLRgKH3XbZ+=pLCzPiFOV7DAvAYUvNLA7SMNkaNLEqQ@mail.gmail.com>
-Message-ID: <CALCETrUjLRgKH3XbZ+=pLCzPiFOV7DAvAYUvNLA7SMNkaNLEqQ@mail.gmail.com>
-Subject: Re: [RFC KVM 02/27] KVM: x86: Introduce address_space_isolation
- module parameter
+Date:   Mon, 13 May 2019 08:49:07 -0700
+X-Gmail-Original-Message-ID: <CALCETrXmHHjfa3tX2fxec_o165NB0qFBAG3q5i4BaKV==t7F2Q@mail.gmail.com>
+Message-ID: <CALCETrXmHHjfa3tX2fxec_o165NB0qFBAG3q5i4BaKV==t7F2Q@mail.gmail.com>
+Subject: Re: [RFC KVM 05/27] KVM: x86: Add handler to exit kvm isolation
 To:     Alexandre Chartre <alexandre.chartre@oracle.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Radim Krcmar <rkrcmar@redhat.com>,
@@ -65,11 +64,8 @@ On Mon, May 13, 2019 at 7:39 AM Alexandre Chartre
 >
 > From: Liran Alon <liran.alon@oracle.com>
 >
-> Add the address_space_isolation parameter to the kvm module.
->
-> When set to true, KVM #VMExit handlers run in isolated address space
-> which maps only KVM required code and per-VM information instead of
-> entire kernel address space.
+> Interrupt handlers will need this handler to switch from
+> the KVM address space back to the kernel address space
+> on their prelog.
 
-Does the *entry* also get isolated?  If not, it seems less useful for
-side-channel mitigation.
+This patch doesn't appear to do anything at all.  What am I missing?
