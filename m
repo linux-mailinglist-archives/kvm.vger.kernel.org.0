@@ -2,192 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D0BA61BB78
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 19:02:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D61B1BBD2
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 19:23:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731191AbfEMRCU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 13:02:20 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:39344 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731045AbfEMRCU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 13:02:20 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4DGwgch132176;
-        Mon, 13 May 2019 17:00:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=4xiDPOzSHcQpk0xHvpIXFduYKLuE1ShLeQljNETPlH8=;
- b=bIbPRVQMgiUHCVQwzQuqCiiZIMI38WFqpvE61wvkwdHcTyhzPfLq4oD3+D8wgtXVJoxY
- 8pC1Vh0vbaJ30yemQlGtGrVuLAlyjkghNmAbqrM8fv46zQ94FvB757novPa3rKLV2imw
- 0Rsln4Ilxb01BbtFroGEkx5twV4K/0dcJwz27KIIJVo9abCRYhOxxhQrvBsDBZRIO9Ty
- fRd5tFBbwgLIO5OYE3zC4KfSunv09l19QUIWVVDyhKWbZBQOOX4YplDNz7gkK6j5i6n7
- j89WdQO6nRc6bsocVSBH3ck1exCVyYHV40l8U51e46C4tjj5CNcjBeBCdDLOJw5BdN4S vA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2130.oracle.com with ESMTP id 2sdkwdgm9w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 May 2019 17:00:37 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4DGxHjO090835;
-        Mon, 13 May 2019 17:00:36 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 2se0tvp1hb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 May 2019 17:00:36 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4DH0ZfW031069;
-        Mon, 13 May 2019 17:00:35 GMT
-Received: from [10.166.106.34] (/10.166.106.34)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 13 May 2019 10:00:35 -0700
-Subject: Re: [RFC KVM 19/27] kvm/isolation: initialize the KVM page table with
- core mappings
-To:     Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        kvm list <kvm@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        jan.setjeeilers@oracle.com, Liran Alon <liran.alon@oracle.com>,
-        Jonathan Adams <jwadams@google.com>
-References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
- <1557758315-12667-20-git-send-email-alexandre.chartre@oracle.com>
- <a9198e28-abe1-b980-597e-2d82273a2c17@intel.com>
- <CALCETrXYW-CfixanL3Wk5v_5Ex7WMe+7POV0VfBVHujfb6cvtQ@mail.gmail.com>
-From:   Alexandre Chartre <alexandre.chartre@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <ec26a85f-ff1c-89d9-5e6c-ff42e834c48d@oracle.com>
-Date:   Mon, 13 May 2019 19:00:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+        id S1731629AbfEMRX2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 13:23:28 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:45754 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731336AbfEMRX1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 13:23:27 -0400
+Received: by mail-wr1-f66.google.com with SMTP id b18so6224237wrq.12
+        for <kvm@vger.kernel.org>; Mon, 13 May 2019 10:23:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=aOc6CBKw+RVeeMdGwIxa6uCL3lFsOT0Lwgti+Fi6e58=;
+        b=dEjeyW/D+qL2AHYnc+Xx80CdA83066wEQ1kiB9UrjYfyQRmTPsCJY/5Le4x+AqBGrw
+         qs3hMCEDMYdpkhTgSmG6FwlWtOh+/pBqXIlPrzt4YwQqeu3DXLt3ZMdyN3uXKzvgEx/O
+         7yfu0DojmZvqoAQPtyazxGyB/5xDHqovsXDn1DFHuQ8xl0HCIXTkkQkQnBejqrkIbsoO
+         PPA+R5GebXlB35ayqSD85lhWatr0UE26tCcgmPdZQZk6xJVNHH+tzfH6wXNZKSjs7LaV
+         bzwZidTuDc8oSw9d3eg0miXwMyjLvyIItoBSd+FgwVPrPR5k6fysoF0rcJ8T9oSQD6gg
+         N+LQ==
+X-Gm-Message-State: APjAAAXFfyUSHx1a10SqTwgKmVlO8TfJjowfQCe0iiuMl3l7neBaBbP2
+        P2uFZuxabc+kZhbWxGmuBtTing==
+X-Google-Smtp-Source: APXvYqyGLQfQ9qgYBMhBOROA3KDzQZd+2RzOsjvMydbObvwkA2lyVoOmT5x005cmHKCzFX+X+nkBqQ==
+X-Received: by 2002:adf:b35e:: with SMTP id k30mr2281815wrd.178.1557768205296;
+        Mon, 13 May 2019 10:23:25 -0700 (PDT)
+Received: from steredhat (host151-251-static.12-87-b.business.telecomitalia.it. [87.12.251.151])
+        by smtp.gmail.com with ESMTPSA id s7sm13859054wrn.84.2019.05.13.10.23.24
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 13 May 2019 10:23:24 -0700 (PDT)
+Date:   Mon, 13 May 2019 19:23:22 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH v2 1/8] vsock/virtio: limit the memory used per-socket
+Message-ID: <20190513172322.vcgenx7xk4v6r2ay@steredhat>
+References: <20190510125843.95587-1-sgarzare@redhat.com>
+ <20190510125843.95587-2-sgarzare@redhat.com>
+ <3b275b52-63d9-d260-1652-8e8bf7dd679f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CALCETrXYW-CfixanL3Wk5v_5Ex7WMe+7POV0VfBVHujfb6cvtQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905130116
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905130116
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3b275b52-63d9-d260-1652-8e8bf7dd679f@redhat.com>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 5/13/19 6:00 PM, Andy Lutomirski wrote:
-> On Mon, May 13, 2019 at 8:50 AM Dave Hansen <dave.hansen@intel.com> wrote:
->>
->>> +     /*
->>> +      * Copy the mapping for all the kernel text. We copy at the PMD
->>> +      * level since the PUD is shared with the module mapping space.
->>> +      */
->>> +     rv = kvm_copy_mapping((void *)__START_KERNEL_map, KERNEL_IMAGE_SIZE,
->>> +          PGT_LEVEL_PMD);
->>> +     if (rv)
->>> +             goto out_uninit_page_table;
->>
->> Could you double-check this?  We (I) have had some repeated confusion
->> with the PTI code and kernel text vs. kernel data vs. __init.
->> KERNEL_IMAGE_SIZE looks to be 512MB which is quite a bit bigger than
->> kernel text.
->>
->>> +     /*
->>> +      * Copy the mapping for cpu_entry_area and %esp fixup stacks
->>> +      * (this is based on the PTI userland address space, but probably
->>> +      * not needed because the KVM address space is not directly
->>> +      * enterered from userspace). They can both be copied at the P4D
->>> +      * level since they each have a dedicated P4D entry.
->>> +      */
->>> +     rv = kvm_copy_mapping((void *)CPU_ENTRY_AREA_PER_CPU, P4D_SIZE,
->>> +          PGT_LEVEL_P4D);
->>> +     if (rv)
->>> +             goto out_uninit_page_table;
->>
->> cpu_entry_area is used for more than just entry from userspace.  The gdt
->> mapping, for instance, is needed everywhere.  You might want to go look
->> at 'struct cpu_entry_area' in some more detail.
->>
->>> +#ifdef CONFIG_X86_ESPFIX64
->>> +     rv = kvm_copy_mapping((void *)ESPFIX_BASE_ADDR, P4D_SIZE,
->>> +          PGT_LEVEL_P4D);
->>> +     if (rv)
->>> +             goto out_uninit_page_table;
->>> +#endif
->>
->> Why are these mappings *needed*?  I thought we only actually used these
->> fixup stacks for some crazy iret-to-userspace handling.  We're certainly
->> not doing that from KVM context.
->>
->> Am I forgetting something?
->>
->>> +#ifdef CONFIG_VMAP_STACK
->>> +     /*
->>> +      * Interrupt stacks are vmap'ed with guard pages, so we need to
->>> +      * copy mappings.
->>> +      */
->>> +     for_each_possible_cpu(cpu) {
->>> +             stack = per_cpu(hardirq_stack_ptr, cpu);
->>> +             pr_debug("IRQ Stack %px\n", stack);
->>> +             if (!stack)
->>> +                     continue;
->>> +             rv = kvm_copy_ptes(stack - IRQ_STACK_SIZE, IRQ_STACK_SIZE);
->>> +             if (rv)
->>> +                     goto out_uninit_page_table;
->>> +     }
->>> +
->>> +#endif
->>
->> I seem to remember that the KVM VMENTRY/VMEXIT context is very special.
->>   Interrupts (and even NMIs?) are disabled.  Would it be feasible to do
->> the switching in there so that we never even *get* interrupts in the KVM
->> context?
+On Mon, May 13, 2019 at 05:58:53PM +0800, Jason Wang wrote:
 > 
-> That would be nicer.
+> On 2019/5/10 下午8:58, Stefano Garzarella wrote:
+> > Since virtio-vsock was introduced, the buffers filled by the host
+> > and pushed to the guest using the vring, are directly queued in
+> > a per-socket list avoiding to copy it.
+> > These buffers are preallocated by the guest with a fixed
+> > size (4 KB).
+> > 
+> > The maximum amount of memory used by each socket should be
+> > controlled by the credit mechanism.
+> > The default credit available per-socket is 256 KB, but if we use
+> > only 1 byte per packet, the guest can queue up to 262144 of 4 KB
+> > buffers, using up to 1 GB of memory per-socket. In addition, the
+> > guest will continue to fill the vring with new 4 KB free buffers
+> > to avoid starvation of other sockets.
+> > 
+> > This patch solves this issue copying the payload in a new buffer.
+> > Then it is queued in the per-socket list, and the 4KB buffer used
+> > by the host is freed.
+> > 
+> > In this way, the memory used by each socket respects the credit
+> > available, and we still avoid starvation, paying the cost of an
+> > extra memory copy. When the buffer is completely full we do a
+> > "zero-copy", moving the buffer directly in the per-socket list.
 > 
-> Looking at this code, it occurs to me that mapping the IRQ stacks
-> seems questionable.  As it stands, this series switches to a normal
-> CR3 in some C code somewhere moderately deep in the APIC IRQ code.  By
-> that time, I think you may have executed traceable code, and, if that
-> happens, you lose.  i hate to say this, but any shenanigans like this
-> patch does might need to happen in the entry code *before* even
-> switching to the IRQ stack.  Or perhaps shortly thereafter.
->
-> We've talked about moving context tracking to C.  If we go that route,
-> then this KVM context mess could go there, too -- we'd have a
-> low-level C wrapper for each entry that would deal with getting us
-> ready to run normal C code.
 > 
-> (We need to do something about terminology.  This kvm_mm thing isn't
-> an mm in the normal sense.  An mm has normal kernel mappings and
-> varying user mappings.  For example, the PTI "userspace" page tables
-> aren't an mm.  And we really don't want a situation where the vmalloc
-> fault code runs with the "kvm_mm" mm active -- it will totally
-> malfunction.)
+> I wonder in the long run we should use generic socket accouting mechanism
+> provided by kernel (e.g socket, skb, sndbuf, recvbug, truesize) instead of
+> vsock specific thing to avoid duplicating efforts.
+
+I agree, the idea is to switch to sk_buff but this should require an huge
+change. If we will use the virtio-net datapath, it will become simpler.
+
 > 
+> 
+> > 
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > ---
+> >   drivers/vhost/vsock.c                   |  2 +
+> >   include/linux/virtio_vsock.h            |  8 +++
+> >   net/vmw_vsock/virtio_transport.c        |  1 +
+> >   net/vmw_vsock/virtio_transport_common.c | 95 ++++++++++++++++++-------
+> >   4 files changed, 81 insertions(+), 25 deletions(-)
+> > 
+> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > index bb5fc0e9fbc2..7964e2daee09 100644
+> > --- a/drivers/vhost/vsock.c
+> > +++ b/drivers/vhost/vsock.c
+> > @@ -320,6 +320,8 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
+> >   		return NULL;
+> >   	}
+> > +	pkt->buf_len = pkt->len;
+> > +
+> >   	nbytes = copy_from_iter(pkt->buf, pkt->len, &iov_iter);
+> >   	if (nbytes != pkt->len) {
+> >   		vq_err(vq, "Expected %u byte payload, got %zu bytes\n",
+> > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> > index e223e2632edd..345f04ee9193 100644
+> > --- a/include/linux/virtio_vsock.h
+> > +++ b/include/linux/virtio_vsock.h
+> > @@ -54,9 +54,17 @@ struct virtio_vsock_pkt {
+> >   	void *buf;
+> >   	u32 len;
+> >   	u32 off;
+> > +	u32 buf_len;
+> >   	bool reply;
+> >   };
+> > +struct virtio_vsock_buf {
+> > +	struct list_head list;
+> > +	void *addr;
+> > +	u32 len;
+> > +	u32 off;
+> > +};
+> > +
+> >   struct virtio_vsock_pkt_info {
+> >   	u32 remote_cid, remote_port;
+> >   	struct vsock_sock *vsk;
+> > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> > index 15eb5d3d4750..af1d2ce12f54 100644
+> > --- a/net/vmw_vsock/virtio_transport.c
+> > +++ b/net/vmw_vsock/virtio_transport.c
+> > @@ -280,6 +280,7 @@ static void virtio_vsock_rx_fill(struct virtio_vsock *vsock)
+> >   			break;
+> >   		}
+> > +		pkt->buf_len = buf_len;
+> >   		pkt->len = buf_len;
+> >   		sg_init_one(&hdr, &pkt->hdr, sizeof(pkt->hdr));
+> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > index 602715fc9a75..0248d6808755 100644
+> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > @@ -65,6 +65,9 @@ virtio_transport_alloc_pkt(struct virtio_vsock_pkt_info *info,
+> >   		pkt->buf = kmalloc(len, GFP_KERNEL);
+> >   		if (!pkt->buf)
+> >   			goto out_pkt;
+> > +
+> > +		pkt->buf_len = len;
+> > +
+> >   		err = memcpy_from_msg(pkt->buf, info->msg, len);
+> >   		if (err)
+> >   			goto out;
+> > @@ -86,6 +89,46 @@ virtio_transport_alloc_pkt(struct virtio_vsock_pkt_info *info,
+> >   	return NULL;
+> >   }
+> > +static struct virtio_vsock_buf *
+> > +virtio_transport_alloc_buf(struct virtio_vsock_pkt *pkt, bool zero_copy)
+> > +{
+> > +	struct virtio_vsock_buf *buf;
+> > +
+> > +	if (pkt->len == 0)
+> > +		return NULL;
+> > +
+> > +	buf = kzalloc(sizeof(*buf), GFP_KERNEL);
+> > +	if (!buf)
+> > +		return NULL;
+> > +
+> > +	/* If the buffer in the virtio_vsock_pkt is full, we can move it to
+> > +	 * the new virtio_vsock_buf avoiding the copy, because we are sure that
+> > +	 * we are not use more memory than that counted by the credit mechanism.
+> > +	 */
+> > +	if (zero_copy && pkt->len == pkt->buf_len) {
+> > +		buf->addr = pkt->buf;
+> > +		pkt->buf = NULL;
+> > +	} else {
+> 
+> 
+> Is the copy still needed if we're just few bytes less? We meet similar issue
+> for virito-net, and virtio-net solve this by always copy first 128bytes for
+> big packets.
+> 
+> See receive_big()
 
-One of my next step is to try to put the KVM page table in the PTI userspace
-page tables, and not switch CR3 on KVM_RUN ioctl. That way, we will run with
-a regular mm (but using the userspace page table). Then interrupt would switch
-CR3 to kernel page table (like paranoid idtentry currently do it).
+I'm seeing, It is more sophisticated.
+IIUC, virtio-net allocates a sk_buff with 128 bytes of buffer, then copies the
+first 128 bytes, then adds the buffer used to receive the packet as a frag to
+the skb.
 
-alex.
+Do you suggest to implement something similar, or for now we can use my
+approach and if we will merge the datapath we can reuse the virtio-net
+approach?
 
-
-
-
+Thanks,
+Stefano
