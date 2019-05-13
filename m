@@ -2,125 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B35E01B30D
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 11:41:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B34951B31D
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 11:44:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728640AbfEMJlp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 05:41:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54020 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726274AbfEMJlp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 05:41:45 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 64DBE81F07;
-        Mon, 13 May 2019 09:41:44 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5C9641001DDE;
-        Mon, 13 May 2019 09:41:39 +0000 (UTC)
-Date:   Mon, 13 May 2019 11:41:36 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH 06/10] s390/cio: add basic protected virtualization
- support
-Message-ID: <20190513114136.783c851c.cohuck@redhat.com>
-In-Reply-To: <20190426183245.37939-7-pasic@linux.ibm.com>
-References: <20190426183245.37939-1-pasic@linux.ibm.com>
-        <20190426183245.37939-7-pasic@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1728203AbfEMJoR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 05:44:17 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:45682 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727857AbfEMJoR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 05:44:17 -0400
+Received: by mail-ot1-f66.google.com with SMTP id t24so2416715otl.12
+        for <kvm@vger.kernel.org>; Mon, 13 May 2019 02:44:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=TXYVyM1elY/e/gwr441pJoxadHFYtIz0EH7uksaUA00=;
+        b=GQawiz8mlWxh/yf7/DiecVKQmIl48uHHnfbDs6NwSWdi9y+D4Kf5bCLwsxaGnEIUZf
+         nrUE6T/lrxJFWLvhe10ToW17PX+6WZ7PWEf4xSPOXb8k1DSLt7O2Juet2Lgt5lC759eq
+         g1/2yARQtJwd9CIw7tB136d5woqAAOHI8bNZLOCKr92a6YDS5/J3WlNpe+gEZ05/VpR8
+         xBK5t6xm5FLjWabkFaYeqqAUPHhVrHYsN5daplbQKzmXrU6omOOpWIp9oBDSDKGEQLEE
+         NVXTCZ3tJt/VjAwmPbgBz0t9AjLNN3OsPpyEBbIDeOrWVTKi2ZQkX7y2xbus1kqxTGmq
+         bnZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=TXYVyM1elY/e/gwr441pJoxadHFYtIz0EH7uksaUA00=;
+        b=kECd70MkxEK88lyqbpBeViXw4ErMi5MoaSA2QFrfZjQTPD2/rgSCLqzvIwr090m+rA
+         UZEj00cVB7kgOTQBgfhtoPIvY0IjmcunM6NMTyRTK1D/wdryeqjcqmfBW5yOv4xqD3TK
+         1S2KwZ4lHbVRTunuGhV5gV+pxu0+zaAu23zhEO+R+0Hau4knz965nlnJwrjtzE52mdgd
+         ENopqYSOz0zg5milyBoMDxSnWYaNGgCBtOVwtQtS+sSAiF6USn7S5DWTULA9ZbpKn3Ml
+         lShfhhqrM2UnEmk6MKSU7eDVux/fGpZrKQfj1QYEJtMaiCsGEe+Hi0kRmCQTBPWjTr8Q
+         V78w==
+X-Gm-Message-State: APjAAAVv+EgwxHnZsT5R28bzfbOZfK7IuhVNkrJ8h6s52YYpHZHPynEy
+        KHivUxhJ9NXQC8R8OvjJS0jsTHk5z1Qhkd3iMRNgJw==
+X-Google-Smtp-Source: APXvYqzaNT+TgVDjenXnFHOeex93upzugiVccOLalDaA6Ieg0c7UGMs4NUZH4TszrKklUoDkyyO8dIHeKn7h76sHRXU=
+X-Received: by 2002:a9d:6855:: with SMTP id c21mr14592075oto.151.1557740656833;
+ Mon, 13 May 2019 02:44:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Mon, 13 May 2019 09:41:44 +0000 (UTC)
+References: <1557728917-49079-1-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <1557728917-49079-1-git-send-email-gengdongjiu@huawei.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Mon, 13 May 2019 10:44:05 +0100
+Message-ID: <CAFEAcA-S6Kh8yUqVZVA8gtDdRscgVaTfC4CwxngoS2ZPt6K9ww@mail.gmail.com>
+Subject: Re: [RFC PATCH V2] kvm: arm64: export memory error recovery
+ capability to user space
+To:     Dongjiu Geng <gengdongjiu@huawei.com>
+Cc:     Christoffer Dall <christoffer.dall@arm.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        James Morse <james.morse@arm.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        arm-mail-list <linux-arm-kernel@lists.infradead.org>,
+        kvmarm@lists.cs.columbia.edu, Zheng Xiang <zhengxiang9@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 26 Apr 2019 20:32:41 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
-
-> As virtio-ccw devices are channel devices, we need to use the dma area
-> for any communication with the hypervisor.
-> 
-> This patch addresses the most basic stuff (mostly what is required for
-> virtio-ccw), and does take care of QDIO or any devices.
-
-"does not take care of QDIO", surely? (Also, what does "any devices"
-mean? Do you mean "every arbitrary device", perhaps?)
-
-> 
-> An interesting side effect is that virtio structures are now going to
-> get allocated in 31 bit addressable storage.
-
-Hm...
-
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+On Mon, 13 May 2019 at 07:32, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+>
+> When user space do memory recovery, it will check whether KVM and
+> guest support the error recovery, only when both of them support,
+> user space will do the error recovery. This patch exports this
+> capability of KVM to user space.
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 > ---
->  arch/s390/include/asm/ccwdev.h   |  4 +++
->  drivers/s390/cio/ccwreq.c        |  8 ++---
->  drivers/s390/cio/device.c        | 65 +++++++++++++++++++++++++++++++++-------
->  drivers/s390/cio/device_fsm.c    | 40 ++++++++++++-------------
->  drivers/s390/cio/device_id.c     | 18 +++++------
->  drivers/s390/cio/device_ops.c    | 21 +++++++++++--
->  drivers/s390/cio/device_pgid.c   | 20 ++++++-------
->  drivers/s390/cio/device_status.c | 24 +++++++--------
->  drivers/s390/cio/io_sch.h        | 21 +++++++++----
->  drivers/s390/virtio/virtio_ccw.c | 10 -------
->  10 files changed, 148 insertions(+), 83 deletions(-)
+> v1->v2:
+> 1. check whether host support memory failure instead of RAS capability
+>    https://patchwork.kernel.org/patch/10730827/
+>
+> v1:
+> 1. User space needs to check this capability of host is suggested by Peter[1],
+> this patch as RFC tag because user space patches are still under review,
+> so this kernel patch is firstly sent out for review.
+>
+> [1]: https://patchwork.codeaurora.org/patch/652261/
+> ---
 
-(...)
+I thought the conclusion of the thread on the v1 patch was that
+userspace doesn't need to specifically ask the host kernel if
+it has support for this -- if it does not, then the host kernel
+will just never deliver userspace any SIGBUS with MCEERR code,
+which is fine. Or am I still confused?
 
-> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> index 6d989c360f38..bb7a92316fc8 100644
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -66,7 +66,6 @@ struct virtio_ccw_device {
->  	bool device_lost;
->  	unsigned int config_ready;
->  	void *airq_info;
-> -	u64 dma_mask;
->  };
->  
->  struct vq_info_block_legacy {
-> @@ -1255,16 +1254,7 @@ static int virtio_ccw_online(struct ccw_device *cdev)
->  		ret = -ENOMEM;
->  		goto out_free;
->  	}
-> -
->  	vcdev->vdev.dev.parent = &cdev->dev;
-> -	cdev->dev.dma_mask = &vcdev->dma_mask;
-> -	/* we are fine with common virtio infrastructure using 64 bit DMA */
-> -	ret = dma_set_mask_and_coherent(&cdev->dev, DMA_BIT_MASK(64));
-> -	if (ret) {
-> -		dev_warn(&cdev->dev, "Failed to enable 64-bit DMA.\n");
-> -		goto out_free;
-> -	}
-
-This means that vring structures now need to fit into 31 bits as well,
-I think? Is there any way to reserve the 31 bit restriction for channel
-subsystem structures and keep vring in the full 64 bit range? (Or am I
-fundamentally misunderstanding something?)
-
-> -
->  	vcdev->config_block = kzalloc(sizeof(*vcdev->config_block),
->  				   GFP_DMA | GFP_KERNEL);
->  	if (!vcdev->config_block) {
-
+thanks
+-- PMM
