@@ -2,131 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E2F1E1B329
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 11:46:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B02191B337
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 11:52:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728559AbfEMJqp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 05:46:45 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:37618 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727848AbfEMJqp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 05:46:45 -0400
-Received: by mail-pl1-f196.google.com with SMTP id p15so6203927pll.4;
-        Mon, 13 May 2019 02:46:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=vsdiDk6Zs+VFH2JCv9rnfu5G+QrChkqRIl4npyicJBc=;
-        b=sJoehUkfTIPBjdwCA842y47ItVU7i0/ozJqcI7HD7rahSFSwiOjxdqnTRMDQd1uexP
-         za3Eg0f9RS6Kzy5IiE2/Nkm1DorV2mAJ8ViCldtmBh7rBAcSnVECvo89Hctg3MLkE0YK
-         eKiayAvWMeIdj8VBlREE32aOwQJ1n87rjCWKH+RT8vLP37vPDoIf7NPl4CYCtHHp94Zc
-         6L1u26+hHZDbmC/iqjqXTOvQXjL9GbHtHw5KOPNYs4Bz+X3SShCdO/3rWE+WayNACl5o
-         N2x3LRMNlb0/R9jmXBGXUVpFBc26kjYzK8JPXOl6YKcStk5I4KegNc9VstS5vPltVn7v
-         dB/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=vsdiDk6Zs+VFH2JCv9rnfu5G+QrChkqRIl4npyicJBc=;
-        b=l7AHoQ2fnTakytdumQI6jTj/yAiu9xj8lUciTAcl5WiMOQHTpt9jsKvB3zhVPaeM91
-         /t46Hkt8lGX2XllLPXBmClnjFinui6FsfUpg0y4uVXgRKnM1tkRI+dezPjgk87s9jRdN
-         FfTkI67kqfkni6lhc/tUvlxQtvFKsO3dmu5DDNJwNvkW+9BAuY+Eg4BMbVuG4Rs6olbK
-         AW9uPkzSw3zL4Uh3zwzydAfySHz14lRZGGrwdRSnpQzV/YaHMGOqL9yuIQGYVT6KP+Sj
-         SC3/xiGSEDRHpfiZxIdQIYIYqZKWvRug0ulFrXj4KQIYjLn++9d8taFWi8cPXQT3KBvm
-         463Q==
-X-Gm-Message-State: APjAAAUq3+BP6aChx+ewkvOLe1RCOFrIu5+jJJVg9fnrDIqE8pH9YZOa
-        FkY416m3yVeEeEKV5ERn99CadRMx
-X-Google-Smtp-Source: APXvYqyjKly6u6Z18VoqWMjZrdaPbwKxYzIuM4bmXIZ5zBMTRUS+DzhCU9T/OQxjUb1Yzygw0Kk3Og==
-X-Received: by 2002:a17:902:f215:: with SMTP id gn21mr29293861plb.194.1557740804275;
-        Mon, 13 May 2019 02:46:44 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id r64sm44584748pfa.25.2019.05.13.02.46.42
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 13 May 2019 02:46:43 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Liran Alon <liran.alon@oracle.com>
-Subject: [PATCH] KVM: X86: Enable IA32_MSIC_ENABLE MONITOR bit when exposing mwait/monitor
-Date:   Mon, 13 May 2019 17:46:39 +0800
-Message-Id: <1557740799-5792-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        id S1727974AbfEMJwf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 05:52:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50642 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727616AbfEMJwf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 05:52:35 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 447673082E24;
+        Mon, 13 May 2019 09:52:35 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5020019C67;
+        Mon, 13 May 2019 09:52:29 +0000 (UTC)
+Date:   Mon, 13 May 2019 11:52:27 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>
+Subject: Re: [PATCH 01/10] virtio/s390: use vring_create_virtqueue
+Message-ID: <20190513115227.1d316ec8.cohuck@redhat.com>
+In-Reply-To: <20190512124730-mutt-send-email-mst@kernel.org>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+        <20190426183245.37939-2-pasic@linux.ibm.com>
+        <20190503111724.70c6ec37.cohuck@redhat.com>
+        <20190503160421-mutt-send-email-mst@kernel.org>
+        <20190504160340.29f17b98.pasic@linux.ibm.com>
+        <20190505131523.159bec7c.cohuck@redhat.com>
+        <ed6cbf63-f2ff-f259-ccb0-3b9ba60f2b35@de.ibm.com>
+        <20190510160744.00285367.cohuck@redhat.com>
+        <20190512124730-mutt-send-email-mst@kernel.org>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Mon, 13 May 2019 09:52:35 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Sun, 12 May 2019 12:47:39 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-MSR IA32_MSIC_ENABLE bit 18, according to SDM:
+> On Fri, May 10, 2019 at 04:07:44PM +0200, Cornelia Huck wrote:
+> > On Tue, 7 May 2019 15:58:12 +0200
+> > Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> >   
+> > > On 05.05.19 13:15, Cornelia Huck wrote:  
+> > > > On Sat, 4 May 2019 16:03:40 +0200
+> > > > Halil Pasic <pasic@linux.ibm.com> wrote:
+> > > >     
+> > > >> On Fri, 3 May 2019 16:04:48 -0400
+> > > >> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > >>    
+> > > >>> On Fri, May 03, 2019 at 11:17:24AM +0200, Cornelia Huck wrote:      
+> > > >>>> On Fri, 26 Apr 2019 20:32:36 +0200
+> > > >>>> Halil Pasic <pasic@linux.ibm.com> wrote:
+> > > >>>>       
+> > > >>>>> The commit 2a2d1382fe9d ("virtio: Add improved queue allocation API")
+> > > >>>>> establishes a new way of allocating virtqueues (as a part of the effort
+> > > >>>>> that taught DMA to virtio rings).
+> > > >>>>>
+> > > >>>>> In the future we will want virtio-ccw to use the DMA API as well.
+> > > >>>>>
+> > > >>>>> Let us switch from the legacy method of allocating virtqueues to
+> > > >>>>> vring_create_virtqueue() as the first step into that direction.
+> > > >>>>>
+> > > >>>>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> > > >>>>> ---
+> > > >>>>>  drivers/s390/virtio/virtio_ccw.c | 30 +++++++++++-------------------
+> > > >>>>>  1 file changed, 11 insertions(+), 19 deletions(-)      
+> > > >>>>
+> > > >>>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> > > >>>>
+> > > >>>> I'd vote for merging this patch right away for 5.2.      
+> > > >>>
+> > > >>> So which tree is this going through? mine?
+> > > >>>       
+> > > >>
+> > > >> Christian, what do you think? If the whole series is supposed to go in
+> > > >> in one go (which I hope it is), via Martin's tree could be the simplest
+> > > >> route IMHO.    
+> > > > 
+> > > > 
+> > > > The first three patches are virtio(-ccw) only and the those are the ones
+> > > > that I think are ready to go.
+> > > > 
+> > > > I'm not feeling comfortable going forward with the remainder as it
+> > > > stands now; waiting for some other folks to give feedback. (They are
+> > > > touching/interacting with code parts I'm not so familiar with, and lack
+> > > > of documentation, while not the developers' fault, does not make it
+> > > > easier.)
+> > > > 
+> > > > Michael, would you like to pick up 1-3 for your tree directly? That
+> > > > looks like the easiest way.    
+> > > 
+> > > Agreed. Michael please pick 1-3.
+> > > We will continue to review 4- first and then see which tree is best.  
+> > 
+> > Michael, please let me know if you'll pick directly or whether I should
+> > post a series.
+> > 
+> > [Given that the patches are from one virtio-ccw maintainer and reviewed
+> > by the other, picking directly would eliminate an unnecessary
+> > indirection :)]  
+> 
+> picked them
 
- | When this bit is set to 0, the MONITOR feature flag is not set (CPUID.01H:ECX[bit 3] = 0). 
- | This indicates that MONITOR/MWAIT are not supported.
- | 
- | Software attempts to execute MONITOR/MWAIT will cause #UD when this bit is 0.
- | 
- | When this bit is set to 1 (default), MONITOR/MWAIT are supported (CPUID.01H:ECX[bit 3] = 1). 
-
-This bit should be set to 1, if BIOS enables MONITOR/MWAIT support on host and 
-we intend to expose mwait/monitor to the guest.
-
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Cc: Liran Alon <liran.alon@oracle.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/x86.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 1d89cb9..664449e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2723,6 +2723,13 @@ static int get_msr_mce(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata, bool host)
- 	return 0;
- }
- 
-+static inline bool kvm_can_mwait_in_guest(void)
-+{
-+	return boot_cpu_has(X86_FEATURE_MWAIT) &&
-+		!boot_cpu_has_bug(X86_BUG_MONITOR) &&
-+		boot_cpu_has(X86_FEATURE_ARAT);
-+}
-+
- int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- {
- 	switch (msr_info->index) {
-@@ -2801,6 +2808,8 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		msr_info->data = (u64)vcpu->arch.ia32_tsc_adjust_msr;
- 		break;
- 	case MSR_IA32_MISC_ENABLE:
-+		if (kvm_can_mwait_in_guest() && kvm_mwait_in_guest(vcpu->kvm))
-+			vcpu->arch.ia32_misc_enable_msr |= MSR_IA32_MISC_ENABLE_MWAIT;
- 		msr_info->data = vcpu->arch.ia32_misc_enable_msr;
- 		break;
- 	case MSR_IA32_SMBASE:
-@@ -2984,13 +2993,6 @@ static int msr_io(struct kvm_vcpu *vcpu, struct kvm_msrs __user *user_msrs,
- 	return r;
- }
- 
--static inline bool kvm_can_mwait_in_guest(void)
--{
--	return boot_cpu_has(X86_FEATURE_MWAIT) &&
--		!boot_cpu_has_bug(X86_BUG_MONITOR) &&
--		boot_cpu_has(X86_FEATURE_ARAT);
--}
--
- int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- {
- 	int r = 0;
--- 
-2.7.4
-
+Thanks!
