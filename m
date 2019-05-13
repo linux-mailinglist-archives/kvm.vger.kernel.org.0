@@ -2,116 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E49201BF5E
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 00:09:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3DFD1BF8D
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 00:43:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726532AbfEMWJO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 18:09:14 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:52974 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726339AbfEMWJO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 18:09:14 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4DM3bt1193849;
-        Mon, 13 May 2019 22:08:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=+bKar+AVIXt3UhsHuOh61v4Ml02y2pBXRpujk/BHMDc=;
- b=CcY2DAb/yJgK+gVnJbtxYUEwv/XuPgr6dHQgV6J0CenlO1UpnbeMtus64VP3FakhUfIJ
- AOLXl1KHEErf3zEr1sMsENg+N+dTSZlpr9xjbgo0WytoSBunv9oQFisH89VCISAexsnW
- K2WbuZuhugWvZ9FeHZBd7/aClke7VmpPrgvG6IrPP3TVeMpZ4DbhDVatKKuQUdHMngoI
- gbihSgJdkyD44pODMZCqXCEGgcJmluMUZO9uZ1cgzxvvna0isaFGGBQEVFIxvI0Ubywy
- aIuzzKrC6mN5HFYh9Ur8/xCs4tPcsaws6Ft4uxLSMhDjNTjApUZqWXeEAy37zfAM24SH pg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2sdq1q9xd6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 May 2019 22:08:51 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4DM7mbf145188;
-        Mon, 13 May 2019 22:08:51 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2sdnqj7bku-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 May 2019 22:08:51 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4DM8nk8031473;
-        Mon, 13 May 2019 22:08:50 GMT
-Received: from dhcp-10-132-91-225.usdhcp.oraclecorp.com (/10.132.91.225)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 13 May 2019 15:08:49 -0700
-Subject: Re: [PATCH 1/8][KVMnVMX]: Enable "load IA32_PERF_GLOBAL_CTRL" VM-exit
- control for nested guests
+        id S1726475AbfEMWnY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 18:43:24 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:41544 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726414AbfEMWnX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 18:43:23 -0400
+Received: by mail-pf1-f195.google.com with SMTP id l132so7963153pfc.8
+        for <kvm@vger.kernel.org>; Mon, 13 May 2019 15:43:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Iz17uylUOixOvYoCts1S5k/pag2CDfw8pil6TBcK9uE=;
+        b=hfOUciK+DtqQ1B5UwZoPdzAmR3FUYG7xa6ZqtInshTOXa/7Lh1UWQwc7zi/Gl8rykh
+         1iuyJIhEOc+eB3y5JwO4t8HRZvcrL0Wp3Ln0Gfs4SpIZywealFWWPZ5Jv9JPuQl2hmWf
+         C1OhP2tk+QSkTA6/Mkaf/j7/JKrDjrK6egrjJlFQ0foAk+J01WC5nq6b2ezg91A5iRdn
+         CLJOvrElyT/78S5UFNHlYbVqpWul46BF8Y9+MbFLq5va35gR7VlnQZE9tYyLSdq6J+P5
+         DX6leFoRQNnrNBK+4TcekYL/zJl2iBIoGXZ6GAECDPeLR0fb1RKs3MQnpOWo5h7TJ202
+         cobg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Iz17uylUOixOvYoCts1S5k/pag2CDfw8pil6TBcK9uE=;
+        b=XykGCA1UiJ1FlQA3xvyIgLiRkj3gOu5I7+a0l71joClcmeBortXcYnvnL/fI334ay1
+         dCOoV/ckTKGREuJVSnohMFHlHKLdi8cDEP6RNNfWQKnItiZ/6cJ3cVlrMeKxwBr/uIb9
+         NAzM7r8XPE6gL4+ALHFL6THOMwU2t/v5QS+CgLunmqVn6NJhmDJjjK2nrFB0fBIhMggn
+         RpkHhQKkzzGunDOxn0Sk8tRqfb6HQHsAHIvmfwtXoJcy4grPlTQc51yRpTBE8Sa2hw7N
+         OqL0kGjgEz2lW7W2nrZqXCT5AoQlkIRmzH7Yv0h1EqMIcsK6Rip9K0/RmLnzaW05bXwd
+         bwSA==
+X-Gm-Message-State: APjAAAWm/4C/O4cUvI4Ad1IHdrZc2yHFPOwxXNWprXRPCvxMPHSC2Aub
+        CEVuSqRf1i+ABLE+6/R7kX6OuZXC
+X-Google-Smtp-Source: APXvYqwMRvoYxDKf4fsXghb+IJBxNq3wK1BOJM/ZOvSDEmXRpBaDg8YCzhZP51p4FzP9Dq6KzTx1Cg==
+X-Received: by 2002:a63:6988:: with SMTP id e130mr34928225pgc.150.1557787402895;
+        Mon, 13 May 2019 15:43:22 -0700 (PDT)
+Received: from [172.30.49.191] (50-204-120-225-static.hfc.comcastbusiness.net. [50.204.120.225])
+        by smtp.gmail.com with ESMTPSA id l1sm17494547pgp.9.2019.05.13.15.43.21
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 13 May 2019 15:43:22 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: Re: [kvm-unit-tests PATCH] x86: nVMX: Dynamically calculate and check
+ max VMCS field encoding index
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20190416013832.11697-1-sean.j.christopherson@intel.com>
+Date:   Mon, 13 May 2019 15:43:18 -0700
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?utf-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <04F148C8-5E44-4195-97E7-35A428E36983@gmail.com>
+References: <20190416013832.11697-1-sean.j.christopherson@intel.com>
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
-        jmattson@google.com
-References: <20190424231724.2014-1-krish.sadhukhan@oracle.com>
- <20190424231724.2014-2-krish.sadhukhan@oracle.com>
- <20190513184930.GF28561@linux.intel.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <29d30b7d-5cd0-65f3-283e-05b78df2bf3e@oracle.com>
-Date:   Mon, 13 May 2019 15:08:49 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
-MIME-Version: 1.0
-In-Reply-To: <20190513184930.GF28561@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=11 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905130147
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=11 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905130147
+X-Mailer: Apple Mail (2.3445.104.8)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+> On Apr 15, 2019, at 6:38 PM, Sean Christopherson =
+<sean.j.christopherson@intel.com> wrote:
+>=20
+> Per Intel's SDM:
+>=20
+>  IA32_VMX_VMCS_ENUM indicates to software the highest index value used
+>  in the encoding of any field supported by the processor:
+>    - Bits 9:1 contain the highest index value used for any VMCS =
+encoding.
+>    - Bit 0 and bits 63:10 are reserved and are read as 0
+>=20
+> KVM correctly emulates this behavior, in no small part due to the VMX
+> preemption timer being unconditionally emulated *and* having the =
+highest
+> index of any field supported in vmcs12.  Given that the maximum =
+control
+> field index is already above the VMX preemption timer (0x32 vs 0x2E),
+> odds are good that the max index supported in vmcs12 will change in =
+the
+> not-too-distant future.
+>=20
+> Unfortunately, the only unit test coverage for IA32_VMX_VMCS_ENUM is =
+in
+> test_vmx_caps(), which simply checks that the max index is >=3D 0x2a, =
+i.e.
+> won't catch any future breakage of KVM's IA32_VMX_VMCS_ENUM emulation,
+> especially if the max index depends on underlying hardware support.
+>=20
+> Instead of playing whack-a-mole with a hardcoded max index test,
+> piggyback the exhaustive VMWRITE/VMREAD test and dynamically calculate
+> the max index based on which fields can be VMREAD.  Leave the existing
+> hardcoded check in place as it won't hurt anything and test_vmx_caps()
+> is a better location for checking the reserved bits of the MSR.
 
+[ Yes, I know this patch was already accepted. ]
 
-On 05/13/2019 11:49 AM, Sean Christopherson wrote:
-> On Wed, Apr 24, 2019 at 07:17:17PM -0400, Krish Sadhukhan wrote:
->> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
->> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
->> ---
->>   arch/x86/kvm/vmx/nested.c | 3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index 3170e291215d..42a4deb662c6 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -5493,7 +5493,8 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps,
->>   	msrs->exit_ctls_high |=
->>   		VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR |
->>   		VM_EXIT_LOAD_IA32_EFER | VM_EXIT_SAVE_IA32_EFER |
->> -		VM_EXIT_SAVE_VMX_PREEMPTION_TIMER | VM_EXIT_ACK_INTR_ON_EXIT;
->> +		VM_EXIT_SAVE_VMX_PREEMPTION_TIMER | VM_EXIT_ACK_INTR_ON_EXIT |
->> +		VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
-> This exposes the control to L1 but doesn't implement the backing
-> functionality.  The backing functionality, consistency checks and exposure
-> to L1 should be a single patch.  The consistency checks could be added
-> earlier, but I don't see much value in doing so given that the checks are
-> (currently) a few lines.
+This patch causes me problems.
 
-I will combine the exposure of the control and its backing functionality 
-into a single patch. But I would prefer to keep the consistency checks 
-in separate patches just to make it a gradual progression i.e., first 
-enabling the controls in a  patch and then checking their consistency in 
-the successive patch.
+I think that probing using the known VMCS fields gives you a minimum for =
+the
+maximum index. There might be VMCS fields that the test does not know =
+about.
+Otherwise it would require to update kvm-unit-tests for every fields =
+that is
+added to kvm.
 
->
->>   
->>   	/* We support free control of debug control saving. */
->>   	msrs->exit_ctls_low &= ~VM_EXIT_SAVE_DEBUG_CONTROLS;
->> -- 
->> 2.17.2
->>
+One option is just to change the max index, as determined by the probing =
+to
+be required to smaller or equal to IA32_VMX_VMCS_ENUM.MAX_INDEX. A =
+second
+option is to run additional probing, using IA32_VMX_VMCS_ENUM.MAX_INDEX =
+and
+see if it is supported.
 
+What do you say?=
