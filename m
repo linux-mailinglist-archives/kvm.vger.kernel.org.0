@@ -2,139 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CFA21B643
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 14:46:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F189A1B663
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 14:50:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729437AbfEMMq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 08:46:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41316 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728820AbfEMMq2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 08:46:28 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 524E630832CC;
-        Mon, 13 May 2019 12:46:28 +0000 (UTC)
-Received: from [10.72.12.49] (ovpn-12-49.pek2.redhat.com [10.72.12.49])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 551F36A48A;
-        Mon, 13 May 2019 12:46:21 +0000 (UTC)
-Subject: Re: [PATCH v2 8/8] vsock/virtio: make the RX buffer size tunable
-From:   Jason Wang <jasowang@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>, netdev@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
+        id S1730003AbfEMMuw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 08:50:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56516 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729557AbfEMMuv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 May 2019 08:50:51 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4DCcBmn047169
+        for <kvm@vger.kernel.org>; Mon, 13 May 2019 08:50:50 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sf8g09f2h-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 13 May 2019 08:50:50 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
+        Mon, 13 May 2019 13:50:48 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 13 May 2019 13:50:45 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4DCohaK52101178
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 13 May 2019 12:50:43 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D0EB942045;
+        Mon, 13 May 2019 12:50:43 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2DDB542049;
+        Mon, 13 May 2019 12:50:43 +0000 (GMT)
+Received: from [9.152.97.147] (unknown [9.152.97.147])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 13 May 2019 12:50:43 +0000 (GMT)
+Reply-To: mimu@linux.ibm.com
+Subject: Re: [PATCH 04/10] s390/mm: force swiotlb for protected virtualization
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
         virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>
-References: <20190510125843.95587-1-sgarzare@redhat.com>
- <20190510125843.95587-9-sgarzare@redhat.com>
- <eddb5a89-ed44-3a65-0181-84f7f27dd2cb@redhat.com>
-Message-ID: <8e72ef5e-cf6a-a635-3f76-bdeac95761b8@redhat.com>
-Date:   Mon, 13 May 2019 20:46:19 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+ <20190426183245.37939-5-pasic@linux.ibm.com>
+ <20190426192711.GA31463@infradead.org>
+ <20190429155951.3175fef5.pasic@linux.ibm.com>
+ <3b9956a5-d8da-65fa-a2f7-4f54087d91d6@de.ibm.com>
+From:   Michael Mueller <mimu@linux.ibm.com>
+Organization: IBM
+Date:   Mon, 13 May 2019 14:50:42 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <eddb5a89-ed44-3a65-0181-84f7f27dd2cb@redhat.com>
+In-Reply-To: <3b9956a5-d8da-65fa-a2f7-4f54087d91d6@de.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Mon, 13 May 2019 12:46:28 +0000 (UTC)
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19051312-0016-0000-0000-0000027B266B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051312-0017-0000-0000-000032D7EB0E
+Message-Id: <b80f9f39-73a9-de29-9b7a-c720bb7f215f@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-13_07:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=875 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905130090
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2019/5/13 下午6:05, Jason Wang wrote:
->
-> On 2019/5/10 下午8:58, Stefano Garzarella wrote:
->> The RX buffer size determines the memory consumption of the
->> vsock/virtio guest driver, so we make it tunable through
->> a module parameter.
+
+On 29.04.19 16:05, Christian Borntraeger wrote:
+> 
+> 
+> On 29.04.19 15:59, Halil Pasic wrote:
+>> On Fri, 26 Apr 2019 12:27:11 -0700
+>> Christoph Hellwig <hch@infradead.org> wrote:
 >>
->> The size allowed are between 4 KB and 64 KB in order to be
->> compatible with old host drivers.
+>>> On Fri, Apr 26, 2019 at 08:32:39PM +0200, Halil Pasic wrote:
+>>>> +EXPORT_SYMBOL_GPL(set_memory_encrypted);
+>>>
+>>>> +EXPORT_SYMBOL_GPL(set_memory_decrypted);
+>>>
+>>>> +EXPORT_SYMBOL_GPL(sev_active);
+>>>
+>>> Why do you export these?  I know x86 exports those as well, but
+>>> it shoudn't be needed there either.
+>>>
 >>
->> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
->> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->
->
-> I don't see much value of doing this through kernel command line. We 
-> should deal with them automatically like what virtio-net did. Or even 
-> a module parameter is better.
->
-> Thanks
-
-
-Sorry, I misread the patch. But even module parameter is something not 
-flexible enough. We should deal with them transparently.
-
-Thanks
-
-
->
->
->> ---
->>   include/linux/virtio_vsock.h     |  1 +
->>   net/vmw_vsock/virtio_transport.c | 27 ++++++++++++++++++++++++++-
->>   2 files changed, 27 insertions(+), 1 deletion(-)
+>> I export these to be in line with the x86 implementation (which
+>> is the original and seems to be the only one at the moment). I assumed
+>> that 'exported or not' is kind of a part of the interface definition.
+>> Honestly, I did not give it too much thought.
 >>
->> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->> index 5a9d25be72df..b9f8c3d91f80 100644
->> --- a/include/linux/virtio_vsock.h
->> +++ b/include/linux/virtio_vsock.h
->> @@ -13,6 +13,7 @@
->>   #define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE    (1024 * 64)
->>   #define VIRTIO_VSOCK_MAX_BUF_SIZE        0xFFFFFFFFUL
->>   #define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE        (1024 * 64)
->> +#define VIRTIO_VSOCK_MIN_PKT_BUF_SIZE        (1024 * 4)
->>     enum {
->>       VSOCK_VQ_RX     = 0, /* for host to guest data */
->> diff --git a/net/vmw_vsock/virtio_transport.c 
->> b/net/vmw_vsock/virtio_transport.c
->> index af1d2ce12f54..732398b4e28f 100644
->> --- a/net/vmw_vsock/virtio_transport.c
->> +++ b/net/vmw_vsock/virtio_transport.c
->> @@ -66,6 +66,31 @@ struct virtio_vsock {
->>       u32 guest_cid;
->>   };
->>   +static unsigned int rx_buf_size = VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE;
->> +
->> +static int param_set_rx_buf_size(const char *val, const struct 
->> kernel_param *kp)
->> +{
->> +    unsigned int size;
->> +    int ret;
->> +
->> +    ret = kstrtouint(val, 0, &size);
->> +    if (ret)
->> +        return ret;
->> +
->> +    if (size < VIRTIO_VSOCK_MIN_PKT_BUF_SIZE ||
->> +        size > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
->> +        return -EINVAL;
->> +
->> +    return param_set_uint(val, kp);
->> +};
->> +
->> +static const struct kernel_param_ops param_ops_rx_buf_size = {
->> +    .set = param_set_rx_buf_size,
->> +    .get = param_get_uint,
->> +};
->> +
->> +module_param_cb(rx_buf_size, &param_ops_rx_buf_size, &rx_buf_size, 
->> 0644);
->> +
->>   static struct virtio_vsock *virtio_vsock_get(void)
->>   {
->>       return the_virtio_vsock;
->> @@ -261,7 +286,7 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
->>     static void virtio_vsock_rx_fill(struct virtio_vsock *vsock)
->>   {
->> -    int buf_len = VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE;
->> +    int buf_len = rx_buf_size;
->>       struct virtio_vsock_pkt *pkt;
->>       struct scatterlist hdr, buf, *sgs[2];
->>       struct virtqueue *vq;
+>> For x86 set_memory(en|de)crypted got exported by 95cf9264d5f3 "x86, drm,
+>> fbdev: Do not specify encrypted memory for video mappings" (Tom
+>> Lendacky, 2017-07-17). With CONFIG_FB_VGA16=m seems to be necessary for x84.
+>>
+>> If the consensus is don't export: I won't. I'm fine one way or the other.
+>> @Christian, what is your take on this?
+> 
+> If we do not need it today for anything (e.g. virtio-gpu) then we can get rid
+> of the exports (and introduce them when necessary).
+
+I'll take them out then.
+
+>>
+>> Thank you very much!
+>>
+>> Regards,
+>> Halil
+>>
+>>
+> 
+
