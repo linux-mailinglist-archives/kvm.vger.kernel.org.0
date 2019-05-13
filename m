@@ -2,223 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F17871B89D
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 16:41:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 768D41B9AF
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 17:15:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729619AbfEMOkw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 10:40:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55232 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729482AbfEMOkw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 10:40:52 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9D2ED30832D1;
-        Mon, 13 May 2019 14:40:50 +0000 (UTC)
-Received: from [10.36.116.17] (ovpn-116-17.ams2.redhat.com [10.36.116.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DA5265D722;
-        Mon, 13 May 2019 14:40:42 +0000 (UTC)
-Subject: Re: [PATCH v7 12/23] iommu/smmuv3: Get prepared for nested stage
- support
-To:     Robin Murphy <robin.murphy@arm.com>, eric.auger.pro@gmail.com,
-        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
-        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
-        yi.l.liu@intel.com, jean-philippe.brucker@arm.com,
-        will.deacon@arm.com
-Cc:     kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com,
-        christoffer.dall@arm.com, peter.maydell@linaro.org,
-        vincent.stehle@arm.com
-References: <20190408121911.24103-1-eric.auger@redhat.com>
- <20190408121911.24103-13-eric.auger@redhat.com>
- <66f873eb-35c0-d1e9-794e-9150dbdb13fe@arm.com>
- <a1099cec-a8ad-6efa-b7e8-77388814f7e2@redhat.com>
- <424fc9bc-f040-d702-5a04-0faef1125989@arm.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <cc13eb29-576f-6816-dafd-dd5a814a6013@redhat.com>
-Date:   Mon, 13 May 2019 16:40:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1729638AbfEMPPP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 11:15:15 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:47714 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727437AbfEMPPO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 11:15:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=sYk1qF0Vg/KIRkZli5M/2CG/IiUILwRXwJH2skE3G4Y=; b=REx4synBpzyocaSPNSMhz/dBh
+        x399vWJqF7p4npVM5QsVPsG55ErkZ5fQHzNE7SvhPaxAGuPAcMoqAhGfsgpUJo8i76muR4yWQQUtU
+        tQxC2t4SmATs64p35q/UrMh+zG44Emo+gkoUbGpHChXki9LtyftxRMvXAnAt+8772zDazDPvmcrYZ
+        IO6mWpHJHrpQ7Wh+tT7dtK938iXOpR30ImB4A7clcoQAjzmeyAiFIpojNXFvexY4vkFKlAG8lL58r
+        +Sogz+Ndue92+0bFtoSM4dJkpK9Nw4F2bT0AXmKHBTkW2UkLKappwxdwuffjpqkmFrgkz4tA9Fal8
+        /7i9i1OVQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hQCfO-0005lL-4u; Mon, 13 May 2019 15:15:02 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 57CEA2029F877; Mon, 13 May 2019 17:15:00 +0200 (CEST)
+Date:   Mon, 13 May 2019 17:15:00 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Alexandre Chartre <alexandre.chartre@oracle.com>
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        dave.hansen@linux.intel.com, luto@kernel.org, kvm@vger.kernel.org,
+        x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
+        liran.alon@oracle.com, jwadams@google.com
+Subject: Re: [RFC KVM 24/27] kvm/isolation: KVM page fault handler
+Message-ID: <20190513151500.GY2589@hirez.programming.kicks-ass.net>
+References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
+ <1557758315-12667-25-git-send-email-alexandre.chartre@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <424fc9bc-f040-d702-5a04-0faef1125989@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Mon, 13 May 2019 14:40:50 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1557758315-12667-25-git-send-email-alexandre.chartre@oracle.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Robin,
+On Mon, May 13, 2019 at 04:38:32PM +0200, Alexandre Chartre wrote:
+> diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
+> index 46df4c6..317e105 100644
+> --- a/arch/x86/mm/fault.c
+> +++ b/arch/x86/mm/fault.c
+> @@ -33,6 +33,10 @@
+>  #define CREATE_TRACE_POINTS
+>  #include <asm/trace/exceptions.h>
+>  
+> +bool (*kvm_page_fault_handler)(struct pt_regs *regs, unsigned long error_code,
+> +			       unsigned long address);
+> +EXPORT_SYMBOL(kvm_page_fault_handler);
 
-On 5/13/19 1:43 PM, Robin Murphy wrote:
-> On 10/05/2019 15:34, Auger Eric wrote:
->> Hi Robin,
->>
->> On 5/8/19 4:24 PM, Robin Murphy wrote:
->>> On 08/04/2019 13:19, Eric Auger wrote:
->>>> To allow nested stage support, we need to store both
->>>> stage 1 and stage 2 configurations (and remove the former
->>>> union).
->>>>
->>>> A nested setup is characterized by both s1_cfg and s2_cfg
->>>> set.
->>>>
->>>> We introduce a new ste.abort field that will be set upon
->>>> guest stage1 configuration passing. If s1_cfg is NULL and
->>>> ste.abort is set, traffic can't pass. If ste.abort is not set,
->>>> S1 is bypassed.
->>>>
->>>> arm_smmu_write_strtab_ent() is modified to write both stage
->>>> fields in the STE and deal with the abort field.
->>>>
->>>> In nested mode, only stage 2 is "finalized" as the host does
->>>> not own/configure the stage 1 context descriptor, guest does.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>
->>>> ---
->>>>
->>>> v4 -> v5:
->>>> - reset ste.abort on detach
->>>>
->>>> v3 -> v4:
->>>> - s1_cfg.nested_abort and nested_bypass removed.
->>>> - s/ste.nested/ste.abort
->>>> - arm_smmu_write_strtab_ent modifications with introduction
->>>>     of local abort, bypass and translate local variables
->>>> - comment updated
->>>>
->>>> v1 -> v2:
->>>> - invalidate the STE before moving from a live STE config to another
->>>> - add the nested_abort and nested_bypass fields
->>>> ---
->>>>    drivers/iommu/arm-smmu-v3.c | 35 ++++++++++++++++++++---------------
->>>>    1 file changed, 20 insertions(+), 15 deletions(-)
->>>>
->>>> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
->>>> index 21d027695181..e22e944ffc05 100644
->>>> --- a/drivers/iommu/arm-smmu-v3.c
->>>> +++ b/drivers/iommu/arm-smmu-v3.c
->>>> @@ -211,6 +211,7 @@
->>>>    #define STRTAB_STE_0_CFG_BYPASS        4
->>>>    #define STRTAB_STE_0_CFG_S1_TRANS    5
->>>>    #define STRTAB_STE_0_CFG_S2_TRANS    6
->>>> +#define STRTAB_STE_0_CFG_NESTED        7
->>>>      #define STRTAB_STE_0_S1FMT        GENMASK_ULL(5, 4)
->>>>    #define STRTAB_STE_0_S1FMT_LINEAR    0
->>>> @@ -514,6 +515,7 @@ struct arm_smmu_strtab_ent {
->>>>         * configured according to the domain type.
->>>>         */
->>>>        bool                assigned;
->>>> +    bool                abort;
->>>>        struct arm_smmu_s1_cfg        *s1_cfg;
->>>>        struct arm_smmu_s2_cfg        *s2_cfg;
->>>>    };
->>>> @@ -628,10 +630,8 @@ struct arm_smmu_domain {
->>>>        bool                non_strict;
->>>>          enum arm_smmu_domain_stage    stage;
->>>> -    union {
->>>> -        struct arm_smmu_s1_cfg    s1_cfg;
->>>> -        struct arm_smmu_s2_cfg    s2_cfg;
->>>> -    };
->>>> +    struct arm_smmu_s1_cfg    s1_cfg;
->>>> +    struct arm_smmu_s2_cfg    s2_cfg;
->>>>          struct iommu_domain        domain;
->>>>    @@ -1108,12 +1108,13 @@ static void arm_smmu_write_strtab_ent(struct
->>>> arm_smmu_device *smmu, u32 sid,
->>>>                          __le64 *dst, struct arm_smmu_strtab_ent *ste)
->>>>    {
->>>>        /*
->>>> -     * This is hideously complicated, but we only really care about
->>>> -     * three cases at the moment:
->>>> +     * We care about the following transitions:
->>>>         *
->>>>         * 1. Invalid (all zero) -> bypass/fault (init)
->>>> -     * 2. Bypass/fault -> translation/bypass (attach)
->>>> -     * 3. Translation/bypass -> bypass/fault (detach)
->>>> +     * 2. Bypass/fault -> single stage translation/bypass (attach)
->>>> +     * 3. single stage Translation/bypass -> bypass/fault (detach)
->>>> +     * 4. S2 -> S1 + S2 (attach_pasid_table)
->>>> +     * 5. S1 + S2 -> S2 (detach_pasid_table)
->>>>         *
->>>>         * Given that we can't update the STE atomically and the SMMU
->>>>         * doesn't read the thing in a defined order, that leaves us
->>>> @@ -1124,7 +1125,7 @@ static void arm_smmu_write_strtab_ent(struct
->>>> arm_smmu_device *smmu, u32 sid,
->>>>         * 3. Update Config, sync
->>>>         */
->>>>        u64 val = le64_to_cpu(dst[0]);
->>>> -    bool ste_live = false;
->>>> +    bool abort, bypass, translate, ste_live = false;
->>>>        struct arm_smmu_cmdq_ent prefetch_cmd = {
->>>>            .opcode        = CMDQ_OP_PREFETCH_CFG,
->>>>            .prefetch    = {
->>>> @@ -1138,11 +1139,11 @@ static void arm_smmu_write_strtab_ent(struct
->>>> arm_smmu_device *smmu, u32 sid,
->>>>                break;
->>>>            case STRTAB_STE_0_CFG_S1_TRANS:
->>>>            case STRTAB_STE_0_CFG_S2_TRANS:
->>>> +        case STRTAB_STE_0_CFG_NESTED:
->>>>                ste_live = true;
->>>>                break;
->>>>            case STRTAB_STE_0_CFG_ABORT:
->>>> -            if (disable_bypass)
->>>> -                break;
->>>> +            break;
->>>>            default:
->>>>                BUG(); /* STE corruption */
->>>>            }
->>>> @@ -1152,8 +1153,13 @@ static void arm_smmu_write_strtab_ent(struct
->>>> arm_smmu_device *smmu, u32 sid,
->>>>        val = STRTAB_STE_0_V;
->>>>          /* Bypass/fault */
->>>> -    if (!ste->assigned || !(ste->s1_cfg || ste->s2_cfg)) {
->>>> -        if (!ste->assigned && disable_bypass)
->>>> +
->>>> +    abort = (!ste->assigned && disable_bypass) || ste->abort;
->>>> +    translate = ste->s1_cfg || ste->s2_cfg;
->>>> +    bypass = !abort && !translate;
->>>> +
->>>> +    if (abort || bypass) {
->>>> +        if (abort)
->>>>                val |= FIELD_PREP(STRTAB_STE_0_CFG,
->>>> STRTAB_STE_0_CFG_ABORT);
->>>>            else
->>>>                val |= FIELD_PREP(STRTAB_STE_0_CFG,
->>>> STRTAB_STE_0_CFG_BYPASS);
->>>> @@ -1172,7 +1178,6 @@ static void arm_smmu_write_strtab_ent(struct
->>>> arm_smmu_device *smmu, u32 sid,
->>>>        }
->>>>          if (ste->s1_cfg) {
->>>> -        BUG_ON(ste_live);
->>>
->>> Hmm, I'm a little uneasy about just removing these checks altogether, as
->>> there are still cases where rewriting a live entry is bogus, that we'd
->>> really like to keep catching. Is the problem that it's hard to tell when
->>> you're 'rewriting' the S2 config of a nested entry with the same thing
->>> on attaching/detaching its S1 context?
->> No, I restored the original checks in !nested mode and added a new check
->> to make sure we never update a live S1 in nested mode. Only S2 can be
->> live.
-> 
-> Right, either way it's fairly easy to enforce "!(cfg->s1 && ste->s1)",
-> but what I'm really concerned about is that fact where Stream IDs (or
-> possibly PASIDS) get messed up and we end up silently writing a nested
-> config over an STE which happens to already have an S2 configuration for
-> some other domain (or vice versa).
+NAK NAK NAK NAK
 
-> 
-> I guess it might suffice to verify that the VTTBRs match for S2<->nested
-> transitions, what do you reckon?
-Yes I can test the STE.S2TTB values which should are identical during
-such transitions.
-
-Thanks
-
-Eric
-> 
-> Robin.
+This is one of the biggest anti-patterns around.
