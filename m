@@ -2,110 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D05F81B270
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 11:12:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABBD31B2BB
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 11:19:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728594AbfEMJMU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 05:12:20 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:46335 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727576AbfEMJMP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 05:12:15 -0400
-Received: by mail-ot1-f66.google.com with SMTP id j49so3393906otc.13
-        for <kvm@vger.kernel.org>; Mon, 13 May 2019 02:12:15 -0700 (PDT)
+        id S1728370AbfEMJTY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 05:19:24 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:38105 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727576AbfEMJTY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 05:19:24 -0400
+Received: by mail-ot1-f67.google.com with SMTP id s19so11065497otq.5;
+        Mon, 13 May 2019 02:19:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=zNwmz7t6PBFmt5YGiQO+xKffu0RcO5OiBU8nsC1V0bQ=;
-        b=bDk+mRKf1bhPVKobiF94W6w0jIYFs2nKILDbLzROMuQflfYxvHldwHhCaWN2iV7XxH
-         f/EwqHFJuOdfJribj2X5FHGbCG/FEIaV4rmpf9Qz+K5xS5ZiOEalVC4JC31S2OycN1xq
-         B11RH/MfgSZ9JR0q0MZVRBbs2hE7/etR9EtgPqCdD2XDDipDPBhU1n/YXzVD8xRaSCf0
-         dzP1dn+qqjLOw0xzjkfZAm12TFIvv0eXdYzpI3BQLoNnagdo8hsQ8ZpoJ2/wqA4nWJzX
-         QrdInrJvp1Ysll/+rl3F8FxqbdXICNWj13M/W1lFtuIomFuKirx10x4WCyU7X+/jq3Lc
-         3dxg==
+        bh=ujdVx8/hOHAXTn+/pwv56Do81M/Ae/T+j37v3szZuZA=;
+        b=r+7/Uj5OgiHJVo6bYPKFZntd8/2VvY01FDvmq94a5OmI7/EDko/mWs3R7zpIVFzQQP
+         q3THuGsvjz0uYA6obt5vr1XQJX0c556O3TL2ED9WIGp2pIwKF08tee53h+fFSI4XacqW
+         r/kfdp4bZckqQCwloqhwpagPU4QTsH3hAhrMlt5HP3af5BYaCjHyRzdbq/ybTEURP43y
+         gCzAv5R8tPF5ABx6gWQectJCPEmIr2wgHMPsafq9MAQ4GlYq+pXN6NTT6Scq/KT3QcuT
+         vXyWSoGbVVgBtz55/+NbMCFDwxd6fPsMZBAI5EUGIl1pZhFZNOQIpXu0kboMdKxMUH3l
+         I58g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=zNwmz7t6PBFmt5YGiQO+xKffu0RcO5OiBU8nsC1V0bQ=;
-        b=lw8Vj181BbY3B5ivosvJ0ktZVDLuDzaNK0a3GSi++VvqjU4y1jVIn+HVQlu+LDvaY0
-         soSnQUDGppPWPpDa3Sfyvmb4cYbso5UBom0s18lHOEUpOztjqO5I08YeahGkDuJ1bTWe
-         K5Q6YYTAfYKNtBSh2x1qX9rhPfQFkShg4bf8pErc20s8MbuWbf0iqWHBL+cl8c1BDkRz
-         GLw/hrAnnNRTRkLKDhc9kttlgZJgTDhjV1/mc5wP76SI81yOCOMDs1W935WGO26vT1MQ
-         bR4O3IfsLItb775qLF0G0Zr0k8t7cBlHLXbuPcqMDRdOUj8eXrpC5UxzRasAV2Yv54DC
-         X7sg==
-X-Gm-Message-State: APjAAAWM9Zz+toaR8asY9hRkxJ6n1sjQkeQLdkWW0iRI8fzCEPgGJCNx
-        ApFNnf0MF4PwPPmDEmNGrBdXaFvOk1TJTG62gE3uIsD1
-X-Google-Smtp-Source: APXvYqwdwJCrvJIP/W9yVSMtFA+NF9tBUYgk2J8U2GT4DSFQbNkT5fpPQSiEF2tZWvMJ3BeIFBkO3PAVwcVeFjJQzso=
-X-Received: by 2002:a05:6830:1389:: with SMTP id d9mr13718otq.329.1557738735013;
- Mon, 13 May 2019 02:12:15 -0700 (PDT)
+        bh=ujdVx8/hOHAXTn+/pwv56Do81M/Ae/T+j37v3szZuZA=;
+        b=YO90CznyKh/iDvst1CwSVmss2ZCEzR1DIWbuq6AVl0aV93tH24t6cWuPPWxELEoIvC
+         nLmC34a3f1xYOFrHxODBGllMNn9A0i765kVDvitdxw5aTMoFkzvbO+ZEjTkXY6nyEt0K
+         VZgD83qD+uVqJZ+jnjw35Dahp68MvLdVxCVR0dQZVmlAPSckFAHZzR7J+zdIyOFyV8Ei
+         Gdo80utiu0l2y7zvtx8gPUA/bEWMbYKX73//ei0m1dEf2lrIewNPDSHyPu22QVMeygxy
+         A92zRFTAbyfohOtKVMHJeqNcpwqTt6atFT+gbvX/+doMGK3D6snF2748Kv5YipZd3drK
+         lEGA==
+X-Gm-Message-State: APjAAAVU1FemMp8FFm24jEdKEeGGzYzAro6VymSG3Ap9n0x4miWgifn/
+        hwd+b7mnBnpuKnEiSZXseJ+yV4bBn5wAZIr/mjE=
+X-Google-Smtp-Source: APXvYqygNFs08oY/relMZpc/d09rofQMTkf7ccwOd7iCguFZlNc7h56VryKgAP6n9gMXy3DbSMnkFlg0/vX11zr1TXE=
+X-Received: by 2002:a05:6830:1389:: with SMTP id d9mr30479otq.329.1557739162822;
+ Mon, 13 May 2019 02:19:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190415154526.64709-1-liran.alon@oracle.com> <20190415181702.GH24010@linux.intel.com>
- <AD81166E-0C42-49FD-AC37-E6F385C23B13@oracle.com> <4848D424-F852-4E1C-8A86-6AA1A26D2E90@oracle.com>
- <2dad36e7-a0e5-9670-c902-819c5200466f@oracle.com> <CANRm+CyYkjFaLZMOHP3sMYVjFNo1P7uKbrRr7U3FfRHhG5jVkA@mail.gmail.com>
- <d930e87a-fbe3-cf63-b8a0-26e9f012442a@oracle.com> <20190510171733.GA16852@linux.intel.com>
-In-Reply-To: <20190510171733.GA16852@linux.intel.com>
+References: <20190507185647.GA29409@amt.cnet>
+In-Reply-To: <20190507185647.GA29409@amt.cnet>
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 13 May 2019 17:13:29 +0800
-Message-ID: <CANRm+Cy4GKvNpJN0ORfMGXC=BfPHZ+khKZhJQzeWvFYVmTGVfA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: VMX: Nop emulation of MSR_IA32_POWER_CTL
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Joao Martins <joao.m.martins@oracle.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>
+Date:   Mon, 13 May 2019 17:20:37 +0800
+Message-ID: <CANRm+Cx8zCDG6Oz1m9eukkmx_uVFYcQOdMwZrHwsQcbLm_kuPA@mail.gmail.com>
+Subject: Re: [PATCH] sched: introduce configurable delay before entering idle
+To:     Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     kvm-devel <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Bandan Das <bsd@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 11 May 2019 at 01:17, Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
+On Wed, 8 May 2019 at 02:57, Marcelo Tosatti <mtosatti@redhat.com> wrote:
 >
-> On Fri, May 10, 2019 at 11:34:41AM +0100, Joao Martins wrote:
-> > On 5/10/19 10:54 AM, Wanpeng Li wrote:
-> > > It is weird that we can observe intel_idle driver in the guest
-> > > executes mwait eax=0x20, and the corresponding pCPU enters C3 on HSW
-> > > server, however, we can't observe this on SKX/CLX server, it just
-> > > enters maximal C1.
-> >
-> > I assume you refer to the case where you pass the host mwait substates to the
-> > guests as is, right? Or are you zeroing/filtering out the mwait cpuid leaf EDX
-> > like my patch (attached in the previous message) suggests?
-> >
-> > Interestingly, hints set to 0x20 actually corresponds to C6 on HSW (based on
-> > intel_idle driver). IIUC From the SDM (see Vol 2B, "MWAIT for Power Management"
-> > in instruction set reference M-U) the hints register, doesn't necessarily
-> > guarantee the specified C-state depicted in the hints will be used. The manual
-> > makes it sound like it is tentative, and implementation-specific condition may
-> > either ignore it or enter a different one. It appears to be only guaranteed that
-> > it won't enter a C-{sub,}state deeper than the one depicted.
 >
-> Yep, section "MWAIT EXTENSIONS FOR ADVANCED POWER MANAGEMENT" is more
-> explicit on this point:
->
->   At CPL=0, system software can specify desired C-state and sub C-state by
->   using the MWAIT hints register (EAX).  Processors will not go to C-state
->   and sub C-state deeper than what is specified by the hint register.
->
-> As for why SKX/CLX only enters C1, AFAICT SKX isn't configured to support
-> C3, e.g. skx_cstates in drivers/idle/intel_idle.c shows C1, C1E and C6.
-> A quick search brings up a variety of docs that confirm this.  My guess is
-> that C1E provides better power/performance than C3 for the majority of
-> server workloads, e.g. C3 doesn't provide enough power savings to justify
-> its higher latency and TLB flush.
+> Certain workloads perform poorly on KVM compared to baremetal
+> due to baremetal's ability to perform mwait on NEED_RESCHED
+> bit of task flags (therefore skipping the IPI).
 
-You are right, I figure this out by referring to the SKX/CLX EDS, the
-Core C-States of these two generations just support CC0/CC1/CC1E/CC6.
-The issue here is after exposing mwait to the guest, SKX/CLX guest
-can't enter CC6, however, HSW guest can enter CC3/CC6. Both HSW and
-SKX/CLX hosts can enter CC6. We observe SKX/CLX guests execute mwait
-eax 0x20, however, we can't observe the corresponding pCPU enter CC6
-by turbostat or reading MSR_CORE_C6_RESIDENCY directly.
+KVM supports expose mwait to the guest, if it can solve this?
 
 Regards,
 Wanpeng Li
+
+>
+> This patch introduces a configurable busy-wait delay before entering the
+> architecture delay routine, allowing wakeup IPIs to be skipped
+> (if the IPI happens in that window).
+>
+> The real-life workload which this patch improves performance
+> is SAP HANA (by 5-10%) (for which case setting idle_spin to 30
+> is sufficient).
+>
+> This patch improves the attached server.py and client.py example
+> as follows:
+>
+> Host:                           31.814230202231556
+> Guest:                          38.17718765199993       (83 %)
+> Guest, idle_spin=50us:          33.317709898000004      (95 %)
+> Guest, idle_spin=220us:         32.27826551499999       (98 %)
+>
+> Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+>
+> ---
+>  kernel/sched/idle.c |   86 ++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 86 insertions(+)
+>
+> diff --git a/kernel/sched/idle.c b/kernel/sched/idle.c
+> index f5516bae0c1b..bca7656a7ea0 100644
+> --- a/kernel/sched/idle.c
+> +++ b/kernel/sched/idle.c
+> @@ -216,6 +216,29 @@ static void cpuidle_idle_call(void)
+>         rcu_idle_exit();
+>  }
+>
+> +static unsigned int spin_before_idle_us;
+>
+> +static void do_spin_before_idle(void)
+> +{
+> +       ktime_t now, end_spin;
+> +
+> +       now = ktime_get();
+> +       end_spin = ktime_add_ns(now, spin_before_idle_us*1000);
+> +
+> +       rcu_idle_enter();
+> +       local_irq_enable();
+> +       stop_critical_timings();
+> +
+> +       do {
+> +               cpu_relax();
+> +               now = ktime_get();
+> +       } while (!tif_need_resched() && ktime_before(now, end_spin));
+> +
+> +       start_critical_timings();
+> +       rcu_idle_exit();
+> +       local_irq_disable();
+> +}
+> +
+>  /*
+>   * Generic idle loop implementation
+>   *
+> @@ -259,6 +282,8 @@ static void do_idle(void)
+>                         tick_nohz_idle_restart_tick();
+>                         cpu_idle_poll();
+>                 } else {
+> +                       if (spin_before_idle_us)
+> +                               do_spin_before_idle();
+>                         cpuidle_idle_call();
+>                 }
+>                 arch_cpu_idle_exit();
+> @@ -465,3 +490,64 @@ const struct sched_class idle_sched_class = {
+>         .switched_to            = switched_to_idle,
+>         .update_curr            = update_curr_idle,
+>  };
+> +
+> +
+> +static ssize_t store_idle_spin(struct kobject *kobj,
+> +                              struct kobj_attribute *attr,
+> +                              const char *buf, size_t count)
+> +{
+> +       unsigned int val;
+> +
+> +       if (kstrtouint(buf, 10, &val) < 0)
+> +               return -EINVAL;
+> +
+> +       if (val > USEC_PER_SEC)
+> +               return -EINVAL;
+> +
+> +       spin_before_idle_us = val;
+> +       return count;
+> +}
+> +
+> +static ssize_t show_idle_spin(struct kobject *kobj,
+> +                             struct kobj_attribute *attr,
+> +                             char *buf)
+> +{
+> +       ssize_t ret;
+> +
+> +       ret = sprintf(buf, "%d\n", spin_before_idle_us);
+> +
+> +       return ret;
+> +}
+> +
+> +static struct kobj_attribute idle_spin_attr =
+> +       __ATTR(idle_spin, 0644, show_idle_spin, store_idle_spin);
+> +
+> +static struct attribute *sched_attrs[] = {
+> +       &idle_spin_attr.attr,
+> +       NULL,
+> +};
+> +
+> +static const struct attribute_group sched_attr_group = {
+> +       .attrs = sched_attrs,
+> +};
+> +
+> +static struct kobject *sched_kobj;
+> +
+> +static int __init sched_sysfs_init(void)
+> +{
+> +       int error;
+> +
+> +       sched_kobj = kobject_create_and_add("sched", kernel_kobj);
+> +       if (!sched_kobj)
+> +               return -ENOMEM;
+> +
+> +       error = sysfs_create_group(sched_kobj, &sched_attr_group);
+> +       if (error)
+> +               goto err;
+> +       return 0;
+> +
+> +err:
+> +       kobject_put(sched_kobj);
+> +       return error;
+> +}
+> +postcore_initcall(sched_sysfs_init);
