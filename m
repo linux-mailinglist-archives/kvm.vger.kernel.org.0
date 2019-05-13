@@ -2,163 +2,315 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 40C751B09A
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 09:00:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB2211B170
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 09:46:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727597AbfEMHA3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 03:00:29 -0400
-Received: from mail-eopbgr760051.outbound.protection.outlook.com ([40.107.76.51]:19435
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726330AbfEMHA3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 03:00:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=analog.onmicrosoft.com; s=selector1-analog-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sYMxlTU42U8IEHuaefeXBUDbrbbRBESKyCojAVqw4Hs=;
- b=gDL7Mqp4cjHd9tnfv2Oc1qnpYT4Fac8j07kqzHoMV4t4fblqqvc/VaI9b3eW64VcLXIB/IIy6eJ2zPrMIPgV3ZayvIayU+ziMWE4G1SNhTClihPWWYWJfxAonZzDgMbLjip70cWFf6cVkIyteBkWBVFGb865vhK+yAGxY5lk4K0=
-Received: from BY5PR03CA0029.namprd03.prod.outlook.com (2603:10b6:a03:1e0::39)
- by CY1PR03MB2265.namprd03.prod.outlook.com (2603:10b6:600:1::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.1878.21; Mon, 13 May
- 2019 07:00:23 +0000
-Received: from CY1NAM02FT063.eop-nam02.prod.protection.outlook.com
- (2a01:111:f400:7e45::206) by BY5PR03CA0029.outlook.office365.com
- (2603:10b6:a03:1e0::39) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1878.21 via Frontend
- Transport; Mon, 13 May 2019 07:00:22 +0000
-Authentication-Results: spf=pass (sender IP is 137.71.25.55)
- smtp.mailfrom=analog.com; vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=bestguesspass action=none
- header.from=analog.com;
-Received-SPF: Pass (protection.outlook.com: domain of analog.com designates
- 137.71.25.55 as permitted sender) receiver=protection.outlook.com;
- client-ip=137.71.25.55; helo=nwd2mta1.analog.com;
-Received: from nwd2mta1.analog.com (137.71.25.55) by
- CY1NAM02FT063.mail.protection.outlook.com (10.152.75.161) with Microsoft SMTP
- Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.1856.11
- via Frontend Transport; Mon, 13 May 2019 07:00:20 +0000
-Received: from NWD2HUBCAS7.ad.analog.com (nwd2hubcas7.ad.analog.com [10.64.69.107])
-        by nwd2mta1.analog.com (8.13.8/8.13.8) with ESMTP id x4D70JiL017961
-        (version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=OK);
-        Mon, 13 May 2019 00:00:19 -0700
-Received: from NWD2MBX7.ad.analog.com ([fe80::190e:f9c1:9a22:9663]) by
- NWD2HUBCAS7.ad.analog.com ([fe80::595b:ced1:cc03:539d%12]) with mapi id
- 14.03.0415.000; Mon, 13 May 2019 03:00:19 -0400
-From:   "Ardelean, Alexandru" <alexandru.Ardelean@analog.com>
-To:     "andriy.shevchenko@linux.intel.com" 
-        <andriy.shevchenko@linux.intel.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-ide@vger.kernel.org" <linux-ide@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>,
-        "linux-gpio@vger.kernel.org" <linux-gpio@vger.kernel.org>,
-        "linux-security-module@vger.kernel.org" 
-        <linux-security-module@vger.kernel.org>,
-        "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
-        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "linux-rpi-kernel@lists.infradead.org" 
-        <linux-rpi-kernel@lists.infradead.org>,
-        "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-rockchip@lists.infradead.org" 
-        <linux-rockchip@lists.infradead.org>,
-        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-        "linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>
-Subject: Re: [PATCH 03/16] lib,treewide: add new match_string() helper/macro
-Thread-Topic: [PATCH 03/16] lib,treewide: add new match_string() helper/macro
-Thread-Index: AQHVBZFQXT7pBvOEwE+osXNwuBSvQKZhdwMAgAACFgCAAADdAIAC38WAgABZCYCABDgygA==
-Date:   Mon, 13 May 2019 07:00:18 +0000
-Message-ID: <146ba7b61998d1e26cf2312fdaa01525d7c7d8de.camel@analog.com>
-References: <20190508112842.11654-1-alexandru.ardelean@analog.com>
-         <20190508112842.11654-5-alexandru.ardelean@analog.com>
-         <20190508131128.GL9224@smile.fi.intel.com>
-         <20190508131856.GB10138@kroah.com>
-         <b2440bc9485456a7a90a488c528997587b22088b.camel@analog.com>
-         <4df165bc4247e60aa4952fd55cb0c77e60712767.camel@analog.com>
-         <20190510143407.GA9224@smile.fi.intel.com>
-In-Reply-To: <20190510143407.GA9224@smile.fi.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.50.1.244]
-x-adiroutedonprem: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FDDE4955D460DC40AB641BB9139D6ABF@analog.com>
-Content-Transfer-Encoding: base64
+        id S1728135AbfEMHqe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 03:46:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38486 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727726AbfEMHqe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 03:46:34 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0D11D86671;
+        Mon, 13 May 2019 07:46:33 +0000 (UTC)
+Received: from [10.36.116.17] (ovpn-116-17.ams2.redhat.com [10.36.116.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C6DB35D71E;
+        Mon, 13 May 2019 07:46:28 +0000 (UTC)
+From:   Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH v7 18/23] iommu/smmuv3: Report non recoverable faults
+To:     Robin Murphy <robin.murphy@arm.com>, eric.auger.pro@gmail.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
+        alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
+        yi.l.liu@intel.com, jean-philippe.brucker@arm.com,
+        will.deacon@arm.com
+Cc:     kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com,
+        christoffer.dall@arm.com, peter.maydell@linaro.org,
+        vincent.stehle@arm.com
+References: <20190408121911.24103-1-eric.auger@redhat.com>
+ <20190408121911.24103-19-eric.auger@redhat.com>
+ <52dd9de0-67a9-0316-cfe1-83d855d26c66@arm.com>
+Message-ID: <46f39a8e-a909-5493-b1eb-f8f082b0bb20@redhat.com>
+Date:   Mon, 13 May 2019 09:46:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:137.71.25.55;IPV:NLI;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(10009020)(1496009)(396003)(346002)(39860400002)(136003)(376002)(2980300002)(189003)(199004)(51914003)(426003)(446003)(50466002)(436003)(126002)(2616005)(6246003)(2906002)(11346002)(336012)(8936002)(476003)(2351001)(246002)(186003)(356004)(26005)(316002)(86362001)(23676004)(5660300002)(305945005)(7636002)(5640700003)(70206006)(14444005)(4326008)(229853002)(106002)(2501003)(47776003)(2486003)(76176011)(14454004)(118296001)(54906003)(7736002)(3846002)(6916009)(8676002)(486006)(36756003)(6116002)(70586007)(478600001)(7696005)(102836004)(7416002)(142933001);DIR:OUT;SFP:1101;SCL:1;SRVR:CY1PR03MB2265;H:nwd2mta1.analog.com;FPR:;SPF:Pass;LANG:en;PTR:nwd2mail10.analog.com;MX:1;A:1;
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 00d843ba-2114-4365-1750-08d6d770ab01
-X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4709054)(2017052603328)(7193020);SRVR:CY1PR03MB2265;
-X-MS-TrafficTypeDiagnostic: CY1PR03MB2265:
-X-Microsoft-Antispam-PRVS: <CY1PR03MB2265347D2D5A29BD38B4EABBF90F0@CY1PR03MB2265.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-Forefront-PRVS: 0036736630
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam-Message-Info: pqGW1MWQ3Zq088ZBBnRq58UtaiOWWrFuHBJi7VQpoJbSlJTml7IN0ZB79LgwW/q3coszuClL9TMb8LD8oKaWG7L67xaWLTLo4Dl5yXSxaYpBmG+Xog6/FxwkOZuU2IjOucWlNzpAFux6Mwb2L0fj7gBrNwwieeRaYqhwSdf06t/SMvTJASTiiAUu2AW4N7x6Xc6ahiqNZGT2RZlVmczozENjmdjvtvndvf2Dx+mGlM4/aQJY0WTqVMlcWs8jrF4ba/XFXGMyWvyAyH4V58N9E72j8+HxTQe7Yc0mkFuxWNDA0N0r9OC/7KnwHUj3pg1+Gx6dW22M8zWeA2xQJm1BF3xnZkV9zf9qWppJGAC5RZM2IO73HRpNW7spE2HNsspgIzH/VtLuyUQIVg7MbQ0TJO0gxLjUaCUyPM4+5bVRGLE=
-X-OriginatorOrg: analog.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2019 07:00:20.8904
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00d843ba-2114-4365-1750-08d6d770ab01
-X-MS-Exchange-CrossTenant-Id: eaa689b4-8f87-40e0-9c6f-7228de4d754a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=eaa689b4-8f87-40e0-9c6f-7228de4d754a;Ip=[137.71.25.55];Helo=[nwd2mta1.analog.com]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR03MB2265
+In-Reply-To: <52dd9de0-67a9-0316-cfe1-83d855d26c66@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Mon, 13 May 2019 07:46:33 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gRnJpLCAyMDE5LTA1LTEwIGF0IDE3OjM0ICswMzAwLCBhbmRyaXkuc2hldmNoZW5rb0BsaW51
-eC5pbnRlbC5jb20gd3JvdGU6DQo+IFtFeHRlcm5hbF0NCj4gDQo+IA0KPiBPbiBGcmksIE1heSAx
-MCwgMjAxOSBhdCAwOToxNToyN0FNICswMDAwLCBBcmRlbGVhbiwgQWxleGFuZHJ1IHdyb3RlOg0K
-PiA+IE9uIFdlZCwgMjAxOS0wNS0wOCBhdCAxNjoyMiArMDMwMCwgQWxleGFuZHJ1IEFyZGVsZWFu
-IHdyb3RlOg0KPiA+ID4gT24gV2VkLCAyMDE5LTA1LTA4IGF0IDE1OjE4ICswMjAwLCBHcmVnIEtI
-IHdyb3RlOg0KPiA+ID4gPiBPbiBXZWQsIE1heSAwOCwgMjAxOSBhdCAwNDoxMToyOFBNICswMzAw
-LCBBbmR5IFNoZXZjaGVua28gd3JvdGU6DQo+ID4gPiA+ID4gT24gV2VkLCBNYXkgMDgsIDIwMTkg
-YXQgMDI6Mjg6MjlQTSArMDMwMCwgQWxleGFuZHJ1IEFyZGVsZWFuDQo+ID4gPiA+ID4gd3JvdGU6
-DQo+ID4gPiA+ID4gQ2FuIHlvdSBzcGxpdCBpbmNsdWRlL2xpbnV4LyBjaGFuZ2UgZnJvbSB0aGUg
-cmVzdD8NCj4gPiA+ID4gDQo+ID4gPiA+IFRoYXQgd291bGQgYnJlYWsgdGhlIGJ1aWxkLCB3aHkg
-ZG8geW91IHdhbnQgaXQgc3BsaXQgb3V0PyAgVGhpcw0KPiA+ID4gPiBtYWtlcw0KPiA+ID4gPiBz
-ZW5zZSBhbGwgYXMgYSBzaW5nbGUgcGF0Y2ggdG8gbWUuDQo+ID4gPiA+IA0KPiA+ID4gDQo+ID4g
-PiBOb3QgcmVhbGx5Lg0KPiA+ID4gSXQgd291bGQgYmUganVzdCBiZSB0aGUgbmV3IG1hdGNoX3N0
-cmluZygpIGhlbHBlci9tYWNybyBpbiBhIG5ldw0KPiA+ID4gY29tbWl0Lg0KPiA+ID4gQW5kIHRo
-ZSBjb252ZXJzaW9ucyBvZiB0aGUgc2ltcGxlIHVzZXJzIG9mIG1hdGNoX3N0cmluZygpICh0aGUg
-b25lcw0KPiA+ID4gdXNpbmcNCj4gPiA+IEFSUkFZX1NJWkUoKSkgaW4gYW5vdGhlciBjb21taXQu
-DQo+ID4gPiANCj4gPiANCj4gPiBJIHNob3VsZCBoYXZlIGFza2VkIGluIG15IHByZXZpb3VzIHJl
-cGx5Lg0KPiA+IExlYXZlIHRoaXMgYXMtaXMgb3IgcmUtZm9ybXVsYXRlIGluIDIgcGF0Y2hlcyA/
-DQo+IA0KPiBEZXBlbmRzIG9uIG9uIHdoYXQgeW91IHdvdWxkIGxpa2UgdG8gc3BlbmQgeW91ciB0
-aW1lOiBjb2xsZWN0aW5nIEFja3MgZm9yDQo+IGFsbA0KPiBwaWVjZXMgaW4gdHJlZXdpZGUgcGF0
-Y2ggb3Igc2VuZCBuZXcgQVBJIGZpcnN0IGZvbGxvd2VkIHVwIGJ5IHBlciBkcml2ZXINCj4gLw0K
-PiBtb2R1bGUgdXBkYXRlIGluIG5leHQgY3ljbGUuDQoNCkkgYWN0dWFsbHkgd291bGQgaGF2ZSBw
-cmVmZXJyZWQgbmV3IEFQSSBmaXJzdCwgd2l0aCB0aGUgY3VycmVudA0KYG1hdGNoX3N0cmluZygp
-YCAtPiBgX19tYXRjaF9zdHJpbmcoKWAgcmVuYW1lIGZyb20gdGhlIHN0YXJ0LCBidXQgSSB3YXNu
-J3QNCnN1cmUuIEkgYW0gc3RpbGwgbmF2aWdhdGluZyB0aHJvdWdoIGhvdyBmZWVkYmFja3MgYXJl
-IHdvcmtpbmcgaW4gdGhpcw0KcmVhbG0uDQoNCkknbGwgc2VuZCBhIFYyIHdpdGggdGhlIEFQSSBj
-aGFuZ2UtZmlyc3Qvb25seTsgc2hvdWxkIGJlIGEgc21hbGxlciBsaXN0Lg0KVGhlbiBzZWUgYWJv
-dXQgZm9sbG93LXVwcy9jaGFuZ2VzIHBlciBzdWJzeXN0ZW1zLg0KDQo+IA0KPiBJIGFsc28gaGF2
-ZSBubyBzdHJvbmcgcHJlZmVyZW5jZS4NCj4gQW5kIEkgdGhpbmsgaXQncyBnb29kIHRvIGFkZCBI
-ZWlra2kgS3JvZ2VydXMgdG8gQ2MgbGlzdCBmb3IgYm90aCBwYXRjaA0KPiBzZXJpZXMsDQo+IHNp
-bmNlIGhlIGlzIHRoZSBhdXRob3Igb2Ygc3lzZnMgdmFyaWFudCBhbmQgbWF5IGhhdmUgc29tZXRo
-aW5nIHRvIGNvbW1lbnQNCj4gb24NCj4gdGhlIHJlc3QuDQoNClRoYW5rcyBmb3IgdGhlIHJlZmVy
-ZW5jZS4NCg0KPiANCj4gLS0NCj4gV2l0aCBCZXN0IFJlZ2FyZHMsDQo+IEFuZHkgU2hldmNoZW5r
-bw0KPiANCj4gDQo=
+Hi Robin,
+
+On 5/8/19 7:20 PM, Robin Murphy wrote:
+> On 08/04/2019 13:19, Eric Auger wrote:
+>> When a stage 1 related fault event is read from the event queue,
+>> let's propagate it to potential external fault listeners, ie. users
+>> who registered a fault handler.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> v4 -> v5:
+>> - s/IOMMU_FAULT_PERM_INST/IOMMU_FAULT_PERM_EXEC
+>> ---
+>>   drivers/iommu/arm-smmu-v3.c | 169 +++++++++++++++++++++++++++++++++---
+>>   1 file changed, 158 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
+>> index 8044445bc32a..1fd320788dcb 100644
+>> --- a/drivers/iommu/arm-smmu-v3.c
+>> +++ b/drivers/iommu/arm-smmu-v3.c
+>> @@ -167,6 +167,26 @@
+>>   #define ARM_SMMU_PRIQ_IRQ_CFG1        0xd8
+>>   #define ARM_SMMU_PRIQ_IRQ_CFG2        0xdc
+>>   +/* Events */
+>> +#define ARM_SMMU_EVT_F_UUT        0x01
+>> +#define ARM_SMMU_EVT_C_BAD_STREAMID    0x02
+>> +#define ARM_SMMU_EVT_F_STE_FETCH    0x03
+>> +#define ARM_SMMU_EVT_C_BAD_STE        0x04
+>> +#define ARM_SMMU_EVT_F_BAD_ATS_TREQ    0x05
+>> +#define ARM_SMMU_EVT_F_STREAM_DISABLED    0x06
+>> +#define ARM_SMMU_EVT_F_TRANSL_FORBIDDEN    0x07
+>> +#define ARM_SMMU_EVT_C_BAD_SUBSTREAMID    0x08
+>> +#define ARM_SMMU_EVT_F_CD_FETCH        0x09
+>> +#define ARM_SMMU_EVT_C_BAD_CD        0x0a
+>> +#define ARM_SMMU_EVT_F_WALK_EABT    0x0b
+>> +#define ARM_SMMU_EVT_F_TRANSLATION    0x10
+>> +#define ARM_SMMU_EVT_F_ADDR_SIZE    0x11
+>> +#define ARM_SMMU_EVT_F_ACCESS        0x12
+>> +#define ARM_SMMU_EVT_F_PERMISSION    0x13
+>> +#define ARM_SMMU_EVT_F_TLB_CONFLICT    0x20
+>> +#define ARM_SMMU_EVT_F_CFG_CONFLICT    0x21
+>> +#define ARM_SMMU_EVT_E_PAGE_REQUEST    0x24
+>> +
+>>   /* Common MSI config fields */
+>>   #define MSI_CFG0_ADDR_MASK        GENMASK_ULL(51, 2)
+>>   #define MSI_CFG2_SH            GENMASK(5, 4)
+>> @@ -332,6 +352,15 @@
+>>   #define EVTQ_MAX_SZ_SHIFT        7
+>>     #define EVTQ_0_ID            GENMASK_ULL(7, 0)
+>> +#define EVTQ_0_SSV            GENMASK_ULL(11, 11)
+>> +#define EVTQ_0_SUBSTREAMID        GENMASK_ULL(31, 12)
+>> +#define EVTQ_0_STREAMID            GENMASK_ULL(63, 32)
+>> +#define EVTQ_1_PNU            GENMASK_ULL(33, 33)
+>> +#define EVTQ_1_IND            GENMASK_ULL(34, 34)
+>> +#define EVTQ_1_RNW            GENMASK_ULL(35, 35)
+>> +#define EVTQ_1_S2            GENMASK_ULL(39, 39)
+>> +#define EVTQ_1_CLASS            GENMASK_ULL(40, 41)
+>> +#define EVTQ_3_FETCH_ADDR        GENMASK_ULL(51, 3)
+>>     /* PRI queue */
+>>   #define PRIQ_ENT_DWORDS            2
+>> @@ -639,6 +668,64 @@ struct arm_smmu_domain {
+>>       spinlock_t            devices_lock;
+>>   };
+>>   +/* fault propagation */
+>> +
+>> +#define IOMMU_FAULT_F_FIELDS    (IOMMU_FAULT_UNRECOV_PASID_VALID | \
+>> +                 IOMMU_FAULT_UNRECOV_PERM_VALID | \
+>> +                 IOMMU_FAULT_UNRECOV_ADDR_VALID)
+>> +
+>> +struct arm_smmu_fault_propagation_data {
+>> +    enum iommu_fault_reason reason;
+>> +    bool s1_check;
+>> +    u32 fields; /* IOMMU_FAULT_UNRECOV_*_VALID bits */
+>> +};
+>> +
+>> +/*
+>> + * Describes how SMMU faults translate into generic IOMMU faults
+>> + * and if they need to be reported externally
+>> + */
+>> +static const struct arm_smmu_fault_propagation_data
+>> fault_propagation[] = {
+>> +[ARM_SMMU_EVT_F_UUT]            = { },
+>> +[ARM_SMMU_EVT_C_BAD_STREAMID]        = { },
+>> +[ARM_SMMU_EVT_F_STE_FETCH]        = { },
+>> +[ARM_SMMU_EVT_C_BAD_STE]        = { },
+>> +[ARM_SMMU_EVT_F_BAD_ATS_TREQ]        = { },
+>> +[ARM_SMMU_EVT_F_STREAM_DISABLED]    = { },
+>> +[ARM_SMMU_EVT_F_TRANSL_FORBIDDEN]    = { },
+>> +[ARM_SMMU_EVT_C_BAD_SUBSTREAMID]    = {IOMMU_FAULT_REASON_PASID_INVALID,
+>> +                       false,
+>> +                       IOMMU_FAULT_UNRECOV_PASID_VALID
+>> +                      },
+>> +[ARM_SMMU_EVT_F_CD_FETCH]        = {IOMMU_FAULT_REASON_PASID_FETCH,
+>> +                       false,
+>> +                       IOMMU_FAULT_UNRECOV_PASID_VALID |
+> 
+> It doesn't make sense to presume validity here, or in any of the faults
+> below...
+
+
+> 
+>> +                       IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID
+>> +                      },
+>> +[ARM_SMMU_EVT_C_BAD_CD]            =
+>> {IOMMU_FAULT_REASON_BAD_PASID_ENTRY,
+>> +                       false,
+>> +                       IOMMU_FAULT_UNRECOV_PASID_VALID
+>> +                      },
+>> +[ARM_SMMU_EVT_F_WALK_EABT]        = {IOMMU_FAULT_REASON_WALK_EABT, true,
+>> +                       IOMMU_FAULT_F_FIELDS |
+>> +                       IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID
+>> +                      },
+>> +[ARM_SMMU_EVT_F_TRANSLATION]        = {IOMMU_FAULT_REASON_PTE_FETCH,
+>> true,
+>> +                       IOMMU_FAULT_F_FIELDS
+>> +                      },
+>> +[ARM_SMMU_EVT_F_ADDR_SIZE]        = {IOMMU_FAULT_REASON_OOR_ADDRESS,
+>> true,
+>> +                       IOMMU_FAULT_F_FIELDS
+>> +                      },
+>> +[ARM_SMMU_EVT_F_ACCESS]            = {IOMMU_FAULT_REASON_ACCESS, true,
+>> +                       IOMMU_FAULT_F_FIELDS
+>> +                      },
+>> +[ARM_SMMU_EVT_F_PERMISSION]        = {IOMMU_FAULT_REASON_PERMISSION,
+>> true,
+>> +                       IOMMU_FAULT_F_FIELDS
+>> +                      },
+>> +[ARM_SMMU_EVT_F_TLB_CONFLICT]        = { },
+>> +[ARM_SMMU_EVT_F_CFG_CONFLICT]        = { },
+>> +[ARM_SMMU_EVT_E_PAGE_REQUEST]        = { },
+>> +};
+>> +
+>>   struct arm_smmu_option_prop {
+>>       u32 opt;
+>>       const char *prop;
+>> @@ -1258,7 +1345,6 @@ static int arm_smmu_init_l2_strtab(struct
+>> arm_smmu_device *smmu, u32 sid)
+>>       return 0;
+>>   }
+>>   -__maybe_unused
+>>   static struct arm_smmu_master_data *
+>>   arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
+>>   {
+>> @@ -1284,24 +1370,85 @@ arm_smmu_find_master(struct arm_smmu_device
+>> *smmu, u32 sid)
+>>       return master;
+>>   }
+>>   +/* Populates the record fields according to the input SMMU event */
+>> +static bool arm_smmu_transcode_fault(u64 *evt, u8 type,
+>> +                     struct iommu_fault_unrecoverable *record)
+>> +{
+>> +    const struct arm_smmu_fault_propagation_data *data;
+>> +    u32 fields;
+>> +
+>> +    if (type >= ARRAY_SIZE(fault_propagation))
+>> +        return false;
+>> +
+>> +    data = &fault_propagation[type];
+>> +    if (!data->reason)
+>> +        return false;
+>> +
+>> +    fields = data->fields;
+>> +
+>> +    if (data->s1_check & FIELD_GET(EVTQ_1_S2, evt[1]))
+>> +        return false; /* S2 related fault, don't propagate */
+>> +
+>> +    if (fields & IOMMU_FAULT_UNRECOV_PASID_VALID) {
+>> +        if (FIELD_GET(EVTQ_0_SSV, evt[0]))
+>> +            record->pasid = FIELD_GET(EVTQ_0_SUBSTREAMID, evt[0]);
+>> +        else
+>> +            fields &= ~IOMMU_FAULT_UNRECOV_PASID_VALID;
+> 
+> ...because this logic then breaks for C_BAD_SUBSTREAMID, which ends up
+> coming out of here *without* reporting the offending PASID.
+Correct.
+> 
+>> +    }
+>> +    if (fields & IOMMU_FAULT_UNRECOV_PERM_VALID) {
+>> +        if (!FIELD_GET(EVTQ_1_RNW, evt[1]))
+>> +            record->perm |= IOMMU_FAULT_PERM_WRITE;
+>> +        if (FIELD_GET(EVTQ_1_PNU, evt[1]))
+>> +            record->perm |= IOMMU_FAULT_PERM_PRIV;
+>> +        if (FIELD_GET(EVTQ_1_IND, evt[1]))
+>> +            record->perm |= IOMMU_FAULT_PERM_EXEC;
+>> +    }
+>> +    if (fields & IOMMU_FAULT_UNRECOV_ADDR_VALID)
+>> +        record->addr = evt[2];
+>> +
+>> +    if (fields & IOMMU_FAULT_UNRECOV_FETCH_ADDR_VALID)
+>> +        record->fetch_addr = FIELD_GET(EVTQ_3_FETCH_ADDR, evt[3]);
+>> +
+>> +    record->flags = fields;
+>> +    return true;
+>> +}
+>> +
+>> +static void arm_smmu_report_event(struct arm_smmu_device *smmu, u64
+>> *evt)
+>> +{
+>> +    u32 sid = FIELD_GET(EVTQ_0_STREAMID, evt[0]);
+>> +    u8 type = FIELD_GET(EVTQ_0_ID, evt[0]);
+>> +    struct arm_smmu_master_data *master;
+>> +    struct iommu_fault_event event = {};
+>> +    int i;
+>> +
+>> +    master = arm_smmu_find_master(smmu, sid);
+>> +    if (WARN_ON(!master))
+>> +        return;
+> 
+> NAK. If I'm getting global faults like C_BAD_STE where a device almost
+> certainly *isn't* configured (because hey, we would have initialised its
+> STEs if we knew), then I sure as hell want to see the actual faults.
+> Spamming a constant stream of stack traces *instead* of showing them is
+> worse than useless.
+Sure, if !master I will output the original traces.
+> 
+>> +
+>> +    event.fault.type = IOMMU_FAULT_DMA_UNRECOV;
+>> +
+>> +    if (arm_smmu_transcode_fault(evt, type, &event.fault.event)) {
+>> +        iommu_report_device_fault(master->dev, &event);
+>> +        return;
+> 
+> And again, the vast majority of the time, there won't be a fault handler
+> registered, so unconditionally suppressing the most common and useful
+> stuff like translation and permission faults is very much not OK.
+Going to test whether we are in nested mode before entering that path.
+
+Thanks!
+
+Eric
+> 
+> Robin.
+> 
+>> +    }
+>> +
+>> +    dev_info(smmu->dev, "event 0x%02x received:\n", type);
+>> +    for (i = 0; i < EVTQ_ENT_DWORDS; ++i) {
+>> +        dev_info(smmu->dev, "\t0x%016llx\n",
+>> +             (unsigned long long)evt[i]);
+>> +    }
+>> +}
+>> +
+>>   /* IRQ and event handlers */
+>>   static irqreturn_t arm_smmu_evtq_thread(int irq, void *dev)
+>>   {
+>> -    int i;
+>>       struct arm_smmu_device *smmu = dev;
+>>       struct arm_smmu_queue *q = &smmu->evtq.q;
+>>       u64 evt[EVTQ_ENT_DWORDS];
+>>         do {
+>> -        while (!queue_remove_raw(q, evt)) {
+>> -            u8 id = FIELD_GET(EVTQ_0_ID, evt[0]);
+>> -
+>> -            dev_info(smmu->dev, "event 0x%02x received:\n", id);
+>> -            for (i = 0; i < ARRAY_SIZE(evt); ++i)
+>> -                dev_info(smmu->dev, "\t0x%016llx\n",
+>> -                     (unsigned long long)evt[i]);
+>> -
+>> -        }
+>> +        while (!queue_remove_raw(q, evt))
+>> +            arm_smmu_report_event(smmu, evt);
+>>             /*
+>>            * Not much we can do on overflow, so scream and pretend we're
+>>
