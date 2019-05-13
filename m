@@ -2,93 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FF5C1AE5E
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 01:07:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A5FF1AEB5
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 03:22:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726910AbfELXHp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 May 2019 19:07:45 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:37581 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726664AbfELXHo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 May 2019 19:07:44 -0400
-Received: by mail-ot1-f65.google.com with SMTP id r10so9369369otd.4
-        for <kvm@vger.kernel.org>; Sun, 12 May 2019 16:07:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:reply-to:sender:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=isdxOJu0yyaPJTD+TRpvL3sx0A1P3TxEiS8bGbrVxqc=;
-        b=Q74SNWNWfnunv9bBpJjFx9XTHFzxORVi6pfGZGKumVoI8LYyX1oyN7zp8Of1EPyvOd
-         vEJjgZx2nE/wpFGNK1kswbVwnDvYyjiWUKxDKVPWVYnn+bZCDT5o7d6JPVgaXVWCLI5W
-         XnQTV/X+tyXTsUkIUppTAFvYFGcyiEIC98tOBzOQ34t1Z+onAIV6bhgaoKTEJTbC/AJG
-         01IoWeAc6/UaJ/eO50Nxda5OkliDSf5GAcPn/u3Y6FfWnia051dKxpe1uVKzBxMxuajO
-         WSD95UkWgDDZNnZAKkLju7hIOVqSfqLeHbqEwlUaXw8f2H7A0I/IsSN973vrJQKJ/xIE
-         VAng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:sender:from:date
-         :message-id:subject:to:content-transfer-encoding;
-        bh=isdxOJu0yyaPJTD+TRpvL3sx0A1P3TxEiS8bGbrVxqc=;
-        b=noyajaLSJeJNgIthSWqfaCjp2womFkXS3DWfuIS6JB5mPK11QcDr43AdJo7Fr/ss5J
-         xcLTg+CCavH8IZjoOPwctTkWr67QFtuX6c0mqQgAcPqBgqV99OMpgMrH83X+OLQrnaQI
-         yIEvJmKWTb+MEbD5hbYmrSTHrJw5kQU6RGBxH45Zd6OiRdye+NBH3xoIMWBt8gu5oe+6
-         Rjhjcv1NK1v+agaOlTHdZgVKYmB9vjXCoQoi9eQDs008HI4/qsAKTObjwpOLYze7ddY3
-         VOmA4gP06gIkkPSPzWXXlpr8vWWzVLm2tFor6VVa6LQxQrvZap1DsYo9yzZsCfI4EkAI
-         pFvw==
-X-Gm-Message-State: APjAAAVqwIzi3n+WEWDQqqxDqHUy9RUVN4p/xbZoq0t6FdvEKh9ievqm
-        LzEcGjEyD6UKdwhoIFNYOqUecHco3/Q/2EMPfec=
-X-Google-Smtp-Source: APXvYqyXKerFzJP+SUl5wgw3mjr//wuRh8SkYySaWl3G5W2y5+5aRq510EKbEEl24LG4m8pgMUgTjyRvpjvlsM2vbiA=
-X-Received: by 2002:a05:6830:14cd:: with SMTP id t13mr14422855otq.25.1557702463835;
- Sun, 12 May 2019 16:07:43 -0700 (PDT)
+        id S1727287AbfEMBWK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 May 2019 21:22:10 -0400
+Received: from mga17.intel.com ([192.55.52.151]:48260 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727131AbfEMBWK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 May 2019 21:22:10 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 May 2019 18:22:09 -0700
+X-ExtLoop1: 1
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.9])
+  by fmsmga005.fm.intel.com with ESMTP; 12 May 2019 18:22:05 -0700
+Date:   Sun, 12 May 2019 21:16:26 -0400
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "eskultet@redhat.com" <eskultet@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "berrange@redhat.com" <berrange@redhat.com>,
+        "dinechin@redhat.com" <dinechin@redhat.com>
+Subject: Re: [PATCH v2 1/2] vfio/mdev: add version attribute for mdev device
+Message-ID: <20190513011626.GI24397@joy-OptiPlex-7040>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20190506014514.3555-1-yan.y.zhao@intel.com>
+ <20190506014904.3621-1-yan.y.zhao@intel.com>
+ <20190507151826.502be009@x1.home>
+ <20190509173839.2b9b2b46.cohuck@redhat.com>
+ <20190509154857.GF2868@work-vm>
+ <20190509175404.512ae7aa.cohuck@redhat.com>
+ <20190509164825.GG2868@work-vm>
+ <20190510110838.2df4c4d0.cohuck@redhat.com>
+ <20190510093608.GD2854@work-vm>
+ <20190510114838.7e16c3d6.cohuck@redhat.com>
 MIME-Version: 1.0
-Reply-To: mrshenritapieres1@gmail.com
-Received: by 2002:a4a:9dc9:0:0:0:0:0 with HTTP; Sun, 12 May 2019 16:07:43
- -0700 (PDT)
-From:   Henrita Pieres <piereshenrita61@gmail.com>
-Date:   Sun, 12 May 2019 16:07:43 -0700
-X-Google-Sender-Auth: ESj1atiBeHtur2-t2eTzQvvTuH4
-Message-ID: <CADN_KkkBga=fN6qVc=DwTqqvvYK2mmhj2iATyPisdHv27sn58A@mail.gmail.com>
-Subject: Hello
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190510114838.7e16c3d6.cohuck@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Dear,
+On Fri, May 10, 2019 at 05:48:38PM +0800, Cornelia Huck wrote:
+> On Fri, 10 May 2019 10:36:09 +0100
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> 
+> > * Cornelia Huck (cohuck@redhat.com) wrote:
+> > > On Thu, 9 May 2019 17:48:26 +0100
+> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > >   
+> > > > * Cornelia Huck (cohuck@redhat.com) wrote:  
+> > > > > On Thu, 9 May 2019 16:48:57 +0100
+> > > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > > > >     
+> > > > > > * Cornelia Huck (cohuck@redhat.com) wrote:    
+> > > > > > > On Tue, 7 May 2019 15:18:26 -0600
+> > > > > > > Alex Williamson <alex.williamson@redhat.com> wrote:
+> > > > > > >       
+> > > > > > > > On Sun,  5 May 2019 21:49:04 -0400
+> > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:      
+> > > > > > >       
+> > > > > > > > > +  Errno:
+> > > > > > > > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev
+> > > > > > > > > +  devices, it should not register version attribute for this mdev device. But if
+> > > > > > > > > +  a vendor driver has already registered version attribute and it wants to claim
+> > > > > > > > > +  a mdev device incompatible to all other mdev devices, it needs to return
+> > > > > > > > > +  -ENODEV on access to this mdev device's version attribute.
+> > > > > > > > > +  If a mdev device is only incompatible to certain mdev devices, write of
+> > > > > > > > > +  incompatible mdev devices's version strings to its version attribute should
+> > > > > > > > > +  return -EINVAL;        
+> > > > > > > > 
+> > > > > > > > I think it's best not to define the specific errno returned for a
+> > > > > > > > specific situation, let the vendor driver decide, userspace simply
+> > > > > > > > needs to know that an errno on read indicates the device does not
+> > > > > > > > support migration version comparison and that an errno on write
+> > > > > > > > indicates the devices are incompatible or the target doesn't support
+> > > > > > > > migration versions.      
+> > > > > > > 
+> > > > > > > I think I have to disagree here: It's probably valuable to have an
+> > > > > > > agreed error for 'cannot migrate at all' vs 'cannot migrate between
+> > > > > > > those two particular devices'. Userspace might want to do different
+> > > > > > > things (e.g. trying with different device pairs).      
+> > > > > > 
+> > > > > > Trying to stuff these things down an errno seems a bad idea; we can't
+> > > > > > get much information that way.    
+> > > > > 
+> > > > > So, what would be a reasonable approach? Userspace should first read
+> > > > > the version attributes on both devices (to find out whether migration
+> > > > > is supported at all), and only then figure out via writing whether they
+> > > > > are compatible?
+> > > > > 
+> > > > > (Or just go ahead and try, if it does not care about the reason.)    
+> > > > 
+> > > > Well, I'm OK with something like writing to test whether it's
+> > > > compatible, it's just we need a better way of saying 'no'.
+> > > > I'm not sure if that involves reading back from somewhere after
+> > > > the write or what.  
+> > > 
+> > > Hm, so I basically see two ways of doing that:
+> > > - standardize on some error codes... problem: error codes can be hard
+> > >   to fit to reasons
+> > > - make the error available in some attribute that can be read
+> > > 
+> > > I'm not sure how we can serialize the readback with the last write,
+> > > though (this looks inherently racy).
+> > > 
+> > > How important is detailed error reporting here?  
+> > 
+> > I think we need something, otherwise we're just going to get vague
+> > user reports of 'but my VM doesn't migrate'; I'd like the error to be
+> > good enough to point most users to something they can understand
+> > (e.g. wrong card family/too old a driver etc).
+> 
+> Ok, that sounds like a reasonable point. Not that I have a better idea
+> how to achieve that, though... we could also log a more verbose error
+> message to the kernel log, but that's not necessarily where a user will
+> look first.
+> 
+> Ideally, we'd want to have the user space program setting up things
+> querying the general compatibility for migration (so that it becomes
+> their problem on how to alert the user to problems :), but I'm not sure
+> how to eliminate the race between asking the vendor driver for
+> compatibility and getting the result of that operation.
+> 
+> Unless we introduce an interface that can retrieve _all_ results
+> together with the written value? Or is that not going to be much of a
+> problem in practice?
+what about defining a migration_errors attribute, storing recent 10 error
+records with format like:
+    input string: error
+as identical input strings always have the same error string, the 10 error
+records may meet 10+ reason querying operations. And in practice, I think there
+wouldn't be 10 simultaneous migration requests?
 
-Please forgive me for stressing you with my predicaments as I know
-that this letter may come to you as big surprise.  Actually, I came
-across your E-mail from my personal search afterward I decided to
-email you directly believing that you will be honest to fulfill my
-final wish before i die. Meanwhile, I am Mrs. Henrita Pieres, 62 years
-old, from France, and I am  suffering from a long time cancer and from
-all indication my condition is really deteriorating as my doctors have
-confirmed and courageously Advised me that I may not live beyond two
-months from now for the reason that my tumor has reached a  critical
-stage which has defiled all forms of medical treatment, As a matter of
-fact, registered nurse by profession while my  husband was dealing on
-Gold Dust and Gold Dory Bars in Burkina Faso till his sudden death the
-year 2012 then I took over his business till date. In fact, at this
-moment I have a deposit sum of four million five hundred thousand US
-dollars   [$4,500,000.00] with one of the leading bank in Burkina Faso
-but unfortunately I cannot visit the bank since I=E2=80=99m critically sick
-and powerless to do anything myself but my bank account officer
-advised me to assign any of my trustworthy relative, friends or
-partner with authorization letter to stand as the recipient of my
-money but sorrowfully I don=E2=80=99t have any reliable relative and no chi=
-ld.
-
-Therefore, I want you to receive the money and take 50% to take care
-of yourself and family while 50% should be use basically  on
-humanitarian purposes mostly to orphanages home, Motherless babies
-home, less privileged and disable citizens and widows around the
-world. And as soon as I receive your respond I shall send you the full
-details with my pictures, banking records and with full contacts of my
-banking institution to communicate them on the matter.
-
-Hope to hear from you soon.
-Yours Faithfully,
-Mrs. Henrita Pieres
+or could we just define some common errno? like 
+#define ENOMIGRATION         140  /* device not supporting migration */
+#define EUNATCH              49  /* software version not match */
+#define EHWNM                142  /* hardware not matching*/
