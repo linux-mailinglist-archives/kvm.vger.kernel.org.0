@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 58A9F1B8A7
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 16:41:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA9601B888
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 16:40:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730452AbfEMOkB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 10:40:01 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:37252 "EHLO
+        id S1730514AbfEMOkC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 10:40:02 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:37302 "EHLO
         aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730420AbfEMOkA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 10:40:00 -0400
+        with ESMTP id S1730447AbfEMOkC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 10:40:02 -0400
 Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4DEd28F193025;
-        Mon, 13 May 2019 14:39:16 GMT
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4DEd3jQ193102;
+        Mon, 13 May 2019 14:39:24 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=3oQZsnmQ7NshrUK5gBFOiQdwJCmvyMk7rTDgLZ4eiR8=;
- b=cackC5e/rN14Atf5QlnsuYve24xrmHKk5OAv4LozaAp9vhiUL7E7xPH3kbnOM8VYLH+M
- qQZDMDajYAWzXDX4pYfxSi/cFR9+miTzGtpQvwsGANTuO936Hac7155wikox7cO9zHM6
- D6VSW0wFlH4kS9hhjEHDuhBzZL61Y1YPaaQ9QapuqevDj5phnii9KR4rMc6oFyvj+0cK
- chnwMcSACXVNjOAa1xqmZO14HcVVu9E4v0xi+ZQhdjbaq/Q1oelYLJg/hz12bN7CBmtg
- 1H1C0ZDiqvGmCSUtMdjVlrxOudApkaffggciBhogmTfWK5aks2i24a2IdgYkJ3LSxlPk OA== 
+ bh=5Qtz3s/XQzDItLwgII6a7yqyolD8+y7jKItUNNZ5jHw=;
+ b=bc0UAXJuEUDdxvyu9LwCdXHqD4qh6pNojWMqcM9jSLBAxGM6igASeeKPL3IWePb5ch0s
+ fbCFf/kSYwqFzCOuWD0pbNuB78gAyLFK5Ed4veTVvUvCkVI2DR43VeRRk0g9ufQAr0sw
+ e6QhuGNeEnywPiXsoWdU2luDBNsmNNUqdcfqgUJyVy51fsmTOMsXHwAuC4cslhey/L9A
+ UYFWoKFzlhctdRm9y9d9iC7Djqvsf9+FCNhU/NbXFxMpjmDvfMOaaoR1Y5lpKRNKz4fW
+ VMMMFGBaxysR4n+y/P893dNcj5PpeJwOEyHs1Tnsryx4DvPOgcmS7i7F6ug4vAd8pZZL 3A== 
 Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by aserp2130.oracle.com with ESMTP id 2sdkwdfkwq-1
+        by aserp2130.oracle.com with ESMTP id 2sdkwdfkxg-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 May 2019 14:39:16 +0000
+        Mon, 13 May 2019 14:39:24 +0000
 Received: from achartre-desktop.fr.oracle.com (dhcp-10-166-106-34.fr.oracle.com [10.166.106.34])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x4DEcZQF022780;
-        Mon, 13 May 2019 14:39:13 GMT
+        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x4DEcZQG022780;
+        Mon, 13 May 2019 14:39:16 GMT
 From:   Alexandre Chartre <alexandre.chartre@oracle.com>
 To:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
@@ -38,9 +38,9 @@ To:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
 Cc:     konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
         liran.alon@oracle.com, jwadams@google.com,
         alexandre.chartre@oracle.com
-Subject: [RFC KVM 12/27] kvm/isolation: add KVM page table entry allocation functions
-Date:   Mon, 13 May 2019 16:38:20 +0200
-Message-Id: <1557758315-12667-13-git-send-email-alexandre.chartre@oracle.com>
+Subject: [RFC KVM 13/27] kvm/isolation: add KVM page table entry set functions
+Date:   Mon, 13 May 2019 16:38:21 +0200
+Message-Id: <1557758315-12667-14-git-send-email-alexandre.chartre@oracle.com>
 X-Mailer: git-send-email 1.7.1
 In-Reply-To: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
 References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
@@ -55,114 +55,127 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These functions allocate p4d/pud/pmd/pte pages and ensure that
-pages are in the KVM page table.
+Add wrappers around the page table entry (pgd/p4d/pud/pmd) set function
+to check that an existing entry is not being overwritten.
 
 Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
 ---
- arch/x86/kvm/isolation.c |   94 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 94 insertions(+), 0 deletions(-)
+ arch/x86/kvm/isolation.c |  107 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 files changed, 107 insertions(+), 0 deletions(-)
 
 diff --git a/arch/x86/kvm/isolation.c b/arch/x86/kvm/isolation.c
-index b29a09b..6ec86df 100644
+index 6ec86df..b681e4f 100644
 --- a/arch/x86/kvm/isolation.c
 +++ b/arch/x86/kvm/isolation.c
-@@ -248,6 +248,100 @@ static inline void kvm_p4d_free(struct mm_struct *mm, p4d_t *p4d)
- 	p4d_free(mm, PGTD_ALIGN(p4d));
+@@ -342,6 +342,113 @@ static inline void kvm_p4d_free(struct mm_struct *mm, p4d_t *p4d)
+ 	return p4d;
  }
  
 +/*
-+ * kvm_pXX_alloc() functions are equivalent to kernel pXX_alloc()
-+ * functions but, in addition, they ensure that page table pointers
-+ * are in the KVM page table. Otherwise an error is returned.
++ * kvm_set_pXX() functions are equivalent to kernel set_pXX() functions
++ * but, in addition, they ensure that they are not overwriting an already
++ * existing reference in the page table. Otherwise an error is returned.
++ *
++ * Note that this is not used for PTE because a PTE entry points to page
++ * frames containing the actual user data, and not to another entry in the
++ * page table. However this is used for PGD.
 + */
 +
-+static pte_t *kvm_pte_alloc(struct mm_struct *mm, pmd_t *pmd,
-+			    unsigned long addr)
++static int kvm_set_pmd(pmd_t *pmd, pmd_t pmd_value)
 +{
-+	pte_t *pte;
++#ifdef DEBUG
++	/*
++	 * The pmd pointer should come from kvm_pmd_alloc() or kvm_pmd_offset()
++	 * both of which check if the pointer is in the KVM page table. So this
++	 * is a paranoid check to ensure the pointer is really in the KVM page
++	 * table.
++	 */
++	if (!kvm_valid_pgt_entry(pmd)) {
++		pr_err("PMD %px is not in KVM page table\n", pmd);
++		return -EINVAL;
++	}
++#endif
++	if (pmd_val(*pmd) == pmd_val(pmd_value))
++		return 0;
 +
-+	if (pmd_none(*pmd)) {
-+		pte = pte_alloc_kernel(pmd, addr);
-+		if (!pte) {
-+			pr_debug("PTE: ERR ALLOC\n");
-+			return ERR_PTR(-ENOMEM);
-+		}
-+		if (!kvm_add_pgt_directory(pte, PGT_LEVEL_PTE)) {
-+			kvm_pte_free(mm, pte);
-+			return ERR_PTR(-EINVAL);
-+		}
-+	} else {
-+		pte = kvm_pte_offset(pmd, addr);
++	if (!pmd_none(*pmd)) {
++		pr_err("PMD %px: overwriting %lx with %lx\n",
++		    pmd, pmd_val(*pmd), pmd_val(pmd_value));
++		return -EBUSY;
 +	}
 +
-+	return pte;
++	set_pmd(pmd, pmd_value);
++
++	return 0;
 +}
 +
-+static pmd_t *kvm_pmd_alloc(struct mm_struct *mm, pud_t *pud,
-+			    unsigned long addr)
++static int kvm_set_pud(pud_t *pud, pud_t pud_value)
 +{
-+	pmd_t *pmd;
++#ifdef DEBUG
++	/*
++	 * The pud pointer should come from kvm_pud_alloc() or kvm_pud_offset()
++	 * both of which check if the pointer is in the KVM page table. So this
++	 * is a paranoid check to ensure the pointer is really in the KVM page
++	 * table.
++	 */
++	if (!kvm_valid_pgt_entry(pud)) {
++		pr_err("PUD %px is not in KVM page table\n", pud);
++		return -EINVAL;
++	}
++#endif
++	if (pud_val(*pud) == pud_val(pud_value))
++		return 0;
 +
-+	if (pud_none(*pud)) {
-+		pmd = pmd_alloc(mm, pud, addr);
-+		if (!pmd) {
-+			pr_debug("PMD: ERR ALLOC\n");
-+			return ERR_PTR(-ENOMEM);
-+		}
-+		if (!kvm_add_pgt_directory(pmd, PGT_LEVEL_PMD)) {
-+			kvm_pmd_free(mm, pmd);
-+			return ERR_PTR(-EINVAL);
-+		}
-+	} else {
-+		pmd = kvm_pmd_offset(pud, addr);
++	if (!pud_none(*pud)) {
++		pr_err("PUD %px: overwriting %lx\n", pud, pud_val(*pud));
++		return -EBUSY;
 +	}
 +
-+	return pmd;
++	set_pud(pud, pud_value);
++
++	return 0;
 +}
 +
-+static pud_t *kvm_pud_alloc(struct mm_struct *mm, p4d_t *p4d,
-+			    unsigned long addr)
++static int kvm_set_p4d(p4d_t *p4d, p4d_t p4d_value)
 +{
-+	pud_t *pud;
++#ifdef DEBUG
++	/*
++	 * The p4d pointer should come from kvm_p4d_alloc() or kvm_p4d_offset()
++	 * both of which check if the pointer is in the KVM page table. So this
++	 * is a paranoid check to ensure the pointer is really in the KVM page
++	 * table.
++	 */
++	if (!kvm_valid_pgt_entry(p4d)) {
++		pr_err("P4D %px is not in KVM page table\n", p4d);
++		return -EINVAL;
++	}
++#endif
++	if (p4d_val(*p4d) == p4d_val(p4d_value))
++		return 0;
 +
-+	if (p4d_none(*p4d)) {
-+		pud = pud_alloc(mm, p4d, addr);
-+		if (!pud) {
-+			pr_debug("PUD: ERR ALLOC\n");
-+			return ERR_PTR(-ENOMEM);
-+		}
-+		if (!kvm_add_pgt_directory(pud, PGT_LEVEL_PUD)) {
-+			kvm_pud_free(mm, pud);
-+			return ERR_PTR(-EINVAL);
-+		}
-+	} else {
-+		pud = kvm_pud_offset(p4d, addr);
++	if (!p4d_none(*p4d)) {
++		pr_err("P4D %px: overwriting %lx\n", p4d, p4d_val(*p4d));
++		return -EBUSY;
 +	}
 +
-+	return pud;
++	set_p4d(p4d, p4d_value);
++
++	return 0;
 +}
 +
-+static p4d_t *kvm_p4d_alloc(struct mm_struct *mm, pgd_t *pgd,
-+			    unsigned long addr)
++static int kvm_set_pgd(pgd_t *pgd, pgd_t pgd_value)
 +{
-+	p4d_t *p4d;
++	if (pgd_val(*pgd) == pgd_val(pgd_value))
++		return 0;
 +
-+	if (pgd_none(*pgd)) {
-+		p4d = p4d_alloc(mm, pgd, addr);
-+		if (!p4d) {
-+			pr_debug("P4D: ERR ALLOC\n");
-+			return ERR_PTR(-ENOMEM);
-+		}
-+		if (!kvm_add_pgt_directory(p4d, PGT_LEVEL_P4D)) {
-+			kvm_p4d_free(mm, p4d);
-+			return ERR_PTR(-EINVAL);
-+		}
-+	} else {
-+		p4d = kvm_p4d_offset(pgd, addr);
++	if (!pgd_none(*pgd)) {
++		pr_err("PGD %px: overwriting %lx\n", pgd, pgd_val(*pgd));
++		return -EBUSY;
 +	}
 +
-+	return p4d;
++	set_pgd(pgd, pgd_value);
++
++	return 0;
 +}
 +
  
