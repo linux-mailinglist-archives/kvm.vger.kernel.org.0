@@ -2,162 +2,277 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 84CC81B707
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 15:28:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 121D61B70A
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2019 15:29:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729458AbfEMN2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 09:28:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59410 "EHLO mx1.redhat.com"
+        id S1730099AbfEMN3f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 09:29:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42056 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728409AbfEMN2V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 09:28:21 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        id S1728409AbfEMN3f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 09:29:35 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 285468830B;
-        Mon, 13 May 2019 13:28:20 +0000 (UTC)
-Received: from beluga.usersys.redhat.com (unknown [10.43.2.166])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D1EE10027DA;
-        Mon, 13 May 2019 13:28:07 +0000 (UTC)
-Date:   Mon, 13 May 2019 15:28:04 +0200
-From:   Erik Skultety <eskultet@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        intel-gvt-dev@lists.freedesktop.org, arei.gonglei@huawei.com,
-        aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com,
-        shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org,
-        eauger@redhat.com, yi.l.liu@intel.com, ziye.yang@intel.com,
-        mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
-        changpeng.liu@intel.com, Ken.Xue@amd.com,
-        jonathan.davies@nutanix.com, shaopeng.he@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        libvir-list@redhat.com, kevin.tian@intel.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, cjia@nvidia.com,
-        kwankhede@nvidia.com, berrange@redhat.com, dinechin@redhat.com
-Subject: Re: [PATCH v2 1/2] vfio/mdev: add version attribute for mdev device
-Message-ID: <20190513132804.GD11139@beluga.usersys.redhat.com>
-References: <20190506014514.3555-1-yan.y.zhao@intel.com>
- <20190506014904.3621-1-yan.y.zhao@intel.com>
- <20190507151826.502be009@x1.home>
- <20190509173839.2b9b2b46.cohuck@redhat.com>
- <20190509154857.GF2868@work-vm>
- <20190509175404.512ae7aa.cohuck@redhat.com>
- <20190509164825.GG2868@work-vm>
- <20190510110838.2df4c4d0.cohuck@redhat.com>
- <20190510093608.GD2854@work-vm>
- <20190510114838.7e16c3d6.cohuck@redhat.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id 4203E308620E;
+        Mon, 13 May 2019 13:29:34 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 239FF5C225;
+        Mon, 13 May 2019 13:29:26 +0000 (UTC)
+Date:   Mon, 13 May 2019 15:29:24 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Sebastian Ott <sebott@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Michael Mueller <mimu@linux.ibm.com>
+Subject: Re: [PATCH 05/10] s390/cio: introduce DMA pools to cio
+Message-ID: <20190513152924.1e8e8f5a.cohuck@redhat.com>
+In-Reply-To: <20190512202256.5517592d.pasic@linux.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+        <20190426183245.37939-6-pasic@linux.ibm.com>
+        <alpine.LFD.2.21.1905081447280.1773@schleppi>
+        <20190508232210.5a555caa.pasic@linux.ibm.com>
+        <20190509121106.48aa04db.cohuck@redhat.com>
+        <20190510001112.479b2fd7.pasic@linux.ibm.com>
+        <20190510161013.7e697337.cohuck@redhat.com>
+        <20190512202256.5517592d.pasic@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190510114838.7e16c3d6.cohuck@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Mon, 13 May 2019 13:28:20 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Mon, 13 May 2019 13:29:34 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 10, 2019 at 11:48:38AM +0200, Cornelia Huck wrote:
-> On Fri, 10 May 2019 10:36:09 +0100
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
->
-> > * Cornelia Huck (cohuck@redhat.com) wrote:
-> > > On Thu, 9 May 2019 17:48:26 +0100
-> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > >
-> > > > * Cornelia Huck (cohuck@redhat.com) wrote:
-> > > > > On Thu, 9 May 2019 16:48:57 +0100
-> > > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > > > >
-> > > > > > * Cornelia Huck (cohuck@redhat.com) wrote:
-> > > > > > > On Tue, 7 May 2019 15:18:26 -0600
-> > > > > > > Alex Williamson <alex.williamson@redhat.com> wrote:
-> > > > > > >
-> > > > > > > > On Sun,  5 May 2019 21:49:04 -0400
-> > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > > > >
-> > > > > > > > > +  Errno:
-> > > > > > > > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev
-> > > > > > > > > +  devices, it should not register version attribute for this mdev device. But if
-> > > > > > > > > +  a vendor driver has already registered version attribute and it wants to claim
-> > > > > > > > > +  a mdev device incompatible to all other mdev devices, it needs to return
-> > > > > > > > > +  -ENODEV on access to this mdev device's version attribute.
-> > > > > > > > > +  If a mdev device is only incompatible to certain mdev devices, write of
-> > > > > > > > > +  incompatible mdev devices's version strings to its version attribute should
-> > > > > > > > > +  return -EINVAL;
-> > > > > > > >
-> > > > > > > > I think it's best not to define the specific errno returned for a
-> > > > > > > > specific situation, let the vendor driver decide, userspace simply
-> > > > > > > > needs to know that an errno on read indicates the device does not
-> > > > > > > > support migration version comparison and that an errno on write
-> > > > > > > > indicates the devices are incompatible or the target doesn't support
-> > > > > > > > migration versions.
-> > > > > > >
-> > > > > > > I think I have to disagree here: It's probably valuable to have an
-> > > > > > > agreed error for 'cannot migrate at all' vs 'cannot migrate between
-> > > > > > > those two particular devices'. Userspace might want to do different
-> > > > > > > things (e.g. trying with different device pairs).
-> > > > > >
-> > > > > > Trying to stuff these things down an errno seems a bad idea; we can't
-> > > > > > get much information that way.
-> > > > >
-> > > > > So, what would be a reasonable approach? Userspace should first read
-> > > > > the version attributes on both devices (to find out whether migration
-> > > > > is supported at all), and only then figure out via writing whether they
-> > > > > are compatible?
-> > > > >
-> > > > > (Or just go ahead and try, if it does not care about the reason.)
-> > > >
-> > > > Well, I'm OK with something like writing to test whether it's
-> > > > compatible, it's just we need a better way of saying 'no'.
-> > > > I'm not sure if that involves reading back from somewhere after
-> > > > the write or what.
-> > >
-> > > Hm, so I basically see two ways of doing that:
-> > > - standardize on some error codes... problem: error codes can be hard
-> > >   to fit to reasons
-> > > - make the error available in some attribute that can be read
-> > >
-> > > I'm not sure how we can serialize the readback with the last write,
-> > > though (this looks inherently racy).
-> > >
-> > > How important is detailed error reporting here?
-> >
-> > I think we need something, otherwise we're just going to get vague
-> > user reports of 'but my VM doesn't migrate'; I'd like the error to be
-> > good enough to point most users to something they can understand
-> > (e.g. wrong card family/too old a driver etc).
->
-> Ok, that sounds like a reasonable point. Not that I have a better idea
-> how to achieve that, though... we could also log a more verbose error
-> message to the kernel log, but that's not necessarily where a user will
-> look first.
+On Sun, 12 May 2019 20:22:56 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-In case of libvirt checking the compatibility, it won't matter how good the
-error message in the kernel log is and regardless of how many error states you
-want to handle, libvirt's only limited to errno here, since we're going to do
-plain read/write, so our internal error message returned to the user is only
-going to contain what the errno says - okay, of course we can (and we DO)
-provide libvirt specific string, further specifying the error but like I
-mentioned, depending on how many error cases we want to distinguish this may be
-hard for anyone to figure out solely on the error code, as apps will most
-probably not parse the
-logs.
+> On Fri, 10 May 2019 16:10:13 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > On Fri, 10 May 2019 00:11:12 +0200
+> > Halil Pasic <pasic@linux.ibm.com> wrote:
+> >   
+> > > On Thu, 9 May 2019 12:11:06 +0200
+> > > Cornelia Huck <cohuck@redhat.com> wrote:
+> > >   
+> > > > On Wed, 8 May 2019 23:22:10 +0200
+> > > > Halil Pasic <pasic@linux.ibm.com> wrote:
+> > > >     
+> > > > > On Wed, 8 May 2019 15:18:10 +0200 (CEST)
+> > > > > Sebastian Ott <sebott@linux.ibm.com> wrote:    
+> > > >     
+> > > > > > > @@ -1063,6 +1163,7 @@ static int __init css_bus_init(void)
+> > > > > > >  		unregister_reboot_notifier(&css_reboot_notifier);
+> > > > > > >  		goto out_unregister;
+> > > > > > >  	}
+> > > > > > > +	cio_dma_pool_init();        
+> > > > > > 
+> > > > > > This is too late for early devices (ccw console!).      
+> > > > > 
+> > > > > You have already raised concern about this last time (thanks). I think,
+> > > > > I've addressed this issue: the cio_dma_pool is only used by the airq
+> > > > > stuff. I don't think the ccw console needs it. Please have an other look
+> > > > > at patch #6, and explain your concern in more detail if it persists.    
+> > > > 
+> > > > What about changing the naming/adding comments here, so that (1) folks
+> > > > aren't confused by the same thing in the future and (2) folks don't try
+> > > > to use that pool for something needed for the early ccw consoles?
+> > > >     
+> > > 
+> > > I'm all for clarity! Suggestions for better names?  
+> > 
+> > css_aiv_dma_pool, maybe? Or is there other cross-device stuff that may
+> > need it?
+> >   
+> 
+> Ouch! I was considering to use cio_dma_zalloc() for the adapter
+> interruption vectors but I ended up between the two chairs in the end.
+> So with this series there are no uses for cio_dma pool.
+> 
+> I don't feel strongly about this going one way the other.
+> 
+> Against getting rid of the cio_dma_pool and sticking with the speaks
+> dma_alloc_coherent() that we waste a DMA page per vector, which is a
+> non obvious side effect.
 
-Regards,
-Erik
->
-> Ideally, we'd want to have the user space program setting up things
-> querying the general compatibility for migration (so that it becomes
-> their problem on how to alert the user to problems :), but I'm not sure
-> how to eliminate the race between asking the vendor driver for
-> compatibility and getting the result of that operation.
->
-> Unless we introduce an interface that can retrieve _all_ results
-> together with the written value? Or is that not going to be much of a
-> problem in practice?
+That would basically mean one DMA page per virtio-ccw device, right?
+For single queue devices, this seems like quite a bit of overhead.
 
+Are we expecting many devices in use per guest?
+
+> 
+> What speaks against cio_dma_pool is that it is slightly more code, and
+> this currently can not be used for very early stuff, which I don't
+> think is relevant. 
+
+Unless properly documented, it feels like something you can easily trip
+over, however.
+
+I assume that the "very early stuff" is basically only ccw consoles.
+Not sure if we can use virtio-serial as an early ccw console -- IIRC
+that was only about 3215/3270? While QEMU guests are able to use a 3270
+console, this is experimental and I would not count that as a use case.
+Anyway, 3215/3270 don't use adapter interrupts, and probably not
+anything cross-device, either; so unless early virtio-serial is a
+thing, this restriction is fine if properly documented.
+
+> What also used to speak against it is that
+> allocations asking for more than a page would just fail, but I addressed
+> that in the patch I've hacked up on top of the series, and I'm going to
+> paste below. While at it I addressed some other issues as well.
+
+Hm, which "other issues"?
+
+> 
+> I've also got code that deals with AIRQ_IV_CACHELINE by turning the
+> kmem_cache into a dma_pool.
+
+Isn't that percolating to other airq users again? Or maybe I just don't
+understand what you're proposing here...
+
+> 
+> Cornelia, Sebastian which approach do you prefer:
+> 1) get rid of cio_dma_pool and AIRQ_IV_CACHELINE, and waste a page per
+> vector, or
+> 2) go with the approach taken by the patch below?
+
+I'm not sure that I properly understand this (yeah, you probably
+guessed); so I'm not sure I can make a good call here.
+
+> 
+> 
+> Regards,
+> Halil
+> -----------------------8<---------------------------------------------
+> From: Halil Pasic <pasic@linux.ibm.com>
+> Date: Sun, 12 May 2019 18:08:05 +0200
+> Subject: [PATCH] WIP: use cio dma pool for airqs
+> 
+> Let's not waste a DMA page per adapter interrupt bit vector.
+> ---
+> Lightly tested...
+> ---
+>  arch/s390/include/asm/airq.h |  1 -
+>  drivers/s390/cio/airq.c      | 10 +++-------
+>  drivers/s390/cio/css.c       | 18 +++++++++++++++---
+>  3 files changed, 18 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/s390/include/asm/airq.h b/arch/s390/include/asm/airq.h
+> index 1492d48..981a3eb 100644
+> --- a/arch/s390/include/asm/airq.h
+> +++ b/arch/s390/include/asm/airq.h
+> @@ -30,7 +30,6 @@ void unregister_adapter_interrupt(struct airq_struct *airq);
+>  /* Adapter interrupt bit vector */
+>  struct airq_iv {
+>  	unsigned long *vector;	/* Adapter interrupt bit vector */
+> -	dma_addr_t vector_dma; /* Adapter interrupt bit vector dma */
+>  	unsigned long *avail;	/* Allocation bit mask for the bit vector */
+>  	unsigned long *bitlock;	/* Lock bit mask for the bit vector */
+>  	unsigned long *ptr;	/* Pointer associated with each bit */
+> diff --git a/drivers/s390/cio/airq.c b/drivers/s390/cio/airq.c
+> index 7a5c0a0..f11f437 100644
+> --- a/drivers/s390/cio/airq.c
+> +++ b/drivers/s390/cio/airq.c
+> @@ -136,8 +136,7 @@ struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags)
+>  		goto out;
+>  	iv->bits = bits;
+>  	size = iv_size(bits);
+> -	iv->vector = dma_alloc_coherent(cio_get_dma_css_dev(), size,
+> -						 &iv->vector_dma, GFP_KERNEL);
+> +	iv->vector = cio_dma_zalloc(size);
+>  	if (!iv->vector)
+>  		goto out_free;
+>  	if (flags & AIRQ_IV_ALLOC) {
+> @@ -172,8 +171,7 @@ struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags)
+>  	kfree(iv->ptr);
+>  	kfree(iv->bitlock);
+>  	kfree(iv->avail);
+> -	dma_free_coherent(cio_get_dma_css_dev(), size, iv->vector,
+> -			  iv->vector_dma);
+> +	cio_dma_free(iv->vector, size);
+>  	kfree(iv);
+>  out:
+>  	return NULL;
+> @@ -189,9 +187,7 @@ void airq_iv_release(struct airq_iv *iv)
+>  	kfree(iv->data);
+>  	kfree(iv->ptr);
+>  	kfree(iv->bitlock);
+> -	kfree(iv->vector);
+> -	dma_free_coherent(cio_get_dma_css_dev(), iv_size(iv->bits),
+> -			  iv->vector, iv->vector_dma);
+> +	cio_dma_free(iv->vector, iv_size(iv->bits));
+>  	kfree(iv->avail);
+>  	kfree(iv);
+>  }
+> diff --git a/drivers/s390/cio/css.c b/drivers/s390/cio/css.c
+> index 7087cc3..88d9c92 100644
+> --- a/drivers/s390/cio/css.c
+> +++ b/drivers/s390/cio/css.c
+> @@ -1063,7 +1063,10 @@ struct gen_pool *cio_gp_dma_create(struct device *dma_dev, int nr_pages)
+>  static void __gp_dma_free_dma(struct gen_pool *pool,
+>  			      struct gen_pool_chunk *chunk, void *data)
+>  {
+> -	dma_free_coherent((struct device *) data, PAGE_SIZE,
+> +
+> +	size_t chunk_size = chunk->end_addr - chunk->start_addr + 1;
+> +
+> +	dma_free_coherent((struct device *) data, chunk_size,
+>  			 (void *) chunk->start_addr,
+>  			 (dma_addr_t) chunk->phys_addr);
+>  }
+> @@ -1088,13 +1091,15 @@ void *cio_gp_dma_zalloc(struct gen_pool *gp_dma, struct device *dma_dev,
+>  {
+>  	dma_addr_t dma_addr;
+>  	unsigned long addr = gen_pool_alloc(gp_dma, size);
+> +	size_t chunk_size;
+>  
+>  	if (!addr) {
+> +		chunk_size = round_up(size, PAGE_SIZE);
+
+Doesn't that mean that we still go up to chunks of at least PAGE_SIZE?
+Or can vectors now share the same chunk?
+
+>  		addr = (unsigned long) dma_alloc_coherent(dma_dev,
+> -					PAGE_SIZE, &dma_addr, CIO_DMA_GFP);
+> +					 chunk_size, &dma_addr, CIO_DMA_GFP);
+>  		if (!addr)
+>  			return NULL;
+> -		gen_pool_add_virt(gp_dma, addr, dma_addr, PAGE_SIZE, -1);
+> +		gen_pool_add_virt(gp_dma, addr, dma_addr, chunk_size, -1);
+>  		addr = gen_pool_alloc(gp_dma, size);
+>  	}
+>  	return (void *) addr;
+> @@ -1108,6 +1113,13 @@ void cio_gp_dma_free(struct gen_pool *gp_dma, void *cpu_addr, size_t size)
+>  	gen_pool_free(gp_dma, (unsigned long) cpu_addr, size);
+>  }
+>  
+> +/**
+> + * Allocate dma memory from the css global pool. Intended for memory not
+> + * specific to any single device within the css.
+> + *
+> + * Caution: Not suitable for early stuff like console.
+
+Maybe add "Do not use prior to <point in startup>"?
+
+> + *
+> + */
+>  void *cio_dma_zalloc(size_t size)
+>  {
+>  	return cio_gp_dma_zalloc(cio_dma_pool, cio_get_dma_css_dev(), size);
 
