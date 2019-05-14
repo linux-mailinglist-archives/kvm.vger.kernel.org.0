@@ -2,257 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B7A11E449
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 00:08:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 64F981E456
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 00:16:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726338AbfENWIX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 18:08:23 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:1820 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726148AbfENWIX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 18:08:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1557871701; x=1589407701;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:mime-version:
-   content-transfer-encoding;
-  bh=PRP1xBxuo+1R+ttuKDucVSYxEcz5wPNDFETPGhUhDeg=;
-  b=LQpxGUSjdqJ5oZqjmFwOyytXC4+uIG9f5CzhSyAIs4n5Qe+yj3ax9Ezg
-   Le2QvlX0VFHhOxfUnje/TWMZPxbI3ZfKd3aEhktB6C2wG6iUavTTopuxZ
-   Ikad/aZyrzO8ZgIGa4RXSTcKUUqyVrZsTn9AxNttvf2QTgyraqEinZhJe
-   U=;
-X-IronPort-AV: E=Sophos;i="5.60,470,1549929600"; 
-   d="scan'208";a="799668867"
-Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-2b-55156cd4.us-west-2.amazon.com) ([10.47.22.34])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 14 May 2019 22:08:19 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2b-55156cd4.us-west-2.amazon.com (8.14.7/8.14.7) with ESMTP id x4EM8F2O129758
-        (version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=FAIL);
-        Tue, 14 May 2019 22:08:19 GMT
-Received: from EX13D02EUC003.ant.amazon.com (10.43.164.10) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 14 May 2019 22:08:18 +0000
-Received: from EX13D02EUC001.ant.amazon.com (10.43.164.92) by
- EX13D02EUC003.ant.amazon.com (10.43.164.10) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 14 May 2019 22:08:17 +0000
-Received: from EX13D02EUC001.ant.amazon.com ([10.43.164.92]) by
- EX13D02EUC001.ant.amazon.com ([10.43.164.92]) with mapi id 15.00.1367.000;
- Tue, 14 May 2019 22:08:17 +0000
-From:   "Sironi, Filippo" <sironi@amazon.de>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>
-CC:     LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "vasu.srinivasan@oracle.com" <vasu.srinivasan@oracle.com>
-Subject: Re: [PATCH v2 1/2] KVM: Start populating /sys/hypervisor with KVM
- entries
-Thread-Topic: [PATCH v2 1/2] KVM: Start populating /sys/hypervisor with KVM
- entries
-Thread-Index: AQHVCmguTMwTmVyYP0+tMrT8Z/dQMaZqvgUAgAAL5ICAAGRWAA==
-Date:   Tue, 14 May 2019 22:08:16 +0000
-Message-ID: <0E82B8C2-5169-4788-B1C0-1668D1F74204@amazon.de>
-References: <1539078879-4372-1-git-send-email-sironi@amazon.de>
- <1557847002-23519-1-git-send-email-sironi@amazon.de>
- <1557847002-23519-2-git-send-email-sironi@amazon.de>
- <d03f6be5-d8dc-4389-e14c-295f36a68827@de.ibm.com>
- <56DAB9BD-2543-49DA-9886-C9C8F2B814F9@amazon.de>
-In-Reply-To: <56DAB9BD-2543-49DA-9886-C9C8F2B814F9@amazon.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.166.102]
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <D4A90837FC6EEB479DA8881876B210DF@amazon.com>
+        id S1726259AbfENWQt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 18:16:49 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:34713 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726180AbfENWQs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 18:16:48 -0400
+Received: by mail-qk1-f195.google.com with SMTP id j20so306279qke.1
+        for <kvm@vger.kernel.org>; Tue, 14 May 2019 15:16:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=sGvgwbM8Qq7R+d/pXVInrNBNpxBHuLlypbYxdcSh0QQ=;
+        b=U9HzuBAo2+ougdnIOsGzuV3CfabYNQPgKPZCf7VQ98DwGuDdOzEHvaVxHQE6MelcwG
+         mTJMXdX0jqswuX+qhBLZbRrtydXubk9T7V6ZOObVERTkDGDd5liTsLOQKyMu2LS/fPrc
+         3TLgoxa1meMQzUthc97bzBrEf2Xq3quEVDrt8gqHq7IbhmAVujv8uM+9+umaXZWRz+3g
+         m5CdyQmkS6QiNGomShY/AnTEqRbkAPTTE14PmICkKnNyQ5U56rfiXSJ+qwALocaKcdQ/
+         edtdHb5hYndmxGUr47L0cYhhTBw6QmoGBCmaNAVlixtC37vNFO4HRJogDcZp8RaXW4IW
+         v5Vw==
+X-Gm-Message-State: APjAAAVUJNi4j9mwqCiX/9hPBquLHWkpkToBJEsBuHxsLJUH+9T7ZJuh
+        Wm7mh0PsArgG8s5EQQpUCJpVWA==
+X-Google-Smtp-Source: APXvYqzxwTTzn51KbxxNaAzyv/pkJUV1ke6okBZa0i2lA3TII6YFz3jTQ7gK0oYDoqLv2xlrm4e0cA==
+X-Received: by 2002:ae9:e806:: with SMTP id a6mr14184171qkg.247.1557872207417;
+        Tue, 14 May 2019 15:16:47 -0700 (PDT)
+Received: from redhat.com ([185.54.206.10])
+        by smtp.gmail.com with ESMTPSA id t6sm41702qkt.25.2019.05.14.15.16.32
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 14 May 2019 15:16:46 -0700 (PDT)
+Date:   Tue, 14 May 2019 18:16:28 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Darren Hart <dvhart@infradead.org>
+Subject: Re: [PATCH net] vhost: don't use kmap() to log dirty pages
+Message-ID: <20190514181150-mutt-send-email-mst@kernel.org>
+References: <1557725265-63525-1-git-send-email-jasowang@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1557725265-63525-1-git-send-email-jasowang@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, May 13, 2019 at 01:27:45AM -0400, Jason Wang wrote:
+> Vhost log dirty pages directly to a userspace bitmap through GUP and
+> kmap_atomic() since kernel doesn't have a set_bit_to_user()
+> helper. This will cause issues for the arch that has virtually tagged
+> caches. The way to fix is to keep using userspace virtual
+> address. Fortunately, futex has arch_futex_atomic_op_inuser() which
+> could be used for setting a bit to user.
+> 
+> Note there're several cases that futex helper can fail e.g a page
+> fault or the arch that doesn't have the support. For those cases, a
+> simplified get_user()/put_user() pair protected by a global mutex is
+> provided as a fallback. The fallback may lead false positive that
+> userspace may see more dirty pages.
+> 
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
+> Cc: Andrea Arcangeli <aarcange@redhat.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Darren Hart <dvhart@infradead.org>
+> Fixes: 3a4d5c94e9593 ("vhost_net: a kernel-level virtio server")
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+> Changes from RFC V2:
+> - drop GUP and provide get_user()/put_user() fallbacks
+> - round down log_base
+> Changes from RFC V1:
+> - switch to use arch_futex_atomic_op_inuser()
+> ---
+>  drivers/vhost/vhost.c | 54 ++++++++++++++++++++++++++++-----------------------
+>  1 file changed, 30 insertions(+), 24 deletions(-)
+> 
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 351af88..7fa05ba 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -31,6 +31,7 @@
+>  #include <linux/sched/signal.h>
+>  #include <linux/interval_tree_generic.h>
+>  #include <linux/nospec.h>
+> +#include <asm/futex.h>
+>  
+>  #include "vhost.h"
+>  
+> @@ -43,6 +44,8 @@
+>  MODULE_PARM_DESC(max_iotlb_entries,
+>  	"Maximum number of iotlb entries. (default: 2048)");
+>  
+> +static DEFINE_MUTEX(vhost_log_lock);
+> +
+>  enum {
+>  	VHOST_MEMORY_F_LOG = 0x1,
+>  };
+> @@ -1692,28 +1695,31 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
+>  }
+>  EXPORT_SYMBOL_GPL(vhost_dev_ioctl);
+>  
+> -/* TODO: This is really inefficient.  We need something like get_user()
+> - * (instruction directly accesses the data, with an exception table entry
+> - * returning -EFAULT). See Documentation/x86/exception-tables.txt.
+> - */
+> -static int set_bit_to_user(int nr, void __user *addr)
+> +static int set_bit_to_user(int nr, u32 __user *addr)
+>  {
+> -	unsigned long log = (unsigned long)addr;
+> -	struct page *page;
+> -	void *base;
+> -	int bit = nr + (log % PAGE_SIZE) * 8;
+> +	u32 old;
+>  	int r;
+>  
+> -	r = get_user_pages_fast(log, 1, 1, &page);
+> -	if (r < 0)
+> -		return r;
+> -	BUG_ON(r != 1);
+> -	base = kmap_atomic(page);
+> -	set_bit(bit, base);
+> -	kunmap_atomic(base);
+> -	set_page_dirty_lock(page);
+> -	put_page(page);
+> +	r = arch_futex_atomic_op_inuser(FUTEX_OP_OR, 1 << nr, &old, addr);
+> +	if (r) {
+> +		/* Fallback through get_user()/put_user(), this may
+> +		 * lead false positive that userspace may see more
+> +		 * dirty pages. A mutex is used to synchronize log
+> +		 * access between vhost threads.
+> +		 */
+> +		mutex_lock(&vhost_log_lock);
+> +		r = get_user(old, addr);
+> +		if (r)
+> +			goto err;
+> +		r = put_user(old | 1 << nr, addr);
+> +		if (r)
+> +			goto err;
+> +		mutex_unlock(&vhost_log_lock);
+> +	}
 
+Problem is, we always said it's atomic.
 
-> On 14. May 2019, at 18:09, Sironi, Filippo <sironi@amazon.de> wrote:
-> =
-
->> On 14. May 2019, at 17:26, Christian Borntraeger <borntraeger@de.ibm.com=
-> wrote:
->> =
-
->>> On 14.05.19 17:16, Filippo Sironi wrote:
->>> Start populating /sys/hypervisor with KVM entries when we're running on
->>> KVM. This is to replicate functionality that's available when we're
->>> running on Xen.
->>> =
-
->>> Start with /sys/hypervisor/uuid, which users prefer over
->>> /sys/devices/virtual/dmi/id/product_uuid as a way to recognize a virtual
->>> machine, since it's also available when running on Xen HVM and on Xen PV
->>> and, on top of that doesn't require root privileges by default.
->>> Let's create arch-specific hooks so that different architectures can
->>> provide different implementations.
->>> =
-
->>> Signed-off-by: Filippo Sironi <sironi@amazon.de>
->>> ---
->>> v2:
->>> * move the retrieval of the VM UUID out of uuid_show and into
->>> kvm_para_get_uuid, which is a weak function that can be overwritten
->>> =
-
->>> drivers/Kconfig              |  2 ++
->>> drivers/Makefile             |  2 ++
->>> drivers/kvm/Kconfig          | 14 ++++++++++++++
->>> drivers/kvm/Makefile         |  1 +
->>> drivers/kvm/sys-hypervisor.c | 30 ++++++++++++++++++++++++++++++
->>> 5 files changed, 49 insertions(+)
->>> create mode 100644 drivers/kvm/Kconfig
->>> create mode 100644 drivers/kvm/Makefile
->>> create mode 100644 drivers/kvm/sys-hypervisor.c
->>> =
-
->>> diff --git a/drivers/Kconfig b/drivers/Kconfig
->>> index 45f9decb9848..90eb835fe951 100644
->>> --- a/drivers/Kconfig
->>> +++ b/drivers/Kconfig
->>> @@ -146,6 +146,8 @@ source "drivers/hv/Kconfig"
->>> =
-
->>> source "drivers/xen/Kconfig"
->>> =
-
->>> +source "drivers/kvm/Kconfig"
->>> +
->>> source "drivers/staging/Kconfig"
->>> =
-
->>> source "drivers/platform/Kconfig"
->>> diff --git a/drivers/Makefile b/drivers/Makefile
->>> index c61cde554340..79cc92a3f6bf 100644
->>> --- a/drivers/Makefile
->>> +++ b/drivers/Makefile
->>> @@ -44,6 +44,8 @@ obj-y				+=3D soc/
->>> obj-$(CONFIG_VIRTIO)		+=3D virtio/
->>> obj-$(CONFIG_XEN)		+=3D xen/
->>> =
-
->>> +obj-$(CONFIG_KVM_GUEST)		+=3D kvm/
->>> +
->>> # regulators early, since some subsystems rely on them to initialize
->>> obj-$(CONFIG_REGULATOR)		+=3D regulator/
->>> =
-
->>> diff --git a/drivers/kvm/Kconfig b/drivers/kvm/Kconfig
->>> new file mode 100644
->>> index 000000000000..3fc041df7c11
->>> --- /dev/null
->>> +++ b/drivers/kvm/Kconfig
->>> @@ -0,0 +1,14 @@
->>> +menu "KVM driver support"
->>> +        depends on KVM_GUEST
->>> +
->>> +config KVM_SYS_HYPERVISOR
->>> +        bool "Create KVM entries under /sys/hypervisor"
->>> +        depends on SYSFS
->>> +        select SYS_HYPERVISOR
->>> +        default y
->>> +        help
->>> +          Create KVM entries under /sys/hypervisor (e.g., uuid). When =
-running
->>> +          native or on another hypervisor, /sys/hypervisor may still be
->>> +          present, but it will have no KVM entries.
->>> +
->>> +endmenu
->>> diff --git a/drivers/kvm/Makefile b/drivers/kvm/Makefile
->>> new file mode 100644
->>> index 000000000000..73a43fc994b9
->>> --- /dev/null
->>> +++ b/drivers/kvm/Makefile
->>> @@ -0,0 +1 @@
->>> +obj-$(CONFIG_KVM_SYS_HYPERVISOR) +=3D sys-hypervisor.o
->>> diff --git a/drivers/kvm/sys-hypervisor.c b/drivers/kvm/sys-hypervisor.c
->>> new file mode 100644
->>> index 000000000000..43b1d1a09807
->>> --- /dev/null
->>> +++ b/drivers/kvm/sys-hypervisor.c
->>> @@ -0,0 +1,30 @@
->>> +/* SPDX-License-Identifier: GPL-2.0 */
->>> +
->>> +#include <asm/kvm_para.h>
->>> +
->>> +#include <linux/kobject.h>
->>> +#include <linux/sysfs.h>
->>> +
->>> +__weak const char *kvm_para_get_uuid(void)
->>> +{
->>> +	return NULL;
->>> +}
->>> +
->>> +static ssize_t uuid_show(struct kobject *obj,
->>> +			 struct kobj_attribute *attr,
->>> +			 char *buf)
->>> +{
->>> +	const char *uuid =3D kvm_para_get_uuid();
->> =
-
->> I would prefer to have kvm_para_get_uuid return a uuid_t
->> but char * will probably work out as well.
-> =
-
-> Let me give this a quick spin.
-
-I looked into getting a uuid_t.
-
-At least for architectures where we retrieve that bit of
-information from DMI tables, this is undesirable since
-the interpretation of the UUID changed with DMI 2.6
-(the first 3 fields are now encoded in little-endian).
-This means that we wouldn't know how to print it in this
-generic code.
-
-I think that it's best if the architecture specific code
-turns the UUID into the string representation.
-
->>> +	return sprintf(buf, "%s\n", uuid);
->>> +}
->>> +
->>> +static struct kobj_attribute uuid =3D __ATTR_RO(uuid);
->>> +
->>> +static int __init uuid_init(void)
->>> +{
->>> +	if (!kvm_para_available())
->> =
-
->> Isnt kvm_para_available a function that is defined in the context of the=
- HOST
->> and not of the guest?
-> =
-
-> No, kvm_para_available is defined in the guest context.
-> On x86, it checks for the presence of the KVM CPUID leafs.
-> =
-
->>> +		return 0;
->>> +	return sysfs_create_file(hypervisor_kobj, &uuid.attr);
->>> +}
->>> +
->>> +device_initcall(uuid_init);
+This trick will work if userspace only clears bits
+in the log, but won't if it sets bits in the log.
+E.g. reusing the log structure for vhost-user
+will have exactly this effect.
 
 
 
 
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrer: Christian Schlaeger, Ralf Herbrich
-Ust-ID: DE 289 237 879
-Eingetragen am Amtsgericht Charlottenburg HRB 149173 B
-
-
+>  	return 0;
+> +err:
+> +	mutex_unlock(&vhost_log_lock);
+> +	return r;
+>  }
+>  
+>  static int log_write(void __user *log_base,
+> @@ -1725,13 +1731,13 @@ static int log_write(void __user *log_base,
+>  	if (!write_length)
+>  		return 0;
+>  	write_length += write_address % VHOST_PAGE_SIZE;
+> +	log_base = (void __user *)((u64)log_base & ~0x3ULL);
+> +	write_page += ((u64)log_base & 0x3ULL) * 8;
+>  	for (;;) {
+> -		u64 base = (u64)(unsigned long)log_base;
+> -		u64 log = base + write_page / 8;
+> -		int bit = write_page % 8;
+> -		if ((u64)(unsigned long)log != log)
+> -			return -EFAULT;
+> -		r = set_bit_to_user(bit, (void __user *)(unsigned long)log);
+> +		u32 __user *log = (u32 __user *)log_base + write_page / 32;
+> +		int bit = write_page % 32;
+> +
+> +		r = set_bit_to_user(bit, log);
+>  		if (r < 0)
+>  			return r;
+>  		if (write_length <= VHOST_PAGE_SIZE)
+> -- 
+> 1.8.3.1
