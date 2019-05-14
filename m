@@ -2,108 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 92C361C7C4
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 13:25:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0039E1C7D2
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 13:30:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726283AbfENLZf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 07:25:35 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:55308 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725893AbfENLZe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 07:25:34 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 381A0BE33AB50F181077;
-        Tue, 14 May 2019 19:25:33 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS412-HUB.china.huawei.com
- (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Tue, 14 May 2019
- 19:25:22 +0800
-Subject: Re: [PATCH v16 10/10] target-arm: kvm64: handle SIGBUS signal from
- kernel or KVM
-To:     Peter Maydell <peter.maydell@linaro.org>
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Shannon Zhao <shannon.zhaosl@gmail.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Richard Henderson" <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        "Zheng Xiang" <zhengxiang9@huawei.com>,
-        Jonathan Cameron <jonathan.cameron@huawei.com>,
-        "xuwei (O)" <xuwei5@huawei.com>, kvm-devel <kvm@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        qemu-arm <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>
-References: <1557751388-27063-1-git-send-email-gengdongjiu@huawei.com>
- <1557751388-27063-11-git-send-email-gengdongjiu@huawei.com>
- <CAFEAcA81nMkHdCvQTcv2ixNB7sg+3Qx+9mpNgF0XLaBPY7-PNQ@mail.gmail.com>
-From:   gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <d23719b7-65e4-1136-ffb4-f58de774d8cd@huawei.com>
-Date:   Tue, 14 May 2019 19:25:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+        id S1726338AbfENLaY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 07:30:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43072 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726265AbfENLaX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 07:30:23 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C265A3082E5A;
+        Tue, 14 May 2019 11:30:22 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 04D9760BCF;
+        Tue, 14 May 2019 11:30:09 +0000 (UTC)
+Date:   Tue, 14 May 2019 13:30:07 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>,
+        Erik Skultety <eskultet@redhat.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "dinechin@redhat.com" <dinechin@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "berrange@redhat.com" <berrange@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>
+Subject: Re: [PATCH v2 1/2] vfio/mdev: add version attribute for mdev device
+Message-ID: <20190514133007.5e1c6c2e.cohuck@redhat.com>
+In-Reply-To: <20190514110143.GD2753@work-vm>
+References: <20190510110838.2df4c4d0.cohuck@redhat.com>
+        <20190510093608.GD2854@work-vm>
+        <20190510114838.7e16c3d6.cohuck@redhat.com>
+        <20190513132804.GD11139@beluga.usersys.redhat.com>
+        <20190514061235.GC20407@joy-OptiPlex-7040>
+        <20190514072039.GA2089@beluga.usersys.redhat.com>
+        <20190514073219.GD20407@joy-OptiPlex-7040>
+        <20190514074344.GB2089@beluga.usersys.redhat.com>
+        <20190514074736.GE20407@joy-OptiPlex-7040>
+        <20190514115135.078bbaf7.cohuck@redhat.com>
+        <20190514110143.GD2753@work-vm>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA81nMkHdCvQTcv2ixNB7sg+3Qx+9mpNgF0XLaBPY7-PNQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 14 May 2019 11:30:23 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 14 May 2019 12:01:45 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-> 
->> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
->> +{
->> +    ARMCPU *cpu = ARM_CPU(c);
->> +    CPUARMState *env = &cpu->env;
->> +    ram_addr_t ram_addr;
->> +    hwaddr paddr;
->> +
->> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
->> +
->> +    if (addr) {
->> +        ram_addr = qemu_ram_addr_from_host(addr);
->> +        if (ram_addr != RAM_ADDR_INVALID &&
->> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
->> +            kvm_hwpoison_page_add(ram_addr);
->> +            /* Asynchronous signal will be masked by main thread, so
->> +             * only handle synchronous signal.
->> +             */
->> +            if (code == BUS_MCEERR_AR) {
->> +                kvm_cpu_synchronize_state(c);
->> +                if (GHES_CPER_FAIL != ghes_record_errors(ACPI_HEST_NOTIFY_SEA, paddr)) {
->> +                    kvm_inject_arm_sea(c);
->> +                } else {
->> +                    fprintf(stderr, "failed to record the error\n");
->> +                }
->> +            }
->> +            return;
->> +        }
->> +        fprintf(stderr, "Hardware memory error for memory used by "
->> +                "QEMU itself instead of guest system!\n");
->> +    }
->> +
->> +    if (code == BUS_MCEERR_AR) {
->> +        fprintf(stderr, "Hardware memory error!\n");
->> +        exit(1);
->> +    }
->> +}
-> 
-> This code appears to still be unconditionally trying to
-> notify the guest of the error via the ACPI tables without
-> checking whether those ACPI tables even exist. I told you
-> about this in a previous round of review :-(
+> * Cornelia Huck (cohuck@redhat.com) wrote:
+> > On Tue, 14 May 2019 03:47:36 -0400
+> > Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-Thanks very much for the comments, and sorry for my forgetting
-I added the ACPI checking in the new V17 version.
-
+> > > hi Cornelia and Dave,
+> > > do you also agree on:
+> > > 1. "not to define the specific errno returned for a specific situation,
+> > > let the vendor driver decide, userspace simply needs to know that an errno on
+> > > read indicates the device does not support migration version comparison and
+> > > that an errno on write indicates the devices are incompatible or the target
+> > > doesn't support migration versions. "
+> > > 2. vendor driver should log detailed error reasons in kernel log.  
+> > 
+> > Two questions:
+> > - How reasonable is it to refer to the system log in order to find out
+> >   what exactly went wrong?
+> > - If detailed error reporting is basically done to the syslog, do
+> >   different error codes still provide useful information? Or should the
+> >   vendor driver decide what it wants to do?  
 > 
-> thanks
-> -- PMM
-> .
-> 
+> I don't see error codes as being that helpful; if we can't actually get
+> an error message back up the stack (which was my preference), then I guess
+> syslog is as good as it will get.
 
+Ok, so letting the vendor driver simply return an(y) error and possibly
+dumping an error message into the syslog seems to be the most
+reasonable approach.
