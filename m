@@ -2,86 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A08D1C691
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 12:02:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1ACDB1C6C1
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 12:13:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726490AbfENKCx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 06:02:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36718 "EHLO mx1.redhat.com"
+        id S1726646AbfENKNe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 06:13:34 -0400
+Received: from ozlabs.org ([203.11.71.1]:36593 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726075AbfENKCx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 06:02:53 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8C74C30198BD;
-        Tue, 14 May 2019 10:02:52 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 96F1A63B8B;
-        Tue, 14 May 2019 10:02:51 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 412B818089C8;
-        Tue, 14 May 2019 10:02:49 +0000 (UTC)
-Date:   Tue, 14 May 2019 06:02:48 -0400 (EDT)
-From:   Pankaj Gupta <pagupta@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org,
-        dan j williams <dan.j.williams@intel.com>,
-        zwisler@kernel.org, vishal l verma <vishal.l.verma@intel.com>,
-        dave jiang <dave.jiang@intel.com>, mst@redhat.com,
-        jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net,
-        hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu,
-        adilger kernel <adilger.kernel@dilger.ca>,
-        darrick wong <darrick.wong@oracle.com>, lcapitulino@redhat.com,
-        kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com,
-        nilal@redhat.com, riel@surriel.com, stefanha@redhat.com,
-        aarcange@redhat.com, david@fromorbit.com, cohuck@redhat.com,
-        xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-        pbonzini@redhat.com, kilobyte@angband.pl,
-        yuval shaia <yuval.shaia@oracle.com>, jstaron@google.com
-Message-ID: <919431491.28558886.1557828168896.JavaMail.zimbra@redhat.com>
-In-Reply-To: <cd5572ac-14d0-f872-6321-c522daa70f49@redhat.com>
-References: <20190510155202.14737-1-pagupta@redhat.com> <20190510155202.14737-3-pagupta@redhat.com> <f2ea35a6-ec98-447c-44fe-0cb3ab309340@redhat.com> <752392764.28554139.1557826022323.JavaMail.zimbra@redhat.com> <86298c2c-cc7c-5b97-0f11-335d7da8c450@redhat.com> <712871093.28555872.1557827242385.JavaMail.zimbra@redhat.com> <cd5572ac-14d0-f872-6321-c522daa70f49@redhat.com>
-Subject: Re: [PATCH v8 2/6] virtio-pmem: Add virtio pmem driver
+        id S1726211AbfENKNd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 06:13:33 -0400
+Received: by ozlabs.org (Postfix, from userid 1003)
+        id 453D6M23T0z9sMr; Tue, 14 May 2019 20:13:31 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+        t=1557828811; bh=3ZC5rwVVnYc/CNFGC04hlUVgDbQl3qTlacY4Q4Fe3gs=;
+        h=Date:From:To:Cc:Subject:From;
+        b=Rip0U82hdADw5tkVqMuajXtlMgTw+dwy1P0+sNBZyRoenbsb3BC2Y3gDT5138MC0r
+         q8+vP9HWUg34wfHaD1pUcg348FAH7QALuiB1iQ8atbJvFXThwiozhXrJ2lGz7qkoWM
+         KQ8nybgvRLQmYuRvjMaqp3s2JS+6YEe0g43qGRbWU0cmoRLmYqP2RnhYvTbcB5335E
+         ByX6j0EFgYhwndgsGkYi0Spmj/q5T539NwGMPR1GRE4NRQX6VJ0jUgX4quTC+H6IQZ
+         smYbuk4iLW3kzkSyuwXYyRfvOxjGDy8+hK4wjeKPcbdl0GKA75YfX05LmSN4fN3RWD
+         opOz+LG6C5F3w==
+Date:   Tue, 14 May 2019 20:13:27 +1000
+From:   Paul Mackerras <paulus@ozlabs.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org
+Subject: [GIT PULL] Please pull my kvm-ppc-next-5.2-2 tag
+Message-ID: <20190514101327.GA13522@blackberry>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.65.16.148, 10.4.195.1]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: TcH/fzTmTGlr7ZcMfiu1eOEXog6lYw==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Tue, 14 May 2019 10:02:52 +0000 (UTC)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Paolo, Radim,
 
-> >>
-> >> I think you should do the same here, vdev->priv is allocated in
-> >> virtio_pmem_probe.
-> >>
-> >> But maybe I am missing something important here :)
-> > 
-> > Because virtio_balloon use "kzalloc" for allocation and needs to be freed.
-> > But virtio pmem uses "devm_kzalloc" which takes care of automatically
-> > deleting
-> > the device memory when associated device is detached.
-> 
-> Hehe, thanks, that was the part that I was missing!
+I have added 3 more commits to my kvm-ppc-next tree, for various fixes
+that have come in recently.  There is one bug fix, one spelling fix,
+and one commit that removes some code that does nothing.  The net
+result is 12 fewer lines of code in the kernel. :)
 
-Thank you for the review.
+If you pull this tag and not the earlier kvm-ppc-next-5.2-1 tag, you
+might want to include the text from that tag in the commit message.
+That text is:
 
-Best regards,
-Pankaj
-> 
-> --
-> 
-> Thanks,
-> 
-> David / dhildenb
-> 
+"
+PPC KVM update for 5.2
+
+* Support for guests to access the new POWER9 XIVE interrupt controller
+  hardware directly, reducing interrupt latency and overhead for guests.
+
+* In-kernel implementation of the H_PAGE_INIT hypercall.
+
+* Reduce memory usage of sparsely-populated IOMMU tables.
+
+* Several bug fixes.
+"
+
+Thanks,
+Paul.
+
+The following changes since commit 0caecf5b00199636eb2d32201199ecd6be52558d:
+
+  KVM: PPC: Book3S HV: XIVE: Clear escalation interrupt pointers on device close (2019-04-30 19:41:01 +1000)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/paulus/powerpc tags/kvm-ppc-next-5.2-2
+
+for you to fetch changes up to 4894fbcce856635c9ab79f44e50826e86bb92110:
+
+  KVM: PPC: Book3S: Remove useless checks in 'release' method of KVM device (2019-05-14 12:06:03 +1000)
+
+----------------------------------------------------------------
+Second PPC KVM update for 5.2
+
+- Fix a bug, fix a spelling mistake, remove some useless code.
+
+----------------------------------------------------------------
+Colin Ian King (1):
+      KVM: PPC: Book3S HV: XIVE: Fix spelling mistake "acessing" -> "accessing"
+
+Cédric Le Goater (1):
+      KVM: PPC: Book3S: Remove useless checks in 'release' method of KVM device
+
+Paul Mackerras (1):
+      KVM: PPC: Book3S HV: Make sure to load LPID for radix VCPUs
+
+ arch/powerpc/kvm/book3s_hv_rmhandlers.S | 6 ------
+ arch/powerpc/kvm/book3s_xive_native.c   | 2 +-
+ virt/kvm/kvm_main.c                     | 6 ------
+ 3 files changed, 1 insertion(+), 13 deletions(-)
