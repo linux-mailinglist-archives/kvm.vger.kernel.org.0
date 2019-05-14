@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 306FE1CC8C
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 18:10:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AECA01CCD5
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 18:21:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726134AbfENQKq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 12:10:46 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:36041 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725901AbfENQKq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 12:10:46 -0400
-Received: by mail-wm1-f67.google.com with SMTP id j187so3412774wmj.1
-        for <kvm@vger.kernel.org>; Tue, 14 May 2019 09:10:45 -0700 (PDT)
+        id S1726200AbfENQVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 12:21:01 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42480 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725901AbfENQVB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 12:21:01 -0400
+Received: by mail-wr1-f67.google.com with SMTP id l2so19895580wrb.9
+        for <kvm@vger.kernel.org>; Tue, 14 May 2019 09:21:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to:user-agent;
-        bh=wYcnLcHNEWzuyUPaOSPaqvipKhwQq75NVlrWVwfonxY=;
-        b=jlBrdiXhMeNmzvXL7zEpBW8YObeRuEN5HFC/m8ynmT+klwvvAKp0QoGQ2j7WL+5Ba0
-         g3B0T9mnhJr7wgzm+Roc/3EkawKS8+ip7awgBiB1Dunz9p55v1xTt8+QUqvUnuZ0hqoG
-         lbahyyXjHNgvPXfZqWvNNJCYrk4c9lGmkRaW5w1czRffTVVjPySrodg6+jCSz5IaKpqX
-         BF+D8aojx/78tz0TV1rXsw4qwqwZNC8IwEKdWIIgph3eMURss7pokRGGhtLBurZ1R5Z6
-         yNNpilOn7YuYRc7unwOPrKs5xWE1bwj3WIcD6rbmkp0q++VLh9Xf5KggUvC3ELIKU/lo
-         y67g==
-X-Gm-Message-State: APjAAAWMdDsiqw/vliqtjKRfBzYRnIXxdkxShZcLoHAi1pVpGi9JwFfW
-        gfM4xzNKuKA5/v3g/KXmFhpD9w==
-X-Google-Smtp-Source: APXvYqxqlLOgXzEWalLGMo/rtA7vvFLalOSyrklAhb9ipPKK7DakL4gduRG3L+0mF5EDXgRvQwftWw==
-X-Received: by 2002:a1c:2dd2:: with SMTP id t201mr9244992wmt.136.1557850244405;
-        Tue, 14 May 2019 09:10:44 -0700 (PDT)
+        bh=BOCFSrhgfdaeCsPqx/9Z23ucW5WFX+NmToiNV2PrBeE=;
+        b=Wo4uwGL0bornznynBx4W7haECl/LXZYxEVGQBqCZsHLBEA5KDFAnFobrQKJawUnVvN
+         lUX0K7WG8kYkrm2P3yK7OpG3MbayMwGl+W5zZTlDiJR04rFgOh06gLmb6x70+B8joBF+
+         lTgarKse3JDo8lb/8UkMGOogUtGh1ZAUf+rA2cL0O9F0KtJqCqaVGfjETOOW9wJSpTYv
+         xpj2cYibHbm5b/BtJg5FwK5Q/ViSWZVi3aSpiuFsi2tOx9HobIp95LIq6fqPIEInVFTA
+         Wg4VhBoy12X/mQIO4m9GkYD2EmU9zVdIZfAywtWpUS50CtSZHsdbaJCBTyhlE2FvceFB
+         YDxA==
+X-Gm-Message-State: APjAAAWYYwdlR5XhVtycXd2gqiZvBsx1qOUeWZHFN8HDlWphGZoElbrC
+        DfK8FenRgSG5LUqqNcC78EOYIA==
+X-Google-Smtp-Source: APXvYqyscd4jQz6/42rGahRh0erb6xOt/MMNshG64dkL9Ee+1e2OY4Rd80gvnBFmXC+AkJhQaflnLg==
+X-Received: by 2002:adf:afcd:: with SMTP id y13mr21348543wrd.270.1557850859484;
+        Tue, 14 May 2019 09:20:59 -0700 (PDT)
 Received: from steredhat (host151-251-static.12-87-b.business.telecomitalia.it. [87.12.251.151])
-        by smtp.gmail.com with ESMTPSA id l2sm5293724wmf.16.2019.05.14.09.10.43
+        by smtp.gmail.com with ESMTPSA id g3sm4407851wmf.9.2019.05.14.09.20.58
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 14 May 2019 09:10:43 -0700 (PDT)
-Date:   Tue, 14 May 2019 18:10:41 +0200
+        Tue, 14 May 2019 09:20:58 -0700 (PDT)
+Date:   Tue, 14 May 2019 18:20:56 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
 Cc:     netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
@@ -42,59 +42,106 @@ Cc:     netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
         virtualization@lists.linux-foundation.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v2 8/8] vsock/virtio: make the RX buffer size tunable
-Message-ID: <20190514161041.y4exigcwwys34naf@steredhat>
+Subject: Re: [PATCH v2 7/8] vsock/virtio: increase RX buffer size to 64 KiB
+Message-ID: <20190514162056.5aotcuzsi6e6wya7@steredhat>
 References: <20190510125843.95587-1-sgarzare@redhat.com>
- <20190510125843.95587-9-sgarzare@redhat.com>
- <eddb5a89-ed44-3a65-0181-84f7f27dd2cb@redhat.com>
- <8e72ef5e-cf6a-a635-3f76-bdeac95761b8@redhat.com>
+ <20190510125843.95587-8-sgarzare@redhat.com>
+ <bf0416f1-0e69-722d-75ce-3d101e6d7d71@redhat.com>
+ <20190513175138.4yycad2xi65komw6@steredhat>
+ <fd934a4c-f7d2-8a04-ed93-a3b690ed0d79@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <8e72ef5e-cf6a-a635-3f76-bdeac95761b8@redhat.com>
+In-Reply-To: <fd934a4c-f7d2-8a04-ed93-a3b690ed0d79@redhat.com>
 User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 13, 2019 at 08:46:19PM +0800, Jason Wang wrote:
+On Tue, May 14, 2019 at 11:38:05AM +0800, Jason Wang wrote:
 > 
-> On 2019/5/13 下午6:05, Jason Wang wrote:
-> > 
-> > On 2019/5/10 下午8:58, Stefano Garzarella wrote:
-> > > The RX buffer size determines the memory consumption of the
-> > > vsock/virtio guest driver, so we make it tunable through
-> > > a module parameter.
+> On 2019/5/14 上午1:51, Stefano Garzarella wrote:
+> > On Mon, May 13, 2019 at 06:01:52PM +0800, Jason Wang wrote:
+> > > On 2019/5/10 下午8:58, Stefano Garzarella wrote:
+> > > > In order to increase host -> guest throughput with large packets,
+> > > > we can use 64 KiB RX buffers.
+> > > > 
+> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > > ---
+> > > >    include/linux/virtio_vsock.h | 2 +-
+> > > >    1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> > > > index 84b72026d327..5a9d25be72df 100644
+> > > > --- a/include/linux/virtio_vsock.h
+> > > > +++ b/include/linux/virtio_vsock.h
+> > > > @@ -10,7 +10,7 @@
+> > > >    #define VIRTIO_VSOCK_DEFAULT_MIN_BUF_SIZE	128
+> > > >    #define VIRTIO_VSOCK_DEFAULT_BUF_SIZE		(1024 * 256)
+> > > >    #define VIRTIO_VSOCK_DEFAULT_MAX_BUF_SIZE	(1024 * 256)
+> > > > -#define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE	(1024 * 4)
+> > > > +#define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE	(1024 * 64)
+> > > >    #define VIRTIO_VSOCK_MAX_BUF_SIZE		0xFFFFFFFFUL
+> > > >    #define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE		(1024 * 64)
 > > > 
-> > > The size allowed are between 4 KB and 64 KB in order to be
-> > > compatible with old host drivers.
-> > > 
-> > > Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > We probably don't want such high order allocation. It's better to switch to
+> > > use order 0 pages in this case. See add_recvbuf_big() for virtio-net. If we
+> > > get datapath unified, we will get more stuffs set.
+> > IIUC, you are suggesting to allocate only pages and put them in a
+> > scatterlist, then add them to the virtqueue.
 > > 
-> > 
-> > I don't see much value of doing this through kernel command line. We
-> > should deal with them automatically like what virtio-net did. Or even a
-> > module parameter is better.
-> > 
-> > Thanks
+> > Is it correct?
 > 
 > 
-> Sorry, I misread the patch. But even module parameter is something not
-> flexible enough. We should deal with them transparently.
+> Yes since you are using:
+> 
+>                 pkt->buf = kmalloc(buf_len, GFP_KERNEL);
+>                 if (!pkt->buf) {
+>                         virtio_transport_free_pkt(pkt);
+>                         break;
+>                 }
+> 
+> This is likely to fail when the memory is fragmented which is kind of
+> fragile.
+> 
 > 
 
-Okay, I'll try to understand how we can automatically adapt the RX
-buffer size. Since the flow is stream based, the receiver doesn't know the
-original packet size.
+Thanks for pointing that out.
 
-Maybe I can reuse the EWMA approach to understand if the buffers are
-entirely filled or not.
-In that case I can increase (e.g. double) or decrease the size.
+> > 
+> > The issue that I have here, is that the virtio-vsock guest driver, see
+> > virtio_vsock_rx_fill(), allocates a struct virtio_vsock_pkt that
+> > contains the room for the header, then allocates the buffer for the payload.
+> > At this point it fills the scatterlist with the &virtio_vsock_pkt.hdr and the
+> > buffer for the payload.
+> 
+> 
+> This part should be fine since what is needed is just adding more pages to
+> sg[] and call virtuqeueu_add_sg().
+> 
+> 
 
-I'll try to do it!
+Yes, I agree.
+
+> > 
+> > Changing this will require several modifications, and if we get datapath
+> > unified, I'm not sure it's worth it.
+> > Of course, if we leave the datapaths separated, I'd like to do that later.
+> > 
+> > What do you think?
+> 
+> 
+> For the driver it self, it should not be hard. But I think you mean the
+> issue of e.g virtio_vsock_pkt itself which doesn't support sg. For short
+> time, maybe we can use kvec instead.
+
+I'll try to use kvec in the virtio_vsock_pkt.
+
+Since this struct is shared also with the host driver (vhost-vsock),
+I hope the changes could be limited, otherwise we can remove the last 2
+patches of the series for now, leaving the RX buffer size to 4KB.
 
 Thanks,
 Stefano
