@@ -2,111 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DE99B1C398
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 09:03:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C4B11C3A1
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 09:07:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726349AbfENHDo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 03:03:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49692 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725946AbfENHDn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 03:03:43 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 84137307D941;
-        Tue, 14 May 2019 07:03:42 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F266160C4D;
-        Tue, 14 May 2019 07:03:28 +0000 (UTC)
-Date:   Tue, 14 May 2019 09:03:26 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Yan Zhao <yan.y.zhao@intel.com>
-Cc:     Erik Skultety <eskultet@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "berrange@redhat.com" <berrange@redhat.com>,
-        "dinechin@redhat.com" <dinechin@redhat.com>
-Subject: Re: [PATCH v2 1/2] vfio/mdev: add version attribute for mdev device
-Message-ID: <20190514090326.2f4288ae.cohuck@redhat.com>
-In-Reply-To: <20190514061235.GC20407@joy-OptiPlex-7040>
-References: <20190506014904.3621-1-yan.y.zhao@intel.com>
-        <20190507151826.502be009@x1.home>
-        <20190509173839.2b9b2b46.cohuck@redhat.com>
-        <20190509154857.GF2868@work-vm>
-        <20190509175404.512ae7aa.cohuck@redhat.com>
-        <20190509164825.GG2868@work-vm>
-        <20190510110838.2df4c4d0.cohuck@redhat.com>
-        <20190510093608.GD2854@work-vm>
-        <20190510114838.7e16c3d6.cohuck@redhat.com>
-        <20190513132804.GD11139@beluga.usersys.redhat.com>
-        <20190514061235.GC20407@joy-OptiPlex-7040>
-Organization: Red Hat GmbH
+        id S1726314AbfENHHl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 03:07:41 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:34236 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725946AbfENHHl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 03:07:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=bnleR30QPIQpq+EFwBkF6XZjkSnpThngrZ0Pg3kgcGM=; b=fj8Pr4HGZz0EffcR3mMIilbKU
+        fw2M4dJTleSkNrTFwvh8Xs0jEjW3csUzM6UlbkmE+h4NJSbyN1qXkhAjKCTsO61cTx+t8imqrXN8S
+        0rQ6trjzcgY+Ek1FpZg4xVOto/iAuNkyo2qkztLhyrNP7BQdtcOmzL0dqS9biIpCkVAZyFIF27KIq
+        i59RJMm8ZVxQAWKjZk0Egm7j5WlaJRcSVPUVls0HDAmaHtOJzuXORnbslZy/3esomWW5W3XaQ5fMa
+        kgMziZKLho0llyMphjzIedWd+CVfi8S5JmkjDx1A4voaVaOPz2muFlfyL9z/18kaC3Y9VpXA9rT9k
+        KABV+JT4Q==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hQRX0-00063G-SZ; Tue, 14 May 2019 07:07:23 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id E3F802029F87A; Tue, 14 May 2019 09:07:19 +0200 (CEST)
+Date:   Tue, 14 May 2019 09:07:19 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Alexandre Chartre <alexandre.chartre@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        kvm list <kvm@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        jan.setjeeilers@oracle.com, Liran Alon <liran.alon@oracle.com>,
+        Jonathan Adams <jwadams@google.com>
+Subject: Re: [RFC KVM 06/27] KVM: x86: Exit KVM isolation on IRQ entry
+Message-ID: <20190514070719.GD2589@hirez.programming.kicks-ass.net>
+References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
+ <1557758315-12667-7-git-send-email-alexandre.chartre@oracle.com>
+ <CALCETrUzAjUFGd=xZRmCbyLfvDgC_WbPYyXB=OznwTkcV-PKNw@mail.gmail.com>
+ <64c49aa6-e7f2-4400-9254-d280585b4067@oracle.com>
+ <CALCETrUd2UO=+JOb_008mGbPdfW5YJgQyw5H7D_CxOgaWv=gxw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 14 May 2019 07:03:43 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALCETrUd2UO=+JOb_008mGbPdfW5YJgQyw5H7D_CxOgaWv=gxw@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 14 May 2019 02:12:35 -0400
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+On Mon, May 13, 2019 at 11:13:34AM -0700, Andy Lutomirski wrote:
+> On Mon, May 13, 2019 at 9:28 AM Alexandre Chartre
+> <alexandre.chartre@oracle.com> wrote:
 
-> On Mon, May 13, 2019 at 09:28:04PM +0800, Erik Skultety wrote:
-
-> > In case of libvirt checking the compatibility, it won't matter how good the
-> > error message in the kernel log is and regardless of how many error states you
-> > want to handle, libvirt's only limited to errno here, since we're going to do
-> > plain read/write, so our internal error message returned to the user is only
-> > going to contain what the errno says - okay, of course we can (and we DO)
-> > provide libvirt specific string, further specifying the error but like I
-> > mentioned, depending on how many error cases we want to distinguish this may be
-> > hard for anyone to figure out solely on the error code, as apps will most
-> > probably not parse the
-> > logs.
-> > 
-> > Regards,
-> > Erik  
-> hi Erik
-> do you mean you are agreeing on defining common errors and only returning errno?
+> > Actually, I am not sure this is effectively useful because the IRQ
+> > handler is probably faulting before it tries to exit isolation, so
+> > the isolation exit will be done by the kvm page fault handler. I need
+> > to check that.
+> >
 > 
-> e.g.
-> #define ENOMIGRATION         140  /* device not supporting migration */
-> #define EUNATCH              49  /* software version not match */
-> #define EHWNM                142  /* hardware not matching*/
+> The whole idea of having #PF exit with a different CR3 than was loaded
+> on entry seems questionable to me.  I'd be a lot more comfortable with
+> the whole idea if a page fault due to accessing the wrong data was an
+> OOPS and the code instead just did the right thing directly.
 
-Defining custom error codes is probably not such a good idea... can we
-match to common error codes instead? Do we have a good idea about
-common error categories, anyway?
+So I've ran into this idea before; it basically allows a lazy approach
+to things.
 
-(Btw: does libvirt do a generic error-to-description translation, or
-does it match to the context? I.e., can libvirt translate well-defined
-error codes to a useful message for a specific case?)
+I'm somewhat conflicted on things, on the one hand, changing CR3 from
+#PF is a natural extention in that #PF already changes page-tables (for
+userspace / vmalloc etc..), on the other hand, there's a thin line
+between being lazy and being sloppy.
+
+If we're going down this route; I think we need a very coherent design
+and strong rules.
