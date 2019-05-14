@@ -2,111 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D2641CBEA
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 17:31:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 359931CC07
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 17:38:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726216AbfENPbs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 11:31:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57418 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725901AbfENPbs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 11:31:48 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id BBF47307D962;
-        Tue, 14 May 2019 15:31:47 +0000 (UTC)
-Received: from x1.home (ovpn-117-92.phx2.redhat.com [10.3.117.92])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B2F695C542;
-        Tue, 14 May 2019 15:31:40 +0000 (UTC)
-Date:   Tue, 14 May 2019 09:31:40 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Boris Fiuczynski <fiuczy@linux.ibm.com>
-Cc:     Yan Zhao <yan.y.zhao@intel.com>, Halil Pasic <pasic@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "eskultet@redhat.com" <eskultet@redhat.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "dinechin@redhat.com" <dinechin@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>
-Subject: Re: [libvirt] [PATCH v2 1/2] vfio/mdev: add version attribute for
- mdev device
-Message-ID: <20190514093140.68cc6f7a@x1.home>
-In-Reply-To: <5eac912c-e753-b5f6-83a4-b646f991d858@linux.ibm.com>
-References: <20190506014514.3555-1-yan.y.zhao@intel.com>
-        <20190506014904.3621-1-yan.y.zhao@intel.com>
-        <20190507151826.502be009@x1.home>
-        <20190508112740.GA24397@joy-OptiPlex-7040>
-        <20190508152242.4b54a5e7@x1.home>
-        <5eac912c-e753-b5f6-83a4-b646f991d858@linux.ibm.com>
-Organization: Red Hat
+        id S1726179AbfENPh6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 11:37:58 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:41286 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725916AbfENPh6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 11:37:58 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4EFY5Ad041917;
+        Tue, 14 May 2019 15:36:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=K6RAKYDjcjRrn7OwP84UHYgsO7ChGZaEr+sqPb3xwhc=;
+ b=5XJ/WDUHZ0rtX1wy7iGiSQInjd4Yje8V0Nmw7F2TpN62bao4hby9ViD40alDqoIimCcT
+ IqmNrySa/hvm/yvNnPV7kAphqhwRpXXmIo9tmtGOcJefID4qORAU6rmiyGDpSb8VzGkL
+ wb2TZXj3OraOSmMlRjSCXoGgbjRn5+uqIUwZ+EjtnghualrShvTzaqilDUUKkav3ZVEG
+ DUvMwQXC/emAR1qaIFGPMioz6EbIWV+l5UJVwALQDf2XpMOl/tGCRp2uLVjWvH3o5D1j
+ ygyljCSo8K2hmvy8qbg334BYRGKGGy7EcRlTxjFeqnVaX0FP4NSfdl91Nuo1L4e/hW2f uQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2sdnttpxv1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 May 2019 15:36:59 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4EFZLrw135409;
+        Tue, 14 May 2019 15:36:59 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2se0tw7m68-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 May 2019 15:36:58 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4EFatFM011608;
+        Tue, 14 May 2019 15:36:56 GMT
+Received: from [10.166.106.34] (/10.166.106.34)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 14 May 2019 08:36:54 -0700
+Subject: Re: [RFC KVM 24/27] kvm/isolation: KVM page fault handler
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>
+Cc:     Liran Alon <liran.alon@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        kvm list <kvm@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        jan.setjeeilers@oracle.com, Jonathan Adams <jwadams@google.com>
+References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
+ <1557758315-12667-25-git-send-email-alexandre.chartre@oracle.com>
+ <20190513151500.GY2589@hirez.programming.kicks-ass.net>
+ <13F2FA4F-116F-40C6-9472-A1DE689FE061@oracle.com>
+ <CALCETrUcR=3nfOtFW2qt3zaa7CnNJWJLqRY8AS9FTJVHErjhfg@mail.gmail.com>
+ <20190514072110.GF2589@hirez.programming.kicks-ass.net>
+From:   Alexandre Chartre <alexandre.chartre@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <95f462d4-37d3-f863-b7c6-2bcbb92251ec@oracle.com>
+Date:   Tue, 14 May 2019 17:36:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190514072110.GF2589@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 14 May 2019 15:31:48 +0000 (UTC)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=941
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905140109
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=973 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905140110
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 8 May 2019 17:27:47 +0200
-Boris Fiuczynski <fiuczy@linux.ibm.com> wrote:
 
-> On 5/8/19 11:22 PM, Alex Williamson wrote:
-> >>> I thought there was a request to make this more specific to migration
-> >>> by renaming it to something like migration_version.  Also, as an
-> >>>     
-> >> so this attribute may not only include a mdev device's parent device info and
-> >> mdev type, but also include numeric software version of vendor specific
-> >> migration code, right?  
-> > It's a vendor defined string, it should be considered opaque to the
-> > user, the vendor can include whatever they feel is relevant.
-> >   
-> Would a vendor also be allowed to provide a string expressing required 
-> features as well as containing backend resource requirements which need 
-> to be compatible for a successful migration? Somehow a bit like a cpu 
-> model... maybe even as json or xml...
-> I am asking this with vfio-ap in mind. In that context checking 
-> compatibility of two vfio-ap mdev devices is not as simple as checking 
-> if version A is smaller or equal to version B.
+On 5/14/19 9:21 AM, Peter Zijlstra wrote:
+> On Mon, May 13, 2019 at 07:02:30PM -0700, Andy Lutomirski wrote:
+> 
+>> This sounds like a great use case for static_call().  PeterZ, do you
+>> suppose we could wire up static_call() with the module infrastructure
+>> to make it easy to do "static_call to such-and-such GPL module symbol
+>> if that symbol is in a loaded module, else nop"?
+> 
+> You're basically asking it to do dynamic linking. And I suppose that is
+> technically possible.
+> 
+> However, I'm really starting to think kvm (or at least these parts of it
+> that want to play these games) had better not be a module anymore.
+> 
 
-Two pieces to this, the first is that the string is opaque exactly so
-that the vendor driver can express whatever they need in it.  The user
-should never infer that two devices are compatible.  The second is that
-this is not a resource availability or reservation interface.  The fact
-that a target device would be compatible for migration should not take
-into account whether the target has the resources to actually create
-such a device.  Doing so would imply some sort of resource reservation
-support that does not exist.  Matrix devices are clearly a bit
-complicated here since maybe the source is expressing a component of
-the device that doesn't exist on the target.  In such a "resource not
-available at all" case, it might be fair to nak the compatibility test,
-but a "ok, but resource not currently available" case should pass,
-imo.  Thanks,
+Maybe we can use an atomic notifier (e.g. page_fault_notifier)?
 
-Alex
+alex.
