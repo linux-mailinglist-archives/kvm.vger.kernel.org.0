@@ -2,48 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 359931CC07
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 17:38:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16C301CC12
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 17:43:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726179AbfENPh6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 11:37:58 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:41286 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725916AbfENPh6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 11:37:58 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4EFY5Ad041917;
-        Tue, 14 May 2019 15:36:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=K6RAKYDjcjRrn7OwP84UHYgsO7ChGZaEr+sqPb3xwhc=;
- b=5XJ/WDUHZ0rtX1wy7iGiSQInjd4Yje8V0Nmw7F2TpN62bao4hby9ViD40alDqoIimCcT
- IqmNrySa/hvm/yvNnPV7kAphqhwRpXXmIo9tmtGOcJefID4qORAU6rmiyGDpSb8VzGkL
- wb2TZXj3OraOSmMlRjSCXoGgbjRn5+uqIUwZ+EjtnghualrShvTzaqilDUUKkav3ZVEG
- DUvMwQXC/emAR1qaIFGPMioz6EbIWV+l5UJVwALQDf2XpMOl/tGCRp2uLVjWvH3o5D1j
- ygyljCSo8K2hmvy8qbg334BYRGKGGy7EcRlTxjFeqnVaX0FP4NSfdl91Nuo1L4e/hW2f uQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2sdnttpxv1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 May 2019 15:36:59 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4EFZLrw135409;
-        Tue, 14 May 2019 15:36:59 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2se0tw7m68-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 May 2019 15:36:58 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4EFatFM011608;
-        Tue, 14 May 2019 15:36:56 GMT
-Received: from [10.166.106.34] (/10.166.106.34)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 14 May 2019 08:36:54 -0700
+        id S1726325AbfENPnr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 11:43:47 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:39511 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726134AbfENPnr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 11:43:47 -0400
+Received: by mail-pl1-f196.google.com with SMTP id g9so8462185plm.6
+        for <kvm@vger.kernel.org>; Tue, 14 May 2019 08:43:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=v0nvVqgy68rs5XKTL1qS0XTg9vbvJX75DMTfHz65o7k=;
+        b=o4uo3BL2FJTiVqjqCYWGK7TMMV+lwcOVDCNWJTqe+tsflDaF1yLX/e9s+YSEdV9a/X
+         0LABKAoi0StS36W6oGQpGj2P9Ct672agdHbaJD3SQjoZ0jW0NpD1tvHmfqZg3k3gEIMm
+         pD3Y0PN2veoFVEcAjudbuFBK4ihHBhxjGmFrArDMaQOSdIoNf0wbzeoWhlxvo11h8EQj
+         5+ePJDr+YQ3YkBtn6wnDJCoLAujldWH4NLM1lyC6LyWFIUDCdOPrWhUQBDcmMaKmwirX
+         GLQ96LzLwwi7s2MUdjqt+joWr3rsVAX/g44QiL28zCZdC3f8nx6CKfXtYBWsA//YqsXb
+         s4oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=v0nvVqgy68rs5XKTL1qS0XTg9vbvJX75DMTfHz65o7k=;
+        b=EQVEHgreeWBMNrQuqrcbluXwFX2HqKzHa8MxhW/MguNQkHSgc0zUJSPlGVeWHiVYnQ
+         bvdR4w0IXHiNZntyf6Kx8nwuKfF8cZtYwdUfthjHmw+n8m54r1JOzbRwMTz8eU3wiOax
+         TQIIzc/7/mKZjRcnDxI8I76hC2Xy6wxF5YJTvlwfGISkUWPKVN6JKhBC0O0qurPluczJ
+         FwgcLN+VxekpvRD3bC/xJM8niALfwwTeawlE5KczK5sVo0z2j/HJQeDr77SQ+lxT1gO2
+         g2MzMbtY6YlcNWp2+yQ7WUpERCXzDpt6vPryrhy+tlDJWyVqBCL/KdQIp/G74BLr2bNB
+         lzcg==
+X-Gm-Message-State: APjAAAV6Nbld7r5wGWpZHf/3j/4aaaKp8TiAIvsacpwu2Pxt/cOegc2k
+        MSXEMAnvs4X6KQQOS/ISHnDbig==
+X-Google-Smtp-Source: APXvYqzfFBQAOq4cxgvOLcK8bcyy/NCFnT7eLClak8c7V4eglmQgE2DbsTwqSnHYj5t5cw7CJVy3Wg==
+X-Received: by 2002:a17:902:4203:: with SMTP id g3mr19140823pld.288.1557848626663;
+        Tue, 14 May 2019 08:43:46 -0700 (PDT)
+Received: from ?IPv6:2601:646:c200:1ef2:1d0a:33b8:7824:bf6b? ([2601:646:c200:1ef2:1d0a:33b8:7824:bf6b])
+        by smtp.gmail.com with ESMTPSA id o2sm36069339pgq.1.2019.05.14.08.43.45
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 14 May 2019 08:43:45 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (1.0)
 Subject: Re: [RFC KVM 24/27] kvm/isolation: KVM page fault handler
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>
-Cc:     Liran Alon <liran.alon@oracle.com>,
+From:   Andy Lutomirski <luto@amacapital.net>
+X-Mailer: iPhone Mail (16E227)
+In-Reply-To: <95f462d4-37d3-f863-b7c6-2bcbb92251ec@oracle.com>
+Date:   Tue, 14 May 2019 08:43:44 -0700
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Liran Alon <liran.alon@oracle.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Radim Krcmar <rkrcmar@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -55,55 +66,38 @@ Cc:     Liran Alon <liran.alon@oracle.com>,
         LKML <linux-kernel@vger.kernel.org>,
         Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
         jan.setjeeilers@oracle.com, Jonathan Adams <jwadams@google.com>
-References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
- <1557758315-12667-25-git-send-email-alexandre.chartre@oracle.com>
- <20190513151500.GY2589@hirez.programming.kicks-ass.net>
- <13F2FA4F-116F-40C6-9472-A1DE689FE061@oracle.com>
- <CALCETrUcR=3nfOtFW2qt3zaa7CnNJWJLqRY8AS9FTJVHErjhfg@mail.gmail.com>
- <20190514072110.GF2589@hirez.programming.kicks-ass.net>
-From:   Alexandre Chartre <alexandre.chartre@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <95f462d4-37d3-f863-b7c6-2bcbb92251ec@oracle.com>
-Date:   Tue, 14 May 2019 17:36:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
-MIME-Version: 1.0
-In-Reply-To: <20190514072110.GF2589@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=941
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905140109
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=973 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905140110
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <8DBEACE9-AB4C-4891-8522-A474CA59E325@amacapital.net>
+References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com> <1557758315-12667-25-git-send-email-alexandre.chartre@oracle.com> <20190513151500.GY2589@hirez.programming.kicks-ass.net> <13F2FA4F-116F-40C6-9472-A1DE689FE061@oracle.com> <CALCETrUcR=3nfOtFW2qt3zaa7CnNJWJLqRY8AS9FTJVHErjhfg@mail.gmail.com> <20190514072110.GF2589@hirez.programming.kicks-ass.net> <95f462d4-37d3-f863-b7c6-2bcbb92251ec@oracle.com>
+To:     Alexandre Chartre <alexandre.chartre@oracle.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 5/14/19 9:21 AM, Peter Zijlstra wrote:
-> On Mon, May 13, 2019 at 07:02:30PM -0700, Andy Lutomirski wrote:
-> 
->> This sounds like a great use case for static_call().  PeterZ, do you
->> suppose we could wire up static_call() with the module infrastructure
->> to make it easy to do "static_call to such-and-such GPL module symbol
->> if that symbol is in a loaded module, else nop"?
-> 
-> You're basically asking it to do dynamic linking. And I suppose that is
-> technically possible.
-> 
-> However, I'm really starting to think kvm (or at least these parts of it
-> that want to play these games) had better not be a module anymore.
-> 
 
-Maybe we can use an atomic notifier (e.g. page_fault_notifier)?
+> On May 14, 2019, at 8:36 AM, Alexandre Chartre <alexandre.chartre@oracle.c=
+om> wrote:
+>=20
+>=20
+>> On 5/14/19 9:21 AM, Peter Zijlstra wrote:
+>>> On Mon, May 13, 2019 at 07:02:30PM -0700, Andy Lutomirski wrote:
+>>> This sounds like a great use case for static_call().  PeterZ, do you
+>>> suppose we could wire up static_call() with the module infrastructure
+>>> to make it easy to do "static_call to such-and-such GPL module symbol
+>>> if that symbol is in a loaded module, else nop"?
+>> You're basically asking it to do dynamic linking. And I suppose that is
+>> technically possible.
+>> However, I'm really starting to think kvm (or at least these parts of it
+>> that want to play these games) had better not be a module anymore.
+>=20
+> Maybe we can use an atomic notifier (e.g. page_fault_notifier)?
+>=20
+>=20
 
-alex.
+IMO that=E2=80=99s worse. I want to be able to read do_page_fault() and unde=
+rstand what happens and in what order.
+
+Having do_page_fault run with the wrong CR3 is so fundamental to its operati=
+on that it needs to be very obvious what=E2=80=99s happening.=
