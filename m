@@ -2,114 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0958F1CC43
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 17:52:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BBF81CC85
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 18:09:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726044AbfENPwL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 11:52:11 -0400
-Received: from mail-eopbgr820070.outbound.protection.outlook.com ([40.107.82.70]:49432
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725916AbfENPwL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 11:52:11 -0400
+        id S1726148AbfENQJI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 12:09:08 -0400
+Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:52846 "EHLO
+        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725901AbfENQJI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 12:09:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EmW+u8Pr0LB9YtbOQ/lGTDz63206JAT2zpJymOaTIZE=;
- b=uEw13o1NCtKN24JooA03TZCdOXsH5p/vV7uqfJ4uLBCz7Gboyl06mFfVPZFLYTwKIw05QseJRkChOXF0IkAerZnNdJ5J/36kTuUwcuFTYWevo4xqFCriay96gsvedsMGGi+rc6YDX2krotdrim3sx/PQAyhTOwnPxkdWNpSgwjM=
-Received: from DM6PR12MB2844.namprd12.prod.outlook.com (20.176.117.96) by
- DM6PR12MB3004.namprd12.prod.outlook.com (20.178.29.209) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1878.25; Tue, 14 May 2019 15:52:08 +0000
-Received: from DM6PR12MB2844.namprd12.prod.outlook.com
- ([fe80::edb0:d696:3077:51bc]) by DM6PR12MB2844.namprd12.prod.outlook.com
- ([fe80::edb0:d696:3077:51bc%2]) with mapi id 15.20.1878.024; Tue, 14 May 2019
- 15:52:08 +0000
-From:   "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>
-To:     "Graf, Alexander" <graf@amazon.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>
-Subject: Re: [PATCH] svm/avic: Do not send AVIC doorbell to self
-Thread-Topic: [PATCH] svm/avic: Do not send AVIC doorbell to self
-Thread-Index: AQHVAbWM1dd1RWWcW0KGDe4yNBolwqZfqq2AgAsr2wA=
-Date:   Tue, 14 May 2019 15:52:08 +0000
-Message-ID: <bf389c60-1e47-80c1-43cc-9211a729b693@amd.com>
-References: <1556890721-9613-1-git-send-email-suravee.suthikulpanit@amd.com>
- <ca64dd06-df77-050a-92ff-5d5448382390@amazon.com>
-In-Reply-To: <ca64dd06-df77-050a-92ff-5d5448382390@amazon.com>
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1557850146; x=1589386146;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:mime-version:
+   content-transfer-encoding;
+  bh=plFXiYh0xL6L4GZRf8G+HDY7MbdFYndRHWvRX7zth/w=;
+  b=ZBiTgtcSutWm4WZq0zTbkOwSaN4geL/hEhvYq6dspPnOV3Xc/OtTP8Oj
+   pFGvBuO2BJ6SPY4u4cIWAKOr+ydJuZfbuFBx3bUhEVWdRunzA8bXLvCiX
+   3GwbkHQEC2Qh+K4cmXU4H9fKZ0P0INV+8/jl+cODcWyAq0HgK89v2VDU4
+   s=;
+X-IronPort-AV: E=Sophos;i="5.60,469,1549929600"; 
+   d="scan'208";a="402102493"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2a-1c1b5cdd.us-west-2.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 14 May 2019 16:09:04 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-2a-1c1b5cdd.us-west-2.amazon.com (8.14.7/8.14.7) with ESMTP id x4EG8wr5099411
+        (version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=FAIL);
+        Tue, 14 May 2019 16:09:03 GMT
+Received: from EX13D02EUC004.ant.amazon.com (10.43.164.117) by
+ EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Tue, 14 May 2019 16:09:03 +0000
+Received: from EX13D02EUC001.ant.amazon.com (10.43.164.92) by
+ EX13D02EUC004.ant.amazon.com (10.43.164.117) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Tue, 14 May 2019 16:09:02 +0000
+Received: from EX13D02EUC001.ant.amazon.com ([10.43.164.92]) by
+ EX13D02EUC001.ant.amazon.com ([10.43.164.92]) with mapi id 15.00.1367.000;
+ Tue, 14 May 2019 16:09:02 +0000
+From:   "Sironi, Filippo" <sironi@amazon.de>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+CC:     LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        "vasu.srinivasan@oracle.com" <vasu.srinivasan@oracle.com>
+Subject: Re: [PATCH v2 1/2] KVM: Start populating /sys/hypervisor with KVM
+ entries
+Thread-Topic: [PATCH v2 1/2] KVM: Start populating /sys/hypervisor with KVM
+ entries
+Thread-Index: AQHVCmguTMwTmVyYP0+tMrT8Z/dQMaZqvgUAgAAL5IA=
+Date:   Tue, 14 May 2019 16:09:01 +0000
+Message-ID: <56DAB9BD-2543-49DA-9886-C9C8F2B814F9@amazon.de>
+References: <1539078879-4372-1-git-send-email-sironi@amazon.de>
+ <1557847002-23519-1-git-send-email-sironi@amazon.de>
+ <1557847002-23519-2-git-send-email-sironi@amazon.de>
+ <d03f6be5-d8dc-4389-e14c-295f36a68827@de.ibm.com>
+In-Reply-To: <d03f6be5-d8dc-4389-e14c-295f36a68827@de.ibm.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-x-originating-ip: [165.204.78.1]
-x-clientproxiedby: SN4PR0501CA0020.namprd05.prod.outlook.com
- (2603:10b6:803:40::33) To DM6PR12MB2844.namprd12.prod.outlook.com
- (2603:10b6:5:45::32)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Suravee.Suthikulpanit@amd.com; 
 x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 37ff25fd-c45c-4f89-b584-08d6d8841e63
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:DM6PR12MB3004;
-x-ms-traffictypediagnostic: DM6PR12MB3004:
-x-microsoft-antispam-prvs: <DM6PR12MB30049AE7D57D5631B3937905F3080@DM6PR12MB3004.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1186;
-x-forefront-prvs: 0037FD6480
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(136003)(376002)(39860400002)(396003)(366004)(189003)(199004)(52116002)(14454004)(65826007)(76176011)(6512007)(86362001)(2906002)(2201001)(25786009)(7736002)(305945005)(4326008)(3846002)(6246003)(31696002)(53936002)(64126003)(65956001)(65806001)(66066001)(6116002)(53546011)(186003)(476003)(2616005)(58126008)(54906003)(99286004)(316002)(446003)(6436002)(486006)(6486002)(26005)(2501003)(102836004)(386003)(31686004)(6506007)(110136005)(68736007)(72206003)(66946007)(73956011)(36756003)(66476007)(5660300002)(66446008)(64756008)(66556008)(229853002)(256004)(8676002)(81156014)(8936002)(11346002)(81166006)(71200400001)(71190400001)(478600001);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3004;H:DM6PR12MB2844.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: WzpWXKruLSjA2a12BkBBnJ+9JeYWMEorXlZ7sduuoTpVEVgxWiJk/2pAsOQYzifRLT6LuPJoPldjoJ1VUSFRw3g0DbIP9FCZkagFbqXmwICOlxGqc/DdP2iakXCRnLlrkbHn89/IC7+lxcuLEHufIYi3osmpmfmLPuLEAaIzVYHYyfH1XDmV5i4wFhJAFEyR6CJBWzakldtFgiibWulnHJ18kR+4karWkgwg6Y3F08kk7E/4mwW57xiPM+gKPw/fBXNr/ahmce94qjzuiK7IbXj/mnnw8whsTwi9X30WW9lXrUF4HUzwzhC7Z8sIDTwbQYA7mJmgw2cGqT4FlSd5DbDR7i6NsLr0jNL2oU9vvtHDwX6+baMuM2h9QLxTekoHjljVoyn0C81CJtGevC7odjhtMUHv65kayVifEkP6gHM=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2485C81F5FB50647BC8569080C342F1C@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.164.163]
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <CCC5E4FD52492B49A46973EAD664A3EF@amazon.com>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 37ff25fd-c45c-4f89-b584-08d6d8841e63
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 May 2019 15:52:08.1441
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3004
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-QWxleCwNCg0KT24gNS83LzIwMTkgODoxNiBBTSwgR3JhZiwgQWxleGFuZGVyIHdyb3RlOg0KPiBb
-Q0FVVElPTjrCoEV4dGVybmFswqBFbWFpbF0NCj4gDQo+IE9uwqAwMy4wNS4xOcKgMTU6MzgswqBT
-dXRoaWt1bHBhbml0LMKgU3VyYXZlZcKgd3JvdGU6DQo+PiBBVklDwqBkb29yYmVsbMKgaXPCoHVz
-ZWTCoHRvwqBub3RpZnnCoGHCoHJ1bm5pbmfCoHZDUFXCoHRoYXTCoGludGVycnVwdHMNCj4+IGhh
-c8KgYmVlbsKgaW5qZWN0ZWTCoGludG/CoHRoZcKgdkNQVcKgQVZJQ8KgYmFja2luZ8KgcGFnZS7C
-oEN1cnJlbnTCoGxvZ2ljDQo+PiBjaGVja3PCoG9ubHnCoGlmwqBhwqBWQ1BVwqBpc8KgcnVubmlu
-Z8KgYmVmb3JlwqBzZW5kaW5nwqBhwqBkb29yYmVsbC4NCj4+IEhvd2V2ZXIswqB0aGXCoGRvb3Ji
-ZWxswqBpc8Kgbm90wqBuZWNlc3NhcnnCoGlmwqB0aGXCoGRlc3RpbmF0aW9uDQo+PiBDUFXCoGlz
-wqBpdHNlbGYuDQo+Pg0KPj4gQWRkwqBsb2dpY8KgdG/CoGNoZWNrwqBjdXJyZW50bHnCoHJ1bm5p
-bmfCoENQVcKgYmVmb3JlwqBzZW5kaW5nwqBkb29yYmVsbC4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5
-OsKgU3VyYXZlZcKgU3V0aGlrdWxwYW5pdCA8c3VyYXZlZS5zdXRoaWt1bHBhbml0QGFtZC5jb20+
-DQo+IA0KPiBSZXZpZXdlZC1ieTrCoEFsZXhhbmRlcsKgR3JhZiA8Z3JhZkBhbWF6b24uY29tPg0K
-DQpUaGFua3MuDQoNCj4+IC0tLQ0KPj4gwqDCoGFyY2gveDg2L2t2bS9zdm0uY8KgfMKgMTHCoCsr
-KysrKystLS0tDQo+PiDCoMKgMcKgZmlsZcKgY2hhbmdlZCzCoDfCoGluc2VydGlvbnMoKykswqA0
-wqBkZWxldGlvbnMoLSkNCj4+DQo+PiBkaWZmwqAtLWdpdMKgYS9hcmNoL3g4Ni9rdm0vc3ZtLmPC
-oGIvYXJjaC94ODYva3ZtL3N2bS5jDQo+PiBpbmRleMKgMTIyNzg4Zi4uNGJiZjZmY8KgMTAwNjQ0
-DQo+PiAtLS3CoGEvYXJjaC94ODYva3ZtL3N2bS5jDQo+PiArKyvCoGIvYXJjaC94ODYva3ZtL3N2
-bS5jDQo+PiBAQMKgLTUyODMsMTDCoCs1MjgzLDEzwqBAQMKgc3RhdGljwqB2b2lkwqBzdm1fZGVs
-aXZlcl9hdmljX2ludHIoc3RydWN0wqBrdm1fdmNwdcKgKnZjcHUswqBpbnTCoHZlYykNCj4+IMKg
-wqDCoMKgwqDCoGt2bV9sYXBpY19zZXRfaXJyKHZlYyzCoHZjcHUtPmFyY2guYXBpYyk7DQo+PiDC
-oMKgwqDCoMKgwqBzbXBfbWJfX2FmdGVyX2F0b21pYygpOw0KPj4NCj4+IC3CoMKgwqDCoMKgaWbC
-oChhdmljX3ZjcHVfaXNfcnVubmluZyh2Y3B1KSkNCj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoHdybXNybChTVk1fQVZJQ19ET09SQkVMTCwNCj4+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKga3ZtX2NwdV9nZXRfYXBpY2lkKHZjcHUtPmNwdSkpOw0KPj4gLcKg
-wqDCoMKgwqBlbHNlDQo+PiArwqDCoMKgwqDCoGlmwqAoYXZpY192Y3B1X2lzX3J1bm5pbmcodmNw
-dSkpwqB7wqA+wqArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGludMKgY3B1aWTCoD3CoHZjcHUtPmNw
-dTsNCj4+ICsNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmwqAoY3B1aWTCoCE9wqBn
-ZXRfY3B1KCkpDQo+IA0KPiBUaW55wqBuaXRwaWNrOsKgV2hhdMKgd291bGTCoGtlZXDCoHlvdcKg
-ZnJvbcKgY2hlY2tpbmfCoHZjcHUtPmNwdcKgZGlyZWN0bHnCoGhlcmU/DQoNCk5vdGhpbmcuIEp1
-c3QgY29kaW5nIHN0eWxlLg0KDQpUaGFua3MsDQpTdXJhdmVlDQo=
+
+
+> On 14. May 2019, at 17:26, Christian Borntraeger <borntraeger@de.ibm.com>=
+ wrote:
+> =
+
+> =
+
+> =
+
+> On 14.05.19 17:16, Filippo Sironi wrote:
+>> Start populating /sys/hypervisor with KVM entries when we're running on
+>> KVM. This is to replicate functionality that's available when we're
+>> running on Xen.
+>> =
+
+>> Start with /sys/hypervisor/uuid, which users prefer over
+>> /sys/devices/virtual/dmi/id/product_uuid as a way to recognize a virtual
+>> machine, since it's also available when running on Xen HVM and on Xen PV
+>> and, on top of that doesn't require root privileges by default.
+>> Let's create arch-specific hooks so that different architectures can
+>> provide different implementations.
+>> =
+
+>> Signed-off-by: Filippo Sironi <sironi@amazon.de>
+>> ---
+>> v2:
+>> * move the retrieval of the VM UUID out of uuid_show and into
+>>  kvm_para_get_uuid, which is a weak function that can be overwritten
+>> =
+
+>> drivers/Kconfig              |  2 ++
+>> drivers/Makefile             |  2 ++
+>> drivers/kvm/Kconfig          | 14 ++++++++++++++
+>> drivers/kvm/Makefile         |  1 +
+>> drivers/kvm/sys-hypervisor.c | 30 ++++++++++++++++++++++++++++++
+>> 5 files changed, 49 insertions(+)
+>> create mode 100644 drivers/kvm/Kconfig
+>> create mode 100644 drivers/kvm/Makefile
+>> create mode 100644 drivers/kvm/sys-hypervisor.c
+>> =
+
+>> diff --git a/drivers/Kconfig b/drivers/Kconfig
+>> index 45f9decb9848..90eb835fe951 100644
+>> --- a/drivers/Kconfig
+>> +++ b/drivers/Kconfig
+>> @@ -146,6 +146,8 @@ source "drivers/hv/Kconfig"
+>> =
+
+>> source "drivers/xen/Kconfig"
+>> =
+
+>> +source "drivers/kvm/Kconfig"
+>> +
+>> source "drivers/staging/Kconfig"
+>> =
+
+>> source "drivers/platform/Kconfig"
+>> diff --git a/drivers/Makefile b/drivers/Makefile
+>> index c61cde554340..79cc92a3f6bf 100644
+>> --- a/drivers/Makefile
+>> +++ b/drivers/Makefile
+>> @@ -44,6 +44,8 @@ obj-y				+=3D soc/
+>> obj-$(CONFIG_VIRTIO)		+=3D virtio/
+>> obj-$(CONFIG_XEN)		+=3D xen/
+>> =
+
+>> +obj-$(CONFIG_KVM_GUEST)		+=3D kvm/
+>> +
+>> # regulators early, since some subsystems rely on them to initialize
+>> obj-$(CONFIG_REGULATOR)		+=3D regulator/
+>> =
+
+>> diff --git a/drivers/kvm/Kconfig b/drivers/kvm/Kconfig
+>> new file mode 100644
+>> index 000000000000..3fc041df7c11
+>> --- /dev/null
+>> +++ b/drivers/kvm/Kconfig
+>> @@ -0,0 +1,14 @@
+>> +menu "KVM driver support"
+>> +        depends on KVM_GUEST
+>> +
+>> +config KVM_SYS_HYPERVISOR
+>> +        bool "Create KVM entries under /sys/hypervisor"
+>> +        depends on SYSFS
+>> +        select SYS_HYPERVISOR
+>> +        default y
+>> +        help
+>> +          Create KVM entries under /sys/hypervisor (e.g., uuid). When r=
+unning
+>> +          native or on another hypervisor, /sys/hypervisor may still be
+>> +          present, but it will have no KVM entries.
+>> +
+>> +endmenu
+>> diff --git a/drivers/kvm/Makefile b/drivers/kvm/Makefile
+>> new file mode 100644
+>> index 000000000000..73a43fc994b9
+>> --- /dev/null
+>> +++ b/drivers/kvm/Makefile
+>> @@ -0,0 +1 @@
+>> +obj-$(CONFIG_KVM_SYS_HYPERVISOR) +=3D sys-hypervisor.o
+>> diff --git a/drivers/kvm/sys-hypervisor.c b/drivers/kvm/sys-hypervisor.c
+>> new file mode 100644
+>> index 000000000000..43b1d1a09807
+>> --- /dev/null
+>> +++ b/drivers/kvm/sys-hypervisor.c
+>> @@ -0,0 +1,30 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +
+>> +#include <asm/kvm_para.h>
+>> +
+>> +#include <linux/kobject.h>
+>> +#include <linux/sysfs.h>
+>> +
+>> +__weak const char *kvm_para_get_uuid(void)
+>> +{
+>> +	return NULL;
+>> +}
+>> +
+>> +static ssize_t uuid_show(struct kobject *obj,
+>> +			 struct kobj_attribute *attr,
+>> +			 char *buf)
+>> +{
+>> +	const char *uuid =3D kvm_para_get_uuid();
+> =
+
+> I would prefer to have kvm_para_get_uuid return a uuid_t
+> but char * will probably work out as well.
+
+Let me give this a quick spin.
+
+>> +	return sprintf(buf, "%s\n", uuid);
+>> +}
+>> +
+>> +static struct kobj_attribute uuid =3D __ATTR_RO(uuid);
+>> +
+>> +static int __init uuid_init(void)
+>> +{
+>> +	if (!kvm_para_available())
+> =
+
+> Isnt kvm_para_available a function that is defined in the context of the =
+HOST
+> and not of the guest?
+
+No, kvm_para_available is defined in the guest context.
+On x86, it checks for the presence of the KVM CPUID leafs.
+
+>> +		return 0;
+>> +	return sysfs_create_file(hypervisor_kobj, &uuid.attr);
+>> +}
+>> +
+>> +device_initcall(uuid_init);
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrer: Christian Schlaeger, Ralf Herbrich
+Ust-ID: DE 289 237 879
+Eingetragen am Amtsgericht Charlottenburg HRB 149173 B
+
+
