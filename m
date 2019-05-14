@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D08D51C7B5
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 13:22:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8242F1C7B9
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 13:22:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726362AbfENLWF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 07:22:05 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:44092 "EHLO huawei.com"
+        id S1726369AbfENLWC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 07:22:02 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:44108 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726363AbfENLWC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726338AbfENLWC (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 14 May 2019 07:22:02 -0400
 Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 2FDC12560BFF5A8ED008;
+        by Forcepoint Email with ESMTP id 3F83D18CFD8C6B38241D;
         Tue, 14 May 2019 19:22:00 +0800 (CST)
 Received: from ros.huawei.com (10.143.28.118) by
  DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.439.0; Tue, 14 May 2019 19:21:49 +0800
+ 14.3.439.0; Tue, 14 May 2019 19:21:50 +0800
 From:   Dongjiu Geng <gengdongjiu@huawei.com>
 To:     <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
         <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
@@ -26,9 +26,9 @@ To:     <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
         <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
         <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
         <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
-Subject: [PATCH v17 01/10] hw/arm/virt: Add RAS platform version for migration
-Date:   Tue, 14 May 2019 04:18:14 -0700
-Message-ID: <1557832703-42620-2-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v17 02/10] ACPI: add some GHES structures and macros definition
+Date:   Tue, 14 May 2019 04:18:15 -0700
+Message-ID: <1557832703-42620-3-git-send-email-gengdongjiu@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
 References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
@@ -41,46 +41,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Support this feature since version 4.1, disable it by
-default in the old version.
+Add Generic Error Status Block structures and some macros
+definitions, which is referred to the ACPI 4.0 or ACPI 6.2. The
+HEST table generation and CPER record will use them.
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
- hw/arm/virt.c         | 6 ++++++
- include/hw/arm/virt.h | 1 +
- 2 files changed, 7 insertions(+)
+ include/hw/acpi/acpi-defs.h | 52 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 5331ab7..7bdd41b 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -2043,8 +2043,14 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 1)
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index f9aa4bd..d1996fb 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -224,6 +224,25 @@ typedef struct AcpiMultipleApicTable AcpiMultipleApicTable;
+ #define ACPI_APIC_RESERVED              16   /* 16 and greater are reserved */
  
- static void virt_machine_4_0_options(MachineClass *mc)
- {
-+    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
+ /*
++ * Values for Hardware Error Notification Type field
++ */
++enum AcpiHestNotifyType {
++    ACPI_HEST_NOTIFY_POLLED = 0,
++    ACPI_HEST_NOTIFY_EXTERNAL = 1,
++    ACPI_HEST_NOTIFY_LOCAL = 2,
++    ACPI_HEST_NOTIFY_SCI = 3,
++    ACPI_HEST_NOTIFY_NMI = 4,
++    ACPI_HEST_NOTIFY_CMCI = 5,  /* ACPI 5.0: 18.3.2.7, Table 18-290 */
++    ACPI_HEST_NOTIFY_MCE = 6,   /* ACPI 5.0: 18.3.2.7, Table 18-290 */
++    ACPI_HEST_NOTIFY_GPIO = 7,  /* ACPI 6.0: 18.3.2.7, Table 18-332 */
++    ACPI_HEST_NOTIFY_SEA = 8,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
++    ACPI_HEST_NOTIFY_SEI = 9,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
++    ACPI_HEST_NOTIFY_GSIV = 10, /* ACPI 6.1: 18.3.2.9, Table 18-345 */
++    ACPI_HEST_NOTIFY_SDEI = 11, /* ACPI 6.2: 18.3.2.9, Table 18-383 */
++    ACPI_HEST_NOTIFY_RESERVED = 12 /* 12 and greater are reserved */
++};
 +
-     virt_machine_4_1_options(mc);
-     compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len);
-+    /* Disable memory recovery feature for 4.0 as RAS support was
-+     * introduced with 4.1.
-+     */
-+    vmc->no_ras = true;
- }
- DEFINE_VIRT_MACHINE(4, 0)
++/*
+  * MADT sub-structures (Follow MULTIPLE_APIC_DESCRIPTION_TABLE)
+  */
+ #define ACPI_SUB_HEADER_DEF   /* Common ACPI sub-structure header */\
+@@ -400,6 +419,39 @@ struct AcpiSystemResourceAffinityTable {
+ } QEMU_PACKED;
+ typedef struct AcpiSystemResourceAffinityTable AcpiSystemResourceAffinityTable;
  
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 4240709..7f1a033 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -104,6 +104,7 @@ typedef struct {
-     bool disallow_affinity_adjustment;
-     bool no_its;
-     bool no_pmu;
-+    bool no_ras;
-     bool claim_edge_triggered_timers;
-     bool smbios_old_sys_ver;
-     bool no_highmem_ecam;
++/*
++ * Generic Error Status Block
++ */
++struct AcpiGenericErrorStatus {
++    /* It is a bitmask composed of ACPI_GEBS_xxx macros */
++    uint32_t block_status;
++    uint32_t raw_data_offset;
++    uint32_t raw_data_length;
++    uint32_t data_length;
++    uint32_t error_severity;
++} QEMU_PACKED;
++typedef struct AcpiGenericErrorStatus AcpiGenericErrorStatus;
++
++/*
++ * Masks for block_status flags above
++ */
++#define ACPI_GEBS_UNCORRECTABLE         1
++
++/*
++ * Values for error_severity field above
++ */
++enum AcpiGenericErrorSeverity {
++    ACPI_CPER_SEV_RECOVERABLE,
++    ACPI_CPER_SEV_FATAL,
++    ACPI_CPER_SEV_CORRECTED,
++    ACPI_CPER_SEV_NONE,
++};
++
++/*
++ * Generic Hardware Error Source version 2
++ */
++#define ACPI_HEST_SOURCE_GENERIC_ERROR_V2    10
++
+ #define ACPI_SRAT_PROCESSOR_APIC     0
+ #define ACPI_SRAT_MEMORY             1
+ #define ACPI_SRAT_PROCESSOR_x2APIC   2
 -- 
 1.8.3.1
 
