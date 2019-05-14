@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D2241C7BB
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 13:22:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67C4D1C7BA
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 13:22:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726561AbfENLWM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 07:22:12 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:44478 "EHLO huawei.com"
+        id S1726568AbfENLWN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 07:22:13 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:44496 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726465AbfENLWH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726424AbfENLWH (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 14 May 2019 07:22:07 -0400
 Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 56F04EF173E4AFE96C18;
+        by Forcepoint Email with ESMTP id C7B803012A4F42748010;
         Tue, 14 May 2019 19:22:05 +0800 (CST)
 Received: from ros.huawei.com (10.143.28.118) by
  DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.439.0; Tue, 14 May 2019 19:21:56 +0800
+ 14.3.439.0; Tue, 14 May 2019 19:21:57 +0800
 From:   Dongjiu Geng <gengdongjiu@huawei.com>
 To:     <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
         <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
@@ -26,9 +26,9 @@ To:     <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
         <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
         <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
         <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
-Subject: [PATCH v17 08/10] KVM: Move related hwpoison page functions to accel/kvm/ folder
-Date:   Tue, 14 May 2019 04:18:21 -0700
-Message-ID: <1557832703-42620-9-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v17 09/10] target-arm: kvm64: inject synchronous External Abort
+Date:   Tue, 14 May 2019 04:18:22 -0700
+Message-ID: <1557832703-42620-10-git-send-email-gengdongjiu@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
 References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
@@ -41,170 +41,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_hwpoison_page_add() and kvm_unpoison_all() will be used both
-by X86 and ARM platforms, so move these functions to a common
-accel/kvm/ folder to avoid duplicate code.
+Add synchronous external abort injection logic, setup
+exception type and syndrome value. When switch to guest,
+it will jump to the synchronous external abort vector
+table entry.
+
+The ESR_ELx.DFSC is set to synchronous external abort(0x10),
+and ESR_ELx.FnV is set to not valid(0x1), which will tell
+guest that FAR is not valid and hold an UNKNOWN value.
+These value will be set to KVM register structures through
+KVM_SET_ONE_REG IOCTL.
 
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
- accel/kvm/kvm-all.c     | 33 +++++++++++++++++++++++++++++++++
- include/exec/ram_addr.h | 24 ++++++++++++++++++++++++
- target/arm/kvm.c        |  3 +++
- target/i386/kvm.c       | 34 +---------------------------------
- 4 files changed, 61 insertions(+), 33 deletions(-)
+ target/arm/internals.h |  5 +++--
+ target/arm/kvm64.c     | 34 ++++++++++++++++++++++++++++++++++
+ target/arm/op_helper.c |  2 +-
+ 3 files changed, 38 insertions(+), 3 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 524c4dd..b9f9f29 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -625,6 +625,39 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension)
-     return ret;
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 587a1dd..4d67a91 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -451,13 +451,14 @@ static inline uint32_t syn_insn_abort(int same_el, int ea, int s1ptw, int fsc)
+         | ARM_EL_IL | (ea << 9) | (s1ptw << 7) | fsc;
  }
  
-+typedef struct HWPoisonPage {
-+    ram_addr_t ram_addr;
-+    QLIST_ENTRY(HWPoisonPage) list;
-+} HWPoisonPage;
-+
-+static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
-+    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
-+
-+void kvm_unpoison_all(void *param)
+-static inline uint32_t syn_data_abort_no_iss(int same_el,
++static inline uint32_t syn_data_abort_no_iss(int same_el, int fnv,
+                                              int ea, int cm, int s1ptw,
+                                              int wnr, int fsc)
+ {
+     return (EC_DATAABORT << ARM_EL_EC_SHIFT) | (same_el << ARM_EL_EC_SHIFT)
+            | ARM_EL_IL
+-           | (ea << 9) | (cm << 8) | (s1ptw << 7) | (wnr << 6) | fsc;
++           | (fnv << 10) | (ea << 9) | (cm << 8) | (s1ptw << 7)
++           | (wnr << 6) | fsc;
+ }
+ 
+ static inline uint32_t syn_data_abort_with_iss(int same_el,
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index e3ba149..c7bdc6a 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -697,6 +697,40 @@ int kvm_arm_cpreg_level(uint64_t regidx)
+     return KVM_PUT_RUNTIME_STATE;
+ }
+ 
++/* Inject synchronous external abort */
++static void kvm_inject_arm_sea(CPUState *c)
 +{
-+    HWPoisonPage *page, *next_page;
++    ARMCPU *cpu = ARM_CPU(c);
++    CPUARMState *env = &cpu->env;
++    CPUClass *cc = CPU_GET_CLASS(c);
++    uint32_t esr;
++    bool same_el;
 +
-+    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
-+        QLIST_REMOVE(page, list);
-+        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
-+        g_free(page);
-+    }
++    /**
++     * set the exception type to synchronous data abort
++     * and the target exception Level to EL1.
++     */
++    c->exception_index = EXCP_DATA_ABORT;
++    env->exception.target_el = 1;
++
++    /*
++     * Set the DFSC to synchronous external abort and set FnV to not valid,
++     * this will tell guest the FAR_ELx is UNKNOWN for this abort.
++     */
++
++    /* This exception comes from lower or current exception level. */
++    same_el = arm_current_el(env) == env->exception.target_el;
++    esr = syn_data_abort_no_iss(same_el, 1, 0, 0, 0, 0, 0x10);
++
++    env->exception.syndrome = esr;
++
++    /**
++     * The vcpu thread already hold BQL, so no need hold again when
++     * calling do_interrupt
++     */
++    cc->do_interrupt(c);
 +}
 +
-+void kvm_hwpoison_page_add(ram_addr_t ram_addr)
-+{
-+    HWPoisonPage *page;
-+
-+    QLIST_FOREACH(page, &hwpoison_page_list, list) {
-+        if (page->ram_addr == ram_addr) {
-+            return;
-+        }
-+    }
-+    page = g_new(HWPoisonPage, 1);
-+    page->ram_addr = ram_addr;
-+    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
-+}
-+
- static uint32_t adjust_ioeventfd_endianness(uint32_t val, uint32_t size)
- {
- #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 139ad79..193b0a7 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -116,6 +116,30 @@ void qemu_ram_free(RAMBlock *block);
+ #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+                  KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
  
- int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp);
- 
-+/**
-+ * kvm_hwpoison_page_add:
-+ *
-+ * Parameters:
-+ *  @ram_addr: the address in the RAM for the poisoned page
-+ *
-+ * Add a poisoned page to the list
-+ *
-+ * Return: None.
-+ */
-+void kvm_hwpoison_page_add(ram_addr_t ram_addr);
-+
-+/**
-+ * kvm_unpoison_all:
-+ *
-+ * Parameters:
-+ *  @param: some data may be passed to this function
-+ *
-+ * Free and remove all the poisoned pages in the list
-+ *
-+ * Return: None.
-+ */
-+void kvm_unpoison_all(void *param);
-+
- #define DIRTY_CLIENTS_ALL     ((1 << DIRTY_MEMORY_NUM) - 1)
- #define DIRTY_CLIENTS_NOCODE  (DIRTY_CLIENTS_ALL & ~(1 << DIRTY_MEMORY_CODE))
- 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 5995634..6d3b25b 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -29,6 +29,7 @@
- #include "exec/address-spaces.h"
- #include "hw/boards.h"
- #include "qemu/log.h"
-+#include "exec/ram_addr.h"
- 
- const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
-     KVM_CAP_LAST_INFO
-@@ -187,6 +188,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
- 
-     cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
- 
-+    qemu_register_reset(kvm_unpoison_all, NULL);
-+
-     return 0;
- }
- 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 3b29ce5..9bdb879 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -46,6 +46,7 @@
- #include "migration/blocker.h"
- #include "exec/memattrs.h"
- #include "trace.h"
-+#include "exec/ram_addr.h"
- 
- //#define DEBUG_KVM
- 
-@@ -467,39 +468,6 @@ uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
- }
- 
- 
--typedef struct HWPoisonPage {
--    ram_addr_t ram_addr;
--    QLIST_ENTRY(HWPoisonPage) list;
--} HWPoisonPage;
--
--static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
--    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
--
--static void kvm_unpoison_all(void *param)
--{
--    HWPoisonPage *page, *next_page;
--
--    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
--        QLIST_REMOVE(page, list);
--        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
--        g_free(page);
--    }
--}
--
--static void kvm_hwpoison_page_add(ram_addr_t ram_addr)
--{
--    HWPoisonPage *page;
--
--    QLIST_FOREACH(page, &hwpoison_page_list, list) {
--        if (page->ram_addr == ram_addr) {
--            return;
--        }
--    }
--    page = g_new(HWPoisonPage, 1);
--    page->ram_addr = ram_addr;
--    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
--}
--
- static int kvm_get_mce_cap_supported(KVMState *s, uint64_t *mce_cap,
-                                      int *max_banks)
- {
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index 8698b4d..d43134a 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -109,7 +109,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
+      * ISV field.
+      */
+     if (!(template_syn & ARM_EL_ISV) || target_el != 2 || s1ptw) {
+-        syn = syn_data_abort_no_iss(same_el,
++        syn = syn_data_abort_no_iss(same_el, 0,
+                                     ea, 0, s1ptw, is_write, fsc);
+     } else {
+         /* Fields: IL, ISV, SAS, SSE, SRT, SF and AR come from the template
 -- 
 1.8.3.1
 
