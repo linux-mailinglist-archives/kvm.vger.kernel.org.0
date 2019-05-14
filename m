@@ -2,293 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F017B1CCDB
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 18:21:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B7021CCE6
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 18:25:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726338AbfENQVr convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 14 May 2019 12:21:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28387 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726025AbfENQVq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 12:21:46 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7F317C0624DF;
-        Tue, 14 May 2019 16:21:43 +0000 (UTC)
-Received: from x1.home (ovpn-117-92.phx2.redhat.com [10.3.117.92])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CB18A600C5;
-        Tue, 14 May 2019 16:21:38 +0000 (UTC)
-Date:   Tue, 14 May 2019 10:21:38 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     kwankhede@nvidia.com, kevin.tian@intel.com,
-        baolu.lu@linux.intel.com, yi.y.sun@intel.com, joro@8bytes.org,
-        jean-philippe.brucker@arm.com, peterx@redhat.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        yamada.masahiro@socionext.com, iommu@lists.linux-foundation.org
-Subject: Re: [RFC v3 1/3] vfio_pci: split vfio_pci.c into two source files
-Message-ID: <20190514102138.13bf7de0@x1.home>
-In-Reply-To: <1556021680-2911-2-git-send-email-yi.l.liu@intel.com>
-References: <1556021680-2911-1-git-send-email-yi.l.liu@intel.com>
-        <1556021680-2911-2-git-send-email-yi.l.liu@intel.com>
-Organization: Red Hat
+        id S1726107AbfENQZk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 12:25:40 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:34746 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725980AbfENQZk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 12:25:40 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4EGELEW097729;
+        Tue, 14 May 2019 16:24:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=JCV/HzgrZlCHVmf/0Cx/bB8oSFM3Re9RwssBEXXRqZc=;
+ b=soBldPESLpJww1uCH2gLsnSanFFjMUy/AlTjGJ9OkUBv6qJNOBHy1+fFhi9hJQ+737dg
+ tJf1MiPoFlWIpy0YVR8DtCOFPhvOWKt9vq3A+pMsKfAp2/IrfcFJyalxALp0aBrMK8zw
+ gK0Up3guxWE/N1DTXoY/dX4xyFMkqwJvXCLgZXEWJRyRtyyjWHFMWUJNb41TIEqsxH/0
+ f4TnwL3Mz8fw8pQtfsmFPuZfY8FzdgkuyR/aIyrQagKrFxi/TddxfozWkPVdMnsH9b3W
+ 9/at8r4tPmHvEJJCoB+XTRDj7rUeAVaRHDwKsE2Zo7YSQPS6SLOJrGD1faWqvlfcZkQP YQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2130.oracle.com with ESMTP id 2sdkwdqhdg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 May 2019 16:24:56 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4EGNc90005562;
+        Tue, 14 May 2019 16:24:55 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2sdnqjnh3e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 May 2019 16:24:55 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4EGOqDm006383;
+        Tue, 14 May 2019 16:24:52 GMT
+Received: from [10.166.106.34] (/10.166.106.34)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 14 May 2019 09:24:52 -0700
+Subject: Re: [RFC KVM 18/27] kvm/isolation: function to copy page table
+ entries for percpu buffer
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        kvm list <kvm@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        jan.setjeeilers@oracle.com, Liran Alon <liran.alon@oracle.com>,
+        Jonathan Adams <jwadams@google.com>
+References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
+ <1557758315-12667-19-git-send-email-alexandre.chartre@oracle.com>
+ <CALCETrWUKZv=wdcnYjLrHDakamMBrJv48wp2XBxZsEmzuearRQ@mail.gmail.com>
+ <20190514070941.GE2589@hirez.programming.kicks-ass.net>
+ <b8487de1-83a8-2761-f4a6-26c583eba083@oracle.com>
+ <B447B6E8-8CEF-46FF-9967-DFB2E00E55DB@amacapital.net>
+ <4e7d52d7-d4d2-3008-b967-c40676ed15d2@oracle.com>
+ <CALCETrXtwksWniEjiWKgZWZAyYLDipuq+sQ449OvDKehJ3D-fg@mail.gmail.com>
+From:   Alexandre Chartre <alexandre.chartre@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <e5fedad9-4607-0aa4-297e-398c0e34ae2b@oracle.com>
+Date:   Tue, 14 May 2019 18:24:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 14 May 2019 16:21:46 +0000 (UTC)
+In-Reply-To: <CALCETrXtwksWniEjiWKgZWZAyYLDipuq+sQ449OvDKehJ3D-fg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905140114
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905140114
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 23 Apr 2019 20:14:38 +0800
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-> This patch splits the non-module specific codes from original
-> drivers/vfio/pci/vfio_pci.c into a common.c under drivers/vfio/pci.
-> This is for potential code sharing. e.g. vfio-mdev-pci driver
+On 5/14/19 5:23 PM, Andy Lutomirski wrote:
+> On Tue, May 14, 2019 at 2:42 AM Alexandre Chartre
+> <alexandre.chartre@oracle.com> wrote:
+>>
+>>
+>> On 5/14/19 10:34 AM, Andy Lutomirski wrote:
+>>>
+>>>
+>>>> On May 14, 2019, at 1:25 AM, Alexandre Chartre <alexandre.chartre@oracle.com> wrote:
+>>>>
+>>>>
+>>>>> On 5/14/19 9:09 AM, Peter Zijlstra wrote:
+>>>>>> On Mon, May 13, 2019 at 11:18:41AM -0700, Andy Lutomirski wrote:
+>>>>>> On Mon, May 13, 2019 at 7:39 AM Alexandre Chartre
+>>>>>> <alexandre.chartre@oracle.com> wrote:
+>>>>>>>
+>>>>>>> pcpu_base_addr is already mapped to the KVM address space, but this
+>>>>>>> represents the first percpu chunk. To access a per-cpu buffer not
+>>>>>>> allocated in the first chunk, add a function which maps all cpu
+>>>>>>> buffers corresponding to that per-cpu buffer.
+>>>>>>>
+>>>>>>> Also add function to clear page table entries for a percpu buffer.
+>>>>>>>
+>>>>>>
+>>>>>> This needs some kind of clarification so that readers can tell whether
+>>>>>> you're trying to map all percpu memory or just map a specific
+>>>>>> variable.  In either case, you're making a dubious assumption that
+>>>>>> percpu memory contains no secrets.
+>>>>> I'm thinking the per-cpu random pool is a secrit. IOW, it demonstrably
+>>>>> does contain secrits, invalidating that premise.
+>>>>
+>>>> The current code unconditionally maps the entire first percpu chunk
+>>>> (pcpu_base_addr). So it assumes it doesn't contain any secret. That is
+>>>> mainly a simplification for the POC because a lot of core information
+>>>> that we need, for example just to switch mm, are stored there (like
+>>>> cpu_tlbstate, current_task...).
+>>>
+>>> I don’t think you should need any of this.
+>>>
+>>
+>> At the moment, the current code does need it. Otherwise it can't switch from
+>> kvm mm to kernel mm: switch_mm_irqs_off() will fault accessing "cpu_tlbstate",
+>> and then the page fault handler will fail accessing "current" before calling
+>> the kvm page fault handler. So it will double fault or loop on page faults.
+>> There are many different places where percpu variables are used, and I have
+>> experienced many double fault/page fault loop because of that.
 > 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Lu Baolu <baolu.lu@linux.intel.com>
-> Signed-off-by: Liu, Yi L <yi.l.liu@intel.com>
-> ---
->  drivers/vfio/pci/Makefile           |    2 +-
->  drivers/vfio/pci/common.c           | 1511 +++++++++++++++++++++++++++++++++++
->  drivers/vfio/pci/vfio_pci.c         | 1476 +---------------------------------
->  drivers/vfio/pci/vfio_pci_private.h |   27 +
->  4 files changed, 1551 insertions(+), 1465 deletions(-)
->  create mode 100644 drivers/vfio/pci/common.c
+> Now you're experiencing what working on the early PTI code was like :)
 > 
-> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-> index 9662c06..813f6b3 100644
-> --- a/drivers/vfio/pci/Makefile
-> +++ b/drivers/vfio/pci/Makefile
-> @@ -1,5 +1,5 @@
->  
-> -vfio-pci-y := vfio_pci.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
-> +vfio-pci-y := vfio_pci.o common.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
->  vfio-pci-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
->  vfio-pci-$(CONFIG_VFIO_PCI_NVLINK2) += vfio_pci_nvlink2.o
->  
-> diff --git a/drivers/vfio/pci/common.c b/drivers/vfio/pci/common.c
-> new file mode 100644
-> index 0000000..847e2e4
-> --- /dev/null
-> +++ b/drivers/vfio/pci/common.c
+> This is why I think you shouldn't touch current in any of this.
+> 
+>>
+>>>>
+>>>> If the entire first percpu chunk effectively has secret then we will
+>>>> need to individually map only buffers we need. The kvm_copy_percpu_mapping()
+>>>> function is added to copy mapping for a specified percpu buffer, so
+>>>> this used to map percpu buffers which are not in the first percpu chunk.
+>>>>
+>>>> Also note that mapping is constrained by PTE (4K), so mapped buffers
+>>>> (percpu or not) which do not fill a whole set of pages can leak adjacent
+>>>> data store on the same pages.
+>>>>
+>>>>
+>>>
+>>> I would take a different approach: figure out what you need and put it in its
+>>> own dedicated area, kind of like cpu_entry_area.
+>>
+>> That's certainly something we can do, like Julian proposed with "Process-local
+>> memory allocations": https://lkml.org/lkml/2018/11/22/1240
+>>
+>> That's fine for buffers allocated from KVM, however, we will still need some
+>> core kernel mappings so the thread can run and interrupts can be handled.
+>>
+>>> One nasty issue you’ll have is vmalloc: the kernel stack is in the
+>>> vmap range, and, if you allow access to vmap memory at all, you’ll
+>>> need some way to ensure that *unmap* gets propagated. I suspect the
+>>> right choice is to see if you can avoid using the kernel stack at all
+>>> in isolated mode.  Maybe you could run on the IRQ stack instead.
+>>
+>> I am currently just copying the task stack mapping into the KVM page table
+>> (patch 23) when a vcpu is created:
+>>
+>>          err = kvm_copy_ptes(tsk->stack, THREAD_SIZE);
+>>
+>> And this seems to work. I am clearing the mapping when the VM vcpu is freed,
+>> so I am making the assumption that the same task is used to create and free
+>> a vcpu.
+>>
+> 
+> vCPUs are bound to an mm but not a specific task, right?  So I think
+> this is wrong in both directions.
+> 
 
-Nit, I realize that our file naming scheme includes a lot of
-redundancy, but better to have redundancy than inconsistency imo.
-Perhaps vfio_pci_common.c.
+I know, that was yet another shortcut for the POC, I assume there's a 1:1
+mapping between a vCPU and task, but I think that's fair with qemu.
 
-> @@ -0,0 +1,1511 @@
-> +/*
-> + * Copyright © 2019 Intel Corporation.
-> + *     Author: Liu, Yi L <yi.l.liu@intel.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + *
-> + * Derived from original vfio_pci.c:
-> + * Copyright (C) 2012 Red Hat, Inc.  All rights reserved.
-> + *     Author: Alex Williamson <alex.williamson@redhat.com>
-> + *
-> + * Derived from original vfio:
-> + * Copyright 2010 Cisco Systems, Inc.  All rights reserved.
-> + * Author: Tom Lyon, pugs@cisco.com
-> + */
-> +
-> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> +
-> +#include <linux/device.h>
-> +#include <linux/eventfd.h>
-> +#include <linux/file.h>
-> +#include <linux/interrupt.h>
-> +#include <linux/iommu.h>
-> +#include <linux/module.h>
-> +#include <linux/mutex.h>
-> +#include <linux/notifier.h>
-> +#include <linux/pci.h>
-> +#include <linux/pm_runtime.h>
-> +#include <linux/slab.h>
-> +#include <linux/types.h>
-> +#include <linux/uaccess.h>
-> +#include <linux/vfio.h>
-> +#include <linux/vgaarb.h>
-> +#include <linux/nospec.h>
-> +
-> +#include "vfio_pci_private.h"
-> +
 
-[snip faithful code moves]
+> Suppose a vCPU is created, then the task exits, the stack mapping gets
+> freed (the core code tries to avoid this, but it does happen), and a
+> new stack gets allocated at the same VA with different physical pages.
+> Now you're toast :)  On the flip side, wouldn't you crash if a vCPU is
+> created and then run on a different thread?
 
-> +void vfio_pci_vga_probe(struct vfio_pci_device *vdev)
-> +{
-> +	vga_client_register(vdev->pdev, vdev, NULL, vfio_pci_set_vga_decode);
-> +	vga_set_legacy_decoding(vdev->pdev,
-> +				vfio_pci_set_vga_decode(vdev, false));
-> +}
-> +
-> +void vfio_pci_vga_remove(struct vfio_pci_device *vdev)
-> +{
-> +	vga_client_register(vdev->pdev, NULL, NULL, NULL);
-> +	vga_set_legacy_decoding(vdev->pdev,
-> +			VGA_RSRC_NORMAL_IO | VGA_RSRC_NORMAL_MEM |
-> +			VGA_RSRC_LEGACY_IO | VGA_RSRC_LEGACY_MEM);
-> +}
+Yes, that's why I have a safety net: before entering KVM isolation I always
+check that the current task is mapped in the KVM address space, if not it
+gets mapped.
 
-Two new functions, though the names don't really match their purpose.
+> How important is the ability to enable IRQs while running with the KVM
+> page tables?
+> 
 
-[snip more faithful code moves]
-> +
-> +void vfio_pci_probe_idle_d3(struct vfio_pci_device *vdev)
-> +{
-> +
-> +	/*
-> +	 * pci-core sets the device power state to an unknown value at
-> +	 * bootup and after being removed from a driver.  The only
-> +	 * transition it allows from this unknown state is to D0, which
-> +	 * typically happens when a driver calls pci_enable_device().
-> +	 * We're not ready to enable the device yet, but we do want to
-> +	 * be able to get to D3.  Therefore first do a D0 transition
-> +	 * before going to D3.
-> +	 */
-> +	vfio_pci_set_power_state(vdev, PCI_D0);
-> +	vfio_pci_set_power_state(vdev, PCI_D3hot);
-> +}
+I can't say, I would need to check but we probably need IRQs at least for
+some timers. Sounds like you would really prefer IRQs to be disabled.
 
-Another new function.  This also doesn't really match function name to
-purpose.
 
-[snip more faithful code moves]
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index 3fa20e9..6ce1a81 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-[en masse code deletes]
-> @@ -1324,6 +147,11 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  	spin_lock_init(&vdev->irqlock);
->  	mutex_init(&vdev->ioeventfds_lock);
->  	INIT_LIST_HEAD(&vdev->ioeventfds_list);
-> +	vdev->nointxmask = nointxmask;
-> +#ifdef CONFIG_VFIO_PCI_VGA
-> +	vdev->disable_vga = disable_vga;
-> +#endif
-> +	vdev->disable_idle_d3 = disable_idle_d3;
->  
->  	ret = vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
->  	if (ret) {
-> @@ -1340,27 +168,13 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  		return ret;
->  	}
->  
-> -	if (vfio_pci_is_vga(pdev)) {
-> -		vga_client_register(pdev, vdev, NULL, vfio_pci_set_vga_decode);
-> -		vga_set_legacy_decoding(pdev,
-> -					vfio_pci_set_vga_decode(vdev, false));
-> -	}
-> +	if (vfio_pci_is_vga(pdev))
-> +		vfio_pci_vga_probe(vdev);
->  
->  	vfio_pci_probe_power_state(vdev);
->  
-> -	if (!disable_idle_d3) {
-> -		/*
-> -		 * pci-core sets the device power state to an unknown value at
-> -		 * bootup and after being removed from a driver.  The only
-> -		 * transition it allows from this unknown state is to D0, which
-> -		 * typically happens when a driver calls pci_enable_device().
-> -		 * We're not ready to enable the device yet, but we do want to
-> -		 * be able to get to D3.  Therefore first do a D0 transition
-> -		 * before going to D3.
-> -		 */
-> -		vfio_pci_set_power_state(vdev, PCI_D0);
-> -		vfio_pci_set_power_state(vdev, PCI_D3hot);
-> -	}
-> +	if (!disable_idle_d3)
-> +		vfio_pci_probe_idle_d3(vdev);
->  
->  	return ret;
->  }
-> @@ -1383,48 +197,14 @@ static void vfio_pci_remove(struct pci_dev *pdev)
->  		vfio_pci_set_power_state(vdev, PCI_D0);
->  
->  	kfree(vdev->pm_save);
-> -	kfree(vdev);
->  
->  	if (vfio_pci_is_vga(pdev)) {
-> -		vga_client_register(pdev, NULL, NULL, NULL);
-> -		vga_set_legacy_decoding(pdev,
-> -				VGA_RSRC_NORMAL_IO | VGA_RSRC_NORMAL_MEM |
-> -				VGA_RSRC_LEGACY_IO | VGA_RSRC_LEGACY_MEM);
-> -	}
-> -}
-> -
-> -static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
-> -						  pci_channel_state_t state)
-> -{
-> -	struct vfio_pci_device *vdev;
-> -	struct vfio_device *device;
-> -
-> -	device = vfio_device_get_from_dev(&pdev->dev);
-> -	if (device == NULL)
-> -		return PCI_ERS_RESULT_DISCONNECT;
-> -
-> -	vdev = vfio_device_data(device);
-> -	if (vdev == NULL) {
-> -		vfio_device_put(device);
-> -		return PCI_ERS_RESULT_DISCONNECT;
-> +		vfio_pci_vga_remove(vdev);
->  	}
->  
-> -	mutex_lock(&vdev->igate);
-> -
-> -	if (vdev->err_trigger)
-> -		eventfd_signal(vdev->err_trigger, 1);
-> -
-> -	mutex_unlock(&vdev->igate);
-> -
-> -	vfio_device_put(device);
-> -
-> -	return PCI_ERS_RESULT_CAN_RECOVER;
-> +	kfree(vdev);
->  }
-
-All of the above refactoring should occur in a preceding patch(es).
-This patch should be 100% unchanged code moves plus support
-includes/defines and comment header in the new file.
-
-> @@ -1685,7 +233,7 @@ static int __init vfio_pci_init(void)
->  	if (ret)
->  		goto out_driver;
->  
-> -	vfio_pci_fill_ids();
-> +	vfio_pci_fill_ids(&ids[0], &vfio_pci_driver);
-
-For instance I missed this change.
-
->  
->  	return 0;
->  
-> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-> index 1812cf2..9bbf22c 100644
-> --- a/drivers/vfio/pci/vfio_pci_private.h
-> +++ b/drivers/vfio/pci/vfio_pci_private.h
-> @@ -125,6 +125,11 @@ struct vfio_pci_device {
->  	struct list_head	dummy_resources_list;
->  	struct mutex		ioeventfds_lock;
->  	struct list_head	ioeventfds_list;
-> +	bool			nointxmask;
-> +#ifdef CONFIG_VFIO_PCI_VGA
-> +	bool			disable_vga;
-> +#endif
-> +	bool			disable_idle_d3;
-
-More refactoring, do these separately so they can be properly reviewed
-without trying to spot changes in 3000 lines of diff.  I think what
-you've done is sound, it just needs to be refactored separate from the
-code moves so that it can be reviewed.  Thanks!
-
-Alex
+alex.
