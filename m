@@ -2,334 +2,505 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1062D1C594
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 11:02:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4630E1C604
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 11:27:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726709AbfENJCp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 05:02:45 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:47394 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725916AbfENJCp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 05:02:45 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 3FDCEC449AF04FC2B0DD;
-        Tue, 14 May 2019 17:02:40 +0800 (CST)
-Received: from [127.0.0.1] (10.67.78.74) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Tue, 14 May 2019
- 17:02:29 +0800
-Subject: Re: [RFC] Question about enable doorbell irq and halt_poll process
-From:   "Tangnianyao (ICT)" <tangnianyao@huawei.com>
-To:     Marc Zyngier <marc.zyngier@arm.com>
-CC:     <kvmarm@lists.cs.columbia.edu>, <linux-kernel@vger.kernel.org>,
-        <linuxarm@huawei.com>, <guoheyi@huawei.com>, <kvm@vger.kernel.org>,
-        <xuwei5@huawei.com>, <wanghaibin.wang@huawei.com>
-References: <0fb3c9ba-8428-ea6c-2973-952624f601cc@huawei.com>
- <20190320170219.510f2e1e@why.wild-wind.fr.eu.org>
- <5df934fd-06d5-55f2-68a5-6f4985e4ac1b@huawei.com>
- <86zhpc66jl.wl-marc.zyngier@arm.com>
- <e32d81ed-d1f5-ce0b-7845-d4b680d556df@huawei.com>
- <86imvu3uje.wl-marc.zyngier@arm.com>
- <6547b80a-f0c1-b74e-f37f-59c1ad96c8b3@huawei.com>
- <861s1tavn0.wl-marc.zyngier@arm.com>
- <5910533f-c6ac-6350-370f-bd218bba3fd8@huawei.com>
-Message-ID: <53a525e5-c9a7-0d98-ff7a-ca5be0ea381a@huawei.com>
-Date:   Tue, 14 May 2019 17:02:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.0
+        id S1726303AbfENJ1F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 05:27:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35594 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725916AbfENJ1F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 05:27:05 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E269A87624;
+        Tue, 14 May 2019 09:27:03 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8660360166;
+        Tue, 14 May 2019 09:27:03 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id CEC2D41F3C;
+        Tue, 14 May 2019 09:27:02 +0000 (UTC)
+Date:   Tue, 14 May 2019 05:27:02 -0400 (EDT)
+From:   Pankaj Gupta <pagupta@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org,
+        dan j williams <dan.j.williams@intel.com>,
+        zwisler@kernel.org, vishal l verma <vishal.l.verma@intel.com>,
+        dave jiang <dave.jiang@intel.com>, mst@redhat.com,
+        jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net,
+        hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu,
+        adilger kernel <adilger.kernel@dilger.ca>,
+        darrick wong <darrick.wong@oracle.com>, lcapitulino@redhat.com,
+        kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com,
+        nilal@redhat.com, riel@surriel.com, stefanha@redhat.com,
+        aarcange@redhat.com, david@fromorbit.com, cohuck@redhat.com,
+        xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
+        pbonzini@redhat.com, kilobyte@angband.pl,
+        yuval shaia <yuval.shaia@oracle.com>, jstaron@google.com
+Message-ID: <752392764.28554139.1557826022323.JavaMail.zimbra@redhat.com>
+In-Reply-To: <f2ea35a6-ec98-447c-44fe-0cb3ab309340@redhat.com>
+References: <20190510155202.14737-1-pagupta@redhat.com> <20190510155202.14737-3-pagupta@redhat.com> <f2ea35a6-ec98-447c-44fe-0cb3ab309340@redhat.com>
+Subject: Re: [PATCH v8 2/6] virtio-pmem: Add virtio pmem driver
 MIME-Version: 1.0
-In-Reply-To: <5910533f-c6ac-6350-370f-bd218bba3fd8@huawei.com>
-Content-Type: text/plain; charset="gbk"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.78.74]
-X-CFilter-Loop: Reflected
+X-Originating-IP: [10.65.16.148, 10.4.195.18]
+Thread-Topic: virtio-pmem: Add virtio pmem driver
+Thread-Index: xYWChsuo0mqv2Tff4hSAYzNT4Gs45Q==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 14 May 2019 09:27:04 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+Hi David,
 
-On 2019/4/29 10:29, Tangnianyao (ICT) wrote:
+Thank you for the review.
 
-Hi, Marc
+> On 10.05.19 17:51, Pankaj Gupta wrote:
+> > This patch adds virtio-pmem driver for KVM guest.
+> > 
+> > Guest reads the persistent memory range information from
+> > Qemu over VIRTIO and registers it on nvdimm_bus. It also
+> > creates a nd_region object with the persistent memory
+> > range information so that existing 'nvdimm/pmem' driver
+> > can reserve this into system memory map. This way
+> > 'virtio-pmem' driver uses existing functionality of pmem
+> > driver to register persistent memory compatible for DAX
+> > capable filesystems.
+> > 
+> > This also provides function to perform guest flush over
+> > VIRTIO from 'pmem' driver when userspace performs flush
+> > on DAX memory range.
+> > 
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
+> > ---
+> >  drivers/nvdimm/Makefile          |   1 +
+> >  drivers/nvdimm/nd_virtio.c       | 129 +++++++++++++++++++++++++++++++
+> >  drivers/nvdimm/virtio_pmem.c     | 117 ++++++++++++++++++++++++++++
+> >  drivers/virtio/Kconfig           |  10 +++
+> >  include/linux/virtio_pmem.h      |  60 ++++++++++++++
+> >  include/uapi/linux/virtio_ids.h  |   1 +
+> >  include/uapi/linux/virtio_pmem.h |  10 +++
+> >  7 files changed, 328 insertions(+)
+> >  create mode 100644 drivers/nvdimm/nd_virtio.c
+> >  create mode 100644 drivers/nvdimm/virtio_pmem.c
+> >  create mode 100644 include/linux/virtio_pmem.h
+> >  create mode 100644 include/uapi/linux/virtio_pmem.h
+> > 
+> > diff --git a/drivers/nvdimm/Makefile b/drivers/nvdimm/Makefile
+> > index 6f2a088afad6..cefe233e0b52 100644
+> > --- a/drivers/nvdimm/Makefile
+> > +++ b/drivers/nvdimm/Makefile
+> > @@ -5,6 +5,7 @@ obj-$(CONFIG_ND_BTT) += nd_btt.o
+> >  obj-$(CONFIG_ND_BLK) += nd_blk.o
+> >  obj-$(CONFIG_X86_PMEM_LEGACY) += nd_e820.o
+> >  obj-$(CONFIG_OF_PMEM) += of_pmem.o
+> > +obj-$(CONFIG_VIRTIO_PMEM) += virtio_pmem.o nd_virtio.o
+> >  
+> >  nd_pmem-y := pmem.o
+> >  
+> > diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
+> > new file mode 100644
+> > index 000000000000..ed7ddcc5a62c
+> > --- /dev/null
+> > +++ b/drivers/nvdimm/nd_virtio.c
+> > @@ -0,0 +1,129 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * virtio_pmem.c: Virtio pmem Driver
+> > + *
+> > + * Discovers persistent memory range information
+> > + * from host and provides a virtio based flushing
+> > + * interface.
+> > + */
+> > +#include <linux/virtio_pmem.h>
+> > +#include "nd.h"
+> > +
+> > + /* The interrupt handler */
+> > +void host_ack(struct virtqueue *vq)
+> > +{
+> > +	unsigned int len;
+> > +	unsigned long flags;
+> > +	struct virtio_pmem_request *req, *req_buf;
+> > +	struct virtio_pmem *vpmem = vq->vdev->priv;
+> 
+> Nit: use reverse Christmas tree layout :)
 
-> On 2019/4/23 18:00, Marc Zyngier wrote:
-> 
-> Hi, Marc
-> 
->> On Tue, 23 Apr 2019 08:44:17 +0100,
->> "Tangnianyao (ICT)" <tangnianyao@huawei.com> wrote:
->>>
->>> Hi, Marc
->>
->> [...]
->>
->>> I've learned that there's some implementation problem for the PCIe
->>> controller of Hi1616, the processor of D05. The PCIe ACS was not
->>> implemented properly and D05 doesn't support VM using pcie vf.
->>
->> My D05 completely disagrees with you:
->>
->> root@unassigned-hostname:~# lspci -v
->> 00:00.0 Host bridge: Red Hat, Inc. QEMU PCIe Host bridge
->> 	Subsystem: Red Hat, Inc QEMU PCIe Host bridge
->> 	Flags: fast devsel
->> lspci: Unable to load libkmod resources: error -12
->>
->> 00:01.0 Ethernet controller: Red Hat, Inc Virtio network device (rev 01)
->> 	Subsystem: Red Hat, Inc Virtio network device
->> 	Flags: bus master, fast devsel, latency 0, IRQ 40
->> 	Memory at 10040000 (32-bit, non-prefetchable) [size=4K]
->> 	Memory at 8000000000 (64-bit, prefetchable) [size=16K]
->> 	Expansion ROM at 10000000 [disabled] [size=256K]
->> 	Capabilities: [98] MSI-X: Enable+ Count=3 Masked-
->> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
->> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
->> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
->> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
->> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
->> 	Kernel driver in use: virtio-pci
->>
->> 00:02.0 SCSI storage controller: Red Hat, Inc Virtio block device (rev 01)
->> 	Subsystem: Red Hat, Inc Virtio block device
->> 	Flags: bus master, fast devsel, latency 0, IRQ 41
->> 	Memory at 10041000 (32-bit, non-prefetchable) [size=4K]
->> 	Memory at 8000004000 (64-bit, prefetchable) [size=16K]
->> 	Capabilities: [98] MSI-X: Enable+ Count=2 Masked-
->> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
->> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
->> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
->> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
->> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
->> 	Kernel driver in use: virtio-pci
->>
->> 00:03.0 SCSI storage controller: Red Hat, Inc Virtio SCSI (rev 01)
->> 	Subsystem: Red Hat, Inc Virtio SCSI
->> 	Flags: bus master, fast devsel, latency 0, IRQ 42
->> 	Memory at 10042000 (32-bit, non-prefetchable) [size=4K]
->> 	Memory at 8000008000 (64-bit, prefetchable) [size=16K]
->> 	Capabilities: [98] MSI-X: Enable+ Count=4 Masked-
->> 	Capabilities: [84] Vendor Specific Information: VirtIO: <unknown>
->> 	Capabilities: [70] Vendor Specific Information: VirtIO: Notify
->> 	Capabilities: [60] Vendor Specific Information: VirtIO: DeviceCfg
->> 	Capabilities: [50] Vendor Specific Information: VirtIO: ISR
->> 	Capabilities: [40] Vendor Specific Information: VirtIO: CommonCfg
->> 	Kernel driver in use: virtio-pci
->>
->> 00:04.0 Ethernet controller: Intel Corporation I350 Ethernet Controller Virtual Function (rev 01)
->> 	Subsystem: Intel Corporation I350 Ethernet Controller Virtual Function
->> 	Flags: bus master, fast devsel, latency 0
->> 	Memory at 800000c000 (64-bit, prefetchable) [size=16K]
->> 	Memory at 8000010000 (64-bit, prefetchable) [size=16K]
->> 	Capabilities: [70] MSI-X: Enable+ Count=3 Masked-
->> 	Capabilities: [a0] Express Root Complex Integrated Endpoint, MSI 00
->> 	Capabilities: [100] Advanced Error Reporting
->> 	Capabilities: [1a0] Transaction Processing Hints
->> 	Capabilities: [1d0] Access Control Services
->> 	Kernel driver in use: igbvf
->>
->> root@unassigned-hostname:~# uptime
->>  05:40:45 up 27 days, 17:16,  1 user,  load average: 4.10, 4.05, 4.01
->>
-> 
-> I have make a new quirk to fix ACS problem on Hi1616, to enable VM using
-> pcie vf.
-> 
->> For something that isn't supposed to work, it is pretty good. So
->> please test it and let me know how it fares. At this stage, not
->> regressing deployed HW is more important than improving the situation
->> on HW that nobody has.
->>
->>>
->>>>
->>>>>
->>>>>>
->>>>>>> Compared to default halt_poll_ns, 500000ns, enabling doorbells is not
->>>>>>> large at all.
->>>>>>
->>>>>> Sure. But I'm not sure this is a universal figure.
->>>>>>
->>>>>>>
->>>>>>>> Frankly, you want to be careful with that. I'd rather enable them late
->>>>>>>> and have a chance of not blocking because of another (virtual)
->>>>>>>> interrupt, which saves us the doorbell business.
->>>>>>>>
->>>>>>>> I wonder if you wouldn't be in a better position by drastically
->>>>>>>> reducing halt_poll_ns for vcpu that can have directly injected
->>>>>>>> interrupts.
->>>>>>>>
->>>>>>>
->>>>>>> If we set halt_poll_ns to a small value, the chance of
->>>>>>> not blocking and vcpu scheduled out becomes larger. The cost
->>>>>>> of vcpu scheduled out is quite expensive.
->>>>>>> In many cases, one pcpu is assigned to only
->>>>>>> one vcpu, and halt_poll_ns is set quite large, to increase
->>>>>>> chance of halt_poll process got terminated. This is the
->>>>>>> reason we want to set halt_poll_ns large. And We hope vlpi
->>>>>>> stop halt_poll process in time.
->>>>>>
->>>>>> Fair enough. It is certainly realistic to strictly partition the
->>>>>> system when GICv4 is in use, so I can see some potential benefit.
->>>>>>
->>>>>>> Though it will check whether vcpu is runnable again by
->>>>>>> kvm_vcpu_check_block. Vlpi can prevent scheduling vcpu out.
->>>>>>> However it's somewhat later if halt_poll_ns is larger.
->>>>>>>
->>>>>>>> In any case, this is something that we should measure, not guess.
->>>>>>
->>>>>> Please post results of realistic benchmarks that we can reproduce,
->>>>>> with and without this change. I'm willing to entertain the idea, but I
->>>>>> need more than just a vague number.
->>>>>>
->>>>>> Thanks,
->>>>>>
->>>>>> 	M.
->>>>>>
->>>>>
->>>>> I tested it with and without change (patch attached in the last).
->>>>> halt_poll_ns is keep default, 500000ns.
->>>>> I have merged the patch "arm64: KVM: Always set ICH_HCR_EL2.EN if GICv4 is enabled"
->>>>> to my test kernel, to make sure ICH_HCR_EL2.EN=1 in guest.
->>>>>
->>>>> netperf result:
->>>>> D06 as server, intel 8180 server as client
->>>>> with change:
->>>>> package 512 bytes - 5400 Mbits/s
->>>>> package 64 bytes - 740 Mbits/s
->>>>> without change:
->>>>> package 512 bytes - 5000 Mbits/s
->>>>> package 64 bytes - 710 Mbits/s
->>>>>
->>>>> Also I have tested D06 as client, intel machine as server,
->>>>> with the change, the result remains the same.
->>>>
->>>> So anywhere between 4% and 8% improvement. Please post results for D05
->>>> once you've found one.
->>>>
->>>>>
->>>>>
->>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>>>> index 55fe8e2..0f56904 100644
->>>>> --- a/virt/kvm/kvm_main.c
->>>>> +++ b/virt/kvm/kvm_main.c
->>>>> @@ -2256,6 +2256,16 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->>>>>  	if (vcpu->halt_poll_ns) {
->>>>>  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
->>>>>
->>>>> +#ifdef CONFIG_ARM64
->>>>> +		/*
->>>>> +		 * When using gicv4, enable doorbell before halt pool wait
->>>>> +		 * so that direct vlpi can stop halt poll.
->>>>> +		 */
->>>>> +		if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.its_vm) {
->>>>> +			kvm_vgic_v4_enable_doorbell(vcpu);
->>>>> +		}
->>>>> +#endif
->>>>> +
->>>>
->>>> Irk. No. You're now leaving doorbells enabled when going back to the
->>>> guest, and that's pretty bad as the whole logic relies on doorbells
->>>> being disabled if the guest can run.
->>>>
->>>> So please try this instead on top of mainline. And it has to be on top
->>>> of mainline as we've changed the way timer interrupts work in 5.1 --
->>>> see accb99bcd0ca ("KVM: arm/arm64: Simplify bg_timer programming").
->>>>
->>
->> [...]
->>
->>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>>> index f25aa98a94df..0ae4ad5dcb12 100644
->>>> --- a/virt/kvm/kvm_main.c
->>>> +++ b/virt/kvm/kvm_main.c
->>>> @@ -2252,6 +2252,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->>>>  	bool waited = false;
->>>>  	u64 block_ns;
->>>>  
->>>> +	kvm_arch_vcpu_blocking(vcpu);
->>>> +
->>>>  	start = cur = ktime_get();
->>>>  	if (vcpu->halt_poll_ns) {
->>>>  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
->>>> @@ -2272,8 +2274,6 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->>>>  		} while (single_task_running() && ktime_before(cur, stop));
->>>>  	}
->>>>  
->>>> -	kvm_arch_vcpu_blocking(vcpu);
->>>> -
->>>>  	for (;;) {
->>>>  		prepare_to_swait_exclusive(&vcpu->wq, &wait, TASK_INTERRUPTIBLE);
->>>>  
->>>> @@ -2287,8 +2287,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->>>>  	finish_swait(&vcpu->wq, &wait);
->>>>  	cur = ktime_get();
->>>>  
->>>> -	kvm_arch_vcpu_unblocking(vcpu);
->>>>  out:
->>>> +	kvm_arch_vcpu_unblocking(vcpu);
->>>>  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
->>>>  
->>>>  	if (!vcpu_valid_wakeup(vcpu))
->>>>
->>>> Thanks,
->>>>
->>>> 	M.
->>>>
->>>
->>> I've tested your patch and the results showed as follow:
->>>
->>> netperf result:
->>> D06 as server, intel 8180 server as client
->>> with change:
->>> package 512 bytes - 5500 Mbits/s
->>> package 64 bytes - 760 Mbits/s
->>> without change:
->>> package 512 bytes - 5000 Mbits/s
->>> package 64 bytes - 710 Mbits/s
->>
->> OK, that's pretty good. Let me know once you've tested it on D05.
->>
->> Thanks,
->>
->> 	M.
->>
-> 
-> The average cost of kvm_vgic_v4_enable_doorbell on D05 is 0.74us,
-> while it is 0.35us on D06.
-> 
-> netperf result:
-> server: D05 vm using 82599 vf,
-> client: intel 8180
-> 5.0.0-rc3, have merged the patch "arm64: KVM: Always set ICH_HCR_EL2.EN
-> if GICv4 is enabled"
-> 
-> with change:
-> package 512 bytes - 7150 Mbits/s
-> package 64 bytes - 1080 Mbits/s
-> without change:
-> package 512 bytes - 7050 Mbits/s
-> package 64 bytes - 1080 Mbits/s
-> 
-> It seems not work on D05, as the doorbell enable process costs more than
-> that on D06.
-> 
-> Thanks,
-> Tang
-> 
-> 
-> .
-> 
+o.k
 
-On D05, Hi1616, ACS extended capability was not implemented standardly, it
-has to fix it by making a new quirk. And this change results to about 1.5%
-performance drop on D05, while it improves 5% to 8% on D06. D06 will be
-more commercially used than D05. We think it may be reasonable to change
-this process.
-If you need to verify this process,  you may use our D06 machine. I will
-shows how you can use it with another email. As I know, James.Morse@arm.com
-has ever used it too.
+> 
+> > +
+> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> > +	while ((req = virtqueue_get_buf(vq, &len)) != NULL) {
+> > +		req->done = true;
+> > +		wake_up(&req->host_acked);
+> > +
+> > +		if (!list_empty(&vpmem->req_list)) {
+> > +			req_buf = list_first_entry(&vpmem->req_list,
+> > +					struct virtio_pmem_request, list);
+> > +			req_buf->wq_buf_avail = true;
+> > +			wake_up(&req_buf->wq_buf);
+> > +			list_del(&req_buf->list);
+> > +		}
+> > +	}
+> > +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> > +}
+> > +EXPORT_SYMBOL_GPL(host_ack);
+> > +
+> > + /* The request submission function */
+> > +int virtio_pmem_flush(struct nd_region *nd_region)
+> > +{
+> > +	int err, err1;
+> > +	unsigned long flags;
+> > +	struct scatterlist *sgs[2], sg, ret;
+> > +	struct virtio_device *vdev = nd_region->provider_data;
+> > +	struct virtio_pmem *vpmem = vdev->priv;
+> > +	struct virtio_pmem_request *req;
+> 
+> Nit: use reverse Christmas tree layout :)
+
+o.k
+
+> 
+> > +
+> > +	might_sleep();
+> > +	req = kmalloc(sizeof(*req), GFP_KERNEL);
+> > +	if (!req)
+> > +		return -ENOMEM;
+> > +
+> > +	req->done = false;
+> > +	strcpy(req->name, "FLUSH");
+> > +	init_waitqueue_head(&req->host_acked);
+> > +	init_waitqueue_head(&req->wq_buf);
+> > +	INIT_LIST_HEAD(&req->list);
+> > +	sg_init_one(&sg, req->name, strlen(req->name));
+> > +	sgs[0] = &sg;
+> > +	sg_init_one(&ret, &req->ret, sizeof(req->ret));
+> > +	sgs[1] = &ret;
+> > +
+> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> > +	 /*
+> > +	  * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual
+> > +	  * queue does not have free descriptor. We add the request
+> > +	  * to req_list and wait for host_ack to wake us up when free
+> > +	  * slots are available.
+> > +	  */
+> > +	while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req,
+> > +					GFP_ATOMIC)) == -ENOSPC) {
+> > +
+> > +		dev_err(&vdev->dev, "failed to send command to virtio pmem"\
+> > +			"device, no free slots in the virtqueue\n");
+> > +		req->wq_buf_avail = false;
+> > +		list_add_tail(&req->list, &vpmem->req_list);
+> > +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> > +
+> > +		/* When host has read buffer, this completes via host_ack */
+> 
+> "A host repsonse results in "host_ack" getting called" ... ?
+
+o.k
+
+> 
+> > +		wait_event(req->wq_buf, req->wq_buf_avail);
+> > +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> > +	}
+> > +	err1 = virtqueue_kick(vpmem->req_vq);
+> > +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> > +
+> > +	/*
+> > +	 * virtqueue_add_sgs failed with error different than -ENOSPC, we can't
+> > +	 * do anything about that.
+> > +	 */
+> > +	if (err || !err1) {
+> > +		dev_info(&vdev->dev, "failed to send command to virtio pmem device\n");
+> > +		err = -EIO;
+> > +		goto ret;
+> 
+> Avoid the goto. Just move the following statements into an "else" case.
+
+o.k
+
+> 
+> > +	}
+> > +
+> > +	/* When host has read buffer, this completes via host_ack */
+> 
+> "A host repsonse results in "host_ack" getting called" ... ?
+> 
+> > +	wait_event(req->host_acked, req->done);
+> > +	err = req->ret;
+> > +ret:
+> > +	kfree(req);
+> > +	return err;
+> > +};
+> > +
+> > +/* The asynchronous flush callback function */
+> > +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
+> > +{
+> > +	int rc = 0;
+> > +
+> > +	/* Create child bio for asynchronous flush and chain with
+> > +	 * parent bio. Otherwise directly call nd_region flush.
+> > +	 */
+> > +	if (bio && bio->bi_iter.bi_sector != -1) {
+> > +		struct bio *child = bio_alloc(GFP_ATOMIC, 0);
+> > +
+> > +		if (!child)
+> > +			return -ENOMEM;
+> > +		bio_copy_dev(child, bio);
+> > +		child->bi_opf = REQ_PREFLUSH;
+> > +		child->bi_iter.bi_sector = -1;
+> > +		bio_chain(child, bio);
+> > +		submit_bio(child);
+> 
+> return 0;
+> 
+> Then, drop the "else" case and "int rc" and do directly
+> 
+> if (virtio_pmem_flush(nd_region))
+> 	return -EIO;
+
+and another 'return 0' here :)
+
+I don't like return from multiple places instead I prefer
+single exit point from function.
+
+> 
+> > +	} else {
+> > +
+> > +			rc = -EIO;
+> > +	}
+> > +
+> > +	return rc;
+> > +};
+> > +EXPORT_SYMBOL_GPL(async_pmem_flush);
+> > +MODULE_LICENSE("GPL");
+> > diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
+> > new file mode 100644
+> > index 000000000000..cfc6381c4e5d
+> > --- /dev/null
+> > +++ b/drivers/nvdimm/virtio_pmem.c
+> > @@ -0,0 +1,117 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * virtio_pmem.c: Virtio pmem Driver
+> > + *
+> > + * Discovers persistent memory range information
+> > + * from host and registers the virtual pmem device
+> > + * with libnvdimm core.
+> > + */
+> > +#include <linux/virtio_pmem.h>
+> > +#include "nd.h"
+> > +
+> > +static struct virtio_device_id id_table[] = {
+> > +	{ VIRTIO_ID_PMEM, VIRTIO_DEV_ANY_ID },
+> > +	{ 0 },
+> > +};
+> > +
+> > + /* Initialize virt queue */
+> > +static int init_vq(struct virtio_pmem *vpmem)
+> > +{
+> > +	/* single vq */
+> > +	vpmem->req_vq = virtio_find_single_vq(vpmem->vdev,
+> > +				host_ack, "flush_queue");
+> 
+> Nit: Wrong indentation of parameters.
+
+o.k
+
+> 
+> > +	if (IS_ERR(vpmem->req_vq))
+> > +		return PTR_ERR(vpmem->req_vq);
+> > +
+> > +	spin_lock_init(&vpmem->pmem_lock);
+> > +	INIT_LIST_HEAD(&vpmem->req_list);
+> 
+> I would initialize the locks in the virtio_pmem_probe() directly,
+> earlier (directly after allocating vpmem).
+
+Since the lock is to protect the vq so logically I put it in 'init_vq'
+which is eventually called by probe.
+ 
+> 
+> > +
+> > +	return 0;
+> > +};
+> > +
+> > +static int virtio_pmem_probe(struct virtio_device *vdev)
+> > +{
+> > +	int err = 0;
+> > +	struct resource res;
+> > +	struct virtio_pmem *vpmem;
+> > +	struct nd_region_desc ndr_desc = {};
+> > +	int nid = dev_to_node(&vdev->dev);
+> > +	struct nd_region *nd_region;
+> 
+> Nit: use reverse Christmas tree layout :)
+
+Done.
+
+> 
+> > +
+> > +	if (!vdev->config->get) {
+> > +		dev_err(&vdev->dev, "%s failure: config access disabled\n",
+> > +			__func__);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem), GFP_KERNEL);
+> > +	if (!vpmem) {
+> > +		err = -ENOMEM;
+> > +		goto out_err;
+> > +	}
+> > +
+> > +	vpmem->vdev = vdev;
+> > +	vdev->priv = vpmem;
+> > +	err = init_vq(vpmem);
+> > +	if (err)
+> > +		goto out_err;
+> > +
+> > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> > +			start, &vpmem->start);
+> > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> > +			size, &vpmem->size);
+> > +
+> > +	res.start = vpmem->start;
+> > +	res.end   = vpmem->start + vpmem->size-1;
+> > +	vpmem->nd_desc.provider_name = "virtio-pmem";
+> > +	vpmem->nd_desc.module = THIS_MODULE;
+> > +
+> > +	vpmem->nvdimm_bus = nvdimm_bus_register(&vdev->dev,
+> > +						&vpmem->nd_desc);
+> > +	if (!vpmem->nvdimm_bus)
+> > +		goto out_vq;
+> > +
+> > +	dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
+> > +
+> > +	ndr_desc.res = &res;
+> > +	ndr_desc.numa_node = nid;
+> > +	ndr_desc.flush = async_pmem_flush;
+> > +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
+> > +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
+> > +	nd_region = nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_desc);
+> > +
+> 
+> I'd drop this empty line.
+
+hmm.
+
+> 
+> > +	if (!nd_region)
+> > +		goto out_nd;
+> > +	nd_region->provider_data = dev_to_virtio(nd_region->dev.parent->parent);
+> 
+> Does it make sense to move some parts into separate functions for
+> readability? E.g., virtio_pmem_init_nvdimm_bus()
+
+I think this function only has initialization and don't have any complex logic.
+
+> 
+> > +	return 0;
+> > +out_nd:
+> > +	err = -ENXIO;
+> 
+> I'd always initialize "err" along with the goto statement for
+> readability, especially because ...
+> 
+> > +	nvdimm_bus_unregister(vpmem->nvdimm_bus);
+> > +out_vq:
+> 
+> ... you don't initialize err in this case. Err is here 0 if I am not wrong.
+
+Right. Changed.
+
+> 
+> > +	vdev->config->del_vqs(vdev);
+> > +out_err:
+> > +	dev_err(&vdev->dev, "failed to register virtio pmem memory\n");
+> 
+> Should we try to give more meaning full messages? I can think of
+> scenarios like "memory region is not properly aligned" or "out of memory".
+
+o.k
+
+> 
+> > +	return err;
+> > +}
+> > +
+> > +static void virtio_pmem_remove(struct virtio_device *vdev)
+> > +{
+> > +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
+> > +
+> 
+> Is the nd_region implicitly cleaned up?
+
+yes. it will be.
+
+> 
+> You are not freeing "vdev->priv".
+
+vdev->priv is vpmem which is allocated using devm API.
+> 
+> > +	nvdimm_bus_unregister(nvdimm_bus);
+> > +	vdev->config->del_vqs(vdev);
+> > +	vdev->config->reset(vdev);
+> > +}
+> > +
+> > +static struct virtio_driver virtio_pmem_driver = {
+> > +	.driver.name		= KBUILD_MODNAME,
+> > +	.driver.owner		= THIS_MODULE,
+> > +	.id_table		= id_table,
+> > +	.probe			= virtio_pmem_probe,
+> > +	.remove			= virtio_pmem_remove,
+> > +};
+> > +
+> > +module_virtio_driver(virtio_pmem_driver);
+> > +MODULE_DEVICE_TABLE(virtio, id_table);
+> > +MODULE_DESCRIPTION("Virtio pmem driver");
+> > +MODULE_LICENSE("GPL");
+> > diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
+> > index 35897649c24f..9f634a2ed638 100644
+> > --- a/drivers/virtio/Kconfig
+> > +++ b/drivers/virtio/Kconfig
+> > @@ -42,6 +42,16 @@ config VIRTIO_PCI_LEGACY
+> >  
+> >  	  If unsure, say Y.
+> >  
+> > +config VIRTIO_PMEM
+> > +	tristate "Support for virtio pmem driver"
+> > +	depends on VIRTIO
+> > +	depends on LIBNVDIMM
+> > +	help
+> > +	This driver provides support for virtio based flushing interface
+> > +	for persistent memory range.
+> 
+> "This driver provides access to virtio-pmem devices, storage devices
+> that are mapped into the physical address space - similar to NVDIMMs -
+> with a virtio-based flushing interface." ... ?
+
+looks better. Incorporated.
 
 Thanks,
-Tang
-
-
+Pankaj
+> 
+> > +
+> > +	If unsure, say M.
+> > +
+> 
+> 
+> --
+> 
+> Thanks,
+> 
+> David / dhildenb
+> 
