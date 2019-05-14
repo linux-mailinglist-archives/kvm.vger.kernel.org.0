@@ -2,209 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B7021CCE6
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 18:25:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BF551CD04
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 18:31:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726107AbfENQZk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 12:25:40 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:34746 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725980AbfENQZk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 12:25:40 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4EGELEW097729;
-        Tue, 14 May 2019 16:24:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=JCV/HzgrZlCHVmf/0Cx/bB8oSFM3Re9RwssBEXXRqZc=;
- b=soBldPESLpJww1uCH2gLsnSanFFjMUy/AlTjGJ9OkUBv6qJNOBHy1+fFhi9hJQ+737dg
- tJf1MiPoFlWIpy0YVR8DtCOFPhvOWKt9vq3A+pMsKfAp2/IrfcFJyalxALp0aBrMK8zw
- gK0Up3guxWE/N1DTXoY/dX4xyFMkqwJvXCLgZXEWJRyRtyyjWHFMWUJNb41TIEqsxH/0
- f4TnwL3Mz8fw8pQtfsmFPuZfY8FzdgkuyR/aIyrQagKrFxi/TddxfozWkPVdMnsH9b3W
- 9/at8r4tPmHvEJJCoB+XTRDj7rUeAVaRHDwKsE2Zo7YSQPS6SLOJrGD1faWqvlfcZkQP YQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2130.oracle.com with ESMTP id 2sdkwdqhdg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 May 2019 16:24:56 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4EGNc90005562;
-        Tue, 14 May 2019 16:24:55 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2sdnqjnh3e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 May 2019 16:24:55 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4EGOqDm006383;
-        Tue, 14 May 2019 16:24:52 GMT
-Received: from [10.166.106.34] (/10.166.106.34)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 14 May 2019 09:24:52 -0700
-Subject: Re: [RFC KVM 18/27] kvm/isolation: function to copy page table
- entries for percpu buffer
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        kvm list <kvm@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        jan.setjeeilers@oracle.com, Liran Alon <liran.alon@oracle.com>,
-        Jonathan Adams <jwadams@google.com>
-References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
- <1557758315-12667-19-git-send-email-alexandre.chartre@oracle.com>
- <CALCETrWUKZv=wdcnYjLrHDakamMBrJv48wp2XBxZsEmzuearRQ@mail.gmail.com>
- <20190514070941.GE2589@hirez.programming.kicks-ass.net>
- <b8487de1-83a8-2761-f4a6-26c583eba083@oracle.com>
- <B447B6E8-8CEF-46FF-9967-DFB2E00E55DB@amacapital.net>
- <4e7d52d7-d4d2-3008-b967-c40676ed15d2@oracle.com>
- <CALCETrXtwksWniEjiWKgZWZAyYLDipuq+sQ449OvDKehJ3D-fg@mail.gmail.com>
-From:   Alexandre Chartre <alexandre.chartre@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <e5fedad9-4607-0aa4-297e-398c0e34ae2b@oracle.com>
-Date:   Tue, 14 May 2019 18:24:48 +0200
+        id S1726363AbfENQbs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 12:31:48 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37998 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726013AbfENQbo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 May 2019 12:31:44 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4EGRPlA004574
+        for <kvm@vger.kernel.org>; Tue, 14 May 2019 12:31:43 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sg0992san-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 14 May 2019 12:31:43 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Tue, 14 May 2019 17:31:40 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 14 May 2019 17:31:38 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4EGVbFZ54657156
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 May 2019 16:31:37 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EE2484203F;
+        Tue, 14 May 2019 16:31:36 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8EB6A42045;
+        Tue, 14 May 2019 16:31:36 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.148.90])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 14 May 2019 16:31:36 +0000 (GMT)
+Subject: Re: [PATCH v2 1/2] KVM: Start populating /sys/hypervisor with KVM
+ entries
+To:     "Sironi, Filippo" <sironi@amazon.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        "vasu.srinivasan@oracle.com" <vasu.srinivasan@oracle.com>
+References: <1539078879-4372-1-git-send-email-sironi@amazon.de>
+ <1557847002-23519-1-git-send-email-sironi@amazon.de>
+ <1557847002-23519-2-git-send-email-sironi@amazon.de>
+ <d03f6be5-d8dc-4389-e14c-295f36a68827@de.ibm.com>
+ <56DAB9BD-2543-49DA-9886-C9C8F2B814F9@amazon.de>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date:   Tue, 14 May 2019 18:31:36 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <CALCETrXtwksWniEjiWKgZWZAyYLDipuq+sQ449OvDKehJ3D-fg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <56DAB9BD-2543-49DA-9886-C9C8F2B814F9@amazon.de>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905140114
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905140114
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19051416-4275-0000-0000-00000334B4CC
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051416-4276-0000-0000-0000384435BA
+Message-Id: <926fdc5e-8ef2-0995-6a74-77b76af0905e@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-14_10:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=630 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905140115
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 5/14/19 5:23 PM, Andy Lutomirski wrote:
-> On Tue, May 14, 2019 at 2:42 AM Alexandre Chartre
-> <alexandre.chartre@oracle.com> wrote:
->>
->>
->> On 5/14/19 10:34 AM, Andy Lutomirski wrote:
->>>
->>>
->>>> On May 14, 2019, at 1:25 AM, Alexandre Chartre <alexandre.chartre@oracle.com> wrote:
->>>>
->>>>
->>>>> On 5/14/19 9:09 AM, Peter Zijlstra wrote:
->>>>>> On Mon, May 13, 2019 at 11:18:41AM -0700, Andy Lutomirski wrote:
->>>>>> On Mon, May 13, 2019 at 7:39 AM Alexandre Chartre
->>>>>> <alexandre.chartre@oracle.com> wrote:
->>>>>>>
->>>>>>> pcpu_base_addr is already mapped to the KVM address space, but this
->>>>>>> represents the first percpu chunk. To access a per-cpu buffer not
->>>>>>> allocated in the first chunk, add a function which maps all cpu
->>>>>>> buffers corresponding to that per-cpu buffer.
->>>>>>>
->>>>>>> Also add function to clear page table entries for a percpu buffer.
->>>>>>>
->>>>>>
->>>>>> This needs some kind of clarification so that readers can tell whether
->>>>>> you're trying to map all percpu memory or just map a specific
->>>>>> variable.  In either case, you're making a dubious assumption that
->>>>>> percpu memory contains no secrets.
->>>>> I'm thinking the per-cpu random pool is a secrit. IOW, it demonstrably
->>>>> does contain secrits, invalidating that premise.
->>>>
->>>> The current code unconditionally maps the entire first percpu chunk
->>>> (pcpu_base_addr). So it assumes it doesn't contain any secret. That is
->>>> mainly a simplification for the POC because a lot of core information
->>>> that we need, for example just to switch mm, are stored there (like
->>>> cpu_tlbstate, current_task...).
->>>
->>> I don’t think you should need any of this.
->>>
->>
->> At the moment, the current code does need it. Otherwise it can't switch from
->> kvm mm to kernel mm: switch_mm_irqs_off() will fault accessing "cpu_tlbstate",
->> and then the page fault handler will fail accessing "current" before calling
->> the kvm page fault handler. So it will double fault or loop on page faults.
->> There are many different places where percpu variables are used, and I have
->> experienced many double fault/page fault loop because of that.
+
+On 14.05.19 18:09, Sironi, Filippo wrote:
+
+>> Isnt kvm_para_available a function that is defined in the context of the HOST
+>> and not of the guest?
 > 
-> Now you're experiencing what working on the early PTI code was like :)
-> 
-> This is why I think you shouldn't touch current in any of this.
-> 
->>
->>>>
->>>> If the entire first percpu chunk effectively has secret then we will
->>>> need to individually map only buffers we need. The kvm_copy_percpu_mapping()
->>>> function is added to copy mapping for a specified percpu buffer, so
->>>> this used to map percpu buffers which are not in the first percpu chunk.
->>>>
->>>> Also note that mapping is constrained by PTE (4K), so mapped buffers
->>>> (percpu or not) which do not fill a whole set of pages can leak adjacent
->>>> data store on the same pages.
->>>>
->>>>
->>>
->>> I would take a different approach: figure out what you need and put it in its
->>> own dedicated area, kind of like cpu_entry_area.
->>
->> That's certainly something we can do, like Julian proposed with "Process-local
->> memory allocations": https://lkml.org/lkml/2018/11/22/1240
->>
->> That's fine for buffers allocated from KVM, however, we will still need some
->> core kernel mappings so the thread can run and interrupts can be handled.
->>
->>> One nasty issue you’ll have is vmalloc: the kernel stack is in the
->>> vmap range, and, if you allow access to vmap memory at all, you’ll
->>> need some way to ensure that *unmap* gets propagated. I suspect the
->>> right choice is to see if you can avoid using the kernel stack at all
->>> in isolated mode.  Maybe you could run on the IRQ stack instead.
->>
->> I am currently just copying the task stack mapping into the KVM page table
->> (patch 23) when a vcpu is created:
->>
->>          err = kvm_copy_ptes(tsk->stack, THREAD_SIZE);
->>
->> And this seems to work. I am clearing the mapping when the VM vcpu is freed,
->> so I am making the assumption that the same task is used to create and free
->> a vcpu.
->>
-> 
-> vCPUs are bound to an mm but not a specific task, right?  So I think
-> this is wrong in both directions.
+> No, kvm_para_available is defined in the guest context.
+> On x86, it checks for the presence of the KVM CPUID leafs.
 > 
 
-I know, that was yet another shortcut for the POC, I assume there's a 1:1
-mapping between a vCPU and task, but I think that's fair with qemu.
+Right you are, I mixed that up.
 
-
-> Suppose a vCPU is created, then the task exits, the stack mapping gets
-> freed (the core code tries to avoid this, but it does happen), and a
-> new stack gets allocated at the same VA with different physical pages.
-> Now you're toast :)  On the flip side, wouldn't you crash if a vCPU is
-> created and then run on a different thread?
-
-Yes, that's why I have a safety net: before entering KVM isolation I always
-check that the current task is mapped in the KVM address space, if not it
-gets mapped.
-
-> How important is the ability to enable IRQs while running with the KVM
-> page tables?
-> 
-
-I can't say, I would need to check but we probably need IRQs at least for
-some timers. Sounds like you would really prefer IRQs to be disabled.
-
-
-alex.
