@@ -2,83 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 10CF81CD30
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 18:45:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FEFB1CD6C
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 19:05:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726447AbfENQpE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 12:45:04 -0400
-Received: from mga02.intel.com ([134.134.136.20]:55352 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726013AbfENQpE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 12:45:04 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 May 2019 09:45:03 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by orsmga001.jf.intel.com with ESMTP; 14 May 2019 09:45:03 -0700
-Date:   Tue, 14 May 2019 09:45:03 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        id S1726783AbfENRFf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 13:05:35 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:49112 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726044AbfENRFf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 13:05:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=KlbgFAVXgBXigN146B3nlFdjOxF2TXPML68s5DT9K4M=; b=jmPpBeXUM05r6s4bzTOSf6IqR
+        +gcxkAlmEIZHWVOGUSv2eKJST1OuQS90zya54qlP9PNVULIwibJlblBwZsXAe2Tw9v0vEg7MjiaM/
+        boWCqM4HmbVadcMDA2prEGa3avhoxYuF2vh3xSdRIHCKv6faoneacq3v8ilnKkxoDdFTuTgPbsDuT
+        uLEdi9/F+FBWIQlm1a1dv6w5TIgPFvJ8BPFmU5wT6QPVgtTBJ1vdYZpeSo4AAqT0EWeUhZDUEIjFO
+        FrcTQwOxOHFzl5NUcBxEpfOaWiTDtXCsTRjQU4nGpWW7HpkKES1Iudvt4IdtGHjcxL1Q9sWZFMh2Z
+        b4JKSdzYg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hQark-0000lD-Qy; Tue, 14 May 2019 17:05:25 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id D00982029F888; Tue, 14 May 2019 19:05:22 +0200 (CEST)
+Date:   Tue, 14 May 2019 19:05:22 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Alexandre Chartre <alexandre.chartre@oracle.com>
+Cc:     Andy Lutomirski <luto@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH 3/3] KVM: LAPIC: Optimize timer latency further
-Message-ID: <20190514164503.GA1668@linux.intel.com>
-References: <1557401361-3828-1-git-send-email-wanpengli@tencent.com>
- <1557401361-3828-4-git-send-email-wanpengli@tencent.com>
- <20190513195417.GM28561@linux.intel.com>
- <CANRm+CxVRMQF9yHoqDMJR9FROGtLwYgaQXPqu++S7Juneh2vtw@mail.gmail.com>
- <CANRm+Czg-0m1dV1DVfqSTr89Xrq169xx3LqEGTYH0mmjafvhMQ@mail.gmail.com>
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        kvm list <kvm@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        jan.setjeeilers@oracle.com, Liran Alon <liran.alon@oracle.com>,
+        Jonathan Adams <jwadams@google.com>
+Subject: Re: [RFC KVM 18/27] kvm/isolation: function to copy page table
+ entries for percpu buffer
+Message-ID: <20190514170522.GW2623@hirez.programming.kicks-ass.net>
+References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
+ <1557758315-12667-19-git-send-email-alexandre.chartre@oracle.com>
+ <CALCETrWUKZv=wdcnYjLrHDakamMBrJv48wp2XBxZsEmzuearRQ@mail.gmail.com>
+ <20190514070941.GE2589@hirez.programming.kicks-ass.net>
+ <b8487de1-83a8-2761-f4a6-26c583eba083@oracle.com>
+ <B447B6E8-8CEF-46FF-9967-DFB2E00E55DB@amacapital.net>
+ <4e7d52d7-d4d2-3008-b967-c40676ed15d2@oracle.com>
+ <CALCETrXtwksWniEjiWKgZWZAyYLDipuq+sQ449OvDKehJ3D-fg@mail.gmail.com>
+ <e5fedad9-4607-0aa4-297e-398c0e34ae2b@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CANRm+Czg-0m1dV1DVfqSTr89Xrq169xx3LqEGTYH0mmjafvhMQ@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <e5fedad9-4607-0aa4-297e-398c0e34ae2b@oracle.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 14, 2019 at 06:56:04PM +0800, Wanpeng Li wrote:
-> On Tue, 14 May 2019 at 09:45, Wanpeng Li <kernellwp@gmail.com> wrote:
-> >
-> > On Tue, 14 May 2019 at 03:54, Sean Christopherson
-> > <sean.j.christopherson@intel.com> wrote:
-> > > Rather than reinvent the wheel, can we simply move the call to
-> > > wait_lapic_expire() into vmx.c and svm.c?  For VMX we'd probably want to
-> > > support the advancement if enable_unrestricted_guest=true so that we avoid
-> > > the emulation_required case, but other than that I don't see anything that
-> > > requires wait_lapic_expire() to be called where it is.
-> >
-> > I also considered to move wait_lapic_expire() into vmx.c and svm.c
-> > before, what do you think, Paolo, Radim?
+On Tue, May 14, 2019 at 06:24:48PM +0200, Alexandre Chartre wrote:
+> On 5/14/19 5:23 PM, Andy Lutomirski wrote:
+
+> > How important is the ability to enable IRQs while running with the KVM
+> > page tables?
+> > 
 > 
-> However, guest_enter_irqoff() also prevents this. Otherwise, we will
-> account busy wait time as guest time. How about sampling several times
-> and get the average value or conservative min value to handle Sean's
-> concern?
+> I can't say, I would need to check but we probably need IRQs at least for
+> some timers. Sounds like you would really prefer IRQs to be disabled.
+> 
 
-Hmm, looking at the history, wait_lapic_expire() was originally called
-immediately before kvm_x86_ops->run()[1].  The call was moved above
-guest_enter_irqoff() because of its tracepoint, which violated the RCU
-extended quiescent state invoked by guest_enter_irqoff()[2][3].  In
-other words, I don't think there is a fundamental issue with accounting
-the busy wait time to the guest rather than the host.
+I think what amluto is getting at, is:
 
-Assuming the tracepoint was added to help tune the advancement time, I
-think we can simply remove the tracepoint, which would allow moving
-wait_lapic_expire().  Now that the advancement time is tracked per-vCPU,
-realizing a change in the advancement time requires creating a new VM.
-For all intents and purposes this makes it impractical to hand tune the
-advancement in real time using the tracepoint as the feedback mechanism.
+again:
+	local_irq_disable();
+	switch_to_kvm_mm();
+	/* do very little -- (A) */
+	VMEnter()
 
-If we want to expose the per-vCPU advancement time to the user, a debugfs
-entry is likely sufficient given that the advancement time is
-automatically adjusted.
+		/* runs as guest */
 
-[1] Commit d0659d946be0 ("KVM: x86: add option to advance tscdeadline hrtimer expiration")
-[2] Commit 8b89fe1f6c43 ("kvm: x86: move tracepoints outside extended quiescent state")
-[3] https://patchwork.kernel.org/patch/7821111/
+	/* IRQ happens */
+	WMExit()
+	/* inspect exit raisin */
+	if (/* IRQ pending */) {
+		switch_from_kvm_mm();
+		local_irq_restore();
+		goto again;
+	}
+
+
+but I don't know anything about VMX/SVM at all, so the above might not
+be feasible, specifically I read something about how VMX allows NMIs
+where SVM did not somewhere around (A) -- or something like that,
+earlier in this thread.
