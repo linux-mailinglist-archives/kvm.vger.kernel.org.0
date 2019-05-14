@@ -2,138 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BF551CD04
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 18:31:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BB241CD17
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 18:35:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726363AbfENQbs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 12:31:48 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37998 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726013AbfENQbo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 May 2019 12:31:44 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4EGRPlA004574
-        for <kvm@vger.kernel.org>; Tue, 14 May 2019 12:31:43 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2sg0992san-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 14 May 2019 12:31:43 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 14 May 2019 17:31:40 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 14 May 2019 17:31:38 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4EGVbFZ54657156
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 May 2019 16:31:37 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EE2484203F;
-        Tue, 14 May 2019 16:31:36 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8EB6A42045;
-        Tue, 14 May 2019 16:31:36 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.148.90])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 14 May 2019 16:31:36 +0000 (GMT)
-Subject: Re: [PATCH v2 1/2] KVM: Start populating /sys/hypervisor with KVM
- entries
-To:     "Sironi, Filippo" <sironi@amazon.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "vasu.srinivasan@oracle.com" <vasu.srinivasan@oracle.com>
-References: <1539078879-4372-1-git-send-email-sironi@amazon.de>
- <1557847002-23519-1-git-send-email-sironi@amazon.de>
- <1557847002-23519-2-git-send-email-sironi@amazon.de>
- <d03f6be5-d8dc-4389-e14c-295f36a68827@de.ibm.com>
- <56DAB9BD-2543-49DA-9886-C9C8F2B814F9@amazon.de>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Tue, 14 May 2019 18:31:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726553AbfENQfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 12:35:06 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:34599 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726325AbfENQfG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 12:35:06 -0400
+Received: by mail-wr1-f66.google.com with SMTP id f8so2134647wrt.1
+        for <kvm@vger.kernel.org>; Tue, 14 May 2019 09:35:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=TRmSH+toJMjBNKSEQ3RtsylK7+rS178KvQ1RBahf+5s=;
+        b=QbJaoIrWbCMC+zQoeVpCThfwiQ2fK4v6qJORb0quT46HjUtncNAQIjnXLnjxXZdzGT
+         PcXJS6+uDMqsi0RG7n4C3IBKmDNonvcr9b9y3CBJANlGWJ5bPDErfPsCGcV5HMGBvKed
+         jz1+QTAzlxXs/1SorxXy0lbG7l00EKyoCeHXrLKY5VFZtHgbqoZy/Kyxml4MxiOyLAXA
+         3VjI2szLptxQ3pXPHQTwwYtqPsBcXQ8kbX4Zyfph6VnEwLL9dcg5B/WzRC11nHqykhuM
+         b2tf/Uq/dfmv0n0Liy8sQp84rVY/2iIqBpfxjz5214GWNLNOxzXq46I5bP7ZH90WgfnJ
+         WFTw==
+X-Gm-Message-State: APjAAAWqiU2cHpKlUAu8KBpTZmCOqElUyNhj/KKv+284fYMIFPIHPJDs
+        zBTTo3LeAQlfQK1clpTjX5pizg==
+X-Google-Smtp-Source: APXvYqyND+LSSDNDqT28MDu7z589ljMmvUo3U9FjLPyHbLMSLJ3Rz1AjcAEc90+CUvdqClX2N9lZHQ==
+X-Received: by 2002:a5d:61c4:: with SMTP id q4mr9943354wrv.295.1557851703616;
+        Tue, 14 May 2019 09:35:03 -0700 (PDT)
+Received: from steredhat (host151-251-static.12-87-b.business.telecomitalia.it. [87.12.251.151])
+        by smtp.gmail.com with ESMTPSA id j131sm5790374wmb.9.2019.05.14.09.35.02
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 14 May 2019 09:35:02 -0700 (PDT)
+Date:   Tue, 14 May 2019 18:35:00 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH v2 1/8] vsock/virtio: limit the memory used per-socket
+Message-ID: <20190514163500.a7moalixvpn5mkcr@steredhat>
+References: <20190510125843.95587-1-sgarzare@redhat.com>
+ <20190510125843.95587-2-sgarzare@redhat.com>
+ <3b275b52-63d9-d260-1652-8e8bf7dd679f@redhat.com>
+ <20190513172322.vcgenx7xk4v6r2ay@steredhat>
+ <f834c9e9-5d0e-8ebb-44e0-6d99b6284e5c@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <56DAB9BD-2543-49DA-9886-C9C8F2B814F9@amazon.de>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051416-4275-0000-0000-00000334B4CC
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051416-4276-0000-0000-0000384435BA
-Message-Id: <926fdc5e-8ef2-0995-6a74-77b76af0905e@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-14_10:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=630 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905140115
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f834c9e9-5d0e-8ebb-44e0-6d99b6284e5c@redhat.com>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 14.05.19 18:09, Sironi, Filippo wrote:
-
->> Isnt kvm_para_available a function that is defined in the context of the HOST
->> and not of the guest?
+On Tue, May 14, 2019 at 11:25:34AM +0800, Jason Wang wrote:
 > 
-> No, kvm_para_available is defined in the guest context.
-> On x86, it checks for the presence of the KVM CPUID leafs.
+> On 2019/5/14 上午1:23, Stefano Garzarella wrote:
+> > On Mon, May 13, 2019 at 05:58:53PM +0800, Jason Wang wrote:
+> > > On 2019/5/10 下午8:58, Stefano Garzarella wrote:
+> > > > Since virtio-vsock was introduced, the buffers filled by the host
+> > > > and pushed to the guest using the vring, are directly queued in
+> > > > a per-socket list avoiding to copy it.
+> > > > These buffers are preallocated by the guest with a fixed
+> > > > size (4 KB).
+> > > > 
+> > > > The maximum amount of memory used by each socket should be
+> > > > controlled by the credit mechanism.
+> > > > The default credit available per-socket is 256 KB, but if we use
+> > > > only 1 byte per packet, the guest can queue up to 262144 of 4 KB
+> > > > buffers, using up to 1 GB of memory per-socket. In addition, the
+> > > > guest will continue to fill the vring with new 4 KB free buffers
+> > > > to avoid starvation of her sockets.
+> > > > 
+> > > > This patch solves this issue copying the payload in a new buffer.
+> > > > Then it is queued in the per-socket list, and the 4KB buffer used
+> > > > by the host is freed.
+> > > > 
+> > > > In this way, the memory used by each socket respects the credit
+> > > > available, and we still avoid starvation, paying the cost of an
+> > > > extra memory copy. When the buffer is completely full we do a
+> > > > "zero-copy", moving the buffer directly in the per-socket list.
+> > > 
+> > > I wonder in the long run we should use generic socket accouting mechanism
+> > > provided by kernel (e.g socket, skb, sndbuf, recvbug, truesize) instead of
+> > > vsock specific thing to avoid duplicating efforts.
+> > I agree, the idea is to switch to sk_buff but this should require an huge
+> > change. If we will use the virtio-net datapath, it will become simpler.
+> 
+> 
+> Yes, unix domain socket is one example that uses general skb and socket
+> structure. And we probably need some kind of socket pair on host. Using
+> socket can also simplify the unification with vhost-net which depends on the
+> socket proto_ops to work. I admit it's a huge change probably, we can do it
+> gradually.
 > 
 
-Right you are, I mixed that up.
+Yes, I also prefer to do this change gradually :)
 
+> 
+> > > 
+> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > > ---
+> > > >    drivers/vhost/vsock.c                   |  2 +
+> > > >    include/linux/virtio_vsock.h            |  8 +++
+> > > >    net/vmw_vsock/virtio_transport.c        |  1 +
+> > > >    net/vmw_vsock/virtio_transport_common.c | 95 ++++++++++++++++++-------
+> > > >    4 files changed, 81 insertions(+), 25 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > > > index bb5fc0e9fbc2..7964e2daee09 100644
+> > > > --- a/drivers/vhost/vsock.c
+> > > > +++ b/drivers/vhost/vsock.c
+> > > > @@ -320,6 +320,8 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
+> > > >    		return NULL;
+> > > >    	}
+> > > > +	pkt->buf_len = pkt->len;
+> > > > +
+> > > >    	nbytes = copy_from_iter(pkt->buf, pkt->len, &iov_iter);
+> > > >    	if (nbytes != pkt->len) {
+> > > >    		vq_err(vq, "Expected %u byte payload, got %zu bytes\n",
+> > > > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> > > > index e223e2632edd..345f04ee9193 100644
+> > > > --- a/include/linux/virtio_vsock.h
+> > > > +++ b/include/linux/virtio_vsock.h
+> > > > @@ -54,9 +54,17 @@ struct virtio_vsock_pkt {
+> > > >    	void *buf;
+> > > >    	u32 len;
+> > > >    	u32 off;
+> > > > +	u32 buf_len;
+> > > >    	bool reply;
+> > > >    };
+> > > > +struct virtio_vsock_buf {
+> > > > +	struct list_head list;
+> > > > +	void *addr;
+> > > > +	u32 len;
+> > > > +	u32 off;
+> > > > +};
+> > > > +
+> > > >    struct virtio_vsock_pkt_info {
+> > > >    	u32 remote_cid, remote_port;
+> > > >    	struct vsock_sock *vsk;
+> > > > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> > > > index 15eb5d3d4750..af1d2ce12f54 100644
+> > > > --- a/net/vmw_vsock/virtio_transport.c
+> > > > +++ b/net/vmw_vsock/virtio_transport.c
+> > > > @@ -280,6 +280,7 @@ static void virtio_vsock_rx_fill(struct virtio_vsock *vsock)
+> > > >    			break;
+> > > >    		}
+> > > > +		pkt->buf_len = buf_len;
+> > > >    		pkt->len = buf_len;
+> > > >    		sg_init_one(&hdr, &pkt->hdr, sizeof(pkt->hdr));
+> > > > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > > > index 602715fc9a75..0248d6808755 100644
+> > > > --- a/net/vmw_vsock/virtio_transport_common.c
+> > > > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > > > @@ -65,6 +65,9 @@ virtio_transport_alloc_pkt(struct virtio_vsock_pkt_info *info,
+> > > >    		pkt->buf = kmalloc(len, GFP_KERNEL);
+> > > >    		if (!pkt->buf)
+> > > >    			goto out_pkt;
+> > > > +
+> > > > +		pkt->buf_len = len;
+> > > > +
+> > > >    		err = memcpy_from_msg(pkt->buf, info->msg, len);
+> > > >    		if (err)
+> > > >    			goto out;
+> > > > @@ -86,6 +89,46 @@ virtio_transport_alloc_pkt(struct virtio_vsock_pkt_info *info,
+> > > >    	return NULL;
+> > > >    }
+> > > > +static struct virtio_vsock_buf *
+> > > > +virtio_transport_alloc_buf(struct virtio_vsock_pkt *pkt, bool zero_copy)
+> > > > +{
+> > > > +	struct virtio_vsock_buf *buf;
+> > > > +
+> > > > +	if (pkt->len == 0)
+> > > > +		return NULL;
+> > > > +
+> > > > +	buf = kzalloc(sizeof(*buf), GFP_KERNEL);
+> > > > +	if (!buf)
+> > > > +		return NULL;
+> > > > +
+> > > > +	/* If the buffer in the virtio_vsock_pkt is full, we can move it to
+> > > > +	 * the new virtio_vsock_buf avoiding the copy, because we are sure that
+> > > > +	 * we are not use more memory than that counted by the credit mechanism.
+> > > > +	 */
+> > > > +	if (zero_copy && pkt->len == pkt->buf_len) {
+> > > > +		buf->addr = pkt->buf;
+> > > > +		pkt->buf = NULL;
+> > > > +	} else {
+> > > 
+> > > Is the copy still needed if we're just few bytes less? We meet similar issue
+> > > for virito-net, and virtio-net solve this by always copy first 128bytes for
+> > > big packets.
+> > > 
+> > > See receive_big()
+> > I'm seeing, It is more sophisticated.
+> > IIUC, virtio-net allocates a sk_buff with 128 bytes of buffer, then copies the
+> > first 128 bytes, then adds the buffer used to receive the packet as a frag to
+> > the skb.
+> 
+> 
+> Yes and the point is if the packet is smaller than 128 bytes the pages will
+> be recycled.
+> 
+> 
+
+So it's avoid the overhead of allocation of a large buffer. I got it.
+
+Just a curiosity, why the threshold is 128 bytes?
+
+> > 
+> > Do you suggest to implement something similar, or for now we can use my
+> > approach and if we will merge the datapath we can reuse the virtio-net
+> > approach?
+> 
+> 
+> I think we need a better threshold. If I understand the patch correctly, we
+> will do copy unless the packet is 64K when guest is doing receiving. 1 byte
+> packet is indeed a problem, but we need to solve it without losing too much
+> performance.
+
+It is correct. I'll try to figure out a better threshold and the usage of
+order 0 page.
+
+Thanks again for your advices,
+Stefano
