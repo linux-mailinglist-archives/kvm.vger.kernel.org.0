@@ -2,259 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 25C931C61F
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 11:34:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B50941C63E
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 11:42:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726482AbfENJeV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 05:34:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40260 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725916AbfENJeV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 05:34:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 41D56C1306E5;
-        Tue, 14 May 2019 09:34:20 +0000 (UTC)
-Received: from [10.36.117.118] (ovpn-117-118.ams2.redhat.com [10.36.117.118])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 132E0608AC;
-        Tue, 14 May 2019 09:34:05 +0000 (UTC)
-Subject: Re: [PATCH v8 2/6] virtio-pmem: Add virtio pmem driver
-To:     Pankaj Gupta <pagupta@redhat.com>
-Cc:     linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org,
-        dan j williams <dan.j.williams@intel.com>,
-        zwisler@kernel.org, vishal l verma <vishal.l.verma@intel.com>,
-        dave jiang <dave.jiang@intel.com>, mst@redhat.com,
-        jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net,
-        hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu,
-        adilger kernel <adilger.kernel@dilger.ca>,
-        darrick wong <darrick.wong@oracle.com>, lcapitulino@redhat.com,
-        kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com,
-        nilal@redhat.com, riel@surriel.com, stefanha@redhat.com,
-        aarcange@redhat.com, david@fromorbit.com, cohuck@redhat.com,
-        xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-        pbonzini@redhat.com, kilobyte@angband.pl,
-        yuval shaia <yuval.shaia@oracle.com>, jstaron@google.com
-References: <20190510155202.14737-1-pagupta@redhat.com>
- <20190510155202.14737-3-pagupta@redhat.com>
- <f2ea35a6-ec98-447c-44fe-0cb3ab309340@redhat.com>
- <752392764.28554139.1557826022323.JavaMail.zimbra@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <86298c2c-cc7c-5b97-0f11-335d7da8c450@redhat.com>
-Date:   Tue, 14 May 2019 11:34:05 +0200
+        id S1726339AbfENJmw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 05:42:52 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:40494 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726075AbfENJmw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 05:42:52 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4E9cprn123136;
+        Tue, 14 May 2019 09:41:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=YGDQa1OkuMiXUV4tNUheY+38sI8XlHHOPmmUhcxpfkg=;
+ b=s5uOWBtyx5/VI95COzKSHJ/b/LVqo+7GlEl1DbKKVD33BRoJAKQq1nRPIAqjgas9q0L/
+ mwMEaaJxbDV3Pf5hxsGOBzlfSwtaF2pgC1uPZdmOl/JvXhfVp+8TUwwxvgkCOxrplHWU
+ 77HLbDKF18hazfA1PjCoqLA3NFAGX43RJlzJRgbsEHbIyUgo/OIceeIiY+GaIr9y6Aa0
+ DLq2s0dWRNoDJQRTcM9WJBbBqkFwCytNxeElFSr4bE1sbm2a0EjNlVGCJ7BtminobseM
+ +i7Xa0HWfSx4EalKWyakdHJodZyFqpHs917sLRUUbOyKmNFELd29+Xu/claf3qQnx5yn aw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2130.oracle.com with ESMTP id 2sdkwdmwam-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 May 2019 09:41:49 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4E9fGlY003658;
+        Tue, 14 May 2019 09:41:49 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2sdmeayt91-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 May 2019 09:41:49 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4E9fkZN010996;
+        Tue, 14 May 2019 09:41:46 GMT
+Received: from [10.166.106.34] (/10.166.106.34)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 14 May 2019 02:41:45 -0700
+Subject: Re: [RFC KVM 18/27] kvm/isolation: function to copy page table
+ entries for percpu buffer
+To:     Andy Lutomirski <luto@amacapital.net>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        kvm list <kvm@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        jan.setjeeilers@oracle.com, Liran Alon <liran.alon@oracle.com>,
+        Jonathan Adams <jwadams@google.com>
+References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
+ <1557758315-12667-19-git-send-email-alexandre.chartre@oracle.com>
+ <CALCETrWUKZv=wdcnYjLrHDakamMBrJv48wp2XBxZsEmzuearRQ@mail.gmail.com>
+ <20190514070941.GE2589@hirez.programming.kicks-ass.net>
+ <b8487de1-83a8-2761-f4a6-26c583eba083@oracle.com>
+ <B447B6E8-8CEF-46FF-9967-DFB2E00E55DB@amacapital.net>
+From:   Alexandre Chartre <alexandre.chartre@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <4e7d52d7-d4d2-3008-b967-c40676ed15d2@oracle.com>
+Date:   Tue, 14 May 2019 11:41:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-In-Reply-To: <752392764.28554139.1557826022323.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <B447B6E8-8CEF-46FF-9967-DFB2E00E55DB@amacapital.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Tue, 14 May 2019 09:34:20 +0000 (UTC)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905140070
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905140070
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->>
->>> +	}
->>> +
->>> +	/* When host has read buffer, this completes via host_ack */
->>
->> "A host repsonse results in "host_ack" getting called" ... ?
->>
->>> +	wait_event(req->host_acked, req->done);
->>> +	err = req->ret;
->>> +ret:
->>> +	kfree(req);
->>> +	return err;
->>> +};
->>> +
->>> +/* The asynchronous flush callback function */
->>> +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
->>> +{
->>> +	int rc = 0;
->>> +
->>> +	/* Create child bio for asynchronous flush and chain with
->>> +	 * parent bio. Otherwise directly call nd_region flush.
->>> +	 */
->>> +	if (bio && bio->bi_iter.bi_sector != -1) {
->>> +		struct bio *child = bio_alloc(GFP_ATOMIC, 0);
->>> +
->>> +		if (!child)
->>> +			return -ENOMEM;
->>> +		bio_copy_dev(child, bio);
->>> +		child->bi_opf = REQ_PREFLUSH;
->>> +		child->bi_iter.bi_sector = -1;
->>> +		bio_chain(child, bio);
->>> +		submit_bio(child);
->>
->> return 0;
->>
->> Then, drop the "else" case and "int rc" and do directly
->>
->> if (virtio_pmem_flush(nd_region))
->> 	return -EIO;
-> 
-> and another 'return 0' here :)
-> 
-> I don't like return from multiple places instead I prefer
-> single exit point from function.
 
-Makes this function more complicated than necessary. I agree when there
-are locks involved.
-
->  
->>
->>> +
->>> +	return 0;
->>> +};
->>> +
->>> +static int virtio_pmem_probe(struct virtio_device *vdev)
->>> +{
->>> +	int err = 0;
->>> +	struct resource res;
->>> +	struct virtio_pmem *vpmem;
->>> +	struct nd_region_desc ndr_desc = {};
->>> +	int nid = dev_to_node(&vdev->dev);
->>> +	struct nd_region *nd_region;
->>
->> Nit: use reverse Christmas tree layout :)
+On 5/14/19 10:34 AM, Andy Lutomirski wrote:
 > 
-> Done.
 > 
+>> On May 14, 2019, at 1:25 AM, Alexandre Chartre <alexandre.chartre@oracle.com> wrote:
 >>
->>> +
->>> +	if (!vdev->config->get) {
->>> +		dev_err(&vdev->dev, "%s failure: config access disabled\n",
->>> +			__func__);
->>> +		return -EINVAL;
->>> +	}
->>> +
->>> +	vpmem = devm_kzalloc(&vdev->dev, sizeof(*vpmem), GFP_KERNEL);
->>> +	if (!vpmem) {
->>> +		err = -ENOMEM;
->>> +		goto out_err;
->>> +	}
->>> +
->>> +	vpmem->vdev = vdev;
->>> +	vdev->priv = vpmem;
->>> +	err = init_vq(vpmem);
->>> +	if (err)
->>> +		goto out_err;
->>> +
->>> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
->>> +			start, &vpmem->start);
->>> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
->>> +			size, &vpmem->size);
->>> +
->>> +	res.start = vpmem->start;
->>> +	res.end   = vpmem->start + vpmem->size-1;
->>> +	vpmem->nd_desc.provider_name = "virtio-pmem";
->>> +	vpmem->nd_desc.module = THIS_MODULE;
->>> +
->>> +	vpmem->nvdimm_bus = nvdimm_bus_register(&vdev->dev,
->>> +						&vpmem->nd_desc);
->>> +	if (!vpmem->nvdimm_bus)
->>> +		goto out_vq;
->>> +
->>> +	dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
->>> +
->>> +	ndr_desc.res = &res;
->>> +	ndr_desc.numa_node = nid;
->>> +	ndr_desc.flush = async_pmem_flush;
->>> +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
->>> +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
->>> +	nd_region = nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_desc);
->>> +
 >>
->> I'd drop this empty line.
+>>> On 5/14/19 9:09 AM, Peter Zijlstra wrote:
+>>>> On Mon, May 13, 2019 at 11:18:41AM -0700, Andy Lutomirski wrote:
+>>>> On Mon, May 13, 2019 at 7:39 AM Alexandre Chartre
+>>>> <alexandre.chartre@oracle.com> wrote:
+>>>>>
+>>>>> pcpu_base_addr is already mapped to the KVM address space, but this
+>>>>> represents the first percpu chunk. To access a per-cpu buffer not
+>>>>> allocated in the first chunk, add a function which maps all cpu
+>>>>> buffers corresponding to that per-cpu buffer.
+>>>>>
+>>>>> Also add function to clear page table entries for a percpu buffer.
+>>>>>
+>>>>
+>>>> This needs some kind of clarification so that readers can tell whether
+>>>> you're trying to map all percpu memory or just map a specific
+>>>> variable.  In either case, you're making a dubious assumption that
+>>>> percpu memory contains no secrets.
+>>> I'm thinking the per-cpu random pool is a secrit. IOW, it demonstrably
+>>> does contain secrits, invalidating that premise.
+>>
+>> The current code unconditionally maps the entire first percpu chunk
+>> (pcpu_base_addr). So it assumes it doesn't contain any secret. That is
+>> mainly a simplification for the POC because a lot of core information
+>> that we need, for example just to switch mm, are stored there (like
+>> cpu_tlbstate, current_task...).
 > 
-> hmm.
+> I don’t think you should need any of this.
 > 
 
-The common pattern after allocating something, immediately check for it
-in the next line (like you do throughout this patch ;) )
-
-...
->> You are not freeing "vdev->priv".
-> 
-> vdev->priv is vpmem which is allocated using devm API.
-
-I'm confused. Looking at drivers/virtio/virtio_balloon.c:
-
-static void virtballoon_remove(struct virtio_device *vdev)
-{
-	struct virtio_balloon *vb = vdev->priv;
-
-	...
-
-	kfree(vb);
-}
-
-I think you should do the same here, vdev->priv is allocated in
-virtio_pmem_probe.
-
-But maybe I am missing something important here :)
+At the moment, the current code does need it. Otherwise it can't switch from
+kvm mm to kernel mm: switch_mm_irqs_off() will fault accessing "cpu_tlbstate",
+and then the page fault handler will fail accessing "current" before calling
+the kvm page fault handler. So it will double fault or loop on page faults.
+There are many different places where percpu variables are used, and I have
+experienced many double fault/page fault loop because of that.
 
 >>
->>> +	nvdimm_bus_unregister(nvdimm_bus);
->>> +	vdev->config->del_vqs(vdev);
->>> +	vdev->config->reset(vdev);
->>> +}
->>> +
+>> If the entire first percpu chunk effectively has secret then we will
+>> need to individually map only buffers we need. The kvm_copy_percpu_mapping()
+>> function is added to copy mapping for a specified percpu buffer, so
+>> this used to map percpu buffers which are not in the first percpu chunk.
+>>
+>> Also note that mapping is constrained by PTE (4K), so mapped buffers
+>> (percpu or not) which do not fill a whole set of pages can leak adjacent
+>> data store on the same pages.
+>>
+>>
+> 
+> I would take a different approach: figure out what you need and put it in its
+> own dedicated area, kind of like cpu_entry_area.
 
--- 
+That's certainly something we can do, like Julian proposed with "Process-local
+memory allocations": https://lkml.org/lkml/2018/11/22/1240
 
-Thanks,
+That's fine for buffers allocated from KVM, however, we will still need some
+core kernel mappings so the thread can run and interrupts can be handled.
 
-David / dhildenb
+> One nasty issue you’ll have is vmalloc: the kernel stack is in the
+> vmap range, and, if you allow access to vmap memory at all, you’ll
+> need some way to ensure that *unmap* gets propagated. I suspect the
+> right choice is to see if you can avoid using the kernel stack at all
+> in isolated mode.  Maybe you could run on the IRQ stack instead.
+
+I am currently just copying the task stack mapping into the KVM page table
+(patch 23) when a vcpu is created:
+
+	err = kvm_copy_ptes(tsk->stack, THREAD_SIZE);
+
+And this seems to work. I am clearing the mapping when the VM vcpu is freed,
+so I am making the assumption that the same task is used to create and free
+a vcpu.
+
+
+alex.
