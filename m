@@ -2,223 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 97B0B1C42D
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 09:53:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F2011C43F
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 09:58:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726078AbfENHxV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 03:53:21 -0400
-Received: from mga11.intel.com ([192.55.52.93]:6153 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725881AbfENHxV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 03:53:21 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 May 2019 00:53:21 -0700
-X-ExtLoop1: 1
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040) ([10.239.13.9])
-  by FMSMGA003.fm.intel.com with ESMTP; 14 May 2019 00:53:15 -0700
-Date:   Tue, 14 May 2019 03:47:36 -0400
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Erik Skultety <eskultet@redhat.com>
-Cc:     "cjia@nvidia.com" <cjia@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "aik@ozlabs.ru" <aik@ozlabs.ru>,
-        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "eauger@redhat.com" <eauger@redhat.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Yang, Ziye" <ziye.yang@intel.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
-        "felipe@nutanix.com" <felipe@nutanix.com>,
-        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "dinechin@redhat.com" <dinechin@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "Liu, Changpeng" <changpeng.liu@intel.com>,
-        "berrange@redhat.com" <berrange@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
-        "He, Shaopeng" <shaopeng.he@intel.com>
-Subject: Re: [PATCH v2 1/2] vfio/mdev: add version attribute for mdev device
-Message-ID: <20190514074736.GE20407@joy-OptiPlex-7040>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20190509175404.512ae7aa.cohuck@redhat.com>
- <20190509164825.GG2868@work-vm>
- <20190510110838.2df4c4d0.cohuck@redhat.com>
- <20190510093608.GD2854@work-vm>
- <20190510114838.7e16c3d6.cohuck@redhat.com>
- <20190513132804.GD11139@beluga.usersys.redhat.com>
- <20190514061235.GC20407@joy-OptiPlex-7040>
- <20190514072039.GA2089@beluga.usersys.redhat.com>
- <20190514073219.GD20407@joy-OptiPlex-7040>
- <20190514074344.GB2089@beluga.usersys.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190514074344.GB2089@beluga.usersys.redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+        id S1725985AbfENH6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 03:58:39 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:50062 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725866AbfENH6j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 03:58:39 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4E7rWLj013371;
+        Tue, 14 May 2019 07:57:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=Hm9Tm5LOAz3Yewu8iIsMrN/PygszNEAXdNiSHUZXasc=;
+ b=Cxu0RbtnDfFw0XdHX1a2nnhh6Murm5HeXI3uwUQKENUOiWgCk+Uad2iC/dmeOx92QJ4c
+ ArOiWnnJX0B4nK1vHuAdNSDrIwvsD3/DLRNjc+AfrPwlVG7eY1cpq+mQpPHLqKkSXGZM
+ s3Zzb+PcTUXnnJoR0u5Vu0UtNpHoH2qD/++5S7CaEEHgYj+WZhVYhg7kpQ5gqvdiE6l6
+ XxxsU8vhbvd8ChVXIr9Z9SYgOwqyAb6FiFlf+ykIotOkitY7klVomllhLJliLaJ/O8Ws
+ 0PBgos6GaN0Wt4URNQU2Md4SGAZ5MlFC+MM9fI6bw4HS4Mi0ylZzQx9Igug9XTnyytC3 7g== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2sdnttm1k1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 May 2019 07:57:44 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4E7vHQ8144326;
+        Tue, 14 May 2019 07:57:43 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3030.oracle.com with ESMTP id 2sdmeax9ua-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 May 2019 07:57:43 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4E7vZFf007379;
+        Tue, 14 May 2019 07:57:37 GMT
+Received: from [10.0.5.57] (/213.57.127.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 14 May 2019 07:57:35 +0000
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [RFC KVM 00/27] KVM Address Space Isolation
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20190514072941.GG2589@hirez.programming.kicks-ass.net>
+Date:   Tue, 14 May 2019 10:57:29 +0300
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        kvm list <kvm@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        jan.setjeeilers@oracle.com, Jonathan Adams <jwadams@google.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <F88E7218-04F2-4C86-A89E-D73695A03B0A@oracle.com>
+References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
+ <CALCETrVhRt0vPgcun19VBqAU_sWUkRg1RDVYk4osY6vK0SKzgg@mail.gmail.com>
+ <C2A30CC6-1459-4182-B71A-D8FF121A19F2@oracle.com>
+ <20190514072941.GG2589@hirez.programming.kicks-ass.net>
+To:     Peter Zijlstra <peterz@infradead.org>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905140058
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9256 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905140058
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 14, 2019 at 03:43:44PM +0800, Erik Skultety wrote:
-> On Tue, May 14, 2019 at 03:32:19AM -0400, Yan Zhao wrote:
-> > On Tue, May 14, 2019 at 03:20:40PM +0800, Erik Skultety wrote:
-> > > On Tue, May 14, 2019 at 02:12:35AM -0400, Yan Zhao wrote:
-> > > > On Mon, May 13, 2019 at 09:28:04PM +0800, Erik Skultety wrote:
-> > > > > On Fri, May 10, 2019 at 11:48:38AM +0200, Cornelia Huck wrote:
-> > > > > > On Fri, 10 May 2019 10:36:09 +0100
-> > > > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > > > > >
-> > > > > > > * Cornelia Huck (cohuck@redhat.com) wrote:
-> > > > > > > > On Thu, 9 May 2019 17:48:26 +0100
-> > > > > > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > > > > > > >
-> > > > > > > > > * Cornelia Huck (cohuck@redhat.com) wrote:
-> > > > > > > > > > On Thu, 9 May 2019 16:48:57 +0100
-> > > > > > > > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > > > > > > > > >
-> > > > > > > > > > > * Cornelia Huck (cohuck@redhat.com) wrote:
-> > > > > > > > > > > > On Tue, 7 May 2019 15:18:26 -0600
-> > > > > > > > > > > > Alex Williamson <alex.williamson@redhat.com> wrote:
-> > > > > > > > > > > >
-> > > > > > > > > > > > > On Sun,  5 May 2019 21:49:04 -0400
-> > > > > > > > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > > > > > > > > >
-> > > > > > > > > > > > > > +  Errno:
-> > > > > > > > > > > > > > +  If vendor driver wants to claim a mdev device incompatible to all other mdev
-> > > > > > > > > > > > > > +  devices, it should not register version attribute for this mdev device. But if
-> > > > > > > > > > > > > > +  a vendor driver has already registered version attribute and it wants to claim
-> > > > > > > > > > > > > > +  a mdev device incompatible to all other mdev devices, it needs to return
-> > > > > > > > > > > > > > +  -ENODEV on access to this mdev device's version attribute.
-> > > > > > > > > > > > > > +  If a mdev device is only incompatible to certain mdev devices, write of
-> > > > > > > > > > > > > > +  incompatible mdev devices's version strings to its version attribute should
-> > > > > > > > > > > > > > +  return -EINVAL;
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > I think it's best not to define the specific errno returned for a
-> > > > > > > > > > > > > specific situation, let the vendor driver decide, userspace simply
-> > > > > > > > > > > > > needs to know that an errno on read indicates the device does not
-> > > > > > > > > > > > > support migration version comparison and that an errno on write
-> > > > > > > > > > > > > indicates the devices are incompatible or the target doesn't support
-> > > > > > > > > > > > > migration versions.
-> > > > > > > > > > > >
-> > > > > > > > > > > > I think I have to disagree here: It's probably valuable to have an
-> > > > > > > > > > > > agreed error for 'cannot migrate at all' vs 'cannot migrate between
-> > > > > > > > > > > > those two particular devices'. Userspace might want to do different
-> > > > > > > > > > > > things (e.g. trying with different device pairs).
-> > > > > > > > > > >
-> > > > > > > > > > > Trying to stuff these things down an errno seems a bad idea; we can't
-> > > > > > > > > > > get much information that way.
-> > > > > > > > > >
-> > > > > > > > > > So, what would be a reasonable approach? Userspace should first read
-> > > > > > > > > > the version attributes on both devices (to find out whether migration
-> > > > > > > > > > is supported at all), and only then figure out via writing whether they
-> > > > > > > > > > are compatible?
-> > > > > > > > > >
-> > > > > > > > > > (Or just go ahead and try, if it does not care about the reason.)
-> > > > > > > > >
-> > > > > > > > > Well, I'm OK with something like writing to test whether it's
-> > > > > > > > > compatible, it's just we need a better way of saying 'no'.
-> > > > > > > > > I'm not sure if that involves reading back from somewhere after
-> > > > > > > > > the write or what.
-> > > > > > > >
-> > > > > > > > Hm, so I basically see two ways of doing that:
-> > > > > > > > - standardize on some error codes... problem: error codes can be hard
-> > > > > > > >   to fit to reasons
-> > > > > > > > - make the error available in some attribute that can be read
-> > > > > > > >
-> > > > > > > > I'm not sure how we can serialize the readback with the last write,
-> > > > > > > > though (this looks inherently racy).
-> > > > > > > >
-> > > > > > > > How important is detailed error reporting here?
-> > > > > > >
-> > > > > > > I think we need something, otherwise we're just going to get vague
-> > > > > > > user reports of 'but my VM doesn't migrate'; I'd like the error to be
-> > > > > > > good enough to point most users to something they can understand
-> > > > > > > (e.g. wrong card family/too old a driver etc).
-> > > > > >
-> > > > > > Ok, that sounds like a reasonable point. Not that I have a better idea
-> > > > > > how to achieve that, though... we could also log a more verbose error
-> > > > > > message to the kernel log, but that's not necessarily where a user will
-> > > > > > look first.
-> > > > >
-> > > > > In case of libvirt checking the compatibility, it won't matter how good the
-> > > > > error message in the kernel log is and regardless of how many error states you
-> > > > > want to handle, libvirt's only limited to errno here, since we're going to do
-> > > > > plain read/write, so our internal error message returned to the user is only
-> > > > > going to contain what the errno says - okay, of course we can (and we DO)
-> > > > > provide libvirt specific string, further specifying the error but like I
-> > > > > mentioned, depending on how many error cases we want to distinguish this may be
-> > > > > hard for anyone to figure out solely on the error code, as apps will most
-> > > > > probably not parse the
-> > > > > logs.
-> > > > >
-> > > > > Regards,
-> > > > > Erik
-> > > > hi Erik
-> > > > do you mean you are agreeing on defining common errors and only returning errno?
-> > >
-> > > In a sense, yes. While it is highly desirable to have logs with descriptive
-> > > messages which will help in troubleshooting tremendously, I wanted to point out
-> > > that spending time with error logs may not be that worthwhile especially since
-> > > most apps (like libvirt) will solely rely on using read(3)/write(3) to sysfs.
-> > > That means that we're limited by the errnos available, so apart from
-> > > reporting the generic system message we can't any more magic in terms of the
-> > > error messages, so the driver needs to assure that a proper message is
-> > > propagated to the journal and at best libvirt can direct the user (consumer) to
-> > > look through the system logs for more info. I also agree with the point
-> > > mentioned above that defining a specific errno is IMO not the way to go, as
-> > > these would be just too specific for the read(3)/write(3) use case.
-> > >
-> > > That said, from libvirt POV as a consumer, I'd expect there to be truly only 2
-> > > errors (I believe Alex has mentioned something similar in one of his responses
-> > > in one of the threads):
-> > >     a) read error indicating that an mdev type doesn't support migration
-> > >         - I assume if one type doesn't support migration, none of the other
-> > >           types exposed on the parent device do, is that a fair assumption?
-> > >     b) write error indicating that the mdev types are incompatible for
-> > >     migration
-> > >
-> > > Regards,
-> > > Erik
-> > Thanks for this explanation.
-> > so, can we arrive at below agreements?
-> >
-> > 1. "not to define the specific errno returned for a specific situation,
-> > let the vendor driver decide, userspace simply needs to know that an errno on
-> > read indicates the device does not support migration version comparison and
-> > that an errno on write indicates the devices are incompatible or the target
-> > doesn't support migration versions. "
-> > 2. vendor driver should log detailed error reasons in kernel log.
-> 
-> That would be my take on this, yes, but I open to hear any other suggestions and
-> ideas I couldn't think of as well.
-> 
-> Erik
-got it. thanks a lot!
 
-hi Cornelia and Dave,
-do you also agree on:
-1. "not to define the specific errno returned for a specific situation,
-let the vendor driver decide, userspace simply needs to know that an errno on
-read indicates the device does not support migration version comparison and
-that an errno on write indicates the devices are incompatible or the target
-doesn't support migration versions. "
-2. vendor driver should log detailed error reasons in kernel log.
- 
-Thanks
-Yan
+
+> On 14 May 2019, at 10:29, Peter Zijlstra <peterz@infradead.org> wrote:
+>=20
+>=20
+> (please, wrap our emails at 78 chars)
+>=20
+> On Tue, May 14, 2019 at 12:08:23AM +0300, Liran Alon wrote:
+>=20
+>> 3) =46rom (2), we should have theoretically deduced that for every
+>> #VMExit, there is a need to kick the sibling hyperthread also outside
+>> of guest until the #VMExit is completed.
+>=20
+> That's not in fact quite true; all you have to do is send the IPI.
+> Having one sibling IPI the other sibling carries enough guarantees =
+that
+> the receiving sibling will not execute any further guest instructions.
+>=20
+> That is, you don't have to wait on the VMExit to complete; you can =
+just
+> IPI and get on with things. Now, this is still expensive, But it is
+> heaps better than doing a full sync up between siblings.
+>=20
+
+I agree.
+
+I didn=E2=80=99t say you need to do full sync. You just need to IPI the =
+sibling
+hyperthreads before switching to the full kernel address space.
+But you need to make sure these sibling hyperthreads don=E2=80=99t get =
+back into
+the guest until all hyperthreads are running with KVM isolated address =
+space.
+
+It is still very expensive if done for every #VMExit. Which as I =
+explained,
+can be avoided in case we use the KVM isolated address space technique.
+
+-Liran
+
