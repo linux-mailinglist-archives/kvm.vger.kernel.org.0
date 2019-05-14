@@ -2,454 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BFAA81D16B
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 23:39:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 03E2D1E42D
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 23:55:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726490AbfENVj0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 17:39:26 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:40644 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726338AbfENVj0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 17:39:26 -0400
-Received: by mail-qt1-f194.google.com with SMTP id k24so882027qtq.7
-        for <kvm@vger.kernel.org>; Tue, 14 May 2019 14:39:25 -0700 (PDT)
+        id S1726487AbfENVzW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 17:55:22 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:44958 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726357AbfENVzV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 17:55:21 -0400
+Received: by mail-pg1-f194.google.com with SMTP id z16so216392pgv.11
+        for <kvm@vger.kernel.org>; Tue, 14 May 2019 14:55:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=zGsQ7lgpHhpTbszYslBdzxyDCXSizX6+VVJQr1o6b6I=;
+        b=Sqp9nGAlWQZ5vX1dxWHDTDuxZAQ8qZWMKHz3Jl8zJhU4HCd4U5LRW6+WrNk+FFVT4m
+         hghwxry4xwaDl/HQX8VpDYEsXxjpIc+C5kovvhxiwYCqXTRQef29CxCNWFm1bW5znOQt
+         K7SZARGMC8Rt7RfHAn3RpY8sM6daSCeeLH7swaooopzfa3ObMdZ6EWj/nj1LpViuniyi
+         4bbhnkKWhoastGyfdBE/DJkoP1Rh8R0rld6KSf2YfFl4gdmjFXNecFeWf9TzQuYX9kSC
+         yl5u8Qe4FV0TiiOwcMABkeTC1I2KGOOO/tJlPkFrFplmiajsczCkdhcwsEb9HLfHGJbp
+         bZGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=aWK7PXXvQrEhOv6s8QWB7I7Boz6+XjnQ7xuFCvI0oVU=;
-        b=OqFuQAujcdiia9c3xrL7F++UhlTp0ybSHe5VkO/XPwXNVFaD1bBfNtYnQRytPEe3Ec
-         uQTuzrfFrtVkg2sQHlmo991IQPAIs10J7c6ah0v/gPHgJhSZixRtygRY0tgu0LB1g17y
-         ar9s4Et4H3l8ZK09R9K0Cvh1iSNHRoVqW7/X9+HaoWmId5Cyec208jajuzMa5VlSC1P6
-         lSOa7A/bmEJhSOTUW3T4kESPTI8bkaD1ZJANyfyEELUyYlSf22V6bspZVHJygwbz4BO1
-         WILGJDSkFjHzehIw2ldW3wamWkXBbEkxMELsarD0T6TymYdi1EPa6sV84MAtH27XFqCR
-         0mWw==
-X-Gm-Message-State: APjAAAVtzg6k19fRl1e9i6ofsBQZSwi+7Ap9VCCHEQ8fav2tVbi3np4x
-        zLX9J0lNhNu8qlStKR914KX53g==
-X-Google-Smtp-Source: APXvYqyUH3DCGNAgl6is6ltPv9BK0itoAq9TUOKssuzcmBenrgWo5uFpT9bZO0oG+lKaN/sd9hObGA==
-X-Received: by 2002:ac8:4304:: with SMTP id z4mr23665337qtm.275.1557869964487;
-        Tue, 14 May 2019 14:39:24 -0700 (PDT)
-Received: from redhat.com ([185.54.206.10])
-        by smtp.gmail.com with ESMTPSA id t17sm100990qte.66.2019.05.14.14.39.21
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 14 May 2019 14:39:23 -0700 (PDT)
-Date:   Tue, 14 May 2019 17:39:19 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ppandit@redhat.com
-Subject: Re: [PATCH net] vhost_net: fix possible infinite loop
-Message-ID: <20190514173016-mutt-send-email-mst@kernel.org>
-References: <1556177599-56248-1-git-send-email-jasowang@redhat.com>
- <20190425131021-mutt-send-email-mst@kernel.org>
- <f4b4ff70-d64f-c3fb-fe2e-97ef6c55bda0@redhat.com>
- <999ef863-2994-e0c0-fbb1-a6e92de3fd24@redhat.com>
- <20190512125959-mutt-send-email-mst@kernel.org>
- <a0d99d7a-2323-a6a8-262d-9fdc5d926384@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a0d99d7a-2323-a6a8-262d-9fdc5d926384@redhat.com>
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=zGsQ7lgpHhpTbszYslBdzxyDCXSizX6+VVJQr1o6b6I=;
+        b=e1z0wQ3SFlz+ndl7Cq0+EF26cnuVF6EsDTPt5hnW6YrDUoF7xMx3DxTvfmQwgLSIby
+         TYNBYQ8DKl0EMGHdphsP1Q8AysIhhG4OI042Ahbo/8NpbowcOlPXXUIFcFNQAAWNo3WX
+         4UDq9jOO2uUttUa7mpNK0AsTVW7bIOGQ1xiIKpMI0Bu/xUzAgbRSClgIGZ1lVaNlUyOd
+         /ilXtLxkSAPBlTGPebeAXn12WA7joEzFUV50SmZ+3aQbzTZRMub9PI9nM8Kbg5pebKZt
+         qBa232NJKLPXhj/Bic/ZQ0imh+omPwmNEInDGMLXNMjSViyAqYc6NMSiSpOwiDU7/yPj
+         srkA==
+X-Gm-Message-State: APjAAAW7bpmbcB6Bqs3DCvy0Jy8zEIhhhJp2FO6wAadlCKrDciS9NxCZ
+        sA7vcD+bjqzRBAT8m+o/xC2vLg==
+X-Google-Smtp-Source: APXvYqw24l2gqEGsaEZKg5LYXhvlKPM4W+qe2urWfGhhgYhWFa149ACdSpb4zow/e83hwlMY5jdZGg==
+X-Received: by 2002:a63:2bc8:: with SMTP id r191mr39777166pgr.72.1557870920728;
+        Tue, 14 May 2019 14:55:20 -0700 (PDT)
+Received: from ?IPv6:2601:646:c200:1ef2:bde9:fbad:7d91:52eb? ([2601:646:c200:1ef2:bde9:fbad:7d91:52eb])
+        by smtp.gmail.com with ESMTPSA id d15sm116637pfm.186.2019.05.14.14.55.18
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 14 May 2019 14:55:19 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (1.0)
+Subject: Re: [RFC KVM 18/27] kvm/isolation: function to copy page table entries for percpu buffer
+From:   Andy Lutomirski <luto@amacapital.net>
+X-Mailer: iPhone Mail (16E227)
+In-Reply-To: <20190514210603.GD1977@linux.intel.com>
+Date:   Tue, 14 May 2019 14:55:18 -0700
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        kvm list <kvm@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        jan.setjeeilers@oracle.com, Liran Alon <liran.alon@oracle.com>,
+        Jonathan Adams <jwadams@google.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A1EB80C0-2D88-4DC0-A898-3BED50A4F5A8@amacapital.net>
+References: <CALCETrWUKZv=wdcnYjLrHDakamMBrJv48wp2XBxZsEmzuearRQ@mail.gmail.com> <20190514070941.GE2589@hirez.programming.kicks-ass.net> <b8487de1-83a8-2761-f4a6-26c583eba083@oracle.com> <B447B6E8-8CEF-46FF-9967-DFB2E00E55DB@amacapital.net> <4e7d52d7-d4d2-3008-b967-c40676ed15d2@oracle.com> <CALCETrXtwksWniEjiWKgZWZAyYLDipuq+sQ449OvDKehJ3D-fg@mail.gmail.com> <e5fedad9-4607-0aa4-297e-398c0e34ae2b@oracle.com> <20190514170522.GW2623@hirez.programming.kicks-ass.net> <20190514180936.GA1977@linux.intel.com> <CALCETrVzbBLokip5n0KEyG6irH6aoEWqyNODTy8embpXhB1GQg@mail.gmail.com> <20190514210603.GD1977@linux.intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 13, 2019 at 01:42:33PM +0800, Jason Wang wrote:
-> 
-> On 2019/5/13 上午1:10, Michael S. Tsirkin wrote:
-> > On Sun, May 05, 2019 at 12:20:24PM +0800, Jason Wang wrote:
-> > > On 2019/4/26 下午3:35, Jason Wang wrote:
-> > > > On 2019/4/26 上午1:52, Michael S. Tsirkin wrote:
-> > > > > On Thu, Apr 25, 2019 at 03:33:19AM -0400, Jason Wang wrote:
-> > > > > > When the rx buffer is too small for a packet, we will discard the vq
-> > > > > > descriptor and retry it for the next packet:
-> > > > > > 
-> > > > > > while ((sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
-> > > > > >                            &busyloop_intr))) {
-> > > > > > ...
-> > > > > >      /* On overrun, truncate and discard */
-> > > > > >      if (unlikely(headcount > UIO_MAXIOV)) {
-> > > > > >          iov_iter_init(&msg.msg_iter, READ, vq->iov, 1, 1);
-> > > > > >          err = sock->ops->recvmsg(sock, &msg,
-> > > > > >                       1, MSG_DONTWAIT | MSG_TRUNC);
-> > > > > >          pr_debug("Discarded rx packet: len %zd\n", sock_len);
-> > > > > >          continue;
-> > > > > >      }
-> > > > > > ...
-> > > > > > }
-> > > > > > 
-> > > > > > This makes it possible to trigger a infinite while..continue loop
-> > > > > > through the co-opreation of two VMs like:
-> > > > > > 
-> > > > > > 1) Malicious VM1 allocate 1 byte rx buffer and try to slow down the
-> > > > > >      vhost process as much as possible e.g using indirect descriptors or
-> > > > > >      other.
-> > > > > > 2) Malicious VM2 generate packets to VM1 as fast as possible
-> > > > > > 
-> > > > > > Fixing this by checking against weight at the end of RX and TX
-> > > > > > loop. This also eliminate other similar cases when:
-> > > > > > 
-> > > > > > - userspace is consuming the packets in the meanwhile
-> > > > > > - theoretical TOCTOU attack if guest moving avail index back and forth
-> > > > > >     to hit the continue after vhost find guest just add new buffers
-> > > > > > 
-> > > > > > This addresses CVE-2019-3900.
-> > > > > > 
-> > > > > > Fixes: d8316f3991d20 ("vhost: fix total length when packets are
-> > > > > > too short")
-> > > > > I agree this is the real issue.
-> > > > > 
-> > > > > > Fixes: 3a4d5c94e9593 ("vhost_net: a kernel-level virtio server")
-> > > > > This is just a red herring imho. We can stick this on any vhost patch :)
-> > > > > 
-> > > > > > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > > > > > ---
-> > > > > >    drivers/vhost/net.c | 41 +++++++++++++++++++++--------------------
-> > > > > >    1 file changed, 21 insertions(+), 20 deletions(-)
-> > > > > > 
-> > > > > > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > > > > > index df51a35..fb46e6b 100644
-> > > > > > --- a/drivers/vhost/net.c
-> > > > > > +++ b/drivers/vhost/net.c
-> > > > > > @@ -778,8 +778,9 @@ static void handle_tx_copy(struct vhost_net
-> > > > > > *net, struct socket *sock)
-> > > > > >        int err;
-> > > > > >        int sent_pkts = 0;
-> > > > > >        bool sock_can_batch = (sock->sk->sk_sndbuf == INT_MAX);
-> > > > > > +    bool next_round = false;
-> > > > > >    -    for (;;) {
-> > > > > > +    do {
-> > > > > >            bool busyloop_intr = false;
-> > > > > >              if (nvq->done_idx == VHOST_NET_BATCH)
-> > > > > > @@ -845,11 +846,10 @@ static void handle_tx_copy(struct
-> > > > > > vhost_net *net, struct socket *sock)
-> > > > > >            vq->heads[nvq->done_idx].id = cpu_to_vhost32(vq, head);
-> > > > > >            vq->heads[nvq->done_idx].len = 0;
-> > > > > >            ++nvq->done_idx;
-> > > > > > -        if (vhost_exceeds_weight(++sent_pkts, total_len)) {
-> > > > > > -            vhost_poll_queue(&vq->poll);
-> > > > > > -            break;
-> > > > > > -        }
-> > > > > > -    }
-> > > > > > +    } while (!(next_round = vhost_exceeds_weight(++sent_pkts,
-> > > > > > total_len)));
-> > > > > > +
-> > > > > > +    if (next_round)
-> > > > > > +        vhost_poll_queue(&vq->poll);
-> > > > > >          vhost_tx_batch(net, nvq, sock, &msg);
-> > > > > >    }
-> > > > > > @@ -873,8 +873,9 @@ static void handle_tx_zerocopy(struct
-> > > > > > vhost_net *net, struct socket *sock)
-> > > > > >        struct vhost_net_ubuf_ref *uninitialized_var(ubufs);
-> > > > > >        bool zcopy_used;
-> > > > > >        int sent_pkts = 0;
-> > > > > > +    bool next_round = false;
-> > > > > >    -    for (;;) {
-> > > > > > +    do {
-> > > > > >            bool busyloop_intr;
-> > > > > >              /* Release DMAs done buffers first */
-> > > > > > @@ -951,11 +952,10 @@ static void handle_tx_zerocopy(struct
-> > > > > > vhost_net *net, struct socket *sock)
-> > > > > >            else
-> > > > > >                vhost_zerocopy_signal_used(net, vq);
-> > > > > >            vhost_net_tx_packet(net);
-> > > > > > -        if (unlikely(vhost_exceeds_weight(++sent_pkts, total_len))) {
-> > > > > > -            vhost_poll_queue(&vq->poll);
-> > > > > > -            break;
-> > > > > > -        }
-> > > > > > -    }
-> > > > > > +    } while (!(next_round = vhost_exceeds_weight(++sent_pkts,
-> > > > > > total_len)));
-> > > > > > +
-> > > > > > +    if (next_round)
-> > > > > > +        vhost_poll_queue(&vq->poll);
-> > > > > >    }
-> > > > > >      /* Expects to be always run from workqueue - which acts as
-> > > > > > @@ -1134,6 +1134,7 @@ static void handle_rx(struct vhost_net *net)
-> > > > > >        struct iov_iter fixup;
-> > > > > >        __virtio16 num_buffers;
-> > > > > >        int recv_pkts = 0;
-> > > > > > +    bool next_round = false;
-> > > > > >          mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
-> > > > > >        sock = vq->private_data;
-> > > > > > @@ -1153,8 +1154,11 @@ static void handle_rx(struct vhost_net *net)
-> > > > > >            vq->log : NULL;
-> > > > > >        mergeable = vhost_has_feature(vq, VIRTIO_NET_F_MRG_RXBUF);
-> > > > > >    -    while ((sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
-> > > > > > -                              &busyloop_intr))) {
-> > > > > > +    do {
-> > > > > > +        sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
-> > > > > > +                              &busyloop_intr);
-> > > > > > +        if (!sock_len)
-> > > > > > +            break;
-> > > > > >            sock_len += sock_hlen;
-> > > > > >            vhost_len = sock_len + vhost_hlen;
-> > > > > >            headcount = get_rx_bufs(vq, vq->heads + nvq->done_idx,
-> > > > > > @@ -1239,12 +1243,9 @@ static void handle_rx(struct vhost_net *net)
-> > > > > >                vhost_log_write(vq, vq_log, log, vhost_len,
-> > > > > >                        vq->iov, in);
-> > > > > >            total_len += vhost_len;
-> > > > > > -        if (unlikely(vhost_exceeds_weight(++recv_pkts, total_len))) {
-> > > > > > -            vhost_poll_queue(&vq->poll);
-> > > > > > -            goto out;
-> > > > > > -        }
-> > > > > > -    }
-> > > > > > -    if (unlikely(busyloop_intr))
-> > > > > > +    } while (!(next_round = vhost_exceeds_weight(++recv_pkts,
-> > > > > > total_len)));
-> > > > > > +
-> > > > > > +    if (unlikely(busyloop_intr || next_round))
-> > > > > >            vhost_poll_queue(&vq->poll);
-> > > > > >        else
-> > > > > >            vhost_net_enable_vq(net, vq);
-> > > > > I'm afraid with this addition the code is too much like spagetty. What
-> > > > > does next_round mean?  Just that we are breaking out of loop?
-> > > > 
-> > > > Yes, we can have a better name of course.
-> > > > 
-> > > > 
-> > > > > That is
-> > > > > what goto is for...  Either let's have for(;;) with goto/break to get
-> > > > > outside or a while loop with a condition.  Both is just unreadable.
-> > > > > 
-> > > > > All these checks in 3 places are exactly the same on all paths and they
-> > > > > are slow path. Why don't we put this in a function?
-> > > > 
-> > > > The point I think is, we want the weight to be checked in both fast path
-> > > > and slow path.
-> > > > 
-> > > > 
-> > > > > E.g. like the below.
-> > > > > Warning: completely untested.
-> > > > > 
-> > > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > > > 
-> > > > > ---
-> > > > > 
-> > > > > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> > > > > index df51a35cf537..a0f89a504cd9 100644
-> > > > > --- a/drivers/vhost/net.c
-> > > > > +++ b/drivers/vhost/net.c
-> > > > > @@ -761,6 +761,23 @@ static int vhost_net_build_xdp(struct
-> > > > > vhost_net_virtqueue *nvq,
-> > > > >        return 0;
-> > > > >    }
-> > > > >    +/* Returns true if caller needs to go back and re-read the ring. */
-> > > > > +static bool empty_ring(struct vhost_net *net, struct
-> > > > > vhost_virtqueue *vq,
-> > > > > +               int pkts, size_t total_len, bool busyloop_intr)
-> > > > > +{
-> > > > > +    if (unlikely(busyloop_intr)) {
-> > > > > +        vhost_poll_queue(&vq->poll);
-> > > > > +    } else if (unlikely(vhost_enable_notify(&net->dev, vq))) {
-> > > > > +        /* They have slipped one in meanwhile: check again. */
-> > > > > +        vhost_disable_notify(&net->dev, vq);
-> > > > > +        if (!vhost_exceeds_weight(pkts, total_len))
-> > > > > +            return true;
-> > > > > +        vhost_poll_queue(&vq->poll);
-> > > > > +    }
-> > > > > +    /* Nothing new?  Wait for eventfd to tell us they refilled. */
-> > > > > +    return false;
-> > > > > +}
-> > > > 
-> > > > Ring empy is not the only places that needs care. E.g for RX, we need
-> > > > care about overrun and when userspace is consuming the packet in the
-> > > > same time. So there's no need to toggle vq notification in those two.
-> > Well I just factored out code that looked exactly the same.
-> > You can add more common code and rename the function
-> > if it turns out to be worth while.
-> > 
-> > 
-> > > > 
-> > > > > +
-> > > > >    static void handle_tx_copy(struct vhost_net *net, struct socket *sock)
-> > > > >    {
-> > > > >        struct vhost_net_virtqueue *nvq = &net->vqs[VHOST_NET_VQ_TX];
-> > > > > @@ -790,15 +807,10 @@ static void handle_tx_copy(struct vhost_net
-> > > > > *net, struct socket *sock)
-> > > > >            /* On error, stop handling until the next kick. */
-> > > > >            if (unlikely(head < 0))
-> > > > >                break;
-> > > > > -        /* Nothing new?  Wait for eventfd to tell us they refilled. */
-> > > > >            if (head == vq->num) {
-> > > > > -            if (unlikely(busyloop_intr)) {
-> > > > > -                vhost_poll_queue(&vq->poll);
-> > > > > -            } else if (unlikely(vhost_enable_notify(&net->dev,
-> > > > > -                                vq))) {
-> > > > > -                vhost_disable_notify(&net->dev, vq);
-> > > > > +            if (unlikely(empty_ring(net, vq, ++sent_pkts,
-> > > > > +                        total_len, busyloop_intr)))
-> > > > >                    continue;
-> > > > > -            }
-> > > > >                break;
-> > > > >            }
-> > > > >    @@ -886,14 +898,10 @@ static void handle_tx_zerocopy(struct
-> > > > > vhost_net *net, struct socket *sock)
-> > > > >            /* On error, stop handling until the next kick. */
-> > > > >            if (unlikely(head < 0))
-> > > > >                break;
-> > > > > -        /* Nothing new?  Wait for eventfd to tell us they refilled. */
-> > > > >            if (head == vq->num) {
-> > > > > -            if (unlikely(busyloop_intr)) {
-> > > > > -                vhost_poll_queue(&vq->poll);
-> > > > > -            } else if (unlikely(vhost_enable_notify(&net->dev, vq))) {
-> > > > > -                vhost_disable_notify(&net->dev, vq);
-> > > > > +            if (unlikely(empty_ring(net, vq, ++sent_pkts,
-> > > > > +                        total_len, busyloop_intr)))
-> > > > >                    continue;
-> > > > > -            }
-> > > > >                break;
-> > > > >            }
-> > > > >    @@ -1163,18 +1171,10 @@ static void handle_rx(struct vhost_net *net)
-> > > > >            /* On error, stop handling until the next kick. */
-> > > > >            if (unlikely(headcount < 0))
-> > > > >                goto out;
-> > > > > -        /* OK, now we need to know about added descriptors. */
-> > > > >            if (!headcount) {
-> > > > > -            if (unlikely(busyloop_intr)) {
-> > > > > -                vhost_poll_queue(&vq->poll);
-> > > > > -            } else if (unlikely(vhost_enable_notify(&net->dev, vq))) {
-> > > > > -                /* They have slipped one in as we were
-> > > > > -                 * doing that: check again. */
-> > > > > -                vhost_disable_notify(&net->dev, vq);
-> > > > > -                continue;
-> > > > > -            }
-> > > > > -            /* Nothing new?  Wait for eventfd to tell us
-> > > > > -             * they refilled. */
-> > > > > +            if (unlikely(empty_ring(net, vq, ++recv_pkts,
-> > > > > +                        total_len, busyloop_intr)))
-> > > > > +                    continue;
-> > > > >                goto out;
-> > > > >            }
-> > > > >            busyloop_intr = false;
-> > > > The patch misses several other continue that need cares and there's
-> > > > another call of vhost_exceeds_weight() at the end of the loop.
-> > > > 
-> > > > So instead of duplicating check everywhere like:
-> > > > 
-> > > > for (;;) {
-> > > >      if (condition_x) {
-> > > >          if (empty_ring())
-> > > >              continue;
-> > > >          break;
-> > > >      }
-> > > >      if (condition_y) {
-> > > >          if (empty_ring());
-> > > >              continue;
-> > > >          break;
-> > > >      }
-> > > >      if (condition_z) {
-> > > >          if (empty_ring())
-> > > >              continue;
-> > > >          break;
-> > > >      }
-> > > > 
-> > > > }
-> > > > 
-> > > > What this patch did:
-> > > > 
-> > > > do {
-> > > >     if (condition_x)
-> > > >      continue;
-> > > >     if (condition_y)
-> > > >      continue;
-> > > >     if (condition_z)
-> > > >      continue;
-> > > > } while(!need_break())
-> > > > 
-> > > > is much more compact and easier to read?
-> > > > 
-> > > > Thanks
-> > > 
-> > > Hi Michael:
-> > > 
-> > > Any more comments?
-> > > 
-> > > Thanks
-> > Jason the actual code in e.g. handle_tx_copy is nowhere close to the
-> > neat example you provide below. Yes new parts are like this but we
-> > kept all the old code around and that works differently.
-> > 
-> > 
-> > Look at handle_tx_copy for example.
-> > With your patch applied one can exit the loop:
-> > 
-> > 
-> > 	with a break
-> > 	with continue and condition false
-> > 	get to end of loop and condition false
-> > 
-> > 	and we have a goto there which now can get us to
-> > 	end of loop and then exit.
-> 
-> 
-> For the goto case, there's no functional change. For either case, there will
-> be a weight check at the end of the loop. Isn't it?
-> 
-> 
-> > 
-> > previously at least we would only exit
-> > on a break.
-> 
-> 
-> Actually, the only difference in handle_tx_copy() is the handling of
-> 'continue'. Without the patch, we won't check weight. With the patch, we
-> will check and exit the loop if we exceeds the weight. Did I miss anything
-> obvious?
-> 
-> Thanks
-
-Let me try to explain again.
-At the moment how does handle_tx_copy exit?
-It's for(;;) so you know you need to look for a break.
-
-When reading code you also notice there's a goto done
-which could exit the loop. if you scan forward
-you notice that it does not.
-This is confusing, but oh well. Worth fixing maybe ...
-
-Now you add the next round check.
-And there is also special code that
-detects whether you exited with break
-and whenever you did it acts specially.
-
-Yea it works. But I think it's clearer if we
-just make things obvious.
-If we want something to happen on error then
-
-	if (error)
-		handle
-		break
-
-is imho clearer than
-
-	flag = true
-	if (error)
-		break
-	flag = false
 
 
-if (flag)
-	handle
+> On May 14, 2019, at 2:06 PM, Sean Christopherson <sean.j.christopherson@in=
+tel.com> wrote:
+>=20
+>> On Tue, May 14, 2019 at 01:33:21PM -0700, Andy Lutomirski wrote:
+>> On Tue, May 14, 2019 at 11:09 AM Sean Christopherson
+>> <sean.j.christopherson@intel.com> wrote:
+>>> For IRQs it's somewhat feasible, but not for NMIs since NMIs are unblock=
+ed
+>>> on VMX immediately after VM-Exit, i.e. there's no way to prevent an NMI
+>>> from occuring while KVM's page tables are loaded.
+>>>=20
+>>> Back to Andy's question about enabling IRQs, the answer is "it depends".=
 
-in partucular - less branches on data path.
+>>> Exits due to INTR, NMI and #MC are considered high priority and are
+>>> serviced before re-enabling IRQs and preemption[1].  All other exits are=
 
-you point out code duplication correctly,
-but we can solve it just by adding functions.
-like i suggested.
+>>> handled after IRQs and preemption are re-enabled.
+>>>=20
+>>> A decent number of exit handlers are quite short, e.g. CPUID, most RDMSR=
 
+>>> and WRMSR, any event-related exit, etc...  But many exit handlers requir=
+e
+>>> significantly longer flows, e.g. EPT violations (page faults) and anythi=
+ng
+>>> that requires extensive emulation, e.g. nested VMX.  In short, leaving
+>>> IRQs disabled across all exits is not practical.
+>>>=20
+>>> Before going down the path of figuring out how to handle the corner case=
+s
+>>> regarding kvm_mm, I think it makes sense to pinpoint exactly what exits
+>>> are a) in the hot path for the use case (configuration) and b) can be
+>>> handled fast enough that they can run with IRQs disabled.  Generating th=
+at
+>>> list might allow us to tightly bound the contents of kvm_mm and sidestep=
 
-> 
-> > 
-> > Frankly trying to review it I get lost now.
-> > I also think repeated checking of empty_ring is not that
-> > problematic.
-> > But I don't insist on this specific splitup
-> > just pls make the code regular by
-> > moving stuff to sub-function.
-> > 
-> > 
+>>> many of the corner cases, i.e. select VM-Exits are handle with IRQs
+>>> disabled using KVM's mm, while "slow" VM-Exits go through the full conte=
+xt
+>>> switch.
+>>=20
+>> I suspect that the context switch is a bit of a red herring.  A
+>> PCID-don't-flush CR3 write is IIRC under 300 cycles.  Sure, it's slow,
+>> but it's probably minor compared to the full cost of the vm exit.  The
+>> pain point is kicking the sibling thread.
+>=20
+> Speaking of PCIDs, a separate mm for KVM would mean consuming another
+> ASID, which isn't good.
+
+I=E2=80=99m not sure we care. We have many logical address spaces (two per m=
+m plus a few more).  We have 4096 PCIDs, but we only use ten or so.  And we h=
+ave some undocumented number of *physical* ASIDs with some undocumented mech=
+anism by which PCID maps to a physical ASID.
+
+I don=E2=80=99t suppose you know how many physical ASIDs we have?  And how i=
+t interacts with the VPID stuff?
