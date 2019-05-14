@@ -2,75 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 03E2D1E42D
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 23:55:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B7A11E449
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 00:08:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726487AbfENVzW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 17:55:22 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:44958 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726357AbfENVzV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 17:55:21 -0400
-Received: by mail-pg1-f194.google.com with SMTP id z16so216392pgv.11
-        for <kvm@vger.kernel.org>; Tue, 14 May 2019 14:55:21 -0700 (PDT)
+        id S1726338AbfENWIX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 18:08:23 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:1820 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726148AbfENWIX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 18:08:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=zGsQ7lgpHhpTbszYslBdzxyDCXSizX6+VVJQr1o6b6I=;
-        b=Sqp9nGAlWQZ5vX1dxWHDTDuxZAQ8qZWMKHz3Jl8zJhU4HCd4U5LRW6+WrNk+FFVT4m
-         hghwxry4xwaDl/HQX8VpDYEsXxjpIc+C5kovvhxiwYCqXTRQef29CxCNWFm1bW5znOQt
-         K7SZARGMC8Rt7RfHAn3RpY8sM6daSCeeLH7swaooopzfa3ObMdZ6EWj/nj1LpViuniyi
-         4bbhnkKWhoastGyfdBE/DJkoP1Rh8R0rld6KSf2YfFl4gdmjFXNecFeWf9TzQuYX9kSC
-         yl5u8Qe4FV0TiiOwcMABkeTC1I2KGOOO/tJlPkFrFplmiajsczCkdhcwsEb9HLfHGJbp
-         bZGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=zGsQ7lgpHhpTbszYslBdzxyDCXSizX6+VVJQr1o6b6I=;
-        b=e1z0wQ3SFlz+ndl7Cq0+EF26cnuVF6EsDTPt5hnW6YrDUoF7xMx3DxTvfmQwgLSIby
-         TYNBYQ8DKl0EMGHdphsP1Q8AysIhhG4OI042Ahbo/8NpbowcOlPXXUIFcFNQAAWNo3WX
-         4UDq9jOO2uUttUa7mpNK0AsTVW7bIOGQ1xiIKpMI0Bu/xUzAgbRSClgIGZ1lVaNlUyOd
-         /ilXtLxkSAPBlTGPebeAXn12WA7joEzFUV50SmZ+3aQbzTZRMub9PI9nM8Kbg5pebKZt
-         qBa232NJKLPXhj/Bic/ZQ0imh+omPwmNEInDGMLXNMjSViyAqYc6NMSiSpOwiDU7/yPj
-         srkA==
-X-Gm-Message-State: APjAAAW7bpmbcB6Bqs3DCvy0Jy8zEIhhhJp2FO6wAadlCKrDciS9NxCZ
-        sA7vcD+bjqzRBAT8m+o/xC2vLg==
-X-Google-Smtp-Source: APXvYqw24l2gqEGsaEZKg5LYXhvlKPM4W+qe2urWfGhhgYhWFa149ACdSpb4zow/e83hwlMY5jdZGg==
-X-Received: by 2002:a63:2bc8:: with SMTP id r191mr39777166pgr.72.1557870920728;
-        Tue, 14 May 2019 14:55:20 -0700 (PDT)
-Received: from ?IPv6:2601:646:c200:1ef2:bde9:fbad:7d91:52eb? ([2601:646:c200:1ef2:bde9:fbad:7d91:52eb])
-        by smtp.gmail.com with ESMTPSA id d15sm116637pfm.186.2019.05.14.14.55.18
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 14 May 2019 14:55:19 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (1.0)
-Subject: Re: [RFC KVM 18/27] kvm/isolation: function to copy page table entries for percpu buffer
-From:   Andy Lutomirski <luto@amacapital.net>
-X-Mailer: iPhone Mail (16E227)
-In-Reply-To: <20190514210603.GD1977@linux.intel.com>
-Date:   Tue, 14 May 2019 14:55:18 -0700
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Alexandre Chartre <alexandre.chartre@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        kvm list <kvm@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        jan.setjeeilers@oracle.com, Liran Alon <liran.alon@oracle.com>,
-        Jonathan Adams <jwadams@google.com>
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1557871701; x=1589407701;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:mime-version:
+   content-transfer-encoding;
+  bh=PRP1xBxuo+1R+ttuKDucVSYxEcz5wPNDFETPGhUhDeg=;
+  b=LQpxGUSjdqJ5oZqjmFwOyytXC4+uIG9f5CzhSyAIs4n5Qe+yj3ax9Ezg
+   Le2QvlX0VFHhOxfUnje/TWMZPxbI3ZfKd3aEhktB6C2wG6iUavTTopuxZ
+   Ikad/aZyrzO8ZgIGa4RXSTcKUUqyVrZsTn9AxNttvf2QTgyraqEinZhJe
+   U=;
+X-IronPort-AV: E=Sophos;i="5.60,470,1549929600"; 
+   d="scan'208";a="799668867"
+Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-2b-55156cd4.us-west-2.amazon.com) ([10.47.22.34])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 14 May 2019 22:08:19 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-2b-55156cd4.us-west-2.amazon.com (8.14.7/8.14.7) with ESMTP id x4EM8F2O129758
+        (version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=FAIL);
+        Tue, 14 May 2019 22:08:19 GMT
+Received: from EX13D02EUC003.ant.amazon.com (10.43.164.10) by
+ EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Tue, 14 May 2019 22:08:18 +0000
+Received: from EX13D02EUC001.ant.amazon.com (10.43.164.92) by
+ EX13D02EUC003.ant.amazon.com (10.43.164.10) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Tue, 14 May 2019 22:08:17 +0000
+Received: from EX13D02EUC001.ant.amazon.com ([10.43.164.92]) by
+ EX13D02EUC001.ant.amazon.com ([10.43.164.92]) with mapi id 15.00.1367.000;
+ Tue, 14 May 2019 22:08:17 +0000
+From:   "Sironi, Filippo" <sironi@amazon.de>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+CC:     LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        "vasu.srinivasan@oracle.com" <vasu.srinivasan@oracle.com>
+Subject: Re: [PATCH v2 1/2] KVM: Start populating /sys/hypervisor with KVM
+ entries
+Thread-Topic: [PATCH v2 1/2] KVM: Start populating /sys/hypervisor with KVM
+ entries
+Thread-Index: AQHVCmguTMwTmVyYP0+tMrT8Z/dQMaZqvgUAgAAL5ICAAGRWAA==
+Date:   Tue, 14 May 2019 22:08:16 +0000
+Message-ID: <0E82B8C2-5169-4788-B1C0-1668D1F74204@amazon.de>
+References: <1539078879-4372-1-git-send-email-sironi@amazon.de>
+ <1557847002-23519-1-git-send-email-sironi@amazon.de>
+ <1557847002-23519-2-git-send-email-sironi@amazon.de>
+ <d03f6be5-d8dc-4389-e14c-295f36a68827@de.ibm.com>
+ <56DAB9BD-2543-49DA-9886-C9C8F2B814F9@amazon.de>
+In-Reply-To: <56DAB9BD-2543-49DA-9886-C9C8F2B814F9@amazon.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.166.102]
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <D4A90837FC6EEB479DA8881876B210DF@amazon.com>
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <A1EB80C0-2D88-4DC0-A898-3BED50A4F5A8@amacapital.net>
-References: <CALCETrWUKZv=wdcnYjLrHDakamMBrJv48wp2XBxZsEmzuearRQ@mail.gmail.com> <20190514070941.GE2589@hirez.programming.kicks-ass.net> <b8487de1-83a8-2761-f4a6-26c583eba083@oracle.com> <B447B6E8-8CEF-46FF-9967-DFB2E00E55DB@amacapital.net> <4e7d52d7-d4d2-3008-b967-c40676ed15d2@oracle.com> <CALCETrXtwksWniEjiWKgZWZAyYLDipuq+sQ449OvDKehJ3D-fg@mail.gmail.com> <e5fedad9-4607-0aa4-297e-398c0e34ae2b@oracle.com> <20190514170522.GW2623@hirez.programming.kicks-ass.net> <20190514180936.GA1977@linux.intel.com> <CALCETrVzbBLokip5n0KEyG6irH6aoEWqyNODTy8embpXhB1GQg@mail.gmail.com> <20190514210603.GD1977@linux.intel.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -78,58 +79,180 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-> On May 14, 2019, at 2:06 PM, Sean Christopherson <sean.j.christopherson@in=
-tel.com> wrote:
->=20
->> On Tue, May 14, 2019 at 01:33:21PM -0700, Andy Lutomirski wrote:
->> On Tue, May 14, 2019 at 11:09 AM Sean Christopherson
->> <sean.j.christopherson@intel.com> wrote:
->>> For IRQs it's somewhat feasible, but not for NMIs since NMIs are unblock=
-ed
->>> on VMX immediately after VM-Exit, i.e. there's no way to prevent an NMI
->>> from occuring while KVM's page tables are loaded.
->>>=20
->>> Back to Andy's question about enabling IRQs, the answer is "it depends".=
+> On 14. May 2019, at 18:09, Sironi, Filippo <sironi@amazon.de> wrote:
+> =
 
->>> Exits due to INTR, NMI and #MC are considered high priority and are
->>> serviced before re-enabling IRQs and preemption[1].  All other exits are=
+>> On 14. May 2019, at 17:26, Christian Borntraeger <borntraeger@de.ibm.com=
+> wrote:
+>> =
 
->>> handled after IRQs and preemption are re-enabled.
->>>=20
->>> A decent number of exit handlers are quite short, e.g. CPUID, most RDMSR=
+>>> On 14.05.19 17:16, Filippo Sironi wrote:
+>>> Start populating /sys/hypervisor with KVM entries when we're running on
+>>> KVM. This is to replicate functionality that's available when we're
+>>> running on Xen.
+>>> =
 
->>> and WRMSR, any event-related exit, etc...  But many exit handlers requir=
-e
->>> significantly longer flows, e.g. EPT violations (page faults) and anythi=
-ng
->>> that requires extensive emulation, e.g. nested VMX.  In short, leaving
->>> IRQs disabled across all exits is not practical.
->>>=20
->>> Before going down the path of figuring out how to handle the corner case=
-s
->>> regarding kvm_mm, I think it makes sense to pinpoint exactly what exits
->>> are a) in the hot path for the use case (configuration) and b) can be
->>> handled fast enough that they can run with IRQs disabled.  Generating th=
-at
->>> list might allow us to tightly bound the contents of kvm_mm and sidestep=
+>>> Start with /sys/hypervisor/uuid, which users prefer over
+>>> /sys/devices/virtual/dmi/id/product_uuid as a way to recognize a virtual
+>>> machine, since it's also available when running on Xen HVM and on Xen PV
+>>> and, on top of that doesn't require root privileges by default.
+>>> Let's create arch-specific hooks so that different architectures can
+>>> provide different implementations.
+>>> =
 
->>> many of the corner cases, i.e. select VM-Exits are handle with IRQs
->>> disabled using KVM's mm, while "slow" VM-Exits go through the full conte=
-xt
->>> switch.
->>=20
->> I suspect that the context switch is a bit of a red herring.  A
->> PCID-don't-flush CR3 write is IIRC under 300 cycles.  Sure, it's slow,
->> but it's probably minor compared to the full cost of the vm exit.  The
->> pain point is kicking the sibling thread.
->=20
-> Speaking of PCIDs, a separate mm for KVM would mean consuming another
-> ASID, which isn't good.
+>>> Signed-off-by: Filippo Sironi <sironi@amazon.de>
+>>> ---
+>>> v2:
+>>> * move the retrieval of the VM UUID out of uuid_show and into
+>>> kvm_para_get_uuid, which is a weak function that can be overwritten
+>>> =
 
-I=E2=80=99m not sure we care. We have many logical address spaces (two per m=
-m plus a few more).  We have 4096 PCIDs, but we only use ten or so.  And we h=
-ave some undocumented number of *physical* ASIDs with some undocumented mech=
-anism by which PCID maps to a physical ASID.
+>>> drivers/Kconfig              |  2 ++
+>>> drivers/Makefile             |  2 ++
+>>> drivers/kvm/Kconfig          | 14 ++++++++++++++
+>>> drivers/kvm/Makefile         |  1 +
+>>> drivers/kvm/sys-hypervisor.c | 30 ++++++++++++++++++++++++++++++
+>>> 5 files changed, 49 insertions(+)
+>>> create mode 100644 drivers/kvm/Kconfig
+>>> create mode 100644 drivers/kvm/Makefile
+>>> create mode 100644 drivers/kvm/sys-hypervisor.c
+>>> =
 
-I don=E2=80=99t suppose you know how many physical ASIDs we have?  And how i=
-t interacts with the VPID stuff?
+>>> diff --git a/drivers/Kconfig b/drivers/Kconfig
+>>> index 45f9decb9848..90eb835fe951 100644
+>>> --- a/drivers/Kconfig
+>>> +++ b/drivers/Kconfig
+>>> @@ -146,6 +146,8 @@ source "drivers/hv/Kconfig"
+>>> =
+
+>>> source "drivers/xen/Kconfig"
+>>> =
+
+>>> +source "drivers/kvm/Kconfig"
+>>> +
+>>> source "drivers/staging/Kconfig"
+>>> =
+
+>>> source "drivers/platform/Kconfig"
+>>> diff --git a/drivers/Makefile b/drivers/Makefile
+>>> index c61cde554340..79cc92a3f6bf 100644
+>>> --- a/drivers/Makefile
+>>> +++ b/drivers/Makefile
+>>> @@ -44,6 +44,8 @@ obj-y				+=3D soc/
+>>> obj-$(CONFIG_VIRTIO)		+=3D virtio/
+>>> obj-$(CONFIG_XEN)		+=3D xen/
+>>> =
+
+>>> +obj-$(CONFIG_KVM_GUEST)		+=3D kvm/
+>>> +
+>>> # regulators early, since some subsystems rely on them to initialize
+>>> obj-$(CONFIG_REGULATOR)		+=3D regulator/
+>>> =
+
+>>> diff --git a/drivers/kvm/Kconfig b/drivers/kvm/Kconfig
+>>> new file mode 100644
+>>> index 000000000000..3fc041df7c11
+>>> --- /dev/null
+>>> +++ b/drivers/kvm/Kconfig
+>>> @@ -0,0 +1,14 @@
+>>> +menu "KVM driver support"
+>>> +        depends on KVM_GUEST
+>>> +
+>>> +config KVM_SYS_HYPERVISOR
+>>> +        bool "Create KVM entries under /sys/hypervisor"
+>>> +        depends on SYSFS
+>>> +        select SYS_HYPERVISOR
+>>> +        default y
+>>> +        help
+>>> +          Create KVM entries under /sys/hypervisor (e.g., uuid). When =
+running
+>>> +          native or on another hypervisor, /sys/hypervisor may still be
+>>> +          present, but it will have no KVM entries.
+>>> +
+>>> +endmenu
+>>> diff --git a/drivers/kvm/Makefile b/drivers/kvm/Makefile
+>>> new file mode 100644
+>>> index 000000000000..73a43fc994b9
+>>> --- /dev/null
+>>> +++ b/drivers/kvm/Makefile
+>>> @@ -0,0 +1 @@
+>>> +obj-$(CONFIG_KVM_SYS_HYPERVISOR) +=3D sys-hypervisor.o
+>>> diff --git a/drivers/kvm/sys-hypervisor.c b/drivers/kvm/sys-hypervisor.c
+>>> new file mode 100644
+>>> index 000000000000..43b1d1a09807
+>>> --- /dev/null
+>>> +++ b/drivers/kvm/sys-hypervisor.c
+>>> @@ -0,0 +1,30 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0 */
+>>> +
+>>> +#include <asm/kvm_para.h>
+>>> +
+>>> +#include <linux/kobject.h>
+>>> +#include <linux/sysfs.h>
+>>> +
+>>> +__weak const char *kvm_para_get_uuid(void)
+>>> +{
+>>> +	return NULL;
+>>> +}
+>>> +
+>>> +static ssize_t uuid_show(struct kobject *obj,
+>>> +			 struct kobj_attribute *attr,
+>>> +			 char *buf)
+>>> +{
+>>> +	const char *uuid =3D kvm_para_get_uuid();
+>> =
+
+>> I would prefer to have kvm_para_get_uuid return a uuid_t
+>> but char * will probably work out as well.
+> =
+
+> Let me give this a quick spin.
+
+I looked into getting a uuid_t.
+
+At least for architectures where we retrieve that bit of
+information from DMI tables, this is undesirable since
+the interpretation of the UUID changed with DMI 2.6
+(the first 3 fields are now encoded in little-endian).
+This means that we wouldn't know how to print it in this
+generic code.
+
+I think that it's best if the architecture specific code
+turns the UUID into the string representation.
+
+>>> +	return sprintf(buf, "%s\n", uuid);
+>>> +}
+>>> +
+>>> +static struct kobj_attribute uuid =3D __ATTR_RO(uuid);
+>>> +
+>>> +static int __init uuid_init(void)
+>>> +{
+>>> +	if (!kvm_para_available())
+>> =
+
+>> Isnt kvm_para_available a function that is defined in the context of the=
+ HOST
+>> and not of the guest?
+> =
+
+> No, kvm_para_available is defined in the guest context.
+> On x86, it checks for the presence of the KVM CPUID leafs.
+> =
+
+>>> +		return 0;
+>>> +	return sysfs_create_file(hypervisor_kobj, &uuid.attr);
+>>> +}
+>>> +
+>>> +device_initcall(uuid_init);
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrer: Christian Schlaeger, Ralf Herbrich
+Ust-ID: DE 289 237 879
+Eingetragen am Amtsgericht Charlottenburg HRB 149173 B
+
+
