@@ -2,146 +2,293 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AECA01CCD5
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 18:21:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F017B1CCDB
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 18:21:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726200AbfENQVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 12:21:01 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:42480 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725901AbfENQVB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 12:21:01 -0400
-Received: by mail-wr1-f67.google.com with SMTP id l2so19895580wrb.9
-        for <kvm@vger.kernel.org>; Tue, 14 May 2019 09:21:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=BOCFSrhgfdaeCsPqx/9Z23ucW5WFX+NmToiNV2PrBeE=;
-        b=Wo4uwGL0bornznynBx4W7haECl/LXZYxEVGQBqCZsHLBEA5KDFAnFobrQKJawUnVvN
-         lUX0K7WG8kYkrm2P3yK7OpG3MbayMwGl+W5zZTlDiJR04rFgOh06gLmb6x70+B8joBF+
-         lTgarKse3JDo8lb/8UkMGOogUtGh1ZAUf+rA2cL0O9F0KtJqCqaVGfjETOOW9wJSpTYv
-         xpj2cYibHbm5b/BtJg5FwK5Q/ViSWZVi3aSpiuFsi2tOx9HobIp95LIq6fqPIEInVFTA
-         Wg4VhBoy12X/mQIO4m9GkYD2EmU9zVdIZfAywtWpUS50CtSZHsdbaJCBTyhlE2FvceFB
-         YDxA==
-X-Gm-Message-State: APjAAAWYYwdlR5XhVtycXd2gqiZvBsx1qOUeWZHFN8HDlWphGZoElbrC
-        DfK8FenRgSG5LUqqNcC78EOYIA==
-X-Google-Smtp-Source: APXvYqyscd4jQz6/42rGahRh0erb6xOt/MMNshG64dkL9Ee+1e2OY4Rd80gvnBFmXC+AkJhQaflnLg==
-X-Received: by 2002:adf:afcd:: with SMTP id y13mr21348543wrd.270.1557850859484;
-        Tue, 14 May 2019 09:20:59 -0700 (PDT)
-Received: from steredhat (host151-251-static.12-87-b.business.telecomitalia.it. [87.12.251.151])
-        by smtp.gmail.com with ESMTPSA id g3sm4407851wmf.9.2019.05.14.09.20.58
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 14 May 2019 09:20:58 -0700 (PDT)
-Date:   Tue, 14 May 2019 18:20:56 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        virtualization@lists.linux-foundation.org,
+        id S1726338AbfENQVr convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 14 May 2019 12:21:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:28387 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726025AbfENQVq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 12:21:46 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7F317C0624DF;
+        Tue, 14 May 2019 16:21:43 +0000 (UTC)
+Received: from x1.home (ovpn-117-92.phx2.redhat.com [10.3.117.92])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CB18A600C5;
+        Tue, 14 May 2019 16:21:38 +0000 (UTC)
+Date:   Tue, 14 May 2019 10:21:38 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     kwankhede@nvidia.com, kevin.tian@intel.com,
+        baolu.lu@linux.intel.com, yi.y.sun@intel.com, joro@8bytes.org,
+        jean-philippe.brucker@arm.com, peterx@redhat.com,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v2 7/8] vsock/virtio: increase RX buffer size to 64 KiB
-Message-ID: <20190514162056.5aotcuzsi6e6wya7@steredhat>
-References: <20190510125843.95587-1-sgarzare@redhat.com>
- <20190510125843.95587-8-sgarzare@redhat.com>
- <bf0416f1-0e69-722d-75ce-3d101e6d7d71@redhat.com>
- <20190513175138.4yycad2xi65komw6@steredhat>
- <fd934a4c-f7d2-8a04-ed93-a3b690ed0d79@redhat.com>
+        yamada.masahiro@socionext.com, iommu@lists.linux-foundation.org
+Subject: Re: [RFC v3 1/3] vfio_pci: split vfio_pci.c into two source files
+Message-ID: <20190514102138.13bf7de0@x1.home>
+In-Reply-To: <1556021680-2911-2-git-send-email-yi.l.liu@intel.com>
+References: <1556021680-2911-1-git-send-email-yi.l.liu@intel.com>
+        <1556021680-2911-2-git-send-email-yi.l.liu@intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fd934a4c-f7d2-8a04-ed93-a3b690ed0d79@redhat.com>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 14 May 2019 16:21:46 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 14, 2019 at 11:38:05AM +0800, Jason Wang wrote:
-> 
-> On 2019/5/14 上午1:51, Stefano Garzarella wrote:
-> > On Mon, May 13, 2019 at 06:01:52PM +0800, Jason Wang wrote:
-> > > On 2019/5/10 下午8:58, Stefano Garzarella wrote:
-> > > > In order to increase host -> guest throughput with large packets,
-> > > > we can use 64 KiB RX buffers.
-> > > > 
-> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > > ---
-> > > >    include/linux/virtio_vsock.h | 2 +-
-> > > >    1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-> > > > index 84b72026d327..5a9d25be72df 100644
-> > > > --- a/include/linux/virtio_vsock.h
-> > > > +++ b/include/linux/virtio_vsock.h
-> > > > @@ -10,7 +10,7 @@
-> > > >    #define VIRTIO_VSOCK_DEFAULT_MIN_BUF_SIZE	128
-> > > >    #define VIRTIO_VSOCK_DEFAULT_BUF_SIZE		(1024 * 256)
-> > > >    #define VIRTIO_VSOCK_DEFAULT_MAX_BUF_SIZE	(1024 * 256)
-> > > > -#define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE	(1024 * 4)
-> > > > +#define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE	(1024 * 64)
-> > > >    #define VIRTIO_VSOCK_MAX_BUF_SIZE		0xFFFFFFFFUL
-> > > >    #define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE		(1024 * 64)
-> > > 
-> > > We probably don't want such high order allocation. It's better to switch to
-> > > use order 0 pages in this case. See add_recvbuf_big() for virtio-net. If we
-> > > get datapath unified, we will get more stuffs set.
-> > IIUC, you are suggesting to allocate only pages and put them in a
-> > scatterlist, then add them to the virtqueue.
-> > 
-> > Is it correct?
-> 
-> 
-> Yes since you are using:
-> 
->                 pkt->buf = kmalloc(buf_len, GFP_KERNEL);
->                 if (!pkt->buf) {
->                         virtio_transport_free_pkt(pkt);
->                         break;
->                 }
-> 
-> This is likely to fail when the memory is fragmented which is kind of
-> fragile.
-> 
-> 
+On Tue, 23 Apr 2019 20:14:38 +0800
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-Thanks for pointing that out.
-
-> > 
-> > The issue that I have here, is that the virtio-vsock guest driver, see
-> > virtio_vsock_rx_fill(), allocates a struct virtio_vsock_pkt that
-> > contains the room for the header, then allocates the buffer for the payload.
-> > At this point it fills the scatterlist with the &virtio_vsock_pkt.hdr and the
-> > buffer for the payload.
+> This patch splits the non-module specific codes from original
+> drivers/vfio/pci/vfio_pci.c into a common.c under drivers/vfio/pci.
+> This is for potential code sharing. e.g. vfio-mdev-pci driver
 > 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Lu Baolu <baolu.lu@linux.intel.com>
+> Signed-off-by: Liu, Yi L <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/pci/Makefile           |    2 +-
+>  drivers/vfio/pci/common.c           | 1511 +++++++++++++++++++++++++++++++++++
+>  drivers/vfio/pci/vfio_pci.c         | 1476 +---------------------------------
+>  drivers/vfio/pci/vfio_pci_private.h |   27 +
+>  4 files changed, 1551 insertions(+), 1465 deletions(-)
+>  create mode 100644 drivers/vfio/pci/common.c
 > 
-> This part should be fine since what is needed is just adding more pages to
-> sg[] and call virtuqeueu_add_sg().
-> 
-> 
+> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
+> index 9662c06..813f6b3 100644
+> --- a/drivers/vfio/pci/Makefile
+> +++ b/drivers/vfio/pci/Makefile
+> @@ -1,5 +1,5 @@
+>  
+> -vfio-pci-y := vfio_pci.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
+> +vfio-pci-y := vfio_pci.o common.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
+>  vfio-pci-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
+>  vfio-pci-$(CONFIG_VFIO_PCI_NVLINK2) += vfio_pci_nvlink2.o
+>  
+> diff --git a/drivers/vfio/pci/common.c b/drivers/vfio/pci/common.c
+> new file mode 100644
+> index 0000000..847e2e4
+> --- /dev/null
+> +++ b/drivers/vfio/pci/common.c
 
-Yes, I agree.
+Nit, I realize that our file naming scheme includes a lot of
+redundancy, but better to have redundancy than inconsistency imo.
+Perhaps vfio_pci_common.c.
 
-> > 
-> > Changing this will require several modifications, and if we get datapath
-> > unified, I'm not sure it's worth it.
-> > Of course, if we leave the datapaths separated, I'd like to do that later.
-> > 
-> > What do you think?
-> 
-> 
-> For the driver it self, it should not be hard. But I think you mean the
-> issue of e.g virtio_vsock_pkt itself which doesn't support sg. For short
-> time, maybe we can use kvec instead.
+> @@ -0,0 +1,1511 @@
+> +/*
+> + * Copyright © 2019 Intel Corporation.
+> + *     Author: Liu, Yi L <yi.l.liu@intel.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * Derived from original vfio_pci.c:
+> + * Copyright (C) 2012 Red Hat, Inc.  All rights reserved.
+> + *     Author: Alex Williamson <alex.williamson@redhat.com>
+> + *
+> + * Derived from original vfio:
+> + * Copyright 2010 Cisco Systems, Inc.  All rights reserved.
+> + * Author: Tom Lyon, pugs@cisco.com
+> + */
+> +
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+> +#include <linux/device.h>
+> +#include <linux/eventfd.h>
+> +#include <linux/file.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/iommu.h>
+> +#include <linux/module.h>
+> +#include <linux/mutex.h>
+> +#include <linux/notifier.h>
+> +#include <linux/pci.h>
+> +#include <linux/pm_runtime.h>
+> +#include <linux/slab.h>
+> +#include <linux/types.h>
+> +#include <linux/uaccess.h>
+> +#include <linux/vfio.h>
+> +#include <linux/vgaarb.h>
+> +#include <linux/nospec.h>
+> +
+> +#include "vfio_pci_private.h"
+> +
 
-I'll try to use kvec in the virtio_vsock_pkt.
+[snip faithful code moves]
 
-Since this struct is shared also with the host driver (vhost-vsock),
-I hope the changes could be limited, otherwise we can remove the last 2
-patches of the series for now, leaving the RX buffer size to 4KB.
+> +void vfio_pci_vga_probe(struct vfio_pci_device *vdev)
+> +{
+> +	vga_client_register(vdev->pdev, vdev, NULL, vfio_pci_set_vga_decode);
+> +	vga_set_legacy_decoding(vdev->pdev,
+> +				vfio_pci_set_vga_decode(vdev, false));
+> +}
+> +
+> +void vfio_pci_vga_remove(struct vfio_pci_device *vdev)
+> +{
+> +	vga_client_register(vdev->pdev, NULL, NULL, NULL);
+> +	vga_set_legacy_decoding(vdev->pdev,
+> +			VGA_RSRC_NORMAL_IO | VGA_RSRC_NORMAL_MEM |
+> +			VGA_RSRC_LEGACY_IO | VGA_RSRC_LEGACY_MEM);
+> +}
 
-Thanks,
-Stefano
+Two new functions, though the names don't really match their purpose.
+
+[snip more faithful code moves]
+> +
+> +void vfio_pci_probe_idle_d3(struct vfio_pci_device *vdev)
+> +{
+> +
+> +	/*
+> +	 * pci-core sets the device power state to an unknown value at
+> +	 * bootup and after being removed from a driver.  The only
+> +	 * transition it allows from this unknown state is to D0, which
+> +	 * typically happens when a driver calls pci_enable_device().
+> +	 * We're not ready to enable the device yet, but we do want to
+> +	 * be able to get to D3.  Therefore first do a D0 transition
+> +	 * before going to D3.
+> +	 */
+> +	vfio_pci_set_power_state(vdev, PCI_D0);
+> +	vfio_pci_set_power_state(vdev, PCI_D3hot);
+> +}
+
+Another new function.  This also doesn't really match function name to
+purpose.
+
+[snip more faithful code moves]
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 3fa20e9..6ce1a81 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+[en masse code deletes]
+> @@ -1324,6 +147,11 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  	spin_lock_init(&vdev->irqlock);
+>  	mutex_init(&vdev->ioeventfds_lock);
+>  	INIT_LIST_HEAD(&vdev->ioeventfds_list);
+> +	vdev->nointxmask = nointxmask;
+> +#ifdef CONFIG_VFIO_PCI_VGA
+> +	vdev->disable_vga = disable_vga;
+> +#endif
+> +	vdev->disable_idle_d3 = disable_idle_d3;
+>  
+>  	ret = vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
+>  	if (ret) {
+> @@ -1340,27 +168,13 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  		return ret;
+>  	}
+>  
+> -	if (vfio_pci_is_vga(pdev)) {
+> -		vga_client_register(pdev, vdev, NULL, vfio_pci_set_vga_decode);
+> -		vga_set_legacy_decoding(pdev,
+> -					vfio_pci_set_vga_decode(vdev, false));
+> -	}
+> +	if (vfio_pci_is_vga(pdev))
+> +		vfio_pci_vga_probe(vdev);
+>  
+>  	vfio_pci_probe_power_state(vdev);
+>  
+> -	if (!disable_idle_d3) {
+> -		/*
+> -		 * pci-core sets the device power state to an unknown value at
+> -		 * bootup and after being removed from a driver.  The only
+> -		 * transition it allows from this unknown state is to D0, which
+> -		 * typically happens when a driver calls pci_enable_device().
+> -		 * We're not ready to enable the device yet, but we do want to
+> -		 * be able to get to D3.  Therefore first do a D0 transition
+> -		 * before going to D3.
+> -		 */
+> -		vfio_pci_set_power_state(vdev, PCI_D0);
+> -		vfio_pci_set_power_state(vdev, PCI_D3hot);
+> -	}
+> +	if (!disable_idle_d3)
+> +		vfio_pci_probe_idle_d3(vdev);
+>  
+>  	return ret;
+>  }
+> @@ -1383,48 +197,14 @@ static void vfio_pci_remove(struct pci_dev *pdev)
+>  		vfio_pci_set_power_state(vdev, PCI_D0);
+>  
+>  	kfree(vdev->pm_save);
+> -	kfree(vdev);
+>  
+>  	if (vfio_pci_is_vga(pdev)) {
+> -		vga_client_register(pdev, NULL, NULL, NULL);
+> -		vga_set_legacy_decoding(pdev,
+> -				VGA_RSRC_NORMAL_IO | VGA_RSRC_NORMAL_MEM |
+> -				VGA_RSRC_LEGACY_IO | VGA_RSRC_LEGACY_MEM);
+> -	}
+> -}
+> -
+> -static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+> -						  pci_channel_state_t state)
+> -{
+> -	struct vfio_pci_device *vdev;
+> -	struct vfio_device *device;
+> -
+> -	device = vfio_device_get_from_dev(&pdev->dev);
+> -	if (device == NULL)
+> -		return PCI_ERS_RESULT_DISCONNECT;
+> -
+> -	vdev = vfio_device_data(device);
+> -	if (vdev == NULL) {
+> -		vfio_device_put(device);
+> -		return PCI_ERS_RESULT_DISCONNECT;
+> +		vfio_pci_vga_remove(vdev);
+>  	}
+>  
+> -	mutex_lock(&vdev->igate);
+> -
+> -	if (vdev->err_trigger)
+> -		eventfd_signal(vdev->err_trigger, 1);
+> -
+> -	mutex_unlock(&vdev->igate);
+> -
+> -	vfio_device_put(device);
+> -
+> -	return PCI_ERS_RESULT_CAN_RECOVER;
+> +	kfree(vdev);
+>  }
+
+All of the above refactoring should occur in a preceding patch(es).
+This patch should be 100% unchanged code moves plus support
+includes/defines and comment header in the new file.
+
+> @@ -1685,7 +233,7 @@ static int __init vfio_pci_init(void)
+>  	if (ret)
+>  		goto out_driver;
+>  
+> -	vfio_pci_fill_ids();
+> +	vfio_pci_fill_ids(&ids[0], &vfio_pci_driver);
+
+For instance I missed this change.
+
+>  
+>  	return 0;
+>  
+> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+> index 1812cf2..9bbf22c 100644
+> --- a/drivers/vfio/pci/vfio_pci_private.h
+> +++ b/drivers/vfio/pci/vfio_pci_private.h
+> @@ -125,6 +125,11 @@ struct vfio_pci_device {
+>  	struct list_head	dummy_resources_list;
+>  	struct mutex		ioeventfds_lock;
+>  	struct list_head	ioeventfds_list;
+> +	bool			nointxmask;
+> +#ifdef CONFIG_VFIO_PCI_VGA
+> +	bool			disable_vga;
+> +#endif
+> +	bool			disable_idle_d3;
+
+More refactoring, do these separately so they can be properly reviewed
+without trying to spot changes in 3000 lines of diff.  I think what
+you've done is sound, it just needs to be refactored separate from the
+code moves so that it can be reviewed.  Thanks!
+
+Alex
