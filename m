@@ -2,99 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4ECA11C952
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 15:23:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAA4D1C9A1
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 15:55:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726254AbfENNW7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 09:22:59 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:42253 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726238AbfENNW7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 09:22:59 -0400
-Received: by mail-wr1-f68.google.com with SMTP id l2so19191360wrb.9
-        for <kvm@vger.kernel.org>; Tue, 14 May 2019 06:22:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=uFHSJsNByyay2Kmq9r271hEwxa2SlTHGMXGEWSzHBMI=;
-        b=g9ARIGOwWpshAOtltGl+lDSSZ/T4U4pdjE3sgXWJmDai8ZncZBjTlNSIP/lmPQAlSf
-         A1y5jkphxYHejkfR+96SvKXc0DDyHp7PUQjpyhGWgcV8Jl1qIRlRqdUvPOowPgdYfasX
-         ZQFayzNAlchJ543Pmrmz2AUtu/VuCe22neiU45JQ0QUmUybQPZbfuKcSOMA6Cn5CLSvD
-         9FRPqJwtr0VkVMA93Uy3ePCf+nwX9cOQVRxsg02kupBXOS4AUmT955iu+BGHMJ4Iduof
-         2AQUUPjOpt/FuKPse/sbEl0l5YpvBb42hOdnpgfyDp0rd3sw7NPMGoP6mLDt10EL56JN
-         WrDg==
-X-Gm-Message-State: APjAAAVd/ZVV6cqQ1DOGBqcBOHfOnhWSLHOsyTQThbp8N41fXfLtm24t
-        /HlKu4HJ7dbqmpEB6eBDd1bkTtT7Rs0=
-X-Google-Smtp-Source: APXvYqzLA7DdgWaapFTZmwqb7mHH3YTIXbyeudVVfoFPH8Bo3tN3uBaZw6hz9LJ9L3lpSlUDwHsiVA==
-X-Received: by 2002:adf:ce90:: with SMTP id r16mr22028791wrn.156.1557840177629;
-        Tue, 14 May 2019 06:22:57 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id s22sm4289095wmh.45.2019.05.14.06.22.56
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 14 May 2019 06:22:56 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>,
+        id S1726143AbfENNy7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 09:54:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39880 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725901AbfENNy6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 09:54:58 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A901F3097033;
+        Tue, 14 May 2019 13:54:58 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-10.gru2.redhat.com [10.97.112.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1F0F8608A7;
+        Tue, 14 May 2019 13:54:56 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id B8E7F105174;
+        Tue, 14 May 2019 10:50:25 -0300 (BRT)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id x4EDoNXN004704;
+        Tue, 14 May 2019 10:50:23 -0300
+Date:   Tue, 14 May 2019 10:50:23 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     kvm-devel <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Bandan Das <bsd@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: Fix a condition in test_hv_cpuid()
-In-Reply-To: <20190514103451.GA1694@mwanda>
-References: <20190514103451.GA1694@mwanda>
-Date:   Tue, 14 May 2019 09:22:56 -0400
-Message-ID: <87lfz9npan.fsf@vitty.brq.redhat.com>
+Subject: Re: [PATCH] sched: introduce configurable delay before entering idle
+Message-ID: <20190514135022.GD4392@amt.cnet>
+References: <20190507185647.GA29409@amt.cnet>
+ <CANRm+Cx8zCDG6Oz1m9eukkmx_uVFYcQOdMwZrHwsQcbLm_kuPA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANRm+Cx8zCDG6Oz1m9eukkmx_uVFYcQOdMwZrHwsQcbLm_kuPA@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Tue, 14 May 2019 13:54:58 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dan Carpenter <dan.carpenter@oracle.com> writes:
+On Mon, May 13, 2019 at 05:20:37PM +0800, Wanpeng Li wrote:
+> On Wed, 8 May 2019 at 02:57, Marcelo Tosatti <mtosatti@redhat.com> wrote:
+> >
+> >
+> > Certain workloads perform poorly on KVM compared to baremetal
+> > due to baremetal's ability to perform mwait on NEED_RESCHED
+> > bit of task flags (therefore skipping the IPI).
+> 
+> KVM supports expose mwait to the guest, if it can solve this?
+> 
+> Regards,
+> Wanpeng Li
 
-> The code is trying to check that all the padding is zeroed out and it
-> does this:
->
->     entry->padding[0] == entry->padding[1] == entry->padding[2] == 0
->
-> Assume everything is zeroed correctly, then the first comparison is
-> true, the next comparison is false and false is equal to zero so the
-> overall condition is true.  This bug doesn't affect run time very
-> badly, but the code should instead just check that all three paddings
-> are zero individually.
->
-> Also the error message was copy and pasted from an earlier error and it
-> wasn't correct.
->
-> Fixes: 7edcb7343327 ("KVM: selftests: Add hyperv_cpuid test")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> ---
->  tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> index 9a21e912097c..63b9fc3fdfbe 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> @@ -58,9 +58,8 @@ static void test_hv_cpuid(struct kvm_cpuid2
-> *hv_cpuid_entries,
+Unfortunately mwait in guest is not feasible (uncompatible with multiple
+guests). Checking whether a paravirt solution is possible.
 
-we also seem to check for 'entry->index == 0' twice here.
-
->  		TEST_ASSERT(entry->flags == 0,
->  			    ".flags field should be zero");
->  
-> -		TEST_ASSERT(entry->padding[0] == entry->padding[1]
-> -			    == entry->padding[2] == 0,
-> -			    ".index field should be zero");
-> +		TEST_ASSERT(!entry->padding[0] && !entry->padding[1] &&
-> +			    !entry->padding[2], "padding should be zero");
->  
->  		/*
->  		 * If needed for debug:
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
