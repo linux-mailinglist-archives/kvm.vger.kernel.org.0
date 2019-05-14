@@ -2,115 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D875B1CA60
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 16:29:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 048BE1CAB3
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 16:47:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726466AbfENO3Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 10:29:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60171 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726060AbfENO3Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 10:29:24 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CB5DAC089A7E;
-        Tue, 14 May 2019 14:29:20 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 96B0B19752;
-        Tue, 14 May 2019 14:29:15 +0000 (UTC)
-Date:   Tue, 14 May 2019 16:29:13 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Pierre Morel <pmorel@linux.ibm.com>,
+        id S1726098AbfENOrn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 10:47:43 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50384 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725901AbfENOrm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 May 2019 10:47:42 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4EEkoLN179804
+        for <kvm@vger.kernel.org>; Tue, 14 May 2019 10:47:41 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2sfyqw818a-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 14 May 2019 10:47:41 -0400
+Received: from localhost
+        by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <jjherne@linux.ibm.com>;
+        Tue, 14 May 2019 15:47:40 +0100
+Received: from b01cxnp22034.gho.pok.ibm.com (9.57.198.24)
+        by e11.ny.us.ibm.com (146.89.104.198) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 14 May 2019 15:47:37 +0100
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4EElYmh11927646
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 May 2019 14:47:34 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 86A0B28060;
+        Tue, 14 May 2019 14:47:34 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3856828058;
+        Tue, 14 May 2019 14:47:34 +0000 (GMT)
+Received: from [9.60.75.213] (unknown [9.60.75.213])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue, 14 May 2019 14:47:34 +0000 (GMT)
+Reply-To: jjherne@linux.ibm.com
+Subject: Re: [PATCH 06/10] s390/cio: add basic protected virtualization
+ support
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Farhan Ali <alifm@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 7/7] s390/cio: Remove vfio-ccw checks of command codes
-Message-ID: <20190514162913.6db90f44.cohuck@redhat.com>
-In-Reply-To: <85fe257b-721a-f900-32fa-011845f242ed@linux.ibm.com>
-References: <20190503134912.39756-1-farman@linux.ibm.com>
-        <20190503134912.39756-8-farman@linux.ibm.com>
-        <8625f759-0a2d-09af-c8b5-5b312d854ba1@linux.ibm.com>
-        <7c897993-d146-bf8e-48ad-11a914a04716@linux.ibm.com>
-        <bba6c0a8-2346-cd99-b8ad-f316daac010b@linux.ibm.com>
-        <7ac9fb43-8d7a-9e04-8cba-fa4c63dfc413@linux.ibm.com>
-        <1f2e4272-8570-f93f-9d67-a43dcb00fc55@linux.ibm.com>
-        <5c2b74a9-e1d9-cd63-1284-6544fa4376d9@linux.ibm.com>
-        <20190510134718.3f727571.cohuck@redhat.com>
-        <85fe257b-721a-f900-32fa-011845f242ed@linux.ibm.com>
-Organization: Red Hat GmbH
+        Eric Farman <farman@linux.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+ <20190426183245.37939-7-pasic@linux.ibm.com>
+ <20190513114136.783c851c.cohuck@redhat.com>
+From:   "Jason J. Herne" <jjherne@linux.ibm.com>
+Organization: IBM
+Date:   Tue, 14 May 2019 10:47:34 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190513114136.783c851c.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 14 May 2019 14:29:23 +0000 (UTC)
+X-TM-AS-GCONF: 00
+x-cbid: 19051414-2213-0000-0000-0000038D9A3A
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011096; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000285; SDB=6.01203230; UDB=6.00631560; IPR=6.00984152;
+ MB=3.00026883; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-14 14:47:39
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051414-2214-0000-0000-00005E6E8108
+Message-Id: <d0ffefec-a14e-ee83-0aae-df288c3ffda4@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-14_09:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905140105
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 10 May 2019 10:24:31 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
+On 5/13/19 5:41 AM, Cornelia Huck wrote:
+> On Fri, 26 Apr 2019 20:32:41 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
+> 
+>> As virtio-ccw devices are channel devices, we need to use the dma area
+>> for any communication with the hypervisor.
+>>
+>> This patch addresses the most basic stuff (mostly what is required for
+>> virtio-ccw), and does take care of QDIO or any devices.
+> 
+> "does not take care of QDIO", surely? (Also, what does "any devices"
+> mean? Do you mean "every arbitrary device", perhaps?)
+> 
+>>
+>> An interesting side effect is that virtio structures are now going to
+>> get allocated in 31 bit addressable storage.
+> 
+> Hm...
+> 
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+>> ---
+>>   arch/s390/include/asm/ccwdev.h   |  4 +++
+>>   drivers/s390/cio/ccwreq.c        |  8 ++---
+>>   drivers/s390/cio/device.c        | 65 +++++++++++++++++++++++++++++++++-------
+>>   drivers/s390/cio/device_fsm.c    | 40 ++++++++++++-------------
+>>   drivers/s390/cio/device_id.c     | 18 +++++------
+>>   drivers/s390/cio/device_ops.c    | 21 +++++++++++--
+>>   drivers/s390/cio/device_pgid.c   | 20 ++++++-------
+>>   drivers/s390/cio/device_status.c | 24 +++++++--------
+>>   drivers/s390/cio/io_sch.h        | 21 +++++++++----
+>>   drivers/s390/virtio/virtio_ccw.c | 10 -------
+>>   10 files changed, 148 insertions(+), 83 deletions(-)
+> 
+> (...)
+> 
+>> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+>> index 6d989c360f38..bb7a92316fc8 100644
+>> --- a/drivers/s390/virtio/virtio_ccw.c
+>> +++ b/drivers/s390/virtio/virtio_ccw.c
+>> @@ -66,7 +66,6 @@ struct virtio_ccw_device {
+>>   	bool device_lost;
+>>   	unsigned int config_ready;
+>>   	void *airq_info;
+>> -	u64 dma_mask;
+>>   };
+>>   
+>>   struct vq_info_block_legacy {
+>> @@ -1255,16 +1254,7 @@ static int virtio_ccw_online(struct ccw_device *cdev)
+>>   		ret = -ENOMEM;
+>>   		goto out_free;
+>>   	}
+>> -
+>>   	vcdev->vdev.dev.parent = &cdev->dev;
+>> -	cdev->dev.dma_mask = &vcdev->dma_mask;
+>> -	/* we are fine with common virtio infrastructure using 64 bit DMA */
+>> -	ret = dma_set_mask_and_coherent(&cdev->dev, DMA_BIT_MASK(64));
+>> -	if (ret) {
+>> -		dev_warn(&cdev->dev, "Failed to enable 64-bit DMA.\n");
+>> -		goto out_free;
+>> -	}
+> 
+> This means that vring structures now need to fit into 31 bits as well,
+> I think? Is there any way to reserve the 31 bit restriction for channel
+> subsystem structures and keep vring in the full 64 bit range? (Or am I
+> fundamentally misunderstanding something?)
+> 
 
-> On 5/10/19 7:47 AM, Cornelia Huck wrote:
-> > On Wed, 8 May 2019 11:22:07 +0200
-> > Pierre Morel <pmorel@linux.ibm.com> wrote:
-> >   
-> >> For the NOOP its clearly stated that it does not start a data transfer.
-> >> If we pin the CDA, it could then eventually be the cause of errors if
-> >> the address indicated by the CDA is not accessible.
-> >>
-> >> The NOOP is a particular CONTROL operation for which no data is transfered.
-> >> Other CONTROL operation may start a data transfer.  
-> > 
-> > I've just looked at the documentation again.
-> > 
-> > The Olde Common I/O Device Commands document indicates that a NOOP
-> > simply causes channel end/device end.
-> > 
-> > The PoP seems to indicate that the cda is always checked (i.e. does it
-> > point to a valid memory area?), but I'm not sure whether the area that
-> > is pointed to is checked for accessibility etc. as well, even if the
-> > command does not transfer any data.
-> > 
-> > Has somebody tried to find out what happens on Real Hardware(tm) if you
-> > send a command that is not supposed to transfer any data where the cda
-> > points to a valid, but not accessible area?  
-> 
-> Hrm...  The CDA itself?  I don't think so.  Since every CCW is converted 
-> to an IDAL in vfio-ccw, we guarantee that it's pointing to something 
-> valid at that point.
-> 
-> So, I hacked ccwchain_fetch_direct() to NOT set the IDAL flag in a NOP 
-> CCW, and to leave the CDA alone.  This means it will still contain the 
-> guest address, which is risky but hey it's a test system.  :)  (I 
-> offline'd a bunch of host memory too, to make sure I had some 
-> unavailable addresses.)
-> 
-> In my traces, the non-IDA NOP CCWs were issued to the host with and 
-> without the skip flag, with zero and non-zero counts, and with zero and 
-> non-zero CDAs.  All of them work just fine, including the ones who's 
-> addresses fall into the offline space.  Even the combination of no skip, 
-> non-zero count, and zero cda.
-> 
-> I modified that hack to do the same for a known invalid control opcode, 
-> and it seemed to be okay too.  We got an (expected) invalid command 
-> before we noticed any problem with the provided address.
+I hope I've understood everything... I'm new to virtio. But from what I'm understanding, 
+the vring structure (a.k.a. the VirtQueue) needs to be accessed and modified by both host 
+and guest. Therefore the page(s) holding that data need to be marked shared if using 
+protected virtualization. This patch set makes use of DMA pages by way of swiotlb (always 
+below 32-bit line right?) for shared memory. Therefore, a side effect is that all shared 
+memory, including VirtQueue data will be in the DMA zone and in 32-bit memory.
 
-That's interesting; I would not have arrived at this by interpreting
-the PoP...
+I don't see any restrictions on sharing pages above the 32-bit line. So it seems possible. 
+I'm not sure how much more work it would be. I wonder if Halil has considered this? Are we 
+worried that virtio data structures are going to be a burden on the 31-bit address space?
 
-> > 
-> > In general, I think doing the translation (and probably already hitting
-> > errors there) is better than sending down a guest address.
-> >   
-> 
-> I mostly agree, but I have one test program that generates invalid GUEST 
-> addresses with its NOP CCWs, since it doesn't seem to care about whether 
-> they're valid or not.  So any attempt to pin them will end badly, which 
-> is why I call that opcode out in ccw_does_data_transfer(), and just send 
-> invalid IDAWs with it.
 
-So, without the attempt to pin they do not fail? Maybe the right
-approach would be to rewrite the cda before sending the ccws?
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
+
