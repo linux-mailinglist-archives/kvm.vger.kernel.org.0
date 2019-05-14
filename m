@@ -2,128 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8821C1C1D2
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 07:27:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 317151C2A2
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 07:55:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726755AbfENF1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 01:27:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43248 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725562AbfENF1V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 01:27:21 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 09F663092670;
-        Tue, 14 May 2019 05:27:21 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F3478600C6;
-        Tue, 14 May 2019 05:27:19 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 9997218089C8;
-        Tue, 14 May 2019 05:27:18 +0000 (UTC)
-Date:   Tue, 14 May 2019 01:27:17 -0400 (EDT)
-From:   Pankaj Gupta <pagupta@redhat.com>
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     Jan Kara <jack@suse.cz>, KVM list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, david <david@fromorbit.com>,
-        Qemu Developers <qemu-devel@nongnu.org>,
-        virtualization@lists.linux-foundation.org,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Ross Zwisler <zwisler@kernel.org>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Dave Jiang <dave.jiang@intel.com>, jstaron@google.com,
-        linux-nvdimm <linux-nvdimm@lists.01.org>,
-        Vishal L Verma <vishal.l.verma@intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Linux ACPI <linux-acpi@vger.kernel.org>,
-        jmoyer <jmoyer@redhat.com>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        Len Brown <lenb@kernel.org>,
-        Adam Borowski <kilobyte@angband.pl>,
-        Rik van Riel <riel@surriel.com>,
-        yuval shaia <yuval.shaia@oracle.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>, lcapitulino@redhat.com,
-        Kevin Wolf <kwolf@redhat.com>,
-        Nitesh Narayan Lal <nilal@redhat.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        cohuck@redhat.com, "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>
-Message-ID: <676644679.28490825.1557811637861.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CAPcyv4genJtCt6dp6N07_6RfPTwC6xXMhLp-dr0GWQy5q52YoA@mail.gmail.com>
-References: <20190510155202.14737-1-pagupta@redhat.com> <20190510155202.14737-4-pagupta@redhat.com> <CAPcyv4hbVNRFSyS2CTbmO88uhnbeH4eiukAng2cxgbDzLfizwg@mail.gmail.com> <864186878.28040999.1557535549792.JavaMail.zimbra@redhat.com> <CAPcyv4gL3ODfOr52Ztgq7BM4gVf1cih6cj0271gcpVvpi9aFSA@mail.gmail.com> <2003480558.28042237.1557537797923.JavaMail.zimbra@redhat.com> <116369545.28425569.1557768748009.JavaMail.zimbra@redhat.com> <CAPcyv4genJtCt6dp6N07_6RfPTwC6xXMhLp-dr0GWQy5q52YoA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v8 3/6] libnvdimm: add dax_dev sync flag
+        id S1726807AbfENFzQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 01:55:16 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:43467 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725562AbfENFzQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 01:55:16 -0400
+Received: by mail-pf1-f196.google.com with SMTP id c6so8494725pfa.10;
+        Mon, 13 May 2019 22:55:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CMDRp8XpQweyoE6w7mWaIS4V4U3Zt6PA6daqDS60vy4=;
+        b=AGETcZb5B5+JSFCrLzQCchKAqOSdHTu08ihur04wjJAh4hRZzLT5eq0cLyddtkUxpy
+         9EAUk0dM3Jh09plKuOu01QSRFeSHDwN3hbK/O01GgzEeO/4agp1pcwQBmYkoUTXNrK4S
+         wt40Lc832cHqClBbr5NtBUsffKq8l/dvP7Yhcibu4GuO78iIy0BGaTxcM8tlriyAJKWY
+         4cUtkluCq3TE4EA20rAMgEqrIDKaiugh/VrCoj/ToAukkNJ5RdYQmCiul6xi/KaQoBfE
+         +m9UVL+ZjktcaXrKq3w1kWnxRr+iVTyzx+3LC73cDhZ3dS+w4gjviHZfwq3pZdBNL78D
+         TYOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CMDRp8XpQweyoE6w7mWaIS4V4U3Zt6PA6daqDS60vy4=;
+        b=rCsH5uu8/TSUHIv4v97ozlyMtXMCqOxcGrC6tQGhEXWDt4aCcR2cxtagVCcIJSezbl
+         6kPD+UwH5qmFYrfdqtgUH46vmQbDBXg4SR5Vl+D6AWH14bUFodHdQoPAXJ8k2CmSjnVe
+         9m9TJtNFfVy0TnZMvoh9+cb6XOpgWvkGHo96Mrh57AtUXHF5eBtUuIVgN2CYVPdqXyiB
+         sGYGq6ymSYdKVkHdhoPyplDw//gp2WyZz2vfnM1QK6PMQOUiAELIf81Ekey64oNdL0X1
+         h6bNdj9pXnQ9HGKegAdTNv5UATzAr41f9wG3Y0CYldxnkfGHG5/kvwAKYKKbiYIiIH91
+         Ly8Q==
+X-Gm-Message-State: APjAAAU4lyIpFpNshLhKYXe+31UDKkf/5JCFHekCFjIl242nBYZT9hnP
+        76PHxwTe0dcXn6NgEn+Ba5D4w+sy
+X-Google-Smtp-Source: APXvYqwJB4aneVhpH1fMcWBasJHmUPuELrl/sHgYpGsFJ084xgc/kGYBvgpy0nL8CvfCAVIAX32xjQ==
+X-Received: by 2002:a63:309:: with SMTP id 9mr36437674pgd.49.1557813315521;
+        Mon, 13 May 2019 22:55:15 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+        by smtp.googlemail.com with ESMTPSA id f87sm22808814pff.56.2019.05.13.22.55.13
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Mon, 13 May 2019 22:55:15 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Subject: [PATCH v2] KVM: X86: Emulate MSR_IA32_MISC_ENABLE MWAIT bit
+Date:   Tue, 14 May 2019 13:55:09 +0800
+Message-Id: <1557813309-8524-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.65.16.148, 10.4.195.17]
-Thread-Topic: libnvdimm: add dax_dev sync flag
-Thread-Index: wQqDJDTh4d6BDzUQZjrFKazK6E2QhQ==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Tue, 14 May 2019 05:27:21 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Wanpeng Li <wanpengli@tencent.com>
 
-> >
-> >
-> > Hi Dan,
-> >
-> > While testing device mapper with DAX, I faced a bug with the commit:
-> >
-> > commit ad428cdb525a97d15c0349fdc80f3d58befb50df
-> > Author: Dan Williams <dan.j.williams@intel.com>
-> > Date:   Wed Feb 20 21:12:50 2019 -0800
-> >
-> > When I reverted the condition to old code[1] it worked for me. I
-> > am thinking when we map two different devices (e.g with device mapper),
-> > will
-> > start & end pfn still point to same pgmap? Or there is something else which
-> > I am missing here.
-> >
-> > Note: I tested only EXT4.
-> >
-> > [1]
-> >
-> > -               if (pgmap && pgmap->type == MEMORY_DEVICE_FS_DAX)
-> > +               end_pgmap = get_dev_pagemap(pfn_t_to_pfn(end_pfn), NULL);
-> > +               if (pgmap && pgmap == end_pgmap && pgmap->type ==
-> > MEMORY_DEVICE_FS_DAX
-> > +                               && pfn_t_to_page(pfn)->pgmap == pgmap
-> > +                               && pfn_t_to_page(end_pfn)->pgmap == pgmap
-> > +                               && pfn_t_to_pfn(pfn) ==
-> > PHYS_PFN(__pa(kaddr))
-> > +                               && pfn_t_to_pfn(end_pfn) ==
-> > PHYS_PFN(__pa(end_kaddr)))
-> 
-> Ugh, yes, device-mapper continues to be an awkward fit for dax (or
-> vice versa). We would either need a way to have a multi-level pfn to
-> pagemap lookup for composite devices, or a way to discern that even
-> though the pagemap is different that the result is still valid / not
-> an indication that we have leaked into an unassociated address range.
-> Perhaps a per-daxdev callback for ->dax_supported() so that
-> device-mapper internals can be used for this validation.
+MSR IA32_MSIC_ENABLE bit 18, according to SDM:
 
-Yes, Will look at it.
+| When this bit is set to 0, the MONITOR feature flag is not set (CPUID.01H:ECX[bit 3] = 0). 
+| This indicates that MONITOR/MWAIT are not supported.
+| 
+| Software attempts to execute MONITOR/MWAIT will cause #UD when this bit is 0.
+| 
+| When this bit is set to 1 (default), MONITOR/MWAIT are supported (CPUID.01H:ECX[bit 3] = 1). 
 
-> 
-> We need to get that fixed up, but I don't see it as a blocker /
-> pre-requisite for virtio-pmem.
+The CPUID.01H:ECX[bit 3] ought to mirror the value of the MSR bit, 
+CPUID.01H:ECX[bit 3] is a better guard than kvm_mwait_in_guest().
+kvm_mwait_in_guest() affects the behavior of MONITOR/MWAIT, not its
+guest visibility.
 
-Agree. Will send virtio-pmem patch series.
+This patch implements toggling of the CPUID bit based on guest writes 
+to the MSR.
 
-Thank you,
-Pankaj
-> 
-> 
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+Cc: Liran Alon <liran.alon@oracle.com>
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+v1 -> v2:
+ * to configure MSR_IA32_MISC_ENABLE_MWAIT bit in userspace
+ * implements toggling of the CPUID bit based on guest writes to the MSR
+
+ arch/x86/kvm/cpuid.c | 8 ++++++++
+ arch/x86/kvm/x86.c   | 9 +++++++++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index fd39516..0f82393 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -137,6 +137,14 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
+ 		(best->eax & (1 << KVM_FEATURE_PV_UNHALT)))
+ 		best->eax &= ~(1 << KVM_FEATURE_PV_UNHALT);
+ 
++	best = kvm_find_cpuid_entry(vcpu, 0x1, 0);
++	if (best) {
++		if (vcpu->arch.ia32_misc_enable_msr & MSR_IA32_MISC_ENABLE_MWAIT)
++			best->ecx |= F(MWAIT);
++		else
++			best->ecx &= ~F(MWAIT);
++	}
++
+ 	/* Update physical-address width */
+ 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
+ 	kvm_mmu_reset_context(vcpu);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 3bbf3ab..4ed45ab 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2506,6 +2506,15 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		}
+ 		break;
+ 	case MSR_IA32_MISC_ENABLE:
++		if ((vcpu->arch.ia32_misc_enable_msr ^ data) & MSR_IA32_MISC_ENABLE_MWAIT) {
++			if ((vcpu->arch.ia32_misc_enable_msr & MSR_IA32_MISC_ENABLE_MWAIT) &&
++				!(data & MSR_IA32_MISC_ENABLE_MWAIT)) {
++				if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
++					return 1;
++			}
++			vcpu->arch.ia32_misc_enable_msr = data;
++			kvm_update_cpuid(vcpu);
++		}
+ 		vcpu->arch.ia32_misc_enable_msr = data;
+ 		break;
+ 	case MSR_IA32_SMBASE:
+-- 
+2.7.4
+
