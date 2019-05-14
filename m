@@ -2,137 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FE3F1C07D
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 04:07:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D95E1C0E1
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 05:25:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726609AbfENCHv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 22:07:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43116 "EHLO mail.kernel.org"
+        id S1726722AbfENDZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 23:25:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34954 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726327AbfENCHu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 22:07:50 -0400
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1726327AbfENDZo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 23:25:44 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4F935216B7
-        for <kvm@vger.kernel.org>; Tue, 14 May 2019 02:07:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1557799669;
-        bh=194cYzJSEWelAQdAamSQ+HGCjU5m9KnJ95hz0wnBDOw=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=AWYLnYQXqecynVt8YdrwsS+Xfe7b6aCvx26D2JOr6eOFfLp34kg8+aoO6xKlIGs+n
-         if+Vo2q8fZoCeysFzcDiUsbbBG2udM5TCiMj02dJ8dNOct9/ZqVispF3WQeOuagvIo
-         NudBGjsk7KLG9PNcK2KUdJ8z3KuRVee+3Ctp2/cA=
-Received: by mail-wm1-f52.google.com with SMTP id c66so1209360wme.0
-        for <kvm@vger.kernel.org>; Mon, 13 May 2019 19:07:49 -0700 (PDT)
-X-Gm-Message-State: APjAAAUzshkBAXF+SbQ6JOgAoRj+5MkDADijEgl1nLy5baRSyP0tt+3i
-        23wqVqZFpu4pwU9D3sYZI86yjhPJXuYwzBj6J0qyyg==
-X-Google-Smtp-Source: APXvYqzLSJXQVwKfkewbLcE7v0r0bhXbJZ1wHCUTLEQOaL5ypCYuhmil6I3fNQ+XQ6Dh66OKap38pkC6fcXCiEHQ6uk=
-X-Received: by 2002:a7b:c844:: with SMTP id c4mr6663648wml.108.1557799667844;
- Mon, 13 May 2019 19:07:47 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id D9C6530832C8;
+        Tue, 14 May 2019 03:25:43 +0000 (UTC)
+Received: from [10.72.12.59] (ovpn-12-59.pek2.redhat.com [10.72.12.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6C01E5C1B4;
+        Tue, 14 May 2019 03:25:36 +0000 (UTC)
+Subject: Re: [PATCH v2 1/8] vsock/virtio: limit the memory used per-socket
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>
+References: <20190510125843.95587-1-sgarzare@redhat.com>
+ <20190510125843.95587-2-sgarzare@redhat.com>
+ <3b275b52-63d9-d260-1652-8e8bf7dd679f@redhat.com>
+ <20190513172322.vcgenx7xk4v6r2ay@steredhat>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <f834c9e9-5d0e-8ebb-44e0-6d99b6284e5c@redhat.com>
+Date:   Tue, 14 May 2019 11:25:34 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
- <CALCETrVhRt0vPgcun19VBqAU_sWUkRg1RDVYk4osY6vK0SKzgg@mail.gmail.com> <C2A30CC6-1459-4182-B71A-D8FF121A19F2@oracle.com>
-In-Reply-To: <C2A30CC6-1459-4182-B71A-D8FF121A19F2@oracle.com>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Mon, 13 May 2019 19:07:36 -0700
-X-Gmail-Original-Message-ID: <CALCETrXK8+tUxNA=iVDse31nFRZyiQYvcrQxV1JaidhnL4GC0w@mail.gmail.com>
-Message-ID: <CALCETrXK8+tUxNA=iVDse31nFRZyiQYvcrQxV1JaidhnL4GC0w@mail.gmail.com>
-Subject: Re: [RFC KVM 00/27] KVM Address Space Isolation
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Alexandre Chartre <alexandre.chartre@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        kvm list <kvm@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        jan.setjeeilers@oracle.com, Jonathan Adams <jwadams@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190513172322.vcgenx7xk4v6r2ay@steredhat>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Tue, 14 May 2019 03:25:44 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 13, 2019 at 2:09 PM Liran Alon <liran.alon@oracle.com> wrote:
->
->
->
-> > On 13 May 2019, at 21:17, Andy Lutomirski <luto@kernel.org> wrote:
-> >
-> >> I expect that the KVM address space can eventually be expanded to incl=
-ude
-> >> the ioctl syscall entries. By doing so, and also adding the KVM page t=
-able
-> >> to the process userland page table (which should be safe to do because=
- the
-> >> KVM address space doesn't have any secret), we could potentially handl=
-e the
-> >> KVM ioctl without having to switch to the kernel pagetable (thus effec=
-tively
-> >> eliminating KPTI for KVM). Then the only overhead would be if a VM-Exi=
-t has
-> >> to be handled using the full kernel address space.
-> >>
-> >
-> > In the hopefully common case where a VM exits and then gets re-entered
-> > without needing to load full page tables, what code actually runs?
-> > I'm trying to understand when the optimization of not switching is
-> > actually useful.
-> >
-> > Allowing ioctl() without switching to kernel tables sounds...
-> > extremely complicated.  It also makes the dubious assumption that user
-> > memory contains no secrets.
->
-> Let me attempt to clarify what we were thinking when creating this patch =
-series:
->
-> 1) It is never safe to execute one hyperthread inside guest while it=E2=
-=80=99s sibling hyperthread runs in a virtual address space which contains =
-secrets of host or other guests.
-> This is because we assume that using some speculative gadget (such as hal=
-f-Spectrev2 gadget), it will be possible to populate *some* CPU core resour=
-ce which could then be *somehow* leaked by the hyperthread running inside g=
-uest. In case of L1TF, this would be data populated to the L1D cache.
->
-> 2) Because of (1), every time a hyperthread runs inside host kernel, we m=
-ust make sure it=E2=80=99s sibling is not running inside guest. i.e. We mus=
-t kick the sibling hyperthread outside of guest using IPI.
->
-> 3) From (2), we should have theoretically deduced that for every #VMExit,=
- there is a need to kick the sibling hyperthread also outside of guest unti=
-l the #VMExit is completed. Such a patch series was implemented at some poi=
-nt but it had (obviously) significant performance hit.
->
->
-4) The main goal of this patch series is to preserve (2), but to avoid
-the overhead specified in (3).
->
-> The way this patch series achieves (4) is by observing that during the ru=
-n of a VM, most #VMExits can be handled rather quickly and locally inside K=
-VM and doesn=E2=80=99t need to reference any data that is not relevant to t=
-his VM or KVM code. Therefore, if we will run these #VMExits in an isolated=
- virtual address space (i.e. KVM isolated address space), there is no need =
-to kick the sibling hyperthread from guest while these #VMExits handlers ru=
-n.
 
-Thanks!  This clarifies a lot of things.
+On 2019/5/14 上午1:23, Stefano Garzarella wrote:
+> On Mon, May 13, 2019 at 05:58:53PM +0800, Jason Wang wrote:
+>> On 2019/5/10 下午8:58, Stefano Garzarella wrote:
+>>> Since virtio-vsock was introduced, the buffers filled by the host
+>>> and pushed to the guest using the vring, are directly queued in
+>>> a per-socket list avoiding to copy it.
+>>> These buffers are preallocated by the guest with a fixed
+>>> size (4 KB).
+>>>
+>>> The maximum amount of memory used by each socket should be
+>>> controlled by the credit mechanism.
+>>> The default credit available per-socket is 256 KB, but if we use
+>>> only 1 byte per packet, the guest can queue up to 262144 of 4 KB
+>>> buffers, using up to 1 GB of memory per-socket. In addition, the
+>>> guest will continue to fill the vring with new 4 KB free buffers
+>>> to avoid starvation of her sockets.
+>>>
+>>> This patch solves this issue copying the payload in a new buffer.
+>>> Then it is queued in the per-socket list, and the 4KB buffer used
+>>> by the host is freed.
+>>>
+>>> In this way, the memory used by each socket respects the credit
+>>> available, and we still avoid starvation, paying the cost of an
+>>> extra memory copy. When the buffer is completely full we do a
+>>> "zero-copy", moving the buffer directly in the per-socket list.
+>>
+>> I wonder in the long run we should use generic socket accouting mechanism
+>> provided by kernel (e.g socket, skb, sndbuf, recvbug, truesize) instead of
+>> vsock specific thing to avoid duplicating efforts.
+> I agree, the idea is to switch to sk_buff but this should require an huge
+> change. If we will use the virtio-net datapath, it will become simpler.
 
-> The hope is that the very vast majority of #VMExit handlers will be able =
-to completely run without requiring to switch to full address space. Theref=
-ore, avoiding the performance hit of (2).
-> However, for the very few #VMExits that does require to run in full kerne=
-l address space, we must first kick the sibling hyperthread outside of gues=
-t and only then switch to full kernel address space and only once all hyper=
-threads return to KVM address space, then allow then to enter into guest.
 
-What exactly does "kick" mean in this context?  It sounds like you're
-going to need to be able to kick sibling VMs from extremely atomic
-contexts like NMI and MCE.
+Yes, unix domain socket is one example that uses general skb and socket 
+structure. And we probably need some kind of socket pair on host. Using 
+socket can also simplify the unification with vhost-net which depends on 
+the socket proto_ops to work. I admit it's a huge change probably, we 
+can do it gradually.
+
+
+>>
+>>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>> ---
+>>>    drivers/vhost/vsock.c                   |  2 +
+>>>    include/linux/virtio_vsock.h            |  8 +++
+>>>    net/vmw_vsock/virtio_transport.c        |  1 +
+>>>    net/vmw_vsock/virtio_transport_common.c | 95 ++++++++++++++++++-------
+>>>    4 files changed, 81 insertions(+), 25 deletions(-)
+>>>
+>>> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>>> index bb5fc0e9fbc2..7964e2daee09 100644
+>>> --- a/drivers/vhost/vsock.c
+>>> +++ b/drivers/vhost/vsock.c
+>>> @@ -320,6 +320,8 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
+>>>    		return NULL;
+>>>    	}
+>>> +	pkt->buf_len = pkt->len;
+>>> +
+>>>    	nbytes = copy_from_iter(pkt->buf, pkt->len, &iov_iter);
+>>>    	if (nbytes != pkt->len) {
+>>>    		vq_err(vq, "Expected %u byte payload, got %zu bytes\n",
+>>> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>>> index e223e2632edd..345f04ee9193 100644
+>>> --- a/include/linux/virtio_vsock.h
+>>> +++ b/include/linux/virtio_vsock.h
+>>> @@ -54,9 +54,17 @@ struct virtio_vsock_pkt {
+>>>    	void *buf;
+>>>    	u32 len;
+>>>    	u32 off;
+>>> +	u32 buf_len;
+>>>    	bool reply;
+>>>    };
+>>> +struct virtio_vsock_buf {
+>>> +	struct list_head list;
+>>> +	void *addr;
+>>> +	u32 len;
+>>> +	u32 off;
+>>> +};
+>>> +
+>>>    struct virtio_vsock_pkt_info {
+>>>    	u32 remote_cid, remote_port;
+>>>    	struct vsock_sock *vsk;
+>>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>>> index 15eb5d3d4750..af1d2ce12f54 100644
+>>> --- a/net/vmw_vsock/virtio_transport.c
+>>> +++ b/net/vmw_vsock/virtio_transport.c
+>>> @@ -280,6 +280,7 @@ static void virtio_vsock_rx_fill(struct virtio_vsock *vsock)
+>>>    			break;
+>>>    		}
+>>> +		pkt->buf_len = buf_len;
+>>>    		pkt->len = buf_len;
+>>>    		sg_init_one(&hdr, &pkt->hdr, sizeof(pkt->hdr));
+>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>> index 602715fc9a75..0248d6808755 100644
+>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>> @@ -65,6 +65,9 @@ virtio_transport_alloc_pkt(struct virtio_vsock_pkt_info *info,
+>>>    		pkt->buf = kmalloc(len, GFP_KERNEL);
+>>>    		if (!pkt->buf)
+>>>    			goto out_pkt;
+>>> +
+>>> +		pkt->buf_len = len;
+>>> +
+>>>    		err = memcpy_from_msg(pkt->buf, info->msg, len);
+>>>    		if (err)
+>>>    			goto out;
+>>> @@ -86,6 +89,46 @@ virtio_transport_alloc_pkt(struct virtio_vsock_pkt_info *info,
+>>>    	return NULL;
+>>>    }
+>>> +static struct virtio_vsock_buf *
+>>> +virtio_transport_alloc_buf(struct virtio_vsock_pkt *pkt, bool zero_copy)
+>>> +{
+>>> +	struct virtio_vsock_buf *buf;
+>>> +
+>>> +	if (pkt->len == 0)
+>>> +		return NULL;
+>>> +
+>>> +	buf = kzalloc(sizeof(*buf), GFP_KERNEL);
+>>> +	if (!buf)
+>>> +		return NULL;
+>>> +
+>>> +	/* If the buffer in the virtio_vsock_pkt is full, we can move it to
+>>> +	 * the new virtio_vsock_buf avoiding the copy, because we are sure that
+>>> +	 * we are not use more memory than that counted by the credit mechanism.
+>>> +	 */
+>>> +	if (zero_copy && pkt->len == pkt->buf_len) {
+>>> +		buf->addr = pkt->buf;
+>>> +		pkt->buf = NULL;
+>>> +	} else {
+>>
+>> Is the copy still needed if we're just few bytes less? We meet similar issue
+>> for virito-net, and virtio-net solve this by always copy first 128bytes for
+>> big packets.
+>>
+>> See receive_big()
+> I'm seeing, It is more sophisticated.
+> IIUC, virtio-net allocates a sk_buff with 128 bytes of buffer, then copies the
+> first 128 bytes, then adds the buffer used to receive the packet as a frag to
+> the skb.
+
+
+Yes and the point is if the packet is smaller than 128 bytes the pages 
+will be recycled.
+
+
+>
+> Do you suggest to implement something similar, or for now we can use my
+> approach and if we will merge the datapath we can reuse the virtio-net
+> approach?
+
+
+I think we need a better threshold. If I understand the patch correctly, 
+we will do copy unless the packet is 64K when guest is doing receiving. 
+1 byte packet is indeed a problem, but we need to solve it without 
+losing too much performance.
+
+Thanks
+
+
+>
+> Thanks,
+> Stefano
