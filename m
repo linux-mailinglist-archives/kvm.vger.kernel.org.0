@@ -2,233 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C6071C064
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 03:44:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28B611C073
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 04:02:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726553AbfENBo2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 May 2019 21:44:28 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:45119 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726412AbfENBo2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 May 2019 21:44:28 -0400
-Received: by mail-ot1-f68.google.com with SMTP id t24so4989194otl.12;
-        Mon, 13 May 2019 18:44:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=yy2Yel/USF4a4M7OXdkKtgr8TJY88ids8FL33ul2o24=;
-        b=ftyK0Zu9SdNODowfCGef5M5MWQtnQRW+K0ewSddIAjJgnD5x5De/Wful+d8XCktU23
-         4bwBdP69H8+MQYi+jRvJAp7NBtj/l8b8Nk/UJojkNONU61O9M4mNHoZdkj4TIhMbUVAM
-         jzpRiTb7mMsfy1ss082O4RGHaU0k2paXKqcFb2Z8OFlohjBHm3Y51WGnD5DQSXjX6YzA
-         bzSocXEUoe8HCjc6tavJnVIqrzWsZpVhZyOsOL4MCKps1BozD8llD+CJ1BEBvatCLfyf
-         uWsGnTe0nWTT3qPkBjayQHVVjHjZL511+xkHrf0urrRA4OYcRcM1HOO1LqBVzgQGYr2I
-         cYrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=yy2Yel/USF4a4M7OXdkKtgr8TJY88ids8FL33ul2o24=;
-        b=AiMsWd2Z0Uq5NhKLCx40gv4OGuMNjeYSCj1MvaGyhg7TWKZHid4LlDrxklaDiYlolw
-         ViS3O7fwjnUgZSZEnFQMztz9f4A8qqr/PosSjxdjFqXz1u75UFfqVg5BtEAgOteXA3n6
-         hLIHDB1f/1bvIB4MWOykMU5P6ZMCmv+54VwW5PatwHtpcU4yL2FDnX5UZubUMQmc8B1w
-         LJhtpVv3dZLSUU7ms2Tw0WCdh3jxsC97iSf3s8LoyZTjzjuu6L/BF8MT+02eBjOqUqry
-         2JQxVw5M/Vaf/q5LPRxhH0gcwWVP1DRi8CINIYqPK/RyKIstoU4DvtHnTzyClBY2B7SL
-         1LOQ==
-X-Gm-Message-State: APjAAAXjLVIiWzprUh/7d2u/KFj5AEC627bWpYIjV8sGYeXUZJrFcfUZ
-        ZDgAn1ExORToPRrUAH1IVecoSJGxHD4Mo36DhWE=
-X-Google-Smtp-Source: APXvYqwCwweRgGxR0q2aDofRD6zHvfdGOjy5pQEcLdAMiC084mM+T8w4F7wNjpERXuETfAeHr9bSFtMlVmspTdrv4ZM=
-X-Received: by 2002:a9d:7f8b:: with SMTP id t11mr18632299otp.110.1557798267465;
- Mon, 13 May 2019 18:44:27 -0700 (PDT)
+        id S1726604AbfENCCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 May 2019 22:02:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40620 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726327AbfENCCo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 May 2019 22:02:44 -0400
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 67E7921734
+        for <kvm@vger.kernel.org>; Tue, 14 May 2019 02:02:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1557799363;
+        bh=4OBmtfQllm0RymwAbmCzcP2d3KH9f8oCMkSmd1HlaAA=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=15OxqietpeRfGcIVu5u4YGK6lQMkA8PXcTMZtnOt1lzuJODROCsf/5K71H11TL4ul
+         XIQLz6xsf1OfhAS72AXJbUsNOQo5rEO7Y4JJrc/YQcRpjxUqD+Y1DbYwehJXNSN6/d
+         Q0NETdnisf6YcHjz5rFLGoBCziHZbk+A/5MudBlA=
+Received: by mail-wm1-f48.google.com with SMTP id 198so1104244wme.3
+        for <kvm@vger.kernel.org>; Mon, 13 May 2019 19:02:43 -0700 (PDT)
+X-Gm-Message-State: APjAAAWGAWGC8X5Kw3um+gU2fSbs9Ue+DLz+ymj5ecfe7fydbC7yMgdq
+        ezKK/jnK4M7yCWA0CIYGq1QJGnWdhRm2ZHnqQD3n7A==
+X-Google-Smtp-Source: APXvYqynOcw9YL9Rj7oZzy310IyYvddcWfkYtYUCrEZa+qhWQKqb0ESZyXTuKlKEYx+4/q84sAUpXBybTnLqOnGPL3A=
+X-Received: by 2002:a1c:486:: with SMTP id 128mr16481232wme.83.1557799361797;
+ Mon, 13 May 2019 19:02:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <1557401361-3828-1-git-send-email-wanpengli@tencent.com>
- <1557401361-3828-4-git-send-email-wanpengli@tencent.com> <20190513195417.GM28561@linux.intel.com>
-In-Reply-To: <20190513195417.GM28561@linux.intel.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 14 May 2019 09:45:40 +0800
-Message-ID: <CANRm+CxVRMQF9yHoqDMJR9FROGtLwYgaQXPqu++S7Juneh2vtw@mail.gmail.com>
-Subject: Re: [PATCH 3/3] KVM: LAPIC: Optimize timer latency further
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+References: <1557758315-12667-1-git-send-email-alexandre.chartre@oracle.com>
+ <1557758315-12667-25-git-send-email-alexandre.chartre@oracle.com>
+ <20190513151500.GY2589@hirez.programming.kicks-ass.net> <13F2FA4F-116F-40C6-9472-A1DE689FE061@oracle.com>
+In-Reply-To: <13F2FA4F-116F-40C6-9472-A1DE689FE061@oracle.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Mon, 13 May 2019 19:02:30 -0700
+X-Gmail-Original-Message-ID: <CALCETrUcR=3nfOtFW2qt3zaa7CnNJWJLqRY8AS9FTJVHErjhfg@mail.gmail.com>
+Message-ID: <CALCETrUcR=3nfOtFW2qt3zaa7CnNJWJLqRY8AS9FTJVHErjhfg@mail.gmail.com>
+Subject: Re: [RFC KVM 24/27] kvm/isolation: KVM page fault handler
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Alexandre Chartre <alexandre.chartre@oracle.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andrew Lutomirski <luto@kernel.org>,
+        kvm list <kvm@vger.kernel.org>, X86 ML <x86@kernel.org>,
+        Linux-MM <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        jan.setjeeilers@oracle.com, Jonathan Adams <jwadams@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 14 May 2019 at 03:54, Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
+On Mon, May 13, 2019 at 2:26 PM Liran Alon <liran.alon@oracle.com> wrote:
 >
-> On Thu, May 09, 2019 at 07:29:21PM +0800, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > Advance lapic timer tries to hidden the hypervisor overhead between hos=
-t
-> > timer fires and the guest awares the timer is fired. However, it just h=
-idden
-> > the time between apic_timer_fn/handle_preemption_timer -> wait_lapic_ex=
-pire,
-> > instead of the real position of vmentry which is mentioned in the orign=
-ial
-> > commit d0659d946be0 ("KVM: x86: add option to advance tscdeadline hrtim=
-er
-> > expiration"). There is 700+ cpu cycles between the end of wait_lapic_ex=
-pire
-> > and before world switch on my haswell desktop, it will be 2400+ cycles =
-if
-> > vmentry_l1d_flush is tuned to always.
-> >
-> > This patch tries to narrow the last gap, it measures the time between
-> > the end of wait_lapic_expire and before world switch, we take this
-> > time into consideration when busy waiting, otherwise, the guest still
-> > awares the latency between wait_lapic_expire and world switch, we also
-> > consider this when adaptively tuning the timer advancement. The patch
-> > can reduce 50% latency (~1600+ cycles to ~800+ cycles on a haswell
-> > desktop) for kvm-unit-tests/tscdeadline_latency when testing busy waits=
-.
-> >
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> > Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Cc: Liran Alon <liran.alon@oracle.com>
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > ---
-> >  arch/x86/kvm/lapic.c   | 23 +++++++++++++++++++++--
-> >  arch/x86/kvm/lapic.h   |  8 ++++++++
-> >  arch/x86/kvm/vmx/vmx.c |  2 ++
-> >  3 files changed, 31 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index e7a0660..01d3a87 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -1545,13 +1545,19 @@ void wait_lapic_expire(struct kvm_vcpu *vcpu)
-> >
-> >       tsc_deadline =3D apic->lapic_timer.expired_tscdeadline;
-> >       apic->lapic_timer.expired_tscdeadline =3D 0;
-> > -     guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc());
-> > +     guest_tsc =3D kvm_read_l1_tsc(vcpu, (apic->lapic_timer.measure_de=
-lay_done =3D=3D 2) ?
-> > +             rdtsc() + apic->lapic_timer.vmentry_delay : rdtsc());
-> >       trace_kvm_wait_lapic_expire(vcpu->vcpu_id, guest_tsc - tsc_deadli=
-ne);
-> >
-> >       if (guest_tsc < tsc_deadline)
-> >               __wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
-> >
-> >       adaptive_tune_timer_advancement(vcpu, guest_tsc, tsc_deadline);
-> > +
-> > +     if (!apic->lapic_timer.measure_delay_done) {
-> > +             apic->lapic_timer.measure_delay_done =3D 1;
-> > +             apic->lapic_timer.vmentry_delay =3D rdtsc();
-> > +     }
-> >  }
-> >
-> >  static void start_sw_tscdeadline(struct kvm_lapic *apic)
-> > @@ -1837,6 +1843,18 @@ static void apic_manage_nmi_watchdog(struct kvm_=
-lapic *apic, u32 lvt0_val)
-> >       }
-> >  }
-> >
-> > +void kvm_lapic_measure_vmentry_delay(struct kvm_vcpu *vcpu)
-> > +{
-> > +     struct kvm_timer *ktimer =3D &vcpu->arch.apic->lapic_timer;
 >
-> This will #GP if the APIC is not in-kernel, i.e. @apic is NULL.
 >
-> > +
-> > +     if (ktimer->measure_delay_done =3D=3D 1) {
-> > +             ktimer->vmentry_delay =3D rdtsc() -
-> > +                     ktimer->vmentry_delay;
-> > +             ktimer->measure_delay_done =3D 2;
+> > On 13 May 2019, at 18:15, Peter Zijlstra <peterz@infradead.org> wrote:
+> >
+> > On Mon, May 13, 2019 at 04:38:32PM +0200, Alexandre Chartre wrote:
+> >> diff --git a/arch/x86/mm/fault.c b/arch/x86/mm/fault.c
+> >> index 46df4c6..317e105 100644
+> >> --- a/arch/x86/mm/fault.c
+> >> +++ b/arch/x86/mm/fault.c
+> >> @@ -33,6 +33,10 @@
+> >> #define CREATE_TRACE_POINTS
+> >> #include <asm/trace/exceptions.h>
+> >>
+> >> +bool (*kvm_page_fault_handler)(struct pt_regs *regs, unsigned long error_code,
+> >> +                           unsigned long address);
+> >> +EXPORT_SYMBOL(kvm_page_fault_handler);
+> >
+> > NAK NAK NAK NAK
+> >
+> > This is one of the biggest anti-patterns around.
 >
-> Measuring the delay a single time is bound to result in random outliers,
-> e.g. if an NMI happens to occur after wait_lapic_expire().
+> I agree.
+> I think that mm should expose a mm_set_kvm_page_fault_handler() or something (give it a better name).
+> Similar to how arch/x86/kernel/irq.c have kvm_set_posted_intr_wakeup_handler().
 >
-> Rather than reinvent the wheel, can we simply move the call to
-> wait_lapic_expire() into vmx.c and svm.c?  For VMX we'd probably want to
-> support the advancement if enable_unrestricted_guest=3Dtrue so that we av=
-oid
-> the emulation_required case, but other than that I don't see anything tha=
-t
-> requires wait_lapic_expire() to be called where it is.
+> -Liran
+>
 
-I also considered to move wait_lapic_expire() into vmx.c and svm.c
-before, what do you think, Paolo, Radim?
-
-Regards,
-Wanpeng Li
-
->
-> > +     }
-> > +}
-> > +EXPORT_SYMBOL_GPL(kvm_lapic_measure_vmentry_delay);
-> > +
-> >  int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
-> >  {
-> >       int ret =3D 0;
-> > @@ -2318,7 +2336,8 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int t=
-imer_advance_ns)
-> >               apic->lapic_timer.timer_advance_ns =3D timer_advance_ns;
-> >               apic->lapic_timer.timer_advance_adjust_done =3D true;
-> >       }
-> > -
-> > +     apic->lapic_timer.vmentry_delay =3D 0;
-> > +     apic->lapic_timer.measure_delay_done =3D 0;
-> >
-> >       /*
-> >        * APIC is created enabled. This will prevent kvm_lapic_set_base =
-from
-> > diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> > index d6d049b..f1d037b 100644
-> > --- a/arch/x86/kvm/lapic.h
-> > +++ b/arch/x86/kvm/lapic.h
-> > @@ -35,6 +35,13 @@ struct kvm_timer {
-> >       atomic_t pending;                       /* accumulated triggered =
-timers */
-> >       bool hv_timer_in_use;
-> >       bool timer_advance_adjust_done;
-> > +     /**
-> > +      * 0 unstart measure
-> > +      * 1 start record
-> > +      * 2 get delta
-> > +      */
-> > +     u32 measure_delay_done;
-> > +     u64 vmentry_delay;
-> >  };
-> >
-> >  struct kvm_lapic {
-> > @@ -230,6 +237,7 @@ void kvm_lapic_switch_to_hv_timer(struct kvm_vcpu *=
-vcpu);
-> >  void kvm_lapic_expired_hv_timer(struct kvm_vcpu *vcpu);
-> >  bool kvm_lapic_hv_timer_in_use(struct kvm_vcpu *vcpu);
-> >  void kvm_lapic_restart_hv_timer(struct kvm_vcpu *vcpu);
-> > +void kvm_lapic_measure_vmentry_delay(struct kvm_vcpu *vcpu);
-> >
-> >  static inline enum lapic_mode kvm_apic_mode(u64 apic_base)
-> >  {
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 9663d41..a939bf5 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -6437,6 +6437,8 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
-> >       if (vcpu->arch.cr2 !=3D read_cr2())
-> >               write_cr2(vcpu->arch.cr2);
-> >
-> > +     kvm_lapic_measure_vmentry_delay(vcpu);
->
-> This should be wrapped in an unlikely of some form given that it happens
-> literally once out of thousands/millions runs.
->
-> > +
-> >       vmx->fail =3D __vmx_vcpu_run(vmx, (unsigned long *)&vcpu->arch.re=
-gs,
-> >                                  vmx->loaded_vmcs->launched);
-> >
-> > --
-> > 2.7.4
-> >
+This sounds like a great use case for static_call().  PeterZ, do you
+suppose we could wire up static_call() with the module infrastructure
+to make it easy to do "static_call to such-and-such GPL module symbol
+if that symbol is in a loaded module, else nop"?
