@@ -2,174 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EF3E41C74B
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 12:55:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 775C21C755
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2019 12:57:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726490AbfENKyx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 06:54:53 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:32792 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726473AbfENKyw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 06:54:52 -0400
-Received: by mail-ot1-f66.google.com with SMTP id 66so14792366otq.0;
-        Tue, 14 May 2019 03:54:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=QtB5Rs/peEa4JN+D+iPr59JmMiQWnsnfd52Mq2rk5Fc=;
-        b=RJsDKL3+Kry+B8IxmAwZ/vkcvpAaZsiTayf7bGzVyoBmjaVPIPTy6hYnyGjK3EPmI5
-         0dkYQAXR/6f5xfTqU0cT+sgI+EAf38OalOkteS7YBoR7WfHHZmXOyOCyNDjxA3cvWd2d
-         9S4V2K2oWDeZnzSC6nxRDEiZI22X8Y5JiE9fmvbdJ7rfDjaWSFieKVaquT0XPwPCxeMk
-         Wjk1RS6dm+cqTciREvRf4v97LERVEiYepfpEj8ylrbLMbzf6/p1C0sIqtadUW1V+k9TA
-         KBO4zS7HKLrY/nxQ62xfsPS4fk+wr3md8lz10+V8sYXiA9VjnPEAVRvAij8OGC+yjNRv
-         W0ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=QtB5Rs/peEa4JN+D+iPr59JmMiQWnsnfd52Mq2rk5Fc=;
-        b=PCA9mO3c+Pt6i0Kd6JviphUHwzxCJCDO4gWwesHRSvyifOd9xhZ7jEFSq6689Jzemy
-         +RUhybPxecZZ/294+o1oJmaBHBpjF1rYrHXS1qLtZsNq6THcP8/x06ebYXZwQXxhz+hC
-         cGnim6Gm9emCtVP8UZAYUHqJCPz+pcM04A8yIDSfpZRZqVL/u6WWN3nGPBOZEIifedva
-         8knnajhUxWxvy+Jqp+7mJZSmCotvnf2zNlQg8WUK+7dkAThAIXtUmsX2uqCw7an6ocIf
-         7APK3n8rWgNS1KqmGUvnfd59ETAJF6EhDZKzFZyfFPbWERt9HNSzsEqx/iNTG55exvA0
-         k6xQ==
-X-Gm-Message-State: APjAAAUQ+xnDYaUOazWfG8FeoTEZ6sIw1QXvIBTyR2hFbIWl4Z6Vkhc3
-        kU7IJpYUPWGlxR54MbOVleYhjkPa1wgqSFg0ahQ=
-X-Google-Smtp-Source: APXvYqzGzg2Ya/Iw5LDBCkQejuZY4jHMDMNe2KOKzz+WDUQpKWBSS25E8Ee7CzBzY4e9gtDoeWLGqwc2gVWxNpBbM3g=
-X-Received: by 2002:a9d:7343:: with SMTP id l3mr19766347otk.63.1557831291504;
- Tue, 14 May 2019 03:54:51 -0700 (PDT)
+        id S1726332AbfENK5V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 06:57:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37644 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726036AbfENK5V (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 06:57:21 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id EBF7FC045770;
+        Tue, 14 May 2019 10:57:19 +0000 (UTC)
+Received: from beluga.usersys.redhat.com (unknown [10.43.2.166])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 39A211001DE1;
+        Tue, 14 May 2019 10:57:07 +0000 (UTC)
+Date:   Tue, 14 May 2019 12:57:04 +0200
+From:   Erik Skultety <eskultet@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Yan Zhao <yan.y.zhao@intel.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "aik@ozlabs.ru" <aik@ozlabs.ru>,
+        "Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+        "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "eauger@redhat.com" <eauger@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "Yang, Ziye" <ziye.yang@intel.com>,
+        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        "arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+        "felipe@nutanix.com" <felipe@nutanix.com>,
+        "Ken.Xue@amd.com" <Ken.Xue@amd.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "dinechin@redhat.com" <dinechin@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "Liu, Changpeng" <changpeng.liu@intel.com>,
+        "berrange@redhat.com" <berrange@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+        "He, Shaopeng" <shaopeng.he@intel.com>
+Subject: Re: [PATCH v2 1/2] vfio/mdev: add version attribute for mdev device
+Message-ID: <20190514105704.GA10926@beluga.usersys.redhat.com>
+References: <20190510110838.2df4c4d0.cohuck@redhat.com>
+ <20190510093608.GD2854@work-vm>
+ <20190510114838.7e16c3d6.cohuck@redhat.com>
+ <20190513132804.GD11139@beluga.usersys.redhat.com>
+ <20190514061235.GC20407@joy-OptiPlex-7040>
+ <20190514072039.GA2089@beluga.usersys.redhat.com>
+ <20190514073219.GD20407@joy-OptiPlex-7040>
+ <20190514074344.GB2089@beluga.usersys.redhat.com>
+ <20190514074736.GE20407@joy-OptiPlex-7040>
+ <20190514115135.078bbaf7.cohuck@redhat.com>
 MIME-Version: 1.0
-References: <1557401361-3828-1-git-send-email-wanpengli@tencent.com>
- <1557401361-3828-4-git-send-email-wanpengli@tencent.com> <20190513195417.GM28561@linux.intel.com>
- <CANRm+CxVRMQF9yHoqDMJR9FROGtLwYgaQXPqu++S7Juneh2vtw@mail.gmail.com>
-In-Reply-To: <CANRm+CxVRMQF9yHoqDMJR9FROGtLwYgaQXPqu++S7Juneh2vtw@mail.gmail.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 14 May 2019 18:56:04 +0800
-Message-ID: <CANRm+Czg-0m1dV1DVfqSTr89Xrq169xx3LqEGTYH0mmjafvhMQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] KVM: LAPIC: Optimize timer latency further
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190514115135.078bbaf7.cohuck@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 14 May 2019 10:57:20 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 14 May 2019 at 09:45, Wanpeng Li <kernellwp@gmail.com> wrote:
+On Tue, May 14, 2019 at 11:51:35AM +0200, Cornelia Huck wrote:
+> On Tue, 14 May 2019 03:47:36 -0400
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
 >
-> On Tue, 14 May 2019 at 03:54, Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >
-> > On Thu, May 09, 2019 at 07:29:21PM +0800, Wanpeng Li wrote:
-> > > From: Wanpeng Li <wanpengli@tencent.com>
-> > >
-> > > Advance lapic timer tries to hidden the hypervisor overhead between h=
-ost
-> > > timer fires and the guest awares the timer is fired. However, it just=
- hidden
-> > > the time between apic_timer_fn/handle_preemption_timer -> wait_lapic_=
-expire,
-> > > instead of the real position of vmentry which is mentioned in the ori=
-gnial
-> > > commit d0659d946be0 ("KVM: x86: add option to advance tscdeadline hrt=
-imer
-> > > expiration"). There is 700+ cpu cycles between the end of wait_lapic_=
-expire
-> > > and before world switch on my haswell desktop, it will be 2400+ cycle=
-s if
-> > > vmentry_l1d_flush is tuned to always.
-> > >
-> > > This patch tries to narrow the last gap, it measures the time between
-> > > the end of wait_lapic_expire and before world switch, we take this
-> > > time into consideration when busy waiting, otherwise, the guest still
-> > > awares the latency between wait_lapic_expire and world switch, we als=
-o
-> > > consider this when adaptively tuning the timer advancement. The patch
-> > > can reduce 50% latency (~1600+ cycles to ~800+ cycles on a haswell
-> > > desktop) for kvm-unit-tests/tscdeadline_latency when testing busy wai=
-ts.
-> > >
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> > > Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > Cc: Liran Alon <liran.alon@oracle.com>
-> > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > > ---
-> > >  arch/x86/kvm/lapic.c   | 23 +++++++++++++++++++++--
-> > >  arch/x86/kvm/lapic.h   |  8 ++++++++
-> > >  arch/x86/kvm/vmx/vmx.c |  2 ++
-> > >  3 files changed, 31 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > > index e7a0660..01d3a87 100644
-> > > --- a/arch/x86/kvm/lapic.c
-> > > +++ b/arch/x86/kvm/lapic.c
-> > > @@ -1545,13 +1545,19 @@ void wait_lapic_expire(struct kvm_vcpu *vcpu)
-> > >
-> > >       tsc_deadline =3D apic->lapic_timer.expired_tscdeadline;
-> > >       apic->lapic_timer.expired_tscdeadline =3D 0;
-> > > -     guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc());
-> > > +     guest_tsc =3D kvm_read_l1_tsc(vcpu, (apic->lapic_timer.measure_=
-delay_done =3D=3D 2) ?
-> > > +             rdtsc() + apic->lapic_timer.vmentry_delay : rdtsc());
-> > >       trace_kvm_wait_lapic_expire(vcpu->vcpu_id, guest_tsc - tsc_dead=
-line);
-> > >
-> > >       if (guest_tsc < tsc_deadline)
-> > >               __wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
-> > >
-> > >       adaptive_tune_timer_advancement(vcpu, guest_tsc, tsc_deadline);
-> > > +
-> > > +     if (!apic->lapic_timer.measure_delay_done) {
-> > > +             apic->lapic_timer.measure_delay_done =3D 1;
-> > > +             apic->lapic_timer.vmentry_delay =3D rdtsc();
-> > > +     }
-> > >  }
-> > >
-> > >  static void start_sw_tscdeadline(struct kvm_lapic *apic)
-> > > @@ -1837,6 +1843,18 @@ static void apic_manage_nmi_watchdog(struct kv=
-m_lapic *apic, u32 lvt0_val)
-> > >       }
-> > >  }
-> > >
-> > > +void kvm_lapic_measure_vmentry_delay(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +     struct kvm_timer *ktimer =3D &vcpu->arch.apic->lapic_timer;
-> >
-> > This will #GP if the APIC is not in-kernel, i.e. @apic is NULL.
-> >
-> > > +
-> > > +     if (ktimer->measure_delay_done =3D=3D 1) {
-> > > +             ktimer->vmentry_delay =3D rdtsc() -
-> > > +                     ktimer->vmentry_delay;
-> > > +             ktimer->measure_delay_done =3D 2;
-> >
-> > Measuring the delay a single time is bound to result in random outliers=
-,
-> > e.g. if an NMI happens to occur after wait_lapic_expire().
-> >
-> > Rather than reinvent the wheel, can we simply move the call to
-> > wait_lapic_expire() into vmx.c and svm.c?  For VMX we'd probably want t=
-o
-> > support the advancement if enable_unrestricted_guest=3Dtrue so that we =
-avoid
-> > the emulation_required case, but other than that I don't see anything t=
-hat
-> > requires wait_lapic_expire() to be called where it is.
+> > On Tue, May 14, 2019 at 03:43:44PM +0800, Erik Skultety wrote:
+> > > On Tue, May 14, 2019 at 03:32:19AM -0400, Yan Zhao wrote:
+> > > > On Tue, May 14, 2019 at 03:20:40PM +0800, Erik Skultety wrote:
 >
-> I also considered to move wait_lapic_expire() into vmx.c and svm.c
-> before, what do you think, Paolo, Radim?
+> > > > > That said, from libvirt POV as a consumer, I'd expect there to be truly only 2
+> > > > > errors (I believe Alex has mentioned something similar in one of his responses
+> > > > > in one of the threads):
+> > > > >     a) read error indicating that an mdev type doesn't support migration
+> > > > >         - I assume if one type doesn't support migration, none of the other
+> > > > >           types exposed on the parent device do, is that a fair assumption?
+>
+> Probably; but there might be cases where the migratability depends not
+> on the device type, but how the partitioning has been done... or is
+> that too contrived?
 
-However, guest_enter_irqoff() also prevents this. Otherwise, we will
-account busy wait time as guest time. How about sampling several times
-and get the average value or conservative min value to handle Sean's
-concern?
+No, you have a point - once again I let my thoughts be carried away by the idea
+of heterogeneous setups, which is a discussion for another time anyway, I was
+just thinking out loud.
+
+>
+> > > > >     b) write error indicating that the mdev types are incompatible for
+> > > > >     migration
+> > > > >
+> > > > > Regards,
+> > > > > Erik
+> > > > Thanks for this explanation.
+> > > > so, can we arrive at below agreements?
+> > > >
+> > > > 1. "not to define the specific errno returned for a specific situation,
+> > > > let the vendor driver decide, userspace simply needs to know that an errno on
+> > > > read indicates the device does not support migration version comparison and
+> > > > that an errno on write indicates the devices are incompatible or the target
+> > > > doesn't support migration versions. "
+> > > > 2. vendor driver should log detailed error reasons in kernel log.
+> > >
+> > > That would be my take on this, yes, but I open to hear any other suggestions and
+> > > ideas I couldn't think of as well.
+>
+> So, read to find out whether migration is supported at all, write to
+> find out whether it is supported for that concrete pairing is
+> reasonable for libvirt?
+
+Yes, more specifically, in the prepare phase of migration, we'd retrieve the
+string (potentially reporting an error like: "Failed to query migration
+support: <errno translation>"), put the string into the migration cookie and
+do the check with write on destination. The only thing is that if the error is
+on the destination, the error message in kernel log lives only on the
+destination, which doesn't help libvirt users, so it would require setting up
+remote logging, but for layered products, this is not a problem since those
+already utilize central logging nodes.
+
+Then there are the libvirt-specific bits out of scope of this discussion,
+whether we should only assume identical mdev type pairs, or whether we should
+employ best effort approach and iterate over all the available types exposed by
+the vendor and check whether any of the types would support this migration
+(back to your note Connie, partitioning would come into the picture here).
+
+
+>
+> > >
+> > > Erik
+> > got it. thanks a lot!
+> >
+> > hi Cornelia and Dave,
+> > do you also agree on:
+> > 1. "not to define the specific errno returned for a specific situation,
+> > let the vendor driver decide, userspace simply needs to know that an errno on
+> > read indicates the device does not support migration version comparison and
+> > that an errno on write indicates the devices are incompatible or the target
+> > doesn't support migration versions. "
+> > 2. vendor driver should log detailed error reasons in kernel log.
+>
+> Two questions:
+> - How reasonable is it to refer to the system log in order to find out
+>   what exactly went wrong?
+> - If detailed error reporting is basically done to the syslog, do
+>   different error codes still provide useful information? Or should the
+>   vendor driver decide what it wants to do?
+
+I'd leave anything beyond returning -1 on read/write from/to the sysfs to the
+vendor driver, as user space has no control over it, even if there was a
+facility to interpret different return codes for us, I'm not sure (in this
+migration-related case) how much would userspace be able to recover or
+fallback anyway, you either can or cannot migrate smoothely.
 
 Regards,
-Wanpeng Li
+Erik
+
