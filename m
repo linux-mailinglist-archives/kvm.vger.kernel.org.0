@@ -2,156 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FF421F2C1
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 14:08:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59CBA1EC71
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 12:55:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729332AbfEOMGa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 08:06:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43772 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728925AbfEOLKI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 May 2019 07:10:08 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 954602166E;
-        Wed, 15 May 2019 11:10:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1557918607;
-        bh=r8UsJHeobUmrU9dWDtYjj8wQqq1tEaW8hScVYrx/nBo=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=1rIPjNqdTk8gWAaAjLxEeF4AIHjBppXF12ViJepG7n3nOreyQ0VKvoA5qr9bsqk0J
-         BlNFZLxGBlwRycPdSbxrkU+ZhqRx/oD7Irdsu2tIum9VAyhbvrFWjXLNOaet0WP2FQ
-         bjhypkJwMfPAvq2Uf9QGzUgrLe4saEtN8Rxff87w=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org,
-        Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Joerg Roedel <joro@8bytes.org>,
+        id S1726548AbfEOKzs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 06:55:48 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58786 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726520AbfEOKzp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 May 2019 06:55:45 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4FAsFuN138230
+        for <kvm@vger.kernel.org>; Wed, 15 May 2019 06:55:44 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2sgfe8xfsm-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 15 May 2019 06:55:43 -0400
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
+        Wed, 15 May 2019 11:55:42 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 15 May 2019 11:55:39 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4FAtcVi58458156
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 May 2019 10:55:38 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 228FB4C040;
+        Wed, 15 May 2019 10:55:38 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C435D4C04A;
+        Wed, 15 May 2019 10:55:37 +0000 (GMT)
+Received: from dyn-9-152-224-73.boeblingen.de.ibm.com (unknown [9.152.224.73])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 15 May 2019 10:55:37 +0000 (GMT)
+Subject: Re: [PATCH] KVM: s390: change default halt poll to 50000
+To:     David Hildenbrand <david@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Borislav Petkov <bp@suse.de>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
-        x86@kernel.org, Ben Hutchings <ben@decadent.org.uk>
-Subject: [PATCH 4.4 196/266] KVM: x86: SVM: Call x86_spec_ctrl_set_guest/host() with interrupts disabled
-Date:   Wed, 15 May 2019 12:55:03 +0200
-Message-Id: <20190515090729.575734497@linuxfoundation.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190515090722.696531131@linuxfoundation.org>
-References: <20190515090722.696531131@linuxfoundation.org>
-User-Agent: quilt/0.66
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Collin Walling <walling@linux.ibm.com>,
+        "Jason J . Herne" <jjherne@linux.ibm.com>
+References: <20190515082324.112755-1-borntraeger@de.ibm.com>
+ <d4227b89-4161-084a-91dc-6178afe5aad0@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Openpgp: preference=signencrypt
+Date:   Wed, 15 May 2019 12:55:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <d4227b89-4161-084a-91dc-6178afe5aad0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19051510-0012-0000-0000-0000031BE6D0
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051510-0013-0000-0000-00002154833D
+Message-Id: <a742cf8b-d480-e469-6bda-2f34131781fb@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-15_07:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=949 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905150070
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Thomas Gleixner <tglx@xxxxxxxxxxxxx>
+On 5/15/19 12:22 PM, David Hildenbrand wrote:
+> "KVM: s390: change default halt poll time to 50us
+> 
+> Recent measurements indicate that using 50us results in a reduced CPU
+> consumption, while still providing the benefit of halt polling. Let's
+> use 50us instead."
+> 
+> Acked-by: David Hildenbrand <david@redhat.com>
 
-commit 024d83cadc6b2af027e473720f3c3da97496c318 upstream.
+With that change:
+Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
 
-Mikhail reported the following lockdep splat:
-
-WARNING: possible irq lock inversion dependency detected
-CPU 0/KVM/10284 just changed the state of lock:
-  000000000d538a88 (&st->lock){+...}, at:
-  speculative_store_bypass_update+0x10b/0x170
-
-but this lock was taken by another, HARDIRQ-safe lock
-in the past:
-
-(&(&sighand->siglock)->rlock){-.-.}
-
-   and interrupts could create inverse lock ordering between them.
-
-Possible interrupt unsafe locking scenario:
-
-    CPU0                    CPU1
-    ----                    ----
-   lock(&st->lock);
-                           local_irq_disable();
-                           lock(&(&sighand->siglock)->rlock);
-                           lock(&st->lock);
-    <Interrupt>
-     lock(&(&sighand->siglock)->rlock);
-     *** DEADLOCK ***
-
-The code path which connects those locks is:
-
-   speculative_store_bypass_update()
-   ssb_prctl_set()
-   do_seccomp()
-   do_syscall_64()
-
-In svm_vcpu_run() speculative_store_bypass_update() is called with
-interupts enabled via x86_virt_spec_ctrl_set_guest/host().
-
-This is actually a false positive, because GIF=0 so interrupts are
-disabled even if IF=1; however, we can easily move the invocations of
-x86_virt_spec_ctrl_set_guest/host() into the interrupt disabled region to
-cure it, and it's a good idea to keep the GIF=0/IF=1 area as small
-and self-contained as possible.
-
-Fixes: 1f50ddb4f418 ("x86/speculation: Handle HT correctly on AMD")
-Reported-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Tested-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-Cc: Joerg Roedel <joro@8bytes.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: Matthew Wilcox <willy@infradead.org>
-Cc: Borislav Petkov <bp@suse.de>
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: kvm@vger.kernel.org
-Cc: x86@kernel.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- arch/x86/kvm/svm.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -3928,8 +3928,6 @@ static void svm_vcpu_run(struct kvm_vcpu
- 
- 	clgi();
- 
--	local_irq_enable();
--
- 	/*
- 	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
- 	 * it's non-zero. Since vmentry is serialising on affected CPUs, there
-@@ -3938,6 +3936,8 @@ static void svm_vcpu_run(struct kvm_vcpu
- 	 */
- 	x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
- 
-+	local_irq_enable();
-+
- 	asm volatile (
- 		"push %%" _ASM_BP "; \n\t"
- 		"mov %c[rbx](%[svm]), %%" _ASM_BX " \n\t"
-@@ -4060,12 +4060,12 @@ static void svm_vcpu_run(struct kvm_vcpu
- 	if (!msr_write_intercepted(vcpu, MSR_IA32_SPEC_CTRL))
- 		svm->spec_ctrl = native_read_msr(MSR_IA32_SPEC_CTRL);
- 
--	x86_spec_ctrl_restore_host(svm->spec_ctrl, svm->virt_spec_ctrl);
--
- 	reload_tss(vcpu);
- 
- 	local_irq_disable();
- 
-+	x86_spec_ctrl_restore_host(svm->spec_ctrl, svm->virt_spec_ctrl);
-+
- 	vcpu->arch.cr2 = svm->vmcb->save.cr2;
- 	vcpu->arch.regs[VCPU_REGS_RAX] = svm->vmcb->save.rax;
- 	vcpu->arch.regs[VCPU_REGS_RSP] = svm->vmcb->save.rsp;
-
+> 
+> 
+> 
+> On 15.05.19 10:23, Christian Borntraeger wrote:
+>> older performance measurements indicated that 50000 vs 80000 reduces cpu
+>> consumption while still providing the benefit of halt polling. We had
+>> this change in the IBM KVM product, but it got lost so it never went
+>> upstream. Recent re-measurement indicate that 50k is still better than
+>> 80k.>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>>  arch/s390/include/asm/kvm_host.h | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+>> index dbe254847e0d..cb63cc7bbf06 100644
+>> --- a/arch/s390/include/asm/kvm_host.h
+>> +++ b/arch/s390/include/asm/kvm_host.h
+>> @@ -36,7 +36,7 @@
+>>   */
+>>  #define KVM_NR_IRQCHIPS 1
+>>  #define KVM_IRQCHIP_NUM_PINS 4096
+>> -#define KVM_HALT_POLL_NS_DEFAULT 80000
+>> +#define KVM_HALT_POLL_NS_DEFAULT 50000
+>>  
+>>  /* s390-specific vcpu->requests bit members */
+>>  #define KVM_REQ_ENABLE_IBS	KVM_ARCH_REQ(0)
+>>
+> 
+> 
 
