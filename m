@@ -2,186 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F0D651FC10
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 23:07:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 379711FC16
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 23:08:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727095AbfEOVHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 17:07:37 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:37441 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726730AbfEOVHg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 May 2019 17:07:36 -0400
-Received: by mail-ot1-f65.google.com with SMTP id r10so1418108otd.4
-        for <kvm@vger.kernel.org>; Wed, 15 May 2019 14:07:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=zEAiaEFTDEo5AHTXNi1igG//m3yl73MYATUt/TyQM/s=;
-        b=JldDYW+LTAR5BoMmvzt3GhFBKSNFCQljO95A7CQF8h7lezT59wkCmoZR8HlZNeo3ZX
-         ACz18is11PqZLJkpbZTbPrVApVsXuwCwQzpumDKhMYUGYyeEKSs4shc89Funjj7rmnrR
-         zPCblVOMVW4B/FdfDdDBm0eQtlDpcEoDreFJYHB2TrhXh9porw+VCF0gkgtOPIdPF4AY
-         hPK/m0cAXNVhKubNUJt+B+Ge41ks183CJ7yggGXayFgFqQhy+nfr59BSRoNiAIUor77P
-         UmqXqpMAHdjAUWsPGhNLbi9iUpZ9FsKZwds3Nd3zmasJxQ+15Rm38l4yGAgNrmpf7grH
-         OFBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=zEAiaEFTDEo5AHTXNi1igG//m3yl73MYATUt/TyQM/s=;
-        b=ijQu5dXSNkTzcLimCwrphkl3l7QUwLftwqDVVgYP4xiTENeD2wKImGXMZIOK5elTbt
-         8XjNFMu3gt2GkELvWLSsmUb9iI3Vgf2DVWtRfluwvVpCRL/oQmAnWJ+9mw52ZZmoVVcX
-         fr/CVyTjO2S6SARnf+MLjj2Q527LgDn07zH/oUA/qjJwgysfFDqtfo35CYmntHWAWNDi
-         nOoN+TaX1yWud+Q53oIvWzIF7geXGqIBK12feHkPHXinhk2IYKTGTpV6Ql0/n+KqEVi1
-         cZUaHPPmGmaeWz98jpctfv5vwNyTgfJLiFDQPEfGqSWPsv4CN2Sy8vuy2T5F3aauoSoH
-         QA+g==
-X-Gm-Message-State: APjAAAUaCvG+bxxc3fGFkEjsfKOEUNk4Tq6DoqFvSt+vM2DCvbLT1WXL
-        L0FV/fiVbJmTivLck23sqAlrVS9Z/hRHwMQXq5W4vg==
-X-Google-Smtp-Source: APXvYqyDA/EWUSXzmLh3QyRTwliJkHZQ726n1NRYV2Be3duzD6pV8jVLvRmpMo63mBrfvCQmmCONZIUwdUcOhHdo8aI=
-X-Received: by 2002:a05:6830:14d3:: with SMTP id t19mr27993804otq.57.1557954454945;
- Wed, 15 May 2019 14:07:34 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190514145422.16923-1-pagupta@redhat.com> <20190514145422.16923-2-pagupta@redhat.com>
-In-Reply-To: <20190514145422.16923-2-pagupta@redhat.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Wed, 15 May 2019 14:07:23 -0700
-Message-ID: <CAPcyv4gEr_zPJEQp3k89v2UXfHp9PQwnJXY+W99HwXfxpvua_w@mail.gmail.com>
-Subject: Re: [PATCH v9 1/7] libnvdimm: nd_region flush callback support
-To:     Pankaj Gupta <pagupta@redhat.com>
-Cc:     linux-nvdimm <linux-nvdimm@lists.01.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        id S1726580AbfEOVI5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 17:08:57 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50832 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726566AbfEOVI5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 May 2019 17:08:57 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4FL3D94000912
+        for <kvm@vger.kernel.org>; Wed, 15 May 2019 17:08:56 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sgsq9huee-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 15 May 2019 17:08:55 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Wed, 15 May 2019 22:08:53 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 15 May 2019 22:08:49 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4FL8mis58261712
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 May 2019 21:08:48 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 169E94C052;
+        Wed, 15 May 2019 21:08:48 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4FA2F4C059;
+        Wed, 15 May 2019 21:08:47 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.21.52])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 15 May 2019 21:08:47 +0000 (GMT)
+Date:   Wed, 15 May 2019 23:08:17 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     "Jason J. Herne" <jjherne@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
         virtualization@lists.linux-foundation.org,
-        KVM list <kvm@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux ACPI <linux-acpi@vger.kernel.org>,
-        Qemu Developers <qemu-devel@nongnu.org>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        Ross Zwisler <zwisler@kernel.org>,
-        Vishal L Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
         Christoph Hellwig <hch@infradead.org>,
-        Len Brown <lenb@kernel.org>, Jan Kara <jack@suse.cz>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        lcapitulino@redhat.com, Kevin Wolf <kwolf@redhat.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        jmoyer <jmoyer@redhat.com>,
-        Nitesh Narayan Lal <nilal@redhat.com>,
-        Rik van Riel <riel@surriel.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        david <david@fromorbit.com>, cohuck@redhat.com,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Adam Borowski <kilobyte@angband.pl>,
-        yuval shaia <yuval.shaia@oracle.com>, jstaron@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>
+Subject: Re: [PATCH 06/10] s390/cio: add basic protected virtualization
+ support
+In-Reply-To: <d0ffefec-a14e-ee83-0aae-df288c3ffda4@linux.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+        <20190426183245.37939-7-pasic@linux.ibm.com>
+        <20190513114136.783c851c.cohuck@redhat.com>
+        <d0ffefec-a14e-ee83-0aae-df288c3ffda4@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19051521-0008-0000-0000-000002E71637
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051521-0009-0000-0000-00002253B73F
+Message-Id: <20190515230817.2f8a8a5d.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-15_15:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905150128
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 14, 2019 at 7:55 AM Pankaj Gupta <pagupta@redhat.com> wrote:
->
-> This patch adds functionality to perform flush from guest
-> to host over VIRTIO. We are registering a callback based
-> on 'nd_region' type. virtio_pmem driver requires this special
-> flush function. For rest of the region types we are registering
-> existing flush function. Report error returned by host fsync
-> failure to userspace.
->
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> ---
->  drivers/acpi/nfit/core.c     |  4 ++--
->  drivers/nvdimm/claim.c       |  6 ++++--
->  drivers/nvdimm/nd.h          |  1 +
->  drivers/nvdimm/pmem.c        | 13 ++++++++-----
->  drivers/nvdimm/region_devs.c | 26 ++++++++++++++++++++++++--
->  include/linux/libnvdimm.h    |  8 +++++++-
->  6 files changed, 46 insertions(+), 12 deletions(-)
->
-> diff --git a/drivers/acpi/nfit/core.c b/drivers/acpi/nfit/core.c
-> index 5a389a4f4f65..08dde76cf459 100644
-> --- a/drivers/acpi/nfit/core.c
-> +++ b/drivers/acpi/nfit/core.c
-> @@ -2434,7 +2434,7 @@ static void write_blk_ctl(struct nfit_blk *nfit_blk=
-, unsigned int bw,
->                 offset =3D to_interleave_offset(offset, mmio);
->
->         writeq(cmd, mmio->addr.base + offset);
-> -       nvdimm_flush(nfit_blk->nd_region);
-> +       nvdimm_flush(nfit_blk->nd_region, NULL);
->
->         if (nfit_blk->dimm_flags & NFIT_BLK_DCR_LATCH)
->                 readq(mmio->addr.base + offset);
-> @@ -2483,7 +2483,7 @@ static int acpi_nfit_blk_single_io(struct nfit_blk =
-*nfit_blk,
->         }
->
->         if (rw)
-> -               nvdimm_flush(nfit_blk->nd_region);
-> +               nvdimm_flush(nfit_blk->nd_region, NULL);
->
->         rc =3D read_blk_stat(nfit_blk, lane) ? -EIO : 0;
->         return rc;
-> diff --git a/drivers/nvdimm/claim.c b/drivers/nvdimm/claim.c
-> index fb667bf469c7..13510bae1e6f 100644
-> --- a/drivers/nvdimm/claim.c
-> +++ b/drivers/nvdimm/claim.c
-> @@ -263,7 +263,7 @@ static int nsio_rw_bytes(struct nd_namespace_common *=
-ndns,
->         struct nd_namespace_io *nsio =3D to_nd_namespace_io(&ndns->dev);
->         unsigned int sz_align =3D ALIGN(size + (offset & (512 - 1)), 512)=
-;
->         sector_t sector =3D offset >> 9;
-> -       int rc =3D 0;
-> +       int rc =3D 0, ret =3D 0;
->
->         if (unlikely(!size))
->                 return 0;
-> @@ -301,7 +301,9 @@ static int nsio_rw_bytes(struct nd_namespace_common *=
-ndns,
->         }
->
->         memcpy_flushcache(nsio->addr + offset, buf, size);
-> -       nvdimm_flush(to_nd_region(ndns->dev.parent));
-> +       ret =3D nvdimm_flush(to_nd_region(ndns->dev.parent), NULL);
-> +       if (ret)
-> +               rc =3D ret;
->
->         return rc;
->  }
-> diff --git a/drivers/nvdimm/nd.h b/drivers/nvdimm/nd.h
-> index a5ac3b240293..0c74d2428bd7 100644
-> --- a/drivers/nvdimm/nd.h
-> +++ b/drivers/nvdimm/nd.h
-> @@ -159,6 +159,7 @@ struct nd_region {
->         struct badblocks bb;
->         struct nd_interleave_set *nd_set;
->         struct nd_percpu_lane __percpu *lane;
-> +       int (*flush)(struct nd_region *nd_region, struct bio *bio);
+On Tue, 14 May 2019 10:47:34 -0400
+"Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 
-So this triggers:
+> On 5/13/19 5:41 AM, Cornelia Huck wrote:
+> > On Fri, 26 Apr 2019 20:32:41 +0200
+> > Halil Pasic <pasic@linux.ibm.com> wrote:
+> > 
+> >> As virtio-ccw devices are channel devices, we need to use the dma area
+> >> for any communication with the hypervisor.
+> >>
+> >> This patch addresses the most basic stuff (mostly what is required for
+> >> virtio-ccw), and does take care of QDIO or any devices.
+> > 
+> > "does not take care of QDIO", surely? (Also, what does "any devices"
+> > mean? Do you mean "every arbitrary device", perhaps?)
+> > 
+> >>
+> >> An interesting side effect is that virtio structures are now going to
+> >> get allocated in 31 bit addressable storage.
+> > 
+> > Hm...
+> > 
+> >>
+> >> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> >> ---
+> >>   arch/s390/include/asm/ccwdev.h   |  4 +++
+> >>   drivers/s390/cio/ccwreq.c        |  8 ++---
+> >>   drivers/s390/cio/device.c        | 65 +++++++++++++++++++++++++++++++++-------
+> >>   drivers/s390/cio/device_fsm.c    | 40 ++++++++++++-------------
+> >>   drivers/s390/cio/device_id.c     | 18 +++++------
+> >>   drivers/s390/cio/device_ops.c    | 21 +++++++++++--
+> >>   drivers/s390/cio/device_pgid.c   | 20 ++++++-------
+> >>   drivers/s390/cio/device_status.c | 24 +++++++--------
+> >>   drivers/s390/cio/io_sch.h        | 21 +++++++++----
+> >>   drivers/s390/virtio/virtio_ccw.c | 10 -------
+> >>   10 files changed, 148 insertions(+), 83 deletions(-)
+> > 
+> > (...)
+> > 
+> >> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
+> >> index 6d989c360f38..bb7a92316fc8 100644
+> >> --- a/drivers/s390/virtio/virtio_ccw.c
+> >> +++ b/drivers/s390/virtio/virtio_ccw.c
+> >> @@ -66,7 +66,6 @@ struct virtio_ccw_device {
+> >>   	bool device_lost;
+> >>   	unsigned int config_ready;
+> >>   	void *airq_info;
+> >> -	u64 dma_mask;
+> >>   };
+> >>   
+> >>   struct vq_info_block_legacy {
+> >> @@ -1255,16 +1254,7 @@ static int virtio_ccw_online(struct ccw_device *cdev)
+> >>   		ret = -ENOMEM;
+> >>   		goto out_free;
+> >>   	}
+> >> -
+> >>   	vcdev->vdev.dev.parent = &cdev->dev;
+> >> -	cdev->dev.dma_mask = &vcdev->dma_mask;
+> >> -	/* we are fine with common virtio infrastructure using 64 bit DMA */
+> >> -	ret = dma_set_mask_and_coherent(&cdev->dev, DMA_BIT_MASK(64));
+> >> -	if (ret) {
+> >> -		dev_warn(&cdev->dev, "Failed to enable 64-bit DMA.\n");
+> >> -		goto out_free;
+> >> -	}
+> > 
+> > This means that vring structures now need to fit into 31 bits as well,
+> > I think? Is there any way to reserve the 31 bit restriction for channel
+> > subsystem structures and keep vring in the full 64 bit range? (Or am I
+> > fundamentally misunderstanding something?)
+> > 
+> 
+> I hope I've understood everything... I'm new to virtio. But from what I'm understanding, 
+> the vring structure (a.k.a. the VirtQueue) needs to be accessed and modified by both host 
+> and guest. Therefore the page(s) holding that data need to be marked shared if using 
+> protected virtualization. This patch set makes use of DMA pages by way of swiotlb (always 
+> below 32-bit line right?) for shared memory.
 
-In file included from drivers/nvdimm/e820.c:7:
-./include/linux/libnvdimm.h:140:51: warning: =E2=80=98struct bio=E2=80=99 d=
-eclared
-inside parameter list will not be visible outside of this definition
-or declaration
-  int (*flush)(struct nd_region *nd_region, struct bio *bio);
-                                                   ^~~
-I was already feeling uneasy about trying to squeeze this into v5.2,
-but this warning and the continued drip of comments leads me to
-conclude that this driver would do well to wait one more development
-cycle. Lets close out the final fixups and let this driver soak in
--next. Then for the v5.3 cycle I'll redouble my efforts towards the
-goal of closing patch acceptance at the -rc6 / -rc7 development
-milestone.
+The last sentence is wrong. You have to differentiate between stuff that
+is mapped as DMA and that is allocated as DMA. The mapped stuff is
+handled via swiotlb and bouncing. But that can not work for vring stuff
+which needs to be allocated as DMA.
+
+> Therefore, a side effect is that all shared 
+> memory, including VirtQueue data will be in the DMA zone and in 32-bit memory.
+> 
+
+Consequently wrong. The reason I explained in a reply to Connie (see
+there).
+
+> I don't see any restrictions on sharing pages above the 32-bit line. So it seems possible. 
+> I'm not sure how much more work it would be. I wonder if Halil has considered this?
+
+I did consider this, the RFC was doing this (again see other mail).
+
+> Are we 
+> worried that virtio data structures are going to be a burden on the 31-bit address space?
+> 
+> 
+
+That is a good question I can not answer. Since it is currently at least
+a page per queue (because we use dma direct, right Mimu?), I am concerned
+about this.
+
+Connie, what is your opinion?
+
+Regards,
+Halil
+
