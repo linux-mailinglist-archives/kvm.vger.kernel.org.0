@@ -2,29 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 230751F86D
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 18:22:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D38FA1F876
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 18:25:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726861AbfEOQWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 12:22:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43896 "EHLO mx1.redhat.com"
+        id S1726511AbfEOQZF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 12:25:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40774 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725953AbfEOQWU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 May 2019 12:22:20 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        id S1726422AbfEOQZE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 May 2019 12:25:04 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B5ADF356DF;
-        Wed, 15 May 2019 16:22:19 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4F6C38553B;
+        Wed, 15 May 2019 16:25:04 +0000 (UTC)
 Received: from [10.40.205.57] (unknown [10.40.205.57])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 071865D71E;
-        Wed, 15 May 2019 16:22:15 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 1/2] powerpc: Allow for a custom decr
- value to be specified to load on decr excp
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 22B579CCA;
+        Wed, 15 May 2019 16:25:01 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 2/2] powerpc: Make h_cede_tm test run by
+ default
 To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
         kvm@vger.kernel.org
 Cc:     kvm-ppc@vger.kernel.org, thuth@redhat.com, dgibson@redhat.com
 References: <20190515002801.20517-1-sjitindarsingh@gmail.com>
+ <20190515002801.20517-2-sjitindarsingh@gmail.com>
 From:   Laurent Vivier <lvivier@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
@@ -69,123 +70,46 @@ Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
  oDqSoLt5w9GoQQ6gDVP2ZjTWqwSRMLzNr37rJjZ1pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyx
  FCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbLXiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsB
  kmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZD+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <132d5cba-1b9e-0be9-848b-676848af7c48@redhat.com>
-Date:   Wed, 15 May 2019 18:22:13 +0200
+Message-ID: <4f78cbdc-139a-33bd-3712-4dfe381ce9b7@redhat.com>
+Date:   Wed, 15 May 2019 18:25:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190515002801.20517-1-sjitindarsingh@gmail.com>
+In-Reply-To: <20190515002801.20517-2-sjitindarsingh@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Wed, 15 May 2019 16:22:19 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Wed, 15 May 2019 16:25:04 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 15/05/2019 02:28, Suraj Jitindar Singh wrote:
-> Currently the handler for a decrementer exception will simply reload the
-> maximum value (0x7FFFFFFF), which will take ~4 seconds to expire again.
-> This means that if a vcpu cedes, it will be ~4 seconds between wakeups.
-> 
-> The h_cede_tm test is testing a known breakage when a guest cedes while
-> suspended. To be sure we cede 500 times to check for the bug. However
-> since it takes ~4 seconds to be woken up once we've ceded, we only get
-> through ~20 iterations before we reach the 90 seconds timeout and the
-> test appears to fail.
-> 
-> Add an option when registering the decrementer handler to specify the
-> value which should be reloaded by the handler, allowing the timeout to be
-> chosen.
-> 
-> Modify the spr test to use the max timeout to preserve existing
-> behaviour.
-> Modify the h_cede_tm test to use a 10ms timeout to ensure we can perform
-> 500 iterations before hitting the 90 second time limit for a test.
-> 
-> This means the h_cede_tm test now succeeds rather than timing out.
+> This test was initially designed to test for a known bug where
+> performing a sequence of H_CEDE hcalls while suspended would cause a
+> vcpu to lockup in the host. The fix has been available for some time
+> now, so to increase coverage of this test remove the no-default flag.
 > 
 > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> 
 > ---
+>  powerpc/unittests.cfg | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> V1 -> V2:
-> - Make decr variables static
-> - Load intial decr value in tm test to ensure known value present
-> ---
->  lib/powerpc/handlers.c | 7 ++++---
->  powerpc/sprs.c         | 5 +++--
->  powerpc/tm.c           | 4 +++-
->  3 files changed, 10 insertions(+), 6 deletions(-)
-> 
-> diff --git a/lib/powerpc/handlers.c b/lib/powerpc/handlers.c
-> index be8226a..c8721e0 100644
-> --- a/lib/powerpc/handlers.c
-> +++ b/lib/powerpc/handlers.c
-> @@ -12,11 +12,12 @@
+> diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
+> index af535b7..1e74948 100644
+> --- a/powerpc/unittests.cfg
+> +++ b/powerpc/unittests.cfg
+> @@ -64,7 +64,7 @@ file = emulator.elf
+>  file = tm.elf
+>  smp = 2,threads=2
+>  extra_params = -machine cap-htm=on -append "h_cede_tm"
+> -groups = nodefault,h_cede_tm
+> +groups = h_cede_tm
 >  
->  /*
->   * Generic handler for decrementer exceptions (0x900)
-> - * Just reset the decrementer back to its maximum value (0x7FFFFFFF)
-> + * Just reset the decrementer back to the value specified when registering the
-> + * handler
->   */
-> -void dec_except_handler(struct pt_regs *regs __unused, void *data __unused)
-> +void dec_except_handler(struct pt_regs *regs __unused, void *data)
->  {
-> -	uint32_t dec = 0x7FFFFFFF;
-> +	uint64_t dec = *((uint64_t *) data);
->  
->  	asm volatile ("mtdec %0" : : "r" (dec));
->  }
-> diff --git a/powerpc/sprs.c b/powerpc/sprs.c
-> index 6744bd8..0e2e1c9 100644
-> --- a/powerpc/sprs.c
-> +++ b/powerpc/sprs.c
-> @@ -253,6 +253,7 @@ int main(int argc, char **argv)
->  		0x1234567890ABCDEFULL, 0xFEDCBA0987654321ULL,
->  		-1ULL,
->  	};
-> +	static uint64_t decr = 0x7FFFFFFF; /* Max value */
->  
->  	for (i = 1; i < argc; i++) {
->  		if (!strcmp(argv[i], "-w")) {
-> @@ -288,8 +289,8 @@ int main(int argc, char **argv)
->  		(void) getchar();
->  	} else {
->  		puts("Sleeping...\n");
-> -		handle_exception(0x900, &dec_except_handler, NULL);
-> -		asm volatile ("mtdec %0" : : "r" (0x3FFFFFFF));
-> +		handle_exception(0x900, &dec_except_handler, &decr);
-> +		asm volatile ("mtdec %0" : : "r" (decr));
-
-why do you replace the 0x3FFFFFFF by decr which is 0x7FFFFFFF?
-
->  		hcall(H_CEDE);
->  	}
->  
-> diff --git a/powerpc/tm.c b/powerpc/tm.c
-> index bd56baa..c588985 100644
-> --- a/powerpc/tm.c
-> +++ b/powerpc/tm.c
-> @@ -95,11 +95,13 @@ static bool enable_tm(void)
->  static void test_h_cede_tm(int argc, char **argv)
->  {
->  	int i;
-> +	static uint64_t decr = 0x3FFFFF; /* ~10ms */
->  
->  	if (argc > 2)
->  		report_abort("Unsupported argument: '%s'", argv[2]);
->  
-> -	handle_exception(0x900, &dec_except_handler, NULL);
-> +	handle_exception(0x900, &dec_except_handler, &decr);
-> +	asm volatile ("mtdec %0" : : "r" (decr));
->  
->  	if (!start_all_cpus(halt, 0))
->  		report_abort("Failed to start secondary cpus");
+>  [sprs]
+>  file = sprs.elf
 > 
 
-Thanks,
-Laurent
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
