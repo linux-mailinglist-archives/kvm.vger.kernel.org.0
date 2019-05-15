@@ -2,187 +2,267 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ECC0A1FA36
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 20:48:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E8491FAD9
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 21:31:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726495AbfEOSsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 14:48:35 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:35116 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726392AbfEOSsf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 May 2019 14:48:35 -0400
-Received: by mail-wr1-f68.google.com with SMTP id m3so457478wrv.2
-        for <kvm@vger.kernel.org>; Wed, 15 May 2019 11:48:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=De9JgMDQ06C9LaVnjG7+zOeHQpYKMqwwpbwqcPz8V5U=;
-        b=BQWI996fVw7OTB8DdCwvT9SjVH0lI2fCp4H4sAay7cJdGHZtqY5y2qYWJ9EFnC3XKN
-         blPS7wANmq+zIOqlC7wLV/IA/YJ23oqoDP/bKUoaiQB27a8BNbYsYVjsicw58ABEKSl6
-         kKGgx//zq5Pa5SX25yPZW58jjpxpRwIgs9OSBVMq0SwzUIfGkPlk+/7yH9t2M1JT0uyW
-         64sZiJhFrLiyd3H4fbNU/BqOVmdCnAl0mq9emWTnp7OhM8kQLuXADyVJAGeFV8ONmZ11
-         XckQGhitGsQ5Ml6E0yZ5b3W52EzSaH6SY0zwZ9Gbd1L/lY8+4w0EMYx1CycE4FIN8cGH
-         jLsQ==
-X-Gm-Message-State: APjAAAUXFcFwOBhMFshAjqEeppLNcaWQEsMtKcPWl6yKiq9QBZjZdNwq
-        cNwXy7O86SuwrQPrQCrCtU9Vna4nGaY=
-X-Google-Smtp-Source: APXvYqyCrswnIJuD6YiAXmuOSBdYdrYb44qjo/xkUBflvHhr3+nXv9Tx2+m82xzrh7RVGbBIJlLYdg==
-X-Received: by 2002:a5d:4109:: with SMTP id l9mr6245786wrp.204.1557946113135;
-        Wed, 15 May 2019 11:48:33 -0700 (PDT)
-Received: from vitty.brq.redhat.com (ip-62-245-115-84.net.upcbroadband.cz. [62.245.115.84])
-        by smtp.gmail.com with ESMTPSA id v137sm3232500wmf.28.2019.05.15.11.48.31
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 15 May 2019 11:48:32 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     Peter Shier <pshier@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com,
-        Jim Mattson <jmattson@google.com>,
-        Marc Orr <marcorr@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 2/3] KVM: nVMX: KVM_SET_NESTED_STATE - Tear down old EVMCS state before setting new state
-In-Reply-To: <CAAAPnDHPCztgDCCKkaux=2=Fr-YrVhARR_8qrdYo-+AT3CQ+LQ@mail.gmail.com>
-References: <20190502183133.258026-1-aaronlewis@google.com> <87zho37s2h.fsf@vitty.brq.redhat.com> <CAAAPnDHJ=ZC+CoKYkYkRsv+WJJjHJ66iN6jU72spL3+LckUpvA@mail.gmail.com> <878svgsovg.fsf@vitty.brq.redhat.com> <CAAAPnDFsixYb2R-0uN-_DCEb4U-MEo0Pd1hmFzpqqAojc9GxXA@mail.gmail.com> <CAAAPnDHPCztgDCCKkaux=2=Fr-YrVhARR_8qrdYo-+AT3CQ+LQ@mail.gmail.com>
-Date:   Wed, 15 May 2019 14:48:31 -0400
-Message-ID: <87bm03mu4g.fsf@vitty.brq.redhat.com>
+        id S1727502AbfEOT1d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 15:27:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54120 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726260AbfEOT1d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 May 2019 15:27:33 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 37CD030B96FD;
+        Wed, 15 May 2019 19:27:32 +0000 (UTC)
+Received: from horse.redhat.com (unknown [10.18.25.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C0D185D9CC;
+        Wed, 15 May 2019 19:27:29 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 556DC220386; Wed, 15 May 2019 15:27:29 -0400 (EDT)
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-nvdimm@lists.01.org
+Cc:     vgoyal@redhat.com, miklos@szeredi.hu, stefanha@redhat.com,
+        dgilbert@redhat.com, swhiteho@redhat.com
+Subject: [PATCH v2 00/30] [RFC] virtio-fs: shared file system for virtual machines
+Date:   Wed, 15 May 2019 15:26:45 -0400
+Message-Id: <20190515192715.18000-1-vgoyal@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Wed, 15 May 2019 19:27:32 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Aaron Lewis <aaronlewis@google.com> writes:
+Hi,
 
-> On Wed, May 8, 2019 at 2:18 PM Aaron Lewis <aaronlewis@google.com> wrote:
->>
->> From: Vitaly Kuznetsov <vkuznets@redhat.com>
->> Date: Wed, May 8, 2019 at 12:55 PM
->> To: Aaron Lewis
->> Cc: Peter Shier, Paolo Bonzini, <rkrcmar@redhat.com>, Jim Mattson,
->> Marc Orr, <kvm@vger.kernel.org>
->>
->> > Aaron Lewis <aaronlewis@google.com> writes:
->> >
->> > > From: Vitaly Kuznetsov <vkuznets@redhat.com>
->> > > Date: Fri, May 3, 2019 at 3:25 AM
->> > > To: Aaron Lewis
->> > > Cc: Peter Shier, <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
->> > > <jmattson@google.com>, <marcorr@google.com>, <kvm@vger.kernel.org>
->> > >
->> > >> Aaron Lewis <aaronlewis@google.com> writes:
->> > >>
->> > >> > Move call to nested_enable_evmcs until after free_nested() is complete.
->> > >> >
->> > >> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
->> > >> > Reviewed-by: Marc Orr <marcorr@google.com>
->> > >> > Reviewed-by: Peter Shier <pshier@google.com>
->> > >> > ---
->> > >> >  arch/x86/kvm/vmx/nested.c | 6 +++---
->> > >> >  1 file changed, 3 insertions(+), 3 deletions(-)
->> > >> >
->> > >> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> > >> > index 081dea6e211a..3b39c60951ac 100644
->> > >> > --- a/arch/x86/kvm/vmx/nested.c
->> > >> > +++ b/arch/x86/kvm/vmx/nested.c
->> > >> > @@ -5373,9 +5373,6 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->> > >> >       if (kvm_state->format != 0)
->> > >> >               return -EINVAL;
->> > >> >
->> > >> > -     if (kvm_state->flags & KVM_STATE_NESTED_EVMCS)
->> > >> > -             nested_enable_evmcs(vcpu, NULL);
->> > >> > -
->> > >> >       if (!nested_vmx_allowed(vcpu))
->> > >> >               return kvm_state->vmx.vmxon_pa == -1ull ? 0 : -EINVAL;
->> > >> >
->> > >> > @@ -5417,6 +5414,9 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->> > >> >       if (kvm_state->vmx.vmxon_pa == -1ull)
->> > >> >               return 0;
->> > >> >
->> > >> > +     if (kvm_state->flags & KVM_STATE_NESTED_EVMCS)
->> > >> > +             nested_enable_evmcs(vcpu, NULL);
->> > >> > +
->> > >> >       vmx->nested.vmxon_ptr = kvm_state->vmx.vmxon_pa;
->> > >> >       ret = enter_vmx_operation(vcpu);
->> > >> >       if (ret)
->> > >>
->> > >> nested_enable_evmcs() doesn't do much, actually, in case it was
->> > >> previously enabled it doesn't do anything and in case it wasn't ordering
->> > >> with free_nested() (where you're aiming at nested_release_evmcs() I
->> > >> would guess) shouldn't matter. So could you please elaborate (better in
->> > >> the commit message) why do we need this re-ordered? My guess is that
->> > >> you'd like to perform checks for e.g. 'vmx.vmxon_pa == -1ull' before
->> > >> we actually start doing any changes but let's clarify that.
->> > >>
->> > >> Thanks!
->> > >>
->> > >> --
->> > >> Vitaly
->> > >
->> > > There are two reasons for doing this:
->> > > 1. We don't want to set new state if we are going to leave nesting and
->> > > exit the function (ie: vmx.vmxon_pa = -1), like you pointed out.
->> > > 2. To be more future proof, we don't want to set new state before
->> > > tearing down state.  This could cause conflicts down the road.
->> > >
->> > > I can add this to the commit message if there are no objections to
->> > > these points.
->> >
->> > Sounds good to me, please do. Thanks!
->> >
->> > --
->> > Vitaly
->>
->> Here is the updated patch:
->>
->>
->> Move call to nested_enable_evmcs until after free_nested() is
->> complete.  There are two reasons for doing this:
->> 1. We don't want to set new state if we are going to leave nesting and
->> exit the function (ie: vmx.vmxon_pa = -1).
->> 2. To be more future proof, we don't want to set new state before
->> tearing down state.  This could cause conflicts down the road.
->>
->> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
->> Reviewed-by: Marc Orr <marcorr@google.com>
->> Reviewed-by: Peter Shier <pshier@google.com>
->> ---
->>  arch/x86/kvm/vmx/nested.c | 6 +++---
->>  1 file changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index fe5814df5149..6ecc301df874 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -5373,9 +5373,6 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->>   if (kvm_state->format != 0)
->>   return -EINVAL;
->>
->> - if (kvm_state->flags & KVM_STATE_NESTED_EVMCS)
->> - nested_enable_evmcs(vcpu, NULL);
->> -
->>   if (!nested_vmx_allowed(vcpu))
->>   return kvm_state->vmx.vmxon_pa == -1ull ? 0 : -EINVAL;
->>
->> @@ -5417,6 +5414,9 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->>   if (kvm_state->vmx.vmxon_pa == -1ull)
->>   return 0;
->>
->> + if (kvm_state->flags & KVM_STATE_NESTED_EVMCS)
->> + nested_enable_evmcs(vcpu, NULL);
->> +
->>   vmx->nested.vmxon_ptr = kvm_state->vmx.vmxon_pa;
->>   ret = enter_vmx_operation(vcpu);
->>   if (ret)
->
-> Hi Vitaly,
->
-> Does this update look good or are any other changes needed?
->
+Here are the RFC patches for V2 of virtio-fs. These patches apply on top
+of 5.1 kernel. These patches are also available here.
 
-Hi Aaron,
+https://github.com/rhvgoyal/linux/commits/virtio-fs-dev-5.1
+  
+Patches for V1 were posted here.
+  
+https://lwn.net/ml/linux-fsdevel/20181210171318.16998-1-vgoyal@redhat.com/
 
-my apologies for not replying earlier. The changelog looks good to me
-now, thanks!
+This is still work in progress. As of now one can passthrough a host
+directory in to guest and it works reasonably well. pjdfstests test
+suite passes and blogbench runs. But this dirctory can't be shared
+between guests and host can't modify files in directory yet.  That's
+still TBD.
+  
+Posting another version to gather feedback and comments on progress so far.
+  
+More information about the project can be found here.
+  
+https://virtio-fs.gitlab.io/
+
+Changes from V1
+===============
+- Various bug fixes
+- virtio-fs dax huge page size working, leading to improved performance.
+- Fixed kernel automated tests warnings.
+- Better handling of shared cache region reporting by virtio device.
+
+Description from V1 posting
+---------------------------
+Problem Description
+===================
+We want to be able to take a directory tree on the host and share it with
+guest[s]. Our goal is to be able to do it in a fast, consistent and secure
+manner. Our primary use case is kata containers, but it should be usable in
+other scenarios as well.
+
+Containers may rely on local file system semantics for shared volumes,
+read-write mounts that multiple containers access simultaneously.  File
+system changes must be visible to other containers with the same consistency
+expected of a local file system, including mmap MAP_SHARED.
+
+Existing Solutions
+==================
+We looked at existing solutions and virtio-9p already provides basic shared
+file system functionality although does not offer local file system semantics,
+causing some workloads and test suites to fail. In addition, virtio-9p
+performance has been an issue for Kata Containers and we believe this cannot
+be alleviated without major changes that do not fit into the 9P protocol.
+
+Design Overview
+===============
+With the goal of designing something with better performance and local file
+system semantics, a bunch of ideas were proposed.
+
+- Use fuse protocol (instead of 9p) for communication between guest
+  and host. Guest kernel will be fuse client and a fuse server will
+  run on host to serve the requests. Benchmark results are encouraging and
+  show this approach performs well (2x to 8x improvement depending on test
+  being run).
+
+- For data access inside guest, mmap portion of file in QEMU address
+  space and guest accesses this memory using dax. That way guest page
+  cache is bypassed and there is only one copy of data (on host). This
+  will also enable mmap(MAP_SHARED) between guests.
+
+- For metadata coherency, there is a shared memory region which contains
+  version number associated with metadata and any guest changing metadata
+  updates version number and other guests refresh metadata on next
+  access. This is yet to be implemented.
+
+How virtio-fs differs from existing approaches
+==============================================
+The unique idea behind virtio-fs is to take advantage of the co-location
+of the virtual machine and hypervisor to avoid communication (vmexits).
+
+DAX allows file contents to be accessed without communication with the
+hypervisor. The shared memory region for metadata avoids communication in
+the common case where metadata is unchanged.
+
+By replacing expensive communication with cheaper shared memory accesses,
+we expect to achieve better performance than approaches based on network
+file system protocols. In addition, this also makes it easier to achieve
+local file system semantics (coherency).
+
+These techniques are not applicable to network file system protocols since
+the communications channel is bypassed by taking advantage of shared memory
+on a local machine. This is why we decided to build virtio-fs rather than
+focus on 9P or NFS.
+
+HOWTO
+======
+We have put instructions on how to use it here.
+
+https://virtio-fs.gitlab.io/
+
+Caching Modes
+=============
+Like virtio-9p, different caching modes are supported which determine the
+coherency level as well. The “cache=FOO” and “writeback” options control the
+level of coherence between the guest and host filesystems. The “shared” option
+only has an effect on coherence between virtio-fs filesystem instances
+running inside different guests.
+
+- cache=none
+  metadata, data and pathname lookup are not cached in guest. They are always
+  fetched from host and any changes are immediately pushed to host.
+
+- cache=always
+  metadata, data and pathname lookup are cached in guest and never expire.
+
+- cache=auto
+  metadata and pathname lookup cache expires after a configured amount of time
+  (default is 1 second). Data is cached while the file is open (close to open
+  consistency).
+
+- writeback/no_writeback
+  These options control the writeback strategy.  If writeback is disabled,
+  then normal writes will immediately be synchronized with the host fs. If
+  writeback is enabled, then writes may be cached in the guest until the file
+  is closed or an fsync(2) performed. This option has no effect on mmap-ed
+  writes or writes going through the DAX mechanism.
+
+- shared/no_shared
+  These options control the  use of the shared version table. If shared mode
+  is enabled then metadata and pathname lookup is cached in guest, but is
+  refreshed due to changes in another virtio-fs instance.
+
+DAX
+===
+- dax can be turned on/off when mounting virtio-fs inside guest.
+
+TODO
+====
+- Implement "cache=shared" option.
+- Improve error handling on host. If page fault on host fails, we need
+  to propagate it into guest.
+- Try to fine tune for performance.
+- Bug fixes
+
+RESULTS
+=======
+- pjdfstests are passing. Have tried cache=none/auto/always and dax on/off).
+
+  https://github.com/pjd/pjdfstest
+
+  (one symlink test fails and that seems to be due xfs on host. Yet to
+   look into it).
+
+- Ran blogbench and that works too.
+
+Thanks
+Vivek  
+
+Miklos Szeredi (2):
+  fuse: delete dentry if timeout is zero
+  fuse: Use default_file_splice_read for direct IO
+
+Sebastien Boeuf (3):
+  virtio: Add get_shm_region method
+  virtio: Implement get_shm_region for PCI transport
+  virtio: Implement get_shm_region for MMIO transport
+
+Stefan Hajnoczi (10):
+  fuse: export fuse_end_request()
+  fuse: export fuse_len_args()
+  fuse: export fuse_get_unique()
+  fuse: extract fuse_fill_super_common()
+  fuse: add fuse_iqueue_ops callbacks
+  virtio_fs: add skeleton virtio_fs.ko module
+  dax: remove block device dependencies
+  fuse, dax: add fuse_conn->dax_dev field
+  virtio_fs, dax: Set up virtio_fs dax_device
+  fuse, dax: add DAX mmap support
+
+Vivek Goyal (15):
+  fuse: Clear setuid bit even in cache=never path
+  fuse: Export fuse_send_init_request()
+  fuse: Separate fuse device allocation and installation in fuse_conn
+  dax: Pass dax_dev to dax_writeback_mapping_range()
+  fuse: Keep a list of free dax memory ranges
+  fuse: Introduce setupmapping/removemapping commands
+  fuse, dax: Implement dax read/write operations
+  fuse: Define dax address space operations
+  fuse, dax: Take ->i_mmap_sem lock during dax page fault
+  fuse: Maintain a list of busy elements
+  fuse: Add logic to free up a memory range
+  fuse: Release file in process context
+  fuse: Reschedule dax free work if too many EAGAIN attempts
+  fuse: Take inode lock for dax inode truncation
+  virtio-fs: Do not provide abort interface in fusectl
+
+ drivers/dax/super.c                |    3 +-
+ drivers/virtio/virtio_mmio.c       |   32 +
+ drivers/virtio/virtio_pci_modern.c |  108 +++
+ fs/dax.c                           |   23 +-
+ fs/ext2/inode.c                    |    2 +-
+ fs/ext4/inode.c                    |    2 +-
+ fs/fuse/Kconfig                    |   11 +
+ fs/fuse/Makefile                   |    1 +
+ fs/fuse/control.c                  |    4 +-
+ fs/fuse/cuse.c                     |    5 +-
+ fs/fuse/dev.c                      |   80 +-
+ fs/fuse/dir.c                      |   28 +-
+ fs/fuse/file.c                     |  953 ++++++++++++++++++++++-
+ fs/fuse/fuse_i.h                   |  206 ++++-
+ fs/fuse/inode.c                    |  307 ++++++--
+ fs/fuse/virtio_fs.c                | 1129 ++++++++++++++++++++++++++++
+ fs/splice.c                        |    3 +-
+ fs/xfs/xfs_aops.c                  |    2 +-
+ include/linux/dax.h                |    6 +-
+ include/linux/fs.h                 |    2 +
+ include/linux/virtio_config.h      |   17 +
+ include/uapi/linux/fuse.h          |   34 +
+ include/uapi/linux/virtio_fs.h     |   44 ++
+ include/uapi/linux/virtio_ids.h    |    1 +
+ include/uapi/linux/virtio_mmio.h   |   11 +
+ include/uapi/linux/virtio_pci.h    |   10 +
+ 26 files changed, 2875 insertions(+), 149 deletions(-)
+ create mode 100644 fs/fuse/virtio_fs.c
+ create mode 100644 include/uapi/linux/virtio_fs.h
 
 -- 
-Vitaly
+2.20.1
+
