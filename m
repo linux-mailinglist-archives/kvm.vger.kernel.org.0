@@ -2,84 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E85E1FC58
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 23:41:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F27991FC59
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 23:41:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726876AbfEOVlA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 17:41:00 -0400
-Received: from mail-wr1-f49.google.com ([209.85.221.49]:32833 "EHLO
-        mail-wr1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726441AbfEOVlA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 May 2019 17:41:00 -0400
-Received: by mail-wr1-f49.google.com with SMTP id d9so1114556wrx.0
-        for <kvm@vger.kernel.org>; Wed, 15 May 2019 14:40:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=q3l2b5U5MnUONYDesPrYGDUO70H7doCCRIcVWaH0dmA=;
-        b=GtDPevip2pQ9HXnwzCC/GyiRhqM3EWDIGbNLKbBO7GsXGE0mydV3701KiDt/6yhk1x
-         9qLJWF6fmM+l5P2/NABlW/TBmFeY+ZmI/sr8pdRC+g+QQHsEn/e19OotWAgLB69UtvDe
-         F/LqmzYfVujTZ9QuEbIrpVoMN+bqS6IKLDoVaHin0hIy9JeC1BaoRGCcGgd6I9Fq/PTN
-         ihr6QS2so0aNbpHRTk/rnA7p4B7v6xFWslYcPIilVFYaAAa9eDY+0E5Q5vP40GXy2UuN
-         PVlr9S+5enZELnkf1KgxYrMauewY4jjj6wFE0OuPb5AYgg3sWFSc84xtU7CI+hP09yfq
-         msmA==
-X-Gm-Message-State: APjAAAWoo3c2fW4c/dP5UyWNrQMmJAQ+gxu37d+bUfieMoiTGDusfZfE
-        LfDt90Xm7fCvAEBGQuwoqMn0oQ==
-X-Google-Smtp-Source: APXvYqx5tmNLoLZ/z4emlsVi8ax44v2hTqGrnnTGREvFz9J4SA09qTosM85jMDvkNuhSpc656akCbQ==
-X-Received: by 2002:adf:dc08:: with SMTP id t8mr26132781wri.220.1557956458518;
-        Wed, 15 May 2019 14:40:58 -0700 (PDT)
-Received: from [172.10.18.228] (24-113-124-115.wavecable.com. [24.113.124.115])
-        by smtp.gmail.com with ESMTPSA id o6sm5110319wrh.55.2019.05.15.14.40.56
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 15 May 2019 14:40:57 -0700 (PDT)
-Subject: Re: [GIT PULL] Please pull my kvm-ppc-next-5.2-2 tag
-To:     Paul Mackerras <paulus@ozlabs.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org
-References: <20190514101327.GA13522@blackberry>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bcb4ef86-1bca-4f6a-2e31-eede09192672@redhat.com>
-Date:   Wed, 15 May 2019 23:40:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190514101327.GA13522@blackberry>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1727021AbfEOVlS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 17:41:18 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:36122 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726441AbfEOVlR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 May 2019 17:41:17 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4FLDvoU121102;
+        Wed, 15 May 2019 21:41:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=fzGVzml2ttQjCi7j3P1R3TQPk9G5RucsEVTnpsP7YK4=;
+ b=lTw90Zo1bQ7hvMB4ub+TivFKyKCTEjikQSQhWUufi85yr7apY8QMXZtHbP4rr+0+zH9P
+ Y1fOyO4q23riuFGeeibaulEIYMnvEPW14Bcz26GPCFIyrQMT54G6oauNDB9aHimFVECT
+ eLesV+PYGInIgxS5e75Pxj2To/1NGLpDbwZbWMvVoIsE8FgE5cHnC1HrxKJ05ELyoajm
+ t0WFxW2XoMyakzMUaIQrFHppll7trV++WK5BjBTEvbpcD5X/oDeStj/feHyudPA3Cw0r
+ 9Kt0RfzKZoM4GOXuDL+7JWY3NoL8hLehovtSFHhyYzgqqcGwThakZHLxt/QsUH17a3T/ hw== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2sdnttypbv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 May 2019 21:41:01 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4FLdWYG171665;
+        Wed, 15 May 2019 21:41:00 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 2sgp32mp43-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 May 2019 21:41:00 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4FLexCi025994;
+        Wed, 15 May 2019 21:40:59 GMT
+Received: from [10.74.124.190] (/10.74.124.190)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 15 May 2019 21:40:59 +0000
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH kvm-unit-tests] vmware_backdoors: run with -cpu host
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <1557956157-40196-1-git-send-email-pbonzini@redhat.com>
+Date:   Thu, 16 May 2019 00:40:56 +0300
+Cc:     kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <6B5FAFDD-B593-4AFF-A0B1-EBE64C5BDDA6@oracle.com>
+References: <1557956157-40196-1-git-send-email-pbonzini@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9258 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905150129
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9258 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905150129
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/05/19 12:13, Paul Mackerras wrote:
-> Paolo, Radim,
-> 
-> I have added 3 more commits to my kvm-ppc-next tree, for various fixes
-> that have come in recently.  There is one bug fix, one spelling fix,
-> and one commit that removes some code that does nothing.  The net
-> result is 12 fewer lines of code in the kernel. :)
-> 
-> If you pull this tag and not the earlier kvm-ppc-next-5.2-1 tag, you
-> might want to include the text from that tag in the commit message.
-> That text is:
-> 
-> "
-> PPC KVM update for 5.2
-> 
-> * Support for guests to access the new POWER9 XIVE interrupt controller
->   hardware directly, reducing interrupt latency and overhead for guests.
-> 
-> * In-kernel implementation of the H_PAGE_INIT hypercall.
-> 
-> * Reduce memory usage of sparsely-populated IOMMU tables.
-> 
-> * Several bug fixes.
 
-Pulled, thanks.  Sorry for not following up on this before, my
-travelling schedule was horrible for this merge window.
+> On 16 May 2019, at 0:35, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> After KVM commit 672ff6cff80ca43bf3258410d2b887036969df5f, reading a =
+VMware
+> pseudo PMC will fail with #GP unless the PMU is supported by the =
+guest.
+> Invoke the test with PMU emulation to ensure that it passes.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Paolo
+Reviewed-by: Liran Alon <liran.alon@oracle.com>
+I think it will also be more intuitive if in addition, we will check in =
+the kvm-unit-test itself the CPUID such that we will skip test in case =
+PMU is not exposed by vCPU.
+
+-Liran
+
+> ---
+> x86/unittests.cfg | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index 2abf6d5..ed47d3f 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -157,7 +157,7 @@ check =3D /proc/sys/kernel/nmi_watchdog=3D0
+>=20
+> [vmware_backdoors]
+> file =3D vmware_backdoors.flat
+> -extra_params =3D -machine vmport=3Don
+> +extra_params =3D -machine vmport=3Don -cpu host
+> arch =3D x86_64
+>=20
+> [port80]
+> --=20
+> 1.8.3.1
+>=20
+
