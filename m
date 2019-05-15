@@ -2,306 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A8B7A1F645
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 16:15:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 033EA1F695
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 16:30:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727073AbfEOOPM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 10:15:12 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47966 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726766AbfEOOPM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 May 2019 10:15:12 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4FEEKCB085855
-        for <kvm@vger.kernel.org>; Wed, 15 May 2019 10:15:11 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2sgk1yd6am-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 15 May 2019 10:15:11 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
-        Wed, 15 May 2019 15:15:08 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 15 May 2019 15:15:06 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4FEF4Y048693364
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 May 2019 14:15:04 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6C3DF52051;
-        Wed, 15 May 2019 14:15:04 +0000 (GMT)
-Received: from [9.152.99.219] (unknown [9.152.99.219])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id AF43C52050;
-        Wed, 15 May 2019 14:15:03 +0000 (GMT)
-Reply-To: mimu@linux.ibm.com
-Subject: Re: [PATCH 04/10] s390/mm: force swiotlb for protected virtualization
-To:     Halil Pasic <pasic@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>
-References: <20190426183245.37939-1-pasic@linux.ibm.com>
- <20190426183245.37939-5-pasic@linux.ibm.com>
- <20190508151540.14ba1d90@p-imbrenda.boeblingen.de.ibm.com>
- <20190510003401.4254f200.pasic@linux.ibm.com>
-From:   Michael Mueller <mimu@linux.ibm.com>
-Organization: IBM
-Date:   Wed, 15 May 2019 16:15:03 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.6.1
+        id S1727329AbfEOOaR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 10:30:17 -0400
+Received: from mga18.intel.com ([134.134.136.126]:6774 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726911AbfEOOaR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 May 2019 10:30:17 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 May 2019 07:30:16 -0700
+X-ExtLoop1: 1
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
+  by fmsmga007.fm.intel.com with ESMTP; 15 May 2019 07:30:15 -0700
+Date:   Wed, 15 May 2019 07:30:15 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     Joao Martins <joao.m.martins@oracle.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>
+Subject: Re: [PATCH] KVM: VMX: Nop emulation of MSR_IA32_POWER_CTL
+Message-ID: <20190515143015.GB5875@linux.intel.com>
+References: <20190415154526.64709-1-liran.alon@oracle.com>
+ <20190415181702.GH24010@linux.intel.com>
+ <AD81166E-0C42-49FD-AC37-E6F385C23B13@oracle.com>
+ <4848D424-F852-4E1C-8A86-6AA1A26D2E90@oracle.com>
+ <2dad36e7-a0e5-9670-c902-819c5200466f@oracle.com>
+ <CANRm+CyYkjFaLZMOHP3sMYVjFNo1P7uKbrRr7U3FfRHhG5jVkA@mail.gmail.com>
+ <d930e87a-fbe3-cf63-b8a0-26e9f012442a@oracle.com>
+ <20190510171733.GA16852@linux.intel.com>
+ <CANRm+Cy4GKvNpJN0ORfMGXC=BfPHZ+khKZhJQzeWvFYVmTGVfA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190510003401.4254f200.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051514-0012-0000-0000-0000031BFF88
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051514-0013-0000-0000-000021549CFD
-Message-Id: <cfb14388-15ed-afe3-f0a7-6cb384e73995@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-15_08:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905150088
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANRm+Cy4GKvNpJN0ORfMGXC=BfPHZ+khKZhJQzeWvFYVmTGVfA@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, May 13, 2019 at 05:13:29PM +0800, Wanpeng Li wrote:
+> On Sat, 11 May 2019 at 01:17, Sean Christopherson
+> <sean.j.christopherson@intel.com> wrote:
+> >
+> > On Fri, May 10, 2019 at 11:34:41AM +0100, Joao Martins wrote:
+> > > On 5/10/19 10:54 AM, Wanpeng Li wrote:
+> > > > It is weird that we can observe intel_idle driver in the guest
+> > > > executes mwait eax=0x20, and the corresponding pCPU enters C3 on HSW
+> > > > server, however, we can't observe this on SKX/CLX server, it just
+> > > > enters maximal C1.
+> > >
+> > > I assume you refer to the case where you pass the host mwait substates to the
+> > > guests as is, right? Or are you zeroing/filtering out the mwait cpuid leaf EDX
+> > > like my patch (attached in the previous message) suggests?
+> > >
+> > > Interestingly, hints set to 0x20 actually corresponds to C6 on HSW (based on
+> > > intel_idle driver). IIUC From the SDM (see Vol 2B, "MWAIT for Power Management"
+> > > in instruction set reference M-U) the hints register, doesn't necessarily
+> > > guarantee the specified C-state depicted in the hints will be used. The manual
+> > > makes it sound like it is tentative, and implementation-specific condition may
+> > > either ignore it or enter a different one. It appears to be only guaranteed that
+> > > it won't enter a C-{sub,}state deeper than the one depicted.
+> >
+> > Yep, section "MWAIT EXTENSIONS FOR ADVANCED POWER MANAGEMENT" is more
+> > explicit on this point:
+> >
+> >   At CPL=0, system software can specify desired C-state and sub C-state by
+> >   using the MWAIT hints register (EAX).  Processors will not go to C-state
+> >   and sub C-state deeper than what is specified by the hint register.
+> >
+> > As for why SKX/CLX only enters C1, AFAICT SKX isn't configured to support
+> > C3, e.g. skx_cstates in drivers/idle/intel_idle.c shows C1, C1E and C6.
+> > A quick search brings up a variety of docs that confirm this.  My guess is
+> > that C1E provides better power/performance than C3 for the majority of
+> > server workloads, e.g. C3 doesn't provide enough power savings to justify
+> > its higher latency and TLB flush.
+> 
+> You are right, I figure this out by referring to the SKX/CLX EDS, the
+> Core C-States of these two generations just support CC0/CC1/CC1E/CC6.
+> The issue here is after exposing mwait to the guest, SKX/CLX guest
+> can't enter CC6, however, HSW guest can enter CC3/CC6. Both HSW and
+> SKX/CLX hosts can enter CC6. We observe SKX/CLX guests execute mwait
+> eax 0x20, however, we can't observe the corresponding pCPU enter CC6
+> by turbostat or reading MSR_CORE_C6_RESIDENCY directly.
 
-
-On 10.05.19 00:34, Halil Pasic wrote:
-> On Wed, 8 May 2019 15:15:40 +0200
-> Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
-> 
->> On Fri, 26 Apr 2019 20:32:39 +0200
->> Halil Pasic <pasic@linux.ibm.com> wrote:
->>
->>> On s390, protected virtualization guests have to use bounced I/O
->>> buffers.  That requires some plumbing.
->>>
->>> Let us make sure, any device that uses DMA API with direct ops
->>> correctly is spared from the problems, that a hypervisor attempting
->>> I/O to a non-shared page would bring.
->>>
->>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
->>> ---
->>>   arch/s390/Kconfig                   |  4 +++
->>>   arch/s390/include/asm/mem_encrypt.h | 18 +++++++++++++
->>>   arch/s390/mm/init.c                 | 50
->>> +++++++++++++++++++++++++++++++++++++ 3 files changed, 72
->>> insertions(+) create mode 100644 arch/s390/include/asm/mem_encrypt.h
->>>
->>> diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
->>> index 1c3fcf19c3af..5500d05d4d53 100644
->>> --- a/arch/s390/Kconfig
->>> +++ b/arch/s390/Kconfig
->>> @@ -1,4 +1,7 @@
->>>   # SPDX-License-Identifier: GPL-2.0
->>> +config ARCH_HAS_MEM_ENCRYPT
->>> +        def_bool y
->>> +
->>>   config MMU
->>>   	def_bool y
->>>   
->>> @@ -191,6 +194,7 @@ config S390
->>>   	select ARCH_HAS_SCALED_CPUTIME
->>>   	select VIRT_TO_BUS
->>>   	select HAVE_NMI
->>> +	select SWIOTLB
->>>   
->>>   
->>>   config SCHED_OMIT_FRAME_POINTER
->>> diff --git a/arch/s390/include/asm/mem_encrypt.h
->>> b/arch/s390/include/asm/mem_encrypt.h new file mode 100644
->>> index 000000000000..0898c09a888c
->>> --- /dev/null
->>> +++ b/arch/s390/include/asm/mem_encrypt.h
->>> @@ -0,0 +1,18 @@
->>> +/* SPDX-License-Identifier: GPL-2.0 */
->>> +#ifndef S390_MEM_ENCRYPT_H__
->>> +#define S390_MEM_ENCRYPT_H__
->>> +
->>> +#ifndef __ASSEMBLY__
->>> +
->>> +#define sme_me_mask	0ULL
->>
->> This is rather ugly, but I understand why it's there
->>
-> 
-> Nod.
-> 
->>> +
->>> +static inline bool sme_active(void) { return false; }
->>> +extern bool sev_active(void);
->>> +
->>> +int set_memory_encrypted(unsigned long addr, int numpages);
->>> +int set_memory_decrypted(unsigned long addr, int numpages);
->>> +
->>> +#endif	/* __ASSEMBLY__ */
->>> +
->>> +#endif	/* S390_MEM_ENCRYPT_H__ */
->>> +
->>> diff --git a/arch/s390/mm/init.c b/arch/s390/mm/init.c
->>> index 3e82f66d5c61..7e3cbd15dcfa 100644
->>> --- a/arch/s390/mm/init.c
->>> +++ b/arch/s390/mm/init.c
->>> @@ -18,6 +18,7 @@
->>>   #include <linux/mman.h>
->>>   #include <linux/mm.h>
->>>   #include <linux/swap.h>
->>> +#include <linux/swiotlb.h>
->>>   #include <linux/smp.h>
->>>   #include <linux/init.h>
->>>   #include <linux/pagemap.h>
->>> @@ -29,6 +30,7 @@
->>>   #include <linux/export.h>
->>>   #include <linux/cma.h>
->>>   #include <linux/gfp.h>
->>> +#include <linux/dma-mapping.h>
->>>   #include <asm/processor.h>
->>>   #include <linux/uaccess.h>
->>>   #include <asm/pgtable.h>
->>> @@ -42,6 +44,8 @@
->>>   #include <asm/sclp.h>
->>>   #include <asm/set_memory.h>
->>>   #include <asm/kasan.h>
->>> +#include <asm/dma-mapping.h>
->>> +#include <asm/uv.h>
->>>   
->>>   pgd_t swapper_pg_dir[PTRS_PER_PGD] __section(.bss..swapper_pg_dir);
->>>   
->>> @@ -126,6 +130,50 @@ void mark_rodata_ro(void)
->>>   	pr_info("Write protected read-only-after-init data: %luk\n",
->>> size >> 10); }
->>>   
->>> +int set_memory_encrypted(unsigned long addr, int numpages)
->>> +{
->>> +	int i;
->>> +
->>> +	/* make all pages shared, (swiotlb, dma_free) */
->>
->> this is a copypaste typo, I think? (should be UNshared?)
->> also, it doesn't make ALL pages unshared, but only those specified in
->> the parameters
-> 
-> Right a copy paste error. Needs correction. The all was meant like all
-> pages in the range specified by the arguments. But it is better changed
-> since it turned out to be confusing.
-> 
->>
->> with this fixed:
->> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->>
-> 
-> Thanks!
-> 
->>> +	for (i = 0; i < numpages; ++i) {
->>> +		uv_remove_shared(addr);
->>> +		addr += PAGE_SIZE;
->>> +	}
->>> +	return 0;
->>> +}
->>> +EXPORT_SYMBOL_GPL(set_memory_encrypted);
->>> +
->>> +int set_memory_decrypted(unsigned long addr, int numpages)
->>> +{
->>> +	int i;
->>> +	/* make all pages shared (swiotlb, dma_alloca) */
->>
->> same here with ALL
->>
->>> +	for (i = 0; i < numpages; ++i) {
->>> +		uv_set_shared(addr);
->>> +		addr += PAGE_SIZE;
->>> +	}
->>> +	return 0;
->>> +}
->>> +EXPORT_SYMBOL_GPL(set_memory_decrypted);
->>> +
->>> +/* are we a protected virtualization guest? */
->>> +bool sev_active(void)
->>
->> this is also ugly. the correct solution would be probably to refactor
->> everything, including all the AMD SEV code.... let's not go there
->>
-> 
-> Nod. Maybe later.
-> 
->>> +{
->>> +	return is_prot_virt_guest();
->>> +}
->>> +EXPORT_SYMBOL_GPL(sev_active);
->>> +
->>> +/* protected virtualization */
->>> +static void pv_init(void)
->>> +{
->>> +	if (!sev_active())
->>
->> can't you just use is_prot_virt_guest here?
->>
-> 
-> Sure! I guess it would be less confusing. It is something I did not
-> remember to change when the interface for this provided by uv.h went
-> from sketchy to nice.
-
-integrated in v2
-
-Michael
-
-> 
-> Thanks again!
-> 
-> Regards,
-> Halil
-> 
->>> +		return;
->>> +
->>> +	/* make sure bounce buffers are shared */
->>> +	swiotlb_init(1);
->>> +	swiotlb_update_mem_attributes();
->>> +	swiotlb_force = SWIOTLB_FORCE;
->>> +}
->>> +
->>>   void __init mem_init(void)
->>>   {
->>>   	cpumask_set_cpu(0, &init_mm.context.cpu_attach_mask);
->>> @@ -134,6 +182,8 @@ void __init mem_init(void)
->>>   	set_max_mapnr(max_low_pfn);
->>>           high_memory = (void *) __va(max_low_pfn * PAGE_SIZE);
->>>   
->>> +	pv_init();
->>> +
->>>   	/* Setup guest page hinting */
->>>   	cmma_init();
->>>   
->>
-> 
-
--- 
-Mit freundlichen Grüßen / Kind regards
-Michael Müller
-
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Matthias Hartmann
-Geschäftsführung: Dirk Wittkopp
-Sitz der Gesellschaft: Böblingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
-
+It's likely that the CPU is operating as expected and isn't dropping into
+the deeper sleep state because of some heuristic or wake event.  It might
+be something as simple as the combination of periodic tick interrupts
+between host and guest occuring too frequently (to get to C6), or it could
+be a much more complex scenario.  It's been several years since I've done
+anything close to hands on debug with C-states, I have no idea what
+capabilities are available to help debug this sort of thing.  Sorry I
+can't be more helpful.
