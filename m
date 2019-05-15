@@ -2,121 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 59CBA1EC71
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 12:55:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44C171F177
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 13:54:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726548AbfEOKzs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 06:55:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58786 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726520AbfEOKzp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 May 2019 06:55:45 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4FAsFuN138230
-        for <kvm@vger.kernel.org>; Wed, 15 May 2019 06:55:44 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2sgfe8xfsm-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 15 May 2019 06:55:43 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <frankja@linux.ibm.com>;
-        Wed, 15 May 2019 11:55:42 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 15 May 2019 11:55:39 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4FAtcVi58458156
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 May 2019 10:55:38 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 228FB4C040;
-        Wed, 15 May 2019 10:55:38 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C435D4C04A;
-        Wed, 15 May 2019 10:55:37 +0000 (GMT)
-Received: from dyn-9-152-224-73.boeblingen.de.ibm.com (unknown [9.152.224.73])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 15 May 2019 10:55:37 +0000 (GMT)
-Subject: Re: [PATCH] KVM: s390: change default halt poll to 50000
-To:     David Hildenbrand <david@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        id S1730894AbfEOLTH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 07:19:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56710 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730426AbfEOLTH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 May 2019 07:19:07 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 37F93206BF;
+        Wed, 15 May 2019 11:19:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1557919145;
+        bh=0GxLroJ9rQ01BD2T/uvBVOf+RDZZi4rcMmYmjtAm53Y=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=ueXhQOs+GJM6Bq/v2xEx+0GifPch1BmYqZ19LLUSvUdb8mHUBWA262DlE1XAyc9aZ
+         c3wUo0S2+3cIbmvdKztP1BKlZEgEDVZijzCnMO/G/VNHXf5yPTem5AWtXUPk4UYBZr
+         lR+FMTGy4meIEr0+NepeOt9DMiTyXf+MhfgMqM8Y=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Borislav Petkov <bp@suse.de>, Rik van Riel <riel@surriel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Nicolai Stange <nstange@suse.de>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Collin Walling <walling@linux.ibm.com>,
-        "Jason J . Herne" <jjherne@linux.ibm.com>
-References: <20190515082324.112755-1-borntraeger@de.ibm.com>
- <d4227b89-4161-084a-91dc-6178afe5aad0@redhat.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Openpgp: preference=signencrypt
-Date:   Wed, 15 May 2019 12:55:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        kvm ML <kvm@vger.kernel.org>,
+        linux-efi <linux-efi@vger.kernel.org>, x86-ml <x86@kernel.org>,
+        Sasha Levin <alexander.levin@microsoft.com>
+Subject: [PATCH 4.14 083/115] x86/fpu: Dont export __kernel_fpu_{begin,end}()
+Date:   Wed, 15 May 2019 12:56:03 +0200
+Message-Id: <20190515090705.368088327@linuxfoundation.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190515090659.123121100@linuxfoundation.org>
+References: <20190515090659.123121100@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-In-Reply-To: <d4227b89-4161-084a-91dc-6178afe5aad0@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051510-0012-0000-0000-0000031BE6D0
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051510-0013-0000-0000-00002154833D
-Message-Id: <a742cf8b-d480-e469-6bda-2f34131781fb@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-15_07:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=949 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905150070
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/15/19 12:22 PM, David Hildenbrand wrote:
-> "KVM: s390: change default halt poll time to 50us
-> 
-> Recent measurements indicate that using 50us results in a reduced CPU
-> consumption, while still providing the benefit of halt polling. Let's
-> use 50us instead."
-> 
-> Acked-by: David Hildenbrand <david@redhat.com>
+[ Upstream commit 12209993e98c5fa1855c467f22a24e3d5b8be205 ]
 
-With that change:
-Acked-by: Janosch Frank <frankja@linux.vnet.ibm.com>
+There is one user of __kernel_fpu_begin() and before invoking it,
+it invokes preempt_disable(). So it could invoke kernel_fpu_begin()
+right away. The 32bit version of arch_efi_call_virt_setup() and
+arch_efi_call_virt_teardown() does this already.
 
-> 
-> 
-> 
-> On 15.05.19 10:23, Christian Borntraeger wrote:
->> older performance measurements indicated that 50000 vs 80000 reduces cpu
->> consumption while still providing the benefit of halt polling. We had
->> this change in the IBM KVM product, but it got lost so it never went
->> upstream. Recent re-measurement indicate that 50k is still better than
->> 80k.>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->>  arch/s390/include/asm/kvm_host.h | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
->> index dbe254847e0d..cb63cc7bbf06 100644
->> --- a/arch/s390/include/asm/kvm_host.h
->> +++ b/arch/s390/include/asm/kvm_host.h
->> @@ -36,7 +36,7 @@
->>   */
->>  #define KVM_NR_IRQCHIPS 1
->>  #define KVM_IRQCHIP_NUM_PINS 4096
->> -#define KVM_HALT_POLL_NS_DEFAULT 80000
->> +#define KVM_HALT_POLL_NS_DEFAULT 50000
->>  
->>  /* s390-specific vcpu->requests bit members */
->>  #define KVM_REQ_ENABLE_IBS	KVM_ARCH_REQ(0)
->>
-> 
-> 
+The comment above *kernel_fpu*() claims that before invoking
+__kernel_fpu_begin() preemption should be disabled and that KVM is a
+good example of doing it. Well, KVM doesn't do that since commit
+
+  f775b13eedee2 ("x86,kvm: move qemu/guest FPU switching out to vcpu_run")
+
+so it is not an example anymore.
+
+With EFI gone as the last user of __kernel_fpu_{begin|end}(), both can
+be made static and not exported anymore.
+
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Reviewed-by: Rik van Riel <riel@surriel.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Nicolai Stange <nstange@suse.de>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: kvm ML <kvm@vger.kernel.org>
+Cc: linux-efi <linux-efi@vger.kernel.org>
+Cc: x86-ml <x86@kernel.org>
+Link: https://lkml.kernel.org/r/20181129150210.2k4mawt37ow6c2vq@linutronix.de
+Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+---
+ arch/x86/include/asm/efi.h     |  6 ++----
+ arch/x86/include/asm/fpu/api.h | 15 +++++----------
+ arch/x86/kernel/fpu/core.c     |  6 ++----
+ 3 files changed, 9 insertions(+), 18 deletions(-)
+
+diff --git a/arch/x86/include/asm/efi.h b/arch/x86/include/asm/efi.h
+index a399c1ebf6f0e..96fd0251f8f57 100644
+--- a/arch/x86/include/asm/efi.h
++++ b/arch/x86/include/asm/efi.h
+@@ -82,8 +82,7 @@ struct efi_scratch {
+ #define arch_efi_call_virt_setup()					\
+ ({									\
+ 	efi_sync_low_kernel_mappings();					\
+-	preempt_disable();						\
+-	__kernel_fpu_begin();						\
++	kernel_fpu_begin();						\
+ 	firmware_restrict_branch_speculation_start();			\
+ 									\
+ 	if (efi_scratch.use_pgd) {					\
+@@ -104,8 +103,7 @@ struct efi_scratch {
+ 	}								\
+ 									\
+ 	firmware_restrict_branch_speculation_end();			\
+-	__kernel_fpu_end();						\
+-	preempt_enable();						\
++	kernel_fpu_end();						\
+ })
+ 
+ extern void __iomem *__init efi_ioremap(unsigned long addr, unsigned long size,
+diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
+index a9caac9d4a729..b56d504af6545 100644
+--- a/arch/x86/include/asm/fpu/api.h
++++ b/arch/x86/include/asm/fpu/api.h
+@@ -12,17 +12,12 @@
+ #define _ASM_X86_FPU_API_H
+ 
+ /*
+- * Careful: __kernel_fpu_begin/end() must be called with preempt disabled
+- * and they don't touch the preempt state on their own.
+- * If you enable preemption after __kernel_fpu_begin(), preempt notifier
+- * should call the __kernel_fpu_end() to prevent the kernel/user FPU
+- * state from getting corrupted. KVM for example uses this model.
+- *
+- * All other cases use kernel_fpu_begin/end() which disable preemption
+- * during kernel FPU usage.
++ * Use kernel_fpu_begin/end() if you intend to use FPU in kernel context. It
++ * disables preemption so be careful if you intend to use it for long periods
++ * of time.
++ * If you intend to use the FPU in softirq you need to check first with
++ * irq_fpu_usable() if it is possible.
+  */
+-extern void __kernel_fpu_begin(void);
+-extern void __kernel_fpu_end(void);
+ extern void kernel_fpu_begin(void);
+ extern void kernel_fpu_end(void);
+ extern bool irq_fpu_usable(void);
+diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+index 2ea85b32421a0..2e5003fef51a9 100644
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -93,7 +93,7 @@ bool irq_fpu_usable(void)
+ }
+ EXPORT_SYMBOL(irq_fpu_usable);
+ 
+-void __kernel_fpu_begin(void)
++static void __kernel_fpu_begin(void)
+ {
+ 	struct fpu *fpu = &current->thread.fpu;
+ 
+@@ -111,9 +111,8 @@ void __kernel_fpu_begin(void)
+ 		__cpu_invalidate_fpregs_state();
+ 	}
+ }
+-EXPORT_SYMBOL(__kernel_fpu_begin);
+ 
+-void __kernel_fpu_end(void)
++static void __kernel_fpu_end(void)
+ {
+ 	struct fpu *fpu = &current->thread.fpu;
+ 
+@@ -122,7 +121,6 @@ void __kernel_fpu_end(void)
+ 
+ 	kernel_fpu_enable();
+ }
+-EXPORT_SYMBOL(__kernel_fpu_end);
+ 
+ void kernel_fpu_begin(void)
+ {
+-- 
+2.20.1
+
+
 
