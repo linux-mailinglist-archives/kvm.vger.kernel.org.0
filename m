@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E53111E750
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 06:11:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BBCC1E75A
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 06:12:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726325AbfEOELh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 00:11:37 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:34615 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725876AbfEOELg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 May 2019 00:11:36 -0400
-Received: by mail-pf1-f195.google.com with SMTP id n19so653900pfa.1;
-        Tue, 14 May 2019 21:11:36 -0700 (PDT)
+        id S1726669AbfEOEL7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 00:11:59 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:37642 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725941AbfEOEL7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 May 2019 00:11:59 -0400
+Received: by mail-pg1-f196.google.com with SMTP id e6so660225pgc.4;
+        Tue, 14 May 2019 21:11:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id;
         bh=p98OlGu9SV+BFYem5XMwnXe15at0yFGCsMrG4alRIQ4=;
-        b=pIx3SabZFC0lSb9tUT09jqGksi9P3BLToB76wJHDVOisRhsqmEV/xiMeHyns3sFVCE
-         XBYXFz/ZylP7at2Pa9TH8ZQsR/swbRfyFrlaEgFDSuQ2Y0gDs5BQw/Rpgx2t9Pp92el3
-         8Dnc1QURoR5TWf0cV6su6+loENMwgf1iznkIlQZb168kWKraLSTFz4ael8IruXQaBjnv
-         1xFR+O4/2ygV2mqQvD6/BjQkidtyfgvoWTWv7LneCSZ3xiDo7pRcBuU+SQGBZ7Tid1vq
-         7jHJEOophbHiKdCXA85NjmRionhnef0D5IzDmGw5XpFWTQj3MTxZaXZ5f/pugQE+WRbI
-         KyQA==
+        b=JiRmYewA2vI4C1WSGbBqh8MIr2fCCVFgzCmdpqoOLknC7+ElLjvlGoCl1vu5ihnCOX
+         bvbHjE2GPfv3f57X3HZBc6rKvrb41wdHlrEt7oI3eNyLXLesmkNt7oC4ScoMspEIFAGS
+         KybQau4WYnMy3aRHWBHWPlAbbo7PEjivEL/E2bNc19gKTWQhwEkZndPh6NjRwopTxyMe
+         uH7Hg3yvAkQjWGd7quVATOaTmYEAGZ9ZcmtbvkV4Fy9IwQytPSxwNDb9TWA01TIX10JG
+         Iyu96UUoCN5sDHibWi3AarYpfktxzgaCRGSArnD7bxc3eZ5XjVeQGoODNkVHdPb42oLj
+         Kwow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
         bh=p98OlGu9SV+BFYem5XMwnXe15at0yFGCsMrG4alRIQ4=;
-        b=jyvcV7U2ekc8I8CEs2QYDzQTGQiJsKAJvCux/GImXCPZEkJZSHmEnuulIRcfJmYoZ0
-         IVaW3/ITvvzH1lovIh564eRnNPZ/1xcTuWfNv9HapplcRdMKtlsRhfZ6RpjOaQZzdHQY
-         Y8ZYKesw+U+Rml6oo30ZIfGgpV2Q8nI/S7ZrR3tim9YLlMkXMw41LdZuxakqM2NFp6O3
-         Q4XHUIl/oLaIOJYut1M+TjbjZ5AwXbYAgHuF6/M0C4Q55nbgDsyT3Hm2KyFI+XiRy8EJ
-         X7eSr/rLWGTlH9p6R5gzitszguPCUsL8VoPdMPL7IWiDaIN9svFNV5CTzzwCeaghyHcA
-         H4GA==
-X-Gm-Message-State: APjAAAXCNyqJCo4jgCAeDHpC/jds9pckKaQXpdb2aMuMe2yopnLznu1k
-        JkYVUD4pozJ7FDLeVjKJnZVkfZ7U
-X-Google-Smtp-Source: APXvYqzNjIHeV+2C5d2WxNNM5MKUn7P54T4iPAtFq1vaBto7GQfmQfmbL3xO6pvnEFkgPmdJCZ2cTA==
-X-Received: by 2002:a62:7513:: with SMTP id q19mr44835622pfc.108.1557893495865;
-        Tue, 14 May 2019 21:11:35 -0700 (PDT)
+        b=osDN5g42aEwKFSuot3FX98dbBEecgvAKfRgGYohCyMY7LMygCXfT1nV3Fq3ZHqAuBc
+         jcHkNX9e6uvm4U2RmRvcQPtUh56S+3TNdpYgR1AGYP5ZAGnjk6NGj/vvDdYFB88KuIlY
+         Oy886Usztmzn6Ll4ThuWZXuHdGcvlEfSG8TMsqs5svSfluVU4v1K9Y24XCGNfO+IZsPe
+         nPQ+2PspcC1Is+CMFik+txgs4RC7rzDXaqXQ+xsUDElpfZozavL00OrEZIR53WCtDuW7
+         jfYLZs+fnu0JiglRq4wkGgya0BCz16k8tUnssL8avhb4vnI+nr4tJNFaZCkXlvPU4/EZ
+         WLSw==
+X-Gm-Message-State: APjAAAV037bP5crVOLrO4n5giXHRbA3P9sJeXhgTq0zlyyxOMLtieu5f
+        1Wc4wvNeuzaeukVvmc4iceGL8dN6
+X-Google-Smtp-Source: APXvYqy8Fucb9Ju9Qr+JIuSy6U8+YA0eVo3xBPVFwwOyo0zPIkzPqxRR+3pE3nBx1d02nLZRMePj8g==
+X-Received: by 2002:a65:62c4:: with SMTP id m4mr41741608pgv.308.1557893518626;
+        Tue, 14 May 2019 21:11:58 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id i12sm808026pfd.33.2019.05.14.21.11.34
+        by smtp.googlemail.com with ESMTPSA id z187sm886788pfb.132.2019.05.14.21.11.56
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Tue, 14 May 2019 21:11:35 -0700 (PDT)
+        Tue, 14 May 2019 21:11:58 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
 Subject: [PATCH v2 0/4] KVM: LAPIC: Optimize timer latency further
-Date:   Wed, 15 May 2019 12:11:30 +0800
-Message-Id: <1557893490-5715-1-git-send-email-wanpengli@tencent.com>
+Date:   Wed, 15 May 2019 12:11:50 +0800
+Message-Id: <1557893514-5815-1-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
