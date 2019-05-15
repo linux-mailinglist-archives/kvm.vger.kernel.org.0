@@ -2,102 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 033EA1F695
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 16:30:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE7941F698
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 16:30:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727329AbfEOOaR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 10:30:17 -0400
-Received: from mga18.intel.com ([134.134.136.126]:6774 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726911AbfEOOaR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 May 2019 10:30:17 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 May 2019 07:30:16 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by fmsmga007.fm.intel.com with ESMTP; 15 May 2019 07:30:15 -0700
-Date:   Wed, 15 May 2019 07:30:15 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Joao Martins <joao.m.martins@oracle.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>
-Subject: Re: [PATCH] KVM: VMX: Nop emulation of MSR_IA32_POWER_CTL
-Message-ID: <20190515143015.GB5875@linux.intel.com>
-References: <20190415154526.64709-1-liran.alon@oracle.com>
- <20190415181702.GH24010@linux.intel.com>
- <AD81166E-0C42-49FD-AC37-E6F385C23B13@oracle.com>
- <4848D424-F852-4E1C-8A86-6AA1A26D2E90@oracle.com>
- <2dad36e7-a0e5-9670-c902-819c5200466f@oracle.com>
- <CANRm+CyYkjFaLZMOHP3sMYVjFNo1P7uKbrRr7U3FfRHhG5jVkA@mail.gmail.com>
- <d930e87a-fbe3-cf63-b8a0-26e9f012442a@oracle.com>
- <20190510171733.GA16852@linux.intel.com>
- <CANRm+Cy4GKvNpJN0ORfMGXC=BfPHZ+khKZhJQzeWvFYVmTGVfA@mail.gmail.com>
+        id S1727346AbfEOOam (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 10:30:42 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37344 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726911AbfEOOam (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 May 2019 10:30:42 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4FENDCT077000
+        for <kvm@vger.kernel.org>; Wed, 15 May 2019 10:30:41 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sgkqubjvb-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 15 May 2019 10:30:40 -0400
+Received: from localhost
+        by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <alifm@linux.ibm.com>;
+        Wed, 15 May 2019 15:30:40 +0100
+Received: from b03cxnp07028.gho.boulder.ibm.com (9.17.130.15)
+        by e32.co.us.ibm.com (192.168.1.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 15 May 2019 15:30:38 +0100
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4FEUaDH8716672
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 May 2019 14:30:36 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B45B2C6063;
+        Wed, 15 May 2019 14:30:36 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 51FABC6066;
+        Wed, 15 May 2019 14:30:36 +0000 (GMT)
+Received: from [9.56.58.102] (unknown [9.56.58.102])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 15 May 2019 14:30:36 +0000 (GMT)
+Subject: Re: [PATCH v2 1/7] s390/cio: Update SCSW if it points to the end of
+ the chain
+To:     Eric Farman <farman@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+References: <20190514234248.36203-1-farman@linux.ibm.com>
+ <20190514234248.36203-2-farman@linux.ibm.com>
+From:   Farhan Ali <alifm@linux.ibm.com>
+Date:   Wed, 15 May 2019 10:30:35 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANRm+Cy4GKvNpJN0ORfMGXC=BfPHZ+khKZhJQzeWvFYVmTGVfA@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190514234248.36203-2-farman@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19051514-0004-0000-0000-0000150F0896
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011102; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000285; SDB=6.01203701; UDB=6.00631845; IPR=6.00984627;
+ MB=3.00026905; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-15 14:30:39
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051514-0005-0000-0000-00008BAC336C
+Message-Id: <978ed329-cc81-b08f-8d59-ae92350abc17@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-15_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905150089
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 13, 2019 at 05:13:29PM +0800, Wanpeng Li wrote:
-> On Sat, 11 May 2019 at 01:17, Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> >
-> > On Fri, May 10, 2019 at 11:34:41AM +0100, Joao Martins wrote:
-> > > On 5/10/19 10:54 AM, Wanpeng Li wrote:
-> > > > It is weird that we can observe intel_idle driver in the guest
-> > > > executes mwait eax=0x20, and the corresponding pCPU enters C3 on HSW
-> > > > server, however, we can't observe this on SKX/CLX server, it just
-> > > > enters maximal C1.
-> > >
-> > > I assume you refer to the case where you pass the host mwait substates to the
-> > > guests as is, right? Or are you zeroing/filtering out the mwait cpuid leaf EDX
-> > > like my patch (attached in the previous message) suggests?
-> > >
-> > > Interestingly, hints set to 0x20 actually corresponds to C6 on HSW (based on
-> > > intel_idle driver). IIUC From the SDM (see Vol 2B, "MWAIT for Power Management"
-> > > in instruction set reference M-U) the hints register, doesn't necessarily
-> > > guarantee the specified C-state depicted in the hints will be used. The manual
-> > > makes it sound like it is tentative, and implementation-specific condition may
-> > > either ignore it or enter a different one. It appears to be only guaranteed that
-> > > it won't enter a C-{sub,}state deeper than the one depicted.
-> >
-> > Yep, section "MWAIT EXTENSIONS FOR ADVANCED POWER MANAGEMENT" is more
-> > explicit on this point:
-> >
-> >   At CPL=0, system software can specify desired C-state and sub C-state by
-> >   using the MWAIT hints register (EAX).  Processors will not go to C-state
-> >   and sub C-state deeper than what is specified by the hint register.
-> >
-> > As for why SKX/CLX only enters C1, AFAICT SKX isn't configured to support
-> > C3, e.g. skx_cstates in drivers/idle/intel_idle.c shows C1, C1E and C6.
-> > A quick search brings up a variety of docs that confirm this.  My guess is
-> > that C1E provides better power/performance than C3 for the majority of
-> > server workloads, e.g. C3 doesn't provide enough power savings to justify
-> > its higher latency and TLB flush.
-> 
-> You are right, I figure this out by referring to the SKX/CLX EDS, the
-> Core C-States of these two generations just support CC0/CC1/CC1E/CC6.
-> The issue here is after exposing mwait to the guest, SKX/CLX guest
-> can't enter CC6, however, HSW guest can enter CC3/CC6. Both HSW and
-> SKX/CLX hosts can enter CC6. We observe SKX/CLX guests execute mwait
-> eax 0x20, however, we can't observe the corresponding pCPU enter CC6
-> by turbostat or reading MSR_CORE_C6_RESIDENCY directly.
 
-It's likely that the CPU is operating as expected and isn't dropping into
-the deeper sleep state because of some heuristic or wake event.  It might
-be something as simple as the combination of periodic tick interrupts
-between host and guest occuring too frequently (to get to C6), or it could
-be a much more complex scenario.  It's been several years since I've done
-anything close to hands on debug with C-states, I have no idea what
-capabilities are available to help debug this sort of thing.  Sorry I
-can't be more helpful.
+
+On 05/14/2019 07:42 PM, Eric Farman wrote:
+> Per the POPs [1], when processing an interrupt the SCSW.CPA field of an
+> IRB generally points to 8 bytes after the last CCW that was executed
+> (there are exceptions, but this is the most common behavior).
+> 
+> In the case of an error, this points us to the first un-executed CCW
+> in the chain.  But in the case of normal I/O, the address points beyond
+> the end of the chain.  While the guest generally only cares about this
+> when possibly restarting a channel program after error recovery, we
+> should convert the address even in the good scenario so that we provide
+> a consistent, valid, response upon I/O completion.
+> 
+> [1] Figure 16-6 in SA22-7832-11.  The footnotes in that table also state
+> that this is true even if the resulting address is invalid or protected,
+> but moving to the end of the guest chain should not be a surprise.
+> 
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>   drivers/s390/cio/vfio_ccw_cp.c | 6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index 384b3987eeb4..41f48b8790bc 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -870,7 +870,11 @@ void cp_update_scsw(struct channel_program *cp, union scsw *scsw)
+>   	 */
+>   	list_for_each_entry(chain, &cp->ccwchain_list, next) {
+>   		ccw_head = (u32)(u64)chain->ch_ccw;
+> -		if (is_cpa_within_range(cpa, ccw_head, chain->ch_len)) {
+> +		/*
+> +		 * On successful execution, cpa points just beyond the end
+> +		 * of the chain.
+> +		 */
+> +		if (is_cpa_within_range(cpa, ccw_head, chain->ch_len + 1)) {
+>   			/*
+>   			 * (cpa - ccw_head) is the offset value of the host
+>   			 * physical ccw to its chain head.
+> 
+
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+
