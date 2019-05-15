@@ -2,112 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 16A131F882
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 18:26:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58F921F8C2
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 18:38:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727066AbfEOQ0H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 12:26:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55458 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725953AbfEOQ0H (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 May 2019 12:26:07 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4FGNDG7047801
-        for <kvm@vger.kernel.org>; Wed, 15 May 2019 12:26:05 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2sgmsmd2h4-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 15 May 2019 12:26:05 -0400
-Received: from localhost
-        by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <alifm@linux.ibm.com>;
-        Wed, 15 May 2019 17:26:04 +0100
-Received: from b03cxnp08028.gho.boulder.ibm.com (9.17.130.20)
-        by e33.co.us.ibm.com (192.168.1.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 15 May 2019 17:26:01 +0100
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4FGPx3k32309530
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 May 2019 16:26:00 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C8B08C6067;
-        Wed, 15 May 2019 16:25:59 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4A367C605D;
-        Wed, 15 May 2019 16:25:59 +0000 (GMT)
-Received: from [9.56.58.102] (unknown [9.56.58.102])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed, 15 May 2019 16:25:59 +0000 (GMT)
-Subject: Re: [PATCH v2 4/7] s390/cio: Initialize the host addresses in
- pfn_array
-To:     Eric Farman <farman@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-References: <20190514234248.36203-1-farman@linux.ibm.com>
- <20190514234248.36203-5-farman@linux.ibm.com>
-From:   Farhan Ali <alifm@linux.ibm.com>
-Date:   Wed, 15 May 2019 12:25:58 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
+        id S1726991AbfEOQij (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 12:38:39 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:48494 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726406AbfEOQii (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 May 2019 12:38:38 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4841C80D;
+        Wed, 15 May 2019 09:38:38 -0700 (PDT)
+Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8DDE13F703;
+        Wed, 15 May 2019 09:38:35 -0700 (PDT)
+Date:   Wed, 15 May 2019 17:38:32 +0100
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Marc Zyngier <marc.zyngier@arm.com>
+Cc:     Zenghui Yu <yuzenghui@huawei.com>, <christoffer.dall@arm.com>,
+        <eric.auger@redhat.com>, <james.morse@arm.com>,
+        <julien.thierry@arm.com>, <suzuki.poulose@arm.com>,
+        <kvmarm@lists.cs.columbia.edu>, <mst@redhat.com>,
+        <pbonzini@redhat.com>, <rkrcmar@redhat.com>, <kvm@vger.kernel.org>,
+        <wanghaibin.wang@huawei.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>,
+        "Raslan, KarimAllah" <karahmed@amazon.de>
+Subject: Re: [RFC PATCH] KVM: arm/arm64: Enable direct irqfd MSI injection
+Message-ID: <20190515173832.62afdd90@donnerap.cambridge.arm.com>
+In-Reply-To: <20190318133040.1cfad9a4@why.wild-wind.fr.eu.org>
+References: <1552833373-19828-1-git-send-email-yuzenghui@huawei.com>
+        <86o969z42z.wl-marc.zyngier@arm.com>
+        <20190318133040.1cfad9a4@why.wild-wind.fr.eu.org>
+Organization: ARM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20190514234248.36203-5-farman@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051516-0036-0000-0000-00000ABB121C
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011102; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000285; SDB=6.01203739; UDB=6.00631868; IPR=6.00984665;
- MB=3.00026906; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-15 16:26:03
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051516-0037-0000-0000-00004BCD6A24
-Message-Id: <205a6fee-f751-bab3-e26c-8a37027fdfa1@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-15_11:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905150099
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, 18 Mar 2019 13:30:40 +0000
+Marc Zyngier <marc.zyngier@arm.com> wrote:
 
+Hi,
 
-On 05/14/2019 07:42 PM, Eric Farman wrote:
-> Let's initialize the host address to something that is invalid,
-> rather than letting it default to zero.  This just makes it easier
-> to notice when a pin operation has failed or been skipped.
+> On Sun, 17 Mar 2019 19:35:48 +0000
+> Marc Zyngier <marc.zyngier@arm.com> wrote:
 > 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
->   drivers/s390/cio/vfio_ccw_cp.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
+> [...]
 > 
-> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-> index 60aa784717c5..0a97978d1d28 100644
-> --- a/drivers/s390/cio/vfio_ccw_cp.c
-> +++ b/drivers/s390/cio/vfio_ccw_cp.c
-> @@ -91,8 +91,11 @@ static int pfn_array_alloc(struct pfn_array *pa, u64 iova, unsigned int len)
->   	pa->pa_pfn = pa->pa_iova_pfn + pa->pa_nr;
->   
->   	pa->pa_iova_pfn[0] = pa->pa_iova >> PAGE_SHIFT;
-> -	for (i = 1; i < pa->pa_nr; i++)
-> +	pa->pa_pfn[0] = -1ULL;
-> +	for (i = 1; i < pa->pa_nr; i++) {
->   		pa->pa_iova_pfn[i] = pa->pa_iova_pfn[i - 1] + 1;
-> +		pa->pa_pfn[i] = -1ULL;
-> +	}
->   
->   	return 0;
->   }
+> > A first approach would be to keep a small cache of the last few
+> > successful translations for this ITS, cache that could be looked-up by
+> > holding a spinlock instead. A hit in this cache could directly be
+> > injected. Any command that invalidates or changes anything (DISCARD,
+> > INV, INVALL, MAPC with V=0, MAPD with V=0, MOVALL, MOVI) should nuke
+> > the cache altogether.  
 > 
+> And to explain what I meant with this, I've pushed a branch[1] with a
+> basic prototype. It is good enough to get a VM to boot, but I wouldn't
+> trust it for anything serious just yet.
+> 
+> If anyone feels like giving it a go and check whether it has any
+> benefit performance wise, please do so.
 
-Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+So I took a stab at the performance aspect, and it took me a while to find
+something where it actually makes a difference. The trick is to create *a
+lot* of interrupts. This is my setup now:
+- GICv3 and ITS
+- 5.1.0 kernel vs. 5.1.0 plus Marc's rebased "ITS cache" patches on top
+- 4 VCPU guest on a 4 core machine
+- passing through a M.2 NVMe SSD (or a USB3 controller) to the guest
+- running FIO in the guest, with:
+  - 4K block size, random reads, queue depth 16, 4 jobs (small)
+  - 1M block size, sequential reads, QD 1, 1 job (big)
+
+For the NVMe disk I see a whopping 19% performance improvement with Marc's
+series (for the small blocks). For a SATA SSD connected via USB3.0 I still
+see 6% improvement. For NVMe there were 50,000 interrupts per second on
+the host, the USB3 setup came only up to 10,000/s. For big blocks (with
+IRQs in the low thousands/s) the win is less, but still a measurable 3%.
+
+Now that I have the setup, I can rerun experiments very quickly (given I
+don't loose access to the machine), so let me know if someone needs
+further tests.
+
+Cheers,
+Andre.
+
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/its-translation-cache
 
