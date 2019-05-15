@@ -2,85 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AB5B31E61C
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 02:28:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F10571E6BB
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 03:41:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726279AbfEOA2U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 20:28:20 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:37871 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726044AbfEOA2U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 20:28:20 -0400
-Received: by mail-pl1-f196.google.com with SMTP id p15so413504pll.4;
-        Tue, 14 May 2019 17:28:19 -0700 (PDT)
+        id S1726261AbfEOBl1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 21:41:27 -0400
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:39546 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726174AbfEOBl1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 21:41:27 -0400
+Received: by mail-ot1-f68.google.com with SMTP id r7so753775otn.6;
+        Tue, 14 May 2019 18:41:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=hnc8cznRhYvEAOZ3BRQNnfK9FHmywKk+08nAcSSfYMY=;
-        b=tlNOsJIVMuq2Haokf4av2xT9NaQbpQaKdW2+XmSkOAj6f3EOu5K0ADEtfUb0kvn4CK
-         uOVx0u/7RVvw1B0BTxhRr6VvScBagqCHQPSr6zIe8jdJeaTBVwXHpcyXmyUXD3rWjuVk
-         jb1lugDhjvbYYzJUcxuqw18wOtsSLqrzqMRQC05SeEAKViVjL4vLRyshfyeKZxZmS6Yn
-         xz2rTfP53XTnrGjpNJfMkM3Fgoc55diP7+Z6phv5ArsZlUjT/InwLhRo2x/EKKBmV9RA
-         CSeqKR+isS8wEilish5TVi+pjO4ZoKrCRVgt0akffc9//5eNSql67U3gobUuUB98vy6B
-         60MQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=J2mfwiE6nx3Yy6yAluRr22vHBggLySihK+ARf9SxdE8=;
+        b=XKfP8DVZvjhInKSfi8Kk/88EGsjrYsfBjJKu4yYbwZtK2aRITQLSDpteGVOd59LAjK
+         ZhLB4wvy5yZ2QHAOl+OsJjgDdkNMlLGfqmT+Zdd6ejrgkmqiNHO5RCaplpLfWp82ibf2
+         Blqke4faM/UCbg0QNZbxtUL9WCfQkcxHkDHWdcY4fnrl7m1Dg2GDDpfp/9kDr/EfpDcZ
+         ZUplK3AE4wj9Hz2VoBJ80uJaEQ7qaz1HR2Zv6vocmLuEZNXEJxFzi4MtNKL9RJlYuI7s
+         t9E2Q7IuQkUkiPNs1n9em9Z4RK3hiD7sDfXF4Lt/45tIrrBURZeiC22BSDF5T+3zHrSJ
+         8Mkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=hnc8cznRhYvEAOZ3BRQNnfK9FHmywKk+08nAcSSfYMY=;
-        b=j1WQIgI/TGYR2CpcBLaHp/Fbd6b3gPDFpQDXB6RnTiUe6R1IIeDMK59mrzwSqVJzja
-         LI6rF4Qd1MNqBpkzKrXIMnM8F1l/jfkBFn2kVARGoR22tK041th3/79/3SSiHWxvMl7p
-         dKPitV1Oc4oi8RX0HleNVi9fJO34Gfv3o/VaSkiQnsqYHAYmNx+Oc1zVPnPXtoCDhRbs
-         F7Tw6PXgCqiXVqRUX1rFoQqzzEpJ4qVDmuRCumMKZ0OyUae8GV9rgG0VcP9f/vG2IZee
-         gat99CeUU3RGjeZoVYgIpWimZEcpnKRr1XvFff2rHqVfihd9x+w1FsTFWTT2m9oDTmTx
-         8oFg==
-X-Gm-Message-State: APjAAAVNQxgohSlCyELoax4enY4NVZ88CDgAYk6Uv6+Mr2VtVtceWaBc
-        xhjDY4HzsaZfxBXfSt8nMT7YPbpX
-X-Google-Smtp-Source: APXvYqwFHEh87hcCLCaEyqi0/kpApBt8yMnJXmhhd6QQZm3J48f3nSsjX/TKkB5Dwbc7p3watBk0Jw==
-X-Received: by 2002:a17:902:e785:: with SMTP id cp5mr21917647plb.167.1557880099260;
-        Tue, 14 May 2019 17:28:19 -0700 (PDT)
-Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
-        by smtp.gmail.com with ESMTPSA id o2sm281374pgq.1.2019.05.14.17.28.16
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 14 May 2019 17:28:18 -0700 (PDT)
-From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org, lvivier@redhat.com, thuth@redhat.com,
-        dgibson@redhat.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Subject: [kvm-unit-tests PATCH v2 2/2] powerpc: Make h_cede_tm test run by default
-Date:   Wed, 15 May 2019 10:28:01 +1000
-Message-Id: <20190515002801.20517-2-sjitindarsingh@gmail.com>
-X-Mailer: git-send-email 2.13.6
-In-Reply-To: <20190515002801.20517-1-sjitindarsingh@gmail.com>
-References: <20190515002801.20517-1-sjitindarsingh@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=J2mfwiE6nx3Yy6yAluRr22vHBggLySihK+ARf9SxdE8=;
+        b=inXYkkgmu6WgNttBqnK9C4bIEyn2wuA7BsyD5iSjte92iFQd/gMuv7tNDmZl+kg5zI
+         sfXVF8y3jwxTFgYI2/bmUfDo97bBL40roASLnB0RA4tu696xYq9P7AarGcmG5xycvd/X
+         sLFpAk49C+tWKSt418TIvCBlAqburtJ3ImAEHd/Cr3qMtzj83PJgulB5KfbxXrljP+Xk
+         YqG679LWzXuSXCRaAsC7DGabQ4zLNUR38qCutQZbgaoXaJ2EV7OKL09W47Xh1QleS9fd
+         /e1V1FTQnNasH+2D2poY5oBVXNHODA4RuzsZVwPe0G71qrSHA7HELum9DBOiNBVNeOU4
+         7mJg==
+X-Gm-Message-State: APjAAAWmtwwuZzNZWLS0DAI+85xfdWrbdo/SdAzkOwi7vVbA9GDB4GTl
+        pb+QAdvJ94Yv+m7460eRLnaW5qUvTbjwuLcY9AI=
+X-Google-Smtp-Source: APXvYqwaKB2X66f/xf6bS1GuerYjrcGs9dfqgsW8d6lqy9wsrgS5/zG9giodZgzfFSFgquA5LsaE/wm+fAm52LBJpa4=
+X-Received: by 2002:a9d:588b:: with SMTP id x11mr20086510otg.295.1557884486465;
+ Tue, 14 May 2019 18:41:26 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190507185647.GA29409@amt.cnet> <CANRm+Cx8zCDG6Oz1m9eukkmx_uVFYcQOdMwZrHwsQcbLm_kuPA@mail.gmail.com>
+ <20190514135022.GD4392@amt.cnet> <20190514152015.GM20906@char.us.oracle.com> <20190514174235.GA12269@amt.cnet>
+In-Reply-To: <20190514174235.GA12269@amt.cnet>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Wed, 15 May 2019 09:42:48 +0800
+Message-ID: <CANRm+CytV7PfS++RnYU0P3HT_QBufrO=bzd6Fx-7dC2=sotvmA@mail.gmail.com>
+Subject: Re: [PATCH] sched: introduce configurable delay before entering idle
+To:     Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Bandan Das <bsd@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This test was initially designed to test for a known bug where
-performing a sequence of H_CEDE hcalls while suspended would cause a
-vcpu to lockup in the host. The fix has been available for some time
-now, so to increase coverage of this test remove the no-default flag.
+On Wed, 15 May 2019 at 02:20, Marcelo Tosatti <mtosatti@redhat.com> wrote:
+>
+> On Tue, May 14, 2019 at 11:20:15AM -0400, Konrad Rzeszutek Wilk wrote:
+> > On Tue, May 14, 2019 at 10:50:23AM -0300, Marcelo Tosatti wrote:
+> > > On Mon, May 13, 2019 at 05:20:37PM +0800, Wanpeng Li wrote:
+> > > > On Wed, 8 May 2019 at 02:57, Marcelo Tosatti <mtosatti@redhat.com> wrote:
+> > > > >
+> > > > >
+> > > > > Certain workloads perform poorly on KVM compared to baremetal
+> > > > > due to baremetal's ability to perform mwait on NEED_RESCHED
+> > > > > bit of task flags (therefore skipping the IPI).
+> > > >
+> > > > KVM supports expose mwait to the guest, if it can solve this?
+> > > >
+> > > > Regards,
+> > > > Wanpeng Li
+> > >
+> > > Unfortunately mwait in guest is not feasible (uncompatible with multiple
+> > > guests). Checking whether a paravirt solution is possible.
+> >
+> > There is the obvious problem with that the guest can be malicious and
+> > provide via the paravirt solution bogus data. That is it expose 0% CPU
+> > usage but in reality be mining and using 100%.
+>
+> The idea is to have a hypercall for the guest to perform the
+> need_resched=1 bit set. It can only hurt itself.
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
----
- powerpc/unittests.cfg | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This lets me recall the patchset from aliyun
+https://lkml.org/lkml/2017/6/22/296 They poll after
+__current_set_polling() in do_idle() so avoid this hypercall I think.
+Btw, do you get SAP HANA by 5-10% bonus even if adaptive halt-polling
+is enabled?
 
-diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
-index af535b7..1e74948 100644
---- a/powerpc/unittests.cfg
-+++ b/powerpc/unittests.cfg
-@@ -64,7 +64,7 @@ file = emulator.elf
- file = tm.elf
- smp = 2,threads=2
- extra_params = -machine cap-htm=on -append "h_cede_tm"
--groups = nodefault,h_cede_tm
-+groups = h_cede_tm
- 
- [sprs]
- file = sprs.elf
--- 
-2.13.6
-
+Regards,
+Wanpeng Li
