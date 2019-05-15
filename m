@@ -2,233 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 910DF1F81E
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 18:04:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 230751F86D
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 18:22:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726653AbfEOQEX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 12:04:23 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41294 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726168AbfEOQEX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 May 2019 12:04:23 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4FFw7DO095335;
-        Wed, 15 May 2019 12:04:19 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2sgmf8np57-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 May 2019 12:04:18 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x4F9wuJ1019903;
-        Wed, 15 May 2019 10:08:41 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma01dal.us.ibm.com with ESMTP id 2sdp14xh1u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 15 May 2019 10:08:41 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4FG4FpF39321712
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 May 2019 16:04:15 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8EE7DC605B;
-        Wed, 15 May 2019 16:04:15 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 029F7C605D;
-        Wed, 15 May 2019 16:04:14 +0000 (GMT)
-Received: from [9.56.58.102] (unknown [9.56.58.102])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed, 15 May 2019 16:04:14 +0000 (GMT)
-Subject: Re: [PATCH v2 3/7] s390/cio: Split pfn_array_alloc_pin into pieces
-To:     Eric Farman <farman@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-References: <20190514234248.36203-1-farman@linux.ibm.com>
- <20190514234248.36203-4-farman@linux.ibm.com>
-From:   Farhan Ali <alifm@linux.ibm.com>
-Message-ID: <ab8e6a2b-e8c3-d74a-9af1-5139cdce7e7a@linux.ibm.com>
-Date:   Wed, 15 May 2019 12:04:14 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
+        id S1726861AbfEOQWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 12:22:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43896 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725953AbfEOQWU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 May 2019 12:22:20 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B5ADF356DF;
+        Wed, 15 May 2019 16:22:19 +0000 (UTC)
+Received: from [10.40.205.57] (unknown [10.40.205.57])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 071865D71E;
+        Wed, 15 May 2019 16:22:15 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 1/2] powerpc: Allow for a custom decr
+ value to be specified to load on decr excp
+To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
+        kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, thuth@redhat.com, dgibson@redhat.com
+References: <20190515002801.20517-1-sjitindarsingh@gmail.com>
+From:   Laurent Vivier <lvivier@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <132d5cba-1b9e-0be9-848b-676848af7c48@redhat.com>
+Date:   Wed, 15 May 2019 18:22:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190514234248.36203-4-farman@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190515002801.20517-1-sjitindarsingh@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-15_10:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=956 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905150097
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Wed, 15 May 2019 16:22:19 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 05/14/2019 07:42 PM, Eric Farman wrote:
-> The pfn_array_alloc_pin routine is doing too much.  Today, it does the
-> alloc of the pfn_array struct and its member arrays, builds the iova
-> address lists out of a contiguous piece of guest memory, and asks vfio
-> to pin the resulting pages.
+On 15/05/2019 02:28, Suraj Jitindar Singh wrote:
+> Currently the handler for a decrementer exception will simply reload the
+> maximum value (0x7FFFFFFF), which will take ~4 seconds to expire again.
+> This means that if a vcpu cedes, it will be ~4 seconds between wakeups.
 > 
-> Let's effectively revert a significant portion of commit 5c1cfb1c3948
-> ("vfio: ccw: refactor and improve pfn_array_alloc_pin()") such that we
-> break pfn_array_alloc_pin() into its component pieces, and have one
-> routine that allocates/populates the pfn_array structs, and another
-> that actually pins the memory.  In the future, we will be able to
-> handle scenarios where pinning memory isn't actually appropriate.
+> The h_cede_tm test is testing a known breakage when a guest cedes while
+> suspended. To be sure we cede 500 times to check for the bug. However
+> since it takes ~4 seconds to be woken up once we've ceded, we only get
+> through ~20 iterations before we reach the 90 seconds timeout and the
+> test appears to fail.
 > 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> Add an option when registering the decrementer handler to specify the
+> value which should be reloaded by the handler, allowing the timeout to be
+> chosen.
+> 
+> Modify the spr test to use the max timeout to preserve existing
+> behaviour.
+> Modify the h_cede_tm test to use a 10ms timeout to ensure we can perform
+> 500 iterations before hitting the 90 second time limit for a test.
+> 
+> This means the h_cede_tm test now succeeds rather than timing out.
+> 
+> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> 
 > ---
->   drivers/s390/cio/vfio_ccw_cp.c | 64 ++++++++++++++++++++++++----------
->   1 file changed, 46 insertions(+), 18 deletions(-)
 > 
-> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-> index 41f48b8790bc..60aa784717c5 100644
-> --- a/drivers/s390/cio/vfio_ccw_cp.c
-> +++ b/drivers/s390/cio/vfio_ccw_cp.c
-> @@ -50,28 +50,25 @@ struct ccwchain {
->   };
->   
->   /*
-> - * pfn_array_alloc_pin() - alloc memory for PFNs, then pin user pages in memory
-> + * pfn_array_alloc() - alloc memory for PFNs
->    * @pa: pfn_array on which to perform the operation
-> - * @mdev: the mediated device to perform pin/unpin operations
->    * @iova: target guest physical address
->    * @len: number of bytes that should be pinned from @iova
->    *
-> - * Attempt to allocate memory for PFNs, and pin user pages in memory.
-> + * Attempt to allocate memory for PFNs.
->    *
->    * Usage of pfn_array:
->    * We expect (pa_nr == 0) and (pa_iova_pfn == NULL), any field in
->    * this structure will be filled in by this function.
->    *
->    * Returns:
-> - *   Number of pages pinned on success.
-> - *   If @pa->pa_nr is not 0, or @pa->pa_iova_pfn is not NULL initially,
-> - *   returns -EINVAL.
-> - *   If no pages were pinned, returns -errno.
-> + *         0 if PFNs are allocated
-> + *   -EINVAL if pa->pa_nr is not initially zero, or pa->pa_iova_pfn is not NULL
-> + *   -ENOMEM if alloc failed
->    */
-> -static int pfn_array_alloc_pin(struct pfn_array *pa, struct device *mdev,
-> -			       u64 iova, unsigned int len)
-> +static int pfn_array_alloc(struct pfn_array *pa, u64 iova, unsigned int len)
->   {
-> -	int i, ret = 0;
-> +	int i;
->   
->   	if (!len)
->   		return 0;
-> @@ -97,6 +94,22 @@ static int pfn_array_alloc_pin(struct pfn_array *pa, struct device *mdev,
->   	for (i = 1; i < pa->pa_nr; i++)
->   		pa->pa_iova_pfn[i] = pa->pa_iova_pfn[i - 1] + 1;
->   
-> +	return 0;
-> +}
-> +
-> +/*
-> + * pfn_array_pin() - Pin user pages in memory
-> + * @pa: pfn_array on which to perform the operation
-> + * @mdev: the mediated device to perform pin operations
-> + *
-> + * Returns number of pages pinned upon success.
-> + * If the pin request partially succeeds, or fails completely,
-> + * all pages are left unpinned and a negative error value is returned.
-> + */
-> +static int pfn_array_pin(struct pfn_array *pa, struct device *mdev)
-> +{
-> +	int ret = 0;
-> +
->   	ret = vfio_pin_pages(mdev, pa->pa_iova_pfn, pa->pa_nr,
->   			     IOMMU_READ | IOMMU_WRITE, pa->pa_pfn);
->   
-> @@ -112,8 +125,6 @@ static int pfn_array_alloc_pin(struct pfn_array *pa, struct device *mdev,
->   
->   err_out:
->   	pa->pa_nr = 0;
-> -	kfree(pa->pa_iova_pfn);
-> -	pa->pa_iova_pfn = NULL;
->   
->   	return ret;
->   }
-> @@ -121,7 +132,9 @@ static int pfn_array_alloc_pin(struct pfn_array *pa, struct device *mdev,
->   /* Unpin the pages before releasing the memory. */
->   static void pfn_array_unpin_free(struct pfn_array *pa, struct device *mdev)
->   {
-> -	vfio_unpin_pages(mdev, pa->pa_iova_pfn, pa->pa_nr);
-> +	/* Only unpin if any pages were pinned to begin with */
-> +	if (pa->pa_nr)
-> +		vfio_unpin_pages(mdev, pa->pa_iova_pfn, pa->pa_nr);
->   	pa->pa_nr = 0;
->   	kfree(pa->pa_iova_pfn);
->   }
-> @@ -209,10 +222,16 @@ static long copy_from_iova(struct device *mdev,
->   	int i, ret;
->   	unsigned long l, m;
->   
-> -	ret = pfn_array_alloc_pin(&pa, mdev, iova, n);
-> -	if (ret <= 0)
-> +	ret = pfn_array_alloc(&pa, iova, n);
-> +	if (ret < 0)
->   		return ret;
->   
-> +	ret = pfn_array_pin(&pa, mdev);
-> +	if (ret < 0) {
-> +		pfn_array_unpin_free(&pa, mdev);
-> +		return ret;
-> +	}
-> +
->   	l = n;
->   	for (i = 0; i < pa.pa_nr; i++) {
->   		from = pa.pa_pfn[i] << PAGE_SHIFT;
-> @@ -559,7 +578,11 @@ static int ccwchain_fetch_direct(struct ccwchain *chain,
->   	if (ret)
->   		goto out_init;
->   
-> -	ret = pfn_array_alloc_pin(pat->pat_pa, cp->mdev, ccw->cda, ccw->count);
-> +	ret = pfn_array_alloc(pat->pat_pa, ccw->cda, ccw->count);
-> +	if (ret < 0)
-> +		goto out_unpin;
-> +
-> +	ret = pfn_array_pin(pat->pat_pa, cp->mdev);
->   	if (ret < 0)
->   		goto out_unpin;
->   
-> @@ -589,6 +612,7 @@ static int ccwchain_fetch_idal(struct ccwchain *chain,
->   {
->   	struct ccw1 *ccw;
->   	struct pfn_array_table *pat;
-> +	struct pfn_array *pa;
->   	unsigned long *idaws;
->   	u64 idaw_iova;
->   	unsigned int idaw_nr, idaw_len;
-> @@ -627,9 +651,13 @@ static int ccwchain_fetch_idal(struct ccwchain *chain,
->   
->   	for (i = 0; i < idaw_nr; i++) {
->   		idaw_iova = *(idaws + i);
-> +		pa = pat->pat_pa + i;
-> +
-> +		ret = pfn_array_alloc(pa, idaw_iova, 1);
-> +		if (ret < 0)
-> +			goto out_free_idaws;
->   
-> -		ret = pfn_array_alloc_pin(pat->pat_pa + i, cp->mdev,
-> -					  idaw_iova, 1);
-> +		ret = pfn_array_pin(pa, cp->mdev);
->   		if (ret < 0)
->   			goto out_free_idaws;
->   	}
+> V1 -> V2:
+> - Make decr variables static
+> - Load intial decr value in tm test to ensure known value present
+> ---
+>  lib/powerpc/handlers.c | 7 ++++---
+>  powerpc/sprs.c         | 5 +++--
+>  powerpc/tm.c           | 4 +++-
+>  3 files changed, 10 insertions(+), 6 deletions(-)
 > 
-Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
+> diff --git a/lib/powerpc/handlers.c b/lib/powerpc/handlers.c
+> index be8226a..c8721e0 100644
+> --- a/lib/powerpc/handlers.c
+> +++ b/lib/powerpc/handlers.c
+> @@ -12,11 +12,12 @@
+>  
+>  /*
+>   * Generic handler for decrementer exceptions (0x900)
+> - * Just reset the decrementer back to its maximum value (0x7FFFFFFF)
+> + * Just reset the decrementer back to the value specified when registering the
+> + * handler
+>   */
+> -void dec_except_handler(struct pt_regs *regs __unused, void *data __unused)
+> +void dec_except_handler(struct pt_regs *regs __unused, void *data)
+>  {
+> -	uint32_t dec = 0x7FFFFFFF;
+> +	uint64_t dec = *((uint64_t *) data);
+>  
+>  	asm volatile ("mtdec %0" : : "r" (dec));
+>  }
+> diff --git a/powerpc/sprs.c b/powerpc/sprs.c
+> index 6744bd8..0e2e1c9 100644
+> --- a/powerpc/sprs.c
+> +++ b/powerpc/sprs.c
+> @@ -253,6 +253,7 @@ int main(int argc, char **argv)
+>  		0x1234567890ABCDEFULL, 0xFEDCBA0987654321ULL,
+>  		-1ULL,
+>  	};
+> +	static uint64_t decr = 0x7FFFFFFF; /* Max value */
+>  
+>  	for (i = 1; i < argc; i++) {
+>  		if (!strcmp(argv[i], "-w")) {
+> @@ -288,8 +289,8 @@ int main(int argc, char **argv)
+>  		(void) getchar();
+>  	} else {
+>  		puts("Sleeping...\n");
+> -		handle_exception(0x900, &dec_except_handler, NULL);
+> -		asm volatile ("mtdec %0" : : "r" (0x3FFFFFFF));
+> +		handle_exception(0x900, &dec_except_handler, &decr);
+> +		asm volatile ("mtdec %0" : : "r" (decr));
 
+why do you replace the 0x3FFFFFFF by decr which is 0x7FFFFFFF?
 
+>  		hcall(H_CEDE);
+>  	}
+>  
+> diff --git a/powerpc/tm.c b/powerpc/tm.c
+> index bd56baa..c588985 100644
+> --- a/powerpc/tm.c
+> +++ b/powerpc/tm.c
+> @@ -95,11 +95,13 @@ static bool enable_tm(void)
+>  static void test_h_cede_tm(int argc, char **argv)
+>  {
+>  	int i;
+> +	static uint64_t decr = 0x3FFFFF; /* ~10ms */
+>  
+>  	if (argc > 2)
+>  		report_abort("Unsupported argument: '%s'", argv[2]);
+>  
+> -	handle_exception(0x900, &dec_except_handler, NULL);
+> +	handle_exception(0x900, &dec_except_handler, &decr);
+> +	asm volatile ("mtdec %0" : : "r" (decr));
+>  
+>  	if (!start_all_cpus(halt, 0))
+>  		report_abort("Failed to start secondary cpus");
+> 
+
+Thanks,
+Laurent
