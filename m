@@ -2,96 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 58F921F8C2
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 18:38:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 075C41F8D8
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 18:43:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726991AbfEOQij (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 12:38:39 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:48494 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726406AbfEOQii (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 May 2019 12:38:38 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4841C80D;
-        Wed, 15 May 2019 09:38:38 -0700 (PDT)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8DDE13F703;
-        Wed, 15 May 2019 09:38:35 -0700 (PDT)
-Date:   Wed, 15 May 2019 17:38:32 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Marc Zyngier <marc.zyngier@arm.com>
-Cc:     Zenghui Yu <yuzenghui@huawei.com>, <christoffer.dall@arm.com>,
-        <eric.auger@redhat.com>, <james.morse@arm.com>,
-        <julien.thierry@arm.com>, <suzuki.poulose@arm.com>,
-        <kvmarm@lists.cs.columbia.edu>, <mst@redhat.com>,
-        <pbonzini@redhat.com>, <rkrcmar@redhat.com>, <kvm@vger.kernel.org>,
-        <wanghaibin.wang@huawei.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>,
-        "Raslan, KarimAllah" <karahmed@amazon.de>
-Subject: Re: [RFC PATCH] KVM: arm/arm64: Enable direct irqfd MSI injection
-Message-ID: <20190515173832.62afdd90@donnerap.cambridge.arm.com>
-In-Reply-To: <20190318133040.1cfad9a4@why.wild-wind.fr.eu.org>
-References: <1552833373-19828-1-git-send-email-yuzenghui@huawei.com>
-        <86o969z42z.wl-marc.zyngier@arm.com>
-        <20190318133040.1cfad9a4@why.wild-wind.fr.eu.org>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S1727248AbfEOQm7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 12:42:59 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:40485 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726406AbfEOQm7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 May 2019 12:42:59 -0400
+Received: by mail-lj1-f194.google.com with SMTP id d15so388163ljc.7
+        for <kvm@vger.kernel.org>; Wed, 15 May 2019 09:42:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7lwWCU/enr49sAtX03bw0pmLYZWGqwWLRgDGE/HyyFM=;
+        b=Rzf/qWmuDKqTD56DSAhGNHRaaF2xWZ+Bxs4hV3XQVpg4QyV54Xx1N2lPCZtq8NQWql
+         pLazxDb0dZgOmiQlg/0e69/WWillDHdFNaqNXUVQEdZVsD90HPLGwLcQaesmcKpryAay
+         CkfiNoFSWd/YmNdpykLVUcP0EgmbN5KPoXbVL8qJ7+IOexRMw/ePEgn74B4UP0CNsKBV
+         QAfxwTMniDBUueMMrtbcLu0waSvd3/JoCJpNDcp1evNmZd4iJ6vAnDPHyg7RZ/ja1AUj
+         BkwEyolPi1mebZ+ibUdPLdXr4aUy8u3wuHPuRdZmC+OgJVMS42qa2Y6Hc3+FRZ4EtNGN
+         QF4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7lwWCU/enr49sAtX03bw0pmLYZWGqwWLRgDGE/HyyFM=;
+        b=f+rriw+O6mW6r6Sf0e7VWpIi5VWUXo/8+9fT22SdKNpa3/FXRVPplTQRA8t6QDPUhT
+         l3m/YiTCfjaPZJhhEDxiR3e4zGeQIgfHdKSeLGrJf1WrWtq9tJRpyxDzNInpOIo+6eLZ
+         EEmmaK4z9sftgeSzjZvwB+/J8rjtKw9c5te9GlKXrU9I2WXtUVphGlB82b3KvCUPBnKD
+         +vcmJ60+Z3YY6O5SRYBx4b+axn4dOLR2r0e9vLGR0hCagCJXwzJh3UP3In3e8d0UAdNK
+         BcEj/94Q2Rk2bvd4/5sl9EylyDzolF5uua8QoXjgO80fRJAouU7sA1aHB0O6Bl9L7bxi
+         pjLA==
+X-Gm-Message-State: APjAAAWLOR8+q6mnEkCstlMpfucUkTz8ZR8/t9P9FNb+EfvTPnjqwPyb
+        grjt1G4Jv8J2dj1s/utB9XMPda3rajfkhqUELHbR3A==
+X-Google-Smtp-Source: APXvYqwUJRxPZ3wsv+y2nfcD10ABe2Mkgu2RxDX37gdelb1SY8vbkXSj+t4XjKZoWpJsi5gqNM7xfYwP8As7Mh+7rh4=
+X-Received: by 2002:a2e:a294:: with SMTP id k20mr15504341lja.118.1557938575681;
+ Wed, 15 May 2019 09:42:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20190502183133.258026-1-aaronlewis@google.com>
+ <87zho37s2h.fsf@vitty.brq.redhat.com> <CAAAPnDHJ=ZC+CoKYkYkRsv+WJJjHJ66iN6jU72spL3+LckUpvA@mail.gmail.com>
+ <878svgsovg.fsf@vitty.brq.redhat.com> <CAAAPnDFsixYb2R-0uN-_DCEb4U-MEo0Pd1hmFzpqqAojc9GxXA@mail.gmail.com>
+In-Reply-To: <CAAAPnDFsixYb2R-0uN-_DCEb4U-MEo0Pd1hmFzpqqAojc9GxXA@mail.gmail.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Wed, 15 May 2019 09:42:44 -0700
+Message-ID: <CAAAPnDHPCztgDCCKkaux=2=Fr-YrVhARR_8qrdYo-+AT3CQ+LQ@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: nVMX: KVM_SET_NESTED_STATE - Tear down old EVMCS
+ state before setting new state
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Peter Shier <pshier@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com,
+        Jim Mattson <jmattson@google.com>,
+        Marc Orr <marcorr@google.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 18 Mar 2019 13:30:40 +0000
-Marc Zyngier <marc.zyngier@arm.com> wrote:
+On Wed, May 8, 2019 at 2:18 PM Aaron Lewis <aaronlewis@google.com> wrote:
+>
+> From: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Date: Wed, May 8, 2019 at 12:55 PM
+> To: Aaron Lewis
+> Cc: Peter Shier, Paolo Bonzini, <rkrcmar@redhat.com>, Jim Mattson,
+> Marc Orr, <kvm@vger.kernel.org>
+>
+> > Aaron Lewis <aaronlewis@google.com> writes:
+> >
+> > > From: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > > Date: Fri, May 3, 2019 at 3:25 AM
+> > > To: Aaron Lewis
+> > > Cc: Peter Shier, <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
+> > > <jmattson@google.com>, <marcorr@google.com>, <kvm@vger.kernel.org>
+> > >
+> > >> Aaron Lewis <aaronlewis@google.com> writes:
+> > >>
+> > >> > Move call to nested_enable_evmcs until after free_nested() is complete.
+> > >> >
+> > >> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> > >> > Reviewed-by: Marc Orr <marcorr@google.com>
+> > >> > Reviewed-by: Peter Shier <pshier@google.com>
+> > >> > ---
+> > >> >  arch/x86/kvm/vmx/nested.c | 6 +++---
+> > >> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > >> >
+> > >> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > >> > index 081dea6e211a..3b39c60951ac 100644
+> > >> > --- a/arch/x86/kvm/vmx/nested.c
+> > >> > +++ b/arch/x86/kvm/vmx/nested.c
+> > >> > @@ -5373,9 +5373,6 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+> > >> >       if (kvm_state->format != 0)
+> > >> >               return -EINVAL;
+> > >> >
+> > >> > -     if (kvm_state->flags & KVM_STATE_NESTED_EVMCS)
+> > >> > -             nested_enable_evmcs(vcpu, NULL);
+> > >> > -
+> > >> >       if (!nested_vmx_allowed(vcpu))
+> > >> >               return kvm_state->vmx.vmxon_pa == -1ull ? 0 : -EINVAL;
+> > >> >
+> > >> > @@ -5417,6 +5414,9 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+> > >> >       if (kvm_state->vmx.vmxon_pa == -1ull)
+> > >> >               return 0;
+> > >> >
+> > >> > +     if (kvm_state->flags & KVM_STATE_NESTED_EVMCS)
+> > >> > +             nested_enable_evmcs(vcpu, NULL);
+> > >> > +
+> > >> >       vmx->nested.vmxon_ptr = kvm_state->vmx.vmxon_pa;
+> > >> >       ret = enter_vmx_operation(vcpu);
+> > >> >       if (ret)
+> > >>
+> > >> nested_enable_evmcs() doesn't do much, actually, in case it was
+> > >> previously enabled it doesn't do anything and in case it wasn't ordering
+> > >> with free_nested() (where you're aiming at nested_release_evmcs() I
+> > >> would guess) shouldn't matter. So could you please elaborate (better in
+> > >> the commit message) why do we need this re-ordered? My guess is that
+> > >> you'd like to perform checks for e.g. 'vmx.vmxon_pa == -1ull' before
+> > >> we actually start doing any changes but let's clarify that.
+> > >>
+> > >> Thanks!
+> > >>
+> > >> --
+> > >> Vitaly
+> > >
+> > > There are two reasons for doing this:
+> > > 1. We don't want to set new state if we are going to leave nesting and
+> > > exit the function (ie: vmx.vmxon_pa = -1), like you pointed out.
+> > > 2. To be more future proof, we don't want to set new state before
+> > > tearing down state.  This could cause conflicts down the road.
+> > >
+> > > I can add this to the commit message if there are no objections to
+> > > these points.
+> >
+> > Sounds good to me, please do. Thanks!
+> >
+> > --
+> > Vitaly
+>
+> Here is the updated patch:
+>
+>
+> Move call to nested_enable_evmcs until after free_nested() is
+> complete.  There are two reasons for doing this:
+> 1. We don't want to set new state if we are going to leave nesting and
+> exit the function (ie: vmx.vmxon_pa = -1).
+> 2. To be more future proof, we don't want to set new state before
+> tearing down state.  This could cause conflicts down the road.
+>
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> Reviewed-by: Marc Orr <marcorr@google.com>
+> Reviewed-by: Peter Shier <pshier@google.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index fe5814df5149..6ecc301df874 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -5373,9 +5373,6 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+>   if (kvm_state->format != 0)
+>   return -EINVAL;
+>
+> - if (kvm_state->flags & KVM_STATE_NESTED_EVMCS)
+> - nested_enable_evmcs(vcpu, NULL);
+> -
+>   if (!nested_vmx_allowed(vcpu))
+>   return kvm_state->vmx.vmxon_pa == -1ull ? 0 : -EINVAL;
+>
+> @@ -5417,6 +5414,9 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+>   if (kvm_state->vmx.vmxon_pa == -1ull)
+>   return 0;
+>
+> + if (kvm_state->flags & KVM_STATE_NESTED_EVMCS)
+> + nested_enable_evmcs(vcpu, NULL);
+> +
+>   vmx->nested.vmxon_ptr = kvm_state->vmx.vmxon_pa;
+>   ret = enter_vmx_operation(vcpu);
+>   if (ret)
 
-Hi,
+Hi Vitaly,
 
-> On Sun, 17 Mar 2019 19:35:48 +0000
-> Marc Zyngier <marc.zyngier@arm.com> wrote:
-> 
-> [...]
-> 
-> > A first approach would be to keep a small cache of the last few
-> > successful translations for this ITS, cache that could be looked-up by
-> > holding a spinlock instead. A hit in this cache could directly be
-> > injected. Any command that invalidates or changes anything (DISCARD,
-> > INV, INVALL, MAPC with V=0, MAPD with V=0, MOVALL, MOVI) should nuke
-> > the cache altogether.  
-> 
-> And to explain what I meant with this, I've pushed a branch[1] with a
-> basic prototype. It is good enough to get a VM to boot, but I wouldn't
-> trust it for anything serious just yet.
-> 
-> If anyone feels like giving it a go and check whether it has any
-> benefit performance wise, please do so.
+Does this update look good or are any other changes needed?
 
-So I took a stab at the performance aspect, and it took me a while to find
-something where it actually makes a difference. The trick is to create *a
-lot* of interrupts. This is my setup now:
-- GICv3 and ITS
-- 5.1.0 kernel vs. 5.1.0 plus Marc's rebased "ITS cache" patches on top
-- 4 VCPU guest on a 4 core machine
-- passing through a M.2 NVMe SSD (or a USB3 controller) to the guest
-- running FIO in the guest, with:
-  - 4K block size, random reads, queue depth 16, 4 jobs (small)
-  - 1M block size, sequential reads, QD 1, 1 job (big)
-
-For the NVMe disk I see a whopping 19% performance improvement with Marc's
-series (for the small blocks). For a SATA SSD connected via USB3.0 I still
-see 6% improvement. For NVMe there were 50,000 interrupts per second on
-the host, the USB3 setup came only up to 10,000/s. For big blocks (with
-IRQs in the low thousands/s) the win is less, but still a measurable 3%.
-
-Now that I have the setup, I can rerun experiments very quickly (given I
-don't loose access to the machine), so let me know if someone needs
-further tests.
-
-Cheers,
-Andre.
-
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/its-translation-cache
-
+Thanks,
+Aaron
