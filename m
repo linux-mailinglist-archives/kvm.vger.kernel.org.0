@@ -2,239 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 54EA31FBC2
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 22:52:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BD691FBCB
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 22:53:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727381AbfEOUwm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 16:52:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38034 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726170AbfEOUwm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 May 2019 16:52:42 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4FKg68I095987
-        for <kvm@vger.kernel.org>; Wed, 15 May 2019 16:52:40 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2sgr4vds4p-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 15 May 2019 16:52:40 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
-        Wed, 15 May 2019 21:52:38 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 15 May 2019 21:52:35 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4FKqYUb42860690
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 15 May 2019 20:52:34 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 27CA84C058;
-        Wed, 15 May 2019 20:52:34 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 602F04C04E;
-        Wed, 15 May 2019 20:52:33 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.21.52])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 15 May 2019 20:52:33 +0000 (GMT)
-Date:   Wed, 15 May 2019 22:51:58 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH 06/10] s390/cio: add basic protected virtualization
- support
-In-Reply-To: <20190513114136.783c851c.cohuck@redhat.com>
-References: <20190426183245.37939-1-pasic@linux.ibm.com>
-        <20190426183245.37939-7-pasic@linux.ibm.com>
-        <20190513114136.783c851c.cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1727599AbfEOUxJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 16:53:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37800 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726985AbfEOUxJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 May 2019 16:53:09 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C8B8B309264F;
+        Wed, 15 May 2019 20:53:07 +0000 (UTC)
+Received: from [10.36.116.133] (ovpn-116-133.ams2.redhat.com [10.36.116.133])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5C08460BE5;
+        Wed, 15 May 2019 20:52:54 +0000 (UTC)
+Subject: Re: [PATCH v9 2/7] virtio-pmem: Add virtio pmem driver
+From:   David Hildenbrand <david@redhat.com>
+To:     Pankaj Gupta <pagupta@redhat.com>, linux-nvdimm@lists.01.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org, mst@redhat.com
+Cc:     dan.j.williams@intel.com, zwisler@kernel.org,
+        vishal.l.verma@intel.com, dave.jiang@intel.com,
+        jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net,
+        hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu,
+        adilger.kernel@dilger.ca, darrick.wong@oracle.com,
+        lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com,
+        jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com,
+        stefanha@redhat.com, aarcange@redhat.com, david@fromorbit.com,
+        cohuck@redhat.com, xiaoguangrong.eric@gmail.com,
+        pbonzini@redhat.com, kilobyte@angband.pl, yuval.shaia@oracle.com,
+        jstaron@google.com
+References: <20190514145422.16923-1-pagupta@redhat.com>
+ <20190514145422.16923-3-pagupta@redhat.com>
+ <9f6b1d8e-ef90-7d8b-56da-61a426953ba3@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <1d6f6964-4653-ebf3-554f-666fda3779f1@redhat.com>
+Date:   Wed, 15 May 2019 22:52:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <9f6b1d8e-ef90-7d8b-56da-61a426953ba3@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051520-0008-0000-0000-000002E7156C
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051520-0009-0000-0000-00002253B66C
-Message-Id: <20190515225158.301af387.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-15_15:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905150126
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Wed, 15 May 2019 20:53:08 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 13 May 2019 11:41:36 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> On Fri, 26 Apr 2019 20:32:41 +0200
-> Halil Pasic <pasic@linux.ibm.com> wrote:
+On 15.05.19 22:46, David Hildenbrand wrote:
+>> +	vpmem->vdev = vdev;
+>> +	vdev->priv = vpmem;
+>> +	err = init_vq(vpmem);
+>> +	if (err) {
+>> +		dev_err(&vdev->dev, "failed to initialize virtio pmem vq's\n");
+>> +		goto out_err;
+>> +	}
+>> +
+>> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+>> +			start, &vpmem->start);
+>> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+>> +			size, &vpmem->size);
+>> +
+>> +	res.start = vpmem->start;
+>> +	res.end   = vpmem->start + vpmem->size-1;
 > 
-> > As virtio-ccw devices are channel devices, we need to use the dma area
-> > for any communication with the hypervisor.
-> > 
-> > This patch addresses the most basic stuff (mostly what is required for
-> > virtio-ccw), and does take care of QDIO or any devices.
+> nit: " - 1;"
 > 
-> "does not take care of QDIO", surely? 
+>> +	vpmem->nd_desc.provider_name = "virtio-pmem";
+>> +	vpmem->nd_desc.module = THIS_MODULE;
+>> +
+>> +	vpmem->nvdimm_bus = nvdimm_bus_register(&vdev->dev,
+>> +						&vpmem->nd_desc);
+>> +	if (!vpmem->nvdimm_bus) {
+>> +		dev_err(&vdev->dev, "failed to register device with nvdimm_bus\n");
+>> +		err = -ENXIO;
+>> +		goto out_vq;
+>> +	}
+>> +
+>> +	dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
+>> +
+>> +	ndr_desc.res = &res;
+>> +	ndr_desc.numa_node = nid;
+>> +	ndr_desc.flush = async_pmem_flush;
+>> +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
+>> +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
+>> +	nd_region = nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_desc);
+>> +	if (!nd_region) {
+>> +		dev_err(&vdev->dev, "failed to create nvdimm region\n");
+>> +		err = -ENXIO;
+>> +		goto out_nd;
+>> +	}
+>> +	nd_region->provider_data = dev_to_virtio(nd_region->dev.parent->parent);
+>> +	return 0;
+>> +out_nd:
+>> +	nvdimm_bus_unregister(vpmem->nvdimm_bus);
+>> +out_vq:
+>> +	vdev->config->del_vqs(vdev);
+>> +out_err:
+>> +	return err;
+>> +}
+>> +
+>> +static void virtio_pmem_remove(struct virtio_device *vdev)
+>> +{
+>> +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
+>> +
+>> +	nvdimm_bus_unregister(nvdimm_bus);
+>> +	vdev->config->del_vqs(vdev);
+>> +	vdev->config->reset(vdev);
+>> +}
+>> +
+>> +static struct virtio_driver virtio_pmem_driver = {
+>> +	.driver.name		= KBUILD_MODNAME,
+>> +	.driver.owner		= THIS_MODULE,
+>> +	.id_table		= id_table,
+>> +	.probe			= virtio_pmem_probe,
+>> +	.remove			= virtio_pmem_remove,
+>> +};
+>> +
+>> +module_virtio_driver(virtio_pmem_driver);
+>> +MODULE_DEVICE_TABLE(virtio, id_table);
+>> +MODULE_DESCRIPTION("Virtio pmem driver");
+>> +MODULE_LICENSE("GPL");
+>> diff --git a/drivers/nvdimm/virtio_pmem.h b/drivers/nvdimm/virtio_pmem.h
+>> new file mode 100644
+>> index 000000000000..ab1da877575d
+>> --- /dev/null
+>> +++ b/drivers/nvdimm/virtio_pmem.h
+>> @@ -0,0 +1,60 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/*
+>> + * virtio_pmem.h: virtio pmem Driver
+>> + *
+>> + * Discovers persistent memory range information
+>> + * from host and provides a virtio based flushing
+>> + * interface.
+>> + **/
+>> +
+>> +#ifndef _LINUX_VIRTIO_PMEM_H
+>> +#define _LINUX_VIRTIO_PMEM_H
+>> +
+>> +#include <linux/virtio_ids.h>
+>> +#include <linux/module.h>
+>> +#include <linux/virtio_config.h>
+>> +#include <uapi/linux/virtio_pmem.h>
+>> +#include <linux/libnvdimm.h>
+>> +#include <linux/spinlock.h>
+>> +
+>> +struct virtio_pmem_request {
+>> +	/* Host return status corresponding to flush request */
+>> +	int ret;
+>> +
+>> +	/* command name*/
+>> +	char name[16];
+> 
+> So ... why are we sending string commands and expect native-endianess
+> integers and don't define a proper request/response structure + request
+> types in include/uapi/linux/virtio_pmem.h like
+> 
+> struct virtio_pmem_resp {
+> 	__virtio32 ret;
+> }
 
-I did not bother making the QDIO library code use dma memory for
-anything that is conceptually dma memory. AFAIK QDIO is out of scope for
-prot virt for now. If one were to do some emulated qdio with prot virt
-guests, one wound need to make a bunch of things shared.
+FWIW, I wonder if we should even properly translate return values and
+define types like
 
-> (Also, what does "any devices"
-> mean? Do you mean "every arbitrary device", perhaps?)
+VIRTIO_PMEM_RESP_TYPE_OK	0
+VIRTIO_PMEM_RESP_TYPE_EIO	1
 
-What I mean is: this patch takes care of the core stuff, but any
-particular device is likely to have to do more -- that is it ain't all
-the cio devices support prot virt with this patch. For example
-virtio-ccw needs to make sure that the ccws constituting the channel
-programs, as well as the data pointed by the ccws is shared. If one
-would want to make vfio-ccw DASD pass-through work under prot virt, one
-would need to make sure, that everything that needs to be shared is
-shared (data buffers, channel programs).
-
-Does is clarify things?
+..
 
 > 
-> > 
-> > An interesting side effect is that virtio structures are now going to
-> > get allocated in 31 bit addressable storage.
+> #define VIRTIO_PMEM_REQ_TYPE_FLUSH	1
+> struct virtio_pmem_req {
+> 	__virtio16 type;
+> }
 > 
-> Hm...
+> ... and this way we also define a proper endianess format for exchange
+> and keep it extensible
 > 
-> > 
-> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> > ---
-> >  arch/s390/include/asm/ccwdev.h   |  4 +++
-> >  drivers/s390/cio/ccwreq.c        |  8 ++---
-> >  drivers/s390/cio/device.c        | 65 +++++++++++++++++++++++++++++++++-------
-> >  drivers/s390/cio/device_fsm.c    | 40 ++++++++++++-------------
-> >  drivers/s390/cio/device_id.c     | 18 +++++------
-> >  drivers/s390/cio/device_ops.c    | 21 +++++++++++--
-> >  drivers/s390/cio/device_pgid.c   | 20 ++++++-------
-> >  drivers/s390/cio/device_status.c | 24 +++++++--------
-> >  drivers/s390/cio/io_sch.h        | 21 +++++++++----
-> >  drivers/s390/virtio/virtio_ccw.c | 10 -------
-> >  10 files changed, 148 insertions(+), 83 deletions(-)
+> @MST, what's your take on this?
 > 
-> (...)
-> 
-> > diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> > index 6d989c360f38..bb7a92316fc8 100644
-> > --- a/drivers/s390/virtio/virtio_ccw.c
-> > +++ b/drivers/s390/virtio/virtio_ccw.c
-> > @@ -66,7 +66,6 @@ struct virtio_ccw_device {
-> >  	bool device_lost;
-> >  	unsigned int config_ready;
-> >  	void *airq_info;
-> > -	u64 dma_mask;
-> >  };
-> >  
-> >  struct vq_info_block_legacy {
-> > @@ -1255,16 +1254,7 @@ static int virtio_ccw_online(struct ccw_device *cdev)
-> >  		ret = -ENOMEM;
-> >  		goto out_free;
-> >  	}
-> > -
-> >  	vcdev->vdev.dev.parent = &cdev->dev;
-> > -	cdev->dev.dma_mask = &vcdev->dma_mask;
-> > -	/* we are fine with common virtio infrastructure using 64 bit DMA */
-> > -	ret = dma_set_mask_and_coherent(&cdev->dev, DMA_BIT_MASK(64));
-> > -	if (ret) {
-> > -		dev_warn(&cdev->dev, "Failed to enable 64-bit DMA.\n");
-> > -		goto out_free;
-> > -	}
-> 
-> This means that vring structures now need to fit into 31 bits as well,
-> I think?
-
-Nod.
-
-> Is there any way to reserve the 31 bit restriction for channel
-> subsystem structures and keep vring in the full 64 bit range? (Or am I
-> fundamentally misunderstanding something?)
-> 
-
-At the root of this problem is that the DMA API basically says devices
-may have addressing limitations expressed by the dma_mask, while our
-addressing limitations are not coming from the device but from the IO
-arch: e.g. orb.cpa and ccw.cda are 31 bit addresses. In our case it
-depends on how and for what is the device going to use the memory (e.g.
-buffers addressed by MIDA vs IDA vs direct).
-
-Virtio uses the DMA properties of the parent, that is in our case the
-struct device embedded in struct ccw_device.
-
-The previous version (RFC) used to allocate all the cio DMA stuff from
-this global cio_dma_pool using the css0.dev for the DMA API
-interactions. And we set *css0.dev.dma_mask == DMA_BIT_MASK(31) so
-e.g. the allocated ccws are 31 bit addressable.
-
-But I was asked to change this so that when I allocate DMA memory for a
-channel program of particular ccw device, a struct device of that ccw
-device is used as the first argument of dma_alloc_coherent().
-
-Considering
-
-void *dma_alloc_attrs(struct device *dev, size_t size, dma_addr_t *dma_handle,
-                gfp_t flag, unsigned long attrs)
-{
-        const struct dma_map_ops *ops = get_dma_ops(dev);
-        void *cpu_addr;
-
-        WARN_ON_ONCE(dev && !dev->coherent_dma_mask);
-
-        if (dma_alloc_from_dev_coherent(dev, size, dma_handle, &cpu_addr))
-                return cpu_addr;
-
-        /* let the implementation decide on the zone to allocate from: */
-        flag &= ~(__GFP_DMA | __GFP_DMA32 | __GFP_HIGHMEM);
-
-that is the GFP flags dropped that implies that we really want
-cdev->dev restricted to 31 bit addressable memory because we can't tell
-(with the current common DMA code) hey but this piece of DMA mem you
-are abot to allocate for me must be 31 bit addressable (using GFP_DMA
-as we usually do).
-
-So, as described in the commit message, the vring stuff being forced
-into ZONE_DMA is an unfortunate consequence of this all.
-
-A side note: making the subchannel device 'own' the DMA stuff of a ccw
-device (something that was discussed in the RFC thread) is tricky
-because the ccw device may outlive the subchannel (all that orphan
-stuff).
-
-So the answer is: it is technically possible (e.g. see RFC) but it comes
-at a price, and I see no obviously brilliant solution.
-
-Regards,
-Halil
-
-> > -
-> >  	vcdev->config_block = kzalloc(sizeof(*vcdev->config_block),
-> >  				   GFP_DMA | GFP_KERNEL);
-> >  	if (!vcdev->config_block) {
 > 
 
+
+-- 
+
+Thanks,
+
+David / dhildenb
