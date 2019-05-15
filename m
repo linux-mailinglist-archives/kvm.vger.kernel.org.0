@@ -2,155 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 74F901E61A
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 02:28:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB5B31E61C
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 02:28:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726229AbfEOA2R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 May 2019 20:28:17 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:45819 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726044AbfEOA2R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 May 2019 20:28:17 -0400
-Received: by mail-pg1-f193.google.com with SMTP id i21so375418pgi.12;
-        Tue, 14 May 2019 17:28:16 -0700 (PDT)
+        id S1726279AbfEOA2U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 May 2019 20:28:20 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:37871 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726044AbfEOA2U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 May 2019 20:28:20 -0400
+Received: by mail-pl1-f196.google.com with SMTP id p15so413504pll.4;
+        Tue, 14 May 2019 17:28:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=APbUiEWtsn5UYHvxww0x21/cxMCspJF7WW5D6ZYjgYA=;
-        b=PjOoN1qNjGvu9pSadyZbNVaB0nE5NfEgm2l1q5DNZuSI6by0AnI4Ci0HM+mPYIt+iO
-         tNrAi/uIqoDDOIYYMUI55SAv6q+/KEfOlDpu8sLhj2M59Q1QFV2+wwAi9rBlQmzD0TDE
-         eL89UUzv2iP7yJV4tYDJGOnKqcB9qQlhWlP6ba1v7eoYBjvxVKgCVhJ+jC6M8wSMQXcY
-         ZRKCq68HzlMQJMwmhyzxjg2eC8WKoh2s9jPmQYOIxlV/OJTttYIvhb11aXo7IdCSMZhp
-         VsFMbnyzu+sF5rkp3NapZW7l9IyZq46jCXWAKPpPVtri8Hebb6ybDEG6mHTTJxc+QIFc
-         y+7A==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=hnc8cznRhYvEAOZ3BRQNnfK9FHmywKk+08nAcSSfYMY=;
+        b=tlNOsJIVMuq2Haokf4av2xT9NaQbpQaKdW2+XmSkOAj6f3EOu5K0ADEtfUb0kvn4CK
+         uOVx0u/7RVvw1B0BTxhRr6VvScBagqCHQPSr6zIe8jdJeaTBVwXHpcyXmyUXD3rWjuVk
+         jb1lugDhjvbYYzJUcxuqw18wOtsSLqrzqMRQC05SeEAKViVjL4vLRyshfyeKZxZmS6Yn
+         xz2rTfP53XTnrGjpNJfMkM3Fgoc55diP7+Z6phv5ArsZlUjT/InwLhRo2x/EKKBmV9RA
+         CSeqKR+isS8wEilish5TVi+pjO4ZoKrCRVgt0akffc9//5eNSql67U3gobUuUB98vy6B
+         60MQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=APbUiEWtsn5UYHvxww0x21/cxMCspJF7WW5D6ZYjgYA=;
-        b=IUCRIH79aQJU3lPaJ59jdZ8KcncYtRXgqF9XcmZWJoOFc+YnyRhCIIZByFXd/SrJQ8
-         aBQH3nxuPo0tOZ6kTT0GOZbnVTU5SX69wvsV9SWlKEOO5QOQCWM/+MDdvFEiF6kEl60J
-         dt/UC2R709Ypsu44rFcjJnC6dC1PHT+gOR+8z/hFfiRr1fDZ1OmSmCVTxJxrirnE3ZkO
-         iPZL+f7UlbsLMyUY6CI5Sn/zTjGyhrhONYlOUfyXsvllm/bbqSsNdQK0b9U0k7fD24Xm
-         J6Te8yMy+yVfW/cwG7XtMCZVeDNl/COw6XF5hcv/lezs3FJhN6I1uoyj9IbE0vIh0kcw
-         dCuQ==
-X-Gm-Message-State: APjAAAVlp4rw/iOYXFNGB/UUtwigCVvpvES40Q/eZy0D/8KrEzYZs1F3
-        AhQZt8ZnYLOD91CqRqkdZseBYFz2
-X-Google-Smtp-Source: APXvYqwUYM9uS1Ia0hb7mGkvq7XoHqMcfyVZiXM27fP5ey+h1I/rPJWxFukRUorlpYaGRsDp5B/XBQ==
-X-Received: by 2002:a63:3e47:: with SMTP id l68mr40513155pga.85.1557880096281;
-        Tue, 14 May 2019 17:28:16 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=hnc8cznRhYvEAOZ3BRQNnfK9FHmywKk+08nAcSSfYMY=;
+        b=j1WQIgI/TGYR2CpcBLaHp/Fbd6b3gPDFpQDXB6RnTiUe6R1IIeDMK59mrzwSqVJzja
+         LI6rF4Qd1MNqBpkzKrXIMnM8F1l/jfkBFn2kVARGoR22tK041th3/79/3SSiHWxvMl7p
+         dKPitV1Oc4oi8RX0HleNVi9fJO34Gfv3o/VaSkiQnsqYHAYmNx+Oc1zVPnPXtoCDhRbs
+         F7Tw6PXgCqiXVqRUX1rFoQqzzEpJ4qVDmuRCumMKZ0OyUae8GV9rgG0VcP9f/vG2IZee
+         gat99CeUU3RGjeZoVYgIpWimZEcpnKRr1XvFff2rHqVfihd9x+w1FsTFWTT2m9oDTmTx
+         8oFg==
+X-Gm-Message-State: APjAAAVNQxgohSlCyELoax4enY4NVZ88CDgAYk6Uv6+Mr2VtVtceWaBc
+        xhjDY4HzsaZfxBXfSt8nMT7YPbpX
+X-Google-Smtp-Source: APXvYqwFHEh87hcCLCaEyqi0/kpApBt8yMnJXmhhd6QQZm3J48f3nSsjX/TKkB5Dwbc7p3watBk0Jw==
+X-Received: by 2002:a17:902:e785:: with SMTP id cp5mr21917647plb.167.1557880099260;
+        Tue, 14 May 2019 17:28:19 -0700 (PDT)
 Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
-        by smtp.gmail.com with ESMTPSA id o2sm281374pgq.1.2019.05.14.17.28.09
+        by smtp.gmail.com with ESMTPSA id o2sm281374pgq.1.2019.05.14.17.28.16
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 14 May 2019 17:28:15 -0700 (PDT)
+        Tue, 14 May 2019 17:28:18 -0700 (PDT)
 From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 To:     kvm@vger.kernel.org
 Cc:     kvm-ppc@vger.kernel.org, lvivier@redhat.com, thuth@redhat.com,
         dgibson@redhat.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Subject: [kvm-unit-tests PATCH v2 1/2] powerpc: Allow for a custom decr value to be specified to load on decr excp
-Date:   Wed, 15 May 2019 10:28:00 +1000
-Message-Id: <20190515002801.20517-1-sjitindarsingh@gmail.com>
+Subject: [kvm-unit-tests PATCH v2 2/2] powerpc: Make h_cede_tm test run by default
+Date:   Wed, 15 May 2019 10:28:01 +1000
+Message-Id: <20190515002801.20517-2-sjitindarsingh@gmail.com>
 X-Mailer: git-send-email 2.13.6
+In-Reply-To: <20190515002801.20517-1-sjitindarsingh@gmail.com>
+References: <20190515002801.20517-1-sjitindarsingh@gmail.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently the handler for a decrementer exception will simply reload the
-maximum value (0x7FFFFFFF), which will take ~4 seconds to expire again.
-This means that if a vcpu cedes, it will be ~4 seconds between wakeups.
-
-The h_cede_tm test is testing a known breakage when a guest cedes while
-suspended. To be sure we cede 500 times to check for the bug. However
-since it takes ~4 seconds to be woken up once we've ceded, we only get
-through ~20 iterations before we reach the 90 seconds timeout and the
-test appears to fail.
-
-Add an option when registering the decrementer handler to specify the
-value which should be reloaded by the handler, allowing the timeout to be
-chosen.
-
-Modify the spr test to use the max timeout to preserve existing
-behaviour.
-Modify the h_cede_tm test to use a 10ms timeout to ensure we can perform
-500 iterations before hitting the 90 second time limit for a test.
-
-This means the h_cede_tm test now succeeds rather than timing out.
+This test was initially designed to test for a known bug where
+performing a sequence of H_CEDE hcalls while suspended would cause a
+vcpu to lockup in the host. The fix has been available for some time
+now, so to increase coverage of this test remove the no-default flag.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-
 ---
+ powerpc/unittests.cfg | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-V1 -> V2:
-- Make decr variables static
-- Load intial decr value in tm test to ensure known value present
----
- lib/powerpc/handlers.c | 7 ++++---
- powerpc/sprs.c         | 5 +++--
- powerpc/tm.c           | 4 +++-
- 3 files changed, 10 insertions(+), 6 deletions(-)
-
-diff --git a/lib/powerpc/handlers.c b/lib/powerpc/handlers.c
-index be8226a..c8721e0 100644
---- a/lib/powerpc/handlers.c
-+++ b/lib/powerpc/handlers.c
-@@ -12,11 +12,12 @@
+diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
+index af535b7..1e74948 100644
+--- a/powerpc/unittests.cfg
++++ b/powerpc/unittests.cfg
+@@ -64,7 +64,7 @@ file = emulator.elf
+ file = tm.elf
+ smp = 2,threads=2
+ extra_params = -machine cap-htm=on -append "h_cede_tm"
+-groups = nodefault,h_cede_tm
++groups = h_cede_tm
  
- /*
-  * Generic handler for decrementer exceptions (0x900)
-- * Just reset the decrementer back to its maximum value (0x7FFFFFFF)
-+ * Just reset the decrementer back to the value specified when registering the
-+ * handler
-  */
--void dec_except_handler(struct pt_regs *regs __unused, void *data __unused)
-+void dec_except_handler(struct pt_regs *regs __unused, void *data)
- {
--	uint32_t dec = 0x7FFFFFFF;
-+	uint64_t dec = *((uint64_t *) data);
- 
- 	asm volatile ("mtdec %0" : : "r" (dec));
- }
-diff --git a/powerpc/sprs.c b/powerpc/sprs.c
-index 6744bd8..0e2e1c9 100644
---- a/powerpc/sprs.c
-+++ b/powerpc/sprs.c
-@@ -253,6 +253,7 @@ int main(int argc, char **argv)
- 		0x1234567890ABCDEFULL, 0xFEDCBA0987654321ULL,
- 		-1ULL,
- 	};
-+	static uint64_t decr = 0x7FFFFFFF; /* Max value */
- 
- 	for (i = 1; i < argc; i++) {
- 		if (!strcmp(argv[i], "-w")) {
-@@ -288,8 +289,8 @@ int main(int argc, char **argv)
- 		(void) getchar();
- 	} else {
- 		puts("Sleeping...\n");
--		handle_exception(0x900, &dec_except_handler, NULL);
--		asm volatile ("mtdec %0" : : "r" (0x3FFFFFFF));
-+		handle_exception(0x900, &dec_except_handler, &decr);
-+		asm volatile ("mtdec %0" : : "r" (decr));
- 		hcall(H_CEDE);
- 	}
- 
-diff --git a/powerpc/tm.c b/powerpc/tm.c
-index bd56baa..c588985 100644
---- a/powerpc/tm.c
-+++ b/powerpc/tm.c
-@@ -95,11 +95,13 @@ static bool enable_tm(void)
- static void test_h_cede_tm(int argc, char **argv)
- {
- 	int i;
-+	static uint64_t decr = 0x3FFFFF; /* ~10ms */
- 
- 	if (argc > 2)
- 		report_abort("Unsupported argument: '%s'", argv[2]);
- 
--	handle_exception(0x900, &dec_except_handler, NULL);
-+	handle_exception(0x900, &dec_except_handler, &decr);
-+	asm volatile ("mtdec %0" : : "r" (decr));
- 
- 	if (!start_all_cpus(halt, 0))
- 		report_abort("Failed to start secondary cpus");
+ [sprs]
+ file = sprs.elf
 -- 
 2.13.6
 
