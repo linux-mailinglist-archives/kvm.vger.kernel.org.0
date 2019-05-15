@@ -2,96 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F1FE1F5BC
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 15:42:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB5361F5C5
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 15:43:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727474AbfEONmL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 09:42:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57436 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726691AbfEONmK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 May 2019 09:42:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7E4463079B71;
-        Wed, 15 May 2019 13:42:10 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 696EE608A6;
-        Wed, 15 May 2019 13:42:09 +0000 (UTC)
-Date:   Wed, 15 May 2019 15:42:07 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Farhan Ali <alifm@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 7/7] s390/cio: Remove vfio-ccw checks of command
- codes
-Message-ID: <20190515154207.3a6f7968.cohuck@redhat.com>
-In-Reply-To: <1f0e2084-2e3d-bc97-f8cf-a40f194d7288@linux.ibm.com>
-References: <20190514234248.36203-1-farman@linux.ibm.com>
-        <20190514234248.36203-8-farman@linux.ibm.com>
-        <20190515144305.46a2ecb1.cohuck@redhat.com>
-        <1f0e2084-2e3d-bc97-f8cf-a40f194d7288@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1727811AbfEONnk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 09:43:40 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34918 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726674AbfEONnk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 May 2019 09:43:40 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4FDe2a7101402
+        for <kvm@vger.kernel.org>; Wed, 15 May 2019 09:43:38 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sghwtebrg-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 15 May 2019 09:43:37 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
+        Wed, 15 May 2019 14:43:29 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 15 May 2019 14:43:26 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4FDhOZe46334144
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 May 2019 13:43:24 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 649E95204F;
+        Wed, 15 May 2019 13:43:24 +0000 (GMT)
+Received: from [9.152.99.219] (unknown [9.152.99.219])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B2D4552050;
+        Wed, 15 May 2019 13:43:23 +0000 (GMT)
+Reply-To: mimu@linux.ibm.com
+Subject: Re: [PATCH 10/10] virtio/s390: make airq summary indicators DMA
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+ <20190426183245.37939-11-pasic@linux.ibm.com>
+ <20190513142010.36c8478f.cohuck@redhat.com>
+From:   Michael Mueller <mimu@linux.ibm.com>
+Organization: IBM
+Date:   Wed, 15 May 2019 15:43:23 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190513142010.36c8478f.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 15 May 2019 13:42:10 +0000 (UTC)
+X-TM-AS-GCONF: 00
+x-cbid: 19051513-0008-0000-0000-000002E6F96B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051513-0009-0000-0000-000022539922
+Message-Id: <3a8353e2-97e3-778e-ab2e-ef285ac7027d@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-15_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905150086
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 15 May 2019 09:36:01 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
 
-> On 5/15/19 8:43 AM, Cornelia Huck wrote:
-> > On Wed, 15 May 2019 01:42:48 +0200
-> > Eric Farman <farman@linux.ibm.com> wrote:
-> >   
-> >> If the CCW being processed is a No-Operation, then by definition no
-> >> data is being transferred.  Let's fold those checks into the normal
-> >> CCW processors, rather than skipping out early.
-> >>
-> >> Likewise, if the CCW being processed is a "test" (an invented
-> >> definition to simply mean it ends in a zero), let's permit that to go
-> >> through to the hardware.  There's nothing inherently unique about
-> >> those command codes versus one that ends in an eight [1], or any other
-> >> otherwise valid command codes that are undefined for the device type
-> >> in question.  
-> > 
-> > Hm... let's tweak that a bit? It's not that "test" is an invented
-> > category; it's just that this has not been a valid command for
-> > post-s/370 and therefore should not get any special treatment and just
-> > be sent to the hardware?  
-> 
-> Agreed, I should've re-read that one before I sent it...  How about:
-> 
-> Likewise, if the CCW being processed is a "test" (a category defined
-> here as an opcode that contains zero in the lowest four bits) then no
-> special processing is necessary as far as vfio-ccw is concerned.
-> These command codes have not been valid since the S/370 days, meaning
-> they are invalid in the same way as one that ends in an eight [1] or
-> an otherwise valid command code that is undefined for the device type
-> in question.  Considering that, let's just process "test" CCWs like
-> any other CCW, and send everything to the hardware.
 
-Sounds good to me!
+On 13.05.19 14:20, Cornelia Huck wrote:
+> On Fri, 26 Apr 2019 20:32:45 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
+> 
+>> Hypervisor needs to interact with the summary indicators, so these
+>> need to be DMA memory as well (at least for protected virtualization
+>> guests).
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+>> ---
+>>   drivers/s390/virtio/virtio_ccw.c | 24 +++++++++++++++++-------
+>>   1 file changed, 17 insertions(+), 7 deletions(-)
+> 
+> (...)
+> 
+>> @@ -237,7 +243,8 @@ static void virtio_airq_handler(struct airq_struct *airq)
+>>   	read_unlock(&info->lock);
+>>   }
+>>   
+>> -static struct airq_info *new_airq_info(void)
+>> +/* call with drivers/s390/virtio/virtio_ccw.cheld */
+> 
+> Hm, where is airq_areas_lock defined? If it was introduced in one of
+> the previous patches, I have missed it.
+
+There is no airq_areas_lock defined currently. My assumption is that
+this will be used in context with the likely race condition this
+part of the patch is talking about.
+
+@@ -273,8 +281,9 @@ static unsigned long get_airq_indicator(struct 
+virtqueue *vqs[], int nvqs,
+  	unsigned long bit, flags;
+
+  	for (i = 0; i < MAX_AIRQ_AREAS && !indicator_addr; i++) {
++		/* TODO: this seems to be racy */
+  		if (!airq_areas[i])
+-			airq_areas[i] = new_airq_info();
++			airq_areas[i] = new_airq_info(i);
+
+
+As this shall be handled by a separate patch I will drop the comment
+in regard to airq_areas_lock from this patch as well for v2.
+
+Michael
 
 > 
-> >   
-> >>
-> >> [1] POPS states that a x08 is a TIC CCW, and that having any high-order
-> >> bits enabled is invalid for format-1 CCWs.  For format-0 CCWs, the
-> >> high-order bits are ignored.
-> >>
-> >> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> >> ---
-> >>   drivers/s390/cio/vfio_ccw_cp.c | 11 +++++------
-> >>   1 file changed, 5 insertions(+), 6 deletions(-)  
-> >   
+>> +static struct airq_info *new_airq_info(int index)
+>>   {
+>>   	struct airq_info *info;
+>>   	int rc;
 > 
 
