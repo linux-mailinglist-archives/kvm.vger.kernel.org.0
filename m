@@ -2,118 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DEE061FAB2
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 21:29:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 607351FB61
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 22:08:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728082AbfEOT3C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 15:29:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53902 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727636AbfEOT1e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 May 2019 15:27:34 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1DE5F3003C77;
-        Wed, 15 May 2019 19:27:34 +0000 (UTC)
-Received: from horse.redhat.com (unknown [10.18.25.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EE03919C71;
-        Wed, 15 May 2019 19:27:33 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id 31BA8225492; Wed, 15 May 2019 15:27:30 -0400 (EDT)
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-nvdimm@lists.01.org
-Cc:     vgoyal@redhat.com, miklos@szeredi.hu, stefanha@redhat.com,
-        dgilbert@redhat.com, swhiteho@redhat.com
-Subject: [PATCH v2 30/30] virtio-fs: Do not provide abort interface in fusectl
-Date:   Wed, 15 May 2019 15:27:15 -0400
-Message-Id: <20190515192715.18000-31-vgoyal@redhat.com>
-In-Reply-To: <20190515192715.18000-1-vgoyal@redhat.com>
-References: <20190515192715.18000-1-vgoyal@redhat.com>
+        id S1726657AbfEOUId (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 16:08:33 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51520 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726124AbfEOUId (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 May 2019 16:08:33 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4FK8U75005934
+        for <kvm@vger.kernel.org>; Wed, 15 May 2019 16:08:32 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sgr2putxv-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 15 May 2019 16:08:31 -0400
+Received: from localhost
+        by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <alifm@linux.ibm.com>;
+        Wed, 15 May 2019 21:08:23 +0100
+Received: from b03cxnp07029.gho.boulder.ibm.com (9.17.130.16)
+        by e31.co.us.ibm.com (192.168.1.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 15 May 2019 21:08:21 +0100
+Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4FK8JNJ8585496
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 May 2019 20:08:19 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BF095C6055;
+        Wed, 15 May 2019 20:08:19 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 540C5C605B;
+        Wed, 15 May 2019 20:08:19 +0000 (GMT)
+Received: from [9.56.58.102] (unknown [9.56.58.102])
+        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 15 May 2019 20:08:19 +0000 (GMT)
+Subject: Re: [PATCH v2 5/7] s390/cio: Allow zero-length CCWs in vfio-ccw
+To:     Eric Farman <farman@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+References: <20190514234248.36203-1-farman@linux.ibm.com>
+ <20190514234248.36203-6-farman@linux.ibm.com>
+ <20190515142339.12065a1d.cohuck@redhat.com>
+ <f309cad9-9265-e276-8d57-8b6387f6fed7@linux.ibm.com>
+From:   Farhan Ali <alifm@linux.ibm.com>
+Date:   Wed, 15 May 2019 16:08:18 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
+In-Reply-To: <f309cad9-9265-e276-8d57-8b6387f6fed7@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 15 May 2019 19:27:34 +0000 (UTC)
+X-TM-AS-GCONF: 00
+x-cbid: 19051520-8235-0000-0000-00000E971E19
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011102; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000285; SDB=6.01203813; UDB=6.00631912; IPR=6.00984739;
+ MB=3.00026907; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-15 20:08:22
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051520-8236-0000-0000-00004593B4CE
+Message-Id: <39c7904f-7f9b-473d-201d-8d6aae4c490b@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-15_15:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=827 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905150122
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-virtio-fs does not support aborting requests which are being processed. That
-is requests which have been sent to fuse daemon on host.
 
-So do not provide "abort" interface for virtio-fs in fusectl.
 
-Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
----
- fs/fuse/control.c   | 4 ++--
- fs/fuse/fuse_i.h    | 4 ++++
- fs/fuse/inode.c     | 1 +
- fs/fuse/virtio_fs.c | 1 +
- 4 files changed, 8 insertions(+), 2 deletions(-)
+On 05/15/2019 11:04 AM, Eric Farman wrote:
+> 
+> 
+> On 5/15/19 8:23 AM, Cornelia Huck wrote:
+>> On Wed, 15 May 2019 01:42:46 +0200
+>> Eric Farman <farman@linux.ibm.com> wrote:
+>>
+>>> It is possible that a guest might issue a CCW with a length of zero,
+>>> and will expect a particular response.  Consider this chain:
+>>>
+>>>     Address   Format-1 CCW
+>>>     --------  -----------------
+>>>   0 33110EC0  346022CC 33177468
+>>>   1 33110EC8  CF200000 3318300C
+>>>
+>>> CCW[0] moves a little more than two pages, but also has the
+>>> Suppress Length Indication (SLI) bit set to handle the expectation
+>>> that considerably less data will be moved.  CCW[1] also has the SLI
+>>> bit set, and has a length of zero.  Once vfio-ccw does its magic,
+>>> the kernel issues a start subchannel on behalf of the guest with this:
+>>>
+>>>     Address   Format-1 CCW
+>>>     --------  -----------------
+>>>   0 021EDED0  346422CC 021F0000
+>>>   1 021EDED8  CF240000 3318300C
+>>>
+>>> Both CCWs were converted to an IDAL and have the corresponding flags
+>>> set (which is by design), but only the address of the first data
+>>> address is converted to something the host is aware of.  The second
+>>> CCW still has the address used by the guest, which happens to be (A)
+>>> (probably) an invalid address for the host, and (B) an invalid IDAW
+>>> address (doubleword boundary, etc.).
+>>>
+>>> While the I/O fails, it doesn't fail correctly.  In this example, we
+>>> would receive a program check for an invalid IDAW address, instead of
+>>> a unit check for an invalid command.
+>>>
+>>> To fix this, revert commit 4cebc5d6a6ff ("vfio: ccw: validate the
+>>> count field of a ccw before pinning") and allow the individual fetch
+>>> routines to process them like anything else.  We'll make a slight
+>>> adjustment to our allocation of the pfn_array (for direct CCWs) or
+>>> IDAL (for IDAL CCWs) memory, so that we have room for at least one
+>>> address even though no data will be transferred.
+>>>
+>>> Note that this doesn't provide us with a channel program that will
+>>> fail in the expected way.  Since our length is zero, vfio_pin_pages()
+> 
+> s/is/was/
+> 
+>>> returns -EINVAL and cp_prefetch() will thus fail.  This will be fixed
+>>> in the next patch.
+>>
+>> So, this failed before, and still fails, just differently? 
+> 
+> Probably.  If the guest gave us a valid address, the pin might actually 
+> work now whereas before it would fail because the length was zero.  If 
+> the address were also invalid,
+> 
+>  >IOW, this
+>> has no effect on bisectability?
+> 
+> I think so, but I suppose that either (A) patch 5 and 6 could be 
+> squashed together, or (B) I could move the "set pa_nr to zero" (or more 
+> accurately, set it to ccw->count) pieces from patch 6 into this patch, 
+> so that the vfio_pin_pages() call occurs like it does today.
+> 
+>>
 
-diff --git a/fs/fuse/control.c b/fs/fuse/control.c
-index fe80bea4ad89..c1423f2ebc5e 100644
---- a/fs/fuse/control.c
-+++ b/fs/fuse/control.c
-@@ -278,8 +278,8 @@ int fuse_ctl_add_conn(struct fuse_conn *fc)
- 
- 	if (!fuse_ctl_add_dentry(parent, fc, "waiting", S_IFREG | 0400, 1,
- 				 NULL, &fuse_ctl_waiting_ops) ||
--	    !fuse_ctl_add_dentry(parent, fc, "abort", S_IFREG | 0200, 1,
--				 NULL, &fuse_ctl_abort_ops) ||
-+	    (!fc->no_abort && !fuse_ctl_add_dentry(parent, fc, "abort",
-+			S_IFREG | 0200, 1, NULL, &fuse_ctl_abort_ops)) ||
- 	    !fuse_ctl_add_dentry(parent, fc, "max_background", S_IFREG | 0600,
- 				 1, NULL, &fuse_conn_max_background_ops) ||
- 	    !fuse_ctl_add_dentry(parent, fc, "congestion_threshold",
-diff --git a/fs/fuse/fuse_i.h b/fs/fuse/fuse_i.h
-index b4a5728444bb..7ac7f9a0b81b 100644
---- a/fs/fuse/fuse_i.h
-+++ b/fs/fuse/fuse_i.h
-@@ -86,6 +86,7 @@ struct fuse_mount_data {
- 	unsigned allow_other:1;
- 	unsigned dax:1;
- 	unsigned destroy:1;
-+	unsigned no_abort:1;
- 	unsigned max_read;
- 	unsigned blksize;
- 
-@@ -847,6 +848,9 @@ struct fuse_conn {
- 	/** Does the filesystem support copy_file_range? */
- 	unsigned no_copy_file_range:1;
- 
-+	/** Do not create abort file in fuse control fs */
-+	unsigned no_abort:1;
-+
- 	/** The number of requests waiting for completion */
- 	atomic_t num_waiting;
- 
-diff --git a/fs/fuse/inode.c b/fs/fuse/inode.c
-index 8af7f31c6e19..302f7e04b645 100644
---- a/fs/fuse/inode.c
-+++ b/fs/fuse/inode.c
-@@ -1272,6 +1272,7 @@ int fuse_fill_super_common(struct super_block *sb,
- 	fc->user_id = mount_data->user_id;
- 	fc->group_id = mount_data->group_id;
- 	fc->max_read = max_t(unsigned, 4096, mount_data->max_read);
-+	fc->no_abort = mount_data->no_abort;
- 
- 	/* Used by get_root_inode() */
- 	sb->s_fs_info = fc;
-diff --git a/fs/fuse/virtio_fs.c b/fs/fuse/virtio_fs.c
-index 76c46edcc8ac..18fc0dca0abc 100644
---- a/fs/fuse/virtio_fs.c
-+++ b/fs/fuse/virtio_fs.c
-@@ -1042,6 +1042,7 @@ static int virtio_fs_fill_super(struct super_block *sb, void *data,
- 	d.fiq_priv = fs;
- 	d.fudptr = (void **)&fs->vqs[VQ_REQUEST].fud;
- 	d.destroy = true; /* Send destroy request on unmount */
-+	d.no_abort = 1;
- 	err = fuse_fill_super_common(sb, &d);
- 	if (err < 0)
- 		goto err_free_init_req;
--- 
-2.20.1
+While going through patch 5, I was confused as to why we need to pin 
+pages if we are only trying to translate the addresses and no data 
+transfer will take place with count==0. Well, you answer that in patch 6 :)
+
+So maybe it might be better to move parts of patch 6 to 5 or squash 
+them, or maybe reverse the order.
+
+Thanks
+Farhan
+
+
+>>>
+>>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+>>> ---
+>>>   drivers/s390/cio/vfio_ccw_cp.c | 26 ++++++++------------------
+>>>   1 file changed, 8 insertions(+), 18 deletions(-)
+>>
+> 
 
