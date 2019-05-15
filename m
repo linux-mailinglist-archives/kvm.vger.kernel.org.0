@@ -2,159 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 077951F973
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 19:43:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F113F1FA2A
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2019 20:43:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726796AbfEORmy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 13:42:54 -0400
-Received: from mga02.intel.com ([134.134.136.20]:27990 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726657AbfEORmx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 May 2019 13:42:53 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 May 2019 10:42:52 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by fmsmga007.fm.intel.com with ESMTP; 15 May 2019 10:42:52 -0700
-Date:   Wed, 15 May 2019 10:42:51 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH v2 4/4] KVM: LAPIC: Optimize timer latency further
-Message-ID: <20190515174251.GF5875@linux.intel.com>
-References: <1557893514-5815-1-git-send-email-wanpengli@tencent.com>
- <1557893514-5815-5-git-send-email-wanpengli@tencent.com>
+        id S1726676AbfEOSnT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 14:43:19 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:43826 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725974AbfEOSnT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 May 2019 14:43:19 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4FIdRhN007966;
+        Wed, 15 May 2019 18:42:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=otXXOszYdsBjfduSwJUQZMWPrfd3KE8B1WDi+bhrywk=;
+ b=ITAdYKE1B/U0xNlismRf6Qdi+fFFUhlE60wD5BkDOFle1E4oerlFWH5BN4cn+Oq3NaSL
+ UixopBNoYqtHSys4Lcf4By4RPyZP7a1oQuEKag2VubVoE9YiwWIx1o1DCh5nDbR3LkqL
+ Cw72lo/JDO5YdQWUANbGRuPM/QdAovfkJ5Yhp4Xdu757pmJOktPivaNlAhYERbX/w6uZ
+ 3NBc5goakeLwFMJ+hoBzs1u0XOxVhYAh6yVfQEofs/X8z4wfOOg8QYB3NmwSqsC1gk4B
+ iltYLhrKJkmVadl5MvuYw0zZaK+uWrITUL+0s9tYPP1VBzBhvp1k9hRVFnkcyyX6Y7WU bQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 2sdq1qpr5b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 May 2019 18:42:42 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4FIgE9p104332;
+        Wed, 15 May 2019 18:42:42 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 2sgkx3n23q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 May 2019 18:42:42 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4FIgf6k002096;
+        Wed, 15 May 2019 18:42:41 GMT
+Received: from [10.156.75.204] (/10.156.75.204)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 15 May 2019 18:42:40 +0000
+Subject: Re: [PATCH] sched: introduce configurable delay before entering idle
+To:     Marcelo Tosatti <mtosatti@redhat.com>,
+        Wanpeng Li <kernellwp@gmail.com>
+Cc:     kvm-devel <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Bandan Das <bsd@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20190507185647.GA29409@amt.cnet>
+ <CANRm+Cx8zCDG6Oz1m9eukkmx_uVFYcQOdMwZrHwsQcbLm_kuPA@mail.gmail.com>
+ <20190514135022.GD4392@amt.cnet>
+From:   Ankur Arora <ankur.a.arora@oracle.com>
+Message-ID: <7e390fef-e0df-963f-4e18-e44ac2766be3@oracle.com>
+Date:   Wed, 15 May 2019 11:42:56 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1557893514-5815-5-git-send-email-wanpengli@tencent.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190514135022.GD4392@amt.cnet>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9257 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905150112
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9257 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905150113
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 15, 2019 at 12:11:54PM +0800, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
+On 5/14/19 6:50 AM, Marcelo Tosatti wrote:
+> On Mon, May 13, 2019 at 05:20:37PM +0800, Wanpeng Li wrote:
+>> On Wed, 8 May 2019 at 02:57, Marcelo Tosatti <mtosatti@redhat.com> wrote:
+>>>
+>>>
+>>> Certain workloads perform poorly on KVM compared to baremetal
+>>> due to baremetal's ability to perform mwait on NEED_RESCHED
+>>> bit of task flags (therefore skipping the IPI).
+>>
+>> KVM supports expose mwait to the guest, if it can solve this?
+>>
+>> Regards,
+>> Wanpeng Li
 > 
-> Advance lapic timer tries to hidden the hypervisor overhead between the 
-> host emulated timer fires and the guest awares the timer is fired. However, 
-> it just hidden the time between apic_timer_fn/handle_preemption_timer -> 
-> wait_lapic_expire, instead of the real position of vmentry which is 
-> mentioned in the orignial commit d0659d946be0 ("KVM: x86: add option to 
-> advance tscdeadline hrtimer expiration"). There is 700+ cpu cycles between 
-> the end of wait_lapic_expire and before world switch on my haswell desktop, 
-> it will be 2400+ cycles if vmentry_l1d_flush is tuned to always. 
-> 
-> This patch tries to narrow the last gap(wait_lapic_expire -> world switch), 
-> it takes the real overhead time between apic_timer_fn/handle_preemption_timer
-> and before world switch into consideration when adaptively tuning timer 
-> advancement. The patch can reduce 40% latency (~1600+ cycles to ~1000+ cycles 
-> on a haswell desktop) for kvm-unit-tests/tscdeadline_latency when testing 
-> busy waits.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Cc: Liran Alon <liran.alon@oracle.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/lapic.c   | 3 ++-
->  arch/x86/kvm/lapic.h   | 2 +-
->  arch/x86/kvm/svm.c     | 4 ++++
->  arch/x86/kvm/vmx/vmx.c | 4 ++++
->  arch/x86/kvm/x86.c     | 3 ---
->  5 files changed, 11 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index af38ece..63513de 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1531,7 +1531,7 @@ static inline void adaptive_tune_timer_advancement(struct kvm_vcpu *vcpu,
->  	apic->lapic_timer.timer_advance_ns = timer_advance_ns;
->  }
->  
-> -void wait_lapic_expire(struct kvm_vcpu *vcpu)
-> +void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_lapic *apic = vcpu->arch.apic;
->  	u64 guest_tsc, tsc_deadline;
-> @@ -1553,6 +1553,7 @@ void wait_lapic_expire(struct kvm_vcpu *vcpu)
->  	if (unlikely(!apic->lapic_timer.timer_advance_adjust_done))
->  		adaptive_tune_timer_advancement(vcpu, apic->lapic_timer.advance_expire_delta);
->  }
-> +EXPORT_SYMBOL_GPL(kvm_wait_lapic_expire);
->  
->  static void start_sw_tscdeadline(struct kvm_lapic *apic)
->  {
-> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> index 3e72a25..f974a3d 100644
-> --- a/arch/x86/kvm/lapic.h
-> +++ b/arch/x86/kvm/lapic.h
-> @@ -220,7 +220,7 @@ static inline int kvm_lapic_latched_init(struct kvm_vcpu *vcpu)
->  
->  bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector);
->  
-> -void wait_lapic_expire(struct kvm_vcpu *vcpu);
-> +void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
->  
->  bool kvm_intr_is_single_vcpu_fast(struct kvm *kvm, struct kvm_lapic_irq *irq,
->  			struct kvm_vcpu **dest_vcpu);
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 406b558..740fb3f 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -5646,6 +5646,10 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
->  	 */
->  	x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
->  
-> +	if (lapic_in_kernel(vcpu) &&
-> +		vcpu->arch.apic->lapic_timer.timer_advance_ns)
-> +		kvm_wait_lapic_expire(vcpu);
-> +
->  	local_irq_enable();
->  
->  	asm volatile (
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 9663d41..1c49946 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6437,6 +6437,10 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
->  	if (vcpu->arch.cr2 != read_cr2())
->  		write_cr2(vcpu->arch.cr2);
->  
-> +	if (lapic_in_kernel(vcpu) &&
-> +		vcpu->arch.apic->lapic_timer.timer_advance_ns)
-> +		kvm_wait_lapic_expire(vcpu);
+> Unfortunately mwait in guest is not feasible (uncompatible with multiple
+> guests). Checking whether a paravirt solution is possible.
 
-One potential hiccup with this approach is that we're now accessing more
-data after flushing the L1.  Not sure if that's actually a problem here,
-but it probably should be explicitly addressed/considered.
+Hi Marcelo,
 
-> +
->  	vmx->fail = __vmx_vcpu_run(vmx, (unsigned long *)&vcpu->arch.regs,
->  				   vmx->loaded_vmcs->launched);
->  
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 1d89cb9..0eb9549 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7894,9 +7894,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  	}
->  
->  	trace_kvm_entry(vcpu->vcpu_id);
-> -	if (lapic_in_kernel(vcpu) &&
-> -	    vcpu->arch.apic->lapic_timer.timer_advance_ns)
-> -		wait_lapic_expire(vcpu);
->  	guest_enter_irqoff();
->  
->  	fpregs_assert_state_consistent();
-> -- 
-> 2.7.4
-> 
+I was also looking at making MWAIT available to guests in a safe manner:
+whether through emulation or a PV-MWAIT. My (unsolicited) thoughts
+follow.
+
+We basically want to handle this sequence:
+
+     monitor(monitor_address);
+     if (*monitor_address == base_value)
+          mwaitx(max_delay);
+
+Emulation seems problematic because, AFAICS this would happen:
+
+     guest                                   hypervisor
+     =====                                   ====
+
+     monitor(monitor_address);
+         vmexit  ===>                        monitor(monitor_address)
+     if (*monitor_address == base_value)
+          mwait();
+               vmexit    ====>               mwait()
+
+There's a context switch back to the guest in this sequence which seems
+problematic. Both the AMD and Intel specs list system calls and
+far calls as events which would lead to the MWAIT being woken up: 
+"Voluntary transitions due to fast system call and far calls (occurring 
+prior to issuing MWAIT but after setting the monitor)".
+
+
+We could do this instead:
+
+     guest                                   hypervisor
+     =====                                   ====
+
+     monitor(monitor_address);
+         vmexit  ===>                        cache monitor_address
+     if (*monitor_address == base_value)
+          mwait();
+               vmexit    ====>              monitor(monitor_address)
+                                            mwait()
+
+But, this would miss the "if (*monitor_address == base_value)" check in
+the host which is problematic if *monitor_address changed simultaneously
+when monitor was executed.
+(Similar problem if we cache both the monitor_address and
+*monitor_address.)
+
+
+So, AFAICS, the only thing that would work is the guest offloading the
+whole PV-MWAIT operation.
+
+AFAICS, that could be a paravirt operation which needs three parameters:
+(monitor_address, base_value, max_delay.)
+
+This would allow the guest to offload this whole operation to
+the host:
+     monitor(monitor_address);
+     if (*monitor_address == base_value)
+          mwaitx(max_delay);
+
+I'm guessing you are thinking on similar lines?
+
+
+High level semantics: If the CPU doesn't have any runnable threads, then
+we actually do this version of PV-MWAIT -- arming a timer if necessary
+so we only sleep until the time-slice expires or the MWAIT max_delay does.
+
+If the CPU has any runnable threads then this could still finish its 
+time-quanta or we could just do a schedule-out.
+
+
+So the semantics guaranteed to the host would be that PV-MWAIT returns 
+after >= max_delay OR with the *monitor_address changed.
+
+
+
+Ankur
