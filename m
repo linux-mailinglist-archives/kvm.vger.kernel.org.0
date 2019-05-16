@@ -2,159 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8419B20FC2
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 22:51:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BA8021072
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 00:08:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727968AbfEPUvL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 May 2019 16:51:11 -0400
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:36697 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727510AbfEPUvL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 May 2019 16:51:11 -0400
-Received: by mail-pf1-f202.google.com with SMTP id d21so2983323pfr.3
-        for <kvm@vger.kernel.org>; Thu, 16 May 2019 13:51:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=O0A3Y6O8QZ1jZo/IAcyQwbrOJctQs0ZeB/K1vYWmuBI=;
-        b=V3SH9UWTXhecnBvY9y5BQamRei5+qE2Sfjc4eidha3qPpIUKiFC2Za/3ErpPsnlN8W
-         2+YfB6DRHUxK86SVsJQ6HjeCgq/V+ywqPMuLW2kErg8FmTPzKnWZu3K3jboTADUzrV+/
-         zJHSv1CG9E1NrqB6ZtXofWvgyI/BMJDpbHgRgfXupGEBoOI6rca9n+8JFme6U3Z9NyOf
-         sil6q/xnC5ZppxoSW1dAZmXM51G91MNKXOu/ApqMaUGTEpL7g+Qw9gm8nm9uYsS0SrzG
-         WOp24BXJeHc9i1WyrUKHdAnHDB8xbzO44RPj+JlDVuyfvKCTZDppOjyT6w8dy5JqtqQe
-         uo/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=O0A3Y6O8QZ1jZo/IAcyQwbrOJctQs0ZeB/K1vYWmuBI=;
-        b=apvBXyft+EG5USyAplVN1h5G1oBV/MeZnam6OpUSNHfdGHrW2GlQJpz7lJXDBqhMkk
-         HDOXBWdGQstE+QiNIDGhcu3EPBggKQEBy0TOPIxKm/n6QK2D3GPGZ1bzMg6L5bZ7uIOY
-         BkZ9F83/KKjxVm2VJPyuoHxu2KDL1kztAH0CQTfi/EkD7YCFqJrFG1YB8ZjARvcJ7DGR
-         5QEpAhnMR7h1AuQ7/L60AwD97nHjWwhd5geCWGRLp7pSANlfXk2B+3VxGqXaxHo7A9e3
-         KOAdPrrWv03LlvIcMQh0k+tr0yBsmwvajIKfY4AfTSqY3vDwwlfvDL90K/wZFWxc8Shk
-         z0mA==
-X-Gm-Message-State: APjAAAU4HVxCKXNj/NvJgumAlmfFnYrjEVLsenKV4VAxRXLJEjenh0s0
-        mcdmbnEZY0RCV5YlnfxWGvqWhO5wvV7CH5I=
-X-Google-Smtp-Source: APXvYqwf41flQIat3KOIsyjjpw5N63ZvcHDik9EhfhYXCkBPgjXrtlDQs2OKDmjNAjHU9uyT/bCBM5OoUqnw6s4=
-X-Received: by 2002:a63:7552:: with SMTP id f18mr49259106pgn.234.1558039869914;
- Thu, 16 May 2019 13:51:09 -0700 (PDT)
-Date:   Thu, 16 May 2019 13:51:07 -0700
-Message-Id: <20190516205107.222003-1-jemoreira@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.21.0.1020.gf2820cf01a-goog
-Subject: [PATCH RESEND] vsock/virtio: Initialize core virtio vsock before
- registering the driver
-From:   "Jorge E. Moreira" <jemoreira@google.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        kernel-team@android.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        id S1727933AbfEPWIP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 May 2019 18:08:15 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:34272 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726762AbfEPWIP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 May 2019 18:08:15 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4GLwkdk131288;
+        Thu, 16 May 2019 22:07:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=N+RrLuQi/yWZ/T4pDK9Q7Cqmdio1ysKCh9wepuuqeQg=;
+ b=w5V/D8ovPxpyZYTc61eBr08UCDm1DZ/rbMgfpzq5XTULo/mkNmFTdz8bwaYeU0jMETsG
+ obzLPMZ2k/QDQCDh2KFZsqF54/5RPeqJGx2KYsa10jzsTrNNNtZuiRNcYPSyn7eIkHRs
+ kLcsNN/brI9Sl3xkiDkchu7my9Ih/2/GDDR8DCoIc82mIWVM8U6sUPlNgVKjs8IWK863
+ nJO+VH3oafqD8SjDLSK+S/1InSH966vVYhCyMMC0Nl6rMO7xO/n6kWswC3zXYRc7APLY
+ 5qz92EnsVt0ZA6DfhN53B7SViD6PqBz6lrbmuznOIrzcjl9wfsZ/Or3FHPhaeGBaIqqg MQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 2sdq1qx8jb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 May 2019 22:07:51 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4GM7gps129809;
+        Thu, 16 May 2019 22:07:50 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 2sgkx4bfcj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 May 2019 22:07:50 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4GM7nvI003861;
+        Thu, 16 May 2019 22:07:49 GMT
+Received: from dhcp-10-132-91-225.usdhcp.oraclecorp.com (/10.132.91.225)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 16 May 2019 15:07:49 -0700
+Subject: Re: [PATCH 4/8][KVM nVMX]: Check "load IA32_PERF_GLOBAL_CTRL" VM-exit
+ control on vmentry of nested guests
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
+        jmattson@google.com
+References: <20190424231724.2014-1-krish.sadhukhan@oracle.com>
+ <20190424231724.2014-5-krish.sadhukhan@oracle.com>
+ <20190513190016.GI28561@linux.intel.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <2c08cd38-fd7d-da68-7c8d-2c7c93c3a9c8@oracle.com>
+Date:   Thu, 16 May 2019 15:07:48 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
+MIME-Version: 1.0
+In-Reply-To: <20190513190016.GI28561@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9259 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905160134
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9259 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905160133
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Avoid a race in which static variables in net/vmw_vsock/af_vsock.c are
-accessed (while handling interrupts) before they are initialized.
 
-[    4.201410] BUG: unable to handle kernel paging request at ffffffffffffffe8
-[    4.207829] IP: vsock_addr_equals_addr+0x3/0x20
-[    4.211379] PGD 28210067 P4D 28210067 PUD 28212067 PMD 0
-[    4.211379] Oops: 0000 [#1] PREEMPT SMP PTI
-[    4.211379] Modules linked in:
-[    4.211379] CPU: 1 PID: 30 Comm: kworker/1:1 Not tainted 4.14.106-419297-gd7e28cc1f241 #1
-[    4.211379] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
-[    4.211379] Workqueue: virtio_vsock virtio_transport_rx_work
-[    4.211379] task: ffffa3273d175280 task.stack: ffffaea1800e8000
-[    4.211379] RIP: 0010:vsock_addr_equals_addr+0x3/0x20
-[    4.211379] RSP: 0000:ffffaea1800ebd28 EFLAGS: 00010286
-[    4.211379] RAX: 0000000000000002 RBX: 0000000000000000 RCX: ffffffffb94e42f0
-[    4.211379] RDX: 0000000000000400 RSI: ffffffffffffffe0 RDI: ffffaea1800ebdd0
-[    4.211379] RBP: ffffaea1800ebd58 R08: 0000000000000001 R09: 0000000000000001
-[    4.211379] R10: 0000000000000000 R11: ffffffffb89d5d60 R12: ffffaea1800ebdd0
-[    4.211379] R13: 00000000828cbfbf R14: 0000000000000000 R15: ffffaea1800ebdc0
-[    4.211379] FS:  0000000000000000(0000) GS:ffffa3273fd00000(0000) knlGS:0000000000000000
-[    4.211379] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    4.211379] CR2: ffffffffffffffe8 CR3: 000000002820e001 CR4: 00000000001606e0
-[    4.211379] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[    4.211379] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[    4.211379] Call Trace:
-[    4.211379]  ? vsock_find_connected_socket+0x6c/0xe0
-[    4.211379]  virtio_transport_recv_pkt+0x15f/0x740
-[    4.211379]  ? detach_buf+0x1b5/0x210
-[    4.211379]  virtio_transport_rx_work+0xb7/0x140
-[    4.211379]  process_one_work+0x1ef/0x480
-[    4.211379]  worker_thread+0x312/0x460
-[    4.211379]  kthread+0x132/0x140
-[    4.211379]  ? process_one_work+0x480/0x480
-[    4.211379]  ? kthread_destroy_worker+0xd0/0xd0
-[    4.211379]  ret_from_fork+0x35/0x40
-[    4.211379] Code: c7 47 08 00 00 00 00 66 c7 07 28 00 c7 47 08 ff ff ff ff c7 47 04 ff ff ff ff c3 0f 1f 00 66 2e 0f 1f 84 00 00 00 00 00 8b 47 08 <3b> 46 08 75 0a 8b 47 04 3b 46 04 0f 94 c0 c3 31 c0 c3 90 66 2e
-[    4.211379] RIP: vsock_addr_equals_addr+0x3/0x20 RSP: ffffaea1800ebd28
-[    4.211379] CR2: ffffffffffffffe8
-[    4.211379] ---[ end trace f31cc4a2e6df3689 ]---
-[    4.211379] Kernel panic - not syncing: Fatal exception in interrupt
-[    4.211379] Kernel Offset: 0x37000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-[    4.211379] Rebooting in 5 seconds..
 
-Fixes: 22b5c0b63f32 ("vsock/virtio: fix kernel panic after device hot-unplug")
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: kvm@vger.kernel.org
-Cc: virtualization@lists.linux-foundation.org
-Cc: netdev@vger.kernel.org
-Cc: kernel-team@android.com
-Cc: stable@vger.kernel.org [4.9+]
-Signed-off-by: Jorge E. Moreira <jemoreira@google.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- net/vmw_vsock/virtio_transport.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+On 05/13/2019 12:00 PM, Sean Christopherson wrote:
+> On Wed, Apr 24, 2019 at 07:17:20PM -0400, Krish Sadhukhan wrote:
+>> According to section "Checks on Host Control Registers and MSRs" in Intel
+>> SDM vol 3C, the following check is performed on vmentry of nested guests:
+>>
+>>      "If the "load IA32_PERF_GLOBAL_CTRL" VM-exit control is 1, bits reserved
+>>      in the IA32_PERF_GLOBAL_CTRL MSR must be 0 in the field for that
+>>      register."
+>>
+>> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+>> ---
+>>   arch/x86/kvm/vmx/nested.c | 5 +++++
+>>   1 file changed, 5 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> index 83cd887638cb..d2067370e288 100644
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -2595,6 +2595,11 @@ static int nested_check_host_control_regs(struct kvm_vcpu *vcpu,
+>>   	    !nested_host_cr4_valid(vcpu, vmcs12->host_cr4) ||
+>>   	    !nested_cr3_valid(vcpu, vmcs12->host_cr3))
+>>   		return -EINVAL;
+>> +
+>> +	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL &&
+>> +	   !kvm_valid_perf_global_ctrl(vmcs12->host_ia32_perf_global_ctrl))
+> If vmcs12->host_ia32_perf_global_ctrl were ever actually consumed, this
+> needs to ensure L1 isn't able to take control of counters that are owned
+> by the host.
 
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index 15eb5d3d4750..96ab344f17bb 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -702,28 +702,27 @@ static int __init virtio_vsock_init(void)
- 	if (!virtio_vsock_workqueue)
- 		return -ENOMEM;
- 
--	ret = register_virtio_driver(&virtio_vsock_driver);
-+	ret = vsock_core_init(&virtio_transport.transport);
- 	if (ret)
- 		goto out_wq;
- 
--	ret = vsock_core_init(&virtio_transport.transport);
-+	ret = register_virtio_driver(&virtio_vsock_driver);
- 	if (ret)
--		goto out_vdr;
-+		goto out_vci;
- 
- 	return 0;
- 
--out_vdr:
--	unregister_virtio_driver(&virtio_vsock_driver);
-+out_vci:
-+	vsock_core_exit();
- out_wq:
- 	destroy_workqueue(virtio_vsock_workqueue);
- 	return ret;
--
- }
- 
- static void __exit virtio_vsock_exit(void)
- {
--	vsock_core_exit();
- 	unregister_virtio_driver(&virtio_vsock_driver);
-+	vsock_core_exit();
- 	destroy_workqueue(virtio_vsock_workqueue);
- }
- 
--- 
-2.21.0.1020.gf2820cf01a-goog
+Sorry, I didn't understand your concern. Could you please explain how L1 
+can control L0's counters ?
+
+>
+>> +		return -EINVAL;
+>> +
+>>   	/*
+>>   	 * If the load IA32_EFER VM-exit control is 1, bits reserved in the
+>>   	 * IA32_EFER MSR must be 0 in the field for that register. In addition,
+>> -- 
+>> 2.17.2
+>>
 
