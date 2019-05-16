@@ -2,52 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B4BF1FDF1
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 05:13:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 580411FDF2
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 05:13:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726272AbfEPDNH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 23:13:07 -0400
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:44749 "EHLO
+        id S1726425AbfEPDNu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 23:13:50 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:42049 "EHLO
         mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726157AbfEPDNH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 May 2019 23:13:07 -0400
-Received: by mail-oi1-f194.google.com with SMTP id z65so1386786oia.11;
-        Wed, 15 May 2019 20:13:06 -0700 (PDT)
+        with ESMTP id S1726157AbfEPDNu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 May 2019 23:13:50 -0400
+Received: by mail-oi1-f194.google.com with SMTP id k9so1402995oig.9;
+        Wed, 15 May 2019 20:13:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=wL2LzkzA7t8tfuIUbLBzWDPQUhplC7NcF2EvAx3KbHM=;
-        b=J4V/oeTB9otXxka/396yGMdkhJ/yn13ovryxgY8N9PcOfsgjje5mFWVIW5lTgwMFwc
-         cz7TNUqHnaU/X2M+VD8MKw1he+tyRLkFFegRf87mUDbXQjWgk1zKYv7bXP48MGIIun7+
-         G8rapKqt4mv3tHbgeUysAzsl3m90gFL82VLeoHAC7PU5z88U2/JH9uoYvABnctwfkdt+
-         dQM7ij64Lrx/L2WO6ysihcGGpPe9SbsACTg7X4fpgMEw67pja6h+96VbxQEDn0LJWybx
-         ASNQr8MPojY4KrQsf8cqlV9VDY6XV5hoBLJ+LnOqzwzFu82RfvmjZFohm6fQIHaomIE7
-         Hc6A==
+        bh=nQLrJG/rtyMfyjg8xodMHV8b5DIFETCrat3O+1ZGccE=;
+        b=KMpZas/VkspcTYmIWz/679SkE+o9a7V2vV1HcW0lpalO1ANcgJy5YlOI8hB7ilNHhA
+         7HNiylHGgBzvAG2Pv81L8RQVhpAbk2e4QeoaPAie5HkEwcvZYZrdN6rOAsDouqXZQndr
+         p0TYbDOrshTuv2QfaQ+pC4ZcJb3aM147yvStgEHMns5rU4CHKWb95UgrUQjJjNGHZYWf
+         +R/BIWKuW1eKb9rQZzPJfA9gRixkFpg0X3LtuLD9pS7jwXg6wFKSGkrO1NTFV8h1R4zV
+         LTmw9l+fMQynFUmWEnlO144FxeBR+gGyc7RF6T4iyUyrXi5NJdGz3BZdpdYm8sid0IXZ
+         Xbjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=wL2LzkzA7t8tfuIUbLBzWDPQUhplC7NcF2EvAx3KbHM=;
-        b=dUhBmwVeUJab5Exc9uLu2TWbvKNh+/1Bpk6tPGAsEVMfKAB8noZ9eE8oyUvAcpXKlI
-         maAKdpOabhPgk6fnfPTb72Ok3LCBWybCa12BgLMWWVCUoXWrlbmtFEBiI6/Xj1dKgQqb
-         rOgzKeSfwNIwKmZKswtFok3aCiyCcCpFnobag6tBFvNXMfsmVTgjuCebEMDaf2a3gw/L
-         5MVFzwvf6mOflQBiC6UFmsvU0oyE0KTsmt9KxH/H+B3NLFzglPCLywydzBG58rfOoeaV
-         CZWXr6bdFoVfy0PSeF7sF5AcTFbNvVt4cj1Jn6KOaKhaR7F89C8cSpMJximt1ZYhaCMb
-         tyuw==
-X-Gm-Message-State: APjAAAVW2Rz7BOWRuQ8vvDP06sD5M+ClxLeLyRUgtB0dioQL+XvALQdF
-        4eZNvuXz8i9LAIMfijByMYnkd4MxXqvynhX8htA=
-X-Google-Smtp-Source: APXvYqy0HoXiWSYkQ6g/EjpeBo60qCl3VbRrSqkNF25EstM70Gwp12iz0c6mOUUbBHA7nFlqq5gNNE/YfS4rgW9DA10=
-X-Received: by 2002:aca:bf83:: with SMTP id p125mr8860857oif.47.1557976386255;
- Wed, 15 May 2019 20:13:06 -0700 (PDT)
+        bh=nQLrJG/rtyMfyjg8xodMHV8b5DIFETCrat3O+1ZGccE=;
+        b=ixFtUSmZef3NN2pjpoVv/hr1zLux2l68lC6zuuovjtcjnsQmZjg943Fpw/LZQZlfFh
+         PKYigB9twlBhsfSJVy1LcaqmYXrrGvSxnh8IcwTHD8fXDYbDYrHhjfmQibeJPbBkgs5n
+         dDD19Vuh0CwfchIe8uDzfsLV7BQfk1LxoEo5D4o/ugKGS7RG78bWQ1rchhwaOVhcjr97
+         xRQlXIqM0hwZzfkXYyhkNOC6UgzEiHu+CaUj24t1w73T9EzJd67FSqAFZptIRs7fkyLa
+         IUZuWJgWEf7QkefT95EbYtfQJWVuxecUfC4Bup9lTVUhYGcxOEw2xsn9j5KsAo/w1v21
+         6GKg==
+X-Gm-Message-State: APjAAAVlHiO8g+GcnvLWGJIsebGq2KtKOcyQ42C+qOLBMbNzC1Pt8rVa
+        yNxkSsl4uGSj4p8S6zngEtYWHHMVFrWXbAWZDQCUug==
+X-Google-Smtp-Source: APXvYqy5xIuYztcFAe+BnOihFLgqBgaPMYJBKZp9KPilfdPciLi5qm2f8CD8PqPnGLvQa1MUz8QsMp1XeJ/f1Xjaa90=
+X-Received: by 2002:aca:3305:: with SMTP id z5mr4812192oiz.141.1557976429718;
+ Wed, 15 May 2019 20:13:49 -0700 (PDT)
 MIME-Version: 1.0
 References: <1557893514-5815-1-git-send-email-wanpengli@tencent.com>
- <1557893514-5815-5-git-send-email-wanpengli@tencent.com> <20190515174251.GF5875@linux.intel.com>
-In-Reply-To: <20190515174251.GF5875@linux.intel.com>
+ <1557893514-5815-4-git-send-email-wanpengli@tencent.com> <20190515172132.GE5875@linux.intel.com>
+In-Reply-To: <20190515172132.GE5875@linux.intel.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 16 May 2019 11:14:26 +0800
-Message-ID: <CANRm+Cy8O9yv6DF8thsJ854yf+82-94Xin_7sDjDmwV=9Pj-vA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] KVM: LAPIC: Optimize timer latency further
+Date:   Thu, 16 May 2019 11:15:10 +0800
+Message-ID: <CANRm+Cx5yQ_VQpSjKmO=Fi2_KCC4Rd_jMUr+mM7qvZ6EUD+=aA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/4] KVM: LAPIC: Expose per-vCPU timer adavance
+ information to userspace
 To:     Sean Christopherson <sean.j.christopherson@intel.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -60,35 +61,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 16 May 2019 at 01:42, Sean Christopherson
+On Thu, 16 May 2019 at 01:21, Sean Christopherson
 <sean.j.christopherson@intel.com> wrote:
 >
-> On Wed, May 15, 2019 at 12:11:54PM +0800, Wanpeng Li wrote:
+> On Wed, May 15, 2019 at 12:11:53PM +0800, Wanpeng Li wrote:
 > > From: Wanpeng Li <wanpengli@tencent.com>
 > >
-> > Advance lapic timer tries to hidden the hypervisor overhead between the
-> > host emulated timer fires and the guest awares the timer is fired. Howe=
-ver,
-> > it just hidden the time between apic_timer_fn/handle_preemption_timer -=
->
-> > wait_lapic_expire, instead of the real position of vmentry which is
-> > mentioned in the orignial commit d0659d946be0 ("KVM: x86: add option to
-> > advance tscdeadline hrtimer expiration"). There is 700+ cpu cycles betw=
-een
-> > the end of wait_lapic_expire and before world switch on my haswell desk=
-top,
-> > it will be 2400+ cycles if vmentry_l1d_flush is tuned to always.
+> > Expose the per-vCPU advancement information to the user via per-vCPU de=
+bugfs
+> > entry. wait_lapic_expire() call was moved above guest_enter_irqoff() be=
+cause
+> > of its tracepoint, which violated the RCU extended quiescent state invo=
+ked
+> > by guest_enter_irqoff()[1][2]. This patch simply removes the tracepoint=
+,
+> > which would allow moving wait_lapic_expire(). Sean pointed out:
 > >
-> > This patch tries to narrow the last gap(wait_lapic_expire -> world swit=
-ch),
-> > it takes the real overhead time between apic_timer_fn/handle_preemption=
-_timer
-> > and before world switch into consideration when adaptively tuning timer
-> > advancement. The patch can reduce 40% latency (~1600+ cycles to ~1000+ =
-cycles
-> > on a haswell desktop) for kvm-unit-tests/tscdeadline_latency when testi=
-ng
-> > busy waits.
+> > | Now that the advancement time is tracked per-vCPU, realizing a change
+> > | in the advancement time requires creating a new VM. For all intents
+> > | and purposes this makes it impractical to hand tune the advancement
+> > | in real time using the tracepoint as the feedback mechanism.
+> >
+> > [1] Commit 8b89fe1f6c43 ("kvm: x86: move tracepoints outside extended q=
+uiescent state")
+> > [2] https://patchwork.kernel.org/patch/7821111/
 > >
 > > Cc: Paolo Bonzini <pbonzini@redhat.com>
 > > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
@@ -96,108 +92,188 @@ ng
 > > Cc: Liran Alon <liran.alon@oracle.com>
 > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 > > ---
-> >  arch/x86/kvm/lapic.c   | 3 ++-
-> >  arch/x86/kvm/lapic.h   | 2 +-
-> >  arch/x86/kvm/svm.c     | 4 ++++
-> >  arch/x86/kvm/vmx/vmx.c | 4 ++++
-> >  arch/x86/kvm/x86.c     | 3 ---
-> >  5 files changed, 11 insertions(+), 5 deletions(-)
+> >  arch/x86/kvm/debugfs.c | 16 ++++++++++++++++
+> >  arch/x86/kvm/lapic.c   | 16 ++++++++--------
+> >  arch/x86/kvm/lapic.h   |  1 +
+> >  arch/x86/kvm/trace.h   | 20 --------------------
+> >  4 files changed, 25 insertions(+), 28 deletions(-)
 > >
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index af38ece..63513de 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -1531,7 +1531,7 @@ static inline void adaptive_tune_timer_advancemen=
-t(struct kvm_vcpu *vcpu,
-> >       apic->lapic_timer.timer_advance_ns =3D timer_advance_ns;
+> > diff --git a/arch/x86/kvm/debugfs.c b/arch/x86/kvm/debugfs.c
+> > index c19c7ed..8cf542e 100644
+> > --- a/arch/x86/kvm/debugfs.c
+> > +++ b/arch/x86/kvm/debugfs.c
+> > @@ -9,12 +9,22 @@
+> >   */
+> >  #include <linux/kvm_host.h>
+> >  #include <linux/debugfs.h>
+> > +#include "lapic.h"
+> >
+> >  bool kvm_arch_has_vcpu_debugfs(void)
+> >  {
+> >       return true;
 > >  }
 > >
-> > -void wait_lapic_expire(struct kvm_vcpu *vcpu)
-> > +void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
-> >  {
-> >       struct kvm_lapic *apic =3D vcpu->arch.apic;
-> >       u64 guest_tsc, tsc_deadline;
-> > @@ -1553,6 +1553,7 @@ void wait_lapic_expire(struct kvm_vcpu *vcpu)
-> >       if (unlikely(!apic->lapic_timer.timer_advance_adjust_done))
-> >               adaptive_tune_timer_advancement(vcpu, apic->lapic_timer.a=
-dvance_expire_delta);
-> >  }
-> > +EXPORT_SYMBOL_GPL(kvm_wait_lapic_expire);
-> >
-> >  static void start_sw_tscdeadline(struct kvm_lapic *apic)
-> >  {
-> > diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> > index 3e72a25..f974a3d 100644
-> > --- a/arch/x86/kvm/lapic.h
-> > +++ b/arch/x86/kvm/lapic.h
-> > @@ -220,7 +220,7 @@ static inline int kvm_lapic_latched_init(struct kvm=
-_vcpu *vcpu)
-> >
-> >  bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector);
-> >
-> > -void wait_lapic_expire(struct kvm_vcpu *vcpu);
-> > +void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
-> >
-> >  bool kvm_intr_is_single_vcpu_fast(struct kvm *kvm, struct kvm_lapic_ir=
-q *irq,
-> >                       struct kvm_vcpu **dest_vcpu);
-> > diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> > index 406b558..740fb3f 100644
-> > --- a/arch/x86/kvm/svm.c
-> > +++ b/arch/x86/kvm/svm.c
-> > @@ -5646,6 +5646,10 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
-> >        */
-> >       x86_spec_ctrl_set_guest(svm->spec_ctrl, svm->virt_spec_ctrl);
-> >
-> > +     if (lapic_in_kernel(vcpu) &&
-> > +             vcpu->arch.apic->lapic_timer.timer_advance_ns)
-> > +             kvm_wait_lapic_expire(vcpu);
+> > +static int vcpu_get_timer_expire_delta(void *data, u64 *val)
+> > +{
+> > +     struct kvm_vcpu *vcpu =3D (struct kvm_vcpu *) data;
+> > +     *val =3D vcpu->arch.apic->lapic_timer.advance_expire_delta;
+> > +     return 0;
+> > +}
 > > +
-> >       local_irq_enable();
+> > +DEFINE_SIMPLE_ATTRIBUTE(vcpu_timer_expire_delta_fops, vcpu_get_timer_e=
+xpire_delta, NULL, "%lld\n");
+> > +
+> >  static int vcpu_get_tsc_offset(void *data, u64 *val)
+> >  {
+> >       struct kvm_vcpu *vcpu =3D (struct kvm_vcpu *) data;
+> > @@ -51,6 +61,12 @@ int kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vc=
+pu)
+> >       if (!ret)
+> >               return -ENOMEM;
 > >
-> >       asm volatile (
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 9663d41..1c49946 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -6437,6 +6437,10 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
-> >       if (vcpu->arch.cr2 !=3D read_cr2())
-> >               write_cr2(vcpu->arch.cr2);
-> >
-> > +     if (lapic_in_kernel(vcpu) &&
-> > +             vcpu->arch.apic->lapic_timer.timer_advance_ns)
-> > +             kvm_wait_lapic_expire(vcpu);
+> > +     ret =3D debugfs_create_file("advance_expire_delta", 0444,
+> > +                                                     vcpu->debugfs_den=
+try,
+> > +                                                     vcpu, &vcpu_timer=
+_expire_delta_fops);
 >
-> One potential hiccup with this approach is that we're now accessing more
-> data after flushing the L1.  Not sure if that's actually a problem here,
-> but it probably should be explicitly addressed/considered.
+> I was thinking we would expose 'kvm_timer.timer_advance_ns', not the
+> delta, the idea being that being able to query the auto-adjusted value
+> is now the desired behavior.  But rethinking things, that enhancement is
+> orthogonal to removing the tracepoint.
+>
+> Back to the tracepoint, an alternative solution would be to add
+> kvm_timer.advance_expire_delta as you did, but rather than add a new
+> debugfs entry, simply move the tracepoint below guest_exit_irqoff()
+> in vcpu_enter_guest().  I.e. snapshot the delta before VM-Enter, but
+> trace it after VM-Exit.
+>
+> If we want to continue supporting hand tuning the advancement, then a
+> tracepoint is much easier for userspace to consume, e.g. it allows the
+> user to monitor the history of the delta while adjusting the advancement
+> time.  Manually approximating that behavior by sampling the value from
+> debugfs would be quite cumbersome.
 
-Handle it in v3.
+Good point, handle it in v3.
 
 Regards,
 Wanpeng Li
 
 >
+> > +     if (!ret)
+> > +             return -ENOMEM;
 > > +
-> >       vmx->fail =3D __vmx_vcpu_run(vmx, (unsigned long *)&vcpu->arch.re=
-gs,
-> >                                  vmx->loaded_vmcs->launched);
+> >       if (kvm_has_tsc_control) {
+> >               ret =3D debugfs_create_file("tsc-scaling-ratio", 0444,
+> >                                                       vcpu->debugfs_den=
+try,
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index 2f364fe..af38ece 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -1502,27 +1502,27 @@ static inline void __wait_lapic_expire(struct k=
+vm_vcpu *vcpu, u64 guest_cycles)
+> >  }
 > >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 1d89cb9..0eb9549 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -7894,9 +7894,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu=
-)
+> >  static inline void adaptive_tune_timer_advancement(struct kvm_vcpu *vc=
+pu,
+> > -                             u64 guest_tsc, u64 tsc_deadline)
+> > +                             s64 advance_expire_delta)
+> >  {
+> >       struct kvm_lapic *apic =3D vcpu->arch.apic;
+> >       u32 timer_advance_ns =3D apic->lapic_timer.timer_advance_ns;
+> >       u64 ns;
+> >
+> >       /* too early */
+> > -     if (guest_tsc < tsc_deadline) {
+> > -             ns =3D (tsc_deadline - guest_tsc) * 1000000ULL;
+> > +     if (advance_expire_delta < 0) {
+> > +             ns =3D -advance_expire_delta * 1000000ULL;
+> >               do_div(ns, vcpu->arch.virtual_tsc_khz);
+> >               timer_advance_ns -=3D min((u32)ns,
+> >                       timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STE=
+P);
+> >       } else {
+> >       /* too late */
+> > -             ns =3D (guest_tsc - tsc_deadline) * 1000000ULL;
+> > +             ns =3D advance_expire_delta * 1000000ULL;
+> >               do_div(ns, vcpu->arch.virtual_tsc_khz);
+> >               timer_advance_ns +=3D min((u32)ns,
+> >                       timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STE=
+P);
 > >       }
 > >
-> >       trace_kvm_entry(vcpu->vcpu_id);
-> > -     if (lapic_in_kernel(vcpu) &&
-> > -         vcpu->arch.apic->lapic_timer.timer_advance_ns)
-> > -             wait_lapic_expire(vcpu);
-> >       guest_enter_irqoff();
+> > -     if (abs(guest_tsc - tsc_deadline) < LAPIC_TIMER_ADVANCE_ADJUST_DO=
+NE)
+> > +     if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
+> >               apic->lapic_timer.timer_advance_adjust_done =3D true;
+> >       if (unlikely(timer_advance_ns > 5000)) {
+> >               timer_advance_ns =3D 0;
+> > @@ -1545,13 +1545,13 @@ void wait_lapic_expire(struct kvm_vcpu *vcpu)
+> >       tsc_deadline =3D apic->lapic_timer.expired_tscdeadline;
+> >       apic->lapic_timer.expired_tscdeadline =3D 0;
+> >       guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc());
+> > -     trace_kvm_wait_lapic_expire(vcpu->vcpu_id, guest_tsc - tsc_deadli=
+ne);
+> > +     apic->lapic_timer.advance_expire_delta =3D guest_tsc - tsc_deadli=
+ne;
 > >
-> >       fpregs_assert_state_consistent();
+> > -     if (guest_tsc < tsc_deadline)
+> > +     if (apic->lapic_timer.advance_expire_delta < 0)
+> >               __wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
+> >
+> >       if (unlikely(!apic->lapic_timer.timer_advance_adjust_done))
+> > -             adaptive_tune_timer_advancement(vcpu, guest_tsc, tsc_dead=
+line);
+> > +             adaptive_tune_timer_advancement(vcpu, apic->lapic_timer.a=
+dvance_expire_delta);
+> >  }
+> >
+> >  static void start_sw_tscdeadline(struct kvm_lapic *apic)
+> > diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+> > index d6d049b..3e72a25 100644
+> > --- a/arch/x86/kvm/lapic.h
+> > +++ b/arch/x86/kvm/lapic.h
+> > @@ -32,6 +32,7 @@ struct kvm_timer {
+> >       u64 tscdeadline;
+> >       u64 expired_tscdeadline;
+> >       u32 timer_advance_ns;
+> > +     s64 advance_expire_delta;
+> >       atomic_t pending;                       /* accumulated triggered =
+timers */
+> >       bool hv_timer_in_use;
+> >       bool timer_advance_adjust_done;
+> > diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+> > index 4d47a26..3f9bc62 100644
+> > --- a/arch/x86/kvm/trace.h
+> > +++ b/arch/x86/kvm/trace.h
+> > @@ -953,26 +953,6 @@ TRACE_EVENT(kvm_pvclock_update,
+> >                 __entry->flags)
+> >  );
+> >
+> > -TRACE_EVENT(kvm_wait_lapic_expire,
+> > -     TP_PROTO(unsigned int vcpu_id, s64 delta),
+> > -     TP_ARGS(vcpu_id, delta),
+> > -
+> > -     TP_STRUCT__entry(
+> > -             __field(        unsigned int,   vcpu_id         )
+> > -             __field(        s64,            delta           )
+> > -     ),
+> > -
+> > -     TP_fast_assign(
+> > -             __entry->vcpu_id           =3D vcpu_id;
+> > -             __entry->delta             =3D delta;
+> > -     ),
+> > -
+> > -     TP_printk("vcpu %u: delta %lld (%s)",
+> > -               __entry->vcpu_id,
+> > -               __entry->delta,
+> > -               __entry->delta < 0 ? "early" : "late")
+> > -);
+> > -
+> >  TRACE_EVENT(kvm_enter_smm,
+> >       TP_PROTO(unsigned int vcpu_id, u64 smbase, bool entering),
+> >       TP_ARGS(vcpu_id, smbase, entering),
 > > --
 > > 2.7.4
 > >
