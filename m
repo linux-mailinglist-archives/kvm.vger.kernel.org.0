@@ -2,278 +2,374 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 580411FDF2
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 05:13:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59CFE1FF6B
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 08:13:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726425AbfEPDNu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 23:13:50 -0400
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:42049 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726157AbfEPDNu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 May 2019 23:13:50 -0400
-Received: by mail-oi1-f194.google.com with SMTP id k9so1402995oig.9;
-        Wed, 15 May 2019 20:13:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=nQLrJG/rtyMfyjg8xodMHV8b5DIFETCrat3O+1ZGccE=;
-        b=KMpZas/VkspcTYmIWz/679SkE+o9a7V2vV1HcW0lpalO1ANcgJy5YlOI8hB7ilNHhA
-         7HNiylHGgBzvAG2Pv81L8RQVhpAbk2e4QeoaPAie5HkEwcvZYZrdN6rOAsDouqXZQndr
-         p0TYbDOrshTuv2QfaQ+pC4ZcJb3aM147yvStgEHMns5rU4CHKWb95UgrUQjJjNGHZYWf
-         +R/BIWKuW1eKb9rQZzPJfA9gRixkFpg0X3LtuLD9pS7jwXg6wFKSGkrO1NTFV8h1R4zV
-         LTmw9l+fMQynFUmWEnlO144FxeBR+gGyc7RF6T4iyUyrXi5NJdGz3BZdpdYm8sid0IXZ
-         Xbjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=nQLrJG/rtyMfyjg8xodMHV8b5DIFETCrat3O+1ZGccE=;
-        b=ixFtUSmZef3NN2pjpoVv/hr1zLux2l68lC6zuuovjtcjnsQmZjg943Fpw/LZQZlfFh
-         PKYigB9twlBhsfSJVy1LcaqmYXrrGvSxnh8IcwTHD8fXDYbDYrHhjfmQibeJPbBkgs5n
-         dDD19Vuh0CwfchIe8uDzfsLV7BQfk1LxoEo5D4o/ugKGS7RG78bWQ1rchhwaOVhcjr97
-         xRQlXIqM0hwZzfkXYyhkNOC6UgzEiHu+CaUj24t1w73T9EzJd67FSqAFZptIRs7fkyLa
-         IUZuWJgWEf7QkefT95EbYtfQJWVuxecUfC4Bup9lTVUhYGcxOEw2xsn9j5KsAo/w1v21
-         6GKg==
-X-Gm-Message-State: APjAAAVlHiO8g+GcnvLWGJIsebGq2KtKOcyQ42C+qOLBMbNzC1Pt8rVa
-        yNxkSsl4uGSj4p8S6zngEtYWHHMVFrWXbAWZDQCUug==
-X-Google-Smtp-Source: APXvYqy5xIuYztcFAe+BnOihFLgqBgaPMYJBKZp9KPilfdPciLi5qm2f8CD8PqPnGLvQa1MUz8QsMp1XeJ/f1Xjaa90=
-X-Received: by 2002:aca:3305:: with SMTP id z5mr4812192oiz.141.1557976429718;
- Wed, 15 May 2019 20:13:49 -0700 (PDT)
+        id S1726687AbfEPGN5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 May 2019 02:13:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54360 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726447AbfEPGN5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 May 2019 02:13:57 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A91A4C057F2F;
+        Thu, 16 May 2019 06:13:56 +0000 (UTC)
+Received: from gondolin (ovpn-204-119.brq.redhat.com [10.40.204.119])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 150BF60BE5;
+        Thu, 16 May 2019 06:13:46 +0000 (UTC)
+Date:   Thu, 16 May 2019 08:13:43 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Sebastian Ott <sebott@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Michael Mueller <mimu@linux.ibm.com>
+Subject: Re: [PATCH 05/10] s390/cio: introduce DMA pools to cio
+Message-ID: <20190516081343.0d22db55.cohuck@redhat.com>
+In-Reply-To: <20190515191257.31bdc583.pasic@linux.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+        <20190426183245.37939-6-pasic@linux.ibm.com>
+        <alpine.LFD.2.21.1905081447280.1773@schleppi>
+        <20190508232210.5a555caa.pasic@linux.ibm.com>
+        <20190509121106.48aa04db.cohuck@redhat.com>
+        <20190510001112.479b2fd7.pasic@linux.ibm.com>
+        <20190510161013.7e697337.cohuck@redhat.com>
+        <20190512202256.5517592d.pasic@linux.ibm.com>
+        <20190513152924.1e8e8f5a.cohuck@redhat.com>
+        <20190515191257.31bdc583.pasic@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <1557893514-5815-1-git-send-email-wanpengli@tencent.com>
- <1557893514-5815-4-git-send-email-wanpengli@tencent.com> <20190515172132.GE5875@linux.intel.com>
-In-Reply-To: <20190515172132.GE5875@linux.intel.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 16 May 2019 11:15:10 +0800
-Message-ID: <CANRm+Cx5yQ_VQpSjKmO=Fi2_KCC4Rd_jMUr+mM7qvZ6EUD+=aA@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] KVM: LAPIC: Expose per-vCPU timer adavance
- information to userspace
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 16 May 2019 06:13:56 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 16 May 2019 at 01:21, Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Wed, May 15, 2019 at 12:11:53PM +0800, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > Expose the per-vCPU advancement information to the user via per-vCPU de=
-bugfs
-> > entry. wait_lapic_expire() call was moved above guest_enter_irqoff() be=
-cause
-> > of its tracepoint, which violated the RCU extended quiescent state invo=
-ked
-> > by guest_enter_irqoff()[1][2]. This patch simply removes the tracepoint=
-,
-> > which would allow moving wait_lapic_expire(). Sean pointed out:
-> >
-> > | Now that the advancement time is tracked per-vCPU, realizing a change
-> > | in the advancement time requires creating a new VM. For all intents
-> > | and purposes this makes it impractical to hand tune the advancement
-> > | in real time using the tracepoint as the feedback mechanism.
-> >
-> > [1] Commit 8b89fe1f6c43 ("kvm: x86: move tracepoints outside extended q=
-uiescent state")
-> > [2] https://patchwork.kernel.org/patch/7821111/
-> >
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> > Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Cc: Liran Alon <liran.alon@oracle.com>
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > ---
-> >  arch/x86/kvm/debugfs.c | 16 ++++++++++++++++
-> >  arch/x86/kvm/lapic.c   | 16 ++++++++--------
-> >  arch/x86/kvm/lapic.h   |  1 +
-> >  arch/x86/kvm/trace.h   | 20 --------------------
-> >  4 files changed, 25 insertions(+), 28 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/debugfs.c b/arch/x86/kvm/debugfs.c
-> > index c19c7ed..8cf542e 100644
-> > --- a/arch/x86/kvm/debugfs.c
-> > +++ b/arch/x86/kvm/debugfs.c
-> > @@ -9,12 +9,22 @@
-> >   */
-> >  #include <linux/kvm_host.h>
-> >  #include <linux/debugfs.h>
-> > +#include "lapic.h"
-> >
-> >  bool kvm_arch_has_vcpu_debugfs(void)
-> >  {
-> >       return true;
-> >  }
-> >
-> > +static int vcpu_get_timer_expire_delta(void *data, u64 *val)
-> > +{
-> > +     struct kvm_vcpu *vcpu =3D (struct kvm_vcpu *) data;
-> > +     *val =3D vcpu->arch.apic->lapic_timer.advance_expire_delta;
-> > +     return 0;
-> > +}
-> > +
-> > +DEFINE_SIMPLE_ATTRIBUTE(vcpu_timer_expire_delta_fops, vcpu_get_timer_e=
-xpire_delta, NULL, "%lld\n");
-> > +
-> >  static int vcpu_get_tsc_offset(void *data, u64 *val)
-> >  {
-> >       struct kvm_vcpu *vcpu =3D (struct kvm_vcpu *) data;
-> > @@ -51,6 +61,12 @@ int kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vc=
-pu)
-> >       if (!ret)
-> >               return -ENOMEM;
-> >
-> > +     ret =3D debugfs_create_file("advance_expire_delta", 0444,
-> > +                                                     vcpu->debugfs_den=
-try,
-> > +                                                     vcpu, &vcpu_timer=
-_expire_delta_fops);
->
-> I was thinking we would expose 'kvm_timer.timer_advance_ns', not the
-> delta, the idea being that being able to query the auto-adjusted value
-> is now the desired behavior.  But rethinking things, that enhancement is
-> orthogonal to removing the tracepoint.
->
-> Back to the tracepoint, an alternative solution would be to add
-> kvm_timer.advance_expire_delta as you did, but rather than add a new
-> debugfs entry, simply move the tracepoint below guest_exit_irqoff()
-> in vcpu_enter_guest().  I.e. snapshot the delta before VM-Enter, but
-> trace it after VM-Exit.
->
-> If we want to continue supporting hand tuning the advancement, then a
-> tracepoint is much easier for userspace to consume, e.g. it allows the
-> user to monitor the history of the delta while adjusting the advancement
-> time.  Manually approximating that behavior by sampling the value from
-> debugfs would be quite cumbersome.
+On Wed, 15 May 2019 19:12:57 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-Good point, handle it in v3.
+> On Mon, 13 May 2019 15:29:24 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > On Sun, 12 May 2019 20:22:56 +0200
+> > Halil Pasic <pasic@linux.ibm.com> wrote:
+> >   
+> > > On Fri, 10 May 2019 16:10:13 +0200
+> > > Cornelia Huck <cohuck@redhat.com> wrote:
+> > >   
+> > > > On Fri, 10 May 2019 00:11:12 +0200
+> > > > Halil Pasic <pasic@linux.ibm.com> wrote:
+> > > >     
+> > > > > On Thu, 9 May 2019 12:11:06 +0200
+> > > > > Cornelia Huck <cohuck@redhat.com> wrote:
+> > > > >     
+> > > > > > On Wed, 8 May 2019 23:22:10 +0200
+> > > > > > Halil Pasic <pasic@linux.ibm.com> wrote:
+> > > > > >       
+> > > > > > > On Wed, 8 May 2019 15:18:10 +0200 (CEST)
+> > > > > > > Sebastian Ott <sebott@linux.ibm.com> wrote:      
+> > > > > >       
+> > > > > > > > > @@ -1063,6 +1163,7 @@ static int __init css_bus_init(void)
+> > > > > > > > >  		unregister_reboot_notifier(&css_reboot_notifier);
+> > > > > > > > >  		goto out_unregister;
+> > > > > > > > >  	}
+> > > > > > > > > +	cio_dma_pool_init();          
+> > > > > > > > 
+> > > > > > > > This is too late for early devices (ccw console!).        
+> > > > > > > 
+> > > > > > > You have already raised concern about this last time (thanks). I think,
+> > > > > > > I've addressed this issue: the cio_dma_pool is only used by the airq
+> > > > > > > stuff. I don't think the ccw console needs it. Please have an other look
+> > > > > > > at patch #6, and explain your concern in more detail if it persists.      
+> > > > > > 
+> > > > > > What about changing the naming/adding comments here, so that (1) folks
+> > > > > > aren't confused by the same thing in the future and (2) folks don't try
+> > > > > > to use that pool for something needed for the early ccw consoles?
+> > > > > >       
+> > > > > 
+> > > > > I'm all for clarity! Suggestions for better names?    
+> > > > 
+> > > > css_aiv_dma_pool, maybe? Or is there other cross-device stuff that may
+> > > > need it?
+> > > >     
+> > > 
+> > > Ouch! I was considering to use cio_dma_zalloc() for the adapter
+> > > interruption vectors but I ended up between the two chairs in the end.
+> > > So with this series there are no uses for cio_dma pool.
+> > > 
+> > > I don't feel strongly about this going one way the other.
+> > > 
+> > > Against getting rid of the cio_dma_pool and sticking with the speaks
+> > > dma_alloc_coherent() that we waste a DMA page per vector, which is a
+> > > non obvious side effect.  
+> > 
+> > That would basically mean one DMA page per virtio-ccw device, right?  
+> 
+> Not quite: virtio-ccw shares airq vectors among multiple devices. We
+> alloc 64 bytes a time and use that as long as we don't run out of bits.
+>  
+> > For single queue devices, this seems like quite a bit of overhead.
+> >  
+> 
+> Nod.
+>  
+> > Are we expecting many devices in use per guest?  
+> 
+> This is affect linux in general, not only guest 2 stuff (i.e. we
+> also waste in vanilla lpar mode). And zpci seems to do at least one
+> airq_iv_create() per pci function.
 
-Regards,
-Wanpeng Li
+Hm, I thought that guests with virtio-ccw devices were the most heavy
+user of this.
 
->
-> > +     if (!ret)
-> > +             return -ENOMEM;
-> > +
-> >       if (kvm_has_tsc_control) {
-> >               ret =3D debugfs_create_file("tsc-scaling-ratio", 0444,
-> >                                                       vcpu->debugfs_den=
-try,
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 2f364fe..af38ece 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -1502,27 +1502,27 @@ static inline void __wait_lapic_expire(struct k=
-vm_vcpu *vcpu, u64 guest_cycles)
-> >  }
-> >
-> >  static inline void adaptive_tune_timer_advancement(struct kvm_vcpu *vc=
-pu,
-> > -                             u64 guest_tsc, u64 tsc_deadline)
-> > +                             s64 advance_expire_delta)
-> >  {
-> >       struct kvm_lapic *apic =3D vcpu->arch.apic;
-> >       u32 timer_advance_ns =3D apic->lapic_timer.timer_advance_ns;
-> >       u64 ns;
-> >
-> >       /* too early */
-> > -     if (guest_tsc < tsc_deadline) {
-> > -             ns =3D (tsc_deadline - guest_tsc) * 1000000ULL;
-> > +     if (advance_expire_delta < 0) {
-> > +             ns =3D -advance_expire_delta * 1000000ULL;
-> >               do_div(ns, vcpu->arch.virtual_tsc_khz);
-> >               timer_advance_ns -=3D min((u32)ns,
-> >                       timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STE=
-P);
-> >       } else {
-> >       /* too late */
-> > -             ns =3D (guest_tsc - tsc_deadline) * 1000000ULL;
-> > +             ns =3D advance_expire_delta * 1000000ULL;
-> >               do_div(ns, vcpu->arch.virtual_tsc_khz);
-> >               timer_advance_ns +=3D min((u32)ns,
-> >                       timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STE=
-P);
-> >       }
-> >
-> > -     if (abs(guest_tsc - tsc_deadline) < LAPIC_TIMER_ADVANCE_ADJUST_DO=
-NE)
-> > +     if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
-> >               apic->lapic_timer.timer_advance_adjust_done =3D true;
-> >       if (unlikely(timer_advance_ns > 5000)) {
-> >               timer_advance_ns =3D 0;
-> > @@ -1545,13 +1545,13 @@ void wait_lapic_expire(struct kvm_vcpu *vcpu)
-> >       tsc_deadline =3D apic->lapic_timer.expired_tscdeadline;
-> >       apic->lapic_timer.expired_tscdeadline =3D 0;
-> >       guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc());
-> > -     trace_kvm_wait_lapic_expire(vcpu->vcpu_id, guest_tsc - tsc_deadli=
-ne);
-> > +     apic->lapic_timer.advance_expire_delta =3D guest_tsc - tsc_deadli=
-ne;
-> >
-> > -     if (guest_tsc < tsc_deadline)
-> > +     if (apic->lapic_timer.advance_expire_delta < 0)
-> >               __wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
-> >
-> >       if (unlikely(!apic->lapic_timer.timer_advance_adjust_done))
-> > -             adaptive_tune_timer_advancement(vcpu, guest_tsc, tsc_dead=
-line);
-> > +             adaptive_tune_timer_advancement(vcpu, apic->lapic_timer.a=
-dvance_expire_delta);
-> >  }
-> >
-> >  static void start_sw_tscdeadline(struct kvm_lapic *apic)
-> > diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> > index d6d049b..3e72a25 100644
-> > --- a/arch/x86/kvm/lapic.h
-> > +++ b/arch/x86/kvm/lapic.h
-> > @@ -32,6 +32,7 @@ struct kvm_timer {
-> >       u64 tscdeadline;
-> >       u64 expired_tscdeadline;
-> >       u32 timer_advance_ns;
-> > +     s64 advance_expire_delta;
-> >       atomic_t pending;                       /* accumulated triggered =
-timers */
-> >       bool hv_timer_in_use;
-> >       bool timer_advance_adjust_done;
-> > diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> > index 4d47a26..3f9bc62 100644
-> > --- a/arch/x86/kvm/trace.h
-> > +++ b/arch/x86/kvm/trace.h
-> > @@ -953,26 +953,6 @@ TRACE_EVENT(kvm_pvclock_update,
-> >                 __entry->flags)
-> >  );
-> >
-> > -TRACE_EVENT(kvm_wait_lapic_expire,
-> > -     TP_PROTO(unsigned int vcpu_id, s64 delta),
-> > -     TP_ARGS(vcpu_id, delta),
-> > -
-> > -     TP_STRUCT__entry(
-> > -             __field(        unsigned int,   vcpu_id         )
-> > -             __field(        s64,            delta           )
-> > -     ),
-> > -
-> > -     TP_fast_assign(
-> > -             __entry->vcpu_id           =3D vcpu_id;
-> > -             __entry->delta             =3D delta;
-> > -     ),
-> > -
-> > -     TP_printk("vcpu %u: delta %lld (%s)",
-> > -               __entry->vcpu_id,
-> > -               __entry->delta,
-> > -               __entry->delta < 0 ? "early" : "late")
-> > -);
-> > -
-> >  TRACE_EVENT(kvm_enter_smm,
-> >       TP_PROTO(unsigned int vcpu_id, u64 smbase, bool entering),
-> >       TP_ARGS(vcpu_id, smbase, entering),
-> > --
-> > 2.7.4
-> >
+On LPAR (which would be the environment where I'd expect lots of
+devices), how many users of this infrastructure do we typically have?
+DASD do not use adapter interrupts, and QDIO devices (qeth/zfcp) use
+their own indicator handling (that pre-dates this infrastructure) IIRC,
+which basically only leaves the PCI functions you mention above.
+
+> 
+> >   
+> > > 
+> > > What speaks against cio_dma_pool is that it is slightly more code, and
+> > > this currently can not be used for very early stuff, which I don't
+> > > think is relevant.   
+> > 
+> > Unless properly documented, it feels like something you can easily trip
+> > over, however.
+> > 
+> > I assume that the "very early stuff" is basically only ccw consoles.
+> > Not sure if we can use virtio-serial as an early ccw console -- IIRC
+> > that was only about 3215/3270? While QEMU guests are able to use a 3270
+> > console, this is experimental and I would not count that as a use case.
+> > Anyway, 3215/3270 don't use adapter interrupts, and probably not
+> > anything cross-device, either; so unless early virtio-serial is a
+> > thing, this restriction is fine if properly documented.
+> >   
+> 
+> Mimu can you dig into this a bit?
+> 
+> We could also aim for getting rid of this limitation. One idea would be
+> some sort of lazy initialization (i.e. triggered by first usage).
+> Another idea would be simply doing the initialization earlier.
+> Unfortunately I'm not all that familiar with the early stuff. Is there
+> some doc you can recommend?
+
+I'd probably look at the code for that.
+
+> 
+> Anyway before investing much more into this, I think we should have a
+> fair idea which option do we prefer...
+
+Agreed.
+
+> 
+> > > What also used to speak against it is that
+> > > allocations asking for more than a page would just fail, but I addressed
+> > > that in the patch I've hacked up on top of the series, and I'm going to
+> > > paste below. While at it I addressed some other issues as well.  
+> > 
+> > Hm, which "other issues"?
+> >   
+> 
+> The kfree() I've forgotten to get rid of, and this 'document does not
+> work early' (pun intended) business.
+
+Ok.
+
+> 
+> > > 
+> > > I've also got code that deals with AIRQ_IV_CACHELINE by turning the
+> > > kmem_cache into a dma_pool.  
+> > 
+> > Isn't that percolating to other airq users again? Or maybe I just don't
+> > understand what you're proposing here...  
+> 
+> Absolutely.
+> 
+> >   
+> > > 
+> > > Cornelia, Sebastian which approach do you prefer:
+> > > 1) get rid of cio_dma_pool and AIRQ_IV_CACHELINE, and waste a page per
+> > > vector, or
+> > > 2) go with the approach taken by the patch below?  
+> > 
+> > I'm not sure that I properly understand this (yeah, you probably
+> > guessed); so I'm not sure I can make a good call here.
+> >   
+> 
+> I hope you, I managed to clarify some of the questions. Please keep
+> asking if stuff remains unclear. I'm not a great communicator, but a
+> quite tenacious one.
+> 
+> I hope Sebastian will chime in as well.
+
+Yes, waiting for his comments as well :)
+
+> 
+> > > 
+> > > 
+> > > Regards,
+> > > Halil
+> > > -----------------------8<---------------------------------------------
+> > > From: Halil Pasic <pasic@linux.ibm.com>
+> > > Date: Sun, 12 May 2019 18:08:05 +0200
+> > > Subject: [PATCH] WIP: use cio dma pool for airqs
+> > > 
+> > > Let's not waste a DMA page per adapter interrupt bit vector.
+> > > ---
+> > > Lightly tested...
+> > > ---
+> > >  arch/s390/include/asm/airq.h |  1 -
+> > >  drivers/s390/cio/airq.c      | 10 +++-------
+> > >  drivers/s390/cio/css.c       | 18 +++++++++++++++---
+> > >  3 files changed, 18 insertions(+), 11 deletions(-)
+> > > 
+> > > diff --git a/arch/s390/include/asm/airq.h b/arch/s390/include/asm/airq.h
+> > > index 1492d48..981a3eb 100644
+> > > --- a/arch/s390/include/asm/airq.h
+> > > +++ b/arch/s390/include/asm/airq.h
+> > > @@ -30,7 +30,6 @@ void unregister_adapter_interrupt(struct airq_struct *airq);
+> > >  /* Adapter interrupt bit vector */
+> > >  struct airq_iv {
+> > >  	unsigned long *vector;	/* Adapter interrupt bit vector */
+> > > -	dma_addr_t vector_dma; /* Adapter interrupt bit vector dma */
+> > >  	unsigned long *avail;	/* Allocation bit mask for the bit vector */
+> > >  	unsigned long *bitlock;	/* Lock bit mask for the bit vector */
+> > >  	unsigned long *ptr;	/* Pointer associated with each bit */
+> > > diff --git a/drivers/s390/cio/airq.c b/drivers/s390/cio/airq.c
+> > > index 7a5c0a0..f11f437 100644
+> > > --- a/drivers/s390/cio/airq.c
+> > > +++ b/drivers/s390/cio/airq.c
+> > > @@ -136,8 +136,7 @@ struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags)
+> > >  		goto out;
+> > >  	iv->bits = bits;
+> > >  	size = iv_size(bits);
+> > > -	iv->vector = dma_alloc_coherent(cio_get_dma_css_dev(), size,
+> > > -						 &iv->vector_dma, GFP_KERNEL);
+> > > +	iv->vector = cio_dma_zalloc(size);
+> > >  	if (!iv->vector)
+> > >  		goto out_free;
+> > >  	if (flags & AIRQ_IV_ALLOC) {
+> > > @@ -172,8 +171,7 @@ struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags)
+> > >  	kfree(iv->ptr);
+> > >  	kfree(iv->bitlock);
+> > >  	kfree(iv->avail);
+> > > -	dma_free_coherent(cio_get_dma_css_dev(), size, iv->vector,
+> > > -			  iv->vector_dma);
+> > > +	cio_dma_free(iv->vector, size);
+> > >  	kfree(iv);
+> > >  out:
+> > >  	return NULL;
+> > > @@ -189,9 +187,7 @@ void airq_iv_release(struct airq_iv *iv)
+> > >  	kfree(iv->data);
+> > >  	kfree(iv->ptr);
+> > >  	kfree(iv->bitlock);
+> > > -	kfree(iv->vector);
+> > > -	dma_free_coherent(cio_get_dma_css_dev(), iv_size(iv->bits),
+> > > -			  iv->vector, iv->vector_dma);
+> > > +	cio_dma_free(iv->vector, iv_size(iv->bits));
+> > >  	kfree(iv->avail);
+> > >  	kfree(iv);
+> > >  }
+> > > diff --git a/drivers/s390/cio/css.c b/drivers/s390/cio/css.c
+> > > index 7087cc3..88d9c92 100644
+> > > --- a/drivers/s390/cio/css.c
+> > > +++ b/drivers/s390/cio/css.c
+> > > @@ -1063,7 +1063,10 @@ struct gen_pool *cio_gp_dma_create(struct device *dma_dev, int nr_pages)
+> > >  static void __gp_dma_free_dma(struct gen_pool *pool,
+> > >  			      struct gen_pool_chunk *chunk, void *data)
+> > >  {
+> > > -	dma_free_coherent((struct device *) data, PAGE_SIZE,
+> > > +
+> > > +	size_t chunk_size = chunk->end_addr - chunk->start_addr + 1;
+> > > +
+> > > +	dma_free_coherent((struct device *) data, chunk_size,
+> > >  			 (void *) chunk->start_addr,
+> > >  			 (dma_addr_t) chunk->phys_addr);
+> > >  }
+> > > @@ -1088,13 +1091,15 @@ void *cio_gp_dma_zalloc(struct gen_pool *gp_dma, struct device *dma_dev,
+> > >  {
+> > >  	dma_addr_t dma_addr;
+> > >  	unsigned long addr = gen_pool_alloc(gp_dma, size);
+> > > +	size_t chunk_size;
+> > >  
+> > >  	if (!addr) {
+> > > +		chunk_size = round_up(size, PAGE_SIZE);  
+> > 
+> > Doesn't that mean that we still go up to chunks of at least PAGE_SIZE?
+> > Or can vectors now share the same chunk?  
+> 
+> Exactly! We put the allocated dma mem into the genpool. So if the next
+> request can be served from what is already in the genpool we don't end
+> up in this fallback path where we grow the pool. 
+
+Ok, that makes sense.
+
+> 
+> >   
+> > >  		addr = (unsigned long) dma_alloc_coherent(dma_dev,
+> > > -					PAGE_SIZE, &dma_addr, CIO_DMA_GFP);
+> > > +					 chunk_size, &dma_addr, CIO_DMA_GFP);
+> > >  		if (!addr)
+> > >  			return NULL;
+> > > -		gen_pool_add_virt(gp_dma, addr, dma_addr, PAGE_SIZE, -1);
+> > > +		gen_pool_add_virt(gp_dma, addr, dma_addr, chunk_size, -1);
+> > >  		addr = gen_pool_alloc(gp_dma, size);  
+> 
+> BTW I think it would be good to recover from this alloc failing due to a
+> race (qute unlikely with small allocations thogh...).
+
+The callers hopefully check the result?
+
+> 
+> > >  	}
+> > >  	return (void *) addr;
+> > > @@ -1108,6 +1113,13 @@ void cio_gp_dma_free(struct gen_pool *gp_dma, void *cpu_addr, size_t size)
+> > >  	gen_pool_free(gp_dma, (unsigned long) cpu_addr, size);
+> > >  }
+> > >  
+> > > +/**
+> > > + * Allocate dma memory from the css global pool. Intended for memory not
+> > > + * specific to any single device within the css.
+> > > + *
+> > > + * Caution: Not suitable for early stuff like console.  
+> > 
+> > Maybe add "Do not use prior to <point in startup>"?
+> >   
+> 
+> I'm not awfully familiar with the well known 'points in startup'. Can
+> you recommend me some documentation on this topic?
+
+The code O:-) Anyway, that's where I'd start reading; there might be
+good stuff under Documentation/ that I've never looked at...
+
+> 
+> 
+> Regards,
+> Halil
+> 
+> > > + *
+> > > + */
+> > >  void *cio_dma_zalloc(size_t size)
+> > >  {
+> > >  	return cio_gp_dma_zalloc(cio_dma_pool, cio_get_dma_css_dev(), size);  
+> >   
+> 
+
