@@ -2,209 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 01CAB200B3
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 09:54:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9ADF200B9
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 09:55:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726759AbfEPHyR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 May 2019 03:54:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:65318 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726363AbfEPHyR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 May 2019 03:54:17 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id BFF97308FC5F;
-        Thu, 16 May 2019 07:54:16 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 872F45D772;
-        Thu, 16 May 2019 07:54:16 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 11A561806B11;
-        Thu, 16 May 2019 07:54:16 +0000 (UTC)
-Date:   Thu, 16 May 2019 03:54:15 -0400 (EDT)
-From:   Pankaj Gupta <pagupta@redhat.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, mst@redhat.com,
-        dan j williams <dan.j.williams@intel.com>,
-        zwisler@kernel.org, vishal l verma <vishal.l.verma@intel.com>,
-        dave jiang <dave.jiang@intel.com>, jasowang@redhat.com,
-        willy@infradead.org, rjw@rjwysocki.net, hch@infradead.org,
-        lenb@kernel.org, jack@suse.cz, tytso@mit.edu,
-        adilger kernel <adilger.kernel@dilger.ca>,
-        darrick wong <darrick.wong@oracle.com>, lcapitulino@redhat.com,
-        kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com,
-        nilal@redhat.com, riel@surriel.com, stefanha@redhat.com,
-        aarcange@redhat.com, david@fromorbit.com, cohuck@redhat.com,
-        xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-        pbonzini@redhat.com, kilobyte@angband.pl,
-        yuval shaia <yuval.shaia@oracle.com>, jstaron@google.com
-Message-ID: <1392189898.29183015.1557993255983.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1d6f6964-4653-ebf3-554f-666fda3779f1@redhat.com>
-References: <20190514145422.16923-1-pagupta@redhat.com> <20190514145422.16923-3-pagupta@redhat.com> <9f6b1d8e-ef90-7d8b-56da-61a426953ba3@redhat.com> <1d6f6964-4653-ebf3-554f-666fda3779f1@redhat.com>
-Subject: Re: [PATCH v9 2/7] virtio-pmem: Add virtio pmem driver
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.65.16.97, 10.4.195.28]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: QMQNE7pgfu3mBYS2GC/vovrzij4mzg==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Thu, 16 May 2019 07:54:17 +0000 (UTC)
+        id S1726707AbfEPHy5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 May 2019 03:54:57 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:34216 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726454AbfEPHy5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 May 2019 03:54:57 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4G7sUlc186465;
+        Thu, 16 May 2019 07:54:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=wlI4FuevQ2mhRamMuoO2zlRoWsnWTKc4nNrjHwGyT60=;
+ b=5gQuHnUnkp2m3kS9rfSBd3os2IJV71BbS7WODagQKTlCsBuQxH6EYMnLBrHyDcpw1iyo
+ uR01tB/m9/P47nCYDeEO0K3cIRJfRDsEs+VdRd53QLuYW3dHSZVQH8t/jKN5Wd7v5Hnd
+ PfuesEeYPyXvUOA3jfz7+5GH6TDwU4qOPxzZSUJnzO65/UIpsUKJpwRCBw/ohrXzrRCy
+ FF+KNl31MGykrkmBi6GVk10pDAsfKV6+toEBomis4vMybBxgX22XjnWbZVEWW2O7TCGS
+ LtznRa3KTiTwcMN0tWCBO5IkpRrFV3IAIBFaUI1t9rHq5DHG8htKF0LRq1PUQevkQHwN PQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 2sdq1qsfcw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 May 2019 07:54:48 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4G7rOSd024323;
+        Thu, 16 May 2019 07:54:47 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2sggethpg5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 May 2019 07:54:47 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4G7slYB019462;
+        Thu, 16 May 2019 07:54:47 GMT
+Received: from [10.0.5.57] (/213.57.127.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 16 May 2019 00:54:47 -0700
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: Question about MDS mitigation
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <f513e534-2c7b-f32b-7346-1a64edf0db73@huawei.com>
+Date:   Thu, 16 May 2019 10:54:43 +0300
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Huangzhichao <huangzhichao@huawei.com>,
+        guijianfeng <guijianfeng@huawei.com>,
+        gaowanlong <gaowanlong@huawei.com>,
+        "Chentao (Boby)" <boby.chen@huawei.com>,
+        "Liujinsong (Paul)" <liu.jinsong@huawei.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <39F1D5C9-BD42-4E9F-BE56-2473B4713B82@oracle.com>
+References: <f513e534-2c7b-f32b-7346-1a64edf0db73@huawei.com>
+To:     "wencongyang (A)" <wencongyang2@huawei.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9258 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=880
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905160054
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9258 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=910 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905160054
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Indeed those CPU resources are shared between sibling hyperthreads on =
+same CPU core.
+There is currently no mechanism merged upstream to completely mitigate =
+SMT-enabled scenarios.
+Note that this is also true for L1TF.
 
-> >> +	vpmem->vdev = vdev;
-> >> +	vdev->priv = vpmem;
-> >> +	err = init_vq(vpmem);
-> >> +	if (err) {
-> >> +		dev_err(&vdev->dev, "failed to initialize virtio pmem vq's\n");
-> >> +		goto out_err;
-> >> +	}
-> >> +
-> >> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> >> +			start, &vpmem->start);
-> >> +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
-> >> +			size, &vpmem->size);
-> >> +
-> >> +	res.start = vpmem->start;
-> >> +	res.end   = vpmem->start + vpmem->size-1;
-> > 
-> > nit: " - 1;"
-> > 
-> >> +	vpmem->nd_desc.provider_name = "virtio-pmem";
-> >> +	vpmem->nd_desc.module = THIS_MODULE;
-> >> +
-> >> +	vpmem->nvdimm_bus = nvdimm_bus_register(&vdev->dev,
-> >> +						&vpmem->nd_desc);
-> >> +	if (!vpmem->nvdimm_bus) {
-> >> +		dev_err(&vdev->dev, "failed to register device with nvdimm_bus\n");
-> >> +		err = -ENXIO;
-> >> +		goto out_vq;
-> >> +	}
-> >> +
-> >> +	dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
-> >> +
-> >> +	ndr_desc.res = &res;
-> >> +	ndr_desc.numa_node = nid;
-> >> +	ndr_desc.flush = async_pmem_flush;
-> >> +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
-> >> +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
-> >> +	nd_region = nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_desc);
-> >> +	if (!nd_region) {
-> >> +		dev_err(&vdev->dev, "failed to create nvdimm region\n");
-> >> +		err = -ENXIO;
-> >> +		goto out_nd;
-> >> +	}
-> >> +	nd_region->provider_data = dev_to_virtio(nd_region->dev.parent->parent);
-> >> +	return 0;
-> >> +out_nd:
-> >> +	nvdimm_bus_unregister(vpmem->nvdimm_bus);
-> >> +out_vq:
-> >> +	vdev->config->del_vqs(vdev);
-> >> +out_err:
-> >> +	return err;
-> >> +}
-> >> +
-> >> +static void virtio_pmem_remove(struct virtio_device *vdev)
-> >> +{
-> >> +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
-> >> +
-> >> +	nvdimm_bus_unregister(nvdimm_bus);
-> >> +	vdev->config->del_vqs(vdev);
-> >> +	vdev->config->reset(vdev);
-> >> +}
-> >> +
-> >> +static struct virtio_driver virtio_pmem_driver = {
-> >> +	.driver.name		= KBUILD_MODNAME,
-> >> +	.driver.owner		= THIS_MODULE,
-> >> +	.id_table		= id_table,
-> >> +	.probe			= virtio_pmem_probe,
-> >> +	.remove			= virtio_pmem_remove,
-> >> +};
-> >> +
-> >> +module_virtio_driver(virtio_pmem_driver);
-> >> +MODULE_DEVICE_TABLE(virtio, id_table);
-> >> +MODULE_DESCRIPTION("Virtio pmem driver");
-> >> +MODULE_LICENSE("GPL");
-> >> diff --git a/drivers/nvdimm/virtio_pmem.h b/drivers/nvdimm/virtio_pmem.h
-> >> new file mode 100644
-> >> index 000000000000..ab1da877575d
-> >> --- /dev/null
-> >> +++ b/drivers/nvdimm/virtio_pmem.h
-> >> @@ -0,0 +1,60 @@
-> >> +/* SPDX-License-Identifier: GPL-2.0 */
-> >> +/*
-> >> + * virtio_pmem.h: virtio pmem Driver
-> >> + *
-> >> + * Discovers persistent memory range information
-> >> + * from host and provides a virtio based flushing
-> >> + * interface.
-> >> + **/
-> >> +
-> >> +#ifndef _LINUX_VIRTIO_PMEM_H
-> >> +#define _LINUX_VIRTIO_PMEM_H
-> >> +
-> >> +#include <linux/virtio_ids.h>
-> >> +#include <linux/module.h>
-> >> +#include <linux/virtio_config.h>
-> >> +#include <uapi/linux/virtio_pmem.h>
-> >> +#include <linux/libnvdimm.h>
-> >> +#include <linux/spinlock.h>
-> >> +
-> >> +struct virtio_pmem_request {
-> >> +	/* Host return status corresponding to flush request */
-> >> +	int ret;
-> >> +
-> >> +	/* command name*/
-> >> +	char name[16];
-> > 
-> > So ... why are we sending string commands and expect native-endianess
-> > integers and don't define a proper request/response structure + request
-> > types in include/uapi/linux/virtio_pmem.h like
-> > 
-> > struct virtio_pmem_resp {
-> > 	__virtio32 ret;
-> > }
-> 
-> FWIW, I wonder if we should even properly translate return values and
-> define types like
-> 
-> VIRTIO_PMEM_RESP_TYPE_OK	0
-> VIRTIO_PMEM_RESP_TYPE_EIO	1
+There are several proposal to address this but they are still in early =
+research mode.
+For example, see this KVM address space isolation patch series developed =
+by myself and Alexandre:
+https://lkml.org/lkml/2019/5/13/515
+(Which should be integrated with a mechanism which kick sibling =
+hyperthreads when switching from KVM isolated address space to full =
+kernel address space)
+This partially mimics Microsoft work regarding HyperClear which you can =
+read more about it here:
+=
+https://techcommunity.microsoft.com/t5/Virtualization/Hyper-V-HyperClear-M=
+itigation-for-L1-Terminal-Fault/ba-p/382429
 
-Don't think these are required as only failure and success
-return types easy to understand.
+-Liran
 
-Thanks,
-Pankaj
-> 
-> ..
-> 
-> > 
-> > #define VIRTIO_PMEM_REQ_TYPE_FLUSH	1
-> > struct virtio_pmem_req {
-> > 	__virtio16 type;
-> > }
-> > 
-> > ... and this way we also define a proper endianess format for exchange
-> > and keep it extensible
-> > 
-> > @MST, what's your take on this?
-> > 
-> > 
-> 
-> 
-> --
-> 
-> Thanks,
-> 
-> David / dhildenb
-> 
+> On 16 May 2019, at 5:42, wencongyang (A) <wencongyang2@huawei.com> =
+wrote:
+>=20
+> Hi all
+>=20
+> Fill buffers, load ports are shared between threads on the same =
+physical core.
+> We need to run more than one vm on the same physical core.
+> Is there any complete mitigation for environments utilizing SMT?
+>=20
+
