@@ -2,39 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C50D020622
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 13:59:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DEB4820607
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 13:59:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728044AbfEPLrZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 May 2019 07:47:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48516 "EHLO mail.kernel.org"
+        id S1728351AbfEPLqJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 May 2019 07:46:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49128 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727674AbfEPLkU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 May 2019 07:40:20 -0400
+        id S1727828AbfEPLkp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 May 2019 07:40:45 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0DEF621473;
-        Thu, 16 May 2019 11:40:18 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id BA99520881;
+        Thu, 16 May 2019 11:40:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558006819;
-        bh=XHv33oDvCTQ41+E7zo+bGDI+pR7RThafNLojm+xkSyo=;
+        s=default; t=1558006844;
+        bh=v/HqS3IgvVJDebTuRTMYuP8V01kl/l3JAlMRASQwuIA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=aPCGCffawrqjul51YR3WXX1t57ZUM/sLgSo9TlK9JOjqXNSReKlE0HY2ZL5K8Jsch
-         40ncIhwSxQkPvRrdQpUCixnpFLtXM8RGuj0p0xMUh1NntqsMOe4fb44yg2x6Ue+4X0
-         wBrqTygT8owgKU/s4AK2VljcIuQAvDOfHunrbl7U=
+        b=u4yFKws3eeQI8SCcEbGdGgVF4igY6sVNguDUq0gSAa2HrSC2Caed/Wjz/NG9Kiedu
+         QeGYGmy1A/mBLSe/rhXFQ8WDnaETurheEwCVUp5UyUQIHnYMpvJATsn20kN22kUanz
+         ItH6nRHu3rI+nNbAAchHZIzVLaLz2PrV6UwfnRfo=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.0 29/34] KVM: selftests: make hyperv_cpuid test pass on AMD
-Date:   Thu, 16 May 2019 07:39:26 -0400
-Message-Id: <20190516113932.8348-29-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 13/25] x86: kvm: hyper-v: deal with buggy TLB flush requests from WS2012
+Date:   Thu, 16 May 2019 07:40:16 -0400
+Message-Id: <20190516114029.8682-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190516113932.8348-1-sashal@kernel.org>
-References: <20190516113932.8348-1-sashal@kernel.org>
+In-Reply-To: <20190516114029.8682-1-sashal@kernel.org>
+References: <20190516114029.8682-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -46,45 +45,58 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-[ Upstream commit eba3afde1cea7dbd7881683232f2a85e2ed86bfe ]
+[ Upstream commit da66761c2d93a46270d69001abb5692717495a68 ]
 
-Enlightened VMCS is only supported on Intel CPUs but the test shouldn't
-fail completely.
+It was reported that with some special Multi Processor Group configuration,
+e.g:
+ bcdedit.exe /set groupsize 1
+ bcdedit.exe /set maxgroup on
+ bcdedit.exe /set groupaware on
+for a 16-vCPU guest WS2012 shows BSOD on boot when PV TLB flush mechanism
+is in use.
+
+Tracing kvm_hv_flush_tlb immediately reveals the issue:
+
+ kvm_hv_flush_tlb: processor_mask 0x0 address_space 0x0 flags 0x2
+
+The only flag set in this request is HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES,
+however, processor_mask is 0x0 and no HV_FLUSH_ALL_PROCESSORS is specified.
+We don't flush anything and apparently it's not what Windows expects.
+
+TLFS doesn't say anything about such requests and newer Windows versions
+seem to be unaffected. This all feels like a WS2012 bug, which is, however,
+easy to workaround in KVM: let's flush everything when we see an empty
+flush request, over-flushing doesn't hurt.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ arch/x86/kvm/hyperv.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-index 264425f75806b..9a21e912097c4 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-@@ -141,7 +141,13 @@ int main(int argc, char *argv[])
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 01d209ab5481b..229d996051653 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1291,7 +1291,16 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *current_vcpu, u64 ingpa,
+ 				       flush.address_space, flush.flags);
  
- 	free(hv_cpuid_entries);
- 
--	vcpu_ioctl(vm, VCPU_ID, KVM_ENABLE_CAP, &enable_evmcs_cap);
-+	rv = _vcpu_ioctl(vm, VCPU_ID, KVM_ENABLE_CAP, &enable_evmcs_cap);
+ 		sparse_banks[0] = flush.processor_mask;
+-		all_cpus = flush.flags & HV_FLUSH_ALL_PROCESSORS;
 +
-+	if (rv) {
-+		fprintf(stderr,
-+			"Enlightened VMCS is unsupported, skip related test\n");
-+		goto vm_free;
-+	}
- 
- 	hv_cpuid_entries = kvm_get_supported_hv_cpuid(vm);
- 	if (!hv_cpuid_entries)
-@@ -151,6 +157,7 @@ int main(int argc, char *argv[])
- 
- 	free(hv_cpuid_entries);
- 
-+vm_free:
- 	kvm_vm_free(vm);
- 
- 	return 0;
++		/*
++		 * Work around possible WS2012 bug: it sends hypercalls
++		 * with processor_mask = 0x0 and HV_FLUSH_ALL_PROCESSORS clear,
++		 * while also expecting us to flush something and crashing if
++		 * we don't. Let's treat processor_mask == 0 same as
++		 * HV_FLUSH_ALL_PROCESSORS.
++		 */
++		all_cpus = (flush.flags & HV_FLUSH_ALL_PROCESSORS) ||
++			flush.processor_mask == 0;
+ 	} else {
+ 		if (unlikely(kvm_read_guest(kvm, ingpa, &flush_ex,
+ 					    sizeof(flush_ex))))
 -- 
 2.20.1
 
