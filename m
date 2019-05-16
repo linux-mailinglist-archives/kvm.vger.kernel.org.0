@@ -2,101 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DEB4820607
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 13:59:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C6D3205EA
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 13:59:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728351AbfEPLqJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 May 2019 07:46:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49128 "EHLO mail.kernel.org"
+        id S1727924AbfEPLoo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 May 2019 07:44:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45286 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727828AbfEPLkp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 May 2019 07:40:45 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1727784AbfEPLon (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 May 2019 07:44:43 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BA99520881;
-        Thu, 16 May 2019 11:40:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558006844;
-        bh=v/HqS3IgvVJDebTuRTMYuP8V01kl/l3JAlMRASQwuIA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=u4yFKws3eeQI8SCcEbGdGgVF4igY6sVNguDUq0gSAa2HrSC2Caed/Wjz/NG9Kiedu
-         QeGYGmy1A/mBLSe/rhXFQ8WDnaETurheEwCVUp5UyUQIHnYMpvJATsn20kN22kUanz
-         ItH6nRHu3rI+nNbAAchHZIzVLaLz2PrV6UwfnRfo=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 13/25] x86: kvm: hyper-v: deal with buggy TLB flush requests from WS2012
-Date:   Thu, 16 May 2019 07:40:16 -0400
-Message-Id: <20190516114029.8682-13-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190516114029.8682-1-sashal@kernel.org>
-References: <20190516114029.8682-1-sashal@kernel.org>
+        by mx1.redhat.com (Postfix) with ESMTPS id BEB5C3004419;
+        Thu, 16 May 2019 11:44:43 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8164C2E19A;
+        Thu, 16 May 2019 11:44:42 +0000 (UTC)
+Date:   Thu, 16 May 2019 13:44:40 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Farhan Ali <alifm@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 0/7] s390: vfio-ccw fixes
+Message-ID: <20190516134440.35be758c.cohuck@redhat.com>
+In-Reply-To: <20190514234248.36203-1-farman@linux.ibm.com>
+References: <20190514234248.36203-1-farman@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Thu, 16 May 2019 11:44:43 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+On Wed, 15 May 2019 01:42:41 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
 
-[ Upstream commit da66761c2d93a46270d69001abb5692717495a68 ]
+> They are based on 5.1.0, not Conny's vfio-ccw tree even though there are
+> some good fixes pending for 5.2 there.  I've run this series both with
+> and without that code, but couldn't decide which base would provide an
+> easier time applying patches.  "I think" they should apply fine to both,
+> but I apologize in advance if I guessed wrong!  :)
 
-It was reported that with some special Multi Processor Group configuration,
-e.g:
- bcdedit.exe /set groupsize 1
- bcdedit.exe /set maxgroup on
- bcdedit.exe /set groupaware on
-for a 16-vCPU guest WS2012 shows BSOD on boot when PV TLB flush mechanism
-is in use.
+Patch 2 stumbled over a trivial-to-fix context change; else, things
+applied cleanly.
 
-Tracing kvm_hv_flush_tlb immediately reveals the issue:
-
- kvm_hv_flush_tlb: processor_mask 0x0 address_space 0x0 flags 0x2
-
-The only flag set in this request is HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES,
-however, processor_mask is 0x0 and no HV_FLUSH_ALL_PROCESSORS is specified.
-We don't flush anything and apparently it's not what Windows expects.
-
-TLFS doesn't say anything about such requests and newer Windows versions
-seem to be unaffected. This all feels like a WS2012 bug, which is, however,
-easy to workaround in KVM: let's flush everything when we see an empty
-flush request, over-flushing doesn't hurt.
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/x86/kvm/hyperv.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 01d209ab5481b..229d996051653 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1291,7 +1291,16 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *current_vcpu, u64 ingpa,
- 				       flush.address_space, flush.flags);
- 
- 		sparse_banks[0] = flush.processor_mask;
--		all_cpus = flush.flags & HV_FLUSH_ALL_PROCESSORS;
-+
-+		/*
-+		 * Work around possible WS2012 bug: it sends hypercalls
-+		 * with processor_mask = 0x0 and HV_FLUSH_ALL_PROCESSORS clear,
-+		 * while also expecting us to flush something and crashing if
-+		 * we don't. Let's treat processor_mask == 0 same as
-+		 * HV_FLUSH_ALL_PROCESSORS.
-+		 */
-+		all_cpus = (flush.flags & HV_FLUSH_ALL_PROCESSORS) ||
-+			flush.processor_mask == 0;
- 	} else {
- 		if (unlikely(kvm_read_guest(kvm, ingpa, &flush_ex,
- 					    sizeof(flush_ex))))
--- 
-2.20.1
-
+Thanks, queued patches 1-4.
