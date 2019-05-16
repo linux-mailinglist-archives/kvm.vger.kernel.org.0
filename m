@@ -2,95 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7949F202A3
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 11:35:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45CB12030B
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 11:59:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726987AbfEPJez (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 May 2019 05:34:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60350 "EHLO mx1.redhat.com"
+        id S1727287AbfEPJ7u convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 16 May 2019 05:59:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55866 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726336AbfEPJez (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 May 2019 05:34:55 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        id S1726374AbfEPJ7u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 May 2019 05:59:50 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6074B2E95B3;
-        Thu, 16 May 2019 09:34:55 +0000 (UTC)
-Received: from localhost (ovpn-117-183.ams2.redhat.com [10.36.117.183])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A1D405D6A9;
-        Thu, 16 May 2019 09:34:51 +0000 (UTC)
-Date:   Thu, 16 May 2019 10:34:50 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com
-Subject: Re: [PATCH net 0/4] Prevent vhost kthread from hogging CPU
-Message-ID: <20190516093450.GR29507@stefanha-x1.localdomain>
-References: <1557992862-27320-1-git-send-email-jasowang@redhat.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id B200B308FB9D;
+        Thu, 16 May 2019 09:59:49 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 778B96A257;
+        Thu, 16 May 2019 09:59:48 +0000 (UTC)
+Date:   Thu, 16 May 2019 11:59:46 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Farhan Ali <alifm@linux.ibm.com>
+Cc:     Eric Farman <farman@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 5/7] s390/cio: Allow zero-length CCWs in vfio-ccw
+Message-ID: <20190516115946.11d18510.cohuck@redhat.com>
+In-Reply-To: <39c7904f-7f9b-473d-201d-8d6aae4c490b@linux.ibm.com>
+References: <20190514234248.36203-1-farman@linux.ibm.com>
+        <20190514234248.36203-6-farman@linux.ibm.com>
+        <20190515142339.12065a1d.cohuck@redhat.com>
+        <f309cad9-9265-e276-8d57-8b6387f6fed7@linux.ibm.com>
+        <39c7904f-7f9b-473d-201d-8d6aae4c490b@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="+S4DbcR7QPeSsP0V"
-Content-Disposition: inline
-In-Reply-To: <1557992862-27320-1-git-send-email-jasowang@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Thu, 16 May 2019 09:34:55 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Thu, 16 May 2019 09:59:49 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 15 May 2019 16:08:18 -0400
+Farhan Ali <alifm@linux.ibm.com> wrote:
 
---+S4DbcR7QPeSsP0V
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 05/15/2019 11:04 AM, Eric Farman wrote:
+> > 
+> > 
+> > On 5/15/19 8:23 AM, Cornelia Huck wrote:  
+> >> On Wed, 15 May 2019 01:42:46 +0200
+> >> Eric Farman <farman@linux.ibm.com> wrote:
+> >>  
+> >>> It is possible that a guest might issue a CCW with a length of zero,
+> >>> and will expect a particular response.  Consider this chain:
+> >>>
+> >>>     Address   Format-1 CCW
+> >>>     --------  -----------------
+> >>>   0 33110EC0  346022CC 33177468
+> >>>   1 33110EC8  CF200000 3318300C
+> >>>
+> >>> CCW[0] moves a little more than two pages, but also has the
+> >>> Suppress Length Indication (SLI) bit set to handle the expectation
+> >>> that considerably less data will be moved.  CCW[1] also has the SLI
+> >>> bit set, and has a length of zero.  Once vfio-ccw does its magic,
+> >>> the kernel issues a start subchannel on behalf of the guest with this:
+> >>>
+> >>>     Address   Format-1 CCW
+> >>>     --------  -----------------
+> >>>   0 021EDED0  346422CC 021F0000
+> >>>   1 021EDED8  CF240000 3318300C
+> >>>
+> >>> Both CCWs were converted to an IDAL and have the corresponding flags
+> >>> set (which is by design), but only the address of the first data
+> >>> address is converted to something the host is aware of.  The second
+> >>> CCW still has the address used by the guest, which happens to be (A)
+> >>> (probably) an invalid address for the host, and (B) an invalid IDAW
+> >>> address (doubleword boundary, etc.).
+> >>>
+> >>> While the I/O fails, it doesn't fail correctly.  In this example, we
+> >>> would receive a program check for an invalid IDAW address, instead of
+> >>> a unit check for an invalid command.
+> >>>
+> >>> To fix this, revert commit 4cebc5d6a6ff ("vfio: ccw: validate the
+> >>> count field of a ccw before pinning") and allow the individual fetch
+> >>> routines to process them like anything else.  We'll make a slight
+> >>> adjustment to our allocation of the pfn_array (for direct CCWs) or
+> >>> IDAL (for IDAL CCWs) memory, so that we have room for at least one
+> >>> address even though no data will be transferred.
+> >>>
+> >>> Note that this doesn't provide us with a channel program that will
+> >>> fail in the expected way.  Since our length is zero, vfio_pin_pages()  
+> > 
+> > s/is/was/
+> >   
+> >>> returns -EINVAL and cp_prefetch() will thus fail.  This will be fixed
+> >>> in the next patch.  
+> >>
+> >> So, this failed before, and still fails, just differently?   
+> > 
+> > Probably.  If the guest gave us a valid address, the pin might actually 
+> > work now whereas before it would fail because the length was zero.  If 
+> > the address were also invalid,
+> >   
+> >  >IOW, this
+> >> has no effect on bisectability?  
+> > 
+> > I think so, but I suppose that either (A) patch 5 and 6 could be 
+> > squashed together, or (B) I could move the "set pa_nr to zero" (or more 
+> > accurately, set it to ccw->count) pieces from patch 6 into this patch, 
+> > so that the vfio_pin_pages() call occurs like it does today.
+> >   
+> >>  
+> 
+> While going through patch 5, I was confused as to why we need to pin 
+> pages if we are only trying to translate the addresses and no data 
+> transfer will take place with count==0. Well, you answer that in patch 6 :)
+> 
+> So maybe it might be better to move parts of patch 6 to 5 or squash 
+> them, or maybe reverse the order.
 
-On Thu, May 16, 2019 at 03:47:38AM -0400, Jason Wang wrote:
-> Hi:
->=20
-> This series try to prvernt a guest triggerable CPU hogging through
-> vhost kthread. This is done by introducing and checking the weight
-> after each requrest. The patch has been tested with reproducer of
-> vsock and virtio-net. Only compile test is done for vhost-scsi.
->=20
-> Please review.
->=20
-> This addresses CVE-2019-3900.
->=20
-> Jason Wang (4):
->   vhost: introduce vhost_exceeds_weight()
->   vhost_net: fix possible infinite loop
->   vhost: vsock: add weight support
->   vhost: scsi: add weight support
->=20
->  drivers/vhost/net.c   | 41 ++++++++++++++---------------------------
->  drivers/vhost/scsi.c  | 21 ++++++++++++++-------
->  drivers/vhost/vhost.c | 20 +++++++++++++++++++-
->  drivers/vhost/vhost.h |  5 ++++-
->  drivers/vhost/vsock.c | 28 +++++++++++++++++++++-------
->  5 files changed, 72 insertions(+), 43 deletions(-)
->=20
-> --=20
-> 1.8.3.1
->=20
+I think this will get a bit unwieldy of squashed, so what about simply
+moving code from 6 to 5? I think people are confused enough by the two
+patches to make a change look like a good idea.
 
-Looks good aside from the use-after-free in the vsock patch.
+(I can queue patches 1-4 to get them out of the way :)
 
---+S4DbcR7QPeSsP0V
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+> Thanks
+> Farhan
+> 
+> 
+> >>>
+> >>> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> >>> ---
+> >>>   drivers/s390/cio/vfio_ccw_cp.c | 26 ++++++++------------------
+> >>>   1 file changed, 8 insertions(+), 18 deletions(-)  
+> >>  
+> >   
+> 
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzdLroACgkQnKSrs4Gr
-c8hOGgf/TuvPxOE1Wzw+hWbX63+OyCIjKxtdlJzH3ahFiBAY+mlbhloiyLFxwFwm
-Her1G3erNlR7kYao/4RMryOx0Bvz6l8iPocrRdkCimdgGuue3RN2fh1lL2kkKQny
-33nIZNeWyzfD1igdQ/3Oab0o98s0Nl6orEdx6Ap3cKgBjrdRLhl72qnssF4etlve
-G4k/1V8OyAQchWGqLBr4/xr0bnnA7Blx4sl18NgJn251MfZazuCk8SxffpfnZ3ni
-yx6HxtZmQS3fRMCWioBVkforSNUlxURBvCnZYgWpHTP5CnQxzBPyT2NNBEpgXDvi
-kYJIkiL2SbXqRNh87QZIQAu/WEyUGQ==
-=JvSa
------END PGP SIGNATURE-----
-
---+S4DbcR7QPeSsP0V--
