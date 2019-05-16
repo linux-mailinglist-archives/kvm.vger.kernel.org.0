@@ -2,151 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9737F20B14
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 17:25:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D48120B18
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 17:25:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727458AbfEPPZH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 May 2019 11:25:07 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:25987 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726758AbfEPPZH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 May 2019 11:25:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1558020306; x=1589556306;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:mime-version:
-   content-transfer-encoding;
-  bh=kUZ9rEq+loBEpuV/agF7lMwxuKWMwuSBBWGCLZkR43o=;
-  b=gj0/FSOvM4dQoxmEbvnqIs8YNp1mgLWUaf3Vp92IlAIsZ6DjphFkww0s
-   JEUFn/d5bhbxCp0y/SW7k89wFTjNgywB/rU/oKeoAFdLatmU5PgZEBgkv
-   /VinmJlon51HeH1HGBZoqVTLlqxBzNpQ7GUK23WhqWwveNz/a81QxxPpP
-   g=;
-X-IronPort-AV: E=Sophos;i="5.60,477,1549929600"; 
-   d="scan'208";a="733383237"
-Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-2b-3714e498.us-west-2.amazon.com) ([10.124.125.2])
-  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 16 May 2019 15:25:03 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2b-3714e498.us-west-2.amazon.com (8.14.7/8.14.7) with ESMTP id x4GFOu5J042984
-        (version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=FAIL);
-        Thu, 16 May 2019 15:25:02 GMT
-Received: from EX13D02EUC002.ant.amazon.com (10.43.164.14) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 16 May 2019 15:25:01 +0000
-Received: from EX13D02EUC001.ant.amazon.com (10.43.164.92) by
- EX13D02EUC002.ant.amazon.com (10.43.164.14) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 16 May 2019 15:25:00 +0000
-Received: from EX13D02EUC001.ant.amazon.com ([10.43.164.92]) by
- EX13D02EUC001.ant.amazon.com ([10.43.164.92]) with mapi id 15.00.1367.000;
- Thu, 16 May 2019 15:25:00 +0000
-From:   "Sironi, Filippo" <sironi@amazon.de>
-To:     "Graf, Alexander" <graf@amazon.com>
-CC:     LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "vasu.srinivasan@oracle.com" <vasu.srinivasan@oracle.com>
-Subject: Re: [PATCH v2 2/2] KVM: x86: Implement the arch-specific hook to
- report the VM UUID
-Thread-Topic: [PATCH v2 2/2] KVM: x86: Implement the arch-specific hook to
- report the VM UUID
-Thread-Index: AQHVCmgxSNZRVPU/lkacpReSlg9JAaZtyWCAgAAY24A=
-Date:   Thu, 16 May 2019 15:25:00 +0000
-Message-ID: <7395EFE9-0B38-4B61-81D4-E8450561AABE@amazon.de>
-References: <1539078879-4372-1-git-send-email-sironi@amazon.de>
- <1557847002-23519-1-git-send-email-sironi@amazon.de>
- <1557847002-23519-3-git-send-email-sironi@amazon.de>
- <f51a6a84-b21c-ab75-7e30-bfbe2ac6b98b@amazon.com>
-In-Reply-To: <f51a6a84-b21c-ab75-7e30-bfbe2ac6b98b@amazon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.166.108]
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <322B72780715F949BC86D7AC0C1B0C37@amazon.com>
+        id S1727697AbfEPPZj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 May 2019 11:25:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49597 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726692AbfEPPZj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 May 2019 11:25:39 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 71315306641B;
+        Thu, 16 May 2019 15:25:38 +0000 (UTC)
+Received: from localhost (ovpn-117-183.ams2.redhat.com [10.36.117.183])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 23C4D60851;
+        Thu, 16 May 2019 15:25:34 +0000 (UTC)
+Date:   Thu, 16 May 2019 16:25:33 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH v2 1/8] vsock/virtio: limit the memory used per-socket
+Message-ID: <20190516152533.GB29808@stefanha-x1.localdomain>
+References: <20190510125843.95587-1-sgarzare@redhat.com>
+ <20190510125843.95587-2-sgarzare@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="qcHopEYAB45HaUaB"
+Content-Disposition: inline
+In-Reply-To: <20190510125843.95587-2-sgarzare@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Thu, 16 May 2019 15:25:38 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-> On 16. May 2019, at 15:56, Graf, Alexander <graf@amazon.com> wrote:
-> =
+--qcHopEYAB45HaUaB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On 14.05.19 08:16, Filippo Sironi wrote:
->> On x86, we report the UUID in DMI System Information (i.e., DMI Type 1)
->> as VM UUID.
->> =
+On Fri, May 10, 2019 at 02:58:36PM +0200, Stefano Garzarella wrote:
+> +struct virtio_vsock_buf {
 
->> Signed-off-by: Filippo Sironi <sironi@amazon.de>
->> ---
->> arch/x86/kernel/kvm.c | 7 +++++++
->> 1 file changed, 7 insertions(+)
->> =
+Please add a comment describing the purpose of this struct and to
+differentiate its use from struct virtio_vsock_pkt.
 
->> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
->> index 5c93a65ee1e5..441cab08a09d 100644
->> --- a/arch/x86/kernel/kvm.c
->> +++ b/arch/x86/kernel/kvm.c
->> @@ -25,6 +25,7 @@
->> #include <linux/kernel.h>
->> #include <linux/kvm_para.h>
->> #include <linux/cpu.h>
->> +#include <linux/dmi.h>
->> #include <linux/mm.h>
->> #include <linux/highmem.h>
->> #include <linux/hardirq.h>
->> @@ -694,6 +695,12 @@ bool kvm_para_available(void)
->> }
->> EXPORT_SYMBOL_GPL(kvm_para_available);
->> =
+> +static struct virtio_vsock_buf *
+> +virtio_transport_alloc_buf(struct virtio_vsock_pkt *pkt, bool zero_copy)
+> +{
+> +	struct virtio_vsock_buf *buf;
+> +
+> +	if (pkt->len =3D=3D 0)
+> +		return NULL;
+> +
+> +	buf =3D kzalloc(sizeof(*buf), GFP_KERNEL);
+> +	if (!buf)
+> +		return NULL;
+> +
+> +	/* If the buffer in the virtio_vsock_pkt is full, we can move it to
+> +	 * the new virtio_vsock_buf avoiding the copy, because we are sure that
+> +	 * we are not use more memory than that counted by the credit mechanism.
+> +	 */
+> +	if (zero_copy && pkt->len =3D=3D pkt->buf_len) {
+> +		buf->addr =3D pkt->buf;
+> +		pkt->buf =3D NULL;
+> +	} else {
+> +		buf->addr =3D kmalloc(pkt->len, GFP_KERNEL);
 
->> +const char *kvm_para_get_uuid(void)
->> +{
->> +	return dmi_get_system_info(DMI_PRODUCT_UUID);
-> =
+buf and buf->addr could be allocated in a single call, though I'm not
+sure how big an optimization this is.
 
-> This adds a new dependency on CONFIG_DMI. Probably best to guard it with
-> an #if IS_ENABLED(CONFIG_DMI).
-> =
+> @@ -841,20 +882,24 @@ virtio_transport_recv_connected(struct sock *sk,
+>  {
+>  	struct vsock_sock *vsk =3D vsock_sk(sk);
+>  	struct virtio_vsock_sock *vvs =3D vsk->trans;
+> +	struct virtio_vsock_buf *buf;
+>  	int err =3D 0;
+> =20
+>  	switch (le16_to_cpu(pkt->hdr.op)) {
+>  	case VIRTIO_VSOCK_OP_RW:
+>  		pkt->len =3D le32_to_cpu(pkt->hdr.len);
+> -		pkt->off =3D 0;
+> +		buf =3D virtio_transport_alloc_buf(pkt, true);
+> =20
+> -		spin_lock_bh(&vvs->rx_lock);
+> -		virtio_transport_inc_rx_pkt(vvs, pkt);
+> -		list_add_tail(&pkt->list, &vvs->rx_queue);
+> -		spin_unlock_bh(&vvs->rx_lock);
+> +		if (buf) {
+> +			spin_lock_bh(&vvs->rx_lock);
+> +			virtio_transport_inc_rx_pkt(vvs, pkt->len);
+> +			list_add_tail(&buf->list, &vvs->rx_queue);
+> +			spin_unlock_bh(&vvs->rx_lock);
+> =20
+> -		sk->sk_data_ready(sk);
+> -		return err;
+> +			sk->sk_data_ready(sk);
+> +		}
 
-> The concept seems sound though.
-> =
+The return value of this function isn't used but the code still makes an
+effort to return errors.  Please return -ENOMEM when buf =3D=3D NULL.
 
-> Alex
+If you'd like to remove the return value that's fine too, but please do
+it for the whole function to be consistent.
 
-include/linux/dmi.h contains a dummy implementation of
-dmi_get_system_info that returns NULL if CONFIG_DMI isn't defined.
-This is enough unless we decide to return "<denied>" like in Xen.
-If then, we can have the check in the generic code to turn NULL
-into "<denied>".
+--qcHopEYAB45HaUaB
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Filippo
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzdgO0ACgkQnKSrs4Gr
+c8i2BQf/SKch1qy6NDC+HDYgEJxI8sLacx7MgcaTqQGmvc29mZInkaMMDj88G6T/
+LGW/vJZ1x1ZPrLx+fKiNOs82ZIiiHhLy8HGEjuu8eMW+YYk0y8QPu7QPsxRV2IaG
+u7gSGPxdUKUvGVejNWyqo5/mW2kZOLaMg0Z5zTghUhZ9hLyBQAU5UwvdqVICnedh
+1IYkF86rZrfKQFZCv/X5Q7IwRvg1lHZyYjTyqUBomc2z1tAk4t1NrMT3LDhLD1XZ
+dnUdBc5bBVspwArnAl9P4Uag0Gjh8yjEp0S7ITrZI58G6tilDb3cncv9w+nRvQks
+EY4F99igT+SAp97NrMrIW0E/MZjnOw==
+=gdG0
+-----END PGP SIGNATURE-----
 
->> +}
->> +EXPORT_SYMBOL_GPL(kvm_para_get_uuid);
->> +
->> unsigned int kvm_arch_para_features(void)
->> {
->> 	return cpuid_eax(kvm_cpuid_base() | KVM_CPUID_FEATURES);
-
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrer: Christian Schlaeger, Ralf Herbrich
-Ust-ID: DE 289 237 879
-Eingetragen am Amtsgericht Charlottenburg HRB 149173 B
-
-
+--qcHopEYAB45HaUaB--
