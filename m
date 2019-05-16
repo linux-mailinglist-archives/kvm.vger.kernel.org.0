@@ -2,140 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F344A20E33
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 19:49:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2199520EB0
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 20:31:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728105AbfEPRtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 May 2019 13:49:13 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:50049 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726441AbfEPRtM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 May 2019 13:49:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1558028951; x=1589564951;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=9nVrkLPFrKFzW5I8vXU9JV7oHZCN/SUECinSigxy+dM=;
-  b=p7z8pf6l5SM6L73FjEss9AbW6394rhnt4c0LO3Xj8gflXVAHYnExujUc
-   wORwvgp+AotEDFma/c0u3U8Ol8QblDW5GrCKu3pW656n2VwIUZdSzeRcZ
-   yU9tqkaRhZ0Npxf69pKyoT+QkdM4FC2moU+saeglRI5zmHBz37fGe6/ft
-   E=;
-X-IronPort-AV: E=Sophos;i="5.60,477,1549929600"; 
-   d="scan'208";a="674736306"
-Received: from sea3-co-svc-lb6-vlan3.sea.amazon.com (HELO email-inbound-relay-2b-baacba05.us-west-2.amazon.com) ([10.47.22.38])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 16 May 2019 17:49:07 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2b-baacba05.us-west-2.amazon.com (8.14.7/8.14.7) with ESMTP id x4GHn6De107439
-        (version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=FAIL);
-        Thu, 16 May 2019 17:49:07 GMT
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 16 May 2019 17:49:06 +0000
-Received: from macbook-2.local (10.43.160.4) by EX13D20UWC001.ant.amazon.com
- (10.43.162.244) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Thu, 16 May
- 2019 17:49:05 +0000
-Subject: Re: [PATCH v2 2/2] KVM: x86: Implement the arch-specific hook to
- report the VM UUID
-To:     "Sironi, Filippo" <sironi@amazon.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>
-CC:     LKML <linux-kernel@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "vasu.srinivasan@oracle.com" <vasu.srinivasan@oracle.com>
-References: <1539078879-4372-1-git-send-email-sironi@amazon.de>
- <1557847002-23519-1-git-send-email-sironi@amazon.de>
- <1557847002-23519-3-git-send-email-sironi@amazon.de>
- <f51a6a84-b21c-ab75-7e30-bfbe2ac6b98b@amazon.com>
- <7395EFE9-0B38-4B61-81D4-E8450561AABE@amazon.de>
- <8c6a2de2-f080-aad5-16af-c4a5eafb31af@amazon.com>
- <3a9762a2-24e8-a842-862d-fadae563361d@oracle.com>
- <DD0087B6-094D-4D07-9C85-827881E3DDD0@amazon.de>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <cb50c8a6-58e7-e123-feb9-d9dd2bc33b34@amazon.com>
-Date:   Thu, 16 May 2019 10:49:03 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.6.1
+        id S1726865AbfEPSbN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 May 2019 14:31:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40866 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726357AbfEPSbM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 May 2019 14:31:12 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C1DD5317914E;
+        Thu, 16 May 2019 18:31:04 +0000 (UTC)
+Received: from x1.home (ovpn-117-92.phx2.redhat.com [10.3.117.92])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1E2715D9CC;
+        Thu, 16 May 2019 18:31:00 +0000 (UTC)
+Date:   Thu, 16 May 2019 12:31:00 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     sebott@linux.vnet.ibm.com, gerald.schaefer@de.ibm.com,
+        pasic@linux.vnet.ibm.com, borntraeger@de.ibm.com,
+        walling@linux.ibm.com, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, joro@8bytes.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com
+Subject: Re: [PATCH 2/4] vfio: vfio_iommu_type1: Define
+ VFIO_IOMMU_INFO_CAPABILITIES
+Message-ID: <20190516123100.529f06be@x1.home>
+In-Reply-To: <1557476555-20256-3-git-send-email-pmorel@linux.ibm.com>
+References: <1557476555-20256-1-git-send-email-pmorel@linux.ibm.com>
+        <1557476555-20256-3-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <DD0087B6-094D-4D07-9C85-827881E3DDD0@amazon.de>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.43.160.4]
-X-ClientProxiedBy: EX13D27UWB001.ant.amazon.com (10.43.161.169) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Thu, 16 May 2019 18:31:12 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, 10 May 2019 10:22:33 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-On 16.05.19 10:41, Sironi, Filippo wrote:
->> On 16. May 2019, at 18:40, Boris Ostrovsky <boris.ostrovsky@oracle.com> wrote:
->>
->> On 5/16/19 11:33 AM, Alexander Graf wrote:
->>> On 16.05.19 08:25, Sironi, Filippo wrote:
->>>>> On 16. May 2019, at 15:56, Graf, Alexander <graf@amazon.com> wrote:
->>>>>
->>>>> On 14.05.19 08:16, Filippo Sironi wrote:
->>>>>> On x86, we report the UUID in DMI System Information (i.e., DMI Type 1)
->>>>>> as VM UUID.
->>>>>>
->>>>>> Signed-off-by: Filippo Sironi <sironi@amazon.de>
->>>>>> ---
->>>>>> arch/x86/kernel/kvm.c | 7 +++++++
->>>>>> 1 file changed, 7 insertions(+)
->>>>>>
->>>>>> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
->>>>>> index 5c93a65ee1e5..441cab08a09d 100644
->>>>>> --- a/arch/x86/kernel/kvm.c
->>>>>> +++ b/arch/x86/kernel/kvm.c
->>>>>> @@ -25,6 +25,7 @@
->>>>>> #include <linux/kernel.h>
->>>>>> #include <linux/kvm_para.h>
->>>>>> #include <linux/cpu.h>
->>>>>> +#include <linux/dmi.h>
->>>>>> #include <linux/mm.h>
->>>>>> #include <linux/highmem.h>
->>>>>> #include <linux/hardirq.h>
->>>>>> @@ -694,6 +695,12 @@ bool kvm_para_available(void)
->>>>>> }
->>>>>> EXPORT_SYMBOL_GPL(kvm_para_available);
->>>>>>
->>>>>> +const char *kvm_para_get_uuid(void)
->>>>>> +{
->>>>>> +	return dmi_get_system_info(DMI_PRODUCT_UUID);
->>>>> This adds a new dependency on CONFIG_DMI. Probably best to guard it with
->>>>> an #if IS_ENABLED(CONFIG_DMI).
->>>>>
->>>>> The concept seems sound though.
->>>>>
->>>>> Alex
->>>> include/linux/dmi.h contains a dummy implementation of
->>>> dmi_get_system_info that returns NULL if CONFIG_DMI isn't defined.
->>> Oh, I missed that bit. Awesome! Less work :).
->>>
->>>
->>>> This is enough unless we decide to return "<denied>" like in Xen.
->>>> If then, we can have the check in the generic code to turn NULL
->>>> into "<denied>".
->>> Yes. Waiting for someone from Xen to answer this :)
->> Not sure I am answering your question but on Xen we return UUID value
->> zero if access permissions are not sufficient. Not <denied>.
->>
->> http://xenbits.xen.org/gitweb/?p=xen.git;a=blob;f=xen/common/kernel.c;h=612575430f1ce7faf5bd66e7a99f1758c63fb3cb;hb=HEAD#l506
->>
->> -boris
-> Then, I believe that returning 00000000-0000-0000-0000-000000000000
-> instead of NULL in the weak implementation of 1/2 and translating
-> NULL into 00000000-0000-0000-0000-000000000000 is the better approach.
+> To use the VFIO_IOMMU_GET_INFO to retrieve IOMMU specific information,
+> we define a new flag VFIO_IOMMU_INFO_CAPABILITIES in the
+> vfio_iommu_type1_info structure and the associated capability
+> information block.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  include/uapi/linux/vfio.h | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 8f10748..8f68e0f 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -715,6 +715,16 @@ struct vfio_iommu_type1_info {
+>  	__u32	flags;
+>  #define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info */
+>  	__u64	iova_pgsizes;		/* Bitmap of supported page sizes */
+> +#define VFIO_IOMMU_INFO_CAPABILITIES (1 << 1)  /* support capabilities info */
+> +	__u64   cap_offset;     /* Offset within info struct of first cap */
+> +};
+> +
+> +#define VFIO_IOMMU_INFO_CAP_QFN		1
+> +#define VFIO_IOMMU_INFO_CAP_QGRP	2
 
+Descriptions?
 
-Just keep it at NULL in kvm_para_get_uuid() and convert to the canonical
-00000000-0000-0000-0000-000000000000 in uuid_show().
+> +
+> +struct vfio_iommu_type1_info_block {
+> +	struct vfio_info_cap_header header;
+> +	__u32 data[];
+>  };
+>  
+>  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+
+This is just a blob of data, what's the API?  How do we revision it?
+How does the user know how to interpret it?  Dumping kernel internal
+structures out to userspace like this is not acceptable, define a user
+API. Thanks,
 
 Alex
-
