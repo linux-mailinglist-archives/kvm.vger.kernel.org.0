@@ -2,190 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C1CBD1FCC7
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 01:30:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B75B1FD4F
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 03:48:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726563AbfEOX37 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 May 2019 19:29:59 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:37718 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726454AbfEOX16 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 May 2019 19:27:58 -0400
-Received: by mail-pf1-f194.google.com with SMTP id g3so777383pfi.4;
-        Wed, 15 May 2019 16:27:58 -0700 (PDT)
+        id S1726971AbfEPBqb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 May 2019 21:46:31 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:35635 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726677AbfEPAWD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 May 2019 20:22:03 -0400
+Received: by mail-oi1-f194.google.com with SMTP id a132so1222196oib.2
+        for <kvm@vger.kernel.org>; Wed, 15 May 2019 17:22:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=okDJOcLTw50sbIY4czXBkDRFjJplAdmZ5Oir4pfxoyw=;
-        b=fIUfYQnKdJ8g50+Sqk62eXHWZNn4IGXFSaHeUsAcMZMEuEvUlTC+MSIPVLUMimamG6
-         qTqgKxbVFkHA/O8xEwTBWQw2kjOAG/omPAdG5acze/XdtZXJfNa4hAeNNs4Co5v4ACvv
-         07VT0Pn4664G/zYmGXlNW8i/59kYRiJCgWQv+QOnhuRh1m4dQjyYEW+o2cxmv9Jc7t1g
-         lSNeYEzoAwWuc3dvLHxCtpWUTkoj/H5dH4TZABiqzQbvu7IxNQWAgKt0m8/TydBY06YX
-         4+kEN8aXPl0EWlLVFxZdU0tiNnzTsHaK/fbOw09djpK4QkqD9ol0cEf//HeJQZQVuwK+
-         ujXg==
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=bobcIcGI2hoSe5dAxap34CNUn9LKnTkS03oUmV7h0q4=;
+        b=j9nGNhyMsOaTVud6KO3dskijFfmT2ZQWGqLP7vYr40RYrbZpP2ISfBY4/jbvgTXbHD
+         PBNLGCVvSGEIW+pkvZWIknWRx7irtf13DgdR99Ie6/6xDxy1VgUpVBlwuK3ybEJWLqgW
+         utTN/SrtWzEr/dIFr8r1RtV1Jsh3YspspkZIMQzCSJBi0BrKaoBFZs55FZ0kUQ+CSg3y
+         cLNlzpERm8qRNJFebCDsd3GPaloqk3nhEzbkU4ir0yewDOVvjZvhY9NZ9QQfKgfHgQw3
+         Jf1vLci6RuObHmAw9PyVKzRBRDvCgYO0flvWfgK5uIBS1CIRxOGoy2HsIk/r+YmH4QgG
+         GIkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=okDJOcLTw50sbIY4czXBkDRFjJplAdmZ5Oir4pfxoyw=;
-        b=g7BH0SyoAG3p1yUETsdKslSElPe8BORutJib+vxIfXXsRJx5wTZ6xLd5HEFrb7ltP6
-         /rUMo4Gga43Tk/hAkL22HN0R+Hx4CETgrW1OUH+gVV9KzJ4Z0AmABOfdUCmabC1c317H
-         qFbg+Jd095/6dJtMD2jBwIaOy3nX/wndF8UMqEJJbehByYRSVt+1ke8G6fejpjNAW4Q2
-         lietPAhBNiRksPqclKnP4zIzg60IEEhtVZ9NxWMrhfXK4M+NP5VvqJ865bM1PWUztCmZ
-         ELM4qFtlBa5goU/xcD2WWYK6axPhLXLfxVqcfBoFhhN30KqJTr0DFMfz3t4vnJaJiX4D
-         0KoQ==
-X-Gm-Message-State: APjAAAW7QzASSXjfwl3YmN27dpP88NBjeZP85HbJqYy5ipvRwe6fzksu
-        kfC+vXKBSpkYlyIc4CbCi0G5WZpI
-X-Google-Smtp-Source: APXvYqyGhDNLrM1M+gSFTydAFpgMMp90nk2hB1n6TJO+Ep574sGD4/pBdjoifk0kf4pDSrbaF2NFJg==
-X-Received: by 2002:a63:231c:: with SMTP id j28mr46927988pgj.430.1557962877747;
-        Wed, 15 May 2019 16:27:57 -0700 (PDT)
-Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
-        by smtp.googlemail.com with ESMTPSA id j19sm4318421pfr.155.2019.05.15.16.27.54
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 15 May 2019 16:27:56 -0700 (PDT)
-Message-ID: <1557962870.1877.1.camel@gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2 1/2] powerpc: Allow for a custom decr
- value to be specified to load on decr excp
-From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-To:     Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org, thuth@redhat.com, dgibson@redhat.com
-Date:   Thu, 16 May 2019 09:27:50 +1000
-In-Reply-To: <132d5cba-1b9e-0be9-848b-676848af7c48@redhat.com>
-References: <20190515002801.20517-1-sjitindarsingh@gmail.com>
-         <132d5cba-1b9e-0be9-848b-676848af7c48@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=bobcIcGI2hoSe5dAxap34CNUn9LKnTkS03oUmV7h0q4=;
+        b=jow1bqZBtOj6pBZb2K4Hta0iROQYOeEEW47z99yXzT0jr+NTA/T9Ce+OwR6XHLVM0h
+         UVsEvoz4gDo/TOOPwqdSNmA/NRq9xwBwxGgHzg/ZH6fADs7Yiw+8uaHZBbRS8ritWZs5
+         cFrmwM6qKdKx8Q8CI8xeV6Cu/qgj40TRNvM4pX+Y7vSxhNHZHTRlio9HqkIWY5mK+9RY
+         P/9yjVCRhoz2ZGaPFzhg4kN+dhzxlioP9xhr3RNCbKVbTNJWiB0NH3VUfLNV33K6RkdM
+         wT87Eed2R9ezzqEEoFHDSdybabEHE+zi9YnLsf2KACkbrYjTgXKmEdRP0AihHtAOxqSs
+         icmQ==
+X-Gm-Message-State: APjAAAVWm9LbQNZzRh86o0lAkTJ2LFRavVhCFQ3/Sa/HqWLn+hHg6NTL
+        Ne6tp7q0QFcnwHQCxyBbTM5Yi/JY7JCHcqESIIZarZSO
+X-Google-Smtp-Source: APXvYqzDrmQi77dAWBNc07ndDu3T5pa6iN0pcVHtAZNxLtfjwvQPS0Zb7sMkMpyK1B3ioBtGGZnPjQ/C8y0NssMQmSA=
+X-Received: by 2002:aca:b641:: with SMTP id g62mr5885998oif.149.1557966122846;
+ Wed, 15 May 2019 17:22:02 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190515192715.18000-1-vgoyal@redhat.com> <20190515192715.18000-13-vgoyal@redhat.com>
+In-Reply-To: <20190515192715.18000-13-vgoyal@redhat.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 15 May 2019 17:21:51 -0700
+Message-ID: <CAPcyv4i_-ri=w0jYJ4WjK4QD9E8pMzkGQNdMbt9H_nawDqYD3A@mail.gmail.com>
+Subject: Re: [PATCH v2 12/30] dax: remove block device dependencies
+To:     Vivek Goyal <vgoyal@redhat.com>
+Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>,
+        Steven Whitehouse <swhiteho@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2019-05-15 at 18:22 +0200, Laurent Vivier wrote:
-> On 15/05/2019 02:28, Suraj Jitindar Singh wrote:
-> > Currently the handler for a decrementer exception will simply
-> > reload the
-> > maximum value (0x7FFFFFFF), which will take ~4 seconds to expire
-> > again.
-> > This means that if a vcpu cedes, it will be ~4 seconds between
-> > wakeups.
-> > 
-> > The h_cede_tm test is testing a known breakage when a guest cedes
-> > while
-> > suspended. To be sure we cede 500 times to check for the bug.
-> > However
-> > since it takes ~4 seconds to be woken up once we've ceded, we only
-> > get
-> > through ~20 iterations before we reach the 90 seconds timeout and
-> > the
-> > test appears to fail.
-> > 
-> > Add an option when registering the decrementer handler to specify
-> > the
-> > value which should be reloaded by the handler, allowing the timeout
-> > to be
-> > chosen.
-> > 
-> > Modify the spr test to use the max timeout to preserve existing
-> > behaviour.
-> > Modify the h_cede_tm test to use a 10ms timeout to ensure we can
-> > perform
-> > 500 iterations before hitting the 90 second time limit for a test.
-> > 
-> > This means the h_cede_tm test now succeeds rather than timing out.
-> > 
-> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> > 
-> > ---
-> > 
-> > V1 -> V2:
-> > - Make decr variables static
-> > - Load intial decr value in tm test to ensure known value present
-> > ---
-> >  lib/powerpc/handlers.c | 7 ++++---
-> >  powerpc/sprs.c         | 5 +++--
-> >  powerpc/tm.c           | 4 +++-
-> >  3 files changed, 10 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/lib/powerpc/handlers.c b/lib/powerpc/handlers.c
-> > index be8226a..c8721e0 100644
-> > --- a/lib/powerpc/handlers.c
-> > +++ b/lib/powerpc/handlers.c
-> > @@ -12,11 +12,12 @@
-> >  
-> >  /*
-> >   * Generic handler for decrementer exceptions (0x900)
-> > - * Just reset the decrementer back to its maximum value
-> > (0x7FFFFFFF)
-> > + * Just reset the decrementer back to the value specified when
-> > registering the
-> > + * handler
-> >   */
-> > -void dec_except_handler(struct pt_regs *regs __unused, void *data
-> > __unused)
-> > +void dec_except_handler(struct pt_regs *regs __unused, void *data)
-> >  {
-> > -	uint32_t dec = 0x7FFFFFFF;
-> > +	uint64_t dec = *((uint64_t *) data);
-> >  
-> >  	asm volatile ("mtdec %0" : : "r" (dec));
-> >  }
-> > diff --git a/powerpc/sprs.c b/powerpc/sprs.c
-> > index 6744bd8..0e2e1c9 100644
-> > --- a/powerpc/sprs.c
-> > +++ b/powerpc/sprs.c
-> > @@ -253,6 +253,7 @@ int main(int argc, char **argv)
-> >  		0x1234567890ABCDEFULL, 0xFEDCBA0987654321ULL,
-> >  		-1ULL,
-> >  	};
-> > +	static uint64_t decr = 0x7FFFFFFF; /* Max value */
-> >  
-> >  	for (i = 1; i < argc; i++) {
-> >  		if (!strcmp(argv[i], "-w")) {
-> > @@ -288,8 +289,8 @@ int main(int argc, char **argv)
-> >  		(void) getchar();
-> >  	} else {
-> >  		puts("Sleeping...\n");
-> > -		handle_exception(0x900, &dec_except_handler,
-> > NULL);
-> > -		asm volatile ("mtdec %0" : : "r" (0x3FFFFFFF));
-> > +		handle_exception(0x900, &dec_except_handler,
-> > &decr);
-> > +		asm volatile ("mtdec %0" : : "r" (decr));
-> 
-> why do you replace the 0x3FFFFFFF by decr which is 0x7FFFFFFF?
+On Wed, May 15, 2019 at 12:28 PM Vivek Goyal <vgoyal@redhat.com> wrote:
+>
+> From: Stefan Hajnoczi <stefanha@redhat.com>
+>
+> Although struct dax_device itself is not tied to a block device, some
+> DAX code assumes there is a block device.  Make block devices optional
+> by allowing bdev to be NULL in commonly used DAX APIs.
+>
+> When there is no block device:
+>  * Skip the partition offset calculation in bdev_dax_pgoff()
+>  * Skip the blkdev_issue_zeroout() optimization
+>
+> Note that more block device assumptions remain but I haven't reach those
+> code paths yet.
+>
 
-Oh yeah, my mistake. I mis-read and thought they were the same. Is
-there any reason it was 0x3FFFFFFF? Can this be fixed up when applying
-or should I resend?
+Is there a generic object that non-block-based filesystems reference
+for physical storage as a bdev stand-in? I assume "sector_t" is still
+the common type for addressing filesystem capacity?
 
-> 
-> >  		hcall(H_CEDE);
-> >  	}
-> >  
-> > diff --git a/powerpc/tm.c b/powerpc/tm.c
-> > index bd56baa..c588985 100644
-> > --- a/powerpc/tm.c
-> > +++ b/powerpc/tm.c
-> > @@ -95,11 +95,13 @@ static bool enable_tm(void)
-> >  static void test_h_cede_tm(int argc, char **argv)
-> >  {
-> >  	int i;
-> > +	static uint64_t decr = 0x3FFFFF; /* ~10ms */
-> >  
-> >  	if (argc > 2)
-> >  		report_abort("Unsupported argument: '%s'",
-> > argv[2]);
-> >  
-> > -	handle_exception(0x900, &dec_except_handler, NULL);
-> > +	handle_exception(0x900, &dec_except_handler, &decr);
-> > +	asm volatile ("mtdec %0" : : "r" (decr));
-> >  
-> >  	if (!start_all_cpus(halt, 0))
-> >  		report_abort("Failed to start secondary cpus");
-> > 
-> 
-> Thanks,
-> Laurent
+It just seems to me that we should stop pretending that the
+filesystem-dax facility requires block devices and try to move this
+functionality to generically use a dax device across all interfaces.
