@@ -2,108 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A9ADF200B9
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 09:55:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D00A2013D
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 10:26:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726707AbfEPHy5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 May 2019 03:54:57 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:34216 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726454AbfEPHy5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 May 2019 03:54:57 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4G7sUlc186465;
-        Thu, 16 May 2019 07:54:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2018-07-02; bh=wlI4FuevQ2mhRamMuoO2zlRoWsnWTKc4nNrjHwGyT60=;
- b=5gQuHnUnkp2m3kS9rfSBd3os2IJV71BbS7WODagQKTlCsBuQxH6EYMnLBrHyDcpw1iyo
- uR01tB/m9/P47nCYDeEO0K3cIRJfRDsEs+VdRd53QLuYW3dHSZVQH8t/jKN5Wd7v5Hnd
- PfuesEeYPyXvUOA3jfz7+5GH6TDwU4qOPxzZSUJnzO65/UIpsUKJpwRCBw/ohrXzrRCy
- FF+KNl31MGykrkmBi6GVk10pDAsfKV6+toEBomis4vMybBxgX22XjnWbZVEWW2O7TCGS
- LtznRa3KTiTwcMN0tWCBO5IkpRrFV3IAIBFaUI1t9rHq5DHG8htKF0LRq1PUQevkQHwN PQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2sdq1qsfcw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 May 2019 07:54:48 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4G7rOSd024323;
-        Thu, 16 May 2019 07:54:47 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 2sggethpg5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 May 2019 07:54:47 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4G7slYB019462;
-        Thu, 16 May 2019 07:54:47 GMT
-Received: from [10.0.5.57] (/213.57.127.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 16 May 2019 00:54:47 -0700
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: Question about MDS mitigation
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <f513e534-2c7b-f32b-7346-1a64edf0db73@huawei.com>
-Date:   Thu, 16 May 2019 10:54:43 +0300
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Huangzhichao <huangzhichao@huawei.com>,
-        guijianfeng <guijianfeng@huawei.com>,
-        gaowanlong <gaowanlong@huawei.com>,
-        "Chentao (Boby)" <boby.chen@huawei.com>,
-        "Liujinsong (Paul)" <liu.jinsong@huawei.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <39F1D5C9-BD42-4E9F-BE56-2473B4713B82@oracle.com>
-References: <f513e534-2c7b-f32b-7346-1a64edf0db73@huawei.com>
-To:     "wencongyang (A)" <wencongyang2@huawei.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9258 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=880
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905160054
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9258 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=910 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905160054
+        id S1726589AbfEPI0h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 May 2019 04:26:37 -0400
+Received: from mga11.intel.com ([192.55.52.93]:22098 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726279AbfEPI0g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 May 2019 04:26:36 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 May 2019 01:26:36 -0700
+X-ExtLoop1: 1
+Received: from skl-s2.bj.intel.com ([10.240.192.102])
+  by orsmga005.jf.intel.com with ESMTP; 16 May 2019 01:26:34 -0700
+From:   Luwei Kang <luwei.kang@intel.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        x86@kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
+        Luwei Kang <luwei.kang@intel.com>
+Subject: [PATCH v1 0/6] KVM: VMX: Intel PT configuration switch using XSAVES/XRSTORS on VM-Entry/Exit
+Date:   Thu, 16 May 2019 16:25:08 +0800
+Message-Id: <1557995114-21629-1-git-send-email-luwei.kang@intel.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Indeed those CPU resources are shared between sibling hyperthreads on =
-same CPU core.
-There is currently no mechanism merged upstream to completely mitigate =
-SMT-enabled scenarios.
-Note that this is also true for L1TF.
+This patch set is mainly used for reduce the overhead of switch
+Intel PT configuation contex on VM-Entry/Exit by XSAVES/XRSTORS
+instructions.
 
-There are several proposal to address this but they are still in early =
-research mode.
-For example, see this KVM address space isolation patch series developed =
-by myself and Alexandre:
-https://lkml.org/lkml/2019/5/13/515
-(Which should be integrated with a mechanism which kick sibling =
-hyperthreads when switching from KVM isolated address space to full =
-kernel address space)
-This partially mimics Microsoft work regarding HyperClear which you can =
-read more about it here:
-=
-https://techcommunity.microsoft.com/t5/Virtualization/Hyper-V-HyperClear-M=
-itigation-for-L1-Terminal-Fault/ba-p/382429
+I measured the cycles number of context witch on Manual and
+XSAVES/XRSTORES by rdtsc, and the data as below:
 
--Liran
+Manual save(rdmsr):     ~334  cycles
+Manual restore(wrmsr):  ~1668 cycles
 
-> On 16 May 2019, at 5:42, wencongyang (A) <wencongyang2@huawei.com> =
-wrote:
->=20
-> Hi all
->=20
-> Fill buffers, load ports are shared between threads on the same =
-physical core.
-> We need to run more than one vm on the same physical core.
-> Is there any complete mitigation for environments utilizing SMT?
->=20
+XSAVES insturction:     ~124  cycles
+XRSTORS instruction:    ~378  cycles
+
+Manual: Switch the configuration by rdmsr and wrmsr instruction,
+        and there have 8 registers need to be saved or restore.
+        They are IA32_RTIT_OUTPUT_BASE, *_OUTPUT_MASK_PTRS,
+        *_STATUS, *_CR3_MATCH, *_ADDR0_A, *_ADDR0_B,
+        *_ADDR1_A, *_ADDR1_B.
+XSAVES/XRSTORS: Switch the configuration context by XSAVES/XRSTORS
+        instructions. This patch set will allocate separate
+        "struct fpu" structure to save host and guest PT state.
+        Only a small portion of this structure will be used because
+        we only save/restore PT state (not save AVX, AVX-512, MPX,
+        PKRU and so on).
+
+This patch set also do some code clean e.g. patch 2 will reuse
+the fpu pt_state to save the PT configuration contex and
+patch 3 will dymamic allocate Intel PT configuration state.
+
+Luwei Kang (6):
+  x86/fpu: Introduce new fpu state for Intel processor trace
+  KVM: VMX: Reuse the pt_state structure for PT context
+  KVM: VMX: Dymamic allocate Intel PT configuration state
+  KVM: VMX: Allocate XSAVE area for Intel PT configuration
+  KVM: VMX: Intel PT configration context switch using XSAVES/XRSTORS
+  KVM: VMX: Get PT state from xsave area to variables
+
+ arch/x86/include/asm/fpu/types.h |  13 ++
+ arch/x86/kvm/vmx/nested.c        |   2 +-
+ arch/x86/kvm/vmx/vmx.c           | 338 ++++++++++++++++++++++++++-------------
+ arch/x86/kvm/vmx/vmx.h           |  21 +--
+ 4 files changed, 243 insertions(+), 131 deletions(-)
+
+-- 
+1.8.3.1
 
