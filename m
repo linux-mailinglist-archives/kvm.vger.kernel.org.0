@@ -2,161 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F32320A77
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 16:58:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 719DA20A99
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 17:03:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727363AbfEPO5v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 May 2019 10:57:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38820 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726801AbfEPO5v (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 May 2019 10:57:51 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4GEj96i086713
-        for <kvm@vger.kernel.org>; Thu, 16 May 2019 10:57:50 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2sh8wqbvh1-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 16 May 2019 10:57:49 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Thu, 16 May 2019 15:57:47 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 16 May 2019 15:57:44 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4GEvhxd45613220
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 May 2019 14:57:43 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3F848A4053;
-        Thu, 16 May 2019 14:57:43 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BC0BBA404D;
-        Thu, 16 May 2019 14:57:42 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.226])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 16 May 2019 14:57:42 +0000 (GMT)
-Subject: Re: [PATCH 2/4] vfio: vfio_iommu_type1: Define
- VFIO_IOMMU_INFO_CAPABILITIES
-To:     Pierre Morel <pmorel@linux.ibm.com>, sebott@linux.vnet.ibm.com,
-        alex.williamson@redhat.com
-Cc:     gerald.schaefer@de.ibm.com, pasic@linux.vnet.ibm.com,
-        walling@linux.ibm.com, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, joro@8bytes.org,
+        id S1727390AbfEPPDM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 May 2019 11:03:12 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:48012 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726687AbfEPPDL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 May 2019 11:03:11 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4GEwuJq165009;
+        Thu, 16 May 2019 15:02:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=CEliZ7+T5NDLrMHrikPoN8vHUXniCEvebAc8ymNPGu4=;
+ b=m67rHuJ6yMMHTeFiE8akqxWrf/39kTx//2c/AyvOygDuOwNj3hRTpeaBIyLMrHnO7dm8
+ kctsnf6gAVN0l0u5Fih8ucxHN17z3jjbn5b63XLnMh8Gt+yqsuYQLqC2Lm/YLAjw60Ft
+ RsWPM6W0tALOxNj3YVv+k+gIHAGiBRYUxs0SQFotWD9IfwR+gwdIRPVywQ3N9B5xEzgO
+ HgbBCeiOJeFRE43ZagNUwEBk6y1d6KZJdAlGHzt/mn7MxcEudnNDSI8PuJQpVbvsRTPJ
+ Of4L6gLwKPkQpS3cS1S4lklcCAZBOP/lhEPxYsMnMddRT6Vgaf49R8uCgxiofzaMVhlQ zA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2130.oracle.com with ESMTP id 2sdkwe4807-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 May 2019 15:02:53 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4GF1Re6096541;
+        Thu, 16 May 2019 15:02:53 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 2sgp3321sy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 May 2019 15:02:52 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4GF2oc9003548;
+        Thu, 16 May 2019 15:02:50 GMT
+Received: from bostrovs-us.us.oracle.com (/10.152.32.65)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 16 May 2019 08:02:50 -0700
+Subject: Re: [Xen-devel] [PATCH v2 1/2] KVM: Start populating /sys/hypervisor
+ with KVM entries
+To:     Alexander Graf <graf@amazon.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Filippo Sironi <sironi@amazon.de>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com
-References: <1557476555-20256-1-git-send-email-pmorel@linux.ibm.com>
- <1557476555-20256-3-git-send-email-pmorel@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
+        borntraeger@de.ibm.com, cohuck@redhat.com, konrad.wilk@oracle.com,
+        xen-devel@lists.xenproject.org
+References: <1539078879-4372-1-git-send-email-sironi@amazon.de>
+ <1557847002-23519-1-git-send-email-sironi@amazon.de>
+ <1557847002-23519-2-git-send-email-sironi@amazon.de>
+ <e976f31b-2ccd-29ba-6a32-2edde49f867f@amazon.com>
+ <7aae3e49-5b1c-96d1-466e-5b061305dc9d@citrix.com>
+ <22fadfb1-e48d-ccb6-0e42-c105b7335d7a@amazon.com>
+From:   Boris Ostrovsky <boris.ostrovsky@oracle.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Thu, 16 May 2019 16:57:42 +0200
+Autocrypt: addr=boris.ostrovsky@oracle.com; prefer-encrypt=mutual; keydata=
+ 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
+ Jg6OxFYd01z+a+oL
+Message-ID: <92f2f186-2e29-d798-84bd-7209e874f103@oracle.com>
+Date:   Thu, 16 May 2019 11:02:15 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <1557476555-20256-3-git-send-email-pmorel@linux.ibm.com>
+In-Reply-To: <22fadfb1-e48d-ccb6-0e42-c105b7335d7a@amazon.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051614-0012-0000-0000-0000031C628F
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051614-0013-0000-0000-000021550489
-Message-Id: <f396492c-5815-7fd2-0e78-7681e6380591@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-16_12:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=985 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905160095
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9258 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905160096
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9258 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905160096
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Alex, 
+On 5/16/19 10:08 AM, Alexander Graf wrote:
+>
+> My point is mostly that we should be as common
+> as possible when it comes to /sys/hypervisor, so that tools don't have
+> to care about the HV they're working against.
 
-patch 1 and 3 are s390 specific, 2 and 4 are vfio common code.
-Are you ok with the common code changes? If yes, would you prefer to have this
-via the s390 tree (Martin) or your tree?
+It might make sense to have a common sys-hypervisor.c file
+(drivers/hypervisor/sys-hypervisor.c or some such), with
+hypervisor-specific ops/callbacks/etc.
 
-On 10.05.19 10:22, Pierre Morel wrote:
-> To use the VFIO_IOMMU_GET_INFO to retrieve IOMMU specific information,
-> we define a new flag VFIO_IOMMU_INFO_CAPABILITIES in the
-> vfio_iommu_type1_info structure and the associated capability
-> information block.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  include/uapi/linux/vfio.h | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 8f10748..8f68e0f 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -715,6 +715,16 @@ struct vfio_iommu_type1_info {
->  	__u32	flags;
->  #define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info */
->  	__u64	iova_pgsizes;		/* Bitmap of supported page sizes */
-> +#define VFIO_IOMMU_INFO_CAPABILITIES (1 << 1)  /* support capabilities info */
-> +	__u64   cap_offset;     /* Offset within info struct of first cap */
-> +};
-> +
-> +#define VFIO_IOMMU_INFO_CAP_QFN		1
-> +#define VFIO_IOMMU_INFO_CAP_QGRP	2
-> +
-> +struct vfio_iommu_type1_info_block {
-> +	struct vfio_info_cap_header header;
-> +	__u32 data[];
->  };
->  
->  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
-> 
+-boris
+
 
