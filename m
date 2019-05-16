@@ -2,119 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C77420AE7
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 17:14:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D50820B11
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2019 17:24:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727527AbfEPPOY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 May 2019 11:14:24 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:20354 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727109AbfEPPOY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 May 2019 11:14:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1558019662; x=1589555662;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:mime-version:
-   content-transfer-encoding;
-  bh=aig0jPNztAGTfLrveYmFoH55ckuO8R7q/yjW4HU7drI=;
-  b=iLghvfw7DmDA9oQ8+pD3fZJ8tfQBAcqoTsSof03pQz5NQtxfIF5gZNze
-   77VeFBmdUtotNCjrQa0lMLfgbEp/m1BkHc2jKKfHt8pyY0T+/84schARa
-   7RNr3cdBwry6M0njpPMlqe1BxVLxXLmBvLAi/oQPqpwUiET3aCQynh8x0
-   o=;
-X-IronPort-AV: E=Sophos;i="5.60,477,1549929600"; 
-   d="scan'208";a="800025988"
-Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-2a-6e2fc477.us-west-2.amazon.com) ([10.47.22.34])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 16 May 2019 15:14:18 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2a-6e2fc477.us-west-2.amazon.com (8.14.7/8.14.7) with ESMTP id x4GFEEo0036922
-        (version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=FAIL);
-        Thu, 16 May 2019 15:14:18 GMT
-Received: from EX13D02EUC003.ant.amazon.com (10.43.164.10) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 16 May 2019 15:14:17 +0000
-Received: from EX13D02EUC001.ant.amazon.com (10.43.164.92) by
- EX13D02EUC003.ant.amazon.com (10.43.164.10) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Thu, 16 May 2019 15:14:16 +0000
-Received: from EX13D02EUC001.ant.amazon.com ([10.43.164.92]) by
- EX13D02EUC001.ant.amazon.com ([10.43.164.92]) with mapi id 15.00.1367.000;
- Thu, 16 May 2019 15:14:16 +0000
-From:   "Sironi, Filippo" <sironi@amazon.de>
-To:     Boris Ostrovsky <boris.ostrovsky@oracle.com>
-CC:     "Graf, Alexander" <graf@amazon.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-Subject: Re: [Xen-devel] [PATCH v2 1/2] KVM: Start populating /sys/hypervisor
- with KVM entries
-Thread-Topic: [Xen-devel] [PATCH v2 1/2] KVM: Start populating /sys/hypervisor
- with KVM entries
-Thread-Index: AQHVCmguTMwTmVyYP0+tMrT8Z/dQMaZtx8qAgAADQgCAAAG8gIAADxmAgAADWQA=
-Date:   Thu, 16 May 2019 15:14:16 +0000
-Message-ID: <649AEBAC-8408-4BC0-AA22-F721CC23648D@amazon.de>
-References: <1539078879-4372-1-git-send-email-sironi@amazon.de>
- <1557847002-23519-1-git-send-email-sironi@amazon.de>
- <1557847002-23519-2-git-send-email-sironi@amazon.de>
- <e976f31b-2ccd-29ba-6a32-2edde49f867f@amazon.com>
- <7aae3e49-5b1c-96d1-466e-5b061305dc9d@citrix.com>
- <22fadfb1-e48d-ccb6-0e42-c105b7335d7a@amazon.com>
- <92f2f186-2e29-d798-84bd-7209e874f103@oracle.com>
-In-Reply-To: <92f2f186-2e29-d798-84bd-7209e874f103@oracle.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.165.224]
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <6E2A8B9BB2A14F4E92BDE4A9FB721974@amazon.com>
+        id S1727188AbfEPPYt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 May 2019 11:24:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42236 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726692AbfEPPYt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 May 2019 11:24:49 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4GFDhCr081335
+        for <kvm@vger.kernel.org>; Thu, 16 May 2019 11:24:47 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sha8b8s71-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 16 May 2019 11:24:47 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Thu, 16 May 2019 16:24:45 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 16 May 2019 16:24:42 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4GFOfDv44236992
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 May 2019 15:24:41 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F304F42049;
+        Thu, 16 May 2019 15:24:40 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A6544203F;
+        Thu, 16 May 2019 15:24:40 +0000 (GMT)
+Received: from [9.152.222.58] (unknown [9.152.222.58])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 16 May 2019 15:24:40 +0000 (GMT)
+Reply-To: pmorel@linux.ibm.com
+Subject: Re: [PATCH 08/10] virtio/s390: add indirection to indicators access
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+ <20190426183245.37939-9-pasic@linux.ibm.com>
+ <716d47ca-016f-e8f4-6d78-7746a7d9f6ba@linux.ibm.com>
+ <a4bf1976-8037-63bb-2cf6-c389edbd2e89@linux.ibm.com>
+ <20190509202600.4fd6aebe.pasic@linux.ibm.com>
+ <c1e03cf0-3773-de00-10ae-d092ffe7ccc5@linux.ibm.com>
+ <20190510135421.5363f14a.pasic@linux.ibm.com>
+ <89074bc5-78ee-a2e3-0546-791a465f83bd@linux.ibm.com>
+ <20190513121502.34d3dc62.cohuck@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Thu, 16 May 2019 17:24:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190513121502.34d3dc62.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19051615-0020-0000-0000-0000033D631B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051615-0021-0000-0000-000021902B7B
+Message-Id: <2736e862-69e5-7923-b429-aee0dcdd2c5a@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-16_13:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905160097
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 13/05/2019 12:15, Cornelia Huck wrote:
+> On Fri, 10 May 2019 17:36:05 +0200
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+>> On 10/05/2019 13:54, Halil Pasic wrote:
+>>> On Fri, 10 May 2019 09:43:08 +0200
+>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>>>    
+>>>> On 09/05/2019 20:26, Halil Pasic wrote:
+>>>>> On Thu, 9 May 2019 14:01:01 +0200
+>>>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>>>>>   
+>>>>>> On 08/05/2019 16:31, Pierre Morel wrote:
+>>>>>>> On 26/04/2019 20:32, Halil Pasic wrote:
+>>>>>>>> This will come in handy soon when we pull out the indicators from
+>>>>>>>> virtio_ccw_device to a memory area that is shared with the hypervisor
+>>>>>>>> (in particular for protected virtualization guests).
+>>>>>>>>
+>>>>>>>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+>>>>>>>> ---
+>>>>>>>>      drivers/s390/virtio/virtio_ccw.c | 40
+>>>>>>>> +++++++++++++++++++++++++---------------
+>>>>>>>>      1 file changed, 25 insertions(+), 15 deletions(-)
+>>>>>>>>
+>>>>>>>> diff --git a/drivers/s390/virtio/virtio_ccw.c
+>>>>>>>> b/drivers/s390/virtio/virtio_ccw.c
+>>>>>>>> index bb7a92316fc8..1f3e7d56924f 100644
+>>>>>>>> --- a/drivers/s390/virtio/virtio_ccw.c
+>>>>>>>> +++ b/drivers/s390/virtio/virtio_ccw.c
+>>>>>>>> @@ -68,6 +68,16 @@ struct virtio_ccw_device {
+>>>>>>>>          void *airq_info;
+>>>>>>>>      };
+>>>>>>>> +static inline unsigned long *indicators(struct virtio_ccw_device *vcdev)
+>>>>>>>> +{
+>>>>>>>> +    return &vcdev->indicators;
+>>>>>>>> +}
+>>>>>>>> +
+>>>>>>>> +static inline unsigned long *indicators2(struct virtio_ccw_device
+>>>>>>>> *vcdev)
+>>>>>>>> +{
+>>>>>>>> +    return &vcdev->indicators2;
+>>>>>>>> +}
+>>>>>>>> +
+>>>>>>>>      struct vq_info_block_legacy {
+>>>>>>>>          __u64 queue;
+>>>>>>>>          __u32 align;
+>>>>>>>> @@ -337,17 +347,17 @@ static void virtio_ccw_drop_indicator(struct
+>>>>>>>> virtio_ccw_device *vcdev,
+>>>>>>>>              ccw->cda = (__u32)(unsigned long) thinint_area;
+>>>>>>>>          } else {
+>>>>>>>>              /* payload is the address of the indicators */
+>>>>>>>> -        indicatorp = kmalloc(sizeof(&vcdev->indicators),
+>>>>>>>> +        indicatorp = kmalloc(sizeof(indicators(vcdev)),
+>>>>>>>>                           GFP_DMA | GFP_KERNEL);
+>>>>>>>>              if (!indicatorp)
+>>>>>>>>                  return;
+>>>>>>>>              *indicatorp = 0;
+>>>>>>>>              ccw->cmd_code = CCW_CMD_SET_IND;
+>>>>>>>> -        ccw->count = sizeof(&vcdev->indicators);
+>>>>>>>> +        ccw->count = sizeof(indicators(vcdev));
+>>>>>>>
+>>>>>>> This looks strange to me. Was already weird before.
+>>>>>>> Lucky we are indicators are long...
+>>>>>>> may be just sizeof(long)
+>>>>>>   
+>>>>>
+>>>>> I'm not sure I understand where are you coming from...
+>>>>>
+>>>>> With CCW_CMD_SET_IND we tell the hypervisor the guest physical address
+>>>>> at which the so called classic indicators. There is a comment that
+>>>>> makes this obvious. The argument of the sizeof was and remained a
+>>>>> pointer type. AFAIU this is what bothers you.
+>>>>>>
+>>>>>> AFAIK the size of the indicators (AIV/AIS) is not restricted by the
+>>>>>> architecture.
+>>>>>
+>>>>> The size of vcdev->indicators is restricted or defined by the virtio
+>>>>> specification. Please have a look at '4.3.2.6.1 Setting Up Classic Queue
+>>>>> Indicators' here:
+>>>>> https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-1630002
+>>>>>
+>>>>> Since with Linux on s390 only 64 bit is supported, both the sizes are in
+>>>>> line with the specification. Using u64 would semantically match the spec
+>>>>> better, modulo pre virtio 1.0 which ain't specified. I did not want to
+>>>>> do changes that are not necessary for what I'm trying to accomplish. If
+>>>>> we want we can change these to u64 with a patch on top.
+>>>>
+>>>> I mean you are changing these line already, so why not doing it right
+>>>> while at it?
+>>>>   
+>>>
+>>> This patch is about adding the indirection so we can move the member
+>>> painlessly. Mixing in different stuff would be a bad practice.
+>>>
+>>> BTW I just explained that it ain't wrong, so I really do not understand
+>>> what do you mean by  'why not doing it right'. Can you please explain?
+>>>    
+>>
+>> I did not wanted to discuss a long time on this and gave my R-B, so
+>> meaning that I am OK with this patch.
+>>
+>> But if you ask, yes I can, it seems quite obvious.
+>> When you build a CCW you give the pointer to CCW->cda and you give the
+>> size of the transfer in CCW->count.
+>>
+>> Here the count is initialized with the sizeof of the pointer used to
+>> initialize CCW->cda with.
+> 
+> But the cda points to the pointer address, so the size of the pointer
+> is actually the correct value here, isn't it?
 
-> On 16. May 2019, at 17:02, Boris Ostrovsky <boris.ostrovsky@oracle.com> w=
-rote:
-> =
+Oh. Yes, it is correct.
+What I do not like are the mixing of (unsigned long), (unsigned long *) 
+and &
+if we had
+cda = _u32 (unsigned long) indicatorp
+count = sizeof(*indicatorp)
 
-> On 5/16/19 10:08 AM, Alexander Graf wrote:
->> =
+I would have been completely happy.
 
->> My point is mostly that we should be as common
->> as possible when it comes to /sys/hypervisor, so that tools don't have
->> to care about the HV they're working against.
-> =
-
-> It might make sense to have a common sys-hypervisor.c file
-> (drivers/hypervisor/sys-hypervisor.c or some such), with
-> hypervisor-specific ops/callbacks/etc.
-> =
-
-> -boris
+It was just a non important thing and I wouldn't have given a R-B if the 
+functionality was not correct.
 
 
-Yes, it definitely does. I would follow up with future patches to make it
-happen.
+> 
+>> Lukily we work on a 64 bits machine with 64 bits pointers and the size
+>> of the pointed object is 64 bits wide so... the resulting count is right.
+>> But it is not the correct way to do it.
+> 
+> I think it is, but this interface really is confusing.
 
-Filippo
+Yes, it is what I thought we could do better.
+
+> 
+>> That is all. Not a big concern, you do not need to change it, as you
+>> said it can be done in another patch.
+>>
+>>> Did you agree with the rest of my comment? I mean there was more to it.
+>>>    
+>>
+>> I understood from your comments that the indicators in Linux are 64bits
+>> wide so all OK.
+>>
+>> Regards
+>> Pierre
+>>
+>>
+>>
+>>
+>>
+>>
+> 
 
 
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrer: Christian Schlaeger, Ralf Herbrich
-Ust-ID: DE 289 237 879
-Eingetragen am Amtsgericht Charlottenburg HRB 149173 B
-
+-- 
+Pierre Morel
+Linux/KVM/QEMU in Böblingen - Germany
 
