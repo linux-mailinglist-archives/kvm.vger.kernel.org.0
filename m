@@ -2,292 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C1412110A
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 01:31:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B95FB21134
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 02:19:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727338AbfEPXaq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 May 2019 19:30:46 -0400
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:51721 "EHLO
-        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727327AbfEPXap (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 May 2019 19:30:45 -0400
-Received: from Internal Mail-Server by MTLPINE2 (envelope-from parav@mellanox.com)
-        with ESMTPS (AES256-SHA encrypted); 17 May 2019 02:30:42 +0300
-Received: from sw-mtx-036.mtx.labs.mlnx (sw-mtx-036.mtx.labs.mlnx [10.12.150.149])
-        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x4GNUZ9i029611;
-        Fri, 17 May 2019 02:30:41 +0300
-From:   Parav Pandit <parav@mellanox.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cohuck@redhat.com, kwankhede@nvidia.com, alex.williamson@redhat.com
-Cc:     cjia@nvidia.com, parav@mellanox.com
-Subject: [PATCHv3 3/3] vfio/mdev: Synchronize device create/remove with parent removal
-Date:   Thu, 16 May 2019 18:30:34 -0500
-Message-Id: <20190516233034.16407-4-parav@mellanox.com>
-X-Mailer: git-send-email 2.19.2
-In-Reply-To: <20190516233034.16407-1-parav@mellanox.com>
-References: <20190516233034.16407-1-parav@mellanox.com>
+        id S1726241AbfEQATM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 May 2019 20:19:12 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:44334 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726238AbfEQATL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 May 2019 20:19:11 -0400
+Received: by mail-pf1-f193.google.com with SMTP id g9so2689826pfo.11
+        for <kvm@vger.kernel.org>; Thu, 16 May 2019 17:19:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=grI6nIUF/mMOBdv6LrPvHsdNVES0yai/LfFYIZ4bkWY=;
+        b=trB5X+v2CFHJR5/h5Ogo8pnGEbixSq/5SbMCfW0BvmcDG2zeRdzxHL4lknPMI8JsaG
+         91o9aNowjUtiTckfyBLWY/pZJBmRERl33EcI9dq0zR0lXd+XHl45wImJtwD6qTmBiD3C
+         YvIdILOfNr02D208IUOgX7xjB1B80gLQERVK/akSkqvFqS79gmXpU/duephS4OxkvMCj
+         iFkaZbcWb+04sJYfOvlYsPNWM7LK/oP8HkDOryS8f1XdKVoMLZUlQ8YVZMbBQiMDnraB
+         fYXacmGWn0btEdYeftIv0rPSsHpeCBXpkkAwnfL+k2zqdhfQJ6WS6TGQ7DeGxI98ZyT1
+         d5aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=grI6nIUF/mMOBdv6LrPvHsdNVES0yai/LfFYIZ4bkWY=;
+        b=iUwo19Bbc7F3E4IUAvnrhEROscirVAGggfuvXZQJMQURccmC6UC3KFpJKwQxK9LfHs
+         T5rnIDOKv/5GQQ7kCFvjR35mA0Gon/6Vi9SUTO1pXDSbf+iwjpwH+2G5LtmiSYhMZxRZ
+         h1iDUY4M49avM0YgK1S9cppRX0Hgg5kH5cPqnZdHmqz2zzA6pd1k4iWtPxuq9wuRyVRC
+         N8KXTZpI82XSe7ledPfma3K5l+ovO1+UwUINN5i40FA3l/I/VT7GJA4LuCiG6t3fxPrU
+         rSxL7AIbE6aBiKbxArB8mIzkMSnfcljzQ2pBMQ3pgzh9sNcG0QxDuzCC153Sch7/xdEi
+         7TsA==
+X-Gm-Message-State: APjAAAXxpVwRrt1SZwCpJ+kP2JgwgC8hJmC9QooVouua04rKxyczgQcy
+        7AZzDN3+JwRZn2w4rEHFxgFcuw==
+X-Google-Smtp-Source: APXvYqyv1iVBQbL6jyOdYGu6UtPQiwVBUuqofcSXUoK/ck1DMyLzSDgzGJaT2Ro5WErOmsiHR9V/gQ==
+X-Received: by 2002:a63:d816:: with SMTP id b22mr52619479pgh.16.1558051959951;
+        Thu, 16 May 2019 17:12:39 -0700 (PDT)
+Received: from jstaron2.mtv.corp.google.com ([2620:15c:202:201:b94f:2527:c39f:ca2d])
+        by smtp.gmail.com with ESMTPSA id a6sm7245768pgd.67.2019.05.16.17.12.37
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 16 May 2019 17:12:39 -0700 (PDT)
+Subject: Re: [PATCH v9 2/7] virtio-pmem: Add virtio pmem driver
+To:     Pankaj Gupta <pagupta@redhat.com>, linux-nvdimm@lists.01.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org
+Cc:     dan.j.williams@intel.com, zwisler@kernel.org,
+        vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com,
+        jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net,
+        hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu,
+        adilger.kernel@dilger.ca, darrick.wong@oracle.com,
+        lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com,
+        jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com,
+        stefanha@redhat.com, aarcange@redhat.com, david@redhat.com,
+        david@fromorbit.com, cohuck@redhat.com,
+        xiaoguangrong.eric@gmail.com, pbonzini@redhat.com,
+        kilobyte@angband.pl, yuval.shaia@oracle.com, smbarber@google.com
+References: <20190514145422.16923-1-pagupta@redhat.com>
+ <20190514145422.16923-3-pagupta@redhat.com>
+From:   =?UTF-8?Q?Jakub_Staro=c5=84?= <jstaron@google.com>
+Message-ID: <c06514fd-8675-ba74-4b7b-ff0eb4a91605@google.com>
+Date:   Thu, 16 May 2019 17:12:36 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190514145422.16923-3-pagupta@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In following sequences, child devices created while removing mdev parent
-device can be left out, or it may lead to race of removing half
-initialized child mdev devices.
+On 5/14/19 7:54 AM, Pankaj Gupta wrote:
+> +		if (!list_empty(&vpmem->req_list)) {
+> +			req_buf = list_first_entry(&vpmem->req_list,
+> +					struct virtio_pmem_request, list);
+> +			req_buf->wq_buf_avail = true;
+> +			wake_up(&req_buf->wq_buf);
+> +			list_del(&req_buf->list);
+Yes, this change is the right one, thank you!
 
-issue-1:
---------
-       cpu-0                         cpu-1
-       -----                         -----
-                                  mdev_unregister_device()
-                                    device_for_each_child()
-                                      mdev_device_remove_cb()
-                                        mdev_device_remove()
-create_store()
-  mdev_device_create()                   [...]
-    device_add()
-                                  parent_remove_sysfs_files()
+> +	 /*
+> +	  * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual
+> +	  * queue does not have free descriptor. We add the request
+> +	  * to req_list and wait for host_ack to wake us up when free
+> +	  * slots are available.
+> +	  */
+> +	while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req,
+> +					GFP_ATOMIC)) == -ENOSPC) {
+> +
+> +		dev_err(&vdev->dev, "failed to send command to virtio pmem" \
+> +			"device, no free slots in the virtqueue\n");
+> +		req->wq_buf_avail = false;
+> +		list_add_tail(&req->list, &vpmem->req_list);
+> +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> +
+> +		/* A host response results in "host_ack" getting called */
+> +		wait_event(req->wq_buf, req->wq_buf_avail);
+> +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
+> +	}
+> +	err1 = virtqueue_kick(vpmem->req_vq);
+> +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
+> +
+> +	/*
+> +	 * virtqueue_add_sgs failed with error different than -ENOSPC, we can't
+> +	 * do anything about that.
+> +	 */
+> +	if (err || !err1) {
+> +		dev_info(&vdev->dev, "failed to send command to virtio pmem device\n");
+> +		err = -EIO;
+> +	} else {
+> +		/* A host repsonse results in "host_ack" getting called */
+> +		wait_event(req->host_acked, req->done);
+> +		err = req->ret;
+> +I confirm that the failures I was facing with the `-ENOSPC` error path are not present in v9.
 
-/* BUG: device added by cpu-0
- * whose parent is getting removed
- * and it won't process this mdev.
- */
-
-issue-2:
---------
-Below crash is observed when user initiated remove is in progress
-and mdev_unregister_driver() completes parent unregistration.
-
-       cpu-0                         cpu-1
-       -----                         -----
-remove_store()
-   mdev_device_remove()
-   active = false;
-                                  mdev_unregister_device()
-                                  parent device removed.
-   [...]
-   parents->ops->remove()
- /*
-  * BUG: Accessing invalid parent.
-  */
-
-This is similar race like create() racing with mdev_unregister_device().
-
-BUG: unable to handle kernel paging request at ffffffffc0585668
-PGD e8f618067 P4D e8f618067 PUD e8f61a067 PMD 85adca067 PTE 0
-Oops: 0000 [#1] SMP PTI
-CPU: 41 PID: 37403 Comm: bash Kdump: loaded Not tainted 5.1.0-rc6-vdevbus+ #6
-Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS 2.0b 08/09/2016
-RIP: 0010:mdev_device_remove+0xfa/0x140 [mdev]
-Call Trace:
- remove_store+0x71/0x90 [mdev]
- kernfs_fop_write+0x113/0x1a0
- vfs_write+0xad/0x1b0
- ksys_write+0x5a/0xe0
- do_syscall_64+0x5a/0x210
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Therefore, mdev core is improved as below to overcome above issues.
-
-Wait for any ongoing mdev create() and remove() to finish before
-unregistering parent device using refcount and completion.
-This continues to allow multiple create and remove to progress in
-parallel for different mdev devices as most common case.
-At the same time guard parent removal while parent is being access by
-create() and remove callbacks.
-
-Code is simplified from kref to use refcount as unregister_device() has
-to wait anyway for all create/remove to finish.
-
-While removing mdev devices during parent unregistration, there isn't
-need to acquire refcount of parent device, hence code is restructured
-using mdev_device_remove_common() to avoid it.
-
-Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
-Signed-off-by: Parav Pandit <parav@mellanox.com>
----
- drivers/vfio/mdev/mdev_core.c    | 86 ++++++++++++++++++++------------
- drivers/vfio/mdev/mdev_private.h |  6 ++-
- 2 files changed, 60 insertions(+), 32 deletions(-)
-
-diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index 0bef0cae1d4b..ca33246c1dc3 100644
---- a/drivers/vfio/mdev/mdev_core.c
-+++ b/drivers/vfio/mdev/mdev_core.c
-@@ -78,34 +78,41 @@ static struct mdev_parent *__find_parent_device(struct device *dev)
- 	return NULL;
- }
- 
--static void mdev_release_parent(struct kref *kref)
-+static bool mdev_try_get_parent(struct mdev_parent *parent)
- {
--	struct mdev_parent *parent = container_of(kref, struct mdev_parent,
--						  ref);
--	struct device *dev = parent->dev;
--
--	kfree(parent);
--	put_device(dev);
-+	if (parent)
-+		return refcount_inc_not_zero(&parent->refcount);
-+	return false;
- }
- 
--static struct mdev_parent *mdev_get_parent(struct mdev_parent *parent)
-+static void mdev_put_parent(struct mdev_parent *parent)
- {
--	if (parent)
--		kref_get(&parent->ref);
--
--	return parent;
-+	if (parent && refcount_dec_and_test(&parent->refcount))
-+		complete(&parent->unreg_completion);
- }
- 
--static void mdev_put_parent(struct mdev_parent *parent)
-+static void mdev_device_remove_common(struct mdev_device *mdev)
- {
--	if (parent)
--		kref_put(&parent->ref, mdev_release_parent);
-+	struct mdev_parent *parent;
-+	struct mdev_type *type;
-+	int ret;
-+
-+	type = to_mdev_type(mdev->type_kobj);
-+	mdev_remove_sysfs_files(&mdev->dev, type);
-+	device_del(&mdev->dev);
-+	parent = mdev->parent;
-+	ret = parent->ops->remove(mdev);
-+	if (ret)
-+		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
-+
-+	/* Balances with device_initialize() */
-+	put_device(&mdev->dev);
- }
- 
- static int mdev_device_remove_cb(struct device *dev, void *data)
- {
- 	if (dev_is_mdev(dev))
--		mdev_device_remove(dev);
-+		mdev_device_remove_common(to_mdev_device(dev));
- 
- 	return 0;
- }
-@@ -147,7 +154,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
- 		goto add_dev_err;
- 	}
- 
--	kref_init(&parent->ref);
-+	refcount_set(&parent->refcount, 1);
-+	init_completion(&parent->unreg_completion);
- 
- 	parent->dev = dev;
- 	parent->ops = ops;
-@@ -206,14 +214,27 @@ void mdev_unregister_device(struct device *dev)
- 	dev_info(dev, "MDEV: Unregistering\n");
- 
- 	list_del(&parent->next);
-+	mutex_unlock(&parent_list_lock);
-+
-+	/* Release the initial reference so that new create cannot start */
-+	mdev_put_parent(parent);
-+
-+	/*
-+	 * Wait for all the create and remove references to drop.
-+	 */
-+	wait_for_completion(&parent->unreg_completion);
-+
-+	/*
-+	 * New references cannot be taken and all users are done
-+	 * using the parent. So it is safe to unregister parent.
-+	 */
- 	class_compat_remove_link(mdev_bus_compat_class, dev, NULL);
- 
- 	device_for_each_child(dev, NULL, mdev_device_remove_cb);
- 
- 	parent_remove_sysfs_files(parent);
--
--	mutex_unlock(&parent_list_lock);
--	mdev_put_parent(parent);
-+	kfree(parent);
-+	put_device(dev);
- }
- EXPORT_SYMBOL(mdev_unregister_device);
- 
-@@ -237,10 +258,11 @@ int mdev_device_create(struct kobject *kobj,
- 	struct mdev_parent *parent;
- 	struct mdev_type *type = to_mdev_type(kobj);
- 
--	parent = mdev_get_parent(type->parent);
--	if (!parent)
-+	if (!mdev_try_get_parent(type->parent))
- 		return -EINVAL;
- 
-+	parent = type->parent;
-+
- 	mutex_lock(&mdev_list_lock);
- 
- 	/* Check for duplicate */
-@@ -287,6 +309,7 @@ int mdev_device_create(struct kobject *kobj,
- 
- 	mdev->active = true;
- 	dev_dbg(&mdev->dev, "MDEV: created\n");
-+	mdev_put_parent(parent);
- 
- 	return 0;
- 
-@@ -306,7 +329,6 @@ int mdev_device_remove(struct device *dev)
- 	struct mdev_device *mdev, *tmp;
- 	struct mdev_parent *parent;
- 	struct mdev_type *type;
--	int ret;
- 
- 	mdev = to_mdev_device(dev);
- 
-@@ -330,15 +352,17 @@ int mdev_device_remove(struct device *dev)
- 	mutex_unlock(&mdev_list_lock);
- 
- 	type = to_mdev_type(mdev->type_kobj);
--	mdev_remove_sysfs_files(dev, type);
--	device_del(&mdev->dev);
--	parent = mdev->parent;
--	ret = parent->ops->remove(mdev);
--	if (ret)
--		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
-+	if (!mdev_try_get_parent(type->parent)) {
-+		/*
-+		 * Parent unregistration have started.
-+		 * No need to remove here.
-+		 */
-+		mutex_unlock(&mdev_list_lock);
-+		return -ENODEV;
-+	}
- 
--	/* Balances with device_initialize() */
--	put_device(&mdev->dev);
-+	parent = mdev->parent;
-+	mdev_device_remove_common(mdev);
- 	mdev_put_parent(parent);
- 
- 	return 0;
-diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
-index 924ed2274941..55ebab0af7b0 100644
---- a/drivers/vfio/mdev/mdev_private.h
-+++ b/drivers/vfio/mdev/mdev_private.h
-@@ -19,7 +19,11 @@ void mdev_bus_unregister(void);
- struct mdev_parent {
- 	struct device *dev;
- 	const struct mdev_parent_ops *ops;
--	struct kref ref;
-+	/* Protects unregistration to wait until create/remove
-+	 * are completed.
-+	 */
-+	refcount_t refcount;
-+	struct completion unreg_completion;
- 	struct list_head next;
- 	struct kset *mdev_types_kset;
- 	struct list_head type_list;
--- 
-2.19.2
-
+Best,
+Jakub Staron
