@@ -2,59 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C7E6215B2
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 10:50:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2B78215AF
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 10:50:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728291AbfEQIt7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 May 2019 04:49:59 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:33230 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727624AbfEQIt6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 May 2019 04:49:58 -0400
-Received: by mail-pg1-f194.google.com with SMTP id h17so3005949pgv.0;
-        Fri, 17 May 2019 01:49:58 -0700 (PDT)
+        id S1728508AbfEQIuB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 May 2019 04:50:01 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:35521 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728481AbfEQIuA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 May 2019 04:50:00 -0400
+Received: by mail-pl1-f193.google.com with SMTP id g5so3056558plt.2;
+        Fri, 17 May 2019 01:50:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=BMZTqCRe7Yq2IM+sICYMlznnn3t4JBojU8sT9FmlO4o=;
-        b=cW7xcpKhrqtkIzyTFrMiDQ5p+TtZrCS3gBiD2zsnKHX/876EjpglYdiYy2K5mBdSzw
-         b1J3wBqorDacpSoiBdeGkqVb+vsjpcRbAeW0ctnvw+yrzavMsJ2R/2dF6vvvoNrYPYX8
-         CO5uZWmCMd67CPIxJbIfTM+FcpP84IKzIMjpYW7eBcI/MTmETqqOZf7Er8SltTqWLepa
-         RbfWJ4+MHMCH3MmujNL/PFp2BKsuG323gwwPja4JmB908c8fVEJT5eUHR96WaEZVzZOI
-         hOnjRqjgs3lqBQiHPBUDQuRopPoYCnfeQD2OKioIgzBRgv82jd0Cl2qJS7br2WoX5Ktp
-         Z9jA==
+        bh=5VREHkPw8R8lwRxH+KVXuUktO+8MCxC49x2eL5UCIow=;
+        b=RPF5qcECkRQX0J004+yKvh9PHjuDP9QRAl1CTIGwYdfFjC73ZOLGRcxDyItiIW7XyA
+         nbv2F1mtgRdvb5ihxRpkb3z/RtFdWaS3jZoQtTHtuZuaN+M96WdPShDILNxokcxMGmK7
+         fRmgTv9Wt0N7ybh4BTAndZqH7yw/uUDNoe0JHoE3xA7owQGGbmrO/zzIsC10J4WDrEyJ
+         WSfQKHZF4soeugQiLr5Qp2Kk1HO4TyKa5EWRgd2eL1cm66YKg1l6GYzikIeHsFV6SVXG
+         cMYlPysB335VCYVBaSNNenhR8jQkxOVjEHMf0XmlklLT+MhhJ7V4gRkvDoXoX9NGDoMm
+         60dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=BMZTqCRe7Yq2IM+sICYMlznnn3t4JBojU8sT9FmlO4o=;
-        b=FUHYNYA44qyb8i2ryx8qAaDKZf5wZ0f9wr8MyjQZoSnimi2CZPhzJ10atY2+n6xiui
-         X5kyKfPSdSOMt4db1u8fpRErsLbyi08OzLZPA+sJqFhOJzMaUiNifD4bG4DIntfdvYhW
-         gWO9VIPUzhZAl1pMhaFIhIHQK/0n/Y5H9BepwBRW0y2nmmB5/izAAWNjOAV6mWLLI29O
-         0VxL1Z4O6BUg7xsswJqtJTjhn10cE9krgvfZCXRtiYeYASOQk8TWVzIT6kTQHSqPdT5z
-         ELsolKnnLLMAe2XRGj5yWS7KtTIOwd/+P9KyI5T8/2w6xkdlBoKN8puDWHCpKbPCTFWO
-         vKog==
-X-Gm-Message-State: APjAAAWFwJ62bLR57jb0DutRALS3dmzGFrV954weEFkGctm7JvJ3j5X9
-        4HyUOUdduKgLo459UZIlhEUfRICG
-X-Google-Smtp-Source: APXvYqw39p1zjnYKnmyqGgifghpRVUZmXaCSxgucKvVBhasmkJ0xJcGLVC/TXH1ct3+/qFkrArIAsg==
-X-Received: by 2002:aa7:9a99:: with SMTP id w25mr20416545pfi.249.1558082998095;
-        Fri, 17 May 2019 01:49:58 -0700 (PDT)
+        bh=5VREHkPw8R8lwRxH+KVXuUktO+8MCxC49x2eL5UCIow=;
+        b=TI1hwb2e8AuC8zzKWCHsFfPu3lqRQKdhO8xu1tWvk3LyOFbF4s+n5riZCwkm2s75Pc
+         mKdKy3y2eNXFutAVycF5Wx9aTMfQ80uKlu3g8ZYtTz7J9AflsHHAwwmShbgIFuMVbX5Y
+         1ZRAUewCLVAcJJjtfgfAkuGxIGOuZboQLfKqe7UN42DivCQXs/fO+O7CA65iHPHWo9QQ
+         ZY2Dk3jWdwRGlgTxc+EApwJHEWrpoYVZRQQgr1LU4XNHJlNW5KpSOUl6Pt4a/7+UDv/E
+         6ds7oe2QyBpiX6/tRxJFvMiOtTXV7uZNAz/ThrOSE1xlPptkUoSMW2GjgMPBQs5K8liq
+         jccA==
+X-Gm-Message-State: APjAAAXjW/PQL+Kt8nqjjXn7Dh32PRx6yjdiYxGCc3fIpxYUkDgKqva3
+        gHhBEU36gnQx1lkiGYAMTOAfrOIe
+X-Google-Smtp-Source: APXvYqxe4n7YAE9tLJpT4f6BzKilEwXE3tVIRNBySLRokH+e3XoGXrD1560o4yN2vgR74SJe88LRlA==
+X-Received: by 2002:a17:902:aa95:: with SMTP id d21mr1072036plr.32.1558083000075;
+        Fri, 17 May 2019 01:50:00 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id 63sm10417127pfu.95.2019.05.17.01.49.55
+        by smtp.googlemail.com with ESMTPSA id 63sm10417127pfu.95.2019.05.17.01.49.58
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Fri, 17 May 2019 01:49:57 -0700 (PDT)
+        Fri, 17 May 2019 01:49:59 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Subject: [PATCH RESEND 2/4] KVM: X86: Emulate MSR_IA32_MISC_ENABLE MWAIT bit
-Date:   Fri, 17 May 2019 16:49:48 +0800
-Message-Id: <1558082990-7822-2-git-send-email-wanpengli@tencent.com>
+        "Paul E . McKenney" <paulmck@linux.ibm.com>
+Subject: [PATCH 3/4] KVM: Fix spinlock taken warning during host resume
+Date:   Fri, 17 May 2019 16:49:49 +0800
+Message-Id: <1558082990-7822-3-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1558082990-7822-1-git-send-email-wanpengli@tencent.com>
 References: <1558082990-7822-1-git-send-email-wanpengli@tencent.com>
@@ -68,73 +66,54 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-MSR IA32_MSIC_ENABLE bit 18, according to SDM:
+ WARNING: CPU: 0 PID: 13554 at kvm/arch/x86/kvm//../../../virt/kvm/kvm_main.c:4183 kvm_resume+0x3c/0x40 [kvm]
+  CPU: 0 PID: 13554 Comm: step_after_susp Tainted: G           OE     5.1.0-rc4+ #1
+  RIP: 0010:kvm_resume+0x3c/0x40 [kvm]
+  Call Trace:
+   syscore_resume+0x63/0x2d0
+   suspend_devices_and_enter+0x9d1/0xa40
+   pm_suspend+0x33a/0x3b0
+   state_store+0x82/0xf0
+   kobj_attr_store+0x12/0x20
+   sysfs_kf_write+0x4b/0x60
+   kernfs_fop_write+0x120/0x1a0
+   __vfs_write+0x1b/0x40
+   vfs_write+0xcd/0x1d0
+   ksys_write+0x5f/0xe0
+   __x64_sys_write+0x1a/0x20
+   do_syscall_64+0x6f/0x6c0
+   entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
-| When this bit is set to 0, the MONITOR feature flag is not set (CPUID.01H:ECX[bit 3] = 0).
-| This indicates that MONITOR/MWAIT are not supported.
-|
-| Software attempts to execute MONITOR/MWAIT will cause #UD when this bit is 0.
-|
-| When this bit is set to 1 (default), MONITOR/MWAIT are supported (CPUID.01H:ECX[bit 3] = 1).
+Commit ca84d1a24 (KVM: x86: Add clock sync request to hardware enable) mentioned 
+that "we always hold kvm_lock when hardware_enable is called.  The one place that 
+doesn't need to worry about it is resume, as resuming a frozen CPU, the spinlock 
+won't be taken." However, commit 6706dae9 (virt/kvm: Replace spin_is_locked() with 
+lockdep) introduces a bug, it asserts when the lock is not held which is contrary 
+to the original goal. 
 
-The CPUID.01H:ECX[bit 3] ought to mirror the value of the MSR bit,
-CPUID.01H:ECX[bit 3] is a better guard than kvm_mwait_in_guest().
-kvm_mwait_in_guest() affects the behavior of MONITOR/MWAIT, not its
-guest visibility.
-
-This patch implements toggling of the CPUID bit based on guest writes
-to the MSR.
+This patch fixes it by WARN_ON when the lock is held.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Cc: Liran Alon <liran.alon@oracle.com>
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: Paul E. McKenney <paulmck@linux.ibm.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- arch/x86/kvm/cpuid.c | 8 ++++++++
- arch/x86/kvm/x86.c   | 9 +++++++++
- 2 files changed, 17 insertions(+)
+ virt/kvm/kvm_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index fd39516..9244d63 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -137,6 +137,14 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
- 		(best->eax & (1 << KVM_FEATURE_PV_UNHALT)))
- 		best->eax &= ~(1 << KVM_FEATURE_PV_UNHALT);
- 
-+	best = kvm_find_cpuid_entry(vcpu, 0x1, 0);
-+	if (best) {
-+		if (vcpu->arch.ia32_misc_enable_msr & MSR_IA32_MISC_ENABLE_MWAIT)
-+			best->ecx |= F(MWAIT);
-+		else
-+			best->ecx &= ~F(MWAIT);
-+	}
-+
- 	/* Update physical-address width */
- 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
- 	kvm_mmu_reset_context(vcpu);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 1d89cb9..f2e3847 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2506,6 +2506,15 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		}
- 		break;
- 	case MSR_IA32_MISC_ENABLE:
-+		if ((vcpu->arch.ia32_misc_enable_msr ^ data) & MSR_IA32_MISC_ENABLE_MWAIT) {
-+			if ((vcpu->arch.ia32_misc_enable_msr & MSR_IA32_MISC_ENABLE_MWAIT) &&
-+				!(data & MSR_IA32_MISC_ENABLE_MWAIT)) {
-+				if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
-+					return 1;
-+			}
-+			vcpu->arch.ia32_misc_enable_msr = data;
-+			kvm_update_cpuid(vcpu);
-+		}
- 		vcpu->arch.ia32_misc_enable_msr = data;
- 		break;
- 	case MSR_IA32_SMBASE:
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 5fb0f16..c7eab5f 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4096,7 +4096,7 @@ static int kvm_suspend(void)
+ static void kvm_resume(void)
+ {
+ 	if (kvm_usage_count) {
+-		lockdep_assert_held(&kvm_count_lock);
++		WARN_ON(lockdep_is_held(&kvm_count_lock));
+ 		hardware_enable_nolock(NULL);
+ 	}
+ }
 -- 
 2.7.4
 
