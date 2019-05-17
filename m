@@ -2,233 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AFDC921323
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 06:33:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A02B121366
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 07:31:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727052AbfEQEc4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 May 2019 00:32:56 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:45716 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726755AbfEQEc4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 May 2019 00:32:56 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4H4Sj70188098;
-        Fri, 17 May 2019 04:32:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=nOKhMtl8ztBW14O8cXNb2dmbmY/cHyuONSYOR46kZk4=;
- b=G8hHkDGOQ2heyTdbE7B+2zix2NpC5ikq5w64NzIXpA27UbcTs1DKN2l7zhk6YF6ycZuS
- N+njV4nXF0WfaxSj8GABJCuNgR9llQkkEW/BZsbnS1/6SQXdr3uAtXyuW7O2NjgGxK2z
- 9mt1+7lpyERnPBeQeEpjphf3T/Cz9613gkzXb/aVMZEiQP8wKaLnOVgXDjbyy1XGa1ME
- oSx5PZInonfbHrpCHNwCrvntEACFjQfrcHmyhuXU4wKYJ1RCg2eTYkWIz6oivrqxacPQ
- qypF8rlhQscwZVTGcQR/ZYhqfoCIaF87RJ8Io+ZECm9QbVILOIl8GY0JngaWnrR1R2OU yA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2130.oracle.com with ESMTP id 2sdkwe7fat-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 May 2019 04:32:13 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4H4Vqcu039029;
-        Fri, 17 May 2019 04:32:13 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2shh5gu9ym-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 May 2019 04:32:12 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4H4WAkx021084;
-        Fri, 17 May 2019 04:32:10 GMT
-Received: from [192.168.0.110] (/70.36.60.91)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 16 May 2019 21:32:10 -0700
-Subject: Re: [PATCH] sched: introduce configurable delay before entering idle
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     Wanpeng Li <kernellwp@gmail.com>, kvm-devel <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@kernel.org>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Bandan Das <bsd@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20190507185647.GA29409@amt.cnet>
- <CANRm+Cx8zCDG6Oz1m9eukkmx_uVFYcQOdMwZrHwsQcbLm_kuPA@mail.gmail.com>
- <20190514135022.GD4392@amt.cnet>
- <7e390fef-e0df-963f-4e18-e44ac2766be3@oracle.com>
- <20190515204356.GB31128@amt.cnet>
-From:   Ankur Arora <ankur.a.arora@oracle.com>
-Message-ID: <ee5656d7-3745-28c6-2021-adda0ed67240@oracle.com>
-Date:   Thu, 16 May 2019 21:32:06 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1727376AbfEQFbp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 May 2019 01:31:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60624 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727089AbfEQFbp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 May 2019 01:31:45 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C7FAE811DC;
+        Fri, 17 May 2019 05:31:43 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7FC4660BE5;
+        Fri, 17 May 2019 05:31:43 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 7045B1806B10;
+        Fri, 17 May 2019 05:31:41 +0000 (UTC)
+Date:   Fri, 17 May 2019 01:31:40 -0400 (EDT)
+From:   Pankaj Gupta <pagupta@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        David Hildenbrand <david@redhat.com>
+Cc:     cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org,
+        jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
+        virtualization@lists.linux-foundation.org,
+        adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
+        aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
+        jstaron@google.com, linux-nvdimm@lists.01.org,
+        vishal l verma <vishal.l.verma@intel.com>,
+        willy@infradead.org, hch@infradead.org, linux-acpi@vger.kernel.org,
+        jmoyer@redhat.com, linux-ext4@vger.kernel.org, lenb@kernel.org,
+        kilobyte@angband.pl, riel@surriel.com,
+        yuval shaia <yuval.shaia@oracle.com>, stefanha@redhat.com,
+        pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>,
+        lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
+        tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
+        darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
+        linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, imammedo@redhat.com
+Message-ID: <1808083054.29407926.1558071100913.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190516095618-mutt-send-email-mst@kernel.org>
+References: <20190514145422.16923-1-pagupta@redhat.com> <20190514145422.16923-3-pagupta@redhat.com> <9f6b1d8e-ef90-7d8b-56da-61a426953ba3@redhat.com> <20190516095618-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v9 2/7] virtio-pmem: Add virtio pmem driver
 MIME-Version: 1.0
-In-Reply-To: <20190515204356.GB31128@amt.cnet>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9259 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905170028
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9259 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905170028
+X-Originating-IP: [10.67.116.188, 10.4.195.6]
+Thread-Topic: virtio-pmem: Add virtio pmem driver
+Thread-Index: FMi3zX+ydzvNE+LRIfWGkFwCXnTU+g==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Fri, 17 May 2019 05:31:44 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019-05-15 1:43 p.m., Marcelo Tosatti wrote:
-> On Wed, May 15, 2019 at 11:42:56AM -0700, Ankur Arora wrote:
->> On 5/14/19 6:50 AM, Marcelo Tosatti wrote:
->>> On Mon, May 13, 2019 at 05:20:37PM +0800, Wanpeng Li wrote:
->>>> On Wed, 8 May 2019 at 02:57, Marcelo Tosatti <mtosatti@redhat.com> wrote:
->>>>>
->>>>>
->>>>> Certain workloads perform poorly on KVM compared to baremetal
->>>>> due to baremetal's ability to perform mwait on NEED_RESCHED
->>>>> bit of task flags (therefore skipping the IPI).
->>>>
->>>> KVM supports expose mwait to the guest, if it can solve this?
->>>>
->>>> Regards,
->>>> Wanpeng Li
->>>
->>> Unfortunately mwait in guest is not feasible (uncompatible with multiple
->>> guests). Checking whether a paravirt solution is possible.
-> 
-> Hi Ankur,
-> 
->>
->> Hi Marcelo,
->>
->> I was also looking at making MWAIT available to guests in a safe manner:
->> whether through emulation or a PV-MWAIT. My (unsolicited) thoughts
-> 
-> What use-case are you interested in?
-Currently Oracle does not make MWAIT available to guests in cloud
-environments. My interest is 1) allow guests to avoid the IPI and
-2) allow the waiting to be in deeper C-states so that other cores
-could get the benefit of turbo-boost etc.
-
 
 > 
->>
->> We basically want to handle this sequence:
->>
->>      monitor(monitor_address);
->>      if (*monitor_address == base_value)
->>           mwaitx(max_delay);
->>
->> Emulation seems problematic because, AFAICS this would happen:
->>
->>      guest                                   hypervisor
->>      =====                                   ====
->>
->>      monitor(monitor_address);
->>          vmexit  ===>                        monitor(monitor_address)
->>      if (*monitor_address == base_value)
->>           mwait();
->>                vmexit    ====>               mwait()
->>
->> There's a context switch back to the guest in this sequence which seems
->> problematic. Both the AMD and Intel specs list system calls and
->> far calls as events which would lead to the MWAIT being woken up:
->> "Voluntary transitions due to fast system call and far calls
->> (occurring prior to issuing MWAIT but after setting the monitor)".
->>
->>
->> We could do this instead:
->>
->>      guest                                   hypervisor
->>      =====                                   ====
->>
->>      monitor(monitor_address);
->>          vmexit  ===>                        cache monitor_address
->>      if (*monitor_address == base_value)
->>           mwait();
->>                vmexit    ====>              monitor(monitor_address)
->>                                             mwait()
->>
->> But, this would miss the "if (*monitor_address == base_value)" check in
->> the host which is problematic if *monitor_address changed simultaneously
->> when monitor was executed.
->> (Similar problem if we cache both the monitor_address and
->> *monitor_address.)
->>
->>
->> So, AFAICS, the only thing that would work is the guest offloading the
->> whole PV-MWAIT operation.
->>
->> AFAICS, that could be a paravirt operation which needs three parameters:
->> (monitor_address, base_value, max_delay.)
->>
->> This would allow the guest to offload this whole operation to
->> the host:
->>      monitor(monitor_address);
->>      if (*monitor_address == base_value)
->>           mwaitx(max_delay);
->>
->> I'm guessing you are thinking on similar lines?
+> On Wed, May 15, 2019 at 10:46:00PM +0200, David Hildenbrand wrote:
+> > > +	vpmem->vdev = vdev;
+> > > +	vdev->priv = vpmem;
+> > > +	err = init_vq(vpmem);
+> > > +	if (err) {
+> > > +		dev_err(&vdev->dev, "failed to initialize virtio pmem vq's\n");
+> > > +		goto out_err;
+> > > +	}
+> > > +
+> > > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> > > +			start, &vpmem->start);
+> > > +	virtio_cread(vpmem->vdev, struct virtio_pmem_config,
+> > > +			size, &vpmem->size);
+> > > +
+> > > +	res.start = vpmem->start;
+> > > +	res.end   = vpmem->start + vpmem->size-1;
+> > 
+> > nit: " - 1;"
+> > 
+> > > +	vpmem->nd_desc.provider_name = "virtio-pmem";
+> > > +	vpmem->nd_desc.module = THIS_MODULE;
+> > > +
+> > > +	vpmem->nvdimm_bus = nvdimm_bus_register(&vdev->dev,
+> > > +						&vpmem->nd_desc);
+> > > +	if (!vpmem->nvdimm_bus) {
+> > > +		dev_err(&vdev->dev, "failed to register device with nvdimm_bus\n");
+> > > +		err = -ENXIO;
+> > > +		goto out_vq;
+> > > +	}
+> > > +
+> > > +	dev_set_drvdata(&vdev->dev, vpmem->nvdimm_bus);
+> > > +
+> > > +	ndr_desc.res = &res;
+> > > +	ndr_desc.numa_node = nid;
+> > > +	ndr_desc.flush = async_pmem_flush;
+> > > +	set_bit(ND_REGION_PAGEMAP, &ndr_desc.flags);
+> > > +	set_bit(ND_REGION_ASYNC, &ndr_desc.flags);
+> > > +	nd_region = nvdimm_pmem_region_create(vpmem->nvdimm_bus, &ndr_desc);
+> > > +	if (!nd_region) {
+> > > +		dev_err(&vdev->dev, "failed to create nvdimm region\n");
+> > > +		err = -ENXIO;
+> > > +		goto out_nd;
+> > > +	}
+> > > +	nd_region->provider_data =
+> > > dev_to_virtio(nd_region->dev.parent->parent);
+> > > +	return 0;
+> > > +out_nd:
+> > > +	nvdimm_bus_unregister(vpmem->nvdimm_bus);
+> > > +out_vq:
+> > > +	vdev->config->del_vqs(vdev);
+> > > +out_err:
+> > > +	return err;
+> > > +}
+> > > +
+> > > +static void virtio_pmem_remove(struct virtio_device *vdev)
+> > > +{
+> > > +	struct nvdimm_bus *nvdimm_bus = dev_get_drvdata(&vdev->dev);
+> > > +
+> > > +	nvdimm_bus_unregister(nvdimm_bus);
+> > > +	vdev->config->del_vqs(vdev);
+> > > +	vdev->config->reset(vdev);
+> > > +}
+> > > +
+> > > +static struct virtio_driver virtio_pmem_driver = {
+> > > +	.driver.name		= KBUILD_MODNAME,
+> > > +	.driver.owner		= THIS_MODULE,
+> > > +	.id_table		= id_table,
+> > > +	.probe			= virtio_pmem_probe,
+> > > +	.remove			= virtio_pmem_remove,
+> > > +};
+> > > +
+> > > +module_virtio_driver(virtio_pmem_driver);
+> > > +MODULE_DEVICE_TABLE(virtio, id_table);
+> > > +MODULE_DESCRIPTION("Virtio pmem driver");
+> > > +MODULE_LICENSE("GPL");
+> > > diff --git a/drivers/nvdimm/virtio_pmem.h b/drivers/nvdimm/virtio_pmem.h
+> > > new file mode 100644
+> > > index 000000000000..ab1da877575d
+> > > --- /dev/null
+> > > +++ b/drivers/nvdimm/virtio_pmem.h
+> > > @@ -0,0 +1,60 @@
+> > > +/* SPDX-License-Identifier: GPL-2.0 */
+> > > +/*
+> > > + * virtio_pmem.h: virtio pmem Driver
+> > > + *
+> > > + * Discovers persistent memory range information
+> > > + * from host and provides a virtio based flushing
+> > > + * interface.
+> > > + **/
+> > > +
+> > > +#ifndef _LINUX_VIRTIO_PMEM_H
+> > > +#define _LINUX_VIRTIO_PMEM_H
+> > > +
+> > > +#include <linux/virtio_ids.h>
+> > > +#include <linux/module.h>
+> > > +#include <linux/virtio_config.h>
+> > > +#include <uapi/linux/virtio_pmem.h>
+> > > +#include <linux/libnvdimm.h>
+> > > +#include <linux/spinlock.h>
+> > > +
+> > > +struct virtio_pmem_request {
+> > > +	/* Host return status corresponding to flush request */
+> > > +	int ret;
+> > > +
+> > > +	/* command name*/
+> > > +	char name[16];
+> > 
+> > So ... why are we sending string commands and expect native-endianess
+> > integers and don't define a proper request/response structure + request
+> > types in include/uapi/linux/virtio_pmem.h like
 > 
-> Sort of: only trying to avoid the IPI to wake a remote vCPU.
-> 
-> Problem is that MWAIT works only on a contiguous range
-> of bits in memory (512 bits max on current CPUs).
-> 
-> So if you execute mwait on the host on behalf of the guest,
-> the region of memory monitored must include both host
-> and guest bits.
-Yeah, an MWAITv would have come pretty handy here ;).
+> passing names could be ok.
+> I missed the fact we return a native endian int.
+> Pls fix that.
 
-My idea of PV-MWAIT didn't include waiting on behalf of the host. I
-was thinking of waiting in the host but exclusively on behalf of the
-guest, until the guest is woken up or when it's time-quanta expires.
-
-Waiting on behalf of both the guest and the host would clearly be better.
-
-If we can do mwait for both the guest and host (say they share a 512
-bit region), then the host will need some protection from the guest.
-Maybe the waking guest-thread could just do a hypercall to wake up
-the remote vCPU? Or maybe it could poke the monitored region,
-but that is handled as a special page-fault?
-The hypercall-to-wake would also allow us to move guest-threads across
-CPUs. That said, I'm not sure how expensive either of these would be.
-
-Assuming host/guest can share a monitored region safely, the host's
-idle could monitor some region other than its &thread_info->flags.
-Maybe we could setup a mwait notifier with a percpu waiting area which
-could be registered by idle, guests etc.
-
-Though on second thoughts, if the remote thread will do a
-hypercall/page-fault then the handling could just as easily be: mark
-the guest's remote thread runnable and set the resched bit.
+Sure. will fix this.
 
 > 
->>
->>
->> High level semantics: If the CPU doesn't have any runnable threads, then
->> we actually do this version of PV-MWAIT -- arming a timer if necessary
->> so we only sleep until the time-slice expires or the MWAIT max_delay does.
 > 
-> That would kill the sched_wake_idle_without_ipi optimization for the
-> host.
-Yeah, I was thinking in terms of the MWAIT being exclusively on behalf
-of the guest so in a sense the guest was still scheduled just waiting.
-
-Ankur
-
+> > 
+> > struct virtio_pmem_resp {
+> > 	__virtio32 ret;
+> > }
+> > 
+> > #define VIRTIO_PMEM_REQ_TYPE_FLUSH	1
+> > struct virtio_pmem_req {
+> > 	__virtio16 type;
+> > }
+> > 
+> > ... and this way we also define a proper endianess format for exchange
+> > and keep it extensible
+> > 
+> > @MST, what's your take on this?
 > 
->> If the CPU has any runnable threads then this could still finish its
->> time-quanta or we could just do a schedule-out.
->>
->>
->> So the semantics guaranteed to the host would be that PV-MWAIT
->> returns after >= max_delay OR with the *monitor_address changed.
->>
->>
->>
->> Ankur
+> Extensions can always use feature bits so I don't think
+> it's a problem.
 
+That was exactly my thought when I implemented this. Though I am
+fine with separate structures for request/response and I made the
+change. 
+
+Thank you for all the comments.
+
+Best regards,
+Pankaj 
+> > 
+> > --
+> > 
+> > Thanks,
+> > 
+> > David / dhildenb
+> 
+> 
