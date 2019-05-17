@@ -2,108 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C7BEA21ED8
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 22:05:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 761A921EEC
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 22:12:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727380AbfEQUFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 May 2019 16:05:10 -0400
-Received: from mga11.intel.com ([192.55.52.93]:39234 "EHLO mga11.intel.com"
+        id S1727146AbfEQUMm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 May 2019 16:12:42 -0400
+Received: from mga07.intel.com ([134.134.136.100]:51061 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726738AbfEQUFK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 May 2019 16:05:10 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1727018AbfEQUMm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 May 2019 16:12:42 -0400
+X-Amp-Result: UNSCANNABLE
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 May 2019 13:05:10 -0700
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 May 2019 13:12:41 -0700
 X-ExtLoop1: 1
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by orsmga005.jf.intel.com with ESMTP; 17 May 2019 13:05:09 -0700
-Date:   Fri, 17 May 2019 13:05:09 -0700
+  by orsmga007.jf.intel.com with ESMTP; 17 May 2019 13:12:41 -0700
+Date:   Fri, 17 May 2019 13:12:41 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Wanpeng Li <kernellwp@gmail.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>
-Subject: Re: [PATCH v3 3/5] KVM: LAPIC: Expose per-vCPU timer_advance_ns to
- userspace
-Message-ID: <20190517200509.GJ15006@linux.intel.com>
-References: <1557975980-9875-1-git-send-email-wanpengli@tencent.com>
- <1557975980-9875-4-git-send-email-wanpengli@tencent.com>
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH 4/4] KVM: nVMX: Fix using __this_cpu_read() in
+ preemptible context
+Message-ID: <20190517201241.GK15006@linux.intel.com>
+References: <1558082990-7822-1-git-send-email-wanpengli@tencent.com>
+ <1558082990-7822-4-git-send-email-wanpengli@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1557975980-9875-4-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1558082990-7822-4-git-send-email-wanpengli@tencent.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 16, 2019 at 11:06:18AM +0800, Wanpeng Li wrote:
+On Fri, May 17, 2019 at 04:49:50PM +0800, Wanpeng Li wrote:
 > From: Wanpeng Li <wanpengli@tencent.com>
 > 
-> Expose per-vCPU timer_advance_ns to userspace, so it is able to 
-> query the auto-adjusted value.
+>  BUG: using __this_cpu_read() in preemptible [00000000] code: qemu-system-x86/4590
+>   caller is nested_vmx_enter_non_root_mode+0xebd/0x1790 [kvm_intel]
+>   CPU: 4 PID: 4590 Comm: qemu-system-x86 Tainted: G           OE     5.1.0-rc4+ #1
+>   Call Trace:
+>    dump_stack+0x67/0x95
+>    __this_cpu_preempt_check+0xd2/0xe0
+>    nested_vmx_enter_non_root_mode+0xebd/0x1790 [kvm_intel]
+>    nested_vmx_run+0xda/0x2b0 [kvm_intel]
+>    handle_vmlaunch+0x13/0x20 [kvm_intel]
+>    vmx_handle_exit+0xbd/0x660 [kvm_intel]
+>    kvm_arch_vcpu_ioctl_run+0xa2c/0x1e50 [kvm]
+>    kvm_vcpu_ioctl+0x3ad/0x6d0 [kvm]
+>    do_vfs_ioctl+0xa5/0x6e0
+>    ksys_ioctl+0x6d/0x80
+>    __x64_sys_ioctl+0x1a/0x20
+>    do_syscall_64+0x6f/0x6c0
+>    entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> 
+> Accessing per-cpu variable should disable preemption, this patch extends the 
+> preemption disable region for __this_cpu_read().
 > 
 > Cc: Paolo Bonzini <pbonzini@redhat.com>
 > Cc: Radim Krčmář <rkrcmar@redhat.com>
-> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> Cc: Liran Alon <liran.alon@oracle.com>
 > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 > ---
->  arch/x86/kvm/debugfs.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/debugfs.c b/arch/x86/kvm/debugfs.c
-> index c19c7ed..a6f1f93 100644
-> --- a/arch/x86/kvm/debugfs.c
-> +++ b/arch/x86/kvm/debugfs.c
-> @@ -9,12 +9,22 @@
->   */
->  #include <linux/kvm_host.h>
->  #include <linux/debugfs.h>
-> +#include "lapic.h"
->  
->  bool kvm_arch_has_vcpu_debugfs(void)
->  {
->  	return true;
->  }
->  
-> +static int vcpu_get_timer_advance_ns(void *data, u64 *val)
-> +{
-> +	struct kvm_vcpu *vcpu = (struct kvm_vcpu *) data;
-> +	*val = vcpu->arch.apic->lapic_timer.timer_advance_ns;
 
-This needs to ensure to check lapic_in_kernel() to ensure apic isn't NULL.
-Actually, I think we can skip creation of the parameter entirely if
-lapic_in_kernel() is false.  VMX and SVM both instantiate the lapic
-during kvm_arch_vcpu_create(), which is (obviously) called before
-kvm_arch_create_vcpu_debugfs().
+Fixes: 52017608da33 ("KVM: nVMX: add option to perform early consistency checks via H/W")
 
-> +	return 0;
-> +}
-> +
-> +DEFINE_SIMPLE_ATTRIBUTE(vcpu_timer_advance_ns_fops, vcpu_get_timer_advance_ns, NULL, "%llu\n");
-> +
->  static int vcpu_get_tsc_offset(void *data, u64 *val)
->  {
->  	struct kvm_vcpu *vcpu = (struct kvm_vcpu *) data;
-> @@ -51,6 +61,12 @@ int kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
->  	if (!ret)
->  		return -ENOMEM;
->  
-> +	ret = debugfs_create_file("lapic_timer_advance_ns", 0444,
-> +							vcpu->debugfs_dentry,
-> +							vcpu, &vcpu_timer_advance_ns_fops);
-> +	if (!ret)
-> +		return -ENOMEM;
-> +
->  	if (kvm_has_tsc_control) {
->  		ret = debugfs_create_file("tsc-scaling-ratio", 0444,
->  							vcpu->debugfs_dentry,
-> -- 
-> 2.7.4
-> 
+and probably
+
+Cc: stable@vger.kernel.org
+
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
