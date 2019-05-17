@@ -2,139 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C95121539
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 10:18:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F119A2154E
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 10:25:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728807AbfEQISm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 May 2019 04:18:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47960 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728136AbfEQISl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 May 2019 04:18:41 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4H8GbnQ036564
-        for <kvm@vger.kernel.org>; Fri, 17 May 2019 04:18:40 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2shs428tch-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 17 May 2019 04:18:40 -0400
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Fri, 17 May 2019 09:18:38 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 17 May 2019 09:18:35 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4H8IYlF28573942
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 May 2019 08:18:34 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 23B9DAE068;
-        Fri, 17 May 2019 08:18:34 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8153EAE05F;
-        Fri, 17 May 2019 08:18:33 +0000 (GMT)
-Received: from [9.145.153.112] (unknown [9.145.153.112])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 17 May 2019 08:18:33 +0000 (GMT)
-Reply-To: pmorel@linux.ibm.com
-Subject: Re: [PATCH 2/4] vfio: vfio_iommu_type1: Define
- VFIO_IOMMU_INFO_CAPABILITIES
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     sebott@linux.vnet.ibm.com, gerald.schaefer@de.ibm.com,
-        pasic@linux.vnet.ibm.com, borntraeger@de.ibm.com,
-        walling@linux.ibm.com, linux-s390@vger.kernel.org,
-        iommu@lists.linux-foundation.org, joro@8bytes.org,
+        id S1728755AbfEQIZK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 May 2019 04:25:10 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:39180 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728334AbfEQIZK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 May 2019 04:25:10 -0400
+Received: by mail-wr1-f68.google.com with SMTP id w8so6134578wrl.6
+        for <kvm@vger.kernel.org>; Fri, 17 May 2019 01:25:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=cULMJDOvF9eVDSo9dp6+c4o/bcGy8xGnvE5CwRJMTP8=;
+        b=g51+JhK45LyL5hBP+6kQmeL/RdEqIBr+m+BfkABJ/xs2T/J1YKUyv0U+cMGjW7l7GO
+         Xg5AA2ziWxa6y+wrySofsHI3wWOlVbVul/92Nfsso53qG9Q6FH4HsoXi27YnAzULAi+v
+         HIMCgrRMluiLA6r4DKNbLHOYVYowJrTNKfyycDCT024MQ0PipJWwE4KKFk/kubtyTT3I
+         eJvwYwZdZPfWAhlzOX7oOD4m0mZS+lEP1ghgXDiHkOiUJtk1Tcstxzf0jlC+vMQHeh4k
+         HKn4pdv6MzI8wJxAgVwOJxUjkBx5R6HgE6BG/vAN0c9/MaTNciAB2+1R9bz1JAsdsB/y
+         zSsg==
+X-Gm-Message-State: APjAAAX3/62HXwNgKNbnBWW8ipfjW++X3G3MFEF7dayELQQqlvZmSfKP
+        tmqp0YylcNkllZfcZETH3dnG1g==
+X-Google-Smtp-Source: APXvYqx44DAzcoMxwbPxDzA5zwUNnPhQ9uXSTLL/mcvCVkyoGjdl0B2O21dlBn3vcpThmyUCCK30Hw==
+X-Received: by 2002:a5d:4f0e:: with SMTP id c14mr17663814wru.91.1558081508824;
+        Fri, 17 May 2019 01:25:08 -0700 (PDT)
+Received: from steredhat (host151-251-static.12-87-b.business.telecomitalia.it. [87.12.251.151])
+        by smtp.gmail.com with ESMTPSA id l18sm7415127wrv.38.2019.05.17.01.25.07
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 17 May 2019 01:25:08 -0700 (PDT)
+Date:   Fri, 17 May 2019 10:25:05 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        virtualization@lists.linux-foundation.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com
-References: <1557476555-20256-1-git-send-email-pmorel@linux.ibm.com>
- <1557476555-20256-3-git-send-email-pmorel@linux.ibm.com>
- <20190516123100.529f06be@x1.home>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-Date:   Fri, 17 May 2019 10:18:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH v2 1/8] vsock/virtio: limit the memory used per-socket
+Message-ID: <20190517082505.ibjkuh7zibumen77@steredhat>
+References: <20190510125843.95587-1-sgarzare@redhat.com>
+ <20190510125843.95587-2-sgarzare@redhat.com>
+ <20190516152533.GB29808@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20190516123100.529f06be@x1.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051708-0028-0000-0000-0000036EA8E8
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051708-0029-0000-0000-0000242E46EB
-Message-Id: <ce6c7c44-b406-00d1-cf40-0dae6a6ed563@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-17_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905170056
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190516152533.GB29808@stefanha-x1.localdomain>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/05/2019 20:31, Alex Williamson wrote:
-> On Fri, 10 May 2019 10:22:33 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
+On Thu, May 16, 2019 at 04:25:33PM +0100, Stefan Hajnoczi wrote:
+> On Fri, May 10, 2019 at 02:58:36PM +0200, Stefano Garzarella wrote:
+> > +struct virtio_vsock_buf {
 > 
->> To use the VFIO_IOMMU_GET_INFO to retrieve IOMMU specific information,
->> we define a new flag VFIO_IOMMU_INFO_CAPABILITIES in the
->> vfio_iommu_type1_info structure and the associated capability
->> information block.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   include/uapi/linux/vfio.h | 10 ++++++++++
->>   1 file changed, 10 insertions(+)
->>
->> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->> index 8f10748..8f68e0f 100644
->> --- a/include/uapi/linux/vfio.h
->> +++ b/include/uapi/linux/vfio.h
->> @@ -715,6 +715,16 @@ struct vfio_iommu_type1_info {
->>   	__u32	flags;
->>   #define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info */
->>   	__u64	iova_pgsizes;		/* Bitmap of supported page sizes */
->> +#define VFIO_IOMMU_INFO_CAPABILITIES (1 << 1)  /* support capabilities info */
->> +	__u64   cap_offset;     /* Offset within info struct of first cap */
->> +};
->> +
->> +#define VFIO_IOMMU_INFO_CAP_QFN		1
->> +#define VFIO_IOMMU_INFO_CAP_QGRP	2
-> 
-> Descriptions?
-> 
->> +
->> +struct vfio_iommu_type1_info_block {
->> +	struct vfio_info_cap_header header;
->> +	__u32 data[];
->>   };
->>   
->>   #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
-> 
-> This is just a blob of data, what's the API?  How do we revision it?
-> How does the user know how to interpret it?  Dumping kernel internal
-> structures out to userspace like this is not acceptable, define a user
-> API. Thanks,
-> 
-> Alex
+> Please add a comment describing the purpose of this struct and to
+> differentiate its use from struct virtio_vsock_pkt.
 > 
 
-Thanks Alex for the comments.
-I will add the decription and the user API for the next iteration.
+Sure, I'll fix it.
 
-Regards,
-Pierre
+> > +static struct virtio_vsock_buf *
+> > +virtio_transport_alloc_buf(struct virtio_vsock_pkt *pkt, bool zero_copy)
+> > +{
+> > +	struct virtio_vsock_buf *buf;
+> > +
+> > +	if (pkt->len == 0)
+> > +		return NULL;
+> > +
+> > +	buf = kzalloc(sizeof(*buf), GFP_KERNEL);
+> > +	if (!buf)
+> > +		return NULL;
+> > +
+> > +	/* If the buffer in the virtio_vsock_pkt is full, we can move it to
+> > +	 * the new virtio_vsock_buf avoiding the copy, because we are sure that
+> > +	 * we are not use more memory than that counted by the credit mechanism.
+> > +	 */
+> > +	if (zero_copy && pkt->len == pkt->buf_len) {
+> > +		buf->addr = pkt->buf;
+> > +		pkt->buf = NULL;
+> > +	} else {
+> > +		buf->addr = kmalloc(pkt->len, GFP_KERNEL);
+> 
+> buf and buf->addr could be allocated in a single call, though I'm not
+> sure how big an optimization this is.
+> 
 
+IIUC, in the case of zero-copy I should allocate only the buf,
+otherwise I should allocate both buf and buf->addr in a single call
+when I'm doing a full-copy.
 
+Is it correct?
 
+> > @@ -841,20 +882,24 @@ virtio_transport_recv_connected(struct sock *sk,
+> >  {
+> >  	struct vsock_sock *vsk = vsock_sk(sk);
+> >  	struct virtio_vsock_sock *vvs = vsk->trans;
+> > +	struct virtio_vsock_buf *buf;
+> >  	int err = 0;
+> >  
+> >  	switch (le16_to_cpu(pkt->hdr.op)) {
+> >  	case VIRTIO_VSOCK_OP_RW:
+> >  		pkt->len = le32_to_cpu(pkt->hdr.len);
+> > -		pkt->off = 0;
+> > +		buf = virtio_transport_alloc_buf(pkt, true);
+> >  
+> > -		spin_lock_bh(&vvs->rx_lock);
+> > -		virtio_transport_inc_rx_pkt(vvs, pkt);
+> > -		list_add_tail(&pkt->list, &vvs->rx_queue);
+> > -		spin_unlock_bh(&vvs->rx_lock);
+> > +		if (buf) {
+> > +			spin_lock_bh(&vvs->rx_lock);
+> > +			virtio_transport_inc_rx_pkt(vvs, pkt->len);
+> > +			list_add_tail(&buf->list, &vvs->rx_queue);
+> > +			spin_unlock_bh(&vvs->rx_lock);
+> >  
+> > -		sk->sk_data_ready(sk);
+> > -		return err;
+> > +			sk->sk_data_ready(sk);
+> > +		}
+> 
+> The return value of this function isn't used but the code still makes an
+> effort to return errors.  Please return -ENOMEM when buf == NULL.
+> 
+> If you'd like to remove the return value that's fine too, but please do
+> it for the whole function to be consistent.
 
--- 
-Pierre Morel
-Linux/KVM/QEMU in Böblingen - Germany
+I'll return -ENOMEM when the allocation fails.
 
+Thanks,
+Stefano
