@@ -2,119 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C6FFB21410
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 09:15:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8854E21534
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 10:18:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728179AbfEQHPP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 May 2019 03:15:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41632 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727871AbfEQHPP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 May 2019 03:15:15 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id EA08EC05FF80;
-        Fri, 17 May 2019 07:15:14 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-117-142.ams2.redhat.com [10.36.117.142])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4773E1001DE1;
-        Fri, 17 May 2019 07:15:09 +0000 (UTC)
-Subject: Re: [PATCH] KVM: selftests: Compile code with warnings enabled
-To:     Peter Xu <peterx@redhat.com>
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linux-kernel@vger.kernel.org
-References: <20190516130257.29445-1-thuth@redhat.com>
- <20190517024510.GN16681@xz-x1>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <66ad01c4-74ba-db0d-bbca-2b98e3984d43@redhat.com>
-Date:   Fri, 17 May 2019 09:15:08 +0200
+        id S1727726AbfEQISQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 May 2019 04:18:16 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45432 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727386AbfEQISQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 May 2019 04:18:16 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4H8I3jt088195
+        for <kvm@vger.kernel.org>; Fri, 17 May 2019 04:18:14 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2shqvpcc02-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 17 May 2019 04:18:09 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Fri, 17 May 2019 09:17:23 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 17 May 2019 09:17:19 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4H8HIE849741984
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 May 2019 08:17:18 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E9F4CAE055;
+        Fri, 17 May 2019 08:17:17 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5D004AE053;
+        Fri, 17 May 2019 08:17:17 +0000 (GMT)
+Received: from [9.145.153.112] (unknown [9.145.153.112])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 17 May 2019 08:17:17 +0000 (GMT)
+Reply-To: pmorel@linux.ibm.com
+Subject: Re: [PATCH 4/4] vfio: vfio_iommu_type1: implement
+ VFIO_IOMMU_INFO_CAPABILITIES
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     sebott@linux.vnet.ibm.com, gerald.schaefer@de.ibm.com,
+        pasic@linux.vnet.ibm.com, borntraeger@de.ibm.com,
+        walling@linux.ibm.com, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, joro@8bytes.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com
+References: <1557476555-20256-1-git-send-email-pmorel@linux.ibm.com>
+ <1557476555-20256-5-git-send-email-pmorel@linux.ibm.com>
+ <20190516124026.415bf671@x1.home>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+Date:   Fri, 17 May 2019 10:17:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190517024510.GN16681@xz-x1>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190516124026.415bf671@x1.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Fri, 17 May 2019 07:15:15 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19051708-0028-0000-0000-0000036EA8CC
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19051708-0029-0000-0000-0000242E46CE
+Message-Id: <29209ea1-be49-47bc-c258-6e87da055fac@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-17_04:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905170056
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/05/2019 04.45, Peter Xu wrote:
-> Hi, Thomas,
+On 16/05/2019 20:40, Alex Williamson wrote:
+> On Fri, 10 May 2019 10:22:35 +0200
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
 > 
-> On Thu, May 16, 2019 at 03:02:57PM +0200, Thomas Huth wrote:
->> So far the KVM selftests are compiled without any compiler warnings
->> enabled. That's quite bad, since we miss a lot of possible bugs this
->> way. Let's enable at least "-Wall" and some other useful warning flags
->> now.
+>> We implement a capability intercafe for VFIO_IOMMU_GET_INFO and add the
+>> first capability: VFIO_IOMMU_INFO_CAPABILITIES.
 >>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> When calling the ioctl, the user must specify
+>> VFIO_IOMMU_INFO_CAPABILITIES to retrieve the capabilities and must check
+>> in the answer if capabilities are supported.
+>> Older kernel will not check nor set the VFIO_IOMMU_INFO_CAPABILITIES in
+>> the flags of vfio_iommu_type1_info.
+>>
+>> The iommu get_attr callback will be called to retrieve the specific
+>> attributes and fill the capabilities, VFIO_IOMMU_INFO_CAP_QFN for the
+>> PCI query function attributes and VFIO_IOMMU_INFO_CAP_QGRP for the
+>> PCI query function group.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 >> ---
->>  This patch fixes most of the warnings in the x86 code already - but
->>  for some warnings, I was not quite sure (e.g. about the need for the
->>  kvm_get_supported_cpuid_entry(1) in some tests), so I did not touch
+>>   drivers/vfio/vfio_iommu_type1.c | 95 ++++++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 94 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index d0f731c..f7f8120 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -1658,6 +1658,70 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+>>   	return ret;
+>>   }
+>>   
+>> +int vfio_iommu_type1_caps(struct vfio_iommu *iommu, struct vfio_info_cap *caps,
+>> +			  size_t size)
+>> +{
+>> +	struct vfio_domain *d;
+>> +	struct vfio_iommu_type1_info_block *info_fn;
+>> +	struct vfio_iommu_type1_info_block *info_grp;
+>> +	unsigned long total_size, fn_size, grp_size;
+>> +	int ret;
+>> +
+>> +	d = list_first_entry(&iommu->domain_list, struct vfio_domain, next);
+>> +	if (!d)
+>> +		return -ENODEV;
+>> +	/* The size of these capabilities are device dependent */
+>> +	fn_size = iommu_domain_get_attr(d->domain,
+>> +					DOMAIN_ATTR_ZPCI_FN_SIZE, NULL);
+>> +	if (fn_size < 0)
+>> +		return fn_size;
 > 
-> If you mean the two calls in state_test and evmcs_test I would agree
-> they should be dropped directly.
+> What if non-Z archs want to use this?  The function is architected
+> specifically for this one use case, fail if any component is not there
+> which means it requires a re-write to add further support.  If
+> ZPCI_FN_SIZE isn't support, move on to the next thing.
 
-Yes, that were the once I had in mind. I'll drop them in v2.
+yes, clear.
 
-> Just to mention that the patch may not apply cleanly to kvm/queue now
-> probably because the dirty-log-test.c touchup recently, so may need a
-> rebase.  Otherwise it looks nice at least to me to have these checks.
+> 
+>> +	fn_size +=  sizeof(struct vfio_info_cap_header);
+>> +	total_size = fn_size;
+> 
+> Here too, total_size should be initialized to zero and each section +=
+> the size they'd like to add.
 
-Ok, thanks for the hint, I'll rebase and send a v2.
+thanks, clear too.
 
- Thomas
+> 
+>> +
+>> +	grp_size = iommu_domain_get_attr(d->domain,
+>> +					 DOMAIN_ATTR_ZPCI_GRP_SIZE, NULL);
+>> +	if (grp_size < 0)
+>> +		return grp_size;
+>> +	grp_size +=  sizeof(struct vfio_info_cap_header);
+>> +	total_size += grp_size;
+>> +
+>> +	/* Tell caller to call us with a greater buffer */
+>> +	if (total_size > size) {
+>> +		caps->size = total_size;
+>> +		return 0;
+>> +	}
+>> +
+>> +	info_fn = kzalloc(fn_size, GFP_KERNEL);
+>> +	if (!info_fn)
+>> +		return -ENOMEM;
+> 
+> Maybe fn_size was zero because we're not on Z.
+> 
+>> +	ret = iommu_domain_get_attr(d->domain,
+>> +				    DOMAIN_ATTR_ZPCI_FN, &info_fn->data);
+> 
+> Kernel internal structures != user api.  Thanks,
+> 
+> Alex
+
+Thanks a lot Alex,
+I understand the concerns, I was too focussed on Z, I will rework this 
+as you said:
+- definition of the user API and
+- take care that another architecture may want to use the interface.
+
+Regards,
+Pierre
+
+
+
+-- 
+Pierre Morel
+Linux/KVM/QEMU in Böblingen - Germany
+
