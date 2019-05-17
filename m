@@ -2,126 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6594021609
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 11:11:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CEA42164D
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 11:30:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728782AbfEQJK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 May 2019 05:10:58 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:40777 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727620AbfEQJK6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 May 2019 05:10:58 -0400
-Received: by mail-wr1-f65.google.com with SMTP id h4so6287969wre.7;
-        Fri, 17 May 2019 02:10:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=uQP6UNBIuUPV1AZ1CoOW9AZlPGtgb8rjFjKOBI0fJng=;
-        b=MK7l06K/5p1djD0GO7FMR5hUiraiIDATcpZ/TXE0SqO3vXLhBq+yLai+CCX3FgzlWo
-         813DJmO1DOtdeNYPVD3e3cvs8+xEuhHYmcOzmMu4krLuLoVwQRSvpNGvoKqCKeWqtttD
-         ahb/XQdbQZvQpm3XLp1fkRokLCL2zMGhAT+wC8LXIcT2dC8dD0jJfu/o6dfzhUjlG/Gu
-         qVWeafdYi/FvTLSACg7rCkSBvj3qkziXsjwusmYqqPheTg3nZZrKOIdVi2mLV5iBMmvF
-         ZlgtBbL1ryWttAUlQm+vG3QyHxcI6C255vFXf/zmbDebolGxZTPUEjquagUWkkzlIrve
-         UVPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=uQP6UNBIuUPV1AZ1CoOW9AZlPGtgb8rjFjKOBI0fJng=;
-        b=Taae7ZBPMVqLqWI9X4XPIjdUKKG+jhYXMNKiuNDvTgmbEL3IEAie2TF8unN5OiBKqD
-         iMBWr8jwnd2G/p8w0PdXnsIWAM8nrzBm40marRZXDiOATD0k/5Dk6S30hK7hHD3mfJ1C
-         oAs+XqA2vmStgScaXXeYs2iAtNIlE/ODtu9Ykpx+N07AAb2oeAyt17v4uSYfFfHimNkm
-         pTtRlijUeczIJFBefdkTxLZhaR6raSBIHI4sV5cWPBlYNpdZ6tC4M8/74QFA2/N+WkT5
-         bJnKlEGurXfetaOZvLo6dewXC47JU408+uKX9ZrWoddc6wGcwpMQ9LI721yJetyGHrms
-         Pc1A==
-X-Gm-Message-State: APjAAAXdzP3Tz5ePlxIFjlPvWmSbfExblwpd+FbalxusEfQ18iOfU12D
-        UNkkvzAX2nMxJgoqTuxeTH9y6bLR/e8=
-X-Google-Smtp-Source: APXvYqynhf+F/VtAp3WICJenqlGOUtcwqDHIX042FUWZUXsuXf49AXeMdg+LfCNqZaZUCPolt9fLdA==
-X-Received: by 2002:adf:eb84:: with SMTP id t4mr4431385wrn.43.1558084256073;
-        Fri, 17 May 2019 02:10:56 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id k67sm8663482wmb.34.2019.05.17.02.10.55
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 17 May 2019 02:10:55 -0700 (PDT)
-Date:   Fri, 17 May 2019 10:10:54 +0100
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        stefanha@redhat.com
-Subject: Re: [PATCH V2 0/4] Prevent vhost kthread from hogging CPU
-Message-ID: <20190517091054.GE3679@stefanha-x1.localdomain>
-References: <1558067392-11740-1-git-send-email-jasowang@redhat.com>
+        id S1728282AbfEQJaK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 May 2019 05:30:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39774 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727758AbfEQJaK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 May 2019 05:30:10 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 16E8D30ADC82;
+        Fri, 17 May 2019 09:30:10 +0000 (UTC)
+Received: from xz-x1 (dhcp-15-205.nay.redhat.com [10.66.15.205])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 346D85D9C4;
+        Fri, 17 May 2019 09:30:02 +0000 (UTC)
+Date:   Fri, 17 May 2019 17:30:00 +0800
+From:   Peter Xu <peterx@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: selftests: Compile code with warnings enabled
+Message-ID: <20190517093000.GO16681@xz-x1>
+References: <20190517090445.4502-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="ytoMbUMiTKPMT3hY"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1558067392-11740-1-git-send-email-jasowang@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190517090445.4502-1-thuth@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Fri, 17 May 2019 09:30:10 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, May 17, 2019 at 11:04:45AM +0200, Thomas Huth wrote:
+> So far the KVM selftests are compiled without any compiler warnings
+> enabled. That's quite bad, since we miss a lot of possible bugs this
+> way. Let's enable at least "-Wall" and some other useful warning flags
+> now, and fix at least the trivial problems in the code (like unused
+> variables).
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  v2:
+>  - Rebased to kvm/queue
+>  - Fix warnings in state_test.c and evmcs_test.c, too
 
---ytoMbUMiTKPMT3hY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I still see these warnings (probably because the hyperv_cpuid.c is a
+new test):
 
-On Fri, May 17, 2019 at 12:29:48AM -0400, Jason Wang wrote:
-> Hi:
->=20
-> This series try to prevent a guest triggerable CPU hogging through
-> vhost kthread. This is done by introducing and checking the weight
-> after each requrest. The patch has been tested with reproducer of
-> vsock and virtio-net. Only compile test is done for vhost-scsi.
->=20
-> Please review.
->=20
-> This addresses CVE-2019-3900.
->=20
-> Changs from V1:
-> - fix user-ater-free in vosck patch
->=20
-> Jason Wang (4):
->   vhost: introduce vhost_exceeds_weight()
->   vhost_net: fix possible infinite loop
->   vhost: vsock: add weight support
->   vhost: scsi: add weight support
->=20
->  drivers/vhost/net.c   | 41 ++++++++++++++---------------------------
->  drivers/vhost/scsi.c  | 21 ++++++++++++++-------
->  drivers/vhost/vhost.c | 20 +++++++++++++++++++-
->  drivers/vhost/vhost.h |  5 ++++-
->  drivers/vhost/vsock.c | 28 +++++++++++++++++++++-------
->  5 files changed, 72 insertions(+), 43 deletions(-)
->=20
-> --=20
-> 1.8.3.1
->=20
-> _______________________________________________
-> Virtualization mailing list
-> Virtualization@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+In file included from x86_64/hyperv_cpuid.c:18:
+x86_64/hyperv_cpuid.c: In function ‘test_hv_cpuid’:
+x86_64/hyperv_cpuid.c:61:33: warning: suggest parentheses around comparison in operand of ‘==’ [-Wparentheses]
+   TEST_ASSERT(entry->padding[0] == entry->padding[1]
+               ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+include/test_util.h:32:15: note: in definition of macro ‘TEST_ASSERT’
+  test_assert((e), #e, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
+               ^
+x86_64/hyperv_cpuid.c:62:8: warning: suggest parentheses around comparison in operand of ‘==’ [-Wparentheses]
+   TEST_ASSERT(entry->padding[0] == entry->padding[1]
+               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        == entry->padding[2] == 0,
+        ^~~~~~~~~~~~~~~~~~~~
+include/test_util.h:32:15: note: in definition of macro ‘TEST_ASSERT’
+  test_assert((e), #e, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
+               ^
+x86_64/hyperv_cpuid.c: In function ‘kvm_get_supported_hv_cpuid’:
+x86_64/hyperv_cpuid.c:93:6: warning: unused variable ‘ret’ [-Wunused-variable]
+  int ret;
+      ^~~
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+The first two seem to be real bugs in the test code, and the 3rd one
+might need a cleanup too.
 
---ytoMbUMiTKPMT3hY
-Content-Type: application/pgp-signature; name="signature.asc"
+Thanks,
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzeep4ACgkQnKSrs4Gr
-c8iNjggAneRqHvB02eyRBli2HesL5fARqNFQbAFYGE3ABJtYfF1NDOnIwXI1t5Bt
-BassfyZocyhGcUX5kzLujRenaH0Yponx/sp7aDcA3EzH8gwyjdFAlozMSO5Mo/1M
-Tq48N/3dHRew7HDCyR83slVKuuaYch4HBtn/K8XAe+HaDAEcdGx8tGAoieeBd1fH
-jt7U2G0upIpOGhR1HOtHIZJ6llJU888Xj/l9EySxcXcoApQgaTV1Ta3oR2Sml3ts
-WrSc06MuGo/2kKevVAW+qWvqLWk01rIhUWF1IH8+FGUkrPY/QZQDay+muNVXrD7m
-/Zp2SmuE+tdA+yhwHfGEWgMsIDspGA==
-=Dchs
------END PGP SIGNATURE-----
-
---ytoMbUMiTKPMT3hY--
+-- 
+Peter Xu
