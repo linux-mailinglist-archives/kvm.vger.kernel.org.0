@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F119A2154E
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 10:25:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48E4D21559
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 10:27:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728755AbfEQIZK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 May 2019 04:25:10 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39180 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728334AbfEQIZK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 May 2019 04:25:10 -0400
-Received: by mail-wr1-f68.google.com with SMTP id w8so6134578wrl.6
-        for <kvm@vger.kernel.org>; Fri, 17 May 2019 01:25:09 -0700 (PDT)
+        id S1728845AbfEQI06 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 May 2019 04:26:58 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:32855 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727726AbfEQI06 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 May 2019 04:26:58 -0400
+Received: by mail-wm1-f66.google.com with SMTP id c66so8756674wme.0
+        for <kvm@vger.kernel.org>; Fri, 17 May 2019 01:26:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=cULMJDOvF9eVDSo9dp6+c4o/bcGy8xGnvE5CwRJMTP8=;
-        b=g51+JhK45LyL5hBP+6kQmeL/RdEqIBr+m+BfkABJ/xs2T/J1YKUyv0U+cMGjW7l7GO
-         Xg5AA2ziWxa6y+wrySofsHI3wWOlVbVul/92Nfsso53qG9Q6FH4HsoXi27YnAzULAi+v
-         HIMCgrRMluiLA6r4DKNbLHOYVYowJrTNKfyycDCT024MQ0PipJWwE4KKFk/kubtyTT3I
-         eJvwYwZdZPfWAhlzOX7oOD4m0mZS+lEP1ghgXDiHkOiUJtk1Tcstxzf0jlC+vMQHeh4k
-         HKn4pdv6MzI8wJxAgVwOJxUjkBx5R6HgE6BG/vAN0c9/MaTNciAB2+1R9bz1JAsdsB/y
-         zSsg==
-X-Gm-Message-State: APjAAAX3/62HXwNgKNbnBWW8ipfjW++X3G3MFEF7dayELQQqlvZmSfKP
-        tmqp0YylcNkllZfcZETH3dnG1g==
-X-Google-Smtp-Source: APXvYqx44DAzcoMxwbPxDzA5zwUNnPhQ9uXSTLL/mcvCVkyoGjdl0B2O21dlBn3vcpThmyUCCK30Hw==
-X-Received: by 2002:a5d:4f0e:: with SMTP id c14mr17663814wru.91.1558081508824;
-        Fri, 17 May 2019 01:25:08 -0700 (PDT)
+        bh=sEvENpqG7iRDJFzplTTWGKcKFWzhWauRstxh0Bhc8E4=;
+        b=MsrP6ssuGrlvr/rs9PTxXaB65ASBYVelwEDQ/JN6RE2VRHkJDmSApoa1AC8U7p+7mb
+         3nvvcvXOQaUZ2beXudmZCbesMet9+eznBdpWrfeJeDr/0bYkesqas1kO70SE3uG6iuqG
+         j9CpOyKG3q1QCFKu/3dLQbcIJZutQFZYOVbk2IdWJ6R3dcNupZp8zhbiPskiif1Kg8dF
+         DR8Z1F5DUAnle3hJZ8yr78q/VXm7P/h/KphXiPOnPi+VNjQTQYifMh4CFUaGCx4J0f05
+         0/NU2v1p2Y5EYP2tlcMKRw06m2MbwtPAg7hX/GvI58LiimYwaMYPmELMX+AdRE+endQI
+         rN0Q==
+X-Gm-Message-State: APjAAAVYOEWgLSDccPrhqcFfPaKKQjlxvsHR9QrQ1HJE0erNPdc4akrf
+        YQAbDt19mB7ZL3Q35uvTXy6PgDWCXws=
+X-Google-Smtp-Source: APXvYqzbrpzTZlidwr0VrrxreIABY704QNogR/kYguVAnOeyJIKbn/D8MSRkU5vYa/5xmd361QHBXQ==
+X-Received: by 2002:a1c:c015:: with SMTP id q21mr1265915wmf.75.1558081616187;
+        Fri, 17 May 2019 01:26:56 -0700 (PDT)
 Received: from steredhat (host151-251-static.12-87-b.business.telecomitalia.it. [87.12.251.151])
-        by smtp.gmail.com with ESMTPSA id l18sm7415127wrv.38.2019.05.17.01.25.07
+        by smtp.gmail.com with ESMTPSA id a5sm6714144wrt.10.2019.05.17.01.26.55
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 17 May 2019 01:25:08 -0700 (PDT)
-Date:   Fri, 17 May 2019 10:25:05 +0200
+        Fri, 17 May 2019 01:26:55 -0700 (PDT)
+Date:   Fri, 17 May 2019 10:26:53 +0200
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     Stefan Hajnoczi <stefanha@redhat.com>
 Cc:     netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
@@ -41,98 +41,38 @@ Cc:     netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
         virtualization@lists.linux-foundation.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH v2 1/8] vsock/virtio: limit the memory used per-socket
-Message-ID: <20190517082505.ibjkuh7zibumen77@steredhat>
+Subject: Re: [PATCH v2 2/8] vsock/virtio: free packets during the socket
+ release
+Message-ID: <20190517082653.aymkhkqkj5yminfg@steredhat>
 References: <20190510125843.95587-1-sgarzare@redhat.com>
- <20190510125843.95587-2-sgarzare@redhat.com>
- <20190516152533.GB29808@stefanha-x1.localdomain>
+ <20190510125843.95587-3-sgarzare@redhat.com>
+ <20190516153218.GC29808@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190516152533.GB29808@stefanha-x1.localdomain>
+In-Reply-To: <20190516153218.GC29808@stefanha-x1.localdomain>
 User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 16, 2019 at 04:25:33PM +0100, Stefan Hajnoczi wrote:
-> On Fri, May 10, 2019 at 02:58:36PM +0200, Stefano Garzarella wrote:
-> > +struct virtio_vsock_buf {
+On Thu, May 16, 2019 at 04:32:18PM +0100, Stefan Hajnoczi wrote:
+> On Fri, May 10, 2019 at 02:58:37PM +0200, Stefano Garzarella wrote:
+> > When the socket is released, we should free all packets
+> > queued in the per-socket list in order to avoid a memory
+> > leak.
+> > 
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > ---
+> >  net/vmw_vsock/virtio_transport_common.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
 > 
-> Please add a comment describing the purpose of this struct and to
-> differentiate its use from struct virtio_vsock_pkt.
-> 
+> Ouch, this would be nice as a separate patch that can be merged right
+> away (with s/virtio_vsock_buf/virtio_vsock_pkt/).
 
-Sure, I'll fix it.
-
-> > +static struct virtio_vsock_buf *
-> > +virtio_transport_alloc_buf(struct virtio_vsock_pkt *pkt, bool zero_copy)
-> > +{
-> > +	struct virtio_vsock_buf *buf;
-> > +
-> > +	if (pkt->len == 0)
-> > +		return NULL;
-> > +
-> > +	buf = kzalloc(sizeof(*buf), GFP_KERNEL);
-> > +	if (!buf)
-> > +		return NULL;
-> > +
-> > +	/* If the buffer in the virtio_vsock_pkt is full, we can move it to
-> > +	 * the new virtio_vsock_buf avoiding the copy, because we are sure that
-> > +	 * we are not use more memory than that counted by the credit mechanism.
-> > +	 */
-> > +	if (zero_copy && pkt->len == pkt->buf_len) {
-> > +		buf->addr = pkt->buf;
-> > +		pkt->buf = NULL;
-> > +	} else {
-> > +		buf->addr = kmalloc(pkt->len, GFP_KERNEL);
-> 
-> buf and buf->addr could be allocated in a single call, though I'm not
-> sure how big an optimization this is.
-> 
-
-IIUC, in the case of zero-copy I should allocate only the buf,
-otherwise I should allocate both buf and buf->addr in a single call
-when I'm doing a full-copy.
-
-Is it correct?
-
-> > @@ -841,20 +882,24 @@ virtio_transport_recv_connected(struct sock *sk,
-> >  {
-> >  	struct vsock_sock *vsk = vsock_sk(sk);
-> >  	struct virtio_vsock_sock *vvs = vsk->trans;
-> > +	struct virtio_vsock_buf *buf;
-> >  	int err = 0;
-> >  
-> >  	switch (le16_to_cpu(pkt->hdr.op)) {
-> >  	case VIRTIO_VSOCK_OP_RW:
-> >  		pkt->len = le32_to_cpu(pkt->hdr.len);
-> > -		pkt->off = 0;
-> > +		buf = virtio_transport_alloc_buf(pkt, true);
-> >  
-> > -		spin_lock_bh(&vvs->rx_lock);
-> > -		virtio_transport_inc_rx_pkt(vvs, pkt);
-> > -		list_add_tail(&pkt->list, &vvs->rx_queue);
-> > -		spin_unlock_bh(&vvs->rx_lock);
-> > +		if (buf) {
-> > +			spin_lock_bh(&vvs->rx_lock);
-> > +			virtio_transport_inc_rx_pkt(vvs, pkt->len);
-> > +			list_add_tail(&buf->list, &vvs->rx_queue);
-> > +			spin_unlock_bh(&vvs->rx_lock);
-> >  
-> > -		sk->sk_data_ready(sk);
-> > -		return err;
-> > +			sk->sk_data_ready(sk);
-> > +		}
-> 
-> The return value of this function isn't used but the code still makes an
-> effort to return errors.  Please return -ENOMEM when buf == NULL.
-> 
-> If you'd like to remove the return value that's fine too, but please do
-> it for the whole function to be consistent.
-
-I'll return -ENOMEM when the allocation fails.
+Okay, I'll fix this patch following the David's comment and I'll send
+as a separate patch using the virtio_vsock_pkt.
 
 Thanks,
 Stefano
