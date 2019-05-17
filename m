@@ -2,30 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3131B216C8
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 12:13:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21CF8216E0
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 12:20:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728559AbfEQKNQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 May 2019 06:13:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:30801 "EHLO mx1.redhat.com"
+        id S1728384AbfEQKU0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 May 2019 06:20:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36504 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727899AbfEQKNQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 May 2019 06:13:16 -0400
+        id S1726282AbfEQKU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 May 2019 06:20:26 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8065B81123;
-        Fri, 17 May 2019 10:13:15 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id A1A2230ADC7F;
+        Fri, 17 May 2019 10:20:25 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-117-142.ams2.redhat.com [10.36.117.142])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3AD5D600C4;
-        Fri, 17 May 2019 10:13:04 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v2 2/2] powerpc: Make h_cede_tm test run by
- default
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6FF68600C4;
+        Fri, 17 May 2019 10:20:24 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v2 1/2] powerpc: Allow for a custom decr
+ value to be specified to load on decr excp
 To:     Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
-        kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org, lvivier@redhat.com, dgibson@redhat.com
+        Laurent Vivier <lvivier@redhat.com>, kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org, dgibson@redhat.com
 References: <20190515002801.20517-1-sjitindarsingh@gmail.com>
- <20190515002801.20517-2-sjitindarsingh@gmail.com>
+ <132d5cba-1b9e-0be9-848b-676848af7c48@redhat.com>
+ <1557962870.1877.1.camel@gmail.com>
 From:   Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -71,45 +72,122 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
  WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <426a5f6c-fe7c-f1ea-1e86-44467ec823fc@redhat.com>
-Date:   Fri, 17 May 2019 12:13:04 +0200
+Message-ID: <102f4c37-a1b2-5e33-3b98-f1c9422a0a4c@redhat.com>
+Date:   Fri, 17 May 2019 12:20:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190515002801.20517-2-sjitindarsingh@gmail.com>
+In-Reply-To: <1557962870.1877.1.camel@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 17 May 2019 10:13:15 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Fri, 17 May 2019 10:20:25 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/05/2019 02.28, Suraj Jitindar Singh wrote:
-> This test was initially designed to test for a known bug where
-> performing a sequence of H_CEDE hcalls while suspended would cause a
-> vcpu to lockup in the host. The fix has been available for some time
-> now, so to increase coverage of this test remove the no-default flag.
+On 16/05/2019 01.27, Suraj Jitindar Singh wrote:
+> On Wed, 2019-05-15 at 18:22 +0200, Laurent Vivier wrote:
+>> On 15/05/2019 02:28, Suraj Jitindar Singh wrote:
+>>> Currently the handler for a decrementer exception will simply
+>>> reload the
+>>> maximum value (0x7FFFFFFF), which will take ~4 seconds to expire
+>>> again.
+>>> This means that if a vcpu cedes, it will be ~4 seconds between
+>>> wakeups.
+>>>
+>>> The h_cede_tm test is testing a known breakage when a guest cedes
+>>> while
+>>> suspended. To be sure we cede 500 times to check for the bug.
+>>> However
+>>> since it takes ~4 seconds to be woken up once we've ceded, we only
+>>> get
+>>> through ~20 iterations before we reach the 90 seconds timeout and
+>>> the
+>>> test appears to fail.
+>>>
+>>> Add an option when registering the decrementer handler to specify
+>>> the
+>>> value which should be reloaded by the handler, allowing the timeout
+>>> to be
+>>> chosen.
+>>>
+>>> Modify the spr test to use the max timeout to preserve existing
+>>> behaviour.
+>>> Modify the h_cede_tm test to use a 10ms timeout to ensure we can
+>>> perform
+>>> 500 iterations before hitting the 90 second time limit for a test.
+>>>
+>>> This means the h_cede_tm test now succeeds rather than timing out.
+>>>
+>>> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+>>>
+>>> ---
+>>>
+>>> V1 -> V2:
+>>> - Make decr variables static
+>>> - Load intial decr value in tm test to ensure known value present
+>>> ---
+>>>  lib/powerpc/handlers.c | 7 ++++---
+>>>  powerpc/sprs.c         | 5 +++--
+>>>  powerpc/tm.c           | 4 +++-
+>>>  3 files changed, 10 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/lib/powerpc/handlers.c b/lib/powerpc/handlers.c
+>>> index be8226a..c8721e0 100644
+>>> --- a/lib/powerpc/handlers.c
+>>> +++ b/lib/powerpc/handlers.c
+>>> @@ -12,11 +12,12 @@
+>>>  
+>>>  /*
+>>>   * Generic handler for decrementer exceptions (0x900)
+>>> - * Just reset the decrementer back to its maximum value
+>>> (0x7FFFFFFF)
+>>> + * Just reset the decrementer back to the value specified when
+>>> registering the
+>>> + * handler
+>>>   */
+>>> -void dec_except_handler(struct pt_regs *regs __unused, void *data
+>>> __unused)
+>>> +void dec_except_handler(struct pt_regs *regs __unused, void *data)
+>>>  {
+>>> -	uint32_t dec = 0x7FFFFFFF;
+>>> +	uint64_t dec = *((uint64_t *) data);
+>>>  
+>>>  	asm volatile ("mtdec %0" : : "r" (dec));
+>>>  }
+>>> diff --git a/powerpc/sprs.c b/powerpc/sprs.c
+>>> index 6744bd8..0e2e1c9 100644
+>>> --- a/powerpc/sprs.c
+>>> +++ b/powerpc/sprs.c
+>>> @@ -253,6 +253,7 @@ int main(int argc, char **argv)
+>>>  		0x1234567890ABCDEFULL, 0xFEDCBA0987654321ULL,
+>>>  		-1ULL,
+>>>  	};
+>>> +	static uint64_t decr = 0x7FFFFFFF; /* Max value */
+>>>  
+>>>  	for (i = 1; i < argc; i++) {
+>>>  		if (!strcmp(argv[i], "-w")) {
+>>> @@ -288,8 +289,8 @@ int main(int argc, char **argv)
+>>>  		(void) getchar();
+>>>  	} else {
+>>>  		puts("Sleeping...\n");
+>>> -		handle_exception(0x900, &dec_except_handler,
+>>> NULL);
+>>> -		asm volatile ("mtdec %0" : : "r" (0x3FFFFFFF));
+>>> +		handle_exception(0x900, &dec_except_handler,
+>>> &decr);
+>>> +		asm volatile ("mtdec %0" : : "r" (decr));
+>>
+>> why do you replace the 0x3FFFFFFF by decr which is 0x7FFFFFFF?
 > 
-> Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-> ---
->  powerpc/unittests.cfg | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
-> index af535b7..1e74948 100644
-> --- a/powerpc/unittests.cfg
-> +++ b/powerpc/unittests.cfg
-> @@ -64,7 +64,7 @@ file = emulator.elf
->  file = tm.elf
->  smp = 2,threads=2
->  extra_params = -machine cap-htm=on -append "h_cede_tm"
-> -groups = nodefault,h_cede_tm
-> +groups = h_cede_tm
->  
->  [sprs]
->  file = sprs.elf
+> Oh yeah, my mistake. I mis-read and thought they were the same. Is
+> there any reason it was 0x3FFFFFFF? Can this be fixed up when applying
+> or should I resend?
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+Should be fine to fix this when the patch gets picked up. With the value
+fixed:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
