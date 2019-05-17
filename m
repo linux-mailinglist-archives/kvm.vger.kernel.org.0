@@ -2,129 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BE56921A02
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 16:49:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0882121AD3
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 17:42:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729109AbfEQOtk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 May 2019 10:49:40 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:44286 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729041AbfEQOtk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 May 2019 10:49:40 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C624E1715;
-        Fri, 17 May 2019 07:49:39 -0700 (PDT)
-Received: from arrakis.emea.arm.com (arrakis.cambridge.arm.com [10.1.196.78])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3BA583F71E;
-        Fri, 17 May 2019 07:49:34 -0700 (PDT)
-Date:   Fri, 17 May 2019 15:49:31 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
-Message-ID: <20190517144931.GA56186@arrakis.emea.arm.com>
-References: <cover.1557160186.git.andreyknvl@google.com>
+        id S1729214AbfEQPlq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 May 2019 11:41:46 -0400
+Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:13948 "EHLO
+        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728861AbfEQPlp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 May 2019 11:41:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1558107704; x=1589643704;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:mime-version:
+   content-transfer-encoding;
+  bh=5PwOvUa2QeUYezBMIw7pLuLH7aeDi9x8dxh6Bcuj1T0=;
+  b=pkPNEBpTfId2pSiHw35G46whRha12mw7LuOjkWbLFW2QpZWK7Pd+iACu
+   O9gxMfRMILX+TNuS8NM+T6gt8jmnEgS3RVQZ97Z/RbsbLBTnGrfhWnprs
+   fGsVAVV/HQWJ2e/faBWiCUigmoPh2x/kKqHIgD7t1w41Cx5QIu+r9lcCa
+   c=;
+X-IronPort-AV: E=Sophos;i="5.60,480,1549929600"; 
+   d="scan'208";a="402579638"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1e-57e1d233.us-east-1.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 17 May 2019 15:41:43 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1e-57e1d233.us-east-1.amazon.com (8.14.7/8.14.7) with ESMTP id x4HFffwv037521
+        (version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=FAIL);
+        Fri, 17 May 2019 15:41:42 GMT
+Received: from EX13D02EUC004.ant.amazon.com (10.43.164.117) by
+ EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 17 May 2019 15:41:41 +0000
+Received: from EX13D02EUC001.ant.amazon.com (10.43.164.92) by
+ EX13D02EUC004.ant.amazon.com (10.43.164.117) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 17 May 2019 15:41:40 +0000
+Received: from EX13D02EUC001.ant.amazon.com ([10.43.164.92]) by
+ EX13D02EUC001.ant.amazon.com ([10.43.164.92]) with mapi id 15.00.1367.000;
+ Fri, 17 May 2019 15:41:40 +0000
+From:   "Sironi, Filippo" <sironi@amazon.de>
+To:     "Graf, Alexander" <graf@amazon.com>
+CC:     LKML <linux-kernel@vger.kernel.org>,
+        KVM list <kvm@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+Subject: Re: [PATCH v2 1/2] KVM: Start populating /sys/hypervisor with KVM
+ entries
+Thread-Topic: [PATCH v2 1/2] KVM: Start populating /sys/hypervisor with KVM
+ entries
+Thread-Index: AQHVCmguTMwTmVyYP0+tMrT8Z/dQMaZtx8qAgAGxboA=
+Date:   Fri, 17 May 2019 15:41:39 +0000
+Message-ID: <3D2C4EE3-1C2E-4032-9964-31A066E542AA@amazon.de>
+References: <1539078879-4372-1-git-send-email-sironi@amazon.de>
+ <1557847002-23519-1-git-send-email-sironi@amazon.de>
+ <1557847002-23519-2-git-send-email-sironi@amazon.de>
+ <e976f31b-2ccd-29ba-6a32-2edde49f867f@amazon.com>
+In-Reply-To: <e976f31b-2ccd-29ba-6a32-2edde49f867f@amazon.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.165.155]
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <10D2265497ECB941BB8FCEB5614DF2F7@amazon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1557160186.git.andreyknvl@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andrey,
 
-On Mon, May 06, 2019 at 06:30:46PM +0200, Andrey Konovalov wrote:
-> One of the alternative approaches to untagging that was considered is to
-> completely strip the pointer tag as the pointer enters the kernel with
-> some kind of a syscall wrapper, but that won't work with the countless
-> number of different ioctl calls. With this approach we would need a custom
-> wrapper for each ioctl variation, which doesn't seem practical.
+> On 16. May 2019, at 15:50, Graf, Alexander <graf@amazon.com> wrote:
+> =
 
-The more I look at this problem, the less convinced I am that we can
-solve it in a way that results in a stable ABI covering ioctls(). While
-for the Android kernel codebase it could be simpler as you don't upgrade
-the kernel version every 2.5 months, for the mainline kernel this
-doesn't scale. Any run-time checks are relatively limited in terms of
-drivers covered. Better static checking would be nice as a long term
-solution but we didn't get anywhere with the discussion last year.
+> On 14.05.19 08:16, Filippo Sironi wrote:
+>> Start populating /sys/hypervisor with KVM entries when we're running on
+>> KVM. This is to replicate functionality that's available when we're
+>> running on Xen.
+>> =
 
-IMO (RFC for now), I see two ways forward:
+>> Start with /sys/hypervisor/uuid, which users prefer over
+>> /sys/devices/virtual/dmi/id/product_uuid as a way to recognize a virtual
+>> machine, since it's also available when running on Xen HVM and on Xen PV
+>> and, on top of that doesn't require root privileges by default.
+>> Let's create arch-specific hooks so that different architectures can
+>> provide different implementations.
+>> =
 
-1. Make this a user space problem and do not allow tagged pointers into
-   the syscall ABI. A libc wrapper would have to convert structures,
-   parameters before passing them into the kernel. Note that we can
-   still support the hardware MTE in the kernel by enabling tagged
-   memory ranges, saving/restoring tags etc. but not allowing tagged
-   addresses at the syscall boundary.
+>> Signed-off-by: Filippo Sironi <sironi@amazon.de>
+> =
 
-2. Similar shim to the above libc wrapper but inside the kernel
-   (arch/arm64 only; most pointer arguments could be covered with an
-   __SC_CAST similar to the s390 one). There are two differences from
-   what we've discussed in the past:
+> I think this needs something akin to
+> =
 
-   a) this is an opt-in by the user which would have to explicitly call
-      prctl(). If it returns -ENOTSUPP etc., the user won't be allowed
-      to pass tagged pointers to the kernel. This would probably be the
-      responsibility of the C lib to make sure it doesn't tag heap
-      allocations. If the user did not opt-in, the syscalls are routed
-      through the normal path (no untagging address shim).
+>  https://www.kernel.org/doc/Documentation/ABI/stable/sysfs-hypervisor-xen
+> =
 
-   b) ioctl() and other blacklisted syscalls (prctl) will not accept
-      tagged pointers (to be documented in Vicenzo's ABI patches).
+> to document which files are available.
+> =
 
-It doesn't solve the problems we are trying to address but 2.a saves us
-from blindly relaxing the ABI without knowing how to easily assess new
-code being merged (over 500K lines between kernel versions). Existing
-applications (who don't opt-in) won't inadvertently start using the new
-ABI which could risk becoming de-facto ABI that we need to support on
-the long run.
+>> ---
+>> v2:
+>> * move the retrieval of the VM UUID out of uuid_show and into
+>>  kvm_para_get_uuid, which is a weak function that can be overwritten
+>> =
 
-Option 1 wouldn't solve the ioctl() problem either and while it makes
-things simpler for the kernel, I am aware that it's slightly more
-complicated in user space (but I really don't mind if you prefer option
-1 ;)).
+>> drivers/Kconfig              |  2 ++
+>> drivers/Makefile             |  2 ++
+>> drivers/kvm/Kconfig          | 14 ++++++++++++++
+>> drivers/kvm/Makefile         |  1 +
+>> drivers/kvm/sys-hypervisor.c | 30 ++++++++++++++++++++++++++++++
+>> 5 files changed, 49 insertions(+)
+>> create mode 100644 drivers/kvm/Kconfig
+>> create mode 100644 drivers/kvm/Makefile
+>> create mode 100644 drivers/kvm/sys-hypervisor.c
+>> =
 
-The tagged pointers (whether hwasan or MTE) should ideally be a
-transparent feature for the application writer but I don't think we can
-solve it entirely and make it seamless for the multitude of ioctls().
-I'd say you only opt in to such feature if you know what you are doing
-and the user code takes care of specific cases like ioctl(), hence the
-prctl() proposal even for the hwasan.
+> =
 
-Comments welcomed.
+> [...]
+> =
 
--- 
-Catalin
+>> +
+>> +__weak const char *kvm_para_get_uuid(void)
+>> +{
+>> +	return NULL;
+>> +}
+>> +
+>> +static ssize_t uuid_show(struct kobject *obj,
+>> +			 struct kobj_attribute *attr,
+>> +			 char *buf)
+>> +{
+>> +	const char *uuid =3D kvm_para_get_uuid();
+>> +	return sprintf(buf, "%s\n", uuid);
+> =
+
+> The usual return value for the Xen /sys/hypervisor interface is
+> "<denied>". Wouldn't it make sense to follow that pattern for the KVM
+> one too? Currently, if we can not determine the UUID this will just
+> return (null).
+> =
+
+> Otherwise, looks good to me. Are you aware of any other files we should
+> provide? Also, is there any reason not to implement ARM as well while at =
+it?
+> =
+
+> Alex
+
+This originated from a customer request that was using /sys/hypervisor/uuid.
+My guess is that we would want to expose "type" and "version" moving
+forward and that's when we hypervisor hooks will be useful on top
+of arch hooks.
+
+On a different note, any idea how to check whether the OS is running
+virtualized on KVM on ARM and ARM64?  kvm_para_available() isn't an
+option and the same is true for S390 where kvm_para_available()
+always returns true and it would even if a KVM enabled kernel would
+be running on bare metal.
+
+I think we will need another arch hook to call a function that says
+whether the OS is running virtualized on KVM.
+
+>> +}
+>> +
+>> +static struct kobj_attribute uuid =3D __ATTR_RO(uuid);
+>> +
+>> +static int __init uuid_init(void)
+>> +{
+>> +	if (!kvm_para_available())
+>> +		return 0;
+>> +	return sysfs_create_file(hypervisor_kobj, &uuid.attr);
+>> +}
+>> +
+>> +device_initcall(uuid_init);
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrer: Christian Schlaeger, Ralf Herbrich
+Ust-ID: DE 289 237 879
+Eingetragen am Amtsgericht Charlottenburg HRB 149173 B
+
+
