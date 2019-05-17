@@ -2,53 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C04021D62
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 20:36:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A48D21DB8
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 20:48:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728762AbfEQSfW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 May 2019 14:35:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41728 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727984AbfEQSfV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 May 2019 14:35:21 -0400
-Subject: Re: [GIT PULL] KVM changes for 5.2 merge window
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558118121;
-        bh=dBoheXLcKwaJdtIdj1gCODQxnjGJGXPs5QUcffxdf8U=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=eRSrcb5T51S8XbF+acLCOIy6V59DJLVTOY8FVM2Dq74Jkjxb1swgAm1ZuPTWSTGFR
-         W+42GyFEKer9FO2sKxDDrdPA1nZeRlxTy2QBW7ZOmZtuOwz41h/CpEWNS+3iSGWv8m
-         G9asvc2ZLk0UXsuGlQ5ichPPBlmaQYYTBGgK0F/8=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <1558065576-21115-1-git-send-email-pbonzini@redhat.com>
-References: <1558065576-21115-1-git-send-email-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <1558065576-21115-1-git-send-email-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git
- tags/for-linus
-X-PR-Tracked-Commit-Id: dd53f6102c30a774e0db8e55d49017a38060f6f6
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: c011d23ba046826ccf8c4a4a6c1d01c9ccaa1403
-Message-Id: <155811812120.11644.15152833429360428605.pr-tracker-bot@kernel.org>
-Date:   Fri, 17 May 2019 18:35:21 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        rkrcmar@redhat.com, kvm@vger.kernel.org
+        id S1729375AbfEQSrX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 May 2019 14:47:23 -0400
+Received: from shards.monkeyblade.net ([23.128.96.9]:46380 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729127AbfEQSrW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 May 2019 14:47:22 -0400
+Received: from localhost (unknown [IPv6:2601:601:9f80:35cd::3d8])
+        (using TLSv1 with cipher AES256-SHA (256/256 bits))
+        (Client did not present a certificate)
+        (Authenticated sender: davem-davemloft)
+        by shards.monkeyblade.net (Postfix) with ESMTPSA id 760DB13E2B9D7;
+        Fri, 17 May 2019 11:47:21 -0700 (PDT)
+Date:   Fri, 17 May 2019 11:47:20 -0700 (PDT)
+Message-Id: <20190517.114720.1616258447183708235.davem@davemloft.net>
+To:     sgarzare@redhat.com
+Cc:     netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        stefanha@redhat.com, stable@vger.kernel.org
+Subject: Re: [PATCH v3] vsock/virtio: free packets during the socket release
+From:   David Miller <davem@davemloft.net>
+In-Reply-To: <20190517144543.362935-1-sgarzare@redhat.com>
+References: <20190517144543.362935-1-sgarzare@redhat.com>
+X-Mailer: Mew version 6.8 on Emacs 26.1
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Fri, 17 May 2019 11:47:21 -0700 (PDT)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Fri, 17 May 2019 05:59:36 +0200:
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Fri, 17 May 2019 16:45:43 +0200
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+> When the socket is released, we should free all packets
+> queued in the per-socket list in order to avoid a memory
+> leak.
+> 
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/c011d23ba046826ccf8c4a4a6c1d01c9ccaa1403
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+Applied and queued up for -stable.
