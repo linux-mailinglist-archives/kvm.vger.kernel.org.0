@@ -2,51 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2950D21CC8
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 19:47:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B562621CCA
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 19:48:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726872AbfEQRr3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 May 2019 13:47:29 -0400
-Received: from mail-it1-f196.google.com ([209.85.166.196]:38129 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725932AbfEQRr3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 May 2019 13:47:29 -0400
-Received: by mail-it1-f196.google.com with SMTP id i63so13337144ita.3
-        for <kvm@vger.kernel.org>; Fri, 17 May 2019 10:47:29 -0700 (PDT)
+        id S1727585AbfEQRsP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 May 2019 13:48:15 -0400
+Received: from mail-it1-f194.google.com ([209.85.166.194]:37564 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725932AbfEQRsP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 May 2019 13:48:15 -0400
+Received: by mail-it1-f194.google.com with SMTP id m140so13364888itg.2
+        for <kvm@vger.kernel.org>; Fri, 17 May 2019 10:48:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=IK28MJD2iFmE9+Gx2woqqyhNagawB06wV7GHXJ2nXyQ=;
-        b=Hyu4OCUWSc4JD+46pFpzlNgSUamRQhTpIqszayhM784WQ05sJNWkH7vsP8Ept2Qcrk
-         VlJ/WCrRNZxaP3pVwVky4sraTIoLZMP8H/y5VFBvb4gqTNb1LEfRJH2qWjHu7m1IGDbF
-         3jUxC3WRGYzvXaubI7Vs7IFQCgPnTA7ON+vzPaJJNfPQvH1OxJ9wKxdsvH+jwX5Mjfi5
-         bihgsWgO+CP40V9KNB7BNYLHvZrabZdDVZaA/WTOwpQz4+XziuiJCls35aMiep2nso+C
-         GdxK1t18H5fG5emB76afTyaBqVmSvClzS4GgAoL6RjRjfMQtRdNCpHLVuvSsUt+whcmx
-         7D7A==
+        bh=6b5WEJzWjojzN3ELA/9vFJA63IZyJZqOxvIv2wQUKE4=;
+        b=KdgOrsFjsiZDyMw0KYS0I32yg6+Kvf9XeIskoWeJhVmszQo8t6q2kTE18C//Qeje52
+         MOwTUZLfnYnoKau3iCkf0lkfvfSUGauDdtuKlOwAMEfywLvmJJhenU+PaWdqoXS7/qrx
+         IMAlNB4+Ud+EWH8wECrvLjuWf1E+aWKLYaz60wMRopW0aGqfU0y3iHArCTcU+XZUiJOo
+         4nMvlXV/0bE1jLCmeEgtz4+NL0cSybmdAuxmkiqOyCzHitEW62WLb8bdbfIdY5xIV00+
+         zt0kuil23Kub0uXERg64okovRBz1h1UK1aWWAlOWZYocekNdTd+piMfUKxuJ1LZ6mwkf
+         K6UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=IK28MJD2iFmE9+Gx2woqqyhNagawB06wV7GHXJ2nXyQ=;
-        b=sADPZZbIC5RdmhOQOA9f+klT34DzBuirYloSF5OFRyqz93ma8CQEzEccLG1Cx0Ci73
-         On1SuOpXNtGf8hG8SAj1haN9WN0nKawYG1W1Qn7myf3tVJwm8+O5TK2aa4aFEe2OucYM
-         fKZKRz+F/u1otHIFGOkQUwduvtaOZyeHcZO7GNdOF8skRB6DRyIqVokYIQzJTRAwQITu
-         oH9LQI8kI4knW+gHbtMtjYBL5t5yNkq6rJVTqd03FuLi3TZC8DEYgKupL0V3aMsAmptY
-         6nB+2qmvudb116bbchoFLdi2vCSlax3YGAXbxKd9mipTW7PlW7hmzCxDLA0RuN4Ff/aV
-         uV4Q==
-X-Gm-Message-State: APjAAAW716d76pblkAA3ZWe3NbbGOa05SydD4RJwmZUP5bfDGPceI8TE
-        4CGg48NePQoG/rybmBHCyiN46qkeUVJBxdR1sbnchg==
-X-Google-Smtp-Source: APXvYqyQZkGYsHC2I///F75ESdV7p/RjZTMmfl6WaICkf+Ov3p/m04pInF7n8xfWmkFR8tooBhzUNAB5D/Ki7NMCTmE=
-X-Received: by 2002:a02:234b:: with SMTP id u72mr4000614jau.4.1558115248380;
- Fri, 17 May 2019 10:47:28 -0700 (PDT)
+        bh=6b5WEJzWjojzN3ELA/9vFJA63IZyJZqOxvIv2wQUKE4=;
+        b=IVVZ8xqjFdGRJSXFfI/xrTc8GoFlYh9hSSS8Q7DNb/eGTTDci0qsbvPDtW6HEmRFCZ
+         0JNWu+vbDCNPlX2jCHuqQ+PH69HnHIS3zLN/s6L1KpF1ztWa7+buFXirnVSh0JMegOEk
+         amP/BeaIyviha+xByFpRmTc0lkvYPup+/q+a4zspvgC6DwubcIMrCch3CDPNPHKkcbBm
+         HZ6nVDFNw0MKxJ3syOJ93DH6cJIl41UAG4bv4bvTGnhdvNQ2eAdVUKHLs1NJJFA331lu
+         yENM/pMCM/nDw0K4Kax2jqtM/5tJsWhs1pDdpCehPyKepAw2ebAGjJW6qlcjON82wjY8
+         p6Vg==
+X-Gm-Message-State: APjAAAU/2iZDHdbHJifax5cebZBVQOz0Cpb7vPmULewO3+OLf4MPMC/k
+        KCQDrqXN2myO0Z0W0QsBpNFx5nIYN3ryxREjKcMWI1hxS/M=
+X-Google-Smtp-Source: APXvYqyXEG4PYFy50O7fTZ5LNlqHdtUpzxc4qM5m39RgaTuKKbaElcvmrodCItg/uhZLvRKEVGos/pzbOx/LBr7yKEE=
+X-Received: by 2002:a24:5255:: with SMTP id d82mr19710221itb.104.1558115294120;
+ Fri, 17 May 2019 10:48:14 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190327201537.77350-1-jmattson@google.com> <20190401170616.GC28514@zn.tnic>
-In-Reply-To: <20190401170616.GC28514@zn.tnic>
+References: <20190327201537.77350-1-jmattson@google.com> <20190327201537.77350-2-jmattson@google.com>
+ <20190401171304.GD28514@zn.tnic>
+In-Reply-To: <20190401171304.GD28514@zn.tnic>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 17 May 2019 10:47:17 -0700
-Message-ID: <CALMp9eSEkKK+v4mR4-9pcO6mKUT6Fs2m3KTwQLdrNWf3DKhpJg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kvm: x86: Include multiple indices with CPUID leaf 0x8000001d
+Date:   Fri, 17 May 2019 10:48:03 -0700
+Message-ID: <CALMp9eRbe8VWzhGcs_HB0gBT5EQN4PCtop5am9j+-WG5pK8r8w@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kvm: x86: Include CPUID leaf 0x8000001e in kvm's
+ supported CPUID
 To:     Borislav Petkov <bp@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm list <kvm@vger.kernel.org>,
         Brijesh Singh <brijesh.singh@amd.com>,
@@ -57,29 +59,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Apr 1, 2019 at 10:06 AM Borislav Petkov <bp@suse.de> wrote:
+On Mon, Apr 1, 2019 at 10:13 AM Borislav Petkov <bp@suse.de> wrote:
 >
-> On Wed, Mar 27, 2019 at 01:15:36PM -0700, Jim Mattson wrote:
-> > Per the APM, "CPUID Fn8000_001D_E[D,C,B,A]X reports cache topology
-> > information for the cache enumerated by the value passed to the
-> > instruction in ECX, referred to as Cache n in the following
-> > description. To gather information for all cache levels, software must
-> > repeatedly execute CPUID with 8000_001Dh in EAX and ECX set to
-> > increasing values beginning with 0 until a value of 00h is returned in
-> > the field CacheType (EAX[4:0]) indicating no more cache descriptions
-> > are available for this processor."
+> On Wed, Mar 27, 2019 at 01:15:37PM -0700, Jim Mattson wrote:
+> > Kvm now supports extended CPUID functions through 0x8000001f.  CPUID
+> > leaf 0x8000001e is AMD's Processor Topology Information leaf. This
+> > contains similar information to CPUID leaf 0xb (Intel's Extended
+> > Topology Enumeration leaf), and should be included in the output of
+> > KVM_GET_SUPPORTED_CPUID, even though userspace is likely to override
+> > some of this information based upon the configuration of the
+> > particular VM.
 > >
-> > The termination condition is the same as leaf 4, so we can reuse that
-> > code block for leaf 0x8000001d.
-> >
-> > Fixes: 8765d75329a38 ("KVM: X86: Extend CPUID range to include new leaf")
 > > Cc: Brijesh Singh <brijesh.singh@amd.com>
 > > Cc: Borislav Petkov <bp@suse.de>
+> > Fixes: 8765d75329a38 ("KVM: X86: Extend CPUID range to include new leaf")
 > > Signed-off-by: Jim Mattson <jmattson@google.com>
 > > Reviewed-by: Marc Orr <marcorr@google.com>
 > > ---
-> >  arch/x86/kvm/cpuid.c | 7 +++----
-> >  1 file changed, 3 insertions(+), 4 deletions(-)
+> >  arch/x86/kvm/cpuid.c | 1 +
+> >  1 file changed, 1 insertion(+)
 >
 > Reviewed-by: Borislav Petkov <bp@suse.de>
 
