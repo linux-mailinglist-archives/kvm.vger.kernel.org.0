@@ -2,350 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 499C321799
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 13:22:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4B68217E3
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 13:49:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728808AbfEQLWL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 May 2019 07:22:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41394 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728803AbfEQLWL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 May 2019 07:22:11 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A4541C09AD18;
-        Fri, 17 May 2019 11:22:10 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 68803173C5;
-        Fri, 17 May 2019 11:22:09 +0000 (UTC)
-Date:   Fri, 17 May 2019 13:22:06 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kwankhede@nvidia.com, alex.williamson@redhat.com, cjia@nvidia.com
-Subject: Re: [PATCHv3 3/3] vfio/mdev: Synchronize device create/remove with
- parent removal
-Message-ID: <20190517132207.12d823f2.cohuck@redhat.com>
-In-Reply-To: <20190516233034.16407-4-parav@mellanox.com>
-References: <20190516233034.16407-1-parav@mellanox.com>
-        <20190516233034.16407-4-parav@mellanox.com>
-Organization: Red Hat GmbH
+        id S1727221AbfEQLth (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 May 2019 07:49:37 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:46210 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727975AbfEQLth (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 May 2019 07:49:37 -0400
+Received: by mail-pg1-f194.google.com with SMTP id t187so3187157pgb.13
+        for <kvm@vger.kernel.org>; Fri, 17 May 2019 04:49:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qjpZSW9P86hUhxCXQpbZYJLTAJv9t1jQ7A46fddIkiA=;
+        b=c37tIkL5L7g63ADe0AWuEu0kp57Gj2pkRm566pgvGASQEvsa2Bl+zojm/fcbBd4GBc
+         p1Hn0ed1MDLl3wSko9So/VkRmZFrB0NwBim6Fi56xodpH9FX9QgpEg7zLjzY4i1fTp1t
+         NV8LeVy5oBWqXbgXQn5vuUWL5a12fFc8p2rxRavFkSfCDei9hu04PbsPwCnC99i7Z5V5
+         o2Hjq0wkKo8MDetlQXbqDi+wIaj3QqG27IMjaL4A8Lw480dRwHoD/uMnvu761N9t/X8Y
+         Hwvk8xU3ro3qXDyRjQaDEx6y6d4+Bo2QD71XAgKA0R/4cac/K1hx3twboFqv7PKWyVzI
+         0Eew==
+X-Gm-Message-State: APjAAAUfaCvh9rHod0u+EpmbZh1E+D0OhXn/Uk1K6C/18HQOWQyfD+ah
+        EUoBUerv8IkJT+jmOP+KkUEmH3LWAr8=
+X-Google-Smtp-Source: APXvYqy3OmP/a8Gvw7GrWFbJxOIprB9wNBP4LNhgib6Y9emzTZAqgh4TdJZx/l+wp5UNgszQx6m5PQ==
+X-Received: by 2002:a63:4f16:: with SMTP id d22mr13102896pgb.148.1558093775894;
+        Fri, 17 May 2019 04:49:35 -0700 (PDT)
+Received: from [172.27.174.155] (23-24-245-129-static.hfc.comcastbusiness.net. [23.24.245.129])
+        by smtp.gmail.com with ESMTPSA id l7sm4565036pfl.9.2019.05.17.04.49.34
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 17 May 2019 04:49:35 -0700 (PDT)
+Subject: Re: [GIT PULL] KVM changes for 5.2 merge window
+To:     Nathan Chancellor <natechancellor@gmail.com>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        rkrcmar@redhat.com, kvm@vger.kernel.org
+References: <1558065576-21115-1-git-send-email-pbonzini@redhat.com>
+ <20190517062214.GA127599@archlinux-epyc>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a8170dab-7c7d-de3d-9461-9eecb73026ff@redhat.com>
+Date:   Fri, 17 May 2019 13:49:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Fri, 17 May 2019 11:22:10 +0000 (UTC)
+In-Reply-To: <20190517062214.GA127599@archlinux-epyc>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 16 May 2019 18:30:34 -0500
-Parav Pandit <parav@mellanox.com> wrote:
-
-> In following sequences, child devices created while removing mdev parent
-> device can be left out, or it may lead to race of removing half
-> initialized child mdev devices.
+On 17/05/19 08:22, Nathan Chancellor wrote:
+> On Fri, May 17, 2019 at 05:59:36AM +0200, Paolo Bonzini wrote:
+>> Linus,
+>>
+>> The following changes since commit 7a223e06b1a411cef6c4cd7a9b9a33c8d225b10e:
+>>
+>>   KVM: x86: avoid misreporting level-triggered irqs as edge-triggered in tracing (2019-04-16 15:38:08 +0200)
+>>
+>> are available in the git repository at:
+>>
+>>   https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+>>
+>> for you to fetch changes up to dd53f6102c30a774e0db8e55d49017a38060f6f6:
+>>
+>>   Merge tag 'kvmarm-for-v5.2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2019-05-15 23:41:43 +0200)
+>>
+>> ----------------------------------------------------------------
+>>
+>> * ARM: support for SVE and Pointer Authentication in guests, PMU improvements
+>>
+>> * POWER: support for direct access to the POWER9 XIVE interrupt controller,
+>> memory and performance optimizations.
+>>
+>> * x86: support for accessing memory not backed by struct page, fixes and refactoring
+>>
+>> * Generic: dirty page tracking improvements
+>>
+>> ----------------------------------------------------------------
+>> Aaron Lewis (5):
+>>       tests: kvm: Add tests to .gitignore
+>>       tests: kvm: Add tests for KVM_CAP_MAX_VCPUS and KVM_CAP_MAX_CPU_ID
+>>       KVM: nVMX: KVM_SET_NESTED_STATE - Tear down old EVMCS state before setting new state
+>>       tests: kvm: Add tests for KVM_SET_NESTED_STATE
+>>       kvm: nVMX: Set nested_run_pending in vmx_set_nested_state after checks complete
+>>
+>> Alexey Kardashevskiy (3):
+>>       KVM: PPC: Book3S HV: Fix lockdep warning when entering the guest
+>>       KVM: PPC: Book3S HV: Avoid lockdep debugging in TCE realmode handlers
+>>       KVM: PPC: Book3S: Allocate guest TCEs on demand too
+>>
+>> Amit Daniel Kachhap (3):
+>>       KVM: arm64: Add a vcpu flag to control ptrauth for guest
+>>       KVM: arm64: Add userspace flag to enable pointer authentication
+>>       KVM: arm64: Add capability to advertise ptrauth for guest
+>>
+>> Andrew Murray (9):
+>>       arm64: arm_pmu: Remove unnecessary isb instruction
+>>       arm64: KVM: Encapsulate kvm_cpu_context in kvm_host_data
+>>       arm64: KVM: Add accessors to track guest/host only counters
+>>       arm64: arm_pmu: Add !VHE support for exclude_host/exclude_guest attributes
+>>       arm64: KVM: Enable !VHE support for :G/:H perf event modifiers
+>>       arm64: KVM: Enable VHE support for :G/:H perf event modifiers
+>>       arm64: KVM: Avoid isb's by using direct pmxevtyper sysreg
+>>       arm64: docs: Document perf event attributes
+>>       arm64: KVM: Fix perf cycle counter support for VHE
+>>
+>> Borislav Petkov (1):
+>>       x86/kvm: Implement HWCR support
+>>
+>> Christian Borntraeger (9):
+>>       KVM: s390: add vector enhancements facility 2 to cpumodel
+>>       KVM: s390: add vector BCD enhancements facility to cpumodel
+>>       KVM: s390: add MSA9 to cpumodel
+>>       KVM: s390: provide query function for instructions returning 32 byte
+>>       KVM: s390: add enhanced sort facilty to cpu model
+>>       KVM: s390: add deflate conversion facilty to cpu model
+>>       KVM: s390: enable MSA9 keywrapping functions depending on cpu model
+>>       KVM: polling: add architecture backend to disable polling
+>>       KVM: s390: provide kvm_arch_no_poll function
+>>
+>> Colin Ian King (1):
+>>       KVM: PPC: Book3S HV: XIVE: Fix spelling mistake "acessing" -> "accessing"
+>>
+>> Cédric Le Goater (18):
+>>       powerpc/xive: add OPAL extensions for the XIVE native exploitation support
+>>       KVM: PPC: Book3S HV: Add a new KVM device for the XIVE native exploitation mode
+>>       KVM: PPC: Book3S HV: XIVE: Introduce a new capability KVM_CAP_PPC_IRQ_XIVE
+>>       KVM: PPC: Book3S HV: XIVE: add a control to initialize a source
+>>       KVM: PPC: Book3S HV: XIVE: Add a control to configure a source
+>>       KVM: PPC: Book3S HV: XIVE: Add controls for the EQ configuration
+>>       KVM: PPC: Book3S HV: XIVE: Add a global reset control
+>>       KVM: PPC: Book3S HV: XIVE: Add a control to sync the sources
+>>       KVM: PPC: Book3S HV: XIVE: Add a control to dirty the XIVE EQ pages
+>>       KVM: PPC: Book3S HV: XIVE: Add get/set accessors for the VP XIVE state
+>>       KVM: Introduce a 'mmap' method for KVM devices
+>>       KVM: PPC: Book3S HV: XIVE: Add a TIMA mapping
+>>       KVM: PPC: Book3S HV: XIVE: Add a mapping for the source ESB pages
+>>       KVM: PPC: Book3S HV: XIVE: Add passthrough support
+>>       KVM: PPC: Book3S HV: XIVE: Activate XIVE exploitation mode
+>>       KVM: Introduce a 'release' method for KVM devices
+>>       KVM: PPC: Book3S HV: XIVE: Replace the 'destroy' method by a 'release' method
+>>       KVM: PPC: Book3S: Remove useless checks in 'release' method of KVM device
+>>
+>> Dan Carpenter (1):
+>>       KVM: vmx: clean up some debug output
+>>
+>> Dave Martin (41):
+>>       KVM: Documentation: Document arm64 core registers in detail
+>>       arm64: fpsimd: Always set TIF_FOREIGN_FPSTATE on task state flush
+>>       KVM: arm64: Delete orphaned declaration for __fpsimd_enabled()
+>>       KVM: arm64: Refactor kvm_arm_num_regs() for easier maintenance
+>>       KVM: arm64: Add missing #includes to kvm_host.h
+>>       arm64/sve: Clarify role of the VQ map maintenance functions
+>>       arm64/sve: Check SVE virtualisability
+>>       arm64/sve: Enable SVE state tracking for non-task contexts
+>>       KVM: arm64: Add a vcpu flag to control SVE visibility for the guest
+>>       KVM: arm64: Propagate vcpu into read_id_reg()
+>>       KVM: arm64: Support runtime sysreg visibility filtering
+>>       KVM: arm64/sve: System register context switch and access support
+>>       KVM: arm64/sve: Context switch the SVE registers
+>>       KVM: Allow 2048-bit register access via ioctl interface
+>>       KVM: arm64: Add missing #include of <linux/string.h> in guest.c
+>>       KVM: arm64: Factor out core register ID enumeration
+>>       KVM: arm64: Reject ioctl access to FPSIMD V-regs on SVE vcpus
+>>       KVM: arm64/sve: Add SVE support to register access ioctl interface
+>>       KVM: arm64: Enumerate SVE register indices for KVM_GET_REG_LIST
+>>       arm64/sve: In-kernel vector length availability query interface
+>>       KVM: arm/arm64: Add hook for arch-specific KVM initialisation
+>>       KVM: arm/arm64: Add KVM_ARM_VCPU_FINALIZE ioctl
+>>       KVM: arm64/sve: Add pseudo-register for the guest's vector lengths
+>>       KVM: arm64/sve: Allow userspace to enable SVE for vcpus
+>>       KVM: arm64: Add a capability to advertise SVE support
+>>       KVM: Document errors for KVM_GET_ONE_REG and KVM_SET_ONE_REG
+>>       KVM: arm64/sve: Document KVM API extensions for SVE
+>>       arm64/sve: Clarify vq map semantics
+>>       KVM: arm/arm64: Demote kvm_arm_init_arch_resources() to just set up SVE
+>>       KVM: arm: Make vcpu finalization stubs into inline functions
+>>       KVM: arm64/sve: sys_regs: Demote redundant vcpu_has_sve() checks to WARNs
+>>       KVM: arm64/sve: Clean up UAPI register ID definitions
+>>       KVM: arm64/sve: Miscellaneous tidyups in guest.c
+>>       KVM: arm64/sve: Make register ioctl access errors more consistent
+>>       KVM: arm64/sve: WARN when avoiding divide-by-zero in sve_reg_to_region()
+>>       KVM: arm64/sve: Simplify KVM_REG_ARM64_SVE_VLS array sizing
+>>       KVM: arm64/sve: Explain validity checks in set_sve_vls()
+>>       KVM: arm/arm64: Clean up vcpu finalization function parameter naming
+>>       KVM: Clarify capability requirements for KVM_ARM_VCPU_FINALIZE
+>>       KVM: Clarify KVM_{SET,GET}_ONE_REG error code documentation
+>>       KVM: arm64: Clarify access behaviour for out-of-range SVE register slice IDs
+>>
+>> Eric Farman (1):
+>>       KVM: s390: Fix potential spectre warnings
+>>
+>> Filippo Sironi (1):
+>>       X86/KVM: Handle PFNs outside of kernel reach when touching GPTEs
+>>
+>> Jiang Biao (1):
+>>       kvm_main: fix some comments
+>>
+>> Kai Huang (1):
+>>       kvm: x86: Fix L1TF mitigation for shadow MMU
+>>
+>> KarimAllah Ahmed (13):
+>>       X86/nVMX: handle_vmon: Read 4 bytes from guest memory
+>>       X86/nVMX: Update the PML table without mapping and unmapping the page
+>>       KVM: Introduce a new guest mapping API
 > 
-> issue-1:
-> --------
->        cpu-0                         cpu-1
->        -----                         -----
->                                   mdev_unregister_device()
->                                     device_for_each_child()
->                                       mdev_device_remove_cb()
->                                         mdev_device_remove()
-> create_store()
->   mdev_device_create()                   [...]
->     device_add()
->                                   parent_remove_sysfs_files()
+> This commit causes a build failure on arm64 defconfig:
 > 
-> /* BUG: device added by cpu-0
->  * whose parent is getting removed
->  * and it won't process this mdev.
->  */
+> $ make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- O=out defconfig Image.gz
+> ...
+>     ../arch/arm64/kvm/../../../virt/kvm/kvm_main.c: In function '__kvm_map_gfn':
+> ../arch/arm64/kvm/../../../virt/kvm/kvm_main.c:1763:9: error: implicit declaration of function 'memremap'; did you mean 'memset_p'? [-Werror=implicit-function-declaration]
+>    hva = memremap(pfn_to_hpa(pfn), PAGE_SIZE, MEMREMAP_WB);
+>          ^~~~~~~~
+>          memset_p
+>   CC      kernel/cgroup/rstat.o
+> ../arch/arm64/kvm/../../../virt/kvm/kvm_main.c:1763:46: error: 'MEMREMAP_WB' undeclared (first use in this function)
+>    hva = memremap(pfn_to_hpa(pfn), PAGE_SIZE, MEMREMAP_WB);
+>                                               ^~~~~~~~~~~
+> ../arch/arm64/kvm/../../../virt/kvm/kvm_main.c:1763:46: note: each undeclared identifier is reported only once for each function it appears in
+> ../arch/arm64/kvm/../../../virt/kvm/kvm_main.c: In function 'kvm_vcpu_unmap':
+> ../arch/arm64/kvm/../../../virt/kvm/kvm_main.c:1795:3: error: implicit declaration of function 'memunmap'; did you mean 'vm_munmap'? [-Werror=implicit-function-declaration]
+>    memunmap(map->hva);
+>    ^~~~~~~~
+>    vm_munmap
 > 
-> issue-2:
-> --------
-> Below crash is observed when user initiated remove is in progress
-> and mdev_unregister_driver() completes parent unregistration.
-> 
->        cpu-0                         cpu-1
->        -----                         -----
-> remove_store()
->    mdev_device_remove()
->    active = false;
->                                   mdev_unregister_device()
->                                   parent device removed.
->    [...]
->    parents->ops->remove()
->  /*
->   * BUG: Accessing invalid parent.
->   */
-> 
-> This is similar race like create() racing with mdev_unregister_device().
-> 
-> BUG: unable to handle kernel paging request at ffffffffc0585668
-> PGD e8f618067 P4D e8f618067 PUD e8f61a067 PMD 85adca067 PTE 0
-> Oops: 0000 [#1] SMP PTI
-> CPU: 41 PID: 37403 Comm: bash Kdump: loaded Not tainted 5.1.0-rc6-vdevbus+ #6
-> Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS 2.0b 08/09/2016
-> RIP: 0010:mdev_device_remove+0xfa/0x140 [mdev]
-> Call Trace:
->  remove_store+0x71/0x90 [mdev]
->  kernfs_fop_write+0x113/0x1a0
->  vfs_write+0xad/0x1b0
->  ksys_write+0x5a/0xe0
->  do_syscall_64+0x5a/0x210
->  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> 
-> Therefore, mdev core is improved as below to overcome above issues.
-> 
-> Wait for any ongoing mdev create() and remove() to finish before
-> unregistering parent device using refcount and completion.
-> This continues to allow multiple create and remove to progress in
-> parallel for different mdev devices as most common case.
-> At the same time guard parent removal while parent is being access by
-> create() and remove callbacks.
-> 
-> Code is simplified from kref to use refcount as unregister_device() has
-> to wait anyway for all create/remove to finish.
-> 
-> While removing mdev devices during parent unregistration, there isn't
-> need to acquire refcount of parent device, hence code is restructured
-> using mdev_device_remove_common() to avoid it.
-> 
-> Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
-> Signed-off-by: Parav Pandit <parav@mellanox.com>
-> ---
->  drivers/vfio/mdev/mdev_core.c    | 86 ++++++++++++++++++++------------
->  drivers/vfio/mdev/mdev_private.h |  6 ++-
->  2 files changed, 60 insertions(+), 32 deletions(-)
+> It seems that the <asm/io.h> include should probably be converted into
+> <linux/io.h>.
 
-I'm still not quite happy with this patch. I think most of my dislike
-comes from how you are using a member called 'refcount' vs. what I
-believe a refcount actually is. See below.
+Ouch, thanks. :/  I'll send a new pull request as soon as I finish
+testing the change you suggested.
 
-> 
-> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-> index 0bef0cae1d4b..ca33246c1dc3 100644
-> --- a/drivers/vfio/mdev/mdev_core.c
-> +++ b/drivers/vfio/mdev/mdev_core.c
-> @@ -78,34 +78,41 @@ static struct mdev_parent *__find_parent_device(struct device *dev)
->  	return NULL;
->  }
->  
-> -static void mdev_release_parent(struct kref *kref)
-> +static bool mdev_try_get_parent(struct mdev_parent *parent)
->  {
-> -	struct mdev_parent *parent = container_of(kref, struct mdev_parent,
-> -						  ref);
-> -	struct device *dev = parent->dev;
-> -
-> -	kfree(parent);
-> -	put_device(dev);
-> +	if (parent)
-> +		return refcount_inc_not_zero(&parent->refcount);
-> +	return false;
->  }
->  
-> -static struct mdev_parent *mdev_get_parent(struct mdev_parent *parent)
-> +static void mdev_put_parent(struct mdev_parent *parent)
->  {
-> -	if (parent)
-> -		kref_get(&parent->ref);
-> -
-> -	return parent;
-> +	if (parent && refcount_dec_and_test(&parent->refcount))
-> +		complete(&parent->unreg_completion);
->  }
+Paolo
 
-So far, this is "obtain a reference if the reference is not 0 (implying
-the object is not ready to use) and notify waiters when the last
-reference is dropped". This still looks idiomatic enough.
-
->  
-> -static void mdev_put_parent(struct mdev_parent *parent)
-> +static void mdev_device_remove_common(struct mdev_device *mdev)
->  {
-> -	if (parent)
-> -		kref_put(&parent->ref, mdev_release_parent);
-> +	struct mdev_parent *parent;
-> +	struct mdev_type *type;
-> +	int ret;
-> +
-> +	type = to_mdev_type(mdev->type_kobj);
-> +	mdev_remove_sysfs_files(&mdev->dev, type);
-> +	device_del(&mdev->dev);
-> +	parent = mdev->parent;
-> +	ret = parent->ops->remove(mdev);
-> +	if (ret)
-> +		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
-> +
-> +	/* Balances with device_initialize() */
-> +	put_device(&mdev->dev);
->  }
->  
->  static int mdev_device_remove_cb(struct device *dev, void *data)
->  {
->  	if (dev_is_mdev(dev))
-> -		mdev_device_remove(dev);
-> +		mdev_device_remove_common(to_mdev_device(dev));
->  
->  	return 0;
->  }
-> @@ -147,7 +154,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
->  		goto add_dev_err;
->  	}
->  
-> -	kref_init(&parent->ref);
-> +	refcount_set(&parent->refcount, 1);
-
-Initializing to 1 when creating is also fine.
-
-> +	init_completion(&parent->unreg_completion);
->  
->  	parent->dev = dev;
->  	parent->ops = ops;
-> @@ -206,14 +214,27 @@ void mdev_unregister_device(struct device *dev)
->  	dev_info(dev, "MDEV: Unregistering\n");
->  
->  	list_del(&parent->next);
-> +	mutex_unlock(&parent_list_lock);
-> +
-> +	/* Release the initial reference so that new create cannot start */
-> +	mdev_put_parent(parent);
-
-The comment is confusing: We do drop one reference, but this does not
-imply we're going to 0 (which would be the one thing that would block
-creating new devices).
-
-> +
-> +	/*
-> +	 * Wait for all the create and remove references to drop.
-> +	 */
-> +	wait_for_completion(&parent->unreg_completion);
-
-It only reaches 0 after this wait.
-
-> +
-> +	/*
-> +	 * New references cannot be taken and all users are done
-> +	 * using the parent. So it is safe to unregister parent.
-> +	 */
->  	class_compat_remove_link(mdev_bus_compat_class, dev, NULL);
->  
->  	device_for_each_child(dev, NULL, mdev_device_remove_cb);
->  
->  	parent_remove_sysfs_files(parent);
-> -
-> -	mutex_unlock(&parent_list_lock);
-> -	mdev_put_parent(parent);
-> +	kfree(parent);
-> +	put_device(dev);
->  }
->  EXPORT_SYMBOL(mdev_unregister_device);
->  
-> @@ -237,10 +258,11 @@ int mdev_device_create(struct kobject *kobj,
->  	struct mdev_parent *parent;
->  	struct mdev_type *type = to_mdev_type(kobj);
->  
-> -	parent = mdev_get_parent(type->parent);
-> -	if (!parent)
-> +	if (!mdev_try_get_parent(type->parent))
-
-If other calls are still running, the refcount won't be 0, and this
-will succeed, even if we really want to get rid of the device.
-
->  		return -EINVAL;
->  
-> +	parent = type->parent;
-> +
->  	mutex_lock(&mdev_list_lock);
->  
->  	/* Check for duplicate */
-> @@ -287,6 +309,7 @@ int mdev_device_create(struct kobject *kobj,
->  
->  	mdev->active = true;
->  	dev_dbg(&mdev->dev, "MDEV: created\n");
-> +	mdev_put_parent(parent);
->  
->  	return 0;
->  
-> @@ -306,7 +329,6 @@ int mdev_device_remove(struct device *dev)
->  	struct mdev_device *mdev, *tmp;
->  	struct mdev_parent *parent;
->  	struct mdev_type *type;
-> -	int ret;
->  
->  	mdev = to_mdev_device(dev);
->  
-> @@ -330,15 +352,17 @@ int mdev_device_remove(struct device *dev)
->  	mutex_unlock(&mdev_list_lock);
->  
->  	type = to_mdev_type(mdev->type_kobj);
-> -	mdev_remove_sysfs_files(dev, type);
-> -	device_del(&mdev->dev);
-> -	parent = mdev->parent;
-> -	ret = parent->ops->remove(mdev);
-> -	if (ret)
-> -		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
-> +	if (!mdev_try_get_parent(type->parent)) {
-
-Same here: Is there really a guarantee that the refcount is 0 when the
-parent is going away?
-
-> +		/*
-> +		 * Parent unregistration have started.
-> +		 * No need to remove here.
-> +		 */
-> +		mutex_unlock(&mdev_list_lock);
-
-Btw., you already unlocked above.
-
-> +		return -ENODEV;
-> +	}
->  
-> -	/* Balances with device_initialize() */
-> -	put_device(&mdev->dev);
-> +	parent = mdev->parent;
-> +	mdev_device_remove_common(mdev);
->  	mdev_put_parent(parent);
->  
->  	return 0;
-> diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
-> index 924ed2274941..55ebab0af7b0 100644
-> --- a/drivers/vfio/mdev/mdev_private.h
-> +++ b/drivers/vfio/mdev/mdev_private.h
-> @@ -19,7 +19,11 @@ void mdev_bus_unregister(void);
->  struct mdev_parent {
->  	struct device *dev;
->  	const struct mdev_parent_ops *ops;
-> -	struct kref ref;
-> +	/* Protects unregistration to wait until create/remove
-> +	 * are completed.
-> +	 */
-> +	refcount_t refcount;
-> +	struct completion unreg_completion;
->  	struct list_head next;
->  	struct kset *mdev_types_kset;
->  	struct list_head type_list;
-
-I think what's really needed is to split up the different needs and not
-overload the 'refcount' concept.
-
-- If we need to make sure that a reference to the parent is held so
-  that the parent may not go away while still in use, we should
-  continue to use the kref (in the idiomatic way it is used before this
-  patch.)
-- We need to protect against creation of new devices if the parent is
-  going away. Maybe set a going_away marker in the parent structure for
-  that so that creation bails out immediately? What happens if the
-  creation has already started when parent removal kicks in, though?
-  Do we need some child list locking and an indication whether a child
-  is in progress of being registered/unregistered?
-- We also need to protect against removal of devices while unregister
-  is in progress (same mechanism as above?) The second issue you
-  describe above should be fixed then if the children keep a reference
-  of the parent.
