@@ -2,127 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B95FB21134
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 02:19:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 15A5221189
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 03:05:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726241AbfEQATM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 May 2019 20:19:12 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:44334 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726238AbfEQATL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 May 2019 20:19:11 -0400
-Received: by mail-pf1-f193.google.com with SMTP id g9so2689826pfo.11
-        for <kvm@vger.kernel.org>; Thu, 16 May 2019 17:19:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=grI6nIUF/mMOBdv6LrPvHsdNVES0yai/LfFYIZ4bkWY=;
-        b=trB5X+v2CFHJR5/h5Ogo8pnGEbixSq/5SbMCfW0BvmcDG2zeRdzxHL4lknPMI8JsaG
-         91o9aNowjUtiTckfyBLWY/pZJBmRERl33EcI9dq0zR0lXd+XHl45wImJtwD6qTmBiD3C
-         YvIdILOfNr02D208IUOgX7xjB1B80gLQERVK/akSkqvFqS79gmXpU/duephS4OxkvMCj
-         iFkaZbcWb+04sJYfOvlYsPNWM7LK/oP8HkDOryS8f1XdKVoMLZUlQ8YVZMbBQiMDnraB
-         fYXacmGWn0btEdYeftIv0rPSsHpeCBXpkkAwnfL+k2zqdhfQJ6WS6TGQ7DeGxI98ZyT1
-         d5aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=grI6nIUF/mMOBdv6LrPvHsdNVES0yai/LfFYIZ4bkWY=;
-        b=iUwo19Bbc7F3E4IUAvnrhEROscirVAGggfuvXZQJMQURccmC6UC3KFpJKwQxK9LfHs
-         T5rnIDOKv/5GQQ7kCFvjR35mA0Gon/6Vi9SUTO1pXDSbf+iwjpwH+2G5LtmiSYhMZxRZ
-         h1iDUY4M49avM0YgK1S9cppRX0Hgg5kH5cPqnZdHmqz2zzA6pd1k4iWtPxuq9wuRyVRC
-         N8KXTZpI82XSe7ledPfma3K5l+ovO1+UwUINN5i40FA3l/I/VT7GJA4LuCiG6t3fxPrU
-         rSxL7AIbE6aBiKbxArB8mIzkMSnfcljzQ2pBMQ3pgzh9sNcG0QxDuzCC153Sch7/xdEi
-         7TsA==
-X-Gm-Message-State: APjAAAXxpVwRrt1SZwCpJ+kP2JgwgC8hJmC9QooVouua04rKxyczgQcy
-        7AZzDN3+JwRZn2w4rEHFxgFcuw==
-X-Google-Smtp-Source: APXvYqyv1iVBQbL6jyOdYGu6UtPQiwVBUuqofcSXUoK/ck1DMyLzSDgzGJaT2Ro5WErOmsiHR9V/gQ==
-X-Received: by 2002:a63:d816:: with SMTP id b22mr52619479pgh.16.1558051959951;
-        Thu, 16 May 2019 17:12:39 -0700 (PDT)
-Received: from jstaron2.mtv.corp.google.com ([2620:15c:202:201:b94f:2527:c39f:ca2d])
-        by smtp.gmail.com with ESMTPSA id a6sm7245768pgd.67.2019.05.16.17.12.37
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 16 May 2019 17:12:39 -0700 (PDT)
-Subject: Re: [PATCH v9 2/7] virtio-pmem: Add virtio pmem driver
-To:     Pankaj Gupta <pagupta@redhat.com>, linux-nvdimm@lists.01.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org
-Cc:     dan.j.williams@intel.com, zwisler@kernel.org,
-        vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com,
-        jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net,
-        hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu,
-        adilger.kernel@dilger.ca, darrick.wong@oracle.com,
-        lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com,
-        jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com,
-        stefanha@redhat.com, aarcange@redhat.com, david@redhat.com,
-        david@fromorbit.com, cohuck@redhat.com,
-        xiaoguangrong.eric@gmail.com, pbonzini@redhat.com,
-        kilobyte@angband.pl, yuval.shaia@oracle.com, smbarber@google.com
-References: <20190514145422.16923-1-pagupta@redhat.com>
- <20190514145422.16923-3-pagupta@redhat.com>
-From:   =?UTF-8?Q?Jakub_Staro=c5=84?= <jstaron@google.com>
-Message-ID: <c06514fd-8675-ba74-4b7b-ff0eb4a91605@google.com>
-Date:   Thu, 16 May 2019 17:12:36 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1727269AbfEQBFJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 May 2019 21:05:09 -0400
+Received: from ozlabs.org ([203.11.71.1]:35041 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726575AbfEQBFJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 May 2019 21:05:09 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 454qp943VNz9s9y;
+        Fri, 17 May 2019 11:05:05 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1558055105;
+        bh=ooupRwlzmgFq0MFwFv3NKtnYvDLGwPP8J9xeQL+ZykQ=;
+        h=Date:From:To:Cc:Subject:From;
+        b=CgdytqRUncOwEPckLArZr8pyeLLPfMwXL2UdRxDu0rgPfN110WWIHvouxbDaIiztb
+         VFTPie0DDU3W9NP0VijAo7x1vdF5FnyMSb1lZ/1hF85ZNJJ4jK+uIki0ftPRKhIzha
+         HJ8Iod6twuI6WToHMTpO2w2urlan6YYjgvriUhPDRe6EqvpdSnwyi1ug73IUz7LtBR
+         0zHifRYp9EY334caSvmCgGGS+SmNKssQt5DEv1LfrIRSF2IlMWErUfv/d8bwBXmItK
+         YmegUKfWiE/lFQ9lsKL93lcv9umgALeipFqBkXmuRYri4/N7FfReySpJ27yor3Tjzg
+         IjdTI9ViXiU6g==
+Date:   Fri, 17 May 2019 11:04:47 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        KVM <kvm@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Andrew Jones <drjones@redhat.com>, Peter Xu <peterx@redhat.com>
+Subject: linux-next: manual merge of the kvm tree with Linus' tree
+Message-ID: <20190517110447.34e65beb@canb.auug.org.au>
 MIME-Version: 1.0
-In-Reply-To: <20190514145422.16923-3-pagupta@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/GkhwStloeVvNpPg8oh+2H7f"; protocol="application/pgp-signature"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/14/19 7:54 AM, Pankaj Gupta wrote:
-> +		if (!list_empty(&vpmem->req_list)) {
-> +			req_buf = list_first_entry(&vpmem->req_list,
-> +					struct virtio_pmem_request, list);
-> +			req_buf->wq_buf_avail = true;
-> +			wake_up(&req_buf->wq_buf);
-> +			list_del(&req_buf->list);
-Yes, this change is the right one, thank you!
+--Sig_/GkhwStloeVvNpPg8oh+2H7f
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> +	 /*
-> +	  * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual
-> +	  * queue does not have free descriptor. We add the request
-> +	  * to req_list and wait for host_ack to wake us up when free
-> +	  * slots are available.
-> +	  */
-> +	while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req,
-> +					GFP_ATOMIC)) == -ENOSPC) {
-> +
-> +		dev_err(&vdev->dev, "failed to send command to virtio pmem" \
-> +			"device, no free slots in the virtqueue\n");
-> +		req->wq_buf_avail = false;
-> +		list_add_tail(&req->list, &vpmem->req_list);
-> +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +
-> +		/* A host response results in "host_ack" getting called */
-> +		wait_event(req->wq_buf, req->wq_buf_avail);
-> +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	}
-> +	err1 = virtqueue_kick(vpmem->req_vq);
-> +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +
-> +	/*
-> +	 * virtqueue_add_sgs failed with error different than -ENOSPC, we can't
-> +	 * do anything about that.
-> +	 */
-> +	if (err || !err1) {
-> +		dev_info(&vdev->dev, "failed to send command to virtio pmem device\n");
-> +		err = -EIO;
-> +	} else {
-> +		/* A host repsonse results in "host_ack" getting called */
-> +		wait_event(req->host_acked, req->done);
-> +		err = req->ret;
-> +I confirm that the failures I was facing with the `-ENOSPC` error path are not present in v9.
+Hi all,
 
-Best,
-Jakub Staron
+Today's linux-next merge of the kvm tree got a conflict in:
+
+  Documentation/virtual/kvm/api.txt
+
+between commit:
+
+  dbcdae185a70 ("Documentation: kvm: fix dirty log ioctl arch lists")
+
+from Linus' tree and commit:
+
+  d7547c55cbe7 ("KVM: Introduce KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2")
+
+from the kvm tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc Documentation/virtual/kvm/api.txt
+index 64b38dfcc243,73a501eb9291..000000000000
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@@ -3809,8 -3936,8 +3936,8 @@@ to I/O ports
+ =20
+  4.117 KVM_CLEAR_DIRTY_LOG (vm ioctl)
+ =20
+- Capability: KVM_CAP_MANUAL_DIRTY_LOG_PROTECT
++ Capability: KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2
+ -Architectures: x86
+ +Architectures: x86, arm, arm64, mips
+  Type: vm ioctl
+  Parameters: struct kvm_dirty_log (in)
+  Returns: 0 on success, -1 on error
+@@@ -4798,9 -4968,9 +4968,9 @@@ and injected exceptions
+  * For the new DR6 bits, note that bit 16 is set iff the #DB exception
+    will clear DR6.RTM.
+ =20
+- 7.18 KVM_CAP_MANUAL_DIRTY_LOG_PROTECT
++ 7.18 KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2
+ =20
+ -Architectures: all
+ +Architectures: x86, arm, arm64, mips
+  Parameters: args[0] whether feature should be enabled or not
+ =20
+  With this capability enabled, KVM_GET_DIRTY_LOG will not automatically
+
+--Sig_/GkhwStloeVvNpPg8oh+2H7f
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAlzeCK8ACgkQAVBC80lX
+0Gweegf/cRv0YebzAmqhtNeCTu4uNeuma3G+ITfHVHUGsEZ8zQxGInYyu1GPxfB4
+A219pIl1/hwzZ0LAnGi0h9QDSudZUlIsvQ49DY5Cw2Gojf4WnbfwZgQY3Pa6ii0M
+PR0hQicg9KeeHIDwu/Y+qiczAB36jA8XxlPr+FqJ10YtrdYn3iM67Em/CWwat2Dh
+cwZCdBUVoG1HPTDaxv7DTyRjHnCdDG7sR0Y+W+2XHeLK1mMeC/IuTZKLfgaOi4cO
+1jZSL14SIkqyUibpbIa2A3WVXVX0mGItW/YWQLC8bHD/86XgID5KfYNnv1sDQxE6
+wcydxA+pQ1K1PGlw1ZrmW2J1xf/oVQ==
+=n3xT
+-----END PGP SIGNATURE-----
+
+--Sig_/GkhwStloeVvNpPg8oh+2H7f--
