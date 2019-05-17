@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D2B78215AF
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 10:50:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DEEAC215AD
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2019 10:50:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728508AbfEQIuB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 May 2019 04:50:01 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:35521 "EHLO
+        id S1728638AbfEQIuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 May 2019 04:50:04 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:35523 "EHLO
         mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728481AbfEQIuA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 May 2019 04:50:00 -0400
-Received: by mail-pl1-f193.google.com with SMTP id g5so3056558plt.2;
-        Fri, 17 May 2019 01:50:00 -0700 (PDT)
+        with ESMTP id S1728566AbfEQIuC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 May 2019 04:50:02 -0400
+Received: by mail-pl1-f193.google.com with SMTP id g5so3056594plt.2;
+        Fri, 17 May 2019 01:50:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=5VREHkPw8R8lwRxH+KVXuUktO+8MCxC49x2eL5UCIow=;
-        b=RPF5qcECkRQX0J004+yKvh9PHjuDP9QRAl1CTIGwYdfFjC73ZOLGRcxDyItiIW7XyA
-         nbv2F1mtgRdvb5ihxRpkb3z/RtFdWaS3jZoQtTHtuZuaN+M96WdPShDILNxokcxMGmK7
-         fRmgTv9Wt0N7ybh4BTAndZqH7yw/uUDNoe0JHoE3xA7owQGGbmrO/zzIsC10J4WDrEyJ
-         WSfQKHZF4soeugQiLr5Qp2Kk1HO4TyKa5EWRgd2eL1cm66YKg1l6GYzikIeHsFV6SVXG
-         cMYlPysB335VCYVBaSNNenhR8jQkxOVjEHMf0XmlklLT+MhhJ7V4gRkvDoXoX9NGDoMm
-         60dA==
+        bh=LXdojfs9tV6rnZ/fXmeiGAyGOFlNjDR2xUpvGACHON0=;
+        b=EG+mPKckPfuZ2vfk8a6ttfLtJ+/laZpt7eB1TWVIm2VkpYk/ukPr+nsXXk5elLZlMD
+         NV8i3ZybA4tKsIYD23t+H9z5McPcNQalHXvM/Zc359jp6nH5dT/VjUw1CiLzrKM+v62I
+         zeLFcywisHAc+lMh+j3VbDjV9/LMkepD6ezDp4BJNGKjevFijsZdiYbGc9zDlwIV8qVE
+         uFWxP5l27aXZgURttQRNn2O9SyabMmKmNgN4iZUuvlcM4HTklAvI5pphFEoWo//wN/0w
+         hGEAoOEG+t8HaTOWTQ94DieJcjffwOkfIXVv8stpZjysMiPcpsy9S82sNZghzQuE3Ubx
+         OS5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=5VREHkPw8R8lwRxH+KVXuUktO+8MCxC49x2eL5UCIow=;
-        b=TI1hwb2e8AuC8zzKWCHsFfPu3lqRQKdhO8xu1tWvk3LyOFbF4s+n5riZCwkm2s75Pc
-         mKdKy3y2eNXFutAVycF5Wx9aTMfQ80uKlu3g8ZYtTz7J9AflsHHAwwmShbgIFuMVbX5Y
-         1ZRAUewCLVAcJJjtfgfAkuGxIGOuZboQLfKqe7UN42DivCQXs/fO+O7CA65iHPHWo9QQ
-         ZY2Dk3jWdwRGlgTxc+EApwJHEWrpoYVZRQQgr1LU4XNHJlNW5KpSOUl6Pt4a/7+UDv/E
-         6ds7oe2QyBpiX6/tRxJFvMiOtTXV7uZNAz/ThrOSE1xlPptkUoSMW2GjgMPBQs5K8liq
-         jccA==
-X-Gm-Message-State: APjAAAXjW/PQL+Kt8nqjjXn7Dh32PRx6yjdiYxGCc3fIpxYUkDgKqva3
-        gHhBEU36gnQx1lkiGYAMTOAfrOIe
-X-Google-Smtp-Source: APXvYqxe4n7YAE9tLJpT4f6BzKilEwXE3tVIRNBySLRokH+e3XoGXrD1560o4yN2vgR74SJe88LRlA==
-X-Received: by 2002:a17:902:aa95:: with SMTP id d21mr1072036plr.32.1558083000075;
-        Fri, 17 May 2019 01:50:00 -0700 (PDT)
+        bh=LXdojfs9tV6rnZ/fXmeiGAyGOFlNjDR2xUpvGACHON0=;
+        b=PnsEBpe27t6m4Q51otH5El4u5vDZbOWQD8dFbWiGLOeE3lUNlmuiSpBGqzvYQmlaNA
+         c8X5HZDPLRM2vCR0PkEkrMiZf5ML3k183FKKL2JNSVK3AoiRMRY6oyqSeM6QXCrzioQi
+         IRraLjgO/J805rNNOFVQWm2hlrx6s5DsjQTd8hg/vnMSklAGm2J2/EWJ8kMj4ARDzfEg
+         EmhwpXkQ+H0SQlWahPO3ByiXfX/4a6NlTccDVQMsF0HxIlp4/E+puEz+m6xhzQRJPsQO
+         1uYJke61LN2+f9c5iilN6WlwssifCFwWPqj+gYRWYlajtfd41CnFGIGMAIUio5rT3THW
+         mRig==
+X-Gm-Message-State: APjAAAUHUXtY9BlJcT8qVDNExrBOo6bBbZhdwf/fe6tvINuLn9ZwnRFT
+        NRJhMyB+AO4Z1k+trDqJipnjhPws
+X-Google-Smtp-Source: APXvYqx6UZmeM1Meepadf6z2mpg8VSstpYtAyfG5btHRv7xogLmK8f4zFUKNMaJW9hanOFnKfnyYuQ==
+X-Received: by 2002:a17:902:b492:: with SMTP id y18mr50545153plr.96.1558083001916;
+        Fri, 17 May 2019 01:50:01 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id 63sm10417127pfu.95.2019.05.17.01.49.58
+        by smtp.googlemail.com with ESMTPSA id 63sm10417127pfu.95.2019.05.17.01.50.00
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Fri, 17 May 2019 01:49:59 -0700 (PDT)
+        Fri, 17 May 2019 01:50:01 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        "Paul E . McKenney" <paulmck@linux.ibm.com>
-Subject: [PATCH 3/4] KVM: Fix spinlock taken warning during host resume
-Date:   Fri, 17 May 2019 16:49:49 +0800
-Message-Id: <1558082990-7822-3-git-send-email-wanpengli@tencent.com>
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Subject: [PATCH 4/4] KVM: nVMX: Fix using __this_cpu_read() in preemptible context
+Date:   Fri, 17 May 2019 16:49:50 +0800
+Message-Id: <1558082990-7822-4-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1558082990-7822-1-git-send-email-wanpengli@tencent.com>
 References: <1558082990-7822-1-git-send-email-wanpengli@tencent.com>
@@ -66,54 +65,62 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
- WARNING: CPU: 0 PID: 13554 at kvm/arch/x86/kvm//../../../virt/kvm/kvm_main.c:4183 kvm_resume+0x3c/0x40 [kvm]
-  CPU: 0 PID: 13554 Comm: step_after_susp Tainted: G           OE     5.1.0-rc4+ #1
-  RIP: 0010:kvm_resume+0x3c/0x40 [kvm]
+ BUG: using __this_cpu_read() in preemptible [00000000] code: qemu-system-x86/4590
+  caller is nested_vmx_enter_non_root_mode+0xebd/0x1790 [kvm_intel]
+  CPU: 4 PID: 4590 Comm: qemu-system-x86 Tainted: G           OE     5.1.0-rc4+ #1
   Call Trace:
-   syscore_resume+0x63/0x2d0
-   suspend_devices_and_enter+0x9d1/0xa40
-   pm_suspend+0x33a/0x3b0
-   state_store+0x82/0xf0
-   kobj_attr_store+0x12/0x20
-   sysfs_kf_write+0x4b/0x60
-   kernfs_fop_write+0x120/0x1a0
-   __vfs_write+0x1b/0x40
-   vfs_write+0xcd/0x1d0
-   ksys_write+0x5f/0xe0
-   __x64_sys_write+0x1a/0x20
+   dump_stack+0x67/0x95
+   __this_cpu_preempt_check+0xd2/0xe0
+   nested_vmx_enter_non_root_mode+0xebd/0x1790 [kvm_intel]
+   nested_vmx_run+0xda/0x2b0 [kvm_intel]
+   handle_vmlaunch+0x13/0x20 [kvm_intel]
+   vmx_handle_exit+0xbd/0x660 [kvm_intel]
+   kvm_arch_vcpu_ioctl_run+0xa2c/0x1e50 [kvm]
+   kvm_vcpu_ioctl+0x3ad/0x6d0 [kvm]
+   do_vfs_ioctl+0xa5/0x6e0
+   ksys_ioctl+0x6d/0x80
+   __x64_sys_ioctl+0x1a/0x20
    do_syscall_64+0x6f/0x6c0
    entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
-Commit ca84d1a24 (KVM: x86: Add clock sync request to hardware enable) mentioned 
-that "we always hold kvm_lock when hardware_enable is called.  The one place that 
-doesn't need to worry about it is resume, as resuming a frozen CPU, the spinlock 
-won't be taken." However, commit 6706dae9 (virt/kvm: Replace spin_is_locked() with 
-lockdep) introduces a bug, it asserts when the lock is not held which is contrary 
-to the original goal. 
-
-This patch fixes it by WARN_ON when the lock is held.
+Accessing per-cpu variable should disable preemption, this patch extends the 
+preemption disable region for __this_cpu_read().
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: Paul E. McKenney <paulmck@linux.ibm.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- virt/kvm/kvm_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/vmx/nested.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 5fb0f16..c7eab5f 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4096,7 +4096,7 @@ static int kvm_suspend(void)
- static void kvm_resume(void)
- {
- 	if (kvm_usage_count) {
--		lockdep_assert_held(&kvm_count_lock);
-+		WARN_ON(lockdep_is_held(&kvm_count_lock));
- 		hardware_enable_nolock(NULL);
- 	}
- }
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 0c601d0..8f6f69c 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2792,14 +2792,13 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
+ 	      : "cc", "memory"
+ 	);
+ 
+-	preempt_enable();
+-
+ 	if (vmx->msr_autoload.host.nr)
+ 		vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
+ 	if (vmx->msr_autoload.guest.nr)
+ 		vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
+ 
+ 	if (vm_fail) {
++		preempt_enable();
+ 		WARN_ON_ONCE(vmcs_read32(VM_INSTRUCTION_ERROR) !=
+ 			     VMXERR_ENTRY_INVALID_CONTROL_FIELD);
+ 		return 1;
+@@ -2811,6 +2810,7 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
+ 	local_irq_enable();
+ 	if (hw_breakpoint_active())
+ 		set_debugreg(__this_cpu_read(cpu_dr7), 7);
++	preempt_enable();
+ 
+ 	/*
+ 	 * A non-failing VMEntry means we somehow entered guest mode with
 -- 
 2.7.4
 
