@@ -2,69 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E12F23E51
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 19:21:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 953EB23E5F
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 19:23:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392824AbfETRVM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 13:21:12 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:46980 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392821AbfETRVM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 13:21:12 -0400
-Received: by mail-wr1-f65.google.com with SMTP id r7so15462002wrr.13
-        for <kvm@vger.kernel.org>; Mon, 20 May 2019 10:21:11 -0700 (PDT)
+        id S2392860AbfETRXq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 13:23:46 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:44316 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392853AbfETRXp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 13:23:45 -0400
+Received: by mail-wr1-f67.google.com with SMTP id w13so4759790wru.11
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 10:23:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=2XkW6U8tyuCedKGU5mO7OaB7yAk+TZauHH3mf/E1c94=;
-        b=p44WJbKhg6aDKhtPgfYMkb/Gn1hYYvPb4DEzYZlugltKsMri3qdidnbp4wna9ma7rc
-         HQbtj1e20SLPddNfUG+sGBmCo+48Ur80YCbL142d9tFp1ZjG+CW0myBn3E2HtYTOpWqS
-         LKfdOFadDmMBvWzfmfahAGYD4LUGBGKog1THxUpNMrvBv0rVs5UUgm1Ae43r6FIkcErD
-         Dubo/UUwJugngs2HEePgSXaXJ7iZAl6MhUwbQKkPV0EAWeoUh354IummA0Ts2A2wDQl1
-         vAkKiJkqsIq+Xi60l31tNhA1ggAo2jx0S1yyV3x/1Oma3e7fbWXpyCC50YBMFcz29AVH
-         Lu/w==
-X-Gm-Message-State: APjAAAVnZRlSRNwk1gvL7mol+fnrDxw12tYfFszbycn2kukxaaKeNyor
-        Y4NF4d9uOU5Jsf1D5byXAx+aOQ==
-X-Google-Smtp-Source: APXvYqzHbMQXZY9AvzceJG4qwon/KSr7H8D9aBqmC7dwe4lLYgLGhWFslKkgf6Wj41wGvZ2Syu+j0w==
-X-Received: by 2002:adf:8189:: with SMTP id 9mr44545296wra.71.1558372870599;
-        Mon, 20 May 2019 10:21:10 -0700 (PDT)
+        bh=5IBTHlLWle5UHeHtFTJc2+zC+bcnwX/bM8+GOzR3AZs=;
+        b=dMSUtjtjUUIz5vsZd9wuJJMLKYDugMbYoJoJqvPJvXpWu8sEkvE5n4mG29UdVTm1yl
+         qzWGZiFCZUZtnTUgP1ljZH56ymflk57dKvgzLTA0xGv+jrmpeUMbFQGxknpkaKdEZG0+
+         9xU3nyd8ZnZNAocF46kb2VSVSqfh/IYPmonC5rnf/QB0YqEfz2QMOiycB31lfI0kKuJP
+         5M1lkJHDxnZzw+K94aLtsnOOBgGuC8exAO4AluClm1MvtawiLKWYIrNk4ZpacmQqFxlu
+         A5PNtGON0SbnLoJNuUExu3abM/FMvflM2JnlcO8SMo7i4sE7IzH1IPFL2COLmkgOsSGi
+         Qhdw==
+X-Gm-Message-State: APjAAAXtj8cF+rBMbxjo/5j9RKh8OjExC649Fm1eWby/eM6ihXMfWxBJ
+        8TgbbeVEoDbA/fdyIivvQo0BTw==
+X-Google-Smtp-Source: APXvYqyMHAUocoJjg+Rd0QCpMErsETkEHHPCbpKrDtr/Wh2IbPJRUt3kGmDTQyjsfGosb8vnh6kVmw==
+X-Received: by 2002:a5d:53c8:: with SMTP id a8mr10808166wrw.152.1558373024313;
+        Mon, 20 May 2019 10:23:44 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:ac04:eef9:b257:b844? ([2001:b07:6468:f312:ac04:eef9:b257:b844])
-        by smtp.gmail.com with ESMTPSA id t13sm38506608wra.81.2019.05.20.10.21.09
+        by smtp.gmail.com with ESMTPSA id x6sm27281408wru.36.2019.05.20.10.23.43
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 May 2019 10:21:10 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH 1/2] x86: nVMX: Use #DB in nmi and intr
- tests
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-References: <20190508102715.685-1-namit@vmware.com>
- <20190508102715.685-2-namit@vmware.com>
- <CALMp9eRnqn6Jrd762UZGZ9cQSMBFaxvNFsOkqYryP8ngG7dUEw@mail.gmail.com>
- <7B8B0BFD-3D85-4062-9F44-7BA8AC7F9DAE@gmail.com>
- <76ffb0ca-c007-05c4-7bef-5f72f03a7a4e@redhat.com>
- <FAC1484C-8157-45F4-BF1A-514DDF4E0ABC@gmail.com>
+        Mon, 20 May 2019 10:23:43 -0700 (PDT)
+Subject: Re: [PATCH RESEND] kvm: make kvm_vcpu_(un)map dependency on
+ CONFIG_HAS_IOMEM explicit
+To:     Michal Kubecek <mkubecek@suse.cz>, kvm@vger.kernel.org
+Cc:     Radim Krcmar <rkrcmar@redhat.com>,
+        KarimAllah Ahmed <karahmed@amazon.de>,
+        linux-kernel@vger.kernel.org
+References: <20190520164418.06D1CE0184@unicorn.suse.cz>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <39f0658b-8ef0-feee-34a8-3f1f559c48a6@redhat.com>
-Date:   Mon, 20 May 2019 19:21:09 +0200
+Message-ID: <41adfaf7-90e8-b011-2716-ea5dc464ae5a@redhat.com>
+Date:   Mon, 20 May 2019 19:23:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <FAC1484C-8157-45F4-BF1A-514DDF4E0ABC@gmail.com>
+In-Reply-To: <20190520164418.06D1CE0184@unicorn.suse.cz>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/05/19 18:39, Nadav Amit wrote:
-> I’m sorry for not collecting the patches into a set, but I know that it
-> would just cause me to resend all of them for individual patch issue.
+On 20/05/19 18:44, Michal Kubecek wrote:
+> Recently introduced functions kvm_vcpu_map() and kvm_vcpu_unmap() call
+> memremap() and memunmap() which are only available if HAS_IOMEM is enabled
+> but this dependency is not explicit, so that the build fails with HAS_IOMEM
+> disabled.
+> 
+> As both function are only used on x86 where HAS_IOMEM is always enabled,
+> the easiest fix seems to be to only provide them when HAS_IOMEM is enabled.
+> 
+> Fixes: e45adf665a53 ("KVM: Introduce a new guest mapping API")
+> Signed-off-by: Michal Kubecek <mkubecek@suse.cz>
+> ---
 
-All the patches you've sent make sense individually.  Thanks to you (and
-the corporate overlord ;)) for doing the work and for sharing it, really.
+Thank you very much.  However, it's better if only the memremap part is
+hidden behind CONFIG_HAS_IOMEM.  I'll send a patch tomorrow and have it
+reach Linus at most on Wednesday.
+
+There is actually nothing specific to CONFIG_HAS_IOMEM in them,
+basically the functionality we want is remap_pfn_range but without a
+VMA.  However, it's for a niche use case where KVM guest memory is
+mmap-ed from /dev/mem and it's okay if for now that part remains
+disabled on s390.
 
 Paolo
