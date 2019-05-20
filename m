@@ -2,129 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BFD9F2438D
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 00:45:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C785244CE
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 01:54:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726384AbfETWpm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 18:45:42 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:33208 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725776AbfETWpl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 18:45:41 -0400
-Received: by mail-pg1-f196.google.com with SMTP id h17so7491111pgv.0
-        for <kvm@vger.kernel.org>; Mon, 20 May 2019 15:45:41 -0700 (PDT)
+        id S1727694AbfETXxf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 19:53:35 -0400
+Received: from mail-vs1-f66.google.com ([209.85.217.66]:41492 "EHLO
+        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727440AbfETXxU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 19:53:20 -0400
+Received: by mail-vs1-f66.google.com with SMTP id g187so10039542vsc.8
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 16:53:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=5Lriv7+U6WgLVg2Ap25ZmsKmP6G6qWt4u+kPIyLhwrA=;
-        b=SOgOXTOhar+mPuEKRbn54BBErO2TGsLgtMWK81YjlKmWU6y7joQzJQxy5MtSGiCtDb
-         JqFSNxs+NURyxn5+7mYTLbJ89X/6+X07tJDkaFKDewdDLtzWlv9O+Na5+cJOhSONklwA
-         5VqW1O5gTCeOy1JU87pRnjbLgT0VGxXDdpG28NaYeQqkmbpfzt6Y0Bs3oj+NMhxC/ywc
-         L4WCL7GBty2jsTNtw7ZYJQkFZP3dKQyQfuVrUw51B4fs1Hb5JHuum5NNheTCfB77eWE7
-         t3aVDie8To7qjwjdzPi9sgAZsRdCB1ueeWP/Fnv6KYLExZncAL/5QiqdK6yqpT5FM/s+
-         3iFA==
+        bh=DOow0La3W2Essx5H031uTOWFbAnDcBGJlXVfamcoL3w=;
+        b=Dx4+lU9jqXDtln/17Mrd8EV4Dxp/5zASL+1Y8Niio9Pqb06rC0aI8wedP3ohgziyEW
+         jppEZzDyXiAo/njLuzUnS0cZqB4tlCDf5SInO7A6W3spDccr9FtwpNa39rs9vTjn9Pol
+         gFjx66w14oqATAsCg/4xevDnAIAQo2Q0YzZMa3Njt5yFKOelm+SuxVUsWhk4woonxC/+
+         9D5FC/UAWBXCau72ARfrLZBFx2zGvzGs/3QYXrUb8NFYR9FnDOYRxbwkdocqirkPGsSw
+         AxoIYh3MeUP070fRiIy388VcetefsVsnX0FjFahzGTgGe2zBg5LkCE8dqpCaiB/D65kK
+         79Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=5Lriv7+U6WgLVg2Ap25ZmsKmP6G6qWt4u+kPIyLhwrA=;
-        b=PZQ1bOQXvuE/Ig+CkwdFjIfuh2VT3ZHjXAMctg/4TZMe8GL9sVCq35sHtOb3ISjy0v
-         gfzq4BnIVf9QT/hEQDnRNE2/NrDey+/Y1gsLib3rKL/6ecoNtTFIfEn1T/3/lpmnowRi
-         l5LVVZ4DJHjZdzjbizBBmzgm5eJHagojcV+Pj5Cp/TiJkR9uwApDX1tghWxFs4lRlWft
-         NMUj9SR6GjnFH/mxAlM/SVZmnuuHPgihglCk4FG9Pf/4/SGdcTriL6i4NZOQ+SG39iv/
-         BzrFCagwwBwWtlfuNiMYDFrX6IL6k+DVBCmjHZhc9l72aN3cdrSahLoYb+cmsgv8nizu
-         NO+g==
-X-Gm-Message-State: APjAAAV0emyRFXy4Yba/fmqWGOi9HDv7EQL4RZUWb+xavrEZgUFomGsr
-        Y1TLKLEc15ZsjbUumaR48Kj0t5BhBaFLQ/qUC+umGA==
-X-Google-Smtp-Source: APXvYqxJvnLUlslVYi/Zm30oi4BtCg59ayav/48NRihHpFdqhNt5/Fi04O4HXDvuEDLP7DXOXr0pmxBqbL7AENLKB4M=
-X-Received: by 2002:a63:5c1c:: with SMTP id q28mr77304551pgb.45.1558392340903;
- Mon, 20 May 2019 15:45:40 -0700 (PDT)
+        bh=DOow0La3W2Essx5H031uTOWFbAnDcBGJlXVfamcoL3w=;
+        b=b2piNbbQgd3YyZYUtUecvnt0k4XKzqnPJ+apE11MN1UZtgAqiAutvoQOTDAYBViGtM
+         0/aAJbykcpSfgTFM3HIdCorAdgqCGXbahJoj+Z5R/7dnslbPsOeA9BtH7FWovMIJpwSM
+         dbycdS+kGTsVVUyNP6hNDTzGPbV5OjNnyYlqWURysQF/AiOBNXyojW/0+x+F61EcASdA
+         mkMZRbcTWcBmxZINcsA6lKmbJ0/VsBAh0HfyDIETwc2AkRzH2i0UWd11V7Xz1jedP/9W
+         5vGu0U4Tx2BXbaZ8v5QxXweNJsOTJXsMgbE0XrcgLLwiwh9xEwJIPjzcdbgajxse48qF
+         6xjw==
+X-Gm-Message-State: APjAAAWroM2WHWuceOPoqsya8Jw/krCiguG/niDym7z75OVwlDyF6q7R
+        7JjNpIXYb1TYTIUOtoG5f/0L/xWQ3DqiU1I1b9100g==
+X-Google-Smtp-Source: APXvYqyR0JsazypV3hCmWgdEzYpNKlJ3PjKF8ENA0Fjbz+eEGES/3XAyQs/kAm4YlbOIpNAtAAzvW9GW3+g1GtceCfY=
+X-Received: by 2002:a67:be17:: with SMTP id x23mr26047761vsq.173.1558396399029;
+ Mon, 20 May 2019 16:53:19 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190520164418.06D1CE0184@unicorn.suse.cz>
-In-Reply-To: <20190520164418.06D1CE0184@unicorn.suse.cz>
-From:   Bjorn Andersson <bjorn.andersson@linaro.org>
-Date:   Mon, 20 May 2019 15:45:29 -0700
-Message-ID: <CAOCOHw6rm1hvj1MDoMw=GArEafcPr-dnw4D18=baTcSdypbu0w@mail.gmail.com>
-Subject: Re: [PATCH RESEND] kvm: make kvm_vcpu_(un)map dependency on
- CONFIG_HAS_IOMEM explicit
-To:     Michal Kubecek <mkubecek@suse.cz>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        KarimAllah Ahmed <karahmed@amazon.de>,
-        lkml <linux-kernel@vger.kernel.org>
+References: <cover.1557160186.git.andreyknvl@google.com> <20190517144931.GA56186@arrakis.emea.arm.com>
+In-Reply-To: <20190517144931.GA56186@arrakis.emea.arm.com>
+From:   Evgenii Stepanov <eugenis@google.com>
+Date:   Mon, 20 May 2019 16:53:07 -0700
+Message-ID: <CAFKCwrj6JEtp4BzhqO178LFJepmepoMx=G+YdC8sqZ3bcBp3EQ@mail.gmail.com>
+Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Andrey Konovalov <andreyknvl@google.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Elliott Hughes <enh@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 20, 2019 at 9:44 AM Michal Kubecek <mkubecek@suse.cz> wrote:
+On Fri, May 17, 2019 at 7:49 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
 >
-> Recently introduced functions kvm_vcpu_map() and kvm_vcpu_unmap() call
-> memremap() and memunmap() which are only available if HAS_IOMEM is enabled
-> but this dependency is not explicit, so that the build fails with HAS_IOMEM
-> disabled.
+> Hi Andrey,
 >
-> As both function are only used on x86 where HAS_IOMEM is always enabled,
-> the easiest fix seems to be to only provide them when HAS_IOMEM is enabled.
+> On Mon, May 06, 2019 at 06:30:46PM +0200, Andrey Konovalov wrote:
+> > One of the alternative approaches to untagging that was considered is to
+> > completely strip the pointer tag as the pointer enters the kernel with
+> > some kind of a syscall wrapper, but that won't work with the countless
+> > number of different ioctl calls. With this approach we would need a custom
+> > wrapper for each ioctl variation, which doesn't seem practical.
 >
-> Fixes: e45adf665a53 ("KVM: Introduce a new guest mapping API")
-> Signed-off-by: Michal Kubecek <mkubecek@suse.cz>
+> The more I look at this problem, the less convinced I am that we can
+> solve it in a way that results in a stable ABI covering ioctls(). While
+> for the Android kernel codebase it could be simpler as you don't upgrade
+> the kernel version every 2.5 months, for the mainline kernel this
+> doesn't scale. Any run-time checks are relatively limited in terms of
+> drivers covered. Better static checking would be nice as a long term
+> solution but we didn't get anywhere with the discussion last year.
+>
+> IMO (RFC for now), I see two ways forward:
+>
+> 1. Make this a user space problem and do not allow tagged pointers into
+>    the syscall ABI. A libc wrapper would have to convert structures,
+>    parameters before passing them into the kernel. Note that we can
+>    still support the hardware MTE in the kernel by enabling tagged
+>    memory ranges, saving/restoring tags etc. but not allowing tagged
+>    addresses at the syscall boundary.
+>
+> 2. Similar shim to the above libc wrapper but inside the kernel
+>    (arch/arm64 only; most pointer arguments could be covered with an
+>    __SC_CAST similar to the s390 one). There are two differences from
+>    what we've discussed in the past:
+>
+>    a) this is an opt-in by the user which would have to explicitly call
+>       prctl(). If it returns -ENOTSUPP etc., the user won't be allowed
+>       to pass tagged pointers to the kernel. This would probably be the
+>       responsibility of the C lib to make sure it doesn't tag heap
+>       allocations. If the user did not opt-in, the syscalls are routed
+>       through the normal path (no untagging address shim).
+>
+>    b) ioctl() and other blacklisted syscalls (prctl) will not accept
+>       tagged pointers (to be documented in Vicenzo's ABI patches).
+>
+> It doesn't solve the problems we are trying to address but 2.a saves us
+> from blindly relaxing the ABI without knowing how to easily assess new
+> code being merged (over 500K lines between kernel versions). Existing
+> applications (who don't opt-in) won't inadvertently start using the new
+> ABI which could risk becoming de-facto ABI that we need to support on
+> the long run.
+>
+> Option 1 wouldn't solve the ioctl() problem either and while it makes
+> things simpler for the kernel, I am aware that it's slightly more
+> complicated in user space (but I really don't mind if you prefer option
+> 1 ;)).
+>
+> The tagged pointers (whether hwasan or MTE) should ideally be a
+> transparent feature for the application writer but I don't think we can
+> solve it entirely and make it seamless for the multitude of ioctls().
+> I'd say you only opt in to such feature if you know what you are doing
+> and the user code takes care of specific cases like ioctl(), hence the
+> prctl() proposal even for the hwasan.
+>
+> Comments welcomed.
 
-Hi Michal,
+Any userspace shim approach is problematic for Android because of the
+apps that use raw system calls. AFAIK, all apps written in Go are in
+that camp - I'm not sure how common they are, but getting them all
+recompiled is probably not realistic.
 
-I see the same build issue on arm64 and as CONFIG_HAS_IOMEM is set
-there this patch has no effect on solving that. Instead I had to
-include linux/io.h in kvm_main.c to make it compile.
+The way I see it, a patch that breaks handling of tagged pointers is
+not that different from, say, a patch that adds a wild pointer
+dereference. Both are bugs; the difference is that (a) the former
+breaks a relatively uncommon target and (b) it's arguably an easier
+mistake to make. If MTE adoption goes well, (a) will not be the case
+for long.
 
-Regards,
-Bjorn
+This is a bit of a chicken-and-egg problem. In a world where memory
+allocators on one or several popular platforms generate pointers with
+non-zero tags, any such breakage will be caught in testing.
+Unfortunately to reach that state we need the kernel to start
+accepting tagged pointers first, and then hold on for a couple of
+years until userspace catches up.
 
-> ---
->  include/linux/kvm_host.h | 6 +++++-
->  virt/kvm/kvm_main.c      | 2 ++
->  2 files changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 79fa4426509c..371d68fef5e1 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -759,9 +759,13 @@ struct kvm_memslots *kvm_vcpu_memslots(struct kvm_vcpu *vcpu);
->  struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn);
->  kvm_pfn_t kvm_vcpu_gfn_to_pfn_atomic(struct kvm_vcpu *vcpu, gfn_t gfn);
->  kvm_pfn_t kvm_vcpu_gfn_to_pfn(struct kvm_vcpu *vcpu, gfn_t gfn);
-> +
-> +#ifdef CONFIG_HAS_IOMEM
->  int kvm_vcpu_map(struct kvm_vcpu *vcpu, gpa_t gpa, struct kvm_host_map *map);
-> -struct page *kvm_vcpu_gfn_to_page(struct kvm_vcpu *vcpu, gfn_t gfn);
->  void kvm_vcpu_unmap(struct kvm_vcpu *vcpu, struct kvm_host_map *map, bool dirty);
-> +#endif
-> +
-> +struct page *kvm_vcpu_gfn_to_page(struct kvm_vcpu *vcpu, gfn_t gfn);
->  unsigned long kvm_vcpu_gfn_to_hva(struct kvm_vcpu *vcpu, gfn_t gfn);
->  unsigned long kvm_vcpu_gfn_to_hva_prot(struct kvm_vcpu *vcpu, gfn_t gfn, bool *writable);
->  int kvm_vcpu_read_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn, void *data, int offset,
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index f0d13d9d125d..4a2c813e75d6 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1743,6 +1743,7 @@ struct page *gfn_to_page(struct kvm *kvm, gfn_t gfn)
->  }
->  EXPORT_SYMBOL_GPL(gfn_to_page);
->
-> +#ifdef CONFIG_HAS_IOMEM
->  static int __kvm_map_gfn(struct kvm_memory_slot *slot, gfn_t gfn,
->                          struct kvm_host_map *map)
->  {
-> @@ -1806,6 +1807,7 @@ void kvm_vcpu_unmap(struct kvm_vcpu *vcpu, struct kvm_host_map *map,
->         map->page = NULL;
->  }
->  EXPORT_SYMBOL_GPL(kvm_vcpu_unmap);
-> +#endif /* CONFIG_HAS_IOMEM */
->
->  struct page *kvm_vcpu_gfn_to_page(struct kvm_vcpu *vcpu, gfn_t gfn)
->  {
-> --
-> 2.21.0
->
+Perhaps we can start by whitelisting ioctls by driver?
