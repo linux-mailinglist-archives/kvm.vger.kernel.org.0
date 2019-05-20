@@ -2,81 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A7891232A7
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 13:36:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B89B232CC
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 13:42:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732354AbfETLgu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 07:36:50 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:35195 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732263AbfETLgu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 07:36:50 -0400
-Received: by mail-ot1-f65.google.com with SMTP id n14so12661953otk.2;
-        Mon, 20 May 2019 04:36:49 -0700 (PDT)
+        id S1731057AbfETLkA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 07:40:00 -0400
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:33757 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730708AbfETLkA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 07:40:00 -0400
+Received: by mail-oi1-f193.google.com with SMTP id q186so3027635oia.0;
+        Mon, 20 May 2019 04:39:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=oYKgpm1NW/AEu497K47vi3qUNsDgBwJgGMZFIkaRyMg=;
-        b=lA+ZjDiPZJ2CZVw1XjRn0/jANWPRUrsJdBVluiAyCOhBKfG/P4PFg5C7zTvulV62aq
-         ZDyb6XMMfe3RciCzFc8m9up7j35GwmjDeWfIStOmX+0wkCEGN5HRafDtzUsga5aDE2f4
-         hTODAbqF5+kEpSvz6o3Ys27HoLYmDSfPgCThssldgX77NfLvjdzfHUSinn1f5r0cC3p0
-         VbgqCxQUaPaa5EefWDIrr7JJVR1PRq9RepZCjxywzBzrfcFo25O4oO+Q5DUt5li76YWL
-         oSFdeTnZF7HSs67rurdZl/ljomNvUtahGttN+w1fidkK3y8g4tfg3fMAQ5BbafaYia6Y
-         UK8Q==
+        bh=44L6cEnx4TRmAaeTvxDONBxhfaF21/upIkBICkfjKkY=;
+        b=bHr8RLIt91biK7iigtLZcjVNFcOwKVPjNeVI687TtYDUi1JjPrExUi2+P1Iptq7Mg0
+         USm/LztXpGWXUV4PC2RaEmSaCYVp4U3pp/NeoALvMa5kclANhUrVr+IzDLz9BePad5b9
+         c+5FLsLiFS7mDKdYMy/eMFMdjO9mvVLz7nUBVVe4c5GR365pfRgggCbLQHAkOIlmKhmS
+         XZVzhKsEaqKj7EV7q9Pge7toXiv2fzB9XNWwdg+wXOjNjKp+ilNlQyebFF1bDq/etThh
+         afoQ+hO2ayyXNIRk1yXgFPqcu0Fs3BEjwBJgyMCK75Uda5CAviqRWcsV4lPKsKL36vbc
+         CT6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=oYKgpm1NW/AEu497K47vi3qUNsDgBwJgGMZFIkaRyMg=;
-        b=RTBww1UoSHICxzzua7zTB/nK/4jPQc4MJNMz+djsvGWVPoPG2BmPDDqEiEz0LDpjCk
-         Yh7hHe9zv6SiMi2MVGuLYwU+2wS/tefobB6ET/ZW3ulxorW+UW4M95odXmDPRTp0LUnH
-         ZlTOOCwfWwS1EnVeHyCVt4uoNFsdqBP47vKvS/K+21WGvWj6Uz79bwSYGuyKNC75bpL6
-         4b+zdz77zYvlTmnf5jmRR6150pCs+66FvBHw2i3G1lxj9obTZDp3yjK6lotk00fXnm4S
-         pXUSBkFhZtsredMjPFqWZruExMlB9g05IFY2Bil4bLEgmI0CacB0AyccCT2dyhZvE/h5
-         KJMA==
-X-Gm-Message-State: APjAAAXsdto5hKGsGMtvTwPL0OgI+WNSWDcjpojggUZBLPnnCQPlb+G+
-        3JjcHK+RMAsNtHH2O7M164tInD9GRi+C0SfT488=
-X-Google-Smtp-Source: APXvYqy61zi+V498WQ3FqLdONnpg7SFfQMBTf7Gg3cEi871xFOXNfayrSfkUXZRT32gvR5j4wql+guNN5876drs7yKc=
-X-Received: by 2002:a9d:6312:: with SMTP id q18mr3636712otk.45.1558352209285;
- Mon, 20 May 2019 04:36:49 -0700 (PDT)
+        bh=44L6cEnx4TRmAaeTvxDONBxhfaF21/upIkBICkfjKkY=;
+        b=IdnumE8hybWlnIio/Oco2H1wX/ziiO2B2D+O3XWYLXmEFOCAbb1Zu4h3NLwu7sB5FE
+         40FxJZZcLFhubSqjrpARWqbi6b+fYTfrGKyDfBiwJkXg/72R0QOI8ZqutG3c4NzettUW
+         vXtmoBHkzOb4YsWgo97yNOuN2f7EJkZ8D/o+0wAtTzmo1M9fXrg7O+Hzkc3ci3nfYP9J
+         y+8z7lq+3oQhrAmcEPYRnW4JqWzax0j/U9GHIDX69uptfBplcasFcazyIs/cSMBx/cOb
+         3wA8OqKY/6j6wfcVE84GMjGLCHqzovruSdhTGPtdqyK2zJg+CpM5EqBWyGIKznyG+sfp
+         JhlA==
+X-Gm-Message-State: APjAAAWvNITLSiG4cSjkI0NAu0ohYF4MfObNo2QMesGlaOw2+H0qVcDG
+        M3Hdry7T/CjdaJno3ul/5IcEm4GmlehmTS0YOuoB9A==
+X-Google-Smtp-Source: APXvYqx9PctHUEASD2bRyy2WbrCEnqfZjZV/8lGUIXbMnRESp8XKe1Ed9sqZ2qK3AQY5MChbfRJX3p8qOfKT/uYooO8=
+X-Received: by 2002:aca:da07:: with SMTP id r7mr23708730oig.5.1558352399589;
+ Mon, 20 May 2019 04:39:59 -0700 (PDT)
 MIME-Version: 1.0
-References: <1558340289-6857-1-git-send-email-wanpengli@tencent.com>
- <1558340289-6857-5-git-send-email-wanpengli@tencent.com> <b80a0c3b-c5b1-bfd1-83d7-ace3436b230e@redhat.com>
- <CANRm+CyDpA-2j28soX9si5CX3vFadd4_BASFzt1f4FbNNNDzyw@mail.gmail.com> <bd60e5c2-e3c5-80fc-3a1d-c75809573945@redhat.com>
-In-Reply-To: <bd60e5c2-e3c5-80fc-3a1d-c75809573945@redhat.com>
+References: <1558082990-7822-1-git-send-email-wanpengli@tencent.com>
+ <1558082990-7822-2-git-send-email-wanpengli@tencent.com> <e96eecd6-7095-58b3-32a7-2cfde2f2ebcc@redhat.com>
+In-Reply-To: <e96eecd6-7095-58b3-32a7-2cfde2f2ebcc@redhat.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 20 May 2019 19:36:40 +0800
-Message-ID: <CANRm+CzFQy4UC9oGxFK8UVVhdtV_LGeF3JcNohpRcgspSqcxwg@mail.gmail.com>
-Subject: Re: [PATCH v4 4/5] KVM: LAPIC: Delay trace advance expire delta
+Date:   Mon, 20 May 2019 19:39:50 +0800
+Message-ID: <CANRm+Cze1YGtsXibqmRvL=XNHNETH3ZcpH4HEy-7qwE4qPnA9Q@mail.gmail.com>
+Subject: Re: [PATCH RESEND 2/4] KVM: X86: Emulate MSR_IA32_MISC_ENABLE MWAIT bit
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
-        Liran Alon <liran.alon@oracle.com>
+        Liran Alon <liran.alon@oracle.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 May 2019 at 19:33, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Mon, 20 May 2019 at 18:34, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> On 20/05/19 13:22, Wanpeng Li wrote:
-> >>
-> >> We would like to move wait_lapic_expire() just before vmentry, which would
-> >> place wait_lapic_expire() again inside the extended quiescent state.  Drop
-> >> the tracepoint, but add instead another one that can be useful and where
-> >> we can check the status of the adaptive tuning procedure.
-> > https://lkml.org/lkml/2019/5/15/1435
+> On 17/05/19 10:49, Wanpeng Li wrote:
+> > MSR IA32_MSIC_ENABLE bit 18, according to SDM:
 > >
-> > Maybe Sean's comment is reasonable, per-vCPU debugfs entry for
-> > adaptive tuning and wait_lapic_expire() tracepoint for hand tuning.
+> > | When this bit is set to 0, the MONITOR feature flag is not set (CPUID.01H:ECX[bit 3] = 0).
+> > | This indicates that MONITOR/MWAIT are not supported.
+> > |
+> > | Software attempts to execute MONITOR/MWAIT will cause #UD when this bit is 0.
+> > |
+> > | When this bit is set to 1 (default), MONITOR/MWAIT are supported (CPUID.01H:ECX[bit 3] = 1).
+> >
+> > The CPUID.01H:ECX[bit 3] ought to mirror the value of the MSR bit,
+> > CPUID.01H:ECX[bit 3] is a better guard than kvm_mwait_in_guest().
+> > kvm_mwait_in_guest() affects the behavior of MONITOR/MWAIT, not its
+> > guest visibility.
+> >
+> > This patch implements toggling of the CPUID bit based on guest writes
+> > to the MSR.
 >
-> Hmm, yeah, that makes sense.  The location of the tracepoint is a bit
-> weird, but I guess we can add a comment in the code.
+> Won't this disable mwait after migration, unless IA32_MISC_ENABLE is set
+> correctly by firmware or userspace?  I think you need to hide this
 
-Do you need me to post a new patchset? :)
+Agreed.
+
+> behind KVM_CAP_DISABLE_QUIRKS.  (Also, what is the reason for this
+> change in general besides making behavior closer to real hardware?)
+
+Just making behavior closer to real hardware. :)
 
 Regards,
 Wanpeng Li
