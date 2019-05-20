@@ -2,81 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 61B9723E30
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 19:17:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB1CE230D4
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 11:58:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403948AbfETRRN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 13:17:13 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:38470 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403896AbfETRRN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 13:17:13 -0400
-Received: by mail-pl1-f193.google.com with SMTP id f97so7004967plb.5
-        for <kvm@vger.kernel.org>; Mon, 20 May 2019 10:17:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=ZOAFt+EVBvRQjGvA+lirOOWJZTc+k2CDtH1cV19fpyg=;
-        b=Rd0nRkQD2f4HHH4INmwZuwYsxFgRLt+8OhQYgbxOwBKL6TcJfvA3PowEhR5asUThzA
-         DSzhna2lZm2ioTFV4Wg1GJM86+JLLpyQZRoGOtRg+Gjrw6ASTeec0NyWLpqxX0hdWt2q
-         hzO89+PMfXgBdYxU3asGi+5GvnfiP7PKXWzhD4mvldIyiXOTUjSLZEfBfcwnDpeAA+cr
-         OynBoxxZXBsAX+fjfqQb4mHi4C2cto4tLwE/z+5nEh7Y57KnH1Ekm9KRNzOdc0aaKkdc
-         muKNVkZrN6IpH1bi+MC6O0cqu5q2eaFHyDvkfuQ5go7ZZU3ACw1vDa1TPcBXjCYgm1UK
-         UodQ==
+        id S1725951AbfETJ6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 05:58:34 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39366 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730209AbfETJ6d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 05:58:33 -0400
+Received: by mail-wr1-f67.google.com with SMTP id w8so13855920wrl.6
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 02:58:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=ZOAFt+EVBvRQjGvA+lirOOWJZTc+k2CDtH1cV19fpyg=;
-        b=rzFzHanGQW+rpXhu++Sf3JiEMUKrQ7xxl47eBSAa0Xlgrbg9opOyUcq4hRBqzE15Vc
-         +BzZDhIrNUQQKYvR35mYvfNR/1AUIp2MQXt4tRHZ8J0fbuZepE/hsfpZvcKV8SWZ5J7d
-         bgrxaYg5ln6ct3wFIUv81hMJLib/N2Z3jtukA+QdTEgfE8g4I8XEWm/6+LDbL8ZPUR9Q
-         QwH1du3yAhEYL6qJc2fBajIdsAd5juqd/zl2UqQf8o/4zsyVn1IK90gebxI+QEjzI7y8
-         zW6oYbExA4pNojWVGmv2yVd1qgH8cZwPSz+EOSKWMSvb9H+2zi6pOrqTJOv43RdEiEQr
-         3oFQ==
-X-Gm-Message-State: APjAAAWzgvvakIpLAFZdapa9g3YrSv97E6jlXLgUL/PEN8jK2U3t+ZKq
-        HN0r79CjbAXgqtdaOs63D0A=
-X-Google-Smtp-Source: APXvYqwOFfcLiq3R38qcFmdYjhY+JsDleZbKfo4e5pJJsEGGJT7rJjUsnxfYXBDRclSVzyPjgN2jag==
-X-Received: by 2002:a17:902:5983:: with SMTP id p3mr74839232pli.224.1558372632370;
-        Mon, 20 May 2019 10:17:12 -0700 (PDT)
-Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id i7sm14978114pfo.19.2019.05.20.10.17.11
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=JVX6gPsrTfTmuCUUF5HGp9mgh5XhxV0UDCSIyVUX2pU=;
+        b=t5eTxk8WE3Fkl3wgQWEpaL+GFnQz66xvblHq5pYHQv7PgqTyk0OTghaKsddv7HPhBZ
+         DOSXhLm5GOFX4b+dFRIMEm3t1dgnFKx74pZj7ULOuiueH1g8EO/F8zgs0LHrbZYVRcg1
+         8r2BMs1Mxfo6XTSa0dAKHSZgWfGIktKYkgIR1wh9K1mbnZpBoiWfTfzPf2vFyWRKo4oI
+         lpOKV9TSieOsiWHdcjc0xduVM50rYrYfU60EovoPgDGBcKx7zR/kwAcC+giEN9Ri7NlI
+         FaPbeoj+7Wm3lZE3+ggNxsGiT1TX0rKn1vArxSEutut7QoherGNB6uKg1h81amyeGi+v
+         niVQ==
+X-Gm-Message-State: APjAAAV0ZT23HYW+KycDuqVKSLqHzIwPARqBE//YiZd94rUXCBLWGq+z
+        kiqBxPLkDwgU503Kbeem+sF8Vg==
+X-Google-Smtp-Source: APXvYqyX+/koAl8XVvzNRVRQDgM/pyryMi4qE9o/3q6ykq4c2PuK+wPoPcWKF4qxruA4OZxBGgrJBA==
+X-Received: by 2002:adf:e908:: with SMTP id f8mr13645789wrm.124.1558346312200;
+        Mon, 20 May 2019 02:58:32 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ac04:eef9:b257:b844? ([2001:b07:6468:f312:ac04:eef9:b257:b844])
+        by smtp.gmail.com with ESMTPSA id u2sm26180540wra.82.2019.05.20.02.58.31
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 May 2019 10:17:11 -0700 (PDT)
-From:   Nadav Amit <nadav.amit@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
-        Marc Orr <marcorr@google.com>
-Subject: [kvm-unit-tests PATCH] x86: Remove xfail in entry check in enter_guest_with_bad_controls()
-Date:   Mon, 20 May 2019 02:55:16 -0700
-Message-Id: <20190520095516.15916-1-nadav.amit@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        Mon, 20 May 2019 02:58:31 -0700 (PDT)
+Subject: Re: [PATCH] KVM: selftests: Fix a condition in test_hv_cpuid()
+To:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <20190514103451.GA1694@mwanda>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4bb7a5d3-887f-8487-e8f3-70770312517a@redhat.com>
+Date:   Mon, 20 May 2019 11:58:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190514103451.GA1694@mwanda>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The test succeeds in failing entry. This is not an expected failure.
+On 14/05/19 12:34, Dan Carpenter wrote:
+> The code is trying to check that all the padding is zeroed out and it
+> does this:
+> 
+>     entry->padding[0] == entry->padding[1] == entry->padding[2] == 0
+> 
+> Assume everything is zeroed correctly, then the first comparison is
+> true, the next comparison is false and false is equal to zero so the
+> overall condition is true.  This bug doesn't affect run time very
+> badly, but the code should instead just check that all three paddings
+> are zero individually.
+> 
+> Also the error message was copy and pasted from an earlier error and it
+> wasn't correct.
+> 
+> Fixes: 7edcb7343327 ("KVM: selftests: Add hyperv_cpuid test")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> ---
+>  tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> index 9a21e912097c..63b9fc3fdfbe 100644
+> --- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> @@ -58,9 +58,8 @@ static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
+>  		TEST_ASSERT(entry->flags == 0,
+>  			    ".flags field should be zero");
+>  
+> -		TEST_ASSERT(entry->padding[0] == entry->padding[1]
+> -			    == entry->padding[2] == 0,
+> -			    ".index field should be zero");
+> +		TEST_ASSERT(!entry->padding[0] && !entry->padding[1] &&
+> +			    !entry->padding[2], "padding should be zero");
+>  
+>  		/*
+>  		 * If needed for debug:
+> 
 
-Cc: Marc Orr <marcorr@google.com>
-Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
----
- x86/vmx.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Queued, thanks.
 
-diff --git a/x86/vmx.c b/x86/vmx.c
-index f540e15..014bf50 100644
---- a/x86/vmx.c
-+++ b/x86/vmx.c
-@@ -1833,8 +1833,7 @@ void enter_guest_with_bad_controls(void)
- 			"Called enter_guest() after guest returned.");
- 
- 	ok = vmx_enter_guest(&failure);
--	report_xfail("vmlaunch fails, as expected",
--		     true, ok);
-+	report("vmlaunch fails, as expected", !ok);
- 	report("failure occurred early", failure.early);
- 	report("FLAGS set correctly",
- 	       (failure.flags & VMX_ENTRY_FLAGS) == X86_EFLAGS_ZF);
--- 
-2.17.1
-
+Paolo
