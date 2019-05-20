@@ -2,163 +2,326 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 18C9C232F9
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 13:46:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D2782330D
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 13:52:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730887AbfETLqD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 07:46:03 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:39887 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728719AbfETLqC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 07:46:02 -0400
-Received: by mail-ot1-f65.google.com with SMTP id r7so12659458otn.6;
-        Mon, 20 May 2019 04:46:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YK40W8FYXPsem3N0M5GP+38ah6mkX7Im5MvwKipFNsw=;
-        b=RoY4Rk0tf3pwB6ho+Y7WLAFKHG+h2TTjnpz9K/w1TMsCjFsOQ8uYov3Grmlp2nYp47
-         vJt0VoWo13wdxNwTnNn0xyVAWlLZzYArcIzgKJBXYsCDjTScjv+V9bNqaDV6xHIG8YKT
-         Sxzbeg+qUtwGFull//2leGoW4yzKdzTMnmkmN8dkiNEryvLSr3Z4qsSdKC/ZCJkYZl+H
-         z32RRiFVizIG+0HhWlg4jgwHd9fYYlMEK/FUARTkSsZ63SdIJw/pxi6zUj7j8IPBy6hY
-         enPvETd/fAA9ts/JglX8blm6o1iVQzon2FtUoFTZ8e9JsVOcQaHXP2hEtbq+ynt++bKt
-         9q6A==
+        id S1732067AbfETLwB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 07:52:01 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:37510 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731093AbfETLwB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 07:52:01 -0400
+Received: by mail-wr1-f65.google.com with SMTP id e15so14263534wrs.4
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 04:51:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YK40W8FYXPsem3N0M5GP+38ah6mkX7Im5MvwKipFNsw=;
-        b=DNBTyB7z+RG8uhACv66tUvFb3JSLRHZ82tYDBJDtuVuoYicxn4SS1c/PhN4dA7pizW
-         1dtGUz7xwYbqjejkOs4bFlqOZsPsPwpk9VEMObDVsqePna0rwHP67hqxDupufbttnoaZ
-         y17OFittYO0VwMlDzWNRoleL9uIPkHXkbtJVF+MNWXqF3g8zoqnG1WaH3OGPi/fAFirZ
-         d0RZeyMRARVPcUvsjEbshLkoGo7oM9Hpk7F9GwUuUfvfea7gw/LDizUZiSsaPUYdwMwS
-         9BBbBnUD5UIL0lpg00dizq2F3Ryykp4CKGlo8SMdKGog7tD7UFzUfzrV5XZ9RvrXUeXP
-         Dj6w==
-X-Gm-Message-State: APjAAAXocQF0XGLPdDikRxJcGHAKivhMzGmlgG1QyW+BTwQlDYRnhAnp
-        trGjiahyBhG347Y4zNuK78aa11rIWDT7buSTl1qfVQ==
-X-Google-Smtp-Source: APXvYqyLirWDkCv1jsHOwXXeOs+83ro/jbI0opgbhIzBti3BcptCNQgwATHJ6OMUc0oyBh10kyjZ7F49+xcusFtpogU=
-X-Received: by 2002:a9d:1405:: with SMTP id h5mr20033485oth.118.1558352761836;
- Mon, 20 May 2019 04:46:01 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Q2PEIiIF1A7rTvGUAk7SsEfg651tnJ59JNCgRp3FyYI=;
+        b=rbwwIXSiBkBz0Mq9KkIcJ6pmR13WS+KTLwzZ+7lq5oUkLqWobxZ4aklcQSnEKcpZI4
+         KL20b7pDxQgiLjKTogInx3JoHc8NhCj88YFzBwhYykZaWD+86Sn8PlABi7tdiQgdQWHG
+         QxMwGBtSPCecQ7EKx7CJC/d8QDn5qxPCHVz2NnmidCyNP4RzZ/2dxzu/DHygB6LsprXF
+         +DZoYlHIrfMgXWE2gaQ3trekofn/5/HbPSCFUYCv7Mb8Irbnjh2cxuQAbS/WhlbZD8Wy
+         drjl7i3xVTAnn4BEg8S/Q4tTjsgeE5PwL9PO9YQwYFNUApgyXomPG5RBzzodKvpEg1mC
+         /8hw==
+X-Gm-Message-State: APjAAAVQvUXb9kHaZ3aABjVRGulQzEn29vLXU48W6zlzZ/qMfkrDgbVa
+        aGBuMZva09PXq70B6NE6SUSnHA==
+X-Google-Smtp-Source: APXvYqw1PaGad9NLGx5TkoGsuLd/el0us2a6use+EdpS0QqLSXpFCA2iM3HoF6r9/pdvFvxtAkscFA==
+X-Received: by 2002:adf:9022:: with SMTP id h31mr17708835wrh.46.1558353119121;
+        Mon, 20 May 2019 04:51:59 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ac04:eef9:b257:b844? ([2001:b07:6468:f312:ac04:eef9:b257:b844])
+        by smtp.gmail.com with ESMTPSA id t66sm9081410wmf.39.2019.05.20.04.51.58
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 20 May 2019 04:51:58 -0700 (PDT)
+Subject: Re: [PATCH] x86: add cpuidle_kvm driver to allow guest side halt
+ polling
+To:     Marcelo Tosatti <mtosatti@redhat.com>,
+        kvm-devel <kvm@vger.kernel.org>
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        "Raslan, KarimAllah" <karahmed@amazon.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>
+References: <20190517174857.GA8611@amt.cnet>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fd5caf49-6d98-4887-0052-ccbc999fc077@redhat.com>
+Date:   Mon, 20 May 2019 13:51:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <1558340289-6857-1-git-send-email-wanpengli@tencent.com>
- <1558340289-6857-5-git-send-email-wanpengli@tencent.com> <b80a0c3b-c5b1-bfd1-83d7-ace3436b230e@redhat.com>
- <CANRm+CyDpA-2j28soX9si5CX3vFadd4_BASFzt1f4FbNNNDzyw@mail.gmail.com>
- <bd60e5c2-e3c5-80fc-3a1d-c75809573945@redhat.com> <CANRm+CzFQy4UC9oGxFK8UVVhdtV_LGeF3JcNohpRcgspSqcxwg@mail.gmail.com>
- <024a0c93-f8a3-abe0-85de-fa41babf06a0@redhat.com>
-In-Reply-To: <024a0c93-f8a3-abe0-85de-fa41babf06a0@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 20 May 2019 19:45:52 +0800
-Message-ID: <CANRm+Cy69VH+5w4en-Q+N85bRCBoCWNi6oEwpJGgp+MBaUUX8Q@mail.gmail.com>
-Subject: Re: [PATCH v4 4/5] KVM: LAPIC: Delay trace advance expire delta
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Liran Alon <liran.alon@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190517174857.GA8611@amt.cnet>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 May 2019 at 19:41, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 20/05/19 13:36, Wanpeng Li wrote:
-> >> Hmm, yeah, that makes sense.  The location of the tracepoint is a bit
-> >> weird, but I guess we can add a comment in the code.
-> > Do you need me to post a new patchset? :)
->
-> No problem.  The final patch that I committed is this:
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index c12b090f4fad..f8615872ae64 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1502,27 +1502,27 @@ static inline void __wait_lapic_expire(struct kvm_vcpu *vcpu, u64 guest_cycles)
->  }
->
->  static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
-> -                                             u64 guest_tsc, u64 tsc_deadline)
-> +                                             s64 advance_expire_delta)
->  {
->         struct kvm_lapic *apic = vcpu->arch.apic;
->         u32 timer_advance_ns = apic->lapic_timer.timer_advance_ns;
->         u64 ns;
->
->         /* too early */
-> -       if (guest_tsc < tsc_deadline) {
-> -               ns = (tsc_deadline - guest_tsc) * 1000000ULL;
-> +       if (advance_expire_delta < 0) {
-> +               ns = -advance_expire_delta * 1000000ULL;
->                 do_div(ns, vcpu->arch.virtual_tsc_khz);
->                 timer_advance_ns -= min((u32)ns,
->                         timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
->         } else {
->         /* too late */
-> -               ns = (guest_tsc - tsc_deadline) * 1000000ULL;
-> +               ns = advance_expire_delta * 1000000ULL;
->                 do_div(ns, vcpu->arch.virtual_tsc_khz);
->                 timer_advance_ns += min((u32)ns,
->                         timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
->         }
->
-> -       if (abs(guest_tsc - tsc_deadline) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
-> +       if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
->                 apic->lapic_timer.timer_advance_adjust_done = true;
->         if (unlikely(timer_advance_ns > 5000)) {
->                 timer_advance_ns = 0;
-> @@ -1545,13 +1545,13 @@ void wait_lapic_expire(struct kvm_vcpu *vcpu)
->         tsc_deadline = apic->lapic_timer.expired_tscdeadline;
->         apic->lapic_timer.expired_tscdeadline = 0;
->         guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
-> -       trace_kvm_wait_lapic_expire(vcpu->vcpu_id, guest_tsc - tsc_deadline);
-> +       apic->lapic_timer.advance_expire_delta = guest_tsc - tsc_deadline;
->
->         if (guest_tsc < tsc_deadline)
->                 __wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
->
->         if (unlikely(!apic->lapic_timer.timer_advance_adjust_done))
-> -               adjust_lapic_timer_advance(vcpu, guest_tsc, tsc_deadline);
-> +               adjust_lapic_timer_advance(vcpu, apic->lapic_timer.advance_expire_delta);
->  }
->
->  static void start_sw_tscdeadline(struct kvm_lapic *apic)
-> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> index d6d049ba3045..3e72a255543d 100644
-> --- a/arch/x86/kvm/lapic.h
-> +++ b/arch/x86/kvm/lapic.h
-> @@ -32,6 +32,7 @@ struct kvm_timer {
->         u64 tscdeadline;
->         u64 expired_tscdeadline;
->         u32 timer_advance_ns;
-> +       s64 advance_expire_delta;
->         atomic_t pending;                       /* accumulated triggered timers */
->         bool hv_timer_in_use;
->         bool timer_advance_adjust_done;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index e7e57de50a3c..35631505421c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8008,6 +8008,13 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->         ++vcpu->stat.exits;
->
->         guest_exit_irqoff();
-> +       if (lapic_in_kernel(vcpu)) {
-> +               s64 delta = vcpu->arch.apic->lapic_timer.advance_expire_delta;
-> +               if (delta != S64_MIN) {
-> +                       trace_kvm_wait_lapic_expire(vcpu->vcpu_id, delta);
-> +                       vcpu->arch.apic->lapic_timer.advance_expire_delta = S64_MIN;
-> +               }
-> +       }
->
->         local_irq_enable();
->         preempt_enable();
->
-> so that KVM tracks whether wait_lapic_expire was called, and do not
-> invoke the tracepoint if not.
+On 17/05/19 19:48, Marcelo Tosatti wrote:
+> 
+> The cpuidle_kvm driver allows the guest vcpus to poll for a specified
+> amount of time before halting. This provides the following benefits
+> to host side polling:
+> 
+> 	1) The POLL flag is set while polling is performed, which allows
+> 	   a remote vCPU to avoid sending an IPI (and the associated
+>  	   cost of handling the IPI) when performing a wakeup.
+> 
+> 	2) The HLT VM-exit cost can be avoided.
+> 
+> The downside of guest side polling is that polling is performed
+> even with other runnable tasks in the host.
+> 
+> Results comparing halt_poll_ns and server/client application
+> where a small packet is ping-ponged:
+> 
+> host                                        --> 31.33	
+> halt_poll_ns=300000 / no guest busy spin    --> 33.40	(93.8%)
+> halt_poll_ns=0 / guest_halt_poll_ns=300000  --> 32.73	(95.7%)
+> 
+> For the SAP HANA benchmarks (where idle_spin is a parameter 
+> of the previous version of the patch, results should be the
+> same):
+> 
+> hpns == halt_poll_ns
+> 
+>                           idle_spin=0/   idle_spin=800/	   idle_spin=0/
+> 			  hpns=200000    hpns=0            hpns=800000
+> DeleteC06T03 (100 thread) 1.76           1.71 (-3%)        1.78	  (+1%)
+> InsertC16T02 (100 thread) 2.14     	 2.07 (-3%)        2.18   (+1.8%)
+> DeleteC00T01 (1 thread)   1.34 		 1.28 (-4.5%)	   1.29   (-3.7%)
+> UpdateC00T03 (1 thread)	  4.72		 4.18 (-12%)	   4.53   (-5%)
 
-Looks good to me, thank you. :)
+Hi Marcelo,
 
-Regards,
-Wanpeng Li
+some quick observations:
+
+1) This is actually not KVM-specific, so the name and placement of the
+docs should be adjusted.
+
+2) Regarding KVM-specific code, however, we could add an MSR so that KVM
+disables halt_poll_ns for this VM when this is active in the guest?
+
+3) The spin time could use the same adaptive algorithm that KVM uses in
+the host.
+
+Thanks,
+
+Paolo
+
+
+> ---
+>  Documentation/virtual/kvm/guest-halt-polling.txt |   39 ++++++++
+>  arch/x86/Kconfig                                 |    9 +
+>  arch/x86/kernel/Makefile                         |    1 
+>  arch/x86/kernel/cpuidle_kvm.c                    |  105 +++++++++++++++++++++++
+>  arch/x86/kernel/process.c                        |    2 
+>  5 files changed, 155 insertions(+), 1 deletion(-)
+> 
+> Index: linux-2.6.git/arch/x86/Kconfig
+> ===================================================================
+> --- linux-2.6.git.orig/arch/x86/Kconfig	2019-04-22 13:49:42.858303265 -0300
+> +++ linux-2.6.git/arch/x86/Kconfig	2019-05-16 14:18:41.254852745 -0300
+> @@ -805,6 +805,15 @@
+>  	  underlying device model, the host provides the guest with
+>  	  timing infrastructure such as time of day, and system time
+>  
+> +config KVM_CPUIDLE
+> +	tristate "KVM cpuidle driver"
+> +	depends on KVM_GUEST
+> +	default y
+> +	help
+> +	  This option enables KVM cpuidle driver, which allows to poll
+> +	  before halting in the guest (more efficient than polling in the
+> +	  host via halt_poll_ns for some scenarios).
+> +
+>  config PVH
+>  	bool "Support for running PVH guests"
+>  	---help---
+> Index: linux-2.6.git/arch/x86/kernel/Makefile
+> ===================================================================
+> --- linux-2.6.git.orig/arch/x86/kernel/Makefile	2019-04-22 13:49:42.869303331 -0300
+> +++ linux-2.6.git/arch/x86/kernel/Makefile	2019-05-17 12:59:51.673274881 -0300
+> @@ -112,6 +112,7 @@
+>  obj-$(CONFIG_DEBUG_NMI_SELFTEST) += nmi_selftest.o
+>  
+>  obj-$(CONFIG_KVM_GUEST)		+= kvm.o kvmclock.o
+> +obj-$(CONFIG_KVM_CPUIDLE)	+= cpuidle_kvm.o
+>  obj-$(CONFIG_PARAVIRT)		+= paravirt.o paravirt_patch_$(BITS).o
+>  obj-$(CONFIG_PARAVIRT_SPINLOCKS)+= paravirt-spinlocks.o
+>  obj-$(CONFIG_PARAVIRT_CLOCK)	+= pvclock.o
+> Index: linux-2.6.git/arch/x86/kernel/process.c
+> ===================================================================
+> --- linux-2.6.git.orig/arch/x86/kernel/process.c	2019-04-22 13:49:42.876303374 -0300
+> +++ linux-2.6.git/arch/x86/kernel/process.c	2019-05-17 13:19:18.055435117 -0300
+> @@ -580,7 +580,7 @@
+>  	safe_halt();
+>  	trace_cpu_idle_rcuidle(PWR_EVENT_EXIT, smp_processor_id());
+>  }
+> -#ifdef CONFIG_APM_MODULE
+> +#if defined(CONFIG_APM_MODULE) || defined(CONFIG_KVM_CPUIDLE_MODULE)
+>  EXPORT_SYMBOL(default_idle);
+>  #endif
+>  
+> Index: linux-2.6.git/arch/x86/kernel/cpuidle_kvm.c
+> ===================================================================
+> --- /dev/null	1970-01-01 00:00:00.000000000 +0000
+> +++ linux-2.6.git/arch/x86/kernel/cpuidle_kvm.c	2019-05-17 13:38:02.553941356 -0300
+> @@ -0,0 +1,105 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * cpuidle driver for KVM guests.
+> + *
+> + * Copyright 2019 Red Hat, Inc. and/or its affiliates.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> + * the COPYING file in the top-level directory.
+> + *
+> + * Authors: Marcelo Tosatti <mtosatti@redhat.com>
+> + */
+> +
+> +#include <linux/init.h>
+> +#include <linux/cpuidle.h>
+> +#include <linux/module.h>
+> +#include <linux/timekeeping.h>
+> +#include <linux/sched/idle.h>
+> +
+> +unsigned int guest_halt_poll_ns;
+> +module_param(guest_halt_poll_ns, uint, 0644);
+> +
+> +static int kvm_enter_idle(struct cpuidle_device *dev,
+> +			  struct cpuidle_driver *drv, int index)
+> +{
+> +	int do_halt = 0;
+> +
+> +	/* No polling */
+> +	if (guest_halt_poll_ns == 0) {
+> +		if (current_clr_polling_and_test()) {
+> +			local_irq_enable();
+> +			return index;
+> +		}
+> +		default_idle();
+> +		return index;
+> +	}
+> +
+> +	local_irq_enable();
+> +	if (!current_set_polling_and_test()) {
+> +		ktime_t now, end_spin;
+> +
+> +		now = ktime_get();
+> +		end_spin = ktime_add_ns(now, guest_halt_poll_ns);
+> +
+> +		while (!need_resched()) {
+> +			cpu_relax();
+> +			now = ktime_get();
+> +
+> +			if (!ktime_before(now, end_spin)) {
+> +				do_halt = 1;
+> +				break;
+> +			}
+> +		}
+> +	}
+> +
+> +	if (do_halt) {
+> +		/*
+> +		 * No events while busy spin window passed,
+> +		 * halt.
+> +		 */
+> +		local_irq_disable();
+> +		if (current_clr_polling_and_test()) {
+> +			local_irq_enable();
+> +			return index;
+> +		}
+> +		default_idle();
+> +	} else {
+> +		current_clr_polling();
+> +	}
+> +
+> +	return index;
+> +}
+> +
+> +static struct cpuidle_driver kvm_idle_driver = {
+> +	.name = "kvm_idle",
+> +	.owner = THIS_MODULE,
+> +	.states = {
+> +		{ /* entry 0 is for polling */ },
+> +		{
+> +			.enter			= kvm_enter_idle,
+> +			.exit_latency		= 0,
+> +			.target_residency	= 0,
+> +			.power_usage		= -1,
+> +			.name			= "KVM",
+> +			.desc			= "KVM idle",
+> +		},
+> +	},
+> +	.safe_state_index = 0,
+> +	.state_count = 2,
+> +};
+> +
+> +static int __init kvm_cpuidle_init(void)
+> +{
+> +	return cpuidle_register(&kvm_idle_driver, NULL);
+> +}
+> +
+> +static void __exit kvm_cpuidle_exit(void)
+> +{
+> +	cpuidle_unregister(&kvm_idle_driver);
+> +}
+> +
+> +module_init(kvm_cpuidle_init);
+> +module_exit(kvm_cpuidle_exit);
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Marcelo Tosatti <mtosatti@redhat.com>");
+> +
+> Index: linux-2.6.git/Documentation/virtual/kvm/guest-halt-polling.txt
+> ===================================================================
+> --- /dev/null	1970-01-01 00:00:00.000000000 +0000
+> +++ linux-2.6.git/Documentation/virtual/kvm/guest-halt-polling.txt	2019-05-17 13:36:39.274703710 -0300
+> @@ -0,0 +1,39 @@
+> +KVM guest halt polling
+> +======================
+> +
+> +The cpuidle_kvm driver allows the guest vcpus to poll for a specified
+> +amount of time before halting. This provides the following benefits
+> +to host side polling:
+> +
+> +	1) The POLL flag is set while polling is performed, which allows
+> +	   a remote vCPU to avoid sending an IPI (and the associated
+> + 	   cost of handling the IPI) when performing a wakeup.
+> +
+> +	2) The HLT VM-exit cost can be avoided.
+> +
+> +The downside of guest side polling is that polling is performed
+> +even with other runnable tasks in the host.
+> +
+> +Module Parameters
+> +=================
+> +
+> +The cpuidle_kvm module has 1 tuneable module parameter: guest_halt_poll_ns,
+> +the amount of time, in nanoseconds, that polling is performed before
+> +halting.
+> +
+> +This module parameter can be set from the debugfs files in:
+> +
+> +	/sys/module/cpuidle_kvm/parameters/
+> +
+> +Further Notes
+> +=============
+> +
+> +- Care should be taken when setting the guest_halt_poll_ns parameter as a
+> +large value has the potential to drive the cpu usage to 100% on a machine which
+> +would be almost entirely idle otherwise.
+> +
+> +- The effective amount of time that polling is performed is the host poll
+> +value (see halt-polling.txt) plus guest_halt_poll_ns. If all guests
+> +on a host system support and have properly configured guest_halt_poll_ns,
+> +then setting halt_poll_ns to 0 in the host is probably the best choice.
+> +
+> 
+
