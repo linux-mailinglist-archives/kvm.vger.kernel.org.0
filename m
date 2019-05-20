@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E992E22E3C
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 10:18:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 600F522E3D
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 10:18:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731251AbfETISf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 04:18:35 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:35745 "EHLO
+        id S1731264AbfETISg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 04:18:36 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:40324 "EHLO
         mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731227AbfETISd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 04:18:33 -0400
-Received: by mail-pg1-f193.google.com with SMTP id t1so5005363pgc.2;
-        Mon, 20 May 2019 01:18:33 -0700 (PDT)
+        with ESMTP id S1731250AbfETISg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 04:18:36 -0400
+Received: by mail-pg1-f193.google.com with SMTP id d30so6418191pgm.7;
+        Mon, 20 May 2019 01:18:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=pgbMJUS0t5EEMQVa4x2z1mBqXaayN9eDcVUF1ZHkpGo=;
-        b=gOskyFqv4TYixDqOL3mWr4ZC8ZZtb79p7fL7c/1IBW0fSralC96MYcHJgyWH4jAal3
-         bnBr/jh0vRlGAXji9LVLh90zSPAFXv8SEoxgHi6xx9dkmbtu0/XcoXX5biOqaCCqqxXO
-         sWromyHdk2tw4yfYti1DPOwoMJKIvGV1b8jsWKfglEugepEdBjPdqwwKqgBK1ISr3zC9
-         ugw9sWe9APCT2wiGTDK4Kol5l97HyQRDlM0AhLTsn/YSKun/5nnXrin6tTUE0llWhOar
-         uDA2YRZSKPoY35rxCNYO8hvyTtoLIqEIUtU1G2lNWV2D9yaxXthEDXPoYxS8iUnzVyRs
-         Q+8w==
+        bh=kpDjSa6rGnO+8XAS5uIFDRLRqGo48wwbHZAcXP1SnMk=;
+        b=ok1+HO/2AuRosAo20+uTnpWgfEx9f90VMs2K0zxSu5gGiNBCqYhvhq6MhCuI7FhtVb
+         6AtiVCfGbk/I/1w28D8ltKw1dim3qX1zDUg+atNhZXlPbAlTj59J3aKUFOrNov+tuf/S
+         oKB0BCif/q8W2cxZCqvLupMLQTm2p5RIP79a1HYteZi8EBW+fTm9CR6A5hRgAw453GzR
+         h6JlcRe1aHFkAZ6D2ZIOOCq9Oj/HYNrwlRTn+DyYDWTXX6LScRsE2O3s3LTOEZ2W4IeS
+         Orj+hUaQdK9Jfr9tAidiA6/Y4K0JBiWnz7B4oG5zq+SRhoIJWyKONJNQHEq6etOyGPkl
+         snLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=pgbMJUS0t5EEMQVa4x2z1mBqXaayN9eDcVUF1ZHkpGo=;
-        b=KSMELdH0UHj4b4wXE3U1k6/x00FTUOKh0JhJlRFcBEX39zfvRkG+vag/0oTIPk2mbH
-         1rOZuVTuB5xMFxEf2wbQex7Jg1ZDMiuCoDq9fL1J3nFT/EwBVECliPLkA1B+dfZnE92J
-         fKEXmh0kIguxQragp7PxKjxkTMiqCepUyuuuxjlpbQaDKvZChDBedBODbTwZZ1lp5UrJ
-         RO3pUtEwcPUQxXd+Xs8RNSYehFzE3Jnov88p8+wgdgNgDWnT2+yeta3YhXXFI0nS7O9z
-         ooSSLBpPB/Cg8jYJcx4phCsIQOvaOVMQBzMnIwHwiB5gc176qOUCMbAMr0RlVRVTv/o2
-         kcgg==
-X-Gm-Message-State: APjAAAX0DbUBKUZt0F2b6Xs6BzkaANhqo1+EwkA6+BLgoxW6TLoMxm7V
-        3Sy0CFECCFLsGHgCK16xEYu9ycqg
-X-Google-Smtp-Source: APXvYqzUZMJcNkf5rEYtW9VtjGz/GwR/ogbXpYTmexsCYg+iIbwg7uUa4IwJyHKTlVXMlRziflDLKA==
-X-Received: by 2002:a65:5cca:: with SMTP id b10mr74406405pgt.444.1558340312802;
-        Mon, 20 May 2019 01:18:32 -0700 (PDT)
+        bh=kpDjSa6rGnO+8XAS5uIFDRLRqGo48wwbHZAcXP1SnMk=;
+        b=BdpHS2yPmJRbfSVkgqP8KVlCJ8BCGMb2uGEd0uArASFkUzdRnDyd3THXsovFDp55/C
+         cEJroiX83yDJmPaVfU7LePndd9HKy3Odpznz0wtXAywIZ5qTlcz7xNEUmT3HEwzyK8Vk
+         vwH6QOiR9/h5ng0d1zHZubGL/y2PtvOgmvvdCX5fblWEoLRn/CEPtoepHbltegbOcVaU
+         kazWxLHRpos8k8dMgBdWhftWEFEdiS6ZooF5JTKrLTMciNBqd0yzpllBCC5OWXMOGTJo
+         ijt7T2qz4m4VqZOSaOmu6jm3cJ3lvj2OBJ2AbfL0t20hZuMOjv7gq39f/OgTO3c9IVof
+         aAKA==
+X-Gm-Message-State: APjAAAU9qi8QN487OAQy9hHOO09NqBXuTvh10DCeASKvFJ42LHVQg2ez
+        ZIMtRmj6qPJ/+41qOqXWWlN0NUZU
+X-Google-Smtp-Source: APXvYqxpVxrUKsv16f4yYfyE58sT6WYTU9v2cAub2b3tv50wPdb/kGDuxeS6Wkhh6SoRB/ZKFJH3rQ==
+X-Received: by 2002:a63:4852:: with SMTP id x18mr60586780pgk.14.1558340314989;
+        Mon, 20 May 2019 01:18:34 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id z9sm18522110pgc.82.2019.05.20.01.18.30
+        by smtp.googlemail.com with ESMTPSA id z9sm18522110pgc.82.2019.05.20.01.18.32
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 20 May 2019 01:18:32 -0700 (PDT)
+        Mon, 20 May 2019 01:18:34 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -51,9 +51,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Liran Alon <liran.alon@oracle.com>
-Subject: [PATCH v4 4/5] KVM: LAPIC: Delay trace advance expire delta
-Date:   Mon, 20 May 2019 16:18:08 +0800
-Message-Id: <1558340289-6857-5-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH v4 5/5] KVM: LAPIC: Optimize timer latency further
+Date:   Mon, 20 May 2019 16:18:09 +0800
+Message-Id: <1558340289-6857-6-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1558340289-6857-1-git-send-email-wanpengli@tencent.com>
 References: <1558340289-6857-1-git-send-email-wanpengli@tencent.com>
@@ -67,107 +67,113 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-wait_lapic_expire() call was moved above guest_enter_irqoff() because of 
-its tracepoint, which violated the RCU extended quiescent state invoked 
-by guest_enter_irqoff()[1][2]. This patch simply moves the tracepoint 
-below guest_exit_irqoff() in vcpu_enter_guest(). Snapshot the delta before 
-VM-Enter, but trace it after VM-Exit. This can help us to move 
-wait_lapic_expire() just before vmentry in the later patch.
+Advance lapic timer tries to hidden the hypervisor overhead between the 
+host emulated timer fires and the guest awares the timer is fired. However, 
+it just hidden the time between apic_timer_fn/handle_preemption_timer -> 
+wait_lapic_expire, instead of the real position of vmentry which is 
+mentioned in the orignial commit d0659d946be0 ("KVM: x86: add option to 
+advance tscdeadline hrtimer expiration"). There is 700+ cpu cycles between 
+the end of wait_lapic_expire and before world switch on my haswell desktop.
 
-[1] Commit 8b89fe1f6c43 ("kvm: x86: move tracepoints outside extended quiescent state")
-[2] https://patchwork.kernel.org/patch/7821111/
+This patch tries to narrow the last gap(wait_lapic_expire -> world switch), 
+it takes the real overhead time between apic_timer_fn/handle_preemption_timer
+and before world switch into consideration when adaptively tuning timer 
+advancement. The patch can reduce 40% latency (~1600+ cycles to ~1000+ cycles 
+on a haswell desktop) for kvm-unit-tests/tscdeadline_latency when testing 
+busy waits.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Radim Krčmář <rkrcmar@redhat.com>
 Cc: Sean Christopherson <sean.j.christopherson@intel.com>
 Cc: Liran Alon <liran.alon@oracle.com>
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- arch/x86/kvm/lapic.c | 14 +++++++-------
- arch/x86/kvm/lapic.h |  1 +
- arch/x86/kvm/x86.c   |  4 ++++
- 3 files changed, 12 insertions(+), 7 deletions(-)
+ arch/x86/kvm/lapic.c   | 3 ++-
+ arch/x86/kvm/lapic.h   | 2 +-
+ arch/x86/kvm/svm.c     | 4 ++++
+ arch/x86/kvm/vmx/vmx.c | 4 ++++
+ arch/x86/kvm/x86.c     | 3 ---
+ 5 files changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 89ac82d..6652928 100644
+index 6652928..db75ac5 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -1502,27 +1502,27 @@ static inline void __wait_lapic_expire(struct kvm_vcpu *vcpu, u64 guest_cycles)
+@@ -1531,7 +1531,7 @@ static inline void adaptive_tune_timer_advancement(struct kvm_vcpu *vcpu,
+ 	apic->lapic_timer.timer_advance_ns = timer_advance_ns;
  }
  
- static inline void adaptive_tune_timer_advancement(struct kvm_vcpu *vcpu,
--				u64 guest_tsc, u64 tsc_deadline)
-+				s64 advance_expire_delta)
+-void wait_lapic_expire(struct kvm_vcpu *vcpu)
++void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
  {
  	struct kvm_lapic *apic = vcpu->arch.apic;
- 	u32 timer_advance_ns = apic->lapic_timer.timer_advance_ns;
- 	u64 ns;
- 
- 	/* too early */
--	if (guest_tsc < tsc_deadline) {
--		ns = (tsc_deadline - guest_tsc) * 1000000ULL;
-+	if (advance_expire_delta < 0) {
-+		ns = -advance_expire_delta * 1000000ULL;
- 		do_div(ns, vcpu->arch.virtual_tsc_khz);
- 		timer_advance_ns -= min((u32)ns,
- 			timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
- 	} else {
- 	/* too late */
--		ns = (guest_tsc - tsc_deadline) * 1000000ULL;
-+		ns = advance_expire_delta * 1000000ULL;
- 		do_div(ns, vcpu->arch.virtual_tsc_khz);
- 		timer_advance_ns += min((u32)ns,
- 			timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
- 	}
- 
--	if (abs(guest_tsc - tsc_deadline) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
-+	if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
- 		apic->lapic_timer.timer_advance_adjust_done = true;
- 	if (unlikely(timer_advance_ns > 5000)) {
- 		timer_advance_ns = 0;
-@@ -1545,13 +1545,13 @@ void wait_lapic_expire(struct kvm_vcpu *vcpu)
- 	tsc_deadline = apic->lapic_timer.expired_tscdeadline;
- 	apic->lapic_timer.expired_tscdeadline = 0;
- 	guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
--	trace_kvm_wait_lapic_expire(vcpu->vcpu_id, guest_tsc - tsc_deadline);
-+	apic->lapic_timer.advance_expire_delta = guest_tsc - tsc_deadline;
- 
- 	if (guest_tsc < tsc_deadline)
- 		__wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
- 
+ 	u64 guest_tsc, tsc_deadline;
+@@ -1553,6 +1553,7 @@ void wait_lapic_expire(struct kvm_vcpu *vcpu)
  	if (unlikely(!apic->lapic_timer.timer_advance_adjust_done))
--		adaptive_tune_timer_advancement(vcpu, guest_tsc, tsc_deadline);
-+		adaptive_tune_timer_advancement(vcpu, apic->lapic_timer.advance_expire_delta);
+ 		adaptive_tune_timer_advancement(vcpu, apic->lapic_timer.advance_expire_delta);
  }
++EXPORT_SYMBOL_GPL(kvm_wait_lapic_expire);
  
  static void start_sw_tscdeadline(struct kvm_lapic *apic)
+ {
 diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index d6d049b..3e72a25 100644
+index 3e72a25..f974a3d 100644
 --- a/arch/x86/kvm/lapic.h
 +++ b/arch/x86/kvm/lapic.h
-@@ -32,6 +32,7 @@ struct kvm_timer {
- 	u64 tscdeadline;
- 	u64 expired_tscdeadline;
- 	u32 timer_advance_ns;
-+	s64 advance_expire_delta;
- 	atomic_t pending;			/* accumulated triggered timers */
- 	bool hv_timer_in_use;
- 	bool timer_advance_adjust_done;
+@@ -220,7 +220,7 @@ static inline int kvm_lapic_latched_init(struct kvm_vcpu *vcpu)
+ 
+ bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector);
+ 
+-void wait_lapic_expire(struct kvm_vcpu *vcpu);
++void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
+ 
+ bool kvm_intr_is_single_vcpu_fast(struct kvm *kvm, struct kvm_lapic_irq *irq,
+ 			struct kvm_vcpu **dest_vcpu);
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index a849dcb..e68c1b9 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -5632,6 +5632,10 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	clgi();
+ 	kvm_load_guest_xcr0(vcpu);
+ 
++	if (lapic_in_kernel(vcpu) &&
++		vcpu->arch.apic->lapic_timer.timer_advance_ns)
++		kvm_wait_lapic_expire(vcpu);
++
+ 	/*
+ 	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
+ 	 * it's non-zero. Since vmentry is serialising on affected CPUs, there
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 16d2a3e..57d0e57 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6433,6 +6433,10 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	vmx_update_hv_timer(vcpu);
+ 
++	if (lapic_in_kernel(vcpu) &&
++		vcpu->arch.apic->lapic_timer.timer_advance_ns)
++		kvm_wait_lapic_expire(vcpu);
++
+ 	/*
+ 	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
+ 	 * it's non-zero. Since vmentry is serialising on affected CPUs, there
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 3eb77e7..ac7353f 100644
+index ac7353f..e6f05f4 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -8017,6 +8017,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	++vcpu->stat.exits;
+@@ -7959,9 +7959,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	}
  
- 	guest_exit_irqoff();
-+	if (lapic_in_kernel(vcpu) &&
-+	    vcpu->arch.apic->lapic_timer.timer_advance_ns)
-+		trace_kvm_wait_lapic_expire(vcpu->vcpu_id,
-+			vcpu->arch.apic->lapic_timer.advance_expire_delta);
+ 	trace_kvm_entry(vcpu->vcpu_id);
+-	if (lapic_in_kernel(vcpu) &&
+-	    vcpu->arch.apic->lapic_timer.timer_advance_ns)
+-		wait_lapic_expire(vcpu);
+ 	guest_enter_irqoff();
  
- 	local_irq_enable();
- 	preempt_enable();
+ 	fpregs_assert_state_consistent();
 -- 
 2.7.4
 
