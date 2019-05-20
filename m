@@ -2,97 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BB0DC23C6E
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 17:43:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63D3A23C99
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 17:54:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392327AbfETPmo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 11:42:44 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:36136 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732399AbfETPmi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 11:42:38 -0400
-Received: by mail-wr1-f67.google.com with SMTP id s17so15186190wru.3;
-        Mon, 20 May 2019 08:42:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=pTMTqWY8E4+UnCZ9AjMEiomm00MjjGjXsokoRCkoYLc=;
-        b=DRl+KqdIokWtcnwsE6se0zRs1ML6Kgm5bl5siV1nJDAo4iSmjRnWsw0M798AjhjBF3
-         ew4/B/7NlF3XRd8e0/QekmlLtPWw5uoRKUKLuubsrSH6GpaUcg+og9IqBjsqVWjLerZ9
-         ASrOFalwLhiL/xx7tppP5YrCN5ob3vLKQUKynHSCEPcZSghHuYvgPZLP6u/VKIh5KO2z
-         Hb1AUo1BFbB+4jCjVqnJE7UTQD6RKoB81ZXyEVpV/kjwjO9tpvd+R1Ob50jWsXEAW/ia
-         JlbVfWAMOSB+17SuHnnlTbLOzDl1RPLMzHH5UQEGxIQmVKe9rscdfomvyFZQlX/6K4HN
-         1Byg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=pTMTqWY8E4+UnCZ9AjMEiomm00MjjGjXsokoRCkoYLc=;
-        b=hviR3VTPFZETcBTQyAEyKEMkKEl06dxAhjjbNKoLYCQtgHPuxrmmEnIChMs3QHYneT
-         X/dE5W2PFG/NwqkO7oif4D0LjPEr2IacX2AIZPXzByiX84t4CK5Qa5xnwBuyCtdLCAB5
-         ntuCz2XPEsL/miEsZ56FvFVQ+pnvYU6s4ZcNfV9tq415vdiiCZbxycBL0352hdeoatUl
-         vM7swRbM8nIj76MZXvUgEFeTWwZ1Wk6fpyJaLNFo9gWd+ghv2FLQdxJaBKVBvpFmP7O4
-         tqCwyJfKOW5RcixNtFH4OjQfW78YxmG6y/hd3xm4arO4GLgv8lH1NapMP46u7D62jur1
-         6tTw==
-X-Gm-Message-State: APjAAAUzfg/GXv36QFgWn1L4QVGGYt/hfXMgNA3DSUCYVPBrQaV9uvBI
-        IixlUwpwZybyMlUyWDuWyMg7e3Im
-X-Google-Smtp-Source: APXvYqx/JY1VdrUlB1N4GQpIfYrei6E013ax5TCwwP3gyNNdvMlBuS3CQRLeTY+cgMRCa9akd05eSw==
-X-Received: by 2002:a05:6000:41:: with SMTP id k1mr14631085wrx.332.1558366955908;
-        Mon, 20 May 2019 08:42:35 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id v11sm15851995wrq.80.2019.05.20.08.42.34
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 May 2019 08:42:35 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH 2/2] KVM: x86/pmu: do not mask the value that is written to fixed PMUs
-Date:   Mon, 20 May 2019 17:42:31 +0200
-Message-Id: <1558366951-19259-3-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1558366951-19259-1-git-send-email-pbonzini@redhat.com>
-References: <1558366951-19259-1-git-send-email-pbonzini@redhat.com>
+        id S2388956AbfETPye (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 11:54:34 -0400
+Received: from mx01.bbu.dsd.mx.bitdefender.com ([91.199.104.161]:56142 "EHLO
+        mx01.bbu.dsd.mx.bitdefender.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732031AbfETPye (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 May 2019 11:54:34 -0400
+X-Greylist: delayed 383 seconds by postgrey-1.27 at vger.kernel.org; Mon, 20 May 2019 11:54:33 EDT
+Received: from smtp.bitdefender.com (smtp02.buh.bitdefender.net [10.17.80.76])
+        by mx01.bbu.dsd.mx.bitdefender.com (Postfix) with ESMTPS id 3B07330747C6;
+        Mon, 20 May 2019 18:48:09 +0300 (EEST)
+Received: from [10.17.91.220] (unknown [195.210.5.22])
+        by smtp.bitdefender.com (Postfix) with ESMTPSA id 308B7306E4AC;
+        Mon, 20 May 2019 18:48:09 +0300 (EEST)
+Message-ID: <571322cc13b98f3805a4843db28f5befbb1bd5a9.camel@bitdefender.com>
+Subject: #VE support for VMI
+From:   Mihai =?UTF-8?Q?Don=C8=9Bu?= <mdontu@bitdefender.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+Date:   Mon, 20 May 2019 18:48:09 +0300
+Organization: Bitdefender
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to the SDM, for MSR_IA32_PERFCTR0/1 "the lower-order 32 bits of
-each MSR may be written with any value, and the high-order 8 bits are
-sign-extended according to the value of bit 31", but the fixed counters
-in real hardware appear to be limited to the width of the fixed counters.
-Fix KVM to do the same.
+Hi Paolo,
 
-Reported-by: Nadav Amit <nadav.amit@gmail.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx/pmu_intel.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+We are looking at adding #VE support to the VMI subsystem we are
+working on. Its purpose is to suppress VMEXIT-s caused by the page
+table walker when the guest page tables are write-protected. A very
+small in-guest agent (protected by the hypervisor) will receive the EPT
+violation events, handle PT-walk writes and turn the rest into VMCALL-
+s.
 
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index b6f5157445fe..a99613a060dd 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -240,11 +240,14 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		}
- 		break;
- 	default:
--		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
--		    (pmc = get_fixed_pmc(pmu, msr))) {
--			if (!msr_info->host_initiated)
--				data = (s64)(s32)data;
--			pmc->counter += data - pmc_read_counter(pmc);
-+		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))) {
-+			if (msr_info->host_initiated)
-+				pmc->counter = data;
-+			else
-+				pmc->counter = (s32)data;
-+			return 0;
-+		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
-+			pmc->counter = data;
- 			return 0;
- 		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
- 			if (data == pmc->eventsel)
+A brief presentation of similar work on Xen can be found here:
+https://www.slideshare.net/xen_com_mgr/xpdss17-hypervisorbased-security-bringing-virtualized-exceptions-into-the-game-mihai-dontu-bitdefender
+
+There is a bit of an issue with using #VE on KVM, though: because the
+EPT is built on-the-fly (as the guest runs), when we enable #VE in
+VMCS, all EPT violations become virtualized, because all EPTE-s have
+bit 63 zero (0: convert to #VE, 1: generate VMEXIT). At the moment, I
+see two solutions:
+
+(a) have the in-guest agent generate a VMCALL that KVM will interpret
+as EPT-violation and call the default page fault handler;
+(b) populate the EPT completely before entering the guest;
+
+The first one requires adding dedicated code for KVM in the agent used
+for handling #VE events, something we are trying to avoid. The second
+one has implications we can't fully see, besides migration with which
+we don't interact (VMI is designed to be disabled before migration
+starts, implicitly #VE too).
+
+I would appreciate any opinion / suggestion you have on a proper
+approach to this issue.
+
+Regards,
+
 -- 
-1.8.3.1
+Mihai Donțu
+
 
