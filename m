@@ -2,90 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2004823DBC
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 18:44:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E12F23E51
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 19:21:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389301AbfETQoT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 12:44:19 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54890 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2389205AbfETQoT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 12:44:19 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 5D061AC63;
-        Mon, 20 May 2019 16:44:18 +0000 (UTC)
-Received: by unicorn.suse.cz (Postfix, from userid 1000)
-        id 06D1CE0184; Mon, 20 May 2019 18:44:18 +0200 (CEST)
-From:   Michal Kubecek <mkubecek@suse.cz>
-Subject: [PATCH RESEND] kvm: make kvm_vcpu_(un)map dependency on CONFIG_HAS_IOMEM
- explicit
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        KarimAllah Ahmed <karahmed@amazon.de>,
-        linux-kernel@vger.kernel.org
-Message-Id: <20190520164418.06D1CE0184@unicorn.suse.cz>
-Date:   Mon, 20 May 2019 18:44:18 +0200 (CEST)
+        id S2392824AbfETRVM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 13:21:12 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:46980 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392821AbfETRVM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 13:21:12 -0400
+Received: by mail-wr1-f65.google.com with SMTP id r7so15462002wrr.13
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 10:21:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2XkW6U8tyuCedKGU5mO7OaB7yAk+TZauHH3mf/E1c94=;
+        b=p44WJbKhg6aDKhtPgfYMkb/Gn1hYYvPb4DEzYZlugltKsMri3qdidnbp4wna9ma7rc
+         HQbtj1e20SLPddNfUG+sGBmCo+48Ur80YCbL142d9tFp1ZjG+CW0myBn3E2HtYTOpWqS
+         LKfdOFadDmMBvWzfmfahAGYD4LUGBGKog1THxUpNMrvBv0rVs5UUgm1Ae43r6FIkcErD
+         Dubo/UUwJugngs2HEePgSXaXJ7iZAl6MhUwbQKkPV0EAWeoUh354IummA0Ts2A2wDQl1
+         vAkKiJkqsIq+Xi60l31tNhA1ggAo2jx0S1yyV3x/1Oma3e7fbWXpyCC50YBMFcz29AVH
+         Lu/w==
+X-Gm-Message-State: APjAAAVnZRlSRNwk1gvL7mol+fnrDxw12tYfFszbycn2kukxaaKeNyor
+        Y4NF4d9uOU5Jsf1D5byXAx+aOQ==
+X-Google-Smtp-Source: APXvYqzHbMQXZY9AvzceJG4qwon/KSr7H8D9aBqmC7dwe4lLYgLGhWFslKkgf6Wj41wGvZ2Syu+j0w==
+X-Received: by 2002:adf:8189:: with SMTP id 9mr44545296wra.71.1558372870599;
+        Mon, 20 May 2019 10:21:10 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ac04:eef9:b257:b844? ([2001:b07:6468:f312:ac04:eef9:b257:b844])
+        by smtp.gmail.com with ESMTPSA id t13sm38506608wra.81.2019.05.20.10.21.09
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 20 May 2019 10:21:10 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 1/2] x86: nVMX: Use #DB in nmi and intr
+ tests
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     Jim Mattson <jmattson@google.com>, kvm list <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20190508102715.685-1-namit@vmware.com>
+ <20190508102715.685-2-namit@vmware.com>
+ <CALMp9eRnqn6Jrd762UZGZ9cQSMBFaxvNFsOkqYryP8ngG7dUEw@mail.gmail.com>
+ <7B8B0BFD-3D85-4062-9F44-7BA8AC7F9DAE@gmail.com>
+ <76ffb0ca-c007-05c4-7bef-5f72f03a7a4e@redhat.com>
+ <FAC1484C-8157-45F4-BF1A-514DDF4E0ABC@gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <39f0658b-8ef0-feee-34a8-3f1f559c48a6@redhat.com>
+Date:   Mon, 20 May 2019 19:21:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <FAC1484C-8157-45F4-BF1A-514DDF4E0ABC@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Recently introduced functions kvm_vcpu_map() and kvm_vcpu_unmap() call
-memremap() and memunmap() which are only available if HAS_IOMEM is enabled
-but this dependency is not explicit, so that the build fails with HAS_IOMEM
-disabled.
+On 20/05/19 18:39, Nadav Amit wrote:
+> I’m sorry for not collecting the patches into a set, but I know that it
+> would just cause me to resend all of them for individual patch issue.
 
-As both function are only used on x86 where HAS_IOMEM is always enabled,
-the easiest fix seems to be to only provide them when HAS_IOMEM is enabled.
+All the patches you've sent make sense individually.  Thanks to you (and
+the corporate overlord ;)) for doing the work and for sharing it, really.
 
-Fixes: e45adf665a53 ("KVM: Introduce a new guest mapping API")
-Signed-off-by: Michal Kubecek <mkubecek@suse.cz>
----
- include/linux/kvm_host.h | 6 +++++-
- virt/kvm/kvm_main.c      | 2 ++
- 2 files changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 79fa4426509c..371d68fef5e1 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -759,9 +759,13 @@ struct kvm_memslots *kvm_vcpu_memslots(struct kvm_vcpu *vcpu);
- struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn);
- kvm_pfn_t kvm_vcpu_gfn_to_pfn_atomic(struct kvm_vcpu *vcpu, gfn_t gfn);
- kvm_pfn_t kvm_vcpu_gfn_to_pfn(struct kvm_vcpu *vcpu, gfn_t gfn);
-+
-+#ifdef CONFIG_HAS_IOMEM
- int kvm_vcpu_map(struct kvm_vcpu *vcpu, gpa_t gpa, struct kvm_host_map *map);
--struct page *kvm_vcpu_gfn_to_page(struct kvm_vcpu *vcpu, gfn_t gfn);
- void kvm_vcpu_unmap(struct kvm_vcpu *vcpu, struct kvm_host_map *map, bool dirty);
-+#endif
-+
-+struct page *kvm_vcpu_gfn_to_page(struct kvm_vcpu *vcpu, gfn_t gfn);
- unsigned long kvm_vcpu_gfn_to_hva(struct kvm_vcpu *vcpu, gfn_t gfn);
- unsigned long kvm_vcpu_gfn_to_hva_prot(struct kvm_vcpu *vcpu, gfn_t gfn, bool *writable);
- int kvm_vcpu_read_guest_page(struct kvm_vcpu *vcpu, gfn_t gfn, void *data, int offset,
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index f0d13d9d125d..4a2c813e75d6 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1743,6 +1743,7 @@ struct page *gfn_to_page(struct kvm *kvm, gfn_t gfn)
- }
- EXPORT_SYMBOL_GPL(gfn_to_page);
- 
-+#ifdef CONFIG_HAS_IOMEM
- static int __kvm_map_gfn(struct kvm_memory_slot *slot, gfn_t gfn,
- 			 struct kvm_host_map *map)
- {
-@@ -1806,6 +1807,7 @@ void kvm_vcpu_unmap(struct kvm_vcpu *vcpu, struct kvm_host_map *map,
- 	map->page = NULL;
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_unmap);
-+#endif /* CONFIG_HAS_IOMEM */
- 
- struct page *kvm_vcpu_gfn_to_page(struct kvm_vcpu *vcpu, gfn_t gfn)
- {
--- 
-2.21.0
-
+Paolo
