@@ -2,71 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E5B822ADB
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 06:26:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9627C22AF9
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 06:47:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729158AbfETE0A convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 20 May 2019 00:26:00 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:55494 "EHLO mxct.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725372AbfETEZ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 00:25:59 -0400
-Received: from mse-fl1.zte.com.cn (unknown [10.30.14.238])
-        by Forcepoint Email with ESMTPS id 128A0A7E7B54D04269F2;
-        Mon, 20 May 2019 12:25:55 +0800 (CST)
-Received: from notes_smtp.zte.com.cn ([10.30.1.239])
-        by mse-fl1.zte.com.cn with ESMTP id x4K4PpWE081937;
-        Mon, 20 May 2019 12:25:51 +0800 (GMT-8)
-        (envelope-from wang.yi59@zte.com.cn)
-Received: from fox-host8.localdomain ([10.74.120.8])
-          by szsmtp06.zte.com.cn (Lotus Domino Release 8.5.3FP6)
-          with ESMTP id 2019052012255471-9980 ;
-          Mon, 20 May 2019 12:25:54 +0800 
-From:   Yi Wang <wang.yi59@zte.com.cn>
-To:     pbonzini@redhat.com
-Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, wang.yi59@zte.com.cn
-Subject: [PATCH] kvm: vmx: Fix -Wmissing-prototypes warnings
-Date:   Mon, 20 May 2019 12:27:47 +0800
-Message-Id: <1558326467-48530-1-git-send-email-wang.yi59@zte.com.cn>
-X-Mailer: git-send-email 1.8.3.1
-MIME-Version: 1.0
-X-MIMETrack: Itemize by SMTP Server on SZSMTP06/server/zte_ltd(Release 8.5.3FP6|November
- 21, 2013) at 2019-05-20 12:25:54,
-        Serialize by Router on notes_smtp/zte_ltd(Release 9.0.1FP7|August  17, 2016) at
- 2019-05-20 12:25:50
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-MAIL: mse-fl1.zte.com.cn x4K4PpWE081937
+        id S1730034AbfETErd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 00:47:33 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:42449 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725372AbfETErd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 00:47:33 -0400
+Received: by mail-pg1-f193.google.com with SMTP id 145so6130772pgg.9;
+        Sun, 19 May 2019 21:47:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=c+5/e4r7QURAPjgt0pstVJODTU8tXgqkX2glWZVobkM=;
+        b=gMto9eoPQaIySY3QLYHKjy9iAPNrE5GjdJZihgfu6ASZxDWdkLiG/Jx37ppauLIVIq
+         fjxm3/5qPKUZ7skkK3/qXSJzQqNrYOtFbBYWBtDptNA0JkM+/fHlOI40rgIfjc0XaIHj
+         zqgo5aDW5uMfG0imKjTCNK9Le6JydE/KBP6YAJTOaulJb3c8lcWvcZFg1dQ7JXiuWZvw
+         SjVOegc7rAcM6F4cRaUiNsF29LbogDCvo8M8lS1TlxRZ7j8GxGEfpodNKhPr3xiJYXmL
+         hRWqdH55As8gwi6V0VvZFYl1GpfCx1il16tazLsekk+h8ZMJVo1fUVAq1bCH6MYx1Ixj
+         zV4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=c+5/e4r7QURAPjgt0pstVJODTU8tXgqkX2glWZVobkM=;
+        b=Sy6NGrr036q7zwQpgx+JRJCCG3l5/VXkr/Hxd/BijWrsXivPBMM9S+bzr8M5xPeD3v
+         ll+zoyOsxsZv4FjI0kENb142RAfboJ6ZxVb9DQ+bBZF/mMyBtWylnLydp4GVylbOv08k
+         Powce8EMi0jGZGSFPj7qEhQG52+UsWVseg+L1jEL+jXWSHJPHysH/mjUZgoXzBAUctW8
+         Pj2jEVoHRRr9RH4eA8yBzBWRugj24uXtLzAEWNJIZTyIaBTavCvynQJy98teXYMdb8hn
+         E4m4MLUOfo5khK79oMxK1ti/eldWLTIvZP9dk2sqkhkKFKze/w917bXsQK9MgD/vrJYp
+         c64g==
+X-Gm-Message-State: APjAAAU6QkHKQJid+jggZXuy65KVDbRgffD0nSHGlsIwmqcS6lwSPtRk
+        V50d2IFfzKBydoKehiN3XKk=
+X-Google-Smtp-Source: APXvYqw+D6cC0nRczOxV4So/Prf6dPmIMD7sQVDc/gsxpJURxndlNNlbZ8A1oi9dk6kQ4i6fv/BvyQ==
+X-Received: by 2002:a63:e52:: with SMTP id 18mr73343114pgo.3.1558327652463;
+        Sun, 19 May 2019 21:47:32 -0700 (PDT)
+Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
+        by smtp.googlemail.com with ESMTPSA id s28sm22719117pgl.88.2019.05.19.21.47.29
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Sun, 19 May 2019 21:47:31 -0700 (PDT)
+Message-ID: <1558327647.5110.0.camel@gmail.com>
+Subject: Re: [kvm-unit-tests PULL 1/2] powerpc: Allow for a custom decr
+ value to be specified to load on decr excp
+From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Radim =?UTF-8?Q?Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     kvm-ppc@vger.kernel.org
+Date:   Mon, 20 May 2019 14:47:27 +1000
+In-Reply-To: <1bea83ba-6c64-3b21-baca-8c414ea86770@redhat.com>
+References: <20190517130305.32123-1-lvivier@redhat.com>
+         <20190517130305.32123-2-lvivier@redhat.com>
+         <1bea83ba-6c64-3b21-baca-8c414ea86770@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We get a warning when build kernel W=1:
-arch/x86/kvm/vmx/vmx.c:6365:6: warning: no previous prototype for ‘vmx_update_host_rsp’ [-Wmissing-prototypes]
- void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp)
+On Fri, 2019-05-17 at 15:10 +0200, Thomas Huth wrote:
+> On 17/05/2019 15.03, Laurent Vivier wrote:
+> > From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> > 
+> > Currently the handler for a decrementer exception will simply
+> > reload the
+> > maximum value (0x7FFFFFFF), which will take ~4 seconds to expire
+> > again.
+> > This means that if a vcpu cedes, it will be ~4 seconds between
+> > wakeups.
+> > 
+> > The h_cede_tm test is testing a known breakage when a guest cedes
+> > while
+> > suspended. To be sure we cede 500 times to check for the bug.
+> > However
+> > since it takes ~4 seconds to be woken up once we've ceded, we only
+> > get
+> > through ~20 iterations before we reach the 90 seconds timeout and
+> > the
+> > test appears to fail.
+> > 
+> > Add an option when registering the decrementer handler to specify
+> > the
+> > value which should be reloaded by the handler, allowing the timeout
+> > to be
+> > chosen.
+> > 
+> > Modify the spr test to use the max timeout to preserve existing
+> > behaviour.
+> > Modify the h_cede_tm test to use a 10ms timeout to ensure we can
+> > perform
+> > 500 iterations before hitting the 90 second time limit for a test.
+> > 
+> > This means the h_cede_tm test now succeeds rather than timing out.
+> > 
+> > Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+> > Reviewed-by: Thomas Huth <thuth@redhat.com>
+> > Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> > [lv: reset initial value to 0x3FFFFFFF]
+> 
+> Looks like something went wrong here? There is still the 0x7FFFFFFF
+> in
+> the hunk below...
 
-Add the missing declaration to fix this.
+No, I think this is correct.
+Max value is ox7FFFFFFF, but the initial value we load via mtdec is the
+original 0x3FFFFFFF.
 
-Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
----
- arch/x86/kvm/vmx/vmx.h | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index f879529..9cd72de 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -314,6 +314,7 @@ struct kvm_vmx {
- void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
- struct shared_msr_entry *find_msr_entry(struct vcpu_vmx *vmx, u32 msr);
- void pt_update_intercept_for_msr(struct vcpu_vmx *vmx);
-+void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp);
- 
- #define POSTED_INTR_ON  0
- #define POSTED_INTR_SN  1
--- 
-1.8.3.1
-
+> 
+> > diff --git a/powerpc/sprs.c b/powerpc/sprs.c
+> > index 6744bd8d8049..3c2d98c9ca99 100644
+> > --- a/powerpc/sprs.c
+> > +++ b/powerpc/sprs.c
+> > @@ -253,6 +253,7 @@ int main(int argc, char **argv)
+> >  		0x1234567890ABCDEFULL, 0xFEDCBA0987654321ULL,
+> >  		-1ULL,
+> >  	};
+> > +	static uint64_t decr = 0x7FFFFFFF; /* Max value */
+> >  
+> >  	for (i = 1; i < argc; i++) {
+> >  		if (!strcmp(argv[i], "-w")) {
+> > @@ -288,7 +289,7 @@ int main(int argc, char **argv)
+> >  		(void) getchar();
+> >  	} else {
+> >  		puts("Sleeping...\n");
+> > -		handle_exception(0x900, &dec_except_handler,
+> > NULL);
+> > +		handle_exception(0x900, &dec_except_handler,
+> > &decr);
+> >  		asm volatile ("mtdec %0" : : "r" (0x3FFFFFFF));
+> >  		hcall(H_CEDE);
+> >  	}
+> 
+>  Thomas
