@@ -2,182 +2,325 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AB242354F
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 14:44:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B70D823BFA
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 17:23:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390914AbfETMeX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 08:34:23 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41652 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2390907AbfETMeW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 May 2019 08:34:22 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4KCWPt4036694
-        for <kvm@vger.kernel.org>; Mon, 20 May 2019 08:34:21 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2skujxa4xm-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 20 May 2019 08:34:21 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
-        Mon, 20 May 2019 13:34:18 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 20 May 2019 13:34:15 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4KCYDkJ50528316
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 20 May 2019 12:34:13 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B55EE52050;
-        Mon, 20 May 2019 12:34:13 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.57.34])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id F2BF35204E;
-        Mon, 20 May 2019 12:34:12 +0000 (GMT)
-Date:   Mon, 20 May 2019 14:34:11 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH 06/10] s390/cio: add basic protected virtualization
- support
-In-Reply-To: <20190520122143.259ff8df.cohuck@redhat.com>
-References: <20190426183245.37939-1-pasic@linux.ibm.com>
-        <20190426183245.37939-7-pasic@linux.ibm.com>
-        <20190513114136.783c851c.cohuck@redhat.com>
-        <20190515225158.301af387.pasic@linux.ibm.com>
-        <20190516082928.1371696b.cohuck@redhat.com>
-        <20190518201100.0fd07d7f.pasic@linux.ibm.com>
-        <20190520122143.259ff8df.cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S2390872AbfETPXs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 11:23:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48222 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731389AbfETPXr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 11:23:47 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B2EB583F42;
+        Mon, 20 May 2019 15:23:32 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-3.gru2.redhat.com [10.97.112.3])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 114A3601A0;
+        Mon, 20 May 2019 15:23:26 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id D209210518B;
+        Mon, 20 May 2019 09:49:18 -0300 (BRT)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id x4KCnCbK003910;
+        Mon, 20 May 2019 09:49:12 -0300
+Date:   Mon, 20 May 2019 09:49:10 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm-devel <kvm@vger.kernel.org>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        "Raslan, KarimAllah" <karahmed@amazon.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>
+Subject: Re: [PATCH] x86: add cpuidle_kvm driver to allow guest side halt
+ polling
+Message-ID: <20190520124910.GA3800@amt.cnet>
+References: <20190517174857.GA8611@amt.cnet>
+ <fd5caf49-6d98-4887-0052-ccbc999fc077@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19052012-4275-0000-0000-00000336AF69
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052012-4276-0000-0000-000038463FE6
-Message-Id: <20190520143411.15130af3.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-20_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905200086
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fd5caf49-6d98-4887-0052-ccbc999fc077@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Mon, 20 May 2019 15:23:47 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 May 2019 12:21:43 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> On Sat, 18 May 2019 20:11:00 +0200
-> Halil Pasic <pasic@linux.ibm.com> wrote:
-> 
-> > On Thu, 16 May 2019 08:29:28 +0200
-> > Cornelia Huck <cohuck@redhat.com> wrote:
+On Mon, May 20, 2019 at 01:51:57PM +0200, Paolo Bonzini wrote:
+> On 17/05/19 19:48, Marcelo Tosatti wrote:
 > > 
-> > > On Wed, 15 May 2019 22:51:58 +0200
-> > > Halil Pasic <pasic@linux.ibm.com> wrote:
-> 
-> > Don't like the second sentence. How about "It handles neither QDIO
-> > in the common code, nor any device type specific stuff (like channel
-> > programs constructed by the DADS driver)."
-> 
-> Sounds good to me (with s/DADS/DASD/ :)
-> 
-
-Of course!
-
-> > > > A side note: making the subchannel device 'own' the DMA stuff of a
-> > > > ccw device (something that was discussed in the RFC thread) is tricky
-> > > > because the ccw device may outlive the subchannel (all that orphan
-> > > > stuff).  
-> > > 
-> > > Yes, that's... eww. Not really a problem for virtio-ccw devices (which
-> > > do not support the disconnected state), but can we make DMA and the
-> > > subchannel moving play nice with each other at all?
-> > >   
+> > The cpuidle_kvm driver allows the guest vcpus to poll for a specified
+> > amount of time before halting. This provides the following benefits
+> > to host side polling:
 > > 
-> > I don't quite understand the question. This series does not have any
-> > problems with that AFAIU. Can you please clarify?
+> > 	1) The POLL flag is set while polling is performed, which allows
+> > 	   a remote vCPU to avoid sending an IPI (and the associated
+> >  	   cost of handling the IPI) when performing a wakeup.
+> > 
+> > 	2) The HLT VM-exit cost can be avoided.
+> > 
+> > The downside of guest side polling is that polling is performed
+> > even with other runnable tasks in the host.
+> > 
+> > Results comparing halt_poll_ns and server/client application
+> > where a small packet is ping-ponged:
+> > 
+> > host                                        --> 31.33	
+> > halt_poll_ns=300000 / no guest busy spin    --> 33.40	(93.8%)
+> > halt_poll_ns=0 / guest_halt_poll_ns=300000  --> 32.73	(95.7%)
+> > 
+> > For the SAP HANA benchmarks (where idle_spin is a parameter 
+> > of the previous version of the patch, results should be the
+> > same):
+> > 
+> > hpns == halt_poll_ns
+> > 
+> >                           idle_spin=0/   idle_spin=800/	   idle_spin=0/
+> > 			  hpns=200000    hpns=0            hpns=800000
+> > DeleteC06T03 (100 thread) 1.76           1.71 (-3%)        1.78	  (+1%)
+> > InsertC16T02 (100 thread) 2.14     	 2.07 (-3%)        2.18   (+1.8%)
+> > DeleteC00T01 (1 thread)   1.34 		 1.28 (-4.5%)	   1.29   (-3.7%)
+> > UpdateC00T03 (1 thread)	  4.72		 4.18 (-12%)	   4.53   (-5%)
 > 
-> Wait, weren't you saying that there actually is a problem?
->
-
-No, what I tried to say is: if we tried to make all the dma mem belong to
-the subchannel device, we would have a problem. It appeared as a
-tempting opportunity for consolidation, but I decided to not do it.
-
-> We seem to have the following situation:
-> - the device per se is represented by the ccw device
-> - the subchannel is the means of communication, and dma is tied to the
->   (I/O ?) subchannel
-
-It is not. When for example a virtio-ccw device talks to the device
-using a channel program, the dma mem hosting the channel program belongs
-to the ccw device and not to the subchannel.
-
-In fact everything but the stuff in io_priv->dma_area belongs to the ccw
-device.
-
-> - the machine check handling code may move a ccw device to a different
->   subchannel, or even to a fake subchannel (orphanage handling)
+> Hi Marcelo,
 > 
-
-Right!
-
-> The moving won't happen with virtio-ccw devices (as they do not support
-> the disconnected state, which is a prereq for being moved around), but
-> at a glance, this looks like it is worth some more thought.
+> some quick observations:
 > 
-> - Are all (I/O) subchannels using e.g. the same dma size? (TBH, that
->   question sounds a bit silly: that should be a property belonging to
->   the ccw device, shouldn't it?)
-> - What dma properties does the fake subchannel have? (Probably none, as
->   its only purpose is to serve as a parent for otherwise parentless
->   disconnected ccw devices, and is therefore not involved in any I/O.)
-> - There needs to be some kind of handling in the machine check code, I
->   guess? We would probably need a different allocation if we end up at
->   a different subchannel?
+> 1) This is actually not KVM-specific, so the name and placement of the
+> docs should be adjusted.
+
+Agreed. Will call it: cpuidle_halt_poll, move it to drivers/cpuidle/
+
+> 2) Regarding KVM-specific code, however, we could add an MSR so that KVM
+> disables halt_poll_ns for this VM when this is active in the guest?
+
+Sure.
+
+> 3) The spin time could use the same adaptive algorithm that KVM uses in
+> the host.
+
+Agreed... This can be done later, i suppose (the current fixed
+setting works sufficiently well for our needs).
+
+> Thanks,
 > 
-
-Basically nothing changes with mem ownership, except that some bits are
-dma memory now. Should I provide a more detailed answer to the
-questions above?
-
-> I think we can assume that the dma size is at most 31 bits (since that
-> is what the common I/O layer needs); but can we also assume that it
-> will always be at least 31 bits?
+> Paolo
 > 
-
-You mean dma_mas by dma size?
-
-> My take on this is that we should be sure that we're not digging
-> ourselves a hole that will be hard to get out of again should we want to
-> support non-virtio-ccw in the future, not that the current
-> implementation is necessarily broken.
 > 
-
-I agree!
-
-Regards,
-Hali
-
+> > ---
+> >  Documentation/virtual/kvm/guest-halt-polling.txt |   39 ++++++++
+> >  arch/x86/Kconfig                                 |    9 +
+> >  arch/x86/kernel/Makefile                         |    1 
+> >  arch/x86/kernel/cpuidle_kvm.c                    |  105 +++++++++++++++++++++++
+> >  arch/x86/kernel/process.c                        |    2 
+> >  5 files changed, 155 insertions(+), 1 deletion(-)
+> > 
+> > Index: linux-2.6.git/arch/x86/Kconfig
+> > ===================================================================
+> > --- linux-2.6.git.orig/arch/x86/Kconfig	2019-04-22 13:49:42.858303265 -0300
+> > +++ linux-2.6.git/arch/x86/Kconfig	2019-05-16 14:18:41.254852745 -0300
+> > @@ -805,6 +805,15 @@
+> >  	  underlying device model, the host provides the guest with
+> >  	  timing infrastructure such as time of day, and system time
+> >  
+> > +config KVM_CPUIDLE
+> > +	tristate "KVM cpuidle driver"
+> > +	depends on KVM_GUEST
+> > +	default y
+> > +	help
+> > +	  This option enables KVM cpuidle driver, which allows to poll
+> > +	  before halting in the guest (more efficient than polling in the
+> > +	  host via halt_poll_ns for some scenarios).
+> > +
+> >  config PVH
+> >  	bool "Support for running PVH guests"
+> >  	---help---
+> > Index: linux-2.6.git/arch/x86/kernel/Makefile
+> > ===================================================================
+> > --- linux-2.6.git.orig/arch/x86/kernel/Makefile	2019-04-22 13:49:42.869303331 -0300
+> > +++ linux-2.6.git/arch/x86/kernel/Makefile	2019-05-17 12:59:51.673274881 -0300
+> > @@ -112,6 +112,7 @@
+> >  obj-$(CONFIG_DEBUG_NMI_SELFTEST) += nmi_selftest.o
+> >  
+> >  obj-$(CONFIG_KVM_GUEST)		+= kvm.o kvmclock.o
+> > +obj-$(CONFIG_KVM_CPUIDLE)	+= cpuidle_kvm.o
+> >  obj-$(CONFIG_PARAVIRT)		+= paravirt.o paravirt_patch_$(BITS).o
+> >  obj-$(CONFIG_PARAVIRT_SPINLOCKS)+= paravirt-spinlocks.o
+> >  obj-$(CONFIG_PARAVIRT_CLOCK)	+= pvclock.o
+> > Index: linux-2.6.git/arch/x86/kernel/process.c
+> > ===================================================================
+> > --- linux-2.6.git.orig/arch/x86/kernel/process.c	2019-04-22 13:49:42.876303374 -0300
+> > +++ linux-2.6.git/arch/x86/kernel/process.c	2019-05-17 13:19:18.055435117 -0300
+> > @@ -580,7 +580,7 @@
+> >  	safe_halt();
+> >  	trace_cpu_idle_rcuidle(PWR_EVENT_EXIT, smp_processor_id());
+> >  }
+> > -#ifdef CONFIG_APM_MODULE
+> > +#if defined(CONFIG_APM_MODULE) || defined(CONFIG_KVM_CPUIDLE_MODULE)
+> >  EXPORT_SYMBOL(default_idle);
+> >  #endif
+> >  
+> > Index: linux-2.6.git/arch/x86/kernel/cpuidle_kvm.c
+> > ===================================================================
+> > --- /dev/null	1970-01-01 00:00:00.000000000 +0000
+> > +++ linux-2.6.git/arch/x86/kernel/cpuidle_kvm.c	2019-05-17 13:38:02.553941356 -0300
+> > @@ -0,0 +1,105 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * cpuidle driver for KVM guests.
+> > + *
+> > + * Copyright 2019 Red Hat, Inc. and/or its affiliates.
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> > + * the COPYING file in the top-level directory.
+> > + *
+> > + * Authors: Marcelo Tosatti <mtosatti@redhat.com>
+> > + */
+> > +
+> > +#include <linux/init.h>
+> > +#include <linux/cpuidle.h>
+> > +#include <linux/module.h>
+> > +#include <linux/timekeeping.h>
+> > +#include <linux/sched/idle.h>
+> > +
+> > +unsigned int guest_halt_poll_ns;
+> > +module_param(guest_halt_poll_ns, uint, 0644);
+> > +
+> > +static int kvm_enter_idle(struct cpuidle_device *dev,
+> > +			  struct cpuidle_driver *drv, int index)
+> > +{
+> > +	int do_halt = 0;
+> > +
+> > +	/* No polling */
+> > +	if (guest_halt_poll_ns == 0) {
+> > +		if (current_clr_polling_and_test()) {
+> > +			local_irq_enable();
+> > +			return index;
+> > +		}
+> > +		default_idle();
+> > +		return index;
+> > +	}
+> > +
+> > +	local_irq_enable();
+> > +	if (!current_set_polling_and_test()) {
+> > +		ktime_t now, end_spin;
+> > +
+> > +		now = ktime_get();
+> > +		end_spin = ktime_add_ns(now, guest_halt_poll_ns);
+> > +
+> > +		while (!need_resched()) {
+> > +			cpu_relax();
+> > +			now = ktime_get();
+> > +
+> > +			if (!ktime_before(now, end_spin)) {
+> > +				do_halt = 1;
+> > +				break;
+> > +			}
+> > +		}
+> > +	}
+> > +
+> > +	if (do_halt) {
+> > +		/*
+> > +		 * No events while busy spin window passed,
+> > +		 * halt.
+> > +		 */
+> > +		local_irq_disable();
+> > +		if (current_clr_polling_and_test()) {
+> > +			local_irq_enable();
+> > +			return index;
+> > +		}
+> > +		default_idle();
+> > +	} else {
+> > +		current_clr_polling();
+> > +	}
+> > +
+> > +	return index;
+> > +}
+> > +
+> > +static struct cpuidle_driver kvm_idle_driver = {
+> > +	.name = "kvm_idle",
+> > +	.owner = THIS_MODULE,
+> > +	.states = {
+> > +		{ /* entry 0 is for polling */ },
+> > +		{
+> > +			.enter			= kvm_enter_idle,
+> > +			.exit_latency		= 0,
+> > +			.target_residency	= 0,
+> > +			.power_usage		= -1,
+> > +			.name			= "KVM",
+> > +			.desc			= "KVM idle",
+> > +		},
+> > +	},
+> > +	.safe_state_index = 0,
+> > +	.state_count = 2,
+> > +};
+> > +
+> > +static int __init kvm_cpuidle_init(void)
+> > +{
+> > +	return cpuidle_register(&kvm_idle_driver, NULL);
+> > +}
+> > +
+> > +static void __exit kvm_cpuidle_exit(void)
+> > +{
+> > +	cpuidle_unregister(&kvm_idle_driver);
+> > +}
+> > +
+> > +module_init(kvm_cpuidle_init);
+> > +module_exit(kvm_cpuidle_exit);
+> > +MODULE_LICENSE("GPL");
+> > +MODULE_AUTHOR("Marcelo Tosatti <mtosatti@redhat.com>");
+> > +
+> > Index: linux-2.6.git/Documentation/virtual/kvm/guest-halt-polling.txt
+> > ===================================================================
+> > --- /dev/null	1970-01-01 00:00:00.000000000 +0000
+> > +++ linux-2.6.git/Documentation/virtual/kvm/guest-halt-polling.txt	2019-05-17 13:36:39.274703710 -0300
+> > @@ -0,0 +1,39 @@
+> > +KVM guest halt polling
+> > +======================
+> > +
+> > +The cpuidle_kvm driver allows the guest vcpus to poll for a specified
+> > +amount of time before halting. This provides the following benefits
+> > +to host side polling:
+> > +
+> > +	1) The POLL flag is set while polling is performed, which allows
+> > +	   a remote vCPU to avoid sending an IPI (and the associated
+> > + 	   cost of handling the IPI) when performing a wakeup.
+> > +
+> > +	2) The HLT VM-exit cost can be avoided.
+> > +
+> > +The downside of guest side polling is that polling is performed
+> > +even with other runnable tasks in the host.
+> > +
+> > +Module Parameters
+> > +=================
+> > +
+> > +The cpuidle_kvm module has 1 tuneable module parameter: guest_halt_poll_ns,
+> > +the amount of time, in nanoseconds, that polling is performed before
+> > +halting.
+> > +
+> > +This module parameter can be set from the debugfs files in:
+> > +
+> > +	/sys/module/cpuidle_kvm/parameters/
+> > +
+> > +Further Notes
+> > +=============
+> > +
+> > +- Care should be taken when setting the guest_halt_poll_ns parameter as a
+> > +large value has the potential to drive the cpu usage to 100% on a machine which
+> > +would be almost entirely idle otherwise.
+> > +
+> > +- The effective amount of time that polling is performed is the host poll
+> > +value (see halt-polling.txt) plus guest_halt_poll_ns. If all guests
+> > +on a host system support and have properly configured guest_halt_poll_ns,
+> > +then setting halt_poll_ns to 0 in the host is probably the best choice.
+> > +
+> > 
