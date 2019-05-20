@@ -2,172 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 23C6123237
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 13:23:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60A782323C
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 13:24:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732682AbfETLW4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 07:22:56 -0400
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:43684 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731487AbfETLW4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 07:22:56 -0400
-Received: by mail-oi1-f195.google.com with SMTP id t187so9647689oie.10;
-        Mon, 20 May 2019 04:22:55 -0700 (PDT)
+        id S1732655AbfETLYm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 07:24:42 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:35104 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732609AbfETLYm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 07:24:42 -0400
+Received: by mail-qt1-f193.google.com with SMTP id a39so15819340qtk.2
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 04:24:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=pqJsM3I7VCsCBoW08AaOqNI2KyFITesPxcJ79o2nhOY=;
-        b=kzFA2iZkmhj+hMC7x3NQTmHLxTdFCMkKG72QKILHzE5vC2f2S4rkZsgL983zr8+8BZ
-         wTiDF+EPQdFWOpqI/XujsRnREJMf+i2r30eP2gDEyN68vKiFzWUYAG+3b0U7n29EAxMF
-         Us2X9NgwH8z9Igvtc7iLkRAZLiZipZXqs96CFG9V+cdQWL6fvBiEEgH5Ye6UUWevD5FZ
-         iIAjHVG31ilVJd8yio/TXoRFakMTusuYv3+4MQTGzRD20WcsPgKjzw2CTvCUb1ruSI2p
-         8Z87vggS/oxAneCCbsdv/rf3tJNm4UGq2Dy/RyPyq4USZfca50KZcfJNBxPhTtHsOcCC
-         2KvA==
+        h=mime-version:reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=SAoSdsefzzCmPOTzwU+Ovh/O9jS+esAN3o944dSuqEw=;
+        b=bobitScyk8wyTAKAVjPh9JopFv4PXysmafVbD/eD6TQd3yXYVFr/Debb9FVwyLMdQ+
+         5aOWqNXXo0LMN1UW7kzUWyY3/jv4So/ZTylJyuRs0wPpMIAlfW6k/AoTCHjWIgdjIh1j
+         7y4Widxegant7Vtx6FfFMiEctdElrH04DgLyBe2HM0LMXdnYyVCNxp5N2gPJG63EWY8O
+         JiS4DJkqMcQhoPtmeEbXQILzK0OnuIdEl4P5tw9aJGzujYMVJ4q+smpNLCPqWdQwGd3O
+         1zIzTQJUcJOp//fPgb1r5G3ITcqUb9sqzBMcvlSoXYkJKoCxgzjA7Ci0OANRP+dgykuF
+         K/EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pqJsM3I7VCsCBoW08AaOqNI2KyFITesPxcJ79o2nhOY=;
-        b=P/3YM0tR/XtC0P5iB/FGKSbM/cOocBxYhtKInW65WAZq4+UXpvaOLjfQT3eM63cCzX
-         3VaDcS1P18EyRK/OmeuBNdY4i03ZledelYrFfgC/DAvqJB7fbD2hWaq+areklByoZnX5
-         SOscHUwhte6Lo7cBhgZGQk6T2sAx2xg2Ts6oHC8CCfc6TJZUSfmR5duHh9pBntX7dDsB
-         vfKsVUkU9XNZlA1953Nm7VvajmxAT8qAZKL8gxAxkOtabF2bAOnaGLXyCZMKSDntiltH
-         7EWEoZJxQBddg5rYEi7I0pattAwuUxfipPxb/2tfUbnRNPpGgMR6dPcrXOV2rBDdIHLs
-         YrRg==
-X-Gm-Message-State: APjAAAXN4f1VOcVrrufn4iTft50fETyBSKZcUNbCEJUTBioBMuHL9nV0
-        86aZMASwJ5LMwtNF1q9n+e4kDHk/LfWwEmHq5dsj0wws
-X-Google-Smtp-Source: APXvYqzzzLEbFr/YCGl6P2GF59jY07tpiE2qxD8404B1NsnaV6x3z47aRMdPOBTHq8Sh9jE3FuwsMT4L1bi8SMBqPmM=
-X-Received: by 2002:aca:c711:: with SMTP id x17mr48064oif.174.1558351375321;
- Mon, 20 May 2019 04:22:55 -0700 (PDT)
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to:content-transfer-encoding;
+        bh=SAoSdsefzzCmPOTzwU+Ovh/O9jS+esAN3o944dSuqEw=;
+        b=F+YYlZowOXJf8xAmqIHk2QIn+miI6xMCd0tpzow5yFGSP4z+PBrzP2xdITB4ZT+5RH
+         fE7KtbqDSQXk1kHZBP+DNP8vogy3nEJNLzd0RDIxgkwLPe7tAmMX3cBTtXnfcM9FuHiT
+         9lTtjeSWpDf2pys7rkojtWRlLri7l0QKQJImNkJ8N0YdXTQVnoVJik9lOBrENQix8Mp4
+         I0cCe/Fe/nm3UcqkWf/jiPBPGmTuUbWw3J5HXzQbCRFgrVIKzGioHjNHPqhrsvk8d9bH
+         Uhfx9B7h4OOK1/uB8ztwbt1RK2qdzytSdKvPigVw7uAvds2PK6bGqF9mw3kyro5VSFEj
+         kkkA==
+X-Gm-Message-State: APjAAAV77pQFFai0wZOnEjkjaYpRG3SEICChBLWGLBNdp6sJ8y0E+cMJ
+        vzdNSNgLvV3jrPJAjh3Zuvrp2JVt33ZH5VehWx4=
+X-Google-Smtp-Source: APXvYqzr46vv1ibFnLTqVG/5gO+UGZDnCZD2qEiGgN5Udm8uVFpSP9OTWQwlNpY5x9+GRFiO/jL21kz276bvQ4udZV4=
+X-Received: by 2002:aed:3a0a:: with SMTP id n10mr63876885qte.145.1558351481142;
+ Mon, 20 May 2019 04:24:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <1558340289-6857-1-git-send-email-wanpengli@tencent.com>
- <1558340289-6857-5-git-send-email-wanpengli@tencent.com> <b80a0c3b-c5b1-bfd1-83d7-ace3436b230e@redhat.com>
-In-Reply-To: <b80a0c3b-c5b1-bfd1-83d7-ace3436b230e@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 20 May 2019 19:22:46 +0800
-Message-ID: <CANRm+CyDpA-2j28soX9si5CX3vFadd4_BASFzt1f4FbNNNDzyw@mail.gmail.com>
-Subject: Re: [PATCH v4 4/5] KVM: LAPIC: Delay trace advance expire delta
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Liran Alon <liran.alon@oracle.com>
+Received: by 2002:a0c:afb2:0:0:0:0:0 with HTTP; Mon, 20 May 2019 04:24:40
+ -0700 (PDT)
+Reply-To: eddywilliam0002@gmail.com
+From:   eddy william <ed7293954@gmail.com>
+Date:   Mon, 20 May 2019 13:24:40 +0200
+Message-ID: <CAN9Ept+ZQVJ8HwtL_WOo3nWdN8ArqtpGjxWVgb46vj0H64dtkQ@mail.gmail.com>
+Subject: hello
+To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 May 2019 at 19:14, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 20/05/19 10:18, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > wait_lapic_expire() call was moved above guest_enter_irqoff() because of
-> > its tracepoint, which violated the RCU extended quiescent state invoked
-> > by guest_enter_irqoff()[1][2]. This patch simply moves the tracepoint
-> > below guest_exit_irqoff() in vcpu_enter_guest(). Snapshot the delta before
-> > VM-Enter, but trace it after VM-Exit. This can help us to move
-> > wait_lapic_expire() just before vmentry in the later patch.
-> >
-> > [1] Commit 8b89fe1f6c43 ("kvm: x86: move tracepoints outside extended quiescent state")
-> > [2] https://patchwork.kernel.org/patch/7821111/
->
-> This is a bit confusing, since the delta is printed after the
-> corresponding vmexit but the wait is done before the vmentry.  I think
-> we can drop the tracepoint:
->
-> ------------- 8< ----------------
-> From ae148d98d49b96b5222e2c78ac1b1e13cc526d71 Mon Sep 17 00:00:00 2001
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> Date: Mon, 20 May 2019 13:10:01 +0200
-> Subject: [PATCH] KVM: lapic: replace wait_lapic_expire tracepoint with
->  restart_apic_timer
->
-> wait_lapic_expire() call was moved above guest_enter_irqoff() because of
-> its tracepoint, which violated the RCU extended quiescent state invoked
-> by guest_enter_irqoff()[1][2].
->
-> We would like to move wait_lapic_expire() just before vmentry, which would
-> place wait_lapic_expire() again inside the extended quiescent state.  Drop
-> the tracepoint, but add instead another one that can be useful and where
-> we can check the status of the adaptive tuning procedure.
+Mijn naam is Eddy William. Ik ben van beroep advocaat. Ik wil je aanbieden
+nabestaanden van mijn cli=C3=ABnt. Je ervaart de som van ($ 14,2 miljoen)
+dollars die mijn cli=C3=ABnt voor zijn overlijden op de bank heeft achterge=
+laten.
 
-https://lkml.org/lkml/2019/5/15/1435
+Mijn klant is een burger van jouw land die stierf in auto-ongeluk met zijn =
+vrouw
+en alleen zoon. Ik krijg 50% van het totale fonds en 50% wel
+voor jou zijn.
 
-Maybe Sean's comment is reasonable, per-vCPU debugfs entry for
-adaptive tuning and wait_lapic_expire() tracepoint for hand tuning.
+Neem hier voor meer informatie contact op met mijn priv=C3=A9mail:
+eddywilliam0002@gmail.com
 
-Regards,
-Wanpeng Li
+Bij voorbaat hartelijk dank,
+Eddy William,
 
->
-> [1] Commit 8b89fe1f6c43 ("kvm: x86: move tracepoints outside extended quiescent state")
-> [2] https://patchwork.kernel.org/patch/7821111/
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->
-> ---
->  arch/x86/kvm/lapic.c |  4 +++-
->  arch/x86/kvm/trace.h | 15 +++++++--------
->  2 files changed, 10 insertions(+), 9 deletions(-)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index c12b090f4fad..8f05c1d0b486 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1545,7 +1545,6 @@ void wait_lapic_expire(struct kvm_vcpu *vcpu)
->         tsc_deadline = apic->lapic_timer.expired_tscdeadline;
->         apic->lapic_timer.expired_tscdeadline = 0;
->         guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
-> -       trace_kvm_wait_lapic_expire(vcpu->vcpu_id, guest_tsc - tsc_deadline);
->
->         if (guest_tsc < tsc_deadline)
->                 __wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
-> @@ -1763,6 +1762,9 @@ static void start_sw_timer(struct kvm_lapic *apic)
->
->  static void restart_apic_timer(struct kvm_lapic *apic)
->  {
-> +       trace_kvm_restart_apic_timer(apic->vcpu->vcpu_id,
-> +                                    apic->lapic_timer.timer_advance_ns);
-> +
->         preempt_disable();
->
->         if (!apic_lvtt_period(apic) && atomic_read(&apic->lapic_timer.pending))
-> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> index 4d47a2631d1f..f6e000038f3f 100644
-> --- a/arch/x86/kvm/trace.h
-> +++ b/arch/x86/kvm/trace.h
-> @@ -953,24 +953,23 @@
->                   __entry->flags)
->  );
->
-> -TRACE_EVENT(kvm_wait_lapic_expire,
-> -       TP_PROTO(unsigned int vcpu_id, s64 delta),
-> -       TP_ARGS(vcpu_id, delta),
-> +TRACE_EVENT(kvm_restart_apic_timer,
-> +       TP_PROTO(unsigned int vcpu_id, u32 advance),
-> +       TP_ARGS(vcpu_id, advance),
->
->         TP_STRUCT__entry(
->                 __field(        unsigned int,   vcpu_id         )
-> -               __field(        s64,            delta           )
-> +               __field(        u32,            advance         )
->         ),
->
->         TP_fast_assign(
->                 __entry->vcpu_id           = vcpu_id;
-> -               __entry->delta             = delta;
-> +               __entry->advance           = advance;
->         ),
->
-> -       TP_printk("vcpu %u: delta %lld (%s)",
-> +       TP_printk("vcpu %u: advance %u",
->                   __entry->vcpu_id,
-> -                 __entry->delta,
-> -                 __entry->delta < 0 ? "early" : "late")
-> +                 __entry->advance)
->  );
->
->  TRACE_EVENT(kvm_enter_smm,
+
+
+Hello
+
+My name is Eddy William I am a lawyer by profession. I wish to offer you
+the next of kin to my client. You will inherit the sum of ($14.2 Million)
+dollars my client left in the bank before his death.
+
+My client is a citizen of your country who died in auto crash with his wife
+and only son. I will be entitled with 50% of the total fund while 50% will
+be for you.
+
+Please contact my private email here for more details:eddywilliam0002@gmail=
+.com
+
+Many thanks in advance,
+Mr.Eddy William,
