@@ -2,120 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9539623268
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 13:31:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8CA22329D
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 13:34:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732690AbfETLai (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 07:30:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44414 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731193AbfETLah (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 07:30:37 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3B7B8368B1;
-        Mon, 20 May 2019 11:30:37 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-117-9.ams2.redhat.com [10.36.117.9])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 058B95C553;
-        Mon, 20 May 2019 11:30:31 +0000 (UTC)
-Subject: Re: [RFC PATCH 0/4] KVM selftests for s390x
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        Andrew Jones <drjones@redhat.com>
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20190516111253.4494-1-thuth@redhat.com>
- <b412e591-3983-ebef-510b-43f9b7be4147@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <9423ba89-b10e-5e6e-3cc8-8088f3088233@redhat.com>
-Date:   Mon, 20 May 2019 13:30:31 +0200
+        id S1733019AbfETLdc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 07:33:32 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:43484 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733015AbfETLdb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 07:33:31 -0400
+Received: by mail-wr1-f68.google.com with SMTP id r4so14157200wro.10
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 04:33:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7yhZpsDUhANl2Z2Dw10e3o+cyHg6NesHSnxHIjr6nRg=;
+        b=mhxXgxQEN4i6XMHT4UGMegb1s1dD8866dnQh6xaNpUplc6GA+wbe6AFc21TKZzLOfF
+         LNaxL9ntMbQ+ciZUBes+p9i3FqDaKrSs/k/sVCAyCMvpYE5YhWv5I8JVlMIIxYz4RAsO
+         BcNe2pmhgQLTDXSmPKHki0xkbpRknd3ZsNJerZbNBAFSU1CoBl0dJ40tb85+Xmnwst9U
+         qWskPjAHuTvuR0D+llQ+ICBhR5hkVTccL0bzZ90YqMNVPOm7JNPAg8epCcBM1hmhNg2d
+         PJjQHbUtVhQfVk/rq9hrWE1835V4BYdFIrmQBJ0E6RI+v3vHBHOJcn7esQIVMyUtkmGd
+         XHyA==
+X-Gm-Message-State: APjAAAUaq/Ukj6IQSFBY3i7QIB/R0V9rQGLy1HfParvI8HYS01q3ZAOq
+        3g/VYjvS2wcVI+k6Tx8uE2y2dw==
+X-Google-Smtp-Source: APXvYqwvNe9RKnRbqyhGMHN2J8QriyDrZzVPw1rR8tiyL92RyU7WMYn5vjJxKdYvlKh9B9swK89fww==
+X-Received: by 2002:adf:8306:: with SMTP id 6mr32920357wrd.155.1558352010019;
+        Mon, 20 May 2019 04:33:30 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ac04:eef9:b257:b844? ([2001:b07:6468:f312:ac04:eef9:b257:b844])
+        by smtp.gmail.com with ESMTPSA id z20sm20168646wmf.14.2019.05.20.04.33.29
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 20 May 2019 04:33:29 -0700 (PDT)
+Subject: Re: [PATCH v4 4/5] KVM: LAPIC: Delay trace advance expire delta
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Liran Alon <liran.alon@oracle.com>
+References: <1558340289-6857-1-git-send-email-wanpengli@tencent.com>
+ <1558340289-6857-5-git-send-email-wanpengli@tencent.com>
+ <b80a0c3b-c5b1-bfd1-83d7-ace3436b230e@redhat.com>
+ <CANRm+CyDpA-2j28soX9si5CX3vFadd4_BASFzt1f4FbNNNDzyw@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bd60e5c2-e3c5-80fc-3a1d-c75809573945@redhat.com>
+Date:   Mon, 20 May 2019 13:33:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <b412e591-3983-ebef-510b-43f9b7be4147@redhat.com>
+In-Reply-To: <CANRm+CyDpA-2j28soX9si5CX3vFadd4_BASFzt1f4FbNNNDzyw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Mon, 20 May 2019 11:30:37 +0000 (UTC)
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/05/2019 13.20, Paolo Bonzini wrote:
-> On 16/05/19 13:12, Thomas Huth wrote:
->> This patch series enables the KVM selftests for s390x. As a first
->> test, the sync_regs from x86 has been adapted to s390x.
+On 20/05/19 13:22, Wanpeng Li wrote:
 >>
->> Please note that the ucall() interface is not used yet - since
->> s390x neither has PIO nor MMIO, this needs some more work first
->> before it becomes usable (we likely should use a DIAG hypercall
->> here, which is what the sync_reg test is currently using, too...).
+>> We would like to move wait_lapic_expire() just before vmentry, which would
+>> place wait_lapic_expire() again inside the extended quiescent state.  Drop
+>> the tracepoint, but add instead another one that can be useful and where
+>> we can check the status of the adaptive tuning procedure.
+> https://lkml.org/lkml/2019/5/15/1435
 > 
-> No objections at all, though it would be like to have ucall plumbed in
-> from the beginning.
+> Maybe Sean's comment is reasonable, per-vCPU debugfs entry for
+> adaptive tuning and wait_lapic_expire() tracepoint for hand tuning.
 
-I'm still looking at the ucall interface ... what I don't quite get yet
-is the question why the ucall_type there is selectable during runtime?
+Hmm, yeah, that makes sense.  The location of the tracepoint is a bit
+weird, but I guess we can add a comment in the code.
 
-Are there plans to have test that could either use UCALL_PIO or
-UCALL_MMIO? If not, what about moving ucall_init() and ucall() to
-architecture specific code in tools/testing/selftests/kvm/lib/aarch64/
-and tools/testing/selftests/kvm/lib/x86_64 instead, and to remove the
-ucall_type stuff again (so that x86 is hard-wired to PIO and aarch64
-is hard-wired to MMIO)? ... then I could add a DIAG-based ucall
-on s390x more easily, I think.
-
- Thomas
-
+Paolo
