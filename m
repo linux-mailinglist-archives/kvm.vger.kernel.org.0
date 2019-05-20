@@ -2,119 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 869DE232D2
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 13:42:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0850522DF4
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 10:08:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730632AbfETLm2 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 20 May 2019 07:42:28 -0400
-Received: from 2.mo7.mail-out.ovh.net ([87.98.143.68]:53003 "EHLO
-        2.mo7.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725372AbfETLm1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 07:42:27 -0400
-X-Greylist: delayed 10798 seconds by postgrey-1.27 at vger.kernel.org; Mon, 20 May 2019 07:42:26 EDT
-Received: from player687.ha.ovh.net (unknown [10.108.57.53])
-        by mo7.mail-out.ovh.net (Postfix) with ESMTP id 8B90E11D237
-        for <kvm@vger.kernel.org>; Mon, 20 May 2019 10:07:01 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player687.ha.ovh.net (Postfix) with ESMTPSA id A90C15E5B499;
-        Mon, 20 May 2019 08:06:55 +0000 (UTC)
-Date:   Mon, 20 May 2019 10:06:54 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm@vger.kernel.org,
-        Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Subject: Re: [PATCH 2/3] KVM: PPC: Book3S HV: XIVE: do not test the EQ flag
- validity when resetting
-Message-ID: <20190520100654.4da6574a@bahia.lan>
-In-Reply-To: <20190520071514.9308-3-clg@kaod.org>
-References: <20190520071514.9308-1-clg@kaod.org>
-        <20190520071514.9308-3-clg@kaod.org>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1730551AbfETIIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 04:08:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42538 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728105AbfETIIN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 04:08:13 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2E7F030832E3;
+        Mon, 20 May 2019 08:08:13 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-117-9.ams2.redhat.com [10.36.117.9])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 953DB5C22E;
+        Mon, 20 May 2019 08:08:06 +0000 (UTC)
+Subject: Re: [RFC PATCH 1/4] KVM: selftests: Guard struct kvm_vcpu_events with
+ __KVM_HAVE_VCPU_EVENTS
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20190516111253.4494-1-thuth@redhat.com>
+ <20190516111253.4494-2-thuth@redhat.com>
+ <e8a57340-6f8d-90b8-ad73-c39c19f5c9a4@de.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <8fda58ac-0e0c-6576-f492-2a9f9d2a3194@redhat.com>
+Date:   Mon, 20 May 2019 10:08:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Ovh-Tracer-Id: 6927943605061785995
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddtkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+In-Reply-To: <e8a57340-6f8d-90b8-ad73-c39c19f5c9a4@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Mon, 20 May 2019 08:08:13 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 May 2019 09:15:13 +0200
-Cédric Le Goater <clg@kaod.org> wrote:
-
-> When a CPU is hot-unplugged, the EQ is deconfigured using a zero size
-> and a zero address. In this case, there is no need to check the flag
-> and queue size validity. Move the checks after the queue reset code
-> section to fix CPU hot-unplug.
+On 20/05/2019 09.12, Christian Borntraeger wrote:
 > 
-> Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-> Tested-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  arch/powerpc/kvm/book3s_xive_native.c | 36 +++++++++++++--------------
->  1 file changed, 18 insertions(+), 18 deletions(-)
+> On 16.05.19 13:12, Thomas Huth wrote:
+>> The struct kvm_vcpu_events code is only available on certain architectures
+>> (arm, arm64 and x86). To be able to compile kvm_util.c also for other
+>> architectures, we've got to fence the code with __KVM_HAVE_VCPU_EVENTS.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > 
-> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-> index 796d86549cfe..3fdea6bf4e97 100644
-> --- a/arch/powerpc/kvm/book3s_xive_native.c
-> +++ b/arch/powerpc/kvm/book3s_xive_native.c
-> @@ -565,24 +565,6 @@ static int kvmppc_xive_native_set_queue_config(struct kvmppc_xive *xive,
->  		 __func__, server, priority, kvm_eq.flags,
->  		 kvm_eq.qshift, kvm_eq.qaddr, kvm_eq.qtoggle, kvm_eq.qindex);
->  
-> -	/*
-> -	 * sPAPR specifies a "Unconditional Notify (n) flag" for the
-> -	 * H_INT_SET_QUEUE_CONFIG hcall which forces notification
-> -	 * without using the coalescing mechanisms provided by the
-> -	 * XIVE END ESBs. This is required on KVM as notification
-> -	 * using the END ESBs is not supported.
-> -	 */
-> -	if (kvm_eq.flags != KVM_XIVE_EQ_ALWAYS_NOTIFY) {
-> -		pr_err("invalid flags %d\n", kvm_eq.flags);
-> -		return -EINVAL;
-> -	}
-> -
-> -	rc = xive_native_validate_queue_size(kvm_eq.qshift);
-> -	if (rc) {
-> -		pr_err("invalid queue size %d\n", kvm_eq.qshift);
-> -		return rc;
-> -	}
-> -
->  	/* reset queue and disable queueing */
->  	if (!kvm_eq.qshift) {
->  		q->guest_qaddr  = 0;
-> @@ -604,6 +586,24 @@ static int kvmppc_xive_native_set_queue_config(struct kvmppc_xive *xive,
->  		return 0;
->  	}
->  
-> +	/*
-> +	 * sPAPR specifies a "Unconditional Notify (n) flag" for the
-> +	 * H_INT_SET_QUEUE_CONFIG hcall which forces notification
-> +	 * without using the coalescing mechanisms provided by the
-> +	 * XIVE END ESBs. This is required on KVM as notification
-> +	 * using the END ESBs is not supported.
-> +	 */
-> +	if (kvm_eq.flags != KVM_XIVE_EQ_ALWAYS_NOTIFY) {
-> +		pr_err("invalid flags %d\n", kvm_eq.flags);
-> +		return -EINVAL;
-> +	}
-> +
-> +	rc = xive_native_validate_queue_size(kvm_eq.qshift);
-> +	if (rc) {
-> +		pr_err("invalid queue size %d\n", kvm_eq.qshift);
-> +		return rc;
-> +	}
-> +
->  	if (kvm_eq.qaddr & ((1ull << kvm_eq.qshift) - 1)) {
->  		pr_err("queue page is not aligned %llx/%llx\n", kvm_eq.qaddr,
->  		       1ull << kvm_eq.qshift);
+> According to the MAINTAINERS patches, you want me to pick these patches. Correct?
 
+That would be nice, yes. But if you don't want to be responsible for
+s390x-related KVM selftest patches, please let me know, then I'll drop
+these hunks from the patches again.
+
+ Thomas
