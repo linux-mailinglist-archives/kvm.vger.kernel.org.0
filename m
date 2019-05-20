@@ -2,117 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9602C23139
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 12:21:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 399C223157
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 12:30:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730701AbfETKV4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 06:21:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60124 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730632AbfETKV4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 06:21:56 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D7FBF20276;
-        Mon, 20 May 2019 10:21:55 +0000 (UTC)
-Received: from gondolin (ovpn-204-110.brq.redhat.com [10.40.204.110])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F99A5C221;
-        Mon, 20 May 2019 10:21:46 +0000 (UTC)
-Date:   Mon, 20 May 2019 12:21:43 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Martin Schwidefsky <schwidefsky@de.ibm.com>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>
-Subject: Re: [PATCH 06/10] s390/cio: add basic protected virtualization
- support
-Message-ID: <20190520122143.259ff8df.cohuck@redhat.com>
-In-Reply-To: <20190518201100.0fd07d7f.pasic@linux.ibm.com>
-References: <20190426183245.37939-1-pasic@linux.ibm.com>
-        <20190426183245.37939-7-pasic@linux.ibm.com>
-        <20190513114136.783c851c.cohuck@redhat.com>
-        <20190515225158.301af387.pasic@linux.ibm.com>
-        <20190516082928.1371696b.cohuck@redhat.com>
-        <20190518201100.0fd07d7f.pasic@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1731049AbfETKao (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 06:30:44 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:50881 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730819AbfETKao (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 06:30:44 -0400
+Received: by mail-wm1-f65.google.com with SMTP id f204so12734032wme.0
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 03:30:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0PmYvULW8b+vhtRBg4p2Q8VUlpSkSvMV+uikqOEEQ0M=;
+        b=XIz7DVuyR6+blirrqmKr+W0ZSND8V5wBRths4cEekRCS9n3HS5XeM63ilkUvfpOQq6
+         ClyhZW2DhFX4AKh9cGcDRbU7ifTXtruE6HyQx9mCUtndH5JMt0KHVd/YP0tIAMmOcbFB
+         ORaV0HQHCEp4+qanLm1CKHssufHvkYAqK7FrbyaUVNv8wiuVKzXL3KH1OqomKlfEO/xc
+         AfDhR2oiFrb/O1vbwAIv/+Rep/JZ/mePe2IjTk8BjLcxfWmfyceQyY0zHgY/aVrir1p2
+         g7yYkq5TtnwXbgENpYEY9eiKuQouORb9FmVLzdJPbwLfhG0WfZOo6v5Qf+uVHg4PJNPM
+         RMrw==
+X-Gm-Message-State: APjAAAVtGXgyYcF4/pfTlrGD9D7NU+X3d8bibrW4yEkxWiSrJ2jH/mrV
+        bHvX/axRlT/jJOiHcKsjSj83XQ==
+X-Google-Smtp-Source: APXvYqy8mwAvgC577RNezQmaz8YthJFOSgFun9/nFroItHZdPx2TxQO2lK0CONgi/ac8AFIc3xOCBg==
+X-Received: by 2002:a1c:f910:: with SMTP id x16mr11906527wmh.132.1558348242247;
+        Mon, 20 May 2019 03:30:42 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ac04:eef9:b257:b844? ([2001:b07:6468:f312:ac04:eef9:b257:b844])
+        by smtp.gmail.com with ESMTPSA id u2sm26308457wra.82.2019.05.20.03.30.41
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 20 May 2019 03:30:41 -0700 (PDT)
+Subject: Re: [PATCH 1/4] KVM: x86: Disable intercept for CORE cstate read
+To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Liran Alon <liran.alon@oracle.com>
+References: <1558082990-7822-1-git-send-email-wanpengli@tencent.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7787e0cb-2c46-b5b5-94ea-72c061ea0235@redhat.com>
+Date:   Mon, 20 May 2019 12:30:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Mon, 20 May 2019 10:21:56 +0000 (UTC)
+In-Reply-To: <1558082990-7822-1-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 18 May 2019 20:11:00 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
-
-> On Thu, 16 May 2019 08:29:28 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
+On 17/05/19 10:49, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
 > 
-> > On Wed, 15 May 2019 22:51:58 +0200
-> > Halil Pasic <pasic@linux.ibm.com> wrote:
+> Allow guest reads CORE cstate when exposing host CPU power management capabilities 
+> to the guest. PKG cstate is restricted to avoid a guest to get the whole package 
+> information in multi-tenant scenario.
 
-> Don't like the second sentence. How about "It handles neither QDIO
-> in the common code, nor any device type specific stuff (like channel
-> programs constructed by the DADS driver)."
+Hmm, I am not sure about this.  I can see why it can be useful to run
+turbostat in the guest, but is it a good idea to share it with the
+guest, since it counts from machine reset rather than from VM reset?
 
-Sounds good to me (with s/DADS/DASD/ :)
+Maybe it could use a separate bit for KVM_CAP_X86_DISABLE_EXITS?
 
-> > > A side note: making the subchannel device 'own' the DMA stuff of a
-> > > ccw device (something that was discussed in the RFC thread) is tricky
-> > > because the ccw device may outlive the subchannel (all that orphan
-> > > stuff).  
-> > 
-> > Yes, that's... eww. Not really a problem for virtio-ccw devices (which
-> > do not support the disconnected state), but can we make DMA and the
-> > subchannel moving play nice with each other at all?
-> >   
+Thanks,
+
+Paolo
+
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Radim Krčmář <rkrcmar@redhat.com>
+> Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+> Cc: Liran Alon <liran.alon@oracle.com>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> I don't quite understand the question. This series does not have any
-> problems with that AFAIU. Can you please clarify?
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 771d3bf..b0d6be5 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6615,6 +6615,12 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
+>  	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
+>  	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_ESP, MSR_TYPE_RW);
+>  	vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_EIP, MSR_TYPE_RW);
+> +	if (kvm_mwait_in_guest(kvm)) {
+> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C1_RES, MSR_TYPE_R);
+> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C3_RESIDENCY, MSR_TYPE_R);
+> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C6_RESIDENCY, MSR_TYPE_R);
+> +		vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C7_RESIDENCY, MSR_TYPE_R);
+> +	}
+>  	vmx->msr_bitmap_mode = 0;
+>  
+>  	vmx->loaded_vmcs = &vmx->vmcs01;
+> 
 
-Wait, weren't you saying that there actually is a problem?
-
-We seem to have the following situation:
-- the device per se is represented by the ccw device
-- the subchannel is the means of communication, and dma is tied to the
-  (I/O ?) subchannel
-- the machine check handling code may move a ccw device to a different
-  subchannel, or even to a fake subchannel (orphanage handling)
-
-The moving won't happen with virtio-ccw devices (as they do not support
-the disconnected state, which is a prereq for being moved around), but
-at a glance, this looks like it is worth some more thought.
-
-- Are all (I/O) subchannels using e.g. the same dma size? (TBH, that
-  question sounds a bit silly: that should be a property belonging to
-  the ccw device, shouldn't it?)
-- What dma properties does the fake subchannel have? (Probably none, as
-  its only purpose is to serve as a parent for otherwise parentless
-  disconnected ccw devices, and is therefore not involved in any I/O.)
-- There needs to be some kind of handling in the machine check code, I
-  guess? We would probably need a different allocation if we end up at
-  a different subchannel?
-
-I think we can assume that the dma size is at most 31 bits (since that
-is what the common I/O layer needs); but can we also assume that it
-will always be at least 31 bits?
-
-My take on this is that we should be sure that we're not digging
-ourselves a hole that will be hard to get out of again should we want to
-support non-virtio-ccw in the future, not that the current
-implementation is necessarily broken.
