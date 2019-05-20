@@ -2,88 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 64888230E7
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 12:04:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9602C23139
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 12:21:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731569AbfETKES (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 06:04:18 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:42304 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729834AbfETKES (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 06:04:18 -0400
-Received: by mail-wr1-f67.google.com with SMTP id l2so13866268wrb.9
-        for <kvm@vger.kernel.org>; Mon, 20 May 2019 03:04:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=eDTLgWjDZyEWBd4EOYN8wwdDkryUyB2GrBPhBkzPJWQ=;
-        b=cdNaP90BU4Bc5lcnz+OF2KQb/sNja1wtjPcL6WIv9YhuqspNhAPpD74zQA1SoKFv6J
-         smGAxlwZ1cZa9JZ/wAtyItUCf/nO+MeI63FboF884kiIY3Dk8CNxvaYATHj6ivET/BFg
-         EiZ6Mq0B06BNZ7Hc2+suPHYCOnMIyil82V+1jpztmSZdCH4lpyhscZC6Z14OdTTPtBxs
-         tsd9NvgCoq7rkRIYGo7usl9qelX6BGQXFqJWkqxf/j/JVvAF/WZWqtlrVx/sxw2gOZ3k
-         D8SCg9bcpG4haFIQgXCdIYEQx8vHO5cMKSEB4gTnmOlDnWKKga+3X7kjIojpikdK6oDT
-         GlGw==
-X-Gm-Message-State: APjAAAWOKQeYk9NiiSxFkNF5nVvpeBI1SmhvVxHOFj3ci2hQS2JFHMG6
-        xPZxqGsW5obPxyTFA2ACg66UvQ==
-X-Google-Smtp-Source: APXvYqwfCPb6Ub4vQIPJsBa7bJbC8oN8bymcwi3g2iPRay1gsMD3vDLwcPgdt0g1QwW+/7PpXnm59g==
-X-Received: by 2002:adf:aa09:: with SMTP id p9mr18212336wrd.59.1558346656829;
-        Mon, 20 May 2019 03:04:16 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ac04:eef9:b257:b844? ([2001:b07:6468:f312:ac04:eef9:b257:b844])
-        by smtp.gmail.com with ESMTPSA id v1sm16669809wrd.47.2019.05.20.03.04.16
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 May 2019 03:04:16 -0700 (PDT)
-Subject: Re: [PATCH 2/2] kvm: x86: Include CPUID leaf 0x8000001e in kvm's
- supported CPUID
-To:     Jim Mattson <jmattson@google.com>, Borislav Petkov <bp@suse.de>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Marc Orr <marcorr@google.com>, Jacob Xu <jacobhxu@google.com>
-References: <20190327201537.77350-1-jmattson@google.com>
- <20190327201537.77350-2-jmattson@google.com> <20190401171304.GD28514@zn.tnic>
- <CALMp9eRbe8VWzhGcs_HB0gBT5EQN4PCtop5am9j+-WG5pK8r8w@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d98b62d0-846c-0af7-c8dd-6344c73bf801@redhat.com>
-Date:   Mon, 20 May 2019 12:04:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1730701AbfETKV4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 06:21:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60124 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730632AbfETKV4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 06:21:56 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D7FBF20276;
+        Mon, 20 May 2019 10:21:55 +0000 (UTC)
+Received: from gondolin (ovpn-204-110.brq.redhat.com [10.40.204.110])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F99A5C221;
+        Mon, 20 May 2019 10:21:46 +0000 (UTC)
+Date:   Mon, 20 May 2019 12:21:43 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Martin Schwidefsky <schwidefsky@de.ibm.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>
+Subject: Re: [PATCH 06/10] s390/cio: add basic protected virtualization
+ support
+Message-ID: <20190520122143.259ff8df.cohuck@redhat.com>
+In-Reply-To: <20190518201100.0fd07d7f.pasic@linux.ibm.com>
+References: <20190426183245.37939-1-pasic@linux.ibm.com>
+        <20190426183245.37939-7-pasic@linux.ibm.com>
+        <20190513114136.783c851c.cohuck@redhat.com>
+        <20190515225158.301af387.pasic@linux.ibm.com>
+        <20190516082928.1371696b.cohuck@redhat.com>
+        <20190518201100.0fd07d7f.pasic@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <CALMp9eRbe8VWzhGcs_HB0gBT5EQN4PCtop5am9j+-WG5pK8r8w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Mon, 20 May 2019 10:21:56 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/05/19 19:48, Jim Mattson wrote:
-> On Mon, Apr 1, 2019 at 10:13 AM Borislav Petkov <bp@suse.de> wrote:
->>
->> On Wed, Mar 27, 2019 at 01:15:37PM -0700, Jim Mattson wrote:
->>> Kvm now supports extended CPUID functions through 0x8000001f.  CPUID
->>> leaf 0x8000001e is AMD's Processor Topology Information leaf. This
->>> contains similar information to CPUID leaf 0xb (Intel's Extended
->>> Topology Enumeration leaf), and should be included in the output of
->>> KVM_GET_SUPPORTED_CPUID, even though userspace is likely to override
->>> some of this information based upon the configuration of the
->>> particular VM.
->>>
->>> Cc: Brijesh Singh <brijesh.singh@amd.com>
->>> Cc: Borislav Petkov <bp@suse.de>
->>> Fixes: 8765d75329a38 ("KVM: X86: Extend CPUID range to include new leaf")
->>> Signed-off-by: Jim Mattson <jmattson@google.com>
->>> Reviewed-by: Marc Orr <marcorr@google.com>
->>> ---
->>>  arch/x86/kvm/cpuid.c | 1 +
->>>  1 file changed, 1 insertion(+)
->>
->> Reviewed-by: Borislav Petkov <bp@suse.de>
-> 
-> Paolo?
-> 
+On Sat, 18 May 2019 20:11:00 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-Queued both (for 5.2-rc2), thanks.
+> On Thu, 16 May 2019 08:29:28 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > On Wed, 15 May 2019 22:51:58 +0200
+> > Halil Pasic <pasic@linux.ibm.com> wrote:
 
-Paolo
+> Don't like the second sentence. How about "It handles neither QDIO
+> in the common code, nor any device type specific stuff (like channel
+> programs constructed by the DADS driver)."
+
+Sounds good to me (with s/DADS/DASD/ :)
+
+> > > A side note: making the subchannel device 'own' the DMA stuff of a
+> > > ccw device (something that was discussed in the RFC thread) is tricky
+> > > because the ccw device may outlive the subchannel (all that orphan
+> > > stuff).  
+> > 
+> > Yes, that's... eww. Not really a problem for virtio-ccw devices (which
+> > do not support the disconnected state), but can we make DMA and the
+> > subchannel moving play nice with each other at all?
+> >   
+> 
+> I don't quite understand the question. This series does not have any
+> problems with that AFAIU. Can you please clarify?
+
+Wait, weren't you saying that there actually is a problem?
+
+We seem to have the following situation:
+- the device per se is represented by the ccw device
+- the subchannel is the means of communication, and dma is tied to the
+  (I/O ?) subchannel
+- the machine check handling code may move a ccw device to a different
+  subchannel, or even to a fake subchannel (orphanage handling)
+
+The moving won't happen with virtio-ccw devices (as they do not support
+the disconnected state, which is a prereq for being moved around), but
+at a glance, this looks like it is worth some more thought.
+
+- Are all (I/O) subchannels using e.g. the same dma size? (TBH, that
+  question sounds a bit silly: that should be a property belonging to
+  the ccw device, shouldn't it?)
+- What dma properties does the fake subchannel have? (Probably none, as
+  its only purpose is to serve as a parent for otherwise parentless
+  disconnected ccw devices, and is therefore not involved in any I/O.)
+- There needs to be some kind of handling in the machine check code, I
+  guess? We would probably need a different allocation if we end up at
+  a different subchannel?
+
+I think we can assume that the dma size is at most 31 bits (since that
+is what the common I/O layer needs); but can we also assume that it
+will always be at least 31 bits?
+
+My take on this is that we should be sure that we're not digging
+ourselves a hole that will be hard to get out of again should we want to
+support non-virtio-ccw in the future, not that the current
+implementation is necessarily broken.
