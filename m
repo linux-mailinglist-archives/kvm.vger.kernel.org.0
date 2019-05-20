@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 15117230E2
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 12:03:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 64888230E7
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 12:04:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731572AbfETKDM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 06:03:12 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:52866 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725951AbfETKDM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 06:03:12 -0400
-Received: by mail-wm1-f66.google.com with SMTP id y3so12626264wmm.2
-        for <kvm@vger.kernel.org>; Mon, 20 May 2019 03:03:11 -0700 (PDT)
+        id S1731569AbfETKES (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 06:04:18 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42304 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729834AbfETKES (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 06:04:18 -0400
+Received: by mail-wr1-f67.google.com with SMTP id l2so13866268wrb.9
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 03:04:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ntBh3gwN9WoX40GwCBpFxX6GBpRNGTL9y6TfLLH0P8Y=;
-        b=cm9mz+eNFNX2D+724awLm2ls/BLU7CZuwpIDi1ZxGvcSnFIql1n3c9k7M70ehIG+eo
-         ZPu0eQ2oj+vpRuUvJP1wmZawnGJGNwCu2pznQ6Ptm8wUY8T5N6qOWgZBBRxdWIGEtsoI
-         DUiftEhC0H4QbMEX5Jv6hJ3GZDVcGFopX3onydabVKYoqxkcWTj8LeGXvN5vCCnmZ6JP
-         EDOBZBI7EQjCPxtEsDgkP+YRvCyG/qXczR6losfqHinfYwbC1qwUszW956+3NXPZWjMy
-         CD0GvQ1ja5pYU5ijQeqk67OZbMD3pqC/uCzdh5tbN2Mxo1kFigXfRjE4jucskNKF1oIq
-         L6WA==
-X-Gm-Message-State: APjAAAUG7B33Y/mcymMfFCDr2Ym9tizY7LxMY4b1QVMqAfKQHK8odVk/
-        Nmc+rijILtES72P7oVwptwXjEw==
-X-Google-Smtp-Source: APXvYqwCViWNb1nszawZx5mGOC1uWv3OZtGu2OV4T05uHlrHYWk1+jCA3rZNhigRAkrAXmHcizwTeA==
-X-Received: by 2002:a1c:cb0e:: with SMTP id b14mr26501343wmg.61.1558346590407;
-        Mon, 20 May 2019 03:03:10 -0700 (PDT)
+        bh=eDTLgWjDZyEWBd4EOYN8wwdDkryUyB2GrBPhBkzPJWQ=;
+        b=cdNaP90BU4Bc5lcnz+OF2KQb/sNja1wtjPcL6WIv9YhuqspNhAPpD74zQA1SoKFv6J
+         smGAxlwZ1cZa9JZ/wAtyItUCf/nO+MeI63FboF884kiIY3Dk8CNxvaYATHj6ivET/BFg
+         EiZ6Mq0B06BNZ7Hc2+suPHYCOnMIyil82V+1jpztmSZdCH4lpyhscZC6Z14OdTTPtBxs
+         tsd9NvgCoq7rkRIYGo7usl9qelX6BGQXFqJWkqxf/j/JVvAF/WZWqtlrVx/sxw2gOZ3k
+         D8SCg9bcpG4haFIQgXCdIYEQx8vHO5cMKSEB4gTnmOlDnWKKga+3X7kjIojpikdK6oDT
+         GlGw==
+X-Gm-Message-State: APjAAAWOKQeYk9NiiSxFkNF5nVvpeBI1SmhvVxHOFj3ci2hQS2JFHMG6
+        xPZxqGsW5obPxyTFA2ACg66UvQ==
+X-Google-Smtp-Source: APXvYqwfCPb6Ub4vQIPJsBa7bJbC8oN8bymcwi3g2iPRay1gsMD3vDLwcPgdt0g1QwW+/7PpXnm59g==
+X-Received: by 2002:adf:aa09:: with SMTP id p9mr18212336wrd.59.1558346656829;
+        Mon, 20 May 2019 03:04:16 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:ac04:eef9:b257:b844? ([2001:b07:6468:f312:ac04:eef9:b257:b844])
-        by smtp.gmail.com with ESMTPSA id g13sm15296462wrw.63.2019.05.20.03.03.09
+        by smtp.gmail.com with ESMTPSA id v1sm16669809wrd.47.2019.05.20.03.04.16
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 May 2019 03:03:09 -0700 (PDT)
-Subject: Re: [PATCH v2] KVM: selftests: Compile code with warnings enabled
-To:     Thomas Huth <thuth@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Shuah Khan <shuah@kernel.org>, Andrew Jones <drjones@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        linux-kernel@vger.kernel.org
-References: <20190517090445.4502-1-thuth@redhat.com>
+        Mon, 20 May 2019 03:04:16 -0700 (PDT)
+Subject: Re: [PATCH 2/2] kvm: x86: Include CPUID leaf 0x8000001e in kvm's
+ supported CPUID
+To:     Jim Mattson <jmattson@google.com>, Borislav Petkov <bp@suse.de>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Marc Orr <marcorr@google.com>, Jacob Xu <jacobhxu@google.com>
+References: <20190327201537.77350-1-jmattson@google.com>
+ <20190327201537.77350-2-jmattson@google.com> <20190401171304.GD28514@zn.tnic>
+ <CALMp9eRbe8VWzhGcs_HB0gBT5EQN4PCtop5am9j+-WG5pK8r8w@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f998da41-c75d-0afa-02cd-e2e5d8f0f546@redhat.com>
-Date:   Mon, 20 May 2019 12:03:08 +0200
+Message-ID: <d98b62d0-846c-0af7-c8dd-6344c73bf801@redhat.com>
+Date:   Mon, 20 May 2019 12:04:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190517090445.4502-1-thuth@redhat.com>
+In-Reply-To: <CALMp9eRbe8VWzhGcs_HB0gBT5EQN4PCtop5am9j+-WG5pK8r8w@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -58,32 +58,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/05/19 11:04, Thomas Huth wrote:
-> So far the KVM selftests are compiled without any compiler warnings
-> enabled. That's quite bad, since we miss a lot of possible bugs this
-> way. Let's enable at least "-Wall" and some other useful warning flags
-> now, and fix at least the trivial problems in the code (like unused
-> variables).
+On 17/05/19 19:48, Jim Mattson wrote:
+> On Mon, Apr 1, 2019 at 10:13 AM Borislav Petkov <bp@suse.de> wrote:
+>>
+>> On Wed, Mar 27, 2019 at 01:15:37PM -0700, Jim Mattson wrote:
+>>> Kvm now supports extended CPUID functions through 0x8000001f.  CPUID
+>>> leaf 0x8000001e is AMD's Processor Topology Information leaf. This
+>>> contains similar information to CPUID leaf 0xb (Intel's Extended
+>>> Topology Enumeration leaf), and should be included in the output of
+>>> KVM_GET_SUPPORTED_CPUID, even though userspace is likely to override
+>>> some of this information based upon the configuration of the
+>>> particular VM.
+>>>
+>>> Cc: Brijesh Singh <brijesh.singh@amd.com>
+>>> Cc: Borislav Petkov <bp@suse.de>
+>>> Fixes: 8765d75329a38 ("KVM: X86: Extend CPUID range to include new leaf")
+>>> Signed-off-by: Jim Mattson <jmattson@google.com>
+>>> Reviewed-by: Marc Orr <marcorr@google.com>
+>>> ---
+>>>  arch/x86/kvm/cpuid.c | 1 +
+>>>  1 file changed, 1 insertion(+)
+>>
+>> Reviewed-by: Borislav Petkov <bp@suse.de>
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v2:
->  - Rebased to kvm/queue
->  - Fix warnings in state_test.c and evmcs_test.c, too
+> Paolo?
 > 
->  tools/testing/selftests/kvm/Makefile                       | 4 +++-
->  tools/testing/selftests/kvm/dirty_log_test.c               | 6 +++++-
->  tools/testing/selftests/kvm/lib/kvm_util.c                 | 3 ---
->  tools/testing/selftests/kvm/lib/x86_64/processor.c         | 4 +---
->  tools/testing/selftests/kvm/x86_64/cr4_cpuid_sync_test.c   | 1 +
->  tools/testing/selftests/kvm/x86_64/evmcs_test.c            | 7 +------
->  tools/testing/selftests/kvm/x86_64/platform_info_test.c    | 1 -
->  tools/testing/selftests/kvm/x86_64/smm_test.c              | 3 +--
->  tools/testing/selftests/kvm/x86_64/state_test.c            | 7 +------
->  .../selftests/kvm/x86_64/vmx_close_while_nested_test.c     | 5 +----
->  tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c   | 5 ++---
->  11 files changed, 16 insertions(+), 30 deletions(-)
 
-Queued, with a squashed fix to kvm_get_supported_hv_cpuid.
+Queued both (for 5.2-rc2), thanks.
 
 Paolo
