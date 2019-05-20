@@ -2,91 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AC8622A7F
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 05:47:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E5B822ADB
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 06:26:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730290AbfETDrn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 May 2019 23:47:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56734 "EHLO mx1.redhat.com"
+        id S1729158AbfETE0A convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 20 May 2019 00:26:00 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:55494 "EHLO mxct.zte.com.cn"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726014AbfETDrn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 19 May 2019 23:47:43 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CC0F9308A963;
-        Mon, 20 May 2019 03:47:42 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B0F8E611A1;
-        Mon, 20 May 2019 03:47:42 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 786E518089C8;
-        Mon, 20 May 2019 03:47:42 +0000 (UTC)
-Date:   Sun, 19 May 2019 23:47:42 -0400 (EDT)
-From:   Pankaj Gupta <pagupta@redhat.com>
-To:     Jakub =?utf-8?Q?Staro=C5=84?= <jstaron@google.com>
-Cc:     cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org,
-        mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
-        qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
-        adilger kernel <adilger.kernel@dilger.ca>, smbarber@google.com,
-        zwisler@kernel.org, aarcange@redhat.com,
-        dave jiang <dave.jiang@intel.com>, linux-nvdimm@lists.01.org,
-        vishal l verma <vishal.l.verma@intel.com>, david@redhat.com,
-        willy@infradead.org, hch@infradead.org, linux-acpi@vger.kernel.org,
-        jmoyer@redhat.com, linux-ext4@vger.kernel.org, lenb@kernel.org,
-        kilobyte@angband.pl, riel@surriel.com,
-        yuval shaia <yuval.shaia@oracle.com>, stefanha@redhat.com,
-        imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>,
-        lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-        tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-        darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
-        linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, pbonzini@redhat.com
-Message-ID: <68418388.29774907.1558324062441.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1902045958.29774859.1558323977950.JavaMail.zimbra@redhat.com>
-References: <20190514145422.16923-1-pagupta@redhat.com> <20190514145422.16923-3-pagupta@redhat.com> <c06514fd-8675-ba74-4b7b-ff0eb4a91605@google.com> <1954162775.29408078.1558071358974.JavaMail.zimbra@redhat.com> <5e27fa73-53f5-007a-e0c1-f32f83e5764f@google.com> <1902045958.29774859.1558323977950.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v9 2/7] virtio-pmem: Add virtio pmem driver
+        id S1725372AbfETEZ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 00:25:59 -0400
+Received: from mse-fl1.zte.com.cn (unknown [10.30.14.238])
+        by Forcepoint Email with ESMTPS id 128A0A7E7B54D04269F2;
+        Mon, 20 May 2019 12:25:55 +0800 (CST)
+Received: from notes_smtp.zte.com.cn ([10.30.1.239])
+        by mse-fl1.zte.com.cn with ESMTP id x4K4PpWE081937;
+        Mon, 20 May 2019 12:25:51 +0800 (GMT-8)
+        (envelope-from wang.yi59@zte.com.cn)
+Received: from fox-host8.localdomain ([10.74.120.8])
+          by szsmtp06.zte.com.cn (Lotus Domino Release 8.5.3FP6)
+          with ESMTP id 2019052012255471-9980 ;
+          Mon, 20 May 2019 12:25:54 +0800 
+From:   Yi Wang <wang.yi59@zte.com.cn>
+To:     pbonzini@redhat.com
+Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, wang.yi59@zte.com.cn
+Subject: [PATCH] kvm: vmx: Fix -Wmissing-prototypes warnings
+Date:   Mon, 20 May 2019 12:27:47 +0800
+Message-Id: <1558326467-48530-1-git-send-email-wang.yi59@zte.com.cn>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.42, 10.4.195.12]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: 4LLaKD2mAqtUZ1AopBm+Wwx4LVVjgdYM8BfX
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Mon, 20 May 2019 03:47:43 +0000 (UTC)
+X-MIMETrack: Itemize by SMTP Server on SZSMTP06/server/zte_ltd(Release 8.5.3FP6|November
+ 21, 2013) at 2019-05-20 12:25:54,
+        Serialize by Router on notes_smtp/zte_ltd(Release 9.0.1FP7|August  17, 2016) at
+ 2019-05-20 12:25:50
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-MAIL: mse-fl1.zte.com.cn x4K4PpWE081937
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+We get a warning when build kernel W=1:
+arch/x86/kvm/vmx/vmx.c:6365:6: warning: no previous prototype for ‘vmx_update_host_rsp’ [-Wmissing-prototypes]
+ void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp)
 
-> 
-> 
-> > On 5/16/19 10:35 PM, Pankaj Gupta wrote:
-> > > Can I take it your reviewed/acked-by? or tested-by tag? for the virtio
-> > > patch :)I don't feel that I have enough expertise to give the reviewed-by
-> > > tag, but you can
-> > take my acked-by + tested-by.
-> > 
-> > Acked-by: Jakub Staron <jstaron@google.com>
-> > Tested-by: Jakub Staron <jstaron@google.com>
-> > 
-> > No kernel panics/stalls encountered during testing this patches (v9) with
-> > QEMU + xfstests.
-> 
-> Thank you for testing and confirming the results. I will add your tested &
-> acked-by in v10.
-> 
-> > Some CPU stalls encountered while testing with crosvm instead of QEMU with
-> > xfstests
-> > (test generic/464) but no repro for QEMU, so the fault may be on the side
-> > of
-> > crosvm.
-> 
-> yes, looks like crosvm related as we did not see any of this in my and your
-> testing with Qemu.
+Add the missing declaration to fix this.
 
-Also, they don't seem to be related with virtio-pmem.
+Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+---
+ arch/x86/kvm/vmx/vmx.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks,
-Pankaj
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index f879529..9cd72de 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -314,6 +314,7 @@ struct kvm_vmx {
+ void vmx_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
+ struct shared_msr_entry *find_msr_entry(struct vcpu_vmx *vmx, u32 msr);
+ void pt_update_intercept_for_msr(struct vcpu_vmx *vmx);
++void vmx_update_host_rsp(struct vcpu_vmx *vmx, unsigned long host_rsp);
+ 
+ #define POSTED_INTR_ON  0
+ #define POSTED_INTR_SN  1
+-- 
+1.8.3.1
+
