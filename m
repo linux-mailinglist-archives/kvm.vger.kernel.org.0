@@ -2,70 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C572F24074
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 20:33:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A82CE240D0
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 21:02:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726462AbfETSdc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 14:33:32 -0400
-Received: from mga14.intel.com ([192.55.52.115]:62965 "EHLO mga14.intel.com"
+        id S1726266AbfETTB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 15:01:59 -0400
+Received: from mga05.intel.com ([192.55.52.43]:65229 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725976AbfETSdc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 14:33:32 -0400
+        id S1725995AbfETTB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 15:01:58 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 May 2019 11:33:31 -0700
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 May 2019 12:01:58 -0700
 X-ExtLoop1: 1
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by fmsmga005.fm.intel.com with ESMTP; 20 May 2019 11:33:31 -0700
-Date:   Mon, 20 May 2019 11:33:31 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 20 May 2019 12:01:58 -0700
+Date:   Mon, 20 May 2019 12:01:58 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Alexander Graf <agraf@csgraf.de>
-Cc:     Mihai =?utf-8?B?RG9uyJt1?= <mdontu@bitdefender.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        KarimAllah Ahmed <karahmed@amazon.de>
-Subject: Re: #VE support for VMI
-Message-ID: <20190520183331.GD28482@linux.intel.com>
-References: <571322cc13b98f3805a4843db28f5befbb1bd5a9.camel@bitdefender.com>
- <80e0baaf-150b-0966-6920-b36d23a6cdef@csgraf.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: x86/pmu: do not mask the value that is written
+ to fixed PMUs
+Message-ID: <20190520190158.GE28482@linux.intel.com>
+References: <1558366951-19259-1-git-send-email-pbonzini@redhat.com>
+ <1558366951-19259-3-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <80e0baaf-150b-0966-6920-b36d23a6cdef@csgraf.de>
+In-Reply-To: <1558366951-19259-3-git-send-email-pbonzini@redhat.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 20, 2019 at 11:10:51AM -0700, Alexander Graf wrote:
-> On 20.05.19 08:48, Mihai Donțu wrote:
-> > Hi Paolo,
-> > 
-> > We are looking at adding #VE support to the VMI subsystem we are
-> > working on. Its purpose is to suppress VMEXIT-s caused by the page
-> > table walker when the guest page tables are write-protected. A very
-> > small in-guest agent (protected by the hypervisor) will receive the EPT
-> > violation events, handle PT-walk writes and turn the rest into VMCALL-
-> > s.
-> > 
-> > A brief presentation of similar work on Xen can be found here:
-> > https://www.slideshare.net/xen_com_mgr/xpdss17-hypervisorbased-security-bringing-virtualized-exceptions-into-the-game-mihai-dontu-bitdefender
-> > 
-> > There is a bit of an issue with using #VE on KVM, though: because the
-> > EPT is built on-the-fly (as the guest runs), when we enable #VE in
-> > VMCS, all EPT violations become virtualized, because all EPTE-s have
-> > bit 63 zero (0: convert to #VE, 1: generate VMEXIT). At the moment, I
-> 
-> Are you 100% sure? Last time I played with #VE, it only triggered on
-> misconfigurations/permission checks (lack of R/W/X, but P=1), not on P=0
-> pages.
+On Mon, May 20, 2019 at 05:42:31PM +0200, Paolo Bonzini wrote:
+> According to the SDM, for MSR_IA32_PERFCTR0/1 "the lower-order 32 bits of
+> each MSR may be written with any value, and the high-order 8 bits are
+> sign-extended according to the value of bit 31", but the fixed counters
+> in real hardware appear to be limited to the width of the fixed counters.
+> Fix KVM to do the same.
 
-#VEs trigger on RWX=0, but not misconfigurations, i.e. any and all
-EPT_VIOLATION exits (reason 48) are convertible, and EPT_MISCONFIG exits
-(reason 49) are never convertible.  The reasoning behind the logic is
-that an EPT_MISCONFIG is the result of a VMM bug (or in KVM's case, MMIO
-trickery), whereas a RWX=0 EPT_VIOLATION could be a malicious entity in
-the guest probing non-existent pages or pages it doesn't have access to.
+The section of the SDM you're quoting relates to P6 behavior, which
+predates the architectural perfmons.  Section 18.2.1.1 "Architectural
+Performance Monitoring Version 1 Facilities" has a more relevant blurb
+for the MSR_IA32_PERFCTRx change (slightly modified to eliminate
+embarassing typos in the SDM):
+
+  The bit width of an IA32_PMCx MSR is reported using CPUID.0AH:EAXH[23:16].
+  This is the number of valid bits for read operation.  On write operations,
+  the lower-order 32-bits of the MSR may be written with any value, and the
+  high-order bits are sign-extended from the value of bit 31.
+
+And for the fixed counters, section 18.2.2 "Architectural Performance
+Monitoring Version 2":
+
+  The facilities provided by architectural performance monitoring version 2
+  can be queried from CPUID leaf 0AH by examinng the content of register EDX:
+
+    - Bits 5 through 12 of CPUID.0AH.EDX indicates the bit-width of fixed-
+      function performance counters.  Bits beyond the width of the fixed-
+      function counter are reserved and must be written as zeros.
+
+> 
+> Reported-by: Nadav Amit <nadav.amit@gmail.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/pmu_intel.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index b6f5157445fe..a99613a060dd 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -240,11 +240,14 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		}
+>  		break;
+>  	default:
+> -		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+> -		    (pmc = get_fixed_pmc(pmu, msr))) {
+> -			if (!msr_info->host_initiated)
+> -				data = (s64)(s32)data;
+> -			pmc->counter += data - pmc_read_counter(pmc);
+> +		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))) {
+> +			if (msr_info->host_initiated)
+> +				pmc->counter = data;
+> +			else
+> +				pmc->counter = (s32)data;
+> +			return 0;
+> +		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
+> +			pmc->counter = data;
+
+Would it make sense to inject a #GP if the guest attempts to set bits that
+are reserved to be zero, e.g. based on guest CPUID?
+
+>  			return 0;
+>  		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
+>  			if (data == pmc->eventsel)
+> -- 
+> 1.8.3.1
+> 
