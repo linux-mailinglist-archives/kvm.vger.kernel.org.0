@@ -2,61 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3824324070
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 20:33:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DEEC23A99
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 16:42:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726343AbfETScv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 14:32:51 -0400
-Received: from westpalmbeachmassagegroup.com ([45.35.221.60]:39965 "EHLO
-        wolfgangdigital.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726205AbfETScv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 14:32:51 -0400
-To:     kvm@vger.kernel.org
-Subject: Print your logo
-Message-ID: <491e7ee48c8c1bbfdbbf9c9632730a0a@esquire.com>
-Date:   Mon, 20 May 2019 16:34:48 +0200
-From:   "Heather" <heather@usblogo.space>
-Reply-To: flashdrive@aliyun.com
+        id S2391905AbfETOlr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 10:41:47 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:35540 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391891AbfETOlq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 10:41:46 -0400
+Received: by mail-wr1-f68.google.com with SMTP id m3so1952873wrv.2
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 07:41:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=szeredi.hu; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=wIkoBjfIwezg37K8GyVLa4Ib4GG1DfXOe0xDWRIHC9c=;
+        b=Ou8A0T5aNjnqbPlBgwGcea2Jt9WREkncm2pZ2tzBkRLRUyzdHu/788KR2EoEZb9mkK
+         Uc0cJxu+0ZffxR3RKAwpxWA+Pa4RUhS5MdKIHC+QqTBZftrk7zJrl15NN6dttqr5OpMP
+         8xroeKkE6/8JUdYcncxaCbltjgHZuJY1yQojg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=wIkoBjfIwezg37K8GyVLa4Ib4GG1DfXOe0xDWRIHC9c=;
+        b=DXDUM7qRdT6ScWcMbL9Nx5TMONkYafaIkZDUHzOAn5N4MnJBMIiDJmoUb8RyftrCPL
+         NLDn19o4v+f8oZZv4UpBReqOP5VTcgB8Rf89VQM2MnVW/APwOLfBd5N1xz+r5kqWUXFi
+         TwbOd3XHji8lMbWAOdlkXsx2e40+JaXJ1KCh0GULSFzwTdX/VLhiSR2b70mshoIytZPb
+         GC062Pbkcla4arU8UxiY1svcAZxkEayLJpb+kcGkd7a5WvVaxFMsbFnnNCQqxjm0kh0a
+         QGMRxXQzuRSmcs8Jp86rUFzFLNJYre+GFFul0iFuCutjD6Ap/9ppYUr37PRRqPdRVKQL
+         y1Lw==
+X-Gm-Message-State: APjAAAWMvV/5fU6wNKG68Sthv0rkeWT81AkEUSJJf7hdjwisxsVXA3MV
+        UC2HwURfZ0mptp6/xVJAQ3ndJw==
+X-Google-Smtp-Source: APXvYqyUmEWgtNuNz/KLPkSE1Lwvd2WXTdR3OckfDP8fsKM/AbqeGou/Yo4wcQWm5VhE6j5qlpjEbQ==
+X-Received: by 2002:a5d:53c8:: with SMTP id a8mr10213096wrw.152.1558363305299;
+        Mon, 20 May 2019 07:41:45 -0700 (PDT)
+Received: from localhost.localdomain (catv-212-96-48-140.catv.broadband.hu. [212.96.48.140])
+        by smtp.gmail.com with ESMTPSA id n1sm12945556wmc.19.2019.05.20.07.41.43
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 20 May 2019 07:41:44 -0700 (PDT)
+Date:   Mon, 20 May 2019 16:41:37 +0200
+From:   Miklos Szeredi <miklos@szeredi.hu>
+To:     Vivek Goyal <vgoyal@redhat.com>
+Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-nvdimm@lists.01.org,
+        stefanha@redhat.com, dgilbert@redhat.com, swhiteho@redhat.com
+Subject: Re: [PATCH v2 02/30] fuse: Clear setuid bit even in cache=never path
+Message-ID: <20190520144137.GA24093@localhost.localdomain>
+References: <20190515192715.18000-1-vgoyal@redhat.com>
+ <20190515192715.18000-3-vgoyal@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190515192715.18000-3-vgoyal@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Wed, May 15, 2019 at 03:26:47PM -0400, Vivek Goyal wrote:
+> If fuse daemon is started with cache=never, fuse falls back to direct IO.
+> In that write path we don't call file_remove_privs() and that means setuid
+> bit is not cleared if unpriviliged user writes to a file with setuid bit set.
+> 
+> pjdfstest chmod test 12.t tests this and fails.
 
-I didn’t know if you had received my email from last week?
+I think better sulution is to tell the server if the suid bit needs to be
+removed, so it can do so in a race free way.
 
-We manufacture ALL custom LOGO and branded products – over 300,000 to
-choose from.
+Here's the kernel patch, and I'll reply with the libfuse patch.
 
-The most asked about product that we make, is the custom printed USB flash
-drives!
-We can print your logo on them and load your digital images, videos and
-files!
+---
+ fs/fuse2/file.c           |    2 ++
+ include/uapi/linux/fuse.h |    3 +++
+ 2 files changed, 5 insertions(+)
 
-Here is what we include:
--Any size memory you need: 64MB up to 128GB
--We will print your logo on both sides, just ask!
--Very Low Order Minimums
--Need them quickly?  Not a problem, we offer Rush Service
+--- a/fs/fuse2/file.c
++++ b/fs/fuse2/file.c
+@@ -363,6 +363,8 @@ static ssize_t fuse_send_write(struct fu
+ 		inarg->flags |= O_DSYNC;
+ 	if (iocb->ki_flags & IOCB_SYNC)
+ 		inarg->flags |= O_SYNC;
++	if (!capable(CAP_FSETID))
++		inarg->write_flags |= FUSE_WRITE_KILL_PRIV;
+ 	req->inh.opcode = FUSE_WRITE;
+ 	req->inh.nodeid = ff->nodeid;
+ 	req->inh.len = req->inline_inlen + count;
+--- a/include/uapi/linux/fuse.h
++++ b/include/uapi/linux/fuse.h
+@@ -125,6 +125,7 @@
+  *
+  *  7.29
+  *  - add FUSE_NO_OPENDIR_SUPPORT flag
++ *  - add FUSE_WRITE_KILL_PRIV flag
+  */
+ 
+ #ifndef _LINUX_FUSE_H
+@@ -318,9 +319,11 @@ struct fuse_file_lock {
+  *
+  * FUSE_WRITE_CACHE: delayed write from page cache, file handle is guessed
+  * FUSE_WRITE_LOCKOWNER: lock_owner field is valid
++ * FUSE_WRITE_KILL_PRIV: kill suid and sgid bits
+  */
+ #define FUSE_WRITE_CACHE	(1 << 0)
+ #define FUSE_WRITE_LOCKOWNER	(1 << 1)
++#define FUSE_WRITE_KILL_PRIV	(1 << 2)
+ 
+ /**
+  * Read flags
 
-Email over a copy of your logo and we will create a design mock up for you
-at no cost!
-
-Our higher memory sizes are a really good option right now!
-
-Pricing is low right now, so let us know what you need and we will get you
-a quick quote.
-
-We always offer great rates for schools and nonprofits as well.
-
-Let us know what you would like quoted?
-
-Regards,
-
-Heather Millons
-Custom USB Account Manager
 
