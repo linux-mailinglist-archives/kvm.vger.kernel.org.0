@@ -2,113 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 15BB422F8C
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 10:58:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ADEF623DAF
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 18:39:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731711AbfETI5r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 04:57:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40668 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731080AbfETI5r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 04:57:47 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8B11D307D90F;
-        Mon, 20 May 2019 08:57:38 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.13])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 00EB75D719;
-        Mon, 20 May 2019 08:57:32 +0000 (UTC)
-Date:   Mon, 20 May 2019 09:57:31 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH v2 1/8] vsock/virtio: limit the memory used per-socket
-Message-ID: <20190520085731.GA22546@stefanha-x1.localdomain>
-References: <20190510125843.95587-1-sgarzare@redhat.com>
- <20190510125843.95587-2-sgarzare@redhat.com>
- <20190516152533.GB29808@stefanha-x1.localdomain>
- <20190517082505.ibjkuh7zibumen77@steredhat>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="wRRV7LY7NUeQGEoC"
-Content-Disposition: inline
-In-Reply-To: <20190517082505.ibjkuh7zibumen77@steredhat>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Mon, 20 May 2019 08:57:46 +0000 (UTC)
+        id S2392680AbfETQjc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 12:39:32 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:33755 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392674AbfETQjc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 12:39:32 -0400
+Received: by mail-pf1-f195.google.com with SMTP id z28so7517340pfk.0
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 09:39:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=f+A8ag4YLav+vPppsJY/NVVk9kuuwpxIHjnghkZpcHo=;
+        b=BqR00efKFw3q5NzR2CbaGVEAd+hKOxzPF7q9ZlETtZU2JgBifdC2thaOREZWJ6TMe5
+         p/tBORy1PK5liI4P7GPoHclq+fE3qTg5l59LIejL0ZRZkxtv8ZsJRR5fOQ8BIBz0AZOa
+         MDWXLPqwVCoOe2ozh4OBRmFuikGkWUd/GKYQDpn5//rqlXpFCHwlN2TgwYGAjgok3zks
+         eJKyXGOJUrqlTUn4TmzAYPmZbdGnwHVjAv+MGoWB44VuNoPxL2uOH4nluZlqzIKcY02C
+         CN2TkuOD2iuRhJP1Ir2JQuBGYg7hKZLxrwSJPn1NLm/NsGLwyC5QJUKK0kmLDgP13icB
+         l3Rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=f+A8ag4YLav+vPppsJY/NVVk9kuuwpxIHjnghkZpcHo=;
+        b=KF2AAYWLL12zCHGYPwd4wne6dLlMGRb9L3v0T5wRT3RbewFHiYMmkBJzeg3keaIxqm
+         oPjPqYl4hhmpPNmwLXTlA5TZ0Y9Q6t5OqT6S/J8EBmZFfrnageVo2Mb/ogVwLWJ1lB6M
+         cbmN8ls61WvXJ/L7SB6bo5l0xVEtYj4AgN5+5TX/FdRBkbYFbC298rKFbMQ3158PweOw
+         HeZWCBzUaiEgrd6csPt08ibb5Q2YZ2pI5FKr9HGi3fGWSk93WLFZQ8bPN6T7jEgasBV7
+         1KHVf0LFHMZHnvOPq4LBaItPprOw/HPs5zOrDA7Vy03CPFiK4OBGW++c2/q1CTJdrkE+
+         v6uQ==
+X-Gm-Message-State: APjAAAW6amu8ltpovFEzJAB7Xizj2ivLLivCaFJZRwe0kXpNLLgLCp5+
+        5uzWgcqhM8GEMpnvz5XWdpU=
+X-Google-Smtp-Source: APXvYqxlwThgglsQlqnCZDP2rD7A5gcNNvbP+e+pdiZPkEPt+l8Q7mCE3nfMvWrSN70edPvMBv/Y2g==
+X-Received: by 2002:a63:6fce:: with SMTP id k197mr77381106pgc.140.1558370371438;
+        Mon, 20 May 2019 09:39:31 -0700 (PDT)
+Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id a66sm25101076pfa.89.2019.05.20.09.39.29
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 20 May 2019 09:39:30 -0700 (PDT)
+From:   Nadav Amit <nadav.amit@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>
+Subject: [kvm-unit-tests PATCH] x86: Fix SMP stacks
+Date:   Mon, 20 May 2019 02:17:30 -0700
+Message-Id: <20190520091730.15536-1-nadav.amit@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Avoid smashing the SMP stacks during boot as currently happens by
+allocating sufficient space for them.
 
---wRRV7LY7NUeQGEoC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+---
+ x86/cstart64.S | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Fri, May 17, 2019 at 10:25:05AM +0200, Stefano Garzarella wrote:
-> On Thu, May 16, 2019 at 04:25:33PM +0100, Stefan Hajnoczi wrote:
-> > On Fri, May 10, 2019 at 02:58:36PM +0200, Stefano Garzarella wrote:
-> > > +static struct virtio_vsock_buf *
-> > > +virtio_transport_alloc_buf(struct virtio_vsock_pkt *pkt, bool zero_c=
-opy)
-> > > +{
-> > > +	struct virtio_vsock_buf *buf;
-> > > +
-> > > +	if (pkt->len =3D=3D 0)
-> > > +		return NULL;
-> > > +
-> > > +	buf =3D kzalloc(sizeof(*buf), GFP_KERNEL);
-> > > +	if (!buf)
-> > > +		return NULL;
-> > > +
-> > > +	/* If the buffer in the virtio_vsock_pkt is full, we can move it to
-> > > +	 * the new virtio_vsock_buf avoiding the copy, because we are sure =
-that
-> > > +	 * we are not use more memory than that counted by the credit mecha=
-nism.
-> > > +	 */
-> > > +	if (zero_copy && pkt->len =3D=3D pkt->buf_len) {
-> > > +		buf->addr =3D pkt->buf;
-> > > +		pkt->buf =3D NULL;
-> > > +	} else {
-> > > +		buf->addr =3D kmalloc(pkt->len, GFP_KERNEL);
-> >=20
-> > buf and buf->addr could be allocated in a single call, though I'm not
-> > sure how big an optimization this is.
-> >=20
->=20
-> IIUC, in the case of zero-copy I should allocate only the buf,
-> otherwise I should allocate both buf and buf->addr in a single call
-> when I'm doing a full-copy.
->=20
-> Is it correct?
+diff --git a/x86/cstart64.S b/x86/cstart64.S
+index a4b55c5..71c3153 100644
+--- a/x86/cstart64.S
++++ b/x86/cstart64.S
+@@ -19,7 +19,7 @@ max_cpus = MAX_TEST_CPUS
+ 	.align 16
+ stacktop:
+ 
+-	. = . + 4096
++	. = . + 4096 * max_cpus
+ 	.align 16
+ ring0stacktop:
+ 
+@@ -170,7 +170,7 @@ efer = 0xc0000080
+ 	mov %eax, %cr0
+ 	ret
+ 
+-smp_stacktop:	.long 0xa0000
++smp_stacktop:	.long stacktop - 4096
+ 
+ .align 16
+ 
+-- 
+2.17.1
 
-Yes, but it's your choice whether optimization is worthwhile.  If it
-increases the complexity of the code and doesn't result in a measurable
-improvement, then it's not worth it.
-
-Stefan
-
---wRRV7LY7NUeQGEoC
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzia/sACgkQnKSrs4Gr
-c8j8/Qf+NOeZJ2tO8MN+lVvjuwE3gShPAFPc2joqHrqQkZPrfOMHyxNPWBjmd06G
-mJaov5ZMGAQQdvkkJatcCbnrnV2IuYLbZyGpfQAGrjVZ4S5RtU8/2VpksfxRJNDV
-KrRPS/HoPQrDfJcMnsRxXSpf0dFcG/WptgKFMOlzLPAKiwWZ62dpc/m8ghrHXbzz
-/x/TaT4NA9m4S3NwFqZYq/kTQwiXtrSU40sPo/QGk6Wn5o4sTcgNDEveJK3KsLI+
-p8KQrt7muGMn9FbRrLjwq2VytiLXksXrdFAeWugUon0qEkmxaKiUSNvbgof0/qi3
-4DwGQi4FYh6hvSyjckKOVP/y/F8jSg==
-=1IhX
------END PGP SIGNATURE-----
-
---wRRV7LY7NUeQGEoC--
