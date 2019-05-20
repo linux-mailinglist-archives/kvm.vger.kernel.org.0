@@ -2,104 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 72357241D0
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 22:10:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44A6124219
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 22:26:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726074AbfETUKb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 16:10:31 -0400
-Received: from mga01.intel.com ([192.55.52.88]:23437 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725372AbfETUKb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 16:10:31 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 May 2019 13:10:30 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.36])
-  by orsmga001.jf.intel.com with ESMTP; 20 May 2019 13:10:30 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     kvm@vger.kernel.org
-Subject: [PATCH 2/2] Revert "KVM: nVMX: always use early vmcs check when EPT is disabled"
-Date:   Mon, 20 May 2019 13:10:29 -0700
-Message-Id: <20190520201029.7126-3-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190520201029.7126-1-sean.j.christopherson@intel.com>
-References: <20190520201029.7126-1-sean.j.christopherson@intel.com>
+        id S1726628AbfETUZz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 16:25:55 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:55227 "EHLO
+        out4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725763AbfETUZz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 May 2019 16:25:55 -0400
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailout.nyi.internal (Postfix) with ESMTP id 01A7524627;
+        Mon, 20 May 2019 16:25:52 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Mon, 20 May 2019 16:25:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rath.org; h=from
+        :to:cc:subject:references:date:in-reply-to:message-id
+        :mime-version:content-type:content-transfer-encoding; s=fm2; bh=
+        2s8insJw7SXiaaoi7n/jvMQaGaOOEQGGn9MA9sTXCzY=; b=nTVN23Gom1plLxpc
+        7qd56RBh1d3zg39gxTuhjiar9f2o+0UBPe9IZOUFZwuGyCZiz0l6OEjzfyMegQRB
+        kpA61V1jEC4TJQ6w/csBHq88m8rH6mzeHd9p3ib/VOh/wcURQ8E4JWe1z+rxoDJS
+        riIbZmeDgi+SR5rL4zO6JYWtHsTKgQ1fgrGPdVUDNFDlAUnBW6lV7On+2rf54yIL
+        98ercTcOkQk43giawKpcbz/pB31VOiezM2LsBxthPivE5C81+raWg2rB5OuMjRhP
+        Bm55qTL1E09AlbLJFdhjjdOC5Zsqy2sf8CEohNnAKruGmn+Ryx6fjXLilfgFcdkx
+        FyBTrw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:content-type
+        :date:from:in-reply-to:message-id:mime-version:references
+        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; bh=2s8insJw7SXiaaoi7n/jvMQaGaOOEQGGn9MA9sTXC
+        zY=; b=piEfKWYZVjjloiN91Gr8WKPqaq5AB5JOvYVIJFVUyuzruj6zx1inX4Ag2
+        fHo2iGeXPT2KD4m5QyY9l3y/uzN6Fyc27m+oNff2mjLkQeRPRFkGgd1u2D2MKzyH
+        zYPCtPggTO9+u2y2vAfbrikr2neLOK1hRytDAYPuQ4igrL2vHjYpXMVa44QF/+P8
+        vi3bP/E0bYzo7EBvOpFJC+A0RMa1rxC91IOX9oU4w4fo/FPaHBzvgcB3CUZdoe0N
+        dz84LaB6Wto9snsa10XIiO4I7T5RPSg7eMU3Ybmd6ND8Gx1lK4Dcwbrk+6c6GO/q
+        FqfYzEaykUJxI1j2CQEHa+VHKwuIg==
+X-ME-Sender: <xms:Tg3jXPSPMV2Zifntr-gXS1Wod57QlBL87TAYu2mgEZ5BEHPu6ehCIQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduuddruddtkedgudehvdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefhvffufhffjgfkfgggtgfgsehtqhdttddtreejnecuhfhrohhmpefpihhk
+    ohhlrghushcutfgrthhhuceopfhikhholhgruhhssehrrghthhdrohhrgheqnecuffhomh
+    grihhnpehgihhthhhusgdrtghomhenucfkphepudekhedrfedrleegrdduleegnecurfgr
+    rhgrmhepmhgrihhlfhhrohhmpefpihhkohhlrghushesrhgrthhhrdhorhhgnecuvehluh
+    hsthgvrhfuihiivgepud
+X-ME-Proxy: <xmx:Tw3jXHnofyaTWPXOM2EmL4-bZccirz8aglg4Gej6SaqXedM5iw-pJA>
+    <xmx:Tw3jXNxHbGqRnanASHfrQtGZr1_gLfZC5xRf-eHKyikxX1k4XJuDvg>
+    <xmx:Tw3jXB0MfLetAtMWCuMMAzXvfg_2Dtfd153_MlpY0_ka-S1Cd8Pu1g>
+    <xmx:Tw3jXMtNSUyYLa786PlpyrIhNLWWtCZBzCQrj1CGUaRQmT-zupvToQ>
+Received: from ebox.rath.org (ebox.rath.org [185.3.94.194])
+        by mail.messagingengine.com (Postfix) with ESMTPA id AA09B80061;
+        Mon, 20 May 2019 16:25:50 -0400 (EDT)
+Received: from vostro.rath.org (vostro [192.168.12.4])
+        by ebox.rath.org (Postfix) with ESMTPS id CB17360;
+        Mon, 20 May 2019 20:25:49 +0000 (UTC)
+Received: by vostro.rath.org (Postfix, from userid 1000)
+        id 9E565E00E1; Mon, 20 May 2019 21:25:49 +0100 (BST)
+From:   Nikolaus Rath <Nikolaus@rath.org>
+To:     Miklos Szeredi <miklos@szeredi.hu>
+Cc:     Vivek Goyal <vgoyal@redhat.com>, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-nvdimm@lists.01.org, stefanha@redhat.com,
+        dgilbert@redhat.com, swhiteho@redhat.com
+Subject: Re: [PATCH v2 02/30] fuse: Clear setuid bit even in cache=never path
+References: <20190515192715.18000-1-vgoyal@redhat.com>
+        <20190515192715.18000-3-vgoyal@redhat.com>
+        <20190520144137.GA24093@localhost.localdomain>
+        <20190520144437.GB24093@localhost.localdomain>
+Mail-Copies-To: never
+Mail-Followup-To: Miklos Szeredi <miklos@szeredi.hu>, Vivek Goyal
+        <vgoyal@redhat.com>, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-nvdimm@lists.01.org, stefanha@redhat.com, dgilbert@redhat.com,
+        swhiteho@redhat.com
+Date:   Mon, 20 May 2019 21:25:49 +0100
+In-Reply-To: <20190520144437.GB24093@localhost.localdomain> (Miklos Szeredi's
+        message of "Mon, 20 May 2019 16:44:37 +0200")
+Message-ID: <87k1ekub3m.fsf@vostro.rath.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that KVM stuffs vmc01.GUEST_CR3 prior to nested VM-Entry, there is
-no need to avoid nested_vmx_restore_host_state() when EPT is disabled
-as refreshing vcpu->arch.cr3 from vmcs01.GUEST_CR3 will automagically
-obtain the correct value.
+On May 20 2019, Miklos Szeredi <miklos@szeredi.hu> wrote:
+> On Mon, May 20, 2019 at 04:41:37PM +0200, Miklos Szeredi wrote:
+>> On Wed, May 15, 2019 at 03:26:47PM -0400, Vivek Goyal wrote:
+>> > If fuse daemon is started with cache=3Dnever, fuse falls back to direc=
+t IO.
+>> > In that write path we don't call file_remove_privs() and that means se=
+tuid
+>> > bit is not cleared if unpriviliged user writes to a file with setuid b=
+it set.
+>> >=20
+>> > pjdfstest chmod test 12.t tests this and fails.
+>>=20
+>> I think better sulution is to tell the server if the suid bit needs to be
+>> removed, so it can do so in a race free way.
+>>=20
+>> Here's the kernel patch, and I'll reply with the libfuse patch.
+>
+> Here are the patches for libfuse and passthrough_ll.
 
-This reverts commit 2b27924bb1d48e3775f432b70bdad5e6dd4e7798.
+Could you also submit them as pull requests at https://github.com/libfuse/l=
+ibfuse/pulls?
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/include/uapi/asm/vmx.h |  1 -
- arch/x86/kvm/vmx/nested.c       | 22 ++--------------------
- 2 files changed, 2 insertions(+), 21 deletions(-)
+Best,
+-Nikolaus
 
-diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
-index d213ec5c3766..f0b0c90dd398 100644
---- a/arch/x86/include/uapi/asm/vmx.h
-+++ b/arch/x86/include/uapi/asm/vmx.h
-@@ -146,7 +146,6 @@
- 
- #define VMX_ABORT_SAVE_GUEST_MSR_FAIL        1
- #define VMX_ABORT_LOAD_HOST_PDPTE_FAIL       2
--#define VMX_ABORT_VMCS_CORRUPTED             3
- #define VMX_ABORT_LOAD_HOST_MSR_FAIL         4
- 
- #endif /* _UAPIVMX_H */
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 92117092f6e9..c17fbe3cc2fb 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3777,18 +3777,8 @@ static void nested_vmx_restore_host_state(struct kvm_vcpu *vcpu)
- 	vmx_set_cr4(vcpu, vmcs_readl(CR4_READ_SHADOW));
- 
- 	nested_ept_uninit_mmu_context(vcpu);
--
--	/*
--	 * This is only valid if EPT is in use, otherwise the vmcs01 GUEST_CR3
--	 * points to shadow pages!  Fortunately we only get here after a WARN_ON
--	 * if EPT is disabled, so a VMabort is perfectly fine.
--	 */
--	if (enable_ept) {
--		vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
--		__set_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail);
--	} else {
--		nested_vmx_abort(vcpu, VMX_ABORT_VMCS_CORRUPTED);
--	}
-+	vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
-+	__set_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail);
- 
- 	/*
- 	 * Use ept_save_pdptrs(vcpu) to load the MMU's cached PDPTRs
-@@ -5729,14 +5719,6 @@ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
- {
- 	int i;
- 
--	/*
--	 * Without EPT it is not possible to restore L1's CR3 and PDPTR on
--	 * VMfail, because they are not available in vmcs01.  Just always
--	 * use hardware checks.
--	 */
--	if (!enable_ept)
--		nested_early_check = 1;
--
- 	if (!cpu_has_vmx_shadow_vmcs())
- 		enable_shadow_vmcs = 0;
- 	if (enable_shadow_vmcs) {
--- 
-2.21.0
+--=20
+GPG Fingerprint: ED31 791B 2C5C 1613 AF38 8B8A D113 FCAC 3C4E 599F
 
+             =C2=BBTime flies like an arrow, fruit flies like a Banana.=C2=
+=AB
