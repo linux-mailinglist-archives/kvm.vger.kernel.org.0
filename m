@@ -2,86 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AF33237AC
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 15:18:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96BEC237AF
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 15:18:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387973AbfETMyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 08:54:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57330 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731662AbfETMyF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 08:54:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5D89D3091782;
-        Mon, 20 May 2019 12:54:00 +0000 (UTC)
-Received: from horse.redhat.com (unknown [10.18.25.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6BBDB6085B;
-        Mon, 20 May 2019 12:53:56 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id 06ECD220386; Mon, 20 May 2019 08:53:56 -0400 (EDT)
-Date:   Mon, 20 May 2019 08:53:55 -0400
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     Eric Ren <ericdotren@gmail.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, linux-nvdimm@lists.01.org, miklos@szeredi.hu,
-        stefanha@redhat.com, dgilbert@redhat.com, swhiteho@redhat.com
-Subject: Re: [PATCH v2 26/30] fuse: Add logic to free up a memory range
-Message-ID: <20190520125355.GA28008@redhat.com>
-References: <20190515192715.18000-1-vgoyal@redhat.com>
- <20190515192715.18000-27-vgoyal@redhat.com>
- <CAN+Pk99SNKSf+GjSQUUWt_eu1fSjTy_ByUOEQUXHi8zNqXY1zA@mail.gmail.com>
+        id S1732118AbfETMy4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 08:54:56 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:39244 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730323AbfETMy4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 08:54:56 -0400
+Received: by mail-wm1-f65.google.com with SMTP id n25so12519412wmk.4
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 05:54:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=U85pRBHGrRMlyH8JX2I6eaC18PlfD1m7nOZTuLAWrQI=;
+        b=e5Bs/PwP39A58Uv0Hzm/OSBJxoQc7Iuwrf7CW3O6zt9il1SNGWNPAuSl/JaowrnVb6
+         Fz1WsTQBAu0Z8ybsiS7vfYaqLJDBIL7+frNwyJW5MvRQ4R5pWLFP9BJnjhUTqH6trpVC
+         miCY/EWif7FIoE8TTh9lCLQO8KhE8Jk2eMB8MyNBPjrI86bMQRgdrolpuLj2B6IGsENQ
+         RJCJf1Lqh3PUj9xZKHVbMN/8p75DqbuXflZjxPgJedSiSftdQgRURqGvTMTP79wGYu2+
+         xSMJDOQ+nKpS/AO09605hCLH8DCCMG1TSbGnC9eUU25pvK+iBFBm/o7ym9PvkTH3kWkf
+         nWdw==
+X-Gm-Message-State: APjAAAVAkooCcyCzow4RpdjtV0C1YY0kkphk5ZGU5tmvXwKsnY+7EVjz
+        QxCrJqMMHjpLin2KmxfiZUL5dJll+kh9AQ==
+X-Google-Smtp-Source: APXvYqyCGEuYfRU94pPQVHopuciZuEwYX+zbpJfBTwzG9/vB2G058y0rsvDZiyb/Isahg51AaIs+dQ==
+X-Received: by 2002:a1c:e30a:: with SMTP id a10mr41644796wmh.128.1558356894653;
+        Mon, 20 May 2019 05:54:54 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:ac04:eef9:b257:b844? ([2001:b07:6468:f312:ac04:eef9:b257:b844])
+        by smtp.gmail.com with ESMTPSA id b10sm40914348wrh.59.2019.05.20.05.54.53
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 20 May 2019 05:54:54 -0700 (PDT)
+Subject: Re: [PATCH] kvm: Check irqchip mode before assign irqfd
+To:     Peter Xu <peterx@redhat.com>, kvm@vger.kernel.org
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>
+References: <20190505085642.6773-1-peterx@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <94af836c-762b-5986-2b94-bb979398a3df@redhat.com>
+Date:   Mon, 20 May 2019 14:54:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAN+Pk99SNKSf+GjSQUUWt_eu1fSjTy_ByUOEQUXHi8zNqXY1zA@mail.gmail.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Mon, 20 May 2019 12:54:05 +0000 (UTC)
+In-Reply-To: <20190505085642.6773-1-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, May 19, 2019 at 03:48:05PM +0800, Eric Ren wrote:
-> Hi,
+On 05/05/19 10:56, Peter Xu wrote:
+> When assigning kvm irqfd we didn't check the irqchip mode but we allow
+> KVM_IRQFD to succeed with all the irqchip modes.  However it does not
+> make much sense to create irqfd even without the kernel chips.  Let's
+> provide a arch-dependent helper to check whether a specific irqfd is
+> allowed by the arch.  At least for x86, it should make sense to check:
 > 
-> @@ -1784,8 +1822,23 @@ static int fuse_iomap_begin(struct inode *inode,
-> > loff_t pos, loff_t length,
-> >                 if (pos >= i_size_read(inode))
-> >                         goto iomap_hole;
-> >
-> > -               alloc_dmap = alloc_dax_mapping(fc);
-> > -               if (!alloc_dmap)
-> > +               /* Can't do reclaim in fault path yet due to lock ordering.
-> > +                * Read path takes shared inode lock and that's not
-> > sufficient
-> > +                * for inline range reclaim. Caller needs to drop lock,
-> > wait
-> > +                * and retry.
-> > +                */
-> > +               if (flags & IOMAP_FAULT || !(flags & IOMAP_WRITE)) {
-> > +                       alloc_dmap = alloc_dax_mapping(fc);
-> > +                       if (!alloc_dmap)
-> > +                               return -ENOSPC;
-> > +               } else {
-> > +                       alloc_dmap = alloc_dax_mapping_reclaim(fc, inode);
-> >
+> - when irqchip mode is NONE, all irqfds should be disallowed, and,
 > 
-> alloc_dmap could be NULL as follows:
+> - when irqchip mode is SPLIT, irqfds that are with resamplefd should
+>   be disallowed.
 > 
-> alloc_dax_mapping_reclaim
->    -->fuse_dax_reclaim_first_mapping
->              -->fuse_dax_reclaim_first_mapping_locked
->                   --> fuse_dax_interval_tree_iter_first  ==> return NULL
-> and
+> For either of the case, previously we'll silently ignore the irq or
+> the irq ack event if the irqchip mode is incorrect.  However that can
+> cause misterious guest behaviors and it can be hard to triage.  Let's
+> fail KVM_IRQFD even earlier to detect these incorrect configurations.
 > 
-> IS_ERR(NULL) is false, so we may miss that error case.
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Radim Krčmář <rkrcmar@redhat.com>
+> CC: Alex Williamson <alex.williamson@redhat.com>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  arch/x86/kvm/irq.c | 7 +++++++
+>  arch/x86/kvm/irq.h | 1 +
+>  virt/kvm/eventfd.c | 9 +++++++++
+>  3 files changed, 17 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
+> index faa264822cee..007bc654f928 100644
+> --- a/arch/x86/kvm/irq.c
+> +++ b/arch/x86/kvm/irq.c
+> @@ -172,3 +172,10 @@ void __kvm_migrate_timers(struct kvm_vcpu *vcpu)
+>  	__kvm_migrate_apic_timer(vcpu);
+>  	__kvm_migrate_pit_timer(vcpu);
+>  }
+> +
+> +bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
+> +{
+> +	bool resample = args->flags & KVM_IRQFD_FLAG_RESAMPLE;
+> +
+> +	return resample ? irqchip_kernel(kvm) : irqchip_in_kernel(kvm);
+> +}
+> diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
+> index d5005cc26521..fd210cdd4983 100644
+> --- a/arch/x86/kvm/irq.h
+> +++ b/arch/x86/kvm/irq.h
+> @@ -114,6 +114,7 @@ static inline int irqchip_in_kernel(struct kvm *kvm)
+>  	return mode != KVM_IRQCHIP_NONE;
+>  }
+>  
+> +bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
+>  void kvm_inject_pending_timer_irqs(struct kvm_vcpu *vcpu);
+>  void kvm_inject_apic_timer_irqs(struct kvm_vcpu *vcpu);
+>  void kvm_apic_nmi_wd_deliver(struct kvm_vcpu *vcpu);
+> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+> index 001aeda4c154..3972a9564c76 100644
+> --- a/virt/kvm/eventfd.c
+> +++ b/virt/kvm/eventfd.c
+> @@ -44,6 +44,12 @@
+>  
+>  static struct workqueue_struct *irqfd_cleanup_wq;
+>  
+> +bool __attribute__((weak))
+> +kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
+> +{
+> +	return true;
+> +}
+> +
+>  static void
+>  irqfd_inject(struct work_struct *work)
+>  {
+> @@ -297,6 +303,9 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
+>  	if (!kvm_arch_intc_initialized(kvm))
+>  		return -EAGAIN;
+>  
+> +	if (!kvm_arch_irqfd_allowed(kvm, args))
+> +		return -EINVAL;
+> +
+>  	irqfd = kzalloc(sizeof(*irqfd), GFP_KERNEL_ACCOUNT);
+>  	if (!irqfd)
+>  		return -ENOMEM;
+> 
 
-Hi Eric,
+Queued, thanks.
 
-Good catch. I will fix it next version. 
-
-Thanks
-Vivek
+Paolo
