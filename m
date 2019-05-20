@@ -2,49 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 317B6239A8
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 16:16:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE9AA239AC
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 16:17:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391249AbfETOQC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 10:16:02 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:35184 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730353AbfETOQC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 10:16:02 -0400
-Received: by mail-wr1-f65.google.com with SMTP id m3so1845911wrv.2
-        for <kvm@vger.kernel.org>; Mon, 20 May 2019 07:16:00 -0700 (PDT)
+        id S2387881AbfETORb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 10:17:31 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:41759 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731093AbfETORb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 10:17:31 -0400
+Received: by mail-wr1-f66.google.com with SMTP id g12so14536380wro.8
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 07:17:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=pQyJ4r/pIskiq2x4lBoZE1MWpmwpdgVXMYSxR5QT8Kg=;
-        b=klvXmiKrJ30yO0YY1mPD1sZrhAoT7SUmabJ5fF5cwJMCxKoTKgUltNhOpnJD04zTIa
-         z5WnhplDAXc4H8uiqHc13fytaXwLzxgOSwDJ2dbTEd5ulGhhOpqxRoddsh74RcVXoNZv
-         cupturClQIczt42dmGr03XLKhNuVnVrNwI+t6xDNig3/rlmcajK841EL9VzGfGOM313K
-         EH7iKdEs1f9O9qyvteTwnvoxfOmebwHRiW5rNI4agTgnsFRkItHgXx66x84KWUklJSFQ
-         ZZ/WPOGpkDd7mf862a1bp0mX3cfcNjKZTEdEog/VGGQ8hHxbFQvgJ32XBEyPxbGQWHAg
-         c2Qw==
-X-Gm-Message-State: APjAAAWR4vcLZUrzK2PJ1toOCAWLOvYyKWM4DwgRf182VJdHYicawuBp
-        qE0kh+e0rTgTUDQ+bQ2D+L5pIllWMrfMqA==
-X-Google-Smtp-Source: APXvYqzNHQU1/VWwhaA0jYE1pbaIMp8CLASYZcL5r4obpsxo0doHqi9yUCFdoHnBOSODzByDB+B6Lw==
-X-Received: by 2002:adf:f44b:: with SMTP id f11mr16313743wrp.128.1558361760156;
-        Mon, 20 May 2019 07:16:00 -0700 (PDT)
+        bh=4lAZErK7b2VHa1Zj4KqxqA7DIiJbWmQKebdWPmjtqLM=;
+        b=qZzn/t7oJ7pN1VNPOTEVhYYvlZ9SeKi3Aro9STfdD2pzTomFFHuQXipgkH06xsqvuW
+         cOd8j03nss7lSvyv6SraECiNtWC9vreLJkfbHtppXTsYR5ime+YWmAJtcvd/p0NtwXt2
+         +ONVHtnEi5EADme4ObydOKccWaLH5BntoFx6eo/DCFlsknBbf5BOgFwvD1uX9wEFV/SQ
+         wOBJtmj8QGWRwmPceJpslVNtvaA8ZhQr6iZjMTQjQ9YfXmzeKd5V8ZdyXVNriNGjv4Vl
+         I3EpgjqqtwLfncWVOTWfmrNdZiJdaVdpsoaZ0z7nBSxLdE7BB3yTgfC38IaN0cgm2SQU
+         5seA==
+X-Gm-Message-State: APjAAAWcCf3y4JD+aKHnY+6ogl9dVdMTpUE2Z7YBkHuy2QGBw+VsucpQ
+        jTr2FFDvP6vcaUfBEUC3cusz3l3U0z6aJQ==
+X-Google-Smtp-Source: APXvYqzre9jAXpVh1+naIa2XF8M3acXzLBPvxLL5uy6uLCDqVtO3J49gjKkcy6il6D4e7W2v3sblrQ==
+X-Received: by 2002:adf:cf0c:: with SMTP id o12mr36842393wrj.182.1558361849557;
+        Mon, 20 May 2019 07:17:29 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:ac04:eef9:b257:b844? ([2001:b07:6468:f312:ac04:eef9:b257:b844])
-        by smtp.gmail.com with ESMTPSA id m206sm22545413wmf.21.2019.05.20.07.15.59
+        by smtp.gmail.com with ESMTPSA id k17sm14607294wrm.73.2019.05.20.07.17.28
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 May 2019 07:15:59 -0700 (PDT)
-Subject: Re: [PATCH v2] x86: Some cleanup of delay() and io_delay()
-To:     "nadav.amit@gmail.com" <nadav.amit@gmail.com>
-Cc:     kvm@vger.kernel.org, Krish Sadhukhan <krish.sadhukhan@oracle.com>
-References: <20190503111307.10716-1-nadav.amit@gmail.com>
+        Mon, 20 May 2019 07:17:28 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH 1/2] x86: PMU: Fix PMU counters masking
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     kvm@vger.kernel.org
+References: <20190504223142.26668-1-nadav.amit@gmail.com>
+ <20190504223142.26668-2-nadav.amit@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <636e3100-fb0e-4fcb-9167-bea7f418a038@redhat.com>
-Date:   Mon, 20 May 2019 16:15:57 +0200
+Message-ID: <466e8513-5271-0827-f81d-b4bc257d149c@redhat.com>
+Date:   Mon, 20 May 2019 16:17:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190503111307.10716-1-nadav.amit@gmail.com>
+In-Reply-To: <20190504223142.26668-2-nadav.amit@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -53,122 +54,91 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/05/19 13:13, nadav.amit@gmail.com wrote:
-> From: Nadav Amit <nadav.amit@gmail.com>
+On 05/05/19 00:31, Nadav Amit wrote:
+> Intel SDM says that for MSR_IA32_PERFCTR0/1 "the lower-order 32 bits of
+> each MSR may be written with any value, and the high-order 8 bits are
+> sign-extended according to the value of bit 31." The current PMU tests
+> ignored the fact that the high bit is sign-extended.
 > 
-> There is no guarantee that a self-IPI would be delivered immediately.
-> In eventinj, io_delay() is called after self-IPI is generated but does
-> nothing.
+> At the same time, the fixed counters are not limited to 32-bit, but
+> appear to be limited to the width of the fixed counters (I could not
+> find clear documentation).
 > 
-> In general, there is mess in regard to delay() and io_delay(). There are
-> two definitions of delay() and they do not really look on the timestamp
-> counter and instead count invocations of "pause" (or even "nop"), which
-> might be different on different CPUs/setups, for example due to
-> different pause-loop-exiting configurations.
+> Fix the tests accordingly.
 > 
-> To address these issues change io_delay() to really do a delay, based on
-> timestamp counter, and move common functions into delay.[hc].
-> 
-> Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
 > Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+> 
+> ---
+> 
+> As a result of this fix, the fixed counters test currently fails on KVM.
+> I am unable to provide a bug-fix although the fix is simple.
 
-Queued; there is another io_delay instance in taskswitch2.c, so I
-removed it too.
+Fair enough, I'll give it a look.
+
+Queued both, thanks.
 
 Paolo
 
 > ---
->  lib/x86/delay.c | 9 ++++++---
->  lib/x86/delay.h | 7 +++++++
->  x86/eventinj.c  | 5 +----
->  x86/ioapic.c    | 8 +-------
->  4 files changed, 15 insertions(+), 14 deletions(-)
+>  x86/pmu.c | 28 +++++++++++++++++++++-------
+>  1 file changed, 21 insertions(+), 7 deletions(-)
 > 
-> diff --git a/lib/x86/delay.c b/lib/x86/delay.c
-> index 595ad24..e7d2717 100644
-> --- a/lib/x86/delay.c
-> +++ b/lib/x86/delay.c
-> @@ -1,8 +1,11 @@
->  #include "delay.h"
-> +#include "processor.h"
->  
->  void delay(u64 count)
->  {
-> -	while (count--)
-> -		asm volatile("pause");
-> -}
-> +	u64 start = rdtsc();
->  
-> +	do {
-> +		pause();
-> +	} while (rdtsc() - start < count);
-> +}
-> diff --git a/lib/x86/delay.h b/lib/x86/delay.h
-> index a9bf894..a51eb34 100644
-> --- a/lib/x86/delay.h
-> +++ b/lib/x86/delay.h
-> @@ -3,6 +3,13 @@
->  
->  #include "libcflat.h"
->  
-> +#define IPI_DELAY 1000000
+> diff --git a/x86/pmu.c b/x86/pmu.c
+> index 6658fe9..afb387b 100644
+> --- a/x86/pmu.c
+> +++ b/x86/pmu.c
+> @@ -316,14 +316,19 @@ static void check_counter_overflow(void)
+>  	for (i = 0; i < num_counters + 1; i++, cnt.ctr++) {
+>  		uint64_t status;
+>  		int idx;
+> -		if (i == num_counters)
 > +
->  void delay(u64 count);
->  
-> +static inline void io_delay(void)
-> +{
-> +	delay(IPI_DELAY);
-> +}
+> +		cnt.count = 1 - count;
 > +
->  #endif
-> diff --git a/x86/eventinj.c b/x86/eventinj.c
-> index d2dfc40..901b9db 100644
-> --- a/x86/eventinj.c
-> +++ b/x86/eventinj.c
-> @@ -7,6 +7,7 @@
->  #include "apic-defs.h"
->  #include "vmalloc.h"
->  #include "alloc_page.h"
-> +#include "delay.h"
+> +		if (i == num_counters) {
+>  			cnt.ctr = fixed_events[0].unit_sel;
+> +			cnt.count &= (1ul << edx.split.bit_width_fixed) - 1;
+> +		}
+> +
+>  		if (i % 2)
+>  			cnt.config |= EVNTSEL_INT;
+>  		else
+>  			cnt.config &= ~EVNTSEL_INT;
+>  		idx = event_to_global_idx(&cnt);
+> -		cnt.count = 1 - count;
+>  		measure(&cnt, 1);
+>  		report("cntr-%d", cnt.count == 1, i);
+>  		status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
+> @@ -357,16 +362,25 @@ static void check_rdpmc(void)
+>  	report_prefix_push("rdpmc");
 >  
->  #ifdef __x86_64__
->  #  define R "r"
-> @@ -16,10 +17,6 @@
->  
->  void do_pf_tss(void);
->  
-> -static inline void io_delay(void)
-> -{
-> -}
-> -
->  static void apic_self_ipi(u8 v)
->  {
->  	apic_icr_write(APIC_DEST_SELF | APIC_DEST_PHYSICAL | APIC_DM_FIXED |
-> diff --git a/x86/ioapic.c b/x86/ioapic.c
-> index 2ac4ac6..c32dabd 100644
-> --- a/x86/ioapic.c
-> +++ b/x86/ioapic.c
-> @@ -4,6 +4,7 @@
->  #include "smp.h"
->  #include "desc.h"
->  #include "isr.h"
-> +#include "delay.h"
->  
->  static void toggle_irq_line(unsigned line)
->  {
-> @@ -165,13 +166,6 @@ static void test_ioapic_level_tmr(bool expected_tmr_before)
->  	       expected_tmr_before ? "true" : "false");
->  }
->  
-> -#define IPI_DELAY 1000000
-> -
-> -static void delay(int count)
-> -{
-> -	while(count--) asm("");
-> -}
-> -
->  static void toggle_irq_line_0x0e(void *data)
->  {
->  	irq_disable();
+>  	for (i = 0; i < num_counters; i++) {
+> -		uint64_t x = (val & 0xffffffff) |
+> -			((1ull << (eax.split.bit_width - 32)) - 1) << 32;
+> +		uint64_t x;
+> +
+> +		/*
+> +		 * Only the low 32 bits are writable, and the value is
+> +		 * sign-extended.
+> +		 */
+> +		x = (uint64_t)(int64_t)(int32_t)val;
+> +
+> +		/* Mask according to the number of supported bits */
+> +		x &= (1ull << eax.split.bit_width) - 1;
+> +
+>  		wrmsr(MSR_IA32_PERFCTR0 + i, val);
+>  		report("cntr-%d", rdpmc(i) == x, i);
+>  		report("fast-%d", rdpmc(i | (1<<31)) == (u32)val, i);
+>  	}
+>  	for (i = 0; i < edx.split.num_counters_fixed; i++) {
+> -		uint64_t x = (val & 0xffffffff) |
+> -			((1ull << (edx.split.bit_width_fixed - 32)) - 1) << 32;
+> -		wrmsr(MSR_CORE_PERF_FIXED_CTR0 + i, val);
+> +		uint64_t x = val & ((1ull << edx.split.bit_width_fixed) - 1);
+> +
+> +		wrmsr(MSR_CORE_PERF_FIXED_CTR0 + i, x);
+>  		report("fixed cntr-%d", rdpmc(i | (1 << 30)) == x, i);
+>  		report("fixed fast-%d", rdpmc(i | (3<<30)) == (u32)val, i);
+>  	}
 > 
 
