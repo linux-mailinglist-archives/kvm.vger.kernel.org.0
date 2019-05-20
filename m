@@ -2,92 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6507723211
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 13:16:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A92B623224
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 13:19:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732568AbfETLQ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 07:16:27 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:46398 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731214AbfETLQ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 07:16:26 -0400
-Received: by mail-wr1-f68.google.com with SMTP id r7so14086749wrr.13
-        for <kvm@vger.kernel.org>; Mon, 20 May 2019 04:16:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ZxAda8y+Lw5w6X737KJdEPUh+wkc1U8IjaEMWE3lVAU=;
-        b=LaivQ/Toh/DzU+8nbgsuQVtAgRaGU1xDsUgH4qDBF/u+rgD4n1txc1Jnc2fxb450jW
-         qqRecvhOVTiZApNPtCaB/Ex+xboa1NsDIjzp4JmZ/mLbXuexyw+9I1k4I9LmuyUudhdV
-         iAbici7AofSWkpb4WFhJND/lZ7bk4QJN4V9rZC2EX+tREnPkQuilPtngdKkRSCLP2Rp1
-         8AHyKMiV199tMJs92ahF8GqXMTdJe68M+nrS9ykmtieK2I1nrVlt6s/g4qW7WJo/v2jb
-         jbMIiiMzp4koSJEdxPFuNYD3mGH7X4gum8pN3Wi3ZKeAdUUmDRWbfKFBPmkHuKcJTDZ/
-         f9ng==
-X-Gm-Message-State: APjAAAVvjhAFA0WNMVbmn6JUr6BHw5uyG6k1KLpaVFJJMx+dYkllHTOh
-        g/zD/dahQ0fldlIDfh0mRJ0XdQ==
-X-Google-Smtp-Source: APXvYqxKv0sQ2iquFAoDIXnp3sduGK6TezmZvrJwiMji2N1+QfUnBhmOkknC6pCZTEflbhnzO3ZTiQ==
-X-Received: by 2002:adf:dc04:: with SMTP id t4mr41535607wri.126.1558350985398;
-        Mon, 20 May 2019 04:16:25 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ac04:eef9:b257:b844? ([2001:b07:6468:f312:ac04:eef9:b257:b844])
-        by smtp.gmail.com with ESMTPSA id 91sm25337283wrs.43.2019.05.20.04.16.24
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 May 2019 04:16:24 -0700 (PDT)
-Subject: Re: [PATCH] KVM: selftests: Remove duplicated TEST_ASSERT in
- hyperv_cpuid.c
-To:     Thomas Huth <thuth@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190520105511.12471-1-thuth@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8402b29a-6be4-b123-eb14-80b3fa8d8080@redhat.com>
-Date:   Mon, 20 May 2019 13:16:23 +0200
+        id S1725601AbfETLTg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 07:19:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54978 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730771AbfETLTe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 May 2019 07:19:34 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4KBHNxV066472
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 07:19:32 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sks8nndsw-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 07:19:32 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
+        Mon, 20 May 2019 12:19:30 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 20 May 2019 12:19:26 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4KBJOY747841290
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 20 May 2019 11:19:24 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 99C60AE051;
+        Mon, 20 May 2019 11:19:24 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F2E9EAE045;
+        Mon, 20 May 2019 11:19:23 +0000 (GMT)
+Received: from [9.145.24.80] (unknown [9.145.24.80])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 20 May 2019 11:19:23 +0000 (GMT)
+Reply-To: pmorel@linux.ibm.com
+Subject: Re: [PATCH v2 4/4] vfio: vfio_iommu_type1: implement
+ VFIO_IOMMU_INFO_CAPABILITIES
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     sebott@linux.vnet.ibm.com, gerald.schaefer@de.ibm.com,
+        pasic@linux.vnet.ibm.com, borntraeger@de.ibm.com,
+        walling@linux.ibm.com, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, joro@8bytes.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
+        robin.murphy@arm.com
+References: <1558109810-18683-1-git-send-email-pmorel@linux.ibm.com>
+ <1558109810-18683-5-git-send-email-pmorel@linux.ibm.com>
+ <20190517104143.240082b5@x1.home>
+ <92b6ad4e-9a49-636b-9225-acca0bec4bb7@linux.ibm.com>
+Date:   Mon, 20 May 2019 13:19:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190520105511.12471-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <92b6ad4e-9a49-636b-9225-acca0bec4bb7@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19052011-0020-0000-0000-0000033E8C6A
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19052011-0021-0000-0000-0000219162BD
+Message-Id: <ed193353-56f0-14b5-f1fb-1835d0a6c603@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-20_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=929 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905200080
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/05/19 12:55, Thomas Huth wrote:
-> The check for entry->index == 0 is done twice. One time should
-> be sufficient.
+On 17/05/2019 20:04, Pierre Morel wrote:
+> On 17/05/2019 18:41, Alex Williamson wrote:
+>> On Fri, 17 May 2019 18:16:50 +0200
+>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>>
+>>> We implement the capability interface for VFIO_IOMMU_GET_INFO.
+>>>
+>>> When calling the ioctl, the user must specify
+>>> VFIO_IOMMU_INFO_CAPABILITIES to retrieve the capabilities and
+>>> must check in the answer if capabilities are supported.
+>>>
+>>> The iommu get_attr callback will be used to retrieve the specific
+>>> attributes and fill the capabilities.
+>>>
+>>> Currently two Z-PCI specific capabilities will be queried and
+>>> filled by the underlying Z specific s390_iommu:
+>>> VFIO_IOMMU_INFO_CAP_QFN for the PCI query function attributes
+>>> and
+>>> VFIO_IOMMU_INFO_CAP_QGRP for the PCI query function group.
+>>>
+>>> Other architectures may add new capabilities in the same way
+>>> after enhancing the architecture specific IOMMU driver.
+>>>
+>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>> ---
+>>>   drivers/vfio/vfio_iommu_type1.c | 122 
+>>> +++++++++++++++++++++++++++++++++++++++-
+>>>   1 file changed, 121 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/vfio/vfio_iommu_type1.c 
+>>> b/drivers/vfio/vfio_iommu_type1.c
+>>> index d0f731c..9435647 100644
+>>> --- a/drivers/vfio/vfio_iommu_type1.c
+>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>>> @@ -1658,6 +1658,97 @@ static int 
+>>> vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+>>>       return ret;
+>>>   }
+>>> +static int vfio_iommu_type1_zpci_fn(struct iommu_domain *domain,
+>>> +                    struct vfio_info_cap *caps, size_t size)
+>>> +{
+>>> +    struct vfio_iommu_type1_info_pcifn *info_fn;
+>>> +    int ret;
+>>> +
+>>> +    info_fn = kzalloc(size, GFP_KERNEL);
+>>> +    if (!info_fn)
+>>> +        return -ENOMEM;
+>>> +
+>>> +    ret = iommu_domain_get_attr(domain, DOMAIN_ATTR_ZPCI_FN,
+>>> +                    &info_fn->response);
+>>
+>> What ensures that the 'struct clp_rsp_query_pci' returned from this
+>> get_attr remains consistent with a 'struct vfio_iommu_pci_function'?
+>> Why does the latter contains so many reserved fields (beyond simply
+>> alignment) for a user API?  What fields of these structures are
+>> actually useful to userspace?  Should any fields not be exposed to the
+>> user?  Aren't BAR sizes redundant to what's available through the vfio
+>> PCI API?  I'm afraid that simply redefining an internal structure as
+>> the API leaves a lot to be desired too.  Thanks,
+>>
+>> Alex
+>>
+> Hi Alex,
 > 
-> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  Vitaly already noticed this in his review to the "Fix a condition
->  in test_hv_cpuid()" patch a couple of days ago, but so far I haven't
->  seen any patch yet on the list that fixes this ... if I missed it
->  instead, please simply ignore this patch.
+> I simply used the structure returned by the firmware to be sure to be 
+> consistent with future evolutions and facilitate the copy from CLP and 
+> to userland.
 > 
->  tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c | 3 ---
->  1 file changed, 3 deletions(-)
+> If you prefer, and I understand that this is the case, I can define a 
+> specific VFIO_IOMMU structure with only the fields relevant to the user, 
+> leaving future enhancement of the user's interface being implemented in 
+> another kernel patch when the time has come.
 > 
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> index 9a21e912097c..8bdf1e7da6cc 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
-> @@ -52,9 +52,6 @@ static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
->  		TEST_ASSERT(entry->index == 0,
->  			    ".index field should be zero");
->  
-> -		TEST_ASSERT(entry->index == 0,
-> -			    ".index field should be zero");
-> -
->  		TEST_ASSERT(entry->flags == 0,
->  			    ".flags field should be zero");
->  
+> In fact, the struct will have all defined fields I used but not the BAR 
+> size and address (at least for now because there are special cases we do 
+> not support yet with bars).
+> All the reserved fields can go away.
+> 
+> Is it more conform to your idea?
+> 
+> Also I have 2 interfaces:
+> 
+> s390_iommu.get_attr <-I1-> VFIO_IOMMU <-I2-> userland
+> 
+> Do you prefer:
+> - 2 different structures, no CLP raw structure
+> - the CLP raw structure for I1 and a VFIO specific structure for I2
+
+Hi Alex,
+
+I am back again on this.
+This solution here above seems to me the best one but in this way I must 
+include S390 specific include inside the iommu_type1, which is AFAIU not 
+a good thing.
+It seems that the powerpc architecture use a solution with a dedicated 
+VFIO_IOMMU, the vfio_iommu_spar_tce.
+
+Wouldn't it be a solution for s390 too, to use the vfio_iommu_type1 as a 
+basis to have a s390 dedicated solution.
+Then it becomes easier to have on one side the s390_iommu interface, 
+S390 specific, and on the other side a VFIO interface without a blind 
+copy of the firmware values.
+
+Do you think it is a viable solution?
+
+Thanks,
+Pierre
+
+
+
+> - the same VFIO structure for both I1 and I2
+> 
+> Thank you if you could give me a direction for this.
+> 
+> Thanks for the comments, and thanks a lot to have answered so quickly.
+> 
+> Pierre
+> 
+> 
+> 
+> 
+> 
+> 
 > 
 
-Queued, thanks.
 
-Paolo
+-- 
+Pierre Morel
+Linux/KVM/QEMU in Böblingen - Germany
+
