@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E1E6A22CBF
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 09:15:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C15C22CD1
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 09:20:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730351AbfETHPk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 03:15:40 -0400
-Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:39861 "EHLO
-        7.mo68.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730058AbfETHPk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 03:15:40 -0400
-Received: from player158.ha.ovh.net (unknown [10.108.42.215])
-        by mo68.mail-out.ovh.net (Postfix) with ESMTP id C11AE12E5FF
-        for <kvm@vger.kernel.org>; Mon, 20 May 2019 09:15:37 +0200 (CEST)
+        id S1730522AbfETHUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 03:20:55 -0400
+Received: from 6.mo1.mail-out.ovh.net ([46.105.43.205]:44604 "EHLO
+        6.mo1.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726901AbfETHUy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 03:20:54 -0400
+Received: from player158.ha.ovh.net (unknown [10.109.160.239])
+        by mo1.mail-out.ovh.net (Postfix) with ESMTP id 197E517929E
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 09:15:43 +0200 (CEST)
 Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
         (Authenticated sender: clg@kaod.org)
-        by player158.ha.ovh.net (Postfix) with ESMTPSA id C16205D36025;
-        Mon, 20 May 2019 07:15:30 +0000 (UTC)
+        by player158.ha.ovh.net (Postfix) with ESMTPSA id A3F765D360B7;
+        Mon, 20 May 2019 07:15:37 +0000 (UTC)
 From:   =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To:     kvm-ppc@vger.kernel.org
 Cc:     Paul Mackerras <paulus@samba.org>,
@@ -25,16 +25,16 @@ Cc:     Paul Mackerras <paulus@samba.org>,
         kvm@vger.kernel.org,
         =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
         Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Subject: [PATCH 2/3] KVM: PPC: Book3S HV: XIVE: do not test the EQ flag validity when resetting
-Date:   Mon, 20 May 2019 09:15:13 +0200
-Message-Id: <20190520071514.9308-3-clg@kaod.org>
+Subject: [PATCH 3/3] KVM: PPC: Book3S HV: XIVE: fix the enforced limit on the vCPU identifier
+Date:   Mon, 20 May 2019 09:15:14 +0200
+Message-Id: <20190520071514.9308-4-clg@kaod.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190520071514.9308-1-clg@kaod.org>
 References: <20190520071514.9308-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 6059874777678253015
+X-Ovh-Tracer-Id: 6061563625976531927
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddtjedguddvudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
@@ -43,72 +43,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a CPU is hot-unplugged, the EQ is deconfigured using a zero size
-and a zero address. In this case, there is no need to check the flag
-and queue size validity. Move the checks after the queue reset code
-section to fix CPU hot-unplug.
+When a vCPU is connected to the KVM device, it is done using its vCPU
+identifier in the guest. Fix the enforced limit on the vCPU identifier
+by taking into account the SMT mode.
 
 Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 Tested-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
 ---
- arch/powerpc/kvm/book3s_xive_native.c | 36 +++++++++++++--------------
- 1 file changed, 18 insertions(+), 18 deletions(-)
+ arch/powerpc/kvm/book3s_xive_native.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-index 796d86549cfe..3fdea6bf4e97 100644
+index 3fdea6bf4e97..25b6b0e2d02a 100644
 --- a/arch/powerpc/kvm/book3s_xive_native.c
 +++ b/arch/powerpc/kvm/book3s_xive_native.c
-@@ -565,24 +565,6 @@ static int kvmppc_xive_native_set_queue_config(struct kvmppc_xive *xive,
- 		 __func__, server, priority, kvm_eq.flags,
- 		 kvm_eq.qshift, kvm_eq.qaddr, kvm_eq.qtoggle, kvm_eq.qindex);
- 
--	/*
--	 * sPAPR specifies a "Unconditional Notify (n) flag" for the
--	 * H_INT_SET_QUEUE_CONFIG hcall which forces notification
--	 * without using the coalescing mechanisms provided by the
--	 * XIVE END ESBs. This is required on KVM as notification
--	 * using the END ESBs is not supported.
--	 */
--	if (kvm_eq.flags != KVM_XIVE_EQ_ALWAYS_NOTIFY) {
--		pr_err("invalid flags %d\n", kvm_eq.flags);
--		return -EINVAL;
--	}
--
--	rc = xive_native_validate_queue_size(kvm_eq.qshift);
--	if (rc) {
--		pr_err("invalid queue size %d\n", kvm_eq.qshift);
--		return rc;
--	}
--
- 	/* reset queue and disable queueing */
- 	if (!kvm_eq.qshift) {
- 		q->guest_qaddr  = 0;
-@@ -604,6 +586,24 @@ static int kvmppc_xive_native_set_queue_config(struct kvmppc_xive *xive,
- 		return 0;
+@@ -109,7 +109,7 @@ int kvmppc_xive_native_connect_vcpu(struct kvm_device *dev,
+ 		return -EPERM;
+ 	if (vcpu->arch.irq_type != KVMPPC_IRQ_DEFAULT)
+ 		return -EBUSY;
+-	if (server_num >= KVM_MAX_VCPUS) {
++	if (server_num >= (KVM_MAX_VCPUS * vcpu->kvm->arch.emul_smt_mode)) {
+ 		pr_devel("Out of bounds !\n");
+ 		return -EINVAL;
  	}
- 
-+	/*
-+	 * sPAPR specifies a "Unconditional Notify (n) flag" for the
-+	 * H_INT_SET_QUEUE_CONFIG hcall which forces notification
-+	 * without using the coalescing mechanisms provided by the
-+	 * XIVE END ESBs. This is required on KVM as notification
-+	 * using the END ESBs is not supported.
-+	 */
-+	if (kvm_eq.flags != KVM_XIVE_EQ_ALWAYS_NOTIFY) {
-+		pr_err("invalid flags %d\n", kvm_eq.flags);
-+		return -EINVAL;
-+	}
-+
-+	rc = xive_native_validate_queue_size(kvm_eq.qshift);
-+	if (rc) {
-+		pr_err("invalid queue size %d\n", kvm_eq.qshift);
-+		return rc;
-+	}
-+
- 	if (kvm_eq.qaddr & ((1ull << kvm_eq.qshift) - 1)) {
- 		pr_err("queue page is not aligned %llx/%llx\n", kvm_eq.qaddr,
- 		       1ull << kvm_eq.qshift);
 -- 
 2.20.1
 
