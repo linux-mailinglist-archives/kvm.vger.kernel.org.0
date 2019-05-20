@@ -2,65 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EA4523180
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 12:40:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4AB0231D2
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2019 12:55:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730887AbfETKkp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 May 2019 06:40:45 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:40072 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726146AbfETKkp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 May 2019 06:40:45 -0400
-Received: by mail-wr1-f67.google.com with SMTP id h4so14011627wre.7
-        for <kvm@vger.kernel.org>; Mon, 20 May 2019 03:40:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Npi8Ht/enySYexRXn6PiDHIk8ELqfdJW0KR70Q1Ujmo=;
-        b=j4iNXwe+VOHQIwWUO4yqo7Rd798DaJa9Z8CbHnLiQxNouBrrYv/poVBkmnGQVdQvzi
-         JQkRYJv3xuGbtgPyzLTaQ8kQyZeMsX4ZTlxWvbIiZc93ZbZAJDrGVvT1RdjczTnlV14q
-         331MWTaImCPbaOISPS5mh+Zqqgl1pkCvbTGYDFEKCb4aoMGSwuKKHAmWjCKvMFQwhVGu
-         GVIu8Urpp3ph0ZrnO3MHIYACvKeRRcAz6QOxpZynqlTw6JqC5XZw7BU4e+TNdaOthV1q
-         tmpYA1Wu07PILLyAj+OS/sSTpLtVfFXsavjJxmo30f5AaCWC+4ifT/LcsSvZQT5b33v6
-         pn4g==
-X-Gm-Message-State: APjAAAVwTO9kx08VD7LrhG17wqcEFYu/HnBiJyYwrj/ew57UzAxgJgZM
-        NIyTdiGvv6tOjnpSJHRizemWbw==
-X-Google-Smtp-Source: APXvYqytptBgJ8n/W1J3wxlBrGAipoGMB+/e14oasouVR8LMFTtdelW2vg3Uok5icD+/rOXy6iqABw==
-X-Received: by 2002:adf:e2c7:: with SMTP id d7mr8989845wrj.272.1558348843578;
-        Mon, 20 May 2019 03:40:43 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ac04:eef9:b257:b844? ([2001:b07:6468:f312:ac04:eef9:b257:b844])
-        by smtp.gmail.com with ESMTPSA id s10sm14464267wrt.66.2019.05.20.03.40.42
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 May 2019 03:40:43 -0700 (PDT)
-Subject: Re: [GIT PULL 0/2] KVM: s390: Fixes for 5.2-rc2
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Wei Yongjun <weiyongjun1@huawei.com>
-References: <20190520103055.246818-1-borntraeger@de.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b6f4acd8-df71-78f5-bb1a-bbc2dc1f4a5e@redhat.com>
-Date:   Mon, 20 May 2019 12:40:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1732116AbfETKzZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 May 2019 06:55:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42648 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725601AbfETKzZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 May 2019 06:55:25 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6572630842B0;
+        Mon, 20 May 2019 10:55:25 +0000 (UTC)
+Received: from thuth.com (ovpn-117-9.ams2.redhat.com [10.36.117.9])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 964CA5D967;
+        Mon, 20 May 2019 10:55:22 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: selftests: Remove duplicated TEST_ASSERT in hyperv_cpuid.c
+Date:   Mon, 20 May 2019 12:55:11 +0200
+Message-Id: <20190520105511.12471-1-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190520103055.246818-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Mon, 20 May 2019 10:55:25 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/05/19 12:30, Christian Borntraeger wrote:
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-master-5.2-1
+The check for entry->index == 0 is done twice. One time should
+be sufficient.
 
-Pulled, thanks.
+Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ Vitaly already noticed this in his review to the "Fix a condition
+ in test_hv_cpuid()" patch a couple of days ago, but so far I haven't
+ seen any patch yet on the list that fixes this ... if I missed it
+ instead, please simply ignore this patch.
 
-Paolo
+ tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+index 9a21e912097c..8bdf1e7da6cc 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+@@ -52,9 +52,6 @@ static void test_hv_cpuid(struct kvm_cpuid2 *hv_cpuid_entries,
+ 		TEST_ASSERT(entry->index == 0,
+ 			    ".index field should be zero");
+ 
+-		TEST_ASSERT(entry->index == 0,
+-			    ".index field should be zero");
+-
+ 		TEST_ASSERT(entry->flags == 0,
+ 			    ".flags field should be zero");
+ 
+-- 
+2.21.0
+
