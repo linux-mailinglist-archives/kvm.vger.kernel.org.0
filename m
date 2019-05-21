@@ -2,83 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CB7F254B6
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 18:03:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F1A025581
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 18:24:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728099AbfEUQC6 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Tue, 21 May 2019 12:02:58 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:43604 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728053AbfEUQC6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 May 2019 12:02:58 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id AEDC1289A5
-        for <kvm@vger.kernel.org>; Tue, 21 May 2019 16:02:57 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 91F7528ACE; Tue, 21 May 2019 16:02:57 +0000 (UTC)
-X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
-        pdx-wl-mail.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-1.9 required=2.0 tests=BAYES_00,NO_RECEIVED,
-        NO_RELAYS autolearn=unavailable version=3.3.1
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 203543] Starting with kernel 5.1.0-rc6,  kvm_intel can no
- longer be loaded in nested kvm/guests
-Date:   Tue, 21 May 2019 16:02:56 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: hilld@binarystorm.net
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-203543-28872-XvIewyZxIN@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-203543-28872@https.bugzilla.kernel.org/>
-References: <bug-203543-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1728911AbfEUQYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 May 2019 12:24:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39834 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728858AbfEUQYk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 May 2019 12:24:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4368830833AF;
+        Tue, 21 May 2019 16:24:29 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1465F4387;
+        Tue, 21 May 2019 16:24:24 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id C3F6A5B423;
+        Tue, 21 May 2019 16:24:14 +0000 (UTC)
+Date:   Tue, 21 May 2019 12:24:14 -0400 (EDT)
+From:   Pankaj Gupta <pagupta@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org,
+        david@redhat.com, jasowang@redhat.com, david@fromorbit.com,
+        qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
+        dm-devel@redhat.com, adilger kernel <adilger.kernel@dilger.ca>,
+        zwisler@kernel.org, aarcange@redhat.com,
+        dave jiang <dave.jiang@intel.com>, jstaron@google.com,
+        linux-nvdimm@lists.01.org,
+        vishal l verma <vishal.l.verma@intel.com>,
+        willy@infradead.org, hch@infradead.org, linux-acpi@vger.kernel.org,
+        jmoyer@redhat.com, linux-ext4@vger.kernel.org, lenb@kernel.org,
+        kilobyte@angband.pl, rdunlap@infradead.org, riel@surriel.com,
+        yuval shaia <yuval.shaia@oracle.com>, stefanha@redhat.com,
+        pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>,
+        lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
+        tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
+        snitzer@redhat.com, darrick wong <darrick.wong@oracle.com>,
+        rjw@rjwysocki.net, linux-kernel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        imammedo@redhat.com
+Message-ID: <176786650.30122184.1558455854322.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190521094543-mutt-send-email-mst@kernel.org>
+References: <20190521133713.31653-1-pagupta@redhat.com> <20190521133713.31653-3-pagupta@redhat.com> <20190521094543-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v10 2/7] virtio-pmem: Add virtio pmem
+ driver
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.105, 10.4.195.14]
+Thread-Topic: virtio-pmem: Add virtio pmem driver
+Thread-Index: 3AiQ7PJb9jLe5p+DRlEZBNdQ18HFYA==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Tue, 21 May 2019 16:24:39 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=203543
 
---- Comment #13 from David Hill (hilld@binarystorm.net) ---
-Well, I did this:
+> > diff --git a/include/uapi/linux/virtio_pmem.h
+> > b/include/uapi/linux/virtio_pmem.h
+> > new file mode 100644
+> > index 000000000000..7a3e2fe52415
+> > --- /dev/null
+> > +++ b/include/uapi/linux/virtio_pmem.h
+> > @@ -0,0 +1,35 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
+> > +/*
+> > + * Definitions for virtio-pmem devices.
+> > + *
+> > + * Copyright (C) 2019 Red Hat, Inc.
+> > + *
+> > + * Author(s): Pankaj Gupta <pagupta@redhat.com>
+> > + */
+> > +
+> > +#ifndef _UAPI_LINUX_VIRTIO_PMEM_H
+> > +#define _UAPI_LINUX_VIRTIO_PMEM_H
+> > +
+> > +#include <linux/types.h>
+> > +#include <linux/virtio_types.h>
+> > +#include <linux/virtio_ids.h>
+> > +#include <linux/virtio_config.h>
+> > +
+> > +struct virtio_pmem_config {
+> > +	__le64 start;
+> > +	__le64 size;
+> > +};
+> > +
+> 
+> config generally should be __u64.
+> Are you sure sparse does not complain?
 
-1) git checkout v5.2-rc1
-2) compile it
-3) configure grub to use it
-4) reboot
-5) boot the existing VM
-6) lsmod | grep kvm_intel
+I used this because VIRTIO 1.1 spec says: 
+"The device configuration space uses the little-endian format for multi-byte fields. "
 
-and at 5) it wasn't loaded.  next I did:
-1) git checkout v5.2-rc1
-2) git revert f93f7ede087f2edcc18e4b02310df5749a6b5a61
-3) git revert e51bfdb68725dc052d16241ace40ea3140f938aa.
-4) compile that
-5) configure grub to use it
-6) reboot
-7) boot the existing VM
-8) lsmod | grep kvm_intel 
+and __le64 looks ok to me. Also, its used in other driver config as welle.g virtio-vsock
 
-and at 8) it was loaded.
+> 
+> 
+> > +#define VIRTIO_PMEM_REQ_TYPE_FLUSH      0
+> > +
+> > +struct virtio_pmem_resp {
+> > +	/* Host return status corresponding to flush request */
+> > +	__virtio32 ret;
+> > +};
+> > +
+> > +struct virtio_pmem_req {
+> > +	/* command type */
+> > +	__virtio32 type;
+> > +};
+> > +
+> > +#endif
+> > --
+> > 2.20.1
+> 
+> Sorry why are these __virtio32 not __le32?
 
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+I used __virtio32 for data fields for guest and host supporting different endianess.
+ 
+Thanks,
+Pankaj
+> 
+> --
+> MST
+> 
+> 
