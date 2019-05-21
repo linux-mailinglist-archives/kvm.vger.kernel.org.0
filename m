@@ -2,112 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 18719247EC
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 08:17:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28FBD24904
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 09:33:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727910AbfEUGRw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 May 2019 02:17:52 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:42043 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725885AbfEUGRv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 May 2019 02:17:51 -0400
-Received: by mail-pf1-f195.google.com with SMTP id 13so8489701pfw.9
-        for <kvm@vger.kernel.org>; Mon, 20 May 2019 23:17:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=J0uuieNJWIEqFucVVL6HHob/1V+xJ9X3pNwzM9VDJZ0=;
-        b=iAILzZqNIPswUqlH8JOZ7+vNDvmfXLVoXJIxX2pMr6K+W+bYWxejR2GHSWRq5E47A9
-         +VOfS8YbrQHfhFr7ihHe+UDBs8GsWPVm81gOqbikTXUXTinXaK5hYC9uAXP7euPrkAfO
-         W3z6pM1PlpsNwjc9CsNyroG7N/i0J/9W/pNuTtwQQA+p2+FPHbalQl4hDooMHBBpiEN5
-         2kicJrYTxu1HzkN0+pbwtNM4BG2RgcgDdPdSPEQ4ZAXh+ARZzdnmstNsaTbUrM8BeTh3
-         EawOZc3DzJIcULJcNysgL7W1kitDu+KytOK29j4bZlaQ3PjMG64tGQ/8f/P6Cc5JOZOR
-         NJ1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=J0uuieNJWIEqFucVVL6HHob/1V+xJ9X3pNwzM9VDJZ0=;
-        b=pFNOxJSs/Kp/0Yd766UM6+Vt30FG9MZ2sZrQ9GTJShjIsZaANNH1/ULQA3K8fIRRB7
-         qsQPlfyeaqjYItyWyWRCDdcdhQM4oirpcVowCPKsR09MisBaKzGyLKHyk7Qk2clyizul
-         N2Rk3Wrl/+b80/fot8Y9xLXCZV/iBUtfpCAfCKk5dX4P77DnZVclnOf20wwhcBq5bKmv
-         WQMUetZ4nJOYczl4Zae4euIUP9j3NChGraRfhDYm6hoXMYFMrBg1u7w5kXYcoev2JHE9
-         kQDJlt9wZN6k6mg8FH4dEeSPawZe14AerUN3/86OXZS/3xcfbRP4oDG6RdHGS2MGVaPp
-         953A==
-X-Gm-Message-State: APjAAAXPqX6dVrDKakrkYad9y7Eh0Y0KjAhK+bZWOJTf90aK+51co4E6
-        E/pYh1snuFjhDpoSEcAUEGk=
-X-Google-Smtp-Source: APXvYqw2zFKfTVHfge7XSBqtWwR0RD497wZjCcT/BNKF+0TPFWkQe97zoVI6lF5pwDcUzRZL6LH/JQ==
-X-Received: by 2002:a63:1460:: with SMTP id 32mr80416982pgu.319.1558419471484;
-        Mon, 20 May 2019 23:17:51 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id o66sm23112295pfb.184.2019.05.20.23.17.49
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 20 May 2019 23:17:51 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PATCH] kvm: support guest access CORE cstate
-Date:   Tue, 21 May 2019 14:17:47 +0800
-Message-Id: <1558419467-7155-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        id S1726853AbfEUHdV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 May 2019 03:33:21 -0400
+Received: from smtp.lucina.net ([62.176.169.44]:59506 "EHLO smtp.lucina.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725790AbfEUHdU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 May 2019 03:33:20 -0400
+X-Greylist: delayed 525 seconds by postgrey-1.27 at vger.kernel.org; Tue, 21 May 2019 03:33:20 EDT
+Received: from nodbug.lucina.net (188-167-250-119.dynamic.chello.sk [188.167.250.119])
+        by smtp.lucina.net (Postfix) with ESMTPSA id 739D2122804
+        for <kvm@vger.kernel.org>; Tue, 21 May 2019 09:24:34 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=lucina.net;
+        s=dkim-201811; t=1558423474;
+        bh=lHVulHQV4hVDwBbMHDiDM+CX7vfJtx9zPkWnutH4c8E=;
+        h=Date:From:To:Subject:From;
+        b=F0J4iT8FWvpi7Bm+FNdZZbeUlTt7YC6nldhbIaLU6+EZ4mFrYrG57gaPR6bDOT+pn
+         e2xrivmYguP2fy0//Kfpd2yDPDeA8u5Vp+mSGn8jbkdQyqXxgBj/pGWVRzPrZ3e8xE
+         qxiydPDMZ40/O71OBWMLh50cFODxgLTh0NZF/VtoD1fokgdCuZK488FAD6qTXs2ZPb
+         UWyaKw5QR5Le4OVgWJpRfdu+CcYjCiOrxIm0cWiX+JnEajrT8liNhDtNi8ORVnSuUy
+         THD9mtu3iWwF7aXk7MDIF1dlP/8f+6GZg6p4KqDIAlsg6eNlh8KkSTeuNwn/8rgCwI
+         U2KjFNrdWsshg==
+Received: by nodbug.lucina.net (Postfix, from userid 1000)
+        id 2F565268437A; Tue, 21 May 2019 09:24:34 +0200 (CEST)
+Date:   Tue, 21 May 2019 09:24:34 +0200
+From:   Martin Lucina <martin@lucina.net>
+To:     kvm@vger.kernel.org
+Subject: Interaction between host-side mprotect() and KVM MMU
+Message-ID: <20190521072434.p4rtnbkerk5jqwh4@nodbug.lucina.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+Hi all,
 
-Allow guest reads CORE cstate when exposing host CPU power management capabilities 
-to the guest. PKG cstate is restricted to avoid a guest to get the whole package 
-information in multi-tenant scenario.
+as part of an effort to enforce W^X for the KVM backend of Solo5 [1], I'm
+trying to understand how host-side mprotect() interacts with the KVM MMU.
 
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- linux-headers/linux/kvm.h | 4 +++-
- target/i386/kvm.c         | 3 ++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
+Take a KVM guest on x86_64, where the guest runs exclusively in long mode,
+in virtual ring 0, using 1:1 2MB pages in the guest, and all guest page
+tables are RWX, i.e. no memory protection is enforced inside the guest
+itself. EPT is enabled on the host.
 
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index b53ee59..d648fde 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -696,9 +696,11 @@ struct kvm_ioeventfd {
- #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
- #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
- #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
-+#define KVM_X86_DISABLE_EXITS_CSTATE         (1 << 3)
- #define KVM_X86_DISABLE_VALID_EXITS          (KVM_X86_DISABLE_EXITS_MWAIT | \
-                                               KVM_X86_DISABLE_EXITS_HLT | \
--                                              KVM_X86_DISABLE_EXITS_PAUSE)
-+                                              KVM_X86_DISABLE_EXITS_PAUSE | \
-+                                              KVM_X86_DISABLE_EXITS_CSTATE)
- 
- /* for KVM_ENABLE_CAP */
- struct kvm_enable_cap {
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 3b29ce5..49a0cc1 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1645,7 +1645,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         if (disable_exits) {
-             disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
-                               KVM_X86_DISABLE_EXITS_HLT |
--                              KVM_X86_DISABLE_EXITS_PAUSE);
-+                              KVM_X86_DISABLE_EXITS_PAUSE |
-+                              KVM_X86_DISABLE_EXITS_CSTATE);
-         }
- 
-         ret = kvm_vm_enable_cap(s, KVM_CAP_X86_DISABLE_EXITS, 0,
--- 
-2.7.4
+Instead, our ELF loader applies a host-side mprotect(PROT_...) based on the
+protection bits in the guest application (unikernel) ELF PHDRs.
 
+The observed behaviour I see, from tests run inside the guest:
+
+1. Attempting to WRITE to .text which has had mprotect(PROT_READ |
+PROT_EXEC) applied on the host side results in a EFAULT from KVM_RUN in the
+userspace tender (our equivalent of a VMM).
+
+2. Attempting to EXECUTE code in .data which has had mprotect(PROT_READ |
+PROT_WRITE) applied on the host side succeeds.
+
+Questions:
+
+a. Is this the intended behaviour, and can it be relied on? Note that
+KVM/aarch64 behaves the same for me.
+
+b. Why does case (1) fail but case (2) succeed? I spent a day reading
+through the KVM MMU code, but failed to understand how this is implemented.
+
+c. In order to enforce W^X both ways I'd like to have case (2) also fail
+with EFAULT, is this possible?
+
+Martin
+
+[1] https://github.com/Solo5/solo5
