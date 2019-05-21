@@ -2,67 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E35D42568A
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 19:22:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77BA72573C
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 20:06:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729164AbfEURWF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 May 2019 13:22:05 -0400
-Received: from shelob.surriel.com ([96.67.55.147]:37336 "EHLO
-        shelob.surriel.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728127AbfEURWF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 May 2019 13:22:05 -0400
-Received: from [2603:3005:d05:2b00:6e0b:84ff:fee2:98bb] (helo=imladris.surriel.com)
-        by shelob.surriel.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
-        (Exim 4.91)
-        (envelope-from <riel@shelob.surriel.com>)
-        id 1hT8Si-0004YY-3a; Tue, 21 May 2019 13:22:04 -0400
-Date:   Tue, 21 May 2019 13:22:00 -0400
-From:   Rik van Riel <riel@surriel.com>
-To:     "Paolo Bonzini" <pbonzini@redhat.com>
-Cc:     kernel-team@fb.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "Radim =?UTF-8?B?S3LEjW3DocWZ?=" <rkrcmar@redhat.com>
-Subject: [PATCH] kvm: change KVM_REQUEST_MASK to reflect vcpu.requests size
-Message-ID: <20190521132200.2b45c029@imladris.surriel.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1728500AbfEUSGU convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 21 May 2019 14:06:20 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:59076 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727898AbfEUSGU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 May 2019 14:06:20 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 5338E28AE0
+        for <kvm@vger.kernel.org>; Tue, 21 May 2019 18:06:19 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 455F628ADD; Tue, 21 May 2019 18:06:19 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+        pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.9 required=2.0 tests=BAYES_00,NO_RECEIVED,
+        NO_RELAYS autolearn=unavailable version=3.3.1
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 203543] Starting with kernel 5.1.0-rc6,  kvm_intel can no
+ longer be loaded in nested kvm/guests
+Date:   Tue, 21 May 2019 18:06:18 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: sean.j.christopherson@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-203543-28872-ed5vVVKp3S@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-203543-28872@https.bugzilla.kernel.org/>
+References: <bug-203543-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The code using KVM_REQUEST_MASK uses a pattern reminiscent of a bitmask:
+https://bugzilla.kernel.org/show_bug.cgi?id=203543
 
-	set_bit(req & KVM_REQUEST_MASK, &vcpu->requests);
+--- Comment #14 from Sean Christopherson (sean.j.christopherson@intel.com) ---
+I've verified reverting f93f7ede087f and e51bfdb68725 yields the exact same
+code as v5.2-rc1.  Can you please sanity check that v5.2-rc1 is indeed broken? 
+E.g. ensure there are no modified files when compiling and include the git
+commit id in the kernel name.
 
-However, the first argument passed to set_bit, test_bit, and clear_bit
-is a bit number, not a bitmask. That means the current definition would
-allow users of kvm_make_request to overflow the vcpu.requests bitmask,
-and is confusing to developers examining the code.
-
-Redefine KVM_REQUEST_MASK to reflect the number of bits that actually
-fit inside an unsigned long, and add a comment explaining set_bit and
-friends take bit numbers, not a bitmask.
-
-Signed-off-by: Rik van Riel <riel@surriel.com>
----
- include/linux/kvm_host.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 79fa4426509c..d15fb43d7796 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -138,7 +138,8 @@ static inline bool is_error_page(struct page *page)
- 	return IS_ERR(page);
- }
- 
--#define KVM_REQUEST_MASK           GENMASK(7,0)
-+/* Limit the bit numbers for set_bit etc to fit unsigned long vcpu.requests. */
-+#define KVM_REQUEST_MASK           (BITS_PER_LONG-1)
- #define KVM_REQUEST_NO_WAKEUP      BIT(8)
- #define KVM_REQUEST_WAIT           BIT(9)
- /*
-
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
