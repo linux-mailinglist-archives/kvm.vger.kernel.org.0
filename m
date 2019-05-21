@@ -2,131 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F1A025581
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 18:24:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B23C025667
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 19:14:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728911AbfEUQYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 May 2019 12:24:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39834 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728858AbfEUQYk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 May 2019 12:24:40 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4368830833AF;
-        Tue, 21 May 2019 16:24:29 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1465F4387;
-        Tue, 21 May 2019 16:24:24 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id C3F6A5B423;
-        Tue, 21 May 2019 16:24:14 +0000 (UTC)
-Date:   Tue, 21 May 2019 12:24:14 -0400 (EDT)
-From:   Pankaj Gupta <pagupta@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org,
-        david@redhat.com, jasowang@redhat.com, david@fromorbit.com,
-        qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
-        dm-devel@redhat.com, adilger kernel <adilger.kernel@dilger.ca>,
-        zwisler@kernel.org, aarcange@redhat.com,
-        dave jiang <dave.jiang@intel.com>, jstaron@google.com,
-        linux-nvdimm@lists.01.org,
-        vishal l verma <vishal.l.verma@intel.com>,
-        willy@infradead.org, hch@infradead.org, linux-acpi@vger.kernel.org,
-        jmoyer@redhat.com, linux-ext4@vger.kernel.org, lenb@kernel.org,
-        kilobyte@angband.pl, rdunlap@infradead.org, riel@surriel.com,
-        yuval shaia <yuval.shaia@oracle.com>, stefanha@redhat.com,
-        pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>,
-        lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-        tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-        snitzer@redhat.com, darrick wong <darrick.wong@oracle.com>,
-        rjw@rjwysocki.net, linux-kernel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        imammedo@redhat.com
-Message-ID: <176786650.30122184.1558455854322.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190521094543-mutt-send-email-mst@kernel.org>
-References: <20190521133713.31653-1-pagupta@redhat.com> <20190521133713.31653-3-pagupta@redhat.com> <20190521094543-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v10 2/7] virtio-pmem: Add virtio pmem
- driver
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.105, 10.4.195.14]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: 3AiQ7PJb9jLe5p+DRlEZBNdQ18HFYA==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Tue, 21 May 2019 16:24:39 +0000 (UTC)
+        id S1729057AbfEUROw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 May 2019 13:14:52 -0400
+Received: from mail-ot1-f73.google.com ([209.85.210.73]:44535 "EHLO
+        mail-ot1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726900AbfEUROw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 May 2019 13:14:52 -0400
+Received: by mail-ot1-f73.google.com with SMTP id o98so8769618ota.11
+        for <kvm@vger.kernel.org>; Tue, 21 May 2019 10:14:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=H9evgUtJKk9iOh7s92VoABd87c19KFvCz9OXqkkAR5Y=;
+        b=FSVq4k3IgzVdLTFdIe8okEbWjo9vwGx6zzWcZ4gR25d5HhwRfuwewjMecO2CSIYyfk
+         xE6yTDp7d1bESO6kZIKFN0/zoyctYMlP5XjTMoGs9krMQOnPdyWAVLBVMHD3wZfmjI6S
+         Y1j/482ukx3gJY7ewSPEaIRLeWIRigCoZ/PCP52zJWQYbTOuHX1sFkP6i07WPXC0EZ2z
+         qRGeu0/rq4tkQsIqnNfdPeIMblM63x8wtiPuLo6oWtjjdTeq9y9319Gj6U+D0dG1gydP
+         4KKRJGsF7QoUDvxfM1/jWPDLoPUpTIE1mAYROy9554ASuV6pXraHdFT44OOjauQeUksz
+         dELw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=H9evgUtJKk9iOh7s92VoABd87c19KFvCz9OXqkkAR5Y=;
+        b=Y/sYNvxaz59eFfoUkXkEdjWcVxZcFoKGjD+BzKCxD/55Wds1wSB6G5FYSsWfi1nbA0
+         LwwVQgFBsqply+2mm3Y1qrd6b6FTVEfUy9GQv81vRN1rTpOSEPjZyDxAoeg3ecmjZSKS
+         +bXNL0tg1SwIwmgrP8RxUgCA694Psu48Um1FEwr6tEMkg8KjoomF68ul13BeoYbIqUpF
+         fWxRddoxotsDEobEcN6yphhf2cvs9rzQ7htdRwrMNrftAihsQDI2PGyGRxF5F4WQckCu
+         IcT4pWb9ZiaaHuuWPWExUoGdAzLYxvk4C5xda0lUYuIo1ARAQzi+Pq8mevXnokOJcS0t
+         FYsw==
+X-Gm-Message-State: APjAAAUkdYV8ACnmGZHYjOb5yIFvpSa+pmJ1sFqxHDb30WrqnbT2vUmY
+        twZRi313udj6MZ1PGlUjVC4qBxTnZLuj7WS3
+X-Google-Smtp-Source: APXvYqxA1/SkRyXS78iGWR++jmybxmYnyHrRuF9qm+iSxFU+cf5G/E+GzkrrZHcpQy5Ba+VGPuKntXkCIMkSPdhk
+X-Received: by 2002:aca:5517:: with SMTP id j23mr4161792oib.17.1558458891361;
+ Tue, 21 May 2019 10:14:51 -0700 (PDT)
+Date:   Tue, 21 May 2019 10:13:58 -0700
+Message-Id: <20190521171358.158429-1-aaronlewis@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.21.0.1020.gf2820cf01a-goog
+Subject: [PATCH] kvm: tests: Sort tests in the Makefile alphabetically
+From:   Aaron Lewis <aaronlewis@google.com>
+To:     jmattson@google.com, pshier@google.com, marcorr@google.com,
+        kvm@vger.kernel.org
+Cc:     Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+Reviewed-by: Peter Shier <pshier@google.com>
+---
+ tools/testing/selftests/kvm/Makefile | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-> > diff --git a/include/uapi/linux/virtio_pmem.h
-> > b/include/uapi/linux/virtio_pmem.h
-> > new file mode 100644
-> > index 000000000000..7a3e2fe52415
-> > --- /dev/null
-> > +++ b/include/uapi/linux/virtio_pmem.h
-> > @@ -0,0 +1,35 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
-> > +/*
-> > + * Definitions for virtio-pmem devices.
-> > + *
-> > + * Copyright (C) 2019 Red Hat, Inc.
-> > + *
-> > + * Author(s): Pankaj Gupta <pagupta@redhat.com>
-> > + */
-> > +
-> > +#ifndef _UAPI_LINUX_VIRTIO_PMEM_H
-> > +#define _UAPI_LINUX_VIRTIO_PMEM_H
-> > +
-> > +#include <linux/types.h>
-> > +#include <linux/virtio_types.h>
-> > +#include <linux/virtio_ids.h>
-> > +#include <linux/virtio_config.h>
-> > +
-> > +struct virtio_pmem_config {
-> > +	__le64 start;
-> > +	__le64 size;
-> > +};
-> > +
-> 
-> config generally should be __u64.
-> Are you sure sparse does not complain?
-
-I used this because VIRTIO 1.1 spec says: 
-"The device configuration space uses the little-endian format for multi-byte fields. "
-
-and __le64 looks ok to me. Also, its used in other driver config as welle.g virtio-vsock
-
-> 
-> 
-> > +#define VIRTIO_PMEM_REQ_TYPE_FLUSH      0
-> > +
-> > +struct virtio_pmem_resp {
-> > +	/* Host return status corresponding to flush request */
-> > +	__virtio32 ret;
-> > +};
-> > +
-> > +struct virtio_pmem_req {
-> > +	/* command type */
-> > +	__virtio32 type;
-> > +};
-> > +
-> > +#endif
-> > --
-> > 2.20.1
-> 
-> Sorry why are these __virtio32 not __le32?
-
-I used __virtio32 for data fields for guest and host supporting different endianess.
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 79c524395ebe..234f679fa5ad 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -10,23 +10,23 @@ LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/ucall.c lib/sparsebi
+ LIBKVM_x86_64 = lib/x86_64/processor.c lib/x86_64/vmx.c
+ LIBKVM_aarch64 = lib/aarch64/processor.c
  
-Thanks,
-Pankaj
-> 
-> --
-> MST
-> 
-> 
+-TEST_GEN_PROGS_x86_64 = x86_64/platform_info_test
+-TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
+-TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
+-TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
+-TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
+-TEST_GEN_PROGS_x86_64 += x86_64/state_test
++TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
+ TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
+-TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
+-TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+ TEST_GEN_PROGS_x86_64 += x86_64/kvm_create_max_vcpus
++TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
++TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
++TEST_GEN_PROGS_x86_64 += x86_64/smm_test
++TEST_GEN_PROGS_x86_64 += x86_64/state_test
++TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
++TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
+-TEST_GEN_PROGS_x86_64 += dirty_log_test
++TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
+ TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
++TEST_GEN_PROGS_x86_64 += dirty_log_test
+ 
+-TEST_GEN_PROGS_aarch64 += dirty_log_test
+ TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
++TEST_GEN_PROGS_aarch64 += dirty_log_test
+ 
+ TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
+ LIBKVM += $(LIBKVM_$(UNAME_M))
+-- 
+2.21.0.1020.gf2820cf01a-goog
+
