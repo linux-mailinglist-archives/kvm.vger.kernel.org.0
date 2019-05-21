@@ -2,62 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 475F6247BF
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 08:07:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18719247EC
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 08:17:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727926AbfEUGHG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 May 2019 02:07:06 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:39078 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726719AbfEUGHG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 May 2019 02:07:06 -0400
-Received: by mail-pf1-f196.google.com with SMTP id z26so8478948pfg.6;
-        Mon, 20 May 2019 23:07:05 -0700 (PDT)
+        id S1727910AbfEUGRw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 May 2019 02:17:52 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:42043 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725885AbfEUGRv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 May 2019 02:17:51 -0400
+Received: by mail-pf1-f195.google.com with SMTP id 13so8489701pfw.9
+        for <kvm@vger.kernel.org>; Mon, 20 May 2019 23:17:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=T2f0j+HcR+Hm2808+uYZ0INzAMJinwKKeoQwZ5KAAMI=;
-        b=AfTgyoeXL7FvsFCYPAMw2WB6WEYULcybTi8Y4feHwmKhP32/yEDF7uQVjZCOD1BOyH
-         MJkOKTFQTBy+9FR9fykBAuRzjhuYIMFY6LOJUotbnevwBeiCealuEvvzdv3t2799rSeh
-         feljqw21jIYZLBfOMhKN3jDfh0PVDpcDsPpfqP5aVrv9DhEllO5x4ASFWNKqThoN0Trj
-         Pazimk3nOviXHAB3wyl0VbQ4Dvwd0M1zmMDIGhszXhuKzZBxsh3LgR5NKRWv1Mn59Jvv
-         PsuPJ+NDlziuakmxo10qlB5hxKS4p10i44atoayaiRyldpDnMGCuZU3fIIlhqQMllRV2
-         s12Q==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=J0uuieNJWIEqFucVVL6HHob/1V+xJ9X3pNwzM9VDJZ0=;
+        b=iAILzZqNIPswUqlH8JOZ7+vNDvmfXLVoXJIxX2pMr6K+W+bYWxejR2GHSWRq5E47A9
+         +VOfS8YbrQHfhFr7ihHe+UDBs8GsWPVm81gOqbikTXUXTinXaK5hYC9uAXP7euPrkAfO
+         W3z6pM1PlpsNwjc9CsNyroG7N/i0J/9W/pNuTtwQQA+p2+FPHbalQl4hDooMHBBpiEN5
+         2kicJrYTxu1HzkN0+pbwtNM4BG2RgcgDdPdSPEQ4ZAXh+ARZzdnmstNsaTbUrM8BeTh3
+         EawOZc3DzJIcULJcNysgL7W1kitDu+KytOK29j4bZlaQ3PjMG64tGQ/8f/P6Cc5JOZOR
+         NJ1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=T2f0j+HcR+Hm2808+uYZ0INzAMJinwKKeoQwZ5KAAMI=;
-        b=H6n6IGbTdFraDRn3h0z+dcRso0p4U3dY16rK6MTppkkRZZ80a5TUAS09RzCtJA0ITz
-         C3adAMALZp3Tq+s5qCwUiLzQBO+9gGYbbv++srOxgWGQ49F92k9iDE9cXpHfw+u0R9kf
-         ZH2BfXnvF6xPTymtf7a3nYF3IdHbpdXoCTylz+qyJCujuLxSk6HkVyHJn9eiw8ycibno
-         MX+f9socNtkqWQlh5/4vCzJN+dkCLqttbe1vNl46Y6BzTW9ls3J0WzYgDf1F8biIEfiC
-         TnP5BM4nggxXvoMj9TURH32ltJhLDU7sJ5iYmRaH/PrZIeG3OH2vBuRmC3suimQi5sKs
-         XB3g==
-X-Gm-Message-State: APjAAAXz+Px93naRAUKj5iV4RAteatoy0mFyCdnpGzyzvFAy0oJ387Yw
-        /k1rQX+arNP+IO1SXIf39CuCOLb1
-X-Google-Smtp-Source: APXvYqwK/Tl2RHm3mvIPhxToSh/2lEv1avoEWuM3BPxoT0DKr2jUctRvx8kGLha9eTQMMOzFVdc1+g==
-X-Received: by 2002:a63:495e:: with SMTP id y30mr37000742pgk.185.1558418825234;
-        Mon, 20 May 2019 23:07:05 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=J0uuieNJWIEqFucVVL6HHob/1V+xJ9X3pNwzM9VDJZ0=;
+        b=pFNOxJSs/Kp/0Yd766UM6+Vt30FG9MZ2sZrQ9GTJShjIsZaANNH1/ULQA3K8fIRRB7
+         qsQPlfyeaqjYItyWyWRCDdcdhQM4oirpcVowCPKsR09MisBaKzGyLKHyk7Qk2clyizul
+         N2Rk3Wrl/+b80/fot8Y9xLXCZV/iBUtfpCAfCKk5dX4P77DnZVclnOf20wwhcBq5bKmv
+         WQMUetZ4nJOYczl4Zae4euIUP9j3NChGraRfhDYm6hoXMYFMrBg1u7w5kXYcoev2JHE9
+         kQDJlt9wZN6k6mg8FH4dEeSPawZe14AerUN3/86OXZS/3xcfbRP4oDG6RdHGS2MGVaPp
+         953A==
+X-Gm-Message-State: APjAAAXPqX6dVrDKakrkYad9y7Eh0Y0KjAhK+bZWOJTf90aK+51co4E6
+        E/pYh1snuFjhDpoSEcAUEGk=
+X-Google-Smtp-Source: APXvYqw2zFKfTVHfge7XSBqtWwR0RD497wZjCcT/BNKF+0TPFWkQe97zoVI6lF5pwDcUzRZL6LH/JQ==
+X-Received: by 2002:a63:1460:: with SMTP id 32mr80416982pgu.319.1558419471484;
+        Mon, 20 May 2019 23:17:51 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id a15sm2351484pgv.4.2019.05.20.23.07.03
+        by smtp.googlemail.com with ESMTPSA id o66sm23112295pfb.184.2019.05.20.23.17.49
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 20 May 2019 23:07:04 -0700 (PDT)
+        Mon, 20 May 2019 23:17:51 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+To:     qemu-devel@nongnu.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Subject: [PATCH v2 3/3] KVM: X86: Emulate MSR_IA32_MISC_ENABLE MWAIT bit
-Date:   Tue, 21 May 2019 14:06:54 +0800
-Message-Id: <1558418814-6822-3-git-send-email-wanpengli@tencent.com>
+        Eduardo Habkost <ehabkost@redhat.com>
+Subject: [PATCH] kvm: support guest access CORE cstate
+Date:   Tue, 21 May 2019 14:17:47 +0800
+Message-Id: <1558419467-7155-1-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1558418814-6822-1-git-send-email-wanpengli@tencent.com>
-References: <1558418814-6822-1-git-send-email-wanpengli@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -68,92 +64,50 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-MSR IA32_MISC_ENABLE bit 18, according to SDM:
+Allow guest reads CORE cstate when exposing host CPU power management capabilities 
+to the guest. PKG cstate is restricted to avoid a guest to get the whole package 
+information in multi-tenant scenario.
 
-| When this bit is set to 0, the MONITOR feature flag is not set (CPUID.01H:ECX[bit 3] = 0).
-| This indicates that MONITOR/MWAIT are not supported.
-|
-| Software attempts to execute MONITOR/MWAIT will cause #UD when this bit is 0.
-|
-| When this bit is set to 1 (default), MONITOR/MWAIT are supported (CPUID.01H:ECX[bit 3] = 1).
-
-The CPUID.01H:ECX[bit 3] ought to mirror the value of the MSR bit,
-CPUID.01H:ECX[bit 3] is a better guard than kvm_mwait_in_guest().
-kvm_mwait_in_guest() affects the behavior of MONITOR/MWAIT, not its
-guest visibility.
-
-This patch implements toggling of the CPUID bit based on guest writes
-to the MSR.
-
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Cc: Liran Alon <liran.alon@oracle.com>
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
-v1 -> v2:
- * hide behind KVM_CAP_DISABLE_QUIRKS
+ linux-headers/linux/kvm.h | 4 +++-
+ target/i386/kvm.c         | 3 ++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
- arch/x86/include/uapi/asm/kvm.h |  1 +
- arch/x86/kvm/cpuid.c            | 10 ++++++++++
- arch/x86/kvm/x86.c              | 10 ++++++++++
- 3 files changed, 21 insertions(+)
-
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 7a0e64c..e3ae96b5 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -382,6 +382,7 @@ struct kvm_sync_regs {
- #define KVM_X86_QUIRK_CD_NW_CLEARED	(1 << 1)
- #define KVM_X86_QUIRK_LAPIC_MMIO_HOLE	(1 << 2)
- #define KVM_X86_QUIRK_OUT_7E_INC_RIP	(1 << 3)
-+#define KVM_X86_QUIRK_MISC_ENABLE_MWAIT (1 << 4)
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index b53ee59..d648fde 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -696,9 +696,11 @@ struct kvm_ioeventfd {
+ #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
+ #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
+ #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
++#define KVM_X86_DISABLE_EXITS_CSTATE         (1 << 3)
+ #define KVM_X86_DISABLE_VALID_EXITS          (KVM_X86_DISABLE_EXITS_MWAIT | \
+                                               KVM_X86_DISABLE_EXITS_HLT | \
+-                                              KVM_X86_DISABLE_EXITS_PAUSE)
++                                              KVM_X86_DISABLE_EXITS_PAUSE | \
++                                              KVM_X86_DISABLE_EXITS_CSTATE)
  
- #define KVM_STATE_NESTED_GUEST_MODE	0x00000001
- #define KVM_STATE_NESTED_RUN_PENDING	0x00000002
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index e18a9f9..f54d266 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -137,6 +137,16 @@ int kvm_update_cpuid(struct kvm_vcpu *vcpu)
- 		(best->eax & (1 << KVM_FEATURE_PV_UNHALT)))
- 		best->eax &= ~(1 << KVM_FEATURE_PV_UNHALT);
+ /* for KVM_ENABLE_CAP */
+ struct kvm_enable_cap {
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 3b29ce5..49a0cc1 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1645,7 +1645,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         if (disable_exits) {
+             disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
+                               KVM_X86_DISABLE_EXITS_HLT |
+-                              KVM_X86_DISABLE_EXITS_PAUSE);
++                              KVM_X86_DISABLE_EXITS_PAUSE |
++                              KVM_X86_DISABLE_EXITS_CSTATE);
+         }
  
-+	if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_MWAIT)) {
-+		best = kvm_find_cpuid_entry(vcpu, 0x1, 0);
-+		if (best) {
-+			if (vcpu->arch.ia32_misc_enable_msr & MSR_IA32_MISC_ENABLE_MWAIT)
-+				best->ecx |= F(MWAIT);
-+			else
-+				best->ecx &= ~F(MWAIT);
-+		}
-+	}
-+
- 	/* Update physical-address width */
- 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
- 	kvm_mmu_reset_context(vcpu);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 765fe59..a4eb711 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2547,6 +2547,16 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		}
- 		break;
- 	case MSR_IA32_MISC_ENABLE:
-+		if (kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_MWAIT) &&
-+			((vcpu->arch.ia32_misc_enable_msr ^ data) & MSR_IA32_MISC_ENABLE_MWAIT)) {
-+			if ((vcpu->arch.ia32_misc_enable_msr & MSR_IA32_MISC_ENABLE_MWAIT) &&
-+				!(data & MSR_IA32_MISC_ENABLE_MWAIT)) {
-+				if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
-+					return 1;
-+			}
-+			vcpu->arch.ia32_misc_enable_msr = data;
-+			kvm_update_cpuid(vcpu);
-+		}
- 		vcpu->arch.ia32_misc_enable_msr = data;
- 		break;
- 	case MSR_IA32_SMBASE:
+         ret = kvm_vm_enable_cap(s, KVM_CAP_X86_DISABLE_EXITS, 0,
 -- 
 2.7.4
 
