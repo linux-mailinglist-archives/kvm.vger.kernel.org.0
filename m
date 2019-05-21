@@ -2,58 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0566724F70
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 14:57:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C49FB24F71
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 14:57:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728246AbfEUM5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 May 2019 08:57:23 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:36731 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728243AbfEUM5X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 May 2019 08:57:23 -0400
-Received: by mail-qt1-f194.google.com with SMTP id a17so20339390qth.3
-        for <kvm@vger.kernel.org>; Tue, 21 May 2019 05:57:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=/rCiM/B8HfGH2ohVDNoGZetNTIGm0MPIRR/CHY2PtpA=;
-        b=BL/imHa0gGmyV1BVL/yzJUO+GJBoFyZHL/SZ4WvkUhJ54ESduBGNSsPFR998eSrY26
-         RUe10cudvVeEt4EwTjvRhL5ZXzPzn3uxq29wQrrz6kcOZF4hhDQxS/vfMbPQBuhjXwRg
-         TW+9NpiA5tP+ZRg8mmUm+x4NZlqwiYQUh/E1v0kZ8WnY87krq+9SO9II4o+8FzkO9N+1
-         +NfCeFeH8axgkMyhC1F/+eu3JwLUWBnIp7hu55dkFdfJJF0l0AL7fZ0vR+GPtdDxlRFQ
-         IzG5xDOJxCKKQvjJfELPegzUKVcGiCr/uc8YHT1Z+AwnEUlUN1SP9+7Rky/K9uMSPjwX
-         2AZg==
-X-Gm-Message-State: APjAAAULiIDsJpYZnJXYFPyfhzYulb6fGnHzLrp8fXRBMEQDKZ7pJl2U
-        Epr/TS5PC927RGDbyIPLoF8cqLAFGL0=
-X-Google-Smtp-Source: APXvYqx5XKAivp4pqYhySy/3k0croeVWZQceSjJkVpUXaPc7RmrK3vQSH053MUsNl/8YOvHrCLwlMA==
-X-Received: by 2002:a0c:b5ad:: with SMTP id g45mr39767457qve.231.1558443441539;
-        Tue, 21 May 2019 05:57:21 -0700 (PDT)
-Received: from knox.orion (modemcable053.167-176-173.mc.videotron.ca. [173.176.167.53])
-        by smtp.gmail.com with ESMTPSA id 29sm11019287qty.87.2019.05.21.05.57.20
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 21 May 2019 05:57:20 -0700 (PDT)
-Subject: Re: [Bug 203543] Starting with kernel 5.1.0-rc6, kvm_intel can no
+        id S1728248AbfEUM50 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 21 May 2019 08:57:26 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:58978 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726692AbfEUM50 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 21 May 2019 08:57:26 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 3F41F28A12
+        for <kvm@vger.kernel.org>; Tue, 21 May 2019 12:57:25 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 311D328A13; Tue, 21 May 2019 12:57:25 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+        pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.9 required=2.0 tests=BAYES_00,NO_RECEIVED,
+        NO_RELAYS autolearn=unavailable version=3.3.1
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 203543] Starting with kernel 5.1.0-rc6,  kvm_intel can no
  longer be loaded in nested kvm/guests
-To:     bugzilla-daemon@bugzilla.kernel.org, kvm@vger.kernel.org
+Date:   Tue, 21 May 2019 12:57:24 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: dhill@redhat.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-203543-28872-h0GAHaPjlz@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-203543-28872@https.bugzilla.kernel.org/>
 References: <bug-203543-28872@https.bugzilla.kernel.org/>
- <bug-203543-28872-mCpNTawwAw@https.bugzilla.kernel.org/>
-From:   David Hill <dhill@redhat.com>
-Message-ID: <45af4e87-92f9-b876-5700-4202a0837857@redhat.com>
-Date:   Tue, 21 May 2019 08:57:19 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-In-Reply-To: <bug-203543-28872-mCpNTawwAw@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=203543
+
+--- Comment #9 from dhill@redhat.com ---
 Hi guys,
 
     I justed tested kernel 5.2.1-rc1 which contains the following commit 
@@ -141,7 +145,8 @@ On 2019-05-08 6:14 p.m., bugzilla-daemon@bugzilla.kernel.org wrote:
 > What is the reason that KVM relies on CPU_BASED_RDPMC_EXITING to be exposed
 > from underlying CPU? How is it critical for it’s functionality?
 > If it’s because we want to make sure that we hide host PMCs, we should
-> condition this to be a min requirement of kvm_intel only in case underlying CPU
+> condition this to be a min requirement of kvm_intel only in case underlying
+> CPU
 > exposes PMU to begin with.
 > Do you agree? If yes, I can create the patch to fix this.
 >
@@ -150,13 +155,19 @@ On 2019-05-08 6:14 p.m., bugzilla-daemon@bugzilla.kernel.org wrote:
 >> On 8 May 2019, at 16:51, bugzilla-daemon@bugzilla.kernel.org wrote:
 >>
 >>
+>>
 >> https://urldefense.proofpoint.com/v2/url?u=https-3A__bugzilla.kernel.org_show-5Fbug.cgi-3Fid-3D203543&d=DwIDaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=Jk6Q8nNzkQ6LJ6g42qARkg6ryIDGQr-yKXPNGZbpTx0&m=7TirfLMNxYI-3Ygxm3kjDUB49Jwmk8bqD7671wy0hi8&s=Z_L1UqH19zon0ohDrCMU91ixA-Wn_vO7d-fO8s2G3PI&e=
 >>
 >> --- Comment #5 from David Hill (hilld@binarystorm.net) ---
 >> I can confirm that reverting that commit solves the problem:
 >>
->> e51bfdb68725 ("KVM: nVMX: Expose RDPMC-exiting only when guest supports PMU”)
+>> e51bfdb68725 ("KVM: nVMX: Expose RDPMC-exiting only when guest supports
+>> PMU”)
 >>
 >> -- 
 >> You are receiving this mail because:
 >> You are watching the assignee of the bug.
+
+-- 
+You are receiving this mail because:
+You are watching the assignee of the bug.
