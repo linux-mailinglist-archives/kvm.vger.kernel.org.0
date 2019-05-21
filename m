@@ -2,94 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F03B2540A
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 17:34:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED89E2542F
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2019 17:39:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728967AbfEUPes (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 May 2019 11:34:48 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41240 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728950AbfEUPes (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 21 May 2019 11:34:48 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4LFSFVI044828
-        for <kvm@vger.kernel.org>; Tue, 21 May 2019 11:34:47 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2smkdhj8yr-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 21 May 2019 11:34:47 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Tue, 21 May 2019 16:34:44 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 21 May 2019 16:34:42 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4LFYeMX43515916
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 21 May 2019 15:34:41 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DE392AE053;
-        Tue, 21 May 2019 15:34:40 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4FFFFAE056;
-        Tue, 21 May 2019 15:34:40 +0000 (GMT)
-Received: from morel-ThinkPad-W530.boeblingen.de.ibm.com (unknown [9.152.222.56])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 21 May 2019 15:34:40 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     borntraeger@de.ibm.com
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, frankja@linux.ibm.com, akrowiak@linux.ibm.com,
-        pasic@linux.ibm.com, david@redhat.com, schwidefsky@de.ibm.com,
-        heiko.carstens@de.ibm.com, freude@linux.ibm.com, mimu@linux.ibm.com
-Subject: [PATCH v9 4/4] s390: ap: kvm: Enable PQAP/AQIC facility for the guest
-Date:   Tue, 21 May 2019 17:34:37 +0200
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1558452877-27822-1-git-send-email-pmorel@linux.ibm.com>
-References: <1558452877-27822-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19052115-0012-0000-0000-0000031E0270
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052115-0013-0000-0000-00002156B413
-Message-Id: <1558452877-27822-5-git-send-email-pmorel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-21_03:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=808 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905210096
+        id S1728662AbfEUPjq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 21 May 2019 11:39:46 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:59490 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728435AbfEUPjp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 21 May 2019 11:39:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1558453184; x=1589989184;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=WfztY7zZ4LiPHFhQ5Ww3a/tWVFfo4DHyPMlNscacqJA=;
+  b=D3+HXFPfDCpCl6Nu/VhwhF8OtmvktWUen0K5qlyePs21ODuAUSxxsR5w
+   d2OgoTS9iekZJzv976VDF0ypwicoY6vFchWTbNYSy/+CsVX9PSV3pRxcB
+   IVuZhnhAtaZli/2WmtOcPhDQi7JfyWnNANcJTJvA03e/89ZAi4H2Ylhs4
+   U=;
+X-IronPort-AV: E=Sophos;i="5.60,495,1549929600"; 
+   d="scan'208";a="800925985"
+Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-1d-9ec21598.us-east-1.amazon.com) ([10.47.22.34])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP/TLS/DHE-RSA-AES256-SHA; 21 May 2019 15:39:42 +0000
+Received: from EX13MTAUEB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1d-9ec21598.us-east-1.amazon.com (8.14.7/8.14.7) with ESMTP id x4LFdbVg109786
+        (version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=FAIL);
+        Tue, 21 May 2019 15:39:37 GMT
+Received: from EX13D08UEB003.ant.amazon.com (10.43.60.11) by
+ EX13MTAUEB001.ant.amazon.com (10.43.60.129) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Tue, 21 May 2019 15:39:37 +0000
+Received: from EX13MTAUWA001.ant.amazon.com (10.43.160.58) by
+ EX13D08UEB003.ant.amazon.com (10.43.60.11) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Tue, 21 May 2019 15:39:36 +0000
+Received: from uc2253769c0055c.ant.amazon.com (10.28.85.98) by
+ mail-relay.amazon.com (10.43.160.118) with Microsoft SMTP Server id
+ 15.0.1367.3 via Frontend Transport; Tue, 21 May 2019 15:39:32 +0000
+From:   Sam Caccavale <samcacc@amazon.de>
+CC:     <samcacc@amazon.de>, <samcaccavale@gmail.com>,
+        <nmanthey@amazon.de>, <wipawel@amazon.de>, <dwmw@amazon.co.uk>,
+        <mpohlack@amazon.de>, <graf@amazon.de>, <karahmed@amazon.de>,
+        <andrew.cooper3@citrix.com>, <JBeulich@suse.com>,
+        <pbonzini@redhat.com>, <rkrcmar@redhat.com>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <bp@alien8.de>, <hpa@zytor.com>,
+        <paullangton4@gmail.com>, <anirudhkaushik@google.com>,
+        <x86@kernel.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: x86 instruction emulator fuzzing
+Date:   Tue, 21 May 2019 17:39:21 +0200
+Message-ID: <20190521153924.15110-1-samcacc@amazon.de>
+X-Mailer: git-send-email 2.17.1
+MIME-Version: 1.0
+Content-Type: text/plain
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-AP Queue Interruption Control (AQIC) facility gives
-the guest the possibility to control interruption for
-the Cryptographic Adjunct Processor queues.
+Dear all,
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
----
- arch/s390/tools/gen_facilities.c | 1 +
- 1 file changed, 1 insertion(+)
+This series aims to provide an entrypoint for, and fuzz KVM's x86 instruction
+emulator from userspace.  It mirrors Xen's application of the AFL fuzzer to
+it's instruction emulator in the hopes of discovering vulnerabilities.
+Since this entrypoint also allows arbitrary execution of the emulators code
+from userspace, it may also be useful for testing.
 
-diff --git a/arch/s390/tools/gen_facilities.c b/arch/s390/tools/gen_facilities.c
-index 61ce5b5..aed14fc 100644
---- a/arch/s390/tools/gen_facilities.c
-+++ b/arch/s390/tools/gen_facilities.c
-@@ -114,6 +114,7 @@ static struct facility_def facility_defs[] = {
- 		.bits = (int[]){
- 			12, /* AP Query Configuration Information */
- 			15, /* AP Facilities Test */
-+			65, /* AP Queue Interruption Control */
- 			156, /* etoken facility */
- 			-1  /* END */
- 		}
--- 
-2.7.4
+The current 3 patches build the emulator and 2 harnesses: simple-harness is
+an example of unit testing; afl-harness is a frontend for the AFL fuzzer.
+They are early POC and include some issues outlined under "Issues."
+
+Patches
+=======
+
+- 01: Builds and links afl-harness with the required kernel objects.
+- 02: Introduces the minimal set of emulator operations and supporting code
+to emulate simple instructions.
+- 03: Demonstrates simple-harness as a unit test.
+
+Issues
+=======
+
+1. Currently, building requires manually running the `make_deps` script
+since I was unable to make the kernel objects a dependency of the tool.
+2. The code will segfault if `CONFIG_STACKPROTECTOR=y` in config.
+3. The code requires stderr to be buffered or it otherwise segfaults.
+
+The latter two issues seem related and all of them are likely fixable by
+someone more familiar with the linux than me.
+
+Concerns
+=======
+
+I was able to carve the `arch/x86/kvm/emulate.c` code, but the emulator is
+constructed in such a way that a lot of the code which enforces expected
+behavior lives in the x86_emulate_ops supplied in `arch/x86/kvm/x86.c`.
+Testing the emulator is still valuable, but a reproducible way to use the kvm
+ops would be useful.
+
+Any comments/suggestions are greatly appreciated.
+
+Best,
+Sam Caccavale
+
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrer: Christian Schlaeger, Ralf Herbrich
+Ust-ID: DE 289 237 879
+Eingetragen am Amtsgericht Charlottenburg HRB 149173 B
+
 
