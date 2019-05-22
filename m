@@ -2,105 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 39BB627326
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 02:12:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F95527324
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 02:12:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728027AbfEWAMf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 May 2019 20:12:35 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:33071 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727790AbfEWAMe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 May 2019 20:12:34 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 458VLm50z9z9s1c; Thu, 23 May 2019 10:12:32 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1558570352;
-        bh=dEFSRRK6x3J1fbxwCbrJv4H0uXynvhKzsQwjaW77KF4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=cLxPptZ24fYDXsQYhK6nAlH+hQT3XfI8gKjXSIZ1HPkwil4fnNd7BL6oRDHZYAu+2
-         BGAbD5rgaCwm0w1oguktzZs5TXALgknFPJCra8IBUIDnW8fPGCYoUcUtafD4onoxM1
-         c/PhVr/4L8kDorWMPHIuvxy/fXNHBWTn1GbmyPw4=
-Date:   Thu, 23 May 2019 09:30:43 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 0/3] KVM: PPC: Book3S HV: XIVE: assorted fixes on vCPU
- and RAM limits
-Message-ID: <20190522233043.GO30423@umbus.fritz.box>
-References: <20190520071514.9308-1-clg@kaod.org>
+        id S1727734AbfEWAMZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 May 2019 20:12:25 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:44620 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726215AbfEWAMZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 May 2019 20:12:25 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4N047As121755;
+        Thu, 23 May 2019 00:12:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2018-07-02; bh=ZAx5pdqX1K1ipF4397VdY5xbElVquceEuaINwTGVVzw=;
+ b=JMAurhALYEUfFyPozYAF8M9uHDFteWrsQIrbQLft/l8JP+D41lE0vEjZMD80IJi/fzq5
+ lw1/A6z0whcU7lzTbtCTT9Odmd2+71FiRXCeCXHdPcOvBn3uIkp7b0BbhHbQ1PyZ+2f4
+ gfDc45HgDAzdf8dcYDRPtW8+UTtf8K2TlI2qf/UeURywXoiGN4Jhi84zup3WL316EgMP
+ F7qzBo1nBDU2Q4QOtfOdUoYW60OU6JZBCWG+fOwa6HrbZ3vft7w/QNElQir3RfQBLF+3
+ T+SxEr/08z8WaxOmkpLETgn0F11mj/vFMpfnWSMFVeJzsdFXq1ftQzBolf3d6tAH+hkQ 9w== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 2smsk5f43n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 23 May 2019 00:12:02 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4N0BPf9156758;
+        Thu, 23 May 2019 00:12:02 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 2smshewt26-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 23 May 2019 00:12:02 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4N0C166020235;
+        Thu, 23 May 2019 00:12:01 GMT
+Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 23 May 2019 00:12:00 +0000
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     rkrcmar@redhat.com, pbonzini@redhat.com, jmattson@google.com
+Subject: [PATCH 0/2] kvm-unit-test: nVMX: Test "Load IA32_EFER" VM-exit control on vmentry of nested guests
+Date:   Wed, 22 May 2019 19:45:43 -0400
+Message-Id: <20190522234545.5930-1-krish.sadhukhan@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="p2pkNiL1PnZBJ6Nr"
-Content-Disposition: inline
-In-Reply-To: <20190520071514.9308-1-clg@kaod.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=13 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=602
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905220168
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=13 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=657 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905220168
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Patch# 1 creates a wrapper for checking if the NX bit in MSR_EFER is enabled.
+It is used in patch# 2.
 
---p2pkNiL1PnZBJ6Nr
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Patch# 2 adds tests for "Load IA32_EFER" VM-exit control.
 
-On Mon, May 20, 2019 at 09:15:11AM +0200, C=E9dric Le Goater wrote:
-> Hello,
->=20
-> Here are a couple of fixes for issues in the XIVE KVM device when
-> testing the limits : RAM size and number of vCPUS.
 
-How serious are the problems these patches fix?  I'm wondering if I
-need to make a backport for RHEL8.1.
+[PATCH 1/2] kvm-unit-test: x86: Add a wrapper to check if the CPU supports NX bit in
+[PATCH 2/2] kvm-unit-test: nVMX: Test "Load IA32_EFER" VM-exit control on vmentry of
 
->=20
-> Based on 5.2-rc1.
->=20
-> Available on GitHub:
->=20
->     https://github.com/legoater/linux/commits/xive-5.2
->=20
-> Thanks,
->=20
-> C.=20
->=20
-> C=E9dric Le Goater (3):
->   KVM: PPC: Book3S HV: XIVE: clear file mapping when device is released
->   KVM: PPC: Book3S HV: XIVE: do not test the EQ flag validity when
->     reseting
->   KVM: PPC: Book3S HV: XIVE: fix the enforced limit on the vCPU
->     identifier
->=20
->  arch/powerpc/kvm/book3s_xive_native.c | 46 ++++++++++++++++-----------
->  1 file changed, 27 insertions(+), 19 deletions(-)
->=20
+ lib/x86/processor.h |   8 ++++
+ x86/vmexit.c        |   2 +-
+ x86/vmx_tests.c     | 121 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 130 insertions(+), 1 deletion(-)
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Krish Sadhukhan (2):
+      x86: Add a wrapper to check if the CPU supports NX bit in MSR_EFER
+      nVMX: Test "Load IA32_EFER" VM-exit control on vmentry of nested guests
 
---p2pkNiL1PnZBJ6Nr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzl26MACgkQbDjKyiDZ
-s5Kizg/+M0gnZlRTGg6UiTXSNFHRE5LAFKwsthsukXOg6JYSQqjTO9ZQncNmgOiD
-lookGUyfl74NCAWOBl81KtM3buphvnjHvSeknRh6JfN4uXgMx4r36KmaHvm3lR2s
-VQXhilkN1+gcUCAKUiEx/eVupW8+EQ4sI1xI/xraLwPRR3tWRH4n/ZrU2QR4U3Vg
-8TO/h20Qrrm1KqpvYcWbQi+bW2v8o8brSNy/BNRgA38lq6k/GHgv3J19so416wE9
-b3RWH63YT16Aa+1vrATLhsj2CCISyAuzjNBQKaE+knInQ4+PaZORr3NqgykJIOCR
-aKyGIPRDM7dwxTqFZj9IfKV1md9mSrpo+siRKv4JsvdQ7LmXoZrdSb2ETe83ehN+
-gtiOcIINuc973wU2Yy6zvbrm3AGfDeFCYzFNXYNyA4mFdRfRkm9GqChd/bZ7VDjx
-xhZSMn41gFtAMGr3uvarL2u3C7j8EK6FsZE5poOzplOkvsbGIEzDsMBnQGHOoTgu
-VUWH1rrXz51GUcdjfMaM+XlNZQdawfPlxiWBLwKPjxmwk4n1AWA2HTUchpTFIUO7
-eBpQBoHTsnAPJpSjJdLH5i6ZWdwQPVcCEBSlz5+q0qP7hEK6uzLdjMY2LvUi6w9I
-myqqLLpjCrSkDuqr8t3XQjR5na0/EksL2ralkXX4+DRVwd4gqW0=
-=Q3mK
------END PGP SIGNATURE-----
-
---p2pkNiL1PnZBJ6Nr--
