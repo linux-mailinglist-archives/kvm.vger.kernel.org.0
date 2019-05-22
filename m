@@ -2,83 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3039426376
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 14:09:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 32544263B5
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 14:21:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729071AbfEVMJR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 May 2019 08:09:17 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:49132 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727464AbfEVMJR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 May 2019 08:09:17 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 74CBF80D;
-        Wed, 22 May 2019 05:09:16 -0700 (PDT)
-Received: from mbp (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AA7D73F575;
-        Wed, 22 May 2019 05:09:10 -0700 (PDT)
-Date:   Wed, 22 May 2019 13:09:07 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v15 09/17] fs, arm64: untag user pointers in
- copy_mount_options
-Message-ID: <20190522120907.tf3tb3h5oxhfokgw@mbp>
-References: <cover.1557160186.git.andreyknvl@google.com>
- <ac2ca3454b1ae8856ea2e29a1316fea50a30c788.1557160186.git.andreyknvl@google.com>
+        id S1729336AbfEVMVH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 May 2019 08:21:07 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53032 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728971AbfEVMVG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 22 May 2019 08:21:06 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4MCI69q088329;
+        Wed, 22 May 2019 08:20:47 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2sn67b098v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 May 2019 08:20:47 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x4M7ivYP010118;
+        Wed, 22 May 2019 07:50:48 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma01dal.us.ibm.com with ESMTP id 2smks6sht6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 22 May 2019 07:50:48 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4MCKiA07668004
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 May 2019 12:20:44 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BC0406E050;
+        Wed, 22 May 2019 12:20:44 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 227B86E04C;
+        Wed, 22 May 2019 12:20:44 +0000 (GMT)
+Received: from [9.85.136.32] (unknown [9.85.136.32])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed, 22 May 2019 12:20:43 +0000 (GMT)
+Subject: Re: [PATCH v3 0/3] s390: vfio-ccw fixes
+To:     Eric Farman <farman@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+References: <20190516161403.79053-1-farman@linux.ibm.com>
+From:   Farhan Ali <alifm@linux.ibm.com>
+Message-ID: <0769d5bc-cf0b-3a66-7d35-381490a115b5@linux.ibm.com>
+Date:   Wed, 22 May 2019 08:20:43 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ac2ca3454b1ae8856ea2e29a1316fea50a30c788.1557160186.git.andreyknvl@google.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20190516161403.79053-1-farman@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-22_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905220090
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 06, 2019 at 06:30:55PM +0200, Andrey Konovalov wrote:
-> This patch is a part of a series that extends arm64 kernel ABI to allow to
-> pass tagged user pointers (with the top byte set to something else other
-> than 0x00) as syscall arguments.
-> 
-> In copy_mount_options a user address is being subtracted from TASK_SIZE.
-> If the address is lower than TASK_SIZE, the size is calculated to not
-> allow the exact_copy_from_user() call to cross TASK_SIZE boundary.
-> However if the address is tagged, then the size will be calculated
-> incorrectly.
-> 
-> Untag the address before subtracting.
-> 
-> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+
+On 05/16/2019 12:14 PM, Eric Farman wrote:
+> Here are the remaining patches in my fixes series, to handle the more
+> involved scenario of channel programs that do not move any actual data
+> to/from the device.  They were reordered per feedback from v2, which
+> means they received minor massaging because of overlapping code and
+> some cleanup to the commit messages.
+> 
+> They are based on Conny's vfio-ccw tree.  :)
+> 
+> Changelog:
+>   v2 -> v3:
+>    - Patches 1-4:
+>       - [Farhan] Added r-b
+>       - [Cornelia] Queued to vfio-ccw, dropped from this version
+>    - Patches 5/6:
+>       - [Cornelia/Farhan] Swapped the order of these patches, minor
+>         rework on the placement of bytes/idaw_nr variables and the
+>         commit messages that resulted.
+>   v2: https://patchwork.kernel.org/cover/10944075/
+>   v1: https://patchwork.kernel.org/cover/10928799/
+> 
+> Eric Farman (3):
+>    s390/cio: Don't pin vfio pages for empty transfers
+>    s390/cio: Allow zero-length CCWs in vfio-ccw
+>    s390/cio: Remove vfio-ccw checks of command codes
+> 
+>   drivers/s390/cio/vfio_ccw_cp.c | 92 ++++++++++++++++++++++++----------
+>   1 file changed, 65 insertions(+), 27 deletions(-)
+> 
+
+
+Acked-by: Farhan Ali <alifm@linux.ibm.com> for the series.
+
+Thanks
+Farhan
