@@ -2,74 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 503C125FBC
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 10:44:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E6F825FCD
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 10:52:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728728AbfEVIoV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 May 2019 04:44:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47566 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727946AbfEVIoV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 May 2019 04:44:21 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0DCDC3082E42;
-        Wed, 22 May 2019 08:44:21 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (ovpn-204-233.brq.redhat.com [10.40.204.233])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 33C00600C6;
-        Wed, 22 May 2019 08:44:14 +0000 (UTC)
-Date:   Wed, 22 May 2019 10:44:09 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [RFC PATCH 0/4] KVM selftests for s390x
-Message-ID: <20190522084409.qz5hs7lqj65qg6x5@kamzik.brq.redhat.com>
-References: <20190516111253.4494-1-thuth@redhat.com>
- <b412e591-3983-ebef-510b-43f9b7be4147@redhat.com>
- <9423ba89-b10e-5e6e-3cc8-8088f3088233@redhat.com>
- <4d94124e-00f6-aa65-3a4a-bd8910480329@redhat.com>
+        id S1728734AbfEVIwF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 May 2019 04:52:05 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:41984 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726552AbfEVIwE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 May 2019 04:52:04 -0400
+Received: by mail-oi1-f195.google.com with SMTP id w9so991655oic.9;
+        Wed, 22 May 2019 01:52:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dJ4wm+mdjXtu+eOzSO5zfL1pe6lE6wK9af8XsWQTncE=;
+        b=qqCo3fFW9XUWHn252Q2WFlLZvSAu/rSqSVOpdnL+6JkaWkvBV9db/TsdE2hCqPjcUO
+         vDbOuJSjDyOQlbu2Vz5fwhkmY6ko36t+1UTqukYQKdCXaQjYX3qvFXSDEdm9/jr5OaNu
+         FPGLbailOOLuQc78LlQGUivYQB2PGrtA5blcV516e4qRRIKOCKZgfrSUpkUyha73IJxD
+         oKyD7cO2RBYEOaRC41OIO68QqOs3OfwaXSkrRbVGw0Lvby++KY/ra7wXZkr8TKdylBJY
+         6mHbK73xzWpqxrigHqu4zTlA+2Sg5GIrVKSV4ecXgFXYUxqdLKpE5xcknZsBumyAShbl
+         R6xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dJ4wm+mdjXtu+eOzSO5zfL1pe6lE6wK9af8XsWQTncE=;
+        b=FN6f4viuBOcdsKEW1/zv3PfMCUnXRpwAWohL+YBNkD1mq3y3jEJ0gYI6N7h4wi+4FA
+         MDG1mjSY9QcAXNO2cI8SIwR4ssXfpQQa4/Kcf3OYhQ08ypUTVle4nf9olUSQFykow5Xf
+         xGMRQ7oIyNJts+oLaZEvre8xVyg07DdCcaGSKlf9lSs/kqayKDkVqXuxFES8JdXI9V3h
+         MmRTBGgwqH3RlhXcPI1Nzpd4GTIKDOlCuOft5XCvDK8IExPdAzTb96wXr47n8fJaSjWV
+         OPUvQJbL8zZFXDT02iztK2cM8oqipJbAb4+t2d5XgFyi8ugNrpVlNjnOXDK+JyD6hRIQ
+         zIbQ==
+X-Gm-Message-State: APjAAAWFbxWDOF8Fvpgnbbkj+JchaFh0i5m+x2zu80g8pX8UgQYZxX1j
+        LZIa8I+jzpwaNXJyd3QrmsqEYCrmzfoz+y/Aox27Zg==
+X-Google-Smtp-Source: APXvYqzWqtntfEpUbYhbg9b1uoi4VMeSgM35pQjyl/6kZpkGpdPxywV+CDrw7U5YeNuJgTdSJL2wuSuRTFh2RhcfP/o=
+X-Received: by 2002:aca:bf83:: with SMTP id p125mr6252674oif.47.1558515124059;
+ Wed, 22 May 2019 01:52:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4d94124e-00f6-aa65-3a4a-bd8910480329@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Wed, 22 May 2019 08:44:21 +0000 (UTC)
+References: <1558340289-6857-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1558340289-6857-1-git-send-email-wanpengli@tencent.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Wed, 22 May 2019 16:51:52 +0800
+Message-ID: <CANRm+Cx0o14p_pTp5_dk5-W=mL20E9DHAFK-qYYNNv+5VuSR=Q@mail.gmail.com>
+Subject: Re: [PATCH v4 0/5] KVM: LAPIC: Optimize timer latency further
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 20, 2019 at 01:43:06PM +0200, Paolo Bonzini wrote:
-> On 20/05/19 13:30, Thomas Huth wrote:
-> >> No objections at all, though it would be like to have ucall plumbed in
-> >> from the beginning.
-> > I'm still looking at the ucall interface ... what I don't quite get yet
-> > is the question why the ucall_type there is selectable during runtime?
-> > 
-> > Are there plans to have test that could either use UCALL_PIO or
-> > UCALL_MMIO? If not, what about moving ucall_init() and ucall() to
-> > architecture specific code in tools/testing/selftests/kvm/lib/aarch64/
-> > and tools/testing/selftests/kvm/lib/x86_64 instead, and to remove the
-> > ucall_type stuff again (so that x86 is hard-wired to PIO and aarch64
-> > is hard-wired to MMIO)? ... then I could add a DIAG-based ucall
-> > on s390x more easily, I think.
-> 
-> Yes, that would work.  I think Andrew wanted the flexibility to use MMIO
-> on x86, but it's not really necessary to have it.
+On Mon, 20 May 2019 at 16:18, Wanpeng Li <kernellwp@gmail.com> wrote:
+>
+> Advance lapic timer tries to hidden the hypervisor overhead between the
+> host emulated timer fires and the guest awares the timer is fired. However,
+> it just hidden the time between apic_timer_fn/handle_preemption_timer ->
+> wait_lapic_expire, instead of the real position of vmentry which is
+> mentioned in the orignial commit d0659d946be0 ("KVM: x86: add option to
+> advance tscdeadline hrtimer expiration"). There is 700+ cpu cycles between
+> the end of wait_lapic_expire and before world switch on my haswell desktop.
+>
+> This patchset tries to narrow the last gap(wait_lapic_expire -> world switch),
+> it takes the real overhead time between apic_timer_fn/handle_preemption_timer
+> and before world switch into consideration when adaptively tuning timer
+> advancement. The patchset can reduce 40% latency (~1600+ cycles to ~1000+
+> cycles on a haswell desktop) for kvm-unit-tests/tscdeadline_latency when
+> testing busy waits.
 
-If the flexibility isn't necessary, then I agree that it'll be nicer to
-put the ucall_init() in arch setup code, avoiding the need to remember
-it in each unit test.
+Testing on a Skylake Server, w/ nohz=off, idle=poll in the guest.
+Reduces average cyclictest latency from 3us to 2us.
 
-Thanks,
-drew
+Regards,
+Wanpeng Li
