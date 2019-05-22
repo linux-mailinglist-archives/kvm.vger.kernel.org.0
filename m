@@ -2,210 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E80B27068
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 22:04:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACD3726D9F
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 21:43:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729962AbfEVTVb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 May 2019 15:21:31 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:35776 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729933AbfEVTVa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 May 2019 15:21:30 -0400
-Received: by mail-pg1-f196.google.com with SMTP id t1so1809422pgc.2
-        for <kvm@vger.kernel.org>; Wed, 22 May 2019 12:21:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=NP4JWkHqbCIs5rs8MQbZ/rJv31PHu50+VP85AcMzbbU=;
-        b=GFshwxVjgFyTBuVsTzhm7IUt1UjnhWPD0MinKNguPB3el83BFNud8bHr5plz3emii+
-         cTc7Cjy2KfiVySMa4vl3S45MUDV6ughBv+eP5o9C9KIg6ntk97RzOYluREumaUsuEfOH
-         SjJgP3hh0ohPvQPPbSdKkfRYeqkQoVWPqO5e4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=NP4JWkHqbCIs5rs8MQbZ/rJv31PHu50+VP85AcMzbbU=;
-        b=CgXmUmz2Jt2nVqJolFMKn0TfqQnv/iuWsa6wFBsfQWnHwkJyZBxTtdFI5qoX9FP6h/
-         ugrlJNwm6YILZ/SSk3OPnk2wmz2sEEucWADS30pfKWjfKJoZ/fl76/YK3NUOQTKsYZmZ
-         uQx26aoQRcjF1Rn/+JmwyhUlsS2e0gCTa3lxzGl7voeb5qTkjmCWBYv7QpH6y4nS+y4f
-         ExGQLKcGxSBac+gHvDkOqW9Fzo4xYzTtrDxJlr8H3m7SnQIwWI3hH5JTcoowrKww9FuQ
-         sKQRISzvtH461f8LyoloMHSXwMtz1i31vWjo5KT64/XZ3pI6U4PggJv6TJk1MdPu1MeE
-         3Luw==
-X-Gm-Message-State: APjAAAUTRn68MLfcngQDbUBDeM3rJDKRqUQQ7WSTTkQ3Jhan2A1TajkW
-        a9pjtz0BbW3JdVfyyEaZ6rs+bA==
-X-Google-Smtp-Source: APXvYqzNjksdiGtBA2K0Yn7lD7hXz0a3WOc+KaCHe5Lfb///NUHl50P+zldmTZ4Tu8MFGQvOw+1qnw==
-X-Received: by 2002:a62:6456:: with SMTP id y83mr32990581pfb.71.1558552889913;
-        Wed, 22 May 2019 12:21:29 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id x10sm37135797pfj.136.2019.05.22.12.21.28
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 22 May 2019 12:21:28 -0700 (PDT)
-Date:   Wed, 22 May 2019 12:21:27 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     enh <enh@google.com>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Evgenii Stepanov <eugenis@google.com>,
-        Andrey Konovalov <andreyknvl@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
-Message-ID: <201905221157.A9BAB1F296@keescook>
-References: <cover.1557160186.git.andreyknvl@google.com>
- <20190517144931.GA56186@arrakis.emea.arm.com>
- <CAFKCwrj6JEtp4BzhqO178LFJepmepoMx=G+YdC8sqZ3bcBp3EQ@mail.gmail.com>
- <20190521182932.sm4vxweuwo5ermyd@mbp>
- <201905211633.6C0BF0C2@keescook>
- <20190522101110.m2stmpaj7seezveq@mbp>
- <CAJgzZoosKBwqXRyA6fb8QQSZXFqfHqe9qO9je5TogHhzuoGXJQ@mail.gmail.com>
+        id S1732948AbfEVTnT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 May 2019 15:43:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51038 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732540AbfEVT2X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 May 2019 15:28:23 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 07B85204FD;
+        Wed, 22 May 2019 19:28:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1558553302;
+        bh=gh9zzXTRZHjIb5I+GARRWUDXgSVwhRNzOe2oFcbM0Jc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=EZuX5DmNiIIYaqJPVRVX9wqoZ/PgwMypsMz/ExBAuxS3xE5DkMhzTFkRjhrhy575S
+         rBV37ZRcvOL6Mmi85P3J2DzUJfordLsMHAfROP/2mbsQd5j/GYGX5eNLdhk5qLhA4I
+         nvGKlD+5KV0hI7aoGmx6smPjzwrBbUBG+HLjUh20=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 072/244] vfio-ccw: Do not call flush_workqueue while holding the spinlock
+Date:   Wed, 22 May 2019 15:23:38 -0400
+Message-Id: <20190522192630.24917-72-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190522192630.24917-1-sashal@kernel.org>
+References: <20190522192630.24917-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJgzZoosKBwqXRyA6fb8QQSZXFqfHqe9qO9je5TogHhzuoGXJQ@mail.gmail.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 22, 2019 at 08:30:21AM -0700, enh wrote:
-> On Wed, May 22, 2019 at 3:11 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > On Tue, May 21, 2019 at 05:04:39PM -0700, Kees Cook wrote:
-> > > I just want to make sure I fully understand your concern about this
-> > > being an ABI break, and I work best with examples. The closest situation
-> > > I can see would be:
-> > >
-> > > - some program has no idea about MTE
-> >
-> > Apart from some libraries like libc (and maybe those that handle
-> > specific device ioctls), I think most programs should have no idea about
-> > MTE. I wouldn't expect programmers to have to change their app just
-> > because we have a new feature that colours heap allocations.
+From: Farhan Ali <alifm@linux.ibm.com>
 
-Right -- things should Just Work from the application perspective.
+[ Upstream commit cea5dde42a83b5f0a039da672f8686455936b8d8 ]
 
-> obviously i'm biased as a libc maintainer, but...
-> 
-> i don't think it helps to move this to libc --- now you just have an
-> extra dependency where to have a guaranteed working system you need to
-> update your kernel and libc together. (or at least update your libc to
-> understand new ioctls etc _before_ you can update your kernel.)
+Currently we call flush_workqueue while holding the subchannel
+spinlock. But flush_workqueue function can go to sleep, so
+do not call the function while holding the spinlock.
 
-I think (hope?) we've all agreed that we shouldn't pass this off to
-userspace. At the very least, it reduces the utility of MTE, and at worst
-it complicates userspace when this is clearly a kernel/architecture issue.
+Fixes the following bug:
 
-> 
-> > > - malloc() starts returning MTE-tagged addresses
-> > > - program doesn't break from that change
-> > > - program uses some syscall that is missing untagged_addr() and fails
-> > > - kernel has now broken userspace that used to work
-> >
-> > That's one aspect though probably more of a case of plugging in a new
-> > device (graphics card, network etc.) and the ioctl to the new device
-> > doesn't work.
+[  285.203430] BUG: scheduling while atomic: bash/14193/0x00000002
+[  285.203434] INFO: lockdep is turned off.
+....
+[  285.203485] Preemption disabled at:
+[  285.203488] [<000003ff80243e5c>] vfio_ccw_sch_quiesce+0xbc/0x120 [vfio_ccw]
+[  285.203496] CPU: 7 PID: 14193 Comm: bash Tainted: G        W
+....
+[  285.203504] Call Trace:
+[  285.203510] ([<0000000000113772>] show_stack+0x82/0xd0)
+[  285.203514]  [<0000000000b7a102>] dump_stack+0x92/0xd0
+[  285.203518]  [<000000000017b8be>] __schedule_bug+0xde/0xf8
+[  285.203524]  [<0000000000b95b5a>] __schedule+0x7a/0xc38
+[  285.203528]  [<0000000000b9678a>] schedule+0x72/0xb0
+[  285.203533]  [<0000000000b9bfbc>] schedule_timeout+0x34/0x528
+[  285.203538]  [<0000000000b97608>] wait_for_common+0x118/0x1b0
+[  285.203544]  [<0000000000166d6a>] flush_workqueue+0x182/0x548
+[  285.203550]  [<000003ff80243e6e>] vfio_ccw_sch_quiesce+0xce/0x120 [vfio_ccw]
+[  285.203556]  [<000003ff80245278>] vfio_ccw_mdev_reset+0x38/0x70 [vfio_ccw]
+[  285.203562]  [<000003ff802458b0>] vfio_ccw_mdev_remove+0x40/0x78 [vfio_ccw]
+[  285.203567]  [<000003ff801a499c>] mdev_device_remove_ops+0x3c/0x80 [mdev]
+[  285.203573]  [<000003ff801a4d5c>] mdev_device_remove+0xc4/0x130 [mdev]
+[  285.203578]  [<000003ff801a5074>] remove_store+0x6c/0xa8 [mdev]
+[  285.203582]  [<000000000046f494>] kernfs_fop_write+0x14c/0x1f8
+[  285.203588]  [<00000000003c1530>] __vfs_write+0x38/0x1a8
+[  285.203593]  [<00000000003c187c>] vfs_write+0xb4/0x198
+[  285.203597]  [<00000000003c1af2>] ksys_write+0x5a/0xb0
+[  285.203601]  [<0000000000b9e270>] system_call+0xdc/0x2d8
 
-I think MTE will likely be rather like NX/PXN and SMAP/PAN: there will
-be glitches, and we can disable stuff either via CONFIG or (as is more
-common now) via a kernel commandline with untagged_addr() containing a
-static branch, etc. But I actually don't think we need to go this route
-(see below...)
+Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+Message-Id: <626bab8bb2958ae132452e1ddaf1b20882ad5a9d.1554756534.git.alifm@linux.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/s390/cio/vfio_ccw_drv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > The other is that, assuming we reach a point where the kernel entirely
-> > supports this relaxed ABI, can we guarantee that it won't break in the
-> > future. Let's say some subsequent kernel change (some refactoring)
-> > misses out an untagged_addr(). This renders a previously TBI/MTE-capable
-> > syscall unusable. Can we rely only on testing?
-> >
-> > > The trouble I see with this is that it is largely theoretical and
-> > > requires part of userspace to collude to start using a new CPU feature
-> > > that tickles a bug in the kernel. As I understand the golden rule,
-> > > this is a bug in the kernel (a missed ioctl() or such) to be fixed,
-> > > not a global breaking of some userspace behavior.
-> >
-> > Yes, we should follow the rule that it's a kernel bug but it doesn't
-> > help the user that a newly installed kernel causes user space to no
-> > longer reach a prompt. Hence the proposal of an opt-in via personality
-> > (for MTE we would need an explicit opt-in by the user anyway since the
-> > top byte is no longer ignored but checked against the allocation tag).
-> 
-> but realistically would this actually get used in this way? or would
-> any given system either be MTE or non-MTE. in which case a kernel
-> configuration option would seem to make more sense. (because either
-> way, the hypothetical user basically needs to recompile the kernel to
-> get back on their feet. or all of userspace.)
-
-Right: the point is to design things so that we do our best to not break
-userspace that is using the new feature (which I think this series has
-done well). But supporting MTE/TBI is just like supporting PAN: if someone
-refactors a driver and swaps a copy_from_user() to a memcpy(), it's going
-to break under PAN. There will be the same long tail of these bugs like
-any other, but my sense is that they are small and rare. But I agree:
-they're going to be pretty weird bugs to track down. The final result,
-however, will be excellent annotation in the kernel for where userspace
-addresses get used and people make assumptions about them.
-
-The sooner we get the series landed and gain QEMU support (or real
-hardware), the faster we can hammer out these missed corner-cases.
-What's the timeline for either of those things, BTW?
-
-> > > I feel like I'm missing something about this being seen as an ABI
-> > > break. The kernel already fails on userspace addresses that have high
-> > > bits set -- are there things that _depend_ on this failure to operate?
-> >
-> > It's about providing a relaxed ABI which allows non-zero top byte and
-> > breaking it later inadvertently without having something better in place
-> > to analyse the kernel changes.
-
-It sounds like the question is how to switch a process in or out of this
-ABI (but I don't think that's the real issue: I think it's just a matter
-of whether or not a process uses tags at all). Doing it at the prctl()
-level doesn't make sense to me, except maybe to detect MTE support or
-something. ("Should I tag allocations?") And that state is controlled
-by the kernel: the kernel does it or it doesn't.
-
-If a process wants to not tag, that's also up to the allocator where
-it can decide not to ask the kernel, and just not tag. Nothing breaks in
-userspace if a process is NOT tagging and untagged_addr() exists or is
-missing. This, I think, is the core way this doesn't trip over the
-golden rule: an old system image will run fine (because it's not
-tagging). A *new* system may encounter bugs with tagging because it's a
-new feature: this is The Way Of Things. But we don't break old userspace
-because old userspace isn't using tags.
-
-So the agreement appears to be between the kernel and the allocator.
-Kernel says "I support this" or not. Telling the allocator to not tag if
-something breaks sounds like an entirely userspace decision, yes?
-
+diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+index fabd9798e4c47..0e0a743aeaf69 100644
+--- a/drivers/s390/cio/vfio_ccw_drv.c
++++ b/drivers/s390/cio/vfio_ccw_drv.c
+@@ -54,9 +54,9 @@ int vfio_ccw_sch_quiesce(struct subchannel *sch)
+ 
+ 			wait_for_completion_timeout(&completion, 3*HZ);
+ 
+-			spin_lock_irq(sch->lock);
+ 			private->completion = NULL;
+ 			flush_workqueue(vfio_ccw_work_q);
++			spin_lock_irq(sch->lock);
+ 			ret = cio_cancel_halt_clear(sch, &iretry);
+ 		};
+ 
 -- 
-Kees Cook
+2.20.1
+
