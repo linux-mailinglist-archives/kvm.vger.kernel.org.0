@@ -2,193 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DD0525B06
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 02:05:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FB9425E70
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 09:04:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727733AbfEVAEn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 21 May 2019 20:04:43 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:36738 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726434AbfEVAEn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 21 May 2019 20:04:43 -0400
-Received: by mail-pf1-f194.google.com with SMTP id v80so301006pfa.3
-        for <kvm@vger.kernel.org>; Tue, 21 May 2019 17:04:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=h+HMpjJbOByDkcgcmqTFcjwM/Zjfkc20s8NGwt76Mr8=;
-        b=Zf9QLE33qmPluiR2OGF4dL2quucaUAVgN4YPizfJiTzAzfLxxGI5FlE9xizVc831A4
-         PZROfhtKhT/R7pMFQlHGrknlILzZeG3LHD5gyBNKzIo1iuXRcoC6OuM/wsNOYEBlL6Lp
-         KGXm5hniO64celTxThJARG41BLIiM0pmyycsI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=h+HMpjJbOByDkcgcmqTFcjwM/Zjfkc20s8NGwt76Mr8=;
-        b=iXmbs+p5S8/PSoEHnfFVGXT6s0QzrPGUL5QjnknTSwHWXJIcRnQ6ar9nGTYneYmbj/
-         P/nN9s4tMSj5pJHcBIJCF/PsKDF1qAQbUy9enXJb6ZNuydnYqIS/c4YImRmc1QpESDNl
-         QlMXR0hdTrUexC+rdW+4+HurOpR2AQM6GTEk3CwrkxZ69xIQTu8VLgZWvLGMsa8FH5ZJ
-         uxJvbPW2vARpHVn/FdkWSywbBvAOgp44DWzXEy4R9ICBMinyGc7KlTorUHvnBYoIBUex
-         Dqrig/KMlGKmgILdY8hCr6LDPSZsrZWtLvh3IiXvoChmhCcgRmHv7xxxxPz0rNGDf+O0
-         RQ3Q==
-X-Gm-Message-State: APjAAAXMrkWT2re9WMp/P4Q2rjOx1ROFnSmZc4N5ZM5Kg7ZNNT6Vn7V5
-        9f+leKpQveHex5m4Fzy4QjMfPg==
-X-Google-Smtp-Source: APXvYqyRHlp4k1ARvHRDx6pnXWJEks1ZEDsNIbDRibBeuJSxc6NZrbRUP3gWhA9hXypH8RUrMs25NQ==
-X-Received: by 2002:a63:8dc8:: with SMTP id z191mr87505404pgd.9.1558483482349;
-        Tue, 21 May 2019 17:04:42 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id a11sm15675685pff.128.2019.05.21.17.04.40
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 21 May 2019 17:04:40 -0700 (PDT)
-Date:   Tue, 21 May 2019 17:04:39 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Catalin Marinas <catalin.marinas@arm.com>
-Cc:     Evgenii Stepanov <eugenis@google.com>,
-        Andrey Konovalov <andreyknvl@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Elliott Hughes <enh@google.com>
-Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
-Message-ID: <201905211633.6C0BF0C2@keescook>
-References: <cover.1557160186.git.andreyknvl@google.com>
- <20190517144931.GA56186@arrakis.emea.arm.com>
- <CAFKCwrj6JEtp4BzhqO178LFJepmepoMx=G+YdC8sqZ3bcBp3EQ@mail.gmail.com>
- <20190521182932.sm4vxweuwo5ermyd@mbp>
+        id S1728434AbfEVHBz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 May 2019 03:01:55 -0400
+Received: from mga18.intel.com ([134.134.136.126]:31984 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726552AbfEVHBz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 May 2019 03:01:55 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 May 2019 00:01:54 -0700
+X-ExtLoop1: 1
+Received: from local-michael-cet-test.sh.intel.com ([10.239.159.128])
+  by fmsmga001.fm.intel.com with ESMTP; 22 May 2019 00:01:52 -0700
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
+        mst@redhat.com, rkrcmar@redhat.com, jmattson@google.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        yu-cheng.yu@intel.com
+Cc:     weijiang.yang@intel.com
+Subject: [PATCH v5 0/8] Introduce support for Guest CET feature
+Date:   Wed, 22 May 2019 15:00:53 +0800
+Message-Id: <20190522070101.7636-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190521182932.sm4vxweuwo5ermyd@mbp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 21, 2019 at 07:29:33PM +0100, Catalin Marinas wrote:
-> On Mon, May 20, 2019 at 04:53:07PM -0700, Evgenii Stepanov wrote:
-> > On Fri, May 17, 2019 at 7:49 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > > IMO (RFC for now), I see two ways forward:
-> > > [...]
-> > > 2. Similar shim to the above libc wrapper but inside the kernel
-> > >    (arch/arm64 only; most pointer arguments could be covered with an
-> > >    __SC_CAST similar to the s390 one). There are two differences from
-> > >    what we've discussed in the past:
-> > >
-> > >    a) this is an opt-in by the user which would have to explicitly call
-> > >       prctl(). If it returns -ENOTSUPP etc., the user won't be allowed
-> > >       to pass tagged pointers to the kernel. This would probably be the
-> > >       responsibility of the C lib to make sure it doesn't tag heap
-> > >       allocations. If the user did not opt-in, the syscalls are routed
-> > >       through the normal path (no untagging address shim).
-> > >
-> > >    b) ioctl() and other blacklisted syscalls (prctl) will not accept
-> > >       tagged pointers (to be documented in Vicenzo's ABI patches).
-> >
-> > The way I see it, a patch that breaks handling of tagged pointers is
-> > not that different from, say, a patch that adds a wild pointer
-> > dereference. Both are bugs; the difference is that (a) the former
-> > breaks a relatively uncommon target and (b) it's arguably an easier
-> > mistake to make. If MTE adoption goes well, (a) will not be the case
-> > for long.
-> 
-> It's also the fact such patch would go unnoticed for a long time until
-> someone exercises that code path. And when they do, the user would be
-> pretty much in the dark trying to figure what what went wrong, why a
-> SIGSEGV or -EFAULT happened. What's worse, we can't even say we fixed
-> all the places where it matters in the current kernel codebase (ignoring
-> future patches).
+Control-flow Enforcement Technology (CET) provides protection against
+Return/Jump-Oriented Programming (ROP/JOP) attack. It includes two
+sub-features: shadow stack (SHSTK) and indirect branch tracking (IBT).
 
-So, looking forward a bit, this isn't going to be an ARM-specific issue
-for long. In fact, I think we shouldn't have arm-specific syscall wrappers
-in this series: I think untagged_addr() should likely be added at the
-top-level and have it be a no-op for other architectures. So given this
-becoming a kernel-wide multi-architecture issue (under the assumption
-that x86, RISC-V, and others will gain similar TBI or MTE things),
-we should solve it in a way that we can re-use.
+KVM modification is required to support Guest CET feature.
+This patch serial implemented CET related CPUID/XSAVES enumeration, MSRs 
+and VMEntry configuration etc.so that Guest kernel can setup CET
+runtime infrastructure based on them. Some MSRs and related feature
+flags used in the patches reference the definitions in kernel patch.
 
-We need something that is going to work everywhere. And it needs to be
-supported by the kernel for the simple reason that the kernel needs to
-do MTE checks during copy_from_user(): having that information stripped
-means we lose any userspace-assigned MTE protections if they get handled
-by the kernel, which is a total non-starter, IMO.
+CET kernel patch is here:
+https://lkml.org/lkml/2018/11/20/225.
 
-As an aside: I think Sparc ADI support in Linux actually side-stepped
-this[1] (i.e. chose "solution 1"): "All addresses passed to kernel must
-be non-ADI tagged addresses." (And sadly, "Kernel does not enable ADI
-for kernel code.") I think this was a mistake we should not repeat for
-arm64 (we do seem to be at least in agreement about this, I think).
+PATCH 1    : Define CET VMCS fields and bits.
+PATCH 2/3  : Enumerate CET features/XSAVES in CPUID.
+PATCH 4    : Fix xsaves size calculation issue.
+PATCH 5    : Pass through CET MSRs to Guest.
+PATCH 6    : Set Guest auto loading bit for CET.
+PATCH 7    : Load Guest FPU states for XSAVES managed MSRs.
+PATCH 8    : Add user-space access interface for CET states.
 
-[1] https://lore.kernel.org/patchwork/patch/654481/
 
-> > This is a bit of a chicken-and-egg problem. In a world where memory
-> > allocators on one or several popular platforms generate pointers with
-> > non-zero tags, any such breakage will be caught in testing.
-> > Unfortunately to reach that state we need the kernel to start
-> > accepting tagged pointers first, and then hold on for a couple of
-> > years until userspace catches up.
-> 
-> Would the kernel also catch up with providing a stable ABI? Because we
-> have two moving targets.
-> 
-> On one hand, you have Android or some Linux distro that stick to a
-> stable kernel version for some time, so they have better chance of
-> clearing most of the problems. On the other hand, we have mainline
-> kernel that gets over 500K lines every release. As maintainer, I can't
-> rely on my testing alone as this is on a limited number of platforms. So
-> my concern is that every kernel release has a significant chance of
-> breaking the ABI, unless we have a better way of identifying potential
-> issues.
+ v4 -> v5:
+  - Rebase patch to kernel v5.1.
+  - Wrap CPUID(0xD, n>=1) code to a helper function.
+  - Pass through MSR_IA32_PL1_SSP and MSR_IA32_PL2_SSP to Guest.
+  - Add Co-developed-by expression in patch description.
+  - Refine patch description.
 
-I just want to make sure I fully understand your concern about this
-being an ABI break, and I work best with examples. The closest situation
-I can see would be:
+ v3 -> v4:
+ - Add Sean's patch for loading Guest fpu state before access XSAVES
+   managed CET MSRs.
+ - Melt down CET bits setting into CPUID configuration patch.
+ - Add VMX interface to query Host XSS.
+ - Check Host and Guest XSS support bits before set Guest XSS.
+ - Make Guest SHSTK and IBT feature enabling independent.
+ - Do not report CET support to Guest when Host CET feature is Disabled.
 
-- some program has no idea about MTE
-- malloc() starts returning MTE-tagged addresses
-- program doesn't break from that change
-- program uses some syscall that is missing untagged_addr() and fails
-- kernel has now broken userspace that used to work
+ v2 -> v3:
+ - Modified patches to make Guest CET independent to Host enabling.
+ - Added patch 8 to add user space access for Guest CET MSR access.
+ - Modified code comments and patch description to reflect changes.
 
-The trouble I see with this is that it is largely theoretical and
-requires part of userspace to collude to start using a new CPU feature
-that tickles a bug in the kernel. As I understand the golden rule,
-this is a bug in the kernel (a missed ioctl() or such) to be fixed,
-not a global breaking of some userspace behavior.
+ v1 -> v2:
+ - Re-ordered patch sequence, combined one patch.
+ - Added more description for CET related VMCS fields.
+ - Added Host CET capability check while enabling Guest CET loading bit.
+ - Added Host CET capability check while reporting Guest CPUID(EAX=7, EXC=0).
+ - Modified code in reporting Guest CPUID(EAX=D,ECX>=1), make it clearer.
+ - Added Host and Guest XSS mask check while
+   setting bits for Guest XSS.
 
-I feel like I'm missing something about this being seen as an ABI
-break. The kernel already fails on userspace addresses that have high
-bits set -- are there things that _depend_ on this failure to operate?
+Sean Christopherson (1):
+  KVM: x86: Load Guest fpu state when accessing MSRs managed by XSAVES
+
+Yang Weijiang (7):
+  KVM: VMX: Define CET VMCS fields and control bits
+  KVM: x86: Implement CET CPUID support for Guest
+  KVM: x86: Fix XSAVE size calculation issue
+  KVM: VMX: Pass through CET related MSRs to Guest
+  KVM: VMX: Load Guest CET via VMCS when CET is enabled in Guest
+  KVM: x86: Allow Guest to set supported bits in XSS
+  KVM: x86: Add user-space access interface for CET MSRs
+
+ arch/x86/include/asm/kvm_host.h  |   5 +-
+ arch/x86/include/asm/msr-index.h |   2 +
+ arch/x86/include/asm/vmx.h       |   8 +++
+ arch/x86/kvm/cpuid.c             | 109 +++++++++++++++++++++----------
+ arch/x86/kvm/vmx/vmx.c           |  83 +++++++++++++++++++++--
+ arch/x86/kvm/x86.c               |  29 +++++++-
+ arch/x86/kvm/x86.h               |   4 ++
+ 7 files changed, 197 insertions(+), 43 deletions(-)
 
 -- 
-Kees Cook
+2.17.2
+
