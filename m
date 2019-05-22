@@ -2,125 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A4B7125E68
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 09:02:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 503C125FBC
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 10:44:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728774AbfEVHCN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 May 2019 03:02:13 -0400
-Received: from mga18.intel.com ([134.134.136.126]:31984 "EHLO mga18.intel.com"
+        id S1728728AbfEVIoV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 May 2019 04:44:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47566 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728725AbfEVHCI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 May 2019 03:02:08 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 May 2019 00:02:08 -0700
-X-ExtLoop1: 1
-Received: from local-michael-cet-test.sh.intel.com ([10.239.159.128])
-  by fmsmga001.fm.intel.com with ESMTP; 22 May 2019 00:02:06 -0700
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     pbonzini@redhat.com, sean.j.christopherson@intel.com,
-        mst@redhat.com, rkrcmar@redhat.com, jmattson@google.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        yu-cheng.yu@intel.com
-Cc:     weijiang.yang@intel.com
-Subject: [PATCH v5 8/8] KVM: x86: Add user-space access interface for CET MSRs
-Date:   Wed, 22 May 2019 15:01:01 +0800
-Message-Id: <20190522070101.7636-9-weijiang.yang@intel.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20190522070101.7636-1-weijiang.yang@intel.com>
-References: <20190522070101.7636-1-weijiang.yang@intel.com>
+        id S1727946AbfEVIoV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 May 2019 04:44:21 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0DCDC3082E42;
+        Wed, 22 May 2019 08:44:21 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (ovpn-204-233.brq.redhat.com [10.40.204.233])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 33C00600C6;
+        Wed, 22 May 2019 08:44:14 +0000 (UTC)
+Date:   Wed, 22 May 2019 10:44:09 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [RFC PATCH 0/4] KVM selftests for s390x
+Message-ID: <20190522084409.qz5hs7lqj65qg6x5@kamzik.brq.redhat.com>
+References: <20190516111253.4494-1-thuth@redhat.com>
+ <b412e591-3983-ebef-510b-43f9b7be4147@redhat.com>
+ <9423ba89-b10e-5e6e-3cc8-8088f3088233@redhat.com>
+ <4d94124e-00f6-aa65-3a4a-bd8910480329@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4d94124e-00f6-aa65-3a4a-bd8910480329@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Wed, 22 May 2019 08:44:21 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There're two different places storing Guest CET states, the states
-managed with XSAVES/XRSTORS, as restored/saved
-in previous patch, can be read/write directly from/to the MSRs.
-For those stored in VMCS fields, they're access via vmcs_read/
-vmcs_write.
+On Mon, May 20, 2019 at 01:43:06PM +0200, Paolo Bonzini wrote:
+> On 20/05/19 13:30, Thomas Huth wrote:
+> >> No objections at all, though it would be like to have ucall plumbed in
+> >> from the beginning.
+> > I'm still looking at the ucall interface ... what I don't quite get yet
+> > is the question why the ucall_type there is selectable during runtime?
+> > 
+> > Are there plans to have test that could either use UCALL_PIO or
+> > UCALL_MMIO? If not, what about moving ucall_init() and ucall() to
+> > architecture specific code in tools/testing/selftests/kvm/lib/aarch64/
+> > and tools/testing/selftests/kvm/lib/x86_64 instead, and to remove the
+> > ucall_type stuff again (so that x86 is hard-wired to PIO and aarch64
+> > is hard-wired to MMIO)? ... then I could add a DIAG-based ucall
+> > on s390x more easily, I think.
+> 
+> Yes, that would work.  I think Andrew wanted the flexibility to use MMIO
+> on x86, but it's not really necessary to have it.
 
-Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
----
- arch/x86/include/asm/msr-index.h |  2 ++
- arch/x86/kvm/vmx/vmx.c           | 43 ++++++++++++++++++++++++++++++++
- 2 files changed, 45 insertions(+)
+If the flexibility isn't necessary, then I agree that it'll be nicer to
+put the ucall_init() in arch setup code, avoiding the need to remember
+it in each unit test.
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index dc0a67c1ed80..53a4ef337846 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -827,6 +827,8 @@
- #define MSR_IA32_U_CET		0x6a0 /* user mode cet setting */
- #define MSR_IA32_S_CET		0x6a2 /* kernel mode cet setting */
- #define MSR_IA32_PL0_SSP	0x6a4 /* kernel shstk pointer */
-+#define MSR_IA32_PL1_SSP	0x6a5 /* ring 1 shstk pointer */
-+#define MSR_IA32_PL2_SSP	0x6a6 /* ring 2 shstk pointer */
- #define MSR_IA32_PL3_SSP	0x6a7 /* user shstk pointer */
- #define MSR_IA32_INT_SSP_TAB	0x6a8 /* exception shstk table */
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index dec6bda20235..233f58af3878 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1777,6 +1777,27 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		else
- 			msr_info->data = vmx->pt_desc.guest.addr_a[index / 2];
- 		break;
-+	case MSR_IA32_S_CET:
-+		msr_info->data = vmcs_readl(GUEST_S_CET);
-+		break;
-+	case MSR_IA32_U_CET:
-+		rdmsrl(MSR_IA32_U_CET, msr_info->data);
-+		break;
-+	case MSR_IA32_INT_SSP_TAB:
-+		msr_info->data = vmcs_readl(GUEST_INTR_SSP_TABLE);
-+		break;
-+	case MSR_IA32_PL0_SSP:
-+		rdmsrl(MSR_IA32_PL0_SSP, msr_info->data);
-+		break;
-+	case MSR_IA32_PL1_SSP:
-+		rdmsrl(MSR_IA32_PL1_SSP, msr_info->data);
-+		break;
-+	case MSR_IA32_PL2_SSP:
-+		rdmsrl(MSR_IA32_PL2_SSP, msr_info->data);
-+		break;
-+	case MSR_IA32_PL3_SSP:
-+		rdmsrl(MSR_IA32_PL3_SSP, msr_info->data);
-+		break;
- 	case MSR_TSC_AUX:
- 		if (!msr_info->host_initiated &&
- 		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
-@@ -2012,6 +2033,28 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		else
- 			vmx->pt_desc.guest.addr_a[index / 2] = data;
- 		break;
-+	case MSR_IA32_S_CET:
-+		vmcs_writel(GUEST_S_CET, data);
-+		break;
-+	case MSR_IA32_U_CET:
-+		wrmsrl(MSR_IA32_U_CET, data);
-+		break;
-+	case MSR_IA32_INT_SSP_TAB:
-+		vmcs_writel(GUEST_INTR_SSP_TABLE, data);
-+		break;
-+	case MSR_IA32_PL0_SSP:
-+		wrmsrl(MSR_IA32_PL0_SSP, data);
-+		break;
-+	case MSR_IA32_PL1_SSP:
-+		wrmsrl(MSR_IA32_PL1_SSP, data);
-+		break;
-+	case MSR_IA32_PL2_SSP:
-+		wrmsrl(MSR_IA32_PL2_SSP, data);
-+		break;
-+	case MSR_IA32_PL3_SSP:
-+		wrmsrl(MSR_IA32_PL3_SSP, data);
-+		break;
-+
- 	case MSR_TSC_AUX:
- 		if (!msr_info->host_initiated &&
- 		    !guest_cpuid_has(vcpu, X86_FEATURE_RDTSCP))
--- 
-2.17.2
-
+Thanks,
+drew
