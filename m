@@ -2,155 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CEC2270E4
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 22:38:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 131D827103
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 22:47:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730028AbfEVUik (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 May 2019 16:38:40 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57318 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728761AbfEVUij (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 22 May 2019 16:38:39 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4MKbIwR079461
-        for <kvm@vger.kernel.org>; Wed, 22 May 2019 16:38:38 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2sncbravxn-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 22 May 2019 16:38:38 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <rppt@linux.ibm.com>;
-        Wed, 22 May 2019 21:38:36 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 22 May 2019 21:38:33 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4MKcW4Y50397334
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 May 2019 20:38:32 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5E2C5AE045;
-        Wed, 22 May 2019 20:38:32 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 87F48AE04D;
-        Wed, 22 May 2019 20:38:31 +0000 (GMT)
-Received: from rapoport-lnx (unknown [9.148.205.81])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed, 22 May 2019 20:38:31 +0000 (GMT)
-Date:   Wed, 22 May 2019 23:38:29 +0300
-From:   Mike Rapoport <rppt@linux.ibm.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Borislav Petkov <bp@suse.de>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH] mm/gup: continue VM_FAULT_RETRY processing event for
- pre-faults
-References: <1557844195-18882-1-git-send-email-rppt@linux.ibm.com>
- <20190522122113.a2edc8aba32f0fad189bae21@linux-foundation.org>
+        id S1730228AbfEVUrj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 May 2019 16:47:39 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:33822 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730184AbfEVUrj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 May 2019 16:47:39 -0400
+Received: by mail-pl1-f193.google.com with SMTP id w7so1633013plz.1
+        for <kvm@vger.kernel.org>; Wed, 22 May 2019 13:47:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zy3PazUIRm9Jc9PdJuB2u+ElFTk96lbYpo+oNBJZGCM=;
+        b=Y8j7WD6zpcc/2sEpj8EY6NRT1Dc510C1spsir21/hkUeu4mUUaoDDgjLww0pivEwF/
+         z6iJ0+f+gBw8re6q5xM6Dar0lLD7YYS2gJO3KPMVbNBtZ3Id3RkPfmb6s3Yr3rdRIcuf
+         rTPZw7otg9Z5O5b4Ojw+hEe7n4misMdps/iC8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zy3PazUIRm9Jc9PdJuB2u+ElFTk96lbYpo+oNBJZGCM=;
+        b=hHDQx+fCKneGVacmhd2dP394NXROhxWzDozydhUAldC4RW5ljlVjBX/AqX6iWYefIM
+         g5TwVXswrpcunEKEAk8cJCRFcjySCjvnYoVrn5O090yofnD+x/ZA9lDDU20aukhHa8Tq
+         OwkyoQoLgbvmwmGQxVfVRRQ8ENJ5hP21hH2FLcuOXuVX5ebPlzO4TeSBsmXIjbsX/1DP
+         nTmbf/pr5u59Eg03al5JRgHBH/pB7u7MkXgORwl0M+WYlKB0HXarOzTVJz4laLBXIhUn
+         TJVJ08TFAns/HBfWtFkIhQMYcrvtgDJfkrVMmatoc1fGH2RtUVkdYQ6kKASfWYQzHi6M
+         6xtQ==
+X-Gm-Message-State: APjAAAXbMh6LrJDHb26k2Fvle6dXyvAvLdkN0Q6rv1RsnzK0DR0he3z/
+        CvZQYupB3hhrNSICntl57IW98Q==
+X-Google-Smtp-Source: APXvYqxzAX+RobICkloaWYce4rx4oMkBv2QD394+NKxfoEao6LHAAvOlkD0rcjglQVK68ClP6ctquQ==
+X-Received: by 2002:a17:902:15c5:: with SMTP id a5mr93624265plh.39.1558558058259;
+        Wed, 22 May 2019 13:47:38 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id d13sm23312074pfh.113.2019.05.22.13.47.36
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 22 May 2019 13:47:37 -0700 (PDT)
+Date:   Wed, 22 May 2019 13:47:36 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     enh <enh@google.com>, Evgenii Stepanov <eugenis@google.com>,
+        Andrey Konovalov <andreyknvl@google.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
+Message-ID: <201905221316.865581CF@keescook>
+References: <cover.1557160186.git.andreyknvl@google.com>
+ <20190517144931.GA56186@arrakis.emea.arm.com>
+ <CAFKCwrj6JEtp4BzhqO178LFJepmepoMx=G+YdC8sqZ3bcBp3EQ@mail.gmail.com>
+ <20190521182932.sm4vxweuwo5ermyd@mbp>
+ <201905211633.6C0BF0C2@keescook>
+ <20190522101110.m2stmpaj7seezveq@mbp>
+ <CAJgzZoosKBwqXRyA6fb8QQSZXFqfHqe9qO9je5TogHhzuoGXJQ@mail.gmail.com>
+ <20190522163527.rnnc6t4tll7tk5zw@mbp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190522122113.a2edc8aba32f0fad189bae21@linux-foundation.org>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-TM-AS-GCONF: 00
-x-cbid: 19052220-0020-0000-0000-0000033F6D06
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052220-0021-0000-0000-0000219253D1
-Message-Id: <20190522203828.GC18865@rapoport-lnx>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-22_12:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905220144
+In-Reply-To: <20190522163527.rnnc6t4tll7tk5zw@mbp>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-(added kvm)
+On Wed, May 22, 2019 at 05:35:27PM +0100, Catalin Marinas wrote:
+> The two hard requirements I have for supporting any new hardware feature
+> in Linux are (1) a single kernel image binary continues to run on old
+> hardware while making use of the new feature if available and (2) old
+> user space continues to run on new hardware while new user space can
+> take advantage of the new feature.
 
-On Wed, May 22, 2019 at 12:21:13PM -0700, Andrew Morton wrote:
-> On Tue, 14 May 2019 17:29:55 +0300 Mike Rapoport <rppt@linux.ibm.com> wrote:
-> 
-> > When get_user_pages*() is called with pages = NULL, the processing of
-> > VM_FAULT_RETRY terminates early without actually retrying to fault-in all
-> > the pages.
-> > 
-> > If the pages in the requested range belong to a VMA that has userfaultfd
-> > registered, handle_userfault() returns VM_FAULT_RETRY *after* user space
-> > has populated the page, but for the gup pre-fault case there's no actual
-> > retry and the caller will get no pages although they are present.
-> > 
-> > This issue was uncovered when running post-copy memory restore in CRIU
-> > after commit d9c9ce34ed5c ("x86/fpu: Fault-in user stack if
-> > copy_fpstate_to_sigframe() fails").
-> > 
-> > After this change, the copying of FPU state to the sigframe switched from
-> > copy_to_user() variants which caused a real page fault to get_user_pages()
-> > with pages parameter set to NULL.
-> 
-> You're saying that argument buf_fx in copy_fpstate_to_sigframe() is NULL?
+Agreed! And I think the series meets these requirements, yes?
 
-Apparently I haven't explained well. The 'pages' parameter in the call to
-get_user_pages_unlocked() is NULL.
- 
-> If so was that expected by the (now cc'ed) developers of
-> d9c9ce34ed5c8923 ("x86/fpu: Fault-in user stack if
-> copy_fpstate_to_sigframe() fails")?
-> 
-> It seems rather odd.  copy_fpregs_to_sigframe() doesn't look like it's
-> expecting a NULL argument.
-> 
-> Also, I wonder if copy_fpstate_to_sigframe() would be better using
-> fault_in_pages_writeable() rather than get_user_pages_unlocked().  That
-> seems like it operates at a more suitable level and I guess it will fix
-> this issue also.
+> For MTE, we just can't enable it by default since there are applications
+> who use the top byte of a pointer and expect it to be ignored rather
+> than failing with a mismatched tag. Just think of a hwasan compiled
+> binary where TBI is expected to work and you try to run it with MTE
+> turned on.
 
-If I understand correctly, one of the points of d9c9ce34ed5c8923 ("x86/fpu:
-Fault-in user stack if copy_fpstate_to_sigframe() fails") was to to avoid
-page faults, hence the use of get_user_pages().
+Ah! Okay, here's the use-case I wasn't thinking of: the concern is TBI
+conflicting with MTE. And anything that starts using TBI suddenly can't
+run in the future because it's being interpreted as MTE bits? (Is that
+the ABI concern? I feel like we got into the weeds about ioctl()s and
+one-off bugs...)
 
-With fault_in_pages_writeable() there might be a page fault, unless I've
-completely mistaken.
+So there needs to be some way to let the kernel know which of three
+things it should be doing:
+1- leaving userspace addresses as-is (present)
+2- wiping the top bits before using (this series)
+3- wiping the top bits for most things, but retaining them for MTE as
+   needed (the future)
 
-Unrelated to copy_fpstate_to_sigframe(), the issue could happen if any call
-to get_user_pages() with pages parameter set to NULL tries to access
-userfaultfd-managed memory. Currently, there are 4 in tree users:
+I expect MTE to be the "default" in the future. Once a system's libc has
+grown support for it, everything will be trying to use MTE. TBI will be
+the special case (but TBI is effectively a prerequisite).
 
-arch/x86/kernel/fpu/signal.c:198:8-31:  -> gup with !pages
-arch/x86/mm/mpx.c:423:11-25:  -> gup with !pages
-virt/kvm/async_pf.c:90:1-22:  -> gup with !pages
-virt/kvm/kvm_main.c:1437:6-20:  -> gup with !pages
+AFAICT, the only difference I see between 2 and 3 will be the tag handling
+in usercopy (all other places will continue to ignore the top bits). Is
+that accurate?
 
-I don't know if anybody is using mpx with uffd and anyway mpx seems to go
-away.
+Is "1" a per-process state we want to keep? (I assume not, but rather it
+is available via no TBI/MTE CONFIG or a boot-time option, if at all?)
 
-As for KVM, I think that post-copy live migration of L2 guest might trigger
-that as well. Not sure though, I'm not really familiar with KVM code.
- 
-> > In post-copy mode of CRIU, the destination memory is managed with
-> > userfaultfd and lack of the retry for pre-fault case in get_user_pages()
-> > causes a crash of the restored process.
-> > 
-> > Making the pre-fault behavior of get_user_pages() the same as the "normal"
-> > one fixes the issue.
-> 
-> Should this be backported into -stable trees?
+To choose between "2" and "3", it seems we need a per-process flag to
+opt into TBI (and out of MTE). For userspace, how would a future binary
+choose TBI over MTE? If it's a library issue, we can't use an ELF bit,
+since the choice may be "late" after ELF load (this implies the need
+for a prctl().) If it's binary-only ("built with HWKASan") then an ELF
+bit seems sufficient. And without the marking, I'd expect the kernel to
+enforce MTE when there are high bits.
 
-I think that it depends on whether KVM affected by this or not.
+> I would also expect the C library or dynamic loader to check for the
+> presence of a HWCAP_MTE bit before starting to tag memory allocations,
+> otherwise it would get SIGILL on the first MTE instruction it tries to
+> execute.
 
-> > Fixes: d9c9ce34ed5c ("x86/fpu: Fault-in user stack if copy_fpstate_to_sigframe() fails")
-> > Signed-off-by: Mike Rapoport <rppt@linux.ibm.com>
-> 
-> 
+I've got the same question as Elliot: aren't MTE instructions just NOP
+to older CPUs? I.e. if the CPU (or kernel) don't support it, it just
+gets entirely ignored: checking is only needed to satisfy curiosity
+or behavioral expectations.
+
+To me, the conflict seems to be using TBI in the face of expecting MTE to
+be the default state of the future. (But the internal changes needed
+for TBI -- this series -- is a prereq for MTE.)
 
 -- 
-Sincerely yours,
-Mike.
-
+Kees Cook
