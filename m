@@ -2,269 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BB6562717D
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 23:17:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D37B27181
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 23:18:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729891AbfEVVRL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 May 2019 17:17:11 -0400
-Received: from mail-ua1-f66.google.com ([209.85.222.66]:35164 "EHLO
-        mail-ua1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729720AbfEVVRL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 May 2019 17:17:11 -0400
-Received: by mail-ua1-f66.google.com with SMTP id r7so1421215ual.2
-        for <kvm@vger.kernel.org>; Wed, 22 May 2019 14:17:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4dHniiz5Iec+zX/39XStbUXbmPxCKmuaK7gygHepfyc=;
-        b=BozsRedf7hxOrPEwc14/5gYKjPtcuYPfCzdL5Qh8eptxMopndG6sl6KK8l1wx0gHcO
-         fX9KUGo72jJQy2d1m1wZ3No1Qi2uQpl1cB2uKNXeTTE0y7bVHQRp3jZ8gNy6f12oUbuZ
-         9pqndA18D5HuCzEP7FakfNMcFjkFYSW5Qf6tTdWeb6YU5HYx7NFV4gOPaqZKnmwkQ5VN
-         K2fCVmPCADr0j8VP+wLoOUFpEpW6WISMm8/ajD25DfdGIBy1SiKGnwF+/Lt+nHE51rtB
-         vS7fbs1gYfPlwpTBaswd0RKzwzIK+7d4NhNx6dxPb1W6jd5YUGLoFQyi73p/mW3CKcJq
-         v2ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4dHniiz5Iec+zX/39XStbUXbmPxCKmuaK7gygHepfyc=;
-        b=O0llybFzvnjpCgbwjlDb+v5sy7Qdk12yceBGieOwiqnNADG41yxdCD5H4Ndt+6Mrro
-         FJ7mGRxZF4kkWri0YFcbRGkBpOG5Kl92xWONYNnANnHHN46/uObBygGYl4Ulm+UfTofw
-         z3oeOBcMw7i/UbhjKdzMXUuHgkC9bMRJTHBA+xGYXg2bfTocsN/ha5zAw5ugkexBBzjg
-         ZPK6zz6jAUhNKV7uY16j7IE8bhV7oGK+NncjE/q6ZBFr7N9jq0feIMQztERkGftoy3Sk
-         bXPq+jPHm2IDePTzwPaN6UnxwUfAzfdRx9d4lmyfwWv+3tV3uCwhlRqdVufGmDFAJWr9
-         PP5A==
-X-Gm-Message-State: APjAAAUcAj8CSJU0zs383ubChYTMYomepp5GpBPmScXwKCkuvsLMlBkp
-        AK7Ak96rVdzGipNYZcrAGnwhJrCssJEzZ7qxeEuA9g==
-X-Google-Smtp-Source: APXvYqxH4+lXdvKeAKR6IcV6qRcWyD41x0RLMgowdC0uvePb1uyY7QqZdIceH4zhHD2Gn25pj1INm9uTZm6L2qnPIh8=
-X-Received: by 2002:ab0:115a:: with SMTP id g26mr16507991uac.84.1558559829704;
- Wed, 22 May 2019 14:17:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1557160186.git.andreyknvl@google.com> <00eb4c63fefc054e2c8d626e8fedfca11d7c2600.1557160186.git.andreyknvl@google.com>
- <20190522114910.emlckebwzv2qz42i@mbp>
-In-Reply-To: <20190522114910.emlckebwzv2qz42i@mbp>
-From:   Evgenii Stepanov <eugenis@google.com>
-Date:   Wed, 22 May 2019 14:16:57 -0700
-Message-ID: <CAFKCwrjyP+x0JJy=qpBFsp4pub3He6UkvU0qnf1UOKt6W1LPRQ@mail.gmail.com>
-Subject: Re: [PATCH v15 05/17] arms64: untag user pointers passed to memory syscalls
-To:     Catalin Marinas <catalin.marinas@arm.com>
-Cc:     Andrey Konovalov <andreyknvl@google.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1729958AbfEVVSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 May 2019 17:18:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49802 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729483AbfEVVSF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 May 2019 17:18:05 -0400
+Received: from localhost.localdomain (c-73-223-200-170.hsd1.ca.comcast.net [73.223.200.170])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9878B2173E;
+        Wed, 22 May 2019 21:18:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1558559883;
+        bh=vm5TFptU4z16aOaq6WyJVuLQG+smQSsecNHc6EdO2EQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=cWBMS3PZhojaDwCxM24fm9eZtn2egLd4rKSnhyyfFkuHkE9NM/B7vOwsCfa4hFLGr
+         uBaSKoEy87eBUtvEQ4U3tKU9B0eI9hYynsiUeYbH9IeamI/gPYa5UnGJ8MDzTEXSLm
+         uv2bfg9jqE4iHSK1DBHm1Bj5munpo/iw6Bx190H4=
+Date:   Wed, 22 May 2019 14:18:03 -0700
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     Mike Rapoport <rppt@linux.ibm.com>
+Cc:     Andrea Arcangeli <aarcange@redhat.com>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Borislav Petkov <bp@suse.de>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH] mm/gup: continue VM_FAULT_RETRY processing event for
+ pre-faults
+Message-Id: <20190522141803.c6714f96f57612caaac5d19b@linux-foundation.org>
+In-Reply-To: <20190522203828.GC18865@rapoport-lnx>
+References: <1557844195-18882-1-git-send-email-rppt@linux.ibm.com>
+        <20190522122113.a2edc8aba32f0fad189bae21@linux-foundation.org>
+        <20190522203828.GC18865@rapoport-lnx>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 22, 2019 at 4:49 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
->
-> On Mon, May 06, 2019 at 06:30:51PM +0200, Andrey Konovalov wrote:
-> > This patch is a part of a series that extends arm64 kernel ABI to allow to
-> > pass tagged user pointers (with the top byte set to something else other
-> > than 0x00) as syscall arguments.
-> >
-> > This patch allows tagged pointers to be passed to the following memory
-> > syscalls: brk, get_mempolicy, madvise, mbind, mincore, mlock, mlock2,
-> > mmap, mmap_pgoff, mprotect, mremap, msync, munlock, munmap,
-> > remap_file_pages, shmat and shmdt.
-> >
-> > This is done by untagging pointers passed to these syscalls in the
-> > prologues of their handlers.
->
-> I'll go through them one by one to see if we can tighten the expected
-> ABI while having the MTE in mind.
->
-> > diff --git a/arch/arm64/kernel/sys.c b/arch/arm64/kernel/sys.c
-> > index b44065fb1616..933bb9f3d6ec 100644
-> > --- a/arch/arm64/kernel/sys.c
-> > +++ b/arch/arm64/kernel/sys.c
-> > @@ -35,10 +35,33 @@ SYSCALL_DEFINE6(mmap, unsigned long, addr, unsigned long, len,
-> >  {
-> >       if (offset_in_page(off) != 0)
-> >               return -EINVAL;
-> > -
-> > +     addr = untagged_addr(addr);
-> >       return ksys_mmap_pgoff(addr, len, prot, flags, fd, off >> PAGE_SHIFT);
-> >  }
->
-> If user passes a tagged pointer to mmap() and the address is honoured
-> (or MAP_FIXED is given), what is the expected return pointer? Does it
-> need to be tagged with the value from the hint?
+On Wed, 22 May 2019 23:38:29 +0300 Mike Rapoport <rppt@linux.ibm.com> wrote:
 
-For HWASan the most convenient would be to use the tag from the hint.
-But since in the TBI (not MTE) mode the kernel has no idea what
-meaning userspace assigns to pointer tags, perhaps it should not try
-to guess, and should return raw (zero-tagged) address instead.
+> (added kvm)
+> 
+> On Wed, May 22, 2019 at 12:21:13PM -0700, Andrew Morton wrote:
+> > On Tue, 14 May 2019 17:29:55 +0300 Mike Rapoport <rppt@linux.ibm.com> wrote:
+> > 
+> > > When get_user_pages*() is called with pages = NULL, the processing of
+> > > VM_FAULT_RETRY terminates early without actually retrying to fault-in all
+> > > the pages.
+> > > 
+> > > If the pages in the requested range belong to a VMA that has userfaultfd
+> > > registered, handle_userfault() returns VM_FAULT_RETRY *after* user space
+> > > has populated the page, but for the gup pre-fault case there's no actual
+> > > retry and the caller will get no pages although they are present.
+> > > 
+> > > This issue was uncovered when running post-copy memory restore in CRIU
+> > > after commit d9c9ce34ed5c ("x86/fpu: Fault-in user stack if
+> > > copy_fpstate_to_sigframe() fails").
+> > > 
+> > > After this change, the copying of FPU state to the sigframe switched from
+> > > copy_to_user() variants which caused a real page fault to get_user_pages()
+> > > with pages parameter set to NULL.
+> > 
+> > You're saying that argument buf_fx in copy_fpstate_to_sigframe() is NULL?
+> 
+> Apparently I haven't explained well. The 'pages' parameter in the call to
+> get_user_pages_unlocked() is NULL.
 
-> With MTE, we may want to use this as a request for the default colour of
-> the mapped pages (still under discussion).
+Doh.
 
-I like this - and in that case it would make sense to return the
-pointer that can be immediately dereferenced without crashing the
-process, i.e. with the matching tag.
+> > If so was that expected by the (now cc'ed) developers of
+> > d9c9ce34ed5c8923 ("x86/fpu: Fault-in user stack if
+> > copy_fpstate_to_sigframe() fails")?
+> > 
+> > It seems rather odd.  copy_fpregs_to_sigframe() doesn't look like it's
+> > expecting a NULL argument.
+> > 
+> > Also, I wonder if copy_fpstate_to_sigframe() would be better using
+> > fault_in_pages_writeable() rather than get_user_pages_unlocked().  That
+> > seems like it operates at a more suitable level and I guess it will fix
+> > this issue also.
+> 
+> If I understand correctly, one of the points of d9c9ce34ed5c8923 ("x86/fpu:
+> Fault-in user stack if copy_fpstate_to_sigframe() fails") was to to avoid
+> page faults, hence the use of get_user_pages().
+> 
+> With fault_in_pages_writeable() there might be a page fault, unless I've
+> completely mistaken.
+> 
+> Unrelated to copy_fpstate_to_sigframe(), the issue could happen if any call
+> to get_user_pages() with pages parameter set to NULL tries to access
+> userfaultfd-managed memory. Currently, there are 4 in tree users:
+> 
+> arch/x86/kernel/fpu/signal.c:198:8-31:  -> gup with !pages
+> arch/x86/mm/mpx.c:423:11-25:  -> gup with !pages
+> virt/kvm/async_pf.c:90:1-22:  -> gup with !pages
+> virt/kvm/kvm_main.c:1437:6-20:  -> gup with !pages
 
-> > +SYSCALL_DEFINE6(arm64_mmap_pgoff, unsigned long, addr, unsigned long, len,
-> > +             unsigned long, prot, unsigned long, flags,
-> > +             unsigned long, fd, unsigned long, pgoff)
-> > +{
-> > +     addr = untagged_addr(addr);
-> > +     return ksys_mmap_pgoff(addr, len, prot, flags, fd, pgoff);
-> > +}
->
-> We don't have __NR_mmap_pgoff on arm64.
->
-> > +SYSCALL_DEFINE5(arm64_mremap, unsigned long, addr, unsigned long, old_len,
-> > +             unsigned long, new_len, unsigned long, flags,
-> > +             unsigned long, new_addr)
-> > +{
-> > +     addr = untagged_addr(addr);
-> > +     new_addr = untagged_addr(new_addr);
-> > +     return ksys_mremap(addr, old_len, new_len, flags, new_addr);
-> > +}
->
-> Similar comment as for mmap(), do we want the tag from new_addr to be
-> preserved? In addition, should we check that the two tags are identical
-> or mremap() should become a way to repaint a memory region?
->
-> > +SYSCALL_DEFINE2(arm64_munmap, unsigned long, addr, size_t, len)
-> > +{
-> > +     addr = untagged_addr(addr);
-> > +     return ksys_munmap(addr, len);
-> > +}
->
-> This looks fine.
->
-> > +SYSCALL_DEFINE1(arm64_brk, unsigned long, brk)
-> > +{
-> > +     brk = untagged_addr(brk);
-> > +     return ksys_brk(brk);
-> > +}
->
-> I wonder whether brk() should simply not accept tags, and should not
-> return them (similar to the prctl(PR_SET_MM) discussion). We could
-> document this in the ABI requirements.
->
-> > +SYSCALL_DEFINE5(arm64_get_mempolicy, int __user *, policy,
-> > +             unsigned long __user *, nmask, unsigned long, maxnode,
-> > +             unsigned long, addr, unsigned long, flags)
-> > +{
-> > +     addr = untagged_addr(addr);
-> > +     return ksys_get_mempolicy(policy, nmask, maxnode, addr, flags);
-> > +}
-> > +
-> > +SYSCALL_DEFINE3(arm64_madvise, unsigned long, start,
-> > +             size_t, len_in, int, behavior)
-> > +{
-> > +     start = untagged_addr(start);
-> > +     return ksys_madvise(start, len_in, behavior);
-> > +}
-> > +
-> > +SYSCALL_DEFINE6(arm64_mbind, unsigned long, start, unsigned long, len,
-> > +             unsigned long, mode, const unsigned long __user *, nmask,
-> > +             unsigned long, maxnode, unsigned int, flags)
-> > +{
-> > +     start = untagged_addr(start);
-> > +     return ksys_mbind(start, len, mode, nmask, maxnode, flags);
-> > +}
-> > +
-> > +SYSCALL_DEFINE2(arm64_mlock, unsigned long, start, size_t, len)
-> > +{
-> > +     start = untagged_addr(start);
-> > +     return ksys_mlock(start, len, VM_LOCKED);
-> > +}
-> > +
-> > +SYSCALL_DEFINE2(arm64_mlock2, unsigned long, start, size_t, len)
-> > +{
-> > +     start = untagged_addr(start);
-> > +     return ksys_mlock(start, len, VM_LOCKED);
-> > +}
-> > +
-> > +SYSCALL_DEFINE2(arm64_munlock, unsigned long, start, size_t, len)
-> > +{
-> > +     start = untagged_addr(start);
-> > +     return ksys_munlock(start, len);
-> > +}
-> > +
-> > +SYSCALL_DEFINE3(arm64_mprotect, unsigned long, start, size_t, len,
-> > +             unsigned long, prot)
-> > +{
-> > +     start = untagged_addr(start);
-> > +     return ksys_mprotect_pkey(start, len, prot, -1);
-> > +}
-> > +
-> > +SYSCALL_DEFINE3(arm64_msync, unsigned long, start, size_t, len, int, flags)
-> > +{
-> > +     start = untagged_addr(start);
-> > +     return ksys_msync(start, len, flags);
-> > +}
-> > +
-> > +SYSCALL_DEFINE3(arm64_mincore, unsigned long, start, size_t, len,
-> > +             unsigned char __user *, vec)
-> > +{
-> > +     start = untagged_addr(start);
-> > +     return ksys_mincore(start, len, vec);
-> > +}
->
-> These look fine.
->
-> > +SYSCALL_DEFINE5(arm64_remap_file_pages, unsigned long, start,
-> > +             unsigned long, size, unsigned long, prot,
-> > +             unsigned long, pgoff, unsigned long, flags)
-> > +{
-> > +     start = untagged_addr(start);
-> > +     return ksys_remap_file_pages(start, size, prot, pgoff, flags);
-> > +}
->
-> While this has been deprecated for some time, I presume user space still
-> invokes it?
->
-> > +SYSCALL_DEFINE3(arm64_shmat, int, shmid, char __user *, shmaddr, int, shmflg)
-> > +{
-> > +     shmaddr = untagged_addr(shmaddr);
-> > +     return ksys_shmat(shmid, shmaddr, shmflg);
-> > +}
-> > +
-> > +SYSCALL_DEFINE1(arm64_shmdt, char __user *, shmaddr)
-> > +{
-> > +     shmaddr = untagged_addr(shmaddr);
-> > +     return ksys_shmdt(shmaddr);
-> > +}
->
-> Do we actually want to allow shared tagged memory? Who's going to tag
-> it? If not, we can document it as not supported.
->
-> --
-> Catalin
+OK.
+
+> I don't know if anybody is using mpx with uffd and anyway mpx seems to go
+> away.
+> 
+> As for KVM, I think that post-copy live migration of L2 guest might trigger
+> that as well. Not sure though, I'm not really familiar with KVM code.
+>  
+> > > In post-copy mode of CRIU, the destination memory is managed with
+> > > userfaultfd and lack of the retry for pre-fault case in get_user_pages()
+> > > causes a crash of the restored process.
+> > > 
+> > > Making the pre-fault behavior of get_user_pages() the same as the "normal"
+> > > one fixes the issue.
+> > 
+> > Should this be backported into -stable trees?
+> 
+> I think that it depends on whether KVM affected by this or not.
+> 
+
+How do we determine this?
+
+I guess it doesn't matter much.
