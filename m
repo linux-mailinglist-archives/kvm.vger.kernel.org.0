@@ -2,100 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CE4126981
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 20:04:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E62FE26ECE
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2019 21:52:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729466AbfEVSEq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 May 2019 14:04:46 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:39200 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728272AbfEVSEq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 May 2019 14:04:46 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4MI42H6057108;
-        Wed, 22 May 2019 18:04:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=vNGE+0uZ7+d6OMvSR28E+rQ2Uw8q+Rmo8/vlHSZ5AlI=;
- b=PLx9+LuiCl0T8AKx6m0zIp+9YZSXsyR1Yaa2JmvmwurFCbb0y9W5Fd1SMIJWIA6Mvu2p
- zdT9SCsJo1hyc3OGiGLQ9JCTxMR/vKXNiAnjRgwEBSI1E1UoTk2zE5o8w54/qi4635T1
- vgOytFZm/g3ihAPuP/5O6ypN9I1Y83Yzn/Lcro9C+R9ddZvCA0WkJg77BU5n1wy51qKa
- M4DExMajQd4fhy0FTUvazLl9lXgLGzesWLe+CZaFKI0ck5dnoRHZcXcpcigmhYBD2gux
- 4TB/p5gMbUfQbDbakriRdGoXBPyvDOmYiBIcmMVJL4tXPgqCjhnvSUT6tqKuwmOyECF2 Gg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2130.oracle.com with ESMTP id 2smsk5dp28-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 May 2019 18:04:12 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4MI45Tw191793;
-        Wed, 22 May 2019 18:04:12 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2smsh1rue8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 22 May 2019 18:04:12 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4MI4AXX001566;
-        Wed, 22 May 2019 18:04:11 GMT
-Received: from [10.159.159.229] (/10.159.159.229)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 22 May 2019 18:04:10 +0000
-Subject: Re: [PATCH kvm-unit-tests] vmx_tests: use enter_guest if guest state
- is valid
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <1558521229-8770-1-git-send-email-pbonzini@redhat.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <06c91c5e-9a50-a038-f836-f6bab51f6a94@oracle.com>
-Date:   Wed, 22 May 2019 11:04:09 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1731869AbfEVT0G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 22 May 2019 15:26:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47488 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731844AbfEVT0G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 22 May 2019 15:26:06 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E9E7720675;
+        Wed, 22 May 2019 19:26:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1558553164;
+        bh=qtDvzC94e9QsmzuSJ45lCF7jx8FzTa1Ty05BUcSIs9E=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=eq7yM0S0foQQszBXOMM0hfHk9mn/7sHDR5zsQiiz0evuLgQNuJASd22PLlg3cmrsC
+         oDEMLXvBbQ80QWg+L5YbAA9vh+kNt0N08LW+LzLeZokSHXq5Ri8Lqy5SeCPqZUidck
+         9KwlXMl4pwKM6OtphgMS2y6Aipjd0ofmuHCyi/q4=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.0 089/317] vfio-ccw: Do not call flush_workqueue while holding the spinlock
+Date:   Wed, 22 May 2019 15:19:50 -0400
+Message-Id: <20190522192338.23715-89-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190522192338.23715-1-sashal@kernel.org>
+References: <20190522192338.23715-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1558521229-8770-1-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905220126
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905220126
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Farhan Ali <alifm@linux.ibm.com>
 
-On 5/22/19 3:33 AM, Paolo Bonzini wrote:
-> Change one remaining call site where the guest state is valid as far as
-> PAT is concerned; we should abort on both an early vmentry failure
-> as well as an invalid guest state.
->
-> Suggested-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   x86/vmx_tests.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index a0b3639..b9bb169 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -6735,7 +6735,7 @@ static void test_pat(u32 field, const char * field_name, u32 ctrl_field,
->   				report_prefix_pop();
->   
->   			} else {	// GUEST_PAT
-> -				enter_guest_with_invalid_guest_state();
-> +				enter_guest();
->   				report_guest_pat_test("ENT_LOAD_PAT enabled",
->   						       VMX_VMCALL, val);
->   			}
+[ Upstream commit cea5dde42a83b5f0a039da672f8686455936b8d8 ]
 
+Currently we call flush_workqueue while holding the subchannel
+spinlock. But flush_workqueue function can go to sleep, so
+do not call the function while holding the spinlock.
 
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Fixes the following bug:
+
+[  285.203430] BUG: scheduling while atomic: bash/14193/0x00000002
+[  285.203434] INFO: lockdep is turned off.
+....
+[  285.203485] Preemption disabled at:
+[  285.203488] [<000003ff80243e5c>] vfio_ccw_sch_quiesce+0xbc/0x120 [vfio_ccw]
+[  285.203496] CPU: 7 PID: 14193 Comm: bash Tainted: G        W
+....
+[  285.203504] Call Trace:
+[  285.203510] ([<0000000000113772>] show_stack+0x82/0xd0)
+[  285.203514]  [<0000000000b7a102>] dump_stack+0x92/0xd0
+[  285.203518]  [<000000000017b8be>] __schedule_bug+0xde/0xf8
+[  285.203524]  [<0000000000b95b5a>] __schedule+0x7a/0xc38
+[  285.203528]  [<0000000000b9678a>] schedule+0x72/0xb0
+[  285.203533]  [<0000000000b9bfbc>] schedule_timeout+0x34/0x528
+[  285.203538]  [<0000000000b97608>] wait_for_common+0x118/0x1b0
+[  285.203544]  [<0000000000166d6a>] flush_workqueue+0x182/0x548
+[  285.203550]  [<000003ff80243e6e>] vfio_ccw_sch_quiesce+0xce/0x120 [vfio_ccw]
+[  285.203556]  [<000003ff80245278>] vfio_ccw_mdev_reset+0x38/0x70 [vfio_ccw]
+[  285.203562]  [<000003ff802458b0>] vfio_ccw_mdev_remove+0x40/0x78 [vfio_ccw]
+[  285.203567]  [<000003ff801a499c>] mdev_device_remove_ops+0x3c/0x80 [mdev]
+[  285.203573]  [<000003ff801a4d5c>] mdev_device_remove+0xc4/0x130 [mdev]
+[  285.203578]  [<000003ff801a5074>] remove_store+0x6c/0xa8 [mdev]
+[  285.203582]  [<000000000046f494>] kernfs_fop_write+0x14c/0x1f8
+[  285.203588]  [<00000000003c1530>] __vfs_write+0x38/0x1a8
+[  285.203593]  [<00000000003c187c>] vfs_write+0xb4/0x198
+[  285.203597]  [<00000000003c1af2>] ksys_write+0x5a/0xb0
+[  285.203601]  [<0000000000b9e270>] system_call+0xdc/0x2d8
+
+Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+Message-Id: <626bab8bb2958ae132452e1ddaf1b20882ad5a9d.1554756534.git.alifm@linux.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/s390/cio/vfio_ccw_drv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+index 0b3b9de45c602..64bb121ba5987 100644
+--- a/drivers/s390/cio/vfio_ccw_drv.c
++++ b/drivers/s390/cio/vfio_ccw_drv.c
+@@ -54,9 +54,9 @@ int vfio_ccw_sch_quiesce(struct subchannel *sch)
+ 
+ 			wait_for_completion_timeout(&completion, 3*HZ);
+ 
+-			spin_lock_irq(sch->lock);
+ 			private->completion = NULL;
+ 			flush_workqueue(vfio_ccw_work_q);
++			spin_lock_irq(sch->lock);
+ 			ret = cio_cancel_halt_clear(sch, &iretry);
+ 		};
+ 
+-- 
+2.20.1
 
