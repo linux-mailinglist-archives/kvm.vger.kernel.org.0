@@ -2,97 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 105D427614
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 08:36:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C20827627
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 08:44:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727466AbfEWGgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 02:36:46 -0400
-Received: from ozlabs.org ([203.11.71.1]:34359 "EHLO ozlabs.org"
+        id S1726309AbfEWGoJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 02:44:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40418 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726385AbfEWGgp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 02:36:45 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 458ft353Lrz9sBV; Thu, 23 May 2019 16:36:43 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1558593403; bh=XqYcC2hfPVNyLaizCQlvjY5iInJ3OLoLBVpPVN8v8LU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pnayADD3fDzj8vJX/tLcCYRdJwDw6tWApdyWE5oEFWXOPxNJxSuWp5d+ty16mEAuo
-         Mw4B1rMAjWXRxUL+EMVQDivCDRpxGl6Wsrh84MnKGJ6KDYJ11z364cyiKURxPTVF6z
-         Ddwn7xqP0fIrzv0gVM3EHjstnWfbInkoF48YeEPrLXIlWyKDnyHULm32iVd3WuNTtY
-         WcOnwBsIiTTFiL98nCsnYCzxTxOJWUNleGfBl4AMFb7j1KAPJsXh4m+bPTQgb+cq6x
-         ZBaZZI2uNSB877cKB7VnqUMFTudqsczK+guPMRCW16efIlzqCEJP97qYJbyuUQkoTL
-         OMexRWIStWG9Q==
-Date:   Thu, 23 May 2019 16:36:32 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org,
-        =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: [PATCH 4/4] KVM: PPC: Book3S HV: Don't take kvm->lock around
- kvm_for_each_vcpu
-Message-ID: <20190523063632.GF19655@blackberry>
-References: <20190523063424.GB19655@blackberry>
+        id S1725814AbfEWGoJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 02:44:09 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0FB5637EEF;
+        Thu, 23 May 2019 06:44:09 +0000 (UTC)
+Received: from gondolin (ovpn-116-44.ams2.redhat.com [10.36.116.44])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6E6D5619CF;
+        Thu, 23 May 2019 06:44:07 +0000 (UTC)
+Date:   Thu, 23 May 2019 08:44:04 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Farhan Ali <alifm@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 0/3] s390: vfio-ccw fixes
+Message-ID: <20190523084404.5bc47111.cohuck@redhat.com>
+In-Reply-To: <20190516161403.79053-1-farman@linux.ibm.com>
+References: <20190516161403.79053-1-farman@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190523063424.GB19655@blackberry>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Thu, 23 May 2019 06:44:09 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently the HV KVM code takes the kvm->lock around calls to
-kvm_for_each_vcpu() and kvm_get_vcpu_by_id() (which can call
-kvm_for_each_vcpu() internally).  However, that leads to a lock
-order inversion problem, because these are called in contexts where
-the vcpu mutex is held, but the vcpu mutexes nest within kvm->lock
-according to Documentation/virtual/kvm/locking.txt.  Hence there
-is a possibility of deadlock.
+On Thu, 16 May 2019 18:14:00 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
 
-To fix this, we simply don't take the kvm->lock mutex around these
-calls.  This is safe because the implementations of kvm_for_each_vcpu()
-and kvm_get_vcpu_by_id() have been designed to be able to be called
-locklessly.
+> Here are the remaining patches in my fixes series, to handle the more
+> involved scenario of channel programs that do not move any actual data
+> to/from the device.  They were reordered per feedback from v2, which
+> means they received minor massaging because of overlapping code and
+> some cleanup to the commit messages.
+> 
+> They are based on Conny's vfio-ccw tree.  :)
+> 
+> Changelog:
+>  v2 -> v3:
+>   - Patches 1-4:
+>      - [Farhan] Added r-b
+>      - [Cornelia] Queued to vfio-ccw, dropped from this version
+>   - Patches 5/6:
+>      - [Cornelia/Farhan] Swapped the order of these patches, minor
+>        rework on the placement of bytes/idaw_nr variables and the
+>        commit messages that resulted.
+>  v2: https://patchwork.kernel.org/cover/10944075/
+>  v1: https://patchwork.kernel.org/cover/10928799/
+> 
+> Eric Farman (3):
+>   s390/cio: Don't pin vfio pages for empty transfers
+>   s390/cio: Allow zero-length CCWs in vfio-ccw
+>   s390/cio: Remove vfio-ccw checks of command codes
+> 
+>  drivers/s390/cio/vfio_ccw_cp.c | 92 ++++++++++++++++++++++++----------
+>  1 file changed, 65 insertions(+), 27 deletions(-)
+> 
 
-Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
----
- arch/powerpc/kvm/book3s_hv.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
-
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index b1c0a9b..27054d3 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -446,12 +446,7 @@ static void kvmppc_dump_regs(struct kvm_vcpu *vcpu)
- 
- static struct kvm_vcpu *kvmppc_find_vcpu(struct kvm *kvm, int id)
- {
--	struct kvm_vcpu *ret;
--
--	mutex_lock(&kvm->lock);
--	ret = kvm_get_vcpu_by_id(kvm, id);
--	mutex_unlock(&kvm->lock);
--	return ret;
-+	return kvm_get_vcpu_by_id(kvm, id);
- }
- 
- static void init_vpa(struct kvm_vcpu *vcpu, struct lppaca *vpa)
-@@ -1583,7 +1578,6 @@ static void kvmppc_set_lpcr(struct kvm_vcpu *vcpu, u64 new_lpcr,
- 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
- 	u64 mask;
- 
--	mutex_lock(&kvm->lock);
- 	spin_lock(&vc->lock);
- 	/*
- 	 * If ILE (interrupt little-endian) has changed, update the
-@@ -1623,7 +1617,6 @@ static void kvmppc_set_lpcr(struct kvm_vcpu *vcpu, u64 new_lpcr,
- 		mask &= 0xFFFFFFFF;
- 	vc->lpcr = (vc->lpcr & ~mask) | (new_lpcr & mask);
- 	spin_unlock(&vc->lock);
--	mutex_unlock(&kvm->lock);
- }
- 
- static int kvmppc_get_one_reg_hv(struct kvm_vcpu *vcpu, u64 id,
--- 
-2.7.4
-
+Thanks, applied.
