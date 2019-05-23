@@ -2,122 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2299F284A3
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 19:15:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EB40284C4
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 19:20:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731138AbfEWRPs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 13:15:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38486 "EHLO mx1.redhat.com"
+        id S1731226AbfEWRUN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 13:20:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39304 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731089AbfEWRPr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 13:15:47 -0400
+        id S1731106AbfEWRUM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 13:20:12 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8E2E6308A104
-        for <kvm@vger.kernel.org>; Thu, 23 May 2019 17:15:47 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 597C46EF;
+        Thu, 23 May 2019 17:20:12 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9303810027C7;
-        Thu, 23 May 2019 17:15:43 +0000 (UTC)
-Date:   Thu, 23 May 2019 19:15:41 +0200
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C145100200D;
+        Thu, 23 May 2019 17:20:06 +0000 (UTC)
+Date:   Thu, 23 May 2019 19:20:04 +0200
 From:   Andrew Jones <drjones@redhat.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com
-Subject: Re: [PATCH] kvm: selftests: aarch64: dirty_log_test: fix unaligned
- memslot size
-Message-ID: <20190523171541.2hccg55buykxc2ak@kamzik.brq.redhat.com>
-References: <20190523093405.17887-1-drjones@redhat.com>
- <20190523094859.GB2517@xz-x1>
- <20190523100527.cp5ij43scb3m2hel@kamzik.brq.redhat.com>
- <20190523134709.GC2517@xz-x1>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH 4/9] KVM: selftests: Introduce a VM_MODE_DEFAULT macro
+ for the default bits
+Message-ID: <20190523172004.yeo5wtugofoh5mid@kamzik.brq.redhat.com>
+References: <20190523164309.13345-1-thuth@redhat.com>
+ <20190523164309.13345-5-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190523134709.GC2517@xz-x1>
+In-Reply-To: <20190523164309.13345-5-thuth@redhat.com>
 User-Agent: NeoMutt/20180716
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Thu, 23 May 2019 17:15:47 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Thu, 23 May 2019 17:20:12 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 23, 2019 at 09:47:09PM +0800, Peter Xu wrote:
-> On Thu, May 23, 2019 at 12:05:27PM +0200, Andrew Jones wrote:
-> > On Thu, May 23, 2019 at 05:48:59PM +0800, Peter Xu wrote:
-> > > On Thu, May 23, 2019 at 11:34:05AM +0200, Andrew Jones wrote:
-> > > > The memory slot size must be aligned to the host's page size. When
-> > > > testing a guest with a 4k page size on a host with a 64k page size,
-> > > > then 3 guest pages are not host page size aligned. Since we just need
-> > > > a nearly arbitrary number of extra pages to ensure the memslot is not
-> > > > aligned to a 64 host-page boundary for this test, then we can use
-> > > > 16, as that's 64k aligned, but not 64 * 64k aligned.
-> > > > 
-> > > > Fixes: 76d58e0f07ec ("KVM: fix KVM_CLEAR_DIRTY_LOG for memory slots of unaligned size", 2019-04-17)
-> > > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > > 
-> > > > ---
-> > > > Note, the commit "KVM: fix KVM_CLEAR_DIRTY_LOG for memory slots of
-> > > > unaligned size" was somehow committed twice. 76d58e0f07ec is the
-> > > > first instance.
-> > > > 
-> > > >  tools/testing/selftests/kvm/dirty_log_test.c | 2 +-
-> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-> > > > index f50a15c38f9b..bf85afbf1b5f 100644
-> > > > --- a/tools/testing/selftests/kvm/dirty_log_test.c
-> > > > +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-> > > > @@ -292,7 +292,7 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
-> > > >  	 * A little more than 1G of guest page sized pages.  Cover the
-> > > >  	 * case where the size is not aligned to 64 pages.
-> > > >  	 */
-> > > > -	guest_num_pages = (1ul << (30 - guest_page_shift)) + 3;
-> > > > +	guest_num_pages = (1ul << (30 - guest_page_shift)) + 16;
-> > > 
-> > > Hi, Drew,
-> > > 
-> > > Could you help explain what's the error on ARM?  Since I still cannot
-> > > understand how it failed from the first glance...
-> > 
-> > The KVM_SET_USER_MEMORY_REGION ioctl will fail because of
-> > 
-> >     if (mem->memory_size & (PAGE_SIZE - 1))
-> >             goto out;
-> > 
-> > in __kvm_set_memory_region(). And that's because PAGE_SIZE == 64k
-> > on the host (kvm), but we're attempting to allocate a size of 3*4k.
+On Thu, May 23, 2019 at 06:43:04PM +0200, Thomas Huth wrote:
+> This will be required later for tests like the kvm_create_max_vcpus
+> test that do not use the vm_create_default() function.
 > 
-> Oops yes.  I merely forgot we've got two memory regions for the test,
-> sorry.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/include/kvm_util.h      | 6 ++++++
+>  tools/testing/selftests/kvm/lib/aarch64/processor.c | 2 +-
+>  tools/testing/selftests/kvm/lib/x86_64/processor.c  | 2 +-
+>  3 files changed, 8 insertions(+), 2 deletions(-)
 > 
-> > 
-> > > 
-> > > Also, even if we want to have the alignment, shall we do the math
-> > > using known host/guest page size rather than another adhoc number or
-> > > could it still break with some other combinations of host/guest page
-> > > sizes?
-> > 
-> > I don't think we need to worry too much about > 64k pages being a
-> > thing any time soon and I'd rather not change the number of pages
-> > allocated based on the page sizes, so other than maybe doing something
-> > like
-> > 
-> > /*
-> >  * Comment stating why we have this.
-> >  */
-> > #define GUEST_EXTRA_PAGES 16
-> > 
-> > then I think we're already fine.
-> 
-> IMHO it would be as simple as replacing 3 with "3 * host_size /
-> guest_size", but both work for me.
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index b8bf961074fe..b6eb6471e6b2 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -43,6 +43,12 @@ enum vm_guest_mode {
+>  	NUM_VM_MODES,
+>  };
+>  
+> +#ifdef __aarch64__
+> +#define VM_MODE_DEFAULT VM_MODE_P40V48_4K
+> +#else
+> +#define VM_MODE_DEFAULT VM_MODE_P52V48_4K
+> +#endif
+> +
+>  #define vm_guest_mode_string(m) vm_guest_mode_string[m]
+>  extern const char * const vm_guest_mode_string[];
+>  
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index fa6cd340137c..596ccaf09cb6 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -226,7 +226,7 @@ struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
+>  	uint64_t extra_pg_pages = (extra_mem_pages / ptrs_per_4k_pte) * 2;
+>  	struct kvm_vm *vm;
+>  
+> -	vm = vm_create(VM_MODE_P40V48_4K, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages, O_RDWR);
+> +	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES + extra_pg_pages, O_RDWR);
+>  
+>  	kvm_vm_elf_load(vm, program_invocation_name, 0, 0);
+>  	vm_vcpu_add_default(vm, vcpuid, guest_code);
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index dc7fae9fa424..bb38bbcefac5 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -823,7 +823,7 @@ struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
+>  	uint64_t extra_pg_pages = extra_mem_pages / 512 * 2;
+>  
+>  	/* Create VM */
+> -	vm = vm_create(VM_MODE_P52V48_4K,
+> +	vm = vm_create(VM_MODE_DEFAULT,
+>  		       DEFAULT_GUEST_PHY_PAGES + extra_pg_pages,
+>  		       O_RDWR);
+>  
+> -- 
+> 2.21.0
+>
 
-As I said, I'd rather not change the number of pages allocated based
-on the pages sizes. With this you get 3 4k or 64k pages when both host
-and guest are the same, 48 4k pages when the host is 64 and guest is 4,
-and when the host has 4k and the guest has 64k, we would get 0, which
-we don't want.
-
-Thanks,
-drew
+Reviewed-by: Andrew Jones <drjones@redhat.com>
