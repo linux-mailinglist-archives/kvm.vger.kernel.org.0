@@ -2,88 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 07BB52793E
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 11:31:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E49D27951
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 11:34:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730000AbfEWJbW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 05:31:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41184 "EHLO mx1.redhat.com"
+        id S1730516AbfEWJeI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 05:34:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43564 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726230AbfEWJbV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 05:31:21 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        id S1730461AbfEWJeH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 05:34:07 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9A2798830E;
-        Thu, 23 May 2019 09:31:21 +0000 (UTC)
-Received: from thuth.com (ovpn-116-124.ams2.redhat.com [10.36.116.124])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E6E6E5D707;
-        Thu, 23 May 2019 09:31:18 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: selftests: Wrap vcpu_nested_state_get/set functions with x86 guard
-Date:   Thu, 23 May 2019 11:31:14 +0200
-Message-Id: <20190523093114.18182-1-thuth@redhat.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id C7AFADF26
+        for <kvm@vger.kernel.org>; Thu, 23 May 2019 09:34:07 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A12475DC1A;
+        Thu, 23 May 2019 09:34:06 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, peterx@redhat.com
+Subject: [PATCH] kvm: selftests: aarch64: dirty_log_test: fix unaligned memslot size
+Date:   Thu, 23 May 2019 11:34:05 +0200
+Message-Id: <20190523093405.17887-1-drjones@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Thu, 23 May 2019 09:31:21 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Thu, 23 May 2019 09:34:07 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-struct kvm_nested_state is only available on x86 so far. To be able
-to compile the code on other architectures as well, we need to wrap
-the related code with #ifdefs.
+The memory slot size must be aligned to the host's page size. When
+testing a guest with a 4k page size on a host with a 64k page size,
+then 3 guest pages are not host page size aligned. Since we just need
+a nearly arbitrary number of extra pages to ensure the memslot is not
+aligned to a 64 host-page boundary for this test, then we can use
+16, as that's 64k aligned, but not 64 * 64k aligned.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Fixes: 76d58e0f07ec ("KVM: fix KVM_CLEAR_DIRTY_LOG for memory slots of unaligned size", 2019-04-17)
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+
 ---
- tools/testing/selftests/kvm/include/kvm_util.h | 2 ++
- tools/testing/selftests/kvm/lib/kvm_util.c     | 2 ++
- 2 files changed, 4 insertions(+)
+Note, the commit "KVM: fix KVM_CLEAR_DIRTY_LOG for memory slots of
+unaligned size" was somehow committed twice. 76d58e0f07ec is the
+first instance.
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 8c6b9619797d..a5a4b28f14d8 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -118,10 +118,12 @@ void vcpu_events_get(struct kvm_vm *vm, uint32_t vcpuid,
- 		     struct kvm_vcpu_events *events);
- void vcpu_events_set(struct kvm_vm *vm, uint32_t vcpuid,
- 		     struct kvm_vcpu_events *events);
-+#ifdef __x86_64__
- void vcpu_nested_state_get(struct kvm_vm *vm, uint32_t vcpuid,
- 			   struct kvm_nested_state *state);
- int vcpu_nested_state_set(struct kvm_vm *vm, uint32_t vcpuid,
- 			  struct kvm_nested_state *state, bool ignore_error);
-+#endif
- 
- const char *exit_reason_str(unsigned int exit_reason);
- 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index cf62de377310..633b22df46a4 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1248,6 +1248,7 @@ void vcpu_events_set(struct kvm_vm *vm, uint32_t vcpuid,
- 		ret, errno);
- }
- 
-+#ifdef __x86_64__
- void vcpu_nested_state_get(struct kvm_vm *vm, uint32_t vcpuid,
- 			   struct kvm_nested_state *state)
- {
-@@ -1279,6 +1280,7 @@ int vcpu_nested_state_set(struct kvm_vm *vm, uint32_t vcpuid,
- 
- 	return ret;
- }
-+#endif
- 
- /*
-  * VM VCPU System Regs Get
+ tools/testing/selftests/kvm/dirty_log_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index f50a15c38f9b..bf85afbf1b5f 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -292,7 +292,7 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
+ 	 * A little more than 1G of guest page sized pages.  Cover the
+ 	 * case where the size is not aligned to 64 pages.
+ 	 */
+-	guest_num_pages = (1ul << (30 - guest_page_shift)) + 3;
++	guest_num_pages = (1ul << (30 - guest_page_shift)) + 16;
+ 	host_page_size = getpagesize();
+ 	host_num_pages = (guest_num_pages * guest_page_size) / host_page_size +
+ 			 !!((guest_num_pages * guest_page_size) % host_page_size);
 -- 
-2.21.0
+2.18.1
 
