@@ -2,66 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E2A8528464
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 18:58:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4626A2846F
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 19:00:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731098AbfEWQ6g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 12:58:36 -0400
-Received: from mail-it1-f196.google.com ([209.85.166.196]:50768 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730899AbfEWQ6g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 12:58:36 -0400
-Received: by mail-it1-f196.google.com with SMTP id a186so1061561itg.0
-        for <kvm@vger.kernel.org>; Thu, 23 May 2019 09:58:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qvOckQPmf88tA3fBd0FnVt1+4Xz7hyduRt9XZLMQBao=;
-        b=mqlPzKOcxvZnBc+OW2kAhF9H+ObZIEm2U98GTru5i4t1w5KsWaE9IrkNrTDf0HvApN
-         uYa+/wbWkTnqAybyRmThn4vC+31/IisncdXMJdp7Hsom5igxFHW8aC5d94pUa7jjWR3+
-         KxUiDFHsW847ykZucH5E4APgORtjbvijCVJEA2DSH5Sam3uuJrPBrQxyXVvx54FlXfuy
-         0QLQpRqOrlluR92+j3KltDBfsjl6YIAlmAoMXPFY4Bx7UrcV1DCKoe6X58OCcApTV61s
-         VnQKSs9KiBer165vSUMOMEqS6ZD+OJV1v05woSkq/7ukB6rVUb7okRqj+ArbRO/HDg50
-         QNyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qvOckQPmf88tA3fBd0FnVt1+4Xz7hyduRt9XZLMQBao=;
-        b=Jd/H8njZKwrOu68YtX2fF9IZ97fKQVkFIqIKrLymBWrsDkBgqNAsMrCmaUWBkkwpLJ
-         /9uVdwMuMDrwuND30n6RNqeAa7IlMwSGYVJb1zvY9SlsbRZsp2cF0hDBF32LIHORMqD+
-         sRnvMCpRebbm/iMO3UF7X9X9QpChMcXUJ+msvGQCrAr6lq0EoD+fvb7X7nQEKlvTZuZZ
-         VForQNCYWx/pM1TO1079sdn/ZOyOPspDda+bMxy0cWiamcwCMvSSb/RI5XVNXGcdYe9L
-         HhMS5vUJyv3VUaeI6pda2oZHt7zk7JZO1UTB1M6PyYCpOHiop/nNJqGhhLRCQJY+yUm2
-         16Uw==
-X-Gm-Message-State: APjAAAXhYaU69SpaUideGRl+Fp29sLNBIKHeqVO8BoeeExPGoH1/y17N
-        4TbtDBfKWwfVMJfVCk5NQ9aptqCSKuzt6P0haGvVWA==
-X-Google-Smtp-Source: APXvYqyx1yJPWAjb/UBr1bd7va9J+5UIQXsEpvpYGZBX7xitFrb0F6QWIWILN568p+fYWPxN4nZlbD9aZNtl4uMSP+M=
-X-Received: by 2002:a24:618f:: with SMTP id s137mr13726481itc.134.1558630715154;
- Thu, 23 May 2019 09:58:35 -0700 (PDT)
+        id S1731303AbfEWRAh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 13:00:37 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:51018 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730918AbfEWRAg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 13:00:36 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3B21C374;
+        Thu, 23 May 2019 10:00:36 -0700 (PDT)
+Received: from mbp (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DF1633F5AF;
+        Thu, 23 May 2019 10:00:29 -0700 (PDT)
+Date:   Thu, 23 May 2019 18:00:27 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     enh <enh@google.com>
+Cc:     Kees Cook <keescook@chromium.org>,
+        Evgenii Stepanov <eugenis@google.com>,
+        Andrey Konovalov <andreyknvl@google.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
+Message-ID: <20190523170026.nso2me5qnrrjbrdr@mbp>
+References: <20190517144931.GA56186@arrakis.emea.arm.com>
+ <CAFKCwrj6JEtp4BzhqO178LFJepmepoMx=G+YdC8sqZ3bcBp3EQ@mail.gmail.com>
+ <20190521182932.sm4vxweuwo5ermyd@mbp>
+ <201905211633.6C0BF0C2@keescook>
+ <20190522101110.m2stmpaj7seezveq@mbp>
+ <CAJgzZoosKBwqXRyA6fb8QQSZXFqfHqe9qO9je5TogHhzuoGXJQ@mail.gmail.com>
+ <20190522163527.rnnc6t4tll7tk5zw@mbp>
+ <201905221316.865581CF@keescook>
+ <20190523144449.waam2mkyzhjpqpur@mbp>
+ <CAJgzZoqX--Kd9=Kjpnfz-5cjVJ=TdsXM5dJM_EjLFKniVbny2w@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190522234545.5930-1-krish.sadhukhan@oracle.com> <20190522234545.5930-2-krish.sadhukhan@oracle.com>
-In-Reply-To: <20190522234545.5930-2-krish.sadhukhan@oracle.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 23 May 2019 09:58:24 -0700
-Message-ID: <CALMp9eSgov_U_ZKr8MbBjzRhsDugBqL_3JJtHNdGvLYLN3VQAw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kvm-unit-test: x86: Add a wrapper to check if the CPU
- supports NX bit in MSR_EFER
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJgzZoqX--Kd9=Kjpnfz-5cjVJ=TdsXM5dJM_EjLFKniVbny2w@mail.gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 22, 2019 at 5:12 PM Krish Sadhukhan
-<krish.sadhukhan@oracle.com> wrote:
->
-> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-There will likely be a lot of these over time. Why not implement
-something more generic, like static_cpu_has() in the kernel?
+On Thu, May 23, 2019 at 08:44:12AM -0700, enh wrote:
+> On Thu, May 23, 2019 at 7:45 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > On Wed, May 22, 2019 at 01:47:36PM -0700, Kees Cook wrote:
+> > > For userspace, how would a future binary choose TBI over MTE? If it's
+> > > a library issue, we can't use an ELF bit, since the choice may be
+> > > "late" after ELF load (this implies the need for a prctl().) If it's
+> > > binary-only ("built with HWKASan") then an ELF bit seems sufficient.
+> > > And without the marking, I'd expect the kernel to enforce MTE when
+> > > there are high bits.
+> >
+> > The current plan is that a future binary issues a prctl(), after
+> > checking the HWCAP_MTE bit (as I replied to Elliot, the MTE instructions
+> > are not in the current NOP space). I'd expect this to be done by the
+> > libc or dynamic loader under the assumption that the binaries it loads
+> > do _not_ use the top pointer byte for anything else.
+> 
+> yeah, it sounds like to support hwasan and MTE, the dynamic linker
+> will need to not use either itself.
+> 
+> > With hwasan compiled objects this gets more confusing (any ELF note
+> > to identify them?).
+> 
+> no, at the moment code that wants to know checks for the presence of
+> __hwasan_init. (and bionic doesn't actually look at any ELF notes
+> right now.) but we can always add something if we need to.
+
+It's a userspace decision to make. In the kernel, we are proposing that
+bionic calls a prctl() to enable MTE explicitly. It could first check
+for the presence of __hwasan_init.
+
+-- 
+Catalin
