@@ -2,123 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 285832845C
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 18:57:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2A8528464
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 18:58:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731336AbfEWQ5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 12:57:23 -0400
-Received: from foss.arm.com ([217.140.101.70]:50904 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730899AbfEWQ5W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 12:57:22 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0774C374;
-        Thu, 23 May 2019 09:57:22 -0700 (PDT)
-Received: from mbp (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1B06C3F5AF;
-        Thu, 23 May 2019 09:57:15 -0700 (PDT)
-Date:   Thu, 23 May 2019 17:57:09 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Dave Martin <Dave.Martin@arm.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
-        Lee Smith <Lee.Smith@arm.com>, linux-kselftest@vger.kernel.org,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org,
-        linux-arm-kernel@lists.infradead.org,
-        Evgeniy Stepanov <eugenis@google.com>,
-        linux-media@vger.kernel.org, Kees Cook <keescook@chromium.org>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Andrey Konovalov <andreyknvl@google.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        linux-kernel@vger.kernel.org,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
-Message-ID: <20190523165708.q6ru7xg45aqfjzpr@mbp>
-References: <cover.1557160186.git.andreyknvl@google.com>
- <20190517144931.GA56186@arrakis.emea.arm.com>
- <20190521184856.GC2922@ziepe.ca>
- <20190522134925.GV28398@e103592.cambridge.arm.com>
- <20190523002052.GF15389@ziepe.ca>
- <20190523104256.GX28398@e103592.cambridge.arm.com>
+        id S1731098AbfEWQ6g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 12:58:36 -0400
+Received: from mail-it1-f196.google.com ([209.85.166.196]:50768 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730899AbfEWQ6g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 12:58:36 -0400
+Received: by mail-it1-f196.google.com with SMTP id a186so1061561itg.0
+        for <kvm@vger.kernel.org>; Thu, 23 May 2019 09:58:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qvOckQPmf88tA3fBd0FnVt1+4Xz7hyduRt9XZLMQBao=;
+        b=mqlPzKOcxvZnBc+OW2kAhF9H+ObZIEm2U98GTru5i4t1w5KsWaE9IrkNrTDf0HvApN
+         uYa+/wbWkTnqAybyRmThn4vC+31/IisncdXMJdp7Hsom5igxFHW8aC5d94pUa7jjWR3+
+         KxUiDFHsW847ykZucH5E4APgORtjbvijCVJEA2DSH5Sam3uuJrPBrQxyXVvx54FlXfuy
+         0QLQpRqOrlluR92+j3KltDBfsjl6YIAlmAoMXPFY4Bx7UrcV1DCKoe6X58OCcApTV61s
+         VnQKSs9KiBer165vSUMOMEqS6ZD+OJV1v05woSkq/7ukB6rVUb7okRqj+ArbRO/HDg50
+         QNyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qvOckQPmf88tA3fBd0FnVt1+4Xz7hyduRt9XZLMQBao=;
+        b=Jd/H8njZKwrOu68YtX2fF9IZ97fKQVkFIqIKrLymBWrsDkBgqNAsMrCmaUWBkkwpLJ
+         /9uVdwMuMDrwuND30n6RNqeAa7IlMwSGYVJb1zvY9SlsbRZsp2cF0hDBF32LIHORMqD+
+         sRnvMCpRebbm/iMO3UF7X9X9QpChMcXUJ+msvGQCrAr6lq0EoD+fvb7X7nQEKlvTZuZZ
+         VForQNCYWx/pM1TO1079sdn/ZOyOPspDda+bMxy0cWiamcwCMvSSb/RI5XVNXGcdYe9L
+         HhMS5vUJyv3VUaeI6pda2oZHt7zk7JZO1UTB1M6PyYCpOHiop/nNJqGhhLRCQJY+yUm2
+         16Uw==
+X-Gm-Message-State: APjAAAXhYaU69SpaUideGRl+Fp29sLNBIKHeqVO8BoeeExPGoH1/y17N
+        4TbtDBfKWwfVMJfVCk5NQ9aptqCSKuzt6P0haGvVWA==
+X-Google-Smtp-Source: APXvYqyx1yJPWAjb/UBr1bd7va9J+5UIQXsEpvpYGZBX7xitFrb0F6QWIWILN568p+fYWPxN4nZlbD9aZNtl4uMSP+M=
+X-Received: by 2002:a24:618f:: with SMTP id s137mr13726481itc.134.1558630715154;
+ Thu, 23 May 2019 09:58:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190523104256.GX28398@e103592.cambridge.arm.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <20190522234545.5930-1-krish.sadhukhan@oracle.com> <20190522234545.5930-2-krish.sadhukhan@oracle.com>
+In-Reply-To: <20190522234545.5930-2-krish.sadhukhan@oracle.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 23 May 2019 09:58:24 -0700
+Message-ID: <CALMp9eSgov_U_ZKr8MbBjzRhsDugBqL_3JJtHNdGvLYLN3VQAw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kvm-unit-test: x86: Add a wrapper to check if the CPU
+ supports NX bit in MSR_EFER
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 23, 2019 at 11:42:57AM +0100, Dave P Martin wrote:
-> On Wed, May 22, 2019 at 09:20:52PM -0300, Jason Gunthorpe wrote:
-> > On Wed, May 22, 2019 at 02:49:28PM +0100, Dave Martin wrote:
-> > > If multiple people will care about this, perhaps we should try to
-> > > annotate types more explicitly in SYSCALL_DEFINEx() and ABI data
-> > > structures.
-> > > 
-> > > For example, we could have a couple of mutually exclusive modifiers
-> > > 
-> > > T __object *
-> > > T __vaddr * (or U __vaddr)
-> > > 
-> > > In the first case the pointer points to an object (in the C sense)
-> > > that the call may dereference but not use for any other purpose.
-> > 
-> > How would you use these two differently?
-> > 
-> > So far the kernel has worked that __user should tag any pointer that
-> > is from userspace and then you can't do anything with it until you
-> > transform it into a kernel something
-> 
-> Ultimately it would be good to disallow casting __object pointers execpt
-> to compatible __object pointer types, and to make get_user etc. demand
-> __object.
-> 
-> __vaddr pointers / addresses would be freely castable, but not to
-> __object and so would not be dereferenceable even indirectly.
-
-I think it gets too complicated and there are ambiguous cases that we
-may not be able to distinguish. For example copy_from_user() may be used
-to copy a user data structure into the kernel, hence __object would
-work, while the same function may be used to copy opaque data to a file,
-so __vaddr may be a better option (unless I misunderstood your
-proposal).
-
-We currently have T __user * and I think it's a good starting point. The
-prior attempt [1] was shut down because it was just hiding the cast
-using __force. We'd need to work through those cases again and rather
-start changing the function prototypes to avoid unnecessary casting in
-the callers (e.g. get_user_pages(void __user *) or come up with a new
-type) while changing the explicit casting to a macro where it needs to
-be obvious that we are converting a user pointer, potentially typed
-(tagged), to an untyped address range. We may need a user_ptr_to_ulong()
-macro or similar (it seems that we have a u64_to_user_ptr, wasn't aware
-of it).
-
-It may actually not be far from what you suggested but I'd keep the
-current T __user * to denote possible dereference.
-
-[1] https://lore.kernel.org/lkml/5d54526e5ff2e5ad63d0dfdd9ab17cf359afa4f2.1535629099.git.andreyknvl@google.com/
-
--- 
-Catalin
+On Wed, May 22, 2019 at 5:12 PM Krish Sadhukhan
+<krish.sadhukhan@oracle.com> wrote:
+>
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+There will likely be a lot of these over time. Why not implement
+something more generic, like static_cpu_has() in the kernel?
