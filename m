@@ -2,79 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AAC23284CF
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 19:22:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD7CF2851B
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 19:40:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731263AbfEWRWi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 13:22:38 -0400
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:43072 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731095AbfEWRWi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 13:22:38 -0400
-Received: by mail-qk1-f194.google.com with SMTP id z6so4260547qkl.10
-        for <kvm@vger.kernel.org>; Thu, 23 May 2019 10:22:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=orxdKAeTGhuAr1KDO8ykLR98bbgYAJIpSNP1r+lkby0=;
-        b=Okicvdm3H0wZl9B1jt0etcPTcquQ3GxXOUvhvPTxrJogGfobRHM7fPwlf8u+mzuG6c
-         KE4GGr0KhKYZId7pPs2MDodYkdMiH16W4tfGouV3wHm7ERPDKFx9QF6LAbYt8mELO/GB
-         5NPfq4Sz9l1FlaRXBwie3J8w3y8in2T4so3Fs+nnZnzuXXraGr1C3yFJ0FtxM3v3BO5i
-         IlwVseRgbir15VD1caff5/HWQDR5i+8dso1W+7EwjZC3KHTGQ5rjTrDuMQyaQufI2FIO
-         fQYLL1k7cUCVnWgyEVl/U54mc/vvB7uzgRNfFv44AnZDo0SWE7jSkG0CJW6L1WVixcuS
-         wjFw==
-X-Gm-Message-State: APjAAAXRtmjEVaf1IMpa4e9FOB2FsoQnmsBJ9YwqVgsT2FbAqJkd+0z7
-        MwFfKY7gnHdswhySe6HZKBZDPAFheS4=
-X-Google-Smtp-Source: APXvYqykamv1Wqqs833PdyLZedOafUeo+CHIJkq0yhHSr/u9oMeUTX6fQlKnQFFG/JvpWeUzz3qZdw==
-X-Received: by 2002:a05:620a:1084:: with SMTP id g4mr75399078qkk.228.1558632157708;
-        Thu, 23 May 2019 10:22:37 -0700 (PDT)
-Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net. [173.76.105.71])
-        by smtp.gmail.com with ESMTPSA id x30sm18102171qtx.35.2019.05.23.10.22.34
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 23 May 2019 10:22:36 -0700 (PDT)
-Date:   Thu, 23 May 2019 13:22:32 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     David Miller <davem@davemloft.net>
-Cc:     jasowang@redhat.com, virtualization@lists.linux-foundation.org,
-        kvm@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-        stefanha@redhat.com
-Subject: Re: [PATCH V2 0/4] Prevent vhost kthread from hogging CPU
-Message-ID: <20190523132228-mutt-send-email-mst@kernel.org>
-References: <1558067392-11740-1-git-send-email-jasowang@redhat.com>
- <20190518.132712.1971625204431294331.davem@davemloft.net>
+        id S1731364AbfEWRkg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 13:40:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45258 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731195AbfEWRkf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 13:40:35 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0DD0830C1AF9;
+        Thu, 23 May 2019 17:40:35 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7CCF55C219;
+        Thu, 23 May 2019 17:40:30 +0000 (UTC)
+Date:   Thu, 23 May 2019 19:40:28 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH 5/9] KVM: selftests: Align memory region addresses to 1M
+ on s390x
+Message-ID: <20190523174028.3giefzff3l5eclki@kamzik.brq.redhat.com>
+References: <20190523164309.13345-1-thuth@redhat.com>
+ <20190523164309.13345-6-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190518.132712.1971625204431294331.davem@davemloft.net>
+In-Reply-To: <20190523164309.13345-6-thuth@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Thu, 23 May 2019 17:40:35 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 18, 2019 at 01:27:12PM -0700, David Miller wrote:
-> From: Jason Wang <jasowang@redhat.com>
-> Date: Fri, 17 May 2019 00:29:48 -0400
+On Thu, May 23, 2019 at 06:43:05PM +0200, Thomas Huth wrote:
+> On s390x, there is a constraint that memory regions have to be aligned
+> to 1M (or running the VM will fail). Introduce a new "alignment" variable
+> in the vm_userspace_mem_region_add() function which now can be used for
+> both, huge page and s390x alignment requirements.
 > 
-> > Hi:
-> > 
-> > This series try to prevent a guest triggerable CPU hogging through
-> > vhost kthread. This is done by introducing and checking the weight
-> > after each requrest. The patch has been tested with reproducer of
-> > vsock and virtio-net. Only compile test is done for vhost-scsi.
-> > 
-> > Please review.
-> > 
-> > This addresses CVE-2019-3900.
-> > 
-> > Changs from V1:
-> > - fix user-ater-free in vosck patch
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/lib/kvm_util.c | 21 ++++++++++++++++-----
+>  1 file changed, 16 insertions(+), 5 deletions(-)
 > 
-> I am assuming that not only will mst review this, it will also go via
-> his tree rather than mine.
-> 
-> Thanks.
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 08edb8436c47..656df9d5cd4d 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -559,6 +559,7 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+>  	unsigned long pmem_size = 0;
+>  	struct userspace_mem_region *region;
+>  	size_t huge_page_size = KVM_UTIL_PGS_PER_HUGEPG * vm->page_size;
+> +	size_t alignment;
+>  
+>  	TEST_ASSERT((guest_paddr % vm->page_size) == 0, "Guest physical "
+>  		"address not on a page boundary.\n"
+> @@ -608,9 +609,20 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+>  	TEST_ASSERT(region != NULL, "Insufficient Memory");
+>  	region->mmap_size = npages * vm->page_size;
+>  
+> -	/* Enough memory to align up to a huge page. */
+> +#ifdef __s390x__
+> +	/* On s390x, the host address must be aligned to 1M (due to PGSTEs) */
+> +	alignment = 0x100000;
+> +#else
+> +	alignment = 1;
+> +#endif
+> +
+>  	if (src_type == VM_MEM_SRC_ANONYMOUS_THP)
+> -		region->mmap_size += huge_page_size;
+> +		alignment = huge_page_size;
 
-Will do.
+I guess s390x won't ever support VM_MEM_SRC_ANONYMOUS_THP? If it does,
+then we need 'alignment = max(huge_page_size, alignment)'. Actually
+that might be a nice way to write this anyway for future-proofing.
 
+> +
+> +	/* Add enough memory to align up if necessary */
+> +	if (alignment > 1)
+> +		region->mmap_size += alignment;
+> +
+>  	region->mmap_start = mmap(NULL, region->mmap_size,
+>  				  PROT_READ | PROT_WRITE,
+>  				  MAP_PRIVATE | MAP_ANONYMOUS
+> @@ -620,9 +632,8 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+>  		    "test_malloc failed, mmap_start: %p errno: %i",
+>  		    region->mmap_start, errno);
+>  
+> -	/* Align THP allocation up to start of a huge page. */
+> -	region->host_mem = align(region->mmap_start,
+> -				 src_type == VM_MEM_SRC_ANONYMOUS_THP ?  huge_page_size : 1);
+> +	/* Align host address */
+> +	region->host_mem = align(region->mmap_start, alignment);
+>  
+>  	/* As needed perform madvise */
+>  	if (src_type == VM_MEM_SRC_ANONYMOUS || src_type == VM_MEM_SRC_ANONYMOUS_THP) {
+> -- 
+> 2.21.0
+> 
