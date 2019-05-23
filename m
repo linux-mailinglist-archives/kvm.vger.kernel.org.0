@@ -2,195 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DCC828013
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 16:45:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EA8F28041
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 16:53:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730957AbfEWOo7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 10:44:59 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:47978 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730709AbfEWOo7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 10:44:59 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B972A80D;
-        Thu, 23 May 2019 07:44:58 -0700 (PDT)
-Received: from mbp (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9DF2A3F690;
-        Thu, 23 May 2019 07:44:52 -0700 (PDT)
-Date:   Thu, 23 May 2019 15:44:49 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     enh <enh@google.com>, Evgenii Stepanov <eugenis@google.com>,
-        Andrey Konovalov <andreyknvl@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
-Message-ID: <20190523144449.waam2mkyzhjpqpur@mbp>
-References: <cover.1557160186.git.andreyknvl@google.com>
- <20190517144931.GA56186@arrakis.emea.arm.com>
- <CAFKCwrj6JEtp4BzhqO178LFJepmepoMx=G+YdC8sqZ3bcBp3EQ@mail.gmail.com>
- <20190521182932.sm4vxweuwo5ermyd@mbp>
- <201905211633.6C0BF0C2@keescook>
- <20190522101110.m2stmpaj7seezveq@mbp>
- <CAJgzZoosKBwqXRyA6fb8QQSZXFqfHqe9qO9je5TogHhzuoGXJQ@mail.gmail.com>
- <20190522163527.rnnc6t4tll7tk5zw@mbp>
- <201905221316.865581CF@keescook>
+        id S1730933AbfEWOxO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 10:53:14 -0400
+Received: from mga02.intel.com ([134.134.136.20]:4283 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730672AbfEWOxN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 10:53:13 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP; 23 May 2019 07:53:12 -0700
+X-ExtLoop1: 1
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
+  by fmsmga008.fm.intel.com with ESMTP; 23 May 2019 07:53:12 -0700
+Date:   Thu, 23 May 2019 07:53:12 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     kvm@vger.kernel.org
+Subject: Re: Interaction between host-side mprotect() and KVM MMU
+Message-ID: <20190523145312.GB12078@linux.intel.com>
+References: <20190521072434.p4rtnbkerk5jqwh4@nodbug.lucina.net>
+ <20190521140238.GA22089@linux.intel.com>
+ <20190523092703.ddze6zcfsm2cj6kc@nodbug.lucina.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <201905221316.865581CF@keescook>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190523092703.ddze6zcfsm2cj6kc@nodbug.lucina.net>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 22, 2019 at 01:47:36PM -0700, Kees Cook wrote:
-> On Wed, May 22, 2019 at 05:35:27PM +0100, Catalin Marinas wrote:
-> > The two hard requirements I have for supporting any new hardware feature
-> > in Linux are (1) a single kernel image binary continues to run on old
-> > hardware while making use of the new feature if available and (2) old
-> > user space continues to run on new hardware while new user space can
-> > take advantage of the new feature.
+On Thu, May 23, 2019 at 11:27:03AM +0200, Martin Lucina wrote:
+> On Tuesday, 21.05.2019 at 07:02, Sean Christopherson wrote:
+> > > Questions:
+> > > 
+> > > a. Is this the intended behaviour, and can it be relied on? Note that
+> > > KVM/aarch64 behaves the same for me.
+> > > 
+> > > b. Why does case (1) fail but case (2) succeed? I spent a day reading
+> > > through the KVM MMU code, but failed to understand how this is implemented.
+> > 
+> > Case (1) fails because KVM explicitly grabs WRITE permissions when
+> > retrieving the HPA.  See __gfn_to_pfn_memslot() and hva_to_pfn().
+> > Note, KVM also allows userspace to set a guest memslot as RO
+> > independent of mprotect().
 > 
-> Agreed! And I think the series meets these requirements, yes?
-
-Yes. I mentioned this just to make sure people don't expect different
-kernel builds for different hardware features.
-
-There is also the obvious requirement which I didn't mention: new user
-space continues to run on new/subsequent kernel versions. That's one of
-the points of contention for this series (ignoring MTE) with the
-maintainers having to guarantee this without much effort. IOW, do the
-500K+ new lines in a subsequent kernel version break any user space out
-there? I'm only talking about the relaxed TBI ABI. Are the usual LTP,
-syskaller sufficient? Better static analysis would definitely help.
-
-> > For MTE, we just can't enable it by default since there are applications
-> > who use the top byte of a pointer and expect it to be ignored rather
-> > than failing with a mismatched tag. Just think of a hwasan compiled
-> > binary where TBI is expected to work and you try to run it with MTE
-> > turned on.
+> Thanks for the pointers. I'm aware of the ability to set a memslot as RO,
+> but currently we use a single memslot + mprotect() as it suits our loader
+> architecture better (see below).
 > 
-> Ah! Okay, here's the use-case I wasn't thinking of: the concern is TBI
-> conflicting with MTE. And anything that starts using TBI suddenly can't
-> run in the future because it's being interpreted as MTE bits? (Is that
-> the ABI concern?
+> > Case (2) doesn't fault because KVM doesn't support execute protection,
+> > i.e. all pages are executable in the guest (at least on x86).  My guess
+> > is that execute protection isn't supported because there isn't a strong
+> > use case for traditional virtualization and so no one has gone through
+> > the effort to add NX support.  E.g. the vast majority of system memory
+> > can be dynamically allocated (for userspace code), which practically
+> > speaking leaves only the guest kernel's data sections, and marking those
+> > NX requires at a minimum:
+> > 
+> >   - knowing exactly what kernel will be loaded
+> >   - no ASLR in the physical domain
+> >   - no transient execution, e.g. in vBIOS or trampoline code
+> 
+> In the Solo5 case we're using hardware virtualization in a non-traditional
+> sense, as an isolation layer for a static guest (i.e. no changes to
+> physical memory layout or page protections after "boot"). The guest is
+> considered untrusted and all [*] the setup is performed by the loader/VMM
+> ("tender" in our terminology), which has all the knowledge of what gets
+> loaded into the VM available up front. So your points above are not an
+> issue.
 
-That's another aspect to figure out when we add the MTE support. I don't
-think we'd be able to do this without an explicit opt-in by the user.
+I assumed as much, I was simply pointing out why KVM historically has not
+supported NX.
 
-Or, if we ever want MTE to be turned on by default (i.e. tag checking),
-even if everything is tagged with 0, we have to disallow TBI for user
-and this includes hwasan. There were a small number of programs using
-the TBI (I think some JavaScript compilers tried this). But now we are
-bringing in the hwasan support and this can be a large user base. Shall
-we add an ELF note for such binaries that use TBI/hwasan?
+> [*] well, almost all, the guest sets up its own IDT in order to report
+> exceptions and abort
+> 
+> > 
+> > > c. In order to enforce W^X both ways I'd like to have case (2) also fail
+> > > with EFAULT, is this possible?
+> > 
+> > Not without modifying KVM and the kernel (if you want to do it through
+> > mprotect()).
+> 
+> Hooking up the full EPT protection bits available to KVM via mprotect()
+> would be the best solution for us, and could also give us the ability to
+> have execute-only pages on x86, which is a nice defence against ROP attacks
+> in the guest. However, I can see now that this is not a trivial
+> undertaking, especially across the various MMU models (tdp, softmmu) and
+> architectures dealt with by the core KVM code.
+> 
+> N.B. We also have tender implementations for bhyve and OpenBSD vmm, and at
+> least in the OpenBSD case some community contributors are looking into
+> developing an "ept_mprotect" for precisely this use-case, though their vmm
+> code is much simpler (and does less) compared to KVM.
+> 
+> I take it there's no other way to mark a range of pages as NX by the guest
+> from the host side, so if we want this without modifying KVM and the
+> kernel, the only way to get it would be to set up "real" page tables inside
+> the guest ...?
 
-This series is still required for MTE but we may decide not to relax the
-ABI blindly, therefore the opt-in (prctl) or personality idea.
+Correct, KVM does currently support marking pages NX from the host.  But
+note that when EPT is enabled, KVM does not intercept writes to CR3, i.e.
+the guest can configure and load its own page page tables to bypass the
+restrictions of the tender, which may or may not be an issue.
 
-> I feel like we got into the weeds about ioctl()s and one-off bugs...)
-
-This needs solving as well. Most driver developers won't know why
-untagged_addr() is needed unless we have more rigorous types or type
-annotations and a tool to check them (we should probably revive the old
-sparse thread).
-
-> So there needs to be some way to let the kernel know which of three
-> things it should be doing:
-> 1- leaving userspace addresses as-is (present)
-> 2- wiping the top bits before using (this series)
-
-(I'd say tolerating rather than wiping since get_user still uses the tag
-in the current series)
-
-The current series does not allow any choice between 1 and 2, the
-default ABI basically becomes option 2.
-
-> 3- wiping the top bits for most things, but retaining them for MTE as
->    needed (the future)
-
-2 and 3 are not entirely compatible as a tagged pointer may be checked
-against the memory colour by the hardware. So you can't have hwasan
-binary with MTE enabled.
-
-> I expect MTE to be the "default" in the future. Once a system's libc has
-> grown support for it, everything will be trying to use MTE. TBI will be
-> the special case (but TBI is effectively a prerequisite).
-
-The kernel handling of tagged pointers is indeed a prerequisite. The ABI
-distinction between the above 2 and 3 needs to be solved.
-
-> AFAICT, the only difference I see between 2 and 3 will be the tag handling
-> in usercopy (all other places will continue to ignore the top bits). Is
-> that accurate?
-
-Yes, mostly (for the kernel). If MTE is enabled by default for a hwasan
-binary, it will SEGFAULT (either in user space or in kernel uaccess).
-How does the kernel choose between 2 and 3?
-
-> Is "1" a per-process state we want to keep? (I assume not, but rather it
-> is available via no TBI/MTE CONFIG or a boot-time option, if at all?)
-
-Possibly, though not necessarily per process. For testing or if
-something goes wrong during boot, a command line option with a static
-label would do. The AT_FLAGS bit needs to be checked by user space. My
-preference would be per-process.
-
-> To choose between "2" and "3", it seems we need a per-process flag to
-> opt into TBI (and out of MTE).
-
-Or leave option 2 the default and get it to opt in to MTE.
-
-> For userspace, how would a future binary choose TBI over MTE? If it's
-> a library issue, we can't use an ELF bit, since the choice may be
-> "late" after ELF load (this implies the need for a prctl().) If it's
-> binary-only ("built with HWKASan") then an ELF bit seems sufficient.
-> And without the marking, I'd expect the kernel to enforce MTE when
-> there are high bits.
-
-The current plan is that a future binary issues a prctl(), after
-checking the HWCAP_MTE bit (as I replied to Elliot, the MTE instructions
-are not in the current NOP space). I'd expect this to be done by the
-libc or dynamic loader under the assumption that the binaries it loads
-do _not_ use the top pointer byte for anything else. With hwasan
-compiled objects this gets more confusing (any ELF note to identify
-them?).
-
-(there is also the risk of existing applications using TBI already but
-I'm not aware of any still using this feature other than hwasan)
-
--- 
-Catalin
+On the other hand, modifying KVM to support NX via mprotect() in a limited
+capacity might be a relatively low effort option, e.g. support it as a
+per-module opt-in feature only when using TDP (EPT or NPT).
