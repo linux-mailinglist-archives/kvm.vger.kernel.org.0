@@ -2,100 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D1154275D8
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 08:06:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 276A627C45
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 13:56:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726081AbfEWGGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 02:06:52 -0400
-Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:35908 "EHLO
-        9.mo179.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725873AbfEWGGw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 02:06:52 -0400
-Received: from player688.ha.ovh.net (unknown [10.108.57.245])
-        by mo179.mail-out.ovh.net (Postfix) with ESMTP id C52A41300BF
-        for <kvm@vger.kernel.org>; Thu, 23 May 2019 08:06:49 +0200 (CEST)
-Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
-        (Authenticated sender: clg@kaod.org)
-        by player688.ha.ovh.net (Postfix) with ESMTPSA id D3CD95FC343E;
-        Thu, 23 May 2019 06:06:45 +0000 (UTC)
-Subject: Re: [PATCH 0/3] KVM: PPC: Book3S HV: XIVE: assorted fixes on vCPU and
- RAM limits
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
+        id S1730369AbfEWL4p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 07:56:45 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:34059 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729698AbfEWL4o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 07:56:44 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 458nzF42Z1z9s4V; Thu, 23 May 2019 21:56:41 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1558612601;
+        bh=YFHaKAHwSkkNV01pYtDLBmlGW8tDfBU5zHN14Jech/U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=cRTr4603N7N0NAWy9HE9tGd+GYfZOqgmMD/dAGxIN+xOaLn5TiiEqgmuMtaeBxTWk
+         Yc4VNThu0g1ATCaZ5OIzXWEtm0D6Vaolly2lCmMPtRKwMis1DaQjphmpQSqx2jIxvl
+         6XIWir3CMxvxaaiAnOcdzBf4ckpyBj7sd3+fkfqs=
+Date:   Thu, 23 May 2019 16:27:15 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Greg Kurz <groug@kaod.org>
+Cc:     =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+        kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
         kvm@vger.kernel.org
+Subject: Re: [PATCH 0/3] KVM: PPC: Book3S HV: XIVE: assorted fixes on vCPU
+ and RAM limits
+Message-ID: <20190523062715.GR30423@umbus.fritz.box>
 References: <20190520071514.9308-1-clg@kaod.org>
  <20190522233043.GO30423@umbus.fritz.box>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <10ae32dc-a103-e523-1da2-a5ebedf9432f@kaod.org>
-Date:   Thu, 23 May 2019 08:06:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ <20190523080123.6e700a1e@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20190522233043.GO30423@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 4069283740144536455
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddufedguddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="BZziOT8Kz25R/m/E"
+Content-Disposition: inline
+In-Reply-To: <20190523080123.6e700a1e@bahia.lan>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/23/19 1:30 AM, David Gibson wrote:
-> On Mon, May 20, 2019 at 09:15:11AM +0200, Cédric Le Goater wrote:
->> Hello,
->>
->> Here are a couple of fixes for issues in the XIVE KVM device when
->> testing the limits : RAM size and number of vCPUS.
 
-This summary is wrong. RAM size was fixed in QEMU.
+--BZziOT8Kz25R/m/E
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> How serious are the problems these patches fix?  I'm wondering if I
-> need to make a backport for RHEL8.1.
+On Thu, May 23, 2019 at 08:01:23AM +0200, Greg Kurz wrote:
+> On Thu, 23 May 2019 09:30:43 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Mon, May 20, 2019 at 09:15:11AM +0200, C=E9dric Le Goater wrote:
+> > > Hello,
+> > >=20
+> > > Here are a couple of fixes for issues in the XIVE KVM device when
+> > > testing the limits : RAM size and number of vCPUS. =20
+> >=20
+> > How serious are the problems these patches fix?  I'm wondering if I
+> > need to make a backport for RHEL8.1.
+> >=20
+>=20
+> Patch 2/3 fixes a QEMU error when hot-unplugging a vCPU:
+>=20
+> qemu-system-ppc64: KVM_SET_DEVICE_ATTR failed: Group 4 attr 0x00000000000=
+00046: Invalid argument
+>=20
+>=20
+> Patch 3/3 fixes an issue where the guest freezes at some point when doing
+> vCPU hot-plug/unplug in a loop.
 
-Patch 1 is a cleanup patch. It does not fix any critical issues.
+Oh.. weird.  It's not clear to me how it would do that.
 
-Patch 2 fixes CPU hotplug. The test on the EQ flag is at the wrong 
-place :/ This is important I think.
+> Both issues have a BZ at IBM. They can be mirrored to RH if needed.
 
-Patch 3 fixes the maximum number of vCPUS supported. This one is 
-less important maybe, unless we want to run a guest with 1024 vCPUs.
-Which is quite slow to run on most P9 systems. 
-
-QEMU emits a warning :
-
-  warning: Number of SMP cpus requested (1024) exceeds the recommended cpus supported by KVM (120)
-
-May be we should refuse to run QEMU when that number is above a 
-certain threshold ? 
-
-C. 
+That would be helpful, thanks.
 
 
 
->>
->> Based on 5.2-rc1.
->>
->> Available on GitHub:
->>
->>     https://github.com/legoater/linux/commits/xive-5.2
->>
->> Thanks,
->>
->> C. 
->>
->> Cédric Le Goater (3):
->>   KVM: PPC: Book3S HV: XIVE: clear file mapping when device is released
->>   KVM: PPC: Book3S HV: XIVE: do not test the EQ flag validity when
->>     reseting
->>   KVM: PPC: Book3S HV: XIVE: fix the enforced limit on the vCPU
->>     identifier
->>
->>  arch/powerpc/kvm/book3s_xive_native.c | 46 ++++++++++++++++-----------
->>  1 file changed, 27 insertions(+), 19 deletions(-)
->>
-> 
 
+>=20
+> > >=20
+> > > Based on 5.2-rc1.
+> > >=20
+> > > Available on GitHub:
+> > >=20
+> > >     https://github.com/legoater/linux/commits/xive-5.2
+> > >=20
+> > > Thanks,
+> > >=20
+> > > C.=20
+> > >=20
+> > > C=E9dric Le Goater (3):
+> > >   KVM: PPC: Book3S HV: XIVE: clear file mapping when device is releas=
+ed
+> > >   KVM: PPC: Book3S HV: XIVE: do not test the EQ flag validity when
+> > >     reseting
+> > >   KVM: PPC: Book3S HV: XIVE: fix the enforced limit on the vCPU
+> > >     identifier
+> > >=20
+> > >  arch/powerpc/kvm/book3s_xive_native.c | 46 ++++++++++++++++---------=
+--
+> > >  1 file changed, 27 insertions(+), 19 deletions(-)
+> > >  =20
+> >=20
+>=20
+
+
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--BZziOT8Kz25R/m/E
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzmPUEACgkQbDjKyiDZ
+s5IrWg/+OTY4FNwrBdELptmuvQZnFRtq5PGofd5x7xRrpjX/soyjsiUt+YPUIQvd
+YGWbJcr8K+j2IYc1AxNmeXKyTZdLEha82ZkwigxIhpPKJj+xaOe5bWkseBU0TciM
+t0tIb6HgHwUAjnkSg7eWyXXS0U+jo3/7QtxSSiWzJY8vLot5Bt41yOAIzCEvLtYp
+cJYWmjXhAbxNJz/Fp5qiGyBlzzDmbc3nKd83VcOL8bTtEYtGSIMb724qaQqvDj7H
+q0bIl1snxr35SleGBPWJUm1U0EemulNYAHcwZWco8tFl2MfPl92Y/9X5xEqqBLpD
+hNBD+C1NwGLaegdVJTXcoAiSXO3o3dhMiMKTG5IJJVf6O77p2bWPN3PZXmNJL0bP
+DNzLXHLxcDJa//dW1SW4WIpjFe9fJfRr9jot61kpCK64tRKiHvZWB0a7VN8zVuIJ
+uKlNCQksU+Lj6kgmMVJFBXCSH6852NjqS04mUZfWiRopl4rv001KUw7Xlk2R/HNS
+b2g2I9owivRLbL032tc7P2LmaOGk6Ty4nZdG4SgCxhBS84yg5JYvXyPSIhCU3v4a
+VpVZvQtkNoBuXTRjKC0dsIGavvNi2Q5UOTMpFH4yT7T1Miy6pR1UoLufEZXcYdtd
+m9BLwje58Lz1oaoRi3FI9cPnLw/YoRNW1IJPvYXTioQovok9dRk=
+=0Y7N
+-----END PGP SIGNATURE-----
+
+--BZziOT8Kz25R/m/E--
