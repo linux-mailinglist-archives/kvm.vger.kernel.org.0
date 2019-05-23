@@ -2,116 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DF7827E9B
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 15:47:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DCC828013
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 16:45:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730829AbfEWNrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 09:47:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55060 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729698AbfEWNrW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 09:47:22 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5068C317916C
-        for <kvm@vger.kernel.org>; Thu, 23 May 2019 13:47:21 +0000 (UTC)
-Received: from xz-x1 (ovpn-12-16.pek2.redhat.com [10.72.12.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8577E7BE78;
-        Thu, 23 May 2019 13:47:18 +0000 (UTC)
-Date:   Thu, 23 May 2019 21:47:09 +0800
-From:   Peter Xu <peterx@redhat.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com
-Subject: Re: [PATCH] kvm: selftests: aarch64: dirty_log_test: fix unaligned
- memslot size
-Message-ID: <20190523134709.GC2517@xz-x1>
-References: <20190523093405.17887-1-drjones@redhat.com>
- <20190523094859.GB2517@xz-x1>
- <20190523100527.cp5ij43scb3m2hel@kamzik.brq.redhat.com>
+        id S1730957AbfEWOo7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 10:44:59 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:47978 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730709AbfEWOo7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 10:44:59 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B972A80D;
+        Thu, 23 May 2019 07:44:58 -0700 (PDT)
+Received: from mbp (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9DF2A3F690;
+        Thu, 23 May 2019 07:44:52 -0700 (PDT)
+Date:   Thu, 23 May 2019 15:44:49 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     enh <enh@google.com>, Evgenii Stepanov <eugenis@google.com>,
+        Andrey Konovalov <andreyknvl@google.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
+Message-ID: <20190523144449.waam2mkyzhjpqpur@mbp>
+References: <cover.1557160186.git.andreyknvl@google.com>
+ <20190517144931.GA56186@arrakis.emea.arm.com>
+ <CAFKCwrj6JEtp4BzhqO178LFJepmepoMx=G+YdC8sqZ3bcBp3EQ@mail.gmail.com>
+ <20190521182932.sm4vxweuwo5ermyd@mbp>
+ <201905211633.6C0BF0C2@keescook>
+ <20190522101110.m2stmpaj7seezveq@mbp>
+ <CAJgzZoosKBwqXRyA6fb8QQSZXFqfHqe9qO9je5TogHhzuoGXJQ@mail.gmail.com>
+ <20190522163527.rnnc6t4tll7tk5zw@mbp>
+ <201905221316.865581CF@keescook>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190523100527.cp5ij43scb3m2hel@kamzik.brq.redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Thu, 23 May 2019 13:47:21 +0000 (UTC)
+In-Reply-To: <201905221316.865581CF@keescook>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 23, 2019 at 12:05:27PM +0200, Andrew Jones wrote:
-> On Thu, May 23, 2019 at 05:48:59PM +0800, Peter Xu wrote:
-> > On Thu, May 23, 2019 at 11:34:05AM +0200, Andrew Jones wrote:
-> > > The memory slot size must be aligned to the host's page size. When
-> > > testing a guest with a 4k page size on a host with a 64k page size,
-> > > then 3 guest pages are not host page size aligned. Since we just need
-> > > a nearly arbitrary number of extra pages to ensure the memslot is not
-> > > aligned to a 64 host-page boundary for this test, then we can use
-> > > 16, as that's 64k aligned, but not 64 * 64k aligned.
-> > > 
-> > > Fixes: 76d58e0f07ec ("KVM: fix KVM_CLEAR_DIRTY_LOG for memory slots of unaligned size", 2019-04-17)
-> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > 
-> > > ---
-> > > Note, the commit "KVM: fix KVM_CLEAR_DIRTY_LOG for memory slots of
-> > > unaligned size" was somehow committed twice. 76d58e0f07ec is the
-> > > first instance.
-> > > 
-> > >  tools/testing/selftests/kvm/dirty_log_test.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-> > > index f50a15c38f9b..bf85afbf1b5f 100644
-> > > --- a/tools/testing/selftests/kvm/dirty_log_test.c
-> > > +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-> > > @@ -292,7 +292,7 @@ static void run_test(enum vm_guest_mode mode, unsigned long iterations,
-> > >  	 * A little more than 1G of guest page sized pages.  Cover the
-> > >  	 * case where the size is not aligned to 64 pages.
-> > >  	 */
-> > > -	guest_num_pages = (1ul << (30 - guest_page_shift)) + 3;
-> > > +	guest_num_pages = (1ul << (30 - guest_page_shift)) + 16;
-> > 
-> > Hi, Drew,
-> > 
-> > Could you help explain what's the error on ARM?  Since I still cannot
-> > understand how it failed from the first glance...
+On Wed, May 22, 2019 at 01:47:36PM -0700, Kees Cook wrote:
+> On Wed, May 22, 2019 at 05:35:27PM +0100, Catalin Marinas wrote:
+> > The two hard requirements I have for supporting any new hardware feature
+> > in Linux are (1) a single kernel image binary continues to run on old
+> > hardware while making use of the new feature if available and (2) old
+> > user space continues to run on new hardware while new user space can
+> > take advantage of the new feature.
 > 
-> The KVM_SET_USER_MEMORY_REGION ioctl will fail because of
-> 
->     if (mem->memory_size & (PAGE_SIZE - 1))
->             goto out;
-> 
-> in __kvm_set_memory_region(). And that's because PAGE_SIZE == 64k
-> on the host (kvm), but we're attempting to allocate a size of 3*4k.
+> Agreed! And I think the series meets these requirements, yes?
 
-Oops yes.  I merely forgot we've got two memory regions for the test,
-sorry.
+Yes. I mentioned this just to make sure people don't expect different
+kernel builds for different hardware features.
 
-> 
-> > 
-> > Also, even if we want to have the alignment, shall we do the math
-> > using known host/guest page size rather than another adhoc number or
-> > could it still break with some other combinations of host/guest page
-> > sizes?
-> 
-> I don't think we need to worry too much about > 64k pages being a
-> thing any time soon and I'd rather not change the number of pages
-> allocated based on the page sizes, so other than maybe doing something
-> like
-> 
-> /*
->  * Comment stating why we have this.
->  */
-> #define GUEST_EXTRA_PAGES 16
-> 
-> then I think we're already fine.
+There is also the obvious requirement which I didn't mention: new user
+space continues to run on new/subsequent kernel versions. That's one of
+the points of contention for this series (ignoring MTE) with the
+maintainers having to guarantee this without much effort. IOW, do the
+500K+ new lines in a subsequent kernel version break any user space out
+there? I'm only talking about the relaxed TBI ABI. Are the usual LTP,
+syskaller sufficient? Better static analysis would definitely help.
 
-IMHO it would be as simple as replacing 3 with "3 * host_size /
-guest_size", but both work for me.
+> > For MTE, we just can't enable it by default since there are applications
+> > who use the top byte of a pointer and expect it to be ignored rather
+> > than failing with a mismatched tag. Just think of a hwasan compiled
+> > binary where TBI is expected to work and you try to run it with MTE
+> > turned on.
+> 
+> Ah! Okay, here's the use-case I wasn't thinking of: the concern is TBI
+> conflicting with MTE. And anything that starts using TBI suddenly can't
+> run in the future because it's being interpreted as MTE bits? (Is that
+> the ABI concern?
 
-Thanks,
+That's another aspect to figure out when we add the MTE support. I don't
+think we'd be able to do this without an explicit opt-in by the user.
+
+Or, if we ever want MTE to be turned on by default (i.e. tag checking),
+even if everything is tagged with 0, we have to disallow TBI for user
+and this includes hwasan. There were a small number of programs using
+the TBI (I think some JavaScript compilers tried this). But now we are
+bringing in the hwasan support and this can be a large user base. Shall
+we add an ELF note for such binaries that use TBI/hwasan?
+
+This series is still required for MTE but we may decide not to relax the
+ABI blindly, therefore the opt-in (prctl) or personality idea.
+
+> I feel like we got into the weeds about ioctl()s and one-off bugs...)
+
+This needs solving as well. Most driver developers won't know why
+untagged_addr() is needed unless we have more rigorous types or type
+annotations and a tool to check them (we should probably revive the old
+sparse thread).
+
+> So there needs to be some way to let the kernel know which of three
+> things it should be doing:
+> 1- leaving userspace addresses as-is (present)
+> 2- wiping the top bits before using (this series)
+
+(I'd say tolerating rather than wiping since get_user still uses the tag
+in the current series)
+
+The current series does not allow any choice between 1 and 2, the
+default ABI basically becomes option 2.
+
+> 3- wiping the top bits for most things, but retaining them for MTE as
+>    needed (the future)
+
+2 and 3 are not entirely compatible as a tagged pointer may be checked
+against the memory colour by the hardware. So you can't have hwasan
+binary with MTE enabled.
+
+> I expect MTE to be the "default" in the future. Once a system's libc has
+> grown support for it, everything will be trying to use MTE. TBI will be
+> the special case (but TBI is effectively a prerequisite).
+
+The kernel handling of tagged pointers is indeed a prerequisite. The ABI
+distinction between the above 2 and 3 needs to be solved.
+
+> AFAICT, the only difference I see between 2 and 3 will be the tag handling
+> in usercopy (all other places will continue to ignore the top bits). Is
+> that accurate?
+
+Yes, mostly (for the kernel). If MTE is enabled by default for a hwasan
+binary, it will SEGFAULT (either in user space or in kernel uaccess).
+How does the kernel choose between 2 and 3?
+
+> Is "1" a per-process state we want to keep? (I assume not, but rather it
+> is available via no TBI/MTE CONFIG or a boot-time option, if at all?)
+
+Possibly, though not necessarily per process. For testing or if
+something goes wrong during boot, a command line option with a static
+label would do. The AT_FLAGS bit needs to be checked by user space. My
+preference would be per-process.
+
+> To choose between "2" and "3", it seems we need a per-process flag to
+> opt into TBI (and out of MTE).
+
+Or leave option 2 the default and get it to opt in to MTE.
+
+> For userspace, how would a future binary choose TBI over MTE? If it's
+> a library issue, we can't use an ELF bit, since the choice may be
+> "late" after ELF load (this implies the need for a prctl().) If it's
+> binary-only ("built with HWKASan") then an ELF bit seems sufficient.
+> And without the marking, I'd expect the kernel to enforce MTE when
+> there are high bits.
+
+The current plan is that a future binary issues a prctl(), after
+checking the HWCAP_MTE bit (as I replied to Elliot, the MTE instructions
+are not in the current NOP space). I'd expect this to be done by the
+libc or dynamic loader under the assumption that the binaries it loads
+do _not_ use the top pointer byte for anything else. With hwasan
+compiled objects this gets more confusing (any ELF note to identify
+them?).
+
+(there is also the risk of existing applications using TBI already but
+I'm not aware of any still using this feature other than hwasan)
 
 -- 
-Peter Xu
+Catalin
