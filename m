@@ -2,68 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BAD312747F
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 04:38:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1C1B27503
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 06:19:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729583AbfEWChs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 22 May 2019 22:37:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35600 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727305AbfEWChr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 22 May 2019 22:37:47 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id AA1143082163;
-        Thu, 23 May 2019 02:37:47 +0000 (UTC)
-Received: from [10.72.12.128] (ovpn-12-128.pek2.redhat.com [10.72.12.128])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4A6D910AFEC9;
-        Thu, 23 May 2019 02:37:40 +0000 (UTC)
-Subject: Re: [PATCH V2 0/4] Prevent vhost kthread from hogging CPU
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, stefanha@redhat.com
-References: <1558067392-11740-1-git-send-email-jasowang@redhat.com>
- <20190520085207-mutt-send-email-mst@kernel.org>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <aa132e69-4646-da70-7def-b6ad72d4ebda@redhat.com>
-Date:   Thu, 23 May 2019 10:37:39 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726203AbfEWES6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 00:18:58 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:33278 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725792AbfEWES6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 00:18:58 -0400
+Received: by mail-pg1-f194.google.com with SMTP id h17so2425680pgv.0;
+        Wed, 22 May 2019 21:18:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=HbqtOQevQsp/ok74pQVOtTO4LnYP1GQdx8YeHeJwjdA=;
+        b=KUCtlCKQiEsmI4qGb5+5ls2Urv7EPflFrlNcayB80Hbzpnm6l2sig4DOkKVjy2L3/Y
+         DCuGlFQkA1XdKFHo2pCJG/dXO7KAKTGHKRxVsBfCP91+DA8Q/qgRB51tMJBFbZBU5s9U
+         LzOu3T2leyByV7HSD7nvZj42azIGalpu/X5vyigVydotYCMrLt+Gr9JqnRqWhopHeMK7
+         apETmcWQ003JlQhS7NyO99/odcD8T44nUYxxa6v4q935IrFKgMdb2Wd+MMzmwocjQRM3
+         /H8t6M3pszMEAyn7Y0gmU23w16DOMrRB1UTyLgVqe76seahwAUDIRvSytbfYJw25Ar1t
+         8K/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=HbqtOQevQsp/ok74pQVOtTO4LnYP1GQdx8YeHeJwjdA=;
+        b=JN9PyhAW6JP4LMFPJO/wBsiOyMZ8K//Vv9fb4JlBiuu1Ynu5f+KHAZ4k3ERK0/DUi4
+         a0tmWzl7TNV975gOlFi+0v8dM+wnK9D3+FIrGB9EPgngSo9oFB1zLuF3y6RAbQXJOEup
+         Dh464HAyQ9pbPg1rdUwvOovUDND5h9aemLEo5YjHC3yUAVyGBB5AWlhWxp7cx/64PC/0
+         g/y6S0f/graEcyX8d2BnUwCojte2uSR9zoi90WRRxX2MU/L5VRoLWlgdRc0Z++rYyfcc
+         x/eFWIoX7neNqGstFhKRGZkVibYeUUte64j1G9ONvYrTDWSk4dhQj0EFIhu08Pnv0TJm
+         AcMQ==
+X-Gm-Message-State: APjAAAVTBTOB6iIY8RlxBsW6AI3NvQMs9iMk+Buir4k4bleBVGLlvynA
+        ajOuQOBLSVqAR3CvKJqBQ87/vHee
+X-Google-Smtp-Source: APXvYqzM2AE7xEJVcugB0F0nxfevORP435QvjJsvCkkKHUxCnEXIJdTnxTMM9RMQIN+QtEuNrlAuPg==
+X-Received: by 2002:aa7:8b57:: with SMTP id i23mr19083581pfd.54.1558585136738;
+        Wed, 22 May 2019 21:18:56 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+        by smtp.googlemail.com with ESMTPSA id m12sm22991427pgi.56.2019.05.22.21.18.54
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Wed, 22 May 2019 21:18:56 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH 1/2] KVM: LAPIC: Optimize timer latency consider world switch time
+Date:   Thu, 23 May 2019 12:18:50 +0800
+Message-Id: <1558585131-1321-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-In-Reply-To: <20190520085207-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Thu, 23 May 2019 02:37:47 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Wanpeng Li <wanpengli@tencent.com>
 
-On 2019/5/20 下午8:52, Michael S. Tsirkin wrote:
-> On Fri, May 17, 2019 at 12:29:48AM -0400, Jason Wang wrote:
->> Hi:
->>
->> This series try to prevent a guest triggerable CPU hogging through
->> vhost kthread. This is done by introducing and checking the weight
->> after each requrest. The patch has been tested with reproducer of
->> vsock and virtio-net. Only compile test is done for vhost-scsi.
->>
->> Please review.
->> This addresses CVE-2019-3900.
-> OK I think we should clean this code some more but given
-> it's a CVE fix maybe it's best to do as a patch on top.
->
-> Acked-by: Michael S. Tsirkin<mst@redhat.com>
->
-> Dave do you want to merge this or should I?
->
+Advance lapic timer tries to hidden the hypervisor overhead between the
+host emulated timer fires and the guest awares the timer is fired. However,
+even though after more sustaining optimizations, kvm-unit-tests/tscdeadline_latency 
+still awares ~1000 cycles latency since we lost the time between the end of 
+wait_lapic_expire and the guest awares the timer is fired. There are 
+codes between the end of wait_lapic_expire and the world switch, futhermore, 
+the world switch itself also has overhead. Actually the guest_tsc is equal 
+to the target deadline time in wait_lapic_expire is too late, guest will
+aware the latency between the end of wait_lapic_expire() and after vmentry 
+to the guest. This patch takes this time into consideration. 
 
-According to David's last reply, it's better for you to merge I think.
+The vmentry_lapic_timer_advance_ns module parameter should be well tuned by 
+host admin, it can reduce average cyclictest latency from 3us to 2us on 
+Skylake server. (guest w/ nohz=off, idle=poll, host w/ preemption_timer=N, 
+the cyclictest latency is not too sensitive when preemption_timer=Y for this 
+optimization in my testing), kvm-unit-tests/tscdeadline_latency can reach 0.
 
-Thanks
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/lapic.c   | 17 +++++++++++++++--
+ arch/x86/kvm/lapic.h   |  1 +
+ arch/x86/kvm/vmx/vmx.c |  2 +-
+ arch/x86/kvm/x86.c     |  3 +++
+ arch/x86/kvm/x86.h     |  2 ++
+ 5 files changed, 22 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index fcf42a3..6f85221 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1531,6 +1531,19 @@ static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
+ 	apic->lapic_timer.timer_advance_ns = timer_advance_ns;
+ }
+ 
++u64 get_vmentry_advance_delta(struct kvm_vcpu *vcpu)
++{
++	u64 vmentry_lapic_timer_advance_cycles = 0;
++
++	if (vmentry_lapic_timer_advance_ns) {
++		vmentry_lapic_timer_advance_cycles = vmentry_lapic_timer_advance_ns *
++			vcpu->arch.virtual_tsc_khz;
++		do_div(vmentry_lapic_timer_advance_cycles, 1000000);
++	}
++	return vmentry_lapic_timer_advance_cycles;
++}
++EXPORT_SYMBOL_GPL(get_vmentry_advance_delta);
++
+ void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_lapic *apic = vcpu->arch.apic;
+@@ -1544,7 +1557,7 @@ void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
+ 
+ 	tsc_deadline = apic->lapic_timer.expired_tscdeadline;
+ 	apic->lapic_timer.expired_tscdeadline = 0;
+-	guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
++	guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc()) + get_vmentry_advance_delta(vcpu);
+ 	apic->lapic_timer.advance_expire_delta = guest_tsc - tsc_deadline;
+ 
+ 	if (guest_tsc < tsc_deadline)
+@@ -1572,7 +1585,7 @@ static void start_sw_tscdeadline(struct kvm_lapic *apic)
+ 	local_irq_save(flags);
+ 
+ 	now = ktime_get();
+-	guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
++	guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc()) + get_vmentry_advance_delta(vcpu);
+ 
+ 	ns = (tscdeadline - guest_tsc) * 1000000ULL;
+ 	do_div(ns, this_tsc_khz);
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index f974a3d..df2fe17 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -221,6 +221,7 @@ static inline int kvm_lapic_latched_init(struct kvm_vcpu *vcpu)
+ bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector);
+ 
+ void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
++u64 get_vmentry_advance_delta(struct kvm_vcpu *vcpu);
+ 
+ bool kvm_intr_is_single_vcpu_fast(struct kvm *kvm, struct kvm_lapic_irq *irq,
+ 			struct kvm_vcpu **dest_vcpu);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index da24f18..0199ac3 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7047,7 +7047,7 @@ static int vmx_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
+ 
+ 	vmx = to_vmx(vcpu);
+ 	tscl = rdtsc();
+-	guest_tscl = kvm_read_l1_tsc(vcpu, tscl);
++	guest_tscl = kvm_read_l1_tsc(vcpu, tscl) + get_vmentry_advance_delta(vcpu);
+ 	delta_tsc = max(guest_deadline_tsc, guest_tscl) - guest_tscl;
+ 	lapic_timer_advance_cycles = nsec_to_cycles(vcpu,
+ 						    ktimer->timer_advance_ns);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a4eb711..a02e2c3 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -145,6 +145,9 @@ module_param(tsc_tolerance_ppm, uint, S_IRUGO | S_IWUSR);
+ static int __read_mostly lapic_timer_advance_ns = -1;
+ module_param(lapic_timer_advance_ns, int, S_IRUGO | S_IWUSR);
+ 
++u32 __read_mostly vmentry_lapic_timer_advance_ns = 0;
++module_param(vmentry_lapic_timer_advance_ns, uint, S_IRUGO | S_IWUSR);
++
+ static bool __read_mostly vector_hashing = true;
+ module_param(vector_hashing, bool, S_IRUGO);
+ 
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 275b3b6..b0a3b84 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -294,6 +294,8 @@ extern u64 kvm_supported_xcr0(void);
+ 
+ extern unsigned int min_timer_period_us;
+ 
++extern unsigned int vmentry_lapic_timer_advance_ns;
++
+ extern bool enable_vmware_backdoor;
+ 
+ extern struct static_key kvm_no_apic_vcpu;
+-- 
+2.7.4
 
