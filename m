@@ -2,44 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 55C6F2815C
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 17:36:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3320228186
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 17:44:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731100AbfEWPgU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 11:36:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44606 "EHLO
+        id S1731160AbfEWPol (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 11:44:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49978 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730913AbfEWPgU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 May 2019 11:36:20 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4NFXFin055300
-        for <kvm@vger.kernel.org>; Thu, 23 May 2019 11:36:19 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2snwb83a6a-1
+        by vger.kernel.org with ESMTP id S1731141AbfEWPoi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 May 2019 11:44:38 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4NFgI37017822
+        for <kvm@vger.kernel.org>; Thu, 23 May 2019 11:44:37 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2snuwx8jcy-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 23 May 2019 11:36:19 -0400
+        for <kvm@vger.kernel.org>; Thu, 23 May 2019 11:44:37 -0400
 Received: from localhost
-        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <akrowiak@linux.ibm.com>;
-        Thu, 23 May 2019 16:36:18 +0100
-Received: from b01cxnp23033.gho.pok.ibm.com (9.57.198.28)
-        by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Thu, 23 May 2019 16:44:36 +0100
+Received: from b01cxnp22034.gho.pok.ibm.com (9.57.198.24)
+        by e17.ny.us.ibm.com (146.89.104.204) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 23 May 2019 16:36:15 +0100
+        Thu, 23 May 2019 16:44:32 +0100
 Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4NFaD3440239452
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4NFhFXF39321658
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 May 2019 15:36:13 GMT
+        Thu, 23 May 2019 15:43:15 GMT
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5CF8A2805A;
-        Thu, 23 May 2019 15:36:13 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 202E02805C;
+        Thu, 23 May 2019 15:43:15 +0000 (GMT)
 Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C3D2D28059;
-        Thu, 23 May 2019 15:36:12 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 793C328058;
+        Thu, 23 May 2019 15:43:14 +0000 (GMT)
 Received: from [9.85.195.246] (unknown [9.85.195.246])
         by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 23 May 2019 15:36:12 +0000 (GMT)
-Subject: Re: [PATCH v9 0/4] vfio: ap: AP Queue Interrupt Control
+        Thu, 23 May 2019 15:43:14 +0000 (GMT)
+Subject: Re: [PATCH v9 3/4] s390: ap: implement PAPQ AQIC interception in
+ kernel
 To:     Pierre Morel <pmorel@linux.ibm.com>, borntraeger@de.ibm.com
 Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
         linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
@@ -47,178 +48,598 @@ Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
         david@redhat.com, schwidefsky@de.ibm.com,
         heiko.carstens@de.ibm.com, freude@linux.ibm.com, mimu@linux.ibm.com
 References: <1558452877-27822-1-git-send-email-pmorel@linux.ibm.com>
+ <1558452877-27822-4-git-send-email-pmorel@linux.ibm.com>
 From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Date:   Thu, 23 May 2019 11:36:12 -0400
+Date:   Thu, 23 May 2019 11:43:14 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <1558452877-27822-1-git-send-email-pmorel@linux.ibm.com>
+In-Reply-To: <1558452877-27822-4-git-send-email-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19052315-0052-0000-0000-000003C6077C
+x-cbid: 19052315-0040-0000-0000-000004F390D5
 X-IBM-SpamModules-Scores: 
 X-IBM-SpamModules-Versions: BY=3.00011149; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01207499; UDB=6.00634153; IPR=6.00988479;
- MB=3.00027020; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-23 15:36:17
+ PH=3.00000004; SC=3.00000286; SDB=6.01207501; UDB=6.00634154; IPR=6.00988482;
+ MB=3.00027020; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-23 15:44:34
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052315-0053-0000-0000-00006104218B
-Message-Id: <5b46f988-fa79-4d84-c81f-144daa0c4426@linux.ibm.com>
+x-cbparentid: 19052315-0041-0000-0000-000008FFA5BF
+Message-Id: <837a569e-2fc5-06b8-5c08-1610ae1ec6de@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-23_13:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905230106
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905230107
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 5/21/19 11:34 AM, Pierre Morel wrote:
-> This patch series implements PQAP/AQIC interception in KVM.
+> We register a AP PQAP instruction hook during the open
+> of the mediated device. And unregister it on release.
 > 
-> 1) Data to handle GISA interrupt for AQIC
+> During the probe of the AP device, we allocate a vfio_ap_queue
+> structure to keep track of the information we need for the
+> PQAP/AQIC instruction interception.
 > 
-> To implement this we need to add a new structure, vfio_ap_queue,
-> to be able to retrieve the mediated device associated with a queue
-> and specific values needed to register/unregister the interrupt
-> structures:
->    - APQN: to be able to issue the commands and search for queue
->      structures
->    - saved NIB : to keep track of the pin page for unpining it
->    - saved ISC : to unregister with the GIB interface
->    - matrix_mdev: to retrieve the associate matrix, the mediated device
->      and KVM
+> In the AP PQAP instruction hook, if we receive a demand to
+> enable IRQs,
+> - we retrieve the vfio_ap_queue based on the APQN we receive
+>    in REG1,
+> - we retrieve the page of the guest address, (NIB), from
+>    register REG2
+> - we retrieve the mediated device to use the VFIO pinning
+>    infrastructure to pin the page of the guest address,
+> - we retrieve the pointer to KVM to register the guest ISC
+>    and retrieve the host ISC
+> - finaly we activate GISA
 > 
-> Specific handling bei keeping old values when re-registering is
-> needed because the guest could unregister interrupt in a invisble
-> manner bei issuing an un-interceptible RESET command.
+> If we receive a demand to disable IRQs,
+> - we deactivate GISA
+> - unregister from the GIB
+> - unpin the NIB
 > 
-> Reset commands issued directly by the guest and indirectly when
-> removing the guest unpin the memory and deregister the ISC.
+> When removing the AP device from the driver the device is
+> reseted and this process unregisters the GISA from the GIB,
+> and unpins the NIB address then we free the vfio_ap_queue
+> structure.
 > 
-> The vfio_ap_queue is associated to the ap_device during the probe
-> of the device and dissociated during the remove of the ap_device.
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>   drivers/s390/crypto/vfio_ap_drv.c     |  34 +++-
+>   drivers/s390/crypto/vfio_ap_ops.c     | 336 +++++++++++++++++++++++++++++++++-
+>   drivers/s390/crypto/vfio_ap_private.h |  11 ++
+>   3 files changed, 374 insertions(+), 7 deletions(-)
 > 
-> The vfio_ap_queue is associated to the matrix mediated device during
-> each interception of the AQIC command, so it does not need to be
-> dissociated until the guest is terminated.
-> 
-> The life of the vfio_ap_queue will be protected by the matrix_dev lock
-> to guaranty that no change can occur to the CRYCB or that devices can
-> not be removed when a vfio_ap_queue is in use.
-> 
-> 2) KVM destroy race conditions
-> 
-> To make sure that KVM do not vanish and GISA is still available
-> when the VFIO_AP driver is in used we take a reference to KVM
-> during the opening of the mediated device and release it on
-> releasing the mediated device.
-> 
-> 3) Interception of PQAP
-> 
-> The driver registers a hook structure to KVM providing:
-> - a pointer to a function implementing PQAP(AQIC) handling
-> - the reference to the module owner of the hook
-> 
-> On interception by KVM we do not change the behavior, returning
->   -EOPNOTSUPP to the user in the case AP instructions are not
-> supported by the host or by the guest.
-> Otherwise we verify the exceptions cases before trying to call
-> the vfio_ap hook.
-> 
-> In the case we do not find a hook we assume that the CRYCB has not
-> been setup for the guest and is empty.
-> 
-> 4) Enabling and disabling the IRQ
-> 
-> When enabling the IRQ care is taken to unping the saved NIB.
-> When disabling IRQ care is taken to wait until the IRQ bit
-> of the queue status is cleared before unpining the NIB.
-> 
-> On RESET and before unpinning the NIB and unregistering the ISC
-> the IRQ is disabled using PQAP/AQIC even when a PQAP/APZQ have
-> been done.
-> 
-> 5) Removing the AP device
-> 
-> Removing the AP device without having unassign it is clearly
-> discourage by the documentation.
-> The patch series does not check if the queue is used by a
-> guest. It only de-register the IRQ, unregister ISC and unpin
-> the NIB, then free the vfio_ap_queue.
-> 
-> 6) Associated QEMU patch
-> 
-> There is a QEMU patch which is needed to enable the PQAP/AQIC
-> facility in the guest.
-> 
-> Posted in qemu-devel@nongnu.org as:
-> Message-Id: <1550146494-21085-1-git-send-email-pmorel@linux.ibm.com>
-> 
-> 7) Compatibility with Dynamic configuration patches
-> 
-> Tony, I did not rebase this series above the dynamic configuration
-> patches because:
-> - This series do the work it needs to do without having to take
->    care on the dynamic configuration.
-> - It is guarantied that interrupt will be shut off after removing
->    the APQueue device
-> - The dynamic configuration series is not converging.
+> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
+> index e9824c3..003662a 100644
+> --- a/drivers/s390/crypto/vfio_ap_drv.c
+> +++ b/drivers/s390/crypto/vfio_ap_drv.c
+> @@ -5,6 +5,7 @@
+>    * Copyright IBM Corp. 2018
+>    *
+>    * Author(s): Tony Krowiak <akrowiak@linux.ibm.com>
+> + *	      Pierre Morel <pmorel@linux.ibm.com>
+>    */
+>   
+>   #include <linux/module.h>
+> @@ -40,14 +41,45 @@ static struct ap_device_id ap_queue_ids[] = {
+>   
+>   MODULE_DEVICE_TABLE(vfio_ap, ap_queue_ids);
+>   
+> +/**
+> + * vfio_ap_queue_dev_probe:
+> + *
+> + * Allocate a vfio_ap_queue structure and associate it
+> + * with the device as driver_data.
+> + */
+>   static int vfio_ap_queue_dev_probe(struct ap_device *apdev)
+>   {
+> +	struct vfio_ap_queue *q;
+> +
+> +	q = kzalloc(sizeof(*q), GFP_KERNEL);
+> +	if (!q)
+> +		return -ENOMEM;
+> +	dev_set_drvdata(&apdev->device, q);
+> +	q->apqn = to_ap_queue(&apdev->device)->qid;
+> +	q->saved_isc = VFIO_AP_ISC_INVALID;
 
-Would you consider the following?
+As per my comments in the cover letter, you would embed the code
+above in the vfio_ap_mdev_probe_queue function and call it here.
 
-* Take dynconfig patch "s390: vfio-ap: wait for queue empty on queue
-   reset" and include it in your series. This patch modifies the
-   reset function to wait for queue empty.
 
-* In dynconfig patch "s390: vfio-ap: handle bind and unbind of AP queue
-   device" the following functions are introduced:
+>   	return 0;
+>   }
+>   
+> +/**
+> + * vfio_ap_queue_dev_remove:
+> + *
+> + * Takes the matrix lock to avoid actions on this device while removing
+> + * Free the associated vfio_ap_queue structure
+> + */
+>   static void vfio_ap_queue_dev_remove(struct ap_device *apdev)
+>   {
+> -	/* Nothing to do yet */
+> +	struct vfio_ap_queue *q;
+> +	int apid, apqi;
+> +
+> +	mutex_lock(&matrix_dev->lock);
+> +	q = dev_get_drvdata(&apdev->device);
+> +	dev_set_drvdata(&apdev->device, NULL);
+> +	apid = AP_QID_CARD(q->apqn);
+> +	apqi = AP_QID_QUEUE(q->apqn);
+> +	vfio_ap_mdev_reset_queue(apid, apqi, 1);
+> +	vfio_ap_irq_disable(q);
+> +	kfree(q);
 
-      void vfio_ap_mdev_probe_queue(struct ap_queue *queue)
-      void vfio_ap_mdev_remove_queue(struct ap_queue *queue)
+As per my comments in the cover letter, you would embed the code
+above in the vfio_ap_mdev_remove_queue function and call it here.
 
-   The vfio_ap_mdev_probe_queue function is called from the vfio_ap
-   driver probe callback. You could embed the code you've introduced in
-   the probe callback there. Of course, you would need to return int
-   from the function for the -ENOMEM error.
+> +	mutex_unlock(&matrix_dev->lock);
+>   }
+>   
+>   static void vfio_ap_matrix_dev_release(struct device *dev)
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index e8e87bf..015174f 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -24,6 +24,295 @@
+>   #define VFIO_AP_MDEV_TYPE_HWVIRT "passthrough"
+>   #define VFIO_AP_MDEV_NAME_HWVIRT "VFIO AP Passthrough Device"
+>   
+> +static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev);
+> +
+> +static int match_apqn(struct device *dev, void *data)
+> +{
+> +	struct vfio_ap_queue *q = dev_get_drvdata(dev);
+> +
+> +	return (q->apqn == *(int *)(data)) ? 1 : 0;
+> +}
+> +
+> +/**
+> + * vfio_ap_get_queue: Retrieve a queue with a specific APQN from a list
+> + * @matrix_mdev: the associated mediated matrix
+> + * @apqn: The queue APQN
+> + *
+> + * Retrieve a queue with a specific APQN from the list of the
+> + * devices of the vfio_ap_drv.
+> + * Verify that the APID and the APQI are set in the matrix.
+> + *
+> + * Returns the pointer to the associated vfio_ap_queue
+> + */
+> +struct vfio_ap_queue *vfio_ap_get_queue(struct ap_matrix_mdev *matrix_mdev,
+> +					int apqn)
+> +{
+> +	struct vfio_ap_queue *q;
+> +	struct device *dev;
+> +
+> +	if (!test_bit_inv(AP_QID_CARD(apqn), matrix_mdev->matrix.apm))
+> +		return NULL;
+> +	if (!test_bit_inv(AP_QID_QUEUE(apqn), matrix_mdev->matrix.aqm))
+> +		return NULL;
+> +
+> +	dev = driver_find_device(&matrix_dev->vfio_ap_drv->driver, NULL,
+> +				 &apqn, match_apqn);
+> +	if (!dev)
+> +		return NULL;
+> +	q = dev_get_drvdata(dev);
+> +	q->matrix_mdev = matrix_mdev;
+> +	put_device(dev);
+> +
+> +	return q;
+> +}
+> +
+> +/**
+> + * vfio_ap_wait_for_irqclear
+> + * @apqn: The AP Queue number
+> + *
+> + * Checks the IRQ bit for the status of this APQN using ap_tapq.
+> + * Returns if the ap_tapq function succedded and the bit is clear.
+> + * Returns if ap_tapq function failed with invalid, deconfigured or
+> + * checkstopped AP.
+> + * Otherwise retries up to 5 times after waiting 20ms.
+> + *
+> + */
+> +static void vfio_ap_wait_for_irqclear(int apqn)
+> +{
+> +	struct ap_queue_status status;
+> +	int retry = 5;
+> +
+> +	do {
+> +		status = ap_tapq(apqn, NULL);
+> +		switch (status.response_code) {
+> +		case AP_RESPONSE_NORMAL:
+> +		case AP_RESPONSE_RESET_IN_PROGRESS:
+> +			if (!status.irq_enabled)
+> +				return;
+> +			/* Fall through */
+> +		case AP_RESPONSE_BUSY:
+> +			msleep(20);
+> +			break;
+> +		case AP_RESPONSE_Q_NOT_AVAIL:
+> +		case AP_RESPONSE_DECONFIGURED:
+> +		case AP_RESPONSE_CHECKSTOPPED:
+> +		default:
+> +			WARN_ONCE(1, "%s: tapq rc %02x: %04x\n", __func__,
+> +				  status.response_code, apqn);
+> +			return;
+> +		}
+> +	} while (--retry);
+> +
+> +	WARN_ONCE(1, "%s: tapq rc %02x: %04x could not clear IR bit\n",
+> +		  __func__, status.response_code, apqn);
+> +}
+> +
+> +/**
+> + * vfio_ap_free_aqic_resources
+> + * @q: The vfio_ap_queue
+> + *
+> + * Unregisters the ISC in the GIB when the saved ISC not invalid.
+> + * Unpin the guest's page holding the NIB when it exist.
+> + * Reset the saved_pfn and saved_isc to invalid values.
+> + * Clear the pointer to the matrix mediated device.
+> + *
+> + */
+> +static void vfio_ap_free_aqic_resources(struct vfio_ap_queue *q)
+> +{
+> +	if (q->saved_isc != VFIO_AP_ISC_INVALID && q->matrix_mdev)
+> +		kvm_s390_gisc_unregister(q->matrix_mdev->kvm, q->saved_isc);
+> +	if (q->saved_pfn && q->matrix_mdev)
+> +		vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev),
+> +				 &q->saved_pfn, 1);
+> +	q->saved_pfn = 0;
+> +	q->saved_isc = VFIO_AP_ISC_INVALID;
+> +	q->matrix_mdev = NULL;
+> +}
+> +
+> +/**
+> + * vfio_ap_irq_disable
+> + * @q: The vfio_ap_queue
+> + *
+> + * Uses ap_aqic to disable the interruption and in case of success, reset
+> + * in progress or IRQ disable command already proceeded: calls
+> + * vfio_ap_wait_for_irqclear() to check for the IRQ bit to be clear
+> + * and calls vfio_ap_free_aqic_resources() to free the resources associated
+> + * with the AP interrupt handling.
+> + *
+> + * In the case the AP is busy, or a reset is in progress,
+> + * retries after 20ms, up to 5 times.
+> + *
+> + * Returns if ap_aqic function failed with invalid, deconfigured or
+> + * checkstopped AP.
+> + */
+> +struct ap_queue_status vfio_ap_irq_disable(struct vfio_ap_queue *q)
+> +{
+> +	struct ap_qirq_ctrl aqic_gisa = {};
+> +	struct ap_queue_status status;
+> +	int retries = 5;
+> +
+> +	do {
+> +		status = ap_aqic(q->apqn, aqic_gisa, NULL);
+> +		switch (status.response_code) {
+> +		case AP_RESPONSE_OTHERWISE_CHANGED:
+> +		case AP_RESPONSE_NORMAL:
+> +			vfio_ap_wait_for_irqclear(q->apqn);
+> +			goto end_free;
+> +		case AP_RESPONSE_RESET_IN_PROGRESS:
+> +		case AP_RESPONSE_BUSY:
+> +			msleep(20);
+> +			break;
+> +		case AP_RESPONSE_Q_NOT_AVAIL:
+> +		case AP_RESPONSE_DECONFIGURED:
+> +		case AP_RESPONSE_CHECKSTOPPED:
+> +		case AP_RESPONSE_INVALID_ADDRESS:
+> +		default:
+> +			/* All cases in default means AP not operational */
+> +			WARN_ONCE(1, "%s: ap_aqic status %d\n", __func__,
+> +				  status.response_code);
+> +			goto end_free;
+> +		}
+> +	} while (retries--);
+> +
+> +	WARN_ONCE(1, "%s: ap_aqic status %d\n", __func__,
+> +		  status.response_code);
+> +end_free:
+> +	vfio_ap_free_aqic_resources(q);
+> +	return status;
+> +}
+> +
+> +/**
+> + * vfio_ap_setirq: Enable Interruption for a APQN
+> + *
+> + * @dev: the device associated with the ap_queue
+> + * @q:   the vfio_ap_queue holding AQIC parameters
+> + *
+> + * Pin the NIB saved in *q
+> + * Register the guest ISC to GIB interface and retrieve the
+> + * host ISC to issue the host side PQAP/AQIC
+> + *
+> + * Response.status may be set to AP_RESPONSE_INVALID_ADDRESS in case the
+> + * vfio_pin_pages failed.
+> + *
+> + * Otherwise return the ap_queue_status returned by the ap_aqic(),
+> + * all retry handling will be done by the guest.
+> + */
+> +static struct ap_queue_status vfio_ap_irq_enable(struct vfio_ap_queue *q,
+> +						 int isc,
+> +						 unsigned long nib)
+> +{
+> +	struct ap_qirq_ctrl aqic_gisa = {};
+> +	struct ap_queue_status status = {};
+> +	struct kvm_s390_gisa *gisa;
+> +	struct kvm *kvm;
+> +	unsigned long h_nib, g_pfn, h_pfn;
+> +	int ret;
+> +
+> +	g_pfn = nib >> PAGE_SHIFT;
+> +	ret = vfio_pin_pages(mdev_dev(q->matrix_mdev->mdev), &g_pfn, 1,
+> +			     IOMMU_READ | IOMMU_WRITE, &h_pfn);
+> +	switch (ret) {
+> +	case 1:
+> +		break;
+> +	default:
+> +		status.response_code = AP_RESPONSE_INVALID_ADDRESS;
+> +		return status;
+> +	}
+> +
+> +	kvm = q->matrix_mdev->kvm;
+> +	gisa = kvm->arch.gisa_int.origin;
+> +
+> +	h_nib = (h_pfn << PAGE_SHIFT) | (nib & ~PAGE_MASK);
+> +	aqic_gisa.gisc = isc;
+> +	aqic_gisa.isc = kvm_s390_gisc_register(kvm, isc);
+> +	aqic_gisa.ir = 1;
+> +	aqic_gisa.gisa = (uint64_t)gisa >> 4;
+> +
+> +	status = ap_aqic(q->apqn, aqic_gisa, (void *)h_nib);
+> +	switch (status.response_code) {
+> +	case AP_RESPONSE_NORMAL:
+> +		/* See if we did clear older IRQ configuration */
+> +		vfio_ap_free_aqic_resources(q);
+> +		q->saved_pfn = g_pfn;
+> +		q->saved_isc = isc;
+> +		break;
+> +	case AP_RESPONSE_OTHERWISE_CHANGED:
+> +		/* We could not modify IRQ setings: clear new configuration */
+> +		vfio_unpin_pages(mdev_dev(q->matrix_mdev->mdev), &g_pfn, 1);
+> +		kvm_s390_gisc_unregister(kvm, isc);
+> +		break;
+> +	default:
+> +		pr_warn("%s: apqn %04x: response: %02x\n", __func__, q->apqn,
+> +			status.response_code);
+> +		vfio_ap_irq_disable(q);
+> +		break;
+> +	}
+> +
+> +	return status;
+> +}
+> +
+> +/**
+> + * handle_pqap: PQAP instruction callback
+> + *
+> + * @vcpu: The vcpu on which we received the PQAP instruction
+> + *
+> + * Get the general register contents to initialize internal variables.
+> + * REG[0]: APQN
+> + * REG[1]: IR and ISC
+> + * REG[2]: NIB
+> + *
+> + * Response.status may be set to following Response Code:
+> + * - AP_RESPONSE_Q_NOT_AVAIL: if the queue is not available
+> + * - AP_RESPONSE_DECONFIGURED: if the queue is not configured
+> + * - AP_RESPONSE_NORMAL (0) : in case of successs
+> + *   Check vfio_ap_setirq() and vfio_ap_clrirq() for other possible RC.
+> + * We take the matrix_dev lock to ensure serialization on queues and
+> + * mediated device access.
+> + *
+> + * Return 0 if we could handle the request inside KVM.
+> + * otherwise, returns -EOPNOTSUPP to let QEMU handle the fault.
+> + */
+> +static int handle_pqap(struct kvm_vcpu *vcpu)
+> +{
+> +	uint64_t status;
+> +	uint16_t apqn;
+> +	struct vfio_ap_queue *q;
+> +	struct ap_queue_status qstatus = {
+> +			       .response_code = AP_RESPONSE_Q_NOT_AVAIL, };
+> +	struct ap_matrix_mdev *matrix_mdev;
+> +
+> +	/* If we do not use the AIV facility just go to userland */
+> +	if (!(vcpu->arch.sie_block->eca & ECA_AIV))
+> +		return -EOPNOTSUPP;
+> +
+> +	apqn = vcpu->run->s.regs.gprs[0] & 0xffff;
+> +	mutex_lock(&matrix_dev->lock);
+> +
+> +	if (!vcpu->kvm->arch.crypto.pqap_hook)
+> +		goto out_unlock;
+> +	matrix_mdev = container_of(vcpu->kvm->arch.crypto.pqap_hook,
+> +				   struct ap_matrix_mdev, pqap_hook);
+> +
+> +	q = vfio_ap_get_queue(matrix_mdev, apqn);
+> +	if (!q)
+> +		goto out_unlock;
+> +
+> +	status = vcpu->run->s.regs.gprs[1];
+> +
+> +	/* If IR bit(16) is set we enable the interrupt */
+> +	if ((status >> (63 - 16)) & 0x01)
+> +		qstatus = vfio_ap_irq_enable(q, status & 0x07,
+> +					     vcpu->run->s.regs.gprs[2]);
+> +	else
+> +		qstatus = vfio_ap_irq_disable(q);
+> +
+> +out_unlock:
+> +	memcpy(&vcpu->run->s.regs.gprs[1], &qstatus, sizeof(qstatus));
+> +	vcpu->run->s.regs.gprs[1] >>= 32;
+> +	mutex_unlock(&matrix_dev->lock);
+> +	return 0;
+> +}
+> +
+>   static void vfio_ap_matrix_init(struct ap_config_info *info,
+>   				struct ap_matrix *matrix)
+>   {
+> @@ -45,8 +334,11 @@ static int vfio_ap_mdev_create(struct kobject *kobj, struct mdev_device *mdev)
+>   		return -ENOMEM;
+>   	}
+>   
+> +	matrix_mdev->mdev = mdev;
+>   	vfio_ap_matrix_init(&matrix_dev->info, &matrix_mdev->matrix);
+>   	mdev_set_drvdata(mdev, matrix_mdev);
+> +	matrix_mdev->pqap_hook.hook = handle_pqap;
+> +	matrix_mdev->pqap_hook.owner = THIS_MODULE;
+>   	mutex_lock(&matrix_dev->lock);
+>   	list_add(&matrix_mdev->node, &matrix_dev->mdev_list);
+>   	mutex_unlock(&matrix_dev->lock);
+> @@ -62,6 +354,7 @@ static int vfio_ap_mdev_remove(struct mdev_device *mdev)
+>   		return -EBUSY;
+>   
+>   	mutex_lock(&matrix_dev->lock);
+> +	vfio_ap_mdev_reset_queues(mdev);
+>   	list_del(&matrix_mdev->node);
+>   	mutex_unlock(&matrix_dev->lock);
+>   
+> @@ -754,6 +1047,8 @@ static int vfio_ap_mdev_set_kvm(struct ap_matrix_mdev *matrix_mdev,
+>   	}
+>   
+>   	matrix_mdev->kvm = kvm;
+> +	kvm_get_kvm(kvm);
+> +	kvm->arch.crypto.pqap_hook = &matrix_mdev->pqap_hook;
+>   	mutex_unlock(&matrix_dev->lock);
+>   
+>   	return 0;
+> @@ -819,15 +1114,36 @@ static int vfio_ap_mdev_group_notifier(struct notifier_block *nb,
+>   	return NOTIFY_OK;
+>   }
+>   
+> -static int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
+> -				    unsigned int retry)
+> +static void vfio_ap_irq_disable_apqn(int apqn)
+> +{
+> +	struct device *dev;
+> +	struct vfio_ap_queue *q;
+> +
+> +	dev = driver_find_device(&matrix_dev->vfio_ap_drv->driver, NULL,
+> +				 &apqn, match_apqn);
+> +	if (dev) {
+> +		q = dev_get_drvdata(dev);
+> +		vfio_ap_irq_disable(q);
+> +		put_device(dev);
+> +	}
+> +}
+> +
+> +int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
+> +			     unsigned int retry)
+>   {
+>   	struct ap_queue_status status;
+> +	int retry2 = 2;
+> +	int apqn = AP_MKQID(apid, apqi);
+>   
+>   	do {
+> -		status = ap_zapq(AP_MKQID(apid, apqi));
+> +		status = ap_zapq(apqn);
+>   		switch (status.response_code) {
+>   		case AP_RESPONSE_NORMAL:
+> +			while (!status.queue_empty && retry2--) {
+> +				msleep(20);
+> +				status = ap_tapq(apqn, NULL);
+> +			}
+> +			WARN_ON_ONCE(retry <= 0);
+>   			return 0;
+>   		case AP_RESPONSE_RESET_IN_PROGRESS:
+>   		case AP_RESPONSE_BUSY:
+> @@ -861,6 +1177,7 @@ static int vfio_ap_mdev_reset_queues(struct mdev_device *mdev)
+>   			 */
+>   			if (ret)
+>   				rc = ret;
+> +			vfio_ap_irq_disable_apqn(AP_MKQID(apid, apqi));
+>   		}
+>   	}
+>   
+> @@ -904,15 +1221,20 @@ static void vfio_ap_mdev_release(struct mdev_device *mdev)
+>   {
+>   	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+>   
+> -	if (matrix_mdev->kvm)
+> +	mutex_lock(&matrix_dev->lock);
+> +	if (matrix_mdev->kvm) {
+>   		kvm_arch_crypto_clear_masks(matrix_mdev->kvm);
+> +		matrix_mdev->kvm->arch.crypto.pqap_hook = NULL;
+> +		vfio_ap_mdev_reset_queues(mdev);
+> +		kvm_put_kvm(matrix_mdev->kvm);
+> +		matrix_mdev->kvm = NULL;
+> +	}
+> +	mutex_unlock(&matrix_dev->lock);
+>   
+> -	vfio_ap_mdev_reset_queues(mdev);
+>   	vfio_unregister_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
+>   				 &matrix_mdev->iommu_notifier);
+>   	vfio_unregister_notifier(mdev_dev(mdev), VFIO_GROUP_NOTIFY,
+>   				 &matrix_mdev->group_notifier);
+> -	matrix_mdev->kvm = NULL;
+>   	module_put(THIS_MODULE);
+>   }
+>   
+> @@ -941,6 +1263,7 @@ static ssize_t vfio_ap_mdev_ioctl(struct mdev_device *mdev,
+>   {
+>   	int ret;
+>   
+> +	mutex_lock(&matrix_dev->lock);
+>   	switch (cmd) {
+>   	case VFIO_DEVICE_GET_INFO:
+>   		ret = vfio_ap_mdev_get_device_info(arg);
+> @@ -952,6 +1275,7 @@ static ssize_t vfio_ap_mdev_ioctl(struct mdev_device *mdev,
+>   		ret = -EOPNOTSUPP;
+>   		break;
+>   	}
+> +	mutex_unlock(&matrix_dev->lock);
+>   
+>   	return ret;
+>   }
+> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+> index 18dcc4d..f46dde5 100644
+> --- a/drivers/s390/crypto/vfio_ap_private.h
+> +++ b/drivers/s390/crypto/vfio_ap_private.h
+> @@ -4,6 +4,7 @@
+>    *
+>    * Author(s): Tony Krowiak <akrowiak@linux.ibm.com>
+>    *	      Halil Pasic <pasic@linux.ibm.com>
+> + *	      Pierre Morel <pmorel@linux.ibm.com>
+>    *
+>    * Copyright IBM Corp. 2018
+>    */
+> @@ -89,5 +90,15 @@ struct ap_matrix_mdev {
+>   
+>   extern int vfio_ap_mdev_register(void);
+>   extern void vfio_ap_mdev_unregister(void);
+> +int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
+> +			     unsigned int retry);
 
-   The vfio_ap_mdev_remove_queue function is called from the vfio_ap
-   driver remove callback. You could embed the code you've introduced in
-   the remove callback there.
+As per my comments in the cover letter, get rid of this.
 
-* Move your vfio_ap_irq_disable function to vfio_ap_ops.c and make it a
-   static function.
+>   
+> +struct vfio_ap_queue {
+> +	struct ap_matrix_mdev *matrix_mdev;
+> +	unsigned long saved_pfn;
+> +	int	apqn;
+> +#define VFIO_AP_ISC_INVALID 0xff
+> +	unsigned char saved_isc;
+> +};
+> +struct ap_queue_status vfio_ap_irq_disable(struct vfio_ap_queue *q);
+>   #endif /* _VFIO_AP_PRIVATE_H_ */
 
-* Leave the vfio_ap_mdev_reset_queue function as a static function in
-   vfio_ap_ops.c
+As per my comments in the cover letter, get rid of this and make it a
+static function in vfio_ap_ops.c.
 
-If you do the things above, then I can base the dynconfig series on
-the IRQ series without much of a merge issue. What say you?
+You'll have to add the following function defs instead:
 
-Note: I've included review comments for patch 3/4 to match the
-       suggestions above.
+int vfio_ap_mdev_probe_queue(struct ap_queue *queue);
+void vfio_ap_mdev_remove_queue(struct ap_queue *queue);
 
-> 
-> However Tony, the choice is your's, I won't be able to help
-> in a near future.
-> 
-> 
-> Pierre Morel (4):
->    s390: ap: kvm: add PQAP interception for AQIC
->    vfio: ap: register IOMMU VFIO notifier
->    s390: ap: implement PAPQ AQIC interception in kernel
->    s390: ap: kvm: Enable PQAP/AQIC facility for the guest
-> 
->   arch/s390/include/asm/kvm_host.h      |   7 +
->   arch/s390/kvm/priv.c                  |  86 ++++++++
->   arch/s390/tools/gen_facilities.c      |   1 +
->   drivers/s390/crypto/vfio_ap_drv.c     |  34 ++-
->   drivers/s390/crypto/vfio_ap_ops.c     | 379 +++++++++++++++++++++++++++++++++-
->   drivers/s390/crypto/vfio_ap_private.h |  15 ++
->   6 files changed, 514 insertions(+), 8 deletions(-)
 > 
 
