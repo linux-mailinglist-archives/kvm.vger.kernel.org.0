@@ -2,92 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D62927A2B
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 12:16:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6E1227ACB
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 12:37:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730369AbfEWKQh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 06:16:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38860 "EHLO mx1.redhat.com"
+        id S1729966AbfEWKfV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 06:35:21 -0400
+Received: from foss.arm.com ([217.140.101.70]:42996 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726846AbfEWKQh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 06:16:37 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D1990309265C
-        for <kvm@vger.kernel.org>; Thu, 23 May 2019 10:16:36 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AAF3B6251D;
-        Thu, 23 May 2019 10:16:35 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, thuth@redhat.com
-Subject: [PATCH v2] kvm: selftests: aarch64: compile with warnings on
-Date:   Thu, 23 May 2019 12:16:34 +0200
-Message-Id: <20190523101634.19720-1-drjones@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Thu, 23 May 2019 10:16:36 +0000 (UTC)
+        id S1727466AbfEWKfV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 06:35:21 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E3737341;
+        Thu, 23 May 2019 03:35:20 -0700 (PDT)
+Received: from usa.arm.com (e107155-lin.cambridge.arm.com [10.1.196.42])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id CECA73F718;
+        Thu, 23 May 2019 03:35:18 -0700 (PDT)
+From:   Sudeep Holla <sudeep.holla@arm.com>
+To:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc:     Sudeep Holla <sudeep.holla@arm.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Julien Thierry <julien.thierry@arm.com>
+Subject: [PATCH 00/15] arm64: KVM: add SPE profiling support for guest
+Date:   Thu, 23 May 2019 11:34:47 +0100
+Message-Id: <20190523103502.25925-1-sudeep.holla@arm.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-aarch64 fixups needed to compile with warnings as errors.
+Hi,
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- tools/testing/selftests/kvm/lib/aarch64/processor.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+This series implements support for allowing KVM guests to use the Arm
+Statistical Profiling Extension (SPE).
 
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index e8c42506a09d..03abba9495af 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -7,6 +7,8 @@
- 
- #define _GNU_SOURCE /* for program_invocation_name */
- 
-+#include <linux/compiler.h>
-+
- #include "kvm_util.h"
- #include "../kvm_util_internal.h"
- #include "processor.h"
-@@ -67,15 +69,13 @@ static uint64_t ptrs_per_pgd(struct kvm_vm *vm)
- 	return 1 << (vm->va_bits - shift);
- }
- 
--static uint64_t ptrs_per_pte(struct kvm_vm *vm)
-+static uint64_t __maybe_unused ptrs_per_pte(struct kvm_vm *vm)
- {
- 	return 1 << (vm->page_shift - 3);
- }
- 
- void virt_pgd_alloc(struct kvm_vm *vm, uint32_t pgd_memslot)
- {
--	int rc;
--
- 	if (!vm->pgd_created) {
- 		vm_paddr_t paddr = vm_phy_pages_alloc(vm,
- 			page_align(vm, ptrs_per_pgd(vm) * 8) / vm->page_size,
-@@ -181,6 +181,7 @@ vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
- unmapped_gva:
- 	TEST_ASSERT(false, "No mapping for vm virtual address, "
- 		    "gva: 0x%lx", gva);
-+	exit(1);
- }
- 
- static void pte_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent, uint64_t page, int level)
-@@ -312,6 +313,6 @@ void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
- 	get_reg(vm, vcpuid, ARM64_CORE_REG(regs.pstate), &pstate);
- 	get_reg(vm, vcpuid, ARM64_CORE_REG(regs.pc), &pc);
- 
--	fprintf(stream, "%*spstate: 0x%.16llx pc: 0x%.16llx\n",
-+	fprintf(stream, "%*spstate: 0x%.16lx pc: 0x%.16lx\n",
- 		indent, "", pstate, pc);
- }
--- 
-2.20.1
+The patches are also available on a branch[1]. The last two extra
+patches are for the kvmtool if someone wants to play with it.
+
+Regards,
+Sudeep
+
+v1->v2:
+	- Rebased on v5.2-rc1
+	- Adjusted sysreg_elx_s macros with merged clang build support
+
+[1] git://git.kernel.org/pub/scm/linux/kernel/git/sudeep.holla/linux.git kvm_spe
+
+Sudeep Holla (15):
+  KVM: arm64: add {read,write}_sysreg_elx_s versions for new registers
+  dt-bindings: ARM SPE: highlight the need for PPI partitions on
+    heterogeneous systems
+  arm64: KVM: reset E2PB correctly in MDCR_EL2 when exiting the
+    guest(VHE)
+  arm64: KVM: define SPE data structure for each vcpu
+  arm64: KVM: add access handler for SPE system registers
+  arm64: KVM/VHE: enable the use PMSCR_EL12 on VHE systems
+  arm64: KVM: split debug save restore across vm/traps activation
+  arm64: KVM/debug: drop pmscr_el1 and use sys_regs[PMSCR_EL1] in
+    kvm_cpu_context
+  arm64: KVM: add support to save/restore SPE profiling buffer controls
+  arm64: KVM: enable conditional save/restore full SPE profiling buffer
+    controls
+  arm64: KVM/debug: trap all accesses to SPE controls at EL1
+  KVM: arm64: add a new vcpu device control group for SPEv1
+  KVM: arm64: enable SPE support
+  KVMTOOL: update_headers: Sync kvm UAPI headers with linux v5.2-rc1
+  KVMTOOL: kvm: add a vcpu feature for SPEv1 support
+
+ .../devicetree/bindings/arm/spe-pmu.txt       |   5 +-
+ Documentation/virtual/kvm/devices/vcpu.txt    |  28 +++
+ arch/arm64/boot/dts/arm/rtsm_ve-aemv8a.dts    | 185 +++++++++++-------
+ arch/arm64/configs/defconfig                  |   6 +
+ arch/arm64/include/asm/kvm_host.h             |  19 +-
+ arch/arm64/include/asm/kvm_hyp.h              |  26 ++-
+ arch/arm64/include/uapi/asm/kvm.h             |   4 +
+ arch/arm64/kvm/Kconfig                        |   7 +
+ arch/arm64/kvm/Makefile                       |   1 +
+ arch/arm64/kvm/guest.c                        |   9 +
+ arch/arm64/kvm/hyp/debug-sr.c                 |  98 +++++++---
+ arch/arm64/kvm/hyp/switch.c                   |  18 +-
+ arch/arm64/kvm/reset.c                        |   3 +
+ arch/arm64/kvm/sys_regs.c                     |  35 ++++
+ include/kvm/arm_spe.h                         |  71 +++++++
+ include/uapi/linux/kvm.h                      |   1 +
+ virt/kvm/arm/arm.c                            |   5 +
+ virt/kvm/arm/spe.c                            | 163 +++++++++++++++
+ 18 files changed, 570 insertions(+), 114 deletions(-)
+ create mode 100644 include/kvm/arm_spe.h
+ create mode 100644 virt/kvm/arm/spe.c
+
+--
+2.17.1
 
