@@ -2,265 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AD4FC27ABC
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 12:36:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13B5427AF4
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 12:43:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730760AbfEWKf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 06:35:59 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:43202 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730749AbfEWKf4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 06:35:56 -0400
+        id S1730461AbfEWKnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 06:43:06 -0400
+Received: from foss.arm.com ([217.140.101.70]:43642 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727434AbfEWKnG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 06:43:06 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 284E41688;
-        Thu, 23 May 2019 03:35:56 -0700 (PDT)
-Received: from usa.arm.com (e107155-lin.cambridge.arm.com [10.1.196.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 142383F718;
-        Thu, 23 May 2019 03:35:53 -0700 (PDT)
-From:   Sudeep Holla <sudeep.holla@arm.com>
-To:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc:     Sudeep Holla <sudeep.holla@arm.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 84A77341;
+        Thu, 23 May 2019 03:43:05 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C9A023F718;
+        Thu, 23 May 2019 03:42:59 -0700 (PDT)
+Date:   Thu, 23 May 2019 11:42:57 +0100
+From:   Dave Martin <Dave.Martin@arm.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
         Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will.deacon@arm.com>,
-        Julien Thierry <julien.thierry@arm.com>
-Subject: [PATCH v2 15/15][KVMTOOL] kvm: add a vcpu feature for SPEv1 support
-Date:   Thu, 23 May 2019 11:35:02 +0100
-Message-Id: <20190523103502.25925-16-sudeep.holla@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190523103502.25925-1-sudeep.holla@arm.com>
-References: <20190523103502.25925-1-sudeep.holla@arm.com>
+        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
+        Lee Smith <Lee.Smith@arm.com>, linux-kselftest@vger.kernel.org,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org,
+        linux-arm-kernel@lists.infradead.org,
+        Evgeniy Stepanov <eugenis@google.com>,
+        linux-media@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Andrey Konovalov <andreyknvl@google.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        linux-kernel@vger.kernel.org,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
+Message-ID: <20190523104256.GX28398@e103592.cambridge.arm.com>
+References: <cover.1557160186.git.andreyknvl@google.com>
+ <20190517144931.GA56186@arrakis.emea.arm.com>
+ <20190521184856.GC2922@ziepe.ca>
+ <20190522134925.GV28398@e103592.cambridge.arm.com>
+ <20190523002052.GF15389@ziepe.ca>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190523002052.GF15389@ziepe.ca>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a runtime configurable for KVM tool to enable Statistical
-Profiling Extensions version 1 support in guest kernel. A command line
-option --spe is required to use the same.
+On Wed, May 22, 2019 at 09:20:52PM -0300, Jason Gunthorpe wrote:
+> On Wed, May 22, 2019 at 02:49:28PM +0100, Dave Martin wrote:
+> > On Tue, May 21, 2019 at 03:48:56PM -0300, Jason Gunthorpe wrote:
+> > > On Fri, May 17, 2019 at 03:49:31PM +0100, Catalin Marinas wrote:
+> > > 
+> > > > The tagged pointers (whether hwasan or MTE) should ideally be a
+> > > > transparent feature for the application writer but I don't think we can
+> > > > solve it entirely and make it seamless for the multitude of ioctls().
+> > > > I'd say you only opt in to such feature if you know what you are doing
+> > > > and the user code takes care of specific cases like ioctl(), hence the
+> > > > prctl() proposal even for the hwasan.
+> > > 
+> > > I'm not sure such a dire view is warrented.. 
+> > > 
+> > > The ioctl situation is not so bad, other than a few special cases,
+> > > most drivers just take a 'void __user *' and pass it as an argument to
+> > > some function that accepts a 'void __user *'. sparse et al verify
+> > > this. 
+> > > 
+> > > As long as the core functions do the right thing the drivers will be
+> > > OK.
+> > > 
+> > > The only place things get dicy is if someone casts to unsigned long
+> > > (ie for vma work) but I think that reflects that our driver facing
+> > > APIs for VMAs are compatible with static analysis (ie I have no
+> > > earthly idea why get_user_pages() accepts an unsigned long), not that
+> > > this is too hard.
+> > 
+> > If multiple people will care about this, perhaps we should try to
+> > annotate types more explicitly in SYSCALL_DEFINEx() and ABI data
+> > structures.
+> > 
+> > For example, we could have a couple of mutually exclusive modifiers
+> > 
+> > T __object *
+> > T __vaddr * (or U __vaddr)
+> > 
+> > In the first case the pointer points to an object (in the C sense)
+> > that the call may dereference but not use for any other purpose.
+> 
+> How would you use these two differently?
+> 
+> So far the kernel has worked that __user should tag any pointer that
+> is from userspace and then you can't do anything with it until you
+> transform it into a kernel something
 
-Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
----
- Makefile                                  |  2 +-
- arm/aarch64/arm-cpu.c                     |  2 +
- arm/aarch64/include/asm/kvm.h             |  4 ++
- arm/aarch64/include/kvm/kvm-config-arch.h |  2 +
- arm/aarch64/include/kvm/kvm-cpu-arch.h    |  3 +-
- arm/include/arm-common/kvm-config-arch.h  |  1 +
- arm/include/arm-common/spe.h              |  4 ++
- arm/spe.c                                 | 81 +++++++++++++++++++++++
- include/linux/kvm.h                       |  1 +
- 9 files changed, 98 insertions(+), 2 deletions(-)
- create mode 100644 arm/include/arm-common/spe.h
- create mode 100644 arm/spe.c
+Ultimately it would be good to disallow casting __object pointers execpt
+to compatible __object pointer types, and to make get_user etc. demand
+__object.
 
-diff --git a/Makefile b/Makefile
-index 9e21a4e2b419..b7c7ad8caf20 100644
---- a/Makefile
-+++ b/Makefile
-@@ -158,7 +158,7 @@ endif
- # ARM
- OBJS_ARM_COMMON		:= arm/fdt.o arm/gic.o arm/gicv2m.o arm/ioport.o \
- 			   arm/kvm.o arm/kvm-cpu.o arm/pci.o arm/timer.o \
--			   arm/pmu.o
-+			   arm/pmu.o arm/spe.o
- HDRS_ARM_COMMON		:= arm/include
- ifeq ($(ARCH), arm)
- 	DEFINES		+= -DCONFIG_ARM
-diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-index d7572b7790b1..6ccea033f361 100644
---- a/arm/aarch64/arm-cpu.c
-+++ b/arm/aarch64/arm-cpu.c
-@@ -6,6 +6,7 @@
- #include "arm-common/gic.h"
- #include "arm-common/timer.h"
- #include "arm-common/pmu.h"
-+#include "arm-common/spe.h"
- 
- #include <linux/byteorder.h>
- #include <linux/types.h>
-@@ -17,6 +18,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
- 	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
- 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
- 	pmu__generate_fdt_nodes(fdt, kvm);
-+	spe__generate_fdt_nodes(fdt, kvm);
- }
- 
- static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
-diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
-index 7b7ac0f6cec9..4c9e168de896 100644
---- a/arm/aarch64/include/asm/kvm.h
-+++ b/arm/aarch64/include/asm/kvm.h
-@@ -106,6 +106,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
- #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
- #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
-+#define KVM_ARM_VCPU_SPE_V1		7 /* Support guest SPEv1 */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-@@ -306,6 +307,9 @@ struct kvm_vcpu_events {
- #define KVM_ARM_VCPU_TIMER_CTRL		1
- #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
- #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
-+#define KVM_ARM_VCPU_SPE_V1_CTRL	2
-+#define   KVM_ARM_VCPU_SPE_V1_IRQ	0
-+#define   KVM_ARM_VCPU_SPE_V1_INIT	1
- 
- /* KVM_IRQ_LINE irq field index values */
- #define KVM_ARM_IRQ_TYPE_SHIFT		24
-diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index 04be43dfa9b2..9968e1666de5 100644
---- a/arm/aarch64/include/kvm/kvm-config-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -6,6 +6,8 @@
- 			"Run AArch32 guest"),				\
- 	OPT_BOOLEAN('\0', "pmu", &(cfg)->has_pmuv3,			\
- 			"Create PMUv3 device"),				\
-+	OPT_BOOLEAN('\0', "spe", &(cfg)->has_spev1,			\
-+			"Create SPEv1 device"),				\
- 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
- 			"Specify random seed for Kernel Address Space "	\
- 			"Layout Randomization (KASLR)"),
-diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-index a9d8563382c6..5abaf9505274 100644
---- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-@@ -8,7 +8,8 @@
- #define ARM_VCPU_FEATURE_FLAGS(kvm, cpuid)	{				\
- 	[0] = ((!!(cpuid) << KVM_ARM_VCPU_POWER_OFF) |				\
- 	       (!!(kvm)->cfg.arch.aarch32_guest << KVM_ARM_VCPU_EL1_32BIT) |	\
--	       (!!(kvm)->cfg.arch.has_pmuv3 << KVM_ARM_VCPU_PMU_V3))		\
-+	       (!!(kvm)->cfg.arch.has_pmuv3 << KVM_ARM_VCPU_PMU_V3) |		\
-+	       (!!(kvm)->cfg.arch.has_spev1 << KVM_ARM_VCPU_SPE_V1))		\
- }
- 
- #define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 5734c46ab9e6..742733e289af 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -9,6 +9,7 @@ struct kvm_config_arch {
- 	bool		virtio_trans_pci;
- 	bool		aarch32_guest;
- 	bool		has_pmuv3;
-+	bool		has_spev1;
- 	u64		kaslr_seed;
- 	enum irqchip_type irqchip;
- 	u64		fw_addr;
-diff --git a/arm/include/arm-common/spe.h b/arm/include/arm-common/spe.h
-new file mode 100644
-index 000000000000..bcfa40877f6f
---- /dev/null
-+++ b/arm/include/arm-common/spe.h
-@@ -0,0 +1,4 @@
-+
-+#define KVM_ARM_SPEV1_PPI			21
-+
-+void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm);
-diff --git a/arm/spe.c b/arm/spe.c
-new file mode 100644
-index 000000000000..ec03b01a3866
---- /dev/null
-+++ b/arm/spe.c
-@@ -0,0 +1,81 @@
-+#include "kvm/fdt.h"
-+#include "kvm/kvm.h"
-+#include "kvm/kvm-cpu.h"
-+#include "kvm/util.h"
-+
-+#include "arm-common/gic.h"
-+#include "arm-common/spe.h"
-+
-+#ifdef CONFIG_ARM64
-+static int set_spe_attr(struct kvm *kvm, int vcpu_idx,
-+			struct kvm_device_attr *attr)
-+{
-+	int ret, fd;
-+
-+	fd = kvm->cpus[vcpu_idx]->vcpu_fd;
-+
-+	ret = ioctl(fd, KVM_HAS_DEVICE_ATTR, attr);
-+	if (!ret) {
-+		ret = ioctl(fd, KVM_SET_DEVICE_ATTR, attr);
-+		if (ret)
-+			pr_err("SPE KVM_SET_DEVICE_ATTR failed (%d)\n", ret);
-+	} else {
-+		pr_err("Unsupported SPE on vcpu%d\n", vcpu_idx);
-+	}
-+
-+	return ret;
-+}
-+
-+void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm)
-+{
-+	const char compatible[] = "arm,statistical-profiling-extension-v1";
-+	int irq = KVM_ARM_SPEV1_PPI;
-+	int i, ret;
-+
-+	u32 cpu_mask = (((1 << kvm->nrcpus) - 1) << GIC_FDT_IRQ_PPI_CPU_SHIFT) \
-+		       & GIC_FDT_IRQ_PPI_CPU_MASK;
-+	u32 irq_prop[] = {
-+		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
-+		cpu_to_fdt32(irq - 16),
-+		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_HIGH),
-+	};
-+
-+	if (!kvm->cfg.arch.has_spev1)
-+		return;
-+
-+	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_SPE_V1)) {
-+		pr_info("SPE unsupported\n");
-+		return;
-+	}
-+
-+	for (i = 0; i < kvm->nrcpus; i++) {
-+		struct kvm_device_attr spe_attr;
-+
-+		spe_attr = (struct kvm_device_attr){
-+			.group	= KVM_ARM_VCPU_SPE_V1_CTRL,
-+			.addr	= (u64)(unsigned long)&irq,
-+			.attr	= KVM_ARM_VCPU_SPE_V1_IRQ,
-+		};
-+
-+		ret = set_spe_attr(kvm, i, &spe_attr);
-+		if (ret)
-+			return;
-+
-+		spe_attr = (struct kvm_device_attr){
-+			.group	= KVM_ARM_VCPU_SPE_V1_CTRL,
-+			.attr	= KVM_ARM_VCPU_SPE_V1_INIT,
-+		};
-+
-+		ret = set_spe_attr(kvm, i, &spe_attr);
-+		if (ret)
-+			return;
-+	}
-+
-+	_FDT(fdt_begin_node(fdt, "spe"));
-+	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
-+	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
-+	_FDT(fdt_end_node(fdt));
-+}
-+#else
-+void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm) { }
-+#endif
-diff --git a/include/linux/kvm.h b/include/linux/kvm.h
-index 2fe12b40d503..698bcc2f96e3 100644
---- a/include/linux/kvm.h
-+++ b/include/linux/kvm.h
-@@ -993,6 +993,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_SVE 170
- #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
- #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
-+#define KVM_CAP_ARM_SPE_V1 173
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.17.1
+__vaddr pointers / addresses would be freely castable, but not to
+__object and so would not be dereferenceable even indirectly.
 
+Or that's the general idea.  Figuring out a sane set of rules that we
+could actually check / enforce would require a bit of work.
+
+(Whether the __vaddr base type is a pointer or an integer type is
+probably moot, due to the restrictions we would place on the use of
+these anyway.)
+
+> > to tell static analysers the real type of pointers smuggled through
+> > UAPI disguised as other types (*cough* KVM, etc.)
+> 
+> Yes, that would help alot, we often have to pass pointers through a
+> u64 in the uAPI, and there is no static checker support to make sure
+> they are run through the u64_to_user_ptr() helper.
+
+Agreed.
+
+Cheers
+---Dave
