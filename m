@@ -2,224 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 86B0F28181
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 17:44:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5712128353
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 18:23:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731107AbfEWPo2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 11:44:28 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:40517 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731032AbfEWPo1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 11:44:27 -0400
-Received: by mail-lj1-f196.google.com with SMTP id q62so5928797ljq.7
-        for <kvm@vger.kernel.org>; Thu, 23 May 2019 08:44:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/wji4Ea/4BKbtz1pB+NomkucTVNmeP5sWS4Z09Qoh/0=;
-        b=aFH35CN6oPRsy0HINPVyUyCLmmZ1q+W5tanGOLFB9ZDOu6iaE0T6Zf2p50/YpwHsbr
-         48EE1NUmchXldef87VmFcBOfomkIHiEfKDLilaRqMK87cFmewn3SJqhTI1TRHWczozD4
-         oXQnG40alYiwUIlV5zhAeNCFOXlq3pqE0BbnZ0FvRVuwBWMRV9wfu1H9fYBPCAdnSv5U
-         HVNKv9dUz6r+VmwUQYwzrC3kRsKz62p+YOIjrLW4bC1aoOEaVaZZBPmIi8QCc4AHmXYb
-         1tLTls+6tcRQac2V8FPQbYxeEAGXeJISVC1rVB3y4LA5KetGIABPN8JvrlKNXRYKDzkN
-         FlXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/wji4Ea/4BKbtz1pB+NomkucTVNmeP5sWS4Z09Qoh/0=;
-        b=cYo0f6tYO7XCcl8zg4v7HlxkmGqsVbCJM+qy5GC5wyT+rI17eTdkyVLrcqXssOBkZi
-         NrvjiQBhXNqFxntCddWaJXmHrYKTPLApNpH7avHDYDfcrxLJSRh+BaeOaUcJbIGD3dpi
-         9P2DWJ0RFiWtJ/t0X2wUGV3GyQsWs2cK9dxbUjq7jWBNOQFJNOwrnydhIa/1CBXto5YL
-         qpiNdwhSTNN9UFWZ8j+kExC7LjBPNY7j3grzc1oou5ItPqMkERjU99BRlYqkMnfsQM/a
-         Qnlr5iMWKyCmfFKmvxRvp/4Gc0V34I1y1M59oSIt5zIsX0VdmWwYjO/a95oU1hAhBnsP
-         GE7w==
-X-Gm-Message-State: APjAAAUaVqmHBSjkPRcj+ork0LESJM6Jot24goZWYTk60k0A0LpfkWDz
-        1tMh+x5kZc6970NYaKxBt3TnZQfnc1ujMzX+XSdE4A==
-X-Google-Smtp-Source: APXvYqzhSDjrNWAy5KyNhMUlv7cjkwlGbRwsa6Uqsf4zqqYvI69PmEIAwS9JjP+IZnW+JBpTZSKDycdIF2QLVLgBgoM=
-X-Received: by 2002:a2e:9d4e:: with SMTP id y14mr23518941ljj.199.1558626264355;
- Thu, 23 May 2019 08:44:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1557160186.git.andreyknvl@google.com> <20190517144931.GA56186@arrakis.emea.arm.com>
- <CAFKCwrj6JEtp4BzhqO178LFJepmepoMx=G+YdC8sqZ3bcBp3EQ@mail.gmail.com>
- <20190521182932.sm4vxweuwo5ermyd@mbp> <201905211633.6C0BF0C2@keescook>
- <20190522101110.m2stmpaj7seezveq@mbp> <CAJgzZoosKBwqXRyA6fb8QQSZXFqfHqe9qO9je5TogHhzuoGXJQ@mail.gmail.com>
- <20190522163527.rnnc6t4tll7tk5zw@mbp> <201905221316.865581CF@keescook> <20190523144449.waam2mkyzhjpqpur@mbp>
-In-Reply-To: <20190523144449.waam2mkyzhjpqpur@mbp>
-From:   enh <enh@google.com>
-Date:   Thu, 23 May 2019 08:44:12 -0700
-Message-ID: <CAJgzZoqX--Kd9=Kjpnfz-5cjVJ=TdsXM5dJM_EjLFKniVbny2w@mail.gmail.com>
-Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
-To:     Catalin Marinas <catalin.marinas@arm.com>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Evgenii Stepanov <eugenis@google.com>,
-        Andrey Konovalov <andreyknvl@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1731145AbfEWQWW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 12:22:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41704 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731202AbfEWQWV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 23 May 2019 12:22:21 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4NGGucK131788
+        for <kvm@vger.kernel.org>; Thu, 23 May 2019 12:22:20 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2snvu0xgcb-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 23 May 2019 12:22:20 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
+        Thu, 23 May 2019 17:22:18 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 23 May 2019 17:22:14 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4NGMCrR29098026
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 23 May 2019 16:22:12 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8E8784C05C;
+        Thu, 23 May 2019 16:22:12 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 094CC4C059;
+        Thu, 23 May 2019 16:22:12 +0000 (GMT)
+Received: from s38lp84.lnxne.boe (unknown [9.152.108.100])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 23 May 2019 16:22:11 +0000 (GMT)
+From:   Michael Mueller <mimu@linux.ibm.com>
+To:     KVM Mailing List <kvm@vger.kernel.org>,
+        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Michael Mueller <mimu@linux.ibm.com>
+Subject: [PATCH v2 0/8] s390: virtio: support protected virtualization
+Date:   Thu, 23 May 2019 18:22:01 +0200
+X-Mailer: git-send-email 2.13.4
+X-TM-AS-GCONF: 00
+x-cbid: 19052316-4275-0000-0000-00000337DAFB
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19052316-4276-0000-0000-0000384777E7
+Message-Id: <20190523162209.9543-1-mimu@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-23_13:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905230110
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 23, 2019 at 7:45 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
->
-> On Wed, May 22, 2019 at 01:47:36PM -0700, Kees Cook wrote:
-> > On Wed, May 22, 2019 at 05:35:27PM +0100, Catalin Marinas wrote:
-> > > The two hard requirements I have for supporting any new hardware feature
-> > > in Linux are (1) a single kernel image binary continues to run on old
-> > > hardware while making use of the new feature if available and (2) old
-> > > user space continues to run on new hardware while new user space can
-> > > take advantage of the new feature.
-> >
-> > Agreed! And I think the series meets these requirements, yes?
->
-> Yes. I mentioned this just to make sure people don't expect different
-> kernel builds for different hardware features.
->
-> There is also the obvious requirement which I didn't mention: new user
-> space continues to run on new/subsequent kernel versions. That's one of
-> the points of contention for this series (ignoring MTE) with the
-> maintainers having to guarantee this without much effort. IOW, do the
-> 500K+ new lines in a subsequent kernel version break any user space out
-> there? I'm only talking about the relaxed TBI ABI. Are the usual LTP,
-> syskaller sufficient? Better static analysis would definitely help.
->
-> > > For MTE, we just can't enable it by default since there are applications
-> > > who use the top byte of a pointer and expect it to be ignored rather
-> > > than failing with a mismatched tag. Just think of a hwasan compiled
-> > > binary where TBI is expected to work and you try to run it with MTE
-> > > turned on.
-> >
-> > Ah! Okay, here's the use-case I wasn't thinking of: the concern is TBI
-> > conflicting with MTE. And anything that starts using TBI suddenly can't
-> > run in the future because it's being interpreted as MTE bits? (Is that
-> > the ABI concern?
->
-> That's another aspect to figure out when we add the MTE support. I don't
-> think we'd be able to do this without an explicit opt-in by the user.
->
-> Or, if we ever want MTE to be turned on by default (i.e. tag checking),
-> even if everything is tagged with 0, we have to disallow TBI for user
-> and this includes hwasan. There were a small number of programs using
-> the TBI (I think some JavaScript compilers tried this). But now we are
-> bringing in the hwasan support and this can be a large user base. Shall
-> we add an ELF note for such binaries that use TBI/hwasan?
->
-> This series is still required for MTE but we may decide not to relax the
-> ABI blindly, therefore the opt-in (prctl) or personality idea.
->
-> > I feel like we got into the weeds about ioctl()s and one-off bugs...)
->
-> This needs solving as well. Most driver developers won't know why
-> untagged_addr() is needed unless we have more rigorous types or type
-> annotations and a tool to check them (we should probably revive the old
-> sparse thread).
->
-> > So there needs to be some way to let the kernel know which of three
-> > things it should be doing:
-> > 1- leaving userspace addresses as-is (present)
-> > 2- wiping the top bits before using (this series)
->
-> (I'd say tolerating rather than wiping since get_user still uses the tag
-> in the current series)
->
-> The current series does not allow any choice between 1 and 2, the
-> default ABI basically becomes option 2.
->
-> > 3- wiping the top bits for most things, but retaining them for MTE as
-> >    needed (the future)
->
-> 2 and 3 are not entirely compatible as a tagged pointer may be checked
-> against the memory colour by the hardware. So you can't have hwasan
-> binary with MTE enabled.
->
-> > I expect MTE to be the "default" in the future. Once a system's libc has
-> > grown support for it, everything will be trying to use MTE. TBI will be
-> > the special case (but TBI is effectively a prerequisite).
->
-> The kernel handling of tagged pointers is indeed a prerequisite. The ABI
-> distinction between the above 2 and 3 needs to be solved.
->
-> > AFAICT, the only difference I see between 2 and 3 will be the tag handling
-> > in usercopy (all other places will continue to ignore the top bits). Is
-> > that accurate?
->
-> Yes, mostly (for the kernel). If MTE is enabled by default for a hwasan
-> binary, it will SEGFAULT (either in user space or in kernel uaccess).
-> How does the kernel choose between 2 and 3?
->
-> > Is "1" a per-process state we want to keep? (I assume not, but rather it
-> > is available via no TBI/MTE CONFIG or a boot-time option, if at all?)
->
-> Possibly, though not necessarily per process. For testing or if
-> something goes wrong during boot, a command line option with a static
-> label would do. The AT_FLAGS bit needs to be checked by user space. My
-> preference would be per-process.
->
-> > To choose between "2" and "3", it seems we need a per-process flag to
-> > opt into TBI (and out of MTE).
->
-> Or leave option 2 the default and get it to opt in to MTE.
->
-> > For userspace, how would a future binary choose TBI over MTE? If it's
-> > a library issue, we can't use an ELF bit, since the choice may be
-> > "late" after ELF load (this implies the need for a prctl().) If it's
-> > binary-only ("built with HWKASan") then an ELF bit seems sufficient.
-> > And without the marking, I'd expect the kernel to enforce MTE when
-> > there are high bits.
->
-> The current plan is that a future binary issues a prctl(), after
-> checking the HWCAP_MTE bit (as I replied to Elliot, the MTE instructions
-> are not in the current NOP space). I'd expect this to be done by the
-> libc or dynamic loader under the assumption that the binaries it loads
-> do _not_ use the top pointer byte for anything else.
+Enhanced virtualization protection technology may require the use of
+bounce buffers for I/O. While support for this was built into the virtio
+core, virtio-ccw wasn't changed accordingly.
 
-yeah, it sounds like to support hwasan and MTE, the dynamic linker
-will need to not use either itself.
+Some background on technology (not part of this series) and the
+terminology used.
 
-> With hwasan
-> compiled objects this gets more confusing (any ELF note to identify
-> them?).
+* Protected Virtualization (PV):
 
-no, at the moment code that wants to know checks for the presence of
-__hwasan_init. (and bionic doesn't actually look at any ELF notes
-right now.) but we can always add something if we need to.
+Protected Virtualization guarantees, that non-shared memory of a  guest
+that operates in PV mode private to that guest. I.e. any attempts by the
+hypervisor or other guests to access it will result in an exception. If
+supported by the environment (machine, KVM, guest VM) a guest can decide
+to change into PV mode by doing the appropriate ultravisor calls.
 
-> (there is also the risk of existing applications using TBI already but
-> I'm not aware of any still using this feature other than hwasan)
->
-> --
-> Catalin
+* Ultravisor:
+
+A hardware/firmware entity that manages PV guests, and polices access to
+their memory. A PV guest prospect needs to interact with the ultravisor,
+to enter PV mode, and potentially to share pages (for I/O which should
+be encrypted by the guest). A guest interacts with the ultravisor via so
+called ultravisor calls. A hypervisor needs to interact with the
+ultravisor to facilitate interpretation, emulation and swapping. A
+hypervisor  interacts with the ultravisor via ultravisor calls and via
+the SIE state description. Generally the ultravisor sanitizes hypervisor
+inputs so that the guest can not be corrupted (except for denial of
+service.
+
+
+What needs to be done
+=====================
+
+Thus what needs to be done to bring virtio-ccw up to speed with respect
+to protected virtualization is:
+* use some 'new' common virtio stuff
+* make sure that virtio-ccw specific stuff uses shared memory when
+  talking to the hypervisor (except control/communication blocks like ORB,
+  these are handled by the ultravisor)
+* make sure the DMA API does what is necessary to talk through shared
+  memory if we are a protected virtualization guest.
+* make sure the common IO layer plays along as well (airqs, sense).
+
+
+Important notes
+================
+
+* This patch set is based on Martins features branch
+ (git://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git branch
+ 'features').
+
+* Documentation is still very sketchy. I'm committed to improving this,
+  but I'm currently hampered by some dependencies currently.  
+
+* The existing naming in the common infrastructure (kernel internal
+  interfaces) is pretty much based on the AMD SEV terminology. Thus the
+  names aren't always perfect. There might be merit to changing these
+  names to more abstract ones. I did not put much thought into that at
+  the current stage.
+
+* Testing: Please use iommu_platform=on for any virtio devices you are
+  going to test this code with (so virtio actually uses the DMA API).
+
+Change log
+==========
+
+v1 --> v2:
+* patch "virtio/s390: use vring_create_virtqueue" went already upstream
+* patch "virtio/s390: DMA support for virtio-ccw" went already upstream
+* patch "virtio/s390: enable packed ring" went already upstream
+* Made dev.dma_mask point to dev.coherent_dma_mask for css, subchannel
+  and ccw devices.
+* While rebasing 's390/airq: use DMA memory for adapter interrupts' the
+  newly introduced kmem_cache  was replaced with an equivalent dma_pool;
+  the kalloc() allocations are now replaced with cio_dma_zalloc()
+  allocations to avoid wasting almost a full page.
+* Made virtio-ccw use the new AIRQ_IV_CACHELINE flag.
+* fixed all remaining checkpatch issues
+
+RFC --> v1:
+* Fixed bugs found by Connie (may_reduce and handling reduced,  warning,
+  split move -- thanks Connie!).
+* Fixed console bug found by Sebastian (thanks Sebastian!).
+* Removed the completely useless duplicate of dma-mapping.h spotted by
+  Christoph (thanks Christoph!).
+* Don't use the global DMA pool for subchannel and ccw device
+  owned memory as requested by Sebastian. Consequences:
+	* Both subchannel and ccw devices have their dma masks
+	now (both specifying 31 bit addressable)
+	* We require at least 2 DMA pages per ccw device now, most of
+	this memory is wasted though.
+	* DMA memory allocated by virtio is also 31 bit addressable now
+        as virtio uses the parent (which is the ccw device).
+* Enabled packed ring.
+* Rebased onto Martins feature branch; using the actual uv (ultravisor)
+  interface instead of TODO comments.
+* Added some explanations to the cover letter (Connie, David).
+* Squashed a couple of patches together and fixed some text stuff. 
+
+Looking forward to your review, or any other type of input.
+
+Halil Pasic (8):
+  s390/mm: force swiotlb for protected virtualization
+  s390/cio: introduce DMA pools to cio
+  s390/cio: add basic protected virtualization support
+  s390/airq: use DMA memory for adapter interrupts
+  virtio/s390: use cacheline aligned airq bit vectors
+  virtio/s390: add indirection to indicators access
+  virtio/s390: use DMA memory for ccw I/O and classic notifiers
+  virtio/s390: make airq summary indicators DMA
+
+ arch/s390/Kconfig                   |   5 +
+ arch/s390/include/asm/airq.h        |   2 +
+ arch/s390/include/asm/ccwdev.h      |   4 +
+ arch/s390/include/asm/cio.h         |  11 ++
+ arch/s390/include/asm/mem_encrypt.h |  18 +++
+ arch/s390/mm/init.c                 |  47 +++++++
+ drivers/s390/cio/airq.c             |  32 +++--
+ drivers/s390/cio/ccwreq.c           |   9 +-
+ drivers/s390/cio/cio.h              |   2 +
+ drivers/s390/cio/css.c              | 111 ++++++++++++++++
+ drivers/s390/cio/device.c           |  64 ++++++++--
+ drivers/s390/cio/device_fsm.c       |  53 +++++---
+ drivers/s390/cio/device_id.c        |  20 +--
+ drivers/s390/cio/device_ops.c       |  21 +++-
+ drivers/s390/cio/device_pgid.c      |  22 ++--
+ drivers/s390/cio/device_status.c    |  24 ++--
+ drivers/s390/cio/io_sch.h           |  20 ++-
+ drivers/s390/virtio/virtio_ccw.c    | 244 ++++++++++++++++++++----------------
+ 18 files changed, 514 insertions(+), 195 deletions(-)
+ create mode 100644 arch/s390/include/asm/mem_encrypt.h
+
+-- 
+2.13.4
+
