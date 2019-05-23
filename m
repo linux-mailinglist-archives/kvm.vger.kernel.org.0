@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9038128C8A
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 23:43:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F4A028CB1
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 23:49:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388236AbfEWVnh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 17:43:37 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:53272 "EHLO
+        id S2388350AbfEWVtw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 17:49:52 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:58870 "EHLO
         aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387709AbfEWVnh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 17:43:37 -0400
+        with ESMTP id S2388134AbfEWVtw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 17:49:52 -0400
 Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4NLYrP6194020;
-        Thu, 23 May 2019 21:42:41 GMT
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4NLhifU004317;
+        Thu, 23 May 2019 21:49:13 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=fChv2jZysnH0YR2y5rlBhLoHF4XJSOv5yE7IjBMa6MI=;
- b=i5j6lJ3z4Hf6Mwe1uFCyW+Dx0BGc6CLgnMT05UhOAfwtXEFuubZ+5cv8bNXRQH8SGgIo
- 3OyLnYWAZcw9X87yhv0YScSmwlfD77yg0wTvg1PD2uhxSUM5Gy8pVikHFeRo6px2TaaX
- 1T5zqOZo/S3v8s0hewcbGZ3eIMfGRoZXC5u4QclbQcN+yRHCnMRvFytz7HBe/xVcQAjJ
- q7QGNHrFLf5im7IlibITLPPps1G2JhmeRisj45eynyh1gJCP32P+yM8kZMYnSTS9vT+Y
- qf/xCuv9cZn8I8m8yv46kQ4CowM5trlHuA6dN6lqyIZI05Jf3nu9oHXNSoc9l5912SdM mQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2130.oracle.com with ESMTP id 2smsk5n8d7-1
+ bh=CA4BRvH7LpSOvdwGQ1RgbPK5R7ura7qGqy4SrVn6TGs=;
+ b=X//cpGAKkvYu1m1BjaIbh5y4EYuwM+8rZjWW5aAmW0vi1toc+ON7ojqHQsbcK6pAW1oD
+ bdaUeEmghYKNyuWdojEirpuCtcEnGnpjzGNjA/TAPNGPvcylGBa+20OGWCMnCwLHj8Tf
+ YRS6xbAb5NCY6/3hnPEk+xsQaxia6MP4a6XjVZSvoh9chZIbCYwa7XRJ+TOdhejZB+v7
+ XSe3hifUXqlRGwDwQJJUjbd8e+die4vTzQ+aF3wEY1CdthC5hOmZQere78SM0w/UZFJa
+ y1F1RpJmvyYHjzu9jq9fzTHoce2ebfeYA5vSKPJb2pXe3nPIQrp8MMBgMFftquXsLaI1 XQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2130.oracle.com with ESMTP id 2smsk5n948-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 May 2019 21:42:41 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4NLfaot156717;
-        Thu, 23 May 2019 21:42:41 GMT
+        Thu, 23 May 2019 21:49:13 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4NLmFZJ185512;
+        Thu, 23 May 2019 21:49:12 GMT
 Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2smsgtgmuy-1
+        by userp3020.oracle.com with ESMTP id 2smsgvrm93-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 May 2019 21:42:41 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4NLgaOB031829;
-        Thu, 23 May 2019 21:42:37 GMT
+        Thu, 23 May 2019 21:49:12 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4NLn8SI003595;
+        Thu, 23 May 2019 21:49:09 GMT
 Received: from [192.168.1.16] (/24.9.64.241)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 23 May 2019 21:42:36 +0000
+        with ESMTP ; Thu, 23 May 2019 21:49:08 +0000
 Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
 To:     Catalin Marinas <catalin.marinas@arm.com>
 Cc:     Kees Cook <keescook@chromium.org>,
@@ -86,8 +86,8 @@ References: <cover.1557160186.git.andreyknvl@google.com>
  <20190523201105.oifkksus4rzcwqt4@mbp>
 From:   Khalid Aziz <khalid.aziz@oracle.com>
 Organization: Oracle Corp
-Message-ID: <047e3b90-d73e-0ca8-869c-d03b7580e644@oracle.com>
-Date:   Thu, 23 May 2019 15:42:33 -0600
+Message-ID: <ffe58af3-7c70-d559-69f6-1f6ebcb0fec6@oracle.com>
+Date:   Thu, 23 May 2019 15:49:05 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
@@ -99,13 +99,13 @@ X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9266 signatures=6
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905230138
+ engine=8.0.1-1810050000 definitions=main-1905230139
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9266 signatures=668687
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
  suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905230138
+ definitions=main-1905230139
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -140,25 +140,49 @@ d
 > in the kernel (e.g. sys_write)? Is the tag removed on kernel entry or i=
 t
 > ends up deeper in the core code?
+>=20
 
-Tag is not removed from the user addresses. Kernel passes tagged
-addresses to copy_from_user and copy_to_user. MMU checks the tag
-embedded in the address when kernel accesses userspace addresses. This
-maintains the ADI integrity even when userspace attempts to access any
-userspace addresses through system calls.
+Another spot I should point out in ADI patch - Tags are not stored in
+VMAs and IOMMU does not support ADI tags on M7. ADI tags are stripped
+before userspace addresses are passed to IOMMU in the following snippet
+from the patch:
 
-On sparc, access_ok() is defined as:
+diff --git a/arch/sparc/mm/gup.c b/arch/sparc/mm/gup.c
+index 5335ba3c850e..357b6047653a 100644
+--- a/arch/sparc/mm/gup.c
++++ b/arch/sparc/mm/gup.c
+@@ -201,6 +202,24 @@ int __get_user_pages_fast(unsigned long start, int
+nr_pages
+, int write,
+        pgd_t *pgdp;
+        int nr =3D 0;
 
-#define access_ok(addr, size) __access_ok((unsigned long)(addr), size)
-#define __access_ok(addr, size) (__user_ok((addr) & get_fs().seg, (size))=
-)
-#define __user_ok(addr, size) ({ (void)(size); (addr) < STACK_TOP; })
++#ifdef CONFIG_SPARC64
++       if (adi_capable()) {
++               long addr =3D start;
++
++               /* If userspace has passed a versioned address, kernel
++                * will not find it in the VMAs since it does not store
++                * the version tags in the list of VMAs. Storing version
++                * tags in list of VMAs is impractical since they can be
++                * changed any time from userspace without dropping into
++                * kernel. Any address search in VMAs will be done with
++                * non-versioned addresses. Ensure the ADI version bits
++                * are dropped here by sign extending the last bit before=
 
-STACK_TOP for M7 processor (which is the first sparc processor to
-support ADI) is 0xfff8000000000000UL. Tagged addresses pass the
-access_ok() check fine. Any tag mismatches that happen during kernel
-access to userspace addresses are handled by do_mcd_err().
++                * ADI bits. IOMMU does not implement version tags.
++                */
++               addr =3D (addr << (long)adi_nbits()) >> (long)adi_nbits()=
+;
++               start =3D addr;
++       }
++#endif
+        start &=3D PAGE_MASK;
+        addr =3D start;
+        len =3D (unsigned long) nr_pages << PAGE_SHIFT;
+
 
 --
 Khalid
+
 
