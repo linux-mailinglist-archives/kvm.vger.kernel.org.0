@@ -2,96 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E03927502
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 06:19:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D0EB27967
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 11:37:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726846AbfEWETA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 00:19:00 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:33280 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725792AbfEWES7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 00:18:59 -0400
-Received: by mail-pg1-f194.google.com with SMTP id h17so2425709pgv.0;
-        Wed, 22 May 2019 21:18:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=wyIsAgKxN8tvE2hNP2yzX9LrmM9i/7FrObscEtVyCho=;
-        b=lt42LZxMVNKVokraVTgtQcZH1Cqg/bWugTeamCcxdZ55lar6qmQkx4jWu+M9NGiLXV
-         K/Qve5Qfivw/hLt5veZoSjOYE75v0Toxq5E7IcRzx/6vA5X9BsL83wSVeJp2RYeJ5iJ/
-         pbQGZ8Vv3y8t7aPUN3chim/KJT7IAGxsMOjQwGVCLrH0sy/go3P8y0T1QZBZWthrNML3
-         tsZz1XUiEfjp+0HBS344er/yQYyTAHgIAqG6AaIRXUESuVLlxzkjeZzZhQiVXPxDnDov
-         bKEN+H0Jzuc7FZEclrlzoapq4kUnDvrPtbfY09Zx2tAqQLYalFpnJCsgc+2ZgVPgrfFR
-         t0OA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=wyIsAgKxN8tvE2hNP2yzX9LrmM9i/7FrObscEtVyCho=;
-        b=Tgyl41i5F5W53Y8bEipkPOHEOAsoHvYZsaNGE9ZRwPwgMQln2SyW9KF8h9IDPBt7pP
-         xKIOBkByt4qULDFOgoNOOB0Oi249V0+hiGldDpb6KxVxzfVmbXflfb30ykHMywRWLAMX
-         mMmXmNnxQ3s47jSPLqIrg0h8FcMPjBkm0Xd77NWyzVWYvurBattP1pjNdkoIt0ZK3z1K
-         IQ88sOarmbLBg81AwCxPmDNUl2ijYvn4NGH6K5D8rCoMaT8OJYuU1SB5QQp+o4wqaXPf
-         JnxtM2oEn1AoUaZIN9VPzBLGaDHLlU3ENNYivQ9z1DHzp1TJLtbG2WG+TscSV19pwfHJ
-         s1DQ==
-X-Gm-Message-State: APjAAAWk7GXNnuT3uo1FEcL5esE6QY06EPRvb9iootjW4eEkuhZeVauM
-        +xrnVjvxLbtvUjb655Iz0SYy4qQd
-X-Google-Smtp-Source: APXvYqyFFEWEeGpZiRcf8oj4nJYDRsPQkPOrHdx7WUGGw/K7u/qi3NwY18eTeLG66qTyjqTqlBq6GQ==
-X-Received: by 2002:a62:6444:: with SMTP id y65mr101400603pfb.148.1558585138685;
-        Wed, 22 May 2019 21:18:58 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id m12sm22991427pgi.56.2019.05.22.21.18.56
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Wed, 22 May 2019 21:18:58 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH 2/2] KVM: LAPIC: remove the trailing newline used in the fmt parameter of TP_printk
-Date:   Thu, 23 May 2019 12:18:51 +0800
-Message-Id: <1558585131-1321-2-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1558585131-1321-1-git-send-email-wanpengli@tencent.com>
-References: <1558585131-1321-1-git-send-email-wanpengli@tencent.com>
+        id S1727440AbfEWJhe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 05:37:34 -0400
+Received: from 2.mo7.mail-out.ovh.net ([87.98.143.68]:48608 "EHLO
+        2.mo7.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726081AbfEWJhd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 05:37:33 -0400
+Received: from player797.ha.ovh.net (unknown [10.109.146.106])
+        by mo7.mail-out.ovh.net (Postfix) with ESMTP id 7E0B311DCE5
+        for <kvm@vger.kernel.org>; Thu, 23 May 2019 08:01:29 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
+        (Authenticated sender: groug@kaod.org)
+        by player797.ha.ovh.net (Postfix) with ESMTPSA id 1729262D9AF4;
+        Thu, 23 May 2019 06:01:24 +0000 (UTC)
+Date:   Thu, 23 May 2019 08:01:23 +0200
+From:   Greg Kurz <groug@kaod.org>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
+        kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 0/3] KVM: PPC: Book3S HV: XIVE: assorted fixes on vCPU
+ and RAM limits
+Message-ID: <20190523080123.6e700a1e@bahia.lan>
+In-Reply-To: <20190522233043.GO30423@umbus.fritz.box>
+References: <20190520071514.9308-1-clg@kaod.org>
+        <20190522233043.GO30423@umbus.fritz.box>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/bHinS0IXP.Nh/xogOoPORG1"; protocol="application/pgp-signature"
+X-Ovh-Tracer-Id: 3979211747638352358
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddufedguddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+--Sig_/bHinS0IXP.Nh/xogOoPORG1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-The trailing newlines will lead to extra newlines in the trace file 
-which looks like the following output, so remove it.
+On Thu, 23 May 2019 09:30:43 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-qemu-system-x86-15695 [002] ...1 15774.839240: kvm_hv_timer_state: vcpu_id 0 hv_timer 1
+> On Mon, May 20, 2019 at 09:15:11AM +0200, C=C3=A9dric Le Goater wrote:
+> > Hello,
+> >=20
+> > Here are a couple of fixes for issues in the XIVE KVM device when
+> > testing the limits : RAM size and number of vCPUS. =20
+>=20
+> How serious are the problems these patches fix?  I'm wondering if I
+> need to make a backport for RHEL8.1.
+>=20
 
-qemu-system-x86-15695 [002] ...1 15774.839309: kvm_hv_timer_state: vcpu_id 0 hv_timer 1
+Patch 2/3 fixes a QEMU error when hot-unplugging a vCPU:
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/trace.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+qemu-system-ppc64: KVM_SET_DEVICE_ATTR failed: Group 4 attr 0x0000000000000=
+046: Invalid argument
 
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 4d47a26..b5c831e 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -1365,7 +1365,7 @@ TRACE_EVENT(kvm_hv_timer_state,
- 			__entry->vcpu_id = vcpu_id;
- 			__entry->hv_timer_in_use = hv_timer_in_use;
- 			),
--		TP_printk("vcpu_id %x hv_timer %x\n",
-+		TP_printk("vcpu_id %x hv_timer %x",
- 			__entry->vcpu_id,
- 			__entry->hv_timer_in_use)
- );
--- 
-2.7.4
 
+Patch 3/3 fixes an issue where the guest freezes at some point when doing
+vCPU hot-plug/unplug in a loop.
+
+
+Both issues have a BZ at IBM. They can be mirrored to RH if needed.
+
+> >=20
+> > Based on 5.2-rc1.
+> >=20
+> > Available on GitHub:
+> >=20
+> >     https://github.com/legoater/linux/commits/xive-5.2
+> >=20
+> > Thanks,
+> >=20
+> > C.=20
+> >=20
+> > C=C3=A9dric Le Goater (3):
+> >   KVM: PPC: Book3S HV: XIVE: clear file mapping when device is released
+> >   KVM: PPC: Book3S HV: XIVE: do not test the EQ flag validity when
+> >     reseting
+> >   KVM: PPC: Book3S HV: XIVE: fix the enforced limit on the vCPU
+> >     identifier
+> >=20
+> >  arch/powerpc/kvm/book3s_xive_native.c | 46 ++++++++++++++++-----------
+> >  1 file changed, 27 insertions(+), 19 deletions(-)
+> >  =20
+>=20
+
+
+--Sig_/bHinS0IXP.Nh/xogOoPORG1
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlzmNzMACgkQcdTV5YIv
+c9aj2xAAo/lpIZAk8uAymFmCacMO880OG62USpKrjcLOo9CDLFC5BmrteRsnsUXl
+JSDkLGVJPMUHHsFFRV2jmPre/e6zZ1bOovS/4MQ+kld/zUzYfIxuN2pAv3L/BP+W
+2wXwq+M/ugMTK5d1kb8YyyqmVBCRQqbiDknGsYRe/mdigVrv/Q8xzwjtFVVQgGWY
+8pubnBPZJJglGw3aryuE1UHt9U3b5mfpC1TIc5+sACi2fk2Rp6/3AHht/n6v/S89
+D7Y3e19FcxB8C+q0TcpDnA3Gx/0TJzk0H+ROers8njFeeAD42ROzr4fBmx45OHxF
+jX7TKJABfTRtJEvrojYjnVEjuWT8N611Fs3U480hQ/atkkb32EI10FQOmkTXgC3m
+t3TmZbiyu/aLDUaLqg59IsRe9mEp9xGMauO6sADC3NLJB7LVUQEthp0Wv6yz/ej/
+tvnV+bUG9s0OOO4MRSfKq+LqhgD6Xj9591zfc1/2YBl5+QZAolRi4re32KjJ6CUN
+xqBC6MCuG9ggjedivLZWIMm3btfVQdQYyFqBo3XAPjJAPk+niGaSY9Uk4+J65O69
+hjBjw5+dtenCqcp8FSX70rqCNukDj5FrTDHCp0JegOACC8gN281up6mPUcIyrkUa
+UX3Hn4rasBGmrTvK0NkDZ3YZjaqm9+KBFU8SwU1Yd/Fh5GqxldI=
+=GjBz
+-----END PGP SIGNATURE-----
+
+--Sig_/bHinS0IXP.Nh/xogOoPORG1--
