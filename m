@@ -2,242 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 90C2C27CB5
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 14:25:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A6D227EF7
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 16:00:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730631AbfEWMZg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 08:25:36 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49502 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729430AbfEWMZf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 May 2019 08:25:35 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4NC8VOa102610
-        for <kvm@vger.kernel.org>; Thu, 23 May 2019 08:25:35 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2snu6e0y0w-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 23 May 2019 08:25:34 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pmorel@linux.ibm.com>;
-        Thu, 23 May 2019 13:25:32 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 23 May 2019 13:25:30 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4NCPTdO43515970
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 May 2019 12:25:29 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1FAC55204E;
-        Thu, 23 May 2019 12:25:29 +0000 (GMT)
-Received: from morel-ThinkPad-W530.boeblingen.de.ibm.com (unknown [9.152.222.40])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 928E952051;
-        Thu, 23 May 2019 12:25:28 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     sebott@linux.vnet.ibm.com
-Cc:     gerald.schaefer@de.ibm.com, pasic@linux.vnet.ibm.com,
-        borntraeger@de.ibm.com, walling@linux.ibm.com,
-        linux-s390@vger.kernel.org, iommu@lists.linux-foundation.org,
-        joro@8bytes.org, linux-kernel@vger.kernel.org,
-        alex.williamson@redhat.com, kvm@vger.kernel.org,
-        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
-        robin.murphy@arm.com
-Subject: [PATCH v3 3/3] vfio: pci: Using a device region to retrieve zPCI information
-Date:   Thu, 23 May 2019 14:25:26 +0200
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1558614326-24711-1-git-send-email-pmorel@linux.ibm.com>
-References: <1558614326-24711-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19052312-0008-0000-0000-000002E9A67D
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052312-0009-0000-0000-000022566522
-Message-Id: <1558614326-24711-4-git-send-email-pmorel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-23_10:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905230087
+        id S1730756AbfEWOA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 10:00:56 -0400
+Received: from 1.mo6.mail-out.ovh.net ([46.105.56.136]:58044 "EHLO
+        1.mo6.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730323AbfEWOA4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 10:00:56 -0400
+X-Greylist: delayed 3607 seconds by postgrey-1.27 at vger.kernel.org; Thu, 23 May 2019 10:00:54 EDT
+Received: from player760.ha.ovh.net (unknown [10.109.159.152])
+        by mo6.mail-out.ovh.net (Postfix) with ESMTP id 19C831CD0E7
+        for <kvm@vger.kernel.org>; Thu, 23 May 2019 14:44:29 +0200 (CEST)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+        (Authenticated sender: groug@kaod.org)
+        by player760.ha.ovh.net (Postfix) with ESMTPSA id 50A3B61B7FE5;
+        Thu, 23 May 2019 12:44:23 +0000 (UTC)
+Date:   Thu, 23 May 2019 14:44:19 +0200
+From:   Greg Kurz <groug@kaod.org>
+To:     David Gibson <david@gibson.dropbear.id.au>
+Cc:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
+        kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 0/3] KVM: PPC: Book3S HV: XIVE: assorted fixes on vCPU
+ and RAM limits
+Message-ID: <20190523144419.4dfddcd5@bahia.lan>
+In-Reply-To: <20190523062715.GR30423@umbus.fritz.box>
+References: <20190520071514.9308-1-clg@kaod.org>
+        <20190522233043.GO30423@umbus.fritz.box>
+        <20190523080123.6e700a1e@bahia.lan>
+        <20190523062715.GR30423@umbus.fritz.box>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/D_opXZ085nm8qQAhT4NnT+H"; protocol="application/pgp-signature"
+X-Ovh-Tracer-Id: 10784995209467501030
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddugedgheejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We define a new configuration entry for VFIO/PCI, VFIO_PCI_ZDEV
+--Sig_/D_opXZ085nm8qQAhT4NnT+H
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-When the VFIO_PCI_ZDEV feature is configured we initialize
-a new device region, VFIO_REGION_SUBTYPE_ZDEV_CLP, to hold
-the information from the ZPCI device the userland needs to
-give to a guest driving the zPCI function.
+On Thu, 23 May 2019 16:27:15 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- drivers/vfio/pci/Kconfig            |  7 ++++
- drivers/vfio/pci/Makefile           |  1 +
- drivers/vfio/pci/vfio_pci.c         |  9 ++++
- drivers/vfio/pci/vfio_pci_private.h | 10 +++++
- drivers/vfio/pci/vfio_pci_zdev.c    | 83 +++++++++++++++++++++++++++++++++++++
- 5 files changed, 110 insertions(+)
- create mode 100644 drivers/vfio/pci/vfio_pci_zdev.c
+> On Thu, May 23, 2019 at 08:01:23AM +0200, Greg Kurz wrote:
+> > On Thu, 23 May 2019 09:30:43 +1000
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >  =20
+> > > On Mon, May 20, 2019 at 09:15:11AM +0200, C=C3=A9dric Le Goater wrote=
+: =20
+> > > > Hello,
+> > > >=20
+> > > > Here are a couple of fixes for issues in the XIVE KVM device when
+> > > > testing the limits : RAM size and number of vCPUS.   =20
+> > >=20
+> > > How serious are the problems these patches fix?  I'm wondering if I
+> > > need to make a backport for RHEL8.1.
+> > >  =20
+> >=20
+> > Patch 2/3 fixes a QEMU error when hot-unplugging a vCPU:
+> >=20
+> > qemu-system-ppc64: KVM_SET_DEVICE_ATTR failed: Group 4 attr 0x000000000=
+0000046: Invalid argument
+> >=20
+> >=20
+> > Patch 3/3 fixes an issue where the guest freezes at some point when doi=
+ng
+> > vCPU hot-plug/unplug in a loop. =20
+>=20
+> Oh.. weird.  It's not clear to me how it would do that.
+>=20
 
-diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-index d0f8e4f..9c1181c 100644
---- a/drivers/vfio/pci/Kconfig
-+++ b/drivers/vfio/pci/Kconfig
-@@ -44,3 +44,10 @@ config VFIO_PCI_NVLINK2
- 	depends on VFIO_PCI && PPC_POWERNV
- 	help
- 	  VFIO PCI support for P9 Witherspoon machine with NVIDIA V100 GPUs
-+
-+config VFIO_PCI_ZDEV
-+	tristate "VFIO PCI Generic for ZPCI devices"
-+	depends on VFIO_PCI && S390
-+	default y
-+	help
-+	  VFIO PCI support for S390 Z-PCI devices
-diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-index 9662c06..fd53819 100644
---- a/drivers/vfio/pci/Makefile
-+++ b/drivers/vfio/pci/Makefile
-@@ -2,5 +2,6 @@
- vfio-pci-y := vfio_pci.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
- vfio-pci-$(CONFIG_VFIO_PCI_IGD) += vfio_pci_igd.o
- vfio-pci-$(CONFIG_VFIO_PCI_NVLINK2) += vfio_pci_nvlink2.o
-+vfio-pci-$(CONFIG_VFIO_PCI_ZDEV) += vfio_pci_zdev.o
- 
- obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 3fa20e9..b6087d6 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -362,6 +362,15 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
- 		}
- 	}
- 
-+	if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV)) {
-+		ret = vfio_pci_zdev_init(vdev);
-+		if (ret) {
-+			dev_warn(&vdev->pdev->dev,
-+				 "Failed to setup ZDEV regions\n");
-+			goto disable_exit;
-+		}
-+	}
-+
- 	vfio_pci_probe_mmaps(vdev);
- 
- 	return 0;
-diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-index 1812cf2..db73cdf 100644
---- a/drivers/vfio/pci/vfio_pci_private.h
-+++ b/drivers/vfio/pci/vfio_pci_private.h
-@@ -189,4 +189,14 @@ static inline int vfio_pci_ibm_npu2_init(struct vfio_pci_device *vdev)
- 	return -ENODEV;
- }
- #endif
-+
-+#ifdef(IS_ENABLED_VFIO_PCI_ZDEV)
-+extern int vfio_pci_zdev_init(struct vfio_pci_device *vdev);
-+#else
-+static inline int vfio_pci_zdev_init(struct vfio_pci_device *vdev)
-+{
-+	return -ENODEV;
-+}
-+#endif
-+
- #endif /* VFIO_PCI_PRIVATE_H */
-diff --git a/drivers/vfio/pci/vfio_pci_zdev.c b/drivers/vfio/pci/vfio_pci_zdev.c
-new file mode 100644
-index 0000000..230a4e4
---- /dev/null
-+++ b/drivers/vfio/pci/vfio_pci_zdev.c
-@@ -0,0 +1,83 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*
-+ * VFIO ZPCI devices support
-+ *
-+ * Copyright (C) IBM Corp. 2019.  All rights reserved.
-+ *	Author: Pierre Morel <pmorel@linux.ibm.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ */
-+#include <linux/io.h>
-+#include <linux/pci.h>
-+#include <linux/uaccess.h>
-+#include <linux/vfio.h>
-+#include <linux/vfio_zdev.h>
-+
-+#include "vfio_pci_private.h"
-+
-+static size_t vfio_pci_zdev_rw(struct vfio_pci_device *vdev,
-+			       char __user *buf, size_t count, loff_t *ppos,
-+			       bool iswrite)
-+{
-+	struct vfio_region_zpci_info *region;
-+	struct zpci_dev *zdev;
-+	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
-+
-+	if (!vdev->pdev->bus)
-+		return -ENODEV;
-+
-+	zdev = vdev->pdev->bus->sysdata;
-+	if (!zdev)
-+		return -ENODEV;
-+
-+	if ((*ppos & VFIO_PCI_OFFSET_MASK) || (count != sizeof(*region)))
-+		return -EINVAL;
-+
-+	region = vdev->region[index - VFIO_PCI_NUM_REGIONS].data;
-+	region->dasm = zdev->dma_mask;
-+	region->start_dma = zdev->start_dma;
-+	region->end_dma = zdev->end_dma;
-+	region->msi_addr = zdev->msi_addr;
-+	region->flags = VFIO_PCI_ZDEV_FLAGS_REFRESH;
-+	region->gid = zdev->pfgid;
-+	region->mui = zdev->fmb_update;
-+	region->noi = zdev->max_msi;
-+	memcpy(region->util_str, zdev->util_str, CLP_UTIL_STR_LEN);
-+
-+	if (copy_to_user(buf, region, count))
-+		return -EFAULT;
-+
-+	return count;
-+}
-+
-+static void vfio_pci_zdev_release(struct vfio_pci_device *vdev,
-+				  struct vfio_pci_region *region)
-+{
-+	kfree(region->data);
-+}
-+
-+static const struct vfio_pci_regops vfio_pci_zdev_regops = {
-+	.rw		= vfio_pci_zdev_rw,
-+	.release	= vfio_pci_zdev_release,
-+};
-+
-+int vfio_pci_zdev_init(struct vfio_pci_device *vdev)
-+{
-+	struct vfio_region_zpci_info *region;
-+	int ret;
-+
-+	region = kmalloc(sizeof(*region), GFP_KERNEL);
-+	if (!region)
-+		return -ENOMEM;
-+
-+	ret = vfio_pci_register_dev_region(vdev,
-+		PCI_VENDOR_ID_IBM | VFIO_REGION_TYPE_PCI_VENDOR_TYPE,
-+		VFIO_REGION_SUBTYPE_ZDEV_CLP,
-+		&vfio_pci_zdev_regops, sizeof(*region),
-+		VFIO_REGION_INFO_FLAG_READ, region);
-+
-+	return ret;
-+}
--- 
-2.7.4
+Cedric provided a better description in some other mail: guest with 1024
+vCPUs.
 
+> > Both issues have a BZ at IBM. They can be mirrored to RH if needed. =20
+>=20
+> That would be helpful, thanks.
+>=20
+
+Ok, I'll take care of that.
+
+>=20
+>=20
+>=20
+> >  =20
+> > > >=20
+> > > > Based on 5.2-rc1.
+> > > >=20
+> > > > Available on GitHub:
+> > > >=20
+> > > >     https://github.com/legoater/linux/commits/xive-5.2
+> > > >=20
+> > > > Thanks,
+> > > >=20
+> > > > C.=20
+> > > >=20
+> > > > C=C3=A9dric Le Goater (3):
+> > > >   KVM: PPC: Book3S HV: XIVE: clear file mapping when device is rele=
+ased
+> > > >   KVM: PPC: Book3S HV: XIVE: do not test the EQ flag validity when
+> > > >     reseting
+> > > >   KVM: PPC: Book3S HV: XIVE: fix the enforced limit on the vCPU
+> > > >     identifier
+> > > >=20
+> > > >  arch/powerpc/kvm/book3s_xive_native.c | 46 ++++++++++++++++-------=
+----
+> > > >  1 file changed, 27 insertions(+), 19 deletions(-)
+> > > >    =20
+> > >  =20
+> >  =20
+>=20
+>=20
+>=20
+
+
+--Sig_/D_opXZ085nm8qQAhT4NnT+H
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlzmlaMACgkQcdTV5YIv
+c9a9+w//c1q0mjRXWkXMCNkSnRSkMhwGGeelqnnnn7yjzwbgzg4A2Bnhd1BClQeb
+sdV/AipzZFQWLrdJVApWh4t3xVIw+FweGn/JgDZisN6sThYA+ZGIwaVE2FrCVREF
+P+QgxwjsBKPp+hFcY3Funn5oqbkY0TlrKlQ/855OigSSPa/1DAYuyN8RNeNkBnQo
+y2fry50dy4duVQnr6/Kltfli8tYua95djvuDqls4jMHV4vd12+3fTERNifmCqruN
+U85YpjlYw8qNY1DRBO8jH70gDx2gX6POunrZs+yrngDDgcJJ/98s6Toxn3RljGwL
+vogK5/W09FjSEFWx20Fhb8ZvljRqq4EeJjTvW4gWHIANeGw4LK5EgCx/9iResdJK
+LXSmQkRBhaqG2V4IeTpkGZ3eAdkH04YWCh0OIT6s4CLXJ/5R92xq7yQCAO9fu4sP
+iQ0s1OHEwElaefzOvCNVBSbzF2DQ69LdNemISgH5FxzW7VPWaiDxMpanuCNjwCwl
+p3XuCXTYCZArpAWKXlnoPlgdzVeDUu/dcKK6E/e6O/54R/k11ONp3Kg8OQ2xl7TP
+LkXat/F2G7PyM3ZaCL4IOwzCtdfBy0eSlkV/nslK0+MsCnne11WW6uHPK3s/bd3S
+k+TLtT7cSye9b7DvHXa/VpmpVonEFIcLhwpQlZWJym5ITZYAWPU=
+=jacf
+-----END PGP SIGNATURE-----
+
+--Sig_/D_opXZ085nm8qQAhT4NnT+H--
