@@ -2,138 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 276A627C45
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 13:56:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 748A527600
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 08:32:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730369AbfEWL4p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 07:56:45 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:34059 "EHLO ozlabs.org"
+        id S1726230AbfEWGcM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 02:32:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51774 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729698AbfEWL4o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 07:56:44 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-        id 458nzF42Z1z9s4V; Thu, 23 May 2019 21:56:41 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=gibson.dropbear.id.au; s=201602; t=1558612601;
-        bh=YFHaKAHwSkkNV01pYtDLBmlGW8tDfBU5zHN14Jech/U=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=cRTr4603N7N0NAWy9HE9tGd+GYfZOqgmMD/dAGxIN+xOaLn5TiiEqgmuMtaeBxTWk
-         Yc4VNThu0g1ATCaZ5OIzXWEtm0D6Vaolly2lCmMPtRKwMis1DaQjphmpQSqx2jIxvl
-         6XIWir3CMxvxaaiAnOcdzBf4ckpyBj7sd3+fkfqs=
-Date:   Thu, 23 May 2019 16:27:15 +1000
-From:   David Gibson <david@gibson.dropbear.id.au>
-To:     Greg Kurz <groug@kaod.org>
-Cc:     =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
-        kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 0/3] KVM: PPC: Book3S HV: XIVE: assorted fixes on vCPU
- and RAM limits
-Message-ID: <20190523062715.GR30423@umbus.fritz.box>
-References: <20190520071514.9308-1-clg@kaod.org>
- <20190522233043.GO30423@umbus.fritz.box>
- <20190523080123.6e700a1e@bahia.lan>
+        id S1725873AbfEWGcL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 02:32:11 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 73F3FDD9F4;
+        Thu, 23 May 2019 06:32:11 +0000 (UTC)
+Received: from gondolin (ovpn-116-44.ams2.redhat.com [10.36.116.44])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CC8EC648DE;
+        Thu, 23 May 2019 06:32:09 +0000 (UTC)
+Date:   Thu, 23 May 2019 08:32:06 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Farhan Ali <alifm@linux.ibm.com>
+Cc:     Eric Farman <farman@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 0/3] s390: vfio-ccw fixes
+Message-ID: <20190523083206.07e374bf.cohuck@redhat.com>
+In-Reply-To: <0769d5bc-cf0b-3a66-7d35-381490a115b5@linux.ibm.com>
+References: <20190516161403.79053-1-farman@linux.ibm.com>
+        <0769d5bc-cf0b-3a66-7d35-381490a115b5@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="BZziOT8Kz25R/m/E"
-Content-Disposition: inline
-In-Reply-To: <20190523080123.6e700a1e@bahia.lan>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Thu, 23 May 2019 06:32:11 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 22 May 2019 08:20:43 -0400
+Farhan Ali <alifm@linux.ibm.com> wrote:
 
---BZziOT8Kz25R/m/E
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 05/16/2019 12:14 PM, Eric Farman wrote:
+> > Here are the remaining patches in my fixes series, to handle the more
+> > involved scenario of channel programs that do not move any actual data
+> > to/from the device.  They were reordered per feedback from v2, which
+> > means they received minor massaging because of overlapping code and
+> > some cleanup to the commit messages.
+> > 
+> > They are based on Conny's vfio-ccw tree.  :)
+> > 
+> > Changelog:
+> >   v2 -> v3:
+> >    - Patches 1-4:
+> >       - [Farhan] Added r-b
+> >       - [Cornelia] Queued to vfio-ccw, dropped from this version
+> >    - Patches 5/6:
+> >       - [Cornelia/Farhan] Swapped the order of these patches, minor
+> >         rework on the placement of bytes/idaw_nr variables and the
+> >         commit messages that resulted.
+> >   v2: https://patchwork.kernel.org/cover/10944075/
+> >   v1: https://patchwork.kernel.org/cover/10928799/
+> > 
+> > Eric Farman (3):
+> >    s390/cio: Don't pin vfio pages for empty transfers
+> >    s390/cio: Allow zero-length CCWs in vfio-ccw
+> >    s390/cio: Remove vfio-ccw checks of command codes
+> > 
+> >   drivers/s390/cio/vfio_ccw_cp.c | 92 ++++++++++++++++++++++++----------
+> >   1 file changed, 65 insertions(+), 27 deletions(-)
+> >   
+> 
+> 
+> Acked-by: Farhan Ali <alifm@linux.ibm.com> for the series.
 
-On Thu, May 23, 2019 at 08:01:23AM +0200, Greg Kurz wrote:
-> On Thu, 23 May 2019 09:30:43 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Mon, May 20, 2019 at 09:15:11AM +0200, C=E9dric Le Goater wrote:
-> > > Hello,
-> > >=20
-> > > Here are a couple of fixes for issues in the XIVE KVM device when
-> > > testing the limits : RAM size and number of vCPUS. =20
-> >=20
-> > How serious are the problems these patches fix?  I'm wondering if I
-> > need to make a backport for RHEL8.1.
-> >=20
->=20
-> Patch 2/3 fixes a QEMU error when hot-unplugging a vCPU:
->=20
-> qemu-system-ppc64: KVM_SET_DEVICE_ATTR failed: Group 4 attr 0x00000000000=
-00046: Invalid argument
->=20
->=20
-> Patch 3/3 fixes an issue where the guest freezes at some point when doing
-> vCPU hot-plug/unplug in a loop.
-
-Oh.. weird.  It's not clear to me how it would do that.
-
-> Both issues have a BZ at IBM. They can be mirrored to RH if needed.
-
-That would be helpful, thanks.
-
-
-
-
->=20
-> > >=20
-> > > Based on 5.2-rc1.
-> > >=20
-> > > Available on GitHub:
-> > >=20
-> > >     https://github.com/legoater/linux/commits/xive-5.2
-> > >=20
-> > > Thanks,
-> > >=20
-> > > C.=20
-> > >=20
-> > > C=E9dric Le Goater (3):
-> > >   KVM: PPC: Book3S HV: XIVE: clear file mapping when device is releas=
-ed
-> > >   KVM: PPC: Book3S HV: XIVE: do not test the EQ flag validity when
-> > >     reseting
-> > >   KVM: PPC: Book3S HV: XIVE: fix the enforced limit on the vCPU
-> > >     identifier
-> > >=20
-> > >  arch/powerpc/kvm/book3s_xive_native.c | 46 ++++++++++++++++---------=
---
-> > >  1 file changed, 27 insertions(+), 19 deletions(-)
-> > >  =20
-> >=20
->=20
-
-
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---BZziOT8Kz25R/m/E
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzmPUEACgkQbDjKyiDZ
-s5IrWg/+OTY4FNwrBdELptmuvQZnFRtq5PGofd5x7xRrpjX/soyjsiUt+YPUIQvd
-YGWbJcr8K+j2IYc1AxNmeXKyTZdLEha82ZkwigxIhpPKJj+xaOe5bWkseBU0TciM
-t0tIb6HgHwUAjnkSg7eWyXXS0U+jo3/7QtxSSiWzJY8vLot5Bt41yOAIzCEvLtYp
-cJYWmjXhAbxNJz/Fp5qiGyBlzzDmbc3nKd83VcOL8bTtEYtGSIMb724qaQqvDj7H
-q0bIl1snxr35SleGBPWJUm1U0EemulNYAHcwZWco8tFl2MfPl92Y/9X5xEqqBLpD
-hNBD+C1NwGLaegdVJTXcoAiSXO3o3dhMiMKTG5IJJVf6O77p2bWPN3PZXmNJL0bP
-DNzLXHLxcDJa//dW1SW4WIpjFe9fJfRr9jot61kpCK64tRKiHvZWB0a7VN8zVuIJ
-uKlNCQksU+Lj6kgmMVJFBXCSH6852NjqS04mUZfWiRopl4rv001KUw7Xlk2R/HNS
-b2g2I9owivRLbL032tc7P2LmaOGk6Ty4nZdG4SgCxhBS84yg5JYvXyPSIhCU3v4a
-VpVZvQtkNoBuXTRjKC0dsIGavvNi2Q5UOTMpFH4yT7T1Miy6pR1UoLufEZXcYdtd
-m9BLwje58Lz1oaoRi3FI9cPnLw/YoRNW1IJPvYXTioQovok9dRk=
-=0Y7N
------END PGP SIGNATURE-----
-
---BZziOT8Kz25R/m/E--
+Thank you!
