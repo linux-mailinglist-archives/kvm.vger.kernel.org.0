@@ -2,119 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D0EB27967
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 11:37:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1154275D8
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 08:06:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727440AbfEWJhe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 05:37:34 -0400
-Received: from 2.mo7.mail-out.ovh.net ([87.98.143.68]:48608 "EHLO
-        2.mo7.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726081AbfEWJhd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 05:37:33 -0400
-Received: from player797.ha.ovh.net (unknown [10.109.146.106])
-        by mo7.mail-out.ovh.net (Postfix) with ESMTP id 7E0B311DCE5
-        for <kvm@vger.kernel.org>; Thu, 23 May 2019 08:01:29 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player797.ha.ovh.net (Postfix) with ESMTPSA id 1729262D9AF4;
-        Thu, 23 May 2019 06:01:24 +0000 (UTC)
-Date:   Thu, 23 May 2019 08:01:23 +0200
-From:   Greg Kurz <groug@kaod.org>
+        id S1726081AbfEWGGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 02:06:52 -0400
+Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:35908 "EHLO
+        9.mo179.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725873AbfEWGGw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 02:06:52 -0400
+Received: from player688.ha.ovh.net (unknown [10.108.57.245])
+        by mo179.mail-out.ovh.net (Postfix) with ESMTP id C52A41300BF
+        for <kvm@vger.kernel.org>; Thu, 23 May 2019 08:06:49 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+        (Authenticated sender: clg@kaod.org)
+        by player688.ha.ovh.net (Postfix) with ESMTPSA id D3CD95FC343E;
+        Thu, 23 May 2019 06:06:45 +0000 (UTC)
+Subject: Re: [PATCH 0/3] KVM: PPC: Book3S HV: XIVE: assorted fixes on vCPU and
+ RAM limits
 To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
-        kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
+Cc:     kvm-ppc@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
         kvm@vger.kernel.org
-Subject: Re: [PATCH 0/3] KVM: PPC: Book3S HV: XIVE: assorted fixes on vCPU
- and RAM limits
-Message-ID: <20190523080123.6e700a1e@bahia.lan>
-In-Reply-To: <20190522233043.GO30423@umbus.fritz.box>
 References: <20190520071514.9308-1-clg@kaod.org>
-        <20190522233043.GO30423@umbus.fritz.box>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ <20190522233043.GO30423@umbus.fritz.box>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <10ae32dc-a103-e523-1da2-a5ebedf9432f@kaod.org>
+Date:   Thu, 23 May 2019 08:06:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/bHinS0IXP.Nh/xogOoPORG1"; protocol="application/pgp-signature"
-X-Ovh-Tracer-Id: 3979211747638352358
+In-Reply-To: <20190522233043.GO30423@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 4069283740144536455
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddufedguddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddufedguddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/bHinS0IXP.Nh/xogOoPORG1
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+On 5/23/19 1:30 AM, David Gibson wrote:
+> On Mon, May 20, 2019 at 09:15:11AM +0200, Cédric Le Goater wrote:
+>> Hello,
+>>
+>> Here are a couple of fixes for issues in the XIVE KVM device when
+>> testing the limits : RAM size and number of vCPUS.
 
-On Thu, 23 May 2019 09:30:43 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+This summary is wrong. RAM size was fixed in QEMU.
 
-> On Mon, May 20, 2019 at 09:15:11AM +0200, C=C3=A9dric Le Goater wrote:
-> > Hello,
-> >=20
-> > Here are a couple of fixes for issues in the XIVE KVM device when
-> > testing the limits : RAM size and number of vCPUS. =20
->=20
 > How serious are the problems these patches fix?  I'm wondering if I
 > need to make a backport for RHEL8.1.
->=20
 
-Patch 2/3 fixes a QEMU error when hot-unplugging a vCPU:
+Patch 1 is a cleanup patch. It does not fix any critical issues.
 
-qemu-system-ppc64: KVM_SET_DEVICE_ATTR failed: Group 4 attr 0x0000000000000=
-046: Invalid argument
+Patch 2 fixes CPU hotplug. The test on the EQ flag is at the wrong 
+place :/ This is important I think.
 
+Patch 3 fixes the maximum number of vCPUS supported. This one is 
+less important maybe, unless we want to run a guest with 1024 vCPUs.
+Which is quite slow to run on most P9 systems. 
 
-Patch 3/3 fixes an issue where the guest freezes at some point when doing
-vCPU hot-plug/unplug in a loop.
+QEMU emits a warning :
 
+  warning: Number of SMP cpus requested (1024) exceeds the recommended cpus supported by KVM (120)
 
-Both issues have a BZ at IBM. They can be mirrored to RH if needed.
+May be we should refuse to run QEMU when that number is above a 
+certain threshold ? 
 
-> >=20
-> > Based on 5.2-rc1.
-> >=20
-> > Available on GitHub:
-> >=20
-> >     https://github.com/legoater/linux/commits/xive-5.2
-> >=20
-> > Thanks,
-> >=20
-> > C.=20
-> >=20
-> > C=C3=A9dric Le Goater (3):
-> >   KVM: PPC: Book3S HV: XIVE: clear file mapping when device is released
-> >   KVM: PPC: Book3S HV: XIVE: do not test the EQ flag validity when
-> >     reseting
-> >   KVM: PPC: Book3S HV: XIVE: fix the enforced limit on the vCPU
-> >     identifier
-> >=20
-> >  arch/powerpc/kvm/book3s_xive_native.c | 46 ++++++++++++++++-----------
-> >  1 file changed, 27 insertions(+), 19 deletions(-)
-> >  =20
->=20
+C. 
 
 
---Sig_/bHinS0IXP.Nh/xogOoPORG1
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
 
------BEGIN PGP SIGNATURE-----
+>>
+>> Based on 5.2-rc1.
+>>
+>> Available on GitHub:
+>>
+>>     https://github.com/legoater/linux/commits/xive-5.2
+>>
+>> Thanks,
+>>
+>> C. 
+>>
+>> Cédric Le Goater (3):
+>>   KVM: PPC: Book3S HV: XIVE: clear file mapping when device is released
+>>   KVM: PPC: Book3S HV: XIVE: do not test the EQ flag validity when
+>>     reseting
+>>   KVM: PPC: Book3S HV: XIVE: fix the enforced limit on the vCPU
+>>     identifier
+>>
+>>  arch/powerpc/kvm/book3s_xive_native.c | 46 ++++++++++++++++-----------
+>>  1 file changed, 27 insertions(+), 19 deletions(-)
+>>
+> 
 
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlzmNzMACgkQcdTV5YIv
-c9aj2xAAo/lpIZAk8uAymFmCacMO880OG62USpKrjcLOo9CDLFC5BmrteRsnsUXl
-JSDkLGVJPMUHHsFFRV2jmPre/e6zZ1bOovS/4MQ+kld/zUzYfIxuN2pAv3L/BP+W
-2wXwq+M/ugMTK5d1kb8YyyqmVBCRQqbiDknGsYRe/mdigVrv/Q8xzwjtFVVQgGWY
-8pubnBPZJJglGw3aryuE1UHt9U3b5mfpC1TIc5+sACi2fk2Rp6/3AHht/n6v/S89
-D7Y3e19FcxB8C+q0TcpDnA3Gx/0TJzk0H+ROers8njFeeAD42ROzr4fBmx45OHxF
-jX7TKJABfTRtJEvrojYjnVEjuWT8N611Fs3U480hQ/atkkb32EI10FQOmkTXgC3m
-t3TmZbiyu/aLDUaLqg59IsRe9mEp9xGMauO6sADC3NLJB7LVUQEthp0Wv6yz/ej/
-tvnV+bUG9s0OOO4MRSfKq+LqhgD6Xj9591zfc1/2YBl5+QZAolRi4re32KjJ6CUN
-xqBC6MCuG9ggjedivLZWIMm3btfVQdQYyFqBo3XAPjJAPk+niGaSY9Uk4+J65O69
-hjBjw5+dtenCqcp8FSX70rqCNukDj5FrTDHCp0JegOACC8gN281up6mPUcIyrkUa
-UX3Hn4rasBGmrTvK0NkDZ3YZjaqm9+KBFU8SwU1Yd/Fh5GqxldI=
-=GjBz
------END PGP SIGNATURE-----
-
---Sig_/bHinS0IXP.Nh/xogOoPORG1--
