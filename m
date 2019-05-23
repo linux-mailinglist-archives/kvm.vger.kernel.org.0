@@ -2,187 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F4A028CB1
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 23:49:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A8E428DB5
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 01:20:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388350AbfEWVtw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 17:49:52 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:58870 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388134AbfEWVtw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 23 May 2019 17:49:52 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4NLhifU004317;
-        Thu, 23 May 2019 21:49:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=CA4BRvH7LpSOvdwGQ1RgbPK5R7ura7qGqy4SrVn6TGs=;
- b=X//cpGAKkvYu1m1BjaIbh5y4EYuwM+8rZjWW5aAmW0vi1toc+ON7ojqHQsbcK6pAW1oD
- bdaUeEmghYKNyuWdojEirpuCtcEnGnpjzGNjA/TAPNGPvcylGBa+20OGWCMnCwLHj8Tf
- YRS6xbAb5NCY6/3hnPEk+xsQaxia6MP4a6XjVZSvoh9chZIbCYwa7XRJ+TOdhejZB+v7
- XSe3hifUXqlRGwDwQJJUjbd8e+die4vTzQ+aF3wEY1CdthC5hOmZQere78SM0w/UZFJa
- y1F1RpJmvyYHjzu9jq9fzTHoce2ebfeYA5vSKPJb2pXe3nPIQrp8MMBgMFftquXsLaI1 XQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2130.oracle.com with ESMTP id 2smsk5n948-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 May 2019 21:49:13 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4NLmFZJ185512;
-        Thu, 23 May 2019 21:49:12 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2smsgvrm93-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 May 2019 21:49:12 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4NLn8SI003595;
-        Thu, 23 May 2019 21:49:09 GMT
-Received: from [192.168.1.16] (/24.9.64.241)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 23 May 2019 21:49:08 +0000
-Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
-To:     Catalin Marinas <catalin.marinas@arm.com>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Evgenii Stepanov <eugenis@google.com>,
-        Andrey Konovalov <andreyknvl@google.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Elliott Hughes <enh@google.com>
-References: <cover.1557160186.git.andreyknvl@google.com>
- <20190517144931.GA56186@arrakis.emea.arm.com>
- <CAFKCwrj6JEtp4BzhqO178LFJepmepoMx=G+YdC8sqZ3bcBp3EQ@mail.gmail.com>
- <20190521182932.sm4vxweuwo5ermyd@mbp> <201905211633.6C0BF0C2@keescook>
- <6049844a-65f5-f513-5b58-7141588fef2b@oracle.com>
- <20190523201105.oifkksus4rzcwqt4@mbp>
-From:   Khalid Aziz <khalid.aziz@oracle.com>
-Organization: Oracle Corp
-Message-ID: <ffe58af3-7c70-d559-69f6-1f6ebcb0fec6@oracle.com>
-Date:   Thu, 23 May 2019 15:49:05 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S2388092AbfEWXUE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 19:20:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58466 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387693AbfEWXUE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 19:20:04 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5D24630821BF;
+        Thu, 23 May 2019 23:20:04 +0000 (UTC)
+Received: from x1.home (ovpn-117-37.phx2.redhat.com [10.3.117.37])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9FD93600C8;
+        Thu, 23 May 2019 23:20:01 +0000 (UTC)
+Date:   Thu, 23 May 2019 17:20:01 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     Libvirt Devel <libvir-list@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Erik Skultety <eskultet@redhat.com>,
+        Pavel Hrdina <phrdina@redhat.com>,
+        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+        Sylvain Bauza <sbauza@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: mdevctl: A shoestring mediated device management and persistence
+ utility
+Message-ID: <20190523172001.41f386d8@x1.home>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20190523201105.oifkksus4rzcwqt4@mbp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9266 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905230139
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9266 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905230139
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Thu, 23 May 2019 23:20:04 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/23/19 2:11 PM, Catalin Marinas wrote:
-> Hi Khalid,
->=20
-> On Thu, May 23, 2019 at 11:51:40AM -0600, Khalid Aziz wrote:
->> On 5/21/19 6:04 PM, Kees Cook wrote:
->>> As an aside: I think Sparc ADI support in Linux actually side-stepped=
+Hi,
 
->>> this[1] (i.e. chose "solution 1"): "All addresses passed to kernel mu=
-st
->>> be non-ADI tagged addresses." (And sadly, "Kernel does not enable ADI=
+Currently mediated device management, much like SR-IOV VF management,
+is largely left as an exercise for the user.  This is an attempt to
+provide something and see where it goes.  I doubt we'll solve
+everyone's needs on the first pass, but maybe we'll solve enough and
+provide helpers for the rest.  Without further ado, I'll point to what
+I have so far:
 
->>> for kernel code.") I think this was a mistake we should not repeat fo=
-r
->>> arm64 (we do seem to be at least in agreement about this, I think).
->>>
->>> [1] https://lore.kernel.org/patchwork/patch/654481/
->>
->> That is a very early version of the sparc ADI patch. Support for tagge=
-d
->> addresses in syscalls was added in later versions and is in the patch
->> that is in the kernel.
->=20
-> I tried to figure out but I'm not familiar with the sparc port. How did=
+https://github.com/awilliam/mdevctl
 
-> you solve the tagged address going into various syscall implementations=
+This is inspired by driverctl, which is also a bash utility.  mdevctl
+uses udev and systemd to record and recreate mdev devices for
+persistence and provides a command line utility for querying, listing,
+starting, stopping, adding, and removing mdev devices.  Currently, for
+better or worse, it considers anything created to be persistent.  I can
+imagine a global configuration option that might disable this and
+perhaps an autostart flag per mdev device, such that mdevctl might
+simply "know" about some mdevs but not attempt to create them
+automatically.  Clearly command line usage help, man pages, and
+packaging are lacking as well, release early, release often, plus this
+is a discussion starter to see if perhaps this is sufficient to meet
+some needs.
 
-> in the kernel (e.g. sys_write)? Is the tag removed on kernel entry or i=
-t
-> ends up deeper in the core code?
->=20
+Originally I thought about making a utility to manage both mdev and
+SR-IOV VFs all in one, but it seemed more natural to start here
+(besides, I couldn't think of a good name for the combined utility).
+If this seems useful, maybe I'll start on a vfctl for SR-IOV and we'll
+see whether they have enough synergy to become one.
 
-Another spot I should point out in ADI patch - Tags are not stored in
-VMAs and IOMMU does not support ADI tags on M7. ADI tags are stripped
-before userspace addresses are passed to IOMMU in the following snippet
-from the patch:
+It would be really useful if s390 folks could help me understand
+whether it's possible to glean all the information necessary to
+recreate a ccw or ap mdev device from sysfs.  I expect the file where
+we currently only store the mdev_type to evolve into something that
+includes more information to facilitate more complicated devices.  For
+now I make no claims to maintaining compatibility of recorded mdev
+devices, it will absolutely change, but I didn't want to get bogged
+down in making sure I don't accidentally source a root kit hidden in an
+mdev config file.
 
-diff --git a/arch/sparc/mm/gup.c b/arch/sparc/mm/gup.c
-index 5335ba3c850e..357b6047653a 100644
---- a/arch/sparc/mm/gup.c
-+++ b/arch/sparc/mm/gup.c
-@@ -201,6 +202,24 @@ int __get_user_pages_fast(unsigned long start, int
-nr_pages
-, int write,
-        pgd_t *pgdp;
-        int nr =3D 0;
+I'm also curious how or if libvirt or openstack might use this.  If
+nothing else, it makes libvirt hook scripts easier to write, especially
+if we add an option not to autostart mdevs, or if users don't mind
+persistent mdevs, maybe there's nothing more to do.
 
-+#ifdef CONFIG_SPARC64
-+       if (adi_capable()) {
-+               long addr =3D start;
-+
-+               /* If userspace has passed a versioned address, kernel
-+                * will not find it in the VMAs since it does not store
-+                * the version tags in the list of VMAs. Storing version
-+                * tags in list of VMAs is impractical since they can be
-+                * changed any time from userspace without dropping into
-+                * kernel. Any address search in VMAs will be done with
-+                * non-versioned addresses. Ensure the ADI version bits
-+                * are dropped here by sign extending the last bit before=
+BTW, feel free to clean up by bash, I'm a brute force and ignorance
+shell coder ;)  Thanks,
 
-+                * ADI bits. IOMMU does not implement version tags.
-+                */
-+               addr =3D (addr << (long)adi_nbits()) >> (long)adi_nbits()=
-;
-+               start =3D addr;
-+       }
-+#endif
-        start &=3D PAGE_MASK;
-        addr =3D start;
-        len =3D (unsigned long) nr_pages << PAGE_SHIFT;
-
-
---
-Khalid
-
-
+Alex
