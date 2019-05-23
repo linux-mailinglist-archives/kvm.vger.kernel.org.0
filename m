@@ -2,182 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 09F4428361
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 18:23:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 657D628372
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2019 18:25:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731523AbfEWQW3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 23 May 2019 12:22:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35366 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731503AbfEWQW1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 23 May 2019 12:22:27 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4NGGvp0139652
-        for <kvm@vger.kernel.org>; Thu, 23 May 2019 12:22:26 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2snvkwqfmp-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 23 May 2019 12:22:25 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
-        Thu, 23 May 2019 17:22:23 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 23 May 2019 17:22:19 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4NGMHMP50200670
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 May 2019 16:22:18 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CE6854C044;
-        Thu, 23 May 2019 16:22:17 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3F8B54C058;
-        Thu, 23 May 2019 16:22:17 +0000 (GMT)
-Received: from s38lp84.lnxne.boe (unknown [9.152.108.100])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 23 May 2019 16:22:17 +0000 (GMT)
-From:   Michael Mueller <mimu@linux.ibm.com>
-To:     KVM Mailing List <kvm@vger.kernel.org>,
-        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Michael Mueller <mimu@linux.ibm.com>
-Subject: [PATCH v2 8/8] virtio/s390: make airq summary indicators DMA
-Date:   Thu, 23 May 2019 18:22:09 +0200
-X-Mailer: git-send-email 2.13.4
-In-Reply-To: <20190523162209.9543-1-mimu@linux.ibm.com>
-References: <20190523162209.9543-1-mimu@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19052316-0008-0000-0000-000002E9B705
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052316-0009-0000-0000-000022567686
-Message-Id: <20190523162209.9543-9-mimu@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-23_13:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905230110
+        id S1731228AbfEWQYp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 23 May 2019 12:24:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55442 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731061AbfEWQYp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 23 May 2019 12:24:45 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3CD53308FBA9;
+        Thu, 23 May 2019 16:24:40 +0000 (UTC)
+Received: from gondolin (dhcp-192-213.str.redhat.com [10.33.192.213])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BF0B364027;
+        Thu, 23 May 2019 16:24:35 +0000 (UTC)
+Date:   Thu, 23 May 2019 18:24:33 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     sebott@linux.vnet.ibm.com, gerald.schaefer@de.ibm.com,
+        pasic@linux.vnet.ibm.com, borntraeger@de.ibm.com,
+        walling@linux.ibm.com, linux-s390@vger.kernel.org,
+        iommu@lists.linux-foundation.org, joro@8bytes.org,
+        linux-kernel@vger.kernel.org, alex.williamson@redhat.com,
+        kvm@vger.kernel.org, schwidefsky@de.ibm.com,
+        heiko.carstens@de.ibm.com, robin.murphy@arm.com
+Subject: Re: [PATCH v3 2/3] vfio: zpci: defining the VFIO headers
+Message-ID: <20190523182433.567b8408.cohuck@redhat.com>
+In-Reply-To: <1558614326-24711-3-git-send-email-pmorel@linux.ibm.com>
+References: <1558614326-24711-1-git-send-email-pmorel@linux.ibm.com>
+        <1558614326-24711-3-git-send-email-pmorel@linux.ibm.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Thu, 23 May 2019 16:24:45 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Halil Pasic <pasic@linux.ibm.com>
+On Thu, 23 May 2019 14:25:25 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-Hypervisor needs to interact with the summary indicators, so these
-need to be DMA memory as well (at least for protected virtualization
-guests).
+> We define a new device region in vfio.h to be able to
+> get the ZPCI CLP information by reading this region from
+> userland.
+> 
+> We create a new file, vfio_zdev.h to define the structure
+> of the new region we defined in vfio.h
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  include/uapi/linux/vfio.h      |  4 ++++
+>  include/uapi/linux/vfio_zdev.h | 34 ++++++++++++++++++++++++++++++++++
+>  2 files changed, 38 insertions(+)
+>  create mode 100644 include/uapi/linux/vfio_zdev.h
+> 
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 8f10748..56595b8 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -306,6 +306,10 @@ struct vfio_region_info_cap_type {
+>  #define VFIO_REGION_TYPE_GFX                    (1)
+>  #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
+>  
+> +/* IBM Subtypes */
+> +#define VFIO_REGION_TYPE_IBM_ZDEV		(1)
+> +#define VFIO_REGION_SUBTYPE_ZDEV_CLP		(1)
 
-Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
----
- drivers/s390/virtio/virtio_ccw.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+I'm afraid that confuses me a bit. You want to add the region to every
+vfio-pci device when we're running under s390, right? So this does not
+depend on the device type of the actual device (which may or may not be
+from IBM), but only on the architecture?
 
-diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-index 03c9f7001fb1..f666ed397dc0 100644
---- a/drivers/s390/virtio/virtio_ccw.c
-+++ b/drivers/s390/virtio/virtio_ccw.c
-@@ -140,11 +140,17 @@ static int virtio_ccw_use_airq = 1;
- 
- struct airq_info {
- 	rwlock_t lock;
--	u8 summary_indicator;
-+	u8 summary_indicator_idx;
- 	struct airq_struct airq;
- 	struct airq_iv *aiv;
- };
- static struct airq_info *airq_areas[MAX_AIRQ_AREAS];
-+static u8 *summary_indicators;
-+
-+static inline u8 *get_summary_indicator(struct airq_info *info)
-+{
-+	return summary_indicators + info->summary_indicator_idx;
-+}
- 
- #define CCW_CMD_SET_VQ 0x13
- #define CCW_CMD_VDEV_RESET 0x33
-@@ -225,7 +231,7 @@ static void virtio_airq_handler(struct airq_struct *airq, bool floating)
- 			break;
- 		vring_interrupt(0, (void *)airq_iv_get_ptr(info->aiv, ai));
- 	}
--	info->summary_indicator = 0;
-+	*(get_summary_indicator(info)) = 0;
- 	smp_wmb();
- 	/* Walk through indicators field, summary indicator not active. */
- 	for (ai = 0;;) {
-@@ -237,7 +243,7 @@ static void virtio_airq_handler(struct airq_struct *airq, bool floating)
- 	read_unlock(&info->lock);
- }
- 
--static struct airq_info *new_airq_info(void)
-+static struct airq_info *new_airq_info(int index)
- {
- 	struct airq_info *info;
- 	int rc;
-@@ -253,7 +259,8 @@ static struct airq_info *new_airq_info(void)
- 		return NULL;
- 	}
- 	info->airq.handler = virtio_airq_handler;
--	info->airq.lsi_ptr = &info->summary_indicator;
-+	info->summary_indicator_idx = index;
-+	info->airq.lsi_ptr = get_summary_indicator(info);
- 	info->airq.lsi_mask = 0xff;
- 	info->airq.isc = VIRTIO_AIRQ_ISC;
- 	rc = register_adapter_interrupt(&info->airq);
-@@ -275,7 +282,7 @@ static unsigned long get_airq_indicator(struct virtqueue *vqs[], int nvqs,
- 
- 	for (i = 0; i < MAX_AIRQ_AREAS && !indicator_addr; i++) {
- 		if (!airq_areas[i])
--			airq_areas[i] = new_airq_info();
-+			airq_areas[i] = new_airq_info(i);
- 		info = airq_areas[i];
- 		if (!info)
- 			return 0;
-@@ -360,7 +367,7 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
- 		if (!thinint_area)
- 			return;
- 		thinint_area->summary_indicator =
--			(unsigned long) &airq_info->summary_indicator;
-+			(unsigned long) get_summary_indicator(airq_info);
- 		thinint_area->isc = VIRTIO_AIRQ_ISC;
- 		ccw->cmd_code = CCW_CMD_SET_IND_ADAPTER;
- 		ccw->count = sizeof(*thinint_area);
-@@ -625,7 +632,7 @@ static int virtio_ccw_register_adapter_ind(struct virtio_ccw_device *vcdev,
- 	}
- 	info = vcdev->airq_info;
- 	thinint_area->summary_indicator =
--		(unsigned long) &info->summary_indicator;
-+		(unsigned long) get_summary_indicator(info);
- 	thinint_area->isc = VIRTIO_AIRQ_ISC;
- 	ccw->cmd_code = CCW_CMD_SET_IND_ADAPTER;
- 	ccw->flags = CCW_FLAG_SLI;
-@@ -1501,6 +1508,7 @@ static int __init virtio_ccw_init(void)
- {
- 	/* parse no_auto string before we do anything further */
- 	no_auto_parse();
-+	summary_indicators = cio_dma_zalloc(MAX_AIRQ_AREAS);
- 	return ccw_driver_register(&virtio_ccw_driver);
- }
- device_initcall(virtio_ccw_init);
--- 
-2.13.4
+(Generally speaking, I think using regions for this makes sense,
+though.)
+
+> +
+>  /**
+>   * struct vfio_region_gfx_edid - EDID region layout.
+>   *
+> diff --git a/include/uapi/linux/vfio_zdev.h b/include/uapi/linux/vfio_zdev.h
+> new file mode 100644
+> index 0000000..84b1a82
+> --- /dev/null
+> +++ b/include/uapi/linux/vfio_zdev.h
+> @@ -0,0 +1,34 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + * Region definition for ZPCI devices
+> + *
+> + * Copyright IBM Corp. 2019
+> + *
+> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+> + */
+> +
+> +#ifndef _VFIO_ZDEV_H_
+> +#define _VFIO_ZDEV_H_
+> +
+> +#include <linux/types.h>
+> +
+> +/**
+> + * struct vfio_region_zpci_info - ZPCI information.
+> + *
+> + */
+> +struct vfio_region_zpci_info {
+> +	__u64 dasm;
+> +	__u64 start_dma;
+> +	__u64 end_dma;
+> +	__u64 msi_addr;
+> +	__u64 flags;
+> +	__u16 pchid;
+> +	__u16 mui;
+> +	__u16 noi;
+> +	__u8 gid;
+> +	__u8 version;
+> +#define VFIO_PCI_ZDEV_FLAGS_REFRESH 1
+> +	__u8 util_str[CLP_UTIL_STR_LEN];
+> +} __packed;
+> +
+> +#endif
 
