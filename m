@@ -2,140 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A979298A7
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 15:14:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C95342989F
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 15:13:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391595AbfEXNOF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 May 2019 09:14:05 -0400
-Received: from casper.infradead.org ([85.118.1.10]:53982 "EHLO
-        casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391560AbfEXNOF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 May 2019 09:14:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-        MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=/n51XGtaWTFL2kzn79WHLkkiSbCnRxm63xReP9D+Qhg=; b=bUkJxWW27UUn0amoOcX30OMJrj
-        ZKVRSd1fLa7wKAL02nzw4IuOiQA4rzgr054ftsu9MviuEbu9mlGcvkuzEzVnirDZFWPfHjMMLLRk3
-        ZsW9iClnPD6BeArzI/irNnfgAKRVNaTgvodZ4TtoBZwoHm+HpL855LvNq4JvaGdw7aEGxArIj4/ar
-        bjQ2iBjNGlyPTpQSCWDE80zIQI9EXYMUp8RizSkmI+AmxIKaaD96lVlDCETopHnXFcxZVFNsAuFYn
-        eLi0l7CIdF+p1i1kh/+U5yW0qGVeRM/1NgoUENimwmZJ/qxCwebQt5wRW4slq4faCCWf2/ok2eNHJ
-        OcM7Zp+w==;
-Received: from 177.97.63.247.dynamic.adsl.gvt.net.br ([177.97.63.247] helo=coco.lan)
-        by casper.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hUA1G-0007UW-C4; Fri, 24 May 2019 13:13:58 +0000
-Date:   Fri, 24 May 2019 10:13:45 -0300
-From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v15 14/17] media/v4l2-core, arm64: untag user pointers
- in videobuf_dma_contig_user_get
-Message-ID: <20190524101345.67c425fa@coco.lan>
-In-Reply-To: <b7999d13af54eb3ed8d7b0192397c7cde3df0b28.1557160186.git.andreyknvl@google.com>
-References: <cover.1557160186.git.andreyknvl@google.com>
-        <b7999d13af54eb3ed8d7b0192397c7cde3df0b28.1557160186.git.andreyknvl@google.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S2391494AbfEXNNx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 May 2019 09:13:53 -0400
+Received: from foss.arm.com ([217.140.101.70]:42714 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2391124AbfEXNNx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 May 2019 09:13:53 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1388CA78;
+        Fri, 24 May 2019 06:13:53 -0700 (PDT)
+Received: from [10.162.42.134] (p8cg001049571a15.blr.arm.com [10.162.42.134])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 99E793F5AF;
+        Fri, 24 May 2019 06:13:49 -0700 (PDT)
+Subject: Re: mm/compaction: BUG: NULL pointer dereference
+To:     Mel Gorman <mgorman@techsingularity.net>
+Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>, linux-mm@kvack.org,
+        akpm@linux-foundation.org, mhocko@suse.com, cai@lca.pw,
+        linux-kernel@vger.kernel.org, marc.zyngier@arm.com,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+References: <1558689619-16891-1-git-send-email-suzuki.poulose@arm.com>
+ <cfddd75a-b302-5557-05b8-2b328bba27c8@arm.com>
+ <20190524123047.GO18914@techsingularity.net>
+From:   Anshuman Khandual <anshuman.khandual@arm.com>
+Message-ID: <9ae23db2-e696-047b-af18-1e75ebbda085@arm.com>
+Date:   Fri, 24 May 2019 18:43:59 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190524123047.GO18914@techsingularity.net>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Em Mon,  6 May 2019 18:31:00 +0200
-Andrey Konovalov <andreyknvl@google.com> escreveu:
 
-> This patch is a part of a series that extends arm64 kernel ABI to allow to
-> pass tagged user pointers (with the top byte set to something else other
-> than 0x00) as syscall arguments.
+
+On 05/24/2019 06:00 PM, Mel Gorman wrote:
+> On Fri, May 24, 2019 at 04:26:16PM +0530, Anshuman Khandual wrote:
+>>
+>>
+>> On 05/24/2019 02:50 PM, Suzuki K Poulose wrote:
+>>> Hi,
+>>>
+>>> We are hitting NULL pointer dereferences while running stress tests with KVM.
+>>> See splat [0]. The test is to spawn 100 VMs all doing standard debian
+>>> installation (Thanks to Marc's automated scripts, available here [1] ).
+>>> The problem has been reproduced with a better rate of success from 5.1-rc6
+>>> onwards.
+>>>
+>>> The issue is only reproducible with swapping enabled and the entire
+>>> memory is used up, when swapping heavily. Also this issue is only reproducible
+>>> on only one server with 128GB, which has the following memory layout:
+>>>
+>>> [32GB@4GB, hole , 96GB@544GB]
+>>>
+>>> Here is my non-expert analysis of the issue so far.
+>>>
+>>> Under extreme memory pressure, the kswapd could trigger reset_isolation_suitable()
+>>> to figure out the cached values for migrate/free pfn for a zone, by scanning through
+>>> the entire zone. On our server it does so in the range of [ 0x10_0000, 0xa00_0000 ],
+>>> with the following area of holes : [ 0x20_0000, 0x880_0000 ].
+>>> In the failing case, we end up setting the cached migrate pfn as : 0x508_0000, which
+>>> is right in the center of the zone pfn range. i.e ( 0x10_0000 + 0xa00_0000 ) / 2,
+>>> with reset_migrate = 0x88_4e00, reset_free = 0x10_0000.
+>>>
+>>> Now these cached values are used by the fast_isolate_freepages() to find a pfn. However,
+>>> since we cant find anything during the search we fall back to using the page belonging
+>>> to the min_pfn (which is the migrate_pfn), without proper checks to see if that is valid
+>>> PFN or not. This is then passed on to fast_isolate_around() which tries to do :
+>>> set_pageblock_skip(page) on the page which blows up due to an NULL mem_section pointer.
+>>>
+>>> The following patch seems to fix the issue for me, but I am not quite convinced that
+>>> it is the right fix. Thoughts ?
+>>>
+>>>
+>>> diff --git a/mm/compaction.c b/mm/compaction.c
+>>> index 9febc8c..9e1b9ac 100644
+>>> --- a/mm/compaction.c
+>>> +++ b/mm/compaction.c
+>>> @@ -1399,7 +1399,7 @@ fast_isolate_freepages(struct compact_control *cc)
+>>>  				page = pfn_to_page(highest);
+>>>  				cc->free_pfn = highest;
+>>>  			} else {
+>>> -				if (cc->direct_compaction) {
+>>> +				if (cc->direct_compaction && pfn_valid(min_pfn)) {
+>>>  					page = pfn_to_page(min_pfn);
+>>
+>> pfn_to_online_page() here would be better as it does not add pfn_valid() cost on
+>> architectures which does not subscribe to CONFIG_HOLES_IN_ZONE. But regardless if
+>> the compaction is trying to scan pfns in zone holes, then it should be avoided.
 > 
-> videobuf_dma_contig_user_get() uses provided user pointers for vma
-> lookups, which can only by done with untagged pointers.
-> 
-> Untag the pointers in this function.
-> 
-> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> CONFIG_HOLES_IN_ZONE typically applies in special cases where an arch
+> punches holes within a section. As both do a section lookup, the cost is
+> similar but pfn_valid in general is less subtle in this case. Normally
+> pfn_valid_within is only ok when a pfn_valid check has been made on the
+> max_order aligned range as well as a zone boundary check. In this case,
+> it's much more straight-forward to leave it as pfn_valid.
 
-Acked-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-
-> ---
->  drivers/media/v4l2-core/videobuf-dma-contig.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/media/v4l2-core/videobuf-dma-contig.c b/drivers/media/v4l2-core/videobuf-dma-contig.c
-> index e1bf50df4c70..8a1ddd146b17 100644
-> --- a/drivers/media/v4l2-core/videobuf-dma-contig.c
-> +++ b/drivers/media/v4l2-core/videobuf-dma-contig.c
-> @@ -160,6 +160,7 @@ static void videobuf_dma_contig_user_put(struct videobuf_dma_contig_memory *mem)
->  static int videobuf_dma_contig_user_get(struct videobuf_dma_contig_memory *mem,
->  					struct videobuf_buffer *vb)
->  {
-> +	unsigned long untagged_baddr = untagged_addr(vb->baddr);
->  	struct mm_struct *mm = current->mm;
->  	struct vm_area_struct *vma;
->  	unsigned long prev_pfn, this_pfn;
-> @@ -167,22 +168,22 @@ static int videobuf_dma_contig_user_get(struct videobuf_dma_contig_memory *mem,
->  	unsigned int offset;
->  	int ret;
->  
-> -	offset = vb->baddr & ~PAGE_MASK;
-> +	offset = untagged_baddr & ~PAGE_MASK;
->  	mem->size = PAGE_ALIGN(vb->size + offset);
->  	ret = -EINVAL;
->  
->  	down_read(&mm->mmap_sem);
->  
-> -	vma = find_vma(mm, vb->baddr);
-> +	vma = find_vma(mm, untagged_baddr);
->  	if (!vma)
->  		goto out_up;
->  
-> -	if ((vb->baddr + mem->size) > vma->vm_end)
-> +	if ((untagged_baddr + mem->size) > vma->vm_end)
->  		goto out_up;
->  
->  	pages_done = 0;
->  	prev_pfn = 0; /* kill warning */
-> -	user_address = vb->baddr;
-> +	user_address = untagged_baddr;
->  
->  	while (pages_done < (mem->size >> PAGE_SHIFT)) {
->  		ret = follow_pfn(vma, user_address, &this_pfn);
-
-
-
-Thanks,
-Mauro
+Sure, makes sense.
