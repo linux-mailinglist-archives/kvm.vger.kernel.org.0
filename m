@@ -2,258 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 081F72998E
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 15:58:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 750C2299BD
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 16:06:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404101AbfEXN5y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 May 2019 09:57:54 -0400
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:60680 "EHLO
-        mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2404096AbfEXN5x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 May 2019 09:57:53 -0400
-Received: from Internal Mail-Server by MTLPINE2 (envelope-from parav@mellanox.com)
-        with ESMTPS (AES256-SHA encrypted); 24 May 2019 16:57:47 +0300
-Received: from sw-mtx-036.mtx.labs.mlnx (sw-mtx-036.mtx.labs.mlnx [10.12.150.149])
-        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x4ODvdQu019054;
-        Fri, 24 May 2019 16:57:45 +0300
-From:   Parav Pandit <parav@mellanox.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cohuck@redhat.com, kwankhede@nvidia.com, alex.williamson@redhat.com
-Cc:     cjia@nvidia.com, parav@mellanox.com
-Subject: [PATCHv4 3/3] vfio/mdev: Synchronize device create/remove with parent removal
-Date:   Fri, 24 May 2019 08:57:38 -0500
-Message-Id: <20190524135738.54862-4-parav@mellanox.com>
-X-Mailer: git-send-email 2.19.2
-In-Reply-To: <20190524135738.54862-1-parav@mellanox.com>
-References: <20190524135738.54862-1-parav@mellanox.com>
+        id S2404027AbfEXOGe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 May 2019 10:06:34 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36594 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2403843AbfEXOGe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 24 May 2019 10:06:34 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4OE2nUc048143
+        for <kvm@vger.kernel.org>; Fri, 24 May 2019 10:06:33 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2spgst4m1c-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 24 May 2019 10:06:32 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Fri, 24 May 2019 15:06:29 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 24 May 2019 15:06:25 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4OE6O5437683430
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 24 May 2019 14:06:24 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9F2D6A4060;
+        Fri, 24 May 2019 14:06:24 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 89287A4066;
+        Fri, 24 May 2019 14:06:24 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 24 May 2019 14:06:24 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id 42969E0268; Fri, 24 May 2019 16:06:24 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        linux-kselftest@vger.kernel.org,
+        linux-s390 <linux-s390@vger.kernel.org>
+Subject: [PATCH] KVM: s390: fix memory slot handling for KVM_SET_USER_MEMORY_REGION
+Date:   Fri, 24 May 2019 16:06:23 +0200
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19052414-0020-0000-0000-00000340081F
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19052414-0021-0000-0000-00002192F7F1
+Message-Id: <20190524140623.104033-1-borntraeger@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-24_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=614 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905240095
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In following sequences, child devices created while removing mdev parent
-device can be left out, or it may lead to race of removing half
-initialized child mdev devices.
+kselftests exposed a problem in the s390 handling for memory slots.
+Right now we only do proper memory slot handling for creation of new
+memory slots. Neither MOVE, nor DELETION are handled properly. Let us
+implement those.
 
-issue-1:
---------
-       cpu-0                         cpu-1
-       -----                         -----
-                                  mdev_unregister_device()
-                                    device_for_each_child()
-                                      mdev_device_remove_cb()
-                                        mdev_device_remove()
-create_store()
-  mdev_device_create()                   [...]
-    device_add()
-                                  parent_remove_sysfs_files()
-
-/* BUG: device added by cpu-0
- * whose parent is getting removed
- * and it won't process this mdev.
- */
-
-issue-2:
---------
-Below crash is observed when user initiated remove is in progress
-and mdev_unregister_driver() completes parent unregistration.
-
-       cpu-0                         cpu-1
-       -----                         -----
-remove_store()
-   mdev_device_remove()
-   active = false;
-                                  mdev_unregister_device()
-                                  parent device removed.
-   [...]
-   parents->ops->remove()
- /*
-  * BUG: Accessing invalid parent.
-  */
-
-This is similar race like create() racing with mdev_unregister_device().
-
-BUG: unable to handle kernel paging request at ffffffffc0585668
-PGD e8f618067 P4D e8f618067 PUD e8f61a067 PMD 85adca067 PTE 0
-Oops: 0000 [#1] SMP PTI
-CPU: 41 PID: 37403 Comm: bash Kdump: loaded Not tainted 5.1.0-rc6-vdevbus+ #6
-Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS 2.0b 08/09/2016
-RIP: 0010:mdev_device_remove+0xfa/0x140 [mdev]
-Call Trace:
- remove_store+0x71/0x90 [mdev]
- kernfs_fop_write+0x113/0x1a0
- vfs_write+0xad/0x1b0
- ksys_write+0x5a/0xe0
- do_syscall_64+0x5a/0x210
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Therefore, mdev core is improved as below to overcome above issues.
-
-Wait for any ongoing mdev create() and remove() to finish before
-unregistering parent device.
-This continues to allow multiple create and remove to progress in
-parallel for different mdev devices as most common case.
-At the same time guard parent removal while parent is being access by
-create() and remove callbacks.
-create()/remove() and unregister_device() are synchronized by the rwsem.
-
-Refactor device removal code to mdev_device_remove_common() to avoid
-acquiring unreg_sem of the parent.
-
-Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
-Signed-off-by: Parav Pandit <parav@mellanox.com>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- drivers/vfio/mdev/mdev_core.c    | 61 ++++++++++++++++++++++++--------
- drivers/vfio/mdev/mdev_private.h |  2 ++
- 2 files changed, 49 insertions(+), 14 deletions(-)
+ arch/s390/kvm/kvm-s390.c | 35 +++++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index 0bef0cae1d4b..c5401a8c6843 100644
---- a/drivers/vfio/mdev/mdev_core.c
-+++ b/drivers/vfio/mdev/mdev_core.c
-@@ -102,11 +102,36 @@ static void mdev_put_parent(struct mdev_parent *parent)
- 		kref_put(&parent->ref, mdev_release_parent);
- }
- 
-+static void mdev_device_remove_common(struct mdev_device *mdev)
-+{
-+	struct mdev_parent *parent;
-+	struct mdev_type *type;
-+	int ret;
-+
-+	type = to_mdev_type(mdev->type_kobj);
-+	mdev_remove_sysfs_files(&mdev->dev, type);
-+	device_del(&mdev->dev);
-+	parent = mdev->parent;
-+	ret = parent->ops->remove(mdev);
-+	if (ret)
-+		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
-+
-+	/* Balances with device_initialize() */
-+	put_device(&mdev->dev);
-+	mdev_put_parent(parent);
-+}
-+
- static int mdev_device_remove_cb(struct device *dev, void *data)
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 871d2e99b156..6ec0685ab2c7 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -4525,21 +4525,28 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 				const struct kvm_memory_slot *new,
+ 				enum kvm_mr_change change)
  {
--	if (dev_is_mdev(dev))
--		mdev_device_remove(dev);
-+	struct mdev_parent *parent;
-+	struct mdev_device *mdev;
+-	int rc;
++	int rc = 0;
  
-+	if (!dev_is_mdev(dev))
-+		return 0;
-+
-+	mdev = to_mdev_device(dev);
-+	parent = mdev->parent;
-+	mdev_device_remove_common(mdev);
- 	return 0;
- }
- 
-@@ -148,6 +173,7 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
- 	}
- 
- 	kref_init(&parent->ref);
-+	init_rwsem(&parent->unreg_sem);
- 
- 	parent->dev = dev;
- 	parent->ops = ops;
-@@ -206,13 +232,17 @@ void mdev_unregister_device(struct device *dev)
- 	dev_info(dev, "MDEV: Unregistering\n");
- 
- 	list_del(&parent->next);
-+	mutex_unlock(&parent_list_lock);
-+
-+	down_write(&parent->unreg_sem);
-+
- 	class_compat_remove_link(mdev_bus_compat_class, dev, NULL);
- 
- 	device_for_each_child(dev, NULL, mdev_device_remove_cb);
- 
- 	parent_remove_sysfs_files(parent);
-+	up_write(&parent->unreg_sem);
- 
--	mutex_unlock(&parent_list_lock);
- 	mdev_put_parent(parent);
- }
- EXPORT_SYMBOL(mdev_unregister_device);
-@@ -265,6 +295,12 @@ int mdev_device_create(struct kobject *kobj,
- 
- 	mdev->parent = parent;
- 
-+	ret = down_read_trylock(&parent->unreg_sem);
-+	if (!ret) {
-+		ret = -ENODEV;
-+		goto mdev_fail;
-+	}
-+
- 	device_initialize(&mdev->dev);
- 	mdev->dev.parent  = dev;
- 	mdev->dev.bus     = &mdev_bus_type;
-@@ -287,6 +323,7 @@ int mdev_device_create(struct kobject *kobj,
- 
- 	mdev->active = true;
- 	dev_dbg(&mdev->dev, "MDEV: created\n");
-+	up_read(&parent->unreg_sem);
- 
- 	return 0;
- 
-@@ -295,6 +332,7 @@ int mdev_device_create(struct kobject *kobj,
- add_fail:
- 	parent->ops->remove(mdev);
- ops_create_fail:
-+	up_read(&parent->unreg_sem);
- 	put_device(&mdev->dev);
- mdev_fail:
- 	mdev_put_parent(parent);
-@@ -305,7 +343,6 @@ int mdev_device_remove(struct device *dev)
- {
- 	struct mdev_device *mdev, *tmp;
- 	struct mdev_parent *parent;
--	struct mdev_type *type;
- 	int ret;
- 
- 	mdev = to_mdev_device(dev);
-@@ -329,18 +366,14 @@ int mdev_device_remove(struct device *dev)
- 	mdev->active = false;
- 	mutex_unlock(&mdev_list_lock);
- 
--	type = to_mdev_type(mdev->type_kobj);
--	mdev_remove_sysfs_files(dev, type);
--	device_del(&mdev->dev);
- 	parent = mdev->parent;
--	ret = parent->ops->remove(mdev);
--	if (ret)
--		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
+-	/* If the basics of the memslot do not change, we do not want
+-	 * to update the gmap. Every update causes several unnecessary
+-	 * segment translation exceptions. This is usually handled just
+-	 * fine by the normal fault handler + gmap, but it will also
+-	 * cause faults on the prefix page of running guest CPUs.
+-	 */
+-	if (old->userspace_addr == mem->userspace_addr &&
+-	    old->base_gfn * PAGE_SIZE == mem->guest_phys_addr &&
+-	    old->npages * PAGE_SIZE == mem->memory_size)
+-		return;
 -
--	/* Balances with device_initialize() */
--	put_device(&mdev->dev);
--	mdev_put_parent(parent);
-+	/* Check if parent unregistration has started */
-+	ret = down_read_trylock(&parent->unreg_sem);
-+	if (!ret)
-+		return -ENODEV;
- 
-+	mdev_device_remove_common(mdev);
-+	up_read(&parent->unreg_sem);
- 	return 0;
- }
- 
-diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
-index 924ed2274941..398767526276 100644
---- a/drivers/vfio/mdev/mdev_private.h
-+++ b/drivers/vfio/mdev/mdev_private.h
-@@ -23,6 +23,8 @@ struct mdev_parent {
- 	struct list_head next;
- 	struct kset *mdev_types_kset;
- 	struct list_head type_list;
-+	/* Synchronize device creation/removal with parent unregistration */
-+	struct rw_semaphore unreg_sem;
- };
- 
- struct mdev_device {
+-	rc = gmap_map_segment(kvm->arch.gmap, mem->userspace_addr,
+-		mem->guest_phys_addr, mem->memory_size);
++	switch (change) {
++	case KVM_MR_DELETE:
++		rc = gmap_unmap_segment(kvm->arch.gmap, old->base_gfn * PAGE_SIZE,
++					old->npages * PAGE_SIZE);
++		break;
++	case KVM_MR_MOVE:
++		rc = gmap_unmap_segment(kvm->arch.gmap, old->base_gfn * PAGE_SIZE,
++					old->npages * PAGE_SIZE);
++		if (rc)
++			break;
++		/* FALLTHROUGH */
++	case KVM_MR_CREATE:
++		rc = gmap_map_segment(kvm->arch.gmap, mem->userspace_addr,
++				      mem->guest_phys_addr, mem->memory_size);
++		break;
++	case KVM_MR_FLAGS_ONLY:
++		break;
++	default:
++		WARN(1, "Unknown KVM MR CHANGE: %d\n", change);
++	}
+ 	if (rc)
+ 		pr_warn("failed to commit memory region\n");
+ 	return;
 -- 
-2.19.2
+2.21.0
 
