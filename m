@@ -2,62 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D01029FC1
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 22:23:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E078529FCD
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 22:24:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403884AbfEXUXe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 May 2019 16:23:34 -0400
-Received: from mga05.intel.com ([192.55.52.43]:48550 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2403785AbfEXUXe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 May 2019 16:23:34 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 May 2019 13:23:33 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by orsmga007.jf.intel.com with ESMTP; 24 May 2019 13:23:33 -0700
-Date:   Fri, 24 May 2019 13:23:33 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
+        id S2404188AbfEXUYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 May 2019 16:24:40 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45278 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2403762AbfEXUYk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 May 2019 16:24:40 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id DD832AD47;
+        Fri, 24 May 2019 20:24:38 +0000 (UTC)
+Received: by unicorn.suse.cz (Postfix, from userid 1000)
+        id 7C4A6E00A9; Fri, 24 May 2019 22:24:38 +0200 (CEST)
+Date:   Fri, 24 May 2019 22:24:38 +0200
+From:   Michal Kubecek <mkubecek@suse.cz>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org, Wanpeng Li <kernellwp@gmail.com>
-Subject: Re: [PATCH] KVM: lapic: Reuse auto-adjusted timer advance of first
- stable vCPU
-Message-ID: <20190524202333.GG365@linux.intel.com>
-References: <20190508214702.25317-1-sean.j.christopherson@intel.com>
- <3ea5ae51-89b2-ee0c-d156-88198af90b95@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] kvm: fix compilation on s390
+Message-ID: <20190524202438.GE30439@unicorn.suse.cz>
+References: <1558725957-22998-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3ea5ae51-89b2-ee0c-d156-88198af90b95@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <1558725957-22998-1-git-send-email-pbonzini@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 20, 2019 at 03:03:10PM +0200, Paolo Bonzini wrote:
-> On 08/05/19 23:47, Sean Christopherson wrote:
-> > +
-> > +		/*
-> > +		 * The first vCPU to get a stable advancement time "wins" and
-> > +		 * sets the advancement time that is used for *new* vCPUS that
-> > +		 * are created with auto-adjusting enabled.
-> > +		 */
-> > +		if (apic->lapic_timer.timer_advance_adjust_done)
-> > +			(void)cmpxchg(&adjusted_timer_advance_ns, -1,
-> > +				      timer_advance_ns);
+On Fri, May 24, 2019 at 09:25:57PM +0200, Paolo Bonzini wrote:
+> s390 does not have memremap, even though in this particular case it
+> would be useful.
+
+This is not completely true: memremap() is built when HAS_IOMEM is
+defined which on s390 depends on CONFIG_PCI. So for "normal" configs
+HAS_IOMEM would be enabled and memremap() would be available. We only
+encountered the build error with a special minimal config for zfcpdump.
+
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  virt/kvm/kvm_main.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> This is relatively expensive, so it should only be done after setting
-> timer_advance_adjust_done to true.
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 1fadfb9cf36e..134ec0283a8a 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1761,8 +1761,10 @@ static int __kvm_map_gfn(struct kvm_memory_slot *slot, gfn_t gfn,
+>  	if (pfn_valid(pfn)) {
+>  		page = pfn_to_page(pfn);
+>  		hva = kmap(page);
+> +#ifdef CONFIG_HAS_IOMEM
+>  	} else {
+>  		hva = memremap(pfn_to_hpa(pfn), PAGE_SIZE, MEMREMAP_WB);
+> +#endif
+>  	}
+>  
+>  	if (!hva)
+> -- 
+> 1.8.3.1
 
-That's already the case, or am I missing something?
+I would have to run a test build to be sure but IMHO you will also need
+to handle the memunmap() call in kvm_vcpu_unmap().
 
-This code is inside "if (!apic->lapic_timer.timer_advance_adjust_done)",
-and apic->lapic_timer.timer_advance_adjust_done is set to true at creation
-time if "adjusted_timer_advance_ns != -1", i.e. the cmpxchg() will only
-be reached on vCPUs that are created before adjusted_timer_advance_ns is
-set and will be reached at most once per vCPU.
+Michal Kubecek
