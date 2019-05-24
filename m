@@ -2,222 +2,347 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 928BF296FF
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 13:21:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B7E22970E
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 13:22:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390808AbfEXLUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 May 2019 07:20:31 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:40630 "EHLO
+        id S2390905AbfEXLVv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 May 2019 07:21:51 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:40706 "EHLO
         foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390535AbfEXLUa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 May 2019 07:20:30 -0400
+        id S2390772AbfEXLVv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 May 2019 07:21:51 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C89F4374;
-        Fri, 24 May 2019 04:20:29 -0700 (PDT)
-Received: from mbp (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B166B3F703;
-        Fri, 24 May 2019 04:20:23 -0700 (PDT)
-Date:   Fri, 24 May 2019 12:20:20 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     enh <enh@google.com>, Evgenii Stepanov <eugenis@google.com>,
-        Andrey Konovalov <andreyknvl@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F6B7374;
+        Fri, 24 May 2019 04:21:50 -0700 (PDT)
+Received: from e107155-lin (e107155-lin.cambridge.arm.com [10.1.196.42])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 189EA3F703;
+        Fri, 24 May 2019 04:21:47 -0700 (PDT)
+Date:   Fri, 24 May 2019 12:21:45 +0100
+From:   Sudeep Holla <sudeep.holla@arm.com>
+To:     Marc Zyngier <marc.zyngier@arm.com>
+Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
-Message-ID: <20190524112020.xcio5jrx6kzmrdnz@mbp>
-References: <20190521182932.sm4vxweuwo5ermyd@mbp>
- <201905211633.6C0BF0C2@keescook>
- <20190522101110.m2stmpaj7seezveq@mbp>
- <CAJgzZoosKBwqXRyA6fb8QQSZXFqfHqe9qO9je5TogHhzuoGXJQ@mail.gmail.com>
- <20190522163527.rnnc6t4tll7tk5zw@mbp>
- <201905221316.865581CF@keescook>
- <20190523144449.waam2mkyzhjpqpur@mbp>
- <201905230917.DEE7A75EF0@keescook>
- <20190523174345.6sv3kcipkvlwfmox@mbp>
- <201905231327.77CA8D0A36@keescook>
+        Julien Thierry <julien.thierry@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>
+Subject: Re: [PATCH v2 12/15] KVM: arm64: add a new vcpu device control group
+ for SPEv1
+Message-ID: <20190524112145.GC13121@e107155-lin>
+References: <20190523103502.25925-1-sudeep.holla@arm.com>
+ <20190523103502.25925-13-sudeep.holla@arm.com>
+ <a2d64bf0-2424-83c5-d3c8-17affd59dd20@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <201905231327.77CA8D0A36@keescook>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <a2d64bf0-2424-83c5-d3c8-17affd59dd20@arm.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 23, 2019 at 02:31:16PM -0700, Kees Cook wrote:
-> On Thu, May 23, 2019 at 06:43:46PM +0100, Catalin Marinas wrote:
-> > On Thu, May 23, 2019 at 09:38:19AM -0700, Kees Cook wrote:
-> > > What about testing tools that intentionally insert high bits for syscalls
-> > > and are _expecting_ them to fail? It seems the TBI series will break them?
-> > > In that case, do we need to opt into TBI as well?
+On Fri, May 24, 2019 at 11:37:51AM +0100, Marc Zyngier wrote:
+> Hi Sudeep,
+> 
+> On 23/05/2019 11:34, Sudeep Holla wrote:
+> > To configure the virtual SPEv1 overflow interrupt number, we use the
+> > vcpu kvm_device ioctl, encapsulating the KVM_ARM_VCPU_SPE_V1_IRQ
+> > attribute within the KVM_ARM_VCPU_SPE_V1_CTRL group.
 > > 
-> > If there are such tools, then we may need a per-process control. It's
-> > basically an ABI change.
-> 
-> syzkaller already attempts to randomly inject non-canonical and
-> 0xFFFF....FFFF addresses for user pointers in syscalls in an effort to
-> find bugs like CVE-2017-5123 where waitid() via unchecked put_user() was
-> able to write directly to kernel memory[1].
-> 
-> It seems that using TBI by default and not allowing a switch back to
-> "normal" ABI without a reboot actually means that userspace cannot inject
-> kernel pointers into syscalls any more, since they'll get universally
-> stripped now. Is my understanding correct, here? i.e. exploiting
-> CVE-2017-5123 would be impossible under TBI?
-
-Unless the kernel is also using TBI (khwasan), in which case masking out
-the top byte wouldn't help. Anyway, as per this discussion, we want the
-tagged pointer to remain intact all the way to put_user(), so nothing
-gets masked out. I don't think this would have helped with the waitid()
-bug.
-
-> If so, then I think we should commit to the TBI ABI and have a boot
-> flag to disable it, but NOT have a process flag, as that would allow
-> attackers to bypass the masking. The only flag should be "TBI or MTE".
-> 
-> If so, can I get top byte masking for other architectures too? Like,
-> just to strip high bits off userspace addresses? ;)
-
-But you didn't like my option 2 shim proposal which strips the tag on
-kernel entry because it lowers the value of MTE ;).
-
-> (Oh, in looking I see this is implemented with sign-extension... why
-> not just a mask? So it'll either be valid userspace address or forced
-> into the non-canonical range?)
-
-The TTBR0/1 selection on memory accesses is done based on bit 63 if TBI
-is disabled and bit 55 when enabled. Sign-extension allows us to use the
-same macro for both user and kernel tagged pointers. With MTE tag 0
-would be match-all for TTBR0 and 0xff for TTBR1 (so that we don't modify
-the virtual address space of the kernel; I need to check the latest spec
-to be sure). Note that the VA space for both user and kernel is limited
-to 52-bit architecturally so, on access, bits 55..52 must be the same, 0
-or 1, otherwise you get a fault.
-
-Since the syzkaller tests would also need to set bits 55-52 (actually 48
-for kernel addresses, we haven't merged the 52-bit kernel VA patches
-yet) to hit a valid kernel address, I don't think ignoring the top byte
-makes much difference to the expected failure scenario.
-
-> > > Alright, the tl;dr appears to be:
-> > > - you want more assurances that we can find __user stripping in the
-> > >   kernel more easily. (But this seems like a parallel problem.)
+> > After configuring the SPEv1, call the vcpu ioctl with attribute
+> > KVM_ARM_VCPU_SPE_V1_INIT to initialize the SPEv1.
 > > 
-> > Yes, and that we found all (most) cases now. The reason I don't see it
-> > as a parallel problem is that, as maintainer, I promise an ABI to user
-> > and I'd rather stick to it. I don't want, for example, ncurses to stop
-> > working because of some ioctl() rejecting tagged pointers.
-> 
-> But this is what I don't understand: it would need to be ncurses _using
-> TBI_, that would stop working (having started to work before, but then
-> regress due to a newly added one-off bug). Regular ncurses will be fine
-> because it's not using TBI. So The Golden Rule isn't violated,
-
-Once we introduced TBI and the libc starts tagging heap allocations,
-this becomes the new "regular" user space behaviour (i.e. using TBI). So
-a new bug would break the golden rule. It could also be an old bug that
-went unnoticed (i.e. you changed the graphics card and its driver gets
-confused by tagged pointers coming from user-space).
-
-> and by definition, it's a specific regression caused by some bug
-> (since TBI would have had to have worked _before_ in the situation to
-> be considered a regression now). Which describes the normal path for
-> kernel development... add feature, find corner cases where it doesn't
-> work, fix them, encounter new regressions, fix those, repeat forever.
-> 
-> > If it's just the occasional one-off bug I'm fine to deal with it. But
-> > no-one convinced me yet that this is the case.
-> 
-> You believe there still to be some systemic cases that haven't been
-> found yet? And even if so -- isn't it better to work on that
-> incrementally?
-
-I want some way to systematically identify potential issues (sparse?).
-Since problems are most likely in drivers, I don't have all devices to
-check and not all users have the knowledge to track down why something
-failed.
-
-I think we can do this incrementally as long the TBI ABI is not the
-default. Even better if we made it per process.
-
-> > As for the generic driver code (filesystems or other subsystems),
-> > without some clear direction for developers, together with static
-> > checking/sparse, on how user pointers are cast to longs (one example),
-> > it would become my responsibility to identify and fix them up with any
-> > kernel release. This series is not providing such guidance, just adding
-> > untagged_addr() in some places that we think matter.
-> 
-> What about adding a nice bit of .rst documentation that describes the
-> situation and shows how to use untagged_addr(). This is the kind of
-> kernel-wide change that "everyone" needs to know about, and shouldn't
-> be the arch maintainer's sole responsibility to fix.
-
-This works (if people read it) but we also need to be more prescriptive
-in how casting is done and how we differentiate between a pointer for
-dereference (T __user *) and address space management (usually unsigned
-long). On top of that, we'd get sparse to check for such conversions and
-maybe even checkpatch for some low-hanging fruit.
-
-> > > - we might need to opt in to TBI with a prctl()
+> > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+> > ---
+> >  Documentation/virtual/kvm/devices/vcpu.txt |  28 ++++
+> >  arch/arm64/include/asm/kvm_host.h          |   2 +-
+> >  arch/arm64/include/uapi/asm/kvm.h          |   4 +
+> >  arch/arm64/kvm/Makefile                    |   1 +
+> >  arch/arm64/kvm/guest.c                     |   9 ++
+> >  arch/arm64/kvm/reset.c                     |   3 +
+> >  include/kvm/arm_spe.h                      |  35 +++++
+> >  include/uapi/linux/kvm.h                   |   1 +
+> >  virt/kvm/arm/arm.c                         |   1 +
+> >  virt/kvm/arm/spe.c                         | 163 +++++++++++++++++++++
+> >  10 files changed, 246 insertions(+), 1 deletion(-)
+> >  create mode 100644 virt/kvm/arm/spe.c
 > > 
-> > Yes, although still up for discussion.
+> > diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
+> > index 2b5dab16c4f2..d1ece488aeee 100644
+> > --- a/Documentation/virtual/kvm/devices/vcpu.txt
+> > +++ b/Documentation/virtual/kvm/devices/vcpu.txt
+> > @@ -60,3 +60,31 @@ time to use the number provided for a given timer, overwriting any previously
+> >  configured values on other VCPUs.  Userspace should configure the interrupt
+> >  numbers on at least one VCPU after creating all VCPUs and before running any
+> >  VCPUs.
+> > +
+> > +3. GROUP: KVM_ARM_VCPU_SPE_V1_CTRL
+> > +Architectures: ARM64
+> > +
+> > +1.1. ATTRIBUTE: KVM_ARM_VCPU_SPE_V1_IRQ
+> > +Parameters: in kvm_device_attr.addr the address for SPE buffer overflow interrupt
+> > +	    is a pointer to an int
+> > +Returns: -EBUSY: The SPE overflow interrupt is already set
+> > +         -ENXIO: The overflow interrupt not set when attempting to get it
+> > +         -ENODEV: SPEv1 not supported
+> > +         -EINVAL: Invalid SPE overflow interrupt number supplied or
+> > +                  trying to set the IRQ number without using an in-kernel
+> > +                  irqchip.
+> > +
+> > +A value describing the SPEv1 (Statistical Profiling Extension v1) overflow
+> > +interrupt number for this vcpu. This interrupt should be PPI and the interrupt
+> > +type and number must be same for each vcpu.
+> > +
+> > +1.2 ATTRIBUTE: KVM_ARM_VCPU_SPE_V1_INIT
+> > +Parameters: no additional parameter in kvm_device_attr.addr
+> > +Returns: -ENODEV: SPEv1 not supported or GIC not initialized
+> > +         -ENXIO: SPEv1 not properly configured or in-kernel irqchip not
+> > +                 configured as required prior to calling this attribute
+> > +         -EBUSY: SPEv1 already initialized
+> > +
+> > +Request the initialization of the SPEv1.  If using the SPEv1 with an in-kernel
+> > +virtual GIC implementation, this must be done after initializing the in-kernel
+> > +irqchip.
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 6921fdfd477b..fc4ead0774b3 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -50,7 +50,7 @@
+> >  
+> >  #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+> >  
+> > -#define KVM_VCPU_MAX_FEATURES 7
+> > +#define KVM_VCPU_MAX_FEATURES 8
+> >  
+> >  #define KVM_REQ_SLEEP \
+> >  	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> > index 7b7ac0f6cec9..4c9e168de896 100644
+> > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > @@ -106,6 +106,7 @@ struct kvm_regs {
+> >  #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
+> >  #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
+> >  #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
+> > +#define KVM_ARM_VCPU_SPE_V1		7 /* Support guest SPEv1 */
+> >  
+> >  struct kvm_vcpu_init {
+> >  	__u32 target;
+> > @@ -306,6 +307,9 @@ struct kvm_vcpu_events {
+> >  #define KVM_ARM_VCPU_TIMER_CTRL		1
+> >  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
+> >  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+> > +#define KVM_ARM_VCPU_SPE_V1_CTRL	2
+> > +#define   KVM_ARM_VCPU_SPE_V1_IRQ	0
+> > +#define   KVM_ARM_VCPU_SPE_V1_INIT	1
+> >  
+> >  /* KVM_IRQ_LINE irq field index values */
+> >  #define KVM_ARM_IRQ_TYPE_SHIFT		24
+> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> > index 3ac1a64d2fb9..1ba6154dd8e1 100644
+> > --- a/arch/arm64/kvm/Makefile
+> > +++ b/arch/arm64/kvm/Makefile
+> > @@ -35,3 +35,4 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-debug.o
+> >  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/irqchip.o
+> >  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+> >  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
+> > +kvm-$(CONFIG_KVM_ARM_SPE) += $(KVM)/arm/spe.o
+> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > index 3ae2f82fca46..02c28a7eb332 100644
+> > --- a/arch/arm64/kvm/guest.c
+> > +++ b/arch/arm64/kvm/guest.c
+> > @@ -848,6 +848,9 @@ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+> >  	case KVM_ARM_VCPU_TIMER_CTRL:
+> >  		ret = kvm_arm_timer_set_attr(vcpu, attr);
+> >  		break;
+> > +	case KVM_ARM_VCPU_SPE_V1_CTRL:
+> > +		ret = kvm_arm_spe_v1_set_attr(vcpu, attr);
+> > +		break;
+> >  	default:
+> >  		ret = -ENXIO;
+> >  		break;
+> > @@ -868,6 +871,9 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+> >  	case KVM_ARM_VCPU_TIMER_CTRL:
+> >  		ret = kvm_arm_timer_get_attr(vcpu, attr);
+> >  		break;
+> > +	case KVM_ARM_VCPU_SPE_V1_CTRL:
+> > +		ret = kvm_arm_spe_v1_get_attr(vcpu, attr);
+> > +		break;
+> >  	default:
+> >  		ret = -ENXIO;
+> >  		break;
+> > @@ -888,6 +894,9 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+> >  	case KVM_ARM_VCPU_TIMER_CTRL:
+> >  		ret = kvm_arm_timer_has_attr(vcpu, attr);
+> >  		break;
+> > +	case KVM_ARM_VCPU_SPE_V1_CTRL:
+> > +		ret = kvm_arm_spe_v1_has_attr(vcpu, attr);
+> > +		break;
+> >  	default:
+> >  		ret = -ENXIO;
+> >  		break;
+> > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> > index 1140b4485575..33ce5248613e 100644
+> > --- a/arch/arm64/kvm/reset.c
+> > +++ b/arch/arm64/kvm/reset.c
+> > @@ -91,6 +91,9 @@ int kvm_arch_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> >  	case KVM_CAP_ARM_INJECT_SERROR_ESR:
+> >  		r = cpus_have_const_cap(ARM64_HAS_RAS_EXTN);
+> >  		break;
+> > +	case KVM_CAP_ARM_SPE_V1:
+> > +		r = kvm_arm_support_spe_v1();
+> > +		break;
+> >  	case KVM_CAP_SET_GUEST_DEBUG:
+> >  	case KVM_CAP_VCPU_ATTRIBUTES:
+> >  		r = 1;
+> > diff --git a/include/kvm/arm_spe.h b/include/kvm/arm_spe.h
+> > index fdcb0df1e0fd..8c2e8f10a965 100644
+> > --- a/include/kvm/arm_spe.h
+> > +++ b/include/kvm/arm_spe.h
+> > @@ -19,6 +19,9 @@ struct kvm_spe {
+> >  #ifdef CONFIG_KVM_ARM_SPE
+> >  
+> >  #define kvm_arm_spe_v1_ready(v)		((v)->arch.spe.ready)
+> > +#define kvm_arm_spe_irq_initialized(v)		\
+> > +	((v)->arch.spe.irq >= VGIC_NR_SGIS &&	\
+> > +	(v)->arch.spe.irq <= VGIC_MAX_PRIVATE)
+> >  
+> >  static inline bool kvm_arm_support_spe_v1(void)
+> >  {
+> > @@ -27,10 +30,42 @@ static inline bool kvm_arm_support_spe_v1(void)
+> >  	return !!cpuid_feature_extract_unsigned_field(dfr0,
+> >  						      ID_AA64DFR0_PMSVER_SHIFT);
+> >  }
+> > +
+> > +int kvm_arm_spe_v1_set_attr(struct kvm_vcpu *vcpu,
+> > +			    struct kvm_device_attr *attr);
+> > +int kvm_arm_spe_v1_get_attr(struct kvm_vcpu *vcpu,
+> > +			    struct kvm_device_attr *attr);
+> > +int kvm_arm_spe_v1_has_attr(struct kvm_vcpu *vcpu,
+> > +			    struct kvm_device_attr *attr);
+> > +int kvm_arm_spe_v1_enable(struct kvm_vcpu *vcpu);
+> >  #else
+> >  
+> >  #define kvm_arm_spe_v1_ready(v)		(false)
+> >  #define kvm_arm_support_spe_v1()	(false)
+> > +#define kvm_arm_spe_irq_initialized(v)	(false)
+> > +
+> > +static inline int kvm_arm_spe_v1_set_attr(struct kvm_vcpu *vcpu,
+> > +					  struct kvm_device_attr *attr)
+> > +{
+> > +	return -ENXIO;
+> > +}
+> > +
+> > +static inline int kvm_arm_spe_v1_get_attr(struct kvm_vcpu *vcpu,
+> > +					  struct kvm_device_attr *attr)
+> > +{
+> > +	return -ENXIO;
+> > +}
+> > +
+> > +static inline int kvm_arm_spe_v1_has_attr(struct kvm_vcpu *vcpu,
+> > +					  struct kvm_device_attr *attr)
+> > +{
+> > +	return -ENXIO;
+> > +}
+> > +
+> > +static inline int kvm_arm_spe_v1_enable(struct kvm_vcpu *vcpu)
+> > +{
+> > +	return 0;
+> > +}
+> >  #endif /* CONFIG_KVM_ARM_SPE */
+> >  
+> >  #endif /* __ASM_ARM_KVM_SPE_H */
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index 2fe12b40d503..698bcc2f96e3 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -993,6 +993,7 @@ struct kvm_ppc_resize_hpt {
+> >  #define KVM_CAP_ARM_SVE 170
+> >  #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
+> >  #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
+> > +#define KVM_CAP_ARM_SPE_V1 173
+> >  
+> >  #ifdef KVM_CAP_IRQ_ROUTING
+> >  
+> > diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> > index 90cedebaeb94..c5b711ef1cf8 100644
+> > --- a/virt/kvm/arm/arm.c
+> > +++ b/virt/kvm/arm/arm.c
+> > @@ -34,6 +34,7 @@
+> >  #include <trace/events/kvm.h>
+> >  #include <kvm/arm_pmu.h>
+> >  #include <kvm/arm_psci.h>
+> > +#include <kvm/arm_spe.h>
+> >  
+> >  #define CREATE_TRACE_POINTS
+> >  #include "trace.h"
+> > diff --git a/virt/kvm/arm/spe.c b/virt/kvm/arm/spe.c
+> > new file mode 100644
+> > index 000000000000..87f02ed92426
+> > --- /dev/null
+> > +++ b/virt/kvm/arm/spe.c
+> > @@ -0,0 +1,163 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * Copyright (C) 2018 ARM Ltd.
+> > + */
+> > +
+> > +#include <linux/cpu.h>
+> > +#include <linux/kvm.h>
+> > +#include <linux/kvm_host.h>
+> > +#include <linux/uaccess.h>
+> > +#include <asm/kvm_emulate.h>
+> > +#include <kvm/arm_spe.h>
+> > +#include <kvm/arm_vgic.h>
+> > +
+> > +int kvm_arm_spe_v1_enable(struct kvm_vcpu *vcpu)
+> > +{
+> > +	if (!vcpu->arch.spe.created)
+> > +		return 0;
+> > +
+> > +	/*
+> > +	 * A valid interrupt configuration for the SPE is either to have a
+> > +	 * properly configured interrupt number and using an in-kernel irqchip.
+> > +	 */
+> > +	if (irqchip_in_kernel(vcpu->kvm)) {
+> > +		int irq = vcpu->arch.spe.irq;
+> > +
+> > +		if (!kvm_arm_spe_irq_initialized(vcpu))
+> > +			return -EINVAL;
+> > +
+> > +		if (!irq_is_ppi(irq))
+> > +			return -EINVAL;
+> > +	}
+> > +
+> > +	vcpu->arch.spe.ready = true;
 > 
-> I think I've talked myself out of it. I say boot param only! :)
+> I don't think we should entertain the idea of using SPE without an
+> in-kernel irqchip, nor on systems that do not have a GIC.
+>
 
-I hope I talked you in again ;). I don't see TBI as improving kernel
-security.
+I agree, but sorry I didn't realise that this infrastructure is just
+to deal with those scenario. I assume these in place for sanity check
+the details we get from DT/ACPI. My assumption is completely wrong I
+suppose.
 
-> So what do you say to these next steps:
-> 
-> - change untagged_addr() to use a static branch that is controlled with
->   a boot parameter.
+> But there is a more fundamental issue here: I do not see how the SPE
+> interrupt get injected in the guest. I've gone through the series twice,
+> and I can't see how we go from a physical interrupt triggered by the HW
+> on the host to a virtual interrupt injected in the guest.
+>
 
-access_ok() as well.
+I haven't been able to trigger error/overflow interrupt from the guest
+so far on the models. I initial started taking PMU KVM implementation
+as reference and soon realised it is quite different. IIUC, we don't
+need to inject the interrupt and KVM takes care to set the corresponding
+virtual INTID to the pending state on vCPU.
 
-> - add, say, Documentation/core-api/user-addresses.rst to describe
->   proper care and handling of user space pointers with untagged_addr(),
->   with examples based on all the cases seen so far in this series.
+--
+Regards,
+Sudeep
 
-We have u64_to_user_ptr(). What about the reverse? And maybe changing
-get_user_pages() to take void __user *.
 
-> - continue work to improve static analysis.
-
-Andrew Murray in the ARM kernel team started revisiting the old sparse
-threads, let's see how it goes.
-
--- 
-Catalin
