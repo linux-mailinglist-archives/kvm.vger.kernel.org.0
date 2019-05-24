@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A0C7A29989
+	by mail.lfdr.de (Postfix) with ESMTP id 3623729988
 	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 15:58:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404055AbfEXN5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S2404059AbfEXN5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Fri, 24 May 2019 09:57:49 -0400
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:60662 "EHLO
+Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:60665 "EHLO
         mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2404045AbfEXN5s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S2403843AbfEXN5s (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 24 May 2019 09:57:48 -0400
 Received: from Internal Mail-Server by MTLPINE2 (envelope-from parav@mellanox.com)
-        with ESMTPS (AES256-SHA encrypted); 24 May 2019 16:57:43 +0300
+        with ESMTPS (AES256-SHA encrypted); 24 May 2019 16:57:45 +0300
 Received: from sw-mtx-036.mtx.labs.mlnx (sw-mtx-036.mtx.labs.mlnx [10.12.150.149])
-        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x4ODvdQs019054;
-        Fri, 24 May 2019 16:57:42 +0300
+        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x4ODvdQt019054;
+        Fri, 24 May 2019 16:57:43 +0300
 From:   Parav Pandit <parav@mellanox.com>
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         cohuck@redhat.com, kwankhede@nvidia.com, alex.williamson@redhat.com
 Cc:     cjia@nvidia.com, parav@mellanox.com
-Subject: [PATCHv4 1/3] vfio/mdev: Improve the create/remove sequence
-Date:   Fri, 24 May 2019 08:57:36 -0500
-Message-Id: <20190524135738.54862-2-parav@mellanox.com>
+Subject: [PATCHv4 2/3] vfio/mdev: Avoid creating sysfs remove file on stale device removal
+Date:   Fri, 24 May 2019 08:57:37 -0500
+Message-Id: <20190524135738.54862-3-parav@mellanox.com>
 X-Mailer: git-send-email 2.19.2
 In-Reply-To: <20190524135738.54862-1-parav@mellanox.com>
 References: <20190524135738.54862-1-parav@mellanox.com>
@@ -33,50 +33,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch addresses below two issues and prepares the code to address
-3rd issue listed below.
+If device is removal is initiated by two threads as below, mdev core
+attempts to create a syfs remove file on stale device.
+During this flow, below [1] call trace is observed.
 
-1. mdev device is placed on the mdev bus before it is created in the
-vendor driver. Once a device is placed on the mdev bus without creating
-its supporting underlying vendor device, mdev driver's probe() gets triggered.
-However there isn't a stable mdev available to work on.
+     cpu-0                                    cpu-1
+     -----                                    -----
+  mdev_unregister_device()
+    device_for_each_child
+       mdev_device_remove_cb
+          mdev_device_remove
+                                       user_syscall
+                                         remove_store()
+                                           mdev_device_remove()
+                                        [..]
+   unregister device();
+                                       /* not found in list or
+                                        * active=false.
+                                        */
+                                          sysfs_create_file()
+                                          ..Call trace
 
-   create_store()
-     mdev_create_device()
-       device_register()
-          ...
-         vfio_mdev_probe()
-        [...]
-        parent->ops->create()
-          vfio_ap_mdev_create()
-            mdev_set_drvdata(mdev, matrix_mdev);
-            /* Valid pointer set above */
+Now that mdev core follows correct device removal system of the linux
+bus model, remove shouldn't fail in normal cases. If it fails, there is
+no point of creating a stale file or checking for specific error status.
 
-Due to this way of initialization, mdev driver who wants to use the mdev,
-doesn't have a valid mdev to work on.
-
-2. Current creation sequence is,
-   parent->ops_create()
-   groups_register()
-
-Remove sequence is,
-   parent->ops->remove()
-   groups_unregister()
-
-However, remove sequence should be exact mirror of creation sequence.
-Once this is achieved, all users of the mdev will be terminated first
-before removing underlying vendor device.
-(Follow standard linux driver model).
-At that point vendor's remove() ops shouldn't fail because taking the
-device off the bus should terminate any usage.
-
-3. When remove operation fails, mdev sysfs removal attempts to add the
-file back on already removed device. Following call trace [1] is observed.
-
-[1] call trace:
-kernel: WARNING: CPU: 2 PID: 9348 at fs/sysfs/file.c:327 sysfs_create_file_ns+0x7f/0x90
-kernel: CPU: 2 PID: 9348 Comm: bash Kdump: loaded Not tainted 5.1.0-rc6-vdevbus+ #6
-kernel: Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS 2.0b 08/09/2016
+kernel: WARNING: CPU: 2 PID: 9348 at fs/sysfs/file.c:327
+sysfs_create_file_ns+0x7f/0x90
+kernel: CPU: 2 PID: 9348 Comm: bash Kdump: loaded Not tainted
+5.1.0-rc6-vdevbus+ #6
+kernel: Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS 2.0b
+08/09/2016
 kernel: RIP: 0010:sysfs_create_file_ns+0x7f/0x90
 kernel: Call Trace:
 kernel: remove_store+0xdc/0x100 [mdev]
@@ -86,231 +73,27 @@ kernel: ksys_write+0x5a/0xe0
 kernel: do_syscall_64+0x5a/0x210
 kernel: entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
-Therefore, mdev core is improved in following ways.
-
-1. Split the device registration/deregistration sequence so that some
-things can be done between initialization of the device and
-hooking it up to the bus respectively after deregistering it
-from the bus but before giving up our final reference.
-In particular, this means invoking the ->create and ->remove
-callbacks in those new windows. This gives the vendor driver an
-initialized mdev device to work with during creation.
-At the same time, a bus driver who wish to bind to mdev driver also
-gets initialized mdev device.
-
-This follows standard Linux kernel bus and device model.
-
-2. During remove flow, first remove the device from the bus. This
-ensures that any bus specific devices are removed.
-Once device is taken off the mdev bus, invoke remove() of mdev
-from the vendor driver.
-
-3. The driver core device model provides way to register and auto
-unregister the device sysfs attribute groups at dev->groups.
-Make use of dev->groups to let core create the groups and eliminate
-code to avoid explicit groups creation and removal.
-
-To ensure, that new sequence is solid, a below stack dump of a
-process is taken who attempts to remove the device while device is in
-use by vfio driver and user application.
-This stack dump validates that vfio driver guards against such device
-removal when device is in use.
-
- cat /proc/21962/stack
-[<0>] vfio_del_group_dev+0x216/0x3c0 [vfio]
-[<0>] mdev_remove+0x21/0x40 [mdev]
-[<0>] device_release_driver_internal+0xe8/0x1b0
-[<0>] bus_remove_device+0xf9/0x170
-[<0>] device_del+0x168/0x350
-[<0>] mdev_device_remove_common+0x1d/0x50 [mdev]
-[<0>] mdev_device_remove+0x8c/0xd0 [mdev]
-[<0>] remove_store+0x71/0x90 [mdev]
-[<0>] kernfs_fop_write+0x113/0x1a0
-[<0>] vfs_write+0xad/0x1b0
-[<0>] ksys_write+0x5a/0xe0
-[<0>] do_syscall_64+0x5a/0x210
-[<0>] entry_SYSCALL_64_after_hwframe+0x49/0xbe
-[<0>] 0xffffffffffffffff
-
-This prepares the code to eliminate calling device_create_file() in
-subsequent patch.
-
 Signed-off-by: Parav Pandit <parav@mellanox.com>
 ---
- drivers/vfio/mdev/mdev_core.c    | 94 +++++++++-----------------------
- drivers/vfio/mdev/mdev_private.h |  2 +-
- drivers/vfio/mdev/mdev_sysfs.c   |  2 +-
- 3 files changed, 27 insertions(+), 71 deletions(-)
+ drivers/vfio/mdev/mdev_sysfs.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index 3cc1a05fde1c..0bef0cae1d4b 100644
---- a/drivers/vfio/mdev/mdev_core.c
-+++ b/drivers/vfio/mdev/mdev_core.c
-@@ -102,55 +102,10 @@ static void mdev_put_parent(struct mdev_parent *parent)
- 		kref_put(&parent->ref, mdev_release_parent);
- }
- 
--static int mdev_device_create_ops(struct kobject *kobj,
--				  struct mdev_device *mdev)
--{
--	struct mdev_parent *parent = mdev->parent;
--	int ret;
--
--	ret = parent->ops->create(kobj, mdev);
--	if (ret)
--		return ret;
--
--	ret = sysfs_create_groups(&mdev->dev.kobj,
--				  parent->ops->mdev_attr_groups);
--	if (ret)
--		parent->ops->remove(mdev);
--
--	return ret;
--}
--
--/*
-- * mdev_device_remove_ops gets called from sysfs's 'remove' and when parent
-- * device is being unregistered from mdev device framework.
-- * - 'force_remove' is set to 'false' when called from sysfs's 'remove' which
-- *   indicates that if the mdev device is active, used by VMM or userspace
-- *   application, vendor driver could return error then don't remove the device.
-- * - 'force_remove' is set to 'true' when called from mdev_unregister_device()
-- *   which indicate that parent device is being removed from mdev device
-- *   framework so remove mdev device forcefully.
-- */
--static int mdev_device_remove_ops(struct mdev_device *mdev, bool force_remove)
--{
--	struct mdev_parent *parent = mdev->parent;
--	int ret;
--
--	/*
--	 * Vendor driver can return error if VMM or userspace application is
--	 * using this mdev device.
--	 */
--	ret = parent->ops->remove(mdev);
--	if (ret && !force_remove)
--		return ret;
--
--	sysfs_remove_groups(&mdev->dev.kobj, parent->ops->mdev_attr_groups);
--	return 0;
--}
--
- static int mdev_device_remove_cb(struct device *dev, void *data)
- {
- 	if (dev_is_mdev(dev))
--		mdev_device_remove(dev, true);
-+		mdev_device_remove(dev);
- 
- 	return 0;
- }
-@@ -310,41 +265,43 @@ int mdev_device_create(struct kobject *kobj,
- 
- 	mdev->parent = parent;
- 
-+	device_initialize(&mdev->dev);
- 	mdev->dev.parent  = dev;
- 	mdev->dev.bus     = &mdev_bus_type;
- 	mdev->dev.release = mdev_device_release;
- 	dev_set_name(&mdev->dev, "%pUl", uuid);
-+	mdev->dev.groups = parent->ops->mdev_attr_groups;
-+	mdev->type_kobj = kobj;
- 
--	ret = device_register(&mdev->dev);
--	if (ret) {
--		put_device(&mdev->dev);
--		goto mdev_fail;
--	}
-+	ret = parent->ops->create(kobj, mdev);
-+	if (ret)
-+		goto ops_create_fail;
- 
--	ret = mdev_device_create_ops(kobj, mdev);
-+	ret = device_add(&mdev->dev);
- 	if (ret)
--		goto create_fail;
-+		goto add_fail;
- 
- 	ret = mdev_create_sysfs_files(&mdev->dev, type);
--	if (ret) {
--		mdev_device_remove_ops(mdev, true);
--		goto create_fail;
--	}
-+	if (ret)
-+		goto sysfs_fail;
- 
--	mdev->type_kobj = kobj;
- 	mdev->active = true;
- 	dev_dbg(&mdev->dev, "MDEV: created\n");
- 
- 	return 0;
- 
--create_fail:
--	device_unregister(&mdev->dev);
-+sysfs_fail:
-+	device_del(&mdev->dev);
-+add_fail:
-+	parent->ops->remove(mdev);
-+ops_create_fail:
-+	put_device(&mdev->dev);
- mdev_fail:
- 	mdev_put_parent(parent);
- 	return ret;
- }
- 
--int mdev_device_remove(struct device *dev, bool force_remove)
-+int mdev_device_remove(struct device *dev)
- {
- 	struct mdev_device *mdev, *tmp;
- 	struct mdev_parent *parent;
-@@ -373,16 +330,15 @@ int mdev_device_remove(struct device *dev, bool force_remove)
- 	mutex_unlock(&mdev_list_lock);
- 
- 	type = to_mdev_type(mdev->type_kobj);
-+	mdev_remove_sysfs_files(dev, type);
-+	device_del(&mdev->dev);
- 	parent = mdev->parent;
-+	ret = parent->ops->remove(mdev);
-+	if (ret)
-+		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
- 
--	ret = mdev_device_remove_ops(mdev, force_remove);
--	if (ret) {
--		mdev->active = true;
--		return ret;
--	}
--
--	mdev_remove_sysfs_files(dev, type);
--	device_unregister(dev);
-+	/* Balances with device_initialize() */
-+	put_device(&mdev->dev);
- 	mdev_put_parent(parent);
- 
- 	return 0;
-diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
-index 36cbbdb754de..924ed2274941 100644
---- a/drivers/vfio/mdev/mdev_private.h
-+++ b/drivers/vfio/mdev/mdev_private.h
-@@ -60,6 +60,6 @@ void mdev_remove_sysfs_files(struct device *dev, struct mdev_type *type);
- 
- int  mdev_device_create(struct kobject *kobj,
- 			struct device *dev, const guid_t *uuid);
--int  mdev_device_remove(struct device *dev, bool force_remove);
-+int  mdev_device_remove(struct device *dev);
- 
- #endif /* MDEV_PRIVATE_H */
 diff --git a/drivers/vfio/mdev/mdev_sysfs.c b/drivers/vfio/mdev/mdev_sysfs.c
-index cbf94b8165ea..9f774b91d275 100644
+index 9f774b91d275..ffa3dcebf201 100644
 --- a/drivers/vfio/mdev/mdev_sysfs.c
 +++ b/drivers/vfio/mdev/mdev_sysfs.c
-@@ -236,7 +236,7 @@ static ssize_t remove_store(struct device *dev, struct device_attribute *attr,
- 	if (val && device_remove_file_self(dev, attr)) {
+@@ -237,10 +237,8 @@ static ssize_t remove_store(struct device *dev, struct device_attribute *attr,
  		int ret;
  
--		ret = mdev_device_remove(dev, false);
-+		ret = mdev_device_remove(dev);
- 		if (ret) {
- 			device_create_file(dev, attr);
+ 		ret = mdev_device_remove(dev);
+-		if (ret) {
+-			device_create_file(dev, attr);
++		if (ret)
  			return ret;
+-		}
+ 	}
+ 
+ 	return count;
 -- 
 2.19.2
 
