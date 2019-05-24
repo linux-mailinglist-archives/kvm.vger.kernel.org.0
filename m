@@ -2,216 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EF48F29E4B
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 20:46:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 411F729ED0
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 21:07:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729552AbfEXSqF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 May 2019 14:46:05 -0400
-Received: from mail-eopbgr60075.outbound.protection.outlook.com ([40.107.6.75]:48704
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727465AbfEXSqF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 May 2019 14:46:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5wYJRfdiAAsqY7L89a4YQiMnznmrEeASmH74QKvkOQ0=;
- b=Q650k94yVMokFJN4u7Au8g4A1Pselg93rgeFKWjtKUIHnIq4sj+rsi04mnNfryqppiKCD2LjnyDY47wsZUXyKx2nqOFoEC9Ka94NbzNvbVVD3bC+HlrYz4jOCU/ESQo6VUuIdvUPCk26iKdB1atbkWYwZTTWGl1KoQuWngqT7HM=
-Received: from VI1PR0501MB2271.eurprd05.prod.outlook.com (10.169.134.149) by
- VI1PR0501MB2413.eurprd05.prod.outlook.com (10.168.134.17) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1922.16; Fri, 24 May 2019 18:45:57 +0000
-Received: from VI1PR0501MB2271.eurprd05.prod.outlook.com
- ([fe80::a0a7:7e01:762e:58e0]) by VI1PR0501MB2271.eurprd05.prod.outlook.com
- ([fe80::a0a7:7e01:762e:58e0%6]) with mapi id 15.20.1900.020; Fri, 24 May 2019
- 18:45:57 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>
-Subject: RE: [PATCHv3 1/3] vfio/mdev: Improve the create/remove sequence
-Thread-Topic: [PATCHv3 1/3] vfio/mdev: Improve the create/remove sequence
-Thread-Index: AQHVDD9o/mxSVG1oh0uHfLZmDCQyjKZ28DqAgAO4otA=
-Date:   Fri, 24 May 2019 18:45:57 +0000
-Message-ID: <VI1PR0501MB22718C46D1D3EF0DB97D4DF4D1020@VI1PR0501MB2271.eurprd05.prod.outlook.com>
-References: <20190516233034.16407-1-parav@mellanox.com>
-        <20190516233034.16407-2-parav@mellanox.com>
- <20190522115435.677b457c.cohuck@redhat.com>
-In-Reply-To: <20190522115435.677b457c.cohuck@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [122.172.180.107]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: fba3a6a9-3e24-4be8-bf54-08d6e0780f35
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:VI1PR0501MB2413;
-x-ms-traffictypediagnostic: VI1PR0501MB2413:
-x-microsoft-antispam-prvs: <VI1PR0501MB24136734833A4AEFA209C453D1020@VI1PR0501MB2413.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 0047BC5ADE
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(136003)(396003)(39850400004)(376002)(366004)(13464003)(189003)(199004)(4326008)(316002)(305945005)(25786009)(6246003)(53936002)(6116002)(3846002)(2906002)(14454004)(229853002)(55236004)(6506007)(102836004)(76176011)(99286004)(7696005)(54906003)(53546011)(66066001)(26005)(33656002)(478600001)(476003)(66476007)(66556008)(73956011)(7736002)(9686003)(71190400001)(71200400001)(81166006)(81156014)(66446008)(186003)(8676002)(86362001)(8936002)(446003)(6436002)(76116006)(486006)(68736007)(55016002)(66946007)(256004)(14444005)(74316002)(52536014)(6916009)(64756008)(5660300002)(11346002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0501MB2413;H:VI1PR0501MB2271.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: QCrmldt/CQ3Undw/8KoqPX2MRnV8c2ctZMMnSkYD90iTjY9Hhy4oZF8p7ddAbmKdl3Ffx7HSxZswQqkOZEbiZt0l1Md39uzUcLYZqRwA/T157n/Gtn80zmVOdeoiU+N57rpIcAIdECsKVWokgC02AADOGehMOryoadJHQ2y/+7FfKCLmHKjXsEcBaY8xvzWfsT1H7yOS67odV+bJ7uE4ZNL0g/WtBzIJArRRWAJAtSYtnRaLyfs7j9iKZ515tFTwy8qckaAQXhqGvJs1EzJ6/JYa630zD/GBCnZVjVZs+YnGJR93ShRq34dJNM8ma238Z4oXxrLjxL8FZUxgyIF+h0nJ2qukwLOcD86ssi8/E8dagqgMI/WQJ0gDyKxX1cqPFo/Pi08eqAg693YvyIfdZouSlxwlfpJjcNH9gUq+18M=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S2391372AbfEXTH0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 May 2019 15:07:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42374 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727115AbfEXTH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 May 2019 15:07:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E374A83F40;
+        Fri, 24 May 2019 19:07:25 +0000 (UTC)
+Received: from [10.36.116.21] (ovpn-116-21.ams2.redhat.com [10.36.116.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C9A9F5C1B4;
+        Fri, 24 May 2019 19:07:23 +0000 (UTC)
+Subject: Re: [PATCH] KVM: selftests: enable pgste option for the linker on
+ s390
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        linux-kselftest@vger.kernel.org,
+        linux-s390 <linux-s390@vger.kernel.org>
+References: <20190523164309.13345-1-thuth@redhat.com>
+ <20190524103301.87017-1-borntraeger@de.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <be868d7d-0d18-6827-6f8a-3ef473db183d@redhat.com>
+Date:   Fri, 24 May 2019 21:07:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fba3a6a9-3e24-4be8-bf54-08d6e0780f35
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 May 2019 18:45:57.3920
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0501MB2413
+In-Reply-To: <20190524103301.87017-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Fri, 24 May 2019 19:07:26 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex, Cornelia,
+On 24.05.19 12:33, Christian Borntraeger wrote:
+> To avoid testcase failures we need to enable the pgstes. This can be
+> done with /proc/sys/vm/allocate_pgste or with a linker option that
+> creates an  S390_PGSTE program header.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  tools/testing/selftests/kvm/Makefile | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index aef5bd1166cf..4aac14c1919f 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -44,7 +44,10 @@ CFLAGS += -O2 -g -std=gnu99 -fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE
+>  no-pie-option := $(call try-run, echo 'int main() { return 0; }' | \
+>          $(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
+>  
+> -LDFLAGS += -pthread $(no-pie-option)
+> +# On s390, build the testcases KVM-enabled
+> +pgste-option := $(call cc-ldoption, -Wl$(comma)--s390-pgste)
+> +
+> +LDFLAGS += -pthread $(no-pie-option) $(pgste-option)
+>  
+>  # After inclusion, $(OUTPUT) is defined and
+>  # $(TEST_GEN_PROGS) starts with $(OUTPUT)/
+> 
 
-> -----Original Message-----
-> From: Cornelia Huck <cohuck@redhat.com>
-> Sent: Wednesday, May 22, 2019 3:25 PM
-> To: Parav Pandit <parav@mellanox.com>
-> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> kwankhede@nvidia.com; alex.williamson@redhat.com; cjia@nvidia.com
-> Subject: Re: [PATCHv3 1/3] vfio/mdev: Improve the create/remove sequence
->=20
-> On Thu, 16 May 2019 18:30:32 -0500
-> Parav Pandit <parav@mellanox.com> wrote:
->=20
-> > This patch addresses below two issues and prepares the code to address
-> > 3rd issue listed below.
-> >
-> > 1. mdev device is placed on the mdev bus before it is created in the
-> > vendor driver. Once a device is placed on the mdev bus without
-> > creating its supporting underlying vendor device, mdev driver's probe()
-> gets triggered.
-> > However there isn't a stable mdev available to work on.
-> >
-> >    create_store()
-> >      mdev_create_device()
-> >        device_register()
-> >           ...
-> >          vfio_mdev_probe()
-> >         [...]
-> >         parent->ops->create()
-> >           vfio_ap_mdev_create()
-> >             mdev_set_drvdata(mdev, matrix_mdev);
-> >             /* Valid pointer set above */
-> >
-> > Due to this way of initialization, mdev driver who wants to use the
-> > mdev, doesn't have a valid mdev to work on.
-> >
-> > 2. Current creation sequence is,
-> >    parent->ops_create()
-> >    groups_register()
-> >
-> > Remove sequence is,
-> >    parent->ops->remove()
-> >    groups_unregister()
-> >
-> > However, remove sequence should be exact mirror of creation sequence.
-> > Once this is achieved, all users of the mdev will be terminated first
-> > before removing underlying vendor device.
-> > (Follow standard linux driver model).
-> > At that point vendor's remove() ops shouldn't fail because taking the
-> > device off the bus should terminate any usage.
-> >
-> > 3. When remove operation fails, mdev sysfs removal attempts to add the
-> > file back on already removed device. Following call trace [1] is observ=
-ed.
-> >
-> > [1] call trace:
-> > kernel: WARNING: CPU: 2 PID: 9348 at fs/sysfs/file.c:327
-> > sysfs_create_file_ns+0x7f/0x90
-> > kernel: CPU: 2 PID: 9348 Comm: bash Kdump: loaded Not tainted
-> > 5.1.0-rc6-vdevbus+ #6
-> > kernel: Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS 2.0b
-> > 08/09/2016
-> > kernel: RIP: 0010:sysfs_create_file_ns+0x7f/0x90
-> > kernel: Call Trace:
-> > kernel: remove_store+0xdc/0x100 [mdev]
-> > kernel: kernfs_fop_write+0x113/0x1a0
-> > kernel: vfs_write+0xad/0x1b0
-> > kernel: ksys_write+0x5a/0xe0
-> > kernel: do_syscall_64+0x5a/0x210
-> > kernel: entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> >
-> > Therefore, mdev core is improved in following ways.
-> >
-> > 1. Split the device registration/deregistration sequence so that some
-> > things can be done between initialization of the device and hooking it
-> > up to the bus respectively after deregistering it from the bus but
-> > before giving up our final reference.
-> > In particular, this means invoking the ->create and ->remove callbacks
-> > in those new windows. This gives the vendor driver an initialized mdev
-> > device to work with during creation.
-> > At the same time, a bus driver who wish to bind to mdev driver also
->=20
-> s/who wish/that wishes/
->=20
-> > gets initialized mdev device.
-> >
-> > This follows standard Linux kernel bus and device model.
-> >
-> > 2. During remove flow, first remove the device from the bus. This
-> > ensures that any bus specific devices are removed.
-> > Once device is taken off the mdev bus, invoke remove() of mdev from
-> > the vendor driver.
-> >
-> > 3. The driver core device model provides way to register and auto
-> > unregister the device sysfs attribute groups at dev->groups.
-> > Make use of dev->groups to let core create the groups and eliminate
-> > code to avoid explicit groups creation and removal.
-> >
-> > To ensure, that new sequence is solid, a below stack dump of a process
-> > is taken who attempts to remove the device while device is in use by
-> > vfio driver and user application.
-> > This stack dump validates that vfio driver guards against such device
-> > removal when device is in use.
-> >
-> >  cat /proc/21962/stack
-> > [<0>] vfio_del_group_dev+0x216/0x3c0 [vfio] [<0>]
-> > mdev_remove+0x21/0x40 [mdev] [<0>]
-> > device_release_driver_internal+0xe8/0x1b0
-> > [<0>] bus_remove_device+0xf9/0x170
-> > [<0>] device_del+0x168/0x350
-> > [<0>] mdev_device_remove_common+0x1d/0x50 [mdev] [<0>]
-> > mdev_device_remove+0x8c/0xd0 [mdev] [<0>] remove_store+0x71/0x90
-> > [mdev] [<0>] kernfs_fop_write+0x113/0x1a0 [<0>] vfs_write+0xad/0x1b0
-> > [<0>] ksys_write+0x5a/0xe0 [<0>] do_syscall_64+0x5a/0x210 [<0>]
-> > entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> > [<0>] 0xffffffffffffffff
-> >
-> > This prepares the code to eliminate calling device_create_file() in
-> > subsquent patch.
-> >
-> > Signed-off-by: Parav Pandit <parav@mellanox.com>
-> > ---
-> >  drivers/vfio/mdev/mdev_core.c    | 94 +++++++++-----------------------
-> >  drivers/vfio/mdev/mdev_private.h |  2 +-
-> >  drivers/vfio/mdev/mdev_sysfs.c   |  2 +-
-> >  3 files changed, 27 insertions(+), 71 deletions(-)
->=20
-> Personally, I'd do a more compact patch description, but there's nothing
-> really wrong with yours, either.
->=20
-> Patch also seems sane to me, although I'd probably have merged this and
-> the next patch. But no reason to quibble further.
->=20
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-I missed to add your RB signature in v4.
-If you send all 3 or just fist 2 of them in 5.2-rc, please include Cornelia=
-'s RB tag.
+-- 
+
+Thanks,
+
+David / dhildenb
