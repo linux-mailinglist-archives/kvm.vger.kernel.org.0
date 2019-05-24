@@ -2,135 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 750C2299BD
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 16:06:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5F9B299CF
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 16:12:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404027AbfEXOGe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 May 2019 10:06:34 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36594 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2403843AbfEXOGe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 May 2019 10:06:34 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4OE2nUc048143
-        for <kvm@vger.kernel.org>; Fri, 24 May 2019 10:06:33 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2spgst4m1c-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 24 May 2019 10:06:32 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Fri, 24 May 2019 15:06:29 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 24 May 2019 15:06:25 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4OE6O5437683430
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 May 2019 14:06:24 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9F2D6A4060;
-        Fri, 24 May 2019 14:06:24 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 89287A4066;
-        Fri, 24 May 2019 14:06:24 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri, 24 May 2019 14:06:24 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id 42969E0268; Fri, 24 May 2019 16:06:24 +0200 (CEST)
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Janosch Frank <frankja@linux.vnet.ibm.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        linux-kselftest@vger.kernel.org,
-        linux-s390 <linux-s390@vger.kernel.org>
-Subject: [PATCH] KVM: s390: fix memory slot handling for KVM_SET_USER_MEMORY_REGION
-Date:   Fri, 24 May 2019 16:06:23 +0200
-X-Mailer: git-send-email 2.21.0
+        id S2403932AbfEXOM1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 May 2019 10:12:27 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:43846 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2403864AbfEXOM0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 May 2019 10:12:26 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E549BA78;
+        Fri, 24 May 2019 07:12:25 -0700 (PDT)
+Received: from e107155-lin (e107155-lin.cambridge.arm.com [10.1.196.42])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CFD8C3F575;
+        Fri, 24 May 2019 07:12:23 -0700 (PDT)
+Date:   Fri, 24 May 2019 15:12:18 +0100
+From:   Sudeep Holla <sudeep.holla@arm.com>
+To:     Julien Thierry <julien.thierry@arm.com>
+Cc:     kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Pouloze <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v2 05/15] arm64: KVM: add access handler for SPE system
+ registers
+Message-ID: <20190524141218.GA29406@e107155-lin>
+References: <20190523103502.25925-1-sudeep.holla@arm.com>
+ <20190523103502.25925-6-sudeep.holla@arm.com>
+ <c45323a8-92e4-e406-381b-2084e222a870@arm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19052414-0020-0000-0000-00000340081F
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052414-0021-0000-0000-00002192F7F1
-Message-Id: <20190524140623.104033-1-borntraeger@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-24_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=614 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905240095
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c45323a8-92e4-e406-381b-2084e222a870@arm.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kselftests exposed a problem in the s390 handling for memory slots.
-Right now we only do proper memory slot handling for creation of new
-memory slots. Neither MOVE, nor DELETION are handled properly. Let us
-implement those.
+On Fri, May 24, 2019 at 12:36:24PM +0100, Julien Thierry wrote:
+> Hi Sudeep,
+> 
+> On 23/05/2019 11:34, Sudeep Holla wrote:
+> > SPE Profiling Buffer owning EL is configurable and when MDCR_EL2.E2PB
+> > is configured to provide buffer ownership to EL1, the control registers
+> > are trapped.
+> > 
+> > Add access handlers for the Statistical Profiling Extension(SPE)
+> > Profiling Buffer controls registers. This is need to support profiling
+> > using SPE in the guests.
+> > 
+> > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 13 ++++++++++++
+> >  arch/arm64/kvm/sys_regs.c         | 35 +++++++++++++++++++++++++++++++
+> >  include/kvm/arm_spe.h             | 15 +++++++++++++
+> >  3 files changed, 63 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 611a4884fb6c..559aa6931291 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -147,6 +147,19 @@ enum vcpu_sysreg {
+> >  	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
+> >  	DISR_EL1,	/* Deferred Interrupt Status Register */
+> >  
+> > +	/* Statistical Profiling Extension Registers */
+> > +
+> > +	PMSCR_EL1,
+> > +	PMSICR_EL1,
+> > +	PMSIRR_EL1,
+> > +	PMSFCR_EL1,
+> > +	PMSEVFR_EL1,
+> > +	PMSLATFR_EL1,
+> > +	PMSIDR_EL1,
+> > +	PMBLIMITR_EL1,
+> > +	PMBPTR_EL1,
+> > +	PMBSR_EL1,
+> > +
+> >  	/* Performance Monitors Registers */
+> >  	PMCR_EL0,	/* Control Register */
+> >  	PMSELR_EL0,	/* Event Counter Selection Register */
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 857b226bcdde..dbf5056828d3 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -646,6 +646,30 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> >  	__vcpu_sys_reg(vcpu, PMCR_EL0) = val;
+> >  }
+> >  
+> > +static bool access_pmsb_val(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> > +			    const struct sys_reg_desc *r)
+> > +{
+> > +	if (p->is_write)
+> > +		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
+> > +	else
+> > +		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
+> > +
+> > +	return true;
+> > +}
+> > +
+> > +static void reset_pmsb_val(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> > +{
+> > +	if (!kvm_arm_support_spe_v1()) {
+> > +		__vcpu_sys_reg(vcpu, r->reg) = 0;
+> > +		return;
+> > +	}
+> > +
+> > +	if (r->reg == PMSIDR_EL1)
+> 
+> If only PMSIDR_EL1 has a non-zero reset value, it feels a bit weird to
+> share the reset function for all these registers.
+>
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- arch/s390/kvm/kvm-s390.c | 35 +++++++++++++++++++++--------------
- 1 file changed, 21 insertions(+), 14 deletions(-)
+Ah, right. Initially I did have couple of other registers which were not
+needed. So I removed them without observing that I could have just used
+reset_val(0) for all except PMSIDR_EL1.
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 871d2e99b156..6ec0685ab2c7 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4525,21 +4525,28 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				const struct kvm_memory_slot *new,
- 				enum kvm_mr_change change)
- {
--	int rc;
-+	int rc = 0;
- 
--	/* If the basics of the memslot do not change, we do not want
--	 * to update the gmap. Every update causes several unnecessary
--	 * segment translation exceptions. This is usually handled just
--	 * fine by the normal fault handler + gmap, but it will also
--	 * cause faults on the prefix page of running guest CPUs.
--	 */
--	if (old->userspace_addr == mem->userspace_addr &&
--	    old->base_gfn * PAGE_SIZE == mem->guest_phys_addr &&
--	    old->npages * PAGE_SIZE == mem->memory_size)
--		return;
--
--	rc = gmap_map_segment(kvm->arch.gmap, mem->userspace_addr,
--		mem->guest_phys_addr, mem->memory_size);
-+	switch (change) {
-+	case KVM_MR_DELETE:
-+		rc = gmap_unmap_segment(kvm->arch.gmap, old->base_gfn * PAGE_SIZE,
-+					old->npages * PAGE_SIZE);
-+		break;
-+	case KVM_MR_MOVE:
-+		rc = gmap_unmap_segment(kvm->arch.gmap, old->base_gfn * PAGE_SIZE,
-+					old->npages * PAGE_SIZE);
-+		if (rc)
-+			break;
-+		/* FALLTHROUGH */
-+	case KVM_MR_CREATE:
-+		rc = gmap_map_segment(kvm->arch.gmap, mem->userspace_addr,
-+				      mem->guest_phys_addr, mem->memory_size);
-+		break;
-+	case KVM_MR_FLAGS_ONLY:
-+		break;
-+	default:
-+		WARN(1, "Unknown KVM MR CHANGE: %d\n", change);
-+	}
- 	if (rc)
- 		pr_warn("failed to commit memory region\n");
- 	return;
--- 
-2.21.0
+> I would suggest only having a reset_pmsidr() function, and just use
+> reset_val() with sys_reg_desc->val set to 0 for all the others.
+>
 
+Thanks for pointing this out.
+
+--
+Regards,
+Sudeep
