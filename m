@@ -2,363 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D09E529A50
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 16:48:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8EF629B17
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 17:32:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404205AbfEXOsG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 May 2019 10:48:06 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:44516 "EHLO
+        id S2389919AbfEXPcE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 May 2019 11:32:04 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:45342 "EHLO
         foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404199AbfEXOsG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 May 2019 10:48:06 -0400
+        id S2389887AbfEXPcE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 May 2019 11:32:04 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 65D31169E;
-        Fri, 24 May 2019 07:48:05 -0700 (PDT)
-Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9900D3F575;
-        Fri, 24 May 2019 07:48:03 -0700 (PDT)
-From:   Marc Zyngier <marc.zyngier@arm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Julien Thierry <julien.thierry@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Subject: [PATCH 3/3] KVM: arm/arm64: Move cc/it checks under hyp's Makefile to avoid instrumentation
-Date:   Fri, 24 May 2019 15:47:45 +0100
-Message-Id: <20190524144745.227242-4-marc.zyngier@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190524144745.227242-1-marc.zyngier@arm.com>
-References: <20190524144745.227242-1-marc.zyngier@arm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 11F4180D;
+        Fri, 24 May 2019 08:32:03 -0700 (PDT)
+Received: from en101.cambridge.arm.com (en101.cambridge.arm.com [10.1.196.93])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 429663F575;
+        Fri, 24 May 2019 08:32:01 -0700 (PDT)
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+To:     linux-mm@kvack.org
+Cc:     mgorman@techsingularity.net, akpm@linux-foundation.org,
+        mhocko@suse.com, cai@lca.pw, linux-kernel@vger.kernel.org,
+        marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, suzuki.poulose@arm.com
+Subject: [PATCH] mm, compaction: Make sure we isolate a valid PFN
+Date:   Fri, 24 May 2019 16:31:48 +0100
+Message-Id: <1558711908-15688-1-git-send-email-suzuki.poulose@arm.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <20190524103924.GN18914@techsingularity.net>
+References: <20190524103924.GN18914@techsingularity.net>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: James Morse <james.morse@arm.com>
+When we have holes in a normal memory zone, we could endup having
+cached_migrate_pfns which may not necessarily be valid, under heavy memory
+pressure with swapping enabled ( via __reset_isolation_suitable(), triggered
+by kswapd).
 
-KVM has helpers to handle the condition codes of trapped aarch32
-instructions. These are marked __hyp_text and used from HYP, but they
-aren't built by the 'hyp' Makefile, which has all the runes to avoid ASAN
-and KCOV instrumentation.
+Later if we fail to find a page via fast_isolate_freepages(), we may
+end up using the migrate_pfn we started the search with, as valid
+page. This could lead to accessing NULL pointer derefernces like below,
+due to an invalid mem_section pointer.
 
-Move this code to a new hyp/aarch32.c to avoid a hyp-panic when starting
-an aarch32 guest on a host built with the ASAN/KCOV debug options.
+Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008 [47/1825]
+ Mem abort info:
+   ESR = 0x96000004
+   Exception class = DABT (current EL), IL = 32 bits
+   SET = 0, FnV = 0
+   EA = 0, S1PTW = 0
+ Data abort info:
+   ISV = 0, ISS = 0x00000004
+   CM = 0, WnR = 0
+ user pgtable: 4k pages, 48-bit VAs, pgdp = 0000000082f94ae9
+ [0000000000000008] pgd=0000000000000000
+ Internal error: Oops: 96000004 [#1] SMP
+ ...
+ CPU: 10 PID: 6080 Comm: qemu-system-aar Not tainted 510-rc1+ #6
+ Hardware name: AmpereComputing(R) OSPREY EV-883832-X3-0001/OSPREY, BIOS 4819 09/25/2018
+ pstate: 60000005 (nZCv daif -PAN -UAO)
+ pc : set_pfnblock_flags_mask+0x58/0xe8
+ lr : compaction_alloc+0x300/0x950
+ [...]
+ Process qemu-system-aar (pid: 6080, stack limit = 0x0000000095070da5)
+ Call trace:
+  set_pfnblock_flags_mask+0x58/0xe8
+  compaction_alloc+0x300/0x950
+  migrate_pages+0x1a4/0xbb0
+  compact_zone+0x750/0xde8
+  compact_zone_order+0xd8/0x118
+  try_to_compact_pages+0xb4/0x290
+  __alloc_pages_direct_compact+0x84/0x1e0
+  __alloc_pages_nodemask+0x5e0/0xe18
+  alloc_pages_vma+0x1cc/0x210
+  do_huge_pmd_anonymous_page+0x108/0x7c8
+  __handle_mm_fault+0xdd4/0x1190
+  handle_mm_fault+0x114/0x1c0
+  __get_user_pages+0x198/0x3c0
+  get_user_pages_unlocked+0xb4/0x1d8
+  __gfn_to_pfn_memslot+0x12c/0x3b8
+  gfn_to_pfn_prot+0x4c/0x60
+  kvm_handle_guest_abort+0x4b0/0xcd8
+  handle_exit+0x140/0x1b8
+  kvm_arch_vcpu_ioctl_run+0x260/0x768
+  kvm_vcpu_ioctl+0x490/0x898
+  do_vfs_ioctl+0xc4/0x898
+  ksys_ioctl+0x8c/0xa0
+  __arm64_sys_ioctl+0x28/0x38
+  el0_svc_common+0x74/0x118
+  el0_svc_handler+0x38/0x78
+  el0_svc+0x8/0xc
+ Code: f8607840 f100001f 8b011401 9a801020 (f9400400)
+ ---[ end trace af6a35219325a9b6 ]---
 
-Fixes: 021234ef3752f ("KVM: arm64: Make kvm_condition_valid32() accessible from EL2")
-Fixes: 8cebe750c4d9a ("arm64: KVM: Make kvm_skip_instr32 available to HYP")
-Signed-off-by: James Morse <james.morse@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+The issue was reported on an arm64 server with 128GB with holes in the zone
+(e.g, [32GB@4GB, 96GB@544GB]), with a swap device enabled, while running 100 KVM
+guest instances.
+
+This patch fixes the issue by ensuring that the page belongs to a valid PFN
+when we fallback to using the lower limit of the scan range upon failure in
+fast_isolate_freepages().
+
+Fixes: 5a811889de10f1eb ("mm, compaction: use free lists to quickly locate a migration target")
+Reported-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm/kvm/hyp/Makefile   |   1 +
- arch/arm64/kvm/hyp/Makefile |   1 +
- virt/kvm/arm/aarch32.c      | 121 --------------------------------
- virt/kvm/arm/hyp/aarch32.c  | 136 ++++++++++++++++++++++++++++++++++++
- 4 files changed, 138 insertions(+), 121 deletions(-)
- create mode 100644 virt/kvm/arm/hyp/aarch32.c
+ mm/compaction.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
-index d2b5ec9c4b92..ba88b1eca93c 100644
---- a/arch/arm/kvm/hyp/Makefile
-+++ b/arch/arm/kvm/hyp/Makefile
-@@ -11,6 +11,7 @@ CFLAGS_ARMV7VE		   :=$(call cc-option, -march=armv7ve)
- 
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
-+obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/aarch32.o
- 
- obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
- obj-$(CONFIG_KVM_ARM_HOST) += cp15-sr.o
-diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index 82d1904328ad..ea710f674cb6 100644
---- a/arch/arm64/kvm/hyp/Makefile
-+++ b/arch/arm64/kvm/hyp/Makefile
-@@ -10,6 +10,7 @@ KVM=../../../../virt/kvm
- 
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/vgic-v3-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/timer-sr.o
-+obj-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/hyp/aarch32.o
- 
- obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-cpuif-proxy.o
- obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
-diff --git a/virt/kvm/arm/aarch32.c b/virt/kvm/arm/aarch32.c
-index 5abbe9b3c652..6880236974b8 100644
---- a/virt/kvm/arm/aarch32.c
-+++ b/virt/kvm/arm/aarch32.c
-@@ -25,127 +25,6 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
- 
--/*
-- * stolen from arch/arm/kernel/opcodes.c
-- *
-- * condition code lookup table
-- * index into the table is test code: EQ, NE, ... LT, GT, AL, NV
-- *
-- * bit position in short is condition code: NZCV
-- */
--static const unsigned short cc_map[16] = {
--	0xF0F0,			/* EQ == Z set            */
--	0x0F0F,			/* NE                     */
--	0xCCCC,			/* CS == C set            */
--	0x3333,			/* CC                     */
--	0xFF00,			/* MI == N set            */
--	0x00FF,			/* PL                     */
--	0xAAAA,			/* VS == V set            */
--	0x5555,			/* VC                     */
--	0x0C0C,			/* HI == C set && Z clear */
--	0xF3F3,			/* LS == C clear || Z set */
--	0xAA55,			/* GE == (N==V)           */
--	0x55AA,			/* LT == (N!=V)           */
--	0x0A05,			/* GT == (!Z && (N==V))   */
--	0xF5FA,			/* LE == (Z || (N!=V))    */
--	0xFFFF,			/* AL always              */
--	0			/* NV                     */
--};
--
--/*
-- * Check if a trapped instruction should have been executed or not.
-- */
--bool __hyp_text kvm_condition_valid32(const struct kvm_vcpu *vcpu)
--{
--	unsigned long cpsr;
--	u32 cpsr_cond;
--	int cond;
--
--	/* Top two bits non-zero?  Unconditional. */
--	if (kvm_vcpu_get_hsr(vcpu) >> 30)
--		return true;
--
--	/* Is condition field valid? */
--	cond = kvm_vcpu_get_condition(vcpu);
--	if (cond == 0xE)
--		return true;
--
--	cpsr = *vcpu_cpsr(vcpu);
--
--	if (cond < 0) {
--		/* This can happen in Thumb mode: examine IT state. */
--		unsigned long it;
--
--		it = ((cpsr >> 8) & 0xFC) | ((cpsr >> 25) & 0x3);
--
--		/* it == 0 => unconditional. */
--		if (it == 0)
--			return true;
--
--		/* The cond for this insn works out as the top 4 bits. */
--		cond = (it >> 4);
--	}
--
--	cpsr_cond = cpsr >> 28;
--
--	if (!((cc_map[cond] >> cpsr_cond) & 1))
--		return false;
--
--	return true;
--}
--
--/**
-- * adjust_itstate - adjust ITSTATE when emulating instructions in IT-block
-- * @vcpu:	The VCPU pointer
-- *
-- * When exceptions occur while instructions are executed in Thumb IF-THEN
-- * blocks, the ITSTATE field of the CPSR is not advanced (updated), so we have
-- * to do this little bit of work manually. The fields map like this:
-- *
-- * IT[7:0] -> CPSR[26:25],CPSR[15:10]
-- */
--static void __hyp_text kvm_adjust_itstate(struct kvm_vcpu *vcpu)
--{
--	unsigned long itbits, cond;
--	unsigned long cpsr = *vcpu_cpsr(vcpu);
--	bool is_arm = !(cpsr & PSR_AA32_T_BIT);
--
--	if (is_arm || !(cpsr & PSR_AA32_IT_MASK))
--		return;
--
--	cond = (cpsr & 0xe000) >> 13;
--	itbits = (cpsr & 0x1c00) >> (10 - 2);
--	itbits |= (cpsr & (0x3 << 25)) >> 25;
--
--	/* Perform ITAdvance (see page A2-52 in ARM DDI 0406C) */
--	if ((itbits & 0x7) == 0)
--		itbits = cond = 0;
--	else
--		itbits = (itbits << 1) & 0x1f;
--
--	cpsr &= ~PSR_AA32_IT_MASK;
--	cpsr |= cond << 13;
--	cpsr |= (itbits & 0x1c) << (10 - 2);
--	cpsr |= (itbits & 0x3) << 25;
--	*vcpu_cpsr(vcpu) = cpsr;
--}
--
--/**
-- * kvm_skip_instr - skip a trapped instruction and proceed to the next
-- * @vcpu: The vcpu pointer
-- */
--void __hyp_text kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr)
--{
--	bool is_thumb;
--
--	is_thumb = !!(*vcpu_cpsr(vcpu) & PSR_AA32_T_BIT);
--	if (is_thumb && !is_wide_instr)
--		*vcpu_pc(vcpu) += 2;
--	else
--		*vcpu_pc(vcpu) += 4;
--	kvm_adjust_itstate(vcpu);
--}
--
- /*
-  * Table taken from ARMv8 ARM DDI0487B-B, table G1-10.
-  */
-diff --git a/virt/kvm/arm/hyp/aarch32.c b/virt/kvm/arm/hyp/aarch32.c
-new file mode 100644
-index 000000000000..d31f267961e7
---- /dev/null
-+++ b/virt/kvm/arm/hyp/aarch32.c
-@@ -0,0 +1,136 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Hyp portion of the (not much of an) Emulation layer for 32bit guests.
-+ *
-+ * Copyright (C) 2012,2013 - ARM Ltd
-+ * Author: Marc Zyngier <marc.zyngier@arm.com>
-+ *
-+ * based on arch/arm/kvm/emulate.c
-+ * Copyright (C) 2012 - Virtual Open Systems and Columbia University
-+ * Author: Christoffer Dall <c.dall@virtualopensystems.com>
-+ */
-+
-+#include <linux/kvm_host.h>
-+#include <asm/kvm_emulate.h>
-+#include <asm/kvm_hyp.h>
-+
-+/*
-+ * stolen from arch/arm/kernel/opcodes.c
-+ *
-+ * condition code lookup table
-+ * index into the table is test code: EQ, NE, ... LT, GT, AL, NV
-+ *
-+ * bit position in short is condition code: NZCV
-+ */
-+static const unsigned short cc_map[16] = {
-+	0xF0F0,			/* EQ == Z set            */
-+	0x0F0F,			/* NE                     */
-+	0xCCCC,			/* CS == C set            */
-+	0x3333,			/* CC                     */
-+	0xFF00,			/* MI == N set            */
-+	0x00FF,			/* PL                     */
-+	0xAAAA,			/* VS == V set            */
-+	0x5555,			/* VC                     */
-+	0x0C0C,			/* HI == C set && Z clear */
-+	0xF3F3,			/* LS == C clear || Z set */
-+	0xAA55,			/* GE == (N==V)           */
-+	0x55AA,			/* LT == (N!=V)           */
-+	0x0A05,			/* GT == (!Z && (N==V))   */
-+	0xF5FA,			/* LE == (Z || (N!=V))    */
-+	0xFFFF,			/* AL always              */
-+	0			/* NV                     */
-+};
-+
-+/*
-+ * Check if a trapped instruction should have been executed or not.
-+ */
-+bool __hyp_text kvm_condition_valid32(const struct kvm_vcpu *vcpu)
-+{
-+	unsigned long cpsr;
-+	u32 cpsr_cond;
-+	int cond;
-+
-+	/* Top two bits non-zero?  Unconditional. */
-+	if (kvm_vcpu_get_hsr(vcpu) >> 30)
-+		return true;
-+
-+	/* Is condition field valid? */
-+	cond = kvm_vcpu_get_condition(vcpu);
-+	if (cond == 0xE)
-+		return true;
-+
-+	cpsr = *vcpu_cpsr(vcpu);
-+
-+	if (cond < 0) {
-+		/* This can happen in Thumb mode: examine IT state. */
-+		unsigned long it;
-+
-+		it = ((cpsr >> 8) & 0xFC) | ((cpsr >> 25) & 0x3);
-+
-+		/* it == 0 => unconditional. */
-+		if (it == 0)
-+			return true;
-+
-+		/* The cond for this insn works out as the top 4 bits. */
-+		cond = (it >> 4);
-+	}
-+
-+	cpsr_cond = cpsr >> 28;
-+
-+	if (!((cc_map[cond] >> cpsr_cond) & 1))
-+		return false;
-+
-+	return true;
-+}
-+
-+/**
-+ * adjust_itstate - adjust ITSTATE when emulating instructions in IT-block
-+ * @vcpu:	The VCPU pointer
-+ *
-+ * When exceptions occur while instructions are executed in Thumb IF-THEN
-+ * blocks, the ITSTATE field of the CPSR is not advanced (updated), so we have
-+ * to do this little bit of work manually. The fields map like this:
-+ *
-+ * IT[7:0] -> CPSR[26:25],CPSR[15:10]
-+ */
-+static void __hyp_text kvm_adjust_itstate(struct kvm_vcpu *vcpu)
-+{
-+	unsigned long itbits, cond;
-+	unsigned long cpsr = *vcpu_cpsr(vcpu);
-+	bool is_arm = !(cpsr & PSR_AA32_T_BIT);
-+
-+	if (is_arm || !(cpsr & PSR_AA32_IT_MASK))
-+		return;
-+
-+	cond = (cpsr & 0xe000) >> 13;
-+	itbits = (cpsr & 0x1c00) >> (10 - 2);
-+	itbits |= (cpsr & (0x3 << 25)) >> 25;
-+
-+	/* Perform ITAdvance (see page A2-52 in ARM DDI 0406C) */
-+	if ((itbits & 0x7) == 0)
-+		itbits = cond = 0;
-+	else
-+		itbits = (itbits << 1) & 0x1f;
-+
-+	cpsr &= ~PSR_AA32_IT_MASK;
-+	cpsr |= cond << 13;
-+	cpsr |= (itbits & 0x1c) << (10 - 2);
-+	cpsr |= (itbits & 0x3) << 25;
-+	*vcpu_cpsr(vcpu) = cpsr;
-+}
-+
-+/**
-+ * kvm_skip_instr - skip a trapped instruction and proceed to the next
-+ * @vcpu: The vcpu pointer
-+ */
-+void __hyp_text kvm_skip_instr32(struct kvm_vcpu *vcpu, bool is_wide_instr)
-+{
-+	bool is_thumb;
-+
-+	is_thumb = !!(*vcpu_cpsr(vcpu) & PSR_AA32_T_BIT);
-+	if (is_thumb && !is_wide_instr)
-+		*vcpu_pc(vcpu) += 2;
-+	else
-+		*vcpu_pc(vcpu) += 4;
-+	kvm_adjust_itstate(vcpu);
-+}
+diff --git a/mm/compaction.c b/mm/compaction.c
+index 9febc8c..9e1b9ac 100644
+--- a/mm/compaction.c
++++ b/mm/compaction.c
+@@ -1399,7 +1399,7 @@ fast_isolate_freepages(struct compact_control *cc)
+ 				page = pfn_to_page(highest);
+ 				cc->free_pfn = highest;
+ 			} else {
+-				if (cc->direct_compaction) {
++				if (cc->direct_compaction && pfn_valid(min_pfn)) {
+ 					page = pfn_to_page(min_pfn);
+ 					cc->free_pfn = min_pfn;
+ 				}
 -- 
-2.20.1
+2.7.4
 
