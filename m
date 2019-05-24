@@ -2,53 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E156929F06
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 21:24:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF6F629F08
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 21:24:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730009AbfEXTY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 May 2019 15:24:27 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:55217 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730054AbfEXTY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 May 2019 15:24:27 -0400
-Received: by mail-wm1-f67.google.com with SMTP id i3so10430917wml.4
-        for <kvm@vger.kernel.org>; Fri, 24 May 2019 12:24:25 -0700 (PDT)
+        id S1732099AbfEXTYg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 May 2019 15:24:36 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34896 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732018AbfEXTYf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 May 2019 15:24:35 -0400
+Received: by mail-wr1-f68.google.com with SMTP id m3so11062306wrv.2
+        for <kvm@vger.kernel.org>; Fri, 24 May 2019 12:24:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=yvn6Z+8CNLO1tsaW5/zxMotanzz8ExB5H3ow81Rb1J8=;
-        b=MTtOYtLkkptWxL+3GLe2GH6l0LC+DUgdk/cXY9Jtj3Ii94uXklwHj0GPOiLM0wJKh0
-         4XDoVzkAQ7d+4evp9/S7iqC1EUAU/M0XJEAvVBncTz3EoISwqYNf0phiXw5/sas25xik
-         oGr3EIRQXa3CdTdh/0zmchabmar7IxbweJQROQCZiDObIpGCP+gCo2Z0VRP7Hm3zUiGs
-         yNLCWIBVfE7exUmypJMZB2at4CYSbwbXilRLGDoyrpe97B8ntFGeUUiiKex2rFxlhDsT
-         1GFDJkdOrvDRMlVVEfEIEGCE5UW+rC8RoGtc7Kjw55WW//EY9o3ilvW22Yed/pxTYgWC
-         hiCQ==
-X-Gm-Message-State: APjAAAUeAQzQhDLFSiegVbcIdRpQiyedE1fLzO6lhm3x+4dyfssZyZgQ
-        GyEldwMpDsyw0wFAYmKGtl/yhQ==
-X-Google-Smtp-Source: APXvYqzfqL+E+LxIXGZhopDTwiNLeQSCRmfercctqPmlnf0LEtgtnNgAywaKzY5YC3KvCOvA4KPUcQ==
-X-Received: by 2002:a7b:c344:: with SMTP id l4mr18350497wmj.25.1558725865276;
-        Fri, 24 May 2019 12:24:25 -0700 (PDT)
+        bh=RiLdSm+UzMaJuvEn0wpY5Et6MpVF76OPre2rr2zBWJI=;
+        b=bBUYKOxnkiuPaZHZPFdszxESyruWXRL3dDWO5vOaTHUxQ3PQX/H2Bcq+1gtx/GhhKs
+         898grMu7sd1zmLL4QNwxvpZT73HQan2+U+iqG3E+sQrDSaLGys4bCM24ZFmpxiHCjWWo
+         +KPm7LSZKU1e9H/qGu2cRb4Exov2aL6h8ptoiGz9qCoLwudf2bWPVIRHPR7cndCZWP+n
+         XcHdGUz+H69WeyDeA2CzxObw/5A3MTKhaNszJOW4cbAnTNw1jRVa0AJQca88P9KBLbTL
+         In4p7vljNhnWKQlVhcqyRCIZvGVoYDsYmqww/CiMzgk/0tT9/x+uXAfIiY7iFSxAb8Ei
+         Ngnw==
+X-Gm-Message-State: APjAAAXSjoDGDNJ2rVyzh7ZmzQVLIZgWPueX+OlDTWTLIPWX7+wnxm/h
+        98a0N0+Bn26l5c8eNn3l7EYqHw==
+X-Google-Smtp-Source: APXvYqzoUsvro6Wxw8AqgAHyQuZmdtBdPAud4tFBaOFFnZn+pI/JBoYi0pekaj8lJdnotDCWc9rnoA==
+X-Received: by 2002:a5d:5544:: with SMTP id g4mr57306165wrw.327.1558725874185;
+        Fri, 24 May 2019 12:24:34 -0700 (PDT)
 Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id 74sm3410408wma.7.2019.05.24.12.24.24
+        by smtp.gmail.com with ESMTPSA id j206sm5849863wma.47.2019.05.24.12.24.33
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 24 May 2019 12:24:24 -0700 (PDT)
-Subject: Re: [PATCH] KVM: selftests: Wrap vcpu_nested_state_get/set functions
- with x86 guard
-To:     Thomas Huth <thuth@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20190523093114.18182-1-thuth@redhat.com>
+        Fri, 24 May 2019 12:24:33 -0700 (PDT)
+Subject: Re: [PATCH v2] kvm: selftests: aarch64: compile with warnings on
+To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
+Cc:     rkrcmar@redhat.com, thuth@redhat.com
+References: <20190523101634.19720-1-drjones@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1cb9f031-3483-b721-2e74-b12664b705ec@redhat.com>
-Date:   Fri, 24 May 2019 21:24:24 +0200
+Message-ID: <f31e5d57-9de0-ea1f-9197-1046d22f99d1@redhat.com>
+Date:   Fri, 24 May 2019 21:24:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190523093114.18182-1-thuth@redhat.com>
+In-Reply-To: <20190523101634.19720-1-drjones@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -57,54 +53,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/05/19 11:31, Thomas Huth wrote:
-> struct kvm_nested_state is only available on x86 so far. To be able
-> to compile the code on other architectures as well, we need to wrap
-> the related code with #ifdefs.
+On 23/05/19 12:16, Andrew Jones wrote:
+> aarch64 fixups needed to compile with warnings as errors.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
 > ---
->  tools/testing/selftests/kvm/include/kvm_util.h | 2 ++
->  tools/testing/selftests/kvm/lib/kvm_util.c     | 2 ++
->  2 files changed, 4 insertions(+)
+>  tools/testing/selftests/kvm/lib/aarch64/processor.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 8c6b9619797d..a5a4b28f14d8 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -118,10 +118,12 @@ void vcpu_events_get(struct kvm_vm *vm, uint32_t vcpuid,
->  		     struct kvm_vcpu_events *events);
->  void vcpu_events_set(struct kvm_vm *vm, uint32_t vcpuid,
->  		     struct kvm_vcpu_events *events);
-> +#ifdef __x86_64__
->  void vcpu_nested_state_get(struct kvm_vm *vm, uint32_t vcpuid,
->  			   struct kvm_nested_state *state);
->  int vcpu_nested_state_set(struct kvm_vm *vm, uint32_t vcpuid,
->  			  struct kvm_nested_state *state, bool ignore_error);
-> +#endif
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index e8c42506a09d..03abba9495af 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -7,6 +7,8 @@
 >  
->  const char *exit_reason_str(unsigned int exit_reason);
+>  #define _GNU_SOURCE /* for program_invocation_name */
 >  
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index cf62de377310..633b22df46a4 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -1248,6 +1248,7 @@ void vcpu_events_set(struct kvm_vm *vm, uint32_t vcpuid,
->  		ret, errno);
+> +#include <linux/compiler.h>
+> +
+>  #include "kvm_util.h"
+>  #include "../kvm_util_internal.h"
+>  #include "processor.h"
+> @@ -67,15 +69,13 @@ static uint64_t ptrs_per_pgd(struct kvm_vm *vm)
+>  	return 1 << (vm->va_bits - shift);
 >  }
 >  
-> +#ifdef __x86_64__
->  void vcpu_nested_state_get(struct kvm_vm *vm, uint32_t vcpuid,
->  			   struct kvm_nested_state *state)
+> -static uint64_t ptrs_per_pte(struct kvm_vm *vm)
+> +static uint64_t __maybe_unused ptrs_per_pte(struct kvm_vm *vm)
 >  {
-> @@ -1279,6 +1280,7 @@ int vcpu_nested_state_set(struct kvm_vm *vm, uint32_t vcpuid,
->  
->  	return ret;
+>  	return 1 << (vm->page_shift - 3);
 >  }
-> +#endif
 >  
->  /*
->   * VM VCPU System Regs Get
+>  void virt_pgd_alloc(struct kvm_vm *vm, uint32_t pgd_memslot)
+>  {
+> -	int rc;
+> -
+>  	if (!vm->pgd_created) {
+>  		vm_paddr_t paddr = vm_phy_pages_alloc(vm,
+>  			page_align(vm, ptrs_per_pgd(vm) * 8) / vm->page_size,
+> @@ -181,6 +181,7 @@ vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+>  unmapped_gva:
+>  	TEST_ASSERT(false, "No mapping for vm virtual address, "
+>  		    "gva: 0x%lx", gva);
+> +	exit(1);
+>  }
+>  
+>  static void pte_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent, uint64_t page, int level)
+> @@ -312,6 +313,6 @@ void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
+>  	get_reg(vm, vcpuid, ARM64_CORE_REG(regs.pstate), &pstate);
+>  	get_reg(vm, vcpuid, ARM64_CORE_REG(regs.pc), &pc);
+>  
+> -	fprintf(stream, "%*spstate: 0x%.16llx pc: 0x%.16llx\n",
+> +	fprintf(stream, "%*spstate: 0x%.16lx pc: 0x%.16lx\n",
+>  		indent, "", pstate, pc);
+>  }
 > 
 
 Queued, thanks.
