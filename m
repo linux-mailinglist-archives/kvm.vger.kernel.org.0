@@ -2,109 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DEE6E294DF
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 11:37:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4169229471
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 11:20:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390357AbfEXJhE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 May 2019 05:37:04 -0400
-Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:53315 "EHLO
-        9.mo177.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390203AbfEXJhE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 24 May 2019 05:37:04 -0400
-Received: from player728.ha.ovh.net (unknown [10.108.35.197])
-        by mo177.mail-out.ovh.net (Postfix) with ESMTP id 8D6DBF6C77
-        for <kvm@vger.kernel.org>; Fri, 24 May 2019 11:17:21 +0200 (CEST)
-Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
-        (Authenticated sender: clg@kaod.org)
-        by player728.ha.ovh.net (Postfix) with ESMTPSA id AC82160B1AD8;
-        Fri, 24 May 2019 09:17:18 +0000 (UTC)
-Subject: Re: [PATCH 0/4] KVM: PPC: Book3S: Fix potential deadlocks
-To:     Paul Mackerras <paulus@ozlabs.org>, kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org
-References: <20190523063424.GB19655@blackberry>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <3633e945-7126-c655-587d-e09eafb9f9f3@kaod.org>
-Date:   Fri, 24 May 2019 11:17:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190523063424.GB19655@blackberry>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 13159799586557299671
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudduiedgudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenuc
+        id S2389988AbfEXJUg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 May 2019 05:20:36 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:37628 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389710AbfEXJUf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 May 2019 05:20:35 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 10AE7A78;
+        Fri, 24 May 2019 02:20:35 -0700 (PDT)
+Received: from en101.cambridge.arm.com (en101.cambridge.arm.com [10.1.196.93])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 407523F703;
+        Fri, 24 May 2019 02:20:33 -0700 (PDT)
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+To:     linux-mm@kvack.org
+Cc:     mgorman@techsingularity.net, akpm@linux-foundation.org,
+        mhocko@suse.com, cai@lca.pw, linux-kernel@vger.kernel.org,
+        marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: mm/compaction: BUG: NULL pointer dereference
+Date:   Fri, 24 May 2019 10:20:19 +0100
+Message-Id: <1558689619-16891-1-git-send-email-suzuki.poulose@arm.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/23/19 8:34 AM, Paul Mackerras wrote:
-> Recent reports of lockdep splats in the HV KVM code revealed that it
-> was taking the kvm->lock mutex in several contexts where a vcpu mutex
-> was already held.  Lockdep has only started warning since I added code
-> to take the vcpu mutexes in the XIVE device release functions, but
-> since Documentation/virtual/kvm/locking.txt specifies that the vcpu
-> mutexes nest inside kvm->lock, it seems that the new code is correct
-> and it is most of the old uses of kvm->lock that are wrong.
-> 
-> This series should fix the problems, by adding new mutexes that nest
-> inside the vcpu mutexes and using them instead of kvm->lock.
+Hi,
 
-Hello,
+We are hitting NULL pointer dereferences while running stress tests with KVM.
+See splat [0]. The test is to spawn 100 VMs all doing standard debian
+installation (Thanks to Marc's automated scripts, available here [1] ).
+The problem has been reproduced with a better rate of success from 5.1-rc6
+onwards.
 
-I guest this warning when running a guest with this patchset :
+The issue is only reproducible with swapping enabled and the entire
+memory is used up, when swapping heavily. Also this issue is only reproducible
+on only one server with 128GB, which has the following memory layout:
 
-[  228.686461] DEBUG_LOCKS_WARN_ON(current->hardirqs_enabled)
-[  228.686480] WARNING: CPU: 116 PID: 3803 at ../kernel/locking/lockdep.c:4219 check_flags.part.23+0x21c/0x270
-[  228.686544] Modules linked in: vhost_net vhost xt_CHECKSUM iptable_mangle xt_MASQUERADE iptable_nat nf_nat xt_conntrack nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ipt_REJECT nf_reject_ipv4 tun bridge stp llc ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter fuse kvm_hv kvm at24 ipmi_powernv regmap_i2c ipmi_devintf uio_pdrv_genirq ofpart ipmi_msghandler uio powernv_flash mtd ibmpowernv opal_prd ip_tables ext4 mbcache jbd2 btrfs zstd_decompress zstd_compress raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx libcrc32c xor raid6_pq raid1 raid0 ses sd_mod enclosure scsi_transport_sas ast i2c_opal i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops ttm drm i40e e1000e cxl aacraid tg3 drm_panel_orientation_quirks i2c_core
-[  228.686859] CPU: 116 PID: 3803 Comm: qemu-system-ppc Kdump: loaded Not tainted 5.2.0-rc1-xive+ #42
-[  228.686911] NIP:  c0000000001b394c LR: c0000000001b3948 CTR: c000000000bfad20
-[  228.686963] REGS: c000200cdb50f570 TRAP: 0700   Not tainted  (5.2.0-rc1-xive+)
-[  228.687001] MSR:  9000000002823033 <SF,HV,VEC,VSX,FP,ME,IR,DR,RI,LE>  CR: 48222222  XER: 20040000
-[  228.687060] CFAR: c000000000116db0 IRQMASK: 1 
-[  228.687060] GPR00: c0000000001b3948 c000200cdb50f800 c0000000015e7600 000000000000002e 
-[  228.687060] GPR04: 0000000000000001 c0000000001c71a0 000000006e655f73 72727563284e4f5f 
-[  228.687060] GPR08: 0000200e60680000 0000000000000000 c000200cdb486180 0000000000000000 
-[  228.687060] GPR12: 0000000000002000 c000200fff61a680 0000000000000000 00007fffb75c0000 
-[  228.687060] GPR16: 0000000000000000 0000000000000000 c0000000017d6900 c000000001124900 
-[  228.687060] GPR20: 0000000000000074 c008000006916f68 0000000000000074 0000000000000074 
-[  228.687060] GPR24: ffffffffffffffff ffffffffffffffff 0000000000000003 c000200d4b600000 
-[  228.687060] GPR28: c000000001627e58 c000000001489908 c000000001627e58 c000000002304de0 
-[  228.687377] NIP [c0000000001b394c] check_flags.part.23+0x21c/0x270
-[  228.687415] LR [c0000000001b3948] check_flags.part.23+0x218/0x270
-[  228.687466] Call Trace:
-[  228.687488] [c000200cdb50f800] [c0000000001b3948] check_flags.part.23+0x218/0x270 (unreliable)
-[  228.687542] [c000200cdb50f870] [c0000000001b6548] lock_is_held_type+0x188/0x1c0
-[  228.687595] [c000200cdb50f8d0] [c0000000001d939c] rcu_read_lock_sched_held+0xdc/0x100
-[  228.687646] [c000200cdb50f900] [c0000000001dd704] rcu_note_context_switch+0x304/0x340
-[  228.687701] [c000200cdb50f940] [c0080000068fcc58] kvmhv_run_single_vcpu+0xdb0/0x1120 [kvm_hv]
-[  228.687756] [c000200cdb50fa20] [c0080000068fd5b0] kvmppc_vcpu_run_hv+0x5e8/0xe40 [kvm_hv]
-[  228.687816] [c000200cdb50faf0] [c0080000071797dc] kvmppc_vcpu_run+0x34/0x48 [kvm]
-[  228.687863] [c000200cdb50fb10] [c0080000071755dc] kvm_arch_vcpu_ioctl_run+0x244/0x420 [kvm]
-[  228.687916] [c000200cdb50fba0] [c008000007165ccc] kvm_vcpu_ioctl+0x424/0x838 [kvm]
-[  228.687957] [c000200cdb50fd10] [c000000000433a24] do_vfs_ioctl+0xd4/0xcd0
-[  228.687995] [c000200cdb50fdb0] [c000000000434724] ksys_ioctl+0x104/0x120
-[  228.688033] [c000200cdb50fe00] [c000000000434768] sys_ioctl+0x28/0x80
-[  228.688072] [c000200cdb50fe20] [c00000000000b888] system_call+0x5c/0x70
-[  228.688109] Instruction dump:
-[  228.688142] 4bf6342d 60000000 0fe00000 e8010080 7c0803a6 4bfffe60 3c82ff87 3c62ff87 
-[  228.688196] 388472d0 3863d738 4bf63405 60000000 <0fe00000> 4bffff4c 3c82ff87 3c62ff87 
-[  228.688251] irq event stamp: 205
-[  228.688287] hardirqs last  enabled at (205): [<c0080000068fc1b4>] kvmhv_run_single_vcpu+0x30c/0x1120 [kvm_hv]
-[  228.688344] hardirqs last disabled at (204): [<c0080000068fbff0>] kvmhv_run_single_vcpu+0x148/0x1120 [kvm_hv]
-[  228.688412] softirqs last  enabled at (180): [<c000000000c0b2ac>] __do_softirq+0x4ac/0x5d4
-[  228.688464] softirqs last disabled at (169): [<c000000000122aa8>] irq_exit+0x1f8/0x210
-[  228.688513] ---[ end trace eb16f6260022a812 ]---
-[  228.688548] possible reason: unannotated irqs-off.
-[  228.688571] irq event stamp: 205
-[  228.688607] hardirqs last  enabled at (205): [<c0080000068fc1b4>] kvmhv_run_single_vcpu+0x30c/0x1120 [kvm_hv]
-[  228.688664] hardirqs last disabled at (204): [<c0080000068fbff0>] kvmhv_run_single_vcpu+0x148/0x1120 [kvm_hv]
-[  228.688719] softirqs last  enabled at (180): [<c000000000c0b2ac>] __do_softirq+0x4ac/0x5d4
-[  228.688758] softirqs last disabled at (169): [<c000000000122aa8>] irq_exit+0x1f8/0x210
+[32GB@4GB, hole , 96GB@544GB]
+
+Here is my non-expert analysis of the issue so far.
+
+Under extreme memory pressure, the kswapd could trigger reset_isolation_suitable()
+to figure out the cached values for migrate/free pfn for a zone, by scanning through
+the entire zone. On our server it does so in the range of [ 0x10_0000, 0xa00_0000 ],
+with the following area of holes : [ 0x20_0000, 0x880_0000 ].
+In the failing case, we end up setting the cached migrate pfn as : 0x508_0000, which
+is right in the center of the zone pfn range. i.e ( 0x10_0000 + 0xa00_0000 ) / 2,
+with reset_migrate = 0x88_4e00, reset_free = 0x10_0000.
+
+Now these cached values are used by the fast_isolate_freepages() to find a pfn. However,
+since we cant find anything during the search we fall back to using the page belonging
+to the min_pfn (which is the migrate_pfn), without proper checks to see if that is valid
+PFN or not. This is then passed on to fast_isolate_around() which tries to do :
+set_pageblock_skip(page) on the page which blows up due to an NULL mem_section pointer.
+
+The following patch seems to fix the issue for me, but I am not quite convinced that
+it is the right fix. Thoughts ?
 
 
+diff --git a/mm/compaction.c b/mm/compaction.c
+index 9febc8c..9e1b9ac 100644
+--- a/mm/compaction.c
++++ b/mm/compaction.c
+@@ -1399,7 +1399,7 @@ fast_isolate_freepages(struct compact_control *cc)
+ 				page = pfn_to_page(highest);
+ 				cc->free_pfn = highest;
+ 			} else {
+-				if (cc->direct_compaction) {
++				if (cc->direct_compaction && pfn_valid(min_pfn)) {
+ 					page = pfn_to_page(min_pfn);
+ 					cc->free_pfn = min_pfn;
+ 				}
 
-C.
+
+Suzuki
+
+
+[ 0 ] Kernel splat
+ Unable to handle kernel NULL pointer dereference at virtual address 0000000000000008 [47/1825]
+ Mem abort info:
+   ESR = 0x96000004
+   Exception class = DABT (current EL), IL = 32 bits
+   SET = 0, FnV = 0
+   EA = 0, S1PTW = 0
+ Data abort info:
+   ISV = 0, ISS = 0x00000004
+   CM = 0, WnR = 0
+ user pgtable: 4k pages, 48-bit VAs, pgdp = 0000000082f94ae9
+ [0000000000000008] pgd=0000000000000000
+ Internal error: Oops: 96000004 [#1] SMP
+ ...
+ CPU: 10 PID: 6080 Comm: qemu-system-aar Not tainted 510-rc1+ #6
+ Hardware name: AmpereComputing(R) OSPREY EV-883832-X3-0001/OSPREY, BIOS 4819 09/25/2018
+ pstate: 60000005 (nZCv daif -PAN -UAO)
+ pc : set_pfnblock_flags_mask+0x58/0xe8
+ lr : compaction_alloc+0x300/0x950
+ sp : ffff00001fc03010
+ x29: ffff00001fc03010 x28: 0000000000000000 
+ x27: 0000000000000000 x26: ffff000010bf7000 
+ x25: 0000000006445000 x24: 0000000006444e00 
+ x23: ffff7e018f138000 x22: 0000000000000003 
+ x21: 0000000000000001 x20: 0000000006444e00 
+ x19: 0000000000000001 x18: 0000000000000000 
+ x17: 0000000000000000 x16: ffff809f7fe97268 
+ x15: 0000000191138000 x14: 0000000000000000 
+ x13: 0000000000000070 x12: 0000000000000000 
+ x11: ffff00001fc03108 x10: 0000000000000000 
+ x9 : 0000000009222400 x8 : 0000000000000187 
+ x7 : 00000000063c4e00 x6 : 0000000006444e00 
+ x5 : 0000000000080000 x4 : 0000000000000001 
+ x3 : 0000000000000003 x2 : ffff809f7fe92840 
+ x1 : 0000000000000220 x0 : 0000000000000000 
+ Process qemu-system-aar (pid: 6080, stack limit = 0x0000000095070da5)
+ Call trace:
+  set_pfnblock_flags_mask+0x58/0xe8
+  compaction_alloc+0x300/0x950
+  migrate_pages+0x1a4/0xbb0
+  compact_zone+0x750/0xde8
+  compact_zone_order+0xd8/0x118
+  try_to_compact_pages+0xb4/0x290
+  __alloc_pages_direct_compact+0x84/0x1e0
+  __alloc_pages_nodemask+0x5e0/0xe18
+  alloc_pages_vma+0x1cc/0x210
+  do_huge_pmd_anonymous_page+0x108/0x7c8
+  __handle_mm_fault+0xdd4/0x1190
+  handle_mm_fault+0x114/0x1c0
+  __get_user_pages+0x198/0x3c0
+  get_user_pages_unlocked+0xb4/0x1d8
+  __gfn_to_pfn_memslot+0x12c/0x3b8
+  gfn_to_pfn_prot+0x4c/0x60
+  kvm_handle_guest_abort+0x4b0/0xcd8
+  handle_exit+0x140/0x1b8
+  kvm_arch_vcpu_ioctl_run+0x260/0x768
+  kvm_vcpu_ioctl+0x490/0x898
+  do_vfs_ioctl+0xc4/0x898
+  ksys_ioctl+0x8c/0xa0
+  __arm64_sys_ioctl+0x28/0x38
+  el0_svc_common+0x74/0x118
+  el0_svc_handler+0x38/0x78
+  el0_svc+0x8/0xc
+ Code: f8607840 f100001f 8b011401 9a801020 (f9400400) 
+ ---[ end trace af6a35219325a9b6 ]---
+
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/vminstall.git/
