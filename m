@@ -2,185 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A098829E1D
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 20:33:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF48F29E4B
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2019 20:46:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732194AbfEXSdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 24 May 2019 14:33:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57336 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731979AbfEXSdx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 24 May 2019 14:33:53 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4OIWBql083818
-        for <kvm@vger.kernel.org>; Fri, 24 May 2019 14:33:51 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2spjjmsxg4-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 24 May 2019 14:33:51 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Fri, 24 May 2019 19:33:49 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 24 May 2019 19:33:44 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4OIXhWZ59834370
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 24 May 2019 18:33:43 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 96691A405B;
-        Fri, 24 May 2019 18:33:43 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 27AD9A405C;
-        Fri, 24 May 2019 18:33:42 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.16.173])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 24 May 2019 18:33:42 +0000 (GMT)
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20190523164309.13345-1-thuth@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Fri, 24 May 2019 20:33:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190523164309.13345-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
+        id S1729552AbfEXSqF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 24 May 2019 14:46:05 -0400
+Received: from mail-eopbgr60075.outbound.protection.outlook.com ([40.107.6.75]:48704
+        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727465AbfEXSqF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 24 May 2019 14:46:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5wYJRfdiAAsqY7L89a4YQiMnznmrEeASmH74QKvkOQ0=;
+ b=Q650k94yVMokFJN4u7Au8g4A1Pselg93rgeFKWjtKUIHnIq4sj+rsi04mnNfryqppiKCD2LjnyDY47wsZUXyKx2nqOFoEC9Ka94NbzNvbVVD3bC+HlrYz4jOCU/ESQo6VUuIdvUPCk26iKdB1atbkWYwZTTWGl1KoQuWngqT7HM=
+Received: from VI1PR0501MB2271.eurprd05.prod.outlook.com (10.169.134.149) by
+ VI1PR0501MB2413.eurprd05.prod.outlook.com (10.168.134.17) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1922.16; Fri, 24 May 2019 18:45:57 +0000
+Received: from VI1PR0501MB2271.eurprd05.prod.outlook.com
+ ([fe80::a0a7:7e01:762e:58e0]) by VI1PR0501MB2271.eurprd05.prod.outlook.com
+ ([fe80::a0a7:7e01:762e:58e0%6]) with mapi id 15.20.1900.020; Fri, 24 May 2019
+ 18:45:57 +0000
+From:   Parav Pandit <parav@mellanox.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>
+Subject: RE: [PATCHv3 1/3] vfio/mdev: Improve the create/remove sequence
+Thread-Topic: [PATCHv3 1/3] vfio/mdev: Improve the create/remove sequence
+Thread-Index: AQHVDD9o/mxSVG1oh0uHfLZmDCQyjKZ28DqAgAO4otA=
+Date:   Fri, 24 May 2019 18:45:57 +0000
+Message-ID: <VI1PR0501MB22718C46D1D3EF0DB97D4DF4D1020@VI1PR0501MB2271.eurprd05.prod.outlook.com>
+References: <20190516233034.16407-1-parav@mellanox.com>
+        <20190516233034.16407-2-parav@mellanox.com>
+ <20190522115435.677b457c.cohuck@redhat.com>
+In-Reply-To: <20190522115435.677b457c.cohuck@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19052418-0008-0000-0000-000002EA1161
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052418-0009-0000-0000-00002256D505
-Message-Id: <41d6b365-7e8f-f028-cc5b-c3896d73db83@de.ibm.com>
-Subject: Re:  [PATCH v1 0/9] KVM selftests for s390x
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-24_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=945 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905240120
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=parav@mellanox.com; 
+x-originating-ip: [122.172.180.107]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: fba3a6a9-3e24-4be8-bf54-08d6e0780f35
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:VI1PR0501MB2413;
+x-ms-traffictypediagnostic: VI1PR0501MB2413:
+x-microsoft-antispam-prvs: <VI1PR0501MB24136734833A4AEFA209C453D1020@VI1PR0501MB2413.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0047BC5ADE
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(136003)(396003)(39850400004)(376002)(366004)(13464003)(189003)(199004)(4326008)(316002)(305945005)(25786009)(6246003)(53936002)(6116002)(3846002)(2906002)(14454004)(229853002)(55236004)(6506007)(102836004)(76176011)(99286004)(7696005)(54906003)(53546011)(66066001)(26005)(33656002)(478600001)(476003)(66476007)(66556008)(73956011)(7736002)(9686003)(71190400001)(71200400001)(81166006)(81156014)(66446008)(186003)(8676002)(86362001)(8936002)(446003)(6436002)(76116006)(486006)(68736007)(55016002)(66946007)(256004)(14444005)(74316002)(52536014)(6916009)(64756008)(5660300002)(11346002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0501MB2413;H:VI1PR0501MB2271.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: QCrmldt/CQ3Undw/8KoqPX2MRnV8c2ctZMMnSkYD90iTjY9Hhy4oZF8p7ddAbmKdl3Ffx7HSxZswQqkOZEbiZt0l1Md39uzUcLYZqRwA/T157n/Gtn80zmVOdeoiU+N57rpIcAIdECsKVWokgC02AADOGehMOryoadJHQ2y/+7FfKCLmHKjXsEcBaY8xvzWfsT1H7yOS67odV+bJ7uE4ZNL0g/WtBzIJArRRWAJAtSYtnRaLyfs7j9iKZ515tFTwy8qckaAQXhqGvJs1EzJ6/JYa630zD/GBCnZVjVZs+YnGJR93ShRq34dJNM8ma238Z4oXxrLjxL8FZUxgyIF+h0nJ2qukwLOcD86ssi8/E8dagqgMI/WQJ0gDyKxX1cqPFo/Pi08eqAg693YvyIfdZouSlxwlfpJjcNH9gUq+18M=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fba3a6a9-3e24-4be8-bf54-08d6e0780f35
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 May 2019 18:45:57.3920
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0501MB2413
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I have now queued every patch in the kselftest branch on kvms390 at kernel.org.
-I will push out for next as soon as I have some ack/nacks on the
-"KVM: s390: fix memory slot handling for KVM_SET_USER_MEMORY_REGION"
-patch.
+Hi Alex, Cornelia,
 
-On 23.05.19 18:43, Thomas Huth wrote:
-> This patch series enables the KVM selftests for s390x. As a first
-> test, the sync_regs from x86 has been adapted to s390x, and after
-> a fix for KVM_CAP_MAX_VCPU_ID on s390x, the kvm_create_max_vcpus
-> is now enabled here, too.
-> 
-> Please note that the ucall() interface is not used yet - since
-> s390x neither has PIO nor MMIO, this needs some more work first
-> before it becomes usable (we likely should use a DIAG hypercall
-> here, which is what the sync_reg test is currently using, too...
-> I started working on that topic, but did not finish that work
-> yet, so I decided to not include it yet).
-> 
-> RFC -> v1:
->  - Rebase, needed to add the first patch for vcpu_nested_state_get/set
->  - Added patch to introduce VM_MODE_DEFAULT macro
->  - Improved/cleaned up the code in processor.c
->  - Added patch to fix KVM_CAP_MAX_VCPU_ID on s390x
->  - Added patch to enable the kvm_create_max_vcpus on s390x and aarch64
-> 
-> Andrew Jones (1):
->   kvm: selftests: aarch64: fix default vm mode
-> 
-> Thomas Huth (8):
->   KVM: selftests: Wrap vcpu_nested_state_get/set functions with x86
->     guard
->   KVM: selftests: Guard struct kvm_vcpu_events with
->     __KVM_HAVE_VCPU_EVENTS
->   KVM: selftests: Introduce a VM_MODE_DEFAULT macro for the default bits
->   KVM: selftests: Align memory region addresses to 1M on s390x
->   KVM: selftests: Add processor code for s390x
->   KVM: selftests: Add the sync_regs test for s390x
->   KVM: s390: Do not report unusabled IDs via KVM_CAP_MAX_VCPU_ID
->   KVM: selftests: Move kvm_create_max_vcpus test to generic code
-> 
->  MAINTAINERS                                   |   2 +
->  arch/mips/kvm/mips.c                          |   3 +
->  arch/powerpc/kvm/powerpc.c                    |   3 +
->  arch/s390/kvm/kvm-s390.c                      |   1 +
->  arch/x86/kvm/x86.c                            |   3 +
->  tools/testing/selftests/kvm/Makefile          |   7 +-
->  .../testing/selftests/kvm/include/kvm_util.h  |  10 +
->  .../selftests/kvm/include/s390x/processor.h   |  22 ++
->  .../kvm/{x86_64 => }/kvm_create_max_vcpus.c   |   3 +-
->  .../selftests/kvm/lib/aarch64/processor.c     |   2 +-
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  25 +-
->  .../selftests/kvm/lib/s390x/processor.c       | 286 ++++++++++++++++++
->  .../selftests/kvm/lib/x86_64/processor.c      |   2 +-
->  .../selftests/kvm/s390x/sync_regs_test.c      | 151 +++++++++
->  virt/kvm/arm/arm.c                            |   3 +
->  virt/kvm/kvm_main.c                           |   2 -
->  16 files changed, 514 insertions(+), 11 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/include/s390x/processor.h
->  rename tools/testing/selftests/kvm/{x86_64 => }/kvm_create_max_vcpus.c (93%)
->  create mode 100644 tools/testing/selftests/kvm/lib/s390x/processor.c
->  create mode 100644 tools/testing/selftests/kvm/s390x/sync_regs_test.c
-> 
+> -----Original Message-----
+> From: Cornelia Huck <cohuck@redhat.com>
+> Sent: Wednesday, May 22, 2019 3:25 PM
+> To: Parav Pandit <parav@mellanox.com>
+> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
+> kwankhede@nvidia.com; alex.williamson@redhat.com; cjia@nvidia.com
+> Subject: Re: [PATCHv3 1/3] vfio/mdev: Improve the create/remove sequence
+>=20
+> On Thu, 16 May 2019 18:30:32 -0500
+> Parav Pandit <parav@mellanox.com> wrote:
+>=20
+> > This patch addresses below two issues and prepares the code to address
+> > 3rd issue listed below.
+> >
+> > 1. mdev device is placed on the mdev bus before it is created in the
+> > vendor driver. Once a device is placed on the mdev bus without
+> > creating its supporting underlying vendor device, mdev driver's probe()
+> gets triggered.
+> > However there isn't a stable mdev available to work on.
+> >
+> >    create_store()
+> >      mdev_create_device()
+> >        device_register()
+> >           ...
+> >          vfio_mdev_probe()
+> >         [...]
+> >         parent->ops->create()
+> >           vfio_ap_mdev_create()
+> >             mdev_set_drvdata(mdev, matrix_mdev);
+> >             /* Valid pointer set above */
+> >
+> > Due to this way of initialization, mdev driver who wants to use the
+> > mdev, doesn't have a valid mdev to work on.
+> >
+> > 2. Current creation sequence is,
+> >    parent->ops_create()
+> >    groups_register()
+> >
+> > Remove sequence is,
+> >    parent->ops->remove()
+> >    groups_unregister()
+> >
+> > However, remove sequence should be exact mirror of creation sequence.
+> > Once this is achieved, all users of the mdev will be terminated first
+> > before removing underlying vendor device.
+> > (Follow standard linux driver model).
+> > At that point vendor's remove() ops shouldn't fail because taking the
+> > device off the bus should terminate any usage.
+> >
+> > 3. When remove operation fails, mdev sysfs removal attempts to add the
+> > file back on already removed device. Following call trace [1] is observ=
+ed.
+> >
+> > [1] call trace:
+> > kernel: WARNING: CPU: 2 PID: 9348 at fs/sysfs/file.c:327
+> > sysfs_create_file_ns+0x7f/0x90
+> > kernel: CPU: 2 PID: 9348 Comm: bash Kdump: loaded Not tainted
+> > 5.1.0-rc6-vdevbus+ #6
+> > kernel: Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS 2.0b
+> > 08/09/2016
+> > kernel: RIP: 0010:sysfs_create_file_ns+0x7f/0x90
+> > kernel: Call Trace:
+> > kernel: remove_store+0xdc/0x100 [mdev]
+> > kernel: kernfs_fop_write+0x113/0x1a0
+> > kernel: vfs_write+0xad/0x1b0
+> > kernel: ksys_write+0x5a/0xe0
+> > kernel: do_syscall_64+0x5a/0x210
+> > kernel: entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> >
+> > Therefore, mdev core is improved in following ways.
+> >
+> > 1. Split the device registration/deregistration sequence so that some
+> > things can be done between initialization of the device and hooking it
+> > up to the bus respectively after deregistering it from the bus but
+> > before giving up our final reference.
+> > In particular, this means invoking the ->create and ->remove callbacks
+> > in those new windows. This gives the vendor driver an initialized mdev
+> > device to work with during creation.
+> > At the same time, a bus driver who wish to bind to mdev driver also
+>=20
+> s/who wish/that wishes/
+>=20
+> > gets initialized mdev device.
+> >
+> > This follows standard Linux kernel bus and device model.
+> >
+> > 2. During remove flow, first remove the device from the bus. This
+> > ensures that any bus specific devices are removed.
+> > Once device is taken off the mdev bus, invoke remove() of mdev from
+> > the vendor driver.
+> >
+> > 3. The driver core device model provides way to register and auto
+> > unregister the device sysfs attribute groups at dev->groups.
+> > Make use of dev->groups to let core create the groups and eliminate
+> > code to avoid explicit groups creation and removal.
+> >
+> > To ensure, that new sequence is solid, a below stack dump of a process
+> > is taken who attempts to remove the device while device is in use by
+> > vfio driver and user application.
+> > This stack dump validates that vfio driver guards against such device
+> > removal when device is in use.
+> >
+> >  cat /proc/21962/stack
+> > [<0>] vfio_del_group_dev+0x216/0x3c0 [vfio] [<0>]
+> > mdev_remove+0x21/0x40 [mdev] [<0>]
+> > device_release_driver_internal+0xe8/0x1b0
+> > [<0>] bus_remove_device+0xf9/0x170
+> > [<0>] device_del+0x168/0x350
+> > [<0>] mdev_device_remove_common+0x1d/0x50 [mdev] [<0>]
+> > mdev_device_remove+0x8c/0xd0 [mdev] [<0>] remove_store+0x71/0x90
+> > [mdev] [<0>] kernfs_fop_write+0x113/0x1a0 [<0>] vfs_write+0xad/0x1b0
+> > [<0>] ksys_write+0x5a/0xe0 [<0>] do_syscall_64+0x5a/0x210 [<0>]
+> > entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> > [<0>] 0xffffffffffffffff
+> >
+> > This prepares the code to eliminate calling device_create_file() in
+> > subsquent patch.
+> >
+> > Signed-off-by: Parav Pandit <parav@mellanox.com>
+> > ---
+> >  drivers/vfio/mdev/mdev_core.c    | 94 +++++++++-----------------------
+> >  drivers/vfio/mdev/mdev_private.h |  2 +-
+> >  drivers/vfio/mdev/mdev_sysfs.c   |  2 +-
+> >  3 files changed, 27 insertions(+), 71 deletions(-)
+>=20
+> Personally, I'd do a more compact patch description, but there's nothing
+> really wrong with yours, either.
+>=20
+> Patch also seems sane to me, although I'd probably have merged this and
+> the next patch. But no reason to quibble further.
+>=20
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
+I missed to add your RB signature in v4.
+If you send all 3 or just fist 2 of them in 5.2-rc, please include Cornelia=
+'s RB tag.
