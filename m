@@ -2,117 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A48C2A377
-	for <lists+kvm@lfdr.de>; Sat, 25 May 2019 10:38:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 984F72A383
+	for <lists+kvm@lfdr.de>; Sat, 25 May 2019 10:57:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726458AbfEYIiO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 May 2019 04:38:14 -0400
-Received: from mail-eopbgr680041.outbound.protection.outlook.com ([40.107.68.41]:51968
-        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
+        id S1726464AbfEYIyy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 May 2019 04:54:54 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58168 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726376AbfEYIiO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 May 2019 04:38:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r6J2DvToHqUoKJMZU5ckrb26c5lekjhb7vISkynKHyI=;
- b=KExin2AMte4c/j7+rFNWbofR0BeuSUpBWbQDy6w+XHknTeULNVIPux87gv+iYLDZ/oN2OHErnPVp4LlTZ7pLfmVEL+my2NfdGmegE6nVyiqGtdO2NPMkq7AKSVSHMgkPG+mu/GHApqF3ySrNqj76N56MGThU5AK01GXqk0co0Mg=
-Received: from BYAPR05MB4776.namprd05.prod.outlook.com (52.135.233.146) by
- BYAPR05MB4615.namprd05.prod.outlook.com (52.135.233.24) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1922.13; Sat, 25 May 2019 08:38:06 +0000
-Received: from BYAPR05MB4776.namprd05.prod.outlook.com
- ([fe80::2cb6:a3d1:f675:ced8]) by BYAPR05MB4776.namprd05.prod.outlook.com
- ([fe80::2cb6:a3d1:f675:ced8%3]) with mapi id 15.20.1943.007; Sat, 25 May 2019
- 08:38:06 +0000
-From:   Nadav Amit <namit@vmware.com>
-To:     Nadav Amit <namit@vmware.com>
-CC:     Ingo Molnar <mingo@redhat.com>,
+        id S1726376AbfEYIyy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 May 2019 04:54:54 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 4A801AE27;
+        Sat, 25 May 2019 08:54:52 +0000 (UTC)
+Subject: Re: [RFC PATCH 5/6] x86/mm/tlb: Flush remote and local TLBs
+ concurrently
+To:     Nadav Amit <namit@vmware.com>, Ingo Molnar <mingo@redhat.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Andy Lutomirski <luto@kernel.org>
+Cc:     Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
         "K. Y. Srinivasan" <kys@microsoft.com>,
         Haiyang Zhang <haiyangz@microsoft.com>,
         Stephen Hemminger <sthemmin@microsoft.com>,
         Sasha Levin <sashal@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "x86@kernel.org" <x86@kernel.org>, Juergen Gross <jgross@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-Subject: Re: [RFC PATCH 5/6] x86/mm/tlb: Flush remote and local TLBs
- concurrently
-Thread-Topic: [RFC PATCH 5/6] x86/mm/tlb: Flush remote and local TLBs
- concurrently
-Thread-Index: AQHVEtL3brMxLnyQKEm7V/vFcW9jOKZ7hLGA
-Date:   Sat, 25 May 2019 08:38:05 +0000
-Message-ID: <F9875905-7383-4815-B6F6-B3EA73B7BF3F@vmware.com>
+        linux-hyperv@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org
 References: <20190525082203.6531-1-namit@vmware.com>
  <20190525082203.6531-6-namit@vmware.com>
-In-Reply-To: <20190525082203.6531-6-namit@vmware.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=namit@vmware.com; 
-x-originating-ip: [2601:647:4580:b719:c833:b364:6fe3:b42b]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a0ecb8eb-24df-456a-89f4-08d6e0ec4eed
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:BYAPR05MB4615;
-x-ms-traffictypediagnostic: BYAPR05MB4615:
-x-microsoft-antispam-prvs: <BYAPR05MB461521666233A75FC7AA838CD0030@BYAPR05MB4615.namprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-forefront-prvs: 0048BCF4DA
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(39860400002)(366004)(396003)(136003)(346002)(376002)(199004)(189003)(82746002)(99286004)(229853002)(66556008)(64756008)(66446008)(73956011)(66476007)(66946007)(25786009)(53546011)(54906003)(14444005)(14454004)(256004)(6200100001)(37006003)(8936002)(81166006)(81156014)(6506007)(8676002)(7416002)(33656002)(6436002)(76176011)(86362001)(76116006)(305945005)(7736002)(316002)(478600001)(6512007)(486006)(6486002)(476003)(5660300002)(446003)(6862004)(46003)(11346002)(36756003)(4744005)(2616005)(6246003)(2906002)(53936002)(4326008)(186003)(102836004)(6116002)(71200400001)(71190400001)(68736007)(83716004);DIR:OUT;SFP:1101;SCL:1;SRVR:BYAPR05MB4615;H:BYAPR05MB4776.namprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: vmware.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: +MzpgiAwJJ1Y0+54CC/xVsiJ4fsLrUc+V0z0BaUwSLpHi6Mi7JLHsskn5Gv3BeLeI8Wb/WhcQ0SOfBPPg1IVALSCW1hImG0HugvyeMPmYwW98wqjf87+iqYUo5egeAHCsNnguUht6k8YuhR7IEcZbiOlQdMlJJmDC90xta/NvEyAWOxp796E841P/hJHBnIaFUGfF8cHkUCb5uWt91nCE7mRNboQUIOO9f1ZW3VgN6/DoRvnHdQgV613iTDauyBS61xGRtOJJv9qT9Bjq5+1Q4JLhCKtsv+4u07av/oXlRbgQAnrJoJeIXgV39kO12HScwXMTHEPHlkARtAubi+1xPaeXzCqvsx0pwkF1epyppKLH0xf9k65U2hqZgxUt3o32n7X4a3R4i8mUKJbZZTD8VyXBka88JwTe1snJxBmMuA=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <75106B379062644D9E12CC0F943F0E87@namprd05.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+From:   Juergen Gross <jgross@suse.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jgross@suse.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <08b21fb5-2226-7924-30e3-31e4adcfc0a3@suse.com>
+Date:   Sat, 25 May 2019 10:54:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-X-OriginatorOrg: vmware.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a0ecb8eb-24df-456a-89f4-08d6e0ec4eed
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 May 2019 08:38:05.9608
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: namit@vmware.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR05MB4615
+In-Reply-To: <20190525082203.6531-6-namit@vmware.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On May 25, 2019, at 1:22 AM, Nadav Amit <namit@vmware.com> wrote:
->=20
+On 25/05/2019 10:22, Nadav Amit wrote:
 > To improve TLB shootdown performance, flush the remote and local TLBs
 > concurrently. Introduce flush_tlb_multi() that does so. The current
 > flush_tlb_others() interface is kept, since paravirtual interfaces need
 > to be adapted first before it can be removed. This is left for future
 > work. In such PV environments, TLB flushes are not performed, at this
 > time, concurrently.
->=20
-> +void native_flush_tlb_multi(const struct cpumask *cpumask,
-> +			    const struct flush_tlb_info *info)
-> {
+> 
+> Add a static key to tell whether this new interface is supported.
+> 
+> Cc: "K. Y. Srinivasan" <kys@microsoft.com>
+> Cc: Haiyang Zhang <haiyangz@microsoft.com>
+> Cc: Stephen Hemminger <sthemmin@microsoft.com>
+> Cc: Sasha Levin <sashal@kernel.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: x86@kernel.org
+> Cc: Juergen Gross <jgross@suse.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: Andy Lutomirski <luto@kernel.org>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+> Cc: linux-hyperv@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: virtualization@lists.linux-foundation.org
+> Cc: kvm@vger.kernel.org
+> Cc: xen-devel@lists.xenproject.org
+> Signed-off-by: Nadav Amit <namit@vmware.com>
+> ---
+>  arch/x86/hyperv/mmu.c                 |  2 +
+>  arch/x86/include/asm/paravirt.h       |  8 +++
+>  arch/x86/include/asm/paravirt_types.h |  6 ++
+>  arch/x86/include/asm/tlbflush.h       |  6 ++
+>  arch/x86/kernel/kvm.c                 |  1 +
+>  arch/x86/kernel/paravirt.c            |  3 +
+>  arch/x86/mm/tlb.c                     | 80 +++++++++++++++++++++++----
+>  arch/x86/xen/mmu_pv.c                 |  2 +
+>  8 files changed, 96 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/x86/hyperv/mmu.c b/arch/x86/hyperv/mmu.c
+> index e65d7fe6489f..ca28b400c87c 100644
+> --- a/arch/x86/hyperv/mmu.c
+> +++ b/arch/x86/hyperv/mmu.c
+> @@ -233,4 +233,6 @@ void hyperv_setup_mmu_ops(void)
+>  	pr_info("Using hypercall for remote TLB flush\n");
+>  	pv_ops.mmu.flush_tlb_others = hyperv_flush_tlb_others;
+>  	pv_ops.mmu.tlb_remove_table = tlb_remove_table;
+> +
+> +	static_key_disable(&flush_tlb_multi_enabled.key);
+>  }
+> diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/paravirt.h
+> index c25c38a05c1c..192be7254457 100644
+> --- a/arch/x86/include/asm/paravirt.h
+> +++ b/arch/x86/include/asm/paravirt.h
+> @@ -47,6 +47,8 @@ static inline void slow_down_io(void)
+>  #endif
+>  }
+>  
+> +DECLARE_STATIC_KEY_TRUE(flush_tlb_multi_enabled);
+> +
+>  static inline void __flush_tlb(void)
+>  {
+>  	PVOP_VCALL0(mmu.flush_tlb_user);
+> @@ -62,6 +64,12 @@ static inline void __flush_tlb_one_user(unsigned long addr)
+>  	PVOP_VCALL1(mmu.flush_tlb_one_user, addr);
+>  }
+>  
+> +static inline void flush_tlb_multi(const struct cpumask *cpumask,
+> +				   const struct flush_tlb_info *info)
+> +{
+> +	PVOP_VCALL2(mmu.flush_tlb_multi, cpumask, info);
+> +}
+> +
+>  static inline void flush_tlb_others(const struct cpumask *cpumask,
+>  				    const struct flush_tlb_info *info)
+>  {
+> diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm/paravirt_types.h
+> index 946f8f1f1efc..3a156e63c57d 100644
+> --- a/arch/x86/include/asm/paravirt_types.h
+> +++ b/arch/x86/include/asm/paravirt_types.h
+> @@ -211,6 +211,12 @@ struct pv_mmu_ops {
+>  	void (*flush_tlb_user)(void);
+>  	void (*flush_tlb_kernel)(void);
+>  	void (*flush_tlb_one_user)(unsigned long addr);
 > +	/*
-> +	 * native_flush_tlb_multi() can handle a single CPU, but it is
-> +	 * suboptimal if the local TLB should be flushed, and therefore should
-> +	 * not be used in such case. Check that it is not used in such case,
-> +	 * and use this assumption for tracing and accounting of remote TLB
-> +	 * flushes.
-> +	 */
-> +	VM_WARN_ON(!cpumask_any_but(cpumask, smp_processor_id()));
+> +	 * flush_tlb_multi() is the preferred interface. When it is used,
+> +	 * flush_tlb_others() should return false.
 
-This warning might fire off incorrectly and will be removed.
+This comment does not make sense. flush_tlb_others() return type is
+void.
 
+
+Juergen
