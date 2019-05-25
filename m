@@ -2,89 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 85CB42A3D9
-	for <lists+kvm@lfdr.de>; Sat, 25 May 2019 11:58:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2473B2A4C0
+	for <lists+kvm@lfdr.de>; Sat, 25 May 2019 15:54:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726826AbfEYJ6I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 25 May 2019 05:58:08 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:58124 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726667AbfEYJ6E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 25 May 2019 05:58:04 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DC81580D;
-        Sat, 25 May 2019 02:58:03 -0700 (PDT)
-Received: from mbp (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 19D783F703;
-        Sat, 25 May 2019 02:57:57 -0700 (PDT)
-Date:   Sat, 25 May 2019 10:57:55 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v15 05/17] arms64: untag user pointers passed to memory
- syscalls
-Message-ID: <20190525095753.caehqipafdc5m3yp@mbp>
-References: <cover.1557160186.git.andreyknvl@google.com>
- <00eb4c63fefc054e2c8d626e8fedfca11d7c2600.1557160186.git.andreyknvl@google.com>
+        id S1726940AbfEYNyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 25 May 2019 09:54:21 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:17573 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726898AbfEYNyV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 25 May 2019 09:54:21 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id DC0AF18DC2E8F554C2AD;
+        Sat, 25 May 2019 21:54:18 +0800 (CST)
+Received: from localhost (10.177.31.96) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Sat, 25 May 2019
+ 21:54:08 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     <kwankhede@nvidia.com>, <alex.williamson@redhat.com>
+CC:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH -next] sample/mdev/mbochs: remove set but not used variable 'mdev_state'
+Date:   Sat, 25 May 2019 21:53:49 +0800
+Message-ID: <20190525135349.16488-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00eb4c63fefc054e2c8d626e8fedfca11d7c2600.1557160186.git.andreyknvl@google.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Type: text/plain
+X-Originating-IP: [10.177.31.96]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 06, 2019 at 06:30:51PM +0200, Andrey Konovalov wrote:
-> +SYSCALL_DEFINE5(arm64_get_mempolicy, int __user *, policy,
-> +		unsigned long __user *, nmask, unsigned long, maxnode,
-> +		unsigned long, addr, unsigned long, flags)
-> +{
-> +	addr = untagged_addr(addr);
-> +	return ksys_get_mempolicy(policy, nmask, maxnode, addr, flags);
-> +}
-[...]
-> +SYSCALL_DEFINE6(arm64_mbind, unsigned long, start, unsigned long, len,
-> +		unsigned long, mode, const unsigned long __user *, nmask,
-> +		unsigned long, maxnode, unsigned int, flags)
-> +{
-> +	start = untagged_addr(start);
-> +	return ksys_mbind(start, len, mode, nmask, maxnode, flags);
-> +}
+Fixes gcc '-Wunused-but-set-variable' warning:
 
-The kernel fails to build with CONFIG_NUMA disabled because the above
-are in mm/mempolicy.c which is no longer compiled in.
+samples/vfio-mdev/mbochs.c: In function mbochs_ioctl:
+samples/vfio-mdev/mbochs.c:1188:21: warning: variable mdev_state set but not used [-Wunused-but-set-variable]
 
+It's not used any more since commit 104c7405a64d ("vfio:
+add edid support to mbochs sample driver")
+
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ samples/vfio-mdev/mbochs.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+index b038aa9f5a70..ac5c8c17b1ff 100644
+--- a/samples/vfio-mdev/mbochs.c
++++ b/samples/vfio-mdev/mbochs.c
+@@ -1185,9 +1185,6 @@ static long mbochs_ioctl(struct mdev_device *mdev, unsigned int cmd,
+ {
+ 	int ret = 0;
+ 	unsigned long minsz, outsz;
+-	struct mdev_state *mdev_state;
+-
+-	mdev_state = mdev_get_drvdata(mdev);
+ 
+ 	switch (cmd) {
+ 	case VFIO_DEVICE_GET_INFO:
 -- 
-Catalin
+2.17.1
+
+
