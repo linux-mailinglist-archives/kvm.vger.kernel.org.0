@@ -2,87 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1DDDC2AB82
-	for <lists+kvm@lfdr.de>; Sun, 26 May 2019 19:54:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC85F2AC35
+	for <lists+kvm@lfdr.de>; Sun, 26 May 2019 22:49:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728046AbfEZRxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 May 2019 13:53:55 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:41523 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727985AbfEZRxy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 May 2019 13:53:54 -0400
-Received: by mail-wr1-f65.google.com with SMTP id u16so10729645wrn.8
-        for <kvm@vger.kernel.org>; Sun, 26 May 2019 10:53:53 -0700 (PDT)
+        id S1726102AbfEZUth (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 May 2019 16:49:37 -0400
+Received: from mail-lf1-f48.google.com ([209.85.167.48]:38801 "EHLO
+        mail-lf1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725820AbfEZUtg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 May 2019 16:49:36 -0400
+Received: by mail-lf1-f48.google.com with SMTP id b11so4173908lfa.5
+        for <kvm@vger.kernel.org>; Sun, 26 May 2019 13:49:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IJg/yCjfVM3Ozhpb5ZCNN4WebegqjDbfI7FMAeP5e48=;
+        b=GD3ZVbCtAZQtaJFSDPqrCMmGJBcOkN8aadPzlAK4DlrCkWV1mtFgYPxuS4XgVoIFNB
+         07DttpIS7YSA6RHknmleBz7ZadImeyD5hn2YsmsOhxL1gJeJcYNAfteCCxReSzZW5Sy7
+         HXffCAFYiq7pFrgWGoGWbWSP6Y+fjHTJprbE0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3E6kp+r7OBI+9gX6jKnLvemsSLfWQYZx5SlrWEsr91k=;
-        b=ivKPEOf70BFCAejpM8u35lF6Z5a0cH7hQABjnF44bNmSNh02mz/0A1eWdr0h1QAusC
-         OjsRQijiVmbjRn/SN8pPSuXc8d8seVIgHhf5uBvVrXc01hUYEDtpROY57XtEwHXysvF7
-         xNEXXjuIngFUWoPOM3eWgC1oMh32K7hYDPQ6wBbWpKisZaSBGQewdtCQYBJvkQ+2BH9e
-         vWQSpTxD5FOLmPAG9f7FoFi6Lks2EaT+euUQHo4CYsYHfQDTrgFSLYhijLorRHJC3Pv+
-         L71q7/OMIPD2ubFtZY1ohZaPhYZB8ki+jUQRW1gyIXcIsTgawlN8g5TbEunUC25jcOjJ
-         VT/g==
-X-Gm-Message-State: APjAAAViA5hQtSoJXNvhPI2C3h/iwfycTUd/uplsqszb9kAsuoyH2m4d
-        f5qMOANFLLTLBHrv7l7a2T7cdmY2MY0=
-X-Google-Smtp-Source: APXvYqzQOxQEM8sgEkxzsO2Ks3B+FO1y/Lc06FIhA94o3VdiVhvDVjoDuFE1oO8eaQRV+PbB7yXgnA==
-X-Received: by 2002:adf:8062:: with SMTP id 89mr678539wrk.97.1558893232941;
-        Sun, 26 May 2019 10:53:52 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7428:5a9c:3100:a747? ([2001:b07:6468:f312:7428:5a9c:3100:a747])
-        by smtp.gmail.com with ESMTPSA id n10sm418987wrr.11.2019.05.26.10.53.51
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IJg/yCjfVM3Ozhpb5ZCNN4WebegqjDbfI7FMAeP5e48=;
+        b=X+wMyVS54MyJGA3JEI9wx0EhFQvt4+GPPrLo6SYNRIx7f6Ju+WQdFScisWxOtx/v4A
+         e0T5m0GUShhPVwT9sAOiMiEnSkBwyWyvZgZikoEefBy4FRwJJHZm0veEtTBVSmBGSjCI
+         um5tFUEmQC1CsXd+Uus2XotbKGdz7Cul6/8mSxFwwHtPULK6HBHqMTqNqeZQLdeDN8Ap
+         /ai+e3cSiJkCoREQ7xhTokJFjqhbEtGsEz0PwMFPt1QPOt+99aDNNd2P+R8OfvvTpvTz
+         wvAa9UwwIA1abTOscVTBxbhHj01C0zkYI0uBEjPC/yU/muthA+JprkPToWnxd5/uopFE
+         Fqvw==
+X-Gm-Message-State: APjAAAXTBSqu4b7jwDkpIElJ8PTLn0vIAM8esauMkcQqidToN4M1SFSo
+        l9W+LtGwwvM9EasmIS0AaqmuRyg+yvc=
+X-Google-Smtp-Source: APXvYqygSwh83QeXQ8N9gTuaiUrSzAGxV9Btw0MYB2/XWexJkDJUed6JIKxbSpwPEYw3NPccpmCXSw==
+X-Received: by 2002:ac2:5961:: with SMTP id h1mr6228386lfp.183.1558903774113;
+        Sun, 26 May 2019 13:49:34 -0700 (PDT)
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com. [209.85.167.54])
+        by smtp.gmail.com with ESMTPSA id v12sm1839172ljv.49.2019.05.26.13.49.33
+        for <kvm@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 26 May 2019 10:53:52 -0700 (PDT)
+        Sun, 26 May 2019 13:49:33 -0700 (PDT)
+Received: by mail-lf1-f54.google.com with SMTP id a25so724644lfg.2
+        for <kvm@vger.kernel.org>; Sun, 26 May 2019 13:49:33 -0700 (PDT)
+X-Received: by 2002:a19:521a:: with SMTP id m26mr10136807lfb.134.1558903772902;
+ Sun, 26 May 2019 13:49:32 -0700 (PDT)
+MIME-Version: 1.0
+References: <1558864555-53503-1-git-send-email-pbonzini@redhat.com>
+ <CAHk-=wi3YcO4JTpkeENETz3fqf3DeKc7-tvXwqPmVcq-pgKg5g@mail.gmail.com> <2d55fd2a-afbf-1b7c-ca82-8bffaa18e0d0@redhat.com>
+In-Reply-To: <2d55fd2a-afbf-1b7c-ca82-8bffaa18e0d0@redhat.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun, 26 May 2019 13:49:16 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgzKzAwS=_ySikL1f=Gr62YXL_WXGh82wZKMOvzJ9+2VA@mail.gmail.com>
+Message-ID: <CAHk-=wgzKzAwS=_ySikL1f=Gr62YXL_WXGh82wZKMOvzJ9+2VA@mail.gmail.com>
 Subject: Re: [GIT PULL] KVM changes for Linux 5.2-rc2
-To:     Linus Torvalds <torvalds@linux-foundation.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Junio Hamano C <gitster@pobox.com>
 Cc:     Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
         =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        KVM list <kvm@vger.kernel.org>
-References: <1558864555-53503-1-git-send-email-pbonzini@redhat.com>
- <CAHk-=wi3YcO4JTpkeENETz3fqf3DeKc7-tvXwqPmVcq-pgKg5g@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2d55fd2a-afbf-1b7c-ca82-8bffaa18e0d0@redhat.com>
-Date:   Sun, 26 May 2019 19:53:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <CAHk-=wi3YcO4JTpkeENETz3fqf3DeKc7-tvXwqPmVcq-pgKg5g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        KVM list <kvm@vger.kernel.org>,
+        Git List Mailing <git@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/05/19 17:51, Linus Torvalds wrote:
-> On Sun, May 26, 2019 at 2:56 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->>   https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-> 
-> This says it's a tag, but it's not. It's just a commit pointer (also
-> called a "lightweight tag", because while it technically is exactly
-> the same thing as a branch, it's obviously in the tag namespace and
-> git will _treat_ it like a tag).
-> 
-> Normally your tags are proper signed tags. So I'm not pulling this,
-> waiting for confirmation.
+On Sun, May 26, 2019 at 10:53 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The interesting thing is that not only git will treat lightweight tags
+> like, well, tags:
 
-Shell history shows that I typed
+Yeah, that's very much by design - lightweight tags are very
+comvenient for local temporary stuff where you don't want signing etc
+(think automated test infrastructure, or just local reminders).
 
-	git push kvm +HEAD:tags/for-linus
+> In addition, because I _locally_ had a tag object that
+> pointed to the same commit and had the same name, git-request-pull
+> included my local tag's message in its output!  I wonder if this could
+> be considered a bug.
 
-(which matches the "git push kvm +HEAD:queue" that I often do, and
-therefore can be explained by muscle memory).
+Yeah, I think git request-pull should at least *warn* about the tag
+not being the same object locally as in the remote you're asking me to
+pull.
 
-The interesting thing is that not only git will treat lightweight tags
-like, well, tags: in addition, because I _locally_ had a tag object that
-pointed to the same commit and had the same name, git-request-pull
-included my local tag's message in its output!  I wonder if this could
-be considered a bug.
+Are you sure you didn't get a warning, and just missed it? But adding
+Junio and the Git list just as a possible heads-up for this in case
+git request-pull really only compares the object the tag points to,
+rather than the SHA1 of the tag itself.
 
-I have now pushed the actual tag object to the same place.
-
-Paolo
-
+             Linus
