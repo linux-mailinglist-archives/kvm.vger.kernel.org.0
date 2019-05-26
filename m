@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FEC12AAD0
-	for <lists+kvm@lfdr.de>; Sun, 26 May 2019 18:11:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34A4C2AAD3
+	for <lists+kvm@lfdr.de>; Sun, 26 May 2019 18:11:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728142AbfEZQLU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 May 2019 12:11:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55426 "EHLO mx1.redhat.com"
+        id S1727865AbfEZQL0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 May 2019 12:11:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38234 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727865AbfEZQLT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 May 2019 12:11:19 -0400
+        id S1728148AbfEZQLY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 May 2019 12:11:24 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3711F3082E51;
-        Sun, 26 May 2019 16:11:19 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6F2F486668;
+        Sun, 26 May 2019 16:11:23 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-67.ams2.redhat.com [10.36.116.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 55AE34FA39;
-        Sun, 26 May 2019 16:11:15 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8CF245D962;
+        Sun, 26 May 2019 16:11:19 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
@@ -28,220 +28,213 @@ To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         will.deacon@arm.com, robin.murphy@arm.com
 Cc:     kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com,
         peter.maydell@linaro.org, vincent.stehle@arm.com
-Subject: [PATCH v8 11/29] iommu/arm-smmu-v3: Maintain a SID->device structure
-Date:   Sun, 26 May 2019 18:09:46 +0200
-Message-Id: <20190526161004.25232-12-eric.auger@redhat.com>
+Subject: [PATCH v8 12/29] iommu/smmuv3: Dynamically allocate s1_cfg and s2_cfg
+Date:   Sun, 26 May 2019 18:09:47 +0200
+Message-Id: <20190526161004.25232-13-eric.auger@redhat.com>
 In-Reply-To: <20190526161004.25232-1-eric.auger@redhat.com>
 References: <20190526161004.25232-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Sun, 26 May 2019 16:11:19 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Sun, 26 May 2019 16:11:23 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+In preparation for the introduction of nested configuration
+let's turn s1_cfg and s2_cfg fields into pointers which are
+dynamically allocated depending on the smmu_domain stage.
 
-When handling faults from the event or PRI queue, we need to find the
-struct device associated to a SID. Add a rb_tree to keep track of SIDs.
+In nested mode, s1_cfg will only be allocated when setting up
+S1 translation.
 
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- drivers/iommu/arm-smmu-v3.c | 134 ++++++++++++++++++++++++++++++++++--
- 1 file changed, 130 insertions(+), 4 deletions(-)
+ drivers/iommu/arm-smmu-v3.c | 88 +++++++++++++++++++++----------------
+ 1 file changed, 49 insertions(+), 39 deletions(-)
 
 diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index 4d5a694f02c2..1c9f0444a81b 100644
+index 1c9f0444a81b..7be509ed86d9 100644
 --- a/drivers/iommu/arm-smmu-v3.c
 +++ b/drivers/iommu/arm-smmu-v3.c
-@@ -594,6 +594,16 @@ struct arm_smmu_device {
+@@ -634,10 +634,8 @@ struct arm_smmu_domain {
+ 	bool				non_strict;
  
- 	/* IOMMU core code handle */
- 	struct iommu_device		iommu;
-+
-+	struct rb_root			streams;
-+	struct mutex			streams_mutex;
-+
-+};
-+
-+struct arm_smmu_stream {
-+	u32				id;
-+	struct arm_smmu_master		*master;
-+	struct rb_node			node;
- };
+ 	enum arm_smmu_domain_stage	stage;
+-	union {
+-		struct arm_smmu_s1_cfg	s1_cfg;
+-		struct arm_smmu_s2_cfg	s2_cfg;
+-	};
++	struct arm_smmu_s1_cfg		*s1_cfg;
++	struct arm_smmu_s2_cfg		*s2_cfg;
  
- /* SMMU private data for each master */
-@@ -603,6 +613,7 @@ struct arm_smmu_master {
- 	struct arm_smmu_domain		*domain;
- 	struct list_head		domain_head;
- 	u32				*sids;
-+	struct arm_smmu_stream		*streams;
- 	unsigned int			num_sids;
- 	bool				ats_enabled		:1;
- };
-@@ -1289,6 +1300,32 @@ static int arm_smmu_init_l2_strtab(struct arm_smmu_device *smmu, u32 sid)
- 	return 0;
- }
+ 	struct iommu_domain		domain;
  
-+__maybe_unused
-+static struct arm_smmu_master *
-+arm_smmu_find_master(struct arm_smmu_device *smmu, u32 sid)
-+{
-+	struct rb_node *node;
-+	struct arm_smmu_stream *stream;
-+	struct arm_smmu_master *master = NULL;
-+
-+	mutex_lock(&smmu->streams_mutex);
-+	node = smmu->streams.rb_node;
-+	while (node) {
-+		stream = rb_entry(node, struct arm_smmu_stream, node);
-+		if (stream->id < sid) {
-+			node = node->rb_right;
-+		} else if (stream->id > sid) {
-+			node = node->rb_left;
-+		} else {
-+			master = stream->master;
-+			break;
-+		}
-+	}
-+	mutex_unlock(&smmu->streams_mutex);
-+
-+	return master;
-+}
-+
- /* IRQ and event handlers */
- static irqreturn_t arm_smmu_evtq_thread(int irq, void *dev)
+@@ -1165,17 +1163,8 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+ 	}
+ 
+ 	if (smmu_domain) {
+-		switch (smmu_domain->stage) {
+-		case ARM_SMMU_DOMAIN_S1:
+-			s1_cfg = &smmu_domain->s1_cfg;
+-			break;
+-		case ARM_SMMU_DOMAIN_S2:
+-		case ARM_SMMU_DOMAIN_NESTED:
+-			s2_cfg = &smmu_domain->s2_cfg;
+-			break;
+-		default:
+-			break;
+-		}
++		s1_cfg = smmu_domain->s1_cfg;
++		s2_cfg = smmu_domain->s2_cfg;
+ 	}
+ 
+ 	if (val & STRTAB_STE_0_V) {
+@@ -1587,11 +1576,11 @@ static void arm_smmu_tlb_inv_context(void *cookie)
+ 
+ 	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+ 		cmd.opcode	= CMDQ_OP_TLBI_NH_ASID;
+-		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
++		cmd.tlbi.asid	= smmu_domain->s1_cfg->cd.asid;
+ 		cmd.tlbi.vmid	= 0;
+ 	} else {
+ 		cmd.opcode	= CMDQ_OP_TLBI_S12_VMALL;
+-		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
++		cmd.tlbi.vmid	= smmu_domain->s2_cfg->vmid;
+ 	}
+ 
+ 	/*
+@@ -1618,10 +1607,10 @@ static void arm_smmu_tlb_inv_range_nosync(unsigned long iova, size_t size,
+ 
+ 	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+ 		cmd.opcode	= CMDQ_OP_TLBI_NH_VA;
+-		cmd.tlbi.asid	= smmu_domain->s1_cfg.cd.asid;
++		cmd.tlbi.asid	= smmu_domain->s1_cfg->cd.asid;
+ 	} else {
+ 		cmd.opcode	= CMDQ_OP_TLBI_S2_IPA;
+-		cmd.tlbi.vmid	= smmu_domain->s2_cfg.vmid;
++		cmd.tlbi.vmid	= smmu_domain->s2_cfg->vmid;
+ 	}
+ 
+ 	do {
+@@ -1702,26 +1691,29 @@ static void arm_smmu_domain_free(struct iommu_domain *domain)
  {
-@@ -2047,6 +2084,69 @@ static bool arm_smmu_sid_in_range(struct arm_smmu_device *smmu, u32 sid)
- 	return sid < limit;
- }
+ 	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+ 	struct arm_smmu_device *smmu = smmu_domain->smmu;
++	struct arm_smmu_s1_cfg *s1_cfg = smmu_domain->s1_cfg;
++	struct arm_smmu_s2_cfg *s2_cfg = smmu_domain->s2_cfg;
  
-+static int arm_smmu_insert_master(struct arm_smmu_device *smmu,
-+				  struct arm_smmu_master *master)
-+{
-+	int i;
-+	int ret = 0;
-+	struct arm_smmu_stream *new_stream, *cur_stream;
-+	struct rb_node **new_node, *parent_node = NULL;
-+
-+	master->streams = kcalloc(master->num_sids,
-+				  sizeof(struct arm_smmu_stream), GFP_KERNEL);
-+	if (!master->streams)
-+		return -ENOMEM;
-+
-+	mutex_lock(&smmu->streams_mutex);
-+	for (i = 0; i < master->num_sids && !ret; i++) {
-+		new_stream = &master->streams[i];
-+		new_stream->id = master->sids[i];
-+		new_stream->master = master;
-+
-+		new_node = &(smmu->streams.rb_node);
-+		while (*new_node) {
-+			cur_stream = rb_entry(*new_node, struct arm_smmu_stream,
-+					      node);
-+			parent_node = *new_node;
-+			if (cur_stream->id > new_stream->id) {
-+				new_node = &((*new_node)->rb_left);
-+			} else if (cur_stream->id < new_stream->id) {
-+				new_node = &((*new_node)->rb_right);
-+			} else {
-+				dev_warn(master->dev,
-+					 "stream %u already in tree\n",
-+					 cur_stream->id);
-+				ret = -EINVAL;
-+				break;
-+			}
-+		}
-+
-+		if (!ret) {
-+			rb_link_node(&new_stream->node, parent_node, new_node);
-+			rb_insert_color(&new_stream->node, &smmu->streams);
-+		}
-+	}
-+	mutex_unlock(&smmu->streams_mutex);
-+
-+	return ret;
-+}
-+
-+static void arm_smmu_remove_master(struct arm_smmu_device *smmu,
-+				   struct arm_smmu_master *master)
-+{
-+	int i;
-+
-+	if (!master->streams)
-+		return;
-+
-+	mutex_lock(&smmu->streams_mutex);
-+	for (i = 0; i < master->num_sids; i++)
-+		rb_erase(&master->streams[i].node, &smmu->streams);
-+	mutex_unlock(&smmu->streams_mutex);
-+
-+	kfree(master->streams);
-+}
-+
- static struct iommu_ops arm_smmu_ops;
+ 	iommu_put_dma_cookie(domain);
+ 	free_io_pgtable_ops(smmu_domain->pgtbl_ops);
  
- static int arm_smmu_add_device(struct device *dev)
-@@ -2097,13 +2197,35 @@ static int arm_smmu_add_device(struct device *dev)
+-	/* Free the CD and ASID, if we allocated them */
+-	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+-		struct arm_smmu_s1_cfg *cfg = &smmu_domain->s1_cfg;
+-
+-		if (cfg->cdptr) {
++	if (s1_cfg) {
++		/* Free the CD and ASID, if we allocated them */
++		if (s1_cfg->cdptr) {
+ 			dmam_free_coherent(smmu_domain->smmu->dev,
+ 					   CTXDESC_CD_DWORDS << 3,
+-					   cfg->cdptr,
+-					   cfg->cdptr_dma);
++					   s1_cfg->cdptr,
++					   s1_cfg->cdptr_dma);
+ 
+-			arm_smmu_bitmap_free(smmu->asid_map, cfg->cd.asid);
++			arm_smmu_bitmap_free(smmu->asid_map,
++					     s1_cfg->cd.asid);
  		}
+-	} else {
+-		struct arm_smmu_s2_cfg *cfg = &smmu_domain->s2_cfg;
+-		if (cfg->vmid)
+-			arm_smmu_bitmap_free(smmu->vmid_map, cfg->vmid);
++		kfree(s1_cfg);
++	}
++	if (s2_cfg) {
++		if (s2_cfg->vmid)
++			arm_smmu_bitmap_free(smmu->vmid_map, s2_cfg->vmid);
++		kfree(s2_cfg);
  	}
  
-+	ret = iommu_device_link(&smmu->iommu, dev);
-+	if (ret)
-+		goto err_free_master;
+ 	kfree(smmu_domain);
+@@ -1733,11 +1725,16 @@ static int arm_smmu_domain_finalise_s1(struct arm_smmu_domain *smmu_domain,
+ 	int ret;
+ 	int asid;
+ 	struct arm_smmu_device *smmu = smmu_domain->smmu;
+-	struct arm_smmu_s1_cfg *cfg = &smmu_domain->s1_cfg;
++	struct arm_smmu_s1_cfg *cfg = kzalloc(sizeof(*cfg), GFP_KERNEL);
 +
-+	ret = arm_smmu_insert_master(smmu, master);
-+	if (ret)
-+		goto err_unlink;
-+
- 	group = iommu_group_get_for_dev(dev);
--	if (!IS_ERR(group)) {
--		iommu_group_put(group);
--		iommu_device_link(&smmu->iommu, dev);
-+	if (IS_ERR(group)) {
-+		ret = PTR_ERR(group);
-+		goto err_remove_master;
- 	}
++	if (!cfg)
++		return -ENOMEM;
  
--	return PTR_ERR_OR_ZERO(group);
-+	iommu_group_put(group);
+ 	asid = arm_smmu_bitmap_alloc(smmu->asid_map, smmu->asid_bits);
+-	if (asid < 0)
+-		return asid;
++	if (asid < 0) {
++		ret = asid;
++		goto out_free_cfg;
++	}
+ 
+ 	cfg->cdptr = dmam_alloc_coherent(smmu->dev, CTXDESC_CD_DWORDS << 3,
+ 					 &cfg->cdptr_dma,
+@@ -1752,28 +1749,41 @@ static int arm_smmu_domain_finalise_s1(struct arm_smmu_domain *smmu_domain,
+ 	cfg->cd.ttbr	= pgtbl_cfg->arm_lpae_s1_cfg.ttbr[0];
+ 	cfg->cd.tcr	= pgtbl_cfg->arm_lpae_s1_cfg.tcr;
+ 	cfg->cd.mair	= pgtbl_cfg->arm_lpae_s1_cfg.mair[0];
++	smmu_domain->s1_cfg = cfg;
+ 	return 0;
+ 
+ out_free_asid:
+ 	arm_smmu_bitmap_free(smmu->asid_map, asid);
++out_free_cfg:
++	kfree(cfg);
+ 	return ret;
+ }
+ 
+ static int arm_smmu_domain_finalise_s2(struct arm_smmu_domain *smmu_domain,
+ 				       struct io_pgtable_cfg *pgtbl_cfg)
+ {
+-	int vmid;
++	int vmid, ret;
+ 	struct arm_smmu_device *smmu = smmu_domain->smmu;
+-	struct arm_smmu_s2_cfg *cfg = &smmu_domain->s2_cfg;
++	struct arm_smmu_s2_cfg *cfg = kzalloc(sizeof(*cfg), GFP_KERNEL);
 +
-+	return 0;
++	if (!cfg)
++		return -ENOMEM;
+ 
+ 	vmid = arm_smmu_bitmap_alloc(smmu->vmid_map, smmu->vmid_bits);
+-	if (vmid < 0)
+-		return vmid;
++	if (vmid < 0) {
++		ret = vmid;
++		goto out_free_cfg;
++	}
+ 
+ 	cfg->vmid	= (u16)vmid;
+ 	cfg->vttbr	= pgtbl_cfg->arm_lpae_s2_cfg.vttbr;
+ 	cfg->vtcr	= pgtbl_cfg->arm_lpae_s2_cfg.vtcr;
++	smmu_domain->s2_cfg = cfg;
+ 	return 0;
 +
-+err_remove_master:
-+	arm_smmu_remove_master(smmu, master);
-+
-+err_unlink:
-+	iommu_device_unlink(&smmu->iommu, dev);
-+
-+err_free_master:
-+	kfree(master);
-+	fwspec->iommu_priv = NULL;
-+
++out_free_cfg:
++	kfree(cfg);
 +	return ret;
  }
  
- static void arm_smmu_remove_device(struct device *dev)
-@@ -2119,6 +2241,7 @@ static void arm_smmu_remove_device(struct device *dev)
- 	smmu = master->smmu;
- 	arm_smmu_detach_dev(master);
- 	iommu_group_remove_device(dev);
-+	arm_smmu_remove_master(smmu, master);
- 	iommu_device_unlink(&smmu->iommu, dev);
- 	kfree(master);
- 	iommu_fwspec_free(dev);
-@@ -2432,6 +2555,9 @@ static int arm_smmu_init_structures(struct arm_smmu_device *smmu)
- {
- 	int ret;
+ static int arm_smmu_domain_finalise(struct iommu_domain *domain)
+@@ -1992,7 +2002,7 @@ static int arm_smmu_attach_dev(struct iommu_domain *domain, struct device *dev)
+ 		arm_smmu_enable_ats(master);
  
-+	mutex_init(&smmu->streams_mutex);
-+	smmu->streams = RB_ROOT;
-+
- 	ret = arm_smmu_init_queues(smmu);
- 	if (ret)
- 		return ret;
+ 	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1)
+-		arm_smmu_write_ctx_desc(smmu, &smmu_domain->s1_cfg);
++		arm_smmu_write_ctx_desc(smmu, smmu_domain->s1_cfg);
+ 
+ 	arm_smmu_install_ste_for_dev(master);
+ out_unlock:
 -- 
 2.20.1
 
