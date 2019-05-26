@@ -2,66 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 388252A983
-	for <lists+kvm@lfdr.de>; Sun, 26 May 2019 13:59:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC36A2A98F
+	for <lists+kvm@lfdr.de>; Sun, 26 May 2019 14:11:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727706AbfEZL7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 May 2019 07:59:44 -0400
-Received: from www17.your-server.de ([213.133.104.17]:49672 "EHLO
-        www17.your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727638AbfEZL7o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 May 2019 07:59:44 -0400
-X-Greylist: delayed 936 seconds by postgrey-1.27 at vger.kernel.org; Sun, 26 May 2019 07:59:43 EDT
-Received: from [88.198.220.130] (helo=sslproxy01.your-server.de)
-        by www17.your-server.de with esmtpsa (TLSv1.2:DHE-RSA-AES256-GCM-SHA384:256)
-        (Exim 4.89_1)
-        (envelope-from <thomas@m3y3r.de>)
-        id 1hUrZO-0001z0-4z; Sun, 26 May 2019 13:44:06 +0200
-Received: from [2a02:908:4c22:ec00:915f:2518:d2f6:b586] (helo=maria.localdomain)
-        by sslproxy01.your-server.de with esmtpsa (TLSv1.2:DHE-RSA-AES256-GCM-SHA384:256)
-        (Exim 4.89)
-        (envelope-from <thomas@m3y3r.de>)
-        id 1hUrZM-0007qA-Q8; Sun, 26 May 2019 13:44:05 +0200
-Received: by maria.localdomain (sSMTP sendmail emulation); Sun, 26 May 2019 13:44:04 +0200
-From:   "Thomas Meyer" <thomas@m3y3r.de>
-Date:   Sun, 26 May 2019 13:44:04 +0200
-Message-Id: <E1hUrZM-0007qA-Q8@sslproxy01.your-server.de>
-X-Authenticated-Sender: thomas@m3y3r.de
-X-Virus-Scanned: Clear (ClamAV 0.100.3/25461/Sun May 26 09:57:08 2019)
-To:     unlisted-recipients:; (no To-header on input)
+        id S1727688AbfEZMLc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 May 2019 08:11:32 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:40201 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726296AbfEZMLc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 May 2019 08:11:32 -0400
+Received: by mail-qk1-f195.google.com with SMTP id c70so42285qkg.7
+        for <kvm@vger.kernel.org>; Sun, 26 May 2019 05:11:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=17m5qjRn+gOfPG5zvtspmQjNxo1PZa0JwIq69Rsd7PQ=;
+        b=S9NvMmZ26qDjO1nXDZ/HBLWF/nDHMOnLUBLAVH6Niy41CfjSatB7keJFiKPZF0X5DD
+         1LRxrFAFVvp+KXLEQEVM/4SV3UOonprEN5RELznSuAGzNKabaRrNE9cxR/HZ8XNZyhqd
+         4tEamCzcIAbInIY8/JrlzCTjJKE7jNEkCSHJE0Q7K6qTDBnqk+W9+XacoKEDo5flr+gs
+         v4caY79pxViiQtg0QB0H0gaXYHZ42c8kEY1CU25DqzIP7CuLTJrIxoANEi9K2CWx7V+4
+         WRZZX8IqwfUOiXRitm9JQ2wt1VdZn+9ekm1i5r6OyVgSTKcXNJwTy8yhCU2gjKIe4gGg
+         I4Wg==
+X-Gm-Message-State: APjAAAU5zmRvILG/Au0156KD0TCUGJp2gjHonhBcbVglhDCrZ9Bf/xmv
+        GsbQ1ufnXs0vat43tVWB9YDuLPSRVLk=
+X-Google-Smtp-Source: APXvYqwjs+R7LMkDhXD4K/nOaxTe/sfIGqTD/pTYRlTgVDDA/HPNI7iCUlExoUSjZ3O9Xf/Wr6J6Cg==
+X-Received: by 2002:a37:4a17:: with SMTP id x23mr33832549qka.206.1558872691099;
+        Sun, 26 May 2019 05:11:31 -0700 (PDT)
+Received: from knox.orion (modemcable053.167-176-173.mc.videotron.ca. [173.176.167.53])
+        by smtp.gmail.com with ESMTPSA id l3sm3143112qkd.49.2019.05.26.05.11.30
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Sun, 26 May 2019 05:11:30 -0700 (PDT)
+Subject: Re: [Bug 203543] Starting with kernel 5.1.0-rc6, kvm_intel can no
+ longer be loaded in nested kvm/guests
+To:     bugzilla-daemon@bugzilla.kernel.org, kvm@vger.kernel.org
+References: <bug-203543-28872@https.bugzilla.kernel.org/>
+ <bug-203543-28872-ed5vVVKp3S@https.bugzilla.kernel.org/>
+From:   David Hill <dhill@redhat.com>
+Message-ID: <4d4ebee2-7103-cb23-6adb-b52d5e71cd5e@redhat.com>
+Date:   Sun, 26 May 2019 08:11:28 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <bug-203543-28872-ed5vVVKp3S@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From thomas@m3y3r.de Sun May 26 00:13:26 2019
-Subject: [PATCH] vfio-pci/nvlink2: Use vma_pages function instead of explicit
- computation
-To: alex.williamson@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Patch: Cocci
-X-Mailer: DiffSplit
-Message-ID: <1558822461341-1674464153-1-diffsplit-thomas@m3y3r.de>
-References: <1558822461331-726613767-0-diffsplit-thomas@m3y3r.de>
-In-Reply-To: <1558822461331-726613767-0-diffsplit-thomas@m3y3r.de>
-X-Serial-No: 1
+You are right actually.   I did a mistake in my code and it didn't pull 
+v5.2-rc1 ... I was still on v5.1.x tag so that's why it didn't work.
 
-Use vma_pages function on vma object instead of explicit computation.
+I guess this is issue is solved and if I hit any bugs with v5.2-rc1 it'd 
+be a new issue since we reverted that commit.
 
-Signed-off-by: Thomas Meyer <thomas@m3y3r.de>
----
-
-diff -u -p a/drivers/vfio/pci/vfio_pci_nvlink2.c b/drivers/vfio/pci/vfio_pci_nvlink2.c
---- a/drivers/vfio/pci/vfio_pci_nvlink2.c
-+++ b/drivers/vfio/pci/vfio_pci_nvlink2.c
-@@ -161,7 +161,7 @@ static int vfio_pci_nvgpu_mmap(struct vf
- 
- 	atomic_inc(&data->mm->mm_count);
- 	ret = (int) mm_iommu_newdev(data->mm, data->useraddr,
--			(vma->vm_end - vma->vm_start) >> PAGE_SHIFT,
-+			vma_pages(vma),
- 			data->gpu_hpa, &data->mem);
- 
- 	trace_vfio_pci_nvgpu_mmap(vdev->pdev, data->gpu_hpa, data->useraddr,
+On 2019-05-21 2:06 p.m., bugzilla-daemon@bugzilla.kernel.org wrote:
+> https://bugzilla.kernel.org/show_bug.cgi?id=203543
+>
+> --- Comment #14 from Sean Christopherson (sean.j.christopherson@intel.com) ---
+> I've verified reverting f93f7ede087f and e51bfdb68725 yields the exact same
+> code as v5.2-rc1.  Can you please sanity check that v5.2-rc1 is indeed broken?
+> E.g. ensure there are no modified files when compiling and include the git
+> commit id in the kernel name.
+>
