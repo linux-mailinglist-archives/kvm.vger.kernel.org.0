@@ -2,109 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 024802ACA9
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 02:13:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AAB32AD61
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 05:48:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726046AbfE0AMx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 26 May 2019 20:12:53 -0400
-Received: from mga05.intel.com ([192.55.52.43]:51181 "EHLO mga05.intel.com"
+        id S1726065AbfE0DsJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 26 May 2019 23:48:09 -0400
+Received: from mga09.intel.com ([134.134.136.24]:65229 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726015AbfE0AMx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 26 May 2019 20:12:53 -0400
+        id S1725923AbfE0DsI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 26 May 2019 23:48:08 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 May 2019 17:12:53 -0700
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 May 2019 20:48:08 -0700
 X-ExtLoop1: 1
-Received: from khuang2-desk.gar.corp.intel.com ([10.254.22.77])
-  by orsmga006.jf.intel.com with ESMTP; 26 May 2019 17:12:50 -0700
-Message-ID: <1558915969.17622.8.camel@linux.intel.com>
-Subject: Re: [PATCH 0/2] Fix reserved bits calculation errors caused by MKTME
-From:   Kai Huang <kai.huang@linux.intel.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>
-Cc:     "Christopherson, Sean J" <sean.j.christopherson@intel.com>,
-        "junaids@google.com" <junaids@google.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
-        "guangrong.xiao@gmail.com" <guangrong.xiao@gmail.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>
-Date:   Mon, 27 May 2019 12:12:49 +1200
-In-Reply-To: <105F7BF4D0229846AF094488D65A098935788A80@PGSMSX112.gar.corp.intel.com>
-References: <cover.1556877940.git.kai.huang@linux.intel.com>
-         <105F7BF4D0229846AF094488D65A098935788A80@PGSMSX112.gar.corp.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+X-IronPort-AV: E=Sophos;i="5.60,517,1549958400"; 
+   d="scan'208";a="178707617"
+Received: from joy-optiplex-7040.sh.intel.com ([10.239.13.9])
+  by fmsmga002.fm.intel.com with ESMTP; 26 May 2019 20:48:03 -0700
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     intel-gvt-dev@lists.freedesktop.org
+Cc:     aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com,
+        shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org,
+        eauger@redhat.com, yi.l.liu@intel.com, ziye.yang@intel.com,
+        mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
+        changpeng.liu@intel.com, Ken.Xue@amd.com,
+        jonathan.davies@nutanix.com, shaopeng.he@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        libvir-list@redhat.com, alex.williamson@redhat.com,
+        eskultet@redhat.com, dgilbert@redhat.com, cohuck@redhat.com,
+        kevin.tian@intel.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, cjia@nvidia.com, kwankhede@nvidia.com,
+        berrange@redhat.com, dinechin@redhat.com,
+        Yan Zhao <yan.y.zhao@intel.com>
+Subject: [PATCH v3 0/2] introduction of migration_version attribute for VFIO live migration
+Date:   Sun, 26 May 2019 23:41:55 -0400
+Message-Id: <20190527034155.31473-1-yan.y.zhao@intel.com>
+X-Mailer: git-send-email 2.17.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+This patchset introduces a migration_version attribute under sysfs of VFIO
+Mediated devices.
 
-Kindly ping.
+This migration_version attribute is used to check migration compatibility
+between two mdev devices of the same mdev type.
 
-Thanks,
--Kai
+Patch 1 defines migration_version attribute in
+Documentation/vfio-mediated-device.txt
 
-On Mon, 2019-05-13 at 03:31 +0000, Huang, Kai wrote:
-> Hi Paolo/Radim,
-> 
-> Would you take a look?
-> 
-> Thanks,
-> -Kai
-> 
-> 
-> > -----Original Message-----
-> > From: Kai Huang [mailto:kai.huang@linux.intel.com]
-> > Sent: Friday, May 3, 2019 10:09 PM
-> > To: kvm@vger.kernel.org; pbonzini@redhat.com; rkrcmar@redhat.com
-> > Cc: Christopherson, Sean J <sean.j.christopherson@intel.com>;
-> > junaids@google.com; thomas.lendacky@amd.com; brijesh.singh@amd.com;
-> > guangrong.xiao@gmail.com; tglx@linutronix.de; bp@alien8.de;
-> > hpa@zytor.com; Huang, Kai <kai.huang@intel.com>
-> > Subject: [PATCH 0/2] Fix reserved bits calculation errors caused by MKTME
-> > 
-> > This series fix reserved bits related calculation errors caused by MKTME.
-> > MKTME repurposes high bits of physical address bits as 'keyID' thus they are
-> > not reserved bits, and to honor such HW behavior those reduced bits are
-> > taken away from boot_cpu_data.x86_phys_bits when MKTME is detected
-> > (exactly how many bits are taken away is configured by BIOS). Currently KVM
-> > asssumes bits from boot_cpu_data.x86_phys_bits to 51 are reserved bits,
-> > which is not true anymore with MKTME, and needs fix.
-> > 
-> > This series was splitted from the old patch I sent out around 2 weeks ago:
-> > 
-> > kvm: x86: Fix several SPTE mask calculation errors caused by MKTME
-> > 
-> > Changes to old patch:
-> > 
-> >   - splitted one patch into two patches. First patch is to move
-> >     kvm_set_mmio_spte_mask() as prerequisite. It doesn't impact
-> > functionality.
-> >     Patch 2 does the real fix.
-> > 
-> >   - renamed shadow_first_rsvd_bits to shadow_phys_bits suggested by Sean.
-> > 
-> >   - refined comments and commit msg to be more concise.
-> > 
-> > Btw sorry that I will be out next week and won't be able to reply email.
-> > 
-> > Kai Huang (2):
-> >   kvm: x86: Move kvm_set_mmio_spte_mask() from x86.c to mmu.c
-> >   kvm: x86: Fix reserved bits related calculation errors caused by MKTME
-> > 
-> >  arch/x86/kvm/mmu.c | 61
-> > ++++++++++++++++++++++++++++++++++++++++++++++++++----
-> >  arch/x86/kvm/x86.c | 31 ---------------------------
-> >  2 files changed, 57 insertions(+), 35 deletions(-)
-> > 
-> > --
-> > 2.13.6
-> 
-> 
+Patch 2 uses GVT as an example to show how to expose migration_version
+attribute and check migration compatibility in vendor driver.
+
+
+v3:
+1. renamed version to migration_version
+2. let errno to be freely defined by vendor driver
+3. let checking mdev_type be prerequisite of migration compatibility check
+4. reworded most part of patch 1
+5. print detailed error log in patch 2 and generate migration_version
+string at init time
+
+v2:
+1. renamed patched 1
+2. made definition of device version string completely private to vendor
+driver
+3. reverted changes to sample mdev drivers
+4. described intent and usage of version attribute more clearly.
+
+
+Yan Zhao (2):
+  vfio/mdev: add migration_version attribute for mdev device
+  drm/i915/gvt: export migration_version to mdev sysfs for Intel vGPU
+
+ Documentation/vfio-mediated-device.txt       | 113 +++++++++++++
+ drivers/gpu/drm/i915/gvt/Makefile            |   2 +-
+ drivers/gpu/drm/i915/gvt/gvt.c               |  39 +++++
+ drivers/gpu/drm/i915/gvt/gvt.h               |   5 +
+ drivers/gpu/drm/i915/gvt/migration_version.c | 167 +++++++++++++++++++
+ drivers/gpu/drm/i915/gvt/vgpu.c              |  13 +-
+ 6 files changed, 336 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/gpu/drm/i915/gvt/migration_version.c
+
+-- 
+2.17.1
+
