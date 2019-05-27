@@ -2,82 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 54B5D2B26B
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 12:46:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CDEA2B280
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 12:53:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726094AbfE0Kqp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 May 2019 06:46:45 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:34450 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725991AbfE0Kqp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 May 2019 06:46:45 -0400
-Received: by mail-pg1-f195.google.com with SMTP id h2so5853694pgg.1
-        for <kvm@vger.kernel.org>; Mon, 27 May 2019 03:46:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=YULeuaw6Jc86bWQlKIn+WYEbp/WlRteTq6uuOLuLmgE=;
-        b=gnPHGGvc3H5whBiSLcsGnQAPbOAcnvtQRKdl/vtEacTw2uoUUb55Z/1g33VtJeM8f7
-         Dny7JXEXAA4aTNuVqnZlSWTPyE2raU1rCEWDAClUzECIt2Pr1zeK+MjRTxueCrHE6N2g
-         OBivMwsMQrV/ahBijej/AkRweU/BSjVJ6KCEKALUsbFedxkrN8n7MUgKIcNh2lkmUcHH
-         xE/+M7M5uBSDGzYLMhyYYkDOxXgA8f5LDhaNsVnn7ak0ZS05zgNYQ0C9Waqiy3kOnSVp
-         XLZWxTVybRQmvLsfd5nvSleX/qTywlAKqEq6SwemuXtOujyncAUx0pf73ZS0UPoBctu7
-         u8+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=YULeuaw6Jc86bWQlKIn+WYEbp/WlRteTq6uuOLuLmgE=;
-        b=XVPsALNAApnEAIlQbGEDG6bvcWhE7Xig+5B2iNESiJZA4+IozBjtuk+3AjGPBvAvNU
-         myXVZVxkKvLwuuDXuey9db41pWD8DYy4ELIL89aixyGWKSogNJ2a6v679rN22EXMKMGj
-         H81sbmVxBP28rpMKyTh6SwwazimUSM4exCO5y1ykFsNcjZlgnm5NRwOdHjdMWfSI7CoW
-         510J+c/YBME2BgjBIZSc8Lil5NuEMA30Aa17z/GlAC2Zwvi4XlnbNCug8FMzzdU9bMBz
-         PN7XZAmx0/Srx9zdtZ4UTyCkFZz6rn24vIvv6hHWrl3F5NwBPVJtejEmq6WXzQIPlzRb
-         vL3Q==
-X-Gm-Message-State: APjAAAV75m90lVtcKkmcVJhsnWUvZdn09cNLOgpCDGqvoIxB2Dw1/Slx
-        wMviowUepphvsKkyamPgpJ8dGRrE
-X-Google-Smtp-Source: APXvYqyC7V1Bddt2ayGRgVkCJMHVJ9PYyLGgL/wJtpD3rLj4iNTzMOYpMH7u5Gm9y1nUaW+68DgSvA==
-X-Received: by 2002:a17:90a:9281:: with SMTP id n1mr29517336pjo.25.1558954004814;
-        Mon, 27 May 2019 03:46:44 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id k13sm10174792pgr.90.2019.05.27.03.46.43
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 27 May 2019 03:46:44 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH] target-i386: adds PV_SCHED_YIELD CPUID feature bit
-Date:   Mon, 27 May 2019 18:46:40 +0800
-Message-Id: <1558954000-9715-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        id S1726197AbfE0Kxb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 May 2019 06:53:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41840 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725814AbfE0Kxb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 May 2019 06:53:31 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 41B4E307D855;
+        Mon, 27 May 2019 10:53:31 +0000 (UTC)
+Received: from gondolin (ovpn-204-109.brq.redhat.com [10.40.204.109])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3EFDD5D704;
+        Mon, 27 May 2019 10:53:23 +0000 (UTC)
+Date:   Mon, 27 May 2019 12:53:20 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Michael Mueller <mimu@linux.ibm.com>
+Cc:     KVM Mailing List <kvm@vger.kernel.org>,
+        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>
+Subject: Re: [PATCH v2 4/8] s390/airq: use DMA memory for adapter interrupts
+Message-ID: <20190527125320.7540049a.cohuck@redhat.com>
+In-Reply-To: <20190523162209.9543-5-mimu@linux.ibm.com>
+References: <20190523162209.9543-1-mimu@linux.ibm.com>
+        <20190523162209.9543-5-mimu@linux.ibm.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Mon, 27 May 2019 10:53:31 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Thu, 23 May 2019 18:22:05 +0200
+Michael Mueller <mimu@linux.ibm.com> wrote:
 
-Adds PV_SCHED_YIELD CPUID feature bit.
+> From: Halil Pasic <pasic@linux.ibm.com>
+> 
+> Protected virtualization guests have to use shared pages for airq
+> notifier bit vectors, because hypervisor needs to write these bits.
+> 
+> Let us make sure we allocate DMA memory for the notifier bit vectors by
+> replacing the kmem_cache with a dma_cache and kalloc() with
+> cio_dma_zalloc().
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> ---
+>  arch/s390/include/asm/airq.h |  2 ++
+>  drivers/s390/cio/airq.c      | 32 ++++++++++++++++++++------------
+>  drivers/s390/cio/cio.h       |  2 ++
+>  drivers/s390/cio/css.c       |  1 +
+>  4 files changed, 25 insertions(+), 12 deletions(-)
 
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- target/i386/cpu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+(...)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 5f07d68..f4c4b6b 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -902,7 +902,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "kvmclock", "kvm-nopiodelay", "kvm-mmu", "kvmclock",
-             "kvm-asyncpf", "kvm-steal-time", "kvm-pv-eoi", "kvm-pv-unhalt",
-             NULL, "kvm-pv-tlb-flush", NULL, "kvm-pv-ipi",
--            NULL, NULL, NULL, NULL,
-+            "kvm-pv-sched-yield", NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             "kvmclock-stable-bit", NULL, NULL, NULL,
--- 
-2.7.4
+> diff --git a/drivers/s390/cio/css.c b/drivers/s390/cio/css.c
+> index 789f6ecdbbcc..f09521771a32 100644
+> --- a/drivers/s390/cio/css.c
+> +++ b/drivers/s390/cio/css.c
+> @@ -1173,6 +1173,7 @@ static int __init css_bus_init(void)
+>  		goto out_unregister;
+>  	}
+>  	cio_dma_pool_init();
+> +	airq_init();
+>  	css_init_done = 1;
+>  
+>  	/* Enable default isc for I/O subchannels. */
 
+Not directly related to this patch (I don't really have any comment
+here), but I started looking at the code again and now I'm wondering
+about chsc. I think it came up before, but I can't remember if chsc
+needed special treatment... Anyway, css_bus_init() uses some chscs
+early (before cio_dma_pool_init), so we could not use the pools there,
+even if we wanted to. Do chsc commands either work, or else fail
+benignly on a protected virt guest?
