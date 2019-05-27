@@ -2,77 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FC7B2B88C
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 17:44:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6B802B90F
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 18:26:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726693AbfE0PoQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 May 2019 11:44:16 -0400
-Received: from mail-wr1-f42.google.com ([209.85.221.42]:33556 "EHLO
-        mail-wr1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726329AbfE0PoK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 May 2019 11:44:10 -0400
-Received: by mail-wr1-f42.google.com with SMTP id d9so17302126wrx.0
-        for <kvm@vger.kernel.org>; Mon, 27 May 2019 08:44:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=2A4/Dy7CeUNWJQHbbLk0HO1r8qYMXPrMtWyOg+ikpyk=;
-        b=KzSDx165yq32+IDr5c5PA0e7guMO3UTVJ+ItIZlUnA0KxMvvTLpjjv1L6pFMWM5QOd
-         c6Eg/uKGTelx7NDt5naTKYmvcy4mwhyKl70LL/hC28kfXmWqte75JzczVyCm8UzHfN6r
-         BjLWaZBdqgzV1qNNt3J4WzV+yCPU+NMDua1NhXxJyyrl9QZR8Fs2X3YfNbONOWDmRLFb
-         cASFgbD/XEhclrcg9WsJQquD4c/7tArkDyOP62cWrNYv26ocVmdrg3XzgMEFJyr3R8mW
-         /TVQRXD7Neg4Q6z81ZnGYatiNl0/nTPHe488encdtm9G8pGBrcTJBb5T3teyKqQAC19n
-         F8Zg==
-X-Gm-Message-State: APjAAAVXL6OnsPSALdZ31KcOhTfigDudi0RSVrM4y9mQ4zqb4TCOxrv/
-        SBLl6ZyxcZ9oN+oCtq06bxGqhw==
-X-Google-Smtp-Source: APXvYqxek10K/dO9NSTEttg+mnORuKnxwc7jyGofKaHXmyE/ma/6TRaCxUAv7G+DGuJ8bDopIl1MFQ==
-X-Received: by 2002:adf:ef8d:: with SMTP id d13mr6429556wro.60.1558971848967;
-        Mon, 27 May 2019 08:44:08 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c92d:f9e8:f150:3553? ([2001:b07:6468:f312:c92d:f9e8:f150:3553])
-        by smtp.gmail.com with ESMTPSA id s62sm22814951wmf.24.2019.05.27.08.44.08
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 27 May 2019 08:44:08 -0700 (PDT)
-Subject: Re: [RFC/PATCH] refs: tone down the dwimmery in refname_match() for
- {heads,tags,remotes}/*
-To:     Junio C Hamano <gitster@pobox.com>,
-        =?UTF-8?B?w4Z2YXIgQXJuZmrDtnLDsCBCamFybWFzb24=?= <avarab@gmail.com>
-Cc:     git@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        KVM list <kvm@vger.kernel.org>,
-        Michael Haggerty <mhagger@alum.mit.edu>
-References: <CAHk-=wgzKzAwS=_ySikL1f=Gr62YXL_WXGh82wZKMOvzJ9+2VA@mail.gmail.com>
- <20190526225445.21618-1-avarab@gmail.com>
- <5c9ce55c-2c3a-fce0-d6e3-dfe5f8fc9b01@redhat.com>
- <874l5gezsn.fsf@evledraar.gmail.com>
- <xmqqef4jewj6.fsf@gitster-ct.c.googlers.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a40c5388-4274-6bfa-4213-6013601c8fae@redhat.com>
-Date:   Mon, 27 May 2019 17:44:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726494AbfE0Q0j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 May 2019 12:26:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45270 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725991AbfE0Q0j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 May 2019 12:26:39 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2FFF233027D
+        for <kvm@vger.kernel.org>; Mon, 27 May 2019 16:26:39 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3722460BE2;
+        Mon, 27 May 2019 16:26:38 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com
+Subject: [PATCH] arm64: timer: ensure pending signal was cleared
+Date:   Mon, 27 May 2019 18:26:36 +0200
+Message-Id: <20190527162636.28878-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <xmqqef4jewj6.fsf@gitster-ct.c.googlers.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Mon, 27 May 2019 16:26:39 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/05/19 17:39, Junio C Hamano wrote:
-> I do not think lightweight vs annotated should be the issue.  The
-> tag that the requestor asks to be pulled (from repository ../b)
-> should be what the requestor has locally when writing the request
-> (in repository .).  Even if both tags at remote and local are
-> annotated, we should still warn if they are different objects, no?
+Ensure set_timer_irq_enabled() clears the pending interrupt from
+the gic before proceeding with the next test.
 
-Right, lightweight vs annotated then is the obvious special case where
-one of the two is a commit and the other is a tag, hence they ought not
-to have the same SHA1.  I'll take a look.
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ arm/timer.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Paolo
+diff --git a/arm/timer.c b/arm/timer.c
+index 275d0494083d..eebc451722d9 100644
+--- a/arm/timer.c
++++ b/arm/timer.c
+@@ -231,6 +231,7 @@ static void test_timer(struct timer_info *info)
+ 	/* Disable the timer again and prepare to take interrupts */
+ 	info->write_ctl(0);
+ 	set_timer_irq_enabled(info, true);
++	report("interrupt signal no longer pending", !gic_timer_pending(info));
+ 
+ 	report("latency within 10 ms", test_cval_10msec(info));
+ 	report("interrupt received", info->irq_received);
+-- 
+2.18.1
+
