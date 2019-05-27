@@ -2,84 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 944672B736
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 16:04:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F04F02B73B
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 16:04:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726262AbfE0OEF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 May 2019 10:04:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38206 "EHLO mx1.redhat.com"
+        id S1726457AbfE0OEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 May 2019 10:04:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52159 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726184AbfE0OEF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 May 2019 10:04:05 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        id S1726184AbfE0OEm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 May 2019 10:04:42 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B88047EBC1;
-        Mon, 27 May 2019 14:04:04 +0000 (UTC)
-Received: from gondolin (ovpn-204-109.brq.redhat.com [10.40.204.109])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E18BF7854F;
-        Mon, 27 May 2019 14:03:58 +0000 (UTC)
-Date:   Mon, 27 May 2019 16:03:55 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     "Thomas Meyer" <thomas@m3y3r.de>
-Cc:     alex.williamson@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: your patch
-Message-ID: <20190527160355.1cd446c4.cohuck@redhat.com>
-In-Reply-To: <E1hUrZM-0007qA-Q8@sslproxy01.your-server.de>
-References: <E1hUrZM-0007qA-Q8@sslproxy01.your-server.de>
-Organization: Red Hat GmbH
+        by mx1.redhat.com (Postfix) with ESMTPS id 4A91430833B5;
+        Mon, 27 May 2019 14:04:37 +0000 (UTC)
+Received: from x1.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2777410027C5;
+        Mon, 27 May 2019 14:04:31 +0000 (UTC)
+Date:   Mon, 27 May 2019 08:04:30 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Tina Zhang <tina.zhang@intel.com>
+Cc:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kraxel@redhat.com,
+        zhenyuw@linux.intel.com, hang.yuan@intel.com, zhiyuan.lv@intel.com
+Subject: Re: [PATCH 1/2] vfio: ABI for setting mdev display flip eventfd
+Message-ID: <20190527080430.28f40888@x1.home>
+In-Reply-To: <20190527084312.8872-2-tina.zhang@intel.com>
+References: <20190527084312.8872-1-tina.zhang@intel.com>
+        <20190527084312.8872-2-tina.zhang@intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Mon, 27 May 2019 14:04:04 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Mon, 27 May 2019 14:04:42 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 26 May 2019 13:44:04 +0200
-"Thomas Meyer" <thomas@m3y3r.de> wrote:
+On Mon, 27 May 2019 16:43:11 +0800
+Tina Zhang <tina.zhang@intel.com> wrote:
 
-> From thomas@m3y3r.de Sun May 26 00:13:26 2019
-> Subject: [PATCH] vfio-pci/nvlink2: Use vma_pages function instead of explicit
->  computation
-> To: alex.williamson@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-> Content-Type: text/plain; charset="UTF-8"
-> Mime-Version: 1.0
-> Content-Transfer-Encoding: 8bit
-> X-Patch: Cocci
-> X-Mailer: DiffSplit
-> Message-ID: <1558822461341-1674464153-1-diffsplit-thomas@m3y3r.de>
-> References: <1558822461331-726613767-0-diffsplit-thomas@m3y3r.de>
-> In-Reply-To: <1558822461331-726613767-0-diffsplit-thomas@m3y3r.de>
-> X-Serial-No: 1
-
-Hi,
-
-some kind of accident seems to have happened to your patch... maybe the
-missing colon after the 'From'?
-
+> Add VFIO_DEVICE_SET_GFX_FLIP_EVENTFD ioctl command to set eventfd
+> based signaling mechanism to deliver vGPU framebuffer page flip
+> event to userspace.
 > 
-> Use vma_pages function on vma object instead of explicit computation.
-> 
-> Signed-off-by: Thomas Meyer <thomas@m3y3r.de>
+> Signed-off-by: Tina Zhang <tina.zhang@intel.com>
 > ---
+>  include/uapi/linux/vfio.h | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 > 
-> diff -u -p a/drivers/vfio/pci/vfio_pci_nvlink2.c b/drivers/vfio/pci/vfio_pci_nvlink2.c
-> --- a/drivers/vfio/pci/vfio_pci_nvlink2.c
-> +++ b/drivers/vfio/pci/vfio_pci_nvlink2.c
-> @@ -161,7 +161,7 @@ static int vfio_pci_nvgpu_mmap(struct vf
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 02bb7ad6e986..27300597717f 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -696,6 +696,18 @@ struct vfio_device_ioeventfd {
 >  
->  	atomic_inc(&data->mm->mm_count);
->  	ret = (int) mm_iommu_newdev(data->mm, data->useraddr,
-> -			(vma->vm_end - vma->vm_start) >> PAGE_SHIFT,
-> +			vma_pages(vma),
->  			data->gpu_hpa, &data->mem);
+>  #define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 16)
 >  
->  	trace_vfio_pci_nvgpu_mmap(vdev->pdev, data->gpu_hpa, data->useraddr,
+> +/**
+> + * VFIO_DEVICE_SET_GFX_FLIP_EVENTFD - _IOW(VFIO_TYPE, VFIO_BASE + 17, __s32)
+> + *
+> + * Set eventfd based signaling mechanism to deliver vGPU framebuffer page
+> + * flip event to userspace. A value of -1 is used to stop the page flip
+> + * delivering.
+> + *
+> + * Return: 0 on success, -errno on failure.
+> + */
+> +
+> +#define VFIO_DEVICE_SET_GFX_FLIP_EVENTFD _IO(VFIO_TYPE, VFIO_BASE + 17)
+> +
+>  /* -------- API for Type1 VFIO IOMMU -------- */
+>  
+>  /**
 
-The change looks good to me.
+Why can't we use VFIO_DEVICE_SET_IRQS for this?  We can add a
+capability to vfio_irq_info in the same way that we did for regions to
+describe device specific IRQ support.  Thanks,
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Alex
