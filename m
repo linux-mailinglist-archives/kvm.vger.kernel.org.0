@@ -2,29 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 413D22AF5F
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 09:28:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 779CB2AF73
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 09:39:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726063AbfE0H2E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 May 2019 03:28:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33300 "EHLO mx1.redhat.com"
+        id S1726282AbfE0HjS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 May 2019 03:39:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40756 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725869AbfE0H2E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 May 2019 03:28:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S1725869AbfE0HjS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 May 2019 03:39:18 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2CF1988317
-        for <kvm@vger.kernel.org>; Mon, 27 May 2019 07:28:04 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 45EB73086216;
+        Mon, 27 May 2019 07:39:17 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-235.ams2.redhat.com [10.36.116.235])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1AC335D9DE;
-        Mon, 27 May 2019 07:28:02 +0000 (UTC)
-Subject: Re: [PATCH 1/4] kvm: selftests: rename vm_vcpu_add to
- vm_vcpu_add_memslots
-To:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com
-References: <20190523125756.4645-1-drjones@redhat.com>
- <20190523125756.4645-2-drjones@redhat.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F286F27C38;
+        Mon, 27 May 2019 07:39:10 +0000 (UTC)
+Subject: Re: [PATCH] KVM: s390: fix memory slot handling for
+ KVM_SET_USER_MEMORY_REGION
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        linux-kselftest@vger.kernel.org,
+        linux-s390 <linux-s390@vger.kernel.org>
+References: <20190524140623.104033-1-borntraeger@de.ibm.com>
 From:   Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -70,73 +77,85 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
  WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
 Organization: Red Hat
-Message-ID: <eb7473ef-3d78-5858-577c-62abcd15d967@redhat.com>
-Date:   Mon, 27 May 2019 09:27:56 +0200
+Message-ID: <54e7751b-53a0-fd69-2ce0-d7836411a8e6@redhat.com>
+Date:   Mon, 27 May 2019 09:39:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190523125756.4645-2-drjones@redhat.com>
+In-Reply-To: <20190524140623.104033-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Mon, 27 May 2019 07:28:04 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Mon, 27 May 2019 07:39:17 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23/05/2019 14.57, Andrew Jones wrote:
-> This frees up the name vm_vcpu_add for another use.
+On 24/05/2019 16.06, Christian Borntraeger wrote:
+> kselftests exposed a problem in the s390 handling for memory slots.
+> Right now we only do proper memory slot handling for creation of new
+> memory slots. Neither MOVE, nor DELETION are handled properly. Let us
+> implement those.
 > 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > ---
->  tools/testing/selftests/kvm/include/kvm_util.h       |  4 ++--
->  tools/testing/selftests/kvm/lib/aarch64/processor.c  |  2 +-
->  tools/testing/selftests/kvm/lib/kvm_util.c           | 12 +++++++-----
->  tools/testing/selftests/kvm/lib/x86_64/processor.c   |  2 +-
->  tools/testing/selftests/kvm/x86_64/evmcs_test.c      |  2 +-
->  .../selftests/kvm/x86_64/kvm_create_max_vcpus.c      |  2 +-
->  tools/testing/selftests/kvm/x86_64/smm_test.c        |  2 +-
->  tools/testing/selftests/kvm/x86_64/state_test.c      |  2 +-
->  8 files changed, 15 insertions(+), 13 deletions(-)
-[...]
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index e9113857f44e..937292dca81b 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -756,21 +756,23 @@ static int vcpu_mmap_sz(void)
->  }
+>  arch/s390/kvm/kvm-s390.c | 35 +++++++++++++++++++++--------------
+>  1 file changed, 21 insertions(+), 14 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 871d2e99b156..6ec0685ab2c7 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4525,21 +4525,28 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+>  				const struct kvm_memory_slot *new,
+>  				enum kvm_mr_change change)
+>  {
+> -	int rc;
+> +	int rc = 0;
 >  
->  /*
-> - * VM VCPU Add
-> + * VM VCPU Add with provided memslots
->   *
->   * Input Args:
->   *   vm - Virtual Machine
->   *   vcpuid - VCPU ID
-> + *   pgd_memslot - Memory region slot for new virtual translation tables
-> + *   gdt_memslot - Memory region slot for data pages
->   *
->   * Output Args: None
->   *
->   * Return: None
->   *
-> - * Creates and adds to the VM specified by vm and virtual CPU with
-> - * the ID given by vcpuid.
-> + * Adds a virtual CPU to the VM specified by vm with the ID given by vcpuid
-> + * and then sets it up with vcpu_setup() and the provided memslots.
->   */
-> -void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, int pgd_memslot,
-> -		 int gdt_memslot)
-> +void vm_vcpu_add_memslots(struct kvm_vm *vm, uint32_t vcpuid, int pgd_memslot,
-> +			  int gdt_memslot)
+> -	/* If the basics of the memslot do not change, we do not want
+> -	 * to update the gmap. Every update causes several unnecessary
+> -	 * segment translation exceptions. This is usually handled just
+> -	 * fine by the normal fault handler + gmap, but it will also
+> -	 * cause faults on the prefix page of running guest CPUs.
+> -	 */
+> -	if (old->userspace_addr == mem->userspace_addr &&
+> -	    old->base_gfn * PAGE_SIZE == mem->guest_phys_addr &&
+> -	    old->npages * PAGE_SIZE == mem->memory_size)
+> -		return;
 
-I think the naming and description of the function is somewhat
-unfortunate now. The function is not really about memslots, but about
-setting up some MMU tables in the memory (and for this you need a
-memslot). So maybe rather name it vm_vcpu_add_with_mmu() or something
-similar? Also it would be nice to give the reason for the memslots in
-the comment before the function.
+This check is now gone in the new code. Maybe mention the reason in the
+patch description?
 
- Thomas
+> -	rc = gmap_map_segment(kvm->arch.gmap, mem->userspace_addr,
+> -		mem->guest_phys_addr, mem->memory_size);
+> +	switch (change) {
+> +	case KVM_MR_DELETE:
+> +		rc = gmap_unmap_segment(kvm->arch.gmap, old->base_gfn * PAGE_SIZE,
+> +					old->npages * PAGE_SIZE);
+> +		break;
+> +	case KVM_MR_MOVE:
+> +		rc = gmap_unmap_segment(kvm->arch.gmap, old->base_gfn * PAGE_SIZE,
+> +					old->npages * PAGE_SIZE);
+> +		if (rc)
+> +			break;
+> +		/* FALLTHROUGH */
+> +	case KVM_MR_CREATE:
+> +		rc = gmap_map_segment(kvm->arch.gmap, mem->userspace_addr,
+> +				      mem->guest_phys_addr, mem->memory_size);
+> +		break;
+> +	case KVM_MR_FLAGS_ONLY:
+> +		break;
+> +	default:
+> +		WARN(1, "Unknown KVM MR CHANGE: %d\n", change);
+> +	}
+>  	if (rc)
+>  		pr_warn("failed to commit memory region\n");
+>  	return;
+> 
+
+Looks good to me, but I'm not an expert in this area, so FWIW a weak:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
