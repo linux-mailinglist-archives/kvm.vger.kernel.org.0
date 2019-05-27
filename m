@@ -2,83 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F04F02B73B
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 16:04:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 892572B782
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 16:29:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726457AbfE0OEm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 May 2019 10:04:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52159 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726184AbfE0OEm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 May 2019 10:04:42 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4A91430833B5;
-        Mon, 27 May 2019 14:04:37 +0000 (UTC)
-Received: from x1.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2777410027C5;
-        Mon, 27 May 2019 14:04:31 +0000 (UTC)
-Date:   Mon, 27 May 2019 08:04:30 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Tina Zhang <tina.zhang@intel.com>
-Cc:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kraxel@redhat.com,
-        zhenyuw@linux.intel.com, hang.yuan@intel.com, zhiyuan.lv@intel.com
-Subject: Re: [PATCH 1/2] vfio: ABI for setting mdev display flip eventfd
-Message-ID: <20190527080430.28f40888@x1.home>
-In-Reply-To: <20190527084312.8872-2-tina.zhang@intel.com>
-References: <20190527084312.8872-1-tina.zhang@intel.com>
-        <20190527084312.8872-2-tina.zhang@intel.com>
-Organization: Red Hat
+        id S1726468AbfE0O3d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 May 2019 10:29:33 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:39719 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726191AbfE0O3d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 May 2019 10:29:33 -0400
+Received: by mail-ed1-f65.google.com with SMTP id e24so27012775edq.6;
+        Mon, 27 May 2019 07:29:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:references:user-agent:in-reply-to:date
+         :message-id:mime-version:content-transfer-encoding;
+        bh=R1AzxQRXU80ZX5XlNuDiv+NBZP+OSp10LmHxXSL0x0w=;
+        b=AiCWHoCAvp7FsuBpthidNFx/02mjK0qH0iS0s0JJyqwmtUEJ7pK46F519eHsPQK9YD
+         iHApNZRWjr9Sqaj9pfDK11l1BTfugz2Aw2qi67tjsJwz9JdfyZ21ictjTY4OtHF9lfqk
+         UAT1fB1y84EsTHu7RIidW4w/pP025+m6r8rq4+sNHf1D8yHSDSkYLMUV1Vhm20aMmPuX
+         j5N8KxFO/30zdUe637oW2mJrZ4on+E0uMtGuGhYUGs5gL228gRn8aTuiXdupz+8ICsa2
+         wIUl11FDF34EqNDQS+5QhSPlyX2Y1kdeQfsiupaIfFesi40cWWfHnGugFAbF0PAvDtZF
+         zqjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:references:user-agent
+         :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+        bh=R1AzxQRXU80ZX5XlNuDiv+NBZP+OSp10LmHxXSL0x0w=;
+        b=Ipxhhq3np0zp48SMXBBuQZ8DzNBvLssk7C8Kphg4/c+W5orPqgsPKGFq9QYME+wku1
+         +0q84AlonhsaSbnl+Jo+TKMfeLotxUu6Gnk7qlcEkwJBIpdPyJdpglO0IiIH7626uu3j
+         nGOurZD2ebztN5OdJeJ0vfJl945ArRHmt0LPVqa3LfnmdrmItp1diTsoja+XnHVl0eV9
+         atelkbNMrK7IpU7Eq7TetMUt2X5QcpxqckVODlR/zmRdl6e9TxFuaa+0lyoYake0xoNp
+         FIcdBZVghKZNeFyGx8peEP1gK9gm4vZYrzibrSAbk9Zk9otLA5x2/sNKoffFcofi9YbJ
+         UPMw==
+X-Gm-Message-State: APjAAAXMFMV4Q9isB32P639sW0G26MkXOevb2M88F4FfczI+Ro6x6KLp
+        1KhnuL8Sv1CR/EmfBPZOtME=
+X-Google-Smtp-Source: APXvYqxY4ajZ79OyA5ygAapQwFXXc0kzlW/Sjz7E9RhvuT2PC6ddGjwjP1kAcvHkPzknFkbdDKyoYg==
+X-Received: by 2002:a17:906:d215:: with SMTP id w21mr53198737ejz.122.1558967371143;
+        Mon, 27 May 2019 07:29:31 -0700 (PDT)
+Received: from evledraar ([5.57.21.48])
+        by smtp.gmail.com with ESMTPSA id v16sm3358696edm.56.2019.05.27.07.29.29
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 27 May 2019 07:29:29 -0700 (PDT)
+From:   =?utf-8?B?w4Z2YXIgQXJuZmrDtnLDsA==?= Bjarmason <avarab@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     git@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Junio C Hamano <gitster@pobox.com>,
+        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        KVM list <kvm@vger.kernel.org>,
+        Michael Haggerty <mhagger@alum.mit.edu>
+Subject: Re: [RFC/PATCH] refs: tone down the dwimmery in refname_match() for {heads,tags,remotes}/*
+References: <CAHk-=wgzKzAwS=_ySikL1f=Gr62YXL_WXGh82wZKMOvzJ9+2VA@mail.gmail.com> <20190526225445.21618-1-avarab@gmail.com> <5c9ce55c-2c3a-fce0-d6e3-dfe5f8fc9b01@redhat.com>
+User-agent: Debian GNU/Linux 10 (buster); Emacs 26.1; mu4e 1.1.0
+In-reply-to: <5c9ce55c-2c3a-fce0-d6e3-dfe5f8fc9b01@redhat.com>
+Date:   Mon, 27 May 2019 16:29:28 +0200
+Message-ID: <874l5gezsn.fsf@evledraar.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Mon, 27 May 2019 14:04:42 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 27 May 2019 16:43:11 +0800
-Tina Zhang <tina.zhang@intel.com> wrote:
 
-> Add VFIO_DEVICE_SET_GFX_FLIP_EVENTFD ioctl command to set eventfd
-> based signaling mechanism to deliver vGPU framebuffer page flip
-> event to userspace.
-> 
-> Signed-off-by: Tina Zhang <tina.zhang@intel.com>
-> ---
->  include/uapi/linux/vfio.h | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 02bb7ad6e986..27300597717f 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -696,6 +696,18 @@ struct vfio_device_ioeventfd {
->  
->  #define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 16)
->  
-> +/**
-> + * VFIO_DEVICE_SET_GFX_FLIP_EVENTFD - _IOW(VFIO_TYPE, VFIO_BASE + 17, __s32)
-> + *
-> + * Set eventfd based signaling mechanism to deliver vGPU framebuffer page
-> + * flip event to userspace. A value of -1 is used to stop the page flip
-> + * delivering.
-> + *
-> + * Return: 0 on success, -errno on failure.
-> + */
-> +
-> +#define VFIO_DEVICE_SET_GFX_FLIP_EVENTFD _IO(VFIO_TYPE, VFIO_BASE + 17)
-> +
->  /* -------- API for Type1 VFIO IOMMU -------- */
->  
->  /**
+On Mon, May 27 2019, Paolo Bonzini wrote:
 
-Why can't we use VFIO_DEVICE_SET_IRQS for this?  We can add a
-capability to vfio_irq_info in the same way that we did for regions to
-describe device specific IRQ support.  Thanks,
+> On 27/05/19 00:54, =C3=86var Arnfj=C3=B6r=C3=B0 Bjarmason wrote:
+>> This resulted in a case[1] where someone on LKML did:
+>>
+>>     git push kvm +HEAD:tags/for-linus
+>>
+>> Which would have created a new "tags/for-linus" branch in their "kvm"
+>> repository, except because they happened to have an existing
+>> "refs/tags/for-linus" reference we pushed there instead, and replaced
+>> an annotated tag with a lightweight tag.
+>
+> Actually, I would not be surprised even if "git push foo
+> someref:tags/foo" _always_ created a lightweight tag (i.e. push to
+> refs/tags/foo).
 
-Alex
+That's not the intention (I think), and not what we document.
+
+It mostly (and I believe always should) works by looking at whether
+"someref" is a named ref, and e.g. looking at whether it's "master". We
+then see that it lives in "refs/heads/master" locally, and thus
+correspondingly add a "refs/heads/" to your <dst> "tags/foo", making it
+"refs/heads/tags/foo".
+
+*Or* we take e.g. <some random SHA-1>:master, the <some random...> is
+ambiguous, but we see that "master" unambiguously refers to
+"refs/heads/master" on the remote (so e.g. a refs/tags/master doesn't
+exist). If you had both refs/{heads,tags}/master refs on the remote we'd
+emit:
+
+    error: dst refspec master matches more than one
+
+(We should improve that error to note what conflicted, #leftoverbits)
+
+So your HEAD:tags/for-linus resulted in pushing a HEAD that referred to
+some refs/heads/* to refs/tags/for-linus. I believe that's an unintendedem
+ergent effect in how we try to apply these two rules. We should apply
+one, not both in combination.
+
+And as an aside none of these rules have to do with whether the <src> is
+a lightweight or annotated tag, and both types live in the refs/tags/*
+namespace.
+
+> In my opinion, the bug is that "git request-pull" should warn if the tag
+> is lightweight remotely but not locally, and possibly even vice versa.
+> Here is a simple testcase:
+>
+>   # setup "local" repo
+>   mkdir -p testdir/a
+>   cd testdir/a
+>   git init
+>   echo a > test
+>   git add test
+>   git commit -minitial
+>
+>   # setup "remote" repo
+>   git clone --bare . ../b
+>
+>   # setup "local" tag
+>   echo b >> test
+>   git commit -msecond test
+>   git tag -mtag tag1
+>
+>   # create remote lightweight tag and prepare a pull request
+>   git push ../b HEAD:refs/tags/tag1
+>   git request-pull HEAD^ ../b tags/tag1
+
+Yeah, maybe. I don't use git-request-pull. So maybe this is a simple
+mitigation for that tool since you supply a <remote> to it already.
+
+I was more interested and surprised by HEAD being implicitly resolved to
+refs/tags/* in a way that would be *different* than if you didn't have
+an existing tag there, but of course if we errored on that you might
+have just done "+HEAD:refs/tags/for-linus" and ended up with the same
+thing.
+
+As an aside, in *general* tags, unlike branches, don't have "remote
+tracking". That's something we'd eventually want, but we're nowhere near
+the refstore and porcelain supporting that.
+
+Thus such a check is hard to support in general, we'd always need a
+remote name and a network roundtrip. Otherwise we couldn't do anything
+sensible if you have 10 remotes of fellow LKML developers, all of whom
+have a "for-linus" tag, which I'm assuming is a common use-case.
+
+But since git-request-pull gets the remote it can (and does) check on
+that remote, but seems to satisfied to see that the ref exists somewhere
+on that remote.
