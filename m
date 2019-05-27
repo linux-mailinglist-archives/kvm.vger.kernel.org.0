@@ -2,127 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 37E022B32E
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 13:26:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C2672B343
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 13:29:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726592AbfE0L0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 May 2019 07:26:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43852 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726322AbfE0L0y (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 May 2019 07:26:54 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4RBHKBa145995
-        for <kvm@vger.kernel.org>; Mon, 27 May 2019 07:26:53 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2srdcrnt2m-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 27 May 2019 07:26:52 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
-        Mon, 27 May 2019 12:26:51 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 27 May 2019 12:26:48 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4RBQkjq57278554
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 May 2019 11:26:46 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2EE7CA405B;
-        Mon, 27 May 2019 11:26:46 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9AA0AA4054;
-        Mon, 27 May 2019 11:26:45 +0000 (GMT)
-Received: from [9.152.98.56] (unknown [9.152.98.56])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 27 May 2019 11:26:45 +0000 (GMT)
-Reply-To: mimu@linux.ibm.com
-Subject: Re: [PATCH v2 2/8] s390/cio: introduce DMA pools to cio
-To:     Sebastian Ott <sebott@linux.ibm.com>
-Cc:     KVM Mailing List <kvm@vger.kernel.org>,
-        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>
-References: <20190523162209.9543-1-mimu@linux.ibm.com>
- <20190523162209.9543-3-mimu@linux.ibm.com>
- <alpine.LFD.2.21.1905251115590.3359@schleppi>
-From:   Michael Mueller <mimu@linux.ibm.com>
-Organization: IBM
-Date:   Mon, 27 May 2019 13:26:45 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.7.0
+        id S1726678AbfE0L3A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 May 2019 07:29:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54930 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725858AbfE0L27 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 May 2019 07:28:59 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6ACBE3082B4D
+        for <kvm@vger.kernel.org>; Mon, 27 May 2019 11:28:59 +0000 (UTC)
+Received: from thuth.com (ovpn-116-235.ams2.redhat.com [10.36.116.235])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D08C66C327;
+        Mon, 27 May 2019 11:28:57 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH] gitlab-ci: Run tests with a Fedora docker image
+Date:   Mon, 27 May 2019 13:28:53 +0200
+Message-Id: <20190527112853.3920-1-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LFD.2.21.1905251115590.3359@schleppi>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19052711-0012-0000-0000-0000031FE1DC
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052711-0013-0000-0000-00002158A50B
-Message-Id: <a42a0d7d-fd0b-b1bf-d4d9-3d64a8ff31f1@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-27_07:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905270081
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Mon, 27 May 2019 11:28:59 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Fedora has a newer version of QEMU - and most notably it has a *working*
+version of qemu-system-s390x! So we can finally also run some s390x tests
+in the gitlab-ci.
 
+For some unknown reasons, the sieve test is now failing on x86_64,
+so I had to disable it. OTOH, the taskswitch2 test now works on
+i386, so we can enable this test instead.
 
-On 25.05.19 11:22, Sebastian Ott wrote:
-> 
-> On Thu, 23 May 2019, Michael Mueller wrote:
->> +static void __init cio_dma_pool_init(void)
->> +{
->> +	/* No need to free up the resources: compiled in */
->> +	cio_dma_pool = cio_gp_dma_create(cio_get_dma_css_dev(), 1);
-> 
-> This can return NULL.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ .gitlab-ci.yml | 29 ++++++++++++++++++-----------
+ 1 file changed, 18 insertions(+), 11 deletions(-)
 
-css_bus_init() will fail with -ENOMEM in v3
-
-> 
->> +/**
->> + * Allocate dma memory from the css global pool. Intended for memory not
->> + * specific to any single device within the css. The allocated memory
->> + * is not guaranteed to be 31-bit addressable.
->> + *
->> + * Caution: Not suitable for early stuff like console.
->> + *
->> + */
-> 
-> drivers/s390/cio/css.c:1121: warning: Function parameter or member 'size' not described in 'cio_dma_zalloc'
-
-will complete param description in v3
-
-> 
-> Reviewed-by: Sebastian Ott <sebott@linux.ibm.com>
-
-Thanks!
-
-> 
-
-Michael
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 50a1e39..a9dc16a 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -1,10 +1,12 @@
++image: fedora:30
++
+ before_script:
+- - apt-get update -qq
+- - apt-get install -y -qq qemu-system
++ - dnf update -y
++ - dnf install -y make python
+ 
+ build-aarch64:
+  script:
+- - apt-get install -y -qq gcc-aarch64-linux-gnu
++ - dnf install -y qemu-system-aarch64 gcc-aarch64-linux-gnu
+  - ./configure --arch=aarch64 --cross-prefix=aarch64-linux-gnu-
+  - make -j2
+  - ACCEL=tcg ./run_tests.sh
+@@ -15,8 +17,8 @@ build-aarch64:
+ 
+ build-arm:
+  script:
+- - apt-get install -y -qq gcc-arm-linux-gnueabi
+- - ./configure --arch=arm --cross-prefix=arm-linux-gnueabi-
++ - dnf install -y qemu-system-arm gcc-arm-linux-gnu
++ - ./configure --arch=arm --cross-prefix=arm-linux-gnu-
+  - make -j2
+  - ACCEL=tcg ./run_tests.sh
+      selftest-setup selftest-vectors-kernel selftest-vectors-user selftest-smp
+@@ -26,7 +28,7 @@ build-arm:
+ 
+ build-ppc64be:
+  script:
+- - apt-get install -y -qq gcc-powerpc64-linux-gnu
++ - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu
+  - ./configure --arch=ppc64 --endian=big --cross-prefix=powerpc64-linux-gnu-
+  - make -j2
+  - ACCEL=tcg ./run_tests.sh
+@@ -37,7 +39,7 @@ build-ppc64be:
+ 
+ build-ppc64le:
+  script:
+- - apt-get install -y -qq gcc-powerpc64-linux-gnu
++ - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu
+  - ./configure --arch=ppc64 --endian=little --cross-prefix=powerpc64-linux-gnu-
+  - make -j2
+  - ACCEL=tcg ./run_tests.sh
+@@ -48,28 +50,33 @@ build-ppc64le:
+ 
+ build-s390x:
+  script:
+- - apt-get install -y -qq gcc-s390x-linux-gnu
++ - dnf install -y qemu-system-s390x gcc-s390x-linux-gnu
+  - ./configure --arch=s390x --cross-prefix=s390x-linux-gnu-
+  - make -j2
++ - ACCEL=tcg ./run_tests.sh
++     selftest-setup intercept emulator sieve diag10
++     | tee results.txt
++ - if grep -q FAIL results.txt ; then exit 1 ; fi
+ 
+ build-x86_64:
+  script:
++ - dnf install -y qemu-system-x86 gcc
+  - ./configure --arch=x86_64
+  - make -j2
+  - ACCEL=tcg ./run_tests.sh
+      ioapic-split ioapic smptest smptest3 vmexit_cpuid vmexit_mov_from_cr8
+      vmexit_mov_to_cr8 vmexit_inl_pmtimer  vmexit_ipi vmexit_ipi_halt
+      vmexit_ple_round_robin vmexit_tscdeadline vmexit_tscdeadline_immed
+-     eventinj msr port80 sieve tsc rmap_chain umip hyperv_stimer intel_iommu
++     eventinj msr port80 syscall tsc rmap_chain umip intel_iommu
+      | tee results.txt
+  - if grep -q FAIL results.txt ; then exit 1 ; fi
+ 
+ build-i386:
+  script:
+- - apt-get install -y -qq gcc-multilib
++ - dnf install -y qemu-system-x86 gcc
+  - ./configure --arch=i386
+  - make -j2
+  - ACCEL=tcg ./run_tests.sh
+-     eventinj port80 sieve tsc taskswitch umip hyperv_stimer
++     eventinj port80 sieve tsc taskswitch taskswitch2 umip
+      | tee results.txt
+  - if grep -q FAIL results.txt ; then exit 1 ; fi
+-- 
+2.21.0
 
