@@ -2,96 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ABCF52B793
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 16:31:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 546512B7A9
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 16:37:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726819AbfE0Obx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 May 2019 10:31:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53916 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726793AbfE0Obx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 May 2019 10:31:53 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 146CE883A2
-        for <kvm@vger.kernel.org>; Mon, 27 May 2019 14:31:53 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BBC6960126;
-        Mon, 27 May 2019 14:31:51 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, thuth@redhat.com,
-        peterx@redhat.com
-Subject: [PATCH v2 4/4] kvm: selftests: introduce aarch64_vcpu_add_default
-Date:   Mon, 27 May 2019 16:31:41 +0200
-Message-Id: <20190527143141.13883-5-drjones@redhat.com>
-In-Reply-To: <20190527143141.13883-1-drjones@redhat.com>
-References: <20190527143141.13883-1-drjones@redhat.com>
+        id S1726583AbfE0Oha (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 May 2019 10:37:30 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:37776 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726191AbfE0Oh3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 May 2019 10:37:29 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5825FA78;
+        Mon, 27 May 2019 07:37:29 -0700 (PDT)
+Received: from MBP.local (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 765183F59C;
+        Mon, 27 May 2019 07:37:23 -0700 (PDT)
+Date:   Mon, 27 May 2019 15:37:20 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Andrey Konovalov <andreyknvl@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+        linux-media@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Subject: Re: [PATCH v15 05/17] arms64: untag user pointers passed to memory
+ syscalls
+Message-ID: <20190527143719.GA59948@MBP.local>
+References: <cover.1557160186.git.andreyknvl@google.com>
+ <00eb4c63fefc054e2c8d626e8fedfca11d7c2600.1557160186.git.andreyknvl@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Mon, 27 May 2019 14:31:53 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <00eb4c63fefc054e2c8d626e8fedfca11d7c2600.1557160186.git.andreyknvl@google.com>
+User-Agent: Mutt/1.11.2 (2019-01-07)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is the same as vm_vcpu_add_default, but it also takes a
-kvm_vcpu_init struct pointer.
+On Mon, May 06, 2019 at 06:30:51PM +0200, Andrey Konovalov wrote:
+> This patch is a part of a series that extends arm64 kernel ABI to allow to
+> pass tagged user pointers (with the top byte set to something else other
+> than 0x00) as syscall arguments.
+> 
+> This patch allows tagged pointers to be passed to the following memory
+> syscalls: brk, get_mempolicy, madvise, mbind, mincore, mlock, mlock2,
+> mmap, mmap_pgoff, mprotect, mremap, msync, munlock, munmap,
+> remap_file_pages, shmat and shmdt.
+> 
+> This is done by untagging pointers passed to these syscalls in the
+> prologues of their handlers.
+> 
+> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- .../testing/selftests/kvm/include/aarch64/processor.h |  2 ++
- tools/testing/selftests/kvm/lib/aarch64/processor.c   | 11 +++++++++--
- 2 files changed, 11 insertions(+), 2 deletions(-)
+Actually, I don't think any of these wrappers get called (have you
+tested this patch?). Following commit 4378a7d4be30 ("arm64: implement
+syscall wrappers"), I think we have other macro names for overriding the
+sys_* ones.
 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index 37f8129e1ea9..b7fa0c8551db 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -53,5 +53,7 @@ static inline void set_reg(struct kvm_vm *vm, uint32_t vcpuid, uint64_t id, uint
- }
- 
- void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *init);
-+void aarch64_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid,
-+			      struct kvm_vcpu_init *init, void *guest_code);
- 
- #endif /* SELFTEST_KVM_PROCESSOR_H */
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 285d86a2b6c3..284dfd63b65b 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -235,7 +235,8 @@ struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_pages,
- 	return vm;
- }
- 
--void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
-+void aarch64_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid,
-+			      struct kvm_vcpu_init *init, void *guest_code)
- {
- 	size_t stack_size = vm->page_size == 4096 ?
- 					DEFAULT_STACK_PGS * vm->page_size :
-@@ -243,12 +244,18 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
- 	uint64_t stack_vaddr = vm_vaddr_alloc(vm, stack_size,
- 					DEFAULT_ARM64_GUEST_STACK_VADDR_MIN, 0, 0);
- 
--	vm_vcpu_add_with_memslots(vm, vcpuid, 0, 0);
-+	vm_vcpu_add(vm, vcpuid);
-+	aarch64_vcpu_setup(vm, vcpuid, init);
- 
- 	set_reg(vm, vcpuid, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size);
- 	set_reg(vm, vcpuid, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
- }
- 
-+void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
-+{
-+	aarch64_vcpu_add_default(vm, vcpuid, NULL, guest_code);
-+}
-+
- void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *init)
- {
- 	struct kvm_vcpu_init default_init = { .target = -1, };
 -- 
-2.20.1
-
+Catalin
