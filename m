@@ -2,230 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C815D2B119
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 11:12:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D79D62B12D
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 11:16:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726115AbfE0JM3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 May 2019 05:12:29 -0400
-Received: from mga02.intel.com ([134.134.136.20]:14216 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725869AbfE0JM3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 May 2019 05:12:29 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 May 2019 02:12:28 -0700
-X-ExtLoop1: 1
-Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.13.116])
-  by FMSMGA003.fm.intel.com with ESMTP; 27 May 2019 02:12:26 -0700
-Date:   Mon, 27 May 2019 17:11:13 +0800
-From:   Zhenyu Wang <zhenyuw@linux.intel.com>
-To:     Tina Zhang <tina.zhang@intel.com>
-Cc:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kraxel@redhat.com,
-        zhenyuw@linux.intel.com, alex.williamson@redhat.com,
-        hang.yuan@intel.com, zhiyuan.lv@intel.com
-Subject: Re: [PATCH 2/2] drm/i915/gvt: Support delivering page flip event to
- userspace
-Message-ID: <20190527091113.GF29553@zhen-hp.sh.intel.com>
-Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-References: <20190527084312.8872-1-tina.zhang@intel.com>
- <20190527084312.8872-3-tina.zhang@intel.com>
+        id S1726063AbfE0JQa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 May 2019 05:16:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38296 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725869AbfE0JQa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 27 May 2019 05:16:30 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4R9CErw131408
+        for <kvm@vger.kernel.org>; Mon, 27 May 2019 05:16:29 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2srcyq8jr6-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 27 May 2019 05:16:29 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Mon, 27 May 2019 10:16:26 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 27 May 2019 10:16:22 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4R9GLKE61341702
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 27 May 2019 09:16:21 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D8A3811C050;
+        Mon, 27 May 2019 09:16:21 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C70E211C04C;
+        Mon, 27 May 2019 09:16:21 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 27 May 2019 09:16:21 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id 8D449E0502; Mon, 27 May 2019 11:16:21 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michal Kubecek <mkubecek@suse.cz>,
+        KarimAllah Ahmed <karahmed@amazon.de>
+Subject: [PATCH] kvm: fix compile on s390 part 2
+Date:   Mon, 27 May 2019 11:16:21 +0200
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="BRE3mIcgqKzpedwo"
-Content-Disposition: inline
-In-Reply-To: <20190527084312.8872-3-tina.zhang@intel.com>
-User-Agent: Mutt/1.10.0 (2018-05-17)
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19052709-0008-0000-0000-000002EAD37D
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19052709-0009-0000-0000-000022579BAE
+Message-Id: <20190527091621.151415-1-borntraeger@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-27_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=621 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905270065
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+We also need to fence the memunmap part.
 
---BRE3mIcgqKzpedwo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Fixes: e45adf665a53 ("KVM: Introduce a new guest mapping API")
+Fixes: d30b214d1d0a (kvm: fix compilation on s390)
+Cc: Michal Kubecek <mkubecek@suse.cz>
+Cc: KarimAllah Ahmed <karahmed@amazon.de>
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ virt/kvm/kvm_main.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On 2019.05.27 16:43:12 +0800, Tina Zhang wrote:
-> Use the eventfd based signaling mechanism provided by vfio/display
-> to deliver vGPU framebuffer page flip event to userspace.
->=20
-> Signed-off-by: Tina Zhang <tina.zhang@intel.com>
-> ---
->  drivers/gpu/drm/i915/gvt/dmabuf.c   | 31 +++++++++++++++++++++++++++++
->  drivers/gpu/drm/i915/gvt/dmabuf.h   |  1 +
->  drivers/gpu/drm/i915/gvt/gvt.c      |  1 +
->  drivers/gpu/drm/i915/gvt/gvt.h      |  2 ++
->  drivers/gpu/drm/i915/gvt/handlers.c |  2 ++
->  drivers/gpu/drm/i915/gvt/kvmgt.c    |  7 +++++++
->  6 files changed, 44 insertions(+)
->=20
-> diff --git a/drivers/gpu/drm/i915/gvt/dmabuf.c b/drivers/gpu/drm/i915/gvt=
-/dmabuf.c
-> index 4e1e425189ba..f2ed45616d72 100644
-> --- a/drivers/gpu/drm/i915/gvt/dmabuf.c
-> +++ b/drivers/gpu/drm/i915/gvt/dmabuf.c
-> @@ -538,6 +538,35 @@ int intel_vgpu_get_dmabuf(struct intel_vgpu *vgpu, u=
-nsigned int dmabuf_id)
->  	return ret;
->  }
-> =20
-> +static void release_flip_eventfd_ctx(struct intel_vgpu *vgpu)
-> +{
-> +	struct eventfd_ctx **trigger =3D &vgpu->page_flip_trigger;
-> +
-> +	if (*trigger) {
-> +		eventfd_ctx_put(*trigger);
-> +		*trigger =3D NULL;
-> +	}
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 134ec0283a8a..301089a462c4 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1795,8 +1795,10 @@ void kvm_vcpu_unmap(struct kvm_vcpu *vcpu, struct kvm_host_map *map,
+ 
+ 	if (map->page)
+ 		kunmap(map->page);
++#ifdef CONFIG_HAS_IOMEM
+ 	else
+ 		memunmap(map->hva);
++#endif
+ 
+ 	if (dirty) {
+ 		kvm_vcpu_mark_page_dirty(vcpu, map->gfn);
+-- 
+2.21.0
 
-Why so twisted?
-
-        if (vgpu->page_flip_trigger) {
-                eventfd_ctx_put(vgpu->page_flip_trigger);
-		vgpu->page_flip_trigger =3D NULL;
-        }
-
-> +}
-> +
-> +int intel_vgpu_set_flip_eventfd(struct intel_vgpu *vgpu, int fd)
-> +{
-> +	struct eventfd_ctx *trigger;
-> +
-> +	if (fd =3D=3D -1) {
-> +		release_flip_eventfd_ctx(vgpu);
-> +	} else if (fd >=3D 0) {
-> +		trigger =3D eventfd_ctx_fdget(fd);
-> +		if (IS_ERR(trigger)) {
-> +			gvt_vgpu_err("eventfd_ctx_fdget failed\n");
-> +			return PTR_ERR(trigger);
-> +		}
-> +		vgpu->page_flip_trigger =3D trigger;
-> +	} else
-> +		return -EINVAL;
-
-Better put (fd < 0) check earlier in ioctl handler to simplify this.
-
-> +
-> +	return 0;
-> +}
-> +
->  void intel_vgpu_dmabuf_cleanup(struct intel_vgpu *vgpu)
->  {
->  	struct list_head *pos, *n;
-> @@ -561,4 +590,6 @@ void intel_vgpu_dmabuf_cleanup(struct intel_vgpu *vgp=
-u)
-> =20
->  	}
->  	mutex_unlock(&vgpu->dmabuf_lock);
-> +
-> +	release_flip_eventfd_ctx(vgpu);
->  }
-> diff --git a/drivers/gpu/drm/i915/gvt/dmabuf.h b/drivers/gpu/drm/i915/gvt=
-/dmabuf.h
-> index 5f8f03fb1d1b..4d9caa3732d2 100644
-> --- a/drivers/gpu/drm/i915/gvt/dmabuf.h
-> +++ b/drivers/gpu/drm/i915/gvt/dmabuf.h
-> @@ -62,6 +62,7 @@ struct intel_vgpu_dmabuf_obj {
-> =20
->  int intel_vgpu_query_plane(struct intel_vgpu *vgpu, void *args);
->  int intel_vgpu_get_dmabuf(struct intel_vgpu *vgpu, unsigned int dmabuf_i=
-d);
-> +int intel_vgpu_set_flip_eventfd(struct intel_vgpu *vgpu, int fd);
->  void intel_vgpu_dmabuf_cleanup(struct intel_vgpu *vgpu);
-> =20
->  #endif
-> diff --git a/drivers/gpu/drm/i915/gvt/gvt.c b/drivers/gpu/drm/i915/gvt/gv=
-t.c
-> index 43f4242062dd..7fd4afa432ef 100644
-> --- a/drivers/gpu/drm/i915/gvt/gvt.c
-> +++ b/drivers/gpu/drm/i915/gvt/gvt.c
-> @@ -184,6 +184,7 @@ static const struct intel_gvt_ops intel_gvt_ops =3D {
->  	.get_gvt_attrs =3D intel_get_gvt_attrs,
->  	.vgpu_query_plane =3D intel_vgpu_query_plane,
->  	.vgpu_get_dmabuf =3D intel_vgpu_get_dmabuf,
-> +	.vgpu_set_flip_eventfd =3D intel_vgpu_set_flip_eventfd,
->  	.write_protect_handler =3D intel_vgpu_page_track_handler,
->  	.emulate_hotplug =3D intel_vgpu_emulate_hotplug,
->  };
-> diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gv=
-t.h
-> index f5a328b5290a..86ca223f9a60 100644
-> --- a/drivers/gpu/drm/i915/gvt/gvt.h
-> +++ b/drivers/gpu/drm/i915/gvt/gvt.h
-> @@ -229,6 +229,7 @@ struct intel_vgpu {
->  	struct completion vblank_done;
-> =20
->  	u32 scan_nonprivbb;
-> +	struct eventfd_ctx *page_flip_trigger;
->  };
-> =20
->  /* validating GM healthy status*/
-> @@ -570,6 +571,7 @@ struct intel_gvt_ops {
->  			struct attribute_group ***intel_vgpu_type_groups);
->  	int (*vgpu_query_plane)(struct intel_vgpu *vgpu, void *);
->  	int (*vgpu_get_dmabuf)(struct intel_vgpu *vgpu, unsigned int);
-> +	int (*vgpu_set_flip_eventfd)(struct intel_vgpu *vgpu, int fd);
->  	int (*write_protect_handler)(struct intel_vgpu *, u64, void *,
->  				     unsigned int);
->  	void (*emulate_hotplug)(struct intel_vgpu *vgpu, bool connected);
-> diff --git a/drivers/gpu/drm/i915/gvt/handlers.c b/drivers/gpu/drm/i915/g=
-vt/handlers.c
-> index 18f01eeb2510..1b5455888bdf 100644
-> --- a/drivers/gpu/drm/i915/gvt/handlers.c
-> +++ b/drivers/gpu/drm/i915/gvt/handlers.c
-> @@ -763,6 +763,8 @@ static int pri_surf_mmio_write(struct intel_vgpu *vgp=
-u, unsigned int offset,
->  	else
->  		set_bit(event, vgpu->irq.flip_done_event[pipe]);
-> =20
-> +	eventfd_signal(vgpu->page_flip_trigger, 1);
-
-Need to check if page_flip_trigger is armed or not.
-
-> +
->  	return 0;
->  }
-> =20
-> diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/=
-kvmgt.c
-> index a68addf95c23..00c75bd76bc0 100644
-> --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-> +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-> @@ -1547,6 +1547,13 @@ static long intel_vgpu_ioctl(struct mdev_device *m=
-dev, unsigned int cmd,
->  		dmabuf_fd =3D intel_gvt_ops->vgpu_get_dmabuf(vgpu, dmabuf_id);
->  		return dmabuf_fd;
-> =20
-> +	} else if (cmd =3D=3D VFIO_DEVICE_SET_GFX_FLIP_EVENTFD) {
-> +		__s32 event_fd;
-> +
-> +		if (get_user(event_fd, (__s32 __user *)arg))
-> +			return -EFAULT;
-> +
-> +		return intel_gvt_ops->vgpu_set_flip_eventfd(vgpu, event_fd);
->  	}
-> =20
->  	return -ENOTTY;
-> --=20
-> 2.17.1
->=20
-
---=20
-Open Source Technology Center, Intel ltd.
-
-$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
-
---BRE3mIcgqKzpedwo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCXOupsQAKCRCxBBozTXgY
-JxbuAJ4kNMoua0PETExQpHBAIZ2hJDRvaQCfekjRkSFcY0VlZyW57GoruPc4/H4=
-=T0iT
------END PGP SIGNATURE-----
-
---BRE3mIcgqKzpedwo--
