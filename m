@@ -2,102 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A36D2B545
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 14:31:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 475002B55B
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 14:33:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726490AbfE0Mbh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 May 2019 08:31:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57964 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726106AbfE0Mbh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 May 2019 08:31:37 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id F0A223079B92
-        for <kvm@vger.kernel.org>; Mon, 27 May 2019 12:31:36 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 00A6879810;
-        Mon, 27 May 2019 12:31:35 +0000 (UTC)
-Date:   Mon, 27 May 2019 14:31:33 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com
-Subject: Re: [PATCH 1/4] kvm: selftests: rename vm_vcpu_add to
- vm_vcpu_add_memslots
-Message-ID: <20190527123133.tzdwrhw7bk7zm42l@kamzik.brq.redhat.com>
-References: <20190523125756.4645-1-drjones@redhat.com>
- <20190523125756.4645-2-drjones@redhat.com>
- <eb7473ef-3d78-5858-577c-62abcd15d967@redhat.com>
+        id S1726722AbfE0Mc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 May 2019 08:32:58 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:39992 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726106AbfE0Mc5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 May 2019 08:32:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=Bb4riJdUbAvU2dFDq22LE6R9qG/UUI43/Y/+y4V6Qvs=; b=c4TDFTpHK0CYd1vWu7R1zqW+/
+        2vf2CkvycdZ1TOZgh6586+6hBSUOonS4izJJJLlU/laLZdtRg9vo/tFqP67DP/DrVq5GNeyOXkp8N
+        ExSQgN5WmAiXgiz9FXGhkb7sqDhbv1+1n9qPgIj2TuqbkRY8ULdb/xs9kniGA0ESzx0t8DJo/mrAl
+        uLK3C6fLgcCbWbFpO9EhXKZtWIcTmu+x6Co60LQwrkDHUOi8//21mfSvFniFvyuP82yQFaVkGwBIf
+        aK/OeehLVOOzYZiUm+0l62ODKjdgrXRftiZCRVCOymL15JzQ7yEwGoiNpC9TkUxMutHPzfpYZgiur
+        Nuu3rPt0w==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hVEnP-0003D7-9F; Mon, 27 May 2019 12:32:07 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 10A95202BF3E2; Mon, 27 May 2019 14:32:06 +0200 (CEST)
+Date:   Mon, 27 May 2019 14:32:06 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Juergen Gross <jgross@suse.com>, Nadav Amit <namit@vmware.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        linux-hyperv@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org
+Subject: Re: [RFC PATCH 5/6] x86/mm/tlb: Flush remote and local TLBs
+ concurrently
+Message-ID: <20190527123206.GC2623@hirez.programming.kicks-ass.net>
+References: <20190525082203.6531-1-namit@vmware.com>
+ <20190525082203.6531-6-namit@vmware.com>
+ <08b21fb5-2226-7924-30e3-31e4adcfc0a3@suse.com>
+ <20190527094710.GU2623@hirez.programming.kicks-ass.net>
+ <e9c0dc1f-799a-b6e3-8d41-58f0a6b693cd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <eb7473ef-3d78-5858-577c-62abcd15d967@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Mon, 27 May 2019 12:31:37 +0000 (UTC)
+In-Reply-To: <e9c0dc1f-799a-b6e3-8d41-58f0a6b693cd@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 27, 2019 at 09:27:56AM +0200, Thomas Huth wrote:
-> On 23/05/2019 14.57, Andrew Jones wrote:
-> > This frees up the name vm_vcpu_add for another use.
-> > 
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  tools/testing/selftests/kvm/include/kvm_util.h       |  4 ++--
-> >  tools/testing/selftests/kvm/lib/aarch64/processor.c  |  2 +-
-> >  tools/testing/selftests/kvm/lib/kvm_util.c           | 12 +++++++-----
-> >  tools/testing/selftests/kvm/lib/x86_64/processor.c   |  2 +-
-> >  tools/testing/selftests/kvm/x86_64/evmcs_test.c      |  2 +-
-> >  .../selftests/kvm/x86_64/kvm_create_max_vcpus.c      |  2 +-
-> >  tools/testing/selftests/kvm/x86_64/smm_test.c        |  2 +-
-> >  tools/testing/selftests/kvm/x86_64/state_test.c      |  2 +-
-> >  8 files changed, 15 insertions(+), 13 deletions(-)
-> [...]
-> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > index e9113857f44e..937292dca81b 100644
-> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > @@ -756,21 +756,23 @@ static int vcpu_mmap_sz(void)
-> >  }
+On Mon, May 27, 2019 at 12:21:59PM +0200, Paolo Bonzini wrote:
+> On 27/05/19 11:47, Peter Zijlstra wrote:
+
+> > --- a/arch/x86/kernel/kvm.c
+> > +++ b/arch/x86/kernel/kvm.c
+> > @@ -580,7 +580,7 @@ static void __init kvm_apf_trap_init(voi
 > >  
-> >  /*
-> > - * VM VCPU Add
-> > + * VM VCPU Add with provided memslots
-> >   *
-> >   * Input Args:
-> >   *   vm - Virtual Machine
-> >   *   vcpuid - VCPU ID
-> > + *   pgd_memslot - Memory region slot for new virtual translation tables
-> > + *   gdt_memslot - Memory region slot for data pages
-> >   *
-> >   * Output Args: None
-> >   *
-> >   * Return: None
-> >   *
-> > - * Creates and adds to the VM specified by vm and virtual CPU with
-> > - * the ID given by vcpuid.
-> > + * Adds a virtual CPU to the VM specified by vm with the ID given by vcpuid
-> > + * and then sets it up with vcpu_setup() and the provided memslots.
-> >   */
-> > -void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, int pgd_memslot,
-> > -		 int gdt_memslot)
-> > +void vm_vcpu_add_memslots(struct kvm_vm *vm, uint32_t vcpuid, int pgd_memslot,
-> > +			  int gdt_memslot)
+> >  static DEFINE_PER_CPU(cpumask_var_t, __pv_tlb_mask);
+> >  
+> > -static void kvm_flush_tlb_others(const struct cpumask *cpumask,
+> > +static void kvm_flush_tlb_multi(const struct cpumask *cpumask,
+> >  			const struct flush_tlb_info *info)
+> >  {
+> >  	u8 state;
+> > @@ -594,6 +594,9 @@ static void kvm_flush_tlb_others(const s
+> >  	 * queue flush_on_enter for pre-empted vCPUs
+> >  	 */
+> >  	for_each_cpu(cpu, flushmask) {
+> > +		if (cpu == smp_processor_id())
+> > +			continue;
+> > +
 > 
-> I think the naming and description of the function is somewhat
-> unfortunate now. The function is not really about memslots, but about
-> setting up some MMU tables in the memory (and for this you need a
-> memslot). So maybe rather name it vm_vcpu_add_with_mmu() or something
-> similar? Also it would be nice to give the reason for the memslots in
-> the comment before the function.
->
+> Even this would be just an optimization; the vCPU you're running on
+> cannot be preempted.  You can just change others to multi.
 
-Peter Xu suggested almost the same name, so I'll do that for a v2.
-I'll add a couple more words to the comment too.
+Yeah, I know, but it felt weird so I added the explicit skip. No strong
+feelings though.
 
-Thanks,
-drew 
