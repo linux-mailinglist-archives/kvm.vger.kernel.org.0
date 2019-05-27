@@ -2,175 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 393BD2B80F
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 17:01:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99CC82B87A
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 17:40:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726982AbfE0PBX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 May 2019 11:01:23 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47472 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726094AbfE0PBW (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 27 May 2019 11:01:22 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4REqamI055986
-        for <kvm@vger.kernel.org>; Mon, 27 May 2019 11:01:21 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2srj0rgkmp-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 27 May 2019 11:01:20 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
-        Mon, 27 May 2019 16:01:19 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 27 May 2019 16:01:14 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4RF1DN260096556
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 27 May 2019 15:01:13 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 499CDAA101;
-        Mon, 27 May 2019 15:01:13 +0000 (GMT)
-Received: from [9.152.98.56] (unknown [9.152.98.56])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B6FA1AA0FD;
-        Mon, 27 May 2019 15:01:12 +0000 (GMT)
-Reply-To: mimu@linux.ibm.com
-Subject: Re: [PATCH v2 3/8] s390/cio: add basic protected virtualization
- support
-To:     Sebastian Ott <sebott@linux.ibm.com>
-Cc:     KVM Mailing List <kvm@vger.kernel.org>,
-        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>
-References: <20190523162209.9543-1-mimu@linux.ibm.com>
- <20190523162209.9543-4-mimu@linux.ibm.com>
- <alpine.LFD.2.21.1905251124230.3359@schleppi>
-From:   Michael Mueller <mimu@linux.ibm.com>
-Organization: IBM
-Date:   Mon, 27 May 2019 17:01:12 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.7.0
+        id S1726338AbfE0PkD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 May 2019 11:40:03 -0400
+Received: from pb-smtp1.pobox.com ([64.147.108.70]:61109 "EHLO
+        pb-smtp1.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726191AbfE0PkD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 May 2019 11:40:03 -0400
+Received: from pb-smtp1.pobox.com (unknown [127.0.0.1])
+        by pb-smtp1.pobox.com (Postfix) with ESMTP id 2F28713F397;
+        Mon, 27 May 2019 11:39:59 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=pobox.com; h=from:to:cc
+        :subject:references:date:in-reply-to:message-id:mime-version
+        :content-type:content-transfer-encoding; s=sasl; bh=9sDE2dodoZFO
+        Eve5TaqRjuw4g+k=; b=pbqSdnuBuHyQCi85vnKPCBzqkOAiQ7uwE93N1Q46Dg+Y
+        MCug1BeI8/W8MPtViYbXewniDF76NIlAdU6pg4yJojF5JwFy3niuN/gpi9aIqk5b
+        VJwRR+IlRAVKWVYz0CqKJoI/mqcO7QcRyCTB7U820LsVVWvW1zINAEyg53tdSPk=
+DomainKey-Signature: a=rsa-sha1; c=nofws; d=pobox.com; h=from:to:cc
+        :subject:references:date:in-reply-to:message-id:mime-version
+        :content-type:content-transfer-encoding; q=dns; s=sasl; b=Js0ffw
+        H9tb/MoQLH0rwl0z53DDCI370/R/3wKj8PcepkJTMJBDrPZMWpKaEWEanoBmt4LL
+        u7DzQ9Nb/UBid3FVkkMUfCp2WHFnTCKzB/L70nATSlGil+mWSUwvPYEgrOCg8AKd
+        qX2jSyfoHxFHK9gI2YMRBrUzIiE5fQbdDIG/k=
+Received: from pb-smtp1.nyi.icgroup.com (unknown [127.0.0.1])
+        by pb-smtp1.pobox.com (Postfix) with ESMTP id 2532413F396;
+        Mon, 27 May 2019 11:39:59 -0400 (EDT)
+Received: from pobox.com (unknown [34.76.80.147])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by pb-smtp1.pobox.com (Postfix) with ESMTPSA id 8C46F13F393;
+        Mon, 27 May 2019 11:39:58 -0400 (EDT)
+From:   Junio C Hamano <gitster@pobox.com>
+To:     =?utf-8?B?w4Z2YXIgQXJuZmrDtnLDsA==?= Bjarmason <avarab@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, git@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        KVM list <kvm@vger.kernel.org>,
+        Michael Haggerty <mhagger@alum.mit.edu>
+Subject: Re: [RFC/PATCH] refs: tone down the dwimmery in refname_match() for {heads,tags,remotes}/*
+References: <CAHk-=wgzKzAwS=_ySikL1f=Gr62YXL_WXGh82wZKMOvzJ9+2VA@mail.gmail.com>
+        <20190526225445.21618-1-avarab@gmail.com>
+        <5c9ce55c-2c3a-fce0-d6e3-dfe5f8fc9b01@redhat.com>
+        <874l5gezsn.fsf@evledraar.gmail.com>
+Date:   Mon, 27 May 2019 08:39:57 -0700
+In-Reply-To: <874l5gezsn.fsf@evledraar.gmail.com> (=?utf-8?B?IsOGdmFyIEFy?=
+ =?utf-8?B?bmZqw7Zyw7A=?= Bjarmason"'s
+        message of "Mon, 27 May 2019 16:29:28 +0200")
+Message-ID: <xmqqef4jewj6.fsf@gitster-ct.c.googlers.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <alpine.LFD.2.21.1905251124230.3359@schleppi>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19052715-0016-0000-0000-0000027FF93D
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052715-0017-0000-0000-000032DCFF66
-Message-Id: <f2b8d5c3-a39b-8632-c463-cde47bf38c91@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-27_07:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905270106
+Content-Type: text/plain; charset=utf-8
+X-Pobox-Relay-ID: AEFE72FC-8095-11E9-A21E-46F8B7964D18-77302942!pb-smtp1.pobox.com
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+=C3=86var Arnfj=C3=B6r=C3=B0 Bjarmason <avarab@gmail.com> writes:
 
+> It mostly (and I believe always should) works by looking at whether
+> "someref" is a named ref, and e.g. looking at whether it's "master". We
+> then see that it lives in "refs/heads/master" locally, and thus
+> correspondingly add a "refs/heads/" to your <dst> "tags/foo", making it
+> "refs/heads/tags/foo".
 
-On 25.05.19 11:44, Sebastian Ott wrote:
-> 
-> On Thu, 23 May 2019, Michael Mueller wrote:
->>   static struct ccw_device * io_subchannel_allocate_dev(struct subchannel *sch)
->>   {
->>   	struct ccw_device *cdev;
->> +	struct gen_pool *dma_pool;
->>   
->>   	cdev  = kzalloc(sizeof(*cdev), GFP_KERNEL);
->> -	if (cdev) {
->> -		cdev->private = kzalloc(sizeof(struct ccw_device_private),
->> -					GFP_KERNEL | GFP_DMA);
->> -		if (cdev->private)
->> -			return cdev;
->> -	}
->> +	if (!cdev)
->> +		goto err_cdev;
->> +	cdev->private = kzalloc(sizeof(struct ccw_device_private),
->> +				GFP_KERNEL | GFP_DMA);
->> +	if (!cdev->private)
->> +		goto err_priv;
->> +	cdev->dev.coherent_dma_mask = sch->dev.coherent_dma_mask;
->> +	cdev->dev.dma_mask = &cdev->dev.coherent_dma_mask;
->> +	dma_pool = cio_gp_dma_create(&cdev->dev, 1);
-> 
-> This can return NULL. gen_pool_alloc will panic in this case.
-> [...]
+Yes.
 
-yep, will handled in next version
+(I am still not up to speed, so pardon me if I sound nonsense)
 
-> 
->> +err_dma_area:
->> +		kfree(io_priv);
+> *Or* we take e.g. <some random SHA-1>:master, the <some random...> is
+> ambiguous, but we see that "master" unambiguously refers to
+> "refs/heads/master" on the remote (so e.g. a refs/tags/master doesn't
+> exist). If you had both refs/{heads,tags}/master refs on the remote we'=
+d
+> emit:
+>
+>     error: dst refspec master matches more than one
 
-one tab gone
+OK, so you are saying "if the source is unique, try to qualify the
+destination to the same hierarchy (i.e. the previous paragraph). If
+the source is not a ref (this paragraph), try to find a unique match
+with the destination to determine where it should go".  I think that
+makes sense.
 
-> 
-> Indentation.
-> 
->> +err_priv:
->> +	put_device(&sch->dev);
->> +	return ERR_PTR(-ENOMEM);
->>   }
-> [...]
->>   void ccw_device_update_sense_data(struct ccw_device *cdev)
->>   {
->>   	memset(&cdev->id, 0, sizeof(cdev->id));
->> -	cdev->id.cu_type   = cdev->private->senseid.cu_type;
->> -	cdev->id.cu_model  = cdev->private->senseid.cu_model;
->> -	cdev->id.dev_type  = cdev->private->senseid.dev_type;
->> -	cdev->id.dev_model = cdev->private->senseid.dev_model;
->> +	cdev->id.cu_type   =
->> +		cdev->private->dma_area->senseid.cu_type;
->> +	cdev->id.cu_model  =
->> +		cdev->private->dma_area->senseid.cu_model;
->> +	cdev->id.dev_type  =
->> +		cdev->private->dma_area->senseid.dev_type;
->> +	cdev->id.dev_model =
->> +		cdev->private->dma_area->senseid.dev_model;
-> 
-> These fit into one line.
+> (We should improve that error to note what conflicted, #leftoverbits)
 
-yep, surprisingly below 80 characters
+OK.
 
-> 
->> +/**
->> + * Allocate zeroed dma coherent 31 bit addressable memory using
->> + * the subchannels dma pool. Maximal size of allocation supported
->> + * is PAGE_SIZE.
->> + */
-> drivers/s390/cio/device_ops.c:708: warning: Function parameter or member 'cdev' not described in 'ccw_device_dma_zalloc'
-> drivers/s390/cio/device_ops.c:708: warning: Function parameter or member 'size' not described in 'ccw_device_dma_zalloc'
+> So your HEAD:tags/for-linus resulted in pushing a HEAD that
+> referred to some refs/heads/* to refs/tags/for-linus.  I believe
+> that's an unintendedem ergent effect in how we try to apply these
+> two rules. We should apply one, not both in combination.
 
-changing comment open token
+Are you saying that HEAD is locally dereferenced to a branch name
+(if you are not detached when pushing), and "if the source is unique
+ref" rule is applied first?  That is not how I recall we designed
+this dwimmery.  As we know there is no refs/heads/HEAD, it should be
+like pushing HEAD^0:tags/for-linus (i.e. it should behave the same
+way as pushing "<some random SHA-1>:tags/for-linus"), without "where
+is the source?  let's qualify the destination the same way" rule
+kicking in.  And because the repeated "Linus, please pull from that
+usual tag for this cycle" request is a norm, "does the destination
+uniquely exist at the receiving end" should kick in.  IOW, I think
+that is quite a deliberate behaviour that is desirable, or atleast
+was considered to be desirable when the feature was designed.
 
-> 
-> 
-> Reviewed-by: Sebastian Ott <sebott@linux.ibm.com>
-> 
+>> In my opinion, the bug is that "git request-pull" should warn if the t=
+ag
+>> is lightweight remotely but not locally, and possibly even vice versa.
 
-Thanks!
+Hmm (yes, I realize I am not commenting on what =C3=86var wrote)...
 
+>>   # create remote lightweight tag and prepare a pull request
+>>   git push ../b HEAD:refs/tags/tag1
+>>   git request-pull HEAD^ ../b tags/tag1
 
-Michael
+I do not think lightweight vs annotated should be the issue.  The
+tag that the requestor asks to be pulled (from repository ../b)
+should be what the requestor has locally when writing the request
+(in repository .).  Even if both tags at remote and local are
+annotated, we should still warn if they are different objects, no?
 
+Do we run ls-remote or something (or consult remote-trakcing branch)
+to see if that is the case in request-pull?
+?
