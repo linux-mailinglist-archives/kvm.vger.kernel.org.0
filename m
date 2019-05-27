@@ -2,150 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 91E6A2B24D
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 12:38:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 54B5D2B26B
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2019 12:46:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726538AbfE0KiN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 May 2019 06:38:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48758 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725996AbfE0KiN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 May 2019 06:38:13 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 066B8821D8;
-        Mon, 27 May 2019 10:38:13 +0000 (UTC)
-Received: from gondolin (ovpn-204-109.brq.redhat.com [10.40.204.109])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 58E2C60C64;
-        Mon, 27 May 2019 10:38:06 +0000 (UTC)
-Date:   Mon, 27 May 2019 12:38:02 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Michael Mueller <mimu@linux.ibm.com>
-Cc:     KVM Mailing List <kvm@vger.kernel.org>,
-        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>
-Subject: Re: [PATCH v2 3/8] s390/cio: add basic protected virtualization
- support
-Message-ID: <20190527123802.54cd3589.cohuck@redhat.com>
-In-Reply-To: <20190523162209.9543-4-mimu@linux.ibm.com>
-References: <20190523162209.9543-1-mimu@linux.ibm.com>
-        <20190523162209.9543-4-mimu@linux.ibm.com>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Mon, 27 May 2019 10:38:13 +0000 (UTC)
+        id S1726094AbfE0Kqp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 May 2019 06:46:45 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:34450 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725991AbfE0Kqp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 May 2019 06:46:45 -0400
+Received: by mail-pg1-f195.google.com with SMTP id h2so5853694pgg.1
+        for <kvm@vger.kernel.org>; Mon, 27 May 2019 03:46:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=YULeuaw6Jc86bWQlKIn+WYEbp/WlRteTq6uuOLuLmgE=;
+        b=gnPHGGvc3H5whBiSLcsGnQAPbOAcnvtQRKdl/vtEacTw2uoUUb55Z/1g33VtJeM8f7
+         Dny7JXEXAA4aTNuVqnZlSWTPyE2raU1rCEWDAClUzECIt2Pr1zeK+MjRTxueCrHE6N2g
+         OBivMwsMQrV/ahBijej/AkRweU/BSjVJ6KCEKALUsbFedxkrN8n7MUgKIcNh2lkmUcHH
+         xE/+M7M5uBSDGzYLMhyYYkDOxXgA8f5LDhaNsVnn7ak0ZS05zgNYQ0C9Waqiy3kOnSVp
+         XLZWxTVybRQmvLsfd5nvSleX/qTywlAKqEq6SwemuXtOujyncAUx0pf73ZS0UPoBctu7
+         u8+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=YULeuaw6Jc86bWQlKIn+WYEbp/WlRteTq6uuOLuLmgE=;
+        b=XVPsALNAApnEAIlQbGEDG6bvcWhE7Xig+5B2iNESiJZA4+IozBjtuk+3AjGPBvAvNU
+         myXVZVxkKvLwuuDXuey9db41pWD8DYy4ELIL89aixyGWKSogNJ2a6v679rN22EXMKMGj
+         H81sbmVxBP28rpMKyTh6SwwazimUSM4exCO5y1ykFsNcjZlgnm5NRwOdHjdMWfSI7CoW
+         510J+c/YBME2BgjBIZSc8Lil5NuEMA30Aa17z/GlAC2Zwvi4XlnbNCug8FMzzdU9bMBz
+         PN7XZAmx0/Srx9zdtZ4UTyCkFZz6rn24vIvv6hHWrl3F5NwBPVJtejEmq6WXzQIPlzRb
+         vL3Q==
+X-Gm-Message-State: APjAAAV75m90lVtcKkmcVJhsnWUvZdn09cNLOgpCDGqvoIxB2Dw1/Slx
+        wMviowUepphvsKkyamPgpJ8dGRrE
+X-Google-Smtp-Source: APXvYqyC7V1Bddt2ayGRgVkCJMHVJ9PYyLGgL/wJtpD3rLj4iNTzMOYpMH7u5Gm9y1nUaW+68DgSvA==
+X-Received: by 2002:a17:90a:9281:: with SMTP id n1mr29517336pjo.25.1558954004814;
+        Mon, 27 May 2019 03:46:44 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+        by smtp.googlemail.com with ESMTPSA id k13sm10174792pgr.90.2019.05.27.03.46.43
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Mon, 27 May 2019 03:46:44 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Subject: [PATCH] target-i386: adds PV_SCHED_YIELD CPUID feature bit
+Date:   Mon, 27 May 2019 18:46:40 +0800
+Message-Id: <1558954000-9715-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 23 May 2019 18:22:04 +0200
-Michael Mueller <mimu@linux.ibm.com> wrote:
+From: Wanpeng Li <wanpengli@tencent.com>
 
-> From: Halil Pasic <pasic@linux.ibm.com>
-> 
-> As virtio-ccw devices are channel devices, we need to use the dma area
-> for any communication with the hypervisor.
-> 
-> It handles neither QDIO in the common code, nor any device type specific
-> stuff (like channel programs constructed by the DASD driver).
-> 
-> An interesting side effect is that virtio structures are now going to
-> get allocated in 31 bit addressable storage.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+Adds PV_SCHED_YIELD CPUID feature bit.
 
-[Side note: you really should add your s-o-b if you send someone else's
-patches... if Halil ends up committing them, it's fine, though.]
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ target/i386/cpu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> ---
->  arch/s390/include/asm/ccwdev.h   |  4 +++
->  drivers/s390/cio/ccwreq.c        |  9 +++---
->  drivers/s390/cio/device.c        | 64 +++++++++++++++++++++++++++++++++-------
->  drivers/s390/cio/device_fsm.c    | 53 ++++++++++++++++++++-------------
->  drivers/s390/cio/device_id.c     | 20 +++++++------
->  drivers/s390/cio/device_ops.c    | 21 +++++++++++--
->  drivers/s390/cio/device_pgid.c   | 22 +++++++-------
->  drivers/s390/cio/device_status.c | 24 +++++++--------
->  drivers/s390/cio/io_sch.h        | 20 +++++++++----
->  drivers/s390/virtio/virtio_ccw.c | 10 -------
->  10 files changed, 164 insertions(+), 83 deletions(-)
-> 
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 5f07d68..f4c4b6b 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -902,7 +902,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             "kvmclock", "kvm-nopiodelay", "kvm-mmu", "kvmclock",
+             "kvm-asyncpf", "kvm-steal-time", "kvm-pv-eoi", "kvm-pv-unhalt",
+             NULL, "kvm-pv-tlb-flush", NULL, "kvm-pv-ipi",
+-            NULL, NULL, NULL, NULL,
++            "kvm-pv-sched-yield", NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             "kvmclock-stable-bit", NULL, NULL, NULL,
+-- 
+2.7.4
 
-(...)
-
-> @@ -1593,20 +1622,31 @@ struct ccw_device * __init ccw_device_create_console(struct ccw_driver *drv)
->  		return ERR_CAST(sch);
->  
->  	io_priv = kzalloc(sizeof(*io_priv), GFP_KERNEL | GFP_DMA);
-> -	if (!io_priv) {
-> -		put_device(&sch->dev);
-> -		return ERR_PTR(-ENOMEM);
-> -	}
-> +	if (!io_priv)
-> +		goto err_priv;
-> +	io_priv->dma_area = dma_alloc_coherent(&sch->dev,
-> +				sizeof(*io_priv->dma_area),
-> +				&io_priv->dma_area_dma, GFP_KERNEL);
-
-Even though we'll only end up here for 3215 or 3270 consoles, this sent
-me looking.
-
-This code is invoked via console_init(). A few lines down in
-start_kernel(), we have
-
-        /*                                                                       
-         * This needs to be called before any devices perform DMA                
-         * operations that might use the SWIOTLB bounce buffers. It will         
-         * mark the bounce buffers as decrypted so that their usage will         
-         * not cause "plain-text" data to be decrypted when accessed.            
-         */
-        mem_encrypt_init();
-
-So, I'm wondering if creating the console device interacts in any way
-with the memory encryption interface?
-
-[Does basic recognition work if you start a protected virt guest with a
-3270 console? I realize that the console is unlikely to work, but that
-should at least exercise this code path.]
-
-> +	if (!io_priv->dma_area)
-> +		goto err_dma_area;
->  	set_io_private(sch, io_priv);
->  	cdev = io_subchannel_create_ccwdev(sch);
->  	if (IS_ERR(cdev)) {
->  		put_device(&sch->dev);
-> +		dma_free_coherent(&sch->dev, sizeof(*io_priv->dma_area),
-> +				  io_priv->dma_area, io_priv->dma_area_dma);
->  		kfree(io_priv);
->  		return cdev;
->  	}
->  	cdev->drv = drv;
->  	ccw_device_set_int_class(cdev);
->  	return cdev;
-> +
-> +err_dma_area:
-> +		kfree(io_priv);
-> +err_priv:
-> +	put_device(&sch->dev);
-> +	return ERR_PTR(-ENOMEM);
->  }
->  
->  void __init ccw_device_destroy_console(struct ccw_device *cdev)
