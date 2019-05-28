@@ -2,137 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AC7F02C983
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 17:05:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1C222CA71
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 17:41:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726698AbfE1PFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 May 2019 11:05:33 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:58076 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726560AbfE1PFc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 May 2019 11:05:32 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4SF4QUp083027;
-        Tue, 28 May 2019 15:04:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2018-07-02;
- bh=G9vBM5THlG8pywNzVbsKIK8sbELnMUDNM7aCaLdslP0=;
- b=bgq/F8b/2xwUVXMlsJqTT/j8YvUXLiDeS1H4MJ+nX4NOQ5xuZxuO5UeAXzVEoTG1w3bf
- iu6Ce7E+Lhxw9casXB7xzxnF/LglbRQEC8Hux6StMYE/xjblB+T7bJ8nOxdBonl07JjK
- i4LWZr8dbuD44I3nkitg/rpMislB3CGkymXU4mlpDIqIm+8/2CgEmV0kh75+vCfvC2L4
- Z8Adu0/Y0OQ8FReXSRrA1zB1u+Z7W4E2Dt6b4GdDgXE31SyMNMgBPdc0LZpdUzdIuZHh
- ka4eUEOZ3WXQdsjyQL6SgjVs8mBV0FmA9pPrU0yOOD7DKhfxFyHFYXk1s/ronu4hv6Mr 7g== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2spw4tbtqn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 May 2019 15:04:39 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4SF3Kh9017458;
-        Tue, 28 May 2019 15:04:39 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 2ss1fmwp16-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 May 2019 15:04:38 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4SF4OV0025272;
-        Tue, 28 May 2019 15:04:24 GMT
-Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 28 May 2019 08:04:24 -0700
-Date:   Tue, 28 May 2019 11:04:24 -0400
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Alan Tull <atull@kernel.org>,
+        id S1726720AbfE1PlI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 May 2019 11:41:08 -0400
+Received: from foss.arm.com ([217.140.101.70]:59592 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726602AbfE1PlH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 May 2019 11:41:07 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AE9D7341;
+        Tue, 28 May 2019 08:41:06 -0700 (PDT)
+Received: from arrakis.emea.arm.com (arrakis.cambridge.arm.com [10.1.196.78])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 027FD3F59C;
+        Tue, 28 May 2019 08:41:00 -0700 (PDT)
+Date:   Tue, 28 May 2019 16:40:58 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Andrew Murray <andrew.murray@arm.com>
+Cc:     Andrey Konovalov <andreyknvl@google.com>,
+        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
+        linux-kselftest@vger.kernel.org,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, Dmitry Vyukov <dvyukov@google.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        linux-media@vger.kernel.org, Kevin Brodsky <kevin.brodsky@arm.com>,
+        Kees Cook <keescook@chromium.org>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
         Alex Williamson <alex.williamson@redhat.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Christoph Lameter <cl@linux.com>,
-        Christophe Leroy <christophe.leroy@c-s.fr>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Jason Gunthorpe <jgg@mellanox.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Moritz Fischer <mdf@kernel.org>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        Wu Hao <hao.wu@intel.com>, linux-mm@kvack.org,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-fpga@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] mm: add account_locked_vm utility function
-Message-ID: <20190528150424.tjbaiptpjhzg7y75@ca-dmjordan1.us.oracle.com>
-References: <de375582-2c35-8e8a-4737-c816052a8e58@ozlabs.ru>
- <20190524175045.26897-1-daniel.m.jordan@oracle.com>
- <20190525145118.bfda2d75a14db05a001e49ad@linux-foundation.org>
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Kostya Serebryany <kcc@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        linux-kernel@vger.kernel.org,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: Re: [PATCH v15 05/17] arms64: untag user pointers passed to memory
+ syscalls
+Message-ID: <20190528154057.GD32006@arrakis.emea.arm.com>
+References: <cover.1557160186.git.andreyknvl@google.com>
+ <00eb4c63fefc054e2c8d626e8fedfca11d7c2600.1557160186.git.andreyknvl@google.com>
+ <20190527143719.GA59948@MBP.local>
+ <20190528145411.GA709@e119886-lin.cambridge.arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190525145118.bfda2d75a14db05a001e49ad@linux-foundation.org>
-User-Agent: NeoMutt/20180323-268-5a959c
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9270 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=18 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905280098
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9270 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=18 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905280098
+In-Reply-To: <20190528145411.GA709@e119886-lin.cambridge.arm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, May 25, 2019 at 02:51:18PM -0700, Andrew Morton wrote:
-> On Fri, 24 May 2019 13:50:45 -0400 Daniel Jordan <daniel.m.jordan@oracle.com> wrote:
-> 
-> > locked_vm accounting is done roughly the same way in five places, so
-> > unify them in a helper.  Standardize the debug prints, which vary
-> > slightly, but include the helper's caller to disambiguate between
-> > callsites.
+On Tue, May 28, 2019 at 03:54:11PM +0100, Andrew Murray wrote:
+> On Mon, May 27, 2019 at 03:37:20PM +0100, Catalin Marinas wrote:
+> > On Mon, May 06, 2019 at 06:30:51PM +0200, Andrey Konovalov wrote:
+> > > This patch is a part of a series that extends arm64 kernel ABI to allow to
+> > > pass tagged user pointers (with the top byte set to something else other
+> > > than 0x00) as syscall arguments.
+> > > 
+> > > This patch allows tagged pointers to be passed to the following memory
+> > > syscalls: brk, get_mempolicy, madvise, mbind, mincore, mlock, mlock2,
+> > > mmap, mmap_pgoff, mprotect, mremap, msync, munlock, munmap,
+> > > remap_file_pages, shmat and shmdt.
+> > > 
+> > > This is done by untagging pointers passed to these syscalls in the
+> > > prologues of their handlers.
+> > > 
+> > > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 > > 
-> > Error codes stay the same, so user-visible behavior does too.  The one
-> > exception is that the -EPERM case in tce_account_locked_vm is removed
-> > because Alexey has never seen it triggered.
-> > 
-> > ...
-> >
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -1564,6 +1564,25 @@ long get_user_pages_unlocked(unsigned long start, unsigned long nr_pages,
-> >  int get_user_pages_fast(unsigned long start, int nr_pages,
-> >  			unsigned int gup_flags, struct page **pages);
-> >  
-> > +int __account_locked_vm(struct mm_struct *mm, unsigned long pages, bool inc,
-> > +			struct task_struct *task, bool bypass_rlim);
-> > +
-> > +static inline int account_locked_vm(struct mm_struct *mm, unsigned long pages,
-> > +				    bool inc)
-> > +{
-> > +	int ret;
-> > +
-> > +	if (pages == 0 || !mm)
-> > +		return 0;
-> > +
-> > +	down_write(&mm->mmap_sem);
-> > +	ret = __account_locked_vm(mm, pages, inc, current,
-> > +				  capable(CAP_IPC_LOCK));
-> > +	up_write(&mm->mmap_sem);
-> > +
-> > +	return ret;
-> > +}
+> > Actually, I don't think any of these wrappers get called (have you
+> > tested this patch?). Following commit 4378a7d4be30 ("arm64: implement
+> > syscall wrappers"), I think we have other macro names for overriding the
+> > sys_* ones.
 > 
-> That's quite a mouthful for an inlined function.  How about uninlining
-> the whole thing and fiddling drivers/vfio/vfio_iommu_type1.c to suit. 
-> I wonder why it does down_write_killable and whether it really needs
-> to...
+> What is the value in adding these wrappers?
 
-Sure, I can uninline it.  vfio changelogs don't show a particular reason for
-_killable[1].  Maybe Alex has something to add.  Otherwise I'll respin without
-it since the simplification seems worth removing _killable.
+Not much value, initially proposed just to keep the core changes small.
+I'm fine with moving them back in the generic code (but see below).
 
-[1] 0cfef2b7410b ("vfio/type1: Remove locked page accounting workqueue")
+I think another aspect is how we define the ABI. Is allowing tags to
+mlock() for example something specific to arm64 or would sparc ADI need
+the same? In the absence of other architectures defining such ABI, my
+preference would be to keep the wrappers in the arch code.
+
+Assuming sparc won't implement untagged_addr(), we can place the macros
+back in the generic code but, as per the review here, we need to be more
+restrictive on where we allow tagged addresses. For example, if mmap()
+gets a tagged address with MAP_FIXED, is it expected to return the tag?
+
+My thoughts on allowing tags (quick look):
+
+brk - no
+get_mempolicy - yes
+madvise - yes
+mbind - yes
+mincore - yes
+mlock, mlock2, munlock - yes
+mmap - no (we may change this with MTE but not for TBI)
+mmap_pgoff - not used on arm64
+mprotect - yes
+mremap - yes for old_address, no for new_address (on par with mmap)
+msync - yes
+munmap - probably no (mmap does not return tagged ptrs)
+remap_file_pages - no (also deprecated syscall)
+shmat, shmdt - shall we allow tagged addresses on shared memory?
+
+The above is only about the TBI ABI while ignoring hardware MTE. For the
+latter, we may want to change the mmap() to allow pre-colouring on page
+fault which means that munmap()/mprotect() should also support tagged
+pointers. Possibly mremap() as well but we need to decide whether it
+should allow re-colouring the page (probably no, in which case
+old_address and new_address should have the same tag). For some of these
+we'll end up with arm64 specific wrappers again, unless sparc ADI adopts
+exactly the same ABI restrictions.
+
+-- 
+Catalin
