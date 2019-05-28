@@ -2,146 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C1B4D2C95D
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 16:58:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC7F02C983
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 17:05:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726540AbfE1O6V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 May 2019 10:58:21 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54426 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726497AbfE1O6V (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 May 2019 10:58:21 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4SEvXiE146422
-        for <kvm@vger.kernel.org>; Tue, 28 May 2019 10:58:19 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2ss4y8pkb2-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 28 May 2019 10:58:19 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
-        Tue, 28 May 2019 15:58:17 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 28 May 2019 15:58:13 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4SEwCD545744128
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 May 2019 14:58:12 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E050052052;
-        Tue, 28 May 2019 14:58:11 +0000 (GMT)
-Received: from [9.152.99.121] (unknown [9.152.99.121])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 6B19E52071;
-        Tue, 28 May 2019 14:58:11 +0000 (GMT)
-Reply-To: mimu@linux.ibm.com
-Subject: Re: [PATCH v2 8/8] virtio/s390: make airq summary indicators DMA
-To:     Halil Pasic <pasic@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     KVM Mailing List <kvm@vger.kernel.org>,
-        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>
-References: <20190523162209.9543-1-mimu@linux.ibm.com>
- <20190523162209.9543-9-mimu@linux.ibm.com>
- <20190527140018.7c2d34ff.cohuck@redhat.com>
- <20190528163342.335eea0b.pasic@linux.ibm.com>
-From:   Michael Mueller <mimu@linux.ibm.com>
-Organization: IBM
-Date:   Tue, 28 May 2019 16:58:11 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.7.0
+        id S1726698AbfE1PFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 May 2019 11:05:33 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:58076 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726560AbfE1PFc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 May 2019 11:05:32 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4SF4QUp083027;
+        Tue, 28 May 2019 15:04:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=G9vBM5THlG8pywNzVbsKIK8sbELnMUDNM7aCaLdslP0=;
+ b=bgq/F8b/2xwUVXMlsJqTT/j8YvUXLiDeS1H4MJ+nX4NOQ5xuZxuO5UeAXzVEoTG1w3bf
+ iu6Ce7E+Lhxw9casXB7xzxnF/LglbRQEC8Hux6StMYE/xjblB+T7bJ8nOxdBonl07JjK
+ i4LWZr8dbuD44I3nkitg/rpMislB3CGkymXU4mlpDIqIm+8/2CgEmV0kh75+vCfvC2L4
+ Z8Adu0/Y0OQ8FReXSRrA1zB1u+Z7W4E2Dt6b4GdDgXE31SyMNMgBPdc0LZpdUzdIuZHh
+ ka4eUEOZ3WXQdsjyQL6SgjVs8mBV0FmA9pPrU0yOOD7DKhfxFyHFYXk1s/ronu4hv6Mr 7g== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 2spw4tbtqn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 May 2019 15:04:39 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4SF3Kh9017458;
+        Tue, 28 May 2019 15:04:39 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 2ss1fmwp16-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 May 2019 15:04:38 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4SF4OV0025272;
+        Tue, 28 May 2019 15:04:24 GMT
+Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 28 May 2019 08:04:24 -0700
+Date:   Tue, 28 May 2019 11:04:24 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Alan Tull <atull@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christoph Lameter <cl@linux.com>,
+        Christophe Leroy <christophe.leroy@c-s.fr>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Moritz Fischer <mdf@kernel.org>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Steve Sistare <steven.sistare@oracle.com>,
+        Wu Hao <hao.wu@intel.com>, linux-mm@kvack.org,
+        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-fpga@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] mm: add account_locked_vm utility function
+Message-ID: <20190528150424.tjbaiptpjhzg7y75@ca-dmjordan1.us.oracle.com>
+References: <de375582-2c35-8e8a-4737-c816052a8e58@ozlabs.ru>
+ <20190524175045.26897-1-daniel.m.jordan@oracle.com>
+ <20190525145118.bfda2d75a14db05a001e49ad@linux-foundation.org>
 MIME-Version: 1.0
-In-Reply-To: <20190528163342.335eea0b.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19052814-0020-0000-0000-000003414827
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052814-0021-0000-0000-0000219444FF
-Message-Id: <f06a939d-0d80-a3b2-e69c-3bac9bb2c688@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-28_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905280097
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190525145118.bfda2d75a14db05a001e49ad@linux-foundation.org>
+User-Agent: NeoMutt/20180323-268-5a959c
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9270 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=18 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905280098
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9270 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=18 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905280098
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, May 25, 2019 at 02:51:18PM -0700, Andrew Morton wrote:
+> On Fri, 24 May 2019 13:50:45 -0400 Daniel Jordan <daniel.m.jordan@oracle.com> wrote:
+> 
+> > locked_vm accounting is done roughly the same way in five places, so
+> > unify them in a helper.  Standardize the debug prints, which vary
+> > slightly, but include the helper's caller to disambiguate between
+> > callsites.
+> > 
+> > Error codes stay the same, so user-visible behavior does too.  The one
+> > exception is that the -EPERM case in tce_account_locked_vm is removed
+> > because Alexey has never seen it triggered.
+> > 
+> > ...
+> >
+> > --- a/include/linux/mm.h
+> > +++ b/include/linux/mm.h
+> > @@ -1564,6 +1564,25 @@ long get_user_pages_unlocked(unsigned long start, unsigned long nr_pages,
+> >  int get_user_pages_fast(unsigned long start, int nr_pages,
+> >  			unsigned int gup_flags, struct page **pages);
+> >  
+> > +int __account_locked_vm(struct mm_struct *mm, unsigned long pages, bool inc,
+> > +			struct task_struct *task, bool bypass_rlim);
+> > +
+> > +static inline int account_locked_vm(struct mm_struct *mm, unsigned long pages,
+> > +				    bool inc)
+> > +{
+> > +	int ret;
+> > +
+> > +	if (pages == 0 || !mm)
+> > +		return 0;
+> > +
+> > +	down_write(&mm->mmap_sem);
+> > +	ret = __account_locked_vm(mm, pages, inc, current,
+> > +				  capable(CAP_IPC_LOCK));
+> > +	up_write(&mm->mmap_sem);
+> > +
+> > +	return ret;
+> > +}
+> 
+> That's quite a mouthful for an inlined function.  How about uninlining
+> the whole thing and fiddling drivers/vfio/vfio_iommu_type1.c to suit. 
+> I wonder why it does down_write_killable and whether it really needs
+> to...
 
+Sure, I can uninline it.  vfio changelogs don't show a particular reason for
+_killable[1].  Maybe Alex has something to add.  Otherwise I'll respin without
+it since the simplification seems worth removing _killable.
 
-On 28.05.19 16:33, Halil Pasic wrote:
-> On Mon, 27 May 2019 14:00:18 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
->> On Thu, 23 May 2019 18:22:09 +0200
->> Michael Mueller <mimu@linux.ibm.com> wrote:
->>
->>> From: Halil Pasic <pasic@linux.ibm.com>
->>>
->>> Hypervisor needs to interact with the summary indicators, so these
->>> need to be DMA memory as well (at least for protected virtualization
->>> guests).
->>>
->>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
->>> ---
->>>   drivers/s390/virtio/virtio_ccw.c | 22 +++++++++++++++-------
->>>   1 file changed, 15 insertions(+), 7 deletions(-)
->>
->> (...)
->>
->>> @@ -1501,6 +1508,7 @@ static int __init virtio_ccw_init(void)
->>>   {
->>>   	/* parse no_auto string before we do anything further */
->>>   	no_auto_parse();
->>> +	summary_indicators = cio_dma_zalloc(MAX_AIRQ_AREAS);
->>
->> What happens if this fails?
-> 
-> Bad things could happen!
-> 
-> How about adding
-> 
-> if (!summary_indicators)
-> 	virtio_ccw_use_airq = 0; /* fall back to classic */
-> 
-> ?
-> 
-> Since it ain't very likely to happen, we could also just fail
-> virtio_ccw_init() with -ENOMEM.
-
-That is what I'm currently doing in v3.
-
-> 
-> Regards,
-> Halil
-> 
-> 
->>
->>>   	return ccw_driver_register(&virtio_ccw_driver);
->>>   }
->>>   device_initcall(virtio_ccw_init);
->>
-> 
-
-Michael
-
+[1] 0cfef2b7410b ("vfio/type1: Remove locked page accounting workqueue")
