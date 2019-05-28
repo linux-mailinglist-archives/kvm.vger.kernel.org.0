@@ -2,109 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DEB7B2BC97
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 02:53:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 906A62BC9B
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 02:54:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727730AbfE1Axb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 27 May 2019 20:53:31 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:43004 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727684AbfE1Ax1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 27 May 2019 20:53:27 -0400
-Received: by mail-pl1-f194.google.com with SMTP id go2so7570092plb.9;
-        Mon, 27 May 2019 17:53:26 -0700 (PDT)
+        id S1727758AbfE1AyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 27 May 2019 20:54:21 -0400
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:43408 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727684AbfE1AyV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 27 May 2019 20:54:21 -0400
+Received: by mail-oi1-f193.google.com with SMTP id t187so12969765oie.10;
+        Mon, 27 May 2019 17:54:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=i/suq6wlpwcJ3ogbpvRkyctj8x187X3vDma99VWceU4=;
-        b=KUbzMapXKqbb8qpOqbungemfdaYcq1y//4HlaOQCqMfle1WwAQbq7J4XHSl+E4ruq0
-         JZrWbNgZwIu7QAyj19p9oQeB+QcWLgJKPPIurANw9pq+Mufif5NxdfzA2oge93d8MODI
-         NPY62dgndrt6QhFhHCaK0YvTyfcuJ3c/Qt0OMjGlOmSDB5c+cQmZbytFgFiJvPypONrt
-         Kxa+zFK6BBVzsAgykRM+BZx5Dzq0e7lyVVr0/ZH3aRoRyDtY+n3kUSe5iZLzqGa04gk5
-         EWaysJWMxsvXIP2PT47l7BkWV7IlexG1UY4JZfa+lhWc8HgktSNdS76ZWyYU3sk2aCv3
-         qT9Q==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CyGL+Gzz1OCZVAhgEsSHyzkITvlFztFNw+6oOcVM9cg=;
+        b=djnjs2RUSwHGY/v4OQF/ZJrahrla8igfeXdWmA9d3iOjcMQrYgkpiix5xdSCBh98iu
+         laFG5cbI4EzTCL2/wU9GBteCHfHopSbi0Dq7TGIurT5VkWo4YveKmWtSn7wh6BupGQVD
+         OFujvDeEguyxv1THUl+TX4iWycZEKiVTeL2k3DjFazf233xgKg36xquHlPYMfA/uCWR5
+         Dn62HiKT2feDDkqm/qKgjOoe6Ia80dpi3GBbTdqh+xMuP0uKHjXjFkVwyewKPJCopanT
+         QwN3LyB7OnqaKdy7ueMN0UDHSEe79iT5PyXlMcBIAnMZmQcFrJ0Jg7SwZu3B74sd7zis
+         IHYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=i/suq6wlpwcJ3ogbpvRkyctj8x187X3vDma99VWceU4=;
-        b=pE8fm4WPppxxz3FUtkE/qoqdIy5ZHGjTfyeD421HomRdRcwT6+4uGsJuXQn1cQcKpi
-         ukaT3V5OQt4twmY32ZOtVwLZgLFsA9atcfowPu9+xm2kOcdFAqLL+3YrLv1zcgftVggg
-         G+jnhV3K+Dzq8cZrJYd4gKZdOqs1GNxqDZR0cA3HayHvxFskJRMgA1KVlTYjHL8GO3F3
-         BdkL6dlHiH34rKzP8fSC656/F8cJh2Bz/f+acu9F4jsT9GNWJltygLLjk/cddLpTC7qq
-         IpaiE3jlfkRbnfA4ypkEvCJKK+ql0EcZwNoa8WHJ9b0TnX9ScBJT6Cf1TsG5vl9/bKVw
-         1WVA==
-X-Gm-Message-State: APjAAAVQRXTS9wFVAHi1xsFiBqemRhFiv0d8bpVexGQ8a8pmj2lUvI4w
-        6ZBJ0I1wtcxYxcpXOz93Jr01W7C/
-X-Google-Smtp-Source: APXvYqwm/zSuKPsQd9NRX27U70KMaijoOMBi/urAJVF2EsGFJ9F+AKsskjuPg25BpF+TMgYJqaPL3A==
-X-Received: by 2002:a17:902:42a5:: with SMTP id h34mr107943969pld.178.1559004806452;
-        Mon, 27 May 2019 17:53:26 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id f16sm622085pja.18.2019.05.27.17.53.24
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 27 May 2019 17:53:26 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH v2 3/3] KVM: X86: Expose PV_SCHED_YIELD CPUID feature bit to guest
-Date:   Tue, 28 May 2019 08:53:15 +0800
-Message-Id: <1559004795-19927-4-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1559004795-19927-1-git-send-email-wanpengli@tencent.com>
-References: <1559004795-19927-1-git-send-email-wanpengli@tencent.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CyGL+Gzz1OCZVAhgEsSHyzkITvlFztFNw+6oOcVM9cg=;
+        b=FkogbJpqfkyfXd+sVh00liltHQfYFHdz5VWlsE88elNZMfm0DvgbjJ2NNoSZQ8CHgf
+         f7fONGDBMIduzwxzXG9HkU7TAcuOgLPhUKYMlEBXcP5E4xQzkqCtvkJobFaEIKQK1zg3
+         9cq6JADDmyhuaQRPm03simhqiQmH/JzZ4KTmhtc4ozScW9pJQ0jpxhaXH0ApR1V413r/
+         ywbOzFr58B+dFKMI/wZ6uWq1Mg7cBiLxBYfZe1CVCx66BDr+of8EmyfekWyKUbeoVG2K
+         YuiHTRsQulkaUnHw6q0CwlO+e+LOX5s6aKNEti5ep0PDeSgyqL87G39YqlDFn8+upjhS
+         Fy9g==
+X-Gm-Message-State: APjAAAWtuQvbBV3YvAe5vdNc8uLXF+5VUGTQ8IMM2HRW00BNisDEsQR5
+        crJuiV8ptrjWZ9YBWH+sGPoo3+HIqb6WhNJVj/s=
+X-Google-Smtp-Source: APXvYqy1v0cxAIDP995S1iQku812LGjMdQs7YnIhaPAVVN6yna38JryHmVnsG9yn2jcYCXQtebZ2DBIKcaaEYdTZ0xo=
+X-Received: by 2002:aca:b7c1:: with SMTP id h184mr1071347oif.5.1559004860460;
+ Mon, 27 May 2019 17:54:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <1558953255-9432-1-git-send-email-wanpengli@tencent.com>
+ <1558953255-9432-3-git-send-email-wanpengli@tencent.com> <0b8525d8-e26b-e4df-508d-b6a4d9c06a76@redhat.com>
+In-Reply-To: <0b8525d8-e26b-e4df-508d-b6a4d9c06a76@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 28 May 2019 08:54:14 +0800
+Message-ID: <CANRm+CxEa2Z1Ob=pEM03AvryHUfjg-MEc75w5_a-wHzrb9NtvQ@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: X86: Implement PV sched yield hypercall
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Mon, 27 May 2019 at 19:54, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 27/05/19 12:34, Wanpeng Li wrote:
+> > +     rcu_read_lock();
+> > +     map = rcu_dereference(kvm->arch.apic_map);
+> > +     target = map->phys_map[dest_id]->vcpu;
+> > +     rcu_read_unlock();
+> > +
+> > +     kvm_vcpu_yield_to(target);
+>
+> This needs to check that map->phys_map[dest_id] is not NULL.
 
-Expose PV_SCHED_YIELD feature bit to guest, the guest can check this
-feature bit before using paravirtualized sched yield.
+Fixed in v2, thanks for the quick review. :)
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- Documentation/virtual/kvm/cpuid.txt | 4 ++++
- arch/x86/kvm/cpuid.c                | 3 ++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/virtual/kvm/cpuid.txt b/Documentation/virtual/kvm/cpuid.txt
-index 97ca194..1c39683 100644
---- a/Documentation/virtual/kvm/cpuid.txt
-+++ b/Documentation/virtual/kvm/cpuid.txt
-@@ -66,6 +66,10 @@ KVM_FEATURE_PV_SEND_IPI            ||    11 || guest checks this feature bit
-                                    ||       || before using paravirtualized
-                                    ||       || send IPIs.
- ------------------------------------------------------------------------------
-+KVM_FEATURE_PV_SHED_YIELD          ||    12 || guest checks this feature bit
-+                                   ||       || before using paravirtualized
-+                                   ||       || sched yield.
-+------------------------------------------------------------------------------
- KVM_FEATURE_CLOCKSOURCE_STABLE_BIT ||    24 || host will warn if no guest-side
-                                    ||       || per-cpu warps are expected in
-                                    ||       || kvmclock.
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index e18a9f9..c018fc8 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -643,7 +643,8 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
- 			     (1 << KVM_FEATURE_PV_UNHALT) |
- 			     (1 << KVM_FEATURE_PV_TLB_FLUSH) |
- 			     (1 << KVM_FEATURE_ASYNC_PF_VMEXIT) |
--			     (1 << KVM_FEATURE_PV_SEND_IPI);
-+			     (1 << KVM_FEATURE_PV_SEND_IPI) |
-+			     (1 << KVM_FEATURE_PV_SCHED_YIELD);
- 
- 		if (sched_info_on())
- 			entry->eax |= (1 << KVM_FEATURE_STEAL_TIME);
--- 
-2.7.4
-
+Regards,
+Wanpeng Li
