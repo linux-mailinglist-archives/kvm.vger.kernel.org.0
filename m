@@ -2,65 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DD512BFCC
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 08:58:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 760542C004
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 09:22:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727271AbfE1G6m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 May 2019 02:58:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53820 "EHLO mx1.redhat.com"
+        id S1727207AbfE1HVw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 May 2019 03:21:52 -0400
+Received: from mga02.intel.com ([134.134.136.20]:57195 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727161AbfE1G6m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 May 2019 02:58:42 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E6A1E3087929
-        for <kvm@vger.kernel.org>; Tue, 28 May 2019 06:58:41 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D4F61001943;
-        Tue, 28 May 2019 06:58:40 +0000 (UTC)
-Date:   Tue, 28 May 2019 08:58:38 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com
-Subject: Re: [PATCH] arm64: timer: ensure pending signal was cleared
-Message-ID: <20190528065838.putv7nx7yftvudlh@kamzik.brq.redhat.com>
-References: <20190527162636.28878-1-drjones@redhat.com>
+        id S1726879AbfE1HVw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 May 2019 03:21:52 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 May 2019 00:21:51 -0700
+X-ExtLoop1: 1
+Received: from shzintpr03.sh.intel.com (HELO [0.0.0.0]) ([10.239.4.100])
+  by orsmga001.jf.intel.com with ESMTP; 28 May 2019 00:21:48 -0700
+Subject: Re: [PATCH v2 1/3] KVM: x86: add support for user wait instructions
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        kvm <kvm@vger.kernel.org>, linux-doc@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>, jingqi.liu@intel.com
+References: <20190524075637.29496-1-tao3.xu@intel.com>
+ <20190524075637.29496-2-tao3.xu@intel.com>
+ <20190527103003.GX2623@hirez.programming.kicks-ass.net>
+ <43e2a62a-e992-2138-f038-1e4b2fb79ad1@intel.com>
+ <CANRm+CwnJoj0EwWoFC44SXVUTLdE+iFGovaMr4Yf=OzbaW36sA@mail.gmail.com>
+From:   Tao Xu <tao3.xu@intel.com>
+Message-ID: <072dd34e-0361-5a06-4d0b-d04e8150a3bb@intel.com>
+Date:   Tue, 28 May 2019 15:19:30 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190527162636.28878-1-drjones@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Tue, 28 May 2019 06:58:41 +0000 (UTC)
+In-Reply-To: <CANRm+CwnJoj0EwWoFC44SXVUTLdE+iFGovaMr4Yf=OzbaW36sA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I see I forgot 'kvm-unit-tests' in the [PATCH] tag. Sorry about that.
 
-On Mon, May 27, 2019 at 06:26:36PM +0200, Andrew Jones wrote:
-> Ensure set_timer_irq_enabled() clears the pending interrupt from
-> the gic before proceeding with the next test.
+On 28/05/2019 14:11, Wanpeng Li wrote:
+> On Tue, 28 May 2019 at 13:16, Tao Xu <tao3.xu@intel.com> wrote:
+>>
+>>
+>> On 27/05/2019 18:30, Peter Zijlstra wrote:
+>>> On Fri, May 24, 2019 at 03:56:35PM +0800, Tao Xu wrote:
+>>>> This patch adds support for UMONITOR, UMWAIT and TPAUSE instructions
+>>>> in kvm, and by default dont't expose it to kvm and provide a capability
+>>>> to enable it.
+>>>
+>>> I'm thinking this should be conditional on the guest being a 1:1 guest,
+>>> and I also seem to remember we have bits for that already -- they were
+>>> used to disable paravirt spinlocks for example.
+>>>
+>>
+>> Hi Peter,
+>>
+>> I am wondering if "1:1 guest" means different guests in the same host
+>> should have different settings on user wait instructions?
+>>
+>> User wait instructions(UMONITOR, UMWAIT and TPAUSE) can use in guest
+>> only when the VMCS Secondary Processor-Based VM-Execution Control bit 26
+>> is 1, otherwise any execution of TPAUSE, UMONITOR, or UMWAIT causes a #UD.
+>>
+>> So with a capability to enable it, we use qemu kvm_vm_ioctl_enable_cap()
+>> to enable it. The qemu link is blew:
+>> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg05810.html
+>>
+>> By using different QEMU parameters, different guests in the same host
+>> would have different features with or without user wait instructions.
+>>
+>> About "disable paravirt spinlocks" case, I am wondering if it uses
 > 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  arm/timer.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arm/timer.c b/arm/timer.c
-> index 275d0494083d..eebc451722d9 100644
-> --- a/arm/timer.c
-> +++ b/arm/timer.c
-> @@ -231,6 +231,7 @@ static void test_timer(struct timer_info *info)
->  	/* Disable the timer again and prepare to take interrupts */
->  	info->write_ctl(0);
->  	set_timer_irq_enabled(info, true);
-> +	report("interrupt signal no longer pending", !gic_timer_pending(info));
->  
->  	report("latency within 10 ms", test_cval_10msec(info));
->  	report("interrupt received", info->irq_received);
-> -- 
-> 2.18.1
-> 
+> Please refer to a4429e53c9 (KVM: Introduce paravirtualization hints
+> and KVM_HINTS_DEDICATED) and b2798ba0b87 (KVM: X86: Choose qspinlock
+> when dedicated physical CPUs are available)
+Hi Wanpeng,
+
+Thank you! This information really helped me. After I read the code in 
+KVM/QEMU, I was wondering that with qemu command-line "-cpu 
+host,+kvm-hint-dedicated", then in KVM, 
+"kvm_hint_has_feature(KVM_HINTS_DEDICATED)" will be true, am I right?
+
+Tao
