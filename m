@@ -2,54 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CAC22C81C
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 15:49:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 700F32C836
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 15:58:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727428AbfE1NtH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 May 2019 09:49:07 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33286 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726867AbfE1NtH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 28 May 2019 09:49:07 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4SDm4x0102311
-        for <kvm@vger.kernel.org>; Tue, 28 May 2019 09:49:06 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ss4npcyyn-1
+        id S1727535AbfE1N6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 May 2019 09:58:39 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33852 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726870AbfE1N6j (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 28 May 2019 09:58:39 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4SDvOZV141204
+        for <kvm@vger.kernel.org>; Tue, 28 May 2019 09:58:37 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2ss5m2j7j0-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 28 May 2019 09:49:05 -0400
+        for <kvm@vger.kernel.org>; Tue, 28 May 2019 09:58:37 -0400
 Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 28 May 2019 14:49:03 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Tue, 28 May 2019 14:58:35 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 28 May 2019 14:48:59 +0100
+        Tue, 28 May 2019 14:58:31 +0100
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4SDmwGK51577086
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4SDwU5J28967128
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 May 2019 13:48:58 GMT
+        Tue, 28 May 2019 13:58:30 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6E3B352059;
-        Tue, 28 May 2019 13:48:58 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 31DFE5204E;
+        Tue, 28 May 2019 13:58:30 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.152.224.177])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 1154952052;
-        Tue, 28 May 2019 13:48:58 +0000 (GMT)
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
-        Shuah Khan <shuah@kernel.org>,
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E4B4452050;
+        Tue, 28 May 2019 13:58:29 +0000 (GMT)
+Subject: Re: [PATCH] kvm: fix compile on s390 part 2
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
         David Hildenbrand <david@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20190523164309.13345-1-thuth@redhat.com>
- <20190523164309.13345-9-thuth@redhat.com>
- <1deb73ac-9589-89cb-9a9b-f9957584733e@de.ibm.com>
- <20190528145344.42fe6bc5.cohuck@redhat.com>
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Michal Kubecek <mkubecek@suse.cz>,
+        KarimAllah Ahmed <karahmed@amazon.de>
+References: <20190527091621.151415-1-borntraeger@de.ibm.com>
 From:   Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
@@ -95,74 +91,61 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
  oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
  syiRa+UVlsKmx1hsEg==
-Date:   Tue, 28 May 2019 15:48:57 +0200
+Date:   Tue, 28 May 2019 15:58:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190528145344.42fe6bc5.cohuck@redhat.com>
+In-Reply-To: <20190527091621.151415-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19052813-0008-0000-0000-000002EB3D8D
+x-cbid: 19052813-4275-0000-0000-0000033961E6
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052813-0009-0000-0000-000022580AC5
-Message-Id: <dc8ad44b-3019-bdb2-7991-2ab9a0f1b149@de.ibm.com>
-Subject: Re:  Re: [PATCH 8/9] KVM: s390: Do not report unusabled IDs via
- KVM_CAP_MAX_VCPU_ID
+x-cbparentid: 19052813-4276-0000-0000-000038490A0A
+Message-Id: <75f3f45a-701d-3855-aa16-436c4638e109@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-28_05:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=991 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905280090
+ mlxlogscore=716 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905280091
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+On 27.05.19 11:16, Christian Borntraeger wrote:
+> We also need to fence the memunmap part.
+> 
+> Fixes: e45adf665a53 ("KVM: Introduce a new guest mapping API")
+> Fixes: d30b214d1d0a (kvm: fix compilation on s390)
+> Cc: Michal Kubecek <mkubecek@suse.cz>
+> Cc: KarimAllah Ahmed <karahmed@amazon.de>
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-On 28.05.19 14:53, Cornelia Huck wrote:
-> On Tue, 28 May 2019 13:00:30 +0200
-> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> 
->> Paolo, Radim,
->>
->> would you consider this patch (or the full series) as 5.2 material or 5.3 material?
-> 
-> FWIW, I'd consider this patch 5.2 material, as we're currently relaying
-> wrong values to userspace.
+queued for kvms390/master.
 
-Agreed. I will add cc stable and queue for master. What is our opinion about kselftest?
-Are we merging testtools changes also only during the merge window?
+> ---
+>  virt/kvm/kvm_main.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
->>
->>
->> On 23.05.19 18:43, Thomas Huth wrote:
->>> KVM_CAP_MAX_VCPU_ID is currently always reporting KVM_MAX_VCPU_ID on all
->>> architectures. However, on s390x, the amount of usable CPUs is determined
->>> during runtime - it is depending on the features of the machine the code
->>> is running on. Since we are using the vcpu_id as an index into the SCA
->>> structures that are defined by the hardware (see e.g. the sca_add_vcpu()
->>> function), it is not only the amount of CPUs that is limited by the hard-
->>> ware, but also the range of IDs that we can use.
->>> Thus KVM_CAP_MAX_VCPU_ID must be determined during runtime on s390x, too.
->>> So the handling of KVM_CAP_MAX_VCPU_ID has to be moved from the common
->>> code into the architecture specific code, and on s390x we have to return
->>> the same value here as for KVM_CAP_MAX_VCPUS.
->>> This problem has been discovered with the kvm_create_max_vcpus selftest.
->>> With this change applied, the selftest now passes on s390x, too.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  arch/mips/kvm/mips.c       | 3 +++
->>>  arch/powerpc/kvm/powerpc.c | 3 +++
->>>  arch/s390/kvm/kvm-s390.c   | 1 +
->>>  arch/x86/kvm/x86.c         | 3 +++
->>>  virt/kvm/arm/arm.c         | 3 +++
->>>  virt/kvm/kvm_main.c        | 2 --
->>>  6 files changed, 13 insertions(+), 2 deletions(-)
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 134ec0283a8a..301089a462c4 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1795,8 +1795,10 @@ void kvm_vcpu_unmap(struct kvm_vcpu *vcpu, struct kvm_host_map *map,
+>  
+>  	if (map->page)
+>  		kunmap(map->page);
+> +#ifdef CONFIG_HAS_IOMEM
+>  	else
+>  		memunmap(map->hva);
+> +#endif
+>  
+>  	if (dirty) {
+>  		kvm_vcpu_mark_page_dirty(vcpu, map->gfn);
 > 
 
