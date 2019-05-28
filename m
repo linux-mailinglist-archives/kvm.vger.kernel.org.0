@@ -2,174 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 050452C008
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 09:24:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80B9D2C04D
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 09:40:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727524AbfE1HYb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 May 2019 03:24:31 -0400
-Received: from mga17.intel.com ([192.55.52.151]:57853 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726305AbfE1HYb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 May 2019 03:24:31 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 May 2019 00:24:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,521,1549958400"; 
-   d="scan'208";a="179114371"
-Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
-  by fmsmga002.fm.intel.com with ESMTP; 28 May 2019 00:24:29 -0700
-Received: from kbuild by lkp-server01 with local (Exim 4.89)
-        (envelope-from <lkp@intel.com>)
-        id 1hVWTE-0003sH-LM; Tue, 28 May 2019 15:24:28 +0800
-Date:   Tue, 28 May 2019 15:23:29 +0800
-From:   kbuild test robot <lkp@intel.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     kbuild-all@01.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH RESEND v2] KVM: X86: Implement PV sched yield hypercall
-Message-ID: <201905281519.27MAOvb9%lkp@intel.com>
-References: <1559009752-8536-1-git-send-email-wanpengli@tencent.com>
+        id S1727779AbfE1Hjz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 May 2019 03:39:55 -0400
+Received: from mail-eopbgr740080.outbound.protection.outlook.com ([40.107.74.80]:43750
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727261AbfE1Hjz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 May 2019 03:39:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=analog.onmicrosoft.com; s=selector1-analog-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gWdImhCfyTIUCYzNfD1iIQYARnPSsxhTsT74g8CuXY0=;
+ b=Hq4eM0+YUiVIoYHYAGGuEpOyjhWPdcPFHxn0lkng78s7kuN0jDXksfvZQE0kEOvNPTuar+4Cwfyt9c47tyog14C+ba401xryJ9s5hnJiPDekCnghCGKZj4HeQKs4EbPbnH2B4kKA0p9wn6It0lmbB4CJ95H2YYd7PUpoLM2vyVQ=
+Received: from BN6PR03CA0012.namprd03.prod.outlook.com (2603:10b6:404:23::22)
+ by BL2PR03MB545.namprd03.prod.outlook.com (2a01:111:e400:c23::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.1922.15; Tue, 28 May
+ 2019 07:39:47 +0000
+Received: from BL2NAM02FT030.eop-nam02.prod.protection.outlook.com
+ (2a01:111:f400:7e46::202) by BN6PR03CA0012.outlook.office365.com
+ (2603:10b6:404:23::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1922.16 via Frontend
+ Transport; Tue, 28 May 2019 07:39:47 +0000
+Authentication-Results: spf=pass (sender IP is 137.71.25.55)
+ smtp.mailfrom=analog.com; lists.freedesktop.org; dkim=none (message not
+ signed) header.d=none;lists.freedesktop.org; dmarc=bestguesspass action=none
+ header.from=analog.com;
+Received-SPF: Pass (protection.outlook.com: domain of analog.com designates
+ 137.71.25.55 as permitted sender) receiver=protection.outlook.com;
+ client-ip=137.71.25.55; helo=nwd2mta1.analog.com;
+Received: from nwd2mta1.analog.com (137.71.25.55) by
+ BL2NAM02FT030.mail.protection.outlook.com (10.152.77.172) with Microsoft SMTP
+ Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.1922.16
+ via Frontend Transport; Tue, 28 May 2019 07:39:46 +0000
+Received: from NWD2HUBCAS7.ad.analog.com (nwd2hubcas7.ad.analog.com [10.64.69.107])
+        by nwd2mta1.analog.com (8.13.8/8.13.8) with ESMTP id x4S7dkpQ023241
+        (version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=OK);
+        Tue, 28 May 2019 00:39:46 -0700
+Received: from saturn.analog.com (10.50.1.244) by NWD2HUBCAS7.ad.analog.com
+ (10.64.69.107) with Microsoft SMTP Server id 14.3.408.0; Tue, 28 May 2019
+ 03:39:45 -0400
+From:   Alexandru Ardelean <alexandru.ardelean@analog.com>
+To:     <linuxppc-dev@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>,
+        <linux-ide@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <linux-rpi-kernel@lists.infradead.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-rockchip@lists.infradead.org>, <linux-pm@vger.kernel.org>,
+        <linux-gpio@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+        <intel-gfx@lists.freedesktop.org>, <linux-omap@vger.kernel.org>,
+        <linux-mmc@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+        <linux-tegra@vger.kernel.org>, <devel@driverdev.osuosl.org>,
+        <linux-usb@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-fbdev@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
+        <cgroups@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-security-module@vger.kernel.org>,
+        <linux-integrity@vger.kernel.org>, <alsa-devel@alsa-project.org>
+CC:     <heikki.krogerus@linux.intel.com>, <gregkh@linuxfoundation.org>,
+        <andriy.shevchenko@linux.intel.com>,
+        Alexandru Ardelean <alexandru.ardelean@analog.com>
+Subject: [PATCH 1/3][V2] lib: fix match_string() helper on -1 array size
+Date:   Tue, 28 May 2019 10:39:30 +0300
+Message-ID: <20190528073932.25365-1-alexandru.ardelean@analog.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190508112842.11654-1-alexandru.ardelean@analog.com>
+References: <20190508112842.11654-1-alexandru.ardelean@analog.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1559009752-8536-1-git-send-email-wanpengli@tencent.com>
-X-Patchwork-Hint: ignore
-User-Agent: Mutt/1.5.23 (2014-03-12)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ADIRoutedOnPrem: True
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-Forefront-Antispam-Report: CIP:137.71.25.55;IPV:NLI;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(10009020)(1496009)(376002)(396003)(39860400002)(136003)(346002)(2980300002)(54534003)(189003)(199004)(70586007)(70206006)(2441003)(8936002)(47776003)(7416002)(107886003)(316002)(2201001)(8676002)(14444005)(2906002)(2870700001)(86362001)(356004)(51416003)(6666004)(7696005)(26005)(305945005)(7636002)(1076003)(478600001)(36756003)(4326008)(110136005)(2616005)(126002)(44832011)(54906003)(76176011)(48376002)(486006)(476003)(106002)(50466002)(446003)(11346002)(186003)(50226002)(7406005)(426003)(336012)(53416004)(5660300002)(77096007)(246002)(921003)(1121003)(83996005)(2101003);DIR:OUT;SFP:1101;SCL:1;SRVR:BL2PR03MB545;H:nwd2mta1.analog.com;FPR:;SPF:Pass;LANG:en;PTR:nwd2mail10.analog.com;MX:1;A:1;
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6c76f02a-34d6-47de-ba0c-08d6e33fa89e
+X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(4709054)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328);SRVR:BL2PR03MB545;
+X-MS-TrafficTypeDiagnostic: BL2PR03MB545:
+X-Microsoft-Antispam-PRVS: <BL2PR03MB545CA0A06BB0E64A1EFBE91F91E0@BL2PR03MB545.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 00514A2FE6
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Message-Info: WYQoPPTo42AknDYSpY9w/xftF7FT7SRtXtbzi4SohjgnHD5P3hVPp3WTmUFaLfcDpBMThORg4NphooGNDC9igOh5UCY+z/qJehstorHN6dXF0JXfvmEyhD606e1CCgn1vUccxto/xRVdXdjRcRHavbu1mYcyAlmvTmEDKuQrxdfC1Vrm8H9/tkgoumu/npzY4P0Eyoj1Hwx3z5/P2OctimPreVyglKaTNX/j7lM7XosmVhLrWYt/TLXycti79mDqjngT5xwxZMvszzx4GLzrMAGI+oe486mPjGQdr4mkGPORfalJMEV5ae4/UIaivCRaqH3nuCzPeZes99dzedzF7DJd9vUvbhN8XxbI4NVjhC5LKkww2k/x2hqF8pFkOcddaQzB5rfbyVzu+jJvUQ8J9ZT6v/eq/Une//VX7JZ43bw=
+X-OriginatorOrg: analog.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 May 2019 07:39:46.9658
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c76f02a-34d6-47de-ba0c-08d6e33fa89e
+X-MS-Exchange-CrossTenant-Id: eaa689b4-8f87-40e0-9c6f-7228de4d754a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=eaa689b4-8f87-40e0-9c6f-7228de4d754a;Ip=[137.71.25.55];Helo=[nwd2mta1.analog.com]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL2PR03MB545
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Wanpeng,
+The documentation the `_match_string()` helper mentions that `n`
+should be:
+ * @n: number of strings in the array or -1 for NULL terminated arrays
 
-Thank you for the patch! Perhaps something to improve:
+The behavior of the function is different, in the sense that it exits on
+the first NULL element in the array, regardless of whether `n` is -1 or a
+positive number.
 
-[auto build test WARNING on kvm/linux-next]
-[also build test WARNING on v5.2-rc2 next-20190524]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+This patch changes the behavior, to exit the loop when a NULL element is
+found and n == -1. Essentially, this aligns the behavior with the
+doc-string.
 
-url:    https://github.com/0day-ci/linux/commits/Wanpeng-Li/KVM-X86-Implement-PV-sched-yield-hypercall/20190528-132021
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git linux-next
-reproduce:
-        # apt-get install sparse
-        # sparse version: v0.6.1-rc1-7-g2b96cd8-dirty
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
+There are currently many users of `match_string()`, and so, in order to go
+through them, the next patches in the series will focus on doing some
+cosmetic changes, which are aimed at grouping the users of
+`match_string()`.
 
-If you fix the issue, kindly add following tag
-Reported-by: kbuild test robot <lkp@intel.com>
-
-
-sparse warnings: (new ones prefixed by >>)
-
-   arch/x86/kvm/x86.c:2379:38: sparse: sparse: incorrect type in argument 1 (different address spaces) @@    expected void const [noderef] <asn:1> * @@    got  const [noderef] <asn:1> * @@
-   arch/x86/kvm/x86.c:2379:38: sparse:    expected void const [noderef] <asn:1> *
-   arch/x86/kvm/x86.c:2379:38: sparse:    got unsigned char [usertype] *
-   arch/x86/kvm/x86.c:7181:15: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   arch/x86/kvm/x86.c:7181:15: sparse:    struct kvm_apic_map [noderef] <asn:4> *
-   arch/x86/kvm/x86.c:7181:15: sparse:    struct kvm_apic_map *
-   arch/x86/kvm/x86.c:7243:14: sparse: sparse: undefined identifier 'KVM_HC_SCHED_YIELD'
->> arch/x86/kvm/x86.c:7243:14: sparse: sparse: incompatible types for 'case' statement
-   arch/x86/kvm/x86.c:9408:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   arch/x86/kvm/x86.c:9408:16: sparse:    struct kvm_apic_map [noderef] <asn:4> *
-   arch/x86/kvm/x86.c:9408:16: sparse:    struct kvm_apic_map *
->> arch/x86/kvm/x86.c:7193:9: sparse: sparse: context imbalance in 'kvm_sched_yield' - wrong count at exit
-   arch/x86/kvm/x86.c:7243:14: sparse: sparse: Expected constant expression in case statement
-
-vim +/case +7243 arch/x86/kvm/x86.c
-
-  7174	
-  7175	void kvm_sched_yield(struct kvm *kvm, u64 dest_id)
-  7176	{
-  7177		struct kvm_vcpu *target;
-  7178		struct kvm_apic_map *map;
-  7179	
-  7180		rcu_read_lock();
-  7181		map = rcu_dereference(kvm->arch.apic_map);
-  7182	
-  7183		if (unlikely(!map))
-  7184			goto out;
-  7185	
-  7186		if (map->phys_map[dest_id]->vcpu) {
-  7187			target = map->phys_map[dest_id]->vcpu;
-  7188			rcu_read_unlock();
-  7189			kvm_vcpu_yield_to(target);
-  7190		}
-  7191	
-  7192	out:
-> 7193		if (!target)
-  7194			rcu_read_unlock();
-  7195	}
-  7196	
-  7197	int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
-  7198	{
-  7199		unsigned long nr, a0, a1, a2, a3, ret;
-  7200		int op_64_bit;
-  7201	
-  7202		if (kvm_hv_hypercall_enabled(vcpu->kvm))
-  7203			return kvm_hv_hypercall(vcpu);
-  7204	
-  7205		nr = kvm_rax_read(vcpu);
-  7206		a0 = kvm_rbx_read(vcpu);
-  7207		a1 = kvm_rcx_read(vcpu);
-  7208		a2 = kvm_rdx_read(vcpu);
-  7209		a3 = kvm_rsi_read(vcpu);
-  7210	
-  7211		trace_kvm_hypercall(nr, a0, a1, a2, a3);
-  7212	
-  7213		op_64_bit = is_64_bit_mode(vcpu);
-  7214		if (!op_64_bit) {
-  7215			nr &= 0xFFFFFFFF;
-  7216			a0 &= 0xFFFFFFFF;
-  7217			a1 &= 0xFFFFFFFF;
-  7218			a2 &= 0xFFFFFFFF;
-  7219			a3 &= 0xFFFFFFFF;
-  7220		}
-  7221	
-  7222		if (kvm_x86_ops->get_cpl(vcpu) != 0) {
-  7223			ret = -KVM_EPERM;
-  7224			goto out;
-  7225		}
-  7226	
-  7227		switch (nr) {
-  7228		case KVM_HC_VAPIC_POLL_IRQ:
-  7229			ret = 0;
-  7230			break;
-  7231		case KVM_HC_KICK_CPU:
-  7232			kvm_pv_kick_cpu_op(vcpu->kvm, a0, a1);
-  7233			ret = 0;
-  7234			break;
-  7235	#ifdef CONFIG_X86_64
-  7236		case KVM_HC_CLOCK_PAIRING:
-  7237			ret = kvm_pv_clock_pairing(vcpu, a0, a1);
-  7238			break;
-  7239	#endif
-  7240		case KVM_HC_SEND_IPI:
-  7241			ret = kvm_pv_send_ipi(vcpu->kvm, a0, a1, a2, a3, op_64_bit);
-  7242			break;
-> 7243		case KVM_HC_SCHED_YIELD:
-  7244			kvm_sched_yield(vcpu->kvm, a0);
-  7245			ret = 0;
-  7246			break;
-  7247		default:
-  7248			ret = -KVM_ENOSYS;
-  7249			break;
-  7250		}
-  7251	out:
-  7252		if (!op_64_bit)
-  7253			ret = (u32)ret;
-  7254		kvm_rax_write(vcpu, ret);
-  7255	
-  7256		++vcpu->stat.hypercalls;
-  7257		return kvm_skip_emulated_instruction(vcpu);
-  7258	}
-  7259	EXPORT_SYMBOL_GPL(kvm_emulate_hypercall);
-  7260	
-
+Signed-off-by: Alexandru Ardelean <alexandru.ardelean@analog.com>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+
+Changelog v1 -> v2:
+* split the initial series into just 3 patches that fix the
+  `match_string()` helper and start introducing a new version of this
+  helper, which computes array-size of static arrays
+
+ lib/string.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/lib/string.c b/lib/string.c
+index 6016eb3ac73d..e2cf5acc83bd 100644
+--- a/lib/string.c
++++ b/lib/string.c
+@@ -681,8 +681,11 @@ int match_string(const char * const *array, size_t n, const char *string)
+ 
+ 	for (index = 0; index < n; index++) {
+ 		item = array[index];
+-		if (!item)
++		if (!item) {
++			if (n != (size_t)-1)
++				continue;
+ 			break;
++		}
+ 		if (!strcmp(item, string))
+ 			return index;
+ 	}
+-- 
+2.20.1
+
