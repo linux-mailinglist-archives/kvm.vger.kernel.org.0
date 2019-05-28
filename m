@@ -2,97 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 760542C004
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 09:22:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 050452C008
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 09:24:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727207AbfE1HVw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 May 2019 03:21:52 -0400
-Received: from mga02.intel.com ([134.134.136.20]:57195 "EHLO mga02.intel.com"
+        id S1727524AbfE1HYb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 May 2019 03:24:31 -0400
+Received: from mga17.intel.com ([192.55.52.151]:57853 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726879AbfE1HVw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 May 2019 03:21:52 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
+        id S1726305AbfE1HYb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 May 2019 03:24:31 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 May 2019 00:21:51 -0700
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 May 2019 00:24:30 -0700
 X-ExtLoop1: 1
-Received: from shzintpr03.sh.intel.com (HELO [0.0.0.0]) ([10.239.4.100])
-  by orsmga001.jf.intel.com with ESMTP; 28 May 2019 00:21:48 -0700
-Subject: Re: [PATCH v2 1/3] KVM: x86: add support for user wait instructions
+X-IronPort-AV: E=Sophos;i="5.60,521,1549958400"; 
+   d="scan'208";a="179114371"
+Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
+  by fmsmga002.fm.intel.com with ESMTP; 28 May 2019 00:24:29 -0700
+Received: from kbuild by lkp-server01 with local (Exim 4.89)
+        (envelope-from <lkp@intel.com>)
+        id 1hVWTE-0003sH-LM; Tue, 28 May 2019 15:24:28 +0800
+Date:   Tue, 28 May 2019 15:23:29 +0800
+From:   kbuild test robot <lkp@intel.com>
 To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        kvm <kvm@vger.kernel.org>, linux-doc@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>, jingqi.liu@intel.com
-References: <20190524075637.29496-1-tao3.xu@intel.com>
- <20190524075637.29496-2-tao3.xu@intel.com>
- <20190527103003.GX2623@hirez.programming.kicks-ass.net>
- <43e2a62a-e992-2138-f038-1e4b2fb79ad1@intel.com>
- <CANRm+CwnJoj0EwWoFC44SXVUTLdE+iFGovaMr4Yf=OzbaW36sA@mail.gmail.com>
-From:   Tao Xu <tao3.xu@intel.com>
-Message-ID: <072dd34e-0361-5a06-4d0b-d04e8150a3bb@intel.com>
-Date:   Tue, 28 May 2019 15:19:30 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+Cc:     kbuild-all@01.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH RESEND v2] KVM: X86: Implement PV sched yield hypercall
+Message-ID: <201905281519.27MAOvb9%lkp@intel.com>
+References: <1559009752-8536-1-git-send-email-wanpengli@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <CANRm+CwnJoj0EwWoFC44SXVUTLdE+iFGovaMr4Yf=OzbaW36sA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1559009752-8536-1-git-send-email-wanpengli@tencent.com>
+X-Patchwork-Hint: ignore
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 28/05/2019 14:11, Wanpeng Li wrote:
-> On Tue, 28 May 2019 at 13:16, Tao Xu <tao3.xu@intel.com> wrote:
->>
->>
->> On 27/05/2019 18:30, Peter Zijlstra wrote:
->>> On Fri, May 24, 2019 at 03:56:35PM +0800, Tao Xu wrote:
->>>> This patch adds support for UMONITOR, UMWAIT and TPAUSE instructions
->>>> in kvm, and by default dont't expose it to kvm and provide a capability
->>>> to enable it.
->>>
->>> I'm thinking this should be conditional on the guest being a 1:1 guest,
->>> and I also seem to remember we have bits for that already -- they were
->>> used to disable paravirt spinlocks for example.
->>>
->>
->> Hi Peter,
->>
->> I am wondering if "1:1 guest" means different guests in the same host
->> should have different settings on user wait instructions?
->>
->> User wait instructions(UMONITOR, UMWAIT and TPAUSE) can use in guest
->> only when the VMCS Secondary Processor-Based VM-Execution Control bit 26
->> is 1, otherwise any execution of TPAUSE, UMONITOR, or UMWAIT causes a #UD.
->>
->> So with a capability to enable it, we use qemu kvm_vm_ioctl_enable_cap()
->> to enable it. The qemu link is blew:
->> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg05810.html
->>
->> By using different QEMU parameters, different guests in the same host
->> would have different features with or without user wait instructions.
->>
->> About "disable paravirt spinlocks" case, I am wondering if it uses
-> 
-> Please refer to a4429e53c9 (KVM: Introduce paravirtualization hints
-> and KVM_HINTS_DEDICATED) and b2798ba0b87 (KVM: X86: Choose qspinlock
-> when dedicated physical CPUs are available)
 Hi Wanpeng,
 
-Thank you! This information really helped me. After I read the code in 
-KVM/QEMU, I was wondering that with qemu command-line "-cpu 
-host,+kvm-hint-dedicated", then in KVM, 
-"kvm_hint_has_feature(KVM_HINTS_DEDICATED)" will be true, am I right?
+Thank you for the patch! Perhaps something to improve:
 
-Tao
+[auto build test WARNING on kvm/linux-next]
+[also build test WARNING on v5.2-rc2 next-20190524]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+
+url:    https://github.com/0day-ci/linux/commits/Wanpeng-Li/KVM-X86-Implement-PV-sched-yield-hypercall/20190528-132021
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git linux-next
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.1-rc1-7-g2b96cd8-dirty
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
+
+If you fix the issue, kindly add following tag
+Reported-by: kbuild test robot <lkp@intel.com>
+
+
+sparse warnings: (new ones prefixed by >>)
+
+   arch/x86/kvm/x86.c:2379:38: sparse: sparse: incorrect type in argument 1 (different address spaces) @@    expected void const [noderef] <asn:1> * @@    got  const [noderef] <asn:1> * @@
+   arch/x86/kvm/x86.c:2379:38: sparse:    expected void const [noderef] <asn:1> *
+   arch/x86/kvm/x86.c:2379:38: sparse:    got unsigned char [usertype] *
+   arch/x86/kvm/x86.c:7181:15: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   arch/x86/kvm/x86.c:7181:15: sparse:    struct kvm_apic_map [noderef] <asn:4> *
+   arch/x86/kvm/x86.c:7181:15: sparse:    struct kvm_apic_map *
+   arch/x86/kvm/x86.c:7243:14: sparse: sparse: undefined identifier 'KVM_HC_SCHED_YIELD'
+>> arch/x86/kvm/x86.c:7243:14: sparse: sparse: incompatible types for 'case' statement
+   arch/x86/kvm/x86.c:9408:16: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   arch/x86/kvm/x86.c:9408:16: sparse:    struct kvm_apic_map [noderef] <asn:4> *
+   arch/x86/kvm/x86.c:9408:16: sparse:    struct kvm_apic_map *
+>> arch/x86/kvm/x86.c:7193:9: sparse: sparse: context imbalance in 'kvm_sched_yield' - wrong count at exit
+   arch/x86/kvm/x86.c:7243:14: sparse: sparse: Expected constant expression in case statement
+
+vim +/case +7243 arch/x86/kvm/x86.c
+
+  7174	
+  7175	void kvm_sched_yield(struct kvm *kvm, u64 dest_id)
+  7176	{
+  7177		struct kvm_vcpu *target;
+  7178		struct kvm_apic_map *map;
+  7179	
+  7180		rcu_read_lock();
+  7181		map = rcu_dereference(kvm->arch.apic_map);
+  7182	
+  7183		if (unlikely(!map))
+  7184			goto out;
+  7185	
+  7186		if (map->phys_map[dest_id]->vcpu) {
+  7187			target = map->phys_map[dest_id]->vcpu;
+  7188			rcu_read_unlock();
+  7189			kvm_vcpu_yield_to(target);
+  7190		}
+  7191	
+  7192	out:
+> 7193		if (!target)
+  7194			rcu_read_unlock();
+  7195	}
+  7196	
+  7197	int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+  7198	{
+  7199		unsigned long nr, a0, a1, a2, a3, ret;
+  7200		int op_64_bit;
+  7201	
+  7202		if (kvm_hv_hypercall_enabled(vcpu->kvm))
+  7203			return kvm_hv_hypercall(vcpu);
+  7204	
+  7205		nr = kvm_rax_read(vcpu);
+  7206		a0 = kvm_rbx_read(vcpu);
+  7207		a1 = kvm_rcx_read(vcpu);
+  7208		a2 = kvm_rdx_read(vcpu);
+  7209		a3 = kvm_rsi_read(vcpu);
+  7210	
+  7211		trace_kvm_hypercall(nr, a0, a1, a2, a3);
+  7212	
+  7213		op_64_bit = is_64_bit_mode(vcpu);
+  7214		if (!op_64_bit) {
+  7215			nr &= 0xFFFFFFFF;
+  7216			a0 &= 0xFFFFFFFF;
+  7217			a1 &= 0xFFFFFFFF;
+  7218			a2 &= 0xFFFFFFFF;
+  7219			a3 &= 0xFFFFFFFF;
+  7220		}
+  7221	
+  7222		if (kvm_x86_ops->get_cpl(vcpu) != 0) {
+  7223			ret = -KVM_EPERM;
+  7224			goto out;
+  7225		}
+  7226	
+  7227		switch (nr) {
+  7228		case KVM_HC_VAPIC_POLL_IRQ:
+  7229			ret = 0;
+  7230			break;
+  7231		case KVM_HC_KICK_CPU:
+  7232			kvm_pv_kick_cpu_op(vcpu->kvm, a0, a1);
+  7233			ret = 0;
+  7234			break;
+  7235	#ifdef CONFIG_X86_64
+  7236		case KVM_HC_CLOCK_PAIRING:
+  7237			ret = kvm_pv_clock_pairing(vcpu, a0, a1);
+  7238			break;
+  7239	#endif
+  7240		case KVM_HC_SEND_IPI:
+  7241			ret = kvm_pv_send_ipi(vcpu->kvm, a0, a1, a2, a3, op_64_bit);
+  7242			break;
+> 7243		case KVM_HC_SCHED_YIELD:
+  7244			kvm_sched_yield(vcpu->kvm, a0);
+  7245			ret = 0;
+  7246			break;
+  7247		default:
+  7248			ret = -KVM_ENOSYS;
+  7249			break;
+  7250		}
+  7251	out:
+  7252		if (!op_64_bit)
+  7253			ret = (u32)ret;
+  7254		kvm_rax_write(vcpu, ret);
+  7255	
+  7256		++vcpu->stat.hypercalls;
+  7257		return kvm_skip_emulated_instruction(vcpu);
+  7258	}
+  7259	EXPORT_SYMBOL_GPL(kvm_emulate_hypercall);
+  7260	
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
