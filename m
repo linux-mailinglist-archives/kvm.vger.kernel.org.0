@@ -2,100 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DF9732C15F
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 10:32:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C95D2C173
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 10:35:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726747AbfE1IcD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 May 2019 04:32:03 -0400
-Received: from foss.arm.com ([217.140.101.70]:52088 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726532AbfE1IcD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 May 2019 04:32:03 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED574341;
-        Tue, 28 May 2019 01:32:02 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A0BDA3F59C;
-        Tue, 28 May 2019 01:31:58 -0700 (PDT)
-Subject: Re: [PATCH] KVM: Remove obsolete address of the FSF
-To:     Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry@arm.com>,
-        Suzuki K Pouloze <suzuki.poulose@arm.com>,
-        linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-References: <20190527165606.28295-1-thuth@redhat.com>
-From:   Marc Zyngier <marc.zyngier@arm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: ARM Ltd
-Message-ID: <a9a35f11-513d-325b-4f47-cba12376e6e8@arm.com>
-Date:   Tue, 28 May 2019 09:31:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190527165606.28295-1-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1726631AbfE1If4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 May 2019 04:35:56 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:33242 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725943AbfE1If4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 May 2019 04:35:56 -0400
+Received: by mail-pl1-f196.google.com with SMTP id g21so8061882plq.0
+        for <kvm@vger.kernel.org>; Tue, 28 May 2019 01:35:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=SgSfv16gsEtblka9oNhoUkR95N141+ewYrs8CjvW54E=;
+        b=YjiBfcfPM0w3q8iRRSgUc7eegDabvBxCQU/77AW19EapIZiX8exC37pGxdukzTev2K
+         MSMDnfoKfNd1RWDe9Xo1k/NPtf7ulLZGT2ZktsMJzYQTvyzeVnAD4AEAgDd5O0XygaD7
+         pES014KGJCtBBzH5FCYeE2sKA94L/prTiosbtKP1JzmnNJEyaiHFHttN/u5eXa8U27KX
+         AsE9LkQjpl0atiL1HZeUXHWj2iIlgad6MadQQiAY+NtFbI++WV0d2oT0mgczOQQ1Hg05
+         CZFVvlVYkHjjw6J+amPxYku55L2Pt0MXpYX8UDWWT0tlOlTqSOKGb4Uqoyuz6jeaUnRT
+         MFzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=SgSfv16gsEtblka9oNhoUkR95N141+ewYrs8CjvW54E=;
+        b=ZHQiSsjJTHqWliHFxR6V0W7ck8zBOFSPXJUrb7D2F8vt0SYsCv5TWNSQFo6btyznlZ
+         UmIxn7PLSVM6EGsdCm7wSw2MrcPMjGCD2UHOGU2LtDnoT0oV97HyMmPklSfTZkuRUSx4
+         9acCK+uCDAjPM5JEM16z/iXxUSjb3cpf9bEkJii5QwcRI/zTkiKMDpnByn1fmb+o6cil
+         5+m/fKIo3khVIO44wdufrvX4U3Y25gQLCS6AHrdtX9qMBfT0Gk8SJQoBQxu37eVJaIQ1
+         JKbHiMbyVbpjmfNEBTV8P+Gv5yyxPJ1f77/ng7qDkSIvHCWcCYHWZv4sD1wME2NOxqhs
+         nUfQ==
+X-Gm-Message-State: APjAAAVGFxc3QXejDh400TNnLJgaW1kYJcf4bW9yQEfhDNZA1Irx//ik
+        bNdb8lSoXhkeKg/1Z1MYU3KSLeaI
+X-Google-Smtp-Source: APXvYqx7NP94n+veXdKe4GF+biixUft9gFtxGgfGJO4zAN5KcKuzSdw+sZYjrpTFWc/oqQMPNDkSuQ==
+X-Received: by 2002:a17:902:3283:: with SMTP id z3mr107011258plb.278.1559032555521;
+        Tue, 28 May 2019 01:35:55 -0700 (PDT)
+Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
+        by smtp.gmail.com with ESMTPSA id g71sm21427986pgc.41.2019.05.28.01.35.52
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 28 May 2019 01:35:54 -0700 (PDT)
+From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, paulus@ozlabs.org,
+        dja@axtens.net, Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Subject: [PATCH] kvm: add kvm cap values to debugfs
+Date:   Tue, 28 May 2019 18:35:35 +1000
+Message-Id: <20190528083535.27643-1-sjitindarsingh@gmail.com>
+X-Mailer: git-send-email 2.13.6
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/05/2019 17:56, Thomas Huth wrote:
-> The FSF moved from the "Temple Place" to "51 Franklin Street" quite
-> a while ago already, so we should not refer to the old address in
-> the source code anymore. Anyway, instead of replacing it with the
-> new address, let's rather add proper SPDX identifiers here instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+KVM capabilities are used to communicate the availability of certain
+capabilities to userspace.
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+It might be nice to know these values without having to add debug
+printing to the userspace tool consuming this data.
 
-	M.
+Thus add a file in the kvm per vm debugfs file named "caps" which
+contains a file for each capability number which when read returns what
+would be returned when querying that capability.
+
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+
+---
+
+I'm not sure if it'd be better to keep a per arch list of the revelevant
+capabilities to avoid adding an entry for irrelevant ones. Comments?
+---
+ include/linux/kvm_host.h |  1 +
+ include/uapi/linux/kvm.h |  1 +
+ virt/kvm/kvm_main.c      | 31 +++++++++++++++++++++++++++++++
+ 3 files changed, 33 insertions(+)
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 79fa4426509c..6cb45a8de818 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -500,6 +500,7 @@ struct kvm {
+ 	bool manual_dirty_log_protect;
+ 	struct dentry *debugfs_dentry;
+ 	struct kvm_stat_data **debugfs_stat_data;
++	int debugfs_cap_data[KVM_CAP_MAX + 1];
+ 	struct srcu_struct srcu;
+ 	struct srcu_struct irq_srcu;
+ 	pid_t userspace_pid;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 2fe12b40d503..7b5042ec5902 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -993,6 +993,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_SVE 170
+ #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
+ #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
++#define KVM_CAP_MAX	KVM_CAP_ARM_PTRAUTH_GENERIC
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 134ec0283a8a..b85a43263fb7 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -117,6 +117,7 @@ EXPORT_SYMBOL_GPL(kvm_debugfs_dir);
+ static int kvm_debugfs_num_entries;
+ static const struct file_operations *stat_fops_per_vm[];
+ 
++static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg);
+ static long kvm_vcpu_ioctl(struct file *file, unsigned int ioctl,
+ 			   unsigned long arg);
+ #ifdef CONFIG_KVM_COMPAT
+@@ -594,6 +595,33 @@ static void kvm_destroy_vm_debugfs(struct kvm *kvm)
+ 	}
+ }
+ 
++static int vm_cap_get(void *data, u64 *val)
++{
++	*val = *((int *) data);
++
++	return 0;
++}
++
++DEFINE_SIMPLE_ATTRIBUTE(cap_fops, vm_cap_get, NULL, "%llu\n");
++
++static void kvm_create_vm_cap_debugfs(struct kvm *kvm)
++{
++	char *dir_name = "caps";
++	struct dentry *dentry_p;
++	int i;
++
++	dentry_p = debugfs_create_dir(dir_name, kvm->debugfs_dentry);
++
++	for (i = 0; i <= KVM_CAP_MAX; i++) {
++		int *cap = &kvm->debugfs_cap_data[i];
++		char file_name[ITOA_MAX_LEN];
++
++		*cap = kvm_vm_ioctl_check_extension_generic(kvm, i);
++		snprintf(file_name, sizeof(file_name), "%d", i);
++		debugfs_create_file(file_name, 0444, dentry_p, cap, &cap_fops);
++	}
++}
++
+ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
+ {
+ 	char dir_name[ITOA_MAX_LEN * 2];
+@@ -623,6 +651,9 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
+ 		debugfs_create_file(p->name, 0644, kvm->debugfs_dentry,
+ 				    stat_data, stat_fops_per_vm[p->kind]);
+ 	}
++
++	kvm_create_vm_cap_debugfs(kvm);
++
+ 	return 0;
+ }
+ 
 -- 
-Jazz is not dead. It just smells funny...
+2.13.6
+
