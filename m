@@ -2,136 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ACB5D2C06A
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 09:40:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 94EBF2C097
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2019 09:51:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727952AbfE1HkH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 May 2019 03:40:07 -0400
-Received: from mail-eopbgr770071.outbound.protection.outlook.com ([40.107.77.71]:63759
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727853AbfE1HkF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 May 2019 03:40:05 -0400
+        id S1726910AbfE1HvL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 May 2019 03:51:11 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:40362 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726203AbfE1HvK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 May 2019 03:51:10 -0400
+Received: by mail-pf1-f195.google.com with SMTP id u17so10960002pfn.7;
+        Tue, 28 May 2019 00:51:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=analog.onmicrosoft.com; s=selector1-analog-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EVygfSY8hqy/DBUvsHRCgGvieeoiCENlb8QcgTW8Qa0=;
- b=ug3p+80+pta3QSOyYVopWCIPknnTa/9XApeIFW+44+SXRahs8pvbg98CvxDZWD2q7UoHIhgUD6Sn7ZbGyOWHdj4WAzkhg9cumlMLts6dyltoEMjlw9eglOAVG8lj96mIW2ArwyzQcb/gVfwCJxWUUom9Q8RHLT+KaOaucx79tQQ=
-Received: from BN3PR03CA0110.namprd03.prod.outlook.com (2603:10b6:400:4::28)
- by BLUPR03MB552.namprd03.prod.outlook.com (2a01:111:e400:883::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.1922.22; Tue, 28 May
- 2019 07:39:58 +0000
-Received: from SN1NAM02FT022.eop-nam02.prod.protection.outlook.com
- (2a01:111:f400:7e44::202) by BN3PR03CA0110.outlook.office365.com
- (2603:10b6:400:4::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1943.16 via Frontend
- Transport; Tue, 28 May 2019 07:39:58 +0000
-Authentication-Results: spf=pass (sender IP is 137.71.25.55)
- smtp.mailfrom=analog.com; lists.freedesktop.org; dkim=none (message not
- signed) header.d=none;lists.freedesktop.org; dmarc=bestguesspass action=none
- header.from=analog.com;
-Received-SPF: Pass (protection.outlook.com: domain of analog.com designates
- 137.71.25.55 as permitted sender) receiver=protection.outlook.com;
- client-ip=137.71.25.55; helo=nwd2mta1.analog.com;
-Received: from nwd2mta1.analog.com (137.71.25.55) by
- SN1NAM02FT022.mail.protection.outlook.com (10.152.72.148) with Microsoft SMTP
- Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.1922.16
- via Frontend Transport; Tue, 28 May 2019 07:39:57 +0000
-Received: from NWD2HUBCAS7.ad.analog.com (nwd2hubcas7.ad.analog.com [10.64.69.107])
-        by nwd2mta1.analog.com (8.13.8/8.13.8) with ESMTP id x4S7duOZ023275
-        (version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=OK);
-        Tue, 28 May 2019 00:39:56 -0700
-Received: from saturn.analog.com (10.50.1.244) by NWD2HUBCAS7.ad.analog.com
- (10.64.69.107) with Microsoft SMTP Server id 14.3.408.0; Tue, 28 May 2019
- 03:39:56 -0400
-From:   Alexandru Ardelean <alexandru.ardelean@analog.com>
-To:     <linuxppc-dev@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>,
-        <linux-ide@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <linux-rpi-kernel@lists.infradead.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-rockchip@lists.infradead.org>, <linux-pm@vger.kernel.org>,
-        <linux-gpio@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>, <linux-omap@vger.kernel.org>,
-        <linux-mmc@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        <linux-tegra@vger.kernel.org>, <devel@driverdev.osuosl.org>,
-        <linux-usb@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-fbdev@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
-        <cgroups@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-security-module@vger.kernel.org>,
-        <linux-integrity@vger.kernel.org>, <alsa-devel@alsa-project.org>
-CC:     <heikki.krogerus@linux.intel.com>, <gregkh@linuxfoundation.org>,
-        <andriy.shevchenko@linux.intel.com>,
-        Alexandru Ardelean <alexandru.ardelean@analog.com>
-Subject: [PATCH 3/3][V2] lib: re-introduce new match_string() helper/macro
-Date:   Tue, 28 May 2019 10:39:32 +0300
-Message-ID: <20190528073932.25365-3-alexandru.ardelean@analog.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190528073932.25365-1-alexandru.ardelean@analog.com>
-References: <20190508112842.11654-1-alexandru.ardelean@analog.com>
- <20190528073932.25365-1-alexandru.ardelean@analog.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ADIRoutedOnPrem: True
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:137.71.25.55;IPV:NLI;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(10009020)(1496009)(136003)(39860400002)(346002)(396003)(376002)(2980300002)(199004)(189003)(126002)(2441003)(86362001)(44832011)(5660300002)(2201001)(478600001)(446003)(476003)(2616005)(53416004)(47776003)(316002)(11346002)(2870700001)(2906002)(6666004)(356004)(50226002)(51416003)(7696005)(7416002)(76176011)(48376002)(4326008)(305945005)(70586007)(70206006)(336012)(26005)(77096007)(186003)(1076003)(7636002)(246002)(486006)(426003)(7406005)(110136005)(54906003)(106002)(107886003)(50466002)(36756003)(8936002)(8676002)(921003)(83996005)(1121003)(2101003);DIR:OUT;SFP:1101;SCL:1;SRVR:BLUPR03MB552;H:nwd2mta1.analog.com;FPR:;SPF:Pass;LANG:en;PTR:nwd2mail10.analog.com;A:1;MX:1;
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9f7495c6-88de-4750-c0e9-08d6e33faf63
-X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(4709054)(1401327)(2017052603328);SRVR:BLUPR03MB552;
-X-MS-TrafficTypeDiagnostic: BLUPR03MB552:
-X-Microsoft-Antispam-PRVS: <BLUPR03MB5526A3F85F374B6EF9329F1F91E0@BLUPR03MB552.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1443;
-X-Forefront-PRVS: 00514A2FE6
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam-Message-Info: MswgKhZP9m+ZsGUEhWl3phwXCL8yuqzj7xcxpK+dGlJBf9m5zMl51gqC3LUtKdWQ8Os49FCltfeNbu6Phw/B8l5WNlH00oAhRzdjikewQHYUEmLqJ6/urfczkkAV7S6v3P1UMtUMTOYDySCPLD3RO66kjwZftNeRvVV3dsDqCax4qYOjNj2PWP5gkM5PjRZmJWiCQ5YjWYviSRnNrXmzdalwSZTQ416f6pMfl95WCkKeJFuhdayQMWJGsRNhTOHuxm5bGOp4NnJa6ZTV5K+ilvVE4Xb082rHyJdnAOFnjmjlMMgU1yiCJ2yKYrrmhTGSsWl7mABejle5Gq03Z59rpn0+AbER3kkbBxVnYXW8nX3mrHd8Gqzr89K0YpmuIcGMyscsEWrsfpd9tI6dbYg4W4+zRy2MwWGNPPr9JWXwDBM=
-X-OriginatorOrg: analog.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 May 2019 07:39:57.3627
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f7495c6-88de-4750-c0e9-08d6e33faf63
-X-MS-Exchange-CrossTenant-Id: eaa689b4-8f87-40e0-9c6f-7228de4d754a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=eaa689b4-8f87-40e0-9c6f-7228de4d754a;Ip=[137.71.25.55];Helo=[nwd2mta1.analog.com]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BLUPR03MB552
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=gYEx0O9ga7gmezM3UNZfMFOuMaxOrET+sxlSycHSkpM=;
+        b=Spvfdfdf5+Hi2ME1dkkbMVU8kp4BoweT58Z1VEE9RMlUgy8GpnZD+AUdy5k3qvw8ym
+         gIy4ALuQ5dY+KnR6zwSy5ch77NxR/ksaw/yLMJHWimaS2BZ6O96vVQQYDh8jBdHCUH/4
+         as9FjWWRyM4L4aKAexJG4dburCrm34tOvrhAakfzJkLGs30ACmoHl1nSPnI3dq4FX/Ax
+         6r+aGBs0ir/gjSAZJWw7MHkHK+hwDQekbYudbKDvCjlDXVk0L5Cq1G6jknYbE0GLSBfN
+         6OCx6w0tVYPMjBl4YgVddiF4L5JHloBhpKjczFSNmbhzgupE2r2mHedu50fTIgK4cTdQ
+         0tUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=gYEx0O9ga7gmezM3UNZfMFOuMaxOrET+sxlSycHSkpM=;
+        b=j6oFoSKwMlY1TmdIlxjE/vEamkF8xWu9GGNWTvOC78EMYJ5dIRd5G3CyJgGL6i2EDN
+         Kv6VN7hcs8Xfkqx+TSLr5jZbXp95FfyNkDC6znMMS+RGDJUWjmieuCTf71oKlPxzltFR
+         2ysevLUaB7ozYCCmML98k4Dm2sDvfTbGyaJQN1VJnJvHmt6ESPWF5jJSko2TnUkMbV7X
+         RWUA5m9PEDYI6bwHePcrK0uVxoe2BlIbchAVQGBgRhb8hGkjPPRVEGDgPxGS/P9yMAFq
+         HieWt7y1HRaZW1lOC6uOhRVUGzh9x7ftq6GOCrQetQIbHUizAr5wAJhDk/lKtjmD4p8i
+         y+hw==
+X-Gm-Message-State: APjAAAXUsE9pNNMbzBJG272CCtFJnWfYlC8CNpmRDSUVi8w3Z7eqy7XD
+        smWlfeQ5BWpebywNPMwSDgJqgMJc
+X-Google-Smtp-Source: APXvYqwj+NMpZ1s2uvQ6p3HZ/6VzNBEgzCObP3JqgJ8XjZRHDT3HlFY5f5ns5FEetoV9q50P8zcIdg==
+X-Received: by 2002:aa7:951c:: with SMTP id b28mr120419717pfp.99.1559029869814;
+        Tue, 28 May 2019 00:51:09 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+        by smtp.googlemail.com with ESMTPSA id q20sm18201400pgq.66.2019.05.28.00.51.08
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Tue, 28 May 2019 00:51:09 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Subject: [PATCH RESEND v2 0/3] KVM: Yield to IPI target if necessary
+Date:   Tue, 28 May 2019 15:50:54 +0800
+Message-Id: <1559029857-2750-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1559004795-19927-3-git-send-email-wanpengli@tencent.com>
+References: <1559004795-19927-3-git-send-email-wanpengli@tencent.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This change re-introduces `match_string()` as a macro that uses
-ARRAY_SIZE() to compute the size of the array.
+The idea is from Xen, when sending a call-function IPI-many to vCPUs, 
+yield if any of the IPI target vCPUs was preempted. 17% performance 
+increase of ebizzy benchmark can be observed in an over-subscribe 
+environment. (w/ kvm-pv-tlb disabled, testing TLB flush call-function 
+IPI-many since call-function is not easy to be trigged by userspace 
+workload).
 
-After this change, work can start on migrating subsystems to use this new
-helper. Since the original helper is pretty used, migrating to this new one
-will take a while, and will be reviewed by each subsystem.
+v1 -> v2:
+ * check map is not NULL
+ * check map->phys_map[dest_id] is not NULL
+ * make kvm_sched_yield static
+ * change dest_id to unsinged long
 
-Signed-off-by: Alexandru Ardelean <alexandru.ardelean@analog.com>
----
- include/linux/string.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Wanpeng Li (3):
+  KVM: X86: Implement PV sched yield in linux guest
+  KVM: X86: Implement PV sched yield hypercall
+  KVM: X86: Expose PV_SCHED_YIELD CPUID feature bit to guest
 
-diff --git a/include/linux/string.h b/include/linux/string.h
-index 7149fcdf62df..34491b075449 100644
---- a/include/linux/string.h
-+++ b/include/linux/string.h
-@@ -198,6 +198,15 @@ static inline int strtobool(const char *s, bool *res)
- int __match_string(const char * const *array, size_t n, const char *string);
- int __sysfs_match_string(const char * const *array, size_t n, const char *s);
- 
-+/**
-+ * match_string - matches given string in an array
-+ * @_a: array of strings
-+ * @_s: string to match with
-+ *
-+ * Helper for __match_string(). Calculates the size of @a automatically.
-+ */
-+#define match_string(_a, _s) __match_string(_a, ARRAY_SIZE(_a), _s)
-+
- /**
-  * sysfs_match_string - matches given string in an array
-  * @_a: array of strings
+ Documentation/virtual/kvm/cpuid.txt      |  4 ++++
+ Documentation/virtual/kvm/hypercalls.txt | 11 +++++++++++
+ arch/x86/include/uapi/asm/kvm_para.h     |  1 +
+ arch/x86/kernel/kvm.c                    | 21 +++++++++++++++++++++
+ arch/x86/kvm/cpuid.c                     |  3 ++-
+ arch/x86/kvm/x86.c                       | 26 ++++++++++++++++++++++++++
+ include/uapi/linux/kvm_para.h            |  1 +
+ 7 files changed, 66 insertions(+), 1 deletion(-)
+
 -- 
-2.20.1
+2.7.4
 
