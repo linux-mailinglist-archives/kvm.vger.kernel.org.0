@@ -2,90 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 325072DD69
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 14:48:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC6B72DD77
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 14:51:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726944AbfE2MsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 May 2019 08:48:02 -0400
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:39614 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726516AbfE2MsC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 May 2019 08:48:02 -0400
-Received: by mail-ed1-f67.google.com with SMTP id e24so3602277edq.6
-        for <kvm@vger.kernel.org>; Wed, 29 May 2019 05:48:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=MONbMDhNRBTOrhsT93yPHwMAxRk5gJkctOPhsHPlMjo=;
-        b=pvzGmqfndke61sBQlh1oho21KJ6Iybo1zHRk74CTMX5dILmjLpgpFD9xiNkJcIkykj
-         88K6WVvQaUnOZAxTaXUwsfom9gc9tKGhAlt9jDh1AvRVL2fcPUPvVciXyd+4/cfnzi6Y
-         BQc+Kf6NRRPU+LUsTWAkOih+0iPrKPi5AV8QW2IPC15kto3MI2CcTIDgyW1NvpvnbaHn
-         72gRT4fZtCzDKYazAwoauPiUnTinRIP0Jz8q0vmBhjkSQvKq344X6obRR8SDoPT0HYGL
-         IzumjrtY2Gd+o3l7MaUv/iBxsDD93S/NUHjHNBVVcbESUuNn/24MBGAgjnldGThCL3xB
-         SLRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=MONbMDhNRBTOrhsT93yPHwMAxRk5gJkctOPhsHPlMjo=;
-        b=hvkGWBmxeLnFbgEVfBy4MmGCGFUmdNUzOAR83F2PHGxxAt1mD0STjca1AnfPqKXCjf
-         xPbaCy6ds79+vFmTQVmxPRk8c6d7dWKzxkFevM3pU737WiKUCsaYm52nXdzcFCNyZBrr
-         s5f1oUoU1BhwY6/JiiDmGQtoVgSPqQcq3yRF1OwzkuUPkMQ0WVufyfDdyLdkVaxeS7Tg
-         3hGN2xAdMzPf4/HwxoDbRHoUL8LYPw9vBRhZkqZomXnHhFPCVfxhpp7F576RkMUOJ4ux
-         8oQ212OVV5b5ibtViFT3gYkrlAke0QQAMk674MBTwqlN+oMpk5pdLfcbJByFQDRXhlSz
-         gThw==
-X-Gm-Message-State: APjAAAWz1ib7mF6+VzIFFBSA3WBga3DAaNC05Fj+GeeEVh7FVrf0EEeY
-        4JUrdpBWUqxiC1OpNgiudlmz3g==
-X-Google-Smtp-Source: APXvYqzoaFmZ7mZVbDTqlrFuJBSNrSbiSO0d9+zexx5kswJ+G5IjO7KLQ5NjC4EQdadEnFovCFgWeA==
-X-Received: by 2002:a50:86e5:: with SMTP id 34mr136814479edu.290.1559134080713;
-        Wed, 29 May 2019 05:48:00 -0700 (PDT)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id qq13sm2797939ejb.1.2019.05.29.05.47.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 29 May 2019 05:47:59 -0700 (PDT)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id 050E01041E8; Wed, 29 May 2019 15:47:59 +0300 (+03)
-Date:   Wed, 29 May 2019 15:47:58 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Mike Rapoport <rppt@linux.ibm.com>
-Cc:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@amacapital.net>,
-        David Howells <dhowells@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Kai Huang <kai.huang@linux.intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Alison Schofield <alison.schofield@intel.com>,
-        linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH, RFC 05/62] mm/page_alloc: Handle allocation for
- encrypted memory
-Message-ID: <20190529124758.ojyakxdx2zf6nmtt@box>
-References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
- <20190508144422.13171-6-kirill.shutemov@linux.intel.com>
- <20190529072124.GC3656@rapoport-lnx>
+        id S1726963AbfE2Mu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 May 2019 08:50:58 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34526 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726911AbfE2Mu6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 May 2019 08:50:58 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4TClEZJ022966
+        for <kvm@vger.kernel.org>; Wed, 29 May 2019 08:50:57 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2ssqfx7nbb-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 29 May 2019 08:50:56 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Wed, 29 May 2019 13:50:50 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 29 May 2019 13:50:46 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4TCojBN34406558
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 29 May 2019 12:50:46 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C292111C04A;
+        Wed, 29 May 2019 12:50:45 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B0D1011C04C;
+        Wed, 29 May 2019 12:50:45 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 29 May 2019 12:50:45 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id 6649DE01D7; Wed, 29 May 2019 14:50:45 +0200 (CEST)
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: [GIT PULL 0/2] KVM: s390: fixes for 5.2-rc3
+Date:   Wed, 29 May 2019 14:50:43 +0200
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190529072124.GC3656@rapoport-lnx>
-User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19052912-0028-0000-0000-000003729CEB
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19052912-0029-0000-0000-000024326153
+Message-Id: <20190529125045.42935-1-borntraeger@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-29_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=574 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905290085
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 29, 2019 at 10:21:25AM +0300, Mike Rapoport wrote:
-> Shouldn't it be EXPORT_SYMBOL?
+Paolo, Radim,
 
-We don't have callers outside core-mm at the moment.
+The following changes since commit cd6c84d8f0cdc911df435bb075ba22ce3c605b07:
 
-I'll add kerneldoc in the next submission.
+  Linux 5.2-rc2 (2019-05-26 16:49:19 -0700)
 
--- 
- Kirill A. Shutemov
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-master-5.2-2
+
+for you to fetch changes up to a86cb413f4bf273a9d341a3ab2c2ca44e12eb317:
+
+  KVM: s390: Do not report unusabled IDs via KVM_CAP_MAX_VCPU_ID (2019-05-28 15:52:19 +0200)
+
+----------------------------------------------------------------
+KVM: s390: Fixes
+
+- fix compilation for !CONFIG_PCI
+- fix the output of KVM_CAP_MAX_VCPU_ID
+
+----------------------------------------------------------------
+Christian Borntraeger (1):
+      kvm: fix compile on s390 part 2
+
+Thomas Huth (1):
+      KVM: s390: Do not report unusabled IDs via KVM_CAP_MAX_VCPU_ID
+
+ arch/mips/kvm/mips.c       | 3 +++
+ arch/powerpc/kvm/powerpc.c | 3 +++
+ arch/s390/kvm/kvm-s390.c   | 1 +
+ arch/x86/kvm/x86.c         | 3 +++
+ virt/kvm/arm/arm.c         | 3 +++
+ virt/kvm/kvm_main.c        | 4 ++--
+ 6 files changed, 15 insertions(+), 2 deletions(-)
+
