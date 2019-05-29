@@ -2,78 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 769242D349
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 03:26:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3483F2D34F
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 03:28:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726312AbfE2B0j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 May 2019 21:26:39 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42973 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725847AbfE2B0j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 May 2019 21:26:39 -0400
-Received: by mail-wr1-f65.google.com with SMTP id l2so432672wrb.9
-        for <kvm@vger.kernel.org>; Tue, 28 May 2019 18:26:38 -0700 (PDT)
+        id S1725917AbfE2B2X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 May 2019 21:28:23 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45363 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725828AbfE2B2X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 May 2019 21:28:23 -0400
+Received: by mail-wr1-f67.google.com with SMTP id b18so419746wrq.12
+        for <kvm@vger.kernel.org>; Tue, 28 May 2019 18:28:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=rmRCqN5V69njNKzXqsufXyHQFr1ecAJaoY5I9r8Jg/A=;
-        b=W+lq4R8lCZkozZenxFVIKWivD6ljFxUf4XUewK+CnEbQI9affXBzQNxomnOHcvjDFw
-         VXbHbCyLIw7SZN4Mad89eUV2NIGZ94BGF5joo8OkfAXQo3lbTLn5kkTbserJlOM2bdY7
-         YK29yvfZOOAIrs6aSz971m/OrE52tpLgpijHoHwCeh1lwkuqOgMv9F3i4ghVjRWzV6cz
-         /Q4hiy+A0CJRfEAf7QANORE7M0ZBZlm7kC1wdwRtQ17K8ePVYz9m/MFP2a+iayoO386Z
-         SbzvFrpnVq4nr9k0Yb90PyW/AZDHafdc4nA6EPZTNh/s4m+Yf+5GPLHOj7SYf3uxNTho
-         8J/Q==
-X-Gm-Message-State: APjAAAX/KPSV/KorYCePD4iSbkp8qdlSEofJTSiOGIdcUlgARVijxSoR
-        jbeBmVxZxTw0IEI1pfpf6Cui1Q==
-X-Google-Smtp-Source: APXvYqwX1usmVw6q1CDoi4OTK+z6UWAWXKZZFyXo6pMfhnLF9gUifvkPOsRu9b8SygmMeO8p8Yt+mQ==
-X-Received: by 2002:adf:ba47:: with SMTP id t7mr18702012wrg.175.1559093197515;
-        Tue, 28 May 2019 18:26:37 -0700 (PDT)
+        bh=Zy4dt0/WsQ2pPQWde6zfELpEkgD8cGRU5zkaONVLf7w=;
+        b=ZqhortoeAsl1wnEj+Ljih9BaTFwVVW9O/7l0NwcHEIDqnk6PvsHyJihytxrKApRnDW
+         9gsYV2pRghsP7nbEH9RuUahqCHkIje4knfJ2t/tjfh/WqWK3ysmR5/tJTBI10Zcz1GXv
+         BFyUAR1G7jrfZUL8hM5HngLwnyRgCBI/LPej5FSd35jedwAbnH4AD6PQ6UQXlDFmlYDG
+         sjBt8BNbCzo+VbUpNBxHu/NiVl/BSyHTeBNLdxPGw2ZqWtzjt3COc5C1upWbqXE2wVPE
+         P4WijSKrvIoEEo+e66jr3N1ZGiyonsGeE1UlmaEAoveHt8Vzyiz3NNp9eTgAqBW0ZR7a
+         qdNQ==
+X-Gm-Message-State: APjAAAVE1iQipxHECxJkCjt6VcBoY5HTjBae1ZIpshAcZi16RdXLrKqn
+        Vo1UZEirF9KpmW5cIG3oZgymaQ==
+X-Google-Smtp-Source: APXvYqwZYgBbYcOXL1jluAbtyuzMdx9moyE1uHZ1h1H51iIfrMrheEe0qRvL24XxCKchdTyl5TIvIA==
+X-Received: by 2002:adf:b64b:: with SMTP id i11mr7328142wre.205.1559093301578;
+        Tue, 28 May 2019 18:28:21 -0700 (PDT)
 Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id d26sm3816595wmb.4.2019.05.28.18.26.36
+        by smtp.gmail.com with ESMTPSA id r16sm11765117wrj.13.2019.05.28.18.28.20
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 28 May 2019 18:26:36 -0700 (PDT)
-Subject: Re: [PATCH v2 1/3] KVM: x86: add support for user wait instructions
-To:     Tao Xu <tao3.xu@intel.com>, Wanpeng Li <kernellwp@gmail.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        kvm <kvm@vger.kernel.org>, linux-doc@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>, jingqi.liu@intel.com
+        Tue, 28 May 2019 18:28:21 -0700 (PDT)
+Subject: Re: [PATCH v2 3/3] KVM: vmx: handle vm-exit for UMWAIT and TPAUSE
+To:     Tao Xu <tao3.xu@intel.com>, rkrcmar@redhat.com, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        sean.j.christopherson@intel.com
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jingqi.liu@intel.com
 References: <20190524075637.29496-1-tao3.xu@intel.com>
- <20190524075637.29496-2-tao3.xu@intel.com>
- <20190527103003.GX2623@hirez.programming.kicks-ass.net>
- <43e2a62a-e992-2138-f038-1e4b2fb79ad1@intel.com>
- <CANRm+CwnJoj0EwWoFC44SXVUTLdE+iFGovaMr4Yf=OzbaW36sA@mail.gmail.com>
- <072dd34e-0361-5a06-4d0b-d04e8150a3bb@intel.com>
+ <20190524075637.29496-4-tao3.xu@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f1d739ba-8499-1f41-5515-c53c6dd7f3d2@redhat.com>
-Date:   Wed, 29 May 2019 03:26:35 +0200
+Message-ID: <b0958339-b23c-dd9d-8673-aae098769738@redhat.com>
+Date:   Wed, 29 May 2019 03:28:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <072dd34e-0361-5a06-4d0b-d04e8150a3bb@intel.com>
+In-Reply-To: <20190524075637.29496-4-tao3.xu@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/05/19 09:19, Tao Xu wrote:
+On 24/05/19 09:56, Tao Xu wrote:
+> As the latest Intel 64 and IA-32 Architectures Software Developer's
+> Manual, UMWAIT and TPAUSE instructions cause a VM exit if the
+> “RDTSC exiting” and “enable user wait and pause” VM-execution controls
+> are both 1.
 > 
-> Thank you! This information really helped me. After I read the code in
-> KVM/QEMU, I was wondering that with qemu command-line "-cpu
-> host,+kvm-hint-dedicated", then in KVM,
-> "kvm_hint_has_feature(KVM_HINTS_DEDICATED)" will be true, am I right?
+> This patch is to handle the vm-exit for UMWAIT and TPAUSE as invalid_op.
 
-Yes, but it doesn't matter for this patch series.
+KVM never enables RDTSC exiting, so this is not necessary.
 
 Paolo
