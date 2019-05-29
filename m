@@ -2,129 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5230F2DC7E
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 14:13:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78C4C2DC79
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 14:12:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726893AbfE2MNH convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 29 May 2019 08:13:07 -0400
-Received: from 2.mo173.mail-out.ovh.net ([178.33.251.49]:53596 "EHLO
-        2.mo173.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726018AbfE2MNH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 May 2019 08:13:07 -0400
-Received: from player711.ha.ovh.net (unknown [10.108.35.103])
-        by mo173.mail-out.ovh.net (Postfix) with ESMTP id BD84E10135C
-        for <kvm@vger.kernel.org>; Wed, 29 May 2019 14:03:59 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player711.ha.ovh.net (Postfix) with ESMTPSA id 4F69D63843BA;
-        Wed, 29 May 2019 12:03:53 +0000 (UTC)
-Date:   Wed, 29 May 2019 14:03:52 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     Paul Mackerras <paulus@ozlabs.org>
-Cc:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: XIVE: introduce a KVM device lock
-Message-ID: <20190529140352.318c5990@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20190528041711.ewohm2pdrya5ompz@oak.ozlabs.ibm.com>
-References: <20190524132030.6349-1-clg@kaod.org>
- <20190524201621.23eb7c44@bahia.lan>
- <20190528041711.ewohm2pdrya5ompz@oak.ozlabs.ibm.com>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1726581AbfE2MMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 May 2019 08:12:36 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:44588 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726018AbfE2MMf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 May 2019 08:12:35 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DDBEE80D;
+        Wed, 29 May 2019 05:12:34 -0700 (PDT)
+Received: from mbp (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9733C3F59C;
+        Wed, 29 May 2019 05:12:28 -0700 (PDT)
+Date:   Wed, 29 May 2019 13:12:25 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Andrey Konovalov <andreyknvl@google.com>,
+        Kees Cook <keescook@chromium.org>,
+        Evgenii Stepanov <eugenis@google.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Elliott Hughes <enh@google.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>
+Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
+Message-ID: <20190529121225.q2zjgurxqnohvmkg@mbp>
+References: <CAFKCwrj6JEtp4BzhqO178LFJepmepoMx=G+YdC8sqZ3bcBp3EQ@mail.gmail.com>
+ <20190521182932.sm4vxweuwo5ermyd@mbp>
+ <201905211633.6C0BF0C2@keescook>
+ <6049844a-65f5-f513-5b58-7141588fef2b@oracle.com>
+ <20190523201105.oifkksus4rzcwqt4@mbp>
+ <ffe58af3-7c70-d559-69f6-1f6ebcb0fec6@oracle.com>
+ <20190524101139.36yre4af22bkvatx@mbp>
+ <c6dd53d8-142b-3d8d-6a40-d21c5ee9d272@oracle.com>
+ <CAAeHK+yAUsZWhp6xPAbWewX5Nbw+-G3svUyPmhXu5MVeEDKYvA@mail.gmail.com>
+ <20190529061126.GA18124@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Ovh-Tracer-Id: 8443967828062345659
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvjedggeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190529061126.GA18124@infradead.org>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 28 May 2019 14:17:11 +1000
-Paul Mackerras <paulus@ozlabs.org> wrote:
-
-> Greg,
-> 
-> On Fri, May 24, 2019 at 08:16:21PM +0200, Greg Kurz wrote:
-> > On Fri, 24 May 2019 15:20:30 +0200
-> > Cédric Le Goater <clg@kaod.org> wrote:
-> >   
-> > > The XICS-on-XIVE KVM device needs to allocate XIVE event queues when a
-> > > priority is used by the OS. This is referred as EQ provisioning and it
-> > > is done under the hood when :
-> > > 
-> > >   1. a CPU is hot-plugged in the VM
-> > >   2. the "set-xive" is called at VM startup
-> > >   3. sources are restored at VM restore
-> > > 
-> > > The kvm->lock mutex is used to protect the different XIVE structures
-> > > being modified but in some contextes, kvm->lock is taken under the
-> > > vcpu->mutex which is a forbidden sequence by KVM.
-> > > 
-> > > Introduce a new mutex 'lock' for the KVM devices for them to
-> > > synchronize accesses to the XIVE device structures.
-> > > 
-> > > Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> > > ---
-> > >  arch/powerpc/kvm/book3s_xive.h        |  1 +
-> > >  arch/powerpc/kvm/book3s_xive.c        | 23 +++++++++++++----------
-> > >  arch/powerpc/kvm/book3s_xive_native.c | 15 ++++++++-------
-> > >  3 files changed, 22 insertions(+), 17 deletions(-)
-> > > 
-> > > diff --git a/arch/powerpc/kvm/book3s_xive.h b/arch/powerpc/kvm/book3s_xive.h
-> > > index 426146332984..862c2c9650ae 100644
-> > > --- a/arch/powerpc/kvm/book3s_xive.h
-> > > +++ b/arch/powerpc/kvm/book3s_xive.h
-> > > @@ -141,6 +141,7 @@ struct kvmppc_xive {
-> > >  	struct kvmppc_xive_ops *ops;
-> > >  	struct address_space   *mapping;
-> > >  	struct mutex mapping_lock;
-> > > +	struct mutex lock;
-> > >  };
-> > >  
-> > >  #define KVMPPC_XIVE_Q_COUNT	8
-> > > diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-> > > index f623451ec0a3..12c8a36dd980 100644
-> > > --- a/arch/powerpc/kvm/book3s_xive.c
-> > > +++ b/arch/powerpc/kvm/book3s_xive.c
-> > > @@ -271,14 +271,14 @@ static int xive_provision_queue(struct kvm_vcpu *vcpu, u8 prio)
-> > >  	return rc;
-> > >  }
-> > >  
-> > > -/* Called with kvm_lock held */
-> > > +/* Called with xive->lock held */
-> > >  static int xive_check_provisioning(struct kvm *kvm, u8 prio)
-> > >  {
-> > >  	struct kvmppc_xive *xive = kvm->arch.xive;  
+On Tue, May 28, 2019 at 11:11:26PM -0700, Christoph Hellwig wrote:
+> On Tue, May 28, 2019 at 04:14:45PM +0200, Andrey Konovalov wrote:
+> > Thanks for a lot of valuable input! I've read through all the replies
+> > and got somewhat lost. What are the changes I need to do to this
+> > series?
 > > 
-> > Since the kvm_lock isn't protecting kvm->arch anymore, this looks weird.  
+> > 1. Should I move untagging for memory syscalls back to the generic
+> > code so other arches would make use of it as well, or should I keep
+> > the arm64 specific memory syscalls wrappers and address the comments
+> > on that patch?
 > 
-> Are you suggesting that something that was protected before now isn't
-> with Cédric's patch?
-> 
+> It absolutely needs to move to common code.  Having arch code leads
+> to pointless (often unintentional) semantic difference between
+> architectures, and lots of boilerplate code.
 
-Hi Paul,
+That's fine by me as long as we agree on the semantics (which shouldn't
+be hard; Khalid already following up). We should probably also move the
+proposed ABI document [1] into a common place (or part of since we'll
+have arm64-specifics like prctl() calls to explicitly opt in to memory
+tagging).
 
-No I'm not. As you point out below, it is just a matter of rationalizing the
-arguments of xive_check_provisioning().
+[1] https://lore.kernel.org/lkml/20190318163533.26838-1-vincenzo.frascino@arm.com/T/#u
 
-> > Passing xive instead of kvm and using xive->kvm would make more sense IMHO.
-> > 
-> > Maybe fold the following into your patch ?  
-> 
-> As far as I can see your delta patch doesn't actually change any
-> locking but just rationalizes the parameters for an internal
-> function.  That being so, for 5.2 I am intending to put Cédric's
-> original patch in, unless someone comes up with a good reason not to.
-> 
-
-I certainly don't have such reason :)
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
-> Paul.
-
+-- 
+Catalin
