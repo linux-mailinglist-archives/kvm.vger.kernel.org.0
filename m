@@ -2,151 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D3BB2D453
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 05:40:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC1142D562
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 08:11:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725936AbfE2DkW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 May 2019 23:40:22 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:32829 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725828AbfE2DkW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 May 2019 23:40:22 -0400
-Received: by mail-qt1-f196.google.com with SMTP id 14so936750qtf.0
-        for <kvm@vger.kernel.org>; Tue, 28 May 2019 20:40:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=CA/4dQuaDckNy4AUShkfB3sMJYFzdlrvMh+cMSh6ymk=;
-        b=j1Us37almRmLXq9otqDvvBDJ/qDVMFCwJJuo5qUU4MKpYkh0/VKtC2RmyumfumwMjz
-         mMIPBlg3uxBMQvQuld+COWbixQaXUDUQyqsj7l4GtzgEPEII0k+O7Q0vyU60GAtn0QWu
-         +On11VhWzvzBYqtkNL2hcYITTQzk1NhhjPP4871j8TwUr9MbrcWel5nUJO8kYDjoAVrG
-         tOEqdlXkU3r1zsqbFlrVVdmb2mksPh1CR3VR9S5gS60DYAang5ELzrEtbxrSjI6zrE3u
-         vwNc0Xj2kVCvfSw3/6LRT1Gq7lhE96EYzhJ5ToS9+icXJ6PnyslX5tooS16lIv1rUhTi
-         6KzA==
-X-Gm-Message-State: APjAAAWrp2LSsmvfVzSwtDT02dgm4LhcW+0QJVwy5RTnRfLJ5bJMryMD
-        Mf278Jf97a5QMh1mCQAjx/ugdg==
-X-Google-Smtp-Source: APXvYqxZCW8sl4NzynuNYSnfMxxMzOniFC/UrECQYsUqP/bQUypqcvtbOQPs3tn5egFKxY8JGWz0FQ==
-X-Received: by 2002:ac8:96d:: with SMTP id z42mr90521227qth.24.1559101221644;
-        Tue, 28 May 2019 20:40:21 -0700 (PDT)
-Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net. [100.0.197.103])
-        by smtp.gmail.com with ESMTPSA id w5sm6288911qtc.50.2019.05.28.20.40.20
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 28 May 2019 20:40:20 -0700 (PDT)
-Date:   Tue, 28 May 2019 23:40:18 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Dongjiu Geng <gengdongjiu@huawei.com>
-Cc:     pbonzini@redhat.com, imammedo@redhat.com, shannon.zhaosl@gmail.com,
-        peter.maydell@linaro.org, lersek@redhat.com, james.morse@arm.com,
-        mtosatti@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
-        zhengxiang9@huawei.com, jonathan.cameron@huawei.com,
-        xuwei5@huawei.com, kvm@vger.kernel.org, qemu-devel@nongnu.org,
-        qemu-arm@nongnu.org, linuxarm@huawei.com
-Subject: Re: [PATCH v17 02/10] ACPI: add some GHES structures and macros
- definition
-Message-ID: <20190528233859-mutt-send-email-mst@kernel.org>
-References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
- <1557832703-42620-3-git-send-email-gengdongjiu@huawei.com>
+        id S1726049AbfE2GLd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 May 2019 02:11:33 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:57898 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725855AbfE2GLc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 May 2019 02:11:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=Ki8wlzJaAXUMUjbjK207hScTMszow2OB9kp3Ebyx2W4=; b=C63n5tH5sy21OVy69pE2Oeedi
+        R/8G/O4R+cqkOb+iay2A6/Ut98QvmOoVxDkFq9W2+7U/LqR+H8f2OYu4N8PPxCiXmTn6+ZCacke9R
+        NiVaBNHylJKbX5saC2PVaMZWgJI/vqUasbLHzdYAaf6JMJZnN5dnuUb+xuFqzNQ1JfxCcFuQJ4xK+
+        6qWDzjNi2j3o36d3TPB8w5XNqN0HcN+Qs09ffRNSsIKDnPfv3T/Ev6qXrq/Wr6gPHomkX4l/KvNpH
+        N2TnBmCl3vuVelWduaIB1cfkd9FE3VcX3LaRbJyskNDE+jHFkxAKB3R4p6SImibWTKLIlWDTUm7UG
+        kjPLjC7pg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hVro6-0006Yh-Is; Wed, 29 May 2019 06:11:26 +0000
+Date:   Tue, 28 May 2019 23:11:26 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Andrey Konovalov <andreyknvl@google.com>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Kees Cook <keescook@chromium.org>,
+        Evgenii Stepanov <eugenis@google.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Elliott Hughes <enh@google.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>
+Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
+Message-ID: <20190529061126.GA18124@infradead.org>
+References: <20190517144931.GA56186@arrakis.emea.arm.com>
+ <CAFKCwrj6JEtp4BzhqO178LFJepmepoMx=G+YdC8sqZ3bcBp3EQ@mail.gmail.com>
+ <20190521182932.sm4vxweuwo5ermyd@mbp>
+ <201905211633.6C0BF0C2@keescook>
+ <6049844a-65f5-f513-5b58-7141588fef2b@oracle.com>
+ <20190523201105.oifkksus4rzcwqt4@mbp>
+ <ffe58af3-7c70-d559-69f6-1f6ebcb0fec6@oracle.com>
+ <20190524101139.36yre4af22bkvatx@mbp>
+ <c6dd53d8-142b-3d8d-6a40-d21c5ee9d272@oracle.com>
+ <CAAeHK+yAUsZWhp6xPAbWewX5Nbw+-G3svUyPmhXu5MVeEDKYvA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1557832703-42620-3-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <CAAeHK+yAUsZWhp6xPAbWewX5Nbw+-G3svUyPmhXu5MVeEDKYvA@mail.gmail.com>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 14, 2019 at 04:18:15AM -0700, Dongjiu Geng wrote:
-> Add Generic Error Status Block structures and some macros
-> definitions, which is referred to the ACPI 4.0 or ACPI 6.2. The
-> HEST table generation and CPER record will use them.
+On Tue, May 28, 2019 at 04:14:45PM +0200, Andrey Konovalov wrote:
+> Thanks for a lot of valuable input! I've read through all the replies
+> and got somewhat lost. What are the changes I need to do to this
+> series?
 > 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> 1. Should I move untagging for memory syscalls back to the generic
+> code so other arches would make use of it as well, or should I keep
+> the arm64 specific memory syscalls wrappers and address the comments
+> on that patch?
 
-Are these all still used? I'd rather you moved stuff to
-where it's used.
+It absolutely needs to move to common code.  Having arch code leads
+to pointless (often unintentional) semantic difference between
+architectures, and lots of boilerplate code.
 
-
-
-> ---
->  include/hw/acpi/acpi-defs.h | 52 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 52 insertions(+)
-> 
-> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> index f9aa4bd..d1996fb 100644
-> --- a/include/hw/acpi/acpi-defs.h
-> +++ b/include/hw/acpi/acpi-defs.h
-> @@ -224,6 +224,25 @@ typedef struct AcpiMultipleApicTable AcpiMultipleApicTable;
->  #define ACPI_APIC_RESERVED              16   /* 16 and greater are reserved */
->  
->  /*
-> + * Values for Hardware Error Notification Type field
-> + */
-> +enum AcpiHestNotifyType {
-> +    ACPI_HEST_NOTIFY_POLLED = 0,
-> +    ACPI_HEST_NOTIFY_EXTERNAL = 1,
-> +    ACPI_HEST_NOTIFY_LOCAL = 2,
-> +    ACPI_HEST_NOTIFY_SCI = 3,
-> +    ACPI_HEST_NOTIFY_NMI = 4,
-> +    ACPI_HEST_NOTIFY_CMCI = 5,  /* ACPI 5.0: 18.3.2.7, Table 18-290 */
-> +    ACPI_HEST_NOTIFY_MCE = 6,   /* ACPI 5.0: 18.3.2.7, Table 18-290 */
-> +    ACPI_HEST_NOTIFY_GPIO = 7,  /* ACPI 6.0: 18.3.2.7, Table 18-332 */
-> +    ACPI_HEST_NOTIFY_SEA = 8,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
-> +    ACPI_HEST_NOTIFY_SEI = 9,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
-> +    ACPI_HEST_NOTIFY_GSIV = 10, /* ACPI 6.1: 18.3.2.9, Table 18-345 */
-> +    ACPI_HEST_NOTIFY_SDEI = 11, /* ACPI 6.2: 18.3.2.9, Table 18-383 */
-> +    ACPI_HEST_NOTIFY_RESERVED = 12 /* 12 and greater are reserved */
-> +};
-> +
-
-If there's a single user, the best thing to do
-is just to open-code with a comment that matches
-spec names. It's hard to find stuff like ACPI_HEST_NOTIFY_GSIV
-in a spec.
-
-> +/*
->   * MADT sub-structures (Follow MULTIPLE_APIC_DESCRIPTION_TABLE)
->   */
->  #define ACPI_SUB_HEADER_DEF   /* Common ACPI sub-structure header */\
-> @@ -400,6 +419,39 @@ struct AcpiSystemResourceAffinityTable {
->  } QEMU_PACKED;
->  typedef struct AcpiSystemResourceAffinityTable AcpiSystemResourceAffinityTable;
->  
-> +/*
-> + * Generic Error Status Block
-> + */
-> +struct AcpiGenericErrorStatus {
-> +    /* It is a bitmask composed of ACPI_GEBS_xxx macros */
-> +    uint32_t block_status;
-> +    uint32_t raw_data_offset;
-> +    uint32_t raw_data_length;
-> +    uint32_t data_length;
-> +    uint32_t error_severity;
-> +} QEMU_PACKED;
-> +typedef struct AcpiGenericErrorStatus AcpiGenericErrorStatus;
-> +
-> +/*
-> + * Masks for block_status flags above
-> + */
-> +#define ACPI_GEBS_UNCORRECTABLE         1
-> +
-> +/*
-> + * Values for error_severity field above
-> + */
-> +enum AcpiGenericErrorSeverity {
-> +    ACPI_CPER_SEV_RECOVERABLE,
-> +    ACPI_CPER_SEV_FATAL,
-> +    ACPI_CPER_SEV_CORRECTED,
-> +    ACPI_CPER_SEV_NONE,
-> +};
-> +
-> +/*
-> + * Generic Hardware Error Source version 2
-> + */
-> +#define ACPI_HEST_SOURCE_GENERIC_ERROR_V2    10
-> +
->  #define ACPI_SRAT_PROCESSOR_APIC     0
->  #define ACPI_SRAT_MEMORY             1
->  #define ACPI_SRAT_PROCESSOR_x2APIC   2
-> -- 
-> 1.8.3.1
+Btw, can anyone of the arm crowd or Khalid comment on the linux-mm
+thread on generic gup where I'm dealing with the pre-existing ADI
+case of pointer untagging?
