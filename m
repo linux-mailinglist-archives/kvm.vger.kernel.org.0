@@ -2,61 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E889B2D423
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 05:12:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5AF72D433
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 05:22:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726439AbfE2DMR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 May 2019 23:12:17 -0400
-Received: from mga17.intel.com ([192.55.52.151]:41169 "EHLO mga17.intel.com"
+        id S1726141AbfE2DWw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 May 2019 23:22:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58200 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725816AbfE2DMQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 May 2019 23:12:16 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 May 2019 20:12:16 -0700
-X-ExtLoop1: 1
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.245]) ([10.239.196.245])
-  by orsmga003.jf.intel.com with ESMTP; 28 May 2019 20:12:13 -0700
-Subject: Re: [PATCH v2 1/3] KVM: x86: add support for user wait instructions
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     rkrcmar@redhat.com, corbet@lwn.net, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        sean.j.christopherson@intel.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jingqi.liu@intel.com
-References: <20190524075637.29496-1-tao3.xu@intel.com>
- <20190524075637.29496-2-tao3.xu@intel.com>
- <419f62f3-69a8-7ec0-5eeb-20bed69925f2@redhat.com>
- <c1b27714-2eb8-055e-f26c-e17787d83bb6@intel.com>
- <b5daf72d-d764-baa4-8e7f-b09dff417786@redhat.com>
-From:   Tao Xu <tao3.xu@intel.com>
-Message-ID: <daf8ebd7-47bb-e4d8-fc67-38af8811000c@intel.com>
-Date:   Wed, 29 May 2019 11:12:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1725856AbfE2DWw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 May 2019 23:22:52 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D2D51308425C;
+        Wed, 29 May 2019 03:22:51 +0000 (UTC)
+Received: from [10.72.12.48] (ovpn-12-48.pek2.redhat.com [10.72.12.48])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D46731972B;
+        Wed, 29 May 2019 03:22:42 +0000 (UTC)
+Subject: Re: [PATCH 3/4] vsock/virtio: fix flush of works during the .remove()
+To:     Stefano Garzarella <sgarzare@redhat.com>, netdev@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Michael S . Tsirkin" <mst@redhat.com>
+References: <20190528105623.27983-1-sgarzare@redhat.com>
+ <20190528105623.27983-4-sgarzare@redhat.com>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <9ac9fc4b-5c39-2503-dfbb-660a7bdcfbfd@redhat.com>
+Date:   Wed, 29 May 2019 11:22:40 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <b5daf72d-d764-baa4-8e7f-b09dff417786@redhat.com>
+In-Reply-To: <20190528105623.27983-4-sgarzare@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Wed, 29 May 2019 03:22:51 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/29/2019 10:38 AM, Paolo Bonzini wrote:
-> On 29/05/19 04:05, Tao Xu wrote:
->>>
->>
->> Thank you Paolo, but I have another question. I was wondering if it is
->> appropriate to enable X86_FEATURE_WAITPKG when QEMU uses "-overcommit
->> cpu-pm=on"?
-> 
-> "-overcommit" only establishes the behavior of KVM, it doesn't change
-> the cpuid bits.  So you'd need "-cpu" as well.
-> 
-> Paolo
-> 
-OK I got it. Thank you for your review.
 
+On 2019/5/28 下午6:56, Stefano Garzarella wrote:
+> We flush all pending works before to call vdev->config->reset(vdev),
+> but other works can be queued before the vdev->config->del_vqs(vdev),
+> so we add another flush after it, to avoid use after free.
+>
+> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>   net/vmw_vsock/virtio_transport.c | 23 +++++++++++++++++------
+>   1 file changed, 17 insertions(+), 6 deletions(-)
+>
+> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> index e694df10ab61..ad093ce96693 100644
+> --- a/net/vmw_vsock/virtio_transport.c
+> +++ b/net/vmw_vsock/virtio_transport.c
+> @@ -660,6 +660,15 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>   	return ret;
+>   }
+>   
+> +static void virtio_vsock_flush_works(struct virtio_vsock *vsock)
+> +{
+> +	flush_work(&vsock->loopback_work);
+> +	flush_work(&vsock->rx_work);
+> +	flush_work(&vsock->tx_work);
+> +	flush_work(&vsock->event_work);
+> +	flush_work(&vsock->send_pkt_work);
+> +}
+> +
+>   static void virtio_vsock_remove(struct virtio_device *vdev)
+>   {
+>   	struct virtio_vsock *vsock = vdev->priv;
+> @@ -668,12 +677,6 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
+>   	mutex_lock(&the_virtio_vsock_mutex);
+>   	the_virtio_vsock = NULL;
+>   
+> -	flush_work(&vsock->loopback_work);
+> -	flush_work(&vsock->rx_work);
+> -	flush_work(&vsock->tx_work);
+> -	flush_work(&vsock->event_work);
+> -	flush_work(&vsock->send_pkt_work);
+> -
+>   	/* Reset all connected sockets when the device disappear */
+>   	vsock_for_each_connected_socket(virtio_vsock_reset_sock);
+>   
+> @@ -690,6 +693,9 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
+>   	vsock->event_run = false;
+>   	mutex_unlock(&vsock->event_lock);
+>   
+> +	/* Flush all pending works */
+> +	virtio_vsock_flush_works(vsock);
+> +
+>   	/* Flush all device writes and interrupts, device will not use any
+>   	 * more buffers.
+>   	 */
+> @@ -726,6 +732,11 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
+>   	/* Delete virtqueues and flush outstanding callbacks if any */
+>   	vdev->config->del_vqs(vdev);
+>   
+> +	/* Other works can be queued before 'config->del_vqs()', so we flush
+> +	 * all works before to free the vsock object to avoid use after free.
+> +	 */
+> +	virtio_vsock_flush_works(vsock);
+
+
+Some questions after a quick glance:
+
+1) It looks to me that the work could be queued from the path of 
+vsock_transport_cancel_pkt() . Is that synchronized here?
+
+2) If we decide to flush after dev_vqs(), is tx_run/rx_run/event_run 
+still needed? It looks to me we've already done except that we need 
+flush rx_work in the end since send_pkt_work can requeue rx_work.
+
+Thanks
+
+
+> +
+>   	kfree(vsock);
+>   	mutex_unlock(&the_virtio_vsock_mutex);
+>   }
