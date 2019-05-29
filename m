@@ -2,82 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CA572E93E
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2019 01:26:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB1CB2E96E
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2019 01:33:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726808AbfE2XZd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 May 2019 19:25:33 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:49096 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726476AbfE2XYA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 May 2019 19:24:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=Kn5wMqWy3JTU4pX5ypphe5EsBomce7cXwt2fz91hoN0=; b=GOIrKYFnz8bubQ1Qmo+Xfh4G3i
-        XpoOuYZYAJHaRhwPaSLZLDanj/a0yRVt1XpoTL6k1inyUu4XbIMo28E3nGykAF/1btwSDBousVY13
-        1dgmxiqvL7L+yUYR1k2fGmsEdHVBh31xcpKBXQEcWdp4NPTrRjuHQVjEpjBCDGEExpX4l1/+SNOxK
-        YKXhbORECPHiODD9m9KGdBn9DlkHP9nHdFwryrue76j5rvY+Yy23VE2BZM5XoP6mhYBiNcbWERxUe
-        hSOC435+IKMttTqWMyUZx620sih4ge+EVcQdKQK9Y9vhYGGRJU49LJ/uiDaRnziTQ6o4zjypW+p8Q
-        i21s2msw==;
-Received: from 177.132.232.81.dynamic.adsl.gvt.net.br ([177.132.232.81] helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hW7vL-0005Rf-4n; Wed, 29 May 2019 23:23:59 +0000
-Received: from mchehab by bombadil.infradead.org with local (Exim 4.92)
-        (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1hW7vI-0007xM-OL; Wed, 29 May 2019 20:23:56 -0300
-From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Mauro Carvalho Chehab <mchehab@infradead.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Subject: [PATCH 10/22] docs: amd-memory-encryption.rst get rid of warnings
-Date:   Wed, 29 May 2019 20:23:41 -0300
-Message-Id: <76b7a2990edd771aa1708862d0c6644a6b2d795d.1559171394.git.mchehab+samsung@kernel.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <cover.1559171394.git.mchehab+samsung@kernel.org>
-References: <cover.1559171394.git.mchehab+samsung@kernel.org>
+        id S1726652AbfE2XdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 May 2019 19:33:22 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:39476 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726189AbfE2XdW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 May 2019 19:33:22 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4TNSRIp080130;
+        Wed, 29 May 2019 23:31:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=ZeIntJUzf6RoM7jUUPQSe8jXByDyh+4YkHIeg3GAXsQ=;
+ b=IAaKB5qaUOqWsmMianN1GrQXpj9HG3cU0oz4ab6U1xB/tXO6+QR4XtP3ZMrOtiUMkOoV
+ 4E5Psrzd26xnaBWY4KxDwMtLYLrwtpzQmCqBocQFFxj26Y0zHm7WphZ5Vy7kvikFllbw
+ K8oaFQODFc4ZYWzCBXppsBGoVQwYQdQg2GW8EUlLymnnHNwmkbT5lBnfY5IXgtKbeuvb
+ fRuY8+2I/DomXosaX6EOYlvf6BUj2JvvkWAYxRpc9VIrwm5f0jD27GRQgV/1zhr4IIot
+ MQ7LFuYSpR3RENpPYFVJ87Ior67/wGNxK49Fdt541GiLuVThQPe3y929dj9OI1biQ4aK dA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2spw4tn09w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 29 May 2019 23:31:18 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4TNTqPs081158;
+        Wed, 29 May 2019 23:31:17 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3030.oracle.com with ESMTP id 2srbdxp6qf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 29 May 2019 23:31:17 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4TNV3Z4032602;
+        Wed, 29 May 2019 23:31:04 GMT
+Received: from [192.168.1.222] (/71.63.128.209)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 29 May 2019 16:31:03 -0700
+Subject: Re: [PATCH v2] mm: hwpoison: disable memory error handling on 1GB
+ hugepage
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Punit Agrawal <punit.agrawal@arm.com>,
+        Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>,
+        Anshuman Khandual <khandual@linux.vnet.ibm.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Xiao Guangrong <xiaoguangrong@tencent.com>,
+        lidongchen@tencent.com, yongkaiwu@tencent.com
+References: <20180130013919.GA19959@hori1.linux.bs1.fc.nec.co.jp>
+ <1517284444-18149-1-git-send-email-n-horiguchi@ah.jp.nec.com>
+ <87inbbjx2w.fsf@e105922-lin.cambridge.arm.com>
+ <20180207011455.GA15214@hori1.linux.bs1.fc.nec.co.jp>
+ <87fu6bfytm.fsf@e105922-lin.cambridge.arm.com>
+ <20180208121749.0ac09af2b5a143106f339f55@linux-foundation.org>
+ <87wozhvc49.fsf@concordia.ellerman.id.au>
+ <e673f38a-9e5f-21f6-421b-b3cb4ff02e91@oracle.com>
+ <CANRm+CxAgWVv5aVzQ0wdP_A7QQgqfy7nN_SxyaactG7Mnqfr2A@mail.gmail.com>
+From:   Mike Kravetz <mike.kravetz@oracle.com>
+Message-ID: <f79d828c-b0b4-8a20-c316-a13430cfb13c@oracle.com>
+Date:   Wed, 29 May 2019 16:31:01 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANRm+CxAgWVv5aVzQ0wdP_A7QQgqfy7nN_SxyaactG7Mnqfr2A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9272 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905290145
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9272 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905290146
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Get rid of those warnings:
+On 5/28/19 2:49 AM, Wanpeng Li wrote:
+> Cc Paolo,
+> Hi all,
+> On Wed, 14 Feb 2018 at 06:34, Mike Kravetz <mike.kravetz@oracle.com> wrote:
+>>
+>> On 02/12/2018 06:48 PM, Michael Ellerman wrote:
+>>> Andrew Morton <akpm@linux-foundation.org> writes:
+>>>
+>>>> On Thu, 08 Feb 2018 12:30:45 +0000 Punit Agrawal <punit.agrawal@arm.com> wrote:
+>>>>
+>>>>>>
+>>>>>> So I don't think that the above test result means that errors are properly
+>>>>>> handled, and the proposed patch should help for arm64.
+>>>>>
+>>>>> Although, the deviation of pud_huge() avoids a kernel crash the code
+>>>>> would be easier to maintain and reason about if arm64 helpers are
+>>>>> consistent with expectations by core code.
+>>>>>
+>>>>> I'll look to update the arm64 helpers once this patch gets merged. But
+>>>>> it would be helpful if there was a clear expression of semantics for
+>>>>> pud_huge() for various cases. Is there any version that can be used as
+>>>>> reference?
+>>>>
+>>>> Is that an ack or tested-by?
+>>>>
+>>>> Mike keeps plaintively asking the powerpc developers to take a look,
+>>>> but they remain steadfastly in hiding.
+>>>
+>>> Cc'ing linuxppc-dev is always a good idea :)
+>>>
+>>
+>> Thanks Michael,
+>>
+>> I was mostly concerned about use cases for soft/hard offline of huge pages
+>> larger than PMD_SIZE on powerpc.  I know that powerpc supports PGD_SIZE
+>> huge pages, and soft/hard offline support was specifically added for this.
+>> See, 94310cbcaa3c "mm/madvise: enable (soft|hard) offline of HugeTLB pages
+>> at PGD level"
+>>
+>> This patch will disable that functionality.  So, at a minimum this is a
+>> 'heads up'.  If there are actual use cases that depend on this, then more
+>> work/discussions will need to happen.  From the e-mail thread on PGD_SIZE
+>> support, I can not tell if there is a real use case or this is just a
+>> 'nice to have'.
+> 
+> 1GB hugetlbfs pages are used by DPDK and VMs in cloud deployment, we
+> encounter gup_pud_range() panic several times in product environment.
+> Is there any plan to reenable and fix arch codes?
 
-    Documentation/virtual/kvm/amd-memory-encryption.rst:244: WARNING: Citation [white-paper] is not referenced.
-    Documentation/virtual/kvm/amd-memory-encryption.rst:246: WARNING: Citation [amd-apm] is not referenced.
-    Documentation/virtual/kvm/amd-memory-encryption.rst:247: WARNING: Citation [kvm-forum] is not referenced.
+I too am aware of slightly more interest in 1G huge pages.  Suspect that as
+Intel MMU capacity increases to handle more TLB entries there will be more
+and more interest.
 
-For references that aren't mentioned at the text by adding an
-explicit reference to them.
+Personally, I am not looking at this issue.  Perhaps Naoya will comment as
+he know most about this code.
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
----
- Documentation/virtual/kvm/amd-memory-encryption.rst | 3 +++
- 1 file changed, 3 insertions(+)
+> In addition, https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/x86/kvm/mmu.c#n3213
+> The memory in guest can be 1GB/2MB/4K, though the host-backed memory
+> are 1GB hugetlbfs pages, after above PUD panic is fixed,
+> try_to_unmap() which is called in MCA recovery path will mark the PUD
+> hwpoison entry. The guest will vmexit and retry endlessly when
+> accessing any memory in the guest which is backed by this 1GB poisoned
+> hugetlbfs page. We have a plan to split this 1GB hugetblfs page by 2MB
+> hugetlbfs pages/4KB pages, maybe file remap to a virtual address range
+> which is 2MB/4KB page granularity, also split the KVM MMU 1GB SPTE
+> into 2MB/4KB and mark the offensive SPTE w/ a hwpoison flag, a sigbus
+> will be delivered to VM at page fault next time for the offensive
+> SPTE. Is this proposal acceptable?
 
-diff --git a/Documentation/virtual/kvm/amd-memory-encryption.rst b/Documentation/virtual/kvm/amd-memory-encryption.rst
-index 33d697ab8a58..6c37ff9a0a3c 100644
---- a/Documentation/virtual/kvm/amd-memory-encryption.rst
-+++ b/Documentation/virtual/kvm/amd-memory-encryption.rst
-@@ -243,6 +243,9 @@ Returns: 0 on success, -negative on error
- References
- ==========
- 
-+
-+See [white-paper]_, [api-spec]_, [amd-apm]_ and [kvm-forum]_ for more info.
-+
- .. [white-paper] http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
- .. [api-spec] http://support.amd.com/TechDocs/55766_SEV-KM_API_Specification.pdf
- .. [amd-apm] http://support.amd.com/TechDocs/24593.pdf (section 15.34)
+I am not sure of the error handling design, but this does sound reasonable.
+That block of code which potentially dissolves a huge page on memory error
+is hard to understand and I'm not sure if that is even the 'normal'
+functionality.  Certainly, we would hate to waste/poison an entire 1G page
+for an error on a small subsection.
+
 -- 
-2.21.0
-
+Mike Kravetz
