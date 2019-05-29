@@ -2,162 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DB75E2DE03
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 15:22:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87A1F2DE09
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 15:23:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726901AbfE2NWs convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 29 May 2019 09:22:48 -0400
-Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:39877 "EHLO
-        3.mo179.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726029AbfE2NWs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 May 2019 09:22:48 -0400
-Received: from player157.ha.ovh.net (unknown [10.108.57.14])
-        by mo179.mail-out.ovh.net (Postfix) with ESMTP id C03E81337B8
-        for <kvm@vger.kernel.org>; Wed, 29 May 2019 15:17:28 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player157.ha.ovh.net (Postfix) with ESMTPSA id 5905063CB146;
-        Wed, 29 May 2019 13:17:22 +0000 (UTC)
-Date:   Wed, 29 May 2019 15:17:21 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc:     Paul Mackerras <paulus@samba.org>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: PPC: Book3S HV: XIVE: do not clear IRQ data of
- passthrough interrupts
-Message-ID: <20190529151721.682b5999@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20190528121716.18419-2-clg@kaod.org>
-References: <20190528121716.18419-1-clg@kaod.org>
-        <20190528121716.18419-2-clg@kaod.org>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1727085AbfE2NXv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 May 2019 09:23:51 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:45920 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726029AbfE2NXv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 May 2019 09:23:51 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E0EF180D;
+        Wed, 29 May 2019 06:23:50 -0700 (PDT)
+Received: from mbp (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E5BC23F59C;
+        Wed, 29 May 2019 06:23:44 -0700 (PDT)
+Date:   Wed, 29 May 2019 14:23:42 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Dave Martin <Dave.Martin@arm.com>
+Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
+        linux-kselftest@vger.kernel.org,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, Dmitry Vyukov <dvyukov@google.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        linux-media@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Andrey Konovalov <andreyknvl@google.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Kostya Serebryany <kcc@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        linux-kernel@vger.kernel.org,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Andrew Murray <andrew.murray@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: Re: [PATCH v15 05/17] arms64: untag user pointers passed to memory
+ syscalls
+Message-ID: <20190529132341.27t3knoxpb7t7y3g@mbp>
+References: <cover.1557160186.git.andreyknvl@google.com>
+ <00eb4c63fefc054e2c8d626e8fedfca11d7c2600.1557160186.git.andreyknvl@google.com>
+ <20190527143719.GA59948@MBP.local>
+ <20190528145411.GA709@e119886-lin.cambridge.arm.com>
+ <20190528154057.GD32006@arrakis.emea.arm.com>
+ <20190528155644.GD28398@e103592.cambridge.arm.com>
+ <20190528163400.GE32006@arrakis.emea.arm.com>
+ <20190529124224.GE28398@e103592.cambridge.arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Ovh-Tracer-Id: 9684991002576918923
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvjedgieegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190529124224.GE28398@e103592.cambridge.arm.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 28 May 2019 14:17:15 +0200
-Cédric Le Goater <clg@kaod.org> wrote:
-
-> The passthrough interrupts are defined at the host level and their IRQ
-> data should not be cleared unless specifically deconfigured (shutdown)
-> by the host. They differ from the IPI interrupts which are allocated
-> by the XIVE KVM device and reserved to the guest usage only.
+On Wed, May 29, 2019 at 01:42:25PM +0100, Dave P Martin wrote:
+> On Tue, May 28, 2019 at 05:34:00PM +0100, Catalin Marinas wrote:
+> > On Tue, May 28, 2019 at 04:56:45PM +0100, Dave P Martin wrote:
+> > > On Tue, May 28, 2019 at 04:40:58PM +0100, Catalin Marinas wrote:
+> > > 
+> > > [...]
+> > > 
+> > > > My thoughts on allowing tags (quick look):
+> > > >
+> > > > brk - no
+> > > 
+> > > [...]
+> > > 
+> > > > mlock, mlock2, munlock - yes
+> > > > mmap - no (we may change this with MTE but not for TBI)
+> > > 
+> > > [...]
+> > > 
+> > > > mprotect - yes
+> > > 
+> > > I haven't following this discussion closely... what's the rationale for
+> > > the inconsistencies here (feel free to refer me back to the discussion
+> > > if it's elsewhere).
+> > 
+> > _My_ rationale (feel free to disagree) is that mmap() by default would
+> > not return a tagged address (ignoring MTE for now). If it gets passed a
+> > tagged address or a "tagged NULL" (for lack of a better name) we don't
+> > have clear semantics of whether the returned address should be tagged in
+> > this ABI relaxation. I'd rather reserve this specific behaviour if we
+> > overload the non-zero tag meaning of mmap() for MTE. Similar reasoning
+> > for mremap(), at least on the new_address argument (not entirely sure
+> > about old_address).
+> > 
+> > munmap() should probably follow the mmap() rules.
+> > 
+> > As for brk(), I don't see why the user would need to pass a tagged
+> > address, we can't associate any meaning to this tag.
+> > 
+> > For the rest, since it's likely such addresses would have been tagged by
+> > malloc() in user space, we should allow tagged pointers.
 > 
-> This fixes a host crash when destroying a VM in which a PCI adapter
-> was passed-through. In this case, the interrupt is cleared and freed
-> by the KVM device and then shutdown by vfio at the host level.
+> Those arguments seem reasonable.  We should try to capture this
+> somewhere when documenting the ABI.
 > 
-> [ 1007.360265] BUG: Kernel NULL pointer dereference at 0x00000d00
-> [ 1007.360285] Faulting instruction address: 0xc00000000009da34
-> [ 1007.360296] Oops: Kernel access of bad area, sig: 7 [#1]
-> [ 1007.360303] LE PAGE_SIZE=64K MMU=Radix MMU=Hash SMP NR_CPUS=2048 NUMA PowerNV
-> [ 1007.360314] Modules linked in: vhost_net vhost iptable_mangle ipt_MASQUERADE iptable_nat nf_nat xt_conntrack nf_conntrack nf_defrag_ipv4 ipt_REJECT nf_reject_ipv4 tun bridge stp llc kvm_hv kvm xt_tcpudp iptable_filter squashfs fuse binfmt_misc vmx_crypto ib_iser rdma_cm iw_cm ib_cm libiscsi scsi_transport_iscsi nfsd ip_tables x_tables autofs4 btrfs zstd_decompress zstd_compress lzo_compress raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq multipath mlx5_ib ib_uverbs ib_core crc32c_vpmsum mlx5_core
-> [ 1007.360425] CPU: 9 PID: 15576 Comm: CPU 18/KVM Kdump: loaded Not tainted 5.1.0-gad7e7d0ef #4
-> [ 1007.360454] NIP:  c00000000009da34 LR: c00000000009e50c CTR: c00000000009e5d0
-> [ 1007.360482] REGS: c000007f24ccf330 TRAP: 0300   Not tainted  (5.1.0-gad7e7d0ef)
-> [ 1007.360500] MSR:  900000000280b033 <SF,HV,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>  CR: 24002484  XER: 00000000
-> [ 1007.360532] CFAR: c00000000009da10 DAR: 0000000000000d00 DSISR: 00080000 IRQMASK: 1
-> [ 1007.360532] GPR00: c00000000009e62c c000007f24ccf5c0 c000000001510600 c000007fe7f947c0
-> [ 1007.360532] GPR04: 0000000000000d00 0000000000000000 0000000000000000 c000005eff02d200
-> [ 1007.360532] GPR08: 0000000000400000 0000000000000000 0000000000000000 fffffffffffffffd
-> [ 1007.360532] GPR12: c00000000009e5d0 c000007fffff7b00 0000000000000031 000000012c345718
-> [ 1007.360532] GPR16: 0000000000000000 0000000000000008 0000000000418004 0000000000040100
-> [ 1007.360532] GPR20: 0000000000000000 0000000008430000 00000000003c0000 0000000000000027
-> [ 1007.360532] GPR24: 00000000000000ff 0000000000000000 00000000000000ff c000007faa90d98c
-> [ 1007.360532] GPR28: c000007faa90da40 00000000000fe040 ffffffffffffffff c000007fe7f947c0
-> [ 1007.360689] NIP [c00000000009da34] xive_esb_read+0x34/0x120
-> [ 1007.360706] LR [c00000000009e50c] xive_do_source_set_mask.part.0+0x2c/0x50
-> [ 1007.360732] Call Trace:
-> [ 1007.360738] [c000007f24ccf5c0] [c000000000a6383c] snooze_loop+0x15c/0x270 (unreliable)
-> [ 1007.360775] [c000007f24ccf5f0] [c00000000009e62c] xive_irq_shutdown+0x5c/0xe0
-> [ 1007.360795] [c000007f24ccf630] [c00000000019e4a0] irq_shutdown+0x60/0xe0
-> [ 1007.360813] [c000007f24ccf660] [c000000000198c44] __free_irq+0x3a4/0x420
-> [ 1007.360831] [c000007f24ccf700] [c000000000198dc8] free_irq+0x78/0xe0
-> [ 1007.360849] [c000007f24ccf730] [c00000000096c5a8] vfio_msi_set_vector_signal+0xa8/0x350
-> [ 1007.360878] [c000007f24ccf7f0] [c00000000096c938] vfio_msi_set_block+0xe8/0x1e0
-> [ 1007.360899] [c000007f24ccf850] [c00000000096cae0] vfio_msi_disable+0xb0/0x110
-> [ 1007.360912] [c000007f24ccf8a0] [c00000000096cd04] vfio_pci_set_msi_trigger+0x1c4/0x3d0
-> [ 1007.360922] [c000007f24ccf910] [c00000000096d910] vfio_pci_set_irqs_ioctl+0xa0/0x170
-> [ 1007.360941] [c000007f24ccf930] [c00000000096b400] vfio_pci_disable+0x80/0x5e0
-> [ 1007.360963] [c000007f24ccfa10] [c00000000096b9bc] vfio_pci_release+0x5c/0x90
-> [ 1007.360991] [c000007f24ccfa40] [c000000000963a9c] vfio_device_fops_release+0x3c/0x70
-> [ 1007.361012] [c000007f24ccfa70] [c0000000003b5668] __fput+0xc8/0x2b0
-> [ 1007.361040] [c000007f24ccfac0] [c0000000001409b0] task_work_run+0x140/0x1b0
-> [ 1007.361059] [c000007f24ccfb20] [c000000000118f8c] do_exit+0x3ac/0xd00
-> [ 1007.361076] [c000007f24ccfc00] [c0000000001199b0] do_group_exit+0x60/0x100
-> [ 1007.361094] [c000007f24ccfc40] [c00000000012b514] get_signal+0x1a4/0x8f0
-> [ 1007.361112] [c000007f24ccfd30] [c000000000021cc8] do_notify_resume+0x1a8/0x430
-> [ 1007.361141] [c000007f24ccfe20] [c00000000000e444] ret_from_except_lite+0x70/0x74
-> [ 1007.361159] Instruction dump:
-> [ 1007.361175] 38422c00 e9230000 712a0004 41820010 548a2036 7d442378 78840020 71290020
-> [ 1007.361194] 4082004c e9230010 7c892214 7c0004ac <e9240000> 0c090000 4c00012c 792a0022
+> To be clear, I'm not sure that we should guarantee anywhere that a
+> tagged pointer is rejected: rather the behaviour should probably be
+> left unspecified.  Then we can tidy it up incrementally.
 > 
-> Fixes: 5af50993850a ("KVM: PPC: Book3S HV: Native usage of the XIVE interrupt controller")
+> (The behaviour is unspecified today, in any case.)
 
-Maybe worth adding:
+What is specified (or rather de-facto ABI) today is that passing a user
+address above TASK_SIZE (e.g. non-zero top byte) would fail in most
+cases. If we relax this with the TBI we may end up with some de-facto
+ABI before we actually get MTE hardware. Tightening it afterwards may be
+slightly more problematic, although MTE needs to be an explicit opt-in.
 
-Cc: stable@vger.kernel.org # v4.12+
+IOW, I wouldn't want to unnecessarily relax the ABI if we don't need to.
 
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  arch/powerpc/kvm/book3s_xive.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_xive.c b/arch/powerpc/kvm/book3s_xive.c
-> index 12c8a36dd980..922fd62bcd2a 100644
-> --- a/arch/powerpc/kvm/book3s_xive.c
-> +++ b/arch/powerpc/kvm/book3s_xive.c
-> @@ -1828,7 +1828,6 @@ static void kvmppc_xive_cleanup_irq(u32 hw_num, struct xive_irq_data *xd)
->  {
->  	xive_vm_esb_load(xd, XIVE_ESB_SET_PQ_01);
->  	xive_native_configure_irq(hw_num, 0, MASKED, 0);
-> -	xive_cleanup_irq_data(xd);
->  }
->  
->  void kvmppc_xive_free_sources(struct kvmppc_xive_src_block *sb)
-> @@ -1842,9 +1841,10 @@ void kvmppc_xive_free_sources(struct kvmppc_xive_src_block *sb)
->  			continue;
->  
->  		kvmppc_xive_cleanup_irq(state->ipi_number, &state->ipi_data);
-> +		xive_cleanup_irq_data(&state->ipi_data);
->  		xive_native_free_irq(state->ipi_number);
->  
-> -		/* Pass-through, cleanup too */
-> +		/* Pass-through, cleanup too but keep IRQ hw data */
->  		if (state->pt_number)
->  			kvmppc_xive_cleanup_irq(state->pt_number, state->pt_data);
->  
-
-Also, even if this definitely allows to avoid the crash, I'm still not
-convinced we should be calling kvmppc_xive_cleanup_irq() for pass-through
-at all.
-
-My concern is that kvmppc_xive_clr_mapped() which gets called when VFIO shuts
-the interrupt down seems to be doing extra stuff to release the pass-through
-interrupt back to the host. But when the KVM device gets released before VFIO
-had a chance to do that, kvmppc_xive_clr_mapped() is a nop since both
-kvmppc_xive_release() and kvmppc_xive_native_release() set kvm.arch->xive to
-NULL. This triggers the following warning in the xics-on-xive case:
-
-[25185.218975] kvmppc_clr_passthru_irq (irq 94, gsi 4870) fails: -19
-
-I'm wondering if we should do this extra stuff from kvmppc_xive_clr_mapped()
-as well when closing the KVM device instead of clearing the interrupt as the
-we do now.
-
-This needs some more investigation.
-
-Cheers,
-
---
-Greg
+-- 
+Catalin
