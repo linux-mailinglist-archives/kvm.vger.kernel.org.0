@@ -2,104 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C85512E20D
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 18:12:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 645EE2DB45
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 12:58:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726759AbfE2QMT convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 29 May 2019 12:12:19 -0400
-Received: from 14.mo7.mail-out.ovh.net ([178.33.251.19]:41831 "EHLO
-        14.mo7.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726062AbfE2QMT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 May 2019 12:12:19 -0400
-Received: from player787.ha.ovh.net (unknown [10.109.160.232])
-        by mo7.mail-out.ovh.net (Postfix) with ESMTP id A1C9311F4B9
-        for <kvm@vger.kernel.org>; Wed, 29 May 2019 11:07:05 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net [82.253.208.248])
-        (Authenticated sender: groug@kaod.org)
-        by player787.ha.ovh.net (Postfix) with ESMTPSA id C360F663451E;
-        Wed, 29 May 2019 09:06:58 +0000 (UTC)
-Date:   Wed, 29 May 2019 11:06:57 +0200
-From:   Greg Kurz <groug@kaod.org>
-To:     =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc:     Paul Mackerras <paulus@samba.org>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: XIVE: fix page offset when
- clearing ESB pages
-Message-ID: <20190529110657.2dbd1d72@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20190528211324.18656-1-clg@kaod.org>
-References: <20190528211324.18656-1-clg@kaod.org>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1726054AbfE2K6i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 May 2019 06:58:38 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:34272 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725990AbfE2K6i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 May 2019 06:58:38 -0400
+Received: by mail-wm1-f68.google.com with SMTP id e19so4061101wme.1
+        for <kvm@vger.kernel.org>; Wed, 29 May 2019 03:58:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=4gM+INWJgv9FdjldlOiqfPQs/3KoKbaQl3oay9t+Fsc=;
+        b=McBhI47AQfKDfhYmzI7CYBde2LjM7lxLQJt9K0t2AJmdyGTgPkr3meAFja+65SI5yi
+         QwG5o7oVc3LBwPhRaUSz6APc56v5MNCGyZWR1ZzD9en9ak6agymTcdOPsGgKDe5MsdaQ
+         PmfrMw2PEu+GraJO0WzrLZ9GjKZzp4ZhhtGtT9KFEU5hqJoIEyg0TWsA/akweQ0wd/TO
+         zQmH/BFcV8JWbYtEXgs2Q2gFw72J0HaPCzX8ACtq+IFS2TjY9mbqkOOAm5rIoa4ixKKo
+         97Fgryciu/LPFQyWbo209D/KZm/PJr8afdXQuj4PtwsQBBpKzx7BaCr50qBLbeLFoYdU
+         WZ4Q==
+X-Gm-Message-State: APjAAAWUmu15DLaPZzMRHCWC7th2CH/xZQ6kcSswnoU3ENdLff390KzU
+        YfnIUwl/E+xB79K94AAz65UXFg==
+X-Google-Smtp-Source: APXvYqx8DFltvKkXywu9P2M63vLL0b9huUgQDGKM0bNckHf+CE/QRL47FPbLHu0JlvqcBJyV8vRuLQ==
+X-Received: by 2002:a1c:acc8:: with SMTP id v191mr6597928wme.177.1559127515682;
+        Wed, 29 May 2019 03:58:35 -0700 (PDT)
+Received: from steredhat (host253-229-dynamic.248-95-r.retail.telecomitalia.it. [95.248.229.253])
+        by smtp.gmail.com with ESMTPSA id j123sm9038134wmb.32.2019.05.29.03.58.34
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Wed, 29 May 2019 03:58:34 -0700 (PDT)
+Date:   Wed, 29 May 2019 12:58:32 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Michael S . Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH 3/4] vsock/virtio: fix flush of works during the .remove()
+Message-ID: <20190529105832.oz3sagbne5teq3nt@steredhat>
+References: <20190528105623.27983-1-sgarzare@redhat.com>
+ <20190528105623.27983-4-sgarzare@redhat.com>
+ <9ac9fc4b-5c39-2503-dfbb-660a7bdcfbfd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Ovh-Tracer-Id: 5456392424164596107
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvjedgudefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9ac9fc4b-5c39-2503-dfbb-660a7bdcfbfd@redhat.com>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 28 May 2019 23:13:24 +0200
-Cédric Le Goater <clg@kaod.org> wrote:
-
-> Under XIVE, the ESB pages of an interrupt are used for interrupt
-> management (EOI) and triggering. They are made available to guests
-> through a mapping of the XIVE KVM device.
+On Wed, May 29, 2019 at 11:22:40AM +0800, Jason Wang wrote:
 > 
-> When a device is passed-through, the passthru_irq helpers,
-> kvmppc_xive_set_mapped() and kvmppc_xive_clr_mapped(), clear the ESB
-> pages of the guest IRQ number being mapped and let the VM fault
-> handler repopulate with the correct page.
+> On 2019/5/28 下午6:56, Stefano Garzarella wrote:
+> > We flush all pending works before to call vdev->config->reset(vdev),
+> > but other works can be queued before the vdev->config->del_vqs(vdev),
+> > so we add another flush after it, to avoid use after free.
+> > 
+> > Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > ---
+> >   net/vmw_vsock/virtio_transport.c | 23 +++++++++++++++++------
+> >   1 file changed, 17 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> > index e694df10ab61..ad093ce96693 100644
+> > --- a/net/vmw_vsock/virtio_transport.c
+> > +++ b/net/vmw_vsock/virtio_transport.c
+> > @@ -660,6 +660,15 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+> >   	return ret;
+> >   }
+> > +static void virtio_vsock_flush_works(struct virtio_vsock *vsock)
+> > +{
+> > +	flush_work(&vsock->loopback_work);
+> > +	flush_work(&vsock->rx_work);
+> > +	flush_work(&vsock->tx_work);
+> > +	flush_work(&vsock->event_work);
+> > +	flush_work(&vsock->send_pkt_work);
+> > +}
+> > +
+> >   static void virtio_vsock_remove(struct virtio_device *vdev)
+> >   {
+> >   	struct virtio_vsock *vsock = vdev->priv;
+> > @@ -668,12 +677,6 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
+> >   	mutex_lock(&the_virtio_vsock_mutex);
+> >   	the_virtio_vsock = NULL;
+> > -	flush_work(&vsock->loopback_work);
+> > -	flush_work(&vsock->rx_work);
+> > -	flush_work(&vsock->tx_work);
+> > -	flush_work(&vsock->event_work);
+> > -	flush_work(&vsock->send_pkt_work);
+> > -
+> >   	/* Reset all connected sockets when the device disappear */
+> >   	vsock_for_each_connected_socket(virtio_vsock_reset_sock);
+> > @@ -690,6 +693,9 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
+> >   	vsock->event_run = false;
+> >   	mutex_unlock(&vsock->event_lock);
+> > +	/* Flush all pending works */
+> > +	virtio_vsock_flush_works(vsock);
+> > +
+> >   	/* Flush all device writes and interrupts, device will not use any
+> >   	 * more buffers.
+> >   	 */
+> > @@ -726,6 +732,11 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
+> >   	/* Delete virtqueues and flush outstanding callbacks if any */
+> >   	vdev->config->del_vqs(vdev);
+> > +	/* Other works can be queued before 'config->del_vqs()', so we flush
+> > +	 * all works before to free the vsock object to avoid use after free.
+> > +	 */
+> > +	virtio_vsock_flush_works(vsock);
 > 
-> The ESB pages are mapped at offset 4 (KVM_XIVE_ESB_PAGE_OFFSET) in the
-> KVM device mapping. Unfortunately, this offset was not taken into
-> account when clearing the pages. This lead to issues with the
-
-Good catch ! :)
-
-Reviwed-by: Greg Kurz <groug@kaod.org>
-
-> passthrough devices for which the interrupts were not functional under
-> some guest configuration (tg3 and single CPU) or in any configuration
-
-And this patch fixes my tg3 use case.
-
-Tested-by: Greg Kurz <groug@kaod.org>
-
-> (e1000e adapter).
 > 
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> ---
+> Some questions after a quick glance:
 > 
->  if unmap_mapping_pages() could be called from a module, we would
->  simplify a bit this code.
-> 
->  arch/powerpc/kvm/book3s_xive_native.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/powerpc/kvm/book3s_xive_native.c b/arch/powerpc/kvm/book3s_xive_native.c
-> index 8b762e3ebbc5..5596c8ec221a 100644
-> --- a/arch/powerpc/kvm/book3s_xive_native.c
-> +++ b/arch/powerpc/kvm/book3s_xive_native.c
-> @@ -172,6 +172,7 @@ int kvmppc_xive_native_connect_vcpu(struct kvm_device *dev,
->  static int kvmppc_xive_native_reset_mapped(struct kvm *kvm, unsigned long irq)
->  {
->  	struct kvmppc_xive *xive = kvm->arch.xive;
-> +	pgoff_t esb_pgoff = KVM_XIVE_ESB_PAGE_OFFSET + irq * 2;
->  
->  	if (irq >= KVMPPC_XIVE_NR_IRQS)
->  		return -EINVAL;
-> @@ -185,7 +186,7 @@ static int kvmppc_xive_native_reset_mapped(struct kvm *kvm, unsigned long irq)
->  	mutex_lock(&xive->mapping_lock);
->  	if (xive->mapping)
->  		unmap_mapping_range(xive->mapping,
-> -				    irq * (2ull << PAGE_SHIFT),
-> +				    esb_pgoff << PAGE_SHIFT,
->  				    2ull << PAGE_SHIFT, 1);
->  	mutex_unlock(&xive->mapping_lock);
->  	return 0;
+> 1) It looks to me that the work could be queued from the path of
+> vsock_transport_cancel_pkt() . Is that synchronized here?
+>
 
+Both virtio_transport_send_pkt() and vsock_transport_cancel_pkt() can
+queue work from the upper layer (socket).
+
+Setting the_virtio_vsock to NULL, should synchronize, but after a careful look
+a rare issue could happen:
+we are setting the_virtio_vsock to NULL at the start of .remove() and we
+are freeing the object pointed by it at the end of .remove(), so
+virtio_transport_send_pkt() or vsock_transport_cancel_pkt() may still be
+running, accessing the object that we are freed.
+
+Should I use something like RCU to prevent this issue?
+
+    virtio_transport_send_pkt() and vsock_transport_cancel_pkt()
+    {
+        rcu_read_lock();
+        vsock = rcu_dereference(the_virtio_vsock_mutex);
+        ...
+        rcu_read_unlock();
+    }
+
+    virtio_vsock_remove()
+    {
+        rcu_assign_pointer(the_virtio_vsock_mutex, NULL);
+        synchronize_rcu();
+
+        ...
+
+        free(vsock);
+    }
+
+Could there be a better approach?
+
+
+> 2) If we decide to flush after dev_vqs(), is tx_run/rx_run/event_run still
+> needed? It looks to me we've already done except that we need flush rx_work
+> in the end since send_pkt_work can requeue rx_work.
+
+The main reason of tx_run/rx_run/event_run is to prevent that a worker
+function is running while we are calling config->reset().
+
+E.g. if an interrupt comes between virtio_vsock_flush_works() and
+config->reset(), it can queue new works that can access the device while
+we are in config->reset().
+
+IMHO they are still needed.
+
+What do you think?
+
+
+Thanks for your questions,
+Stefano
