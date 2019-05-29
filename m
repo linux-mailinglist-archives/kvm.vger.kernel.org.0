@@ -2,84 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A64492DD19
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 14:30:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 877D72DD5A
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 14:42:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726901AbfE2Ma4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 May 2019 08:30:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46390 "EHLO mx1.redhat.com"
+        id S1727058AbfE2Mme (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 May 2019 08:42:34 -0400
+Received: from foss.arm.com ([217.140.101.70]:45328 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726581AbfE2Ma4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 May 2019 08:30:56 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C8A0D30C318A;
-        Wed, 29 May 2019 12:30:55 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 73D921972C;
-        Wed, 29 May 2019 12:30:49 +0000 (UTC)
-Date:   Wed, 29 May 2019 14:30:47 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Michael Mueller <mimu@linux.ibm.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        KVM Mailing List <kvm@vger.kernel.org>,
-        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>
-Subject: Re: [PATCH v2 3/8] s390/cio: add basic protected virtualization
- support
-Message-ID: <20190529143047.35b5c7d3.cohuck@redhat.com>
-In-Reply-To: <e794bad2-5fc2-b30c-972e-b586770a0065@linux.ibm.com>
-References: <20190523162209.9543-1-mimu@linux.ibm.com>
-        <20190523162209.9543-4-mimu@linux.ibm.com>
-        <20190527123802.54cd3589.cohuck@redhat.com>
-        <20190527143014.3b48a0d2.pasic@linux.ibm.com>
-        <20190527153130.0f473ffd.cohuck@redhat.com>
-        <e794bad2-5fc2-b30c-972e-b586770a0065@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1726029AbfE2Mme (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 May 2019 08:42:34 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B58780D;
+        Wed, 29 May 2019 05:42:33 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DEF043F59C;
+        Wed, 29 May 2019 05:42:27 -0700 (PDT)
+Date:   Wed, 29 May 2019 13:42:25 +0100
+From:   Dave Martin <Dave.Martin@arm.com>
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
+        linux-kselftest@vger.kernel.org,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, Dmitry Vyukov <dvyukov@google.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        linux-media@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Andrey Konovalov <andreyknvl@google.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Kostya Serebryany <kcc@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        linux-kernel@vger.kernel.org,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Andrew Murray <andrew.murray@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: Re: [PATCH v15 05/17] arms64: untag user pointers passed to memory
+ syscalls
+Message-ID: <20190529124224.GE28398@e103592.cambridge.arm.com>
+References: <cover.1557160186.git.andreyknvl@google.com>
+ <00eb4c63fefc054e2c8d626e8fedfca11d7c2600.1557160186.git.andreyknvl@google.com>
+ <20190527143719.GA59948@MBP.local>
+ <20190528145411.GA709@e119886-lin.cambridge.arm.com>
+ <20190528154057.GD32006@arrakis.emea.arm.com>
+ <20190528155644.GD28398@e103592.cambridge.arm.com>
+ <20190528163400.GE32006@arrakis.emea.arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Wed, 29 May 2019 12:30:56 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190528163400.GE32006@arrakis.emea.arm.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 29 May 2019 14:24:39 +0200
-Michael Mueller <mimu@linux.ibm.com> wrote:
-
-> On 27.05.19 15:31, Cornelia Huck wrote:
-
-> > To actually make the guest use the 3270 as its console, I guess you
-> > need to explicitly force it (see
-> > https://wiki.qemu.org/Features/3270#Using_3270_as_the_console)...
-> > actually starting the console will almost certainly fail; but you can
-> > at least check whether device recognition in the console path works.
-> >   
-> >>
-> >> Mimu, do we have something more elaborate with regards to this?  
+On Tue, May 28, 2019 at 05:34:00PM +0100, Catalin Marinas wrote:
+> On Tue, May 28, 2019 at 04:56:45PM +0100, Dave P Martin wrote:
+> > On Tue, May 28, 2019 at 04:40:58PM +0100, Catalin Marinas wrote:
+> > 
+> > [...]
+> > 
+> > > My thoughts on allowing tags (quick look):
+> > >
+> > > brk - no
+> > 
+> > [...]
+> > 
+> > > mlock, mlock2, munlock - yes
+> > > mmap - no (we may change this with MTE but not for TBI)
+> > 
+> > [...]
+> > 
+> > > mprotect - yes
+> > 
+> > I haven't following this discussion closely... what's the rationale for
+> > the inconsistencies here (feel free to refer me back to the discussion
+> > if it's elsewhere).
 > 
-> I ran that with success
+> _My_ rationale (feel free to disagree) is that mmap() by default would
+> not return a tagged address (ignoring MTE for now). If it gets passed a
+> tagged address or a "tagged NULL" (for lack of a better name) we don't
+> have clear semantics of whether the returned address should be tagged in
+> this ABI relaxation. I'd rather reserve this specific behaviour if we
+> overload the non-zero tag meaning of mmap() for MTE. Similar reasoning
+> for mremap(), at least on the new_address argument (not entirely sure
+> about old_address).
 > 
-> [root@ap01 ~]# lscss | grep 3270
-> 0.0.002a 0.0.0008  0000/00 3270/00 yes  80  80  ff   01000000 00000000
+> munmap() should probably follow the mmap() rules.
 > 
-> and was able to connect and login.
+> As for brk(), I don't see why the user would need to pass a tagged
+> address, we can't associate any meaning to this tag.
+> 
+> For the rest, since it's likely such addresses would have been tagged by
+> malloc() in user space, we should allow tagged pointers.
 
-Oh, cool. I'm actually a bit surprised this works without additional
-changes to the 3270 code :)
+Those arguments seem reasonable.  We should try to capture this
+somewhere when documenting the ABI.
+
+To be clear, I'm not sure that we should guarantee anywhere that a
+tagged pointer is rejected: rather the behaviour should probably be
+left unspecified.  Then we can tidy it up incrementally.
+
+(The behaviour is unspecified today, in any case.)
+
+Cheers
+---Dave
