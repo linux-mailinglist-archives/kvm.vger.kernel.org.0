@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 876562D394
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 04:07:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A32172D3CB
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 04:27:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726275AbfE2CHl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 May 2019 22:07:41 -0400
-Received: from mga07.intel.com ([134.134.136.100]:46297 "EHLO mga07.intel.com"
+        id S1726399AbfE2C1g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 May 2019 22:27:36 -0400
+Received: from mga01.intel.com ([192.55.52.88]:41957 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725816AbfE2CHl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 May 2019 22:07:41 -0400
+        id S1725816AbfE2C1g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 May 2019 22:27:36 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 May 2019 19:07:40 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 May 2019 19:27:35 -0700
 X-ExtLoop1: 1
 Received: from shzintpr04.sh.intel.com (HELO [0.0.0.0]) ([10.239.4.101])
-  by orsmga001.jf.intel.com with ESMTP; 28 May 2019 19:07:37 -0700
-Subject: Re: [PATCH v2 1/3] KVM: x86: add support for user wait instructions
+  by orsmga001.jf.intel.com with ESMTP; 28 May 2019 19:27:32 -0700
+Subject: Re: [PATCH v2 3/3] KVM: vmx: handle vm-exit for UMWAIT and TPAUSE
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     rkrcmar@redhat.com, corbet@lwn.net, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
@@ -26,15 +26,15 @@ Cc:     rkrcmar@redhat.com, corbet@lwn.net, tglx@linutronix.de,
         kvm@vger.kernel.org, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org, jingqi.liu@intel.com
 References: <20190524075637.29496-1-tao3.xu@intel.com>
- <20190524075637.29496-2-tao3.xu@intel.com>
- <419f62f3-69a8-7ec0-5eeb-20bed69925f2@redhat.com>
+ <20190524075637.29496-4-tao3.xu@intel.com>
+ <b0958339-b23c-dd9d-8673-aae098769738@redhat.com>
 From:   Tao Xu <tao3.xu@intel.com>
-Message-ID: <c1b27714-2eb8-055e-f26c-e17787d83bb6@intel.com>
-Date:   Wed, 29 May 2019 10:05:19 +0800
+Message-ID: <a2b463ee-c032-555e-b012-184e4f4753f1@intel.com>
+Date:   Wed, 29 May 2019 10:25:14 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <419f62f3-69a8-7ec0-5eeb-20bed69925f2@redhat.com>
+In-Reply-To: <b0958339-b23c-dd9d-8673-aae098769738@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -43,31 +43,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 29/05/2019 09:24, Paolo Bonzini wrote:
+On 29/05/2019 09:28, Paolo Bonzini wrote:
 > On 24/05/19 09:56, Tao Xu wrote:
->> +7.19 KVM_CAP_ENABLE_USR_WAIT_PAUSE
->> +
->> +Architectures: x86
->> +Parameters: args[0] whether feature should be enabled or not
->> +
->> +With this capability enabled, a VM can use UMONITOR, UMWAIT and TPAUSE
->> +instructions. If the instruction causes a delay, the amount of
->> +time delayed is called here the physical delay. The physical delay is
->> +first computed by determining the virtual delay (the time to delay
->> +relative to the VM’s timestamp counter). Otherwise, UMONITOR, UMWAIT
->> +and TPAUSE cause an invalid-opcode exception(#UD).
->> +
+>> As the latest Intel 64 and IA-32 Architectures Software Developer's
+>> Manual, UMWAIT and TPAUSE instructions cause a VM exit if the
+>> “RDTSC exiting” and “enable user wait and pause” VM-execution controls
+>> are both 1.
+>>
+>> This patch is to handle the vm-exit for UMWAIT and TPAUSE as invalid_op.
 > 
-> There is no need to make it a capability.  You can just check the guest
-> CPUID and see if it includes X86_FEATURE_WAITPKG.
+> KVM never enables RDTSC exiting, so this is not necessary.
 > 
 > Paolo
 > 
+OK, but should we just drop this patch?
+Or add the VMX_EXIT_REASONS bits of UMWAIT and TPAUSE and handle like 
+XSAVES/XRSTORS:
+"kvm_skip_emulated_instruction(vcpu);"
+"WARN(1, "this should never happen\n");"
 
-Thank you Paolo, but I have another question. I was wondering if it is 
-appropriate to enable X86_FEATURE_WAITPKG when QEMU uses "-overcommit 
-cpu-pm=on"? Or just enable X86_FEATURE_WAITPKG when QEMU add the feature 
-"-cpu host,+waitpkg"? User wait instructions is the wait or pause 
-instructions may be executed at any privilege level, but can use 
-IA32_UMWAIT_CONTROL to set the maximum time.
+Looking forward to your reply.
+
+Tao
