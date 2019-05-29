@@ -2,87 +2,281 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BDD42E024
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 16:50:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9E9E2E051
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 16:56:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726323AbfE2Ouy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 May 2019 10:50:54 -0400
-Received: from foss.arm.com ([217.140.101.70]:47398 "EHLO foss.arm.com"
+        id S1726326AbfE2O4f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 May 2019 10:56:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45760 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726012AbfE2Ouy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 May 2019 10:50:54 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E9F4C341;
-        Wed, 29 May 2019 07:50:53 -0700 (PDT)
-Received: from [10.1.196.129] (ostrya.cambridge.arm.com [10.1.196.129])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A08D3F5AF;
-        Wed, 29 May 2019 07:50:53 -0700 (PDT)
-Subject: Re: [PATCH kvmtool 4/4] virtio/blk: Avoid taking pointer to packed
- struct
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Will Deacon <Will.Deacon@arm.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <20190503171544.260901-1-andre.przywara@arm.com>
- <20190503171544.260901-5-andre.przywara@arm.com>
-From:   Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Message-ID: <67f7f667-b3b5-2d6a-d148-d8af61c1d90d@arm.com>
-Date:   Wed, 29 May 2019 15:50:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726238AbfE2O4e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 May 2019 10:56:34 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4C19F6EB87;
+        Wed, 29 May 2019 14:56:34 +0000 (UTC)
+Received: from x1.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C8CF75B681;
+        Wed, 29 May 2019 14:56:33 +0000 (UTC)
+Date:   Wed, 29 May 2019 08:56:33 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Parav Pandit <parav@mellanox.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cohuck@redhat.com, kwankhede@nvidia.com, cjia@nvidia.com
+Subject: Re: [PATCHv4 3/3] vfio/mdev: Synchronize device create/remove with
+ parent removal
+Message-ID: <20190529085633.7fcdf7d2@x1.home>
+In-Reply-To: <20190524135738.54862-4-parav@mellanox.com>
+References: <20190524135738.54862-1-parav@mellanox.com>
+        <20190524135738.54862-4-parav@mellanox.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20190503171544.260901-5-andre.przywara@arm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Wed, 29 May 2019 14:56:34 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/05/2019 18:15, Andre Przywara wrote:
-> clang and GCC9 refuse to compile virtio/blk.c with the following message:
-> virtio/blk.c:161:37: error: taking address of packed member 'geometry' of class
->       or structure 'virtio_blk_config' may result in an unaligned pointer value
->       [-Werror,-Waddress-of-packed-member]
->         struct virtio_blk_geometry *geo = &conf->geometry;
+On Fri, 24 May 2019 08:57:38 -0500
+Parav Pandit <parav@mellanox.com> wrote:
+
+> In following sequences, child devices created while removing mdev parent
+> device can be left out, or it may lead to race of removing half
+> initialized child mdev devices.
 > 
-> Since struct virtio_blk_geometry is in a kernel header, we can't do much
-> about the packed attribute, but as Peter pointed out, the solution is
-> rather simple: just get rid of the convenience variable and use the
-> original struct member directly.
+> issue-1:
+> --------
+>        cpu-0                         cpu-1
+>        -----                         -----
+>                                   mdev_unregister_device()
+>                                     device_for_each_child()
+>                                       mdev_device_remove_cb()
+>                                         mdev_device_remove()
+> create_store()
+>   mdev_device_create()                   [...]
+>     device_add()
+>                                   parent_remove_sysfs_files()
 > 
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-
-Reviewed-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-
-I just encountered this one with GCC 9.1
-
+> /* BUG: device added by cpu-0
+>  * whose parent is getting removed
+>  * and it won't process this mdev.
+>  */
+> 
+> issue-2:
+> --------
+> Below crash is observed when user initiated remove is in progress
+> and mdev_unregister_driver() completes parent unregistration.
+> 
+>        cpu-0                         cpu-1
+>        -----                         -----
+> remove_store()
+>    mdev_device_remove()
+>    active = false;
+>                                   mdev_unregister_device()
+>                                   parent device removed.
+>    [...]
+>    parents->ops->remove()
+>  /*
+>   * BUG: Accessing invalid parent.
+>   */
+> 
+> This is similar race like create() racing with mdev_unregister_device().
+> 
+> BUG: unable to handle kernel paging request at ffffffffc0585668
+> PGD e8f618067 P4D e8f618067 PUD e8f61a067 PMD 85adca067 PTE 0
+> Oops: 0000 [#1] SMP PTI
+> CPU: 41 PID: 37403 Comm: bash Kdump: loaded Not tainted 5.1.0-rc6-vdevbus+ #6
+> Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS 2.0b 08/09/2016
+> RIP: 0010:mdev_device_remove+0xfa/0x140 [mdev]
+> Call Trace:
+>  remove_store+0x71/0x90 [mdev]
+>  kernfs_fop_write+0x113/0x1a0
+>  vfs_write+0xad/0x1b0
+>  ksys_write+0x5a/0xe0
+>  do_syscall_64+0x5a/0x210
+>  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> 
+> Therefore, mdev core is improved as below to overcome above issues.
+> 
+> Wait for any ongoing mdev create() and remove() to finish before
+> unregistering parent device.
+> This continues to allow multiple create and remove to progress in
+> parallel for different mdev devices as most common case.
+> At the same time guard parent removal while parent is being access by
+> create() and remove callbacks.
+> create()/remove() and unregister_device() are synchronized by the rwsem.
+> 
+> Refactor device removal code to mdev_device_remove_common() to avoid
+> acquiring unreg_sem of the parent.
+> 
+> Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
+> Signed-off-by: Parav Pandit <parav@mellanox.com>
 > ---
->  virtio/blk.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/vfio/mdev/mdev_core.c    | 61 ++++++++++++++++++++++++--------
+>  drivers/vfio/mdev/mdev_private.h |  2 ++
+>  2 files changed, 49 insertions(+), 14 deletions(-)
 > 
-> diff --git a/virtio/blk.c b/virtio/blk.c
-> index 50db6f5f..f267be15 100644
-> --- a/virtio/blk.c
-> +++ b/virtio/blk.c
-> @@ -161,7 +161,6 @@ static void set_guest_features(struct kvm *kvm, void *dev, u32 features)
+> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+> index 0bef0cae1d4b..c5401a8c6843 100644
+> --- a/drivers/vfio/mdev/mdev_core.c
+> +++ b/drivers/vfio/mdev/mdev_core.c
+> @@ -102,11 +102,36 @@ static void mdev_put_parent(struct mdev_parent *parent)
+>  		kref_put(&parent->ref, mdev_release_parent);
+>  }
+>  
+
+Some sort of locking semantics comment would be useful here, ex:
+
+/* Caller holds parent unreg_sem read or write lock */
+
+> +static void mdev_device_remove_common(struct mdev_device *mdev)
+> +{
+> +	struct mdev_parent *parent;
+> +	struct mdev_type *type;
+> +	int ret;
+> +
+> +	type = to_mdev_type(mdev->type_kobj);
+> +	mdev_remove_sysfs_files(&mdev->dev, type);
+> +	device_del(&mdev->dev);
+> +	parent = mdev->parent;
+> +	ret = parent->ops->remove(mdev);
+> +	if (ret)
+> +		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
+> +
+> +	/* Balances with device_initialize() */
+> +	put_device(&mdev->dev);
+> +	mdev_put_parent(parent);
+> +}
+> +
+>  static int mdev_device_remove_cb(struct device *dev, void *data)
 >  {
->  	struct blk_dev *bdev = dev;
->  	struct virtio_blk_config *conf = &bdev->blk_config;
-> -	struct virtio_blk_geometry *geo = &conf->geometry;
+> -	if (dev_is_mdev(dev))
+> -		mdev_device_remove(dev);
+> +	struct mdev_parent *parent;
+> +	struct mdev_device *mdev;
 >  
->  	bdev->features = features;
+> +	if (!dev_is_mdev(dev))
+> +		return 0;
+> +
+> +	mdev = to_mdev_device(dev);
+> +	parent = mdev->parent;
+> +	mdev_device_remove_common(mdev);
+
+'parent' is unused here and we only use mdev once, so we probably don't
+need to put it in a local variable.
+
+>  	return 0;
+>  }
 >  
-> @@ -170,7 +169,8 @@ static void set_guest_features(struct kvm *kvm, void *dev, u32 features)
->  	conf->seg_max = virtio_host_to_guest_u32(&bdev->vdev, conf->seg_max);
+> @@ -148,6 +173,7 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+>  	}
 >  
->  	/* Geometry */
-> -	geo->cylinders = virtio_host_to_guest_u16(&bdev->vdev, geo->cylinders);
-> +	conf->geometry.cylinders = virtio_host_to_guest_u16(&bdev->vdev,
-> +						conf->geometry.cylinders);
+>  	kref_init(&parent->ref);
+> +	init_rwsem(&parent->unreg_sem);
 >  
->  	conf->blk_size = virtio_host_to_guest_u32(&bdev->vdev, conf->blk_size);
->  	conf->min_io_size = virtio_host_to_guest_u16(&bdev->vdev, conf->min_io_size);
-> 
+>  	parent->dev = dev;
+>  	parent->ops = ops;
+> @@ -206,13 +232,17 @@ void mdev_unregister_device(struct device *dev)
+>  	dev_info(dev, "MDEV: Unregistering\n");
+>  
+>  	list_del(&parent->next);
+> +	mutex_unlock(&parent_list_lock);
+> +
+> +	down_write(&parent->unreg_sem);
+> +
+>  	class_compat_remove_link(mdev_bus_compat_class, dev, NULL);
+>  
+>  	device_for_each_child(dev, NULL, mdev_device_remove_cb);
+>  
+>  	parent_remove_sysfs_files(parent);
+> +	up_write(&parent->unreg_sem);
+>  
+> -	mutex_unlock(&parent_list_lock);
+>  	mdev_put_parent(parent);
+>  }
+>  EXPORT_SYMBOL(mdev_unregister_device);
+> @@ -265,6 +295,12 @@ int mdev_device_create(struct kobject *kobj,
+>  
+>  	mdev->parent = parent;
+>  
+> +	ret = down_read_trylock(&parent->unreg_sem);
+> +	if (!ret) {
+> +		ret = -ENODEV;
+
+I would have expected -EAGAIN or -EBUSY here, but I guess that since we
+consider the lock-out to deterministically be the parent going away
+that -ENODEV makes sense.  Ok.
+
+> +		goto mdev_fail;
+> +	}
+> +
+>  	device_initialize(&mdev->dev);
+>  	mdev->dev.parent  = dev;
+>  	mdev->dev.bus     = &mdev_bus_type;
+> @@ -287,6 +323,7 @@ int mdev_device_create(struct kobject *kobj,
+>  
+>  	mdev->active = true;
+>  	dev_dbg(&mdev->dev, "MDEV: created\n");
+> +	up_read(&parent->unreg_sem);
+>  
+>  	return 0;
+>  
+> @@ -295,6 +332,7 @@ int mdev_device_create(struct kobject *kobj,
+>  add_fail:
+>  	parent->ops->remove(mdev);
+>  ops_create_fail:
+> +	up_read(&parent->unreg_sem);
+>  	put_device(&mdev->dev);
+>  mdev_fail:
+>  	mdev_put_parent(parent);
+> @@ -305,7 +343,6 @@ int mdev_device_remove(struct device *dev)
+>  {
+>  	struct mdev_device *mdev, *tmp;
+>  	struct mdev_parent *parent;
+> -	struct mdev_type *type;
+>  	int ret;
+>  
+>  	mdev = to_mdev_device(dev);
+> @@ -329,18 +366,14 @@ int mdev_device_remove(struct device *dev)
+>  	mdev->active = false;
+>  	mutex_unlock(&mdev_list_lock);
+>  
+> -	type = to_mdev_type(mdev->type_kobj);
+> -	mdev_remove_sysfs_files(dev, type);
+> -	device_del(&mdev->dev);
+>  	parent = mdev->parent;
+> -	ret = parent->ops->remove(mdev);
+> -	if (ret)
+> -		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
+> -
+> -	/* Balances with device_initialize() */
+> -	put_device(&mdev->dev);
+> -	mdev_put_parent(parent);
+> +	/* Check if parent unregistration has started */
+> +	ret = down_read_trylock(&parent->unreg_sem);
+> +	if (!ret)
+> +		return -ENODEV;
+>  
+> +	mdev_device_remove_common(mdev);
+> +	up_read(&parent->unreg_sem);
+>  	return 0;
+>  }
+>  
+> diff --git a/drivers/vfio/mdev/mdev_private.h b/drivers/vfio/mdev/mdev_private.h
+> index 924ed2274941..398767526276 100644
+> --- a/drivers/vfio/mdev/mdev_private.h
+> +++ b/drivers/vfio/mdev/mdev_private.h
+> @@ -23,6 +23,8 @@ struct mdev_parent {
+>  	struct list_head next;
+>  	struct kset *mdev_types_kset;
+>  	struct list_head type_list;
+> +	/* Synchronize device creation/removal with parent unregistration */
+> +	struct rw_semaphore unreg_sem;
+>  };
+>  
+>  struct mdev_device {
 
