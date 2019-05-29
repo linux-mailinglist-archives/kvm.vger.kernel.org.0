@@ -2,145 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E5A642E0DC
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 17:18:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C28DC2E2EB
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 19:12:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726470AbfE2PSt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 May 2019 11:18:49 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:48042 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725936AbfE2PSt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 May 2019 11:18:49 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 95CC8341;
-        Wed, 29 May 2019 08:18:48 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D9C163F5AF;
-        Wed, 29 May 2019 08:18:42 -0700 (PDT)
-Date:   Wed, 29 May 2019 16:18:40 +0100
-From:   Dave Martin <Dave.Martin@arm.com>
-To:     Catalin Marinas <catalin.marinas@arm.com>
-Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
-        Lee Smith <Lee.Smith@arm.com>, linux-kselftest@vger.kernel.org,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org,
-        linux-arm-kernel@lists.infradead.org,
-        Evgeniy Stepanov <eugenis@google.com>,
-        linux-media@vger.kernel.org, Kees Cook <keescook@chromium.org>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Andrey Konovalov <andreyknvl@google.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        linux-kernel@vger.kernel.org,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Andrew Murray <andrew.murray@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: Re: [PATCH v15 05/17] arms64: untag user pointers passed to memory
- syscalls
-Message-ID: <20190529151839.GF28398@e103592.cambridge.arm.com>
-References: <cover.1557160186.git.andreyknvl@google.com>
- <00eb4c63fefc054e2c8d626e8fedfca11d7c2600.1557160186.git.andreyknvl@google.com>
- <20190527143719.GA59948@MBP.local>
- <20190528145411.GA709@e119886-lin.cambridge.arm.com>
- <20190528154057.GD32006@arrakis.emea.arm.com>
- <20190528155644.GD28398@e103592.cambridge.arm.com>
- <20190528163400.GE32006@arrakis.emea.arm.com>
- <20190529124224.GE28398@e103592.cambridge.arm.com>
- <20190529132341.27t3knoxpb7t7y3g@mbp>
+        id S1726454AbfE2RMN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 May 2019 13:12:13 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:44259 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726008AbfE2RMN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 May 2019 13:12:13 -0400
+Received: by mail-ed1-f68.google.com with SMTP id b8so4823046edm.11
+        for <kvm@vger.kernel.org>; Wed, 29 May 2019 10:12:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gtZZ2mauCSyv5FIfi7408NboHJJId3G3Hf0s1vyrqGw=;
+        b=eGDWJ39iOdOntTvkvhZiKKpZL9AQLAIKs6vpVsHcTKkwqUnNwzQw62hBfGXmb+SdiS
+         14SiapDyFWOZcySaVYui2GNfXxjkehfn+X1bGglg6DoOHmEbpGJOeSZ6x2FI6pATAZkw
+         bQw1CpUHb9SH/+QIq6b0Gfh1PMgb5tIyZx0zLVnnFy1lYEpCDyrFrLzjsKrepfLLZEHP
+         44QqqYoL35GgLIyiWHy+EyQIwvrQ/SGT32gCDnXOlkCY4GVeW49+XmJnQsYKKkzJnNGJ
+         /rsNUKfEbAn6QF0vhlRrS1OC8WvVB1r5t/EN6kzEybXipHqL71AnTOhk38sri5DFvHWW
+         dALw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gtZZ2mauCSyv5FIfi7408NboHJJId3G3Hf0s1vyrqGw=;
+        b=UCn6IDa38tb2ByXW84JGdt4JKzlDdnbo8ue7eR8aQL4GY33TYtgRTs4c0EC6js5HVj
+         yFkjHRxjczF97S2yY2bhCKzHjj4Ns5NPnPhn6UBDt5oVxHRun84wcS7reIYD/ENJsu9G
+         XvJXEQlFL736HkokApaCgrvIO0uNVXBV9EsNXgBp22vl/jTAthAidc1Zez2mkcEaNdYp
+         MjpD3s0Tac+YgC6O6LmO+Ke8N51Il7c5ehs9rQGYURXfcmE+SlkSINyTxZvcyAsw0x9t
+         pTflR+CN7upJYdwl83pGM2SCXeHAedUauwjYlnoCZf1sD3S+Rp4JkUWn/TWP0nKX5+hF
+         ysrQ==
+X-Gm-Message-State: APjAAAVZDdHRf5no7+adJ/Dhso1xY3XDi8Ecp8PvMIytPlx8NV64w5tn
+        zV9qvwjBOtv49JDHvnMGyIWkXHrSekWvAGypDO3/jw==
+X-Google-Smtp-Source: APXvYqzyfGTZk7TLlL39ec2bvtZDUiRpFGbM4jyR3wu/qNp+hnKEkK1mNO6dpV45vCsYtQf6MWFz9Jr/jKh69txeXHU=
+X-Received: by 2002:a17:906:b6cb:: with SMTP id ec11mr5916187ejb.215.1559149930839;
+ Wed, 29 May 2019 10:12:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190529132341.27t3knoxpb7t7y3g@mbp>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+References: <CAOyeoRWfPNmaWY6Lifdkdj3KPPM654vzDO+s3oduEMCJP+Asow@mail.gmail.com>
+ <5CEC9667.30100@intel.com> <CAOyeoRWhfyuuYdguE6Wrzd7GOdow9qRE4MZ4OKkMc5cdhDT53g@mail.gmail.com>
+ <5CEE3AC4.3020904@intel.com>
+In-Reply-To: <5CEE3AC4.3020904@intel.com>
+From:   Eric Hankland <ehankland@google.com>
+Date:   Wed, 29 May 2019 10:11:59 -0700
+Message-ID: <CAOyeoRW85jV=TW_xwSj0ZYwPj_L+G9wu+QPGEF3nBmPbWGX4_g@mail.gmail.com>
+Subject: Re: [PATCH v1] KVM: x86: PMU Whitelist
+To:     Wei Wang <wei.w.wang@intel.com>
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 29, 2019 at 02:23:42PM +0100, Catalin Marinas wrote:
-> On Wed, May 29, 2019 at 01:42:25PM +0100, Dave P Martin wrote:
-> > On Tue, May 28, 2019 at 05:34:00PM +0100, Catalin Marinas wrote:
-> > > On Tue, May 28, 2019 at 04:56:45PM +0100, Dave P Martin wrote:
-> > > > On Tue, May 28, 2019 at 04:40:58PM +0100, Catalin Marinas wrote:
-> > > > 
-> > > > [...]
-> > > > 
-> > > > > My thoughts on allowing tags (quick look):
-> > > > >
-> > > > > brk - no
-> > > > 
-> > > > [...]
-> > > > 
-> > > > > mlock, mlock2, munlock - yes
-> > > > > mmap - no (we may change this with MTE but not for TBI)
-> > > > 
-> > > > [...]
-> > > > 
-> > > > > mprotect - yes
-> > > > 
-> > > > I haven't following this discussion closely... what's the rationale for
-> > > > the inconsistencies here (feel free to refer me back to the discussion
-> > > > if it's elsewhere).
-> > > 
-> > > _My_ rationale (feel free to disagree) is that mmap() by default would
-> > > not return a tagged address (ignoring MTE for now). If it gets passed a
-> > > tagged address or a "tagged NULL" (for lack of a better name) we don't
-> > > have clear semantics of whether the returned address should be tagged in
-> > > this ABI relaxation. I'd rather reserve this specific behaviour if we
-> > > overload the non-zero tag meaning of mmap() for MTE. Similar reasoning
-> > > for mremap(), at least on the new_address argument (not entirely sure
-> > > about old_address).
-> > > 
-> > > munmap() should probably follow the mmap() rules.
-> > > 
-> > > As for brk(), I don't see why the user would need to pass a tagged
-> > > address, we can't associate any meaning to this tag.
-> > > 
-> > > For the rest, since it's likely such addresses would have been tagged by
-> > > malloc() in user space, we should allow tagged pointers.
-> > 
-> > Those arguments seem reasonable.  We should try to capture this
-> > somewhere when documenting the ABI.
-> > 
-> > To be clear, I'm not sure that we should guarantee anywhere that a
-> > tagged pointer is rejected: rather the behaviour should probably be
-> > left unspecified.  Then we can tidy it up incrementally.
-> > 
-> > (The behaviour is unspecified today, in any case.)
-> 
-> What is specified (or rather de-facto ABI) today is that passing a user
-> address above TASK_SIZE (e.g. non-zero top byte) would fail in most
-> cases. If we relax this with the TBI we may end up with some de-facto
+On Wed, May 29, 2019 at 12:49 AM Wei Wang <wei.w.wang@intel.com> wrote:
+>
+> On 05/29/2019 02:14 AM, Eric Hankland wrote:
+> > On Mon, May 27, 2019 at 6:56 PM Wei Wang <wei.w.wang@intel.com> wrote:
+> >> On 05/23/2019 06:23 AM, Eric Hankland wrote:
+> >>> - Add a VCPU ioctl that can control which events the guest can monitor.
+> >>>
+> >>> Signed-off-by: ehankland <ehankland@google.com>
+> >>> ---
+> >>> Some events can provide a guest with information about other guests or the
+> >>> host (e.g. L3 cache stats); providing the capability to restrict access
+> >>> to a "safe" set of events would limit the potential for the PMU to be used
+> >>> in any side channel attacks. This change introduces a new vcpu ioctl that
+> >>> sets an event whitelist. If the guest attempts to program a counter for
+> >>> any unwhitelisted event, the kernel counter won't be created, so any
+> >>> RDPMC/RDMSR will show 0 instances of that event.
+> >> The general idea sounds good to me :)
+> >>
+> >> For the implementation, I would have the following suggestions:
+> >>
+> >> 1) Instead of using a whitelist, it would be better to use a blacklist to
+> >> forbid the guest from counting any core level information. So by default,
+> >> kvm maintains a list of those core level events, which are not supported to
+> >> the guest.
+> >>
+> >> The userspace ioctl removes the related events from the blacklist to
+> >> make them usable by the guest.
+> >>
+> >> 2) Use vm ioctl, instead of vcpu ioctl. The blacklist-ed events can be
+> >> VM wide
+> >> (unnecessary to make each CPU to maintain the same copy).
+> >> Accordingly, put the pmu event blacklist into kvm->arch.
+> >>
+> >> 3) Returning 1 when the guest tries to set the evetlsel msr to count an
+> >> event which is on the blacklist.
+> >>
+> >> Best,
+> >> Wei
+> > Thanks for the feedback. I have a couple concerns with a KVM
+> > maintained blacklist. First, I'm worried it will be difficult to keep
+> > such a list up to date and accurate (both coming up with the initial
+> > list since there are so many events, and updating it whenever any new
+> > events are published or vulnerabilities are discovered).
+>
+> Not sure about "so many" above. I think there should be much
+> fewer events that may need to be blacklisted.
+>
+> For example the event table 19-3 from SDM 19.2 shows hundreds of
+> events, how many of them would you think that need to be blacklisted?
+>
+> > Second, users
+> > may want to differentiate between whole-socket and sub-socket VMs
+> > (some events may be fine for the whole-socket case) - keeping a single
+> > blacklist wouldn't allow for this.
+>
+> Why wouldn't?
+> In any case (e.g. the whole socket dedicated to the single VM) we
+> want to unlock the blacklisted events, we can have the userspace
+> (e.g. qemu command line options "+event1, +event2") do ioctl to
+> have KVM do that.
+>
+> Btw, for the L3 cache stats event example, I'm not sure if that could
+> be an issue if we have "AnyThread=0". I'll double confirm with
+> someone.
+>
+> Best,
+> Wei
 
-I may be being too picky, but "would fail in most cases" sounds like
-"unspecified" ?
+> Not sure about "so many" above. I think there should be much
+> fewer events that may need to be blacklisted.
 
-> ABI before we actually get MTE hardware. Tightening it afterwards may be
-> slightly more problematic, although MTE needs to be an explicit opt-in.
-> 
-> IOW, I wouldn't want to unnecessarily relax the ABI if we don't need to.
+I think you're right that there are not as many events that seem like
+they could leak info as events that seem like they won't, but I think
+the work to validate that they definitely don't could be expensive;
+with a whitelist it's easy to start with a smaller set and
+incrementally add to it without having to evaluate all the events
+right away.
 
-So long we don't block foreseeable future developments unnecessarily
-either -- I agree there's a balance to be struck.
+> > (some events may be fine for the whole-socket case) - keeping a single
+> > blacklist wouldn't allow for this.
+>
+> Why wouldn't?
 
-I guess this can be reviewed when we have nailed down the details a bit
-further.
+Ah I think I misunderstood your proposal (as an ioctl that would just
+enable a hardcoded blacklist). Now that I understand, my main
+objection is just the above (coupled with the trouble of needing to
+maintain the "default" blacklist).
 
-Cheers
----Dave
+Eric
