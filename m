@@ -2,177 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 645EE2DB45
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 12:58:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F9B92DB5E
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 13:05:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726054AbfE2K6i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 May 2019 06:58:38 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:34272 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725990AbfE2K6i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 May 2019 06:58:38 -0400
-Received: by mail-wm1-f68.google.com with SMTP id e19so4061101wme.1
-        for <kvm@vger.kernel.org>; Wed, 29 May 2019 03:58:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=4gM+INWJgv9FdjldlOiqfPQs/3KoKbaQl3oay9t+Fsc=;
-        b=McBhI47AQfKDfhYmzI7CYBde2LjM7lxLQJt9K0t2AJmdyGTgPkr3meAFja+65SI5yi
-         QwG5o7oVc3LBwPhRaUSz6APc56v5MNCGyZWR1ZzD9en9ak6agymTcdOPsGgKDe5MsdaQ
-         PmfrMw2PEu+GraJO0WzrLZ9GjKZzp4ZhhtGtT9KFEU5hqJoIEyg0TWsA/akweQ0wd/TO
-         zQmH/BFcV8JWbYtEXgs2Q2gFw72J0HaPCzX8ACtq+IFS2TjY9mbqkOOAm5rIoa4ixKKo
-         97Fgryciu/LPFQyWbo209D/KZm/PJr8afdXQuj4PtwsQBBpKzx7BaCr50qBLbeLFoYdU
-         WZ4Q==
-X-Gm-Message-State: APjAAAWUmu15DLaPZzMRHCWC7th2CH/xZQ6kcSswnoU3ENdLff390KzU
-        YfnIUwl/E+xB79K94AAz65UXFg==
-X-Google-Smtp-Source: APXvYqx8DFltvKkXywu9P2M63vLL0b9huUgQDGKM0bNckHf+CE/QRL47FPbLHu0JlvqcBJyV8vRuLQ==
-X-Received: by 2002:a1c:acc8:: with SMTP id v191mr6597928wme.177.1559127515682;
-        Wed, 29 May 2019 03:58:35 -0700 (PDT)
-Received: from steredhat (host253-229-dynamic.248-95-r.retail.telecomitalia.it. [95.248.229.253])
-        by smtp.gmail.com with ESMTPSA id j123sm9038134wmb.32.2019.05.29.03.58.34
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 29 May 2019 03:58:34 -0700 (PDT)
-Date:   Wed, 29 May 2019 12:58:32 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Michael S . Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 3/4] vsock/virtio: fix flush of works during the .remove()
-Message-ID: <20190529105832.oz3sagbne5teq3nt@steredhat>
-References: <20190528105623.27983-1-sgarzare@redhat.com>
- <20190528105623.27983-4-sgarzare@redhat.com>
- <9ac9fc4b-5c39-2503-dfbb-660a7bdcfbfd@redhat.com>
+        id S1726518AbfE2LFw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 May 2019 07:05:52 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37322 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725894AbfE2LFw (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 29 May 2019 07:05:52 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4TAvP0i115582
+        for <kvm@vger.kernel.org>; Wed, 29 May 2019 07:05:50 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2ssrpcgj6w-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 29 May 2019 07:05:50 -0400
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
+        Wed, 29 May 2019 12:05:48 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 29 May 2019 12:05:44 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4TB5gTb41615530
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 29 May 2019 11:05:42 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A7A4FAE057;
+        Wed, 29 May 2019 11:05:42 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 08137AE053;
+        Wed, 29 May 2019 11:05:42 +0000 (GMT)
+Received: from [9.152.96.222] (unknown [9.152.96.222])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 29 May 2019 11:05:41 +0000 (GMT)
+Reply-To: mimu@linux.ibm.com
+Subject: Re: [PATCH v2 6/8] virtio/s390: add indirection to indicators access
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Cc:     KVM Mailing List <kvm@vger.kernel.org>,
+        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>
+References: <20190523162209.9543-1-mimu@linux.ibm.com>
+ <20190523162209.9543-7-mimu@linux.ibm.com>
+ <20190527130028.62e1f7d7.cohuck@redhat.com>
+ <20190527135706.34837062.pasic@linux.ibm.com>
+ <20190527141029.102f838a.cohuck@redhat.com>
+From:   Michael Mueller <mimu@linux.ibm.com>
+Organization: IBM
+Date:   Wed, 29 May 2019 13:05:41 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9ac9fc4b-5c39-2503-dfbb-660a7bdcfbfd@redhat.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20190527141029.102f838a.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19052911-0012-0000-0000-00000320901F
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19052911-0013-0000-0000-000021595B35
+Message-Id: <08e56ae6-28ed-52ae-62ec-fde786949500@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-29_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905290074
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 29, 2019 at 11:22:40AM +0800, Jason Wang wrote:
+
+
+On 27.05.19 14:10, Cornelia Huck wrote:
+> On Mon, 27 May 2019 13:57:06 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
 > 
-> On 2019/5/28 下午6:56, Stefano Garzarella wrote:
-> > We flush all pending works before to call vdev->config->reset(vdev),
-> > but other works can be queued before the vdev->config->del_vqs(vdev),
-> > so we add another flush after it, to avoid use after free.
-> > 
-> > Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > ---
-> >   net/vmw_vsock/virtio_transport.c | 23 +++++++++++++++++------
-> >   1 file changed, 17 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> > index e694df10ab61..ad093ce96693 100644
-> > --- a/net/vmw_vsock/virtio_transport.c
-> > +++ b/net/vmw_vsock/virtio_transport.c
-> > @@ -660,6 +660,15 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
-> >   	return ret;
-> >   }
-> > +static void virtio_vsock_flush_works(struct virtio_vsock *vsock)
-> > +{
-> > +	flush_work(&vsock->loopback_work);
-> > +	flush_work(&vsock->rx_work);
-> > +	flush_work(&vsock->tx_work);
-> > +	flush_work(&vsock->event_work);
-> > +	flush_work(&vsock->send_pkt_work);
-> > +}
-> > +
-> >   static void virtio_vsock_remove(struct virtio_device *vdev)
-> >   {
-> >   	struct virtio_vsock *vsock = vdev->priv;
-> > @@ -668,12 +677,6 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
-> >   	mutex_lock(&the_virtio_vsock_mutex);
-> >   	the_virtio_vsock = NULL;
-> > -	flush_work(&vsock->loopback_work);
-> > -	flush_work(&vsock->rx_work);
-> > -	flush_work(&vsock->tx_work);
-> > -	flush_work(&vsock->event_work);
-> > -	flush_work(&vsock->send_pkt_work);
-> > -
-> >   	/* Reset all connected sockets when the device disappear */
-> >   	vsock_for_each_connected_socket(virtio_vsock_reset_sock);
-> > @@ -690,6 +693,9 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
-> >   	vsock->event_run = false;
-> >   	mutex_unlock(&vsock->event_lock);
-> > +	/* Flush all pending works */
-> > +	virtio_vsock_flush_works(vsock);
-> > +
-> >   	/* Flush all device writes and interrupts, device will not use any
-> >   	 * more buffers.
-> >   	 */
-> > @@ -726,6 +732,11 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
-> >   	/* Delete virtqueues and flush outstanding callbacks if any */
-> >   	vdev->config->del_vqs(vdev);
-> > +	/* Other works can be queued before 'config->del_vqs()', so we flush
-> > +	 * all works before to free the vsock object to avoid use after free.
-> > +	 */
-> > +	virtio_vsock_flush_works(vsock);
+>> On Mon, 27 May 2019 13:00:28 +0200
+>> Cornelia Huck <cohuck@redhat.com> wrote:
+>>
+>>> On Thu, 23 May 2019 18:22:07 +0200
+>>> Michael Mueller <mimu@linux.ibm.com> wrote:
+>>>    
+>>>> From: Halil Pasic <pasic@linux.ibm.com>
+>>>>
+>>>> This will come in handy soon when we pull out the indicators from
+>>>> virtio_ccw_device to a memory area that is shared with the hypervisor
+>>>> (in particular for protected virtualization guests).
+>>>>
+>>>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+>>>> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>> ---
+>>>>   drivers/s390/virtio/virtio_ccw.c | 40 +++++++++++++++++++++++++---------------
+>>>>   1 file changed, 25 insertions(+), 15 deletions(-)
+>>>>    
+>>>    
+>>>> @@ -338,17 +348,17 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
+>>>>   		ccw->cda = (__u32)(unsigned long) thinint_area;
+>>>>   	} else {
+>>>>   		/* payload is the address of the indicators */
+>>>> -		indicatorp = kmalloc(sizeof(&vcdev->indicators),
+>>>> +		indicatorp = kmalloc(sizeof(indicators(vcdev)),
+>>>>   				     GFP_DMA | GFP_KERNEL);
+>>>>   		if (!indicatorp)
+>>>>   			return;
+>>>>   		*indicatorp = 0;
+>>>>   		ccw->cmd_code = CCW_CMD_SET_IND;
+>>>> -		ccw->count = sizeof(&vcdev->indicators);
+>>>> +		ccw->count = sizeof(indicators(vcdev));
+>>>>   		ccw->cda = (__u32)(unsigned long) indicatorp;
+>>>>   	}
+>>>>   	/* Deregister indicators from host. */
+>>>> -	vcdev->indicators = 0;
+>>>> +	*indicators(vcdev) = 0;
+>>>
+>>> I'm not too hot about this notation, but it's not wrong and a minor
+>>> thing :)
+>>
+>> I don't have any better ideas :/
+>>
+>>>    
+>>>>   	ccw->flags = 0;
+>>>>   	ret = ccw_io_helper(vcdev, ccw,
+>>>>   			    vcdev->is_thinint ?
+>>>
+>>> Patch looks reasonable and not dependent on the other patches here.
+>>>    
+>>
+>> looks reasonable == r-b?
+>>
+>> Not dependent in a sense that this patch could be made a first patch in
+>> the series. A subsequent patch depends on it.
 > 
+> What is the plan with these patches? I can either pick patch 5+6 and
+> let them go through the virtio tree, or give my r-b and let them go
+> through the s390 tree. The former is probably the quicker route, but
+> the latter has less potential for dependency issues.
+
+please give your r-b then for these.
+
 > 
-> Some questions after a quick glance:
-> 
-> 1) It looks to me that the work could be queued from the path of
-> vsock_transport_cancel_pkt() . Is that synchronized here?
->
 
-Both virtio_transport_send_pkt() and vsock_transport_cancel_pkt() can
-queue work from the upper layer (socket).
+Michael
 
-Setting the_virtio_vsock to NULL, should synchronize, but after a careful look
-a rare issue could happen:
-we are setting the_virtio_vsock to NULL at the start of .remove() and we
-are freeing the object pointed by it at the end of .remove(), so
-virtio_transport_send_pkt() or vsock_transport_cancel_pkt() may still be
-running, accessing the object that we are freed.
-
-Should I use something like RCU to prevent this issue?
-
-    virtio_transport_send_pkt() and vsock_transport_cancel_pkt()
-    {
-        rcu_read_lock();
-        vsock = rcu_dereference(the_virtio_vsock_mutex);
-        ...
-        rcu_read_unlock();
-    }
-
-    virtio_vsock_remove()
-    {
-        rcu_assign_pointer(the_virtio_vsock_mutex, NULL);
-        synchronize_rcu();
-
-        ...
-
-        free(vsock);
-    }
-
-Could there be a better approach?
-
-
-> 2) If we decide to flush after dev_vqs(), is tx_run/rx_run/event_run still
-> needed? It looks to me we've already done except that we need flush rx_work
-> in the end since send_pkt_work can requeue rx_work.
-
-The main reason of tx_run/rx_run/event_run is to prevent that a worker
-function is running while we are calling config->reset().
-
-E.g. if an interrupt comes between virtio_vsock_flush_works() and
-config->reset(), it can queue new works that can access the device while
-we are in config->reset().
-
-IMHO they are still needed.
-
-What do you think?
-
-
-Thanks for your questions,
-Stefano
