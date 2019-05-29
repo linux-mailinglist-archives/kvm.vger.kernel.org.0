@@ -2,159 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D64D2D383
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 03:54:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 876562D394
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2019 04:07:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726137AbfE2ByI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 28 May 2019 21:54:08 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:42739 "EHLO ozlabs.org"
+        id S1726275AbfE2CHl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 28 May 2019 22:07:41 -0400
+Received: from mga07.intel.com ([134.134.136.100]:46297 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725828AbfE2ByI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 28 May 2019 21:54:08 -0400
-Received: by ozlabs.org (Postfix, from userid 1003)
-        id 45DDK91Jlvz9sBb; Wed, 29 May 2019 11:54:05 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
-        t=1559094845; bh=imLPVfI8pPH7045d2jFL+whAPxqGVNVVa01gDxyjly4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PeqQSWxnR80D0WNCxxsXKhaUpdE59FnxBCfXoFoSa7Y4apu78HAMfTpnPUTlD6dxk
-         1hN7SK2ndHGT9pUT24BJJhGl9Z1JdWd8gWCT2U7oeUVfHBXxEkztHXfH3WtZy1NqrH
-         J4C40440uOHQROIurZMO36iqT7XFaV0Oj9iF0d5dPBiHiNnQi9WVG3YzOxVBniZeZE
-         7YSHdLJSuXy8ntrDuO+TVbhvRwwaCIrbJHYcZsT0205tIQRa4fm42hC1+ego/OMyLa
-         nu8o7hbAnB6Y0UExQKQsIfnjITaEzsbi5P/meNNHlz+EhCGuSf6pO1811c/rO6N766
-         xJNxvABYdQhpg==
-Date:   Wed, 29 May 2019 11:54:00 +1000
-From:   Paul Mackerras <paulus@ozlabs.org>
-To:     kvm@vger.kernel.org
-Cc:     kvm-ppc@vger.kernel.org,
-        =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: [PATCH v2 3/4] KVM: PPC: Book3S: Use new mutex to synchronize access
- to rtas token list
-Message-ID: <20190529015400.GA16539@blackberry>
-References: <20190523063424.GB19655@blackberry>
- <20190523063601.GE19655@blackberry>
+        id S1725816AbfE2CHl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 28 May 2019 22:07:41 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 May 2019 19:07:40 -0700
+X-ExtLoop1: 1
+Received: from shzintpr04.sh.intel.com (HELO [0.0.0.0]) ([10.239.4.101])
+  by orsmga001.jf.intel.com with ESMTP; 28 May 2019 19:07:37 -0700
+Subject: Re: [PATCH v2 1/3] KVM: x86: add support for user wait instructions
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     rkrcmar@redhat.com, corbet@lwn.net, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        sean.j.christopherson@intel.com, x86@kernel.org,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jingqi.liu@intel.com
+References: <20190524075637.29496-1-tao3.xu@intel.com>
+ <20190524075637.29496-2-tao3.xu@intel.com>
+ <419f62f3-69a8-7ec0-5eeb-20bed69925f2@redhat.com>
+From:   Tao Xu <tao3.xu@intel.com>
+Message-ID: <c1b27714-2eb8-055e-f26c-e17787d83bb6@intel.com>
+Date:   Wed, 29 May 2019 10:05:19 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190523063601.GE19655@blackberry>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <419f62f3-69a8-7ec0-5eeb-20bed69925f2@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently the Book 3S KVM code uses kvm->lock to synchronize access
-to the kvm->arch.rtas_tokens list.  Because this list is scanned
-inside kvmppc_rtas_hcall(), which is called with the vcpu mutex held,
-taking kvm->lock cause a lock inversion problem, which could lead to
-a deadlock.
 
-To fix this, we add a new mutex, kvm->arch.rtas_token_lock, which nests
-inside the vcpu mutexes, and use that instead of kvm->lock when
-accessing the rtas token list.
+On 29/05/2019 09:24, Paolo Bonzini wrote:
+> On 24/05/19 09:56, Tao Xu wrote:
+>> +7.19 KVM_CAP_ENABLE_USR_WAIT_PAUSE
+>> +
+>> +Architectures: x86
+>> +Parameters: args[0] whether feature should be enabled or not
+>> +
+>> +With this capability enabled, a VM can use UMONITOR, UMWAIT and TPAUSE
+>> +instructions. If the instruction causes a delay, the amount of
+>> +time delayed is called here the physical delay. The physical delay is
+>> +first computed by determining the virtual delay (the time to delay
+>> +relative to the VM’s timestamp counter). Otherwise, UMONITOR, UMWAIT
+>> +and TPAUSE cause an invalid-opcode exception(#UD).
+>> +
+> 
+> There is no need to make it a capability.  You can just check the guest
+> CPUID and see if it includes X86_FEATURE_WAITPKG.
+> 
+> Paolo
+> 
 
-This removes the lockdep_assert_held() in kvmppc_rtas_tokens_free().
-At this point we don't hold the new mutex, but that is OK because
-kvmppc_rtas_tokens_free() is only called when the whole VM is being
-destroyed, and at that point nothing can be looking up a token in
-the list.
-
-Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
----
- arch/powerpc/include/asm/kvm_host.h |  1 +
- arch/powerpc/kvm/book3s.c           |  1 +
- arch/powerpc/kvm/book3s_rtas.c      | 14 ++++++--------
- 3 files changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index 013c76a..fb7d363 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -309,6 +309,7 @@ struct kvm_arch {
- #ifdef CONFIG_PPC_BOOK3S_64
- 	struct list_head spapr_tce_tables;
- 	struct list_head rtas_tokens;
-+	struct mutex rtas_token_lock;
- 	DECLARE_BITMAP(enabled_hcalls, MAX_HCALL_OPCODE/4 + 1);
- #endif
- #ifdef CONFIG_KVM_MPIC
-diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
-index 61a212d..ac56648 100644
---- a/arch/powerpc/kvm/book3s.c
-+++ b/arch/powerpc/kvm/book3s.c
-@@ -902,6 +902,7 @@ int kvmppc_core_init_vm(struct kvm *kvm)
- #ifdef CONFIG_PPC64
- 	INIT_LIST_HEAD_RCU(&kvm->arch.spapr_tce_tables);
- 	INIT_LIST_HEAD(&kvm->arch.rtas_tokens);
-+	mutex_init(&kvm->arch.rtas_token_lock);
- #endif
- 
- 	return kvm->arch.kvm_ops->init_vm(kvm);
-diff --git a/arch/powerpc/kvm/book3s_rtas.c b/arch/powerpc/kvm/book3s_rtas.c
-index 4e178c4..b7ae3df 100644
---- a/arch/powerpc/kvm/book3s_rtas.c
-+++ b/arch/powerpc/kvm/book3s_rtas.c
-@@ -146,7 +146,7 @@ static int rtas_token_undefine(struct kvm *kvm, char *name)
- {
- 	struct rtas_token_definition *d, *tmp;
- 
--	lockdep_assert_held(&kvm->lock);
-+	lockdep_assert_held(&kvm->arch.rtas_token_lock);
- 
- 	list_for_each_entry_safe(d, tmp, &kvm->arch.rtas_tokens, list) {
- 		if (rtas_name_matches(d->handler->name, name)) {
-@@ -167,7 +167,7 @@ static int rtas_token_define(struct kvm *kvm, char *name, u64 token)
- 	bool found;
- 	int i;
- 
--	lockdep_assert_held(&kvm->lock);
-+	lockdep_assert_held(&kvm->arch.rtas_token_lock);
- 
- 	list_for_each_entry(d, &kvm->arch.rtas_tokens, list) {
- 		if (d->token == token)
-@@ -206,14 +206,14 @@ int kvm_vm_ioctl_rtas_define_token(struct kvm *kvm, void __user *argp)
- 	if (copy_from_user(&args, argp, sizeof(args)))
- 		return -EFAULT;
- 
--	mutex_lock(&kvm->lock);
-+	mutex_lock(&kvm->arch.rtas_token_lock);
- 
- 	if (args.token)
- 		rc = rtas_token_define(kvm, args.name, args.token);
- 	else
- 		rc = rtas_token_undefine(kvm, args.name);
- 
--	mutex_unlock(&kvm->lock);
-+	mutex_unlock(&kvm->arch.rtas_token_lock);
- 
- 	return rc;
- }
-@@ -245,7 +245,7 @@ int kvmppc_rtas_hcall(struct kvm_vcpu *vcpu)
- 	orig_rets = args.rets;
- 	args.rets = &args.args[be32_to_cpu(args.nargs)];
- 
--	mutex_lock(&vcpu->kvm->lock);
-+	mutex_lock(&vcpu->kvm->arch.rtas_token_lock);
- 
- 	rc = -ENOENT;
- 	list_for_each_entry(d, &vcpu->kvm->arch.rtas_tokens, list) {
-@@ -256,7 +256,7 @@ int kvmppc_rtas_hcall(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
--	mutex_unlock(&vcpu->kvm->lock);
-+	mutex_unlock(&vcpu->kvm->arch.rtas_token_lock);
- 
- 	if (rc == 0) {
- 		args.rets = orig_rets;
-@@ -282,8 +282,6 @@ void kvmppc_rtas_tokens_free(struct kvm *kvm)
- {
- 	struct rtas_token_definition *d, *tmp;
- 
--	lockdep_assert_held(&kvm->lock);
--
- 	list_for_each_entry_safe(d, tmp, &kvm->arch.rtas_tokens, list) {
- 		list_del(&d->list);
- 		kfree(d);
--- 
-2.7.4
-
+Thank you Paolo, but I have another question. I was wondering if it is 
+appropriate to enable X86_FEATURE_WAITPKG when QEMU uses "-overcommit 
+cpu-pm=on"? Or just enable X86_FEATURE_WAITPKG when QEMU add the feature 
+"-cpu host,+waitpkg"? User wait instructions is the wait or pause 
+instructions may be executed at any privilege level, but can use 
+IA32_UMWAIT_CONTROL to set the maximum time.
