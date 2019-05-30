@@ -2,170 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EB1CB2E96E
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2019 01:33:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 340152EA11
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2019 03:05:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726652AbfE2XdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 May 2019 19:33:22 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:39476 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726189AbfE2XdW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 May 2019 19:33:22 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4TNSRIp080130;
-        Wed, 29 May 2019 23:31:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=ZeIntJUzf6RoM7jUUPQSe8jXByDyh+4YkHIeg3GAXsQ=;
- b=IAaKB5qaUOqWsmMianN1GrQXpj9HG3cU0oz4ab6U1xB/tXO6+QR4XtP3ZMrOtiUMkOoV
- 4E5Psrzd26xnaBWY4KxDwMtLYLrwtpzQmCqBocQFFxj26Y0zHm7WphZ5Vy7kvikFllbw
- K8oaFQODFc4ZYWzCBXppsBGoVQwYQdQg2GW8EUlLymnnHNwmkbT5lBnfY5IXgtKbeuvb
- fRuY8+2I/DomXosaX6EOYlvf6BUj2JvvkWAYxRpc9VIrwm5f0jD27GRQgV/1zhr4IIot
- MQ7LFuYSpR3RENpPYFVJ87Ior67/wGNxK49Fdt541GiLuVThQPe3y929dj9OI1biQ4aK dA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2spw4tn09w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 29 May 2019 23:31:18 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4TNTqPs081158;
-        Wed, 29 May 2019 23:31:17 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 2srbdxp6qf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 29 May 2019 23:31:17 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4TNV3Z4032602;
-        Wed, 29 May 2019 23:31:04 GMT
-Received: from [192.168.1.222] (/71.63.128.209)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 29 May 2019 16:31:03 -0700
-Subject: Re: [PATCH v2] mm: hwpoison: disable memory error handling on 1GB
- hugepage
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Punit Agrawal <punit.agrawal@arm.com>,
-        Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>,
-        Anshuman Khandual <khandual@linux.vnet.ibm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Xiao Guangrong <xiaoguangrong@tencent.com>,
-        lidongchen@tencent.com, yongkaiwu@tencent.com
-References: <20180130013919.GA19959@hori1.linux.bs1.fc.nec.co.jp>
- <1517284444-18149-1-git-send-email-n-horiguchi@ah.jp.nec.com>
- <87inbbjx2w.fsf@e105922-lin.cambridge.arm.com>
- <20180207011455.GA15214@hori1.linux.bs1.fc.nec.co.jp>
- <87fu6bfytm.fsf@e105922-lin.cambridge.arm.com>
- <20180208121749.0ac09af2b5a143106f339f55@linux-foundation.org>
- <87wozhvc49.fsf@concordia.ellerman.id.au>
- <e673f38a-9e5f-21f6-421b-b3cb4ff02e91@oracle.com>
- <CANRm+CxAgWVv5aVzQ0wdP_A7QQgqfy7nN_SxyaactG7Mnqfr2A@mail.gmail.com>
-From:   Mike Kravetz <mike.kravetz@oracle.com>
-Message-ID: <f79d828c-b0b4-8a20-c316-a13430cfb13c@oracle.com>
-Date:   Wed, 29 May 2019 16:31:01 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <CANRm+CxAgWVv5aVzQ0wdP_A7QQgqfy7nN_SxyaactG7Mnqfr2A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9272 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1905290145
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9272 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1905290146
+        id S1727371AbfE3BFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 29 May 2019 21:05:19 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:45335 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726718AbfE3BFT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 May 2019 21:05:19 -0400
+Received: by mail-pl1-f196.google.com with SMTP id x7so819483plr.12;
+        Wed, 29 May 2019 18:05:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=pyl/L4lftqre86x4sDXFC//cXdVYSHdszkBDIq0F9kA=;
+        b=GTCRRX0FPev8NT+YGJsHGcCdJCxG92nkcB8v64iqMk23Rjub8TZ98noOEp9km4gkGo
+         uuf3oW7XL5QFgCpU531dAHkFlDOhFqNf6uyTY/wFPbLVyX+BoNZV98xnQ3oARRBdLgxO
+         DrneOgK9Ld1Nsvma+2iTIDqo8cn7onzbJUYHy9XbL/6mN9u0z4n069XW/NMqp+rLNwr2
+         b21QtQPGxN9KswIMpKnidvm+Itg2ATLUeteHrgu3NVqJhDyS6CKD31kfzXbmf4oj6Sf+
+         QHaTnU5LaVEZhqIjQEnr9vHQGdvbGYIPrcSf0SEPqv/L6fR26G/wCgzXp7TS3HxkfTVG
+         mA+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=pyl/L4lftqre86x4sDXFC//cXdVYSHdszkBDIq0F9kA=;
+        b=GSBZY5KMm4AHbkM2s/xFmD2KfgIUq+weIabNafW26CnfCPFAZ7rAlsPZI9mS/Hkcha
+         npj0QpH5MhAwGcg1ch9Yjz/bGKo0kJAYpj68bzvMlchGEQK5ssYWrlylqLuJ4TCF+Tx1
+         kZFosP1AXyaqoFZNtSEdSxMy40Yd5Le6EEWK35mpFe5uwsLUQlvVHV7pHpJL8h7EgoI3
+         I1DwPN7w0kwTdtxWWQVEDC9l6LjLcnU8Su0ZKjB7cUs3oPfddp0hjmSy5zrQGQ5TkMdS
+         uWNZ1IB9kqYNNT5BxZHHZL4mUyV4HWEWbCdPVevnd0yI7c6pCu8UW2lnsXcUknpery6I
+         NNoQ==
+X-Gm-Message-State: APjAAAXyKQsmFmhHUnKnz7MDE1U10dBk4qO6XXRV4gOQWKGEphj0Rz2g
+        OJvgezFXFYaoQaKj5Yy16b/BG3ZR
+X-Google-Smtp-Source: APXvYqxkxvXL66NaVgVxd4ZMCG5XUs4T06D1NIsaC6C41tKJWj7CHQ0CoEFgnNnaykwmwlGCS4evUg==
+X-Received: by 2002:a17:902:15c5:: with SMTP id a5mr974456plh.39.1559178318967;
+        Wed, 29 May 2019 18:05:18 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+        by smtp.googlemail.com with ESMTPSA id c76sm861965pfc.43.2019.05.29.18.05.16
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Wed, 29 May 2019 18:05:18 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Subject: [PATCH v3 0/3] KVM: Yield to IPI target if necessary
+Date:   Thu, 30 May 2019 09:05:04 +0800
+Message-Id: <1559178307-6835-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/28/19 2:49 AM, Wanpeng Li wrote:
-> Cc Paolo,
-> Hi all,
-> On Wed, 14 Feb 2018 at 06:34, Mike Kravetz <mike.kravetz@oracle.com> wrote:
->>
->> On 02/12/2018 06:48 PM, Michael Ellerman wrote:
->>> Andrew Morton <akpm@linux-foundation.org> writes:
->>>
->>>> On Thu, 08 Feb 2018 12:30:45 +0000 Punit Agrawal <punit.agrawal@arm.com> wrote:
->>>>
->>>>>>
->>>>>> So I don't think that the above test result means that errors are properly
->>>>>> handled, and the proposed patch should help for arm64.
->>>>>
->>>>> Although, the deviation of pud_huge() avoids a kernel crash the code
->>>>> would be easier to maintain and reason about if arm64 helpers are
->>>>> consistent with expectations by core code.
->>>>>
->>>>> I'll look to update the arm64 helpers once this patch gets merged. But
->>>>> it would be helpful if there was a clear expression of semantics for
->>>>> pud_huge() for various cases. Is there any version that can be used as
->>>>> reference?
->>>>
->>>> Is that an ack or tested-by?
->>>>
->>>> Mike keeps plaintively asking the powerpc developers to take a look,
->>>> but they remain steadfastly in hiding.
->>>
->>> Cc'ing linuxppc-dev is always a good idea :)
->>>
->>
->> Thanks Michael,
->>
->> I was mostly concerned about use cases for soft/hard offline of huge pages
->> larger than PMD_SIZE on powerpc.  I know that powerpc supports PGD_SIZE
->> huge pages, and soft/hard offline support was specifically added for this.
->> See, 94310cbcaa3c "mm/madvise: enable (soft|hard) offline of HugeTLB pages
->> at PGD level"
->>
->> This patch will disable that functionality.  So, at a minimum this is a
->> 'heads up'.  If there are actual use cases that depend on this, then more
->> work/discussions will need to happen.  From the e-mail thread on PGD_SIZE
->> support, I can not tell if there is a real use case or this is just a
->> 'nice to have'.
-> 
-> 1GB hugetlbfs pages are used by DPDK and VMs in cloud deployment, we
-> encounter gup_pud_range() panic several times in product environment.
-> Is there any plan to reenable and fix arch codes?
+The idea is from Xen, when sending a call-function IPI-many to vCPUs, 
+yield if any of the IPI target vCPUs was preempted. 17% performance 
+increasement of ebizzy benchmark can be observed in an over-subscribe 
+environment. (w/ kvm-pv-tlb disabled, testing TLB flush call-function 
+IPI-many since call-function is not easy to be trigged by userspace 
+workload).
 
-I too am aware of slightly more interest in 1G huge pages.  Suspect that as
-Intel MMU capacity increases to handle more TLB entries there will be more
-and more interest.
+v2 -> v3:
+ * add bounds-check on dest_id
 
-Personally, I am not looking at this issue.  Perhaps Naoya will comment as
-he know most about this code.
+v1 -> v2:
+ * check map is not NULL
+ * check map->phys_map[dest_id] is not NULL
+ * make kvm_sched_yield static
+ * change dest_id to unsinged long
 
-> In addition, https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/x86/kvm/mmu.c#n3213
-> The memory in guest can be 1GB/2MB/4K, though the host-backed memory
-> are 1GB hugetlbfs pages, after above PUD panic is fixed,
-> try_to_unmap() which is called in MCA recovery path will mark the PUD
-> hwpoison entry. The guest will vmexit and retry endlessly when
-> accessing any memory in the guest which is backed by this 1GB poisoned
-> hugetlbfs page. We have a plan to split this 1GB hugetblfs page by 2MB
-> hugetlbfs pages/4KB pages, maybe file remap to a virtual address range
-> which is 2MB/4KB page granularity, also split the KVM MMU 1GB SPTE
-> into 2MB/4KB and mark the offensive SPTE w/ a hwpoison flag, a sigbus
-> will be delivered to VM at page fault next time for the offensive
-> SPTE. Is this proposal acceptable?
+Wanpeng Li (3):
+  KVM: X86: Yield to IPI target if necessary
+  KVM: X86: Implement PV sched yield hypercall
+  KVM: X86: Expose PV_SCHED_YIELD CPUID feature bit to guest
 
-I am not sure of the error handling design, but this does sound reasonable.
-That block of code which potentially dissolves a huge page on memory error
-is hard to understand and I'm not sure if that is even the 'normal'
-functionality.  Certainly, we would hate to waste/poison an entire 1G page
-for an error on a small subsection.
+ Documentation/virtual/kvm/cpuid.txt      |  4 ++++
+ Documentation/virtual/kvm/hypercalls.txt | 11 +++++++++++
+ arch/x86/include/uapi/asm/kvm_para.h     |  1 +
+ arch/x86/kernel/kvm.c                    | 21 +++++++++++++++++++++
+ arch/x86/kvm/cpuid.c                     |  3 ++-
+ arch/x86/kvm/x86.c                       | 26 ++++++++++++++++++++++++++
+ include/uapi/linux/kvm_para.h            |  1 +
+ 7 files changed, 66 insertions(+), 1 deletion(-)
 
 -- 
-Mike Kravetz
+2.7.4
+
