@@ -2,110 +2,226 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 358892FFAB
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2019 17:55:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D7462FFE4
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2019 18:07:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727216AbfE3Pyy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 May 2019 11:54:54 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:44639 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726253AbfE3Pyy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 May 2019 11:54:54 -0400
-Received: by mail-wr1-f67.google.com with SMTP id w13so4524158wru.11
-        for <kvm@vger.kernel.org>; Thu, 30 May 2019 08:54:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=FrmgiCjXWDWy++epoHTkiT3v6JKrDBvnzKAZJKqqz0M=;
-        b=XFhMYTGR/pT1xxsYmUpOnyKPEsGLZnSiUd9FkiXVpMi/jZQDdKvJMsA0Amhane9gCL
-         J0WP4n4GbxfZvw8Noh6OeiQ985GIuqhe4rqM/LHDzu1Drm82iBiAg5boTTx6B8u2IO1q
-         byhEBfKsrrvynj8J59VF2RlCIAKBi1wuBOunymBNJgxx5ZL+oNXrwj0Xxfy2ZDJWK8aO
-         P/xznkemIjPj4wRjMc8n+K/ugNh1b9hexVY3wH5NGmfOQqkR/N4QyycPQE7t6Qz356wm
-         iH1iply8EJnfBxG29kDMq1ljj7lywR/ByG7qnHxZ5mwVz/639oioGLbZbji6aCXSZMf9
-         o3IQ==
-X-Gm-Message-State: APjAAAU6awiQ5Jps/txHl9NGqXs/dxMUaXqjw6K1/eR1OgguRJOjRw5J
-        /fBHuTsmTbQ9VgLVll9X4gHwtA==
-X-Google-Smtp-Source: APXvYqyvEkuJhdx/IT3Pf2U65bAq0aKoTztvb4ptIHe0hPnvOP7247GIoHIWjpThdmeJ8kkW6LU8jw==
-X-Received: by 2002:adf:e311:: with SMTP id b17mr3123302wrj.11.1559231692169;
-        Thu, 30 May 2019 08:54:52 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:f91e:ffe0:9205:3b26? ([2001:b07:6468:f312:f91e:ffe0:9205:3b26])
-        by smtp.gmail.com with ESMTPSA id a62sm3594397wmf.19.2019.05.30.08.54.50
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 30 May 2019 08:54:51 -0700 (PDT)
-Subject: Re: [PATCH 1/2] scsi_host: add support for request batching
-To:     Bart Van Assche <bvanassche@acm.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jejb@linux.ibm.com, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, stefanha@redhat.com
-References: <20190530112811.3066-1-pbonzini@redhat.com>
- <20190530112811.3066-2-pbonzini@redhat.com>
- <ad0578b0-ce73-85ed-b67d-70c5d8176a23@acm.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <461fe0cd-c5bc-a612-6013-7c002b92dcdc@redhat.com>
-Date:   Thu, 30 May 2019 17:54:49 +0200
+        id S1727243AbfE3QHG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 May 2019 12:07:06 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:43836 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726045AbfE3QHG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 May 2019 12:07:06 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4UG4VBr062702;
+        Thu, 30 May 2019 16:06:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=+GLA6qLrn26KPJEpEajh3ipF/BPoxxfouik/rd34OzM=;
+ b=AwmlutIReVoUCST+0CvuT1i683wuk/bgaVaXpwFLuLObOH6WAfasg+1gIzeRdE2lXYjb
+ k8P67eGtLM2jUaKR9Cy3m4TvgSb5+cBwa2T8P+yN1HdMoZWh+Ggt2lVsYNq8wgS4RczC
+ Ob71kUfljvyH5fcGoqQaqFQS4TYWXfMx3pY3C+r2yQF46AIqpx1jAW7P3kPlizYiO3T0
+ ZblzYxr+PrepeLcYjU1orVLKF6nQOQcaFQBGNaPWrM8vzs9svllGt0RN7sK/lmLWd9+b
+ VLJpczb5tPtPCsmplNczUgngjT1jT/8Yk0IfRgeZkTSIRA/aLnoWnZFsdY3idrib592i Ow== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2spw4ts5tq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 30 May 2019 16:06:12 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4UG64iQ193779;
+        Thu, 30 May 2019 16:06:12 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2sr31vy3va-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 30 May 2019 16:06:12 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4UG62SZ026718;
+        Thu, 30 May 2019 16:06:02 GMT
+Received: from [192.168.1.16] (/24.9.64.241)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 30 May 2019 09:06:02 -0700
+Subject: Re: [PATCH v15 05/17] arms64: untag user pointers passed to memory
+ syscalls
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Andrew Murray <andrew.murray@arm.com>,
+        Andrey Konovalov <andreyknvl@google.com>,
+        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
+        linux-kselftest@vger.kernel.org,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org, Dmitry Vyukov <dvyukov@google.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        linux-media@vger.kernel.org, Kevin Brodsky <kevin.brodsky@arm.com>,
+        Kees Cook <keescook@chromium.org>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Kostya Serebryany <kcc@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        linux-kernel@vger.kernel.org,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+References: <cover.1557160186.git.andreyknvl@google.com>
+ <00eb4c63fefc054e2c8d626e8fedfca11d7c2600.1557160186.git.andreyknvl@google.com>
+ <20190527143719.GA59948@MBP.local>
+ <20190528145411.GA709@e119886-lin.cambridge.arm.com>
+ <20190528154057.GD32006@arrakis.emea.arm.com>
+ <11193998209cc6ff34e7d704f081206b8787b174.camel@oracle.com>
+ <20190529142008.5quqv3wskmpwdfbu@mbp>
+ <b2753e81-7b57-481f-0095-3c6fecb1a74c@oracle.com>
+ <20190530151105.GA35418@arrakis.emea.arm.com>
+From:   Khalid Aziz <khalid.aziz@oracle.com>
+Organization: Oracle Corp
+Message-ID: <f79336b5-46b4-39c0-b754-23366207e32d@oracle.com>
+Date:   Thu, 30 May 2019 10:05:55 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <ad0578b0-ce73-85ed-b67d-70c5d8176a23@acm.org>
+In-Reply-To: <20190530151105.GA35418@arrakis.emea.arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9272 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=660
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905300114
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9272 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=684 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905300114
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/05/19 17:36, Bart Van Assche wrote:
-> On 5/30/19 4:28 AM, Paolo Bonzini wrote:
->> +static const struct blk_mq_ops scsi_mq_ops_no_commit = {
->> +    .get_budget    = scsi_mq_get_budget,
->> +    .put_budget    = scsi_mq_put_budget,
->> +    .queue_rq    = scsi_queue_rq,
->> +    .complete    = scsi_softirq_done,
->> +    .timeout    = scsi_timeout,
->> +#ifdef CONFIG_BLK_DEBUG_FS
->> +    .show_rq    = scsi_show_rq,
->> +#endif
->> +    .init_request    = scsi_mq_init_request,
->> +    .exit_request    = scsi_mq_exit_request,
->> +    .initialize_rq_fn = scsi_initialize_rq,
->> +    .busy        = scsi_mq_lld_busy,
->> +    .map_queues    = scsi_map_queues,
->> +};
->> +
->> +static void scsi_commit_rqs(struct blk_mq_hw_ctx *hctx)
->> +{
->> +    struct request_queue *q = hctx->queue;
->> +    struct scsi_device *sdev = q->queuedata;
->> +    struct Scsi_Host *shost = sdev->host;
->> +
->> +    shost->hostt->commit_rqs(shost, hctx->queue_num);
->> +}
->> +
->>   static const struct blk_mq_ops scsi_mq_ops = {
->>       .get_budget    = scsi_mq_get_budget,
->>       .put_budget    = scsi_mq_put_budget,
->>       .queue_rq    = scsi_queue_rq,
->> +    .commit_rqs    = scsi_commit_rqs,
->>       .complete    = scsi_softirq_done,
->>       .timeout    = scsi_timeout,
->>   #ifdef CONFIG_BLK_DEBUG_FS
-> 
-> Hi Paolo,
-> 
-> Have you considered to modify the block layer such that a single
-> scsi_mq_ops structure can be used for all SCSI LLD types?
+On 5/30/19 9:11 AM, Catalin Marinas wrote:
+> On Wed, May 29, 2019 at 01:16:37PM -0600, Khalid Aziz wrote:
+>> mmap() can return the same tagged address but I am uneasy about kernel=
 
-Yes, but I don't think it's possible to do it in a nice way.
-Any adjustment we make to the block layer to fit the SCSI subsystem's
-desires would make all other block drivers uglier, so I chose to confine
-the ugliness here.
+>> pre-coloring the pages. Database can mmap 100's of GB of memory. That =
+is
+>> lot of work being offloaded to the kernel to pre-color the page even i=
+f
+>> done in batches as pages are faulted in.
+>=20
+> For anonymous mmap() for example, the kernel would have to zero the
+> faulted in pages anyway. We can handle the colouring at the same time i=
+n
+> clear_user_page() (as I said below, we have to clear the colour anyway
+> from previous uses, so it's simply extending this to support something
+> other than tag/colour 0 by default with no additional overhead).
+>=20
 
-The root issue is that the SCSI subsystem is unique in how it sits on
-top of the block layer; this is the famous "adapter" (or "midlayer",
-though that is confusing when talking about SCSI) design that Linux
-usually tries to avoid.
+On sparc M7, clear_user_page() ends up in M7clear_user_page defined in
+arch/sparc/lib/M7memset.S. M7 code use Block Init Store (BIS) to clear
+the page. BIS on M7 clears the memory tags as well and no separate
+instructions are needed to clear the tags. As a result when kernel
+clears a page before returning it to user, the page is not only zeroed
+out, its tags are also cleared to 0.
 
-Paolo
+>>> Since we already need such loop in the kernel, we might as well allow=
+
+>>> user space to require a certain colour. This comes in handy for large=
+
+>>> malloc() and another advantage is that the C library won't be stuck
+>>> trying to paint the whole range (think GB).
+>>
+>> If kernel is going to pre-color all pages in a vma, we will need to
+>> store the default tag in the vma. It will add more time to page fault
+>> handling code. On sparc M7, kernel will need to execute additional 128=
+
+>> stxa instructions to set the tags on a normal page.
+>=20
+> As I said, since the user can retrieve an old colour using ldxa, the
+> kernel should perform this operation anyway on any newly allocated page=
+
+> (unless you clear the existing colour on page freeing).>
+
+Tags are not cleared on sparc on freeing. They get cleared when the page
+is allocated again.
+
+>>>> We can try to store tags for an entire region in vma but that is
+>>>> expensive, plus on sparc tags are set in userspace with no
+>>>> participation from kernel and now we need a way for userspace to
+>>>> communicate the tags to kernel.
+>>>
+>>> We can't support finer granularity through the mmap() syscall and, as=
+
+>>> you said, the vma is not the right thing to store the individual tags=
+=2E
+>>> With the above extension to mmap(), we'd have to store a colour per v=
+ma
+>>> and prevent merging if different colours (we could as well use the
+>>> pkeys mechanism we already have in the kernel but use a colour per vm=
+a
+>>> instead of a key).
+>>
+>> Since tags can change on any part of mmap region on sparc at any time
+>> without kernel being involved, I am not sure I see much reason for
+>> kernel to enforce any tag related restrictions.
+>=20
+> It's not enforcing a tag, more like the default colour for a faulted in=
+
+> page. Anyway, if sparc is going with default 0/untagged, that's fine as=
+
+> well. We may add this mmap() option to arm64 only.
+>=20
+>>>> From sparc point of view, making kernel responsible for assigning ta=
+gs
+>>>> to a page on page fault is full of pitfalls.
+>>>
+>>> This could be just some arm64-specific but if you plan to deploy it m=
+ore
+>>> generically for sparc (at the C library level), you may find this
+>>> useful.
+>>
+>> Common semantics from app developer point of view will be very useful =
+to
+>> maintain. If arm64 says mmap with MAP_FIXED and a tagged address will
+>> return a pre-colored page, I would rather have it be the same on any
+>> architecture. Is there a use case that justifies kernel doing this ext=
+ra
+>> work?
+>=20
+> So if a database program is doing an anonymous mmap(PROT_TBI) of 100GB,=
+
+> IIUC for sparc the faulted-in pages will have random colours (on 64-byt=
+e
+> granularity). Ignoring the information leak from prior uses of such
+> pages, it would be the responsibility of the db program to issue the
+> stxa. On arm64, since we also want to do this via malloc(), any large
+> allocation would require all pages to be faulted in so that malloc() ca=
+n
+> set the write colour before being handed over to the user. That's what
+> we want to avoid and the user is free to repaint the memory as it likes=
+=2E
+>=20
+
+On sparc, any newly allocated page is cleared along with any old tags on
+it. Since clearing tag happens automatically when page is cleared on
+sparc, clear_user_page() will need to execute additional stxa
+instructions to set a new tag. It is doable. In a way it is done already
+if page is being pre-colored with tag 0 always ;) Where would the
+pre-defined tag be stored - as part of address stored in vm_start or a
+new field in vm_area_struct?
+
+--
+Khalid
+
