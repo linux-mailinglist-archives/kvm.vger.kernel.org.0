@@ -2,87 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 486B52EA8F
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2019 04:17:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33E8F2F6C7
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2019 06:59:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726540AbfE3CRi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 29 May 2019 22:17:38 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:38099 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726311AbfE3CRh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 29 May 2019 22:17:37 -0400
-Received: by mail-pl1-f194.google.com with SMTP id f97so1875092plb.5;
-        Wed, 29 May 2019 19:17:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=mG0K6Xuhbuw0UAFGEVQxLHL2UiAfokWdja5pAOSTcpg=;
-        b=VqyPuC7zMupYS4v6p61jz9KDynbRRTkVHwNJiFGnK/Hc22x1CqCZFSBb4M8e4XEiBt
-         KoKy2RQjLyOHhPnY3OXbAVGPfxFbwkqtCh4JBY7mtAlNBqojoAlX6RXSyk6iY15BLOaD
-         JPObD4AEb/7tGgGSGhvu3XQvOWVcaP8HMuuq4bRdnW2jpYkY+sQrjSux25khGi65v9Sl
-         a1K2GuBVQ9unJLDNF/Y3dGrG1982wtYqXqWxS10gUJSf6dbho2UK7+xofFDXvrsrUo2k
-         tFuob60BGNXXGDKJaTTWA4aZUI+CkyqNBlFbK7TXQKlwvn7OzuR/A76hPioKWoIb8Wf2
-         wx2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=mG0K6Xuhbuw0UAFGEVQxLHL2UiAfokWdja5pAOSTcpg=;
-        b=T3QHkmNhwrkGJ8Eqc8lnMFGiIXxIQSvrqhyTCvJUEFAE7vmYiQdbpdK4vjjLIH5V1v
-         7N6p19Wde8r8RVyjfIJt25jvvmZFn9yAq9tNUpUYLl6+EC+B9bCs5rlvm0cnk9/x2byD
-         qboHITxaeAEvIHPUnA0afNdr08yETDNhImxtoCVklLSU3TdoXPfZrEt5zoOwlMwbAPya
-         Fy15ZCboWm6/rlFxPbHj+w3c7Zy0E3U/Q9OOxSMHMh1HiTWqX8QCUQT38xHY7CClChr1
-         FTPPb4le64q3uYidoRx+7oXwTMfZ9gSeYR7I7IJuRjLhFzRenXyf8U+FVhHXfedeqZ4P
-         adXw==
-X-Gm-Message-State: APjAAAVkJIUZFGj6ocrPnszdBgXWXicQxEtq4PBcsVG1oWDImts0MKN6
-        QfKD/jT6N2B4zbzyCDjdmtSMOZHD
-X-Google-Smtp-Source: APXvYqzmsXAqAKLi9iA7Pw+2glcjWOhnjwCr303RsKvFP3aZAWFx95j+iUfQWeD6hFlFPajWOTLlDw==
-X-Received: by 2002:a17:902:a81:: with SMTP id 1mr1257428plp.287.1559182657101;
-        Wed, 29 May 2019 19:17:37 -0700 (PDT)
-Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
-        by smtp.gmail.com with ESMTPSA id x17sm584766pgh.47.2019.05.29.19.17.34
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 29 May 2019 19:17:36 -0700 (PDT)
-From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-To:     kvm-ppc@vger.kernel.org
-Cc:     paulus@ozlabs.org, kvm@vger.kernel.org,
-        Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Subject: [PATCH] KVM: PPC: Book3S HV: Restore SPRG3 in kvmhv_p9_guest_entry()
-Date:   Thu, 30 May 2019 12:17:18 +1000
-Message-Id: <20190530021718.22584-1-sjitindarsingh@gmail.com>
-X-Mailer: git-send-email 2.13.6
+        id S1727987AbfE3E7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 May 2019 00:59:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45040 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727718AbfE3DJn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 29 May 2019 23:09:43 -0400
+Received: from localhost (ip67-88-213-2.z213-88-67.customer.algx.net [67.88.213.2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3B33A24492;
+        Thu, 30 May 2019 03:09:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1559185782;
+        bh=Bx422FIl1dT2IwAkDhd7kxjiKoK4XC/zVmRIsYSeuu0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=AWAsvly/zPfB5MCv7hLPJI9fsiie9AtBgYc3Q5OpX3Rmx3s2p187+B0Hyb1stgV2l
+         ivpYUjT1MeW8bSHp/O7HWh7yQjb3ngT+dhw66RmoeVByT6t2W/3OMfOL+DZugd8Fc/
+         PVIlqlDAqv8Q278mW4kIuA/YMq4I8H2+sVTdTkGw=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Borislav Petkov <bp@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
+        kvm@vger.kernel.org, Liran Alon <liran.alon@oracle.com>,
+        Mihai Carabas <mihai.carabas@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>, x86@kernel.org
+Subject: [PATCH 5.1 005/405] x86/kvm/pmu: Set AMDs virt PMU version to 1
+Date:   Wed, 29 May 2019 20:00:03 -0700
+Message-Id: <20190530030540.630618892@linuxfoundation.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190530030540.291644921@linuxfoundation.org>
+References: <20190530030540.291644921@linuxfoundation.org>
+User-Agent: quilt/0.66
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The sprgs are a set of 4 general purpose sprs provided for software use.
-SPRG3 is special in that it can also be read from userspace. Thus it is
-used on linux to store the cpu and numa id of the process to speed up
-syscall access to this information.
+From: Borislav Petkov <bp@suse.de>
 
-This register is overwritten with the guest value on kvm guest entry,
-and so needs to be restored on exit again. Thus restore the value on
-the guest exit path in kvmhv_p9_guest_entry().
+commit a80c4ec10ed9632c44c829452dc40a0443ff4e85 upstream.
 
-Fixes: 95a6432ce9038 ("KVM: PPC: Book3S HV: Streamlined guest entry/exit path on P9 for radix guests")
+After commit:
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+  672ff6cff80c ("KVM: x86: Raise #GP when guest vCPU do not support PMU")
+
+my AMD guests started #GPing like this:
+
+  general protection fault: 0000 [#1] PREEMPT SMP
+  CPU: 1 PID: 4355 Comm: bash Not tainted 5.1.0-rc6+ #3
+  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.12.0-1 04/01/2014
+  RIP: 0010:x86_perf_event_update+0x3b/0xa0
+
+with Code: pointing to RDPMC. It is RDPMC because the guest has the
+hardware watchdog CONFIG_HARDLOCKUP_DETECTOR_PERF enabled which uses
+perf. Instrumenting kvm_pmu_rdpmc() some, showed that it fails due to:
+
+  if (!pmu->version)
+  	return 1;
+
+which the above commit added. Since AMD's PMU leaves the version at 0,
+that causes the #GP injection into the guest.
+
+Set pmu->version arbitrarily to 1 and move it above the non-applicable
+struct kvm_pmu members.
+
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>
+Cc: kvm@vger.kernel.org
+Cc: Liran Alon <liran.alon@oracle.com>
+Cc: Mihai Carabas <mihai.carabas@oracle.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: x86@kernel.org
+Cc: stable@vger.kernel.org
+Fixes: 672ff6cff80c ("KVM: x86: Raise #GP when guest vCPU do not support PMU")
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
 ---
- arch/powerpc/kvm/book3s_hv.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/x86/kvm/pmu_amd.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index ecbf66b3d2a4..4fdd7a7fe6a7 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -3677,6 +3677,7 @@ out:		kfree(hvregs);
- 	vc->in_guest = 0;
+--- a/arch/x86/kvm/pmu_amd.c
++++ b/arch/x86/kvm/pmu_amd.c
+@@ -269,10 +269,10 @@ static void amd_pmu_refresh(struct kvm_v
  
- 	mtspr(SPRN_DEC, local_paca->kvm_hstate.dec_expires - mftb());
-+	mtspr(SPRN_SPRG_VDSO_WRITE, local_paca->sprg_vdso);
+ 	pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << 48) - 1;
+ 	pmu->reserved_bits = 0xffffffff00200000ull;
++	pmu->version = 1;
+ 	/* not applicable to AMD; but clean them to prevent any fall out */
+ 	pmu->counter_bitmask[KVM_PMC_FIXED] = 0;
+ 	pmu->nr_arch_fixed_counters = 0;
+-	pmu->version = 0;
+ 	pmu->global_status = 0;
+ }
  
- 	kvmhv_load_host_pmu();
- 
--- 
-2.13.6
+
 
