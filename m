@@ -2,191 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DD042FAEC
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2019 13:28:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A9D92FB4B
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2019 13:59:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726947AbfE3L2Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 May 2019 07:28:24 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:41562 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726699AbfE3L2R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 May 2019 07:28:17 -0400
-Received: by mail-wr1-f65.google.com with SMTP id c2so3963693wrm.8;
-        Thu, 30 May 2019 04:28:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=0zslCchXkU9/iE2gw3QRd9dcZ6RTFcWD2DAc5YM+PJU=;
-        b=l/k58YGHILVSQ3nCQBqu7l0MU9SYbdSF3ri5oKMWxBw/9EO1UR+Zs57slpEHC4BfJw
-         ZLELcw/QSBiSq7Jh0wbnj3uynynmL864AH/3COtA/u5hTMo3m0lNJWdhlXUhUlzsYoyy
-         fkjjmovfRx2HZJ8Xk3Ouek+ofPuCSXcHfIb1ox3iCCO087iziUEHTXX2t1y/bSb2MFha
-         dmUSImR2uxEoiI/vokVk9xaQIPx8ZMP4uYPpd11XhIDf5MoTREoTv9ZPRiHKk2cbyPBx
-         EkyUW3hAwsXthKIxjPmtJ8VbMilnfy4XcH6/yRs3m5V2pPOgf663vx7HlIPJOvDRqPHs
-         GeCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=0zslCchXkU9/iE2gw3QRd9dcZ6RTFcWD2DAc5YM+PJU=;
-        b=Dw8e0whjCLHOSxVSyZ3k84OgOjBv8eb9hvPxODmos0CU1FFeobzASrQk0UzZ3fVHOA
-         H4q1uFMc++GrA8ANElCIGzOB2bpjCI6vTdNwj5VJPGgWBvDh4J2aEaYdAecBabMA/Qew
-         bT32jXZubQyjBzKxs6oZZHwpZuIUERI8xOJdARN4Xa3MCZpNPQKRM31COE021/fB0+42
-         KHXgJuqt8AO84dXNQxnInEmL4tsViX9u0AP3i3V22PpINUYy4h+PdpQdOQLgiS64VjwI
-         jI+Z7gjV85atAw2wlxcu1zXt2ib8qodT7BsaLEG8a7OTUdIbN+kwzA9ZL6n7aREmy5kY
-         TVLQ==
-X-Gm-Message-State: APjAAAWi+wKfNj6IQI0xzLtZF8kZuQpz5MArUSLRmIngElkwn0fgb024
-        4794iMGZNsC3mzEGYv1kLp+0wweV
-X-Google-Smtp-Source: APXvYqwQ1ZolElu//tR8q8fWIFyB08c1e/wWz3z13PLYJQojuLdZFVZt1KGebgNtncrsD4/yItIvJQ==
-X-Received: by 2002:a5d:6389:: with SMTP id p9mr2330104wru.297.1559215695004;
-        Thu, 30 May 2019 04:28:15 -0700 (PDT)
-Received: from donizetti.redhat.com ([2001:b07:6468:f312:f91e:ffe0:9205:3b26])
-        by smtp.gmail.com with ESMTPSA id o14sm2601855wrp.77.2019.05.30.04.28.14
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 30 May 2019 04:28:14 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     jejb@linux.ibm.com, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, stefanha@redhat.com
-Subject: [PATCH 2/2] virtio_scsi: implement request batching
-Date:   Thu, 30 May 2019 13:28:11 +0200
-Message-Id: <20190530112811.3066-3-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190530112811.3066-1-pbonzini@redhat.com>
-References: <20190530112811.3066-1-pbonzini@redhat.com>
+        id S1726992AbfE3L7Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 May 2019 07:59:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56028 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726792AbfE3L7X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 May 2019 07:59:23 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 05923308626C;
+        Thu, 30 May 2019 11:59:23 +0000 (UTC)
+Received: from [10.72.12.113] (ovpn-12-113.pek2.redhat.com [10.72.12.113])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C96AA19736;
+        Thu, 30 May 2019 11:59:15 +0000 (UTC)
+Subject: Re: [PATCH 3/4] vsock/virtio: fix flush of works during the .remove()
+To:     Stefano Garzarella <sgarzare@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>
+References: <20190528105623.27983-1-sgarzare@redhat.com>
+ <20190528105623.27983-4-sgarzare@redhat.com>
+ <9ac9fc4b-5c39-2503-dfbb-660a7bdcfbfd@redhat.com>
+ <20190529105832.oz3sagbne5teq3nt@steredhat>
+ <8c9998c8-1b9c-aac6-42eb-135fcb966187@redhat.com>
+ <20190530101036.wnjphmajrz6nz6zc@steredhat.homenet.telecomitalia.it>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <4c881585-8fee-0a53-865c-05d41ffb8ed1@redhat.com>
+Date:   Thu, 30 May 2019 19:59:14 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190530101036.wnjphmajrz6nz6zc@steredhat.homenet.telecomitalia.it>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Thu, 30 May 2019 11:59:23 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Adding the command and kicking the virtqueue so far was done one after
-another.  Make the kick optional, so that we can take into account SCMD_LAST.
-We also need a commit_rqs callback to kick the device if blk-mq aborts
-the submission before the last request is reached.
 
-Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- drivers/scsi/virtio_scsi.c | 55 +++++++++++++++++++++++++++-----------
- 1 file changed, 40 insertions(+), 15 deletions(-)
+On 2019/5/30 下午6:10, Stefano Garzarella wrote:
+> On Thu, May 30, 2019 at 05:46:18PM +0800, Jason Wang wrote:
+>> On 2019/5/29 下午6:58, Stefano Garzarella wrote:
+>>> On Wed, May 29, 2019 at 11:22:40AM +0800, Jason Wang wrote:
+>>>> On 2019/5/28 下午6:56, Stefano Garzarella wrote:
+>>>>> We flush all pending works before to call vdev->config->reset(vdev),
+>>>>> but other works can be queued before the vdev->config->del_vqs(vdev),
+>>>>> so we add another flush after it, to avoid use after free.
+>>>>>
+>>>>> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+>>>>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>>>> ---
+>>>>>     net/vmw_vsock/virtio_transport.c | 23 +++++++++++++++++------
+>>>>>     1 file changed, 17 insertions(+), 6 deletions(-)
+>>>>>
+>>>>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>>>>> index e694df10ab61..ad093ce96693 100644
+>>>>> --- a/net/vmw_vsock/virtio_transport.c
+>>>>> +++ b/net/vmw_vsock/virtio_transport.c
+>>>>> @@ -660,6 +660,15 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>>>>>     	return ret;
+>>>>>     }
+>>>>> +static void virtio_vsock_flush_works(struct virtio_vsock *vsock)
+>>>>> +{
+>>>>> +	flush_work(&vsock->loopback_work);
+>>>>> +	flush_work(&vsock->rx_work);
+>>>>> +	flush_work(&vsock->tx_work);
+>>>>> +	flush_work(&vsock->event_work);
+>>>>> +	flush_work(&vsock->send_pkt_work);
+>>>>> +}
+>>>>> +
+>>>>>     static void virtio_vsock_remove(struct virtio_device *vdev)
+>>>>>     {
+>>>>>     	struct virtio_vsock *vsock = vdev->priv;
+>>>>> @@ -668,12 +677,6 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
+>>>>>     	mutex_lock(&the_virtio_vsock_mutex);
+>>>>>     	the_virtio_vsock = NULL;
+>>>>> -	flush_work(&vsock->loopback_work);
+>>>>> -	flush_work(&vsock->rx_work);
+>>>>> -	flush_work(&vsock->tx_work);
+>>>>> -	flush_work(&vsock->event_work);
+>>>>> -	flush_work(&vsock->send_pkt_work);
+>>>>> -
+>>>>>     	/* Reset all connected sockets when the device disappear */
+>>>>>     	vsock_for_each_connected_socket(virtio_vsock_reset_sock);
+>>>>> @@ -690,6 +693,9 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
+>>>>>     	vsock->event_run = false;
+>>>>>     	mutex_unlock(&vsock->event_lock);
+>>>>> +	/* Flush all pending works */
+>>>>> +	virtio_vsock_flush_works(vsock);
+>>>>> +
+>>>>>     	/* Flush all device writes and interrupts, device will not use any
+>>>>>     	 * more buffers.
+>>>>>     	 */
+>>>>> @@ -726,6 +732,11 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
+>>>>>     	/* Delete virtqueues and flush outstanding callbacks if any */
+>>>>>     	vdev->config->del_vqs(vdev);
+>>>>> +	/* Other works can be queued before 'config->del_vqs()', so we flush
+>>>>> +	 * all works before to free the vsock object to avoid use after free.
+>>>>> +	 */
+>>>>> +	virtio_vsock_flush_works(vsock);
+>>>> Some questions after a quick glance:
+>>>>
+>>>> 1) It looks to me that the work could be queued from the path of
+>>>> vsock_transport_cancel_pkt() . Is that synchronized here?
+>>>>
+>>> Both virtio_transport_send_pkt() and vsock_transport_cancel_pkt() can
+>>> queue work from the upper layer (socket).
+>>>
+>>> Setting the_virtio_vsock to NULL, should synchronize, but after a careful look
+>>> a rare issue could happen:
+>>> we are setting the_virtio_vsock to NULL at the start of .remove() and we
+>>> are freeing the object pointed by it at the end of .remove(), so
+>>> virtio_transport_send_pkt() or vsock_transport_cancel_pkt() may still be
+>>> running, accessing the object that we are freed.
+>>
+>> Yes, that's my point.
+>>
+>>
+>>> Should I use something like RCU to prevent this issue?
+>>>
+>>>       virtio_transport_send_pkt() and vsock_transport_cancel_pkt()
+>>>       {
+>>>           rcu_read_lock();
+>>>           vsock = rcu_dereference(the_virtio_vsock_mutex);
+>>
+>> RCU is probably a way to go. (Like what vhost_transport_send_pkt() did).
+>>
+> Okay, I'm going this way.
+>
+>>>           ...
+>>>           rcu_read_unlock();
+>>>       }
+>>>
+>>>       virtio_vsock_remove()
+>>>       {
+>>>           rcu_assign_pointer(the_virtio_vsock_mutex, NULL);
+>>>           synchronize_rcu();
+>>>
+>>>           ...
+>>>
+>>>           free(vsock);
+>>>       }
+>>>
+>>> Could there be a better approach?
+>>>
+>>>
+>>>> 2) If we decide to flush after dev_vqs(), is tx_run/rx_run/event_run still
+>>>> needed? It looks to me we've already done except that we need flush rx_work
+>>>> in the end since send_pkt_work can requeue rx_work.
+>>> The main reason of tx_run/rx_run/event_run is to prevent that a worker
+>>> function is running while we are calling config->reset().
+>>>
+>>> E.g. if an interrupt comes between virtio_vsock_flush_works() and
+>>> config->reset(), it can queue new works that can access the device while
+>>> we are in config->reset().
+>>>
+>>> IMHO they are still needed.
+>>>
+>>> What do you think?
+>>
+>> I mean could we simply do flush after reset once and without tx_rx/rx_run
+>> tricks?
+>>
+>> rest();
+>>
+>> virtio_vsock_flush_work();
+>>
+>> virtio_vsock_free_buf();
+> My only doubt is:
+> is it safe to call config->reset() while a worker function could access
+> the device?
+>
+> I had this doubt reading the Michael's advice[1] and looking at
+> virtnet_remove() where there are these lines before the config->reset():
+>
+> 	/* Make sure no work handler is accessing the device. */
+> 	flush_work(&vi->config_work);
+>
+> Thanks,
+> Stefano
+>
+> [1] https://lore.kernel.org/netdev/20190521055650-mutt-send-email-mst@kernel.org
 
-diff --git a/drivers/scsi/virtio_scsi.c b/drivers/scsi/virtio_scsi.c
-index 8af01777d09c..918c811cea95 100644
---- a/drivers/scsi/virtio_scsi.c
-+++ b/drivers/scsi/virtio_scsi.c
-@@ -375,14 +375,7 @@ static void virtscsi_event_done(struct virtqueue *vq)
- 	virtscsi_vq_done(vscsi, &vscsi->event_vq, virtscsi_complete_event);
- };
- 
--/**
-- * virtscsi_add_cmd - add a virtio_scsi_cmd to a virtqueue
-- * @vq		: the struct virtqueue we're talking about
-- * @cmd		: command structure
-- * @req_size	: size of the request buffer
-- * @resp_size	: size of the response buffer
-- */
--static int virtscsi_add_cmd(struct virtqueue *vq,
-+static int __virtscsi_add_cmd(struct virtqueue *vq,
- 			    struct virtio_scsi_cmd *cmd,
- 			    size_t req_size, size_t resp_size)
- {
-@@ -427,17 +420,39 @@ static int virtscsi_add_cmd(struct virtqueue *vq,
- 	return virtqueue_add_sgs(vq, sgs, out_num, in_num, cmd, GFP_ATOMIC);
- }
- 
--static int virtscsi_kick_cmd(struct virtio_scsi_vq *vq,
-+static void virtscsi_kick_vq(struct virtio_scsi_vq *vq)
-+{
-+	bool needs_kick;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&vq->vq_lock, flags);
-+	needs_kick = virtqueue_kick_prepare(vq->vq);
-+	spin_unlock_irqrestore(&vq->vq_lock, flags);
-+
-+	if (needs_kick)
-+		virtqueue_notify(vq->vq);
-+}
-+
-+/**
-+ * virtscsi_add_cmd - add a virtio_scsi_cmd to a virtqueue, optionally kick it
-+ * @vq		: the struct virtqueue we're talking about
-+ * @cmd		: command structure
-+ * @req_size	: size of the request buffer
-+ * @resp_size	: size of the response buffer
-+ * @kick	: whether to kick the virtqueue immediately
-+ */
-+static int virtscsi_add_cmd(struct virtio_scsi_vq *vq,
- 			     struct virtio_scsi_cmd *cmd,
--			     size_t req_size, size_t resp_size)
-+			     size_t req_size, size_t resp_size,
-+			     bool kick)
- {
- 	unsigned long flags;
- 	int err;
- 	bool needs_kick = false;
- 
- 	spin_lock_irqsave(&vq->vq_lock, flags);
--	err = virtscsi_add_cmd(vq->vq, cmd, req_size, resp_size);
--	if (!err)
-+	err = __virtscsi_add_cmd(vq->vq, cmd, req_size, resp_size);
-+	if (!err && kick)
- 		needs_kick = virtqueue_kick_prepare(vq->vq);
- 
- 	spin_unlock_irqrestore(&vq->vq_lock, flags);
-@@ -502,6 +517,7 @@ static int virtscsi_queuecommand(struct Scsi_Host *shost,
- 	struct virtio_scsi *vscsi = shost_priv(shost);
- 	struct virtio_scsi_vq *req_vq = virtscsi_pick_vq_mq(vscsi, sc);
- 	struct virtio_scsi_cmd *cmd = scsi_cmd_priv(sc);
-+	bool kick;
- 	unsigned long flags;
- 	int req_size;
- 	int ret;
-@@ -531,7 +547,8 @@ static int virtscsi_queuecommand(struct Scsi_Host *shost,
- 		req_size = sizeof(cmd->req.cmd);
- 	}
- 
--	ret = virtscsi_kick_cmd(req_vq, cmd, req_size, sizeof(cmd->resp.cmd));
-+	kick = (sc->flags & SCMD_LAST) != 0;
-+	ret = virtscsi_add_cmd(req_vq, cmd, req_size, sizeof(cmd->resp.cmd), kick);
- 	if (ret == -EIO) {
- 		cmd->resp.cmd.response = VIRTIO_SCSI_S_BAD_TARGET;
- 		spin_lock_irqsave(&req_vq->vq_lock, flags);
-@@ -549,8 +566,8 @@ static int virtscsi_tmf(struct virtio_scsi *vscsi, struct virtio_scsi_cmd *cmd)
- 	int ret = FAILED;
- 
- 	cmd->comp = &comp;
--	if (virtscsi_kick_cmd(&vscsi->ctrl_vq, cmd,
--			      sizeof cmd->req.tmf, sizeof cmd->resp.tmf) < 0)
-+	if (virtscsi_add_cmd(&vscsi->ctrl_vq, cmd,
-+			      sizeof cmd->req.tmf, sizeof cmd->resp.tmf, true) < 0)
- 		goto out;
- 
- 	wait_for_completion(&comp);
-@@ -664,6 +681,13 @@ static int virtscsi_map_queues(struct Scsi_Host *shost)
- 	return blk_mq_virtio_map_queues(qmap, vscsi->vdev, 2);
- }
- 
-+static void virtscsi_commit_rqs(struct Scsi_Host *shost, u16 hwq)
-+{
-+	struct virtio_scsi *vscsi = shost_priv(shost);
-+
-+	virtscsi_kick_vq(&vscsi->req_vqs[hwq]);
-+}
-+
- /*
-  * The host guarantees to respond to each command, although I/O
-  * latencies might be higher than on bare metal.  Reset the timer
-@@ -681,6 +705,7 @@ static struct scsi_host_template virtscsi_host_template = {
- 	.this_id = -1,
- 	.cmd_size = sizeof(struct virtio_scsi_cmd),
- 	.queuecommand = virtscsi_queuecommand,
-+	.commit_rqs = virtscsi_commit_rqs,
- 	.change_queue_depth = virtscsi_change_queue_depth,
- 	.eh_abort_handler = virtscsi_abort,
- 	.eh_device_reset_handler = virtscsi_device_reset,
--- 
-2.21.0
+
+Good point. Then I agree with you. But if we can use the RCU to detect 
+the detach of device from socket for these, it would be even better.
+
+Thanks
+
 
