@@ -2,67 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 72949301F9
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2019 20:31:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BCE830227
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2019 20:46:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726532AbfE3Sa7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 May 2019 14:30:59 -0400
-Received: from mga09.intel.com ([134.134.136.24]:65262 "EHLO mga09.intel.com"
+        id S1726442AbfE3SqD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 May 2019 14:46:03 -0400
+Received: from mga12.intel.com ([192.55.52.136]:20607 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726079AbfE3Sa7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 May 2019 14:30:59 -0400
-X-Amp-Result: UNSCANNABLE
+        id S1726079AbfE3SqD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 May 2019 14:46:03 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 May 2019 11:30:58 -0700
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 May 2019 11:46:02 -0700
 X-ExtLoop1: 1
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by orsmga008.jf.intel.com with ESMTP; 30 May 2019 11:30:58 -0700
-Date:   Thu, 30 May 2019 11:30:58 -0700
+  by orsmga001.jf.intel.com with ESMTP; 30 May 2019 11:46:02 -0700
+Date:   Thu, 30 May 2019 11:46:02 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Jan Beulich <JBeulich@suse.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krm <rkrcmar@redhat.com>, KVM <kvm@vger.kernel.org>
-Subject: Re: [PATCH] x86/kvm/VMX: drop bad asm() clobber from
- nested_vmx_check_vmentry_hw()
-Message-ID: <20190530183058.GC23930@linux.intel.com>
-References: <5CEBA3B80200007800232856@prv1-mh.provo.novell.com>
+To:     Luwei Kang <luwei.kang@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org
+Subject: Re: [PATCH] KVM: LAPIC: Do not mask the local interrupts when LAPIC
+ is sw disabled
+Message-ID: <20190530184602.GD23930@linux.intel.com>
+References: <1558435455-233679-1-git-send-email-luwei.kang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5CEBA3B80200007800232856@prv1-mh.provo.novell.com>
+In-Reply-To: <1558435455-233679-1-git-send-email-luwei.kang@intel.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, May 27, 2019 at 02:45:44AM -0600, Jan Beulich wrote:
-> While upstream gcc doesn't detect conflicts on cc (yet), it really
-> should, and hence "cc" should not be specified for asm()-s also having
-> "=@cc<cond>" outputs. (It is quite pointless anyway to specify a "cc"
-> clobber in x86 inline assembly, since the compiler assumes it to be
-> always clobbered, and has no means [yet] to suppress this behavior.)
-> 
-> Signed-off-by: Jan Beulich <jbeulich@suse.com>
+On Tue, May 21, 2019 at 06:44:15PM +0800, Luwei Kang wrote:
+> The current code will mask all the local interrupts in the local
+> vector table when the LAPIC is disabled by SVR (Spurious-Interrupt
+> Vector Register) "APIC Software Enable/Disable" flag (bit8).
+> This may block local interrupt be delivered to target vCPU
+> even if LAPIC is enabled by set SVR (bit8 == 1) after.
 
-FWIW (mostly to satisfy my curiosity):
+The current code aligns with the SDM, which states:
 
-Fixes: bbc0b8239257 ("KVM: nVMX: Capture VM-Fail via CC_{SET,OUT} in nested early checks")
+  Local APIC State After It Has Been Software Disabled
 
-Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+  When the APIC software enable/disable flag in the spurious interrupt
+  vector register has been explicitly cleared (as opposed to being cleared
+  during a power up or reset), the local APIC is temporarily disabled.
+  The operation and response of a local APIC while in this software-
+  disabled state is as follows:
 
-> 
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2781,7 +2781,7 @@ static int nested_vmx_check_vmentry_hw(s
->  		[launched]"i"(offsetof(struct loaded_vmcs, launched)),
->  		[host_state_rsp]"i"(offsetof(struct loaded_vmcs, host_state.rsp)),
->  		[wordsize]"i"(sizeof(ulong))
-> -	      : "cc", "memory"
-> +	      : "memory"
->  	);
->  
->  	if (vmx->msr_autoload.host.nr)
-> 
-> 
+    - The mask bits for all the LVT entries are set. Attempts to reset
+      these bits will be ignored.
