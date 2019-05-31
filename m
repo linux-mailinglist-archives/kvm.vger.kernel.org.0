@@ -2,118 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D55C30603
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2019 02:57:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3FE2306F8
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2019 05:28:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726531AbfEaA5m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 May 2019 20:57:42 -0400
-Received: from mga05.intel.com ([192.55.52.43]:27659 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726128AbfEaA5m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 May 2019 20:57:42 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 May 2019 17:57:41 -0700
-X-ExtLoop1: 1
-Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
-  by fmsmga006.fm.intel.com with ESMTP; 30 May 2019 17:57:40 -0700
-Message-ID: <5CF07D37.9090805@intel.com>
-Date:   Fri, 31 May 2019 09:02:47 +0800
-From:   Wei Wang <wei.w.wang@intel.com>
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
+        id S1726667AbfEaD2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 May 2019 23:28:08 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:46841 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726418AbfEaD2I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 May 2019 23:28:08 -0400
+Received: by mail-wr1-f65.google.com with SMTP id n4so226082wrw.13;
+        Thu, 30 May 2019 20:28:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cdoYxYQXllz6fT2zV23F9oA4lywNBkDt8+j3yf5Nll4=;
+        b=GrvkN6pr6W34zjzkdaAI+fJ7LQwQIYEEkeIxXRy9sk+35SIx9ySeflmUxcvIt3lZT1
+         Gr52S1zdOY5KvgANjNLmCCDjrFrzMBJTt2p8y4sYgjxSvf6AQPaU8815u61Sso/+gh93
+         uI6hyLDYjN2fyZ9N+aEy+KjILLPrKc8WPFGLfy7lPfvo4n7RmjIIYeGkO0NZ+S8zZp9G
+         /uN2mOC3T1ur1EJUqg7s3HhQ7Vhg0BA4vq1ozRDdt3ZxbADy6oP5UkLuM1B/i3E8/cN5
+         cs69ZEeaDbozCcDo+ZbKBDJRMQC0b2l5dzqBKnEMI4XGHoamuiDfw2V1oHnIY18qw93a
+         3oxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cdoYxYQXllz6fT2zV23F9oA4lywNBkDt8+j3yf5Nll4=;
+        b=jOGkBuHwsydRrwsNlbmofwQDH5povdecuqozIoU3tTqTmSB4+E1dpcmFmCFmkbfeG3
+         aOM6lAElQFQBpqPRgb+mD9+9dPbBZKlrVZqqTPqV0xQt7agJ0pBhYlJR9AYFjU6wRO+Q
+         LlN+DjQvg+NZwhpO7vkO3z9lpA+8y5nyN8WbmGbFuaO7dPOSnFRjohj0D8GMmZB1iaT3
+         yZyIe2iLhpfNxcUV8jlLw1LxnT2AV88ukdHZrGg0pLsFH+xd1/5wWiznEt4IwiGqwqiS
+         QX/tQINuWofIsuKE6VoCkaMuC1EWlQgISjb4aQS14SZy7yqerI9oB03x7OJ69aOiitHS
+         Sy/Q==
+X-Gm-Message-State: APjAAAWEfBMtpMg8DZWGNFmUuqAXiXXdMAwY95vRLvJschNpYMtkO2Ps
+        sJks5+g5PERTJUmrpH666Vdoh7k6lsxpJYMY8aI=
+X-Google-Smtp-Source: APXvYqzL5LExQSerZyFlXgXDv4tTzhO6UGwA+xmIbrT/jan5FG8C7J7iIe1JE7NeuDx/5WlgPUTRDBjq9AvQqqFjj7o=
+X-Received: by 2002:a5d:68cd:: with SMTP id p13mr4703190wrw.0.1559273286083;
+ Thu, 30 May 2019 20:28:06 -0700 (PDT)
 MIME-Version: 1.0
-To:     Eric Hankland <ehankland@google.com>
-CC:     pbonzini@redhat.com, rkrcmar@redhat.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v1] KVM: x86: PMU Whitelist
-References: <CAOyeoRWfPNmaWY6Lifdkdj3KPPM654vzDO+s3oduEMCJP+Asow@mail.gmail.com> <5CEC9667.30100@intel.com> <CAOyeoRWhfyuuYdguE6Wrzd7GOdow9qRE4MZ4OKkMc5cdhDT53g@mail.gmail.com> <5CEE3AC4.3020904@intel.com> <CAOyeoRW85jV=TW_xwSj0ZYwPj_L+G9wu+QPGEF3nBmPbWGX4_g@mail.gmail.com>
-In-Reply-To: <CAOyeoRW85jV=TW_xwSj0ZYwPj_L+G9wu+QPGEF3nBmPbWGX4_g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20190530112811.3066-1-pbonzini@redhat.com> <20190530112811.3066-2-pbonzini@redhat.com>
+In-Reply-To: <20190530112811.3066-2-pbonzini@redhat.com>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Fri, 31 May 2019 11:27:54 +0800
+Message-ID: <CACVXFVP-B7uKUGn75rZdu0e4QxUOsSqv8FL0vY2ubmuucvxqjQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] scsi_host: add support for request batching
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM General <kvm@vger.kernel.org>, jejb@linux.ibm.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/30/2019 01:11 AM, Eric Hankland wrote:
-> On Wed, May 29, 2019 at 12:49 AM Wei Wang <wei.w.wang@intel.com> wrote:
->> On 05/29/2019 02:14 AM, Eric Hankland wrote:
->>> On Mon, May 27, 2019 at 6:56 PM Wei Wang <wei.w.wang@intel.com> wrote:
->>>> On 05/23/2019 06:23 AM, Eric Hankland wrote:
->>>>> - Add a VCPU ioctl that can control which events the guest can monitor.
->>>>>
->>>>> Signed-off-by: ehankland <ehankland@google.com>
->>>>> ---
->>>>> Some events can provide a guest with information about other guests or the
->>>>> host (e.g. L3 cache stats); providing the capability to restrict access
->>>>> to a "safe" set of events would limit the potential for the PMU to be used
->>>>> in any side channel attacks. This change introduces a new vcpu ioctl that
->>>>> sets an event whitelist. If the guest attempts to program a counter for
->>>>> any unwhitelisted event, the kernel counter won't be created, so any
->>>>> RDPMC/RDMSR will show 0 instances of that event.
->>>> The general idea sounds good to me :)
->>>>
->>>> For the implementation, I would have the following suggestions:
->>>>
->>>> 1) Instead of using a whitelist, it would be better to use a blacklist to
->>>> forbid the guest from counting any core level information. So by default,
->>>> kvm maintains a list of those core level events, which are not supported to
->>>> the guest.
->>>>
->>>> The userspace ioctl removes the related events from the blacklist to
->>>> make them usable by the guest.
->>>>
->>>> 2) Use vm ioctl, instead of vcpu ioctl. The blacklist-ed events can be
->>>> VM wide
->>>> (unnecessary to make each CPU to maintain the same copy).
->>>> Accordingly, put the pmu event blacklist into kvm->arch.
->>>>
->>>> 3) Returning 1 when the guest tries to set the evetlsel msr to count an
->>>> event which is on the blacklist.
->>>>
->>>> Best,
->>>> Wei
->>> Thanks for the feedback. I have a couple concerns with a KVM
->>> maintained blacklist. First, I'm worried it will be difficult to keep
->>> such a list up to date and accurate (both coming up with the initial
->>> list since there are so many events, and updating it whenever any new
->>> events are published or vulnerabilities are discovered).
->> Not sure about "so many" above. I think there should be much
->> fewer events that may need to be blacklisted.
->>
->> For example the event table 19-3 from SDM 19.2 shows hundreds of
->> events, how many of them would you think that need to be blacklisted?
->>
->>> Second, users
->>> may want to differentiate between whole-socket and sub-socket VMs
->>> (some events may be fine for the whole-socket case) - keeping a single
->>> blacklist wouldn't allow for this.
->> Why wouldn't?
->> In any case (e.g. the whole socket dedicated to the single VM) we
->> want to unlock the blacklisted events, we can have the userspace
->> (e.g. qemu command line options "+event1, +event2") do ioctl to
->> have KVM do that.
->>
->> Btw, for the L3 cache stats event example, I'm not sure if that could
->> be an issue if we have "AnyThread=0". I'll double confirm with
->> someone.
->>
->> Best,
->> Wei
->> Not sure about "so many" above. I think there should be much
->> fewer events that may need to be blacklisted.
-> I think you're right that there are not as many events that seem like
-> they could leak info as events that seem like they won't, but I think
-> the work to validate that they definitely don't could be expensive;
-> with a whitelist it's easy to start with a smaller set and
-> incrementally add to it without having to evaluate all the events
-> right away.
+On Thu, May 30, 2019 at 7:28 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> This allows a list of requests to be issued, with the LLD only writing
+> the hardware doorbell when necessary, after the last request was prepared.
+> This is more efficient if we have lists of requests to issue, particularly
+> on virtualized hardware, where writing the doorbell is more expensive than
+> on real hardware.
+>
+> The use case for this is plugged IO, where blk-mq flushes a batch of
+> requests all at once.
+>
+> The API is the same as for blk-mq, just with blk-mq concepts tweaked to
+> fit the SCSI subsystem API: the "last" flag in blk_mq_queue_data becomes
+> a flag in scsi_cmnd, while the queue_num in the commit_rqs callback is
+> extracted from the hctx and passed as a parameter.
+>
+> The only complication is that blk-mq uses different plugging heuristics
+> depending on whether commit_rqs is present or not.  So we have two
+> different sets of blk_mq_ops and pick one depending on whether the
+> scsi_host template uses commit_rqs or not.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  drivers/scsi/scsi_lib.c  | 37 ++++++++++++++++++++++++++++++++++---
+>  include/scsi/scsi_cmnd.h |  1 +
+>  include/scsi/scsi_host.h | 16 ++++++++++++++--
+>  3 files changed, 49 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 601b9f1de267..eb4e67d02bfe 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -1673,10 +1673,11 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+>                 blk_mq_start_request(req);
+>         }
+>
+> +       cmd->flags &= SCMD_PRESERVED_FLAGS;
+>         if (sdev->simple_tags)
+>                 cmd->flags |= SCMD_TAGGED;
+> -       else
+> -               cmd->flags &= ~SCMD_TAGGED;
+> +       if (bd->last)
+> +               cmd->flags |= SCMD_LAST;
+>
+>         scsi_init_cmd_errh(cmd);
+>         cmd->scsi_done = scsi_mq_done;
+> @@ -1807,10 +1808,37 @@ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
+>  }
+>  EXPORT_SYMBOL_GPL(__scsi_init_queue);
+>
+> +static const struct blk_mq_ops scsi_mq_ops_no_commit = {
+> +       .get_budget     = scsi_mq_get_budget,
+> +       .put_budget     = scsi_mq_put_budget,
+> +       .queue_rq       = scsi_queue_rq,
+> +       .complete       = scsi_softirq_done,
+> +       .timeout        = scsi_timeout,
+> +#ifdef CONFIG_BLK_DEBUG_FS
+> +       .show_rq        = scsi_show_rq,
+> +#endif
+> +       .init_request   = scsi_mq_init_request,
+> +       .exit_request   = scsi_mq_exit_request,
+> +       .initialize_rq_fn = scsi_initialize_rq,
+> +       .busy           = scsi_mq_lld_busy,
+> +       .map_queues     = scsi_map_queues,
+> +};
+> +
+> +
+> +static void scsi_commit_rqs(struct blk_mq_hw_ctx *hctx)
+> +{
+> +       struct request_queue *q = hctx->queue;
+> +       struct scsi_device *sdev = q->queuedata;
+> +       struct Scsi_Host *shost = sdev->host;
+> +
+> +       shost->hostt->commit_rqs(shost, hctx->queue_num);
+> +}
 
-Before going that whitelist/blacklist direction, do you have an event
-example that couldn't be solved by setting "AnyThread=0"?
+It should be fine to implement scsi_commit_rqs() as:
 
-If no, I think we could simply gate guest's setting of "AnyThread=0".
+ if (shost->hostt->commit_rqs)
+       shost->hostt->commit_rqs(shost, hctx->queue_num);
 
-Best,
-Wei
+then scsi_mq_ops_no_commit can be saved.
+
+Because .commit_rqs() is only called when BLK_STS_*_RESOURCE is
+returned from scsi_queue_rq(), at that time shost->hostt->commit_rqs should
+have been hit from cache given .queuecommand is called via
+host->hostt->queuecommand.
+
+Not mention BLK_STS_*_RESOURCE is just often returned for small queue depth
+device.
+
+Thanks,
+Ming Lei
