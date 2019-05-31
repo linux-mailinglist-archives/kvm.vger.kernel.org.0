@@ -2,146 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BEF3304FC
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2019 00:52:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4480D305E6
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2019 02:50:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726599AbfE3Wwu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 30 May 2019 18:52:50 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:46077 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726326AbfE3Wwu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 30 May 2019 18:52:50 -0400
-Received: by mail-qt1-f194.google.com with SMTP id t1so9087831qtc.12
-        for <kvm@vger.kernel.org>; Thu, 30 May 2019 15:52:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=t67ZC4MNc2SNAttzYwTDhyatXWg3h6kEvUy6EU0k9QU=;
-        b=FbebRwSVcAnG6Mt9xMV3tJhHXt/tCiSovVVsCYhcBrrJNQ/18R2ocTP68Bxqn/7b/3
-         HsdTdCnTZl4IZD5upYg2LFWrbHGoA3C5uYY/kLWkQYsw1paBwKB9SxTO32Pc4X4x/fos
-         KBGTnP/rINhY0m/AII3crqrI1ppwOcx9RYbM/j05Sn+AK8Y64jMFTmhBbVOpi4L5cioV
-         89/W7a1SOXoK2NELpqlK0LIc+Z/i7LJonal3MbziQ/H1E2TLnzK35dzKNNPix5Y3V12O
-         RpBFOLSP1hxTrL6tpmD58FBUly/G2x1FcnEdaguqAVxEMn0G4TCvfKNZWRXMfzrcZUJL
-         cwnQ==
-X-Gm-Message-State: APjAAAV2u82+YJPGw1Yfv3MtbfopV7CKrT+xxzzXhNRNn2jhQ9AEMeKF
-        YKjCa2ZYEj5Z+4Kzw0Th6kR6ug==
-X-Google-Smtp-Source: APXvYqwTE8uNShrRUaGGlmcc2h+GxOEcZ6AH8JazaRG/qhRpJu7znm1zUJrRhfEE9Idohkf2/B2tSw==
-X-Received: by 2002:ad4:5146:: with SMTP id g6mr5719624qvq.136.1559256769266;
-        Thu, 30 May 2019 15:52:49 -0700 (PDT)
-Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net. [100.0.197.103])
-        by smtp.gmail.com with ESMTPSA id j33sm2606122qtc.10.2019.05.30.15.52.47
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 30 May 2019 15:52:48 -0700 (PDT)
-Date:   Thu, 30 May 2019 18:52:45 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     nitesh@redhat.com, kvm@vger.kernel.org, david@redhat.com,
-        dave.hansen@intel.com, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, yang.zhang.wz@gmail.com, pagupta@redhat.com,
-        riel@surriel.com, konrad.wilk@oracle.com, lcapitulino@redhat.com,
-        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
-Subject: Re: [RFC PATCH 00/11] mm / virtio: Provide support for paravirtual
- waste page treatment
-Message-ID: <20190530185143-mutt-send-email-mst@kernel.org>
-References: <20190530215223.13974.22445.stgit@localhost.localdomain>
+        id S1726509AbfEaAur (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 30 May 2019 20:50:47 -0400
+Received: from mga12.intel.com ([192.55.52.136]:42235 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726131AbfEaAur (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 30 May 2019 20:50:47 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 May 2019 17:50:46 -0700
+X-ExtLoop1: 1
+Received: from joy-optiplex-7040.sh.intel.com ([10.239.13.9])
+  by orsmga001.jf.intel.com with ESMTP; 30 May 2019 17:50:40 -0700
+From:   Yan Zhao <yan.y.zhao@intel.com>
+To:     intel-gvt-dev@lists.freedesktop.org
+Cc:     aik@ozlabs.ru, Zhengxiao.zx@alibaba-inc.com,
+        shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org,
+        eauger@redhat.com, yi.l.liu@intel.com, ziye.yang@intel.com,
+        mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
+        changpeng.liu@intel.com, Ken.Xue@amd.com,
+        jonathan.davies@nutanix.com, shaopeng.he@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        libvir-list@redhat.com, alex.williamson@redhat.com,
+        eskultet@redhat.com, dgilbert@redhat.com, cohuck@redhat.com,
+        kevin.tian@intel.com, zhenyuw@linux.intel.com,
+        zhi.a.wang@intel.com, cjia@nvidia.com, kwankhede@nvidia.com,
+        berrange@redhat.com, dinechin@redhat.com,
+        Yan Zhao <yan.y.zhao@intel.com>
+Subject: [PATCH v4 0/2] introduction of migration_version attribute for VFIO live migration
+Date:   Thu, 30 May 2019 20:44:38 -0400
+Message-Id: <20190531004438.24528-1-yan.y.zhao@intel.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190530215223.13974.22445.stgit@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 30, 2019 at 02:53:34PM -0700, Alexander Duyck wrote:
-> This series provides an asynchronous means of hinting to a hypervisor
-> that a guest page is no longer in use and can have the data associated
-> with it dropped. To do this I have implemented functionality that allows
-> for what I am referring to as "waste page treatment".
-> 
-> I have based many of the terms and functionality off of waste water
-> treatment, the idea for the similarity occured to me after I had reached
-> the point of referring to the hints as "bubbles", as the hints used the
-> same approach as the balloon functionality but would disappear if they
-> were touched, as a result I started to think of the virtio device as an
-> aerator. The general idea with all of this is that the guest should be
-> treating the unused pages so that when they end up heading "downstream"
-> to either another guest, or back at the host they will not need to be
-> written to swap.
+This patchset introduces a migration_version attribute under sysfs of VFIO
+Mediated devices.
 
-A lovely analogy.
+This migration_version attribute is used to check migration compatibility
+between two mdev devices of the same mdev type.
 
-> So for a bit of background for the treatment process, it is based on a
-> sequencing batch reactor (SBR)[1]. The treatment process itself has five
-> stages. The first stage is the fill, with this we take the raw pages and
-> add them to the reactor. The second stage is react, in this stage we hand
-> the pages off to the Virtio Balloon driver to have hints attached to them
-> and for those hints to be sent to the hypervisor. The third stage is
-> settle, in this stage we are waiting for the hypervisor to process the
-> pages, and we should receive an interrupt when it is completed. The fourth
-> stage is to decant, or drain the reactor of pages. Finally we have the
-> idle stage which we will go into if the reference count for the reactor
-> gets down to 0 after a drain, or if a fill operation fails to obtain any
-> pages and the reference count has hit 0. Otherwise we return to the first
-> state and start the cycle over again.
+Patch 1 defines migration_version attribute in
+Documentation/vfio-mediated-device.txt
 
-will review the patchset closely shortly.
+Patch 2 uses GVT as an example to show how to expose migration_version
+attribute and check migration compatibility in vendor driver.
 
-> This patch set is still far more intrusive then I would really like for
-> what it has to do. Currently I am splitting the nr_free_pages into two
-> values and having to add a pointer and an index to track where we area in
-> the treatment process for a given free_area. I'm also not sure I have
-> covered all possible corner cases where pages can get into the free_area
-> or move from one migratetype to another.
-> 
-> Also I am still leaving a number of things hard-coded such as limiting the
-> lowest order processed to PAGEBLOCK_ORDER, and have left it up to the
-> guest to determine what size of reactor it wants to allocate to process
-> the hints.
-> 
-> Another consideration I am still debating is if I really want to process
-> the aerator_cycle() function in interrupt context or if I should have it
-> running in a thread somewhere else.
-> 
-> [1]: https://en.wikipedia.org/wiki/Sequencing_batch_reactor
-> 
-> ---
-> 
-> Alexander Duyck (11):
->       mm: Move MAX_ORDER definition closer to pageblock_order
->       mm: Adjust shuffle code to allow for future coalescing
->       mm: Add support for Treated Buddy pages
->       mm: Split nr_free into nr_free_raw and nr_free_treated
->       mm: Propogate Treated bit when splitting
->       mm: Add membrane to free area to use as divider between treated and raw pages
->       mm: Add support for acquiring first free "raw" or "untreated" page in zone
->       mm: Add support for creating memory aeration
->       mm: Count isolated pages as "treated"
->       virtio-balloon: Add support for aerating memory via bubble hinting
->       mm: Add free page notification hook
-> 
-> 
->  arch/x86/include/asm/page.h         |   11 +
->  drivers/virtio/Kconfig              |    1 
->  drivers/virtio/virtio_balloon.c     |   89 ++++++++++
->  include/linux/gfp.h                 |   10 +
->  include/linux/memory_aeration.h     |   54 ++++++
->  include/linux/mmzone.h              |  100 +++++++++--
->  include/linux/page-flags.h          |   32 +++
->  include/linux/pageblock-flags.h     |    8 +
->  include/uapi/linux/virtio_balloon.h |    1 
->  mm/Kconfig                          |    5 +
->  mm/Makefile                         |    1 
->  mm/aeration.c                       |  324 +++++++++++++++++++++++++++++++++++
->  mm/compaction.c                     |    4 
->  mm/page_alloc.c                     |  220 ++++++++++++++++++++----
->  mm/shuffle.c                        |   24 ---
->  mm/shuffle.h                        |   35 ++++
->  mm/vmstat.c                         |    5 -
->  17 files changed, 838 insertions(+), 86 deletions(-)
->  create mode 100644 include/linux/memory_aeration.h
->  create mode 100644 mm/aeration.c
-> 
-> --
+v4:
+1. fixed indentation/spell errors, reworded several error messages
+2. added a missing memory free for error handling in patch 2
+
+v3:
+1. renamed version to migration_version
+2. let errno to be freely defined by vendor driver
+3. let checking mdev_type be prerequisite of migration compatibility check
+4. reworded most part of patch 1
+5. print detailed error log in patch 2 and generate migration_version
+string at init time
+
+v2:
+1. renamed patched 1
+2. made definition of device version string completely private to vendor
+driver
+3. reverted changes to sample mdev drivers
+4. described intent and usage of version attribute more clearly.
+
+
+Yan Zhao (2):
+  vfio/mdev: add migration_version attribute for mdev device
+  drm/i915/gvt: export migration_version to mdev sysfs for Intel vGPU
+
+ Documentation/vfio-mediated-device.txt       | 113 +++++++++++++
+ drivers/gpu/drm/i915/gvt/Makefile            |   2 +-
+ drivers/gpu/drm/i915/gvt/gvt.c               |  39 +++++
+ drivers/gpu/drm/i915/gvt/gvt.h               |   5 +
+ drivers/gpu/drm/i915/gvt/migration_version.c | 168 +++++++++++++++++++
+ drivers/gpu/drm/i915/gvt/vgpu.c              |  13 +-
+ 6 files changed, 337 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/gpu/drm/i915/gvt/migration_version.c
+
+-- 
+2.17.1
+
