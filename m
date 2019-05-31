@@ -2,113 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 458AE3158F
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2019 21:44:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41054315C4
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2019 21:59:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727421AbfEaToq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 May 2019 15:44:46 -0400
-Received: from mail-eopbgr720066.outbound.protection.outlook.com ([40.107.72.66]:51090
-        "EHLO NAM05-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727147AbfEaTop (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 May 2019 15:44:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Fhf9yg12FYwPe3trfsjjhu4+MxOB+vRFhpqtdNhWi8k=;
- b=ipKZwRiUyYBdAvKtxV9TBNrqnmqAzQhF2KGzWhK8G3aNB7PD/Je1lEFQIwvXEeeKuRqSBawmyjVQWTRWu4a5mWLnOJEvyW+FLCYF+pH0/gM2oij6T33gSEcRt+MNkid9t4ph1bQY1TunTAYKDiY9CD6nXZdu8sAxm7YRyRc30Q8=
-Received: from BYAPR05MB4776.namprd05.prod.outlook.com (52.135.233.146) by
- BYAPR05MB6694.namprd05.prod.outlook.com (20.178.235.204) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1943.13; Fri, 31 May 2019 19:44:41 +0000
-Received: from BYAPR05MB4776.namprd05.prod.outlook.com
- ([fe80::2cb6:a3d1:f675:ced8]) by BYAPR05MB4776.namprd05.prod.outlook.com
- ([fe80::2cb6:a3d1:f675:ced8%3]) with mapi id 15.20.1943.016; Fri, 31 May 2019
- 19:44:41 +0000
-From:   Nadav Amit <namit@vmware.com>
-To:     Juergen Gross <jgross@suse.com>
-CC:     Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-Subject: Re: [RFC PATCH v2 04/12] x86/mm/tlb: Flush remote and local TLBs
- concurrently
-Thread-Topic: [RFC PATCH v2 04/12] x86/mm/tlb: Flush remote and local TLBs
- concurrently
-Thread-Index: AQHVF3tF8UKMn76vfUO/W6G8mcgAUaaFHqkAgACE8gA=
-Date:   Fri, 31 May 2019 19:44:41 +0000
-Message-ID: <1DEA29A7-D033-4816-876C-05E7D77F0437@vmware.com>
-References: <20190531063645.4697-1-namit@vmware.com>
- <20190531063645.4697-5-namit@vmware.com>
- <a847ee9c-4faf-c8b4-43bb-cc30e0980796@suse.com>
-In-Reply-To: <a847ee9c-4faf-c8b4-43bb-cc30e0980796@suse.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=namit@vmware.com; 
-x-originating-ip: [66.170.99.2]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5ff6d24d-760f-4cf1-93a5-08d6e6006cb9
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:BYAPR05MB6694;
-x-ms-traffictypediagnostic: BYAPR05MB6694:
-x-microsoft-antispam-prvs: <BYAPR05MB6694A02D23273C4945DC9657D0190@BYAPR05MB6694.namprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2582;
-x-forefront-prvs: 00540983E2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(396003)(136003)(346002)(39860400002)(376002)(199004)(189003)(5660300002)(6246003)(33656002)(66946007)(4744005)(99286004)(25786009)(54906003)(316002)(2906002)(66476007)(64756008)(66446008)(76116006)(73956011)(68736007)(66556008)(4326008)(7416002)(476003)(66066001)(229853002)(8936002)(14454004)(6512007)(6506007)(2616005)(8676002)(53546011)(446003)(76176011)(11346002)(486006)(81156014)(82746002)(305945005)(6436002)(186003)(6116002)(3846002)(71190400001)(26005)(71200400001)(6916009)(256004)(83716004)(6486002)(81166006)(7736002)(102836004)(478600001)(53936002)(86362001)(36756003);DIR:OUT;SFP:1101;SCL:1;SRVR:BYAPR05MB6694;H:BYAPR05MB4776.namprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: vmware.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 8vzZaIBhzD6qajL16JVgIzMw6d4O8dWiIxREAOQKbgqx7lEuupRTbVsCWDWGr93Cy3VSBBjH9syRZNtEOL2Zn3yu900mPiwa0bKgWpELQ92Kgd+f+yFap9jSai30Wt6Rrty57+qNsl1IxGpoSlhyf2+xWjes0o+DnUjIaSZ98myWf1POpTCv7F33sZvFvqqdwRs0v7NUGH4nU5wNF3zlFeLEkI6JZazDoVWpK8Nue3QyZSGFKToCmGgBGgJCd23hd5SE1uycaK+bcxzgfV7IKBe3+pEjxkkzXyZGsVlqdwMnDt6WsLZhRG0ykA2UQBHZ2hbrzyyPJNDOstW+Ts7fvhlKEIrwSC0yzt47CNLxFXisPrf0Sw1xRTXcchSxXACzzDoEiPd97LOyc/Ym/LvwpxmDnM3oKBVb5zbXtveRK2I=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <498DEB6111D0B64C9D5657F78CFDD0EF@namprd05.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        id S1727372AbfEaT7i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 May 2019 15:59:38 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:41532 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727287AbfEaT7i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 May 2019 15:59:38 -0400
+Received: by mail-ed1-f66.google.com with SMTP id x25so4018791eds.8
+        for <kvm@vger.kernel.org>; Fri, 31 May 2019 12:59:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3SkRaYCGnq1C8VvlqaJ8i8zblsitHZj5v7WamNGN6H8=;
+        b=u+WzyLtECMcbvjVI27nPUY/f1sNnnGQ4v95OEd2FRD+2RIN3aj6jzGAF/2PTtZkWbl
+         IsTT3rCeorqDEpWXIuiNbgTjlGHWnHUr/D/sOZSUHeY0xjsMN9HKVI7kH6G0gclx6jkl
+         B82MHaosoGQikbSAqSxEEk2TDrSJO/hPcw3taZ9jfyFUJ4ANImCDvahXr9qfh8f2T5BE
+         FHCu+ECupVFYxp5GFBf5w0hdhwEUn3OgrWM+Py/pRkyzEODGAZgWcZ81VdDKzxCOPVfN
+         6nLxbxuIKeaZTg+ce2C7SPKFLQaUE7po1agK96jvrVl4UCS91D4hCsJWwk8pQ0eJ7d9+
+         0WLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3SkRaYCGnq1C8VvlqaJ8i8zblsitHZj5v7WamNGN6H8=;
+        b=MHiwnkxngy4MQsepRXfmIuAG/beICdtkdIKGFNLdoVBlGSgYi7IvaJzOesv8POpNCt
+         LOw4a+zq/5ABUZfVBeDpeb6GaOTmtNkfI6qBmW9XRcEDCtB8R5tGHnVTGDOE6Ekz2S73
+         jCSFAEqA0Jhb49WiEqUtyEuZqGvXwXVYjl1G2lgtebQvL8mJ0xVgur4GWl0gHgc9qx5l
+         zZWDGN3dQkkbCwNDX7V6e5ydGYNhP23odMQWhXjkpKA/rPBoz1PMO576T4buymbrhqYs
+         B25cZinSKQZSLp7Sbot0qjZdKWKEkzTELhLNSm7mpDVjjdsiDhPI/69Al7HaRJ1gfqdO
+         rByg==
+X-Gm-Message-State: APjAAAXvrYNtG+NcD7d/yzqiKY36PIfXuuYVex0wjzw7gc5MmSiCYlkR
+        jXewyYNsrx7CPB/+67tqs2rMaOw/q3URnOJzVTGE5Q==
+X-Google-Smtp-Source: APXvYqwCViODZUf7+K8dCeviTHiMP+R9s9zcehJqctp1p3kVpVxvg6odZUTsjoHWEEexh9KnE9DVXLpFwc9HMKyIdjU=
+X-Received: by 2002:a17:906:2922:: with SMTP id v2mr10871610ejd.115.1559332775551;
+ Fri, 31 May 2019 12:59:35 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: vmware.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ff6d24d-760f-4cf1-93a5-08d6e6006cb9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 May 2019 19:44:41.6564
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: namit@vmware.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR05MB6694
+References: <CAOyeoRWfPNmaWY6Lifdkdj3KPPM654vzDO+s3oduEMCJP+Asow@mail.gmail.com>
+ <5CEC9667.30100@intel.com> <CAOyeoRWhfyuuYdguE6Wrzd7GOdow9qRE4MZ4OKkMc5cdhDT53g@mail.gmail.com>
+ <5CEE3AC4.3020904@intel.com> <CAOyeoRW85jV=TW_xwSj0ZYwPj_L+G9wu+QPGEF3nBmPbWGX4_g@mail.gmail.com>
+ <5CF07D37.9090805@intel.com>
+In-Reply-To: <5CF07D37.9090805@intel.com>
+From:   Eric Hankland <ehankland@google.com>
+Date:   Fri, 31 May 2019 12:59:24 -0700
+Message-ID: <CAOyeoRXWQaVYZSVL_LTTdAwJOEr+eCzhp1=_JcOX3i6_CJiD_g@mail.gmail.com>
+Subject: Re: [PATCH v1] KVM: x86: PMU Whitelist
+To:     Wei Wang <wei.w.wang@intel.com>
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On May 31, 2019, at 4:48 AM, Juergen Gross <jgross@suse.com> wrote:
->=20
-> On 31/05/2019 08:36, Nadav Amit wrote:
->>=20
->> --- a/arch/x86/include/asm/paravirt_types.h
->> +++ b/arch/x86/include/asm/paravirt_types.h
->> @@ -211,6 +211,12 @@ struct pv_mmu_ops {
->> 	void (*flush_tlb_user)(void);
->> 	void (*flush_tlb_kernel)(void);
->> 	void (*flush_tlb_one_user)(unsigned long addr);
->> +	/*
->> +	 * flush_tlb_multi() is the preferred interface. When it is used,
->> +	 * flush_tlb_others() should return false.
->=20
-> Didn't you want to remove/change this comment?
+On Thu, May 30, 2019 at 5:57 PM Wei Wang <wei.w.wang@intel.com> wrote:
+>
+> On 05/30/2019 01:11 AM, Eric Hankland wrote:
+> > On Wed, May 29, 2019 at 12:49 AM Wei Wang <wei.w.wang@intel.com> wrote:
+> >> On 05/29/2019 02:14 AM, Eric Hankland wrote:
+> >>> On Mon, May 27, 2019 at 6:56 PM Wei Wang <wei.w.wang@intel.com> wrote:
+> >>>> On 05/23/2019 06:23 AM, Eric Hankland wrote:
+> >>>>> - Add a VCPU ioctl that can control which events the guest can monitor.
+> >>>>>
+> >>>>> Signed-off-by: ehankland <ehankland@google.com>
+> >>>>> ---
+> >>>>> Some events can provide a guest with information about other guests or the
+> >>>>> host (e.g. L3 cache stats); providing the capability to restrict access
+> >>>>> to a "safe" set of events would limit the potential for the PMU to be used
+> >>>>> in any side channel attacks. This change introduces a new vcpu ioctl that
+> >>>>> sets an event whitelist. If the guest attempts to program a counter for
+> >>>>> any unwhitelisted event, the kernel counter won't be created, so any
+> >>>>> RDPMC/RDMSR will show 0 instances of that event.
+> >>>> The general idea sounds good to me :)
+> >>>>
+> >>>> For the implementation, I would have the following suggestions:
+> >>>>
+> >>>> 1) Instead of using a whitelist, it would be better to use a blacklist to
+> >>>> forbid the guest from counting any core level information. So by default,
+> >>>> kvm maintains a list of those core level events, which are not supported to
+> >>>> the guest.
+> >>>>
+> >>>> The userspace ioctl removes the related events from the blacklist to
+> >>>> make them usable by the guest.
+> >>>>
+> >>>> 2) Use vm ioctl, instead of vcpu ioctl. The blacklist-ed events can be
+> >>>> VM wide
+> >>>> (unnecessary to make each CPU to maintain the same copy).
+> >>>> Accordingly, put the pmu event blacklist into kvm->arch.
+> >>>>
+> >>>> 3) Returning 1 when the guest tries to set the evetlsel msr to count an
+> >>>> event which is on the blacklist.
+> >>>>
+> >>>> Best,
+> >>>> Wei
+> >>> Thanks for the feedback. I have a couple concerns with a KVM
+> >>> maintained blacklist. First, I'm worried it will be difficult to keep
+> >>> such a list up to date and accurate (both coming up with the initial
+> >>> list since there are so many events, and updating it whenever any new
+> >>> events are published or vulnerabilities are discovered).
+> >> Not sure about "so many" above. I think there should be much
+> >> fewer events that may need to be blacklisted.
+> >>
+> >> For example the event table 19-3 from SDM 19.2 shows hundreds of
+> >> events, how many of them would you think that need to be blacklisted?
+> >>
+> >>> Second, users
+> >>> may want to differentiate between whole-socket and sub-socket VMs
+> >>> (some events may be fine for the whole-socket case) - keeping a single
+> >>> blacklist wouldn't allow for this.
+> >> Why wouldn't?
+> >> In any case (e.g. the whole socket dedicated to the single VM) we
+> >> want to unlock the blacklisted events, we can have the userspace
+> >> (e.g. qemu command line options "+event1, +event2") do ioctl to
+> >> have KVM do that.
+> >>
+> >> Btw, for the L3 cache stats event example, I'm not sure if that could
+> >> be an issue if we have "AnyThread=0". I'll double confirm with
+> >> someone.
+> >>
+> >> Best,
+> >> Wei
+> >> Not sure about "so many" above. I think there should be much
+> >> fewer events that may need to be blacklisted.
+> > I think you're right that there are not as many events that seem like
+> > they could leak info as events that seem like they won't, but I think
+> > the work to validate that they definitely don't could be expensive;
+> > with a whitelist it's easy to start with a smaller set and
+> > incrementally add to it without having to evaluate all the events
+> > right away.
+>
+> Before going that whitelist/blacklist direction, do you have an event
+> example that couldn't be solved by setting "AnyThread=0"?
+>
+> If no, I think we could simply gate guest's setting of "AnyThread=0".
+>
+> Best,
+> Wei
 
-Yes! Sorry for that. Fixed now.
+With anythread=0, I'm not aware of any events that directly give info
+about other VMs, but monitoring events related to shared resources
+(e.g. LLC References and LLC Misses) could indirectly give you info
+about how heavily other users are using that resource.
+
+I tried returning 1 when the guest tries to write the eventsel msr for
+a disallowed event - the behavior on modern guest kernels looks
+reasonable (warns once about an unchecked MSR access error), but it
+looks like guests using older kernels (older than 2016) might panic
+due to the gpfault (not to mention I'm not sure about the behavior on
+non-linux kernels). So I'm hesitant to return 1 - what do you think?
+
+I also looked into moving from a vcpu ioctl to a vm ioctl - I can send
+out a version of the patch with this change once we settle on the
+other issues. It will involve some extra locking every time the
+counters are programmed to ensure the whitelist or blacklist isn't
+removed during access.
+
+Eric
