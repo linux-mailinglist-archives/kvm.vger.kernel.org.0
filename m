@@ -2,99 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 42A3C31597
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2019 21:48:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 458AE3158F
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2019 21:44:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727335AbfEaTsj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 May 2019 15:48:39 -0400
-Received: from gateway33.websitewelcome.com ([192.185.145.190]:20123 "EHLO
-        gateway33.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726808AbfEaTsj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 31 May 2019 15:48:39 -0400
-X-Greylist: delayed 1415 seconds by postgrey-1.27 at vger.kernel.org; Fri, 31 May 2019 15:48:39 EDT
-Received: from cm14.websitewelcome.com (cm14.websitewelcome.com [100.42.49.7])
-        by gateway33.websitewelcome.com (Postfix) with ESMTP id 3A47917DD3
-        for <kvm@vger.kernel.org>; Fri, 31 May 2019 14:25:04 -0500 (CDT)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id Wn9EhpyQH2qH7Wn9Eh3Jnq; Fri, 31 May 2019 14:25:04 -0500
-X-Authority-Reason: nr=8
-Received: from [189.250.123.250] (port=52648 helo=embeddedor)
-        by gator4166.hostgator.com with esmtpa (Exim 4.91)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1hWn93-003OqT-R2; Fri, 31 May 2019 14:25:02 -0500
-Date:   Fri, 31 May 2019 14:24:53 -0500
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] KVM: irqchip: Use struct_size() in kzalloc()
-Message-ID: <20190531192453.GA13536@embeddedor>
+        id S1727421AbfEaToq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 May 2019 15:44:46 -0400
+Received: from mail-eopbgr720066.outbound.protection.outlook.com ([40.107.72.66]:51090
+        "EHLO NAM05-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727147AbfEaTop (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 May 2019 15:44:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Fhf9yg12FYwPe3trfsjjhu4+MxOB+vRFhpqtdNhWi8k=;
+ b=ipKZwRiUyYBdAvKtxV9TBNrqnmqAzQhF2KGzWhK8G3aNB7PD/Je1lEFQIwvXEeeKuRqSBawmyjVQWTRWu4a5mWLnOJEvyW+FLCYF+pH0/gM2oij6T33gSEcRt+MNkid9t4ph1bQY1TunTAYKDiY9CD6nXZdu8sAxm7YRyRc30Q8=
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com (52.135.233.146) by
+ BYAPR05MB6694.namprd05.prod.outlook.com (20.178.235.204) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1943.13; Fri, 31 May 2019 19:44:41 +0000
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::2cb6:a3d1:f675:ced8]) by BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::2cb6:a3d1:f675:ced8%3]) with mapi id 15.20.1943.016; Fri, 31 May 2019
+ 19:44:41 +0000
+From:   Nadav Amit <namit@vmware.com>
+To:     Juergen Gross <jgross@suse.com>
+CC:     Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+Subject: Re: [RFC PATCH v2 04/12] x86/mm/tlb: Flush remote and local TLBs
+ concurrently
+Thread-Topic: [RFC PATCH v2 04/12] x86/mm/tlb: Flush remote and local TLBs
+ concurrently
+Thread-Index: AQHVF3tF8UKMn76vfUO/W6G8mcgAUaaFHqkAgACE8gA=
+Date:   Fri, 31 May 2019 19:44:41 +0000
+Message-ID: <1DEA29A7-D033-4816-876C-05E7D77F0437@vmware.com>
+References: <20190531063645.4697-1-namit@vmware.com>
+ <20190531063645.4697-5-namit@vmware.com>
+ <a847ee9c-4faf-c8b4-43bb-cc30e0980796@suse.com>
+In-Reply-To: <a847ee9c-4faf-c8b4-43bb-cc30e0980796@suse.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=namit@vmware.com; 
+x-originating-ip: [66.170.99.2]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5ff6d24d-760f-4cf1-93a5-08d6e6006cb9
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:BYAPR05MB6694;
+x-ms-traffictypediagnostic: BYAPR05MB6694:
+x-microsoft-antispam-prvs: <BYAPR05MB6694A02D23273C4945DC9657D0190@BYAPR05MB6694.namprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2582;
+x-forefront-prvs: 00540983E2
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(396003)(136003)(346002)(39860400002)(376002)(199004)(189003)(5660300002)(6246003)(33656002)(66946007)(4744005)(99286004)(25786009)(54906003)(316002)(2906002)(66476007)(64756008)(66446008)(76116006)(73956011)(68736007)(66556008)(4326008)(7416002)(476003)(66066001)(229853002)(8936002)(14454004)(6512007)(6506007)(2616005)(8676002)(53546011)(446003)(76176011)(11346002)(486006)(81156014)(82746002)(305945005)(6436002)(186003)(6116002)(3846002)(71190400001)(26005)(71200400001)(6916009)(256004)(83716004)(6486002)(81166006)(7736002)(102836004)(478600001)(53936002)(86362001)(36756003);DIR:OUT;SFP:1101;SCL:1;SRVR:BYAPR05MB6694;H:BYAPR05MB4776.namprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: vmware.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 8vzZaIBhzD6qajL16JVgIzMw6d4O8dWiIxREAOQKbgqx7lEuupRTbVsCWDWGr93Cy3VSBBjH9syRZNtEOL2Zn3yu900mPiwa0bKgWpELQ92Kgd+f+yFap9jSai30Wt6Rrty57+qNsl1IxGpoSlhyf2+xWjes0o+DnUjIaSZ98myWf1POpTCv7F33sZvFvqqdwRs0v7NUGH4nU5wNF3zlFeLEkI6JZazDoVWpK8Nue3QyZSGFKToCmGgBGgJCd23hd5SE1uycaK+bcxzgfV7IKBe3+pEjxkkzXyZGsVlqdwMnDt6WsLZhRG0ykA2UQBHZ2hbrzyyPJNDOstW+Ts7fvhlKEIrwSC0yzt47CNLxFXisPrf0Sw1xRTXcchSxXACzzDoEiPd97LOyc/Ym/LvwpxmDnM3oKBVb5zbXtveRK2I=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <498DEB6111D0B64C9D5657F78CFDD0EF@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 189.250.123.250
-X-Source-L: No
-X-Exim-ID: 1hWn93-003OqT-R2
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: (embeddedor) [189.250.123.250]:52648
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 3
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+X-OriginatorOrg: vmware.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ff6d24d-760f-4cf1-93a5-08d6e6006cb9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 May 2019 19:44:41.6564
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: namit@vmware.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR05MB6694
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-One of the more common cases of allocation size calculations is finding
-the size of a structure that has a zero-sized array at the end, along
-with memory for some number of elements for that array. For example:
+> On May 31, 2019, at 4:48 AM, Juergen Gross <jgross@suse.com> wrote:
+>=20
+> On 31/05/2019 08:36, Nadav Amit wrote:
+>>=20
+>> --- a/arch/x86/include/asm/paravirt_types.h
+>> +++ b/arch/x86/include/asm/paravirt_types.h
+>> @@ -211,6 +211,12 @@ struct pv_mmu_ops {
+>> 	void (*flush_tlb_user)(void);
+>> 	void (*flush_tlb_kernel)(void);
+>> 	void (*flush_tlb_one_user)(unsigned long addr);
+>> +	/*
+>> +	 * flush_tlb_multi() is the preferred interface. When it is used,
+>> +	 * flush_tlb_others() should return false.
+>=20
+> Didn't you want to remove/change this comment?
 
-struct foo {
-   int stuff;
-   struct boo entry[];
-};
-
-instance = kzalloc(sizeof(struct foo) + count * sizeof(struct boo), GFP_KERNEL);
-
-Instead of leaving these open-coded and prone to type mistakes, we can
-now use the new struct_size() helper:
-
-instance = kzalloc(struct_size(instance, entry, count), GFP_KERNEL);
-
-This code was detected with the help of Coccinelle.
-
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- virt/kvm/irqchip.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-index 79e59e4fa3dc..f8be6a3d1aa6 100644
---- a/virt/kvm/irqchip.c
-+++ b/virt/kvm/irqchip.c
-@@ -196,9 +196,7 @@ int kvm_set_irq_routing(struct kvm *kvm,
- 
- 	nr_rt_entries += 1;
- 
--	new = kzalloc(sizeof(*new) + (nr_rt_entries * sizeof(struct hlist_head)),
--		      GFP_KERNEL_ACCOUNT);
--
-+	new = kzalloc(struct_size(new, map, nr_rt_entries), GFP_KERNEL_ACCOUNT);
- 	if (!new)
- 		return -ENOMEM;
- 
--- 
-2.21.0
-
+Yes! Sorry for that. Fixed now.
