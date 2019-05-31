@@ -2,125 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CE1E2312B2
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2019 18:46:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02C06314DC
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2019 20:42:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726984AbfEaQqP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 May 2019 12:46:15 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:54506 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726652AbfEaQqP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 May 2019 12:46:15 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2DFE0A78;
-        Fri, 31 May 2019 09:46:14 -0700 (PDT)
-Received: from arrakis.emea.arm.com (arrakis.cambridge.arm.com [10.1.196.78])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 48A043F59C;
-        Fri, 31 May 2019 09:46:08 -0700 (PDT)
-Date:   Fri, 31 May 2019 17:46:05 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Evgenii Stepanov <eugenis@google.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Elliott Hughes <enh@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>
-Subject: Re: [PATCH v15 00/17] arm64: untag user pointers passed to the kernel
-Message-ID: <20190531164605.GC3568@arrakis.emea.arm.com>
-References: <6049844a-65f5-f513-5b58-7141588fef2b@oracle.com>
- <20190523201105.oifkksus4rzcwqt4@mbp>
- <ffe58af3-7c70-d559-69f6-1f6ebcb0fec6@oracle.com>
- <20190524101139.36yre4af22bkvatx@mbp>
- <c6dd53d8-142b-3d8d-6a40-d21c5ee9d272@oracle.com>
- <CAAeHK+yAUsZWhp6xPAbWewX5Nbw+-G3svUyPmhXu5MVeEDKYvA@mail.gmail.com>
- <20190530171540.GD35418@arrakis.emea.arm.com>
- <CAAeHK+y34+SNz3Vf+_378bOxrPaj_3GaLCeC2Y2rHAczuaSz1A@mail.gmail.com>
- <20190531161954.GA3568@arrakis.emea.arm.com>
- <CAAeHK+zRDD7ZPPUA9cpwHOdgTRrJLWAby8Wg9oPgmhqMpHwvFw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeHK+zRDD7ZPPUA9cpwHOdgTRrJLWAby8Wg9oPgmhqMpHwvFw@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1727112AbfEaSmF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 May 2019 14:42:05 -0400
+Received: from mail-pl1-f202.google.com ([209.85.214.202]:56048 "EHLO
+        mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727005AbfEaSmE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 May 2019 14:42:04 -0400
+Received: by mail-pl1-f202.google.com with SMTP id q6so4460739pll.22
+        for <kvm@vger.kernel.org>; Fri, 31 May 2019 11:42:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=pnWVJgdabt0b2jRo7Shrg0iUuXwm5WbudjwO6+T7ruY=;
+        b=naBfcKpJU+8hJedYbnxF6wF0GF5aC6lrpbDwuQhG/8nD9+um9kGqmHpssR98zzkmK/
+         0NZ3f13uGIaViZhFNLhHaUaLyeXdMrKuDBtBOENQqnpYvB8BceIZ2QRFUtmKOAjiH+rW
+         Ww//QFP9htNIj3/DWqOk14n8CbPhe71fyUWTLhtf2rjlpTzuADNcthFyXZEG6aikFcJx
+         go0iXd4C6PEiNiCqD56pQ8006pr/JWZoIy+2/kTOTCd4dyQZFo4uHcVvnK6fWY3S19FY
+         RkaVKEkLaAf5OXyGBBm1qPEZb6GTKJcs50tSM6loUYxUnW/6YjGmdOoTC1Bt40q9AF2X
+         yPJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=pnWVJgdabt0b2jRo7Shrg0iUuXwm5WbudjwO6+T7ruY=;
+        b=kKEPqJefrz9aSlA+23evpVR+/Ic9QQJPznXTljcsIcjMgzz0Lp1oQbhZU5bRYjJ41N
+         9XVbURfM6rE73cG5esKzx8BFaiyiCElgMk4P7mUMw7/LMCHYGiu8Riz8WGFVaq2WVhOV
+         SyHMFgBktJVmDLqNem20NIMmcn8blyJqWjLeZy2tbZTThk6MJ7tsQz7JPTrx2WjTyzE7
+         lNE1sX8U7meRVFpQEuAWXO+1r0XR4uuJZb9g4RGY5P4u6kU/qptqZUpGe/Dp3uRHbG8d
+         6lSwGMbUzFmwOo2WYDF1/p4eb6cdlVyX3vVJdgM8RUrpMN81PQ9ulAFd470Tm5sxSiGH
+         ClWw==
+X-Gm-Message-State: APjAAAWIvA0JTe52qkXvbLGSW3ueX2B0O9j7WLop4O4oPvs8R/liA1vz
+        r0Q3t8pBfnjxliTaxCQGcKfBHSMTsjbc+nPy
+X-Google-Smtp-Source: APXvYqxdVw329slwI5k4jMwEMk3SZz71nMe2wdh8FELT1gslh5eRmPf1RXqqfG/4PIIbknE/jM8eA8Cy4eze8i88
+X-Received: by 2002:a63:fb02:: with SMTP id o2mr10948413pgh.357.1559328123820;
+ Fri, 31 May 2019 11:42:03 -0700 (PDT)
+Date:   Fri, 31 May 2019 11:41:59 -0700
+Message-Id: <20190531184159.260151-1-aaronlewis@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.22.0.rc1.311.g5d7573a151-goog
+Subject: [PATCH 1/2] kvm: nVMX: Enforce must-be-zero bits in the
+ IA32_VMX_VMCS_ENUM MSR
+From:   Aaron Lewis <aaronlewis@google.com>
+To:     jmattson@google.com, pshier@google.com, marcorr@google.com,
+        kvm@vger.kernel.org
+Cc:     Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 31, 2019 at 06:24:06PM +0200, Andrey Konovalov wrote:
-> On Fri, May 31, 2019 at 6:20 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > On Fri, May 31, 2019 at 04:29:10PM +0200, Andrey Konovalov wrote:
-> > > On Thu, May 30, 2019 at 7:15 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > > > On Tue, May 28, 2019 at 04:14:45PM +0200, Andrey Konovalov wrote:
-> > > > > Thanks for a lot of valuable input! I've read through all the replies
-> > > > > and got somewhat lost. What are the changes I need to do to this
-> > > > > series?
-> > > > >
-> > > > > 1. Should I move untagging for memory syscalls back to the generic
-> > > > > code so other arches would make use of it as well, or should I keep
-> > > > > the arm64 specific memory syscalls wrappers and address the comments
-> > > > > on that patch?
-> > > >
-> > > > Keep them generic again but make sure we get agreement with Khalid on
-> > > > the actual ABI implications for sparc.
-> > >
-> > > OK, will do. I find it hard to understand what the ABI implications
-> > > are. I'll post the next version without untagging in brk, mmap,
-> > > munmap, mremap (for new_address), mmap_pgoff, remap_file_pages, shmat
-> > > and shmdt.
-> >
-> > It's more about not relaxing the ABI to accept non-zero top-byte unless
-> > we have a use-case for it. For mmap() etc., I don't think that's needed
-> > but if you think otherwise, please raise it.
-> >
-> > > > > 2. Should I make untagging opt-in and controlled by a command line argument?
-> > > >
-> > > > Opt-in, yes, but per task rather than kernel command line option.
-> > > > prctl() is a possibility of opting in.
-> > >
-> > > OK. Should I store a flag somewhere in task_struct? Should it be
-> > > inheritable on clone?
-> >
-> > A TIF flag would do but I'd say leave it out for now (default opted in)
-> > until we figure out the best way to do this (can be a patch on top of
-> > this series).
-> 
-> You mean leave the whole opt-in/prctl part out? So the only change
-> would be to move untagging for memory syscalls into generic code?
+According to the SDM, bit 0 and bits 63:10 of the IA32_VMX_VMCS_ENUM
+MSR are reserved and are read as 0.
 
-Yes (or just wait until next week to see if the discussion settles
-down).
+Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
+---
+ arch/x86/kvm/vmx/nested.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 6401eb7ef19c..3438279e76bb 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1219,6 +1219,8 @@ int vmx_set_vmx_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 data)
+ 	case MSR_IA32_VMX_EPT_VPID_CAP:
+ 		return vmx_restore_vmx_ept_vpid_cap(vmx, data);
+ 	case MSR_IA32_VMX_VMCS_ENUM:
++		if (data & (GENMASK_ULL(63, 10) | BIT_ULL(0)))
++			return -EINVAL;
+ 		vmx->nested.msrs.vmcs_enum = data;
+ 		return 0;
+ 	default:
 -- 
-Catalin
+2.22.0.rc1.311.g5d7573a151-goog
+
