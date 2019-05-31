@@ -2,257 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B967308D3
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2019 08:41:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 94D85309C9
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2019 10:02:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726413AbfEaGlh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 May 2019 02:41:37 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:43210 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726002AbfEaGlg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 May 2019 02:41:36 -0400
-Received: by mail-ot1-f68.google.com with SMTP id i8so8105987oth.10;
-        Thu, 30 May 2019 23:41:36 -0700 (PDT)
+        id S1726593AbfEaICj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 May 2019 04:02:39 -0400
+Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:35496 "EHLO
+        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726158AbfEaICj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 May 2019 04:02:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=IEp6YnRYtBI3k0AHk7RIVAfM1GTZ+Bf/+Lw9qUYFQl0=;
-        b=XVxhIq8DqMD3SwJQx3S72O1+y0bzomnt8H9PpIZ6COi05oJPP08JLpDMHFsIEoP+Xv
-         m0iLtzjKPrPF4SHfWVXpWdnuFOmfYPz2iD0tOcQ+6jt4ozWM5e8SaqPOdNkclRL/RO+X
-         8jZ9AelwQ6WWBgSYCLu+3Lgz7G4610xmC0wFjMqZuL946A4QaE0w4D+/wUHQf+9YhvV9
-         MwUarVsilswA7aXgHo3gXag/MU0d/c83zitSOQkoLsCpzq+L4S1yE9ZENqjCMv49XCfO
-         e1PE17Eu2SgSd2YL2N/b4+lGVgQMeHykCUrE3KK/gHPrk2tFTVcG9xxfTzCsw7xPEvUV
-         On+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=IEp6YnRYtBI3k0AHk7RIVAfM1GTZ+Bf/+Lw9qUYFQl0=;
-        b=b+a6WBb0qggKSvr7UNpn23J5DRzr6vErXMIICbCyWrYjuvBVhNISRY0+x62u62KZSK
-         5eKxOxTHDoxqKOHf16XNtSDA5l9IbFiJa6bGVPsmR7CJudhypIU+QGCDpfq70WOZLkgW
-         pA4N8DRQM98LDndGnGm5YIZ/QIkSKzUWhR9aUMbJNgZXSW8ijDOhyD2M7qxGmB0ys04/
-         XAeRNVMEz7SSBjXzdCLba0GSWllF8pRvxmGOWbR7JxE55X7aUIMeUNYqjWBejgX7jvEZ
-         C3Xs3yzFJCznMgQGanTOuFJvHLxzzVrEJUrVSx1+WLVb07Gk2b6L/AhpNeW8GFdc2l9A
-         eB/g==
-X-Gm-Message-State: APjAAAXLIAoQeJ2edzYxF++q7CBdP8bawG4tY2UgFsre+smX7GFLhAq0
-        qT3/b8LS3y46CMtVu7xHbxFnWxAKGOUv1CXkhlU=
-X-Google-Smtp-Source: APXvYqyrhIO1/T7ysI79mc6QTXa5eTv2tllHe0vWkRSq+mUbUjCQlRtgzBcwnlWnhDedMHx2gBrUhTfinInjwyQQoNY=
-X-Received: by 2002:a9d:469a:: with SMTP id z26mr602911ote.56.1559284895795;
- Thu, 30 May 2019 23:41:35 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1559289758; x=1590825758;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=/WyYQHOnF3HxsjKHW7ouyvrjqjIbBcb2ZzLtjUBe08s=;
+  b=mcR/9dijRIwhdhGy7RPNSytU6HQHt1d+zH4dgn4C1+uZibvSOgX2xAUR
+   txIXyqeYVUEAaFK0/3/zr+poxkda9yEZOT+kM0zKDiB2VA1Up9TeW8Y34
+   oyqMWymX22Ifxg6S2iuWgSj+co/ZhqfdTZX7N/zzy9N77WdvCMYKBnJ5F
+   o=;
+X-IronPort-AV: E=Sophos;i="5.60,534,1549929600"; 
+   d="scan'208";a="404464927"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1e-303d0b0e.us-east-1.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 31 May 2019 08:02:37 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1e-303d0b0e.us-east-1.amazon.com (Postfix) with ESMTPS id E4D9AA24B3;
+        Fri, 31 May 2019 08:02:32 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 31 May 2019 08:02:32 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.161.89) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 31 May 2019 08:02:27 +0000
+Subject: Re: [PATCH 1/3] Build target for emulate.o as a userspace binary
+To:     Sam Caccavale <samcacc@amazon.de>
+CC:     <samcaccavale@gmail.com>, <nmanthey@amazon.de>,
+        <wipawel@amazon.de>, <dwmw@amazon.co.uk>, <mpohlack@amazon.de>,
+        <graf@amazon.de>, <karahmed@amazon.de>,
+        <andrew.cooper3@citrix.com>, <JBeulich@suse.com>,
+        <pbonzini@redhat.com>, <rkrcmar@redhat.com>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <bp@alien8.de>, <hpa@zytor.com>,
+        <paullangton4@gmail.com>, <anirudhkaushik@google.com>,
+        <x86@kernel.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20190521153924.15110-1-samcacc@amazon.de>
+ <20190521153924.15110-2-samcacc@amazon.de>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <529ed65f-f82e-7341-3a4f-6eea1f2961a9@amazon.com>
+Date:   Fri, 31 May 2019 10:02:25 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <1558585131-1321-1-git-send-email-wanpengli@tencent.com> <20190530193653.GA27551@linux.intel.com>
-In-Reply-To: <20190530193653.GA27551@linux.intel.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 31 May 2019 14:41:25 +0800
-Message-ID: <CANRm+CxW70MZo_LRCNg_TivPrNPQ2ZvzBL+ugZ4Gy+_Cw2UFVQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: LAPIC: Optimize timer latency consider world
- switch time
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190521153924.15110-2-samcacc@amazon.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.43.161.89]
+X-ClientProxiedBy: EX13D25UWB004.ant.amazon.com (10.43.161.180) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 31 May 2019 at 03:36, Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
->
-> On Thu, May 23, 2019 at 12:18:50PM +0800, Wanpeng Li wrote:
-> > From: Wanpeng Li <wanpengli@tencent.com>
-> >
-> > Advance lapic timer tries to hidden the hypervisor overhead between the
-> > host emulated timer fires and the guest awares the timer is fired. Howe=
-ver,
-> > even though after more sustaining optimizations, kvm-unit-tests/tscdead=
-line_latency
-> > still awares ~1000 cycles latency since we lost the time between the en=
-d of
-> > wait_lapic_expire and the guest awares the timer is fired. There are
-> > codes between the end of wait_lapic_expire and the world switch, futher=
-more,
-> > the world switch itself also has overhead. Actually the guest_tsc is eq=
-ual
-> > to the target deadline time in wait_lapic_expire is too late, guest wil=
-l
-> > aware the latency between the end of wait_lapic_expire() and after vmen=
-try
-> > to the guest. This patch takes this time into consideration.
-> >
-> > The vmentry_lapic_timer_advance_ns module parameter should be well tune=
-d by
-> > host admin, it can reduce average cyclictest latency from 3us to 2us on
-> > Skylake server. (guest w/ nohz=3Doff, idle=3Dpoll, host w/ preemption_t=
-imer=3DN,
-> > the cyclictest latency is not too sensitive when preemption_timer=3DY f=
-or this
-> > optimization in my testing), kvm-unit-tests/tscdeadline_latency can rea=
-ch 0.
-> >
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> > Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > ---
-> >  arch/x86/kvm/lapic.c   | 17 +++++++++++++++--
-> >  arch/x86/kvm/lapic.h   |  1 +
-> >  arch/x86/kvm/vmx/vmx.c |  2 +-
-> >  arch/x86/kvm/x86.c     |  3 +++
-> >  arch/x86/kvm/x86.h     |  2 ++
-> >  5 files changed, 22 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index fcf42a3..6f85221 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -1531,6 +1531,19 @@ static inline void adjust_lapic_timer_advance(st=
-ruct kvm_vcpu *vcpu,
-> >       apic->lapic_timer.timer_advance_ns =3D timer_advance_ns;
-> >  }
-> >
-> > +u64 get_vmentry_advance_delta(struct kvm_vcpu *vcpu)
->
-> Hmm, this isn't a delta, I think get_vmentry_advance_cycles would be more
-> appropriate.
->
-> > +{
-> > +     u64 vmentry_lapic_timer_advance_cycles =3D 0;
-> > +
-> > +     if (vmentry_lapic_timer_advance_ns) {
-> > +             vmentry_lapic_timer_advance_cycles =3D vmentry_lapic_time=
-r_advance_ns *
-> > +                     vcpu->arch.virtual_tsc_khz;
-> > +             do_div(vmentry_lapic_timer_advance_cycles, 1000000);
-> > +     }
-> > +     return vmentry_lapic_timer_advance_cycles;
-> > +}
-> > +EXPORT_SYMBOL_GPL(get_vmentry_advance_delta);
-> > +
-> >  void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
-> >  {
-> >       struct kvm_lapic *apic =3D vcpu->arch.apic;
-> > @@ -1544,7 +1557,7 @@ void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
-> >
-> >       tsc_deadline =3D apic->lapic_timer.expired_tscdeadline;
-> >       apic->lapic_timer.expired_tscdeadline =3D 0;
-> > -     guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc());
-> > +     guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc()) + get_vmentry_advanc=
-e_delta(vcpu);
-> >       apic->lapic_timer.advance_expire_delta =3D guest_tsc - tsc_deadli=
-ne;
-> >
-> >       if (guest_tsc < tsc_deadline)
-> > @@ -1572,7 +1585,7 @@ static void start_sw_tscdeadline(struct kvm_lapic=
- *apic)
-> >       local_irq_save(flags);
-> >
-> >       now =3D ktime_get();
-> > -     guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc());
-> > +     guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc()) + get_vmentry_advanc=
-e_delta(vcpu);
-> >
-> >       ns =3D (tscdeadline - guest_tsc) * 1000000ULL;
-> >       do_div(ns, this_tsc_khz);
-> > diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> > index f974a3d..df2fe17 100644
-> > --- a/arch/x86/kvm/lapic.h
-> > +++ b/arch/x86/kvm/lapic.h
-> > @@ -221,6 +221,7 @@ static inline int kvm_lapic_latched_init(struct kvm=
-_vcpu *vcpu)
-> >  bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector);
-> >
-> >  void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
-> > +u64 get_vmentry_advance_delta(struct kvm_vcpu *vcpu);
-> >
-> >  bool kvm_intr_is_single_vcpu_fast(struct kvm *kvm, struct kvm_lapic_ir=
-q *irq,
-> >                       struct kvm_vcpu **dest_vcpu);
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index da24f18..0199ac3 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -7047,7 +7047,7 @@ static int vmx_set_hv_timer(struct kvm_vcpu *vcpu=
-, u64 guest_deadline_tsc,
-> >
-> >       vmx =3D to_vmx(vcpu);
-> >       tscl =3D rdtsc();
-> > -     guest_tscl =3D kvm_read_l1_tsc(vcpu, tscl);
-> > +     guest_tscl =3D kvm_read_l1_tsc(vcpu, tscl) + get_vmentry_advance_=
-delta(vcpu);
-> >       delta_tsc =3D max(guest_deadline_tsc, guest_tscl) - guest_tscl;
-> >       lapic_timer_advance_cycles =3D nsec_to_cycles(vcpu,
-> >                                                   ktimer->timer_advance=
-_ns);
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index a4eb711..a02e2c3 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -145,6 +145,9 @@ module_param(tsc_tolerance_ppm, uint, S_IRUGO | S_I=
-WUSR);
-> >  static int __read_mostly lapic_timer_advance_ns =3D -1;
-> >  module_param(lapic_timer_advance_ns, int, S_IRUGO | S_IWUSR);
-> >
-> > +u32 __read_mostly vmentry_lapic_timer_advance_ns =3D 0;
-> > +module_param(vmentry_lapic_timer_advance_ns, uint, S_IRUGO | S_IWUSR);
->
-> Hmm, an interesting idea would be to have some way to "lock" this param,
-> e.g. setting bit 0 locks the param.  That would allow KVM to calculate th=
-e
-> cycles value to avoid the function call and the MUL+DIV.  If I'm not
-> mistaken, vcpu->arch.virtual_tsc_khz is set only in kvm_set_tsc_khz().
->
-> For example, if get_vmentry_advance_cycles() sees the value is locked, it
-> caches the value in struct kvm_lapic.  The cached value would also need t=
-o
-> be updated in kvm_set_tsc_khz() if it has been set.
 
-Good point, handle it in v2.
+On 21.05.19 17:39, Sam Caccavale wrote:
+> This commit contains the minimal set of functionality to build
+> afl-harness around arch/x86/emulate.c which allows exercising code
+> in that source file, like x86_emulate_insn.  Resolving the
+> dependencies was done via GCC's -H flag by get_headers.py.
+>
+> ---
+>   tools/Makefile                                |   9 ++
+>   .../fuzz/x86_instruction_emulation/.gitignore |   2 +
+>   tools/fuzz/x86_instruction_emulation/Makefile |  57 +++++++
+>   .../fuzz/x86_instruction_emulation/README.md  |  12 ++
+>   .../x86_instruction_emulation/afl-harness.c   | 149 ++++++++++++++++++
+>   tools/fuzz/x86_instruction_emulation/common.h |  87 ++++++++++
+>   .../x86_instruction_emulation/emulator_ops.c  |  58 +++++++
+>   .../x86_instruction_emulation/emulator_ops.h  | 117 ++++++++++++++
+>   .../scripts/get_headers.py                    |  95 +++++++++++
+>   .../scripts/make_deps                         |   4 +
+>   tools/fuzz/x86_instruction_emulation/stubs.c  |  56 +++++++
+>   tools/fuzz/x86_instruction_emulation/stubs.h  |  52 ++++++
+>   12 files changed, 698 insertions(+)
+>   create mode 100644 tools/fuzz/x86_instruction_emulation/.gitignore
+>   create mode 100644 tools/fuzz/x86_instruction_emulation/Makefile
+>   create mode 100644 tools/fuzz/x86_instruction_emulation/README.md
+>   create mode 100644 tools/fuzz/x86_instruction_emulation/afl-harness.c
+>   create mode 100644 tools/fuzz/x86_instruction_emulation/common.h
+>   create mode 100644 tools/fuzz/x86_instruction_emulation/emulator_ops.c
+>   create mode 100644 tools/fuzz/x86_instruction_emulation/emulator_ops.h
+>   create mode 100644 tools/fuzz/x86_instruction_emulation/scripts/get_headers.py
+>   create mode 100755 tools/fuzz/x86_instruction_emulation/scripts/make_deps
+>   create mode 100644 tools/fuzz/x86_instruction_emulation/stubs.c
+>   create mode 100644 tools/fuzz/x86_instruction_emulation/stubs.h
+>
+> diff --git a/tools/Makefile b/tools/Makefile
+> index 3dfd72ae6c1a..4d68817b7e49 100644
+> --- a/tools/Makefile
+> +++ b/tools/Makefile
+> @@ -94,6 +94,12 @@ freefall: FORCE
+>   kvm_stat: FORCE
+>   	$(call descend,kvm/$@)
+>   
+> +fuzz: FORCE
+> +	$(call descend,fuzz/x86_instruction_emulation)
+> +
+> +fuzz_deps: FORCE
+> +	$(call descend,fuzz/x86_instruction_emulation,fuzz_deps)
+> +
+>   all: acpi cgroup cpupower gpio hv firewire liblockdep \
+>   		perf selftests spi turbostat usb \
+>   		virtio vm bpf x86_energy_perf_policy \
+> @@ -171,6 +177,9 @@ tmon_clean:
+>   freefall_clean:
+>   	$(call descend,laptop/freefall,clean)
+>   
+> +fuzz_clean:
+> +	$(call descend,fuzz/x86_instruction_emulation,clean)
+> +
+>   build_clean:
+>   	$(call descend,build,clean)
+>   
+> diff --git a/tools/fuzz/x86_instruction_emulation/.gitignore b/tools/fuzz/x86_instruction_emulation/.gitignore
+> new file mode 100644
+> index 000000000000..7d44f7ce266e
+> --- /dev/null
+> +++ b/tools/fuzz/x86_instruction_emulation/.gitignore
+> @@ -0,0 +1,2 @@
+> +*.o
+> +*-harness
+> diff --git a/tools/fuzz/x86_instruction_emulation/Makefile b/tools/fuzz/x86_instruction_emulation/Makefile
+> new file mode 100644
+> index 000000000000..d2854a332605
+> --- /dev/null
+> +++ b/tools/fuzz/x86_instruction_emulation/Makefile
+> @@ -0,0 +1,57 @@
+> +ROOT_DIR=../../..
+> +THIS_DIR=tools/fuzz/x86_instruction_emulation
+> +
+> +include ../../scripts/Makefile.include
+> +
+> +.DEFAULT_GOAL := all
+> +
+> +INCLUDES := $(patsubst -I./%,-I./$(ROOT_DIR)/%, $(LINUXINCLUDE))
+> +INCLUDES := $(patsubst ./include/%,./$(ROOT_DIR)/include/%, $(INCLUDES))
+> +INCLUDES += -include ./$(ROOT_DIR)/include/linux/compiler_types.h
+> +
+> +$(ROOT_DIR)/.config:
+> +	make -C $(ROOT_DIR) menuconfig
+> +	sed -i -r 's/^#? *CONFIG_KVM(.*)=.*/CONFIG_KVM\1=y/' $(ROOT_DIR)/.config
+> +
+> +
+> +ifdef DEBUG
+> +KBUILD_CFLAGS += -DDEBUG
+> +endif
+> +KBUILD_CFLAGS += -g -O0
 
-Regards,
-Wanpeng Li
 
->
-> static inline u64 get_vmentry_advance_cycles(struct kvm_lapic *lapic)
-> {
->         if (lapic->vmentry_advance_cycles)
->                 return lapic->vmentry_advance_cycles;
->
->         return compute_vmentry_advance_cycles(lapic);
-> }
->
-> u64 compute_vmentry_advance_cycles(struct kvm_lapic *lapic)
-> {
->         u64 val =3D vmentry_lapic_timer_advance_ns;
->         u64 cycles =3D (val & ~1ULL) * lapic->vcpu->arch.virtual_tsc_khz;
->
->         do_div(cycles, 1000000);
->
->         if (val & 1)
->                 lapic->vmentry_advance_cycles =3D cycles;
->         return cycles;
-> }
->
-> > +
-> >  static bool __read_mostly vector_hashing =3D true;
-> >  module_param(vector_hashing, bool, S_IRUGO);
-> >
-> > diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> > index 275b3b6..b0a3b84 100644
-> > --- a/arch/x86/kvm/x86.h
-> > +++ b/arch/x86/kvm/x86.h
-> > @@ -294,6 +294,8 @@ extern u64 kvm_supported_xcr0(void);
-> >
-> >  extern unsigned int min_timer_period_us;
-> >
-> > +extern unsigned int vmentry_lapic_timer_advance_ns;
-> > +
-> >  extern bool enable_vmware_backdoor;
-> >
-> >  extern struct static_key kvm_no_apic_vcpu;
-> > --
-> > 2.7.4
-> >
+Why -O0? I would expect a some bugs to only emerge with optimization 
+enabled.
+
+Alex
+
