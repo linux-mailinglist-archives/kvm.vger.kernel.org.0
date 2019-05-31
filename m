@@ -2,64 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FD7831756
-	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2019 00:50:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62CF23184E
+	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2019 01:40:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726610AbfEaWuC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 31 May 2019 18:50:02 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:51017 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726541AbfEaWuC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 31 May 2019 18:50:02 -0400
-Received: by mail-wm1-f67.google.com with SMTP id f204so2937930wme.0
-        for <kvm@vger.kernel.org>; Fri, 31 May 2019 15:50:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=r6NgNqRhWaq191x9dCxnD4RlXHbkV9/EdBSxvhFP1Vw=;
-        b=rYkGtyo/TD9Gh4KM6vQuxun2jKSQ35SdL/8jVFRkJoYGRzS4XSYFmX5srn5g/XgrtY
-         W5zBFTx8d/vT5mwuPYEN4+QAOXsRrz9he07cWWha9131n2FXvqOA1utpoPnknVbBv8A9
-         Lys+Iw80HAfVZSr8ar8PmDnW9iTW7o7KMPE/3ADAJBmKOvP6BbHcVYb8x98v+Zdap0rG
-         CqSN+2w3+v23LeyOWHnD1JqPjxWn3SEY8wRE6sS+rxMoyKUI6of0fDOkAAhfU7BNiaWV
-         c4JE/0OcJ8NZNfDhbVD/GX3ft6hhwzI7XV9WN3UTwEC1JzoC4sUOkNUCGWjN24NFZhrF
-         nFSA==
-X-Gm-Message-State: APjAAAVA1aOkCBq/uQ1tG9pkNALPNoTL8oQnep4NqH3UX8c8gX6lI1UC
-        uzxuJeZ9IPLgBKaStLURqJRiaTD3sg5Zaw==
-X-Google-Smtp-Source: APXvYqyM/XrwIroyNNYyH1E8zovWVkinoiBQN1Mfy1JzMUBi6FOH+Ym/XaVAOeu1WdbtomeeWlvF1Q==
-X-Received: by 2002:a1c:7405:: with SMTP id p5mr7106342wmc.80.1559343000581;
-        Fri, 31 May 2019 15:50:00 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:f910:d845:2bcd:e6c8? ([2001:b07:6468:f312:f910:d845:2bcd:e6c8])
-        by smtp.gmail.com with ESMTPSA id u9sm15979696wme.48.2019.05.31.15.49.59
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 31 May 2019 15:50:00 -0700 (PDT)
-Subject: Re: [GIT PULL 0/2] KVM: s390: fixes for 5.2-rc3
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-References: <20190529125045.42935-1-borntraeger@de.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7c70ab2b-4a3e-e8e6-8872-7d4f0f151306@redhat.com>
-Date:   Sat, 1 Jun 2019 00:49:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726674AbfEaXkT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 31 May 2019 19:40:19 -0400
+Received: from smtp1.ono.com ([62.42.230.162]:39705 "EHLO smtp1.ono.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726518AbfEaXkT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 31 May 2019 19:40:19 -0400
+X-Junkmail-Premium-Raw: score=13/50,refid=2.7.2:2019.5.31.225117:17:13.011,ip=62.42.230.133,rules=__HAS_MSGID,
+ __SANE_MSGID, MSGID_JMAIL_DEFAULT, INVALID_MSGID_NO_FQDN, __HAS_FROM,
+ FROM_NAME_PHRASE, __HAS_REPLYTO, __PHISH_SPEAR_SUBJ_ALERT, __MIME_VERSION,
+ __CT, __CT_TEXT_PLAIN, __CTE, MISSING_HEADERS, __ANY_URI, __URI_NO_WWW,
+ __FRAUD_INTRO, __STOCK_PHRASE_7, __FRAUD_MONEY_BIG_COIN_DIG, __OEM_PRICE,
+ __FRAUD_MONEY_CURRENCY_DOLLAR, __NO_HTML_TAG_RAW, BODYTEXTP_SIZE_400_LESS,
+ BODYTEXTP_SIZE_3000_LESS, BODY_SIZE_300_399, __MIME_TEXT_P1,
+ __MIME_TEXT_ONLY, __URI_NS, HTML_00_01, HTML_00_10, __FRAUD_MONEY_CURRENCY,
+ __FRAUD_MONEY_BIG_COIN, __FRAUD_MONEY_VALUE, __PHISH_SPEAR_GREETING,
+ __FRAUD_MONEY, FRAUD_X3, BODY_SIZE_5000_LESS, __MIME_TEXT_P,
+ __PHISH_SPEAR_STRUCTURE_1, BODY_SIZE_1000_LESS, BODY_SIZE_2000_LESS,
+ __PHISH_SPEAR_STRUCTURE_2, REPLYTO_FROM_DIFF_ADDY, NO_URI_HTTPS,
+ BODY_SIZE_7000_LESS, TO_MALFORMED
+Received: from resprs03 (62.42.230.133) by smtp1.ono.com (9.0.019.09-1)
+        id 5C12554F087C0B48; Sat, 1 Jun 2019 01:39:42 +0200
+Received: from (149.126.76.18) by webmailcpr03n.ono.com;  Sat, 1 Jun 2019 01:39:40 +0200
+Message-ID: <8149985.2807991559345980972.JavaMail.defaultUser@defaultHost>
+Date:   Sat, 1 Jun 2019 01:39:40 +0200 (CEST)
+From:   "Mrs. Amina Kadi" <oposicionesayudantes@ono.com>
+Reply-To: mrsamina.kadi1@barid.com
+Subject: Compliment of the day to you Dear Friend.
 MIME-Version: 1.0
-In-Reply-To: <20190529125045.42935-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain;charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 29/05/19 14:50, Christian Borntraeger wrote:
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-master-5.2-2
 
-Pulled, thanks.
+Compliment of the day to you Dear Friend.
 
-Paolo
+Dear Friend.
+
+I am Mrs. Amina Kadi. am sending this brief letter to solicit your
+partnership to transfer $5.5 million US Dollars. I shall send you
+more information and procedures when I receive positive response from
+you.
+
+Mrs. Amina Kadi
+mrsamina.kadi1@barid.com
