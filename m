@@ -2,73 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4688B320DA
-	for <lists+kvm@lfdr.de>; Sun,  2 Jun 2019 00:08:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FC6732172
+	for <lists+kvm@lfdr.de>; Sun,  2 Jun 2019 03:22:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726601AbfFAWIE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 1 Jun 2019 18:08:04 -0400
-Received: from mail-40135.protonmail.ch ([185.70.40.135]:44967 "EHLO
-        mail-40135.protonmail.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726343AbfFAWIE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 1 Jun 2019 18:08:04 -0400
-Date:   Sat, 01 Jun 2019 22:07:59 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=default; t=1559426881;
-        bh=sCCPTCCPsBcs7Y63lAXufXBWUSjRsNimZwh/IBz/q2g=;
-        h=Date:To:From:Reply-To:Subject:Feedback-ID:From;
-        b=sp8mbZzS2jjc1e2NLkaHUT7neDhuodg+25tbFaWHK/RhuosiK0qkgvk9WFbKI4RbM
-         +Z9tdZkb8ZZXRSJG1UnXMOlfzxoaN2aNqhNDJuuqjFPeuyUGk9Q2uR/TNSnjjh99w0
-         b48OKROWIlTxabCm9fGhoYC2yJ/O+/q/DRu1vW2s=
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-From:   nucleare2 <nucleare2@protonmail.com>
-Reply-To: nucleare2 <nucleare2@protonmail.com>
-Subject: GPU passthrough hot-swapping driver development?
-Message-ID: <7m5yGq2nqhDfQvcZCjBDqj8OEu2o1QDrqiy-MdHrni7Qw8rwHrdkBMtEisMnEG1dgB6lSJI-MleT0EAlkZE28gRfQqjXJsDRlCgsNJw7oPQ=@protonmail.com>
-Feedback-ID: 6cK2ugpeksPec3rG16mXEaHR9GhrR_B-m0z3L-xAiYND-P5vD9hHafIOg6bgnbygXCX6rz6IkScptBLgDrGM0A==:Ext:ProtonMail
+        id S1726531AbfFBBVh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 1 Jun 2019 21:21:37 -0400
+Received: from ahs5.r4l.com ([158.69.52.156]:54481 "EHLO ahs5.r4l.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726211AbfFBBVh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 1 Jun 2019 21:21:37 -0400
+X-Greylist: delayed 4174 seconds by postgrey-1.27 at vger.kernel.org; Sat, 01 Jun 2019 21:21:36 EDT
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=extremeground.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+        MIME-Version:Date:Message-ID:Subject:From:To:Sender:Reply-To:Cc:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=vEKtx9pZYhUtYAIpewcbFvcmezrV0ydZh2tCYu1vvb0=; b=0vAevecg9a3IuQ0a4n7XsUAT8O
+        e7MUdTiEG7I5xb+9W2r/784TAten8xizBHanZV1XSVIMlE60sYCokQwiDCKqefdOkALnjmYW7+lJp
+        FLhV9LNNyPfyQSGNyNuGWLD1jQjD6rSCBbiCintUe/QSGX1fIzl4nelZgrH6yPi2janT10Aua5ZiN
+        sI9N84otxhqC+8j3HbMGr+uvATpdT+4oKz5ZGplJdJD4PZ7Ff56RA77H9YWZ0fnS0G/R/8DDCBCI9
+        bn7EwoG3ASnCBlQ+SgIuO/KOigJYCn0WG7sC8UTyrptnLXeRW+47T/ISEdQEbqWCOIU+gc05uhQug
+        eXozTrZw==;
+Received: from cpeac202ed5e073-cmac202ed5e070.cpe.net.cable.rogers.com ([99.237.87.227]:42306 helo=[192.168.1.20])
+        by ahs5.r4l.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.91)
+        (envelope-from <gary@extremeground.com>)
+        id 1hXE6T-0000lr-TQ
+        for kvm@vger.kernel.org; Sat, 01 Jun 2019 20:12:01 -0400
+To:     kvm@vger.kernel.org
+From:   Gary Dale <gary@extremeground.com>
+Subject: kvm / virsh snapshot management
+Message-ID: <abb7990e-0331-67a4-af92-05276366478c@extremeground.com>
+Date:   Sat, 1 Jun 2019 20:12:01 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.7 required=7.0 tests=ALL_TRUSTED,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO_END_DIGIT autolearn=no
-        autolearn_force=no version=3.4.2
-X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on mail.protonmail.ch
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-CA
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - ahs5.r4l.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - extremeground.com
+X-Get-Message-Sender-Via: ahs5.r4l.com: authenticated_id: gary@extremeground.com
+X-Authenticated-Sender: ahs5.r4l.com: gary@extremeground.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello, I'd like to discuss the possibility of developing a method for hot-s=
-wapping video cards between a KVM host and the guest machine when using pas=
-sthrough.
+A while back I converted a raw disk image to qcow2 to be able to use 
+snapshots. However I realize that I may not really understand exactly 
+how snapshots work. In this particular case, I'm only talking about 
+internal snapshots currently as there seems to be some differences of 
+opinion as to whether internal or external are safer/more reliable. I'm 
+also only talking about shutdown state snapshots, so it should just be 
+the disk that is snapshotted.
 
-It seems that currently passthrough is pretty restrictive as far as assignm=
-ent to the host vs guest goes.  This means for applications like accelerati=
-ng macOS fully a video card needs to be dedicated to passthrough for macOS =
-so that native drivers grab a hold of it at macOS guest startup.
+As I understand it, the first snapshot freezes the base image and 
+subsequent changes in the virtual machine's disk are stored elsewhere in 
+the qcow2 file (remember, only internal snapshots). If I take a second 
+snapshot, that freezes the first one, and subsequent changes are now in 
+third location. Each new snapshot is incremental to the one that 
+preceded it rather than differential to the base image. Each new 
+snapshot is a child of the previous one.
 
-I've been thinking about the possibility of creating some kind of a dummy p=
-assthrough driver that may, at some minimal level, virtualize the GPU acces=
-s so as to allow the KVM host and guest (macOS, Windows, Linux, whatever wo=
-uld need the full GPU access) to "hot-swap" access to the GPU.
+One explanation I've seen of the process is if I delete a snapshot, the 
+changes it contains are merged with its immediate child. So if I deleted 
+the first snapshot, the base image stays the same but any data that has 
+changed since the base image is now in the second snapshot's location. 
+The merge with children explanation also implies that the base image is 
+never touched even if the first snapshot is deleted.
 
-As I said above, right now it appears that it's necessary to have multiple =
-GPUs for the host vs guests that need/want passthrough, but if an appropria=
-te driver is developed that somehow captures some core functionality, could=
-n't a kernel level key combination capture be implemented that would flip p=
-assthrough between host and guest(s)?
+But if I delete a snapshot that has no children, is that essentially the 
+same as reverting to the point that snapshot was created and all 
+subsequent disk changes are lost? Or does it merge down to the parent 
+snapshot? If I delete all snapshots, would that revert to the base image?
 
-Basically if a macOS or Windows (or Linux) guest BELIEVES it still has cont=
-rol of the GPU, then the guest kernel should not panic and should still rem=
-ain operational while the host get's access.  I'm not talking about any kin=
-d of capturing here, just simply making the host or guest think it's still =
-getting GPU access and happily spinning away while the user is flipping bet=
-ween host/guest instances.
+I've seen it explained that a snapshot is very much like a timestamp so 
+deleting a timestamp removes the dividing line between writes that 
+occurred before and after that time, so that data is really only removed 
+if I revert to some time stamp - all writes after that point are 
+discarded. In this explanation, deleting the oldest timestamp is 
+essentially updating the base image. Deleting all snapshots would leave 
+me with the base image fully updated.
 
-Has anyone considered this or put any work into this so far?
+Frankly, the second explanation sounds more reasonable to me, without 
+having to figure out how copy-on-write works,  But I'm dealing with 
+important data here and I don't want to mess it up by mishandling the 
+snapshots.
 
-I've seen someone else mention this before somewhere, but it seemed to not =
-get any attention. This is a pretty critical function that would benefit KV=
-M users enormously.
+Can some provide a little clarity on this? Thanks!
 
--nuc
+
