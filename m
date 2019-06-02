@@ -2,53 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F114A32472
-	for <lists+kvm@lfdr.de>; Sun,  2 Jun 2019 19:25:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9647132492
+	for <lists+kvm@lfdr.de>; Sun,  2 Jun 2019 20:38:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726908AbfFBRZP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 2 Jun 2019 13:25:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35214 "EHLO mail.kernel.org"
+        id S1726485AbfFBSis (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 2 Jun 2019 14:38:48 -0400
+Received: from ahs5.r4l.com ([158.69.52.156]:52668 "EHLO ahs5.r4l.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726876AbfFBRZP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Jun 2019 13:25:15 -0400
-Subject: Re: [GIT PULL] KVM fixes for 5.2-rc3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559496314;
-        bh=TfLxWpOC4SbTif7Gsn4xrF0ocHhDsjWMGlOTKoLN1lc=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=jtlJlsakSJYX9uj2Oy+0tv6IkDt2Tx5c5zRgVRVvWmFuJ6eLxnf7SJ1aFy4wTXvjw
-         HiwaZEYuaMlw6Tr7ofB3fKeEy6EFuParAVTgUI6O6K1ojmWwiktYoiVew9jDdaTbk3
-         8y3CjuSP+D+54oaqdvV0tKlmAS5HVa/wB58Sf8OY=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <1559469039-42045-1-git-send-email-pbonzini@redhat.com>
-References: <1559469039-42045-1-git-send-email-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <1559469039-42045-1-git-send-email-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git
- tags/for-linus
-X-PR-Tracked-Commit-Id: f8d221d2e0e1572d0d60174c118e3554d1aa79fa
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: b44a1dd3f648a433c525efcdd6ba95ad89d50e27
-Message-Id: <155949631467.24242.16308911266332915750.pr-tracker-bot@kernel.org>
-Date:   Sun, 02 Jun 2019 17:25:14 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        rkrcmar@redhat.com, kvm@vger.kernel.org
+        id S1726170AbfFBSis (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 Jun 2019 14:38:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=extremeground.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:References:To:Subject:From:Sender:
+        Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=glXmhaL92oSB2arryjVOx7d7czNc7W+pqAt7Tko2urQ=; b=J/jCSTKjKsmqW4JYO89c5JbuJR
+        5ixC5/pOQmFSBYFysbI+Js6wA5FuJePV5nrwhczo+K3HFUMovyO/B9S7ezivq6zCqCsanpOKS0/Vd
+        H2cuf3iNPeUHgn/s+K2a036TOgk5eEHTij4vrmACyAB+4UDHQkoQ3YKdqzKrfsF6JjRY6SuhN1lUU
+        LWZFMrnoi8VmMSoknLNOLotaJP+77tQR1FlzkvM4AgPeCRuFmAVnyQusKVJib6MzjsBZimJFqzmkf
+        J4qQnxJXW+tMNhFfSYdPXn4GnfAOpCbXoQVr1IPFquc3qjDDl0q2GATLPK7y9mo36bCNhqTaR3Waw
+        jbny0rGA==;
+Received: from cpeac202ed5e073-cmac202ed5e070.cpe.net.cable.rogers.com ([99.237.87.227]:53820 helo=[192.168.1.20])
+        by ahs5.r4l.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.91)
+        (envelope-from <gary@extremeground.com>)
+        id 1hXVNW-00029W-1A
+        for kvm@vger.kernel.org; Sun, 02 Jun 2019 14:38:46 -0400
+From:   Gary Dale <gary@extremeground.com>
+Subject: Re: Windows 7 VM CPU core count
+To:     kvm@vger.kernel.org
+References: <b338a718-28b9-98b9-7560-04c8edbde65e@extremeground.com>
+ <EA057763-BC27-4E94-96A1-8846B34EDE0E@redhat.com>
+Message-ID: <d961d6b4-7a2a-b41e-9e6a-5f3208e83f10@extremeground.com>
+Date:   Sun, 2 Jun 2019 14:38:46 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <EA057763-BC27-4E94-96A1-8846B34EDE0E@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-CA
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - ahs5.r4l.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - extremeground.com
+X-Get-Message-Sender-Via: ahs5.r4l.com: authenticated_id: gary@extremeground.com
+X-Authenticated-Sender: ahs5.r4l.com: gary@extremeground.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Sun,  2 Jun 2019 11:50:39 +0200:
+I checked with a Windows 7 VM set up from scratch and you seem to be 
+correct. A quick check suggests that Windows 10 has the same limitation.
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+My real problem was that I needed to manually configure the topology to 
+set the CPU count, cores and threads. Unfortunately the version of KVM I 
+am using (Debian/Stretch) doesn't recognize the Ryzen processor so I 
+seem to be limited to one thread per core. Presumably that will be fixed 
+in Debian/Buster.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b44a1dd3f648a433c525efcdd6ba95ad89d50e27
+Thanks for your help!
 
-Thank you!
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
