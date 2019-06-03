@@ -2,78 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D00832E30
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 13:07:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C319F32E49
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 13:11:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727714AbfFCLHW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jun 2019 07:07:22 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34291 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725856AbfFCLHW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jun 2019 07:07:22 -0400
-Received: by mail-wr1-f65.google.com with SMTP id e16so3326499wrn.1
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2019 04:07:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Rdf+QSazMX9W42t15vMnXFExNCmmHTg2hetZgBVUhIY=;
-        b=WQQlHdIZ6MDv6ZmOO2MM2Ts4kcZprbpK7YCdlOFfdPeA4zFcfQyJwzlm6Q3xKmfGVK
-         l7F1FlEBaOpkHolb8haIhdKWpLNghLZFi3T/VpO04vvXBExO/TeuhmHgcve0YZ4VXlv6
-         GzGZHu1bmhXIaoLvvRLxZq4nV2hPRb2CIiaBHJgyymyNyDj8vsu/rgceSmiMsoxq8/Bm
-         DGd+72oE6vS05RndDjjpChkSBZSUJ+30uZhVjj0IUE1LSf+MvFUB3h3tC+4gPX6lGYKO
-         Is69pJbPrhmWhyyfLzGIByCp2723cC+aq8Pc8gVvN7vSlSb9qhWakPoZ37T3+FeGL9tS
-         cOWQ==
-X-Gm-Message-State: APjAAAW2JtCoTFygtKw6v45V75c8HLqXcgiQWh5GJcDk1u9/Nei9tLCH
-        ydNIIDYiRUASB3vf94m1r9s1/w==
-X-Google-Smtp-Source: APXvYqzxDfQTTupgrN70BEqNhLgAiEj+6mlq4Bfy4o1lRFeVEHVZDlJsyp3DX8S5zo8Bj0v34tqjEQ==
-X-Received: by 2002:adf:aa0a:: with SMTP id p10mr15815063wrd.125.1559560040922;
-        Mon, 03 Jun 2019 04:07:20 -0700 (PDT)
-Received: from steredhat.homenet.telecomitalia.it (host253-229-dynamic.248-95-r.retail.telecomitalia.it. [95.248.229.253])
-        by smtp.gmail.com with ESMTPSA id w14sm1632043wrk.44.2019.06.03.04.07.19
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 03 Jun 2019 04:07:20 -0700 (PDT)
-Date:   Mon, 3 Jun 2019 13:07:17 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     David Miller <davem@davemloft.net>
-Cc:     netdev@vger.kernel.org, stefanha@redhat.com,
-        virtualization@lists.linux-foundation.org, mst@redhat.com,
-        jasowang@redhat.com, linux-kernel@vger.kernel.org,
+        id S1727862AbfFCLLe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jun 2019 07:11:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35580 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727724AbfFCLLd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 3 Jun 2019 07:11:33 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x53B3Bsl107935
+        for <kvm@vger.kernel.org>; Mon, 3 Jun 2019 07:11:32 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sw1mf2ag0-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2019 07:11:32 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
+        Mon, 3 Jun 2019 12:11:30 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 3 Jun 2019 12:11:27 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x53BBQTI57933894
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 3 Jun 2019 11:11:26 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 08D7D11C05B;
+        Mon,  3 Jun 2019 11:11:26 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BD02611C04C;
+        Mon,  3 Jun 2019 11:11:25 +0000 (GMT)
+Received: from osiris (unknown [9.152.212.21])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon,  3 Jun 2019 11:11:25 +0000 (GMT)
+Date:   Mon, 3 Jun 2019 13:11:24 +0200
+From:   Heiko Carstens <heiko.carstens@de.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org
-Subject: Re: [PATCH v3 2/5] vsock/virtio: fix locking for fwd_cnt and
- buf_alloc
-Message-ID: <20190603110717.rjbwfojpdpye3yxe@steredhat.homenet.telecomitalia.it>
-References: <20190531133954.122567-1-sgarzare@redhat.com>
- <20190531133954.122567-3-sgarzare@redhat.com>
- <20190602.180334.1932703293092139564.davem@davemloft.net>
+Subject: Re: [PULL 0/7] vfio-ccw: fixes
+References: <20190603105038.11788-1-cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190602.180334.1932703293092139564.davem@davemloft.net>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20190603105038.11788-1-cohuck@redhat.com>
+X-TM-AS-GCONF: 00
+x-cbid: 19060311-0008-0000-0000-000002ED4AC0
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19060311-0009-0000-0000-0000225A296F
+Message-Id: <20190603111124.GB20699@osiris>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-03_09:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=588 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906030082
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Jun 02, 2019 at 06:03:34PM -0700, David Miller wrote:
-> From: Stefano Garzarella <sgarzare@redhat.com>
-> Date: Fri, 31 May 2019 15:39:51 +0200
+On Mon, Jun 03, 2019 at 12:50:31PM +0200, Cornelia Huck wrote:
+> The following changes since commit 674459be116955e025d6a5e6142e2d500103de8e:
 > 
-> > @@ -434,7 +434,9 @@ void virtio_transport_set_buffer_size(struct vsock_sock *vsk, u64 val)
-> >  	if (val > vvs->buf_size_max)
-> >  		vvs->buf_size_max = val;
-> >  	vvs->buf_size = val;
-> > +	spin_lock_bh(&vvs->rx_lock);
-> >  	vvs->buf_alloc = val;
-> > +	spin_unlock_bh(&vvs->rx_lock);
+>   MAINTAINERS: add Vasily Gorbik and Christian Borntraeger for s390 (2019-05-31 10:14:15 +0200)
 > 
-> This locking doesn't do anything other than to strongly order the
-> buf_size store to occur before the buf_alloc one.
+> are available in the Git repository at:
+> 
+>   https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git tags/vfio-ccw-20190603
+> 
+> for you to fetch changes up to 9b6e57e5a51696171de990b3c41bd53d4b8ab8ac:
+> 
+>   s390/cio: Remove vfio-ccw checks of command codes (2019-06-03 12:02:55 +0200)
+> 
+> ----------------------------------------------------------------
+> various vfio-ccw fixes (ccw translation, state machine)
+> 
+> ----------------------------------------------------------------
+> 
+> Eric Farman (7):
+>   s390/cio: Update SCSW if it points to the end of the chain
+>   s390/cio: Set vfio-ccw FSM state before ioeventfd
+>   s390/cio: Split pfn_array_alloc_pin into pieces
+>   s390/cio: Initialize the host addresses in pfn_array
+>   s390/cio: Don't pin vfio pages for empty transfers
+>   s390/cio: Allow zero-length CCWs in vfio-ccw
+>   s390/cio: Remove vfio-ccw checks of command codes
 
-Sure, I'll remove the lock. I was confused because I moved its reading
-under the rx_lock (together with other variables), but here I'm updating
-only buf_alloc, so this lock is useless.
+Given that none of the commits contains a stable tag, I assume it's ok
+to schedule these for the next merge window (aka 'feature branch')?
 
-Thanks,
-Stefano
