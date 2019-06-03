@@ -2,53 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ADB653360A
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 19:06:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B17733688
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 19:26:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728266AbfFCRG1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jun 2019 13:06:27 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:37918 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728176AbfFCRG0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jun 2019 13:06:26 -0400
-Received: by mail-pf1-f195.google.com with SMTP id a186so10266397pfa.5
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2019 10:06:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HYJoR/zfyv70Em+OIILglCe3XWuiH6p+K727C24pDAs=;
-        b=XymoGc7JWCRKHtM+wd/9hGi9VWGsUM72Lwa90KnvQJ358uEmtUgcHoKdtU9g/YH4UJ
-         5u34zZdjU4FRJazo1vFuW3Ni1y1DNZVh/alS1ECRtC3BF7TZUH+GUyZUoEV1ZTcu35tt
-         nObul5i9lrx30r8a/e6JYyssLeymB2ctqES0N7//YxV4uMKqEsaUeN3+PzxtLJVdrwsh
-         Z/k985v/01dgnrGjVh59cUp9Nom/0K7l3TgAT4n5WZQPD1vgp3vkfuUimZ+Xh+PsD+fW
-         QdzcgoJaWOtWSqcWc9IK1QohrHJZ7wW5wsfUIytyUhIb0Cs9PUborvrLgVelRcAz9JGB
-         usaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HYJoR/zfyv70Em+OIILglCe3XWuiH6p+K727C24pDAs=;
-        b=G8xarU5pxhjjF/Wf5+WVFZdzrXmFmlfTrtbdBjYq/61/ymMASnaTlaL/ASCP4j8H0r
-         a44VpQL2u3cpO6FlJx09duJCxiH/NTg44tlJV6slvARCJvrMXo4qyxfRJicUawvmDSRa
-         DPHamcMlh2RqFYbmFlUysG19VVQhWVxKFHCtNCcAefO/4YiMaOilueCyJpp+09G3cuO9
-         tn+eqJMwmVERCjHHzmzRhZglmB21y4a8G/I7a8CycPXtZmgOZ6A+G4wkfT26gs/2fK8c
-         IKTB0gz0IyRNg/D1jV2xvDqwSfmjYolGAbF2Cd+FILjD3HXx0Ru84wtmKt3mm2MOAqG/
-         gmYQ==
-X-Gm-Message-State: APjAAAVDp3+wl1I0k8mleTMKeire/TI+O8od4np/ntvI+PBkkIE/Mb6J
-        iwAEeKGhAlFRuVJGUj/vLy487ILHzFSyITdRmyBFYw==
-X-Google-Smtp-Source: APXvYqzVD08oLbUBv5TB7pQev79oUx9XvjbFqir2kEseCZEnF7+ERZIlVyBSOpSgKKJ3rEYpDIEwDIElz1nyAoYLJGY=
-X-Received: by 2002:a17:90a:2488:: with SMTP id i8mr23649149pje.123.1559581585869;
- Mon, 03 Jun 2019 10:06:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1559580831.git.andreyknvl@google.com> <097bc300a5c6554ca6fd1886421bb2e0adb03420.1559580831.git.andreyknvl@google.com>
- <8ff5b0ff-849a-1e0b-18da-ccb5be85dd2b@oracle.com>
-In-Reply-To: <8ff5b0ff-849a-1e0b-18da-ccb5be85dd2b@oracle.com>
-From:   Andrey Konovalov <andreyknvl@google.com>
-Date:   Mon, 3 Jun 2019 19:06:14 +0200
-Message-ID: <CAAeHK+xX2538e674Pz25unkdFPCO_SH0pFwFu=8+DS7RzfYnLQ@mail.gmail.com>
-Subject: Re: [PATCH v16 01/16] uaccess: add untagged_addr definition for other arches
-To:     Khalid Aziz <khalid.aziz@oracle.com>
+        id S1729863AbfFCRZ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jun 2019 13:25:59 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:41602 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726805AbfFCRZ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jun 2019 13:25:59 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x53HJ84U105594;
+        Mon, 3 Jun 2019 17:24:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=oT/Qbn3UCsmi4yHa5dCSEdLGPezhKqW3sHyFd1k2UMQ=;
+ b=2LE6GvdF1Spn4zQDJ/S+Y7Lhctbk5tePOYyaCmnqsyOr3uLvhrds+WPbVc6hPXAu9sIP
+ B0Y1nU/oFPg6ixsYXCZSDZnvxtWWQNi0j+MRjf0CBoAknHC52G/m4p1P8MrAI990VZia
+ 8ujGe7kWSRf7xAIGevSgKmBC3Wct5lXwvZ7qokhMwnYkhd63Cundz/Zl5pnAreMOjiWl
+ HWG+ViIH0FjQ4gxddvAi59ghuxHj+MdKKsrJR6n36wSKJyN/Ok8+n4Cy2uvBvd+9a3r5
+ V3Zqu7KeEDVK/adkgGrKlbvS/ddKrXPyTWM+bUnf/xQW/+CSelKEJwh4J3SpjWi5HA+8 Jg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2sugst8dvs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 03 Jun 2019 17:24:42 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x53HO5Kt055049;
+        Mon, 3 Jun 2019 17:24:42 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 2supp77yt1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 03 Jun 2019 17:24:42 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x53HOdQw028642;
+        Mon, 3 Jun 2019 17:24:39 GMT
+Received: from [192.168.1.16] (/24.9.64.241)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 03 Jun 2019 10:24:38 -0700
+Subject: Re: [PATCH v16 01/16] uaccess: add untagged_addr definition for other
+ arches
+To:     Andrey Konovalov <andreyknvl@google.com>
 Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
         Linux Memory Management List <linux-mm@kvack.org>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -86,61 +80,58 @@ Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
         Robin Murphy <robin.murphy@arm.com>,
         Kevin Brodsky <kevin.brodsky@arm.com>,
         Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <cover.1559580831.git.andreyknvl@google.com>
+ <097bc300a5c6554ca6fd1886421bb2e0adb03420.1559580831.git.andreyknvl@google.com>
+ <8ff5b0ff-849a-1e0b-18da-ccb5be85dd2b@oracle.com>
+ <CAAeHK+xX2538e674Pz25unkdFPCO_SH0pFwFu=8+DS7RzfYnLQ@mail.gmail.com>
+From:   Khalid Aziz <khalid.aziz@oracle.com>
+Organization: Oracle Corp
+Message-ID: <f6711d31-e52c-473a-d7ad-b2d63131d7a5@oracle.com>
+Date:   Mon, 3 Jun 2019 11:24:35 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <CAAeHK+xX2538e674Pz25unkdFPCO_SH0pFwFu=8+DS7RzfYnLQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9277 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=800
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906030120
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9277 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=813 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906030120
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 3, 2019 at 7:04 PM Khalid Aziz <khalid.aziz@oracle.com> wrote:
->
-> On 6/3/19 10:55 AM, Andrey Konovalov wrote:
-> > To allow arm64 syscalls to accept tagged pointers from userspace, we must
-> > untag them when they are passed to the kernel. Since untagging is done in
-> > generic parts of the kernel, the untagged_addr macro needs to be defined
-> > for all architectures.
-> >
-> > Define it as a noop for architectures other than arm64.
-> >
-> > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> > Reviewed-by: Khalid Aziz <khalid.aziz@oracle.com>
-> > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> > ---
-> >  include/linux/mm.h | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > index 0e8834ac32b7..949d43e9c0b6 100644
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -99,6 +99,10 @@ extern int mmap_rnd_compat_bits __read_mostly;
-> >  #include <asm/pgtable.h>
-> >  #include <asm/processor.h>
-> >
-> > +#ifndef untagged_addr
-> > +#define untagged_addr(addr) (addr)
-> > +#endif
-> > +
-> >  #ifndef __pa_symbol
-> >  #define __pa_symbol(x)  __pa(RELOC_HIDE((unsigned long)(x), 0))
-> >  #endif
-> >
->
-> Andrey,
->
-> This patch has now become part of the other patch series Chris Hellwig
-> has sent out -
-> <https://lore.kernel.org/lkml/20190601074959.14036-1-hch@lst.de/>. Can
-> you coordinate with that patch series?
+On 6/3/19 11:06 AM, Andrey Konovalov wrote:
+> On Mon, Jun 3, 2019 at 7:04 PM Khalid Aziz <khalid.aziz@oracle.com> wro=
+te:
+>> Andrey,
+>>
+>> This patch has now become part of the other patch series Chris Hellwig=
 
-Hi!
+>> has sent out -
+>> <https://lore.kernel.org/lkml/20190601074959.14036-1-hch@lst.de/>. Can=
 
-Yes, I've seen it. How should I coordinate? Rebase this series on top
-of that one?
+>> you coordinate with that patch series?
+>=20
+> Hi!
+>=20
+> Yes, I've seen it. How should I coordinate? Rebase this series on top
+> of that one?
 
-Thanks!
+That would be one way to do it. Better yet, separate this patch from
+both patch series, make it standalone and then rebase the two patch
+series on top of it.
 
->
-> --
-> Khalid
->
+--
+Khalid
+
