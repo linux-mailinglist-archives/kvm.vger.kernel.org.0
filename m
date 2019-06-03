@@ -2,107 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 821103369E
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 19:29:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7EBC336BC
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 19:30:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729898AbfFCR3V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jun 2019 13:29:21 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:52402 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727461AbfFCR3V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jun 2019 13:29:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=E3YMznrQvI4XYCbxYdGQLQYRxZ6se0IICAJQI35QmUc=; b=rBmKAzm6VMFiVqBuypdPrNnHG
-        9qR/xC1YUSUo4q1ihLjn3I1k3Z3Zt6ifT4BOE9d8JuD+KANIIdW4jN8PXiVc/rtwsBx2jUqqiusN9
-        XZiJCQFveWwYCiDODxQrw3kCKKimNiQpVcsgEcblb0zsMWY+TexrkRomHsn0JqXwETKx9ELJfGj9q
-        jOQlw3G/UlUJUPhW/UmsBMxDxE09/TlTcCGWjEEy2oiu1YHyvKMt+HBSMRmxLaLtbJMUdKbvkie5m
-        R6xIoJDLFjnWEVIxBVl5q2n4wLYhS96OJs3nOLbuM/ziN5On8QOyJ8ynpVakg7HFTHIHdWMjvK7eX
-        tMuk6CEhg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hXqlo-00025Q-9C; Mon, 03 Jun 2019 17:29:16 +0000
-Date:   Mon, 3 Jun 2019 10:29:16 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Khalid Aziz <khalid.aziz@oracle.com>
-Cc:     Andrey Konovalov <andreyknvl@google.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v16 01/16] uaccess: add untagged_addr definition for
- other arches
-Message-ID: <20190603172916.GA5390@infradead.org>
-References: <cover.1559580831.git.andreyknvl@google.com>
- <097bc300a5c6554ca6fd1886421bb2e0adb03420.1559580831.git.andreyknvl@google.com>
- <8ff5b0ff-849a-1e0b-18da-ccb5be85dd2b@oracle.com>
- <CAAeHK+xX2538e674Pz25unkdFPCO_SH0pFwFu=8+DS7RzfYnLQ@mail.gmail.com>
- <f6711d31-e52c-473a-d7ad-b2d63131d7a5@oracle.com>
+        id S1729961AbfFCRaf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jun 2019 13:30:35 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:39568 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729940AbfFCRae (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jun 2019 13:30:34 -0400
+Received: by mail-ed1-f68.google.com with SMTP id m10so2453596edv.6
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2019 10:30:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Ou7nbKSnWzeuJb0ud+C1KMIknjjtf6JpEdGznfm889o=;
+        b=XRvFg92K9MJE+/snsanTpU1Xdnpb0NRNHT7ExLcvgQdboyR5FHMjR/hC7f8R1gO7iW
+         uYqqg60suaErWHcdMrnieaDGtufM5FGiJCI2O2TYx5rUpd8ZLtSBOEE69tYIQ6tDxenc
+         WEJnE5QSwH+b7YmHJlFYI8IrGIxI92lmAKF+/S2kOTOFF/hc1KT0I1V7+2fUBLhKloV+
+         UTDZiJvLzj5z93XBGXVU1Wr5wnq/KO/bzX97bYXEoFO5KkPOqxTv8X4YqmdoULqoXJx6
+         zOpfE+vdadaCg6sou0U5/XFLR8PwpIYwiHePvxzvmP/jezse24GN+6RPCFPmGUZUe6IL
+         +suA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Ou7nbKSnWzeuJb0ud+C1KMIknjjtf6JpEdGznfm889o=;
+        b=V4LAGxpLkBs/A96UwNeSd6TnYGKx1e8sQasmaHPtCGFFaYP9UOZhF1VJwHkOopmS1d
+         iVv3WP0Jifqkyz59zCresXweRX1u6xUCzNgW7LNH2qs8Z82y3NciWhpTXcd4xJQpSCbY
+         b/XHK5ZDWvHhxycQMyB9jQxGTvY2VpVv36GYFUFuqRskUGG/P/hs/fcSt4RYiFwbF7vz
+         K0nIiSC786fTu6OZJ9DbHIv2Wv1/yYMi0k/Nmkc09nF8yl+GKR3EoWswAXww6kfxCa+d
+         7o8n0+uuRxhLs6iaMpI2ss4nOLp+FMvJBpKavr9VmaJZeR/VBz8D+aQzlm+8ZMqUe7cK
+         MH0w==
+X-Gm-Message-State: APjAAAXbcn3yGvi8TFQ+sR3K8Rid0Xd6rzTPGIIYeDMbi6ZYUGl696Tj
+        TH04zN5X5pS+jbW2CXYBvmktpy68igp/zVTfy4/3gA==
+X-Google-Smtp-Source: APXvYqyyzQEZJ7Lgq+NCeiqX/TahBk6T/cpgdRssAXOY6KVqhmwwIa6fKnhH+hvWKMEFq+m81C+//5OWgsFx6UqGlWw=
+X-Received: by 2002:a50:be03:: with SMTP id a3mr30015391edi.5.1559583032398;
+ Mon, 03 Jun 2019 10:30:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f6711d31-e52c-473a-d7ad-b2d63131d7a5@oracle.com>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <CAOyeoRWfPNmaWY6Lifdkdj3KPPM654vzDO+s3oduEMCJP+Asow@mail.gmail.com>
+ <5CEC9667.30100@intel.com> <CAOyeoRWhfyuuYdguE6Wrzd7GOdow9qRE4MZ4OKkMc5cdhDT53g@mail.gmail.com>
+ <5CEE3AC4.3020904@intel.com> <CAOyeoRW85jV=TW_xwSj0ZYwPj_L+G9wu+QPGEF3nBmPbWGX4_g@mail.gmail.com>
+ <5CF07D37.9090805@intel.com> <CAOyeoRXWQaVYZSVL_LTTdAwJOEr+eCzhp1=_JcOX3i6_CJiD_g@mail.gmail.com>
+ <5CF2599B.3030001@intel.com>
+In-Reply-To: <5CF2599B.3030001@intel.com>
+From:   Eric Hankland <ehankland@google.com>
+Date:   Mon, 3 Jun 2019 10:30:20 -0700
+Message-ID: <CAOyeoRWuHyhoy6NB=O+ekQMhBFngozKoanWzArxgBk4DH2hdtg@mail.gmail.com>
+Subject: Re: [PATCH v1] KVM: x86: PMU Whitelist
+To:     Wei Wang <wei.w.wang@intel.com>
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 03, 2019 at 11:24:35AM -0600, Khalid Aziz wrote:
-> On 6/3/19 11:06 AM, Andrey Konovalov wrote:
-> > On Mon, Jun 3, 2019 at 7:04 PM Khalid Aziz <khalid.aziz@oracle.com> wrote:
-> >> Andrey,
-> >>
-> >> This patch has now become part of the other patch series Chris Hellwig
-> >> has sent out -
-> >> <https://lore.kernel.org/lkml/20190601074959.14036-1-hch@lst.de/>. Can
-> >> you coordinate with that patch series?
-> > 
-> > Hi!
-> > 
-> > Yes, I've seen it. How should I coordinate? Rebase this series on top
-> > of that one?
-> 
-> That would be one way to do it. Better yet, separate this patch from
-> both patch series, make it standalone and then rebase the two patch
-> series on top of it.
+On Sat, Jun 1, 2019 at 3:50 AM Wei Wang <wei.w.wang@intel.com> wrote:
+>
+> My question is that have we proved that this indirect info leakage
+> indeed happens?
+> The spec states that the counter will count the related events generated by
+> the logical CPU with AnyThread=0. I would be inclined to trust the
+> hardware behavior
+> documented in the spec unless we could prove there is a problem.
 
-I think easiest would be to just ask Linus if he could make an exception
-and include this trivial prep patch in 5.2-rc.
+I'm not disputing the spec with regards to AnyThread=0; my point is
+that LLC contention can be quantified using the PMU regardless of
+whether or not you are measuring only the logical CPU you are running
+on.
+
+>  From the guest point of view, returning 0 means that the event counting
+> is running well.
+> That is, the guest is expecting to get some count numbers. So better not
+> to zero the value
+> when the guest does rdpmc/rdmsr to get the count in this case.
+>
+> I think we could just ensure "AnyThread=0" in the config, and create the
+> kernel
+> counter as usual.
+
+If you return non-zero in intel_pmu_set_msr(), KVM emulates a gp
+fault. Which as you said signals that something went wrong to the
+guest. However, older guests with panic_on_oops=1 (which is apparently
+default on RHEL 6) will panic if they get a gpfault while trying to do
+a wrmsr (see the "Carry on after a non-"safe" MSR access fails without
+!panic_on_oops" patch). I think that not panicking guests is probably
+preferable to communicating that we weren't able to program the event.
+
+
+Eric
