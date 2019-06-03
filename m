@@ -2,39 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 59A8033845
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 20:38:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70B1333854
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 20:39:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727104AbfFCSiJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jun 2019 14:38:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41644 "EHLO mx1.redhat.com"
+        id S1726735AbfFCSjO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jun 2019 14:39:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42932 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726800AbfFCSiH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jun 2019 14:38:07 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        id S1726633AbfFCSjO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jun 2019 14:39:14 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CEADD308794D;
-        Mon,  3 Jun 2019 18:37:56 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 22BAB300CAC0;
+        Mon,  3 Jun 2019 18:39:08 +0000 (UTC)
 Received: from [10.40.205.157] (unknown [10.40.205.157])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2FF4A60BFB;
-        Mon,  3 Jun 2019 18:37:20 +0000 (UTC)
-Subject: Re: [QEMU PATCH] KVM: Support for page hinting
-To:     Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
-        pagupta@redhat.com, wei.w.wang@intel.com,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Rik van Riel <riel@surriel.com>,
-        David Hildenbrand <david@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, dodgen@google.com,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        dhildenb@redhat.com, Andrea Arcangeli <aarcange@redhat.com>
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 50DC110013D9;
+        Mon,  3 Jun 2019 18:38:51 +0000 (UTC)
+Subject: Re: [RFC][Patch v10 0/2] mm: Support for page hinting
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, pbonzini@redhat.com, lcapitulino@redhat.com,
+        pagupta@redhat.com, wei.w.wang@intel.com, yang.zhang.wz@gmail.com,
+        riel@surriel.com, david@redhat.com, dodgen@google.com,
+        konrad.wilk@oracle.com, dhildenb@redhat.com, aarcange@redhat.com,
+        alexander.duyck@gmail.com
 References: <20190603170306.49099-1-nitesh@redhat.com>
- <20190603170432.1195-1-nitesh@redhat.com>
- <CAKgT0Udqm2qNQ1+mPkx7vx=c2a7Hjq92fKM30041e1kU47bcHA@mail.gmail.com>
+ <20190603140304-mutt-send-email-mst@kernel.org>
 From:   Nitesh Narayan Lal <nitesh@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
@@ -81,340 +75,243 @@ Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
  NK9ZhT0+qkiN7npFLtNtbzwqaqceq3XhafmCiw8xrtzCnlB/C4SiBr/93Ip4kihXJ0EuHSLn
  VujM7c/b4pps
 Organization: Red Hat Inc,
-Message-ID: <23dd50ab-be28-8275-c22d-fed28b71e81c@redhat.com>
-Date:   Mon, 3 Jun 2019 14:37:17 -0400
+Message-ID: <35dc90f3-3eaf-b2c2-a8a9-b7d8a6043f3b@redhat.com>
+Date:   Mon, 3 Jun 2019 14:38:48 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <CAKgT0Udqm2qNQ1+mPkx7vx=c2a7Hjq92fKM30041e1kU47bcHA@mail.gmail.com>
+In-Reply-To: <20190603140304-mutt-send-email-mst@kernel.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="MjcLktThbye9adVKcn4wvy9DEXe7JShNr"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Mon, 03 Jun 2019 18:38:06 +0000 (UTC)
+ boundary="cfSQOdHyBAa71Ofd0U9ySdm3rw06OprD3"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Mon, 03 Jun 2019 18:39:13 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MjcLktThbye9adVKcn4wvy9DEXe7JShNr
-Content-Type: multipart/mixed; boundary="sDwkWg2EGTObLlfNhJ6WvksPoVWdNMirB";
+--cfSQOdHyBAa71Ofd0U9ySdm3rw06OprD3
+Content-Type: multipart/mixed; boundary="Y5QNV8HrgVfCbdTDlLIOfT8WKVnZvSvIS";
  protected-headers="v1"
 From: Nitesh Narayan Lal <nitesh@redhat.com>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: kvm list <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
- linux-mm <linux-mm@kvack.org>, Paolo Bonzini <pbonzini@redhat.com>,
- lcapitulino@redhat.com, pagupta@redhat.com, wei.w.wang@intel.com,
- Yang Zhang <yang.zhang.wz@gmail.com>, Rik van Riel <riel@surriel.com>,
- David Hildenbrand <david@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- dodgen@google.com, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- dhildenb@redhat.com, Andrea Arcangeli <aarcange@redhat.com>
-Message-ID: <23dd50ab-be28-8275-c22d-fed28b71e81c@redhat.com>
-Subject: Re: [QEMU PATCH] KVM: Support for page hinting
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ pbonzini@redhat.com, lcapitulino@redhat.com, pagupta@redhat.com,
+ wei.w.wang@intel.com, yang.zhang.wz@gmail.com, riel@surriel.com,
+ david@redhat.com, dodgen@google.com, konrad.wilk@oracle.com,
+ dhildenb@redhat.com, aarcange@redhat.com, alexander.duyck@gmail.com
+Message-ID: <35dc90f3-3eaf-b2c2-a8a9-b7d8a6043f3b@redhat.com>
+Subject: Re: [RFC][Patch v10 0/2] mm: Support for page hinting
 References: <20190603170306.49099-1-nitesh@redhat.com>
- <20190603170432.1195-1-nitesh@redhat.com>
- <CAKgT0Udqm2qNQ1+mPkx7vx=c2a7Hjq92fKM30041e1kU47bcHA@mail.gmail.com>
-In-Reply-To: <CAKgT0Udqm2qNQ1+mPkx7vx=c2a7Hjq92fKM30041e1kU47bcHA@mail.gmail.com>
+ <20190603140304-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190603140304-mutt-send-email-mst@kernel.org>
 
---sDwkWg2EGTObLlfNhJ6WvksPoVWdNMirB
+--Y5QNV8HrgVfCbdTDlLIOfT8WKVnZvSvIS
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
 
 
-On 6/3/19 2:34 PM, Alexander Duyck wrote:
-> On Mon, Jun 3, 2019 at 10:04 AM Nitesh Narayan Lal <nitesh@redhat.com> =
-wrote:
->> Enables QEMU to call madvise on the pages which are reported
->> by the guest kernel.
+On 6/3/19 2:04 PM, Michael S. Tsirkin wrote:
+> On Mon, Jun 03, 2019 at 01:03:04PM -0400, Nitesh Narayan Lal wrote:
+>> This patch series proposes an efficient mechanism for communicating fr=
+ee memory
+>> from a guest to its hypervisor. It especially enables guests with no p=
+age cache
+>> (e.g., nvdimm, virtio-pmem) or with small page caches (e.g., ram > dis=
+k) to
+>> rapidly hand back free memory to the hypervisor.
+>> This approach has a minimal impact on the existing core-mm infrastruct=
+ure.
+> Could you help us compare with Alex's series?
+> What are the main differences?
+I have just started reviewing Alex's series. Once I am done with it, I ca=
+n.
+>> Measurement results (measurement details appended to this email):
+>> * With active page hinting, 3 more guests could be launched each of 5 =
+GB(total=20
+>> 5 vs. 2) on a 15GB (single NUMA) system without swapping.
+>> * With active page hinting, on a system with 15 GB of (single NUMA) me=
+mory and
+>> 4GB of swap, the runtime of "memhog 6G" in 3 guests (run sequentially)=
+ resulted
+>> in the last invocation to only need 37s compared to 3m35s without page=
+ hinting.
 >>
->> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
-> What commit-id is this meant to apply on top of? I can't apply this to
-> the latest development version of QEMU.
-I am not at the latest commit with this.
-My top of the commit is: f3b4d5ca67f2e933c93457b701883c307b99c15c
->
->> ---
->>  hw/virtio/trace-events                        |  1 +
->>  hw/virtio/virtio-balloon.c                    | 85 ++++++++++++++++++=
-+
->>  include/hw/virtio/virtio-balloon.h            |  2 +-
->>  include/qemu/osdep.h                          |  7 ++
->>  .../standard-headers/linux/virtio_balloon.h   |  1 +
->>  5 files changed, 95 insertions(+), 1 deletion(-)
+>> This approach tracks all freed pages of the order MAX_ORDER - 2 in bit=
+maps.
+>> A new hook after buddy merging is used to set the bits in the bitmap.
+>> Currently, the bits are only cleared when pages are hinted, not when p=
+ages are
+>> re-allocated.
 >>
->> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
->> index 07bcbe9e85..015565785c 100644
->> --- a/hw/virtio/trace-events
->> +++ b/hw/virtio/trace-events
->> @@ -46,3 +46,4 @@ virtio_balloon_handle_output(const char *name, uint6=
-4_t gpa) "section name: %s g
->>  virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_p=
-ages: %d actual: %d"
->>  virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actua=
-l: %d oldactual: %d"
->>  virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloo=
-n target: 0x%"PRIx64" num_pages: %d"
->> +virtio_balloon_hinting_request(unsigned long pfn, unsigned int num_pa=
-ges) "Guest page hinting request: %lu size: %d"
->> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
->> index a12677d4d5..cbb630279c 100644
->> --- a/hw/virtio/virtio-balloon.c
->> +++ b/hw/virtio/virtio-balloon.c
->> @@ -33,6 +33,13 @@
+>> Bitmaps are stored on a per-zone basis and are protected by the zone l=
+ock. A
+>> workqueue asynchronously processes the bitmaps as soon as a pre-define=
+d memory
+>> threshold is met, trying to isolate and report pages that are still fr=
+ee.
 >>
->>  #define BALLOON_PAGE_SIZE  (1 << VIRTIO_BALLOON_PFN_SHIFT)
+>> The isolated pages are reported via virtio-balloon, which is responsib=
+le for
+>> sending batched pages to the host synchronously. Once the hypervisor p=
+rocessed
+>> the hinting request, the isolated pages are returned back to the buddy=
+=2E
 >>
->> +struct guest_pages {
->> +       uint64_t phys_addr;
->> +       uint32_t len;
->> +};
->> +
-> Any reason for matching up 64b addr w/ 32b size? The way I see it you
-> would be be better off going with either 64b for both or 32b for both.
-> I opted for the 32b approach in my case since there was already code
-> in place for doing the PFN shift anyway in the standard virtio_balloon
-> code path.
->
->> +void page_hinting_request(uint64_t addr, uint32_t len);
->> +
->>  static void balloon_page(void *addr, int deflate)
->>  {
->>      if (!qemu_balloon_is_inhibited()) {
->> @@ -207,6 +214,80 @@ static void balloon_stats_set_poll_interval(Objec=
-t *obj, Visitor *v,
->>      balloon_stats_change_timer(s, 0);
->>  }
+>> The key changes made in this series compared to v9[1] are:
+>> * Pages only in the chunks of "MAX_ORDER - 2" are reported to the hype=
+rvisor to
+>> not break up the THP.
+>> * At a time only a set of 16 pages can be isolated and reported to the=
+ host to
+>> avoids any false OOMs.
+>> * page_hinting.c is moved under mm/ from virt/kvm/ as the feature is d=
+ependent
+>> on virtio and not on KVM itself. This would enable any other hyperviso=
+r to use
+>> this feature by implementing virtio devices.
+>> * The sysctl variable is replaced with a virtio-balloon parameter to
+>> enable/disable page-hinting.
 >>
->> +static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
->> +{
->> +    MemoryRegionSection mrs =3D memory_region_find(get_system_memory(=
-),
->> +                                                 addr, 1);
->> +
->> +    if (!mrs.mr) {
->> +        error_setg(errp, "No memory is mapped at address 0x%" HWADDR_=
-PRIx, addr);
->> +        return NULL;
->> +    }
->> +
->> +    if (!memory_region_is_ram(mrs.mr) && !memory_region_is_romd(mrs.m=
-r)) {
->> +        error_setg(errp, "Memory at address 0x%" HWADDR_PRIx "is not =
-RAM", addr);
->> +        memory_region_unref(mrs.mr);
->> +        return NULL;
->> +    }
->> +
->> +    *p_mr =3D mrs.mr;
->> +    return qemu_map_ram_ptr(mrs.mr->ram_block, mrs.offset_within_regi=
-on);
->> +}
->> +
->> +void page_hinting_request(uint64_t addr, uint32_t len)
->> +{
->> +    Error *local_err =3D NULL;
->> +    MemoryRegion *mr =3D NULL;
->> +    int ret =3D 0;
->> +    struct guest_pages *guest_obj;
->> +    int i =3D 0;
->> +    void *hvaddr_to_free;
->> +    uint64_t gpaddr_to_free;
->> +    void * temp_addr =3D gpa2hva(&mr, addr, &local_err);
->> +
->> +    if (local_err) {
->> +        error_report_err(local_err);
->> +        return;
->> +    }
->> +    guest_obj =3D temp_addr;
->> +    while (i < len) {
->> +       gpaddr_to_free =3D guest_obj[i].phys_addr;
->> +       trace_virtio_balloon_hinting_request(gpaddr_to_free,guest_obj[=
-i].len);
->> +       hvaddr_to_free =3D gpa2hva(&mr, gpaddr_to_free, &local_err);
->> +       if (local_err) {
->> +               error_report_err(local_err);
->> +               return;
->> +       }
->> +       ret =3D qemu_madvise((void *)hvaddr_to_free, guest_obj[i].len,=
- QEMU_MADV_FREE);
->> +       if (ret =3D=3D -1)
->> +           printf("\n%d:%s Error: Madvise failed with error:%d\n", __=
-LINE__, __func__, ret);
->> +       i++;
->> +    }
->> +}
->> +
-> Have we made any determination yet on the MADV_FREE vs MADV_DONT_NEED?
-> My preference would be to have this code just reuse the existing
-> balloon code as I did in my patch set. Then we can avoid the need to
-> have multiple types in use. We could just have the balloon use the
-> same as the hint.
->
->> +static void virtio_balloon_page_hinting(VirtIODevice *vdev, VirtQueue=
- *vq)
->> +{
->> +    VirtQueueElement *elem =3D NULL;
->> +    uint64_t temp_addr;
->> +    uint32_t temp_len;
->> +    size_t size, t_size =3D 0;
->> +
->> +    elem =3D virtqueue_pop(vq, sizeof(VirtQueueElement));
->> +    if (!elem) {
->> +       printf("\npop error\n");
->> +       return;
->> +    }
->> +    size =3D iov_to_buf(elem->out_sg, elem->out_num, 0, &temp_addr, s=
-izeof(temp_addr));
->> +    t_size +=3D size;
->> +    size =3D iov_to_buf(elem->out_sg, elem->out_num, 8, &temp_len, si=
-zeof(temp_len));
->> +    t_size +=3D size;
->> +    if (!qemu_balloon_is_inhibited())
->> +           page_hinting_request(temp_addr, temp_len);
->> +    virtqueue_push(vq, elem, t_size);
->> +    virtio_notify(vdev, vq);
->> +    g_free(elem);
->> +}
->> +
-> If you are doing a u64 addr, and a u32 len, does that mean you are
-> having to use a packed array between the guest and the host? This
-> would be another good reason to have both settle on either u64 or u32.
->
->>  static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueu=
-e *vq)
->>  {
->>      VirtIOBalloon *s =3D VIRTIO_BALLOON(vdev);
->> @@ -376,6 +457,7 @@ static uint64_t virtio_balloon_get_features(VirtIO=
-Device *vdev, uint64_t f,
->>      VirtIOBalloon *dev =3D VIRTIO_BALLOON(vdev);
->>      f |=3D dev->host_features;
->>      virtio_add_feature(&f, VIRTIO_BALLOON_F_STATS_VQ);
->> +    virtio_add_feature(&f, VIRTIO_BALLOON_F_HINTING);
->>      return f;
->>  }
->>
->> @@ -445,6 +527,7 @@ static void virtio_balloon_device_realize(DeviceSt=
-ate *dev, Error **errp)
->>      s->ivq =3D virtio_add_queue(vdev, 128, virtio_balloon_handle_outp=
-ut);
->>      s->dvq =3D virtio_add_queue(vdev, 128, virtio_balloon_handle_outp=
-ut);
->>      s->svq =3D virtio_add_queue(vdev, 128, virtio_balloon_receive_sta=
-ts);
->> +    s->hvq =3D virtio_add_queue(vdev, 128, virtio_balloon_page_hintin=
-g);
->>
->>      reset_stats(s);
->>  }
->> @@ -488,6 +571,8 @@ static void virtio_balloon_instance_init(Object *o=
-bj)
->>
->>      object_property_add(obj, "guest-stats", "guest statistics",
->>                          balloon_stats_get_all, NULL, NULL, s, NULL);
->> +    object_property_add(obj, "guest-page-hinting", "guest page hintin=
-g",
->> +                        NULL, NULL, NULL, s, NULL);
->>
->>      object_property_add(obj, "guest-stats-polling-interval", "int",
->>                          balloon_stats_get_poll_interval,
->> diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/vi=
-rtio-balloon.h
->> index e0df3528c8..774498a6ca 100644
->> --- a/include/hw/virtio/virtio-balloon.h
->> +++ b/include/hw/virtio/virtio-balloon.h
->> @@ -32,7 +32,7 @@ typedef struct virtio_balloon_stat_modern {
->>
->>  typedef struct VirtIOBalloon {
->>      VirtIODevice parent_obj;
->> -    VirtQueue *ivq, *dvq, *svq;
->> +    VirtQueue *ivq, *dvq, *svq, *hvq;
->>      uint32_t num_pages;
->>      uint32_t actual;
->>      uint64_t stats[VIRTIO_BALLOON_S_NR];
->> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
->> index 840af09cb0..4d632933a9 100644
->> --- a/include/qemu/osdep.h
->> +++ b/include/qemu/osdep.h
->> @@ -360,6 +360,11 @@ void qemu_anon_ram_free(void *ptr, size_t size);
->>  #else
->>  #define QEMU_MADV_REMOVE QEMU_MADV_INVALID
->>  #endif
->> +#ifdef MADV_FREE
->> +#define QEMU_MADV_FREE MADV_FREE
->> +#else
->> +#define QEMU_MADV_FREE QEMU_MADV_INVALID
->> +#endif
->>
->>  #elif defined(CONFIG_POSIX_MADVISE)
->>
->> @@ -373,6 +378,7 @@ void qemu_anon_ram_free(void *ptr, size_t size);
->>  #define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID
->>  #define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID
->>  #define QEMU_MADV_REMOVE QEMU_MADV_INVALID
->> +#define QEMU_MADV_FREE QEMU_MADV_INVALID
->>
->>  #else /* no-op */
->>
->> @@ -386,6 +392,7 @@ void qemu_anon_ram_free(void *ptr, size_t size);
->>  #define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID
->>  #define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID
->>  #define QEMU_MADV_REMOVE QEMU_MADV_INVALID
->> +#define QEMU_MADV_FREE QEMU_MADV_INVALID
->>
->>  #endif
->>
->> diff --git a/include/standard-headers/linux/virtio_balloon.h b/include=
-/standard-headers/linux/virtio_balloon.h
->> index 4dbb7dc6c0..f50c0d95ea 100644
->> --- a/include/standard-headers/linux/virtio_balloon.h
->> +++ b/include/standard-headers/linux/virtio_balloon.h
->> @@ -34,6 +34,7 @@
->>  #define VIRTIO_BALLOON_F_MUST_TELL_HOST        0 /* Tell before recla=
-iming pages */
->>  #define VIRTIO_BALLOON_F_STATS_VQ      1 /* Memory Stats virtqueue */=
+>> Pending items:
+>> * Test device assigned guests to ensure that hinting doesn't break it.=
 
->>  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM        2 /* Deflate balloon o=
-n OOM */
->> +#define VIRTIO_BALLOON_F_HINTING       5 /* Page hinting virtqueue */=
+>> * Follow up on VIRTIO_BALLOON_F_PAGE_POISON's device side support.
+>> * Compare reporting free pages via vring with vhost.
+>> * Decide between MADV_DONTNEED and MADV_FREE.
+>> * Look into memory hotplug, more efficient locking, possible races whe=
+n
+>> disabling.
+>> * Come up with proper/traceable error-message/logs.
+>> * Minor reworks and simplifications (e.g., virtio protocol).
+>>
+>> Benefit analysis:
+>> 1. Use-case - Number of guests that can be launched without swap usage=
 
-> So this is obviously built against an old version of QEMU, the latest
-> values for this include:
-> #define VIRTIO_BALLOON_F_FREE_PAGE_HINT 3 /* VQ to report free pages */=
-
-> #define VIRTIO_BALLOON_F_PAGE_POISON    4 /* Guest is using page poison=
-ing */
->
-> I wonder if we shouldn't look for a term other than "HINT" since there
-> is already the code around providing hints to migration.
+>> NUMA Nodes =3D 1 with 15 GB memory
+>> Guest Memory =3D 5 GB
+>> Number of cores in guest =3D 1
+>> Workload =3D test allocation program allocates 4GB memory, touches it =
+via memset
+>> and exits.
+>> Procedure =3D
+>> The first guest is launched and once its console is up, the test alloc=
+ation
+>> program is executed with 4 GB memory request (Due to this the guest oc=
+cupies
+>> almost 4-5 GB of memory in the host in a system without page hinting).=
+ Once
+>> this program exits at that time another guest is launched in the host =
+and the
+>> same process is followed. It is continued until the swap is not used.
+>>
+>> Results:
+>> Without hinting =3D 3, swap usage at the end 1.1GB.
+>> With hinting =3D 5, swap usage at the end 0.
+>>
+>> 2. Use-case - memhog execution time
+>> Guest Memory =3D 6GB
+>> Number of cores =3D 4
+>> NUMA Nodes =3D 1 with 15 GB memory
+>> Process: 3 Guests are launched and the =E2=80=98memhog 6G=E2=80=99 exe=
+cution time is monitored
+>> one after the other in each of them.
+>> Without Hinting - Guest1:47s, Guest2:53s, Guest3:3m35s, End swap usage=
+: 3.5G
+>> With Hinting - Guest1:40s, Guest2:44s, Guest3:37s, End swap usage: 0
+>>
+>> Performance analysis:
+>> 1. will-it-scale's page_faul1:
+>> Guest Memory =3D 6GB
+>> Number of cores =3D 24
+>>
+>> Without Hinting:
+>> tasks,processes,processes_idle,threads,threads_idle,linear
+>> 0,0,100,0,100,0
+>> 1,315890,95.82,317633,95.83,317633
+>> 2,570810,91.67,531147,91.94,635266
+>> 3,826491,87.54,713545,88.53,952899
+>> 4,1087434,83.40,901215,85.30,1270532
+>> 5,1277137,79.26,916442,83.74,1588165
+>> 6,1503611,75.12,1113832,79.89,1905798
+>> 7,1683750,70.99,1140629,78.33,2223431
+>> 8,1893105,66.85,1157028,77.40,2541064
+>> 9,2046516,62.50,1179445,76.48,2858697
+>> 10,2291171,58.57,1209247,74.99,3176330
+>> 11,2486198,54.47,1217265,75.13,3493963
+>> 12,2656533,50.36,1193392,74.42,3811596
+>> 13,2747951,46.21,1185540,73.45,4129229
+>> 14,2965757,42.09,1161862,72.20,4446862
+>> 15,3049128,37.97,1185923,72.12,4764495
+>> 16,3150692,33.83,1163789,70.70,5082128
+>> 17,3206023,29.70,1174217,70.11,5399761
+>> 18,3211380,25.62,1179660,69.40,5717394
+>> 19,3202031,21.44,1181259,67.28,6035027
+>> 20,3218245,17.35,1196367,66.75,6352660
+>> 21,3228576,13.26,1129561,66.74,6670293
+>> 22,3207452,9.15,1166517,66.47,6987926
+>> 23,3153800,5.09,1172877,61.57,7305559
+>> 24,3184542,0.99,1186244,58.36,7623192
+>>
+>> With Hinting:
+>> 0,0,100,0,100,0
+>> 1,306737,95.82,305130,95.78,306737
+>> 2,573207,91.68,530453,91.92,613474
+>> 3,810319,87.53,695281,88.58,920211
+>> 4,1074116,83.40,880602,85.48,1226948
+>> 5,1308283,79.26,1109257,81.23,1533685
+>> 6,1501987,75.12,1093661,80.19,1840422
+>> 7,1695300,70.99,1104207,79.03,2147159
+>> 8,1901523,66.85,1193613,76.90,2453896
+>> 9,2051288,62.73,1200913,76.22,2760633
+>> 10,2275771,58.60,1192992,75.66,3067370
+>> 11,2435016,54.48,1191472,74.66,3374107
+>> 12,2623114,50.35,1196911,74.02,3680844
+>> 13,2766071,46.22,1178589,73.02,3987581
+>> 14,2932163,42.10,1166414,72.96,4294318
+>> 15,3000853,37.96,1177177,72.62,4601055
+>> 16,3113738,33.85,1165444,70.54,4907792
+>> 17,3132135,29.77,1165055,68.51,5214529
+>> 18,3175121,25.69,1166969,69.27,5521266
+>> 19,3205490,21.61,1159310,65.65,5828003
+>> 20,3220855,17.52,1171827,62.04,6134740
+>> 21,3182568,13.48,1138918,65.05,6441477
+>> 22,3130543,9.30,1128185,60.60,6748214
+>> 23,3087426,5.15,1127912,55.36,7054951
+>> 24,3099457,1.04,1176100,54.96,7361688
+>>
+>> [1] https://lkml.org/lkml/2019/3/6/413
+>>
 --=20
 Regards
 Nitesh
 
 
---sDwkWg2EGTObLlfNhJ6WvksPoVWdNMirB--
+--Y5QNV8HrgVfCbdTDlLIOfT8WKVnZvSvIS--
 
---MjcLktThbye9adVKcn4wvy9DEXe7JShNr
+--cfSQOdHyBAa71Ofd0U9ySdm3rw06OprD3
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEkXcoRVGaqvbHPuAGo4ZA3AYyozkFAlz1aN0ACgkQo4ZA3AYy
-ozlpOBAAz4eUjOEuN8jIYI09rtC7PFA8/gWdY5N/nvXlmSOwk3pL8UQQSoLBvkFT
-nlnQSx9h5KmlJxqPUUAj5bY15NaPcaRLWB6EszYgILgR0KGvdYNfbFh3cQyfHGji
-SfCKsAc6fKHkULXSnJ9f7tdktbhvDNG4xWMPqz9pgVdcSYV3hRTn3+hIkhoO7toj
-X7C6t8J1IJ2F606wjm+yhwkWFr0TgVFJ5eaelV+wLorPMXno3WGFFL138G5odaB1
-zWzMiy7tlZgn6CGrspfRZFmYaTYR84RE3PzuLJNtZU+hgFdIwcJFbJ8qSUhazgTP
-yBw1ue0p06SbKHEzPtyg+eOwB67KHv5PwTafvC1M4fV45Pc6o0ifO0p0lcGyhV3w
-dyLydmVtujJv3zuBzB534yxEwu9M1iVi9kQVZe278ONZlX1VPFmKWTsKNATgB5Zo
-9Bzqofn9YcUyGLJqlC09Zg1Yl7AnBuHWVbZVlQgeidDoEjgqbgEyx8fspod4KtwR
-tXobWD9YfaxAPvGwlJv2h67MoEtT0gy6+6PPYo41NGC6UBUy2wO1CoIr2hzXlq3T
-sBHTTDXgXhheYyRf+bOZ+Y6JcWDI1Vrp5rGJlxfbaLEbg6OzEh9V1ma0ltGutKxO
-gPX8YmPiw8IBGk5tVFxndVNGWY1V5InoNmFbEHGi5BrGUHphAtk=
-=Tm/s
+iQIzBAEBCAAdFiEEkXcoRVGaqvbHPuAGo4ZA3AYyozkFAlz1aTgACgkQo4ZA3AYy
+ozn94g/7BeA8NfDTR9E50Fp31nZvDDzLUoiCaM8gOvxvp4UWiW6wuFUgOH3+1Vc9
+5EeMQm9jEnCE0ShOoa9NFk+ZYxdIVeno63V8pPn6qmNQiGPJPHxoOODwKv7wUezU
+1y4J7YF+XOrLwBeCm7rAus9ZwJzJozDk/nkXs56RowX7wA6KR+H8lOabq5xvk3zn
+n/9f6ZXCCB3V1WxJilJ5os9Lye2mN00urUeWeg8LKtV9jsnOa0pREqsmzdmipZCP
+YA/lxT/C6EskSvbcXGG/TkO5LXlgrWRNA7sokh2uDsXGMmUXSO7kN5xmcEDbUohq
+3ROBxr+TS56fQnYeXFAgGUdFq1cGZCd9Q8UA16DwGkjfmbMLrYamXE4ccBhm+zIE
+FtZA3BqT6JY+kkVDnCm6f8zK4zXkISYK1uQekaKoa9iphBk7yf/dyFo5+D7xMqeg
+4w6nz0KahiePt/V2I13nrtLiiI6GNKoZOw99CFw7UQkPySfHMxEIprqizBdS2MUF
+/csn78iT/2tMIlcge2pR4xAguJumORY0tUNXIT8Xj1RM/G7YLw8mINeqztWq9Bto
+yiaPmt3C9Wn8HkFZJTc+DbZQcXsLo3Cldy9Ea3FRcr/WgU6rESl4hxwFrJWu9G+q
+YWFeG7CKDtk8nP4uH7+hBXW90tZFztw4egk/fYPA/6paW+67Qkg=
+=CEiI
 -----END PGP SIGNATURE-----
 
---MjcLktThbye9adVKcn4wvy9DEXe7JShNr--
+--cfSQOdHyBAa71Ofd0U9ySdm3rw06OprD3--
