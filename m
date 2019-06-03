@@ -2,242 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BC6D633586
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 18:56:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C90F633584
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 18:56:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729736AbfFCQ43 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1729778AbfFCQ43 (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Mon, 3 Jun 2019 12:56:29 -0400
-Received: from mail-qk1-f202.google.com ([209.85.222.202]:50641 "EHLO
-        mail-qk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729732AbfFCQ4R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jun 2019 12:56:17 -0400
-Received: by mail-qk1-f202.google.com with SMTP id n77so969566qke.17
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2019 09:56:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=v9MzlIb7HY1yKtXIqdaDnLUOCgnoLYityVGh+V+FCFI=;
-        b=E8Ist5LC6WVHrU8hj11VtWQb5rjU7iBORWjaptcqcX3l9oPWYIMo05KmXzzCVgt3cu
-         lYJ4Yvl8mbNlJpJWSEYMIryL5scHXmPmVUqUSjI9X7Fuxa39wo8rzDRZFWMAkoj3uwjY
-         mqiCqrBWPtOVkiL+4ZV5H/HhzxJmpTR97uHC/IdXM4tljhuvgYTiLw3741mzKX8NYLUt
-         uc6Aqh8uuXDuaxHP4yeJ0XLPpMovyAE85DGwVCzioR0Gt6moVfBUOYshZAWVCnGUBbU4
-         06NzOvSR4tkaeqT9+eniQMZF90V1u65K6kkbFscWsH7pqN+ptT1wb5JpdkKVZRneJwoH
-         CGYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=v9MzlIb7HY1yKtXIqdaDnLUOCgnoLYityVGh+V+FCFI=;
-        b=drmaIvYM/jnaoyV5sWZcQHiOMkUuvLLVPBCGYU4lCI461mcqY1A5oty3asl08hm70X
-         c/mQS75+RkR2aQLbmVpYMU6r4nRLPiooQ3OZ79kqkpsy9sS4XAPOykENYlgy7VoZdg4p
-         7uzrR5BgnRVe5GWgH+baxvS+6ew+epM/S9owRpSfPco7lH6siKPoAvwixf753aMbdCGf
-         LTEteKLlUBU9uaog1gVjzXQiqVb+dtbuLIBcPO7bjabzoQIsXv9Qlc8ivVngnyoy9QIX
-         2WQeCHcmkD/uhHYBH6CkNXSEfSdsrm0+TuPz/KkskCY8M6zGOLyQUpzD9ovPeMvV/EEZ
-         GFSQ==
-X-Gm-Message-State: APjAAAWpPYIluMcOHnZRGcFRht4uL32DkMYr2CanvDrV48JUptlUlkjQ
-        hVJUtOo1WqhJqwJUYoBgGEABL3vX8+UPWJjs
-X-Google-Smtp-Source: APXvYqyupRnjjQO94efnTljbt6p9DxywyyDuZaQUfwBf3Y405Fl40dWCznelJThhDpEIkj52c6mVbKSb6DjD/rvF
-X-Received: by 2002:a37:de06:: with SMTP id h6mr3881914qkj.322.1559580976267;
- Mon, 03 Jun 2019 09:56:16 -0700 (PDT)
-Date:   Mon,  3 Jun 2019 18:55:18 +0200
-In-Reply-To: <cover.1559580831.git.andreyknvl@google.com>
-Message-Id: <9e1b5998a28f82b16076fc85ab4f88af5381cf74.1559580831.git.andreyknvl@google.com>
-Mime-Version: 1.0
-References: <cover.1559580831.git.andreyknvl@google.com>
-X-Mailer: git-send-email 2.22.0.rc1.311.g5d7573a151-goog
-Subject: [PATCH v16 16/16] selftests, arm64: add a selftest for passing tagged
- pointers to kernel
-From:   Andrey Konovalov <andreyknvl@google.com>
-To:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Andrey Konovalov <andreyknvl@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Received: from mx1.redhat.com ([209.132.183.28]:58690 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727866AbfFCQ41 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jun 2019 12:56:27 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 683FE8B947;
+        Mon,  3 Jun 2019 16:56:22 +0000 (UTC)
+Received: from flask (unknown [10.43.2.83])
+        by smtp.corp.redhat.com (Postfix) with SMTP id 456101017E3E;
+        Mon,  3 Jun 2019 16:56:17 +0000 (UTC)
+Received: by flask (sSMTP sendmail emulation); Mon, 03 Jun 2019 18:56:17 +0200
+Date:   Mon, 3 Jun 2019 18:56:17 +0200
+From:   Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To:     Like Xu <like.xu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Ingo Molnar <mingo@redhat.com>, linux-kernel@vger.kernel.org
+Subject: Re: [RESEND PATCH v3] KVM: x86: Add Intel CPUID.1F cpuid emulation
+ support
+Message-ID: <20190603165616.GA11101@flask>
+References: <20190526133052.4069-1-like.xu@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190526133052.4069-1-like.xu@linux.intel.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Mon, 03 Jun 2019 16:56:27 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch is a part of a series that extends arm64 kernel ABI to allow to
-pass tagged user pointers (with the top byte set to something else other
-than 0x00) as syscall arguments.
+2019-05-26 21:30+0800, Like Xu:
+> Add support to expose Intel V2 Extended Topology Enumeration Leaf for
+> some new systems with multiple software-visible die within each package.
+> 
+> Per Intel's SDM, when CPUID executes with EAX set to 1FH, the processor
+> returns information about extended topology enumeration data. Software
+> must detect the presence of CPUID leaf 1FH by verifying (a) the highest
+> leaf index supported by CPUID is >= 1FH, and (b) CPUID.1FH:EBX[15:0]
+> reports a non-zero value.
+> 
+> Co-developed-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+> ==changelog==
+> v3:
+> - Refine commit message and comment
+> 
+> v2: https://lkml.org/lkml/2019/4/25/1246
+> 
+> - Apply cpuid.1f check rule on Intel SDM page 3-222 Vol.2A
+> - Add comment to handle 0x1f anf 0xb in common code
+> - Reduce check time in a descending-break style
+> 
+> v1: https://lkml.org/lkml/2019/4/22/28
+> 
+>  arch/x86/kvm/cpuid.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 80a642a0143d..f9b41f0103b3 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -426,6 +426,11 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
+>  
+>  	switch (function) {
+>  	case 0:
+> +		/* Check if the cpuid leaf 0x1f is actually implemented */
+> +		if (entry->eax >= 0x1f && (cpuid_ebx(0x1f) & 0x0000ffff)) {
+> +			entry->eax = 0x1f;
 
-This patch adds a simple test, that calls the uname syscall with a
-tagged user pointer as an argument. Without the kernel accepting tagged
-user pointers the test fails with EFAULT.
+Sorry for my late reply, but I think this check does more harm than
+good.
 
-Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
----
- tools/testing/selftests/arm64/.gitignore      |  1 +
- tools/testing/selftests/arm64/Makefile        | 22 ++++++++++
- .../testing/selftests/arm64/run_tags_test.sh  | 12 ++++++
- tools/testing/selftests/arm64/tags_lib.c      | 42 +++++++++++++++++++
- tools/testing/selftests/arm64/tags_test.c     | 18 ++++++++
- 5 files changed, 95 insertions(+)
- create mode 100644 tools/testing/selftests/arm64/.gitignore
- create mode 100644 tools/testing/selftests/arm64/Makefile
- create mode 100755 tools/testing/selftests/arm64/run_tags_test.sh
- create mode 100644 tools/testing/selftests/arm64/tags_lib.c
- create mode 100644 tools/testing/selftests/arm64/tags_test.c
+We'll need to change it if we ever add leaf above 0x1f, which also puts
+burden on the new submitter to check that exposing it by an unrelated
+feature doesn't break anything.  Just like you had to see whether the
+leaf 0x14 is still ok when exposing it without f_intel_pt.
 
-diff --git a/tools/testing/selftests/arm64/.gitignore b/tools/testing/selftests/arm64/.gitignore
-new file mode 100644
-index 000000000000..e8fae8d61ed6
---- /dev/null
-+++ b/tools/testing/selftests/arm64/.gitignore
-@@ -0,0 +1 @@
-+tags_test
-diff --git a/tools/testing/selftests/arm64/Makefile b/tools/testing/selftests/arm64/Makefile
-new file mode 100644
-index 000000000000..9dee18727923
---- /dev/null
-+++ b/tools/testing/selftests/arm64/Makefile
-@@ -0,0 +1,22 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+include ../lib.mk
-+
-+# ARCH can be overridden by the user for cross compiling
-+ARCH ?= $(shell uname -m 2>/dev/null || echo not)
-+
-+ifneq (,$(filter $(ARCH),aarch64 arm64))
-+
-+TEST_CUSTOM_PROGS := $(OUTPUT)/tags_test
-+
-+$(OUTPUT)/tags_test: tags_test.c $(OUTPUT)/tags_lib.so
-+	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $<
-+
-+$(OUTPUT)/tags_lib.so: tags_lib.c
-+	$(CC) -o $@ -shared $(CFLAGS) $(LDFLAGS) $^
-+
-+TEST_PROGS := run_tags_test.sh
-+
-+all: $(TEST_CUSTOM_PROGS)
-+
-+endif
-diff --git a/tools/testing/selftests/arm64/run_tags_test.sh b/tools/testing/selftests/arm64/run_tags_test.sh
-new file mode 100755
-index 000000000000..2bbe0cd4220b
---- /dev/null
-+++ b/tools/testing/selftests/arm64/run_tags_test.sh
-@@ -0,0 +1,12 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+
-+echo "--------------------"
-+echo "running tags test"
-+echo "--------------------"
-+LD_PRELOAD=./tags_lib.so ./tags_test
-+if [ $? -ne 0 ]; then
-+	echo "[FAIL]"
-+else
-+	echo "[PASS]"
-+fi
-diff --git a/tools/testing/selftests/arm64/tags_lib.c b/tools/testing/selftests/arm64/tags_lib.c
-new file mode 100644
-index 000000000000..8a674509216e
---- /dev/null
-+++ b/tools/testing/selftests/arm64/tags_lib.c
-@@ -0,0 +1,42 @@
-+#include <stdlib.h>
-+
-+#define TAG_SHIFT	(56)
-+#define TAG_MASK	(0xffUL << TAG_SHIFT)
-+
-+void *__libc_malloc(size_t size);
-+void __libc_free(void *ptr);
-+void *__libc_realloc(void *ptr, size_t size);
-+void *__libc_calloc(size_t nmemb, size_t size);
-+
-+static void *tag_ptr(void *ptr)
-+{
-+	unsigned long tag = rand() & 0xff;
-+	if (!ptr)
-+		return ptr;
-+	return (void *)((unsigned long)ptr | (tag << TAG_SHIFT));
-+}
-+
-+static void *untag_ptr(void *ptr)
-+{
-+	return (void *)((unsigned long)ptr & ~TAG_MASK);
-+}
-+
-+void *malloc(size_t size)
-+{
-+	return tag_ptr(__libc_malloc(size));
-+}
-+
-+void free(void *ptr)
-+{
-+	__libc_free(untag_ptr(ptr));
-+}
-+
-+void *realloc(void *ptr, size_t size)
-+{
-+	return tag_ptr(__libc_realloc(untag_ptr(ptr), size));
-+}
-+
-+void *calloc(size_t nmemb, size_t size)
-+{
-+	return tag_ptr(__libc_calloc(nmemb, size));
-+}
-diff --git a/tools/testing/selftests/arm64/tags_test.c b/tools/testing/selftests/arm64/tags_test.c
-new file mode 100644
-index 000000000000..263b302874ed
---- /dev/null
-+++ b/tools/testing/selftests/arm64/tags_test.c
-@@ -0,0 +1,18 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <stdint.h>
-+#include <sys/utsname.h>
-+
-+int main(void)
-+{
-+	struct utsname *ptr;
-+	int err;
-+
-+	ptr = (struct utsname *)malloc(sizeof(*ptr));
-+	err = uname(ptr);
-+	free(ptr);
-+	return err;
-+}
--- 
-2.22.0.rc1.311.g5d7573a151-goog
+Also, I don't see anything that would make 0x1f worthy of protection
+when enabling it also exposes unimplemented leaves (0x14;0x1f).
+Zeroing 0x1f.ebx disables it and that is implicitly being done if the
+presence check above would fail.
 
+> +			break;
+> +		}
+>  		entry->eax = min(entry->eax, (u32)(f_intel_pt ? 0x14 : 0xd));
+
+Similarly in the existing code.  If we don't have f_intel_pt, then we
+should make sure that leaf 0x14 is not being filled, but we don't really
+have to limit the maximal index.
+
+Adding a single clamping like
+
+		/* Limited to the highest leaf implemented in KVM. */
+		entry->eax = min(entry->eax, 0x1f);
+
+seems sufficient.
+
+(Passing the hardware value is ok in theory, but it is a cheap way to
+ avoid future leaves that cannot be simply zeroed for some weird reason.)
+
+Thanks.
