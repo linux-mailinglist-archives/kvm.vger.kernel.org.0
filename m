@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 504B333BA7
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 01:01:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4109633BB1
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 01:04:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726490AbfFCXBW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jun 2019 19:01:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34178 "EHLO mx1.redhat.com"
+        id S1726229AbfFCXEe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jun 2019 19:04:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40614 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726163AbfFCXBV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jun 2019 19:01:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S1726097AbfFCXEe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jun 2019 19:04:34 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D08187E42C
-        for <kvm@vger.kernel.org>; Mon,  3 Jun 2019 23:01:20 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id C5E363082231;
+        Mon,  3 Jun 2019 23:04:33 +0000 (UTC)
 Received: from amt.cnet (ovpn-112-8.gru2.redhat.com [10.97.112.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 44CF26090E;
-        Mon,  3 Jun 2019 23:01:20 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 387775B684;
+        Mon,  3 Jun 2019 23:04:33 +0000 (UTC)
 Received: from amt.cnet (localhost [127.0.0.1])
-        by amt.cnet (Postfix) with ESMTP id 809D3105177;
-        Mon,  3 Jun 2019 20:01:01 -0300 (BRT)
+        by amt.cnet (Postfix) with ESMTP id D200B10515C;
+        Mon,  3 Jun 2019 20:04:10 -0300 (BRT)
 Received: (from marcelo@localhost)
-        by amt.cnet (8.14.7/8.14.7/Submit) id x53N0v7v007755;
-        Mon, 3 Jun 2019 20:00:57 -0300
-Date:   Mon, 3 Jun 2019 20:00:57 -0300
+        by amt.cnet (8.14.7/8.14.7/Submit) id x53N48jP008254;
+        Mon, 3 Jun 2019 20:04:08 -0300
+Date:   Mon, 3 Jun 2019 20:04:08 -0300
 From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     kvm-devel <kvm@vger.kernel.org>
+To:     kvm-devel <kvm@vger.kernel.org>, qemu-devel <qemu-devel@nongnu.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 Subject: [patch QEMU] kvm: i386: halt poll control MSR support
-Message-ID: <20190603230055.GB1938@amt.cnet>
+Message-ID: <20190603230408.GA7938@amt.cnet>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Mon, 03 Jun 2019 23:01:20 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Mon, 03 Jun 2019 23:04:33 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+(CC'ing qemu devel)
 
-Add support for halt poll control MSR: save/restore, migration 
+Add support for halt poll control MSR: save/restore, migration
 and new feature name.
 
 The purpose of this MSR is to allow the guest to disable
 host halt poll.
 
 Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-
 
 diff --git a/include/standard-headers/asm-x86/kvm_para.h b/include/standard-headers/asm-x86/kvm_para.h
 index 35cd8d6..e171514 100644
