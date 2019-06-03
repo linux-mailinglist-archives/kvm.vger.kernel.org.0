@@ -2,199 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B74B33703
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 19:43:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F41423370A
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 19:46:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728836AbfFCRnj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jun 2019 13:43:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34308 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726635AbfFCRnj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jun 2019 13:43:39 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1732530C5857;
-        Mon,  3 Jun 2019 17:43:39 +0000 (UTC)
-Received: from gondolin (ovpn-204-96.brq.redhat.com [10.40.204.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B618C1001DE4;
-        Mon,  3 Jun 2019 17:43:32 +0000 (UTC)
-Date:   Mon, 3 Jun 2019 19:43:28 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Parav Pandit <parav@mellanox.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kwankhede@nvidia.com, alex.williamson@redhat.com, cjia@nvidia.com
-Subject: Re: [PATCHv5 3/3] vfio/mdev: Synchronize device create/remove with
- parent removal
-Message-ID: <20190603194328.135205a4.cohuck@redhat.com>
-In-Reply-To: <20190530091928.49724-4-parav@mellanox.com>
-References: <20190530091928.49724-1-parav@mellanox.com>
-        <20190530091928.49724-4-parav@mellanox.com>
-Organization: Red Hat GmbH
+        id S1727601AbfFCRqW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jun 2019 13:46:22 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:42828 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727154AbfFCRqV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jun 2019 13:46:21 -0400
+Received: by mail-qt1-f194.google.com with SMTP id s15so10410576qtk.9
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2019 10:46:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=3YD9QwJxecxdMHZGSRuYOcVyiXHhODdQ+7hG9X3IFEc=;
+        b=Y8xQhEUl5VIp1CHI2GNhUWumFeridnSrDVLR4ophf+TEEqb9RYCBYUuzTaKnpS0N95
+         PodsZw5QrRzXwcVAdLU8QbPx8UtppQyKINjpafz63KgI0mbZL1RBR/HG+Aw16qS1mL8x
+         GbfoGarwImiN/E4mJOvSlkb1cLIeV/RY7kSfMlxm7UZhj+NafqRJ9xFMGOVfHXfBQNL8
+         3KhvQIu3nzrYZ9gVumHcKZbTTOBDGZbVoC0PmchuHZfBO5itRE+CWVGivs8JV9Bdb68S
+         oKMm5wdMIjQdNVuG5jJ5CkpKuMh+/TZa/xggfv/76T6HlvfgScQBIZzwwZTZ5LwtflBg
+         nfEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=3YD9QwJxecxdMHZGSRuYOcVyiXHhODdQ+7hG9X3IFEc=;
+        b=k7iPGNerXMBycDIcqYzYUSxNYsUeZIvaeYrxJGUH5Ts0Igz53qe/HcK98ST2JSFDij
+         XOSFYiAfFkV6ZV/2wvn+q735h48SpeZCnly51fI4AA0LYF4pSi94HgRQYBGSyoimmlDj
+         JnjrXLbj+8QdSzRzmQKTDApBQF3KRhjw/WmUwgmmgTWZG9BV2jtMom5yx/JJLUWQw53E
+         9hoy0HDQyRcs7jjCHIho4eSvWRF/2qDPsOxtZGYLd3KHOJtl8GJ8rFz9wiYJz+j6QHQM
+         Z+sTLEWAyEos9NdWJ4xXGTpR8onkNn9XusTfluCIeOzEGj67HDQ+VhZVDcmhNOhTyiYw
+         F9Pw==
+X-Gm-Message-State: APjAAAWZNhnYpP3phkl31Xsyw4J+X8QvPwQ6dP0aWCEZGNtTStkIlRyZ
+        dbdnDYZNSoPTEib9FN7SNzH/LA==
+X-Google-Smtp-Source: APXvYqx+ClbIfZmOUdY0b04TFbjW+3r9mnjIe7N0zaIfZmDOHWubw4QUOroagi67b9WugppzpkzydA==
+X-Received: by 2002:ac8:7381:: with SMTP id t1mr24802701qtp.387.1559583980558;
+        Mon, 03 Jun 2019 10:46:20 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
+        by smtp.gmail.com with ESMTPSA id m40sm12874710qtm.2.2019.06.03.10.46.19
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 03 Jun 2019 10:46:19 -0700 (PDT)
+Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1hXr2J-00032t-AT; Mon, 03 Jun 2019 14:46:19 -0300
+Date:   Mon, 3 Jun 2019 14:46:19 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Andrey Konovalov <andreyknvl@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+        linux-media@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Subject: Re: [PATCH v16 12/16] IB, arm64: untag user pointers in
+ ib_uverbs_(re)reg_mr()
+Message-ID: <20190603174619.GC11474@ziepe.ca>
+References: <cover.1559580831.git.andreyknvl@google.com>
+ <c829f93b19ad6af1b13be8935ce29baa8e58518f.1559580831.git.andreyknvl@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Mon, 03 Jun 2019 17:43:39 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c829f93b19ad6af1b13be8935ce29baa8e58518f.1559580831.git.andreyknvl@google.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 30 May 2019 04:19:28 -0500
-Parav Pandit <parav@mellanox.com> wrote:
-
-> In following sequences, child devices created while removing mdev parent
-> device can be left out, or it may lead to race of removing half
-> initialized child mdev devices.
+On Mon, Jun 03, 2019 at 06:55:14PM +0200, Andrey Konovalov wrote:
+> This patch is a part of a series that extends arm64 kernel ABI to allow to
+> pass tagged user pointers (with the top byte set to something else other
+> than 0x00) as syscall arguments.
 > 
-> issue-1:
-> --------
->        cpu-0                         cpu-1
->        -----                         -----
->                                   mdev_unregister_device()
->                                     device_for_each_child()
->                                       mdev_device_remove_cb()
->                                         mdev_device_remove()
-> create_store()
->   mdev_device_create()                   [...]
->     device_add()
->                                   parent_remove_sysfs_files()
+> ib_uverbs_(re)reg_mr() use provided user pointers for vma lookups (through
+> e.g. mlx4_get_umem_mr()), which can only by done with untagged pointers.
 > 
-> /* BUG: device added by cpu-0
->  * whose parent is getting removed
->  * and it won't process this mdev.
->  */
+> Untag user pointers in these functions.
+>
+> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+>  drivers/infiniband/core/uverbs_cmd.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> issue-2:
-> --------
-> Below crash is observed when user initiated remove is in progress
-> and mdev_unregister_driver() completes parent unregistration.
-> 
->        cpu-0                         cpu-1
->        -----                         -----
-> remove_store()
->    mdev_device_remove()
->    active = false;
->                                   mdev_unregister_device()
->                                   parent device removed.
->    [...]
->    parents->ops->remove()
->  /*
->   * BUG: Accessing invalid parent.
->   */
-> 
-> This is similar race like create() racing with mdev_unregister_device().
-> 
-> BUG: unable to handle kernel paging request at ffffffffc0585668
-> PGD e8f618067 P4D e8f618067 PUD e8f61a067 PMD 85adca067 PTE 0
-> Oops: 0000 [#1] SMP PTI
-> CPU: 41 PID: 37403 Comm: bash Kdump: loaded Not tainted 5.1.0-rc6-vdevbus+ #6
-> Hardware name: Supermicro SYS-6028U-TR4+/X10DRU-i+, BIOS 2.0b 08/09/2016
-> RIP: 0010:mdev_device_remove+0xfa/0x140 [mdev]
-> Call Trace:
->  remove_store+0x71/0x90 [mdev]
->  kernfs_fop_write+0x113/0x1a0
->  vfs_write+0xad/0x1b0
->  ksys_write+0x5a/0xe0
->  do_syscall_64+0x5a/0x210
->  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> 
-> Therefore, mdev core is improved as below to overcome above issues.
-> 
-> Wait for any ongoing mdev create() and remove() to finish before
-> unregistering parent device.
-> This continues to allow multiple create and remove to progress in
-> parallel for different mdev devices as most common case.
-> At the same time guard parent removal while parent is being access by
-
-s/access/accessed/
-
-> create() and remove callbacks.
-
-s/remove/remove()/ (just to make it consistent)
-
-> create()/remove() and unregister_device() are synchronized by the rwsem.
-> 
-> Refactor device removal code to mdev_device_remove_common() to avoid
-> acquiring unreg_sem of the parent.
-> 
-> Fixes: 7b96953bc640 ("vfio: Mediated device Core driver")
-> Signed-off-by: Parav Pandit <parav@mellanox.com>
-> ---
->  drivers/vfio/mdev/mdev_core.c    | 60 ++++++++++++++++++++++++--------
->  drivers/vfio/mdev/mdev_private.h |  2 ++
->  2 files changed, 48 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-> index 0bef0cae1d4b..62be131a22a1 100644
-> --- a/drivers/vfio/mdev/mdev_core.c
-> +++ b/drivers/vfio/mdev/mdev_core.c
-
-(...)
-
-> @@ -265,6 +294,12 @@ int mdev_device_create(struct kobject *kobj,
+> diff --git a/drivers/infiniband/core/uverbs_cmd.c b/drivers/infiniband/core/uverbs_cmd.c
+> index 5a3a1780ceea..f88ee733e617 100644
+> +++ b/drivers/infiniband/core/uverbs_cmd.c
+> @@ -709,6 +709,8 @@ static int ib_uverbs_reg_mr(struct uverbs_attr_bundle *attrs)
+>  	if (ret)
+>  		return ret;
 >  
->  	mdev->parent = parent;
-> 
-
-/* Check if parent unregistration has started */
- 
-> +	ret = down_read_trylock(&parent->unreg_sem);
-> +	if (!ret) {
-
-Maybe write this as
-
-if (!down_read_trylock(&parent->unreg_sem)) {
-
-> +		ret = -ENODEV;
-> +		goto mdev_fail;
-
-I think this leaves a stale mdev device around (and on the mdev list).
-Normally, giving up the last reference to the mdev will call the
-release callback (which will remove it from the mdev list and free it),
-but the device is not yet initialized here. I think you either have to
-remove it from the list and free the memory manually, or move trying to
-get the lock just before calling ->create().
-
-> +	}
+> +	cmd.start = untagged_addr(cmd.start);
 > +
->  	device_initialize(&mdev->dev);
->  	mdev->dev.parent  = dev;
->  	mdev->dev.bus     = &mdev_bus_type;
+>  	if ((cmd.start & ~PAGE_MASK) != (cmd.hca_va & ~PAGE_MASK))
+>  		return -EINVAL;
 
-(...)
+I feel like we shouldn't thave to do this here, surely the cmd.start
+should flow unmodified to get_user_pages, and gup should untag it?
 
-> @@ -329,18 +365,14 @@ int mdev_device_remove(struct device *dev)
->  	mdev->active = false;
->  	mutex_unlock(&mdev_list_lock);
->  
-> -	type = to_mdev_type(mdev->type_kobj);
-> -	mdev_remove_sysfs_files(dev, type);
-> -	device_del(&mdev->dev);
->  	parent = mdev->parent;
-> -	ret = parent->ops->remove(mdev);
-> -	if (ret)
-> -		dev_err(&mdev->dev, "Remove failed: err=%d\n", ret);
-> -
-> -	/* Balances with device_initialize() */
-> -	put_device(&mdev->dev);
-> -	mdev_put_parent(parent);
-> +	/* Check if parent unregistration has started */
-> +	ret = down_read_trylock(&parent->unreg_sem);
-> +	if (!ret)
-> +		return -ENODEV;
+ie, this sort of direction for the IB code (this would be a giant
+patch, so I didn't have time to write it all, but I think it is much
+saner):
 
-Maybe also condense this one to
-
-if (!down_read_trylock(&parent->unreg_sem))
-	return -ENODEV;
-
->  
-> +	mdev_device_remove_common(mdev);
-> +	up_read(&parent->unreg_sem);
->  	return 0;
->  }
->  
-
-Otherwise, looks good to me.
+diff --git a/drivers/infiniband/core/umem.c b/drivers/infiniband/core/umem.c
+index 54628ef879f0ce..7b3b736c87c253 100644
+--- a/drivers/infiniband/core/umem.c
++++ b/drivers/infiniband/core/umem.c
+@@ -193,7 +193,7 @@ EXPORT_SYMBOL(ib_umem_find_best_pgsz);
+  * @access: IB_ACCESS_xxx flags for memory being pinned
+  * @dmasync: flush in-flight DMA when the memory region is written
+  */
+-struct ib_umem *ib_umem_get(struct ib_udata *udata, unsigned long addr,
++struct ib_umem *ib_umem_get(struct ib_udata *udata, void __user *addr,
+ 			    size_t size, int access, int dmasync)
+ {
+ 	struct ib_ucontext *context;
+@@ -201,7 +201,7 @@ struct ib_umem *ib_umem_get(struct ib_udata *udata, unsigned long addr,
+ 	struct page **page_list;
+ 	unsigned long lock_limit;
+ 	unsigned long new_pinned;
+-	unsigned long cur_base;
++	void __user *cur_base;
+ 	struct mm_struct *mm;
+ 	unsigned long npages;
+ 	int ret;
+diff --git a/drivers/infiniband/core/uverbs_cmd.c b/drivers/infiniband/core/uverbs_cmd.c
+index 5a3a1780ceea4d..94389e7f12371f 100644
+--- a/drivers/infiniband/core/uverbs_cmd.c
++++ b/drivers/infiniband/core/uverbs_cmd.c
+@@ -735,7 +735,8 @@ static int ib_uverbs_reg_mr(struct uverbs_attr_bundle *attrs)
+ 		}
+ 	}
+ 
+-	mr = pd->device->ops.reg_user_mr(pd, cmd.start, cmd.length, cmd.hca_va,
++	mr = pd->device->ops.reg_user_mr(pd, u64_to_user_ptr(cmd.start),
++					 cmd.length, cmd.hca_va,
+ 					 cmd.access_flags,
+ 					 &attrs->driver_udata);
+ 	if (IS_ERR(mr)) {
+diff --git a/drivers/infiniband/hw/mlx5/mr.c b/drivers/infiniband/hw/mlx5/mr.c
+index 4d033796dcfcc2..bddbb952082fc5 100644
+--- a/drivers/infiniband/hw/mlx5/mr.c
++++ b/drivers/infiniband/hw/mlx5/mr.c
+@@ -786,7 +786,7 @@ static int mr_cache_max_order(struct mlx5_ib_dev *dev)
+ }
+ 
+ static int mr_umem_get(struct mlx5_ib_dev *dev, struct ib_udata *udata,
+-		       u64 start, u64 length, int access_flags,
++		       void __user *start, u64 length, int access_flags,
+ 		       struct ib_umem **umem, int *npages, int *page_shift,
+ 		       int *ncont, int *order)
+ {
+@@ -1262,8 +1262,8 @@ struct ib_mr *mlx5_ib_reg_dm_mr(struct ib_pd *pd, struct ib_dm *dm,
+ 				 attr->access_flags, mode);
+ }
+ 
+-struct ib_mr *mlx5_ib_reg_user_mr(struct ib_pd *pd, u64 start, u64 length,
+-				  u64 virt_addr, int access_flags,
++struct ib_mr *mlx5_ib_reg_user_mr(struct ib_pd *pd, void __user *start,
++				  u64 length, u64 virt_addr, int access_flags,
+ 				  struct ib_udata *udata)
+ {
+ 	struct mlx5_ib_dev *dev = to_mdev(pd->device);
+diff --git a/include/rdma/ib_verbs.h b/include/rdma/ib_verbs.h
+index ec6446864b08e9..b3c8eaaa35c760 100644
+--- a/include/rdma/ib_verbs.h
++++ b/include/rdma/ib_verbs.h
+@@ -2464,8 +2464,8 @@ struct ib_device_ops {
+ 	struct ib_mr *(*reg_user_mr)(struct ib_pd *pd, u64 start, u64 length,
+ 				     u64 virt_addr, int mr_access_flags,
+ 				     struct ib_udata *udata);
+-	int (*rereg_user_mr)(struct ib_mr *mr, int flags, u64 start, u64 length,
+-			     u64 virt_addr, int mr_access_flags,
++	int (*rereg_user_mr)(struct ib_mr *mr, int flags, void __user *start,
++			     u64 length, u64 virt_addr, int mr_access_flags,
+ 			     struct ib_pd *pd, struct ib_udata *udata);
+ 	int (*dereg_mr)(struct ib_mr *mr, struct ib_udata *udata);
+ 	struct ib_mr *(*alloc_mr)(struct ib_pd *pd, enum ib_mr_type mr_type,
