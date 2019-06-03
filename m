@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0866432DFA
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 12:51:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75F7632DFD
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 12:51:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727550AbfFCKu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jun 2019 06:50:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34206 "EHLO mx1.redhat.com"
+        id S1727553AbfFCKvB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jun 2019 06:51:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56806 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727468AbfFCKu6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jun 2019 06:50:58 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S1727513AbfFCKvB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jun 2019 06:51:01 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9B1C33082B46;
-        Mon,  3 Jun 2019 10:50:57 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 47BF03082E69;
+        Mon,  3 Jun 2019 10:51:00 +0000 (UTC)
 Received: from localhost (ovpn-204-96.brq.redhat.com [10.40.204.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B28B648A9;
-        Mon,  3 Jun 2019 10:50:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CD2761972A;
+        Mon,  3 Jun 2019 10:50:59 +0000 (UTC)
 From:   Cornelia Huck <cohuck@redhat.com>
 To:     Heiko Carstens <heiko.carstens@de.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
@@ -27,15 +27,15 @@ Cc:     Farhan Ali <alifm@linux.ibm.com>,
         Eric Farman <farman@linux.ibm.com>,
         Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
-Subject: [PULL 5/7] s390/cio: Don't pin vfio pages for empty transfers
-Date:   Mon,  3 Jun 2019 12:50:36 +0200
-Message-Id: <20190603105038.11788-6-cohuck@redhat.com>
+Subject: [PULL 6/7] s390/cio: Allow zero-length CCWs in vfio-ccw
+Date:   Mon,  3 Jun 2019 12:50:37 +0200
+Message-Id: <20190603105038.11788-7-cohuck@redhat.com>
 In-Reply-To: <20190603105038.11788-1-cohuck@redhat.com>
 References: <20190603105038.11788-1-cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Mon, 03 Jun 2019 10:50:57 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Mon, 03 Jun 2019 10:51:00 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -43,146 +43,140 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Eric Farman <farman@linux.ibm.com>
 
-The skip flag of a CCW offers the possibility of data not being
-transferred, but is only meaningful for certain commands.
-Specifically, it is only applicable for a read, read backward, sense,
-or sense ID CCW and will be ignored for any other command code
-(SA22-7832-11 page 15-64, and figure 15-30 on page 15-75).
+It is possible that a guest might issue a CCW with a length of zero,
+and will expect a particular response.  Consider this chain:
 
-(A sense ID is xE4, while a sense is x04 with possible modifiers in the
-upper four bits.  So we will cover the whole "family" of sense CCWs.)
+   Address   Format-1 CCW
+   --------  -----------------
+ 0 33110EC0  346022CC 33177468
+ 1 33110EC8  CF200000 3318300C
 
-For those scenarios, since there is no requirement for the target
-address to be valid, we should skip the call to vfio_pin_pages() and
-rely on the IDAL address we have allocated/built for the channel
-program.  The fact that the individual IDAWs within the IDAL are
-invalid is fine, since they aren't actually checked in these cases.
+CCW[0] moves a little more than two pages, but also has the
+Suppress Length Indication (SLI) bit set to handle the expectation
+that considerably less data will be moved.  CCW[1] also has the SLI
+bit set, and has a length of zero.  Once vfio-ccw does its magic,
+the kernel issues a start subchannel on behalf of the guest with this:
 
-Set pa_nr to zero when skipping the pfn_array_pin() call, since it is
-defined as the number of pages pinned and is used to determine
-whether to call vfio_unpin_pages() upon cleanup.
+   Address   Format-1 CCW
+   --------  -----------------
+ 0 021EDED0  346422CC 021F0000
+ 1 021EDED8  CF240000 3318300C
 
-The pfn_array_pin() routine returns the number of pages that were
-pinned, but now might be skipped for some CCWs.  Thus we need to
-calculate the expected number of pages ourselves such that we are
-guaranteed to allocate a reasonable number of IDAWs, which will
-provide a valid address in CCW.CDA regardless of whether the IDAWs
-are filled in with pinned/translated addresses or not.
+Both CCWs were converted to an IDAL and have the corresponding flags
+set (which is by design), but only the address of the first data
+address is converted to something the host is aware of.  The second
+CCW still has the address used by the guest, which happens to be (A)
+(probably) an invalid address for the host, and (B) an invalid IDAW
+address (doubleword boundary, etc.).
+
+While the I/O fails, it doesn't fail correctly.  In this example, we
+would receive a program check for an invalid IDAW address, instead of
+a unit check for an invalid command.
+
+To fix this, revert commit 4cebc5d6a6ff ("vfio: ccw: validate the
+count field of a ccw before pinning") and allow the individual fetch
+routines to process them like anything else.  We'll make a slight
+adjustment to our allocation of the pfn_array (for direct CCWs) or
+IDAL (for IDAL CCWs) memory, so that we have room for at least one
+address even though no guest memory will be pinned and thus the
+IDAW will not be populated with a host address.
 
 Signed-off-by: Eric Farman <farman@linux.ibm.com>
-Message-Id: <20190516161403.79053-2-farman@linux.ibm.com>
+Message-Id: <20190516161403.79053-3-farman@linux.ibm.com>
 Acked-by: Farhan Ali <alifm@linux.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- drivers/s390/cio/vfio_ccw_cp.c | 55 ++++++++++++++++++++++++++++++----
- 1 file changed, 50 insertions(+), 5 deletions(-)
+ drivers/s390/cio/vfio_ccw_cp.c | 30 ++++++++++++------------------
+ 1 file changed, 12 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-index 086faf2dacd3..0467838aed23 100644
+index 0467838aed23..c77c9b4cd2a8 100644
 --- a/drivers/s390/cio/vfio_ccw_cp.c
 +++ b/drivers/s390/cio/vfio_ccw_cp.c
-@@ -294,6 +294,10 @@ static long copy_ccw_from_iova(struct channel_program *cp,
- /*
-  * Helpers to operate ccwchain.
-  */
-+#define ccw_is_read(_ccw) (((_ccw)->cmd_code & 0x03) == 0x02)
-+#define ccw_is_read_backward(_ccw) (((_ccw)->cmd_code & 0x0F) == 0x0C)
-+#define ccw_is_sense(_ccw) (((_ccw)->cmd_code & 0x0F) == CCW_CMD_BASIC_SENSE)
-+
- #define ccw_is_test(_ccw) (((_ccw)->cmd_code & 0x0F) == 0)
+@@ -70,9 +70,6 @@ static int pfn_array_alloc(struct pfn_array *pa, u64 iova, unsigned int len)
+ {
+ 	int i;
  
- #define ccw_is_noop(_ccw) ((_ccw)->cmd_code == CCW_CMD_NOOP)
-@@ -301,10 +305,39 @@ static long copy_ccw_from_iova(struct channel_program *cp,
- #define ccw_is_tic(_ccw) ((_ccw)->cmd_code == CCW_CMD_TIC)
- 
- #define ccw_is_idal(_ccw) ((_ccw)->flags & CCW_FLAG_IDA)
+-	if (!len)
+-		return 0;
 -
-+#define ccw_is_skip(_ccw) ((_ccw)->flags & CCW_FLAG_SKIP)
+ 	if (pa->pa_nr || pa->pa_iova_pfn)
+ 		return -EINVAL;
  
- #define ccw_is_chain(_ccw) ((_ccw)->flags & (CCW_FLAG_CC | CCW_FLAG_DC))
- 
-+/*
-+ * ccw_does_data_transfer()
-+ *
-+ * Determine whether a CCW will move any data, such that the guest pages
-+ * would need to be pinned before performing the I/O.
-+ *
-+ * Returns 1 if yes, 0 if no.
-+ */
-+static inline int ccw_does_data_transfer(struct ccw1 *ccw)
-+{
-+	/* If the skip flag is off, then data will be transferred */
-+	if (!ccw_is_skip(ccw))
-+		return 1;
-+
-+	/*
-+	 * If the skip flag is on, it is only meaningful if the command
-+	 * code is a read, read backward, sense, or sense ID.  In those
-+	 * cases, no data will be transferred.
-+	 */
-+	if (ccw_is_read(ccw) || ccw_is_read_backward(ccw))
+@@ -319,6 +316,10 @@ static long copy_ccw_from_iova(struct channel_program *cp,
+  */
+ static inline int ccw_does_data_transfer(struct ccw1 *ccw)
+ {
++	/* If the count field is zero, then no data will be transferred */
++	if (ccw->count == 0)
 +		return 0;
 +
-+	if (ccw_is_sense(ccw))
-+		return 0;
-+
-+	/* The skip flag is on, but it is ignored for this command code. */
-+	return 1;
-+}
-+
- /*
-  * is_cpa_within_range()
-  *
-@@ -559,6 +592,7 @@ static int ccwchain_fetch_direct(struct ccwchain *chain,
+ 	/* If the skip flag is off, then data will be transferred */
+ 	if (!ccw_is_skip(ccw))
+ 		return 1;
+@@ -405,8 +406,6 @@ static void ccwchain_cda_free(struct ccwchain *chain, int idx)
+ 
+ 	if (ccw_is_test(ccw) || ccw_is_noop(ccw) || ccw_is_tic(ccw))
+ 		return;
+-	if (!ccw->count)
+-		return;
+ 
+ 	kfree((void *)(u64)ccw->cda);
+ }
+@@ -592,19 +591,13 @@ static int ccwchain_fetch_direct(struct ccwchain *chain,
  	struct pfn_array_table *pat;
  	unsigned long *idaws;
  	int ret;
-+	int idaw_nr = 1;
++	int bytes = 1;
+ 	int idaw_nr = 1;
  
  	ccw = chain->ch_ccw + idx;
  
-@@ -570,6 +604,8 @@ static int ccwchain_fetch_direct(struct ccwchain *chain,
- 		 */
- 		ccw->flags |= CCW_FLAG_IDA;
- 		return 0;
-+	} else {
-+		idaw_nr = idal_nr_words((void *)(u64)ccw->cda, ccw->count);
+-	if (!ccw->count) {
+-		/*
+-		 * We just want the translation result of any direct ccw
+-		 * to be an IDA ccw, so let's add the IDA flag for it.
+-		 * Although the flag will be ignored by firmware.
+-		 */
+-		ccw->flags |= CCW_FLAG_IDA;
+-		return 0;
+-	} else {
++	if (ccw->count) {
++		bytes = ccw->count;
+ 		idaw_nr = idal_nr_words((void *)(u64)ccw->cda, ccw->count);
  	}
  
- 	/*
-@@ -586,12 +622,16 @@ static int ccwchain_fetch_direct(struct ccwchain *chain,
+@@ -618,7 +611,7 @@ static int ccwchain_fetch_direct(struct ccwchain *chain,
+ 	if (ret)
+ 		goto out_init;
+ 
+-	ret = pfn_array_alloc(pat->pat_pa, ccw->cda, ccw->count);
++	ret = pfn_array_alloc(pat->pat_pa, ccw->cda, bytes);
  	if (ret < 0)
  		goto out_unpin;
  
--	ret = pfn_array_pin(pat->pat_pa, cp->mdev);
--	if (ret < 0)
--		goto out_unpin;
-+	if (ccw_does_data_transfer(ccw)) {
-+		ret = pfn_array_pin(pat->pat_pa, cp->mdev);
-+		if (ret < 0)
-+			goto out_unpin;
-+	} else {
-+		pat->pat_pa->pa_nr = 0;
-+	}
+@@ -661,17 +654,18 @@ static int ccwchain_fetch_idal(struct ccwchain *chain,
+ 	u64 idaw_iova;
+ 	unsigned int idaw_nr, idaw_len;
+ 	int i, ret;
++	int bytes = 1;
  
- 	/* Translate this direct ccw to a idal ccw. */
--	idaws = kcalloc(ret, sizeof(*idaws), GFP_DMA | GFP_KERNEL);
-+	idaws = kcalloc(idaw_nr, sizeof(*idaws), GFP_DMA | GFP_KERNEL);
- 	if (!idaws) {
- 		ret = -ENOMEM;
- 		goto out_unpin;
-@@ -661,6 +701,11 @@ static int ccwchain_fetch_idal(struct ccwchain *chain,
- 		if (ret < 0)
- 			goto out_free_idaws;
+ 	ccw = chain->ch_ccw + idx;
  
-+		if (!ccw_does_data_transfer(ccw)) {
-+			pa->pa_nr = 0;
-+			continue;
-+		}
-+
- 		ret = pfn_array_pin(pa, cp->mdev);
- 		if (ret < 0)
- 			goto out_free_idaws;
+-	if (!ccw->count)
+-		return 0;
++	if (ccw->count)
++		bytes = ccw->count;
+ 
+ 	/* Calculate size of idaws. */
+ 	ret = copy_from_iova(cp->mdev, &idaw_iova, ccw->cda, sizeof(idaw_iova));
+ 	if (ret)
+ 		return ret;
+-	idaw_nr = idal_nr_words((void *)(idaw_iova), ccw->count);
++	idaw_nr = idal_nr_words((void *)(idaw_iova), bytes);
+ 	idaw_len = idaw_nr * sizeof(*idaws);
+ 
+ 	/* Pin data page(s) in memory. */
 -- 
 2.20.1
 
