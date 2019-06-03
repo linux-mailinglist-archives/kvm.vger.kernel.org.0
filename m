@@ -2,89 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DA65833380
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 17:27:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D93133339A
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 17:34:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727695AbfFCP1v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jun 2019 11:27:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50332 "EHLO mx1.redhat.com"
+        id S1726989AbfFCPeB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jun 2019 11:34:01 -0400
+Received: from mga04.intel.com ([192.55.52.120]:47247 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726714AbfFCP1v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jun 2019 11:27:51 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 480F0307D95F;
-        Mon,  3 Jun 2019 15:27:51 +0000 (UTC)
-Received: from gondolin (ovpn-204-96.brq.redhat.com [10.40.204.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A55660576;
-        Mon,  3 Jun 2019 15:27:44 +0000 (UTC)
-Date:   Mon, 3 Jun 2019 17:27:40 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Michael Mueller <mimu@linux.ibm.com>
-Cc:     KVM Mailing List <kvm@vger.kernel.org>,
-        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>
-Subject: Re: [PATCH v3 4/8] s390/airq: use DMA memory for adapter interrupts
-Message-ID: <20190603172740.1023e078.cohuck@redhat.com>
-In-Reply-To: <20190529122657.166148-5-mimu@linux.ibm.com>
-References: <20190529122657.166148-1-mimu@linux.ibm.com>
-        <20190529122657.166148-5-mimu@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1726714AbfFCPeA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jun 2019 11:34:00 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Jun 2019 08:34:00 -0700
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Jun 2019 08:33:59 -0700
+Message-ID: <f510f69ec5744e80fc612ae06a35b49d56cf2c80.camel@linux.intel.com>
+Subject: Re: [RFC PATCH 00/11] mm / virtio: Provide support for paravirtual
+ waste page treatment
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     David Hildenbrand <david@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>, nitesh@redhat.com,
+        kvm@vger.kernel.org, mst@redhat.com, dave.hansen@intel.com,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
+        konrad.wilk@oracle.com, lcapitulino@redhat.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com
+Date:   Mon, 03 Jun 2019 08:33:59 -0700
+In-Reply-To: <09c42bc7-ddc7-6b34-44d8-ffb5e63c7c6f@redhat.com>
+References: <20190530215223.13974.22445.stgit@localhost.localdomain>
+         <09c42bc7-ddc7-6b34-44d8-ffb5e63c7c6f@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Mon, 03 Jun 2019 15:27:51 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 29 May 2019 14:26:53 +0200
-Michael Mueller <mimu@linux.ibm.com> wrote:
-
-> From: Halil Pasic <pasic@linux.ibm.com>
+On Mon, 2019-06-03 at 11:31 +0200, David Hildenbrand wrote:
+> On 30.05.19 23:53, Alexander Duyck wrote:
+> > This series provides an asynchronous means of hinting to a hypervisor
+> > that a guest page is no longer in use and can have the data associated
+> > with it dropped. To do this I have implemented functionality that allows
+> > for what I am referring to as "waste page treatment".
+> > 
+> > I have based many of the terms and functionality off of waste water
+> > treatment, the idea for the similarity occured to me after I had reached
+> > the point of referring to the hints as "bubbles", as the hints used the
+> > same approach as the balloon functionality but would disappear if they
+> > were touched, as a result I started to think of the virtio device as an
+> > aerator. The general idea with all of this is that the guest should be
+> > treating the unused pages so that when they end up heading "downstream"
+> > to either another guest, or back at the host they will not need to be
+> > written to swap.
+> > 
+> > So for a bit of background for the treatment process, it is based on a
+> > sequencing batch reactor (SBR)[1]. The treatment process itself has five
+> > stages. The first stage is the fill, with this we take the raw pages and
+> > add them to the reactor. The second stage is react, in this stage we hand
+> > the pages off to the Virtio Balloon driver to have hints attached to them
+> > and for those hints to be sent to the hypervisor. The third stage is
+> > settle, in this stage we are waiting for the hypervisor to process the
+> > pages, and we should receive an interrupt when it is completed. The fourth
+> > stage is to decant, or drain the reactor of pages. Finally we have the
+> > idle stage which we will go into if the reference count for the reactor
+> > gets down to 0 after a drain, or if a fill operation fails to obtain any
+> > pages and the reference count has hit 0. Otherwise we return to the first
+> > state and start the cycle over again.
 > 
-> Protected virtualization guests have to use shared pages for airq
-> notifier bit vectors, because hypervisor needs to write these bits.
+> While I like this analogy, I don't like the terminology mixed into
+> linux-mm core.
 > 
-> Let us make sure we allocate DMA memory for the notifier bit vectors by
-> replacing the kmem_cache with a dma_cache and kalloc() with
-> cio_dma_zalloc().
+> mm/aeration.c? Bubble? Treated? whut?
 > 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Reviewed-by: Sebastian Ott <sebott@linux.ibm.com>
-> Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
-> ---
->  arch/s390/include/asm/airq.h |  2 ++
->  drivers/s390/cio/airq.c      | 32 ++++++++++++++++++++------------
->  drivers/s390/cio/cio.h       |  2 ++
->  drivers/s390/cio/css.c       |  1 +
->  4 files changed, 25 insertions(+), 12 deletions(-)
+> Can you come up with a terminology once can understand without a PHD in
+> biology? (if that is even the right field of study, I have no idea)
 
-Apologies if that already has been answered (and I missed it in my mail
-pile...), but two things had come to my mind previously:
+I had started with the bubble, as I had mentioned before. From there I got
+to aerator because of the fact that we were filling the memory with holes.
+I figure the first two work pretty well, but I am not really attached to
+any of the other terms. As far as the rest of the terminology most of it
+is actually chemistry if I am not mistaken. I could probably just swap out
+"Treated" with "Aerated" and it would work just as well. I would also need
+to get away from the more complex terms such as "decant", but for the most
+part that is just a matter of finding the synonyms such as "drain".
 
-- CHSC... does anything need to be done there? Last time I asked:
-  "Anyway, css_bus_init() uses some chscs
-   early (before cio_dma_pool_init), so we could not use the pools
-   there, even if we wanted to. Do chsc commands either work, or else
-   fail benignly on a protected virt guest?"
-- PCI indicators... does this interact with any dma configuration on
-  the pci device? (I know pci is not supported yet, and I don't really
-  expect any problems.)
+> ALSO: isn't the analogy partially wrong? Nobody would be using "waste
+> water" just because they are low on "clean water". At least not in my
+> city (I hope so ;) ). But maybe I am not getting the whole concept
+> because we are dealing with pages we want to hint to the hypervisor and
+> not with actual "waste".
+
+Actually the analogy isn't for a low condition. The analogy would be for a
+condition where we have an excess of waste water and don't want to contain
+it. As such we want to treat it and return it to the water cycle.
+
+As far as the "waste" in the analogy I was thinking more of the page data.
+When a page has been used we normally mark it as "Dirty", so I thought it
+would be an apt analogy since those dirty pages would have to be written
+to long term storage if we didn't do something to invalidate the page
+data.
+
+> > This patch set is still far more intrusive then I would really like for
+> > what it has to do. Currently I am splitting the nr_free_pages into two
+> > values and having to add a pointer and an index to track where we area in
+> > the treatment process for a given free_area. I'm also not sure I have
+> > covered all possible corner cases where pages can get into the free_area
+> > or move from one migratetype to another.
+> 
+> Yes, it is quite intrusive. Maybe we can minimize the impact/error
+> proneness.
+
+My hope by submitting this as an RFC was to get input on what directions I
+might need to head in before I went to far down this current path.
+
+> > Also I am still leaving a number of things hard-coded such as limiting the
+> > lowest order processed to PAGEBLOCK_ORDER, and have left it up to the
+> > guest to determine what size of reactor it wants to allocate to process
+> > the hints.
+> > 
+> > Another consideration I am still debating is if I really want to process
+> > the aerator_cycle() function in interrupt context or if I should have it
+> > running in a thread somewhere else.
+> 
+> Did you get to test/benchmark the difference?
+
+I haven't yet.
+
