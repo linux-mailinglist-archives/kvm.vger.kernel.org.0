@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 60A29335C4
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 18:57:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 646B13355B
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 18:55:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727790AbfFCQzf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jun 2019 12:55:35 -0400
-Received: from mail-ot1-f73.google.com ([209.85.210.73]:44321 "EHLO
-        mail-ot1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729486AbfFCQze (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jun 2019 12:55:34 -0400
-Received: by mail-ot1-f73.google.com with SMTP id o98so9217005ota.11
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2019 09:55:33 -0700 (PDT)
+        id S1729521AbfFCQzi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jun 2019 12:55:38 -0400
+Received: from mail-qk1-f201.google.com ([209.85.222.201]:47524 "EHLO
+        mail-qk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729491AbfFCQzh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jun 2019 12:55:37 -0400
+Received: by mail-qk1-f201.google.com with SMTP id l185so978861qkd.14
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2019 09:55:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=20y1HOjqXQjYCoZ3FMKXhe3A/P2l0vyHswuOkJrBoHc=;
-        b=LglK5GIUUx/pUH7d33srSrOdoxDJcf6k8RPUUYHzql61oC+wNFESJd5PKVtebHfEHg
-         K4rjnwnmDpgmbEhEStseFjNPEkvS+OI72qtgGhLpDEtxWhTvC3aTgCw5FcWPqu/H8YrI
-         EsZSEg5fuJNLUqDTf1Y4yx6ojgmyvktu2GiIy1cCbapuFQIW/4LxM06f8+NqNbEgrvNM
-         UWcCXb3C0eM0WuvLRS+mPfo8NHHpXEwFgU2WjcbOUcfYUWB+71yFOhi1U1i0mgtvoovy
-         MA4D4byZDDLHTtN4PLwPL3K21wgXq++wadXcb7ohaA0PX/0lh5439vbzfphRZaAPKsSb
-         Z6iw==
+        bh=luHVeQDtsejNe05MbpEHIJ5FAOspLsm1rW4+f3IOXdc=;
+        b=ew82e7NzIq+8fpVjdyGeAl2NjSKK4p0nGZ5QsTZKvqtsLjuuAXvE063KXb+pD0cHy3
+         33+cPut/htgPr27GTzwOcJ20GBX2Ux9NssttTzwHChq9HvO45Yd1WsNH+qMaKhyQDDTc
+         D+9zMoo5SrYePAGdOkXZXmMQhF2t0ypsOVpok1EOYB7sNktF/Rh9uldB40uKjOJapI1g
+         axLdF69gRV4YSFbj/UQdIsHxS2aGe/kJaiIGVBIH5qRmQS2qsSWYGny0rQfE2+NQmVfF
+         bjXTeOgusRer2Jz6pFuYk/PEgndLJQ02z9T1gNTKOM3uuFHRlwHl2aCc1w3EkCHnhf6g
+         ZiTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=20y1HOjqXQjYCoZ3FMKXhe3A/P2l0vyHswuOkJrBoHc=;
-        b=c2qhYool/UZpz8d1eMkg8h+HFOqY3CaCnTH97tkJtmzwryUnX35o5E4gu+1+I94QYZ
-         sEJHOSs/Sta/vz724D0S4pkfj2SJOPRbDRbICbTEtl55k96ECPrT3lJI6O68sy6sKm31
-         9vuj196LxZFFQZPhj5/gfxxrQrSFOfxx+ukxwDdX3yJ/fk1pUB7wstU0k9spPbkF151O
-         ceuK8sSwUIhulREDH11H4gzO9vsXVQhcNxCV9cvK94h2rCADtkBP7uR4sM/YJV0St+Is
-         Z3Jz7o13awz7rCh41lxMEq8DkW4HsPa6HkCmIsMNhqEfbohV7PIujM9U2kTvdwTFSgn6
-         4zGw==
-X-Gm-Message-State: APjAAAXrylylhPyS/rAFpz0M6YjQ2E/4coguwluM0XaSNOqulqr8b1dd
-        4vLagVCio/80dtPd21st4l3XVt+uKjgdWvqZ
-X-Google-Smtp-Source: APXvYqzHKkB2rM9PXXWgsahc+U06gQo0dW3SgxcQRqFmx6XqPzOJDdvsIYpt6xPWzmKaja2zBdl1velx+1PVZjyJ
-X-Received: by 2002:a9d:62d5:: with SMTP id z21mr1888837otk.202.1559580933129;
- Mon, 03 Jun 2019 09:55:33 -0700 (PDT)
-Date:   Mon,  3 Jun 2019 18:55:05 +0200
+        bh=luHVeQDtsejNe05MbpEHIJ5FAOspLsm1rW4+f3IOXdc=;
+        b=KJnRGorRP332q5kU6BZrgja/PNSe6gKErI3mEYSsOZgddaIigIU1EOPB3oOxVRGvG7
+         Z/TEsPjSiytJ+zApfM3H1pdFsp1YjqKtbpHrVetQo1GsFesViJH/VS/R/o4+cTEbdjKT
+         fI1/9Mye5rSL/vi+s0eqMGW9YM4Hz0EiSpWjOAFK7l/vlolgIJvwfcdo06+lrj92p2lI
+         J0JaXRHxuPuayYqL33jQPu61WOz7muinHFk935LdBmor2+Ih6yoZUE/G9mfaPY70Btdz
+         wuPqVbFGBCfp87eBo3VGqqmZ6K8DtKBbkrz0Du9s8DDg7kID1RXjIl5HMCimrG17H1j0
+         Bs0Q==
+X-Gm-Message-State: APjAAAUYDbG9WcmEp6+AS/pJ97BY/lrYv3xkNHopS8A61hKNA3svhJfO
+        5KB8AOiSYd3DKRQdxZn+UZA6kJsHtO1Qep14
+X-Google-Smtp-Source: APXvYqxWajnT2+NV3xTud3R56ZNhfS6I5UrUDe55n3y1jJe3OWUToUGKN+BmVqJ0YCPX/M4xXQWJhyPq+bf/72n5
+X-Received: by 2002:a0c:ad23:: with SMTP id u32mr3896810qvc.39.1559580936412;
+ Mon, 03 Jun 2019 09:55:36 -0700 (PDT)
+Date:   Mon,  3 Jun 2019 18:55:06 +0200
 In-Reply-To: <cover.1559580831.git.andreyknvl@google.com>
-Message-Id: <14f17ef1902aa4f07a39f96879394e718a1f5dc1.1559580831.git.andreyknvl@google.com>
+Message-Id: <e410843d00a4ecd7e525a7a949e605ffc6c394c4.1559580831.git.andreyknvl@google.com>
 Mime-Version: 1.0
 References: <cover.1559580831.git.andreyknvl@google.com>
 X-Mailer: git-send-email 2.22.0.rc1.311.g5d7573a151-goog
-Subject: [PATCH v16 03/16] lib, arm64: untag user pointers in strn*_user
+Subject: [PATCH v16 04/16] mm: untag user pointers in do_pages_move
 From:   Andrey Konovalov <andreyknvl@google.com>
 To:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
@@ -94,64 +94,28 @@ This patch is a part of a series that extends arm64 kernel ABI to allow to
 pass tagged user pointers (with the top byte set to something else other
 than 0x00) as syscall arguments.
 
-strncpy_from_user and strnlen_user accept user addresses as arguments, and
-do not go through the same path as copy_from_user and others, so here we
-need to handle the case of tagged user addresses separately.
+do_pages_move() is used in the implementation of the move_pages syscall.
 
-Untag user pointers passed to these functions.
-
-Note, that this patch only temporarily untags the pointers to perform
-validity checks, but then uses them as is to perform user memory accesses.
+Untag user pointers in this function.
 
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 ---
- lib/strncpy_from_user.c | 3 ++-
- lib/strnlen_user.c      | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ mm/migrate.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/lib/strncpy_from_user.c b/lib/strncpy_from_user.c
-index 023ba9f3b99f..dccb95af6003 100644
---- a/lib/strncpy_from_user.c
-+++ b/lib/strncpy_from_user.c
-@@ -6,6 +6,7 @@
- #include <linux/uaccess.h>
- #include <linux/kernel.h>
- #include <linux/errno.h>
-+#include <linux/mm.h>
+diff --git a/mm/migrate.c b/mm/migrate.c
+index f2ecc2855a12..3930bb6fa656 100644
+--- a/mm/migrate.c
++++ b/mm/migrate.c
+@@ -1617,6 +1617,7 @@ static int do_pages_move(struct mm_struct *mm, nodemask_t task_nodes,
+ 		if (get_user(node, nodes + i))
+ 			goto out_flush;
+ 		addr = (unsigned long)p;
++		addr = untagged_addr(addr);
  
- #include <asm/byteorder.h>
- #include <asm/word-at-a-time.h>
-@@ -108,7 +109,7 @@ long strncpy_from_user(char *dst, const char __user *src, long count)
- 		return 0;
- 
- 	max_addr = user_addr_max();
--	src_addr = (unsigned long)src;
-+	src_addr = (unsigned long)untagged_addr(src);
- 	if (likely(src_addr < max_addr)) {
- 		unsigned long max = max_addr - src_addr;
- 		long retval;
-diff --git a/lib/strnlen_user.c b/lib/strnlen_user.c
-index 7f2db3fe311f..28ff554a1be8 100644
---- a/lib/strnlen_user.c
-+++ b/lib/strnlen_user.c
-@@ -2,6 +2,7 @@
- #include <linux/kernel.h>
- #include <linux/export.h>
- #include <linux/uaccess.h>
-+#include <linux/mm.h>
- 
- #include <asm/word-at-a-time.h>
- 
-@@ -109,7 +110,7 @@ long strnlen_user(const char __user *str, long count)
- 		return 0;
- 
- 	max_addr = user_addr_max();
--	src_addr = (unsigned long)str;
-+	src_addr = (unsigned long)untagged_addr(str);
- 	if (likely(src_addr < max_addr)) {
- 		unsigned long max = max_addr - src_addr;
- 		long retval;
+ 		err = -ENODEV;
+ 		if (node < 0 || node >= MAX_NUMNODES)
 -- 
 2.22.0.rc1.311.g5d7573a151-goog
 
