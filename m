@@ -2,209 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 66CB133BA9
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 01:01:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 504B333BA7
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 01:01:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726502AbfFCXBW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1726490AbfFCXBW (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Mon, 3 Jun 2019 19:01:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40138 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:34178 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726102AbfFCXBV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1726163AbfFCXBV (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 3 Jun 2019 19:01:21 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 133EB30821FF;
-        Mon,  3 Jun 2019 23:01:21 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id D08187E42C
+        for <kvm@vger.kernel.org>; Mon,  3 Jun 2019 23:01:20 +0000 (UTC)
 Received: from amt.cnet (ovpn-112-8.gru2.redhat.com [10.97.112.8])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 598D617154;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 44CF26090E;
         Mon,  3 Jun 2019 23:01:20 +0000 (UTC)
 Received: from amt.cnet (localhost [127.0.0.1])
-        by amt.cnet (Postfix) with ESMTP id 55BB3105165;
-        Mon,  3 Jun 2019 19:54:58 -0300 (BRT)
+        by amt.cnet (Postfix) with ESMTP id 809D3105177;
+        Mon,  3 Jun 2019 20:01:01 -0300 (BRT)
 Received: (from marcelo@localhost)
-        by amt.cnet (8.14.7/8.14.7/Submit) id x53MswxR007684;
-        Mon, 3 Jun 2019 19:54:58 -0300
-Message-Id: <20190603225254.360289262@amt.cnet>
-User-Agent: quilt/0.60-1
-Date:   Mon, 03 Jun 2019 19:52:45 -0300
+        by amt.cnet (8.14.7/8.14.7/Submit) id x53N0v7v007755;
+        Mon, 3 Jun 2019 20:00:57 -0300
+Date:   Mon, 3 Jun 2019 20:00:57 -0300
 From:   Marcelo Tosatti <mtosatti@redhat.com>
 To:     kvm-devel <kvm@vger.kernel.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?ISO-8859-15?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= 
-        <rkrcmar@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Raslan KarimAllah <karahmed@amazon.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [patch 3/3] cpuidle-haltpoll: disable host side polling when kvm virtualized
-References: <20190603225242.289109849@amt.cnet>
-Content-Disposition: inline; filename=03-pollcontrol-guest.patch
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Mon, 03 Jun 2019 23:01:21 +0000 (UTC)
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: [patch QEMU] kvm: i386: halt poll control MSR support
+Message-ID: <20190603230055.GB1938@amt.cnet>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Mon, 03 Jun 2019 23:01:20 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When performing guest side polling, it is not necessary to 
-also perform host side polling. 
 
-So disable host side polling, via the new MSR interface, 
-when loading cpuidle-haltpoll driver.
+Add support for halt poll control MSR: save/restore, migration 
+and new feature name.
+
+The purpose of this MSR is to allow the guest to disable
+host halt poll.
 
 Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
----
- arch/x86/Kconfig                        |    7 +++++
- arch/x86/include/asm/cpuidle_haltpoll.h |    8 ++++++
- arch/x86/kernel/kvm.c                   |   40 ++++++++++++++++++++++++++++++++
- drivers/cpuidle/cpuidle-haltpoll.c      |    9 ++++++-
- include/linux/cpuidle_haltpoll.h        |   16 ++++++++++++
- 5 files changed, 79 insertions(+), 1 deletion(-)
 
-Index: linux-2.6.git/arch/x86/include/asm/cpuidle_haltpoll.h
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ linux-2.6.git/arch/x86/include/asm/cpuidle_haltpoll.h	2019-06-03 19:38:42.328718617 -0300
-@@ -0,0 +1,8 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _ARCH_HALTPOLL_H
-+#define _ARCH_HALTPOLL_H
-+
-+void arch_haltpoll_enable(void);
-+void arch_haltpoll_disable(void);
-+
-+#endif
-Index: linux-2.6.git/drivers/cpuidle/cpuidle-haltpoll.c
-===================================================================
---- linux-2.6.git.orig/drivers/cpuidle/cpuidle-haltpoll.c	2019-06-03 19:38:12.376619124 -0300
-+++ linux-2.6.git/drivers/cpuidle/cpuidle-haltpoll.c	2019-06-03 19:38:42.328718617 -0300
-@@ -15,6 +15,7 @@
- #include <linux/module.h>
- #include <linux/timekeeping.h>
- #include <linux/sched/idle.h>
-+#include <linux/cpuidle_haltpoll.h>
- #define CREATE_TRACE_POINTS
- #include "cpuidle-haltpoll-trace.h"
+diff --git a/include/standard-headers/asm-x86/kvm_para.h b/include/standard-headers/asm-x86/kvm_para.h
+index 35cd8d6..e171514 100644
+--- a/include/standard-headers/asm-x86/kvm_para.h
++++ b/include/standard-headers/asm-x86/kvm_para.h
+@@ -29,6 +29,7 @@
+ #define KVM_FEATURE_PV_TLB_FLUSH	9
+ #define KVM_FEATURE_ASYNC_PF_VMEXIT	10
+ #define KVM_FEATURE_PV_SEND_IPI	11
++#define KVM_FEATURE_POLL_CONTROL	12
  
-@@ -157,11 +158,17 @@
+ #define KVM_HINTS_REALTIME      0
  
- static int __init haltpoll_init(void)
+@@ -47,6 +48,7 @@
+ #define MSR_KVM_ASYNC_PF_EN 0x4b564d02
+ #define MSR_KVM_STEAL_TIME  0x4b564d03
+ #define MSR_KVM_PV_EOI_EN      0x4b564d04
++#define MSR_KVM_POLL_CONTROL	0x4b564d05
+ 
+ struct kvm_steal_time {
+ 	uint64_t steal;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index c1ab86d..1ca6944 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -903,7 +903,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             "kvmclock", "kvm-nopiodelay", "kvm-mmu", "kvmclock",
+             "kvm-asyncpf", "kvm-steal-time", "kvm-pv-eoi", "kvm-pv-unhalt",
+             NULL, "kvm-pv-tlb-flush", NULL, "kvm-pv-ipi",
+-            NULL, NULL, NULL, NULL,
++            "kvm-poll-control", NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             "kvmclock-stable-bit", NULL, NULL, NULL,
+@@ -3001,6 +3001,7 @@ static PropValue kvm_default_props[] = {
+     { "kvm-asyncpf", "on" },
+     { "kvm-steal-time", "on" },
+     { "kvm-pv-eoi", "on" },
++    { "kvm-poll-control", "on" },
+     { "kvmclock-stable-bit", "on" },
+     { "x2apic", "on" },
+     { "acpi", "off" },
+@@ -5660,6 +5661,8 @@ static void x86_cpu_initfn(Object *obj)
+     object_property_add_alias(obj, "kvm_steal_time", obj, "kvm-steal-time", &error_abort);
+     object_property_add_alias(obj, "kvm_pv_eoi", obj, "kvm-pv-eoi", &error_abort);
+     object_property_add_alias(obj, "kvm_pv_unhalt", obj, "kvm-pv-unhalt", &error_abort);
++    object_property_add_alias(obj, "kvm_poll_control", obj, "kvm-poll-control",
++                              &error_abort);
+     object_property_add_alias(obj, "svm_lock", obj, "svm-lock", &error_abort);
+     object_property_add_alias(obj, "nrip_save", obj, "nrip-save", &error_abort);
+     object_property_add_alias(obj, "tsc_scale", obj, "tsc-scale", &error_abort);
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index bd06523..21ed2f8 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1241,6 +1241,7 @@ typedef struct CPUX86State {
+     uint64_t steal_time_msr;
+     uint64_t async_pf_en_msr;
+     uint64_t pv_eoi_en_msr;
++    uint64_t poll_control_msr;
+ 
+     /* Partition-wide HV MSRs, will be updated only on the first vcpu */
+     uint64_t msr_hv_hypercall;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 3b29ce5..a5e9cdf 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1369,6 +1369,8 @@ void kvm_arch_reset_vcpu(X86CPU *cpu)
+ 
+         hyperv_x86_synic_reset(cpu);
+     }
++    /* enabled by default */
++    env->poll_control_msr = 1;
+ }
+ 
+ void kvm_arch_do_init_vcpu(X86CPU *cpu)
+@@ -2059,6 +2061,11 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+         if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_STEAL_TIME)) {
+             kvm_msr_entry_add(cpu, MSR_KVM_STEAL_TIME, env->steal_time_msr);
+         }
++
++        if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_POLL_CONTROL)) {
++            kvm_msr_entry_add(cpu, MSR_KVM_POLL_CONTROL, env->poll_control_msr);
++        }
++
+         if (has_architectural_pmu_version > 0) {
+             if (has_architectural_pmu_version > 1) {
+                 /* Stop the counter.  */
+@@ -2443,6 +2450,9 @@ static int kvm_get_msrs(X86CPU *cpu)
+     if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_STEAL_TIME)) {
+         kvm_msr_entry_add(cpu, MSR_KVM_STEAL_TIME, 0);
+     }
++    if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_POLL_CONTROL)) {
++        kvm_msr_entry_add(cpu, MSR_KVM_POLL_CONTROL, 1);
++    }
+     if (has_architectural_pmu_version > 0) {
+         if (has_architectural_pmu_version > 1) {
+             kvm_msr_entry_add(cpu, MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
+@@ -2677,6 +2687,10 @@ static int kvm_get_msrs(X86CPU *cpu)
+         case MSR_KVM_STEAL_TIME:
+             env->steal_time_msr = msrs[i].data;
+             break;
++        case MSR_KVM_POLL_CONTROL: {
++            env->poll_control_msr = msrs[i].data;
++            break;
++        }
+         case MSR_CORE_PERF_FIXED_CTR_CTRL:
+             env->msr_fixed_ctr_ctrl = msrs[i].data;
+             break;
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 225b5d4..1c23e5e 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -323,6 +323,14 @@ static bool steal_time_msr_needed(void *opaque)
+     return cpu->env.steal_time_msr != 0;
+ }
+ 
++/* Poll control MSR enabled by default */
++static bool poll_control_msr_needed(void *opaque)
++{
++    X86CPU *cpu = opaque;
++
++    return cpu->env.poll_control_msr != 1;
++}
++
+ static const VMStateDescription vmstate_steal_time_msr = {
+     .name = "cpu/steal_time_msr",
+     .version_id = 1,
+@@ -356,6 +364,17 @@ static const VMStateDescription vmstate_pv_eoi_msr = {
+     }
+ };
+ 
++static const VMStateDescription vmstate_poll_control_msr = {
++    .name = "cpu/poll_control_msr",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = poll_control_msr_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(env.poll_control_msr, X86CPU),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static bool fpop_ip_dp_needed(void *opaque)
  {
--	return cpuidle_register(&haltpoll_driver, NULL);
-+	int ret = cpuidle_register(&haltpoll_driver, NULL);
-+
-+	if (ret == 0)
-+		arch_haltpoll_enable();
-+
-+	return ret;
- }
- 
- static void __exit haltpoll_exit(void)
- {
-+	arch_haltpoll_disable();
- 	cpuidle_unregister(&haltpoll_driver);
- }
- 
-Index: linux-2.6.git/include/linux/cpuidle_haltpoll.h
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ linux-2.6.git/include/linux/cpuidle_haltpoll.h	2019-06-03 19:41:57.293366260 -0300
-@@ -0,0 +1,16 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _CPUIDLE_HALTPOLL_H
-+#define _CPUIDLE_HALTPOLL_H
-+
-+#ifdef CONFIG_ARCH_CPUIDLE_HALTPOLL
-+#include <asm/cpuidle_haltpoll.h>
-+#else
-+static inline void arch_haltpoll_enable(void)
-+{
-+}
-+
-+static inline void arch_haltpoll_disable(void)
-+{
-+}
-+#endif
-+#endif
-Index: linux-2.6.git/arch/x86/Kconfig
-===================================================================
---- linux-2.6.git.orig/arch/x86/Kconfig	2019-06-03 19:38:12.376619124 -0300
-+++ linux-2.6.git/arch/x86/Kconfig	2019-06-03 19:42:34.478489868 -0300
-@@ -787,6 +787,7 @@
- 	bool "KVM Guest support (including kvmclock)"
- 	depends on PARAVIRT
- 	select PARAVIRT_CLOCK
-+	select ARCH_CPUIDLE_HALTPOLL
- 	default y
- 	---help---
- 	  This option enables various optimizations for running under the KVM
-@@ -795,6 +796,12 @@
- 	  underlying device model, the host provides the guest with
- 	  timing infrastructure such as time of day, and system time
- 
-+config ARCH_CPUIDLE_HALTPOLL
-+        def_bool n
-+        prompt "Disable host haltpoll when loading haltpoll driver"
-+        help
-+	  If virtualized under KVM, disable host haltpoll.
-+
- config PVH
- 	bool "Support for running PVH guests"
- 	---help---
-Index: linux-2.6.git/arch/x86/kernel/kvm.c
-===================================================================
---- linux-2.6.git.orig/arch/x86/kernel/kvm.c	2019-06-03 19:38:12.376619124 -0300
-+++ linux-2.6.git/arch/x86/kernel/kvm.c	2019-06-03 19:40:14.359024312 -0300
-@@ -853,3 +853,43 @@
- }
- 
- #endif	/* CONFIG_PARAVIRT_SPINLOCKS */
-+
-+#ifdef CONFIG_ARCH_CPUIDLE_HALTPOLL
-+
-+void kvm_disable_host_haltpoll(void *i)
-+{
-+	wrmsrl(MSR_KVM_POLL_CONTROL, 0);
-+}
-+
-+void kvm_enable_host_haltpoll(void *i)
-+{
-+	wrmsrl(MSR_KVM_POLL_CONTROL, 1);
-+}
-+
-+void arch_haltpoll_enable(void)
-+{
-+	if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL))
-+		return;
-+
-+	preempt_disable();
-+	/* Enabling guest halt poll disables host halt poll */
-+	kvm_disable_host_haltpoll(NULL);
-+	smp_call_function(kvm_disable_host_haltpoll, NULL, 1);
-+	preempt_enable();
-+}
-+EXPORT_SYMBOL_GPL(arch_haltpoll_enable);
-+
-+void arch_haltpoll_disable(void)
-+{
-+	if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL))
-+		return;
-+
-+	preempt_disable();
-+	/* Enabling guest halt poll disables host halt poll */
-+	kvm_enable_host_haltpoll(NULL);
-+	smp_call_function(kvm_enable_host_haltpoll, NULL, 1);
-+	preempt_enable();
-+}
-+}
-+EXPORT_SYMBOL_GPL(arch_haltpoll_disable);
-+#endif
-
-
+     X86CPU *cpu = opaque;
+@@ -1062,6 +1081,7 @@ VMStateDescription vmstate_x86_cpu = {
+         &vmstate_async_pf_msr,
+         &vmstate_pv_eoi_msr,
+         &vmstate_steal_time_msr,
++        &vmstate_poll_control_msr,
+         &vmstate_fpop_ip_dp,
+         &vmstate_msr_tsc_adjust,
+         &vmstate_msr_tscdeadline,
