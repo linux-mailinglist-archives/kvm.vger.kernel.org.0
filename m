@@ -2,265 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 60493329AE
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 09:33:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D3D432A94
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 10:16:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726694AbfFCHc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jun 2019 03:32:58 -0400
-Received: from pegase1.c-s.fr ([93.17.236.30]:8090 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725975AbfFCHc5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jun 2019 03:32:57 -0400
-Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 45HRbj0L33z9tyqk;
-        Mon,  3 Jun 2019 09:32:49 +0200 (CEST)
-Authentication-Results: localhost; dkim=pass
-        reason="1024-bit key; insecure key"
-        header.d=c-s.fr header.i=@c-s.fr header.b=KCHA/+I2; dkim-adsp=pass;
-        dkim-atps=neutral
-X-Virus-Scanned: Debian amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id f1ZXWwP5lEd5; Mon,  3 Jun 2019 09:32:48 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 45HRbh6GzZz9tyqD;
-        Mon,  3 Jun 2019 09:32:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
-        t=1559547168; bh=mFSnLp9SecdoefqVAi+zrsx7gCUNrqDDhzeAm7hNfcA=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=KCHA/+I2NHjkZkiR233EwpdRJt5jFkb7BB5WvTUHNfzd/oweFVHs6D+raJnJ4JYpd
-         J+KQ8vTwYSp7XV7FCrl9nJmeWCQH+EPqi/mxK+DlAKOo2fjx8cf6H7S04ezRTgUM5E
-         wPjjz8mFCLKIrimihcCu7Fs69Nna3fpjCg3CfU9w=
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 704308B7B1;
-        Mon,  3 Jun 2019 09:32:53 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id eaNrRzoQGBQV; Mon,  3 Jun 2019 09:32:53 +0200 (CEST)
-Received: from PO15451 (po15451.idsi0.si.c-s.fr [172.25.231.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 1C9028B7A1;
-        Mon,  3 Jun 2019 09:32:53 +0200 (CEST)
-Subject: Re: [PATCH 09/22] docs: mark orphan documents as such
-To:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     kvm@vger.kernel.org,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Maxime Ripard <maxime.ripard@bootlin.com>,
-        dri-devel@lists.freedesktop.org,
-        platform-driver-x86@vger.kernel.org,
-        Paul Mackerras <paulus@samba.org>,
-        linux-stm32@st-md-mailman.stormreply.com,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Airlie <airlied@linux.ie>,
-        Andrew Donnellan <ajd@linux.ibm.com>, linux-pm@vger.kernel.org,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Matan Ziv-Av <matan@svgalib.org>,
-        Mauro Carvalho Chehab <mchehab@infradead.org>,
-        Daniel Vetter <daniel@ffwll.ch>, Sean Paul <sean@poorly.run>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Frederic Barrat <fbarrat@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linuxppc-dev@lists.ozlabs.org,
-        Georgi Djakov <georgi.djakov@linaro.org>
-References: <cover.1559171394.git.mchehab+samsung@kernel.org>
- <e0bf4e767dd5de9189e5993fbec2f4b1bafd2064.1559171394.git.mchehab+samsung@kernel.org>
-From:   Christophe Leroy <christophe.leroy@c-s.fr>
-Message-ID: <2891a08c-50b1-db33-0e96-740d45c5235f@c-s.fr>
-Date:   Mon, 3 Jun 2019 09:32:54 +0200
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1727661AbfFCIQ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jun 2019 04:16:26 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:36639 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725856AbfFCIQ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jun 2019 04:16:26 -0400
+Received: by mail-wr1-f68.google.com with SMTP id n4so7935967wrs.3;
+        Mon, 03 Jun 2019 01:16:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:subject:to:cc:references:from:openpgp:autocrypt:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4bw+bduVoO24yS9/ugPSh679fDtpvt1k54ZmtZYvvDY=;
+        b=dDN/25OfphVpFdmx2Jm0doKnu8+atN05cNm6KEHVU78DF2cfkZvcbDm9vuIOBTJsMV
+         /k4tPgB8YVdkX1TWlDmIxkriGJarPJy13VBkSL/KFkNLTowFfrejB5hoSQ0P6nYasBwg
+         vmowOIYLourtfEbWaaUvSg3cfGd4Z7qdaw204JicI/2YqtVeF9hPfNRWX4EjVESLP5D7
+         8gIn5taxacoMd/mKQ3A40WMYCS5N62j9EzS21F4CPVO5u/wBjQD9gIPYeTwgVZXjphoV
+         wZXcsnTq3pS0QP0Ued7mPZR3fCAqtLrUNheK089/2WOIWYB3Rf9HL9zXIwJ3i43PrAOb
+         LyUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
+         :autocrypt:message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=4bw+bduVoO24yS9/ugPSh679fDtpvt1k54ZmtZYvvDY=;
+        b=UCn+vh6YUacOOU6ns53sAkE7iV/DB1lbvR7YG2vxoKMDV2FMdvNFJRqYmoAgT/akPW
+         z3x1zNFJhpvCRP7N3FmlZ8Ao4NHsfEHJKEhB3njVN2h5ofquhrA93+RHKWmmZky7gjJU
+         KhNm1AG5oOnECIM1eHQSuoRwtz0lxqXmiYoe2ceZhc8NAisBYCFLI7cPPaCl9+pk5Hsk
+         YTxURZ551Mx7WVU+G1iSFKUwg39n/5f8rk+BH6A1WwQOepEXOWuFWg6HhnaObLHphwPQ
+         nb/Ze6utmszoiYOSi47M3Loqppd6jiPPQK3poI6f7mDNCLEqrLU+OKuiY/CcQ8jMz/er
+         +ctw==
+X-Gm-Message-State: APjAAAXO7TcKd4GbJ87Csq+342K6I6smyscYJ6qBwikTnLtPR0ocOr3J
+        81usIA8y/i2I5ki8PjmrWHw=
+X-Google-Smtp-Source: APXvYqz1mIfncUFD4WkzhzvNqvFWG3IHO5+AQwqsNIw7Lhez2mHZByWsr3JPaEZGbUmZlefL2cPJ7g==
+X-Received: by 2002:adf:e2c8:: with SMTP id d8mr1435179wrj.14.1559549783866;
+        Mon, 03 Jun 2019 01:16:23 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d43d:6da3:9364:a775? ([2001:b07:6468:f312:d43d:6da3:9364:a775])
+        by smtp.googlemail.com with ESMTPSA id 197sm13547920wma.36.2019.06.03.01.16.22
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Mon, 03 Jun 2019 01:16:22 -0700 (PDT)
+Subject: Re: [PATCH 1/2] scsi_host: add support for request batching
+To:     Ming Lei <tom.leiming@gmail.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        KVM General <kvm@vger.kernel.org>, jejb@linux.ibm.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+References: <20190530112811.3066-1-pbonzini@redhat.com>
+ <20190530112811.3066-2-pbonzini@redhat.com>
+ <CACVXFVP-B7uKUGn75rZdu0e4QxUOsSqv8FL0vY2ubmuucvxqjQ@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+ uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
+Message-ID: <bd7fa062-6c71-13a2-5bbf-0dea859ae75f@redhat.com>
+Date:   Mon, 3 Jun 2019 10:16:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <e0bf4e767dd5de9189e5993fbec2f4b1bafd2064.1559171394.git.mchehab+samsung@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACVXFVP-B7uKUGn75rZdu0e4QxUOsSqv8FL0vY2ubmuucvxqjQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-Le 30/05/2019 à 01:23, Mauro Carvalho Chehab a écrit :
-> Sphinx doesn't like orphan documents:
+On 31/05/19 05:27, Ming Lei wrote:
+> It should be fine to implement scsi_commit_rqs() as:
 > 
->      Documentation/accelerators/ocxl.rst: WARNING: document isn't included in any toctree
->      Documentation/arm/stm32/overview.rst: WARNING: document isn't included in any toctree
->      Documentation/arm/stm32/stm32f429-overview.rst: WARNING: document isn't included in any toctree
->      Documentation/arm/stm32/stm32f746-overview.rst: WARNING: document isn't included in any toctree
->      Documentation/arm/stm32/stm32f769-overview.rst: WARNING: document isn't included in any toctree
->      Documentation/arm/stm32/stm32h743-overview.rst: WARNING: document isn't included in any toctree
->      Documentation/arm/stm32/stm32mp157-overview.rst: WARNING: document isn't included in any toctree
->      Documentation/gpu/msm-crash-dump.rst: WARNING: document isn't included in any toctree
->      Documentation/interconnect/interconnect.rst: WARNING: document isn't included in any toctree
->      Documentation/laptops/lg-laptop.rst: WARNING: document isn't included in any toctree
->      Documentation/powerpc/isa-versions.rst: WARNING: document isn't included in any toctree
->      Documentation/virtual/kvm/amd-memory-encryption.rst: WARNING: document isn't included in any toctree
->      Documentation/virtual/kvm/vcpu-requests.rst: WARNING: document isn't included in any toctree
+>  if (shost->hostt->commit_rqs)
+>        shost->hostt->commit_rqs(shost, hctx->queue_num);
 > 
-> So, while they aren't on any toctree, add :orphan: to them, in order
-> to silent this warning.
-
-Are those files really not meant to be included in a toctree ?
-
-Shouldn't we include them in the relevant toctree instead of just 
-shutting up Sphinx warnings ?
-
-Christophe
-
+> then scsi_mq_ops_no_commit can be saved.
 > 
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-> ---
->   Documentation/accelerators/ocxl.rst                 | 2 ++
->   Documentation/arm/stm32/overview.rst                | 2 ++
->   Documentation/arm/stm32/stm32f429-overview.rst      | 2 ++
->   Documentation/arm/stm32/stm32f746-overview.rst      | 2 ++
->   Documentation/arm/stm32/stm32f769-overview.rst      | 2 ++
->   Documentation/arm/stm32/stm32h743-overview.rst      | 2 ++
->   Documentation/arm/stm32/stm32mp157-overview.rst     | 2 ++
->   Documentation/gpu/msm-crash-dump.rst                | 2 ++
->   Documentation/interconnect/interconnect.rst         | 2 ++
->   Documentation/laptops/lg-laptop.rst                 | 2 ++
->   Documentation/powerpc/isa-versions.rst              | 2 ++
->   Documentation/virtual/kvm/amd-memory-encryption.rst | 2 ++
->   Documentation/virtual/kvm/vcpu-requests.rst         | 2 ++
->   13 files changed, 26 insertions(+)
-> 
-> diff --git a/Documentation/accelerators/ocxl.rst b/Documentation/accelerators/ocxl.rst
-> index 14cefc020e2d..b1cea19a90f5 100644
-> --- a/Documentation/accelerators/ocxl.rst
-> +++ b/Documentation/accelerators/ocxl.rst
-> @@ -1,3 +1,5 @@
-> +:orphan:
-> +
->   ========================================================
->   OpenCAPI (Open Coherent Accelerator Processor Interface)
->   ========================================================
-> diff --git a/Documentation/arm/stm32/overview.rst b/Documentation/arm/stm32/overview.rst
-> index 85cfc8410798..f7e734153860 100644
-> --- a/Documentation/arm/stm32/overview.rst
-> +++ b/Documentation/arm/stm32/overview.rst
-> @@ -1,3 +1,5 @@
-> +:orphan:
-> +
->   ========================
->   STM32 ARM Linux Overview
->   ========================
-> diff --git a/Documentation/arm/stm32/stm32f429-overview.rst b/Documentation/arm/stm32/stm32f429-overview.rst
-> index 18feda97f483..65bbb1c3b423 100644
-> --- a/Documentation/arm/stm32/stm32f429-overview.rst
-> +++ b/Documentation/arm/stm32/stm32f429-overview.rst
-> @@ -1,3 +1,5 @@
-> +:orphan:
-> +
->   STM32F429 Overview
->   ==================
->   
-> diff --git a/Documentation/arm/stm32/stm32f746-overview.rst b/Documentation/arm/stm32/stm32f746-overview.rst
-> index b5f4b6ce7656..42d593085015 100644
-> --- a/Documentation/arm/stm32/stm32f746-overview.rst
-> +++ b/Documentation/arm/stm32/stm32f746-overview.rst
-> @@ -1,3 +1,5 @@
-> +:orphan:
-> +
->   STM32F746 Overview
->   ==================
->   
-> diff --git a/Documentation/arm/stm32/stm32f769-overview.rst b/Documentation/arm/stm32/stm32f769-overview.rst
-> index 228656ced2fe..f6adac862b17 100644
-> --- a/Documentation/arm/stm32/stm32f769-overview.rst
-> +++ b/Documentation/arm/stm32/stm32f769-overview.rst
-> @@ -1,3 +1,5 @@
-> +:orphan:
-> +
->   STM32F769 Overview
->   ==================
->   
-> diff --git a/Documentation/arm/stm32/stm32h743-overview.rst b/Documentation/arm/stm32/stm32h743-overview.rst
-> index 3458dc00095d..c525835e7473 100644
-> --- a/Documentation/arm/stm32/stm32h743-overview.rst
-> +++ b/Documentation/arm/stm32/stm32h743-overview.rst
-> @@ -1,3 +1,5 @@
-> +:orphan:
-> +
->   STM32H743 Overview
->   ==================
->   
-> diff --git a/Documentation/arm/stm32/stm32mp157-overview.rst b/Documentation/arm/stm32/stm32mp157-overview.rst
-> index 62e176d47ca7..2c52cd020601 100644
-> --- a/Documentation/arm/stm32/stm32mp157-overview.rst
-> +++ b/Documentation/arm/stm32/stm32mp157-overview.rst
-> @@ -1,3 +1,5 @@
-> +:orphan:
-> +
->   STM32MP157 Overview
->   ===================
->   
-> diff --git a/Documentation/gpu/msm-crash-dump.rst b/Documentation/gpu/msm-crash-dump.rst
-> index 757cd257e0d8..240ef200f76c 100644
-> --- a/Documentation/gpu/msm-crash-dump.rst
-> +++ b/Documentation/gpu/msm-crash-dump.rst
-> @@ -1,3 +1,5 @@
-> +:orphan:
-> +
->   =====================
->   MSM Crash Dump Format
->   =====================
-> diff --git a/Documentation/interconnect/interconnect.rst b/Documentation/interconnect/interconnect.rst
-> index c3e004893796..56e331dab70e 100644
-> --- a/Documentation/interconnect/interconnect.rst
-> +++ b/Documentation/interconnect/interconnect.rst
-> @@ -1,5 +1,7 @@
->   .. SPDX-License-Identifier: GPL-2.0
->   
-> +:orphan:
-> +
->   =====================================
->   GENERIC SYSTEM INTERCONNECT SUBSYSTEM
->   =====================================
-> diff --git a/Documentation/laptops/lg-laptop.rst b/Documentation/laptops/lg-laptop.rst
-> index aa503ee9b3bc..f2c2ffe31101 100644
-> --- a/Documentation/laptops/lg-laptop.rst
-> +++ b/Documentation/laptops/lg-laptop.rst
-> @@ -1,5 +1,7 @@
->   .. SPDX-License-Identifier: GPL-2.0+
->   
-> +:orphan:
-> +
->   LG Gram laptop extra features
->   =============================
->   
-> diff --git a/Documentation/powerpc/isa-versions.rst b/Documentation/powerpc/isa-versions.rst
-> index 812e20cc898c..66c24140ebf1 100644
-> --- a/Documentation/powerpc/isa-versions.rst
-> +++ b/Documentation/powerpc/isa-versions.rst
-> @@ -1,3 +1,5 @@
-> +:orphan:
-> +
->   CPU to ISA Version Mapping
->   ==========================
->   
-> diff --git a/Documentation/virtual/kvm/amd-memory-encryption.rst b/Documentation/virtual/kvm/amd-memory-encryption.rst
-> index 659bbc093b52..33d697ab8a58 100644
-> --- a/Documentation/virtual/kvm/amd-memory-encryption.rst
-> +++ b/Documentation/virtual/kvm/amd-memory-encryption.rst
-> @@ -1,3 +1,5 @@
-> +:orphan:
-> +
->   ======================================
->   Secure Encrypted Virtualization (SEV)
->   ======================================
-> diff --git a/Documentation/virtual/kvm/vcpu-requests.rst b/Documentation/virtual/kvm/vcpu-requests.rst
-> index 5feb3706a7ae..c1807a1b92e6 100644
-> --- a/Documentation/virtual/kvm/vcpu-requests.rst
-> +++ b/Documentation/virtual/kvm/vcpu-requests.rst
-> @@ -1,3 +1,5 @@
-> +:orphan:
-> +
->   =================
->   KVM VCPU Requests
->   =================
-> 
+> Because .commit_rqs() is only called when BLK_STS_*_RESOURCE is
+> returned from scsi_queue_rq(), at that time shost->hostt->commit_rqs should
+> have been hit from cache given .queuecommand is called via
+> host->hostt->queuecommand.
+
+This is not about d-cache, it's about preserving the heuristics that
+blk-mq applies depending on whether commit_rqs is there or not.
+
+Paolo
