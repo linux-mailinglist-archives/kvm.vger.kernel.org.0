@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9225B33B54
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 00:32:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29FB433B5C
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 00:32:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726631AbfFCWbu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jun 2019 18:31:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49074 "EHLO mx1.redhat.com"
+        id S1726465AbfFCWcE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jun 2019 18:32:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:12218 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726245AbfFCWbu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jun 2019 18:31:50 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S1726101AbfFCWcD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jun 2019 18:32:03 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id BFDAD307D945;
-        Mon,  3 Jun 2019 22:31:49 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2496B3087945;
+        Mon,  3 Jun 2019 22:32:03 +0000 (UTC)
 Received: from x1.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A3854601B6;
-        Mon,  3 Jun 2019 22:31:46 +0000 (UTC)
-Date:   Mon, 3 Jun 2019 16:31:45 -0600
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 032CF611D2;
+        Mon,  3 Jun 2019 22:31:59 +0000 (UTC)
+Date:   Mon, 3 Jun 2019 16:31:59 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Eric Auger <eric.auger@redhat.com>
 Cc:     eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org,
@@ -30,288 +30,427 @@ Cc:     eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org,
         robin.murphy@arm.com, kevin.tian@intel.com, ashok.raj@intel.com,
         marc.zyngier@arm.com, peter.maydell@linaro.org,
         vincent.stehle@arm.com
-Subject: Re: [PATCH v8 04/29] iommu: Add recoverable fault reporting
-Message-ID: <20190603163145.74f25426@x1.home>
-In-Reply-To: <20190526161004.25232-5-eric.auger@redhat.com>
+Subject: Re: [PATCH v8 25/29] vfio-pci: Add a new VFIO_REGION_TYPE_NESTED
+ region type
+Message-ID: <20190603163159.31e7ae23@x1.home>
+In-Reply-To: <20190526161004.25232-26-eric.auger@redhat.com>
 References: <20190526161004.25232-1-eric.auger@redhat.com>
-        <20190526161004.25232-5-eric.auger@redhat.com>
+        <20190526161004.25232-26-eric.auger@redhat.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Mon, 03 Jun 2019 22:31:49 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Mon, 03 Jun 2019 22:32:03 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 26 May 2019 18:09:39 +0200
+On Sun, 26 May 2019 18:10:00 +0200
 Eric Auger <eric.auger@redhat.com> wrote:
 
-> From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> This patch adds two new regions aiming to handle nested mode
+> translation faults.
 > 
-> Some IOMMU hardware features, for example PCI's PRI and Arm SMMU's Stall,
-> enable recoverable I/O page faults. Allow IOMMU drivers to report PRI Page
-> Requests and Stall events through the new fault reporting API. The
-> consumer of the fault can be either an I/O page fault handler in the host,
-> or a guest OS.
+> The first region (two host kernel pages) is read-only from the
+> user-space perspective. The first page contains an header
+> that provides information about the circular buffer located in the
+> second page. The circular buffer is put in a different page in
+> the prospect to be mmappable.
 > 
-> Once handled, the fault must be completed by sending a page response back
-> to the IOMMU. Add an iommu_page_response() function to complete a page
-> fault.
+> The max user API version supported by the kernel is returned
+> through a dedicated fault region capability.
 > 
-> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+> The prod header contains
+> - the user API version in use (potentially inferior to the one
+>   returned in the capability),
+> - the offset of the queue within the region,
+> - the producer index relative to the start of the queue
+> - the max number of fault records,
+> - the size of each record.
+> 
+> The second region is write-only from the user perspective. It
+> contains the version of the requested fault ABI and the consumer
+> index that is updated by the userspace each time this latter has
+> consumed fault records.
+> 
+> The natural order of operation for the userspace is:
+> - retrieve the highest supported fault ABI version
+> - set the requested fault ABI version in the consumer region
+> 
+> Until the ABI version is not set by the userspace, the kernel
+> cannot return a comprehensive set of information inside the
+> prod header (entry size and number of entries in the fault queue).
+
+It's not clear to me why two regions are required for this.  If the
+first page is not mmap capable, why does it need to be read-only?  If
+it were not read-only couldn't the fields of the second region also fit
+within this first page?  If you wanted to deal with an mmap capable
+writeable region, it could just be yet a 3rd page in the first region.
+
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
 > ---
->  drivers/iommu/iommu.c | 77 ++++++++++++++++++++++++++++++++++++++++++-
->  include/linux/iommu.h | 51 ++++++++++++++++++++++++++++
->  2 files changed, 127 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index 795518445a3a..13b301cfb10f 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -869,7 +869,14 @@ EXPORT_SYMBOL_GPL(iommu_group_unregister_notifier);
->   * @data: private data passed as argument to the handler
->   *
->   * When an IOMMU fault event is received, this handler gets called with the
-> - * fault event and data as argument.
-> + * fault event and data as argument. The handler should return 0 on success. If
-> + * the fault is recoverable (IOMMU_FAULT_PAGE_REQ), the handler should also
-> + * complete the fault by calling iommu_page_response() with one of the following
-> + * response code:
-> + * - IOMMU_PAGE_RESP_SUCCESS: retry the translation
-> + * - IOMMU_PAGE_RESP_INVALID: terminate the fault
-> + * - IOMMU_PAGE_RESP_FAILURE: terminate the fault and stop reporting
-> + *   page faults if possible.
->   *
->   * Return 0 if the fault handler was installed successfully, or an error.
->   */
-> @@ -904,6 +911,8 @@ int iommu_register_device_fault_handler(struct device *dev,
->  	}
->  	param->fault_param->handler = handler;
->  	param->fault_param->data = data;
-> +	mutex_init(&param->fault_param->lock);
-> +	INIT_LIST_HEAD(&param->fault_param->faults);
->  
->  done_unlock:
->  	mutex_unlock(&param->lock);
-> @@ -934,6 +943,12 @@ int iommu_unregister_device_fault_handler(struct device *dev)
->  	if (!param->fault_param)
->  		goto unlock;
->  
-> +	/* we cannot unregister handler if there are pending faults */
-> +	if (!list_empty(&param->fault_param->faults)) {
-> +		ret = -EBUSY;
-> +		goto unlock;
-> +	}
-
-Why?  Attempting to unregister a fault handler suggests the handler
-doesn't care about outstanding faults.  Can't we go ahead and dispatch
-them as failed?  Otherwise we need to be careful that we don't
-introduce an environment where the registered fault handler is blocked
-trying to shutdown and release the device due to a flood of errors.
-Thanks,
-
-Alex
-
-> +
->  	kfree(param->fault_param);
->  	param->fault_param = NULL;
->  	put_device(dev);
-> @@ -958,6 +973,7 @@ EXPORT_SYMBOL_GPL(iommu_unregister_device_fault_handler);
->  int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
->  {
->  	struct iommu_param *param = dev->iommu_param;
-> +	struct iommu_fault_event *evt_pending;
->  	struct iommu_fault_param *fparam;
->  	int ret = 0;
->  
-> @@ -972,6 +988,20 @@ int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
->  		ret = -EINVAL;
->  		goto done_unlock;
->  	}
-> +
-> +	if (evt->fault.type == IOMMU_FAULT_PAGE_REQ &&
-> +	    (evt->fault.prm.flags & IOMMU_FAULT_PAGE_REQUEST_LAST_PAGE)) {
-> +		evt_pending = kmemdup(evt, sizeof(struct iommu_fault_event),
-> +				      GFP_KERNEL);
-> +		if (!evt_pending) {
-> +			ret = -ENOMEM;
-> +			goto done_unlock;
-> +		}
-> +		mutex_lock(&fparam->lock);
-> +		list_add_tail(&evt_pending->list, &fparam->faults);
-> +		mutex_unlock(&fparam->lock);
-> +	}
-> +
->  	ret = fparam->handler(evt, fparam->data);
->  done_unlock:
->  	mutex_unlock(&param->lock);
-> @@ -1513,6 +1543,51 @@ int iommu_attach_device(struct iommu_domain *domain, struct device *dev)
+> v4 -> v5
+> - check cons is not null in vfio_pci_check_cons_fault
+> 
+> v3 -> v4:
+> - use 2 separate regions, respectively in read and write modes
+> - add the version capability
+> ---
+>  drivers/vfio/pci/vfio_pci.c         | 105 ++++++++++++++++++++++++++++
+>  drivers/vfio/pci/vfio_pci_private.h |  17 +++++
+>  drivers/vfio/pci/vfio_pci_rdwr.c    |  73 +++++++++++++++++++
+>  include/uapi/linux/vfio.h           |  42 +++++++++++
+>  4 files changed, 237 insertions(+)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index cab71da46f4a..f75f61127277 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -261,6 +261,106 @@ int vfio_pci_set_power_state(struct vfio_pci_device *vdev, pci_power_t state)
+>  	return ret;
 >  }
->  EXPORT_SYMBOL_GPL(iommu_attach_device);
 >  
-> +int iommu_page_response(struct device *dev,
-> +			struct page_response_msg *msg)
+> +void vfio_pci_fault_release(struct vfio_pci_device *vdev,
+> +			    struct vfio_pci_region *region)
 > +{
-> +	struct iommu_param *param = dev->iommu_param;
-> +	int ret = -EINVAL;
-> +	struct iommu_fault_event *evt;
-> +	struct iommu_domain *domain = iommu_get_domain_for_dev(dev);
+> +}
 > +
-> +	if (!domain || !domain->ops->page_response)
-> +		return -ENODEV;
+> +static const struct vfio_pci_fault_abi fault_abi_versions[] = {
+> +	[0] = {
+> +		.entry_size = sizeof(struct iommu_fault),
+> +	},
+> +};
 > +
-> +	/*
-> +	 * Device iommu_param should have been allocated when device is
-> +	 * added to its iommu_group.
-> +	 */
-> +	if (!param || !param->fault_param)
-> +		return -EINVAL;
+> +#define NR_FAULT_ABIS ARRAY_SIZE(fault_abi_versions)
+
+This looks like it's leading to some dangerous complicated code to
+support multiple user selected ABIs.  How many ABIs do we plan to
+support?  The region capability also exposes a type, sub-type, and
+version.  How much of this could be exposed that way?  ie. if we need
+to support multiple versions, expose multiple regions.
+
 > +
-> +	/* Only send response if there is a fault report pending */
-> +	mutex_lock(&param->fault_param->lock);
-> +	if (list_empty(&param->fault_param->faults)) {
-> +		pr_warn("no pending PRQ, drop response\n");
-> +		goto done_unlock;
-> +	}
-> +	/*
-> +	 * Check if we have a matching page request pending to respond,
-> +	 * otherwise return -EINVAL
-> +	 */
-> +	list_for_each_entry(evt, &param->fault_param->faults, list) {
-> +		if (evt->fault.prm.pasid == msg->pasid &&
-> +		    evt->fault.prm.grpid == msg->grpid) {
-> +			msg->iommu_data = evt->iommu_private;
-> +			ret = domain->ops->page_response(dev, msg);
-> +			list_del(&evt->list);
-> +			kfree(evt);
-> +			break;
-> +		}
-> +	}
+> +static int vfio_pci_fault_prod_add_capability(struct vfio_pci_device *vdev,
+> +		struct vfio_pci_region *region, struct vfio_info_cap *caps)
+> +{
+> +	struct vfio_region_info_cap_fault cap = {
+> +		.header.id = VFIO_REGION_INFO_CAP_PRODUCER_FAULT,
+> +		.header.version = 1,
+> +		.version = NR_FAULT_ABIS,
+> +	};
+> +	return vfio_info_add_capability(caps, &cap.header, sizeof(cap));
+> +}
 > +
-> +done_unlock:
-> +	mutex_unlock(&param->fault_param->lock);
+> +static const struct vfio_pci_regops vfio_pci_fault_cons_regops = {
+> +	.rw		= vfio_pci_fault_cons_rw,
+> +	.release	= vfio_pci_fault_release,
+> +};
+> +
+> +static const struct vfio_pci_regops vfio_pci_fault_prod_regops = {
+> +	.rw		= vfio_pci_fault_prod_rw,
+> +	.release	= vfio_pci_fault_release,
+> +	.add_capability = vfio_pci_fault_prod_add_capability,
+> +};
+> +
+> +static int vfio_pci_init_fault_region(struct vfio_pci_device *vdev)
+> +{
+> +	struct vfio_region_fault_prod *header;
+> +	int ret;
+> +
+> +	mutex_init(&vdev->fault_queue_lock);
+> +
+> +	vdev->fault_pages = kzalloc(3 * PAGE_SIZE, GFP_KERNEL);
+> +	if (!vdev->fault_pages)
+> +		return -ENOMEM;
+> +
+> +	ret = vfio_pci_register_dev_region(vdev,
+> +		VFIO_REGION_TYPE_NESTED,
+> +		VFIO_REGION_SUBTYPE_NESTED_FAULT_PROD,
+> +		&vfio_pci_fault_prod_regops, 2 * PAGE_SIZE,
+> +		VFIO_REGION_INFO_FLAG_READ, vdev->fault_pages);
+
+If mmap isn't supported yet, why are we pushing the queue out to the
+2nd page?  We're just wasting space.  vfio_region_fault_prod.offset
+allows us to relocate it when/if it is mmap capable.
+
+> +	if (ret)
+> +		goto out;
+> +
+> +	ret = vfio_pci_register_dev_region(vdev,
+> +		VFIO_REGION_TYPE_NESTED,
+> +		VFIO_REGION_SUBTYPE_NESTED_FAULT_CONS,
+> +		&vfio_pci_fault_cons_regops,
+> +		sizeof(struct vfio_region_fault_cons),
+> +		VFIO_REGION_INFO_FLAG_WRITE,
+> +		vdev->fault_pages + 2 * PAGE_SIZE);
+
+What's the remaining (PAGE_SIZE - sizeof(struct vfio_region_fault_cons))
+bytes used for?
+
+> +	if (ret)
+> +		goto out;
+> +
+> +	header = (struct vfio_region_fault_prod *)vdev->fault_pages;
+> +	header->version = -1;
+> +	header->offset = PAGE_SIZE;
+> +	return 0;
+> +out:
+> +	kfree(vdev->fault_pages);
 > +	return ret;
 > +}
-> +EXPORT_SYMBOL_GPL(iommu_page_response);
 > +
->  static void __iommu_detach_device(struct iommu_domain *domain,
->  				  struct device *dev)
->  {
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index b87b74c63cf9..950347be47f9 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -191,6 +191,42 @@ struct iommu_sva_ops {
->  
->  #ifdef CONFIG_IOMMU_API
->  
-> +/**
-> + * enum page_response_code - Return status of fault handlers, telling the IOMMU
-> + * driver how to proceed with the fault.
-> + *
-> + * @IOMMU_PAGE_RESP_SUCCESS: Fault has been handled and the page tables
-> + *	populated, retry the access. This is "Success" in PCI PRI.
-> + * @IOMMU_PAGE_RESP_FAILURE: General error. Drop all subsequent faults from
-> + *	this device if possible. This is "Response Failure" in PCI PRI.
-> + * @IOMMU_PAGE_RESP_INVALID: Could not handle this fault, don't retry the
-> + *	access. This is "Invalid Request" in PCI PRI.
-> + */
-> +enum page_response_code {
-> +	IOMMU_PAGE_RESP_SUCCESS = 0,
-> +	IOMMU_PAGE_RESP_INVALID,
-> +	IOMMU_PAGE_RESP_FAILURE,
-> +};
-> +
-> +/**
-> + * struct page_response_msg - Generic page response information based on PCI ATS
-> + *                            and PASID spec
-> + * @addr: servicing page address
-> + * @pasid: contains process address space ID
-> + * @pasid_present: the @pasid field is valid
-> + * @resp_code: response code
-> + * @grpid: page request group index
-> + * @iommu_data: data private to the IOMMU
-> + */
-> +struct page_response_msg {
-> +	u64 addr;
-> +	u32 pasid;
-> +	u32 pasid_present:1;
-> +	enum page_response_code resp_code;
-> +	u32 grpid;
-> +	u64 iommu_data;
-> +};
-> +
->  /**
->   * struct iommu_ops - iommu ops and capabilities
->   * @capable: check capability
-> @@ -227,6 +263,7 @@ struct iommu_sva_ops {
->   * @sva_bind: Bind process address space to device
->   * @sva_unbind: Unbind process address space from device
->   * @sva_get_pasid: Get PASID associated to a SVA handle
-> + * @page_response: handle page request response
->   * @pgsize_bitmap: bitmap of all possible supported page sizes
->   */
->  struct iommu_ops {
-> @@ -287,6 +324,8 @@ struct iommu_ops {
->  	void (*sva_unbind)(struct iommu_sva *handle);
->  	int (*sva_get_pasid)(struct iommu_sva *handle);
->  
-> +	int (*page_response)(struct device *dev, struct page_response_msg *msg);
-> +
->  	unsigned long pgsize_bitmap;
->  };
->  
-> @@ -311,11 +350,13 @@ struct iommu_device {
->   * unrecoverable faults such as DMA or IRQ remapping faults.
->   *
->   * @fault: fault descriptor
-> + * @list: pending fault event list, used for tracking responses
->   * @iommu_private: used by the IOMMU driver for storing fault-specific
->   *                 data. Users should not modify this field before
->   *                 sending the fault response.
->   */
->  struct iommu_fault_event {
-> +	struct list_head list;
->  	struct iommu_fault fault;
->  	u64 iommu_private;
->  };
-> @@ -325,10 +366,14 @@ struct iommu_fault_event {
->   *
->   * @handler: Callback function to handle IOMMU faults at device level
->   * @data: handler private data
-> + * @faults: holds the pending faults which needs response, e.g. page response.
-> + * @lock: protect pending faults list
->   */
->  struct iommu_fault_param {
->  	iommu_dev_fault_handler_t handler;
->  	void *data;
-> +	struct list_head faults;
-> +	struct mutex lock;
->  };
->  
->  /**
-> @@ -443,6 +488,7 @@ extern int iommu_unregister_device_fault_handler(struct device *dev);
->  extern int iommu_report_device_fault(struct device *dev,
->  				     struct iommu_fault_event *evt);
->  
-> +extern int iommu_page_response(struct device *dev, struct page_response_msg *msg);
->  extern int iommu_group_id(struct iommu_group *group);
->  extern struct iommu_group *iommu_group_get_for_dev(struct device *dev);
->  extern struct iommu_domain *iommu_group_default_domain(struct iommu_group *);
-> @@ -770,6 +816,11 @@ int iommu_report_device_fault(struct device *dev, struct iommu_fault_event *evt)
->  	return -ENODEV;
->  }
->  
-> +static inline int iommu_page_response(struct device *dev, struct page_response_msg *msg)
+> +int vfio_pci_check_cons_fault(struct vfio_pci_device *vdev,
+> +			     struct vfio_region_fault_cons *cons_header)
 > +{
-> +	return -ENODEV;
+> +	struct vfio_region_fault_prod *prod_header =
+> +		(struct vfio_region_fault_prod *)vdev->fault_pages;
+> +
+> +	if (cons_header->version > NR_FAULT_ABIS)
+> +		return -EINVAL;
+> +
+> +	if (!vdev->fault_abi) {
+> +		vdev->fault_abi = cons_header->version;
+> +		prod_header->entry_size =
+> +			fault_abi_versions[vdev->fault_abi - 1].entry_size;
+> +		prod_header->nb_entries = PAGE_SIZE / prod_header->entry_size;
+
+Is this sufficient for 4K hosts?  Clearly a 64K host has 16x the number
+of entries, so if this is a heuristic the results are vastly different.
+
+> +		return 0;
+> +	}
+> +
+> +	/* Fault ABI is set */
+> +	if (cons_header->version != vdev->fault_abi)
+> +		return -EINVAL;
+> +
+> +	if (cons_header->cons && cons_header->cons >= prod_header->nb_entries)
+
+First test seems unnecessary.
+
+> +		return -EINVAL;
+> +
+> +	return 0;
 > +}
 > +
->  static inline int iommu_group_id(struct iommu_group *group)
+>  static int vfio_pci_enable(struct vfio_pci_device *vdev)
 >  {
->  	return -ENODEV;
+>  	struct pci_dev *pdev = vdev->pdev;
+> @@ -359,6 +459,10 @@ static int vfio_pci_enable(struct vfio_pci_device *vdev)
+>  		}
+>  	}
+>  
+> +	ret = vfio_pci_init_fault_region(vdev);
+> +	if (ret)
+> +		goto disable_exit;
+> +
+>  	vfio_pci_probe_mmaps(vdev);
+>  
+>  	return 0;
+> @@ -1374,6 +1478,7 @@ static void vfio_pci_remove(struct pci_dev *pdev)
+>  
+>  	vfio_iommu_group_put(pdev->dev.iommu_group, &pdev->dev);
+>  	kfree(vdev->region);
+> +	kfree(vdev->fault_pages);
+>  	mutex_destroy(&vdev->ioeventfds_lock);
+>  
+>  	if (!disable_idle_d3)
+> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+> index 1812cf22fc4f..8e0a55682d3f 100644
+> --- a/drivers/vfio/pci/vfio_pci_private.h
+> +++ b/drivers/vfio/pci/vfio_pci_private.h
+> @@ -122,9 +122,12 @@ struct vfio_pci_device {
+>  	int			ioeventfds_nr;
+>  	struct eventfd_ctx	*err_trigger;
+>  	struct eventfd_ctx	*req_trigger;
+> +	struct mutex		fault_queue_lock;
+> +	int			fault_abi;
+>  	struct list_head	dummy_resources_list;
+>  	struct mutex		ioeventfds_lock;
+>  	struct list_head	ioeventfds_list;
+> +	u8			*fault_pages;
+>  };
+>  
+>  #define is_intx(vdev) (vdev->irq_type == VFIO_PCI_INTX_IRQ_INDEX)
+> @@ -153,6 +156,18 @@ extern ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
+>  extern long vfio_pci_ioeventfd(struct vfio_pci_device *vdev, loff_t offset,
+>  			       uint64_t data, int count, int fd);
+>  
+> +struct vfio_pci_fault_abi {
+> +	u32 entry_size;
+> +};
+> +
+> +extern size_t vfio_pci_fault_cons_rw(struct vfio_pci_device *vdev,
+> +				     char __user *buf, size_t count,
+> +				     loff_t *ppos, bool iswrite);
+> +
+> +extern size_t vfio_pci_fault_prod_rw(struct vfio_pci_device *vdev,
+> +				     char __user *buf, size_t count,
+> +				     loff_t *ppos, bool iswrite);
+> +
+>  extern int vfio_pci_init_perm_bits(void);
+>  extern void vfio_pci_uninit_perm_bits(void);
+>  
+> @@ -166,6 +181,8 @@ extern int vfio_pci_register_dev_region(struct vfio_pci_device *vdev,
+>  
+>  extern int vfio_pci_set_power_state(struct vfio_pci_device *vdev,
+>  				    pci_power_t state);
+> +extern int vfio_pci_check_cons_fault(struct vfio_pci_device *vdev,
+> +				     struct vfio_region_fault_cons *header);
+>  
+>  #ifdef CONFIG_VFIO_PCI_IGD
+>  extern int vfio_pci_igd_init(struct vfio_pci_device *vdev);
+> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+> index a6029d0a5524..67cd9363f4e7 100644
+> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
+> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+> @@ -277,6 +277,79 @@ ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
+>  	return done;
+>  }
+>  
+> +/* Read-only region */
+> +size_t vfio_pci_fault_prod_rw(struct vfio_pci_device *vdev, char __user *buf,
+> +			      size_t count, loff_t *ppos, bool iswrite)
+> +{
+> +	unsigned int i = VFIO_PCI_OFFSET_TO_INDEX(*ppos) - VFIO_PCI_NUM_REGIONS;
+> +	void *base = vdev->region[i].data;
+> +	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+> +	int ret = 0;
+> +
+> +	if (iswrite)
+> +		return 0;
+> +
+> +	if (!vdev->fault_abi)
+> +		return -EINVAL;
+> +
+> +	if (pos >= vdev->region[i].size)
+> +		return -EINVAL;
+> +
+> +	count = min(count, (size_t)(vdev->region[i].size - pos));
+> +
+> +	mutex_lock(&vdev->fault_queue_lock);
+> +
+> +	if (copy_to_user(buf, base + pos, count)) {
+> +		ret = -EFAULT;
+> +		goto unlock;
+> +	}
+> +	*ppos += count;
+> +	ret = count;
+> +unlock:
+> +	mutex_unlock(&vdev->fault_queue_lock);
+> +	return ret;
+> +}
+> +
+> +
+> +/* write only */
+> +size_t vfio_pci_fault_cons_rw(struct vfio_pci_device *vdev, char __user *buf,
+> +			      size_t count, loff_t *ppos, bool iswrite)
+> +{
+> +	unsigned int i = VFIO_PCI_OFFSET_TO_INDEX(*ppos) - VFIO_PCI_NUM_REGIONS;
+> +	void *base = vdev->region[i].data;
+> +	loff_t pos = *ppos & VFIO_PCI_OFFSET_MASK;
+> +	struct vfio_region_fault_cons *header;
+> +	struct vfio_region_fault_cons orig_header =
+> +		*(struct vfio_region_fault_cons *)base;
+> +	int ret = 0;
+> +
+> +	if (!iswrite)
+> +		return 0;
+> +
+> +	if (pos >= vdev->region[i].size)
+> +		return -EINVAL;
+> +
+> +	count = min(count, (size_t)(vdev->region[i].size - pos));
+> +
+> +	mutex_lock(&vdev->fault_queue_lock);
+> +
+> +	if (copy_from_user(base + pos, buf, count)) {
+> +		ret = -EFAULT;
+> +		goto unlock;
+> +	}
+> +	header = (struct vfio_region_fault_cons *)base;
+> +	ret = vfio_pci_check_cons_fault(vdev, header);
+> +	if (ret) {
+> +		*header = orig_header;
+> +		goto unlock;
+> +	}
+> +	*ppos += count;
+> +	ret = count;
+> +unlock:
+> +	mutex_unlock(&vdev->fault_queue_lock);
+> +	return ret;
+> +}
+> +
+>  static int vfio_pci_ioeventfd_handler(void *opaque, void *unused)
+>  {
+>  	struct vfio_pci_ioeventfd *ioeventfd = opaque;
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 2774a1ab37ae..13e041b84d48 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -307,6 +307,10 @@ struct vfio_region_info_cap_type {
+>  #define VFIO_REGION_TYPE_GFX                    (1)
+>  #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
+>  
+> +#define VFIO_REGION_TYPE_NESTED			(2)
+> +#define VFIO_REGION_SUBTYPE_NESTED_FAULT_PROD	(1)
+> +#define VFIO_REGION_SUBTYPE_NESTED_FAULT_CONS	(2)
+> +
+>  /**
+>   * struct vfio_region_gfx_edid - EDID region layout.
+>   *
+> @@ -701,6 +705,44 @@ struct vfio_device_ioeventfd {
+>  
+>  #define VFIO_DEVICE_IOEVENTFD		_IO(VFIO_TYPE, VFIO_BASE + 16)
+>  
+> +
+> +/*
+> + * Capability exposed by the Producer Fault Region
+> + * @version: max fault ABI version supported by the kernel
+> + */
+> +#define VFIO_REGION_INFO_CAP_PRODUCER_FAULT	6
+> +
+> +struct vfio_region_info_cap_fault {
+> +	struct vfio_info_cap_header header;
+> +	__u32 version;
+> +};
+> +
+> +/*
+> + * Producer Fault Region (Read-Only from user space perspective)
+> + * Contains the fault circular buffer and the producer index
+> + * @version: version of the fault record uapi
+> + * @entry_size: size of each fault record
+> + * @offset: offset of the start of the queue
+> + * @prod: producer index relative to the start of the queue
+> + */
+> +struct vfio_region_fault_prod {
+> +	__u32   version;
+> +	__u32	nb_entries;
+> +	__u32   entry_size;
+> +	__u32	offset;
+> +	__u32   prod;
+> +};
+> +
+> +/*
+> + * Consumer Fault Region (Write-Only from the user space perspective)
+> + * @version: ABI version requested by the userspace
+> + * @cons: consumer index relative to the start of the queue
+> + */
+> +struct vfio_region_fault_cons {
+> +	__u32 version;
+> +	__u32 cons;
+> +};
+
+I think there are more common semantics than this prod/cons
+terminology, for example head/tail.
+
+> +
+>  /* -------- API for Type1 VFIO IOMMU -------- */
+>  
+>  /**
 
