@@ -2,115 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F23A32DFF
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 12:51:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D00832E30
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2019 13:07:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727572AbfFCKvE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Jun 2019 06:51:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59500 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727476AbfFCKvD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Jun 2019 06:51:03 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 117E93082134;
-        Mon,  3 Jun 2019 10:51:03 +0000 (UTC)
-Received: from localhost (ovpn-204-96.brq.redhat.com [10.40.204.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 93A1461101;
-        Mon,  3 Jun 2019 10:51:02 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
-Subject: [PULL 7/7] s390/cio: Remove vfio-ccw checks of command codes
-Date:   Mon,  3 Jun 2019 12:50:38 +0200
-Message-Id: <20190603105038.11788-8-cohuck@redhat.com>
-In-Reply-To: <20190603105038.11788-1-cohuck@redhat.com>
-References: <20190603105038.11788-1-cohuck@redhat.com>
+        id S1727714AbfFCLHW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Jun 2019 07:07:22 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:34291 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725856AbfFCLHW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Jun 2019 07:07:22 -0400
+Received: by mail-wr1-f65.google.com with SMTP id e16so3326499wrn.1
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2019 04:07:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=Rdf+QSazMX9W42t15vMnXFExNCmmHTg2hetZgBVUhIY=;
+        b=WQQlHdIZ6MDv6ZmOO2MM2Ts4kcZprbpK7YCdlOFfdPeA4zFcfQyJwzlm6Q3xKmfGVK
+         l7F1FlEBaOpkHolb8haIhdKWpLNghLZFi3T/VpO04vvXBExO/TeuhmHgcve0YZ4VXlv6
+         GzGZHu1bmhXIaoLvvRLxZq4nV2hPRb2CIiaBHJgyymyNyDj8vsu/rgceSmiMsoxq8/Bm
+         DGd+72oE6vS05RndDjjpChkSBZSUJ+30uZhVjj0IUE1LSf+MvFUB3h3tC+4gPX6lGYKO
+         Is69pJbPrhmWhyyfLzGIByCp2723cC+aq8Pc8gVvN7vSlSb9qhWakPoZ37T3+FeGL9tS
+         cOWQ==
+X-Gm-Message-State: APjAAAW2JtCoTFygtKw6v45V75c8HLqXcgiQWh5GJcDk1u9/Nei9tLCH
+        ydNIIDYiRUASB3vf94m1r9s1/w==
+X-Google-Smtp-Source: APXvYqzxDfQTTupgrN70BEqNhLgAiEj+6mlq4Bfy4o1lRFeVEHVZDlJsyp3DX8S5zo8Bj0v34tqjEQ==
+X-Received: by 2002:adf:aa0a:: with SMTP id p10mr15815063wrd.125.1559560040922;
+        Mon, 03 Jun 2019 04:07:20 -0700 (PDT)
+Received: from steredhat.homenet.telecomitalia.it (host253-229-dynamic.248-95-r.retail.telecomitalia.it. [95.248.229.253])
+        by smtp.gmail.com with ESMTPSA id w14sm1632043wrk.44.2019.06.03.04.07.19
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 03 Jun 2019 04:07:20 -0700 (PDT)
+Date:   Mon, 3 Jun 2019 13:07:17 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     David Miller <davem@davemloft.net>
+Cc:     netdev@vger.kernel.org, stefanha@redhat.com,
+        virtualization@lists.linux-foundation.org, mst@redhat.com,
+        jasowang@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v3 2/5] vsock/virtio: fix locking for fwd_cnt and
+ buf_alloc
+Message-ID: <20190603110717.rjbwfojpdpye3yxe@steredhat.homenet.telecomitalia.it>
+References: <20190531133954.122567-1-sgarzare@redhat.com>
+ <20190531133954.122567-3-sgarzare@redhat.com>
+ <20190602.180334.1932703293092139564.davem@davemloft.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Mon, 03 Jun 2019 10:51:03 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190602.180334.1932703293092139564.davem@davemloft.net>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Eric Farman <farman@linux.ibm.com>
+On Sun, Jun 02, 2019 at 06:03:34PM -0700, David Miller wrote:
+> From: Stefano Garzarella <sgarzare@redhat.com>
+> Date: Fri, 31 May 2019 15:39:51 +0200
+> 
+> > @@ -434,7 +434,9 @@ void virtio_transport_set_buffer_size(struct vsock_sock *vsk, u64 val)
+> >  	if (val > vvs->buf_size_max)
+> >  		vvs->buf_size_max = val;
+> >  	vvs->buf_size = val;
+> > +	spin_lock_bh(&vvs->rx_lock);
+> >  	vvs->buf_alloc = val;
+> > +	spin_unlock_bh(&vvs->rx_lock);
+> 
+> This locking doesn't do anything other than to strongly order the
+> buf_size store to occur before the buf_alloc one.
 
-If the CCW being processed is a No-Operation, then by definition no
-data is being transferred.  Let's fold those checks into the normal
-CCW processors, rather than skipping out early.
+Sure, I'll remove the lock. I was confused because I moved its reading
+under the rx_lock (together with other variables), but here I'm updating
+only buf_alloc, so this lock is useless.
 
-Likewise, if the CCW being processed is a "test" (a category defined
-here as an opcode that contains zero in the lowest four bits) then no
-special processing is necessary as far as vfio-ccw is concerned.
-These command codes have not been valid since the S/370 days, meaning
-they are invalid in the same way as one that ends in an eight [1] or
-an otherwise valid command code that is undefined for the device type
-in question.  Considering that, let's just process "test" CCWs like
-any other CCW, and send everything to the hardware.
-
-[1] POPS states that a x08 is a TIC CCW, and that having any high-order
-bits enabled is invalid for format-1 CCWs.  For format-0 CCWs, the
-high-order bits are ignored.
-
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
-Message-Id: <20190516161403.79053-4-farman@linux.ibm.com>
-Acked-by: Farhan Ali <alifm@linux.ibm.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- drivers/s390/cio/vfio_ccw_cp.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-index c77c9b4cd2a8..f73cfcfdd032 100644
---- a/drivers/s390/cio/vfio_ccw_cp.c
-+++ b/drivers/s390/cio/vfio_ccw_cp.c
-@@ -295,8 +295,6 @@ static long copy_ccw_from_iova(struct channel_program *cp,
- #define ccw_is_read_backward(_ccw) (((_ccw)->cmd_code & 0x0F) == 0x0C)
- #define ccw_is_sense(_ccw) (((_ccw)->cmd_code & 0x0F) == CCW_CMD_BASIC_SENSE)
- 
--#define ccw_is_test(_ccw) (((_ccw)->cmd_code & 0x0F) == 0)
--
- #define ccw_is_noop(_ccw) ((_ccw)->cmd_code == CCW_CMD_NOOP)
- 
- #define ccw_is_tic(_ccw) ((_ccw)->cmd_code == CCW_CMD_TIC)
-@@ -320,6 +318,10 @@ static inline int ccw_does_data_transfer(struct ccw1 *ccw)
- 	if (ccw->count == 0)
- 		return 0;
- 
-+	/* If the command is a NOP, then no data will be transferred */
-+	if (ccw_is_noop(ccw))
-+		return 0;
-+
- 	/* If the skip flag is off, then data will be transferred */
- 	if (!ccw_is_skip(ccw))
- 		return 1;
-@@ -404,7 +406,7 @@ static void ccwchain_cda_free(struct ccwchain *chain, int idx)
- {
- 	struct ccw1 *ccw = chain->ch_ccw + idx;
- 
--	if (ccw_is_test(ccw) || ccw_is_noop(ccw) || ccw_is_tic(ccw))
-+	if (ccw_is_tic(ccw))
- 		return;
- 
- 	kfree((void *)(u64)ccw->cda);
-@@ -730,9 +732,6 @@ static int ccwchain_fetch_one(struct ccwchain *chain,
- {
- 	struct ccw1 *ccw = chain->ch_ccw + idx;
- 
--	if (ccw_is_test(ccw) || ccw_is_noop(ccw))
--		return 0;
--
- 	if (ccw_is_tic(ccw))
- 		return ccwchain_fetch_tic(chain, idx, cp);
- 
--- 
-2.20.1
-
+Thanks,
+Stefano
