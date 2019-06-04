@@ -2,95 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C8C06349A5
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 15:59:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 857C034A19
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 16:19:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727591AbfFDN7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 09:59:10 -0400
-Received: from mga14.intel.com ([192.55.52.115]:24617 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727033AbfFDN7K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 09:59:10 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Jun 2019 06:59:09 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by fmsmga005.fm.intel.com with ESMTP; 04 Jun 2019 06:59:09 -0700
-Date:   Tue, 4 Jun 2019 06:59:09 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm@vger.kernel.org, rkrcmar@redhat.com, pbonzini@redhat.com,
-        jmattson@google.com
-Subject: Re: [PATCH 1/2] kvm-unit-test: x86: Add a wrapper to check if the
- CPU supports NX bit in MSR_EFER
-Message-ID: <20190604135908.GP13384@linux.intel.com>
-References: <20190522234545.5930-1-krish.sadhukhan@oracle.com>
- <20190522234545.5930-2-krish.sadhukhan@oracle.com>
+        id S1727978AbfFDOTC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 10:19:02 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:52496 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727436AbfFDOSD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jun 2019 10:18:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=NXx6PmnhUtUTm/ybGqV0WKQy6usM3ULP72To5/hYtqI=; b=hhBf5LG46k5k+tlTkgrDdgTk9s
+        okl9la7n1x4PnoWk8QeEavzXjTZaCxWLoPU9MPEH6BMBEhTdezg9JgJLifi84w+ITFDVVepvlgHdJ
+        +3gXP2f/T5HL+E1Fr2eK8qcTk0wRY7aZNdSl+oZE4ODiLUcZJPdF8VZT2ZBYg0KA7dFfe9uWHzKnn
+        zY4EqvnO4WDNlNSaHt+QX8kmpzPZGFsarGscykbhEidJRMDKBCkEcHyM7xjjGK7YWgV3kPFLc9A2C
+        qf/V0mcgqYCaEMZwDtFLm892SiAQ892RqQY8cBtqvcUqJBRWvFvuCBeLG1QtsXNLfUD3Hp2E2Tlwd
+        4ivpsxAA==;
+Received: from [179.182.172.34] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hYAGH-0001Rk-VT; Tue, 04 Jun 2019 14:18:02 +0000
+Received: from mchehab by bombadil.infradead.org with local (Exim 4.92)
+        (envelope-from <mchehab@bombadil.infradead.org>)
+        id 1hYAGE-0002l3-M1; Tue, 04 Jun 2019 11:17:58 -0300
+From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Mauro Carvalho Chehab <mchehab@infradead.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
+Subject: [PATCH v2 07/22] docs: amd-memory-encryption.rst get rid of warnings
+Date:   Tue,  4 Jun 2019 11:17:41 -0300
+Message-Id: <7b916c2b8d551aa06527f332e423e25254b23adc.1559656538.git.mchehab+samsung@kernel.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <cover.1559656538.git.mchehab+samsung@kernel.org>
+References: <cover.1559656538.git.mchehab+samsung@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190522234545.5930-2-krish.sadhukhan@oracle.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 22, 2019 at 07:45:44PM -0400, Krish Sadhukhan wrote:
-> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-> ---
->  lib/x86/processor.h | 8 ++++++++
->  x86/vmexit.c        | 2 +-
->  2 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-> index 15237a5..2ca988e 100644
-> --- a/lib/x86/processor.h
-> +++ b/lib/x86/processor.h
-> @@ -476,4 +476,12 @@ static inline void set_bit(int bit, u8 *addr)
->  			     : "+m" (*addr) : "Ir" (bit) : "cc", "memory");
->  }
->  
-> +static inline int efer_nx_enabled(void)
+Get rid of those warnings:
 
-cpu_has_efer_nx() would be more appropriate.  Most readers would expect
-"enabled" to mean we're checking MSR_EFER.NX==1.
+    Documentation/virtual/kvm/amd-memory-encryption.rst:244: WARNING: Citation [white-paper] is not referenced.
+    Documentation/virtual/kvm/amd-memory-encryption.rst:246: WARNING: Citation [amd-apm] is not referenced.
+    Documentation/virtual/kvm/amd-memory-encryption.rst:247: WARNING: Citation [kvm-forum] is not referenced.
 
-This can have a boolean return value.
+For references that aren't mentioned at the text by adding an
+explicit reference to them.
 
-> +{
-> +	if (cpuid(0x80000001).d & (1 << 20))
-> +		return 1;
-> +	else
-> +		return 0;
-> +}
+Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ Documentation/virtual/kvm/amd-memory-encryption.rst | 3 +++
+ 1 file changed, 3 insertions(+)
 
-This can simply be:
+diff --git a/Documentation/virtual/kvm/amd-memory-encryption.rst b/Documentation/virtual/kvm/amd-memory-encryption.rst
+index 659bbc093b52..d18c97b4e140 100644
+--- a/Documentation/virtual/kvm/amd-memory-encryption.rst
++++ b/Documentation/virtual/kvm/amd-memory-encryption.rst
+@@ -241,6 +241,9 @@ Returns: 0 on success, -negative on error
+ References
+ ==========
+ 
++
++See [white-paper]_, [api-spec]_, [amd-apm]_ and [kvm-forum]_ for more info.
++
+ .. [white-paper] http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
+ .. [api-spec] http://support.amd.com/TechDocs/55766_SEV-KM_API_Specification.pdf
+ .. [amd-apm] http://support.amd.com/TechDocs/24593.pdf (section 15.34)
+-- 
+2.21.0
 
-    return cpuid(0x80000001).d & (1 << 20);
-
-or if gcc complains about boolean stuff:
-
-    return !!(cpuid(0x80000001).d & (1 << 20));
-> +
->  #endif
-> diff --git a/x86/vmexit.c b/x86/vmexit.c
-> index c12dd24..7053a46 100644
-> --- a/x86/vmexit.c
-> +++ b/x86/vmexit.c
-> @@ -526,7 +526,7 @@ static bool do_test(struct test *test)
->  
->  static void enable_nx(void *junk)
->  {
-> -	if (cpuid(0x80000001).d & (1 << 20))
-> +	if (efer_nx_enabled())
->  		wrmsr(MSR_EFER, rdmsr(MSR_EFER) | EFER_NX_MASK);
->  }
->  
-> -- 
-> 2.20.1
-> 
