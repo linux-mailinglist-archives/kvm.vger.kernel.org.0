@@ -2,100 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 44B6C34AFA
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 16:52:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6844A34B0E
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 16:56:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727793AbfFDOwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 10:52:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50420 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727586AbfFDOwA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 10:52:00 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8CA5A30BB367;
-        Tue,  4 Jun 2019 14:51:29 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5D8F410013D9;
-        Tue,  4 Jun 2019 14:51:22 +0000 (UTC)
-Date:   Tue, 4 Jun 2019 16:51:20 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     Michael Mueller <mimu@linux.ibm.com>,
-        KVM Mailing List <kvm@vger.kernel.org>,
-        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>
-Subject: Re: [PATCH v3 4/8] s390/airq: use DMA memory for adapter interrupts
-Message-ID: <20190604165120.5afdce78.cohuck@redhat.com>
-In-Reply-To: <20190604152256.158d688c.pasic@linux.ibm.com>
-References: <20190529122657.166148-1-mimu@linux.ibm.com>
-        <20190529122657.166148-5-mimu@linux.ibm.com>
-        <20190603172740.1023e078.cohuck@redhat.com>
-        <20190604152256.158d688c.pasic@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1727830AbfFDO4Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 10:56:25 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41190 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727574AbfFDO4Y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jun 2019 10:56:24 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x54Eb4gg131109
+        for <kvm@vger.kernel.org>; Tue, 4 Jun 2019 10:56:23 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2swr07902h-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 04 Jun 2019 10:56:22 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Tue, 4 Jun 2019 15:56:21 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 4 Jun 2019 15:56:18 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x54EuFI151314830
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 4 Jun 2019 14:56:15 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C71E1A4059;
+        Tue,  4 Jun 2019 14:56:15 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 43716A404D;
+        Tue,  4 Jun 2019 14:56:15 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.145])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  4 Jun 2019 14:56:15 +0000 (GMT)
+Date:   Tue, 4 Jun 2019 16:56:13 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     Pierre Morel <pmorel@linux.ibm.com>, borntraeger@de.ibm.com,
+        alex.williamson@redhat.com, cohuck@redhat.com,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
+        freude@linux.ibm.com, mimu@linux.ibm.com
+Subject: Re: [PATCH v9 0/4] vfio: ap: AP Queue Interrupt Control
+In-Reply-To: <5b46f988-fa79-4d84-c81f-144daa0c4426@linux.ibm.com>
+References: <1558452877-27822-1-git-send-email-pmorel@linux.ibm.com>
+        <5b46f988-fa79-4d84-c81f-144daa0c4426@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Tue, 04 Jun 2019 14:52:00 +0000 (UTC)
+X-TM-AS-GCONF: 00
+x-cbid: 19060414-4275-0000-0000-0000033CA10B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19060414-4276-0000-0000-0000384CB085
+Message-Id: <20190604165613.4d2803b4.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-04_10:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=839 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906040097
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 4 Jun 2019 15:22:56 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+On Thu, 23 May 2019 11:36:12 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-> On Mon, 3 Jun 2019 17:27:40 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-
-> > Apologies if that already has been answered (and I missed it in my mail
-> > pile...), but two things had come to my mind previously:
+> On 5/21/19 11:34 AM, Pierre Morel wrote:
+> > This patch series implements PQAP/AQIC interception in KVM.
 > > 
-> > - CHSC... does anything need to be done there? Last time I asked:
-> >   "Anyway, css_bus_init() uses some chscs
-> >    early (before cio_dma_pool_init), so we could not use the pools
-> >    there, even if we wanted to. Do chsc commands either work, or else
-> >    fail benignly on a protected virt guest?"  
+
+[..]
+
+> > 
+> > Tony, I did not rebase this series above the dynamic configuration
+> > patches because:
+> > - This series do the work it needs to do without having to take
+> >    care on the dynamic configuration.
+> > - It is guarantied that interrupt will be shut off after removing
+> >    the APQueue device
+> > - The dynamic configuration series is not converging.  
 > 
-> Protected virt won't support all CHSC. The supported ones won't requre
-> use of shared memory. So we are fine.
+> Would you consider the following?
+> 
+> * Take dynconfig patch "s390: vfio-ap: wait for queue empty on queue
 
-I suppose the supported ones are the sync chscs that use the chsc area
-as a direct parameter (and therefore are handled similarly to the other
-I/O instructions that supply a direct parameter)? I don't think we care
-about async chscs in KVM/QEMU anyway, as we don't even emulate chsc
-subchannels :) (And IIRC, you don't get chsc subchannels in z/VM
-guests, either.)
+[..]
 
 > 
-> > - PCI indicators... does this interact with any dma configuration on
-> >   the pci device? (I know pci is not supported yet, and I don't really
-> >   expect any problems.)
-> >   
+> If you do the things above, then I can base the dynconfig series on
+> the IRQ series without much of a merge issue. What say you?
 > 
-> It does but, I'm pretty confident we don't have a problem with PCI. IMHO
-> Sebastian is the guy who needs to be paranoid about this, and he r-b-ed
-> the respective patches.
+> Note: I've included review comments for patch 3/4 to match the
+>        suggestions above.
+> 
+> > 
+> > However Tony, the choice is your's, I won't be able to help
+> > in a near future.
 
-Just wanted to make sure that this was on the radar. You guys are
-obviously in a better position than me to judge this :)
+Since Pierre won't available for a while, and the patches look good
+enough to me, I would like to pick these if nobody objects.
 
-Anyway, I do not intend to annoy with those questions, it's just hard
-to get a feel if there are areas that still need care if you don't have
-access to the documentation for this... if you tell me that you are
-aware of it and it should work, that's fine for me.
+Any objection?
+
+@Tony: Could you please have another look at patch 3? That is the only
+one you haven't r-b yet...
+
+Regards,
+Halil
+
