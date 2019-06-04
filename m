@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CC37346A6
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 14:27:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 306CB34732
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 14:46:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727814AbfFDM1R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 08:27:17 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:33172 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726994AbfFDM1R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 08:27:17 -0400
-Received: by mail-qt1-f193.google.com with SMTP id 14so13468118qtf.0
-        for <kvm@vger.kernel.org>; Tue, 04 Jun 2019 05:27:16 -0700 (PDT)
+        id S1727654AbfFDMpp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 08:45:45 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:40934 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726994AbfFDMpp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jun 2019 08:45:45 -0400
+Received: by mail-pf1-f196.google.com with SMTP id u17so12622782pfn.7
+        for <kvm@vger.kernel.org>; Tue, 04 Jun 2019 05:45:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=wnsJg5IBUcpd0uvGih9L7zWjhXAHb1EJO0yOEExZSzo=;
-        b=dcNC7UmtypwgYv25SVviVAOUG7URTCQh95rjKD+gc1HkGG0jrMjWKvaHqgOqnkLXCe
-         CmoljchytuIVIDVbprMz3tL0S5wF3BfmVPwpXMEcKwEKuopvqQDwmPbpLySBrTe+5P0P
-         +zjXSkVABYGjw15OrEI3UNK6X3hEEYJ5lmU4VodgY1OGgetHeu4xf6gu/Drrr5PoUFZD
-         NGszqORq933qFqUy4wxVOf9PkDJzNBd6Vt6SxvMrx9KcQhBJruI+UAnsanyndNgyFsW8
-         SfJHC+U7tiqZ4PP8CoYnZCXFGYoMymsmvspjQbzELX76TfLMwbqeFyJLFyTuqJIB4Dhp
-         ZF+A==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SX1wXsAGfUFN70h44peTZcKIMqGr5ZE+ZDyQc1zQL5o=;
+        b=E/mvMDTExggwag20QOMbkhKP75T7Pk+0ZF0pcXUr5AaTNbmr23JwDn0UqrTqxdl5Je
+         krdUOdiGs3h2/gebELEz8jqrOUeDCDUC2JEOV4V8ITgtQF1Ax7woXAnTfQ5gsE1sKCk5
+         73PDFS4epP+6c23bo89e7xnteUzAo/q7k0cXafuB0juxjfStepuJz67jDdEHof0O7Ctq
+         rV/upWmgoM7X7JZZHSCmqQbuzKuvYpbwxz+61v3PWpNyw0Pr5WN0hOaTsMwrna556VUE
+         CzT1IMUxqM0c1X/8hXFuS/fU+Fq0VdvtOqB87v2sTCjXWa4vVxnoJGfUoTWZKlqF7TqV
+         Xbpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=wnsJg5IBUcpd0uvGih9L7zWjhXAHb1EJO0yOEExZSzo=;
-        b=e7vLYhtbmktqJbOMbhvcFm+JKqRNFxrHH74E+wKYdle5W9HaDyRefxc5y/S5hqDTFB
-         urkFq2mki7mGsUJ53F37YTYHYspXlCGYeLkpwzJAFcvDC+C0TZBZnxmg4HnPUGOe/Zht
-         83b1OIzICqnDDcuILkayzPfSBLCWv0laQXGfeHdTO8EGWmcydb6De0TMKpnBxiEnN3Ob
-         /KlY9iEJFPAkAhiQVkWUd2vICjz8ZfhimDam7YcbQE8/2CdvAarTNeGmjmkaiz5DBUDq
-         XKyB3UZo1MobMhmbbxXFSj0FF1mPfqGA2u3SeoX7iVnTnDTvTTzC5aOEdrIjyi+3KWyX
-         MsCA==
-X-Gm-Message-State: APjAAAXmjVvD+IM9hOXXpBe5dUq+buBp74zazknLyaH9m8mjaDEFaRxm
-        uXsJaofpiOYTLXCprqyw7kYozg==
-X-Google-Smtp-Source: APXvYqyQKZsajkt/gWb5hfUpWdj5TzMt6KfoFh/bz/W6aTLwqi1dm4Rk21CH5MrcGrt3uoh1Lu64hg==
-X-Received: by 2002:aed:3a87:: with SMTP id o7mr27583430qte.310.1559651236150;
-        Tue, 04 Jun 2019 05:27:16 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
-        by smtp.gmail.com with ESMTPSA id c18sm4454633qkm.78.2019.06.04.05.27.15
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 04 Jun 2019 05:27:15 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1hY8X4-000416-LN; Tue, 04 Jun 2019 09:27:14 -0300
-Date:   Tue, 4 Jun 2019 09:27:14 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Andrey Konovalov <andreyknvl@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SX1wXsAGfUFN70h44peTZcKIMqGr5ZE+ZDyQc1zQL5o=;
+        b=GJvCwjsTd9phWbNk9n4bzMkaHOxcwdLnAmhByzG4NsNOZeqqYblBh0Is3aWx8o36cp
+         CuISteBeyN0x2M8u7lGG4Dh8VBtRR/l95HGFbxpVDF5g5NP2L8xByVod6zweoNSaF8VK
+         jwB41RY0/tt08nDrsxR+s5vr1wxdwf3PAviCCTNVGrfpcDB2HW/9aytXTFwQUx0VQMgE
+         /iN73F7cqrbs60lbeWKKMuw/dfARUxR/BDoKqgb8jD5YmjKkVurSGhQpjRQLNd6Y365J
+         crx5ODd0mgNUqTwSbOrOojHe4zJwGxoZ6nVTdqbh9Dj1eq25U18hVlYO5adexN+snXyT
+         ZSIg==
+X-Gm-Message-State: APjAAAWISqwTGjHuxeGxlOJieRm3kRjtTTrxfiPOx+mtyfWC/Fg46V9h
+        6qQON1E4w14tNCan390HYFfmkSkmFiIFGNkIB+9jag==
+X-Google-Smtp-Source: APXvYqzZt2kMUXJ9WHlwmRLt2vrbUVohOpQLy3RY96eqdlAIdJcx5KC4nxWy0iNPEMefwexAGDMOHmuMZCiVo+DqZfo=
+X-Received: by 2002:a17:90a:2488:: with SMTP id i8mr28955959pje.123.1559652343964;
+ Tue, 04 Jun 2019 05:45:43 -0700 (PDT)
+MIME-Version: 1.0
+References: <cover.1559580831.git.andreyknvl@google.com> <c829f93b19ad6af1b13be8935ce29baa8e58518f.1559580831.git.andreyknvl@google.com>
+ <20190603174619.GC11474@ziepe.ca> <CAAeHK+xy-dx4dLDLLj9dRzRNSVG9H5nDPPnjpYF38qKZNNCh_g@mail.gmail.com>
+ <20190604122714.GA15385@ziepe.ca>
+In-Reply-To: <20190604122714.GA15385@ziepe.ca>
+From:   Andrey Konovalov <andreyknvl@google.com>
+Date:   Tue, 4 Jun 2019 14:45:32 +0200
+Message-ID: <CAAeHK+xyqwuJyviGhvU7L1wPZQF7Mf9g2vgKSsYmML3fV6NrXg@mail.gmail.com>
+Subject: Re: [PATCH v16 12/16] IB, arm64: untag user pointers in ib_uverbs_(re)reg_mr()
+To:     Jason Gunthorpe <jgg@ziepe.ca>
 Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
         Linux Memory Management List <linux-mm@kvack.org>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -87,67 +87,62 @@ Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
         Robin Murphy <robin.murphy@arm.com>,
         Kevin Brodsky <kevin.brodsky@arm.com>,
         Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v16 12/16] IB, arm64: untag user pointers in
- ib_uverbs_(re)reg_mr()
-Message-ID: <20190604122714.GA15385@ziepe.ca>
-References: <cover.1559580831.git.andreyknvl@google.com>
- <c829f93b19ad6af1b13be8935ce29baa8e58518f.1559580831.git.andreyknvl@google.com>
- <20190603174619.GC11474@ziepe.ca>
- <CAAeHK+xy-dx4dLDLLj9dRzRNSVG9H5nDPPnjpYF38qKZNNCh_g@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeHK+xy-dx4dLDLLj9dRzRNSVG9H5nDPPnjpYF38qKZNNCh_g@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 04, 2019 at 02:18:19PM +0200, Andrey Konovalov wrote:
-> On Mon, Jun 3, 2019 at 7:46 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+On Tue, Jun 4, 2019 at 2:27 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+>
+> On Tue, Jun 04, 2019 at 02:18:19PM +0200, Andrey Konovalov wrote:
+> > On Mon, Jun 3, 2019 at 7:46 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > >
+> > > On Mon, Jun 03, 2019 at 06:55:14PM +0200, Andrey Konovalov wrote:
+> > > > This patch is a part of a series that extends arm64 kernel ABI to allow to
+> > > > pass tagged user pointers (with the top byte set to something else other
+> > > > than 0x00) as syscall arguments.
+> > > >
+> > > > ib_uverbs_(re)reg_mr() use provided user pointers for vma lookups (through
+> > > > e.g. mlx4_get_umem_mr()), which can only by done with untagged pointers.
+> > > >
+> > > > Untag user pointers in these functions.
+> > > >
+> > > > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> > > >  drivers/infiniband/core/uverbs_cmd.c | 4 ++++
+> > > >  1 file changed, 4 insertions(+)
+> > > >
+> > > > diff --git a/drivers/infiniband/core/uverbs_cmd.c b/drivers/infiniband/core/uverbs_cmd.c
+> > > > index 5a3a1780ceea..f88ee733e617 100644
+> > > > +++ b/drivers/infiniband/core/uverbs_cmd.c
+> > > > @@ -709,6 +709,8 @@ static int ib_uverbs_reg_mr(struct uverbs_attr_bundle *attrs)
+> > > >       if (ret)
+> > > >               return ret;
+> > > >
+> > > > +     cmd.start = untagged_addr(cmd.start);
+> > > > +
+> > > >       if ((cmd.start & ~PAGE_MASK) != (cmd.hca_va & ~PAGE_MASK))
+> > > >               return -EINVAL;
+> > >
+> > > I feel like we shouldn't thave to do this here, surely the cmd.start
+> > > should flow unmodified to get_user_pages, and gup should untag it?
+> > >
+> > > ie, this sort of direction for the IB code (this would be a giant
+> > > patch, so I didn't have time to write it all, but I think it is much
+> > > saner):
 > >
-> > On Mon, Jun 03, 2019 at 06:55:14PM +0200, Andrey Konovalov wrote:
-> > > This patch is a part of a series that extends arm64 kernel ABI to allow to
-> > > pass tagged user pointers (with the top byte set to something else other
-> > > than 0x00) as syscall arguments.
-> > >
-> > > ib_uverbs_(re)reg_mr() use provided user pointers for vma lookups (through
-> > > e.g. mlx4_get_umem_mr()), which can only by done with untagged pointers.
-> > >
-> > > Untag user pointers in these functions.
-> > >
-> > > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> > >  drivers/infiniband/core/uverbs_cmd.c | 4 ++++
-> > >  1 file changed, 4 insertions(+)
-> > >
-> > > diff --git a/drivers/infiniband/core/uverbs_cmd.c b/drivers/infiniband/core/uverbs_cmd.c
-> > > index 5a3a1780ceea..f88ee733e617 100644
-> > > +++ b/drivers/infiniband/core/uverbs_cmd.c
-> > > @@ -709,6 +709,8 @@ static int ib_uverbs_reg_mr(struct uverbs_attr_bundle *attrs)
-> > >       if (ret)
-> > >               return ret;
-> > >
-> > > +     cmd.start = untagged_addr(cmd.start);
-> > > +
-> > >       if ((cmd.start & ~PAGE_MASK) != (cmd.hca_va & ~PAGE_MASK))
-> > >               return -EINVAL;
+> > Hi Jason,
 > >
-> > I feel like we shouldn't thave to do this here, surely the cmd.start
-> > should flow unmodified to get_user_pages, and gup should untag it?
-> >
-> > ie, this sort of direction for the IB code (this would be a giant
-> > patch, so I didn't have time to write it all, but I think it is much
-> > saner):
-> 
-> Hi Jason,
-> 
-> ib_uverbs_reg_mr() passes cmd.start to mlx4_get_umem_mr(), which calls
-> find_vma(), which only accepts untagged addresses. Could you explain
-> how your patch helps?
+> > ib_uverbs_reg_mr() passes cmd.start to mlx4_get_umem_mr(), which calls
+> > find_vma(), which only accepts untagged addresses. Could you explain
+> > how your patch helps?
+>
+> That mlx4 is just a 'weird duck', it is not the normal flow, and I
+> don't think the core code should be making special consideration for
+> it.
 
-That mlx4 is just a 'weird duck', it is not the normal flow, and I
-don't think the core code should be making special consideration for
-it.
+How do you think we should do untagging (or something else) to deal
+with this 'weird duck' case?
 
-Jason
+>
+> Jason
