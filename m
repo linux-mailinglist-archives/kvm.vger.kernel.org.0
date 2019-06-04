@@ -2,136 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C39634894
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 15:23:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52AB7348D3
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 15:33:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727458AbfFDNXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 09:23:07 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47690 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727264AbfFDNXG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jun 2019 09:23:06 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x54DEhFm035992
-        for <kvm@vger.kernel.org>; Tue, 4 Jun 2019 09:23:05 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2swrc5uk4x-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 04 Jun 2019 09:23:05 -0400
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
-        Tue, 4 Jun 2019 14:23:03 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 4 Jun 2019 14:23:01 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x54DMwfd52559956
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 Jun 2019 13:22:58 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7751CA4059;
-        Tue,  4 Jun 2019 13:22:58 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C92A1A4051;
-        Tue,  4 Jun 2019 13:22:57 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.152.224.145])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  4 Jun 2019 13:22:57 +0000 (GMT)
-Date:   Tue, 4 Jun 2019 15:22:56 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Michael Mueller <mimu@linux.ibm.com>,
-        KVM Mailing List <kvm@vger.kernel.org>,
-        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
+        id S1727591AbfFDNdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 09:33:40 -0400
+Received: from foss.arm.com ([217.140.101.70]:43994 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727271AbfFDNdk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jun 2019 09:33:40 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 50F20341;
+        Tue,  4 Jun 2019 06:33:40 -0700 (PDT)
+Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.144.41])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B5F993F690;
+        Tue,  4 Jun 2019 06:33:39 -0700 (PDT)
+From:   Christoffer Dall <christoffer.dall@arm.com>
+To:     kvm@vger.kernel.org
+Cc:     kvmarm@lists.cs.columbia.edu,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        James Hogan <jhogan@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>
-Subject: Re: [PATCH v3 4/8] s390/airq: use DMA memory for adapter interrupts
-In-Reply-To: <20190603172740.1023e078.cohuck@redhat.com>
-References: <20190529122657.166148-1-mimu@linux.ibm.com>
-        <20190529122657.166148-5-mimu@linux.ibm.com>
-        <20190603172740.1023e078.cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19060413-4275-0000-0000-0000033C8EB0
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19060413-4276-0000-0000-0000384C9DAA
-Message-Id: <20190604152256.158d688c.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-04_09:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906040090
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: [PATCH v3 0/4] KVM: Unify mmu_memory_cache functionality across architectures
+Date:   Tue,  4 Jun 2019 15:33:32 +0200
+Message-Id: <20190604133336.22226-1-christoffer.dall@arm.com>
+X-Mailer: git-send-email 2.18.0
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 3 Jun 2019 17:27:40 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+We currently have duplicated functionality for the mmu_memory_cache used
+to pre-allocate memory for the page table manipulation code which cannot
+allocate memory while holding spinlocks.  This functionality is
+duplicated across x86, arm/arm64, and mips.
 
-> On Wed, 29 May 2019 14:26:53 +0200
-> Michael Mueller <mimu@linux.ibm.com> wrote:
-> 
-> > From: Halil Pasic <pasic@linux.ibm.com>
-> > 
-> > Protected virtualization guests have to use shared pages for airq
-> > notifier bit vectors, because hypervisor needs to write these bits.
-> > 
-> > Let us make sure we allocate DMA memory for the notifier bit vectors by
-> > replacing the kmem_cache with a dma_cache and kalloc() with
-> > cio_dma_zalloc().
-> > 
-> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> > Reviewed-by: Sebastian Ott <sebott@linux.ibm.com>
-> > Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
-> > ---
-> >  arch/s390/include/asm/airq.h |  2 ++
-> >  drivers/s390/cio/airq.c      | 32 ++++++++++++++++++++------------
-> >  drivers/s390/cio/cio.h       |  2 ++
-> >  drivers/s390/cio/css.c       |  1 +
-> >  4 files changed, 25 insertions(+), 12 deletions(-)
-> 
-> Apologies if that already has been answered (and I missed it in my mail
-> pile...), but two things had come to my mind previously:
-> 
-> - CHSC... does anything need to be done there? Last time I asked:
->   "Anyway, css_bus_init() uses some chscs
->    early (before cio_dma_pool_init), so we could not use the pools
->    there, even if we wanted to. Do chsc commands either work, or else
->    fail benignly on a protected virt guest?"
+There were recently a debate of modifying the arm code to be more in
+line with the x86 code and some discussions around changing the page
+flags used for allocation.  This series should make it easier to take a
+uniform approach across architectures.
 
-Protected virt won't support all CHSC. The supported ones won't requre
-use of shared memory. So we are fine.
+While there's not a huge amount of code sharing, we come out with a net
+gain.
 
-> - PCI indicators... does this interact with any dma configuration on
->   the pci device? (I know pci is not supported yet, and I don't really
->   expect any problems.)
-> 
+Only tested on arm/arm64, and only compile-tested on x86 and mips.
 
-It does but, I'm pretty confident we don't have a problem with PCI. IMHO
-Sebastian is the guy who needs to be paranoid about this, and he r-b-ed
-the respective patches.
+Changes since v2:
+ - Simplified kalloc flag definitions as per Paolo's review comment.
 
-Regards,
-Halil
+Changes since v1:
+ - Split out rename from initial x86 patch to have separate patches to
+   move the logic to common code and to rename.
+ - Introduce KVM_ARCH_WANT_MMU_MEMCACHE to avoid compile breakage on
+   architectures that don't use this functionality.
+ - Rename KVM_NR_MEM_OBJS to KVM_MMU_NR_MEMCACHE_OBJS
+
+Christoffer Dall (4):
+  KVM: x86: Move mmu_memory_cache functions to common code
+  KVM: x86: Rename mmu_memory_cache to kvm_mmu_memcache
+  KVM: arm/arm64: Move to common kvm_mmu_memcache infrastructure
+  KVM: mips: Move to common kvm_mmu_memcache infrastructure
+
+ arch/arm/include/asm/kvm_host.h      | 13 +---
+ arch/arm/include/asm/kvm_mmu.h       |  2 +-
+ arch/arm/include/asm/kvm_types.h     | 11 ++++
+ arch/arm64/include/asm/kvm_host.h    | 13 +---
+ arch/arm64/include/asm/kvm_mmu.h     |  2 +-
+ arch/arm64/include/asm/kvm_types.h   | 12 ++++
+ arch/mips/include/asm/kvm_host.h     | 15 +----
+ arch/mips/include/asm/kvm_types.h    | 11 ++++
+ arch/mips/kvm/mips.c                 |  2 +-
+ arch/mips/kvm/mmu.c                  | 54 +++-------------
+ arch/powerpc/include/asm/kvm_types.h |  5 ++
+ arch/s390/include/asm/kvm_types.h    |  5 ++
+ arch/x86/include/asm/kvm_host.h      | 17 +----
+ arch/x86/include/asm/kvm_types.h     | 11 ++++
+ arch/x86/kvm/mmu.c                   | 97 ++++++----------------------
+ arch/x86/kvm/paging_tmpl.h           |  4 +-
+ include/linux/kvm_host.h             | 11 ++++
+ include/linux/kvm_types.h            | 13 ++++
+ virt/kvm/arm/arm.c                   |  2 +-
+ virt/kvm/arm/mmu.c                   | 68 +++++--------------
+ virt/kvm/kvm_main.c                  | 60 +++++++++++++++++
+ 21 files changed, 198 insertions(+), 230 deletions(-)
+ create mode 100644 arch/arm/include/asm/kvm_types.h
+ create mode 100644 arch/arm64/include/asm/kvm_types.h
+ create mode 100644 arch/mips/include/asm/kvm_types.h
+ create mode 100644 arch/powerpc/include/asm/kvm_types.h
+ create mode 100644 arch/s390/include/asm/kvm_types.h
+ create mode 100644 arch/x86/include/asm/kvm_types.h
+
+-- 
+2.18.0
 
