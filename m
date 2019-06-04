@@ -2,156 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A765F34CF5
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 18:12:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 709E134D31
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 18:25:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728308AbfFDQLu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 12:11:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35532 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728293AbfFDQLt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 12:11:49 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0EB493001757;
-        Tue,  4 Jun 2019 16:11:27 +0000 (UTC)
-Received: from [10.36.116.67] (ovpn-116-67.ams2.redhat.com [10.36.116.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E74A1001DFD;
-        Tue,  4 Jun 2019 16:11:11 +0000 (UTC)
-Subject: Re: [PATCH v8 28/29] vfio-pci: Add VFIO_PCI_DMA_FAULT_IRQ_INDEX
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
-        jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
-        jean-philippe.brucker@arm.com, will.deacon@arm.com,
-        robin.murphy@arm.com, kevin.tian@intel.com, ashok.raj@intel.com,
-        marc.zyngier@arm.com, peter.maydell@linaro.org,
-        vincent.stehle@arm.com
-References: <20190526161004.25232-1-eric.auger@redhat.com>
- <20190526161004.25232-29-eric.auger@redhat.com>
- <20190603163130.3f7497ba@x1.home>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <7ba39c76-0b4d-b94f-c516-6414189698f6@redhat.com>
-Date:   Tue, 4 Jun 2019 18:11:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1727588AbfFDQZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 12:25:29 -0400
+Received: from mail-it1-f193.google.com ([209.85.166.193]:53286 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727385AbfFDQZ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jun 2019 12:25:29 -0400
+Received: by mail-it1-f193.google.com with SMTP id m187so1098397ite.3;
+        Tue, 04 Jun 2019 09:25:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=keUx6OuTtnNnS8af2D8MRcezvwV9OMJ0K5kA2b/Onj8=;
+        b=W/L7XlWaFAFC25Fsz4CXjMTrwc8PsTmaQ8HGbUAYsAo60RiR9fODX6dyVe9/QY2ZPe
+         kcWVcaBcvoM3Te+G8UuxrDWK305KGBkb1QlFNgoTOUwmB+ySljpLY/LNOkHUVfyNof5Y
+         RWu7BSCU1KTy8xhog0NHEaML4VIAPY9wEs13EyeiRTVcW4HQ+i43ncoyTxb18LtXyoba
+         s3ClM75/YGscb0IR39VRwOcvsCp/wc+Cl4w4GI4e1I/Xc6JGJtjCga77WcgnCTSYxXi3
+         xSGoOldTC1VSI6zCOg8zXg51veJ3U2NQOIATn6cfOFQzWuzsWsENpwwbGLogs8uow04Y
+         Bt4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=keUx6OuTtnNnS8af2D8MRcezvwV9OMJ0K5kA2b/Onj8=;
+        b=CjP1GWtYsURk6o5VjeuFiYnqWXTz9WW2tG6BZdn675qimLYBI/GftCQmzAkAF0gvvu
+         tLu5DVNrl1KwQCRi12hWI8QXlfo255UWttlpwMMJWeUXz9Xye/0qkuCGn/lJ32BV4pCS
+         tPp+aBTdYSjeEni62PBmxGDRrUMcdXnKmK6jTSYh38/FiUNBU/GlBYUXBcg4t0nWlZ7B
+         yYRbFwyWX4tskKkkHlUPWabErFfM51KE83mLi7r+nASnoyXKaqKglM1sGlXIgPaV2RyW
+         lyl2SMIRir1XVnd+QCQbBosYc8WhQbICnhMXyZVguB/x9rCwmL53NP6LyvKM1cyhJ6JF
+         8z7w==
+X-Gm-Message-State: APjAAAW1Xug2a8qrMwH8UKPvKSGSEBji8+XoUObEzdqSP9PENCgAYrAC
+        pP1VsrS9dV6t5vyuNW6q63GxSwnvbqxbOGH8+t4=
+X-Google-Smtp-Source: APXvYqx/4rCisoqpGnzzw0zsbZQJzp6XnK7vklgy6SJ5670sERpis86AGb6uijJLfZA5p9whZRyv+dcYdZCQul/rIyg=
+X-Received: by 2002:a02:5b05:: with SMTP id g5mr20735653jab.114.1559665528083;
+ Tue, 04 Jun 2019 09:25:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190603163130.3f7497ba@x1.home>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 04 Jun 2019 16:11:49 +0000 (UTC)
+References: <20190603170306.49099-1-nitesh@redhat.com> <20190603170306.49099-2-nitesh@redhat.com>
+ <CAKgT0Udnc_cmgBLFEZ5udexsc1cfjX1rJR3qQFOW-7bfuFh6gQ@mail.gmail.com>
+ <4cdfee20-126e-bc28-cf1c-2cfd484ca28e@redhat.com> <CAKgT0Ud6uKpcj9HFHYOThCY=0_P0=quBLbsDR7uUMdbwcYeSTw@mail.gmail.com>
+ <09e6caea-7000-b3e4-d297-df6bea78e127@redhat.com>
+In-Reply-To: <09e6caea-7000-b3e4-d297-df6bea78e127@redhat.com>
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+Date:   Tue, 4 Jun 2019 09:25:16 -0700
+Message-ID: <CAKgT0UeMpcckGpT6OnC2kqgtyT2p9bvNgE2C0eqW1GOJTU-DHA@mail.gmail.com>
+Subject: Re: [RFC][Patch v10 1/2] mm: page_hinting: core infrastructure
+To:     Nitesh Narayan Lal <nitesh@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
+        pagupta@redhat.com, wei.w.wang@intel.com,
+        Yang Zhang <yang.zhang.wz@gmail.com>,
+        Rik van Riel <riel@surriel.com>,
+        David Hildenbrand <david@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, dodgen@google.com,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        dhildenb@redhat.com, Andrea Arcangeli <aarcange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+On Tue, Jun 4, 2019 at 9:08 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
+>
+>
+> On 6/4/19 11:14 AM, Alexander Duyck wrote:
+> > On Tue, Jun 4, 2019 at 5:55 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
+> >>
+> >> On 6/3/19 3:04 PM, Alexander Duyck wrote:
+> >>> On Mon, Jun 3, 2019 at 10:04 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
+> >>>> This patch introduces the core infrastructure for free page hinting in
+> >>>> virtual environments. It enables the kernel to track the free pages which
+> >>>> can be reported to its hypervisor so that the hypervisor could
+> >>>> free and reuse that memory as per its requirement.
+> >>>>
+> >>>> While the pages are getting processed in the hypervisor (e.g.,
+> >>>> via MADV_FREE), the guest must not use them, otherwise, data loss
+> >>>> would be possible. To avoid such a situation, these pages are
+> >>>> temporarily removed from the buddy. The amount of pages removed
+> >>>> temporarily from the buddy is governed by the backend(virtio-balloon
+> >>>> in our case).
+> >>>>
+> >>>> To efficiently identify free pages that can to be hinted to the
+> >>>> hypervisor, bitmaps in a coarse granularity are used. Only fairly big
+> >>>> chunks are reported to the hypervisor - especially, to not break up THP
+> >>>> in the hypervisor - "MAX_ORDER - 2" on x86, and to save space. The bits
+> >>>> in the bitmap are an indication whether a page *might* be free, not a
+> >>>> guarantee. A new hook after buddy merging sets the bits.
+> >>>>
+> >>>> Bitmaps are stored per zone, protected by the zone lock. A workqueue
+> >>>> asynchronously processes the bitmaps, trying to isolate and report pages
+> >>>> that are still free. The backend (virtio-balloon) is responsible for
+> >>>> reporting these batched pages to the host synchronously. Once reporting/
+> >>>> freeing is complete, isolated pages are returned back to the buddy.
+> >>>>
+> >>>> There are still various things to look into (e.g., memory hotplug, more
+> >>>> efficient locking, possible races when disabling).
+> >>>>
+> >>>> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+> >>> So one thing I had thought about, that I don't believe that has been
+> >>> addressed in your solution, is to determine a means to guarantee
+> >>> forward progress. If you have a noisy thread that is allocating and
+> >>> freeing some block of memory repeatedly you will be stuck processing
+> >>> that and cannot get to the other work. Specifically if you have a zone
+> >>> where somebody is just cycling the number of pages needed to fill your
+> >>> hinting queue how do you get around it and get to the data that is
+> >>> actually code instead of getting stuck processing the noise?
+> >> It should not matter. As every time the memory threshold is met, entire
+> >> bitmap
+> >> is scanned and not just a chunk of memory for possible isolation. This
+> >> will guarantee
+> >> forward progress.
+> > So I think there may still be some issues. I see how you go from the
+> > start to the end, but how to you loop back to the start again as pages
+> > are added? The init_hinting_wq doesn't seem to have a way to get back
+> > to the start again if there is still work to do after you have
+> > completed your pass without queue_work_on firing off another thread.
+> >
+> That will be taken care as the part of a new job, which will be
+> en-queued as soon
+> as the free memory count for the respective zone will reach the threshold.
 
-On 6/4/19 12:31 AM, Alex Williamson wrote:
-> On Sun, 26 May 2019 18:10:03 +0200
-> Eric Auger <eric.auger@redhat.com> wrote:
-> 
->> Add a new VFIO_PCI_DMA_FAULT_IRQ_INDEX index. This allows to
->> set/unset an eventfd that will be triggered when DMA translation
->> faults are detected at physical level when the nested mode is used.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  drivers/vfio/pci/vfio_pci.c       |  3 +++
->>  drivers/vfio/pci/vfio_pci_intrs.c | 19 +++++++++++++++++++
->>  include/uapi/linux/vfio.h         |  1 +
->>  3 files changed, 23 insertions(+)
-> 
-> 
-> Note that I suggested to Intel folks trying to add a GVT-g page
-> flipping eventfd to convert to device specific interrupts the same way
-> we added device specific regions:
-> 
-> https://patchwork.kernel.org/patch/10962337/
-> 
-> I'd probably suggest the same here so we can optionally expose it when
-> supported.  Thanks,
-
-Agreed, I will follow the other thread.
-
-Thanks
-
-Eric
-> 
-> Alex
-> 
->> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
->> index a9c8af2a774a..65a1e6814f5c 100644
->> --- a/drivers/vfio/pci/vfio_pci.c
->> +++ b/drivers/vfio/pci/vfio_pci.c
->> @@ -746,6 +746,8 @@ static int vfio_pci_get_irq_count(struct vfio_pci_device *vdev, int irq_type)
->>  			return 1;
->>  	} else if (irq_type == VFIO_PCI_REQ_IRQ_INDEX) {
->>  		return 1;
->> +	} else if (irq_type == VFIO_PCI_DMA_FAULT_IRQ_INDEX) {
->> +		return 1;
->>  	}
->>  
->>  	return 0;
->> @@ -1082,6 +1084,7 @@ static long vfio_pci_ioctl(void *device_data,
->>  		switch (info.index) {
->>  		case VFIO_PCI_INTX_IRQ_INDEX ... VFIO_PCI_MSIX_IRQ_INDEX:
->>  		case VFIO_PCI_REQ_IRQ_INDEX:
->> +		case VFIO_PCI_DMA_FAULT_IRQ_INDEX:
->>  			break;
->>  		case VFIO_PCI_ERR_IRQ_INDEX:
->>  			if (pci_is_pcie(vdev->pdev))
->> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
->> index 1c46045b0e7f..28a96117daf3 100644
->> --- a/drivers/vfio/pci/vfio_pci_intrs.c
->> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
->> @@ -622,6 +622,18 @@ static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
->>  					       count, flags, data);
->>  }
->>  
->> +static int vfio_pci_set_dma_fault_trigger(struct vfio_pci_device *vdev,
->> +					  unsigned index, unsigned start,
->> +					  unsigned count, uint32_t flags,
->> +					  void *data)
->> +{
->> +	if (index != VFIO_PCI_DMA_FAULT_IRQ_INDEX || start != 0 || count > 1)
->> +		return -EINVAL;
->> +
->> +	return vfio_pci_set_ctx_trigger_single(&vdev->dma_fault_trigger,
->> +					       count, flags, data);
->> +}
->> +
->>  int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
->>  			    unsigned index, unsigned start, unsigned count,
->>  			    void *data)
->> @@ -671,6 +683,13 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
->>  			break;
->>  		}
->>  		break;
->> +	case VFIO_PCI_DMA_FAULT_IRQ_INDEX:
->> +		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
->> +		case VFIO_IRQ_SET_ACTION_TRIGGER:
->> +			func = vfio_pci_set_dma_fault_trigger;
->> +			break;
->> +		}
->> +		break;
->>  	}
->>  
->>  	if (!func)
->> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->> index 13e041b84d48..66b6b08c4a38 100644
->> --- a/include/uapi/linux/vfio.h
->> +++ b/include/uapi/linux/vfio.h
->> @@ -559,6 +559,7 @@ enum {
->>  	VFIO_PCI_MSIX_IRQ_INDEX,
->>  	VFIO_PCI_ERR_IRQ_INDEX,
->>  	VFIO_PCI_REQ_IRQ_INDEX,
->> +	VFIO_PCI_DMA_FAULT_IRQ_INDEX,
->>  	VFIO_PCI_NUM_IRQS
->>  };
->>  
-> 
+So does that mean that you have multiple threads all calling
+queue_work_on until you get below the threshold? If so it seems like
+that would get expensive since that is an atomic test and set
+operation that would be hammered until you get below that threshold.
