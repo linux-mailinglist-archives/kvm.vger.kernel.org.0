@@ -2,25 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0272334DE2
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 18:44:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB20234DF6
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 18:48:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727623AbfFDQof (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 12:44:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:30943 "EHLO mx1.redhat.com"
+        id S1727868AbfFDQsh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 12:48:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33018 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727470AbfFDQoe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 12:44:34 -0400
+        id S1727809AbfFDQsg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jun 2019 12:48:36 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 037D459474;
-        Tue,  4 Jun 2019 16:44:24 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id E07753087944;
+        Tue,  4 Jun 2019 16:48:35 +0000 (UTC)
 Received: from [10.40.205.182] (unknown [10.40.205.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 93144608A7;
-        Tue,  4 Jun 2019 16:44:08 +0000 (UTC)
-Subject: Re: [RFC][Patch v10 2/2] virtio-balloon: page_hinting: reporting to
- the host
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E296611D6;
+        Tue,  4 Jun 2019 16:48:15 +0000 (UTC)
+Subject: Re: [QEMU PATCH] KVM: Support for page hinting
 To:     Alexander Duyck <alexander.duyck@gmail.com>
 Cc:     kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -34,8 +33,8 @@ Cc:     kvm list <kvm@vger.kernel.org>,
         Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
         dhildenb@redhat.com, Andrea Arcangeli <aarcange@redhat.com>
 References: <20190603170306.49099-1-nitesh@redhat.com>
- <20190603170306.49099-3-nitesh@redhat.com>
- <CAKgT0UeRkG0FyESjjQQWeOs3x2O=BUzFYZAdDkjjLyXRiJMnCQ@mail.gmail.com>
+ <20190603170432.1195-1-nitesh@redhat.com>
+ <CAKgT0UeRzF24WeVkTN2WW41iKSUpXpZbpD55-g=MBHf814RV+A@mail.gmail.com>
 From:   Nitesh Narayan Lal <nitesh@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
@@ -82,25 +81,25 @@ Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
  NK9ZhT0+qkiN7npFLtNtbzwqaqceq3XhafmCiw8xrtzCnlB/C4SiBr/93Ip4kihXJ0EuHSLn
  VujM7c/b4pps
 Organization: Red Hat Inc,
-Message-ID: <9511482c-acfd-2415-24fa-6586c5bd3e33@redhat.com>
-Date:   Tue, 4 Jun 2019 12:44:05 -0400
+Message-ID: <0194ca6a-ec00-2a43-545d-aee6459a7582@redhat.com>
+Date:   Tue, 4 Jun 2019 12:48:13 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <CAKgT0UeRkG0FyESjjQQWeOs3x2O=BUzFYZAdDkjjLyXRiJMnCQ@mail.gmail.com>
+In-Reply-To: <CAKgT0UeRzF24WeVkTN2WW41iKSUpXpZbpD55-g=MBHf814RV+A@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="wHqLVccT6sgdHUJ7PuXlZKd3wrVDA6XlB"
+ boundary="TLcRB331klf72kYiAgAoPavq6ytwUZyUY"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Tue, 04 Jun 2019 16:44:34 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Tue, 04 Jun 2019 16:48:36 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wHqLVccT6sgdHUJ7PuXlZKd3wrVDA6XlB
-Content-Type: multipart/mixed; boundary="J41RieuYN08h5ItQqdOsvIJEMDpfLAlWB";
+--TLcRB331klf72kYiAgAoPavq6ytwUZyUY
+Content-Type: multipart/mixed; boundary="4e4kVK3A45X5fOFtNPeg6Nk226eTMC0od";
  protected-headers="v1"
 From: Nitesh Narayan Lal <nitesh@redhat.com>
 To: Alexander Duyck <alexander.duyck@gmail.com>
@@ -111,126 +110,105 @@ Cc: kvm list <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
  David Hildenbrand <david@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
  dodgen@google.com, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
  dhildenb@redhat.com, Andrea Arcangeli <aarcange@redhat.com>
-Message-ID: <9511482c-acfd-2415-24fa-6586c5bd3e33@redhat.com>
-Subject: Re: [RFC][Patch v10 2/2] virtio-balloon: page_hinting: reporting to
- the host
+Message-ID: <0194ca6a-ec00-2a43-545d-aee6459a7582@redhat.com>
+Subject: Re: [QEMU PATCH] KVM: Support for page hinting
 References: <20190603170306.49099-1-nitesh@redhat.com>
- <20190603170306.49099-3-nitesh@redhat.com>
- <CAKgT0UeRkG0FyESjjQQWeOs3x2O=BUzFYZAdDkjjLyXRiJMnCQ@mail.gmail.com>
-In-Reply-To: <CAKgT0UeRkG0FyESjjQQWeOs3x2O=BUzFYZAdDkjjLyXRiJMnCQ@mail.gmail.com>
+ <20190603170432.1195-1-nitesh@redhat.com>
+ <CAKgT0UeRzF24WeVkTN2WW41iKSUpXpZbpD55-g=MBHf814RV+A@mail.gmail.com>
+In-Reply-To: <CAKgT0UeRzF24WeVkTN2WW41iKSUpXpZbpD55-g=MBHf814RV+A@mail.gmail.com>
 
---J41RieuYN08h5ItQqdOsvIJEMDpfLAlWB
+--4e4kVK3A45X5fOFtNPeg6Nk226eTMC0od
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
 
 
-On 6/4/19 12:33 PM, Alexander Duyck wrote:
+On 6/4/19 12:41 PM, Alexander Duyck wrote:
 > On Mon, Jun 3, 2019 at 10:04 AM Nitesh Narayan Lal <nitesh@redhat.com> =
 wrote:
->> Enables the kernel to negotiate VIRTIO_BALLOON_F_HINTING feature with =
-the
->> host. If it is available and page_hinting_flag is set to true, page_hi=
-nting
->> is enabled and its callbacks are configured along with the max_pages c=
-ount
->> which indicates the maximum number of pages that can be isolated and h=
-inted
->> at a time. Currently, only free pages of order >=3D (MAX_ORDER - 2) ar=
-e
->> reported. To prevent any false OOM max_pages count is set to 16.
->>
->> By default page_hinting feature is enabled and gets loaded as soon
->> as the virtio-balloon driver is loaded. However, it could be disabled
->> by writing the page_hinting_flag which is a virtio-balloon parameter.
+>> Enables QEMU to call madvise on the pages which are reported
+>> by the guest kernel.
 >>
 >> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
 >> ---
->>  drivers/virtio/virtio_balloon.c     | 112 +++++++++++++++++++++++++++=
--
->>  include/uapi/linux/virtio_balloon.h |  14 ++++
->>  2 files changed, 125 insertions(+), 1 deletion(-)
+>>  hw/virtio/trace-events                        |  1 +
+>>  hw/virtio/virtio-balloon.c                    | 85 ++++++++++++++++++=
++
+>>  include/hw/virtio/virtio-balloon.h            |  2 +-
+>>  include/qemu/osdep.h                          |  7 ++
+>>  .../standard-headers/linux/virtio_balloon.h   |  1 +
+>>  5 files changed, 95 insertions(+), 1 deletion(-)
 > <snip>
 >
->> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/=
-virtio_balloon.h
->> index a1966cd7b677..25e4f817c660 100644
->> --- a/include/uapi/linux/virtio_balloon.h
->> +++ b/include/uapi/linux/virtio_balloon.h
->> @@ -29,6 +29,7 @@
->>  #include <linux/virtio_types.h>
->>  #include <linux/virtio_ids.h>
->>  #include <linux/virtio_config.h>
->> +#include <linux/page_hinting.h>
-> So this include breaks the build and from what I can tell it isn't
-> really needed. I deleted it in order to be able to build without
-> warnings about the file not being included in UAPI.
-I agree here, it is not required any more.
->
->>  /* The feature bitmap for virtio balloon */
->>  #define VIRTIO_BALLOON_F_MUST_TELL_HOST        0 /* Tell before recla=
-iming pages */
->> @@ -36,6 +37,7 @@
->>  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM        2 /* Deflate balloon o=
-n OOM */
->>  #define VIRTIO_BALLOON_F_FREE_PAGE_HINT        3 /* VQ to report free=
- pages */
->>  #define VIRTIO_BALLOON_F_PAGE_POISON   4 /* Guest is using page poiso=
-ning */
->> +#define VIRTIO_BALLOON_F_HINTING       5 /* Page hinting virtqueue */=
-
->>
->>  /* Size of a PFN in the balloon interface. */
->>  #define VIRTIO_BALLOON_PFN_SHIFT 12
->> @@ -108,4 +110,16 @@ struct virtio_balloon_stat {
->>         __virtio64 val;
->>  } __attribute__((packed));
->>
->> +#ifdef CONFIG_PAGE_HINTING
->> +/*
->> + * struct hinting_data- holds the information associated with hinting=
-=2E
->> + * @phys_add:  physical address associated with a page or the array h=
-olding
->> + *             the array of isolated pages.
->> + * @size:      total size associated with the phys_addr.
->> + */
->> +struct hinting_data {
->> +       __virtio64 phys_addr;
->> +       __virtio32 size;
->> +};
+>> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+>> index 840af09cb0..4d632933a9 100644
+>> --- a/include/qemu/osdep.h
+>> +++ b/include/qemu/osdep.h
+>> @@ -360,6 +360,11 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+>>  #else
+>>  #define QEMU_MADV_REMOVE QEMU_MADV_INVALID
+>>  #endif
+>> +#ifdef MADV_FREE
+>> +#define QEMU_MADV_FREE MADV_FREE
+>> +#else
+>> +#define QEMU_MADV_FREE QEMU_MADV_INVALID
 >> +#endif
->>  #endif /* _LINUX_VIRTIO_BALLOON_H */
->> --
->> 2.21.0
+> Is there a specific reason for making this default to INVALID instead
+> of just using DONTNEED?
+No specific reason.
+>  I ran into some issues as my host kernel
+> didn't have support for MADV_FREE in the exported kernel headers
+> apparently so I was getting no effect. It seems like it would be
+> better to fall back to doing DONTNEED instead of just disabling the
+> functionality all together.
+Possibly, I will further look into it.
+>>  #elif defined(CONFIG_POSIX_MADVISE)
+>>
+>> @@ -373,6 +378,7 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+>>  #define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID
+>>  #define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID
+>>  #define QEMU_MADV_REMOVE QEMU_MADV_INVALID
+>> +#define QEMU_MADV_FREE QEMU_MADV_INVALID
+> Same here. If you already have MADV_DONTNEED you could just use that
+> instead of disabling the functionality.
+>
+>>  #else /* no-op */
+>>
+>> @@ -386,6 +392,7 @@ void qemu_anon_ram_free(void *ptr, size_t size);
+>>  #define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID
+>>  #define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID
+>>  #define QEMU_MADV_REMOVE QEMU_MADV_INVALID
+>> +#define QEMU_MADV_FREE QEMU_MADV_INVALID
+>>
+>>  #endif
 >>
 --=20
 Regards
 Nitesh
 
 
---J41RieuYN08h5ItQqdOsvIJEMDpfLAlWB--
+--4e4kVK3A45X5fOFtNPeg6Nk226eTMC0od--
 
---wHqLVccT6sgdHUJ7PuXlZKd3wrVDA6XlB
+--TLcRB331klf72kYiAgAoPavq6ytwUZyUY
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEkXcoRVGaqvbHPuAGo4ZA3AYyozkFAlz2n9UACgkQo4ZA3AYy
-ozntJhAAlqT4thTU40bCNsdn9GCcVwr+p9rf9V+Vy2idk8dEvRRU7unQ6fBXYNQP
-udujYoM+sJkApNmVAbI948y91O+LAl6z/V3aWbo7VvKCnGUe5p6SJdT9Ch+UeoFa
-nh8Op8lpB5BUEXujpp2nX0ZGiYfRKWYapZ/LPat5SZyMui38nn97Ln8tZuDIqHzN
-I3qYm4PXTP5QKs05Nh9DSjZzF7hd143vmdk3JBUpltD9OWzUJZJ4vOe6yAKYVK/O
-LcB1k6BV7E8Vkv08ekLLdVc+cKoSmH/Gcomp8hQi/flxuNtKZjPU7ulo0dsucO1R
-emEKhqiFXQMz1H29W63bSg+wc6/cGGTindSX64/Z4D9Wpqe1V99KO+3tknLflHWb
-sjy8OVT7Cquup3rg5lh/vgLt8sSWcisoLZEbvUrzIzUWnSlRp3ZDm6+BQqAZLylz
-f5QnbqJeH0X7gbv66No85DjK7NzPrVWP7h3/v4a/HmHpCFwDIWe/4A9/Kl8xOdKL
-GSxDpMVpwqhwPickMK//FSTcYRswbAK6QIru66V/fcp6SBIltsySYVUhSrBxrcto
-3E705yP6WV65iW2PaS5Yt/GZ6qMNdtNLCRalOnN8if4DkHi7xXcrUs5WJX9H43ps
-mNoaxoaZNHjMHRxs+rRiMstaOa62LfW6gBXsL7uDnzCjbYhw7Tc=
-=YVDb
+iQIzBAEBCAAdFiEEkXcoRVGaqvbHPuAGo4ZA3AYyozkFAlz2oM0ACgkQo4ZA3AYy
+ozkA/Q//ZRIMGLMXhxoYzE4ppch83oeD+378YExYsIKrUaWCfG8x6PaEjZ/mfSiF
+YmKSq9CHK8MhELTPPwbba/9/SHGtWa0rD3LL1RHR2GO7QtpcF3YbUR74GipuGbNM
+WlLicfK0xAupX8iYaTntB9FWO4GOfadQOAfWO5bLT0C2PcYA6ChKQMmVBGDnKtiI
+wORJjlYLfW5NQ2Yqe8UjI5+GeqIiDsT32T41vbdV7g4LC1HCQhhsXrSYnq7AgLpj
+e7DtZP1KAse3hN7Wdya4QONN4yqDcUgCZHH/H6Eq60hOjE7vIWO5JP8+kDIae/I1
+sAzobLZi1SF7ZrwaT9C41jUkKojjnb7/rm/YjAX1W1fgbxQOaTV2j/ipSnguBMC+
+jx6KQdS2ybiikGLb9jaT/vxkQHuSMwPU7+9rmAlkd//H3zA966yh84ZSGUku7jeI
+I/ONAtGzd5u+CyPg/2wfFKEZHYa7336ts8yIXIUbQisvgt21nfDR6y9V8WZEHLul
+aQJeGYrJPHeAaaBFdV0O8JD4nWoct5X7jbnWXIFf6h8FepV5aVjxtGKnH7JyAQmQ
+KMx72W2gEqUKGf33iAWh/4IzmpPdefNzFkucKe/KpTMOCHiTvx1qZ9KKBzq5gXUp
+E1WPdIoxrWxi7KOtRzYmGZimN0zqo4oAjbCxHG4ogFtWu/nPUIQ=
+=4/9C
 -----END PGP SIGNATURE-----
 
---wHqLVccT6sgdHUJ7PuXlZKd3wrVDA6XlB--
+--TLcRB331klf72kYiAgAoPavq6ytwUZyUY--
