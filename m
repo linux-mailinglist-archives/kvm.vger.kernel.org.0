@@ -2,212 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4485434668
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 14:18:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 092CE34688
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 14:24:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727476AbfFDMSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 08:18:31 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:44050 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727403AbfFDMSb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 08:18:31 -0400
-Received: by mail-pf1-f195.google.com with SMTP id t16so3761337pfe.11
-        for <kvm@vger.kernel.org>; Tue, 04 Jun 2019 05:18:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=izP2xVkH+lJ1XiJaz25EL/2sjI5XZqFKPi8rAth3/y8=;
-        b=anXrne3zDdmEVildSzDwGKYMdshtpWiEi/bSjfUgHwDoCg62X8GEgJ1oLKPrpJDBTp
-         sCO27Nd8vGOH1LG/aPfklMvFylAFcLd0duV9qTE0Uw2bgUkgehc21vjcK8KjtBKBSIeh
-         hbrrSVL1q8qPT28KLxALn+5w5v0FjrGnKuEQGLgwne0GhOjJGw91IA05Yw5AYbDH2v2V
-         eAfpEy7jnKgsdj8ID/iHcGjtOrlCN+u9PocCqqNSQrn/Xx8uaOQ0ef5ELA37nbSJameE
-         4YvdhcrfbGwQSFgLEIgyOhrMQbK4CtUaCUAqm4fpOOKP+JqNZLGloD+rwiN3Vuf1ojqO
-         poUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=izP2xVkH+lJ1XiJaz25EL/2sjI5XZqFKPi8rAth3/y8=;
-        b=k+eOGl24g+QrnJDPV2uVV5gD6SDaj4tzjE0blPsdBke5sdoBPhU525dBEB/j+N3Ei+
-         U2+VFUJoC8577qNPDGq/zrTgFKDqucCqZa76piXubrptkCRKKTf+TlE1o+dwo6HbRo+n
-         uuTR/IjZLGkreucF3o1RccLS27X2Rf8awiBQZkNsmnu/UkPcjkLJ8YNXYD08dtX8kq1w
-         73BJb6zBW+nImMsVW8qbPnyK7CHKBw5EfTee1zbb97UxzEW2i9Y8FAFBnADbio4OwBSe
-         EGTRw2JXRMm9Wvb3TyIs3AAHIud/nmdx9Z6WQDtslIMtn7d4br8nIAvSVpEK7U6w/D5U
-         I31g==
-X-Gm-Message-State: APjAAAVE5B1Va0LwaRz6e3abNb3R2+q2YfJnrpHA6Rgc70Mbbzme2GLr
-        eAcFweRpBMsAZU83PfLnibGAbe99b+kAGXzPaeyQXA==
-X-Google-Smtp-Source: APXvYqz1BnXRogJ38HsJg+YXXm2v0kW8wf81Q7/M4AVfD5zoRhp7qhUtn8D86raEkRJz58lLKdDFOynhTkL7EDkBRUg=
-X-Received: by 2002:a63:1919:: with SMTP id z25mr35448936pgl.440.1559650710127;
- Tue, 04 Jun 2019 05:18:30 -0700 (PDT)
+        id S1727597AbfFDMYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 08:24:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:12051 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727495AbfFDMYk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jun 2019 08:24:40 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 507569F759;
+        Tue,  4 Jun 2019 12:24:29 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-8.gru2.redhat.com [10.97.112.8])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B6850194A2;
+        Tue,  4 Jun 2019 12:24:23 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id 633F0105157;
+        Tue,  4 Jun 2019 09:24:09 -0300 (BRT)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id x54CO4rb019151;
+        Tue, 4 Jun 2019 09:24:04 -0300
+Date:   Tue, 4 Jun 2019 09:24:04 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     kvm-devel <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Raslan KarimAllah <karahmed@amazon.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: [patch v2 3/3] cpuidle-haltpoll: disable host side polling when kvm
+ virtualized
+Message-ID: <20190604122404.GA18979@amt.cnet>
+References: <20190603225242.289109849@amt.cnet>
+ <20190603225254.360289262@amt.cnet>
 MIME-Version: 1.0
-References: <cover.1559580831.git.andreyknvl@google.com> <c829f93b19ad6af1b13be8935ce29baa8e58518f.1559580831.git.andreyknvl@google.com>
- <20190603174619.GC11474@ziepe.ca>
-In-Reply-To: <20190603174619.GC11474@ziepe.ca>
-From:   Andrey Konovalov <andreyknvl@google.com>
-Date:   Tue, 4 Jun 2019 14:18:19 +0200
-Message-ID: <CAAeHK+xy-dx4dLDLLj9dRzRNSVG9H5nDPPnjpYF38qKZNNCh_g@mail.gmail.com>
-Subject: Re: [PATCH v16 12/16] IB, arm64: untag user pointers in ib_uverbs_(re)reg_mr()
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190603225254.360289262@amt.cnet>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Tue, 04 Jun 2019 12:24:40 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 3, 2019 at 7:46 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
->
-> On Mon, Jun 03, 2019 at 06:55:14PM +0200, Andrey Konovalov wrote:
-> > This patch is a part of a series that extends arm64 kernel ABI to allow to
-> > pass tagged user pointers (with the top byte set to something else other
-> > than 0x00) as syscall arguments.
-> >
-> > ib_uverbs_(re)reg_mr() use provided user pointers for vma lookups (through
-> > e.g. mlx4_get_umem_mr()), which can only by done with untagged pointers.
-> >
-> > Untag user pointers in these functions.
-> >
-> > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> >  drivers/infiniband/core/uverbs_cmd.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/drivers/infiniband/core/uverbs_cmd.c b/drivers/infiniband/core/uverbs_cmd.c
-> > index 5a3a1780ceea..f88ee733e617 100644
-> > +++ b/drivers/infiniband/core/uverbs_cmd.c
-> > @@ -709,6 +709,8 @@ static int ib_uverbs_reg_mr(struct uverbs_attr_bundle *attrs)
-> >       if (ret)
-> >               return ret;
-> >
-> > +     cmd.start = untagged_addr(cmd.start);
-> > +
-> >       if ((cmd.start & ~PAGE_MASK) != (cmd.hca_va & ~PAGE_MASK))
-> >               return -EINVAL;
->
-> I feel like we shouldn't thave to do this here, surely the cmd.start
-> should flow unmodified to get_user_pages, and gup should untag it?
->
-> ie, this sort of direction for the IB code (this would be a giant
-> patch, so I didn't have time to write it all, but I think it is much
-> saner):
 
-Hi Jason,
+When performing guest side polling, it is not necessary to 
+also perform host side polling. 
 
-ib_uverbs_reg_mr() passes cmd.start to mlx4_get_umem_mr(), which calls
-find_vma(), which only accepts untagged addresses. Could you explain
-how your patch helps?
+So disable host side polling, via the new MSR interface, 
+when loading cpuidle-haltpoll driver.
 
-Thanks!
+Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
->
-> diff --git a/drivers/infiniband/core/umem.c b/drivers/infiniband/core/umem.c
-> index 54628ef879f0ce..7b3b736c87c253 100644
-> --- a/drivers/infiniband/core/umem.c
-> +++ b/drivers/infiniband/core/umem.c
-> @@ -193,7 +193,7 @@ EXPORT_SYMBOL(ib_umem_find_best_pgsz);
->   * @access: IB_ACCESS_xxx flags for memory being pinned
->   * @dmasync: flush in-flight DMA when the memory region is written
->   */
-> -struct ib_umem *ib_umem_get(struct ib_udata *udata, unsigned long addr,
-> +struct ib_umem *ib_umem_get(struct ib_udata *udata, void __user *addr,
->                             size_t size, int access, int dmasync)
->  {
->         struct ib_ucontext *context;
-> @@ -201,7 +201,7 @@ struct ib_umem *ib_umem_get(struct ib_udata *udata, unsigned long addr,
->         struct page **page_list;
->         unsigned long lock_limit;
->         unsigned long new_pinned;
-> -       unsigned long cur_base;
-> +       void __user *cur_base;
->         struct mm_struct *mm;
->         unsigned long npages;
->         int ret;
-> diff --git a/drivers/infiniband/core/uverbs_cmd.c b/drivers/infiniband/core/uverbs_cmd.c
-> index 5a3a1780ceea4d..94389e7f12371f 100644
-> --- a/drivers/infiniband/core/uverbs_cmd.c
-> +++ b/drivers/infiniband/core/uverbs_cmd.c
-> @@ -735,7 +735,8 @@ static int ib_uverbs_reg_mr(struct uverbs_attr_bundle *attrs)
->                 }
->         }
->
-> -       mr = pd->device->ops.reg_user_mr(pd, cmd.start, cmd.length, cmd.hca_va,
-> +       mr = pd->device->ops.reg_user_mr(pd, u64_to_user_ptr(cmd.start),
-> +                                        cmd.length, cmd.hca_va,
->                                          cmd.access_flags,
->                                          &attrs->driver_udata);
->         if (IS_ERR(mr)) {
-> diff --git a/drivers/infiniband/hw/mlx5/mr.c b/drivers/infiniband/hw/mlx5/mr.c
-> index 4d033796dcfcc2..bddbb952082fc5 100644
-> --- a/drivers/infiniband/hw/mlx5/mr.c
-> +++ b/drivers/infiniband/hw/mlx5/mr.c
-> @@ -786,7 +786,7 @@ static int mr_cache_max_order(struct mlx5_ib_dev *dev)
->  }
->
->  static int mr_umem_get(struct mlx5_ib_dev *dev, struct ib_udata *udata,
-> -                      u64 start, u64 length, int access_flags,
-> +                      void __user *start, u64 length, int access_flags,
->                        struct ib_umem **umem, int *npages, int *page_shift,
->                        int *ncont, int *order)
->  {
-> @@ -1262,8 +1262,8 @@ struct ib_mr *mlx5_ib_reg_dm_mr(struct ib_pd *pd, struct ib_dm *dm,
->                                  attr->access_flags, mode);
->  }
->
-> -struct ib_mr *mlx5_ib_reg_user_mr(struct ib_pd *pd, u64 start, u64 length,
-> -                                 u64 virt_addr, int access_flags,
-> +struct ib_mr *mlx5_ib_reg_user_mr(struct ib_pd *pd, void __user *start,
-> +                                 u64 length, u64 virt_addr, int access_flags,
->                                   struct ib_udata *udata)
->  {
->         struct mlx5_ib_dev *dev = to_mdev(pd->device);
-> diff --git a/include/rdma/ib_verbs.h b/include/rdma/ib_verbs.h
-> index ec6446864b08e9..b3c8eaaa35c760 100644
-> --- a/include/rdma/ib_verbs.h
-> +++ b/include/rdma/ib_verbs.h
-> @@ -2464,8 +2464,8 @@ struct ib_device_ops {
->         struct ib_mr *(*reg_user_mr)(struct ib_pd *pd, u64 start, u64 length,
->                                      u64 virt_addr, int mr_access_flags,
->                                      struct ib_udata *udata);
-> -       int (*rereg_user_mr)(struct ib_mr *mr, int flags, u64 start, u64 length,
-> -                            u64 virt_addr, int mr_access_flags,
-> +       int (*rereg_user_mr)(struct ib_mr *mr, int flags, void __user *start,
-> +                            u64 length, u64 virt_addr, int mr_access_flags,
->                              struct ib_pd *pd, struct ib_udata *udata);
->         int (*dereg_mr)(struct ib_mr *mr, struct ib_udata *udata);
->         struct ib_mr *(*alloc_mr)(struct ib_pd *pd, enum ib_mr_type mr_type,
+---
+
+v2: remove extra "}"
+
+ arch/x86/Kconfig                        |    7 +++++
+ arch/x86/include/asm/cpuidle_haltpoll.h |    8 ++++++
+ arch/x86/kernel/kvm.c                   |   40 ++++++++++++++++++++++++++++++++
+ drivers/cpuidle/cpuidle-haltpoll.c      |    9 ++++++-
+ include/linux/cpuidle_haltpoll.h        |   16 ++++++++++++
+ 5 files changed, 79 insertions(+), 1 deletion(-)
+
+Index: linux-2.6.git/arch/x86/include/asm/cpuidle_haltpoll.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ linux-2.6.git/arch/x86/include/asm/cpuidle_haltpoll.h	2019-06-03 19:38:42.328718617 -0300
+@@ -0,0 +1,8 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ARCH_HALTPOLL_H
++#define _ARCH_HALTPOLL_H
++
++void arch_haltpoll_enable(void);
++void arch_haltpoll_disable(void);
++
++#endif
+Index: linux-2.6.git/drivers/cpuidle/cpuidle-haltpoll.c
+===================================================================
+--- linux-2.6.git.orig/drivers/cpuidle/cpuidle-haltpoll.c	2019-06-03 19:38:12.376619124 -0300
++++ linux-2.6.git/drivers/cpuidle/cpuidle-haltpoll.c	2019-06-03 19:38:42.328718617 -0300
+@@ -15,6 +15,7 @@
+ #include <linux/module.h>
+ #include <linux/timekeeping.h>
+ #include <linux/sched/idle.h>
++#include <linux/cpuidle_haltpoll.h>
+ #define CREATE_TRACE_POINTS
+ #include "cpuidle-haltpoll-trace.h"
+ 
+@@ -157,11 +158,17 @@
+ 
+ static int __init haltpoll_init(void)
+ {
+-	return cpuidle_register(&haltpoll_driver, NULL);
++	int ret = cpuidle_register(&haltpoll_driver, NULL);
++
++	if (ret == 0)
++		arch_haltpoll_enable();
++
++	return ret;
+ }
+ 
+ static void __exit haltpoll_exit(void)
+ {
++	arch_haltpoll_disable();
+ 	cpuidle_unregister(&haltpoll_driver);
+ }
+ 
+Index: linux-2.6.git/include/linux/cpuidle_haltpoll.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ linux-2.6.git/include/linux/cpuidle_haltpoll.h	2019-06-03 19:41:57.293366260 -0300
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _CPUIDLE_HALTPOLL_H
++#define _CPUIDLE_HALTPOLL_H
++
++#ifdef CONFIG_ARCH_CPUIDLE_HALTPOLL
++#include <asm/cpuidle_haltpoll.h>
++#else
++static inline void arch_haltpoll_enable(void)
++{
++}
++
++static inline void arch_haltpoll_disable(void)
++{
++}
++#endif
++#endif
+Index: linux-2.6.git/arch/x86/Kconfig
+===================================================================
+--- linux-2.6.git.orig/arch/x86/Kconfig	2019-06-03 19:38:12.376619124 -0300
++++ linux-2.6.git/arch/x86/Kconfig	2019-06-03 19:42:34.478489868 -0300
+@@ -787,6 +787,7 @@
+ 	bool "KVM Guest support (including kvmclock)"
+ 	depends on PARAVIRT
+ 	select PARAVIRT_CLOCK
++	select ARCH_CPUIDLE_HALTPOLL
+ 	default y
+ 	---help---
+ 	  This option enables various optimizations for running under the KVM
+@@ -795,6 +796,12 @@
+ 	  underlying device model, the host provides the guest with
+ 	  timing infrastructure such as time of day, and system time
+ 
++config ARCH_CPUIDLE_HALTPOLL
++        def_bool n
++        prompt "Disable host haltpoll when loading haltpoll driver"
++        help
++	  If virtualized under KVM, disable host haltpoll.
++
+ config PVH
+ 	bool "Support for running PVH guests"
+ 	---help---
+Index: linux-2.6.git/arch/x86/kernel/kvm.c
+===================================================================
+--- linux-2.6.git.orig/arch/x86/kernel/kvm.c	2019-06-03 19:38:12.376619124 -0300
++++ linux-2.6.git/arch/x86/kernel/kvm.c	2019-06-03 19:40:14.359024312 -0300
+@@ -853,3 +853,43 @@
+ }
+ 
+ #endif	/* CONFIG_PARAVIRT_SPINLOCKS */
++
++#ifdef CONFIG_ARCH_CPUIDLE_HALTPOLL
++
++void kvm_disable_host_haltpoll(void *i)
++{
++	wrmsrl(MSR_KVM_POLL_CONTROL, 0);
++}
++
++void kvm_enable_host_haltpoll(void *i)
++{
++	wrmsrl(MSR_KVM_POLL_CONTROL, 1);
++}
++
++void arch_haltpoll_enable(void)
++{
++	if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL))
++		return;
++
++	preempt_disable();
++	/* Enabling guest halt poll disables host halt poll */
++	kvm_disable_host_haltpoll(NULL);
++	smp_call_function(kvm_disable_host_haltpoll, NULL, 1);
++	preempt_enable();
++}
++EXPORT_SYMBOL_GPL(arch_haltpoll_enable);
++
++void arch_haltpoll_disable(void)
++{
++	if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL))
++		return;
++
++	preempt_disable();
++	/* Enabling guest halt poll disables host halt poll */
++	kvm_enable_host_haltpoll(NULL);
++	smp_call_function(kvm_enable_host_haltpoll, NULL, 1);
++	preempt_enable();
++}
++
++EXPORT_SYMBOL_GPL(arch_haltpoll_disable);
++#endif
+
