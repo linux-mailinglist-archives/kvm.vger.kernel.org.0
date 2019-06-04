@@ -2,54 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 709E134D31
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 18:25:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2951434D8A
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 18:34:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727588AbfFDQZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 12:25:29 -0400
-Received: from mail-it1-f193.google.com ([209.85.166.193]:53286 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727385AbfFDQZ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 12:25:29 -0400
-Received: by mail-it1-f193.google.com with SMTP id m187so1098397ite.3;
-        Tue, 04 Jun 2019 09:25:28 -0700 (PDT)
+        id S1727586AbfFDQdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 12:33:40 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:45286 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727463AbfFDQdk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jun 2019 12:33:40 -0400
+Received: by mail-io1-f67.google.com with SMTP id e3so17825356ioc.12;
+        Tue, 04 Jun 2019 09:33:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=keUx6OuTtnNnS8af2D8MRcezvwV9OMJ0K5kA2b/Onj8=;
-        b=W/L7XlWaFAFC25Fsz4CXjMTrwc8PsTmaQ8HGbUAYsAo60RiR9fODX6dyVe9/QY2ZPe
-         kcWVcaBcvoM3Te+G8UuxrDWK305KGBkb1QlFNgoTOUwmB+ySljpLY/LNOkHUVfyNof5Y
-         RWu7BSCU1KTy8xhog0NHEaML4VIAPY9wEs13EyeiRTVcW4HQ+i43ncoyTxb18LtXyoba
-         s3ClM75/YGscb0IR39VRwOcvsCp/wc+Cl4w4GI4e1I/Xc6JGJtjCga77WcgnCTSYxXi3
-         xSGoOldTC1VSI6zCOg8zXg51veJ3U2NQOIATn6cfOFQzWuzsWsENpwwbGLogs8uow04Y
-         Bt4A==
+        bh=NFDCs9ixPwmop20pIDVV+hNZcExzVIIYIAvpTPqNIqM=;
+        b=cx9qF2XoM0ItvPLKYrfQK/oiAqbik/wsSMBvAMrHL8fu8Fx/K523FWLP62Taq5dCW+
+         GeVE1uM0MXw54dG4FfQpsBSSfIqJt+BeDwEtP+TaTJsYOGWnVZaxK6WHMMZEiIQCr7c1
+         29YRdE5YPlokMDEIYL8ZBSnQ9QFPiJckpS2Wm8iIFdCBR0HfTI2T0TOimv6v4CP1imSF
+         sOro/P3hwPspStkLZljA33Ma0X+9ae5JeNqKCeX5SHWY6K1oJDWZaC3n5E0+gY6UeDRI
+         PFhuNkiD8tQcLaUt1Hocggi8IY4A2cYLgXOSolXgPJu2RHVtQPEIXlj/1p468yO7GvqA
+         grtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=keUx6OuTtnNnS8af2D8MRcezvwV9OMJ0K5kA2b/Onj8=;
-        b=CjP1GWtYsURk6o5VjeuFiYnqWXTz9WW2tG6BZdn675qimLYBI/GftCQmzAkAF0gvvu
-         tLu5DVNrl1KwQCRi12hWI8QXlfo255UWttlpwMMJWeUXz9Xye/0qkuCGn/lJ32BV4pCS
-         tPp+aBTdYSjeEni62PBmxGDRrUMcdXnKmK6jTSYh38/FiUNBU/GlBYUXBcg4t0nWlZ7B
-         yYRbFwyWX4tskKkkHlUPWabErFfM51KE83mLi7r+nASnoyXKaqKglM1sGlXIgPaV2RyW
-         lyl2SMIRir1XVnd+QCQbBosYc8WhQbICnhMXyZVguB/x9rCwmL53NP6LyvKM1cyhJ6JF
-         8z7w==
-X-Gm-Message-State: APjAAAW1Xug2a8qrMwH8UKPvKSGSEBji8+XoUObEzdqSP9PENCgAYrAC
-        pP1VsrS9dV6t5vyuNW6q63GxSwnvbqxbOGH8+t4=
-X-Google-Smtp-Source: APXvYqx/4rCisoqpGnzzw0zsbZQJzp6XnK7vklgy6SJ5670sERpis86AGb6uijJLfZA5p9whZRyv+dcYdZCQul/rIyg=
-X-Received: by 2002:a02:5b05:: with SMTP id g5mr20735653jab.114.1559665528083;
- Tue, 04 Jun 2019 09:25:28 -0700 (PDT)
+        bh=NFDCs9ixPwmop20pIDVV+hNZcExzVIIYIAvpTPqNIqM=;
+        b=RjSBrSLlWd71CTKBLx1tRwJ2fZPW9aCCvTqr7pGXc0UTy/VP72CPSfww569TTD5TKg
+         UJUULe+2cDWBb5tZNvlQAxZwg4eK4UhDhZbc5liiZUTTTThzOfOcYB5cVA/9p87xAhTe
+         0aFebzWmVwp0XmESznMQEEcZICnGCfHTcnSbCVpMBI2SyCGLQbzSWoaS5Ou/etXCTaNB
+         OEULfdJPkiBwttK05xzcnASUs+XqEI8A0sNJgWWoeR62S1m8bNVXqOxUA8VZkJFYudJo
+         C0E+jSIQ8Ve3nfWEwZQaDirCBMEfMGdm2sTGbF2mTLEmKj/6M2nl2vfwIBISFRNkRjeT
+         i18g==
+X-Gm-Message-State: APjAAAVWjSZ2YqbDrD+kfrFlb/4g9vGh6xVrrR8kyUXnSzb6s9g4ULMj
+        8ndliXqGjYm9lFIfO9pIl+z8GcvZ3Pb9u3CCOrA=
+X-Google-Smtp-Source: APXvYqwJ2HUxS4FKK1XU93wJyd+x/7qURmSpYcNyYnkbHrNeudxQf8vE6jo+0sLFKE/Co6I3WhWb6ZA1CNw3cpjacA4=
+X-Received: by 2002:a6b:901:: with SMTP id t1mr14703305ioi.42.1559666019686;
+ Tue, 04 Jun 2019 09:33:39 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190603170306.49099-1-nitesh@redhat.com> <20190603170306.49099-2-nitesh@redhat.com>
- <CAKgT0Udnc_cmgBLFEZ5udexsc1cfjX1rJR3qQFOW-7bfuFh6gQ@mail.gmail.com>
- <4cdfee20-126e-bc28-cf1c-2cfd484ca28e@redhat.com> <CAKgT0Ud6uKpcj9HFHYOThCY=0_P0=quBLbsDR7uUMdbwcYeSTw@mail.gmail.com>
- <09e6caea-7000-b3e4-d297-df6bea78e127@redhat.com>
-In-Reply-To: <09e6caea-7000-b3e4-d297-df6bea78e127@redhat.com>
+References: <20190603170306.49099-1-nitesh@redhat.com> <20190603170306.49099-3-nitesh@redhat.com>
+In-Reply-To: <20190603170306.49099-3-nitesh@redhat.com>
 From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Tue, 4 Jun 2019 09:25:16 -0700
-Message-ID: <CAKgT0UeMpcckGpT6OnC2kqgtyT2p9bvNgE2C0eqW1GOJTU-DHA@mail.gmail.com>
-Subject: Re: [RFC][Patch v10 1/2] mm: page_hinting: core infrastructure
+Date:   Tue, 4 Jun 2019 09:33:28 -0700
+Message-ID: <CAKgT0UeRkG0FyESjjQQWeOs3x2O=BUzFYZAdDkjjLyXRiJMnCQ@mail.gmail.com>
+Subject: Re: [RFC][Patch v10 2/2] virtio-balloon: page_hinting: reporting to
+ the host
 To:     Nitesh Narayan Lal <nitesh@redhat.com>
 Cc:     kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -68,67 +66,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 4, 2019 at 9:08 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
+On Mon, Jun 3, 2019 at 10:04 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
 >
+> Enables the kernel to negotiate VIRTIO_BALLOON_F_HINTING feature with the
+> host. If it is available and page_hinting_flag is set to true, page_hinting
+> is enabled and its callbacks are configured along with the max_pages count
+> which indicates the maximum number of pages that can be isolated and hinted
+> at a time. Currently, only free pages of order >= (MAX_ORDER - 2) are
+> reported. To prevent any false OOM max_pages count is set to 16.
 >
-> On 6/4/19 11:14 AM, Alexander Duyck wrote:
-> > On Tue, Jun 4, 2019 at 5:55 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
-> >>
-> >> On 6/3/19 3:04 PM, Alexander Duyck wrote:
-> >>> On Mon, Jun 3, 2019 at 10:04 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
-> >>>> This patch introduces the core infrastructure for free page hinting in
-> >>>> virtual environments. It enables the kernel to track the free pages which
-> >>>> can be reported to its hypervisor so that the hypervisor could
-> >>>> free and reuse that memory as per its requirement.
-> >>>>
-> >>>> While the pages are getting processed in the hypervisor (e.g.,
-> >>>> via MADV_FREE), the guest must not use them, otherwise, data loss
-> >>>> would be possible. To avoid such a situation, these pages are
-> >>>> temporarily removed from the buddy. The amount of pages removed
-> >>>> temporarily from the buddy is governed by the backend(virtio-balloon
-> >>>> in our case).
-> >>>>
-> >>>> To efficiently identify free pages that can to be hinted to the
-> >>>> hypervisor, bitmaps in a coarse granularity are used. Only fairly big
-> >>>> chunks are reported to the hypervisor - especially, to not break up THP
-> >>>> in the hypervisor - "MAX_ORDER - 2" on x86, and to save space. The bits
-> >>>> in the bitmap are an indication whether a page *might* be free, not a
-> >>>> guarantee. A new hook after buddy merging sets the bits.
-> >>>>
-> >>>> Bitmaps are stored per zone, protected by the zone lock. A workqueue
-> >>>> asynchronously processes the bitmaps, trying to isolate and report pages
-> >>>> that are still free. The backend (virtio-balloon) is responsible for
-> >>>> reporting these batched pages to the host synchronously. Once reporting/
-> >>>> freeing is complete, isolated pages are returned back to the buddy.
-> >>>>
-> >>>> There are still various things to look into (e.g., memory hotplug, more
-> >>>> efficient locking, possible races when disabling).
-> >>>>
-> >>>> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
-> >>> So one thing I had thought about, that I don't believe that has been
-> >>> addressed in your solution, is to determine a means to guarantee
-> >>> forward progress. If you have a noisy thread that is allocating and
-> >>> freeing some block of memory repeatedly you will be stuck processing
-> >>> that and cannot get to the other work. Specifically if you have a zone
-> >>> where somebody is just cycling the number of pages needed to fill your
-> >>> hinting queue how do you get around it and get to the data that is
-> >>> actually code instead of getting stuck processing the noise?
-> >> It should not matter. As every time the memory threshold is met, entire
-> >> bitmap
-> >> is scanned and not just a chunk of memory for possible isolation. This
-> >> will guarantee
-> >> forward progress.
-> > So I think there may still be some issues. I see how you go from the
-> > start to the end, but how to you loop back to the start again as pages
-> > are added? The init_hinting_wq doesn't seem to have a way to get back
-> > to the start again if there is still work to do after you have
-> > completed your pass without queue_work_on firing off another thread.
-> >
-> That will be taken care as the part of a new job, which will be
-> en-queued as soon
-> as the free memory count for the respective zone will reach the threshold.
+> By default page_hinting feature is enabled and gets loaded as soon
+> as the virtio-balloon driver is loaded. However, it could be disabled
+> by writing the page_hinting_flag which is a virtio-balloon parameter.
+>
+> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
+> ---
+>  drivers/virtio/virtio_balloon.c     | 112 +++++++++++++++++++++++++++-
+>  include/uapi/linux/virtio_balloon.h |  14 ++++
+>  2 files changed, 125 insertions(+), 1 deletion(-)
 
-So does that mean that you have multiple threads all calling
-queue_work_on until you get below the threshold? If so it seems like
-that would get expensive since that is an atomic test and set
-operation that would be hammered until you get below that threshold.
+<snip>
+
+> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
+> index a1966cd7b677..25e4f817c660 100644
+> --- a/include/uapi/linux/virtio_balloon.h
+> +++ b/include/uapi/linux/virtio_balloon.h
+> @@ -29,6 +29,7 @@
+>  #include <linux/virtio_types.h>
+>  #include <linux/virtio_ids.h>
+>  #include <linux/virtio_config.h>
+> +#include <linux/page_hinting.h>
+
+So this include breaks the build and from what I can tell it isn't
+really needed. I deleted it in order to be able to build without
+warnings about the file not being included in UAPI.
+
+>  /* The feature bitmap for virtio balloon */
+>  #define VIRTIO_BALLOON_F_MUST_TELL_HOST        0 /* Tell before reclaiming pages */
+> @@ -36,6 +37,7 @@
+>  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM        2 /* Deflate balloon on OOM */
+>  #define VIRTIO_BALLOON_F_FREE_PAGE_HINT        3 /* VQ to report free pages */
+>  #define VIRTIO_BALLOON_F_PAGE_POISON   4 /* Guest is using page poisoning */
+> +#define VIRTIO_BALLOON_F_HINTING       5 /* Page hinting virtqueue */
+>
+>  /* Size of a PFN in the balloon interface. */
+>  #define VIRTIO_BALLOON_PFN_SHIFT 12
+> @@ -108,4 +110,16 @@ struct virtio_balloon_stat {
+>         __virtio64 val;
+>  } __attribute__((packed));
+>
+> +#ifdef CONFIG_PAGE_HINTING
+> +/*
+> + * struct hinting_data- holds the information associated with hinting.
+> + * @phys_add:  physical address associated with a page or the array holding
+> + *             the array of isolated pages.
+> + * @size:      total size associated with the phys_addr.
+> + */
+> +struct hinting_data {
+> +       __virtio64 phys_addr;
+> +       __virtio32 size;
+> +};
+> +#endif
+>  #endif /* _LINUX_VIRTIO_BALLOON_H */
+> --
+> 2.21.0
+>
