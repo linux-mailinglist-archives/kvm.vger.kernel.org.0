@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D573348D6
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 15:33:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DD59348D9
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 15:33:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727710AbfFDNdq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 09:33:46 -0400
-Received: from foss.arm.com ([217.140.101.70]:44038 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727688AbfFDNdq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 09:33:46 -0400
+        id S1727715AbfFDNds (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 09:33:48 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:44062 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727679AbfFDNds (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jun 2019 09:33:48 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 56AA215A2;
-        Tue,  4 Jun 2019 06:33:45 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AACED15AB;
+        Tue,  4 Jun 2019 06:33:47 -0700 (PDT)
 Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.144.41])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BC0AF3F690;
-        Tue,  4 Jun 2019 06:33:44 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 443683F690;
+        Tue,  4 Jun 2019 06:33:47 -0700 (PDT)
 From:   Christoffer Dall <christoffer.dall@arm.com>
 To:     kvm@vger.kernel.org
 Cc:     kvmarm@lists.cs.columbia.edu,
@@ -31,9 +31,9 @@ Cc:     kvmarm@lists.cs.columbia.edu,
         Anshuman Khandual <anshuman.khandual@arm.com>,
         Suzuki K Poulose <Suzuki.Poulose@arm.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v3 2/4] KVM: x86: Rename mmu_memory_cache to kvm_mmu_memcache
-Date:   Tue,  4 Jun 2019 15:33:34 +0200
-Message-Id: <20190604133336.22226-3-christoffer.dall@arm.com>
+Subject: [PATCH v3 3/4] KVM: arm/arm64: Move to common kvm_mmu_memcache infrastructure
+Date:   Tue,  4 Jun 2019 15:33:35 +0200
+Message-Id: <20190604133336.22226-4-christoffer.dall@arm.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190604133336.22226-1-christoffer.dall@arm.com>
 References: <20190604133336.22226-1-christoffer.dall@arm.com>
@@ -42,306 +42,347 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As we have moved the mmu memory cache definitions and functions to
-common code, they are exported as symols to the rest of the kernel.
+Now when we have a common mmu mmemcache implementation, we can reuse
+this for arm and arm64.
 
-Let's rename the functions and data types to have a kvm_ prefix to make
-it clear where these functions belong and take this chance to rename
-memory_cache to memcache to avoid overly long lines.
-
-This is a bit tedious on the callsites but ends up looking more
-palatable.
+The common implementation has a slightly different behavior when
+allocating objects under high memory pressure; whereas the current
+arm/arm64 implementation will give up and return -ENOMEM if the full
+size of the cache cannot be allocated during topup, the common
+implementation is happy with any allocation between min and max.  There
+should be no architecture-specific requirement for doing it one way or
+the other and it's in fact better to enforce a cross-architecture KVM
+policy on this behavior.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 ---
- arch/x86/include/asm/kvm_host.h  |  6 ++---
- arch/x86/include/asm/kvm_types.h |  4 ++--
- arch/x86/kvm/mmu.c               | 38 ++++++++++++++++----------------
- arch/x86/kvm/paging_tmpl.h       |  4 ++--
- include/linux/kvm_host.h         | 14 ++++++------
- include/linux/kvm_types.h        |  6 ++---
- virt/kvm/kvm_main.c              | 14 ++++++------
- 7 files changed, 43 insertions(+), 43 deletions(-)
+ arch/arm/include/asm/kvm_host.h    | 13 +-----
+ arch/arm/include/asm/kvm_mmu.h     |  2 +-
+ arch/arm/include/asm/kvm_types.h   |  6 +++
+ arch/arm64/include/asm/kvm_host.h  | 13 +-----
+ arch/arm64/include/asm/kvm_mmu.h   |  2 +-
+ arch/arm64/include/asm/kvm_types.h |  6 +++
+ virt/kvm/arm/arm.c                 |  2 +-
+ virt/kvm/arm/mmu.c                 | 68 ++++++++----------------------
+ 8 files changed, 34 insertions(+), 78 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 85d54aff72ec..908e07fb2368 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -593,9 +593,9 @@ struct kvm_vcpu_arch {
- 	 */
- 	struct kvm_mmu *walk_mmu;
- 
--	struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
--	struct kvm_mmu_memory_cache mmu_page_cache;
--	struct kvm_mmu_memory_cache mmu_page_header_cache;
-+	struct kvm_mmu_memcache mmu_pte_list_desc_cache;
-+	struct kvm_mmu_memcache mmu_page_cache;
-+	struct kvm_mmu_memcache mmu_page_header_cache;
- 
- 	/*
- 	 * QEMU userspace and the guest each have their own FPU state.
-diff --git a/arch/x86/include/asm/kvm_types.h b/arch/x86/include/asm/kvm_types.h
-index ef35a627f69e..d2da445502ba 100644
---- a/arch/x86/include/asm/kvm_types.h
-+++ b/arch/x86/include/asm/kvm_types.h
-@@ -2,9 +2,9 @@
- #ifndef _ASM_X86_KVM_TYPES_H
- #define _ASM_X86_KVM_TYPES_H
- 
--#define KVM_ARCH_WANT_MMU_MEMORY_CACHE
-+#define KVM_ARCH_WANT_MMU_MEMCACHE
- 
--#define KVM_NR_MEM_OBJS 40
-+#define KVM_MMU_NR_MEMCACHE_OBJS 40
- 
- #define KVM_MMU_CACHE_GFP_FLAGS		__GFP_ACCOUNT
- 
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index 79cf345e5d7c..0cfa219b186a 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -971,35 +971,35 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
- 	local_irq_enable();
- }
- 
--static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu)
-+static int kvm_mmu_topup_memcaches(struct kvm_vcpu *vcpu)
- {
- 	int r;
- 
--	r = mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
-+	r = kvm_mmu_topup_memcache(&vcpu->arch.mmu_pte_list_desc_cache,
- 				   pte_list_desc_cache, 8 + PTE_PREFETCH_NUM);
- 	if (r)
- 		goto out;
--	r = mmu_topup_memory_cache_page(&vcpu->arch.mmu_page_cache, 8);
-+	r = kvm_mmu_topup_memcache_page(&vcpu->arch.mmu_page_cache, 8);
- 	if (r)
- 		goto out;
--	r = mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
-+	r = kvm_mmu_topup_memcache(&vcpu->arch.mmu_page_header_cache,
- 				   mmu_page_header_cache, 4);
- out:
- 	return r;
- }
- 
--static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
-+static void kvm_mmu_free_memcaches(struct kvm_vcpu *vcpu)
- {
--	mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
-+	kvm_mmu_free_memcache(&vcpu->arch.mmu_pte_list_desc_cache,
- 				pte_list_desc_cache);
--	mmu_free_memory_cache_page(&vcpu->arch.mmu_page_cache);
--	mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache,
-+	kvm_mmu_free_memcache_page(&vcpu->arch.mmu_page_cache);
-+	kvm_mmu_free_memcache(&vcpu->arch.mmu_page_header_cache,
- 				mmu_page_header_cache);
- }
- 
- static struct pte_list_desc *mmu_alloc_pte_list_desc(struct kvm_vcpu *vcpu)
- {
--	return mmu_memory_cache_alloc(&vcpu->arch.mmu_pte_list_desc_cache);
-+	return kvm_mmu_memcache_alloc(&vcpu->arch.mmu_pte_list_desc_cache);
- }
- 
- static void mmu_free_pte_list_desc(struct pte_list_desc *pte_list_desc)
-@@ -1319,10 +1319,10 @@ static struct kvm_rmap_head *gfn_to_rmap(struct kvm *kvm, gfn_t gfn,
- 
- static bool rmap_can_add(struct kvm_vcpu *vcpu)
- {
--	struct kvm_mmu_memory_cache *cache;
-+	struct kvm_mmu_memcache *cache;
- 
- 	cache = &vcpu->arch.mmu_pte_list_desc_cache;
--	return mmu_memory_cache_free_objects(cache);
-+	return kvm_mmu_memcache_free_objects(cache);
- }
- 
- static int rmap_add(struct kvm_vcpu *vcpu, u64 *spte, gfn_t gfn)
-@@ -2005,10 +2005,10 @@ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct
- {
- 	struct kvm_mmu_page *sp;
- 
--	sp = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
--	sp->spt = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_cache);
-+	sp = kvm_mmu_memcache_alloc(&vcpu->arch.mmu_page_header_cache);
-+	sp->spt = kvm_mmu_memcache_alloc(&vcpu->arch.mmu_page_cache);
- 	if (!direct)
--		sp->gfns = mmu_memory_cache_alloc(&vcpu->arch.mmu_page_cache);
-+		sp->gfns = kvm_mmu_memcache_alloc(&vcpu->arch.mmu_page_cache);
- 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
- 	list_add(&sp->link, &vcpu->kvm->arch.active_mmu_pages);
- 	kvm_mod_used_mmu_pages(vcpu->kvm, +1);
-@@ -3936,7 +3936,7 @@ static int nonpaging_page_fault(struct kvm_vcpu *vcpu, gva_t gva,
- 	if (page_fault_handle_page_track(vcpu, error_code, gfn))
- 		return RET_PF_EMULATE;
- 
--	r = mmu_topup_memory_caches(vcpu);
-+	r = kvm_mmu_topup_memcaches(vcpu);
- 	if (r)
- 		return r;
- 
-@@ -4065,7 +4065,7 @@ static int tdp_page_fault(struct kvm_vcpu *vcpu, gva_t gpa, u32 error_code,
- 	if (page_fault_handle_page_track(vcpu, error_code, gfn))
- 		return RET_PF_EMULATE;
- 
--	r = mmu_topup_memory_caches(vcpu);
-+	r = kvm_mmu_topup_memcaches(vcpu);
- 	if (r)
- 		return r;
- 
-@@ -5042,7 +5042,7 @@ int kvm_mmu_load(struct kvm_vcpu *vcpu)
- {
- 	int r;
- 
--	r = mmu_topup_memory_caches(vcpu);
-+	r = kvm_mmu_topup_memcaches(vcpu);
- 	if (r)
- 		goto out;
- 	r = mmu_alloc_roots(vcpu);
-@@ -5220,7 +5220,7 @@ static void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa,
- 	 * or not since pte prefetch is skiped if it does not have
- 	 * enough objects in the cache.
- 	 */
--	mmu_topup_memory_caches(vcpu);
-+	kvm_mmu_topup_memcaches(vcpu);
- 
- 	spin_lock(&vcpu->kvm->mmu_lock);
- 
-@@ -6009,7 +6009,7 @@ void kvm_mmu_destroy(struct kvm_vcpu *vcpu)
- {
- 	kvm_mmu_unload(vcpu);
- 	free_mmu_pages(vcpu);
--	mmu_free_memory_caches(vcpu);
-+	kvm_mmu_free_memcaches(vcpu);
- }
- 
- void kvm_mmu_module_exit(void)
-diff --git a/arch/x86/kvm/paging_tmpl.h b/arch/x86/kvm/paging_tmpl.h
-index 367a47df4ba0..a2535d0d109f 100644
---- a/arch/x86/kvm/paging_tmpl.h
-+++ b/arch/x86/kvm/paging_tmpl.h
-@@ -767,7 +767,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, gva_t addr, u32 error_code,
- 
- 	pgprintk("%s: addr %lx err %x\n", __func__, addr, error_code);
- 
--	r = mmu_topup_memory_caches(vcpu);
-+	r = kvm_mmu_topup_memcaches(vcpu);
- 	if (r)
- 		return r;
- 
-@@ -890,7 +890,7 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
- 	 * No need to check return value here, rmap_can_add() can
- 	 * help us to skip pte prefetch later.
- 	 */
--	mmu_topup_memory_caches(vcpu);
-+	kvm_mmu_topup_memcaches(vcpu);
- 
- 	if (!VALID_PAGE(root_hpa)) {
- 		WARN_ON(1);
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 819b95e090f6..11b5716edf6f 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -790,15 +790,15 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu, bool usermode_vcpu_not_eligible);
- void kvm_flush_remote_tlbs(struct kvm *kvm);
- void kvm_reload_remote_mmus(struct kvm *kvm);
- 
--#ifdef KVM_ARCH_WANT_MMU_MEMORY_CACHE
--int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
-+#ifdef KVM_ARCH_WANT_MMU_MEMCACHE
-+int kvm_mmu_topup_memcache(struct kvm_mmu_memcache *cache,
- 			   struct kmem_cache *base_cache, int min);
--int mmu_memory_cache_free_objects(struct kvm_mmu_memory_cache *cache);
--void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc,
-+int kvm_mmu_memcache_free_objects(struct kvm_mmu_memcache *cache);
-+void kvm_mmu_free_memcache(struct kvm_mmu_memcache *mc,
- 			   struct kmem_cache *cache);
--int mmu_topup_memory_cache_page(struct kvm_mmu_memory_cache *cache, int min);
--void mmu_free_memory_cache_page(struct kvm_mmu_memory_cache *mc);
--void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
-+int kvm_mmu_topup_memcache_page(struct kvm_mmu_memcache *cache, int min);
-+void kvm_mmu_free_memcache_page(struct kvm_mmu_memcache *mc);
-+void *kvm_mmu_memcache_alloc(struct kvm_mmu_memcache *mc);
- #endif
- 
- bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
-diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-index 6cee379588ee..10eaf5f53931 100644
---- a/include/linux/kvm_types.h
-+++ b/include/linux/kvm_types.h
-@@ -64,14 +64,14 @@ struct gfn_to_hva_cache {
- 	struct kvm_memory_slot *memslot;
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 075e1921fdd9..6f3f4ab65c8e 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -91,17 +91,6 @@ struct kvm_arch {
+ 	u32 psci_version;
  };
  
--#ifdef KVM_ARCH_WANT_MMU_MEMORY_CACHE
-+#ifdef KVM_ARCH_WANT_MMU_MEMCACHE
- /*
-  * We don't want allocation failures within the mmu code, so we preallocate
-  * enough memory for a single page fault in a cache.
-  */
+-#define KVM_NR_MEM_OBJS     40
+-
+-/*
+- * We don't want allocation failures within the mmu code, so we preallocate
+- * enough memory for a single page fault in a cache.
+- */
 -struct kvm_mmu_memory_cache {
-+struct kvm_mmu_memcache {
- 	int nobjs;
+-	int nobjs;
 -	void *objects[KVM_NR_MEM_OBJS];
-+	void *objects[KVM_MMU_NR_MEMCACHE_OBJS];
+-};
+-
+ struct kvm_vcpu_fault_info {
+ 	u32 hsr;		/* Hyp Syndrome Register */
+ 	u32 hxfar;		/* Hyp Data/Inst. Fault Address Register */
+@@ -210,7 +199,7 @@ struct kvm_vcpu_arch {
+ 	struct kvm_decode mmio_decode;
+ 
+ 	/* Cache some mmu pages needed inside spinlock regions */
+-	struct kvm_mmu_memory_cache mmu_page_cache;
++	struct kvm_mmu_memcache mmu_page_cache;
+ 
+ 	struct vcpu_reset_state reset_state;
+ 
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 31de4ab93005..4a61159fadfb 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -71,7 +71,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 
+ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ 
+-void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu);
++void kvm_mmu_free_memcaches(struct kvm_vcpu *vcpu);
+ 
+ phys_addr_t kvm_mmu_get_httbr(void);
+ phys_addr_t kvm_get_idmap_vector(void);
+diff --git a/arch/arm/include/asm/kvm_types.h b/arch/arm/include/asm/kvm_types.h
+index bc389f82e88d..9f944872a746 100644
+--- a/arch/arm/include/asm/kvm_types.h
++++ b/arch/arm/include/asm/kvm_types.h
+@@ -2,4 +2,10 @@
+ #ifndef _ASM_ARM_KVM_TYPES_H
+ #define _ASM_ARM_KVM_TYPES_H
+ 
++#define KVM_ARCH_WANT_MMU_MEMCACHE
++
++#define KVM_MMU_NR_MEMCACHE_OBJS 40
++
++#define KVM_MMU_CACHE_GFP_FLAGS		__GFP_ZERO
++
+ #endif /* _ASM_ARM_KVM_TYPES_H */
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 2a8d3f8ca22c..5f6bf47e165c 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -96,17 +96,6 @@ struct kvm_arch {
+ 	u32 psci_version;
  };
- #endif
  
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 61cee2052bfd..72ae434cfb72 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -290,8 +290,8 @@ void kvm_reload_remote_mmus(struct kvm *kvm)
- 	kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_RELOAD);
+-#define KVM_NR_MEM_OBJS     40
+-
+-/*
+- * We don't want allocation failures within the mmu code, so we preallocate
+- * enough memory for a single page fault in a cache.
+- */
+-struct kvm_mmu_memory_cache {
+-	int nobjs;
+-	void *objects[KVM_NR_MEM_OBJS];
+-};
+-
+ struct kvm_vcpu_fault_info {
+ 	u32 esr_el2;		/* Hyp Syndrom Register */
+ 	u64 far_el2;		/* Hyp Fault Address Register */
+@@ -331,7 +320,7 @@ struct kvm_vcpu_arch {
+ 	struct kvm_decode mmio_decode;
+ 
+ 	/* Cache some mmu pages needed inside spinlock regions */
+-	struct kvm_mmu_memory_cache mmu_page_cache;
++	struct kvm_mmu_memcache mmu_page_cache;
+ 
+ 	/* Target CPU and feature flags */
+ 	int target;
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index ebeefcf835e8..0b686498e64a 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -171,7 +171,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 
+ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ 
+-void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu);
++void kvm_mmu_free_memcaches(struct kvm_vcpu *vcpu);
+ 
+ phys_addr_t kvm_mmu_get_httbr(void);
+ phys_addr_t kvm_get_idmap_vector(void);
+diff --git a/arch/arm64/include/asm/kvm_types.h b/arch/arm64/include/asm/kvm_types.h
+index d0987007d581..e28cf83b782b 100644
+--- a/arch/arm64/include/asm/kvm_types.h
++++ b/arch/arm64/include/asm/kvm_types.h
+@@ -2,5 +2,11 @@
+ #ifndef _ASM_ARM64_KVM_TYPES_H
+ #define _ASM_ARM64_KVM_TYPES_H
+ 
++#define KVM_ARCH_WANT_MMU_MEMCACHE
++
++#define KVM_MMU_NR_MEMCACHE_OBJS 40
++
++#define KVM_MMU_CACHE_GFP_FLAGS		__GFP_ZERO
++
+ #endif /* _ASM_ARM64_KVM_TYPES_H */
+ 
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index 90cedebaeb94..e7735fd26f51 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -313,7 +313,7 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.has_run_once && unlikely(!irqchip_in_kernel(vcpu->kvm)))
+ 		static_branch_dec(&userspace_irqchip_in_use);
+ 
+-	kvm_mmu_free_memory_caches(vcpu);
++	kvm_mmu_free_memcaches(vcpu);
+ 	kvm_timer_vcpu_terminate(vcpu);
+ 	kvm_pmu_vcpu_destroy(vcpu);
+ 	kvm_vcpu_uninit(vcpu);
+diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+index 74b6582eaa3c..c4cf70810b4f 100644
+--- a/virt/kvm/arm/mmu.c
++++ b/virt/kvm/arm/mmu.c
+@@ -132,38 +132,6 @@ static void stage2_dissolve_pud(struct kvm *kvm, phys_addr_t addr, pud_t *pudp)
+ 	put_page(virt_to_page(pudp));
  }
  
--#ifdef KVM_ARCH_WANT_MMU_MEMORY_CACHE
--int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
-+#ifdef KVM_ARCH_WANT_MMU_MEMCACHE
-+int kvm_mmu_topup_memcache(struct kvm_mmu_memcache *cache,
- 			   struct kmem_cache *base_cache, int min)
+-static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
+-				  int min, int max)
+-{
+-	void *page;
+-
+-	BUG_ON(max > KVM_NR_MEM_OBJS);
+-	if (cache->nobjs >= min)
+-		return 0;
+-	while (cache->nobjs < max) {
+-		page = (void *)__get_free_page(PGALLOC_GFP);
+-		if (!page)
+-			return -ENOMEM;
+-		cache->objects[cache->nobjs++] = page;
+-	}
+-	return 0;
+-}
+-
+-static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+-{
+-	while (mc->nobjs)
+-		free_page((unsigned long)mc->objects[--mc->nobjs]);
+-}
+-
+-static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+-{
+-	void *p;
+-
+-	BUG_ON(!mc || !mc->nobjs);
+-	p = mc->objects[--mc->nobjs];
+-	return p;
+-}
+-
+ static void clear_stage2_pgd_entry(struct kvm *kvm, pgd_t *pgd, phys_addr_t addr)
  {
- 	void *obj;
-@@ -307,19 +307,19 @@ int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
+ 	pud_t *pud_table __maybe_unused = stage2_pud_offset(kvm, pgd, 0UL);
+@@ -1020,7 +988,7 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
+ 		free_pages_exact(pgd, stage2_pgd_size(kvm));
+ }
+ 
+-static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
++static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memcache *cache,
+ 			     phys_addr_t addr)
+ {
+ 	pgd_t *pgd;
+@@ -1030,7 +998,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
+ 	if (stage2_pgd_none(kvm, *pgd)) {
+ 		if (!cache)
+ 			return NULL;
+-		pud = mmu_memory_cache_alloc(cache);
++		pud = kvm_mmu_memcache_alloc(cache);
+ 		stage2_pgd_populate(kvm, pgd, pud);
+ 		get_page(virt_to_page(pgd));
+ 	}
+@@ -1038,7 +1006,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
+ 	return stage2_pud_offset(kvm, pgd, addr);
+ }
+ 
+-static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
++static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memcache *cache,
+ 			     phys_addr_t addr)
+ {
+ 	pud_t *pud;
+@@ -1051,7 +1019,7 @@ static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
+ 	if (stage2_pud_none(kvm, *pud)) {
+ 		if (!cache)
+ 			return NULL;
+-		pmd = mmu_memory_cache_alloc(cache);
++		pmd = kvm_mmu_memcache_alloc(cache);
+ 		stage2_pud_populate(kvm, pud, pmd);
+ 		get_page(virt_to_page(pud));
+ 	}
+@@ -1059,7 +1027,7 @@ static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
+ 	return stage2_pmd_offset(kvm, pud, addr);
+ }
+ 
+-static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
++static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memcache
+ 			       *cache, phys_addr_t addr, const pmd_t *new_pmd)
+ {
+ 	pmd_t *pmd, old_pmd;
+@@ -1123,7 +1091,7 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
  	return 0;
  }
  
--int mmu_memory_cache_free_objects(struct kvm_mmu_memory_cache *cache)
-+int kvm_mmu_memcache_free_objects(struct kvm_mmu_memcache *cache)
+-static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
++static int stage2_set_pud_huge(struct kvm *kvm, struct kvm_mmu_memcache *cache,
+ 			       phys_addr_t addr, const pud_t *new_pudp)
  {
- 	return cache->nobjs;
+ 	pud_t *pudp, old_pud;
+@@ -1225,7 +1193,7 @@ static bool stage2_is_exec(struct kvm *kvm, phys_addr_t addr)
+ 		return kvm_s2pte_exec(ptep);
  }
  
--void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc,
-+void kvm_mmu_free_memcache(struct kvm_mmu_memcache *mc,
- 			   struct kmem_cache *cache)
+-static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
++static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memcache *cache,
+ 			  phys_addr_t addr, const pte_t *new_pte,
+ 			  unsigned long flags)
  {
- 	while (mc->nobjs)
- 		kmem_cache_free(cache, mc->objects[--mc->nobjs]);
+@@ -1257,7 +1225,7 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+ 	if (stage2_pud_none(kvm, *pud)) {
+ 		if (!cache)
+ 			return 0; /* ignore calls from kvm_set_spte_hva */
+-		pmd = mmu_memory_cache_alloc(cache);
++		pmd = kvm_mmu_memcache_alloc(cache);
+ 		stage2_pud_populate(kvm, pud, pmd);
+ 		get_page(virt_to_page(pud));
+ 	}
+@@ -1282,7 +1250,7 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+ 	if (pmd_none(*pmd)) {
+ 		if (!cache)
+ 			return 0; /* ignore calls from kvm_set_spte_hva */
+-		pte = mmu_memory_cache_alloc(cache);
++		pte = kvm_mmu_memcache_alloc(cache);
+ 		kvm_pmd_populate(pmd, pte);
+ 		get_page(virt_to_page(pmd));
+ 	}
+@@ -1349,7 +1317,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 	phys_addr_t addr, end;
+ 	int ret = 0;
+ 	unsigned long pfn;
+-	struct kvm_mmu_memory_cache cache = { 0, };
++	struct kvm_mmu_memcache cache = { 0, };
+ 
+ 	end = (guest_ipa + size + PAGE_SIZE - 1) & PAGE_MASK;
+ 	pfn = __phys_to_pfn(pa);
+@@ -1360,9 +1328,8 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 		if (writable)
+ 			pte = kvm_s2pte_mkwrite(pte);
+ 
+-		ret = mmu_topup_memory_cache(&cache,
+-					     kvm_mmu_cache_min_pages(kvm),
+-					     KVM_NR_MEM_OBJS);
++		ret = kvm_mmu_topup_memcache_page(&cache,
++						  kvm_mmu_cache_min_pages(kvm));
+ 		if (ret)
+ 			goto out;
+ 		spin_lock(&kvm->mmu_lock);
+@@ -1376,7 +1343,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 	}
+ 
+ out:
+-	mmu_free_memory_cache(&cache);
++	kvm_mmu_free_memcache_page(&cache);
+ 	return ret;
  }
  
--int mmu_topup_memory_cache_page(struct kvm_mmu_memory_cache *cache, int min)
-+int kvm_mmu_topup_memcache_page(struct kvm_mmu_memcache *cache, int min)
- {
- 	void *page;
+@@ -1683,7 +1650,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	unsigned long mmu_seq;
+ 	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
+ 	struct kvm *kvm = vcpu->kvm;
+-	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
++	struct kvm_mmu_memcache *memcache = &vcpu->arch.mmu_page_cache;
+ 	struct vm_area_struct *vma;
+ 	kvm_pfn_t pfn;
+ 	pgprot_t mem_type = PAGE_S2;
+@@ -1728,8 +1695,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	up_read(&current->mm->mmap_sem);
  
-@@ -334,13 +334,13 @@ int mmu_topup_memory_cache_page(struct kvm_mmu_memory_cache *cache, int min)
- 	return 0;
+ 	/* We need minimum second+third level pages */
+-	ret = mmu_topup_memory_cache(memcache, kvm_mmu_cache_min_pages(kvm),
+-				     KVM_NR_MEM_OBJS);
++	ret = kvm_mmu_topup_memcache_page(memcache, kvm_mmu_cache_min_pages(kvm));
+ 	if (ret)
+ 		return ret;
+ 
+@@ -2149,9 +2115,9 @@ int kvm_test_age_hva(struct kvm *kvm, unsigned long hva)
+ 	return handle_hva_to_gpa(kvm, hva, hva, kvm_test_age_hva_handler, NULL);
  }
  
--void mmu_free_memory_cache_page(struct kvm_mmu_memory_cache *mc)
-+void kvm_mmu_free_memcache_page(struct kvm_mmu_memcache *mc)
+-void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu)
++void kvm_mmu_free_memcaches(struct kvm_vcpu *vcpu)
  {
- 	while (mc->nobjs)
- 		free_page((unsigned long)mc->objects[--mc->nobjs]);
+-	mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
++	kvm_mmu_free_memcache_page(&vcpu->arch.mmu_page_cache);
  }
  
--void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
-+void *kvm_mmu_memcache_alloc(struct kvm_mmu_memcache *mc)
- {
- 	void *p;
- 
+ phys_addr_t kvm_mmu_get_httbr(void)
 -- 
 2.18.0
 
