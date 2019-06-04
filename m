@@ -2,116 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D09434F19
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 19:37:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A8EC34F80
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 20:03:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726406AbfFDRhw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 13:37:52 -0400
-Received: from mail-eopbgr30100.outbound.protection.outlook.com ([40.107.3.100]:64937
-        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726660AbfFDRhv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 13:37:51 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=testarcselector01; d=microsoft.com; cv=none;
- b=yWA0Qpm6JWkPrbGONKM9OQnSG1VUBexQvsFzMuXADW57TFA7iL8TFw/NtkA+VM2mgIWs36zFyo91R37gtR4VSUzjAHZ91cwQUvTbMra2YpZgPQETmtOs/PByd4V4HqsztUYxI4kGl8TZPsmmHP1HBL8byq0cL8dUCbMofgrGtrk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=testarcselector01;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0h3QTg6O50dMOCUvJSmxIUNBYPuJY49QGbBfMaCLBis=;
- b=QKiM+oW65AHnxvZQ4g5FYrTHFHKftP7NDRpOcqoB9gJeKXsqg+ELfp8Q6YJyj0SN0x1+RT6finP+BQ5Wam+dYIBcqy8Ee5wQiP2kVn4csZqkyzk/GABeUOdIzAFQwDo+LMpPCteaBbJgQGuD8YsW9TbZm9Ac72BfnIhyXiPS2X8=
-ARC-Authentication-Results: i=1; test.office365.com
- 1;spf=none;dmarc=none;dkim=none;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0h3QTg6O50dMOCUvJSmxIUNBYPuJY49QGbBfMaCLBis=;
- b=BvIDo2Q/Q5pNcaJLuixvm/urp/CS0n283zV3FI9Zg6dpFhZKhaXFzfL1EJqtkzEwuuZKzYfMd0TglI0wlqFnzvNuOdAUmGIJKheq5AcNotdqvCtQW+3rqjxx2dtXqmbX+SrJD/XHcLmAls04AfNC0vJt9FG8LgQiEspAo0f3n0Y=
-Received: from AM0PR83MB0307.EURPRD83.prod.outlook.com (52.135.158.26) by
- AM0PR83MB0290.EURPRD83.prod.outlook.com (52.135.158.21) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.2; Tue, 4 Jun 2019 17:37:48 +0000
-Received: from AM0PR83MB0307.EURPRD83.prod.outlook.com
- ([fe80::34cf:76ca:6dd1:88f7]) by AM0PR83MB0307.EURPRD83.prod.outlook.com
- ([fe80::34cf:76ca:6dd1:88f7%5]) with mapi id 15.20.1987.003; Tue, 4 Jun 2019
- 17:37:48 +0000
-From:   Saar Amar <Saar.Amar@microsoft.com>
+        id S1726474AbfFDSDg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 14:03:36 -0400
+Received: from gateway31.websitewelcome.com ([192.185.144.91]:35046 "EHLO
+        gateway31.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726293AbfFDSDg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jun 2019 14:03:36 -0400
+X-Greylist: delayed 1354 seconds by postgrey-1.27 at vger.kernel.org; Tue, 04 Jun 2019 14:03:35 EDT
+Received: from cm10.websitewelcome.com (cm10.websitewelcome.com [100.42.49.4])
+        by gateway31.websitewelcome.com (Postfix) with ESMTP id A4E3ADA1D
+        for <kvm@vger.kernel.org>; Tue,  4 Jun 2019 12:41:00 -0500 (CDT)
+Received: from gator4166.hostgator.com ([108.167.133.22])
+        by cmsmtp with SMTP
+        id YDQihLzKe2PzOYDQihgcBo; Tue, 04 Jun 2019 12:41:00 -0500
+X-Authority-Reason: nr=8
+Received: from [189.250.127.120] (port=54318 helo=[192.168.1.76])
+        by gator4166.hostgator.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.91)
+        (envelope-from <gustavo@embeddedor.com>)
+        id 1hYDQi-0025IN-7y; Tue, 04 Jun 2019 12:41:00 -0500
+Subject: Re: [PATCH] KVM: irqchip: Use struct_size() in kzalloc()
 To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "rkrcmar@redhat.com" <rkrcmar@redhat.com>
-Subject: RE: [PATCH] Fix apic dangling pointer in vcpu
-Thread-Topic: [PATCH] Fix apic dangling pointer in vcpu
-Thread-Index: AdUZJN49W6QDyt1hSjewybE8oMtziAB1R4YAAACM1WA=
-Date:   Tue, 4 Jun 2019 17:37:48 +0000
-Message-ID: <AM0PR83MB0307918B28E386A8BB792976F1150@AM0PR83MB0307.EURPRD83.prod.outlook.com>
-References: <VI1PR83MB0317F837797D43F91B90149BF11B0@VI1PR83MB0317.EURPRD83.prod.outlook.com>
- <f4cf2f7b-1752-849d-4e99-1ce6b336c1b0@redhat.com>
-In-Reply-To: <f4cf2f7b-1752-849d-4e99-1ce6b336c1b0@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=saaramar@microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-06-04T17:37:44.3640021Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=4a5eb840-6c81-4b67-9e58-abe6a1b9b84a;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Saar.Amar@microsoft.com; 
-x-originating-ip: [141.226.13.39]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 31c08ae4-aeba-4380-9aeb-08d6e9135c9a
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:AM0PR83MB0290;
-x-ms-traffictypediagnostic: AM0PR83MB0290:
-x-o365-sonar-daas-pilot: True
-x-microsoft-antispam-prvs: <AM0PR83MB029075DC31C618FA704C61ECF1150@AM0PR83MB0290.EURPRD83.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
-x-forefront-prvs: 0058ABBBC7
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(39860400002)(136003)(396003)(346002)(376002)(13464003)(189003)(199004)(7696005)(316002)(66556008)(55016002)(66946007)(53546011)(76176011)(6506007)(5660300002)(74316002)(52536014)(110136005)(486006)(3846002)(68736007)(476003)(7736002)(446003)(11346002)(22452003)(4744005)(71200400001)(53936002)(86362001)(305945005)(25786009)(76116006)(66476007)(64756008)(73956011)(4326008)(26005)(186003)(71190400001)(6436002)(6246003)(102836004)(8990500004)(9686003)(8936002)(33656002)(10290500003)(14454004)(2501003)(6116002)(99286004)(478600001)(66066001)(81166006)(8676002)(81156014)(229853002)(66446008)(256004)(10090500001)(5024004)(2906002)(72206003);DIR:OUT;SFP:1102;SCL:1;SRVR:AM0PR83MB0290;H:AM0PR83MB0307.EURPRD83.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: RSP+PwZa9FeWTIW4OmD4Ddo8zBVMVOy0c9eNUrG2Y8gXfzZ56LTgxAytsHGYnLuAUiKx0xLAiPD3gNbqKC9Tz7tGKBP73iBftnW6byN9XCctc2A0ijg+8/G+3wiruH3+O/gPtcww/+MI8Z6b0mq0LFTSWJjSGBn9NnFPzfH+1q4Fmb6PB5CqgnloXM3AzgRzUTsb3HUpEp2Dumnxl48SOQcHN1QrkD3B+NcOLTx3zstlA59XkaB44/EQcj1B/ZqmICXw2k2tlMEfnsyLLZyVj+eqiviCoq3AVK7oPrmRsDrPpuWcezyGbeTlkxqnMuILpy05ro5+raJUuKBJNJ5GJhEJJoQH98pfY/RxJnodu7GCcdGC9XYvbYv+3p+f/iGfVSySa56eERZIujLon4MKCPNJbLWBiMARVY+1jfEqRGU=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190531192453.GA13536@embeddedor>
+ <0bc61102-47c6-5df3-aa2d-1f7ec91214c1@redhat.com>
+From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=gustavo@embeddedor.com; keydata=
+ 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
+ VtSixD1uOgytAP7RWS474w==
+Message-ID: <22eb466f-9736-5add-7ea7-f6cf3c94d4a1@embeddedor.com>
+Date:   Tue, 4 Jun 2019 12:40:59 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 31c08ae4-aeba-4380-9aeb-08d6e9135c9a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2019 17:37:48.4458
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: saaramar@microsoft.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR83MB0290
+In-Reply-To: <0bc61102-47c6-5df3-aa2d-1f7ec91214c1@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 189.250.127.120
+X-Source-L: No
+X-Exim-ID: 1hYDQi-0025IN-7y
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.1.76]) [189.250.127.120]:54318
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 3
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Saar Amar <Saar.Amar@microsoft.com>
 
-Thanks a lot!
-Saar
 
------Original Message-----
-From: Paolo Bonzini <pbonzini@redhat.com>=20
-Sent: Tuesday, June 4, 2019 8:22 PM
-To: Saar Amar <Saar.Amar@microsoft.com>; kvm@vger.kernel.org
-Cc: rkrcmar@redhat.com
-Subject: Re: [PATCH] Fix apic dangling pointer in vcpu
+On 6/4/19 12:20 PM, Paolo Bonzini wrote:
+> 
+> Queued, thanks.
+> 
 
-On 02/06/19 11:23, Saar Amar wrote:
-> Hey guys, can you please help me getting this patch in?
->=20
-> Attached both as file, and here is the plaintext. Thanks a lot!
+Great. :)
 
-Please reply to this email with your "Signed-off-by: Saar Amar <Saar.Amar@m=
-icrosoft.com>" to indicate acceptance of the "Developer's Certificate of Ow=
-nership", then I will include it. Thanks!
-
-Paolo
+Thanks, Paolo.
+--
+Gustavo
