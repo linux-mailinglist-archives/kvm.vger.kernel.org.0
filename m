@@ -2,164 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 583363478D
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 15:03:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F4154347A2
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 15:08:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727573AbfFDNCK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 09:02:10 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:35417 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727554AbfFDNCK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 09:02:10 -0400
-Received: by mail-qt1-f194.google.com with SMTP id d23so13596462qto.2
-        for <kvm@vger.kernel.org>; Tue, 04 Jun 2019 06:02:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=ROjiC3s0siagx/fi+MGJXNVgc6kDjODdOY/lcLdmBIY=;
-        b=Yjg83FKmLcCoTK1qNZRWt/34Ia4Vlgl4OzEswRBoqTA1q96rWHjxDfVIh6O7xWTGYS
-         eTwCJcntFH46Tx+/cfSa7gWeHuAwOuGBn+X1jMdn5S6DRrFvNPM6afZ9JtFGwDFoFWKd
-         IItwYcOZFv/0waUdBmD+9vX5g+lauIFC8gWQwZqeWZqiLI8MWTWgKqH10ZguaFNyDwaJ
-         a6BouIbR+z5GvWPUxO/910/OPmm0It1HqckTeip+hRX/UhVQAxatTT7lXUHm0zw2yFJW
-         DkwJjMsTV0HME+BgheyUHlaQClPbcE8mHooI7fCmf534f4AYixHfdR0GOmoGClDBYuEf
-         l/5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=ROjiC3s0siagx/fi+MGJXNVgc6kDjODdOY/lcLdmBIY=;
-        b=BhUraJ2OEhof5jDoZ7vNcmcgxRBKOBkf/q3hpyboY29IpS5vA2bFElGvarKAtcMpck
-         4FrKnoJ5izLE6MihZqmsVxBbKKvkFoOJeF7sJTm0RVOeKdywGMY34M64ADM9rn9MYLtm
-         gWbbggu3Pb0s6KxF46QiUdsjjjLFJBRIcYrf8zlGi1LvKsMUWwepEf89rjSyd1OeSEFm
-         HB2FnayZ9Ka1VcMI/uVpbTc2yo65olrmSJ+2B+rrbNIPKG8FiP6vPlgY1A+yQiPPGW81
-         YWw4DZCl7LyXgPMWNZ60tvLUrqLzm8mbAu8x333ms/Vjq1Thw+wfcTETUep/aC9tCaMa
-         JjIA==
-X-Gm-Message-State: APjAAAUnQxrK/VzYtkLbcOnGElnlSQjmP4HH8HqWDvckCfcN/Yx67Xyx
-        Njhy/2NzONYeL1lvCFnwnEJPtA==
-X-Google-Smtp-Source: APXvYqz5RimUEjNtxNzzaaY0SoKGmFHRAnKhf0PPTePbHdJhsA1MCZNciExOvF95WwVoO+r2X/Sqlw==
-X-Received: by 2002:a0c:c94d:: with SMTP id v13mr706065qvj.211.1559653328976;
-        Tue, 04 Jun 2019 06:02:08 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
-        by smtp.gmail.com with ESMTPSA id m5sm10984580qke.25.2019.06.04.06.02.08
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 04 Jun 2019 06:02:08 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1hY94p-0004U3-JD; Tue, 04 Jun 2019 10:02:07 -0300
-Date:   Tue, 4 Jun 2019 10:02:07 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        id S1727290AbfFDNI2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 09:08:28 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38852 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727093AbfFDNI2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 4 Jun 2019 09:08:28 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x54D3Q4X095241
+        for <kvm@vger.kernel.org>; Tue, 4 Jun 2019 09:08:27 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2swrv81a1u-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 04 Jun 2019 09:08:27 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Tue, 4 Jun 2019 14:08:25 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 4 Jun 2019 14:08:23 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x54D8LL661276310
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 4 Jun 2019 13:08:21 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EFF9A42041;
+        Tue,  4 Jun 2019 13:08:20 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4274642054;
+        Tue,  4 Jun 2019 13:08:20 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.145])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  4 Jun 2019 13:08:20 +0000 (GMT)
+Date:   Tue, 4 Jun 2019 15:08:19 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Michael Mueller <mimu@linux.ibm.com>,
+        KVM Mailing List <kvm@vger.kernel.org>,
+        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
         Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v16 12/16] IB, arm64: untag user pointers in
- ib_uverbs_(re)reg_mr()
-Message-ID: <20190604130207.GD15385@ziepe.ca>
-References: <cover.1559580831.git.andreyknvl@google.com>
- <c829f93b19ad6af1b13be8935ce29baa8e58518f.1559580831.git.andreyknvl@google.com>
- <20190603174619.GC11474@ziepe.ca>
- <CAAeHK+xy-dx4dLDLLj9dRzRNSVG9H5nDPPnjpYF38qKZNNCh_g@mail.gmail.com>
- <20190604122714.GA15385@ziepe.ca>
- <CAAeHK+xyqwuJyviGhvU7L1wPZQF7Mf9g2vgKSsYmML3fV6NrXg@mail.gmail.com>
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>
+Subject: Re: [PATCH v3 7/8] virtio/s390: use DMA memory for ccw I/O and
+ classic notifiers
+In-Reply-To: <20190603181716.325101d9.cohuck@redhat.com>
+References: <20190529122657.166148-1-mimu@linux.ibm.com>
+        <20190529122657.166148-8-mimu@linux.ibm.com>
+        <20190603181716.325101d9.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeHK+xyqwuJyviGhvU7L1wPZQF7Mf9g2vgKSsYmML3fV6NrXg@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19060413-4275-0000-0000-0000033C8A73
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19060413-4276-0000-0000-0000384C995A
+Message-Id: <20190604150819.1f8707b5.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-04_09:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906040089
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 04, 2019 at 02:45:32PM +0200, Andrey Konovalov wrote:
-> On Tue, Jun 4, 2019 at 2:27 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> >
-> > On Tue, Jun 04, 2019 at 02:18:19PM +0200, Andrey Konovalov wrote:
-> > > On Mon, Jun 3, 2019 at 7:46 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> > > >
-> > > > On Mon, Jun 03, 2019 at 06:55:14PM +0200, Andrey Konovalov wrote:
-> > > > > This patch is a part of a series that extends arm64 kernel ABI to allow to
-> > > > > pass tagged user pointers (with the top byte set to something else other
-> > > > > than 0x00) as syscall arguments.
-> > > > >
-> > > > > ib_uverbs_(re)reg_mr() use provided user pointers for vma lookups (through
-> > > > > e.g. mlx4_get_umem_mr()), which can only by done with untagged pointers.
-> > > > >
-> > > > > Untag user pointers in these functions.
-> > > > >
-> > > > > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> > > > >  drivers/infiniband/core/uverbs_cmd.c | 4 ++++
-> > > > >  1 file changed, 4 insertions(+)
-> > > > >
-> > > > > diff --git a/drivers/infiniband/core/uverbs_cmd.c b/drivers/infiniband/core/uverbs_cmd.c
-> > > > > index 5a3a1780ceea..f88ee733e617 100644
-> > > > > +++ b/drivers/infiniband/core/uverbs_cmd.c
-> > > > > @@ -709,6 +709,8 @@ static int ib_uverbs_reg_mr(struct uverbs_attr_bundle *attrs)
-> > > > >       if (ret)
-> > > > >               return ret;
-> > > > >
-> > > > > +     cmd.start = untagged_addr(cmd.start);
-> > > > > +
-> > > > >       if ((cmd.start & ~PAGE_MASK) != (cmd.hca_va & ~PAGE_MASK))
-> > > > >               return -EINVAL;
-> > > >
-> > > > I feel like we shouldn't thave to do this here, surely the cmd.start
-> > > > should flow unmodified to get_user_pages, and gup should untag it?
-> > > >
-> > > > ie, this sort of direction for the IB code (this would be a giant
-> > > > patch, so I didn't have time to write it all, but I think it is much
-> > > > saner):
-> > >
-> > > Hi Jason,
-> > >
-> > > ib_uverbs_reg_mr() passes cmd.start to mlx4_get_umem_mr(), which calls
-> > > find_vma(), which only accepts untagged addresses. Could you explain
-> > > how your patch helps?
-> >
-> > That mlx4 is just a 'weird duck', it is not the normal flow, and I
-> > don't think the core code should be making special consideration for
-> > it.
+On Mon, 3 Jun 2019 18:17:16 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Wed, 29 May 2019 14:26:56 +0200
+> Michael Mueller <mimu@linux.ibm.com> wrote:
 > 
-> How do you think we should do untagging (or something else) to deal
-> with this 'weird duck' case?
+> > From: Halil Pasic <pasic@linux.ibm.com>
+> > 
+> > Before virtio-ccw could get away with not using DMA API for the pieces of
+> > memory it does ccw I/O with. With protected virtualization this has to
+> > change, since the hypervisor needs to read and sometimes also write these
+> > pieces of memory.
+> > 
+> > The hypervisor is supposed to poke the classic notifiers, if these are
+> > used, out of band with regards to ccw I/O. So these need to be allocated
+> > as DMA memory (which is shared memory for protected virtualization
+> > guests).
+> > 
+> > Let us factor out everything from struct virtio_ccw_device that needs to
+> > be DMA memory in a satellite that is allocated as such.
+> > 
+> > Note: The control blocks of I/O instructions do not need to be shared.
+> > These are marshalled by the ultravisor.
+> > 
+> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> > Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+> > Signed-off-by: Michael Mueller <mimu@linux.ibm.com>
+> > ---
+> >  drivers/s390/virtio/virtio_ccw.c | 177 +++++++++++++++++++++------------------
+> >  1 file changed, 96 insertions(+), 81 deletions(-)
+> > 
+> 
+> (...)
+> 
+> > @@ -176,6 +180,22 @@ static struct virtio_ccw_device *to_vc_device(struct virtio_device *vdev)
+> >  	return container_of(vdev, struct virtio_ccw_device, vdev);
+> >  }
+> >  
+> > +static inline void *__vc_dma_alloc(struct virtio_device *vdev, size_t size)
+> > +{
+> > +	return ccw_device_dma_zalloc(to_vc_device(vdev)->cdev, size);
+> > +}
+> > +
+> > +static inline void __vc_dma_free(struct virtio_device *vdev, size_t size,
+> > +				 void *cpu_addr)
+> > +{
+> > +	return ccw_device_dma_free(to_vc_device(vdev)->cdev, cpu_addr, size);
+> > +}
+> > +
+> > +#define vc_dma_alloc_struct(vdev, ptr) \
+> > +	({ptr = __vc_dma_alloc(vdev, sizeof(*(ptr))); })
+> > +#define vc_dma_free_struct(vdev, ptr) \
+> > +	__vc_dma_free(vdev, sizeof(*(ptr)), (ptr))
+> > +
+> 
+> I *still* don't like these #defines (and the __vc_dma_* functions), as I
+> already commented last time. I think they make it harder to follow the
+> code.
+> 
 
-mlx4 should handle it around the call to find_vma like other patches
-do, ideally as part of the cast from a void __user * to the unsigned
-long that find_vma needs
+Sorry! I think we simply forgot to address this comment of yours. 
 
-Jason
+> >  static void drop_airq_indicator(struct virtqueue *vq, struct airq_info *info)
+> >  {
+> >  	unsigned long i, flags;
+> > @@ -336,8 +356,7 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
+> >  	struct airq_info *airq_info = vcdev->airq_info;
+> >  
+> >  	if (vcdev->is_thinint) {
+> > -		thinint_area = kzalloc(sizeof(*thinint_area),
+> > -				       GFP_DMA | GFP_KERNEL);
+> > +		vc_dma_alloc_struct(&vcdev->vdev, thinint_area);
+> 
+> Last time I wrote:
+> 
+> "Any reason why this takes a detour via the virtio device? The ccw
+>  device is already referenced in vcdev, isn't it?
+>
+> thinint_area = ccw_device_dma_zalloc(vcdev->cdev, sizeof(*thinint_area));
+> 
+>  looks much more obvious to me."
+> 
+> It still seems more obvious to me.
+>
+
+
+The reason why I decided to introduce __vc_dma_alloc() back then is
+because I had no clarity what do we want to do there. If you take a look
+the body of __vc_dma_alloc() changed quite a lot, while I the usage not
+so much. 
+
+Regarding why is the first argument a pointer struct virtio_device, the
+idea was probably to keep the needs to be ZONE_DMA and can use the full
+64 bit address space separate. But I abandoned the ideal.
+
+Also vc_dma_alloc_struct() started out more elaborate (I used to manage
+a dma_addr_t as well -- see RFC).
+
+I'm not quite sure what is your problem with the these. As far as I
+understand, this is another of those matter of taste things. But it ain't
+a big deal. 
+
+I will change this for v4 as you requested. Again sorry for missing it!
+
+Regards,
+Halil
+
+ 
+> >  		if (!thinint_area)
+> >  			return;
+> >  		thinint_area->summary_indicator =
+> 
+
