@@ -2,136 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A3D0234ABA
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 16:46:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44B6C34AFA
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 16:52:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727792AbfFDOqP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 10:46:15 -0400
-Received: from mga09.intel.com ([134.134.136.24]:14528 "EHLO mga09.intel.com"
+        id S1727793AbfFDOwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 10:52:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50420 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727732AbfFDOqP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 10:46:15 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Jun 2019 07:46:14 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by fmsmga001.fm.intel.com with ESMTP; 04 Jun 2019 07:46:13 -0700
-Date:   Tue, 4 Jun 2019 07:46:13 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     pbonzini@redhat.com, mst@redhat.com, rkrcmar@redhat.com,
-        jmattson@google.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, yu-cheng.yu@intel.com
-Subject: Re: [PATCH v5 1/8] KVM: VMX: Define CET VMCS fields and control bits
-Message-ID: <20190604144613.GA12246@linux.intel.com>
-References: <20190522070101.7636-1-weijiang.yang@intel.com>
- <20190522070101.7636-2-weijiang.yang@intel.com>
+        id S1727586AbfFDOwA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jun 2019 10:52:00 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8CA5A30BB367;
+        Tue,  4 Jun 2019 14:51:29 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5D8F410013D9;
+        Tue,  4 Jun 2019 14:51:22 +0000 (UTC)
+Date:   Tue, 4 Jun 2019 16:51:20 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Michael Mueller <mimu@linux.ibm.com>,
+        KVM Mailing List <kvm@vger.kernel.org>,
+        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>
+Subject: Re: [PATCH v3 4/8] s390/airq: use DMA memory for adapter interrupts
+Message-ID: <20190604165120.5afdce78.cohuck@redhat.com>
+In-Reply-To: <20190604152256.158d688c.pasic@linux.ibm.com>
+References: <20190529122657.166148-1-mimu@linux.ibm.com>
+        <20190529122657.166148-5-mimu@linux.ibm.com>
+        <20190603172740.1023e078.cohuck@redhat.com>
+        <20190604152256.158d688c.pasic@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190522070101.7636-2-weijiang.yang@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Tue, 04 Jun 2019 14:52:00 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 22, 2019 at 03:00:54PM +0800, Yang Weijiang wrote:
-> CET(Control-flow Enforcement Technology) is an upcoming Intel® processor
-> family feature that blocks return/jump-oriented programming (ROP) attacks.
-> It provides the following capabilities to defend
-> against ROP/JOP style control-flow subversion attacks:
+On Tue, 4 Jun 2019 15:22:56 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
+
+> On Mon, 3 Jun 2019 17:27:40 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+
+> > Apologies if that already has been answered (and I missed it in my mail
+> > pile...), but two things had come to my mind previously:
+> > 
+> > - CHSC... does anything need to be done there? Last time I asked:
+> >   "Anyway, css_bus_init() uses some chscs
+> >    early (before cio_dma_pool_init), so we could not use the pools
+> >    there, even if we wanted to. Do chsc commands either work, or else
+> >    fail benignly on a protected virt guest?"  
 > 
-> - Shadow Stack (SHSTK):
->   A second stack for the program that is used exclusively for
->   control transfer operations.
+> Protected virt won't support all CHSC. The supported ones won't requre
+> use of shared memory. So we are fine.
+
+I suppose the supported ones are the sync chscs that use the chsc area
+as a direct parameter (and therefore are handled similarly to the other
+I/O instructions that supply a direct parameter)? I don't think we care
+about async chscs in KVM/QEMU anyway, as we don't even emulate chsc
+subchannels :) (And IIRC, you don't get chsc subchannels in z/VM
+guests, either.)
+
 > 
-> - Indirect Branch Tracking (IBT):
->   Free branch protection to defend against jump/call oriented
->   programming.
-
-What is "free" referring to here?  The software enabling certainly isn't
-free, and I doubt the hardware/ucode cost is completely free.
- 
-> Several new CET MSRs are defined in kernel to support CET:
-> MSR_IA32_{U,S}_CET - MSRs to control the CET settings for user
-> mode and suervisor mode respectively.
+> > - PCI indicators... does this interact with any dma configuration on
+> >   the pci device? (I know pci is not supported yet, and I don't really
+> >   expect any problems.)
+> >   
 > 
-> MSR_IA32_PL{0,1,2,3}_SSP - MSRs to store shadow stack pointers for
-> CPL-0,1,2,3 levels.
-> 
-> MSR_IA32_INT_SSP_TAB - MSR to store base address of shadow stack
-> pointer table.
+> It does but, I'm pretty confident we don't have a problem with PCI. IMHO
+> Sebastian is the guy who needs to be paranoid about this, and he r-b-ed
+> the respective patches.
 
-For consistency (within the changelog), these should be list style, e.g.:
+Just wanted to make sure that this was on the radar. You guys are
+obviously in a better position than me to judge this :)
 
-
-  - MSR_IA32_{U,S}_CET: Control CET settings for user mode and suervisor
-                        mode respectively.
-
-  - MSR_IA32_PL{0,1,2,3}_SSP: Store shadow stack pointers for CPL levels.
-
-  - MSR_IA32_INT_SSP_TAB: Stores base address of shadow stack pointer
-                          table.
-
-> Two XSAVES state components are introduced for CET:
-> IA32_XSS:[bit 11] - bit for save/restor user mode CET states
-> IA32_XSS:[bit 12] - bit for save/restor supervisor mode CET states.
-
-Likewise, use a consistent list format.
-
-> 6 VMCS fields are introduced for CET, {HOST,GUEST}_S_CET is to store
-> CET settings in supervisor mode. {HOST,GUEST}_SSP is to store shadow
-> stack pointers in supervisor mode. {HOST,GUEST}_INTR_SSP_TABLE is to
-> store base address of shadow stack pointer table.
-
-It'd probably be easier to use a list format for the fields, e.g.:
-
-6 VMCS fields are introduced for CET:
-
-  - {HOST,GUEST}_S_CET: stores CET settings for supervisor mode.
-
-  - {HOST,GUEST}_SSP: stores shadow stack pointers for supervisor mode.
-
-  - {HOST,GUEST}_INTR_SSP_TABLE: stores the based address of the shadow
-                                 stack pointer table.
-
-> If VM_EXIT_LOAD_HOST_CET_STATE = 1, the host's CET MSRs are restored
-> from below VMCS fields at VM-Exit:
-> - HOST_S_CET
-> - HOST_SSP
-> - HOST_INTR_SSP_TABLE
-
-Personal preference, I like indenting lists like this with a space or two
-so that the list is clearly delineated.
-
-> If VM_ENTRY_LOAD_GUEST_CET_STATE = 1, the guest's CET MSRs are loaded
-> from below VMCS fields at VM-Entry:
-> - GUEST_S_CET
-> - GUEST_SSP
-> - GUEST_INTR_SSP_TABLE
-> 
-> Apart from VMCS auto-load fields, KVM calls kvm_load_guest_fpu() and
-> kvm_put_guest_fpu() to save/restore the guest CET MSR states at
-> VM exit/entry. XSAVES/XRSTORS are executed underneath these functions
-> if they are supported. The CET xsave area is consolidated with other
-> XSAVE components in thread_struct.fpu field.
-> 
-> When context switch happens during task switch/interrupt/exception etc.,
-> Kernel also relies on above functions to switch CET states properly.
-
-These paragraphs about the FPU and KVM behavior don't belong in this
-patch.
- 
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-
-Co-developed-by needs to be accompanied by a SOB.  And your SOB should
-be last since you sent the patch.  This comment applies to all patches.
-
-See "12) When to use Acked-by:, Cc:, and Co-developed-by:" in
-Documentation/process/submitting-patches.rst for details (I recommend
-looking at a v5.2-rc* version, a docs update was merged for v5.2).
+Anyway, I do not intend to annoy with those questions, it's just hard
+to get a feel if there are areas that still need care if you don't have
+access to the documentation for this... if you tell me that you are
+aware of it and it should work, that's fine for me.
