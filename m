@@ -2,83 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 857C034A19
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 16:19:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F253F34A35
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 16:21:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727978AbfFDOTC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 10:19:02 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:52496 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727436AbfFDOSD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 10:18:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=NXx6PmnhUtUTm/ybGqV0WKQy6usM3ULP72To5/hYtqI=; b=hhBf5LG46k5k+tlTkgrDdgTk9s
-        okl9la7n1x4PnoWk8QeEavzXjTZaCxWLoPU9MPEH6BMBEhTdezg9JgJLifi84w+ITFDVVepvlgHdJ
-        +3gXP2f/T5HL+E1Fr2eK8qcTk0wRY7aZNdSl+oZE4ODiLUcZJPdF8VZT2ZBYg0KA7dFfe9uWHzKnn
-        zY4EqvnO4WDNlNSaHt+QX8kmpzPZGFsarGscykbhEidJRMDKBCkEcHyM7xjjGK7YWgV3kPFLc9A2C
-        qf/V0mcgqYCaEMZwDtFLm892SiAQ892RqQY8cBtqvcUqJBRWvFvuCBeLG1QtsXNLfUD3Hp2E2Tlwd
-        4ivpsxAA==;
-Received: from [179.182.172.34] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hYAGH-0001Rk-VT; Tue, 04 Jun 2019 14:18:02 +0000
-Received: from mchehab by bombadil.infradead.org with local (Exim 4.92)
-        (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1hYAGE-0002l3-M1; Tue, 04 Jun 2019 11:17:58 -0300
-From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Mauro Carvalho Chehab <mchehab@infradead.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Subject: [PATCH v2 07/22] docs: amd-memory-encryption.rst get rid of warnings
-Date:   Tue,  4 Jun 2019 11:17:41 -0300
-Message-Id: <7b916c2b8d551aa06527f332e423e25254b23adc.1559656538.git.mchehab+samsung@kernel.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <cover.1559656538.git.mchehab+samsung@kernel.org>
-References: <cover.1559656538.git.mchehab+samsung@kernel.org>
+        id S1727763AbfFDOVK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 10:21:10 -0400
+Received: from mga04.intel.com ([192.55.52.120]:39356 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727169AbfFDOVJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jun 2019 10:21:09 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Jun 2019 07:21:09 -0700
+X-ExtLoop1: 1
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
+  by fmsmga006.fm.intel.com with ESMTP; 04 Jun 2019 07:21:08 -0700
+Date:   Tue, 4 Jun 2019 07:21:08 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc:     kvm@vger.kernel.org, rkrcmar@redhat.com, pbonzini@redhat.com,
+        jmattson@google.com
+Subject: Re: [PATCH 2/2] kvm-unit-test: nVMX: Test "Load IA32_EFER" VM-exit
+ control on vmentry of nested guests
+Message-ID: <20190604142108.GQ13384@linux.intel.com>
+References: <20190522234545.5930-1-krish.sadhukhan@oracle.com>
+ <20190522234545.5930-3-krish.sadhukhan@oracle.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190522234545.5930-3-krish.sadhukhan@oracle.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Get rid of those warnings:
+On Wed, May 22, 2019 at 07:45:45PM -0400, Krish Sadhukhan wrote:
+>  ..to verify KVM performs the appropriate consistency checks for loading
+>    IA32_EFER VM-exit control as part of running a nested guest.
+> 
+> According to section "Checks on Host Control Registers and MSRs" in Intel
+> SDM vol 3C, the following checks are performed on vmentry of nested guests:
+> 
+>    If the “load IA32_EFER” VM-exit control is 1, bits reserved in the
+>    IA32_EFER MSR must be 0 in the field for that register. In addition,
+>    the values of the LMA and LME bits in the field must each be that of
+>    the “host address-space size” VM-exit control.
+> 
+> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+> ---
+>  x86/vmx_tests.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 121 insertions(+)
+> 
+> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+> index 8cb1708..32fa16d 100644
+> --- a/x86/vmx_tests.c
+> +++ b/x86/vmx_tests.c
+> @@ -5136,6 +5136,126 @@ static void test_guest_perf_global_ctl(void)
+>  			     ENT_CONTROLS, ENT_LOAD_PERF);
+>  }
+>  
+> +static void test_efer_bit(u32 fld, const char * fld_name, u32 ctrl_fld,
+> +			   u64 ctrl_bit, u64 efer_bit,
+> +			   const char *efer_bit_name)
 
-    Documentation/virtual/kvm/amd-memory-encryption.rst:244: WARNING: Citation [white-paper] is not referenced.
-    Documentation/virtual/kvm/amd-memory-encryption.rst:246: WARNING: Citation [amd-apm] is not referenced.
-    Documentation/virtual/kvm/amd-memory-encryption.rst:247: WARNING: Citation [kvm-forum] is not referenced.
+IMO, the benefits of genericizing this for potential reuse to test
+GUEST_EFER is outweighed by the added difficulty to read the code.
+And the function can't be reused as is, e.g. the host_addr_size is
+host specific, as is the error condition.
 
-For references that aren't mentioned at the text by adding an
-explicit reference to them.
+> +{
+> +	u64 efer_saved = vmcs_read(fld);
+> +	u32 ctrl_saved = vmcs_read(ctrl_fld);
+> +	u64 host_addr_size = ctrl_saved & EXI_HOST_64;
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Documentation/virtual/kvm/amd-memory-encryption.rst | 3 +++
- 1 file changed, 3 insertions(+)
+The nVMX tests are 64-bit only, i.e. host_addr_size will always be true.
+We can explicitly test host_addr_size == 0, but only for VM-Fail cases.
 
-diff --git a/Documentation/virtual/kvm/amd-memory-encryption.rst b/Documentation/virtual/kvm/amd-memory-encryption.rst
-index 659bbc093b52..d18c97b4e140 100644
---- a/Documentation/virtual/kvm/amd-memory-encryption.rst
-+++ b/Documentation/virtual/kvm/amd-memory-encryption.rst
-@@ -241,6 +241,9 @@ Returns: 0 on success, -negative on error
- References
- ==========
- 
-+
-+See [white-paper]_, [api-spec]_, [amd-apm]_ and [kvm-forum]_ for more info.
-+
- .. [white-paper] http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
- .. [api-spec] http://support.amd.com/TechDocs/55766_SEV-KM_API_Specification.pdf
- .. [amd-apm] http://support.amd.com/TechDocs/24593.pdf (section 15.34)
--- 
-2.21.0
+> +	u64 efer;
+> +
+> +	vmcs_write(ctrl_fld, ctrl_saved & ~ctrl_bit);
+> +	efer = efer_saved & ~efer_bit;
+> +	vmcs_write(fld, efer);
+> +	report_prefix_pushf("%s bit turned off, %s %lx", efer_bit_name,
+> +			    fld_name, efer);
+> +	test_vmx_vmlaunch(0, false);
+> +	report_prefix_pop();
+> +
+> +	efer = efer_saved | efer_bit;
+> +	vmcs_write(fld, efer);
+> +	report_prefix_pushf("%s bit turned on, %s %lx", efer_bit_name,
+> +			    fld_name, efer);
+> +	test_vmx_vmlaunch(0, false);
+> +	report_prefix_pop();
+> +
+> +	vmcs_write(ctrl_fld, ctrl_saved | ctrl_bit);
+> +	efer = efer_saved & ~efer_bit;
+> +	vmcs_write(fld, efer);
+> +	report_prefix_pushf("%s bit turned off, %s %lx", efer_bit_name,
+> +			    fld_name, efer);
+> +	if (host_addr_size)
+> +		test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD,
+> +				  false);
+> +	else
+> +		test_vmx_vmlaunch(0, false);
+> +	report_prefix_pop();
+> +
+> +	efer = efer_saved | efer_bit;
+> +	vmcs_write(fld, efer);
+> +	report_prefix_pushf("%s bit turned on, %s %lx", efer_bit_name,
+> +			    fld_name, efer);
+> +	if (host_addr_size)
+> +		test_vmx_vmlaunch(0, false);
+> +	else
+> +		test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD,
+> +				  false);
+> +	report_prefix_pop();
+> +
+> +	vmcs_write(ctrl_fld, ctrl_saved);
+> +	vmcs_write(fld, efer_saved);
+> +}
+> +
+> +static void test_efer(u32 fld, const char * fld_name, u32 ctrl_fld,
+> +		      u64 ctrl_bit)
+> +{
+> +	u64 efer_saved = vmcs_read(fld);
+> +	u32 ctrl_saved = vmcs_read(ctrl_fld);
+> +	u64 efer_reserved_bits =  ~((u64)(EFER_SCE | EFER_LME | EFER_LMA));
+> +	u64 i;
+> +	u64 efer;
+> +
+> +	if (efer_nx_enabled())
+> +		efer_reserved_bits &= ~EFER_NX;
+> +
+> +	/*
+> +	 * Check reserved bits
+> +	 */
+> +	vmcs_write(ctrl_fld, ctrl_saved & ~ctrl_bit);
+> +	for (i = 0; i < 64; i++) {
+> +		if ((1ull << i) & efer_reserved_bits) {
+> +			efer = efer_saved | (1ull << i);
+> +			vmcs_write(fld, efer);
+> +			report_prefix_pushf("%s %lx", fld_name, efer);
+> +			test_vmx_vmlaunch(0, false);
+> +			report_prefix_pop();
+> +		}
+> +	}
 
+Eh, this feels like a waste of 63 VMLAUNCHes.  My vote would be to do a
+single VMLAUNCH with all reserved bits set and the control disabled.
+
+> +	vmcs_write(ctrl_fld, ctrl_saved | ctrl_bit);
+> +	for (i = 0; i < 64; i++) {
+> +		if ((1ull << i) & efer_reserved_bits) {
+> +			efer = efer_saved | (1ull << i);
+> +			vmcs_write(fld, efer);
+> +			report_prefix_pushf("%s %lx", fld_name, efer);
+> +			test_vmx_vmlaunch(
+> +				VMXERR_ENTRY_INVALID_HOST_STATE_FIELD,
+> +				false);
+> +			report_prefix_pop();
+> +		}
+> +	}
+> +
+> +	vmcs_write(ctrl_fld, ctrl_saved);
+> +	vmcs_write(fld, efer_saved);
+> +
+> +	/*
+> +	 * Check LMA and LME bits
+> +	 */
+> +	test_efer_bit(fld, fld_name, ctrl_fld, ctrl_bit, EFER_LMA,
+> +		      "EFER_LMA");
+> +	test_efer_bit(fld, fld_name, ctrl_fld, ctrl_bit, EFER_LME,
+> +		      "EFER_LME");
+> +}
+> +
+> +/*
+> + * If the “load IA32_EFER” VM-exit control is 1, bits reserved in the
+> + * IA32_EFER MSR must be 0 in the field for that register. In addition,
+> + * the values of the LMA and LME bits in the field must each be that of
+> + * the “host address-space size” VM-exit control.
+> + *
+> + *  [Intel SDM]
+> + */
+> +static void test_host_efer(void)
+> +{
+> +	if (!(ctrl_exit_rev.clr & EXI_LOAD_EFER)) {
+> +		printf("\"Load-IA32-EFER\" exit control not supported\n");
+> +		return;
+> +	}
+> +
+> +	test_efer(HOST_EFER, "HOST_EFER", EXI_CONTROLS, EXI_LOAD_EFER);
+> +}
+> +
+>  /*
+>   * PAT values higher than 8 are uninteresting since they're likely lumped
+>   * in with "8". We only test values above 8 one bit at a time,
+> @@ -5268,6 +5388,7 @@ static void vmx_host_state_area_test(void)
+>  	test_sysenter_field(HOST_SYSENTER_ESP, "HOST_SYSENTER_ESP");
+>  	test_sysenter_field(HOST_SYSENTER_EIP, "HOST_SYSENTER_EIP");
+>  
+> +	test_host_efer();
+>  	test_host_perf_global_ctl();
+>  	test_load_host_pat();
+>  }
+> -- 
+> 2.20.1
+> 
