@@ -2,100 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B0BC434F56
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 19:52:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6BAE35007
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 20:54:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726179AbfFDRw6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 13:52:58 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:40366 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725933AbfFDRw6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 13:52:58 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x54HiKPo062556;
-        Tue, 4 Jun 2019 17:52:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=IDdrf3mxQkHUxoFJBGVqp07pFy+F66WWcRn/7XzQbR4=;
- b=cqLEhsg9tdm2bK44K7Hk8btXxS8Ytk0W5WFAHi6m2XNGt5jyUY3LI4UC0jN+dvfvVUyX
- Eyrv1UZ52TcqBSj1Qsy34iusQgKvaimc86wOTe0aqznw4Jx0KVbyiTnBHVOy1xGY196z
- jjbxR5KLqLSvwWPSHRP5MCHXq62sJn6+DDrL2QtY8bJR3sRjM3/O53RPssQsFve179Fx
- z+L55Jp/NsfWnFqsC5aw5NJ6DvHqLaueBleTkPljJHtJJ5xBiz4MzGoZ+VLYFvy1zLqq
- KP0lcbehhygNM75Y4LSDEGgTtR4ct5lpYetOR496pU6q0k5H2Bjua8uM+iY+WTb411lo PQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 2suj0qegqr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 04 Jun 2019 17:52:51 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x54Hqh3U178944;
-        Tue, 4 Jun 2019 17:52:51 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2swngkg2sa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 04 Jun 2019 17:52:50 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x54HqnW8001159;
-        Tue, 4 Jun 2019 17:52:49 GMT
-Received: from [10.159.240.249] (/10.159.240.249)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 04 Jun 2019 10:52:49 -0700
-Subject: Re: [PATCH 1/2] kvm: nVMX: Enforce must-be-zero bits in the
- IA32_VMX_VMCS_ENUM MSR
-To:     Aaron Lewis <aaronlewis@google.com>, jmattson@google.com,
-        pshier@google.com, marcorr@google.com, kvm@vger.kernel.org
-References: <20190531184159.260151-1-aaronlewis@google.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <4b50c550-308e-2b88-053e-c6933f9ed320@oracle.com>
-Date:   Tue, 4 Jun 2019 10:52:48 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1726463AbfFDSyB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 14:54:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54174 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726261AbfFDSyA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jun 2019 14:54:00 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F1E782075C;
+        Tue,  4 Jun 2019 18:53:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1559674440;
+        bh=Cp6VeCqZCzW+nl+JJJp4Ag83997W0UrXA7j/yyUXqCw=;
+        h=Date:From:To:Cc:Subject:From;
+        b=Hz4F5IAWX5K7ns5/iauYd6ztC2uFH45l1oTRY+3CZ9LVNjvf+Wc4JueKy6VVfTQzD
+         mnlH5aQ8RPlnFpo1TAQeptBSMvVYdAvE1MxukfkctfinBCwhR7iI+5A4OtOts4fTDD
+         8nJ2aS2GQoARjwQdpfnL9rkq56s1TjtwvCiG7vaI=
+Date:   Tue, 4 Jun 2019 11:53:58 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     Borislav Petkov <bp@suse.de>, Dave Hansen <dave.hansen@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Jann Horn <jannh@google.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        kvm ML <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Rik van Riel <riel@surriel.com>, x86-ml <x86@kernel.org>,
+        linux-kernel@vger.kernel.org
+Subject: [5.2 regression] copy_fpstate_to_sigframe() change causing crash in
+ 32-bit process
+Message-ID: <20190604185358.GA820@sol.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20190531184159.260151-1-aaronlewis@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9278 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906040113
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9278 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906040113
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On latest Linus' tree I'm getting a crash in a 32-bit Wine process.
 
-On 5/31/19 11:41 AM, Aaron Lewis wrote:
-> According to the SDM, bit 0 and bits 63:10 of the IA32_VMX_VMCS_ENUM
-> MSR are reserved and are read as 0.
->
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> ---
->   arch/x86/kvm/vmx/nested.c | 2 ++
->   1 file changed, 2 insertions(+)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 6401eb7ef19c..3438279e76bb 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -1219,6 +1219,8 @@ int vmx_set_vmx_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 data)
->   	case MSR_IA32_VMX_EPT_VPID_CAP:
->   		return vmx_restore_vmx_ept_vpid_cap(vmx, data);
->   	case MSR_IA32_VMX_VMCS_ENUM:
-> +		if (data & (GENMASK_ULL(63, 10) | BIT_ULL(0)))
-> +			return -EINVAL;
->   		vmx->nested.msrs.vmcs_enum = data;
->   		return 0;
->   	default:
+I bisected it to the following commit:
 
+commit 39388e80f9b0c3788bfb6efe3054bdce0c3ead45
+Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date:   Wed Apr 3 18:41:35 2019 +0200
 
-Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+    x86/fpu: Don't save fxregs for ia32 frames in copy_fpstate_to_sigframe()
 
+Reverting the commit by applying the following diff makes the problem go away.
+
+diff --git a/arch/x86/kernel/fpu/signal.c b/arch/x86/kernel/fpu/signal.c
+index 5a8d118bc423e..ed16a24aab497 100644
+--- a/arch/x86/kernel/fpu/signal.c
++++ b/arch/x86/kernel/fpu/signal.c
+@@ -157,6 +157,7 @@ static inline int copy_fpregs_to_sigframe(struct xregs_state __user *buf)
+  */
+ int copy_fpstate_to_sigframe(void __user *buf, void __user *buf_fx, int size)
+ {
++	struct fpu *fpu = &current->thread.fpu;
+ 	struct task_struct *tsk = current;
+ 	int ia32_fxstate = (buf != buf_fx);
+ 	int ret;
+@@ -202,6 +203,10 @@ int copy_fpstate_to_sigframe(void __user *buf, void __user *buf_fx, int size)
+ 		return -EFAULT;
+ 	}
+ 
++	/* Update the thread's fxstate to save the fsave header. */
++	if (ia32_fxstate)
++		copy_fxregs_to_kernel(fpu);
++
+ 	/* Save the fsave header for the 32-bit frames. */
+ 	if ((ia32_fxstate || !use_fxsr()) && save_fsave_header(tsk, buf))
+ 		return -1;
+
+Apparently the problem is that save_fsave_header() assumes the registers have
+been saved to fpu->state.fxsave, yet the code that does so was removed.
+
+Note, bisection was not straightforward because there was another bug also
+causing a crash temporarily introduced during the FPU code rework: commit
+39ea9baffda9 ("x86/fpu: Remove fpu->initialized usage in __fpu__restore_sig()")
+forgot to call fpstate_init() on the temporary 'state' buffer, so
+XCOMP_BV_COMPACTED_FORMAT was never set, causing xrstors to fail.  But that bug
+went away in later commits.
+
+- Eric
