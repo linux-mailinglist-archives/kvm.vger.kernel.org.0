@@ -2,244 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 379B0348DA
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 15:33:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8ABC6348F5
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2019 15:36:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727729AbfFDNdv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 09:33:51 -0400
-Received: from foss.arm.com ([217.140.101.70]:44090 "EHLO foss.arm.com"
+        id S1727390AbfFDNge (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 09:36:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40222 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727705AbfFDNdu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 09:33:50 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0925D15BF;
-        Tue,  4 Jun 2019 06:33:50 -0700 (PDT)
-Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.144.41])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9752F3F690;
-        Tue,  4 Jun 2019 06:33:49 -0700 (PDT)
-From:   Christoffer Dall <christoffer.dall@arm.com>
-To:     kvm@vger.kernel.org
-Cc:     kvmarm@lists.cs.columbia.edu,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        James Hogan <jhogan@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
+        id S1727229AbfFDNge (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jun 2019 09:36:34 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C43FFA3B60;
+        Tue,  4 Jun 2019 13:36:33 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CB1EA60C91;
+        Tue,  4 Jun 2019 13:36:27 +0000 (UTC)
+Date:   Tue, 4 Jun 2019 15:36:25 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     Michael Mueller <mimu@linux.ibm.com>,
+        KVM Mailing List <kvm@vger.kernel.org>,
+        Linux-S390 Mailing List <linux-s390@vger.kernel.org>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [PATCH v3 4/4] KVM: mips: Move to common kvm_mmu_memcache infrastructure
-Date:   Tue,  4 Jun 2019 15:33:36 +0200
-Message-Id: <20190604133336.22226-5-christoffer.dall@arm.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190604133336.22226-1-christoffer.dall@arm.com>
-References: <20190604133336.22226-1-christoffer.dall@arm.com>
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>
+Subject: Re: [PATCH v3 7/8] virtio/s390: use DMA memory for ccw I/O and
+ classic notifiers
+Message-ID: <20190604153625.6c03c232.cohuck@redhat.com>
+In-Reply-To: <20190604150819.1f8707b5.pasic@linux.ibm.com>
+References: <20190529122657.166148-1-mimu@linux.ibm.com>
+        <20190529122657.166148-8-mimu@linux.ibm.com>
+        <20190603181716.325101d9.cohuck@redhat.com>
+        <20190604150819.1f8707b5.pasic@linux.ibm.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Tue, 04 Jun 2019 13:36:34 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that we have a common infrastructure for doing MMU cache
-allocations, use this for mips as well.
+On Tue, 4 Jun 2019 15:08:19 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
----
- arch/mips/include/asm/kvm_host.h  | 15 ++-------
- arch/mips/include/asm/kvm_types.h |  6 ++++
- arch/mips/kvm/mips.c              |  2 +-
- arch/mips/kvm/mmu.c               | 54 ++++++-------------------------
- 4 files changed, 19 insertions(+), 58 deletions(-)
+> On Mon, 3 Jun 2019 18:17:16 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > On Wed, 29 May 2019 14:26:56 +0200
+> > Michael Mueller <mimu@linux.ibm.com> wrote:
 
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index 41204a49cf95..418c941f1382 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -293,17 +293,6 @@ struct kvm_mips_tlb {
- 	long tlb_lo[2];
- };
- 
--#define KVM_NR_MEM_OBJS     4
--
--/*
-- * We don't want allocation failures within the mmu code, so we preallocate
-- * enough memory for a single page fault in a cache.
-- */
--struct kvm_mmu_memory_cache {
--	int nobjs;
--	void *objects[KVM_NR_MEM_OBJS];
--};
--
- #define KVM_MIPS_AUX_FPU	0x1
- #define KVM_MIPS_AUX_MSA	0x2
- 
-@@ -378,7 +367,7 @@ struct kvm_vcpu_arch {
- 	unsigned int last_user_gasid;
- 
- 	/* Cache some mmu pages needed inside spinlock regions */
--	struct kvm_mmu_memory_cache mmu_page_cache;
-+	struct kvm_mmu_memcache mmu_page_cache;
- 
- #ifdef CONFIG_KVM_MIPS_VZ
- 	/* vcpu's vzguestid is different on each host cpu in an smp system */
-@@ -915,7 +904,7 @@ void kvm_mips_flush_gva_pt(pgd_t *pgd, enum kvm_mips_flush flags);
- bool kvm_mips_flush_gpa_pt(struct kvm *kvm, gfn_t start_gfn, gfn_t end_gfn);
- int kvm_mips_mkclean_gpa_pt(struct kvm *kvm, gfn_t start_gfn, gfn_t end_gfn);
- pgd_t *kvm_pgd_alloc(void);
--void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu);
-+void kvm_mmu_free_memcaches(struct kvm_vcpu *vcpu);
- void kvm_trap_emul_invalidate_gva(struct kvm_vcpu *vcpu, unsigned long addr,
- 				  bool user);
- void kvm_trap_emul_gva_lockless_begin(struct kvm_vcpu *vcpu);
-diff --git a/arch/mips/include/asm/kvm_types.h b/arch/mips/include/asm/kvm_types.h
-index 5efeb32a5926..f821c659a5b1 100644
---- a/arch/mips/include/asm/kvm_types.h
-+++ b/arch/mips/include/asm/kvm_types.h
-@@ -2,4 +2,10 @@
- #ifndef _ASM_MIPS_KVM_TYPES_H
- #define _ASM_MIPS_KVM_TYPES_H
- 
-+#define KVM_ARCH_WANT_MMU_MEMCACHE
-+
-+#define KVM_MMU_NR_MEMCACHE_OBJS 4
-+
-+#define KVM_MMU_CACHE_GFP_FLAGS 0
-+
- #endif /* _ASM_MIPS_KVM_TYPES_H */
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 6d0517ac18e5..2737f837cd9f 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -425,7 +425,7 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
- 
- 	kvm_mips_dump_stats(vcpu);
- 
--	kvm_mmu_free_memory_caches(vcpu);
-+	kvm_mmu_free_memcaches(vcpu);
- 	kfree(vcpu->arch.guest_ebase);
- 	kfree(vcpu->arch.kseg0_commpage);
- 	kfree(vcpu);
-diff --git a/arch/mips/kvm/mmu.c b/arch/mips/kvm/mmu.c
-index 97e538a8c1be..aed5284d642e 100644
---- a/arch/mips/kvm/mmu.c
-+++ b/arch/mips/kvm/mmu.c
-@@ -25,41 +25,9 @@
- #define KVM_MMU_CACHE_MIN_PAGES 2
- #endif
- 
--static int mmu_topup_memory_cache(struct kvm_mmu_memory_cache *cache,
--				  int min, int max)
-+void kvm_mmu_free_memcaches(struct kvm_vcpu *vcpu)
- {
--	void *page;
--
--	BUG_ON(max > KVM_NR_MEM_OBJS);
--	if (cache->nobjs >= min)
--		return 0;
--	while (cache->nobjs < max) {
--		page = (void *)__get_free_page(GFP_KERNEL);
--		if (!page)
--			return -ENOMEM;
--		cache->objects[cache->nobjs++] = page;
--	}
--	return 0;
--}
--
--static void mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
--{
--	while (mc->nobjs)
--		free_page((unsigned long)mc->objects[--mc->nobjs]);
--}
--
--static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
--{
--	void *p;
--
--	BUG_ON(!mc || !mc->nobjs);
--	p = mc->objects[--mc->nobjs];
--	return p;
--}
--
--void kvm_mmu_free_memory_caches(struct kvm_vcpu *vcpu)
--{
--	mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
-+	kvm_mmu_free_memcache_page(&vcpu->arch.mmu_page_cache);
- }
- 
- /**
-@@ -133,7 +101,7 @@ pgd_t *kvm_pgd_alloc(void)
-  *		NULL if a page table doesn't exist for @addr and !@cache.
-  *		NULL if a page table allocation failed.
-  */
--static pte_t *kvm_mips_walk_pgd(pgd_t *pgd, struct kvm_mmu_memory_cache *cache,
-+static pte_t *kvm_mips_walk_pgd(pgd_t *pgd, struct kvm_mmu_memcache *cache,
- 				unsigned long addr)
- {
- 	pud_t *pud;
-@@ -151,7 +119,7 @@ static pte_t *kvm_mips_walk_pgd(pgd_t *pgd, struct kvm_mmu_memory_cache *cache,
- 
- 		if (!cache)
- 			return NULL;
--		new_pmd = mmu_memory_cache_alloc(cache);
-+		new_pmd = kvm_mmu_memcache_alloc(cache);
- 		pmd_init((unsigned long)new_pmd,
- 			 (unsigned long)invalid_pte_table);
- 		pud_populate(NULL, pud, new_pmd);
-@@ -162,7 +130,7 @@ static pte_t *kvm_mips_walk_pgd(pgd_t *pgd, struct kvm_mmu_memory_cache *cache,
- 
- 		if (!cache)
- 			return NULL;
--		new_pte = mmu_memory_cache_alloc(cache);
-+		new_pte = kvm_mmu_memcache_alloc(cache);
- 		clear_page(new_pte);
- 		pmd_populate_kernel(NULL, pmd, new_pte);
- 	}
-@@ -171,7 +139,7 @@ static pte_t *kvm_mips_walk_pgd(pgd_t *pgd, struct kvm_mmu_memory_cache *cache,
- 
- /* Caller must hold kvm->mm_lock */
- static pte_t *kvm_mips_pte_for_gpa(struct kvm *kvm,
--				   struct kvm_mmu_memory_cache *cache,
-+				   struct kvm_mmu_memcache *cache,
- 				   unsigned long addr)
- {
- 	return kvm_mips_walk_pgd(kvm->arch.gpa_mm.pgd, cache, addr);
-@@ -688,7 +656,7 @@ static int kvm_mips_map_page(struct kvm_vcpu *vcpu, unsigned long gpa,
- 			     pte_t *out_entry, pte_t *out_buddy)
- {
- 	struct kvm *kvm = vcpu->kvm;
--	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
-+	struct kvm_mmu_memcache *memcache = &vcpu->arch.mmu_page_cache;
- 	gfn_t gfn = gpa >> PAGE_SHIFT;
- 	int srcu_idx, err;
- 	kvm_pfn_t pfn;
-@@ -705,8 +673,7 @@ static int kvm_mips_map_page(struct kvm_vcpu *vcpu, unsigned long gpa,
- 		goto out;
- 
- 	/* We need a minimum of cached pages ready for page table creation */
--	err = mmu_topup_memory_cache(memcache, KVM_MMU_CACHE_MIN_PAGES,
--				     KVM_NR_MEM_OBJS);
-+	err = kvm_mmu_topup_memcache_page(memcache, KVM_MMU_CACHE_MIN_PAGES);
- 	if (err)
- 		goto out;
- 
-@@ -785,13 +752,12 @@ static int kvm_mips_map_page(struct kvm_vcpu *vcpu, unsigned long gpa,
- static pte_t *kvm_trap_emul_pte_for_gva(struct kvm_vcpu *vcpu,
- 					unsigned long addr)
- {
--	struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
-+	struct kvm_mmu_memcache *memcache = &vcpu->arch.mmu_page_cache;
- 	pgd_t *pgdp;
- 	int ret;
- 
- 	/* We need a minimum of cached pages ready for page table creation */
--	ret = mmu_topup_memory_cache(memcache, KVM_MMU_CACHE_MIN_PAGES,
--				     KVM_NR_MEM_OBJS);
-+	ret = kvm_mmu_topup_memcache_page(memcache, KVM_MMU_CACHE_MIN_PAGES);
- 	if (ret)
- 		return NULL;
- 
--- 
-2.18.0
+> > (...)
+> >   
+> > > @@ -176,6 +180,22 @@ static struct virtio_ccw_device *to_vc_device(struct virtio_device *vdev)
+> > >  	return container_of(vdev, struct virtio_ccw_device, vdev);
+> > >  }
+> > >  
+> > > +static inline void *__vc_dma_alloc(struct virtio_device *vdev, size_t size)
+> > > +{
+> > > +	return ccw_device_dma_zalloc(to_vc_device(vdev)->cdev, size);
+> > > +}
+> > > +
+> > > +static inline void __vc_dma_free(struct virtio_device *vdev, size_t size,
+> > > +				 void *cpu_addr)
+> > > +{
+> > > +	return ccw_device_dma_free(to_vc_device(vdev)->cdev, cpu_addr, size);
+> > > +}
+> > > +
+> > > +#define vc_dma_alloc_struct(vdev, ptr) \
+> > > +	({ptr = __vc_dma_alloc(vdev, sizeof(*(ptr))); })
+> > > +#define vc_dma_free_struct(vdev, ptr) \
+> > > +	__vc_dma_free(vdev, sizeof(*(ptr)), (ptr))
+> > > +  
+> > 
+> > I *still* don't like these #defines (and the __vc_dma_* functions), as I
+> > already commented last time. I think they make it harder to follow the
+> > code.
+> >   
+> 
+> Sorry! I think we simply forgot to address this comment of yours. 
+> 
+> > >  static void drop_airq_indicator(struct virtqueue *vq, struct airq_info *info)
+> > >  {
+> > >  	unsigned long i, flags;
+> > > @@ -336,8 +356,7 @@ static void virtio_ccw_drop_indicator(struct virtio_ccw_device *vcdev,
+> > >  	struct airq_info *airq_info = vcdev->airq_info;
+> > >  
+> > >  	if (vcdev->is_thinint) {
+> > > -		thinint_area = kzalloc(sizeof(*thinint_area),
+> > > -				       GFP_DMA | GFP_KERNEL);
+> > > +		vc_dma_alloc_struct(&vcdev->vdev, thinint_area);  
+> > 
+> > Last time I wrote:
+> > 
+> > "Any reason why this takes a detour via the virtio device? The ccw
+> >  device is already referenced in vcdev, isn't it?
+> >
+> > thinint_area = ccw_device_dma_zalloc(vcdev->cdev, sizeof(*thinint_area));
+> > 
+> >  looks much more obvious to me."
+> > 
+> > It still seems more obvious to me.
+> >  
+> 
+> 
+> The reason why I decided to introduce __vc_dma_alloc() back then is
+> because I had no clarity what do we want to do there. If you take a look
+> the body of __vc_dma_alloc() changed quite a lot, while I the usage not
+> so much. 
+> 
+> Regarding why is the first argument a pointer struct virtio_device, the
+> idea was probably to keep the needs to be ZONE_DMA and can use the full
+> 64 bit address space separate. But I abandoned the ideal.
+> 
+> Also vc_dma_alloc_struct() started out more elaborate (I used to manage
+> a dma_addr_t as well -- see RFC).
+
+Understood, history is often important :)
+
+> 
+> I'm not quite sure what is your problem with the these. As far as I
+> understand, this is another of those matter of taste things. But it ain't
+> a big deal. 
+
+Two things:
+- The call path goes from the vcdev to the vdev, then back to the vcdev
+  and then to the cdev. Going from the vcdev to the cdev  directly
+  eliminates the roundtrip via the vdev, which I think does not add
+  anything.
+- I prefer
+	variable = function_returning_a_pointer(...);
+  over
+	function_setting_a_variable(..., variable);
+  The latter obscures the fact that we change the value of the
+  variable, unless named very obviously.
+
+> 
+> I will change this for v4 as you requested. Again sorry for missing it!
+
+np, can happen.
+
+> 
+> Regards,
+> Halil
+> 
+>  
+> > >  		if (!thinint_area)
+> > >  			return;
+> > >  		thinint_area->summary_indicator =  
+> >   
+> 
 
