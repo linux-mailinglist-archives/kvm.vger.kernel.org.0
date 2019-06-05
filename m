@@ -2,95 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 96EA735F3D
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2019 16:28:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4332D362B8
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2019 19:33:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727904AbfFEO2t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jun 2019 10:28:49 -0400
-Received: from mga03.intel.com ([134.134.136.65]:59555 "EHLO mga03.intel.com"
+        id S1726603AbfFERdA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jun 2019 13:33:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54740 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727864AbfFEO2t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jun 2019 10:28:49 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Jun 2019 07:28:48 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by fmsmga006.fm.intel.com with ESMTP; 05 Jun 2019 07:28:48 -0700
-Date:   Wed, 5 Jun 2019 07:28:48 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Eugene Korenevsky <ekorenevsky@gmail.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 1/2] kvm: vmx: fix limit checking in
- get_vmx_mem_address()
-Message-ID: <20190605142848.GB26328@linux.intel.com>
-References: <20190604220221.GA23558@dnote>
+        id S1726280AbfFERdA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jun 2019 13:33:00 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3063420866;
+        Wed,  5 Jun 2019 17:32:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1559755979;
+        bh=5QFfJ1gknqDsD3E2MuuC3H7OUAv/kY6TNj3u7Qn2ZxI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Ue0KrUu0WvrPuRI7UsZVg2ilc0IYh952GntcuYBCkrP/hwiQ1jfLvUtucouJe0TNS
+         HIqzU0LHH/d1QaTtAFI2vIyJuYjfyyNlMY5/Jzm7IlvNgmM5KmPfSju7YubrT4ci8j
+         WqAB6FM7g+HodzUzN1FrXJldMXbaY4M1RP1sFKK4=
+Date:   Wed, 5 Jun 2019 10:32:57 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     Borislav Petkov <bp@suse.de>, Dave Hansen <dave.hansen@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Jann Horn <jannh@google.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        kvm ML <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Rik van Riel <riel@surriel.com>, x86-ml <x86@kernel.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [5.2 regression] copy_fpstate_to_sigframe() change causing crash
+ in 32-bit process
+Message-ID: <20190605173256.GA86462@gmail.com>
+References: <20190604185358.GA820@sol.localdomain>
+ <20190605140405.2nnpqslnjpfe2ig2@linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190604220221.GA23558@dnote>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190605140405.2nnpqslnjpfe2ig2@linutronix.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 05, 2019 at 01:02:21AM +0300, Eugene Korenevsky wrote:
-> Intel SDM vol. 3, 5.3:
-> The processor causes a
-> general-protection exception (or, if the segment is SS, a stack-fault
-> exception) any time an attempt is made to access the following addresses
-> in a segment:
-> - A byte at an offset greater than the effective limit
-> - A word at an offset greater than the (effective-limit – 1)
-> - A doubleword at an offset greater than the (effective-limit – 3)
-> - A quadword at an offset greater than the (effective-limit – 7)
+On Wed, Jun 05, 2019 at 04:04:05PM +0200, Sebastian Andrzej Siewior wrote:
+> On 2019-06-04 11:53:58 [-0700], Eric Biggers wrote:
+> > On latest Linus' tree I'm getting a crash in a 32-bit Wine process.
+> > 
+> > I bisected it to the following commit:
+> > 
+> > commit 39388e80f9b0c3788bfb6efe3054bdce0c3ead45
+> > Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > Date:   Wed Apr 3 18:41:35 2019 +0200
+> > 
+> >     x86/fpu: Don't save fxregs for ia32 frames in copy_fpstate_to_sigframe()
+> > 
+> > Reverting the commit by applying the following diff makes the problem go away.
 > 
-> Therefore, the generic limit checking error condition must be
+> This looked like a merge artifact and it has been confirmed as such. Now
+> you say that this was a needed piece of code. Interesting.
+> Is that wine process/testcase something you can share? I will try to
+> take a closer look.
 > 
-> exn = off > limit + 1 - operand_len
-> 
-> but not
-> 
-> exn = off + operand_len > limit
-> 
-> as for now.
+> Sebastian
 
-Probably worth adding a note in the changelog about the access size
-being hardcoded to quadword.  It's difficult to correlate the code with
-the changelog without the context of the following patch to add 'len'.
- 
-> Signed-off-by: Eugene Korenevsky <ekorenevsky@gmail.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index f1a69117ac0f..fef3d7031715 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -4115,7 +4115,7 @@ int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
->  		 */
->  		if (!(s.base == 0 && s.limit == 0xffffffff &&
->  		     ((s.type & 8) || !(s.type & 4))))
-> -			exn = exn || (off + sizeof(u64) > s.limit);
-> +			exn = exn || (off > s.limit + 1 - sizeof(u64));
+As I said, the commit looks broken to me.  save_fsave_header() reads from
+tsk->thread.fpu.state.fxsave, which due to that commit isn't being updated with
+the latest registers.  Am I missing something?  Note the comment you deleted:
 
-Adjusting the limit will wrap a small limit, e.g. s.limit=3 will check
-@off against 0xfffffffc.  And IMO, "off + sizeof(u64) - 1 > s.limit" is
-more intuitive anyways, e.g. it conveys that we're calculating the
-address of the last byte being accessed and checking to see if that would
-cause a limit violation.
+	/* Update the thread's fxstate to save the fsave header. */
 
-On a related note, there's a pre-existing wrap bug for 32-bit KVM since
-@off is a 32-bit value (gva_t is unsigned long), but that's easily fixed
-by casting @off to a u64.
+My test case was "run some Win32 game for a few minutes and see if it crashes"
+so it's not really sharable, sorry.  But I expect it would be possible to write
+a minimal test case, where a 32-bit process sends a signal to itself and checks
+whether the i387 floating point stuff gets restored correctly afterwards.
 
->  	}
->  	if (exn) {
->  		kvm_queue_exception_e(vcpu,
-> -- 
-> 2.21.0
-> 
+- Eric
