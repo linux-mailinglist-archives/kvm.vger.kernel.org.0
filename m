@@ -2,89 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2188935394
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2019 01:27:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D68535514
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2019 03:50:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728161AbfFDX0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Jun 2019 19:26:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37760 "EHLO mail.kernel.org"
+        id S1726603AbfFEBuk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Jun 2019 21:50:40 -0400
+Received: from mga04.intel.com ([192.55.52.120]:17889 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728138AbfFDXZr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Jun 2019 19:25:47 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5F57D20862;
-        Tue,  4 Jun 2019 23:25:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559690747;
-        bh=XOQsj7LhOQZBOh6NMkjXt0yudzIxokbXiey5V7Uw9cI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=S9/B6DBDYOFAGL6wMMrlL3fUlnrv6bZ+vt6LbFpzZCNiZWbWMsiP61e+6ZQcltsGw
-         kLnyBAGbmnaqSuKmbRh9frv+yApXoxryBhD/Sux7qjdNekXqrTaTfA6W54nSnHE4Pk
-         EKE7HklkwMkWjGpzD4hSSquK/bQRDyUEkBI4IGic=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Nadav Amit <nadav.amit@gmail.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 09/10] KVM: x86/pmu: do not mask the value that is written to fixed PMUs
-Date:   Tue,  4 Jun 2019 19:25:30 -0400
-Message-Id: <20190604232532.7953-9-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190604232532.7953-1-sashal@kernel.org>
-References: <20190604232532.7953-1-sashal@kernel.org>
+        id S1726341AbfFEBuj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Jun 2019 21:50:39 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Jun 2019 18:50:39 -0700
+X-ExtLoop1: 1
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by fmsmga004.fm.intel.com with ESMTP; 04 Jun 2019 18:50:37 -0700
+Date:   Wed, 5 Jun 2019 09:49:45 +0800
+From:   Yang Weijiang <weijiang.yang@intel.com>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
+        mst@redhat.com, rkrcmar@redhat.com, jmattson@google.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        yu-cheng.yu@intel.com
+Subject: Re: [PATCH v5 5/8] KVM: VMX: Load Guest CET via VMCS when CET is
+ enabled in Guest
+Message-ID: <20190605014944.GA28360@local-michael-cet-test>
+References: <20190522070101.7636-1-weijiang.yang@intel.com>
+ <20190522070101.7636-6-weijiang.yang@intel.com>
+ <20190604200336.GC7476@linux.intel.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190604200336.GC7476@linux.intel.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+On Tue, Jun 04, 2019 at 01:03:36PM -0700, Sean Christopherson wrote:
+> On Wed, May 22, 2019 at 03:00:58PM +0800, Yang Weijiang wrote:
+> > "Load Guest CET state" bit controls whether Guest CET states
+> > will be loaded at Guest entry. Before doing that, KVM needs
+> > to check if CPU CET feature is available to Guest.
+> > 
+> > Note: SHSTK and IBT features share one control MSR:
+> > MSR_IA32_{U,S}_CET, which means it's difficult to hide
+> > one feature from another in the case of SHSTK != IBT,
+> > after discussed in community, it's agreed to allow Guest
+> > control two features independently as it won't introduce
+> > security hole.
+> > 
+> > Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> > Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
+> > ---
+> >  arch/x86/kvm/vmx/vmx.c | 12 ++++++++++++
+> >  1 file changed, 12 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 9321da538f65..1c0d487a4037 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -47,6 +47,7 @@
+> >  #include <asm/spec-ctrl.h>
+> >  #include <asm/virtext.h>
+> >  #include <asm/vmx.h>
+> > +#include <asm/cet.h>
+> 
+> Is this include actually needed?  I haven't attempted to compile, but a
+> glance everything should be in cpufeatures.h or vmx.h.
+> 
+  Thanks Sean!
+  My original purpose is to re-use the macro cpu_x86_cet_enabled() to
+  check host CET status, for somehow, the check is not there, but to resolve
+  your below question, I need to use the macro to check it, so will keep
+  this include and add the check in next version.
 
-[ Upstream commit 2924b52117b2812e9633d5ea337333299166d373 ]
+> >  #include "capabilities.h"
+> >  #include "cpuid.h"
+> > @@ -2929,6 +2930,17 @@ int vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+> >  		if (!nested_vmx_allowed(vcpu) || is_smm(vcpu))
+> >  			return 1;
+> >  	}
+> > +	if (guest_cpuid_has(vcpu, X86_FEATURE_SHSTK) ||
+> > +	    guest_cpuid_has(vcpu, X86_FEATURE_IBT)) {
+> > +		if (cr4 & X86_CR4_CET)
+> > +			vmcs_set_bits(VM_ENTRY_CONTROLS,
+> > +				      VM_ENTRY_LOAD_GUEST_CET_STATE);
+> > +		else
+> > +			vmcs_clear_bits(VM_ENTRY_CONTROLS,
+> > +					VM_ENTRY_LOAD_GUEST_CET_STATE);
+> > +	} else if (cr4 & X86_CR4_CET) {
+> > +		return 1;
+> > +	}
+> 
+> Don't we also need to check for host CET support prior to toggling
+> VM_ENTRY_LOAD_GUEST_CET_STATE?
 
-According to the SDM, for MSR_IA32_PERFCTR0/1 "the lower-order 32 bits of
-each MSR may be written with any value, and the high-order 8 bits are
-sign-extended according to the value of bit 31", but the fixed counters
-in real hardware are limited to the width of the fixed counters ("bits
-beyond the width of the fixed-function counter are reserved and must be
-written as zeros").  Fix KVM to do the same.
-
-Reported-by: Nadav Amit <nadav.amit@gmail.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/x86/kvm/pmu_intel.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/pmu_intel.c b/arch/x86/kvm/pmu_intel.c
-index 23a7c7ba377a..8fc07ea23344 100644
---- a/arch/x86/kvm/pmu_intel.c
-+++ b/arch/x86/kvm/pmu_intel.c
-@@ -235,11 +235,14 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		}
- 		break;
- 	default:
--		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
--		    (pmc = get_fixed_pmc(pmu, msr))) {
--			if (!msr_info->host_initiated)
--				data = (s64)(s32)data;
--			pmc->counter += data - pmc_read_counter(pmc);
-+		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))) {
-+			if (msr_info->host_initiated)
-+				pmc->counter = data;
-+			else
-+				pmc->counter = (s32)data;
-+			return 0;
-+		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
-+			pmc->counter = data;
- 			return 0;
- 		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
- 			if (data == pmc->eventsel)
--- 
-2.20.1
-
+Yes, need add back the check. v3 patch changed the CET CPUID enumeration to
+guest, and lost the check from then on.
+> 
+> >  
+> >  	if (to_vmx(vcpu)->nested.vmxon && !nested_cr4_valid(vcpu, cr4))
+> >  		return 1;
+> > -- 
+> > 2.17.2
+> > 
