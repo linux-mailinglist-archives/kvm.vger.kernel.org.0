@@ -2,235 +2,516 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 321F2357A5
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2019 09:26:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B65F635868
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2019 10:19:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726467AbfFEH0d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jun 2019 03:26:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54622 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726086AbfFEH0d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jun 2019 03:26:33 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 889A26EF
-        for <kvm@vger.kernel.org>; Wed,  5 Jun 2019 07:26:32 +0000 (UTC)
-Received: from xz-x1 (dhcp-15-205.nay.redhat.com [10.66.15.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 70D2E61984;
-        Wed,  5 Jun 2019 07:26:29 +0000 (UTC)
-Date:   Wed, 5 Jun 2019 15:26:26 +0800
-From:   Peter Xu <peterx@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
-        rkrcmar@redhat.com, thuth@redhat.com
-Subject: Re: [PATCH v2 0/4] kvm: selftests: aarch64: use struct kvm_vcpu_init
-Message-ID: <20190605072626.GI15459@xz-x1>
-References: <20190527143141.13883-1-drjones@redhat.com>
- <ab872d9d-acb2-09cf-3cd2-c5340bcc2387@redhat.com>
+        id S1726551AbfFEITt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jun 2019 04:19:49 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:37088 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725294AbfFEITs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jun 2019 04:19:48 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x558EEm4080311;
+        Wed, 5 Jun 2019 08:18:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=gyPOJ2pQ7vFk4n0O6nuPDA/Zh23y4LlPAzR4+5D8Uvo=;
+ b=0qRJOsOMdwPWJNPJRuHydQqMU0i+xT5cwgGVZT0p0dL4aJUyrTionVfagoAox/82PO7d
+ QE3T3UxM2NW9JjtEsXOCC6dFdZYAcakmCJSEYuiP6nS1N1ekEv8tUcyitpwK96129goo
+ d+UeoX75zflcOa3Mbk2l2t/kqI3w6gOQYBryABjRJ40g4O+Hd7X6v+CBswP99738rDP6
+ UrpvxvQlc6g4PjKNF4v5dawkTWmdFnxEtxZ4oLcGzFMarLnvBFLbXxA+n+rrQR3eQ6Tb
+ xga5YHZCIUT36aa8/vg0VSK/Rofmyk0XAdvlIBb9duUNljbdWbgxvZU/jOL6gizoAyJk zg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2suj0qh6qu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 05 Jun 2019 08:18:43 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x558GWVc036913;
+        Wed, 5 Jun 2019 08:16:43 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2swnha1m1k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 05 Jun 2019 08:16:42 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x558GZiT007364;
+        Wed, 5 Jun 2019 08:16:36 GMT
+Received: from [192.168.0.110] (/70.36.60.91)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 05 Jun 2019 01:16:35 -0700
+Subject: Re: [patch 1/3] drivers/cpuidle: add cpuidle-haltpoll driver
+To:     Marcelo Tosatti <mtosatti@redhat.com>,
+        kvm-devel <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LDhMKNbcODwqE=?= =?UTF-8?B?w4XCmQ==?= 
+        <rkrcmar@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Raslan KarimAllah <karahmed@amazon.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20190603225242.289109849@amt.cnet>
+ <20190603225254.212931277@amt.cnet>
+From:   Ankur Arora <ankur.a.arora@oracle.com>
+Message-ID: <15699d6a-946a-bb8d-ec83-0fa2118c6546@oracle.com>
+Date:   Wed, 5 Jun 2019 01:16:33 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ab872d9d-acb2-09cf-3cd2-c5340bcc2387@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Wed, 05 Jun 2019 07:26:32 +0000 (UTC)
+In-Reply-To: <20190603225254.212931277@amt.cnet>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9278 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906050053
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9278 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906050053
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 04, 2019 at 07:16:34PM +0200, Paolo Bonzini wrote:
-> On 27/05/19 16:31, Andrew Jones wrote:
-> > aarch64 vcpu setup requires a vcpu init step that takes a kvm_vcpu_init
-> > struct. So far we've just hard coded that to be one that requests no
-> > features and always uses KVM_ARM_TARGET_GENERIC_V8 for the target. We
-> > should have used the preferred target from the beginning, so we do that
-> > now, and we also provide an API to unit tests to select a target of their
-> > choosing and/or cpu features.
-> > 
-> > Switching to the preferred target fixes running on platforms that don't
-> > like KVM_ARM_TARGET_GENERIC_V8. The new API will be made use of with
-> > some coming unit tests.
+On 2019-06-03 3:52 p.m., Marcelo Tosatti wrote:
+> The cpuidle_kvm driver allows the guest vcpus to poll for a specified
+> amount of time before halting. This provides the following benefits
+> to host side polling:
 > 
-> The following can replace patches 1 and 2 and simplify the API, so
-> that aarch64 and x86_64 are more similar:
+>          1) The POLL flag is set while polling is performed, which allows
+>             a remote vCPU to avoid sending an IPI (and the associated
+>             cost of handling the IPI) when performing a wakeup.
 > 
-> ---------------- 8< -------------------
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> Subject: [PATCH 1/1] kvm: selftests: hide vcpu_setup in x86_64 code
+>          2) The HLT VM-exit cost can be avoided.
 > 
-> This removes the processor-dependent arguments from vm_vcpu_add.
+> The downside of guest side polling is that polling is performed
+> even with other runnable tasks in the host.
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Results comparing halt_poll_ns and server/client application
+> where a small packet is ping-ponged:
+> 
+> host                                        --> 31.33
+> halt_poll_ns=300000 / no guest busy spin    --> 33.40   (93.8%)
+> halt_poll_ns=0 / guest_halt_poll_ns=300000  --> 32.73   (95.7%)
+> 
+> For the SAP HANA benchmarks (where idle_spin is a parameter
+> of the previous version of the patch, results should be the
+> same):
+> 
+> hpns == halt_poll_ns
+> 
+>                            idle_spin=0/   idle_spin=800/    idle_spin=0/
+>                            hpns=200000    hpns=0            hpns=800000
+> DeleteC06T03 (100 thread) 1.76           1.71 (-3%)        1.78   (+1%)
+> InsertC16T02 (100 thread) 2.14           2.07 (-3%)        2.18   (+1.8%)
+> DeleteC00T01 (1 thread)   1.34           1.28 (-4.5%)	   1.29   (-3.7%)
+> UpdateC00T03 (1 thread)   4.72           4.18 (-12%)	   4.53   (-5%)
+> 
 > ---
->  tools/testing/selftests/kvm/include/kvm_util.h            | 3 +--
->  tools/testing/selftests/kvm/lib/aarch64/processor.c       | 2 +-
->  tools/testing/selftests/kvm/lib/kvm_util.c                | 9 +++------
->  tools/testing/selftests/kvm/lib/kvm_util_internal.h       | 2 --
->  tools/testing/selftests/kvm/lib/x86_64/processor.c        | 5 +++--
->  tools/testing/selftests/kvm/x86_64/evmcs_test.c           | 2 +-
->  tools/testing/selftests/kvm/x86_64/kvm_create_max_vcpus.c | 2 +-
->  tools/testing/selftests/kvm/x86_64/smm_test.c             | 2 +-
->  tools/testing/selftests/kvm/x86_64/state_test.c           | 2 +-
->  9 files changed, 12 insertions(+), 17 deletions(-)
+>   Documentation/virtual/guest-halt-polling.txt |   78 ++++++++++++
+>   arch/x86/kernel/process.c                    |    2
+>   drivers/cpuidle/Kconfig                      |   10 +
+>   drivers/cpuidle/Makefile                     |    1
+>   drivers/cpuidle/cpuidle-haltpoll-trace.h     |   65 ++++++++++
+>   drivers/cpuidle/cpuidle-haltpoll.c           |  172 +++++++++++++++++++++++++++
+>   6 files changed, 327 insertions(+), 1 deletion(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index a5a4b28f14d8..55de43a7bd54 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -88,8 +88,7 @@ int _vcpu_ioctl(struct kvm_vm *vm, uint32_t vcpuid, unsigned long ioctl,
->  		void *arg);
->  void vm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
->  void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
-> -void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, int pgd_memslot,
-> -		 int gdt_memslot);
-> +void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid);
->  vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
->  			  uint32_t data_memslot, uint32_t pgd_memslot);
->  void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> index 19e667911496..16cba9480ad6 100644
-> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> @@ -243,7 +243,7 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
->  	uint64_t stack_vaddr = vm_vaddr_alloc(vm, stack_size,
->  					DEFAULT_ARM64_GUEST_STACK_VADDR_MIN, 0, 0);
->  
-> -	vm_vcpu_add(vm, vcpuid, 0, 0);
-> +	vm_vcpu_add(vm, vcpuid);
+> Index: linux-2.6.git/Documentation/virtual/guest-halt-polling.txt
+> ===================================================================
+> --- /dev/null	1970-01-01 00:00:00.000000000 +0000
+> +++ linux-2.6.git/Documentation/virtual/guest-halt-polling.txt	2019-06-03 19:31:36.003302371 -0300
+> @@ -0,0 +1,78 @@
+> +Guest halt polling
+> +==================
+> +
+> +The cpuidle_haltpoll driver allows the guest vcpus to poll for a specified
+> +amount of time before halting. This provides the following benefits
+> +to host side polling:
+> +
+> +	1) The POLL flag is set while polling is performed, which allows
+> +	   a remote vCPU to avoid sending an IPI (and the associated
+> + 	   cost of handling the IPI) when performing a wakeup.
+> +
+> +	2) The HLT VM-exit cost can be avoided.
+Nit: s/HLT// (also in the commit message). We might be using
+MWAIT passthrough via default_idle_call()
 
-Do we need a vcpu_setup() here?
+> +
+> +The downside of guest side polling is that polling is performed
+> +even with other runnable tasks in the host.
+> +
+> +The basic logic as follows: A global value, guest_halt_poll_ns,
+> +is configured by the user, indicating the maximum amount of
+> +time polling is allowed. This value is fixed.
+> +
+> +Each vcpu has an adjustable guest_halt_poll_ns
+> +("per-cpu guest_halt_poll_ns"), which is adjusted by the algorithm
+I believe the per-cpu variable is halt_poll_ns (below as well.)
 
-There're functional changes below too but they seem all good but I'm
-not sure about this one.  I noticed that in kvm/queue patch 4 added
-this with the new function by Drew so at last it should be fine, but
-it might affect bisection a bit on ARM.
 
->  
->  	set_reg(vm, vcpuid, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size);
->  	set_reg(vm, vcpuid, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 633b22df46a4..6634adc4052d 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -764,11 +764,10 @@ static int vcpu_mmap_sz(void)
->   *
->   * Return: None
->   *
-> - * Creates and adds to the VM specified by vm and virtual CPU with
-> - * the ID given by vcpuid.
-> + * Adds a virtual CPU to the VM specified by vm with the ID given by vcpuid.
-> + * No additional VCPU setup is done.
->   */
-> -void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, int pgd_memslot,
-> -		 int gdt_memslot)
-> +void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid)
->  {
->  	struct vcpu *vcpu;
->  
-> @@ -802,8 +801,6 @@ void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid, int pgd_memslot,
->  		vm->vcpu_head->prev = vcpu;
->  	vcpu->next = vm->vcpu_head;
->  	vm->vcpu_head = vcpu;
-> -
-> -	vcpu_setup(vm, vcpuid, pgd_memslot, gdt_memslot);
->  }
->  
->  /*
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util_internal.h b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-> index 4595e42c6e29..6171c92561f4 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-> @@ -65,8 +65,6 @@ struct kvm_vm {
->  };
->  
->  struct vcpu *vcpu_find(struct kvm_vm *vm, uint32_t vcpuid);
-> -void vcpu_setup(struct kvm_vm *vm, int vcpuid, int pgd_memslot,
-> -		int gdt_memslot);
->  void virt_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent);
->  void regs_dump(FILE *stream, struct kvm_regs *regs, uint8_t indent);
->  void sregs_dump(FILE *stream, struct kvm_sregs *sregs, uint8_t indent);
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index 21f3040d90cb..11f22c562380 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -610,7 +610,7 @@ static void kvm_setup_tss_64bit(struct kvm_vm *vm, struct kvm_segment *segp,
->  	kvm_seg_fill_gdt_64bit(vm, segp);
->  }
->  
-> -void vcpu_setup(struct kvm_vm *vm, int vcpuid, int pgd_memslot, int gdt_memslot)
-> +static void vcpu_setup(struct kvm_vm *vm, int vcpuid, int pgd_memslot, int gdt_memslot)
->  {
->  	struct kvm_sregs sregs;
->  
-> @@ -656,7 +656,8 @@ void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code)
->  				     DEFAULT_GUEST_STACK_VADDR_MIN, 0, 0);
->  
->  	/* Create VCPU */
-> -	vm_vcpu_add(vm, vcpuid, 0, 0);
-> +	vm_vcpu_add(vm, vcpuid);
-> +	vcpu_setup(vm, vcpuid, 0, 0);
->  
->  	/* Setup guest general purpose registers */
->  	vcpu_regs_get(vm, vcpuid, &regs);
-> diff --git a/tools/testing/selftests/kvm/x86_64/evmcs_test.c b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
-> index b38260e29775..dbf82658f2ef 100644
-> --- a/tools/testing/selftests/kvm/x86_64/evmcs_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
-> @@ -144,7 +144,7 @@ int main(int argc, char *argv[])
->  
->  		/* Restore state in a new VM.  */
->  		kvm_vm_restart(vm, O_RDWR);
-> -		vm_vcpu_add(vm, VCPU_ID, 0, 0);
-> +		vm_vcpu_add(vm, VCPU_ID);
->  		vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
->  		vcpu_load_state(vm, VCPU_ID, state);
->  		run = vcpu_state(vm, VCPU_ID);
-> diff --git a/tools/testing/selftests/kvm/x86_64/kvm_create_max_vcpus.c b/tools/testing/selftests/kvm/x86_64/kvm_create_max_vcpus.c
-> index 50e92996f918..e5d980547896 100644
-> --- a/tools/testing/selftests/kvm/x86_64/kvm_create_max_vcpus.c
-> +++ b/tools/testing/selftests/kvm/x86_64/kvm_create_max_vcpus.c
-> @@ -34,7 +34,7 @@ void test_vcpu_creation(int first_vcpu_id, int num_vcpus)
->  		int vcpu_id = first_vcpu_id + i;
->  
->  		/* This asserts that the vCPU was created. */
-> -		vm_vcpu_add(vm, vcpu_id, 0, 0);
-> +		vm_vcpu_add(vm, vcpu_id);
->  	}
->  
->  	kvm_vm_free(vm);
-> diff --git a/tools/testing/selftests/kvm/x86_64/smm_test.c b/tools/testing/selftests/kvm/x86_64/smm_test.c
-> index 4daf520bada1..8c063646f2a0 100644
-> --- a/tools/testing/selftests/kvm/x86_64/smm_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/smm_test.c
-> @@ -144,7 +144,7 @@ int main(int argc, char *argv[])
->  		state = vcpu_save_state(vm, VCPU_ID);
->  		kvm_vm_release(vm);
->  		kvm_vm_restart(vm, O_RDWR);
-> -		vm_vcpu_add(vm, VCPU_ID, 0, 0);
-> +		vm_vcpu_add(vm, VCPU_ID);
->  		vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
->  		vcpu_load_state(vm, VCPU_ID, state);
->  		run = vcpu_state(vm, VCPU_ID);
-> diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
-> index 2a4121f4de01..13545df46d8b 100644
-> --- a/tools/testing/selftests/kvm/x86_64/state_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/state_test.c
-> @@ -177,7 +177,7 @@ int main(int argc, char *argv[])
->  
->  		/* Restore state in a new VM.  */
->  		kvm_vm_restart(vm, O_RDWR);
-> -		vm_vcpu_add(vm, VCPU_ID, 0, 0);
-> +		vm_vcpu_add(vm, VCPU_ID);
->  		vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
->  		vcpu_load_state(vm, VCPU_ID, state);
->  		run = vcpu_state(vm, VCPU_ID);
-> -- 
-> 1.8.3.1
+> +in response to events (explained below).
+> +
+> +Module Parameters
+> +=================
+> +
+> +The cpuidle_haltpoll module has 5 tunable module parameters:
+> +
+> +1) guest_halt_poll_ns:
+> +Maximum amount of time, in nanoseconds, that polling is
+> +performed before halting.
+> +
+> +Default: 200000
+> +
+> +2) guest_halt_poll_shrink:
+> +Division factor used to shrink per-cpu guest_halt_poll_ns when
+> +wakeup event occurs after the global guest_halt_poll_ns.
+> +
+> +Default: 2
+> +
+> +3) guest_halt_poll_grow:
+> +Multiplication factor used to grow per-cpu guest_halt_poll_ns
+> +when event occurs after per-cpu guest_halt_poll_ns
+> +but before global guest_halt_poll_ns.
+> +
+> +Default: 2
+> +
+> +4) guest_halt_poll_grow_start:
+> +The per-cpu guest_halt_poll_ns eventually reaches zero
+> +in case of an idle system. This value sets the initial
+> +per-cpu guest_halt_poll_ns when growing. This can
+> +be increased from 10000, to avoid misses during the initial
+> +growth stage:
+> +
+> +10000, 20000, 40000, ... (example assumes guest_halt_poll_grow=2).
+> +
+> +Default: 10000
+> +
+> +5) guest_halt_poll_allow_shrink:
+> +
+> +Bool parameter which allows shrinking. Set to N
+> +to avoid it (per-cpu guest_halt_poll_ns will remain
+> +high once achieves global guest_halt_poll_ns value).
+> +
+> +Default: Y
+> +
+> +The module parameters can be set from the debugfs files in:
+> +
+> +	/sys/module/cpuidle_haltpoll/parameters/
+> +
+> +Further Notes
+> +=============
+> +
+> +- Care should be taken when setting the guest_halt_poll_ns parameter as a
+> +large value has the potential to drive the cpu usage to 100% on a machine which
+> +would be almost entirely idle otherwise.
+> +
+> Index: linux-2.6.git/arch/x86/kernel/process.c
+> ===================================================================
+> --- linux-2.6.git.orig/arch/x86/kernel/process.c	2019-05-29 14:46:14.527005582 -0300
+> +++ linux-2.6.git/arch/x86/kernel/process.c	2019-06-03 19:31:36.004302375 -0300
+> @@ -580,7 +580,7 @@
+>   	safe_halt();
+>   	trace_cpu_idle_rcuidle(PWR_EVENT_EXIT, smp_processor_id());
+>   }
+> -#ifdef CONFIG_APM_MODULE
+> +#if defined(CONFIG_APM_MODULE) || defined(CONFIG_HALTPOLL_CPUIDLE_MODULE)
+>   EXPORT_SYMBOL(default_idle);
+>   #endif
+>   
+> Index: linux-2.6.git/drivers/cpuidle/Kconfig
+> ===================================================================
+> --- linux-2.6.git.orig/drivers/cpuidle/Kconfig	2019-05-29 14:46:14.668006053 -0300
+> +++ linux-2.6.git/drivers/cpuidle/Kconfig	2019-06-03 19:31:36.004302375 -0300
+> @@ -51,6 +51,16 @@
+>   source "drivers/cpuidle/Kconfig.powerpc"
+>   endmenu
+>   
+> +config HALTPOLL_CPUIDLE
+> +       tristate "Halt poll cpuidle driver"
+> +       depends on X86
+> +       default y
+> +       help
+> +         This option enables halt poll cpuidle driver, which allows to poll
+> +         before halting in the guest (more efficient than polling in the
+> +         host via halt_poll_ns for some scenarios).
+> +
+> +
+>   endif
+>   
+>   config ARCH_NEEDS_CPU_IDLE_COUPLED
+> Index: linux-2.6.git/drivers/cpuidle/Makefile
+> ===================================================================
+> --- linux-2.6.git.orig/drivers/cpuidle/Makefile	2019-05-29 14:44:43.030700871 -0300
+> +++ linux-2.6.git/drivers/cpuidle/Makefile	2019-06-03 19:31:36.004302375 -0300
+> @@ -7,6 +7,7 @@
+>   obj-$(CONFIG_ARCH_NEEDS_CPU_IDLE_COUPLED) += coupled.o
+>   obj-$(CONFIG_DT_IDLE_STATES)		  += dt_idle_states.o
+>   obj-$(CONFIG_ARCH_HAS_CPU_RELAX)	  += poll_state.o
+> +obj-$(CONFIG_HALTPOLL_CPUIDLE)		  += cpuidle-haltpoll.o
+>   
+>   ##################################################################################
+>   # ARM SoC drivers
+> Index: linux-2.6.git/drivers/cpuidle/cpuidle-haltpoll-trace.h
+> ===================================================================
+> --- /dev/null	1970-01-01 00:00:00.000000000 +0000
+> +++ linux-2.6.git/drivers/cpuidle/cpuidle-haltpoll-trace.h	2019-06-03 19:31:36.005302378 -0300
+> @@ -0,0 +1,65 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#if !defined(_HALTPOLL_TRACE_H_) || defined(TRACE_HEADER_MULTI_READ)
+> +#define _HALTPOLL_TRACE_H_
+> +
+> +#include <linux/stringify.h>
+> +#include <linux/types.h>
+> +#include <linux/tracepoint.h>
+> +
+> +#undef TRACE_SYSTEM
+> +#define TRACE_SYSTEM cpuidle_haltpoll
+> +
+> +TRACE_EVENT(cpuidle_haltpoll_success,
+> +	    TP_PROTO(unsigned int cpu_halt_poll_ns, u64 block_ns),
+> +	    TP_ARGS(cpu_halt_poll_ns, block_ns),
+> +
+> +	    TP_STRUCT__entry(
+> +			     __field(unsigned int, cpu_halt_poll_ns)
+> +			     __field(u64,	   block_ns)
+> +			    ),
+> +
+> +	    TP_fast_assign(
+> +			   __entry->cpu_halt_poll_ns = cpu_halt_poll_ns;
+> +			   __entry->block_ns = block_ns;
+> +			  ),
+> +
+> +	    TP_printk("cpu_halt_poll_ns %u block_ns %lld",
+> +			  __entry->cpu_halt_poll_ns,
+> +			  __entry->block_ns)
+> +);
+> +
+> +TRACE_EVENT(cpuidle_haltpoll_fail,
+> +		TP_PROTO(unsigned int prev_cpu_halt_poll_ns,
+> +			 unsigned int cpu_halt_poll_ns,
+> +			 u64 block_ns),
+> +		TP_ARGS(prev_cpu_halt_poll_ns, cpu_halt_poll_ns, block_ns),
+> +
+> +		TP_STRUCT__entry(
+> +				__field(unsigned int, prev_cpu_halt_poll_ns)
+> +				__field(unsigned int, cpu_halt_poll_ns)
+> +				__field(u64,	   block_ns)
+> +				),
+> +
+> +		TP_fast_assign(
+> +			      __entry->prev_cpu_halt_poll_ns =
+> +					prev_cpu_halt_poll_ns;
+> +			      __entry->cpu_halt_poll_ns = cpu_halt_poll_ns;
+> +			      __entry->block_ns = block_ns;
+> +			      ),
+> +
+> +		TP_printk("prev_cpu_halt_poll_ns %u cpu_halt_poll_ns %u block_ns %lld",
+> +			      __entry->prev_cpu_halt_poll_ns,
+> +			      __entry->cpu_halt_poll_ns,
+> +			      __entry->block_ns)
+> +);
+> +
+> +#endif /* _HALTPOLL_TRACE_H_ */
+> +
+> +/* This part must be outside protection */
+> +#undef TRACE_INCLUDE_PATH
+> +#define TRACE_INCLUDE_PATH ../../drivers/cpuidle/
+> +#undef TRACE_INCLUDE_FILE
+> +#define TRACE_INCLUDE_FILE cpuidle-haltpoll-trace
+> +#include <trace/define_trace.h>
+> +
+> +
+> Index: linux-2.6.git/drivers/cpuidle/cpuidle-haltpoll.c
+> ===================================================================
+> --- /dev/null	1970-01-01 00:00:00.000000000 +0000
+> +++ linux-2.6.git/drivers/cpuidle/cpuidle-haltpoll.c	2019-06-03 19:31:36.005302378 -0300
+> @@ -0,0 +1,172 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * cpuidle driver for halt polling.
+> + *
+> + * Copyright 2019 Red Hat, Inc. and/or its affiliates.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> + * the COPYING file in the top-level directory.
+> + *
+> + * Authors: Marcelo Tosatti <mtosatti@redhat.com>
+> + */
+> +
+> +#include <linux/init.h>
+> +#include <linux/cpuidle.h>
+> +#include <linux/module.h>
+> +#include <linux/timekeeping.h>
+> +#include <linux/sched/idle.h>
+> +#define CREATE_TRACE_POINTS
+> +#include "cpuidle-haltpoll-trace.h"
+> +
+> +unsigned int guest_halt_poll_ns = 200000;
+> +module_param(guest_halt_poll_ns, uint, 0644);
+> +
+> +/* division factor to shrink halt_poll_ns */
+> +unsigned int guest_halt_poll_shrink = 2;
+> +module_param(guest_halt_poll_shrink, uint, 0644);
+> +
+> +/* multiplication factor to grow per-cpu halt_poll_ns */
+> +unsigned int guest_halt_poll_grow = 2;
+> +module_param(guest_halt_poll_grow, uint, 0644);
+> +
+> +/* value in ns to start growing per-cpu halt_poll_ns */
+> +unsigned int guest_halt_poll_grow_start = 10000;
+> +module_param(guest_halt_poll_grow_start, uint, 0644);
+> +
+> +/* value in ns to start growing per-cpu halt_poll_ns */
+> +bool guest_halt_poll_allow_shrink = true;
+> +module_param(guest_halt_poll_allow_shrink, bool, 0644);
+> +
+> +static DEFINE_PER_CPU(unsigned int, halt_poll_ns);
+> +
+> +static void adjust_haltpoll_ns(unsigned int block_ns,
+> +			       unsigned int *cpu_halt_poll_ns)
+> +{
+> +	unsigned int val;
+> +	unsigned int prev_halt_poll_ns = *cpu_halt_poll_ns;
+> +
+> +	/* Grow cpu_halt_poll_ns if
+> +	 * cpu_halt_poll_ns < block_ns < guest_halt_poll_ns
+> +	 */
+> +	if (block_ns > *cpu_halt_poll_ns && block_ns <= guest_halt_poll_ns) {
+> +		val = *cpu_halt_poll_ns * guest_halt_poll_grow;
+> +
+> +		if (val < guest_halt_poll_grow_start)
+> +			val = guest_halt_poll_grow_start;
+> +		if (val > guest_halt_poll_ns)
+> +			val = guest_halt_poll_ns;
+> +
+> +		*cpu_halt_poll_ns = val;
+> +	} else if (block_ns > guest_halt_poll_ns &&
+> +		   guest_halt_poll_allow_shrink) {
+> +		unsigned int shrink = guest_halt_poll_shrink;
+> +
+> +		val = *cpu_halt_poll_ns;
+> +		if (shrink == 0)
+> +			val = 0;
+> +		else
+> +			val /= shrink;
+Nit, feel free to ignore: we could check for guest_halt_poll_shrink
+along with guest_halt_poll_allow_shrink and get rid of this whole
+conditional.
+
+Ankur
+
+> +		*cpu_halt_poll_ns = val;
+> +	}
+> +
+> +	trace_cpuidle_haltpoll_fail(prev_halt_poll_ns, *cpu_halt_poll_ns,
+> +				    block_ns);
+> +}
+> +
+> +static int haltpoll_enter_idle(struct cpuidle_device *dev,
+> +			  struct cpuidle_driver *drv, int index)
+> +{
+> +	int do_halt = 0;
+> +	unsigned int *cpu_halt_poll_ns;
+> +	ktime_t start, now;
+> +	int cpu = smp_processor_id();
+> +
+> +	cpu_halt_poll_ns = per_cpu_ptr(&halt_poll_ns, cpu);
+> +
+> +	/* No polling */
+> +	if (guest_halt_poll_ns == 0) {
+> +		if (current_clr_polling_and_test()) {
+> +			local_irq_enable();
+> +			return index;
+> +		}
+> +		default_idle();
+> +		return index;
+> +	}
+> +
+> +	local_irq_enable();
+> +
+> +	now = start = ktime_get();
+> +	if (!current_set_polling_and_test()) {
+> +		ktime_t end_spin;
+> +
+> +		end_spin = ktime_add_ns(now, *cpu_halt_poll_ns);
+> +
+> +		while (!need_resched()) {
+> +			cpu_relax();
+> +			now = ktime_get();
+> +
+> +			if (!ktime_before(now, end_spin)) {
+> +				do_halt = 1;
+> +				break;
+> +			}
+> +		}
+> +	}
+> +
+> +	if (do_halt) {
+> +		u64 block_ns;
+> +
+> +		/*
+> +		 * No events while busy spin window passed,
+> +		 * halt.
+> +		 */
+> +		local_irq_disable();
+> +		if (current_clr_polling_and_test()) {
+> +			local_irq_enable();
+> +			return index;
+> +		}
+> +		default_idle();
+> +		block_ns = ktime_to_ns(ktime_sub(ktime_get(), start));
+> +		adjust_haltpoll_ns(block_ns, cpu_halt_poll_ns);
+> +	} else {
+> +		u64 block_ns = ktime_to_ns(ktime_sub(now, start));
+> +
+> +		trace_cpuidle_haltpoll_success(*cpu_halt_poll_ns, block_ns);
+> +		current_clr_polling();
+> +	}
+> +
+> +	return index;
+> +}
+> +
+> +static struct cpuidle_driver haltpoll_driver = {
+> +	.name = "haltpoll_idle",
+> +	.owner = THIS_MODULE,
+> +	.states = {
+> +		{ /* entry 0 is for polling */ },
+> +		{
+> +			.enter			= haltpoll_enter_idle,
+> +			.exit_latency		= 0,
+> +			.target_residency	= 0,
+> +			.power_usage		= -1,
+> +			.name			= "Halt poll",
+> +			.desc			= "Halt poll idle",
+> +		},
+> +	},
+> +	.safe_state_index = 0,
+> +	.state_count = 2,
+> +};
+> +
+> +static int __init haltpoll_init(void)
+> +{
+> +	return cpuidle_register(&haltpoll_driver, NULL);
+> +}
+> +
+> +static void __exit haltpoll_exit(void)
+> +{
+> +	cpuidle_unregister(&haltpoll_driver);
+> +}
+> +
+> +module_init(haltpoll_init);
+> +module_exit(haltpoll_exit);
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Marcelo Tosatti <mtosatti@redhat.com>");
+> +
+> 
 > 
 
-Regards,
-
--- 
-Peter Xu
