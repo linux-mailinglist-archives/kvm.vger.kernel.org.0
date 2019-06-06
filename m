@@ -2,177 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E20E83743D
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 14:36:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F02CC3745C
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 14:39:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727296AbfFFMgl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 08:36:41 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:36480 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727010AbfFFMgl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 08:36:41 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x56COEgk181929;
-        Thu, 6 Jun 2019 12:36:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2018-07-02; bh=lkkkxiOaBzEF+ZYZuPKKuq0YiuBz8Pp9BBn1w75FoCs=;
- b=tmnQjVCTpzZLctTUB09JyWgPcckrM/E2Y3Xf/YVGVnXWRAoVnzYCtajB/dhOgXSkIAgt
- Nsd0fskUhEih7bu8yYCGZCv1qa5ppImk8Vjp6iufeYCAqhTkmBDFowU3xuVZk0/idu+u
- qNzbmPq1tEgVMDZsYsjNAT9y3RVJo4FvwDXbIgLt1yxTsrx7UV5ncO2JJuGH9zPGKUGy
- HzVtrqLNaOrWaNe8K3uZwKzL9ETdogUaSFr9PjCX0pvCGPF3OFSeGJPlZr2JCi02hzsm
- JQ8/hwps40O+c6kTZz5f4KcmBs2gLnHnzrY9Mjf5HujcfTcvTJ1ksN2I7+Om6FSJYisx ZQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 2sugstr509-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jun 2019 12:36:15 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x56CYY0p153197;
-        Thu, 6 Jun 2019 12:36:15 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2swnhaqta4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jun 2019 12:36:14 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x56CaDWr020265;
-        Thu, 6 Jun 2019 12:36:13 GMT
-Received: from [10.30.3.6] (/213.57.127.2)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 06 Jun 2019 05:36:13 -0700
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH] KVM: x86: move MSR_IA32_POWER_CTL handling to common code
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <1559824417-74835-1-git-send-email-pbonzini@redhat.com>
-Date:   Thu, 6 Jun 2019 15:36:09 +0300
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        sean.j.christopherson@intel.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <811D43D4-8E85-4681-ABA7-EEA209228164@oracle.com>
-References: <1559824417-74835-1-git-send-email-pbonzini@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9279 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906060090
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9279 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906060090
+        id S1727310AbfFFMjP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 08:39:15 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:38713 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725782AbfFFMjP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 08:39:15 -0400
+Received: by mail-wr1-f68.google.com with SMTP id d18so2259705wrs.5
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2019 05:39:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=VA4NRIaT3EdiBZnZ/KEWHClNcoj8m2EjqXtsdyURvi8=;
+        b=Cn07UaJCFXpsABDKGW14WB9i+i33QYVeFWZVhuVSdzoDfaoPkSKZZx/zOJf7S05C2U
+         O812LF0A1mUl8BHwQG0GlUWErGXFI+gDycKuscO7f+rcuoTPymRyGOpJ2x2W5nkVndlZ
+         HzDw6iN+JFvfh+DepJErV0WbDeQDA1+jfEwHsQZhC/v0vZXQhO0f4WUigvKM//MPmPnv
+         o1Z5mOEa+k8HHRYx9vcmzQsPL2qU90nu6kUXulyUi8kXuf2RyPPYqlw8vK8+S4qkdtd1
+         FXpRv2/ZjFbPqP5ROO/1fKPty4dGqEQV5M7Cxlw+hnD+4QF7qxccJJ3UVdfboikKPLmA
+         FimQ==
+X-Gm-Message-State: APjAAAXkPxLW+PSqG9BMaKn9xlLqK/XuL2CmGBJa7by47a7xvhg0mQir
+        Px7SF5BDmL3bej+0h1GkNspXog==
+X-Google-Smtp-Source: APXvYqyvEIUGuKKN7+PL3P//eqdlqNfO5dUH/Yiq3O2gACBivkbQbqFsodxhsc7VPvCgtOe4yXGKFQ==
+X-Received: by 2002:a5d:49c1:: with SMTP id t1mr2409943wrs.35.1559824754147;
+        Thu, 06 Jun 2019 05:39:14 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:657f:501:149f:5617? ([2001:b07:6468:f312:657f:501:149f:5617])
+        by smtp.gmail.com with ESMTPSA id n4sm1747304wrp.61.2019.06.06.05.39.13
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 06 Jun 2019 05:39:13 -0700 (PDT)
+Subject: Re: [PATCH 0/4][kvm-unit-test nVMX]: Test "load
+ IA32_PERF_GLOBAL_CONTROL" VM-entry control on vmentry of nested guests
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
+Cc:     rkrcmar@redhat.com, jmattson@google.com
+References: <20190509212055.29933-1-krish.sadhukhan@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6363dc39-b44b-0cca-de2f-603703df41b9@redhat.com>
+Date:   Thu, 6 Jun 2019 14:39:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190509212055.29933-1-krish.sadhukhan@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 09/05/19 23:20, Krish Sadhukhan wrote:
+> This set contains the unit test, and related changes, for the "load
+> IA32_PERF_GLOBAL_CONTROL" VM-entry control that was enabled in my previous
+> patchset titled:
+> 
+> 	[KVM nVMX]: Check "load IA32_PERF_GLOBAL_CTRL" on vmentry of nested guests
+> 
+> 
+> [PATCH 1/4][kvm-unit-test nVMX]: Rename guest_pat_main to guest_state_test_main
+> [PATCH 2/4][kvm-unit-test nVMX]: Rename report_guest_pat_test to
+> [PATCH 3/4][kvm-unit-test nVMX]: Add #define for "load IA32_PERF_GLOBAL_CONTROL" bit
+> [PATCH 4/4][kvm-unit-test nVMX]: Test "load IA32_PERF_GLOBAL_CONTROL" VM-entry
+> 
+>  x86/vmx.h       |   1 +
+>  x86/vmx_tests.c | 108 +++++++++++++++++++++++++++++++++++++++++++-----------
+>  2 files changed, 87 insertions(+), 22 deletions(-)
+> 
+> Krish Sadhukhan (4):
+>       nVMX: Rename guest_pat_main to guest_state_test_main
+>       nVMX: Rename report_guest_pat_test to report_guest_state_test
+>       nVMX: Add #define for "load IA32_PERF_GLOBAL_CONTROL" bit
+>       nVMX: Test "load IA32_PERF_GLOBAL_CONTROL" VM-entry control on vmentry of nested guests
+> 
 
-> On 6 Jun 2019, at 15:33, Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
-> Make it available to AMD hosts as well, just in case someone is trying
-> to use an Intel processor's CPUID setup.
+Queued 1-3, but patch 4 does not apply.  It seems like you have another
+patch that this sits on top of?
 
-I=E2=80=99m actually quite surprised that such a setup works properly.
-
->=20
-> Suggested-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Reviewed-by: Liran Alon <liran.alon@oracle.com>
-
-> ---
-> arch/x86/include/asm/kvm_host.h | 1 +
-> arch/x86/kvm/vmx/vmx.c          | 6 ------
-> arch/x86/kvm/vmx/vmx.h          | 2 --
-> arch/x86/kvm/x86.c              | 6 ++++++
-> 4 files changed, 7 insertions(+), 8 deletions(-)
->=20
-> diff --git a/arch/x86/include/asm/kvm_host.h =
-b/arch/x86/include/asm/kvm_host.h
-> index a86026969b19..35e7937cc9ac 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -689,6 +689,7 @@ struct kvm_vcpu_arch {
-> 	u32 virtual_tsc_mult;
-> 	u32 virtual_tsc_khz;
-> 	s64 ia32_tsc_adjust_msr;
-> +	u64 msr_ia32_power_ctl;
-> 	u64 tsc_scaling_ratio;
->=20
-> 	atomic_t nmi_queued;  /* unprocessed asynchronous NMIs */
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index cccf73a91e88..5d903f8909d1 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1695,9 +1695,6 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, =
-struct msr_data *msr_info)
-> 	case MSR_IA32_SYSENTER_ESP:
-> 		msr_info->data =3D vmcs_readl(GUEST_SYSENTER_ESP);
-> 		break;
-> -	case MSR_IA32_POWER_CTL:
-> -		msr_info->data =3D vmx->msr_ia32_power_ctl;
-> -		break;
-> 	case MSR_IA32_BNDCFGS:
-> 		if (!kvm_mpx_supported() ||
-> 		    (!msr_info->host_initiated &&
-> @@ -1828,9 +1825,6 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, =
-struct msr_data *msr_info)
-> 	case MSR_IA32_SYSENTER_ESP:
-> 		vmcs_writel(GUEST_SYSENTER_ESP, data);
-> 		break;
-> -	case MSR_IA32_POWER_CTL:
-> -		vmx->msr_ia32_power_ctl =3D data;
-> -		break;
-> 	case MSR_IA32_BNDCFGS:
-> 		if (!kvm_mpx_supported() ||
-> 		    (!msr_info->host_initiated &&
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 61128b48c503..1cdaa5af8245 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -260,8 +260,6 @@ struct vcpu_vmx {
->=20
-> 	unsigned long host_debugctlmsr;
->=20
-> -	u64 msr_ia32_power_ctl;
-> -
-> 	/*
-> 	 * Only bits masked by msr_ia32_feature_control_valid_bits can =
-be set in
-> 	 * msr_ia32_feature_control. FEATURE_CONTROL_LOCKED is always =
-included
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 145df9778ed0..5ec87ded17db 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2563,6 +2563,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, =
-struct msr_data *msr_info)
-> 			return 1;
-> 		vcpu->arch.smbase =3D data;
-> 		break;
-> +	case MSR_IA32_POWER_CTL:
-> +		vcpu->arch.msr_ia32_power_ctl =3D data;
-> +		break;
-> 	case MSR_IA32_TSC:
-> 		kvm_write_tsc(vcpu, msr_info);
-> 		break;
-> @@ -2822,6 +2825,9 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, =
-struct msr_data *msr_info)
-> 			return 1;
-> 		msr_info->data =3D vcpu->arch.arch_capabilities;
-> 		break;
-> +	case MSR_IA32_POWER_CTL:
-> +		msr_info->data =3D vcpu->arch.msr_ia32_power_ctl;
-> +		break;
-> 	case MSR_IA32_TSC:
-> 		msr_info->data =3D kvm_scale_tsc(vcpu, rdtsc()) + =
-vcpu->arch.tsc_offset;
-> 		break;
-> --=20
-> 1.8.3.1
->=20
-
+Paolo
