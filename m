@@ -2,91 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8878F37CF2
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 21:05:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 076BD37D29
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 21:21:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728752AbfFFTFj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 15:05:39 -0400
-Received: from mga04.intel.com ([192.55.52.120]:47531 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728217AbfFFTFj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 15:05:39 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Jun 2019 12:05:38 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by orsmga003.jf.intel.com with ESMTP; 06 Jun 2019 12:05:37 -0700
-Date:   Thu, 6 Jun 2019 12:05:37 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 12/13] KVM: nVMX: Don't mark vmcs12 as dirty when L1
- writes pin controls
-Message-ID: <20190606190537.GL23169@linux.intel.com>
-References: <20190507191805.9932-1-sean.j.christopherson@intel.com>
- <20190507191805.9932-13-sean.j.christopherson@intel.com>
- <496e9a1f-620e-d09c-c9d3-c490e289ec2e@redhat.com>
+        id S1729167AbfFFTVb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 15:21:31 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:52636 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728504AbfFFTVb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 15:21:31 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x56JIs1x159577;
+        Thu, 6 Jun 2019 19:21:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=ZGGJPKfsk3L036pLr1d8EGwGK6t0E9/V4tYTxXtWdSk=;
+ b=UlnRJc85OqZweCACVjr2mQuCCbo75VXDxn3xgd26QlcqJODiscULfKzaYDvPbQAW11O6
+ G2+kAHoDFWH8H7HWw00UhDZ88W2cOglcbx8QFpkO2EpV+lSkttwnqzcRXFHzICUFY5Kk
+ kADzMcVYB0Cs9Poq2Of5CFyampgqvkNCehB3mLkSInXEy6qM+viruJN3vdeLv87ZJFz1
+ UmHK9+KH50VqrTf+9OwLdeHa0nSxpWBmXTSVPXX7902Mtbq92EVFho1aDI3UHnOwri11
+ QTgDt4TDaFRybK7guvT19bcCjJBMfx1GGLN0oxgr0UVsdl9DLP9Jvq3L97FB9RCiQAWi kQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2suj0qtcgy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 06 Jun 2019 19:21:07 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x56JIbns054295;
+        Thu, 6 Jun 2019 19:19:06 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2swnhaxgyj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 06 Jun 2019 19:19:06 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x56JJ57d012830;
+        Thu, 6 Jun 2019 19:19:06 GMT
+Received: from dhcp-10-132-91-225.usdhcp.oraclecorp.com (/10.132.91.225)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 06 Jun 2019 12:19:05 -0700
+Subject: Re: [PATCH] KVM: nVMX: Rename prepare_vmcs02_*_full to
+ prepare_vmcs02_*_extra
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <1559834652-105872-1-git-send-email-pbonzini@redhat.com>
+ <20190606184117.GJ23169@linux.intel.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <89dd5d66-0d37-ea41-3f6d-72d5a8a9815d@oracle.com>
+Date:   Thu, 6 Jun 2019 12:19:04 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <496e9a1f-620e-d09c-c9d3-c490e289ec2e@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190606184117.GJ23169@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9280 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906060128
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9280 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906060129
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 06, 2019 at 07:24:38PM +0200, Paolo Bonzini wrote:
-> On 07/05/19 21:18, Sean Christopherson wrote:
-> > Pin controls doesn't affect dirty logic, e.g. the preemption timer value
-> > is loaded from vmcs12 even if vmcs12 is "clean", i.e. there is no need
-> > to mark vmcs12 dirty when L1 writes pin controls.
-> > 
-> > KVM currently toggles the VMX_PREEMPTION_TIMER control flag when it
-> > disables or enables the timer.  The VMWRITE to toggle the flag can be
-> > responsible for a large percentage of vmcs12 dirtying when running KVM
-> > as L1 (depending on the behavior of L2).
-> > 
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> 
-> I think either we wait for patch 13 to get in the wild so that
-> VMX_PREEMPTION_TIMER writes do not become so frequent, or we can do
-> something like
 
-I'd prefer to get something in now.  I assume a fair number of users will
-be running current/older versions of KVM as L1 for years to come.
 
-I have no objection to shadowing pin controls.  I opted for the cheesy
-approach because I couldn't provide numbers that actually showed a
-performance improvement by shadowing.
+On 06/06/2019 11:41 AM, Sean Christopherson wrote:
+> On Thu, Jun 06, 2019 at 05:24:12PM +0200, Paolo Bonzini wrote:
+>> These function do not prepare the entire state of the vmcs02, only the
+>> rarely needed parts.  Rename them to make this clearer.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>   arch/x86/kvm/vmx/nested.c | 8 ++++----
+>>   1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> index 84438cf23d37..fd8150ef6cce 100644
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -1955,7 +1955,7 @@ static void prepare_vmcs02_constant_state(struct vcpu_vmx *vmx)
+>>   	vmx_set_constant_host_state(vmx);
+>>   }
+>>   
+>> -static void prepare_vmcs02_early_full(struct vcpu_vmx *vmx,
+>> +static void prepare_vmcs02_early_extra(struct vcpu_vmx *vmx,
+> Or maybe 'uncommon', 'rare' or 'ext'?  I don't I particularly love any of
+> the names, but they're all better than 'full'.
 
-> --------- 8< ------------
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> Subject: [PATCH] KVM: nVMX: shadow pin based execution controls
-> 
-> The VMX_PREEMPTION_TIMER flag may be toggled frequently, though not
-> *very* frequently.  Since it does not affect KVM's dirty logic, e.g.
-> the preemption timer value is loaded from vmcs12 even if vmcs12 is
-> "clean", there is no need to mark vmcs12 dirty when L1 writes pin
-> controls, and shadowing the field achieves that.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> diff --git a/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-> b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-> index 4cea018ba285..eb1ecd16fd22 100644
-> --- a/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-> +++ b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-> @@ -47,6 +47,7 @@
->  SHADOW_FIELD_RO(GUEST_CS_AR_BYTES, guest_cs_ar_bytes)
->  SHADOW_FIELD_RO(GUEST_SS_AR_BYTES, guest_ss_ar_bytes)
->  SHADOW_FIELD_RW(CPU_BASED_VM_EXEC_CONTROL, cpu_based_vm_exec_control)
-> +SHADOW_FIELD_RW(PIN_BASED_VM_EXEC_CONTROL, pin_based_vm_exec_control)
->  SHADOW_FIELD_RW(EXCEPTION_BITMAP, exception_bitmap)
->  SHADOW_FIELD_RW(VM_ENTRY_EXCEPTION_ERROR_CODE,
-> vm_entry_exception_error_code)
->  SHADOW_FIELD_RW(VM_ENTRY_INTR_INFO_FIELD, vm_entry_intr_info_field)
+The big chunk of the work in this function is done via 
+prepare_vmcs02_constant_state(). It seems cleaner to get rid of 
+prepare_vmcs02_early_full(), call prepare_vmcs02_constant_state() 
+directly from prepare_vmcs02_early() and move the three vmcs_write16() 
+calls to prepare_vmcs02_early().
+
+>
+> Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>
+>>   				      struct vmcs12 *vmcs12)
+>>   {
+>>   	prepare_vmcs02_constant_state(vmx);
+>> @@ -1976,7 +1976,7 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+>>   	u64 guest_efer = nested_vmx_calc_efer(vmx, vmcs12);
+>>   
+>>   	if (vmx->nested.dirty_vmcs12 || vmx->nested.hv_evmcs)
+>> -		prepare_vmcs02_early_full(vmx, vmcs12);
+>> +		prepare_vmcs02_early_extra(vmx, vmcs12);
+>>   
+>>   	/*
+>>   	 * PIN CONTROLS
+>> @@ -2130,7 +2130,7 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+>>   	}
+>>   }
+>>   
+>> -static void prepare_vmcs02_full(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+>> +static void prepare_vmcs02_extra(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+>>   {
+>>   	struct hv_enlightened_vmcs *hv_evmcs = vmx->nested.hv_evmcs;
+>>   
+>> @@ -2254,7 +2254,7 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>>   	struct vcpu_vmx *vmx = to_vmx(vcpu);
+>>   
+>>   	if (vmx->nested.dirty_vmcs12 || vmx->nested.hv_evmcs) {
+>> -		prepare_vmcs02_full(vmx, vmcs12);
+>> +		prepare_vmcs02_extra(vmx, vmcs12);
+>>   		vmx->nested.dirty_vmcs12 = false;
+>>   	}
+>>   
+>> -- 
+>> 1.8.3.1
+>>
+
