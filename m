@@ -2,86 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9903D37374
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 13:52:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F25DA3737B
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 13:53:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727601AbfFFLwu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 07:52:50 -0400
-Received: from smtp.lucina.net ([62.176.169.44]:59844 "EHLO smtp.lucina.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727574AbfFFLwu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 07:52:50 -0400
-Received: from nodbug.lucina.net (78-141-76-187.dynamic.orange.sk [78.141.76.187])
-        by smtp.lucina.net (Postfix) with ESMTPSA id 4D89D122804
-        for <kvm@vger.kernel.org>; Thu,  6 Jun 2019 13:52:49 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=lucina.net;
-        s=dkim-201811; t=1559821969;
-        bh=XSZTQlQ28VPqPcvvc56kZYvHL/MgVYAABSdRpPLL1N8=;
-        h=Date:From:To:Subject:References:In-Reply-To:From;
-        b=lY8GO8I7zSmIOcIosoZn6/XNq4S9318uS76zZNKUzlKVtCY8/TRH8HuyIJlsqds7W
-         1oS7rABLZZa//BlEJLvIsrWfgnRqJ6rn6+FthoN6naIeDaIXuJm405wbrB7x+bEC84
-         4BCyHYv8svl+KJCfT9lDb+/X1Y+3u+ZGUe1OxlhLwtLsAhNWMRjgikx7sPdffkHCED
-         F/aozzZa/csGpIL47ffWzX9yDNMK8Xj4SHlFDAPVyP2RTqSfSV7P6OhP8uwPvLQOfV
-         ePeO9DZOxiKdZrqi1FUJqJq+Dcyf4EzVJb/yOPkM8z7DjjETJ8n06p21znA/aUR9L7
-         GZTHP4OIu7+XA==
-Received: by nodbug.lucina.net (Postfix, from userid 1000)
-        id 2B246268437A; Thu,  6 Jun 2019 13:52:49 +0200 (CEST)
-Date:   Thu, 6 Jun 2019 13:52:49 +0200
-From:   Martin Lucina <martin@lucina.net>
-To:     kvm@vger.kernel.org
-Subject: Re: Interaction between host-side mprotect() and KVM MMU
-Message-ID: <20190606115249.exu2kyrtxvsuqqa4@nodbug.lucina.net>
-Mail-Followup-To: kvm@vger.kernel.org
-References: <20190521072434.p4rtnbkerk5jqwh4@nodbug.lucina.net>
- <20190521140238.GA22089@linux.intel.com>
- <20190523092703.ddze6zcfsm2cj6kc@nodbug.lucina.net>
- <20190524192659.GE365@linux.intel.com>
+        id S1727460AbfFFLxh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 07:53:37 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34695 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726014AbfFFLxh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 07:53:37 -0400
+Received: by mail-wr1-f68.google.com with SMTP id e16so2121445wrn.1
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2019 04:53:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Kcw2eitPBsnk1lUWFm8LCwt8R5Oq7PsZekBJkOXcnM8=;
+        b=QCBFTIy5Gw0QjBkt3S6ALq2DYRw+RxD3+JVgfyhc0dRQrtyjs3o2MccACJ+B6yZ7qM
+         DbElD+TxESF2A/Lks5nlu3x+3dle6Jn1nSGggdlCkPD2mzQ1/G78OyapvftB5WoHHHrk
+         4mLLzhZ7IX6WLPOVeokmcnoNXy4DBE2kFQL6AqzbcolruQKBKdyI/V44Z4Qe/JtaRnq0
+         CWXdhA442HjhpS0WtPSMY3gBcXRpBK068qTc7awDps1OHsCKFSIL3hqr4hdaDtT9tbMO
+         xV831xQHo/aKkmaDGy1HgwZ7M2yP0Tz70O38hgXjdds7BL1+UvIfvTRlGcRFMFjSDMju
+         eYeQ==
+X-Gm-Message-State: APjAAAXjpJJF3ATC2/31KWxNNzlJE3Ey+p53GUhKxC1NWgH3jWO3OMZU
+        0cd/ZhNmh7I19ennEdNnOmqL/w==
+X-Google-Smtp-Source: APXvYqzvBQtVhLg2YESyms7yapgGIPgP/71w0VZjSO93jVhK3KfJeArIhG93fJ3k2gNrWJBU2TLsAw==
+X-Received: by 2002:adf:ee49:: with SMTP id w9mr6346952wro.112.1559822015432;
+        Thu, 06 Jun 2019 04:53:35 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:657f:501:149f:5617? ([2001:b07:6468:f312:657f:501:149f:5617])
+        by smtp.gmail.com with ESMTPSA id z17sm1537206wru.21.2019.06.06.04.53.33
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 06 Jun 2019 04:53:34 -0700 (PDT)
+Subject: Re: [PATCH] KVM: x86: Use DR_TRAP_BITS instead of hard-coded 15
+To:     Liran Alon <liran.alon@oracle.com>, rkrcmar@redhat.com,
+        kvm@vger.kernel.org
+Cc:     Nikita Leshenko <nikita.leshchenko@oracle.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+References: <20190605225447.12192-1-liran.alon@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8026de82-45d5-8419-0ef7-026bd146c1ee@redhat.com>
+Date:   Thu, 6 Jun 2019 13:53:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190524192659.GE365@linux.intel.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20190605225447.12192-1-liran.alon@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Friday, 24.05.2019 at 12:26, Sean Christopherson wrote:
-> On Thu, May 23, 2019 at 11:27:03AM +0200, Martin Lucina wrote:
-> > On Tuesday, 21.05.2019 at 07:02, Sean Christopherson wrote:
-> > > Not without modifying KVM and the kernel (if you want to do it through
-> > > mprotect()).
-> > 
-> > Hooking up the full EPT protection bits available to KVM via mprotect()
-> > would be the best solution for us, and could also give us the ability to
-> > have execute-only pages on x86, which is a nice defence against ROP attacks
-> > in the guest. However, I can see now that this is not a trivial
-> > undertaking, especially across the various MMU models (tdp, softmmu) and
-> > architectures dealt with by the core KVM code.
+On 06/06/19 00:54, Liran Alon wrote:
+> Make all code consistent with kvm_deliver_exception_payload() by using
+> appropriate symbolic constant instead of hard-coded number.
 > 
-> Belated thought on this...
+> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> ---
+>  arch/x86/kvm/emulate.c | 2 +-
+>  arch/x86/kvm/vmx/vmx.c | 4 ++--
+>  arch/x86/kvm/x86.c     | 2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
 > 
-> Propagating PROT_EXEC from the host's VMAs to the EPT tables would require
-> having *guest* memory mapped with PROT_EXEC in the host.  This is a
-> non-starter for traditional virtualization as it would all but require the
-> hypervisor to have RWX pages.
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index d0d5dd44b4f4..199cd2cf7254 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -4260,7 +4260,7 @@ static int check_dr_read(struct x86_emulate_ctxt *ctxt)
+>  		ulong dr6;
+>  
+>  		ctxt->ops->get_dr(ctxt, 6, &dr6);
+> -		dr6 &= ~15;
+> +		dr6 &= ~DR_TRAP_BITS;
+>  		dr6 |= DR6_BD | DR6_RTM;
+>  		ctxt->ops->set_dr(ctxt, 6, dr6);
+>  		return emulate_db(ctxt);
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index b93e36ddee5e..f64bcbb03906 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -4521,7 +4521,7 @@ static int handle_exception(struct kvm_vcpu *vcpu)
+>  		dr6 = vmcs_readl(EXIT_QUALIFICATION);
+>  		if (!(vcpu->guest_debug &
+>  		      (KVM_GUESTDBG_SINGLESTEP | KVM_GUESTDBG_USE_HW_BP))) {
+> -			vcpu->arch.dr6 &= ~15;
+> +			vcpu->arch.dr6 &= ~DR_TRAP_BITS;
+>  			vcpu->arch.dr6 |= dr6 | DR6_RTM;
+>  			if (is_icebp(intr_info))
+>  				skip_emulated_instruction(vcpu);
+> @@ -4766,7 +4766,7 @@ static int handle_dr(struct kvm_vcpu *vcpu)
+>  			vcpu->run->exit_reason = KVM_EXIT_DEBUG;
+>  			return 0;
+>  		} else {
+> -			vcpu->arch.dr6 &= ~15;
+> +			vcpu->arch.dr6 &= ~DR_TRAP_BITS;
+>  			vcpu->arch.dr6 |= DR6_BD | DR6_RTM;
+>  			kvm_queue_exception(vcpu, DB_VECTOR);
+>  			return 1;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 83aefd759846..db9dc011965b 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -6381,7 +6381,7 @@ static bool kvm_vcpu_check_breakpoint(struct kvm_vcpu *vcpu, int *r)
+>  					   vcpu->arch.db);
+>  
+>  		if (dr6 != 0) {
+> -			vcpu->arch.dr6 &= ~15;
+> +			vcpu->arch.dr6 &= ~DR_TRAP_BITS;
+>  			vcpu->arch.dr6 |= dr6 | DR6_RTM;
+>  			kvm_queue_exception(vcpu, DB_VECTOR);
+>  			*r = EMULATE_DONE;
 > 
-> For the Solo5 case, since the guest is untrusted, mapping its code as
-> executable in the host seems almost as bad from a security perspective.
-> 
-> So yeah, mprotect() might be convenient, but adding a KVM_MEM_NOEXEC
-> flag to KVM_SET_USER_MEMORY_REGION would be more secure (and probably
-> easier to implement in KVM).
 
-This is a good point, and it had slipped my mind. Thanks for bringing it
-up. So it looks like the correct way forward would be to use individual
-memslots for the different Solo5 guest regions rather than mprotect() from
-the host, i.e. splitting the protection bits at all the different layers
-(host, EPT/TDP, guest).
+Queued, thanks.
 
-This does change our architecture somewhat, I'll think about how it could
-work and come back to this, am in the middle of some feature work right
-now.
-
-Thanks for the feedback.
+Paolo
