@@ -2,118 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F53D37A42
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 18:55:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23DB337A44
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 18:55:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729690AbfFFQzW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 12:55:22 -0400
-Received: from foss.arm.com ([217.140.101.70]:50836 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728718AbfFFQzV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 12:55:21 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 988431713;
-        Thu,  6 Jun 2019 09:55:21 -0700 (PDT)
-Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CB8453F690;
-        Thu,  6 Jun 2019 09:55:19 -0700 (PDT)
-From:   Marc Zyngier <marc.zyngier@arm.com>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Julien Thierry <julien.thierry@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        "Raslan, KarimAllah" <karahmed@amazon.de>
-Subject: [PATCH 8/8] KVM: arm/arm64: vgic-irqfd: Implement kvm_arch_set_irq_inatomic
-Date:   Thu,  6 Jun 2019 17:54:55 +0100
-Message-Id: <20190606165455.162478-9-marc.zyngier@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190606165455.162478-1-marc.zyngier@arm.com>
-References: <20190606165455.162478-1-marc.zyngier@arm.com>
+        id S1729708AbfFFQz1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 12:55:27 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:40272 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725267AbfFFQz1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 12:55:27 -0400
+Received: by mail-wm1-f67.google.com with SMTP id v19so661527wmj.5
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2019 09:55:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=e0PF/PRB4Dx464JI+62Sjm5BGxJ6iTtAjp+eMvS+9bQ=;
+        b=dsk+rXzg7GQwKpwimksbdu/aks4KBgnG5Y9+kikQvYdYnVxL9zHeM95wK7QdOJLYgL
+         GIyY5K9YN80bdSC2gGb1lBhV1pQIpi7B7ktmXwGxrYYD7BzVII5N+a8PnjQMecF4Shyo
+         ybOYl5gMLWI/CZHUrS7FLiffJAJ6R590rz2x78+Mfv2/GkTWb8BWO4GKyWXxVSkTQYrR
+         N0foMkhgI9+XzN/dNF5AgZC9jlAWTMjcXN/rtZy/xOrBMEcLMx365UwyvSZoddJlSuXs
+         eDN702PB0lY3pggHw5LS9sUMdRwgTOjInJJfCJeikPzsUCsKTIR1A0Sa8ZDS+bUrfmTh
+         tEWg==
+X-Gm-Message-State: APjAAAWZMnW3U7TRA39Kxi/qgslehbdFDe+vuHhnGKmqQXoQQCynDrQm
+        euONBJwCGe9S4rhPIqcmZhb2e12Ec8A=
+X-Google-Smtp-Source: APXvYqx17U2BiF5bdxdi6bsUURFJpu50wB/d/uSqHOSv/VWExJkYhQ5Hv2Lc2ZbAXhPcHvk5p0/P1A==
+X-Received: by 2002:a1c:c305:: with SMTP id t5mr637660wmf.163.1559840125304;
+        Thu, 06 Jun 2019 09:55:25 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:657f:501:149f:5617? ([2001:b07:6468:f312:657f:501:149f:5617])
+        by smtp.gmail.com with ESMTPSA id n19sm2214953wmk.6.2019.06.06.09.55.24
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 06 Jun 2019 09:55:24 -0700 (PDT)
+Subject: Re: [PATCH 01/13] KVM: nVMX: Use adjusted pin controls for vmcs02
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <20190507191805.9932-1-sean.j.christopherson@intel.com>
+ <20190507191805.9932-2-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fc222b2f-33d8-529b-143e-d27d9f8293d4@redhat.com>
+Date:   Thu, 6 Jun 2019 18:55:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190507191805.9932-2-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that we have a cache of MSI->LPI translations, it is pretty
-easy to implement kvm_arch_set_irq_inatomic (this cache can be
-parsed without sleeping).
+On 07/05/19 21:17, Sean Christopherson wrote:
+> KVM provides a module parameter to allow disabling virtual NMI support
+> to simplify testing (hardware *without* virtual NMI support is virtually
+> non-existent, pun intended).  
 
-Hopefully, this will improve some LPI-heavy workloads.
+I wish. :)  The reason for that module parameter is to test the path
+because removing it got many complaints...
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- virt/kvm/arm/vgic/vgic-irqfd.c | 36 ++++++++++++++++++++++++++++------
- 1 file changed, 30 insertions(+), 6 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
-index 99e026d2dade..9f203ed8c8f3 100644
---- a/virt/kvm/arm/vgic/vgic-irqfd.c
-+++ b/virt/kvm/arm/vgic/vgic-irqfd.c
-@@ -77,6 +77,15 @@ int kvm_set_routing_entry(struct kvm *kvm,
- 	return r;
- }
- 
-+static void kvm_populate_msi(struct kvm_kernel_irq_routing_entry *e,
-+			     struct kvm_msi *msi)
-+{
-+	msi->address_lo = e->msi.address_lo;
-+	msi->address_hi = e->msi.address_hi;
-+	msi->data = e->msi.data;
-+	msi->flags = e->msi.flags;
-+	msi->devid = e->msi.devid;
-+}
- /**
-  * kvm_set_msi: inject the MSI corresponding to the
-  * MSI routing entry
-@@ -90,21 +99,36 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
- {
- 	struct kvm_msi msi;
- 
--	msi.address_lo = e->msi.address_lo;
--	msi.address_hi = e->msi.address_hi;
--	msi.data = e->msi.data;
--	msi.flags = e->msi.flags;
--	msi.devid = e->msi.devid;
--
- 	if (!vgic_has_its(kvm))
- 		return -ENODEV;
- 
- 	if (!level)
- 		return -1;
- 
-+	kvm_populate_msi(e, &msi);
- 	return vgic_its_inject_msi(kvm, &msi);
- }
- 
-+/**
-+ * kvm_arch_set_irq_inatomic: fast-path for irqfd injection
-+ *
-+ * Currently only direct MSI injecton is supported.
-+ */
-+int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
-+			      struct kvm *kvm, int irq_source_id, int level,
-+			      bool line_status)
-+{
-+	if (e->type == KVM_IRQ_ROUTING_MSI && vgic_has_its(kvm) && level) {
-+		struct kvm_msi msi;
-+
-+		kvm_populate_msi(e, &msi);
-+		if (!vgic_its_inject_cached_translation(kvm, &msi))
-+			return 0;
-+	}
-+
-+	return -EWOULDBLOCK;
-+}
-+
- int kvm_vgic_setup_default_irq_routing(struct kvm *kvm)
- {
- 	struct kvm_irq_routing_entry *entries;
--- 
-2.20.1
-
+Paolo
