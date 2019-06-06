@@ -2,257 +2,333 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 77A2837C38
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 20:26:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A227037C40
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 20:29:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729577AbfFFS01 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 14:26:27 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:51726 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729214AbfFFS00 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 14:26:26 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x56IIgbA124084;
-        Thu, 6 Jun 2019 18:25:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=yH8UdEOX5vJy/PhnJC24dl5WASO00fx3wXRpFZxmMHU=;
- b=dyc25b5zZhxR1Nqv2Nr4Av1tPaI5ssnnGCKfnXRfZIqSVkRhi6S8nutiPl/JgqmMrzxk
- AsyklV+kGbe4Qxy62nnSXQ4Akc4BT9In70ioQTt17sgSoXWl3gaG17weBfykXF4uAVF9
- F8HaNNSPl2QJ5JyykBmTUZOu/U/gz8trVfEqXh760glSLnYGAwztYDmUdG6ZaL9QWp4Y
- 8tSvlKfcO9dBKDBXcTfjuX9PrBmHX3L7miy2XIjUsDs05e5/n9j0seXF2XURtJ9/Pn6a
- h6D8lnKNLz56Ksn8o5f2cVvqorxj/7srvFhD/tcJGbJjY/JPZbgvjOWpeSlRKo+ScfoS dg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2130.oracle.com with ESMTP id 2suevdtexk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jun 2019 18:25:35 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x56IOZY1119435;
-        Thu, 6 Jun 2019 18:25:34 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 2swnhawqyv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jun 2019 18:25:34 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x56IPXA0009661;
-        Thu, 6 Jun 2019 18:25:33 GMT
-Received: from [10.175.215.95] (/10.175.215.95)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 06 Jun 2019 11:25:32 -0700
-Subject: Re: [patch v2 3/3] cpuidle-haltpoll: disable host side polling when
- kvm virtualized
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     kvm-devel <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Raslan KarimAllah <karahmed@amazon.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-References: <20190603225242.289109849@amt.cnet>
- <20190603225254.360289262@amt.cnet> <20190604122404.GA18979@amt.cnet>
-From:   Joao Martins <joao.m.martins@oracle.com>
-Message-ID: <cb11ef01-b579-1526-d585-0c815f2e1f6f@oracle.com>
-Date:   Thu, 6 Jun 2019 19:25:28 +0100
+        id S1730589AbfFFS3A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 14:29:00 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:45551 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730454AbfFFS3A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 14:29:00 -0400
+Received: by mail-qt1-f194.google.com with SMTP id j19so3791981qtr.12
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2019 11:28:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VSW0mHlKPnFKRiIMc3nnFOw6KKgjVB71Zu0QRJyAwqk=;
+        b=uW8aqzBg6TxvNRxeW56JqMaqI4hhQlXPw7FQFznjo8iNkSK3XHyyN0FC22RycWFQhj
+         hwjkdl0zM9u5zLfoqQOeaXkxMZe6MYY8GM54Rv9t4ttcJg4Bjhrwnk8pNi/PbW2pbIKb
+         dxofObNas4EaUaRbrA358fOCWRL+hhX/OJ+oUD0vVaqhC8q+YIX3N2Hxk5agI5CN6c6o
+         vBN6nnpuHKFV5wMTnpB85gUQgtltkHXeQYKPEQhdvaKscAe+Lfc4TAVVlSRAxQpKf1Yb
+         fGBSgqHKMWkMku1dVpJr6N/oOetR4latKVu6AqJ+WrtieeDfEIu8MGZ+lKOHEz1snMy9
+         w5eQ==
+X-Gm-Message-State: APjAAAVCbhjzdT+7Y9rlq0U031wc6SMBcAvhPsAJjDoBWqxEtSGxp5Pq
+        SX4DlyD5I9HRwBFChwRLbaysPg==
+X-Google-Smtp-Source: APXvYqyOMiPipyMKs3/NXaVvVmc3VOZ8tY0mlKbylPCpIe8W3cBYix2XiQCSn1D1fkmb1e6r9hnULQ==
+X-Received: by 2002:ac8:35c2:: with SMTP id l2mr42039410qtb.123.1559845739028;
+        Thu, 06 Jun 2019 11:28:59 -0700 (PDT)
+Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net. [100.0.197.103])
+        by smtp.gmail.com with ESMTPSA id c5sm1174402qtj.27.2019.06.06.11.28.57
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 06 Jun 2019 11:28:58 -0700 (PDT)
+Date:   Thu, 6 Jun 2019 14:28:55 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Nathan Chancellor <natechancellor@gmail.com>
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        clang-built-linux@googlegroups.com
+Subject: Re: [PATCH] vhost: Don't use defined in VHOST_ARCH_CAN_ACCEL_UACCESS
+ definition
+Message-ID: <20190606142606-mutt-send-email-mst@kernel.org>
+References: <20190606161223.67979-1-natechancellor@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190604122404.GA18979@amt.cnet>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9280 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906060123
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9280 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906060123
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190606161223.67979-1-natechancellor@gmail.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/4/19 1:24 PM, Marcelo Tosatti wrote:
+On Thu, Jun 06, 2019 at 09:12:23AM -0700, Nathan Chancellor wrote:
+> Clang warns:
 > 
-> When performing guest side polling, it is not necessary to 
-> also perform host side polling. 
+>   drivers/vhost/vhost.c:2085:5: warning: macro expansion producing
+>   'defined' has undefined behavior [-Wexpansion-to-defined]
+>   #if VHOST_ARCH_CAN_ACCEL_UACCESS
+>       ^
+>   drivers/vhost/vhost.h:98:38: note: expanded from macro
+>   'VHOST_ARCH_CAN_ACCEL_UACCESS'
+>   #define VHOST_ARCH_CAN_ACCEL_UACCESS defined(CONFIG_MMU_NOTIFIER) && \
+>                                        ^
 > 
-> So disable host side polling, via the new MSR interface, 
-> when loading cpuidle-haltpoll driver.
+> Rework VHOST_ARCH_CAN_ACCEL_UACCESS to be defined under those conditions
+> so that the meaning of the code doesn't change and clang no longer
+> warns.
 > 
-> Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-> 
+> Fixes: 7f466032dc9e ("vhost: access vq metadata through kernel virtual address")
+> Link: https://github.com/ClangBuiltLinux/linux/issues/508
+> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 > ---
+>  drivers/vhost/vhost.c | 44 +++++++++++++++++++++----------------------
+>  drivers/vhost/vhost.h |  7 ++++---
+>  2 files changed, 26 insertions(+), 25 deletions(-)
 > 
-> v2: remove extra "}"
-> 
->  arch/x86/Kconfig                        |    7 +++++
->  arch/x86/include/asm/cpuidle_haltpoll.h |    8 ++++++
->  arch/x86/kernel/kvm.c                   |   40 ++++++++++++++++++++++++++++++++
->  drivers/cpuidle/cpuidle-haltpoll.c      |    9 ++++++-
->  include/linux/cpuidle_haltpoll.h        |   16 ++++++++++++
->  5 files changed, 79 insertions(+), 1 deletion(-)
-> 
-> Index: linux-2.6.git/arch/x86/include/asm/cpuidle_haltpoll.h
-> ===================================================================
-> --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-> +++ linux-2.6.git/arch/x86/include/asm/cpuidle_haltpoll.h	2019-06-03 19:38:42.328718617 -0300
-> @@ -0,0 +1,8 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _ARCH_HALTPOLL_H
-> +#define _ARCH_HALTPOLL_H
-> +
-> +void arch_haltpoll_enable(void);
-> +void arch_haltpoll_disable(void);
-> +
-> +#endif
-> Index: linux-2.6.git/drivers/cpuidle/cpuidle-haltpoll.c
-> ===================================================================
-> --- linux-2.6.git.orig/drivers/cpuidle/cpuidle-haltpoll.c	2019-06-03 19:38:12.376619124 -0300
-> +++ linux-2.6.git/drivers/cpuidle/cpuidle-haltpoll.c	2019-06-03 19:38:42.328718617 -0300
-> @@ -15,6 +15,7 @@
->  #include <linux/module.h>
->  #include <linux/timekeeping.h>
->  #include <linux/sched/idle.h>
-> +#include <linux/cpuidle_haltpoll.h>
->  #define CREATE_TRACE_POINTS
->  #include "cpuidle-haltpoll-trace.h"
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index dc9301d31f12..cc56d08b4275 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -299,7 +299,7 @@ static void vhost_vq_meta_reset(struct vhost_dev *d)
+>  		__vhost_vq_meta_reset(d->vqs[i]);
+>  }
 >  
-> @@ -157,11 +158,17 @@
->  
->  static int __init haltpoll_init(void)
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  static void vhost_map_unprefetch(struct vhost_map *map)
 >  {
-> -	return cpuidle_register(&haltpoll_driver, NULL);
-> +	int ret = cpuidle_register(&haltpoll_driver, NULL);
-> +
-> +	if (ret == 0)
-> +		arch_haltpoll_enable();
-> +
-> +	return ret;
+>  	kfree(map->pages);
+> @@ -483,7 +483,7 @@ static void vhost_vq_reset(struct vhost_dev *dev,
+>  	vq->iotlb = NULL;
+>  	vq->invalidate_count = 0;
+>  	__vhost_vq_meta_reset(vq);
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	vhost_reset_vq_maps(vq);
+>  #endif
+>  }
+> @@ -635,7 +635,7 @@ void vhost_dev_init(struct vhost_dev *dev,
+>  	INIT_LIST_HEAD(&dev->read_list);
+>  	INIT_LIST_HEAD(&dev->pending_list);
+>  	spin_lock_init(&dev->iotlb_lock);
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	vhost_init_maps(dev);
+>  #endif
+>  
+> @@ -726,7 +726,7 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
+>  	if (err)
+>  		goto err_cgroup;
+>  
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	err = mmu_notifier_register(&dev->mmu_notifier, dev->mm);
+>  	if (err)
+>  		goto err_mmu_notifier;
+> @@ -734,7 +734,7 @@ long vhost_dev_set_owner(struct vhost_dev *dev)
+>  
+>  	return 0;
+>  
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  err_mmu_notifier:
+>  	vhost_dev_free_iovecs(dev);
+>  #endif
+> @@ -828,7 +828,7 @@ static void vhost_clear_msg(struct vhost_dev *dev)
+>  	spin_unlock(&dev->iotlb_lock);
 >  }
 >  
->  static void __exit haltpoll_exit(void)
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  static void vhost_setup_uaddr(struct vhost_virtqueue *vq,
+>  			      int index, unsigned long uaddr,
+>  			      size_t size, bool write)
+> @@ -959,12 +959,12 @@ void vhost_dev_cleanup(struct vhost_dev *dev)
+>  		dev->worker = NULL;
+>  	}
+>  	if (dev->mm) {
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  		mmu_notifier_unregister(&dev->mmu_notifier, dev->mm);
+>  #endif
+>  		mmput(dev->mm);
+>  	}
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	for (i = 0; i < dev->nvqs; i++)
+>  		vhost_uninit_vq_maps(dev->vqs[i]);
+>  #endif
+> @@ -1196,7 +1196,7 @@ static inline void __user *__vhost_get_user(struct vhost_virtqueue *vq,
+>  
+>  static inline int vhost_put_avail_event(struct vhost_virtqueue *vq)
 >  {
-> +	arch_haltpoll_disable();
->  	cpuidle_unregister(&haltpoll_driver);
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	struct vhost_map *map;
+>  	struct vring_used *used;
+>  
+> @@ -1224,7 +1224,7 @@ static inline int vhost_put_used(struct vhost_virtqueue *vq,
+>  				 struct vring_used_elem *head, int idx,
+>  				 int count)
+>  {
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	struct vhost_map *map;
+>  	struct vring_used *used;
+>  	size_t size;
+> @@ -1252,7 +1252,7 @@ static inline int vhost_put_used(struct vhost_virtqueue *vq,
+>  static inline int vhost_put_used_flags(struct vhost_virtqueue *vq)
+>  
+>  {
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	struct vhost_map *map;
+>  	struct vring_used *used;
+>  
+> @@ -1278,7 +1278,7 @@ static inline int vhost_put_used_flags(struct vhost_virtqueue *vq)
+>  static inline int vhost_put_used_idx(struct vhost_virtqueue *vq)
+>  
+>  {
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	struct vhost_map *map;
+>  	struct vring_used *used;
+>  
+> @@ -1342,7 +1342,7 @@ static void vhost_dev_unlock_vqs(struct vhost_dev *d)
+>  static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq,
+>  				      __virtio16 *idx)
+>  {
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	struct vhost_map *map;
+>  	struct vring_avail *avail;
+>  
+> @@ -1367,7 +1367,7 @@ static inline int vhost_get_avail_idx(struct vhost_virtqueue *vq,
+>  static inline int vhost_get_avail_head(struct vhost_virtqueue *vq,
+>  				       __virtio16 *head, int idx)
+>  {
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	struct vhost_map *map;
+>  	struct vring_avail *avail;
+>  
+> @@ -1393,7 +1393,7 @@ static inline int vhost_get_avail_head(struct vhost_virtqueue *vq,
+>  static inline int vhost_get_avail_flags(struct vhost_virtqueue *vq,
+>  					__virtio16 *flags)
+>  {
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	struct vhost_map *map;
+>  	struct vring_avail *avail;
+>  
+> @@ -1418,7 +1418,7 @@ static inline int vhost_get_avail_flags(struct vhost_virtqueue *vq,
+>  static inline int vhost_get_used_event(struct vhost_virtqueue *vq,
+>  				       __virtio16 *event)
+>  {
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	struct vhost_map *map;
+>  	struct vring_avail *avail;
+>  
+> @@ -1441,7 +1441,7 @@ static inline int vhost_get_used_event(struct vhost_virtqueue *vq,
+>  static inline int vhost_get_used_idx(struct vhost_virtqueue *vq,
+>  				     __virtio16 *idx)
+>  {
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	struct vhost_map *map;
+>  	struct vring_used *used;
+>  
+> @@ -1466,7 +1466,7 @@ static inline int vhost_get_used_idx(struct vhost_virtqueue *vq,
+>  static inline int vhost_get_desc(struct vhost_virtqueue *vq,
+>  				 struct vring_desc *desc, int idx)
+>  {
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	struct vhost_map *map;
+>  	struct vring_desc *d;
+>  
+> @@ -1825,7 +1825,7 @@ static bool iotlb_access_ok(struct vhost_virtqueue *vq,
+>  	return true;
 >  }
 >  
-> Index: linux-2.6.git/include/linux/cpuidle_haltpoll.h
-> ===================================================================
-> --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-> +++ linux-2.6.git/include/linux/cpuidle_haltpoll.h	2019-06-03 19:41:57.293366260 -0300
-> @@ -0,0 +1,16 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _CPUIDLE_HALTPOLL_H
-> +#define _CPUIDLE_HALTPOLL_H
-> +
-> +#ifdef CONFIG_ARCH_CPUIDLE_HALTPOLL
-> +#include <asm/cpuidle_haltpoll.h>
-> +#else
-> +static inline void arch_haltpoll_enable(void)
-> +{
-> +}
-> +
-> +static inline void arch_haltpoll_disable(void)
-> +{
-> +}
-> +#endif
-> +#endif
-> Index: linux-2.6.git/arch/x86/Kconfig
-> ===================================================================
-> --- linux-2.6.git.orig/arch/x86/Kconfig	2019-06-03 19:38:12.376619124 -0300
-> +++ linux-2.6.git/arch/x86/Kconfig	2019-06-03 19:42:34.478489868 -0300
-> @@ -787,6 +787,7 @@
->  	bool "KVM Guest support (including kvmclock)"
->  	depends on PARAVIRT
->  	select PARAVIRT_CLOCK
-> +	select ARCH_CPUIDLE_HALTPOLL
->  	default y
->  	---help---
->  	  This option enables various optimizations for running under the KVM
-> @@ -795,6 +796,12 @@
->  	  underlying device model, the host provides the guest with
->  	  timing infrastructure such as time of day, and system time
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  static void vhost_vq_map_prefetch(struct vhost_virtqueue *vq)
+>  {
+>  	struct vhost_map __rcu *map;
+> @@ -1846,7 +1846,7 @@ int vq_meta_prefetch(struct vhost_virtqueue *vq)
+>  	unsigned int num = vq->num;
 >  
-> +config ARCH_CPUIDLE_HALTPOLL
-> +        def_bool n
-> +        proUmpt "Disable host haltpoll when loading haltpoll driver"
-> +        help
-> +	  If virtualized under KVM, disable host haltpoll.
-> +
->  config PVH
->  	bool "Support for running PVH guests"
->  	---help---
-> Index: linux-2.6.git/arch/x86/kernel/kvm.c
-> ===================================================================
-> --- linux-2.6.git.orig/arch/x86/kernel/kvm.c	2019-06-03 19:38:12.376619124 -0300
-> +++ linux-2.6.git/arch/x86/kernel/kvm.c	2019-06-03 19:40:14.359024312 -0300
-> @@ -853,3 +853,43 @@
->  }
+>  	if (!vq->iotlb) {
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  		vhost_vq_map_prefetch(vq);
+>  #endif
+>  		return 1;
+> @@ -2061,7 +2061,7 @@ static long vhost_vring_set_num_addr(struct vhost_dev *d,
 >  
->  #endif	/* CONFIG_PARAVIRT_SPINLOCKS */
-> +
-> +#ifdef CONFIG_ARCH_CPUIDLE_HALTPOLL
-> +
-> +void kvm_disable_host_haltpoll(void *i)
-> +{
-> +	wrmsrl(MSR_KVM_POLL_CONTROL, 0);
-> +}
-> +
-> +void kvm_enable_host_haltpoll(void *i)
-> +{
-> +	wrmsrl(MSR_KVM_POLL_CONTROL, 1);
-> +}
-> +
-> +void arch_haltpoll_enable(void)
-> +{
-> +	if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL))
-> +		return;
-> +
-
-Perhaps warn the user when failing to disable host poll e.g.:
-
-if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL)) {
-	pr_warn_once("haltpoll: Failed to disable host halt polling\n");
-	return;
-}
-
-But I wonder whether we should fail to load cpuidle-haltpoll when host halt
-polling can't be disabled[*]? That is to avoid polling in both host and guest
-and *possibly* avoid chances for performance regressions when running on older
-hypervisors?
-
-[*] with guest still able load with lack of host polling control via modparam
-
-> +	preempt_disable();
-> +	/* Enabling guest halt poll disables host halt poll */
-> +	kvm_disable_host_haltpoll(NULL);
-> +	smp_call_function(kvm_disable_host_haltpoll, NULL, 1);
-> +	preempt_enable();
-> +}
-> +EXPORT_SYMBOL_GPL(arch_haltpoll_enable);
-> +
-> +void arch_haltpoll_disable(void)
-> +{
-> +	if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL))
-> +		return;
-> +
-> +	preempt_disable();
-> +	/* Enabling guest halt poll disables host halt poll */
-> +	kvm_enable_host_haltpoll(NULL);
-> +	smp_call_function(kvm_enable_host_haltpoll, NULL, 1);
-> +	preempt_enable();
-> +}
-> +
-> +EXPORT_SYMBOL_GPL(arch_haltpoll_disable);
+>  	mutex_lock(&vq->mutex);
+>  
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	/* Unregister MMU notifer to allow invalidation callback
+>  	 * can access vq->uaddrs[] without holding a lock.
+>  	 */
+> @@ -2082,7 +2082,7 @@ static long vhost_vring_set_num_addr(struct vhost_dev *d,
+>  		BUG();
+>  	}
+>  
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	vhost_setup_vq_uaddr(vq);
+>  
+>  	if (d->mm)
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> index c5d950cf7627..d9f36c479fa7 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -95,8 +95,9 @@ struct vhost_uaddr {
+>  	bool write;
+>  };
+>  
+> -#define VHOST_ARCH_CAN_ACCEL_UACCESS defined(CONFIG_MMU_NOTIFIER) && \
+> -	ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE == 0
+> +#if defined(CONFIG_MMU_NOTIFIER) && ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE == 0
+> +#define VHOST_ARCH_CAN_ACCEL_UACCESS
 > +#endif
-> 
+>  
+>  /* The virtqueue structure describes a queue attached to a device. */
+>  struct vhost_virtqueue {
+> @@ -109,7 +110,7 @@ struct vhost_virtqueue {
+>  	struct vring_avail __user *avail;
+>  	struct vring_used __user *used;
+>  
+> -#if VHOST_ARCH_CAN_ACCEL_UACCESS
+> +#ifdef VHOST_ARCH_CAN_ACCEL_UACCESS
+>  	/* Read by memory accessors, modified by meta data
+>  	 * prefetching, MMU notifier and vring ioctl().
+>  	 * Synchonrized through mmu_lock (writers) and RCU (writers
+> -- 
+> 2.22.0.rc3
+
+
+
+I'd prefer just changing the definition.
+ifdefs have a disadvantage that it's easy to get
+wrong code if you forget to include a header.
+
+I queued the below - pls confirm it works for you.
+
+
+diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+index c5d950cf7627..819296332913 100644
+--- a/drivers/vhost/vhost.h
++++ b/drivers/vhost/vhost.h
+@@ -95,8 +95,11 @@ struct vhost_uaddr {
+ 	bool write;
+ };
+ 
+-#define VHOST_ARCH_CAN_ACCEL_UACCESS defined(CONFIG_MMU_NOTIFIER) && \
+-	ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE == 0
++#if defined(CONFIG_MMU_NOTIFIER) && ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE == 0
++#define VHOST_ARCH_CAN_ACCEL_UACCESS 1
++#else
++#define VHOST_ARCH_CAN_ACCEL_UACCESS 0
++#endif
+ 
+ /* The virtqueue structure describes a queue attached to a device. */
+ struct vhost_virtqueue {
