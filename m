@@ -2,122 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2123636BCE
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 07:44:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53A9136DAF
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 09:46:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726589AbfFFFoI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 01:44:08 -0400
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:34695 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725782AbfFFFoH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 01:44:07 -0400
-Received: by mail-oi1-f196.google.com with SMTP id u64so758127oib.1;
-        Wed, 05 Jun 2019 22:44:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tk6GyDs0VS64a3+zCzYjeMCP8j+xybcK7R+DofWfXTQ=;
-        b=rPkLfvqs+b9szsegsJkefc+GolU/hypqfn7qndNQlXpKxrMu+qJOxR3hQhuGjkBtiP
-         gi0p0YvHL9enmgSyZaIwDGsMccxH+J847m5eY1lGCDCtdnfsou4DUsb2+bSzwpfyFq/l
-         YW/JKyFEnJSc/5KCqOi0Wp0xhEKesDhQ5AqLtJgXruCpU6sUC3CJOnsX2vSJl8LbcU4T
-         yEO/u4Glk9PEV2TW8JzlMo2vLKi6fEeYSPfoDB7XeRCNwiq8vuZFTk2d4da5nnGdIk7M
-         3mSOuyJg+1VkENKegFNqE0K63VFXYgk27YPXT5/f9mLwgaMXZ6MA860l4/RibM0j2geN
-         /SXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tk6GyDs0VS64a3+zCzYjeMCP8j+xybcK7R+DofWfXTQ=;
-        b=t/T5t/dvMUh6HrbvWvls9aAs+zyPmzLkfXfZMOzGhnNb/eatS2dNwvOxFTHzs9JMum
-         T0w0lEHuJ5PIFQ3SoNax13+XFqGBwQjkQ+r0ck+UXvnl+hYMgJbSlwfI4GURRcNhD5ka
-         ro1lpUs7fmawEoagYDtSCPc0YQ4zBACxA82KFkFQs4V5qWGcCnUnLaCyC2i/kDsoMt46
-         QTyZLD9owcy8UNOudXxkna4P9pW4lbJj+oRgmlHQ/N3Tz+I3OftvvboKbVNAbLT8XOrq
-         E+NZVV66bmMKSwgLWzrzbsCqCpvNDQLkhpDfGChwVlKpPsUvrItg5CrjzAeKPkIySA1P
-         B3Gw==
-X-Gm-Message-State: APjAAAUPXa7cDpQKI1wUPcsQhjqEtTumSTDy/dMaVfw8vcVK7cpAzlhI
-        q+UlGAiCuV/GvQUbrfJAkHtK71afW0ZLKTxwjuZMZg==
-X-Google-Smtp-Source: APXvYqxUe7s92029jMIpWaoTI3EgsZO7a8sHg9UZv3yF+SwRVLlLTb2K7J2cTZDYaeLfPYs0+Ib1zyXQO1P6qWQ2bRg=
-X-Received: by 2002:aca:51ce:: with SMTP id f197mr7245969oib.33.1559799847126;
- Wed, 05 Jun 2019 22:44:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <1559729351-20244-1-git-send-email-wanpengli@tencent.com>
- <1559729351-20244-2-git-send-email-wanpengli@tencent.com> <505fc388-2223-146f-ae8a-824169078a17@redhat.com>
-In-Reply-To: <505fc388-2223-146f-ae8a-824169078a17@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 6 Jun 2019 13:44:32 +0800
-Message-ID: <CANRm+Cz+xqfBQXoxc30SpsBdTKfer+YJW=oV14fBvpmX=kFQYA@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: LAPIC: Make lapic timer unpinned when timer is
- injected by posted-interrupt
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726752AbfFFHoY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 03:44:24 -0400
+Received: from mga01.intel.com ([192.55.52.88]:24992 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725267AbfFFHoY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 03:44:24 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Jun 2019 00:44:24 -0700
+X-ExtLoop1: 1
+Received: from devel-ww.sh.intel.com ([10.239.48.128])
+  by orsmga005.jf.intel.com with ESMTP; 06 Jun 2019 00:44:21 -0700
+From:   Wei Wang <wei.w.wang@intel.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com, ak@linux.intel.com, peterz@infradead.org
+Cc:     kan.liang@intel.com, mingo@redhat.com, rkrcmar@redhat.com,
+        like.xu@intel.com, wei.w.wang@intel.com, jannh@google.com,
+        arei.gonglei@huawei.com, jmattson@google.com
+Subject: [PATCH v6 00/12] Guest LBR Enabling
+Date:   Thu,  6 Jun 2019 15:02:19 +0800
+Message-Id: <1559804551-42271-1-git-send-email-wei.w.wang@intel.com>
+X-Mailer: git-send-email 2.7.4
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 5 Jun 2019 at 21:04, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 05/06/19 12:09, Wanpeng Li wrote:
-> > +static inline bool posted_interrupt_inject_timer(struct kvm_vcpu *vcpu)
-> > +{
-> > +     return (kvm_x86_ops->pi_inject_timer_enabled(vcpu) &&
-> > +             kvm_mwait_in_guest(vcpu->kvm));
-> > +}
-> > +
->
-> Here you need to check kvm_halt_in_guest, not kvm_mwait_in_guest,
-> because you need to go through kvm_apic_expired if the guest needs to be
-> woken up from kvm_vcpu_block.
->
-> There is a case when you get to kvm_vcpu_block with kvm_halt_in_guest,
-> which is when the guest disables asynchronous page faults.  Currently,
-> timer interrupts are delivered while apf.halted = true, with this change
+Last Branch Recording (LBR) is a performance monitor unit (PMU) feature
+on Intel CPUs that captures branch related info. This patch series enables
+this feature to KVM guests.
 
-You are right. I check it in v2 2/3.
+Here is a conclusion of the fundamental methods that we use:
+1) the LBR feature is enabled per guest via QEMU setting of
+   KVM_CAP_X86_GUEST_LBR;
+2) the LBR stack is passed through to the guest for direct accesses after
+   the guest's first access to any of the lbr related MSRs;
+3) the host will help save/resotre the LBR stack when the vCPU is
+   scheduled out/in.
 
-> they wouldn't.  I would just disable KVM_REQ_APF_HALT in
-> kvm_can_do_async_pf if kvm_halt_in_guest is true, let me send a patch
-> for that later.
->
-> When you do this, I think you don't need the
-> kvm_x86_ops->pi_inject_timer_enabled check at all, because if we know
+ChangeLog:
+    - perf/x86:
+        - Patch 7:
+                - define "no counter" as a new PERF_EV cap and keep it
+                  used in the kernel, instead of esposing it in the user
+                  ABI (if defined in perf_event_attr)
+                - add a new API, perf_event_create, which can be used to
+                  create a perf event without counter assignment (e.g.
+                  a perf event simply to get the perf core's help of
+                  switching lbr stack on thread switching, please see
+                  patch 8)
+    - KVM/vPMU:
+	- Patch 8: use perf_event_create to create a perf event without
+                   the need of a perf counter
+	- Patch 12: set the GLOBAL_STATUS_COUNTERS_FROZEN bit when
+                   injecting a vPMI.
+previous:
+	https://lkml.org/lkml/2019/2/14/210
 
-I still keep check mwait and apicv in v2, since w/o mwait exposed, the
-emulated timer can't be offload(thanks to preemption timer is
-disabled). In addition,  w/o posted-interrupt, we can't avoid the
-timer fire vmexit.
+Like Xu (1):
+  KVM/x86/vPMU: Add APIs to support host save/restore the guest lbr
+    stack
 
-> that the vCPU cannot be asleep in kvm_vcpu_block, then we can inject the
-> timer interrupt immediately with __apic_accept_irq (if APICv is
-> disabled, it will set IRR and do kvm_make_request + kvm_vcpu_kick).
->
-> You can keep the module parameter, mostly for debugging reasons, but
-> please move it from kvm-intel to kvm, and add something like
->
-> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
-> index 123ea07a3f3b..1cc7973c382e 100644
-> --- a/kernel/sched/isolation.c
-> +++ b/kernel/sched/isolation.c
-> @@ -14,6 +14,11 @@
->  static cpumask_var_t housekeeping_mask;
->  static unsigned int housekeeping_flags;
->
-> +bool housekeeping_enabled(enum hk_flags flags)
-> +{
-> +       return !!(housekeeping_flags & flags);
-> +}
-> +
->  int housekeeping_any_cpu(enum hk_flags flags)
->  {
->         if (static_branch_unlikely(&housekeeping_overridden))
->
-> so that the default for the module parameter can be
-> housekeeping_enabled(HK_FLAG_TIMER).
+Wei Wang (11):
+  perf/x86: fix the variable type of the LBR MSRs
+  perf/x86: add a function to get the lbr stack
+  KVM/x86: KVM_CAP_X86_GUEST_LBR
+  KVM/x86: intel_pmu_lbr_enable
+  KVM/x86/vPMU: tweak kvm_pmu_get_msr
+  KVM/x86: expose MSR_IA32_PERF_CAPABILITIES to the guest
+  perf/x86: no counter allocation support
+  perf/x86: save/restore LBR_SELECT on vCPU switching
+  KVM/x86/lbr: lazy save the guest lbr stack
+  KVM/x86: remove the common handling of the debugctl msr
+  KVM/VMX/vPMU: support to report GLOBAL_STATUS_LBRS_FROZEN
 
-Agreed. Thanks for the quick review. :)
+ arch/x86/events/core.c            |  12 ++
+ arch/x86/events/intel/lbr.c       |  43 ++++-
+ arch/x86/events/perf_event.h      |   6 +-
+ arch/x86/include/asm/kvm_host.h   |   5 +
+ arch/x86/include/asm/perf_event.h |  16 ++
+ arch/x86/kvm/cpuid.c              |   2 +-
+ arch/x86/kvm/cpuid.h              |   8 +
+ arch/x86/kvm/pmu.c                |  29 ++-
+ arch/x86/kvm/pmu.h                |  12 +-
+ arch/x86/kvm/pmu_amd.c            |   7 +-
+ arch/x86/kvm/vmx/pmu_intel.c      | 397 +++++++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx/vmx.c            |   4 +-
+ arch/x86/kvm/vmx/vmx.h            |   2 +
+ arch/x86/kvm/x86.c                |  32 +--
+ include/linux/perf_event.h        |  13 ++
+ include/uapi/linux/kvm.h          |   1 +
+ kernel/events/core.c              |  37 ++--
+ 17 files changed, 574 insertions(+), 52 deletions(-)
 
-Regards,
-Wanpeng Li
+-- 
+2.7.4
+
