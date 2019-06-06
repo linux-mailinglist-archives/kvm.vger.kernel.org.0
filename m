@@ -2,49 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 23EB337AD9
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 19:20:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B859B37AF8
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 19:24:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730006AbfFFRUf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 13:20:35 -0400
-Received: from mga04.intel.com ([192.55.52.120]:40558 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726693AbfFFRUf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 13:20:35 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Jun 2019 10:20:34 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by orsmga001.jf.intel.com with ESMTP; 06 Jun 2019 10:20:34 -0700
-Date:   Thu, 6 Jun 2019 10:20:34 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: introduce is_pae_paging
-Message-ID: <20190606172033.GD23169@linux.intel.com>
-References: <1559839972-124144-1-git-send-email-pbonzini@redhat.com>
+        id S1728856AbfFFRYm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 13:24:42 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:33111 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726092AbfFFRYm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 13:24:42 -0400
+Received: by mail-wr1-f66.google.com with SMTP id n9so3300740wru.0
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2019 10:24:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=mudUAM5qHHKy0AmfrLylRMnPBxqdWNoyk2npO27tVdw=;
+        b=Z3CK64zYUx3OhxHAvyYd129UMC0XTrtoh8MVjdDSAg7RIKGjdM/U8X1W8c99acS0f6
+         x8vNHnFh9EkXN+AdbSiH82+/OxVQTRmVC19SsWA2+zoZPhetQNvSihMccymkHBDpAMpb
+         QX92ivP9ra8R5Uy8CHFjmmkZCXfWI+v7zobEtT3Uha1OUvhQIYb91C1PK9Kgfk2Lb3dw
+         Y3BN/Iy898UZUGok+5FSRgi0AoGiTlciS2SyJgbq2S0Oln3ZxZAlQkyffD3N2/hTfJEX
+         ZcXV9QCNmH5K3VITiT3mgfGgQb+g8DI5zos5OkrSVgzntetY9vMm6xAb3y7H4MaAVHWX
+         BAqw==
+X-Gm-Message-State: APjAAAVwI0HMoKVHTdyY+F7SiBoiBZ5ryc/s4F1xsM2BtRry5tnK9PcB
+        SqOYpL1GE6RBhhBrmwpN0teI7WgekIs=
+X-Google-Smtp-Source: APXvYqxj6lCQXb4TUjbjo3q4/0DlSR/j1rXOxc/qXqug5L26hsTrsoST/FWB2BzJSYinw+7n/MQYtQ==
+X-Received: by 2002:adf:ee0b:: with SMTP id y11mr17664513wrn.241.1559841880245;
+        Thu, 06 Jun 2019 10:24:40 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:657f:501:149f:5617? ([2001:b07:6468:f312:657f:501:149f:5617])
+        by smtp.gmail.com with ESMTPSA id z14sm3439267wre.96.2019.06.06.10.24.39
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 06 Jun 2019 10:24:39 -0700 (PDT)
+Subject: Re: [PATCH 12/13] KVM: nVMX: Don't mark vmcs12 as dirty when L1
+ writes pin controls
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <20190507191805.9932-1-sean.j.christopherson@intel.com>
+ <20190507191805.9932-13-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <496e9a1f-620e-d09c-c9d3-c490e289ec2e@redhat.com>
+Date:   Thu, 6 Jun 2019 19:24:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1559839972-124144-1-git-send-email-pbonzini@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190507191805.9932-13-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 06, 2019 at 06:52:52PM +0200, Paolo Bonzini wrote:
-> Checking for 32-bit PAE is quite common around code that fiddles with
-> the PDPTRs.  Add a function to compress all checks into a single
-> invocation.
+On 07/05/19 21:18, Sean Christopherson wrote:
+> Pin controls doesn't affect dirty logic, e.g. the preemption timer value
+> is loaded from vmcs12 even if vmcs12 is "clean", i.e. there is no need
+> to mark vmcs12 dirty when L1 writes pin controls.
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> KVM currently toggles the VMX_PREEMPTION_TIMER control flag when it
+> disables or enables the timer.  The VMWRITE to toggle the flag can be
+> responsible for a large percentage of vmcs12 dirtying when running KVM
+> as L1 (depending on the behavior of L2).
+> 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-I considered adding this helper as well, but shied away because I thought
-it might lead to incorrect code, e.g. using is_pae_paging() when is_pae()
-is needed.  But, looking at the patch, it's definitely cleaner, so:
+I think either we wait for patch 13 to get in the wild so that
+VMX_PREEMPTION_TIMER writes do not become so frequent, or we can do
+something like
 
-Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+--------- 8< ------------
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH] KVM: nVMX: shadow pin based execution controls
+
+The VMX_PREEMPTION_TIMER flag may be toggled frequently, though not
+*very* frequently.  Since it does not affect KVM's dirty logic, e.g.
+the preemption timer value is loaded from vmcs12 even if vmcs12 is
+"clean", there is no need to mark vmcs12 dirty when L1 writes pin
+controls, and shadowing the field achieves that.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+diff --git a/arch/x86/kvm/vmx/vmcs_shadow_fields.h
+b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
+index 4cea018ba285..eb1ecd16fd22 100644
+--- a/arch/x86/kvm/vmx/vmcs_shadow_fields.h
++++ b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
+@@ -47,6 +47,7 @@
+ SHADOW_FIELD_RO(GUEST_CS_AR_BYTES, guest_cs_ar_bytes)
+ SHADOW_FIELD_RO(GUEST_SS_AR_BYTES, guest_ss_ar_bytes)
+ SHADOW_FIELD_RW(CPU_BASED_VM_EXEC_CONTROL, cpu_based_vm_exec_control)
++SHADOW_FIELD_RW(PIN_BASED_VM_EXEC_CONTROL, pin_based_vm_exec_control)
+ SHADOW_FIELD_RW(EXCEPTION_BITMAP, exception_bitmap)
+ SHADOW_FIELD_RW(VM_ENTRY_EXCEPTION_ERROR_CODE,
+vm_entry_exception_error_code)
+ SHADOW_FIELD_RW(VM_ENTRY_INTR_INFO_FIELD, vm_entry_intr_info_field)
