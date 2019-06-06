@@ -2,98 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C50337B16
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 19:31:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E87B37B17
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 19:31:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728389AbfFFRbA convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 6 Jun 2019 13:31:00 -0400
-Received: from Galois.linutronix.de ([146.0.238.70]:47542 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726924AbfFFRbA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 13:31:00 -0400
-Received: from bigeasy by Galois.linutronix.de with local (Exim 4.80)
-        (envelope-from <bigeasy@linutronix.de>)
-        id 1hYwDn-0003iG-8I; Thu, 06 Jun 2019 19:30:39 +0200
-Date:   Thu, 6 Jun 2019 19:30:39 +0200
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Borislav Petkov <bp@suse.de>, Dave Hansen <dave.hansen@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Jann Horn <jannh@google.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        kvm ML <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Rik van Riel <riel@surriel.com>, x86-ml <x86@kernel.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [5.2 regression] copy_fpstate_to_sigframe() change causing crash
- in 32-bit process
-Message-ID: <20190606173026.ty7c4cvftrvfrwy3@linutronix.de>
-References: <20190604185358.GA820@sol.localdomain>
- <20190605140405.2nnpqslnjpfe2ig2@linutronix.de>
- <20190605173256.GA86462@gmail.com>
+        id S1730160AbfFFRbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 13:31:17 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:40097 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728720AbfFFRbQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 13:31:16 -0400
+Received: by mail-wm1-f65.google.com with SMTP id v19so766129wmj.5
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2019 10:31:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=VMj5MhL8kNfJfxn0fwFplPYHIC+cAYknr0O9DpUx30I=;
+        b=tDNxYqWZLuWMgozkZNcdqmwXQ9+J6fVhakljA6x4iST2Oaq9rZ+WExC6/UweKhgVOc
+         e3NR5cgchE3xSGzqO1Wd83xdi/PLKK2oLpHp+qUXtDhzw7SLhzlsYA5PLrJ2zv/cn0Le
+         1K4Yt8Nwhq92aMB1CIhbGfJzHSy9g7F0zXcHPqQDm3+ZHcZ6ZwGfJJoIX3x9bOe/tcAY
+         o8oDta3P201pjxJ/5b0gg3KF1CXiluxCylBNj1B9WVyUvuXVjcp/v4BupJ8nHPf5Ww01
+         rgtXLnd9kti7NcM4m8gMYXJlgOwbtQAcKBaQBaFTrMD5KuFW2iQJxpYvTYEW/A1+rb+N
+         W0pQ==
+X-Gm-Message-State: APjAAAVbcRqeVQnzDKoS5BoGhBeOy/5mZSfalYB56F4hKPuxl01edRaL
+        SCPVB04Hg1KlSLhfWm8dUsU1CjS1/A0=
+X-Google-Smtp-Source: APXvYqxAob2SB4oS7sJc8IN9kaeyAuHIoozNTK1Z5u4n8FvF/JSjYCLlo7pWJLIrAMfgbL8B5wLXRQ==
+X-Received: by 2002:a1c:51:: with SMTP id 78mr825124wma.9.1559842274700;
+        Thu, 06 Jun 2019 10:31:14 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:657f:501:149f:5617? ([2001:b07:6468:f312:657f:501:149f:5617])
+        by smtp.gmail.com with ESMTPSA id t6sm3146686wrp.14.2019.06.06.10.31.13
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 06 Jun 2019 10:31:14 -0700 (PDT)
+Subject: Re: [PATCH 2/2] Revert "KVM: nVMX: always use early vmcs check when
+ EPT is disabled"
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
+References: <20190520201029.7126-1-sean.j.christopherson@intel.com>
+ <20190520201029.7126-3-sean.j.christopherson@intel.com>
+ <40c7c3ee-9c49-1df6-c80b-1bc7811ccf69@redhat.com>
+ <20190606170837.GC23169@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <eea2b956-2c58-ad2d-7b47-45858c887c03@redhat.com>
+Date:   Thu, 6 Jun 2019 19:31:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190606170837.GC23169@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <20190605173256.GA86462@gmail.com>
-User-Agent: NeoMutt/20180716
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019-06-05 10:32:57 [-0700], Eric Biggers wrote:
-> As I said, the commit looks broken to me.  save_fsave_header() reads from
-> tsk->thread.fpu.state.fxsave, which due to that commit isn't being updated with
-> the latest registers.  Am I missing something?  Note the comment you deleted:
+On 06/06/19 19:08, Sean Christopherson wrote:
+>> This hunk needs to be moved to patch 1, which then becomes much easier
+>> to understand...
+> I kept the revert in a separate patch so that the bug fix could be
+> easily backported to stable branches (commit 2b27924bb1d4 ("KVM: nVMX:
+> always use early vmcs check when EPT is disabled" wasn't tagged for
+> stable).
+> 
 
-So if your system uses fxsr() then that function shouldn't matter. If
-your system uses xsave() (which I believe it does) then the first
-section is the "fxregs state" which is the same as in fxsr's case (see
-struct xregs_state). So it shouldn't make a difference and that is why I
-strongly assumed it is a miss-merge. However it makes a difference…
+Yeah, I didn't mark it because of the mess involving the vmx.c split
+(basically wait and see if someone report it).  There was quite some
+churn so I am a bit wary to do stable backports where I haven't
+explicitly tested the backport on the oldest affected version.
 
-So the hunk at the end should make things work again (my FPU test case
-passes). I don't know why we convert things forth and back in the signal
-handler but I think something here is different for xsave's legacy area
-vs fxsave.
-
-diff --git a/arch/x86/kernel/fpu/signal.c b/arch/x86/kernel/fpu/signal.c
-index 060d6188b4533..c653c9920c5e0 100644
---- a/arch/x86/kernel/fpu/signal.c
-+++ b/arch/x86/kernel/fpu/signal.c
-@@ -62,16 +62,7 @@ static inline int save_fsave_header(struct task_struct *tsk, void __user *buf)
- 		struct user_i387_ia32_struct env;
- 		struct _fpstate_32 __user *fp = buf;
- 
--		convert_from_fxsr(&env, tsk);
--
--		if (__copy_to_user(buf, &env, sizeof(env)) ||
--		    __put_user(xsave->i387.swd, &fp->status) ||
--		    __put_user(X86_FXSR_MAGIC, &fp->magic))
--			return -1;
--	} else {
--		struct fregs_state __user *fp = buf;
--		u32 swd;
--		if (__get_user(swd, &fp->swd) || __put_user(swd, &fp->status))
-+		if (__put_user(X86_FXSR_MAGIC, &fp->magic))
- 			return -1;
- 	}
- 
-@@ -236,9 +227,6 @@ sanitize_restored_xstate(union fpregs_state *state,
- 		 * reasons.
- 		 */
- 		xsave->i387.mxcsr &= mxcsr_feature_mask;
--
--		if (ia32_env)
--			convert_to_fxsr(&state->fxsave, ia32_env);
- 	}
- }
- 
-
-> - Eric
-
-Sebastian
+Paolo
