@@ -2,391 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AAE993753F
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 15:31:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 795723753E
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 15:31:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727472AbfFFNb4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 09:31:56 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:58702 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726014AbfFFNb4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 09:31:56 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id D250ED0587E66D33FA7F;
-        Thu,  6 Jun 2019 21:31:52 +0800 (CST)
-Received: from localhost (10.202.226.61) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Thu, 6 Jun 2019
- 21:31:46 +0800
-Date:   Thu, 6 Jun 2019 14:31:32 +0100
-From:   Jonathan Cameron <jonathan.cameron@huawei.com>
-To:     Dongjiu Geng <gengdongjiu@huawei.com>
-CC:     <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
-        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
-        <lersek@redhat.com>, <james.morse@arm.com>, <mtosatti@redhat.com>,
-        <rth@twiddle.net>, <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
-        <xuwei5@huawei.com>, <kvm@vger.kernel.org>,
-        <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>,
-        <linuxarm@huawei.com>
-Subject: Re: [PATCH v17 10/10] target-arm: kvm64: handle SIGBUS signal from
- kernel or KVM
-Message-ID: <20190606143132.00003617@huawei.com>
-In-Reply-To: <1557832703-42620-11-git-send-email-gengdongjiu@huawei.com>
-References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
-        <1557832703-42620-11-git-send-email-gengdongjiu@huawei.com>
-Organization: Huawei
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; i686-w64-mingw32)
+        id S1727082AbfFFNbp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 09:31:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36168 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726014AbfFFNbo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 09:31:44 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D7BA7B2DE8;
+        Thu,  6 Jun 2019 13:31:43 +0000 (UTC)
+Received: from work-vm (ovpn-116-119.ams2.redhat.com [10.36.116.119])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CF2C8473C3;
+        Thu,  6 Jun 2019 13:31:41 +0000 (UTC)
+Date:   Thu, 6 Jun 2019 14:31:39 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     kvm list <kvm@vger.kernel.org>, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: QEMU/KVM migration backwards compatibility broken?
+Message-ID: <20190606133138.GM2788@work-vm>
+References: <38B8F53B-F993-45C3-9A82-796A0D4A55EC@oracle.com>
+ <20190606084222.GA2788@work-vm>
+ <862DD946-EB3C-405A-BE88-4B22E0B9709C@oracle.com>
+ <20190606092358.GE2788@work-vm>
+ <8F3FD038-12DB-44BC-A262-3F1B55079753@oracle.com>
+ <20190606103958.GJ2788@work-vm>
+ <B7A9A778-9BD5-449E-A8F3-5D8E3471F4A6@oracle.com>
+ <20190606110737.GK2788@work-vm>
+ <3F6B41CD-C7E2-4A61-875C-F61AE45F2A58@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.226.61]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3F6B41CD-C7E2-4A61-875C-F61AE45F2A58@oracle.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Thu, 06 Jun 2019 13:31:43 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 14 May 2019 04:18:23 -0700
-Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-
-> Add SIGBUS signal handler. In this handler, it checks the SIGBUS type,
-> translates the host VA delivered by host to guest PA, then fill this PA
-> to guest APEI GHES memory, then notify guest according to the SIGBUS type.
+* Liran Alon (liran.alon@oracle.com) wrote:
 > 
-> If guest accesses the poisoned memory, it generates Synchronous External
-> Abort(SEA). Then host kernel gets an APEI notification and call memory_failure()
-> to unmapped the affected page for the guest's stage 2, finally return
-> to guest.
 > 
-> Guest continues to access PG_hwpoison page, it will trap to KVM as stage2 fault,
-> then a SIGBUS_MCEERR_AR synchronous signal is delivered to Qemu, Qemu record this
-> error address into guest APEI GHES memory and notify guest using
-> Synchronous-External-Abort(SEA).
+> > On 6 Jun 2019, at 14:07, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+
+<snip>
+
+> > It's tricky; for distro-based users, hitting 'update' and getting both
+> > makes a lot of sense; but as you say you ened to let them do stuff
+> > individually if they want to, so they can track down problems.
+> > There's also a newer problem which is people want to run the QEMU in
+> > containers on hosts that have separate update schedules - the kernel
+> > version relationship is then much more fluid.
+> > 
+> >> Compiling all above very useful discussion (thanks for this!), I may have a better suggestion that doesn’t require any additional flags:
+> >> 1) Source QEMU will always send all all VMState subsections that is deemed by source QEMU as required to not break guest semantic behaviour.
+> >> This is done by .needed() methods that examine guest runtime state to understand if this state is required to be sent or not.
+> > 
+> > So that's as we already do.
 > 
-> Suggested-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-Hi Dongjiu,
-
-Good to see this moving forwards again.
-
-A few really minor things inline.
-
-Thanks,
-
-Jonathan
-
-> ---
->  hw/acpi/acpi_ghes.c         | 177 ++++++++++++++++++++++++++++++++++++++++++++
->  include/hw/acpi/acpi_ghes.h |   6 +-
->  include/sysemu/kvm.h        |   2 +-
->  target/arm/kvm64.c          |  39 ++++++++++
->  4 files changed, 222 insertions(+), 2 deletions(-)
+> Besides the fact that today we also expect to add a flag tied to machine-type for every new VMState subsection we add that didn’t exist on previous QEMU versions...
 > 
-> diff --git a/hw/acpi/acpi_ghes.c b/hw/acpi/acpi_ghes.c
-> index d03e797..06b7374 100644
-> --- a/hw/acpi/acpi_ghes.c
-> +++ b/hw/acpi/acpi_ghes.c
-> @@ -26,6 +26,101 @@
->  #include "sysemu/sysemu.h"
->  #include "qemu/error-report.h"
->  
-> +/* UEFI 2.6: N.2.5 Memory Error Section */
-> +static void build_append_mem_cper(GArray *table, uint64_t error_physical_addr)
-> +{
-> +    /*
-> +     * Memory Error Record
-> +     */
-> +    build_append_int_noprefix(table,
-> +                 (1UL << 14) | /* Type Valid */
-> +                 (1UL << 1) /* Physical Address Valid */,
-> +                 8);
-> +    /* Memory error status information */
-> +    build_append_int_noprefix(table, 0, 8);
-> +    /* The physical address at which the memory error occurred */
-> +    build_append_int_noprefix(table, error_physical_addr, 8);
-> +    build_append_int_noprefix(table, 0, 48);
+> > 
+> >> 2) Destination QEMU will provide a generic QMP command which allows to set names of VMState subsections that if accepted on migration stream
+> >> and failed to be loaded (because either subsection name is not implemented or because .post_load() method failed) then the failure should be ignored
+> >> and migration should continue as usual. By default, the list of this names will be empty.
+> > 
+> > The format of the migration stream means that you can't skip an unknown
+> > subsection; it's not possible to resume parsing the stream without
+> > knowing what was supposed to be there. [This is pretty awful
+> > but my last attempts to rework it hit a dead end]
+> 
+> Wow… That is indeed pretty awful.
+> I thought every VMState subsection have a header with a length field… :(
 
-This could do with a comment to say we are basically skipping all the
-detailed information normally found in such a record.
+No, no length - it's just a header saying it's a subsection with the
+name, then just unformatted data (that had better match what you
+expect!).
 
+> Why did your last attempts to add such a length field to migration stream protocol failed?
 
-> +    build_append_int_noprefix(table, 0 /* Unknown error */, 1);
-> +    build_append_int_noprefix(table, 0, 7);
-A similar comment for this last section would probably use useful as well.
+There's a lot of stuff that's open coded rather than going through
+VMState's, so you don't know how much data they'll end up generating.
+So the only way to do that is to write to a buffer and then get the
+length and dump the buffer.  Actually all that's rare in subsections
+but does happen elsewhere.  I got some of some of those nasty cases
+but I got stuck trying to get rid of some of the other opencoding
+(and still keep it compatible).
 
-> +}
-> +
-> +static int ghes_record_mem_error(uint64_t error_block_address,
-> +                                    uint64_t error_physical_addr)
-> +{
-> +    GArray *block;
-> +    uint64_t current_block_length;
-> +    uint32_t data_length;
-> +    /* Memory section */
-The variable name is clear I think, so not sure this comment adds any information.
+> > 
+> > So we still need to tie subsections to machine types; that way
+> > you don't send them to old qemu's and there for you don't have the
+> > problem of the qemu receiving something it doesn't know.
+> 
+> I agree that if there is no way to skip a VMState subsection in the stream, then we must
+> have a way to specify to source QEMU to prevent sending this subsection to destination…
+> 
+> I would suggest though that instead of having a flag tied to machine-type, we will have a QMP command
+> that can specify names of subsections we explicitly wish to be skipped sending to destination even if their .needed() method returns true.
 
-> +    char mem_section_id_le[] = {0x14, 0x11, 0xBC, 0xA5, 0x64, 0x6F, 0xDE,
-> +                                0x4E, 0xB8, 0x63, 0x3E, 0x83, 0xED, 0x7C,
-> +                                0x83, 0xB1};
-> +    uint8_t fru_id[16] = {0};
-> +    uint8_t fru_text[20] = {0};
-> +
-> +    /* Generic Error Status Block
-> +     * | +---------------------+
-> +     * | |     block_status    |
-> +     * | +---------------------+
-> +     * | |    raw_data_offset  |
-> +     * | +---------------------+
-> +     * | |    raw_data_length  |
-> +     * | +---------------------+
-> +     * | |     data_length     |
-> +     * | +---------------------+
-> +     * | |   error_severity    |
-> +     * | +---------------------+
-> +     */
-> +    block = g_array_new(false, true /* clear */, 1);
-> +
-> +    /* Get the length of the Generic Error Data Entries */
-> +    cpu_physical_memory_read(error_block_address +
-> +        offsetof(AcpiGenericErrorStatus, data_length), &data_length, 4);
-> +
-> +    /* The current whole length of the generic error status block */
-> +    current_block_length = sizeof(AcpiGenericErrorStatus) + le32_to_cpu(data_length);
-> +
-> +    /* This is the length if adding a new generic error data entry*/
-> +    data_length += GHES_DATA_LENGTH;
-> +    data_length += GHES_MEM_CPER_LENGTH;
-> +
-> +    /* Check whether it will run out of the preallocated memory if adding a new
-> +     * generic error data entry
-> +     */
-> +    if ((data_length + sizeof(AcpiGenericErrorStatus)) > GHES_MAX_RAW_DATA_LENGTH) {
-> +        error_report("Record CPER out of boundary!!!");
-> +        return GHES_CPER_FAIL;
-> +    }
-> +
-> +    /* Build the new generic error status block header */
-> +    build_append_ghes_generic_status(block, cpu_to_le32(ACPI_GEBS_UNCORRECTABLE), 0, 0,
-> +        cpu_to_le32(data_length), cpu_to_le32(ACPI_CPER_SEV_RECOVERABLE));
-> +
-> +    /* Write back above generic error status block header to guest memory */
-> +    cpu_physical_memory_write(error_block_address, block->data,
-> +                              block->len);
-> +
-> +    /* Add a new generic error data entry */
-> +
-> +    data_length = block->len;
-> +    /* Build this new generic error data entry header */
-> +    build_append_ghes_generic_data(block, mem_section_id_le,
-> +                    cpu_to_le32(ACPI_CPER_SEV_RECOVERABLE), cpu_to_le32(0x300), 0, 0,
-> +                    cpu_to_le32(80)/* the total size of Memory Error Record */, fru_id,
+I don't like the thought of generically going behind the devices back;
+it's pretty rare to have to do this, so adding a qmp command to tweak
+properties that we've already got seems to make more sense to me.
 
-Use the define for that 80?
+> This seems like a more explicit approach and doesn’t come with the down-side of forever not migrating this VMState subsection
+Dave
 
-> +                    fru_text, 0);
-> +
-> +    /* Build the memory section CPER for above new generic error data entry */
-> +    build_append_mem_cper(block, error_physical_addr);
-> +
-> +    /* Write back above this new generic error data entry to guest memory */
-> +    cpu_physical_memory_write(error_block_address + current_block_length,
-> +                    block->data + data_length, block->len - data_length);
-> +
-> +    g_array_free(block, true);
-> +
-> +    return GHES_CPER_OK;
-> +}
-> +
->  /* Build table for the hardware error fw_cfg blob */
->  void build_hardware_error_table(GArray *hardware_errors, BIOSLinker *linker)
->  {
-> @@ -169,3 +264,85 @@ void ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_error)
->      fw_cfg_add_file_callback(s, GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL, NULL,
->          &ges.ghes_addr_le, sizeof(ges.ghes_addr_le), false);
->  }
-> +
-> +bool ghes_record_errors(uint32_t notify, uint64_t physical_address)
-> +{
-> +    uint64_t error_block_addr, read_ack_register_addr;
-> +    int read_ack_register = 0, loop = 0;
-> +    uint64_t start_addr = le32_to_cpu(ges.ghes_addr_le);
-> +    bool ret = GHES_CPER_FAIL;
-> +    const uint8_t error_source_id[] = { 0xff, 0xff, 0xff, 0xff,
-> +                                        0xff, 0xff, 0xff, 0, 1};
-> +
-> +    /*
-> +     * | +---------------------+ ges.ghes_addr_le
-> +     * | |error_block_address0 |
-> +     * | +---------------------+ --+--
-> +     * | |    .............    | GHES_ADDRESS_SIZE
-> +     * | +---------------------+ --+--
-> +     * | |error_block_addressN |
-> +     * | +---------------------+
-> +     * | | read_ack_register0  |
-> +     * | +---------------------+ --+--
-> +     * | |   .............     | GHES_ADDRESS_SIZE
-> +     * | +---------------------+ --+--
-> +     * | | read_ack_registerN  |
-> +     * | +---------------------+ --+--
-> +     * | |      CPER           |   |
-> +     * | |      ....           | GHES_MAX_RAW_DATA_LENGT
-> +     * | |      CPER           |   |
-> +     * | +---------------------+ --+--
-> +     * | |    ..........       |
-> +     * | +---------------------+
-> +     * | |      CPER           |
-> +     * | |      ....           |
-> +     * | |      CPER           |
-> +     * | +---------------------+
-> +     */
-> +    if (physical_address && notify < ACPI_HEST_NOTIFY_RESERVED) {
-> +        /* Find and check the source id for this new CPER */
-> +        if (error_source_id[notify] != 0xff) {
-> +            start_addr += error_source_id[notify] * GHES_ADDRESS_SIZE;
-> +        } else {
-> +            goto out;
-> +        }
-> +
-> +        cpu_physical_memory_read(start_addr, &error_block_addr,
-> +                                    GHES_ADDRESS_SIZE);
-> +
-> +        read_ack_register_addr = start_addr +
-> +                        ACPI_HEST_ERROR_SOURCE_COUNT * GHES_ADDRESS_SIZE;
-> +retry:
-> +        cpu_physical_memory_read(read_ack_register_addr,
-> +                                 &read_ack_register, GHES_ADDRESS_SIZE);
-> +
-> +        /* zero means OSPM does not acknowledge the error */
-> +        if (!read_ack_register) {
-> +            if (loop < 3) {
-> +                usleep(100 * 1000);
-> +                loop++;
-> +                goto retry;
-> +            } else {
-> +                error_report("OSPM does not acknowledge previous error,"
-> +                    " so can not record CPER for current error, forcibly acknowledge"
-> +                    " previous error to avoid blocking next time CPER record! Exit");
-> +                read_ack_register = 1;
-> +                cpu_physical_memory_write(read_ack_register_addr,
-> +                    &read_ack_register, GHES_ADDRESS_SIZE);
-> +            }
-> +        } else {
-> +            if (error_block_addr) {
-> +                read_ack_register = 0;
-> +                /* Clear the Read Ack Register, OSPM will write it to 1 when
-> +                 * acknowledge this error.
-> +                 */
-> +                cpu_physical_memory_write(read_ack_register_addr,
-> +                    &read_ack_register, GHES_ADDRESS_SIZE);
-> +                ret = ghes_record_mem_error(error_block_addr, physical_address);
-> +            }
-> +        }
-> +    }
-> +
-> +out:
-> +    return ret;
-> +}
-> diff --git a/include/hw/acpi/acpi_ghes.h b/include/hw/acpi/acpi_ghes.h
-> index 38fd87c..6b38097 100644
-> --- a/include/hw/acpi/acpi_ghes.h
-> +++ b/include/hw/acpi/acpi_ghes.h
-> @@ -32,11 +32,14 @@
->  #define GHES_ADDRESS_SIZE           8
->  
->  #define GHES_DATA_LENGTH            72
-> -#define GHES_CPER_LENGTH            80
-> +#define GHES_MEM_CPER_LENGTH        80
-
-This is a good change to make, but please roll it into patch 7 where
-this was introduced rather than introducing it only to rename later.
-
-Actually it would be even better to just not introduce it in patch 7
-and bring it in for the first time in this patch.
-
->  
->  #define ReadAckPreserve             0xfffffffe
->  #define ReadAckWrite                0x1
->  
-> +#define GHES_CPER_OK                1
-> +#define GHES_CPER_FAIL              0
-> +
->  /* The max size in bytes for one error block */
->  #define GHES_MAX_RAW_DATA_LENGTH        0x1000
->  /* Now only have GPIO-Signal and ARMv8 SEA notification types error sources
-> @@ -76,4 +79,5 @@ void build_apei_hest(GArray *table_data, GArray *hardware_error,
->  
->  void build_hardware_error_table(GArray *hardware_errors, BIOSLinker *linker);
->  void ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_errors);
-> +bool ghes_record_errors(uint32_t notify, uint64_t error_physical_addr);
->  #endif
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index a6d1cd1..1d1a7a8 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -377,7 +377,7 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
->  /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
->  unsigned long kvm_arch_vcpu_id(CPUState *cpu);
->  
-> -#ifdef TARGET_I386
-> +#if defined(TARGET_I386) || defined(TARGET_AARCH64)
->  #define KVM_HAVE_MCE_INJECTION 1
->  void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
->  #endif
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index c7bdc6a..d2eac28 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -27,6 +27,10 @@
->  #include "kvm_arm.h"
->  #include "internals.h"
->  #include "hw/arm/arm.h"
-> +#include "exec/ram_addr.h"
-> +#include "hw/acpi/acpi-defs.h"
-> +#include "hw/acpi/acpi_ghes.h"
-> +#include "hw/acpi/acpi.h"
->  
->  static bool have_guest_debug;
->  
-> @@ -1029,6 +1033,41 @@ int kvm_arch_get_registers(CPUState *cs)
->      return ret;
->  }
->  
-> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
-> +{
-> +    ram_addr_t ram_addr;
-> +    hwaddr paddr;
-> +
-> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
-> +
-> +    if (acpi_enabled && addr) {
-> +        ram_addr = qemu_ram_addr_from_host(addr);
-> +        if (ram_addr != RAM_ADDR_INVALID &&
-> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
-> +            kvm_hwpoison_page_add(ram_addr);
-> +            /* Asynchronous signal will be masked by main thread, so
-> +             * only handle synchronous signal.
-> +             */
-> +            if (code == BUS_MCEERR_AR) {
-> +                kvm_cpu_synchronize_state(c);
-> +                if (GHES_CPER_FAIL != ghes_record_errors(ACPI_HEST_NOTIFY_SEA, paddr)) {
-> +                    kvm_inject_arm_sea(c);
-> +                } else {
-> +                    fprintf(stderr, "failed to record the error\n");
-> +                }
-> +            }
-> +            return;
-> +        }
-> +        fprintf(stderr, "Hardware memory error for memory used by "
-> +                "QEMU itself instead of guest system!\n");
-> +    }
-> +
-> +    if (code == BUS_MCEERR_AR) {
-> +        fprintf(stderr, "Hardware memory error!\n");
-> +        exit(1);
-> +    }
-> +}
-> +
->  /* C6.6.29 BRK instruction */
->  static const uint32_t brk_insn = 0xd4200000;
->  
-
-
+> for the entire lifetime of guest.
+> 
+> > 
+> > Still, you could skip things where the destination kernel doesn't know
+> > about it.
+> > 
+> >> 3) Destination QEMU will implement .post_load() method for all these VMState subsections that depend on kernel capability to be restored properly
+> >> such that it will fail subsection load in case kernel capability is not present. (Note that this load failure will be ignored if subsection name is specified in (2)).
+> >> 
+> >> Above suggestion have the following properties:
+> >> 1) Doesn’t require any flag to be added to QEMU.
+> > 
+> > There's no logical difference between 'flags' and 'names of subsections'
+> > - they're got the same problem in someone somewhere knowing which are
+> >  safe.
+> 
+> I agree. But creating additional flags does come with a development and testing overhead and makes code less intuitive.
+> I would have prefer to use subsection names.
+> 
+> > 
+> >> 2) Moves all control on whether to fail migration because of failure to load VMState subsection to receiver side. Sender always attempts to send max state he believes is required.
+> >> 3) We remove coupling of migration compatibility from machine-type.
+> >> 
+> >> What do you think?
+> > 
+> > Sorry, can't do (3) - we need to keep the binding for subsections to
+> > machine types for qemu compatibility;  I'm open for something for
+> > kernel compat, but not when it's breaking the qemu subsection
+> > checks.
+> > 
+> > Dave
+> 
+> Agree. I have proposed now above how to not break qemu subsection checks while still not tie this to machine-type.
+> Please tell me what you think on that approach. :)
+> 
+> We can combine that approach together with implementing the mentioned .post_load() methods and maybe it solves the discussion at hand here.
+> 
+> -Liran
+> 
+> > 
+> >> 
+> >> -Liran
+> >> 
+> >>> 
+> >>>> -Liran
+> >>>> 
+> >>>>> 
+> >>>>>> -Liran
+> >>>>>> 
+> >>>>>>> 
+> >>>>>>>> Thanks,
+> >>>>>>>> -Liran
+> >>>>>>> --
+> >>>>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >>>>>> 
+> >>>>> --
+> >>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >>>> 
+> >>> --
+> >>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >> 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
