@@ -2,349 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ACDFD377DA
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 17:29:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE7DE377FF
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 17:32:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729274AbfFFP3t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 11:29:49 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:44370 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727559AbfFFP3t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 11:29:49 -0400
-Received: by mail-wr1-f67.google.com with SMTP id b17so1794390wrq.11
-        for <kvm@vger.kernel.org>; Thu, 06 Jun 2019 08:29:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mVZ40N7lnN4yCfDLph22nitMuKVnMuyZv0FvrWDBrRs=;
-        b=lnuonTihR8fpxR1aS6UvjAl6hErqLunmBd91iglVPwJTADSqajUwJfiYIg4y3bz3cg
-         T7VhzHgLXzuZjPsfXiNq0CI/ba9MqISnIuEt5prbpNK+eVV5kmAccoQs33pI+A1fXTzw
-         5Klq8LIf4KDbIGNuvLYAWhr9v1wVlxOxTAlH5QhwEPu+0jXIyYg5gJ6ZFB+tGlvY7mjb
-         YHp29hteFJL4ykru5c/fNJXCh8KB9HCXeHb04NLhPIFcLgPQRDIstj0jDWVZIA18h+Pr
-         bT8v3nAJ1HKynVB+NwVrAoiPa4rkgxZ6OpzLi8yQgYxXZAaHsf2N/HUssRMHRdsLC0eP
-         MytA==
-X-Gm-Message-State: APjAAAU0PvKdofyURQj4DTg158GNsphOwh8BYRgzXOU5BePPToY1LnyM
-        LDF8yRsV7jHkw8yrzYAj5PmJfQ==
-X-Google-Smtp-Source: APXvYqytblk+jnOIFKBPikZTxjR4smWrNS0OEQ7sZc7MzsecLhVLEDlkRJzTrvyPbuDxZX7botGvMg==
-X-Received: by 2002:adf:dcc2:: with SMTP id x2mr16340525wrm.55.1559834986534;
-        Thu, 06 Jun 2019 08:29:46 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:657f:501:149f:5617? ([2001:b07:6468:f312:657f:501:149f:5617])
-        by smtp.gmail.com with ESMTPSA id d10sm2737516wrh.91.2019.06.06.08.29.45
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 06 Jun 2019 08:29:46 -0700 (PDT)
-Subject: Re: [PATCH 7/7] KVM: nVMX: Sync rarely accessed guest fields only
- when needed
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Liran Alon <liran.alon@oracle.com>
-References: <20190507153629.3681-1-sean.j.christopherson@intel.com>
- <20190507153629.3681-8-sean.j.christopherson@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9fe9cc16-641a-25ae-6f5c-79da8bbc57f8@redhat.com>
-Date:   Thu, 6 Jun 2019 17:29:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1729296AbfFFPcb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 11:32:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48616 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729045AbfFFPcb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 11:32:31 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 23426B2DD1;
+        Thu,  6 Jun 2019 15:32:30 +0000 (UTC)
+Received: from x1.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4C34C5F7D8;
+        Thu,  6 Jun 2019 15:32:27 +0000 (UTC)
+Date:   Thu, 6 Jun 2019 09:32:24 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, libvir-list@redhat.com,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH RFC 1/1] allow to specify additional config data
+Message-ID: <20190606093224.3ecb92c7@x1.home>
+In-Reply-To: <20190606144417.1824-2-cohuck@redhat.com>
+References: <20190606144417.1824-1-cohuck@redhat.com>
+        <20190606144417.1824-2-cohuck@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20190507153629.3681-8-sean.j.christopherson@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Thu, 06 Jun 2019 15:32:30 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/05/19 17:36, Sean Christopherson wrote:
-> Many guest fields are rarely read (or written) by VMMs, i.e. likely
-> aren't accessed between runs of a nested VMCS.  Delay pulling rarely
-> accessed guest fields from vmcs02 until they are VMREAD or until vmcs12
-> is dirtied.  The latter case is necessary because nested VM-Entry will
-> consume all manner of fields when vmcs12 is dirty, e.g. for consistency
-> checks.
+On Thu,  6 Jun 2019 16:44:17 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> Add a rough implementation for vfio-ap.
 > 
-> Note, an alternative to synchronizing all guest fields on VMREAD would
-> be to read *only* the field being accessed, but switching VMCS pointers
-> is expensive and odds are good if one guest field is being accessed then
-> others will soon follow, or that vmcs12 will be dirtied due to a VMWRITE
-> (see above).  And the full synchronization results in slightly cleaner
-> code.
-> 
-> Note, although GUEST_PDPTRs are relevant only for a 32-bit PAE guest,
-> they are accessed quite frequently for said guests, and a separate patch
-> is in flight to optimize away GUEST_PDTPR synchronziation for non-PAE
-> guests.
-> 
-> Skipping rarely accessed guest fields reduces the latency of a nested
-> VM-Exit by ~200 cycles.
-> 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-
-Just some naming improvements to be made here:
-
-- __sync_vmcs02_to_vmcs12_ext -> sync_vmcs02_to_vmcs12_extra
-
-- sync_vmcs02_to_vmcs12_ext -> copy_vmcs02_to_vmcs12_extra (copy functions
-take care of vmptrld/vmclear; sync functions don't!)
-
-- need_vmcs02_to_vmcs12_ext_sync -> need_sync_vmcs02_to_vmcs12_extra
-
-and with this change, this follow-up becomes obvious:
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index fd8150ef6cce..b3249d071202 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -3464,6 +3464,8 @@ static void __sync_vmcs02_to_vmcs12_ext(struct kvm_vcpu *vcpu,
- 		vmcs_readl(GUEST_PENDING_DBG_EXCEPTIONS);
- 	if (kvm_mpx_supported())
- 		vmcs12->guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
-+
-+	vmx->nested.need_sync_vmcs02_to_vmcs12_extra = false;
- }
- 
- static void sync_vmcs02_to_vmcs12_ext(struct kvm_vcpu *vcpu,
-@@ -3487,8 +3489,6 @@ static void sync_vmcs02_to_vmcs12_ext(struct kvm_vcpu *vcpu,
- 	vmx->loaded_vmcs = &vmx->vmcs01;
- 	vmx_vcpu_load(&vmx->vcpu, cpu);
- 	put_cpu();
--
--	vmx->nested.need_vmcs02_to_vmcs12_ext_sync = false;
- }
- 
- /*
-
-Paolo
-
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  arch/x86/kvm/vmx/nested.c | 140 ++++++++++++++++++++++++++++++++------
->  arch/x86/kvm/vmx/vmx.h    |   6 ++
->  2 files changed, 125 insertions(+), 21 deletions(-)
+>  mdevctl.libexec | 25 ++++++++++++++++++++++
+>  mdevctl.sbin    | 56 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 80 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 279961a63db2..0ff85c88e2eb 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -3373,21 +3373,56 @@ static u32 vmx_get_preemption_timer_value(struct kvm_vcpu *vcpu)
->  	return value >> VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE;
+> diff --git a/mdevctl.libexec b/mdevctl.libexec
+> index 804166b5086d..cc0546142924 100755
+> --- a/mdevctl.libexec
+> +++ b/mdevctl.libexec
+> @@ -54,6 +54,19 @@ wait_for_supported_types () {
+>      fi
 >  }
 >  
-> -/*
-> - * Update the guest state fields of vmcs12 to reflect changes that
-> - * occurred while L2 was running. (The "IA-32e mode guest" bit of the
-> - * VM-entry controls is also updated, since this is really a guest
-> - * state bit.)
-> - */
-> -static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
-> +static bool is_vmcs12_ext_field(unsigned long field)
->  {
-> -	vmcs12->guest_cr0 = vmcs12_guest_cr0(vcpu, vmcs12);
-> -	vmcs12->guest_cr4 = vmcs12_guest_cr4(vcpu, vmcs12);
-> +	switch (field) {
-> +	case GUEST_ES_SELECTOR:
-> +	case GUEST_CS_SELECTOR:
-> +	case GUEST_SS_SELECTOR:
-> +	case GUEST_DS_SELECTOR:
-> +	case GUEST_FS_SELECTOR:
-> +	case GUEST_GS_SELECTOR:
-> +	case GUEST_LDTR_SELECTOR:
-> +	case GUEST_TR_SELECTOR:
-> +	case GUEST_ES_LIMIT:
-> +	case GUEST_CS_LIMIT:
-> +	case GUEST_SS_LIMIT:
-> +	case GUEST_DS_LIMIT:
-> +	case GUEST_FS_LIMIT:
-> +	case GUEST_GS_LIMIT:
-> +	case GUEST_LDTR_LIMIT:
-> +	case GUEST_TR_LIMIT:
-> +	case GUEST_GDTR_LIMIT:
-> +	case GUEST_IDTR_LIMIT:
-> +	case GUEST_ES_AR_BYTES:
-> +	case GUEST_DS_AR_BYTES:
-> +	case GUEST_FS_AR_BYTES:
-> +	case GUEST_GS_AR_BYTES:
-> +	case GUEST_LDTR_AR_BYTES:
-> +	case GUEST_TR_AR_BYTES:
-> +	case GUEST_ES_BASE:
-> +	case GUEST_CS_BASE:
-> +	case GUEST_SS_BASE:
-> +	case GUEST_DS_BASE:
-> +	case GUEST_FS_BASE:
-> +	case GUEST_GS_BASE:
-> +	case GUEST_LDTR_BASE:
-> +	case GUEST_TR_BASE:
-> +	case GUEST_GDTR_BASE:
-> +	case GUEST_IDTR_BASE:
-> +	case GUEST_PENDING_DBG_EXCEPTIONS:
-> +	case GUEST_BNDCFGS:
-> +		return true;
-> +	default:
-> +		break;
-> +	}
->  
-> -	vmcs12->guest_rsp = kvm_rsp_read(vcpu);
-> -	vmcs12->guest_rip = kvm_rip_read(vcpu);
-> -	vmcs12->guest_rflags = vmcs_readl(GUEST_RFLAGS);
-> +	return false;
-> +}
->  
-> +static void __sync_vmcs02_to_vmcs12_ext(struct kvm_vcpu *vcpu,
-> +					struct vmcs12 *vmcs12)
-> +{
->  	vmcs12->guest_es_selector = vmcs_read16(GUEST_ES_SELECTOR);
->  	vmcs12->guest_cs_selector = vmcs_read16(GUEST_CS_SELECTOR);
->  	vmcs12->guest_ss_selector = vmcs_read16(GUEST_SS_SELECTOR);
-> @@ -3407,8 +3442,6 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
->  	vmcs12->guest_gdtr_limit = vmcs_read32(GUEST_GDTR_LIMIT);
->  	vmcs12->guest_idtr_limit = vmcs_read32(GUEST_IDTR_LIMIT);
->  	vmcs12->guest_es_ar_bytes = vmcs_read32(GUEST_ES_AR_BYTES);
-> -	vmcs12->guest_cs_ar_bytes = vmcs_read32(GUEST_CS_AR_BYTES);
-> -	vmcs12->guest_ss_ar_bytes = vmcs_read32(GUEST_SS_AR_BYTES);
->  	vmcs12->guest_ds_ar_bytes = vmcs_read32(GUEST_DS_AR_BYTES);
->  	vmcs12->guest_fs_ar_bytes = vmcs_read32(GUEST_FS_AR_BYTES);
->  	vmcs12->guest_gs_ar_bytes = vmcs_read32(GUEST_GS_AR_BYTES);
-> @@ -3424,11 +3457,65 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
->  	vmcs12->guest_tr_base = vmcs_readl(GUEST_TR_BASE);
->  	vmcs12->guest_gdtr_base = vmcs_readl(GUEST_GDTR_BASE);
->  	vmcs12->guest_idtr_base = vmcs_readl(GUEST_IDTR_BASE);
-> -
-> -	vmcs12->guest_interruptibility_info =
-> -		vmcs_read32(GUEST_INTERRUPTIBILITY_INFO);
->  	vmcs12->guest_pending_dbg_exceptions =
->  		vmcs_readl(GUEST_PENDING_DBG_EXCEPTIONS);
-> +	if (kvm_mpx_supported())
-> +		vmcs12->guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
+> +# configure vfio-ap devices <config entry> <matrix attribute>
+> +configure_ap_devices() {
+> +    list="`echo "${config[$1]}" | sed 's/,/ /'`"
+> +    [ -z "$list" ] && return
+> +    for a in $list; do
+> +        echo "$a" > "$supported_types/${config[mdev_type]}/devices/$uuid/$2"
+> +        if [ $? -ne 0 ]; then
+> +            echo "Error writing '$a' to '$uuid/$2'" >&2
+> +            exit 1
+> +        fi
+> +    done
 > +}
 > +
-> +static void sync_vmcs02_to_vmcs12_ext(struct kvm_vcpu *vcpu,
-> +				      struct vmcs12 *vmcs12)
-> +{
-> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> +	int cpu;
+>  case ${1} in
+>      start-mdev|stop-mdev)
+>          if [ $# -ne 2 ]; then
+> @@ -148,6 +161,18 @@ case ${cmd} in
+>              echo "Error creating mdev type ${config[mdev_type]} on $parent" >&2
+>              exit 1
+>          fi
 > +
-> +	if (!vmx->nested.need_vmcs02_to_vmcs12_ext_sync)
-> +		return;
-> +
-> +
-> +	WARN_ON_ONCE(vmx->loaded_vmcs != &vmx->vmcs01);
-> +
-> +	cpu = get_cpu();
-> +	vmx->loaded_vmcs = &vmx->nested.vmcs02;
-> +	vmx_vcpu_load(&vmx->vcpu, cpu);
-> +
-> +	__sync_vmcs02_to_vmcs12_ext(vcpu, vmcs12);
-> +
-> +	vmx->loaded_vmcs = &vmx->vmcs01;
-> +	vmx_vcpu_load(&vmx->vcpu, cpu);
-> +	put_cpu();
-> +
-> +	vmx->nested.need_vmcs02_to_vmcs12_ext_sync = false;
-> +}
-> +
-> +/*
-> + * Update the guest state fields of vmcs12 to reflect changes that
-> + * occurred while L2 was running. (The "IA-32e mode guest" bit of the
-> + * VM-entry controls is also updated, since this is really a guest
-> + * state bit.)
-> + */
-> +static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
-> +{
-> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> +
-> +	if (vmx->nested.hv_evmcs)
-> +		__sync_vmcs02_to_vmcs12_ext(vcpu, vmcs12);
-> +
-> +	vmx->nested.need_vmcs02_to_vmcs12_ext_sync = !vmx->nested.hv_evmcs;
-> +
-> +	vmcs12->guest_cr0 = vmcs12_guest_cr0(vcpu, vmcs12);
-> +	vmcs12->guest_cr4 = vmcs12_guest_cr4(vcpu, vmcs12);
-> +
-> +	vmcs12->guest_rsp = kvm_rsp_read(vcpu);
-> +	vmcs12->guest_rip = kvm_rip_read(vcpu);
-> +	vmcs12->guest_rflags = vmcs_readl(GUEST_RFLAGS);
-> +
-> +	vmcs12->guest_cs_ar_bytes = vmcs_read32(GUEST_CS_AR_BYTES);
-> +	vmcs12->guest_ss_ar_bytes = vmcs_read32(GUEST_SS_AR_BYTES);
-> +
-> +	vmcs12->guest_interruptibility_info =
-> +		vmcs_read32(GUEST_INTERRUPTIBILITY_INFO);
-> +
->  	if (vcpu->arch.mp_state == KVM_MP_STATE_HALTED)
->  		vmcs12->guest_activity_state = GUEST_ACTIVITY_HLT;
->  	else
-> @@ -3478,8 +3565,6 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
->  	vmcs12->guest_sysenter_cs = vmcs_read32(GUEST_SYSENTER_CS);
->  	vmcs12->guest_sysenter_esp = vmcs_readl(GUEST_SYSENTER_ESP);
->  	vmcs12->guest_sysenter_eip = vmcs_readl(GUEST_SYSENTER_EIP);
-> -	if (kvm_mpx_supported())
-> -		vmcs12->guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
->  }
+> +        # some types may specify additional config data
+> +        case ${config[mdev_type]} in
+> +            vfio_ap-passthrough)
+
+I think this could have some application beyond ap too, I know NVIDIA
+GRID vGPUs do have some controls under the vendor hierarchy of the
+device, ex. setting the frame rate limiter.  The implementation here is
+a bit rigid, we know a specific protocol for a specific mdev type, but
+for supporting arbitrary vendor options we'd really just want to try to
+apply whatever options are provided.  If we didn't care about ordering,
+we could just look for keys for every file in the device's immediate
+sysfs hierarchy and apply any value we find, independent of the
+mdev_type, ex. intel_vgpu/foo=bar  Thanks,
+
+Alex  
+
+> +                configure_ap_devices ap_adapters assign_adapter
+> +                configure_ap_devices ap_domains assign_domain
+> +                configure_ap_devices ap_control_domains assign_control_domain
+> +                # TODO: is assigning idempotent? Should we unwind on error?
+> +                ;;
+> +            *)
+> +                ;;
+> +        esac
+>          ;;
 >  
->  /*
-> @@ -4276,6 +4361,8 @@ static inline void nested_release_vmcs12(struct kvm_vcpu *vcpu)
->  	if (vmx->nested.current_vmptr == -1ull)
->  		return;
+>      add-mdev)
+> diff --git a/mdevctl.sbin b/mdevctl.sbin
+> index 276cf6ddc817..eb5ee0091879 100755
+> --- a/mdevctl.sbin
+> +++ b/mdevctl.sbin
+> @@ -33,6 +33,8 @@ usage() {
+>      echo "set-start <mdev UUID>: change mdev start policy, if no option specified," >&2
+>      echo "                       system default policy is used" >&2
+>      echo "                       options: [--auto] [--manual]" >&2
+> +    echo "set-additional-config <mdev UUID> {fmt...}: supply additional configuration" >&2
+> +    echo "show-additional-config-format <mdev UUiD>:  prints the format expected by the device" >&2
+>      echo "list-all: list all possible mdev types supported in the system" >&2
+>      echo "list-available: list all mdev types currently available" >&2
+>      echo "list-mdevs: list currently configured mdevs" >&2
+> @@ -48,7 +50,7 @@ while (($# > 0)); do
+>          --manual)
+>              config[start]=manual
+>              ;;
+> -        start-mdev|stop-mdev|remove-mdev|set-start)
+> +        start-mdev|stop-mdev|remove-mdev|set-start|show-additional-config-format)
+>              [ $# -ne 2 ] && usage
+>              cmd=$1
+>              uuid=$2
+> @@ -67,6 +69,14 @@ while (($# > 0)); do
+>              cmd=$1
+>              break
+>              ;;
+> +        set-additional-config)
+> +            [ $# -le 2 ] && usage
+> +            cmd=$1
+> +            uuid=$2
+> +            shift 2
+> +            addtl_config="$*"
+> +            break
+> +            ;;
+>          *)
+>              usage
+>              ;;
+> @@ -114,6 +124,50 @@ case ${cmd} in
+>          fi
+>          ;;
 >  
-> +	sync_vmcs02_to_vmcs12_ext(vcpu, get_vmcs12(vcpu));
+> +    set-additional-config)
+> +        file=$(find $persist_base -name $uuid -type f)
+> +        if [ -w "$file" ]; then
+> +            read_config "$file"
+> +            if [ ${config[start]} == "auto" ]; then
+> +                systemctl stop mdev@$uuid.service
+> +            fi
+> +            # FIXME: validate input!
+> +            for i in $addtl_config; do
+> +                key="`echo "$i" | cut -d '=' -f 1`"
+> +                value="`echo "$i" | cut -d '=' -f 2-`"
+> +                if grep -q ^$key $file; then
+> +                    if [ -z "$value" ]; then
+> +                        sed -i "s/^$key=.*//g" $file
+> +                    else
+> +                        sed -i "s/^$key=.*/$key=$value/g" $file
+> +                    fi
+> +                else
+> +                    echo "$i" >> "$file"
+> +                fi
+> +            done
+> +            if [ ${config[start]} == "auto" ]; then
+> +                systemctl start mdev@$uuid.service
+> +            fi
+> +        else
+> +            exit 1
+> +        fi
+> +        ;;
 > +
->  	if (enable_shadow_vmcs) {
->  		/* copy to memory all shadowed fields in case
->  		   they were modified */
-> @@ -4392,6 +4479,9 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
->  		return nested_vmx_failValid(vcpu,
->  			VMXERR_UNSUPPORTED_VMCS_COMPONENT);
->  
-> +	if (!is_guest_mode(vcpu) && is_vmcs12_ext_field(field))
-> +		sync_vmcs02_to_vmcs12_ext(vcpu, vmcs12);
+> +    show-additional-config-format)
+> +        file=$(find $persist_base -name $uuid -type f)
+> +        read_config "$file"
+> +        case ${config[mdev_type]} in
+> +            vfio_ap-passthrough)
+> +                echo "ap_adapters=<comma-separated list of adapters>"
+> +                echo "ap_domains=<comma-separated list of domains>"
+> +                echo "ap_control_domains=<comma-separated list of control domains>"
+> +                ;;
+> +            *)
+> +                echo "no additional configuration defined"
+> +                ;;
+> +        esac
+> +        ;;
 > +
->  	/* Read the field, zero-extended to a u64 field_value */
->  	field_value = vmcs12_read_any(vmcs12, field, offset);
->  
-> @@ -4489,9 +4579,16 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
->  		return nested_vmx_failValid(vcpu,
->  			VMXERR_VMWRITE_READ_ONLY_VMCS_COMPONENT);
->  
-> -	if (!is_guest_mode(vcpu))
-> +	if (!is_guest_mode(vcpu)) {
->  		vmcs12 = get_vmcs12(vcpu);
-> -	else {
-> +
-> +		/*
-> +		 * Ensure vmcs12 is up-to-date before any VMWRITE that dirties
-> +		 * vmcs12, else we may crush a field or consume a stale value.
-> +		 */
-> +		if (!is_shadow_field_rw(field))
-> +			sync_vmcs02_to_vmcs12_ext(vcpu, vmcs12);
-> +	} else {
->  		/*
->  		 * When vmcs->vmcs_link_pointer is -1ull, any VMWRITE
->  		 * to shadowed-field sets the ALU flags for VMfailInvalid.
-> @@ -5310,6 +5407,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
->  	 */
->  	if (is_guest_mode(vcpu)) {
->  		sync_vmcs02_to_vmcs12(vcpu, vmcs12);
-> +		__sync_vmcs02_to_vmcs12_ext(vcpu, vmcs12);
->  	} else if (!vmx->nested.need_vmcs12_to_shadow_sync) {
->  		if (vmx->nested.hv_evmcs)
->  			copy_enlightened_to_vmcs12(vmx);
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 16210dde0374..8b215c6840b4 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -123,6 +123,12 @@ struct nested_vmx {
->  	 */
->  	bool vmcs02_initialized;
->  
-> +	/*
-> +	 * Indicates lazily loaded guest state has not yet been decached from
-> +	 * vmcs02.
-> +	 */
-> +	bool need_vmcs02_to_vmcs12_ext_sync;
-> +
->  	bool change_vmcs01_virtual_apic_mode;
->  
->  	/*
-> 
+>      list-mdevs)
+>          for mdev in $(find $mdev_base/ -maxdepth 1 -mindepth 1 -type l); do
+>              uuid=$(basename $mdev)
 
