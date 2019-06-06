@@ -2,98 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DB2E437A91
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 19:08:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0767D37AAF
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 19:12:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728500AbfFFRIr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 13:08:47 -0400
-Received: from mga03.intel.com ([134.134.136.65]:45136 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726693AbfFFRIr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 13:08:47 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Jun 2019 10:08:38 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by fmsmga008.fm.intel.com with ESMTP; 06 Jun 2019 10:08:37 -0700
-Date:   Thu, 6 Jun 2019 10:08:37 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 2/2] Revert "KVM: nVMX: always use early vmcs check when
- EPT is disabled"
-Message-ID: <20190606170837.GC23169@linux.intel.com>
-References: <20190520201029.7126-1-sean.j.christopherson@intel.com>
- <20190520201029.7126-3-sean.j.christopherson@intel.com>
- <40c7c3ee-9c49-1df6-c80b-1bc7811ccf69@redhat.com>
+        id S1728611AbfFFRMu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 13:12:50 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:45577 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727522AbfFFRMt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 13:12:49 -0400
+Received: by mail-wr1-f66.google.com with SMTP id f9so3209550wre.12
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2019 10:12:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vUHpvlEqWlZmVbGhbWmVRO3WSH0hTbKnylJIiexic9s=;
+        b=ntAuD+PuxB9a6/oTM6nWzhmBWba8lFdtghrO8SRe37KPo0LmM+gztCgsIWHj9hCI8S
+         dLX6AftPlnZIPrfdXGyFH8ScxqtMwXfInlBuhBhC0rPhGIn05dH0Q8KAGLFfukqhzZ5E
+         h7IicuDOfsBRozeCCXpfA7ayuWDUAFCxz0mlFc7uAH9MPIHtrahzbmkR618JJWbeqG7U
+         o7D+60Y6cCszK1Anq951l7HCzSBWg3qdDmxzO8MQmLlL6rdZvNYTvKSSCYvsCfPzf56B
+         TVUkNck7JukaGTzM4y2bd1MCJtzbaoJmOOV7HEVSeED8x80NsiiZaZr7uJXebrF6rpSx
+         oe0Q==
+X-Gm-Message-State: APjAAAUJZIR25wSPkBjutBx0x56FPm07QuKxAFHwMwXs2GEks7312vKL
+        Izk8OYbFvLYbiVizRPHhCEvYBNaRKUU=
+X-Google-Smtp-Source: APXvYqxnP9cAPcOu/1wUJbVpEAaTbsNYjPTiAAcVvC/d4v98ByaeapHiU3e2xavzv3Ne0VprIISi1w==
+X-Received: by 2002:adf:f542:: with SMTP id j2mr17183604wrp.16.1559841167995;
+        Thu, 06 Jun 2019 10:12:47 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:657f:501:149f:5617? ([2001:b07:6468:f312:657f:501:149f:5617])
+        by smtp.gmail.com with ESMTPSA id e13sm4529102wra.16.2019.06.06.10.12.47
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 06 Jun 2019 10:12:47 -0700 (PDT)
+Subject: Re: [PATCH 09/13] KVM: nVMX: Preserve last USE_MSR_BITMAPS when
+ preparing vmcs02
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <20190507191805.9932-1-sean.j.christopherson@intel.com>
+ <20190507191805.9932-10-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a111a422-0256-d7ed-f538-5dd9712d9d52@redhat.com>
+Date:   Thu, 6 Jun 2019 19:12:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <40c7c3ee-9c49-1df6-c80b-1bc7811ccf69@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190507191805.9932-10-sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 06, 2019 at 02:22:56PM +0200, Paolo Bonzini wrote:
-> On 20/05/19 22:10, Sean Christopherson wrote:
-> > @@ -3777,18 +3777,8 @@ static void nested_vmx_restore_host_state(struct kvm_vcpu *vcpu)
-> >  	vmx_set_cr4(vcpu, vmcs_readl(CR4_READ_SHADOW));
-> >  
-> >  	nested_ept_uninit_mmu_context(vcpu);
-> > -
-> > -	/*
-> > -	 * This is only valid if EPT is in use, otherwise the vmcs01 GUEST_CR3
-> > -	 * points to shadow pages!  Fortunately we only get here after a WARN_ON
-> > -	 * if EPT is disabled, so a VMabort is perfectly fine.
-> > -	 */
-> > -	if (enable_ept) {
-> > -		vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
-> > -		__set_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail);
-> > -	} else {
-> > -		nested_vmx_abort(vcpu, VMX_ABORT_VMCS_CORRUPTED);
-> > -	}
-> > +	vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
-> > +	__set_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail);
-> >  
-> >  	/*
-> >  	 * Use ept_save_pdptrs(vcpu) to load the MMU's cached PDPTRs
+On 07/05/19 21:18, Sean Christopherson wrote:
+> KVM dynamically toggles the CPU_BASED_USE_MSR_BITMAPS execution control
+> for nested guests based on whether or not both L0 and L1 want to pass
+> through the same MSRs to L2.  Preserve the last used value from vmcs02
+> so as to avoid multiple VMWRITEs to (re)set/(re)clear the bit on nested
+> VM-Entry.
 > 
-> This hunk needs to be moved to patch 1, which then becomes much easier
-> to understand...
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 
-I kept the revert in a separate patch so that the bug fix could be
-easily backported to stable branches (commit 2b27924bb1d4 ("KVM: nVMX:
-always use early vmcs check when EPT is disabled" wasn't tagged for
-stable).
+Needs a comment in code, and also leaves you puzzled as to why it's only 
+necessary to clear it.  We can even let the compiler merge the
+two "exec_control &= ~FOO" so that we don't even spend a precious instruction
+on the AND:
 
-> I'm still missing however the place where kvm_mmu_new_cr3 is called
-> in the nested_vmx_restore_host_state path.
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 1150831e4a9b..2e086d5ab837 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2048,10 +2048,18 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+ 	 * A vmexit (to either L1 hypervisor or L0 userspace) is always needed
+ 	 * for I/O port accesses.
+ 	 */
+-	exec_control &= ~CPU_BASED_USE_IO_BITMAPS;
+ 	exec_control |= CPU_BASED_UNCOND_IO_EXITING;
+-	if (!(exec_controls_get(vmx) & CPU_BASED_USE_MSR_BITMAPS))
+-		exec_control &= ~CPU_BASED_USE_MSR_BITMAPS;
++	exec_control &= ~CPU_BASED_USE_IO_BITMAPS;
++
++	/*
++	 * This bit will be computed in nested_get_vmcs12_pages, because
++	 * we do not have access to L1's MSR bitmap yet.  For now, keep
++	 * the same bit as before, hoping to avoid multiple VMWRITEs that
++	 * only set/clear this bit.
++	 */
++	exec_control &= ~CPU_BASED_USE_MSR_BITMAPS;
++	exec_control |= exec_controls_get(vmx) & CPU_BASED_USE_MSR_BITMAPS;
++
+ 	exec_controls_set(vmx, exec_control);
+ 
+ 	/*
 
-vcpu->arch.root_mmu.root_hpa is set to INVALID_PAGE via:
 
-    nested_vmx_restore_host_state() ->
-        kvm_mmu_reset_context() ->
-            kvm_mmu_unload() ->
-                kvm_mmu_free_roots()
-
-kvm_mmu_unload() has WARN_ON(root_hpa != INVALID_PAGE), i.e. we can bank
-on 'root_hpa == INVALID_PAGE' unless the implementation of
-kvm_mmu_reset_context() is changed.
-
-On the way into L1, VMCS.GUEST_CR3 is guaranteed to be written (on a
-successful entry) via:
-
-    vcpu_enter_guest() ->
-        kvm_mmu_reload() ->
-            kvm_mmu_load() ->
-                kvm_mmu_load_cr3() ->
-                    vmx_set_cr3()
-
-The optimization in kvm_mmu_reload() will fail because kvm_mmu_unload()
-set vcpu->arch.root_mmu.root_hpa=INVALID_PAGE, and vcpu->arch.mmu is
-guaranteed to point at root_mmu (via nested_ept_uninit_mmu_context()).
+Paolo
