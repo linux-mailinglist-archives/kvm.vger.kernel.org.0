@@ -2,139 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C6B2E36DA8
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 09:45:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5F8536D5A
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 09:31:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727089AbfFFHo6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 03:44:58 -0400
-Received: from mga01.intel.com ([192.55.52.88]:25022 "EHLO mga01.intel.com"
+        id S1726742AbfFFHbP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 03:31:15 -0400
+Received: from mga05.intel.com ([192.55.52.43]:48979 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726741AbfFFHox (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 03:44:53 -0400
+        id S1726014AbfFFHbP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 03:31:15 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Jun 2019 00:44:53 -0700
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Jun 2019 00:31:09 -0700
 X-ExtLoop1: 1
-Received: from devel-ww.sh.intel.com ([10.239.48.128])
-  by orsmga005.jf.intel.com with ESMTP; 06 Jun 2019 00:44:51 -0700
+Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
+  by fmsmga007.fm.intel.com with ESMTP; 06 Jun 2019 00:31:08 -0700
+Message-ID: <5CF8C272.7050808@intel.com>
+Date:   Thu, 06 Jun 2019 15:36:18 +0800
 From:   Wei Wang <wei.w.wang@intel.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, ak@linux.intel.com, peterz@infradead.org
-Cc:     kan.liang@intel.com, mingo@redhat.com, rkrcmar@redhat.com,
-        like.xu@intel.com, wei.w.wang@intel.com, jannh@google.com,
-        arei.gonglei@huawei.com, jmattson@google.com
-Subject: [PATCH v6 12/12] KVM/VMX/vPMU: support to report GLOBAL_STATUS_LBRS_FROZEN
-Date:   Thu,  6 Jun 2019 15:02:31 +0800
-Message-Id: <1559804551-42271-13-git-send-email-wei.w.wang@intel.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1559804551-42271-1-git-send-email-wei.w.wang@intel.com>
-References: <1559804551-42271-1-git-send-email-wei.w.wang@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
+MIME-Version: 1.0
+To:     Eric Hankland <ehankland@google.com>
+CC:     Cfir Cohen <cfir@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        rkrcmar@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Stephane Eranian <eranian@google.com>
+Subject: Re: [PATCH v1] KVM: x86: PMU Whitelist
+References: <CAOyeoRWfPNmaWY6Lifdkdj3KPPM654vzDO+s3oduEMCJP+Asow@mail.gmail.com> <5CEC9667.30100@intel.com> <CAOyeoRWhfyuuYdguE6Wrzd7GOdow9qRE4MZ4OKkMc5cdhDT53g@mail.gmail.com> <5CEE3AC4.3020904@intel.com> <CAOyeoRW85jV=TW_xwSj0ZYwPj_L+G9wu+QPGEF3nBmPbWGX4_g@mail.gmail.com> <5CF07D37.9090805@intel.com> <CAOyeoRXWQaVYZSVL_LTTdAwJOEr+eCzhp1=_JcOX3i6_CJiD_g@mail.gmail.com> <5CF2599B.3030001@intel.com> <CAOyeoRWuHyhoy6NB=O+ekQMhBFngozKoanWzArxgBk4DH2hdtg@mail.gmail.com> <5CF5F6AE.90706@intel.com> <CAOyeoRW5wx0F=9B24h29KkhUrbaORXVSoJufb4d-XzKiAsz+NQ@mail.gmail.com> <CAEU=KTHsVmrAHXUKdHu_OwcrZoy-hgV7pk4UymtchGE5bGdUGA@mail.gmail.com> <CAOyeoRXFAQNNWRiHNtK3n17V0owBVNyKdv75xjt08Q_pC+XOXg@mail.gmail.com>
+In-Reply-To: <CAOyeoRXFAQNNWRiHNtK3n17V0owBVNyKdv75xjt08Q_pC+XOXg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Arch v4 supports streamlined Freeze_LBR_on_PMI. According to the SDM,
-the LBR_FRZ bit is set to global status when debugctl.freeze_lbr_on_pmi
-has been set and a PMI is generated. The CTR_FRZ bit is set when
-debugctl.freeze_perfmon_on_pmi is set and a PMI is generated.
+On 06/06/2019 05:35 AM, Eric Hankland wrote:
+>>> Right - I'm aware there are other ways of detecting this - it's still
+>>> a class of events that some people don't want to surface. I'll ask if
+>>> there are any better examples.
+> I asked and it sounds like we are treating all events as potentially
+> insecure until they've been reviewed. If Intel were to publish
+> official (reasonably substantiated) guidance stating that the PMU is
+> secure, then I think we'd be happy without such a safeguard in place,
+> but short of that I think we want to err on the side of caution.
+>
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-Cc: Andi Kleen <ak@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Kan Liang <kan.liang@intel.com>
----
- arch/x86/kvm/pmu.c           | 11 +++++++++--
- arch/x86/kvm/pmu.h           |  1 +
- arch/x86/kvm/vmx/pmu_intel.c | 19 +++++++++++++++++++
- 3 files changed, 29 insertions(+), 2 deletions(-)
+I'm not aware of any vendors who'd published statements like that.
 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 1e313f3..f5f1f46 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -55,6 +55,13 @@ static void kvm_pmi_trigger_fn(struct irq_work *irq_work)
- 	kvm_pmu_deliver_pmi(vcpu);
- }
- 
-+static void kvm_perf_set_global_status(struct kvm_pmu *pmu, u8 idx)
-+{
-+	__set_bit(idx, (unsigned long *)&pmu->global_status);
-+	if (kvm_x86_ops->pmu_ops->set_global_status)
-+		kvm_x86_ops->pmu_ops->set_global_status(pmu, idx);
-+}
-+
- static void kvm_perf_overflow(struct perf_event *perf_event,
- 			      struct perf_sample_data *data,
- 			      struct pt_regs *regs)
-@@ -64,7 +71,7 @@ static void kvm_perf_overflow(struct perf_event *perf_event,
- 
- 	if (!test_and_set_bit(pmc->idx,
- 			      (unsigned long *)&pmu->reprogram_pmi)) {
--		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
-+		kvm_perf_set_global_status(pmu, pmc->idx);
- 		kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
- 	}
- }
-@@ -78,7 +85,7 @@ static void kvm_perf_overflow_intr(struct perf_event *perf_event,
- 
- 	if (!test_and_set_bit(pmc->idx,
- 			      (unsigned long *)&pmu->reprogram_pmi)) {
--		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
-+		kvm_perf_set_global_status(pmu, pmc->idx);
- 		kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
- 
- 		/*
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index cadf91a..408ddc2 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -24,6 +24,7 @@ struct kvm_pmu_ops {
- 				    u8 unit_mask);
- 	unsigned (*find_fixed_event)(int idx);
- 	bool (*pmc_is_enabled)(struct kvm_pmc *pmc);
-+	void (*set_global_status)(struct kvm_pmu *pmu, u8 idx);
- 	struct kvm_pmc *(*pmc_idx_to_pmc)(struct kvm_pmu *pmu, int pmc_idx);
- 	struct kvm_pmc *(*msr_idx_to_pmc)(struct kvm_vcpu *vcpu, unsigned idx,
- 					  u64 *mask);
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index c60f564..62e7bcd 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -421,6 +421,24 @@ static bool intel_pmu_access_lbr_msr(struct kvm_vcpu *vcpu,
- 	return ret;
- }
- 
-+static void intel_pmu_set_global_status(struct kvm_pmu *pmu, u8 idx)
-+{
-+	u64 guest_debugctl;
-+
-+	if (pmu->version >= 4) {
-+		guest_debugctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
-+
-+		if ((guest_debugctl & GLOBAL_STATUS_LBRS_FROZEN) ==
-+		    DEBUGCTLMSR_FREEZE_LBRS_ON_PMI)
-+			__set_bit(GLOBAL_STATUS_LBRS_FROZEN,
-+				  (unsigned long *)&pmu->global_status);
-+		if ((guest_debugctl & GLOBAL_STATUS_LBRS_FROZEN) ==
-+		    DEBUGCTLMSR_FREEZE_PERFMON_ON_PMI)
-+			__set_bit(GLOBAL_STATUS_COUNTERS_FROZEN,
-+				  (unsigned long *)&pmu->global_status);
-+	}
-+}
-+
- static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-@@ -719,6 +737,7 @@ void intel_pmu_disable_save_guest_lbr(struct kvm_vcpu *vcpu)
- struct kvm_pmu_ops intel_pmu_ops = {
- 	.find_arch_event = intel_find_arch_event,
- 	.find_fixed_event = intel_find_fixed_event,
-+	.set_global_status = intel_pmu_set_global_status,
- 	.pmc_is_enabled = intel_pmc_is_enabled,
- 	.pmc_idx_to_pmc = intel_pmc_idx_to_pmc,
- 	.msr_idx_to_pmc = intel_msr_idx_to_pmc,
--- 
-2.7.4
+Anyway, are you ready to share your QEMU patches or the events you want 
+to be on the whitelists?
 
+
+Best,
+Wei
