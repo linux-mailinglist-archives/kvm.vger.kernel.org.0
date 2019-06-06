@@ -2,182 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 795723753E
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 15:31:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3AA537540
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 15:31:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727082AbfFFNbp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 09:31:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36168 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726014AbfFFNbo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 09:31:44 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D7BA7B2DE8;
-        Thu,  6 Jun 2019 13:31:43 +0000 (UTC)
-Received: from work-vm (ovpn-116-119.ams2.redhat.com [10.36.116.119])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CF2C8473C3;
-        Thu,  6 Jun 2019 13:31:41 +0000 (UTC)
-Date:   Thu, 6 Jun 2019 14:31:39 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     kvm list <kvm@vger.kernel.org>, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: QEMU/KVM migration backwards compatibility broken?
-Message-ID: <20190606133138.GM2788@work-vm>
-References: <38B8F53B-F993-45C3-9A82-796A0D4A55EC@oracle.com>
- <20190606084222.GA2788@work-vm>
- <862DD946-EB3C-405A-BE88-4B22E0B9709C@oracle.com>
- <20190606092358.GE2788@work-vm>
- <8F3FD038-12DB-44BC-A262-3F1B55079753@oracle.com>
- <20190606103958.GJ2788@work-vm>
- <B7A9A778-9BD5-449E-A8F3-5D8E3471F4A6@oracle.com>
- <20190606110737.GK2788@work-vm>
- <3F6B41CD-C7E2-4A61-875C-F61AE45F2A58@oracle.com>
+        id S1727590AbfFFNb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 09:31:58 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:46359 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727519AbfFFNb6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 09:31:58 -0400
+Received: by mail-wr1-f66.google.com with SMTP id n4so2410517wrw.13
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2019 06:31:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4BDfdiakx4aSQdRzQ5npeD/TnGGGrN7v3yEs6PxEyyU=;
+        b=f7kUJSpgYSc8R1wLDDE8J7DnLgMx3nQYjXujhWhAZoL7JCSlBQ37HdrRazXkHouBDv
+         E9wVA01C193/d5NQM9DsRZCcwxpzuHzy1010ltph5/ECs1mWRiluW6jpwQgaHu/SGLGK
+         Vzn3hGU3IQiwlI0gN+TiGgZ2o4Jy04IwvLnO8SUeYdsx3jfJk0bny9R8kJwnnHxKJPhQ
+         OBgt7XqEbHZ9LL2LZ+I2q0Gf+urdTlSUQFX6AhRPWyW698+vQIwGCUmwvqv7lqwk4WVh
+         V4Dgo6lBo7XYJSc6z2LPmv9tkaW6Lz3F3KGAXSepwe4t6qWbG1uq7E6tP6EECqoz7pIu
+         nIYQ==
+X-Gm-Message-State: APjAAAXomfkd9sPM5caGwCmsghCmVkiMgmrbll5godPxnS7pv8nRL8ZH
+        SpIKAK3Nz8UvCd6KR+2LaHkKOQ==
+X-Google-Smtp-Source: APXvYqxPTY5sAxqZ93d+/oBnuiOC2zEXxCtc+4jn2WMwKZvBcD5NLHJEsAY7zkHLV93di74HhiA4Yw==
+X-Received: by 2002:a5d:6b03:: with SMTP id v3mr10118041wrw.309.1559827916956;
+        Thu, 06 Jun 2019 06:31:56 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:657f:501:149f:5617? ([2001:b07:6468:f312:657f:501:149f:5617])
+        by smtp.gmail.com with ESMTPSA id r5sm720714wrg.10.2019.06.06.06.31.56
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 06 Jun 2019 06:31:56 -0700 (PDT)
+Subject: Re: [PATCH 2/7] KVM: nVMX: Intercept VMWRITEs to
+ GUEST_{CS,SS}_AR_BYTES
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     kvm@vger.kernel.org, Jim Mattson <jmattson@google.com>,
+        Liran Alon <liran.alon@oracle.com>
+References: <20190507153629.3681-1-sean.j.christopherson@intel.com>
+ <20190507153629.3681-3-sean.j.christopherson@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <def2b7f5-6bbf-600a-9edc-53a15f98b478@redhat.com>
+Date:   Thu, 6 Jun 2019 15:31:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190507153629.3681-3-sean.j.christopherson@intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3F6B41CD-C7E2-4A61-875C-F61AE45F2A58@oracle.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Thu, 06 Jun 2019 13:31:43 +0000 (UTC)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Liran Alon (liran.alon@oracle.com) wrote:
-> 
-> 
-> > On 6 Jun 2019, at 14:07, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
+On 07/05/19 17:36, Sean Christopherson wrote:
+> Since the AR_BYTES emulation is done only for intercepted VMWRITE, if a
+> future patch (re)exposed AR_BYTES for both VMWRITE and VMREAD, then KVM
+> would end up with incosistent behavior on pre-Haswell hardware, e.g. KVM
+> would drop the reserved bits on intercepted VMWRITE, but direct VMWRITE
+> to the shadow VMCS would not drop the bits.
 
-<snip>
+Whoever gets that WARN will have probably a hard time finding again all of this, so:
 
-> > It's tricky; for distro-based users, hitting 'update' and getting both
-> > makes a lot of sense; but as you say you ened to let them do stuff
-> > individually if they want to, so they can track down problems.
-> > There's also a newer problem which is people want to run the QEMU in
-> > containers on hosts that have separate update schedules - the kernel
-> > version relationship is then much more fluid.
-> > 
-> >> Compiling all above very useful discussion (thanks for this!), I may have a better suggestion that doesn’t require any additional flags:
-> >> 1) Source QEMU will always send all all VMState subsections that is deemed by source QEMU as required to not break guest semantic behaviour.
-> >> This is done by .needed() methods that examine guest runtime state to understand if this state is required to be sent or not.
-> > 
-> > So that's as we already do.
-> 
-> Besides the fact that today we also expect to add a flag tied to machine-type for every new VMState subsection we add that didn’t exist on previous QEMU versions...
-> 
-> > 
-> >> 2) Destination QEMU will provide a generic QMP command which allows to set names of VMState subsections that if accepted on migration stream
-> >> and failed to be loaded (because either subsection name is not implemented or because .post_load() method failed) then the failure should be ignored
-> >> and migration should continue as usual. By default, the list of this names will be empty.
-> > 
-> > The format of the migration stream means that you can't skip an unknown
-> > subsection; it's not possible to resume parsing the stream without
-> > knowing what was supposed to be there. [This is pretty awful
-> > but my last attempts to rework it hit a dead end]
-> 
-> Wow… That is indeed pretty awful.
-> I thought every VMState subsection have a header with a length field… :(
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index cd51ef68434e..8c5614957e04 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -93,7 +93,7 @@ static void init_vmcs_shadow_fields(void)
+ 
+ 		WARN_ONCE(field >= GUEST_ES_AR_BYTES &&
+ 			  field <= GUEST_TR_AR_BYTES,
+-			  "Update vmcs12_write_any() to expose AR_BYTES RW");
++			  "Update vmcs12_write_any() to drop reserved bits from AR_BYTES");
+ 
+ 		/*
+ 		 * PML and the preemption timer can be emulated, but the
 
-No, no length - it's just a header saying it's a subsection with the
-name, then just unformatted data (that had better match what you
-expect!).
 
-> Why did your last attempts to add such a length field to migration stream protocol failed?
-
-There's a lot of stuff that's open coded rather than going through
-VMState's, so you don't know how much data they'll end up generating.
-So the only way to do that is to write to a buffer and then get the
-length and dump the buffer.  Actually all that's rare in subsections
-but does happen elsewhere.  I got some of some of those nasty cases
-but I got stuck trying to get rid of some of the other opencoding
-(and still keep it compatible).
-
-> > 
-> > So we still need to tie subsections to machine types; that way
-> > you don't send them to old qemu's and there for you don't have the
-> > problem of the qemu receiving something it doesn't know.
-> 
-> I agree that if there is no way to skip a VMState subsection in the stream, then we must
-> have a way to specify to source QEMU to prevent sending this subsection to destination…
-> 
-> I would suggest though that instead of having a flag tied to machine-type, we will have a QMP command
-> that can specify names of subsections we explicitly wish to be skipped sending to destination even if their .needed() method returns true.
-
-I don't like the thought of generically going behind the devices back;
-it's pretty rare to have to do this, so adding a qmp command to tweak
-properties that we've already got seems to make more sense to me.
-
-> This seems like a more explicit approach and doesn’t come with the down-side of forever not migrating this VMState subsection
-Dave
-
-> for the entire lifetime of guest.
-> 
-> > 
-> > Still, you could skip things where the destination kernel doesn't know
-> > about it.
-> > 
-> >> 3) Destination QEMU will implement .post_load() method for all these VMState subsections that depend on kernel capability to be restored properly
-> >> such that it will fail subsection load in case kernel capability is not present. (Note that this load failure will be ignored if subsection name is specified in (2)).
-> >> 
-> >> Above suggestion have the following properties:
-> >> 1) Doesn’t require any flag to be added to QEMU.
-> > 
-> > There's no logical difference between 'flags' and 'names of subsections'
-> > - they're got the same problem in someone somewhere knowing which are
-> >  safe.
-> 
-> I agree. But creating additional flags does come with a development and testing overhead and makes code less intuitive.
-> I would have prefer to use subsection names.
-> 
-> > 
-> >> 2) Moves all control on whether to fail migration because of failure to load VMState subsection to receiver side. Sender always attempts to send max state he believes is required.
-> >> 3) We remove coupling of migration compatibility from machine-type.
-> >> 
-> >> What do you think?
-> > 
-> > Sorry, can't do (3) - we need to keep the binding for subsections to
-> > machine types for qemu compatibility;  I'm open for something for
-> > kernel compat, but not when it's breaking the qemu subsection
-> > checks.
-> > 
-> > Dave
-> 
-> Agree. I have proposed now above how to not break qemu subsection checks while still not tie this to machine-type.
-> Please tell me what you think on that approach. :)
-> 
-> We can combine that approach together with implementing the mentioned .post_load() methods and maybe it solves the discussion at hand here.
-> 
-> -Liran
-> 
-> > 
-> >> 
-> >> -Liran
-> >> 
-> >>> 
-> >>>> -Liran
-> >>>> 
-> >>>>> 
-> >>>>>> -Liran
-> >>>>>> 
-> >>>>>>> 
-> >>>>>>>> Thanks,
-> >>>>>>>> -Liran
-> >>>>>>> --
-> >>>>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >>>>>> 
-> >>>>> --
-> >>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >>>> 
-> >>> --
-> >>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >> 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
