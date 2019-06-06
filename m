@@ -2,117 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CC9C3689E
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 02:10:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FA8F3691F
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 03:21:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726589AbfFFAKk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Jun 2019 20:10:40 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:45862 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726543AbfFFAKk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Jun 2019 20:10:40 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5604kQB041670;
-        Thu, 6 Jun 2019 00:10:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : content-type :
- content-transfer-encoding : mime-version : subject : message-id : date :
- cc : to; s=corp-2018-07-02;
- bh=UpMf1r5JAs33vcx0hs1njyIPgbbilFrxn0QNcI3l0c0=;
- b=R7JUl6T2mXLmDs/zbN6QkYl+1LwgJRxFYihjCM8IfL7yo/OdNMby+sngGvY0yWbWo+q9
- Kwrky+fQxYDejSuo65s4QSNy6x5NU3mBwPkRQOAzV6VZhZHj/QMyv8qQrX9APlW4gQjS
- 9wvSH3YkxLIUGaWwta1D9s68ztIJcqKz89GmL1kf4lBUp0oEBt9MhGEYIkoGp5Xh368n
- Ns6seVdLBUNXsEMPRpOyuQ9ORQhYh4k1NjLsI6hAxzb5gaPbNRsutm/Sg5y0ySgNF5tg
- b4Hmf7+/PRlSmyXDeFbD1s+bB/6EbV1A92Ypi6X5Pvmesjx6nbny/51PZu1O48sk8RXI zw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2sugstnhkt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jun 2019 00:10:03 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5609v1M116261;
-        Thu, 6 Jun 2019 00:10:03 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2swngj5bdq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jun 2019 00:10:02 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x560A0N5017359;
-        Thu, 6 Jun 2019 00:10:00 GMT
-Received: from [192.168.14.112] (/109.66.241.232)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 05 Jun 2019 17:10:00 -0700
-From:   Liran Alon <liran.alon@oracle.com>
-Content-Type: text/plain;
-        charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: QEMU/KVM migration backwards compatibility broken?
-Message-Id: <38B8F53B-F993-45C3-9A82-796A0D4A55EC@oracle.com>
-Date:   Thu, 6 Jun 2019 03:09:57 +0300
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     kvm list <kvm@vger.kernel.org>, qemu-devel@nongnu.org
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9279 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906050153
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9279 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906050153
+        id S1726600AbfFFBVB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Jun 2019 21:21:01 -0400
+Received: from mga06.intel.com ([134.134.136.31]:62188 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726541AbfFFBVB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Jun 2019 21:21:01 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Jun 2019 18:21:00 -0700
+X-ExtLoop1: 1
+Received: from likexu-e5-2699-v4.sh.intel.com ([10.239.48.178])
+  by orsmga008.jf.intel.com with ESMTP; 05 Jun 2019 18:20:58 -0700
+From:   Like Xu <like.xu@linux.intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     Eduardo Habkost <ehabkost@redhat.com>,
+        sean.j.christopherson@intel.com, xiaoyao.li@linux.intel.com,
+        linux-kernel@vger.kernel.org, like.xu@intel.com
+Subject: [PATCH v4] KVM: x86: Add Intel CPUID.1F cpuid emulation support
+Date:   Thu,  6 Jun 2019 09:18:45 +0800
+Message-Id: <20190606011845.40223-1-like.xu@linux.intel.com>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Add support to expose Intel V2 Extended Topology Enumeration Leaf for
+some new systems with multiple software-visible die within each package.
 
-Looking at QEMU source code, I am puzzled regarding how migration =
-backwards compatibility is preserved regarding X86CPU.
+Because unimplemented and unexposed leaves should be explicitly reported
+as zero, there is no need to limit cpuid.0.eax to the maximum value of
+feature configuration but limit it to the highest leaf implemented in
+the current code. A single clamping seems sufficient and cheaper.
 
-As I understand it, fields that are based on KVM capabilities and guest =
-runtime usage are defined in VMState subsections in order to not send =
-them if not necessary.
-This is done such that in case they are not needed and we migrate to an =
-old QEMU which don=E2=80=99t support loading this state, migration will =
-still succeed
-(As .needed() method will return false and therefore this state won=E2=80=99=
-t be sent as part of migration stream).
-Furthermore, in case .needed() returns true and old QEMU don=E2=80=99t =
-support loading this state, migration fails. As it should because we are =
-aware that guest state
-is not going to be restored properly on destination.
+Co-developed-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
+Signed-off-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
+Signed-off-by: Like Xu <like.xu@linux.intel.com>
 
-I=E2=80=99m puzzled about what will happen in the following scenario:
-1) Source is running new QEMU with new KVM that supports save of some =
-VMState subsection.
-2) Destination is running new QEMU that supports load this state but =
-with old kernel that doesn=E2=80=99t know how to load this state.
+---
 
-I would have expected in this case that if source .needed() returns =
-true, then migration will fail because of lack of support in destination =
-kernel.
-However, it seems from current QEMU code that this will actually succeed =
-in many cases.
+==changelog==
 
-For example, if msr_smi_count is sent as part of migration stream (See =
-vmstate_msr_smi_count) and destination have has_msr_smi_count=3D=3Dfalse,
-then destination will succeed loading migration stream but =
-kvm_put_msrs() will actually ignore env->msr_smi_count and will =
-successfully load guest state.
-Therefore, migration will succeed even though it should have failed=E2=80=A6=
+v4:
+- Limited cpuid.0.eax to the highest leaf implemented in KVM
 
+v3: https://lkml.org/lkml/2019/5/26/64
+- Refine commit message and comment
 
-It seems to me that QEMU should have for every such VMState subsection, =
-a .post_load() method that verifies that relevant capability is =
-supported by kernel
-and otherwise fail migration.
+v2: https://lkml.org/lkml/2019/4/25/1246
 
-What do you think? Should I really create a patch to modify all these =
-CPUX86 VMState subsections to behave like this?
+- Apply cpuid.1f check rule on Intel SDM page 3-222 Vol.2A
+- Add comment to handle 0x1f anf 0xb in common code
+- Reduce check time in a descending-break style
 
-Thanks,
--Liran=
+v1: https://lkml.org/lkml/2019/4/22/28
+---
+ arch/x86/kvm/cpuid.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index e18a9f9f65b5..f819011e6a13 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -426,7 +426,8 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
+ 
+ 	switch (function) {
+ 	case 0:
+-		entry->eax = min(entry->eax, (u32)(f_intel_pt ? 0x14 : 0xd));
++		/* Limited to the highest leaf implemented in KVM. */
++		entry->eax = min(entry->eax, 0x1f);
+ 		break;
+ 	case 1:
+ 		entry->edx &= kvm_cpuid_1_edx_x86_features;
+@@ -546,7 +547,11 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
+ 		entry->edx = edx.full;
+ 		break;
+ 	}
+-	/* function 0xb has additional index. */
++	/*
++	 * Per Intel's SDM, the 0x1f is a superset of 0xb,
++	 * thus they can be handled by common code.
++	 */
++	case 0x1f:
+ 	case 0xb: {
+ 		int i, level_type;
+ 
+-- 
+2.21.0
+
