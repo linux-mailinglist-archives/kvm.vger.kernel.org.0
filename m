@@ -2,71 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6883F37E9C
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 22:21:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE7FC37ECB
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 22:29:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726828AbfFFUTJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 16:19:09 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:53004 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726744AbfFFUTH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 16:19:07 -0400
-Received: by mail-wm1-f65.google.com with SMTP id s3so1188394wms.2
-        for <kvm@vger.kernel.org>; Thu, 06 Jun 2019 13:19:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=fAkfn85/lqdX0osdVxNuElygntohyc34l0gKSlhr3ag=;
-        b=dOtow6cDzBj6YgrmlveurGD56muEHVL6LS7q2kOLUE18Cmq4EnTXsLlqi0zL9W1wOm
-         +I+zEQxnKAwYqMzfY5ZQJJGMN3O/RMTBPAu2kmB8f5XCuWnP6oxC4AfM6CrPS+tm9gFD
-         i5Qre0NqrYTE1Vy7OEtS977kYrssEshb7QozQT0apcKDLDlrNmU1Bip40+J0Loczg7tZ
-         GIkcOBiGBh/Pg8Rtl4J4xvVqXWXD7WJpQPvJazGuw6ar+eVFj5fvUi15lW+3rT3G3y+3
-         ogv3n1rympTG1Zk/b/VixnKj5HdK4YN6/a0ecyQpPAy9hzurTj4I7DldBz1s5HDYd7pl
-         w5LQ==
-X-Gm-Message-State: APjAAAWxCvL7HTXLZYVs3TDCpk3fpgpzNwgmZ1HSFztlbmfvBiU4hi9s
-        CwC0gO0qDjLORPsb0AqbSRatBHS8PFo=
-X-Google-Smtp-Source: APXvYqz48mChkyOODV0ajnbXZEGl5Ke1m19drYd50JUK+efjQXEu/HUD/f9LmnXacpx2Wf2aaiFrEA==
-X-Received: by 2002:a1c:dc45:: with SMTP id t66mr1201738wmg.63.1559852345364;
-        Thu, 06 Jun 2019 13:19:05 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id c129sm2700570wma.27.2019.06.06.13.19.04
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 06 Jun 2019 13:19:04 -0700 (PDT)
-Subject: Re: [PATCH] KVM: nVMX: Rename prepare_vmcs02_*_full to
- prepare_vmcs02_*_extra
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <1559834652-105872-1-git-send-email-pbonzini@redhat.com>
- <20190606184117.GJ23169@linux.intel.com>
- <89dd5d66-0d37-ea41-3f6d-72d5a8a9815d@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cd3f30e2-32ed-4bba-0456-f7ab7e24d792@redhat.com>
-Date:   Thu, 6 Jun 2019 22:19:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <89dd5d66-0d37-ea41-3f6d-72d5a8a9815d@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1727201AbfFFU2v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 16:28:51 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36152 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727017AbfFFU2l (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 6 Jun 2019 16:28:41 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x56KQtw5059134
+        for <kvm@vger.kernel.org>; Thu, 6 Jun 2019 16:28:40 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2sy78q7dce-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2019 16:28:40 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <farman@linux.ibm.com>;
+        Thu, 6 Jun 2019 21:28:37 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 6 Jun 2019 21:28:35 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x56KSXAb25952752
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 6 Jun 2019 20:28:33 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D715C11C054;
+        Thu,  6 Jun 2019 20:28:33 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C528311C052;
+        Thu,  6 Jun 2019 20:28:33 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu,  6 Jun 2019 20:28:33 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+        id 507D2E0250; Thu,  6 Jun 2019 22:28:33 +0200 (CEST)
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>, Farhan Ali <alifm@linux.ibm.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
+Subject: [PATCH v2 0/9] s390: vfio-ccw code rework
+Date:   Thu,  6 Jun 2019 22:28:22 +0200
+X-Mailer: git-send-email 2.17.1
+X-TM-AS-GCONF: 00
+x-cbid: 19060620-0008-0000-0000-000002F0EC0D
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19060620-0009-0000-0000-0000225DD9CE
+Message-Id: <20190606202831.44135-1-farman@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-06_14:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=665 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906060138
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/06/19 21:19, Krish Sadhukhan wrote:
-> 
-> The big chunk of the work in this function is done via
-> prepare_vmcs02_constant_state(). It seems cleaner to get rid of
-> prepare_vmcs02_early_full(), call prepare_vmcs02_constant_state()
-> directly from prepare_vmcs02_early() and move the three vmcs_write16()
-> calls to prepare_vmcs02_early().
-> 
+Now that we've gotten a lot of other series either merged or
+pending for the next merge window, I'd like to revisit some
+code simplification that I started many moons ago.
 
-This is just a mechanical search and replace, you can send a patch on
-top to inline it in the caller.
+In that first series, a couple of fixes got merged into 4.20,
+a couple more got some "seems okay" acks/reviews, and the rest
+were nearly forgotten about.  I dusted them off and did quite a
+bit of rework to make things a little more sequential and
+providing a better narrative (I think) based on the lessons we
+learned in my earlier changes.  Because of this rework, the
+acks/reviews on the first version didn't really translate to the
+code that exists here (patch 1 being the closest exception), so
+I didn't apply any of them here.  The end result is mostly the
+same as before, but now looks like this:
 
-Paolo
+Patch summary:
+1:   Squash duplicate code
+2-4: Remove duplicate code in CCW processor
+5-7: Remove one layer of nested arrays
+8-9: Combine direct/indirect addressing CCW processors
+
+Using 5.2.0-rc3 as a base plus the vfio-ccw branch of recent fixes,
+we shrink the code quite a bit (8.7% according to the bloat-o-meter),
+and we remove one set of mallocs/frees on the I/O path by removing
+one layer of the nested arrays.  There are no functional/behavioral
+changes with this series; all the tests that I would run previously
+continue to pass/fail as they today.
+
+Changelog:
+ v1/RFC->v2:
+  - [Eric] Dropped first two patches, as they have been merged
+  - [Eric] Shuffling of patches for readability/understandability
+  - [Halil] Actually added meaningful comments/commit messages
+    in the patches
+ v1/RFC: https://patchwork.kernel.org/cover/10675251/
+
+Eric Farman (9):
+  s390/cio: Squash cp_free() and cp_unpin_free()
+  s390/cio: Refactor the routine that handles TIC CCWs
+  s390/cio: Generalize the TIC handler
+  s390/cio: Use generalized CCW handler in cp_init()
+  vfio-ccw: Rearrange pfn_array and pfn_array_table arrays
+  vfio-ccw: Adjust the first IDAW outside of the nested loops
+  vfio-ccw: Remove pfn_array_table
+  vfio-ccw: Rearrange IDAL allocation in direct CCW
+  s390/cio: Combine direct and indirect CCW paths
+
+ drivers/s390/cio/vfio_ccw_cp.c | 313 +++++++++++----------------------
+ 1 file changed, 102 insertions(+), 211 deletions(-)
+
+-- 
+2.17.1
+
