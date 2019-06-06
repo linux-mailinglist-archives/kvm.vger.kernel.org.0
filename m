@@ -2,102 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BEBA737DD3
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 22:06:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6883F37E9C
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 22:21:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728332AbfFFUG2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 16:06:28 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:40989 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727082AbfFFUG2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 16:06:28 -0400
-Received: by mail-ed1-f66.google.com with SMTP id p15so5050592eds.8;
-        Thu, 06 Jun 2019 13:06:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=fKoBABNUkCBeoWcN3BB4mAKSq62cz70yQSacxGxsGFc=;
-        b=NDCKEI/RYiZCejraQ4pA3/blft0AGjyUEblNUUYKerTg8wmYi8n93ZXUNAUpJCKF3z
-         20X0CM2nsNucYryIixtGheZZNLlIk7HbS+1JTXdITy8utZREwu9KjGSE63vkSpB7890K
-         VDQAkCjGnSDYE3bS74Q+dbwBlWsQqX+dNOWBiUt5pMEvXRV63aufujwZsed+3BJq3vbb
-         ZlfAqHz3TlzljUxZACUgRZARSB2qug1H3SO4ou+4sa9S4bkgyupCoeAE3bN/pbRq+1zG
-         eiZHVv6/Kdsev1X8QP2yTRePtDdx1rmuqvTvM/xfBTp0Vb+gQrusWhynOXMOrd7N1FkP
-         1zWA==
+        id S1726828AbfFFUTJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 16:19:09 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:53004 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726744AbfFFUTH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 16:19:07 -0400
+Received: by mail-wm1-f65.google.com with SMTP id s3so1188394wms.2
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2019 13:19:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=fKoBABNUkCBeoWcN3BB4mAKSq62cz70yQSacxGxsGFc=;
-        b=DEL2VMEXXK5J8q9BrwTsDaxQw8TxhNjBCmSvn5DTQ6s1PvZGQFuiVFeMc3wvyetQQS
-         IqUhK4AvoCz4VNHgyWNTXoD1UEx8IPu5Xot9KWqQqVZN+vCp0N6SM1L9FmfPgbn5EtUh
-         saQT9AwxSDO/896IqwZjcreENq+LSpcc9cY5FmnW9R4aEfwDWSJliG+GKlAAqrf87/BK
-         O1WqelbqrP8fnwMzsWkduyERoHX3vsLaCCDQ4epmPYzeL4pLAzkVIXdF2wMVJEmq6WuL
-         MIhCb9BR62jq9B8c/PNsk2k0/u/64kdKDugRP7kvTqDyEInsrVYpNeaay0kxy0gmQCQN
-         YJDQ==
-X-Gm-Message-State: APjAAAXvSDeFwA11sRvEI6qbomrQ5PeglnkKRvan8q/rOB8d/yWJmIDN
-        VegDh2+ecNWZzvRPDTKCtcI=
-X-Google-Smtp-Source: APXvYqx7REg+H//KW6T/w1Ar/5mEf3ZqsGGG5JRSRXtG5RKWIoZSD9VJF2oR+CPvdQkvfQak4CXcVw==
-X-Received: by 2002:a17:906:3551:: with SMTP id s17mr42857015eja.19.1559851586295;
-        Thu, 06 Jun 2019 13:06:26 -0700 (PDT)
-Received: from archlinux-epyc ([2a01:4f9:2b:2b15::2])
-        by smtp.gmail.com with ESMTPSA id c21sm1735ejk.79.2019.06.06.13.06.24
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 06 Jun 2019 13:06:25 -0700 (PDT)
-Date:   Thu, 6 Jun 2019 13:06:23 -0700
-From:   Nathan Chancellor <natechancellor@gmail.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        clang-built-linux@googlegroups.com
-Subject: Re: [PATCH] vhost: Don't use defined in VHOST_ARCH_CAN_ACCEL_UACCESS
- definition
-Message-ID: <20190606200623.GA12580@archlinux-epyc>
-References: <20190606161223.67979-1-natechancellor@gmail.com>
- <20190606142606-mutt-send-email-mst@kernel.org>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=fAkfn85/lqdX0osdVxNuElygntohyc34l0gKSlhr3ag=;
+        b=dOtow6cDzBj6YgrmlveurGD56muEHVL6LS7q2kOLUE18Cmq4EnTXsLlqi0zL9W1wOm
+         +I+zEQxnKAwYqMzfY5ZQJJGMN3O/RMTBPAu2kmB8f5XCuWnP6oxC4AfM6CrPS+tm9gFD
+         i5Qre0NqrYTE1Vy7OEtS977kYrssEshb7QozQT0apcKDLDlrNmU1Bip40+J0Loczg7tZ
+         GIkcOBiGBh/Pg8Rtl4J4xvVqXWXD7WJpQPvJazGuw6ar+eVFj5fvUi15lW+3rT3G3y+3
+         ogv3n1rympTG1Zk/b/VixnKj5HdK4YN6/a0ecyQpPAy9hzurTj4I7DldBz1s5HDYd7pl
+         w5LQ==
+X-Gm-Message-State: APjAAAWxCvL7HTXLZYVs3TDCpk3fpgpzNwgmZ1HSFztlbmfvBiU4hi9s
+        CwC0gO0qDjLORPsb0AqbSRatBHS8PFo=
+X-Google-Smtp-Source: APXvYqz48mChkyOODV0ajnbXZEGl5Ke1m19drYd50JUK+efjQXEu/HUD/f9LmnXacpx2Wf2aaiFrEA==
+X-Received: by 2002:a1c:dc45:: with SMTP id t66mr1201738wmg.63.1559852345364;
+        Thu, 06 Jun 2019 13:19:05 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id c129sm2700570wma.27.2019.06.06.13.19.04
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 06 Jun 2019 13:19:04 -0700 (PDT)
+Subject: Re: [PATCH] KVM: nVMX: Rename prepare_vmcs02_*_full to
+ prepare_vmcs02_*_extra
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <1559834652-105872-1-git-send-email-pbonzini@redhat.com>
+ <20190606184117.GJ23169@linux.intel.com>
+ <89dd5d66-0d37-ea41-3f6d-72d5a8a9815d@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cd3f30e2-32ed-4bba-0456-f7ab7e24d792@redhat.com>
+Date:   Thu, 6 Jun 2019 22:19:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190606142606-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+In-Reply-To: <89dd5d66-0d37-ea41-3f6d-72d5a8a9815d@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 06, 2019 at 02:28:55PM -0400, Michael S. Tsirkin wrote:
-> I'd prefer just changing the definition.
-> ifdefs have a disadvantage that it's easy to get
-> wrong code if you forget to include a header.
+On 06/06/19 21:19, Krish Sadhukhan wrote:
 > 
-> I queued the below - pls confirm it works for you.
-
-Fine by me, I figured that might be preferred (since clang will warn if
-VHOST_ARCH_CAN_ACCEL_UACCESS is not defined so you'd know if the header
-was forgotten). Thank you for the fix :)
-
-Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-Tested-by: Nathan Chancellor <natechancellor@gmail.com>
-
+> The big chunk of the work in this function is done via
+> prepare_vmcs02_constant_state(). It seems cleaner to get rid of
+> prepare_vmcs02_early_full(), call prepare_vmcs02_constant_state()
+> directly from prepare_vmcs02_early() and move the three vmcs_write16()
+> calls to prepare_vmcs02_early().
 > 
-> 
-> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-> index c5d950cf7627..819296332913 100644
-> --- a/drivers/vhost/vhost.h
-> +++ b/drivers/vhost/vhost.h
-> @@ -95,8 +95,11 @@ struct vhost_uaddr {
->  	bool write;
->  };
->  
-> -#define VHOST_ARCH_CAN_ACCEL_UACCESS defined(CONFIG_MMU_NOTIFIER) && \
-> -	ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE == 0
-> +#if defined(CONFIG_MMU_NOTIFIER) && ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE == 0
-> +#define VHOST_ARCH_CAN_ACCEL_UACCESS 1
-> +#else
-> +#define VHOST_ARCH_CAN_ACCEL_UACCESS 0
-> +#endif
->  
->  /* The virtqueue structure describes a queue attached to a device. */
->  struct vhost_virtqueue {
+
+This is just a mechanical search and replace, you can send a patch on
+top to inline it in the caller.
+
+Paolo
