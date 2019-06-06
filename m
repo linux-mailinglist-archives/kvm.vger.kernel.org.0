@@ -2,130 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D4BF837D34
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 21:26:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BEBA737DD3
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 22:06:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729671AbfFFT0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 15:26:23 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:51666 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729053AbfFFTXd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 15:23:33 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x56JIi6e173638;
-        Thu, 6 Jun 2019 19:22:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : from : to :
- cc : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=5kr/UprSfKpvOLSNj+3SI4XTN13JgnkLNHX47r7NuIk=;
- b=eiYgvXbRlorgbo23HXYYmswPiOQDqFxSWUwUx1KCUgobS3XmFk3TUEnkvBeAFYto52Yx
- 7dYSWf6qj7Pvisg9n5XYYnFk10wf6jVY6WF/1JlpUJEZzDsFDeZXK6lgpNuAQ2hmGoxy
- 7so7SZa2xjWc4TX5FGTIrwlt+elc6S5bFyX3vtXrsNpA4ezNqvsV601G6bW/6yoflPxN
- bdJseae5jPbhyWRU5ff0K8v5Cx/7K0JeYlAH+13nvpWvmdxii8/qpaDWiIryo2Lea4M/
- iuupjCBvpiZqktGAOhTgSxfBpSxiHNUm1r2HLDHRJZnVbBHH5CqmPPhCMTuNownZ5dZc fg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2130.oracle.com with ESMTP id 2suevdtr5c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jun 2019 19:22:49 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x56JMnr3065415;
-        Thu, 6 Jun 2019 19:22:49 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 2swnhaxjvf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Jun 2019 19:22:49 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x56JMjDU015252;
-        Thu, 6 Jun 2019 19:22:46 GMT
-Received: from [10.175.215.95] (/10.175.215.95)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 06 Jun 2019 12:22:45 -0700
-Subject: Re: [patch v2 3/3] cpuidle-haltpoll: disable host side polling when
- kvm virtualized
-From:   Joao Martins <joao.m.martins@oracle.com>
-To:     Andrea Arcangeli <aarcange@redhat.com>
-Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Raslan KarimAllah <karahmed@amazon.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-References: <20190603225242.289109849@amt.cnet>
- <20190603225254.360289262@amt.cnet> <20190604122404.GA18979@amt.cnet>
- <cb11ef01-b579-1526-d585-0c815f2e1f6f@oracle.com>
- <20190606183632.GA20928@redhat.com>
- <7f988399-7718-d4f4-f59c-792fbcbcf9b3@oracle.com>
-Message-ID: <70bf0678-1ff7-bfc4-1ce2-fe7392ad663a@oracle.com>
-Date:   Thu, 6 Jun 2019 20:22:40 +0100
+        id S1728332AbfFFUG2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 16:06:28 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:40989 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727082AbfFFUG2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 16:06:28 -0400
+Received: by mail-ed1-f66.google.com with SMTP id p15so5050592eds.8;
+        Thu, 06 Jun 2019 13:06:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=fKoBABNUkCBeoWcN3BB4mAKSq62cz70yQSacxGxsGFc=;
+        b=NDCKEI/RYiZCejraQ4pA3/blft0AGjyUEblNUUYKerTg8wmYi8n93ZXUNAUpJCKF3z
+         20X0CM2nsNucYryIixtGheZZNLlIk7HbS+1JTXdITy8utZREwu9KjGSE63vkSpB7890K
+         VDQAkCjGnSDYE3bS74Q+dbwBlWsQqX+dNOWBiUt5pMEvXRV63aufujwZsed+3BJq3vbb
+         ZlfAqHz3TlzljUxZACUgRZARSB2qug1H3SO4ou+4sa9S4bkgyupCoeAE3bN/pbRq+1zG
+         eiZHVv6/Kdsev1X8QP2yTRePtDdx1rmuqvTvM/xfBTp0Vb+gQrusWhynOXMOrd7N1FkP
+         1zWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=fKoBABNUkCBeoWcN3BB4mAKSq62cz70yQSacxGxsGFc=;
+        b=DEL2VMEXXK5J8q9BrwTsDaxQw8TxhNjBCmSvn5DTQ6s1PvZGQFuiVFeMc3wvyetQQS
+         IqUhK4AvoCz4VNHgyWNTXoD1UEx8IPu5Xot9KWqQqVZN+vCp0N6SM1L9FmfPgbn5EtUh
+         saQT9AwxSDO/896IqwZjcreENq+LSpcc9cY5FmnW9R4aEfwDWSJliG+GKlAAqrf87/BK
+         O1WqelbqrP8fnwMzsWkduyERoHX3vsLaCCDQ4epmPYzeL4pLAzkVIXdF2wMVJEmq6WuL
+         MIhCb9BR62jq9B8c/PNsk2k0/u/64kdKDugRP7kvTqDyEInsrVYpNeaay0kxy0gmQCQN
+         YJDQ==
+X-Gm-Message-State: APjAAAXvSDeFwA11sRvEI6qbomrQ5PeglnkKRvan8q/rOB8d/yWJmIDN
+        VegDh2+ecNWZzvRPDTKCtcI=
+X-Google-Smtp-Source: APXvYqx7REg+H//KW6T/w1Ar/5mEf3ZqsGGG5JRSRXtG5RKWIoZSD9VJF2oR+CPvdQkvfQak4CXcVw==
+X-Received: by 2002:a17:906:3551:: with SMTP id s17mr42857015eja.19.1559851586295;
+        Thu, 06 Jun 2019 13:06:26 -0700 (PDT)
+Received: from archlinux-epyc ([2a01:4f9:2b:2b15::2])
+        by smtp.gmail.com with ESMTPSA id c21sm1735ejk.79.2019.06.06.13.06.24
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 06 Jun 2019 13:06:25 -0700 (PDT)
+Date:   Thu, 6 Jun 2019 13:06:23 -0700
+From:   Nathan Chancellor <natechancellor@gmail.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        clang-built-linux@googlegroups.com
+Subject: Re: [PATCH] vhost: Don't use defined in VHOST_ARCH_CAN_ACCEL_UACCESS
+ definition
+Message-ID: <20190606200623.GA12580@archlinux-epyc>
+References: <20190606161223.67979-1-natechancellor@gmail.com>
+ <20190606142606-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <7f988399-7718-d4f4-f59c-792fbcbcf9b3@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9280 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906060129
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9280 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906060129
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190606142606-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/6/19 7:51 PM, Joao Martins wrote:
-> On 6/6/19 7:36 PM, Andrea Arcangeli wrote:
->> Hello,
->>
->> On Thu, Jun 06, 2019 at 07:25:28PM +0100, Joao Martins wrote:
->>> But I wonder whether we should fail to load cpuidle-haltpoll when host halt
->>> polling can't be disabled[*]? That is to avoid polling in both host and guest
->>> and *possibly* avoid chances for performance regressions when running on older
->>> hypervisors?
->>
->> I don't think it's necessary: that would force an upgrade of the host
->> KVM version in order to use the guest haltpoll feature with an
->> upgraded guest kernel that can use the guest haltpoll.
->>
-> Hence why I was suggesting a *guest* cpuidle-haltpoll module parameter to still
-> allow it to load or otherwise (or allow guest to pick).
+On Thu, Jun 06, 2019 at 02:28:55PM -0400, Michael S. Tsirkin wrote:
+> I'd prefer just changing the definition.
+> ifdefs have a disadvantage that it's easy to get
+> wrong code if you forget to include a header.
 > 
-By 'still allow it to load', I meant specifically to handle the case when host
-polling control is not supported and what to do in that case.
+> I queued the below - pls confirm it works for you.
 
->> The guest haltpoll is self contained in the guest, so there's no
->> reason to prevent that by design or to force upgrade of the KVM host
->> version. It'd be more than enough to reload kvm.ko in the host with
->> the host haltpoll set to zero with the module parameter already
->> available, to achieve the same runtime without requiring a forced host
->> upgrade.
->>
-> It's just with the new driver we unilaterally poll on both sides, just felt I
-> would point it out should this raise unattended performance side effects ;)
-> 
-To be clear: by 'unilaterally' I was trying to refer to hosts KVM without
-polling control (which is safe to say that it is the majority atm?).
+Fine by me, I figured that might be preferred (since clang will warn if
+VHOST_ARCH_CAN_ACCEL_UACCESS is not defined so you'd know if the header
+was forgotten). Thank you for the fix :)
 
-Alternatively, there's always the option that if guest sees any issues on that
-case (with polling on both sides=, that it can always blacklist
-cpuidle-haltpoll. But may this is not an issue and perhaps majority of users
-still observes benefit when polling is enabled on guest and host.
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+Tested-by: Nathan Chancellor <natechancellor@gmail.com>
 
->> The warning however sounds sensible.
->>
 > 
-> Cool.
 > 
-> 	Joao
-> 
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> index c5d950cf7627..819296332913 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -95,8 +95,11 @@ struct vhost_uaddr {
+>  	bool write;
+>  };
+>  
+> -#define VHOST_ARCH_CAN_ACCEL_UACCESS defined(CONFIG_MMU_NOTIFIER) && \
+> -	ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE == 0
+> +#if defined(CONFIG_MMU_NOTIFIER) && ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE == 0
+> +#define VHOST_ARCH_CAN_ACCEL_UACCESS 1
+> +#else
+> +#define VHOST_ARCH_CAN_ACCEL_UACCESS 0
+> +#endif
+>  
+>  /* The virtqueue structure describes a queue attached to a device. */
+>  struct vhost_virtqueue {
