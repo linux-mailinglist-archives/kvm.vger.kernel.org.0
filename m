@@ -2,77 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C621A393A1
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 19:48:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0030F3945F
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 20:32:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730461AbfFGRrz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jun 2019 13:47:55 -0400
-Received: from mga05.intel.com ([192.55.52.43]:52612 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728684AbfFGRry (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jun 2019 13:47:54 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Jun 2019 10:47:54 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by orsmga003.jf.intel.com with ESMTP; 07 Jun 2019 10:47:53 -0700
-Date:   Fri, 7 Jun 2019 10:47:53 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: VMX: simplify vmx_prepare_switch_to_{guest,host}
-Message-ID: <20190607174753.GH9083@linux.intel.com>
-References: <1559927301-8124-1-git-send-email-pbonzini@redhat.com>
- <20190607173710.GG9083@linux.intel.com>
+        id S1731005AbfFGScs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jun 2019 14:32:48 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:47542 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729047AbfFGScs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jun 2019 14:32:48 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x57ITL6p054648;
+        Fri, 7 Jun 2019 18:32:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2018-07-02; bh=Fw3SdGK6AUcy8ufifD2WpeRlL8K9PLFnG4RodHamVIg=;
+ b=m4GKNYerbsGM7qRVxIpBK74IvpySQr8acoyCwVyNTeSb4rCd+Lfdp8DwqYsUnu2Ek0yq
+ IJgtXEJ9j3m72CdQnHSH2mnEsHUb6CHc7uTeN79X1E7KBImnwcXgjHkUhkFudZmoVAmA
+ 1Cqhz0eLhr4uvDNAXJSU6Dap5zHnHhE2wCN66YOmvpvnGnP3RqC3fgLwmdQkWdvZczP/
+ amsW1m8XR/z/6mrVQ8UZlYDA14w4oPMDESNva8Suxnr+ewqL0pXXi1U7lcgMHttmLXbl
+ tTvRYjAJW49/WasMd1RRZ+R1cs6aC2RbehbmN4UmKHH9BbCJ9imYpceiFcREDtPodzZR uA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2130.oracle.com with ESMTP id 2sueve06rg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 07 Jun 2019 18:32:00 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x57IVxpu041744;
+        Fri, 7 Jun 2019 18:32:00 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2swngk5nfx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 07 Jun 2019 18:32:00 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x57IVwXT028486;
+        Fri, 7 Jun 2019 18:31:59 GMT
+Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 07 Jun 2019 11:31:58 -0700
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com
+Subject: [PATCH] nVMX: Get rid of prepare_vmcs02_early_full and inline its content in the caller
+Date:   Fri,  7 Jun 2019 14:05:44 -0400
+Message-Id: <20190607180544.17241-1-krish.sadhukhan@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190607173710.GG9083@linux.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9281 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=721
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906070123
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9281 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=757 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906070123
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 07, 2019 at 10:37:10AM -0700, Sean Christopherson wrote:
-> On Fri, Jun 07, 2019 at 07:08:21PM +0200, Paolo Bonzini wrote:
-> > vmx->loaded_cpu_state can only be NULL or equal to vmx->loaded_vmcs,
-> > so change it to a bool.  Because the direction of the bool is
-> > now the opposite of vmx->guest_msrs_dirty, change the direction of
-> > vmx->guest_msrs_dirty so that they match.
-> > 
-> > Finally, do not imply that MSRs have to be reloaded when
-> > vmx->guest_sregs_loaded is false; instead, set vmx->guest_msrs_loaded
-> > to false explicitly in vmx_prepare_switch_to_host.
-> > 
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> ...
-> 
-> > @@ -1165,13 +1163,15 @@ static void vmx_prepare_switch_to_host(struct vcpu_vmx *vmx)
-> >  	wrmsrl(MSR_KERNEL_GS_BASE, vmx->msr_host_kernel_gs_base);
-> >  #endif
-> >  	load_fixmap_gdt(raw_smp_processor_id());
-> > +	vmx->guest_sregs_loaded = false;
-> > +	vmx->guest_msrs_loaded = false;
-> >  }
-> >  
-> >  #ifdef CONFIG_X86_64
-> >  static u64 vmx_read_guest_kernel_gs_base(struct vcpu_vmx *vmx)
-> >  {
-> >  	preempt_disable();
-> > -	if (vmx->loaded_cpu_state)
-> > +	if (vmx->guest_sregs_loaded)
-> >  		rdmsrl(MSR_KERNEL_GS_BASE, vmx->msr_guest_kernel_gs_base);
-> 
-> This is the hiccup with naming it sregs_loaded.  The split bools is also
-> kinda wonky since the 32->64 case is a one-off scenario.  I think a
-> cleaner solution would be to remove guest_msrs_dirty and refresh the MSRs
-> directly from setup_msrs().  Then loaded_cpu_state -> loaded_guest_state
-> can be a straight conversion from loaded_vmcs -> bool.  I'll send patches.
+ ..as there is no need for a separate function
 
-Actually, would it be easier on your end if I do a v2 of the series that
-would introduce vmx_sync_vmcs_host_state(), and splice these patch into it?
+Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+---
+ arch/x86/kvm/vmx/nested.c | 30 +++++++++++++-----------------
+ 1 file changed, 13 insertions(+), 17 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index f1a69117ac0f..4643eb3a97f7 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1963,28 +1963,24 @@ static void prepare_vmcs02_constant_state(struct vcpu_vmx *vmx)
+ 	vmx_set_constant_host_state(vmx);
+ }
+ 
+-static void prepare_vmcs02_early_full(struct vcpu_vmx *vmx,
+-				      struct vmcs12 *vmcs12)
+-{
+-	prepare_vmcs02_constant_state(vmx);
+-
+-	vmcs_write64(VMCS_LINK_POINTER, -1ull);
+-
+-	if (enable_vpid) {
+-		if (nested_cpu_has_vpid(vmcs12) && vmx->nested.vpid02)
+-			vmcs_write16(VIRTUAL_PROCESSOR_ID, vmx->nested.vpid02);
+-		else
+-			vmcs_write16(VIRTUAL_PROCESSOR_ID, vmx->vpid);
+-	}
+-}
+-
+ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+ {
+ 	u32 exec_control, vmcs12_exec_ctrl;
+ 	u64 guest_efer = nested_vmx_calc_efer(vmx, vmcs12);
+ 
+-	if (vmx->nested.dirty_vmcs12 || vmx->nested.hv_evmcs)
+-		prepare_vmcs02_early_full(vmx, vmcs12);
++	if (vmx->nested.dirty_vmcs12 || vmx->nested.hv_evmcs) {
++		prepare_vmcs02_constant_state(vmx);
++
++		vmcs_write64(VMCS_LINK_POINTER, -1ull);
++
++		if (enable_vpid) {
++			if (nested_cpu_has_vpid(vmcs12) && vmx->nested.vpid02)
++				vmcs_write16(VIRTUAL_PROCESSOR_ID,
++					     vmx->nested.vpid02);
++			else
++				vmcs_write16(VIRTUAL_PROCESSOR_ID, vmx->vpid);
++		}
++	}
+ 
+ 	/*
+ 	 * PIN CONTROLS
+-- 
+2.20.1
+
