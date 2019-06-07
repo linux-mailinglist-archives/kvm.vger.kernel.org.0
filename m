@@ -2,190 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AFBDA394D9
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 20:55:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C7EA39664
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 22:03:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730306AbfFGSzi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jun 2019 14:55:38 -0400
-Received: from mga02.intel.com ([134.134.136.20]:27538 "EHLO mga02.intel.com"
+        id S1730625AbfFGUDu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jun 2019 16:03:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59134 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729973AbfFGSzh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jun 2019 14:55:37 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Jun 2019 11:55:36 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.36])
-  by orsmga007.jf.intel.com with ESMTP; 07 Jun 2019 11:55:36 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     kvm@vger.kernel.org
-Subject: [PATCH v2] KVM: nVMX: Stash L1's CR3 in vmcs01.GUEST_CR3 on nested entry w/o EPT
-Date:   Fri,  7 Jun 2019 11:55:34 -0700
-Message-Id: <20190607185534.24368-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.21.0
+        id S1729342AbfFGUDu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jun 2019 16:03:50 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B5C4388318;
+        Fri,  7 Jun 2019 20:03:49 +0000 (UTC)
+Received: from x1.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 010C91001943;
+        Fri,  7 Jun 2019 20:03:45 +0000 (UTC)
+Date:   Fri, 7 Jun 2019 14:03:44 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        libvir-list@redhat.com, Matthew Rosato <mjrosato@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH RFC 1/1] allow to specify additional config data
+Message-ID: <20190607140344.0399b766@x1.home>
+In-Reply-To: <ed75a4de-da0b-f6cf-6164-44cebc82c3a5@linux.ibm.com>
+References: <20190606144417.1824-1-cohuck@redhat.com>
+        <20190606144417.1824-2-cohuck@redhat.com>
+        <20190606093224.3ecb92c7@x1.home>
+        <20190606101552.6fc62bef@x1.home>
+        <ed75a4de-da0b-f6cf-6164-44cebc82c3a5@linux.ibm.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 07 Jun 2019 20:03:49 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM does not have 100% coverage of VMX consistency checks, i.e. some
-checks that cause VM-Fail may only be detected by hardware during a
-nested VM-Entry.  In such a case, KVM must restore L1's state to the
-pre-VM-Enter state as L2's state has already been loaded into KVM's
-software model.
+On Fri, 7 Jun 2019 14:26:13 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-L1's CR3 and PDPTRs in particular are loaded from vmcs01.GUEST_*.  But
-when EPT is disabled, the associated fields hold KVM's shadow values,
-not L1's "real" values.  Fortunately, when EPT is disabled the PDPTRs
-come from memory, i.e. are not cached in the VMCS.  Which leaves CR3
-as the sole anomaly.
+> On 6/6/19 12:15 PM, Alex Williamson wrote:
+> > On Thu, 6 Jun 2019 09:32:24 -0600
+> > Alex Williamson <alex.williamson@redhat.com> wrote:
+> >   
+> >> On Thu,  6 Jun 2019 16:44:17 +0200
+> >> Cornelia Huck <cohuck@redhat.com> wrote:
+> >>  
+> >>> Add a rough implementation for vfio-ap.
+> >>>
+> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >>> ---
+> >>>   mdevctl.libexec | 25 ++++++++++++++++++++++
+> >>>   mdevctl.sbin    | 56 ++++++++++++++++++++++++++++++++++++++++++++++++-
+> >>>   2 files changed, 80 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/mdevctl.libexec b/mdevctl.libexec
+> >>> index 804166b5086d..cc0546142924 100755
+> >>> --- a/mdevctl.libexec
+> >>> +++ b/mdevctl.libexec
+> >>> @@ -54,6 +54,19 @@ wait_for_supported_types () {
+> >>>       fi
+> >>>   }
+> >>>   
+> >>> +# configure vfio-ap devices <config entry> <matrix attribute>
+> >>> +configure_ap_devices() {
+> >>> +    list="`echo "${config[$1]}" | sed 's/,/ /'`"
+> >>> +    [ -z "$list" ] && return
+> >>> +    for a in $list; do
+> >>> +        echo "$a" > "$supported_types/${config[mdev_type]}/devices/$uuid/$2"
+> >>> +        if [ $? -ne 0 ]; then
+> >>> +            echo "Error writing '$a' to '$uuid/$2'" >&2
+> >>> +            exit 1
+> >>> +        fi
+> >>> +    done
+> >>> +}
+> >>> +
+> >>>   case ${1} in
+> >>>       start-mdev|stop-mdev)
+> >>>           if [ $# -ne 2 ]; then
+> >>> @@ -148,6 +161,18 @@ case ${cmd} in
+> >>>               echo "Error creating mdev type ${config[mdev_type]} on $parent" >&2
+> >>>               exit 1
+> >>>           fi
+> >>> +
+> >>> +        # some types may specify additional config data
+> >>> +        case ${config[mdev_type]} in
+> >>> +            vfio_ap-passthrough)  
+> >>
+> >> I think this could have some application beyond ap too, I know NVIDIA
+> >> GRID vGPUs do have some controls under the vendor hierarchy of the
+> >> device, ex. setting the frame rate limiter.  The implementation here is
+> >> a bit rigid, we know a specific protocol for a specific mdev type, but
+> >> for supporting arbitrary vendor options we'd really just want to try to
+> >> apply whatever options are provided.  If we didn't care about ordering,
+> >> we could just look for keys for every file in the device's immediate
+> >> sysfs hierarchy and apply any value we find, independent of the
+> >> mdev_type, ex. intel_vgpu/foo=bar  Thanks,  
+> > 
+> > For example:
+> > 
+> > for key in find -P $mdev_base/$uuid/ \( -path
+> > "$mdev_base/$uuid/power/*" -o -path $mdev_base/$uuid/uevent -o -path $mdev_base/$uuid/remove \) -prune -o -type f -print | sed -e "s|$mdev_base/$uuid/||g"); do
+> >    [ -z ${config[$key]} ] && continue
+> >    ... parse value(s) and iteratively apply to key
+> > done
+> > 
+> > The find is a little ugly to exclude stuff, maybe we just let people do
+> > screwy stuff like specify remove=1 in their config.  Also need to think
+> > about whether we're imposing a delimiter to apply multiple values to a
+> > key that conflicts with the attribute usage.  Thanks,
+> > 
+> > Alex  
+> 
+> I like the idea of looking for files in the device's immediate sysfs
+> hierarchy, but maybe the find could exclude attributes that are
+> not vendor defined.
 
-A previously applied workaround to handle CR3 was to force nested early
-checks if EPT is disabled:
+How would we know what attributes are vendor defined?  The above `find`
+strips out the power, uevent, and remove attributes, which for GVT-g
+leaves only the vendor defined attributes[1], but I don't know how to
+instead do a positive match of the vendor attributes without
+unmaintainable lookup tables.  This starts to get into the question of
+how much do we want to (or need to) protect the user from themselves.
+If we let the user specify a key=value of remove=1 and the device
+immediately disappears, is that a bug or a feature?  Thanks,
 
-  commit 2b27924bb1d48 ("KVM: nVMX: always use early vmcs check when EPT
-                         is disabled")
+Alex
 
-Forcing nested early checks is undesirable as doing so adds hundreds of
-cycles to every nested VM-Entry.  Rather than take this performance hit,
-handle CR3 by overwriting vmcs01.GUEST_CR3 with L1's CR3 during nested
-VM-Entry when EPT is disabled *and* nested early checks are disabled.
-By stuffing vmcs01.GUEST_CR3, nested_vmx_restore_host_state() will
-naturally restore the correct vcpu->arch.cr3 from vmcs01.GUEST_CR3.
+[1] GVT-g doesn't actually have an writable attributes, so we'd also
+minimally want to add a test to skip read-only attributes.
 
-These shenanigans work because nested_vmx_restore_host_state() does a
-full kvm_mmu_reset_context(), i.e. unloads the current MMU, which
-guarantees vmcs01.GUEST_CR3 will be rewritten with a new shadow CR3
-prior to re-entering L1.
-
-vcpu->arch.root_mmu.root_hpa is set to INVALID_PAGE via:
-
-    nested_vmx_restore_host_state() ->
-        kvm_mmu_reset_context() ->
-            kvm_mmu_unload() ->
-                kvm_mmu_free_roots()
-
-kvm_mmu_unload() has WARN_ON(root_hpa != INVALID_PAGE), i.e. we can bank
-on 'root_hpa == INVALID_PAGE' unless the implementation of
-kvm_mmu_reset_context() is changed.
-
-On the way into L1, VMCS.GUEST_CR3 is guaranteed to be written (on a
-successful entry) via:
-
-    vcpu_enter_guest() ->
-        kvm_mmu_reload() ->
-            kvm_mmu_load() ->
-                kvm_mmu_load_cr3() ->
-                    vmx_set_cr3()
-
-Stuff vmcs01.GUEST_CR3 if and only if nested early checks are disabled
-as a "late" VM-Fail should never happen win that case (KVM WARNs), and
-the conditional write avoids the need to restore the correct GUEST_CR3
-when nested_vmx_check_vmentry_hw() fails.
-
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
-
-v2: Squashed the revert of the previous workaround into this patch
-    and added a beefy comment [Paolo].
-
- arch/x86/include/uapi/asm/vmx.h |  1 -
- arch/x86/kvm/vmx/nested.c       | 44 +++++++++++++++++----------------
- 2 files changed, 23 insertions(+), 22 deletions(-)
-
-diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
-index d213ec5c3766..f0b0c90dd398 100644
---- a/arch/x86/include/uapi/asm/vmx.h
-+++ b/arch/x86/include/uapi/asm/vmx.h
-@@ -146,7 +146,6 @@
- 
- #define VMX_ABORT_SAVE_GUEST_MSR_FAIL        1
- #define VMX_ABORT_LOAD_HOST_PDPTE_FAIL       2
--#define VMX_ABORT_VMCS_CORRUPTED             3
- #define VMX_ABORT_LOAD_HOST_MSR_FAIL         4
- 
- #endif /* _UAPIVMX_H */
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 0f705c7d590c..5c6f37edb16c 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2964,6 +2964,25 @@ int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry)
- 		!(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
- 		vmx->nested.vmcs01_guest_bndcfgs = vmcs_read64(GUEST_BNDCFGS);
- 
-+	/*
-+	 * Overwrite vmcs01.GUEST_CR3 with L1's CR3 if EPT is disabled *and*
-+	 * nested early checks are disabled.  In the event of a "late" VM-Fail,
-+	 * i.e. a VM-Fail detected by hardware but not KVM, KVM must unwind its
-+	 * software model to the pre-VMEntry host state.  When EPT is disabled,
-+	 * GUEST_CR3 holds KVM's shadow CR3, not L1's "real" CR3, which causes
-+	 * nested_vmx_restore_host_state() to corrupt vcpu->arch.cr3.  Stuffing
-+	 * vmcs01.GUEST_CR3 results in the unwind naturally setting arch.cr3 to
-+	 * the correct value.  Smashing vmcs01.GUEST_CR3 is safe because nested
-+	 * VM-Exits, and the unwind, reset KVM's MMU, i.e. vmcs01.GUEST_CR3 is
-+	 * guaranteed to be overwritten with a shadow CR3 prior to re-entering
-+	 * L1.  Don't stuff vmcs01.GUEST_CR3 when using nested early checks as
-+	 * KVM modifies vcpu->arch.cr3 if and only if the early hardware checks
-+	 * pass, and early VM-Fails do not reset KVM's MMU, i.e. the VM-Fail
-+	 * path would need to manually save/restore vmcs01.GUEST_CR3.
-+	 */
-+	if (!enable_ept && !nested_early_check)
-+		vmcs_writel(GUEST_CR3, vcpu->arch.cr3);
-+
- 	vmx_switch_vmcs(vcpu, &vmx->nested.vmcs02);
- 
- 	prepare_vmcs02_early(vmx, vmcs12);
-@@ -3775,18 +3794,8 @@ static void nested_vmx_restore_host_state(struct kvm_vcpu *vcpu)
- 	vmx_set_cr4(vcpu, vmcs_readl(CR4_READ_SHADOW));
- 
- 	nested_ept_uninit_mmu_context(vcpu);
--
--	/*
--	 * This is only valid if EPT is in use, otherwise the vmcs01 GUEST_CR3
--	 * points to shadow pages!  Fortunately we only get here after a WARN_ON
--	 * if EPT is disabled, so a VMabort is perfectly fine.
--	 */
--	if (enable_ept) {
--		vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
--		__set_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail);
--	} else {
--		nested_vmx_abort(vcpu, VMX_ABORT_VMCS_CORRUPTED);
--	}
-+	vcpu->arch.cr3 = vmcs_readl(GUEST_CR3);
-+	__set_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail);
- 
- 	/*
- 	 * Use ept_save_pdptrs(vcpu) to load the MMU's cached PDPTRs
-@@ -3794,7 +3803,8 @@ static void nested_vmx_restore_host_state(struct kvm_vcpu *vcpu)
- 	 * VMFail, like everything else we just need to ensure our
- 	 * software model is up-to-date.
- 	 */
--	ept_save_pdptrs(vcpu);
-+	if (enable_ept)
-+		ept_save_pdptrs(vcpu);
- 
- 	kvm_mmu_reset_context(vcpu);
- 
-@@ -5726,14 +5736,6 @@ __init int nested_vmx_hardware_setup(int (*exit_handlers[])(struct kvm_vcpu *))
- {
- 	int i;
- 
--	/*
--	 * Without EPT it is not possible to restore L1's CR3 and PDPTR on
--	 * VMfail, because they are not available in vmcs01.  Just always
--	 * use hardware checks.
--	 */
--	if (!enable_ept)
--		nested_early_check = 1;
--
- 	if (!cpu_has_vmx_shadow_vmcs())
- 		enable_shadow_vmcs = 0;
- 	if (enable_shadow_vmcs) {
--- 
-2.21.0
+> >>> +                configure_ap_devices ap_adapters assign_adapter
+> >>> +                configure_ap_devices ap_domains assign_domain
+> >>> +                configure_ap_devices ap_control_domains assign_control_domain
+> >>> +                # TODO: is assigning idempotent? Should we unwind on error?
+> >>> +                ;;
+> >>> +            *)
+> >>> +                ;;
+> >>> +        esac
+> >>>           ;;
+> >>>   
+> >>>       add-mdev)
+> >>> diff --git a/mdevctl.sbin b/mdevctl.sbin
+> >>> index 276cf6ddc817..eb5ee0091879 100755
+> >>> --- a/mdevctl.sbin
+> >>> +++ b/mdevctl.sbin
+> >>> @@ -33,6 +33,8 @@ usage() {
+> >>>       echo "set-start <mdev UUID>: change mdev start policy, if no option specified," >&2
+> >>>       echo "                       system default policy is used" >&2
+> >>>       echo "                       options: [--auto] [--manual]" >&2
+> >>> +    echo "set-additional-config <mdev UUID> {fmt...}: supply additional configuration" >&2
+> >>> +    echo "show-additional-config-format <mdev UUiD>:  prints the format expected by the device" >&2
+> >>>       echo "list-all: list all possible mdev types supported in the system" >&2
+> >>>       echo "list-available: list all mdev types currently available" >&2
+> >>>       echo "list-mdevs: list currently configured mdevs" >&2
+> >>> @@ -48,7 +50,7 @@ while (($# > 0)); do
+> >>>           --manual)
+> >>>               config[start]=manual
+> >>>               ;;
+> >>> -        start-mdev|stop-mdev|remove-mdev|set-start)
+> >>> +        start-mdev|stop-mdev|remove-mdev|set-start|show-additional-config-format)
+> >>>               [ $# -ne 2 ] && usage
+> >>>               cmd=$1
+> >>>               uuid=$2
+> >>> @@ -67,6 +69,14 @@ while (($# > 0)); do
+> >>>               cmd=$1
+> >>>               break
+> >>>               ;;
+> >>> +        set-additional-config)
+> >>> +            [ $# -le 2 ] && usage
+> >>> +            cmd=$1
+> >>> +            uuid=$2
+> >>> +            shift 2
+> >>> +            addtl_config="$*"
+> >>> +            break
+> >>> +            ;;
+> >>>           *)
+> >>>               usage
+> >>>               ;;
+> >>> @@ -114,6 +124,50 @@ case ${cmd} in
+> >>>           fi
+> >>>           ;;
+> >>>   
+> >>> +    set-additional-config)
+> >>> +        file=$(find $persist_base -name $uuid -type f)
+> >>> +        if [ -w "$file" ]; then
+> >>> +            read_config "$file"
+> >>> +            if [ ${config[start]} == "auto" ]; then
+> >>> +                systemctl stop mdev@$uuid.service
+> >>> +            fi
+> >>> +            # FIXME: validate input!
+> >>> +            for i in $addtl_config; do
+> >>> +                key="`echo "$i" | cut -d '=' -f 1`"
+> >>> +                value="`echo "$i" | cut -d '=' -f 2-`"
+> >>> +                if grep -q ^$key $file; then
+> >>> +                    if [ -z "$value" ]; then
+> >>> +                        sed -i "s/^$key=.*//g" $file
+> >>> +                    else
+> >>> +                        sed -i "s/^$key=.*/$key=$value/g" $file
+> >>> +                    fi
+> >>> +                else
+> >>> +                    echo "$i" >> "$file"
+> >>> +                fi
+> >>> +            done
+> >>> +            if [ ${config[start]} == "auto" ]; then
+> >>> +                systemctl start mdev@$uuid.service
+> >>> +            fi
+> >>> +        else
+> >>> +            exit 1
+> >>> +        fi
+> >>> +        ;;
+> >>> +
+> >>> +    show-additional-config-format)
+> >>> +        file=$(find $persist_base -name $uuid -type f)
+> >>> +        read_config "$file"
+> >>> +        case ${config[mdev_type]} in
+> >>> +            vfio_ap-passthrough)
+> >>> +                echo "ap_adapters=<comma-separated list of adapters>"
+> >>> +                echo "ap_domains=<comma-separated list of domains>"
+> >>> +                echo "ap_control_domains=<comma-separated list of control domains>"
+> >>> +                ;;
+> >>> +            *)
+> >>> +                echo "no additional configuration defined"
+> >>> +                ;;
+> >>> +        esac
+> >>> +        ;;
+> >>> +
+> >>>       list-mdevs)
+> >>>           for mdev in $(find $mdev_base/ -maxdepth 1 -mindepth 1 -type l); do
+> >>>               uuid=$(basename $mdev)  
+> >>  
+> >   
+> 
 
