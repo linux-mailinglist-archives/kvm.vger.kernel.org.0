@@ -2,93 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EA76B38E29
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 16:56:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A7B838E30
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 17:00:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728627AbfFGO4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jun 2019 10:56:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54186 "EHLO mx1.redhat.com"
+        id S1728752AbfFGPAJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jun 2019 11:00:09 -0400
+Received: from mga03.intel.com ([134.134.136.65]:18517 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728203AbfFGO4i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jun 2019 10:56:38 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 862A27EBDC;
-        Fri,  7 Jun 2019 14:56:38 +0000 (UTC)
-Received: from gondolin (dhcp-192-191.str.redhat.com [10.33.192.191])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EACC760636;
-        Fri,  7 Jun 2019 14:56:32 +0000 (UTC)
-Date:   Fri, 7 Jun 2019 16:56:30 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        libvir-list@redhat.com, Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH RFC 0/1] mdevctl: further config for vfio-ap
-Message-ID: <20190607165630.21ad033b.cohuck@redhat.com>
-In-Reply-To: <234ed452-45bd-e7ec-f1be-929e3b77d364@linux.ibm.com>
-References: <20190606144417.1824-1-cohuck@redhat.com>
-        <234ed452-45bd-e7ec-f1be-929e3b77d364@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1728408AbfFGPAJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jun 2019 11:00:09 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Jun 2019 08:00:08 -0700
+X-ExtLoop1: 1
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
+  by fmsmga007.fm.intel.com with ESMTP; 07 Jun 2019 08:00:07 -0700
+Date:   Fri, 7 Jun 2019 08:00:07 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Eugene Korenevsky <ekorenevsky@gmail.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v5 1/3] kvm: vmx: fix limit checking in
+ get_vmx_mem_address()
+Message-ID: <20190607150007.GB9083@linux.intel.com>
+References: <20190607060248.GA29087@dnote>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Fri, 07 Jun 2019 14:56:38 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190607060248.GA29087@dnote>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 6 Jun 2019 12:45:29 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+On Fri, Jun 07, 2019 at 09:02:48AM +0300, Eugene Korenevsky wrote:
+> Intel SDM vol. 3, 5.3:
+> The processor causes a
+> general-protection exception (or, if the segment is SS, a stack-fault
+> exception) any time an attempt is made to access the following addresses
+> in a segment:
+> - A byte at an offset greater than the effective limit
+> - A word at an offset greater than the (effective-limit – 1)
+> - A doubleword at an offset greater than the (effective-limit – 3)
+> - A quadword at an offset greater than the (effective-limit – 7)
+> 
+> Therefore, the generic limit checking error condition must be
+> 
+> exn = (off > limit + 1 - access_len) = (off + access_len - 1 > limit)
+> 
+> but not
+> 
+> exn = (off + access_len > limit)
+> 
+> as for now.
+> 
+> Also avoid integer overflow of `off` at 32-bit KVM by casting it to u64.
+> 
+> Note: access length is currently sizeof(u64) which is incorrect. This
+> will be fixed in the subsequent patch.
+> 
+> Signed-off-by: Eugene Korenevsky <ekorenevsky@gmail.com>
 
-> On 6/6/19 10:44 AM, Cornelia Huck wrote:
-> > This patch adds a very rough implementation of additional config data
-> > for mdev devices. The idea is to make it possible to specify some
-> > type-specific key=value pairs in the config file for an mdev device.
-> > If a device is started automatically, the device is stopped and restarted
-> > after applying the config.
-> > 
-> > The code has still some problems, like not doing a lot of error handling
-> > and being ugly in general; but most importantly, I can't really test it,
-> > as I don't have the needed hardware. Feedback welcome; would be good to
-> > know if the direction is sensible in general.  
-> 
-> Hi Connie,
-> 
-> This is very similar to what I was looking to do in zdev (config via
-> key=value pairs), so I like your general approach.
-> 
-> I pulled your code and took it for a spin on an LPAR with access to
-> crypto cards:
-> 
-> # mdevctl create-mdev `uuidgen` matrix vfio_ap-passthrough
-> # mdevctl set-additional-config <uuid> ap_adapters=0x4,0x5
-> # mdevctl set-additional-config <uuid> ap_domains=0x36
-> # mdevctl set-additional-config <uuid> ap_control_domains=0x37
-> 
-> Assuming all valid inputs, this successfully creates the appropriate
-> mdev and what looks to be a valid mdevctl.d entry.  A subsequent reboot
-> successfully brings the same vfio_ap-passthrough device up again.
+When sending a new revision of a patch, please add any supplied tags to
+the changelog, e.g. Reviewed-by, Tested-by, Acked-by, etc...  For example,
+my Reviewed-by for v4 of this patch.
 
-Cool, thanks for checking!
+The one situation where you don't want to carry tags is if you make
+non-trivial changes to a patch, e.g. person X reviews a patch but then
+it gets reworked based on feedback from person Y, in which case the
+Reviewed-by from X should be dropped as they haven't reviewed the new
+code.
 
-> 
-> Matt
-> 
-> > 
-> > Also available at
-> > 
-> > https://github.com/cohuck/mdevctl conf-data
-> > 
-> > Cornelia Huck (1):
-> >   allow to specify additional config data
-> > 
-> >  mdevctl.libexec | 25 ++++++++++++++++++++++
-> >  mdevctl.sbin    | 56 ++++++++++++++++++++++++++++++++++++++++++++++++-
-> >  2 files changed, 80 insertions(+), 1 deletion(-)
-> >   
-> 
+Thans for the patches!
 
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
