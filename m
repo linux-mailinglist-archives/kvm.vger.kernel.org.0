@@ -2,104 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 35606392CF
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 19:10:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23C2D392E4
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 19:17:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731212AbfFGRJw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jun 2019 13:09:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43582 "EHLO mail.kernel.org"
+        id S1730025AbfFGRRa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jun 2019 13:17:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40078 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730196AbfFGRJw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jun 2019 13:09:52 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1728618AbfFGRR3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jun 2019 13:17:29 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1712B208E3;
-        Fri,  7 Jun 2019 17:09:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559927391;
-        bh=zTE9Vnc80prCH8PSEwnKTNhjRC5uBLiJcuWCP0FnZBQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZgApmZjjjZArxNzMJS92zb1duXOLfAHnxFWRojQpdAga3W+RgadVqRoCPs2s886O9
-         WexWxrHwX2eTwI87ZGkFjAOzQdHA71NFyKrqbDFaLMhyP+sGDlo9ITk+SkKm/mEv1Y
-         zCNDruhQwMAkzM7sov7CcGUS7Weuon4IZXp/aAi4=
-Date:   Fri, 7 Jun 2019 10:09:49 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     x86-ml <x86@kernel.org>, Borislav Petkov <bp@suse.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Jann Horn <jannh@google.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        kvm ML <kvm@vger.kernel.org>,
+        by mx1.redhat.com (Postfix) with ESMTPS id D4BF33003097;
+        Fri,  7 Jun 2019 17:17:21 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-16.gru2.redhat.com [10.97.112.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0325D5F9DF;
+        Fri,  7 Jun 2019 17:17:16 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id 42130105157;
+        Fri,  7 Jun 2019 14:16:57 -0300 (BRT)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id x57HGpax005218;
+        Fri, 7 Jun 2019 14:16:51 -0300
+Date:   Fri, 7 Jun 2019 14:16:47 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+Cc:     kvm-devel <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Rik van Riel <riel@surriel.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] x86/fpu: Update kernel's FPU state before using for the
- fsave header
-Message-ID: <20190607170949.GA648@sol.localdomain>
-References: <20190604185358.GA820@sol.localdomain>
- <20190605140405.2nnpqslnjpfe2ig2@linutronix.de>
- <20190605173256.GA86462@gmail.com>
- <20190606173026.ty7c4cvftrvfrwy3@linutronix.de>
- <20190607142915.y52mfmgk5lvhll7n@linutronix.de>
+        Radim =?iso-8859-1?B?S3LEP23DocU/?= <rkrcmar@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Raslan KarimAllah <karahmed@amazon.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Linux PM <linux-pm@vger.kernel.org>
+Subject: Re: [patch 0/3] cpuidle-haltpoll driver (v2)
+Message-ID: <20190607171645.GA28275@amt.cnet>
+References: <20190603225242.289109849@amt.cnet>
+ <6c411948-9e32-9f41-351e-c9accd1facb0@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190607142915.y52mfmgk5lvhll7n@linutronix.de>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+In-Reply-To: <6c411948-9e32-9f41-351e-c9accd1facb0@intel.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Fri, 07 Jun 2019 17:17:29 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 07, 2019 at 04:29:16PM +0200, Sebastian Andrzej Siewior wrote:
-> In commit
-> 
->   39388e80f9b0c ("x86/fpu: Don't save fxregs for ia32 frames in copy_fpstate_to_sigframe()")
-> 
-> I removed the statement
-> |       if (ia32_fxstate)
-> |               copy_fxregs_to_kernel(fpu);
-> 
-> and argued that is was wrongly merged because the content was already
-> saved in kernel's state and the content.
-> This was wrong: It is required to write it back because it is only saved
-> on the user-stack and save_fsave_header() reads it from task's
-> FPU-state. I missed that partâ€¦
-> 
-> Save x87 FPU state unless thread's FPU registers are already up to date.
-> 
-> Fixes: 39388e80f9b0c ("x86/fpu: Don't save fxregs for ia32 frames in copy_fpstate_to_sigframe()")
-> Reported-by: Eric Biggers <ebiggers@kernel.org>
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
->  arch/x86/kernel/fpu/signal.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/arch/x86/kernel/fpu/signal.c b/arch/x86/kernel/fpu/signal.c
-> index 060d6188b4533..0071b794ed193 100644
-> --- a/arch/x86/kernel/fpu/signal.c
-> +++ b/arch/x86/kernel/fpu/signal.c
-> @@ -62,6 +62,11 @@ static inline int save_fsave_header(struct task_struct *tsk, void __user *buf)
->  		struct user_i387_ia32_struct env;
->  		struct _fpstate_32 __user *fp = buf;
->  
-> +		fpregs_lock();
-> +		if (!test_thread_flag(TIF_NEED_FPU_LOAD))
-> +			copy_fxregs_to_kernel(&tsk->thread.fpu);
-> +		fpregs_unlock();
-> +
->  		convert_from_fxsr(&env, tsk);
->  
->  		if (__copy_to_user(buf, &env, sizeof(env)) ||
-> -- 
-> 2.20.1
-> 
+On Fri, Jun 07, 2019 at 11:49:51AM +0200, Rafael J. Wysocki wrote:
+> On 6/4/2019 12:52 AM, Marcelo Tosatti wrote:
+> >The cpuidle-haltpoll driver allows the guest vcpus to poll for a specified
+> >amount of time before halting. This provides the following benefits
+> >to host side polling:
+> >
+> >         1) The POLL flag is set while polling is performed, which allows
+> >            a remote vCPU to avoid sending an IPI (and the associated
+> >            cost of handling the IPI) when performing a wakeup.
+> >
+> >         2) The HLT VM-exit cost can be avoided.
+> >
+> >The downside of guest side polling is that polling is performed
+> >even with other runnable tasks in the host.
+> >
+> >Results comparing halt_poll_ns and server/client application
+> >where a small packet is ping-ponged:
+> >
+> >host                                        --> 31.33
+> >halt_poll_ns=300000 / no guest busy spin    --> 33.40   (93.8%)
+> >halt_poll_ns=0 / guest_halt_poll_ns=300000  --> 32.73   (95.7%)
+> >
+> >For the SAP HANA benchmarks (where idle_spin is a parameter
+> >of the previous version of the patch, results should be the
+> >same):
+> >
+> >hpns == halt_poll_ns
+> >
+> >                           idle_spin=0/   idle_spin=800/    idle_spin=0/
+> >                           hpns=200000    hpns=0            hpns=800000
+> >DeleteC06T03 (100 thread) 1.76           1.71 (-3%)        1.78   (+1%)
+> >InsertC16T02 (100 thread) 2.14           2.07 (-3%)        2.18   (+1.8%)
+> >DeleteC00T01 (1 thread)   1.34           1.28 (-4.5%)	   1.29   (-3.7%)
+> >UpdateC00T03 (1 thread)   4.72           4.18 (-12%)	   4.53   (-5%)
+> >
+> >V2:
+> >
+> >- Move from x86 to generic code (Paolo/Christian).
+> >- Add auto-tuning logic (Paolo).
+> >- Add MSR to disable host side polling (Paolo).
+> >
+> >
+> >
+> First of all, please CC power management patches (including cpuidle,
+> cpufreq etc) to linux-pm@vger.kernel.org (there are people on that
+> list who may want to see your changes before they go in) and CC
+> cpuidle material (in particular) to Peter Zijlstra.
 
-Tested-by: Eric Biggers <ebiggers@kernel.org>
+Ok, Peter is CC'ed, will include linux-pm@vger in the next patches.
 
-- Eric
+> Second, I'm not a big fan of this approach to be honest, as it kind
+> of is a driver trying to play the role of a governor.
+
+Well, its not trying to choose which idle state to enter, because
+there is only one idle state to enter when virtualized (HLT).
+
+> We have a "polling state" already that could be used here in
+> principle so I wonder what would be wrong with that.  
+
+There is no "target residency" concept in the virtualized use-case 
+(which is what poll_state.c uses to calculate the poll time).
+
+Moreover the cpuidle-haltpoll driver uses an adaptive logic to
+tune poll time (which appparently does not make sense for poll_state).
+
+The only thing they share is the main loop structure:
+
+"while (!need_resched()) {
+	cpu_relax();
+	now = ktime_get();
+}"
+
+> Also note that
+> there seems to be at least some code duplication between your code
+> and the "polling state" implementation, so maybe it would be
+> possible to do some things in a common way?
+
+Again, its just the main loop structure that is shared:
+there is no target residency in the virtualized case, 
+and we want an adaptive scheme.
+
+Lets think about deduplication: you would have a cpuidle driver,
+with a fake "target residency". 
+
+Now, it makes no sense to use a governor for the virtualized case
+(again, there is only one idle state: HLT, the host governor is
+used for the actual idle state decision in the host).
+
+So i fail to see how i would go about integrating these two 
+and what are the advantages of doing so ? 
+
+
