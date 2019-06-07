@@ -2,126 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B9BFB37F33
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2019 23:01:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 813C138320
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 05:27:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727631AbfFFVBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Jun 2019 17:01:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:63726 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726969AbfFFVBp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Jun 2019 17:01:45 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 2DB0AC057F2C;
-        Thu,  6 Jun 2019 21:01:37 +0000 (UTC)
-Received: from ultra.random (ovpn-120-155.rdu2.redhat.com [10.10.120.155])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D20537D5B4;
-        Thu,  6 Jun 2019 21:01:32 +0000 (UTC)
-Date:   Thu, 6 Jun 2019 17:01:31 -0400
-From:   Andrea Arcangeli <aarcange@redhat.com>
-To:     Joao Martins <joao.m.martins@oracle.com>
-Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Raslan KarimAllah <karahmed@amazon.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [patch v2 3/3] cpuidle-haltpoll: disable host side polling when
- kvm virtualized
-Message-ID: <20190606210131.GE20928@redhat.com>
-References: <20190603225242.289109849@amt.cnet>
- <20190603225254.360289262@amt.cnet>
- <20190604122404.GA18979@amt.cnet>
- <cb11ef01-b579-1526-d585-0c815f2e1f6f@oracle.com>
- <20190606183632.GA20928@redhat.com>
- <7f988399-7718-d4f4-f59c-792fbcbcf9b3@oracle.com>
- <70bf0678-1ff7-bfc4-1ce2-fe7392ad663a@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <70bf0678-1ff7-bfc4-1ce2-fe7392ad663a@oracle.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 06 Jun 2019 21:01:45 +0000 (UTC)
+        id S1726754AbfFGD11 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Jun 2019 23:27:27 -0400
+Received: from mail-yw1-f65.google.com ([209.85.161.65]:44654 "EHLO
+        mail-yw1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726538AbfFGD11 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Jun 2019 23:27:27 -0400
+Received: by mail-yw1-f65.google.com with SMTP id m80so169185ywd.11
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2019 20:27:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Zyj15udNYieUJw2Ks35d0Z0UvTo9Y5pUANdgp/TRDBA=;
+        b=ak+3D+HUjxzhO+gbm0TCBsG+zy2uKT7ujn9SgegKB6eo3Sadhf5Ea/f7soCcsKwFtY
+         Jv4fV7IX3lJSuU2o7I3BQaSwIDfxhecOlgri2KDpvIpwT0C7w0zJgKe9ioBN7IsQHFNa
+         DbTIELIFH7qz/xNTlI1PdWpf1zAkfJoRU+B64suVEtQrplcHf0y4DiSwZ8p1eRZ9SK7e
+         9zOmtwVSMs4FpdtxzHvZMo/JPkt6MLRobmGWAyFJQzJ3augGcxTNv8cEaKZpEynkGZgr
+         9iMfCBFiRpVGu7+mbbfR0XaWePYlF2Qt2TaK+fG5ljsURVJw/i+E2VlIPtT7otNiQMnY
+         Wkwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Zyj15udNYieUJw2Ks35d0Z0UvTo9Y5pUANdgp/TRDBA=;
+        b=iTHmcxnWZdUxLYHJQ5/hMfXvD/Ucv5ltFTHJWcwfYBvv1wzbY3iOzSo23HnxOrzwdS
+         MY4CiepovcVwl4gUSPzSh1w6YFCnTeTQ6HLpHOLWs95kDUslbRWkOF4pNTdOUbUHeqzz
+         NytYGpC+fiH96+o/JefKJk9zFqjVNOz5fhkQfNGB2JoOtzJFPa7wnxfOJQ3QId6nlQIf
+         4KfEMgXgJ+XhJnyXGWWv5VMN1jIr4CfHbnCW+sf74m5XNiXkQtcDmm8uyElb24K1eyT6
+         sf4h1tRMQjteIhKNeVN8yNsWVrB97NG8xjhGTwHMkVuBC6+xGWDMZfFQRT90q4W7t7XB
+         9Uxg==
+X-Gm-Message-State: APjAAAUGs+Hy6YcUsiD2cFQtLleR3dz5dMZLtcIrsxC6g2pZNsYk3r3q
+        uV+2bUWMir66X2H56htjDKI=
+X-Google-Smtp-Source: APXvYqzfeDPrupgVZ9c0+xfTPRyZVztf4nWVw44A5jPzXkO4RVZN0mjSGQRHfaoyFx+Nj8d3acFLVQ==
+X-Received: by 2002:a81:834c:: with SMTP id t73mr5260819ywf.74.1559878045881;
+        Thu, 06 Jun 2019 20:27:25 -0700 (PDT)
+Received: from [10.2.189.129] ([66.170.99.2])
+        by smtp.gmail.com with ESMTPSA id d21sm241377ywa.29.2019.06.06.20.27.24
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 06 Jun 2019 20:27:25 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [kvm-unit-tests PATCH] x86: Remove xfail in entry check in
+ enter_guest_with_bad_controls()
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <bdc2e93d-ede8-4dab-981d-95e0a9a0558b@redhat.com>
+Date:   Thu, 6 Jun 2019 20:27:23 -0700
+Cc:     kvm@vger.kernel.org, Marc Orr <marcorr@google.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <14D1452D-35AC-41E8-8418-F94445935676@gmail.com>
+References: <20190520095516.15916-1-nadav.amit@gmail.com>
+ <bdc2e93d-ede8-4dab-981d-95e0a9a0558b@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 06, 2019 at 08:22:40PM +0100, Joao Martins wrote:
-> On 6/6/19 7:51 PM, Joao Martins wrote:
-> > On 6/6/19 7:36 PM, Andrea Arcangeli wrote:
-> >> Hello,
-> >>
-> >> On Thu, Jun 06, 2019 at 07:25:28PM +0100, Joao Martins wrote:
-> >>> But I wonder whether we should fail to load cpuidle-haltpoll when host halt
-> >>> polling can't be disabled[*]? That is to avoid polling in both host and guest
-> >>> and *possibly* avoid chances for performance regressions when running on older
-> >>> hypervisors?
-> >>
-> >> I don't think it's necessary: that would force an upgrade of the host
-> >> KVM version in order to use the guest haltpoll feature with an
-> >> upgraded guest kernel that can use the guest haltpoll.
-> >>
-> > Hence why I was suggesting a *guest* cpuidle-haltpoll module parameter to still
-> > allow it to load or otherwise (or allow guest to pick).
-> > 
-> By 'still allow it to load', I meant specifically to handle the case when host
-> polling control is not supported and what to do in that case.
-
-All right, we could add a force=1 parameter to force loading as an
-opt-in (and fail load by default with force=0).
-
-> >> The guest haltpoll is self contained in the guest, so there's no
-> >> reason to prevent that by design or to force upgrade of the KVM host
-> >> version. It'd be more than enough to reload kvm.ko in the host with
-> >> the host haltpoll set to zero with the module parameter already
-> >> available, to achieve the same runtime without requiring a forced host
-> >> upgrade.
-> >>
-> > It's just with the new driver we unilaterally poll on both sides, just felt I
-> > would point it out should this raise unattended performance side effects ;)
-> > 
-> To be clear: by 'unilaterally' I was trying to refer to hosts KVM without
-> polling control (which is safe to say that it is the majority atm?).
+> On Jun 6, 2019, at 5:26 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
 > 
-> Alternatively, there's always the option that if guest sees any issues on that
-> case (with polling on both sides=, that it can always blacklist
-> cpuidle-haltpoll. But may this is not an issue and perhaps majority of users
-> still observes benefit when polling is enabled on guest and host.
+> On 20/05/19 11:55, Nadav Amit wrote:
+>> The test succeeds in failing entry. This is not an expected failure.
+>> 
+>> Cc: Marc Orr <marcorr@google.com>
+>> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+>> ---
+>> x86/vmx.c | 3 +--
+>> 1 file changed, 1 insertion(+), 2 deletions(-)
+>> 
+>> diff --git a/x86/vmx.c b/x86/vmx.c
+>> index f540e15..014bf50 100644
+>> --- a/x86/vmx.c
+>> +++ b/x86/vmx.c
+>> @@ -1833,8 +1833,7 @@ void enter_guest_with_bad_controls(void)
+>> 			"Called enter_guest() after guest returned.");
+>> 
+>> 	ok = vmx_enter_guest(&failure);
+>> -	report_xfail("vmlaunch fails, as expected",
+>> -		     true, ok);
+>> +	report("vmlaunch fails, as expected", !ok);
+>> 	report("failure occurred early", failure.early);
+>> 	report("FLAGS set correctly",
+>> 	       (failure.flags & VMX_ENTRY_FLAGS) == X86_EFLAGS_ZF);
+> 
+> Superseded by commit 74f7e9b ("vmx: introduce
+> enter_guest_with_invalid_guest_state", 2019-04-18); thanks anyway!
 
-It should be workload dependent if it increases performance to
-haltpoll both in both host kernel and guest, the only sure cons is
-that it'd burn some more energy..
+I have some related fixes for recent commits, so I will be waiting for you
+to push the updated kvm-unit-tests before I send the next batch of fixes.
 
-By default the cpuidle-haltpoll driver shouldn't get loaded if it's
-built as a module (the expectation is the default will be =m), and it
-can still easily disabled with rmmod if it hurts performance.
-
-So the policy if to activate guest haltpoll or not will still reside
-in the guest userland: the guest userland code or guest admin, without
-a force parameter has to decide if to load or not to load the module,
-with the force=1 parameter it'll have to decide if to load it with =0
-or =1 (or load it first with =0 and then decide if to try to load it
-again with =1 which would be the benefit the force parameter
-provides). To decide if to load or not to load it, the guest userland
-could check if there's no support for disabling the host haltpoll,
-which can be verified with rdmsr too.
-
-# rdmsr 0x4b564d05
-rdmsr: CPU 0 cannot read MSR 0x4b564d05
-
-Adding a force=1 parameter to force loading will just add a few lines
-more of kernel code, I'm neutral on that but it looks fine either
-ways.
-
-Thanks,
-Andrea
