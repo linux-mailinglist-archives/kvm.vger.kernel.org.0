@@ -2,77 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E48B392CC
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 19:08:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35606392CF
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 19:10:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731205AbfFGRIe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jun 2019 13:08:34 -0400
-Received: from mga02.intel.com ([134.134.136.20]:20601 "EHLO mga02.intel.com"
+        id S1731212AbfFGRJw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jun 2019 13:09:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43582 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731202AbfFGRIe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jun 2019 13:08:34 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Jun 2019 10:08:33 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by fmsmga004.fm.intel.com with ESMTP; 07 Jun 2019 10:08:32 -0700
-Date:   Fri, 7 Jun 2019 10:08:32 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH 06/15] KVM: nVMX: Don't "put" vCPU or host state when
- switching VMCS
-Message-ID: <20190607170832.GF9083@linux.intel.com>
-References: <20190507160640.4812-1-sean.j.christopherson@intel.com>
- <20190507160640.4812-7-sean.j.christopherson@intel.com>
- <79ac3a1c-8386-3f5a-2abd-eb284407abb7@redhat.com>
- <20190606185727.GK23169@linux.intel.com>
- <10df352d-d90b-8594-cc1c-5a5f8df689f7@redhat.com>
+        id S1730196AbfFGRJw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jun 2019 13:09:52 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1712B208E3;
+        Fri,  7 Jun 2019 17:09:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1559927391;
+        bh=zTE9Vnc80prCH8PSEwnKTNhjRC5uBLiJcuWCP0FnZBQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ZgApmZjjjZArxNzMJS92zb1duXOLfAHnxFWRojQpdAga3W+RgadVqRoCPs2s886O9
+         WexWxrHwX2eTwI87ZGkFjAOzQdHA71NFyKrqbDFaLMhyP+sGDlo9ITk+SkKm/mEv1Y
+         zCNDruhQwMAkzM7sov7CcGUS7Weuon4IZXp/aAi4=
+Date:   Fri, 7 Jun 2019 10:09:49 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     x86-ml <x86@kernel.org>, Borislav Petkov <bp@suse.de>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Jann Horn <jannh@google.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        kvm ML <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Rik van Riel <riel@surriel.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] x86/fpu: Update kernel's FPU state before using for the
+ fsave header
+Message-ID: <20190607170949.GA648@sol.localdomain>
+References: <20190604185358.GA820@sol.localdomain>
+ <20190605140405.2nnpqslnjpfe2ig2@linutronix.de>
+ <20190605173256.GA86462@gmail.com>
+ <20190606173026.ty7c4cvftrvfrwy3@linutronix.de>
+ <20190607142915.y52mfmgk5lvhll7n@linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <10df352d-d90b-8594-cc1c-5a5f8df689f7@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190607142915.y52mfmgk5lvhll7n@linutronix.de>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 07, 2019 at 07:00:06PM +0200, Paolo Bonzini wrote:
-> On 06/06/19 20:57, Sean Christopherson wrote:
-> > What about taking the vmcs pointers, and using old/new instead of
-> > prev/cur?  Calling it prev is wonky since it's pulled from the current
-> > value of loaded_cpu_state, especially since cur is the same type.
-> > That oddity is also why I grabbed prev before setting loaded_vmcs,
-> > it just felt wrong even though they really are two separate things.
-> > 
-> > static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
-> > 				     struct loaded_vmcs *old,
-> > 				     struct loaded_vmcs *new)
+On Fri, Jun 07, 2019 at 04:29:16PM +0200, Sebastian Andrzej Siewior wrote:
+> In commit
 > 
-> I had it like that in the beginning actually.  But the idea of this
-> function is that because we're switching vmcs's, the host register
-> fields have to be moved to the VMCS that will be used next.  I don't see
-> how it would be used with old and new being anything other than
-> vmx->loaded_cpu_state and vmx->loaded_vmcs and, because we're switching
-> VMCS, those are the "previously" active VMCS and the "currently" active
-> VMCS.
+>   39388e80f9b0c ("x86/fpu: Don't save fxregs for ia32 frames in copy_fpstate_to_sigframe()")
 > 
-> What would also make sense, is to change loaded_cpu_state to a bool (it
-> must always be equal to loaded_vmcs anyway) and make the prototype
-> something like this:
+> I removed the statement
+> |       if (ia32_fxstate)
+> |               copy_fxregs_to_kernel(fpu);
 > 
-> static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
-> 				     struct loaded_vmcs *prev)
+> and argued that is was wrongly merged because the content was already
+> saved in kernel's state and the content.
+> This was wrong: It is required to write it back because it is only saved
+> on the user-stack and save_fsave_header() reads it from task's
+> FPU-state. I missed that part…
 > 
+> Save x87 FPU state unless thread's FPU registers are already up to date.
 > 
-> I'll send a patch.
+> Fixes: 39388e80f9b0c ("x86/fpu: Don't save fxregs for ia32 frames in copy_fpstate_to_sigframe()")
+> Reported-by: Eric Biggers <ebiggers@kernel.org>
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
+>  arch/x86/kernel/fpu/signal.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/arch/x86/kernel/fpu/signal.c b/arch/x86/kernel/fpu/signal.c
+> index 060d6188b4533..0071b794ed193 100644
+> --- a/arch/x86/kernel/fpu/signal.c
+> +++ b/arch/x86/kernel/fpu/signal.c
+> @@ -62,6 +62,11 @@ static inline int save_fsave_header(struct task_struct *tsk, void __user *buf)
+>  		struct user_i387_ia32_struct env;
+>  		struct _fpstate_32 __user *fp = buf;
+>  
+> +		fpregs_lock();
+> +		if (!test_thread_flag(TIF_NEED_FPU_LOAD))
+> +			copy_fxregs_to_kernel(&tsk->thread.fpu);
+> +		fpregs_unlock();
+> +
+>  		convert_from_fxsr(&env, tsk);
+>  
+>  		if (__copy_to_user(buf, &env, sizeof(env)) ||
+> -- 
+> 2.20.1
+> 
 
-Works for me.  The only reason I made loaded_cpu_state was so that
-vmx_prepare_switch_to_host() could WARN on it diverging from loaded_vmcs.
-Seeing as how that WARN has never fired, I'm comfortable making it a bool.
+Tested-by: Eric Biggers <ebiggers@kernel.org>
+
+- Eric
