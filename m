@@ -2,62 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A6C433918C
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 18:04:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC03539198
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 18:06:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729629AbfFGQEY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jun 2019 12:04:24 -0400
-Received: from mga06.intel.com ([134.134.136.31]:37185 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729133AbfFGQEY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jun 2019 12:04:24 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Jun 2019 09:04:23 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by orsmga006.jf.intel.com with ESMTP; 07 Jun 2019 09:04:22 -0700
-Date:   Fri, 7 Jun 2019 09:04:22 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: nVMX: Rename prepare_vmcs02_*_full to
- prepare_vmcs02_*_extra
-Message-ID: <20190607160422.GE9083@linux.intel.com>
-References: <1559834652-105872-1-git-send-email-pbonzini@redhat.com>
- <20190606184117.GJ23169@linux.intel.com>
- <8382fd94-aed1-51b4-007e-7579a0f35ece@redhat.com>
- <20190607141847.GA9083@linux.intel.com>
- <5762005d-1504-bb41-9583-ec549e107ce5@redhat.com>
+        id S1729782AbfFGQGn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jun 2019 12:06:43 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35300 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729408AbfFGQGn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 7 Jun 2019 12:06:43 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x57FvGOA132100
+        for <kvm@vger.kernel.org>; Fri, 7 Jun 2019 12:06:41 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2syth4hyd7-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 07 Jun 2019 12:06:40 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Fri, 7 Jun 2019 17:06:36 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 7 Jun 2019 17:06:32 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x57G6Vsl58982588
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 7 Jun 2019 16:06:32 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D22ADAE056;
+        Fri,  7 Jun 2019 16:06:31 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 82A47AE045;
+        Fri,  7 Jun 2019 16:06:31 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.168])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  7 Jun 2019 16:06:31 +0000 (GMT)
+Date:   Fri, 7 Jun 2019 18:06:30 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Libvirt Devel <libvir-list@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Erik Skultety <eskultet@redhat.com>,
+        Pavel Hrdina <phrdina@redhat.com>,
+        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+        Sylvain Bauza <sbauza@redhat.com>
+Subject: Re: mdevctl: A shoestring mediated device management and
+ persistence utility
+In-Reply-To: <20190524121106.16e08562.cohuck@redhat.com>
+References: <20190523172001.41f386d8@x1.home>
+ <20190524121106.16e08562.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5762005d-1504-bb41-9583-ec549e107ce5@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19060716-0008-0000-0000-000002F14B12
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19060716-0009-0000-0000-0000225E3C29
+Message-Id: <20190607180630.7e8e24d4.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-07_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906070109
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 07, 2019 at 05:17:09PM +0200, Paolo Bonzini wrote:
-> On 07/06/19 16:18, Sean Christopherson wrote:
-> > On Fri, Jun 07, 2019 at 02:19:20PM +0200, Paolo Bonzini wrote:
-> >> On 06/06/19 20:41, Sean Christopherson wrote:
-> >>>> +static void prepare_vmcs02_early_extra(struct vcpu_vmx *vmx,
-> >>> Or maybe 'uncommon', 'rare' or 'ext'?  I don't I particularly love any of
-> >>> the names, but they're all better than 'full'.
-> >>
-> >> I thought 'ext' was short for 'extra'? :)
-> > 
-> > Ha, I (obviously) didn't make that connection.  ext == extended in my mind.
+On Fri, 24 May 2019 12:11:06 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Thu, 23 May 2019 17:20:01 -0600
+> Alex Williamson <alex.williamson@redhat.com> wrote:
 > 
-> That's what came to mind first, but then "extended" had the same issue
-> as "full" (i.e. encompassing the "basic" set as well) so I decided you
-> knew better!
+> > Hi,
+> > 
 
-Ah, I was thinking of "basic" and "extended" as separate states, but your
-interpretation is correct.
+[..]
 
-I probably have a slight preference for 'uncommon' over 'extra'?  I feel
-like they have equal odds of being misinterpreted, so pick your poison :-)
+> > 
+> > It would be really useful if s390 folks could help me understand
+> > whether it's possible to glean all the information necessary to
+> > recreate a ccw or ap mdev device from sysfs.  I expect the file where
+> > we currently only store the mdev_type to evolve into something that
+> > includes more information to facilitate more complicated devices.  For
+> > now I make no claims to maintaining compatibility of recorded mdev
+> > devices, it will absolutely change, but I didn't want to get bogged
+> > down in making sure I don't accidentally source a root kit hidden in an
+> > mdev config file.
+> 
+> I played a bit with it on my LPAR, and it is at least not obviously
+> broken with vfio-ccw :) I don't have any ap devices to play with,
+> though.
+> 
+
+Sorry for being late...
+
+I guess for vfio-ccw one needs to make sure that the ccw device is bound
+to the vfio-ccw driver first, and only after that can one use  
+create-mdev to create the mdev on top of the subchannel.
+
+So to make this work persistently (survive a reboot) one would need to
+take care of the subchannel getting bound to the right vfio_ccw driver
+before mdevctl is called. Right?
+
+BTW how does this concurrence situation between the drivers io_subchannel
+and vfio_ccw work? Especially if both are build in?
+
+> > 
+> > I'm also curious how or if libvirt or openstack might use this.  If
+> > nothing else, it makes libvirt hook scripts easier to write, especially
+> > if we add an option not to autostart mdevs, or if users don't mind
+> > persistent mdevs, maybe there's nothing more to do.
+> > 
+
++1
+
+@Alex: I'm curious what is the big management picture for non-auto looks
+like.
+
+Regards,
+Halil
+
+[..]
+
