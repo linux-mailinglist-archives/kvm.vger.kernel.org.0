@@ -2,242 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C7EA39664
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 22:03:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E4FA3397E9
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 23:39:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730625AbfFGUDu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jun 2019 16:03:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59134 "EHLO mx1.redhat.com"
+        id S1731366AbfFGVjK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jun 2019 17:39:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37856 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729342AbfFGUDu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jun 2019 16:03:50 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        id S1731339AbfFGVjJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jun 2019 17:39:09 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B5C4388318;
-        Fri,  7 Jun 2019 20:03:49 +0000 (UTC)
-Received: from x1.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 010C91001943;
-        Fri,  7 Jun 2019 20:03:45 +0000 (UTC)
-Date:   Fri, 7 Jun 2019 14:03:44 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        libvir-list@redhat.com, Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH RFC 1/1] allow to specify additional config data
-Message-ID: <20190607140344.0399b766@x1.home>
-In-Reply-To: <ed75a4de-da0b-f6cf-6164-44cebc82c3a5@linux.ibm.com>
-References: <20190606144417.1824-1-cohuck@redhat.com>
-        <20190606144417.1824-2-cohuck@redhat.com>
-        <20190606093224.3ecb92c7@x1.home>
-        <20190606101552.6fc62bef@x1.home>
-        <ed75a4de-da0b-f6cf-6164-44cebc82c3a5@linux.ibm.com>
-Organization: Red Hat
+        by mx1.redhat.com (Postfix) with ESMTPS id C9EEEF74CF;
+        Fri,  7 Jun 2019 21:39:08 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-16.gru2.redhat.com [10.97.112.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AFFD85D9D6;
+        Fri,  7 Jun 2019 21:39:05 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id 8E95B105157;
+        Fri,  7 Jun 2019 17:20:56 -0300 (BRT)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id x57KKqZ4021562;
+        Fri, 7 Jun 2019 17:20:52 -0300
+Date:   Fri, 7 Jun 2019 17:20:47 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Andrea Arcangeli <aarcange@redhat.com>
+Cc:     kvm-devel <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Raslan KarimAllah <karahmed@amazon.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: Re: [patch 1/3] drivers/cpuidle: add cpuidle-haltpoll driver
+Message-ID: <20190607202044.GA5542@amt.cnet>
+References: <20190603225242.289109849@amt.cnet>
+ <20190603225254.212931277@amt.cnet>
+ <20190606175103.GD28785@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 07 Jun 2019 20:03:49 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190606175103.GD28785@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Fri, 07 Jun 2019 21:39:08 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 7 Jun 2019 14:26:13 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+Hi Andrea,
 
-> On 6/6/19 12:15 PM, Alex Williamson wrote:
-> > On Thu, 6 Jun 2019 09:32:24 -0600
-> > Alex Williamson <alex.williamson@redhat.com> wrote:
-> >   
-> >> On Thu,  6 Jun 2019 16:44:17 +0200
-> >> Cornelia Huck <cohuck@redhat.com> wrote:
-> >>  
-> >>> Add a rough implementation for vfio-ap.
-> >>>
-> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> >>> ---
-> >>>   mdevctl.libexec | 25 ++++++++++++++++++++++
-> >>>   mdevctl.sbin    | 56 ++++++++++++++++++++++++++++++++++++++++++++++++-
-> >>>   2 files changed, 80 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/mdevctl.libexec b/mdevctl.libexec
-> >>> index 804166b5086d..cc0546142924 100755
-> >>> --- a/mdevctl.libexec
-> >>> +++ b/mdevctl.libexec
-> >>> @@ -54,6 +54,19 @@ wait_for_supported_types () {
-> >>>       fi
-> >>>   }
-> >>>   
-> >>> +# configure vfio-ap devices <config entry> <matrix attribute>
-> >>> +configure_ap_devices() {
-> >>> +    list="`echo "${config[$1]}" | sed 's/,/ /'`"
-> >>> +    [ -z "$list" ] && return
-> >>> +    for a in $list; do
-> >>> +        echo "$a" > "$supported_types/${config[mdev_type]}/devices/$uuid/$2"
-> >>> +        if [ $? -ne 0 ]; then
-> >>> +            echo "Error writing '$a' to '$uuid/$2'" >&2
-> >>> +            exit 1
-> >>> +        fi
-> >>> +    done
-> >>> +}
-> >>> +
-> >>>   case ${1} in
-> >>>       start-mdev|stop-mdev)
-> >>>           if [ $# -ne 2 ]; then
-> >>> @@ -148,6 +161,18 @@ case ${cmd} in
-> >>>               echo "Error creating mdev type ${config[mdev_type]} on $parent" >&2
-> >>>               exit 1
-> >>>           fi
-> >>> +
-> >>> +        # some types may specify additional config data
-> >>> +        case ${config[mdev_type]} in
-> >>> +            vfio_ap-passthrough)  
-> >>
-> >> I think this could have some application beyond ap too, I know NVIDIA
-> >> GRID vGPUs do have some controls under the vendor hierarchy of the
-> >> device, ex. setting the frame rate limiter.  The implementation here is
-> >> a bit rigid, we know a specific protocol for a specific mdev type, but
-> >> for supporting arbitrary vendor options we'd really just want to try to
-> >> apply whatever options are provided.  If we didn't care about ordering,
-> >> we could just look for keys for every file in the device's immediate
-> >> sysfs hierarchy and apply any value we find, independent of the
-> >> mdev_type, ex. intel_vgpu/foo=bar  Thanks,  
-> > 
-> > For example:
-> > 
-> > for key in find -P $mdev_base/$uuid/ \( -path
-> > "$mdev_base/$uuid/power/*" -o -path $mdev_base/$uuid/uevent -o -path $mdev_base/$uuid/remove \) -prune -o -type f -print | sed -e "s|$mdev_base/$uuid/||g"); do
-> >    [ -z ${config[$key]} ] && continue
-> >    ... parse value(s) and iteratively apply to key
-> > done
-> > 
-> > The find is a little ugly to exclude stuff, maybe we just let people do
-> > screwy stuff like specify remove=1 in their config.  Also need to think
-> > about whether we're imposing a delimiter to apply multiple values to a
-> > key that conflicts with the attribute usage.  Thanks,
-> > 
-> > Alex  
+On Thu, Jun 06, 2019 at 01:51:03PM -0400, Andrea Arcangeli wrote:
+> Hello,
 > 
-> I like the idea of looking for files in the device's immediate sysfs
-> hierarchy, but maybe the find could exclude attributes that are
-> not vendor defined.
-
-How would we know what attributes are vendor defined?  The above `find`
-strips out the power, uevent, and remove attributes, which for GVT-g
-leaves only the vendor defined attributes[1], but I don't know how to
-instead do a positive match of the vendor attributes without
-unmaintainable lookup tables.  This starts to get into the question of
-how much do we want to (or need to) protect the user from themselves.
-If we let the user specify a key=value of remove=1 and the device
-immediately disappears, is that a bug or a feature?  Thanks,
-
-Alex
-
-[1] GVT-g doesn't actually have an writable attributes, so we'd also
-minimally want to add a test to skip read-only attributes.
-
-> >>> +                configure_ap_devices ap_adapters assign_adapter
-> >>> +                configure_ap_devices ap_domains assign_domain
-> >>> +                configure_ap_devices ap_control_domains assign_control_domain
-> >>> +                # TODO: is assigning idempotent? Should we unwind on error?
-> >>> +                ;;
-> >>> +            *)
-> >>> +                ;;
-> >>> +        esac
-> >>>           ;;
-> >>>   
-> >>>       add-mdev)
-> >>> diff --git a/mdevctl.sbin b/mdevctl.sbin
-> >>> index 276cf6ddc817..eb5ee0091879 100755
-> >>> --- a/mdevctl.sbin
-> >>> +++ b/mdevctl.sbin
-> >>> @@ -33,6 +33,8 @@ usage() {
-> >>>       echo "set-start <mdev UUID>: change mdev start policy, if no option specified," >&2
-> >>>       echo "                       system default policy is used" >&2
-> >>>       echo "                       options: [--auto] [--manual]" >&2
-> >>> +    echo "set-additional-config <mdev UUID> {fmt...}: supply additional configuration" >&2
-> >>> +    echo "show-additional-config-format <mdev UUiD>:  prints the format expected by the device" >&2
-> >>>       echo "list-all: list all possible mdev types supported in the system" >&2
-> >>>       echo "list-available: list all mdev types currently available" >&2
-> >>>       echo "list-mdevs: list currently configured mdevs" >&2
-> >>> @@ -48,7 +50,7 @@ while (($# > 0)); do
-> >>>           --manual)
-> >>>               config[start]=manual
-> >>>               ;;
-> >>> -        start-mdev|stop-mdev|remove-mdev|set-start)
-> >>> +        start-mdev|stop-mdev|remove-mdev|set-start|show-additional-config-format)
-> >>>               [ $# -ne 2 ] && usage
-> >>>               cmd=$1
-> >>>               uuid=$2
-> >>> @@ -67,6 +69,14 @@ while (($# > 0)); do
-> >>>               cmd=$1
-> >>>               break
-> >>>               ;;
-> >>> +        set-additional-config)
-> >>> +            [ $# -le 2 ] && usage
-> >>> +            cmd=$1
-> >>> +            uuid=$2
-> >>> +            shift 2
-> >>> +            addtl_config="$*"
-> >>> +            break
-> >>> +            ;;
-> >>>           *)
-> >>>               usage
-> >>>               ;;
-> >>> @@ -114,6 +124,50 @@ case ${cmd} in
-> >>>           fi
-> >>>           ;;
-> >>>   
-> >>> +    set-additional-config)
-> >>> +        file=$(find $persist_base -name $uuid -type f)
-> >>> +        if [ -w "$file" ]; then
-> >>> +            read_config "$file"
-> >>> +            if [ ${config[start]} == "auto" ]; then
-> >>> +                systemctl stop mdev@$uuid.service
-> >>> +            fi
-> >>> +            # FIXME: validate input!
-> >>> +            for i in $addtl_config; do
-> >>> +                key="`echo "$i" | cut -d '=' -f 1`"
-> >>> +                value="`echo "$i" | cut -d '=' -f 2-`"
-> >>> +                if grep -q ^$key $file; then
-> >>> +                    if [ -z "$value" ]; then
-> >>> +                        sed -i "s/^$key=.*//g" $file
-> >>> +                    else
-> >>> +                        sed -i "s/^$key=.*/$key=$value/g" $file
-> >>> +                    fi
-> >>> +                else
-> >>> +                    echo "$i" >> "$file"
-> >>> +                fi
-> >>> +            done
-> >>> +            if [ ${config[start]} == "auto" ]; then
-> >>> +                systemctl start mdev@$uuid.service
-> >>> +            fi
-> >>> +        else
-> >>> +            exit 1
-> >>> +        fi
-> >>> +        ;;
-> >>> +
-> >>> +    show-additional-config-format)
-> >>> +        file=$(find $persist_base -name $uuid -type f)
-> >>> +        read_config "$file"
-> >>> +        case ${config[mdev_type]} in
-> >>> +            vfio_ap-passthrough)
-> >>> +                echo "ap_adapters=<comma-separated list of adapters>"
-> >>> +                echo "ap_domains=<comma-separated list of domains>"
-> >>> +                echo "ap_control_domains=<comma-separated list of control domains>"
-> >>> +                ;;
-> >>> +            *)
-> >>> +                echo "no additional configuration defined"
-> >>> +                ;;
-> >>> +        esac
-> >>> +        ;;
-> >>> +
-> >>>       list-mdevs)
-> >>>           for mdev in $(find $mdev_base/ -maxdepth 1 -mindepth 1 -type l); do
-> >>>               uuid=$(basename $mdev)  
-> >>  
-> >   
+> On Mon, Jun 03, 2019 at 07:52:43PM -0300, Marcelo Tosatti wrote:
+> > +unsigned int guest_halt_poll_ns = 200000;
+> > +module_param(guest_halt_poll_ns, uint, 0644);
+> > +
+> > +/* division factor to shrink halt_poll_ns */
+> > +unsigned int guest_halt_poll_shrink = 2;
+> > +module_param(guest_halt_poll_shrink, uint, 0644);
+> > +
+> > +/* multiplication factor to grow per-cpu halt_poll_ns */
+> > +unsigned int guest_halt_poll_grow = 2;
+> > +module_param(guest_halt_poll_grow, uint, 0644);
+> > +
+> > +/* value in ns to start growing per-cpu halt_poll_ns */
+> > +unsigned int guest_halt_poll_grow_start = 10000;
+> > +module_param(guest_halt_poll_grow_start, uint, 0644);
+> > +
+> > +/* value in ns to start growing per-cpu halt_poll_ns */
+> > +bool guest_halt_poll_allow_shrink = true;
+> > +module_param(guest_halt_poll_allow_shrink, bool, 0644);
 > 
+> These variables can all be static. They also should be __read_mostly
+> to be sure not to unnecessarily hit false sharing while going idle.
 
+Fixed.
+
+> 
+> > +		while (!need_resched()) {
+> > +			cpu_relax();
+> > +			now = ktime_get();
+> > +
+> > +			if (!ktime_before(now, end_spin)) {
+> > +				do_halt = 1;
+> > +				break;
+> > +			}
+> > +		}
+> 
+> On skylake pause takes ~75 cycles with ple_gap=0 (and Marcelo found it
+> takes 6 cycles with pause loop exiting enabled but that shall be fixed
+> in the CPU and we can ignore it).
+
+Right, that is a generic problem.
+
+> So we could call ktime_get() only once every 100 times or more and
+> we'd be still accurate down to at least 1usec.
+> 
+> Ideally we'd like a ktime_try_get() that will break the seqcount loop
+> if read_seqcount_retry fails. Something like below pseudocode:
+> 
+> #define KTIME_ERR ((ktime_t) { .tv64 = 0 })
+> 
+> ktime_t ktime_try_get(void)
+> {
+> 	[..]
+> 	seq = read_seqcount_begin(&timekeeper_seq);
+> 	secs = tk->xtime_sec + tk->wall_to_monotonic.tv_sec;
+> 	nsecs = timekeeping_get_ns(&tk->tkr_mono) +
+> 		tk->wall_to_monotonic.tv_nsec;
+> 	if (unlikely(read_seqcount_retry(&timekeeper_seq, seq)))
+> 		return KTIME_ERR;
+> 	[..]
+> }
+> 
+> If it ktime_try_get() fails we keep calling it at every iteration of
+> the loop, when finally it succeeds we call it again only after 100
+> pause instructions or more. So we continue polling need_resched()
+> while we wait timerkeeper_seq to be released (and hopefully by looping
+> 100 times or more we'll reduce the frequency when we find
+> timekeeper_seq locked).
+> 
+> All we care is to react to need_resched ASAP and to have a resolution
+> of the order of 1usec for the spin time.
+> 
+> If 100 is too wired a new module parameter in __read_mostly section
+> configured to 100 or more by default, sounds preferable than hitting
+> every 75nsec on the timekeeper_seq seqcount cacheline.
+
+I'll switch to the cheaper sched_clock as suggested by Peter. 
+
+Thanks!
+
+> 
+> I doubt it'd make any measurable difference with a few vcpus, but with
+> hundred of host CPUs and vcpus perhaps it's worth it.
+> 
+> This of course can be done later once the patch is merged and if it's
+> confirmed the above makes sense in practice and not just in theory. I
+> wouldn't want to delay the merging for a possible micro optimization.
+> 
+> Reviewed-by: Andrea Arcangeli <aarcange@redhat.com>
+> 
+> Thanks,
+> Andrea
