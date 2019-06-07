@@ -2,51 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B0ADB3940B
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 20:13:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39DD839433
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 20:22:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731179AbfFGSNZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jun 2019 14:13:25 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44550 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731017AbfFGSNY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jun 2019 14:13:24 -0400
-Received: by mail-wr1-f68.google.com with SMTP id b17so3030422wrq.11
-        for <kvm@vger.kernel.org>; Fri, 07 Jun 2019 11:13:23 -0700 (PDT)
+        id S1731387AbfFGSWj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jun 2019 14:22:39 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:34500 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730183AbfFGSWj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jun 2019 14:22:39 -0400
+Received: by mail-wr1-f67.google.com with SMTP id e16so3102179wrn.1
+        for <kvm@vger.kernel.org>; Fri, 07 Jun 2019 11:22:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=EosIO25kscDdg4/deIdAXrXIX/FDoWhyB9PaERsqjT8=;
-        b=sErcL8b5zA02M8YIVL8g5D2OgS1OksP0u0q3kUPK/xLig1yGBeTJ4ZuAg6tm9pc4MK
-         +Cyp3JcNQ/XIOCG4fpES40hdGT0Xrll/WxLDVHfWNAWX3ZSQUxK9tIC5N5zXNBp3n1/O
-         cor9ujMAcce2wd2MnjRCHnkPtWky7kkSgWYDlClW1rY5mLzKW86mbBVc4kaENnrNlmnU
-         TZ/EQofswN3ucy9FuEhaSEY9Hn+0w6IijJfv4TMyKskNs5UDHICTDhoVA/l962JK8R3Q
-         wQ4V75lJENI8zqGINM0qrcgoCqH855iCGq97x/4pjT36y/GqI74cWjOhzxcTK1pbyT4L
-         xVBw==
-X-Gm-Message-State: APjAAAXtWiql7OH+2Mfd+7mbuk+NPs7F6UjLIduxyVmSQB1+TatONebb
-        sU33Z+6lfGt2dDjt1ruaq2dNdrqIqJo=
-X-Google-Smtp-Source: APXvYqxP6cfcdMrFlzUn4io5BVLKCM01R591Zj4sqsIG/1P3jh9zZMqspSJglpTb+em4cSqroAXVTw==
-X-Received: by 2002:a5d:4603:: with SMTP id t3mr11524174wrq.315.1559931203159;
-        Fri, 07 Jun 2019 11:13:23 -0700 (PDT)
+        bh=eNp/kwCcjJ3WyRs1HdEQeYz66YbQ4zXrLFnd6CGtqfQ=;
+        b=EdgF3WN2ThPxrTFdLDp3bX1Vabyk1PiEmFfRXSIoOUABMnL24ZArXp67cQAmlFvlMa
+         wfPF26Tmrw3yDRcueqKHdzNXAPFd3xfHV2qM5uzHqIUsmg6ACZy93AsQ4DulePKdDwjo
+         B1rAfij0ya+AxWMlYbIDf7BStVmcTPstl63ESEMe+EAi5fTOrkcV3SIHGktnAmfjgNOV
+         00LxJI6wblplrGzah5s8M89iLSjaSa4l7mjsbhccLpbBzOi4RQh96TjtDevNL417m1F3
+         MiXBvpZ4rkuwBszF4B/XDR2ibup4CWdr7jRsTytOsPm1WzawLFL2FLqzU/Ts8b8Z1L32
+         1G3g==
+X-Gm-Message-State: APjAAAVha9emNF0bRo4GU1q4zl0ik20dhew4ibhyWb9aoYPKJtc26Wj1
+        Yc4t4d+ipkAqwA6P8ZhvHbVZHw==
+X-Google-Smtp-Source: APXvYqwrf60J+k2JN6vMRpE7QAF5l8jsltiwzK3HTHX6hWafz/VFEn5A2JWE/ev0sD8j3/Nw/SvQPA==
+X-Received: by 2002:a5d:414c:: with SMTP id c12mr21816421wrq.88.1559931757855;
+        Fri, 07 Jun 2019 11:22:37 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:d43d:6da3:9364:a775? ([2001:b07:6468:f312:d43d:6da3:9364:a775])
-        by smtp.gmail.com with ESMTPSA id b2sm3323821wrp.72.2019.06.07.11.13.22
+        by smtp.gmail.com with ESMTPSA id w14sm2975048wrt.59.2019.06.07.11.22.36
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 07 Jun 2019 11:13:22 -0700 (PDT)
-Subject: Re: [PATCH] KVM: VMX: simplify vmx_prepare_switch_to_{guest,host}
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <1559927301-8124-1-git-send-email-pbonzini@redhat.com>
- <20190607173710.GG9083@linux.intel.com>
- <20190607174753.GH9083@linux.intel.com>
+        Fri, 07 Jun 2019 11:22:37 -0700 (PDT)
+Subject: Re: [patch 0/3] cpuidle-haltpoll driver (v2)
+To:     Marcelo Tosatti <mtosatti@redhat.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+Cc:     kvm-devel <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LDhD9tw4PCocOFPw==?= <rkrcmar@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Raslan KarimAllah <karahmed@amazon.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Linux PM <linux-pm@vger.kernel.org>
+References: <20190603225242.289109849@amt.cnet>
+ <6c411948-9e32-9f41-351e-c9accd1facb0@intel.com>
+ <20190607171645.GA28275@amt.cnet>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <11522be0-4d38-a8e5-e4cd-274c8e309b2f@redhat.com>
-Date:   Fri, 7 Jun 2019 20:13:21 +0200
+Message-ID: <9c3853cc-d920-03e8-245c-86c33b280c80@redhat.com>
+Date:   Fri, 7 Jun 2019 20:22:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190607174753.GH9083@linux.intel.com>
+In-Reply-To: <20190607171645.GA28275@amt.cnet>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -55,19 +66,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/06/19 19:47, Sean Christopherson wrote:
->> This is the hiccup with naming it sregs_loaded.  The split bools is also
->> kinda wonky since the 32->64 case is a one-off scenario.  I think a
->> cleaner solution would be to remove guest_msrs_dirty and refresh the MSRs
->> directly from setup_msrs().  Then loaded_cpu_state -> loaded_guest_state
->> can be a straight conversion from loaded_vmcs -> bool.  I'll send patches.
-> Actually, would it be easier on your end if I do a v2 of the series that
-> would introduce vmx_sync_vmcs_host_state(), and splice these patch into it?
+On 07/06/19 19:16, Marcelo Tosatti wrote:
+> There is no "target residency" concept in the virtualized use-case 
+> (which is what poll_state.c uses to calculate the poll time).
 
-For now I'll just rename it to guest_state_loaded, let's do further
-cleanups on top.  My plan is to post my version of everything after
-testing so that you can do a "git range-diff" between my patches and
-yours.  (For exposure I'll probably push that to kvm/queue, but I don't
-intend to merge them to kvm/next without your review).
+Actually there is: it is the cost of a vmexit, and it be calibrated with
+a very short CPUID loop (e.g. run 100 CPUID instructions and take the
+smallest TSC interval---it should take less than 50 microseconds, and
+less than a millisecond even on nested virt).
+
+I think it would make sense to improve poll_state.c to use an adaptive
+algorithm similar to the one you implemented, which includes optionally
+allowing to poll for an interval larger than the target residency.
 
 Paolo
