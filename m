@@ -2,95 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D765B397E7
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2019 23:39:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B334399FB
+	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2019 03:07:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731357AbfFGVjJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jun 2019 17:39:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:20046 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729731AbfFGVjI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jun 2019 17:39:08 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 85F643079B83;
-        Fri,  7 Jun 2019 21:39:08 +0000 (UTC)
-Received: from amt.cnet (ovpn-112-16.gru2.redhat.com [10.97.112.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AD6141001B04;
-        Fri,  7 Jun 2019 21:39:05 +0000 (UTC)
-Received: from amt.cnet (localhost [127.0.0.1])
-        by amt.cnet (Postfix) with ESMTP id 09775105169;
-        Fri,  7 Jun 2019 18:38:34 -0300 (BRT)
-Received: (from marcelo@localhost)
-        by amt.cnet (8.14.7/8.14.7/Submit) id x57LcUHZ028784;
-        Fri, 7 Jun 2019 18:38:30 -0300
-Date:   Fri, 7 Jun 2019 18:38:29 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        Radim =?iso-8859-1?B?S3LEP23DocU/?= <rkrcmar@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Raslan KarimAllah <karahmed@amazon.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Linux PM <linux-pm@vger.kernel.org>
-Subject: Re: [patch 0/3] cpuidle-haltpoll driver (v2)
-Message-ID: <20190607213826.GA25364@amt.cnet>
-References: <20190603225242.289109849@amt.cnet>
- <6c411948-9e32-9f41-351e-c9accd1facb0@intel.com>
- <20190607171645.GA28275@amt.cnet>
- <9c3853cc-d920-03e8-245c-86c33b280c80@redhat.com>
+        id S1729685AbfFHBHc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jun 2019 21:07:32 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:38500 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728441AbfFHBHc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jun 2019 21:07:32 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x580xWo1111733;
+        Sat, 8 Jun 2019 01:07:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=Vp7vKN+uZRTgmaqNUCB1V+HRD9fr7LLOJoGf3ypuppw=;
+ b=ckHv74ZT2CiZ3haw2JlibcPNyOHyKh5ETyfZMfrDtbIOybTaSxHkzouD57VUtFD7HKvh
+ 1u593bBosmQIWO5TPmCHW34rqvkZtbo+00vAEIi4wzc6Ct/PEXfhat+RYhgVU9iy/9nH
+ 3CAbWvIpwIu+BxQmoUMevNN9cOms4XLrZqCD4FvwODpbc2Vj2N1c0gdw2DQsEA1dUEVw
+ qRYadPAF1CHUciB4gejaL9qUkFlw4rDhHNi3nr0Ok3BA2z4gtDdVOmI6yL0dBxMay8Rb
+ uevPTVughxpsj3n23TBG+MfzAz6pK16Fcl8yU8D2enYmq+zbbt0bOUGEt1rzkyShWIjW eg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 2suj0r0xn6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 08 Jun 2019 01:07:01 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x58157Vt069101;
+        Sat, 8 Jun 2019 01:07:01 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 2t024t0hd7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 08 Jun 2019 01:07:01 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x58170AV006353;
+        Sat, 8 Jun 2019 01:07:00 GMT
+Received: from dhcp-10-132-91-225.usdhcp.oraclecorp.com (/10.132.91.225)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 07 Jun 2019 18:06:59 -0700
+Subject: Re: [PATCH 0/4][kvm-unit-test nVMX]: Test "load
+ IA32_PERF_GLOBAL_CONTROL" VM-entry control on vmentry of nested guests
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     rkrcmar@redhat.com, jmattson@google.com
+References: <20190509212055.29933-1-krish.sadhukhan@oracle.com>
+ <6363dc39-b44b-0cca-de2f-603703df41b9@redhat.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <70e2e133-4b6c-8131-72a8-237256e81cb0@oracle.com>
+Date:   Fri, 7 Jun 2019 18:06:59 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9c3853cc-d920-03e8-245c-86c33b280c80@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Fri, 07 Jun 2019 21:39:08 +0000 (UTC)
+In-Reply-To: <6363dc39-b44b-0cca-de2f-603703df41b9@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9281 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906080005
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9281 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906080005
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 07, 2019 at 08:22:35PM +0200, Paolo Bonzini wrote:
-> On 07/06/19 19:16, Marcelo Tosatti wrote:
-> > There is no "target residency" concept in the virtualized use-case 
-> > (which is what poll_state.c uses to calculate the poll time).
-> 
-> Actually there is: it is the cost of a vmexit, and it be calibrated with
-> a very short CPUID loop (e.g. run 100 CPUID instructions and take the
-> smallest TSC interval---it should take less than 50 microseconds, and
-> less than a millisecond even on nested virt).
 
-For a given application, you want to configure the poll time to the
-maximum time an event happen after starting the idle procedure. For SAP
-HANA, that value is between 200us - 800us (most tests require less than
-800us, but some require 800us, to significantly avoid the IPIs).
 
-"The target residency is the minimum time the hardware must spend in the
-given state, including the time needed to enter it (which may be
-substantial), in order to save more energy than it would save by
-entering one of the shallower idle states instead."
+On 06/06/2019 05:39 AM, Paolo Bonzini wrote:
+> On 09/05/19 23:20, Krish Sadhukhan wrote:
+>> This set contains the unit test, and related changes, for the "load
+>> IA32_PERF_GLOBAL_CONTROL" VM-entry control that was enabled in my previous
+>> patchset titled:
+>>
+>> 	[KVM nVMX]: Check "load IA32_PERF_GLOBAL_CTRL" on vmentry of nested guests
+>>
+>>
+>> [PATCH 1/4][kvm-unit-test nVMX]: Rename guest_pat_main to guest_state_test_main
+>> [PATCH 2/4][kvm-unit-test nVMX]: Rename report_guest_pat_test to
+>> [PATCH 3/4][kvm-unit-test nVMX]: Add #define for "load IA32_PERF_GLOBAL_CONTROL" bit
+>> [PATCH 4/4][kvm-unit-test nVMX]: Test "load IA32_PERF_GLOBAL_CONTROL" VM-entry
+>>
+>>   x86/vmx.h       |   1 +
+>>   x86/vmx_tests.c | 108 +++++++++++++++++++++++++++++++++++++++++++-----------
+>>   2 files changed, 87 insertions(+), 22 deletions(-)
+>>
+>> Krish Sadhukhan (4):
+>>        nVMX: Rename guest_pat_main to guest_state_test_main
+>>        nVMX: Rename report_guest_pat_test to report_guest_state_test
+>>        nVMX: Add #define for "load IA32_PERF_GLOBAL_CONTROL" bit
+>>        nVMX: Test "load IA32_PERF_GLOBAL_CONTROL" VM-entry control on vmentry of nested guests
+>>
+> Queued 1-3, but patch 4 does not apply.  It seems like you have another
+> patch that this sits on top of?
 
-Clearly these are two different things...
+Yes, the following patchset:
 
-> I think it would make sense to improve poll_state.c to use an adaptive
-> algorithm similar to the one you implemented, which includes optionally
-> allowing to poll for an interval larger than the target residency.
-> 
+             [KVM nVMX]: Check "load IA32_PERF_GLOBAL_CTRL" on vmentry 
+of nested guests
+
+I need to send out v2 of that set and patch# 4 of this set builds on top 
+of that.
+
+You don't need to pull 1-3 out because they are independent of the 
+pending patchset. I will attach patch# 4 of this set to the v2 of the 
+pending set.
+
+>
 > Paolo
-
-Ok, so i'll move the adaptive code to poll_state.c, where
-the driver selects whether to use target_residency or the 
-adaptive value (based on module parameters).
-
-Not sure if its an adaptible value is desirable for 
-the non virtualized case.
-
 
