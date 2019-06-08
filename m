@@ -2,112 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CDCDD39A05
-	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2019 03:18:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0ED439A58
+	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2019 05:48:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729924AbfFHBSd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jun 2019 21:18:33 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:46862 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729862AbfFHBSd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jun 2019 21:18:33 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x581FAPa121895;
-        Sat, 8 Jun 2019 01:18:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=pdsfGH4CVBqibdcRfZdsvFlLdL5r5V2B7eEBJOaO60A=;
- b=KDwqToqFCKu8RC7VNVG6gBSi1DWz47W2oSuRPCGUlrdJeFHZlN9ZADffQA/yUAmK4/3P
- s5AB1ZwjNJSXrXkMZsimBY7RwIcG9YtKVehsHfmNHB+MUsYRq0M+bC06hLilJKosC3U9
- PQg1vCzdHy/R2BWNj8SVQ7elQnPysU6Y2zkEVYh6MdTByT6O98eCbuTB3vWCnUU8fMSl
- mDKQBbwoHHaJPl/mFcr8DkZ7gnbDIAYiD+i6kJ2nUkM1c9dTCjvz48FwSjKlY+F8Mhte
- haPwCJZ+5+HwwMfJExM52pqSk5n8uvP5jq7v8o0CIRluo9jjrcGPTi2FLsEhD7fPS+Fe aA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2suj0r0y2g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 08 Jun 2019 01:18:01 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x581I04A094738;
-        Sat, 8 Jun 2019 01:18:01 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2swngka9rd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 08 Jun 2019 01:18:00 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x581HxlG007086;
-        Sat, 8 Jun 2019 01:17:59 GMT
-Received: from dhcp-10-132-91-225.usdhcp.oraclecorp.com (/10.132.91.225)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 07 Jun 2019 18:17:59 -0700
-Subject: Re: [PATCH 0/2] kvm-unit-test: nVMX: Test "Load IA32_EFER" VM-exit
- control on vmentry of nested guests
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     rkrcmar@redhat.com, jmattson@google.com
-References: <20190522234545.5930-1-krish.sadhukhan@oracle.com>
- <b1dfa016-0441-22f2-667a-ae4109d41752@redhat.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <790112c9-1b3b-e03b-3afd-142fb6f3b8d5@oracle.com>
-Date:   Fri, 7 Jun 2019 18:17:58 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
+        id S1730185AbfFHDsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jun 2019 23:48:10 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:44131 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730156AbfFHDsK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jun 2019 23:48:10 -0400
+Received: by mail-pl1-f196.google.com with SMTP id c5so1525877pll.11
+        for <kvm@vger.kernel.org>; Fri, 07 Jun 2019 20:48:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=RNlIE7RpVdU5f0iicQk2k5+1DUNsXJMHiELoWiOeeG4=;
+        b=D3MmOWnYob5UGtglFoMh75eVVkGVzLzcVT66trF4Vmsjdvy86taKH6QFas2mfzRzwj
+         M8+OanNKrPI4fOGoGPo9/Uo5q+LH1LQX0K1IVkP72ijXTjagsPaUUaKA337dIrVp0dDF
+         lHdVQs6LUPfUrx+oo7yXpxf993QJ3yfDpOh+8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=RNlIE7RpVdU5f0iicQk2k5+1DUNsXJMHiELoWiOeeG4=;
+        b=gTmzKuOeX8Vm7VKEaCAVKGmnIW2zXg13shEht6tTWmUflQEzYStNJClEGaBa/iv+LT
+         vXz12Yhm4duuRsWrayONncVUwsrJ+4TSBIbD42vri3Tz52xz6NLM90yOmszHM8jEhtlR
+         KivSr0zTigPDYQcIp7GmAxC7rcvV1IfvzK4VksBOaBiOAeYC+HhYcOEMiBpya0MaG4Zl
+         HWVEKyVhlRUa6P7Pe2tTt913uqN4uTIO5N1GVlqutkLZ3MKWt371rvUdKe477lKFCgPw
+         fbTpNzoVMD+XW1bsfL7anjRIavdi+Fc3oCw+PpGoBRAfhNz0rk106fVSRz5EeWFW0wvD
+         aWhQ==
+X-Gm-Message-State: APjAAAVp7o3L9vzHKXEgN0nEAPid4+pzaRIGQ1Npn2Q9ffKhiW9f1iW+
+        OZG4ziESk9Cv6t87lHFRf6oHSg==
+X-Google-Smtp-Source: APXvYqzUHOb4VtJencGcx41aqOHHoNwcDiffGcfqaDDdYTWrPV9XhElqMpS0fUjS81CjEO5luRHFeQ==
+X-Received: by 2002:a17:902:d916:: with SMTP id c22mr34327398plz.195.1559965689632;
+        Fri, 07 Jun 2019 20:48:09 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id l13sm3156889pjq.20.2019.06.07.20.48.08
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 07 Jun 2019 20:48:08 -0700 (PDT)
+Date:   Fri, 7 Jun 2019 20:48:07 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Andrey Konovalov <andreyknvl@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+        linux-media@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Subject: Re: [PATCH v16 03/16] lib, arm64: untag user pointers in strn*_user
+Message-ID: <201906072047.50371DBE2@keescook>
+References: <cover.1559580831.git.andreyknvl@google.com>
+ <14f17ef1902aa4f07a39f96879394e718a1f5dc1.1559580831.git.andreyknvl@google.com>
 MIME-Version: 1.0
-In-Reply-To: <b1dfa016-0441-22f2-667a-ae4109d41752@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9281 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906080006
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9281 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906080006
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <14f17ef1902aa4f07a39f96879394e718a1f5dc1.1559580831.git.andreyknvl@google.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jun 03, 2019 at 06:55:05PM +0200, Andrey Konovalov wrote:
+> This patch is a part of a series that extends arm64 kernel ABI to allow to
+> pass tagged user pointers (with the top byte set to something else other
+> than 0x00) as syscall arguments.
+> 
+> strncpy_from_user and strnlen_user accept user addresses as arguments, and
+> do not go through the same path as copy_from_user and others, so here we
+> need to handle the case of tagged user addresses separately.
+> 
+> Untag user pointers passed to these functions.
+> 
+> Note, that this patch only temporarily untags the pointers to perform
+> validity checks, but then uses them as is to perform user memory accesses.
+> 
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 
+Acked-by: Kees Cook <keescook@chromium.org>
 
-On 06/06/2019 05:48 AM, Paolo Bonzini wrote:
-> On 23/05/19 01:45, Krish Sadhukhan wrote:
->> Patch# 1 creates a wrapper for checking if the NX bit in MSR_EFER is enabled.
->> It is used in patch# 2.
->>
->> Patch# 2 adds tests for "Load IA32_EFER" VM-exit control.
-> Queued with the change suggested by Sean, but this was also on top of
-> some patches that you have not sent yet because patch 2 didn't apply
-> cleanly.
+-Kees
 
-Yes, this patchset was stacked on top of the following (pending v2) 
-patchset in my git repo:
+> ---
+>  lib/strncpy_from_user.c | 3 ++-
+>  lib/strnlen_user.c      | 3 ++-
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/lib/strncpy_from_user.c b/lib/strncpy_from_user.c
+> index 023ba9f3b99f..dccb95af6003 100644
+> --- a/lib/strncpy_from_user.c
+> +++ b/lib/strncpy_from_user.c
+> @@ -6,6 +6,7 @@
+>  #include <linux/uaccess.h>
+>  #include <linux/kernel.h>
+>  #include <linux/errno.h>
+> +#include <linux/mm.h>
+>  
+>  #include <asm/byteorder.h>
+>  #include <asm/word-at-a-time.h>
+> @@ -108,7 +109,7 @@ long strncpy_from_user(char *dst, const char __user *src, long count)
+>  		return 0;
+>  
+>  	max_addr = user_addr_max();
+> -	src_addr = (unsigned long)src;
+> +	src_addr = (unsigned long)untagged_addr(src);
+>  	if (likely(src_addr < max_addr)) {
+>  		unsigned long max = max_addr - src_addr;
+>  		long retval;
+> diff --git a/lib/strnlen_user.c b/lib/strnlen_user.c
+> index 7f2db3fe311f..28ff554a1be8 100644
+> --- a/lib/strnlen_user.c
+> +++ b/lib/strnlen_user.c
+> @@ -2,6 +2,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/export.h>
+>  #include <linux/uaccess.h>
+> +#include <linux/mm.h>
+>  
+>  #include <asm/word-at-a-time.h>
+>  
+> @@ -109,7 +110,7 @@ long strnlen_user(const char __user *str, long count)
+>  		return 0;
+>  
+>  	max_addr = user_addr_max();
+> -	src_addr = (unsigned long)str;
+> +	src_addr = (unsigned long)untagged_addr(str);
+>  	if (likely(src_addr < max_addr)) {
+>  		unsigned long max = max_addr - src_addr;
+>  		long retval;
+> -- 
+> 2.22.0.rc1.311.g5d7573a151-goog
+> 
 
-         [KVM nVMX]: Check "load IA32_PERF_GLOBAL_CTRL" on vmentry of 
-nested guests
-
-
-But the two patchsets are not functionally dependent, so we are good.
-
-Thanks.
-
-> Paolo
->
->
->> [PATCH 1/2] kvm-unit-test: x86: Add a wrapper to check if the CPU supports NX bit in
->> [PATCH 2/2] kvm-unit-test: nVMX: Test "Load IA32_EFER" VM-exit control on vmentry of
->>
->>   lib/x86/processor.h |   8 ++++
->>   x86/vmexit.c        |   2 +-
->>   x86/vmx_tests.c     | 121 ++++++++++++++++++++++++++++++++++++++++++++++++
->>   3 files changed, 130 insertions(+), 1 deletion(-)
->>
->> Krish Sadhukhan (2):
->>        x86: Add a wrapper to check if the CPU supports NX bit in MSR_EFER
->>        nVMX: Test "Load IA32_EFER" VM-exit control on vmentry of nested guests
->>
-
+-- 
+Kees Cook
