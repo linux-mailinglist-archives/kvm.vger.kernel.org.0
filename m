@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 77D0739A72
-	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2019 05:51:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5841D39A7B
+	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2019 05:52:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731564AbfFHDvl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jun 2019 23:51:41 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:42135 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731596AbfFHDvk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jun 2019 23:51:40 -0400
-Received: by mail-pf1-f195.google.com with SMTP id q10so2217401pff.9
-        for <kvm@vger.kernel.org>; Fri, 07 Jun 2019 20:51:10 -0700 (PDT)
+        id S1730484AbfFHDwP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jun 2019 23:52:15 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:35874 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731001AbfFHDwP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jun 2019 23:52:15 -0400
+Received: by mail-pf1-f193.google.com with SMTP id u22so2235078pfm.3
+        for <kvm@vger.kernel.org>; Fri, 07 Jun 2019 20:51:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=3wKfqS97rJvrbhUUDlvq7gOlHPn2Fxrd7rOcfg+ujIw=;
-        b=RYl1PwRkMzex6A4O7SLxvvwiq5dij7m4eHDLUNE4a3aGBYLeVjbDL8gLqao1EoQT+p
-         YQb1mF9o9UcoV8td3+9AP7z+CkGq6mDaNnYR3pzaWwp8gUl1cHoE4YNqEbgWKNWvGAFB
-         0KAoZe50aGSCoeHmlFMZ5SpxFp6+d2TadDVto=
+        bh=+sAqEcYebSGTQqNUHJjZvXdBrlSAt8m9jXPFyYB00fA=;
+        b=CtSxM/iJFdFOilMt5IYz49fhtrPJpe1biMjSLL9dNHxYjLjFZgiPdCXtt2Os7+WUWp
+         2h97ew7Js16BFPaL91oYsoUi+i2fwl58zxZoJKC+5LpNlJocOwDirIXVuEvjdms0IvZ/
+         xj006iO3/Sm/g4St20TSl0BbuhpEFIrb4EXp0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=3wKfqS97rJvrbhUUDlvq7gOlHPn2Fxrd7rOcfg+ujIw=;
-        b=QxxndNoVIRiAwo+WL1TNTZy+E5mlkzP4qvbRlsqhTJQ7pkKyO4xMKp1hxc5fOWe7Ys
-         7YF/T1mbGNruLCbEWe/yN+jb3gU/1nNmd9HwGSiKO/JVXvhZLdzPzhJOcuZaCndE+TvU
-         Vk47Z5TX3oBjMKIV6LuKH7Oyz31eay6af5LSvVKUodUZOGab7yIeuN26Dw9Su3/BxSqB
-         9OCCBmMwJjykv6fEmzX38dNgT7PPYdEgbOU6qlueCEsLg2xrX2BoQXTt0qZDXjkwacAV
-         NJbwsGAP4wEe+VQrqazERMUdHU/iXHnyoYI8quUFkgw5gOpBh8HcDLFRTrd2O9a8NJyi
-         ghTg==
-X-Gm-Message-State: APjAAAW76lEKpOq6vYQUW+Qgdj+2ZxsRsM+PzhAbu+3/f6/vRCKAvXzL
-        dftz3cKU4CjQPYFnG28gKguw6w==
-X-Google-Smtp-Source: APXvYqw907PVDblcTVkonPdzATNJGir/Lb4Vx1Ol6psoQ6Dh4wHkfs9go3mE5W0bvdvS6vG2+lgMCw==
-X-Received: by 2002:a63:161b:: with SMTP id w27mr5796313pgl.338.1559965870042;
-        Fri, 07 Jun 2019 20:51:10 -0700 (PDT)
+        bh=+sAqEcYebSGTQqNUHJjZvXdBrlSAt8m9jXPFyYB00fA=;
+        b=MeJWAO/NDiWBak7/5Dbq4EEXLU4Z09JPlRDDymOTP6R+sJyow3vtUXJqv8+N81he+s
+         B4X44ncFJ70IYkmoY6EUQD8akzHzTiCqL12Lo1lA64YbrewjBu/rE8xxNvOCd6So7/BK
+         +kJDHFaGBeYveI5i+P50BsDfrsXwGecb2V1u/YyFI6u+uLAd+7LhYWpaeS1XyO9WV/Re
+         nN/DfibUOn29w44vQfuCKFccPGvfsqSEa3aSSMZpvDItNg2r6oiEbhX66gDiYOx6Wd8C
+         Mb2BAfbBeGDqfT8naOhG4Ww+5mI2KVZQD7fWa4EsV1GeDjOiyiJDpMyQfBugOSuEsqSb
+         RffA==
+X-Gm-Message-State: APjAAAUsT6jBd4cwN7lCxaeqtwvjM6IMpMg5GaagBOHOiFgpL1SvCnrf
+        i6FSVgaa2VtCkzezUHr2UNgoTA==
+X-Google-Smtp-Source: APXvYqwaFwR9TdiH8fcP0E7/plCUQ2bJqcAs+FgbmWIC/6eFKnV6hJ+Yk3YTH/8Vcg8+zQmbsZgqwQ==
+X-Received: by 2002:a17:90a:b104:: with SMTP id z4mr9232885pjq.102.1559965909964;
+        Fri, 07 Jun 2019 20:51:49 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id e4sm3563052pgi.80.2019.06.07.20.51.09
+        by smtp.gmail.com with ESMTPSA id k13sm3360691pgq.45.2019.06.07.20.51.48
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 07 Jun 2019 20:51:09 -0700 (PDT)
-Date:   Fri, 7 Jun 2019 20:51:08 -0700
+        Fri, 07 Jun 2019 20:51:49 -0700 (PDT)
+Date:   Fri, 7 Jun 2019 20:51:48 -0700
 From:   Kees Cook <keescook@chromium.org>
 To:     Andrey Konovalov <andreyknvl@google.com>
 Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
@@ -78,37 +78,29 @@ Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
         Robin Murphy <robin.murphy@arm.com>,
         Kevin Brodsky <kevin.brodsky@arm.com>,
         Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v16 02/16] arm64: untag user pointers in access_ok and
- __uaccess_mask_ptr
-Message-ID: <201906072051.3047B3DC56@keescook>
+Subject: Re: [PATCH v16 05/16] arm64: untag user pointers passed to memory
+ syscalls
+Message-ID: <201906072051.7B66635BE@keescook>
 References: <cover.1559580831.git.andreyknvl@google.com>
- <4327b260fb17c4776a1e3c844f388e4948cfb747.1559580831.git.andreyknvl@google.com>
+ <045a94326401693e015bf80c444a4d946a5c68ed.1559580831.git.andreyknvl@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4327b260fb17c4776a1e3c844f388e4948cfb747.1559580831.git.andreyknvl@google.com>
+In-Reply-To: <045a94326401693e015bf80c444a4d946a5c68ed.1559580831.git.andreyknvl@google.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 03, 2019 at 06:55:04PM +0200, Andrey Konovalov wrote:
+On Mon, Jun 03, 2019 at 06:55:07PM +0200, Andrey Konovalov wrote:
 > This patch is a part of a series that extends arm64 kernel ABI to allow to
 > pass tagged user pointers (with the top byte set to something else other
 > than 0x00) as syscall arguments.
 > 
-> copy_from_user (and a few other similar functions) are used to copy data
-> from user memory into the kernel memory or vice versa. Since a user can
-> provided a tagged pointer to one of the syscalls that use copy_from_user,
-> we need to correctly handle such pointers.
+> This patch allows tagged pointers to be passed to the following memory
+> syscalls: get_mempolicy, madvise, mbind, mincore, mlock, mlock2, mprotect,
+> mremap, msync, munlock.
 > 
-> Do this by untagging user pointers in access_ok and in __uaccess_mask_ptr,
-> before performing access validity checks.
-> 
-> Note, that this patch only temporarily untags the pointers to perform the
-> checks, but then passes them as is into the kernel internals.
-> 
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 
 Reviewed-by: Kees Cook <keescook@chromium.org>
@@ -116,46 +108,123 @@ Reviewed-by: Kees Cook <keescook@chromium.org>
 -Kees
 
 > ---
->  arch/arm64/include/asm/uaccess.h | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
+>  mm/madvise.c   | 2 ++
+>  mm/mempolicy.c | 3 +++
+>  mm/mincore.c   | 2 ++
+>  mm/mlock.c     | 4 ++++
+>  mm/mprotect.c  | 2 ++
+>  mm/mremap.c    | 2 ++
+>  mm/msync.c     | 2 ++
+>  7 files changed, 17 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/uaccess.h b/arch/arm64/include/asm/uaccess.h
-> index e5d5f31c6d36..9164ecb5feca 100644
-> --- a/arch/arm64/include/asm/uaccess.h
-> +++ b/arch/arm64/include/asm/uaccess.h
-> @@ -94,7 +94,7 @@ static inline unsigned long __range_ok(const void __user *addr, unsigned long si
->  	return ret;
->  }
+> diff --git a/mm/madvise.c b/mm/madvise.c
+> index 628022e674a7..39b82f8a698f 100644
+> --- a/mm/madvise.c
+> +++ b/mm/madvise.c
+> @@ -810,6 +810,8 @@ SYSCALL_DEFINE3(madvise, unsigned long, start, size_t, len_in, int, behavior)
+>  	size_t len;
+>  	struct blk_plug plug;
 >  
-> -#define access_ok(addr, size)	__range_ok(addr, size)
-> +#define access_ok(addr, size)	__range_ok(untagged_addr(addr), size)
->  #define user_addr_max			get_fs
+> +	start = untagged_addr(start);
+> +
+>  	if (!madvise_behavior_valid(behavior))
+>  		return error;
 >  
->  #define _ASM_EXTABLE(from, to)						\
-> @@ -226,7 +226,8 @@ static inline void uaccess_enable_not_uao(void)
+> diff --git a/mm/mempolicy.c b/mm/mempolicy.c
+> index 01600d80ae01..78e0a88b2680 100644
+> --- a/mm/mempolicy.c
+> +++ b/mm/mempolicy.c
+> @@ -1360,6 +1360,7 @@ static long kernel_mbind(unsigned long start, unsigned long len,
+>  	int err;
+>  	unsigned short mode_flags;
 >  
->  /*
->   * Sanitise a uaccess pointer such that it becomes NULL if above the
-> - * current addr_limit.
-> + * current addr_limit. In case the pointer is tagged (has the top byte set),
-> + * untag the pointer before checking.
->   */
->  #define uaccess_mask_ptr(ptr) (__typeof__(ptr))__uaccess_mask_ptr(ptr)
->  static inline void __user *__uaccess_mask_ptr(const void __user *ptr)
-> @@ -234,10 +235,11 @@ static inline void __user *__uaccess_mask_ptr(const void __user *ptr)
->  	void __user *safe_ptr;
+> +	start = untagged_addr(start);
+>  	mode_flags = mode & MPOL_MODE_FLAGS;
+>  	mode &= ~MPOL_MODE_FLAGS;
+>  	if (mode >= MPOL_MAX)
+> @@ -1517,6 +1518,8 @@ static int kernel_get_mempolicy(int __user *policy,
+>  	int uninitialized_var(pval);
+>  	nodemask_t nodes;
 >  
->  	asm volatile(
-> -	"	bics	xzr, %1, %2\n"
-> +	"	bics	xzr, %3, %2\n"
->  	"	csel	%0, %1, xzr, eq\n"
->  	: "=&r" (safe_ptr)
-> -	: "r" (ptr), "r" (current_thread_info()->addr_limit)
-> +	: "r" (ptr), "r" (current_thread_info()->addr_limit),
-> +	  "r" (untagged_addr(ptr))
->  	: "cc");
+> +	addr = untagged_addr(addr);
+> +
+>  	if (nmask != NULL && maxnode < nr_node_ids)
+>  		return -EINVAL;
 >  
->  	csdb();
+> diff --git a/mm/mincore.c b/mm/mincore.c
+> index c3f058bd0faf..64c322ed845c 100644
+> --- a/mm/mincore.c
+> +++ b/mm/mincore.c
+> @@ -249,6 +249,8 @@ SYSCALL_DEFINE3(mincore, unsigned long, start, size_t, len,
+>  	unsigned long pages;
+>  	unsigned char *tmp;
+>  
+> +	start = untagged_addr(start);
+> +
+>  	/* Check the start address: needs to be page-aligned.. */
+>  	if (start & ~PAGE_MASK)
+>  		return -EINVAL;
+> diff --git a/mm/mlock.c b/mm/mlock.c
+> index 080f3b36415b..e82609eaa428 100644
+> --- a/mm/mlock.c
+> +++ b/mm/mlock.c
+> @@ -674,6 +674,8 @@ static __must_check int do_mlock(unsigned long start, size_t len, vm_flags_t fla
+>  	unsigned long lock_limit;
+>  	int error = -ENOMEM;
+>  
+> +	start = untagged_addr(start);
+> +
+>  	if (!can_do_mlock())
+>  		return -EPERM;
+>  
+> @@ -735,6 +737,8 @@ SYSCALL_DEFINE2(munlock, unsigned long, start, size_t, len)
+>  {
+>  	int ret;
+>  
+> +	start = untagged_addr(start);
+> +
+>  	len = PAGE_ALIGN(len + (offset_in_page(start)));
+>  	start &= PAGE_MASK;
+>  
+> diff --git a/mm/mprotect.c b/mm/mprotect.c
+> index bf38dfbbb4b4..19f981b733bc 100644
+> --- a/mm/mprotect.c
+> +++ b/mm/mprotect.c
+> @@ -465,6 +465,8 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
+>  	const bool rier = (current->personality & READ_IMPLIES_EXEC) &&
+>  				(prot & PROT_READ);
+>  
+> +	start = untagged_addr(start);
+> +
+>  	prot &= ~(PROT_GROWSDOWN|PROT_GROWSUP);
+>  	if (grows == (PROT_GROWSDOWN|PROT_GROWSUP)) /* can't be both */
+>  		return -EINVAL;
+> diff --git a/mm/mremap.c b/mm/mremap.c
+> index fc241d23cd97..1d98281f7204 100644
+> --- a/mm/mremap.c
+> +++ b/mm/mremap.c
+> @@ -606,6 +606,8 @@ SYSCALL_DEFINE5(mremap, unsigned long, addr, unsigned long, old_len,
+>  	LIST_HEAD(uf_unmap_early);
+>  	LIST_HEAD(uf_unmap);
+>  
+> +	addr = untagged_addr(addr);
+> +
+>  	if (flags & ~(MREMAP_FIXED | MREMAP_MAYMOVE))
+>  		return ret;
+>  
+> diff --git a/mm/msync.c b/mm/msync.c
+> index ef30a429623a..c3bd3e75f687 100644
+> --- a/mm/msync.c
+> +++ b/mm/msync.c
+> @@ -37,6 +37,8 @@ SYSCALL_DEFINE3(msync, unsigned long, start, size_t, len, int, flags)
+>  	int unmapped_error = 0;
+>  	int error = -EINVAL;
+>  
+> +	start = untagged_addr(start);
+> +
+>  	if (flags & ~(MS_ASYNC | MS_INVALIDATE | MS_SYNC))
+>  		goto out;
+>  	if (offset_in_page(start))
 > -- 
 > 2.22.0.rc1.311.g5d7573a151-goog
 > 
