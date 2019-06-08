@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 919AC39A95
-	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2019 05:58:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D6C439AA0
+	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2019 05:59:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730748AbfFHD6I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Jun 2019 23:58:08 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:45708 "EHLO
+        id S1730484AbfFHD7a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Jun 2019 23:59:30 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:43443 "EHLO
         mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730353AbfFHD6H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Jun 2019 23:58:07 -0400
-Received: by mail-pf1-f195.google.com with SMTP id s11so2218141pfm.12
-        for <kvm@vger.kernel.org>; Fri, 07 Jun 2019 20:58:07 -0700 (PDT)
+        with ESMTP id S1730511AbfFHD7U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Jun 2019 23:59:20 -0400
+Received: by mail-pf1-f195.google.com with SMTP id i189so2220797pfg.10
+        for <kvm@vger.kernel.org>; Fri, 07 Jun 2019 20:59:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=l14jgAawlsDS1VZ8WGmfB4MOY8oLSSKNbX7PpDlwP4w=;
-        b=C5Gjab6oABNd7uWOUXVxMun2EBOiIN1zQFBFmz4oVz6alLd7w4ZDoA104BjgrPqBY8
-         M11UcHeF2K3I4znphl64bBg5eiZ8uh03AO1nktwVISAdyYWU8VZro1t6U3J4ibUtkAgv
-         yam4Xd5rREh0IexVfq4tELDc0YZWvN5ZcS9CQ=
+        bh=rJIAAqD1NAp4Th9vkRNxbBLJIPc3y8ChkLIZvf3dmAk=;
+        b=U7O6NbXBNIeRlPVLj5xwiYB9yIq5HbXkmt1o7eZLIHcCi1sfFtD4pKc4GGOrbqMYRh
+         sgIk+ERejfY1WzlSSBSK2Vn9ctskkWUfC7d9RXEYuV+TF3EleJl2nI9tZYJCJJbjZfXj
+         ev4abqGBRmVAB5Xa6TnqWXyvladDJfFjes7a4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=l14jgAawlsDS1VZ8WGmfB4MOY8oLSSKNbX7PpDlwP4w=;
-        b=Y4fPl1sqHalt7ZIvIxhyhPGbfqnmVV0nQ4zpbQBsFFExZ5c55ejtJfWfgqSgC3rN/q
-         +xas5OBsZTe/YfG88gYAg0A5FKEP1UgmzHDs/qhL5DnQUZzO1MsEo35pMgtwvpg04A7j
-         5ACDJGKgOsBjQiGZ+/asut+oeE48K3y3BkMEZrj81OA1o1wIypFuyZIBfVRNarqdwaNF
-         kGdJUSSWP3+vXkGM2rjLHAj5T4r3j/RwXo99btydyvd9BG00BtI6S0banHv4ibcc5lRE
-         1cmT6Ux6dghpmkq/IvxEf4J2NJqvbJFNEmM/MMa22pNo1mSkFXi1EaSWVP0E354mrjlT
-         568A==
-X-Gm-Message-State: APjAAAVg0Mzy/VDerOXaZISkcpcXjPOL+1zVw5LrGxwm1ShF0GnYrCHM
-        9owfNYFGCqt/TnYV9+z6ueI2pw==
-X-Google-Smtp-Source: APXvYqxfp4HEsqQlOvNH04bl9SHArYk4hyQYoSWfdJS+DhwTyJyuL+IfwdxORVSQ19uSVN9pTMHd5w==
-X-Received: by 2002:a63:1657:: with SMTP id 23mr5550367pgw.98.1559966287061;
-        Fri, 07 Jun 2019 20:58:07 -0700 (PDT)
+        bh=rJIAAqD1NAp4Th9vkRNxbBLJIPc3y8ChkLIZvf3dmAk=;
+        b=K1mXcCMKH/Uo81IWpie1Pj49wz39juApYTXw+qJyjDW0LkXfvW/qhmIl7WkUz+Zbyo
+         tM5+3gPEszP3BMdctE17hDsRfEfwOWnoCSaN9fWwn17U2hd4Xg28O4tFWomC2Bo6SYJk
+         753cY36hyZoKtG0GHW1N7Q0k8PqmEkud2wrFSORh4PEMGHvEH8BXmgkpTepz5O9AaR2R
+         f2bLTXKYuixbklji0hfKIORaJPaxW6k8/dTgd40R5oXz2YaWYkh5/yVzTUQ9GvDJ7xCN
+         ihfA83ZQB6K+F9xU2mcanq1iKthgs1hEdkax6Y9f4wDkw5LvaiZgV9ySb2YzMlkdkujA
+         dYng==
+X-Gm-Message-State: APjAAAWIIaM+rsOeZQRvFZQn7+iRUlrZqA17aJUZVJyyduuBMvu9rsr7
+        6ajc989/r6nQeDpra927AsRqWg==
+X-Google-Smtp-Source: APXvYqwFvS5ZtgK4hv3bppgp+xNWkWaUdmJ6Dck4NUo25EMo4bji/jhdzX5h+4T1rhnDZmDRvB93qA==
+X-Received: by 2002:a17:90a:aa85:: with SMTP id l5mr8851590pjq.69.1559966359909;
+        Fri, 07 Jun 2019 20:59:19 -0700 (PDT)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id l2sm246111pgs.33.2019.06.07.20.58.06
+        by smtp.gmail.com with ESMTPSA id o70sm4127428pfo.33.2019.06.07.20.59.18
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 07 Jun 2019 20:58:06 -0700 (PDT)
-Date:   Fri, 7 Jun 2019 20:58:05 -0700
+        Fri, 07 Jun 2019 20:59:19 -0700 (PDT)
+Date:   Fri, 7 Jun 2019 20:59:18 -0700
 From:   Kees Cook <keescook@chromium.org>
 To:     Andrey Konovalov <andreyknvl@google.com>
 Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
@@ -78,30 +78,32 @@ Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
         Robin Murphy <robin.murphy@arm.com>,
         Kevin Brodsky <kevin.brodsky@arm.com>,
         Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v16 15/16] vfio/type1, arm64: untag user pointers in
- vaddr_get_pfn
-Message-ID: <201906072058.BB57EFA@keescook>
+Subject: Re: [PATCH v16 06/16] mm, arm64: untag user pointers in mm/gup.c
+Message-ID: <201906072059.7D80BA0@keescook>
 References: <cover.1559580831.git.andreyknvl@google.com>
- <c529e1eeea7700beff197c4456da6a882ce2efb7.1559580831.git.andreyknvl@google.com>
+ <e1f6d268135f683fd70c2af27e75f694d7ffaf48.1559580831.git.andreyknvl@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c529e1eeea7700beff197c4456da6a882ce2efb7.1559580831.git.andreyknvl@google.com>
+In-Reply-To: <e1f6d268135f683fd70c2af27e75f694d7ffaf48.1559580831.git.andreyknvl@google.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 03, 2019 at 06:55:17PM +0200, Andrey Konovalov wrote:
+On Mon, Jun 03, 2019 at 06:55:08PM +0200, Andrey Konovalov wrote:
 > This patch is a part of a series that extends arm64 kernel ABI to allow to
 > pass tagged user pointers (with the top byte set to something else other
 > than 0x00) as syscall arguments.
 > 
-> vaddr_get_pfn() uses provided user pointers for vma lookups, which can
-> only by done with untagged pointers.
+> mm/gup.c provides a kernel interface that accepts user addresses and
+> manipulates user pages directly (for example get_user_pages, that is used
+> by the futex syscall). Since a user can provided tagged addresses, we need
+> to handle this case.
 > 
-> Untag user pointers in this function.
+> Add untagging to gup.c functions that use user addresses for vma lookups.
 > 
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 
 Reviewed-by: Kees Cook <keescook@chromium.org>
@@ -109,22 +111,31 @@ Reviewed-by: Kees Cook <keescook@chromium.org>
 -Kees
 
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  mm/gup.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 3ddc375e7063..528e39a1c2dd 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -384,6 +384,8 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
+> diff --git a/mm/gup.c b/mm/gup.c
+> index ddde097cf9e4..c37df3d455a2 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -802,6 +802,8 @@ static long __get_user_pages(struct task_struct *tsk, struct mm_struct *mm,
+>  	if (!nr_pages)
+>  		return 0;
 >  
->  	down_read(&mm->mmap_sem);
->  
-> +	vaddr = untagged_addr(vaddr);
+> +	start = untagged_addr(start);
 > +
->  	vma = find_vma_intersection(mm, vaddr, vaddr + 1);
+>  	VM_BUG_ON(!!pages != !!(gup_flags & FOLL_GET));
 >  
->  	if (vma && vma->vm_flags & VM_PFNMAP) {
+>  	/*
+> @@ -964,6 +966,8 @@ int fixup_user_fault(struct task_struct *tsk, struct mm_struct *mm,
+>  	struct vm_area_struct *vma;
+>  	vm_fault_t ret, major = 0;
+>  
+> +	address = untagged_addr(address);
+> +
+>  	if (unlocked)
+>  		fault_flags |= FAULT_FLAG_ALLOW_RETRY;
+>  
 > -- 
 > 2.22.0.rc1.311.g5d7573a151-goog
 > 
