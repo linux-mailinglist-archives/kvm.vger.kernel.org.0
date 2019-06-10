@@ -2,251 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 78C0B3BEA5
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2019 23:27:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36AF83BEAB
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2019 23:29:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389904AbfFJV1m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jun 2019 17:27:42 -0400
-Received: from ahs5.r4l.com ([158.69.52.156]:42122 "EHLO ahs5.r4l.com"
+        id S2390130AbfFJV21 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jun 2019 17:28:27 -0400
+Received: from mga05.intel.com ([192.55.52.43]:6054 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389193AbfFJV1m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jun 2019 17:27:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=extremeground.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:References:Cc:To:From:Subject:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=RZLN8hvskw7GjJRITfE7JT0hQDXiRFi6ecst0r9g1Pg=; b=qMrHHnCsAOJCJ5jzLm6VozMt0J
-        Ds4VkiUsXEajYbHugYRtM+x1+i7m9zulBNO74TFw5RPN7FwQ9Q16QiRBCkquy4iKxL5Zj567Caayk
-        KK2EGlvppYUs4GdiRM8bBQXbMtQdD4ztgoKZctQPD36wIsWl82GaGyvXI53Pifgl2tBVb8aJ+u/fH
-        367n14lru1MPXYhgBJYCvpXiOiyAsJCJLZ9yKopZxXTE3Ca3+iIj74yy+Ap5MVwFhdm4zMlD/xOCh
-        uRxCHmJOgKOwHns1uxC5Td6noN4k9mhocxC7m1CSQQbPdQHrvuxZ7RVl9X+0RFkW+FZQ+Fq6+Kqlz
-        cAS8MAoQ==;
-Received: from cpeac202ed5e073-cmac202ed5e070.cpe.net.cable.rogers.com ([99.237.87.227]:59718 helo=[192.168.1.20])
-        by ahs5.r4l.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-        (Exim 4.92)
-        (envelope-from <gary@extremeground.com>)
-        id 1haRpM-0003iz-FY; Mon, 10 Jun 2019 17:27:40 -0400
-Subject: Re: kvm / virsh snapshot management
-From:   Gary Dale <gary@extremeground.com>
-To:     Stefan Hajnoczi <stefanha@gmail.com>
-Cc:     kvm@vger.kernel.org, qemu-devel@nongnu.org,
-        Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
-References: <abb7990e-0331-67a4-af92-05276366478c@extremeground.com>
- <20190610121941.GI14257@stefanha-x1.localdomain>
- <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
-Message-ID: <ab3e81c2-f0ce-2ef5-bbe7-948a87463b59@extremeground.com>
-Date:   Mon, 10 Jun 2019 17:27:39 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S2389193AbfFJV21 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jun 2019 17:28:27 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Jun 2019 14:28:26 -0700
+X-ExtLoop1: 1
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
+  by orsmga005.jf.intel.com with ESMTP; 10 Jun 2019 14:28:26 -0700
+Date:   Mon, 10 Jun 2019 14:31:34 -0700
+From:   Jacob Pan <jacob.jun.pan@linux.intel.com>
+To:     Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Cc:     "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "ashok.raj@intel.com" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Marc Zyngier <Marc.Zyngier@arm.com>,
+        Will Deacon <Will.Deacon@arm.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Vincent Stehle <Vincent.Stehle@arm.com>,
+        Robin Murphy <Robin.Murphy@arm.com>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        jacob.jun.pan@linux.intel.com, "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH v8 26/29] vfio-pci: Register an iommu fault handler
+Message-ID: <20190610143134.7bff96e9@jacob-builder>
+In-Reply-To: <e02b024f-6ebc-e8fa-c30c-5bf3f4b164d6@arm.com>
+References: <20190526161004.25232-1-eric.auger@redhat.com>
+        <20190526161004.25232-27-eric.auger@redhat.com>
+        <20190603163139.70fe8839@x1.home>
+        <10dd60d9-4af0-c0eb-08c9-a0db7ee1925e@redhat.com>
+        <20190605154553.0d00ad8d@jacob-builder>
+        <2753d192-1c46-d78e-c425-0c828e48cde2@arm.com>
+        <20190606132903.064f7ac4@jacob-builder>
+        <dc051424-67d7-02ff-9b8e-0d7a8a4e59eb@arm.com>
+        <20190607104301.6b1bbd74@jacob-builder>
+        <e02b024f-6ebc-e8fa-c30c-5bf3f4b164d6@arm.com>
+Organization: OTC
+X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-CA
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - ahs5.r4l.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - extremeground.com
-X-Get-Message-Sender-Via: ahs5.r4l.com: authenticated_id: gary@extremeground.com
-X-Authenticated-Sender: ahs5.r4l.com: gary@extremeground.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019-06-10 11:54 a.m., Gary Dale wrote:
-> On 2019-06-10 8:19 a.m., Stefan Hajnoczi wrote:
->> On Sat, Jun 01, 2019 at 08:12:01PM -0400, Gary Dale wrote:
->>> A while back I converted a raw disk image to qcow2 to be able to use
->>> snapshots. However I realize that I may not really understand 
->>> exactly how
->>> snapshots work. In this particular case, I'm only talking about 
->>> internal
->>> snapshots currently as there seems to be some differences of opinion 
->>> as to
->>> whether internal or external are safer/more reliable. I'm also only 
->>> talking
->>> about shutdown state snapshots, so it should just be the disk that is
->>> snapshotted.
->>>
->>> As I understand it, the first snapshot freezes the base image and 
->>> subsequent
->>> changes in the virtual machine's disk are stored elsewhere in the 
->>> qcow2 file
->>> (remember, only internal snapshots). If I take a second snapshot, that
->>> freezes the first one, and subsequent changes are now in third 
->>> location.
->>> Each new snapshot is incremental to the one that preceded it rather 
->>> than
->>> differential to the base image. Each new snapshot is a child of the 
->>> previous
->>> one.
->> Internal snapshots are not incremental or differential at the qcow2
->> level, they are simply a separate L1/L2 table pointing to data clusters.
->> In other words, they are an independent set of metadata showing the full
->> state of the image at the point of the snapshot.  qcow2 does not track
->> relationships between snapshots and parents/children.
-> Which sounds to me like they are incremental. Each snapshot starts a 
-> new L1/L2 table so that the state of the previous one is preserved.
->>
->>> One explanation I've seen of the process is if I delete a snapshot, the
->>> changes it contains are merged with its immediate child.
->> Nope.  Deleting a snapshot decrements the reference count on all its
->> data clusters.  If a data cluster's reference count reaches zero it will
->> be freed.  That's all, there is no additional data movement or
->> reorganization aside from this.
-> Perhaps not physically but logically it would appear that the data 
-> clusters were merged.
->>
->>> So if I deleted the
->>> first snapshot, the base image stays the same but any data that has 
->>> changed
->>> since the base image is now in the second snapshot's location. The 
->>> merge
->>> with children explanation also implies that the base image is never 
->>> touched
->>> even if the first snapshot is deleted.
->>>
->>> But if I delete a snapshot that has no children, is that essentially 
->>> the
->>> same as reverting to the point that snapshot was created and all 
->>> subsequent
->>> disk changes are lost? Or does it merge down to the parent snapshot? 
->>> If I
->>> delete all snapshots, would that revert to the base image?
->> No.  qcow2 has the concept of the current disk state of the running VM -
->> what you get when you boot the guest - and the snapshots - they are
->> read-only.
->>
->> When you delete snapshots the current disk state (running VM) is
->> unaffected.
->>
->> When you apply a snapshot this throws away the current disk state and
->> uses the snapshot as the new current disk state.  The read-only snapshot
->> itself is not modified in any way and you can apply the same snapshot
->> again as many times as you wish later.
-> So in essence the current state is a pointer to the latest data 
-> cluster, which is the only data cluster that can be modified.
->>
->>> I've seen it explained that a snapshot is very much like a timestamp so
->>> deleting a timestamp removes the dividing line between writes that 
->>> occurred
->>> before and after that time, so that data is really only removed if I 
->>> revert
->>> to some time stamp - all writes after that point are discarded. In this
->>> explanation, deleting the oldest timestamp is essentially updating 
->>> the base
->>> image. Deleting all snapshots would leave me with the base image fully
->>> updated.
->>>
->>> Frankly, the second explanation sounds more reasonable to me, 
->>> without having
->>> to figure out how copy-on-write works,  But I'm dealing with 
->>> important data
->>> here and I don't want to mess it up by mishandling the snapshots.
->>>
->>> Can some provide a little clarity on this? Thanks!
->> If you want an analogy then git(1) is a pretty good one.  qcow2 internal
->> snapshots are like git tags.  Unlike branches, tags are immutable.  In
->> qcow2 you only have a master branch (the current disk state) from which
->> you can create a new tag or you can use git-checkout(1) to apply a
->> snapshot (discarding whatever your current disk state is).
->>
->> Stefan
->
-> That's just making things less clear - I've never tried to understand 
-> git either. Thanks for the attempt though.
->
-> If I've gotten things correct, once the base image is established, 
-> there is a current disk state that points to a table containing all 
-> the writes since the base image. Creating a snapshot essentially takes 
-> that pointer and gives it the snapshot name, while creating a new 
-> current disk state pointer and data table where subsequent writes are 
-> recorded.
->
-> Deleting snapshots removes your ability to refer to a data table by 
-> name, but the table itself still exists anonymously as part of a chain 
-> of data tables between the base image and the current state.
->
-> This leaves a problem. The chain will very quickly get quite long 
-> which will impact performance. To combat this, you can use blockcommit 
-> to merge a child with its parent or blockpull to merge a parent with 
-> its child.
->
-> In my situation, I want to keep a week of daily snapshots in case 
-> something goes horribly wrong with the VM (I recently had a database 
-> file become corrupt, and reverting to the previous working day's image 
-> would have been a quick and easy solution, faster than recovering all 
-> the data tables from the prefious day). I've been shutting down the 
-> VM, deleting the oldest snapshot and creating a new one before 
-> restarting the VM.
->
-> While your explanation confirms that this is safe, it also implies 
-> that I need to manage the data table chains. My first instinct is to 
-> use blockcommit before deleting the oldest snapshot, such as:
->
->     virsh blockcommit <vm name> <qcow2 file path> --top <oldest 
-> snapshot> --delete --wait
->     virsh snapshot-delete  --domain <vm name> --snapshotname <oldest 
-> snapshot>
->
-> so that the base image contains the state as of one week earlier and 
-> the snapshot chains are limited to 7 links.
->
-> 1) does this sound reasonable?
->
-> 2) I note that the syntax in virsh man page is different from the 
-> syntax at 
-> https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/sect-backing-chain 
-> (RedHat uses --top and --base while the man page just has optional 
-> base and top names). I believe the RedHat guide is correct because the 
-> man page doesn't allow distinguishing between the base and the top for 
-> a commit.
->
-> However the need for specifying the path isn't obvious to me. Isn't 
-> the path contained in the VM definition?
->
-> Since blockcommit would make it impossible for me to revert to an 
-> earlier state (because I'm committing the oldest snapshot, if it 
-> screws up, I can't undo within virsh), I need to make sure this 
-> command is correct.
->
-Trying this against a test VM, I ran into a roadblock. My command line 
-and the results are:
+On Mon, 10 Jun 2019 13:45:02 +0100
+Jean-Philippe Brucker <jean-philippe.brucker@arm.com> wrote:
 
-# virsh blockcommit stretch "/home/secure/virtual/stretch.qcow2" --top 
-stretchS3 --delete --wait
-error: unsupported flags (0x2) in function qemuDomainBlockCommit
+> On 07/06/2019 18:43, Jacob Pan wrote:
+> >>> So it seems we agree on the following:
+> >>> - iommu_unregister_device_fault_handler() will never fail
+> >>> - iommu driver cleans up all pending faults when handler is
+> >>> unregistered
+> >>> - assume device driver or guest not sending more page response
+> >>> _after_ handler is unregistered.
+> >>> - system will tolerate rare spurious response
+> >>>
+> >>> Sounds right?    
+> >>
+> >> Yes, I'll add that to the fault series  
+> > Hold on a second please, I think we need more clarifications. Ashok
+> > pointed out to me that the spurious response can be harmful to other
+> > devices when it comes to mdev, where PRQ group id is not per PASID,
+> > device may reuse the group number and receiving spurious page
+> > response can confuse the entire PF.   
+> 
+> I don't understand how mdev differs from the non-mdev situation (but I
+> also still don't fully get how mdev+PASID will be implemented). Is the
+> following the case you're worried about?
+> 
+>   M#: mdev #
+> 
+> # Dev         Host        mdev drv       VFIO/QEMU        Guest
+> ====================================================================
+> 1                     <- reg(handler)
+> 2 PR1 G1 P1    ->         M1 PR1 G1        inject ->     M1 PR1 G1
+> 3                     <- unreg(handler)
+> 4       <- PS1 G1 P1 (F)      |
+> 5                        unreg(handler)
+> 6                     <- reg(handler)
+> 7 PR2 G1 P1    ->         M2 PR2 G1        inject ->     M2 PR2 G1
+> 8                                                     <- M1 PS1 G1
+> 9         accept ??    <- PS1 G1 P1
+> 10                                                    <- M2 PS2 G1
+> 11        accept       <- PS2 G1 P1
+> 
+Not really. I am not worried about PASID reuse or unbind. Just within
+the same PASID bind lifetime of a single mdev, back to back
+register/unregister fault handler.
+After Step 4, device will think G1 is done. Device could reuse G1 for
+the next PR, if we accept PS1 in step 9, device will terminate G1 before
+the real G1 PS arrives in Step 11. The real G1 PS might have a
+different response code. Then we just drop the PS in Step 11?
 
-I get the same thing when the path to the qcow2 file isn't quoted.
+If the device does not reuse G1 immediately, the spurious response to
+G1 will get dropped no issue there.
 
-I noted in 
-https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/virtualization_administration_guide/sub-sect-domain_commands-using_blockcommit_to_shorten_a_backing_chain 
-that the options use a single "-". However the results for that were:
-# virsh blockcommit stretch /home/secure/virtual/stretch.qcow2 -top 
-stretchS3 -delete -wait
-error: Scaled numeric value '-top' for <--bandwidth> option is malformed 
-or out of range
+> 
+> Step 2 injects PR1 for mdev#1. Step 4 auto-responds to PR1. Between
+> steps 5 and 6, we re-allocate PASID #1 for mdev #2. At step 7, we
+> inject PR2 for mdev #2. Step 8 is the spurious Page Response for PR1.
+> 
+> But I don't think step 9 is possible, because the mdev driver knows
+> that mdev #1 isn't using PASID #1 anymore. If the configuration is
+> valid at all (a page response channel still exists for mdev #1), then
+> mdev #1 now has a different PASID, e.g. #2, and step 9 would be "<-
+> PS1 G1 P2" which is rejected by iommu.c (no such pending page
+> request). And step 11 will be accepted.
+> 
+> If PASIDs are allocated through VCMD, then the situation seems
+> similar: at step 2 you inject "M1 PR1 G1 P1" into the guest, and at
+> step 8 the spurious response is "M1 PS1 G1 P1". If mdev #1 doesn't
+> have PASID #1 anymore, then the mdev driver can check that the PASID
+> is invalid and can reject the page response.
+> 
+> > Having spurious page response is also not
+> > abiding the PCIe spec. exactly.  
+> 
+> We are following the PCI spec though, in that we don't send page
+> responses for PRGIs that aren't in flight.
+> 
+You are right, the worst case of the spurious PS is to terminate the
+group prematurely. Need to know the scope of the HW damage in case of mdev
+where group IDs can be shared among mdevs belong to the same PF.
 
-which looks like virsh doesn't like the single dashes and is trying to 
-interpret them as positional options.
+> > We have two options here:
+> > 1. unregister handler will get -EBUSY if outstanding fault exists.
+> > 	-PROs: block offending device unbind only, eventually
+> > timeout will clear.
+> > 	-CONs: flooded faults can prevent clearing
+> > 2. unregister handle will block until all faults are clear in the
+> > host. Never fails unregistration  
+> 
+> Here the host completes the faults itself or wait for a response from
+> the guest? I'm slightly confused by the word "blocking". I'd rather we
+> don't introduce an uninterruptible sleep in the IOMMU core, since it's
+> unlikely to ever finish if we rely on the guest to complete things.
+> 
+No uninterruptible sleep, I meant unregister_handler is a sync call.
+But no wait for guest's response.
+> > 	-PROs: simple flow for VFIO, no need to worry about device
+> > 	holding reference.
+> > 	-CONs: spurious page response may come from
+> > 	misbehaving/malicious guest if guest does unregister and
+> > 	register back to back.  
+> 
+> > It seems the only way to prevent spurious page response is to
+> > introduce a SW token or sequence# for each PRQ that needs a
+> > response. I still think option 2 is good.
+> > 
+> > Consider the following time line:
+> > decoding
+> >  PR#: page request
+> >  G#:  group #
+> >  P#:  PASID
+> >  S#:  sequence #
+> >  A#:  address
+> >  PS#: page response
+> >  (F): Fail
+> >  (S): Success
+> > 
+> > # Dev		Host		VFIO/QEMU	Guest
+> > ===========================================================	
+> > 1				<-reg(handler)
+> > 2 PR1G1S1A1	->		inject	->
+> > PR1G1S1A1 3 PR2G1S2A2	->
+> > inject	->	PR2G1S2A2 4.
+> > <-unreg(handler) 5.	<-PR1G1S1A1(F)			| 
+> > 6.	<-PR2G1S2A2(F)			V
+> > 7.				<-unreg(handler)
+> > 8.				<-reg(handler)
+> > 9 PR3G1S3A1	->		inject	->
+> > PR3G1S3A1 10.
+> > <-PS1G1S1A1 11.		<reject S1>
+> > 11.		<accept S3>			<-PS3G1S3A1
+> > 12.PS3G1S3A1(S)
+> > 
+> > The spurious page response comes in at step 10 where the guest sends
+> > response for the request in step 1. But since the sequence # is 1,
+> > host IOMMU driver will reject it. At step 11, we accept page
+> > response for the matching sequence # then respond SUCCESS to the
+> > device.
+> > 
+> > So would it be OK to add this sequence# to iommu_fault and page
+> > response, or could event reuse the time stamp for that purpose.  
+> 
+> With a PV interface we can do what we want, but it can't work with an
+> IOMMU emulation that only has 9 bits for the PRGI. I suppose we can
+> add the sequence number but we'll have to handle the case where it
+> isn't present in the page response (ie. accept it anyway).
+> 
+For VT-d emulation, we might be able to use the private data as
+sequence# in vIOMMU. Keep the real private data in the host. Need Yi's
+input. If private data is not present, then accept it anyway.
 
-I also did a
-
-# virsh domblklist stretch
-Target     Source
-------------------------------------------------
-vda        /home/secure/virtual/stretch.qcow2
-hda        -
-
-and tried using vda instead of the full path in the blockcommit but got 
-the same error.
-
-Any ideas on what I'm doing wrong?
-
+> Thanks,
+> Jean
