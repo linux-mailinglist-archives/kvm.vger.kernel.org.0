@@ -2,103 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B6333BB7F
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2019 20:01:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93B103BB9F
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2019 20:07:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388309AbfFJSBE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jun 2019 14:01:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39778 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388052AbfFJSBE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jun 2019 14:01:04 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1CF3E3DBC5;
-        Mon, 10 Jun 2019 18:01:04 +0000 (UTC)
-Received: from flask (unknown [10.43.2.83])
-        by smtp.corp.redhat.com (Postfix) with SMTP id 3E3275C231;
-        Mon, 10 Jun 2019 18:01:02 +0000 (UTC)
-Received: by flask (sSMTP sendmail emulation); Mon, 10 Jun 2019 20:01:01 +0200
-Date:   Mon, 10 Jun 2019 20:01:01 +0200
-From:   Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: nVMX: Stash L1's CR3 in vmcs01.GUEST_CR3 on
- nested entry w/o EPT
-Message-ID: <20190610180101.GB6604@flask>
-References: <20190607185534.24368-1-sean.j.christopherson@intel.com>
+        id S2388724AbfFJSHH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jun 2019 14:07:07 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:36345 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388615AbfFJSHG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jun 2019 14:07:06 -0400
+Received: by mail-pf1-f196.google.com with SMTP id u22so5758102pfm.3
+        for <kvm@vger.kernel.org>; Mon, 10 Jun 2019 11:07:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Qk1teTE+M+IujpCJ4fnOYjeYPWGwjvW8JXrxo/yH0Jc=;
+        b=bS38Kka2lRnznRWhG8/qOGDxKjllgWQ6UMeG3F2amaGnqe8pK0xiGk3vZdBB3YxIb3
+         SWpAwEtE9q/WxIcVXvPngtzttAwOIVkoldUG9+Ng+5o+FvKdQZW1HjakB3VBQBFOd4GH
+         8QDt5M3wpL9e9LGdgrn8sofUH/zfBbAJ6Uge8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Qk1teTE+M+IujpCJ4fnOYjeYPWGwjvW8JXrxo/yH0Jc=;
+        b=FIQim9DtQzZgNCHxyOpQuysmW/Sq7+zmQvFoj0Np3O5roERWth47BiOEJ54qWQ7vY+
+         Fo7/dVPHDx812capHu2Ue16XH+vtYq+lml8q9wkoNdPuCHDTtr2By0V2dHRGI1fMRS3E
+         iCDw4QOyVOvgWDTxjwWXU7EQN4WKNDzNwVVusVRGH3gPtflS2AHB9lCcEOtbOYpAm1cd
+         oQ/bCm8K51XIRG6hPoepBVAb34805t3YVk7U0JzQCXTDxuamnEV+R1MQjdT74Q+IQiRy
+         DholpmwvBOvjSXr9c0jiSyhLgIx2lJW/Wv5u4OOzK4xytjxtAJY/ggUU+a8AWafy6WeH
+         a7Pg==
+X-Gm-Message-State: APjAAAUqjRmZOiIIu7+v06GWmFduiuCjAToQ6eezfeGZvPXu0LycLbvB
+        MNJn3bexweHnPfUnqxOmqXOGTQ==
+X-Google-Smtp-Source: APXvYqwpdKpmgyrcHoPqfm2kAKseftWNyRK4QJdbz1OaJAD6dgVCG3NHvWUoe0J25QMfVAkrE6hAGQ==
+X-Received: by 2002:a65:6104:: with SMTP id z4mr16749806pgu.319.1560190025622;
+        Mon, 10 Jun 2019 11:07:05 -0700 (PDT)
+Received: from www.outflux.net (173-164-112-133-Oregon.hfc.comcastbusiness.net. [173.164.112.133])
+        by smtp.gmail.com with ESMTPSA id x7sm11154611pfm.82.2019.06.10.11.07.04
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 10 Jun 2019 11:07:04 -0700 (PDT)
+Date:   Mon, 10 Jun 2019 11:07:03 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Andrey Konovalov <andreyknvl@google.com>,
+        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+        linux-media@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Subject: Re: [PATCH v16 02/16] arm64: untag user pointers in access_ok and
+ __uaccess_mask_ptr
+Message-ID: <201906101106.3CA50745E3@keescook>
+References: <cover.1559580831.git.andreyknvl@google.com>
+ <4327b260fb17c4776a1e3c844f388e4948cfb747.1559580831.git.andreyknvl@google.com>
+ <20190610175326.GC25803@arrakis.emea.arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190607185534.24368-1-sean.j.christopherson@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Mon, 10 Jun 2019 18:01:04 +0000 (UTC)
+In-Reply-To: <20190610175326.GC25803@arrakis.emea.arm.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-2019-06-07 11:55-0700, Sean Christopherson:
-> KVM does not have 100% coverage of VMX consistency checks, i.e. some
-> checks that cause VM-Fail may only be detected by hardware during a
-> nested VM-Entry.  In such a case, KVM must restore L1's state to the
-> pre-VM-Enter state as L2's state has already been loaded into KVM's
-> software model.
+On Mon, Jun 10, 2019 at 06:53:27PM +0100, Catalin Marinas wrote:
+> On Mon, Jun 03, 2019 at 06:55:04PM +0200, Andrey Konovalov wrote:
+> > diff --git a/arch/arm64/include/asm/uaccess.h b/arch/arm64/include/asm/uaccess.h
+> > index e5d5f31c6d36..9164ecb5feca 100644
+> > --- a/arch/arm64/include/asm/uaccess.h
+> > +++ b/arch/arm64/include/asm/uaccess.h
+> > @@ -94,7 +94,7 @@ static inline unsigned long __range_ok(const void __user *addr, unsigned long si
+> >  	return ret;
+> >  }
+> >  
+> > -#define access_ok(addr, size)	__range_ok(addr, size)
+> > +#define access_ok(addr, size)	__range_ok(untagged_addr(addr), size)
 > 
-> L1's CR3 and PDPTRs in particular are loaded from vmcs01.GUEST_*.  But
-> when EPT is disabled, the associated fields hold KVM's shadow values,
-> not L1's "real" values.  Fortunately, when EPT is disabled the PDPTRs
-> come from memory, i.e. are not cached in the VMCS.  Which leaves CR3
-> as the sole anomaly.
+> I'm going to propose an opt-in method here (RFC for now). We can't have
+> a check in untagged_addr() since this is already used throughout the
+> kernel for both user and kernel addresses (khwasan) but we can add one
+> in __range_ok(). The same prctl() option will be used for controlling
+> the precise/imprecise mode of MTE later on. We can use a TIF_ flag here
+> assuming that this will be called early on and any cloned thread will
+> inherit this.
 > 
-> A previously applied workaround to handle CR3 was to force nested early
-> checks if EPT is disabled:
+> Anyway, it's easier to paste some diff than explain but Vincenzo can
+> fold them into his ABI patches that should really go together with
+> these. I added a couple of MTE definitions for prctl() as an example,
+> not used currently:
 > 
->   commit 2b27924bb1d48 ("KVM: nVMX: always use early vmcs check when EPT
->                          is disabled")
-> 
-> Forcing nested early checks is undesirable as doing so adds hundreds of
-> cycles to every nested VM-Entry.  Rather than take this performance hit,
-> handle CR3 by overwriting vmcs01.GUEST_CR3 with L1's CR3 during nested
-> VM-Entry when EPT is disabled *and* nested early checks are disabled.
-> By stuffing vmcs01.GUEST_CR3, nested_vmx_restore_host_state() will
-> naturally restore the correct vcpu->arch.cr3 from vmcs01.GUEST_CR3.
-> 
-> These shenanigans work because nested_vmx_restore_host_state() does a
-> full kvm_mmu_reset_context(), i.e. unloads the current MMU, which
-> guarantees vmcs01.GUEST_CR3 will be rewritten with a new shadow CR3
-> prior to re-entering L1.
-> 
-> vcpu->arch.root_mmu.root_hpa is set to INVALID_PAGE via:
-> 
->     nested_vmx_restore_host_state() ->
->         kvm_mmu_reset_context() ->
->             kvm_mmu_unload() ->
->                 kvm_mmu_free_roots()
-> 
-> kvm_mmu_unload() has WARN_ON(root_hpa != INVALID_PAGE), i.e. we can bank
-> on 'root_hpa == INVALID_PAGE' unless the implementation of
-> kvm_mmu_reset_context() is changed.
-> 
-> On the way into L1, VMCS.GUEST_CR3 is guaranteed to be written (on a
-> successful entry) via:
-> 
->     vcpu_enter_guest() ->
->         kvm_mmu_reload() ->
->             kvm_mmu_load() ->
->                 kvm_mmu_load_cr3() ->
->                     vmx_set_cr3()
-> 
-> Stuff vmcs01.GUEST_CR3 if and only if nested early checks are disabled
-> as a "late" VM-Fail should never happen win that case (KVM WARNs), and
-> the conditional write avoids the need to restore the correct GUEST_CR3
-> when nested_vmx_check_vmentry_hw() fails.
-> 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> ---
+> ------------------8<---------------------------------------------
+> diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+> index fcd0e691b1ea..2d4cb7e4edab 100644
+> --- a/arch/arm64/include/asm/processor.h
+> +++ b/arch/arm64/include/asm/processor.h
+> @@ -307,6 +307,10 @@ extern void __init minsigstksz_setup(void);
+>  /* PR_PAC_RESET_KEYS prctl */
+>  #define PAC_RESET_KEYS(tsk, arg)	ptrauth_prctl_reset_keys(tsk, arg)
+>  
+> +/* PR_UNTAGGED_UADDR prctl */
+> +int untagged_uaddr_set_mode(unsigned long arg);
+> +#define SET_UNTAGGED_UADDR_MODE(arg)	untagged_uaddr_set_mode(arg)
+> +
+>  /*
+>   * For CONFIG_GCC_PLUGIN_STACKLEAK
+>   *
+> diff --git a/arch/arm64/include/asm/thread_info.h b/arch/arm64/include/asm/thread_info.h
+> index c285d1ce7186..89ce77773c49 100644
+> --- a/arch/arm64/include/asm/thread_info.h
+> +++ b/arch/arm64/include/asm/thread_info.h
+> @@ -101,6 +101,7 @@ void arch_release_task_struct(struct task_struct *tsk);
+>  #define TIF_SVE			23	/* Scalable Vector Extension in use */
+>  #define TIF_SVE_VL_INHERIT	24	/* Inherit sve_vl_onexec across exec */
+>  #define TIF_SSBD		25	/* Wants SSB mitigation */
+> +#define TIF_UNTAGGED_UADDR	26
+>  
+>  #define _TIF_SIGPENDING		(1 << TIF_SIGPENDING)
+>  #define _TIF_NEED_RESCHED	(1 << TIF_NEED_RESCHED)
+> @@ -116,6 +117,7 @@ void arch_release_task_struct(struct task_struct *tsk);
+>  #define _TIF_FSCHECK		(1 << TIF_FSCHECK)
+>  #define _TIF_32BIT		(1 << TIF_32BIT)
+>  #define _TIF_SVE		(1 << TIF_SVE)
+> +#define _TIF_UNTAGGED_UADDR	(1 << TIF_UNTAGGED_UADDR)
+>  
+>  #define _TIF_WORK_MASK		(_TIF_NEED_RESCHED | _TIF_SIGPENDING | \
+>  				 _TIF_NOTIFY_RESUME | _TIF_FOREIGN_FPSTATE | \
+> diff --git a/arch/arm64/include/asm/uaccess.h b/arch/arm64/include/asm/uaccess.h
+> index 9164ecb5feca..54f5bbaebbc4 100644
+> --- a/arch/arm64/include/asm/uaccess.h
+> +++ b/arch/arm64/include/asm/uaccess.h
+> @@ -73,6 +73,9 @@ static inline unsigned long __range_ok(const void __user *addr, unsigned long si
+>  {
+>  	unsigned long ret, limit = current_thread_info()->addr_limit;
+>  
+> +	if (test_thread_flag(TIF_UNTAGGED_UADDR))
+> +		addr = untagged_addr(addr);
+> +
+>  	__chk_user_ptr(addr);
+>  	asm volatile(
+>  	// A + B <= C + 1 for all A,B,C, in four easy steps:
+> @@ -94,7 +97,7 @@ static inline unsigned long __range_ok(const void __user *addr, unsigned long si
+>  	return ret;
+>  }
+>  
+> -#define access_ok(addr, size)	__range_ok(untagged_addr(addr), size)
+> +#define access_ok(addr, size)	__range_ok(addr, size)
+>  #define user_addr_max			get_fs
+>  
+>  #define _ASM_EXTABLE(from, to)						\
+> diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
+> index 3767fb21a5b8..fd191c5b92aa 100644
+> --- a/arch/arm64/kernel/process.c
+> +++ b/arch/arm64/kernel/process.c
+> @@ -552,3 +552,18 @@ void arch_setup_new_exec(void)
+>  
+>  	ptrauth_thread_init_user(current);
+>  }
+> +
+> +/*
+> + * Enable the relaxed ABI allowing tagged user addresses into the kernel.
+> + */
+> +int untagged_uaddr_set_mode(unsigned long arg)
+> +{
+> +	if (is_compat_task())
+> +		return -ENOTSUPP;
+> +	if (arg)
+> +		return -EINVAL;
+> +
+> +	set_thread_flag(TIF_UNTAGGED_UADDR);
+> +
+> +	return 0;
+> +}
 
-Surprisingly robust, well done.
+I think this should be paired with a flag clearing in copy_thread(),
+yes? (i.e. each binary needs to opt in)
 
-Reviewed-by: Radim Krčmář <rkrcmar@redhat.com>
+-- 
+Kees Cook
