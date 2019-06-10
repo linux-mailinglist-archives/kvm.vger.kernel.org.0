@@ -2,101 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 24DF93AE22
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2019 06:31:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 285C23AE6F
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2019 07:08:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728212AbfFJEbs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jun 2019 00:31:48 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:32826 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728092AbfFJEbs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jun 2019 00:31:48 -0400
-Received: by mail-ot1-f65.google.com with SMTP id p4so3882794oti.0;
-        Sun, 09 Jun 2019 21:31:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zqVRtfIXSfL2glUOZ/rPqcfEx5EYpKNLA4Zoyt8Pnhg=;
-        b=ue19iE+NTrIsYbDZPeAukExr8wKcPe3hVLkZ8so/3GUG6HTktivL9uGMTedOf1PCI0
-         fvcY9kOdGV6WXSPD+IAqLBo2582Zue8weJb5nZLIbJOkfvTsQSQ2pNXOiTMhstQorQhJ
-         uKdrZRKAUtHShrEd4QqNOfs0dZ6yYZFh4kRZeKmw2bd518fzFUBrSXwODkyMo0KDcSm0
-         kqm5CuQA2zKTcKhqsPZd2oihR2U7gvIpVoLDfwZftgPym/QUKBZWxtsuQ7Y4zoMvScWD
-         +acz2Crjwitx205NOxJEQajagGT0hpESOAamcm2YwSqJyiNBW5iZ2NWbHEeh+HDV7Eg7
-         jMig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zqVRtfIXSfL2glUOZ/rPqcfEx5EYpKNLA4Zoyt8Pnhg=;
-        b=AZwDpDdiTkaqUDFBXEpIzoMtBbhQNJeAz3zYxQEpCnexnMhDOyhoirMQGpzMZQlQkd
-         7vfncgvOZ9hLzcBDn3Dt202ZggB8LrlPQ6QjhjSBmyRbBPzo5Y2f8Sq3LSYEb37ycxYY
-         RX8DlRmo7PJ0zLltYWt0MSBi5HJdTd9GJ1ovbmc94lL+2UcHry4OnOA+gj39Yl5GcQsC
-         A2lbuOL0/bRnm6V3Vmc8tKkoNLsmdp0epXSXIIW7EvIz5gE/urcKeETsk2Tv0uKXL2tV
-         +JjduViIyXaJnzqYEEepcaWGyG9TjuQeZVfmCqjC38G/MRi+xeaYYpVVi/AY0+lKdmzN
-         bpDw==
-X-Gm-Message-State: APjAAAX8wwdYfTchQEfAjBwazL0OnQ0vSF1Us+UTWE1Pr/EslvhMI18z
-        4utZ/2zYbgGHqN/iVlZl2qlNgEkj9cgYGgrrEAFG66P0
-X-Google-Smtp-Source: APXvYqz4AmIrXv9HXM51uFtgYFsZXZOkVbKmfDs32qPNJWsP58722hw+glnxhaRn/TS6A4hgm62/k2MbjKBbd/DYP8U=
-X-Received: by 2002:a9d:6312:: with SMTP id q18mr27167731otk.45.1560141107273;
- Sun, 09 Jun 2019 21:31:47 -0700 (PDT)
+        id S1728335AbfFJFIY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jun 2019 01:08:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40636 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726913AbfFJFIY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jun 2019 01:08:24 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3A5623082E55;
+        Mon, 10 Jun 2019 05:08:23 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E83C15B684;
+        Mon, 10 Jun 2019 05:08:22 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 1D91C206D1;
+        Mon, 10 Jun 2019 05:08:21 +0000 (UTC)
+Date:   Mon, 10 Jun 2019 01:08:20 -0400 (EDT)
+From:   Pankaj Gupta <pagupta@redhat.com>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     linux-nvdimm <linux-nvdimm@lists.01.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        KVM list <kvm@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux ACPI <linux-acpi@vger.kernel.org>,
+        Qemu Developers <qemu-devel@nongnu.org>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        device-mapper development <dm-devel@redhat.com>,
+        Ross Zwisler <zwisler@kernel.org>,
+        Vishal L Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Christoph Hellwig <hch@infradead.org>,
+        Len Brown <lenb@kernel.org>, Jan Kara <jack@suse.cz>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        lcapitulino@redhat.com, Kevin Wolf <kwolf@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        jmoyer <jmoyer@redhat.com>,
+        Nitesh Narayan Lal <nilal@redhat.com>,
+        Rik van Riel <riel@surriel.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        david <david@fromorbit.com>, cohuck@redhat.com,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        yuval shaia <yuval.shaia@oracle.com>,
+        Adam Borowski <kilobyte@angband.pl>, jstaron@google.com,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>
+Message-ID: <1533125860.33764157.1560143300908.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CAPcyv4iW-UeHBs+qSii2Pk7Q2Nki6imGBTEORuxEAWgEMMp=nA@mail.gmail.com>
+References: <20190521133713.31653-1-pagupta@redhat.com> <20190521133713.31653-5-pagupta@redhat.com> <CAPcyv4iW-UeHBs+qSii2Pk7Q2Nki6imGBTEORuxEAWgEMMp=nA@mail.gmail.com>
+Subject: Re: [PATCH v10 4/7] dm: enable synchronous dax
 MIME-Version: 1.0
-References: <1559799086-13912-1-git-send-email-wanpengli@tencent.com>
-In-Reply-To: <1559799086-13912-1-git-send-email-wanpengli@tencent.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 10 Jun 2019 12:32:33 +0800
-Message-ID: <CANRm+CwUyX_7FafiWPCr4JgFetfOkttw2P0xS6yjOzKs-X3f9A@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] KVM: LAPIC: Implement Exitless Timer
-To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.16, 10.4.195.3]
+Thread-Topic: enable synchronous dax
+Thread-Index: bfiNCXycvh8K7TR5aXllhHNvtwio0w==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Mon, 10 Jun 2019 05:08:24 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 6 Jun 2019 at 13:31, Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> Dedicated instances are currently disturbed by unnecessary jitter due
-> to the emulated lapic timers fire on the same pCPUs which vCPUs resident.
-> There is no hardware virtual timer on Intel for guest like ARM. Both
-> programming timer in guest and the emulated timer fires incur vmexits.
-> This patchset tries to avoid vmexit which is incurred by the emulated
-> timer fires in dedicated instance scenario.
->
-> When nohz_full is enabled in dedicated instances scenario, the unpinned
-> timer will be moved to the nearest busy housekeepers after commit 444969223c8
-> ("sched/nohz: Fix affine unpinned timers mess"). However, KVM always makes
-> lapic timer pinned to the pCPU which vCPU residents, the reason is explained
-> by commit 61abdbe0 (kvm: x86: make lapic hrtimer pinned). Actually, these
-> emulated timers can be offload to the housekeeping cpus since APICv
-> is really common in recent years. The guest timer interrupt is injected by
-> posted-interrupt which is delivered by housekeeping cpu once the emulated
-> timer fires.
->
-> The host admin should fine tuned, e.g. dedicated instances scenario w/
-> nohz_full cover the pCPUs which vCPUs resident, several pCPUs surplus
-> for housekeeping, disable mwait/hlt/pause vmexits to occupy the pCPUs,
-> fortunately preemption timer is disabled after mwait is exposed to
-> guest which makes emulated timer offload can be possible.
-> 3%~5% redis performance benefit can be observed on Skylake server.
 
-w/o patchset:
+> On Tue, May 21, 2019 at 6:43 AM Pankaj Gupta <pagupta@redhat.com> wrote:
+> >
+> >  This patch sets dax device 'DAXDEV_SYNC' flag if all the target
+> >  devices of device mapper support synchrononous DAX. If device
+> >  mapper consists of both synchronous and asynchronous dax devices,
+> >  we don't set 'DAXDEV_SYNC' flag.
+> >
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > ---
+> >  drivers/md/dm-table.c | 14 ++++++++++++++
+> >  1 file changed, 14 insertions(+)
+> >
+> > diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> > index cde3b49b2a91..1cce626ff576 100644
+> > --- a/drivers/md/dm-table.c
+> > +++ b/drivers/md/dm-table.c
+> > @@ -886,10 +886,17 @@ static int device_supports_dax(struct dm_target *ti,
+> > struct dm_dev *dev,
+> >         return bdev_dax_supported(dev->bdev, PAGE_SIZE);
+> >  }
+> >
+> > +static int device_synchronous(struct dm_target *ti, struct dm_dev *dev,
+> > +                              sector_t start, sector_t len, void *data)
+> > +{
+> > +       return dax_synchronous(dev->dax_dev);
+> > +}
+> > +
+> >  static bool dm_table_supports_dax(struct dm_table *t)
+> >  {
+> >         struct dm_target *ti;
+> >         unsigned i;
+> > +       bool dax_sync = true;
+> >
+> >         /* Ensure that all targets support DAX. */
+> >         for (i = 0; i < dm_table_get_num_targets(t); i++) {
+> > @@ -901,7 +908,14 @@ static bool dm_table_supports_dax(struct dm_table *t)
+> >                 if (!ti->type->iterate_devices ||
+> >                     !ti->type->iterate_devices(ti, device_supports_dax,
+> >                     NULL))
+> >                         return false;
+> > +
+> > +               /* Check devices support synchronous DAX */
+> > +               if (dax_sync &&
+> > +                   !ti->type->iterate_devices(ti, device_synchronous,
+> > NULL))
+> > +                       dax_sync = false;
+> 
+> Looks like this needs to be rebased on the current state of v5.2-rc,
+> and then we can nudge Mike for an ack.
 
-                             VM-EXIT    Samples  Samples%     Time%
-Min Time    Max Time         Avg time
+Sorry! for late reply due to vacations. I will rebase the series on v5.2-rc4 and
+send a v11.
 
-  EXTERNAL_INTERRUPT      42916    49.43%    39.30%      0.47us
-106.09us      0.71us ( +-   1.09% )
-
-w/ patchset:
-
-                             VM-EXIT    Samples  Samples%     Time%
-Min Time    Max Time         Avg time
-
-  EXTERNAL_INTERRUPT       6871     9.29%     2.96%      0.44us
-57.88us      0.72us ( +-   4.02% )
-
-Regards,
-Wanpeng Li
+Thanks,
+Pankaj
+Yes, 
+> 
