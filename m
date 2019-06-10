@@ -2,91 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 935963BA78
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2019 19:12:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF7473BB10
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2019 19:35:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728488AbfFJRLQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jun 2019 13:11:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34636 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728289AbfFJRLN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jun 2019 13:11:13 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D4E40C18B2DB;
-        Mon, 10 Jun 2019 17:11:12 +0000 (UTC)
-Received: from flask (unknown [10.43.2.83])
-        by smtp.corp.redhat.com (Postfix) with SMTP id D77026061B;
-        Mon, 10 Jun 2019 17:11:10 +0000 (UTC)
-Received: by flask (sSMTP sendmail emulation); Mon, 10 Jun 2019 19:11:10 +0200
-Date:   Mon, 10 Jun 2019 19:11:10 +0200
-From:   Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 1/3] KVM: LAPIC: Make lapic timer unpinned when timer
- is injected by posted-interrupt
-Message-ID: <20190610171110.GB8389@flask>
-References: <1559799086-13912-1-git-send-email-wanpengli@tencent.com>
- <1559799086-13912-2-git-send-email-wanpengli@tencent.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1559799086-13912-2-git-send-email-wanpengli@tencent.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Mon, 10 Jun 2019 17:11:12 +0000 (UTC)
+        id S2388335AbfFJRfu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jun 2019 13:35:50 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:43694 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387779AbfFJRft (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jun 2019 13:35:49 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5AHSX71079843;
+        Mon, 10 Jun 2019 17:34:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2018-07-02;
+ bh=vjpIkG4pJcSKkmi2v8G9rQvnvqiK3JvWrDwev2wP/CY=;
+ b=DVguHHhwrSMLxqZGD1q8rgE702LTb9ImtrdMPncKJPQx8dRPyPwoXqwY3UDPEdge/J8V
+ F0o2VcBs6KS1XXKo/XbtCYJ5M+pbmMslBeO4HB9p8u6ZutYKd/9bOLrsNVQu/jKKOoIX
+ fotagtOYlzeLKASvULuKHN6Dx6xNPHkvIIrre7+D7g7veIBl/xa80wz39onIjlgJpWXN
+ KAmIKS6M7hcDH4sTxaKQIjyq220pYfppUBQIbk1StxUbqDzd0xMY3YB2b4gFDrX9I/K+
+ GQYri3sJpnOhVcuhyuykHxd+7wUySnv+ZYrWdqvR7PmimNVRu7FyY+g/ZO6vzzVXVFX4 Ig== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2130.oracle.com with ESMTP id 2t02hegfta-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Jun 2019 17:34:44 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5AHWqS0117029;
+        Mon, 10 Jun 2019 17:34:44 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2t04hxwc0h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Jun 2019 17:34:44 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5AHYcrW028023;
+        Mon, 10 Jun 2019 17:34:38 GMT
+Received: from ban25x6uut148.us.oracle.com (/10.153.73.148)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 10 Jun 2019 10:34:38 -0700
+From:   Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+To:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        pbonzini@redhat.com, rkrcmar@redhat.com
+Cc:     x86@kernel.org, kvm@vger.kernel.org, alejandro.j.jimenez@oracle.com
+Subject: [PATCH 1/1] kvm/speculation: Allow KVM guests to use SSBD even if host does not
+Date:   Mon, 10 Jun 2019 13:20:10 -0400
+Message-Id: <1560187210-11054-1-git-send-email-alejandro.j.jimenez@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9284 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=626
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906100119
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9284 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=669 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906100119
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-2019-06-06 13:31+0800, Wanpeng Li:
-> From: Wanpeng Li <wanpengli@tencent.com>
-> 
-> Make lapic timer unpinned when timer is injected by posted-interrupt,
-> the emulated timer can be offload to the housekeeping cpus.
-> 
-> The host admin should fine tuned, e.g. dedicated instances scenario 
-> w/ nohz_full cover the pCPUs which vCPUs resident, several pCPUs 
-> surplus for housekeeping, disable mwait/hlt/pause vmexits to occupy 
-> the pCPUs, fortunately preemption timer is disabled after mwait is 
-> exposed to guest which makes emulated timer offload can be possible. 
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/lapic.c            | 20 ++++++++++++++++----
->  arch/x86/kvm/x86.c              |  5 +++++
->  arch/x86/kvm/x86.h              |  2 ++
->  include/linux/sched/isolation.h |  2 ++
->  kernel/sched/isolation.c        |  6 ++++++
->  5 files changed, 31 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index fcf42a3..09b7387 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -127,6 +127,12 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
->  	return apic->vcpu->vcpu_id;
->  }
->  
-> +static inline bool posted_interrupt_inject_timer_enabled(struct kvm_vcpu *vcpu)
-> +{
-> +	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
-> +		kvm_mwait_in_guest(vcpu->kvm);
+The bits set in x86_spec_ctrl_mask are used to calculate the
+guest's value of SPEC_CTRL that is written to the MSR before
+VMENTRY, and control which mitigations the guest can enable.
+In the case of SSBD, unless the host has enabled SSBD always
+on mode (by passing "spec_store_bypass_disable=on" in the
+kernel parameters), the SSBD bit is not set in the mask and
+the guest can not properly enable the SSBD always on
+mitigation mode.
 
-I'm torn about the mwait dependency.  It covers a lot of the targeted
-user base, but the relation is convoluted and not fitting perfectly.
+This is confirmed by running the SSBD PoC on a guest using
+the SSBD always on mitigation mode (booted with kernel
+parameter "spec_store_bypass_disable=on"), and verifying
+that the guest is vulnerable unless the host is also using
+SSBD always on mode. In addition, the guest OS incorrectly
+reports the SSB vulnerability as mitigated.
 
-What do you think about making posted_interrupt_inject_timer_enabled()
-just
+Always set the SSBD bit in x86_spec_ctrl_mask when the host
+CPU supports it, allowing the guest to use SSBD whether or
+not the host has chosen to enable the mitigation in any of
+its modes.
 
-	pi_inject_timer && kvm_vcpu_apicv_active(vcpu)
+Signed-off-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Cc: stable@vger.kernel.org
+---
+ arch/x86/kernel/cpu/bugs.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-and disarming the vmx preemption timer when
-posted_interrupt_inject_timer_enabled(), just like we do with mwait now?
+diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+index 03b4cc0..66ca906 100644
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -836,6 +836,16 @@ static enum ssb_mitigation __init __ssb_select_mitigation(void)
+ 	}
+ 
+ 	/*
++	 * If SSBD is controlled by the SPEC_CTRL MSR, then set the proper
++	 * bit in the mask to allow guests to use the mitigation even in the
++	 * case where the host does not enable it.
++	 */
++	if (static_cpu_has(X86_FEATURE_SPEC_CTRL_SSBD) ||
++	    static_cpu_has(X86_FEATURE_AMD_SSBD)) {
++		x86_spec_ctrl_mask |= SPEC_CTRL_SSBD;
++	}
++
++	/*
+ 	 * We have three CPU feature flags that are in play here:
+ 	 *  - X86_BUG_SPEC_STORE_BYPASS - CPU is susceptible.
+ 	 *  - X86_FEATURE_SSBD - CPU is able to turn off speculative store bypass
+@@ -852,7 +862,6 @@ static enum ssb_mitigation __init __ssb_select_mitigation(void)
+ 			x86_amd_ssb_disable();
+ 		} else {
+ 			x86_spec_ctrl_base |= SPEC_CTRL_SSBD;
+-			x86_spec_ctrl_mask |= SPEC_CTRL_SSBD;
+ 			wrmsrl(MSR_IA32_SPEC_CTRL, x86_spec_ctrl_base);
+ 		}
+ 	}
+-- 
+1.8.3.1
 
-Thanks.
