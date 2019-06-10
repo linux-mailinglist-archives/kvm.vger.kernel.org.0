@@ -2,169 +2,352 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A44643BF18
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 00:03:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC3643BF1C
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 00:05:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728760AbfFJWDj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jun 2019 18:03:39 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:38714 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728651AbfFJWDj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jun 2019 18:03:39 -0400
-Received: by mail-ot1-f66.google.com with SMTP id d17so9854332oth.5;
-        Mon, 10 Jun 2019 15:03:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=54gcKwSl4Wln6AHzMPwIpWwUWYaeFni8TiHUw2HOFcU=;
-        b=dskmdjNB0KGl7ADWUpBB+wipAamdew7TtO9sNutagF6s6VEn+qO4jwH2mjseCHdSb0
-         Zhk/+0L6Zre+dNJx6BSWF7kwtfpcxZGwnRloiIXwpZL2A1T0ySU/wd5wYnQEVOYyjWRO
-         b6poBIoJy9wF2thufAYUGepgzBOIwC2Nhvpahf7t1SO7GsTeH52RjLKPRM56kZrc8MkZ
-         u/uP2qzx9gPR3hoa43Qb+wXelwpIItpUnbtN7CfqAZQmSwC/7kz3rnhia/pjG5gVCKkS
-         NE7vdqDkjcPRAddlfATK2IIaLXhMqmxY/SE80vRc8c4xblp+bkujUhV+fQsCFS2EoBYf
-         0kUg==
-X-Gm-Message-State: APjAAAXSfANdMuhX0vieIhF3Z5Axq20pGc+GM7FfSDx3Ipv1rvhv+Q1c
-        OvgH9QmBeUj6XbDOWjMdcrFGgwMK9a6MjN2miqw=
-X-Google-Smtp-Source: APXvYqxLjX95H9H0dzlpmNatrvxeytb3maSU71Wt6NotvDHzkwP6AwWpHvV3R0dOXAUTJjfbcULqbwqZCVbY0L0rI2U=
-X-Received: by 2002:a9d:5f05:: with SMTP id f5mr26428688oti.167.1560204217931;
- Mon, 10 Jun 2019 15:03:37 -0700 (PDT)
+        id S2389877AbfFJWFC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jun 2019 18:05:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52290 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389083AbfFJWFC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jun 2019 18:05:02 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id DF6FA8552E;
+        Mon, 10 Jun 2019 22:05:01 +0000 (UTC)
+Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 032E15DA2E;
+        Mon, 10 Jun 2019 22:04:58 +0000 (UTC)
+Subject: Re: [Qemu-devel] kvm / virsh snapshot management
+To:     Gary Dale <gary@extremeground.com>,
+        Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <abb7990e-0331-67a4-af92-05276366478c@extremeground.com>
+ <20190610121941.GI14257@stefanha-x1.localdomain>
+ <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
+From:   Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <28719bbe-fcce-9e37-f146-ad6ce3edda51@redhat.com>
+Date:   Mon, 10 Jun 2019 17:04:58 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190603225242.289109849@amt.cnet> <6c411948-9e32-9f41-351e-c9accd1facb0@intel.com>
- <20190610145942.GA24553@amt.cnet>
-In-Reply-To: <20190610145942.GA24553@amt.cnet>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Tue, 11 Jun 2019 00:03:26 +0200
-Message-ID: <CAJZ5v0idYgETFg4scgvpJ-eGtFAx1Wi6hznXz7+XZAfKjiSAPA@mail.gmail.com>
-Subject: Re: [patch 0/3] cpuidle-haltpoll driver (v2)
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LDhD9tw4PCocOFPw==?= <rkrcmar@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Raslan KarimAllah <karahmed@amazon.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Linux PM <linux-pm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="X4susEw3dDp7o8dD2P0cjEPmUpmuecXf8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Mon, 10 Jun 2019 22:05:01 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 10, 2019 at 5:00 PM Marcelo Tosatti <mtosatti@redhat.com> wrote:
->
-> On Fri, Jun 07, 2019 at 11:49:51AM +0200, Rafael J. Wysocki wrote:
-> > On 6/4/2019 12:52 AM, Marcelo Tosatti wrote:
-> > >The cpuidle-haltpoll driver allows the guest vcpus to poll for a specified
-> > >amount of time before halting. This provides the following benefits
-> > >to host side polling:
-> > >
-> > >         1) The POLL flag is set while polling is performed, which allows
-> > >            a remote vCPU to avoid sending an IPI (and the associated
-> > >            cost of handling the IPI) when performing a wakeup.
-> > >
-> > >         2) The HLT VM-exit cost can be avoided.
-> > >
-> > >The downside of guest side polling is that polling is performed
-> > >even with other runnable tasks in the host.
-> > >
-> > >Results comparing halt_poll_ns and server/client application
-> > >where a small packet is ping-ponged:
-> > >
-> > >host                                        --> 31.33
-> > >halt_poll_ns=300000 / no guest busy spin    --> 33.40   (93.8%)
-> > >halt_poll_ns=0 / guest_halt_poll_ns=300000  --> 32.73   (95.7%)
-> > >
-> > >For the SAP HANA benchmarks (where idle_spin is a parameter
-> > >of the previous version of the patch, results should be the
-> > >same):
-> > >
-> > >hpns == halt_poll_ns
-> > >
-> > >                           idle_spin=0/   idle_spin=800/    idle_spin=0/
-> > >                           hpns=200000    hpns=0            hpns=800000
-> > >DeleteC06T03 (100 thread) 1.76           1.71 (-3%)        1.78   (+1%)
-> > >InsertC16T02 (100 thread) 2.14           2.07 (-3%)        2.18   (+1.8%)
-> > >DeleteC00T01 (1 thread)   1.34           1.28 (-4.5%)           1.29   (-3.7%)
-> > >UpdateC00T03 (1 thread)   4.72           4.18 (-12%)    4.53   (-5%)
-> > >
-> > >V2:
-> > >
-> > >- Move from x86 to generic code (Paolo/Christian).
-> > >- Add auto-tuning logic (Paolo).
-> > >- Add MSR to disable host side polling (Paolo).
-> > >
-> > >
-> > >
-> > First of all, please CC power management patches (including cpuidle,
-> > cpufreq etc) to linux-pm@vger.kernel.org (there are people on that
-> > list who may want to see your changes before they go in) and CC
-> > cpuidle material (in particular) to Peter Zijlstra.
-> >
-> > Second, I'm not a big fan of this approach to be honest, as it kind
-> > of is a driver trying to play the role of a governor.
-> >
-> > We have a "polling state" already that could be used here in
-> > principle so I wonder what would be wrong with that.  Also note that
-> > there seems to be at least some code duplication between your code
-> > and the "polling state" implementation, so maybe it would be
-> > possible to do some things in a common way?
->
-> Hi Rafael,
->
-> After modifying poll_state.c to use a generic "poll time" driver
-> callback [1] (since using a variable "target_residency" for that
-> looks really ugly), would need a governor which does:
->
-> haltpoll_governor_select_next_state()
->         if (prev_state was poll and evt happened on prev poll window) -> POLL.
->         if (prev_state == HLT)  -> POLL
->         otherwise               -> HLT
->
-> And a "default_idle" cpuidle driver that:
->
-> defaultidle_idle()
->         if (current_clr_polling_and_test()) {
->                 local_irq_enable();
->                 return index;
->         }
->         default_idle();
->         return
->
-> Using such governor with any other cpuidle driver would
-> be pointless (since it would enter the first state only
-> and therefore not save power).
->
-> Not certain about using the default_idle driver with
-> other governors: one would rather use a driver that
-> supports all states on a given machine.
->
-> This combination of governor/driver pair, for the sake
-> of sharing the idle loop, seems awkward to me.
-> And fails the governor/driver separation: one will use the
-> pair in practice.
->
-> But i have no problem with it, so i'll proceed with that.
->
-> Let me know otherwise.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--X4susEw3dDp7o8dD2P0cjEPmUpmuecXf8
+Content-Type: multipart/mixed; boundary="LgO3XgplPUzy2Wffs5YirAL6i00W4PqiA";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Gary Dale <gary@extremeground.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
+Message-ID: <28719bbe-fcce-9e37-f146-ad6ce3edda51@redhat.com>
+Subject: Re: [Qemu-devel] kvm / virsh snapshot management
+References: <abb7990e-0331-67a4-af92-05276366478c@extremeground.com>
+ <20190610121941.GI14257@stefanha-x1.localdomain>
+ <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
+In-Reply-To: <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
 
-If my understanding of your argumentation is correct, it is only
-necessary to take the default_idle_call() branch of
-cpuidle_idle_call() in the VM case, so it should be sufficient to
-provide a suitable default_idle_call() which is what you seem to be
-trying to do.
+--LgO3XgplPUzy2Wffs5YirAL6i00W4PqiA
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-I might have been confused by the terminology used in the patch series
-if that's the case.
+On 6/10/19 10:54 AM, Gary Dale wrote:
 
-Also, if that's the case, this is not cpuidle matter really.  It is a
-matter of providing a better default_idle_call() for the arch at hand.
+>>> One explanation I've seen of the process is if I delete a snapshot, t=
+he
+>>> changes it contains are merged with its immediate child.
+>> Nope.=A0 Deleting a snapshot decrements the reference count on all its=
 
-Thanks,
-Rafael
+>> data clusters.=A0 If a data cluster's reference count reaches zero it =
+will
+>> be freed.=A0 That's all, there is no additional data movement or
+>> reorganization aside from this.
+> Perhaps not physically but logically it would appear that the data
+> clusters were merged.
+
+No.
+
+If I have an image that starts out as all blanks, then write to part of
+it (top line showing cluster number, bottom line showing representative
+data):
+
+012345
+AA----
+
+then take internal snapshot S1, then write more:
+
+ABB---
+
+then take another internal snapshot S2, then write even more:
+
+ABCC--
+
+the single qcow2 image will have something like:
+
+L1 table for S1 =3D> {
+  guest cluster 0 =3D> host cluster 5 refcount 3 content A
+  guest cluster 1 =3D> host cluster 6 refcount 1 content A
+}
+L1 table for S2 =3D> {
+  guest cluster 0 =3D> host cluster 5 refcount 3 content A
+  guest cluster 1 =3D> host cluster 7 refcount 2 content B
+  guest cluster 2 =3D> host cluster 8 refcount 1 content B
+}
+L1 table for active image =3D> {
+  guest cluster 0 =3D> host cluster 5 refcount 3 content A
+  guest cluster 1 =3D> host cluster 7 refcount 2 content B
+  guest cluster 2 =3D> host cluster 9 refcount 1 content C
+  guest cluster 3 =3D> host cluster 10 refcount 1 content C
+}
+
+
+If I then delete S2, I'm left with:
+
+L1 table for S1 =3D> {
+  guest cluster 0 =3D> host cluster 5 refcount 2 content A
+  guest cluster 1 =3D> host cluster 6 refcount 1 content A
+}
+L1 table for active image =3D> {
+  guest cluster 0 =3D> host cluster 5 refcount 2 content A
+  guest cluster 1 =3D> host cluster 7 refcount 1 content B
+  guest cluster 2 =3D> host cluster 9 refcount 1 content C
+  guest cluster 3 =3D> host cluster 10 refcount 1 content C
+}
+
+and host cluster 8 is no longer in use.
+
+Or, if I instead use external snapshots, I have a chain of images:
+
+base <- mid <- active
+
+L1 table for image base =3D> {
+  guest cluster 0 =3D> host cluster 5 refcount 1 content A
+  guest cluster 1 =3D> host cluster 6 refcount 1 content A
+}
+L1 table for image mid =3D> {
+  guest cluster 1 =3D> host cluster 5 refcount 1 content B
+  guest cluster 2 =3D> host cluster 6 refcount 1 content B
+}
+L1 table for image active =3D> {
+  guest cluster 2 =3D> host cluster 5 refcount 1 content C
+  guest cluster 3 =3D> host cluster 6 refcount 1 content C
+}
+
+If I then delete image mid, I can do so in one of two ways:
+
+blockcommit mid into base:
+base <- active
+L1 table for image base =3D> {
+  guest cluster 0 =3D> host cluster 5 refcount 1 content A
+  guest cluster 1 =3D> host cluster 6 refcount 1 content B
+  guest cluster 2 =3D> host cluster 7 refcount 1 content B
+}
+L1 table for image active =3D> {
+  guest cluster 2 =3D> host cluster 5 refcount 1 content C
+  guest cluster 3 =3D> host cluster 6 refcount 1 content C
+}
+
+
+blockpull mid into active:
+base <- active
+L1 table for image base =3D> {
+  guest cluster 0 =3D> host cluster 5 refcount 1 content A
+  guest cluster 1 =3D> host cluster 6 refcount 1 content A
+}
+L1 table for image active =3D> {
+  guest cluster 1 =3D> host cluster 7 refcount 1 content B
+  guest cluster 2 =3D> host cluster 5 refcount 1 content C
+  guest cluster 3 =3D> host cluster 6 refcount 1 content C
+}
+
+
+>>> Can some provide a little clarity on this? Thanks!
+>> If you want an analogy then git(1) is a pretty good one.=A0 qcow2 inte=
+rnal
+>> snapshots are like git tags.=A0 Unlike branches, tags are immutable.=A0=
+ In
+>> qcow2 you only have a master branch (the current disk state) from whic=
+h
+>> you can create a new tag or you can use git-checkout(1) to apply a
+>> snapshot (discarding whatever your current disk state is).
+>>
+>> Stefan
+>=20
+> That's just making things less clear - I've never tried to understand
+> git either. Thanks for the attempt though.
+>=20
+> If I've gotten things correct, once the base image is established, ther=
+e
+> is a current disk state that points to a table containing all the write=
+s
+> since the base image. Creating a snapshot essentially takes that pointe=
+r
+> and gives it the snapshot name, while creating a new current disk state=
+
+> pointer and data table where subsequent writes are recorded.
+
+Not quite. Rather, for internal snapshots, there is a table pointing to
+ALL the contents that should be visible to the guest at that point in
+time (one table for each snapshot, which is effectively read-only, and
+one table for the active image, which is updated dynamically as guest
+writes happen).  But the table does NOT track provenance of a cluster,
+only a refcount.
+
+>=20
+> Deleting snapshots removes your ability to refer to a data table by
+> name, but the table itself still exists anonymously as part of a chain
+> of data tables between the base image and the current state.
+
+Wrong for internal snapshots. There is no chain of data tables, and if a
+cluster's refcount goes to 0, you no longer have access to the
+information that the guest saw at the time that cluster was created.
+
+Also wrong for external snapshots - there, you do have a chain of data
+between images, but when you delete an external snapshot, you should
+only do so after moving the relevant data elsewhere in the chain, at
+which point you reduced the length of the chain.
+
+>=20
+> This leaves a problem. The chain will very quickly get quite long which=
+
+> will impact performance. To combat this, you can use blockcommit to
+> merge a child with its parent or blockpull to merge a parent with its
+> child.
+
+Wrong for internal snapshots, where blockcommit and blockpull do not
+really work.
+
+More accurate for external snapshots.
+
+>=20
+> In my situation, I want to keep a week of daily snapshots in case
+> something goes horribly wrong with the VM (I recently had a database
+> file become corrupt, and reverting to the previous working day's image
+> would have been a quick and easy solution, faster than recovering all
+> the data tables from the prefious day). I've been shutting down the VM,=
+
+> deleting the oldest snapshot and creating a new one before restarting
+> the VM.
+>=20
+> While your explanation confirms that this is safe, it also implies that=
+
+> I need to manage the data table chains. My first instinct is to use
+> blockcommit before deleting the oldest snapshot, such as:
+>=20
+> =A0=A0=A0 virsh blockcommit <vm name> <qcow2 file path> --top <oldest
+> snapshot> --delete --wait
+> =A0=A0=A0 virsh snapshot-delete=A0 --domain <vm name> --snapshotname <o=
+ldest
+> snapshot>
+>=20
+> so that the base image contains the state as of one week earlier and th=
+e
+> snapshot chains are limited to 7 links.
+>=20
+> 1) does this sound reasonable?
+
+If you want to track WHICH clusters have changed since the last backup
+(which is the goal of incremental/differential backups), you probably
+also want to be using persistent bitmaps.  At the moment, internal
+snapshots have very little upstream development compared to external
+snapshots, and are less likely to have ways to do what you want.
+
+>=20
+> 2) I note that the syntax in virsh man page is different from the synta=
+x
+> at
+> https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/=
+7/html/virtualization_deployment_and_administration_guide/sect-backing-ch=
+ain
+> (RedHat uses --top and --base while the man page just has optional base=
+
+> and top names). I believe the RedHat guide is correct because the man
+> page doesn't allow distinguishing between the base and the top for a
+> commit.
+
+Questions about virsh are outside the realm of what qemu does (that's
+what libvirt adds on top of qemu); and the parameters exposed by virsh
+may differ according to what versions you are running. Also be aware
+that I'm trying to get a new incremental backup API
+virDomainBackupBegin() added to libvirt that will make support for
+incremental/differential backups by using qcow2 persistent bitmaps much
+easier from libvirt's point of use.
+
+>=20
+> However the need for specifying the path isn't obvious to me. Isn't the=
+
+> path contained in the VM definition?
+>=20
+> Since blockcommit would make it impossible for me to revert to an
+> earlier state (because I'm committing the oldest snapshot, if it screws=
+
+> up, I can't undo within virsh), I need to make sure this command is
+> correct.
+>=20
+>=20
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--LgO3XgplPUzy2Wffs5YirAL6i00W4PqiA--
+
+--X4susEw3dDp7o8dD2P0cjEPmUpmuecXf8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz+1AoACgkQp6FrSiUn
+Q2oolQf/Ykcts7UAoI/mtTNRyz/wsvH9E5Wq2X8zlFH9bT9l0n/7+qF7rKOURROM
+skJz2DtbWmyOMOJ/kiNaC9j3BSf0eUFaoWet2vnAEtNBHQjQQUbAA74EvyBgDKEY
+QPe2DLlc/rTQ/yDaZUtuY4ge/pfuCKwWB5C/mpH8CktU8bLTtGhG4hjLnV2Gqo4I
+mgUYFHKyw1teCjCpcWhp7KHv7xSz0YmvwkSYMgXKR0oqoSwZx9z/nG0giD0PgK7Z
+1034SXZCagBxhj/Zaq8zxpPPAbNWSLhIxDpwiu1ZhTLfkWHHg+tFFLgnX38UxYMv
+O4DPAYttFfYKdu4TLNsxpT89rxdglg==
+=W/w6
+-----END PGP SIGNATURE-----
+
+--X4susEw3dDp7o8dD2P0cjEPmUpmuecXf8--
