@@ -2,115 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 602653B51F
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2019 14:37:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 713033B530
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2019 14:45:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389949AbfFJMgV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jun 2019 08:36:21 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:37542 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389905AbfFJMgV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jun 2019 08:36:21 -0400
-Received: by mail-wm1-f66.google.com with SMTP id 22so7999891wmg.2;
-        Mon, 10 Jun 2019 05:36:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=7PM6uoWZ78ckqebs+NRho2n2G33fUn82Yyi1MIgn2mw=;
-        b=QIxAT7fpDsh3nectz0zZqalSAhl36Rky2FXeXgy2/bzfrvwVuGLKcCR9fZ4F1e8Hu/
-         6k0l9qUoRdX3AXMeuUdOCJbyorA5YULhbXDTfx7kholMZj/h9HCGK0QwlCqObOntPEST
-         s7UfLTwUJL+c4C7mvuB3yV3qKVidYgwO3tiXCknk/3ds3moCHqIaFfyTS70yOrgV5g3W
-         9mthIoFEkJ1Jgo3Q1G+EQdlTn6gaIo5g9pqSkwaBsUvFZWxq1/73MVXNtxF12chy6/2e
-         cLhAZhapZWy7EDOKQxfaoB99R6Frlr4RniMSwcEPn8GNRNgIBD0asEqm1weduHhIsuyM
-         jFBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=7PM6uoWZ78ckqebs+NRho2n2G33fUn82Yyi1MIgn2mw=;
-        b=JZluYXjt9ZuGJrna0waQBwdeOnJ16sJZonmpaX+kgZwQgWkoUmbWAXSuV498mXFFJv
-         /V3j9LvqlYPmmE8Et6xzReEewv3s0Lrctk0w7lTGP4hdWZstetabm7nZydZhs0kmXZww
-         +oCSnLR9V/XdTYSZoCEpvgjAMfkL7KDyqFTQ/1RMz06sCbp6ye+Faqzrtj5efU9piclY
-         RfkIKozZTuWYbWEaiCxA0SCJNGxB+mKQbddxS5nmpN7ASLtVWCl5/99+kPlh70afejvf
-         Vdf8eaVFwyQTt9FtolRNDLQMqbg246YZGxHWJDv3EcCnwi42U5PmHIOGobj8YLt3GOLs
-         5jCg==
-X-Gm-Message-State: APjAAAXtuu1r4Muv9PcxFW4iI9wKGem+SeSpEGkzo4eME+cu7YO4ZiLX
-        uiMG5i7NI6L8NySKhQg5BIdCZVnUQfJgrQ==
-X-Google-Smtp-Source: APXvYqyvfc7vIEw7b/PkaFTeK+1lqhxcoZe4J8TJ4kFnOvqR0bwXoivUKMz4jKA8bJXRqf+TioJLCg==
-X-Received: by 2002:a1c:f314:: with SMTP id q20mr12291063wmq.74.1560170179320;
-        Mon, 10 Jun 2019 05:36:19 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id f204sm13850147wme.18.2019.06.10.05.36.18
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 10 Jun 2019 05:36:18 -0700 (PDT)
-Date:   Mon, 10 Jun 2019 13:36:17 +0100
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, stefanha@redhat.com
-Subject: Re: [PATCH 0/2] scsi: add support for request batching
-Message-ID: <20190610123617.GK14257@stefanha-x1.localdomain>
-References: <20190530112811.3066-1-pbonzini@redhat.com>
+        id S2389357AbfFJMpb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jun 2019 08:45:31 -0400
+Received: from foss.arm.com ([217.140.110.172]:42174 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388373AbfFJMpb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jun 2019 08:45:31 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 37699337;
+        Mon, 10 Jun 2019 05:45:30 -0700 (PDT)
+Received: from [10.1.196.129] (ostrya.cambridge.arm.com [10.1.196.129])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7430B3F557;
+        Mon, 10 Jun 2019 05:45:28 -0700 (PDT)
+Subject: Re: [PATCH v8 26/29] vfio-pci: Register an iommu fault handler
+To:     Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc:     "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "ashok.raj@intel.com" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Marc Zyngier <Marc.Zyngier@arm.com>,
+        Will Deacon <Will.Deacon@arm.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Vincent Stehle <Vincent.Stehle@arm.com>,
+        Robin Murphy <Robin.Murphy@arm.com>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+References: <20190526161004.25232-1-eric.auger@redhat.com>
+ <20190526161004.25232-27-eric.auger@redhat.com>
+ <20190603163139.70fe8839@x1.home>
+ <10dd60d9-4af0-c0eb-08c9-a0db7ee1925e@redhat.com>
+ <20190605154553.0d00ad8d@jacob-builder>
+ <2753d192-1c46-d78e-c425-0c828e48cde2@arm.com>
+ <20190606132903.064f7ac4@jacob-builder>
+ <dc051424-67d7-02ff-9b8e-0d7a8a4e59eb@arm.com>
+ <20190607104301.6b1bbd74@jacob-builder>
+From:   Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Message-ID: <e02b024f-6ebc-e8fa-c30c-5bf3f4b164d6@arm.com>
+Date:   Mon, 10 Jun 2019 13:45:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="GvuyDaC2GNSBQusT"
-Content-Disposition: inline
-In-Reply-To: <20190530112811.3066-1-pbonzini@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <20190607104301.6b1bbd74@jacob-builder>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 07/06/2019 18:43, Jacob Pan wrote:
+>>> So it seems we agree on the following:
+>>> - iommu_unregister_device_fault_handler() will never fail
+>>> - iommu driver cleans up all pending faults when handler is
+>>> unregistered
+>>> - assume device driver or guest not sending more page response
+>>> _after_ handler is unregistered.
+>>> - system will tolerate rare spurious response
+>>>
+>>> Sounds right?  
+>>
+>> Yes, I'll add that to the fault series
+> Hold on a second please, I think we need more clarifications. Ashok
+> pointed out to me that the spurious response can be harmful to other
+> devices when it comes to mdev, where PRQ group id is not per PASID,
+> device may reuse the group number and receiving spurious page response
+> can confuse the entire PF. 
 
---GvuyDaC2GNSBQusT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I don't understand how mdev differs from the non-mdev situation (but I
+also still don't fully get how mdev+PASID will be implemented). Is the
+following the case you're worried about?
 
-On Thu, May 30, 2019 at 01:28:09PM +0200, Paolo Bonzini wrote:
-> This allows a list of requests to be issued, with the LLD only writing
-> the hardware doorbell when necessary, after the last request was prepared.
-> This is more efficient if we have lists of requests to issue, particularly
-> on virtualized hardware, where writing the doorbell is more expensive than
-> on real hardware.
->=20
-> This applies to any HBA, either singlequeue or multiqueue; the second
-> patch implements it for virtio-scsi.
->=20
-> Paolo
->=20
-> Paolo Bonzini (2):
->   scsi_host: add support for request batching
->   virtio_scsi: implement request batching
->=20
->  drivers/scsi/scsi_lib.c    | 37 ++++++++++++++++++++++---
->  drivers/scsi/virtio_scsi.c | 55 +++++++++++++++++++++++++++-----------
->  include/scsi/scsi_cmnd.h   |  1 +
->  include/scsi/scsi_host.h   | 16 +++++++++--
->  4 files changed, 89 insertions(+), 20 deletions(-)
->=20
-> --=20
-> 2.21.0
->=20
+  M#: mdev #
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+# Dev         Host        mdev drv       VFIO/QEMU        Guest
+====================================================================
+1                     <- reg(handler)
+2 PR1 G1 P1    ->         M1 PR1 G1        inject ->     M1 PR1 G1
+3                     <- unreg(handler)
+4       <- PS1 G1 P1 (F)      |
+5                        unreg(handler)
+6                     <- reg(handler)
+7 PR2 G1 P1    ->         M2 PR2 G1        inject ->     M2 PR2 G1
+8                                                     <- M1 PS1 G1
+9         accept ??    <- PS1 G1 P1
+10                                                    <- M2 PS2 G1
+11        accept       <- PS2 G1 P1
 
---GvuyDaC2GNSBQusT
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+Step 2 injects PR1 for mdev#1. Step 4 auto-responds to PR1. Between
+steps 5 and 6, we re-allocate PASID #1 for mdev #2. At step 7, we inject
+PR2 for mdev #2. Step 8 is the spurious Page Response for PR1.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlz+TsEACgkQnKSrs4Gr
-c8gE+QgAwWdqWzwfL6+Ow3hy/qynLLmeQ94GdokspoNxkJ+GvFFTuq51OaFQyMeH
-dE+3n2QBm0p57kO1c6doG6CWuOGeMN9pd5PGgLyl+QOaSc1u2LO/kWUJ8Re3Ggyz
-QICTZseq3Z4NVerKLZY5Mx53YZfRMbePKVSrfWUR4okHtwSojMIh6bDaIf1HvHU/
-vcsEDFOUEle1nu2ypocOoVP6E15tYRlIlYlvnhoeM2Dv1A9+VazFnOkavn2wnEi9
-H0ELaaWbRibQFXfIuWf7s8VyLufh1EoGtVAUF4Dza3y/tRg5rVbTEgO3/1S+m1PV
-qqPghgKwdjpLkaF2vXeKWBoC2SqiKw==
-=IMS9
------END PGP SIGNATURE-----
+But I don't think step 9 is possible, because the mdev driver knows that
+mdev #1 isn't using PASID #1 anymore. If the configuration is valid at
+all (a page response channel still exists for mdev #1), then mdev #1 now
+has a different PASID, e.g. #2, and step 9 would be "<- PS1 G1 P2" which
+is rejected by iommu.c (no such pending page request). And step 11 will
+be accepted.
 
---GvuyDaC2GNSBQusT--
+If PASIDs are allocated through VCMD, then the situation seems similar:
+at step 2 you inject "M1 PR1 G1 P1" into the guest, and at step 8 the
+spurious response is "M1 PS1 G1 P1". If mdev #1 doesn't have PASID #1
+anymore, then the mdev driver can check that the PASID is invalid and
+can reject the page response.
+
+> Having spurious page response is also not
+> abiding the PCIe spec. exactly.
+
+We are following the PCI spec though, in that we don't send page
+responses for PRGIs that aren't in flight.
+
+> We have two options here:
+> 1. unregister handler will get -EBUSY if outstanding fault exists.
+> 	-PROs: block offending device unbind only, eventually timeout
+> 	will clear.
+> 	-CONs: flooded faults can prevent clearing
+> 2. unregister handle will block until all faults are clear in the host.
+>    Never fails unregistration
+
+Here the host completes the faults itself or wait for a response from
+the guest? I'm slightly confused by the word "blocking". I'd rather we
+don't introduce an uninterruptible sleep in the IOMMU core, since it's
+unlikely to ever finish if we rely on the guest to complete things.
+
+> 	-PROs: simple flow for VFIO, no need to worry about device
+> 	holding reference.
+> 	-CONs: spurious page response may come from
+> 	misbehaving/malicious guest if guest does unregister and
+> 	register back to back.
+
+> It seems the only way to prevent spurious page response is to introduce
+> a SW token or sequence# for each PRQ that needs a response. I still
+> think option 2 is good.
+> 
+> Consider the following time line:
+> decoding
+>  PR#: page request
+>  G#:  group #
+>  P#:  PASID
+>  S#:  sequence #
+>  A#:  address
+>  PS#: page response
+>  (F): Fail
+>  (S): Success
+> 
+> # Dev		Host		VFIO/QEMU	Guest
+> ===========================================================	
+> 1				<-reg(handler)
+> 2 PR1G1S1A1	->		inject	->	PR1G1S1A1
+> 3 PR2G1S2A2	->		inject	->	PR2G1S2A2
+> 4.				<-unreg(handler)
+> 5.	<-PR1G1S1A1(F)			| 
+> 6.	<-PR2G1S2A2(F)			V
+> 7.				<-unreg(handler)
+> 8.				<-reg(handler)
+> 9 PR3G1S3A1	->		inject	->	PR3G1S3A1
+> 10.						<-PS1G1S1A1
+> 11.		<reject S1>
+> 11.		<accept S3>			<-PS3G1S3A1
+> 12.PS3G1S3A1(S)
+> 
+> The spurious page response comes in at step 10 where the guest sends
+> response for the request in step 1. But since the sequence # is 1, host
+> IOMMU driver will reject it. At step 11, we accept page response for
+> the matching sequence # then respond SUCCESS to the device.
+> 
+> So would it be OK to add this sequence# to iommu_fault and page
+> response, or could event reuse the time stamp for that purpose.
+
+With a PV interface we can do what we want, but it can't work with an
+IOMMU emulation that only has 9 bits for the PRGI. I suppose we can add
+the sequence number but we'll have to handle the case where it isn't
+present in the page response (ie. accept it anyway).
+
+Thanks,
+Jean
