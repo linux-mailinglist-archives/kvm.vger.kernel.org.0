@@ -2,139 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E67753BD93
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2019 22:37:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78C0B3BEA5
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2019 23:27:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389339AbfFJUgG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Jun 2019 16:36:06 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:38087 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389542AbfFJUgG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jun 2019 16:36:06 -0400
-Received: by mail-pg1-f196.google.com with SMTP id v11so5628604pgl.5
-        for <kvm@vger.kernel.org>; Mon, 10 Jun 2019 13:36:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=QIiaElKbYG7X2iRY6VXsdeM4+31zgx4vPIFfu4hUJug=;
-        b=aypLgRrX0btLwkQ78UmSd30OW9UF0AUZJnAd3r2/5HqpTZB7t9pPjkr79taehwRSBe
-         Uf3LjKJsRGeyWW7niEs4BHLmd/27Tp++YcV8xUIXVrHXkWkhfr39ad2bGk73/2ccXpRd
-         Krrfs143htc/xGI+Ppm9VimNWGnjKhQyxh//k=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=QIiaElKbYG7X2iRY6VXsdeM4+31zgx4vPIFfu4hUJug=;
-        b=osFpnZ6im+E9qzIu2YNjkLjHaFzJxCoPp+uZTX68LHgfRuZkQ5NCuBzkl0XGzgecF6
-         le1ZnvFCSP7AR3aQNtHrT3SSGyGz465i0VP1llblaAWYxCf4DeVMLayRHLjvO2jqKF4d
-         amEGgjmwq56WtvFDliHgl2LSt7skTyeWQwbRoIYQjqoxf2almKyTkLH/VKJ0RS6zmmcP
-         xkATfP6cAplFRFIellHUjGIvqGUG5GdI38Npn+7ViAJ1DSGOkobtIy4wQsnUl/JKyJYw
-         mDLjHoe1F6sneJtKDHH16OcIvwlI1vUJ75ZVkFEGjNTDvRG2RjLIJZcuvqHkiNPdJAQ7
-         pGwQ==
-X-Gm-Message-State: APjAAAX8JvKEkCofwD2Bnz8JrUhcFowqjFyh0uFoNd2ijw8ESzbl9lfJ
-        zYy+ogUtNEL7v+ZH8d83Ddsqtw==
-X-Google-Smtp-Source: APXvYqz36v1zCKX0GRWb534Z9an9udGHI/NESxPlvuGqVOMCrwC97gsWY6mXQoFhLwcNndoWLde2ZA==
-X-Received: by 2002:a62:1b85:: with SMTP id b127mr76850297pfb.165.1560198965895;
-        Mon, 10 Jun 2019 13:36:05 -0700 (PDT)
-Received: from www.outflux.net (173-164-112-133-Oregon.hfc.comcastbusiness.net. [173.164.112.133])
-        by smtp.gmail.com with ESMTPSA id k22sm11148457pfk.178.2019.06.10.13.36.04
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 10 Jun 2019 13:36:04 -0700 (PDT)
-Date:   Mon, 10 Jun 2019 13:36:04 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Catalin Marinas <catalin.marinas@arm.com>
-Cc:     Andrey Konovalov <andreyknvl@google.com>,
-        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v16 02/16] arm64: untag user pointers in access_ok and
- __uaccess_mask_ptr
-Message-ID: <201906101335.DF80D631@keescook>
-References: <cover.1559580831.git.andreyknvl@google.com>
- <4327b260fb17c4776a1e3c844f388e4948cfb747.1559580831.git.andreyknvl@google.com>
- <20190610175326.GC25803@arrakis.emea.arm.com>
- <201906101106.3CA50745E3@keescook>
- <20190610185329.xhjawzfy4uddrkrj@mbp>
+        id S2389904AbfFJV1m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jun 2019 17:27:42 -0400
+Received: from ahs5.r4l.com ([158.69.52.156]:42122 "EHLO ahs5.r4l.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389193AbfFJV1m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jun 2019 17:27:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=extremeground.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:References:Cc:To:From:Subject:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=RZLN8hvskw7GjJRITfE7JT0hQDXiRFi6ecst0r9g1Pg=; b=qMrHHnCsAOJCJ5jzLm6VozMt0J
+        Ds4VkiUsXEajYbHugYRtM+x1+i7m9zulBNO74TFw5RPN7FwQ9Q16QiRBCkquy4iKxL5Zj567Caayk
+        KK2EGlvppYUs4GdiRM8bBQXbMtQdD4ztgoKZctQPD36wIsWl82GaGyvXI53Pifgl2tBVb8aJ+u/fH
+        367n14lru1MPXYhgBJYCvpXiOiyAsJCJLZ9yKopZxXTE3Ca3+iIj74yy+Ap5MVwFhdm4zMlD/xOCh
+        uRxCHmJOgKOwHns1uxC5Td6noN4k9mhocxC7m1CSQQbPdQHrvuxZ7RVl9X+0RFkW+FZQ+Fq6+Kqlz
+        cAS8MAoQ==;
+Received: from cpeac202ed5e073-cmac202ed5e070.cpe.net.cable.rogers.com ([99.237.87.227]:59718 helo=[192.168.1.20])
+        by ahs5.r4l.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.92)
+        (envelope-from <gary@extremeground.com>)
+        id 1haRpM-0003iz-FY; Mon, 10 Jun 2019 17:27:40 -0400
+Subject: Re: kvm / virsh snapshot management
+From:   Gary Dale <gary@extremeground.com>
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     kvm@vger.kernel.org, qemu-devel@nongnu.org,
+        Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
+References: <abb7990e-0331-67a4-af92-05276366478c@extremeground.com>
+ <20190610121941.GI14257@stefanha-x1.localdomain>
+ <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
+Message-ID: <ab3e81c2-f0ce-2ef5-bbe7-948a87463b59@extremeground.com>
+Date:   Mon, 10 Jun 2019 17:27:39 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190610185329.xhjawzfy4uddrkrj@mbp>
+In-Reply-To: <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-CA
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - ahs5.r4l.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - extremeground.com
+X-Get-Message-Sender-Via: ahs5.r4l.com: authenticated_id: gary@extremeground.com
+X-Authenticated-Sender: ahs5.r4l.com: gary@extremeground.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 10, 2019 at 07:53:30PM +0100, Catalin Marinas wrote:
-> On Mon, Jun 10, 2019 at 11:07:03AM -0700, Kees Cook wrote:
-> > On Mon, Jun 10, 2019 at 06:53:27PM +0100, Catalin Marinas wrote:
-> > > diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-> > > index 3767fb21a5b8..fd191c5b92aa 100644
-> > > --- a/arch/arm64/kernel/process.c
-> > > +++ b/arch/arm64/kernel/process.c
-> > > @@ -552,3 +552,18 @@ void arch_setup_new_exec(void)
-> > >  
-> > >  	ptrauth_thread_init_user(current);
-> > >  }
-> > > +
-> > > +/*
-> > > + * Enable the relaxed ABI allowing tagged user addresses into the kernel.
-> > > + */
-> > > +int untagged_uaddr_set_mode(unsigned long arg)
-> > > +{
-> > > +	if (is_compat_task())
-> > > +		return -ENOTSUPP;
-> > > +	if (arg)
-> > > +		return -EINVAL;
-> > > +
-> > > +	set_thread_flag(TIF_UNTAGGED_UADDR);
-> > > +
-> > > +	return 0;
-> > > +}
-> > 
-> > I think this should be paired with a flag clearing in copy_thread(),
-> > yes? (i.e. each binary needs to opt in)
-> 
-> It indeed needs clearing though not in copy_thread() as that's used on
-> clone/fork but rather in flush_thread(), called on the execve() path.
+On 2019-06-10 11:54 a.m., Gary Dale wrote:
+> On 2019-06-10 8:19 a.m., Stefan Hajnoczi wrote:
+>> On Sat, Jun 01, 2019 at 08:12:01PM -0400, Gary Dale wrote:
+>>> A while back I converted a raw disk image to qcow2 to be able to use
+>>> snapshots. However I realize that I may not really understand 
+>>> exactly how
+>>> snapshots work. In this particular case, I'm only talking about 
+>>> internal
+>>> snapshots currently as there seems to be some differences of opinion 
+>>> as to
+>>> whether internal or external are safer/more reliable. I'm also only 
+>>> talking
+>>> about shutdown state snapshots, so it should just be the disk that is
+>>> snapshotted.
+>>>
+>>> As I understand it, the first snapshot freezes the base image and 
+>>> subsequent
+>>> changes in the virtual machine's disk are stored elsewhere in the 
+>>> qcow2 file
+>>> (remember, only internal snapshots). If I take a second snapshot, that
+>>> freezes the first one, and subsequent changes are now in third 
+>>> location.
+>>> Each new snapshot is incremental to the one that preceded it rather 
+>>> than
+>>> differential to the base image. Each new snapshot is a child of the 
+>>> previous
+>>> one.
+>> Internal snapshots are not incremental or differential at the qcow2
+>> level, they are simply a separate L1/L2 table pointing to data clusters.
+>> In other words, they are an independent set of metadata showing the full
+>> state of the image at the point of the snapshot.  qcow2 does not track
+>> relationships between snapshots and parents/children.
+> Which sounds to me like they are incremental. Each snapshot starts a 
+> new L1/L2 table so that the state of the previous one is preserved.
+>>
+>>> One explanation I've seen of the process is if I delete a snapshot, the
+>>> changes it contains are merged with its immediate child.
+>> Nope.  Deleting a snapshot decrements the reference count on all its
+>> data clusters.  If a data cluster's reference count reaches zero it will
+>> be freed.  That's all, there is no additional data movement or
+>> reorganization aside from this.
+> Perhaps not physically but logically it would appear that the data 
+> clusters were merged.
+>>
+>>> So if I deleted the
+>>> first snapshot, the base image stays the same but any data that has 
+>>> changed
+>>> since the base image is now in the second snapshot's location. The 
+>>> merge
+>>> with children explanation also implies that the base image is never 
+>>> touched
+>>> even if the first snapshot is deleted.
+>>>
+>>> But if I delete a snapshot that has no children, is that essentially 
+>>> the
+>>> same as reverting to the point that snapshot was created and all 
+>>> subsequent
+>>> disk changes are lost? Or does it merge down to the parent snapshot? 
+>>> If I
+>>> delete all snapshots, would that revert to the base image?
+>> No.  qcow2 has the concept of the current disk state of the running VM -
+>> what you get when you boot the guest - and the snapshots - they are
+>> read-only.
+>>
+>> When you delete snapshots the current disk state (running VM) is
+>> unaffected.
+>>
+>> When you apply a snapshot this throws away the current disk state and
+>> uses the snapshot as the new current disk state.  The read-only snapshot
+>> itself is not modified in any way and you can apply the same snapshot
+>> again as many times as you wish later.
+> So in essence the current state is a pointer to the latest data 
+> cluster, which is the only data cluster that can be modified.
+>>
+>>> I've seen it explained that a snapshot is very much like a timestamp so
+>>> deleting a timestamp removes the dividing line between writes that 
+>>> occurred
+>>> before and after that time, so that data is really only removed if I 
+>>> revert
+>>> to some time stamp - all writes after that point are discarded. In this
+>>> explanation, deleting the oldest timestamp is essentially updating 
+>>> the base
+>>> image. Deleting all snapshots would leave me with the base image fully
+>>> updated.
+>>>
+>>> Frankly, the second explanation sounds more reasonable to me, 
+>>> without having
+>>> to figure out how copy-on-write works,  But I'm dealing with 
+>>> important data
+>>> here and I don't want to mess it up by mishandling the snapshots.
+>>>
+>>> Can some provide a little clarity on this? Thanks!
+>> If you want an analogy then git(1) is a pretty good one.  qcow2 internal
+>> snapshots are like git tags.  Unlike branches, tags are immutable.  In
+>> qcow2 you only have a master branch (the current disk state) from which
+>> you can create a new tag or you can use git-checkout(1) to apply a
+>> snapshot (discarding whatever your current disk state is).
+>>
+>> Stefan
+>
+> That's just making things less clear - I've never tried to understand 
+> git either. Thanks for the attempt though.
+>
+> If I've gotten things correct, once the base image is established, 
+> there is a current disk state that points to a table containing all 
+> the writes since the base image. Creating a snapshot essentially takes 
+> that pointer and gives it the snapshot name, while creating a new 
+> current disk state pointer and data table where subsequent writes are 
+> recorded.
+>
+> Deleting snapshots removes your ability to refer to a data table by 
+> name, but the table itself still exists anonymously as part of a chain 
+> of data tables between the base image and the current state.
+>
+> This leaves a problem. The chain will very quickly get quite long 
+> which will impact performance. To combat this, you can use blockcommit 
+> to merge a child with its parent or blockpull to merge a parent with 
+> its child.
+>
+> In my situation, I want to keep a week of daily snapshots in case 
+> something goes horribly wrong with the VM (I recently had a database 
+> file become corrupt, and reverting to the previous working day's image 
+> would have been a quick and easy solution, faster than recovering all 
+> the data tables from the prefious day). I've been shutting down the 
+> VM, deleting the oldest snapshot and creating a new one before 
+> restarting the VM.
+>
+> While your explanation confirms that this is safe, it also implies 
+> that I need to manage the data table chains. My first instinct is to 
+> use blockcommit before deleting the oldest snapshot, such as:
+>
+>     virsh blockcommit <vm name> <qcow2 file path> --top <oldest 
+> snapshot> --delete --wait
+>     virsh snapshot-delete  --domain <vm name> --snapshotname <oldest 
+> snapshot>
+>
+> so that the base image contains the state as of one week earlier and 
+> the snapshot chains are limited to 7 links.
+>
+> 1) does this sound reasonable?
+>
+> 2) I note that the syntax in virsh man page is different from the 
+> syntax at 
+> https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/sect-backing-chain 
+> (RedHat uses --top and --base while the man page just has optional 
+> base and top names). I believe the RedHat guide is correct because the 
+> man page doesn't allow distinguishing between the base and the top for 
+> a commit.
+>
+> However the need for specifying the path isn't obvious to me. Isn't 
+> the path contained in the VM definition?
+>
+> Since blockcommit would make it impossible for me to revert to an 
+> earlier state (because I'm committing the oldest snapshot, if it 
+> screws up, I can't undo within virsh), I need to make sure this 
+> command is correct.
+>
+Trying this against a test VM, I ran into a roadblock. My command line 
+and the results are:
 
-Ah! Yes, thanks.
+# virsh blockcommit stretch "/home/secure/virtual/stretch.qcow2" --top 
+stretchS3 --delete --wait
+error: unsupported flags (0x2) in function qemuDomainBlockCommit
 
-> And a note to myself: I think PR_UNTAGGED_ADDR (not UADDR) looks better
-> in a uapi header, the user doesn't differentiate between uaddr and
-> kaddr.
+I get the same thing when the path to the qcow2 file isn't quoted.
 
-Good point. I would agree. :)
+I noted in 
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/virtualization_administration_guide/sub-sect-domain_commands-using_blockcommit_to_shorten_a_backing_chain 
+that the options use a single "-". However the results for that were:
+# virsh blockcommit stretch /home/secure/virtual/stretch.qcow2 -top 
+stretchS3 -delete -wait
+error: Scaled numeric value '-top' for <--bandwidth> option is malformed 
+or out of range
 
--- 
-Kees Cook
+which looks like virsh doesn't like the single dashes and is trying to 
+interpret them as positional options.
+
+I also did a
+
+# virsh domblklist stretch
+Target     Source
+------------------------------------------------
+vda        /home/secure/virtual/stretch.qcow2
+hda        -
+
+and tried using vda instead of the full path in the blockcommit but got 
+the same error.
+
+Any ideas on what I'm doing wrong?
+
