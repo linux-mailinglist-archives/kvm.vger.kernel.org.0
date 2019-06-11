@@ -2,290 +2,200 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AFAA3CE5D
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 16:21:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C42473CEA3
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 16:27:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388728AbfFKOTf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 10:19:35 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40528 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2387551AbfFKOTf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 11 Jun 2019 10:19:35 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5BEEtj6009179
-        for <kvm@vger.kernel.org>; Tue, 11 Jun 2019 10:19:33 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2t2dhthm09-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 11 Jun 2019 10:19:33 -0400
-Received: from localhost
-        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <akrowiak@linux.ibm.com>;
-        Tue, 11 Jun 2019 15:19:33 +0100
-Received: from b01cxnp23034.gho.pok.ibm.com (9.57.198.29)
-        by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 11 Jun 2019 15:19:30 +0100
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5BEJThA37421398
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jun 2019 14:19:29 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A3EA7112065;
-        Tue, 11 Jun 2019 14:19:29 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 75417112064;
-        Tue, 11 Jun 2019 14:19:29 +0000 (GMT)
-Received: from [9.60.75.173] (unknown [9.60.75.173])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 11 Jun 2019 14:19:29 +0000 (GMT)
-Subject: Re: [PATCH RFC 1/1] allow to specify additional config data
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        libvir-list@redhat.com, Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-References: <20190606144417.1824-1-cohuck@redhat.com>
- <20190606144417.1824-2-cohuck@redhat.com> <20190606093224.3ecb92c7@x1.home>
- <20190606101552.6fc62bef@x1.home>
- <ed75a4de-da0b-f6cf-6164-44cebc82c3a5@linux.ibm.com>
- <20190607140344.0399b766@x1.home>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Date:   Tue, 11 Jun 2019 10:19:29 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S2389454AbfFKO1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 10:27:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44404 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387551AbfFKO1Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jun 2019 10:27:16 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 94B3A89AD0;
+        Tue, 11 Jun 2019 14:26:57 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-4.gru2.redhat.com [10.97.112.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AFB1127C50;
+        Tue, 11 Jun 2019 14:26:52 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id D097010515C;
+        Tue, 11 Jun 2019 11:26:35 -0300 (BRT)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id x5BEQSWW009568;
+        Tue, 11 Jun 2019 11:26:28 -0300
+Date:   Tue, 11 Jun 2019 11:26:27 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     "Rafael J. Wysocki" <rafael@kernel.org>
+Cc:     "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?iso-8859-1?B?S3LEP23DocU/?= <rkrcmar@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Raslan KarimAllah <karahmed@amazon.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Linux PM <linux-pm@vger.kernel.org>
+Subject: Re: [patch 0/3] cpuidle-haltpoll driver (v2)
+Message-ID: <20190611142627.GB4791@amt.cnet>
+References: <20190603225242.289109849@amt.cnet>
+ <6c411948-9e32-9f41-351e-c9accd1facb0@intel.com>
+ <20190610145942.GA24553@amt.cnet>
+ <CAJZ5v0idYgETFg4scgvpJ-eGtFAx1Wi6hznXz7+XZAfKjiSAPA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190607140344.0399b766@x1.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19061114-0052-0000-0000-000003CE70B5
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011246; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01216459; UDB=6.00639602; IPR=6.00997558;
- MB=3.00027261; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-11 14:19:32
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19061114-0053-0000-0000-0000614848A1
-Message-Id: <1d859c27-31e2-64ca-f505-19abe9bffed2@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-11_07:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906110095
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJZ5v0idYgETFg4scgvpJ-eGtFAx1Wi6hznXz7+XZAfKjiSAPA@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 11 Jun 2019 14:27:16 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/7/19 4:03 PM, Alex Williamson wrote:
-> On Fri, 7 Jun 2019 14:26:13 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Tue, Jun 11, 2019 at 12:03:26AM +0200, Rafael J. Wysocki wrote:
+> On Mon, Jun 10, 2019 at 5:00 PM Marcelo Tosatti <mtosatti@redhat.com> wrote:
+> >
+> > On Fri, Jun 07, 2019 at 11:49:51AM +0200, Rafael J. Wysocki wrote:
+> > > On 6/4/2019 12:52 AM, Marcelo Tosatti wrote:
+> > > >The cpuidle-haltpoll driver allows the guest vcpus to poll for a specified
+> > > >amount of time before halting. This provides the following benefits
+> > > >to host side polling:
+> > > >
+> > > >         1) The POLL flag is set while polling is performed, which allows
+> > > >            a remote vCPU to avoid sending an IPI (and the associated
+> > > >            cost of handling the IPI) when performing a wakeup.
+> > > >
+> > > >         2) The HLT VM-exit cost can be avoided.
+> > > >
+> > > >The downside of guest side polling is that polling is performed
+> > > >even with other runnable tasks in the host.
+> > > >
+> > > >Results comparing halt_poll_ns and server/client application
+> > > >where a small packet is ping-ponged:
+> > > >
+> > > >host                                        --> 31.33
+> > > >halt_poll_ns=300000 / no guest busy spin    --> 33.40   (93.8%)
+> > > >halt_poll_ns=0 / guest_halt_poll_ns=300000  --> 32.73   (95.7%)
+> > > >
+> > > >For the SAP HANA benchmarks (where idle_spin is a parameter
+> > > >of the previous version of the patch, results should be the
+> > > >same):
+> > > >
+> > > >hpns == halt_poll_ns
+> > > >
+> > > >                           idle_spin=0/   idle_spin=800/    idle_spin=0/
+> > > >                           hpns=200000    hpns=0            hpns=800000
+> > > >DeleteC06T03 (100 thread) 1.76           1.71 (-3%)        1.78   (+1%)
+> > > >InsertC16T02 (100 thread) 2.14           2.07 (-3%)        2.18   (+1.8%)
+> > > >DeleteC00T01 (1 thread)   1.34           1.28 (-4.5%)           1.29   (-3.7%)
+> > > >UpdateC00T03 (1 thread)   4.72           4.18 (-12%)    4.53   (-5%)
+> > > >
+> > > >V2:
+> > > >
+> > > >- Move from x86 to generic code (Paolo/Christian).
+> > > >- Add auto-tuning logic (Paolo).
+> > > >- Add MSR to disable host side polling (Paolo).
+> > > >
+> > > >
+> > > >
+> > > First of all, please CC power management patches (including cpuidle,
+> > > cpufreq etc) to linux-pm@vger.kernel.org (there are people on that
+> > > list who may want to see your changes before they go in) and CC
+> > > cpuidle material (in particular) to Peter Zijlstra.
+> > >
+> > > Second, I'm not a big fan of this approach to be honest, as it kind
+> > > of is a driver trying to play the role of a governor.
+> > >
+> > > We have a "polling state" already that could be used here in
+> > > principle so I wonder what would be wrong with that.  Also note that
+> > > there seems to be at least some code duplication between your code
+> > > and the "polling state" implementation, so maybe it would be
+> > > possible to do some things in a common way?
+> >
+> > Hi Rafael,
+> >
+> > After modifying poll_state.c to use a generic "poll time" driver
+> > callback [1] (since using a variable "target_residency" for that
+> > looks really ugly), would need a governor which does:
+> >
+> > haltpoll_governor_select_next_state()
+> >         if (prev_state was poll and evt happened on prev poll window) -> POLL.
+> >         if (prev_state == HLT)  -> POLL
+> >         otherwise               -> HLT
+> >
+> > And a "default_idle" cpuidle driver that:
+> >
+> > defaultidle_idle()
+> >         if (current_clr_polling_and_test()) {
+> >                 local_irq_enable();
+> >                 return index;
+> >         }
+> >         default_idle();
+> >         return
+> >
+> > Using such governor with any other cpuidle driver would
+> > be pointless (since it would enter the first state only
+> > and therefore not save power).
+> >
+> > Not certain about using the default_idle driver with
+> > other governors: one would rather use a driver that
+> > supports all states on a given machine.
+> >
+> > This combination of governor/driver pair, for the sake
+> > of sharing the idle loop, seems awkward to me.
+> > And fails the governor/driver separation: one will use the
+> > pair in practice.
+> >
+> > But i have no problem with it, so i'll proceed with that.
+> >
+> > Let me know otherwise.
 > 
->> On 6/6/19 12:15 PM, Alex Williamson wrote:
->>> On Thu, 6 Jun 2019 09:32:24 -0600
->>> Alex Williamson <alex.williamson@redhat.com> wrote:
->>>    
->>>> On Thu,  6 Jun 2019 16:44:17 +0200
->>>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>>   
->>>>> Add a rough implementation for vfio-ap.
->>>>>
->>>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>>>> ---
->>>>>    mdevctl.libexec | 25 ++++++++++++++++++++++
->>>>>    mdevctl.sbin    | 56 ++++++++++++++++++++++++++++++++++++++++++++++++-
->>>>>    2 files changed, 80 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/mdevctl.libexec b/mdevctl.libexec
->>>>> index 804166b5086d..cc0546142924 100755
->>>>> --- a/mdevctl.libexec
->>>>> +++ b/mdevctl.libexec
->>>>> @@ -54,6 +54,19 @@ wait_for_supported_types () {
->>>>>        fi
->>>>>    }
->>>>>    
->>>>> +# configure vfio-ap devices <config entry> <matrix attribute>
->>>>> +configure_ap_devices() {
->>>>> +    list="`echo "${config[$1]}" | sed 's/,/ /'`"
->>>>> +    [ -z "$list" ] && return
->>>>> +    for a in $list; do
->>>>> +        echo "$a" > "$supported_types/${config[mdev_type]}/devices/$uuid/$2"
->>>>> +        if [ $? -ne 0 ]; then
->>>>> +            echo "Error writing '$a' to '$uuid/$2'" >&2
->>>>> +            exit 1
->>>>> +        fi
->>>>> +    done
->>>>> +}
->>>>> +
->>>>>    case ${1} in
->>>>>        start-mdev|stop-mdev)
->>>>>            if [ $# -ne 2 ]; then
->>>>> @@ -148,6 +161,18 @@ case ${cmd} in
->>>>>                echo "Error creating mdev type ${config[mdev_type]} on $parent" >&2
->>>>>                exit 1
->>>>>            fi
->>>>> +
->>>>> +        # some types may specify additional config data
->>>>> +        case ${config[mdev_type]} in
->>>>> +            vfio_ap-passthrough)
->>>>
->>>> I think this could have some application beyond ap too, I know NVIDIA
->>>> GRID vGPUs do have some controls under the vendor hierarchy of the
->>>> device, ex. setting the frame rate limiter.  The implementation here is
->>>> a bit rigid, we know a specific protocol for a specific mdev type, but
->>>> for supporting arbitrary vendor options we'd really just want to try to
->>>> apply whatever options are provided.  If we didn't care about ordering,
->>>> we could just look for keys for every file in the device's immediate
->>>> sysfs hierarchy and apply any value we find, independent of the
->>>> mdev_type, ex. intel_vgpu/foo=bar  Thanks,
->>>
->>> For example:
->>>
->>> for key in find -P $mdev_base/$uuid/ \( -path
->>> "$mdev_base/$uuid/power/*" -o -path $mdev_base/$uuid/uevent -o -path $mdev_base/$uuid/remove \) -prune -o -type f -print | sed -e "s|$mdev_base/$uuid/||g"); do
->>>     [ -z ${config[$key]} ] && continue
->>>     ... parse value(s) and iteratively apply to key
->>> done
->>>
->>> The find is a little ugly to exclude stuff, maybe we just let people do
->>> screwy stuff like specify remove=1 in their config.  Also need to think
->>> about whether we're imposing a delimiter to apply multiple values to a
->>> key that conflicts with the attribute usage.  Thanks,
->>>
->>> Alex
->>
->> I like the idea of looking for files in the device's immediate sysfs
->> hierarchy, but maybe the find could exclude attributes that are
->> not vendor defined.
-> 
-> How would we know what attributes are vendor defined?  The above `find`
-> strips out the power, uevent, and remove attributes, which for GVT-g
-> leaves only the vendor defined attributes[1], but I don't know how to
-> instead do a positive match of the vendor attributes without
-> unmaintainable lookup tables.  This starts to get into the question of
-> how much do we want to (or need to) protect the user from themselves.
-> If we let the user specify a key=value of remove=1 and the device
-> immediately disappears, is that a bug or a feature?  Thanks,
-> 
-> Alex
+> If my understanding of your argumentation is correct, it is only
+> necessary to take the default_idle_call() branch of
+> cpuidle_idle_call() in the VM case, so it should be sufficient to
+> provide a suitable default_idle_call() which is what you seem to be
+> trying to do.
 
-By vendor defined, I meant attributes that are not defined by the mdev
-framework, such as the 'remove' attribute. As far as whether allowing
-specification of remove-1, I'd have to play with that and see what all
-of the ramifications are.
+In the VM case, we need to poll before actually halting (this is because
+its tricky to implement MWAIT in guests, so polling for some amount 
+of time allows the IPI avoidance optimization,
+see trace_sched_wake_idle_without_ipi, to take place). 
 
-Tony K
+The amount of time we poll is variable and adjusted (see adjust_haltpoll_ns 
+in the patchset).
 
+> I might have been confused by the terminology used in the patch series
+> if that's the case.
 > 
-> [1] GVT-g doesn't actually have an writable attributes, so we'd also
-> minimally want to add a test to skip read-only attributes.
+> Also, if that's the case, this is not cpuidle matter really.  It is a
+> matter of providing a better default_idle_call() for the arch at hand.
 
-Probably a good idea.
+Peter Zijlstra suggested a cpuidle driver for this. 
 
-> 
->>>>> +                configure_ap_devices ap_adapters assign_adapter
->>>>> +                configure_ap_devices ap_domains assign_domain
->>>>> +                configure_ap_devices ap_control_domains assign_control_domain
->>>>> +                # TODO: is assigning idempotent? Should we unwind on error?
->>>>> +                ;;
->>>>> +            *)
->>>>> +                ;;
->>>>> +        esac
->>>>>            ;;
->>>>>    
->>>>>        add-mdev)
->>>>> diff --git a/mdevctl.sbin b/mdevctl.sbin
->>>>> index 276cf6ddc817..eb5ee0091879 100755
->>>>> --- a/mdevctl.sbin
->>>>> +++ b/mdevctl.sbin
->>>>> @@ -33,6 +33,8 @@ usage() {
->>>>>        echo "set-start <mdev UUID>: change mdev start policy, if no option specified," >&2
->>>>>        echo "                       system default policy is used" >&2
->>>>>        echo "                       options: [--auto] [--manual]" >&2
->>>>> +    echo "set-additional-config <mdev UUID> {fmt...}: supply additional configuration" >&2
->>>>> +    echo "show-additional-config-format <mdev UUiD>:  prints the format expected by the device" >&2
->>>>>        echo "list-all: list all possible mdev types supported in the system" >&2
->>>>>        echo "list-available: list all mdev types currently available" >&2
->>>>>        echo "list-mdevs: list currently configured mdevs" >&2
->>>>> @@ -48,7 +50,7 @@ while (($# > 0)); do
->>>>>            --manual)
->>>>>                config[start]=manual
->>>>>                ;;
->>>>> -        start-mdev|stop-mdev|remove-mdev|set-start)
->>>>> +        start-mdev|stop-mdev|remove-mdev|set-start|show-additional-config-format)
->>>>>                [ $# -ne 2 ] && usage
->>>>>                cmd=$1
->>>>>                uuid=$2
->>>>> @@ -67,6 +69,14 @@ while (($# > 0)); do
->>>>>                cmd=$1
->>>>>                break
->>>>>                ;;
->>>>> +        set-additional-config)
->>>>> +            [ $# -le 2 ] && usage
->>>>> +            cmd=$1
->>>>> +            uuid=$2
->>>>> +            shift 2
->>>>> +            addtl_config="$*"
->>>>> +            break
->>>>> +            ;;
->>>>>            *)
->>>>>                usage
->>>>>                ;;
->>>>> @@ -114,6 +124,50 @@ case ${cmd} in
->>>>>            fi
->>>>>            ;;
->>>>>    
->>>>> +    set-additional-config)
->>>>> +        file=$(find $persist_base -name $uuid -type f)
->>>>> +        if [ -w "$file" ]; then
->>>>> +            read_config "$file"
->>>>> +            if [ ${config[start]} == "auto" ]; then
->>>>> +                systemctl stop mdev@$uuid.service
->>>>> +            fi
->>>>> +            # FIXME: validate input!
->>>>> +            for i in $addtl_config; do
->>>>> +                key="`echo "$i" | cut -d '=' -f 1`"
->>>>> +                value="`echo "$i" | cut -d '=' -f 2-`"
->>>>> +                if grep -q ^$key $file; then
->>>>> +                    if [ -z "$value" ]; then
->>>>> +                        sed -i "s/^$key=.*//g" $file
->>>>> +                    else
->>>>> +                        sed -i "s/^$key=.*/$key=$value/g" $file
->>>>> +                    fi
->>>>> +                else
->>>>> +                    echo "$i" >> "$file"
->>>>> +                fi
->>>>> +            done
->>>>> +            if [ ${config[start]} == "auto" ]; then
->>>>> +                systemctl start mdev@$uuid.service
->>>>> +            fi
->>>>> +        else
->>>>> +            exit 1
->>>>> +        fi
->>>>> +        ;;
->>>>> +
->>>>> +    show-additional-config-format)
->>>>> +        file=$(find $persist_base -name $uuid -type f)
->>>>> +        read_config "$file"
->>>>> +        case ${config[mdev_type]} in
->>>>> +            vfio_ap-passthrough)
->>>>> +                echo "ap_adapters=<comma-separated list of adapters>"
->>>>> +                echo "ap_domains=<comma-separated list of domains>"
->>>>> +                echo "ap_control_domains=<comma-separated list of control domains>"
->>>>> +                ;;
->>>>> +            *)
->>>>> +                echo "no additional configuration defined"
->>>>> +                ;;
->>>>> +        esac
->>>>> +        ;;
->>>>> +
->>>>>        list-mdevs)
->>>>>            for mdev in $(find $mdev_base/ -maxdepth 1 -mindepth 1 -type l); do
->>>>>                uuid=$(basename $mdev)
->>>>   
->>>    
->>
-> 
+Also, other architectures will use the same "poll before exiting to VM"
+logic (so we'd rather avoid duplicating this code): PPC, x86, S/390,
+MIPS... So in my POV it makes sense to unify this.
+
+So, back to your initial suggestion: 
+
+Q) "Can you unify code with poll_state.c?" 
+A) Yes, but it requires a new governor, which seems overkill and unfit
+for the purpose.
+
+Moreover, the logic in menu to decide whether its necessary or not
+to stop sched tick is useful for us (so a default_idle_call is not
+sufficient), because the cost of enabling/disabling the sched tick is
+high on VMs.
+
+So i'll fix the comments of the cpuidle driver (which everyone seems
+to agree with, except your understandable distate for it) and repost.
+
+
 
