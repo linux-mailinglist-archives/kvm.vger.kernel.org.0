@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DF693D357
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 19:04:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7673D3D359
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 19:04:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405767AbfFKREA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 13:04:00 -0400
-Received: from foss.arm.com ([217.140.110.172]:37946 "EHLO foss.arm.com"
+        id S2405752AbfFKREC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 13:04:02 -0400
+Received: from foss.arm.com ([217.140.110.172]:37960 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405734AbfFKREA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 13:04:00 -0400
+        id S2405780AbfFKREB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jun 2019 13:04:01 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 71D67105A;
-        Tue, 11 Jun 2019 10:03:59 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 21131106F;
+        Tue, 11 Jun 2019 10:04:01 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 028F23F73C;
-        Tue, 11 Jun 2019 10:03:57 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A61783F73C;
+        Tue, 11 Jun 2019 10:03:59 -0700 (PDT)
 From:   Marc Zyngier <marc.zyngier@arm.com>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -28,9 +28,9 @@ Cc:     Julien Thierry <julien.thierry@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>,
         "Raslan, KarimAllah" <karahmed@amazon.de>,
         "Saidi, Ali" <alisaidi@amazon.com>
-Subject: [PATCH v2 7/9] KVM: arm/arm64: vgic-its: Cache successful MSI->LPI translation
-Date:   Tue, 11 Jun 2019 18:03:34 +0100
-Message-Id: <20190611170336.121706-8-marc.zyngier@arm.com>
+Subject: [PATCH v2 8/9] KVM: arm/arm64: vgic-its: Check the LPI translation cache on MSI injection
+Date:   Tue, 11 Jun 2019 18:03:35 +0100
+Message-Id: <20190611170336.121706-9-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190611170336.121706-1-marc.zyngier@arm.com>
 References: <20190611170336.121706-1-marc.zyngier@arm.com>
@@ -41,119 +41,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On a successful translation, preserve the parameters in the LPI
-translation cache. Each translation is reusing the last slot
-in the list, naturally evincting the least recently used entry.
+When performing an MSI injection, let's first check if the translation
+is already in the cache. If so, let's inject it quickly without
+going through the whole translation process.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-its.c | 86 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 86 insertions(+)
+ virt/kvm/arm/vgic/vgic-its.c | 36 ++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h     |  1 +
+ 2 files changed, 37 insertions(+)
 
 diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 0aa0cbbc3af6..62932458476a 100644
+index 62932458476a..83d80ec33473 100644
 --- a/virt/kvm/arm/vgic/vgic-its.c
 +++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -546,6 +546,90 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
- 	return 0;
+@@ -577,6 +577,20 @@ static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
+ 	return irq;
  }
  
-+static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
-+					       phys_addr_t db,
-+					       u32 devid, u32 eventid)
++static struct vgic_irq *vgic_its_check_cache(struct kvm *kvm, phys_addr_t db,
++					     u32 devid, u32 eventid)
 +{
-+	struct vgic_translation_cache_entry *cte;
-+	struct vgic_irq *irq = NULL;
++	struct vgic_dist *dist = &kvm->arch.vgic;
++	struct vgic_irq *irq;
++	unsigned long flags;
 +
-+	list_for_each_entry(cte, &dist->lpi_translation_cache, entry) {
-+		/*
-+		 * If we hit a NULL entry, there is nothing after this
-+		 * point.
-+		 */
-+		if (!cte->irq)
-+			break;
-+
-+		if (cte->db == db &&
-+		    cte->devid == devid &&
-+		    cte->eventid == eventid) {
-+			/*
-+			 * Move this entry to the head, as it is the
-+			 * most recently used.
-+			 */
-+			list_move(&cte->entry, &dist->lpi_translation_cache);
-+			irq = cte->irq;
-+			break;
-+		}
-+	}
++	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
++	irq = __vgic_its_check_cache(dist, db, devid, eventid);
++	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
 +
 +	return irq;
 +}
 +
-+static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
-+				       u32 devid, u32 eventid,
-+				       struct vgic_irq *irq)
+ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+ 				       u32 devid, u32 eventid,
+ 				       struct vgic_irq *irq)
+@@ -736,6 +750,25 @@ static int vgic_its_trigger_msi(struct kvm *kvm, struct vgic_its *its,
+ 	return 0;
+ }
+ 
++int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi)
 +{
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+	struct vgic_translation_cache_entry *cte;
++	struct vgic_irq *irq;
 +	unsigned long flags;
 +	phys_addr_t db;
 +
-+	/* Do not cache a directly injected interrupt */
-+	if (irq->hw)
-+		return;
++	db = (u64)msi->address_hi << 32 | msi->address_lo;
++	irq = vgic_its_check_cache(kvm, db, msi->devid, msi->data);
 +
-+	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
++	if (!irq)
++		return -1;
 +
-+	if (unlikely(list_empty(&dist->lpi_translation_cache)))
-+		goto out;
++	raw_spin_lock_irqsave(&irq->irq_lock, flags);
++	irq->pending_latch = true;
++	vgic_queue_irq_unlock(kvm, irq, flags);
 +
-+	/*
-+	 * We could have raced with another CPU caching the same
-+	 * translation behind our back, so let's check it is not in
-+	 * already
-+	 */
-+	db = its->vgic_its_base + GITS_TRANSLATER;
-+	if (__vgic_its_check_cache(dist, db, devid, eventid))
-+		goto out;
-+
-+	/* Always reuse the last entry (LRU policy) */
-+	cte = list_last_entry(&dist->lpi_translation_cache,
-+			      typeof(*cte), entry);
-+
-+	/*
-+	 * Caching the translation implies having an extra reference
-+	 * to the interrupt, so drop the potential reference on what
-+	 * was in the cache, and increment it on the new interrupt.
-+	 */
-+	if (cte->irq)
-+		__vgic_put_lpi_locked(kvm, cte->irq);
-+
-+	vgic_get_irq_kref(irq);
-+
-+	cte->db		= db;
-+	cte->devid	= devid;
-+	cte->eventid	= eventid;
-+	cte->irq	= irq;
-+
-+	/* Move the new translation to the head of the list */
-+	list_move(&cte->entry, &dist->lpi_translation_cache);
-+
-+out:
-+	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
++	return 0;
 +}
 +
- void vgic_its_invalidate_cache(struct kvm *kvm)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
-@@ -589,6 +673,8 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
- 	if (!vcpu->arch.vgic_cpu.lpis_enabled)
- 		return -EBUSY;
+ /*
+  * Queries the KVM IO bus framework to get the ITS pointer from the given
+  * doorbell address.
+@@ -747,6 +780,9 @@ int vgic_its_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+ 	struct vgic_its *its;
+ 	int ret;
  
-+	vgic_its_cache_translation(kvm, its, devid, eventid, ite->irq);
++	if (!vgic_its_inject_cached_translation(kvm, msi))
++		return 1;
 +
- 	*irq = ite->irq;
- 	return 0;
- }
+ 	its = vgic_msi_to_its(kvm, msi);
+ 	if (IS_ERR(its))
+ 		return PTR_ERR(its);
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 072f810dc441..ad6eba1e2beb 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -317,6 +317,7 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr);
+ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ 			 u32 devid, u32 eventid, struct vgic_irq **irq);
+ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
++int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi);
+ void vgic_lpi_translation_cache_init(struct kvm *kvm);
+ void vgic_lpi_translation_cache_destroy(struct kvm *kvm);
+ void vgic_its_invalidate_cache(struct kvm *kvm);
 -- 
 2.20.1
 
