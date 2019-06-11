@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CB293CB1A
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 14:23:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6B273CB1C
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 14:24:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388904AbfFKMX6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 08:23:58 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:41852 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387819AbfFKMX6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 08:23:58 -0400
-Received: by mail-pl1-f195.google.com with SMTP id s24so5046407plr.8;
-        Tue, 11 Jun 2019 05:23:57 -0700 (PDT)
+        id S2389035AbfFKMYC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 08:24:02 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:46795 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388969AbfFKMYA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jun 2019 08:24:00 -0400
+Received: by mail-pf1-f193.google.com with SMTP id 81so7326713pfy.13;
+        Tue, 11 Jun 2019 05:23:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=AKeqxqK2gKEF050JzqbZCibb9Lq7XU7zk3Rd1JiS3Ag=;
-        b=LuvR0HuWMAXhFxd9h2DOrYAjzX6po79YvL9sIiqZU6LQBCETX5syodrVB1XOFmvFts
-         2SCrpn1mexFdYIjKAm0Mf8BHsA9Zqyr9N4JcCcmsSqVAZdek8o+wOS6dp01FlxmFyq+J
-         4QUBF/Vezmsftdd2gs0p5zH03De1diPnJzMrtp22nop38YpjjC/i9p0Y4VOMxglmv2On
-         WoEkIjBKnH1dbHqo7UziA8VZ8zNiEPpW1qzvKInBTyqdwDwYybnmMFGWcE9x4zn6G3y0
-         Wej/TrEWFdrWlnrW1uWDlS4upwTSryLuuKjNIGByBxMJHFBU+ilQoxRva0VHzvLqzB23
-         vehw==
+        bh=cGX8ZE5HpPEM8W1A+XwV2MspPdA5BLlcqW7hwnjzPDE=;
+        b=bF8RdgWyt+9d2epLHryzbj0tkgROcIvkGYmrBrdLRN79pcvcqY37JfpJ2yPxoAXF51
+         14GP4T4+hsfzmtZenxi9nRf5wGYW3AbdcQodHfOs4Fr/0A6CDYXsWDxenABFwwhqnNNl
+         v9RDab5wX4VMQlZHJCTtpkdN4fg65xnDcD9QeUT/ZeVxccf+Gs70X0mG1KXCKGPKoqhi
+         epkBZYEPX3AHnKFD3iPWfKMV37psb+PiV0mDDuV1eiaEBxnNqh1QTduJ44zi3RtW2oQp
+         hUhE7a0GuX2hpjDB99OoPrkrjcvgyAbgok0zslDPluKScVDjgGdRgdIU7UsL5hIYWpi9
+         UAoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=AKeqxqK2gKEF050JzqbZCibb9Lq7XU7zk3Rd1JiS3Ag=;
-        b=bCU9UotBiJA4JQuelU+xoi+w6mtC5TQJG4rUUF+k7fr29PHgpf0ytBHGDz59caluAN
-         v0ZEksL7elw9khQEAiLQXV/n0A54qj2j6mDWTSChKx6x0+q1GuzQGME/8WKvqrQDBiiJ
-         Y/OuxXgNTt0FAmMBdWTRC8ncLoikrhJl5H0zsARPNUj2TTvH8bjEGnUe2802iRI9+NV9
-         Io+iuR+z56Ve3Jvz8VK3F//KKGOaYkTAtS+DATfInKpcSgEq2pAWxMKj45P9noqjoC2H
-         Rh48OeGRoItWDe7BHO0YxpKHXAUETzsRpU6GD+YDB0tIEjGOOUQTh7+5Q3i3c8V6I9zM
-         IuMQ==
-X-Gm-Message-State: APjAAAVUiPV46SB7fbxd/aBi1NHAvaYQH3awMVyyIDcwkeY+W5FlGYcu
-        fXhVd4GbwuGNtmVm79fFsELGYblP
-X-Google-Smtp-Source: APXvYqwTT7hkV+XG3d00/uesyvZjWtaFvmevdoatEUYwpbTe3Q5M1lUlhxg2AdT/iyx1JzLMF9TUHw==
-X-Received: by 2002:a17:902:ba82:: with SMTP id k2mr67900016pls.323.1560255836922;
-        Tue, 11 Jun 2019 05:23:56 -0700 (PDT)
+        bh=cGX8ZE5HpPEM8W1A+XwV2MspPdA5BLlcqW7hwnjzPDE=;
+        b=eBrhqfDIo3pfHSutvTfi2KbAujy6vpGrntq0qW2Dpk4omBNQQ1rbmEhzRHnmo6lZ9x
+         D8Db4oVa0YgYct/vNth5zrFAmj27cMGhm9Ujuc0bkOmM7/E+kIPkMa/Rs5i8LZLdZv7M
+         NgTDZkUXYGoOhRHC5kTqo3op4AB3gy7lM2SiNY1Wt7UorjkeRII3hhPO+l2TfHQSZIDD
+         ewJsNOCRJYuCmJ8IEaD07J26BXs7ZzoO6IVzzHfHVyiKJrXJqT/bJaFbRRgIwoRm3r+i
+         Z9dFS652YxGvAuE89Bn83DlnXc/eccfKuQrg4SeStVAeH1Udj/Yup0fU4R+YuOtbYGH3
+         CRdQ==
+X-Gm-Message-State: APjAAAWc+AX6EznOhsCpmbD1ssQv/8wHNsB6sTJiRhlwq/nsd6tLS9LA
+        yHkLbL5ubXn6RwVcTGCntCe32aBS
+X-Google-Smtp-Source: APXvYqwTdZo6LzWhDaT78xZ1R7AU2rhrg0GhTSGylvLrBLcM8qPZeHoK6vpu2bdOS8lFNxcrONfxYg==
+X-Received: by 2002:a63:2c50:: with SMTP id s77mr19852056pgs.175.1560255838924;
+        Tue, 11 Jun 2019 05:23:58 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id 127sm14832271pfc.159.2019.06.11.05.23.54
+        by smtp.googlemail.com with ESMTPSA id 127sm14832271pfc.159.2019.06.11.05.23.57
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Tue, 11 Jun 2019 05:23:56 -0700 (PDT)
+        Tue, 11 Jun 2019 05:23:58 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
         Liran Alon <liran.alon@oracle.com>
-Subject: [PATCH v4 1/3] KVM: X86: Yield to IPI target if necessary
-Date:   Tue, 11 Jun 2019 20:23:48 +0800
-Message-Id: <1560255830-8656-2-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH v4 2/3] KVM: X86: Implement PV sched yield hypercall
+Date:   Tue, 11 Jun 2019 20:23:49 +0800
+Message-Id: <1560255830-8656-3-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1560255830-8656-1-git-send-email-wanpengli@tencent.com>
 References: <1560255830-8656-1-git-send-email-wanpengli@tencent.com>
@@ -66,104 +66,61 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-When sending a call-function IPI-many to vCPUs, yield if any of
-the IPI target vCPUs was preempted, we just select the first
-preempted target vCPU which we found since the state of target
-vCPUs can change underneath and to avoid race conditions.
+The target vCPUs are in runnable state after vcpu_kick and suitable 
+as a yield target. This patch implements the sched yield hypercall.
+
+17% performance increasement of ebizzy benchmark can be observed in an 
+over-subscribe environment. (w/ kvm-pv-tlb disabled, testing TLB flush 
+call-function IPI-many since call-function is not easy to be trigged 
+by userspace workload).
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Radim Krčmář <rkrcmar@redhat.com>
 Cc: Liran Alon <liran.alon@oracle.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- Documentation/virtual/kvm/hypercalls.txt | 11 +++++++++++
- arch/x86/include/uapi/asm/kvm_para.h     |  1 +
- arch/x86/kernel/kvm.c                    | 21 +++++++++++++++++++++
- include/uapi/linux/kvm_para.h            |  1 +
- 4 files changed, 34 insertions(+)
+ arch/x86/kvm/x86.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/Documentation/virtual/kvm/hypercalls.txt b/Documentation/virtual/kvm/hypercalls.txt
-index da24c13..da21065 100644
---- a/Documentation/virtual/kvm/hypercalls.txt
-+++ b/Documentation/virtual/kvm/hypercalls.txt
-@@ -141,3 +141,14 @@ a0 corresponds to the APIC ID in the third argument (a2), bit 1
- corresponds to the APIC ID a2+1, and so on.
- 
- Returns the number of CPUs to which the IPIs were delivered successfully.
-+
-+7. KVM_HC_SCHED_YIELD
-+------------------------
-+Architecture: x86
-+Status: active
-+Purpose: Hypercall used to yield if the IPI target vCPU is preempted
-+
-+a0: destination APIC ID
-+
-+Usage example: When sending a call-function IPI-many to vCPUs, yield if
-+any of the IPI target vCPUs was preempted.
-diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-index 19980ec..d0bf77c 100644
---- a/arch/x86/include/uapi/asm/kvm_para.h
-+++ b/arch/x86/include/uapi/asm/kvm_para.h
-@@ -29,6 +29,7 @@
- #define KVM_FEATURE_PV_TLB_FLUSH	9
- #define KVM_FEATURE_ASYNC_PF_VMEXIT	10
- #define KVM_FEATURE_PV_SEND_IPI	11
-+#define KVM_FEATURE_PV_SCHED_YIELD	12
- 
- #define KVM_HINTS_REALTIME      0
- 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 5169b8c..82caf01 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -527,6 +527,21 @@ static void kvm_setup_pv_ipi(void)
- 	pr_info("KVM setup pv IPIs\n");
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 35c4884..6d49ea0 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7160,6 +7160,23 @@ void kvm_vcpu_deactivate_apicv(struct kvm_vcpu *vcpu)
+ 	kvm_x86_ops->refresh_apicv_exec_ctrl(vcpu);
  }
  
-+static void kvm_smp_send_call_func_ipi(const struct cpumask *mask)
++static void kvm_sched_yield(struct kvm *kvm, unsigned long dest_id)
 +{
-+	int cpu;
++	struct kvm_vcpu *target = NULL;
++	struct kvm_apic_map *map;
 +
-+	native_send_call_func_ipi(mask);
++	rcu_read_lock();
++	map = rcu_dereference(kvm->arch.apic_map);
 +
-+	/* Make sure other vCPUs get a chance to run if they need to. */
-+	for_each_cpu(cpu, mask) {
-+		if (vcpu_is_preempted(cpu)) {
-+			kvm_hypercall1(KVM_HC_SCHED_YIELD, per_cpu(x86_cpu_to_apicid, cpu));
-+			break;
-+		}
-+	}
++	if (likely(map) && dest_id <= map->max_apic_id && map->phys_map[dest_id])
++		target = map->phys_map[dest_id]->vcpu;
++
++	rcu_read_unlock();
++
++	if (target)
++		kvm_vcpu_yield_to(target);
 +}
 +
- static void __init kvm_smp_prepare_cpus(unsigned int max_cpus)
+ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
  {
- 	native_smp_prepare_cpus(max_cpus);
-@@ -638,6 +653,12 @@ static void __init kvm_guest_init(void)
- #ifdef CONFIG_SMP
- 	smp_ops.smp_prepare_cpus = kvm_smp_prepare_cpus;
- 	smp_ops.smp_prepare_boot_cpu = kvm_smp_prepare_boot_cpu;
-+	if (kvm_para_has_feature(KVM_FEATURE_PV_SCHED_YIELD) &&
-+	    !kvm_para_has_hint(KVM_HINTS_REALTIME) &&
-+	    kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
-+		smp_ops.send_call_func_ipi = kvm_smp_send_call_func_ipi;
-+		pr_info("KVM setup pv sched yield\n");
-+	}
- 	if (cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN, "x86/kvm:online",
- 				      kvm_cpu_online, kvm_cpu_down_prepare) < 0)
- 		pr_err("kvm_guest: Failed to install cpu hotplug callbacks\n");
-diff --git a/include/uapi/linux/kvm_para.h b/include/uapi/linux/kvm_para.h
-index 6c0ce49..8b86609 100644
---- a/include/uapi/linux/kvm_para.h
-+++ b/include/uapi/linux/kvm_para.h
-@@ -28,6 +28,7 @@
- #define KVM_HC_MIPS_CONSOLE_OUTPUT	8
- #define KVM_HC_CLOCK_PAIRING		9
- #define KVM_HC_SEND_IPI		10
-+#define KVM_HC_SCHED_YIELD		11
- 
- /*
-  * hypercalls use architecture specific
+ 	unsigned long nr, a0, a1, a2, a3, ret;
+@@ -7206,6 +7223,10 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+ 	case KVM_HC_SEND_IPI:
+ 		ret = kvm_pv_send_ipi(vcpu->kvm, a0, a1, a2, a3, op_64_bit);
+ 		break;
++	case KVM_HC_SCHED_YIELD:
++		kvm_sched_yield(vcpu->kvm, a0);
++		ret = 0;
++		break;
+ 	default:
+ 		ret = -KVM_ENOSYS;
+ 		break;
 -- 
 2.7.4
 
