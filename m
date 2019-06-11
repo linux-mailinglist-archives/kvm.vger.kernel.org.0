@@ -2,208 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 82FBA416CF
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 23:24:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 194A5416E0
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 23:28:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406873AbfFKVYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 17:24:53 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:33657 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388693AbfFKVYw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 17:24:52 -0400
-Received: by mail-ot1-f68.google.com with SMTP id p4so10158541oti.0;
-        Tue, 11 Jun 2019 14:24:52 -0700 (PDT)
+        id S2436517AbfFKV2M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 17:28:12 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:36867 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2407653AbfFKV2L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jun 2019 17:28:11 -0400
+Received: by mail-ot1-f66.google.com with SMTP id r10so13386785otd.4;
+        Tue, 11 Jun 2019 14:28:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yfYsg0/cES0OHcG6fX5W9snm90ggOgAM9kXY3QBEhu4=;
+        b=uikxw7UtyOptEVyjeY2qK4xy247KZZSlixb4FYF44cy5IOYuGfhYNz0auK7eAN3lSf
+         RDykMi53c/UWnKOss3Gbf99f02SgcsLInyU9jZT7mZ9OHg9hKC6fNrTncVfEUwMvFzyT
+         LcQoyh1B+GWH1wcVdCBdLQqRjW9xbNzL/XHVXJwKNd+h41OfOLBnxXrK/w2EGMY7Sdql
+         Ev+iISe8afAaHYadIsKtGIEgMDX6CnpwHgbsBe+aUSzQIjTpiqosNwjLo3ub7MMP5bSh
+         sv6W0b+fg0PHcDLs3IdJMwn13c7joqsHqAOaS3kYpN0/uUkfhOoBhUB3X+c5vOw3dtMp
+         LbTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=uIRbwWRuO7/1ZwaraC6BCujZR3cVhI4nwmywSXcAgsE=;
-        b=WqLWH32JFh35blcEsrkkIXSNKbADGNW5dzqn0v7mN1FPPG5q3J7ccbB72+0v/e/1Ev
-         QbTsuroCf30YwfPy6v5+edvC7Fp/HE8ZTBIGklxIVANnybbLzgutyXaEOdLllwZ65WJg
-         mJ2rO1lMmsimq9gPNZYH96fyWioWFoCp01Kd7MtkcYPn5GOeIyFZtROEVId9uo1eyNgw
-         19Mt8jhSKoalZXHAvJXS0Pulru8XWoOGOZCbRMyCI2niCZdvm6anFMxZz4znofVhVmyp
-         2VkDxLSCMjGptNJgMO70UElxLpJ1a5lMqgWdniN5FI2T6qRz3svKH5iLgW/z1cx/Iakq
-         hNIQ==
-X-Gm-Message-State: APjAAAUoS1zHZykrAFMrweqGcFX0mUyNAdy+v/yFC3voRRtHoZFCU3g9
-        kWsgR3SPw7DGr7kTmNiF3upJLO2h1byMm2JXOx0=
-X-Google-Smtp-Source: APXvYqwiRbWgoGewJXZNzXGtJm32eKWRtswBFrQTNgXaJJDNmyM0R10HTRvq2SYoP6P/HZcl6x8hus9nwQVpkte5e7s=
-X-Received: by 2002:a9d:5e99:: with SMTP id f25mr7850901otl.262.1560288291573;
- Tue, 11 Jun 2019 14:24:51 -0700 (PDT)
+        bh=yfYsg0/cES0OHcG6fX5W9snm90ggOgAM9kXY3QBEhu4=;
+        b=VWmUwoR9ygSpzmu4vbM58zXol8+svInEvDKpx3nMhm+HUUPkpjQFP1iBHSaJGr19vS
+         95FjdqeDmEyVPNLlHxujyrkm+XB4c3pgqKNuXE+cLYd/6DCBbHTUOBSY1Laaci39LtAm
+         ku1YQurhfqt7Rsv8jIxnJmTy8eNUu16xvKh+JlNnQ+qNcCuvvECDFZqTp7Wf5ar24t1A
+         BRP7ry1XKTd2FrHGlum+xDxKYmUGvI7VeTQgDFmlyPKlnt8yATbnMkJ4keOnzeO78NJ+
+         GoEKrkqND1eAAqYaVDicBO/APMs+b88oGYLOtNTBHO11uwPHSqsANgEcL7+k6MWX8RTw
+         fF7w==
+X-Gm-Message-State: APjAAAVBb8lSaSZmNEGcGH0pWaR+0rEHRIElG+mC9Z4PHENl0VkTWb6j
+        Ga0+tOEQHcrmhOUsjZQTRQ0HuPqxUKfRt+DCN84=
+X-Google-Smtp-Source: APXvYqwZE6DuGW97Wtdkbau380s5wncliqmuWNA2I8e3nRFVHn0Gyt7oiNVh7GBK4ctz/0QIVrifVcW0qHRMDnaPYKk=
+X-Received: by 2002:a9d:7b43:: with SMTP id f3mr18847440oto.337.1560288490020;
+ Tue, 11 Jun 2019 14:28:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190603225242.289109849@amt.cnet> <6c411948-9e32-9f41-351e-c9accd1facb0@intel.com>
- <20190610145942.GA24553@amt.cnet> <CAJZ5v0idYgETFg4scgvpJ-eGtFAx1Wi6hznXz7+XZAfKjiSAPA@mail.gmail.com>
- <20190611142627.GB4791@amt.cnet>
-In-Reply-To: <20190611142627.GB4791@amt.cnet>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Tue, 11 Jun 2019 23:24:39 +0200
-Message-ID: <CAJZ5v0gPbSXB3r71XaT-4Q7LsiFO_UVymBwOmU8J1W5+COk_1g@mail.gmail.com>
-Subject: Re: [patch 0/3] cpuidle-haltpoll driver (v2)
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LDhD9tw4PCocOFPw==?= <rkrcmar@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Raslan KarimAllah <karahmed@amazon.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Linux PM <linux-pm@vger.kernel.org>
+References: <20190611193836.2772-1-shyam.saini@amarulasolutions.com>
+ <20190611134831.a60c11f4b691d14d04a87e29@linux-foundation.org>
+ <6DCAE4F8-3BEC-45F2-A733-F4D15850B7F3@dilger.ca> <20190611140907.899bebb12a3d731da24a9ad1@linux-foundation.org>
+In-Reply-To: <20190611140907.899bebb12a3d731da24a9ad1@linux-foundation.org>
+From:   Shyam Saini <mayhs11saini@gmail.com>
+Date:   Wed, 12 Jun 2019 02:57:58 +0530
+Message-ID: <CAOfkYf5_HTN1HO0gQY9iGchK5Anf6oVx7knzMhL1hWpv4gV20Q@mail.gmail.com>
+Subject: Re: [PATCH V2] include: linux: Regularise the use of FIELD_SIZEOF macro
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Andreas Dilger <adilger@dilger.ca>,
+        Shyam Saini <shyam.saini@amarulasolutions.com>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Network Development <netdev@vger.kernel.org>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        devel@lists.orangefs.org, linux-mm <linux-mm@kvack.org>,
+        linux-sctp@vger.kernel.org, bpf <bpf@vger.kernel.org>,
+        kvm@vger.kernel.org, Alexey Dobriyan <adobriyan@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 11, 2019 at 4:27 PM Marcelo Tosatti <mtosatti@redhat.com> wrote:
+Hi Andrew,
+
 >
-> On Tue, Jun 11, 2019 at 12:03:26AM +0200, Rafael J. Wysocki wrote:
-> > On Mon, Jun 10, 2019 at 5:00 PM Marcelo Tosatti <mtosatti@redhat.com> wrote:
+> On Tue, 11 Jun 2019 15:00:10 -0600 Andreas Dilger <adilger@dilger.ca> wrote:
+>
+> > >> to FIELD_SIZEOF
 > > >
-> > > On Fri, Jun 07, 2019 at 11:49:51AM +0200, Rafael J. Wysocki wrote:
-> > > > On 6/4/2019 12:52 AM, Marcelo Tosatti wrote:
-> > > > >The cpuidle-haltpoll driver allows the guest vcpus to poll for a specified
-> > > > >amount of time before halting. This provides the following benefits
-> > > > >to host side polling:
-> > > > >
-> > > > >         1) The POLL flag is set while polling is performed, which allows
-> > > > >            a remote vCPU to avoid sending an IPI (and the associated
-> > > > >            cost of handling the IPI) when performing a wakeup.
-> > > > >
-> > > > >         2) The HLT VM-exit cost can be avoided.
-> > > > >
-> > > > >The downside of guest side polling is that polling is performed
-> > > > >even with other runnable tasks in the host.
-> > > > >
-> > > > >Results comparing halt_poll_ns and server/client application
-> > > > >where a small packet is ping-ponged:
-> > > > >
-> > > > >host                                        --> 31.33
-> > > > >halt_poll_ns=300000 / no guest busy spin    --> 33.40   (93.8%)
-> > > > >halt_poll_ns=0 / guest_halt_poll_ns=300000  --> 32.73   (95.7%)
-> > > > >
-> > > > >For the SAP HANA benchmarks (where idle_spin is a parameter
-> > > > >of the previous version of the patch, results should be the
-> > > > >same):
-> > > > >
-> > > > >hpns == halt_poll_ns
-> > > > >
-> > > > >                           idle_spin=0/   idle_spin=800/    idle_spin=0/
-> > > > >                           hpns=200000    hpns=0            hpns=800000
-> > > > >DeleteC06T03 (100 thread) 1.76           1.71 (-3%)        1.78   (+1%)
-> > > > >InsertC16T02 (100 thread) 2.14           2.07 (-3%)        2.18   (+1.8%)
-> > > > >DeleteC00T01 (1 thread)   1.34           1.28 (-4.5%)           1.29   (-3.7%)
-> > > > >UpdateC00T03 (1 thread)   4.72           4.18 (-12%)    4.53   (-5%)
-> > > > >
-> > > > >V2:
-> > > > >
-> > > > >- Move from x86 to generic code (Paolo/Christian).
-> > > > >- Add auto-tuning logic (Paolo).
-> > > > >- Add MSR to disable host side polling (Paolo).
-> > > > >
-> > > > >
-> > > > >
-> > > > First of all, please CC power management patches (including cpuidle,
-> > > > cpufreq etc) to linux-pm@vger.kernel.org (there are people on that
-> > > > list who may want to see your changes before they go in) and CC
-> > > > cpuidle material (in particular) to Peter Zijlstra.
-> > > >
-> > > > Second, I'm not a big fan of this approach to be honest, as it kind
-> > > > of is a driver trying to play the role of a governor.
-> > > >
-> > > > We have a "polling state" already that could be used here in
-> > > > principle so I wonder what would be wrong with that.  Also note that
-> > > > there seems to be at least some code duplication between your code
-> > > > and the "polling state" implementation, so maybe it would be
-> > > > possible to do some things in a common way?
+> > > As Alexey has pointed out, C structs and unions don't have fields -
+> > > they have members.  So this is an opportunity to switch everything to
+> > > a new member_sizeof().
 > > >
-> > > Hi Rafael,
-> > >
-> > > After modifying poll_state.c to use a generic "poll time" driver
-> > > callback [1] (since using a variable "target_residency" for that
-> > > looks really ugly), would need a governor which does:
-> > >
-> > > haltpoll_governor_select_next_state()
-> > >         if (prev_state was poll and evt happened on prev poll window) -> POLL.
-> > >         if (prev_state == HLT)  -> POLL
-> > >         otherwise               -> HLT
-> > >
-> > > And a "default_idle" cpuidle driver that:
-> > >
-> > > defaultidle_idle()
-> > >         if (current_clr_polling_and_test()) {
-> > >                 local_irq_enable();
-> > >                 return index;
-> > >         }
-> > >         default_idle();
-> > >         return
-> > >
-> > > Using such governor with any other cpuidle driver would
-> > > be pointless (since it would enter the first state only
-> > > and therefore not save power).
-> > >
-> > > Not certain about using the default_idle driver with
-> > > other governors: one would rather use a driver that
-> > > supports all states on a given machine.
-> > >
-> > > This combination of governor/driver pair, for the sake
-> > > of sharing the idle loop, seems awkward to me.
-> > > And fails the governor/driver separation: one will use the
-> > > pair in practice.
-> > >
-> > > But i have no problem with it, so i'll proceed with that.
-> > >
-> > > Let me know otherwise.
+> > > What do people think of that and how does this impact the patch footprint?
 > >
-> > If my understanding of your argumentation is correct, it is only
-> > necessary to take the default_idle_call() branch of
-> > cpuidle_idle_call() in the VM case, so it should be sufficient to
-> > provide a suitable default_idle_call() which is what you seem to be
-> > trying to do.
+> > I did a check, and FIELD_SIZEOF() is used about 350x, while sizeof_field()
+> > is about 30x, and SIZEOF_FIELD() is only about 5x.
 >
-> In the VM case, we need to poll before actually halting (this is because
-> its tricky to implement MWAIT in guests, so polling for some amount
-> of time allows the IPI avoidance optimization,
-> see trace_sched_wake_idle_without_ipi, to take place).
+> Erk.  Sorry, I should have grepped.
 >
-> The amount of time we poll is variable and adjusted (see adjust_haltpoll_ns
-> in the patchset).
->
-> > I might have been confused by the terminology used in the patch series
-> > if that's the case.
+> > That said, I'm much more in favour of "sizeof_field()" or "sizeof_member()"
+> > than FIELD_SIZEOF().  Not only does that better match "offsetof()", with
+> > which it is closely related, but is also closer to the original "sizeof()".
 > >
-> > Also, if that's the case, this is not cpuidle matter really.  It is a
-> > matter of providing a better default_idle_call() for the arch at hand.
+> > Since this is a rather trivial change, it can be split into a number of
+> > patches to get approval/landing via subsystem maintainers, and there is no
+> > huge urgency to remove the original macros until the users are gone.  It
+> > would make sense to remove SIZEOF_FIELD() and sizeof_field() quickly so
+> > they don't gain more users, and the remaining FIELD_SIZEOF() users can be
+> > whittled away as the patches come through the maintainer trees.
 >
-> Peter Zijlstra suggested a cpuidle driver for this.
-
-So I wonder what his rationale was.
-
-> Also, other architectures will use the same "poll before exiting to VM"
-> logic (so we'd rather avoid duplicating this code): PPC, x86, S/390,
-> MIPS... So in my POV it makes sense to unify this.
-
-The logic is fine IMO, but the implementation here is questionable.
-
-> So, back to your initial suggestion:
+> In that case I'd say let's live with FIELD_SIZEOF() and remove
+> sizeof_field() and SIZEOF_FIELD().
 >
-> Q) "Can you unify code with poll_state.c?"
-> A) Yes, but it requires a new governor, which seems overkill and unfit
-> for the purpose.
->
-> Moreover, the logic in menu to decide whether its necessary or not
-> to stop sched tick is useful for us (so a default_idle_call is not
-> sufficient), because the cost of enabling/disabling the sched tick is
-> high on VMs.
+> I'm a bit surprised that the FIELD_SIZEOF() definition ends up in
+> stddef.h rather than in kernel.h where such things are normally
+> defined.  Why is that?
 
-So in fact you need a governor, but you really only need it to decide
-whether or not to stop the tick for you.
-
-menu has a quite high overhead for that. :-)
-
-> So i'll fix the comments of the cpuidle driver (which everyone seems
-> to agree with, except your understandable distate for it) and repost.
+Thanks for pointing out this, I was not aware if this is a convention.
+Anyway, I'll keep FIELD_SIZEOF definition in kernel.h in next version.
