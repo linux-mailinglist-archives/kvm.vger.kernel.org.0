@@ -2,81 +2,329 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BE6663CAF8
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 14:18:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 850DA3CB00
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 14:19:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387934AbfFKMSK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 08:18:10 -0400
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:42468 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387780AbfFKMSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 08:18:09 -0400
-Received: by mail-oi1-f195.google.com with SMTP id s184so8746199oie.9;
-        Tue, 11 Jun 2019 05:18:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0EMixU0L4b0ZCFegtw+unlifhiqds/4ljlhVrZwVzq4=;
-        b=olo+i1fvsbiRzte8WBg6b/XYI4OTLZjRNtelDmZCpC/ugvjSPtaGA+OROyLdIZ5XAM
-         Y7hYZmkUaNvH7Cn+fvA2T5mlNSF5V78Pkr654NIle8cn2fGYYCBZb4AWad4pPeSixZdl
-         nYiGEpF7V5RfHsZoS4OgCr3mgC9v1Z5l4YctKKRGjiN4ZCo9+XJKOLDPwNK79ybWW0z1
-         Uwgy+lI71VenOlzdOQ6uuH+RXpsRj86i9DVcb1nrwUBCujtYWDoeXigFQ3faJrli4T7s
-         cV+i6iAKkri1gJHGSGgedONa98GFXZuw8TLVYZF9o29WUrp4oLWj4o9LKEqPA9fSXe0z
-         Ygpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0EMixU0L4b0ZCFegtw+unlifhiqds/4ljlhVrZwVzq4=;
-        b=PPj06HsKUVDVHoa9K6oN6WKWbIUBwMT1366IH6BGHMg6XlLMk8DRpaAYf5m3kqMBIB
-         e3ei8goisdg8JiQy4/zTgW33oW9IvA4sWt97As5QhBTJ6yzlPAJ4D239/2xEVTP6I0J+
-         UozIshstniS9HFbFXwaGsacKRcMlDjHmMHtuylAXA4I0U2wCCvLhn8NAeNne8KhRQ4q9
-         v0fOu2/50Wmo0XX785D3YLGAjhXgLaLNx47Ps7J+ahhXrvpmYjNs1/WAF+L6KZBcKofR
-         7g1rGiCgVn2fofsp926FlagbxUI+cxXrdpLbC1gRRaBeAcTt676XlnMfZFslHn3+KVvw
-         k4qQ==
-X-Gm-Message-State: APjAAAWruYSVFpwop6SfTQnZTwHPH6gfc+zelLIw80y7ndmyLaZz0ez3
-        XqKHJr242/5V90udMfbQz6qMFo6jCnsK+I/6pS4=
-X-Google-Smtp-Source: APXvYqwhX1Fh6qevzYmBcohucTwsr0U7S/n5WBCtBR3Xup9JGDJ09uPKIozcmODtjO9rtlvHTEfxvxZKtWGmkV16udM=
-X-Received: by 2002:aca:e0d6:: with SMTP id x205mr14784719oig.47.1560255489254;
- Tue, 11 Jun 2019 05:18:09 -0700 (PDT)
+        id S2387972AbfFKMTe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 08:19:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39610 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727140AbfFKMTe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jun 2019 08:19:34 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 76F56552FC;
+        Tue, 11 Jun 2019 12:19:20 +0000 (UTC)
+Received: from [10.40.205.172] (unknown [10.40.205.172])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 273D25DAA0;
+        Tue, 11 Jun 2019 12:19:06 +0000 (UTC)
+Subject: Re: [RFC][Patch v10 0/2] mm: Support for page hinting
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, pbonzini@redhat.com, lcapitulino@redhat.com,
+        pagupta@redhat.com, wei.w.wang@intel.com, yang.zhang.wz@gmail.com,
+        riel@surriel.com, david@redhat.com, dodgen@google.com,
+        konrad.wilk@oracle.com, dhildenb@redhat.com, aarcange@redhat.com,
+        alexander.duyck@gmail.com
+References: <20190603170306.49099-1-nitesh@redhat.com>
+ <20190603140304-mutt-send-email-mst@kernel.org>
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ VujM7c/b4pps
+Organization: Red Hat Inc,
+Message-ID: <500506fd-7641-c628-533b-7aa178a37f18@redhat.com>
+Date:   Tue, 11 Jun 2019 08:19:04 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <1559799086-13912-1-git-send-email-wanpengli@tencent.com>
- <1559799086-13912-3-git-send-email-wanpengli@tencent.com> <c5530947-d48d-e3da-3056-ed64f7fa9a9d@redhat.com>
-In-Reply-To: <c5530947-d48d-e3da-3056-ed64f7fa9a9d@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 11 Jun 2019 20:18:53 +0800
-Message-ID: <CANRm+CzgLov6AYDVLYOFvZvo+bLS9AA+3J_qSis6PK3f9_2utw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] KVM: LAPIC: lapic timer interrupt is injected by
- posted interrupt
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190603140304-mutt-send-email-mst@kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="KNAXxfAzkz54vPDzUdLlmQg653PKEo7Xt"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Tue, 11 Jun 2019 12:19:33 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 11 Jun 2019 at 19:40, Paolo Bonzini <pbonzini@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KNAXxfAzkz54vPDzUdLlmQg653PKEo7Xt
+Content-Type: multipart/mixed; boundary="YnBKnQIIjrnveMKSGll1ZbHtvHbelLIlR";
+ protected-headers="v1"
+From: Nitesh Narayan Lal <nitesh@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ pbonzini@redhat.com, lcapitulino@redhat.com, pagupta@redhat.com,
+ wei.w.wang@intel.com, yang.zhang.wz@gmail.com, riel@surriel.com,
+ david@redhat.com, dodgen@google.com, konrad.wilk@oracle.com,
+ dhildenb@redhat.com, aarcange@redhat.com, alexander.duyck@gmail.com
+Message-ID: <500506fd-7641-c628-533b-7aa178a37f18@redhat.com>
+Subject: Re: [RFC][Patch v10 0/2] mm: Support for page hinting
+References: <20190603170306.49099-1-nitesh@redhat.com>
+ <20190603140304-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190603140304-mutt-send-email-mst@kernel.org>
+
+--YnBKnQIIjrnveMKSGll1ZbHtvHbelLIlR
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+
+
+On 6/3/19 2:04 PM, Michael S. Tsirkin wrote:
+> On Mon, Jun 03, 2019 at 01:03:04PM -0400, Nitesh Narayan Lal wrote:
+>> This patch series proposes an efficient mechanism for communicating fr=
+ee memory
+>> from a guest to its hypervisor. It especially enables guests with no p=
+age cache
+>> (e.g., nvdimm, virtio-pmem) or with small page caches (e.g., ram > dis=
+k) to
+>> rapidly hand back free memory to the hypervisor.
+>> This approach has a minimal impact on the existing core-mm infrastruct=
+ure.
+> Could you help us compare with Alex's series?
+> What are the main differences?
+Sorry for the late reply, but I haven't been feeling too well during the
+last week.
+
+The main differences are that this series uses a bitmap to track pages
+that should be hinted to the hypervisor, while Alexander's series tracks
+it directly in core-mm. Also in order to prevent duplicate hints
+Alexander's series uses a newly defined page flag whereas I have added
+another argument to __free_one_page.
+For these reasons, Alexander's series is relatively more core-mm
+invasive, while this series is lightweight (e.g., LOC). We'll have to
+see if there are real performance differences.
+
+I'm planning on doing some further investigations/review/testing/...
+once I'm back on track.
 >
-> On 06/06/19 07:31, Wanpeng Li wrote:
-> > +static inline bool can_posted_interrupt_inject_timer(struct kvm_vcpu *vcpu)
-> > +{
-> > +     return posted_interrupt_inject_timer_enabled(vcpu) &&
-> > +             !vcpu_halt_in_guest(vcpu);
-> > +}
-> > +
->
-> I agree with Radim, what you want here is just use kvm_hlt_in_guest.
+>> Measurement results (measurement details appended to this email):
+>> * With active page hinting, 3 more guests could be launched each of 5 =
+GB(total=20
+>> 5 vs. 2) on a 15GB (single NUMA) system without swapping.
+>> * With active page hinting, on a system with 15 GB of (single NUMA) me=
+mory and
+>> 4GB of swap, the runtime of "memhog 6G" in 3 guests (run sequentially)=
+ resulted
+>> in the last invocation to only need 37s compared to 3m35s without page=
+ hinting.
+>>
+>> This approach tracks all freed pages of the order MAX_ORDER - 2 in bit=
+maps.
+>> A new hook after buddy merging is used to set the bits in the bitmap.
+>> Currently, the bits are only cleared when pages are hinted, not when p=
+ages are
+>> re-allocated.
+>>
+>> Bitmaps are stored on a per-zone basis and are protected by the zone l=
+ock. A
+>> workqueue asynchronously processes the bitmaps as soon as a pre-define=
+d memory
+>> threshold is met, trying to isolate and report pages that are still fr=
+ee.
+>>
+>> The isolated pages are reported via virtio-balloon, which is responsib=
+le for
+>> sending batched pages to the host synchronously. Once the hypervisor p=
+rocessed
+>> the hinting request, the isolated pages are returned back to the buddy=
+=2E
+>>
+>> The key changes made in this series compared to v9[1] are:
+>> * Pages only in the chunks of "MAX_ORDER - 2" are reported to the hype=
+rvisor to
+>> not break up the THP.
+>> * At a time only a set of 16 pages can be isolated and reported to the=
+ host to
+>> avoids any false OOMs.
+>> * page_hinting.c is moved under mm/ from virt/kvm/ as the feature is d=
+ependent
+>> on virtio and not on KVM itself. This would enable any other hyperviso=
+r to use
+>> this feature by implementing virtio devices.
+>> * The sysctl variable is replaced with a virtio-balloon parameter to
+>> enable/disable page-hinting.
+>>
+>> Pending items:
+>> * Test device assigned guests to ensure that hinting doesn't break it.=
 
-Do it in v3.
+>> * Follow up on VIRTIO_BALLOON_F_PAGE_POISON's device side support.
+>> * Compare reporting free pages via vring with vhost.
+>> * Decide between MADV_DONTNEED and MADV_FREE.
+>> * Look into memory hotplug, more efficient locking, possible races whe=
+n
+>> disabling.
+>> * Come up with proper/traceable error-message/logs.
+>> * Minor reworks and simplifications (e.g., virtio protocol).
+>>
+>> Benefit analysis:
+>> 1. Use-case - Number of guests that can be launched without swap usage=
 
->
-> I'll post shortly a prerequisite patch to block APF artificial halt when
-> kvm_hlt_in_guest is true.
+>> NUMA Nodes =3D 1 with 15 GB memory
+>> Guest Memory =3D 5 GB
+>> Number of cores in guest =3D 1
+>> Workload =3D test allocation program allocates 4GB memory, touches it =
+via memset
+>> and exits.
+>> Procedure =3D
+>> The first guest is launched and once its console is up, the test alloc=
+ation
+>> program is executed with 4 GB memory request (Due to this the guest oc=
+cupies
+>> almost 4-5 GB of memory in the host in a system without page hinting).=
+ Once
+>> this program exits at that time another guest is launched in the host =
+and the
+>> same process is followed. It is continued until the swap is not used.
+>>
+>> Results:
+>> Without hinting =3D 3, swap usage at the end 1.1GB.
+>> With hinting =3D 5, swap usage at the end 0.
+>>
+>> 2. Use-case - memhog execution time
+>> Guest Memory =3D 6GB
+>> Number of cores =3D 4
+>> NUMA Nodes =3D 1 with 15 GB memory
+>> Process: 3 Guests are launched and the =E2=80=98memhog 6G=E2=80=99 exe=
+cution time is monitored
+>> one after the other in each of them.
+>> Without Hinting - Guest1:47s, Guest2:53s, Guest3:3m35s, End swap usage=
+: 3.5G
+>> With Hinting - Guest1:40s, Guest2:44s, Guest3:37s, End swap usage: 0
+>>
+>> Performance analysis:
+>> 1. will-it-scale's page_faul1:
+>> Guest Memory =3D 6GB
+>> Number of cores =3D 24
+>>
+>> Without Hinting:
+>> tasks,processes,processes_idle,threads,threads_idle,linear
+>> 0,0,100,0,100,0
+>> 1,315890,95.82,317633,95.83,317633
+>> 2,570810,91.67,531147,91.94,635266
+>> 3,826491,87.54,713545,88.53,952899
+>> 4,1087434,83.40,901215,85.30,1270532
+>> 5,1277137,79.26,916442,83.74,1588165
+>> 6,1503611,75.12,1113832,79.89,1905798
+>> 7,1683750,70.99,1140629,78.33,2223431
+>> 8,1893105,66.85,1157028,77.40,2541064
+>> 9,2046516,62.50,1179445,76.48,2858697
+>> 10,2291171,58.57,1209247,74.99,3176330
+>> 11,2486198,54.47,1217265,75.13,3493963
+>> 12,2656533,50.36,1193392,74.42,3811596
+>> 13,2747951,46.21,1185540,73.45,4129229
+>> 14,2965757,42.09,1161862,72.20,4446862
+>> 15,3049128,37.97,1185923,72.12,4764495
+>> 16,3150692,33.83,1163789,70.70,5082128
+>> 17,3206023,29.70,1174217,70.11,5399761
+>> 18,3211380,25.62,1179660,69.40,5717394
+>> 19,3202031,21.44,1181259,67.28,6035027
+>> 20,3218245,17.35,1196367,66.75,6352660
+>> 21,3228576,13.26,1129561,66.74,6670293
+>> 22,3207452,9.15,1166517,66.47,6987926
+>> 23,3153800,5.09,1172877,61.57,7305559
+>> 24,3184542,0.99,1186244,58.36,7623192
+>>
+>> With Hinting:
+>> 0,0,100,0,100,0
+>> 1,306737,95.82,305130,95.78,306737
+>> 2,573207,91.68,530453,91.92,613474
+>> 3,810319,87.53,695281,88.58,920211
+>> 4,1074116,83.40,880602,85.48,1226948
+>> 5,1308283,79.26,1109257,81.23,1533685
+>> 6,1501987,75.12,1093661,80.19,1840422
+>> 7,1695300,70.99,1104207,79.03,2147159
+>> 8,1901523,66.85,1193613,76.90,2453896
+>> 9,2051288,62.73,1200913,76.22,2760633
+>> 10,2275771,58.60,1192992,75.66,3067370
+>> 11,2435016,54.48,1191472,74.66,3374107
+>> 12,2623114,50.35,1196911,74.02,3680844
+>> 13,2766071,46.22,1178589,73.02,3987581
+>> 14,2932163,42.10,1166414,72.96,4294318
+>> 15,3000853,37.96,1177177,72.62,4601055
+>> 16,3113738,33.85,1165444,70.54,4907792
+>> 17,3132135,29.77,1165055,68.51,5214529
+>> 18,3175121,25.69,1166969,69.27,5521266
+>> 19,3205490,21.61,1159310,65.65,5828003
+>> 20,3220855,17.52,1171827,62.04,6134740
+>> 21,3182568,13.48,1138918,65.05,6441477
+>> 22,3130543,9.30,1128185,60.60,6748214
+>> 23,3087426,5.15,1127912,55.36,7054951
+>> 24,3099457,1.04,1176100,54.96,7361688
+>>
+>> [1] https://lkml.org/lkml/2019/3/6/413
+>>
+--=20
+Regards
+Nitesh
 
-Thanks Paolo!
 
-Regards,
-Wanpeng Li
+--YnBKnQIIjrnveMKSGll1ZbHtvHbelLIlR--
+
+--KNAXxfAzkz54vPDzUdLlmQg653PKEo7Xt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEkXcoRVGaqvbHPuAGo4ZA3AYyozkFAlz/nDgACgkQo4ZA3AYy
+ozl5Cw/+NNn+xK6GzSyt7aiJM52Okg+9Gi2lKqQP8p8eYcA+27H1ZsDNQ3KAKQ/8
+NjOxSB6dEmTzULR8DEcovvkhu+RDuHj4pTI9QcH0S3RnZgyjVSks/miQDtpFGWi2
+iBgnrw5YkLQx7xa7BKESposc9wH+oWcVoiqbyIv5xxLwp7pdYJLCQ8hR2iqJ9ikc
+YhEykzH5i9IncoE0ablPh3JDPL+EsbTVXUbc0jJC3LuQOayZ/IAS7SSAEdGq45I1
+Putr2FvMVOaZTxMBjapk3Dy4QWWaKSaIc39XtXD3F0vGlG6YFjMPp2PSGS/Ea3XI
+V0nfCXFDAEvjiktef26EdTRyh1VeD2fDfyLHjO/Cmd/Mz7lwc6NmN3dU1khBAQwN
+ibSBG4jq/fuV1qzKt8ZcrPYD0HBkPCvWmuALelx4ZRKVJrMPSiqSetlJkQ3nN5w6
+PecsV4E1MgGp+2AeHqLNCPjoiTxWyA10+ytCk7HjshnpDC3yLx4RhksDnrEA0JG4
+VNb2x8WID4dPqVci9cykU22qO5GvWyAfaaYIi08nGn52OjIa37AH1xVg+CmEFTDb
+ptzPtsdP5tOH9uxNJkYaVo8orKJpxiX7G3Bh2WOCfaIxZIaMBZIAfK6D0LcrAwOY
+qAauN5L7Bl4mWC8x6uzWI1qz1q8f3fxDEgZRjLQYRCxvnopbz9E=
+=NfmV
+-----END PGP SIGNATURE-----
+
+--KNAXxfAzkz54vPDzUdLlmQg653PKEo7Xt--
