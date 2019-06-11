@@ -2,128 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A257E3D084
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 17:14:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0ADF3D0F1
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 17:35:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404408AbfFKPN6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 11:13:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56838 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388333AbfFKPN6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 11:13:58 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 60FFB307D984;
-        Tue, 11 Jun 2019 15:13:51 +0000 (UTC)
-Received: from x1.home (ovpn-116-190.phx2.redhat.com [10.3.116.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1E3E660C4C;
-        Tue, 11 Jun 2019 15:13:48 +0000 (UTC)
-Date:   Tue, 11 Jun 2019 09:13:48 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jiangyiwen <jiangyiwen@huawei.com>
-Cc:     <kvm@vger.kernel.org>,
-        "open list:AMD IOMMU (AMD-VI)" <iommu@lists.linux-foundation.org>
-Subject: Re: [bug report] vfio: Can't find phys by iova in
- vfio_unmap_unpin()
-Message-ID: <20190611091348.60195fe0@x1.home>
-In-Reply-To: <5CFFA149.8070303@huawei.com>
-References: <5CE25C33.2060009@huawei.com>
-        <20190520132801.4e2ab8ab@x1.home>
-        <5CFF1E35.5010602@huawei.com>
-        <5CFFA149.8070303@huawei.com>
-Organization: Red Hat
+        id S2405061AbfFKPfo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 11:35:44 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:32822 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405009AbfFKPfn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jun 2019 11:35:43 -0400
+Received: by mail-pg1-f194.google.com with SMTP id k187so6676846pga.0
+        for <kvm@vger.kernel.org>; Tue, 11 Jun 2019 08:35:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8h42m3mke7DA8ejB89qFnTkC5cX+aLshhHC5jTwYOa4=;
+        b=sLMq+bA6sOUYAuoQSdZze7aS/o01HRJh37fgBzOaTlULVRlgN1Pzky0WnEt9ggPhRi
+         JH1qa8PI3fUsxopnA8vxXjk80emL0gwgHoi/kN+wCfZhW7CtGG3mN+/yxVY59EUBa1rS
+         M4cxQ83xr93VSRZJzwzbUXprtAi+dT3meCk3L8KOZ/xZDFb/kZqFJzv63133Zz0lw9er
+         v1LYil8+krDw44YMHLuvpYAB34RsEpHwQbuoHBJWYMzgMu6DfV6usjm0aFv9/2YjnuNW
+         tz3JzLRCLMzdWSO9grr5tL4TPlHUr6KXqW3Th206n5IMIeoSFDjvZhgTeHCUKYHlgpUu
+         bTiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8h42m3mke7DA8ejB89qFnTkC5cX+aLshhHC5jTwYOa4=;
+        b=WO+DTK1i9o+/uqHuvP9BBKyZMe4yGzuWjfzvayZQ9fU0OWTud945ECb4W49MGw/fSc
+         yoR3aFAR5jOgqTMnGFI2cU1e1zT7ZCwgXASf6F6d76w8J+etvKpX/dM77KDGK8qSkUIm
+         bLcgZgTd1W3lTTa8sl8UlhUu38qJPMrYmROoKYqpTZF3ZCXNPZ6jreb5mnzaME894xoE
+         nE5wH5ZYl75mD+Tn4EhMB+Dp6tQYdJZULwgfhXkfInLKAGzz1Rwa+lc6oIFPoWOXjrUG
+         2LyC59YfRSxGrGs99VhTeGG+ZQPWrP00wguEwFHowu98OnPi+vvtP2onU1KYB/oBLkMa
+         /4ow==
+X-Gm-Message-State: APjAAAUBm2+XdWm8ViH5CRw3xqhlfvHnTSfuV0bW+3XhR1IRkzC5YJSb
+        V+A6BRH2Bo4IJtTrdPLYiaFSF6pGQIQXj/lDkKvWkA==
+X-Google-Smtp-Source: APXvYqwVttVVtet3fqIi0VnES8Ilb/p6V60nSXc7x8WFpoZ7Ynv9ahn+wWxWGukqfJnR2JBKBovfx92r2kGjPnyP20Q=
+X-Received: by 2002:a63:1919:: with SMTP id z25mr21205093pgl.440.1560267342622;
+ Tue, 11 Jun 2019 08:35:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 11 Jun 2019 15:13:57 +0000 (UTC)
+References: <cover.1559580831.git.andreyknvl@google.com> <045a94326401693e015bf80c444a4d946a5c68ed.1559580831.git.andreyknvl@google.com>
+ <20190610142824.GB10165@c02tf0j2hf1t.cambridge.arm.com>
+In-Reply-To: <20190610142824.GB10165@c02tf0j2hf1t.cambridge.arm.com>
+From:   Andrey Konovalov <andreyknvl@google.com>
+Date:   Tue, 11 Jun 2019 17:35:31 +0200
+Message-ID: <CAAeHK+zBDB6i+iEw+TJY14gZeccvWeOBEaU+otn1F+jzDLaRpA@mail.gmail.com>
+Subject: Re: [PATCH v16 05/16] arm64: untag user pointers passed to memory syscalls
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[cc +iommu]
-
-On Tue, 11 Jun 2019 20:40:41 +0800
-Jiangyiwen <jiangyiwen@huawei.com> wrote:
-
-> Hi Alex,
-> 
-> I found this problem is not very easy to solve, for
-> now, in arm64 platform, the "0" physical address
-> is a valid system memory address, so in function
-> arm_smmu_iova_to_phys() I think it should not use
-> "0" as abnormal return value.
-> 
-> Do you have any idea?
-
-I think you're going to need to redefine iommu_iova_to_phys() and fix
-all the IOMMU implementations of it to comply.  Currently AMD and Intel
-IOMMU driver return zero if a mapping is not found.  You could make the
-function return 0/errno and return the physical address via a pointer
-arg.  You could also keep the existing definition, but introduce a test
-for a valid result that might use an architecture specific value (akin
-to IS_ERR()).  You could also just reserve the zero page from userspace
-allocation.  I really don't want #ifdef in the vfio iommu driver trying
-to discern the correct invalid value though.  Thanks,
-
-Alex
-
-> On 2019/6/11 11:21, jiangyiwen wrote:
-> > On 2019/5/21 3:28, Alex Williamson wrote:  
-> >> On Mon, 20 May 2019 15:50:11 +0800
-> >> jiangyiwen <jiangyiwen@huawei.com> wrote:
-> >>  
-> >>> Hello alex,
-> >>>
-> >>> We test a call trace as follows use ARM64 architecture,
-> >>> it prints a WARN_ON() when find not physical address by
-> >>> iova in vfio_unmap_unpin(), I can't find the cause of
-> >>> problem now, do you have any ideas?  
-> >> Is it reproducible?  Can you explain how to reproduce it?  The stack
-> >> trace indicates a KVM VM is being shutdown and we're trying to clean
-> >> out the IOMMU mappings from the domain and find a page that we think
-> >> should be mapped that the IOMMU doesn't have mapped.  What device(s) was
-> >> assigned to the VM?  This could be an IOMMU driver bug or a
-> >> vfio_iommu_type1 bug.  Have you been able to reproduce this on other
-> >> platforms?
-> >>  
-> > Hello Alex,
+On Mon, Jun 10, 2019 at 4:28 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
+>
+> On Mon, Jun 03, 2019 at 06:55:07PM +0200, Andrey Konovalov wrote:
+> > This patch is a part of a series that extends arm64 kernel ABI to allow to
+> > pass tagged user pointers (with the top byte set to something else other
+> > than 0x00) as syscall arguments.
 > >
-> > Sorry to reply you so late because of some things,
-> > this problem's reason is in some platform (like ARM64),
-> > the "0" physical address is valid and can be used for
-> > system memory, so in this case it should not print a
-> > WARN_ON() and continue, we should unmap and unpin this
-> > "0" physical address in these platform.
+> > This patch allows tagged pointers to be passed to the following memory
+> > syscalls: get_mempolicy, madvise, mbind, mincore, mlock, mlock2, mprotect,
+> > mremap, msync, munlock.
 > >
-> > So I want to return FFFFFFFFFFFFFFFFL instead of "0" as invalid
-> > physical address in function iommu_iova_to_phys(). Do you think
-> > it's appropriate?
-> >
-> > Thanks,
-> > Yiwen.
-> >  
-> >>> In addition, I want to know why there is a WARN_ON() instead
-> >>> of BUG_ON()? Does it affect the follow-up process?  
-> >> We're removing an IOMMU page mapping entry and find that it's not
-> >> present, so ultimately the effect at the IOMMU is the same, there's no
-> >> mapping at that address, but I can't say without further analysis
-> >> whether that means a page remains pinned or if that inconsistency was
-> >> resolved previously elsewhere.  We WARN_ON because this is not what we
-> >> expect, but potentially leaking a page of memory doesn't seem worthy of
-> >> crashing the host, nor would a crash dump at that point necessarily aid
-> >> in resolving the missing page as it potentially occurred well in the
-> >> past.  Thanks,
-> >>
-> >> Alex
-> >>
-> >> .
-> >>  
-> >
-> >
-> > .
-> >  
-> 
+> > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+>
+> I would add in the commit log (and possibly in the code with a comment)
+> that mremap() and mmap() do not currently accept tagged hint addresses.
+> Architectures may interpret the hint tag as a background colour for the
+> corresponding vma. With this:
 
+I'll change the commit log. Where do you you think I should put this
+comment? Before mmap and mremap definitions in mm/?
+
+Thanks!
+
+>
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+>
+> --
+> Catalin
