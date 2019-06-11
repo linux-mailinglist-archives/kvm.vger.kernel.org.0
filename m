@@ -2,174 +2,278 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B2BD3D211
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 18:20:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF6B23D281
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 18:39:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405563AbfFKQUD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 12:20:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59078 "EHLO mx1.redhat.com"
+        id S2405674AbfFKQi7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 12:38:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46030 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405444AbfFKQUD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 12:20:03 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S2404082AbfFKQi6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jun 2019 12:38:58 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B2FC537E8E;
-        Tue, 11 Jun 2019 16:19:54 +0000 (UTC)
-Received: from gondolin (ovpn-204-147.brq.redhat.com [10.40.204.147])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 276BD5DD8D;
-        Tue, 11 Jun 2019 16:19:47 +0000 (UTC)
-Date:   Tue, 11 Jun 2019 18:19:44 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        "Jason J. Herne" <jjherne@linux.ibm.com>
-Subject: Re: [PATCH v4 4/8] s390/airq: use DMA memory for adapter interrupts
-Message-ID: <20190611181944.5bf2b953.cohuck@redhat.com>
-In-Reply-To: <20190611162721.67ca8932.pasic@linux.ibm.com>
-References: <20190606115127.55519-1-pasic@linux.ibm.com>
-        <20190606115127.55519-5-pasic@linux.ibm.com>
-        <20190611121721.61bf09b4.cohuck@redhat.com>
-        <20190611162721.67ca8932.pasic@linux.ibm.com>
-Organization: Red Hat GmbH
+        by mx1.redhat.com (Postfix) with ESMTPS id CD3597FDF9;
+        Tue, 11 Jun 2019 16:38:52 +0000 (UTC)
+Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-60.sin2.redhat.com [10.67.116.60])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CE3ED5D704;
+        Tue, 11 Jun 2019 16:38:08 +0000 (UTC)
+From:   Pankaj Gupta <pagupta@redhat.com>
+To:     dm-devel@redhat.com, linux-nvdimm@lists.01.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org
+Cc:     dan.j.williams@intel.com, zwisler@kernel.org,
+        vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com,
+        jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net,
+        hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu,
+        adilger.kernel@dilger.ca, darrick.wong@oracle.com,
+        lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com,
+        jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com,
+        stefanha@redhat.com, aarcange@redhat.com, david@redhat.com,
+        david@fromorbit.com, cohuck@redhat.com,
+        xiaoguangrong.eric@gmail.com, pagupta@redhat.com,
+        pbonzini@redhat.com, yuval.shaia@oracle.com, kilobyte@angband.pl,
+        jstaron@google.com, rdunlap@infradead.org, snitzer@redhat.com
+Subject: [PATCH v12 0/7] virtio pmem driver 
+Date:   Tue, 11 Jun 2019 22:07:55 +0530
+Message-Id: <20190611163802.25352-1-pagupta@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Tue, 11 Jun 2019 16:20:03 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Tue, 11 Jun 2019 16:38:58 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 11 Jun 2019 16:27:21 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+ This patch series is ready to be merged via nvdimm tree
+ as discussed with Dan. We have ack/review on XFS, EXT4
+ & VIRTIO patches. Device mapper change is also reviewed. 
 
-> On Tue, 11 Jun 2019 12:17:21 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > On Thu,  6 Jun 2019 13:51:23 +0200
-> > Halil Pasic <pasic@linux.ibm.com> wrote:
-> >   
-> > > Protected virtualization guests have to use shared pages for airq
-> > > notifier bit vectors, because hypervisor needs to write these bits.
-> > > 
-> > > Let us make sure we allocate DMA memory for the notifier bit vectors by
-> > > replacing the kmem_cache with a dma_cache and kalloc() with
-> > > cio_dma_zalloc().
-> > > 
-> > > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> > > Reviewed-by: Sebastian Ott <sebott@linux.ibm.com>
-> > > ---
-> > >  arch/s390/include/asm/airq.h |  2 ++
-> > >  drivers/s390/cio/airq.c      | 32 ++++++++++++++++++++------------
-> > >  drivers/s390/cio/cio.h       |  2 ++
-> > >  drivers/s390/cio/css.c       |  1 +
-> > >  4 files changed, 25 insertions(+), 12 deletions(-)
-> > >   
-> > 
-> > (...)
-> >   
-> > > @@ -295,12 +303,12 @@ unsigned long airq_iv_scan(struct airq_iv *iv, unsigned long start,
-> > >  }
-> > >  EXPORT_SYMBOL(airq_iv_scan);
-> > >  
-> > > -static int __init airq_init(void)
-> > > +int __init airq_init(void)
-> > >  {
-> > > -	airq_iv_cache = ) "airq_iv_cache", cache_line_size(),
-> > > -					  cache_line_size(), 0, NULL);
-> > > +	airq_iv_cache = dma_pool_create("airq_iv_cache", cio_get_dma_css_dev(),
-> > > +					cache_line_size(),
-> > > +					cache_line_size(), PAGE_SIZE);
-> > >  	if (!airq_iv_cache)
-> > >  		return -ENOMEM;  
-> > 
-> > Sorry about not noticing that in the last iteration; but you may return
-> > an error here if airq_iv_cache could not be allocated...
-> >   
-> > >  	return 0;
-> > >  }
-> > > -subsys_initcall(airq_init);  
-> > 
-> > (...)
-> >   
-> > > diff --git a/drivers/s390/cio/css.c b/drivers/s390/cio/css.c
-> > > index 6fc91d534af1..7901c8ed3597 100644
-> > > --- a/drivers/s390/cio/css.c
-> > > +++ b/drivers/s390/cio/css.c
-> > > @@ -1182,6 +1182,7 @@ static int __init css_bus_init(void)
-> > >  	ret = cio_dma_pool_init();
-> > >  	if (ret)
-> > >  		goto out_unregister_pmn;
-> > > +	airq_init();  
-> > 
-> > ...but don't check the return code here. Probably a pathological case,
-> > but shouldn't you handle that error as well?
-> >   
-> 
-> Tricky business... The problem is that the airq stuff ain't 'private' to
-> the CIO subsystem (e.g. zPCI). I'm afraid failing to init css won't
-> really prevent all usages.
+ Mike, Can you please provide ack for device mapper change
+ i.e patch4. 
 
-Architecture-wise, there's an unfortunate tie-in of some things like
-zPCI with the channel subsystem (most of that seems to come in via chsc
-and machine checks; but as you say, airq as well). I'd basically
-consider css to be a base system for virtually any I/O on s390...
+ This version has changed implementation for patch 4 as
+ suggested by 'Mike'. Keeping all the existing r-o-bs. Jakob
+ CCed also tested the patch series and confirmed the working
+ of v9.
+ ---
 
-> 
-> My first thought was, that this is more or less analogous to what we
-> had before. Namely kmem_cache_create() and dma_pool_create() should fail
-> under similar circumstances, and the return value of airq_init() was
-> ignored in do_initcall_level(). So I was like ignoring it seems to be
-> consistent with previous state.
-> 
-> But, ouch, there is a big difference! While kmem_cache_zalloc() seems
-> to tolerate the first argument (pointer to kmem_cache) being NULL the
-> dma_pool_zalloc() does not.
+ This patch series has implementation for "virtio pmem". 
+ "virtio pmem" is fake persistent memory(nvdimm) in guest 
+ which allows to bypass the guest page cache. This also
+ implements a VIRTIO based asynchronous flush mechanism.  
+ 
+ Sharing guest kernel driver in this patchset with the 
+ changes suggested in v4. Tested with Qemu side device 
+ emulation [5] for virtio-pmem. Documented the impact of
+ possible page cache side channel attacks with suggested
+ countermeasures.
 
-Yeah. While previously continuing with a failed allocation simply was
-not very workable, now we actually would end up with crashes :(
+ Details of project idea for 'virtio pmem' flushing interface 
+ is shared [3] & [4].
 
-> 
-> IMHO the cleanest thing to do at this stage is to check if the
-> airq_iv_cache is NULL and fail the allocation if it is (to preserve
-> previous behavior).
+ Implementation is divided into two parts:
+ New virtio pmem guest driver and qemu code changes for new 
+ virtio pmem paravirtualized device.
 
-That's probably the least invasive fix for now. Did you check whether
-any of the other dma pools this series introduces have a similar
-problem due to init not failing?
+1. Guest virtio-pmem kernel driver
+---------------------------------
+   - Reads persistent memory range from paravirt device and 
+     registers with 'nvdimm_bus'.  
+   - 'nvdimm/pmem' driver uses this information to allocate 
+     persistent memory region and setup filesystem operations 
+     to the allocated memory. 
+   - virtio pmem driver implements asynchronous flushing 
+     interface to flush from guest to host.
 
-> 
-> I would prefer having a separate discussion on eventually changing
-> the behavior (e.g. fail css initialization).
+2. Qemu virtio-pmem device
+---------------------------------
+   - Creates virtio pmem device and exposes a memory range to 
+     KVM guest. 
+   - At host side this is file backed memory which acts as 
+     persistent memory. 
+   - Qemu side flush uses aio thread pool API's and virtio 
+     for asynchronous guest multi request handling. 
 
-I did a quick check of the common I/O layer code and one place that
-looks dangerous is the chsc initialization (where we get two pages that
-are later accessed unconditionally by the code).
+ Virtio-pmem security implications and countermeasures:
+ -----------------------------------------------------
 
-All of this is related to not being able to fulfill some basic memory
-availability requirements early during boot and then discovering that
-pulling the emergency break did not actually stop the train. I'd vote
-for calling panic() if the common I/O layer cannot perform its setup;
-but as this is really a pathological case I also think we should solve
-that independently of this patch series.
+ In previous posting of kernel driver, there was discussion [7]
+ on possible implications of page cache side channel attacks with 
+ virtio pmem. After thorough analysis of details of known side 
+ channel attacks, below are the suggestions:
 
-> 
-> Connie, would that work with you? Thanks for spotting this!
+ - Depends entirely on how host backing image file is mapped 
+   into guest address space. 
 
-Yeah, let's give your approach a try.
+ - virtio-pmem device emulation, by default shared mapping is used
+   to map host backing file. It is recommended to use separate
+   backing file at host side for every guest. This will prevent
+   any possibility of executing common code from multiple guests
+   and any chance of inferring guest local data based based on 
+   execution time.
+
+ - If backing file is required to be shared among multiple guests 
+   it is recommended to don't support host page cache eviction 
+   commands from the guest driver. This will avoid any possibility
+   of inferring guest local data or host data from another guest. 
+
+ - Proposed device specification [6] for virtio-pmem device with 
+   details of possible security implications and suggested 
+   countermeasures for device emulation.
+
+ Virtio-pmem errors handling:
+ ----------------------------------------
+  Checked behaviour of virtio-pmem for below types of errors
+  Need suggestions on expected behaviour for handling these errors?
+
+  - Hardware Errors: Uncorrectable recoverable Errors: 
+  a] virtio-pmem: 
+    - As per current logic if error page belongs to Qemu process, 
+      host MCE handler isolates(hwpoison) that page and send SIGBUS. 
+      Qemu SIGBUS handler injects exception to KVM guest. 
+    - KVM guest then isolates the page and send SIGBUS to guest 
+      userspace process which has mapped the page. 
+  
+  b] Existing implementation for ACPI pmem driver: 
+    - Handles such errors with MCE notifier and creates a list 
+      of bad blocks. Read/direct access DAX operation return EIO 
+      if accessed memory page fall in bad block list.
+    - It also starts backgound scrubbing.  
+    - Similar functionality can be reused in virtio-pmem with MCE 
+      notifier but without scrubbing(no ACPI/ARS)? Need inputs to 
+      confirm if this behaviour is ok or needs any change?
+
+Changes from PATCH v11: [1] 
+ - Change implmentation for setting of synchronous DAX type
+   for device mapper - Mike 
+
+Changes from PATCH v10: [2] 
+ - Rebased on Linux-5.2-rc4
+
+Changes from PATCH v9:
+ - Kconfig help text add two spaces - Randy
+ - Fixed libnvdimm 'bio' include warning - Dan
+ - virtio-pmem, separate request/resp struct and 
+   move to uapi file with updated license - DavidH
+ - Use virtio32* type for req/resp endianess - DavidH
+ - Added tested-by & ack-by of Jakob
+ - Rebased to 5.2-rc1
+
+Changes from PATCH v8:
+ - Set device mapper synchronous if all target devices support - Dan
+ - Move virtio_pmem.h to nvdimm directory  - Dan
+ - Style, indentation & better error messages in patch 2 - DavidH
+ - Added MST's ack in patch 2.
+
+Changes from PATCH v7:
+ - Corrected pending request queue logic (patch 2) - Jakub Staroń
+ - Used unsigned long flags for passing DAXDEV_F_SYNC (patch 3) - Dan
+ - Fixed typo =>  vma 'flag' to 'vm_flag' (patch 4)
+ - Added rob in patch 6 & patch 2
+
+Changes from PATCH v6: 
+ - Corrected comment format in patch 5 & patch 6. [Dave]
+ - Changed variable declaration indentation in patch 6 [Darrick]
+ - Add Reviewed-by tag by 'Jan Kara' in patch 4 & patch 5
+
+Changes from PATCH v5: 
+  Changes suggested in by - [Cornelia, Yuval]
+- Remove assignment chaining in virtio driver
+- Better error message and remove not required free
+- Check nd_region before use
+
+  Changes suggested by - [Jan Kara]
+- dax_synchronous() for !CONFIG_DAX
+- Correct 'daxdev_mapping_supported' comment and non-dax implementation
+
+  Changes suggested by - [Dan Williams]
+- Pass meaningful flag 'DAXDEV_F_SYNC' to alloc_dax
+- Gate nvdimm_flush instead of additional async parameter
+- Move block chaining logic to flush callback than common nvdimm_flush
+- Use NULL flush callback for generic flush for better readability [Dan, Jan]
+
+- Use virtio device id 27 from 25(already used) - [MST]
+
+Changes from PATCH v4:
+- Factor out MAP_SYNC supported functionality to a common helper
+				[Dave, Darrick, Jan]
+- Comment, indentation and virtqueue_kick failure handle - Yuval Shaia
+
+Changes from PATCH v3: 
+- Use generic dax_synchronous() helper to check for DAXDEV_SYNC 
+  flag - [Dan, Darrick, Jan]
+- Add 'is_nvdimm_async' function
+- Document page cache side channel attacks implications & 
+  countermeasures - [Dave Chinner, Michael]
+
+Changes from PATCH v2: 
+- Disable MAP_SYNC for ext4 & XFS filesystems - [Dan] 
+- Use name 'virtio pmem' in place of 'fake dax' 
+
+Changes from PATCH v1: 
+- 0-day build test for build dependency on libnvdimm 
+
+ Changes suggested by - [Dan Williams]
+- Split the driver into two parts virtio & pmem  
+- Move queuing of async block request to block layer
+- Add "sync" parameter in nvdimm_flush function
+- Use indirect call for nvdimm_flush
+- Don’t move declarations to common global header e.g nd.h
+- nvdimm_flush() return 0 or -EIO if it fails
+- Teach nsio_rw_bytes() that the flush can fail
+- Rename nvdimm_flush() to generic_nvdimm_flush()
+- Use 'nd_region->provider_data' for long dereferencing
+- Remove virtio_pmem_freeze/restore functions
+- Remove BSD license text with SPDX license text
+
+- Add might_sleep() in virtio_pmem_flush - [Luiz]
+- Make spin_lock_irqsave() narrow
+
+Pankaj Gupta (7):
+   libnvdimm: nd_region flush callback support
+   virtio-pmem: Add virtio-pmem guest driver
+   libnvdimm: add nd_region buffered dax_dev flag
+   dax: check synchronous mapping is supported
+   dm: dm: Enable synchronous dax
+   ext4: disable map_sync for virtio pmem
+   xfs: disable map_sync for virtio pmem
+
+[1] https://lkml.org/lkml/2019/6/10/209
+[2] https://lkml.org/lkml/2019/5/21/569
+[3] https://www.spinics.net/lists/kvm/msg149761.html
+[4] https://www.spinics.net/lists/kvm/msg153095.html  
+[5] https://marc.info/?l=qemu-devel&m=155860751202202&w=2
+[6] https://lists.oasis-open.org/archives/virtio-dev/201903/msg00083.html
+[7] https://lkml.org/lkml/2019/1/9/1191
+
+ drivers/acpi/nfit/core.c         |    4 -
+ drivers/dax/bus.c                |    2 
+ drivers/dax/super.c              |   19 +++++
+ drivers/md/dm-table.c            |   24 +++++--
+ drivers/md/dm.c                  |    5 -
+ drivers/md/dm.h                  |    5 +
+ drivers/nvdimm/Makefile          |    1 
+ drivers/nvdimm/claim.c           |    6 +
+ drivers/nvdimm/nd.h              |    1 
+ drivers/nvdimm/nd_virtio.c       |  124 +++++++++++++++++++++++++++++++++++++++
+ drivers/nvdimm/pmem.c            |   18 +++--
+ drivers/nvdimm/region_devs.c     |   33 +++++++++-
+ drivers/nvdimm/virtio_pmem.c     |  122 ++++++++++++++++++++++++++++++++++++++
+ drivers/nvdimm/virtio_pmem.h     |   55 +++++++++++++++++
+ drivers/virtio/Kconfig           |   11 +++
+ fs/ext4/file.c                   |   10 +--
+ fs/xfs/xfs_file.c                |    9 +-
+ include/linux/dax.h              |   26 +++++++-
+ include/linux/libnvdimm.h        |   10 ++-
+ include/uapi/linux/virtio_ids.h  |    1 
+ include/uapi/linux/virtio_pmem.h |   35 +++++++++++
+ 21 files changed, 488 insertions(+), 33 deletions(-)
+
+
