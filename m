@@ -2,121 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F0ADF3D0F1
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 17:35:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B75A63D1AF
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 18:05:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405061AbfFKPfo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 11:35:44 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:32822 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405009AbfFKPfn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 11:35:43 -0400
-Received: by mail-pg1-f194.google.com with SMTP id k187so6676846pga.0
-        for <kvm@vger.kernel.org>; Tue, 11 Jun 2019 08:35:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8h42m3mke7DA8ejB89qFnTkC5cX+aLshhHC5jTwYOa4=;
-        b=sLMq+bA6sOUYAuoQSdZze7aS/o01HRJh37fgBzOaTlULVRlgN1Pzky0WnEt9ggPhRi
-         JH1qa8PI3fUsxopnA8vxXjk80emL0gwgHoi/kN+wCfZhW7CtGG3mN+/yxVY59EUBa1rS
-         M4cxQ83xr93VSRZJzwzbUXprtAi+dT3meCk3L8KOZ/xZDFb/kZqFJzv63133Zz0lw9er
-         v1LYil8+krDw44YMHLuvpYAB34RsEpHwQbuoHBJWYMzgMu6DfV6usjm0aFv9/2YjnuNW
-         tz3JzLRCLMzdWSO9grr5tL4TPlHUr6KXqW3Th206n5IMIeoSFDjvZhgTeHCUKYHlgpUu
-         bTiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8h42m3mke7DA8ejB89qFnTkC5cX+aLshhHC5jTwYOa4=;
-        b=WO+DTK1i9o+/uqHuvP9BBKyZMe4yGzuWjfzvayZQ9fU0OWTud945ECb4W49MGw/fSc
-         yoR3aFAR5jOgqTMnGFI2cU1e1zT7ZCwgXASf6F6d76w8J+etvKpX/dM77KDGK8qSkUIm
-         bLcgZgTd1W3lTTa8sl8UlhUu38qJPMrYmROoKYqpTZF3ZCXNPZ6jreb5mnzaME894xoE
-         nE5wH5ZYl75mD+Tn4EhMB+Dp6tQYdJZULwgfhXkfInLKAGzz1Rwa+lc6oIFPoWOXjrUG
-         2LyC59YfRSxGrGs99VhTeGG+ZQPWrP00wguEwFHowu98OnPi+vvtP2onU1KYB/oBLkMa
-         /4ow==
-X-Gm-Message-State: APjAAAUBm2+XdWm8ViH5CRw3xqhlfvHnTSfuV0bW+3XhR1IRkzC5YJSb
-        V+A6BRH2Bo4IJtTrdPLYiaFSF6pGQIQXj/lDkKvWkA==
-X-Google-Smtp-Source: APXvYqwVttVVtet3fqIi0VnES8Ilb/p6V60nSXc7x8WFpoZ7Ynv9ahn+wWxWGukqfJnR2JBKBovfx92r2kGjPnyP20Q=
-X-Received: by 2002:a63:1919:: with SMTP id z25mr21205093pgl.440.1560267342622;
- Tue, 11 Jun 2019 08:35:42 -0700 (PDT)
+        id S2391867AbfFKQEl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 12:04:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54794 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390351AbfFKQEk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jun 2019 12:04:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5E7847FDFE;
+        Tue, 11 Jun 2019 16:04:32 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 10197611DA;
+        Tue, 11 Jun 2019 16:04:25 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id D31A018363C0;
+        Tue, 11 Jun 2019 16:04:21 +0000 (UTC)
+Date:   Tue, 11 Jun 2019 12:04:21 -0400 (EDT)
+From:   Pankaj Gupta <pagupta@redhat.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     rdunlap@infradead.org, jack@suse.cz, kvm@vger.kernel.org,
+        mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
+        qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
+        dm-devel@redhat.com, adilger kernel <adilger.kernel@dilger.ca>,
+        zwisler@kernel.org, aarcange@redhat.com,
+        dave jiang <dave.jiang@intel.com>, jstaron@google.com,
+        linux-nvdimm@lists.01.org,
+        vishal l verma <vishal.l.verma@intel.com>, david@redhat.com,
+        willy@infradead.org, hch@infradead.org, linux-acpi@vger.kernel.org,
+        jmoyer@redhat.com, linux-ext4@vger.kernel.org, lenb@kernel.org,
+        kilobyte@angband.pl, riel@surriel.com,
+        yuval shaia <yuval.shaia@oracle.com>, stefanha@redhat.com,
+        imammedo@redhat.com, dan j williams <dan.j.williams@intel.com>,
+        lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
+        tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
+        cohuck@redhat.com, rjw@rjwysocki.net, linux-kernel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        pbonzini@redhat.com, darrick wong <darrick.wong@oracle.com>
+Message-ID: <1006124881.34430329.1560269061491.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190611150427.GA29288@redhat.com>
+References: <20190610090730.8589-1-pagupta@redhat.com> <20190610090730.8589-5-pagupta@redhat.com> <20190610192803.GA29002@redhat.com> <1206355816.34396746.1560258658768.JavaMail.zimbra@redhat.com> <20190611150427.GA29288@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v11 4/7] dm: enable synchronous dax
 MIME-Version: 1.0
-References: <cover.1559580831.git.andreyknvl@google.com> <045a94326401693e015bf80c444a4d946a5c68ed.1559580831.git.andreyknvl@google.com>
- <20190610142824.GB10165@c02tf0j2hf1t.cambridge.arm.com>
-In-Reply-To: <20190610142824.GB10165@c02tf0j2hf1t.cambridge.arm.com>
-From:   Andrey Konovalov <andreyknvl@google.com>
-Date:   Tue, 11 Jun 2019 17:35:31 +0200
-Message-ID: <CAAeHK+zBDB6i+iEw+TJY14gZeccvWeOBEaU+otn1F+jzDLaRpA@mail.gmail.com>
-Subject: Re: [PATCH v16 05/16] arm64: untag user pointers passed to memory syscalls
-To:     Catalin Marinas <catalin.marinas@arm.com>
-Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.60, 10.4.195.3]
+Thread-Topic: enable synchronous dax
+Thread-Index: H4DObhswv6RiIzHdNTVFv9g9Hzvnew==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Tue, 11 Jun 2019 16:04:40 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 10, 2019 at 4:28 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
->
-> On Mon, Jun 03, 2019 at 06:55:07PM +0200, Andrey Konovalov wrote:
-> > This patch is a part of a series that extends arm64 kernel ABI to allow to
-> > pass tagged user pointers (with the top byte set to something else other
-> > than 0x00) as syscall arguments.
-> >
-> > This patch allows tagged pointers to be passed to the following memory
-> > syscalls: get_mempolicy, madvise, mbind, mincore, mlock, mlock2, mprotect,
-> > mremap, msync, munlock.
-> >
-> > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
->
-> I would add in the commit log (and possibly in the code with a comment)
-> that mremap() and mmap() do not currently accept tagged hint addresses.
-> Architectures may interpret the hint tag as a background colour for the
-> corresponding vma. With this:
 
-I'll change the commit log. Where do you you think I should put this
-comment? Before mmap and mremap definitions in mm/?
 
-Thanks!
+> 
+> > Hi Mike,
+> > 
+> > Thanks for the review Please find my reply inline.
+> > 
+> > > 
+> > > dm_table_supports_dax() is called multiple times (from
+> > > dm_table_set_restrictions and dm_table_determine_type).  It is strange
+> > > to have a getter have a side-effect of being a setter too.  Overloading
+> > > like this could get you in trouble in the future.
+> > > 
+> > > Are you certain this is what you want?
+> > 
+> > I agree with you.
+> > 
+> > > 
+> > > Or would it be better to refactor dm_table_supports_dax() to take an
+> > > iterate_devices_fn arg and have callers pass the appropriate function?
+> > > Then have dm_table_set_restrictions() caller do:
+> > > 
+> > >      if (dm_table_supports_dax(t, device_synchronous, NULL))
+> > >                set_dax_synchronous(t->md->dax_dev);
+> > > 
+> > > (NULL arg implies dm_table_supports_dax() refactoring would take a int
+> > > *data pointer rather than int type).
+> > > 
+> > > Mike
+> > > 
+> > 
+> > I am sending below patch as per your suggestion. Does it look
+> > near to what you have in mind?
+> 
+> Yes, it does.. just one nit I noticed inlined below.
+> 
+> > diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> > index 350cf0451456..8d89acc8b8c2 100644
+> > --- a/drivers/md/dm-table.c
+> > +++ b/drivers/md/dm-table.c
+> 
+> ...
+> 
+> > @@ -1910,8 +1919,13 @@ void dm_table_set_restrictions(struct dm_table *t,
+> > struct request_queue *q,
+> >         }
+> >         blk_queue_write_cache(q, wc, fua);
+> > 
+> > -       if (dm_table_supports_dax(t, PAGE_SIZE))
+> > +       if (dm_table_supports_dax(t, device_supports_dax, &page_size)) {
+> > +
+> 
+> No need for an empty newline here ^
 
->
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
->
-> --
-> Catalin
+Sure. Will remove this and send official v12 patchset with the updated patch 4.
+
+Thanks,
+Pankaj
+
+> 
+> >                 blk_queue_flag_set(QUEUE_FLAG_DAX, q);
+> > +               if (dm_table_supports_dax(t, device_synchronous, NULL))
+> > +                       set_dax_synchronous(t->md->dax_dev);
+> > +       }
+> >         else
+> >                 blk_queue_flag_clear(QUEUE_FLAG_DAX, q);
+> > 
+> 
+> Thanks,
+> Mike
+> 
+> 
