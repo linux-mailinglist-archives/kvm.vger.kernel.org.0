@@ -2,200 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C42473CEA3
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 16:27:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 398EE3CEA6
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 16:27:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389454AbfFKO1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 10:27:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44404 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387551AbfFKO1Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 10:27:16 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 94B3A89AD0;
-        Tue, 11 Jun 2019 14:26:57 +0000 (UTC)
-Received: from amt.cnet (ovpn-112-4.gru2.redhat.com [10.97.112.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AFB1127C50;
-        Tue, 11 Jun 2019 14:26:52 +0000 (UTC)
-Received: from amt.cnet (localhost [127.0.0.1])
-        by amt.cnet (Postfix) with ESMTP id D097010515C;
-        Tue, 11 Jun 2019 11:26:35 -0300 (BRT)
-Received: (from marcelo@localhost)
-        by amt.cnet (8.14.7/8.14.7/Submit) id x5BEQSWW009568;
-        Tue, 11 Jun 2019 11:26:28 -0300
-Date:   Tue, 11 Jun 2019 11:26:27 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     "Rafael J. Wysocki" <rafael@kernel.org>
-Cc:     "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?iso-8859-1?B?S3LEP23DocU/?= <rkrcmar@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Raslan KarimAllah <karahmed@amazon.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
+        id S2390069AbfFKO1l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 10:27:41 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40032 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2388676AbfFKO1k (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 11 Jun 2019 10:27:40 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5BEEoeL012105
+        for <kvm@vger.kernel.org>; Tue, 11 Jun 2019 10:27:39 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2t2dchtf7w-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 11 Jun 2019 10:27:39 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Tue, 11 Jun 2019 15:27:37 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 11 Jun 2019 15:27:34 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5BERWwL26476688
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 11 Jun 2019 14:27:32 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 257464204C;
+        Tue, 11 Jun 2019 14:27:32 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 87C0A42047;
+        Tue, 11 Jun 2019 14:27:31 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.168])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 11 Jun 2019 14:27:31 +0000 (GMT)
+Date:   Tue, 11 Jun 2019 16:27:21 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        Linux PM <linux-pm@vger.kernel.org>
-Subject: Re: [patch 0/3] cpuidle-haltpoll driver (v2)
-Message-ID: <20190611142627.GB4791@amt.cnet>
-References: <20190603225242.289109849@amt.cnet>
- <6c411948-9e32-9f41-351e-c9accd1facb0@intel.com>
- <20190610145942.GA24553@amt.cnet>
- <CAJZ5v0idYgETFg4scgvpJ-eGtFAx1Wi6hznXz7+XZAfKjiSAPA@mail.gmail.com>
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        "Jason J. Herne" <jjherne@linux.ibm.com>
+Subject: Re: [PATCH v4 4/8] s390/airq: use DMA memory for adapter interrupts
+In-Reply-To: <20190611121721.61bf09b4.cohuck@redhat.com>
+References: <20190606115127.55519-1-pasic@linux.ibm.com>
+        <20190606115127.55519-5-pasic@linux.ibm.com>
+        <20190611121721.61bf09b4.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJZ5v0idYgETFg4scgvpJ-eGtFAx1Wi6hznXz7+XZAfKjiSAPA@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 11 Jun 2019 14:27:16 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19061114-0008-0000-0000-000002F254B9
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19061114-0009-0000-0000-0000225F4FF5
+Message-Id: <20190611162721.67ca8932.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-11_07:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906110095
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 11, 2019 at 12:03:26AM +0200, Rafael J. Wysocki wrote:
-> On Mon, Jun 10, 2019 at 5:00 PM Marcelo Tosatti <mtosatti@redhat.com> wrote:
-> >
-> > On Fri, Jun 07, 2019 at 11:49:51AM +0200, Rafael J. Wysocki wrote:
-> > > On 6/4/2019 12:52 AM, Marcelo Tosatti wrote:
-> > > >The cpuidle-haltpoll driver allows the guest vcpus to poll for a specified
-> > > >amount of time before halting. This provides the following benefits
-> > > >to host side polling:
-> > > >
-> > > >         1) The POLL flag is set while polling is performed, which allows
-> > > >            a remote vCPU to avoid sending an IPI (and the associated
-> > > >            cost of handling the IPI) when performing a wakeup.
-> > > >
-> > > >         2) The HLT VM-exit cost can be avoided.
-> > > >
-> > > >The downside of guest side polling is that polling is performed
-> > > >even with other runnable tasks in the host.
-> > > >
-> > > >Results comparing halt_poll_ns and server/client application
-> > > >where a small packet is ping-ponged:
-> > > >
-> > > >host                                        --> 31.33
-> > > >halt_poll_ns=300000 / no guest busy spin    --> 33.40   (93.8%)
-> > > >halt_poll_ns=0 / guest_halt_poll_ns=300000  --> 32.73   (95.7%)
-> > > >
-> > > >For the SAP HANA benchmarks (where idle_spin is a parameter
-> > > >of the previous version of the patch, results should be the
-> > > >same):
-> > > >
-> > > >hpns == halt_poll_ns
-> > > >
-> > > >                           idle_spin=0/   idle_spin=800/    idle_spin=0/
-> > > >                           hpns=200000    hpns=0            hpns=800000
-> > > >DeleteC06T03 (100 thread) 1.76           1.71 (-3%)        1.78   (+1%)
-> > > >InsertC16T02 (100 thread) 2.14           2.07 (-3%)        2.18   (+1.8%)
-> > > >DeleteC00T01 (1 thread)   1.34           1.28 (-4.5%)           1.29   (-3.7%)
-> > > >UpdateC00T03 (1 thread)   4.72           4.18 (-12%)    4.53   (-5%)
-> > > >
-> > > >V2:
-> > > >
-> > > >- Move from x86 to generic code (Paolo/Christian).
-> > > >- Add auto-tuning logic (Paolo).
-> > > >- Add MSR to disable host side polling (Paolo).
-> > > >
-> > > >
-> > > >
-> > > First of all, please CC power management patches (including cpuidle,
-> > > cpufreq etc) to linux-pm@vger.kernel.org (there are people on that
-> > > list who may want to see your changes before they go in) and CC
-> > > cpuidle material (in particular) to Peter Zijlstra.
-> > >
-> > > Second, I'm not a big fan of this approach to be honest, as it kind
-> > > of is a driver trying to play the role of a governor.
-> > >
-> > > We have a "polling state" already that could be used here in
-> > > principle so I wonder what would be wrong with that.  Also note that
-> > > there seems to be at least some code duplication between your code
-> > > and the "polling state" implementation, so maybe it would be
-> > > possible to do some things in a common way?
-> >
-> > Hi Rafael,
-> >
-> > After modifying poll_state.c to use a generic "poll time" driver
-> > callback [1] (since using a variable "target_residency" for that
-> > looks really ugly), would need a governor which does:
-> >
-> > haltpoll_governor_select_next_state()
-> >         if (prev_state was poll and evt happened on prev poll window) -> POLL.
-> >         if (prev_state == HLT)  -> POLL
-> >         otherwise               -> HLT
-> >
-> > And a "default_idle" cpuidle driver that:
-> >
-> > defaultidle_idle()
-> >         if (current_clr_polling_and_test()) {
-> >                 local_irq_enable();
-> >                 return index;
-> >         }
-> >         default_idle();
-> >         return
-> >
-> > Using such governor with any other cpuidle driver would
-> > be pointless (since it would enter the first state only
-> > and therefore not save power).
-> >
-> > Not certain about using the default_idle driver with
-> > other governors: one would rather use a driver that
-> > supports all states on a given machine.
-> >
-> > This combination of governor/driver pair, for the sake
-> > of sharing the idle loop, seems awkward to me.
-> > And fails the governor/driver separation: one will use the
-> > pair in practice.
-> >
-> > But i have no problem with it, so i'll proceed with that.
-> >
-> > Let me know otherwise.
+On Tue, 11 Jun 2019 12:17:21 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Thu,  6 Jun 2019 13:51:23 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
 > 
-> If my understanding of your argumentation is correct, it is only
-> necessary to take the default_idle_call() branch of
-> cpuidle_idle_call() in the VM case, so it should be sufficient to
-> provide a suitable default_idle_call() which is what you seem to be
-> trying to do.
-
-In the VM case, we need to poll before actually halting (this is because
-its tricky to implement MWAIT in guests, so polling for some amount 
-of time allows the IPI avoidance optimization,
-see trace_sched_wake_idle_without_ipi, to take place). 
-
-The amount of time we poll is variable and adjusted (see adjust_haltpoll_ns 
-in the patchset).
-
-> I might have been confused by the terminology used in the patch series
-> if that's the case.
+> > Protected virtualization guests have to use shared pages for airq
+> > notifier bit vectors, because hypervisor needs to write these bits.
+> > 
+> > Let us make sure we allocate DMA memory for the notifier bit vectors by
+> > replacing the kmem_cache with a dma_cache and kalloc() with
+> > cio_dma_zalloc().
+> > 
+> > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> > Reviewed-by: Sebastian Ott <sebott@linux.ibm.com>
+> > ---
+> >  arch/s390/include/asm/airq.h |  2 ++
+> >  drivers/s390/cio/airq.c      | 32 ++++++++++++++++++++------------
+> >  drivers/s390/cio/cio.h       |  2 ++
+> >  drivers/s390/cio/css.c       |  1 +
+> >  4 files changed, 25 insertions(+), 12 deletions(-)
+> > 
 > 
-> Also, if that's the case, this is not cpuidle matter really.  It is a
-> matter of providing a better default_idle_call() for the arch at hand.
+> (...)
+> 
+> > @@ -295,12 +303,12 @@ unsigned long airq_iv_scan(struct airq_iv *iv, unsigned long start,
+> >  }
+> >  EXPORT_SYMBOL(airq_iv_scan);
+> >  
+> > -static int __init airq_init(void)
+> > +int __init airq_init(void)
+> >  {
+> > -	airq_iv_cache = ) "airq_iv_cache", cache_line_size(),
+> > -					  cache_line_size(), 0, NULL);
+> > +	airq_iv_cache = dma_pool_create("airq_iv_cache", cio_get_dma_css_dev(),
+> > +					cache_line_size(),
+> > +					cache_line_size(), PAGE_SIZE);
+> >  	if (!airq_iv_cache)
+> >  		return -ENOMEM;
+> 
+> Sorry about not noticing that in the last iteration; but you may return
+> an error here if airq_iv_cache could not be allocated...
+> 
+> >  	return 0;
+> >  }
+> > -subsys_initcall(airq_init);
+> 
+> (...)
+> 
+> > diff --git a/drivers/s390/cio/css.c b/drivers/s390/cio/css.c
+> > index 6fc91d534af1..7901c8ed3597 100644
+> > --- a/drivers/s390/cio/css.c
+> > +++ b/drivers/s390/cio/css.c
+> > @@ -1182,6 +1182,7 @@ static int __init css_bus_init(void)
+> >  	ret = cio_dma_pool_init();
+> >  	if (ret)
+> >  		goto out_unregister_pmn;
+> > +	airq_init();
+> 
+> ...but don't check the return code here. Probably a pathological case,
+> but shouldn't you handle that error as well?
+> 
 
-Peter Zijlstra suggested a cpuidle driver for this. 
+Tricky business... The problem is that the airq stuff ain't 'private' to
+the CIO subsystem (e.g. zPCI). I'm afraid failing to init css won't
+really prevent all usages.
 
-Also, other architectures will use the same "poll before exiting to VM"
-logic (so we'd rather avoid duplicating this code): PPC, x86, S/390,
-MIPS... So in my POV it makes sense to unify this.
+My first thought was, that this is more or less analogous to what we
+had before. Namely kmem_cache_create() and dma_pool_create() should fail
+under similar circumstances, and the return value of airq_init() was
+ignored in do_initcall_level(). So I was like ignoring it seems to be
+consistent with previous state.
 
-So, back to your initial suggestion: 
+But, ouch, there is a big difference! While kmem_cache_zalloc() seems
+to tolerate the first argument (pointer to kmem_cache) being NULL the
+dma_pool_zalloc() does not.
 
-Q) "Can you unify code with poll_state.c?" 
-A) Yes, but it requires a new governor, which seems overkill and unfit
-for the purpose.
+IMHO the cleanest thing to do at this stage is to check if the
+airq_iv_cache is NULL and fail the allocation if it is (to preserve
+previous behavior).
 
-Moreover, the logic in menu to decide whether its necessary or not
-to stop sched tick is useful for us (so a default_idle_call is not
-sufficient), because the cost of enabling/disabling the sched tick is
-high on VMs.
+I would prefer having a separate discussion on eventually changing
+the behavior (e.g. fail css initialization).
 
-So i'll fix the comments of the cpuidle driver (which everyone seems
-to agree with, except your understandable distate for it) and repost.
+Connie, would that work with you? Thanks for spotting this!
 
+Regards,
+Halil
 
+> >  	css_init_done = 1;
+> >  
+> >  	/* Enable default isc for I/O subchannels. */
+> 
 
