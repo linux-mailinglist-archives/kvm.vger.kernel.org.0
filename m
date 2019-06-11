@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 16E393D713
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 21:42:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 62AF73D716
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 21:42:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405039AbfFKTmd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 15:42:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55698 "EHLO mx1.redhat.com"
+        id S2405705AbfFKTme (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 15:42:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45168 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391080AbfFKTmd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S2389150AbfFKTmd (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 11 Jun 2019 15:42:33 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id DB6073092641;
+        by mx1.redhat.com (Postfix) with ESMTPS id D48823082B15;
         Tue, 11 Jun 2019 19:42:32 +0000 (UTC)
 Received: from amt.cnet (ovpn-112-4.gru2.redhat.com [10.97.112.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1814B1001B01;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 181AC1001B03;
         Tue, 11 Jun 2019 19:42:30 +0000 (UTC)
 Received: from amt.cnet (localhost [127.0.0.1])
-        by amt.cnet (Postfix) with ESMTP id 97AC2105152;
-        Tue, 11 Jun 2019 16:42:14 -0300 (BRT)
+        by amt.cnet (Postfix) with ESMTP id 3811A105153;
+        Tue, 11 Jun 2019 16:42:15 -0300 (BRT)
 Received: (from marcelo@localhost)
-        by amt.cnet (8.14.7/8.14.7/Submit) id x5BJgEYL011941;
+        by amt.cnet (8.14.7/8.14.7/Submit) id x5BJgE7h011942;
         Tue, 11 Jun 2019 16:42:14 -0300
-Message-Id: <20190611194107.269706590@amt.cnet>
+Message-Id: <20190611194107.343397521@amt.cnet>
 User-Agent: quilt/0.60-1
-Date:   Tue, 11 Jun 2019 16:40:55 -0300
+Date:   Tue, 11 Jun 2019 16:40:56 -0300
 From:   Marcelo Tosatti <mtosatti@redhat.com>
 To:     kvm-devel <kvm@vger.kernel.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -41,353 +41,169 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Ankur Arora <ankur.a.arora@oracle.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-pm@vger.kernel.org
-Subject: [patch 1/3] drivers/cpuidle: add cpuidle-haltpoll driver
+        linux-pm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>
+Subject: [patch 2/3] kvm: x86: add host poll control msrs
 References: <20190611194054.878923294@amt.cnet>
-Content-Disposition: inline; filename=01-cpuidle-haltpoll
+Content-Disposition: inline; filename=02-pollcontrol-host.patch
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Tue, 11 Jun 2019 19:42:33 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Tue, 11 Jun 2019 19:42:32 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The cpuidle_haltpoll driver allows the guest vcpus to poll for a specified
-amount of time before halting. This provides the following benefits
-to host side polling:
+Add an MSRs which allows the guest to disable 
+host polling (specifically the cpuidle-haltpoll, 
+when performing polling in the guest, disables
+host side polling).
 
-        1) The POLL flag is set while polling is performed, which allows
-           a remote vCPU to avoid sending an IPI (and the associated
-           cost of handling the IPI) when performing a wakeup.
-
-        2) The HLT VM-exit cost can be avoided.
-
-The downside of guest side polling is that polling is performed
-even with other runnable tasks in the host.
-
-Results comparing halt_poll_ns and server/client application
-where a small packet is ping-ponged:
-
-host                                        --> 31.33
-halt_poll_ns=300000 / no guest busy spin    --> 33.40   (93.8%)
-halt_poll_ns=0 / guest_halt_poll_ns=300000  --> 32.73   (95.7%)
-
-For the SAP HANA benchmarks (where idle_spin is a parameter
-of the previous version of the patch, results should be the
-same):
-
-hpns == halt_poll_ns
-
-                          idle_spin=0/   idle_spin=800/    idle_spin=0/
-                          hpns=200000    hpns=0            hpns=800000
-DeleteC06T03 (100 thread) 1.76           1.71 (-3%)        1.78   (+1%)
-InsertC16T02 (100 thread) 2.14           2.07 (-3%)        2.18   (+1.8%)
-DeleteC00T01 (1 thread)   1.34           1.28 (-4.5%)	   1.29   (-3.7%)
-UpdateC00T03 (1 thread)   4.72           4.18 (-12%)	   4.53   (-5%)
+Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
 ---
- Documentation/virtual/guest-halt-polling.txt |   96 +++++++++++++++++
- arch/x86/kernel/process.c                    |    2 
- drivers/cpuidle/Kconfig                      |    9 +
- drivers/cpuidle/Makefile                     |    1 
- drivers/cpuidle/cpuidle-haltpoll.c           |  145 +++++++++++++++++++++++++++
- 5 files changed, 252 insertions(+), 1 deletion(-)
+ Documentation/virtual/kvm/msr.txt    |    9 +++++++++
+ arch/x86/include/asm/kvm_host.h      |    2 ++
+ arch/x86/include/uapi/asm/kvm_para.h |    2 ++
+ arch/x86/kvm/Kconfig                 |    1 +
+ arch/x86/kvm/cpuid.c                 |    3 ++-
+ arch/x86/kvm/x86.c                   |   22 ++++++++++++++++++++++
+ 6 files changed, 38 insertions(+), 1 deletion(-)
 
-Index: linux-2.6.git/Documentation/virtual/guest-halt-polling.txt
+Index: linux-2.6.git/Documentation/virtual/kvm/msr.txt
 ===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ linux-2.6.git/Documentation/virtual/guest-halt-polling.txt	2019-06-11 16:38:55.072877644 -0300
-@@ -0,0 +1,96 @@
-+Guest halt polling
-+==================
+--- linux-2.6.git.orig/Documentation/virtual/kvm/msr.txt	2019-06-11 15:54:16.500695464 -0300
++++ linux-2.6.git/Documentation/virtual/kvm/msr.txt	2019-06-11 16:04:09.917453903 -0300
+@@ -273,3 +273,12 @@
+ 	guest must both read the least significant bit in the memory area and
+ 	clear it using a single CPU instruction, such as test and clear, or
+ 	compare and exchange.
 +
-+The cpuidle_haltpoll driver allows the guest vcpus to poll for a specified
-+amount of time before halting. This provides the following benefits
-+to host side polling:
++MSR_KVM_POLL_CONTROL: 0x4b564d05
++	Control host side polling.
 +
-+	1) The POLL flag is set while polling is performed, which allows
-+	   a remote vCPU to avoid sending an IPI (and the associated
-+ 	   cost of handling the IPI) when performing a wakeup.
++	data: Bit 0 enables (1) or disables (0) host halt poll
++	logic.
++	KVM guests can disable host halt polling when performing
++	polling themselves.
 +
-+	2) The VM-exit cost can be avoided.
-+
-+The downside of guest side polling is that polling is performed
-+even with other runnable tasks in the host.
-+
-+The basic logic as follows: A global value, guest_halt_poll_ns,
-+is configured by the user, indicating the maximum amount of
-+time polling is allowed. This value is fixed.
-+
-+Each vcpu has an adjustable guest_halt_poll_ns
-+("per-cpu guest_halt_poll_ns"), which is adjusted by the algorithm
-+in response to events (explained below).
-+
-+Module Parameters
-+=================
-+
-+The cpuidle_haltpoll module has 5 tunable module parameters:
-+
-+1) guest_halt_poll_ns:
-+
-+Maximum amount of time, in nanoseconds, that polling is
-+performed before halting.
-+
-+Default: 0
-+
-+2) guest_halt_poll_shrink:
-+
-+Division factor used to shrink per-cpu guest_halt_poll_ns when
-+wakeup event occurs after the global guest_halt_poll_ns.
-+
-+Default: 2
-+
-+3) guest_halt_poll_grow:
-+
-+Multiplication factor used to grow per-cpu guest_halt_poll_ns
-+when event occurs after per-cpu guest_halt_poll_ns
-+but before global guest_halt_poll_ns.
-+
-+Default: 2
-+
-+4) guest_halt_poll_grow_start:
-+
-+The per-cpu guest_halt_poll_ns eventually reaches zero
-+in case of an idle system. This value sets the initial
-+per-cpu guest_halt_poll_ns when growing. This can
-+be increased from 10000, to avoid misses during the initial
-+growth stage:
-+
-+10000, 20000, 40000, ... (example assumes guest_halt_poll_grow=2).
-+
-+Default: 10000
-+
-+5) guest_halt_poll_allow_shrink:
-+
-+Bool parameter which allows shrinking. Set to N
-+to avoid it (per-cpu guest_halt_poll_ns will remain
-+high once achieves global guest_halt_poll_ns value).
-+
-+Default: Y
-+
-+The module parameters can be set from the debugfs files in:
-+
-+	/sys/module/cpuidle_haltpoll/parameters/
-+
-+Host and guest polling
-+======================
-+
-+KVM also performs host side polling (that is, it can poll for a certain
-+amount of time before halting) on behalf of guest vcpus.
-+
-+Modern hosts support poll control MSRs, which are used by
-+cpuidle_haltpoll to disable host side polling on a per-VM basis.
-+
-+If the KVM host does not support this interface, then both guest side
-+and host side polling can be performed, which can incur extra CPU and
-+energy consumption. One might consider disabling host side polling
-+manually if upgrading to a new host is not an option.
-+
-+Further Notes
-+=============
-+
-+Care should be taken when setting the guest_halt_poll_ns parameter
-+as a large value has the potential to drive the cpu usage to 100% on a
-+machine which would be almost entirely idle otherwise.
-+
-Index: linux-2.6.git/arch/x86/kernel/process.c
+Index: linux-2.6.git/arch/x86/include/asm/kvm_host.h
 ===================================================================
---- linux-2.6.git.orig/arch/x86/kernel/process.c	2019-06-11 12:14:37.731286353 -0300
-+++ linux-2.6.git/arch/x86/kernel/process.c	2019-06-11 12:14:44.699424799 -0300
-@@ -580,7 +580,7 @@
- 	safe_halt();
- 	trace_cpu_idle_rcuidle(PWR_EVENT_EXIT, smp_processor_id());
+--- linux-2.6.git.orig/arch/x86/include/asm/kvm_host.h	2019-06-11 15:54:16.500695464 -0300
++++ linux-2.6.git/arch/x86/include/asm/kvm_host.h	2019-06-11 16:04:09.917453903 -0300
+@@ -755,6 +755,8 @@
+ 		struct gfn_to_hva_cache data;
+ 	} pv_eoi;
+ 
++	u64 msr_kvm_poll_control;
++
+ 	/*
+ 	 * Indicate whether the access faults on its page table in guest
+ 	 * which is set when fix page fault and used to detect unhandeable
+Index: linux-2.6.git/arch/x86/include/uapi/asm/kvm_para.h
+===================================================================
+--- linux-2.6.git.orig/arch/x86/include/uapi/asm/kvm_para.h	2019-06-11 15:54:16.500695464 -0300
++++ linux-2.6.git/arch/x86/include/uapi/asm/kvm_para.h	2019-06-11 16:04:09.917453903 -0300
+@@ -29,6 +29,7 @@
+ #define KVM_FEATURE_PV_TLB_FLUSH	9
+ #define KVM_FEATURE_ASYNC_PF_VMEXIT	10
+ #define KVM_FEATURE_PV_SEND_IPI	11
++#define KVM_FEATURE_POLL_CONTROL	12
+ 
+ #define KVM_HINTS_REALTIME      0
+ 
+@@ -47,6 +48,7 @@
+ #define MSR_KVM_ASYNC_PF_EN 0x4b564d02
+ #define MSR_KVM_STEAL_TIME  0x4b564d03
+ #define MSR_KVM_PV_EOI_EN      0x4b564d04
++#define MSR_KVM_POLL_CONTROL	0x4b564d05
+ 
+ struct kvm_steal_time {
+ 	__u64 steal;
+Index: linux-2.6.git/arch/x86/kvm/Kconfig
+===================================================================
+--- linux-2.6.git.orig/arch/x86/kvm/Kconfig	2019-06-11 15:54:16.500695464 -0300
++++ linux-2.6.git/arch/x86/kvm/Kconfig	2019-06-11 16:04:09.917453903 -0300
+@@ -41,6 +41,7 @@
+ 	select PERF_EVENTS
+ 	select HAVE_KVM_MSI
+ 	select HAVE_KVM_CPU_RELAX_INTERCEPT
++	select HAVE_KVM_NO_POLL
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ 	select KVM_VFIO
+ 	select SRCU
+Index: linux-2.6.git/arch/x86/kvm/cpuid.c
+===================================================================
+--- linux-2.6.git.orig/arch/x86/kvm/cpuid.c	2019-06-11 15:54:16.500695464 -0300
++++ linux-2.6.git/arch/x86/kvm/cpuid.c	2019-06-11 16:04:09.918453923 -0300
+@@ -643,7 +643,8 @@
+ 			     (1 << KVM_FEATURE_PV_UNHALT) |
+ 			     (1 << KVM_FEATURE_PV_TLB_FLUSH) |
+ 			     (1 << KVM_FEATURE_ASYNC_PF_VMEXIT) |
+-			     (1 << KVM_FEATURE_PV_SEND_IPI);
++			     (1 << KVM_FEATURE_PV_SEND_IPI) |
++			     (1 << KVM_FEATURE_POLL_CONTROL);
+ 
+ 		if (sched_info_on())
+ 			entry->eax |= (1 << KVM_FEATURE_STEAL_TIME);
+Index: linux-2.6.git/arch/x86/kvm/x86.c
+===================================================================
+--- linux-2.6.git.orig/arch/x86/kvm/x86.c	2019-06-11 15:54:16.500695464 -0300
++++ linux-2.6.git/arch/x86/kvm/x86.c	2019-06-11 16:04:48.002209329 -0300
+@@ -1177,6 +1177,7 @@
+ 	MSR_IA32_POWER_CTL,
+ 
+ 	MSR_K7_HWCR,
++	MSR_KVM_POLL_CONTROL,
+ };
+ 
+ static unsigned num_emulated_msrs;
+@@ -2628,6 +2629,14 @@
+ 			return 1;
+ 		break;
+ 
++	case MSR_KVM_POLL_CONTROL:
++		/* only enable bit supported */
++		if (data & (-1ULL << 1))
++			return 1;
++
++		vcpu->arch.msr_kvm_poll_control = data;
++		break;
++
+ 	case MSR_IA32_MCG_CTL:
+ 	case MSR_IA32_MCG_STATUS:
+ 	case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
+@@ -2877,6 +2886,9 @@
+ 	case MSR_KVM_PV_EOI_EN:
+ 		msr_info->data = vcpu->arch.pv_eoi.msr_val;
+ 		break;
++	case MSR_KVM_POLL_CONTROL:
++		msr_info->data = vcpu->arch.msr_kvm_poll_control;
++		break;
+ 	case MSR_IA32_P5_MC_ADDR:
+ 	case MSR_IA32_P5_MC_TYPE:
+ 	case MSR_IA32_MCG_CAP:
+@@ -8874,6 +8886,10 @@
+ 	msr.host_initiated = true;
+ 	kvm_write_tsc(vcpu, &msr);
+ 	vcpu_put(vcpu);
++
++	/* poll control enabled by default */
++	vcpu->arch.msr_kvm_poll_control = 1;
++
+ 	mutex_unlock(&vcpu->mutex);
+ 
+ 	if (!kvmclock_periodic_sync)
+@@ -9948,6 +9964,12 @@
  }
--#ifdef CONFIG_APM_MODULE
-+#if defined(CONFIG_APM_MODULE) || defined(CONFIG_HALTPOLL_CPUIDLE_MODULE)
- EXPORT_SYMBOL(default_idle);
- #endif
+ EXPORT_SYMBOL_GPL(kvm_vector_hashing_enabled);
  
-Index: linux-2.6.git/drivers/cpuidle/Kconfig
-===================================================================
---- linux-2.6.git.orig/drivers/cpuidle/Kconfig	2019-06-11 12:14:37.731286353 -0300
-+++ linux-2.6.git/drivers/cpuidle/Kconfig	2019-06-11 16:38:13.984060707 -0300
-@@ -51,6 +51,15 @@
- source "drivers/cpuidle/Kconfig.powerpc"
- endmenu
- 
-+config HALTPOLL_CPUIDLE
-+       tristate "Halt poll cpuidle driver"
-+       depends on X86
-+       default y
-+       help
-+         This option enables halt poll cpuidle driver, which allows to poll
-+         before halting in the guest (more efficient than polling in the
-+         host via halt_poll_ns for some scenarios).
-+
- endif
- 
- config ARCH_NEEDS_CPU_IDLE_COUPLED
-Index: linux-2.6.git/drivers/cpuidle/Makefile
-===================================================================
---- linux-2.6.git.orig/drivers/cpuidle/Makefile	2019-06-11 12:14:37.731286353 -0300
-+++ linux-2.6.git/drivers/cpuidle/Makefile	2019-06-11 12:14:44.700424819 -0300
-@@ -7,6 +7,7 @@
- obj-$(CONFIG_ARCH_NEEDS_CPU_IDLE_COUPLED) += coupled.o
- obj-$(CONFIG_DT_IDLE_STATES)		  += dt_idle_states.o
- obj-$(CONFIG_ARCH_HAS_CPU_RELAX)	  += poll_state.o
-+obj-$(CONFIG_HALTPOLL_CPUIDLE)		  += cpuidle-haltpoll.o
- 
- ##################################################################################
- # ARM SoC drivers
-Index: linux-2.6.git/drivers/cpuidle/cpuidle-haltpoll.c
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ linux-2.6.git/drivers/cpuidle/cpuidle-haltpoll.c	2019-06-11 16:37:23.328053569 -0300
-@@ -0,0 +1,145 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * cpuidle driver for halt polling.
-+ *
-+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ * Authors: Marcelo Tosatti <mtosatti@redhat.com>
-+ */
-+
-+#include <linux/init.h>
-+#include <linux/cpuidle.h>
-+#include <linux/module.h>
-+#include <linux/sched/clock.h>
-+#include <linux/sched/idle.h>
-+
-+static unsigned int guest_halt_poll_ns __read_mostly = 200000;
-+module_param(guest_halt_poll_ns, uint, 0644);
-+
-+/* division factor to shrink halt_poll_ns */
-+static unsigned int guest_halt_poll_shrink __read_mostly = 2;
-+module_param(guest_halt_poll_shrink, uint, 0644);
-+
-+/* multiplication factor to grow per-cpu halt_poll_ns */
-+static unsigned int guest_halt_poll_grow __read_mostly = 2;
-+module_param(guest_halt_poll_grow, uint, 0644);
-+
-+/* value in ns to start growing per-cpu halt_poll_ns */
-+static unsigned int guest_halt_poll_grow_start __read_mostly = 10000;
-+module_param(guest_halt_poll_grow_start, uint, 0644);
-+
-+/* value in ns to start growing per-cpu halt_poll_ns */
-+static bool guest_halt_poll_allow_shrink __read_mostly = true;
-+module_param(guest_halt_poll_allow_shrink, bool, 0644);
-+
-+static DEFINE_PER_CPU(unsigned int, halt_poll_ns);
-+
-+static void adjust_haltpoll_ns(unsigned int block_ns,
-+			       unsigned int *cpu_halt_poll_ns)
++bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
 +{
-+	unsigned int val;
-+
-+	/* Grow cpu_halt_poll_ns if
-+	 * cpu_halt_poll_ns < block_ns < guest_halt_poll_ns
-+	 */
-+	if (block_ns > *cpu_halt_poll_ns && block_ns <= guest_halt_poll_ns) {
-+		val = *cpu_halt_poll_ns * guest_halt_poll_grow;
-+
-+		if (val < guest_halt_poll_grow_start)
-+			val = guest_halt_poll_grow_start;
-+		if (val > guest_halt_poll_ns)
-+			val = guest_halt_poll_ns;
-+
-+		*cpu_halt_poll_ns = val;
-+	} else if (block_ns > guest_halt_poll_ns &&
-+		   guest_halt_poll_allow_shrink) {
-+		unsigned int shrink = guest_halt_poll_shrink;
-+
-+		val = *cpu_halt_poll_ns;
-+		if (shrink == 0)
-+			val = 0;
-+		else
-+			val /= shrink;
-+		*cpu_halt_poll_ns = val;
-+	}
++	return (vcpu->arch.msr_kvm_poll_control & 1) == 0;
 +}
++EXPORT_SYMBOL_GPL(kvm_arch_no_poll);
 +
-+static int haltpoll_enter_idle(struct cpuidle_device *dev,
-+			       struct cpuidle_driver *drv, int index)
-+{
-+	unsigned int *cpu_halt_poll_ns;
-+	unsigned long long start, now, block_ns;
-+	int cpu = smp_processor_id();
-+
-+	cpu_halt_poll_ns = per_cpu_ptr(&halt_poll_ns, cpu);
-+
-+	if (current_set_polling_and_test()) {
-+		local_irq_enable();
-+		goto out;
-+	}
-+
-+	start = sched_clock();
-+	local_irq_enable();
-+	for (;;) {
-+		if (need_resched()) {
-+			current_clr_polling();
-+			goto out;
-+		}
-+
-+		now = sched_clock();
-+		if (now - start > *cpu_halt_poll_ns)
-+			break;
-+
-+		cpu_relax();
-+	}
-+
-+	local_irq_disable();
-+	if (current_clr_polling_and_test()) {
-+		local_irq_enable();
-+		goto out;
-+	}
-+
-+	default_idle();
-+	block_ns = sched_clock() - start;
-+	adjust_haltpoll_ns(block_ns, cpu_halt_poll_ns);
-+
-+out:
-+	return index;
-+}
-+
-+static struct cpuidle_driver haltpoll_driver = {
-+	.name = "haltpoll_idle",
-+	.owner = THIS_MODULE,
-+	.states = {
-+		{ /* entry 0 is for polling */ },
-+		{
-+			.enter			= haltpoll_enter_idle,
-+			.exit_latency		= 0,
-+			.target_residency	= 0,
-+			.power_usage		= -1,
-+			.name			= "Halt poll",
-+			.desc			= "Halt poll idle",
-+		},
-+	},
-+	.safe_state_index = 0,
-+	.state_count = 2,
-+};
-+
-+static int __init haltpoll_init(void)
-+{
-+	return cpuidle_register(&haltpoll_driver, NULL);
-+}
-+
-+static void __exit haltpoll_exit(void)
-+{
-+	cpuidle_unregister(&haltpoll_driver);
-+}
-+
-+module_init(haltpoll_init);
-+module_exit(haltpoll_exit);
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Marcelo Tosatti <mtosatti@redhat.com>");
-+
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
 
 
