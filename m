@@ -2,226 +2,254 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 31CCD3C536
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 09:35:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0A4A3C543
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 09:38:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404435AbfFKHed (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 03:34:33 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:36071 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404276AbfFKHec (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 03:34:32 -0400
-Received: by mail-pl1-f196.google.com with SMTP id d21so4723094plr.3;
-        Tue, 11 Jun 2019 00:34:31 -0700 (PDT)
+        id S2404248AbfFKHh4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 03:37:56 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:36336 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404009AbfFKHh4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jun 2019 03:37:56 -0400
+Received: by mail-oi1-f194.google.com with SMTP id w7so8211120oic.3;
+        Tue, 11 Jun 2019 00:37:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=mrGW1T2iSqhdTKZCxglyJmU60TY2UWKhtt2t3Ktg1eY=;
-        b=lhXh9JzbrCKeEvpkhxKGibIZ9hpRyPXZiS1VvBwpSRo9EZutOEvdOIyKGyzSVDlrhx
-         yj3c9E2wA5zPUmMML0UFmKxlyUo2QDyTpX42qNSufnOc2SkmO3xeKRUiSLOBCKrbz7zD
-         zCZS7kSsvGlRonmmWITwbvsgAiJF8QyYHxHBMGkCsoRcYOwHsHeDiytpu1tAa5WMkdku
-         dr/3rPk4Hw4cDytfmxrjoj6ATrQ7v+y2lUU4XruShnwhhvH16HdNF8Kf8AcsVVLqDHgR
-         HkxSf5eVQPqAZCWnYAITogsNUNnzjX9cN4LVb7QmZCmriZ2ke76l+chFO9wWUkFXNzyu
-         xYmg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=uyWNTU55JT9GK2aN646mLXTRkgWwGnf383ImPAHfNpc=;
+        b=NNch+St/7hAl3ovYZbYCVbvfTDW9aaAdG3YFRwtyjwKjabESyVU20yJQkrnKixD3V/
+         MoQhUTsGszn5tB3sqV40NutooZumVOOm53GRxEuKgaiDULicGCieRRvk7R5bj/uoQa02
+         ZcPZNO38kFAJy/g9yETKVRDRXYZLLc6KGC1ouRVEKOAMX/wrHNeyluk2fPksMft1XpGV
+         XGPrYHRVJCCTdzOYbSokuPBI43FsdrG+exejkRj1mJqxgRrLLhO3DvzjPBDmriC5mzoi
+         Am+ztDUZIWoZrvOT3pXdFwClzI9uq6Ltf0K6ph2Bp0y52xWs23mGDCwtR0vMYsk/8S9I
+         sNQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=mrGW1T2iSqhdTKZCxglyJmU60TY2UWKhtt2t3Ktg1eY=;
-        b=jxEdckvuo3ilzgJS+upmlLJ0ZLkBZU/hwx8JeE8I2tn3/jR9tdt+vGP7utka4gBSrC
-         2qpw+Mh7See+bpSIKuCCm8hnR1mdlFFcqifY7DWC5KGgZsvGYe2JL48uHKIZxAejCeuZ
-         x/Ri56KfmMitUP7sDqUXAyr2eSTFsfIBESkXjOgGzDHmd6sGJVQfK2tQO1N72e/KMuSI
-         4qrz/TWIbxHk/IlDzo75TM6gxWV0PlBGovs5LS9J7uNNSMpRrcL7fHaNuT1jMPIeKAwm
-         Gr/v/cJ2o+3jxD+cS8LF4VLf1CBOa/XiCIFp4Tr2JBmlAlYhdETYOY7aCJt4ZJV2rz3J
-         xgoA==
-X-Gm-Message-State: APjAAAUTnZbDaAwAZQmtQ40OrreG4FmkZ+qatgAXDaBhYTI9brnTIxso
-        z2iWrmr3qed47VUsUZejBqxEvMYA
-X-Google-Smtp-Source: APXvYqzIEA65a11MmHTFreR2/leIesD1hYM/5Xatw3lGgrf0ge5x+VAbkuh+h1t5nNOZ0TI1wtyGiA==
-X-Received: by 2002:a17:902:24c:: with SMTP id 70mr74121452plc.2.1560238471181;
-        Tue, 11 Jun 2019 00:34:31 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id 14sm6860800pfj.36.2019.06.11.00.34.29
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Tue, 11 Jun 2019 00:34:30 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH v2 5/5] KVM: X86: Save/restore residency values when vCPU migrations
-Date:   Tue, 11 Jun 2019 15:34:11 +0800
-Message-Id: <1560238451-19495-6-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1560238451-19495-1-git-send-email-wanpengli@tencent.com>
-References: <1560238451-19495-1-git-send-email-wanpengli@tencent.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=uyWNTU55JT9GK2aN646mLXTRkgWwGnf383ImPAHfNpc=;
+        b=jcANhyl9a0lLMLyucPCpFaBiYgG4dFvLQ8HSk2o5Yo5jpgUTXHVh7xqk3QqUa1VWKt
+         o/MqIKytkcGnzRxHWEl9hf/so1rC3OMtK6GYbYANV/nWYtjn+ZfZ5kvVahzqBOcOxdRE
+         vDXqSJfE88AdQlQV5WUmpdxtGGxQiXmTDBPo/Uc1xklaXHYnqMhQQfFZ/eMGh4DX7PCB
+         VJSMQZ2SOUtlX1vStOys5CYKtPmK3mZHKgQQ7CT7DRxpT95MDGccCLlgjwyXoJ3Web/h
+         4X87bsauwfGoWbgYwcbdWnFexPVpfC1aJEiBQql1niFlboJ0TnPo8i3usFbg37UE+57h
+         jKHQ==
+X-Gm-Message-State: APjAAAX1V3szujy6jUA7FdUqZpcldCXzEI7zshSpl8TaYJ9nja3wGkJM
+        h1ZjU2FpZWOo+H75UkzpdCE1EjEa8XLTACuZ8rQ=
+X-Google-Smtp-Source: APXvYqw+OUl8lt7EinVIXV0dyYFcWVFGvEUraTxANWi0wvDXljmpbDt7OmvSt0YYFLlgqxH/x4HFS/kwFzsk6v9ZG5M=
+X-Received: by 2002:aca:3305:: with SMTP id z5mr12567515oiz.141.1560238675747;
+ Tue, 11 Jun 2019 00:37:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <1558418814-6822-1-git-send-email-wanpengli@tencent.com>
+ <1558418814-6822-2-git-send-email-wanpengli@tencent.com> <627e4189-3709-1fb2-a9bc-f1a577712fe0@redhat.com>
+In-Reply-To: <627e4189-3709-1fb2-a9bc-f1a577712fe0@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 11 Jun 2019 15:38:40 +0800
+Message-ID: <CANRm+CyqH5ojNTcX3zfVjB8rayGHAW0Ex+fiGPnrO7bkmvr_4w@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] KVM: X86: Provide a capability to disable cstate
+ msr read intercepts
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Liran Alon <liran.alon@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Wed, 5 Jun 2019 at 00:53, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 21/05/19 08:06, Wanpeng Li wrote:
+> > From: Wanpeng Li <wanpengli@tencent.com>
+> >
+> > Allow guest reads CORE cstate when exposing host CPU power management c=
+apabilities
+> > to the guest. PKG cstate is restricted to avoid a guest to get the whol=
+e package
+> > information in multi-tenant scenario.
+> >
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+> > Cc: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Cc: Liran Alon <liran.alon@oracle.com>
+> > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > ---
+> > v1 -> v2:
+> >  * use a separate bit for KVM_CAP_X86_DISABLE_EXITS
+> >
+> >  Documentation/virtual/kvm/api.txt | 1 +
+> >  arch/x86/include/asm/kvm_host.h   | 1 +
+> >  arch/x86/kvm/vmx/vmx.c            | 6 ++++++
+> >  arch/x86/kvm/x86.c                | 5 ++++-
+> >  arch/x86/kvm/x86.h                | 5 +++++
+> >  include/uapi/linux/kvm.h          | 4 +++-
+> >  tools/include/uapi/linux/kvm.h    | 4 +++-
+> >  7 files changed, 23 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/=
+kvm/api.txt
+> > index 33cd92d..91fd86f 100644
+> > --- a/Documentation/virtual/kvm/api.txt
+> > +++ b/Documentation/virtual/kvm/api.txt
+> > @@ -4894,6 +4894,7 @@ Valid bits in args[0] are
+> >  #define KVM_X86_DISABLE_EXITS_MWAIT            (1 << 0)
+> >  #define KVM_X86_DISABLE_EXITS_HLT              (1 << 1)
+> >  #define KVM_X86_DISABLE_EXITS_PAUSE            (1 << 2)
+> > +#define KVM_X86_DISABLE_EXITS_CSTATE           (1 << 3)
+> >
+> >  Enabling this capability on a VM provides userspace with a way to no
+> >  longer intercept some instructions for improved latency in some
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm=
+_host.h
+> > index d5457c7..1ce8289 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -882,6 +882,7 @@ struct kvm_arch {
+> >       bool mwait_in_guest;
+> >       bool hlt_in_guest;
+> >       bool pause_in_guest;
+> > +     bool cstate_in_guest;
+> >
+> >       unsigned long irq_sources_bitmap;
+> >       s64 kvmclock_offset;
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 0861c71..da24f18 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -6637,6 +6637,12 @@ static struct kvm_vcpu *vmx_create_vcpu(struct k=
+vm *kvm, unsigned int id)
+> >       vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_CS, M=
+SR_TYPE_RW);
+> >       vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_ESP, =
+MSR_TYPE_RW);
+> >       vmx_disable_intercept_for_msr(msr_bitmap, MSR_IA32_SYSENTER_EIP, =
+MSR_TYPE_RW);
+> > +     if (kvm_cstate_in_guest(kvm)) {
+> > +             vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C1_RES=
+, MSR_TYPE_R);
+> > +             vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C3_RES=
+IDENCY, MSR_TYPE_R);
+> > +             vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C6_RES=
+IDENCY, MSR_TYPE_R);
+> > +             vmx_disable_intercept_for_msr(msr_bitmap, MSR_CORE_C7_RES=
+IDENCY, MSR_TYPE_R);
+>
+> I think I have changed my mind on the implementation of this, sorry.
+>
+> 1) We should emulate these MSRs always, otherwise the guest API changes
+> between different values of KVM_CAP_X86_DISABLE_EXITS which is not
+> intended.  Also, KVM_CAP_X86_DISABLE_EXITS does not prevent live
+> migration, so it should be possible to set the MSRs in the host to
+> change the delta between the host and guest values.
+>
+> 2) If both KVM_X86_DISABLE_EXITS_HLT and KVM_X86_DISABLE_EXITS_MWAIT are
+> disabled (i.e. exit happens), the MSRs will be purely emulated.
+> C3/C6/C7 residency will never increase (it will remain the value that is
+> set by the host).  When the VM executes an hlt vmexit, it should save
+> the current TSC.  When it comes back, the C1 residency MSR should be
+> increased by the time that has passed.
+>
+> 3) If KVM_X86_DISABLE_EXITS_HLT is enabled but
+> KVM_X86_DISABLE_EXITS_MWAIT is disabled (i.e. mait exits happen),
+> C3/C6/C7 residency will also never increase, but the C1 residency value
+> should be read using rdmsr from the host, with a delta added from the
+> host value.
+>
+> 4) If KVM_X86_DISABLE_EXITS_HLT and KVM_X86_DISABLE_EXITS_MWAIT are both
+> disabled (i.e. mwait exits do not happen), all four residency values
+> should be read using rdmsr from the host, with a delta added from the
+> host value.
+>
+> 5) If KVM_X86_DISABLE_EXITS_HLT is disabled and
+> KVM_X86_DISABLE_EXITS_MWAIT is enabled, the configuration makes no sense
+> so it's okay not to be very optimized.  In this case, the residency
+> value should be read as in (4), but hlt vmexits will be accounted as in
+> (2) so we need to be careful not to double-count the residency during
+> hlt.  This means doing four rdmsr before the beginning of the hlt vmexit
+> and four at the end of the hlt vmexit.
 
-To save/restore residency values when vCPU migrates between mulitple 
-pCPUs.
+MSR_CORE_C1_RES is unreadable except for ATOM platform, so I think we
+can avoid the complex logic to handle C1 now. :)
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/arm/include/asm/kvm_host.h     |  1 +
- arch/arm64/include/asm/kvm_host.h   |  1 +
- arch/mips/include/asm/kvm_host.h    |  1 +
- arch/powerpc/include/asm/kvm_host.h |  1 +
- arch/s390/include/asm/kvm_host.h    |  1 +
- arch/x86/kvm/x86.c                  | 38 +++++++++++++++++++++++++++++++++++++
- include/linux/kvm_host.h            |  1 +
- virt/kvm/kvm_main.c                 |  1 +
- 8 files changed, 45 insertions(+)
+Regards,
+Wanpeng Li
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 075e192..5e6a487 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -346,6 +346,7 @@ static inline void kvm_arch_hardware_unsetup(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
-+static inline void kvm_arch_sched_out(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
- 
- static inline void kvm_arm_init_debug(void) {}
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 4bcd9c1..12fec7d 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -557,6 +557,7 @@ void kvm_arm_vcpu_ptrauth_trap(struct kvm_vcpu *vcpu);
- static inline void kvm_arch_hardware_unsetup(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
-+static inline void kvm_arch_sched_out(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
- 
- void kvm_arm_init_debug(void);
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index 41204a4..217bbfd 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -1136,6 +1136,7 @@ static inline void kvm_arch_free_memslot(struct kvm *kvm,
- 		struct kvm_memory_slot *free, struct kvm_memory_slot *dont) {}
- static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
-+static inline void kvm_arch_sched_out(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_vcpu_block_finish(struct kvm_vcpu *vcpu) {}
-diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
-index d10df67..4f5306d 100644
---- a/arch/powerpc/include/asm/kvm_host.h
-+++ b/arch/powerpc/include/asm/kvm_host.h
-@@ -854,6 +854,7 @@ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
- static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
-+static inline void kvm_arch_sched_out(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_exit(void) {}
- static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index da5825a..8710298 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -908,6 +908,7 @@ static inline void kvm_arch_hardware_disable(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
- static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
-+static inline void kvm_arch_sched_out(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arch_free_memslot(struct kvm *kvm,
- 		struct kvm_memory_slot *free, struct kvm_memory_slot *dont) {}
- static inline void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen) {}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 36905cd..de91cc5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3332,6 +3332,36 @@ void kvm_core_residency_setup(struct kvm_vcpu *vcpu)
- }
- EXPORT_SYMBOL_GPL(kvm_core_residency_setup);
- 
-+static void kvm_residency_sched_out(struct kvm_vcpu *vcpu)
-+{
-+	int i;
-+	struct kvm_residency_msr *msr;
-+
-+	for (i = 0; i < NR_CORE_RESIDENCY_MSRS; i++) {
-+		msr = &vcpu->arch.core_cstate_msrs[i];
-+		if (msr->count_with_host) {
-+			WARN_ON(!msr->delta_from_host);
-+			msr->value += kvm_residency_read_host(vcpu, msr);
-+			msr->delta_from_host = false;
-+		}
-+	}
-+}
-+
-+static void kvm_residency_sched_in(struct kvm_vcpu *vcpu)
-+{
-+	int i;
-+	struct kvm_residency_msr *msr;
-+
-+	for (i = 0; i < NR_CORE_RESIDENCY_MSRS; i++) {
-+		msr = &vcpu->arch.core_cstate_msrs[i];
-+		if (msr->count_with_host) {
-+			WARN_ON(msr->delta_from_host);
-+			msr->value -= kvm_residency_read_host(vcpu, msr);
-+			msr->delta_from_host = true;
-+		}
-+	}
-+}
-+
- void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	/* Address WBINVD may be executed by guest */
-@@ -9276,6 +9306,14 @@ void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
- {
- 	vcpu->arch.l1tf_flush_l1d = true;
- 	kvm_x86_ops->sched_in(vcpu, cpu);
-+	if (kvm_mwait_in_guest(vcpu->kvm))
-+		kvm_residency_sched_in(vcpu);
-+}
-+
-+void kvm_arch_sched_out(struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_mwait_in_guest(vcpu->kvm))
-+		kvm_residency_sched_out(vcpu);
- }
- 
- int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index abafddb..288bd34 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -854,6 +854,7 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu);
- 
- void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu);
-+void kvm_arch_sched_out(struct kvm_vcpu *vcpu);
- 
- void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9613987..7d504c0 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4221,6 +4221,7 @@ static void kvm_sched_out(struct preempt_notifier *pn,
- 
- 	if (current->state == TASK_RUNNING)
- 		vcpu->preempted = true;
-+	kvm_arch_sched_out(vcpu);
- 	kvm_arch_vcpu_put(vcpu);
- }
- 
--- 
-2.7.4
-
+>
+> Therefore the data structure should be something like
+>
+> struct kvm_residency_msr {
+>         u64 value;
+>         bool delta_from_host;
+>         bool count_with_host;
+> }
+>
+> u64 kvm_residency_read_host(struct kvm_residency_msr *msr)
+> {
+>         u64 unscaled_value =3D rdmsrl(msr->index);
+>         // apply TSC scaling...
+>         return ...
+> }
+>
+> u64 kvm_residency_read(struct kvm_residency_msr *msr)
+> {
+>         return msr->value +
+>                 (msr->delta_from_host ? kvm_residency_read_host(msr) : 0)=
+;
+> }
+>
+> void kvm_residency_write(struct kvm_residency_msr *msr,
+>                          u64 value)
+> {
+>         msr->value =3D value -
+>                 (msr->delta_from_host ? kvm_residency_read_host(msr) : 0)=
+;
+> }
+>
+> // count_with_host is true for C1 iff any of KVM_CAP_DISABLE_EXITS_HLT
+> // or KVM_CAP_DISABLE_EXITS_MWAIT is set
+> // count_with_host is true for C3/C6/C7 iff KVM_CAP_DISABLE_EXITS_MWAIT
+> is set
+> void kvm_residency_setup(struct kvm_residency_msr *msr, u16 index,
+>                          bool count_with_host)
+> {
+>         /* Preserve value on calls after the first */
+>         u64 value =3D msr->index ? kvm_residency_read(msr) : 0;
+>         msr->delta_from_host =3D msr->count_with_host =3D count_with_host=
+;
+>         msr->index =3D index;
+>         kvm_residency_write(msr, value);
+> }
+>
+> // The following functions are called from hlt vmexits.
+>
+> void kvm_residency_start_hlt(struct kvm_residency_msr *msr)
+> {
+>         if (msr->count_with_host) {
+>                 WARN_ON(msr->delta_from_host);
+>                 msr->value +=3D kvm_residency_read_host(msr);
+>                 msr->delta_from_host =3D false;
+>         }
+> }
+>
+> // host_tsc_waited is 0 except for MSR_CORE_C1_RES
+> void kvm_residency_end_hlt(struct kvm_residency_msr *msr,
+>                            u64 host_tsc_waited)
+> {
+>         if (msr->count_with_host) {
+>                 WARN_ON(!msr->delta_from_host);
+>                 msr->value -=3D kvm_residency_read_host(msr);
+>                 msr->delta_from_host =3D true;
+>         }
+>         if (host_tsc_waited) {
+>                 // ... apply TSC scaling to host_tsc_waited ...
+>                 msr->value +=3D ...;
+>         }
+> }
+>
+> Thanks,
+>
+> Paolo
