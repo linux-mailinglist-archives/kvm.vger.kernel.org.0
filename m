@@ -2,164 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3903A3C039
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 01:53:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB4653C058
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 02:11:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390911AbfFJXwc convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 10 Jun 2019 19:52:32 -0400
-Received: from tyo161.gate.nec.co.jp ([114.179.232.161]:58228 "EHLO
-        tyo161.gate.nec.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390568AbfFJXwc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Jun 2019 19:52:32 -0400
-Received: from mailgate02.nec.co.jp ([114.179.233.122])
-        by tyo161.gate.nec.co.jp (8.15.1/8.15.1) with ESMTPS id x5ANpjra015106
-        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-        Tue, 11 Jun 2019 08:51:45 +0900
-Received: from mailsv02.nec.co.jp (mailgate-v.nec.co.jp [10.204.236.94])
-        by mailgate02.nec.co.jp (8.15.1/8.15.1) with ESMTP id x5ANpj1a007816;
-        Tue, 11 Jun 2019 08:51:45 +0900
-Received: from mail02.kamome.nec.co.jp (mail02.kamome.nec.co.jp [10.25.43.5])
-        by mailsv02.nec.co.jp (8.15.1/8.15.1) with ESMTP id x5ANpDXZ009406;
-        Tue, 11 Jun 2019 08:51:45 +0900
-Received: from bpxc99gp.gisp.nec.co.jp ([10.38.151.148] [10.38.151.148]) by mail02.kamome.nec.co.jp with ESMTP id BT-MMP-5840663; Tue, 11 Jun 2019 08:50:39 +0900
-Received: from BPXM23GP.gisp.nec.co.jp ([10.38.151.215]) by
- BPXC20GP.gisp.nec.co.jp ([10.38.151.148]) with mapi id 14.03.0319.002; Tue,
- 11 Jun 2019 08:50:39 +0900
-From:   Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>
-To:     Mike Kravetz <mike.kravetz@oracle.com>
-CC:     Wanpeng Li <kernellwp@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Punit Agrawal <punit.agrawal@arm.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Michal Hocko" <mhocko@kernel.org>,
-        "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>,
-        Anshuman Khandual <khandual@linux.vnet.ibm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Xiao Guangrong <xiaoguangrong@tencent.com>,
-        "lidongchen@tencent.com" <lidongchen@tencent.com>,
-        "yongkaiwu@tencent.com" <yongkaiwu@tencent.com>
-Subject: Re: [PATCH v2] mm: hwpoison: disable memory error handling on 1GB
- hugepage
-Thread-Topic: [PATCH v2] mm: hwpoison: disable memory error handling on 1GB
- hugepage
-Thread-Index: AQHVFnaoUuMkT7+k5kKGu78GtXiXKKaVCtaA
-Date:   Mon, 10 Jun 2019 23:50:38 +0000
-Message-ID: <20190610235045.GB30991@hori.linux.bs1.fc.nec.co.jp>
-References: <20180130013919.GA19959@hori1.linux.bs1.fc.nec.co.jp>
- <1517284444-18149-1-git-send-email-n-horiguchi@ah.jp.nec.com>
- <87inbbjx2w.fsf@e105922-lin.cambridge.arm.com>
- <20180207011455.GA15214@hori1.linux.bs1.fc.nec.co.jp>
- <87fu6bfytm.fsf@e105922-lin.cambridge.arm.com>
- <20180208121749.0ac09af2b5a143106f339f55@linux-foundation.org>
- <87wozhvc49.fsf@concordia.ellerman.id.au>
- <e673f38a-9e5f-21f6-421b-b3cb4ff02e91@oracle.com>
- <CANRm+CxAgWVv5aVzQ0wdP_A7QQgqfy7nN_SxyaactG7Mnqfr2A@mail.gmail.com>
- <f79d828c-b0b4-8a20-c316-a13430cfb13c@oracle.com>
-In-Reply-To: <f79d828c-b0b4-8a20-c316-a13430cfb13c@oracle.com>
-Accept-Language: en-US, ja-JP
-Content-Language: ja-JP
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.34.125.96]
-Content-Type: text/plain; charset="iso-2022-jp"
-Content-ID: <D93DB5550526EC4A8EA7D6EFB4444954@gisp.nec.co.jp>
-Content-Transfer-Encoding: 8BIT
+        id S2389750AbfFKALD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Jun 2019 20:11:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35844 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388749AbfFKALD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Jun 2019 20:11:03 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0481E811D8;
+        Tue, 11 Jun 2019 00:10:54 +0000 (UTC)
+Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7504B19C68;
+        Tue, 11 Jun 2019 00:10:48 +0000 (UTC)
+Subject: Re: [Qemu-devel] kvm / virsh snapshot management
+To:     Gary Dale <gary@extremeground.com>,
+        Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <abb7990e-0331-67a4-af92-05276366478c@extremeground.com>
+ <20190610121941.GI14257@stefanha-x1.localdomain>
+ <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
+ <ab3e81c2-f0ce-2ef5-bbe7-948a87463b59@extremeground.com>
+ <edf57b3a-660c-0964-2455-9461b9aa2711@redhat.com>
+ <33b31422-1198-783a-cb15-8687a3f30199@extremeground.com>
+From:   Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <0cd5c326-4d69-92fd-406d-d9fb8b08ccfc@redhat.com>
+Date:   Mon, 10 Jun 2019 19:10:47 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-X-TM-AS-MML: disable
+In-Reply-To: <33b31422-1198-783a-cb15-8687a3f30199@extremeground.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="FSCzbwHXtR4FuKnBVd262Fjywg2C0DjUS"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Tue, 11 Jun 2019 00:11:02 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 29, 2019 at 04:31:01PM -0700, Mike Kravetz wrote:
-> On 5/28/19 2:49 AM, Wanpeng Li wrote:
-> > Cc Paolo,
-> > Hi all,
-> > On Wed, 14 Feb 2018 at 06:34, Mike Kravetz <mike.kravetz@oracle.com> wrote:
-> >>
-> >> On 02/12/2018 06:48 PM, Michael Ellerman wrote:
-> >>> Andrew Morton <akpm@linux-foundation.org> writes:
-> >>>
-> >>>> On Thu, 08 Feb 2018 12:30:45 +0000 Punit Agrawal <punit.agrawal@arm.com> wrote:
-> >>>>
-> >>>>>>
-> >>>>>> So I don't think that the above test result means that errors are properly
-> >>>>>> handled, and the proposed patch should help for arm64.
-> >>>>>
-> >>>>> Although, the deviation of pud_huge() avoids a kernel crash the code
-> >>>>> would be easier to maintain and reason about if arm64 helpers are
-> >>>>> consistent with expectations by core code.
-> >>>>>
-> >>>>> I'll look to update the arm64 helpers once this patch gets merged. But
-> >>>>> it would be helpful if there was a clear expression of semantics for
-> >>>>> pud_huge() for various cases. Is there any version that can be used as
-> >>>>> reference?
-> >>>>
-> >>>> Is that an ack or tested-by?
-> >>>>
-> >>>> Mike keeps plaintively asking the powerpc developers to take a look,
-> >>>> but they remain steadfastly in hiding.
-> >>>
-> >>> Cc'ing linuxppc-dev is always a good idea :)
-> >>>
-> >>
-> >> Thanks Michael,
-> >>
-> >> I was mostly concerned about use cases for soft/hard offline of huge pages
-> >> larger than PMD_SIZE on powerpc.  I know that powerpc supports PGD_SIZE
-> >> huge pages, and soft/hard offline support was specifically added for this.
-> >> See, 94310cbcaa3c "mm/madvise: enable (soft|hard) offline of HugeTLB pages
-> >> at PGD level"
-> >>
-> >> This patch will disable that functionality.  So, at a minimum this is a
-> >> 'heads up'.  If there are actual use cases that depend on this, then more
-> >> work/discussions will need to happen.  From the e-mail thread on PGD_SIZE
-> >> support, I can not tell if there is a real use case or this is just a
-> >> 'nice to have'.
-> > 
-> > 1GB hugetlbfs pages are used by DPDK and VMs in cloud deployment, we
-> > encounter gup_pud_range() panic several times in product environment.
-> > Is there any plan to reenable and fix arch codes?
-> 
-> I too am aware of slightly more interest in 1G huge pages.  Suspect that as
-> Intel MMU capacity increases to handle more TLB entries there will be more
-> and more interest.
-> 
-> Personally, I am not looking at this issue.  Perhaps Naoya will comment as
-> he know most about this code.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FSCzbwHXtR4FuKnBVd262Fjywg2C0DjUS
+Content-Type: multipart/mixed; boundary="hWWBCJUg7xKfImdPVdCnJH2OkuF7oL8A8";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Gary Dale <gary@extremeground.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
+Message-ID: <0cd5c326-4d69-92fd-406d-d9fb8b08ccfc@redhat.com>
+Subject: Re: [Qemu-devel] kvm / virsh snapshot management
+References: <abb7990e-0331-67a4-af92-05276366478c@extremeground.com>
+ <20190610121941.GI14257@stefanha-x1.localdomain>
+ <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
+ <ab3e81c2-f0ce-2ef5-bbe7-948a87463b59@extremeground.com>
+ <edf57b3a-660c-0964-2455-9461b9aa2711@redhat.com>
+ <33b31422-1198-783a-cb15-8687a3f30199@extremeground.com>
+In-Reply-To: <33b31422-1198-783a-cb15-8687a3f30199@extremeground.com>
 
-Thanks for forwarding this to me, I'm feeling that memory error handling
-on 1GB hugepage is demanded as real use case.
+--hWWBCJUg7xKfImdPVdCnJH2OkuF7oL8A8
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> > In addition, https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/arch/x86/kvm/mmu.c#n3213
-> > The memory in guest can be 1GB/2MB/4K, though the host-backed memory
-> > are 1GB hugetlbfs pages, after above PUD panic is fixed,
-> > try_to_unmap() which is called in MCA recovery path will mark the PUD
-> > hwpoison entry. The guest will vmexit and retry endlessly when
-> > accessing any memory in the guest which is backed by this 1GB poisoned
-> > hugetlbfs page. We have a plan to split this 1GB hugetblfs page by 2MB
-> > hugetlbfs pages/4KB pages, maybe file remap to a virtual address range
-> > which is 2MB/4KB page granularity, also split the KVM MMU 1GB SPTE
-> > into 2MB/4KB and mark the offensive SPTE w/ a hwpoison flag, a sigbus
-> > will be delivered to VM at page fault next time for the offensive
-> > SPTE. Is this proposal acceptable?
-> 
-> I am not sure of the error handling design, but this does sound reasonable.
+On 6/10/19 6:00 PM, Gary Dale wrote:
 
-I agree that that's better.
+>>> Any ideas on what I'm doing wrong?
+>> Do you know for sure whether you have internal or external snapshots?
+>> And at this point, your questions are starting to wander more into
+>> libvirt territory.
+>>
+> Yes. I'm using internal snapshots. From your other e-mail, I gather tha=
+t
+> the (only) benefit to blockcommit with internal snapshots would be to
+> reduce the size of the various tables recording changed blocks. Without=
 
-> That block of code which potentially dissolves a huge page on memory error
-> is hard to understand and I'm not sure if that is even the 'normal'
-> functionality.  Certainly, we would hate to waste/poison an entire 1G page
-> for an error on a small subsection.
+> a blockcommit, the L1 tables get progressively larger over time since
+> they record all changes to the base file. Eventually the snapshots coul=
+d
+> become larger than the base image if I don't do a blockcommit.
 
-Yes, that's not practical, so we need at first establish the code base for
-2GB hugetlb splitting and then extending it to 1GB next.
+Not quite. Blockcommit requires external images. It says to take this
+image chain:
 
-Thanks,
-Naoya Horiguchi
+base <- active
+
+and change it into this shorter chain:
+
+base
+
+by moving the cluster from active into base.  There is no such thing as
+blockcommit on internal snapshots, because you don't have any backing
+file to push into.
+
+With internal snapshots, the longer an L1 table is active, the more
+clusters you have to change compared to what was the case before the
+snapshot was created - every time you change an existing cluster, the
+refcount on the old cluster decreases and the change gets written into a
+new cluster with refcount 1.  Yes, you can reach the point where there
+are more clusters with refcount 1 associated with your current L1 table
+than there are clusters with refcount > 1 that are shared with one or
+more previous internal snapshots. But they are not recording a change to
+the base file, rather, they are recording the current state of the file
+where an internal snapshot says to not forget the old state of the file.
+ And yes, a qcow2 file with internal snapshots can require more disk
+space than the amount of space exposed to the guest.  But that's true
+too with external snapshots (the sum of the space required by all images
+in the chain may be larger than the space visible to the guest).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--hWWBCJUg7xKfImdPVdCnJH2OkuF7oL8A8--
+
+--FSCzbwHXtR4FuKnBVd262Fjywg2C0DjUS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz+8YcACgkQp6FrSiUn
+Q2r4cwf/ZwXsp7ZD4msbrRp3VpMgptdo1XwjvZn/SD8qVXLmaQ/+POcPPojOinXD
+kkyGkrDXfveksaBqQ7+A+Q0igUpaEzp305m1ntNXUbx8mTNTM9pTwtEj4w2ChxRI
+UyYy+UmqZWcr1ERRZtQObBfL36iK1HkCOOPg+a010OBu0tyYGvuPJc26POCtnZMH
+5YKeuxf+h9FMU+tc+BXRjnB8UjDr0Vpb08JbS/tu1ffSMB/gCj+OCH73PQVvmTXA
+sss1vN1kJZDeRoHSgJDcUlwLdZroyGrP2Q1fmP0kI+HB1g8LIsdf6D0PMCZel97/
+wR73RPPDoyAWyrtm0tKYsGjvv/VgpA==
+=e/v6
+-----END PGP SIGNATURE-----
+
+--FSCzbwHXtR4FuKnBVd262Fjywg2C0DjUS--
