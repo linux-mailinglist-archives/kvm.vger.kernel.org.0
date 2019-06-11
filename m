@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DF6983C8F5
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 12:30:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EF883C916
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 12:37:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387593AbfFKKaX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 06:30:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42508 "EHLO mx1.redhat.com"
+        id S1727796AbfFKKhv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 06:37:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46578 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387563AbfFKKaX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 06:30:23 -0400
+        id S1725811AbfFKKhu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jun 2019 06:37:50 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 0B0684DB11;
-        Tue, 11 Jun 2019 10:30:18 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 85F543082E70;
+        Tue, 11 Jun 2019 10:37:50 +0000 (UTC)
 Received: from gondolin (ovpn-204-147.brq.redhat.com [10.40.204.147])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 856D519C70;
-        Tue, 11 Jun 2019 10:30:10 +0000 (UTC)
-Date:   Tue, 11 Jun 2019 12:30:06 +0200
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2C29619C70;
+        Tue, 11 Jun 2019 10:37:43 +0000 (UTC)
+Date:   Tue, 11 Jun 2019 12:37:40 +0200
 From:   Cornelia Huck <cohuck@redhat.com>
 To:     Halil Pasic <pasic@linux.ibm.com>
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
@@ -38,74 +38,35 @@ Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         Farhan Ali <alifm@linux.ibm.com>,
         Eric Farman <farman@linux.ibm.com>,
         "Jason J. Herne" <jjherne@linux.ibm.com>
-Subject: Re: [PATCH v4 7/8] virtio/s390: use DMA memory for ccw I/O and
- classic notifiers
-Message-ID: <20190611123006.222aa424.cohuck@redhat.com>
-In-Reply-To: <20190606115127.55519-8-pasic@linux.ibm.com>
+Subject: Re: [PATCH v4 0/8] s390: virtio: support protected virtualization
+Message-ID: <20190611123740.3d46f31b.cohuck@redhat.com>
+In-Reply-To: <20190606115127.55519-1-pasic@linux.ibm.com>
 References: <20190606115127.55519-1-pasic@linux.ibm.com>
-        <20190606115127.55519-8-pasic@linux.ibm.com>
 Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Tue, 11 Jun 2019 10:30:23 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 11 Jun 2019 10:37:50 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  6 Jun 2019 13:51:26 +0200
+On Thu,  6 Jun 2019 13:51:19 +0200
 Halil Pasic <pasic@linux.ibm.com> wrote:
 
-> Before virtio-ccw could get away with not using DMA API for the pieces of
-> memory it does ccw I/O with. With protected virtualization this has to
-> change, since the hypervisor needs to read and sometimes also write these
-> pieces of memory.
-> 
-> The hypervisor is supposed to poke the classic notifiers, if these are
-> used, out of band with regards to ccw I/O. So these need to be allocated
-> as DMA memory (which is shared memory for protected virtualization
-> guests).
-> 
-> Let us factor out everything from struct virtio_ccw_device that needs to
-> be DMA memory in a satellite that is allocated as such.
-> 
-> Note: The control blocks of I/O instructions do not need to be shared.
-> These are marshalled by the ultravisor.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  drivers/s390/virtio/virtio_ccw.c | 171 ++++++++++++++++---------------
->  1 file changed, 90 insertions(+), 81 deletions(-)
+> * Documentation is still very sketchy. I'm committed to improving this,
+>   but I'm currently hampered by some dependencies currently.  
 
-(...)
+Have the "dependencies" been resolved in the meantime? It probably
+would be a good idea to include some documentation for what needs to be
+dma and what doesn't somewhere in the kernel documentation (IIRC we
+have a s390 drivers 'book' partially generated from kerneldoc; there's
+some general document about the cio interfaces as well, but I'm not
+sure how up-to-date that is.)
 
->  static u64 virtio_ccw_get_features(struct virtio_device *vdev)
->  {
->  	struct virtio_ccw_device *vcdev = to_vc_device(vdev);
->  	struct virtio_feature_desc *features;
-> +	struct ccw1 *ccw;
->  	int ret;
->  	u64 rc;
-> -	struct ccw1 *ccw;
-
-I'd probably not have included unneeded code movement here, but no need
-to respin for that.
-
->  
-> -	ccw = kzalloc(sizeof(*ccw), GFP_DMA | GFP_KERNEL);
-> +	ccw = ccw_device_dma_zalloc(vcdev->cdev, sizeof(*ccw));
->  	if (!ccw)
->  		return 0;
->  
-> -	features = kzalloc(sizeof(*features), GFP_DMA | GFP_KERNEL);
-> +	features = ccw_device_dma_zalloc(vcdev->cdev, sizeof(*features));
->  	if (!features) {
->  		rc = 0;
->  		goto out_free;
-
-(...)
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+I think the code in here looks sane from my point of view (except for
+the one easy-to-fix issue I found); I would be fine with the virtio-ccw
+patches making it into the kernel via the s390 tree (and not via the
+virtio tree).
