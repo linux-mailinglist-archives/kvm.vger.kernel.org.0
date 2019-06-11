@@ -2,256 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F6D93D33A
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 19:03:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6074E3D350
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 19:04:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405660AbfFKRDD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 13:03:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56772 "EHLO mx1.redhat.com"
+        id S2405630AbfFKRDu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 13:03:50 -0400
+Received: from foss.arm.com ([217.140.110.172]:37818 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404282AbfFKRDD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 13:03:03 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8D67530C252E;
-        Tue, 11 Jun 2019 17:02:37 +0000 (UTC)
-Received: from gondolin (ovpn-204-147.brq.redhat.com [10.40.204.147])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E032C19698;
-        Tue, 11 Jun 2019 17:02:14 +0000 (UTC)
-Date:   Tue, 11 Jun 2019 19:02:09 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Pankaj Gupta <pagupta@redhat.com>
-Cc:     dm-devel@redhat.com, linux-nvdimm@lists.01.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org, dan.j.williams@intel.com,
-        zwisler@kernel.org, vishal.l.verma@intel.com, dave.jiang@intel.com,
-        mst@redhat.com, jasowang@redhat.com, willy@infradead.org,
-        rjw@rjwysocki.net, hch@infradead.org, lenb@kernel.org,
-        jack@suse.cz, tytso@mit.edu, adilger.kernel@dilger.ca,
-        darrick.wong@oracle.com, lcapitulino@redhat.com, kwolf@redhat.com,
-        imammedo@redhat.com, jmoyer@redhat.com, nilal@redhat.com,
-        riel@surriel.com, stefanha@redhat.com, aarcange@redhat.com,
-        david@redhat.com, david@fromorbit.com,
-        xiaoguangrong.eric@gmail.com, pbonzini@redhat.com,
-        yuval.shaia@oracle.com, kilobyte@angband.pl, jstaron@google.com,
-        rdunlap@infradead.org, snitzer@redhat.com
-Subject: Re: [PATCH v12 2/7] virtio-pmem: Add virtio pmem driver
-Message-ID: <20190611190209.0b25033e.cohuck@redhat.com>
-In-Reply-To: <20190611163802.25352-3-pagupta@redhat.com>
-References: <20190611163802.25352-1-pagupta@redhat.com>
-        <20190611163802.25352-3-pagupta@redhat.com>
-Organization: Red Hat GmbH
+        id S2405174AbfFKRDu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jun 2019 13:03:50 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BD777337;
+        Tue, 11 Jun 2019 10:03:47 -0700 (PDT)
+Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4D7AB3F73C;
+        Tue, 11 Jun 2019 10:03:46 -0700 (PDT)
+From:   Marc Zyngier <marc.zyngier@arm.com>
+To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Julien Thierry <julien.thierry@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        "Raslan, KarimAllah" <karahmed@amazon.de>,
+        "Saidi, Ali" <alisaidi@amazon.com>
+Subject: [PATCH v2 0/9] KVM: arm/arm64: vgic: ITS translation cache
+Date:   Tue, 11 Jun 2019 18:03:27 +0100
+Message-Id: <20190611170336.121706-1-marc.zyngier@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Tue, 11 Jun 2019 17:03:02 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 11 Jun 2019 22:07:57 +0530
-Pankaj Gupta <pagupta@redhat.com> wrote:
+It recently became apparent[1] that our LPI injection path is not as
+efficient as it could be when injecting interrupts coming from a VFIO
+assigned device.
 
-> This patch adds virtio-pmem driver for KVM guest.
-> 
-> Guest reads the persistent memory range information from
-> Qemu over VIRTIO and registers it on nvdimm_bus. It also
-> creates a nd_region object with the persistent memory
-> range information so that existing 'nvdimm/pmem' driver
-> can reserve this into system memory map. This way
-> 'virtio-pmem' driver uses existing functionality of pmem
-> driver to register persistent memory compatible for DAX
-> capable filesystems.
-> 
-> This also provides function to perform guest flush over
-> VIRTIO from 'pmem' driver when userspace performs flush
-> on DAX memory range.
-> 
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> Acked-by: Jakub Staron <jstaron@google.com>
-> Tested-by: Jakub Staron <jstaron@google.com>
-> ---
->  drivers/nvdimm/Makefile          |   1 +
->  drivers/nvdimm/nd_virtio.c       | 124 +++++++++++++++++++++++++++++++
->  drivers/nvdimm/virtio_pmem.c     | 122 ++++++++++++++++++++++++++++++
->  drivers/nvdimm/virtio_pmem.h     |  55 ++++++++++++++
->  drivers/virtio/Kconfig           |  11 +++
->  include/uapi/linux/virtio_ids.h  |   1 +
->  include/uapi/linux/virtio_pmem.h |  35 +++++++++
->  7 files changed, 349 insertions(+)
->  create mode 100644 drivers/nvdimm/nd_virtio.c
->  create mode 100644 drivers/nvdimm/virtio_pmem.c
->  create mode 100644 drivers/nvdimm/virtio_pmem.h
->  create mode 100644 include/uapi/linux/virtio_pmem.h
+Although the proposed patch wasn't 100% correct, it outlined at least
+two issues:
 
-Sorry about being late to the party; this one has been sitting in my
-'to review' queue for far too long :(
+(1) Injecting an LPI from VFIO always results in a context switch to a
+    worker thread: no good
 
-(...)
+(2) We have no way of amortising the cost of translating a DID+EID pair
+    to an LPI number
 
-> diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
-> new file mode 100644
-> index 000000000000..efc535723517
-> --- /dev/null
-> +++ b/drivers/nvdimm/nd_virtio.c
-> @@ -0,0 +1,124 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * virtio_pmem.c: Virtio pmem Driver
-> + *
-> + * Discovers persistent memory range information
-> + * from host and provides a virtio based flushing
-> + * interface.
-> + */
-> +#include "virtio_pmem.h"
-> +#include "nd.h"
-> +
-> + /* The interrupt handler */
-> +void host_ack(struct virtqueue *vq)
-> +{
-> +	struct virtio_pmem *vpmem = vq->vdev->priv;
-> +	struct virtio_pmem_request *req_data, *req_buf;
-> +	unsigned long flags;
-> +	unsigned int len;
-> +
-> +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	while ((req_data = virtqueue_get_buf(vq, &len)) != NULL) {
-> +		req_data->done = true;
-> +		wake_up(&req_data->host_acked);
-> +
-> +		if (!list_empty(&vpmem->req_list)) {
-> +			req_buf = list_first_entry(&vpmem->req_list,
-> +					struct virtio_pmem_request, list);
-> +			req_buf->wq_buf_avail = true;
-> +			wake_up(&req_buf->wq_buf);
-> +			list_del(&req_buf->list);
-> +		}
-> +	}
-> +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +}
-> +EXPORT_SYMBOL_GPL(host_ack);
+The reason for (1) is that we may sleep when translating an LPI, so we
+do need a context process. A way to fix that is to implement a small
+LPI translation cache that could be looked up from an atomic
+context. It would also solve (2).
 
-Nit: 'host_ack' looks a bit generic for an exported function... would
-'virtio_pmem_host_ack' maybe be better?
+This is what this small series proposes. It implements a very basic
+LRU cache of pre-translated LPIs, which gets used to implement
+kvm_arch_set_irq_inatomic. The size of the cache is currently
+hard-coded at 16 times the number of vcpus, a number I have picked
+under the influence of Ali Saidi. If that's not enough for you, blame
+me, though.
 
-> +
-> + /* The request submission function */
-> +int virtio_pmem_flush(struct nd_region *nd_region)
+Does it work? well, it doesn't crash, and is thus perfect. More
+seriously, I don't really have a way to benchmark it directly, so my
+observations are only indirect:
 
-I don't see an EXPORT_SYMBOL_GPL() for this function... should it get
-one, or should it be made static?
+On a TX2 system, I run a 4 vcpu VM with an Ethernet interface passed
+to it directly. From the host, I inject interrupts using debugfs. In
+parallel, I look at the number of context switch, and the number of
+interrupts on the host. Without this series, I get the same number for
+both IRQ and CS (about half a million of each per second is pretty
+easy to reach). With this series, the number of context switches drops
+to something pretty small (in the low 2k), while the number of
+interrupts stays the same.
 
-> +{
-> +	struct virtio_device *vdev = nd_region->provider_data;
-> +	struct virtio_pmem *vpmem  = vdev->priv;
-> +	struct virtio_pmem_request *req_data;
-> +	struct scatterlist *sgs[2], sg, ret;
-> +	unsigned long flags;
-> +	int err, err1;
-> +
-> +	might_sleep();
-> +	req_data = kmalloc(sizeof(*req_data), GFP_KERNEL);
-> +	if (!req_data)
-> +		return -ENOMEM;
-> +
-> +	req_data->done = false;
-> +	init_waitqueue_head(&req_data->host_acked);
-> +	init_waitqueue_head(&req_data->wq_buf);
-> +	INIT_LIST_HEAD(&req_data->list);
-> +	req_data->req.type = cpu_to_virtio32(vdev, VIRTIO_PMEM_REQ_TYPE_FLUSH);
-> +	sg_init_one(&sg, &req_data->req, sizeof(req_data->req));
-> +	sgs[0] = &sg;
-> +	sg_init_one(&ret, &req_data->resp.ret, sizeof(req_data->resp));
-> +	sgs[1] = &ret;
-> +
-> +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	 /*
-> +	  * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual
-> +	  * queue does not have free descriptor. We add the request
-> +	  * to req_list and wait for host_ack to wake us up when free
-> +	  * slots are available.
-> +	  */
-> +	while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req_data,
-> +					GFP_ATOMIC)) == -ENOSPC) {
-> +
-> +		dev_err(&vdev->dev, "failed to send command to virtio pmem device, no free slots in the virtqueue\n");
+Yes, this is a pretty rubbish benchmark, what did you expect? ;-)
 
-Hm... by the comment above I would have thought that this is not really
-an error, but rather a temporary condition? Maybe downgrade this to
-dev_info()?
+So I'm putting this out for people with real workloads to try out and
+report what they see.
 
-> +		req_data->wq_buf_avail = false;
-> +		list_add_tail(&req_data->list, &vpmem->req_list);
-> +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +
-> +		/* A host response results in "host_ack" getting called */
-> +		wait_event(req_data->wq_buf, req_data->wq_buf_avail);
-> +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> +	}
-> +	err1 = virtqueue_kick(vpmem->req_vq);
-> +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> +	/*
-> +	 * virtqueue_add_sgs failed with error different than -ENOSPC, we can't
-> +	 * do anything about that.
-> +	 */
+[1] https://lore.kernel.org/lkml/1552833373-19828-1-git-send-email-yuzenghui@huawei.com/
 
-Does it make sense to kick if you couldn't add at all?
+* From v1:
 
-> +	if (err || !err1) {
-> +		dev_info(&vdev->dev, "failed to send command to virtio pmem device\n");
+  - Fixed race on allocation, where the same LPI could be cached multiple times
+  - Now invalidate the cache on vgic teardown, avoiding memory leaks
+  - Change patch split slightly, general reshuffling
+  - Small cleanups here and there
+  - Rebased on 5.2-rc4
 
-If this is dev_info, I think the error above really should be dev_info
-as well (and maybe also log the error value)?
+Marc Zyngier (9):
+  KVM: arm/arm64: vgic: Add LPI translation cache definition
+  KVM: arm/arm64: vgic: Add __vgic_put_lpi_locked primitive
+  KVM: arm/arm64: vgic-its: Add MSI-LPI translation cache invalidation
+  KVM: arm/arm64: vgic-its: Invalidate MSI-LPI translation cache on
+    specific commands
+  KVM: arm/arm64: vgic-its: Invalidate MSI-LPI translation cache on
+    disabling LPIs
+  KVM: arm/arm64: vgic-its: Invalidate MSI-LPI translation cache on vgic
+    teardown
+  KVM: arm/arm64: vgic-its: Cache successful MSI->LPI translation
+  KVM: arm/arm64: vgic-its: Check the LPI translation cache on MSI
+    injection
+  KVM: arm/arm64: vgic-irqfd: Implement kvm_arch_set_irq_inatomic
 
-> +		err = -EIO;
-> +	} else {
-> +		/* A host repsonse results in "host_ack" getting called */
-> +		wait_event(req_data->host_acked, req_data->done);
-> +		err = virtio32_to_cpu(vdev, req_data->resp.ret);
-> +	}
-> +
-> +	kfree(req_data);
-> +	return err;
-> +};
-> +
-> +/* The asynchronous flush callback function */
-> +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
-> +{
-> +	/* Create child bio for asynchronous flush and chain with
-> +	 * parent bio. Otherwise directly call nd_region flush.
-> +	 */
+ include/kvm/arm_vgic.h           |   3 +
+ virt/kvm/arm/vgic/vgic-init.c    |   5 +
+ virt/kvm/arm/vgic/vgic-irqfd.c   |  36 +++++-
+ virt/kvm/arm/vgic/vgic-its.c     | 204 +++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio-v3.c |   4 +-
+ virt/kvm/arm/vgic/vgic.c         |  26 ++--
+ virt/kvm/arm/vgic/vgic.h         |   5 +
+ 7 files changed, 267 insertions(+), 16 deletions(-)
 
-Nit: The comment should start with an otherwise empty /* line.
+-- 
+2.20.1
 
-> +	if (bio && bio->bi_iter.bi_sector != -1) {
-> +		struct bio *child = bio_alloc(GFP_ATOMIC, 0);
-> +
-> +		if (!child)
-> +			return -ENOMEM;
-> +		bio_copy_dev(child, bio);
-> +		child->bi_opf = REQ_PREFLUSH;
-> +		child->bi_iter.bi_sector = -1;
-> +		bio_chain(child, bio);
-> +		submit_bio(child);
-> +		return 0;
-> +	}
-> +	if (virtio_pmem_flush(nd_region))
-> +		return -EIO;
-> +
-> +	return 0;
-> +};
-> +EXPORT_SYMBOL_GPL(async_pmem_flush);
-> +MODULE_LICENSE("GPL");
-
-(...)
-
-I have only some more minor comments; on the whole, this looks good to
-me.
