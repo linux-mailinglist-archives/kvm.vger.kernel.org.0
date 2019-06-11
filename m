@@ -2,139 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 349653CA30
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 13:40:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B9FB3CA65
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 13:51:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403784AbfFKLkM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 07:40:12 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:43858 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389839AbfFKLkL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 07:40:11 -0400
-Received: by mail-wr1-f67.google.com with SMTP id p13so2543918wru.10;
-        Tue, 11 Jun 2019 04:40:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:subject:to:cc:references:from:openpgp:autocrypt:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=em9a5c0yFqdrvuzqwVxuFXpJaUhgDuicKQGVbe7tel8=;
-        b=DugH0Pe92Syj0dN+qGmocNpPu5t9g0BYj4ZgBJ5LE6Areja2C6ibXfq/kBIw2b+U6x
-         oFg6QerSf6+HmwGnu+hG2lwIIk5g+pci9TJTqVSLDmyYZF1gyHyjuo0QKeoap1SU4HTr
-         iCOq7HxcGvTwy4JO1TBqPE+9P9k2lRPk2tZtl5nyAFbdHPN8wdOOTxslYqShrL7wkSLx
-         KPm1R29V9PbSLZU9GA/fcvjGXkXCuv9woM+rpWkt6oxIBrb+FOo1YSJ2rfYkP6ZRpg7C
-         G/+alOgcCfK4a5p6gurtqa+YlYbW/qS5AJ9vR19G6BbMNRaRwcJUIJuJ/jAlq9Yje24n
-         kv5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
-         :autocrypt:message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=em9a5c0yFqdrvuzqwVxuFXpJaUhgDuicKQGVbe7tel8=;
-        b=cUHultPWoo3PTsfDH5drfobyO9XLAjBMzo4iNlAHF6kY4pU37zAoKTQbk0Obmo1LPn
-         kFLr4RrSz8bz1eZbGBidi+OJ7fOfGYbrYBfSaBaNdkOlPQFkDRzwWlKOeKeJQPz/0jMy
-         RRwxvhtl/v0uS9k9EvGjt2J1JkuLeUhvMhEGYaY1oGcqArScFMCAkjfmaGn+gck9MiKO
-         H+zKdXo3VjE4Iu6jzRhMCN3+ZgMK6AwScxSvwjvWD/7yhdiA+E+BHZvnYN7vIgOA41Dw
-         NuZm0o+o6IXVnw5Mmq116m/BKzH9m09qVUfhvC8A29+9PFG+UaTIYy7W/RMA0JryYdNR
-         IXWw==
-X-Gm-Message-State: APjAAAUN/X+JZBUY8QqZlL7m66w+DHFsHpXQOlqVI6u/TfxDuEquAdVL
-        ZNAb6Dwz03H9+TDKAUkNygc=
-X-Google-Smtp-Source: APXvYqwASjBh17Z+Ef/czBcLdaGdnb///IUGfuJd50jvEw5VxRJeyqu02ii9MkcA7Geq0dNjQLqIgQ==
-X-Received: by 2002:a5d:4489:: with SMTP id j9mr4277436wrq.15.1560253208905;
-        Tue, 11 Jun 2019 04:40:08 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:8cc3:8abd:4519:2cd6? ([2001:b07:6468:f312:8cc3:8abd:4519:2cd6])
-        by smtp.googlemail.com with ESMTPSA id d10sm20916346wrh.91.2019.06.11.04.40.07
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 11 Jun 2019 04:40:08 -0700 (PDT)
-Subject: Re: [PATCH v2 2/3] KVM: LAPIC: lapic timer interrupt is injected by
- posted interrupt
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-References: <1559799086-13912-1-git-send-email-wanpengli@tencent.com>
- <1559799086-13912-3-git-send-email-wanpengli@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
- uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <c5530947-d48d-e3da-3056-ed64f7fa9a9d@redhat.com>
-Date:   Tue, 11 Jun 2019 13:40:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S2389499AbfFKLvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 07:51:35 -0400
+Received: from foss.arm.com ([217.140.110.172]:59358 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727278AbfFKLve (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jun 2019 07:51:34 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14D75344;
+        Tue, 11 Jun 2019 04:51:34 -0700 (PDT)
+Received: from localhost (e113682-lin.copenhagen.arm.com [10.32.144.41])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F1A463F557;
+        Tue, 11 Jun 2019 04:53:15 -0700 (PDT)
+Date:   Tue, 11 Jun 2019 13:51:32 +0200
+From:   Christoffer Dall <christoffer.dall@arm.com>
+To:     Andrea Arcangeli <aarcange@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, Jerome Glisse <jglisse@redhat.com>
+Subject: Re: Reference count on pages held in secondary MMUs
+Message-ID: <20190611115132.GB5318@e113682-lin.lund.arm.com>
+References: <20190609081805.GC21798@e113682-lin.lund.arm.com>
+ <3ca445bb-0f48-3e39-c371-dd197375c966@redhat.com>
+ <20190609174024.GA4785@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1559799086-13912-3-git-send-email-wanpengli@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190609174024.GA4785@redhat.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/06/19 07:31, Wanpeng Li wrote:
-> +static inline bool can_posted_interrupt_inject_timer(struct kvm_vcpu *vcpu)
-> +{
-> +	return posted_interrupt_inject_timer_enabled(vcpu) &&
-> +		!vcpu_halt_in_guest(vcpu);
-> +}
-> +
+On Sun, Jun 09, 2019 at 01:40:24PM -0400, Andrea Arcangeli wrote:
+> Hello,
+> 
+> On Sun, Jun 09, 2019 at 11:37:19AM +0200, Paolo Bonzini wrote:
+> > On 09/06/19 10:18, Christoffer Dall wrote:
+> > > In some sense, we are thus maintaining a 'hidden', or internal,
+> > > reference to the page, which is not counted anywhere.
+> > > 
+> > > I am wondering if it would be equally valid to take a reference on the
+> > > page, and remove that reference when unmapping via MMU notifiers, and if
+> > > so, if there would be any advantages/drawbacks in doing so?
+> > 
+> > If I understand correctly, I think the MMU notifier would not fire if
+> > you took an actual reference; the page would be pinned in memory and
+> > could not be swapped out.
+> 
+> MMU notifiers still fires, the refcount is simple and can be dropped
+> also in the mmu notifier invalidate 
 
-I agree with Radim, what you want here is just use kvm_hlt_in_guest.
+Sorry, what does this mean?  Do you mean that we can either do:
 
-I'll post shortly a prerequisite patch to block APF artificial halt when
-kvm_hlt_in_guest is true.
+  on_vm_s2_fault() {
+      page = gup();
+      map_page_in_s2_mmu();
+      put_page();
+  }
 
-Paolo
+  mmu_notifier_invalidate() {
+      unmap_page_in_s2_mmu();
+  }
+
+or
+
+  on_vm_s2_fault() {
+      page = gup();
+      map_page_in_s2_mmu();
+  }
+
+  mmu_notifier_invalidate() {
+      unmap_page_in_s2_mmu();
+      put_page();
+  }
+
+
+> and in fact Jerome also thinks
+> like me that we should eventually optimize away the FOLL_GET and not
+> take the refcount in the first place, 
+
+So if I understood the above correct, the next point is that there are
+advantages to avoiding keeping the extra reference on that page, because
+we have problematic race conditions related to set_page_dirty(), and we
+can reduce the problem of race conditions further by not getting a
+reference on the page at all when going GUP as part of a KVM fault?
+
+Can you explain, or provide a pointer to, the root cause of the
+problem with holding a reference on the page and setting it dirty?
+
+> but a whole different chapter is
+> dedicated on the set_page_dirty_lock crash on MAP_SHARED mappings
+> after long term GUP pins. So since you're looking into how to handle
+> the page struct in the MMU notifier it's worth mentioning the issues
+> related to set_page_dirty too.
+
+Is there some background info on the "set_page_dirty_lock crash on
+MAP_SHARED" ?  I'm having trouble following this without the background.
+
+> 
+> To achieve the cleanest writeback fix to avoid crashes in
+> set_page_dirty_lock on long term secondary MMU mappings that supports
+> MMU notifier like KVM shadow MMU, the ideal is to mark the page dirty
+> before establishing a writable the mapping in the secondary MMU like
+> in the model below.
+> 
+> The below solution works also for those secondary MMU that are like a
+> TLB and if there are two concurrent invalidates on the same page
+> invoked at the same time (a potential problem Jerome noticed), you
+> don't know which come out first and you would risk to call
+> set_page_dirty twice, which would be still potentially kernel crashing
+> (even if only a theoretical issue like O_DIRECT).
+
+Why is it problematic to call set_page_dirty() twice?  I thought that at
+worst it would only lead to writing out data to disk unnecessarily ?
+
+I am also not familiar with a problem related to KVM and O_DIRECT, so
+I'm having trouble keeping up here as well :(
+
+
+> So the below model
+> will solve that and it's also valid for KVM/vhost accelleration,
+> despite KVM can figure out how to issue a single set_page_dirty call
+> for each spte that gets invalidated by concurrent invalidates on the
+> same page because it has shadow pagetables and it's not just a TLB.
+> 
+>   access = FOLL_WRITE|FOLL_GET
+> 
+> repeat:
+>   page = gup(access)
+>   put_page(page)
+> 
+>   spin_lock(mmu_notifier_lock);
+>   if (race with invalidate) {
+>     spin_unlock..
+>     goto repeat;
+>   }
+>   if (access == FOLL_WRITE)
+>     set_page_dirty(page)
+>   establish writable mapping in secondary MMU on page
+>   spin_unlock
+> 
+> The above solves the crash in set_page_dirty_lock without having to
+> modify any filesystem, it should work theoretically safer than the
+> O_DIRECT short term GUP pin.
+
+That is not exactly how we do things today on the arm64 side.  We do
+something that looks like:
+
+  /*
+   * user_mem_abort is our function for a secondary MMU fault that
+   * resolves to a memslot.
+   */
+  user_mem_abort() {
+      page = gup(access, &writable);
+      spin_lock(&kvm->mmu_lock);
+      if (mmu_notifier_retry(kvm, mmu_seq))
+          goto out; /* run the VM again and see what happens */
+
+      if (writable)
+          kvm_set_pfn_dirty(page_to_pfn(page));
+      stage2_set_pte(); /* establish_writable mapping in secondary MMU on page */
+
+  out:
+      spin_unlock(&kvm_mmu_lock);
+      put_page(page);
+  }
+
+Should we rework this to address the race you are refering to, and are
+other architectures already safe against this?
+
+> 
+> With regard to KVM this should be enough, but we also look for a crash
+> avoidance solution for those devices that cannot support the MMU
+> notifier for short and long term GUP pins.
+
+Sorry, can you define short and long term GUP pins, and do we have
+current examples of both?
+
+
+> 
+> There's lots of work going on on linux-mm, to try to let those devices
+> support writeback in a safe way (also with stable pages so all fs
+> integrity checks will pass) using bounce buffer if a long term GUP pin
+> is detected by the filesystem. In addition there's other work to make
+> the short term GUP pin theoretically safe by delaying the writeback
+> for the short window the GUP pin is taken by O_DIRECT, so it becomes
+> theoretically safe too (currently it's only practically safe).
+> 
+> However I'm not sure if the long term GUP pins really needs to support
+> writeback.
+> 
+
+I don't think I understand the distinction between a long term GUP pin
+that supports writeback vs. a short term GUP pin.  My question was
+whether or not the pin could be dropped at the time the mapping was torn
+down, or if it has to be done at the same time the mapping is
+established, for things to work properly wrt. the semantics of memory
+behavior of the rest of the kernel.
+
+I'm not sure if we're talking about the same thing here, or if you're
+explaining a different scenario?
+
+
+Thanks,
+
+    Christoffer
