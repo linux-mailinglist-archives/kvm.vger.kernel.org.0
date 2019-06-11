@@ -2,111 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E57F03CB27
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 14:24:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C56F13CCA4
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2019 15:11:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389125AbfFKMYH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 08:24:07 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:46803 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389014AbfFKMYC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 08:24:02 -0400
-Received: by mail-pf1-f196.google.com with SMTP id 81so7326786pfy.13;
-        Tue, 11 Jun 2019 05:24:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=jpK78n7EuwzwuUYa9uLDGGpmavtbv1Fbssm0HIpkmiA=;
-        b=V4KwM3GLF7HCRFJQBiPn0U0u3Yoq3BpbibnG1fmmwO4ZjhuKm5myUMGG1TFMWlClpo
-         P8JMYHtkcGHvWtDoTgrA8Kyze2rcwUkcgE3vzogbTcBG9+oHJqZFcaQmEJ7mW4FgQLqU
-         UpQkPWnK75g4Wx7sM9bBlItGeVBxl9U8IdYU53ZGmkl9eONwB88AwrvJ+/DegmNS+vnB
-         z/zRVEO89+JJ4m1g4zo6hk779nyb1gWqbQ5OFGFoOR7NWRSSOAte30ANIc3H8yKJRKUu
-         LrlqSgV6ngJ1MA/VMMQob1JnseU5xbbz0gpHBksces9aOZ95CWmmk/tcJ/faHr5Jx1Be
-         ifeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=jpK78n7EuwzwuUYa9uLDGGpmavtbv1Fbssm0HIpkmiA=;
-        b=Z2qePusxNFkeu+gTgoq9Eb61TpE94riAzM2OuKYgnAFSIU0MvtOtShFBUv+nk6hQQ3
-         x9kyZ9N3ORf2AFj3Lb5gLZHaA5WPl8VCAH/knYRcFBBy9Q3hOqm4U1Li9mjrezBwcwxa
-         XVZvz9SRYOQ8vysDPIqIgkqq3ImPpJdpEs+0NL0jmQBAnUM88Th6HNLw0IEbHg7DcWbb
-         eIOIlhujvwoNqwfCcrKJuD+sVh13jzaY5JU1m8RJeOqdIH1zhnrATuQ16sekmTYNf/F1
-         6gx1ClfsQmpQymtSbZtpZqtKsnjPSjipdh9p6lHkH/1AOtDOKCTGvP40rD49Dd22LtDe
-         gfuQ==
-X-Gm-Message-State: APjAAAWi/jNICoS/2S0i9jRfoYHoM06F4SD1SKT6m0t1GNuGRzcII/8x
-        iHEfPi6b2wOsw1be10KD2+X018/Q
-X-Google-Smtp-Source: APXvYqwUCQThZamEpHtqoJvNjZFPGs7bzsmpbp1MOs9ez3BVKjK/e0lKZvGo0G0RX7J3ChoivEUPkA==
-X-Received: by 2002:a65:4b88:: with SMTP id t8mr20722333pgq.374.1560255841015;
-        Tue, 11 Jun 2019 05:24:01 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id 127sm14832271pfc.159.2019.06.11.05.23.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Tue, 11 Jun 2019 05:24:00 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>
-Subject: [PATCH v4 3/3] KVM: X86: Expose PV_SCHED_YIELD CPUID feature bit to guest
-Date:   Tue, 11 Jun 2019 20:23:50 +0800
-Message-Id: <1560255830-8656-4-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1560255830-8656-1-git-send-email-wanpengli@tencent.com>
-References: <1560255830-8656-1-git-send-email-wanpengli@tencent.com>
+        id S2389908AbfFKNLf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 09:11:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41482 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726713AbfFKNLf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jun 2019 09:11:35 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 875513082E6A;
+        Tue, 11 Jun 2019 13:11:19 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 374A45D704;
+        Tue, 11 Jun 2019 13:11:08 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 4A3B74EBC9;
+        Tue, 11 Jun 2019 13:10:59 +0000 (UTC)
+Date:   Tue, 11 Jun 2019 09:10:58 -0400 (EDT)
+From:   Pankaj Gupta <pagupta@redhat.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org,
+        mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
+        qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
+        dm-devel@redhat.com, adilger kernel <adilger.kernel@dilger.ca>,
+        zwisler@kernel.org, aarcange@redhat.com,
+        dave jiang <dave.jiang@intel.com>, jstaron@google.com,
+        linux-nvdimm@lists.01.org,
+        vishal l verma <vishal.l.verma@intel.com>, david@redhat.com,
+        willy@infradead.org, hch@infradead.org, linux-acpi@vger.kernel.org,
+        jmoyer@redhat.com, linux-ext4@vger.kernel.org, lenb@kernel.org,
+        kilobyte@angband.pl, rdunlap@infradead.org, riel@surriel.com,
+        yuval shaia <yuval.shaia@oracle.com>, stefanha@redhat.com,
+        pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>,
+        lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
+        tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
+        darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
+        linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, imammedo@redhat.com
+Message-ID: <1206355816.34396746.1560258658768.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190610192803.GA29002@redhat.com>
+References: <20190610090730.8589-1-pagupta@redhat.com> <20190610090730.8589-5-pagupta@redhat.com> <20190610192803.GA29002@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v11 4/7] dm: enable synchronous dax
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.33, 10.4.195.27]
+Thread-Topic: enable synchronous dax
+Thread-Index: 9TyGIIOSkuHn9exFInDwoSOU8/oLjA==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 11 Jun 2019 13:11:34 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+Hi Mike,
 
-Expose PV_SCHED_YIELD feature bit to guest, the guest can check this
-feature bit before using paravirtualized sched yield.
+Thanks for the review Please find my reply inline.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: Liran Alon <liran.alon@oracle.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- Documentation/virtual/kvm/cpuid.txt | 4 ++++
- arch/x86/kvm/cpuid.c                | 3 ++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> dm_table_supports_dax() is called multiple times (from
+> dm_table_set_restrictions and dm_table_determine_type).  It is strange
+> to have a getter have a side-effect of being a setter too.  Overloading
+> like this could get you in trouble in the future.
+> 
+> Are you certain this is what you want?
 
-diff --git a/Documentation/virtual/kvm/cpuid.txt b/Documentation/virtual/kvm/cpuid.txt
-index 97ca194..1c39683 100644
---- a/Documentation/virtual/kvm/cpuid.txt
-+++ b/Documentation/virtual/kvm/cpuid.txt
-@@ -66,6 +66,10 @@ KVM_FEATURE_PV_SEND_IPI            ||    11 || guest checks this feature bit
-                                    ||       || before using paravirtualized
-                                    ||       || send IPIs.
- ------------------------------------------------------------------------------
-+KVM_FEATURE_PV_SHED_YIELD          ||    12 || guest checks this feature bit
-+                                   ||       || before using paravirtualized
-+                                   ||       || sched yield.
-+------------------------------------------------------------------------------
- KVM_FEATURE_CLOCKSOURCE_STABLE_BIT ||    24 || host will warn if no guest-side
-                                    ||       || per-cpu warps are expected in
-                                    ||       || kvmclock.
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 60f87ba..38fc653 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -653,7 +653,8 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
- 			     (1 << KVM_FEATURE_PV_UNHALT) |
- 			     (1 << KVM_FEATURE_PV_TLB_FLUSH) |
- 			     (1 << KVM_FEATURE_ASYNC_PF_VMEXIT) |
--			     (1 << KVM_FEATURE_PV_SEND_IPI);
-+			     (1 << KVM_FEATURE_PV_SEND_IPI) |
-+			     (1 << KVM_FEATURE_PV_SCHED_YIELD);
- 
- 		if (sched_info_on())
- 			entry->eax |= (1 << KVM_FEATURE_STEAL_TIME);
--- 
-2.7.4
+I agree with you.
 
+> 
+> Or would it be better to refactor dm_table_supports_dax() to take an
+> iterate_devices_fn arg and have callers pass the appropriate function?
+> Then have dm_table_set_restrictions() caller do:
+> 
+>      if (dm_table_supports_dax(t, device_synchronous, NULL))
+>                set_dax_synchronous(t->md->dax_dev);
+> 
+> (NULL arg implies dm_table_supports_dax() refactoring would take a int
+> *data pointer rather than int type).
+> 
+> Mike
+> 
+
+I am sending below patch as per your suggestion. Does it look
+near to what you have in mind?
+
+Thank you,
+Pankaj
+
+===============
+
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 350cf0451456..8d89acc8b8c2 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -881,7 +881,7 @@ void dm_table_set_type(struct dm_table *t, enum dm_queue_mode type)
+ EXPORT_SYMBOL_GPL(dm_table_set_type);
+
+ /* validate the dax capability of the target device span */
+-static int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
++int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
+                                       sector_t start, sector_t len, void *data)
+ {
+        int blocksize = *(int *) data;
+@@ -890,7 +890,15 @@ static int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
+                        start, len);
+ }
+
+-bool dm_table_supports_dax(struct dm_table *t, int blocksize)
++/* Check devices support synchronous DAX */
++static int device_synchronous(struct dm_target *ti, struct dm_dev *dev,
++                                      sector_t start, sector_t len, void *data)
++{
++       return dax_synchronous(dev->dax_dev);
++}
++
++bool dm_table_supports_dax(struct dm_table *t,
++                         iterate_devices_callout_fn iterate_fn, int *blocksize)
+ {
+        struct dm_target *ti;
+        unsigned i;
+@@ -903,8 +911,7 @@ bool dm_table_supports_dax(struct dm_table *t, int blocksize)
+                        return false;
+
+                if (!ti->type->iterate_devices ||
+-                   !ti->type->iterate_devices(ti, device_supports_dax,
+-                           &blocksize))
++                       !ti->type->iterate_devices(ti, iterate_fn, blocksize))
+                        return false;
+        }
+
+@@ -940,6 +947,7 @@ static int dm_table_determine_type(struct dm_table *t)
+        struct dm_target *tgt;
+        struct list_head *devices = dm_table_get_devices(t);
+        enum dm_queue_mode live_md_type = dm_get_md_type(t->md);
++       int page_size = PAGE_SIZE;
+
+        if (t->type != DM_TYPE_NONE) {
+                /* target already set the table's type */
+@@ -984,7 +992,7 @@ static int dm_table_determine_type(struct dm_table *t)
+ verify_bio_based:
+                /* We must use this table as bio-based */
+                t->type = DM_TYPE_BIO_BASED;
+-               if (dm_table_supports_dax(t, PAGE_SIZE) ||
++               if (dm_table_supports_dax(t, device_supports_dax, &page_size) ||
+                    (list_empty(devices) && live_md_type == DM_TYPE_DAX_BIO_BASED)) {
+                        t->type = DM_TYPE_DAX_BIO_BASED;
+                } else {
+@@ -1883,6 +1891,7 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+                               struct queue_limits *limits)
+ {
+        bool wc = false, fua = false;
++       int page_size = PAGE_SIZE;
+
+        /*
+         * Copy table's limits to the DM device's request_queue
+@@ -1910,8 +1919,13 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+        }
+        blk_queue_write_cache(q, wc, fua);
+
+-       if (dm_table_supports_dax(t, PAGE_SIZE))
++       if (dm_table_supports_dax(t, device_supports_dax, &page_size)) {
++
+                blk_queue_flag_set(QUEUE_FLAG_DAX, q);
++               if (dm_table_supports_dax(t, device_synchronous, NULL))
++                       set_dax_synchronous(t->md->dax_dev);
++       }
+        else
+                blk_queue_flag_clear(QUEUE_FLAG_DAX, q);
+
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index b1caa7188209..b92c42a72ad4 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1119,7 +1119,7 @@ static bool dm_dax_supported(struct dax_device *dax_dev, struct block_device *bd
+        if (!map)
+                return false;
+
+-       ret = dm_table_supports_dax(map, blocksize);
++       ret = dm_table_supports_dax(map, device_supports_dax, &blocksize);
+
+        dm_put_live_table(md, srcu_idx);
+
+diff --git a/drivers/md/dm.h b/drivers/md/dm.h
+index 17e3db54404c..0475673337f3 100644
+--- a/drivers/md/dm.h
++++ b/drivers/md/dm.h
+@@ -72,7 +72,10 @@ bool dm_table_bio_based(struct dm_table *t);
+ bool dm_table_request_based(struct dm_table *t);
+ void dm_table_free_md_mempools(struct dm_table *t);
+ struct dm_md_mempools *dm_table_get_md_mempools(struct dm_table *t);
+-bool dm_table_supports_dax(struct dm_table *t, int blocksize);
++bool dm_table_supports_dax(struct dm_table *t, iterate_devices_callout_fn fn,
++                          int *blocksize);
++int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
++                          sector_t start, sector_t len, void *data);
+
+ void dm_lock_md_type(struct mapped_device *md);
+ void dm_unlock_md_type(struct mapped_device *md);
+--
+2.20.1
