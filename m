@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 42EDB420F7
+	by mail.lfdr.de (Postfix) with ESMTP id AD372420F8
 	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 11:36:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437467AbfFLJgN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 05:36:13 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:43711 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2436605AbfFLJgM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 05:36:12 -0400
-Received: by mail-pf1-f195.google.com with SMTP id i189so9308016pfg.10;
-        Wed, 12 Jun 2019 02:36:11 -0700 (PDT)
+        id S2437483AbfFLJgQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 05:36:16 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:39254 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2436605AbfFLJgO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 05:36:14 -0400
+Received: by mail-pl1-f193.google.com with SMTP id b7so1358835pls.6;
+        Wed, 12 Jun 2019 02:36:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=88lmluIaE7kKZILXvo6NHqb4oRYbdykbJ9/sXwZnO1M=;
-        b=UxcPVoPge84gHKa9lkF71A9zos8xXimiSmSTNVkzubPoS7hwAzD8wS4pBLPW/GPQCd
-         NqSjLmqqRUQeGzpC2IdQHwMcgNocDNceuU4XUhWuX9T/c5uLsb8ekeSgYhsA68KPBpdQ
-         UwFnsLEG/VCauoc757MpET1YncY8eFTZ3qTJVgp95Rs6IkuqsDfGnsUq0ZWOrsiVX84b
-         wdnmvsVCfOjCn7Sb9lOb+Wgf37S0IMwXUVEhbzzbuZD7RhJXWke4GvHHYXDICCt4KpW8
-         WfY1CA3apdDOMSNOfUkETH+FfhdmdDfcJBoxytO1RGBnLt16vLRbcWcu/0xLvD0zcOOv
-         8NqA==
+        bh=SwGzI5XfH1K4vXAfrjZTodx1XMnoUAT4N0Igdk71XCY=;
+        b=NgfU4ZvFIHAUa5XZscShQ8Z4CDQi0RfI7OWOhoKSu845QOerJAzhH+x01UDUvbyPJi
+         3kCOGHyPT9KgoEqEf2SDAiiphUbOvUWlx+EW5PsIj3pUsOPZyexqX9kt2lPV0xmrszeo
+         eG+EQAD0Rczv7z7k5L+sFF8GvbUDYD/BgruBmHgEdgQTAUyzFOe5lwk4hY+I80MTOsiH
+         AMEGMTiMrEwVJ89g0G1CnBvjBsxOCwW+zNxTy0FkV4/6ISJqAghOrN+eULBmTrKYiDeD
+         XgDbMOdHNVf2su+s3jYYlVodcq43xMNfIFODRB1RYsh+7sp0UBBfPo4b9tvHLWsMbtK2
+         ttvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=88lmluIaE7kKZILXvo6NHqb4oRYbdykbJ9/sXwZnO1M=;
-        b=LXegbZnSYVvHTm0VYfSvkNXh4+ZpYTew82te+sBfRbW+7oQwyTfshDNt7jfS/pRgIa
-         T+330vZb3FXkLUc4gT3nrCitjO/Ex5Xs2iqNI1Z+NW2ZDYbxiodY9ttt+B16MOG++hdA
-         2xAwaUTs+emFp7fHnVaaNTnuj9RM7R9+ApLSP73fyA7vpJCUgsalUsFM2goK4sJU+uxt
-         MfNYPcTZ5mGOsod5SV67/Jb06Nde7YlVXBb9Szpq0lhHtUfg7I0x+7HdbCb9Mu5i13PY
-         FV03difH5leVVxIXxBASEDoiK+N977SlhjjMTjhFbt9N1yYhqxbIJu5L6Cp53UElwUEX
-         Kkqg==
-X-Gm-Message-State: APjAAAWFwKNpn2Vd2C7xd9OJnuNUPQca9iiyrg22EqXUWpZLU6VFM33z
-        r0M8CWrDajQHrlXD7YLtyFdZMpQB
-X-Google-Smtp-Source: APXvYqzx6SQmo43U9ZA704N0c1Y0btJ8Y2tYi1EoZ4svBE7THvNxsSr+dDoHWQ5xMnqNWUgLTVLzVw==
-X-Received: by 2002:a62:ce4f:: with SMTP id y76mr2602196pfg.21.1560332171442;
-        Wed, 12 Jun 2019 02:36:11 -0700 (PDT)
+        bh=SwGzI5XfH1K4vXAfrjZTodx1XMnoUAT4N0Igdk71XCY=;
+        b=Ln8oLsZ2E+wiZLYGLzyhWm3W1FJOgSWAKl2yJIK846Mu3EQ9Lf73Fs1W2jPaUq6jkg
+         DNth/9m6bFXGMogZ7qzqzFBpXkMuXIF5EsRXv/2D6uBaqlrYdMKA/TXTPZqWpBYGZG9Q
+         6y29+TuQzqytFzw6mX9gGbX+90C+AOtKXaAW7gJAm3FQAVf22QA9e+GpWP6d78xi+CEh
+         JSslnsX62N34Ut3S4Van2rVigNCgKWD9B1Cdt1i+l81vI0j7mN7BqgyDuLGEKzyspfGm
+         dbn+ReDaE/lGdDoPF1jJzMMNtFfqogB9bRWRKkU6f+yMm4EOgcqowRx247aO9hy7FHl7
+         cpPg==
+X-Gm-Message-State: APjAAAWSZOAb+h9n88uWvgy2Se4e9k0ubjdVqD82fh4muaPD/FGijI1v
+        xo32f879IKnfBOcSTqR3zLvm34pq
+X-Google-Smtp-Source: APXvYqwe4WQfg2VoWySAJ68UC5vy7Xn4AHB9eF6MZhzn51pcH+zW9OtDTV4KI9OyjcYMOdc86dfu+Q==
+X-Received: by 2002:a17:902:4906:: with SMTP id u6mr81809848pld.220.1560332173747;
+        Wed, 12 Jun 2019 02:36:13 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id 27sm6148936pgl.82.2019.06.12.02.36.09
+        by smtp.googlemail.com with ESMTPSA id 27sm6148936pgl.82.2019.06.12.02.36.11
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Wed, 12 Jun 2019 02:36:10 -0700 (PDT)
+        Wed, 12 Jun 2019 02:36:13 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
@@ -51,9 +51,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Liran Alon <liran.alon@oracle.com>
-Subject: [PATCH v3 1/5] KVM: LAPIC: Extract adaptive tune timer advancement logic
-Date:   Wed, 12 Jun 2019 17:35:56 +0800
-Message-Id: <1560332160-17050-2-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH v3 2/5] KVM: LAPIC: Fix lapic_timer_advance_ns parameter overflow
+Date:   Wed, 12 Jun 2019 17:35:57 +0800
+Message-Id: <1560332160-17050-3-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1560332160-17050-1-git-send-email-wanpengli@tencent.com>
 References: <1560332160-17050-1-git-send-email-wanpengli@tencent.com>
@@ -67,95 +67,43 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-Extract adaptive tune timer advancement logic to a single function.
+After commit c3941d9e0 (KVM: lapic: Allow user to disable adaptive tuning of
+timer advancement), '-1' enables adaptive tuning starting from default
+advancment of 1000ns. However, we should expose an int instead of an overflow
+uint module parameter.
 
+Before patch:
+
+/sys/module/kvm/parameters/lapic_timer_advance_ns:4294967295
+
+After patch:
+
+/sys/module/kvm/parameters/lapic_timer_advance_ns:-1
+
+Fixes: c3941d9e0 (KVM: lapic: Allow user to disable adaptive tuning of timer advancement)
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Radim Krčmář <rkrcmar@redhat.com>
 Cc: Sean Christopherson <sean.j.christopherson@intel.com>
 Cc: Liran Alon <liran.alon@oracle.com>
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- arch/x86/kvm/lapic.c | 57 ++++++++++++++++++++++++++++++----------------------
- 1 file changed, 33 insertions(+), 24 deletions(-)
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index bd13fdd..2f364fe 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1501,11 +1501,40 @@ static inline void __wait_lapic_expire(struct kvm_vcpu *vcpu, u64 guest_cycles)
- 	}
- }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b63e7b0..f2e3847 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -143,7 +143,7 @@ module_param(tsc_tolerance_ppm, uint, S_IRUGO | S_IWUSR);
+  * tuning, i.e. allows priveleged userspace to set an exact advancement time.
+  */
+ static int __read_mostly lapic_timer_advance_ns = -1;
+-module_param(lapic_timer_advance_ns, uint, S_IRUGO | S_IWUSR);
++module_param(lapic_timer_advance_ns, int, S_IRUGO | S_IWUSR);
  
--void wait_lapic_expire(struct kvm_vcpu *vcpu)
-+static inline void adaptive_tune_timer_advancement(struct kvm_vcpu *vcpu,
-+				u64 guest_tsc, u64 tsc_deadline)
- {
- 	struct kvm_lapic *apic = vcpu->arch.apic;
- 	u32 timer_advance_ns = apic->lapic_timer.timer_advance_ns;
--	u64 guest_tsc, tsc_deadline, ns;
-+	u64 ns;
-+
-+	/* too early */
-+	if (guest_tsc < tsc_deadline) {
-+		ns = (tsc_deadline - guest_tsc) * 1000000ULL;
-+		do_div(ns, vcpu->arch.virtual_tsc_khz);
-+		timer_advance_ns -= min((u32)ns,
-+			timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
-+	} else {
-+	/* too late */
-+		ns = (guest_tsc - tsc_deadline) * 1000000ULL;
-+		do_div(ns, vcpu->arch.virtual_tsc_khz);
-+		timer_advance_ns += min((u32)ns,
-+			timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
-+	}
-+
-+	if (abs(guest_tsc - tsc_deadline) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
-+		apic->lapic_timer.timer_advance_adjust_done = true;
-+	if (unlikely(timer_advance_ns > 5000)) {
-+		timer_advance_ns = 0;
-+		apic->lapic_timer.timer_advance_adjust_done = true;
-+	}
-+	apic->lapic_timer.timer_advance_ns = timer_advance_ns;
-+}
-+
-+void wait_lapic_expire(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_lapic *apic = vcpu->arch.apic;
-+	u64 guest_tsc, tsc_deadline;
- 
- 	if (apic->lapic_timer.expired_tscdeadline == 0)
- 		return;
-@@ -1521,28 +1550,8 @@ void wait_lapic_expire(struct kvm_vcpu *vcpu)
- 	if (guest_tsc < tsc_deadline)
- 		__wait_lapic_expire(vcpu, tsc_deadline - guest_tsc);
- 
--	if (!apic->lapic_timer.timer_advance_adjust_done) {
--		/* too early */
--		if (guest_tsc < tsc_deadline) {
--			ns = (tsc_deadline - guest_tsc) * 1000000ULL;
--			do_div(ns, vcpu->arch.virtual_tsc_khz);
--			timer_advance_ns -= min((u32)ns,
--				timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
--		} else {
--		/* too late */
--			ns = (guest_tsc - tsc_deadline) * 1000000ULL;
--			do_div(ns, vcpu->arch.virtual_tsc_khz);
--			timer_advance_ns += min((u32)ns,
--				timer_advance_ns / LAPIC_TIMER_ADVANCE_ADJUST_STEP);
--		}
--		if (abs(guest_tsc - tsc_deadline) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
--			apic->lapic_timer.timer_advance_adjust_done = true;
--		if (unlikely(timer_advance_ns > 5000)) {
--			timer_advance_ns = 0;
--			apic->lapic_timer.timer_advance_adjust_done = true;
--		}
--		apic->lapic_timer.timer_advance_ns = timer_advance_ns;
--	}
-+	if (unlikely(!apic->lapic_timer.timer_advance_adjust_done))
-+		adaptive_tune_timer_advancement(vcpu, guest_tsc, tsc_deadline);
- }
- 
- static void start_sw_tscdeadline(struct kvm_lapic *apic)
+ static bool __read_mostly vector_hashing = true;
+ module_param(vector_hashing, bool, S_IRUGO);
 -- 
 2.7.4
 
