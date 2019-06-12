@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 151BC42075
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 11:15:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC32542072
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 11:15:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437226AbfFLJPC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 05:15:02 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:18559 "EHLO huawei.com"
+        id S2408701AbfFLJO7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 05:14:59 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:18555 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2436777AbfFLJPB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 05:15:01 -0400
+        id S2405360AbfFLJO7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 05:14:59 -0400
 Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 06646C5C9D43BF77E6DD;
+        by Forcepoint Email with ESMTP id 12076407B096C334960D;
         Wed, 12 Jun 2019 17:11:56 +0800 (CST)
 Received: from HGHY2Y004646261.china.huawei.com (10.184.12.158) by
  DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 12 Jun 2019 17:11:46 +0800
+ 14.3.439.0; Wed, 12 Jun 2019 17:11:47 +0800
 From:   Zenghui Yu <yuzenghui@huawei.com>
 To:     <linux-arm-kernel@lists.infradead.org>,
         <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
@@ -29,9 +29,9 @@ CC:     <christoffer.dall@arm.com>, <marc.zyngier@arm.com>,
         <namhyung@kernel.org>, <wanghaibin.wang@huawei.com>,
         <xiexiangyou@huawei.com>, <linuxarm@huawei.com>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v1 3/5] perf tools arm64: Add support for get_cpuid() function
-Date:   Wed, 12 Jun 2019 09:08:44 +0000
-Message-ID: <1560330526-15468-4-git-send-email-yuzenghui@huawei.com>
+Subject: [PATCH v1 4/5] perf,kvm/arm64: Add stat support on arm64
+Date:   Wed, 12 Jun 2019 09:08:45 +0000
+Message-ID: <1560330526-15468-5-git-send-email-yuzenghui@huawei.com>
 X-Mailer: git-send-email 2.6.4.windows.1
 In-Reply-To: <1560330526-15468-1-git-send-email-yuzenghui@huawei.com>
 References: <1560330526-15468-1-git-send-email-yuzenghui@huawei.com>
@@ -44,150 +44,175 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The get_cpuid() function returns the MIDR string of the first CPU.
+'perf kvm stat report/record' generates a statistical analysis of KVM
+events and can be used to analyze guest exit reasons. This patch tries
+to add stat support on arm64.
 
-Cc: Ganapatrao Kulkarni <ganapatrao.kulkarni@cavium.com>
+We have a mapping between guest's "exit_code" and "exit_reason" which
+already exists under arch/arm64/include/asm/ (kvm_arm_exception_type),
+and we've used it to report guest's exit type through trace_kvm_exit().
+Copy kvm_arm_exception_type into aarch64_guest_exits.h, thus export it
+to userspace.
+
+It records on two available KVM tracepoints for arm64: "kvm:kvm_entry"
+and "kvm:kvm_exit", and reports statistical data which includes events
+handles time, samples, and so on.
+
+A simple test go below:
+
+ # pgrep qemu
+6039
+9937
+
+ # ./tools/perf/perf kvm stat record -p 6039
+[ perf record: Woken up 3 times to write data ]
+[ perf record: Captured and wrote 15.629 MB perf.data.guest (199063 samples) ]
+
+ # ./tools/perf/perf kvm stat report --event=vmexit
+
+Analyze events for all VMs, all VCPUs:
+
+             VM-EXIT    Samples  Samples%     Time%    Min Time    Max Time         Avg time
+
+                TRAP      49040    97.15%   100.00%      2.60us   4072.98us   3431.60us ( +-   0.17% )
+                 IRQ       1437     2.85%     0.00%      0.90us     24.56us      2.06us ( +-   1.37% )
+
+Total Samples:50477, Total events handled time:168288630.04us.
+
 Cc: Arnaldo Carvalho de Melo <acme@redhat.com>
 Cc: Peter Zijlstra <peterz@infradead.org>
 Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-
 ---
-When recording, perf will write host's cpuid (through get_cpuid()) into
-perf.data.guest file:
+ tools/perf/arch/arm64/Makefile                   |  2 +
+ tools/perf/arch/arm64/util/Build                 |  1 +
+ tools/perf/arch/arm64/util/aarch64_guest_exits.h | 23 +++++++++
+ tools/perf/arch/arm64/util/kvm-stat.c            | 60 ++++++++++++++++++++++++
+ 4 files changed, 86 insertions(+)
+ create mode 100644 tools/perf/arch/arm64/util/aarch64_guest_exits.h
+ create mode 100644 tools/perf/arch/arm64/util/kvm-stat.c
 
-  __cmd_record
-    record__finish_output
-      perf_session__write_header
-        perf_header__adds_write
-          do_write_feat (type == HEADER_CPUID)
-            write_cpuid
-
-When reporting, perf will read cpuid from perf.data.guest file:
-
-  read_events
-    perf_session__new
-      perf_session__open
-        perf_session__read_header
-          perf_header__process_sections
-            perf_file_section__process
-              process_cpuid
-
-I'm not familiar with ARM ID register usage, and how does perf code make
-use of get_cpuid() function. If we left get_cpuid() unimplemented on
-arm64 (we have a default implementation in tools/perf/util/header.c),
-'perf kvm stat report' will failed with following error:
-        "Failed to look up CPU type"
-
-I will read the code further, and any comments or suggestions from both
-sides (arm64 & perf) will be appreciated.
-
----
- tools/perf/arch/arm64/util/header.c | 74 +++++++++++++++++++++++--------------
- 1 file changed, 47 insertions(+), 27 deletions(-)
-
-diff --git a/tools/perf/arch/arm64/util/header.c b/tools/perf/arch/arm64/util/header.c
-index 534cd25..5c17b86 100644
---- a/tools/perf/arch/arm64/util/header.c
-+++ b/tools/perf/arch/arm64/util/header.c
-@@ -9,17 +9,56 @@
- #define MIDR_VARIANT_SHIFT      20
- #define MIDR_VARIANT_MASK       (0xf << MIDR_VARIANT_SHIFT)
+diff --git a/tools/perf/arch/arm64/Makefile b/tools/perf/arch/arm64/Makefile
+index dbef716..172146e 100644
+--- a/tools/perf/arch/arm64/Makefile
++++ b/tools/perf/arch/arm64/Makefile
+@@ -2,6 +2,8 @@
+ ifndef NO_DWARF
+ PERF_HAVE_DWARF_REGS := 1
+ endif
++
++HAVE_KVM_STAT_SUPPORT := 1
+ PERF_HAVE_JITDUMP := 1
+ PERF_HAVE_ARCH_REGS_QUERY_REGISTER_OFFSET := 1
  
--char *get_cpuid_str(struct perf_pmu *pmu)
-+/* Return value of midr_el1 if success, else return 0. */
-+static int read_midr_el1(char *buf, int cpu_nr)
- {
--	char *buf = NULL;
- 	char path[PATH_MAX];
- 	const char *sysfs = sysfs__mountpoint();
-+	u64 midr = 0;
-+	FILE *file;
+diff --git a/tools/perf/arch/arm64/util/Build b/tools/perf/arch/arm64/util/Build
+index 3cde540..d136674 100644
+--- a/tools/perf/arch/arm64/util/Build
++++ b/tools/perf/arch/arm64/util/Build
+@@ -1,5 +1,6 @@
+ perf-y += header.o
+ perf-y += sym-handling.o
++perf-y += kvm-stat.o
+ perf-$(CONFIG_DWARF)     += dwarf-regs.o
+ perf-$(CONFIG_LOCAL_LIBUNWIND) += unwind-libunwind.o
+ perf-$(CONFIG_LIBDW_DWARF_UNWIND) += unwind-libdw.o
+diff --git a/tools/perf/arch/arm64/util/aarch64_guest_exits.h b/tools/perf/arch/arm64/util/aarch64_guest_exits.h
+new file mode 100644
+index 0000000..a8ca4b8
+--- /dev/null
++++ b/tools/perf/arch/arm64/util/aarch64_guest_exits.h
+@@ -0,0 +1,23 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef ARCH_PERF_AARCH64_GUEST_EXITS_H
++#define ARCH_PERF_AARCH64_GUEST_EXITS_H
 +
-+	if (!sysfs)
-+		return 0;
++/* virt.h */
++/* Error returned when an invalid stub number is passed into x0 */
++#define HVC_STUB_ERR	0xbadca11
 +
-+	scnprintf(path, PATH_MAX, "%s/devices/system/cpu/cpu%d"MIDR,
-+		  sysfs, cpu_nr);
++/* kvm_asm.h */
++#define ARM_EXCEPTION_IRQ         0
++#define ARM_EXCEPTION_EL1_SERROR  1
++#define ARM_EXCEPTION_TRAP        2
++#define ARM_EXCEPTION_IL          3
++/* The hyp-stub will return this for any kvm_call_hyp() call */
++#define ARM_EXCEPTION_HYP_GONE    HVC_STUB_ERR
 +
-+	file = fopen(path, "r");
-+	if (!file) {
-+		pr_debug("fopen failed for file %s\n", path);
-+		return 0;
-+	}
++#define kvm_arm_exception_type					\
++	{ARM_EXCEPTION_IRQ,		"IRQ"		},	\
++	{ARM_EXCEPTION_EL1_SERROR,	"SERROR"	},	\
++	{ARM_EXCEPTION_TRAP,		"TRAP"		},	\
++	{ARM_EXCEPTION_HYP_GONE,	"HYP_GONE"	}
 +
-+	if (!fgets(buf, MIDR_SIZE, file)) {
-+		fclose(file);
-+		return 0;
-+	}
-+	fclose(file);
++#endif
+diff --git a/tools/perf/arch/arm64/util/kvm-stat.c b/tools/perf/arch/arm64/util/kvm-stat.c
+new file mode 100644
+index 0000000..5804bc2
+--- /dev/null
++++ b/tools/perf/arch/arm64/util/kvm-stat.c
+@@ -0,0 +1,60 @@
++/*
++ * Arch specific functions for perf kvm stat.
++ *
++ * Copyright (c) 2019 - Huawei Technologies Co., Ltd.
++ * Author(s): Zenghui Yu <yuzenghui@huawei.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License, version 2, as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++#include <errno.h>
++#include "../../util/kvm-stat.h"
++#include "../../util/evsel.h"
++#include "aarch64_guest_exits.h"
 +
-+	/* Ignore/clear Variant[23:20] and Revision[3:0] of MIDR */
-+	midr = strtoul(buf, NULL, 16);
-+	midr &= (~(MIDR_VARIANT_MASK | MIDR_REVISION_MASK));
-+	scnprintf(buf, MIDR_SIZE, "0x%016lx", midr);
++define_exit_reasons_table(arm64_exit_reasons, kvm_arm_exception_type);
 +
-+	return midr;
-+}
++static struct kvm_events_ops exit_events = {
++	.is_begin_event = exit_event_begin,
++	.is_end_event = exit_event_end,
++	.decode_key = exit_event_decode_key,
++	.name = "VM-EXIT"
++};
 +
-+int get_cpuid(char *buffer, size_t sz __maybe_unused)
++const char *vcpu_id_str = "vcpu_id";
++const int decode_str_len = 20;
++const char *kvm_exit_reason = "ret";
++const char *kvm_entry_trace = "kvm:kvm_entry";
++const char *kvm_exit_trace = "kvm:kvm_exit";
++
++const char *kvm_events_tp[] = {
++	"kvm:kvm_entry",
++	"kvm:kvm_exit",
++	NULL,
++};
++
++struct kvm_reg_events_ops kvm_reg_events_ops[] = {
++	{ .name = "vmexit", .ops = &exit_events },
++	{ NULL, NULL },
++};
++
++const char * const kvm_skip_events[] = {
++	NULL,
++};
++
++int cpu_isa_init(struct perf_kvm_stat *kvm, const char *cpuid __maybe_unused)
 +{
-+	if (read_midr_el1(buffer, 0))
-+		return 0;
++	kvm->exit_reasons = arm64_exit_reasons;
++	kvm->exit_reasons_isa = "aarch64";
 +
-+	return -1;
++	return 0;
 +}
-+
-+char *get_cpuid_str(struct perf_pmu *pmu)
-+{
-+	char *buf = NULL;
- 	int cpu;
- 	u64 midr = 0;
- 	struct cpu_map *cpus;
--	FILE *file;
- 
--	if (!sysfs || !pmu || !pmu->cpus)
-+	if (!pmu || !pmu->cpus)
- 		return NULL;
- 
- 	buf = malloc(MIDR_SIZE);
-@@ -29,29 +68,10 @@ char *get_cpuid_str(struct perf_pmu *pmu)
- 	/* read midr from list of cpus mapped to this pmu */
- 	cpus = cpu_map__get(pmu->cpus);
- 	for (cpu = 0; cpu < cpus->nr; cpu++) {
--		scnprintf(path, PATH_MAX, "%s/devices/system/cpu/cpu%d"MIDR,
--				sysfs, cpus->map[cpu]);
--
--		file = fopen(path, "r");
--		if (!file) {
--			pr_debug("fopen failed for file %s\n", path);
--			continue;
--		}
--
--		if (!fgets(buf, MIDR_SIZE, file)) {
--			fclose(file);
--			continue;
--		}
--		fclose(file);
--
--		/* Ignore/clear Variant[23:20] and
--		 * Revision[3:0] of MIDR
--		 */
--		midr = strtoul(buf, NULL, 16);
--		midr &= (~(MIDR_VARIANT_MASK | MIDR_REVISION_MASK));
--		scnprintf(buf, MIDR_SIZE, "0x%016lx", midr);
--		/* got midr break loop */
--		break;
-+		midr = read_midr_el1(buf, cpus->map[cpu]);
-+		if (midr)
-+			/* got midr break loop */
-+			break;
- 	}
- 
- 	if (!midr) {
 -- 
 1.8.3.1
 
