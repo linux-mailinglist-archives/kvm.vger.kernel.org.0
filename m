@@ -2,85 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B693D41A4E
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 04:19:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95FC941A56
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 04:23:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408385AbfFLCTb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 22:19:31 -0400
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:44398 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405661AbfFLCTb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 22:19:31 -0400
-Received: by mail-oi1-f195.google.com with SMTP id e189so10511146oib.11;
-        Tue, 11 Jun 2019 19:19:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wQDTufhWXmTclfVcFNb1jQ6kdGaN6gyHA/mYmZL80sY=;
-        b=OkEWnRO7vl1Cn4QB1PZiP8eUmLStmLdSZZsd6x3jAtC+YTPd66WtvIhRvn52nZZswF
-         ItyuQ1El0/W5v5RoZZdtLMmyb7Y0S8LxZhPCDmx/cFrenjJq2hRxGw3VrwyB5CG50ZI7
-         YnEZGS5hjxqbuzbXimbtWxsWRY4LLkpn5tqWe1Bz6SpYydBMaxDVncSOWkOxaHeO3TDx
-         IZA4owuu0/Gd+5YLHzWgFue2PgJLLjscQ2TLKu89E3vNF29aC0tQIY1YRklpzXl6fZVf
-         7UYiq5jHvVDgK6DXqTvGhCXPh6EJYTfdfRLsZbaztk8pc3eeUZsfLvJJ9AecXaDFMcq2
-         D3rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wQDTufhWXmTclfVcFNb1jQ6kdGaN6gyHA/mYmZL80sY=;
-        b=ZIdoytIPkoVp/GBnWDEdnQR2epOOwzIrqpXnvVrVbZ7tgOWKAkWi6vXSyQ2qnMX1KW
-         sj9urc+jtzpOpjBC9CVknApN5RotQfnP/+6kzbbSQH1YgkAm02SrdpDi9TmldhwcAgpi
-         ox7nmuG/9IxIiM9pFH3Yr/Rk6VG3xX8w+Qq1uHf3uUvP1y0nb948sU9FVnRTEbEyNCDY
-         IS/FuQh2nWHEZ0M+F8yhSxqGndI9SihaHxi/JgdaCSpeu9M8fhulrtLlPeY70cmYS9HO
-         JPHc6SqS6ybbA4Aqjkx5yPugP6MiawTBxWvmYlmev0TtGtqeNUVsvJeWffVsOWJCkcEF
-         E80A==
-X-Gm-Message-State: APjAAAUuggm6N7LzQV1jSfo1ly9XRbvcS/DERZ9pB0skzoK0G5ENUEne
-        D2LQ/O9OO9PgebJfTIpz651iHE2t3s92YPN/R58=
-X-Google-Smtp-Source: APXvYqxznTpSOFSgXuguROa+bMFdeyJBBYOGNflyVzIW59pLuKjzNA4upjNYPseua6q5L9J9eqW6qtywuWpd0Dyslr0=
-X-Received: by 2002:aca:3305:: with SMTP id z5mr15437298oiz.141.1560305970797;
- Tue, 11 Jun 2019 19:19:30 -0700 (PDT)
+        id S2408405AbfFLCXN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Jun 2019 22:23:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34806 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2405661AbfFLCXN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Jun 2019 22:23:13 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 63D5C3082E03;
+        Wed, 12 Jun 2019 02:23:12 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 32A02648BF;
+        Wed, 12 Jun 2019 02:23:11 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 2391624B25;
+        Wed, 12 Jun 2019 02:23:10 +0000 (UTC)
+Date:   Tue, 11 Jun 2019 22:23:09 -0400 (EDT)
+From:   Pankaj Gupta <pagupta@redhat.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     cohuck@redhat.com, jack@suse.cz, kvm@vger.kernel.org,
+        mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
+        qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
+        dm-devel@redhat.com, adilger kernel <adilger.kernel@dilger.ca>,
+        zwisler@kernel.org, aarcange@redhat.com,
+        dave jiang <dave.jiang@intel.com>, jstaron@google.com,
+        linux-nvdimm@lists.01.org,
+        vishal l verma <vishal.l.verma@intel.com>, david@redhat.com,
+        willy@infradead.org, hch@infradead.org, linux-acpi@vger.kernel.org,
+        jmoyer@redhat.com, linux-ext4@vger.kernel.org, lenb@kernel.org,
+        kilobyte@angband.pl, rdunlap@infradead.org, riel@surriel.com,
+        yuval shaia <yuval.shaia@oracle.com>, stefanha@redhat.com,
+        pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>,
+        lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
+        tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
+        darrick wong <darrick.wong@oracle.com>, rjw@rjwysocki.net,
+        linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, imammedo@redhat.com
+Message-ID: <332155967.34508010.1560306189624.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190611171416.GA1248@redhat.com>
+References: <20190611163802.25352-1-pagupta@redhat.com> <20190611163802.25352-5-pagupta@redhat.com> <20190611171416.GA1248@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v12 4/7] dm: enable synchronous dax
 MIME-Version: 1.0
-References: <1558418814-6822-1-git-send-email-wanpengli@tencent.com>
- <1558418814-6822-2-git-send-email-wanpengli@tencent.com> <627e4189-3709-1fb2-a9bc-f1a577712fe0@redhat.com>
- <CANRm+CyqH5ojNTcX3zfVjB8rayGHAW0Ex+fiGPnrO7bkmvr_4w@mail.gmail.com> <b30067df-2929-9ce9-221f-0f1a84dd1228@redhat.com>
-In-Reply-To: <b30067df-2929-9ce9-221f-0f1a84dd1228@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 12 Jun 2019 10:20:14 +0800
-Message-ID: <CANRm+CyuQCrfOQAv0PNgyuL68u2Xn7fXRqZCYE79wBZVDxVXng@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] KVM: X86: Provide a capability to disable cstate
- msr read intercepts
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Liran Alon <liran.alon@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.70, 10.4.195.27]
+Thread-Topic: enable synchronous dax
+Thread-Index: 7O59Nmg+n8QzGpvkvBkkxWqWG8w3fA==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Wed, 12 Jun 2019 02:23:12 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 11 Jun 2019 at 19:09, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 11/06/19 09:38, Wanpeng Li wrote:
-> > MSR_CORE_C1_RES is unreadable except for ATOM platform, so I think we
-> > can avoid the complex logic to handle C1 now. :)
->
-> I disagree.  Linux uses it on all platforms is available, and virtual
-> machines that don't pass mwait through _only_ have C1, so it would be
-> less useful to have deep C-state residency MSRs and not C1 residency.
 
-Your design heavily depends on read host MSR_CORE_C1_RES for C1
-residency msr emulation, however, the host MSR_CORE_C1_RES is
-unreadable.
-#rdmsr 0x660
-rdmsr: CPU 0 cannot read MSR 0x00000660
+> On Tue, Jun 11 2019 at 12:37pm -0400,
+> Pankaj Gupta <pagupta@redhat.com> wrote:
+> 
+> > This patch sets dax device 'DAXDEV_SYNC' flag if all the target
+> > devices of device mapper support synchrononous DAX. If device
+> > mapper consists of both synchronous and asynchronous dax devices,
+> > we don't set 'DAXDEV_SYNC' flag.
+> > 
+> > 'dm_table_supports_dax' is refactored to pass 'iterate_devices_fn'
+> > as argument so that the callers can pass the appropriate functions.
+> > 
+> > Suggested-by: Mike Snitzer <snitzer@redhat.com>
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> 
+> Thanks, and for the benefit of others, passing function pointers like
+> this is perfectly fine IMHO because this code is _not_ in the fast
+> path.  These methods are only for device creation.
+> 
+> Reviewed-by: Mike Snitzer <snitzer@redhat.com>
 
-Refer to turbostat codes,
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/power/x86/turbostat/turbostat.c#n1335
-C1 is derivated from other parameters. use_c1_residency_msr is true
-just for ATOM platform.
+Thank you, Mike
 
-Regards,
-Wanpeng Li
+Best regards,
+Pankaj
+
+> 
+> 
