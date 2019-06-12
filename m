@@ -2,196 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 87AD0425BA
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 14:28:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E9C06425DC
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 14:33:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727762AbfFLM21 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 08:28:27 -0400
-Received: from foss.arm.com ([217.140.110.172]:52268 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727047AbfFLM20 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 08:28:26 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E37B928;
-        Wed, 12 Jun 2019 05:28:25 -0700 (PDT)
-Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F03F13F246;
-        Wed, 12 Jun 2019 05:30:07 -0700 (PDT)
-Subject: Re: [PATCH v2 1/9] KVM: arm/arm64: vgic: Add LPI translation cache
- definition
-From:   Julien Thierry <julien.thierry@arm.com>
-To:     Marc Zyngier <marc.zyngier@arm.com>
-Cc:     kvm@vger.kernel.org, "Raslan, KarimAllah" <karahmed@amazon.de>,
-        "Saidi, Ali" <alisaidi@amazon.com>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
-References: <20190611170336.121706-1-marc.zyngier@arm.com>
- <20190611170336.121706-2-marc.zyngier@arm.com>
- <54c8547a-51fb-8ae5-975f-261d3934221a@arm.com>
- <86ef3zgmg6.wl-marc.zyngier@arm.com>
- <13655730-165b-d67b-a1da-11c8869c7053@arm.com>
-Message-ID: <29cdb9f5-86c6-e86f-3827-4426a4fa8ac1@arm.com>
-Date:   Wed, 12 Jun 2019 13:28:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <13655730-165b-d67b-a1da-11c8869c7053@arm.com>
-Content-Type: text/plain; charset=utf-8
+        id S2438973AbfFLMbY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 08:31:24 -0400
+Received: from mail-eopbgr140089.outbound.protection.outlook.com ([40.107.14.89]:11827
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2438902AbfFLMbX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 08:31:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JzsvQupAN+gcQeJKOQ2o7kyCHqxsW5uqpl6ZC5jXWRk=;
+ b=lyyV+knAeziQlFW3VAseHnfQhMeAPOBow4sOExqkD8yABODe6h2ys+HaOKmmRD7k0RGvgQFtdmUr94ZzBTLNwpUr8yUWvXC4eDca9cYEcy4Wv9u2GhxYaD28QvlVs1Z2FPXYNvyTf5L5+PGLYMR+e6AVV0HQdQBoCWncF+7qt3U=
+Received: from VE1PR08MB4637.eurprd08.prod.outlook.com (10.255.27.14) by
+ VE1PR08MB4735.eurprd08.prod.outlook.com (10.255.112.74) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1965.13; Wed, 12 Jun 2019 12:30:36 +0000
+Received: from VE1PR08MB4637.eurprd08.prod.outlook.com
+ ([fe80::6574:1efb:6972:2b37]) by VE1PR08MB4637.eurprd08.prod.outlook.com
+ ([fe80::6574:1efb:6972:2b37%6]) with mapi id 15.20.1965.017; Wed, 12 Jun 2019
+ 12:30:36 +0000
+From:   Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+To:     Andrey Konovalov <andreyknvl@google.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+CC:     nd <nd@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>,
+        Vincenzo Frascino <Vincenzo.Frascino@arm.com>,
+        Will Deacon <Will.Deacon@arm.com>,
+        Mark Rutland <Mark.Rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave P Martin <Dave.Martin@arm.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <Robin.Murphy@arm.com>,
+        Kevin Brodsky <Kevin.Brodsky@arm.com>
+Subject: Re: [PATCH v17 15/15] selftests, arm64: add a selftest for passing
+ tagged pointers to kernel
+Thread-Topic: [PATCH v17 15/15] selftests, arm64: add a selftest for passing
+ tagged pointers to kernel
+Thread-Index: AQHVIRQxA9mqrEC18UGUWJeO7iZYdKaX8xmA
+Date:   Wed, 12 Jun 2019 12:30:36 +0000
+Message-ID: <7cd942c0-d4c1-0cf4-623a-bce6ef14d992@arm.com>
+References: <cover.1560339705.git.andreyknvl@google.com>
+ <e024234e652f23be4d76d63227de114e7def5dff.1560339705.git.andreyknvl@google.com>
+In-Reply-To: <e024234e652f23be4d76d63227de114e7def5dff.1560339705.git.andreyknvl@google.com>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+x-originating-ip: [217.140.106.51]
+x-clientproxiedby: LO2P265CA0242.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:8a::14) To VE1PR08MB4637.eurprd08.prod.outlook.com
+ (2603:10a6:802:b1::14)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Szabolcs.Nagy@arm.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 99aee353-e532-4d6e-08cc-08d6ef31c543
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VE1PR08MB4735;
+x-ms-traffictypediagnostic: VE1PR08MB4735:
+nodisclaimer: True
+x-microsoft-antispam-prvs: <VE1PR08MB47350D33F85267298368A6C2EDEC0@VE1PR08MB4735.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 0066D63CE6
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(396003)(39860400002)(136003)(376002)(366004)(346002)(189003)(199004)(316002)(4326008)(31696002)(86362001)(7416002)(2201001)(6436002)(2501003)(36756003)(58126008)(65826007)(2906002)(6116002)(8936002)(6246003)(5660300002)(6486002)(3846002)(64126003)(81166006)(52116002)(72206003)(6506007)(54906003)(478600001)(7736002)(68736007)(81156014)(8676002)(99286004)(14454004)(53546011)(102836004)(446003)(66446008)(25786009)(229853002)(11346002)(110136005)(64756008)(65956001)(6512007)(44832011)(66946007)(71200400001)(65806001)(73956011)(53936002)(66556008)(486006)(66066001)(76176011)(256004)(2616005)(31686004)(71190400001)(66476007)(186003)(476003)(386003)(305945005)(26005)(921003)(1121003);DIR:OUT;SFP:1101;SCL:1;SRVR:VE1PR08MB4735;H:VE1PR08MB4637.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: arm.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: rJ7Myflk/nypTg5f/73dOS7TRRDm+ghZMw88lkc6ZS3BTX3mf2YWXxdJzopWcQoL+pAtHst4LESGB/sFDMU+kDQCtDQ+N+Upw9oABmGwY3Jy1gBzj7BSNJp1sURm642fb5Pkq7vtCJgFYckY+lBpldYk8jnSQbto+SdV3gcndh4C0LoM49y2iwNfmuoKloc2y92N8CyhF511nLoJpEz/xiIcVGmKuwLZyB7L25ujm5gBnome5V0sIaDqhG0ksFSH0LDlVbPwP6o+x3QrNzJQNOKIyCDmikUF4ih2Nhjycxg4HponMHE7rOEo8kqCuaen/dv/NTUk+5qsdMeZHR3GpdeK0+GyDmLONCcLE3PYhZiy5U2URnQY+8ThUrKJeBBHOfWlb6Hbv3WyXRxWifzYMdF3ZI9EvU+z8dvP99lbyvY=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2FA45C6A3FFA994DA2213028275DFA44@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 99aee353-e532-4d6e-08cc-08d6ef31c543
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2019 12:30:36.6121
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Szabolcs.Nagy@arm.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR08MB4735
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 12/06/2019 11:58, Julien Thierry wrote:
-> 
-> 
-> On 12/06/2019 10:52, Marc Zyngier wrote:
->> Hi Julien,
->>
->> On Wed, 12 Jun 2019 09:16:21 +0100,
->> Julien Thierry <julien.thierry@arm.com> wrote:
->>>
->>> Hi Marc,
->>>
->>> On 11/06/2019 18:03, Marc Zyngier wrote:
->>>> Add the basic data structure that expresses an MSI to LPI
->>>> translation as well as the allocation/release hooks.
->>>>
->>>> THe size of the cache is arbitrarily defined as 4*nr_vcpus.
->>>>
->>>
->>> The size has been arbitrarily changed to 16*nr_vcpus :) .
->>
->> Well spotted! ;-)
->>
->>>
->>> Nit: The*
->>
->> Ah, usual lazy finger on the Shift key... One day I'll learn to type.
->>
->>>
->>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>> ---
->>>>  include/kvm/arm_vgic.h        |  3 +++
->>>>  virt/kvm/arm/vgic/vgic-init.c |  5 ++++
->>>>  virt/kvm/arm/vgic/vgic-its.c  | 49 +++++++++++++++++++++++++++++++++++
->>>>  virt/kvm/arm/vgic/vgic.h      |  2 ++
->>>>  4 files changed, 59 insertions(+)
->>>>
-> 
-> [...]
-> 
->>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
->>>> index 44ceaccb18cf..ce9bcddeb7f1 100644
->>>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>>> @@ -149,6 +149,14 @@ struct its_ite {
->>>>  	u32 event_id;
->>>>  };
->>>>  
->>>> +struct vgic_translation_cache_entry {
->>>> +	struct list_head	entry;
->>>> +	phys_addr_t		db;
->>>> +	u32			devid;
->>>> +	u32			eventid;
->>>> +	struct vgic_irq		*irq;
->>>> +};
->>>> +
->>>>  /**
->>>>   * struct vgic_its_abi - ITS abi ops and settings
->>>>   * @cte_esz: collection table entry size
->>>> @@ -1668,6 +1676,45 @@ static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its,
->>>>  	return ret;
->>>>  }
->>>>  
->>>> +/* Default is 16 cached LPIs per vcpu */
->>>> +#define LPI_DEFAULT_PCPU_CACHE_SIZE	16
->>>> +
->>>> +void vgic_lpi_translation_cache_init(struct kvm *kvm)
->>>> +{
->>>> +	struct vgic_dist *dist = &kvm->arch.vgic;
->>>> +	unsigned int sz;
->>>> +	int i;
->>>> +
->>>> +	if (!list_empty(&dist->lpi_translation_cache))
->>>> +		return;
->>>> +
->>>> +	sz = atomic_read(&kvm->online_vcpus) * LPI_DEFAULT_PCPU_CACHE_SIZE;
->>>> +
->>>> +	for (i = 0; i < sz; i++) {
->>>> +		struct vgic_translation_cache_entry *cte;
->>>> +
->>>> +		/* An allocation failure is not fatal */
->>>> +		cte = kzalloc(sizeof(*cte), GFP_KERNEL);
->>>> +		if (WARN_ON(!cte))
->>>> +			break;
->>>> +
->>>> +		INIT_LIST_HEAD(&cte->entry);
->>>> +		list_add(&cte->entry, &dist->lpi_translation_cache);
->>>
->>> Going through the series, it looks like this list is either empty
->>> (before the cache init) or has a fixed number
->>> (LPI_DEFAULT_PCPU_CACHE_SIZE * nr_cpus) of entries.
->>
->> Well, it could also fail when allocating one of the entry, meaning we
->> can have an allocation ranging from 0 to (LPI_DEFAULT_PCPU_CACHE_SIZE
->> * nr_cpus) entries.
->>
->>> And the list never grows nor shrinks throughout the series, so it
->>> seems odd to be using a list here.
->>>
->>> Is there a reason for not using a dynamically allocated array instead of
->>> the list? (does list_move() provide a big perf advantage over swapping
->>> the data from one array entry to another? Or is there some other
->>> facility I am missing?
->>
->> The idea was to make the LRU policy cheap, on the assumption that
->> list_move (which is only a couple of pointer updates) is cheaper than
->> a memmove if you want to keep the array ordered. If we exclude the
->> list head, we end-up with 24 bytes per entry to move down to make room
->> for the new entry at the head of the array. For large caches that miss
->> very often, this will hurt badly. But is that really a problem? I
->> don't know.
->>
-> 
-> Yes, I realized afterwards that the LRU uses the fact you can easily
-> move list entries without modifying the rest of the list.
-> 
->> We could allocate an array as you suggest, and use a linked list
->> inside the array. Or something else. I'm definitely open to
->> suggestion!
-> 
-> If it there turns out to be some benefit to just you a fixed array, we
-> could use a simple ring buffer. Have one pointer on the most recently
-> inserted entry (and we know the next insertion will take place on the
-> entry "just before" it) and one pointer on the least recently used entry
-> (which gets moved when the most recently inserted catches up to it) so
-> we know where to stop when looping. We don't really have to worry about
-> the "ring buffer" full case since that means we just overwrite the LRU
-> and move the pointer.
-> 
-> This might prove a bit more efficient when looping over the cache
-> entries compared to the list. However, I have no certainty of actual
-> performance gain from that and the current implementation has the
-> benefit of being simple.
-> 
-> Let me know if you decide to give the ring buffer approach a try.
-> 
-> Otherwise there's always the option to add even more complex structure
-> with a hashtable + linked list using hashes and tags to lookup the
-> entries. But keeping things simple for now seems reasonable (also, it
-> avoids having to think about what to use as hash and tag :D ).
-> 
-
-Acutally, still not a good approach for when there is a cache hit and we
-want to move a entry to the most recently used position.
-
-List seems like the best approach in terms of keeping it simple.
-
-Sorry for the noise.
-
--- 
-Julien Thierry
+T24gMTIvMDYvMjAxOSAxMjo0MywgQW5kcmV5IEtvbm92YWxvdiB3cm90ZToNCj4gLS0tIC9kZXYv
+bnVsbA0KPiArKysgYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9hcm02NC90YWdzX2xpYi5jDQo+
+IEBAIC0wLDAgKzEsNjIgQEANCj4gKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4w
+DQo+ICsNCj4gKyNpbmNsdWRlIDxzdGRsaWIuaD4NCj4gKyNpbmNsdWRlIDxzeXMvcHJjdGwuaD4N
+Cj4gKw0KPiArI2RlZmluZSBUQUdfU0hJRlQJKDU2KQ0KPiArI2RlZmluZSBUQUdfTUFTSwkoMHhm
+ZlVMIDw8IFRBR19TSElGVCkNCj4gKw0KPiArI2RlZmluZSBQUl9TRVRfVEFHR0VEX0FERFJfQ1RS
+TAk1NQ0KPiArI2RlZmluZSBQUl9HRVRfVEFHR0VEX0FERFJfQ1RSTAk1Ng0KPiArI2RlZmluZSBQ
+Ul9UQUdHRURfQUREUl9FTkFCTEUJKDFVTCA8PCAwKQ0KPiArDQo+ICt2b2lkICpfX2xpYmNfbWFs
+bG9jKHNpemVfdCBzaXplKTsNCj4gK3ZvaWQgX19saWJjX2ZyZWUodm9pZCAqcHRyKTsNCj4gK3Zv
+aWQgKl9fbGliY19yZWFsbG9jKHZvaWQgKnB0ciwgc2l6ZV90IHNpemUpOw0KPiArdm9pZCAqX19s
+aWJjX2NhbGxvYyhzaXplX3Qgbm1lbWIsIHNpemVfdCBzaXplKTsNCg0KdGhpcyBkb2VzIG5vdCB3
+b3JrIG9uIGF0IGxlYXN0IG11c2wuDQoNCnRoZSBtb3N0IHJvYnVzdCBzb2x1dGlvbiB3b3VsZCBi
+ZSB0byBpbXBsZW1lbnQNCnRoZSBtYWxsb2MgYXBpcyB3aXRoIG1tYXAvbXVubWFwL21yZW1hcCwg
+aWYgdGhhdCdzDQp0b28gY3VtYmVyc29tZSB0aGVuIHVzZSBkbHN5bSBSVExEX05FWFQgKGFsdGhv
+dWdoDQp0aGF0IGhhcyB0aGUgc2xpZ2h0IHdhcnQgdGhhdCBpbiBnbGliYyBpdCBtYXkgY2FsbA0K
+Y2FsbG9jIHNvIHdyYXBwaW5nIGNhbGxvYyB0aGF0IHdheSBpcyB0cmlja3kpLg0KDQppbiBzaW1w
+bGUgbGludXggdGVzdHMgaSdkIGp1c3QgdXNlIHN0YXRpYyBvcg0Kc3RhY2sgYWxsb2NhdGlvbnMg
+b3IgbW1hcC4NCg0KaWYgYSBnZW5lcmljIHByZWxvYWRhYmxlIGxpYiBzb2x1dGlvbiBpcyBuZWVk
+ZWQNCnRoZW4gZG8gaXQgcHJvcGVybHkgd2l0aCBwdGhyZWFkX29uY2UgdG8gYXZvaWQNCnJhY2Vz
+IGV0Yy4NCg0KPiArDQo+ICtzdGF0aWMgdm9pZCAqdGFnX3B0cih2b2lkICpwdHIpDQo+ICt7DQo+
+ICsJc3RhdGljIGludCB0YWdnZWRfYWRkcl9lcnIgPSAxOw0KPiArCXVuc2lnbmVkIGxvbmcgdGFn
+ID0gMDsNCj4gKw0KPiArCS8qDQo+ICsJICogTm90ZSB0aGF0IHRoaXMgY29kZSBpcyByYWN5LiBX
+ZSBvbmx5IHVzZSBpdCBhcyBhIHBhcnQgb2YgYSBzaW5nbGUNCj4gKwkgKiB0aHJlYWRlZCB0ZXN0
+IGFwcGxpY2F0aW9uLiBCZXdhcmUgb2YgdXNpbmcgaW4gbXVsdGl0aHJlYWRlZCBvbmVzLg0KPiAr
+CSAqLw0KPiArCWlmICh0YWdnZWRfYWRkcl9lcnIgPT0gMSkNCj4gKwkJdGFnZ2VkX2FkZHJfZXJy
+ID0gcHJjdGwoUFJfU0VUX1RBR0dFRF9BRERSX0NUUkwsDQo+ICsJCQkJUFJfVEFHR0VEX0FERFJf
+RU5BQkxFLCAwLCAwLCAwKTsNCj4gKw0KPiArCWlmICghcHRyKQ0KPiArCQlyZXR1cm4gcHRyOw0K
+PiArCWlmICghdGFnZ2VkX2FkZHJfZXJyKQ0KPiArCQl0YWcgPSByYW5kKCkgJiAweGZmOw0KPiAr
+DQo+ICsJcmV0dXJuICh2b2lkICopKCh1bnNpZ25lZCBsb25nKXB0ciB8ICh0YWcgPDwgVEFHX1NI
+SUZUKSk7DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyB2b2lkICp1bnRhZ19wdHIodm9pZCAqcHRyKQ0K
+PiArew0KPiArCXJldHVybiAodm9pZCAqKSgodW5zaWduZWQgbG9uZylwdHIgJiB+VEFHX01BU0sp
+Ow0KPiArfQ0KPiArDQo+ICt2b2lkICptYWxsb2Moc2l6ZV90IHNpemUpDQo+ICt7DQo+ICsJcmV0
+dXJuIHRhZ19wdHIoX19saWJjX21hbGxvYyhzaXplKSk7DQo+ICt9DQouLi4NCg==
