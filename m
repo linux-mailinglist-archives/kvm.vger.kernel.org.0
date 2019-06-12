@@ -2,71 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 92A58424CB
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 13:53:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 87AD0425BA
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 14:28:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390864AbfFLLw4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 07:52:56 -0400
-Received: from foss.arm.com ([217.140.110.172]:51610 "EHLO foss.arm.com"
+        id S1727762AbfFLM21 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 08:28:27 -0400
+Received: from foss.arm.com ([217.140.110.172]:52268 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387878AbfFLLw4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 07:52:56 -0400
+        id S1727047AbfFLM20 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 08:28:26 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78BEC28;
-        Wed, 12 Jun 2019 04:52:55 -0700 (PDT)
-Received: from [10.1.196.72] (e119884-lin.cambridge.arm.com [10.1.196.72])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E9883F246;
-        Wed, 12 Jun 2019 04:54:33 -0700 (PDT)
-Subject: Re: [PATCH v16 02/16] arm64: untag user pointers in access_ok and
- __uaccess_mask_ptr
-To:     Catalin Marinas <catalin.marinas@arm.com>
-Cc:     Andrey Konovalov <andreyknvl@google.com>,
-        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        linux-kselftest@vger.kernel.org,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        linux-media@vger.kernel.org, Kevin Brodsky <kevin.brodsky@arm.com>,
-        Kees Cook <keescook@chromium.org>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        Kostya Serebryany <kcc@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        linux-kernel@vger.kernel.org,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-References: <cover.1559580831.git.andreyknvl@google.com>
- <4327b260fb17c4776a1e3c844f388e4948cfb747.1559580831.git.andreyknvl@google.com>
- <20190610175326.GC25803@arrakis.emea.arm.com>
- <20190611145720.GA63588@arrakis.emea.arm.com>
- <d3dc2b1f-e8c9-c60d-f648-0bc9b08f20e4@arm.com>
- <20190612093158.GG10165@c02tf0j2hf1t.cambridge.arm.com>
-From:   Vincenzo Frascino <vincenzo.frascino@arm.com>
-Message-ID: <c760f34a-1b99-17bb-8cc8-ea8b0d63fe90@arm.com>
-Date:   Wed, 12 Jun 2019 12:52:49 +0100
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E37B928;
+        Wed, 12 Jun 2019 05:28:25 -0700 (PDT)
+Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F03F13F246;
+        Wed, 12 Jun 2019 05:30:07 -0700 (PDT)
+Subject: Re: [PATCH v2 1/9] KVM: arm/arm64: vgic: Add LPI translation cache
+ definition
+From:   Julien Thierry <julien.thierry@arm.com>
+To:     Marc Zyngier <marc.zyngier@arm.com>
+Cc:     kvm@vger.kernel.org, "Raslan, KarimAllah" <karahmed@amazon.de>,
+        "Saidi, Ali" <alisaidi@amazon.com>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+References: <20190611170336.121706-1-marc.zyngier@arm.com>
+ <20190611170336.121706-2-marc.zyngier@arm.com>
+ <54c8547a-51fb-8ae5-975f-261d3934221a@arm.com>
+ <86ef3zgmg6.wl-marc.zyngier@arm.com>
+ <13655730-165b-d67b-a1da-11c8869c7053@arm.com>
+Message-ID: <29cdb9f5-86c6-e86f-3827-4426a4fa8ac1@arm.com>
+Date:   Wed, 12 Jun 2019 13:28:22 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20190612093158.GG10165@c02tf0j2hf1t.cambridge.arm.com>
+In-Reply-To: <13655730-165b-d67b-a1da-11c8869c7053@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,104 +43,155 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Catalin,
 
-On 12/06/2019 10:32, Catalin Marinas wrote:
-> Hi Vincenzo,
+
+On 12/06/2019 11:58, Julien Thierry wrote:
 > 
-> On Tue, Jun 11, 2019 at 06:09:10PM +0100, Vincenzo Frascino wrote:
->>> diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
->>> index 3767fb21a5b8..69d0be1fc708 100644
->>> --- a/arch/arm64/kernel/process.c
->>> +++ b/arch/arm64/kernel/process.c
->>> @@ -30,6 +30,7 @@
->>>  #include <linux/kernel.h>
->>>  #include <linux/mm.h>
->>>  #include <linux/stddef.h>
->>> +#include <linux/sysctl.h>
->>>  #include <linux/unistd.h>
->>>  #include <linux/user.h>
->>>  #include <linux/delay.h>
->>> @@ -323,6 +324,7 @@ void flush_thread(void)
->>>  	fpsimd_flush_thread();
->>>  	tls_thread_flush();
->>>  	flush_ptrace_hw_breakpoint(current);
->>> +	clear_thread_flag(TIF_TAGGED_ADDR);
+> 
+> On 12/06/2019 10:52, Marc Zyngier wrote:
+>> Hi Julien,
 >>
->> Nit: in line we the other functions in thread_flush we could have something like
->> "tagged_addr_thread_flush", maybe inlined.
-> 
-> The other functions do a lot more than clearing a TIF flag, so they
-> deserved their own place. We could do this when adding MTE support. I
-> think we also need to check what other TIF flags we may inadvertently
-> pass on execve(), maybe have a mask clearing.
-> 
-
-Agreed. All the comments I provided are meant to simplify the addition of MTE
-support.
-
->>> diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
->>> index 094bb03b9cc2..2e927b3e9d6c 100644
->>> --- a/include/uapi/linux/prctl.h
->>> +++ b/include/uapi/linux/prctl.h
->>> @@ -229,4 +229,9 @@ struct prctl_mm_map {
->>>  # define PR_PAC_APDBKEY			(1UL << 3)
->>>  # define PR_PAC_APGAKEY			(1UL << 4)
->>>  
->>> +/* Tagged user address controls for arm64 */
->>> +#define PR_SET_TAGGED_ADDR_CTRL		55
->>> +#define PR_GET_TAGGED_ADDR_CTRL		56
->>> +# define PR_TAGGED_ADDR_ENABLE		(1UL << 0)
->>> +
->>>  #endif /* _LINUX_PRCTL_H */
->>> diff --git a/kernel/sys.c b/kernel/sys.c
->>> index 2969304c29fe..ec48396b4943 100644
->>> --- a/kernel/sys.c
->>> +++ b/kernel/sys.c
->>> @@ -124,6 +124,12 @@
->>>  #ifndef PAC_RESET_KEYS
->>>  # define PAC_RESET_KEYS(a, b)	(-EINVAL)
->>>  #endif
->>> +#ifndef SET_TAGGED_ADDR_CTRL
->>> +# define SET_TAGGED_ADDR_CTRL(a)	(-EINVAL)
->>> +#endif
->>> +#ifndef GET_TAGGED_ADDR_CTRL
->>> +# define GET_TAGGED_ADDR_CTRL()		(-EINVAL)
->>> +#endif
->>>  
->>>  /*
->>>   * this is where the system-wide overflow UID and GID are defined, for
->>> @@ -2492,6 +2498,16 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
->>>  			return -EINVAL;
->>>  		error = PAC_RESET_KEYS(me, arg2);
->>>  		break;
->>> +	case PR_SET_TAGGED_ADDR_CTRL:
->>> +		if (arg3 || arg4 || arg5)
->>> +			return -EINVAL;
->>> +		error = SET_TAGGED_ADDR_CTRL(arg2);
->>> +		break;
->>> +	case PR_GET_TAGGED_ADDR_CTRL:
->>> +		if (arg2 || arg3 || arg4 || arg5)
->>> +			return -EINVAL;
->>> +		error = GET_TAGGED_ADDR_CTRL();
->>> +		break;
+>> On Wed, 12 Jun 2019 09:16:21 +0100,
+>> Julien Thierry <julien.thierry@arm.com> wrote:
+>>>
+>>> Hi Marc,
+>>>
+>>> On 11/06/2019 18:03, Marc Zyngier wrote:
+>>>> Add the basic data structure that expresses an MSI to LPI
+>>>> translation as well as the allocation/release hooks.
+>>>>
+>>>> THe size of the cache is arbitrarily defined as 4*nr_vcpus.
+>>>>
+>>>
+>>> The size has been arbitrarily changed to 16*nr_vcpus :) .
 >>
->> Why do we need two prctl here? We could have only one and use arg2 as set/get
->> and arg3 as a parameter. What do you think?
+>> Well spotted! ;-)
+>>
+>>>
+>>> Nit: The*
+>>
+>> Ah, usual lazy finger on the Shift key... One day I'll learn to type.
+>>
+>>>
+>>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>>> ---
+>>>>  include/kvm/arm_vgic.h        |  3 +++
+>>>>  virt/kvm/arm/vgic/vgic-init.c |  5 ++++
+>>>>  virt/kvm/arm/vgic/vgic-its.c  | 49 +++++++++++++++++++++++++++++++++++
+>>>>  virt/kvm/arm/vgic/vgic.h      |  2 ++
+>>>>  4 files changed, 59 insertions(+)
+>>>>
 > 
-> This follows the other PR_* options, e.g. PR_SET_VL/GET_VL,
-> PR_*_FP_MODE. We will use other bits in arg2, for example to set the
-> precise vs imprecise MTE trapping.
+> [...]
+> 
+>>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>>>> index 44ceaccb18cf..ce9bcddeb7f1 100644
+>>>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>>>> @@ -149,6 +149,14 @@ struct its_ite {
+>>>>  	u32 event_id;
+>>>>  };
+>>>>  
+>>>> +struct vgic_translation_cache_entry {
+>>>> +	struct list_head	entry;
+>>>> +	phys_addr_t		db;
+>>>> +	u32			devid;
+>>>> +	u32			eventid;
+>>>> +	struct vgic_irq		*irq;
+>>>> +};
+>>>> +
+>>>>  /**
+>>>>   * struct vgic_its_abi - ITS abi ops and settings
+>>>>   * @cte_esz: collection table entry size
+>>>> @@ -1668,6 +1676,45 @@ static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its,
+>>>>  	return ret;
+>>>>  }
+>>>>  
+>>>> +/* Default is 16 cached LPIs per vcpu */
+>>>> +#define LPI_DEFAULT_PCPU_CACHE_SIZE	16
+>>>> +
+>>>> +void vgic_lpi_translation_cache_init(struct kvm *kvm)
+>>>> +{
+>>>> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>>>> +	unsigned int sz;
+>>>> +	int i;
+>>>> +
+>>>> +	if (!list_empty(&dist->lpi_translation_cache))
+>>>> +		return;
+>>>> +
+>>>> +	sz = atomic_read(&kvm->online_vcpus) * LPI_DEFAULT_PCPU_CACHE_SIZE;
+>>>> +
+>>>> +	for (i = 0; i < sz; i++) {
+>>>> +		struct vgic_translation_cache_entry *cte;
+>>>> +
+>>>> +		/* An allocation failure is not fatal */
+>>>> +		cte = kzalloc(sizeof(*cte), GFP_KERNEL);
+>>>> +		if (WARN_ON(!cte))
+>>>> +			break;
+>>>> +
+>>>> +		INIT_LIST_HEAD(&cte->entry);
+>>>> +		list_add(&cte->entry, &dist->lpi_translation_cache);
+>>>
+>>> Going through the series, it looks like this list is either empty
+>>> (before the cache init) or has a fixed number
+>>> (LPI_DEFAULT_PCPU_CACHE_SIZE * nr_cpus) of entries.
+>>
+>> Well, it could also fail when allocating one of the entry, meaning we
+>> can have an allocation ranging from 0 to (LPI_DEFAULT_PCPU_CACHE_SIZE
+>> * nr_cpus) entries.
+>>
+>>> And the list never grows nor shrinks throughout the series, so it
+>>> seems odd to be using a list here.
+>>>
+>>> Is there a reason for not using a dynamically allocated array instead of
+>>> the list? (does list_move() provide a big perf advantage over swapping
+>>> the data from one array entry to another? Or is there some other
+>>> facility I am missing?
+>>
+>> The idea was to make the LRU policy cheap, on the assumption that
+>> list_move (which is only a couple of pointer updates) is cheaper than
+>> a memmove if you want to keep the array ordered. If we exclude the
+>> list head, we end-up with 24 bytes per entry to move down to make room
+>> for the new entry at the head of the array. For large caches that miss
+>> very often, this will hurt badly. But is that really a problem? I
+>> don't know.
+>>
+> 
+> Yes, I realized afterwards that the LRU uses the fact you can easily
+> move list entries without modifying the rest of the list.
+> 
+>> We could allocate an array as you suggest, and use a linked list
+>> inside the array. Or something else. I'm definitely open to
+>> suggestion!
+> 
+> If it there turns out to be some benefit to just you a fixed array, we
+> could use a simple ring buffer. Have one pointer on the most recently
+> inserted entry (and we know the next insertion will take place on the
+> entry "just before" it) and one pointer on the least recently used entry
+> (which gets moved when the most recently inserted catches up to it) so
+> we know where to stop when looping. We don't really have to worry about
+> the "ring buffer" full case since that means we just overwrite the LRU
+> and move the pointer.
+> 
+> This might prove a bit more efficient when looping over the cache
+> entries compared to the list. However, I have no certainty of actual
+> performance gain from that and the current implementation has the
+> benefit of being simple.
+> 
+> Let me know if you decide to give the ring buffer approach a try.
+> 
+> Otherwise there's always the option to add even more complex structure
+> with a hashtable + linked list using hashes and tags to lookup the
+> entries. But keeping things simple for now seems reasonable (also, it
+> avoids having to think about what to use as hash and tag :D ).
 > 
 
-Indeed. I was not questioning the pre-existing interface definition, but trying
-more to reduce the changes to the ABI to the minimum since:
- - prctl does not mandate how to use the arg[2-5]
- - prctl interface is flexible enough for the problem to be solved with only one
-   PR_ command.
+Acutally, still not a good approach for when there is a cache hit and we
+want to move a entry to the most recently used position.
 
-I agree on reusing the interface for MTE for the purposes you specified.
+List seems like the best approach in terms of keeping it simple.
+
+Sorry for the noise.
 
 -- 
-Regards,
-Vincenzo
+Julien Thierry
