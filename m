@@ -2,142 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B842642FFA
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 21:27:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1106043071
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 21:52:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387604AbfFLT10 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 15:27:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42978 "EHLO mx1.redhat.com"
+        id S1728198AbfFLTwC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 15:52:02 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:49394 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729083AbfFLT1Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 15:27:25 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727924AbfFLTwC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 15:52:02 -0400
+Received: from zn.tnic (p200300EC2F0A6800329C23FFFEA6A903.dip0.t-ipconnect.de [IPv6:2003:ec:2f0a:6800:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C2A263087958;
-        Wed, 12 Jun 2019 19:27:25 +0000 (UTC)
-Received: from flask (unknown [10.40.205.10])
-        by smtp.corp.redhat.com (Postfix) with SMTP id 428E260CCD;
-        Wed, 12 Jun 2019 19:27:20 +0000 (UTC)
-Received: by flask (sSMTP sendmail emulation); Wed, 12 Jun 2019 21:27:20 +0200
-Date:   Wed, 12 Jun 2019 21:27:20 +0200
-From:   Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 1/2] KVM: LAPIC: Optimize timer latency consider world
- switch time
-Message-ID: <20190612192720.GB23583@flask>
-References: <1560332419-17195-1-git-send-email-wanpengli@tencent.com>
- <20190612151447.GD20308@linux.intel.com>
- <20190612192243.GA23583@flask>
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B4B7C1EC0997;
+        Wed, 12 Jun 2019 21:52:00 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1560369121;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=GUepEpOvj47QrSQxWDV4sX7Wy3tb1AdwOgkXN4qPVac=;
+        b=f/V1Sd+xOmD2rwK5mJf0v6+ZrcG5V3EwY3c5Vft+DHZgc+aIt7T35D8xQpPIwFsVGAI48r
+        tcBaOL/eWzz5/1SH9Gwt+8CdoA+INSu1VQb6FS1TOvrU6F2xEryBq74hmvQBWngMb9f/x/
+        2mKogbU2H5E+W3VYoinET3PppTxVSlA=
+Date:   Wed, 12 Jun 2019 21:51:52 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     George Kennedy <george.kennedy@oracle.com>
+Cc:     joro@8bytes.org, pbonzini@redhat.com, mingo@redhat.com,
+        hpa@zytor.com, kvm@vger.kernel.org, syzkaller@googlegroups.com
+Subject: Re: kernel BUG at arch/x86/kvm/x86.c:361! on AMD CPU
+Message-ID: <20190612195152.GQ32652@zn.tnic>
+References: <37952f51-7687-672c-45d9-92ba418c9133@oracle.com>
+ <20190612161255.GN32652@zn.tnic>
+ <af0054d1-1fc8-c106-b503-ca91da5a6fee@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190612192243.GA23583@flask>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Wed, 12 Jun 2019 19:27:25 +0000 (UTC)
+In-Reply-To: <af0054d1-1fc8-c106-b503-ca91da5a6fee@oracle.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-2019-06-12 21:22+0200, Radim Krčmář:
-> 2019-06-12 08:14-0700, Sean Christopherson:
-> > On Wed, Jun 12, 2019 at 05:40:18PM +0800, Wanpeng Li wrote:
-> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > @@ -145,6 +145,12 @@ module_param(tsc_tolerance_ppm, uint, S_IRUGO | S_IWUSR);
-> > >  static int __read_mostly lapic_timer_advance_ns = -1;
-> > >  module_param(lapic_timer_advance_ns, int, S_IRUGO | S_IWUSR);
-> > >  
-> > > +/*
-> > > + * lapic timer vmentry advance (tscdeadline mode only) in nanoseconds.
-> > > + */
-> > > +u32 __read_mostly vmentry_advance_ns = 300;
-> > 
-> > Enabling this by default makes me nervous, e.g. nothing guarantees that
-> > future versions of KVM and/or CPUs will continue to have 300ns of overhead
-> > between wait_lapic_expire() and VM-Enter.
-> > 
-> > If we want it enabled by default so that it gets tested, the default
-> > value should be extremely conservative, e.g. set the default to a small
-> > percentage (25%?) of the latency of VM-Enter itself on modern CPUs,
-> > VM-Enter latency being the min between VMLAUNCH and VMLOAD+VMRUN+VMSAVE.
-> 
-> I share the sentiment.  We definitely must not enter the guest before
-> the deadline has expired and CPUs are approaching 5 GHz (in turbo), so
-> 300 ns would be too much even today.
-> 
-> I wrote a simple testcase for rough timing and there are 267 cycles
-> (111 ns @ 2.4 GHz) between doing rdtsc() right after
-> kvm_wait_lapic_expire() [1] and doing rdtsc() in the guest as soon as
-> possible (see the attached kvm-unit-test).
+On Wed, Jun 12, 2019 at 02:45:34PM -0400, George Kennedy wrote:
+> The crash can still be reproduced with VM running Upstream 5.2.0-rc4 
 
-I forgot to attach it, pasting here as a patch for kvm-unit-tests.
+That's clear.
 
----
-diff --git a/x86/Makefile.common b/x86/Makefile.common
-index e612dbe..ceed648 100644
---- a/x86/Makefile.common
-+++ b/x86/Makefile.common
-@@ -58,7 +58,7 @@ tests-common = $(TEST_DIR)/vmexit.flat $(TEST_DIR)/tsc.flat \
-                $(TEST_DIR)/init.flat $(TEST_DIR)/smap.flat \
-                $(TEST_DIR)/hyperv_synic.flat $(TEST_DIR)/hyperv_stimer.flat \
-                $(TEST_DIR)/hyperv_connections.flat \
--               $(TEST_DIR)/umip.flat
-+               $(TEST_DIR)/umip.flat $(TEST_DIR)/vmentry_latency.flat
- 
- ifdef API
- tests-api = api/api-sample api/dirty-log api/dirty-log-perf
-diff --git a/x86/vmentry_latency.c b/x86/vmentry_latency.c
-new file mode 100644
-index 0000000..3859f09
---- /dev/null
-+++ b/x86/vmentry_latency.c
-@@ -0,0 +1,45 @@
-+#include "x86/vm.h"
-+
-+static u64 get_last_hypervisor_tsc_delta(void)
-+{
-+	u64 a = 0, b, c, d;
-+	u64 tsc;
-+
-+	/*
-+	 * The first vmcall is there to force a vm exit just before measuring.
-+	 */
-+	asm volatile ("vmcall" : "+a"(a), "=b"(b), "=c"(c), "=d"(d));
-+
-+	tsc = rdtsc();
-+
-+	/*
-+	 * The second hypercall recovers the value that was stored when vm
-+	 * entering to execute the rdtsc()
-+	 */
-+	a = 11;
-+	asm volatile ("vmcall" : "+a"(a), "=b"(b), "=c"(c), "=d"(d));
-+
-+	return tsc - a;
-+}
-+
-+static void vmentry_latency(void)
-+{
-+	unsigned i = 1000000;
-+	u64 min = -1;
-+
-+	while (i--) {
-+		u64 latency = get_last_hypervisor_tsc_delta();
-+		if (latency < min)
-+			min = latency;
-+	}
-+
-+	printf("vm entry latency is %"PRIu64" TSC cycles\n", min);
-+}
-+
-+int main(void)
-+{
-+	setup_vm();
-+	vmentry_latency();
-+
-+	return 0;
-+}
+> and host running Ubuntu on AMD CPU.
+
+That's the important question: why can't I trigger it with 5.2.0-rc4+ as
+the host and you can with the ubuntu kernel 4.15 or so. I.e., what changed
+upstream or does the ubuntu kernel have out-of-tree stuff?
+
+Maybe kvm folks would have a better idea. That kvm_spurious_fault thing
+is for:
+
+/*
+ * Hardware virtualization extension instructions may fault if a
+ * reboot turns off virtualization while processes are running.
+ * Trap the fault and ignore the instruction if that happens.
+ */
+asmlinkage void kvm_spurious_fault(void);
+
+but you're not rebooting...
+
+-- 
+Regards/Gruss,
+    Boris.
+
+Good mailing practices for 400: avoid top-posting and trim the reply.
