@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FC1C42AAE
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 17:19:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45B8642AB5
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 17:20:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727419AbfFLPTX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 11:19:23 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:11547 "EHLO
+        id S2407138AbfFLPTx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 11:19:53 -0400
+Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:60027 "EHLO
         smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726454AbfFLPTX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 11:19:23 -0400
+        with ESMTP id S1731789AbfFLPTx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 11:19:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1560352762; x=1591888762;
+  t=1560352792; x=1591888792;
   h=subject:to:cc:references:from:message-id:date:
    mime-version:in-reply-to:content-transfer-encoding;
-  bh=cnB3AEZTm5fX0gy29VrpQ+7tiLOuylsFSd/NEnTAsi4=;
-  b=aNzWMHZ8bTPU7+DZlHlgX+2gcR4rNE/VNDOPEumdItCkuzIiVyn/oYNo
-   4HQCPJRF3fm0Lz/6PfSTI9dmZ1HZA09WTtqC6POoTjHoy8typ/rGR6Jwt
-   PkxOcldCEUBH0vI9HWSLPQM83jUfGiQTvTR7hNohz+cBCFRSwF+RIWUQU
-   I=;
+  bh=CPFZzLHWbmSgpnYQ4rkNXWoW4rpvmWGWNrlgSIKtMfQ=;
+  b=VASsFb7YRbdgVDw4VtwN51CHara+MjWjDnFEC9jRoZU4pv1Vv80BgKbR
+   vaFkBeByX9NYSixk/gP2mi6Ii8PwmVsmh+0Z8YMj1U/VWuGwk6aE8VWCG
+   lzyuJ+WDIyFyclB2ygv9y5kPG3xN0fOCZ+iQ0AUkxSljukwmRpHLzJanC
+   o=;
 X-IronPort-AV: E=Sophos;i="5.62,366,1554768000"; 
-   d="scan'208";a="737164551"
-Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1e-27fb8269.us-east-1.amazon.com) ([10.124.125.2])
-  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 12 Jun 2019 15:19:21 +0000
+   d="scan'208";a="737164633"
+Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1e-97fdccfd.us-east-1.amazon.com) ([10.124.125.2])
+  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 12 Jun 2019 15:19:51 +0000
 Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1e-27fb8269.us-east-1.amazon.com (Postfix) with ESMTPS id ECCE5A03CB;
-        Wed, 12 Jun 2019 15:19:16 +0000 (UTC)
-Received: from EX13D08UEE002.ant.amazon.com (10.43.62.92) by
+        by email-inbound-relay-1e-97fdccfd.us-east-1.amazon.com (Postfix) with ESMTPS id 5B93DA242A;
+        Wed, 12 Jun 2019 15:19:47 +0000 (UTC)
+Received: from EX13D08UEE001.ant.amazon.com (10.43.62.126) by
  EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 12 Jun 2019 15:19:16 +0000
+ id 15.0.1367.3; Wed, 12 Jun 2019 15:19:30 +0000
 Received: from EX13MTAUWA001.ant.amazon.com (10.43.160.58) by
- EX13D08UEE002.ant.amazon.com (10.43.62.92) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 12 Jun 2019 15:19:16 +0000
+ EX13D08UEE001.ant.amazon.com (10.43.62.126) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 12 Jun 2019 15:19:30 +0000
 Received: from u6cf1b7119fa15b.ant.amazon.com (10.28.85.98) by
  mail-relay.amazon.com (10.43.160.118) with Microsoft SMTP Server (TLS) id
- 15.0.1367.3 via Frontend Transport; Wed, 12 Jun 2019 15:19:11 +0000
-Subject: Re: x86 instruction emulator fuzzing
+ 15.0.1367.3 via Frontend Transport; Wed, 12 Jun 2019 15:19:25 +0000
+Subject: Re: [PATCH 1/3] Build target for emulate.o as a userspace binary
 To:     Alexander Graf <graf@amazon.com>, Sam Caccavale <samcacc@amazon.de>
 CC:     <samcaccavale@gmail.com>, <nmanthey@amazon.de>,
         <wipawel@amazon.de>, <dwmw@amazon.co.uk>, <mpohlack@amazon.de>,
@@ -49,14 +49,15 @@ CC:     <samcaccavale@gmail.com>, <nmanthey@amazon.de>,
         <x86@kernel.org>, <kvm@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
 References: <20190521153924.15110-1-samcacc@amazon.de>
- <6f9f4746-7850-0de0-b531-0ea0e6d7ca82@amazon.com>
+ <20190521153924.15110-2-samcacc@amazon.de>
+ <529ed65f-f82e-7341-3a4f-6eea1f2961a9@amazon.com>
 From:   <samcacc@amazon.com>
-Message-ID: <c1994ba8-7b94-e814-d911-febc545d7506@amazon.com>
-Date:   Wed, 12 Jun 2019 17:19:10 +0200
+Message-ID: <c4f8fe78-39d2-9db0-97c0-0af2c35f22fc@amazon.com>
+Date:   Wed, 12 Jun 2019 17:19:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <6f9f4746-7850-0de0-b531-0ea0e6d7ca82@amazon.com>
+In-Reply-To: <529ed65f-f82e-7341-3a4f-6eea1f2961a9@amazon.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -65,85 +66,111 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/31/19 10:39 AM, Alexander Graf wrote:
+On 5/31/19 10:02 AM, Alexander Graf wrote:
 > 
 > On 21.05.19 17:39, Sam Caccavale wrote:
->> Dear all,
+>> This commit contains the minimal set of functionality to build
+>> afl-harness around arch/x86/emulate.c which allows exercising code
+>> in that source file, like x86_emulate_insn.  Resolving the
+>> dependencies was done via GCC's -H flag by get_headers.py.
 >>
->> This series aims to provide an entrypoint for, and fuzz KVM's x86
->> instruction
->> emulator from userspace.  It mirrors Xen's application of the AFL
->> fuzzer to
->> it's instruction emulator in the hopes of discovering vulnerabilities.
->> Since this entrypoint also allows arbitrary execution of the emulators
->> code
->> from userspace, it may also be useful for testing.
+>> ---
+>>   tools/Makefile                                |   9 ++
+>>   .../fuzz/x86_instruction_emulation/.gitignore |   2 +
+>>   tools/fuzz/x86_instruction_emulation/Makefile |  57 +++++++
+>>   .../fuzz/x86_instruction_emulation/README.md  |  12 ++
+>>   .../x86_instruction_emulation/afl-harness.c   | 149 ++++++++++++++++++
+>>   tools/fuzz/x86_instruction_emulation/common.h |  87 ++++++++++
+>>   .../x86_instruction_emulation/emulator_ops.c  |  58 +++++++
+>>   .../x86_instruction_emulation/emulator_ops.h  | 117 ++++++++++++++
+>>   .../scripts/get_headers.py                    |  95 +++++++++++
+>>   .../scripts/make_deps                         |   4 +
+>>   tools/fuzz/x86_instruction_emulation/stubs.c  |  56 +++++++
+>>   tools/fuzz/x86_instruction_emulation/stubs.h  |  52 ++++++
+>>   12 files changed, 698 insertions(+)
+>>   create mode 100644 tools/fuzz/x86_instruction_emulation/.gitignore
+>>   create mode 100644 tools/fuzz/x86_instruction_emulation/Makefile
+>>   create mode 100644 tools/fuzz/x86_instruction_emulation/README.md
+>>   create mode 100644 tools/fuzz/x86_instruction_emulation/afl-harness.c
+>>   create mode 100644 tools/fuzz/x86_instruction_emulation/common.h
+>>   create mode 100644 tools/fuzz/x86_instruction_emulation/emulator_ops.c
+>>   create mode 100644 tools/fuzz/x86_instruction_emulation/emulator_ops.h
+>>   create mode 100644
+>> tools/fuzz/x86_instruction_emulation/scripts/get_headers.py
+>>   create mode 100755
+>> tools/fuzz/x86_instruction_emulation/scripts/make_deps
+>>   create mode 100644 tools/fuzz/x86_instruction_emulation/stubs.c
+>>   create mode 100644 tools/fuzz/x86_instruction_emulation/stubs.h
 >>
->> The current 3 patches build the emulator and 2 harnesses:
->> simple-harness is
->> an example of unit testing; afl-harness is a frontend for the AFL fuzzer.
->> They are early POC and include some issues outlined under "Issues."
->>
->> Patches
->> =======
->>
->> - 01: Builds and links afl-harness with the required kernel objects.
->> - 02: Introduces the minimal set of emulator operations and supporting
->> code
->> to emulate simple instructions.
->> - 03: Demonstrates simple-harness as a unit test.
->>
->> Issues
->> =======
->>
->> 1. Currently, building requires manually running the `make_deps` script
->> since I was unable to make the kernel objects a dependency of the tool.
->> 2. The code will segfault if `CONFIG_STACKPROTECTOR=y` in config.
->> 3. The code requires stderr to be buffered or it otherwise segfaults.
->>
->> The latter two issues seem related and all of them are likely fixable by
->> someone more familiar with the linux than me.
->>
->> Concerns
->> =======
->>
->> I was able to carve the `arch/x86/kvm/emulate.c` code, but the
->> emulator is
->> constructed in such a way that a lot of the code which enforces expected
->> behavior lives in the x86_emulate_ops supplied in `arch/x86/kvm/x86.c`.
->> Testing the emulator is still valuable, but a reproducible way to use
->> the kvm
->> ops would be useful.
->>
->> Any comments/suggestions are greatly appreciated.
+>> diff --git a/tools/Makefile b/tools/Makefile
+>> index 3dfd72ae6c1a..4d68817b7e49 100644
+>> --- a/tools/Makefile
+>> +++ b/tools/Makefile
+>> @@ -94,6 +94,12 @@ freefall: FORCE
+>>   kvm_stat: FORCE
+>>       $(call descend,kvm/$@)
+>>   +fuzz: FORCE
+>> +    $(call descend,fuzz/x86_instruction_emulation)
+>> +
+>> +fuzz_deps: FORCE
+>> +    $(call descend,fuzz/x86_instruction_emulation,fuzz_deps)
+>> +
+>>   all: acpi cgroup cpupower gpio hv firewire liblockdep \
+>>           perf selftests spi turbostat usb \
+>>           virtio vm bpf x86_energy_perf_policy \
+>> @@ -171,6 +177,9 @@ tmon_clean:
+>>   freefall_clean:
+>>       $(call descend,laptop/freefall,clean)
+>>   +fuzz_clean:
+>> +    $(call descend,fuzz/x86_instruction_emulation,clean)
+>> +
+>>   build_clean:
+>>       $(call descend,build,clean)
+>>   diff --git a/tools/fuzz/x86_instruction_emulation/.gitignore
+>> b/tools/fuzz/x86_instruction_emulation/.gitignore
+>> new file mode 100644
+>> index 000000000000..7d44f7ce266e
+>> --- /dev/null
+>> +++ b/tools/fuzz/x86_instruction_emulation/.gitignore
+>> @@ -0,0 +1,2 @@
+>> +*.o
+>> +*-harness
+>> diff --git a/tools/fuzz/x86_instruction_emulation/Makefile
+>> b/tools/fuzz/x86_instruction_emulation/Makefile
+>> new file mode 100644
+>> index 000000000000..d2854a332605
+>> --- /dev/null
+>> +++ b/tools/fuzz/x86_instruction_emulation/Makefile
+>> @@ -0,0 +1,57 @@
+>> +ROOT_DIR=../../..
+>> +THIS_DIR=tools/fuzz/x86_instruction_emulation
+>> +
+>> +include ../../scripts/Makefile.include
+>> +
+>> +.DEFAULT_GOAL := all
+>> +
+>> +INCLUDES := $(patsubst -I./%,-I./$(ROOT_DIR)/%, $(LINUXINCLUDE))
+>> +INCLUDES := $(patsubst ./include/%,./$(ROOT_DIR)/include/%, $(INCLUDES))
+>> +INCLUDES += -include ./$(ROOT_DIR)/include/linux/compiler_types.h
+>> +
+>> +$(ROOT_DIR)/.config:
+>> +    make -C $(ROOT_DIR) menuconfig
+>> +    sed -i -r 's/^#? *CONFIG_KVM(.*)=.*/CONFIG_KVM\1=y/'
+>> $(ROOT_DIR)/.config
+>> +
+>> +
+>> +ifdef DEBUG
+>> +KBUILD_CFLAGS += -DDEBUG
+>> +endif
+>> +KBUILD_CFLAGS += -g -O0
 > 
 > 
-> First off, thanks a lot for this :). The x86 emulator has been a sore
-> (bug prone) point in KVM for a long time and I'm surprised it's not
-> covered by fuzzing yet. It's great to see that finally happening.
-> 
-> A few nits:
-> 
->   1) Cover letter should be [PATCH 0/3]. Just generate it with git
-> format-patch --cover-letter.
-
-Understood and corrected in v2.
->   2) The directory name "x86_instruction_emulation" is a bit long, no?
-Yes it is.  While tab completion has mostly kept me sane until now, I've
-renamed the folder to `x86ie`s
-
->   3) I think the cover letter should also detail how this relates to
-> other fuzzing efforts and why we need another, separate one.
-
-This sounds worthwhile.  In the interest of time I haven't included this
-in v2, but I'll write it up as soon as possible and update.
-
-> 
+> Why -O0? I would expect a some bugs to only emerge with optimization
+> enabled.
 > 
 > Alex
 > 
-> 
 
-Thanks for the advice, v2 to follow.
+This was supposed to be the `ifdef` actually.  Fixed in v2.
 
 Sam
