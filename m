@@ -2,155 +2,277 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E9C06425DC
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 14:33:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F0644263E
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 14:46:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438973AbfFLMbY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 08:31:24 -0400
-Received: from mail-eopbgr140089.outbound.protection.outlook.com ([40.107.14.89]:11827
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2438902AbfFLMbX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 08:31:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JzsvQupAN+gcQeJKOQ2o7kyCHqxsW5uqpl6ZC5jXWRk=;
- b=lyyV+knAeziQlFW3VAseHnfQhMeAPOBow4sOExqkD8yABODe6h2ys+HaOKmmRD7k0RGvgQFtdmUr94ZzBTLNwpUr8yUWvXC4eDca9cYEcy4Wv9u2GhxYaD28QvlVs1Z2FPXYNvyTf5L5+PGLYMR+e6AVV0HQdQBoCWncF+7qt3U=
-Received: from VE1PR08MB4637.eurprd08.prod.outlook.com (10.255.27.14) by
- VE1PR08MB4735.eurprd08.prod.outlook.com (10.255.112.74) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1965.13; Wed, 12 Jun 2019 12:30:36 +0000
-Received: from VE1PR08MB4637.eurprd08.prod.outlook.com
- ([fe80::6574:1efb:6972:2b37]) by VE1PR08MB4637.eurprd08.prod.outlook.com
- ([fe80::6574:1efb:6972:2b37%6]) with mapi id 15.20.1965.017; Wed, 12 Jun 2019
- 12:30:36 +0000
-From:   Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-To:     Andrey Konovalov <andreyknvl@google.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-CC:     nd <nd@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>,
-        Vincenzo Frascino <Vincenzo.Frascino@arm.com>,
-        Will Deacon <Will.Deacon@arm.com>,
-        Mark Rutland <Mark.Rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave P Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <Robin.Murphy@arm.com>,
-        Kevin Brodsky <Kevin.Brodsky@arm.com>
-Subject: Re: [PATCH v17 15/15] selftests, arm64: add a selftest for passing
- tagged pointers to kernel
-Thread-Topic: [PATCH v17 15/15] selftests, arm64: add a selftest for passing
- tagged pointers to kernel
-Thread-Index: AQHVIRQxA9mqrEC18UGUWJeO7iZYdKaX8xmA
-Date:   Wed, 12 Jun 2019 12:30:36 +0000
-Message-ID: <7cd942c0-d4c1-0cf4-623a-bce6ef14d992@arm.com>
-References: <cover.1560339705.git.andreyknvl@google.com>
- <e024234e652f23be4d76d63227de114e7def5dff.1560339705.git.andreyknvl@google.com>
-In-Reply-To: <e024234e652f23be4d76d63227de114e7def5dff.1560339705.git.andreyknvl@google.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-x-originating-ip: [217.140.106.51]
-x-clientproxiedby: LO2P265CA0242.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:8a::14) To VE1PR08MB4637.eurprd08.prod.outlook.com
- (2603:10a6:802:b1::14)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Szabolcs.Nagy@arm.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 99aee353-e532-4d6e-08cc-08d6ef31c543
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VE1PR08MB4735;
-x-ms-traffictypediagnostic: VE1PR08MB4735:
-nodisclaimer: True
-x-microsoft-antispam-prvs: <VE1PR08MB47350D33F85267298368A6C2EDEC0@VE1PR08MB4735.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 0066D63CE6
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(396003)(39860400002)(136003)(376002)(366004)(346002)(189003)(199004)(316002)(4326008)(31696002)(86362001)(7416002)(2201001)(6436002)(2501003)(36756003)(58126008)(65826007)(2906002)(6116002)(8936002)(6246003)(5660300002)(6486002)(3846002)(64126003)(81166006)(52116002)(72206003)(6506007)(54906003)(478600001)(7736002)(68736007)(81156014)(8676002)(99286004)(14454004)(53546011)(102836004)(446003)(66446008)(25786009)(229853002)(11346002)(110136005)(64756008)(65956001)(6512007)(44832011)(66946007)(71200400001)(65806001)(73956011)(53936002)(66556008)(486006)(66066001)(76176011)(256004)(2616005)(31686004)(71190400001)(66476007)(186003)(476003)(386003)(305945005)(26005)(921003)(1121003);DIR:OUT;SFP:1101;SCL:1;SRVR:VE1PR08MB4735;H:VE1PR08MB4637.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: arm.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: rJ7Myflk/nypTg5f/73dOS7TRRDm+ghZMw88lkc6ZS3BTX3mf2YWXxdJzopWcQoL+pAtHst4LESGB/sFDMU+kDQCtDQ+N+Upw9oABmGwY3Jy1gBzj7BSNJp1sURm642fb5Pkq7vtCJgFYckY+lBpldYk8jnSQbto+SdV3gcndh4C0LoM49y2iwNfmuoKloc2y92N8CyhF511nLoJpEz/xiIcVGmKuwLZyB7L25ujm5gBnome5V0sIaDqhG0ksFSH0LDlVbPwP6o+x3QrNzJQNOKIyCDmikUF4ih2Nhjycxg4HponMHE7rOEo8kqCuaen/dv/NTUk+5qsdMeZHR3GpdeK0+GyDmLONCcLE3PYhZiy5U2URnQY+8ThUrKJeBBHOfWlb6Hbv3WyXRxWifzYMdF3ZI9EvU+z8dvP99lbyvY=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2FA45C6A3FFA994DA2213028275DFA44@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S2439107AbfFLMqd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 08:46:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40968 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2439095AbfFLMqd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 08:46:33 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4DCCF307D915;
+        Wed, 12 Jun 2019 12:46:09 +0000 (UTC)
+Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-228.sin2.redhat.com [10.67.116.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A251D60BF1;
+        Wed, 12 Jun 2019 12:45:32 +0000 (UTC)
+From:   Pankaj Gupta <pagupta@redhat.com>
+To:     dm-devel@redhat.com, linux-nvdimm@lists.01.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
+        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
+        linux-xfs@vger.kernel.org
+Cc:     dan.j.williams@intel.com, zwisler@kernel.org,
+        vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com,
+        jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net,
+        hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu,
+        adilger.kernel@dilger.ca, darrick.wong@oracle.com,
+        lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com,
+        jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com,
+        stefanha@redhat.com, aarcange@redhat.com, david@redhat.com,
+        david@fromorbit.com, cohuck@redhat.com,
+        xiaoguangrong.eric@gmail.com, pagupta@redhat.com,
+        pbonzini@redhat.com, yuval.shaia@oracle.com, kilobyte@angband.pl,
+        jstaron@google.com, rdunlap@infradead.org, snitzer@redhat.com
+Subject: [PATCH v13 0/7] virtio pmem driver 
+Date:   Wed, 12 Jun 2019 18:15:20 +0530
+Message-Id: <20190612124527.3763-1-pagupta@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99aee353-e532-4d6e-08cc-08d6ef31c543
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2019 12:30:36.6121
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Szabolcs.Nagy@arm.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR08MB4735
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Wed, 12 Jun 2019 12:46:32 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMTIvMDYvMjAxOSAxMjo0MywgQW5kcmV5IEtvbm92YWxvdiB3cm90ZToNCj4gLS0tIC9kZXYv
-bnVsbA0KPiArKysgYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9hcm02NC90YWdzX2xpYi5jDQo+
-IEBAIC0wLDAgKzEsNjIgQEANCj4gKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4w
-DQo+ICsNCj4gKyNpbmNsdWRlIDxzdGRsaWIuaD4NCj4gKyNpbmNsdWRlIDxzeXMvcHJjdGwuaD4N
-Cj4gKw0KPiArI2RlZmluZSBUQUdfU0hJRlQJKDU2KQ0KPiArI2RlZmluZSBUQUdfTUFTSwkoMHhm
-ZlVMIDw8IFRBR19TSElGVCkNCj4gKw0KPiArI2RlZmluZSBQUl9TRVRfVEFHR0VEX0FERFJfQ1RS
-TAk1NQ0KPiArI2RlZmluZSBQUl9HRVRfVEFHR0VEX0FERFJfQ1RSTAk1Ng0KPiArI2RlZmluZSBQ
-Ul9UQUdHRURfQUREUl9FTkFCTEUJKDFVTCA8PCAwKQ0KPiArDQo+ICt2b2lkICpfX2xpYmNfbWFs
-bG9jKHNpemVfdCBzaXplKTsNCj4gK3ZvaWQgX19saWJjX2ZyZWUodm9pZCAqcHRyKTsNCj4gK3Zv
-aWQgKl9fbGliY19yZWFsbG9jKHZvaWQgKnB0ciwgc2l6ZV90IHNpemUpOw0KPiArdm9pZCAqX19s
-aWJjX2NhbGxvYyhzaXplX3Qgbm1lbWIsIHNpemVfdCBzaXplKTsNCg0KdGhpcyBkb2VzIG5vdCB3
-b3JrIG9uIGF0IGxlYXN0IG11c2wuDQoNCnRoZSBtb3N0IHJvYnVzdCBzb2x1dGlvbiB3b3VsZCBi
-ZSB0byBpbXBsZW1lbnQNCnRoZSBtYWxsb2MgYXBpcyB3aXRoIG1tYXAvbXVubWFwL21yZW1hcCwg
-aWYgdGhhdCdzDQp0b28gY3VtYmVyc29tZSB0aGVuIHVzZSBkbHN5bSBSVExEX05FWFQgKGFsdGhv
-dWdoDQp0aGF0IGhhcyB0aGUgc2xpZ2h0IHdhcnQgdGhhdCBpbiBnbGliYyBpdCBtYXkgY2FsbA0K
-Y2FsbG9jIHNvIHdyYXBwaW5nIGNhbGxvYyB0aGF0IHdheSBpcyB0cmlja3kpLg0KDQppbiBzaW1w
-bGUgbGludXggdGVzdHMgaSdkIGp1c3QgdXNlIHN0YXRpYyBvcg0Kc3RhY2sgYWxsb2NhdGlvbnMg
-b3IgbW1hcC4NCg0KaWYgYSBnZW5lcmljIHByZWxvYWRhYmxlIGxpYiBzb2x1dGlvbiBpcyBuZWVk
-ZWQNCnRoZW4gZG8gaXQgcHJvcGVybHkgd2l0aCBwdGhyZWFkX29uY2UgdG8gYXZvaWQNCnJhY2Vz
-IGV0Yy4NCg0KPiArDQo+ICtzdGF0aWMgdm9pZCAqdGFnX3B0cih2b2lkICpwdHIpDQo+ICt7DQo+
-ICsJc3RhdGljIGludCB0YWdnZWRfYWRkcl9lcnIgPSAxOw0KPiArCXVuc2lnbmVkIGxvbmcgdGFn
-ID0gMDsNCj4gKw0KPiArCS8qDQo+ICsJICogTm90ZSB0aGF0IHRoaXMgY29kZSBpcyByYWN5LiBX
-ZSBvbmx5IHVzZSBpdCBhcyBhIHBhcnQgb2YgYSBzaW5nbGUNCj4gKwkgKiB0aHJlYWRlZCB0ZXN0
-IGFwcGxpY2F0aW9uLiBCZXdhcmUgb2YgdXNpbmcgaW4gbXVsdGl0aHJlYWRlZCBvbmVzLg0KPiAr
-CSAqLw0KPiArCWlmICh0YWdnZWRfYWRkcl9lcnIgPT0gMSkNCj4gKwkJdGFnZ2VkX2FkZHJfZXJy
-ID0gcHJjdGwoUFJfU0VUX1RBR0dFRF9BRERSX0NUUkwsDQo+ICsJCQkJUFJfVEFHR0VEX0FERFJf
-RU5BQkxFLCAwLCAwLCAwKTsNCj4gKw0KPiArCWlmICghcHRyKQ0KPiArCQlyZXR1cm4gcHRyOw0K
-PiArCWlmICghdGFnZ2VkX2FkZHJfZXJyKQ0KPiArCQl0YWcgPSByYW5kKCkgJiAweGZmOw0KPiAr
-DQo+ICsJcmV0dXJuICh2b2lkICopKCh1bnNpZ25lZCBsb25nKXB0ciB8ICh0YWcgPDwgVEFHX1NI
-SUZUKSk7DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyB2b2lkICp1bnRhZ19wdHIodm9pZCAqcHRyKQ0K
-PiArew0KPiArCXJldHVybiAodm9pZCAqKSgodW5zaWduZWQgbG9uZylwdHIgJiB+VEFHX01BU0sp
-Ow0KPiArfQ0KPiArDQo+ICt2b2lkICptYWxsb2Moc2l6ZV90IHNpemUpDQo+ICt7DQo+ICsJcmV0
-dXJuIHRhZ19wdHIoX19saWJjX21hbGxvYyhzaXplKSk7DQo+ICt9DQouLi4NCg==
+ This patch series is ready to be merged via nvdimm tree
+ as discussed with Dan. We have ack/review on XFS, EXT4
+ device mapper & VIRTIO patches.
+
+ This version has minor changes in patch 2. Keeping all
+ the existing r-o-bs. Jakob CCed also tested the patch
+ series and confirmed the working of v9.
+ ---
+
+ This patch series has implementation for "virtio pmem". 
+ "virtio pmem" is fake persistent memory(nvdimm) in guest 
+ which allows to bypass the guest page cache. This also
+ implements a VIRTIO based asynchronous flush mechanism.  
+ 
+ Sharing guest kernel driver in this patchset with the 
+ changes suggested in v4. Tested with Qemu side device 
+ emulation [5] for virtio-pmem. Documented the impact of
+ possible page cache side channel attacks with suggested
+ countermeasures.
+
+ Details of project idea for 'virtio pmem' flushing interface 
+ is shared [3] & [4].
+
+ Implementation is divided into two parts:
+ New virtio pmem guest driver and qemu code changes for new 
+ virtio pmem paravirtualized device.
+
+1. Guest virtio-pmem kernel driver
+---------------------------------
+   - Reads persistent memory range from paravirt device and 
+     registers with 'nvdimm_bus'.  
+   - 'nvdimm/pmem' driver uses this information to allocate 
+     persistent memory region and setup filesystem operations 
+     to the allocated memory. 
+   - virtio pmem driver implements asynchronous flushing 
+     interface to flush from guest to host.
+
+2. Qemu virtio-pmem device
+---------------------------------
+   - Creates virtio pmem device and exposes a memory range to 
+     KVM guest. 
+   - At host side this is file backed memory which acts as 
+     persistent memory. 
+   - Qemu side flush uses aio thread pool API's and virtio 
+     for asynchronous guest multi request handling. 
+
+ Virtio-pmem security implications and countermeasures:
+ -----------------------------------------------------
+
+ In previous posting of kernel driver, there was discussion [7]
+ on possible implications of page cache side channel attacks with 
+ virtio pmem. After thorough analysis of details of known side 
+ channel attacks, below are the suggestions:
+
+ - Depends entirely on how host backing image file is mapped 
+   into guest address space. 
+
+ - virtio-pmem device emulation, by default shared mapping is used
+   to map host backing file. It is recommended to use separate
+   backing file at host side for every guest. This will prevent
+   any possibility of executing common code from multiple guests
+   and any chance of inferring guest local data based based on 
+   execution time.
+
+ - If backing file is required to be shared among multiple guests 
+   it is recommended to don't support host page cache eviction 
+   commands from the guest driver. This will avoid any possibility
+   of inferring guest local data or host data from another guest. 
+
+ - Proposed device specification [6] for virtio-pmem device with 
+   details of possible security implications and suggested 
+   countermeasures for device emulation.
+
+ Virtio-pmem errors handling:
+ ----------------------------------------
+  Checked behaviour of virtio-pmem for below types of errors
+  Need suggestions on expected behaviour for handling these errors?
+
+  - Hardware Errors: Uncorrectable recoverable Errors: 
+  a] virtio-pmem: 
+    - As per current logic if error page belongs to Qemu process, 
+      host MCE handler isolates(hwpoison) that page and send SIGBUS. 
+      Qemu SIGBUS handler injects exception to KVM guest. 
+    - KVM guest then isolates the page and send SIGBUS to guest 
+      userspace process which has mapped the page. 
+  
+  b] Existing implementation for ACPI pmem driver: 
+    - Handles such errors with MCE notifier and creates a list 
+      of bad blocks. Read/direct access DAX operation return EIO 
+      if accessed memory page fall in bad block list.
+    - It also starts backgound scrubbing.  
+    - Similar functionality can be reused in virtio-pmem with MCE 
+      notifier but without scrubbing(no ACPI/ARS)? Need inputs to 
+      confirm if this behaviour is ok or needs any change?
+
+Changes from PATCH v12: [1] 
+ - Minor changes(function name, dev_err -> dev_info & 
+   make function static in virtio patch - [Cornelia]
+ - Added r-o-b of Mike in patch 4
+
+Changes from PATCH v11: [2] 
+ - Change implmentation for setting of synchronous DAX type
+   for device mapper - [Mike] 
+
+Changes from PATCH v10:
+ - Rebased on Linux-5.2-rc4
+
+Changes from PATCH v9:
+ - Kconfig help text add two spaces - Randy
+ - Fixed libnvdimm 'bio' include warning - Dan
+ - virtio-pmem, separate request/resp struct and 
+   move to uapi file with updated license - DavidH
+ - Use virtio32* type for req/resp endianess - DavidH
+ - Added tested-by & ack-by of Jakob
+ - Rebased to 5.2-rc1
+
+Changes from PATCH v8:
+ - Set device mapper synchronous if all target devices support - Dan
+ - Move virtio_pmem.h to nvdimm directory  - Dan
+ - Style, indentation & better error messages in patch 2 - DavidH
+ - Added MST's ack in patch 2.
+
+Changes from PATCH v7:
+ - Corrected pending request queue logic (patch 2) - Jakub Staroń
+ - Used unsigned long flags for passing DAXDEV_F_SYNC (patch 3) - Dan
+ - Fixed typo =>  vma 'flag' to 'vm_flag' (patch 4)
+ - Added rob in patch 6 & patch 2
+
+Changes from PATCH v6: 
+ - Corrected comment format in patch 5 & patch 6. [Dave]
+ - Changed variable declaration indentation in patch 6 [Darrick]
+ - Add Reviewed-by tag by 'Jan Kara' in patch 4 & patch 5
+
+Changes from PATCH v5: 
+  Changes suggested in by - [Cornelia, Yuval]
+- Remove assignment chaining in virtio driver
+- Better error message and remove not required free
+- Check nd_region before use
+
+  Changes suggested by - [Jan Kara]
+- dax_synchronous() for !CONFIG_DAX
+- Correct 'daxdev_mapping_supported' comment and non-dax implementation
+
+  Changes suggested by - [Dan Williams]
+- Pass meaningful flag 'DAXDEV_F_SYNC' to alloc_dax
+- Gate nvdimm_flush instead of additional async parameter
+- Move block chaining logic to flush callback than common nvdimm_flush
+- Use NULL flush callback for generic flush for better readability [Dan, Jan]
+
+- Use virtio device id 27 from 25(already used) - [MST]
+
+Changes from PATCH v4:
+- Factor out MAP_SYNC supported functionality to a common helper
+				[Dave, Darrick, Jan]
+- Comment, indentation and virtqueue_kick failure handle - Yuval Shaia
+
+Changes from PATCH v3: 
+- Use generic dax_synchronous() helper to check for DAXDEV_SYNC 
+  flag - [Dan, Darrick, Jan]
+- Add 'is_nvdimm_async' function
+- Document page cache side channel attacks implications & 
+  countermeasures - [Dave Chinner, Michael]
+
+Changes from PATCH v2: 
+- Disable MAP_SYNC for ext4 & XFS filesystems - [Dan] 
+- Use name 'virtio pmem' in place of 'fake dax' 
+
+Changes from PATCH v1: 
+- 0-day build test for build dependency on libnvdimm 
+
+ Changes suggested by - [Dan Williams]
+- Split the driver into two parts virtio & pmem  
+- Move queuing of async block request to block layer
+- Add "sync" parameter in nvdimm_flush function
+- Use indirect call for nvdimm_flush
+- Don’t move declarations to common global header e.g nd.h
+- nvdimm_flush() return 0 or -EIO if it fails
+- Teach nsio_rw_bytes() that the flush can fail
+- Rename nvdimm_flush() to generic_nvdimm_flush()
+- Use 'nd_region->provider_data' for long dereferencing
+- Remove virtio_pmem_freeze/restore functions
+- Remove BSD license text with SPDX license text
+
+- Add might_sleep() in virtio_pmem_flush - [Luiz]
+- Make spin_lock_irqsave() narrow
+
+Pankaj Gupta (7):
+   libnvdimm: nd_region flush callback support
+   virtio-pmem: Add virtio-pmem guest driver
+   libnvdimm: add nd_region buffered dax_dev flag
+   dax: check synchronous mapping is supported
+   dm: dm: Enable synchronous dax
+   ext4: disable map_sync for virtio pmem
+   xfs: disable map_sync for virtio pmem
+
+[1] https://lkml.org/lkml/2019/6/11/831
+[2] https://lkml.org/lkml/2019/6/10/209
+[3] https://www.spinics.net/lists/kvm/msg149761.html
+[4] https://www.spinics.net/lists/kvm/msg153095.html  
+[5] https://marc.info/?l=qemu-devel&m=155860751202202&w=2
+[6] https://lists.oasis-open.org/archives/virtio-dev/201903/msg00083.html
+[7] https://lkml.org/lkml/2019/1/9/1191
+
+ drivers/acpi/nfit/core.c         |    4 -
+ drivers/dax/bus.c                |    2 
+ drivers/dax/super.c              |   19 +++++
+ drivers/md/dm-table.c            |   24 +++++--
+ drivers/md/dm.c                  |    5 -
+ drivers/md/dm.h                  |    5 +
+ drivers/nvdimm/Makefile          |    1 
+ drivers/nvdimm/claim.c           |    6 +
+ drivers/nvdimm/nd.h              |    1 
+ drivers/nvdimm/nd_virtio.c       |  125 +++++++++++++++++++++++++++++++++++++++
+ drivers/nvdimm/pmem.c            |   18 +++--
+ drivers/nvdimm/region_devs.c     |   33 +++++++++-
+ drivers/nvdimm/virtio_pmem.c     |  122 ++++++++++++++++++++++++++++++++++++++
+ drivers/nvdimm/virtio_pmem.h     |   55 +++++++++++++++++
+ drivers/virtio/Kconfig           |   11 +++
+ fs/ext4/file.c                   |   10 +--
+ fs/xfs/xfs_file.c                |    9 +-
+ include/linux/dax.h              |   26 +++++++-
+ include/linux/libnvdimm.h        |   10 ++-
+ include/uapi/linux/virtio_ids.h  |    1 
+ include/uapi/linux/virtio_pmem.h |   35 ++++++++++
+ 21 files changed, 489 insertions(+), 33 deletions(-)
