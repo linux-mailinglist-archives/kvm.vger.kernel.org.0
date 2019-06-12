@@ -2,53 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 23ED1423AE
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 13:14:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CBE17423B4
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 13:14:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438248AbfFLLNY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 07:13:24 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:38155 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2438224AbfFLLNU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 07:13:20 -0400
-Received: by mail-pg1-f195.google.com with SMTP id v11so8752605pgl.5
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2019 04:13:20 -0700 (PDT)
+        id S2438254AbfFLLOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 07:14:43 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:33920 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726605AbfFLLOm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 07:14:42 -0400
+Received: by mail-pl1-f194.google.com with SMTP id i2so6508496plt.1
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2019 04:14:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=CPH48pl3zgEAvx1ZV8NCaa+NrirZ7d55m0K/3ZW0DB4=;
-        b=Wa+GrRiixuq08ZJy7YLBy/hw4N6KCGD4D0JGPHXeAhrhP7aYFGu2wrFVi/4U57v07h
-         gabUfJpQMd/ZxixypJh6LG438zDMAFuaLmx1zNosW/bNS5e9DE+bfIpQfyXphO/5R37q
-         J4BK+9faydCecf+zFNicytUzZ+34IwX2nZrUTbQwSG0d5Mwjsh+M/iy5iKaSTm2HU1Vc
-         APJmA3gO7zhEVXs30R27Red8E5MuIvjfWVaZNPU7/jpeOCWo81HFfgpvxUE+snFq9nK5
-         AQ9h1nAmh3KAeta7IGYJp8hdQcsOoF6BnZ35/+mA9Y0+45iTzl1SsN8NtN8M46KVCGVs
-         tN2Q==
+        bh=ICAcqmNM80YqXGU9u0yKcUq/onm/SsQo2SDs/l3f+hY=;
+        b=QkhZMvI8xgho9eMFZ7w6J/3duhWcdGLEkVVUAU2qSaxNfXU+GXLc+PdiUdCpUn61iY
+         0xCUxQ9wiA1Jj7ZnvEwSzmljdVe71a10tK0t/VIk6vJ6KuoIESh9plrNP00oJ9EUV9CE
+         7ZXKJL/NmCDrLh5D1fRV3U/5XcSqnaFIYrJ7IhnmnWDC1y2ZQhZMwMFDrVZ4wkPjj2PR
+         KjnNxVxOeNHsZ1yb6hgnM2H6TbZTzWPz9Cffq6e0f9rEpBuiI2bynmdfsgpQFhae4y5r
+         LLRsk0MnIrY8OwbkGOOGkhYBEu+P7mFEBBswTcH9Mhn9r0qq9AEF/SsRyiNTxER5NtY3
+         eTUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=CPH48pl3zgEAvx1ZV8NCaa+NrirZ7d55m0K/3ZW0DB4=;
-        b=QYoeiAHbp7WHzK+Zh6bCNA3rLPAm0dtgQt9Ck7iIa+FsNNDl//paQ/zg9aTwm0d0Lq
-         vVKAHOnKEqmzipsFGGp0eC7ogk99LjPuZm7WIKOyih4zmYZbKwq3p0904Zh4jCYR5Wi5
-         /+7d3jO/WzZ4rCK4pFN5iLeMrEsB1WghI8ZmhrveiwuPSGc9CT0THDjZPRDZQ3CFgrYY
-         2iD5wWV6iJPRnMFlDFMa2P7Noj6DybRCkmuaLBX+as4HcqtA/SCOBzhlxHcvZPlxtgKh
-         0z0NPT9zDfM2TNpGNju+wEL3vk/1t0kh1bBECP2KdjHOnDdZXBhaQJlkz0RTokII2Q0X
-         X8GA==
-X-Gm-Message-State: APjAAAXu/+eZDX6O8Nb1wHYdgG3/MZLkNhUpUlcZbDRiFUWlImwzay2e
-        9CUQs9rXb62dE/EuB5ret8FVflufiIi6m52iTJ62WA==
-X-Google-Smtp-Source: APXvYqwzlagi41UpMXh0yb3QZZS2gyEag7Dm2eoj6v2jESPsCD8f1MNuoUw/t7+/hDiqSvkq5q/rQO7JKsp+xiDho38=
-X-Received: by 2002:a65:5845:: with SMTP id s5mr25017064pgr.286.1560337999517;
- Wed, 12 Jun 2019 04:13:19 -0700 (PDT)
+        bh=ICAcqmNM80YqXGU9u0yKcUq/onm/SsQo2SDs/l3f+hY=;
+        b=E1NkBVg8+EYEhNKKyGFSKCqRXy0Szy91PWpKsRqUfLFCkuY5B6blX2bY0UaxAIb85p
+         LozaHON/gRpWCTAZrm51QTJpmToEtgGw4p4shTDeSCLF1CEbuRSHvZx7q804XiIG9Ewh
+         BcY1F18UOhdZam78TaamQa6c9nmSAvhSJ0wBU3jcF3IBdajC3B6VBzEWd7chCItSKb7Q
+         gNZqlM9TX8OceM1yMcq/RBdEce3U90X4FbnfXwosQ5rfrTlbnnhstmi+/fpgkeY3NEhR
+         I6mseL6Nbt3pD2Fwf8v/mskbkbA8IhZ4HSYw0qwcfLIabBHMjpqqFhUO1HIXiYQ55J+N
+         fdvw==
+X-Gm-Message-State: APjAAAV4/i/X2ZJQ3xFOISGehoryyGkZm6gev/dulDv+rW78qRoWq4Ke
+        Kgu8CC4ZbkjXpOK24Vw9HYc+pYzF3amDXch04zC0WA==
+X-Google-Smtp-Source: APXvYqygEZ27HGfNqszCpdSgojAf7S6ru14/DaT8Or0Syv3FL9sWDfZ+9LXBU0/5Hxbzx8tkSmaHaZjTcL+f/jghf7s=
+X-Received: by 2002:a17:902:8609:: with SMTP id f9mr75570344plo.252.1560338081704;
+ Wed, 12 Jun 2019 04:14:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1559580831.git.andreyknvl@google.com> <045a94326401693e015bf80c444a4d946a5c68ed.1559580831.git.andreyknvl@google.com>
- <20190610142824.GB10165@c02tf0j2hf1t.cambridge.arm.com> <CAAeHK+zBDB6i+iEw+TJY14gZeccvWeOBEaU+otn1F+jzDLaRpA@mail.gmail.com>
- <20190611174448.exg2zycfqf4a2vea@mbp>
-In-Reply-To: <20190611174448.exg2zycfqf4a2vea@mbp>
+References: <cover.1559580831.git.andreyknvl@google.com> <9e1b5998a28f82b16076fc85ab4f88af5381cf74.1559580831.git.andreyknvl@google.com>
+ <20190611150122.GB63588@arrakis.emea.arm.com> <CAAeHK+wZrVXxAnDXBjoUy8JK9iG553G2Bp8uPWQ0u1u5gts0vQ@mail.gmail.com>
+ <20190611175037.pflr6q6ob67zjj25@mbp>
+In-Reply-To: <20190611175037.pflr6q6ob67zjj25@mbp>
 From:   Andrey Konovalov <andreyknvl@google.com>
-Date:   Wed, 12 Jun 2019 13:13:08 +0200
-Message-ID: <CAAeHK+wkA8PskRrdfJ7MMr+je+x71WW3yDgWajxPRPwPBRNVfA@mail.gmail.com>
-Subject: Re: [PATCH v16 05/16] arm64: untag user pointers passed to memory syscalls
+Date:   Wed, 12 Jun 2019 13:14:30 +0200
+Message-ID: <CAAeHK+x4sHKfQx31uQ9zSO48oRs3XLATfymY=vgEHQ1FLNmeig@mail.gmail.com>
+Subject: Re: [PATCH v16 16/16] selftests, arm64: add a selftest for passing
+ tagged pointers to kernel
 To:     Catalin Marinas <catalin.marinas@arm.com>
 Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
         Linux Memory Management List <linux-mm@kvack.org>,
@@ -93,34 +94,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 11, 2019 at 7:45 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
+On Tue, Jun 11, 2019 at 7:50 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
 >
-> On Tue, Jun 11, 2019 at 05:35:31PM +0200, Andrey Konovalov wrote:
-> > On Mon, Jun 10, 2019 at 4:28 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > > On Mon, Jun 03, 2019 at 06:55:07PM +0200, Andrey Konovalov wrote:
-> > > > This patch is a part of a series that extends arm64 kernel ABI to allow to
-> > > > pass tagged user pointers (with the top byte set to something else other
-> > > > than 0x00) as syscall arguments.
-> > > >
-> > > > This patch allows tagged pointers to be passed to the following memory
-> > > > syscalls: get_mempolicy, madvise, mbind, mincore, mlock, mlock2, mprotect,
-> > > > mremap, msync, munlock.
-> > > >
-> > > > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> On Tue, Jun 11, 2019 at 07:18:04PM +0200, Andrey Konovalov wrote:
+> > On Tue, Jun 11, 2019 at 5:01 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > > static void *tag_ptr(void *ptr)
+> > > {
+> > >         static int tagged_addr_err = 1;
+> > >         unsigned long tag = 0;
 > > >
-> > > I would add in the commit log (and possibly in the code with a comment)
-> > > that mremap() and mmap() do not currently accept tagged hint addresses.
-> > > Architectures may interpret the hint tag as a background colour for the
-> > > corresponding vma. With this:
+> > >         if (tagged_addr_err == 1)
+> > >                 tagged_addr_err = prctl(PR_SET_TAGGED_ADDR_CTRL,
+> > >                                         PR_TAGGED_ADDR_ENABLE, 0, 0, 0);
 > >
-> > I'll change the commit log. Where do you you think I should put this
-> > comment? Before mmap and mremap definitions in mm/?
+> > I think this requires atomics. malloc() can be called from multiple threads.
 >
-> On arm64 we use our own sys_mmap(). I'd say just add a comment on the
-> generic mremap() just before the untagged_addr() along the lines that
-> new_address is not untagged for preserving similar behaviour to mmap().
+> It's slightly racy but I assume in a real libc it can be initialised
+> earlier than the hook calls while still in single-threaded mode (I had
+> a quick attempt with __attribute__((constructor)) but didn't get far).
+>
+> Even with the race, under normal circumstances calling the prctl() twice
+> is not a problem. I think the risk here is that someone disables the ABI
+> via sysctl and the ABI is enabled for some of the threads only.
 
-Will do in v17, thanks!
+OK, I'll keep the code racy, but add a comment pointing it out. Thanks!
 
 >
 > --
