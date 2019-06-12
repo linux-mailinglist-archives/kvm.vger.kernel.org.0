@@ -2,156 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7078142B51
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 17:54:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 450C142B53
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 17:55:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729769AbfFLPyp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 11:54:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41834 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726725AbfFLPyp (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 12 Jun 2019 11:54:45 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5CFpdIo120548
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2019 11:54:43 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2t33bcufvv-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2019 11:54:43 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
-        Wed, 12 Jun 2019 16:54:41 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 12 Jun 2019 16:54:37 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5CFsa3417301728
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 12 Jun 2019 15:54:36 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 850C24203F;
-        Wed, 12 Jun 2019 15:54:36 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 27AC442045;
-        Wed, 12 Jun 2019 15:54:36 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.152.224.26])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 12 Jun 2019 15:54:36 +0000 (GMT)
-Date:   Wed, 12 Jun 2019 17:54:34 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Libvirt Devel <libvir-list@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Erik Skultety <eskultet@redhat.com>,
-        Pavel Hrdina <phrdina@redhat.com>,
-        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-        Sylvain Bauza <sbauza@redhat.com>
-Subject: Re: mdevctl: A shoestring mediated device management and
- persistence utility
-In-Reply-To: <20190612091439.3a33f17b.cohuck@redhat.com>
-References: <20190523172001.41f386d8@x1.home>
-        <20190524121106.16e08562.cohuck@redhat.com>
-        <20190607180630.7e8e24d4.pasic@linux.ibm.com>
-        <20190611214508.0a86aeb2.cohuck@redhat.com>
-        <20190611142822.238ef424@x1.home>
-        <20190612091439.3a33f17b.cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1729799AbfFLPzM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 11:55:12 -0400
+Received: from mga06.intel.com ([134.134.136.31]:63860 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729772AbfFLPzM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 11:55:12 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Jun 2019 08:55:12 -0700
+X-ExtLoop1: 1
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
+  by orsmga001.jf.intel.com with ESMTP; 12 Jun 2019 08:55:12 -0700
+Date:   Wed, 12 Jun 2019 08:55:12 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] kvm: remove invalid check for debugfs_create_dir()
+Message-ID: <20190612155512.GG20308@linux.intel.com>
+References: <20190612145033.GA18084@kroah.com>
+ <20190612154021.GF20308@linux.intel.com>
+ <20190612154622.GA22739@kroah.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19061215-0016-0000-0000-000002887DBC
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19061215-0017-0000-0000-000032E5B47B
-Message-Id: <20190612175434.54e196e2.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-12_09:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906120106
+In-Reply-To: <20190612154622.GA22739@kroah.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 12 Jun 2019 09:14:39 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> On Tue, 11 Jun 2019 14:28:22 -0600
-> Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
-> > On Tue, 11 Jun 2019 21:45:08 +0200
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> > 
-> > > On Fri, 7 Jun 2019 18:06:30 +0200
-> > > Halil Pasic <pasic@linux.ibm.com> wrote:
-> 
-> > > > I guess for vfio-ccw one needs to make sure that the ccw device is bound
-> > > > to the vfio-ccw driver first, and only after that can one use  
-> > > > create-mdev to create the mdev on top of the subchannel.
-> > > > 
-> > > > So to make this work persistently (survive a reboot) one would need to
-> > > > take care of the subchannel getting bound to the right vfio_ccw driver
-> > > > before mdevctl is called. Right?
-> > > > 
-> > > > BTW how does this concurrence situation between the drivers io_subchannel
-> > > > and vfio_ccw work? Especially if both are build in?    
+On Wed, Jun 12, 2019 at 05:46:22PM +0200, Greg Kroah-Hartman wrote:
+> On Wed, Jun 12, 2019 at 08:40:21AM -0700, Sean Christopherson wrote:
+> > On Wed, Jun 12, 2019 at 04:50:33PM +0200, Greg Kroah-Hartman wrote:
+> > > debugfs_create_dir() can never return NULL, so no need to check for an
+> > > impossible thing.
 > > > 
-> > > If you have two drivers that match to the same device type, you'll
-> > > always have the issue that the driver that is first matched with the
-> > > device will bind to it and you have to do the unbind/rebind dance to
-> > > get it bound to the correct device driver. (I guess that this was the
-> > > basic motivation behind the ap bus default driver infrastructure,
-> > > right?) I think that in our case the io_subchannel driver will be
-> > > called first (alphabetical order and the fact that vfio-ccw will often
-> > > be a module). I'm not sure if it is within the scope of mdevctl to
-> > > ensure that the device is bound to the correct driver, or if it rather
-> > > should work with devices already bound to the correct driver only.
-> > > Maybe a separate udev-rules generator?  
+> > > It's also not needed to ever check the return value of this function, so
+> > > just remove the check entirely, and indent the previous line to a sane
+> > > formatting :)
+> > > 
+> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > > Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+> > > Cc: kvm@vger.kernel.org
+> > > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > > ---
+> > >  virt/kvm/kvm_main.c | 4 +---
+> > >  1 file changed, 1 insertion(+), 3 deletions(-)
+> > > 
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > index ca54b09adf5b..4b4ef642d8fa 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -2605,9 +2605,7 @@ static int kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
+> > >  
+> > >  	snprintf(dir_name, sizeof(dir_name), "vcpu%d", vcpu->vcpu_id);
+> > >  	vcpu->debugfs_dentry = debugfs_create_dir(dir_name,
+> > > -								vcpu->kvm->debugfs_dentry);
+> > > -	if (!vcpu->debugfs_dentry)
+> > > -		return -ENOMEM;
+> > > +						  vcpu->kvm->debugfs_dentry);
+> > >  
+> > >  	ret = kvm_arch_create_vcpu_debugfs(vcpu);
+> > >  	if (ret < 0) {
+> > > -- 
+> > > 2.22.0
 > > 
-> > Getting a device bound to a specific driver is exactly the domain of
-> > driverctl.  Implement the sysfs interfaces driverctl uses and see if it
-> > works.  Driverctl defaults to PCI and knows some extra things about
-> > PCI, but appears to be written to be generally bus agnostic.  Thanks,
-> > 
-> > Alex
+> > Any objection to me pulling this into a series to clean up similar issues
+> > in arch/x86/kvm/debugfs.c -> kvm_arch_create_vcpu_debugfs(), and to
+> > change kvm_create_vcpu_debugfs() to not return success/failure?  It'd be
+> > nice to fix everything in a single shot.
 > 
+> It was on my todo list to do the cleanup of the x86 kvm stuff.  I
+> figured this arch-neutral fix was independent, but if you want me to do
+> it all at once, I'll be glad to do so later this week.
 
-@Alex: Thanks! I was not aware of driverctl.
+My preference would be to get it done all at once, having a discrepancy
+between kvm_main and x86 leads to a bit of head scratching.
 
-> Ok, looked at driverctl. Extending this one for non-PCI seems like a
-> reasonable path. However, we would also need to extend any non-PCI
-> device type we want to support with a driver_override attribute like
-> you did for PCI in 782a985d7af26db39e86070d28f987cad2 -- so this is
-> only for newer kernels. Adding that attribute for subchannels looks
-> feasible at a glance, but I have not tried to actually do it :)
-> 
-> Halil, do you think that would make sense?
-
-Looks doable. Did not quite figure out the details yet, but it seems
-that for PCI driver_override has more benefits than for cio (compared
-to simple unbind/bind), as matching and probing seems to be more
-elaborate for PCI. The benefit I see are
-1) the ability to exclude the device form driver binding, and
-2) having the same mechanism and thus consistent experience for pci and
-cio.
-
-What we IMHO should not do is make driver_override the override the
-sch->st == id->type check.
-
-Regards,
-Halil
-
-> 
-> [This might also help with the lcs vs. ctc confusion on a certain 3088
-> cu model if this is added for ccw devices as well; but I'm not sure if
-> these are still out in the wild at all. Probably not worth the effort
-> for that.]
-
+The x86 change would be independent, the piece that's not is converting
+kvm_create_vcpu_debugfs() to handle failure internally and not return
+errors, which would depend on this patch's removal of "return -ENOMEM".
+At a minimum I think that change should be paired with this fix.
