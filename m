@@ -2,109 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BB8141B31
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 06:34:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C7B441C22
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 08:21:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729607AbfFLEdz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 00:33:55 -0400
-Received: from mail-eopbgr80082.outbound.protection.outlook.com ([40.107.8.82]:54247
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725280AbfFLEdz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 00:33:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=t1IAPRsyJixiIDkuGc2CrGq3QqlHknmJalCsZSN7AaQ=;
- b=Wsh8eoz/6lrY/omXmsTwPCsz7twTJRVg6BfnsmojBhl7tcRbUjxk+voi6RLE2u7Qd8P11ODuZ7Ol/jcZwbU2QyAAUTaW1P1R2A/zybV43gMB69uWfNXwj8n5hOFYYoXNLs8zbVHh8hQZBANTi1irR0aREZjVIjz6/dDKAjqxFTU=
-Received: from VI1PR0501MB2271.eurprd05.prod.outlook.com (10.169.134.149) by
- VI1PR0501MB2848.eurprd05.prod.outlook.com (10.172.15.150) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.11; Wed, 12 Jun 2019 04:33:51 +0000
-Received: from VI1PR0501MB2271.eurprd05.prod.outlook.com
- ([fe80::10d7:3b2d:5471:1eb6]) by VI1PR0501MB2271.eurprd05.prod.outlook.com
- ([fe80::10d7:3b2d:5471:1eb6%10]) with mapi id 15.20.1987.010; Wed, 12 Jun
- 2019 04:33:51 +0000
-From:   Parav Pandit <parav@mellanox.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "cjia@nvidia.com" <cjia@nvidia.com>
-Subject: RE: [PATCHv6 3/3] vfio/mdev: Synchronize device create/remove with
- parent removal
-Thread-Topic: [PATCHv6 3/3] vfio/mdev: Synchronize device create/remove with
- parent removal
-Thread-Index: AQHVGj4q7+/NzeZHEUWGN8sRZjbLIKaK/b4AgArXHICAAPRRgIAAskuA
-Date:   Wed, 12 Jun 2019 04:33:50 +0000
-Message-ID: <VI1PR0501MB2271E9CD61064F5A552BBFB7D1EC0@VI1PR0501MB2271.eurprd05.prod.outlook.com>
-References: <20190603185658.54517-1-parav@mellanox.com>
-        <20190603185658.54517-4-parav@mellanox.com>
-        <20190604074820.71853cbb.cohuck@redhat.com>
-        <AM4PR0501MB2260589DAFDA6ECF1E8D6D87D1ED0@AM4PR0501MB2260.eurprd05.prod.outlook.com>
- <20190611115517.7a6f9c8f@x1.home>
-In-Reply-To: <20190611115517.7a6f9c8f@x1.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=parav@mellanox.com; 
-x-originating-ip: [49.207.52.114]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f5e5fd51-19a7-454b-f78e-08d6eeef2b50
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0501MB2848;
-x-ms-traffictypediagnostic: VI1PR0501MB2848:
-x-microsoft-antispam-prvs: <VI1PR0501MB284848400E65BC48AAF47F8FD1EC0@VI1PR0501MB2848.eurprd05.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-forefront-prvs: 0066D63CE6
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(366004)(39860400002)(376002)(396003)(346002)(189003)(199004)(13464003)(256004)(76176011)(14444005)(55016002)(4326008)(68736007)(52536014)(3846002)(55236004)(6116002)(478600001)(6916009)(25786009)(53936002)(102836004)(8936002)(53546011)(14454004)(6506007)(7696005)(99286004)(5660300002)(9686003)(186003)(229853002)(74316002)(7736002)(33656002)(446003)(66066001)(26005)(2906002)(66946007)(73956011)(76116006)(6436002)(66556008)(64756008)(8676002)(54906003)(66446008)(86362001)(305945005)(476003)(6246003)(11346002)(71200400001)(71190400001)(4744005)(66476007)(81166006)(81156014)(486006)(316002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0501MB2848;H:VI1PR0501MB2271.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: mellanox.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: K7/De5+DIInQJXefBJaF0zzTArGled+A+EedBWy7YrLW0jSvDR2ltefHaNs8dofMRIOu1Q6kGBDtLIGujODHzT8vz5+kCyWborJ7w/0kH8+Yj2cO5yKBqiARhWYFLcdDVSm5H7aLm8vhkyRg0gFIZcs9p59Lpdi0Ju6DZnd5HEq5VRMyzL1rFC5ESxFRsOoqixoTJZ98GAtT5bGISgMqg8GuYRPiQUIDGdfgvUCEjGm4PEoYSNeQCKNJoVbM/SYhgHcUatbKj0tt1DtpCvhTnH3w9/hX1FFVk9M6kfOO0K3Fp1QHZ8EeO2f2E3JkS9ZsrqxRKoAH7FLFaV+FFEcQpGKII8pQhAIyBRuX8UHKGrMoF2YCFXeqZYVYatIYXVHsVdOjnCC1xNREkk8vcuUiJAtzOdiIfgVjGBy8ctd4Gws=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1730988AbfFLGVk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 02:21:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36660 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730975AbfFLGVk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 02:21:40 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A7B5330872D9;
+        Wed, 12 Jun 2019 06:21:39 +0000 (UTC)
+Received: from gondolin (ovpn-116-169.ams2.redhat.com [10.36.116.169])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 254E617586;
+        Wed, 12 Jun 2019 06:21:31 +0000 (UTC)
+Date:   Wed, 12 Jun 2019 08:21:27 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Michael Mueller <mimu@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        "Jason J. Herne" <jjherne@linux.ibm.com>
+Subject: Re: [PATCH v4 4/8] s390/airq: use DMA memory for adapter interrupts
+Message-ID: <20190612082127.3fd63091.cohuck@redhat.com>
+In-Reply-To: <20190612023231.7da4908c.pasic@linux.ibm.com>
+References: <20190606115127.55519-1-pasic@linux.ibm.com>
+        <20190606115127.55519-5-pasic@linux.ibm.com>
+        <20190611121721.61bf09b4.cohuck@redhat.com>
+        <20190611162721.67ca8932.pasic@linux.ibm.com>
+        <20190611181944.5bf2b953.cohuck@redhat.com>
+        <20190612023231.7da4908c.pasic@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-OriginatorOrg: Mellanox.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5e5fd51-19a7-454b-f78e-08d6eeef2b50
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2019 04:33:51.0054
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: parav@mellanox.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0501MB2848
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Wed, 12 Jun 2019 06:21:39 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, 12 Jun 2019 02:32:31 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
+> On Tue, 11 Jun 2019 18:19:44 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+> > On Tue, 11 Jun 2019 16:27:21 +0200
+> > Halil Pasic <pasic@linux.ibm.com> wrote:
 
-> -----Original Message-----
-> From: Alex Williamson <alex.williamson@redhat.com>
-> Sent: Tuesday, June 11, 2019 11:25 PM
-> To: Parav Pandit <parav@mellanox.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>; kvm@vger.kernel.org; linux-
-> kernel@vger.kernel.org; kwankhede@nvidia.com; cjia@nvidia.com
-> Subject: Re: [PATCHv6 3/3] vfio/mdev: Synchronize device create/remove
-> with parent removal
->=20
-> On Tue, 11 Jun 2019 03:22:37 +0000
-> Parav Pandit <parav@mellanox.com> wrote:
->=20
-> > Hi Alex,
-> >
-> [snip]
->=20
-> > Now that we have all 3 patches reviewed and comments addressed, if
-> > there are no more comments, can you please take it forward?
->=20
-> Yep, I put it in a branch rolled into linux-next for upstream testing las=
-t week
-> and just sent a pull request to Linus today.  Thanks,
->=20
-Oh ok. Great. Thanks Alex.
+> > > IMHO the cleanest thing to do at this stage is to check if the
+> > > airq_iv_cache is NULL and fail the allocation if it is (to preserve
+> > > previous behavior).  
+> > 
+> > That's probably the least invasive fix for now. Did you check whether
+> > any of the other dma pools this series introduces have a similar
+> > problem due to init not failing?
+> >  
+> 
+> Good question!
+> 
+> I did a quick check. virtio_ccw_init() should be OK, because we don't
+> register the driver if allocation fails, so the thing is going to end
+> up dysfunctional as expected.
+> 
+> If however cio_dma_pool_init() fails, then we end up with the same
+> problem with airqs, just on the !AIRQ_IV_CACHELINE code path. It can be
+> fixed analogously: make cio_dma_zalloc() fail all allocation if
+> cio_dma_pool_init() failed before.
+
+Ok, makes sense.
+
+> 
+> The rest should be OK.
+> 
+> > > 
+> > > I would prefer having a separate discussion on eventually changing
+> > > the behavior (e.g. fail css initialization).  
+> > 
+> > I did a quick check of the common I/O layer code and one place that
+> > looks dangerous is the chsc initialization (where we get two pages that
+> > are later accessed unconditionally by the code).
+> > 
+> > All of this is related to not being able to fulfill some basic memory
+> > availability requirements early during boot and then discovering that
+> > pulling the emergency break did not actually stop the train. I'd vote
+> > for calling panic() if the common I/O layer cannot perform its setup;
+> > but as this is really a pathological case I also think we should solve
+> > that independently of this patch series.
+> >  
+> 
+> panic() sounds very reasonable to me. As an user I would like to see a
+> message that tells me, I'm trying to boot with insufficient RAM. Is there
+> such a message somewhere?
+
+You could add it in the panic() message :) I would not spend overly
+much time on this, though, as this really sounds like someone is trying
+to run on a system that is way too tiny memory-wise for doing anything
+useful.
+
+>  
+> > > 
+> > > Connie, would that work with you? Thanks for spotting this!  
+> > 
+> > Yeah, let's give your approach a try.
+> >   
+> 
+> OK. I intend to send out v5 with these changes tomorrow in the
+> afternoon:
+>  
+> diff --git a/drivers/s390/cio/airq.c b/drivers/s390/cio/airq.c
+> index 89d26e43004d..427b2e24a8ce 100644
+> --- a/drivers/s390/cio/airq.c
+> +++ b/drivers/s390/cio/airq.c
+> @@ -142,7 +142,8 @@ struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags)
+>         size = iv_size(bits);
+>  
+>         if (flags & AIRQ_IV_CACHELINE) {
+> -               if ((cache_line_size() * BITS_PER_BYTE) < bits)
+> +               if ((cache_line_size() * BITS_PER_BYTE) < bits
+> +                               || !airq_iv_cache)
+
+It's perhaps a bit more readable if you keep checking for airq_iv_cache
+on a separate if statement, but that's a matter of taste, I guess.
+
+>                         goto out_free;
+>  
+>                 iv->vector = dma_pool_zalloc(airq_iv_cache, GFP_KERNEL,
+> @@ -186,7 +187,7 @@ struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags)
+>         kfree(iv->ptr);
+>         kfree(iv->bitlock);
+>         kfree(iv->avail);
+> -       if (iv->flags & AIRQ_IV_CACHELINE)
+> +       if (iv->flags & AIRQ_IV_CACHELINE && iv->vector)
+>                 dma_pool_free(airq_iv_cache, iv->vector, iv->vector_dma);
+>         else
+>                 cio_dma_free(iv->vector, size);
+> diff --git a/drivers/s390/cio/css.c b/drivers/s390/cio/css.c
+> index 7901c8ed3597..d709bd8545f2 100644
+> --- a/drivers/s390/cio/css.c
+> +++ b/drivers/s390/cio/css.c
+> @@ -1128,6 +1128,8 @@ void cio_gp_dma_free(struct gen_pool *gp_dma, void *cpu_addr, size_t size)
+>   */
+>  void *cio_dma_zalloc(size_t size)
+>  {
+> +       if (!cio_dma_pool)
+> +               return NULL;
+>         return cio_gp_dma_zalloc(cio_dma_pool, cio_get_dma_css_dev(), size);
+>  }
+> 
+
+Just looked at patch 2 again, will comment there.
