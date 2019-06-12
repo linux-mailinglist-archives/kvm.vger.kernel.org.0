@@ -2,377 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A555641AC7
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 05:35:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BB8141B31
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 06:34:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436948AbfFLDfP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Jun 2019 23:35:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:24830 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2436559AbfFLDfO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Jun 2019 23:35:14 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7F4D5300B916;
-        Wed, 12 Jun 2019 03:34:57 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E8D87E57B;
-        Wed, 12 Jun 2019 03:34:55 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 768FC1806B18;
-        Wed, 12 Jun 2019 03:34:50 +0000 (UTC)
-Date:   Tue, 11 Jun 2019 23:34:50 -0400 (EDT)
-From:   Pankaj Gupta <pagupta@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     dm-devel@redhat.com, linux-nvdimm@lists.01.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org,
-        dan j williams <dan.j.williams@intel.com>,
-        zwisler@kernel.org, vishal l verma <vishal.l.verma@intel.com>,
-        dave jiang <dave.jiang@intel.com>, mst@redhat.com,
-        jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net,
-        hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu,
-        adilger kernel <adilger.kernel@dilger.ca>,
-        darrick wong <darrick.wong@oracle.com>, lcapitulino@redhat.com,
-        kwolf@redhat.com, imammedo@redhat.com, jmoyer@redhat.com,
-        nilal@redhat.com, riel@surriel.com, stefanha@redhat.com,
-        aarcange@redhat.com, david@redhat.com, david@fromorbit.com,
-        xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-        pbonzini@redhat.com, yuval shaia <yuval.shaia@oracle.com>,
-        kilobyte@angband.pl, jstaron@google.com, rdunlap@infradead.org,
-        snitzer@redhat.com
-Message-ID: <1003601865.34513553.1560310490030.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190611190209.0b25033e.cohuck@redhat.com>
-References: <20190611163802.25352-1-pagupta@redhat.com> <20190611163802.25352-3-pagupta@redhat.com> <20190611190209.0b25033e.cohuck@redhat.com>
-Subject: Re: [PATCH v12 2/7] virtio-pmem: Add virtio pmem driver
+        id S1729607AbfFLEdz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 00:33:55 -0400
+Received: from mail-eopbgr80082.outbound.protection.outlook.com ([40.107.8.82]:54247
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725280AbfFLEdz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 00:33:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=t1IAPRsyJixiIDkuGc2CrGq3QqlHknmJalCsZSN7AaQ=;
+ b=Wsh8eoz/6lrY/omXmsTwPCsz7twTJRVg6BfnsmojBhl7tcRbUjxk+voi6RLE2u7Qd8P11ODuZ7Ol/jcZwbU2QyAAUTaW1P1R2A/zybV43gMB69uWfNXwj8n5hOFYYoXNLs8zbVHh8hQZBANTi1irR0aREZjVIjz6/dDKAjqxFTU=
+Received: from VI1PR0501MB2271.eurprd05.prod.outlook.com (10.169.134.149) by
+ VI1PR0501MB2848.eurprd05.prod.outlook.com (10.172.15.150) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1987.11; Wed, 12 Jun 2019 04:33:51 +0000
+Received: from VI1PR0501MB2271.eurprd05.prod.outlook.com
+ ([fe80::10d7:3b2d:5471:1eb6]) by VI1PR0501MB2271.eurprd05.prod.outlook.com
+ ([fe80::10d7:3b2d:5471:1eb6%10]) with mapi id 15.20.1987.010; Wed, 12 Jun
+ 2019 04:33:51 +0000
+From:   Parav Pandit <parav@mellanox.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "cjia@nvidia.com" <cjia@nvidia.com>
+Subject: RE: [PATCHv6 3/3] vfio/mdev: Synchronize device create/remove with
+ parent removal
+Thread-Topic: [PATCHv6 3/3] vfio/mdev: Synchronize device create/remove with
+ parent removal
+Thread-Index: AQHVGj4q7+/NzeZHEUWGN8sRZjbLIKaK/b4AgArXHICAAPRRgIAAskuA
+Date:   Wed, 12 Jun 2019 04:33:50 +0000
+Message-ID: <VI1PR0501MB2271E9CD61064F5A552BBFB7D1EC0@VI1PR0501MB2271.eurprd05.prod.outlook.com>
+References: <20190603185658.54517-1-parav@mellanox.com>
+        <20190603185658.54517-4-parav@mellanox.com>
+        <20190604074820.71853cbb.cohuck@redhat.com>
+        <AM4PR0501MB2260589DAFDA6ECF1E8D6D87D1ED0@AM4PR0501MB2260.eurprd05.prod.outlook.com>
+ <20190611115517.7a6f9c8f@x1.home>
+In-Reply-To: <20190611115517.7a6f9c8f@x1.home>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=parav@mellanox.com; 
+x-originating-ip: [49.207.52.114]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f5e5fd51-19a7-454b-f78e-08d6eeef2b50
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0501MB2848;
+x-ms-traffictypediagnostic: VI1PR0501MB2848:
+x-microsoft-antispam-prvs: <VI1PR0501MB284848400E65BC48AAF47F8FD1EC0@VI1PR0501MB2848.eurprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-forefront-prvs: 0066D63CE6
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(366004)(39860400002)(376002)(396003)(346002)(189003)(199004)(13464003)(256004)(76176011)(14444005)(55016002)(4326008)(68736007)(52536014)(3846002)(55236004)(6116002)(478600001)(6916009)(25786009)(53936002)(102836004)(8936002)(53546011)(14454004)(6506007)(7696005)(99286004)(5660300002)(9686003)(186003)(229853002)(74316002)(7736002)(33656002)(446003)(66066001)(26005)(2906002)(66946007)(73956011)(76116006)(6436002)(66556008)(64756008)(8676002)(54906003)(66446008)(86362001)(305945005)(476003)(6246003)(11346002)(71200400001)(71190400001)(4744005)(66476007)(81166006)(81156014)(486006)(316002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0501MB2848;H:VI1PR0501MB2271.eurprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: mellanox.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: K7/De5+DIInQJXefBJaF0zzTArGled+A+EedBWy7YrLW0jSvDR2ltefHaNs8dofMRIOu1Q6kGBDtLIGujODHzT8vz5+kCyWborJ7w/0kH8+Yj2cO5yKBqiARhWYFLcdDVSm5H7aLm8vhkyRg0gFIZcs9p59Lpdi0Ju6DZnd5HEq5VRMyzL1rFC5ESxFRsOoqixoTJZ98GAtT5bGISgMqg8GuYRPiQUIDGdfgvUCEjGm4PEoYSNeQCKNJoVbM/SYhgHcUatbKj0tt1DtpCvhTnH3w9/hX1FFVk9M6kfOO0K3Fp1QHZ8EeO2f2E3JkS9ZsrqxRKoAH7FLFaV+FFEcQpGKII8pQhAIyBRuX8UHKGrMoF2YCFXeqZYVYatIYXVHsVdOjnCC1xNREkk8vcuUiJAtzOdiIfgVjGBy8ctd4Gws=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.70, 10.4.195.19]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: xouy0wKH9tDSBlfe8WrSfeKKI3BR8Q==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Wed, 12 Jun 2019 03:35:14 +0000 (UTC)
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f5e5fd51-19a7-454b-f78e-08d6eeef2b50
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2019 04:33:51.0054
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: parav@mellanox.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0501MB2848
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-Hi Cornelia,
 
-> On Tue, 11 Jun 2019 22:07:57 +0530
-> Pankaj Gupta <pagupta@redhat.com> wrote:
-> 
-> > This patch adds virtio-pmem driver for KVM guest.
-> > 
-> > Guest reads the persistent memory range information from
-> > Qemu over VIRTIO and registers it on nvdimm_bus. It also
-> > creates a nd_region object with the persistent memory
-> > range information so that existing 'nvdimm/pmem' driver
-> > can reserve this into system memory map. This way
-> > 'virtio-pmem' driver uses existing functionality of pmem
-> > driver to register persistent memory compatible for DAX
-> > capable filesystems.
-> > 
-> > This also provides function to perform guest flush over
-> > VIRTIO from 'pmem' driver when userspace performs flush
-> > on DAX memory range.
-> > 
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
-> > Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> > Acked-by: Jakub Staron <jstaron@google.com>
-> > Tested-by: Jakub Staron <jstaron@google.com>
-> > ---
-> >  drivers/nvdimm/Makefile          |   1 +
-> >  drivers/nvdimm/nd_virtio.c       | 124 +++++++++++++++++++++++++++++++
-> >  drivers/nvdimm/virtio_pmem.c     | 122 ++++++++++++++++++++++++++++++
-> >  drivers/nvdimm/virtio_pmem.h     |  55 ++++++++++++++
-> >  drivers/virtio/Kconfig           |  11 +++
-> >  include/uapi/linux/virtio_ids.h  |   1 +
-> >  include/uapi/linux/virtio_pmem.h |  35 +++++++++
-> >  7 files changed, 349 insertions(+)
-> >  create mode 100644 drivers/nvdimm/nd_virtio.c
-> >  create mode 100644 drivers/nvdimm/virtio_pmem.c
-> >  create mode 100644 drivers/nvdimm/virtio_pmem.h
-> >  create mode 100644 include/uapi/linux/virtio_pmem.h
-> 
-> Sorry about being late to the party; this one has been sitting in my
-> 'to review' queue for far too long :(
-> 
-> (...)
-> 
-> > diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
-> > new file mode 100644
-> > index 000000000000..efc535723517
-> > --- /dev/null
-> > +++ b/drivers/nvdimm/nd_virtio.c
-> > @@ -0,0 +1,124 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * virtio_pmem.c: Virtio pmem Driver
-> > + *
-> > + * Discovers persistent memory range information
-> > + * from host and provides a virtio based flushing
-> > + * interface.
-> > + */
-> > +#include "virtio_pmem.h"
-> > +#include "nd.h"
-> > +
-> > + /* The interrupt handler */
-> > +void host_ack(struct virtqueue *vq)
-> > +{
-> > +	struct virtio_pmem *vpmem = vq->vdev->priv;
-> > +	struct virtio_pmem_request *req_data, *req_buf;
-> > +	unsigned long flags;
-> > +	unsigned int len;
-> > +
-> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	while ((req_data = virtqueue_get_buf(vq, &len)) != NULL) {
-> > +		req_data->done = true;
-> > +		wake_up(&req_data->host_acked);
-> > +
-> > +		if (!list_empty(&vpmem->req_list)) {
-> > +			req_buf = list_first_entry(&vpmem->req_list,
-> > +					struct virtio_pmem_request, list);
-> > +			req_buf->wq_buf_avail = true;
-> > +			wake_up(&req_buf->wq_buf);
-> > +			list_del(&req_buf->list);
-> > +		}
-> > +	}
-> > +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +}
-> > +EXPORT_SYMBOL_GPL(host_ack);
-> 
-> Nit: 'host_ack' looks a bit generic for an exported function... would
-> 'virtio_pmem_host_ack' maybe be better?
-
-Yes, this looks better. Changed.
-
-> 
-> > +
-> > + /* The request submission function */
-> > +int virtio_pmem_flush(struct nd_region *nd_region)
-> 
-> I don't see an EXPORT_SYMBOL_GPL() for this function... should it get
-> one, or should it be made static?
-
-Made static. Leftover from last refactor of 'asyc_pmem_flush'.
-
-> 
-> > +{
-> > +	struct virtio_device *vdev = nd_region->provider_data;
-> > +	struct virtio_pmem *vpmem  = vdev->priv;
-> > +	struct virtio_pmem_request *req_data;
-> > +	struct scatterlist *sgs[2], sg, ret;
-> > +	unsigned long flags;
-> > +	int err, err1;
-> > +
-> > +	might_sleep();
-> > +	req_data = kmalloc(sizeof(*req_data), GFP_KERNEL);
-> > +	if (!req_data)
-> > +		return -ENOMEM;
-> > +
-> > +	req_data->done = false;
-> > +	init_waitqueue_head(&req_data->host_acked);
-> > +	init_waitqueue_head(&req_data->wq_buf);
-> > +	INIT_LIST_HEAD(&req_data->list);
-> > +	req_data->req.type = cpu_to_virtio32(vdev, VIRTIO_PMEM_REQ_TYPE_FLUSH);
-> > +	sg_init_one(&sg, &req_data->req, sizeof(req_data->req));
-> > +	sgs[0] = &sg;
-> > +	sg_init_one(&ret, &req_data->resp.ret, sizeof(req_data->resp));
-> > +	sgs[1] = &ret;
-> > +
-> > +	spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	 /*
-> > +	  * If virtqueue_add_sgs returns -ENOSPC then req_vq virtual
-> > +	  * queue does not have free descriptor. We add the request
-> > +	  * to req_list and wait for host_ack to wake us up when free
-> > +	  * slots are available.
-> > +	  */
-> > +	while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req_data,
-> > +					GFP_ATOMIC)) == -ENOSPC) {
-> > +
-> > +		dev_err(&vdev->dev, "failed to send command to virtio pmem device, no
-> > free slots in the virtqueue\n");
-> 
-> Hm... by the comment above I would have thought that this is not really
-> an error, but rather a temporary condition? Maybe downgrade this to
-> dev_info()?
-
-o.k.
-
-> 
-> > +		req_data->wq_buf_avail = false;
-> > +		list_add_tail(&req_data->list, &vpmem->req_list);
-> > +		spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +
-> > +		/* A host response results in "host_ack" getting called */
-> > +		wait_event(req_data->wq_buf, req_data->wq_buf_avail);
-> > +		spin_lock_irqsave(&vpmem->pmem_lock, flags);
-> > +	}
-> > +	err1 = virtqueue_kick(vpmem->req_vq);
-> > +	spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-> > +	/*
-> > +	 * virtqueue_add_sgs failed with error different than -ENOSPC, we can't
-> > +	 * do anything about that.
-> > +	 */
-> 
-> Does it make sense to kick if you couldn't add at all?
-
-When we could not add because of -ENOSPC we are waiting and when buffer is added
-then only we do a kick. For any other error which might be a rare occurrence, I think
-kick is harmless here and keeps the code clean?
-
-> 
-> > +	if (err || !err1) {
-> > +		dev_info(&vdev->dev, "failed to send command to virtio pmem device\n");
-> 
-> If this is dev_info, I think the error above really should be dev_info
-> as well (and maybe also log the error value)?
-
-o.k. 
-
-> 
-> > +		err = -EIO;
-> > +	} else {
-> > +		/* A host repsonse results in "host_ack" getting called */
-> > +		wait_event(req_data->host_acked, req_data->done);
-> > +		err = virtio32_to_cpu(vdev, req_data->resp.ret);
-> > +	}
-> > +
-> > +	kfree(req_data);
-> > +	return err;
-> > +};
-> > +
-> > +/* The asynchronous flush callback function */
-> > +int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
-> > +{
-> > +	/* Create child bio for asynchronous flush and chain with
-> > +	 * parent bio. Otherwise directly call nd_region flush.
-> > +	 */
-> 
-> Nit: The comment should start with an otherwise empty /* line.
-
-yes.
-
-> 
-> > +	if (bio && bio->bi_iter.bi_sector != -1) {
-> > +		struct bio *child = bio_alloc(GFP_ATOMIC, 0);
-> > +
-> > +		if (!child)
-> > +			return -ENOMEM;
-> > +		bio_copy_dev(child, bio);
-> > +		child->bi_opf = REQ_PREFLUSH;
-> > +		child->bi_iter.bi_sector = -1;
-> > +		bio_chain(child, bio);
-> > +		submit_bio(child);
-> > +		return 0;
-> > +	}
-> > +	if (virtio_pmem_flush(nd_region))
-> > +		return -EIO;
-> > +
-> > +	return 0;
-> > +};
-> > +EXPORT_SYMBOL_GPL(async_pmem_flush);
-> > +MODULE_LICENSE("GPL");
-> 
-> (...)
-> 
-> I have only some more minor comments; on the whole, this looks good to
-> me.
-
-Sure, Thank you. Attaching below on top changes on current patch2 based on
-your suggestions. Let me know if these are okay and then will send official
-v13 to for upstream merging.
-
-Thanks,
-Pankaj
-
-===============
-
-diff --git a/drivers/nvdimm/nd_virtio.c b/drivers/nvdimm/nd_virtio.c
-index efc535723517..5b8d2367da0b 100644
---- a/drivers/nvdimm/nd_virtio.c
-+++ b/drivers/nvdimm/nd_virtio.c
-@@ -10,7 +10,7 @@
- #include "nd.h"
- 
-  /* The interrupt handler */
--void host_ack(struct virtqueue *vq)
-+void virtio_pmem_host_ack(struct virtqueue *vq)
- {
-        struct virtio_pmem *vpmem = vq->vdev->priv;
-        struct virtio_pmem_request *req_data, *req_buf;
-@@ -32,10 +32,10 @@ void host_ack(struct virtqueue *vq)
-        }
-        spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
- }
--EXPORT_SYMBOL_GPL(host_ack);
-+EXPORT_SYMBOL_GPL(virtio_pmem_host_ack);
- 
-  /* The request submission function */
--int virtio_pmem_flush(struct nd_region *nd_region)
-+static int virtio_pmem_flush(struct nd_region *nd_region)
- {
-        struct virtio_device *vdev = nd_region->provider_data;
-        struct virtio_pmem *vpmem  = vdev->priv;
-@@ -69,7 +69,7 @@ int virtio_pmem_flush(struct nd_region *nd_region)
-        while ((err = virtqueue_add_sgs(vpmem->req_vq, sgs, 1, 1, req_data,
-                                        GFP_ATOMIC)) == -ENOSPC) {
- 
--               dev_err(&vdev->dev, "failed to send command to virtio pmem device, no free slots in the virtqueue\n");
-+               dev_info(&vdev->dev, "failed to send command to virtio pmem device, no free slots in the virtqueue\n");
-                req_data->wq_buf_avail = false;
-                list_add_tail(&req_data->list, &vpmem->req_list);
-                spin_unlock_irqrestore(&vpmem->pmem_lock, flags);
-@@ -90,7 +90,8 @@ int virtio_pmem_flush(struct nd_region *nd_region)
-        } else {
-                /* A host repsonse results in "host_ack" getting called */
-                wait_event(req_data->host_acked, req_data->done);
--               err = virtio32_to_cpu(vdev, req_data->resp.ret);
-+               if ((err = virtio32_to_cpu(vdev, req_data->resp.ret)))
-+                       err = -EIO;
-        }
- 
-        kfree(req_data);
-@@ -100,7 +101,8 @@ int virtio_pmem_flush(struct nd_region *nd_region)
- /* The asynchronous flush callback function */
- int async_pmem_flush(struct nd_region *nd_region, struct bio *bio)
- {
--       /* Create child bio for asynchronous flush and chain with
-+       /*
-+        * Create child bio for asynchronous flush and chain with
-         * parent bio. Otherwise directly call nd_region flush.
-         */
-        if (bio && bio->bi_iter.bi_sector != -1) {
-diff --git a/drivers/nvdimm/virtio_pmem.c b/drivers/nvdimm/virtio_pmem.c
-index b60ebd8cd2fd..5e3d07b47e0c 100644
---- a/drivers/nvdimm/virtio_pmem.c
-+++ b/drivers/nvdimm/virtio_pmem.c
-@@ -19,7 +19,7 @@ static int init_vq(struct virtio_pmem *vpmem)
- {
-        /* single vq */
-        vpmem->req_vq = virtio_find_single_vq(vpmem->vdev,
--                                               host_ack, "flush_queue");
-+                                       virtio_pmem_host_ack, "flush_queue");
-        if (IS_ERR(vpmem->req_vq))
-                return PTR_ERR(vpmem->req_vq);
- 
-diff --git a/drivers/nvdimm/virtio_pmem.h b/drivers/nvdimm/virtio_pmem.h
-index 6e47521be158..998efbc7660c 100644
---- a/drivers/nvdimm/virtio_pmem.h
-+++ b/drivers/nvdimm/virtio_pmem.h
-@@ -50,6 +50,6 @@ struct virtio_pmem {
-        uint64_t size;
- };
- 
--void host_ack(struct virtqueue *vq);
-+void virtio_pmem_host_ack(struct virtqueue *vq);
- int async_pmem_flush(struct nd_region *nd_region, struct bio *bio);
- #endif
+> -----Original Message-----
+> From: Alex Williamson <alex.williamson@redhat.com>
+> Sent: Tuesday, June 11, 2019 11:25 PM
+> To: Parav Pandit <parav@mellanox.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>; kvm@vger.kernel.org; linux-
+> kernel@vger.kernel.org; kwankhede@nvidia.com; cjia@nvidia.com
+> Subject: Re: [PATCHv6 3/3] vfio/mdev: Synchronize device create/remove
+> with parent removal
+>=20
+> On Tue, 11 Jun 2019 03:22:37 +0000
+> Parav Pandit <parav@mellanox.com> wrote:
+>=20
+> > Hi Alex,
+> >
+> [snip]
+>=20
+> > Now that we have all 3 patches reviewed and comments addressed, if
+> > there are no more comments, can you please take it forward?
+>=20
+> Yep, I put it in a branch rolled into linux-next for upstream testing las=
+t week
+> and just sent a pull request to Linus today.  Thanks,
+>=20
+Oh ok. Great. Thanks Alex.
