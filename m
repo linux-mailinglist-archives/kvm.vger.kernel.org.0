@@ -2,96 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D2A0D42133
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 11:40:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A88124212E
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 11:40:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437643AbfFLJk2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 05:40:28 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:32976 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2437638AbfFLJk0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 05:40:26 -0400
-Received: by mail-pg1-f194.google.com with SMTP id k187so8128115pga.0;
-        Wed, 12 Jun 2019 02:40:26 -0700 (PDT)
+        id S2437489AbfFLJkO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 05:40:14 -0400
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:40934 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726636AbfFLJkO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 05:40:14 -0400
+Received: by mail-oi1-f194.google.com with SMTP id w196so11195626oie.7;
+        Wed, 12 Jun 2019 02:40:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=wyIsAgKxN8tvE2hNP2yzX9LrmM9i/7FrObscEtVyCho=;
-        b=aeRDCbTpzSaeLvHkLXMdJ9mDGh48mUtrozAhm4VPBG0ztWEHmGWOqQfIW7Kj2kJ2Mx
-         0CrQ4uwsXXzhJ4mUG5eVY/MbNF1ZWA3AXJ4rKIwzVhZ60FWAcOb7Fr/HkPl7UIQGnQKZ
-         1XM3rAZ6QND2S+nJNOD+3n0L9hXd0KdW2v8YotCYVka8DDFx8sVaF3EJ0muccJytGReC
-         g+y/4QHBb3ulR6Gbn4zLU3IPmgeDAGldGsqPK1PnMV1z+m47ZxCYXrFVKUjIGAT+5gnS
-         5wZIIIWTYNOncfSoed8w5Ih8sTduHpTq4IbSVsr2o0dA4KBhGZgjcxjnIUUnxYKF1i5y
-         bOHQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=FVoAL/mxIofQtM8+Ijg+ZIeTSoEU3dKXPoThV0hSLcA=;
+        b=jBI9mrKAUV2KSupGQPeN9PeAsaWi5QWlbK9xn9VFnhlMWui0B+zrXa9VMvPZZi1u8G
+         ABcXBOM/Fnmj8rqtjih6du5B7f7TR9+EiJnHnjYiUDnOLfzNqYA7SsxEqJYM9LGtxq3Y
+         n4M3ERAfKZ157LEl2SWirEMhaJ4IWORsk607AwSuhpLcyAgjpDDhOyvCUXbj84e+MEZw
+         3xyMTXbuM1rJgzWVSU4g1x5lwZ9CytCV9JEaKMNjJb7hJ3+DMytLWh/8lhITk9Kr9eqJ
+         6paymmbbSpp1C77hYAu14GFyMUzYdXjKGdI/u3gZq2esoWfK9YRmv3HpGRSIVptnzVj4
+         kvIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=wyIsAgKxN8tvE2hNP2yzX9LrmM9i/7FrObscEtVyCho=;
-        b=tbXNy9lBVBk2dSReKHKLtmlhwHci/2QUoNb0m7ci4wl5ZMDOM72NDM5rqPrcLmYsoz
-         bnpFisQw8X0N7tyzdg40t4FDZhAugX7MHf24+Is12OALdIc7/pMb++fKsiRjAEWsCJ02
-         WlUoUkKB+mnEthJxUGd5elQ9Y82Bm++r4UihvOJO4vEtnSe41uUWYmnvGzKMwzcB7Oaj
-         o4Y2MT+ZeabgyTgdigLAxNIezVHYfbZc+m08vh0ywhpNu9UaKMSmrDnmGLyStG5+f0uK
-         8OZeU5U/7ddBRmWq+4RVZ8bMprV2Yyo7aXII8SgvHVbXS96dd4x0jeptZFtCA1hFLW0j
-         UrkQ==
-X-Gm-Message-State: APjAAAXNivJZ0IgvyqZX4knnEX/ahRmFWmO95wc7mUEb86njOOReO/he
-        EMuWBYkteGYtYrG61QfmQAZ2iXKl
-X-Google-Smtp-Source: APXvYqz2PUdiZ58BZRnD7I+FMT+w9mQcyBF/A05Rngk7C8bmI6RqmVn659y4jM8SeRwgNPzJ6ZDKJQ==
-X-Received: by 2002:a17:90a:1904:: with SMTP id 4mr12661350pjg.116.1560332425832;
-        Wed, 12 Jun 2019 02:40:25 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id k1sm4706993pjp.2.2019.06.12.02.40.24
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Wed, 12 Jun 2019 02:40:25 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Subject: [PATCH v3 2/2] KVM: LAPIC: remove the trailing newline used in the fmt parameter of TP_printk
-Date:   Wed, 12 Jun 2019 17:40:19 +0800
-Message-Id: <1560332419-17195-2-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1560332419-17195-1-git-send-email-wanpengli@tencent.com>
-References: <1560332419-17195-1-git-send-email-wanpengli@tencent.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=FVoAL/mxIofQtM8+Ijg+ZIeTSoEU3dKXPoThV0hSLcA=;
+        b=ihGCiKBIkdI5W27XuSjW4MUqRqrWj86HWZqiLXfuAZDjSVMso+btMz+4KS1wCamjWz
+         Crb/1iJye+UrbA5egrLnDDRt0cahzXFNreeyPky9o8qu0xRnMVofxoHp4gaMcglYKunW
+         RuHUaY45RYKaasouP+ZTslc35f3i09Usjipur9RP70YDq1pF3pmVeOftjeBpzG4+DCJb
+         /Ujj0Xm5mDtbJAPQOfX+FDYhV5lAAqIy1ju+Jz2xboV2p0whaynhRLr5OoEe+3oRp2NR
+         Hwnj8YDVGogui+WbjGa4aAfGNe5YsFUQzRPeiswMJ6ZD//+kyVsa47BXf6ygU46wLOkK
+         LQuw==
+X-Gm-Message-State: APjAAAUL78gwVEV55FTNOTAdLeqvOaSqWOHIJEDdCasnqqOAW/oWCBks
+        2u/DFkKqxNteIjUvONj3GGK3efW75q1rINKUBquqkA==
+X-Google-Smtp-Source: APXvYqxrZ8xGXX06Vng88mRhUQ5foYHWXyowrcR5e4GnfKyCC7eZmipk8UwTkRegfTzEUFajgnulQAkCaiqR1kP+bFU=
+X-Received: by 2002:aca:544b:: with SMTP id i72mr18813897oib.174.1560332413690;
+ Wed, 12 Jun 2019 02:40:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <1560332160-17050-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1560332160-17050-1-git-send-email-wanpengli@tencent.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Wed, 12 Jun 2019 17:40:57 +0800
+Message-ID: <CANRm+CxR_jrB=tMpmM9OMEJ-pm8gdfMNN7UsDdQ+YrG_akGdAg@mail.gmail.com>
+Subject: Re: [PATCH v3 0/5] KVM: LAPIC: Optimize timer latency further
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
-
-The trailing newlines will lead to extra newlines in the trace file
-which looks like the following output, so remove it.
-
-qemu-system-x86-15695 [002] ...1 15774.839240: kvm_hv_timer_state: vcpu_id 0 hv_timer 1
-
-qemu-system-x86-15695 [002] ...1 15774.839309: kvm_hv_timer_state: vcpu_id 0 hv_timer 1
-
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/trace.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 4d47a26..b5c831e 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -1365,7 +1365,7 @@ TRACE_EVENT(kvm_hv_timer_state,
- 			__entry->vcpu_id = vcpu_id;
- 			__entry->hv_timer_in_use = hv_timer_in_use;
- 			),
--		TP_printk("vcpu_id %x hv_timer %x\n",
-+		TP_printk("vcpu_id %x hv_timer %x",
- 			__entry->vcpu_id,
- 			__entry->hv_timer_in_use)
- );
--- 
-2.7.4
-
+Sorry, send out the wrong patchset, please ignore.
+On Wed, 12 Jun 2019 at 17:36, Wanpeng Li <kernellwp@gmail.com> wrote:
+>
+> Advance lapic timer tries to hidden the hypervisor overhead between the
+> host emulated timer fires and the guest awares the timer is fired. However,
+> it just hidden the time between apic_timer_fn/handle_preemption_timer ->
+> wait_lapic_expire, instead of the real position of vmentry which is
+> mentioned in the orignial commit d0659d946be0 ("KVM: x86: add option to
+> advance tscdeadline hrtimer expiration"). There is 700+ cpu cycles between
+> the end of wait_lapic_expire and before world switch on my haswell desktop.
+>
+> This patchset tries to narrow the last gap(wait_lapic_expire -> world switch),
+> it takes the real overhead time between apic_timer_fn/handle_preemption_timer
+> and before world switch into consideration when adaptively tuning timer
+> advancement. The patchset can reduce 40% latency (~1600+ cycles to ~1000+
+> cycles on a haswell desktop) for kvm-unit-tests/tscdeadline_latency when
+> testing busy waits.
+>
+> v2 -> v3:
+>  * expose 'kvm_timer.timer_advance_ns' to userspace
+>  * move the tracepoint below guest_exit_irqoff()
+>  * move wait_lapic_expire() before flushing the L1
+>
+> v1 -> v2:
+>  * fix indent in patch 1/4
+>  * remove the wait_lapic_expire() tracepoint and expose by debugfs
+>  * move the call to wait_lapic_expire() into vmx.c and svm.c
+>
+> Wanpeng Li (5):
+>   KVM: LAPIC: Extract adaptive tune timer advancement logic
+>   KVM: LAPIC: Fix lapic_timer_advance_ns parameter overflow
+>   KVM: LAPIC: Expose per-vCPU timer_advance_ns to userspace
+>   KVM: LAPIC: Delay trace advance expire delta
+>   KVM: LAPIC: Optimize timer latency further
+>
+>  arch/x86/kvm/debugfs.c | 16 +++++++++++++
+>  arch/x86/kvm/lapic.c   | 62 +++++++++++++++++++++++++++++---------------------
+>  arch/x86/kvm/lapic.h   |  3 ++-
+>  arch/x86/kvm/svm.c     |  4 ++++
+>  arch/x86/kvm/vmx/vmx.c |  4 ++++
+>  arch/x86/kvm/x86.c     |  7 +++---
+>  6 files changed, 65 insertions(+), 31 deletions(-)
+>
+> --
+> 2.7.4
+>
