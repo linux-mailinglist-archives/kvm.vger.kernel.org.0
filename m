@@ -2,62 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 35585430E7
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 22:17:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E77D5430FC
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 22:27:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728503AbfFLURq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 16:17:46 -0400
-Received: from mail-it1-f172.google.com ([209.85.166.172]:52580 "EHLO
-        mail-it1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727321AbfFLURq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 16:17:46 -0400
-Received: by mail-it1-f172.google.com with SMTP id l21so13016666ita.2
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2019 13:17:45 -0700 (PDT)
+        id S2389054AbfFLU1I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 16:27:08 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:46861 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388381AbfFLU1I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 16:27:08 -0400
+Received: by mail-pl1-f196.google.com with SMTP id e5so7089812pls.13
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2019 13:27:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=bmY5T6u/XiIXDzZdI8zSgN1e6W0hKMZOF3xTiGL2+dk=;
-        b=gVxIvxKRfBEk5uE1jd5dsU5YPLseUm0ATyGN2trZ9/fWvT62a4lDxb91RgeC/DIEBU
-         Ud6WZb1NoVoEeTnd+1GszKZTFKyARumGkKuUVVlQhMEdmuGbnlETMwKy/RBP0lygP3Ie
-         GkpscyVvz4R0w7sNa5/Jc/tQ9Olj0T8wXFE/en/18t9ep2wgDITxH81P9UejxmoMio29
-         VMsBl5abfqg8WLVzKdlp+IepHVyY2fYbSfLWZYcdHCYePZ767B947ZvbgogOtnGPg46u
-         MByFtKUvobBHOQGJoeFUJP6GrCtu27jxXZ6MvAA4cOMaAnrh/7xSNo9PvuSdtzLhTb/X
-         5W9A==
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=wQSIjj1uz1dtSEsQ8et37d1oi55PupCcmG/N44FomHg=;
+        b=dosYpfHyXQnOIHiak4h4vT7DtMsiDthIYDzQhi40A07vw+2UujEnaY2h1t/znWnsFr
+         quz6BW2DabQNadx+sDAO2O97r0jLz2nrIHQjYC9CHjraeetUerSWSoTLviI8HPycXoZZ
+         EhrCJYG29dvXZxU6C2YJtgjuh1T7f1raROHKgUW3XwqaYfDhqi2gu8n47/JClJNSwZFK
+         Cy50WsRvmzOO0Wm82pvIO18xzLdWmPQlSHYbVv4RpfrfhpGtr7WHpa/8Vj6GKkjUbi4J
+         I1Lys/X6FYmMf0ochoRNkJNNr7r0V1GDgqmSXn2lH+6rIIfw12YCjQ4hkbB9ywHjoOzK
+         tg3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=bmY5T6u/XiIXDzZdI8zSgN1e6W0hKMZOF3xTiGL2+dk=;
-        b=OJjDpAHv4CXn+IE+cB7kE9St9GhkIHQFO33sPkVSkT9bq99vTPjJoeqgQI77EkfFLH
-         xJalZyjpRr/zzqS0iJYNX9X70MhdyZnGgOigNf60qemqdzCADLVUpSYvndPYvbP98VFZ
-         PAQ5ZeXkAhqid23sG9e6kAwb44t4Hh1+aQ/m9ZRGpg+AzYukIUZA1YtE6CqMY0LQ6C7u
-         AoJ6qPXSfzet0HhNqKdQ6F+KF97oP3Z7nhsw6onlJoZNwd1rM0XwREP0n1uF7ajHa2dX
-         rLz5NTlTDtwfyUz3MMD3wvaUZ9ns48K+8o0LfVOKtLW9r1NfrL17mqwnLidJI5d79G87
-         84lQ==
-X-Gm-Message-State: APjAAAWMZTkNN2nIN8ICqoZow5bTCFPsQz4ke2+cSFdaP40Sx1DeR5wu
-        TLu8EbHZzNGdiLU3vGCqA0jp1SlJXefvIXkgfjERlkvN9gOcLw==
-X-Google-Smtp-Source: APXvYqwyFVB0GZ8IFjV4KE5AAmfjni4EHuEkJjiqywk2B1nuZ/MwyQVxf+z83p9Wjz4vWl57qYMMaV8RyFCwuExq8pY=
-X-Received: by 2002:a24:dd92:: with SMTP id t140mr762066itf.60.1560370664956;
- Wed, 12 Jun 2019 13:17:44 -0700 (PDT)
-MIME-Version: 1.0
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 12 Jun 2019 13:17:33 -0700
-Message-ID: <CALMp9eQ4k71ox=0xQKM+CfOkFe6Vqp+0znJ3Ju4ZmyL9fgjm=w@mail.gmail.com>
-Subject: What's with all of the hardcoded instruction lengths in svm.c?
-To:     kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=wQSIjj1uz1dtSEsQ8et37d1oi55PupCcmG/N44FomHg=;
+        b=NuguPu3NrWxKc2KbEWn6YkEhKUdpZfK34FQl8bGOdFb+qJyNRNOknYyIIkXmN84la4
+         nDEingktSUOnN3B9TRqWo1ALIRCf8jnZPmn/8foNGuz/IB81DgQuAmbJOLsLEaiLkQxq
+         ydmU9429ER6AbWKLZRqLKvavOFpmpBxz5VZJ88ORWnqcab4IOPs3NsnROJ17eEXZfjAf
+         6DPKNafIFXVHwdIo5rSLB1crIi/v5WTyEyH6epmb9BYZJvJL2jNuajFJYuYIS0ML0MQ9
+         A+VJYOWTyQiNQemQJaWj4PJy0D1IM1jDg4Pi00+JC5udru7kqmJ9JCB+UcY/Hpr7aAPs
+         61Ig==
+X-Gm-Message-State: APjAAAXY4hOGHSAzwDcFlTt+b0AC6BDxufqt4EyqxCqDbp/fgFOo6uo1
+        MlS2z0Dw3hpJRL5YxHI0Fdkidw==
+X-Google-Smtp-Source: APXvYqz0dHD5fq+ketC5HFnEXuKjsrvf/JQonYxBDCeP2VEnkY8AJZcbmbqYowRApnU+lnXqwECpog==
+X-Received: by 2002:a17:902:760f:: with SMTP id k15mr58881187pll.125.1560371227543;
+        Wed, 12 Jun 2019 13:27:07 -0700 (PDT)
+Received: from ?IPv6:2601:646:c200:1ef2:e92e:2d95:2c68:42e6? ([2601:646:c200:1ef2:e92e:2d95:2c68:42e6])
+        by smtp.gmail.com with ESMTPSA id m1sm267870pjv.22.2019.06.12.13.27.05
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 12 Jun 2019 13:27:06 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (1.0)
+Subject: Re: [RFC 00/10] Process-local memory allocations for hiding KVM secrets
+From:   Andy Lutomirski <luto@amacapital.net>
+X-Mailer: iPhone Mail (16F203)
+In-Reply-To: <eecc856f-7f3f-ed11-3457-ea832351e963@intel.com>
+Date:   Wed, 12 Jun 2019 13:27:04 -0700
+Cc:     Marius Hillenbrand <mhillenb@amazon.de>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com,
+        linux-mm@kvack.org, Alexander Graf <graf@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A542C98B-486C-4849-9DAC-2355F0F89A20@amacapital.net>
+References: <20190612170834.14855-1-mhillenb@amazon.de> <eecc856f-7f3f-ed11-3457-ea832351e963@intel.com>
+To:     Dave Hansen <dave.hansen@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Take the following code in rdmsr_interception, for example.
 
-svm->next_rip = kvm_rip_read(&svm->vcpu) + 2;
 
-Yes, the canonical rdmsr instruction is two bytes. However, there is
-nothing in the architectural specification prohibiting useless or
-redundant prefixes. So, for instance, 65 66 67 67 67 0f 32 is a
-perfectly valid 7-byte rdmsr instruction.
+> On Jun 12, 2019, at 12:55 PM, Dave Hansen <dave.hansen@intel.com> wrote:
+>=20
+>> On 6/12/19 10:08 AM, Marius Hillenbrand wrote:
+>> This patch series proposes to introduce a region for what we call
+>> process-local memory into the kernel's virtual address space.=20
+>=20
+> It might be fun to cc some x86 folks on this series.  They might have
+> some relevant opinions. ;)
+>=20
+> A few high-level questions:
+>=20
+> Why go to all this trouble to hide guest state like registers if all the
+> guest data itself is still mapped?
+>=20
+> Where's the context-switching code?  Did I just miss it?
+>=20
+> We've discussed having per-cpu page tables where a given PGD is only in
+> use from one CPU at a time.  I *think* this scheme still works in such a
+> case, it just adds one more PGD entry that would have to context-switched.=
 
-It looks like this code was checked in with commit 6aa8b732ca01c
-("kvm: userspace interface"), with nary a word of explanation.
+
+Fair warning: Linus is on record as absolutely hating this idea. He might ch=
+ange his mind, but it=E2=80=99s an uphill battle.=
