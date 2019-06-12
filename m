@@ -2,77 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 466DC428C6
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 16:24:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7C43428F1
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 16:27:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2409353AbfFLOYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 10:24:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42708 "EHLO mx1.redhat.com"
+        id S2439723AbfFLO1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 10:27:20 -0400
+Received: from foss.arm.com ([217.140.110.172]:54060 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2407783AbfFLOYA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 10:24:00 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 820E13079B8F;
-        Wed, 12 Jun 2019 14:23:59 +0000 (UTC)
-Received: from gondolin (ovpn-116-169.ams2.redhat.com [10.36.116.169])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BE1D777DC8;
-        Wed, 12 Jun 2019 14:23:50 +0000 (UTC)
-Date:   Wed, 12 Jun 2019 16:23:48 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Sebastian Ott <sebott@linux.ibm.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
+        id S2439675AbfFLO1F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 10:27:05 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A1BAA2B;
+        Wed, 12 Jun 2019 07:27:04 -0700 (PDT)
+Received: from [10.1.196.72] (e119884-lin.cambridge.arm.com [10.1.196.72])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3DCE73F557;
+        Wed, 12 Jun 2019 07:26:59 -0700 (PDT)
+Subject: Re: [PATCH v17 01/15] arm64: untag user pointers in access_ok and
+ __uaccess_mask_ptr
+To:     Andrey Konovalov <andreyknvl@google.com>,
+        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+        linux-media@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
         Christoph Hellwig <hch@infradead.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Michael Mueller <mimu@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        "Jason J. Herne" <jjherne@linux.ibm.com>
-Subject: Re: [PATCH v5 2/8] s390/cio: introduce DMA pools to cio
-Message-ID: <20190612162348.0c43b806.cohuck@redhat.com>
-In-Reply-To: <20190612111236.99538-3-pasic@linux.ibm.com>
-References: <20190612111236.99538-1-pasic@linux.ibm.com>
-        <20190612111236.99538-3-pasic@linux.ibm.com>
-Organization: Red Hat GmbH
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+References: <cover.1560339705.git.andreyknvl@google.com>
+ <9ed583c1a3acf014987e3aef12249506c1c69146.1560339705.git.andreyknvl@google.com>
+From:   Vincenzo Frascino <vincenzo.frascino@arm.com>
+Message-ID: <52e93b24-3302-e890-5799-6502042ea5c9@arm.com>
+Date:   Wed, 12 Jun 2019 15:26:58 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <9ed583c1a3acf014987e3aef12249506c1c69146.1560339705.git.andreyknvl@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 12 Jun 2019 14:24:00 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 12 Jun 2019 13:12:30 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+On 12/06/2019 12:43, Andrey Konovalov wrote:
+> This patch is a part of a series that extends arm64 kernel ABI to allow to
+> pass tagged user pointers (with the top byte set to something else other
+> than 0x00) as syscall arguments.
+> 
+> copy_from_user (and a few other similar functions) are used to copy data
+> from user memory into the kernel memory or vice versa. Since a user can
+> provided a tagged pointer to one of the syscalls that use copy_from_user,
+> we need to correctly handle such pointers.
+> 
+> Do this by untagging user pointers in access_ok and in __uaccess_mask_ptr,
+> before performing access validity checks.
+> 
+> Note, that this patch only temporarily untags the pointers to perform the
+> checks, but then passes them as is into the kernel internals.
+> 
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
 
-> To support protected virtualization cio will need to make sure the
-> memory used for communication with the hypervisor is DMA memory.
-> 
-> Let us introduce one global pool for cio.
-> 
-> Our DMA pools are implemented as a gen_pool backed with DMA pages. The
-> idea is to avoid each allocation effectively wasting a page, as we
-> typically allocate much less than PAGE_SIZE.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Reviewed-by: Sebastian Ott <sebott@linux.ibm.com>
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
+
 > ---
->  arch/s390/Kconfig           |   1 +
->  arch/s390/include/asm/cio.h |  11 +++
->  drivers/s390/cio/css.c      | 133 ++++++++++++++++++++++++++++++++++--
->  3 files changed, 141 insertions(+), 4 deletions(-)
+>  arch/arm64/include/asm/uaccess.h | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/uaccess.h b/arch/arm64/include/asm/uaccess.h
+> index e5d5f31c6d36..df729afca0ba 100644
+> --- a/arch/arm64/include/asm/uaccess.h
+> +++ b/arch/arm64/include/asm/uaccess.h
+> @@ -73,6 +73,8 @@ static inline unsigned long __range_ok(const void __user *addr, unsigned long si
+>  {
+>  	unsigned long ret, limit = current_thread_info()->addr_limit;
+>  
+> +	addr = untagged_addr(addr);
+> +
+>  	__chk_user_ptr(addr);
+>  	asm volatile(
+>  	// A + B <= C + 1 for all A,B,C, in four easy steps:
+> @@ -226,7 +228,8 @@ static inline void uaccess_enable_not_uao(void)
+>  
+>  /*
+>   * Sanitise a uaccess pointer such that it becomes NULL if above the
+> - * current addr_limit.
+> + * current addr_limit. In case the pointer is tagged (has the top byte set),
+> + * untag the pointer before checking.
+>   */
+>  #define uaccess_mask_ptr(ptr) (__typeof__(ptr))__uaccess_mask_ptr(ptr)
+>  static inline void __user *__uaccess_mask_ptr(const void __user *ptr)
+> @@ -234,10 +237,11 @@ static inline void __user *__uaccess_mask_ptr(const void __user *ptr)
+>  	void __user *safe_ptr;
+>  
+>  	asm volatile(
+> -	"	bics	xzr, %1, %2\n"
+> +	"	bics	xzr, %3, %2\n"
+>  	"	csel	%0, %1, xzr, eq\n"
+>  	: "=&r" (safe_ptr)
+> -	: "r" (ptr), "r" (current_thread_info()->addr_limit)
+> +	: "r" (ptr), "r" (current_thread_info()->addr_limit),
+> +	  "r" (untagged_addr(ptr))
+>  	: "cc");
+>  
+>  	csdb();
+> 
 
-Changes look good to me.
+-- 
+Regards,
+Vincenzo
