@@ -2,85 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 43CF14313C
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 22:56:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96D3D44FA2
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 00:55:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390678AbfFLU4h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 16:56:37 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:34073 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388338AbfFLU4g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 16:56:36 -0400
-Received: by mail-pf1-f194.google.com with SMTP id c85so10386608pfc.1
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2019 13:56:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=TZPBYSKEoaIkhIv00E3WuJ5aJFmWavGoQVJ9IN5iIvo=;
-        b=YKatqYp5ZMD0rZsPMDq0to0PJDreG1XUyrx5SqWGPFgdgJtrZRf5AOIxLF1RFphdWH
-         R8Uycb+uWLqjH30x5HeS9diZaO6zEKBi4ehrFWwTQQhEoyWIgNqsqXzSVDTswGRL/9KD
-         uhKfahNauFol7O1XFQvxQp5RulEWOEW7iex6oysSu++JNYIgkrqn3WOcSrgDk5zaBXNp
-         8B+4btiQ/WZSa7P4mcOyuxUL08dr8X75WN0f9Llk7Bg6kYQ1G/dW5uqsTcyfJCabZyCo
-         CSzxOII00f5vEnofzolLz3aqRMf0Y2IeopHbP2PjiAMHgx7OfqBg8uf57PLTsF74jSYO
-         KVmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=TZPBYSKEoaIkhIv00E3WuJ5aJFmWavGoQVJ9IN5iIvo=;
-        b=lsKtkVLePNq5awvqoI3AviukxHua9PoZ+1UO0GMpzpDVDvh+9+0fXculY4ayCJUfOT
-         cORQYxf92BuZrrONUqFqHcMsPcMdtC6ak9V95Q6mDS3shJfuTpDU6jvf/NSe/loZQD3b
-         dqEIvL1YVvXSRxLHaC7L6Y4wUlemLjZdjxSHbwMK0wi3r9BK7nFO/puw5t5YdPTT7pAb
-         qGRh33rBVbMQFrmw3DKLgqdJaRFCF/tEpcDU3Qe3E+6O82nY63fo+r4+laTuVkI9G+oc
-         eCTnw1TkyVHt6F5uOCVW4bZVAM8QScIaDz3ncWO8GO/KD8ZqySEr6aSqCo6CMq9jSGs7
-         lCEQ==
-X-Gm-Message-State: APjAAAUifvBNqTWlYfzLUe+uTl1nY+7EFYSg8JVKMvad2FKvh75KO2ns
-        BIaOjb0PNZNgioJYLlqEg1KxHg==
-X-Google-Smtp-Source: APXvYqxo/ItMtB3OUs84fhqaf0UCPf/u6DxMcudVwkkrFpAqbneRAxpY8FuZIOMzxuIx2mCUlvJvAg==
-X-Received: by 2002:aa7:90ce:: with SMTP id k14mr89000454pfk.239.1560372995458;
-        Wed, 12 Jun 2019 13:56:35 -0700 (PDT)
-Received: from ?IPv6:2601:646:c200:1ef2:e92e:2d95:2c68:42e6? ([2601:646:c200:1ef2:e92e:2d95:2c68:42e6])
-        by smtp.gmail.com with ESMTPSA id v18sm455164pfg.182.2019.06.12.13.56.34
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 12 Jun 2019 13:56:34 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (1.0)
-Subject: Re: [RFC 00/10] Process-local memory allocations for hiding KVM secrets
-From:   Andy Lutomirski <luto@amacapital.net>
-X-Mailer: iPhone Mail (16F203)
-In-Reply-To: <3cd533c1-3f18-a84f-fbb2-264751ed3eeb@intel.com>
-Date:   Wed, 12 Jun 2019 13:56:31 -0700
-Cc:     Marius Hillenbrand <mhillenb@amazon.de>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com,
-        linux-mm@kvack.org, Alexander Graf <graf@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <FD3482AC-3FB0-41DE-9347-5BD7C3DE8B11@amacapital.net>
-References: <20190612170834.14855-1-mhillenb@amazon.de> <eecc856f-7f3f-ed11-3457-ea832351e963@intel.com> <A542C98B-486C-4849-9DAC-2355F0F89A20@amacapital.net> <3cd533c1-3f18-a84f-fbb2-264751ed3eeb@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>
+        id S1727203AbfFMWzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 18:55:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41628 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727116AbfFMWzP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 18:55:15 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 34C6985539;
+        Thu, 13 Jun 2019 22:55:15 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-4.gru2.redhat.com [10.97.112.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E498C52CF;
+        Thu, 13 Jun 2019 22:55:14 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id 4C55D10517E;
+        Wed, 12 Jun 2019 18:51:28 -0300 (BRT)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id x5CLpOVJ028527;
+        Wed, 12 Jun 2019 18:51:24 -0300
+Date:   Wed, 12 Jun 2019 18:51:23 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     Wanpeng Li <kernellwp@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3 2/4] KVM: LAPIC: lapic timer interrupt is injected by
+ posted interrupt
+Message-ID: <20190612215120.GA28417@amt.cnet>
+References: <1560255429-7105-1-git-send-email-wanpengli@tencent.com>
+ <1560255429-7105-3-git-send-email-wanpengli@tencent.com>
+ <20190611201849.GA7520@amt.cnet>
+ <CANRm+CwrbMQpQ1d_KMp-EBMd-pXFVePQ8GV4Y4X0oy8-zGZCBQ@mail.gmail.com>
+ <20190612152231.GA22785@flask>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190612152231.GA22785@flask>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Thu, 13 Jun 2019 22:55:15 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Jun 12, 2019 at 05:22:31PM +0200, Radim Krčmář wrote:
+> 2019-06-12 09:48+0800, Wanpeng Li:
+> > On Wed, 12 Jun 2019 at 04:39, Marcelo Tosatti <mtosatti@redhat.com> wrote:
+> > > On Tue, Jun 11, 2019 at 08:17:07PM +0800, Wanpeng Li wrote:
+> > > > From: Wanpeng Li <wanpengli@tencent.com>
+> > > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > > > @@ -133,6 +133,12 @@ inline bool posted_interrupt_inject_timer_enabled(struct kvm_vcpu *vcpu)
+> > > >  }
+> > > >  EXPORT_SYMBOL_GPL(posted_interrupt_inject_timer_enabled);
+> > > >
+> > > > +static inline bool can_posted_interrupt_inject_timer(struct kvm_vcpu *vcpu)
+> > > > +{
+> > > > +     return posted_interrupt_inject_timer_enabled(vcpu) &&
+> > > > +             kvm_hlt_in_guest(vcpu->kvm);
+> > > > +}
+> > >
+> > > Hi Li,
+> > 
+> > Hi Marcelo,
+> > 
+> > >
+> > > Don't think its necessary to depend on kvm_hlt_in_guest: Can also use
+> > > exitless injection if the guest is running (think DPDK style workloads
+> > > that busy-spin on network card).
+> 
+> I agree.
+> 
+> > There are some discussions here.
+> > 
+> > https://lkml.org/lkml/2019/6/11/424
+> > https://lkml.org/lkml/2019/6/5/436
+> 
+> Paolo wants to disable the APF synthetic halt first, which I think is
+> unrelated to the timer implementation.
+> The synthetic halt happens when the VCPU cannot progress because the
+> host swapped out its memory and any asynchronous event should unhalt it,
+> because we assume that the interrupt path wasn't swapped out.
+> 
+> The posted interrupt does a swake_up_one (part of vcpu kick), which is
+> everything what the non-posted path does after setting a KVM request --
+> it's a bug if we later handle the PIR differently from the KVM request,
+> so the guest is going to be woken up on any halt blocking in KVM (even
+> synthetic APF halt).
+> 
+> Paolo, have I missed the point?
+> 
+> Thanks.
+
+"Here you need to check kvm_halt_in_guest, not kvm_mwait_in_guest,
+because you need to go through kvm_apic_expired if the guest needs to be
+woken up from kvm_vcpu_block."
+
+Note: VMX preemption timer is disabled by Li's patch.
 
 
-> On Jun 12, 2019, at 1:41 PM, Dave Hansen <dave.hansen@intel.com> wrote:
->=20
-> On 6/12/19 1:27 PM, Andy Lutomirski wrote:
->>> We've discussed having per-cpu page tables where a given PGD is
->>> only in use from one CPU at a time.  I *think* this scheme still
->>> works in such a case, it just adds one more PGD entry that would
->>> have to context-switched.
->> Fair warning: Linus is on record as absolutely hating this idea. He
->> might change his mind, but it=E2=80=99s an uphill battle.
->=20
-> Just to be clear, are you referring to the per-cpu PGDs, or to this
-> patch set with a per-mm kernel area?
-
-per-CPU PGDs=
