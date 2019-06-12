@@ -2,91 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 29E5E42AD5
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 17:22:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EF6E42B09
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 17:36:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407253AbfFLPWf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 11:22:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58206 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727419AbfFLPWf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 11:22:35 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 50B5C11549;
-        Wed, 12 Jun 2019 15:22:35 +0000 (UTC)
-Received: from flask (unknown [10.40.205.10])
-        by smtp.corp.redhat.com (Postfix) with SMTP id 32E4A377B;
-        Wed, 12 Jun 2019 15:22:31 +0000 (UTC)
-Received: by flask (sSMTP sendmail emulation); Wed, 12 Jun 2019 17:22:31 +0200
-Date:   Wed, 12 Jun 2019 17:22:31 +0200
-From:   Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 2/4] KVM: LAPIC: lapic timer interrupt is injected by
- posted interrupt
-Message-ID: <20190612152231.GA22785@flask>
-References: <1560255429-7105-1-git-send-email-wanpengli@tencent.com>
- <1560255429-7105-3-git-send-email-wanpengli@tencent.com>
- <20190611201849.GA7520@amt.cnet>
- <CANRm+CwrbMQpQ1d_KMp-EBMd-pXFVePQ8GV4Y4X0oy8-zGZCBQ@mail.gmail.com>
+        id S2437271AbfFLPgZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 11:36:25 -0400
+Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:29736 "EHLO
+        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2409443AbfFLPgZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 11:36:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1560353785; x=1591889785;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=iysjHFEmFK6WReRy+l8vRaIRl3mJUVuzUzI1BfSSuWA=;
+  b=h/VdZDVYQt+QuQNBHV4WQ+OaIWjgZxkOixOP5tuhujVKt3nw4Zw7Tj66
+   rcjM+fuAzhGM8euXjkXwb1oZC9MjkJ33u9BD/n7YQjxyO9Qwo8+wlGgFL
+   SYPcbygmmVGaWnFg3thwdySl+31uA18jG+QsdDO0nMt/E4MQ5r8a30n00
+   Y=;
+X-IronPort-AV: E=Sophos;i="5.62,366,1554768000"; 
+   d="scan'208";a="400429507"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1e-a70de69e.us-east-1.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 12 Jun 2019 15:36:23 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1e-a70de69e.us-east-1.amazon.com (Postfix) with ESMTPS id 494C6A245B;
+        Wed, 12 Jun 2019 15:36:18 +0000 (UTC)
+Received: from EX13D08UEE002.ant.amazon.com (10.43.62.92) by
+ EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 12 Jun 2019 15:36:18 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (10.43.61.82) by
+ EX13D08UEE002.ant.amazon.com (10.43.62.92) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 12 Jun 2019 15:36:18 +0000
+Received: from u6cf1b7119fa15b.ant.amazon.com (10.28.85.98) by
+ mail-relay.amazon.com (10.43.61.243) with Microsoft SMTP Server id
+ 15.0.1367.3 via Frontend Transport; Wed, 12 Jun 2019 15:36:15 +0000
+From:   Sam Caccavale <samcacc@amazon.de>
+CC:     <samcaccavale@gmail.com>, <nmanthey@amazon.de>,
+        <wipawel@amazon.de>, <dwmw@amazon.co.uk>, <mpohlack@amazon.de>,
+        <graf@amazon.de>, <karahmed@amazon.de>,
+        <andrew.cooper3@citrix.com>, <JBeulich@suse.com>,
+        <pbonzini@redhat.com>, <rkrcmar@redhat.com>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <bp@alien8.de>, <hpa@zytor.com>,
+        <paullangton4@gmail.com>, <anirudhkaushik@google.com>,
+        <x86@kernel.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Sam Caccavale <samcacc@amazon.de>
+Subject: [v2, 0/4] x86 instruction emulator fuzzing
+Date:   Wed, 12 Jun 2019 17:35:56 +0200
+Message-ID: <20190612153600.13073-1-samcacc@amazon.de>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANRm+CwrbMQpQ1d_KMp-EBMd-pXFVePQ8GV4Y4X0oy8-zGZCBQ@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Wed, 12 Jun 2019 15:22:35 +0000 (UTC)
+Content-Type: text/plain
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-2019-06-12 09:48+0800, Wanpeng Li:
-> On Wed, 12 Jun 2019 at 04:39, Marcelo Tosatti <mtosatti@redhat.com> wrote:
-> > On Tue, Jun 11, 2019 at 08:17:07PM +0800, Wanpeng Li wrote:
-> > > From: Wanpeng Li <wanpengli@tencent.com>
-> > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > > @@ -133,6 +133,12 @@ inline bool posted_interrupt_inject_timer_enabled(struct kvm_vcpu *vcpu)
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(posted_interrupt_inject_timer_enabled);
-> > >
-> > > +static inline bool can_posted_interrupt_inject_timer(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +     return posted_interrupt_inject_timer_enabled(vcpu) &&
-> > > +             kvm_hlt_in_guest(vcpu->kvm);
-> > > +}
-> >
-> > Hi Li,
-> 
-> Hi Marcelo,
-> 
-> >
-> > Don't think its necessary to depend on kvm_hlt_in_guest: Can also use
-> > exitless injection if the guest is running (think DPDK style workloads
-> > that busy-spin on network card).
+Dear all,
 
-I agree.
+This series aims to provide an entrypoint for, and fuzz KVM's x86 instruction
+emulator from userspace.  It mirrors Xen's application of the AFL fuzzer to
+it's instruction emulator in the hopes of discovering vulnerabilities.
+Since this entrypoint also allows arbitrary execution of the emulators code
+from userspace, it may also be useful for testing.
 
-> There are some discussions here.
-> 
-> https://lkml.org/lkml/2019/6/11/424
-> https://lkml.org/lkml/2019/6/5/436
+The current 4 patches build the emulator and 2 harnesses: simple-harness is
+an example of unit testing; afl-harness is a frontend for the AFL fuzzer.
 
-Paolo wants to disable the APF synthetic halt first, which I think is
-unrelated to the timer implementation.
-The synthetic halt happens when the VCPU cannot progress because the
-host swapped out its memory and any asynchronous event should unhalt it,
-because we assume that the interrupt path wasn't swapped out.
+Patches
+=======
 
-The posted interrupt does a swake_up_one (part of vcpu kick), which is
-everything what the non-posted path does after setting a KVM request --
-it's a bug if we later handle the PIR differently from the KVM request,
-so the guest is going to be woken up on any halt blocking in KVM (even
-synthetic APF halt).
+- 01: Builds and links afl-harness with the required kernel objects.
+- 02: Introduces the minimal set of emulator operations and supporting code
+to emulate simple instructions.
+- 03: Demonstrates simple-harness as a unit test.
+- 04: Adds scripts for install, running, and crash triage.
 
-Paolo, have I missed the point?
+Any comments/suggestions are greatly appreciated.
 
-Thanks.
+Best,
+Sam Caccavale
+
+Sam Caccavale (4):
+  Build target for emulate.o as a userspace binary
+  Emulate simple x86 instructions in userspace
+  Demonstrating unit testing via simple-harness
+  Added scripts for filtering, building, deploying
+
+ tools/Makefile                                |   9 +
+ tools/fuzz/x86ie/.gitignore                   |   2 +
+ tools/fuzz/x86ie/Makefile                     |  54 +++
+ tools/fuzz/x86ie/README.md                    |  12 +
+ tools/fuzz/x86ie/afl-harness.c                | 151 +++++++
+ tools/fuzz/x86ie/common.h                     |  87 ++++
+ tools/fuzz/x86ie/emulator_ops.c               | 398 ++++++++++++++++++
+ tools/fuzz/x86ie/emulator_ops.h               | 120 ++++++
+ tools/fuzz/x86ie/scripts/afl-many             |  28 ++
+ tools/fuzz/x86ie/scripts/bin.sh               |  49 +++
+ tools/fuzz/x86ie/scripts/build.sh             |  32 ++
+ tools/fuzz/x86ie/scripts/coalesce.sh          |   6 +
+ tools/fuzz/x86ie/scripts/deploy.sh            |   9 +
+ tools/fuzz/x86ie/scripts/deploy_remote.sh     |   9 +
+ tools/fuzz/x86ie/scripts/gen_output.sh        |  11 +
+ tools/fuzz/x86ie/scripts/install_afl.sh       |  14 +
+ .../fuzz/x86ie/scripts/install_deps_ubuntu.sh |   5 +
+ tools/fuzz/x86ie/scripts/rebuild.sh           |   6 +
+ tools/fuzz/x86ie/scripts/run.sh               |  10 +
+ tools/fuzz/x86ie/scripts/summarize.sh         |   9 +
+ tools/fuzz/x86ie/simple-harness.c             |  42 ++
+ tools/fuzz/x86ie/stubs.c                      |  56 +++
+ tools/fuzz/x86ie/stubs.h                      |  52 +++
+ 23 files changed, 1171 insertions(+)
+ create mode 100644 tools/fuzz/x86ie/.gitignore
+ create mode 100644 tools/fuzz/x86ie/Makefile
+ create mode 100644 tools/fuzz/x86ie/README.md
+ create mode 100644 tools/fuzz/x86ie/afl-harness.c
+ create mode 100644 tools/fuzz/x86ie/common.h
+ create mode 100644 tools/fuzz/x86ie/emulator_ops.c
+ create mode 100644 tools/fuzz/x86ie/emulator_ops.h
+ create mode 100755 tools/fuzz/x86ie/scripts/afl-many
+ create mode 100755 tools/fuzz/x86ie/scripts/bin.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/build.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/coalesce.sh
+ create mode 100644 tools/fuzz/x86ie/scripts/deploy.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/deploy_remote.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/gen_output.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/install_afl.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/install_deps_ubuntu.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/rebuild.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/run.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/summarize.sh
+ create mode 100644 tools/fuzz/x86ie/simple-harness.c
+ create mode 100644 tools/fuzz/x86ie/stubs.c
+ create mode 100644 tools/fuzz/x86ie/stubs.h
+
+--
+2.17.1
+
+
+
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Ralf Herbrich
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
