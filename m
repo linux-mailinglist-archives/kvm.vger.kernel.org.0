@@ -2,92 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B0D554236F
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 13:07:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B106242377
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 13:08:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408391AbfFLLFQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 07:05:16 -0400
-Received: from foss.arm.com ([217.140.110.172]:50480 "EHLO foss.arm.com"
+        id S2406968AbfFLLHn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 07:07:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47586 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406137AbfFLLFQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 07:05:16 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 67D1428;
-        Wed, 12 Jun 2019 04:05:15 -0700 (PDT)
-Received: from C02TF0J2HF1T.local (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 74A1E3F246;
-        Wed, 12 Jun 2019 04:06:34 -0700 (PDT)
-Date:   Wed, 12 Jun 2019 12:04:44 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        dri-devel@lists.freedesktop.org,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        linux-media@vger.kernel.org, Kevin Brodsky <kevin.brodsky@arm.com>,
-        Kees Cook <keescook@chromium.org>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Kostya Serebryany <kcc@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: Re: [PATCH v16 02/16] arm64: untag user pointers in access_ok and
- __uaccess_mask_ptr
-Message-ID: <20190612110443.GD28951@C02TF0J2HF1T.local>
-References: <cover.1559580831.git.andreyknvl@google.com>
- <4327b260fb17c4776a1e3c844f388e4948cfb747.1559580831.git.andreyknvl@google.com>
- <20190610175326.GC25803@arrakis.emea.arm.com>
- <20190611145720.GA63588@arrakis.emea.arm.com>
- <CAAeHK+z5nSOOaGfehETzznNcMq5E5U+Eb1rZE16UVsT8FWT0Vg@mail.gmail.com>
- <20190611173903.4icrfmoyfvms35cy@mbp>
- <CAAeHK+ysoiCSiCNrrvXqffK53WwBMHbc3bk69uU0vY0+R4_JvQ@mail.gmail.com>
+        id S2405826AbfFLLHm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 07:07:42 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id BA83730860AE;
+        Wed, 12 Jun 2019 11:07:42 +0000 (UTC)
+Received: from gondolin (ovpn-116-169.ams2.redhat.com [10.36.116.169])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EFAEC17C4D;
+        Wed, 12 Jun 2019 11:07:40 +0000 (UTC)
+Date:   Wed, 12 Jun 2019 13:07:35 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Farhan Ali <alifm@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2 1/9] s390/cio: Squash cp_free() and cp_unpin_free()
+Message-ID: <20190612130735.192696f4.cohuck@redhat.com>
+In-Reply-To: <20190606202831.44135-2-farman@linux.ibm.com>
+References: <20190606202831.44135-1-farman@linux.ibm.com>
+        <20190606202831.44135-2-farman@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeHK+ysoiCSiCNrrvXqffK53WwBMHbc3bk69uU0vY0+R4_JvQ@mail.gmail.com>
-User-Agent: Mutt/1.11.2 (2019-01-07)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 12 Jun 2019 11:07:42 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 12, 2019 at 01:03:10PM +0200, Andrey Konovalov wrote:
-> On Tue, Jun 11, 2019 at 7:39 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > On Tue, Jun 11, 2019 at 07:09:46PM +0200, Andrey Konovalov wrote:
-> > > Should I drop access_ok() change from my patch, since yours just reverts it?
-> >
-> > Not necessary, your patch just relaxes the ABI for all apps, mine
-> > tightens it. You could instead move the untagging to __range_ok() and
-> > rebase my patch accordingly.
+On Thu,  6 Jun 2019 22:28:23 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
+
+> The routine cp_free() does nothing but call cp_unpin_free(), and while
+> most places call cp_free() there is one caller of cp_unpin_free() used
+> when the cp is guaranteed to have not been marked initialized.
 > 
-> OK, will do. I'll also add a comment next to TIF_TAGGED_ADDR as Vincenzo asked.
+> This seems like a dubious way to make a distinction, so let's combine
+> these routines and make cp_free() do all the work.
 
-Thanks.
+Prior to the introduction of ->initialized, cp_free() only was a
+wrapper around cp_unpin_free(), which made even less sense... but
+checking ->initialized does not really matter at all here.
 
--- 
-Catalin
+> 
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+> The RFC version of this patch received r-b's from Farhan [1] and
+> Pierre [2].  This patch is almost identical to that one, but I
+> opted to not include those tags because of the cp->initialized
+> check that now has an impact here.  I still think this patch makes
+> sense, but want them (well, Farhan) to have a chance to look it
+> over since it's been six or seven months.
+> 
+> [1] https://patchwork.kernel.org/comment/22310411/
+> [2] https://patchwork.kernel.org/comment/22317927/
+> ---
+>  drivers/s390/cio/vfio_ccw_cp.c | 36 +++++++++++++++-------------------
+>  1 file changed, 16 insertions(+), 20 deletions(-)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
