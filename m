@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 91B3042D1E
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 19:11:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5436742D20
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 19:12:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2409002AbfFLRLU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 13:11:20 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:41139 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406140AbfFLRLU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 13:11:20 -0400
+        id S2406267AbfFLRLk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 13:11:40 -0400
+Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:38928 "EHLO
+        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405298AbfFLRLj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 13:11:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1560359479; x=1591895479;
+  t=1560359498; x=1591895498;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Ao+6+ybAOyd/41QkzFZKGeI5GKaYYHvHpMzftf308bY=;
-  b=D86NXbePvig4zqCsWHpPh2FXGmmNw/DWihqZVQZH9ec53iGzoXOPfIP6
-   9sfLb7Ga6mENhULAKorGZj8Z6m0CafygaLya+6n7oXjKM3MXUFNHN0+20
-   7x8uCpYc1CwWNtvDjrbXIZAd/V2cc7TSCHob37KBbeh+plT8KwJBskEF8
-   Y=;
+  bh=mHyM8SWHlAfs7A/FW6SKOCGNM1rYZjxh4Tkjo7ZhY7U=;
+  b=uegwbgsJzOC7Sam9PEZ8KhrDVtTbb/25iUP9MY2fmSXMCc7j4Wrycr6q
+   MIMxfL2p0wx4XYL1iZoOTtvVrtB7PhFuxm+prJaycTE3MFiIvwLduU95u
+   ecacg5PhNY3gQT2IGEBKqdBcMvvqKPAfKNDbDU9SWN+tjC1bpCANSx2P9
+   o=;
 X-IronPort-AV: E=Sophos;i="5.62,366,1554768000"; 
-   d="scan'208";a="805048692"
-Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com) ([10.47.22.34])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 12 Jun 2019 17:11:16 +0000
+   d="scan'208";a="406138085"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 12 Jun 2019 17:11:30 +0000
 Received: from ua08cfdeba6fe59dc80a8.ant.amazon.com (pdx2-ws-svc-lb17-vlan2.amazon.com [10.247.140.66])
-        by email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com (Postfix) with ESMTPS id F339EA1956;
-        Wed, 12 Jun 2019 17:11:15 +0000 (UTC)
+        by email-inbound-relay-2b-4ff6265a.us-west-2.amazon.com (Postfix) with ESMTPS id 57BB3A1956;
+        Wed, 12 Jun 2019 17:11:29 +0000 (UTC)
 Received: from ua08cfdeba6fe59dc80a8.ant.amazon.com (ua08cfdeba6fe59dc80a8.ant.amazon.com [127.0.0.1])
-        by ua08cfdeba6fe59dc80a8.ant.amazon.com (8.15.2/8.15.2/Debian-3) with ESMTP id x5CHBDtZ018049;
-        Wed, 12 Jun 2019 19:11:13 +0200
+        by ua08cfdeba6fe59dc80a8.ant.amazon.com (8.15.2/8.15.2/Debian-3) with ESMTP id x5CHBRZt018256;
+        Wed, 12 Jun 2019 19:11:27 +0200
 Received: (from mhillenb@localhost)
-        by ua08cfdeba6fe59dc80a8.ant.amazon.com (8.15.2/8.15.2/Submit) id x5CHBDRf018047;
-        Wed, 12 Jun 2019 19:11:13 +0200
+        by ua08cfdeba6fe59dc80a8.ant.amazon.com (8.15.2/8.15.2/Submit) id x5CHBQ5g018255;
+        Wed, 12 Jun 2019 19:11:26 +0200
 From:   Marius Hillenbrand <mhillenb@amazon.de>
 To:     kvm@vger.kernel.org
 Cc:     Marius Hillenbrand <mhillenb@amazon.de>,
         linux-kernel@vger.kernel.org, kernel-hardening@lists.openwall.com,
         linux-mm@kvack.org, Alexander Graf <graf@amazon.de>,
         David Woodhouse <dwmw@amazon.co.uk>
-Subject: [RFC 05/10] mm: allocate/release physical pages for process-local memory
-Date:   Wed, 12 Jun 2019 19:08:34 +0200
-Message-Id: <20190612170834.14855-6-mhillenb@amazon.de>
+Subject: [RFC 06/10] kvm/x86: add support for storing vCPU state in process-local memory
+Date:   Wed, 12 Jun 2019 19:08:36 +0200
+Message-Id: <20190612170834.14855-7-mhillenb@amazon.de>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190612170834.14855-1-mhillenb@amazon.de>
 References: <20190612170834.14855-1-mhillenb@amazon.de>
@@ -53,255 +53,247 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Implement second half of kmalloc and kfree for process-local memory,
-which allocates physical pages, maps them into the kernel virtual
-address space of the current process, and removes them from the kernel's
-shared direct physical mapping. On kfree, the code performs that
-sequence in reverse, after scrubbing the pages' contents.
-
-Note that both the allocation and free path require TLB flushes, to
-flush remaining mappings in the direct physical mappings (on allocation)
-and in the process-local memory (on release). Aim to keep the impact of
-these flushes minimal by flushing only necessary address ranges.
-
-The allocation only handles the smallest page size (i.e., 4 KiB), no
-huge pages, because in our use case, the size of individual allocations
-is in the order of 4 KiB.
+The hidden KVM state will both contain guest state that is specific to
+x86-64 as well as state specific to SVM or VMX, respectively. Thus,
+allocate the hidden state in the code paths specific to SVM and VMX. For
+the code that is shared between SVM and VMX, introduce a common struct
+for hidden guest state.
 
 Signed-off-by: Marius Hillenbrand <mhillenb@amazon.de>
 Cc: Alexander Graf <graf@amazon.de>
 Cc: David Woodhouse <dwmw@amazon.co.uk>
 ---
- mm/proclocal.c | 167 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 165 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  9 ++++++++
+ arch/x86/kvm/Kconfig            | 10 +++++++++
+ arch/x86/kvm/svm.c              | 37 +++++++++++++++++++++++++++++++-
+ arch/x86/kvm/vmx.c              | 38 ++++++++++++++++++++++++++++++++-
+ arch/x86/kvm/x86.c              |  5 +++++
+ 5 files changed, 97 insertions(+), 2 deletions(-)
 
-diff --git a/mm/proclocal.c b/mm/proclocal.c
-index 7a6217faf765..26bc1f3f68a2 100644
---- a/mm/proclocal.c
-+++ b/mm/proclocal.c
-@@ -56,6 +56,70 @@ static struct page *proclocal_find_first_page(struct mm_struct *mm, const void *
- 	return pfn_to_page(pte_pfn(*ptep));
- }
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 5772fba1c64e..41c7b06588f9 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -534,7 +534,16 @@ struct kvm_vcpu_hv {
+ 	cpumask_t tlb_flush;
+ };
  
-+/*
-+ * Lookup PTE for a given virtual address. Allocate page table structures, if
-+ * they are not present yet.
-+ */
-+static pte_t *pte_lookup_alloc_map(struct mm_struct *mm, unsigned long kvaddr)
-+{
-+	pgd_t *pgd = pgd_offset(mm, kvaddr);
-+	p4d_t *p4d;
-+	pud_t *pud;
-+	pmd_t *pmd;
-+
-+	p4d = p4d_alloc(mm, pgd, kvaddr);
-+	if (IS_ERR_OR_NULL(p4d))
-+		return (pte_t *)p4d;
-+
-+	pud = pud_alloc(mm, p4d, kvaddr);
-+	if (IS_ERR_OR_NULL(pud))
-+		return (pte_t *)pud;
-+
-+	pmd = pmd_alloc(mm, pud, kvaddr);
-+	if (IS_ERR_OR_NULL(pmd))
-+		return (pte_t *)pmd;
-+
-+	return pte_alloc_map(mm, pmd, kvaddr);
-+}
-+
-+static int proclocal_map_notlbflush(struct mm_struct *mm, struct page *page, void *kvaddr)
-+{
-+	int rc;
-+	pte_t *ptep = pte_lookup_alloc_map(mm, (unsigned long)kvaddr);
-+
-+	if (IS_ERR_OR_NULL(ptep)) {
-+		pr_err("failed to pte_lookup_alloc_map, ptep=0x%lx\n",
-+		       (unsigned long)ptep);
-+		return ptep ? PTR_ERR(ptep) : -ENOMEM;
-+	}
-+
-+	set_pte(ptep, mk_pte(page, kmap_prot));
-+	rc = set_direct_map_invalid_noflush(page);
-+	if (rc)
-+		pte_clear(mm, (unsigned long)kvaddr, ptep);
-+	else
-+		pr_debug("map pfn %lx at %p for mm %p pgd %p\n", page_to_pfn(page), kvaddr, mm, mm->pgd);
-+	return rc;
-+}
-+
-+static void proclocal_unmap_page_notlbflush(struct mm_struct *mm, void *vaddr)
-+{
-+	pte_t *ptep = pte_lookup_map(mm, (unsigned long)vaddr);
-+	pte_t pte;
-+	struct page *page;
-+
-+	BUG_ON(IS_ERR_OR_NULL(ptep));
-+	BUG_ON(!pte_present(*ptep)); // already cleared?!
-+
-+	/* scrub page contents */
-+	memset(vaddr, 0, PAGE_SIZE);
-+
-+	pte = ptep_get_and_clear(mm, (unsigned long)vaddr, ptep);
-+	page = pfn_to_page(pte_pfn(pte));
-+
-+	BUG_ON(set_direct_map_default_noflush(page)); /* should never fail for mapped 4K-pages */
-+}
-+
- void proclocal_release_pages(struct list_head *pages)
- {
- 	struct page *pos, *n;
-@@ -65,6 +129,76 @@ void proclocal_release_pages(struct list_head *pages)
- 	}
- }
- 
-+static void proclocal_release_pages_incl_head(struct list_head *pages)
-+{
-+	proclocal_release_pages(pages);
-+	/* the list_head itself is embedded in a struct page we want to release. */
-+	__free_page(list_entry(pages, struct page, proclocal_next));
-+}
-+
-+struct physmap_tlb_flush {
-+	unsigned long start;
-+	unsigned long end;
++#ifdef CONFIG_KVM_PROCLOCAL
++struct kvm_vcpu_arch_hidden {
++	u64 placeholder;
 +};
++#endif
 +
-+static inline void track_page_to_flush(struct physmap_tlb_flush *flush, struct page *page)
-+{
-+	const unsigned long page_start = (unsigned long)page_to_virt(page);
-+	const unsigned long page_end = page_start + PAGE_SIZE;
+ struct kvm_vcpu_arch {
++#ifdef CONFIG_KVM_PROCLOCAL
++	struct kvm_vcpu_arch_hidden *hidden;
++#endif
+ 	/*
+ 	 * rip and regs accesses must go through
+ 	 * kvm_{register,rip}_{read,write} functions.
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index 80abc68b3e90..a3640e2f1a32 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -97,6 +97,16 @@ config KVM_MMU_AUDIT
+ 	 This option adds a R/W kVM module parameter 'mmu_audit', which allows
+ 	 auditing of KVM MMU events at runtime.
+ 
++config KVM_PROCLOCAL
++	bool "Use process-local allocation for KVM"
++	depends on KVM && PROCLOCAL
++	---help---
++	  Use process-local memory for storing vCPU state in KVM. This
++	  option removes assets from the kernel's global direct mapping
++	  of physical memory and stores them only in the address space
++	  of the process hosting a VM.
 +
-+	if (page_start < flush->start)
-+		flush->start = page_start;
-+	if (page_end > flush->end)
-+		flush->end = page_end;
-+}
 +
-+static int alloc_and_map_proclocal_pages(struct mm_struct *mm, void *kvaddr, size_t nr_pages)
-+{
-+	int rc;
-+	size_t i, j;
-+	struct page *page;
-+	struct list_head *pages_list = NULL;
-+	struct physmap_tlb_flush flush = { -1, 0 };
+ # OK, it's a little counter-intuitive to do this, but it puts it neatly under
+ # the virtualization menu.
+ source drivers/vhost/Kconfig
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index cb202c238de2..af66b93902e5 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -41,6 +41,7 @@
+ #include <linux/file.h>
+ #include <linux/pagemap.h>
+ #include <linux/swap.h>
++#include <linux/proclocal.h>
+ 
+ #include <asm/apic.h>
+ #include <asm/perf_event.h>
+@@ -190,9 +191,20 @@ static u32 msrpm_offsets[MSRPM_OFFSETS] __read_mostly;
+  */
+ static uint64_t osvw_len = 4, osvw_status;
+ 
++#ifdef CONFIG_KVM_PROCLOCAL
++struct vcpu_svm_hidden {
++	struct { /* mimic topology in vcpu_svm: */
++		struct kvm_vcpu_arch_hidden arch;
++	} vcpu;
++};
++#endif
 +
-+	for (i = 0; i < nr_pages; i++) {
-+		page = alloc_page(GFP_KERNEL);
-+
-+		if (!page) {
-+			rc = -ENOMEM;
-+			goto unmap_release;
-+		}
-+
-+		rc = proclocal_map_notlbflush(mm, page, kvaddr + i * PAGE_SIZE);
-+		if (rc) {
-+			__free_page(page);
-+			goto unmap_release;
-+		}
-+
-+		track_page_to_flush(&flush, page);
-+		INIT_LIST_HEAD(&page->proclocal_next);
-+		/* track allocation in first struct page */
-+		if (!pages_list) {
-+			pages_list = &page->proclocal_next;
-+			page->proclocal_nr_pages = nr_pages;
-+		} else {
-+			list_add_tail(&page->proclocal_next, pages_list);
-+			page->proclocal_nr_pages = 0;
-+		}
+ struct vcpu_svm {
+ 	struct kvm_vcpu vcpu;
+ 	struct vmcb *vmcb;
++#ifdef CONFIG_KVM_PROCLOCAL
++	struct vcpu_svm_hidden *hidden;
++#endif
+ 	unsigned long vmcb_pa;
+ 	struct svm_cpu_data *svm_data;
+ 	uint64_t asid_generation;
+@@ -2129,9 +2141,18 @@ static struct kvm_vcpu *svm_create_vcpu(struct kvm *kvm, unsigned int id)
+ 		goto out;
+ 	}
+ 
++#ifdef CONFIG_KVM_PROCLOCAL
++	svm->hidden = kzalloc_proclocal(sizeof(struct vcpu_svm_hidden));
++	if (!svm->hidden) {
++		err = -ENOMEM;
++		goto free_svm;
 +	}
++	svm->vcpu.arch.hidden = &svm->hidden->vcpu.arch;
++#endif
 +
-+	/* flush direct mappings of allocated pages from TLBs. */
-+	flush_tlb_kernel_range(flush.start, flush.end);
-+	return 0;
-+
-+unmap_release:
-+	for (j = 0; j < i; j++)
-+		proclocal_unmap_page_notlbflush(mm, kvaddr + j * PAGE_SIZE);
-+
-+	if (pages_list)
-+		proclocal_release_pages_incl_head(pages_list);
-+	return rc;
-+}
-+
- static DEFINE_SPINLOCK(proclocal_lock);
- static struct gen_pool *allocator;
+ 	err = kvm_vcpu_init(&svm->vcpu, kvm, id);
+ 	if (err)
+-		goto free_svm;
++		goto free_hidden;
  
-@@ -106,9 +240,11 @@ static void free_virtual(const void *kvaddr, size_t nr_pages)
- 
- void *kmalloc_proclocal(size_t size)
+ 	err = -ENOMEM;
+ 	page = alloc_page(GFP_KERNEL);
+@@ -2187,7 +2208,11 @@ static struct kvm_vcpu *svm_create_vcpu(struct kvm *kvm, unsigned int id)
+ 	__free_page(page);
+ uninit:
+ 	kvm_vcpu_uninit(&svm->vcpu);
++free_hidden:
++#ifdef CONFIG_KVM_PROCLOCAL
++	kfree_proclocal(svm->hidden);
+ free_svm:
++#endif
+ 	kmem_cache_free(kvm_vcpu_cache, svm);
+ out:
+ 	return ERR_PTR(err);
+@@ -2205,6 +2230,16 @@ static void svm_free_vcpu(struct kvm_vcpu *vcpu)
  {
-+	int rc;
- 	void *kvaddr = NULL;
- 	size_t nr_pages = round_up(size, PAGE_SIZE) / PAGE_SIZE;
- 	size_t nr_pages_virtual = nr_pages + 1; /* + guard page */
-+	struct mm_struct *mm;
+ 	struct vcpu_svm *svm = to_svm(vcpu);
  
- 	BUG_ON(!current);
- 	if (!size)
-@@ -120,7 +256,18 @@ void *kmalloc_proclocal(size_t size)
- 	if (IS_ERR_OR_NULL(kvaddr))
- 		return kvaddr;
- 
--	/* tbd: subsequent patch will allocate and map physical pages */
-+	mm = current->mm;
-+	down_write(&mm->mmap_sem);
-+	rc = alloc_and_map_proclocal_pages(mm, kvaddr, nr_pages);
-+	if (!rc)
-+		mm->proclocal_nr_pages += nr_pages;
-+	up_write(&mm->mmap_sem);
-+
-+	if (unlikely(rc))
-+		kvaddr = ERR_PTR(rc);
-+
-+	pr_debug("allocated %zd bytes at %p (current %p mm %p)\n", size, kvaddr,
-+		 current, current ? current->mm : 0);
- 
- 	return kvaddr;
- }
-@@ -138,6 +285,7 @@ EXPORT_SYMBOL(kzalloc_proclocal);
- 
- void kfree_proclocal(void *kvaddr)
- {
-+	int i;
- 	struct page *first_page;
- 	int nr_pages;
- 	struct mm_struct *mm;
-@@ -152,8 +300,10 @@ void kfree_proclocal(void *kvaddr)
- 	BUG_ON((unsigned long)kvaddr >= (PROCLOCAL_START + PROCLOCAL_SIZE));
- 	BUG_ON(!current);
- 
-+	might_sleep();
- 	mm = current->mm;
- 	down_write(&mm->mmap_sem);
-+
- 	first_page = proclocal_find_first_page(mm, kvaddr);
- 	if (IS_ERR_OR_NULL(first_page)) {
- 		pr_err("double-free?!\n");
-@@ -162,9 +312,22 @@ void kfree_proclocal(void *kvaddr)
- 	nr_pages = first_page->proclocal_nr_pages;
- 	BUG_ON(!nr_pages);
- 	mm->proclocal_nr_pages -= nr_pages;
--	/* subsequent patch will unmap and release physical pages */
-+
-+	for (i = 0; i < nr_pages; i++)
-+		proclocal_unmap_page_notlbflush(mm, kvaddr + i * PAGE_SIZE);
-+
- 	up_write(&mm->mmap_sem);
- 
++#ifdef CONFIG_KVM_PROCLOCAL
 +	/*
-+	 * Flush process-local mappings from TLBs so that we can release the
-+	 * pages afterwards.
++	 * note that the hidden vCPU state in a process-local allocation is
++	 * already cleaned up, because a process's mm is torn down before files
++	 * are closed. make any access in the cleanup code very visible.
 +	 */
-+	flush_tlb_mm_range(mm, (unsigned long)kvaddr,
-+			   (unsigned long)kvaddr + nr_pages * PAGE_SIZE,
-+			   PAGE_SHIFT, false);
++	svm->hidden = (struct vcpu_svm_hidden *)POISON_POINTER_DELTA;
++	svm->vcpu.arch.hidden = (struct kvm_vcpu_arch_hidden *)POISON_POINTER_DELTA;
++#endif
 +
-+	proclocal_release_pages_incl_head(&first_page->proclocal_next);
+ 	/*
+ 	 * The vmcb page can be recycled, causing a false negative in
+ 	 * svm_vcpu_load(). So, ensure that no logical CPU has this
+diff --git a/arch/x86/kvm/vmx.c b/arch/x86/kvm/vmx.c
+index f9a4faf2d1bc..6f59a6ad7835 100644
+--- a/arch/x86/kvm/vmx.c
++++ b/arch/x86/kvm/vmx.c
+@@ -37,6 +37,8 @@
+ #include <linux/hrtimer.h>
+ #include <linux/frame.h>
+ #include <linux/nospec.h>
++#include <linux/proclocal.h>
 +
- 	free_virtual(kvaddr, nr_pages + 1);
+ #include "kvm_cache_regs.h"
+ #include "x86.h"
+ 
+@@ -975,8 +977,19 @@ struct vmx_msrs {
+ 	struct vmx_msr_entry	val[NR_AUTOLOAD_MSRS];
+ };
+ 
++#ifdef CONFIG_KVM_PROCLOCAL
++struct vcpu_vmx_hidden {
++	struct { /* mimic topology in vcpu_svm: */
++		struct kvm_vcpu_arch_hidden arch;
++	} vcpu;
++};
++#endif
++
+ struct vcpu_vmx {
+ 	struct kvm_vcpu       vcpu;
++#ifdef CONFIG_KVM_PROCLOCAL
++	struct vcpu_vmx_hidden *hidden;
++#endif
+ 	unsigned long         host_rsp;
+ 	u8                    fail;
+ 	u8		      msr_bitmap_mode;
+@@ -11756,6 +11769,16 @@ static void vmx_free_vcpu(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 
++#ifdef CONFIG_KVM_PROCLOCAL
++	/*
++	 * note that the hidden vCPU state in a process-local allocation is
++	 * already cleaned up, because a process's mm is torn down before files
++	 * are closed. make any access in the cleanup code very visible.
++	 */
++	vmx->hidden = (struct vcpu_vmx_hidden *)POISON_POINTER_DELTA;
++	vmx->vcpu.arch.hidden = (struct kvm_vcpu_arch_hidden *)POISON_POINTER_DELTA;
++#endif
++
+ 	if (enable_pml)
+ 		vmx_destroy_pml_buffer(vmx);
+ 	free_vpid(vmx->vpid);
+@@ -11777,11 +11800,20 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
+ 	if (!vmx)
+ 		return ERR_PTR(-ENOMEM);
+ 
++#ifdef CONFIG_KVM_PROCLOCAL
++	vmx->hidden = kzalloc_proclocal(sizeof(struct vcpu_vmx_hidden));
++	if (!vmx->hidden) {
++		err = -ENOMEM;
++		goto free_vcpu;
++	}
++	vmx->vcpu.arch.hidden = &vmx->hidden->vcpu.arch;
++#endif
++
+ 	vmx->vpid = allocate_vpid();
+ 
+ 	err = kvm_vcpu_init(&vmx->vcpu, kvm, id);
+ 	if (err)
+-		goto free_vcpu;
++		goto free_hidden;
+ 
+ 	err = -ENOMEM;
+ 
+@@ -11868,7 +11900,11 @@ static struct kvm_vcpu *vmx_create_vcpu(struct kvm *kvm, unsigned int id)
+ 	vmx_destroy_pml_buffer(vmx);
+ uninit_vcpu:
+ 	kvm_vcpu_uninit(&vmx->vcpu);
++free_hidden:
++#ifdef CONFIG_KVM_PROCLOCAL
++	kfree_proclocal(vmx->hidden);
+ free_vcpu:
++#endif
+ 	free_vpid(vmx->vpid);
+ 	kmem_cache_free(kvm_vcpu_cache, vmx);
+ 	return ERR_PTR(err);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 371d98422631..2cfb96ca8cc8 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9309,6 +9309,11 @@ void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu)
+ 	free_page((unsigned long)vcpu->arch.pio_data);
+ 	if (!lapic_in_kernel(vcpu))
+ 		static_key_slow_dec(&kvm_no_apic_vcpu);
++	/*
++	 * note that the hidden vCPU state in a process-local allocation is
++	 * already cleaned up at this point, because a process's mm is torn down
++	 * before files are closed.
++	 */
  }
- EXPORT_SYMBOL(kfree_proclocal);
+ 
+ void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu)
 -- 
 2.21.0
 
