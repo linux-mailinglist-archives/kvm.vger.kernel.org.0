@@ -2,110 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E52842999
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 16:42:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0E54429EA
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 16:50:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437957AbfFLOmF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 10:42:05 -0400
-Received: from foss.arm.com ([217.140.110.172]:54838 "EHLO foss.arm.com"
+        id S2437021AbfFLOuh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 10:50:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57916 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731969AbfFLOmF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 10:42:05 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6763C2B;
-        Wed, 12 Jun 2019 07:42:04 -0700 (PDT)
-Received: from [10.1.196.72] (e119884-lin.cambridge.arm.com [10.1.196.72])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF8A33F557;
-        Wed, 12 Jun 2019 07:41:58 -0700 (PDT)
-Subject: Re: [PATCH v17 14/15] vfio/type1, arm64: untag user pointers in
- vaddr_get_pfn
-To:     Andrey Konovalov <andreyknvl@google.com>,
-        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-References: <cover.1560339705.git.andreyknvl@google.com>
- <e86d8cd6bd0ade9cce6304594bcaf0c8e7f788b0.1560339705.git.andreyknvl@google.com>
-From:   Vincenzo Frascino <vincenzo.frascino@arm.com>
-Message-ID: <b7408e72-aa18-21ef-aa80-76b65cbac7cb@arm.com>
-Date:   Wed, 12 Jun 2019 15:41:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S2436952AbfFLOuh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 10:50:37 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1F488206BB;
+        Wed, 12 Jun 2019 14:50:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1560351036;
+        bh=rTbyq5MmyIh2UQAp0E6ynXYPmdgyNJkcG0/LtgC2t/o=;
+        h=Date:From:To:Cc:Subject:From;
+        b=CAMND5IBjqjHNvOr7moy6UJyUD4K+mD5A2K/3+FFoimbibtGPsGG0wLiGk8fhL0u2
+         vZXpmzd9HNkDn889jfbMfxE9aKcS2nEnLXyqIRWOgcwg4PJGwURMesR294I/zL3AWC
+         QqPeCcd5XUYRPIGTS81ItblG7zH7EOjO7oiLrXy4=
+Date:   Wed, 12 Jun 2019 16:50:33 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     kvm@vger.kernel.org
+Subject: [PATCH] kvm: remove invalid check for debugfs_create_dir()
+Message-ID: <20190612145033.GA18084@kroah.com>
 MIME-Version: 1.0
-In-Reply-To: <e86d8cd6bd0ade9cce6304594bcaf0c8e7f788b0.1560339705.git.andreyknvl@google.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/06/2019 12:43, Andrey Konovalov wrote:
-> This patch is a part of a series that extends arm64 kernel ABI to allow to
-> pass tagged user pointers (with the top byte set to something else other
-> than 0x00) as syscall arguments.
-> 
-> vaddr_get_pfn() uses provided user pointers for vma lookups, which can
-> only by done with untagged pointers.
-> 
-> Untag user pointers in this function.
-> 
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> Reviewed-by: Kees Cook <keescook@chromium.org>
-> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+debugfs_create_dir() can never return NULL, so no need to check for an
+impossible thing.
 
-Reviewed-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
+It's also not needed to ever check the return value of this function, so
+just remove the check entirely, and indent the previous line to a sane
+formatting :)
 
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 3ddc375e7063..528e39a1c2dd 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -384,6 +384,8 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
->  
->  	down_read(&mm->mmap_sem);
->  
-> +	vaddr = untagged_addr(vaddr);
-> +
->  	vma = find_vma_intersection(mm, vaddr, vaddr + 1);
->  
->  	if (vma && vma->vm_flags & VM_PFNMAP) {
-> 
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Radim Krčmář" <rkrcmar@redhat.com>
+Cc: kvm@vger.kernel.org
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ virt/kvm/kvm_main.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index ca54b09adf5b..4b4ef642d8fa 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2605,9 +2605,7 @@ static int kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
+ 
+ 	snprintf(dir_name, sizeof(dir_name), "vcpu%d", vcpu->vcpu_id);
+ 	vcpu->debugfs_dentry = debugfs_create_dir(dir_name,
+-								vcpu->kvm->debugfs_dentry);
+-	if (!vcpu->debugfs_dentry)
+-		return -ENOMEM;
++						  vcpu->kvm->debugfs_dentry);
+ 
+ 	ret = kvm_arch_create_vcpu_debugfs(vcpu);
+ 	if (ret < 0) {
 -- 
-Regards,
-Vincenzo
+2.22.0
+
