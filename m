@@ -2,87 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 170AE426A4
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 14:50:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30D364265E
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2019 14:48:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437285AbfFLMum (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Jun 2019 08:50:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39946 "EHLO mx1.redhat.com"
+        id S2439207AbfFLMsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Jun 2019 08:48:10 -0400
+Received: from foss.arm.com ([217.140.110.172]:52646 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728774AbfFLMum (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 08:50:42 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7DFA08553D;
-        Wed, 12 Jun 2019 12:50:41 +0000 (UTC)
-Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-228.sin2.redhat.com [10.67.116.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F8FD7B000;
-        Wed, 12 Jun 2019 12:49:45 +0000 (UTC)
-From:   Pankaj Gupta <pagupta@redhat.com>
-To:     dm-devel@redhat.com, linux-nvdimm@lists.01.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
-        linux-xfs@vger.kernel.org
-Cc:     dan.j.williams@intel.com, zwisler@kernel.org,
-        vishal.l.verma@intel.com, dave.jiang@intel.com, mst@redhat.com,
-        jasowang@redhat.com, willy@infradead.org, rjw@rjwysocki.net,
-        hch@infradead.org, lenb@kernel.org, jack@suse.cz, tytso@mit.edu,
-        adilger.kernel@dilger.ca, darrick.wong@oracle.com,
-        lcapitulino@redhat.com, kwolf@redhat.com, imammedo@redhat.com,
-        jmoyer@redhat.com, nilal@redhat.com, riel@surriel.com,
-        stefanha@redhat.com, aarcange@redhat.com, david@redhat.com,
-        david@fromorbit.com, cohuck@redhat.com,
-        xiaoguangrong.eric@gmail.com, pagupta@redhat.com,
-        pbonzini@redhat.com, yuval.shaia@oracle.com, kilobyte@angband.pl,
-        jstaron@google.com, rdunlap@infradead.org, snitzer@redhat.com
-Subject: [PATCH v13 7/7] xfs: disable map_sync for async flush
-Date:   Wed, 12 Jun 2019 18:15:27 +0530
-Message-Id: <20190612124527.3763-8-pagupta@redhat.com>
-In-Reply-To: <20190612124527.3763-1-pagupta@redhat.com>
-References: <20190612124527.3763-1-pagupta@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Wed, 12 Jun 2019 12:50:41 +0000 (UTC)
+        id S2439208AbfFLMsK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Jun 2019 08:48:10 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 80036337;
+        Wed, 12 Jun 2019 05:48:09 -0700 (PDT)
+Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 39D8E3F246;
+        Wed, 12 Jun 2019 05:48:07 -0700 (PDT)
+Subject: Re: [PATCH v1 1/5] KVM: arm/arm64: Remove kvm_mmio_emulate tracepoint
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, marc.zyngier@arm.com,
+        catalin.marinas@arm.com, will.deacon@arm.com, acme@kernel.org,
+        linuxarm@huawei.com, acme@redhat.com, peterz@infradead.org,
+        alexander.shishkin@linux.intel.com, mingo@redhat.com,
+        ganapatrao.kulkarni@cavium.com, namhyung@kernel.org,
+        jolsa@redhat.com, xiexiangyou@huawei.com
+References: <1560330526-15468-1-git-send-email-yuzenghui@huawei.com>
+ <1560330526-15468-2-git-send-email-yuzenghui@huawei.com>
+From:   James Morse <james.morse@arm.com>
+Message-ID: <e915c19a-51df-be88-ea3a-7c9a211f4518@arm.com>
+Date:   Wed, 12 Jun 2019 13:48:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <1560330526-15468-2-git-send-email-yuzenghui@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dont support 'MAP_SYNC' with non-DAX files and DAX files
-with asynchronous dax_device. Virtio pmem provides
-asynchronous host page cache flush mechanism. We don't
-support 'MAP_SYNC' with virtio pmem and xfs.
+Hi,
 
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
----
- fs/xfs/xfs_file.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+On 12/06/2019 10:08, Zenghui Yu wrote:
+> In current KVM/ARM code, no one will invoke trace_kvm_mmio_emulate().
+> Remove this TRACE_EVENT definition.
 
-diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-index a7ceae90110e..f17652cca5ff 100644
---- a/fs/xfs/xfs_file.c
-+++ b/fs/xfs/xfs_file.c
-@@ -1203,11 +1203,14 @@ xfs_file_mmap(
- 	struct file	*filp,
- 	struct vm_area_struct *vma)
- {
-+	struct dax_device 	*dax_dev;
-+
-+	dax_dev = xfs_find_daxdev_for_inode(file_inode(filp));
- 	/*
--	 * We don't support synchronous mappings for non-DAX files. At least
--	 * until someone comes with a sensible use case.
-+	 * We don't support synchronous mappings for non-DAX files and
-+	 * for DAX files if underneath dax_device is not synchronous.
- 	 */
--	if (!IS_DAX(file_inode(filp)) && (vma->vm_flags & VM_SYNC))
-+	if (!daxdev_mapping_supported(vma, dax_dev))
- 		return -EOPNOTSUPP;
- 
- 	file_accessed(filp);
--- 
-2.20.1
+Oooer. We can't just go removing these things, they are visible to user-space.
+
+I recall an article on this: https://lwn.net/Articles/737530/
+"Another attempt to address the tracepoint ABI problem"
+
+I agree this is orphaned, it was added by commit 45e96ea6b369 ("KVM: ARM: Handle I/O
+aborts"), but there never was a caller.
+
+The problem with removing it is /sys/kernel/debug/tracing/events/kvm/kvm_mmio_emulate
+disappears. Any program relying on that being present (but useless) is now broken.
+
+
+Thanks,
+
+James
+
+
+> diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
+> index 204d210..8b7dff2 100644
+> --- a/virt/kvm/arm/trace.h
+> +++ b/virt/kvm/arm/trace.h
+> @@ -114,27 +114,6 @@
+>  		  __entry->type, __entry->vcpu_idx, __entry->irq_num, __entry->level)
+>  );
+>  
+> -TRACE_EVENT(kvm_mmio_emulate,
+> -	TP_PROTO(unsigned long vcpu_pc, unsigned long instr,
+> -		 unsigned long cpsr),
+> -	TP_ARGS(vcpu_pc, instr, cpsr),
+> -
+> -	TP_STRUCT__entry(
+> -		__field(	unsigned long,	vcpu_pc		)
+> -		__field(	unsigned long,	instr		)
+> -		__field(	unsigned long,	cpsr		)
+> -	),
+> -
+> -	TP_fast_assign(
+> -		__entry->vcpu_pc		= vcpu_pc;
+> -		__entry->instr			= instr;
+> -		__entry->cpsr			= cpsr;
+> -	),
+> -
+> -	TP_printk("Emulate MMIO at: 0x%08lx (instr: %08lx, cpsr: %08lx)",
+> -		  __entry->vcpu_pc, __entry->instr, __entry->cpsr)
+> -);
+> -
+>  TRACE_EVENT(kvm_unmap_hva_range,
+>  	TP_PROTO(unsigned long start, unsigned long end),
+>  	TP_ARGS(start, end),
+> 
 
