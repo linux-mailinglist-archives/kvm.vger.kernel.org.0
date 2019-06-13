@@ -2,106 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AD7CA43F8D
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 17:59:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89F4F4401A
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 18:03:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731493AbfFMP6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 11:58:24 -0400
-Received: from foss.arm.com ([217.140.110.172]:44214 "EHLO foss.arm.com"
+        id S2388066AbfFMQDA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 12:03:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41784 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390594AbfFMP6X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 11:58:23 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D2C10367;
-        Thu, 13 Jun 2019 08:58:22 -0700 (PDT)
-Received: from C02TF0J2HF1T.local (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 825ED3F246;
-        Thu, 13 Jun 2019 08:58:02 -0700 (PDT)
-Date:   Thu, 13 Jun 2019 16:57:55 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Vincenzo Frascino <vincenzo.frascino@arm.com>
-Cc:     Dave Martin <Dave.Martin@arm.com>,
-        Andrey Konovalov <andreyknvl@google.com>,
-        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Mark Rutland <mark.rutland@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Kees Cook <keescook@chromium.org>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: Re: [PATCH v17 03/15] arm64: Introduce prctl() options to control
- the tagged user addresses ABI
-Message-ID: <20190613155754.GX28951@C02TF0J2HF1T.local>
-References: <cover.1560339705.git.andreyknvl@google.com>
- <a7a2933bea5fe57e504891b7eec7e9432e5e1c1a.1560339705.git.andreyknvl@google.com>
- <20190613111659.GX28398@e103592.cambridge.arm.com>
- <20190613153505.GU28951@C02TF0J2HF1T.local>
- <99cc257d-5e99-922a-fbe7-3bbaf3621e38@arm.com>
+        id S2389378AbfFMQCg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 12:02:36 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2536D301E111;
+        Thu, 13 Jun 2019 16:02:36 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 33DED5E7A2;
+        Thu, 13 Jun 2019 16:02:35 +0000 (UTC)
+Date:   Thu, 13 Jun 2019 18:02:32 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Farhan Ali <alifm@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2 5/9] vfio-ccw: Rearrange pfn_array and
+ pfn_array_table arrays
+Message-ID: <20190613180232.3cbea661.cohuck@redhat.com>
+In-Reply-To: <20190606202831.44135-6-farman@linux.ibm.com>
+References: <20190606202831.44135-1-farman@linux.ibm.com>
+        <20190606202831.44135-6-farman@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <99cc257d-5e99-922a-fbe7-3bbaf3621e38@arm.com>
-User-Agent: Mutt/1.11.2 (2019-01-07)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Thu, 13 Jun 2019 16:02:36 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 13, 2019 at 04:45:54PM +0100, Vincenzo Frascino wrote:
-> On 13/06/2019 16:35, Catalin Marinas wrote:
-> > On Thu, Jun 13, 2019 at 12:16:59PM +0100, Dave P Martin wrote:
-> >> On Wed, Jun 12, 2019 at 01:43:20PM +0200, Andrey Konovalov wrote:
-> >>> +
-> >>> +/*
-> >>> + * Control the relaxed ABI allowing tagged user addresses into the kernel.
-> >>> + */
-> >>> +static unsigned int tagged_addr_prctl_allowed = 1;
-> >>> +
-> >>> +long set_tagged_addr_ctrl(unsigned long arg)
-> >>> +{
-> >>> +	if (!tagged_addr_prctl_allowed)
-> >>> +		return -EINVAL;
-> >>
-> >> So, tagging can actually be locked on by having a process enable it and
-> >> then some possibly unrelated process clearing tagged_addr_prctl_allowed.
-> >> That feels a bit weird.
-> > 
-> > The problem is that if you disable the ABI globally, lots of
-> > applications would crash. This sysctl is meant as a way to disable the
-> > opt-in to the TBI ABI. Another option would be a kernel command line
-> > option (I'm not keen on a Kconfig option).
+On Thu,  6 Jun 2019 22:28:27 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
+
+> While processing a channel program, we currently have two nested
+> arrays that carry a slightly different structure.  The direct CCW
+> path creates this:
 > 
-> Why you are not keen on a Kconfig option?
+>   ccwchain->pfn_array_table[1]->pfn_array[#pages]
+> 
+> while an IDA CCW creates:
+> 
+>   ccwchain->pfn_array_table[#idaws]->pfn_array[1]
+> 
+> The distinction appears to state that each pfn_array_table entry
+> points to an array of contiguous pages, represented by a pfn_array,
+> um, array.  Since the direct-addressed scenario can ONLY represent
+> contiguous pages, it makes the intermediate array necessary but
+> difficult to recognize.  Meanwhile, since an IDAL can contain
+> non-contiguous pages and there is no logic in vfio-ccw to detect
+> adjacent IDAWs, it is the second array that is necessary but appearing
+> to be superfluous.
+> 
+> I am not aware of any documentation that states the pfn_array[] needs
+> to be of contiguous pages; it is just what the code does today.
+> I don't see any reason for this either, let's just flip the IDA
+> codepath around so that it generates:
+> 
+>   ch_pat->pfn_array_table[1]->pfn_array[#idaws]
+> 
+> This will bring it in line with the direct-addressed codepath,
+> so that we can understand the behavior of this memory regardless
+> of what type of CCW is being processed.  And it means the casual
+> observer does not need to know/care whether the pfn_array[]
+> represents contiguous pages or not.
+> 
+> NB: The existing vfio-ccw code only supports 4K-block Format-2 IDAs,
+> so that "#pages" == "#idaws" in this area.  This means that we will
+> have difficulty with this overlap in terminology if support for
+> Format-1 or 2K-block Format-2 IDAs is ever added.  I don't think that
+> this patch changes our ability to make that distinction.
 
-Because I don't want to rebuild the kernel/reboot just to be able to
-test how user space handles the ABI opt-in. I'm ok with a Kconfig option
-to disable this globally in addition to a run-time option (if actually
-needed, I'm not sure).
+I agree; and knowing that later patches will simplify things further, I
+think it will even be easier to do than on the current code base.
 
--- 
-Catalin
+> 
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>  drivers/s390/cio/vfio_ccw_cp.c | 26 +++++++++++---------------
+>  1 file changed, 11 insertions(+), 15 deletions(-)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
