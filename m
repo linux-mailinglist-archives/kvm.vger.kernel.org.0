@@ -2,63 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8761F44CF4
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 22:05:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3F0B44F96
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 00:55:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726876AbfFMUFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 16:05:36 -0400
-Received: from mga14.intel.com ([192.55.52.115]:12703 "EHLO mga14.intel.com"
+        id S1726796AbfFMWzK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 18:55:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41120 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726600AbfFMUFg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 16:05:36 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Jun 2019 13:05:35 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by orsmga005.jf.intel.com with ESMTP; 13 Jun 2019 13:05:35 -0700
-Date:   Thu, 13 Jun 2019 13:05:35 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Nadav Amit <namit@vmware.com>, Andy Lutomirski <luto@kernel.org>,
-        Alexander Graf <graf@amazon.com>,
-        Marius Hillenbrand <mhillenb@amazon.de>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Kernel Hardening <kernel-hardening@lists.openwall.com>,
-        Linux-MM <linux-mm@kvack.org>, Alexander Graf <graf@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [RFC 00/10] Process-local memory allocations for hiding KVM
- secrets
-Message-ID: <20190613200535.GC18385@linux.intel.com>
-References: <20190612170834.14855-1-mhillenb@amazon.de>
- <eecc856f-7f3f-ed11-3457-ea832351e963@intel.com>
- <A542C98B-486C-4849-9DAC-2355F0F89A20@amacapital.net>
- <CALCETrXHbS9VXfZ80kOjiTrreM2EbapYeGp68mvJPbosUtorYA@mail.gmail.com>
- <459e2273-bc27-f422-601b-2d6cdaf06f84@amazon.com>
- <CALCETrVRuQb-P7auHCgxzs5L=qA2_qHzVGTtRMAqoMAut0ETFw@mail.gmail.com>
- <f1dfbfb4-d2d5-bf30-600f-9e756a352860@intel.com>
- <70BEF143-00BA-4E4B-ACD7-41AD2E6250BE@vmware.com>
- <f7f08704-dc4b-c5f8-3889-0fb5957c9c86@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f7f08704-dc4b-c5f8-3889-0fb5957c9c86@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        id S1725837AbfFMWzK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 18:55:10 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 417B785363;
+        Thu, 13 Jun 2019 22:55:10 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-4.gru2.redhat.com [10.97.112.4])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0C5526085B;
+        Thu, 13 Jun 2019 22:55:06 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id 16506105181;
+        Thu, 13 Jun 2019 19:53:03 -0300 (BRT)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id x5DMqwSl025647;
+        Thu, 13 Jun 2019 19:52:58 -0300
+Message-ID: <20190613224532.949768676@redhat.com>
+User-Agent: quilt/0.66
+Date:   Thu, 13 Jun 2019 18:45:32 -0400
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     kvm-devel <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Raslan KarimAllah <karahmed@amazon.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-pm@vger.kernel.org
+Subject: [patch 0/5] cpuidle haltpoll driver and governor (v4)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Thu, 13 Jun 2019 22:55:10 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 13, 2019 at 10:49:42AM -0700, Dave Hansen wrote:
-> On 6/13/19 10:29 AM, Nadav Amit wrote:
-> > Having said that, I am not too excited to deal with this issue. Do
-> > people still care about x86/32-bit?
-> No, not really.
+The cpuidle-haltpoll driver with haltpoll governor allows the guest
+vcpus to poll for a specified amount of time before halting. 
+This provides the following benefits to host side polling:
 
-Especially not for KVM, given the number of times 32-bit KVM has been
-broken recently without anyone noticing for several kernel releases.
+         1) The POLL flag is set while polling is performed, which allows
+            a remote vCPU to avoid sending an IPI (and the associated
+            cost of handling the IPI) when performing a wakeup.
+
+         2) The VM-exit cost can be avoided.
+
+The downside of guest side polling is that polling is performed
+even with other runnable tasks in the host.
+
+Results comparing halt_poll_ns and server/client application
+where a small packet is ping-ponged:
+
+host                                        --> 31.33
+halt_poll_ns=300000 / no guest busy spin    --> 33.40   (93.8%)
+halt_poll_ns=0 / guest_halt_poll_ns=300000  --> 32.73   (95.7%)
+
+For the SAP HANA benchmarks (where idle_spin is a parameter
+of the previous version of the patch, results should be the
+same):
+
+hpns == halt_poll_ns
+
+                           idle_spin=0/   idle_spin=800/    idle_spin=0/
+                           hpns=200000    hpns=0            hpns=800000
+DeleteC06T03 (100 thread) 1.76           1.71 (-3%)        1.78   (+1%)
+InsertC16T02 (100 thread) 2.14           2.07 (-3%)        2.18   (+1.8%)
+DeleteC00T01 (1 thread)   1.34           1.28 (-4.5%)      1.29   (-3.7%)
+UpdateC00T03 (1 thread)   4.72           4.18 (-12%)       4.53   (-5%)
+
+V2:
+
+- Move from x86 to generic code (Paolo/Christian)
+- Add auto-tuning logic (Paolo)
+- Add MSR to disable host side polling (Paolo)
+
+V3:
+
+- Do not be specific about HLT VM-exit in the documentation (Ankur Arora)
+- Mark tuning parameters static and __read_mostly (Andrea Arcangeli)
+- Add WARN_ON if host does not support poll control (Joao Martins)
+- Use sched_clock and cleanup haltpoll_enter_idle (Peter Zijlstra)
+- Mark certain functions in kvm.c as static (kernel test robot)
+- Remove tracepoints as they use RCU from extended quiescent state (kernel
+test robot)
+
+V4:
+- Use a haltpoll governor, use poll_state.c poll code (Rafael J. Wysocki)
+
+
+
