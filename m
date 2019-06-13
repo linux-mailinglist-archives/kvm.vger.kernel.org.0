@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E9C7437DD
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 17:01:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C6F5437E1
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 17:02:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733103AbfFMPBm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 11:01:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57032 "EHLO mx1.redhat.com"
+        id S1733052AbfFMPBu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 11:01:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57012 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732536AbfFMOfT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 10:35:19 -0400
+        id S1732537AbfFMOfQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 10:35:16 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D915730BC58B;
-        Thu, 13 Jun 2019 14:35:00 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id B37CC30BBE97;
+        Thu, 13 Jun 2019 14:35:07 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.141])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 393DD1001B2B;
-        Thu, 13 Jun 2019 14:34:48 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 52FA31001B3A;
+        Thu, 13 Jun 2019 14:35:01 +0000 (UTC)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
@@ -30,104 +30,66 @@ Cc:     Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Samuel Ortiz <sameo@linux.intel.com>,
         Yang Zhong <yang.zhong@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH v2 00/20] hw/i386/pc: Do not restrict the fw_cfg functions to the PC machine
-Date:   Thu, 13 Jun 2019 16:34:26 +0200
-Message-Id: <20190613143446.23937-1-philmd@redhat.com>
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        Li Qiang <liq3ea@gmail.com>
+Subject: [PATCH v2 01/20] hw/i386/pc: Use unsigned type to index arrays
+Date:   Thu, 13 Jun 2019 16:34:27 +0200
+Message-Id: <20190613143446.23937-2-philmd@redhat.com>
+In-Reply-To: <20190613143446.23937-1-philmd@redhat.com>
+References: <20190613143446.23937-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Thu, 13 Jun 2019 14:35:19 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Thu, 13 Jun 2019 14:35:16 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ hw/i386/pc.c         | 5 +++--
+ include/hw/i386/pc.h | 2 +-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-This is my take at salvaging some NEMU good work.
-Samuel worked in adding the fw_cfg device to the x86-virt NEMU machine.
-This series is inspired by NEMU's commit 3cb92d080835 [*] and adapted
-to upstream style. The result makes the upstream codebase more
-modularizable.
-There are very little logical changes, this is mostly a cleanup
-refactor.
-
-Since v1:
-- Addressed Li and MST comments
-
-$ git backport-diff -u v1
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/20:[----] [-C] 'hw/i386/pc: Use unsigned type to index arrays'
-002/20:[----] [-C] 'hw/i386/pc: Use size_t type to hold/return a size of array'
-003/20:[----] [--] 'hw/i386/pc: Let e820_add_entry() return a ssize_t type'
-004/20:[0008] [FC] 'hw/i386/pc: Add the E820Type enum type'
-005/20:[----] [-C] 'hw/i386/pc: Add documentation to the e820_*() functions'
-006/20:[----] [--] 'hw/i386/pc: Use e820_get_num_entries() to access e820_entries'
-007/20:[0016] [FC] 'hw/i386/pc: Extract e820 memory layout code'
-008/20:[----] [--] 'hw/i386/pc: Use address_space_memory in place'
-009/20:[down] 'hw/i386/pc: Rename bochs_bios_init as more generic fw_cfg_arch_create'
-010/20:[0009] [FC] 'hw/i386/pc: Pass the boot_cpus value by argument'
-011/20:[0010] [FC] 'hw/i386/pc: Pass the apic_id_limit value by argument'
-012/20:[0009] [FC] 'hw/i386/pc: Pass the CPUArchIdList array by argument'
-013/20:[0008] [FC] 'hw/i386/pc: Let fw_cfg_init() use the generic MachineState'
-014/20:[----] [--] 'hw/i386/pc: Let pc_build_smbios() take a FWCfgState argument'
-015/20:[----] [--] 'hw/i386/pc: Let pc_build_smbios() take a generic MachineState argument'
-016/20:[----] [--] 'hw/i386/pc: Rename pc_build_smbios() as generic fw_cfg_build_smbios()'
-017/20:[----] [--] 'hw/i386/pc: Let pc_build_feature_control() take a FWCfgState argument'
-018/20:[----] [--] 'hw/i386/pc: Let pc_build_feature_control() take a MachineState argument'
-019/20:[----] [--] 'hw/i386/pc: Rename pc_build_feature_control() as generic fw_cfg_build_*'
-020/20:[0132] [FC] 'hw/i386/pc: Extract the x86 generic fw_cfg code'
-Do you want to view the diffs using meld? y/[n]:
-
-Regards,
-
-Phil.
-
-[*] https://github.com/intel/nemu/commit/3cb92d080835ac8d47c8b713156338afa33cff5c
-
-Philippe Mathieu-Daudé (20):
-  hw/i386/pc: Use unsigned type to index arrays
-  hw/i386/pc: Use size_t type to hold/return a size of array
-  hw/i386/pc: Let e820_add_entry() return a ssize_t type
-  hw/i386/pc: Add the E820Type enum type
-  hw/i386/pc: Add documentation to the e820_*() functions
-  hw/i386/pc: Use e820_get_num_entries() to access e820_entries
-  hw/i386/pc: Extract e820 memory layout code
-  hw/i386/pc: Use address_space_memory in place
-  hw/i386/pc: Rename bochs_bios_init as more generic fw_cfg_arch_create
-  hw/i386/pc: Pass the boot_cpus value by argument
-  hw/i386/pc: Pass the apic_id_limit value by argument
-  hw/i386/pc: Pass the CPUArchIdList array by argument
-  hw/i386/pc: Let fw_cfg_init() use the generic MachineState
-  hw/i386/pc: Let pc_build_smbios() take a FWCfgState argument
-  hw/i386/pc: Let pc_build_smbios() take a generic MachineState argument
-  hw/i386/pc: Rename pc_build_smbios() as generic fw_cfg_build_smbios()
-  hw/i386/pc: Let pc_build_feature_control() take a FWCfgState argument
-  hw/i386/pc: Let pc_build_feature_control() take a MachineState
-    argument
-  hw/i386/pc: Rename pc_build_feature_control() as generic
-    fw_cfg_build_*
-  hw/i386/pc: Extract the x86 generic fw_cfg code
-
- hw/i386/Makefile.objs        |   2 +-
- hw/i386/e820_memory_layout.c |  60 +++++++++++
- hw/i386/e820_memory_layout.h |  76 +++++++++++++
- hw/i386/fw_cfg.c             | 137 ++++++++++++++++++++++++
- hw/i386/fw_cfg.h             |   8 ++
- hw/i386/pc.c                 | 201 ++---------------------------------
- include/hw/i386/pc.h         |  11 --
- target/i386/kvm.c            |   1 +
- 8 files changed, 291 insertions(+), 205 deletions(-)
- create mode 100644 hw/i386/e820_memory_layout.c
- create mode 100644 hw/i386/e820_memory_layout.h
-
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 2c5446b095..bb3c74f4ca 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -874,7 +874,7 @@ static void handle_a20_line_change(void *opaque, int irq, int level)
+ 
+ int e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
+ {
+-    int index = le32_to_cpu(e820_reserve.count);
++    unsigned int index = le32_to_cpu(e820_reserve.count);
+     struct e820_entry *entry;
+ 
+     if (type != E820_RAM) {
+@@ -906,7 +906,8 @@ int e820_get_num_entries(void)
+     return e820_entries;
+ }
+ 
+-bool e820_get_entry(int idx, uint32_t type, uint64_t *address, uint64_t *length)
++bool e820_get_entry(unsigned int idx, uint32_t type,
++                    uint64_t *address, uint64_t *length)
+ {
+     if (idx < e820_entries && e820_table[idx].type == cpu_to_le32(type)) {
+         *address = le64_to_cpu(e820_table[idx].address);
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index a7d0b87166..3b3a0d6e59 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -291,7 +291,7 @@ void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+ 
+ int e820_add_entry(uint64_t, uint64_t, uint32_t);
+ int e820_get_num_entries(void);
+-bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
++bool e820_get_entry(unsigned int, uint32_t, uint64_t *, uint64_t *);
+ 
+ extern GlobalProperty pc_compat_4_0_1[];
+ extern const size_t pc_compat_4_0_1_len;
 -- 
 2.20.1
 
