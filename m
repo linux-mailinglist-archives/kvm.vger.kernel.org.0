@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 577B744897
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:10:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD7844486A
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:10:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393455AbfFMRJO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 13:09:14 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:55097 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389430AbfFMRDp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 13:03:45 -0400
-Received: by mail-wm1-f68.google.com with SMTP id g135so10983409wme.4;
-        Thu, 13 Jun 2019 10:03:43 -0700 (PDT)
+        id S2404518AbfFMRDu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 13:03:50 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:36835 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2392731AbfFMRDt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 13:03:49 -0400
+Received: by mail-wm1-f65.google.com with SMTP id u8so10904644wmm.1;
+        Thu, 13 Jun 2019 10:03:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=gZcDtbd3b6Y1qrHuqb6ivHsJ9MXA/qlBvU9FIZzx3Xo=;
-        b=Pcgr9QMkR+ay1R92AoMWsC9CPJHybVq4Njzcf/flFw2eFmx/GdnTVianZYBgppGoLu
-         9wxyoWEToWNnuNz2AkkqmvBRIaK/g+UUmziS5+dNg5Q/sKJy88QzxKDyLyrHTOw/yXtc
-         v57eeGywHnJ6QAKvTsyZfx+HjMRnBXtnXm0v2LnL1XVRnbhEVun/Jxp9DDLtEJZrg/Ut
-         GCjYgZX94CeU1c00Ks7dAcPZI1G4CcQmieBUHX9g0SlXpgrMZ2CMoz8GSTBkZbqHPfCs
-         bcT0qOe/faCIMP5BoohXb399ZMqXJzADUEegtSd0e9arodpD5t0EsOvk3jLZvhQs+Vw9
-         u6KA==
+        bh=+pz3R1djvSsBldla2VhDwFQOgKC5gEcy56s+Wxv1xbs=;
+        b=MYkL/DHsfAE8JOcPMgiU/WgT0Dp3Vpn5/MIqVT45Xq0cSYCnXETwJ4zrST2WNU3B31
+         64RNQNa4qOMc5q61nrNOlGgi6T2RdkCr7Ft/hkeuzfsGJrR4P5eWXMiI5ou+6i3Ogxwm
+         AQdShaB/bnsZChVnldW2kuDVI8Tyji/eXlIG9Px+iSFBfHARtZb68exQG/81r6MM2TVg
+         yDgO0nXu3d1nC9vTVwhZNT1LjfknmssPVkpRB6g9h4mOyaQzGtUUD50L6NDFYLQVBZnc
+         ASh9yrYQ80eUhBapwRXHOHIs594B7OEQQUPcpOu1VwtqLwrUFxvFP+42t0QE7cFg954D
+         hRwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=gZcDtbd3b6Y1qrHuqb6ivHsJ9MXA/qlBvU9FIZzx3Xo=;
-        b=pcEjNqH3SFpuVb1FsleGsoEcauFfNKn6IAeKsh3hvtAp6Gz7YbEuSCJ3feprTQ/B5Y
-         0cpu1eSEWV74Gd70up57F3SaaJ2qsPBQYukX49Yc1OZbOsegh70fPrH4YCQZT2tl3g1M
-         DWeMjlwrhndDOLG+dqmgiuepmvd95QJFRtVmwgCK7ciNG2G960M5sx20MOhyeWm0pN9p
-         PiEs2fGb4MY/ZAIDaND0/+STrj03Vef0uKSj+t5G/BD1VlUsbf+bsurRQ4G5tdQJROib
-         ikyteoHwOOWRVIM7BRT3vK1nFuKNYMO2VcYR9UbLrVT0MKJmGHFe2u5sSXufC6oh3PlN
-         wCLw==
-X-Gm-Message-State: APjAAAWwDPWx7cCw2HOMWOvIT8TyR9NtOR/kyBttYj2ruDTMZM8cuQx9
-        YTKwAVW0Pid1iR01RZRjb9nwoB36
-X-Google-Smtp-Source: APXvYqyYn798KcJzS5pAjOJEaQBBMaLDr+v/qqaRvFfEiDnNRw7fQKw1KGyO5a0jb7pE8xDISrxG5Q==
-X-Received: by 2002:a1c:448b:: with SMTP id r133mr4759583wma.114.1560445422546;
-        Thu, 13 Jun 2019 10:03:42 -0700 (PDT)
+        bh=+pz3R1djvSsBldla2VhDwFQOgKC5gEcy56s+Wxv1xbs=;
+        b=ZASMmjUOWxc5FUvisg6s9ZwHXRP2KcoRB7LUU9b5mfaOA9Nw2jMTGqhrLiidnOCN2l
+         Wp3fl0A2HWk0rNWzGvhcQ+cvQmXWVQzHIfprmQM6EcAgnwk5LmtTZZEqQkQ0PfCcHLGe
+         Hp/nT63yP+x9rQXI1schavuQEWXIBbL/wx1jkwOE0hfa7pQ9mA6R3dBBgyHOd22SuKgS
+         qphad0q3c+u1T5XK0fiXJQZDZ0ncTDAGwzVDQI0D3f7VQPDDfc3vF7dCQLhltlmX+ml5
+         Zix4YjW/O4xfqEMS0ZAibPvQk0K5sD2GmZDu+ZRV43QodPgeHAaUhKPBFSmbzvE6YIjE
+         uE0w==
+X-Gm-Message-State: APjAAAUBkyJdjZdUebS43vIcCMZp92iojd0hi2tLBY8u/GTPKv45VVWZ
+        CmJXdXUlDCWmpQrFa3nO10kEI5eS
+X-Google-Smtp-Source: APXvYqzz/GJlk+vfE8h3MH+Xf/GvZEIgxRQZPTeYC/sgK6Ta27HH56CFL9ZiBZfxCXQ0Ier47BY73g==
+X-Received: by 2002:a1c:e28b:: with SMTP id z133mr4230068wmg.136.1560445426973;
+        Thu, 13 Jun 2019 10:03:46 -0700 (PDT)
 Received: from 640k.localdomain ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id a10sm341856wrx.17.2019.06.13.10.03.41
+        by smtp.gmail.com with ESMTPSA id a10sm341856wrx.17.2019.06.13.10.03.42
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 10:03:41 -0700 (PDT)
+        Thu, 13 Jun 2019 10:03:42 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         vkuznets@redhat.com
-Subject: [PATCH 11/43] KVM: nVMX: Use descriptive names for VMCS sync functions and flags
-Date:   Thu, 13 Jun 2019 19:02:57 +0200
-Message-Id: <1560445409-17363-12-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 12/43] KVM: nVMX: Add helpers to identify shadowed VMCS fields
+Date:   Thu, 13 Jun 2019 19:02:58 +0200
+Message-Id: <1560445409-17363-13-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
 References: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
@@ -60,179 +60,125 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Nested virtualization involves copying data between many different types
-of VMCSes, e.g. vmcs02, vmcs12, shadow VMCS and eVMCS.  Rename a variety
-of functions and flags to document both the source and destination of
-each sync.
+So that future optimizations related to shadowed fields don't need to
+define their own switch statement.
+
+Add a BUILD_BUG_ON() to ensure at least one of the types (RW vs RO) is
+defined when including vmcs_shadow_fields.h (guess who keeps mistyping
+SHADOW_FIELD_RO as SHADOW_FIELD_R0).
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/nested.c | 28 ++++++++++++++--------------
- arch/x86/kvm/vmx/nested.h |  2 +-
- arch/x86/kvm/vmx/vmx.c    |  4 ++--
- arch/x86/kvm/vmx/vmx.h    |  2 +-
- 4 files changed, 18 insertions(+), 18 deletions(-)
+ arch/x86/kvm/vmx/nested.c             | 71 ++++++++++++++++++++---------------
+ arch/x86/kvm/vmx/vmcs_shadow_fields.h |  4 ++
+ 2 files changed, 44 insertions(+), 31 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index bdaf49d9260f..fc2b8f4cf45f 100644
+index fc2b8f4cf45f..a6fe6cfe96f6 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -1615,7 +1615,7 @@ static int copy_vmcs12_to_enlightened(struct vcpu_vmx *vmx)
- 	 * evmcs->host_gdtr_base = vmcs12->host_gdtr_base;
- 	 * evmcs->host_idtr_base = vmcs12->host_idtr_base;
- 	 * evmcs->host_rsp = vmcs12->host_rsp;
--	 * sync_vmcs12() doesn't read these:
-+	 * sync_vmcs02_to_vmcs12() doesn't read these:
- 	 * evmcs->io_bitmap_a = vmcs12->io_bitmap_a;
- 	 * evmcs->io_bitmap_b = vmcs12->io_bitmap_b;
- 	 * evmcs->msr_bitmap = vmcs12->msr_bitmap;
-@@ -1839,7 +1839,7 @@ static int nested_vmx_handle_enlightened_vmptrld(struct kvm_vcpu *vcpu,
- 	return 1;
+@@ -4420,6 +4420,29 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
+ 	return nested_vmx_succeed(vcpu);
  }
  
--void nested_sync_from_vmcs12(struct kvm_vcpu *vcpu)
-+void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu)
++static bool is_shadow_field_rw(unsigned long field)
++{
++	switch (field) {
++#define SHADOW_FIELD_RW(x, y) case x:
++#include "vmcs_shadow_fields.h"
++		return true;
++	default:
++		break;
++	}
++	return false;
++}
++
++static bool is_shadow_field_ro(unsigned long field)
++{
++	switch (field) {
++#define SHADOW_FIELD_RO(x, y) case x:
++#include "vmcs_shadow_fields.h"
++		return true;
++	default:
++		break;
++	}
++	return false;
++}
+ 
+ static int handle_vmwrite(struct kvm_vcpu *vcpu)
  {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
-@@ -1860,7 +1860,7 @@ void nested_sync_from_vmcs12(struct kvm_vcpu *vcpu)
- 		copy_vmcs12_to_shadow(vmx);
- 	}
- 
--	vmx->nested.need_vmcs12_sync = false;
-+	vmx->nested.need_vmcs12_to_shadow_sync = false;
- }
- 
- static enum hrtimer_restart vmx_preemption_timer_fn(struct hrtimer *timer)
-@@ -3042,7 +3042,7 @@ int nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu, bool from_vmentry)
- 	vmcs12->vm_exit_reason = exit_reason | VMX_EXIT_REASONS_FAILED_VMENTRY;
- 	vmcs12->exit_qualification = exit_qual;
- 	if (enable_shadow_vmcs || vmx->nested.hv_evmcs)
--		vmx->nested.need_vmcs12_sync = true;
-+		vmx->nested.need_vmcs12_to_shadow_sync = true;
- 	return 1;
- }
- 
-@@ -3382,7 +3382,7 @@ static u32 vmx_get_preemption_timer_value(struct kvm_vcpu *vcpu)
-  * VM-entry controls is also updated, since this is really a guest
-  * state bit.)
-  */
--static void sync_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
-+static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
- {
- 	vmcs12->guest_cr0 = vmcs12_guest_cr0(vcpu, vmcs12);
- 	vmcs12->guest_cr4 = vmcs12_guest_cr4(vcpu, vmcs12);
-@@ -3861,14 +3861,14 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
- 		vcpu->arch.tsc_offset -= vmcs12->tsc_offset;
- 
- 	if (likely(!vmx->fail)) {
--		sync_vmcs12(vcpu, vmcs12);
-+		sync_vmcs02_to_vmcs12(vcpu, vmcs12);
- 
- 		if (exit_reason != -1)
- 			prepare_vmcs12(vcpu, vmcs12, exit_reason, exit_intr_info,
- 				       exit_qualification);
- 
- 		/*
--		 * Must happen outside of sync_vmcs12() as it will
-+		 * Must happen outside of sync_vmcs02_to_vmcs12() as it will
- 		 * also be used to capture vmcs12 cache as part of
- 		 * capturing nVMX state for snapshot (migration).
- 		 *
-@@ -3924,7 +3924,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
- 	kvm_make_request(KVM_REQ_APIC_PAGE_RELOAD, vcpu);
- 
- 	if ((exit_reason != -1) && (enable_shadow_vmcs || vmx->nested.hv_evmcs))
--		vmx->nested.need_vmcs12_sync = true;
-+		vmx->nested.need_vmcs12_to_shadow_sync = true;
- 
- 	/* in case we halted in L2 */
- 	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-@@ -4284,7 +4284,7 @@ static inline void nested_release_vmcs12(struct kvm_vcpu *vcpu)
- 		/* copy to memory all shadowed fields in case
- 		   they were modified */
- 		copy_shadow_to_vmcs12(vmx);
--		vmx->nested.need_vmcs12_sync = false;
-+		vmx->nested.need_vmcs12_to_shadow_sync = false;
- 		vmx_disable_shadow_vmcs(vmx);
- 	}
- 	vmx->nested.posted_intr_nv = -1;
-@@ -4551,7 +4551,7 @@ static void set_current_vmptr(struct vcpu_vmx *vmx, gpa_t vmptr)
- 			      SECONDARY_EXEC_SHADOW_VMCS);
- 		vmcs_write64(VMCS_LINK_POINTER,
- 			     __pa(vmx->vmcs01.shadow_vmcs));
--		vmx->nested.need_vmcs12_sync = true;
-+		vmx->nested.need_vmcs12_to_shadow_sync = true;
- 	}
- 	vmx->nested.dirty_vmcs12 = true;
- }
-@@ -5303,12 +5303,12 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
- 	 * When running L2, the authoritative vmcs12 state is in the
- 	 * vmcs02. When running L1, the authoritative vmcs12 state is
- 	 * in the shadow or enlightened vmcs linked to vmcs01, unless
--	 * need_vmcs12_sync is set, in which case, the authoritative
-+	 * need_vmcs12_to_shadow_sync is set, in which case, the authoritative
- 	 * vmcs12 state is in the vmcs12 already.
- 	 */
- 	if (is_guest_mode(vcpu)) {
--		sync_vmcs12(vcpu, vmcs12);
--	} else if (!vmx->nested.need_vmcs12_sync) {
-+		sync_vmcs02_to_vmcs12(vcpu, vmcs12);
-+	} else if (!vmx->nested.need_vmcs12_to_shadow_sync) {
- 		if (vmx->nested.hv_evmcs)
- 			copy_enlightened_to_vmcs12(vmx);
- 		else if (enable_shadow_vmcs)
-@@ -5421,7 +5421,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
- 		 * Sync eVMCS upon entry as we may not have
- 		 * HV_X64_MSR_VP_ASSIST_PAGE set up yet.
- 		 */
--		vmx->nested.need_vmcs12_sync = true;
-+		vmx->nested.need_vmcs12_to_shadow_sync = true;
- 	} else {
- 		return -EINVAL;
- 	}
-diff --git a/arch/x86/kvm/vmx/nested.h b/arch/x86/kvm/vmx/nested.h
-index 29d205bb4e4f..187d39bf0bf1 100644
---- a/arch/x86/kvm/vmx/nested.h
-+++ b/arch/x86/kvm/vmx/nested.h
-@@ -17,7 +17,7 @@ void nested_vmx_setup_ctls_msrs(struct nested_vmx_msrs *msrs, u32 ept_caps,
- bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 exit_reason);
- void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 exit_reason,
- 		       u32 exit_intr_info, unsigned long exit_qualification);
--void nested_sync_from_vmcs12(struct kvm_vcpu *vcpu);
-+void nested_sync_vmcs12_to_shadow(struct kvm_vcpu *vcpu);
- int vmx_set_vmx_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 data);
- int vmx_get_vmx_msr(struct nested_vmx_msrs *msrs, u32 msr_index, u64 *pdata);
- int get_vmx_mem_address(struct kvm_vcpu *vcpu, unsigned long exit_qualification,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 2b182f58c126..1a87a91e98dc 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6399,8 +6399,8 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 		vmcs_write32(PLE_WINDOW, vmx->ple_window);
- 	}
- 
--	if (vmx->nested.need_vmcs12_sync)
--		nested_sync_from_vmcs12(vcpu);
-+	if (vmx->nested.need_vmcs12_to_shadow_sync)
-+		nested_sync_vmcs12_to_shadow(vcpu);
- 
- 	if (test_bit(VCPU_REGS_RSP, (unsigned long *)&vcpu->arch.regs_dirty))
- 		vmcs_writel(GUEST_RSP, vcpu->arch.regs[VCPU_REGS_RSP]);
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index decd31055da8..f4448292df0f 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -113,7 +113,7 @@ struct nested_vmx {
- 	 * Indicates if the shadow vmcs or enlightened vmcs must be updated
- 	 * with the data held by struct vmcs12.
- 	 */
--	bool need_vmcs12_sync;
-+	bool need_vmcs12_to_shadow_sync;
- 	bool dirty_vmcs12;
+@@ -4503,41 +4526,27 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
+ 	vmcs12_write_any(vmcs12, field, offset, field_value);
  
  	/*
+-	 * Do not track vmcs12 dirty-state if in guest-mode
+-	 * as we actually dirty shadow vmcs12 instead of vmcs12.
++	 * Do not track vmcs12 dirty-state if in guest-mode as we actually
++	 * dirty shadow vmcs12 instead of vmcs12.  Fields that can be updated
++	 * by L1 without a vmexit are always updated in the vmcs02, i.e' don't
++	 * "dirty" vmcs12, all others go down the prepare_vmcs02() slow path.
+ 	 */
+-	if (!is_guest_mode(vcpu)) {
+-		switch (field) {
+-#define SHADOW_FIELD_RW(x, y) case x:
+-#include "vmcs_shadow_fields.h"
+-			/*
+-			 * The fields that can be updated by L1 without a vmexit are
+-			 * always updated in the vmcs02, the others go down the slow
+-			 * path of prepare_vmcs02.
+-			 */
+-			break;
+-
+-#define SHADOW_FIELD_RO(x, y) case x:
+-#include "vmcs_shadow_fields.h"
+-			/*
+-			 * L1 can read these fields without exiting, ensure the
+-			 * shadow VMCS is up-to-date.
+-			 */
+-			if (enable_shadow_vmcs) {
+-				preempt_disable();
+-				vmcs_load(vmx->vmcs01.shadow_vmcs);
++	if (!is_guest_mode(vcpu) && !is_shadow_field_rw(field)) {
++		/*
++		 * L1 can read these fields without exiting, ensure the
++		 * shadow VMCS is up-to-date.
++		 */
++		if (enable_shadow_vmcs && is_shadow_field_ro(field)) {
++			preempt_disable();
++			vmcs_load(vmx->vmcs01.shadow_vmcs);
+ 
+-				__vmcs_writel(field, field_value);
++			__vmcs_writel(field, field_value);
+ 
+-				vmcs_clear(vmx->vmcs01.shadow_vmcs);
+-				vmcs_load(vmx->loaded_vmcs->vmcs);
+-				preempt_enable();
+-			}
+-			/* fall through */
+-		default:
+-			vmx->nested.dirty_vmcs12 = true;
+-			break;
++			vmcs_clear(vmx->vmcs01.shadow_vmcs);
++			vmcs_load(vmx->loaded_vmcs->vmcs);
++			preempt_enable();
+ 		}
++		vmx->nested.dirty_vmcs12 = true;
+ 	}
+ 
+ 	return nested_vmx_succeed(vcpu);
+diff --git a/arch/x86/kvm/vmx/vmcs_shadow_fields.h b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
+index 2cfa19ca158e..4cea018ba285 100644
+--- a/arch/x86/kvm/vmx/vmcs_shadow_fields.h
++++ b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
+@@ -1,3 +1,7 @@
++#if !defined(SHADOW_FIELD_RO) && !defined(SHADOW_FIELD_RW)
++BUILD_BUG_ON(1)
++#endif
++
+ #ifndef SHADOW_FIELD_RO
+ #define SHADOW_FIELD_RO(x, y)
+ #endif
 -- 
 1.8.3.1
 
