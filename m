@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A88F44810
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:07:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8433A44813
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:07:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404541AbfFMREC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S2404568AbfFMRED (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 13:04:03 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:36746 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2393369AbfFMREC (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 13 Jun 2019 13:04:02 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:36969 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393356AbfFMREA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 13:04:00 -0400
-Received: by mail-wm1-f66.google.com with SMTP id 22so10899332wmg.2;
-        Thu, 13 Jun 2019 10:03:59 -0700 (PDT)
+Received: by mail-wr1-f68.google.com with SMTP id n4so21630482wrs.3;
+        Thu, 13 Jun 2019 10:04:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=6frhBg5HfhrV+PE9A95yhtehkieS04QOaLeH3DNydrU=;
-        b=F1r80rLFjjtqqyi1EZj7IGMYTN+WiC4M2tN/VxRQipq6FfPmjT+tEbJOconmEl2ddT
-         4nuMFXOLB82A3xxqppvVP5vkTilRmca5d3wsFq2UWAQVvRjKmoQxOp5ME9RyIaBdoqUa
-         oX3+6EtDga+6b5dExhc0tlZl1DgIIZqytaL8Vt+yyW2hHSgDjKlU024u+vjxUG+5Kisk
-         AN2kQE80frTiWn8LRJDLa6qOA9pvpScHagtMPIRwRojIkuU/RtPhy2altQ7pKD8t1g82
-         rOuBNpPwGYhigr66hC0wYeFNp7wDy3WRG3nHpQbt5oD8CqTdnt4UQqeVlsph1MOEfVNH
-         /utg==
+        bh=hiwCoGuMO+HGOrtpBphtyFwrRwIt3o789paugY4guB8=;
+        b=T7XqC2pWYZ5GJe4DHzOPMuCNnFKB2oPkah3Yq8METimUsD/T2RHVp/UV1aMHxMesQ6
+         DVu0HHXJF+2HZU8HbQboGKrCLBoMMSV3AMpniU7YqTOl0OvowdPQ4/aPm7fB4S19Lf2b
+         3kSUEVDSehnkVi/D7vt6JcXwbPvqO/2H/WD1vu18UsOO83AQvyW8a2gdIw+MXCfYoWVm
+         Z55Q2urBRbs7U+z6v00PRvOcUDk98EwWgZtvfx6pZ9R13KstZyoWc5qts30MHX5tR9nt
+         WI64JqV8e7zcVrBl14QXx4FDCc9nKTYLolwE6AyWL7/Mo2igdHlsBhi2uYIOTXHajEjg
+         kV3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=6frhBg5HfhrV+PE9A95yhtehkieS04QOaLeH3DNydrU=;
-        b=EJjw76S+jkWZnxhBQL0fGYHy6s/iUs2ozyN66sF3n/lT1UXSjZuzkjk4w+jP4vV/IR
-         yQ48FGiSwK5g/9Jzd0ljzIOKt954XIPiTlk6J0p3OFO0/d9UdvHbsFvmElCnvZmoiXwm
-         ePHO2/FLeZDFzDBKouo7tBqdhl8gBayuFzGBZNnHIbFq1r9sHng5g2r6ALo2zsufse9z
-         qX+Yf1wFUi7MViHOqi/yTo6IgdVKYumSqjkDfHh/uSWZtjhTnoRgs2BurMA7aTCxoG3I
-         EkATzcEsyd0onuPGG0Cz2k9c/xjLwiYEqxKNs7iJG/nYNN0OGcofFqwi/EgM3Dgoecb9
-         GUiw==
-X-Gm-Message-State: APjAAAXUUKI8+yQM3Fod0CTSzNIms5XHADrABk9xpbc/IWfI2c0po3ir
-        IDNttPg7cRXR4VckHNjWc70LapbU
-X-Google-Smtp-Source: APXvYqwOfKKf83nSjVaIyk/79CqkFvbYTw7OGW2Af3Mp/7GfXb4+scOasrQ0KrECBdWp+kfGLzcx5A==
-X-Received: by 2002:a7b:c94a:: with SMTP id i10mr4396643wml.97.1560445438618;
-        Thu, 13 Jun 2019 10:03:58 -0700 (PDT)
+        bh=hiwCoGuMO+HGOrtpBphtyFwrRwIt3o789paugY4guB8=;
+        b=rJZd0lHAfB+Gl0JK5g/dfjpFXb5hrBP2LH8ShOzB6BvNa4UrmZQSMTQpkIKS+IMlNp
+         6cEEUzBGfCr1cuPigS8u8aZ9URCZFpatLoFQvutCHm9ADfEhkmY0L2s3+VhYNLR5Ghs/
+         bePlgIBHlpIsfzOb1FChlZpz+CKdSkC0ZPV7DELAvZoFxlJAl1PKP2dh0PeOlyDBDFcu
+         9Xo99wTM8utenF/PsVSux4G2GizRbXQsKIAB/JUB9RQIWxQzJoQ6auBXULOLLMNctuc0
+         HqzgmaH3aalOlmXhFrVatf3nR39nf3ErVl+CJ04s/LNDPXvVnq703rG7vJFmBcVCJD4H
+         wrNQ==
+X-Gm-Message-State: APjAAAUJHklH3sViz76w0Y6ULvNO90TWIY28/z/ctIauONlObh4sAIbb
+        yGwAXvsEz8Tza9UXn+DSXAw+dAPD
+X-Google-Smtp-Source: APXvYqyiACdlF0pBcbULwHQ1Mb/L0rnANUHAVYyjaYZqMvRitnCBWDdnFB/V7gQtjypjSoUAhLaiZA==
+X-Received: by 2002:a5d:4d06:: with SMTP id z6mr35027858wrt.343.1560445439539;
+        Thu, 13 Jun 2019 10:03:59 -0700 (PDT)
 Received: from 640k.localdomain ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id a10sm341856wrx.17.2019.06.13.10.03.57
+        by smtp.gmail.com with ESMTPSA id a10sm341856wrx.17.2019.06.13.10.03.58
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
         Thu, 13 Jun 2019 10:03:58 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         vkuznets@redhat.com
-Subject: [PATCH 25/43] KVM: nVMX: Update vmcs12 for MSR_IA32_CR_PAT when it's written
-Date:   Thu, 13 Jun 2019 19:03:11 +0200
-Message-Id: <1560445409-17363-26-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 26/43] KVM: nVMX: Update vmcs12 for SYSENTER MSRs when they're written
+Date:   Thu, 13 Jun 2019 19:03:12 +0200
+Message-Id: <1560445409-17363-27-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
 References: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
@@ -60,49 +60,65 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-As alluded to by the TODO comment, KVM unconditionally intercepts writes
-to the PAT MSR.  In the unlikely event that L1 allows L2 to write L1's
-PAT directly but saves L2's PAT on VM-Exit, update vmcs12 when L2 writes
-the PAT.  This eliminates the need to VMREAD the value from vmcs02 on
-VM-Exit as vmcs12 is already up to date in all situations.
+For L2, KVM always intercepts WRMSR to SYSENTER MSRs.  Update vmcs12 in
+the WRMSR handler so that they don't need to be (re)read from vmcs02 on
+every nested VM-Exit.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/nested.c | 4 ----
- arch/x86/kvm/vmx/vmx.c    | 4 ++++
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 7 ++++---
+ arch/x86/kvm/vmx/vmx.c    | 6 ++++++
+ 2 files changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index a012118e6c8c..4a91a86b5f0a 100644
+index 4a91a86b5f0a..68c031e2cc4d 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -3564,10 +3564,6 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
- 		vmcs12->guest_ia32_debugctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
- 	}
+@@ -3521,6 +3521,10 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
+ 	vmcs12->guest_cs_ar_bytes = vmcs_read32(GUEST_CS_AR_BYTES);
+ 	vmcs12->guest_ss_ar_bytes = vmcs_read32(GUEST_SS_AR_BYTES);
  
--	/* TODO: These cannot have changed unless we have MSR bitmaps and
--	 * the relevant bit asks not to trap the change */
--	if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_IA32_PAT)
--		vmcs12->guest_ia32_pat = vmcs_read64(GUEST_IA32_PAT);
++	vmcs12->guest_sysenter_cs = vmcs_read32(GUEST_SYSENTER_CS);
++	vmcs12->guest_sysenter_esp = vmcs_readl(GUEST_SYSENTER_ESP);
++	vmcs12->guest_sysenter_eip = vmcs_readl(GUEST_SYSENTER_EIP);
++
+ 	vmcs12->guest_interruptibility_info =
+ 		vmcs_read32(GUEST_INTERRUPTIBILITY_INFO);
+ 
+@@ -3566,9 +3570,6 @@ static void sync_vmcs02_to_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12)
+ 
  	if (vmcs12->vm_exit_controls & VM_EXIT_SAVE_IA32_EFER)
  		vmcs12->guest_ia32_efer = vcpu->arch.efer;
- 	vmcs12->guest_sysenter_cs = vmcs_read32(GUEST_SYSENTER_CS);
+-	vmcs12->guest_sysenter_cs = vmcs_read32(GUEST_SYSENTER_CS);
+-	vmcs12->guest_sysenter_esp = vmcs_readl(GUEST_SYSENTER_ESP);
+-	vmcs12->guest_sysenter_eip = vmcs_readl(GUEST_SYSENTER_EIP);
+ }
+ 
+ /*
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 7a2d9a4b828c..56783060449d 100644
+index 56783060449d..ede2ac670f5b 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1910,6 +1910,10 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (!kvm_pat_valid(data))
- 			return 1;
- 
-+		if (is_guest_mode(vcpu) &&
-+		    get_vmcs12(vcpu)->vm_exit_controls & VM_EXIT_SAVE_IA32_PAT)
-+			get_vmcs12(vcpu)->guest_ia32_pat = data;
-+
- 		if (vmcs_config.vmentry_ctrl & VM_ENTRY_LOAD_IA32_PAT) {
- 			vmcs_write64(GUEST_IA32_PAT, data);
- 			vcpu->arch.pat = data;
+@@ -1831,12 +1831,18 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ #endif
+ 	case MSR_IA32_SYSENTER_CS:
++		if (is_guest_mode(vcpu))
++			get_vmcs12(vcpu)->guest_sysenter_cs = data;
+ 		vmcs_write32(GUEST_SYSENTER_CS, data);
+ 		break;
+ 	case MSR_IA32_SYSENTER_EIP:
++		if (is_guest_mode(vcpu))
++			get_vmcs12(vcpu)->guest_sysenter_eip = data;
+ 		vmcs_writel(GUEST_SYSENTER_EIP, data);
+ 		break;
+ 	case MSR_IA32_SYSENTER_ESP:
++		if (is_guest_mode(vcpu))
++			get_vmcs12(vcpu)->guest_sysenter_esp = data;
+ 		vmcs_writel(GUEST_SYSENTER_ESP, data);
+ 		break;
+ 	case MSR_IA32_BNDCFGS:
 -- 
 1.8.3.1
 
