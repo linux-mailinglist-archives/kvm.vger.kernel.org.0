@@ -2,82 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E5324498E
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:22:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 00DE9449A1
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:25:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728815AbfFMRW0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 13:22:26 -0400
-Received: from mga06.intel.com ([134.134.136.31]:56970 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726091AbfFMRWZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 13:22:25 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Jun 2019 10:22:24 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.36])
-  by fmsmga001.fm.intel.com with ESMTP; 13 Jun 2019 10:22:24 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     kvm@vger.kernel.org, Jiri Palecek <jpalecek@web.de>
-Subject: [PATCH] KVM: x86/mmu: Allocate PAE root array when using SVM's 32-bit NPT
-Date:   Thu, 13 Jun 2019 10:22:23 -0700
-Message-Id: <20190613172223.17119-1-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.21.0
+        id S1727819AbfFMRZL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 13:25:11 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:37342 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726984AbfFMRZL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 13:25:11 -0400
+Received: by mail-io1-f66.google.com with SMTP id e5so18720105iok.4
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 10:25:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=i3k1ewQshQXWU0zPqm6pMO1N4JQ6ELHz1NxT8KKHaxU=;
+        b=PRI840OEIYdnMjVzyvdNG6jNrPT6PG0274LwvS4xl/F1GKW4tkG8ElrE5nEv/v4d2h
+         pdQhlRr6ijJYmX/ulTIqX8hEPfoZ+w81aUCCipbv93f0FPopFfSjx1B2Y/A96iqRtIGX
+         lpmt+uy2fpEpDKCZLGMdaA4FiVQKVM43zHgam29l432+DKFE2tusOg58mk22UzkTO+JI
+         sfrv93+aQ7s/YOHOgNvH9R0SWUnTHVoLBWEMF0ZlfHiF1ZaBhJYKX+cXd/qDMljGYRXp
+         ltes+z8RFDcNwoohT/UqVtbVXS07ZVS8G6m9AftlABKcMwgGQbaKVjEeRixEa2CLnusI
+         sGPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=i3k1ewQshQXWU0zPqm6pMO1N4JQ6ELHz1NxT8KKHaxU=;
+        b=iUmOtY09GE119LMgxC5B7HNhgeEORm2CQcWakAtGe/NN02nhyMgKfnl9B2G55zJhdI
+         bx0IZSrwuqAirUotaCx7NX/blBXqdgK/QAqeDnmAxJI2RWaGk+f4tvRtDbe90BiCzE43
+         T9uv5KU+YYAz47zh3mWQ1VktcAaD0ah43vBJl9CLUJkChIKUcXea4tkYddsUqBn45Y3Q
+         M57emp1ud1W86cVsxpuRml2SyWIph75v7bqloy2iRZBYNZEiFC5OuY3ktu0zoNTlgoz2
+         eCKKVGneu/GS7/P14/LnqhoTQTEqOL3N1b75qMZNFZ0K5Iaq/vbC5GbxGtHZs3wYkSGE
+         rl7Q==
+X-Gm-Message-State: APjAAAWGfn1Ot2cNPsQOUHzHUItlrGJoKa4MS5fGV+gGXwUKkwIrHlJZ
+        r0nMubS+f2z6ZS9kulPFQcQ+R80viutrN6meDH7k0g==
+X-Google-Smtp-Source: APXvYqz+be35Z7WOf3tL1YUmH7TuwYnypRlKk1tb+7pCTUCRVz7FVgMNC+q7mps6ZQu5ZnQDIb0tXv/jgzCnqf68NDg=
+X-Received: by 2002:a5d:94d7:: with SMTP id y23mr55512163ior.296.1560446710333;
+ Thu, 13 Jun 2019 10:25:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1560445409-17363-1-git-send-email-pbonzini@redhat.com> <1560445409-17363-2-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1560445409-17363-2-git-send-email-pbonzini@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 13 Jun 2019 10:24:58 -0700
+Message-ID: <CALMp9eQ9_nkK35T2vS+=ujiRAO2kiYJcZLUFSeizWmAc89zjXg@mail.gmail.com>
+Subject: Re: [PATCH 01/43] KVM: VMX: Fix handling of #MC that occurs during VM-Entry
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SVM's Nested Page Tables (NPT) reuses x86 paging for the host-controlled
-page walk.  For 32-bit KVM, this means PAE paging is used even when TDP
-is enabled, i.e. the PAE root array needs to be allocated.
+On Thu, Jun 13, 2019 at 10:03 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>
+> A previous fix to prevent KVM from consuming stale VMCS state after a
+> failed VM-Entry inadvertantly blocked KVM's handling of machine checks
+> that occur during VM-Entry.
+>
+> Per Intel's SDM, a #MC during VM-Entry is handled in one of three ways,
+> depending on when the #MC is recognoized.  As it pertains to this bug
+> fix, the third case explicitly states EXIT_REASON_MCE_DURING_VMENTRY
+> is handled like any other VM-Exit during VM-Entry, i.e. sets bit 31 to
+> indicate the VM-Entry failed.
+>
+> If a machine-check event occurs during a VM entry, one of the following occurs:
+>  - The machine-check event is handled as if it occurred before the VM entry:
+>         ...
+>  - The machine-check event is handled after VM entry completes:
+>         ...
+>  - A VM-entry failure occurs as described in Section 26.7. The basic
+>    exit reason is 41, for "VM-entry failure due to machine-check event".
+>
+> Explicitly handle EXIT_REASON_MCE_DURING_VMENTRY as a one-off case in
+> vmx_vcpu_run() instead of binning it into vmx_complete_atomic_exit().
+> Doing so allows vmx_vcpu_run() to handle VMX_EXIT_REASONS_FAILED_VMENTRY
+> in a sane fashion and also simplifies vmx_complete_atomic_exit() since
+> VMCS.VM_EXIT_INTR_INFO is guaranteed to be fresh.
+>
+> Fixes: b060ca3b2e9e7 ("kvm: vmx: Handle VMLAUNCH/VMRESUME failure properly")
 
-Fixes: ee6268ba3a68 ("KVM: x86: Skip pae_root shadow allocation if tdp enabled")
-Cc: stable@vger.kernel.org
-Reported-by: Jiri Palecek <jpalecek@web.de>
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
+I'm never going to live down that subject line, am I? :-)
 
-Jiri, can you please test this patch?  I haven't actually verified this
-fixes the bug due to lack of SVM hardware.
-
- arch/x86/kvm/mmu.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index 1e9ba81accba..d3c3d5e5ffd4 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -5602,14 +5602,18 @@ static int alloc_mmu_pages(struct kvm_vcpu *vcpu)
- 	struct page *page;
- 	int i;
- 
--	if (tdp_enabled)
--		return 0;
--
- 	/*
--	 * When emulating 32-bit mode, cr3 is only 32 bits even on x86_64.
--	 * Therefore we need to allocate shadow page tables in the first
--	 * 4GB of memory, which happens to fit the DMA32 zone.
-+	 * When using PAE paging, the four PDPTEs are treated as 'root' pages,
-+	 * while the PDP table is a per-vCPU construct that's allocated at MMU
-+	 * creation.  When emulating 32-bit mode, cr3 is only 32 bits even on
-+	 * x86_64.  Therefore we need to allocate the PDP table in the first
-+	 * 4GB of memory, which happens to fit the DMA32 zone.  Except for
-+	 * SVM's 32-bit NPT support, TDP paging doesn't use PAE paging and can
-+	 * skip allocating the PDP table.
- 	 */
-+	if (tdp_enabled && kvm_x86_ops->get_tdp_level(vcpu) > PT32E_ROOT_LEVEL)
-+		return 0;
-+
- 	page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_DMA32);
- 	if (!page)
- 		return -ENOMEM;
--- 
-2.21.0
-
+Reviewed-by: Jim Mattson <jmattson@google.com>
