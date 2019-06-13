@@ -2,241 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A56B743F59
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 17:56:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD7CA43F8D
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 17:59:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388180AbfFMP4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 11:56:39 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36514 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731679AbfFMP4h (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jun 2019 11:56:37 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5DFpjJw068741
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 11:56:36 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2t3rn6u4td-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 11:56:36 -0400
-Received: from localhost
-        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
-        Thu, 13 Jun 2019 16:56:34 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 13 Jun 2019 16:56:31 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5DFuTxk49348724
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Jun 2019 15:56:29 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B2A7EAE055;
-        Thu, 13 Jun 2019 15:56:29 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6C657AE051;
-        Thu, 13 Jun 2019 15:56:29 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.152.224.26])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 13 Jun 2019 15:56:29 +0000 (GMT)
-Date:   Thu, 13 Jun 2019 17:56:28 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        libvir-list@redhat.com, Matthew Rosato <mjrosato@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: Re: [PATCH RFC 1/1] allow to specify additional config data
-In-Reply-To: <20190606144417.1824-2-cohuck@redhat.com>
-References: <20190606144417.1824-1-cohuck@redhat.com>
-        <20190606144417.1824-2-cohuck@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+        id S1731493AbfFMP6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 11:58:24 -0400
+Received: from foss.arm.com ([217.140.110.172]:44214 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390594AbfFMP6X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 11:58:23 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D2C10367;
+        Thu, 13 Jun 2019 08:58:22 -0700 (PDT)
+Received: from C02TF0J2HF1T.local (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 825ED3F246;
+        Thu, 13 Jun 2019 08:58:02 -0700 (PDT)
+Date:   Thu, 13 Jun 2019 16:57:55 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Vincenzo Frascino <vincenzo.frascino@arm.com>
+Cc:     Dave Martin <Dave.Martin@arm.com>,
+        Andrey Konovalov <andreyknvl@google.com>,
+        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+        linux-media@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Kees Cook <keescook@chromium.org>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: Re: [PATCH v17 03/15] arm64: Introduce prctl() options to control
+ the tagged user addresses ABI
+Message-ID: <20190613155754.GX28951@C02TF0J2HF1T.local>
+References: <cover.1560339705.git.andreyknvl@google.com>
+ <a7a2933bea5fe57e504891b7eec7e9432e5e1c1a.1560339705.git.andreyknvl@google.com>
+ <20190613111659.GX28398@e103592.cambridge.arm.com>
+ <20190613153505.GU28951@C02TF0J2HF1T.local>
+ <99cc257d-5e99-922a-fbe7-3bbaf3621e38@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19061315-0028-0000-0000-0000037A0A9E
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19061315-0029-0000-0000-0000243A046B
-Message-Id: <20190613175628.28159268.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-13_10:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906130118
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <99cc257d-5e99-922a-fbe7-3bbaf3621e38@arm.com>
+User-Agent: Mutt/1.11.2 (2019-01-07)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  6 Jun 2019 16:44:17 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> Add a rough implementation for vfio-ap.
+On Thu, Jun 13, 2019 at 04:45:54PM +0100, Vincenzo Frascino wrote:
+> On 13/06/2019 16:35, Catalin Marinas wrote:
+> > On Thu, Jun 13, 2019 at 12:16:59PM +0100, Dave P Martin wrote:
+> >> On Wed, Jun 12, 2019 at 01:43:20PM +0200, Andrey Konovalov wrote:
+> >>> +
+> >>> +/*
+> >>> + * Control the relaxed ABI allowing tagged user addresses into the kernel.
+> >>> + */
+> >>> +static unsigned int tagged_addr_prctl_allowed = 1;
+> >>> +
+> >>> +long set_tagged_addr_ctrl(unsigned long arg)
+> >>> +{
+> >>> +	if (!tagged_addr_prctl_allowed)
+> >>> +		return -EINVAL;
+> >>
+> >> So, tagging can actually be locked on by having a process enable it and
+> >> then some possibly unrelated process clearing tagged_addr_prctl_allowed.
+> >> That feels a bit weird.
+> > 
+> > The problem is that if you disable the ABI globally, lots of
+> > applications would crash. This sysctl is meant as a way to disable the
+> > opt-in to the TBI ABI. Another option would be a kernel command line
+> > option (I'm not keen on a Kconfig option).
 > 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  mdevctl.libexec | 25 ++++++++++++++++++++++
->  mdevctl.sbin    | 56 ++++++++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 80 insertions(+), 1 deletion(-)
-> 
-> diff --git a/mdevctl.libexec b/mdevctl.libexec
-> index 804166b5086d..cc0546142924 100755
-> --- a/mdevctl.libexec
-> +++ b/mdevctl.libexec
-> @@ -54,6 +54,19 @@ wait_for_supported_types () {
->      fi
->  }
->  
-> +# configure vfio-ap devices <config entry> <matrix attribute>
-> +configure_ap_devices() {
-> +    list="`echo "${config[$1]}" | sed 's/,/ /'`"
-> +    [ -z "$list" ] && return
-> +    for a in $list; do
-> +        echo "$a" > "$supported_types/${config[mdev_type]}/devices/$uuid/$2"
-> +        if [ $? -ne 0 ]; then
-> +            echo "Error writing '$a' to '$uuid/$2'" >&2
-> +            exit 1
-> +        fi
-> +    done
-> +}
-> +
->  case ${1} in
->      start-mdev|stop-mdev)
->          if [ $# -ne 2 ]; then
-> @@ -148,6 +161,18 @@ case ${cmd} in
->              echo "Error creating mdev type ${config[mdev_type]} on $parent" >&2
->              exit 1
->          fi
-> +
-> +        # some types may specify additional config data
-> +        case ${config[mdev_type]} in
-> +            vfio_ap-passthrough)
-> +                configure_ap_devices ap_adapters assign_adapter
-> +                configure_ap_devices ap_domains assign_domain
-> +                configure_ap_devices ap_control_domains assign_control_domain
-> +                # TODO: is assigning idempotent? Should we unwind on error?
+> Why you are not keen on a Kconfig option?
 
-It is largely idempotent AFAIR. The pathological case is queues go away
-between the two assigns, but that results in the worst case just
-in an error code -- the previous assignment is still effective. Why are
-you asking? When doing this next time we will start with a freshly
-created mdev I guess.
+Because I don't want to rebuild the kernel/reboot just to be able to
+test how user space handles the ABI opt-in. I'm ok with a Kconfig option
+to disable this globally in addition to a run-time option (if actually
+needed, I'm not sure).
 
-Regarding unwind. Keeping a half configured mdev (errors happened) looks
-like a bad idea to me. Currently we don't fail the start operation if
-we can't configure a device. So I guess the in case of vfio_ap the
-guest would just start with whatever we managed to get.
-
-What about concurrent updates to the config?
-
-> +                ;;
-> +            *)
-> +                ;;
-> +        esac
->          ;;
->  
->      add-mdev)
-> diff --git a/mdevctl.sbin b/mdevctl.sbin
-> index 276cf6ddc817..eb5ee0091879 100755
-> --- a/mdevctl.sbin
-> +++ b/mdevctl.sbin
-> @@ -33,6 +33,8 @@ usage() {
->      echo "set-start <mdev UUID>: change mdev start policy, if no option specified," >&2
->      echo "                       system default policy is used" >&2
->      echo "                       options: [--auto] [--manual]" >&2
-> +    echo "set-additional-config <mdev UUID> {fmt...}: supply additional configuration" >&2
-
-This is a disruptive action for 'auto' at the moment. I'm not sure about
-that, but if we want to have this disruptive, then we need to document
-it as such.
-
-> +    echo "show-additional-config-format <mdev UUiD>:  prints the format expected by the device" >&2
->      echo "list-all: list all possible mdev types supported in the system" >&2
->      echo "list-available: list all mdev types currently available" >&2
->      echo "list-mdevs: list currently configured mdevs" >&2
-> @@ -48,7 +50,7 @@ while (($# > 0)); do
->          --manual)
->              config[start]=manual
->              ;;
-> -        start-mdev|stop-mdev|remove-mdev|set-start)
-> +        start-mdev|stop-mdev|remove-mdev|set-start|show-additional-config-format)
->              [ $# -ne 2 ] && usage
->              cmd=$1
->              uuid=$2
-> @@ -67,6 +69,14 @@ while (($# > 0)); do
->              cmd=$1
->              break
->              ;;
-> +        set-additional-config)
-> +            [ $# -le 2 ] && usage
-> +            cmd=$1
-> +            uuid=$2
-> +            shift 2
-> +            addtl_config="$*"
-> +            break
-> +            ;;
->          *)
->              usage
->              ;;
-> @@ -114,6 +124,50 @@ case ${cmd} in
->          fi
->          ;;
->  
-> +    set-additional-config)
-> +        file=$(find $persist_base -name $uuid -type f)
-> +        if [ -w "$file" ]; then
-> +            read_config "$file"
-> +            if [ ${config[start]} == "auto" ]; then
-> +                systemctl stop mdev@$uuid.service
-> +            fi
-
-If the mdev is not started stop has no effect. If there
-is an mdev started, and in use by a VM destroying the
-mdev is a disruptive operation.
-
-I'm a bit concerned about this semantic. We have a case
-where the change takes effect immediately in a disruptive
-or not disruptive fashion, and then we have a case where
-only the persistent configuration is changed. And then,
-when the configuration are applied, it may only get partially
-applied.
-
-Tony is working on hotplug/unplug on vfio_ap_mdevs. I do
-not see if that is also supposed to fit in here. Probably
-not.
-
-> +            # FIXME: validate input!
-> +            for i in $addtl_config; do
-> +                key="`echo "$i" | cut -d '=' -f 1`"
-> +                value="`echo "$i" | cut -d '=' -f 2-`"
-> +                if grep -q ^$key $file; then
-> +                    if [ -z "$value" ]; then
-> +                        sed -i "s/^$key=.*//g" $file
-> +                    else
-> +                        sed -i "s/^$key=.*/$key=$value/g" $file
-> +                    fi
-> +                else
-> +                    echo "$i" >> "$file"
-> +                fi
-
-How about concurrency? I guess we could end up loosing distinct
-updates without detecting it.
-
-> +            done
-
-Basically we append or change but don't remove. So it is a
-cumulative thing I suppose.
-
-
-I'm not sure 'set-additional-config' is a good idea. For vfio_ap
-I would hope for a tool that is more intelligent, and can help
-with avoiding and managing conflicts.
-
-Regards,
-Halil
-
-[..]
-
+-- 
+Catalin
