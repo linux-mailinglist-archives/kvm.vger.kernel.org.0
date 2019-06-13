@@ -2,43 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DD6FF44C54
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 21:40:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1B1A44C5C
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 21:40:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729195AbfFMTkP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 15:40:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46930 "EHLO
+        id S1729627AbfFMTka (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 15:40:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59138 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729224AbfFMTkP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jun 2019 15:40:15 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5DJbSsu071043
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 15:40:14 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2t3s629kef-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 15:40:13 -0400
-Received: from localhost
-        by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <akrowiak@linux.ibm.com>;
-        Thu, 13 Jun 2019 20:40:13 +0100
-Received: from b03cxnp08027.gho.boulder.ibm.com (9.17.130.19)
-        by e35.co.us.ibm.com (192.168.1.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 13 Jun 2019 20:40:10 +0100
+        by vger.kernel.org with ESMTP id S1729501AbfFMTk0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jun 2019 15:40:26 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5DJaiIo079248;
+        Thu, 13 Jun 2019 15:40:15 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2t3v7thkes-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Jun 2019 15:40:14 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x5DJbOBI022355;
+        Thu, 13 Jun 2019 19:40:14 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma03dal.us.ibm.com with ESMTP id 2t1x6frb84-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 Jun 2019 19:40:13 +0000
 Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5DJe6jE24052060
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5DJe9ko35324396
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Jun 2019 19:40:06 GMT
+        Thu, 13 Jun 2019 19:40:09 GMT
 Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7841A6E056;
+        by IMSVA (Postfix) with ESMTP id 2750B6E059;
+        Thu, 13 Jun 2019 19:40:09 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DF77B6E04C;
         Thu, 13 Jun 2019 19:40:06 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D16D16E058;
-        Thu, 13 Jun 2019 19:40:03 +0000 (GMT)
 Received: from akrowiak-ThinkPad-P50.ibm.com (unknown [9.85.158.129])
         by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Thu, 13 Jun 2019 19:40:03 +0000 (GMT)
+        Thu, 13 Jun 2019 19:40:06 +0000 (GMT)
 From:   Tony Krowiak <akrowiak@linux.ibm.com>
 To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
@@ -48,20 +47,13 @@ Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
         pmorel@linux.ibm.com, pasic@linux.ibm.com,
         alex.williamson@redhat.com, kwankhede@nvidia.com,
         Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: [PATCH v4 6/7] s390: vfio-ap: allow hot plug/unplug of AP resources using mdev device
-Date:   Thu, 13 Jun 2019 15:39:39 -0400
+Subject: [PATCH v4 7/7] s390: vfio-ap: update documentation
+Date:   Thu, 13 Jun 2019 15:39:40 -0400
+Message-Id: <1560454780-20359-8-git-send-email-akrowiak@linux.ibm.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1560454780-20359-1-git-send-email-akrowiak@linux.ibm.com>
 References: <1560454780-20359-1-git-send-email-akrowiak@linux.ibm.com>
 X-TM-AS-GCONF: 00
-x-cbid: 19061319-0012-0000-0000-00001744096D
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011256; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01217510; UDB=6.00640241; IPR=6.00998621;
- MB=3.00027298; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-13 19:40:13
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19061319-0013-0000-0000-000057AF4A11
-Message-Id: <1560454780-20359-7-git-send-email-akrowiak@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-13_12:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
@@ -74,227 +66,455 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's allow AP resources - i.e., adapters, domains and control domains -
-to be assigned to or unassigned from an AP matrix mdev while it is in use
-by a guest. If an AP resource is assigned while a guest is using the
-matrix mdev, the guest's CRYCB will be dynamically updated to grant
-access to the adapter, domain or control domain being assigned. If an
-AP resource is unassigned while a guest is using the matrix mdev, the
-guest's CRYCB will be dynamically updated to take access to the adapter,
-domain or control domain away from the guest.
+This patch updates the vfio-ap documentation to include the information
+below.
+
+Changes made to the mdev matrix assignment interfaces:
+
+* Allow assignment of APQNs that are not bound to the vfio-ap device
+  driver as long as they are not owned by a zcrypt driver as identified
+  in the AP bus sysfs apmask and aqmask interfaces.
+
+* Allow assignment of an AP resource to a mediated device which is in use
+  by a guest to hot plug an adapter, domain and control domain into a
+  running guest.
+
+* Allow unassignment of an AP resource from a mediated device which is in
+  use by a guest to hot unplug an adapter, domain and control domain from
+  a running guest.
+
+This patch also:
+
+* Clarifies the section on configuring the AP bus's apmask and aqmask.
+
+* Adds sections on dynamic configuration using the SE or SCLP command.
 
 Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
 ---
- drivers/s390/crypto/vfio_ap_ops.c | 68 ++++++++++++++++++++++-----------------
- 1 file changed, 38 insertions(+), 30 deletions(-)
+ Documentation/s390/vfio-ap.txt | 292 ++++++++++++++++++++++++++++++-----------
+ 1 file changed, 213 insertions(+), 79 deletions(-)
 
-diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-index 9db86c0db52e..57325eb47278 100644
---- a/drivers/s390/crypto/vfio_ap_ops.c
-+++ b/drivers/s390/crypto/vfio_ap_ops.c
-@@ -465,6 +465,16 @@ static int vfio_ap_mdev_validate_masks(unsigned long *apm, unsigned long *aqm)
- 	return vfio_ap_mdev_verify_no_sharing(apm, aqm);
- }
+diff --git a/Documentation/s390/vfio-ap.txt b/Documentation/s390/vfio-ap.txt
+index 65167cfe4485..9372a6570ce1 100644
+--- a/Documentation/s390/vfio-ap.txt
++++ b/Documentation/s390/vfio-ap.txt
+@@ -81,10 +81,19 @@ definitions:
+   which the AP command is to be sent for processing.
  
-+static void vfio_ap_mdev_update_crycb(struct ap_matrix_mdev *matrix_mdev)
-+{
-+	if (matrix_mdev->kvm && matrix_mdev->kvm->arch.crypto.crycbd) {
-+		kvm_arch_crypto_set_masks(matrix_mdev->kvm,
-+					  matrix_mdev->matrix.apm,
-+					  matrix_mdev->matrix.aqm,
-+					  matrix_mdev->matrix.adm);
-+	}
-+}
+   The AP bus will create a sysfs device for each APQN that can be derived from
+-  the cross product of the AP adapter and usage domain numbers detected when the
+-  AP bus module is loaded. For example, if adapters 4 and 10 (0x0a) and usage
+-  domains 6 and 71 (0x47) are assigned to the LPAR, the AP bus will create the
+-  following sysfs entries:
++  the Cartesian product of the AP adapter and usage domain numbers detected when
++  the AP bus module is loaded. For example, if adapters 4 and 10 (0x0a) and
++  usage domains 6 and 71 (0x47) are assigned to the LPAR, the Cartesian product
++  would be defined by the following table:
 +
- /**
-  * assign_adapter_store
-  *
-@@ -475,7 +485,10 @@ static int vfio_ap_mdev_validate_masks(unsigned long *apm, unsigned long *aqm)
-  * @count:	the number of bytes in @buf
-  *
-  * Parses the APID from @buf and sets the corresponding bit in the mediated
-- * matrix device's APM.
-+ * matrix device's APM. If a guest is using the mediated matrix device and each
-+ * new APQN formed as a result of the assignment identifies an AP queue device
-+ * that is bound to the vfio_ap device driver, the guest will be granted access
-+ * to the adapter with the specified APID.
-  *
-  * Returns the number of bytes processed if the APID is valid; otherwise,
-  * returns one of the following errors:
-@@ -507,10 +520,6 @@ static ssize_t assign_adapter_store(struct device *dev,
- 	struct mdev_device *mdev = mdev_from_dev(dev);
- 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
- 
--	/* If the guest is running, disallow assignment of adapter */
--	if (matrix_mdev->kvm)
--		return -EBUSY;
--
- 	ret = kstrtoul(buf, 0, &apid);
- 	if (ret)
- 		return ret;
-@@ -527,7 +536,9 @@ static ssize_t assign_adapter_store(struct device *dev,
- 		mutex_unlock(&matrix_dev->lock);
- 		return ret;
- 	}
++		        06           71
++		   +-----------+-----------+
++		04 |  (04,06)  |  (04,47)  |
++		   +-----------|-----------+
++		10 |  (0a,06)  |  (0a,47)  |
++		   +-----------|-----------+
 +
- 	set_bit_inv(apid, matrix_mdev->matrix.apm);
-+	vfio_ap_mdev_update_crycb(matrix_mdev);
- 	mutex_unlock(&matrix_dev->lock);
++  The AP bus will create the following sysfs entries:
  
- 	return count;
-@@ -543,7 +554,9 @@ static DEVICE_ATTR_WO(assign_adapter);
-  * @count:	the number of bytes in @buf
-  *
-  * Parses the APID from @buf and clears the corresponding bit in the mediated
-- * matrix device's APM.
-+ * matrix device's APM. If a guest is using the mediated matrix device and has
-+ * access to the AP adapter with the specified APID, access to the adapter will
-+ * be taken from the guest.
-  *
-  * Returns the number of bytes processed if the APID is valid; otherwise,
-  * returns one of the following errors:
-@@ -560,10 +573,6 @@ static ssize_t unassign_adapter_store(struct device *dev,
- 	struct mdev_device *mdev = mdev_from_dev(dev);
- 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
- 
--	/* If the guest is running, disallow un-assignment of adapter */
--	if (matrix_mdev->kvm)
--		return -EBUSY;
--
- 	ret = kstrtoul(buf, 0, &apid);
- 	if (ret)
- 		return ret;
-@@ -573,6 +582,7 @@ static ssize_t unassign_adapter_store(struct device *dev,
- 
- 	mutex_lock(&matrix_dev->lock);
- 	clear_bit_inv((unsigned long)apid, matrix_mdev->matrix.apm);
-+	vfio_ap_mdev_update_crycb(matrix_mdev);
- 	mutex_unlock(&matrix_dev->lock);
- 
- 	return count;
-@@ -589,7 +599,10 @@ static DEVICE_ATTR_WO(unassign_adapter);
-  * @count:	the number of bytes in @buf
-  *
-  * Parses the APQI from @buf and sets the corresponding bit in the mediated
-- * matrix device's AQM.
-+ * matrix device's AQM. If a guest is using the mediated matrix device and each
-+ * new APQN formed as a result of the assignment identifies an AP queue device
-+ * that is bound to the vfio_ap device driver, the guest will be given access
-+ * to the AP queue(s) with the specified APQI.
-  *
-  * Returns the number of bytes processed if the APQI is valid; otherwise returns
-  * one of the following errors:
-@@ -622,10 +635,6 @@ static ssize_t assign_domain_store(struct device *dev,
- 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
- 	unsigned long max_apqi = matrix_mdev->matrix.aqm_max;
- 
--	/* If the guest is running, disallow assignment of domain */
--	if (matrix_mdev->kvm)
--		return -EBUSY;
--
- 	ret = kstrtoul(buf, 0, &apqi);
- 	if (ret)
- 		return ret;
-@@ -641,7 +650,9 @@ static ssize_t assign_domain_store(struct device *dev,
- 		mutex_unlock(&matrix_dev->lock);
- 		return ret;
- 	}
+     /sys/devices/ap/card04/04.0006
+     /sys/devices/ap/card04/04.0047
+@@ -146,10 +155,20 @@ If you recall from the description of an AP Queue, AP instructions include
+ an APQN to identify the AP queue to which an AP command-request message is to be
+ sent (NQAP and PQAP instructions), or from which a command-reply message is to
+ be received (DQAP instruction). The validity of an APQN is defined by the matrix
+-calculated from the APM and AQM; it is the cross product of all assigned adapter
+-numbers (APM) with all assigned queue indexes (AQM). For example, if adapters 1
+-and 2 and usage domains 5 and 6 are assigned to a guest, the APQNs (1,5), (1,6),
+-(2,5) and (2,6) will be valid for the guest.
++calculated from the APM and AQM; it is the Cartesian product of all assigned
++adapter numbers (APM) with all assigned queue indexes (AQM). For example, if
++adapters 1 and 2 and usage domains 5 and 6 are assigned to a guest:
 +
- 	set_bit_inv(apqi, matrix_mdev->matrix.aqm);
-+	vfio_ap_mdev_update_crycb(matrix_mdev);
- 	mutex_unlock(&matrix_dev->lock);
++
++		        05           06
++		   +-----------+-----------+
++		01 |  (01,05)  |  (01,06)  |
++		   +-----------|-----------+
++		02 |  (02,05)  |  (02,06)  |
++		   +-----------|-----------+
++
++
++APQNs (01,05), (01,06), (02,05) and (02,06) will be valid for the guest.
  
- 	return count;
-@@ -659,7 +670,9 @@ static DEVICE_ATTR_WO(assign_domain);
-  * @count:	the number of bytes in @buf
-  *
-  * Parses the APQI from @buf and clears the corresponding bit in the
-- * mediated matrix device's AQM.
-+ * mediated matrix device's AQM. If a guest is using the mediated matrix device
-+ * and has access to queue(s) with the specified domain APQI, access to
-+ * the queue(s) will be taken away from the guest.
-  *
-  * Returns the number of bytes processed if the APQI is valid; otherwise,
-  * returns one of the following errors:
-@@ -675,10 +688,6 @@ static ssize_t unassign_domain_store(struct device *dev,
- 	struct mdev_device *mdev = mdev_from_dev(dev);
- 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+ The APQNs can provide secure key functionality - i.e., a private key is stored
+ on the adapter card for each of its domains - so each APQN must be assigned to
+@@ -349,8 +368,9 @@ matrix device.
+       number of the the usage domain is echoed to the respective attribute
+       file.
+     * matrix:
+-      A read-only file for displaying the APQNs derived from the cross product
+-      of the adapter and domain numbers assigned to the mediated matrix device.
++      A read-only file for displaying the APQNs derived from the Caresian
++      product of the adapter and domain numbers assigned to the mediated matrix
++      device.
+     * assign_control_domain:
+     * unassign_control_domain:
+       Write-only attributes for assigning/unassigning an AP control domain
+@@ -438,9 +458,10 @@ guest use.
+ Example:
+ =======
+ Let's now provide an example to illustrate how KVM guests may be given
+-access to AP facilities. For this example, we will show how to configure
+-three guests such that executing the lszcrypt command on the guests would
+-look like this:
++access to AP facilities. For this example, we will assume that adapters 4, 5
++and 6 and domains 4, 71 (0x47), 171 (0xab) and 255 (0xff) are assigned to the
++LPAR and are online. We will show how to configure three guests such that
++executing the lszcrypt command on the guests would look like this:
  
--	/* If the guest is running, disallow un-assignment of domain */
--	if (matrix_mdev->kvm)
--		return -EBUSY;
+ Guest1
+ ------
+@@ -466,7 +487,7 @@ Guest2
+ CARD.DOMAIN TYPE  MODE
+ ------------------------------
+ 06          CEX5A Accelerator
+-06.0047     CEX5A Accelerator
++06.0047     CEX5A AcceleratorNote that this directory may contain additional bindings depending upon what
+ 06.00ff     CEX5A Accelerator
+ 
+ These are the steps:
+@@ -513,35 +534,44 @@ These are the steps:
+    /sys/bus/ap/aqmask
+ 
+    The 'apmask' is a 256-bit mask that identifies a set of AP adapter IDs
+-   (APID). Each bit in the mask, from left to right (i.e., from most significant
+-   to least significant bit in big endian order), corresponds to an APID from
+-   0-255. If a bit is set, the APID is marked as usable only by the default AP
+-   queue device drivers; otherwise, the APID is usable by the vfio_ap
+-   device driver.
++   (APID). Each bit in the mask, from left to right, corresponds to an APID from
++   0-255.
+ 
+    The 'aqmask' is a 256-bit mask that identifies a set of AP queue indexes
+-   (APQI). Each bit in the mask, from left to right (i.e., from most significant
+-   to least significant bit in big endian order), corresponds to an APQI from
+-   0-255. If a bit is set, the APQI is marked as usable only by the default AP
+-   queue device drivers; otherwise, the APQI is usable by the vfio_ap device
+-   driver.
++   (APQI). Each bit in the mask, from left to right, corresponds to an APQI from
++   0-255.
++
++   The Cartesian product of the APIDs set in the apmask and the APQIs set in
++   the aqmask identify the APQNs of AP queue devices owned by the zcrypt
++   device drivers.
++
++   Take, for example, the following masks:
+ 
+-   Take, for example, the following mask:
++     apmask: 0x7000000000000000000000000000000000000000000000000000000000000000
+ 
+-      0x7dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
++     aqmask: 0x0180000000000000000000000000000000000000000000000000000000000000
+ 
+-    It indicates:
++   The bits set in apmask are bits 1, 2 and 3. The bits set in aqmask are bits
++   7 and 8. The Cartesian product of the bits set in the two masks is:
+ 
+-      1, 2, 3, 4, 5, and 7-255 belong to the default drivers' pool, and 0 and 6
+-      belong to the vfio_ap device driver's pool.
++             07           08
++        +-----------+-----------+
++     01 |  (01,07)  |  (01,08)  |
++        +-----------|-----------+
++     02 |  (02,07)  |  (02,08)  |
++        +-----------|-----------+
++     03 |  (03,07)  |  (03,08)  |
++        +-----------|-----------+
+ 
+-   The APQN of each AP queue device assigned to the linux host is checked by the
+-   AP bus against the set of APQNs derived from the cross product of APIDs
+-   and APQIs marked as usable only by the default AP queue device drivers. If a
+-   match is detected,  only the default AP queue device drivers will be probed;
+-   otherwise, the vfio_ap device driver will be probed.
++   The masks indicate that the queues with APQNs (01,07), (01,08), (02,07),
++   (02,08), (03,07) and (03,08) are owned by the zcrypt drivers. When the AP bus
++   detects an AP queue device, its APQN is checked against the set of APQNs
++   derived from the apmask and aqmask. If a match is detected, the zcrypt
++   device driver registered for the device type of the queue will be probed. If
++   a match is not detected and the device type of the queue is CEX4 or newer,
++   the vfio_ap device driver will be probed.
+ 
+-   By default, the two masks are set to reserve all APQNs for use by the default
++   By default, the two masks are set to reserve all APQNs for use by the zcrypt
+    AP queue device drivers. There are two ways the default masks can be changed:
+ 
+    1. The sysfs mask files can be edited by echoing a string into the
+@@ -554,8 +584,7 @@ These are the steps:
+ 
+            0x4100000000000000000000000000000000000000000000000000000000000000
+ 
+-        Keep in mind that the mask reads from left to right (i.e., most
+-        significant to least significant bit in big endian order), so the mask
++        Keep in mind that the mask reads from left to right, so the mask
+         above identifies device numbers 1 and 7 (01000001).
+ 
+         If the string is longer than the mask, the operation is terminated with
+@@ -563,7 +592,7 @@ These are the steps:
+ 
+       * Individual bits in the mask can be switched on and off by specifying
+         each bit number to be switched in a comma separated list. Each bit
+-        number string must be prepended with a ('+') or minus ('-') to indicate
++        number string must be prefixed with a ('+') or minus ('-') to indicate
+         the corresponding bit is to be switched on ('+') or off ('-'). Some
+         valid values are:
+ 
+@@ -594,19 +623,26 @@ These are the steps:
+             aqmask:
+             0x4000000000000000000000000000000000000000000000000000000000000000
+ 
+-         Resulting in these two pools:
 -
- 	ret = kstrtoul(buf, 0, &apqi);
- 	if (ret)
- 		return ret;
-@@ -688,6 +697,7 @@ static ssize_t unassign_domain_store(struct device *dev,
+-            default drivers pool:    adapter 0-15, domain 1
+-            alternate drivers pool:  adapter 16-255, domains 0, 2-255
++Recall that the Cartesian product of the APIDs set in the apmask and the APQIs
++set in the aqmask identify the APQNs of AP queue devices owned by the zcrypt
++device drivers. If an attempt is made to modify the apmask or aqmask such that
++one or more APQNs changes ownership from a the vfio_ap device driver to a zcrypt
++device driver and the APQN is assigned to a mediated device (see step 3 below),
++the operation will fail with an error ('Address already in use').
  
- 	mutex_lock(&matrix_dev->lock);
- 	clear_bit_inv((unsigned long)apqi, matrix_mdev->matrix.aqm);
-+	vfio_ap_mdev_update_crycb(matrix_mdev);
- 	mutex_unlock(&matrix_dev->lock);
+    Securing the APQNs for our example:
+    ----------------------------------
+-   To secure the AP queues 05.0004, 05.0047, 05.00ab, 05.00ff, 06.0004, 06.0047,
+-   06.00ab, and 06.00ff for use by the vfio_ap device driver, the corresponding
+-   APQNs can either be removed from the default masks:
++   There is no way to secure the specific AP queues 05.0004, 05.0047, 05.00ab,
++   05.00ff, 06.0004, 06.0047, 06.00ab, and 06.00ff for use by the vfio_ap device
++   driver, so we are left with either securing all queues on adapters 05 and
++   06, or queues 0004, 0047, 00ab and 00ff can be secured on all adapters.
++
++   To secure all queues on adapters 05 and 05:
  
- 	return count;
-@@ -703,7 +713,9 @@ static DEVICE_ATTR_WO(unassign_domain);
-  * @count:	the number of bytes in @buf
-  *
-  * Parses the domain ID from @buf and sets the corresponding bit in the mediated
-- * matrix device's ADM.
-+ * matrix device's ADM. If a guest is using the mediated matrix device and the
-+ * guest does not have access to the control domain with the specified ID, the
-+ * guest will be granted access to it.
-  *
-  * Returns the number of bytes processed if the domain ID is valid; otherwise,
-  * returns one of the following errors:
-@@ -719,10 +731,6 @@ static ssize_t assign_control_domain_store(struct device *dev,
- 	struct mdev_device *mdev = mdev_from_dev(dev);
- 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
+       echo -5,-6 > /sys/bus/ap/apmask
  
--	/* If the guest is running, disallow assignment of control domain */
--	if (matrix_mdev->kvm)
--		return -EBUSY;
--
- 	ret = kstrtoul(buf, 0, &id);
- 	if (ret)
- 		return ret;
-@@ -732,6 +740,7 @@ static ssize_t assign_control_domain_store(struct device *dev,
++   To secure queues 0004, 0047, 00ab, and 00ff on all adapters:
++
+       echo -4,-0x47,-0xab,-0xff > /sys/bus/ap/aqmask
  
- 	mutex_lock(&matrix_dev->lock);
- 	set_bit_inv(id, matrix_mdev->matrix.adm);
-+	vfio_ap_mdev_update_crycb(matrix_mdev);
- 	mutex_unlock(&matrix_dev->lock);
+    Or the masks can be set as follows:
+@@ -617,14 +653,20 @@ These are the steps:
+       echo 0xf7fffffffffffffffeffffffffffffffffffffffffeffffffffffffffffffffe \
+       > aqmask
  
- 	return count;
-@@ -747,7 +756,9 @@ static DEVICE_ATTR_WO(assign_control_domain);
-  * @count:	the number of bytes in @buf
-  *
-  * Parses the domain ID from @buf and clears the corresponding bit in the
-- * mediated matrix device's ADM.
-+ * mediated matrix device's ADM. If a guest is using the mediated matrix device
-+ * and has access to control domain with the specified domain ID, access to
-+ * the control domain will be taken from the guest.
-  *
-  * Returns the number of bytes processed if the domain ID is valid; otherwise,
-  * returns one of the following errors:
-@@ -764,10 +775,6 @@ static ssize_t unassign_control_domain_store(struct device *dev,
- 	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
- 	unsigned long max_domid =  matrix_mdev->matrix.adm_max;
+-   This will result in AP queues 05.0004, 05.0047, 05.00ab, 05.00ff, 06.0004,
+-   06.0047, 06.00ab, and 06.00ff getting bound to the vfio_ap device driver. The
+-   sysfs directory for the vfio_ap device driver will now contain symbolic links
+-   to the AP queue devices bound to it:
++   For this example, we will choose to secure queues 0004, 0047, 00ab, and 00ff
++   on all adapters. This will result in AP queues 04.0004, 04.0047, 04.00ab,
++   04.00ff, 05.0004, 05.0047, 05.00ab, 05.00ff, 06.0004, 06.0047, 06.00ab and
++   06.00ff getting bound to the vfio_ap device driver. The sysfs directory for
++   the vfio_ap device driver will now contain symbolic links to the AP queue
++   devices bound to it:
  
--	/* If the guest is running, disallow un-assignment of control domain */
--	if (matrix_mdev->kvm)
--		return -EBUSY;
--
- 	ret = kstrtoul(buf, 0, &domid);
- 	if (ret)
- 		return ret;
-@@ -776,6 +783,7 @@ static ssize_t unassign_control_domain_store(struct device *dev,
+    /sys/bus/ap
+    ... [drivers]
+    ...... [vfio_ap]
++   ......... [04.0004]
++   ......... [04.0047]
++   ......... [04.00ab]
++   ......... [04.00ff]
+    ......... [05.0004]
+    ......... [05.0047]
+    ......... [05.00ab]
+@@ -641,11 +683,12 @@ These are the steps:
+    future and for which there are few older systems on which to test.
  
- 	mutex_lock(&matrix_dev->lock);
- 	clear_bit_inv(domid, matrix_mdev->matrix.adm);
-+	vfio_ap_mdev_update_crycb(matrix_mdev);
- 	mutex_unlock(&matrix_dev->lock);
+    The administrator, therefore, must take care to secure only AP queues that
+-   can be bound to the vfio_ap device driver. The device type for a given AP
+-   queue device can be read from the parent card's sysfs directory. For example,
+-   to see the hardware type of the queue 05.0004:
++   can be bound to the vfio_ap device driver, or those queues will not get bound
++   to any driver. The device type for a given AP queue device can be read from
++   the parent card's sysfs directory. For example, to see the hardware type of
++   the queue 05.0004:
  
- 	return count;
+-   cat /sys/bus/ap/devices/card05/hwtype
++      cat /sys/bus/ap/devices/card05/hwtype
+ 
+    The hwtype must be 10 or higher (CEX4 or newer) in order to be bound to the
+    vfio_ap device driver.
+@@ -747,37 +790,48 @@ These are the steps:
+      higher than the maximum is specified, the operation will terminate with
+      an error (ENODEV).
+ 
+-   * All APQNs that can be derived from the adapter ID and the IDs of
+-     the previously assigned domains must be bound to the vfio_ap device
+-     driver. If no domains have yet been assigned, then there must be at least
+-     one APQN with the specified APID bound to the vfio_ap driver. If no such
+-     APQNs are bound to the driver, the operation will terminate with an
+-     error (EADDRNOTAVAIL).
++   * Each APQN that can be derived from the adapter ID and the IDs of
++     the previously assigned domains must not be reserved for use by the
++     zcrypt device drivers as specified by the /sys/bus/ap/apmask and
++     /sys/bus/ap/aqmask syfs interfaces. If any APQN is reserved, the operation
++     will terminate with an error (EADDRNOTAVAIL).
+ 
+-     No APQN that can be derived from the adapter ID and the IDs of the
++   * No APQN that can be derived from the adapter ID and the IDs of the
+      previously assigned domains can be assigned to another mediated matrix
+      device. If an APQN is assigned to another mediated matrix device, the
+      operation will terminate with an error (EADDRINUSE).
+ 
++   Note that adapters that are currently not available to the host may be
++   assigned to the mediated device. If the adapter subsequently becomes
++   available while a guest is using the mediated device, it will automatically
++   become available to the guest.
++
+    In order to successfully assign a domain:
+ 
+    * The domain number specified must represent a value from 0 up to the
+      maximum domain number configured for the system. If a domain number
+      higher than the maximum is specified, the operation will terminate with
+-     an error (ENODEV).
++     an error (ENODEV). The maximum domain number can be determined by
++     printing the sysfs /sys/bus/ap/ap_max_domain_id attribute:
+ 
+-   * All APQNs that can be derived from the domain ID and the IDs of
+-     the previously assigned adapters must be bound to the vfio_ap device
+-     driver. If no domains have yet been assigned, then there must be at least
+-     one APQN with the specified APQI bound to the vfio_ap driver. If no such
+-     APQNs are bound to the driver, the operation will terminate with an
+-     error (EADDRNOTAVAIL).
++        cat /sys/bus/ap/ap_max_domain_id
+ 
+-     No APQN that can be derived from the domain ID and the IDs of the
++   * Each APQN that can be derived from the domain ID and the IDs of
++     the previously assigned adapters must not be reserved for use by the
++     zcrypt device drivers as specified by the /sys/bus/ap/apmask and
++     /sys/bus/ap/aqmask syfs interfaces. If any APQN is reserved, the operation
++     will terminate with an error (EADDRNOTAVAIL).
++
++   * No APQN that can be derived from the domain ID and the IDs of the
+      previously assigned adapters can be assigned to another mediated matrix
+      device. If an APQN is assigned to another mediated matrix device, the
+      operation will terminate with an error (EADDRINUSE).
+ 
++   Note that domains that are currently not available to the host may be
++   assigned to the mediated device. If the domain subsequently becomes
++   available while a guest is using the mediated device, it will automatically
++   become available to the guest.
++
+    In order to successfully assign a control domain, the domain number
+    specified must represent a value from 0 up to the maximum domain number
+    configured for the system. If a control domain number higher than the maximum
+@@ -822,16 +876,96 @@ Using our example again, to remove the mediated matrix device $uuid1:
+    host. If the mdev matrix device is removed, one may want to also reconfigure
+    the pool of adapters and queues reserved for use by the default drivers.
+ 
+-Limitations
+-===========
+-* The KVM/kernel interfaces do not provide a way to prevent restoring an APQN
+-  to the default drivers pool of a queue that is still assigned to a mediated
+-  device in use by a guest. It is incumbent upon the administrator to
+-  ensure there is no mediated device in use by a guest to which the APQN is
+-  assigned lest the host be given access to the private data of the AP queue
+-  device such as a private key configured specifically for the guest.
++Hot plug/unplug via mdev matrix device sysfs interfaces:
++=======================================================
++If an mdev matrix device is in use by a running guest, AP resources can be
++plugged into or unplugged from the guest via the mdev device's sysfs
++assignment interfaces. Below are some examples.
++
++   To plug adapter 10 into a running guest:
++
++      echo 0xa > assign_adapter
++
++   To unplug domain 5 from a running guest:
++
++      echo 5 > unassign_domain
++
++To display the matrix of a guest using the mdev matrix device:
++
++   cat guest_matrix
++
++If you attempt to display the guest matrix when a guest is not using the
++mdev matrix device, an error will be displayed (ENODEV). Note that adapters and
++domains that are not yet available or not yet assigned to the LPAR can be
++assigned and will become available to the guest as soon as they become available
++to the host.
++
++Dynamic Changes to AP Configuration using the Support Element (SE):
++==================================================================
++The SE can be used to dynamically make the following changes to the AP
++configuration for an LPAR in which a linux host is running:
++
++   * Configure one or more adapters on
++
++     Configuring an adapter on sets its state to online, thus making it
++     available to the LPAR to which it is assigned. When an adapter is
++     configured on, it immediately becomes available to the LPAR as well as to
++     any guests using a mediated device to which the adapter is assigned.
++
++   * Configure one or more adapters off
++
++     Configuring an adapter off sets its state to standby, thus making it
++     unavailable to the LPAR to which it is assigned. When an adapter is
++     configured off, it immediately becomes unavailable to the LPAR as well as
++     to any guests using a mediated device to which the adapter is assigned.
++
++   * Add adapters or domains to the LPAR configuration
++
++     Adapters and/or domains can be assigned to an LPAR using the Change LPAR
++     Cryptographic Controls task. To make dynamic changes to the AP
++     configuration for an LPAR Running a linux guest, the online adapters
++     assigned to the LPAR must first be configured off. After performing the
++     adapter and/or domain assignments, the AP resources will automatically
++     become available to the linux host running in the LPAR as well as any
++     guests using a mediated device to which the adpaters and/or domains are
++     assigned.
++
++   * Remove adapters or domains from the LPAR configuration
++
++     Adapters and/or domains can be unassigned from an LPAR using the Change
++     LPAR Cryptographic Controls task. To make dynamic changes to the AP
++     configuration for an LPAR Running a linux guest, the online adapters
++     assigned to the LPAR must first be configured off. After performing the
++     adapter and/or domain unassignments, the AP resources will automatically
++     become unavailable to the linux host running in the LPAR as well as any
++     guests using a mediated device to which the adpaters and/or domains are
++     assigned.
++
++Dynamic Changes to the AP Configuration using the SCLP command:
++==============================================================
++The following SCLP commands may be used to dynamically configure AP adapters on
++and off:
++
++* Configure Adjunct Processor
++
++  The 'Configure Adjunct Processor' command sets an AP adapter's state to
++  online, thus making it available to the LPARs to which it is assigned. It will
++  likewise become available to any linux guest using a mediated device to which
++  the adapter is assigned.
++
++* Deconfigure Adjunct Processor
++
++  The 'Deconfigure Adjunct Processor' command sets an AP adapter's state to
++  standby, thus making it unavailable to the LPARs to which it is assigned. It
++  will likewise become unavailable to any linux guest using a mediated device to
++  which the adapter is assigned.
+ 
+-* Dynamically modifying the AP matrix for a running guest (which would amount to
+-  hot(un)plug of AP devices for the guest) is currently not supported
++Live migration:
++==============
++Live guest migration is not supported for guests using AP devices. All AP
++devices in use by the guest must be unplugged prior to initiating live
++migration (see "Hot plug/unplug via mdev matrix device sysfs interfaces" section
++above). If you are using QEMU to run your guest and it supports hot plug/unplug
++of the vfio-ap device, this would be another option (consult the QEMU
++documentation for details).
+ 
+-* Live guest migration is not supported for guests using AP devices.
 -- 
 2.7.4
 
