@@ -2,84 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 487F54444E
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 18:37:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0DC2447EC
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:03:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392551AbfFMQgF convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 13 Jun 2019 12:36:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51224 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730699AbfFMQgE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 12:36:04 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A07DDC07188B;
-        Thu, 13 Jun 2019 16:36:04 +0000 (UTC)
-Received: from x1.home (ovpn-116-190.phx2.redhat.com [10.3.116.190])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 686AB54216;
-        Thu, 13 Jun 2019 16:35:55 +0000 (UTC)
-Date:   Thu, 13 Jun 2019 10:35:55 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Christophe de Dinechin <cdupontd@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Libvirt Devel <libvir-list@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Erik Skultety <eskultet@redhat.com>,
-        Pavel Hrdina <phrdina@redhat.com>,
-        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-        Sylvain Bauza <sbauza@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: mdevctl: A shoestring mediated device management and
- persistence utility
-Message-ID: <20190613103555.3923e078@x1.home>
-In-Reply-To: <0358F503-E2C7-42DC-8186-34D1DA31F6D7@redhat.com>
-References: <20190523172001.41f386d8@x1.home>
-        <0358F503-E2C7-42DC-8186-34D1DA31F6D7@redhat.com>
-Organization: Red Hat
+        id S1729694AbfFMRDE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 13:03:04 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:39854 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389218AbfFMRCy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 13:02:54 -0400
+Received: by mail-io1-f68.google.com with SMTP id r185so18520650iod.6
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 10:02:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kEdd6ZwEVdi4q8ux1pv01BMnghhMVODdKurwusZLsCQ=;
+        b=CceHVuUaraSFi3DR/OSw2iRo9fu6dKdlnUwFmTbugD4LoslVlRGLdq+yRMIhnO2kzP
+         wEO1ESs0Xu/04bqfXyd+DzlM3cLiQAT2bNacsUe4FzmlgHsY7gXt8vESjeBiqVtU2RdZ
+         zyN0s1n4hOSprjsLCeVOStSn4BMFWQ0A7JfeNt6W9yUQF7tJmTtmSTVjgv3P/poEJR44
+         CKSnSoQbU8r/eaIcxbUXvhIV8koThuxFNzKWYMUYFeldWqYxGJ0d5Ck4IQbnZUVP7JSz
+         lS8cl6vMoHrPkCT1iwGXFECexMUBPDH7EKxzB8sdSopHtW83H2TaOyU/LZxpF8zXYiYF
+         eUMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kEdd6ZwEVdi4q8ux1pv01BMnghhMVODdKurwusZLsCQ=;
+        b=MUsmuQq8cWOhlJP9KWoRysdPDEvXK9klrBVXfRXosgFiExypmFkMxy4OkZYHMLZQsM
+         jOZtdiG+NlYfQYQaxjntbbAuEpNd0a7PTM4477dL7HkhcaELXOTLv3eWl+1L++9jAupa
+         ijlfLtCo8O9jqQ7jE7zH/qHay2SqUAl7g4V7h1vm8d3hEZyOLkprEbuXQiD+woa8GQBl
+         NOmwM078EYmGFvFeDdQ7qo7pf96YqwYuXM6XQxvHZr23THvvZaUaRIagr/DjozaQ17Xw
+         8GdDLPmiNzyGHswiyw2PiJY1HHLw2zTmtLBtBd193Cg13hEUWwKx/HYBhlRVKG/sIfhW
+         HCnQ==
+X-Gm-Message-State: APjAAAURqdV6NDM2YNw6scDFVq66tPwwJYl4hS6LkpExyy987xPbCbdc
+        payxCanGRACDTAgESsM4QvKz8dm8ZVBAr4B746nF5g==
+X-Google-Smtp-Source: APXvYqzmVW0sDStP8cKI/Y3l1+4nns/pvVF+VccRF6+k5dX2K+Kolh38/gTQUAu+HZA5+QODiAv7GezO7zSVX6CKlio=
+X-Received: by 2002:a02:ac09:: with SMTP id a9mr998075jao.48.1560445373284;
+ Thu, 13 Jun 2019 10:02:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Thu, 13 Jun 2019 16:36:04 +0000 (UTC)
+References: <20190507153629.3681-1-sean.j.christopherson@intel.com> <20190507153629.3681-2-sean.j.christopherson@intel.com>
+In-Reply-To: <20190507153629.3681-2-sean.j.christopherson@intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 13 Jun 2019 10:02:42 -0700
+Message-ID: <CALMp9eRb8GC1NH9agiWWwkY5ac4CKxZqzobzmLiV5FiscV_B+A@mail.gmail.com>
+Subject: Re: [PATCH 1/7] KVM: nVMX: Intercept VMWRITEs to read-only shadow
+ VMCS fields
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Liran Alon <liran.alon@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 13 Jun 2019 18:17:53 +0200
-Christophe de Dinechin <cdupontd@redhat.com> wrote:
+On Tue, May 7, 2019 at 8:36 AM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
 
-> > On 24 May 2019, at 01:20, Alex Williamson <alex.williamson@redhat.com> wrote:
-> > 
-> > Hi,
-> > 
-> > Currently mediated device management, much like SR-IOV VF management,
-> > is largely left as an exercise for the user.  This is an attempt to
-> > provide something and see where it goes.  I doubt we'll solve
-> > everyone's needs on the first pass, but maybe we'll solve enough and
-> > provide helpers for the rest.  Without further ado, I'll point to what
-> > I have so far:
-> > 
-> > https://github.com/awilliam/mdevctl  
-> 
-> While it’s still early, what about :
-> 
-> 	mdevctl create-mdev <parent-device> <mdev-type> [<mdev-uuid>]
-> 
-> where if the mdev-uuid is missing, you just run uuidgen within the script?
-> 
-> I sent a small PR in case you think it makes sense.
+> Not intercepting fields tagged read-only also allows for additional
+> optimizations, e.g. marking GUEST_{CS,SS}_AR_BYTES as SHADOW_FIELD_RO
+> since those fields are rarely written by a VMMs, but read frequently.
 
-It sounds racy.  If the user doesn't provide the UUID then they need to
-guess that an mdev device with the same parent and type is theirs.  How
-do you resolve two instances of this happening in parallel and both
-coming to the same conclusion which is their device.  If a user wants
-this sort of headache they can call mdevctl with `uuidgen` but I don't
-think we should encourage it further.
+Do you have data to support this, or is this just a gut feeling? The
+last time I looked at Virtual Box (which was admittedly a long time
+ago), it liked to read and write just about every VMCS guest-state
+field it could find on every VM-exit.
 
-BTW, I've moved the project to https://github.com/mdevctl/mdevctl, the
-latest commit in the tree above makes that change, I've also updated
-the description on my repo to point to the new location.  Thanks,
+The decision of which fields to shadow is really something that should
+be done dynamically, depending on the behavior of the guest hypervisor
+(which may vary depending on the L2 guest it's running!) Making the
+decision statically is bound to result in a poor outcome for some
+scenarios.
 
-Alex
+When I measured this several years ago, taking one VM-exit for a
+VMREAD or VMWRITE was more expensive than needlessly shadowing it
+~35-40 times.
