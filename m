@@ -2,83 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B916438F4
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 17:10:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D433438D5
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 17:09:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732337AbfFMPKU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 11:10:20 -0400
-Received: from mail-wr1-f47.google.com ([209.85.221.47]:46814 "EHLO
-        mail-wr1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732340AbfFMNzQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 09:55:16 -0400
-Received: by mail-wr1-f47.google.com with SMTP id n4so20852897wrw.13
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 06:55:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=LUxRnqzVxBSH1F72r54SA3efp6hT9i/UqfD235oKS1I=;
-        b=Ly+cT4gmOMofLECJy1vkAnmiUwsUiRTl2k1DM3rpkKy8NhtwHUm+m2KKs7PQl1sgQB
-         HXD0rkqKrOaYoFuYKTXSU+nBd1F9n4nQ6CHzIVtzM6/FCA4SGBgw9QvK84Rc9kcSV54L
-         L/ImIQ+rce6cB6xd3YSYcwo3m5LIcFLlY5pAKaNN0RP+zbVBOc8Ac/kwBnUan1ryLBS3
-         0IwPVQae7czPvojzTaBjQ8aKIIfj7aUkzGFszZEYJRlasF7FTMZYW61aWCkHvMPVK7Mc
-         V312dNVkBLfO33YEu2B4hPrlWFcTU7+PAO0T4D++Ww+MKNJNKhgmaMZKQcF7pmwNBawX
-         uyhQ==
-X-Gm-Message-State: APjAAAX29SEmavgVrAnUUZSYH7Ljuy7eI85A0q7PmzSj1i0QEhtW7EY4
-        4BjPJ1RFes9EBTVEW6MbaUzRRsMYC2A=
-X-Google-Smtp-Source: APXvYqy+3s5MTjEf1IKu3MEBD3MagZRPw8gzMiNtHU8Q1CBx7/2RMHQAlWfb4AtNRtMAiEneBF033Q==
-X-Received: by 2002:a5d:53d2:: with SMTP id a18mr10352094wrw.98.1560434114220;
-        Thu, 13 Jun 2019 06:55:14 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id l190sm3169789wml.25.2019.06.13.06.55.13
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 13 Jun 2019 06:55:13 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>
-Subject: Re: What's with all of the hardcoded instruction lengths in svm.c?
-In-Reply-To: <CALMp9eQ4k71ox=0xQKM+CfOkFe6Vqp+0znJ3Ju4ZmyL9fgjm=w@mail.gmail.com>
-References: <CALMp9eQ4k71ox=0xQKM+CfOkFe6Vqp+0znJ3Ju4ZmyL9fgjm=w@mail.gmail.com>
-Date:   Thu, 13 Jun 2019 15:55:12 +0200
-Message-ID: <87d0jhegjj.fsf@vitty.brq.redhat.com>
+        id S1732512AbfFMPJD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 11:09:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60344 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732368AbfFMN6j (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jun 2019 09:58:39 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5DDrcoK046028
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 09:58:38 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2t3nwrx5yd-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 09:58:37 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
+        Thu, 13 Jun 2019 14:58:34 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 13 Jun 2019 14:58:30 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5DDwTsi54263852
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Jun 2019 13:58:29 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 58AE252057;
+        Thu, 13 Jun 2019 13:58:29 +0000 (GMT)
+Received: from osiris (unknown [9.152.212.21])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 0F37A52054;
+        Thu, 13 Jun 2019 13:58:29 +0000 (GMT)
+Date:   Thu, 13 Jun 2019 15:58:27 +0200
+From:   Heiko Carstens <heiko.carstens@de.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PULL 1/1] vfio-ccw: Destroy kmem cache region on module exit
+References: <20190612101645.9439-1-cohuck@redhat.com>
+ <20190612101645.9439-2-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190612101645.9439-2-cohuck@redhat.com>
+X-TM-AS-GCONF: 00
+x-cbid: 19061313-0008-0000-0000-000002F3799E
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19061313-0009-0000-0000-000022608001
+Message-Id: <20190613135827.GA30929@osiris>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-13_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=5 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906130106
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jim Mattson <jmattson@google.com> writes:
+On Wed, Jun 12, 2019 at 12:16:45PM +0200, Cornelia Huck wrote:
+> From: Farhan Ali <alifm@linux.ibm.com>
+> 
+> Free the vfio_ccw_cmd_region on module exit.
+> 
+> Fixes: d5afd5d135c8 ("vfio-ccw: add handling for async channel instructions")
+> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> Message-Id: <c0f39039d28af39ea2939391bf005e3495d890fd.1559576250.git.alifm@linux.ibm.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  drivers/s390/cio/vfio_ccw_drv.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+> index 66a66ac1f3d1..9cee9f20d310 100644
+> --- a/drivers/s390/cio/vfio_ccw_drv.c
+> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> @@ -299,6 +299,7 @@ static void __exit vfio_ccw_sch_exit(void)
+>  	css_driver_unregister(&vfio_ccw_sch_driver);
+>  	isc_unregister(VFIO_CCW_ISC);
+>  	kmem_cache_destroy(vfio_ccw_io_region);
+> +	kmem_cache_destroy(vfio_ccw_cmd_region);
+>  	destroy_workqueue(vfio_ccw_work_q);
 
-> Take the following code in rdmsr_interception, for example.
->
-> svm->next_rip = kvm_rip_read(&svm->vcpu) + 2;
->
-> Yes, the canonical rdmsr instruction is two bytes. However, there is
-> nothing in the architectural specification prohibiting useless or
-> redundant prefixes. So, for instance, 65 66 67 67 67 0f 32 is a
-> perfectly valid 7-byte rdmsr instruction.
+Applied to 'fixes' branch. Thanks!
 
-(I don't know much about why this was added but nobody else commented
-so in case I'm not terribly mistaken):
-
-This looks ugly, it is likely an over-optimization: we seem to only
-advance svm->next_rip to be able to avoid doing
-kvm_emulate_instruction() in skip_emulated_instruction(). With NRIP_SAVE
-feature (appeared long ago) we don't use the advanced value as we
-already know the next RIP:
-
-	if (svm->vmcb->control.next_rip != 0) {
-		WARN_ON_ONCE(!static_cpu_has(X86_FEATURE_NRIPS));
-		svm->next_rip = svm->vmcb->control.next_rip;
-	}
-
-IMO, always doing kvm_emulate_instruction(vcpu, EMULTYPE_SKIP) in !NRIPS
-case would be the correct way. I tried throwing away these advancements
-and nothing broke, with and without NRIPS.
-
-I can try sending a patch removing the manual advancement to see if
-anyone has any objections.
-
--- 
-Vitaly
