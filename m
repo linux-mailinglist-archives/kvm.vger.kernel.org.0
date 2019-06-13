@@ -2,167 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 681D7449A5
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:27:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D12E449B7
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:29:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726843AbfFMR1J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 13:27:09 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:52252 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725864AbfFMR1J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 13:27:09 -0400
-Received: by mail-wm1-f67.google.com with SMTP id s3so11067860wms.2
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 10:27:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=j4UDJkczRpfkTiJNATKEtxOPGJyA2hruwu9S/Srh2+c=;
-        b=pfHhv2LvHkGLI6O1Y7bAX59qK5dn+j6uVV1h49NEU9hCl3enstjtBTySJD6xlHesB/
-         bXVPO40TQCtwZQjpVBqfHBkKP+SvtzFU5SsLXUJAqdGHhQmQBYo4D20/pFCzvG4Da4NS
-         J2wtGEuGYvhXpcYxdZnn7V/GZ7Wio0Fj/j+f16Rw9I8eLmiI7kgszhwdu8uuX/7J71bm
-         ubnG2pmb/C3ywU2wMEMgI98YoNvMkKu4Rp1uHTfxYNypbaFEWZVaLDa4ss6taIIpSsMx
-         HOi8kIMk3qcfM8LqTnCPXPH4qwOBj89SqhrwzaeNLsqgDrRDHIPBOP8Ff0EFYlyUVoBp
-         Jr/A==
-X-Gm-Message-State: APjAAAX6dL8t07IaHTykwB9ahXYbA2AHvDF4OAPRhJhFsdXeN5LfVAIo
-        m2fWqobUnuKBBu9Nsyzz7KGhSQ==
-X-Google-Smtp-Source: APXvYqw9HLVdBz0DQ2hcd/Ip/301GllfLIkAeYyNAZN6n3XsWQVMJppwRq6T8Ht1aVh0vnULKFnIww==
-X-Received: by 2002:a1c:9d86:: with SMTP id g128mr5010783wme.51.1560446826829;
-        Thu, 13 Jun 2019 10:27:06 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:56e1:adff:fed9:caf0? ([2001:b07:6468:f312:56e1:adff:fed9:caf0])
-        by smtp.gmail.com with ESMTPSA id t198sm741299wmt.2.2019.06.13.10.27.05
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 10:27:05 -0700 (PDT)
-Subject: Re: [PATCH] KVM: x86: clean up conditions for asynchronous page fault
- handling
-To:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Wanpeng Li <wanpengli@tencent.com>
-References: <1560423812-51166-1-git-send-email-pbonzini@redhat.com>
- <20190613171220.GA24873@flask>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <309cf0b7-f831-51da-7c2c-3333cd4c4036@redhat.com>
-Date:   Thu, 13 Jun 2019 19:27:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190613171220.GA24873@flask>
-Content-Type: text/plain; charset=utf-8
+        id S1729399AbfFMR3Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 13:29:16 -0400
+Received: from mail-eopbgr710080.outbound.protection.outlook.com ([40.107.71.80]:26016
+        "EHLO NAM05-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726092AbfFMR3Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 13:29:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Hwm1tvsKbGpRo9J2H8Em3256KGsQwcdi/VSqqm65kwU=;
+ b=bR3K6vBaMftvslR+9iLuITBnrdRy8CmpCDsWjrER+a9SfapXiJehwLGGzUZoPSZ81SnWzC3FB4V6bib2rlq3dbJem4bTeEhP4M2u/gxB1jHijQEx6mFpESdd46paEbyl/Ollifv9wYR7G4fToWhXFxDBb50W3mRUX8ppZu7q9pE=
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com (52.135.233.146) by
+ BYAPR05MB5606.namprd05.prod.outlook.com (20.177.186.155) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1987.10; Thu, 13 Jun 2019 17:29:14 +0000
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::134:af66:bedb:ead9]) by BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::134:af66:bedb:ead9%3]) with mapi id 15.20.1987.008; Thu, 13 Jun 2019
+ 17:29:14 +0000
+From:   Nadav Amit <namit@vmware.com>
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Andy Lutomirski <luto@kernel.org>
+CC:     Alexander Graf <graf@amazon.com>,
+        Marius Hillenbrand <mhillenb@amazon.de>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>,
+        Linux-MM <linux-mm@kvack.org>, Alexander Graf <graf@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [RFC 00/10] Process-local memory allocations for hiding KVM
+ secrets
+Thread-Topic: [RFC 00/10] Process-local memory allocations for hiding KVM
+ secrets
+Thread-Index: AQHVIYeR2j5VBjf3eUa9RwR3XpurVaaZNvCAgACL1YCAAAIdgIAAExeA
+Date:   Thu, 13 Jun 2019 17:29:14 +0000
+Message-ID: <70BEF143-00BA-4E4B-ACD7-41AD2E6250BE@vmware.com>
+References: <20190612170834.14855-1-mhillenb@amazon.de>
+ <eecc856f-7f3f-ed11-3457-ea832351e963@intel.com>
+ <A542C98B-486C-4849-9DAC-2355F0F89A20@amacapital.net>
+ <CALCETrXHbS9VXfZ80kOjiTrreM2EbapYeGp68mvJPbosUtorYA@mail.gmail.com>
+ <459e2273-bc27-f422-601b-2d6cdaf06f84@amazon.com>
+ <CALCETrVRuQb-P7auHCgxzs5L=qA2_qHzVGTtRMAqoMAut0ETFw@mail.gmail.com>
+ <f1dfbfb4-d2d5-bf30-600f-9e756a352860@intel.com>
+In-Reply-To: <f1dfbfb4-d2d5-bf30-600f-9e756a352860@intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=namit@vmware.com; 
+x-originating-ip: [66.170.99.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3138119f-192d-4a66-3623-08d6f024a7b4
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:BYAPR05MB5606;
+x-ms-traffictypediagnostic: BYAPR05MB5606:
+x-microsoft-antispam-prvs: <BYAPR05MB560608061DABE837F6843E9DD0EF0@BYAPR05MB5606.namprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 0067A8BA2A
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(396003)(136003)(346002)(376002)(366004)(39860400002)(189003)(199004)(186003)(54906003)(478600001)(7416002)(73956011)(66066001)(68736007)(66446008)(2906002)(53936002)(66556008)(256004)(6512007)(229853002)(66476007)(102836004)(86362001)(26005)(316002)(110136005)(66946007)(99286004)(76116006)(6436002)(25786009)(14444005)(64756008)(8676002)(6116002)(476003)(81166006)(2616005)(81156014)(3846002)(14454004)(8936002)(71200400001)(71190400001)(6506007)(6486002)(446003)(33656002)(486006)(5660300002)(76176011)(305945005)(7736002)(11346002)(36756003)(4326008)(6246003)(53546011);DIR:OUT;SFP:1101;SCL:1;SRVR:BYAPR05MB5606;H:BYAPR05MB4776.namprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: vmware.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: tfM+xbizek82UJYpE3G8pFbHDAIfKne8E0piLlxImGYOVsTd/BtZ271EEEBwBUKnQvUnNFfwmQT1AWlkDaI64IcidF58phoH4FFXKV+gGo0vBj3kSsnAaqrPulXuCVHqEFuUF5hDg72K8XxAUVavRX1pXZWXlxr8VZGrNncEExqK7Hs0NTkNgUAknDyN82STOU8RYlsHp+BtEeAJRq409Z6t7EGI3WeaXa/VA5/qyObjcInqbybd8D1Dbxp6ITMC4VECnHQADw6XowyZ6n2d4iF71avLFRAzZjU0Bu/k8WE4sSB9NdS6RLPPiL2wIKWCWpBvcsLPcNHqd3aYwpCLSnGUB3Rbx4iIoqNfkaEgCjGYZakqV5ybKCcrxnN4p2TPL/pgDFyFVeAEhm6GO55EfdS9zjmTn5GBs/NNoh5UfME=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <561CA2F7569D154F92346C3F1D71EDE0@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: vmware.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3138119f-192d-4a66-3623-08d6f024a7b4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2019 17:29:14.0329
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: namit@vmware.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR05MB5606
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/06/19 19:12, Radim Krčmář wrote:
-> 2019-06-13 13:03+0200, Paolo Bonzini:
->> Even when asynchronous page fault is disabled, KVM does not want to pause
->> the host if a guest triggers a page fault; instead it will put it into
->> an artificial HLT state that allows running other host processes while
->> allowing interrupt delivery into the guest.
->>
->> However, the way this feature is triggered is a bit confusing.
->> First, it is not used for page faults while a nested guest is
->> running: but this is not an issue since the artificial halt
->> is completely invisible to the guest, either L1 or L2.  Second,
->> it is used even if kvm_halt_in_guest() returns true; in this case,
->> the guest probably should not pay the additional latency cost of the
->> artificial halt, and thus we should handle the page fault in a
->> completely synchronous way.
-> 
-> The same reasoning would apply to kvm_mwait_in_guest(), so I would
-> disable APF with it as well.
+> On Jun 13, 2019, at 9:20 AM, Dave Hansen <dave.hansen@intel.com> wrote:
+>=20
+> On 6/13/19 9:13 AM, Andy Lutomirski wrote:
+>>> It might make sense to use it for kmap_atomic() for debug purposes, as
+>>> it ensures that other users can no longer access the same mapping
+>>> through the linear map. However, it does come at quite a big cost, as w=
+e
+>>> need to shoot down the TLB of all other threads in the system. So I'm
+>>> not sure it's of general value?
+>> What I meant was that kmap_atomic() could use mm-local memory so that
+>> it doesn't need to do a global shootdown.  But I guess it's not
+>> actually used for real on 64-bit, so this is mostly moot.  Are you
+>> planning to support mm-local on 32-bit?
+>=20
+> Do we *do* global shootdowns on kmap_atomic()s on 32-bit?  I thought we
+> used entirely per-cpu addresses, so a stale entry from another CPU can
+> get loaded in the TLB speculatively but it won't ever actually get used.
+> I think it goes:
+>=20
+> kunmap_atomic() ->
+> __kunmap_atomic() ->
+> kpte_clear_flush() ->
+> __flush_tlb_one_kernel() ->
+> __flush_tlb_one_user() ->
+> __native_flush_tlb_one_user() ->
+> invlpg
+>=20
+> The per-cpu address calculation is visible in kmap_atomic_prot():
+>=20
+>        idx =3D type + KM_TYPE_NR*smp_processor_id();
 
-True, on the other hand it's not a very sensible condition to have
-kvm_mwait_in_guest but not kvm_halt_in_guest.
+From a security point-of-view, having such an entry is still not too good,
+since the mapping protection might override the default protection. This
+might lead to potential W+X cases, for example, that might stay for a long
+time if they are speculatively cached in the TLB and not invalidated upon
+kunmap_atomic().
 
->> By introducing a new function kvm_can_deliver_async_pf, this patch
->> commonizes the code that chooses whether to deliver an async page fault
->> (kvm_arch_async_page_not_present) and the code that chooses whether a
->> page fault should be handled synchronously (kvm_can_do_async_pf).
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> @@ -9775,6 +9775,36 @@ static int apf_get_user(struct kvm_vcpu *vcpu, u32 *val)
->> +bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
->> +{
->> +	if (unlikely(!lapic_in_kernel(vcpu) ||
->> +		     kvm_event_needs_reinjection(vcpu) ||
->> +		     vcpu->arch.exception.pending))
->> +		return false;
->> +
->> +	if (kvm_hlt_in_guest(vcpu->kvm) && !kvm_can_deliver_async_pf(vcpu))
->> +		return false;
->> +
->> +	/*
->> +	 * If interrupts are off we cannot even use an artificial
->> +	 * halt state.
-> 
-> Can't we?  The artificial halt state would be canceled by the host page
-> fault handler.
-
-hlt allows interrupts to be injected, which of course is not possible in
-an interrupt-off region.  But, the only difference is that halt_poll is
-not obeyed for synchronous page fault handling; either way, the vCPU
-thread stays in the kernel but it is scheduled out while the page fault
-is being handled.  This is only for lapic_in_kernel so hlt does not
-leave KVM_RUN.
-
->> +	 */
->> +	return kvm_x86_ops->interrupt_allowed(vcpu);
->> @@ -9783,19 +9813,26 @@ void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
->>  	trace_kvm_async_pf_not_present(work->arch.token, work->gva);
->>  	kvm_add_async_pf_gfn(vcpu, work->arch.gfn);
->>  
->> -	if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED) ||
->> -	    (vcpu->arch.apf.send_user_only &&
->> -	     kvm_x86_ops->get_cpl(vcpu) == 0))
->> +	if (!kvm_can_deliver_async_pf(vcpu) ||
->> +	    apf_put_user(vcpu, KVM_PV_REASON_PAGE_NOT_PRESENT)) {
->> +		/*
->> +		 * It is not possible to deliver a paravirtualized asynchronous
->> +		 * page fault, but putting the guest in an artificial halt state
->> +		 * can be beneficial nevertheless: if an interrupt arrives, we
->> +		 * can deliver it timely and perhaps the guest will schedule
->> +		 * another process.  When the instruction that triggered a page
->> +		 * fault is retried, hopefully the page will be ready in the host.
->> +		 */
->>  		kvm_make_request(KVM_REQ_APF_HALT, vcpu);
-> 
-> A return is missing here, to prevent the delivery of PV APF.
-> (I'd probably keep the if/else.)
-
-Fixed in v2 (keeping the if/else but swapping the two arms).
-
-Paolo
-
-> Thanks.
-> 
->> -	else if (!apf_put_user(vcpu, KVM_PV_REASON_PAGE_NOT_PRESENT)) {
->> -		fault.vector = PF_VECTOR;
->> -		fault.error_code_valid = true;
->> -		fault.error_code = 0;
->> -		fault.nested_page_fault = false;
->> -		fault.address = work->arch.token;
->> -		fault.async_page_fault = true;
->> -		kvm_inject_page_fault(vcpu, &fault);
-> 
->>  	}
->> +
->> +	fault.vector = PF_VECTOR;
->> +	fault.error_code_valid = true;
->> +	fault.error_code = 0;
->> +	fault.nested_page_fault = false;
->> +	fault.address = work->arch.token;
->> +	fault.async_page_fault = true;
->> +	kvm_inject_page_fault(vcpu, &fault);
->>  }
->>  
->>  void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
->> -- 
->> 1.8.3.1
->>
+Having said that, I am not too excited to deal with this issue. Do people
+still care about x86/32-bit? In addition, if kunmap_atomic() is used when
+IRQs are disabled, sending a TLB shootdown during kunmap_atomic() can cause
+a deadlock.
 
