@@ -2,127 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A7913441FA
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 18:20:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36BC044250
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 18:22:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731223AbfFMQSW convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 13 Jun 2019 12:18:22 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42303 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733063AbfFMQR6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 12:17:58 -0400
-Received: by mail-wr1-f65.google.com with SMTP id x17so6141227wrl.9
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 09:17:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=+ExDmq83dNbYZk/tg/QUni7x/D2i/YpUnnQbUVgRM1g=;
-        b=HPwTEE5Pjb7z/ImtSQffWZB1daB6uYCSB0bkRjOxAaW0YEstxkiuPeZ9DTN/8WDtdQ
-         pezMh2/DQSbnZGoLOdw2Dq+BePmbf0Nu4mDEbfE1rMA+GSXJ0Xnhp0sm2+OYLg24TOdi
-         N3CH6ktKXsSlioH5YSExMntzygJ+EgbCVLK7Ip8VyduXQpOPFJU/rWPA8GnBVBUeQgNy
-         C5vr4gShCkRGuUT/AHLpBUDnKbCT70QTEPwjQvKb8cjm45xG1u5x/8oLXFiymg9P+v2J
-         pqwTFRq+oTmfSFwd9FgTRNJOaZGeMRmWP/x0em5wK84z1EBQdKPswmYRBktppadkke5k
-         cn1g==
-X-Gm-Message-State: APjAAAUA0HLAcuJdFKL82QRYYILu8+K9Yl41kKzpicCrx3hb0uho5xBA
-        SARPe5j/0VcSb0Eq+fMQSvc/Sg==
-X-Google-Smtp-Source: APXvYqw7fiCb3kkZyxbRFxo4VVBrfPt65Goan0zuATppllSWJ/nVFQ8A9q+sa1xWwDQSlKFs+w4gnw==
-X-Received: by 2002:adf:8367:: with SMTP id 94mr10309136wrd.179.1560442676625;
-        Thu, 13 Jun 2019 09:17:56 -0700 (PDT)
-Received: from ?IPv6:2a01:e35:8b6a:1220:f9e9:3f02:38a3:837b? ([2a01:e35:8b6a:1220:f9e9:3f02:38a3:837b])
-        by smtp.gmail.com with ESMTPSA id t6sm403947wmb.29.2019.06.13.09.17.55
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 09:17:55 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: mdevctl: A shoestring mediated device management and persistence
- utility
-From:   Christophe de Dinechin <cdupontd@redhat.com>
-In-Reply-To: <20190523172001.41f386d8@x1.home>
-Date:   Thu, 13 Jun 2019 18:17:53 +0200
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Libvirt Devel <libvir-list@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Erik Skultety <eskultet@redhat.com>,
-        Pavel Hrdina <phrdina@redhat.com>,
-        =?utf-8?B?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>,
-        Sylvain Bauza <sbauza@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <0358F503-E2C7-42DC-8186-34D1DA31F6D7@redhat.com>
-References: <20190523172001.41f386d8@x1.home>
-To:     Alex Williamson <alex.williamson@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        id S2388923AbfFMQVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 12:21:18 -0400
+Received: from mga02.intel.com ([134.134.136.20]:11431 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727153AbfFMQVR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 12:21:17 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Jun 2019 09:21:16 -0700
+X-ExtLoop1: 1
+Received: from enagarix-mobl.amr.corp.intel.com (HELO [10.251.15.213]) ([10.251.15.213])
+  by orsmga004.jf.intel.com with ESMTP; 13 Jun 2019 09:21:16 -0700
+Subject: Re: [RFC 00/10] Process-local memory allocations for hiding KVM
+ secrets
+To:     Andy Lutomirski <luto@kernel.org>,
+        Alexander Graf <graf@amazon.com>, Nadav Amit <namit@vmware.com>
+Cc:     Marius Hillenbrand <mhillenb@amazon.de>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>,
+        Linux-MM <linux-mm@kvack.org>, Alexander Graf <graf@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>
+References: <20190612170834.14855-1-mhillenb@amazon.de>
+ <eecc856f-7f3f-ed11-3457-ea832351e963@intel.com>
+ <A542C98B-486C-4849-9DAC-2355F0F89A20@amacapital.net>
+ <CALCETrXHbS9VXfZ80kOjiTrreM2EbapYeGp68mvJPbosUtorYA@mail.gmail.com>
+ <459e2273-bc27-f422-601b-2d6cdaf06f84@amazon.com>
+ <CALCETrVRuQb-P7auHCgxzs5L=qA2_qHzVGTtRMAqoMAut0ETFw@mail.gmail.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+Message-ID: <f1dfbfb4-d2d5-bf30-600f-9e756a352860@intel.com>
+Date:   Thu, 13 Jun 2019 09:20:53 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <CALCETrVRuQb-P7auHCgxzs5L=qA2_qHzVGTtRMAqoMAut0ETFw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 6/13/19 9:13 AM, Andy Lutomirski wrote:
+>> It might make sense to use it for kmap_atomic() for debug purposes, as
+>> it ensures that other users can no longer access the same mapping
+>> through the linear map. However, it does come at quite a big cost, as we
+>> need to shoot down the TLB of all other threads in the system. So I'm
+>> not sure it's of general value?
+> What I meant was that kmap_atomic() could use mm-local memory so that
+> it doesn't need to do a global shootdown.  But I guess it's not
+> actually used for real on 64-bit, so this is mostly moot.  Are you
+> planning to support mm-local on 32-bit?
 
+Do we *do* global shootdowns on kmap_atomic()s on 32-bit?  I thought we
+used entirely per-cpu addresses, so a stale entry from another CPU can
+get loaded in the TLB speculatively but it won't ever actually get used.
+ I think it goes:
 
-> On 24 May 2019, at 01:20, Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
-> Hi,
-> 
-> Currently mediated device management, much like SR-IOV VF management,
-> is largely left as an exercise for the user.  This is an attempt to
-> provide something and see where it goes.  I doubt we'll solve
-> everyone's needs on the first pass, but maybe we'll solve enough and
-> provide helpers for the rest.  Without further ado, I'll point to what
-> I have so far:
-> 
-> https://github.com/awilliam/mdevctl
+kunmap_atomic() ->
+__kunmap_atomic() ->
+kpte_clear_flush() ->
+__flush_tlb_one_kernel() ->
+__flush_tlb_one_user() ->
+__native_flush_tlb_one_user() ->
+invlpg
 
-While it’s still early, what about :
+The per-cpu address calculation is visible in kmap_atomic_prot():
 
-	mdevctl create-mdev <parent-device> <mdev-type> [<mdev-uuid>]
-
-where if the mdev-uuid is missing, you just run uuidgen within the script?
-
-I sent a small PR in case you think it makes sense.
-
-
-Thanks,
-Christophe
-
-> 
-> This is inspired by driverctl, which is also a bash utility.  mdevctl
-> uses udev and systemd to record and recreate mdev devices for
-> persistence and provides a command line utility for querying, listing,
-> starting, stopping, adding, and removing mdev devices.  Currently, for
-> better or worse, it considers anything created to be persistent.  I can
-> imagine a global configuration option that might disable this and
-> perhaps an autostart flag per mdev device, such that mdevctl might
-> simply "know" about some mdevs but not attempt to create them
-> automatically.  Clearly command line usage help, man pages, and
-> packaging are lacking as well, release early, release often, plus this
-> is a discussion starter to see if perhaps this is sufficient to meet
-> some needs.
-> 
-> Originally I thought about making a utility to manage both mdev and
-> SR-IOV VFs all in one, but it seemed more natural to start here
-> (besides, I couldn't think of a good name for the combined utility).
-> If this seems useful, maybe I'll start on a vfctl for SR-IOV and we'll
-> see whether they have enough synergy to become one.
-> 
-> It would be really useful if s390 folks could help me understand
-> whether it's possible to glean all the information necessary to
-> recreate a ccw or ap mdev device from sysfs.  I expect the file where
-> we currently only store the mdev_type to evolve into something that
-> includes more information to facilitate more complicated devices.  For
-> now I make no claims to maintaining compatibility of recorded mdev
-> devices, it will absolutely change, but I didn't want to get bogged
-> down in making sure I don't accidentally source a root kit hidden in an
-> mdev config file.
-> 
-> I'm also curious how or if libvirt or openstack might use this.  If
-> nothing else, it makes libvirt hook scripts easier to write, especially
-> if we add an option not to autostart mdevs, or if users don't mind
-> persistent mdevs, maybe there's nothing more to do.
-> 
-> BTW, feel free to clean up by bash, I'm a brute force and ignorance
-> shell coder ;)  Thanks,
-> 
-> Alex
-
+        idx = type + KM_TYPE_NR*smp_processor_id();
