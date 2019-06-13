@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EFC8B44802
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:07:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4EBA448A1
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:10:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393281AbfFMRDg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S2393574AbfFMRJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 13:09:59 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:36691 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2393266AbfFMRDg (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 13 Jun 2019 13:03:36 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:56098 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729782AbfFMRDe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 13:03:34 -0400
-Received: by mail-wm1-f67.google.com with SMTP id a15so10963508wmj.5;
-        Thu, 13 Jun 2019 10:03:33 -0700 (PDT)
+Received: by mail-wr1-f66.google.com with SMTP id n4so21629094wrs.3;
+        Thu, 13 Jun 2019 10:03:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=7m3hMtDG7gra4X2zWk3roSWCEEO5EloSfs0dzfM9Apo=;
-        b=tauNLy6bXrdunw+dGY7UPzi569AXF/L59P1VXZL5xSxv7d3DhA+KdWe49kz5kSjdw+
-         Xj85YtiFbt884q5VSpfMECTWrgrZkAjpTzmhXmIYdrpGcgZthDuybh1SvrfQOyWS0RHh
-         XrekiJjrLprAQbw1aEIH01BaVXGrv5C4GT3t7CVeajy5ou+68XCPGxVfHou4GbHVt+nm
-         pUljNiF5uHfg55WvWtF86bvhGpv7WGaLXsCagILMsFt1Yq51nwyxfpy/xKlMATgHQq3H
-         I4UrmC1pAQCvTK1zGniWI0XtigXmXUf10Hd+a+/yAgpygT5CXA71SPlLnDvxtO+JReWW
-         Zivg==
+        bh=LNkyAGPk1iKZCEgQnBFbCeLjAmjPtNmmbmMQ3KLc/JY=;
+        b=jH9THcz7JwqDftxHoT6yKTB3EfG2eMSMoQRA2zyxLVjXPtWqSn/aiq/+Fc0a9hUomU
+         J+nIhekKfl0hGlWQ8KAcEqRePevH76QmFPp7y+LHN3LvREtM+TOYFZ4TtGU+D7xkT63F
+         GqkKHs6dPhwfrxws3wPkWu6ga8eIVICmsijlAjzfDqrciF3KEOMA9FuOpWLZej22FxTR
+         p9Dp9hzHk7erhotlnjt631nS82RVyUW/GrD0hJFOoI6OUDhFxKEwI17pyX6j0KGCUL3h
+         Cw1GOa4YHrbLppJdt9/LH99YGgL1WjfV5Tt/pK8mo4YOpyDk2CaGUYeh/Aarjd87d+gk
+         MhwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=7m3hMtDG7gra4X2zWk3roSWCEEO5EloSfs0dzfM9Apo=;
-        b=adFEVZ7FyNBRr8CLd0NHCrsT+ecG2bgvPzwBnY29iWClJ/KNJkOm/wsjdS+cA7VgpC
-         iWhZlFSLDIMte4FlBvvyHm8PYTfxpNiOv1JYumPn81ji3uW2ZyC+l/o+lG0oJ6FwOQ7b
-         HpoHbJ1TxnpYiMrURCbD6a6ZPWjQ3z/1At5Ld62FrFNDc0/G6suGsnk5TgVfFW5/ZRay
-         EwF1fPLxH3QJjtlbL7hDMpRIIvfEa+jBQ81LUB8LZ86Bac+gPNhhyybBjfcgxaen8666
-         R/A+FP+CUxheBRBHdpPihLw0Mkc2PsuHZYOfkbz+fersscrdvE+mjizV3vn90meByQCZ
-         oLyQ==
-X-Gm-Message-State: APjAAAUM1q+PQjhYXe5Qh7Q3h3ztKjh2wH+j8jvk9GpQ+4lBIVoOfblT
-        PbzMozCjcMvD5ixVF4NdmNGIPdX1
-X-Google-Smtp-Source: APXvYqxu4kCzKA7T0Wtw/Hp+cpnGxPexT97EFPhWjhA/Q4yqMKDXbO1bwBc5hd5Ea1Yk2JQ4PZyZyA==
-X-Received: by 2002:a1c:7310:: with SMTP id d16mr4447800wmb.107.1560445413046;
+        bh=LNkyAGPk1iKZCEgQnBFbCeLjAmjPtNmmbmMQ3KLc/JY=;
+        b=Sfn/vuuDcy6cRsz8Lyxk1g08JWwybeJFrAt6bhuTAMxCab58S3YVH7JKGMVPAttSPC
+         F99iNWmqEuv4hk/xaW4rwioheehdxu9BosiyV/pJKKmor8NPbHDOjqoPDkLRPeBWLgTn
+         drIq3tgaKROh3Y3VM+DIlPzPvQxkL965BQCb1xO6PRjrFsJkuG+8M9Qb47mYr5Pt5/iy
+         2LMG5wMdOEIm9OWjgSMQ7h6R7Mf7D/LfiJ4n9Ah5Cz4DDYVPn26tKkUciZFsBDHuIaVS
+         DbxxIQZWc0/7T/fBfLsbaCuZAh8rJ1vbKhl0aiNPBYPENxY84Qdew+iybkFxPhbTaQuN
+         mzsw==
+X-Gm-Message-State: APjAAAWFy4mVkWvSkkacDF1CZB1TyzfIzbPjO4AGMb6TbmpcE0ZPaCC0
+        lZwHyhZVsDa3pN1YbRrsYNstd2oT
+X-Google-Smtp-Source: APXvYqzrmOSIeIRT3Hbew41lagbGcge6uoHXX4UaJu1fzQDFPwkiaFbYCAdm1MlLzN2ABLWaC/bvAg==
+X-Received: by 2002:a05:6000:4b:: with SMTP id k11mr9221466wrx.82.1560445413938;
         Thu, 13 Jun 2019 10:03:33 -0700 (PDT)
 Received: from 640k.localdomain ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id a10sm341856wrx.17.2019.06.13.10.03.32
+        by smtp.gmail.com with ESMTPSA id a10sm341856wrx.17.2019.06.13.10.03.33
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 10:03:32 -0700 (PDT)
+        Thu, 13 Jun 2019 10:03:33 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         vkuznets@redhat.com
-Subject: [PATCH 02/43] kvm: nVMX: small cleanup in handle_exception
-Date:   Thu, 13 Jun 2019 19:02:48 +0200
-Message-Id: <1560445409-17363-3-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 03/43] KVM: VMX: Read cached VM-Exit reason to detect external interrupt
+Date:   Thu, 13 Jun 2019 19:02:49 +0200
+Message-Id: <1560445409-17363-4-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
 References: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
@@ -58,34 +58,129 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The reason for skipping handling of NMI and #MC in handle_exception is
-the same, namely they are handled earlier by vmx_complete_atomic_exit.
-Calling the machine check handler (which just returns 1) is misleading,
-don't do it.
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
+Generic x86 code invokes the kvm_x86_ops external interrupt handler on
+all VM-Exits regardless of the actual exit type.  Use the already-cached
+EXIT_REASON to determine if the VM-Exit was due to an interrupt, thus
+avoiding an extra VMREAD (to query VM_EXIT_INTR_INFO) for all other
+types of VM-Exit.
+
+In addition to avoiding the extra VMREAD, checking the EXIT_REASON
+instead of VM_EXIT_INTR_INFO makes it more obvious that
+vmx_handle_external_intr() is called for all VM-Exits, e.g. someone
+unfamiliar with the flow might wonder under what condition(s)
+VM_EXIT_INTR_INFO does not contain a valid interrupt, which is
+simply not possible since KVM always runs with "ack interrupt on exit".
+
+WARN once if VM_EXIT_INTR_INFO doesn't contain a valid interrupt on
+an EXTERNAL_INTERRUPT VM-Exit, as such a condition would indicate a
+hardware bug.
+
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ arch/x86/kvm/vmx/vmcs.h |  6 +++++
+ arch/x86/kvm/vmx/vmx.c  | 62 ++++++++++++++++++++++++++-----------------------
+ 2 files changed, 39 insertions(+), 29 deletions(-)
 
+diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
+index cb6079f8a227..971a46c69df4 100644
+--- a/arch/x86/kvm/vmx/vmcs.h
++++ b/arch/x86/kvm/vmx/vmcs.h
+@@ -115,6 +115,12 @@ static inline bool is_nmi(u32 intr_info)
+ 		== (INTR_TYPE_NMI_INTR | INTR_INFO_VALID_MASK);
+ }
+ 
++static inline bool is_external_intr(u32 intr_info)
++{
++	return (intr_info & (INTR_INFO_VALID_MASK | INTR_INFO_INTR_TYPE_MASK))
++		== (INTR_INFO_VALID_MASK | INTR_TYPE_EXT_INTR);
++}
++
+ enum vmcs_field_width {
+ 	VMCS_FIELD_WIDTH_U16 = 0,
+ 	VMCS_FIELD_WIDTH_U64 = 1,
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 1b3ca0582a0c..da6c829bad9f 100644
+index da6c829bad9f..b541fe2c6347 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4455,11 +4455,8 @@ static int handle_exception(struct kvm_vcpu *vcpu)
- 	vect_info = vmx->idt_vectoring_info;
- 	intr_info = vmx->exit_intr_info;
+@@ -6127,42 +6127,46 @@ static void vmx_complete_atomic_exit(struct vcpu_vmx *vmx)
  
--	if (is_machine_check(intr_info))
--		return handle_machine_check(vcpu);
+ static void vmx_handle_external_intr(struct kvm_vcpu *vcpu)
+ {
+-	u32 exit_intr_info = vmcs_read32(VM_EXIT_INTR_INFO);
 -
--	if (is_nmi(intr_info))
--		return 1;  /* already handled by vmx_vcpu_run() */
-+	if (is_machine_check(intr_info) || is_nmi(intr_info))
-+		return 1;  /* already handled by vmx_complete_atomic_exit */
+-	if ((exit_intr_info & (INTR_INFO_VALID_MASK | INTR_INFO_INTR_TYPE_MASK))
+-			== (INTR_INFO_VALID_MASK | INTR_TYPE_EXT_INTR)) {
+-		unsigned int vector;
+-		unsigned long entry;
+-		gate_desc *desc;
+-		struct vcpu_vmx *vmx = to_vmx(vcpu);
++	unsigned int vector;
++	unsigned long entry;
+ #ifdef CONFIG_X86_64
+-		unsigned long tmp;
++	unsigned long tmp;
+ #endif
++	gate_desc *desc;
++	u32 intr_info;
  
- 	if (is_invalid_opcode(intr_info))
- 		return handle_ud(vcpu);
+-		vector =  exit_intr_info & INTR_INFO_VECTOR_MASK;
+-		desc = (gate_desc *)vmx->host_idt_base + vector;
+-		entry = gate_offset(desc);
+-		asm volatile(
++	if (to_vmx(vcpu)->exit_reason != EXIT_REASON_EXTERNAL_INTERRUPT)
++		return;
++
++	intr_info = vmcs_read32(VM_EXIT_INTR_INFO);
++	if (WARN_ONCE(!is_external_intr(intr_info),
++	    "KVM: unexpected VM-Exit interrupt info: 0x%x", intr_info))
++		return;
++
++	vector = intr_info & INTR_INFO_VECTOR_MASK;
++	desc = (gate_desc *)vmx->host_idt_base + vector;
++	entry = gate_offset(desc);
++
++	asm volatile(
+ #ifdef CONFIG_X86_64
+-			"mov %%" _ASM_SP ", %[sp]\n\t"
+-			"and $0xfffffffffffffff0, %%" _ASM_SP "\n\t"
+-			"push $%c[ss]\n\t"
+-			"push %[sp]\n\t"
++		"mov %%" _ASM_SP ", %[sp]\n\t"
++		"and $0xfffffffffffffff0, %%" _ASM_SP "\n\t"
++		"push $%c[ss]\n\t"
++		"push %[sp]\n\t"
+ #endif
+-			"pushf\n\t"
+-			__ASM_SIZE(push) " $%c[cs]\n\t"
+-			CALL_NOSPEC
+-			:
++		"pushf\n\t"
++		__ASM_SIZE(push) " $%c[cs]\n\t"
++		CALL_NOSPEC
++		:
+ #ifdef CONFIG_X86_64
+-			[sp]"=&r"(tmp),
++		[sp]"=&r"(tmp),
+ #endif
+-			ASM_CALL_CONSTRAINT
+-			:
+-			THUNK_TARGET(entry),
+-			[ss]"i"(__KERNEL_DS),
+-			[cs]"i"(__KERNEL_CS)
+-			);
+-	}
++		ASM_CALL_CONSTRAINT
++		:
++		THUNK_TARGET(entry),
++		[ss]"i"(__KERNEL_DS),
++		[cs]"i"(__KERNEL_CS)
++	);
+ }
+ STACK_FRAME_NON_STANDARD(vmx_handle_external_intr);
+ 
 -- 
 1.8.3.1
 
