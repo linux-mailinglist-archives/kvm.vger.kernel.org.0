@@ -2,90 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 34E5B4497F
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:18:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1451E4498D
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:22:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728119AbfFMRSG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 13:18:06 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:54647 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726230AbfFMRSF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 13:18:05 -0400
-Received: by mail-wm1-f65.google.com with SMTP id g135so11025761wme.4
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 10:18:04 -0700 (PDT)
+        id S1728428AbfFMRWR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 13:22:17 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42949 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726091AbfFMRWR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 13:22:17 -0400
+Received: by mail-wr1-f65.google.com with SMTP id x17so6344143wrl.9;
+        Thu, 13 Jun 2019 10:22:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=AQp+KFfeJT0OSBL+CCZ/KccGQKuMHF8GjaLwYUkA7w4=;
+        b=sHiDmHhhDVNB6jBg1CpsijuLuoyb8ZnTgwF8s7AtooTKwHkbT4jRrvhHZd1otUQTNg
+         d0dK9U0nqWviFJwM6rez1MJ9K7folNyvD761obQX7r4+Gb94XE6FGIefM9ccYfdXBBcn
+         MTONy7tYsyn4cfO0O4lVhmIR94/1kBMD+Ju2JEDa79AaxgwOMus/crbX93a0/urTvtfW
+         IJp+10VTdzon6r4Hg1FHtme9NFkBLH+wIgXfSJYLs0LHFzrzNw69UFrdV5GRQ/9q3tq9
+         rB3gX4xe5V7FQfSD7wtSVa32qXs48cp+ytRujz6dybTeRrg9IbZL24Ud75Tv6GrXSVVf
+         ohgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=kNBPdXobpQxKhUp1vpZiR89rKDdrsNlQ94KX0iJwiks=;
-        b=HvtioscO1427GO7La0sw4z5i7xumLG/9ExiF0+uWId7jZRcrwHBZmOR23/1T0doTvC
-         X83NEJCahV27R4shYedjoesQAesR/UhhvA+moU0nVa5bUvC09DmNAgBWgmKSwBZ2to0X
-         f2cy8IeIB7k2pUOJl3oKEiVN3AZvt5uD7RWNXN80JGYFymqpe9n7w4h7sANvgK1btGpV
-         eFY/vSXu7auzbvrgg/5nhsBgbLIY+FhqQMlB4TwFfuIURqWB6Hy6xdsmrldcSrNoSnwh
-         RiBybGy/A3YUHJlDMQaUE/PPG0wHVVyj6i0hl1zuzW7z3Pfi1DDC6zF0wtNV3K/hXl7j
-         iuFQ==
-X-Gm-Message-State: APjAAAXnza8KgLmTPo9OIqjYNlRckym/IkdeRUl2MTg0jdbLXeVhLJOb
-        a5YnQtpJU/NpT4hcKZRMb5/veg==
-X-Google-Smtp-Source: APXvYqyRIf4uq8u6/A8e46V5D7KYAsHIEIste9gkTICRXaI/HuwGid/QXSginTxr8QOcW+gTJfuOCQ==
-X-Received: by 2002:a1c:2d5:: with SMTP id 204mr4849573wmc.175.1560446283818;
-        Thu, 13 Jun 2019 10:18:03 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:56e1:adff:fed9:caf0? ([2001:b07:6468:f312:56e1:adff:fed9:caf0])
-        by smtp.gmail.com with ESMTPSA id k82sm740121wma.15.2019.06.13.10.18.02
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 10:18:03 -0700 (PDT)
-Subject: Re: [PATCH 1/7] KVM: nVMX: Intercept VMWRITEs to read-only shadow
- VMCS fields
-To:     Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Liran Alon <liran.alon@oracle.com>
-References: <20190507153629.3681-1-sean.j.christopherson@intel.com>
- <20190507153629.3681-2-sean.j.christopherson@intel.com>
- <CALMp9eRb8GC1NH9agiWWwkY5ac4CKxZqzobzmLiV5FiscV_B+A@mail.gmail.com>
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=AQp+KFfeJT0OSBL+CCZ/KccGQKuMHF8GjaLwYUkA7w4=;
+        b=Mj/Ln8okeguL8OqLLsR2dN+2J+aUOON9TT6Sk5RHmNHTl+BHGDlEghly24L35YN6HK
+         SvLMJ3E6G1d4xgRhHeFyiGVGodZwavUFEUTbo1Zo3f+dmj3YwNozSmrIm6RVDqT3drWD
+         TuialyA8gNoSjVf2ZBWE57pos4YrgXCKQAr/p74TZTwTxuZlWAiooNBp2707nnyiESS0
+         9+uUkqNZ/LLpAp1g1sdZ5BnCHe/eBkinloiuPE5b8Vw9Zx8igwhNehB6WCObJ9EouU0C
+         zUHbRAG529Ytqk3wMp6in1rUq4Y1cuSgAojxp9ZViUv2C/OofgHc9emGoJAMRadAISk+
+         C5Eg==
+X-Gm-Message-State: APjAAAWD+f/BI26erw2TeqKdDMUsvKB9v8/L9zNwRXXzhPFVDKmiU7wc
+        ffcJW6vC2HLs5zjllVNK74hQxjB4
+X-Google-Smtp-Source: APXvYqwvlFPZ4u49f9kRdTgPQkkxRQPyaafuWh/FPUVFisw1squkleajFf5dr1Q0eo9nwbd2sJQ7cQ==
+X-Received: by 2002:adf:fc4f:: with SMTP id e15mr17445969wrs.2.1560446534240;
+        Thu, 13 Jun 2019 10:22:14 -0700 (PDT)
+Received: from 640k.localdomain ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id s10sm753538wmf.8.2019.06.13.10.22.13
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 13 Jun 2019 10:22:13 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9d82caf7-1735-a5e8-8206-bdec3ddf12d4@redhat.com>
-Date:   Thu, 13 Jun 2019 19:18:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <CALMp9eRb8GC1NH9agiWWwkY5ac4CKxZqzobzmLiV5FiscV_B+A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     rkrcmar@redhat.com
+Subject: [PATCH v2] KVM: x86: clean up conditions for asynchronous page fault handling
+Date:   Thu, 13 Jun 2019 19:22:12 +0200
+Message-Id: <1560446532-22494-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/06/19 19:02, Jim Mattson wrote:
-> On Tue, May 7, 2019 at 8:36 AM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
-> 
->> Not intercepting fields tagged read-only also allows for additional
->> optimizations, e.g. marking GUEST_{CS,SS}_AR_BYTES as SHADOW_FIELD_RO
->> since those fields are rarely written by a VMMs, but read frequently.
-> 
-> Do you have data to support this, or is this just a gut feeling? The
-> last time I looked at Virtual Box (which was admittedly a long time
-> ago), it liked to read and write just about every VMCS guest-state
-> field it could find on every VM-exit.
+Even when asynchronous page fault is disabled, KVM does not want to pause
+the host if a guest triggers a page fault; instead it will put it into
+an artificial HLT state that allows running other host processes while
+allowing interrupt delivery into the guest.
 
-I have never looked at VirtualBox, but most other hypervisors do have a
-common set of fields (give or take a couple) that they like to read
-and/or write on most if not every vmexit.
+However, the way this feature is triggered is a bit confusing.
+First, it is not used for page faults while a nested guest is
+running: but this is not an issue since the artificial halt
+is completely invisible to the guest, either L1 or L2.  Second,
+it is used even if kvm_halt_in_guest() returns true; in this case,
+the guest probably should not pay the additional latency cost of the
+artificial halt, and thus we should handle the page fault in a
+completely synchronous way.
 
-Also, while this may vary dynamically based on the L2 guest that is
-running, this is much less true for unrestricted-guest processors.
-Without data on _which_ scenarios are bad for a static set of shadowed
-fields, I'm not really happy to add even more complexity.
+By introducing a new function kvm_can_deliver_async_pf, this patch
+commonizes the code that chooses whether to deliver an async page fault
+(kvm_arch_async_page_not_present) and the code that chooses whether a
+page fault should be handled synchronously (kvm_can_do_async_pf).
 
-Paolo
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/mmu.c | 13 -------------
+ arch/x86/kvm/x86.c | 47 ++++++++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 42 insertions(+), 18 deletions(-)
 
-> The decision of which fields to shadow is really something that should
-> be done dynamically, depending on the behavior of the guest hypervisor
-> (which may vary depending on the L2 guest it's running!) Making the
-> decision statically is bound to result in a poor outcome for some
-> scenarios.
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index 3384c539d150..771349e72d2a 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -4040,19 +4040,6 @@ static int kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gva_t gva, gfn_t gfn)
+ 	return kvm_setup_async_pf(vcpu, gva, kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
+ }
+ 
+-bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
+-{
+-	if (unlikely(!lapic_in_kernel(vcpu) ||
+-		     kvm_event_needs_reinjection(vcpu) ||
+-		     vcpu->arch.exception.pending))
+-		return false;
+-
+-	if (!vcpu->arch.apf.delivery_as_pf_vmexit && is_guest_mode(vcpu))
+-		return false;
+-
+-	return kvm_x86_ops->interrupt_allowed(vcpu);
+-}
+-
+ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+ 			 gva_t gva, kvm_pfn_t *pfn, bool write, bool *writable)
+ {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6200d5a51f13..279ab4e8dd82 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9775,6 +9775,36 @@ static int apf_get_user(struct kvm_vcpu *vcpu, u32 *val)
+ 				      sizeof(u32));
+ }
+ 
++static bool kvm_can_deliver_async_pf(struct kvm_vcpu *vcpu)
++{
++	if (!vcpu->arch.apf.delivery_as_pf_vmexit && is_guest_mode(vcpu))
++		return false;
++
++	if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED) ||
++	    (vcpu->arch.apf.send_user_only &&
++	     kvm_x86_ops->get_cpl(vcpu) == 0))
++		return false;
++
++	return true;
++}
++
++bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
++{
++	if (unlikely(!lapic_in_kernel(vcpu) ||
++		     kvm_event_needs_reinjection(vcpu) ||
++		     vcpu->arch.exception.pending))
++		return false;
++
++	if (kvm_hlt_in_guest(vcpu->kvm) && !kvm_can_deliver_async_pf(vcpu))
++		return false;
++
++	/*
++	 * If interrupts are off we cannot even use an artificial
++	 * halt state.
++	 */
++	return kvm_x86_ops->interrupt_allowed(vcpu);
++}
++
+ void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+ 				     struct kvm_async_pf *work)
+ {
+@@ -9783,11 +9813,8 @@ void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+ 	trace_kvm_async_pf_not_present(work->arch.token, work->gva);
+ 	kvm_add_async_pf_gfn(vcpu, work->arch.gfn);
+ 
+-	if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED) ||
+-	    (vcpu->arch.apf.send_user_only &&
+-	     kvm_x86_ops->get_cpl(vcpu) == 0))
+-		kvm_make_request(KVM_REQ_APF_HALT, vcpu);
+-	else if (!apf_put_user(vcpu, KVM_PV_REASON_PAGE_NOT_PRESENT)) {
++	if (kvm_can_deliver_async_pf(vcpu) &&
++	    !apf_put_user(vcpu, KVM_PV_REASON_PAGE_NOT_PRESENT)) {
+ 		fault.vector = PF_VECTOR;
+ 		fault.error_code_valid = true;
+ 		fault.error_code = 0;
+@@ -9795,6 +9822,16 @@ void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+ 		fault.address = work->arch.token;
+ 		fault.async_page_fault = true;
+ 		kvm_inject_page_fault(vcpu, &fault);
++	} else {
++		/*
++		 * It is not possible to deliver a paravirtualized asynchronous
++		 * page fault, but putting the guest in an artificial halt state
++		 * can be beneficial nevertheless: if an interrupt arrives, we
++		 * can deliver it timely and perhaps the guest will schedule
++		 * another process.  When the instruction that triggered a page
++		 * fault is retried, hopefully the page will be ready in the host.
++		 */
++		kvm_make_request(KVM_REQ_APF_HALT, vcpu);
+ 	}
+ }
+ 
+-- 
+1.8.3.1
 
