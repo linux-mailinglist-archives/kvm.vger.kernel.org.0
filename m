@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B3DB144F98
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 00:55:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D78C444F9E
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 00:55:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726978AbfFMWzL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 18:55:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40404 "EHLO mx1.redhat.com"
+        id S1727495AbfFMWzT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 18:55:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42420 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725884AbfFMWzL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 18:55:11 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        id S1727130AbfFMWzQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 18:55:16 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 870053082AED;
-        Thu, 13 Jun 2019 22:55:10 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 757532F8BF7;
+        Thu, 13 Jun 2019 22:55:15 +0000 (UTC)
 Received: from amt.cnet (ovpn-112-4.gru2.redhat.com [10.97.112.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F10731001B2B;
-        Thu, 13 Jun 2019 22:55:06 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DDF562D1AB;
+        Thu, 13 Jun 2019 22:55:14 +0000 (UTC)
 Received: from amt.cnet (localhost [127.0.0.1])
-        by amt.cnet (Postfix) with ESMTP id 1B84B105189;
+        by amt.cnet (Postfix) with ESMTP id 9BA3610518C;
         Thu, 13 Jun 2019 19:53:05 -0300 (BRT)
 Received: (from marcelo@localhost)
-        by amt.cnet (8.14.7/8.14.7/Submit) id x5DMr49e025938;
-        Thu, 13 Jun 2019 19:53:04 -0300
-Message-ID: <20190613225023.067845318@redhat.com>
+        by amt.cnet (8.14.7/8.14.7/Submit) id x5DMr5BB025939;
+        Thu, 13 Jun 2019 19:53:05 -0300
+Message-ID: <20190613225023.119126969@redhat.com>
 User-Agent: quilt/0.66
-Date:   Thu, 13 Jun 2019 18:45:36 -0400
+Date:   Thu, 13 Jun 2019 18:45:37 -0400
 From:   Marcelo Tosatti <mtosatti@redhat.com>
 To:     kvm-devel <kvm@vger.kernel.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -42,170 +42,177 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Ankur Arora <ankur.a.arora@oracle.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         linux-pm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [patch 4/5] kvm: x86: add host poll control msrs
+Subject: [patch 5/5] cpuidle-haltpoll: disable host side polling when kvm virtualized
 References: <20190613224532.949768676@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-15
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Thu, 13 Jun 2019 22:55:10 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Thu, 13 Jun 2019 22:55:15 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add an MSRs which allows the guest to disable 
-host polling (specifically the cpuidle-haltpoll, 
-when performing polling in the guest, disables
-host side polling).
+When performing guest side polling, it is not necessary to 
+also perform host side polling. 
+
+So disable host side polling, via the new MSR interface, 
+when loading cpuidle-haltpoll driver.
 
 Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
 ---
- Documentation/virtual/kvm/msr.txt    |    9 +++++++++
- arch/x86/include/asm/kvm_host.h      |    2 ++
- arch/x86/include/uapi/asm/kvm_para.h |    2 ++
- arch/x86/kvm/Kconfig                 |    1 +
- arch/x86/kvm/cpuid.c                 |    3 ++-
- arch/x86/kvm/x86.c                   |   23 +++++++++++++++++++++++
- 6 files changed, 39 insertions(+), 1 deletion(-)
+ arch/x86/Kconfig                        |    7 +++++
+ arch/x86/include/asm/cpuidle_haltpoll.h |    8 ++++++
+ arch/x86/kernel/kvm.c                   |   42 ++++++++++++++++++++++++++++++++
+ drivers/cpuidle/cpuidle-haltpoll.c      |   10 ++++++-
+ include/linux/cpuidle_haltpoll.h        |   16 ++++++++++++
+ 5 files changed, 82 insertions(+), 1 deletion(-)
 
-Index: linux-2.6.git/Documentation/virtual/kvm/msr.txt
+Index: linux-2.6.git/arch/x86/include/asm/cpuidle_haltpoll.h
 ===================================================================
---- linux-2.6.git.orig/Documentation/virtual/kvm/msr.txt	2019-06-13 18:41:40.127920237 -0400
-+++ linux-2.6.git/Documentation/virtual/kvm/msr.txt	2019-06-13 18:42:06.149503132 -0400
-@@ -273,3 +273,12 @@
- 	guest must both read the least significant bit in the memory area and
- 	clear it using a single CPU instruction, such as test and clear, or
- 	compare and exchange.
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ linux-2.6.git/arch/x86/include/asm/cpuidle_haltpoll.h	2019-06-13 18:42:06.891491238 -0400
+@@ -0,0 +1,8 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ARCH_HALTPOLL_H
++#define _ARCH_HALTPOLL_H
 +
-+MSR_KVM_POLL_CONTROL: 0x4b564d05
-+	Control host side polling.
++void arch_haltpoll_enable(void);
++void arch_haltpoll_disable(void);
 +
-+	data: Bit 0 enables (1) or disables (0) host halt poll
-+	logic.
-+	KVM guests can disable host halt polling when performing
-+	polling themselves.
-+
-Index: linux-2.6.git/arch/x86/include/asm/kvm_host.h
++#endif
+Index: linux-2.6.git/drivers/cpuidle/cpuidle-haltpoll.c
 ===================================================================
---- linux-2.6.git.orig/arch/x86/include/asm/kvm_host.h	2019-06-13 18:41:40.127920237 -0400
-+++ linux-2.6.git/arch/x86/include/asm/kvm_host.h	2019-06-13 18:42:06.149503132 -0400
-@@ -755,6 +755,8 @@
- 		struct gfn_to_hva_cache data;
- 	} pv_eoi;
+--- linux-2.6.git.orig/drivers/cpuidle/cpuidle-haltpoll.c	2019-06-13 18:41:39.305933413 -0400
++++ linux-2.6.git/drivers/cpuidle/cpuidle-haltpoll.c	2019-06-13 18:42:06.892491222 -0400
+@@ -14,6 +14,7 @@
+ #include <linux/cpuidle.h>
+ #include <linux/module.h>
+ #include <linux/sched/idle.h>
++#include <linux/cpuidle_haltpoll.h>
  
-+	u64 msr_kvm_poll_control;
+ static int default_enter_idle(struct cpuidle_device *dev,
+ 			      struct cpuidle_driver *drv, int index)
+@@ -46,15 +47,22 @@
+ 
+ static int __init haltpoll_init(void)
+ {
++	int ret;
+ 	struct cpuidle_driver *drv = &haltpoll_driver;
+ 
+ 	cpuidle_poll_state_init(drv);
+ 
+-	return cpuidle_register(&haltpoll_driver, NULL);
++	ret = cpuidle_register(&haltpoll_driver, NULL);
 +
- 	/*
- 	 * Indicate whether the access faults on its page table in guest
- 	 * which is set when fix page fault and used to detect unhandeable
-Index: linux-2.6.git/arch/x86/include/uapi/asm/kvm_para.h
-===================================================================
---- linux-2.6.git.orig/arch/x86/include/uapi/asm/kvm_para.h	2019-06-13 18:41:40.127920237 -0400
-+++ linux-2.6.git/arch/x86/include/uapi/asm/kvm_para.h	2019-06-13 18:42:06.150503116 -0400
-@@ -29,6 +29,7 @@
- #define KVM_FEATURE_PV_TLB_FLUSH	9
- #define KVM_FEATURE_ASYNC_PF_VMEXIT	10
- #define KVM_FEATURE_PV_SEND_IPI	11
-+#define KVM_FEATURE_POLL_CONTROL	12
- 
- #define KVM_HINTS_REALTIME      0
- 
-@@ -47,6 +48,7 @@
- #define MSR_KVM_ASYNC_PF_EN 0x4b564d02
- #define MSR_KVM_STEAL_TIME  0x4b564d03
- #define MSR_KVM_PV_EOI_EN      0x4b564d04
-+#define MSR_KVM_POLL_CONTROL	0x4b564d05
- 
- struct kvm_steal_time {
- 	__u64 steal;
-Index: linux-2.6.git/arch/x86/kvm/Kconfig
-===================================================================
---- linux-2.6.git.orig/arch/x86/kvm/Kconfig	2019-06-13 18:41:40.127920237 -0400
-+++ linux-2.6.git/arch/x86/kvm/Kconfig	2019-06-13 18:42:06.150503116 -0400
-@@ -41,6 +41,7 @@
- 	select PERF_EVENTS
- 	select HAVE_KVM_MSI
- 	select HAVE_KVM_CPU_RELAX_INTERCEPT
-+	select HAVE_KVM_NO_POLL
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select KVM_VFIO
- 	select SRCU
-Index: linux-2.6.git/arch/x86/kvm/cpuid.c
-===================================================================
---- linux-2.6.git.orig/arch/x86/kvm/cpuid.c	2019-06-13 18:41:40.127920237 -0400
-+++ linux-2.6.git/arch/x86/kvm/cpuid.c	2019-06-13 18:42:06.150503116 -0400
-@@ -643,7 +643,8 @@
- 			     (1 << KVM_FEATURE_PV_UNHALT) |
- 			     (1 << KVM_FEATURE_PV_TLB_FLUSH) |
- 			     (1 << KVM_FEATURE_ASYNC_PF_VMEXIT) |
--			     (1 << KVM_FEATURE_PV_SEND_IPI);
-+			     (1 << KVM_FEATURE_PV_SEND_IPI) |
-+			     (1 << KVM_FEATURE_POLL_CONTROL);
- 
- 		if (sched_info_on())
- 			entry->eax |= (1 << KVM_FEATURE_STEAL_TIME);
-Index: linux-2.6.git/arch/x86/kvm/x86.c
-===================================================================
---- linux-2.6.git.orig/arch/x86/kvm/x86.c	2019-06-13 18:41:40.127920237 -0400
-+++ linux-2.6.git/arch/x86/kvm/x86.c	2019-06-13 18:42:06.151503100 -0400
-@@ -1177,6 +1177,7 @@
- 	MSR_IA32_POWER_CTL,
- 
- 	MSR_K7_HWCR,
-+	MSR_KVM_POLL_CONTROL,
- };
- 
- static unsigned num_emulated_msrs;
-@@ -2628,6 +2629,14 @@
- 			return 1;
- 		break;
- 
-+	case MSR_KVM_POLL_CONTROL:
-+		/* only enable bit supported */
-+		if (data & (-1ULL << 1))
-+			return 1;
++	if (ret == 0)
++		arch_haltpoll_enable();
 +
-+		vcpu->arch.msr_kvm_poll_control = data;
-+		break;
-+
- 	case MSR_IA32_MCG_CTL:
- 	case MSR_IA32_MCG_STATUS:
- 	case MSR_IA32_MC0_CTL ... MSR_IA32_MCx_CTL(KVM_MAX_MCE_BANKS) - 1:
-@@ -2877,6 +2886,9 @@
- 	case MSR_KVM_PV_EOI_EN:
- 		msr_info->data = vcpu->arch.pv_eoi.msr_val;
- 		break;
-+	case MSR_KVM_POLL_CONTROL:
-+		msr_info->data = vcpu->arch.msr_kvm_poll_control;
-+		break;
- 	case MSR_IA32_P5_MC_ADDR:
- 	case MSR_IA32_P5_MC_TYPE:
- 	case MSR_IA32_MCG_CAP:
-@@ -8877,6 +8889,10 @@
- 	msr.host_initiated = true;
- 	kvm_write_tsc(vcpu, &msr);
- 	vcpu_put(vcpu);
-+
-+	/* poll control enabled by default */
-+	vcpu->arch.msr_kvm_poll_control = 1;
-+
- 	mutex_unlock(&vcpu->mutex);
- 
- 	if (!kvmclock_periodic_sync)
-@@ -9951,6 +9967,13 @@
++	return ret;
  }
- EXPORT_SYMBOL_GPL(kvm_vector_hashing_enabled);
  
-+bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
+ static void __exit haltpoll_exit(void)
+ {
++	arch_haltpoll_disable();
+ 	cpuidle_unregister(&haltpoll_driver);
+ }
+ 
+Index: linux-2.6.git/include/linux/cpuidle_haltpoll.h
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ linux-2.6.git/include/linux/cpuidle_haltpoll.h	2019-06-13 18:42:06.892491222 -0400
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _CPUIDLE_HALTPOLL_H
++#define _CPUIDLE_HALTPOLL_H
++
++#ifdef CONFIG_ARCH_CPUIDLE_HALTPOLL
++#include <asm/cpuidle_haltpoll.h>
++#else
++static inline void arch_haltpoll_enable(void)
 +{
-+	return (vcpu->arch.msr_kvm_poll_control & 1) == 0;
 +}
-+EXPORT_SYMBOL_GPL(kvm_arch_no_poll);
 +
++static inline void arch_haltpoll_disable(void)
++{
++}
++#endif
++#endif
+Index: linux-2.6.git/arch/x86/Kconfig
+===================================================================
+--- linux-2.6.git.orig/arch/x86/Kconfig	2019-06-13 18:41:39.305933413 -0400
++++ linux-2.6.git/arch/x86/Kconfig	2019-06-13 18:42:06.893491206 -0400
+@@ -787,6 +787,7 @@
+ 	bool "KVM Guest support (including kvmclock)"
+ 	depends on PARAVIRT
+ 	select PARAVIRT_CLOCK
++	select ARCH_CPUIDLE_HALTPOLL
+ 	default y
+ 	---help---
+ 	  This option enables various optimizations for running under the KVM
+@@ -795,6 +796,12 @@
+ 	  underlying device model, the host provides the guest with
+ 	  timing infrastructure such as time of day, and system time
+ 
++config ARCH_CPUIDLE_HALTPOLL
++        def_bool n
++        prompt "Disable host haltpoll when loading haltpoll driver"
++        help
++	  If virtualized under KVM, disable host haltpoll.
 +
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
+ config PVH
+ 	bool "Support for running PVH guests"
+ 	---help---
+Index: linux-2.6.git/arch/x86/kernel/kvm.c
+===================================================================
+--- linux-2.6.git.orig/arch/x86/kernel/kvm.c	2019-06-13 18:41:39.305933413 -0400
++++ linux-2.6.git/arch/x86/kernel/kvm.c	2019-06-13 18:42:06.893491206 -0400
+@@ -853,3 +853,45 @@
+ }
+ 
+ #endif	/* CONFIG_PARAVIRT_SPINLOCKS */
++
++#ifdef CONFIG_ARCH_CPUIDLE_HALTPOLL
++
++static void kvm_disable_host_haltpoll(void *i)
++{
++	wrmsrl(MSR_KVM_POLL_CONTROL, 0);
++}
++
++static void kvm_enable_host_haltpoll(void *i)
++{
++	wrmsrl(MSR_KVM_POLL_CONTROL, 1);
++}
++
++void arch_haltpoll_enable(void)
++{
++	if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL)) {
++		printk(KERN_ERR "kvm: host does not support poll control\n");
++		printk(KERN_ERR "kvm: host upgrade recommended\n");
++		return;
++	}
++
++	preempt_disable();
++	/* Enable guest halt poll disables host halt poll */
++	kvm_disable_host_haltpoll(NULL);
++	smp_call_function(kvm_disable_host_haltpoll, NULL, 1);
++	preempt_enable();
++}
++EXPORT_SYMBOL_GPL(arch_haltpoll_enable);
++
++void arch_haltpoll_disable(void)
++{
++	if (!kvm_para_has_feature(KVM_FEATURE_POLL_CONTROL))
++		return;
++
++	preempt_disable();
++	/* Enable guest halt poll disables host halt poll */
++	kvm_enable_host_haltpoll(NULL);
++	smp_call_function(kvm_enable_host_haltpoll, NULL, 1);
++	preempt_enable();
++}
++EXPORT_SYMBOL_GPL(arch_haltpoll_disable);
++#endif
 
 
