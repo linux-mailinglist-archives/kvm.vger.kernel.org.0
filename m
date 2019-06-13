@@ -2,321 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1829B43BBF
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 17:31:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D069543BC4
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 17:32:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732424AbfFMPbU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 11:31:20 -0400
-Received: from foss.arm.com ([217.140.110.172]:37966 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728621AbfFMLCn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 07:02:43 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5543A3EF;
-        Thu, 13 Jun 2019 04:02:42 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 03BCD3F694;
-        Thu, 13 Jun 2019 04:04:20 -0700 (PDT)
-Date:   Thu, 13 Jun 2019 12:02:35 +0100
-From:   Dave Martin <Dave.Martin@arm.com>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Mark Rutland <mark.rutland@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Kees Cook <keescook@chromium.org>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: Re: [PATCH v17 03/15] arm64: Introduce prctl() options to control
- the tagged user addresses ABI
-Message-ID: <20190613110235.GW28398@e103592.cambridge.arm.com>
-References: <cover.1560339705.git.andreyknvl@google.com>
- <a7a2933bea5fe57e504891b7eec7e9432e5e1c1a.1560339705.git.andreyknvl@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a7a2933bea5fe57e504891b7eec7e9432e5e1c1a.1560339705.git.andreyknvl@google.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+        id S1732371AbfFMPbT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 11:31:19 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:35827 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728625AbfFMLDh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 07:03:37 -0400
+Received: by mail-wm1-f67.google.com with SMTP id c6so9672731wml.0;
+        Thu, 13 Jun 2019 04:03:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=AAokdGbMPUTql2roL80hHEWTvMypuX8aD+4nP0eZhJg=;
+        b=CbPmIijfPXDoXV/6fdU9wdARXOaTCWwYTRdbNMPEmpkRZ8maFC/ZdmRxxGlMTQ/3hz
+         vUXJyE0vWGq3gDdSIM6WkaglYKFKaE419iDXt3fCi3zXgPf29om3qzrsNr92kK2jSsQ2
+         BltsDxjefMJJ+nrbROi8RUd4lB7Iwv7DZFvFaYg5NeTpQUd+9FOhwYyEuFNf5l1mnfJ9
+         Y+Z41fwXHawT+PMi33vBe4vP5SBDL9vYSVxgs49WI2WwtWgYCvyfIwad4xc2HdeKVoml
+         1Rv2+r97sz7/Xw/G23U2yGnckqm/7+spNmLhqzhrudiVYTHaGfI19r6vgEb8sY9w32tb
+         3m5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=AAokdGbMPUTql2roL80hHEWTvMypuX8aD+4nP0eZhJg=;
+        b=SJ3KaZIBpFybJBUXyU+rN0OHJsWahGZ+R2eQji7WdGq85ahtcZfSMJE4h2HKPIDFC0
+         B/KUxAjEVL6smdIpBYtsWu7q9i9+G9k7cr4X51kWmDsY0Wh7Yx9BszNL58vMpOphBPla
+         m4SwaKV3MSXD6v4kwoY/nwLQSex4w1eW9P6hkwLuN4/CHcytoZIMNXeFltZJezcZtfmT
+         WUaiG9O9EJteNL2P8Ba04ejZhjHDDCr1duRoC+k6r7GgfGDIOyvG1TF8VJeOomfjcBn4
+         NnZKdPUJl3XotIEUu20PL39cJtEq/VdAZnTAazb0m+IZSRBOnb6elwq9PuuHXCA77ji2
+         OoIg==
+X-Gm-Message-State: APjAAAVNHvYrbk8MoNNp1KvBWwLyDtbhAaQUpz+Wt1+wx+qTUThqxLKN
+        8oJs8HOH/Es4DjRCcwL8MvAh18vo
+X-Google-Smtp-Source: APXvYqxKn6FTCHsgUKeM+24rUe23nKUqGI6M4rYLebz+9Ii33fcE0iibfJ+k2hx4q/8/b5f3Bul8zw==
+X-Received: by 2002:a05:600c:228f:: with SMTP id 15mr3447006wmf.31.1560423813983;
+        Thu, 13 Jun 2019 04:03:33 -0700 (PDT)
+Received: from 640k.localdomain ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id f21sm2596606wmb.2.2019.06.13.04.03.33
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 13 Jun 2019 04:03:33 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Wanpeng Li <wanpengli@tencent.com>
+Subject: [PATCH] KVM: x86: clean up conditions for asynchronous page fault handling
+Date:   Thu, 13 Jun 2019 13:03:32 +0200
+Message-Id: <1560423812-51166-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 12, 2019 at 01:43:20PM +0200, Andrey Konovalov wrote:
-> From: Catalin Marinas <catalin.marinas@arm.com>
-> 
-> It is not desirable to relax the ABI to allow tagged user addresses into
-> the kernel indiscriminately. This patch introduces a prctl() interface
-> for enabling or disabling the tagged ABI with a global sysctl control
-> for preventing applications from enabling the relaxed ABI (meant for
-> testing user-space prctl() return error checking without reconfiguring
-> the kernel). The ABI properties are inherited by threads of the same
-> application and fork()'ed children but cleared on execve().
-> 
-> The PR_SET_TAGGED_ADDR_CTRL will be expanded in the future to handle
-> MTE-specific settings like imprecise vs precise exceptions.
-> 
-> Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
-> ---
->  arch/arm64/include/asm/processor.h   |  6 +++
->  arch/arm64/include/asm/thread_info.h |  1 +
->  arch/arm64/include/asm/uaccess.h     |  3 +-
->  arch/arm64/kernel/process.c          | 67 ++++++++++++++++++++++++++++
->  include/uapi/linux/prctl.h           |  5 +++
->  kernel/sys.c                         | 16 +++++++
->  6 files changed, 97 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
-> index fcd0e691b1ea..fee457456aa8 100644
-> --- a/arch/arm64/include/asm/processor.h
-> +++ b/arch/arm64/include/asm/processor.h
-> @@ -307,6 +307,12 @@ extern void __init minsigstksz_setup(void);
->  /* PR_PAC_RESET_KEYS prctl */
->  #define PAC_RESET_KEYS(tsk, arg)	ptrauth_prctl_reset_keys(tsk, arg)
->  
-> +/* PR_TAGGED_ADDR prctl */
-> +long set_tagged_addr_ctrl(unsigned long arg);
-> +long get_tagged_addr_ctrl(void);
-> +#define SET_TAGGED_ADDR_CTRL(arg)	set_tagged_addr_ctrl(arg)
-> +#define GET_TAGGED_ADDR_CTRL()		get_tagged_addr_ctrl()
-> +
->  /*
->   * For CONFIG_GCC_PLUGIN_STACKLEAK
->   *
-> diff --git a/arch/arm64/include/asm/thread_info.h b/arch/arm64/include/asm/thread_info.h
-> index f1d032be628a..354a31d2b737 100644
-> --- a/arch/arm64/include/asm/thread_info.h
-> +++ b/arch/arm64/include/asm/thread_info.h
-> @@ -99,6 +99,7 @@ void arch_release_task_struct(struct task_struct *tsk);
->  #define TIF_SVE			23	/* Scalable Vector Extension in use */
->  #define TIF_SVE_VL_INHERIT	24	/* Inherit sve_vl_onexec across exec */
->  #define TIF_SSBD		25	/* Wants SSB mitigation */
-> +#define TIF_TAGGED_ADDR		26	/* Allow tagged user addresses */
->  
->  #define _TIF_SIGPENDING		(1 << TIF_SIGPENDING)
->  #define _TIF_NEED_RESCHED	(1 << TIF_NEED_RESCHED)
-> diff --git a/arch/arm64/include/asm/uaccess.h b/arch/arm64/include/asm/uaccess.h
-> index df729afca0ba..995b9ea11a89 100644
-> --- a/arch/arm64/include/asm/uaccess.h
-> +++ b/arch/arm64/include/asm/uaccess.h
-> @@ -73,7 +73,8 @@ static inline unsigned long __range_ok(const void __user *addr, unsigned long si
->  {
->  	unsigned long ret, limit = current_thread_info()->addr_limit;
->  
-> -	addr = untagged_addr(addr);
-> +	if (test_thread_flag(TIF_TAGGED_ADDR))
-> +		addr = untagged_addr(addr);
->  
->  	__chk_user_ptr(addr);
->  	asm volatile(
-> diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-> index 3767fb21a5b8..69d0be1fc708 100644
-> --- a/arch/arm64/kernel/process.c
-> +++ b/arch/arm64/kernel/process.c
-> @@ -30,6 +30,7 @@
->  #include <linux/kernel.h>
->  #include <linux/mm.h>
->  #include <linux/stddef.h>
-> +#include <linux/sysctl.h>
->  #include <linux/unistd.h>
->  #include <linux/user.h>
->  #include <linux/delay.h>
-> @@ -323,6 +324,7 @@ void flush_thread(void)
->  	fpsimd_flush_thread();
->  	tls_thread_flush();
->  	flush_ptrace_hw_breakpoint(current);
-> +	clear_thread_flag(TIF_TAGGED_ADDR);
->  }
->  
->  void release_thread(struct task_struct *dead_task)
-> @@ -552,3 +554,68 @@ void arch_setup_new_exec(void)
->  
->  	ptrauth_thread_init_user(current);
->  }
-> +
-> +/*
-> + * Control the relaxed ABI allowing tagged user addresses into the kernel.
-> + */
-> +static unsigned int tagged_addr_prctl_allowed = 1;
-> +
-> +long set_tagged_addr_ctrl(unsigned long arg)
-> +{
-> +	if (!tagged_addr_prctl_allowed)
-> +		return -EINVAL;
-> +	if (is_compat_task())
-> +		return -EINVAL;
-> +	if (arg & ~PR_TAGGED_ADDR_ENABLE)
-> +		return -EINVAL;
-> +
-> +	if (arg & PR_TAGGED_ADDR_ENABLE)
-> +		set_thread_flag(TIF_TAGGED_ADDR);
-> +	else
-> +		clear_thread_flag(TIF_TAGGED_ADDR);
-> +
-> +	return 0;
-> +}
-> +
-> +long get_tagged_addr_ctrl(void)
-> +{
-> +	if (!tagged_addr_prctl_allowed)
-> +		return -EINVAL;
-> +	if (is_compat_task())
-> +		return -EINVAL;
-> +
-> +	if (test_thread_flag(TIF_TAGGED_ADDR))
-> +		return PR_TAGGED_ADDR_ENABLE;
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Global sysctl to disable the tagged user addresses support. This control
-> + * only prevents the tagged address ABI enabling via prctl() and does not
-> + * disable it for tasks that already opted in to the relaxed ABI.
-> + */
-> +static int zero;
-> +static int one = 1;
+Even when asynchronous page fault is disabled, KVM does not want to pause
+the host if a guest triggers a page fault; instead it will put it into
+an artificial HLT state that allows running other host processes while
+allowing interrupt delivery into the guest.
 
-!!!
+However, the way this feature is triggered is a bit confusing.
+First, it is not used for page faults while a nested guest is
+running: but this is not an issue since the artificial halt
+is completely invisible to the guest, either L1 or L2.  Second,
+it is used even if kvm_halt_in_guest() returns true; in this case,
+the guest probably should not pay the additional latency cost of the
+artificial halt, and thus we should handle the page fault in a
+completely synchronous way.
 
-And these can't even be const without a cast.  Yuk.
+By introducing a new function kvm_can_deliver_async_pf, this patch
+commonizes the code that chooses whether to deliver an async page fault
+(kvm_arch_async_page_not_present) and the code that chooses whether a
+page fault should be handled synchronously (kvm_can_do_async_pf).
 
-(Not your fault though, but it would be nice to have a proc_dobool() to
-avoid this.)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/mmu.c | 13 ------------
+ arch/x86/kvm/x86.c | 59 ++++++++++++++++++++++++++++++++++++++++++++----------
+ 2 files changed, 48 insertions(+), 24 deletions(-)
 
-> +
-> +static struct ctl_table tagged_addr_sysctl_table[] = {
-> +	{
-> +		.procname	= "tagged_addr",
-> +		.mode		= 0644,
-> +		.data		= &tagged_addr_prctl_allowed,
-> +		.maxlen		= sizeof(int),
-> +		.proc_handler	= proc_dointvec_minmax,
-> +		.extra1		= &zero,
-> +		.extra2		= &one,
-> +	},
-> +	{ }
-> +};
-> +
-> +static int __init tagged_addr_init(void)
-> +{
-> +	if (!register_sysctl("abi", tagged_addr_sysctl_table))
-> +		return -EINVAL;
-> +	return 0;
-> +}
-> +
-> +core_initcall(tagged_addr_init);
-> diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
-> index 094bb03b9cc2..2e927b3e9d6c 100644
-> --- a/include/uapi/linux/prctl.h
-> +++ b/include/uapi/linux/prctl.h
-> @@ -229,4 +229,9 @@ struct prctl_mm_map {
->  # define PR_PAC_APDBKEY			(1UL << 3)
->  # define PR_PAC_APGAKEY			(1UL << 4)
->  
-> +/* Tagged user address controls for arm64 */
-> +#define PR_SET_TAGGED_ADDR_CTRL		55
-> +#define PR_GET_TAGGED_ADDR_CTRL		56
-> +# define PR_TAGGED_ADDR_ENABLE		(1UL << 0)
-> +
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index 3384c539d150..771349e72d2a 100644
+--- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -4040,19 +4040,6 @@ static int kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gva_t gva, gfn_t gfn)
+ 	return kvm_setup_async_pf(vcpu, gva, kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
+ }
+ 
+-bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
+-{
+-	if (unlikely(!lapic_in_kernel(vcpu) ||
+-		     kvm_event_needs_reinjection(vcpu) ||
+-		     vcpu->arch.exception.pending))
+-		return false;
+-
+-	if (!vcpu->arch.apf.delivery_as_pf_vmexit && is_guest_mode(vcpu))
+-		return false;
+-
+-	return kvm_x86_ops->interrupt_allowed(vcpu);
+-}
+-
+ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+ 			 gva_t gva, kvm_pfn_t *pfn, bool write, bool *writable)
+ {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6200d5a51f13..2fe53b931b72 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9775,6 +9775,36 @@ static int apf_get_user(struct kvm_vcpu *vcpu, u32 *val)
+ 				      sizeof(u32));
+ }
+ 
++static bool kvm_can_deliver_async_pf(struct kvm_vcpu *vcpu)
++{
++	if (!vcpu->arch.apf.delivery_as_pf_vmexit && is_guest_mode(vcpu))
++		return false;
++
++	if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED) ||
++	    (vcpu->arch.apf.send_user_only &&
++	     kvm_x86_ops->get_cpl(vcpu) == 0))
++		return false;
++
++	return true;
++}
++
++bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
++{
++	if (unlikely(!lapic_in_kernel(vcpu) ||
++		     kvm_event_needs_reinjection(vcpu) ||
++		     vcpu->arch.exception.pending))
++		return false;
++
++	if (kvm_hlt_in_guest(vcpu->kvm) && !kvm_can_deliver_async_pf(vcpu))
++		return false;
++
++	/*
++	 * If interrupts are off we cannot even use an artificial
++	 * halt state.
++	 */
++	return kvm_x86_ops->interrupt_allowed(vcpu);
++}
++
+ void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+ 				     struct kvm_async_pf *work)
+ {
+@@ -9783,19 +9813,26 @@ void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+ 	trace_kvm_async_pf_not_present(work->arch.token, work->gva);
+ 	kvm_add_async_pf_gfn(vcpu, work->arch.gfn);
+ 
+-	if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED) ||
+-	    (vcpu->arch.apf.send_user_only &&
+-	     kvm_x86_ops->get_cpl(vcpu) == 0))
++	if (!kvm_can_deliver_async_pf(vcpu) ||
++	    apf_put_user(vcpu, KVM_PV_REASON_PAGE_NOT_PRESENT)) {
++		/*
++		 * It is not possible to deliver a paravirtualized asynchronous
++		 * page fault, but putting the guest in an artificial halt state
++		 * can be beneficial nevertheless: if an interrupt arrives, we
++		 * can deliver it timely and perhaps the guest will schedule
++		 * another process.  When the instruction that triggered a page
++		 * fault is retried, hopefully the page will be ready in the host.
++		 */
+ 		kvm_make_request(KVM_REQ_APF_HALT, vcpu);
+-	else if (!apf_put_user(vcpu, KVM_PV_REASON_PAGE_NOT_PRESENT)) {
+-		fault.vector = PF_VECTOR;
+-		fault.error_code_valid = true;
+-		fault.error_code = 0;
+-		fault.nested_page_fault = false;
+-		fault.address = work->arch.token;
+-		fault.async_page_fault = true;
+-		kvm_inject_page_fault(vcpu, &fault);
+ 	}
++
++	fault.vector = PF_VECTOR;
++	fault.error_code_valid = true;
++	fault.error_code = 0;
++	fault.nested_page_fault = false;
++	fault.address = work->arch.token;
++	fault.async_page_fault = true;
++	kvm_inject_page_fault(vcpu, &fault);
+ }
+ 
+ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+-- 
+1.8.3.1
 
-Do we expect this prctl to be applicable to other arches, or is it
-strictly arm64-specific?
-
->  #endif /* _LINUX_PRCTL_H */
-> diff --git a/kernel/sys.c b/kernel/sys.c
-> index 2969304c29fe..ec48396b4943 100644
-> --- a/kernel/sys.c
-> +++ b/kernel/sys.c
-> @@ -124,6 +124,12 @@
->  #ifndef PAC_RESET_KEYS
->  # define PAC_RESET_KEYS(a, b)	(-EINVAL)
->  #endif
-> +#ifndef SET_TAGGED_ADDR_CTRL
-> +# define SET_TAGGED_ADDR_CTRL(a)	(-EINVAL)
-> +#endif
-> +#ifndef GET_TAGGED_ADDR_CTRL
-> +# define GET_TAGGED_ADDR_CTRL()		(-EINVAL)
-> +#endif
->  
->  /*
->   * this is where the system-wide overflow UID and GID are defined, for
-> @@ -2492,6 +2498,16 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
->  			return -EINVAL;
->  		error = PAC_RESET_KEYS(me, arg2);
->  		break;
-> +	case PR_SET_TAGGED_ADDR_CTRL:
-> +		if (arg3 || arg4 || arg5)
-
-<bikeshed>
-
-How do you anticipate these arguments being used in the future?
-
-For the SVE prctls I took the view that "get" could only ever mean one
-thing, and "put" already had a flags argument with spare bits for future
-expansion anyway, so forcing the extra arguments to zero would be
-unnecessary.
-
-Opinions seem to differ on whether requiring surplus arguments to be 0
-is beneficial for hygiene, but the glibc prototype for prctl() is
-
-	int prctl (int __option, ...);
-
-so it seemed annoying to have to pass extra arguments to it just for the
-sake of it.  IMHO this also makes the code at the call site less
-readable, since it's not immediately apparent that all those 0s are
-meaningless.
-
-</bikeshed>
-
-(OTOH, the extra arguments are harmless and prctl is far from being a
-general-purpose syscall.)
-
-> +			return -EINVAL;
-> +		error = SET_TAGGED_ADDR_CTRL(arg2);
-> +		break;
-> +	case PR_GET_TAGGED_ADDR_CTRL:
-> +		if (arg2 || arg3 || arg4 || arg5)
-> +			return -EINVAL;
-> +		error = GET_TAGGED_ADDR_CTRL();
-
-Having a "get" prctl is probably a good idea, but is there a clear
-usecase for it?
-
-(The usecase for PR_SVE_GET_VL was always a bit dubious, since the
-VL can also be read via an SVE insn or a compiler intrinsic, which is
-less portable but much cheaper.  As for the PR_SVE_SET_VL_INHERIT flag
-that can be read via PR_SVE_GET_VL, I've never been sure how useful it
-is to be able to read that...)
-
-[...]
-
-Cheers
----Dave
