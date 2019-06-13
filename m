@@ -2,176 +2,362 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BB0144653
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 18:50:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4761D44520
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 18:42:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404369AbfFMQut (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 12:50:49 -0400
-Received: from mail-eopbgr720109.outbound.protection.outlook.com ([40.107.72.109]:60366
-        "EHLO NAM05-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730169AbfFMDwc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Jun 2019 23:52:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=testarcselector01; d=microsoft.com; cv=none;
- b=ZxtNbcauMWzBTXAV+6qA34f6owTL0BDTbjxXiK1vam30cu1xYi1+q/CR1i3SxoPxPECOTAJ4/5E+RVrgSKk43nzBKWR2MwzZ3z2shVUfDJBECq8/uAnntMNiFpGsFEnEbKeooNTxDhCRVkMscsSd7l5LpRUU6ZJs+C4yC1J8V5o=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=testarcselector01;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iq+cdw9l6d9VnSoac3CHgw+jrQd6XPnt0ZaNval5z60=;
- b=B9mHQrGzzPno4U7XgxVIrRkNUY4wWEY6x8A30A5rg21vogQsCTYMN7AXEbkV8WeLM/oXF3/rux1KF0ilNakYAFHbsSW6HNkxLBGodz0Owt7V3IxKSJ9ohdoDCV+VtpEVJ4zofRSWCbPrh10r4fpQ23z0TPMT52LCdxGKm01Z05c=
-ARC-Authentication-Results: i=1; test.office365.com
- 1;spf=none;dmarc=none;dkim=none;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iq+cdw9l6d9VnSoac3CHgw+jrQd6XPnt0ZaNval5z60=;
- b=h5uY+iPU+G17t9UnyYDDcYuApORtJ3TeORWg5/sxNMaqbrjpOB88OGpljAJFgC8IFcz7TGsFPp2/bs9jUPYQP/agA+Hz+myAoNixF05w/+7dc2JxWTuue86xYWWvpNpUaglz+6oZ9AbGeNl5v3id+mTIqgd78JB2iA8f+a06NVA=
-Received: from MW2PR2101MB1116.namprd21.prod.outlook.com (2603:10b6:302:a::33)
- by MW2PR2101MB1049.namprd21.prod.outlook.com (2603:10b6:302:a::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2008.2; Thu, 13 Jun
- 2019 03:52:27 +0000
-Received: from MW2PR2101MB1116.namprd21.prod.outlook.com
- ([fe80::a1f6:c002:82ba:ad47]) by MW2PR2101MB1116.namprd21.prod.outlook.com
- ([fe80::a1f6:c002:82ba:ad47%9]) with mapi id 15.20.2008.002; Thu, 13 Jun 2019
- 03:52:27 +0000
-From:   Sunil Muthuswamy <sunilmut@microsoft.com>
-To:     "David S. Miller" <davem@davemloft.net>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>
-CC:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Dexuan Cui <decui@microsoft.com>
-Subject: [PATCH net-next] vsock: correct removal of socket from the list
-Thread-Topic: [PATCH net-next] vsock: correct removal of socket from the list
-Thread-Index: AdUhmo8Nxo5lupZASBWL+cOgCNqu2w==
-Date:   Thu, 13 Jun 2019 03:52:27 +0000
-Message-ID: <MW2PR2101MB11162BBAEC52B232A7B1EFAFC0EF0@MW2PR2101MB1116.namprd21.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=sunilmut@microsoft.com; 
-x-originating-ip: [2001:4898:80e8:2:b9f7:3762:5546:eb5f]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4fbcdf1a-3318-478c-a2f7-08d6efb28d7b
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:MW2PR2101MB1049;
-x-ms-traffictypediagnostic: MW2PR2101MB1049:
-x-microsoft-antispam-prvs: <MW2PR2101MB10492DF9904E03832B3F21D5C0EF0@MW2PR2101MB1049.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 0067A8BA2A
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(39860400002)(366004)(396003)(376002)(189003)(199004)(64756008)(66556008)(66446008)(6116002)(73956011)(66476007)(55016002)(76116006)(68736007)(86362001)(6506007)(7696005)(66946007)(52396003)(22452003)(305945005)(478600001)(14454004)(7736002)(316002)(9686003)(2501003)(8990500004)(10290500003)(46003)(186003)(486006)(6436002)(102836004)(476003)(99286004)(81156014)(81166006)(2906002)(8936002)(110136005)(33656002)(8676002)(54906003)(53936002)(4326008)(2201001)(5660300002)(107886003)(71200400001)(74316002)(256004)(10090500001)(52536014)(71190400001)(25786009)(14444005);DIR:OUT;SFP:1102;SCL:1;SRVR:MW2PR2101MB1049;H:MW2PR2101MB1116.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: FGzPrZhBkmbS8y2++Y+1asXnvrrx3+a1iKnMGRBHK1qBxdgpZ/cDn5tA5KdwIUDSN5gTBOYryUdf2RsOZOgxrzaw3cuITYGroiSvgmBxpshq56LGeFqPumVQINyBhv1R9hU6u3nRWbm1WR0OZnCL58XISYBwy41A28iZvtxJDstApt6EUHenT6TTVD0TAaht1sR6E/6Dily54fjtP/AHHvVgGVAlbuCSprQdf/9s7ZCPUXfwbre4HAaphbAMshfL5v7fpu+rItUEbApoaDZpCbNxehfxl+LEujYRpKaOtPheV8sJHp69RUWvFeApYg1PkAHZgm+27rqAoR0F3QWZ8csAAk2lfA30KGS9UrGeQ5DlblZCYbn2I8D7qwlgEJEeYWJoCnzhPS0WeAgmA952rJTjjA4Bozms+0C8C4Mx7Ac=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S2392588AbfFMQmG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 12:42:06 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:40517 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730523AbfFMGt2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 02:49:28 -0400
+Received: by mail-pg1-f193.google.com with SMTP id d30so10353777pgm.7;
+        Wed, 12 Jun 2019 23:49:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=EWV8HqUW5nD4lYeuHZCchPJIr3ycVzu67AOhwAlhylY=;
+        b=UZ49QdGgk8Z46G08bZVj8g4zlEmwOTCw5eYH79Um9ramjkPF+VPoyBr1iH01k1nb0P
+         9vGLR3Pxt5zVkizQfBUja/4BDlYiOjj/sbWqtHrcAR9UubtAEcHHu1qJ6VYcvQ/azQjK
+         SAcfSS4i0rlANIdbDIuxY/A6KmxoWtvdbKBeMJxA2HjKoAkr3C/x7z8LmuhrOxyzyK5w
+         h/QTjA/r0cK/Cje/sp4lXNccpAws5pWQBIdOK6/TW2jKIpiGu938LUnxCBBJqP28dR5a
+         Bs6NMm4XObmoj93mrT8mdGc2v6861OZZjLY/haXHgbAqbW4/n0+F3z+FMgynzFG7+cmP
+         BbPA==
+X-Gm-Message-State: APjAAAXuK4DaVyTx7ds2LHJk18H5WnKmN9JbNYXIrM0dPu9miBJAn/UO
+        31wtsU4Ni6YZLmmNOvzzzyw=
+X-Google-Smtp-Source: APXvYqw+K1atiiGJQgLV9SN1EyEIO2KJbWIsQQ3d5N7HeaIcjGnehk9lu87UMmJtEDHDqZuBy4rhjg==
+X-Received: by 2002:a17:90a:8a10:: with SMTP id w16mr3546662pjn.133.1560408567383;
+        Wed, 12 Jun 2019 23:49:27 -0700 (PDT)
+Received: from htb-2n-eng-dhcp405.eng.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id i3sm1559973pfa.175.2019.06.12.23.49.19
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Wed, 12 Jun 2019 23:49:26 -0700 (PDT)
+From:   Nadav Amit <namit@vmware.com>
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Nadav Amit <namit@vmware.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>,
+        Juergen Gross <jgross@suse.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        linux-hyperv@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org
+Subject: [PATCH 4/9] x86/mm/tlb: Flush remote and local TLBs concurrently
+Date:   Wed, 12 Jun 2019 23:48:08 -0700
+Message-Id: <20190613064813.8102-5-namit@vmware.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190613064813.8102-1-namit@vmware.com>
+References: <20190613064813.8102-1-namit@vmware.com>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4fbcdf1a-3318-478c-a2f7-08d6efb28d7b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2019 03:52:27.4602
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: sunilmut@ntdev.microsoft.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR2101MB1049
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The current vsock code for removal of socket from the list is both
-subject to race and inefficient. It takes the lock, checks whether
-the socket is in the list, drops the lock and if the socket was on the
-list, deletes it from the list. This is subject to race because as soon
-as the lock is dropped once it is checked for presence, that condition
-cannot be relied upon for any decision. It is also inefficient because
-if the socket is present in the list, it takes the lock twice.
+To improve TLB shootdown performance, flush the remote and local TLBs
+concurrently. Introduce flush_tlb_multi() that does so. The current
+flush_tlb_others() interface is kept, since paravirtual interfaces need
+to be adapted first before it can be removed. This is left for future
+work. In such PV environments, TLB flushes are not performed, at this
+time, concurrently.
 
-Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
+Add a static key to tell whether this new interface is supported.
+
+Cc: "K. Y. Srinivasan" <kys@microsoft.com>
+Cc: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: Stephen Hemminger <sthemmin@microsoft.com>
+Cc: Sasha Levin <sashal@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: x86@kernel.org
+Cc: Juergen Gross <jgross@suse.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Cc: linux-hyperv@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: virtualization@lists.linux-foundation.org
+Cc: kvm@vger.kernel.org
+Cc: xen-devel@lists.xenproject.org
+Signed-off-by: Nadav Amit <namit@vmware.com>
 ---
- net/vmw_vsock/af_vsock.c | 38 +++++++-------------------------------
- 1 file changed, 7 insertions(+), 31 deletions(-)
+ arch/x86/hyperv/mmu.c                 |  2 +
+ arch/x86/include/asm/paravirt.h       |  8 +++
+ arch/x86/include/asm/paravirt_types.h |  6 +++
+ arch/x86/include/asm/tlbflush.h       |  6 +++
+ arch/x86/kernel/kvm.c                 |  1 +
+ arch/x86/kernel/paravirt.c            |  3 ++
+ arch/x86/mm/tlb.c                     | 71 ++++++++++++++++++++++-----
+ arch/x86/xen/mmu_pv.c                 |  2 +
+ 8 files changed, 87 insertions(+), 12 deletions(-)
 
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index d892000..6f063ed 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -282,7 +282,8 @@ EXPORT_SYMBOL_GPL(vsock_insert_connected);
- void vsock_remove_bound(struct vsock_sock *vsk)
+diff --git a/arch/x86/hyperv/mmu.c b/arch/x86/hyperv/mmu.c
+index e65d7fe6489f..ca28b400c87c 100644
+--- a/arch/x86/hyperv/mmu.c
++++ b/arch/x86/hyperv/mmu.c
+@@ -233,4 +233,6 @@ void hyperv_setup_mmu_ops(void)
+ 	pr_info("Using hypercall for remote TLB flush\n");
+ 	pv_ops.mmu.flush_tlb_others = hyperv_flush_tlb_others;
+ 	pv_ops.mmu.tlb_remove_table = tlb_remove_table;
++
++	static_key_disable(&flush_tlb_multi_enabled.key);
+ }
+diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/paravirt.h
+index c25c38a05c1c..192be7254457 100644
+--- a/arch/x86/include/asm/paravirt.h
++++ b/arch/x86/include/asm/paravirt.h
+@@ -47,6 +47,8 @@ static inline void slow_down_io(void)
+ #endif
+ }
+ 
++DECLARE_STATIC_KEY_TRUE(flush_tlb_multi_enabled);
++
+ static inline void __flush_tlb(void)
  {
- 	spin_lock_bh(&vsock_table_lock);
--	__vsock_remove_bound(vsk);
-+	if (__vsock_in_bound_table(vsk))
-+		__vsock_remove_bound(vsk);
- 	spin_unlock_bh(&vsock_table_lock);
+ 	PVOP_VCALL0(mmu.flush_tlb_user);
+@@ -62,6 +64,12 @@ static inline void __flush_tlb_one_user(unsigned long addr)
+ 	PVOP_VCALL1(mmu.flush_tlb_one_user, addr);
  }
- EXPORT_SYMBOL_GPL(vsock_remove_bound);
-@@ -290,7 +291,8 @@ EXPORT_SYMBOL_GPL(vsock_remove_bound);
- void vsock_remove_connected(struct vsock_sock *vsk)
+ 
++static inline void flush_tlb_multi(const struct cpumask *cpumask,
++				   const struct flush_tlb_info *info)
++{
++	PVOP_VCALL2(mmu.flush_tlb_multi, cpumask, info);
++}
++
+ static inline void flush_tlb_others(const struct cpumask *cpumask,
+ 				    const struct flush_tlb_info *info)
  {
- 	spin_lock_bh(&vsock_table_lock);
--	__vsock_remove_connected(vsk);
-+	if (__vsock_in_connected_table(vsk))
-+		__vsock_remove_connected(vsk);
- 	spin_unlock_bh(&vsock_table_lock);
+diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm/paravirt_types.h
+index 946f8f1f1efc..b93b3d90729a 100644
+--- a/arch/x86/include/asm/paravirt_types.h
++++ b/arch/x86/include/asm/paravirt_types.h
+@@ -211,6 +211,12 @@ struct pv_mmu_ops {
+ 	void (*flush_tlb_user)(void);
+ 	void (*flush_tlb_kernel)(void);
+ 	void (*flush_tlb_one_user)(unsigned long addr);
++	/*
++	 * flush_tlb_multi() is the preferred interface, which is capable to
++	 * flush both local and remote CPUs.
++	 */
++	void (*flush_tlb_multi)(const struct cpumask *cpus,
++				const struct flush_tlb_info *info);
+ 	void (*flush_tlb_others)(const struct cpumask *cpus,
+ 				 const struct flush_tlb_info *info);
+ 
+diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
+index dee375831962..79272938cf79 100644
+--- a/arch/x86/include/asm/tlbflush.h
++++ b/arch/x86/include/asm/tlbflush.h
+@@ -569,6 +569,9 @@ static inline void flush_tlb_page(struct vm_area_struct *vma, unsigned long a)
+ 	flush_tlb_mm_range(vma->vm_mm, a, a + PAGE_SIZE, PAGE_SHIFT, false);
  }
- EXPORT_SYMBOL_GPL(vsock_remove_connected);
-@@ -326,35 +328,10 @@ struct sock *vsock_find_connected_socket(struct socka=
-ddr_vm *src,
+ 
++void native_flush_tlb_multi(const struct cpumask *cpumask,
++			     const struct flush_tlb_info *info);
++
+ void native_flush_tlb_others(const struct cpumask *cpumask,
+ 			     const struct flush_tlb_info *info);
+ 
+@@ -593,6 +596,9 @@ static inline void arch_tlbbatch_add_mm(struct arch_tlbflush_unmap_batch *batch,
+ extern void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch);
+ 
+ #ifndef CONFIG_PARAVIRT
++#define flush_tlb_multi(mask, info)	\
++	native_flush_tlb_multi(mask, info)
++
+ #define flush_tlb_others(mask, info)	\
+ 	native_flush_tlb_others(mask, info)
+ 
+diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+index 5169b8cc35bb..00d81e898717 100644
+--- a/arch/x86/kernel/kvm.c
++++ b/arch/x86/kernel/kvm.c
+@@ -630,6 +630,7 @@ static void __init kvm_guest_init(void)
+ 	    kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
+ 		pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
+ 		pv_ops.mmu.tlb_remove_table = tlb_remove_table;
++		static_key_disable(&flush_tlb_multi_enabled.key);
+ 	}
+ 
+ 	if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
+diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
+index 98039d7fb998..ac00afed5570 100644
+--- a/arch/x86/kernel/paravirt.c
++++ b/arch/x86/kernel/paravirt.c
+@@ -159,6 +159,8 @@ unsigned paravirt_patch_insns(void *insn_buff, unsigned len,
+ 	return insn_len;
  }
- EXPORT_SYMBOL_GPL(vsock_find_connected_socket);
-=20
--static bool vsock_in_bound_table(struct vsock_sock *vsk)
--{
--	bool ret;
--
--	spin_lock_bh(&vsock_table_lock);
--	ret =3D __vsock_in_bound_table(vsk);
--	spin_unlock_bh(&vsock_table_lock);
--
--	return ret;
--}
--
--static bool vsock_in_connected_table(struct vsock_sock *vsk)
--{
--	bool ret;
--
--	spin_lock_bh(&vsock_table_lock);
--	ret =3D __vsock_in_connected_table(vsk);
--	spin_unlock_bh(&vsock_table_lock);
--
--	return ret;
--}
--
- void vsock_remove_sock(struct vsock_sock *vsk)
+ 
++DEFINE_STATIC_KEY_TRUE(flush_tlb_multi_enabled);
++
+ static void native_flush_tlb(void)
  {
--	if (vsock_in_bound_table(vsk))
--		vsock_remove_bound(vsk);
--
--	if (vsock_in_connected_table(vsk))
--		vsock_remove_connected(vsk);
-+	vsock_remove_bound(vsk);
-+	vsock_remove_connected(vsk);
+ 	__native_flush_tlb();
+@@ -363,6 +365,7 @@ struct paravirt_patch_template pv_ops = {
+ 	.mmu.flush_tlb_user	= native_flush_tlb,
+ 	.mmu.flush_tlb_kernel	= native_flush_tlb_global,
+ 	.mmu.flush_tlb_one_user	= native_flush_tlb_one_user,
++	.mmu.flush_tlb_multi	= native_flush_tlb_multi,
+ 	.mmu.flush_tlb_others	= native_flush_tlb_others,
+ 	.mmu.tlb_remove_table	=
+ 			(void (*)(struct mmu_gather *, void *))tlb_remove_page,
+diff --git a/arch/x86/mm/tlb.c b/arch/x86/mm/tlb.c
+index c34bcf03f06f..db73d5f1dd43 100644
+--- a/arch/x86/mm/tlb.c
++++ b/arch/x86/mm/tlb.c
+@@ -551,7 +551,7 @@ static void flush_tlb_func_common(const struct flush_tlb_info *f,
+ 		 * garbage into our TLB.  Since switching to init_mm is barely
+ 		 * slower than a minimal flush, just switch to init_mm.
+ 		 *
+-		 * This should be rare, with native_flush_tlb_others skipping
++		 * This should be rare, with native_flush_tlb_multi skipping
+ 		 * IPIs to lazy TLB mode CPUs.
+ 		 */
+ 		switch_mm_irqs_off(NULL, &init_mm, NULL);
+@@ -635,9 +635,12 @@ static void flush_tlb_func_common(const struct flush_tlb_info *f,
+ 	this_cpu_write(cpu_tlbstate.ctxs[loaded_mm_asid].tlb_gen, mm_tlb_gen);
  }
- EXPORT_SYMBOL_GPL(vsock_remove_sock);
-=20
-@@ -485,8 +462,7 @@ static void vsock_pending_work(struct work_struct *work=
-)
- 	 * incoming packets can't find this socket, and to reduce the reference
- 	 * count.
+ 
+-static void flush_tlb_func_local(const void *info, enum tlb_flush_reason reason)
++static void flush_tlb_func_local(void *info)
+ {
+ 	const struct flush_tlb_info *f = info;
++	enum tlb_flush_reason reason;
++
++	reason = (f->mm == NULL) ? TLB_LOCAL_SHOOTDOWN : TLB_LOCAL_MM_SHOOTDOWN;
+ 
+ 	flush_tlb_func_common(f, true, reason);
+ }
+@@ -655,14 +658,21 @@ static void flush_tlb_func_remote(void *info)
+ 	flush_tlb_func_common(f, false, TLB_REMOTE_SHOOTDOWN);
+ }
+ 
+-static bool tlb_is_not_lazy(int cpu, void *data)
++static inline bool tlb_is_not_lazy(int cpu)
+ {
+ 	return !per_cpu(cpu_tlbstate.is_lazy, cpu);
+ }
+ 
+-void native_flush_tlb_others(const struct cpumask *cpumask,
+-			     const struct flush_tlb_info *info)
++static DEFINE_PER_CPU(cpumask_t, flush_tlb_mask);
++
++void native_flush_tlb_multi(const struct cpumask *cpumask,
++			    const struct flush_tlb_info *info)
+ {
++	/*
++	 * Do accounting and tracing. Note that there are (and have always been)
++	 * cases in which a remote TLB flush will be traced, but eventually
++	 * would not happen.
++	 */
+ 	count_vm_tlb_event(NR_TLB_REMOTE_FLUSH);
+ 	if (info->end == TLB_FLUSH_ALL)
+ 		trace_tlb_flush(TLB_REMOTE_SEND_IPI, TLB_FLUSH_ALL);
+@@ -682,10 +692,14 @@ void native_flush_tlb_others(const struct cpumask *cpumask,
+ 		 * means that the percpu tlb_gen variables won't be updated
+ 		 * and we'll do pointless flushes on future context switches.
+ 		 *
+-		 * Rather than hooking native_flush_tlb_others() here, I think
++		 * Rather than hooking native_flush_tlb_multi() here, I think
+ 		 * that UV should be updated so that smp_call_function_many(),
+ 		 * etc, are optimal on UV.
+ 		 */
++		local_irq_disable();
++		flush_tlb_func_local((__force void *)info);
++		local_irq_enable();
++
+ 		cpumask = uv_flush_tlb_others(cpumask, info);
+ 		if (cpumask)
+ 			smp_call_function_many(cpumask, flush_tlb_func_remote,
+@@ -704,11 +718,39 @@ void native_flush_tlb_others(const struct cpumask *cpumask,
+ 	 * doing a speculative memory access.
  	 */
--	if (vsock_in_connected_table(vsk))
--		vsock_remove_connected(vsk);
-+	vsock_remove_connected(vsk);
-=20
- 	sk->sk_state =3D TCP_CLOSE;
-=20
---=20
-2.7.4
+ 	if (info->freed_tables)
+-		smp_call_function_many(cpumask, flush_tlb_func_remote,
+-			       (void *)info, 1);
+-	else
+-		on_each_cpu_cond_mask(tlb_is_not_lazy, flush_tlb_func_remote,
+-				(void *)info, 1, GFP_ATOMIC, cpumask);
++		__smp_call_function_many(cpumask, flush_tlb_func_remote,
++					 flush_tlb_func_local, (void *)info, 1);
++	else {
++		/*
++		 * Although we could have used on_each_cpu_cond_mask(),
++		 * open-coding it has several performance advantages: (1) we can
++		 * use specialized functions for remote and local flushes; (2)
++		 * no need for indirect branch to test if TLB is lazy; (3) we
++		 * can use a designated cpumask for evaluating the condition
++		 * instead of allocating a new one.
++		 *
++		 * This works under the assumption that there are no nested TLB
++		 * flushes, an assumption that is already made in
++		 * flush_tlb_mm_range().
++		 */
++		struct cpumask *cond_cpumask = this_cpu_ptr(&flush_tlb_mask);
++		int cpu;
++
++		cpumask_clear(cond_cpumask);
++
++		for_each_cpu(cpu, cpumask) {
++			if (tlb_is_not_lazy(cpu))
++				__cpumask_set_cpu(cpu, cond_cpumask);
++		}
++		__smp_call_function_many(cond_cpumask, flush_tlb_func_remote,
++					 flush_tlb_func_local, (void *)info, 1);
++	}
++}
++
++void native_flush_tlb_others(const struct cpumask *cpumask,
++			     const struct flush_tlb_info *info)
++{
++	native_flush_tlb_multi(cpumask, info);
+ }
+ 
+ /*
+@@ -774,10 +816,15 @@ static void flush_tlb_on_cpus(const cpumask_t *cpumask,
+ {
+ 	int this_cpu = smp_processor_id();
+ 
++	if (static_branch_likely(&flush_tlb_multi_enabled)) {
++		flush_tlb_multi(cpumask, info);
++		return;
++	}
++
+ 	if (cpumask_test_cpu(this_cpu, cpumask)) {
+ 		lockdep_assert_irqs_enabled();
+ 		local_irq_disable();
+-		flush_tlb_func_local(info, TLB_LOCAL_MM_SHOOTDOWN);
++		flush_tlb_func_local((__force void *)info);
+ 		local_irq_enable();
+ 	}
+ 
+diff --git a/arch/x86/xen/mmu_pv.c b/arch/x86/xen/mmu_pv.c
+index beb44e22afdf..0cb277848cb4 100644
+--- a/arch/x86/xen/mmu_pv.c
++++ b/arch/x86/xen/mmu_pv.c
+@@ -2474,6 +2474,8 @@ void __init xen_init_mmu_ops(void)
+ 
+ 	pv_ops.mmu = xen_mmu_ops;
+ 
++	static_key_disable(&flush_tlb_multi_enabled.key);
++
+ 	memset(dummy_mapping, 0xff, PAGE_SIZE);
+ }
+ 
+-- 
+2.20.1
 
