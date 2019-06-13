@@ -2,150 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DED2D44864
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:10:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 78F5A44865
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:10:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389773AbfFMRDe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S2393274AbfFMRDf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 13:03:35 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:52718 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729536AbfFMRDe (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 13 Jun 2019 13:03:34 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45770 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729473AbfFMRDe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 13:03:34 -0400
-Received: by mail-wr1-f65.google.com with SMTP id f9so21542300wre.12;
-        Thu, 13 Jun 2019 10:03:32 -0700 (PDT)
+Received: by mail-wm1-f65.google.com with SMTP id s3so10997979wms.2;
+        Thu, 13 Jun 2019 10:03:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=r4ArmEbPSut4DJEzdrpSUqeNJMgfplEsP5qTJCvrGG8=;
-        b=JF/iFISKalk9yRG3F1O3rnEnOU+5Z6iKXZJMZ0i+cIOPyJurclDfEvj3eJqD2Fascg
-         l7o15qjAaPqsTg90P8VVF4Q7yhO6/BHiV13a17ido7CSzwW4kuPRKpOLWxLe0xQKoGzo
-         Q79NyRhDhEjPOLzCfJROG/t8W+fYX4RCTnz3CEZ+g0oCbJ58jchvfFshPqdhNiqe/OAw
-         CgWG6U4n+zfndHbyU3/wbZ5voAs7lOKzRR7mYwAtD8dA0y6pNEQpMFE97hGEfwkis+wf
-         CP/S8dUsMVSiqBrJV+iKenYJDhJ9a/q3YBx1FB07LeM2R9Xmr0y2tZhzl/fFkUTAs/Md
-         HUqA==
+        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=rSclv6ckrkEu5swjf7zPGHU+6F6iEfrM6t9n/L0M83k=;
+        b=kW9Mi9c529wb/AlzC9pKtjVmvHUahC1HbneDmyDPdsIFbdrYGiA4JVLGRTDPJV+fVD
+         Vde3tY8Z96NnM9F9gsUuJwLSCJL9F9AqIqM4p+xWyIjHffX8aQrDxsl31nwLQr0xZuUF
+         mM5d8Lp6auIMnXYWzzLWOpB0b9Bu2anPhYOqRdlq8vENv+GFFiqTIYvBs7h/N+jLYihN
+         80reW2tMCGkjnMWE5qqQJuO0vaHRDz0mDn6TkWV2Or9fnVwt3ssgC0OZFlsD/5+bAhor
+         Gb3QmVlKZL1/50AMkHQhCY+bnwwbL3ySsiZMJgVECvbFddBB98KMcg2N/E0V0fROMdHy
+         oaEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=r4ArmEbPSut4DJEzdrpSUqeNJMgfplEsP5qTJCvrGG8=;
-        b=KmEv80evepECsRW2FOMjxxQJYBypLmHaQZ7aghvbpb4zE8EQu2wO3n6ShMhb5ERVvc
-         x3vfrnSOb1Mc0g4y+Pc/1kv4L3juqxDLUT/eaXbbCQMhRTYgxf/SZmgo0GNw0i4wRJ3f
-         76v9vHsHSLJ2jnazQemOMojQjXde86mgNOqJbqvQrPRjxqwF5JSIjKNgQD22sNNJFvL2
-         cy8hfZYI24S4R26B37pHobsYgWpzIMbH/uph6l/JtEjOCg4NvB2kaSuccKmQ0msNsj/e
-         wjfN46sd4CJRYsej61P6UQPor0uSPv7UWsq13tSxZyJlJKHPyGCRdr3nLmKaXgHPx6eB
-         lG0A==
-X-Gm-Message-State: APjAAAW8z4DjI6fN11U35s+xBjE4g/B0StWan59Op9rjsPAbbqfEqNYQ
-        830a9er3QEUj4Pyv8vaxEPH4vQza
-X-Google-Smtp-Source: APXvYqw6tyb4r4kQJnczwSSJb4JzaWc+aH3jJ1UWoHLInEvbExO73clDCCjBvQouVk0YRuxveelrmQ==
-X-Received: by 2002:adf:e841:: with SMTP id d1mr61292033wrn.204.1560445411300;
-        Thu, 13 Jun 2019 10:03:31 -0700 (PDT)
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :in-reply-to:references;
+        bh=rSclv6ckrkEu5swjf7zPGHU+6F6iEfrM6t9n/L0M83k=;
+        b=q8N2MwijTP7OklVF1/JKk7B6I+F5KHsaRSok4dPkorSyipqsH+JEDdxoBhdd3eWa8r
+         ml3olWnSG/oQm58N9kr7hMa11u9ZV084iAu6Vf0fwsbliKJ8VwhEfdEXcd0X6t47AUOt
+         iwXdL1/cLO940rT03J/g1YFDNJekKvNdgyQ/yDJcsngq7Sxrfv3YIIw3dfwip/2Gkx+t
+         ASgzbtMKnuTsKqdUUF7IUQxVgkn0+RjlLEJyYsV+7b2Rafqk0ZtMhxq/TnVweSHsyrYy
+         skIThqKxI6GdiReNFWQHVaxm5LcjtIZbLv1Pt0JURl+LD0pzoHzmTYChMi5aTjXHcRx5
+         YAMg==
+X-Gm-Message-State: APjAAAWQxk3PrmGQOfhZ089XYzDpBZ37mmAVa7qk4iSuuzhZ+DhsPcoN
+        A0dIZ7OJXWIFE/i3N6rEbaXcQ77R
+X-Google-Smtp-Source: APXvYqw41nr2OGsyaDadsZU1c3EvMZVnu0LxaAHcDuesA3f+3vBwCXxYBAspUg75ImTM6jpIRgw5HQ==
+X-Received: by 2002:a1c:a6d3:: with SMTP id p202mr4793150wme.26.1560445412102;
+        Thu, 13 Jun 2019 10:03:32 -0700 (PDT)
 Received: from 640k.localdomain ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id a10sm341856wrx.17.2019.06.13.10.03.30
+        by smtp.gmail.com with ESMTPSA id a10sm341856wrx.17.2019.06.13.10.03.31
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 10:03:30 -0700 (PDT)
+        Thu, 13 Jun 2019 10:03:31 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        vkuznets@redhat.com
-Subject: [PATCH 00/43] VMX optimizations
-Date:   Thu, 13 Jun 2019 19:02:46 +0200
-Message-Id: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
+        vkuznets@redhat.com, Jim Mattson <jmattson@google.com>,
+        stable@vger.kernel.org
+Subject: [PATCH 01/43] KVM: VMX: Fix handling of #MC that occurs during VM-Entry
+Date:   Thu, 13 Jun 2019 19:02:47 +0200
+Message-Id: <1560445409-17363-2-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
+References: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is the outcome of the review of Sean's VMX optimization series,
-with some coding style improvements (at least according to me :)
-and conflicts resolved between the various series that he sent.
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-The result on nested vmexit.flat is about a 12% improvement on
-vmexit speed:
+A previous fix to prevent KVM from consuming stale VMCS state after a
+failed VM-Entry inadvertantly blocked KVM's handling of machine checks
+that occur during VM-Entry.
 
-                                   before   after
-    cpuid                          14886    13142
-    vmcall                         14918    13189
-    inl_from_pmtimer               47277    45536
-    inl_from_qemu                  46747    44826
-    inl_from_kernel                15218    13518
-    outl_to_kernel                 15184    13436
-    self_ipi_sti_nop               16458    14858
-    self_ipi_sti_hlt               31876    28348
-    self_ipi_tpr                   16603    15003
-    self_ipi_tpr_sti_nop           16509    15048
-    self_ipi_tpr_sti_hlt           32027    28386
-    x2apic_self_ipi_sti_hlt        16386    14788
-    x2apic_self_ipi_tpr_sti_hlt    16479    14881
+Per Intel's SDM, a #MC during VM-Entry is handled in one of three ways,
+depending on when the #MC is recognoized.  As it pertains to this bug
+fix, the third case explicitly states EXIT_REASON_MCE_DURING_VMENTRY
+is handled like any other VM-Exit during VM-Entry, i.e. sets bit 31 to
+indicate the VM-Entry failed.
 
+If a machine-check event occurs during a VM entry, one of the following occurs:
+ - The machine-check event is handled as if it occurred before the VM entry:
+        ...
+ - The machine-check event is handled after VM entry completes:
+        ...
+ - A VM-entry failure occurs as described in Section 26.7. The basic
+   exit reason is 41, for "VM-entry failure due to machine-check event".
 
-Patches 1-6 were posted as "KVM: VMX: INTR, NMI and #MC cleanup".
+Explicitly handle EXIT_REASON_MCE_DURING_VMENTRY as a one-off case in
+vmx_vcpu_run() instead of binning it into vmx_complete_atomic_exit().
+Doing so allows vmx_vcpu_run() to handle VMX_EXIT_REASONS_FAILED_VMENTRY
+in a sane fashion and also simplifies vmx_complete_atomic_exit() since
+VMCS.VM_EXIT_INTR_INFO is guaranteed to be fresh.
 
-Patches 7-13 were posted as "KVM: nVMX: Optimize VMCS data copying".
+Fixes: b060ca3b2e9e7 ("kvm: vmx: Handle VMLAUNCH/VMRESUME failure properly")
+Cc: Jim Mattson <jmattson@google.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
 
-Patches 15-30 were posted as "KVM: nVMX: Optimize nested VM-Entry".
-
-Patches 31-43 were posted as "KVM: VMX: Reduce VMWRITEs to VMCS controls".
-
-Paolo Bonzini (5):
-  kvm: nVMX: small cleanup in handle_exception
-  KVM: nVMX: Rename prepare_vmcs02_*_full to prepare_vmcs02_*_rare
-  KVM: VMX: simplify vmx_prepare_switch_to_{guest,host}
-  KVM: x86: introduce is_pae_paging
-  KVM: nVMX: shadow pin based execution controls
-
-Sean Christopherson (38):
-  KVM: VMX: Fix handling of #MC that occurs during VM-Entry
-  KVM: VMX: Read cached VM-Exit reason to detect external interrupt
-  KVM: VMX: Store the host kernel's IDT base in a global variable
-  KVM: x86: Move kvm_{before,after}_interrupt() calls to vendor code
-  KVM: VMX: Handle NMIs, #MCs and async #PFs in common irqs-disabled fn
-  KVM: nVMX: Intercept VMWRITEs to read-only shadow VMCS fields
-  KVM: nVMX: Intercept VMWRITEs to GUEST_{CS,SS}_AR_BYTES
-  KVM: nVMX: Track vmcs12 offsets for shadowed VMCS fields
-  KVM: nVMX: Lift sync_vmcs12() out of prepare_vmcs12()
-  KVM: nVMX: Use descriptive names for VMCS sync functions and flags
-  KVM: nVMX: Add helpers to identify shadowed VMCS fields
-  KVM: nVMX: Sync rarely accessed guest fields only when needed
-  KVM: VMX: Always signal #GP on WRMSR to MSR_IA32_CR_PAT with bad value
-  KVM: nVMX: Always sync GUEST_BNDCFGS when it comes from vmcs01
-  KVM: nVMX: Write ENCLS-exiting bitmap once per vmcs02
-  KVM: nVMX: Don't rewrite GUEST_PML_INDEX during nested VM-Entry
-  KVM: nVMX: Don't "put" vCPU or host state when switching VMCS
-  KVM: nVMX: Don't reread VMCS-agnostic state when switching VMCS
-  KVM: nVMX: Don't dump VMCS if virtual APIC page can't be mapped
-  KVM: nVMX: Don't speculatively write virtual-APIC page address
-  KVM: nVMX: Don't speculatively write APIC-access page address
-  KVM: nVMX: Update vmcs12 for MSR_IA32_CR_PAT when it's written
-  KVM: nVMX: Update vmcs12 for SYSENTER MSRs when they're written
-  KVM: nVMX: Update vmcs12 for MSR_IA32_DEBUGCTLMSR when it's written
-  KVM: nVMX: Don't update GUEST_BNDCFGS if it's clean in HV eVMCS
-  KVM: nVMX: Copy PDPTRs to/from vmcs12 only when necessary
-  KVM: nVMX: Use adjusted pin controls for vmcs02
-  KVM: VMX: Add builder macros for shadowing controls
-  KVM: VMX: Shadow VMCS pin controls
-  KVM: VMX: Shadow VMCS primary execution controls
-  KVM: VMX: Shadow VMCS secondary execution controls
-  KVM: nVMX: Shadow VMCS controls on a per-VMCS basis
-  KVM: nVMX: Don't reset VMCS controls shadow on VMCS switch
-  KVM: VMX: Explicitly initialize controls shadow at VMCS allocation
-  KVM: nVMX: Preserve last USE_MSR_BITMAPS when preparing vmcs02
-  KVM: nVMX: Preset *DT exiting in vmcs02 when emulating UMIP
-  KVM: VMX: Drop hv_timer_armed from 'struct loaded_vmcs'
-  KVM: VMX: Leave preemption timer running when it's disabled
-
- arch/x86/include/asm/kvm_host.h       |   2 +-
- arch/x86/kvm/svm.c                    |   6 +-
- arch/x86/kvm/vmx/nested.c             | 591 +++++++++++++++++++++-------------
- arch/x86/kvm/vmx/nested.h             |   2 +-
- arch/x86/kvm/vmx/vmcs.h               |  17 +-
- arch/x86/kvm/vmx/vmcs12.h             |  57 ++--
- arch/x86/kvm/vmx/vmcs_shadow_fields.h |  79 ++---
- arch/x86/kvm/vmx/vmx.c                | 408 ++++++++++++-----------
- arch/x86/kvm/vmx/vmx.h                | 122 +++----
- arch/x86/kvm/x86.c                    |  12 +-
- arch/x86/kvm/x86.h                    |   5 +
- 11 files changed, 733 insertions(+), 568 deletions(-)
-
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 5d903f8909d1..1b3ca0582a0c 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6107,28 +6107,21 @@ static void vmx_apicv_post_state_restore(struct kvm_vcpu *vcpu)
+ 
+ static void vmx_complete_atomic_exit(struct vcpu_vmx *vmx)
+ {
+-	u32 exit_intr_info = 0;
+-	u16 basic_exit_reason = (u16)vmx->exit_reason;
+-
+-	if (!(basic_exit_reason == EXIT_REASON_MCE_DURING_VMENTRY
+-	      || basic_exit_reason == EXIT_REASON_EXCEPTION_NMI))
++	if (vmx->exit_reason != EXIT_REASON_EXCEPTION_NMI)
+ 		return;
+ 
+-	if (!(vmx->exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY))
+-		exit_intr_info = vmcs_read32(VM_EXIT_INTR_INFO);
+-	vmx->exit_intr_info = exit_intr_info;
++	vmx->exit_intr_info = vmcs_read32(VM_EXIT_INTR_INFO);
+ 
+ 	/* if exit due to PF check for async PF */
+-	if (is_page_fault(exit_intr_info))
++	if (is_page_fault(vmx->exit_intr_info))
+ 		vmx->vcpu.arch.apf.host_apf_reason = kvm_read_and_reset_pf_reason();
+ 
+ 	/* Handle machine checks before interrupts are enabled */
+-	if (basic_exit_reason == EXIT_REASON_MCE_DURING_VMENTRY ||
+-	    is_machine_check(exit_intr_info))
++	if (is_machine_check(vmx->exit_intr_info))
+ 		kvm_machine_check();
+ 
+ 	/* We need to handle NMIs before interrupts are enabled */
+-	if (is_nmi(exit_intr_info)) {
++	if (is_nmi(vmx->exit_intr_info)) {
+ 		kvm_before_interrupt(&vmx->vcpu);
+ 		asm("int $2");
+ 		kvm_after_interrupt(&vmx->vcpu);
+@@ -6535,6 +6528,9 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	vmx->idt_vectoring_info = 0;
+ 
+ 	vmx->exit_reason = vmx->fail ? 0xdead : vmcs_read32(VM_EXIT_REASON);
++	if ((u16)vmx->exit_reason == EXIT_REASON_MCE_DURING_VMENTRY)
++		kvm_machine_check();
++
+ 	if (vmx->fail || (vmx->exit_reason & VMX_EXIT_REASONS_FAILED_VMENTRY))
+ 		return;
+ 
 -- 
 1.8.3.1
+
 
