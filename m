@@ -2,208 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1929E43DE0
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 17:46:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A56B743F59
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 17:56:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389390AbfFMPqD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 11:46:03 -0400
-Received: from foss.arm.com ([217.140.110.172]:43564 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389371AbfFMPqC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 11:46:02 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 35647367;
-        Thu, 13 Jun 2019 08:46:01 -0700 (PDT)
-Received: from [10.1.196.72] (e119884-lin.cambridge.arm.com [10.1.196.72])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EA3A53F246;
-        Thu, 13 Jun 2019 08:45:55 -0700 (PDT)
-Subject: Re: [PATCH v17 03/15] arm64: Introduce prctl() options to control the
- tagged user addresses ABI
-To:     Catalin Marinas <catalin.marinas@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>
-Cc:     Andrey Konovalov <andreyknvl@google.com>,
-        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Mark Rutland <mark.rutland@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Kees Cook <keescook@chromium.org>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-References: <cover.1560339705.git.andreyknvl@google.com>
- <a7a2933bea5fe57e504891b7eec7e9432e5e1c1a.1560339705.git.andreyknvl@google.com>
- <20190613111659.GX28398@e103592.cambridge.arm.com>
- <20190613153505.GU28951@C02TF0J2HF1T.local>
-From:   Vincenzo Frascino <vincenzo.frascino@arm.com>
-Message-ID: <99cc257d-5e99-922a-fbe7-3bbaf3621e38@arm.com>
-Date:   Thu, 13 Jun 2019 16:45:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S2388180AbfFMP4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 11:56:39 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36514 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731679AbfFMP4h (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jun 2019 11:56:37 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5DFpjJw068741
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 11:56:36 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2t3rn6u4td-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 11:56:36 -0400
+Received: from localhost
+        by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Thu, 13 Jun 2019 16:56:34 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 13 Jun 2019 16:56:31 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5DFuTxk49348724
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Jun 2019 15:56:29 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B2A7EAE055;
+        Thu, 13 Jun 2019 15:56:29 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6C657AE051;
+        Thu, 13 Jun 2019 15:56:29 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.26])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 13 Jun 2019 15:56:29 +0000 (GMT)
+Date:   Thu, 13 Jun 2019 17:56:28 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+        libvir-list@redhat.com, Matthew Rosato <mjrosato@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>
+Subject: Re: [PATCH RFC 1/1] allow to specify additional config data
+In-Reply-To: <20190606144417.1824-2-cohuck@redhat.com>
+References: <20190606144417.1824-1-cohuck@redhat.com>
+        <20190606144417.1824-2-cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20190613153505.GU28951@C02TF0J2HF1T.local>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19061315-0028-0000-0000-0000037A0A9E
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19061315-0029-0000-0000-0000243A046B
+Message-Id: <20190613175628.28159268.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-13_10:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906130118
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu,  6 Jun 2019 16:44:17 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> Add a rough implementation for vfio-ap.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  mdevctl.libexec | 25 ++++++++++++++++++++++
+>  mdevctl.sbin    | 56 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 80 insertions(+), 1 deletion(-)
+> 
+> diff --git a/mdevctl.libexec b/mdevctl.libexec
+> index 804166b5086d..cc0546142924 100755
+> --- a/mdevctl.libexec
+> +++ b/mdevctl.libexec
+> @@ -54,6 +54,19 @@ wait_for_supported_types () {
+>      fi
+>  }
+>  
+> +# configure vfio-ap devices <config entry> <matrix attribute>
+> +configure_ap_devices() {
+> +    list="`echo "${config[$1]}" | sed 's/,/ /'`"
+> +    [ -z "$list" ] && return
+> +    for a in $list; do
+> +        echo "$a" > "$supported_types/${config[mdev_type]}/devices/$uuid/$2"
+> +        if [ $? -ne 0 ]; then
+> +            echo "Error writing '$a' to '$uuid/$2'" >&2
+> +            exit 1
+> +        fi
+> +    done
+> +}
+> +
+>  case ${1} in
+>      start-mdev|stop-mdev)
+>          if [ $# -ne 2 ]; then
+> @@ -148,6 +161,18 @@ case ${cmd} in
+>              echo "Error creating mdev type ${config[mdev_type]} on $parent" >&2
+>              exit 1
+>          fi
+> +
+> +        # some types may specify additional config data
+> +        case ${config[mdev_type]} in
+> +            vfio_ap-passthrough)
+> +                configure_ap_devices ap_adapters assign_adapter
+> +                configure_ap_devices ap_domains assign_domain
+> +                configure_ap_devices ap_control_domains assign_control_domain
+> +                # TODO: is assigning idempotent? Should we unwind on error?
+
+It is largely idempotent AFAIR. The pathological case is queues go away
+between the two assigns, but that results in the worst case just
+in an error code -- the previous assignment is still effective. Why are
+you asking? When doing this next time we will start with a freshly
+created mdev I guess.
+
+Regarding unwind. Keeping a half configured mdev (errors happened) looks
+like a bad idea to me. Currently we don't fail the start operation if
+we can't configure a device. So I guess the in case of vfio_ap the
+guest would just start with whatever we managed to get.
+
+What about concurrent updates to the config?
+
+> +                ;;
+> +            *)
+> +                ;;
+> +        esac
+>          ;;
+>  
+>      add-mdev)
+> diff --git a/mdevctl.sbin b/mdevctl.sbin
+> index 276cf6ddc817..eb5ee0091879 100755
+> --- a/mdevctl.sbin
+> +++ b/mdevctl.sbin
+> @@ -33,6 +33,8 @@ usage() {
+>      echo "set-start <mdev UUID>: change mdev start policy, if no option specified," >&2
+>      echo "                       system default policy is used" >&2
+>      echo "                       options: [--auto] [--manual]" >&2
+> +    echo "set-additional-config <mdev UUID> {fmt...}: supply additional configuration" >&2
+
+This is a disruptive action for 'auto' at the moment. I'm not sure about
+that, but if we want to have this disruptive, then we need to document
+it as such.
+
+> +    echo "show-additional-config-format <mdev UUiD>:  prints the format expected by the device" >&2
+>      echo "list-all: list all possible mdev types supported in the system" >&2
+>      echo "list-available: list all mdev types currently available" >&2
+>      echo "list-mdevs: list currently configured mdevs" >&2
+> @@ -48,7 +50,7 @@ while (($# > 0)); do
+>          --manual)
+>              config[start]=manual
+>              ;;
+> -        start-mdev|stop-mdev|remove-mdev|set-start)
+> +        start-mdev|stop-mdev|remove-mdev|set-start|show-additional-config-format)
+>              [ $# -ne 2 ] && usage
+>              cmd=$1
+>              uuid=$2
+> @@ -67,6 +69,14 @@ while (($# > 0)); do
+>              cmd=$1
+>              break
+>              ;;
+> +        set-additional-config)
+> +            [ $# -le 2 ] && usage
+> +            cmd=$1
+> +            uuid=$2
+> +            shift 2
+> +            addtl_config="$*"
+> +            break
+> +            ;;
+>          *)
+>              usage
+>              ;;
+> @@ -114,6 +124,50 @@ case ${cmd} in
+>          fi
+>          ;;
+>  
+> +    set-additional-config)
+> +        file=$(find $persist_base -name $uuid -type f)
+> +        if [ -w "$file" ]; then
+> +            read_config "$file"
+> +            if [ ${config[start]} == "auto" ]; then
+> +                systemctl stop mdev@$uuid.service
+> +            fi
+
+If the mdev is not started stop has no effect. If there
+is an mdev started, and in use by a VM destroying the
+mdev is a disruptive operation.
+
+I'm a bit concerned about this semantic. We have a case
+where the change takes effect immediately in a disruptive
+or not disruptive fashion, and then we have a case where
+only the persistent configuration is changed. And then,
+when the configuration are applied, it may only get partially
+applied.
+
+Tony is working on hotplug/unplug on vfio_ap_mdevs. I do
+not see if that is also supposed to fit in here. Probably
+not.
+
+> +            # FIXME: validate input!
+> +            for i in $addtl_config; do
+> +                key="`echo "$i" | cut -d '=' -f 1`"
+> +                value="`echo "$i" | cut -d '=' -f 2-`"
+> +                if grep -q ^$key $file; then
+> +                    if [ -z "$value" ]; then
+> +                        sed -i "s/^$key=.*//g" $file
+> +                    else
+> +                        sed -i "s/^$key=.*/$key=$value/g" $file
+> +                    fi
+> +                else
+> +                    echo "$i" >> "$file"
+> +                fi
+
+How about concurrency? I guess we could end up loosing distinct
+updates without detecting it.
+
+> +            done
+
+Basically we append or change but don't remove. So it is a
+cumulative thing I suppose.
 
 
-On 13/06/2019 16:35, Catalin Marinas wrote:
-> On Thu, Jun 13, 2019 at 12:16:59PM +0100, Dave P Martin wrote:
->> On Wed, Jun 12, 2019 at 01:43:20PM +0200, Andrey Konovalov wrote:
->>> From: Catalin Marinas <catalin.marinas@arm.com>
->>>
->>> It is not desirable to relax the ABI to allow tagged user addresses into
->>> the kernel indiscriminately. This patch introduces a prctl() interface
->>> for enabling or disabling the tagged ABI with a global sysctl control
->>> for preventing applications from enabling the relaxed ABI (meant for
->>> testing user-space prctl() return error checking without reconfiguring
->>> the kernel). The ABI properties are inherited by threads of the same
->>> application and fork()'ed children but cleared on execve().
->>>
->>> The PR_SET_TAGGED_ADDR_CTRL will be expanded in the future to handle
->>> MTE-specific settings like imprecise vs precise exceptions.
->>>
->>> Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
->>> ---
->>>  arch/arm64/include/asm/processor.h   |  6 +++
->>>  arch/arm64/include/asm/thread_info.h |  1 +
->>>  arch/arm64/include/asm/uaccess.h     |  3 +-
->>>  arch/arm64/kernel/process.c          | 67 ++++++++++++++++++++++++++++
->>>  include/uapi/linux/prctl.h           |  5 +++
->>>  kernel/sys.c                         | 16 +++++++
->>>  6 files changed, 97 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
->>> index fcd0e691b1ea..fee457456aa8 100644
->>> --- a/arch/arm64/include/asm/processor.h
->>> +++ b/arch/arm64/include/asm/processor.h
->>> @@ -307,6 +307,12 @@ extern void __init minsigstksz_setup(void);
->>>  /* PR_PAC_RESET_KEYS prctl */
->>>  #define PAC_RESET_KEYS(tsk, arg)	ptrauth_prctl_reset_keys(tsk, arg)
->>>  
->>> +/* PR_TAGGED_ADDR prctl */
->>
->> (A couple of comments I missed in my last reply:)
->>
->> Name mismatch?
-> 
-> Yeah, it went through several names but it seems that I didn't update
-> all places.
-> 
->>> +long set_tagged_addr_ctrl(unsigned long arg);
->>> +long get_tagged_addr_ctrl(void);
->>> +#define SET_TAGGED_ADDR_CTRL(arg)	set_tagged_addr_ctrl(arg)
->>> +#define GET_TAGGED_ADDR_CTRL()		get_tagged_addr_ctrl()
->>> +
->>
->> [...]
->>
->>> diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
->>> index 3767fb21a5b8..69d0be1fc708 100644
->>> --- a/arch/arm64/kernel/process.c
->>> +++ b/arch/arm64/kernel/process.c
->>> @@ -30,6 +30,7 @@
->>>  #include <linux/kernel.h>
->>>  #include <linux/mm.h>
->>>  #include <linux/stddef.h>
->>> +#include <linux/sysctl.h>
->>>  #include <linux/unistd.h>
->>>  #include <linux/user.h>
->>>  #include <linux/delay.h>
->>> @@ -323,6 +324,7 @@ void flush_thread(void)
->>>  	fpsimd_flush_thread();
->>>  	tls_thread_flush();
->>>  	flush_ptrace_hw_breakpoint(current);
->>> +	clear_thread_flag(TIF_TAGGED_ADDR);
->>>  }
->>>  
->>>  void release_thread(struct task_struct *dead_task)
->>> @@ -552,3 +554,68 @@ void arch_setup_new_exec(void)
->>>  
->>>  	ptrauth_thread_init_user(current);
->>>  }
->>> +
->>> +/*
->>> + * Control the relaxed ABI allowing tagged user addresses into the kernel.
->>> + */
->>> +static unsigned int tagged_addr_prctl_allowed = 1;
->>> +
->>> +long set_tagged_addr_ctrl(unsigned long arg)
->>> +{
->>> +	if (!tagged_addr_prctl_allowed)
->>> +		return -EINVAL;
->>
->> So, tagging can actually be locked on by having a process enable it and
->> then some possibly unrelated process clearing tagged_addr_prctl_allowed.
->> That feels a bit weird.
-> 
-> The problem is that if you disable the ABI globally, lots of
-> applications would crash. This sysctl is meant as a way to disable the
-> opt-in to the TBI ABI. Another option would be a kernel command line
-> option (I'm not keen on a Kconfig option).
->
+I'm not sure 'set-additional-config' is a good idea. For vfio_ap
+I would hope for a tool that is more intelligent, and can help
+with avoiding and managing conflicts.
 
-Why you are not keen on a Kconfig option?
-
->> Do we want to allow a process that has tagging on to be able to turn
->> it off at all?  Possibly things like CRIU might want to do that.
-> 
-> I left it in for symmetry but I don't expect it to be used. A potential
-> use-case is doing it per subsequent threads in an application.
-> 
->>> +	if (is_compat_task())
->>> +		return -EINVAL;
->>> +	if (arg & ~PR_TAGGED_ADDR_ENABLE)
->>> +		return -EINVAL;
->>
->> How do we expect this argument to be extended in the future?
-> 
-> Yes, for MTE. That's why I wouldn't allow random bits here.
-> 
->> I'm wondering whether this is really a bitmask or an enum, or a mixture
->> of the two.  Maybe it doesn't matter.
-> 
-> User may want to set PR_TAGGED_ADDR_ENABLE | PR_MTE_PRECISE in a single
-> call.
-> 
->>> +	if (arg & PR_TAGGED_ADDR_ENABLE)
->>> +		set_thread_flag(TIF_TAGGED_ADDR);
->>> +	else
->>> +		clear_thread_flag(TIF_TAGGED_ADDR);
->>
->> I think update_thread_flag() could be used here.
-> 
-> Yes. I forgot you added this.
-> 
-
--- 
 Regards,
-Vincenzo
+Halil
+
+[..]
+
