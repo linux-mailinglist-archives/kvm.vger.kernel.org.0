@@ -2,251 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D0E8A44A93
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 20:26:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF80544B7F
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 21:01:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727461AbfFMS0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 14:26:02 -0400
-Received: from mail-io1-f72.google.com ([209.85.166.72]:46847 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727058AbfFMS0B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 14:26:01 -0400
-Received: by mail-io1-f72.google.com with SMTP id s83so16011451iod.13
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 11:26:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=H8fkKRsajFNvveyMibT6Ym6gwJL9IWybrrDbLE6hjXM=;
-        b=MVGdr4Ecp2l2VMCWbqMDjpnOYhztVywG8NPRUCAkpUh/wPUtWsuQpXknUyqI0U+TFr
-         83tXT6IFnJBUyecKuUcpyQnPGH4GWVTitTCqeLKuiX6dNjRGdyI+Hw28HJNwLinFZ7Qa
-         pCO/ghXD8/XbeMLOMvNSSd8PZenGSceez9rfOuQg7QoiAgBPHLdGQl/PQYUxW5z7LfEz
-         lxA+USlS1lGgQtiQG5mGul8c0+VQoXSPJR+m7jnOSE58TUImi1iYa/IKAHl4/dXJfyNI
-         TM7fYsnsGijXJAsLgtZ9/7QaXGDY/ft8FPRQUQzyFT/gVh/Khqa9qXNXMzcpX7J4zrl9
-         a8bA==
-X-Gm-Message-State: APjAAAXSZiCev5v0P97MG+cBndRlOoBkgTN/Paf0JlXnYGWGjx7KYor9
-        Ww6nOxvZtbvdjM0pbs3I3wX5IVamPzLvNPFNyjLlyONmEERB
-X-Google-Smtp-Source: APXvYqzBC1FZKm6BWRsem6orfogvQHSXv8MqMWzwoem5idhuC5D8v+7E99KxjGlqvsPxtqaqrIOr9RdqfLmefvin5NKd9sUHCap2
+        id S1727482AbfFMTB2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 15:01:28 -0400
+Received: from Galois.linutronix.de ([146.0.238.70]:36126 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726603AbfFMTB2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 15:01:28 -0400
+Received: from p5b06daab.dip0.t-ipconnect.de ([91.6.218.171] helo=nanos)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1hbUy1-0000Pv-7Q; Thu, 13 Jun 2019 21:00:57 +0200
+Date:   Thu, 13 Jun 2019 21:00:56 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+cc:     Dmitry Safonov <dima@arista.com>, linux-kernel@vger.kernel.org,
+        Prasanna Panchamukhi <panchamukhi@arista.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Cathy Avery <cavery@redhat.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        "Michael Kelley (EOSG)" <Michael.H.Kelley@microsoft.com>,
+        Mohammed Gamal <mmorsy@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?ISO-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
+        Roman Kagan <rkagan@virtuozzo.com>,
+        Sasha Levin <sashal@kernel.org>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        devel@linuxdriverproject.org, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH] x86/hyperv: Disable preemption while setting reenlightenment
+ vector
+In-Reply-To: <8736kff6q3.fsf@vitty.brq.redhat.com>
+Message-ID: <alpine.DEB.2.21.1906132059020.1791@nanos.tec.linutronix.de>
+References: <20190611212003.26382-1-dima@arista.com> <8736kff6q3.fsf@vitty.brq.redhat.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-X-Received: by 2002:a02:b90e:: with SMTP id v14mr28704806jan.122.1560450360686;
- Thu, 13 Jun 2019 11:26:00 -0700 (PDT)
-Date:   Thu, 13 Jun 2019 11:26:00 -0700
-In-Reply-To: <CACT4Y+bAuAiApr9CxSH5CoDnZ5hYmU+K4kJqrSo5yBZLyrzONA@mail.gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007042a8058b38a946@google.com>
-Subject: Re: memory leak in vhost_net_ioctl
-From:   syzbot <syzbot+0789f0c7e45efd7bb643@syzkaller.appspotmail.com>
-To:     asias@redhat.com, ast@kernel.org, bpf@vger.kernel.org,
-        daniel@iogearbox.net, davem@davemloft.net, dvyukov@google.com,
-        hawk@kernel.org, hdanton@sina.com, jakub.kicinski@netronome.com,
-        jasowang@redhat.com, john.fastabend@gmail.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mst@redhat.com,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org,
-        xdp-newbies@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=US-ASCII
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Wed, 12 Jun 2019, Vitaly Kuznetsov wrote:
+> Dmitry Safonov <dima@arista.com> writes:
+> > diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
+> > index 1608050e9df9..0bdd79ecbff8 100644
+> > --- a/arch/x86/hyperv/hv_init.c
+> > +++ b/arch/x86/hyperv/hv_init.c
+> > @@ -91,7 +91,7 @@ EXPORT_SYMBOL_GPL(hv_max_vp_index);
+> >  static int hv_cpu_init(unsigned int cpu)
+> >  {
+> >  	u64 msr_vp_index;
+> > -	struct hv_vp_assist_page **hvp = &hv_vp_assist_page[smp_processor_id()];
+> > +	struct hv_vp_assist_page **hvp = &hv_vp_assist_page[cpu];
+> >  	void **input_arg;
+> >  	struct page *pg;
+> >  
+> > @@ -103,7 +103,7 @@ static int hv_cpu_init(unsigned int cpu)
+> >  
+> >  	hv_get_vp_index(msr_vp_index);
+> >  
+> > -	hv_vp_index[smp_processor_id()] = msr_vp_index;
+> > +	hv_vp_index[cpu] = msr_vp_index;
+> >  
+> >  	if (msr_vp_index > hv_max_vp_index)
+> >  		hv_max_vp_index = msr_vp_index;
+> 
+> The above is unrelated cleanup (as cpu == smp_processor_id() for
+> CPUHP_AP_ONLINE_DYN callbacks), right? As I'm pretty sure these can'd be
+> preempted.
 
-syzbot has tested the proposed patch but the reproducer still triggered  
-crash:
-memory leak in vhost_net_ioctl
+They can be preempted, but they are guaranteed to run on the upcoming CPU,
+i.e. smp_processor_id() is allowed even in preemptible context as the task
+cannot migrate.
 
-ANGE): hsr_slave_1: link becomes ready
-2019/06/13 18:24:57 executed programs: 18
-BUG: memory leak
-unreferenced object 0xffff88811cbc6ac0 (size 64):
-   comm "syz-executor.0", pid 7196, jiffies 4294943804 (age 14.770s)
-   hex dump (first 32 bytes):
-     01 00 00 00 81 88 ff ff 00 00 00 00 82 88 ff ff  ................
-     d0 6a bc 1c 81 88 ff ff d0 6a bc 1c 81 88 ff ff  .j.......j......
-   backtrace:
-     [<000000006c752978>] kmemleak_alloc_recursive  
-include/linux/kmemleak.h:43 [inline]
-     [<000000006c752978>] slab_post_alloc_hook mm/slab.h:439 [inline]
-     [<000000006c752978>] slab_alloc mm/slab.c:3326 [inline]
-     [<000000006c752978>] kmem_cache_alloc_trace+0x13d/0x280 mm/slab.c:3553
-     [<00000000b3825d52>] kmalloc include/linux/slab.h:547 [inline]
-     [<00000000b3825d52>] vhost_net_ubuf_alloc drivers/vhost/net.c:241  
-[inline]
-     [<00000000b3825d52>] vhost_net_set_backend drivers/vhost/net.c:1535  
-[inline]
-     [<00000000b3825d52>] vhost_net_ioctl+0xb43/0xc10  
-drivers/vhost/net.c:1717
-     [<00000000700f02d7>] vfs_ioctl fs/ioctl.c:46 [inline]
-     [<00000000700f02d7>] file_ioctl fs/ioctl.c:509 [inline]
-     [<00000000700f02d7>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
-     [<000000009a0ec0a7>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
-     [<00000000d9416323>] __do_sys_ioctl fs/ioctl.c:720 [inline]
-     [<00000000d9416323>] __se_sys_ioctl fs/ioctl.c:718 [inline]
-     [<00000000d9416323>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
-     [<00000000e4407a23>] do_syscall_64+0x76/0x1a0  
-arch/x86/entry/common.c:301
-     [<000000008715c149>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+Thanks,
 
-BUG: memory leak
-unreferenced object 0xffff88810b1365c0 (size 64):
-   comm "syz-executor.2", pid 7193, jiffies 4294943823 (age 14.580s)
-   hex dump (first 32 bytes):
-     01 00 00 00 81 88 ff ff 00 00 00 00 81 88 ff ff  ................
-     d0 65 13 0b 81 88 ff ff d0 65 13 0b 81 88 ff ff  .e.......e......
-   backtrace:
-     [<000000006c752978>] kmemleak_alloc_recursive  
-include/linux/kmemleak.h:43 [inline]
-     [<000000006c752978>] slab_post_alloc_hook mm/slab.h:439 [inline]
-     [<000000006c752978>] slab_alloc mm/slab.c:3326 [inline]
-     [<000000006c752978>] kmem_cache_alloc_trace+0x13d/0x280 mm/slab.c:3553
-     [<00000000b3825d52>] kmalloc include/linux/slab.h:547 [inline]
-     [<00000000b3825d52>] vhost_net_ubuf_alloc drivers/vhost/net.c:241  
-[inline]
-     [<00000000b3825d52>] vhost_net_set_backend drivers/vhost/net.c:1535  
-[inline]
-     [<00000000b3825d52>] vhost_net_ioctl+0xb43/0xc10  
-drivers/vhost/net.c:1717
-     [<00000000700f02d7>] vfs_ioctl fs/ioctl.c:46 [inline]
-     [<00000000700f02d7>] file_ioctl fs/ioctl.c:509 [inline]
-     [<00000000700f02d7>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
-     [<000000009a0ec0a7>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
-     [<00000000d9416323>] __do_sys_ioctl fs/ioctl.c:720 [inline]
-     [<00000000d9416323>] __se_sys_ioctl fs/ioctl.c:718 [inline]
-     [<00000000d9416323>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
-     [<00000000e4407a23>] do_syscall_64+0x76/0x1a0  
-arch/x86/entry/common.c:301
-     [<000000008715c149>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-BUG: memory leak
-unreferenced object 0xffff88810be23700 (size 64):
-   comm "syz-executor.3", pid 7194, jiffies 4294943823 (age 14.580s)
-   hex dump (first 32 bytes):
-     01 00 00 00 00 00 00 00 00 00 00 00 00 c9 ff ff  ................
-     10 37 e2 0b 81 88 ff ff 10 37 e2 0b 81 88 ff ff  .7.......7......
-   backtrace:
-     [<000000006c752978>] kmemleak_alloc_recursive  
-include/linux/kmemleak.h:43 [inline]
-     [<000000006c752978>] slab_post_alloc_hook mm/slab.h:439 [inline]
-     [<000000006c752978>] slab_alloc mm/slab.c:3326 [inline]
-     [<000000006c752978>] kmem_cache_alloc_trace+0x13d/0x280 mm/slab.c:3553
-     [<00000000b3825d52>] kmalloc include/linux/slab.h:547 [inline]
-     [<00000000b3825d52>] vhost_net_ubuf_alloc drivers/vhost/net.c:241  
-[inline]
-     [<00000000b3825d52>] vhost_net_set_backend drivers/vhost/net.c:1535  
-[inline]
-     [<00000000b3825d52>] vhost_net_ioctl+0xb43/0xc10  
-drivers/vhost/net.c:1717
-     [<00000000700f02d7>] vfs_ioctl fs/ioctl.c:46 [inline]
-     [<00000000700f02d7>] file_ioctl fs/ioctl.c:509 [inline]
-     [<00000000700f02d7>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
-     [<000000009a0ec0a7>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
-     [<00000000d9416323>] __do_sys_ioctl fs/ioctl.c:720 [inline]
-     [<00000000d9416323>] __se_sys_ioctl fs/ioctl.c:718 [inline]
-     [<00000000d9416323>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
-     [<00000000e4407a23>] do_syscall_64+0x76/0x1a0  
-arch/x86/entry/common.c:301
-     [<000000008715c149>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-BUG: memory leak
-unreferenced object 0xffff88810b136500 (size 64):
-   comm "syz-executor.6", pid 7228, jiffies 4294943827 (age 14.540s)
-   hex dump (first 32 bytes):
-     01 00 00 00 20 69 6f 63 00 00 00 00 64 65 76 2f  .... ioc....dev/
-     10 65 13 0b 81 88 ff ff 10 65 13 0b 81 88 ff ff  .e.......e......
-   backtrace:
-     [<000000006c752978>] kmemleak_alloc_recursive  
-include/linux/kmemleak.h:43 [inline]
-     [<000000006c752978>] slab_post_alloc_hook mm/slab.h:439 [inline]
-     [<000000006c752978>] slab_alloc mm/slab.c:3326 [inline]
-     [<000000006c752978>] kmem_cache_alloc_trace+0x13d/0x280 mm/slab.c:3553
-     [<00000000b3825d52>] kmalloc include/linux/slab.h:547 [inline]
-     [<00000000b3825d52>] vhost_net_ubuf_alloc drivers/vhost/net.c:241  
-[inline]
-     [<00000000b3825d52>] vhost_net_set_backend drivers/vhost/net.c:1535  
-[inline]
-     [<00000000b3825d52>] vhost_net_ioctl+0xb43/0xc10  
-drivers/vhost/net.c:1717
-     [<00000000700f02d7>] vfs_ioctl fs/ioctl.c:46 [inline]
-     [<00000000700f02d7>] file_ioctl fs/ioctl.c:509 [inline]
-     [<00000000700f02d7>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
-     [<000000009a0ec0a7>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
-     [<00000000d9416323>] __do_sys_ioctl fs/ioctl.c:720 [inline]
-     [<00000000d9416323>] __se_sys_ioctl fs/ioctl.c:718 [inline]
-     [<00000000d9416323>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
-     [<00000000e4407a23>] do_syscall_64+0x76/0x1a0  
-arch/x86/entry/common.c:301
-     [<000000008715c149>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-BUG: memory leak
-unreferenced object 0xffff88810b9cfec0 (size 64):
-   comm "syz-executor.7", pid 7236, jiffies 4294943829 (age 14.520s)
-   hex dump (first 32 bytes):
-     01 00 00 00 20 69 6f 63 00 00 00 00 64 65 76 2f  .... ioc....dev/
-     d0 fe 9c 0b 81 88 ff ff d0 fe 9c 0b 81 88 ff ff  ................
-   backtrace:
-     [<000000006c752978>] kmemleak_alloc_recursive  
-include/linux/kmemleak.h:43 [inline]
-     [<000000006c752978>] slab_post_alloc_hook mm/slab.h:439 [inline]
-     [<000000006c752978>] slab_alloc mm/slab.c:3326 [inline]
-     [<000000006c752978>] kmem_cache_alloc_trace+0x13d/0x280 mm/slab.c:3553
-     [<00000000b3825d52>] kmalloc include/linux/slab.h:547 [inline]
-     [<00000000b3825d52>] vhost_net_ubuf_alloc drivers/vhost/net.c:241  
-[inline]
-     [<00000000b3825d52>] vhost_net_set_backend drivers/vhost/net.c:1535  
-[inline]
-     [<00000000b3825d52>] vhost_net_ioctl+0xb43/0xc10  
-drivers/vhost/net.c:1717
-     [<00000000700f02d7>] vfs_ioctl fs/ioctl.c:46 [inline]
-     [<00000000700f02d7>] file_ioctl fs/ioctl.c:509 [inline]
-     [<00000000700f02d7>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
-     [<000000009a0ec0a7>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
-     [<00000000d9416323>] __do_sys_ioctl fs/ioctl.c:720 [inline]
-     [<00000000d9416323>] __se_sys_ioctl fs/ioctl.c:718 [inline]
-     [<00000000d9416323>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
-     [<00000000e4407a23>] do_syscall_64+0x76/0x1a0  
-arch/x86/entry/common.c:301
-     [<000000008715c149>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-BUG: memory leak
-unreferenced object 0xffff88810b9cd380 (size 64):
-   comm "syz-executor.4", pid 7218, jiffies 4294943834 (age 14.470s)
-   hex dump (first 32 bytes):
-     01 00 00 00 81 88 ff ff 00 00 00 00 81 88 ff ff  ................
-     90 d3 9c 0b 81 88 ff ff 90 d3 9c 0b 81 88 ff ff  ................
-   backtrace:
-     [<000000006c752978>] kmemleak_alloc_recursive  
-include/linux/kmemleak.h:43 [inline]
-     [<000000006c752978>] slab_post_alloc_hook mm/slab.h:439 [inline]
-     [<000000006c752978>] slab_alloc mm/slab.c:3326 [inline]
-     [<000000006c752978>] kmem_cache_alloc_trace+0x13d/0x280 mm/slab.c:3553
-     [<00000000b3825d52>] kmalloc include/linux/slab.h:547 [inline]
-     [<00000000b3825d52>] vhost_net_ubuf_alloc drivers/vhost/net.c:241  
-[inline]
-     [<00000000b3825d52>] vhost_net_set_backend drivers/vhost/net.c:1535  
-[inline]
-     [<00000000b3825d52>] vhost_net_ioctl+0xb43/0xc10  
-drivers/vhost/net.c:1717
-     [<00000000700f02d7>] vfs_ioctl fs/ioctl.c:46 [inline]
-     [<00000000700f02d7>] file_ioctl fs/ioctl.c:509 [inline]
-     [<00000000700f02d7>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
-     [<000000009a0ec0a7>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
-     [<00000000d9416323>] __do_sys_ioctl fs/ioctl.c:720 [inline]
-     [<00000000d9416323>] __se_sys_ioctl fs/ioctl.c:718 [inline]
-     [<00000000d9416323>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
-     [<00000000e4407a23>] do_syscall_64+0x76/0x1a0  
-arch/x86/entry/common.c:301
-     [<000000008715c149>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-
-
-Tested on:
-
-commit:         c11fb13a Merge branch 'for-linus' of git://git.kernel.org/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11c6b666a00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cb38d33cd06d8d48
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=11ff0de1a00000
-
+	tglx
