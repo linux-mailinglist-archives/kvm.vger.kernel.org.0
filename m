@@ -2,55 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3066244809
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:07:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 817234488A
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:10:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393313AbfFMRDy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 13:03:54 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:51195 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404533AbfFMRDx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S2393214AbfFMRI0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 13:08:26 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40924 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729728AbfFMRDx (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 13 Jun 2019 13:03:53 -0400
-Received: by mail-wm1-f68.google.com with SMTP id c66so10985868wmf.0;
-        Thu, 13 Jun 2019 10:03:51 -0700 (PDT)
+Received: by mail-wm1-f66.google.com with SMTP id v19so10887170wmj.5;
+        Thu, 13 Jun 2019 10:03:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=DhIcMejBJdxQAmrC0DE4pRw6tryHHTsWn2zI8kJgzxo=;
-        b=hZ3ZF2MYe0PwL8KBBkQW7fNxjg1PIHkhgdW9RmBGd2Ahbv3PqmmUU9Mta77U2Gq+B8
-         HSKwAhswuu5vT72DXtQHbukXdVkLkne/fnZB6iIyDS4FOjDpq8LjO3Vkm6Fw1Y7Elibf
-         bqyZAy3Wu8aov5d1c+FeL0kXQwGFWaVCdZGmlL3Jlb3xT3ymth9m3rJNLXYIgHlxV52r
-         bpiFURmw1k3aYeKZDLpT/N9lAjv93GTHFn7i1b/n7tRAc9AuOSg3o/7thhrZqCFT4ITE
-         3KPxSuwCgJAYcPlOFm2vLOO0+/OMeI6hVlGJNs1uC36XHCvqGBLJf3kXfKVhKIH/5uWC
-         ghhQ==
+        bh=ePv84bl3LONQijVs8R1uvqK3iY+gH1mMWEz3/sRHNh4=;
+        b=iG+jB85IqiXtij8iEpdwh2V+oesMsHGhbgK14yUbaqF6wx3NosHX1fOFHGp2IeL0DN
+         It6wkkhKa/eJLYq1dKPQiQGsJO3BzUOvfvNbXGiJWft/TphMxJDtURXseifwmD1cvFdJ
+         8S9wxVRhpdvytylc00Gpm7ywrLpMk+RIH/qtXzbXXgXK/HyLWX5Tbji6a1MkUj+Ryplo
+         8mrkHNGl05s2WZ0+lkbnP8euyIgrEVEJsLVhSQINWFFINhkAURkHRpZPwLCABkeRAvvZ
+         Ome8dtrL/QIN/G7uBG57HIsAujp29FNm2c59Me1fCFmBsrvBp3GksQ7kXq0qBBD+iPN7
+         lzNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=DhIcMejBJdxQAmrC0DE4pRw6tryHHTsWn2zI8kJgzxo=;
-        b=lkE/4ljsT1vF75lGsyjDtjzhN7HWYphFQLBL6fDdb9zH+KF2zeg8sqZjyjSuWd9mCK
-         D62sUj0b2RJr9mbvhPtg5IoP4xoGwujvPE2Lo3XI8TSM7HPLwfpNFYlCGgN7B6cxBade
-         pUtPoaYxgdyU07LKhk/pVvdLKl9SgPbDKDm0oy70eFUBceC0E12giarkq3mxEfcj00mi
-         X6A595I1oTdK/bfzevxGWCVGrHAfJ1mqjexvMhC+grE1XnT2PUvtlTTQuNszeb5iV5pS
-         oA/9wawbXjxGOeGIKSkfPjZdNrqXU6LfCNi07kobcr1s2diZ/VsNnu0Ttci3U2Xr/PJG
-         JBmg==
-X-Gm-Message-State: APjAAAV8/omK1qiQnbrnIuc3SDEScm25efOw8tBobSKikr+wFydCalXu
-        R/IwKROvNj4ffyJM6BIOPlv9DYOz
-X-Google-Smtp-Source: APXvYqxq8fRFDG4a8bogFdJ/wvIr/GY4DjyUk6JrZ4jLquYWaLwfhu0weueXLYK/fk1YMWVfPyGnjw==
-X-Received: by 2002:a1c:c912:: with SMTP id f18mr4402885wmb.118.1560445430834;
-        Thu, 13 Jun 2019 10:03:50 -0700 (PDT)
+        bh=ePv84bl3LONQijVs8R1uvqK3iY+gH1mMWEz3/sRHNh4=;
+        b=SoK7BhPS61aOzBVVL3V6RaTZlRrNoPjMXIQxetAdMACbe+LSEK0oD2ckbslCY/HEqi
+         +QDcFtEzw8kMCjDxszok3CO3wtWhdl5hltSnLQdWYEuH0lyaXJ5WuLewC5FvQqTMk8Yf
+         kGxO6zLDsXehKf/GZ8EMcCY1nag7K1EQ7/Y+siZu59AbnI/Vs3SQ2rvQ6i0LUApkThw7
+         T8WmD9mqfe3TaDu71837a6OiqAdzWxrlR7lrHVoYJdbceyl2Aa3oHMkORMe0sSfWrGEH
+         f8Q5P5LGFDyDxWAZ1peludugTiomEiwtciFGExPmqUItOGmqKvUJiGyDbXZrkwrGkEbD
+         BXpQ==
+X-Gm-Message-State: APjAAAVQpUacbJz9gk47Fa/VVECv94/N7JjdZ8UXwbgYIw20SfvMJwfI
+        4FEAyr0rMuK97jbKHIMHx/jC1VXn
+X-Google-Smtp-Source: APXvYqzqCUPESyKwv5Pnv2qSpaLUg9Xw9KxBR66l9YtqfS5C2p4xhOBYcDDC8jNQ99F14YveLCnEUw==
+X-Received: by 2002:a1c:be0a:: with SMTP id o10mr4530228wmf.91.1560445431583;
+        Thu, 13 Jun 2019 10:03:51 -0700 (PDT)
 Received: from 640k.localdomain ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id a10sm341856wrx.17.2019.06.13.10.03.49
+        by smtp.gmail.com with ESMTPSA id a10sm341856wrx.17.2019.06.13.10.03.50
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 10:03:50 -0700 (PDT)
+        Thu, 13 Jun 2019 10:03:51 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        vkuznets@redhat.com, stable@vger.kernel.org,
-        Liran Alon <liran.alon@oracle.com>
-Subject: [PATCH 16/43] KVM: nVMX: Always sync GUEST_BNDCFGS when it comes from vmcs01
-Date:   Thu, 13 Jun 2019 19:03:02 +0200
-Message-Id: <1560445409-17363-17-git-send-email-pbonzini@redhat.com>
+        vkuznets@redhat.com
+Subject: [PATCH 17/43] KVM: nVMX: Write ENCLS-exiting bitmap once per vmcs02
+Date:   Thu, 13 Jun 2019 19:03:03 +0200
+Message-Id: <1560445409-17363-18-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
 References: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
@@ -61,51 +60,40 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-If L1 does not set VM_ENTRY_LOAD_BNDCFGS, then L1's BNDCFGS value must
-be propagated to vmcs02 since KVM always runs with VM_ENTRY_LOAD_BNDCFGS
-when MPX is supported.  Because the value effectively comes from vmcs01,
-vmcs02 must be updated even if vmcs12 is clean.
+KVM doesn't yet support SGX virtualization, i.e. writes a constant value
+to ENCLS_EXITING_BITMAP so that it can intercept ENCLS and inject a #UD.
 
-Fixes: 62cf9bd8118c4 ("KVM: nVMX: Fix emulation of VM_ENTRY_LOAD_BNDCFGS")
-Cc: stable@vger.kernel.org
-Cc: Liran Alon <liran.alon@oracle.com>
+Fixes: 0b665d3040281 ("KVM: vmx: Inject #UD for SGX ENCLS instruction in guest")
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/nested.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index fb7eddd64714..f2be64256f15 100644
+index f2be64256f15..fee297a5edda 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -2228,13 +2228,9 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+@@ -1943,6 +1943,9 @@ static void prepare_vmcs02_constant_state(struct vcpu_vmx *vmx)
+ 	if (enable_pml)
+ 		vmcs_write64(PML_ADDRESS, page_to_phys(vmx->pml_pg));
  
- 	set_cr4_guest_host_mask(vmx);
++	if (cpu_has_vmx_encls_vmexit())
++		vmcs_write64(ENCLS_EXITING_BITMAP, -1ull);
++
+ 	/*
+ 	 * Set the MSR load/store lists to match L0's settings.  Only the
+ 	 * addresses are constant (for vmcs02), the counts can change based
+@@ -2065,9 +2068,6 @@ static void prepare_vmcs02_early(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+ 		if (exec_control & SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)
+ 			vmcs_write64(APIC_ACCESS_ADDR, -1ull);
  
--	if (kvm_mpx_supported()) {
--		if (vmx->nested.nested_run_pending &&
--			(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
--			vmcs_write64(GUEST_BNDCFGS, vmcs12->guest_bndcfgs);
--		else
--			vmcs_write64(GUEST_BNDCFGS, vmx->nested.vmcs01_guest_bndcfgs);
--	}
-+	if (kvm_mpx_supported() && vmx->nested.nested_run_pending &&
-+	    (vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS))
-+		vmcs_write64(GUEST_BNDCFGS, vmcs12->guest_bndcfgs);
- }
- 
- /*
-@@ -2266,6 +2262,9 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 		kvm_set_dr(vcpu, 7, vcpu->arch.dr7);
- 		vmcs_write64(GUEST_IA32_DEBUGCTL, vmx->nested.vmcs01_debugctl);
+-		if (exec_control & SECONDARY_EXEC_ENCLS_EXITING)
+-			vmcs_write64(ENCLS_EXITING_BITMAP, -1ull);
+-
+ 		vmcs_write32(SECONDARY_VM_EXEC_CONTROL, exec_control);
  	}
-+	if (kvm_mpx_supported() && (!vmx->nested.nested_run_pending ||
-+	    !(vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS)))
-+		vmcs_write64(GUEST_BNDCFGS, vmx->nested.vmcs01_guest_bndcfgs);
- 	vmx_set_rflags(vcpu, vmcs12->guest_rflags);
  
- 	/* EXCEPTION_BITMAP and CR0_GUEST_HOST_MASK should basically be the
 -- 
 1.8.3.1
 
