@@ -2,46 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E2E11443E4
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 18:34:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 349BD443D6
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 18:34:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730831AbfFMQdT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 12:33:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44504 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730827AbfFMIJK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jun 2019 04:09:10 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5D86rP2034071
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 04:09:08 -0400
+        id S2392411AbfFMQc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 12:32:58 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42870 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730840AbfFMIN6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jun 2019 04:13:58 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5D8CZbH123856
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 04:13:57 -0400
 Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2t3j5ahjvj-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2t3gy1cqkm-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 04:09:08 -0400
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 04:13:56 -0400
 Received: from localhost
         by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
-        Thu, 13 Jun 2019 09:09:06 +0100
+        Thu, 13 Jun 2019 09:13:54 +0100
 Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
         by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 13 Jun 2019 09:09:04 +0100
+        Thu, 13 Jun 2019 09:13:51 +0100
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5D892gJ60293372
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5D8DoeI57999430
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Jun 2019 08:09:02 GMT
+        Thu, 13 Jun 2019 08:13:50 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6C453A4053;
-        Thu, 13 Jun 2019 08:09:02 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id DAD5DA4065;
+        Thu, 13 Jun 2019 08:13:49 +0000 (GMT)
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C0414A4057;
-        Thu, 13 Jun 2019 08:09:01 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 43682A4057;
+        Thu, 13 Jun 2019 08:13:49 +0000 (GMT)
 Received: from [9.152.97.224] (unknown [9.152.97.224])
         by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 13 Jun 2019 08:09:01 +0000 (GMT)
+        Thu, 13 Jun 2019 08:13:49 +0000 (GMT)
 Reply-To: mimu@linux.ibm.com
-Subject: Re: [PATCH v5 1/8] s390/mm: force swiotlb for protected
- virtualization
+Subject: Re: [PATCH v5 2/8] s390/cio: introduce DMA pools to cio
 To:     Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
         Sebastian Ott <sebott@linux.ibm.com>,
@@ -59,29 +58,29 @@ Cc:     virtualization@lists.linux-foundation.org,
         Eric Farman <farman@linux.ibm.com>,
         "Jason J. Herne" <jjherne@linux.ibm.com>
 References: <20190612111236.99538-1-pasic@linux.ibm.com>
- <20190612111236.99538-2-pasic@linux.ibm.com>
+ <20190612111236.99538-3-pasic@linux.ibm.com>
 From:   Michael Mueller <mimu@linux.ibm.com>
 Organization: IBM
-Date:   Thu, 13 Jun 2019 10:09:01 +0200
+Date:   Thu, 13 Jun 2019 10:13:48 +0200
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
  Gecko/20100101 Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190612111236.99538-2-pasic@linux.ibm.com>
+In-Reply-To: <20190612111236.99538-3-pasic@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19061308-4275-0000-0000-00000341EC32
+x-cbid: 19061308-4275-0000-0000-00000341EC91
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19061308-4276-0000-0000-0000385204E8
-Message-Id: <38e3b7bf-1882-a12d-073c-04d888ed2432@linux.ibm.com>
+x-cbparentid: 19061308-4276-0000-0000-000038520549
+Message-Id: <4b0f7a77-25cd-65c3-5ec7-97c519d33fb2@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-13_05:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906130065
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906130066
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -90,157 +89,243 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 On 12.06.19 13:12, Halil Pasic wrote:
-> On s390, protected virtualization guests have to use bounced I/O
-> buffers.  That requires some plumbing.
-sed 's/  / /'
-
+> To support protected virtualization cio will need to make sure the
+> memory used for communication with the hypervisor is DMA memory.
 > 
-> Let us make sure, any device that uses DMA API with direct ops correctly
-> is spared from the problems, that a hypervisor attempting I/O to a
-> non-shared page would bring.
-
-That sentence reads pretty cumbersome.
-
+> Let us introduce one global pool for cio.
+> 
+> Our DMA pools are implemented as a gen_pool backed with DMA pages. The
+> idea is to avoid each allocation effectively wasting a page, as we
+> typically allocate much less than PAGE_SIZE.
 > 
 > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Reviewed-by: Sebastian Ott <sebott@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->   arch/s390/Kconfig                   |  4 +++
->   arch/s390/include/asm/mem_encrypt.h | 18 +++++++++++
->   arch/s390/mm/init.c                 | 47 +++++++++++++++++++++++++++++
->   3 files changed, 69 insertions(+)
->   create mode 100644 arch/s390/include/asm/mem_encrypt.h
+>   arch/s390/Kconfig           |   1 +
+>   arch/s390/include/asm/cio.h |  11 +++
+>   drivers/s390/cio/css.c      | 133 ++++++++++++++++++++++++++++++++++--
+>   3 files changed, 141 insertions(+), 4 deletions(-)
 > 
 > diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
-> index 109243fdb6ec..88d8355b7bf7 100644
+> index 88d8355b7bf7..2a245b56db8b 100644
 > --- a/arch/s390/Kconfig
 > +++ b/arch/s390/Kconfig
-> @@ -1,4 +1,7 @@
->   # SPDX-License-Identifier: GPL-2.0
-> +config ARCH_HAS_MEM_ENCRYPT
-> +        def_bool y
-> +
->   config MMU
->   	def_bool y
->   
-> @@ -187,6 +190,7 @@ config S390
->   	select VIRT_CPU_ACCOUNTING
+> @@ -191,6 +191,7 @@ config S390
 >   	select ARCH_HAS_SCALED_CPUTIME
 >   	select HAVE_NMI
-> +	select SWIOTLB
+>   	select SWIOTLB
+> +	select GENERIC_ALLOCATOR
 >   
 >   
 >   config SCHED_OMIT_FRAME_POINTER
-> diff --git a/arch/s390/include/asm/mem_encrypt.h b/arch/s390/include/asm/mem_encrypt.h
-> new file mode 100644
-> index 000000000000..0898c09a888c
-> --- /dev/null
-> +++ b/arch/s390/include/asm/mem_encrypt.h
-> @@ -0,0 +1,18 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef S390_MEM_ENCRYPT_H__
-> +#define S390_MEM_ENCRYPT_H__
+> diff --git a/arch/s390/include/asm/cio.h b/arch/s390/include/asm/cio.h
+> index 1727180e8ca1..58e7db912c30 100644
+> --- a/arch/s390/include/asm/cio.h
+> +++ b/arch/s390/include/asm/cio.h
+> @@ -7,6 +7,7 @@
+>   
+>   #include <linux/spinlock.h>
+>   #include <linux/bitops.h>
+> +#include <linux/genalloc.h>
+>   #include <asm/types.h>
+>   
+>   #define LPM_ANYPATH 0xff
+> @@ -328,6 +329,16 @@ static inline u8 pathmask_to_pos(u8 mask)
+>   void channel_subsystem_reinit(void);
+>   extern void css_schedule_reprobe(void);
+>   
+> +extern void *cio_dma_zalloc(size_t size);
+> +extern void cio_dma_free(void *cpu_addr, size_t size);
+> +extern struct device *cio_get_dma_css_dev(void);
 > +
-> +#ifndef __ASSEMBLY__
+> +void *cio_gp_dma_zalloc(struct gen_pool *gp_dma, struct device *dma_dev,
+> +			size_t size);
+> +void cio_gp_dma_free(struct gen_pool *gp_dma, void *cpu_addr, size_t size);
+> +void cio_gp_dma_destroy(struct gen_pool *gp_dma, struct device *dma_dev);
+> +struct gen_pool *cio_gp_dma_create(struct device *dma_dev, int nr_pages);
 > +
-> +#define sme_me_mask	0ULL
-> +
-> +static inline bool sme_active(void) { return false; }
-> +extern bool sev_active(void);
-> +
-> +int set_memory_encrypted(unsigned long addr, int numpages);
-> +int set_memory_decrypted(unsigned long addr, int numpages);
-> +
-> +#endif	/* __ASSEMBLY__ */
-> +
-> +#endif	/* S390_MEM_ENCRYPT_H__ */
-> +
-> diff --git a/arch/s390/mm/init.c b/arch/s390/mm/init.c
-> index 14d1eae9fe43..f0bee6af3960 100644
-> --- a/arch/s390/mm/init.c
-> +++ b/arch/s390/mm/init.c
-> @@ -18,6 +18,7 @@
->   #include <linux/mman.h>
->   #include <linux/mm.h>
->   #include <linux/swap.h>
-> +#include <linux/swiotlb.h>
->   #include <linux/smp.h>
->   #include <linux/init.h>
->   #include <linux/pagemap.h>
-> @@ -29,6 +30,7 @@
->   #include <linux/export.h>
->   #include <linux/cma.h>
->   #include <linux/gfp.h>
+>   /* Function from drivers/s390/cio/chsc.c */
+>   int chsc_sstpc(void *page, unsigned int op, u16 ctrl, u64 *clock_delta);
+>   int chsc_sstpi(void *page, void *result, size_t size);
+> diff --git a/drivers/s390/cio/css.c b/drivers/s390/cio/css.c
+> index aea502922646..e0f19f1e82a0 100644
+> --- a/drivers/s390/cio/css.c
+> +++ b/drivers/s390/cio/css.c
+> @@ -20,6 +20,8 @@
+>   #include <linux/reboot.h>
+>   #include <linux/suspend.h>
+>   #include <linux/proc_fs.h>
+> +#include <linux/genalloc.h>
 > +#include <linux/dma-mapping.h>
->   #include <asm/processor.h>
->   #include <linux/uaccess.h>
->   #include <asm/pgtable.h>
-> @@ -42,6 +44,8 @@
->   #include <asm/sclp.h>
->   #include <asm/set_memory.h>
->   #include <asm/kasan.h>
-> +#include <asm/dma-mapping.h>
-> +#include <asm/uv.h>
+>   #include <asm/isc.h>
+>   #include <asm/crw.h>
 >   
->   pgd_t swapper_pg_dir[PTRS_PER_PGD] __section(.bss..swapper_pg_dir);
+> @@ -224,6 +226,12 @@ struct subchannel *css_alloc_subchannel(struct subchannel_id schid,
+>   	INIT_WORK(&sch->todo_work, css_sch_todo);
+>   	sch->dev.release = &css_subchannel_release;
+>   	device_initialize(&sch->dev);
+> +	/*
+> +	 * The physical addresses of some the dma structures that can
+> +	 * belong to a subchannel need to fit 31 bit width (e.g. ccw).
+> +	 */
+> +	sch->dev.coherent_dma_mask = DMA_BIT_MASK(31);
+> +	sch->dev.dma_mask = &sch->dev.coherent_dma_mask;
+>   	return sch;
 >   
-> @@ -128,6 +132,47 @@ void mark_rodata_ro(void)
->   	pr_info("Write protected read-only-after-init data: %luk\n", size >> 10);
->   }
+>   err:
+> @@ -899,6 +907,13 @@ static int __init setup_css(int nr)
+>   	dev_set_name(&css->device, "css%x", nr);
+>   	css->device.groups = cssdev_attr_groups;
+>   	css->device.release = channel_subsystem_release;
+> +	/*
+> +	 * We currently allocate notifier bits with this (using
+> +	 * css->device as the device argument with the DMA API)
+> +	 * and are fine with 64 bit addresses.
+> +	 */
+> +	css->device.coherent_dma_mask = DMA_BIT_MASK(64);
+> +	css->device.dma_mask = &css->device.coherent_dma_mask;
 >   
-> +int set_memory_encrypted(unsigned long addr, int numpages)
+>   	mutex_init(&css->mutex);
+>   	css->cssid = chsc_get_cssid(nr);
+> @@ -1018,6 +1033,111 @@ static struct notifier_block css_power_notifier = {
+>   	.notifier_call = css_power_event,
+>   };
+>   
+> +#define  CIO_DMA_GFP (GFP_KERNEL | __GFP_ZERO)
+> +static struct gen_pool *cio_dma_pool;
+> +
+> +/* Currently cio supports only a single css */
+> +struct device *cio_get_dma_css_dev(void)
 > +{
+> +	return &channel_subsystems[0]->device;
+> +}
+> +
+> +struct gen_pool *cio_gp_dma_create(struct device *dma_dev, int nr_pages)
+> +{
+> +	struct gen_pool *gp_dma;
+> +	void *cpu_addr;
+> +	dma_addr_t dma_addr;
 > +	int i;
 > +
-> +	/* make specified pages unshared, (swiotlb, dma_free) */
-> +	for (i = 0; i < numpages; ++i) {
-> +		uv_remove_shared(addr);
-> +		addr += PAGE_SIZE;
+> +	gp_dma = gen_pool_create(3, -1);
+> +	if (!gp_dma)
+> +		return NULL;
+> +	for (i = 0; i < nr_pages; ++i) {
+> +		cpu_addr = dma_alloc_coherent(dma_dev, PAGE_SIZE, &dma_addr,
+> +					      CIO_DMA_GFP);
+> +		if (!cpu_addr)
+> +			return gp_dma;
+> +		gen_pool_add_virt(gp_dma, (unsigned long) cpu_addr,
+> +				  dma_addr, PAGE_SIZE, -1);
 > +	}
-> +	return 0;
+> +	return gp_dma;
 > +}
 > +
-> +int set_memory_decrypted(unsigned long addr, int numpages)
+> +static void __gp_dma_free_dma(struct gen_pool *pool,
+> +			      struct gen_pool_chunk *chunk, void *data)
 > +{
-> +	int i;
-> +	/* make specified pages shared (swiotlb, dma_alloca) */
-> +	for (i = 0; i < numpages; ++i) {
-> +		uv_set_shared(addr);
-> +		addr += PAGE_SIZE;
-> +	}
-> +	return 0;
+> +	size_t chunk_size = chunk->end_addr - chunk->start_addr + 1;
+> +
+> +	dma_free_coherent((struct device *) data, chunk_size,
+> +			 (void *) chunk->start_addr,
+> +			 (dma_addr_t) chunk->phys_addr);
 > +}
 > +
-> +/* are we a protected virtualization guest? */
-> +bool sev_active(void)
+> +void cio_gp_dma_destroy(struct gen_pool *gp_dma, struct device *dma_dev)
 > +{
-> +	return is_prot_virt_guest();
-> +}
-> +
-> +/* protected virtualization */
-> +static void pv_init(void)
-> +{
-> +	if (!is_prot_virt_guest())
+> +	if (!gp_dma)
 > +		return;
-> +
-> +	/* make sure bounce buffers are shared */
-> +	swiotlb_init(1);
-> +	swiotlb_update_mem_attributes();
-> +	swiotlb_force = SWIOTLB_FORCE;
+> +	/* this is quite ugly but no better idea */
+> +	gen_pool_for_each_chunk(gp_dma, __gp_dma_free_dma, dma_dev);
+> +	gen_pool_destroy(gp_dma);
 > +}
 > +
->   void __init mem_init(void)
->   {
->   	cpumask_set_cpu(0, &init_mm.context.cpu_attach_mask);
-> @@ -136,6 +181,8 @@ void __init mem_init(void)
->   	set_max_mapnr(max_low_pfn);
->           high_memory = (void *) __va(max_low_pfn * PAGE_SIZE);
->   
-> +	pv_init();
+> +static int cio_dma_pool_init(void)
+> +{
+> +	/* No need to free up the resources: compiled in */
+> +	cio_dma_pool = cio_gp_dma_create(cio_get_dma_css_dev(), 1);
+> +	if (!cio_dma_pool)
+> +		return -ENOMEM;
+> +	return 0;
+> +}
 > +
->   	/* Setup guest page hinting */
->   	cmma_init();
+> +void *cio_gp_dma_zalloc(struct gen_pool *gp_dma, struct device *dma_dev,
+> +			size_t size)
+> +{
+> +	dma_addr_t dma_addr;
+> +	unsigned long addr;
+> +	size_t chunk_size;
+> +
+> +	if (!cio_dma_pool)
+> +		return NULL;
+> +	addr = gen_pool_alloc(gp_dma, size);
+> +	while (!addr) {
+> +		chunk_size = round_up(size, PAGE_SIZE);
+> +		addr = (unsigned long) dma_alloc_coherent(dma_dev,
+> +					 chunk_size, &dma_addr, CIO_DMA_GFP);
+> +		if (!addr)
+> +			return NULL;
+> +		gen_pool_add_virt(gp_dma, addr, dma_addr, chunk_size, -1);
+> +		addr = gen_pool_alloc(gp_dma, size);
+> +	}
+> +	return (void *) addr;
+> +}
+> +
+> +void cio_gp_dma_free(struct gen_pool *gp_dma, void *cpu_addr, size_t size)
+> +{
+> +	if (!cpu_addr)
+> +		return;
+> +	memset(cpu_addr, 0, size);
+> +	gen_pool_free(gp_dma, (unsigned long) cpu_addr, size);
+> +}
+> +
+> +/*
+> + * Allocate dma memory from the css global pool. Intended for memory not
+> + * specific to any single device within the css. The allocated memory
+> + * is not guaranteed to be 31-bit addressable.
+> + *
+> + * Caution: Not suitable for early stuff like console.
+> + */
+> +void *cio_dma_zalloc(size_t size)
+> +{
+> +	return cio_gp_dma_zalloc(cio_dma_pool, cio_get_dma_css_dev(), size);
+> +}
+> +
+> +void cio_dma_free(void *cpu_addr, size_t size)
+> +{
+> +	cio_gp_dma_free(cio_dma_pool, cpu_addr, size);
+> +}
+> +
+>   /*
+>    * Now that the driver core is running, we can setup our channel subsystem.
+>    * The struct subchannel's are created during probing.
+> @@ -1059,16 +1179,21 @@ static int __init css_bus_init(void)
+>   	if (ret)
+>   		goto out_unregister;
+>   	ret = register_pm_notifier(&css_power_notifier);
+> -	if (ret) {
+> -		unregister_reboot_notifier(&css_reboot_notifier);
+> -		goto out_unregister;
+> -	}
+> +	if (ret)
+> +		goto out_unregister_rn;
+> +	ret = cio_dma_pool_init();
+> +	if (ret)
+> +		goto out_unregister_pmn;
+>   	css_init_done = 1;
 >   
+>   	/* Enable default isc for I/O subchannels. */
+>   	isc_register(IO_SCH_ISC);
+>   
+>   	return 0;
+> +out_unregister_pmn:
+> +	unregister_pm_notifier(&css_power_notifier);
+> +out_unregister_rn:
+> +	unregister_reboot_notifier(&css_reboot_notifier);
+>   out_unregister:
+>   	while (i-- > 0) {
+>   		struct channel_subsystem *css = channel_subsystems[i];
 > 
 
 Reviewed-by: Michael Mueller <mimu@linux.ibm.com>
