@@ -2,120 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B1FB544521
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 18:42:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 516C24446C
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 18:37:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731742AbfFMQmG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 12:42:06 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:37502 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730529AbfFMGtd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 02:49:33 -0400
-Received: by mail-pl1-f194.google.com with SMTP id bh12so7695185plb.4;
-        Wed, 12 Jun 2019 23:49:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=xKPDMBsM8vrHynfTKpftZ1wRPHd2M86wqu3lhZWYIxQ=;
-        b=R2CJdlfbpj/3UfeaHuQdolhnNm9LDeeJdpeuXpcRNiLe+DwqyxRyob1wAYNYwxeF8E
-         0vuM51t1vACyNFiMxoXNsSr2JeATLleB2RJYMsDTKnP3xwXF+4Iz3a3rpZuTq2vaJBlC
-         U0APHCOOpplypfKlZFNucDyQIpBjDAWYCGZDIoFfxLBhw638Yqhr/4JaFZdn7E/uLqsL
-         akDXNVZHBPTN7gcqmYC7dAYfmLB6ckn1lNy94KL+c6XP7noFULT4yVF/IZVryPdvvdQB
-         czekNaishcLUYDdy0Az9lGpAdqeLavpgvtTgCq6TGsbjcHnfHS+O1L21ioJaZRVYbkqs
-         c14Q==
-X-Gm-Message-State: APjAAAWl6xhWDSbq1z6JunRdWuJpTrEWfyKj7Cd0kkDwfHXI35AHJ4AU
-        5vCA+aGdXZ/SJa7bg16h2/I=
-X-Google-Smtp-Source: APXvYqze3spnPy5+jQ2P2RcqO0x3b64/51oCOz9EvFnfH/l48AC8TBWeDKPA5U++WYuimqwPJOokKw==
-X-Received: by 2002:a17:902:b695:: with SMTP id c21mr33768438pls.160.1560408572179;
-        Wed, 12 Jun 2019 23:49:32 -0700 (PDT)
-Received: from htb-2n-eng-dhcp405.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id i3sm1559973pfa.175.2019.06.12.23.49.30
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 12 Jun 2019 23:49:31 -0700 (PDT)
-From:   Nadav Amit <namit@vmware.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Nadav Amit <namit@vmware.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: [PATCH 6/9] KVM: x86: Provide paravirtualized flush_tlb_multi()
-Date:   Wed, 12 Jun 2019 23:48:10 -0700
-Message-Id: <20190613064813.8102-7-namit@vmware.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190613064813.8102-1-namit@vmware.com>
-References: <20190613064813.8102-1-namit@vmware.com>
+        id S2392620AbfFMQhB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 12:37:01 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:51304 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730665AbfFMHUZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 03:20:25 -0400
+Received: from zn.tnic (p4FED33E6.dip0.t-ipconnect.de [79.237.51.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 565C61EC0AB5;
+        Thu, 13 Jun 2019 09:20:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1560410423;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=tKFI3RchuZbj7w3LjtEwG4S62EiV690jJjYj5RY6/LA=;
+        b=Wf4ZGM6wOcNOStraWYddmu1A+eOW/Nu5+HkTPUWpH/kJo5ivcVLl6xyavtlzTo8NsilRzP
+        rkO+Rrkd6/66fFnIbKUF0L4vgC5f8EXXa+iVnv1sZLb+z6xyhJjicIgB/5DDe8+ZOLl1cA
+        koRuPRE4tF3yIvtNdyEV/8VJcrF/g4s=
+Date:   Thu, 13 Jun 2019 09:18:05 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        George Kennedy <george.kennedy@oracle.com>
+Cc:     joro@8bytes.org, pbonzini@redhat.com, mingo@redhat.com,
+        hpa@zytor.com, kvm@vger.kernel.org, syzkaller@googlegroups.com
+Subject: Re: kernel BUG at arch/x86/kvm/x86.c:361! on AMD CPU
+Message-ID: <20190613071805.GA11598@zn.tnic>
+References: <37952f51-7687-672c-45d9-92ba418c9133@oracle.com>
+ <20190612161255.GN32652@zn.tnic>
+ <af0054d1-1fc8-c106-b503-ca91da5a6fee@oracle.com>
+ <20190612195152.GQ32652@zn.tnic>
+ <20190612205430.GA26320@linux.intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190612205430.GA26320@linux.intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Support the new interface of flush_tlb_multi, which also flushes the
-local CPU's TLB, instead of flush_tlb_others that does not. This
-interface is more performant since it parallelize remote and local TLB
-flushes.
+On Wed, Jun 12, 2019 at 01:54:30PM -0700, Sean Christopherson wrote:
+> The reboot thing is a red-herring.   The ____kvm_handle_fault_on_reboot()
+> macro suppresses faults that occur on VMX and SVM instructions while the
+> kernel is rebooting (CPUs need to leave VMX/SVM mode to recognize INIT),
+> i.e. kvm_spurious_fault() is reached when a VMX or SVM instruction faults
+> and we're *not* rebooting.
+> 
+> TL;DR: an SVM instruction is faulting unexpectedly.
 
-The actual implementation of flush_tlb_multi() is almost identical to
-that of flush_tlb_others().
+Aha, thx!
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
-Signed-off-by: Nadav Amit <namit@vmware.com>
----
- arch/x86/kernel/kvm.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+And there are a couple of places in svm_vcpu_run() which can cause that:
 
-diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-index 00d81e898717..d00d551d4a2a 100644
---- a/arch/x86/kernel/kvm.c
-+++ b/arch/x86/kernel/kvm.c
-@@ -580,7 +580,7 @@ static void __init kvm_apf_trap_init(void)
- 
- static DEFINE_PER_CPU(cpumask_var_t, __pv_tlb_mask);
- 
--static void kvm_flush_tlb_others(const struct cpumask *cpumask,
-+static void kvm_flush_tlb_multi(const struct cpumask *cpumask,
- 			const struct flush_tlb_info *info)
- {
- 	u8 state;
-@@ -594,6 +594,11 @@ static void kvm_flush_tlb_others(const struct cpumask *cpumask,
- 	 * queue flush_on_enter for pre-empted vCPUs
- 	 */
- 	for_each_cpu(cpu, flushmask) {
-+		/*
-+		 * The local vCPU is never preempted, so we do not explicitly
-+		 * skip check for local vCPU - it will never be cleared from
-+		 * flushmask.
-+		 */
- 		src = &per_cpu(steal_time, cpu);
- 		state = READ_ONCE(src->preempted);
- 		if ((state & KVM_VCPU_PREEMPTED)) {
-@@ -603,7 +608,7 @@ static void kvm_flush_tlb_others(const struct cpumask *cpumask,
- 		}
- 	}
- 
--	native_flush_tlb_others(flushmask, info);
-+	native_flush_tlb_multi(flushmask, info);
- }
- 
- static void __init kvm_guest_init(void)
-@@ -628,9 +633,8 @@ static void __init kvm_guest_init(void)
- 	if (kvm_para_has_feature(KVM_FEATURE_PV_TLB_FLUSH) &&
- 	    !kvm_para_has_hint(KVM_HINTS_REALTIME) &&
- 	    kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
--		pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
-+		pv_ops.mmu.flush_tlb_multi = kvm_flush_tlb_multi;
- 		pv_ops.mmu.tlb_remove_table = tlb_remove_table;
--		static_key_disable(&flush_tlb_multi_enabled.key);
- 	}
- 
- 	if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
+[  135.498208] Call Trace:
+[  135.498594]  svm_vcpu_run+0xa83/0x20e0
+
+George, can you objdump the area around offset 0xa83 within svm_vcpu_run
+of the guest kernel?
+
+Thx.
+
 -- 
-2.20.1
+Regards/Gruss,
+    Boris.
 
+Good mailing practices for 400: avoid top-posting and trim the reply.
