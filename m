@@ -2,85 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B73854481F
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:07:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C99DD448F0
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:12:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404726AbfFMRES (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 13:04:18 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:34918 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732657AbfFMRER (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 13:04:17 -0400
-Received: by mail-wm1-f68.google.com with SMTP id c6so10921676wml.0;
-        Thu, 13 Jun 2019 10:04:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=w2YvRin0khft70/HQkufh77cwGHzqtMRSykd+mBeVCQ=;
-        b=g0/oQJsu0HiNM3pzjMAX7Ncl32l44dSFd3BKII/9rbhvbMHJFehjI0alIdOutkE9Jj
-         Rv5CauhjQGF6Awnix2AvWfhOSUM3ooJ04fp66s1RhqpK5yhDLvpyaRLJ2tVxpfu7Kelo
-         wrHQRfxkgtUta/XtLwIBnq3ZjZr+i0bfU4G059Sysc/4/0P5bOevglHP7q07S53XeuaB
-         sJugrjBrcuRIcBO26uL0E02IFQBFtv+h15IO6iJziN0+BLYlgrKZMeyAYqVAja+0DqWr
-         LIeg5NWRAgDFrB7pLwbQqk4rHa+se1/jCExE2/OQyqPXgXmycOmtws2ivESGgoNtWJW7
-         ABGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=w2YvRin0khft70/HQkufh77cwGHzqtMRSykd+mBeVCQ=;
-        b=XQgIFMnY7pyNmDuSEq8Nz0larN60ZwkqLcbTgqZm4LjxmYHlJpPwiqva0vThtNkRp+
-         /IFdVsFbEpiW3BXj00E70P2RTfScYm42cAd48EsHF6pSU4VOIUD8KONv8QKr107a3YR+
-         g5z6ssU4d7hUfdUdYlab5/UfIO8se93UKYFk5p6nWn0i10t48IkcLZ5H4Mgn7UL4jBb1
-         rLIm/uGx6ygLRkffB4pGBj0bP0SaWJQGWRgDtSveN2LEjoypMmbVf0vnPShaN/+G1HUC
-         OQ7hqTESrJxG2xlKA+FupOgW2UR7h9tg2eAOfRDP2yfNB9AQlEUrdVpkqyhTh6Wd3rcY
-         WE6A==
-X-Gm-Message-State: APjAAAXXffgMR5otsGrQ2H0GwBhG60P1H+XnUemre+8VX30xXB0CQGQP
-        mBCmC/H5ySM27eqd8H+AFiJN7KC8
-X-Google-Smtp-Source: APXvYqzIoPIJYVmxr0OxCqDzPCOX/Uq5rOqQsi6JQPJTUCi1PcDr0F/NU/r/FIG4Xnm0P66EYC9fYw==
-X-Received: by 2002:a1c:f916:: with SMTP id x22mr4790174wmh.81.1560445455471;
-        Thu, 13 Jun 2019 10:04:15 -0700 (PDT)
-Received: from 640k.localdomain ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id a10sm341856wrx.17.2019.06.13.10.04.14
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 10:04:14 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        vkuznets@redhat.com
-Subject: [PATCH 43/43] KVM: nVMX: shadow pin based execution controls
-Date:   Thu, 13 Jun 2019 19:03:29 +0200
-Message-Id: <1560445409-17363-44-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
-References: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
+        id S1728909AbfFMRMZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 13:12:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41596 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730193AbfFMRMY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 13:12:24 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id EF879C1EB1ED;
+        Thu, 13 Jun 2019 17:12:23 +0000 (UTC)
+Received: from flask (unknown [10.40.205.10])
+        by smtp.corp.redhat.com (Postfix) with SMTP id 439BC5D9C6;
+        Thu, 13 Jun 2019 17:12:21 +0000 (UTC)
+Received: by flask (sSMTP sendmail emulation); Thu, 13 Jun 2019 19:12:20 +0200
+Date:   Thu, 13 Jun 2019 19:12:20 +0200
+From:   Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [PATCH] KVM: x86: clean up conditions for asynchronous page
+ fault handling
+Message-ID: <20190613171220.GA24873@flask>
+References: <1560423812-51166-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1560423812-51166-1-git-send-email-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 13 Jun 2019 17:12:24 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The VMX_PREEMPTION_TIMER flag may be toggled frequently, though not
-*very* frequently.  Since it does not affect KVM's dirty logic, e.g.
-the preemption timer value is loaded from vmcs12 even if vmcs12 is
-"clean", there is no need to mark vmcs12 dirty when L1 writes pin
-controls, and shadowing the field achieves that.
+2019-06-13 13:03+0200, Paolo Bonzini:
+> Even when asynchronous page fault is disabled, KVM does not want to pause
+> the host if a guest triggers a page fault; instead it will put it into
+> an artificial HLT state that allows running other host processes while
+> allowing interrupt delivery into the guest.
+> 
+> However, the way this feature is triggered is a bit confusing.
+> First, it is not used for page faults while a nested guest is
+> running: but this is not an issue since the artificial halt
+> is completely invisible to the guest, either L1 or L2.  Second,
+> it is used even if kvm_halt_in_guest() returns true; in this case,
+> the guest probably should not pay the additional latency cost of the
+> artificial halt, and thus we should handle the page fault in a
+> completely synchronous way.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx/vmcs_shadow_fields.h | 1 +
- 1 file changed, 1 insertion(+)
+The same reasoning would apply to kvm_mwait_in_guest(), so I would
+disable APF with it as well.
 
-diff --git a/arch/x86/kvm/vmx/vmcs_shadow_fields.h b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-index 4cea018ba285..eb1ecd16fd22 100644
---- a/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-+++ b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-@@ -47,6 +47,7 @@
- SHADOW_FIELD_RO(GUEST_CS_AR_BYTES, guest_cs_ar_bytes)
- SHADOW_FIELD_RO(GUEST_SS_AR_BYTES, guest_ss_ar_bytes)
- SHADOW_FIELD_RW(CPU_BASED_VM_EXEC_CONTROL, cpu_based_vm_exec_control)
-+SHADOW_FIELD_RW(PIN_BASED_VM_EXEC_CONTROL, pin_based_vm_exec_control)
- SHADOW_FIELD_RW(EXCEPTION_BITMAP, exception_bitmap)
- SHADOW_FIELD_RW(VM_ENTRY_EXCEPTION_ERROR_CODE, vm_entry_exception_error_code)
- SHADOW_FIELD_RW(VM_ENTRY_INTR_INFO_FIELD, vm_entry_intr_info_field)
--- 
-1.8.3.1
+> By introducing a new function kvm_can_deliver_async_pf, this patch
+> commonizes the code that chooses whether to deliver an async page fault
+> (kvm_arch_async_page_not_present) and the code that chooses whether a
+> page fault should be handled synchronously (kvm_can_do_async_pf).
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> @@ -9775,6 +9775,36 @@ static int apf_get_user(struct kvm_vcpu *vcpu, u32 *val)
+> +bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
+> +{
+> +	if (unlikely(!lapic_in_kernel(vcpu) ||
+> +		     kvm_event_needs_reinjection(vcpu) ||
+> +		     vcpu->arch.exception.pending))
+> +		return false;
+> +
+> +	if (kvm_hlt_in_guest(vcpu->kvm) && !kvm_can_deliver_async_pf(vcpu))
+> +		return false;
+> +
+> +	/*
+> +	 * If interrupts are off we cannot even use an artificial
+> +	 * halt state.
 
+Can't we?  The artificial halt state would be canceled by the host page
+fault handler.
+
+> +	 */
+> +	return kvm_x86_ops->interrupt_allowed(vcpu);
+> @@ -9783,19 +9813,26 @@ void kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+>  	trace_kvm_async_pf_not_present(work->arch.token, work->gva);
+>  	kvm_add_async_pf_gfn(vcpu, work->arch.gfn);
+>  
+> -	if (!(vcpu->arch.apf.msr_val & KVM_ASYNC_PF_ENABLED) ||
+> -	    (vcpu->arch.apf.send_user_only &&
+> -	     kvm_x86_ops->get_cpl(vcpu) == 0))
+> +	if (!kvm_can_deliver_async_pf(vcpu) ||
+> +	    apf_put_user(vcpu, KVM_PV_REASON_PAGE_NOT_PRESENT)) {
+> +		/*
+> +		 * It is not possible to deliver a paravirtualized asynchronous
+> +		 * page fault, but putting the guest in an artificial halt state
+> +		 * can be beneficial nevertheless: if an interrupt arrives, we
+> +		 * can deliver it timely and perhaps the guest will schedule
+> +		 * another process.  When the instruction that triggered a page
+> +		 * fault is retried, hopefully the page will be ready in the host.
+> +		 */
+>  		kvm_make_request(KVM_REQ_APF_HALT, vcpu);
+
+A return is missing here, to prevent the delivery of PV APF.
+(I'd probably keep the if/else.)
+
+Thanks.
+
+> -	else if (!apf_put_user(vcpu, KVM_PV_REASON_PAGE_NOT_PRESENT)) {
+> -		fault.vector = PF_VECTOR;
+> -		fault.error_code_valid = true;
+> -		fault.error_code = 0;
+> -		fault.nested_page_fault = false;
+> -		fault.address = work->arch.token;
+> -		fault.async_page_fault = true;
+> -		kvm_inject_page_fault(vcpu, &fault);
+
+>  	}
+> +
+> +	fault.vector = PF_VECTOR;
+> +	fault.error_code_valid = true;
+> +	fault.error_code = 0;
+> +	fault.nested_page_fault = false;
+> +	fault.address = work->arch.token;
+> +	fault.async_page_fault = true;
+> +	kvm_inject_page_fault(vcpu, &fault);
+>  }
+>  
+>  void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+> -- 
+> 1.8.3.1
+> 
