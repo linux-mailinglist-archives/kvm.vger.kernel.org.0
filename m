@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4EBA448A1
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:10:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D28314489F
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 19:10:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393574AbfFMRJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 13:09:59 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:36691 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393266AbfFMRDg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 13:03:36 -0400
-Received: by mail-wr1-f66.google.com with SMTP id n4so21629094wrs.3;
-        Thu, 13 Jun 2019 10:03:34 -0700 (PDT)
+        id S2393588AbfFMRJv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 13:09:51 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45776 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2393276AbfFMRDh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Jun 2019 13:03:37 -0400
+Received: by mail-wr1-f65.google.com with SMTP id f9so21542468wre.12;
+        Thu, 13 Jun 2019 10:03:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=LNkyAGPk1iKZCEgQnBFbCeLjAmjPtNmmbmMQ3KLc/JY=;
-        b=jH9THcz7JwqDftxHoT6yKTB3EfG2eMSMoQRA2zyxLVjXPtWqSn/aiq/+Fc0a9hUomU
-         J+nIhekKfl0hGlWQ8KAcEqRePevH76QmFPp7y+LHN3LvREtM+TOYFZ4TtGU+D7xkT63F
-         GqkKHs6dPhwfrxws3wPkWu6ga8eIVICmsijlAjzfDqrciF3KEOMA9FuOpWLZej22FxTR
-         p9Dp9hzHk7erhotlnjt631nS82RVyUW/GrD0hJFOoI6OUDhFxKEwI17pyX6j0KGCUL3h
-         Cw1GOa4YHrbLppJdt9/LH99YGgL1WjfV5Tt/pK8mo4YOpyDk2CaGUYeh/Aarjd87d+gk
-         MhwA==
+        bh=BGAkMmyoFXei/C+Osz0W44dM/FTzgOJ4Csn0iH4sTgA=;
+        b=QAp6ZWfH8FyIUQjW0G4Raf644l/P9qNLuvnIF1EcEp/jage8AOChR+IU8BmzDNgNQc
+         WOZYr1ZQweKHGZqGhxd8w4CiVgWZs4mS16yH4iNQcYY2pBnAFfvuITUMGNVgR9CGdepK
+         hLQv/R6a1cH96mcGIa4GMSybK8ioaO1WtNbEYyaCHsAkFt3dqok5Ih8Uya58B4gdDaBz
+         kfBF1W8ws2ODu2zATaocHIR9U960SmuhPbZOFAz5jDqQL4hfHex1jeXw6WTNNeWxr6oX
+         OxP0vuv4A2S6UjhIzXbYYIumNsfOGxt7gwML6+2uHThCEReBqdpQ5070rSOIdeo1rEJt
+         OmYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=LNkyAGPk1iKZCEgQnBFbCeLjAmjPtNmmbmMQ3KLc/JY=;
-        b=Sfn/vuuDcy6cRsz8Lyxk1g08JWwybeJFrAt6bhuTAMxCab58S3YVH7JKGMVPAttSPC
-         F99iNWmqEuv4hk/xaW4rwioheehdxu9BosiyV/pJKKmor8NPbHDOjqoPDkLRPeBWLgTn
-         drIq3tgaKROh3Y3VM+DIlPzPvQxkL965BQCb1xO6PRjrFsJkuG+8M9Qb47mYr5Pt5/iy
-         2LMG5wMdOEIm9OWjgSMQ7h6R7Mf7D/LfiJ4n9Ah5Cz4DDYVPn26tKkUciZFsBDHuIaVS
-         DbxxIQZWc0/7T/fBfLsbaCuZAh8rJ1vbKhl0aiNPBYPENxY84Qdew+iybkFxPhbTaQuN
-         mzsw==
-X-Gm-Message-State: APjAAAWFy4mVkWvSkkacDF1CZB1TyzfIzbPjO4AGMb6TbmpcE0ZPaCC0
-        lZwHyhZVsDa3pN1YbRrsYNstd2oT
-X-Google-Smtp-Source: APXvYqzrmOSIeIRT3Hbew41lagbGcge6uoHXX4UaJu1fzQDFPwkiaFbYCAdm1MlLzN2ABLWaC/bvAg==
-X-Received: by 2002:a05:6000:4b:: with SMTP id k11mr9221466wrx.82.1560445413938;
-        Thu, 13 Jun 2019 10:03:33 -0700 (PDT)
+        bh=BGAkMmyoFXei/C+Osz0W44dM/FTzgOJ4Csn0iH4sTgA=;
+        b=Dx6vj1G0ALFUw2K11sSwE/JrDrtEPTuDafoLKYfGytPHo8NLwxSawdopp63f1n+4XS
+         CXlae9bNYLMy6z3JEnNjSAy7YiQrdlCAf/d/dbVU/7r/xuP3ke2bZON4ACzTe9PFso23
+         A7jVvo1eYdHEw4Z/6THMGJw3yHnaozr2BFxhrfIBm8dgr2dZX3/tY7RVZ3AVuO68/bC2
+         Kyo7KTEkoyQC2Z7asHgaa8ceQB3yVbOtbD+nmgHek2W4ZuNDhZ8go7ZV+aS6YaXeTdN0
+         yvTXHPvSCArCGdErxeXJVU4qik44+7kxGOfRMP2SuVfIgkTvyT5vqtS9CRakT3aQ93LR
+         nICQ==
+X-Gm-Message-State: APjAAAW5OxfbMPz+eE+xWpZdzAQTAni8cel+w8Ywom0KBGn+T7HcDJx2
+        AfhspTOEJfZxLVT4Y78L+B0Bbzfu
+X-Google-Smtp-Source: APXvYqztY30HU9/MPMjHnjpRsb1TI0dZe7Wp0HAYpmXZE1d1egPRxmLguoJyN54DCG7bpSBCN5Iv3w==
+X-Received: by 2002:adf:db02:: with SMTP id s2mr24573519wri.326.1560445414776;
+        Thu, 13 Jun 2019 10:03:34 -0700 (PDT)
 Received: from 640k.localdomain ([93.56.166.5])
         by smtp.gmail.com with ESMTPSA id a10sm341856wrx.17.2019.06.13.10.03.33
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Jun 2019 10:03:33 -0700 (PDT)
+        Thu, 13 Jun 2019 10:03:34 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
         vkuznets@redhat.com
-Subject: [PATCH 03/43] KVM: VMX: Read cached VM-Exit reason to detect external interrupt
-Date:   Thu, 13 Jun 2019 19:02:49 +0200
-Message-Id: <1560445409-17363-4-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 04/43] KVM: VMX: Store the host kernel's IDT base in a global variable
+Date:   Thu, 13 Jun 2019 19:02:50 +0200
+Message-Id: <1560445409-17363-5-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
 References: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
@@ -60,127 +60,107 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Generic x86 code invokes the kvm_x86_ops external interrupt handler on
-all VM-Exits regardless of the actual exit type.  Use the already-cached
-EXIT_REASON to determine if the VM-Exit was due to an interrupt, thus
-avoiding an extra VMREAD (to query VM_EXIT_INTR_INFO) for all other
-types of VM-Exit.
+Although the kernel may use multiple IDTs, KVM should only ever see the
+"real" IDT, e.g. the early init IDT is long gone by the time KVM runs
+and the debug stack IDT is only used for small windows of time in very
+specific flows.
 
-In addition to avoiding the extra VMREAD, checking the EXIT_REASON
-instead of VM_EXIT_INTR_INFO makes it more obvious that
-vmx_handle_external_intr() is called for all VM-Exits, e.g. someone
-unfamiliar with the flow might wonder under what condition(s)
-VM_EXIT_INTR_INFO does not contain a valid interrupt, which is
-simply not possible since KVM always runs with "ack interrupt on exit".
+Before commit a547c6db4d2f1 ("KVM: VMX: Enable acknowledge interupt on
+vmexit"), the kernel's IDT base was consumed by KVM only when setting
+constant VMCS state, i.e. to set VMCS.HOST_IDTR_BASE.  Because constant
+host state is done once per vCPU, there was ostensibly no need to cache
+the kernel's IDT base.
 
-WARN once if VM_EXIT_INTR_INFO doesn't contain a valid interrupt on
-an EXTERNAL_INTERRUPT VM-Exit, as such a condition would indicate a
-hardware bug.
+When support for "ack interrupt on exit" was introduced, KVM added a
+second consumer of the IDT base as handling already-acked interrupts
+requires directly calling the interrupt handler, i.e. KVM uses the IDT
+base to find the address of the handler.  Because interrupts are a fast
+path, KVM cached the IDT base to avoid having to VMREAD HOST_IDTR_BASE.
+Presumably, the IDT base was cached on a per-vCPU basis simply because
+the existing code grabbed the IDT base on a per-vCPU (VMCS) basis.
+
+Note, all post-boot IDTs use the same handlers for external interrupts,
+i.e. the "ack interrupt on exit" use of the IDT base would be unaffected
+even if the cached IDT somehow did not match the current IDT.  And as
+for the original use case of setting VMCS.HOST_IDTR_BASE, if any of the
+above analysis is wrong then KVM has had a bug since the beginning of
+time since KVM has effectively been caching the IDT at vCPU creation
+since commit a8b732ca01c ("[PATCH] kvm: userspace interface").
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/vmcs.h |  6 +++++
- arch/x86/kvm/vmx/vmx.c  | 62 ++++++++++++++++++++++++++-----------------------
- 2 files changed, 39 insertions(+), 29 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 12 +++++++-----
+ arch/x86/kvm/vmx/vmx.h |  1 -
+ 2 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
-index cb6079f8a227..971a46c69df4 100644
---- a/arch/x86/kvm/vmx/vmcs.h
-+++ b/arch/x86/kvm/vmx/vmcs.h
-@@ -115,6 +115,12 @@ static inline bool is_nmi(u32 intr_info)
- 		== (INTR_TYPE_NMI_INTR | INTR_INFO_VALID_MASK);
- }
- 
-+static inline bool is_external_intr(u32 intr_info)
-+{
-+	return (intr_info & (INTR_INFO_VALID_MASK | INTR_INFO_INTR_TYPE_MASK))
-+		== (INTR_INFO_VALID_MASK | INTR_TYPE_EXT_INTR);
-+}
-+
- enum vmcs_field_width {
- 	VMCS_FIELD_WIDTH_U16 = 0,
- 	VMCS_FIELD_WIDTH_U64 = 1,
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index da6c829bad9f..b541fe2c6347 100644
+index b541fe2c6347..c90abf33b509 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6127,42 +6127,46 @@ static void vmx_complete_atomic_exit(struct vcpu_vmx *vmx)
+@@ -392,6 +392,7 @@ static __always_inline void vmx_disable_intercept_for_msr(unsigned long *msr_bit
+ };
  
- static void vmx_handle_external_intr(struct kvm_vcpu *vcpu)
+ u64 host_efer;
++static unsigned long host_idt_base;
+ 
+ /*
+  * Though SYSCALL is only supported in 64-bit mode on Intel CPUs, kvm
+@@ -3728,7 +3729,6 @@ void vmx_set_constant_host_state(struct vcpu_vmx *vmx)
  {
--	u32 exit_intr_info = vmcs_read32(VM_EXIT_INTR_INFO);
--
--	if ((exit_intr_info & (INTR_INFO_VALID_MASK | INTR_INFO_INTR_TYPE_MASK))
--			== (INTR_INFO_VALID_MASK | INTR_TYPE_EXT_INTR)) {
--		unsigned int vector;
--		unsigned long entry;
--		gate_desc *desc;
--		struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	unsigned int vector;
-+	unsigned long entry;
- #ifdef CONFIG_X86_64
--		unsigned long tmp;
-+	unsigned long tmp;
- #endif
-+	gate_desc *desc;
-+	u32 intr_info;
+ 	u32 low32, high32;
+ 	unsigned long tmpl;
+-	struct desc_ptr dt;
+ 	unsigned long cr0, cr3, cr4;
  
--		vector =  exit_intr_info & INTR_INFO_VECTOR_MASK;
--		desc = (gate_desc *)vmx->host_idt_base + vector;
--		entry = gate_offset(desc);
--		asm volatile(
-+	if (to_vmx(vcpu)->exit_reason != EXIT_REASON_EXTERNAL_INTERRUPT)
-+		return;
-+
-+	intr_info = vmcs_read32(VM_EXIT_INTR_INFO);
-+	if (WARN_ONCE(!is_external_intr(intr_info),
-+	    "KVM: unexpected VM-Exit interrupt info: 0x%x", intr_info))
-+		return;
-+
-+	vector = intr_info & INTR_INFO_VECTOR_MASK;
-+	desc = (gate_desc *)vmx->host_idt_base + vector;
-+	entry = gate_offset(desc);
-+
-+	asm volatile(
- #ifdef CONFIG_X86_64
--			"mov %%" _ASM_SP ", %[sp]\n\t"
--			"and $0xfffffffffffffff0, %%" _ASM_SP "\n\t"
--			"push $%c[ss]\n\t"
--			"push %[sp]\n\t"
-+		"mov %%" _ASM_SP ", %[sp]\n\t"
-+		"and $0xfffffffffffffff0, %%" _ASM_SP "\n\t"
-+		"push $%c[ss]\n\t"
-+		"push %[sp]\n\t"
- #endif
--			"pushf\n\t"
--			__ASM_SIZE(push) " $%c[cs]\n\t"
--			CALL_NOSPEC
--			:
-+		"pushf\n\t"
-+		__ASM_SIZE(push) " $%c[cs]\n\t"
-+		CALL_NOSPEC
-+		:
- #ifdef CONFIG_X86_64
--			[sp]"=&r"(tmp),
-+		[sp]"=&r"(tmp),
- #endif
--			ASM_CALL_CONSTRAINT
--			:
--			THUNK_TARGET(entry),
--			[ss]"i"(__KERNEL_DS),
--			[cs]"i"(__KERNEL_CS)
--			);
--	}
-+		ASM_CALL_CONSTRAINT
-+		:
-+		THUNK_TARGET(entry),
-+		[ss]"i"(__KERNEL_DS),
-+		[cs]"i"(__KERNEL_CS)
-+	);
- }
- STACK_FRAME_NON_STANDARD(vmx_handle_external_intr);
+ 	cr0 = read_cr0();
+@@ -3764,9 +3764,7 @@ void vmx_set_constant_host_state(struct vcpu_vmx *vmx)
+ 	vmcs_write16(HOST_SS_SELECTOR, __KERNEL_DS);  /* 22.2.4 */
+ 	vmcs_write16(HOST_TR_SELECTOR, GDT_ENTRY_TSS*8);  /* 22.2.4 */
  
+-	store_idt(&dt);
+-	vmcs_writel(HOST_IDTR_BASE, dt.address);   /* 22.2.4 */
+-	vmx->host_idt_base = dt.address;
++	vmcs_writel(HOST_IDTR_BASE, host_idt_base);   /* 22.2.4 */
+ 
+ 	vmcs_writel(HOST_RIP, (unsigned long)vmx_vmexit); /* 22.2.5 */
+ 
+@@ -6144,7 +6142,7 @@ static void vmx_handle_external_intr(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	vector = intr_info & INTR_INFO_VECTOR_MASK;
+-	desc = (gate_desc *)vmx->host_idt_base + vector;
++	desc = (gate_desc *)host_idt_base + vector;
+ 	entry = gate_offset(desc);
+ 
+ 	asm volatile(
+@@ -7429,10 +7427,14 @@ static bool vmx_need_emulation_on_page_fault(struct kvm_vcpu *vcpu)
+ static __init int hardware_setup(void)
+ {
+ 	unsigned long host_bndcfgs;
++	struct desc_ptr dt;
+ 	int r, i;
+ 
+ 	rdmsrl_safe(MSR_EFER, &host_efer);
+ 
++	store_idt(&dt);
++	host_idt_base = dt.address;
++
+ 	for (i = 0; i < ARRAY_SIZE(vmx_msr_index); ++i)
+ 		kvm_define_shared_msr(i, vmx_msr_index[i]);
+ 
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 1cdaa5af8245..decd31055da8 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -187,7 +187,6 @@ struct vcpu_vmx {
+ 	int                   nmsrs;
+ 	int                   save_nmsrs;
+ 	bool                  guest_msrs_dirty;
+-	unsigned long	      host_idt_base;
+ #ifdef CONFIG_X86_64
+ 	u64		      msr_host_kernel_gs_base;
+ 	u64		      msr_guest_kernel_gs_base;
 -- 
 1.8.3.1
 
