@@ -2,222 +2,270 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 795D543EB6
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 17:53:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A1A0043EA5
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2019 17:52:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389830AbfFMPwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 11:52:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34636 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731642AbfFMJKZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 05:10:25 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5E94588E63;
-        Thu, 13 Jun 2019 09:10:14 +0000 (UTC)
-Received: from [10.72.12.64] (ovpn-12-64.pek2.redhat.com [10.72.12.64])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AECB45F9B0;
-        Thu, 13 Jun 2019 09:09:50 +0000 (UTC)
-Subject: Re: memory leak in vhost_net_ioctl
-To:     Hillf Danton <hdanton@sina.com>,
-        syzbot <syzbot+0789f0c7e45efd7bb643@syzkaller.appspotmail.com>
-Cc:     ast@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
-        davem@davemloft.net, hawk@kernel.org, jakub.kicinski@netronome.com,
-        john.fastabend@gmail.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mst@redhat.com,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org,
-        xdp-newbies@vger.kernel.org
-References: <20190606144013.9884-1-hdanton@sina.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <4664ac5d-07b7-a141-4130-b563b7974181@redhat.com>
-Date:   Thu, 13 Jun 2019 17:09:50 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S2389513AbfFMPvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Jun 2019 11:51:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50348 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731657AbfFMJLY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 13 Jun 2019 05:11:24 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5D9AfYU063478
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 05:11:22 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2t3hepdrgx-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 05:11:22 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <mimu@linux.ibm.com>;
+        Thu, 13 Jun 2019 10:11:20 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 13 Jun 2019 10:11:16 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5D9BEho49152060
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 13 Jun 2019 09:11:15 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D5FB7A4053;
+        Thu, 13 Jun 2019 09:11:14 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0AC65A4051;
+        Thu, 13 Jun 2019 09:11:14 +0000 (GMT)
+Received: from [9.152.97.224] (unknown [9.152.97.224])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 13 Jun 2019 09:11:13 +0000 (GMT)
+Reply-To: mimu@linux.ibm.com
+Subject: Re: [PATCH v5 0/8] s390: virtio: support protected virtualization
+To:     Halil Pasic <pasic@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        Sebastian Ott <sebott@linux.ibm.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        "Jason J. Herne" <jjherne@linux.ibm.com>
+References: <20190612111236.99538-1-pasic@linux.ibm.com>
+From:   Michael Mueller <mimu@linux.ibm.com>
+Organization: IBM
+Date:   Thu, 13 Jun 2019 11:11:13 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190606144013.9884-1-hdanton@sina.com>
+In-Reply-To: <20190612111236.99538-1-pasic@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Thu, 13 Jun 2019 09:10:24 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19061309-0008-0000-0000-000002F3627E
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19061309-0009-0000-0000-00002260677C
+Message-Id: <4d10d4f8-aeb0-a5bc-6900-ab7901c01cf2@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-13_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906130072
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Halil,
 
-On 2019/6/6 下午10:40, Hillf Danton wrote:
->
-> On Wed, 05 Jun 2019 16:42:05 -0700 (PDT) syzbot wrote:
->> Hello,
->>
->> syzbot found the following crash on:
->>
->> HEAD commit:    788a0249 Merge tag 'arc-5.2-rc4' of 
->> git://git.kernel.org/p..
->> git tree:       upstream
->> console output: https://syzkaller.appspot.com/x/log.txt?x=15dc9ea6a00000
->> kernel config: 
->> https://syzkaller.appspot.com/x/.config?x=d5c73825cbdc7326
->> dashboard link: 
->> https://syzkaller.appspot.com/bug?extid=0789f0c7e45efd7bb643
->> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
->> syz repro: https://syzkaller.appspot.com/x/repro.syz?x=10b31761a00000
->> C reproducer: https://syzkaller.appspot.com/x/repro.c?x=124892c1a00000
->>
->> IMPORTANT: if you fix the bug, please add the following tag to the 
->> commit:
->> Reported-by: syzbot+0789f0c7e45efd7bb643@syzkaller.appspotmail.com
->>
->> udit: type=1400 audit(1559768703.229:36): avc:  denied  { map } for  
->> pid=7116 comm="syz-executor330" path="/root/syz-executor330334897" 
->> dev="sda1" ino=16461 
->> scontext=unconfined_u:system_r:insmod_t:s0-s0:c0.c1023 
->> tcontext=unconfined_u:object_r:user_home_t:s0 tclass=file permissive=1
->> executing program
->> executing program
->> BUG: memory leak
->> unreferenced object 0xffff88812421fe40 (size 64):
->>    comm "syz-executor330", pid 7117, jiffies 4294949245 (age 13.030s)
->>    hex dump (first 32 bytes):
->>      01 00 00 00 20 69 6f 63 00 00 00 00 64 65 76 2f  .... ioc....dev/
->>      50 fe 21 24 81 88 ff ff 50 fe 21 24 81 88 ff ff P.!$....P.!$....
->>    backtrace:
->>      [<00000000ae0c4ae0>] kmemleak_alloc_recursive 
->> include/linux/kmemleak.h:55 [inline]
->>      [<00000000ae0c4ae0>] slab_post_alloc_hook mm/slab.h:439 [inline]
->>      [<00000000ae0c4ae0>] slab_alloc mm/slab.c:3326 [inline]
->>      [<00000000ae0c4ae0>] kmem_cache_alloc_trace+0x13d/0x280 
->> mm/slab.c:3553
->>      [<0000000079ebab38>] kmalloc include/linux/slab.h:547 [inline]
->>      [<0000000079ebab38>] vhost_net_ubuf_alloc 
->> drivers/vhost/net.c:241 [inline]
->>      [<0000000079ebab38>] vhost_net_set_backend 
->> drivers/vhost/net.c:1534 [inline]
->>      [<0000000079ebab38>] vhost_net_ioctl+0xb43/0xc10 
->> drivers/vhost/net.c:1716
->>      [<000000009f6204a2>] vfs_ioctl fs/ioctl.c:46 [inline]
->>      [<000000009f6204a2>] file_ioctl fs/ioctl.c:509 [inline]
->>      [<000000009f6204a2>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
->>      [<00000000b45866de>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
->>      [<00000000dfb41eb8>] __do_sys_ioctl fs/ioctl.c:720 [inline]
->>      [<00000000dfb41eb8>] __se_sys_ioctl fs/ioctl.c:718 [inline]
->>      [<00000000dfb41eb8>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
->>      [<0000000049c1f547>] do_syscall_64+0x76/0x1a0 
->> arch/x86/entry/common.c:301
->>      [<0000000029cc8ca7>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> BUG: memory leak
->> unreferenced object 0xffff88812421fa80 (size 64):
->>    comm "syz-executor330", pid 7130, jiffies 4294949755 (age 7.930s)
->>    hex dump (first 32 bytes):
->>      01 00 00 00 01 00 00 00 00 00 00 00 2f 76 69 72 ............/vir
->>      90 fa 21 24 81 88 ff ff 90 fa 21 24 81 88 ff ff ..!$......!$....
->>    backtrace:
->>      [<00000000ae0c4ae0>] kmemleak_alloc_recursive 
->> include/linux/kmemleak.h:55 [inline]
->>      [<00000000ae0c4ae0>] slab_post_alloc_hook mm/slab.h:439 [inline]
->>      [<00000000ae0c4ae0>] slab_alloc mm/slab.c:3326 [inline]
->>      [<00000000ae0c4ae0>] kmem_cache_alloc_trace+0x13d/0x280 
->> mm/slab.c:3553
->>      [<0000000079ebab38>] kmalloc include/linux/slab.h:547 [inline]
->>      [<0000000079ebab38>] vhost_net_ubuf_alloc 
->> drivers/vhost/net.c:241 [inline]
->>      [<0000000079ebab38>] vhost_net_set_backend 
->> drivers/vhost/net.c:1534 [inline]
->>      [<0000000079ebab38>] vhost_net_ioctl+0xb43/0xc10 
->> drivers/vhost/net.c:1716
->>      [<000000009f6204a2>] vfs_ioctl fs/ioctl.c:46 [inline]
->>      [<000000009f6204a2>] file_ioctl fs/ioctl.c:509 [inline]
->>      [<000000009f6204a2>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
->>      [<00000000b45866de>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
->>      [<00000000dfb41eb8>] __do_sys_ioctl fs/ioctl.c:720 [inline]
->>      [<00000000dfb41eb8>] __se_sys_ioctl fs/ioctl.c:718 [inline]
->>      [<00000000dfb41eb8>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
->>      [<0000000049c1f547>] do_syscall_64+0x76/0x1a0 
->> arch/x86/entry/common.c:301
->>      [<0000000029cc8ca7>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->>
->>
->> ---
->> This bug is generated by a bot. It may contain errors.
->> See https://goo.gl/tpsmEJ for more information about syzbot.
->> syzbot engineers can be reached at syzkaller@googlegroups.com.
->>
->> syzbot will keep track of this bug report. See:
->> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->> syzbot can test patches for this bug, for details see:
->> https://goo.gl/tpsmEJ#testing-patches
->>
-> Ignore my noise if you have no interest seeing the syzbot report.
->
-> After commit c38e39c378f46f ("vhost-net: fix use-after-free in
-> vhost_net_flush") flush would no longer free ubuf, just wait until 
-> ubuf users
-> disappear instead.
->
-> The following diff, in hope that may perhaps help you handle the 
-> memory leak,
-> makes flush able to free ubuf in the path of file release.
->
-> Thanks
-> Hillf
-> ---
-> drivers/vhost/net.c | 8 +++++++-
-> 1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index 3beb401..dcf20b6 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -141,6 +141,7 @@ struct vhost_net {
->     unsigned tx_zcopy_err;
->     /* Flush in progress. Protected by tx vq lock. */
->     bool tx_flush;
-> +    bool ld;    /* Last dinner */
->     /* Private page frag */
->     struct page_frag page_frag;
->     /* Refcount bias of page frag */
-> @@ -1283,6 +1284,7 @@ static int vhost_net_open(struct inode *inode, 
-> struct file *f)
->     n = kvmalloc(sizeof *n, GFP_KERNEL | __GFP_RETRY_MAYFAIL);
->     if (!n)
->         return -ENOMEM;
-> +    n->ld = false;
->     vqs = kmalloc_array(VHOST_NET_VQ_MAX, sizeof(*vqs), GFP_KERNEL);
->     if (!vqs) {
->         kvfree(n);
-> @@ -1376,7 +1378,10 @@ static void vhost_net_flush(struct vhost_net *n)
->         n->tx_flush = true;
->         mutex_unlock(&n->vqs[VHOST_NET_VQ_TX].vq.mutex);
->         /* Wait for all lower device DMAs done. */
-> - vhost_net_ubuf_put_and_wait(n->vqs[VHOST_NET_VQ_TX].ubufs);
-> +        if (n->ld)
-> + vhost_net_ubuf_put_wait_and_free(n->vqs[VHOST_NET_VQ_TX].ubufs);
-> +        else
-> + vhost_net_ubuf_put_and_wait(n->vqs[VHOST_NET_VQ_TX].ubufs);
->         mutex_lock(&n->vqs[VHOST_NET_VQ_TX].vq.mutex);
->         n->tx_flush = false;
-> atomic_set(&n->vqs[VHOST_NET_VQ_TX].ubufs->refcount, 1);
-> @@ -1403,6 +1408,7 @@ static int vhost_net_release(struct inode 
-> *inode, struct file *f)
->     synchronize_rcu();
->     /* We do an extra flush before freeing memory,
->      * since jobs can re-queue themselves. */
-> +    n->ld = true;
->     vhost_net_flush(n);
->     kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
->     kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
-> -- 
+I just ran my toleration tests successfully on current HW for
+this series.
 
+Michael
 
-This is basically a kfree(ubuf) after the second vhost_net_flush() in 
-vhost_net_release().
+On 12.06.19 13:12, Halil Pasic wrote:
+> Enhanced virtualization protection technology may require the use of
+> bounce buffers for I/O. While support for this was built into the virtio
+> core, virtio-ccw wasn't changed accordingly.
+> 
+> Some background on technology (not part of this series) and the
+> terminology used.
+> 
+> * Protected Virtualization (PV):
+> 
+> Protected Virtualization guarantees, that non-shared memory of a  guest
+> that operates in PV mode private to that guest. I.e. any attempts by the
+> hypervisor or other guests to access it will result in an exception. If
+> supported by the environment (machine, KVM, guest VM) a guest can decide
+> to change into PV mode by doing the appropriate ultravisor calls.
+> 
+> * Ultravisor:
+> 
+> A hardware/firmware entity that manages PV guests, and polices access to
+> their memory. A PV guest prospect needs to interact with the ultravisor,
+> to enter PV mode, and potentially to share pages (for I/O which should
+> be encrypted by the guest). A guest interacts with the ultravisor via so
+> called ultravisor calls. A hypervisor needs to interact with the
+> ultravisor to facilitate interpretation, emulation and swapping. A
+> hypervisor  interacts with the ultravisor via ultravisor calls and via
+> the SIE state description. Generally the ultravisor sanitizes hypervisor
+> inputs so that the guest can not be corrupted (except for denial of
+> service.
+> 
+> 
+> What needs to be done
+> =====================
+> 
+> Thus what needs to be done to bring virtio-ccw up to speed with respect
+> to protected virtualization is:
+> * use some 'new' common virtio stuff
+> * make sure that virtio-ccw specific stuff uses shared memory when
+>    talking to the hypervisor (except control/communication blocks like ORB,
+>    these are handled by the ultravisor)
+> * make sure the DMA API does what is necessary to talk through shared
+>    memory if we are a protected virtualization guest.
+> * make sure the common IO layer plays along as well (airqs, sense).
+> 
+> 
+> Important notes
+> ================
+> 
+> * This patch set is based on Martins features branch
+>   (git://git.kernel.org/pub/scm/linux/kernel/git/s390/linux.git branch
+>   'features').
+> 
+> * Documentation is still very sketchy. I'm committed to improving this,
+>    but I'm currently hampered by some dependencies currently.
+> 
+> * The existing naming in the common infrastructure (kernel internal
+>    interfaces) is pretty much based on the AMD SEV terminology. Thus the
+>    names aren't always perfect. There might be merit to changing these
+>    names to more abstract ones. I did not put much thought into that at
+>    the current stage.
+> 
+> * Testing: Please use iommu_platform=on for any virtio devices you are
+>    going to test this code with (so virtio actually uses the DMA API).
+> 
+> @Sebastian: I kept your r-b on patch 2 "s390/cio: introduce DMA pools to
+> cio" despite the small changes pointed out below. Please do complain if
+> it ain't OK for you!
+> 
+> Change log
+> ==========
+> 
+> v4 --> v5:
+> * work around dma_pool API not tolerating NULL dma pool (patch 4)
+> * make the genpool based dma pools API  tolerate NULL genpool (patch 2)
+> * fix typo (patch 2)
+> * fix unintended code move (patch 7)
+> * add more r-b's
+> 
+> 
+> 
+> v3 --> v4
+> * fixed cleanup in css_bus_init() (Connie)
+> * made cio.h include genalloc.h instead of a forward declaration
+>    (Connie)
+> * added comments about dma_mask/coherent_dma_mask values (Connie)
+> * fixed error handling in virtio_ccw_init() (Connie)
+> * got rid of the *vc_dma* wrappers (Connie)
+> * added some Reviewed-bys
+> * rebased on top of current master, no changes were necessary
+> 
+> v2 --> v3:
+> * patch 2/8
+>      potential cio_dma_pool_init() returning NULL issue fixed
+>      potential cio_gp_dma_create() returning NULL issue fixed
+>      warning issues with doc type comments fixed
+>      unused define statement removed
+> * patch 3/8
+>      potential cio_gp_dma_create() returning NULL issue fixed
+>      whitespace issue fixed
+>      warning issues with doc type comments fixed
+> * patch 8/8
+>      potential cio_dma_zalloc() returning NULL issue fixed
+> 
+> v1 --> v2:
+> * patch "virtio/s390: use vring_create_virtqueue" went already upstream
+> * patch "virtio/s390: DMA support for virtio-ccw" went already upstream
+> * patch "virtio/s390: enable packed ring" went already upstream
+> * Made dev.dma_mask point to dev.coherent_dma_mask for css, subchannel
+>    and ccw devices.
+> * While rebasing 's390/airq: use DMA memory for adapter interrupts' the
+>    newly introduced kmem_cache  was replaced with an equivalent dma_pool;
+>    the kalloc() allocations are now replaced with cio_dma_zalloc()
+>    allocations to avoid wasting almost a full page.
+> * Made virtio-ccw use the new AIRQ_IV_CACHELINE flag.
+> * fixed all remaining checkpatch issues
+> 
+> RFC --> v1:
+> * Fixed bugs found by Connie (may_reduce and handling reduced,  warning,
+>    split move -- thanks Connie!).
+> * Fixed console bug found by Sebastian (thanks Sebastian!).
+> * Removed the completely useless duplicate of dma-mapping.h spotted by
+>    Christoph (thanks Christoph!).
+> * Don't use the global DMA pool for subchannel and ccw device
+>    owned memory as requested by Sebastian. Consequences:
+> 	* Both subchannel and ccw devices have their dma masks
+> 	now (both specifying 31 bit addressable)
+> 	* We require at least 2 DMA pages per ccw device now, most of
+> 	this memory is wasted though.
+> 	* DMA memory allocated by virtio is also 31 bit addressable now
+>          as virtio uses the parent (which is the ccw device).
+> * Enabled packed ring.
+> * Rebased onto Martins feature branch; using the actual uv (ultravisor)
+>    interface instead of TODO comments.
+> * Added some explanations to the cover letter (Connie, David).
+> * Squashed a couple of patches together and fixed some text stuff.
+> 
+> Halil Pasic (8):
+>    s390/mm: force swiotlb for protected virtualization
+>    s390/cio: introduce DMA pools to cio
+>    s390/cio: add basic protected virtualization support
+>    s390/airq: use DMA memory for adapter interrupts
+>    virtio/s390: use cacheline aligned airq bit vectors
+>    virtio/s390: add indirection to indicators access
+>    virtio/s390: use DMA memory for ccw I/O and classic notifiers
+>    virtio/s390: make airq summary indicators DMA
+> 
+>   arch/s390/Kconfig                   |   5 +
+>   arch/s390/include/asm/airq.h        |   2 +
+>   arch/s390/include/asm/ccwdev.h      |   4 +
+>   arch/s390/include/asm/cio.h         |  11 ++
+>   arch/s390/include/asm/mem_encrypt.h |  18 ++
+>   arch/s390/mm/init.c                 |  47 ++++++
+>   drivers/s390/cio/airq.c             |  37 +++--
+>   drivers/s390/cio/ccwreq.c           |   9 +-
+>   drivers/s390/cio/cio.h              |   2 +
+>   drivers/s390/cio/css.c              | 134 ++++++++++++++-
+>   drivers/s390/cio/device.c           |  68 ++++++--
+>   drivers/s390/cio/device_fsm.c       |  49 +++---
+>   drivers/s390/cio/device_id.c        |  20 ++-
+>   drivers/s390/cio/device_ops.c       |  21 ++-
+>   drivers/s390/cio/device_pgid.c      |  22 +--
+>   drivers/s390/cio/device_status.c    |  24 +--
+>   drivers/s390/cio/io_sch.h           |  20 ++-
+>   drivers/s390/virtio/virtio_ccw.c    | 246 +++++++++++++++-------------
+>   18 files changed, 538 insertions(+), 201 deletions(-)
+>   create mode 100644 arch/s390/include/asm/mem_encrypt.h
+> 
 
-Could you please post a formal patch?
+-- 
+Mit freundlichen Grüßen / Kind regards
+Michael Müller
 
-Thanks
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Matthias Hartmann
+Geschäftsführung: Dirk Wittkopp
+Sitz der Gesellschaft: Böblingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
 
