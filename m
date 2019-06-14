@@ -2,221 +2,223 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5370745DED
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 15:17:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFB3745E0F
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 15:25:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728063AbfFNNRw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jun 2019 09:17:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53132 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727913AbfFNNRv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jun 2019 09:17:51 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6B8B3356EA;
-        Fri, 14 Jun 2019 13:17:40 +0000 (UTC)
-Received: from [10.36.116.67] (ovpn-116-67.ams2.redhat.com [10.36.116.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7366A54696;
-        Fri, 14 Jun 2019 13:17:28 +0000 (UTC)
-Subject: Re: [PATCH v8 23/29] vfio: VFIO_IOMMU_CACHE_INVALIDATE
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "jean-philippe.brucker@arm.com" <jean-philippe.brucker@arm.com>,
-        "will.deacon@arm.com" <will.deacon@arm.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "marc.zyngier@arm.com" <marc.zyngier@arm.com>,
-        "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-        "vincent.stehle@arm.com" <vincent.stehle@arm.com>
-References: <20190526161004.25232-1-eric.auger@redhat.com>
- <20190526161004.25232-24-eric.auger@redhat.com>
- <A2975661238FB949B60364EF0F2C257439EFB432@SHSMSX104.ccr.corp.intel.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <8d36cf34-a89b-6587-08e9-99242e2f34dc@redhat.com>
-Date:   Fri, 14 Jun 2019 15:17:26 +0200
+        id S1728125AbfFNNYl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jun 2019 09:24:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49924 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727954AbfFNNYi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 14 Jun 2019 09:24:38 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5EDNcDk068344
+        for <kvm@vger.kernel.org>; Fri, 14 Jun 2019 09:24:38 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2t4bv51suk-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 14 Jun 2019 09:24:38 -0400
+Received: from localhost
+        by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <akrowiak@linux.ibm.com>;
+        Fri, 14 Jun 2019 14:24:37 +0100
+Received: from b03cxnp08027.gho.boulder.ibm.com (9.17.130.19)
+        by e34.co.us.ibm.com (192.168.1.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 14 Jun 2019 14:24:34 +0100
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5EDOWw835651992
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 14 Jun 2019 13:24:33 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DFB596E053;
+        Fri, 14 Jun 2019 13:24:32 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E0BA96E04E;
+        Fri, 14 Jun 2019 13:24:31 +0000 (GMT)
+Received: from [9.80.235.40] (unknown [9.80.235.40])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 14 Jun 2019 13:24:31 +0000 (GMT)
+Subject: Re: [PATCH RFC 1/1] allow to specify additional config data
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
+        libvir-list@redhat.com, Matthew Rosato <mjrosato@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+References: <20190606144417.1824-1-cohuck@redhat.com>
+ <20190606144417.1824-2-cohuck@redhat.com> <20190606093224.3ecb92c7@x1.home>
+ <20190606101552.6fc62bef@x1.home>
+ <ed75a4de-da0b-f6cf-6164-44cebc82c3a5@linux.ibm.com>
+ <20190607140344.0399b766@x1.home>
+ <1d859c27-31e2-64ca-f505-19abe9bffed2@linux.ibm.com>
+ <20190613161849.070cbc3c.cohuck@redhat.com>
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+Date:   Fri, 14 Jun 2019 09:24:30 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C257439EFB432@SHSMSX104.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190613161849.070cbc3c.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Fri, 14 Jun 2019 13:17:51 +0000 (UTC)
+X-TM-AS-GCONF: 00
+x-cbid: 19061413-0016-0000-0000-000009C27157
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011260; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01217854; UDB=6.00640455; IPR=6.00998976;
+ MB=3.00027308; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-14 13:24:35
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19061413-0017-0000-0000-000043A6547D
+Message-Id: <b475fc4a-2007-7e9e-442a-554ea88d0793@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-14_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906140113
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Liu,
+On 6/13/19 10:18 AM, Cornelia Huck wrote:
+> On Tue, 11 Jun 2019 10:19:29 -0400
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> 
+>> On 6/7/19 4:03 PM, Alex Williamson wrote:
+>>> On Fri, 7 Jun 2019 14:26:13 -0400
+>>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>>>    
+>>>> On 6/6/19 12:15 PM, Alex Williamson wrote:
+>>>>> On Thu, 6 Jun 2019 09:32:24 -0600
+>>>>> Alex Williamson <alex.williamson@redhat.com> wrote:
+>>>>>       
+>>>>>> On Thu,  6 Jun 2019 16:44:17 +0200
+>>>>>> Cornelia Huck <cohuck@redhat.com> wrote:
+>>>>>>      
+>>>>>>> Add a rough implementation for vfio-ap.
+>>>>>>>
+>>>>>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>>>>>> ---
+>>>>>>>     mdevctl.libexec | 25 ++++++++++++++++++++++
+>>>>>>>     mdevctl.sbin    | 56 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>>>>>>>     2 files changed, 80 insertions(+), 1 deletion(-)
+>>>>>>>
+>>>>>>> diff --git a/mdevctl.libexec b/mdevctl.libexec
+>>>>>>> index 804166b5086d..cc0546142924 100755
+>>>>>>> --- a/mdevctl.libexec
+>>>>>>> +++ b/mdevctl.libexec
+>>>>>>> @@ -54,6 +54,19 @@ wait_for_supported_types () {
+>>>>>>>         fi
+>>>>>>>     }
+>>>>>>>     
+>>>>>>> +# configure vfio-ap devices <config entry> <matrix attribute>
+>>>>>>> +configure_ap_devices() {
+>>>>>>> +    list="`echo "${config[$1]}" | sed 's/,/ /'`"
+>>>>>>> +    [ -z "$list" ] && return
+>>>>>>> +    for a in $list; do
+>>>>>>> +        echo "$a" > "$supported_types/${config[mdev_type]}/devices/$uuid/$2"
+>>>>>>> +        if [ $? -ne 0 ]; then
+>>>>>>> +            echo "Error writing '$a' to '$uuid/$2'" >&2
+>>>>>>> +            exit 1
+>>>>>>> +        fi
+>>>>>>> +    done
+>>>>>>> +}
+>>>>>>> +
+>>>>>>>     case ${1} in
+>>>>>>>         start-mdev|stop-mdev)
+>>>>>>>             if [ $# -ne 2 ]; then
+>>>>>>> @@ -148,6 +161,18 @@ case ${cmd} in
+>>>>>>>                 echo "Error creating mdev type ${config[mdev_type]} on $parent" >&2
+>>>>>>>                 exit 1
+>>>>>>>             fi
+>>>>>>> +
+>>>>>>> +        # some types may specify additional config data
+>>>>>>> +        case ${config[mdev_type]} in
+>>>>>>> +            vfio_ap-passthrough)
+>>>>>>
+>>>>>> I think this could have some application beyond ap too, I know NVIDIA
+>>>>>> GRID vGPUs do have some controls under the vendor hierarchy of the
+>>>>>> device, ex. setting the frame rate limiter.  The implementation here is
+>>>>>> a bit rigid, we know a specific protocol for a specific mdev type, but
+>>>>>> for supporting arbitrary vendor options we'd really just want to try to
+>>>>>> apply whatever options are provided.  If we didn't care about ordering,
+>>>>>> we could just look for keys for every file in the device's immediate
+>>>>>> sysfs hierarchy and apply any value we find, independent of the
+>>>>>> mdev_type, ex. intel_vgpu/foo=bar  Thanks,
+>>>>>
+>>>>> For example:
+>>>>>
+>>>>> for key in find -P $mdev_base/$uuid/ \( -path
+>>>>> "$mdev_base/$uuid/power/*" -o -path $mdev_base/$uuid/uevent -o -path $mdev_base/$uuid/remove \) -prune -o -type f -print | sed -e "s|$mdev_base/$uuid/||g"); do
+>>>>>      [ -z ${config[$key]} ] && continue
+>>>>>      ... parse value(s) and iteratively apply to key
+>>>>> done
+>>>>>
+>>>>> The find is a little ugly to exclude stuff, maybe we just let people do
+>>>>> screwy stuff like specify remove=1 in their config.  Also need to think
+>>>>> about whether we're imposing a delimiter to apply multiple values to a
+>>>>> key that conflicts with the attribute usage.  Thanks,
+>>>>>
+>>>>> Alex
+> 
+> One thing that this does is limiting us to things that can be expressed
+> with "if you encounter key=value, take value (possibly decomposed) and
+> write it to <device>/key". A problem with this generic approach is that
+> the code cannot decide itself whether value should be decomposed (and
+> if yes, with which delimiter), or not. We also cannot cover any
+> configuration that does not fit this pattern; so I think we need both
+> generic (for flexibility, and easy extensibility), and explicitly
+> defined options to cover more complex cases.
+> 
+> [As an aside, how should we deal with duplicate key= entries? Not
+> allowed, last one wins, or all are written to the sysfs attribute?]
+> 
+>>>>
+>>>> I like the idea of looking for files in the device's immediate sysfs
+>>>> hierarchy, but maybe the find could exclude attributes that are
+>>>> not vendor defined.
+>>>
+>>> How would we know what attributes are vendor defined?  The above `find`
+>>> strips out the power, uevent, and remove attributes, which for GVT-g
+>>> leaves only the vendor defined attributes[1], but I don't know how to
+>>> instead do a positive match of the vendor attributes without
+>>> unmaintainable lookup tables.  This starts to get into the question of
+>>> how much do we want to (or need to) protect the user from themselves.
+>>> If we let the user specify a key=value of remove=1 and the device
+>>> immediately disappears, is that a bug or a feature?  Thanks,
+>>>
+>>> Alex
+>>
+>> By vendor defined, I meant attributes that are not defined by the mdev
+>> framework, such as the 'remove' attribute.
+> 
+> And those defined by the base driver core like uevent, I guess.
 
-On 6/14/19 2:38 PM, Liu, Yi L wrote:
-> Hi Eric,
-> 
->> From: Eric Auger [mailto:eric.auger@redhat.com]
->> Sent: Monday, May 27, 2019 12:10 AM
->> Subject: [PATCH v8 23/29] vfio: VFIO_IOMMU_CACHE_INVALIDATE
->>
->> From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
->>
->> When the guest "owns" the stage 1 translation structures,  the host IOMMU driver
->> has no knowledge of caching structure updates unless the guest invalidation
->> requests are trapped and passed down to the host.
->>
->> This patch adds the VFIO_IOMMU_CACHE_INVALIDATE ioctl with aims at
->> propagating guest stage1 IOMMU cache invalidations to the host.
->>
->> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> v6 -> v7:
->> - Use iommu_capsule struct
->> - renamed vfio_iommu_for_each_dev into vfio_iommu_lookup_dev
->>   due to checkpatch error related to for_each_dev suffix
->>
->> v2 -> v3:
->> - introduce vfio_iommu_for_each_dev back in this patch
->>
->> v1 -> v2:
->> - s/TLB/CACHE
->> - remove vfio_iommu_task usage
->> - commit message rewording
->> ---
->>  drivers/vfio/vfio_iommu_type1.c | 55 +++++++++++++++++++++++++++++++++
->>  include/uapi/linux/vfio.h       | 13 ++++++++
->>  2 files changed, 68 insertions(+)
->>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index b2d609d6fe83..6fda4fbc9bfa 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -120,6 +120,34 @@ struct vfio_regions {
->>  #define IS_IOMMU_CAP_DOMAIN_IN_CONTAINER(iommu)	\
->>  					(!list_empty(&iommu->domain_list))
->>
->> +struct domain_capsule {
->> +	struct iommu_domain *domain;
->> +	void *data;
->> +};
->> +
->> +/* iommu->lock must be held */
->> +static int
->> +vfio_iommu_lookup_dev(struct vfio_iommu *iommu,
->> +		      int (*fn)(struct device *dev, void *data),
->> +		      void *data)
->> +{
->> +	struct domain_capsule dc = {.data = data};
->> +	struct vfio_domain *d;
->> +	struct vfio_group *g;
->> +	int ret = 0;
->> +
->> +	list_for_each_entry(d, &iommu->domain_list, next) {
->> +		dc.domain = d->domain;
->> +		list_for_each_entry(g, &d->group_list, next) {
->> +			ret = iommu_group_for_each_dev(g->iommu_group,
->> +						       &dc, fn);
->> +			if (ret)
->> +				break;
->> +		}
->> +	}
->> +	return ret;
->> +}
->> +
->>  static int put_pfn(unsigned long pfn, int prot);
->>
->>  /*
->> @@ -1795,6 +1823,15 @@ vfio_attach_pasid_table(struct vfio_iommu *iommu,
->>  	return ret;
->>  }
->>
->> +static int vfio_cache_inv_fn(struct device *dev, void *data) {
->> +	struct domain_capsule *dc = (struct domain_capsule *)data;
->> +	struct vfio_iommu_type1_cache_invalidate *ustruct =
->> +		(struct vfio_iommu_type1_cache_invalidate *)dc->data;
->> +
->> +	return iommu_cache_invalidate(dc->domain, dev, &ustruct->info); }
->> +
->>  static long vfio_iommu_type1_ioctl(void *iommu_data,
->>  				   unsigned int cmd, unsigned long arg)  { @@ -
->> 1881,6 +1918,24 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->>  	} else if (cmd == VFIO_IOMMU_DETACH_PASID_TABLE) {
->>  		vfio_detach_pasid_table(iommu);
->>  		return 0;
->> +	} else if (cmd == VFIO_IOMMU_CACHE_INVALIDATE) {
->> +		struct vfio_iommu_type1_cache_invalidate ustruct;
->> +		int ret;
->> +
->> +		minsz = offsetofend(struct vfio_iommu_type1_cache_invalidate,
->> +				    info);
->> +
->> +		if (copy_from_user(&ustruct, (void __user *)arg, minsz))
->> +			return -EFAULT;
->> +
->> +		if (ustruct.argsz < minsz || ustruct.flags)
-> 
-> May remove the flags field?
-> 
->> +			return -EINVAL;
->> +
->> +		mutex_lock(&iommu->lock);
->> +		ret = vfio_iommu_lookup_dev(iommu, vfio_cache_inv_fn,
->> +					    &ustruct);
->> +		mutex_unlock(&iommu->lock);
->> +		return ret;
->>  	}
->>
->>  	return -ENOTTY;
->> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h index
->> 4316dd8cb5b5..055aa9b9745a 100644
->> --- a/include/uapi/linux/vfio.h
->> +++ b/include/uapi/linux/vfio.h
->> @@ -785,6 +785,19 @@ struct vfio_iommu_type1_attach_pasid_table {
->>   */
->>  #define VFIO_IOMMU_DETACH_PASID_TABLE	_IO(VFIO_TYPE, VFIO_BASE + 23)
->>
->> +/**
->> + * VFIO_IOMMU_CACHE_INVALIDATE - _IOWR(VFIO_TYPE, VFIO_BASE + 24,
->> + *			struct vfio_iommu_type1_cache_invalidate)
->> + *
->> + * Propagate guest IOMMU cache invalidation to the host.
->> + */
->> +struct vfio_iommu_type1_cache_invalidate {
->> +	__u32   argsz;
->> +	__u32   flags;
-> 
-> Looks like there is no more usage on "flags". is it?
+Yes
 
-Agreed. However all the other vfio structs embed it.
-vfio_iommu_type1_dma_unmap (VFIO_IOMMU_UNMAP_DMA) or
-vfio_iommu_type1_info (VFIO_IOMMU_GET_INFO) also feature it and do not
-use it either if I am not wrong.
-
-So I guess flags is a common pattern for the API and somehow allows to
-extend the API if needed. So I would be inclined to keep it, no?
-
-Thanks
-
-Eric
 > 
-> Regards,
-> Yi Liu
+>> As far as whether allowing
+>> specification of remove-1, I'd have to play with that and see what all
+>> of the ramifications are.
 > 
->> +	struct iommu_cache_invalidate_info info; };
->> +#define VFIO_IOMMU_CACHE_INVALIDATE      _IO(VFIO_TYPE, VFIO_BASE + 24)
->> +
->>  /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+> It does feel a bit odd to me (why would you configure it if you
+> immediately want to remove it again?)
+
+This was in response to Alex's comment. My personal preference is to
+exclude attributes that are not vendor created, at least to the
+extent it is possible to determine such.
+
+> 
 >>
->>  /*
->> --
->> 2.20.1
+>> Tony K
+>>
+>>>
+>>> [1] GVT-g doesn't actually have an writable attributes, so we'd also
+>>> minimally want to add a test to skip read-only attributes.
+>>
+>> Probably a good idea.
 > 
+> Agreed.
+> 
+
