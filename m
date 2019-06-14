@@ -2,48 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FB4C45842
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 11:09:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C123445860
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 11:15:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726827AbfFNJJ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jun 2019 05:09:29 -0400
-Received: from mga04.intel.com ([192.55.52.120]:52685 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726083AbfFNJJ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jun 2019 05:09:29 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Jun 2019 02:09:20 -0700
-X-ExtLoop1: 1
-Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
-  by FMSMGA003.fm.intel.com with ESMTP; 14 Jun 2019 02:09:19 -0700
-Message-ID: <5D03657B.1000704@intel.com>
-Date:   Fri, 14 Jun 2019 17:14:35 +0800
-From:   Wei Wang <wei.w.wang@intel.com>
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
+        id S1726734AbfFNJPZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jun 2019 05:15:25 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:52570 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725907AbfFNJPZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jun 2019 05:15:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=bjuICrJxhqbVE3btlCQ3iZkvBOpZmXqWH1hsHhR0vEs=; b=plUvNd2hsauOJNdMcJW7PtfGU
+        ToeAUBkrbzKvJm2BUG/yf8dWjbaAvX7Q4lidDs0ithX9OI2WVuXyjfjTLnReR0Y0BKcgCuAYiXgBC
+        OYMfDsUCaba/eGhvG5pmOg+CVacs6ilSRsk2Vm9Q+cjRnTCoZahKJFZHX8emllCfCdfoOQyfYYpgd
+        8P3NvVIEryL7h01oXhpMERwBy1+5j/J65bjKgYr8HqalG4n/8K5kG47A0w9CyIaEfbCm+XdyPqqR2
+        +SODATdKf9VGfFZV7w3Vcr9SwOJUqEoqFkjC3/4Q1Bw12ultXg+EeVpqKI0Vp+ZCPmsLTqaO2Mazw
+        5m/hAaOGg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hbiIm-0004MH-MW; Fri, 14 Jun 2019 09:15:16 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 0E80820245BD7; Fri, 14 Jun 2019 11:15:14 +0200 (CEST)
+Date:   Fri, 14 Jun 2019 11:15:14 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@amacapital.net>,
+        David Howells <dhowells@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Kai Huang <kai.huang@linux.intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH, RFC 09/62] x86/mm: Preserve KeyID on pte_modify() and
+ pgprot_modify()
+Message-ID: <20190614091513.GW3436@hirez.programming.kicks-ass.net>
+References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
+ <20190508144422.13171-10-kirill.shutemov@linux.intel.com>
 MIME-Version: 1.0
-To:     Eric Hankland <ehankland@google.com>
-CC:     Cfir Cohen <cfir@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        rkrcmar@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Stephane Eranian <eranian@google.com>
-Subject: Re: [PATCH v1] KVM: x86: PMU Whitelist
-References: <CAOyeoRWfPNmaWY6Lifdkdj3KPPM654vzDO+s3oduEMCJP+Asow@mail.gmail.com> <5CEC9667.30100@intel.com> <CAOyeoRWhfyuuYdguE6Wrzd7GOdow9qRE4MZ4OKkMc5cdhDT53g@mail.gmail.com> <5CEE3AC4.3020904@intel.com> <CAOyeoRW85jV=TW_xwSj0ZYwPj_L+G9wu+QPGEF3nBmPbWGX4_g@mail.gmail.com> <5CF07D37.9090805@intel.com> <CAOyeoRXWQaVYZSVL_LTTdAwJOEr+eCzhp1=_JcOX3i6_CJiD_g@mail.gmail.com> <5CF2599B.3030001@intel.com> <CAOyeoRWuHyhoy6NB=O+ekQMhBFngozKoanWzArxgBk4DH2hdtg@mail.gmail.com> <5CF5F6AE.90706@intel.com> <CAOyeoRW5wx0F=9B24h29KkhUrbaORXVSoJufb4d-XzKiAsz+NQ@mail.gmail.com> <CAEU=KTHsVmrAHXUKdHu_OwcrZoy-hgV7pk4UymtchGE5bGdUGA@mail.gmail.com> <CAOyeoRXFAQNNWRiHNtK3n17V0owBVNyKdv75xjt08Q_pC+XOXg@mail.gmail.com> <5CF8C272.7050808@intel.com> <CAOyeoRXPFgzthfO-Yz7L7ShO=jdYdsD7_UFPOrRFBtdA5jpf6A@mail.gmail.com>
-In-Reply-To: <CAOyeoRXPFgzthfO-Yz7L7ShO=jdYdsD7_UFPOrRFBtdA5jpf6A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190508144422.13171-10-kirill.shutemov@linux.intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 06/14/2019 01:43 AM, Eric Hankland wrote:
-> Since we aren't using QEMU, I don't have those patches ready yet, but
-> I can work on them if you want to review them at the same time as this
-> patch. The architectural events (minus the LLC events) are probably a
-> reasonable starting point for the whitelist.
+On Wed, May 08, 2019 at 05:43:29PM +0300, Kirill A. Shutemov wrote:
+> + * Cast PAGE_MASK to a signed type so that it is sign-extended if
+> + * virtual addresses are 32-bits but physical addresses are larger
+> + * (ie, 32-bit PAE).
 
-Sounds good. Please help on the QEMU patches as well.
+On 32bit, 'long' is still 32bit, did you want to cast to 'long long'
+instead? Ideally we'd use pteval_t here, but I see that is unsigned.
 
-Best,
-Wei
+>   */
+> -#define _PAGE_CHG_MASK	(PTE_PFN_MASK | _PAGE_PCD | _PAGE_PWT |		\
+> +#define PTE_PFN_MASK_MAX \
+> +	(((signed long)PAGE_MASK) & ((1ULL << __PHYSICAL_MASK_SHIFT) - 1))
+> +#define _PAGE_CHG_MASK	(PTE_PFN_MASK_MAX | _PAGE_PCD | _PAGE_PWT |		\
+>  			 _PAGE_SPECIAL | _PAGE_ACCESSED | _PAGE_DIRTY |	\
+>  			 _PAGE_SOFT_DIRTY | _PAGE_DEVMAP)
+>  #define _HPAGE_CHG_MASK (_PAGE_CHG_MASK | _PAGE_PSE)
