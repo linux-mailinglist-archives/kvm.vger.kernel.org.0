@@ -2,97 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7066B4578B
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 10:32:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FB4C45842
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 11:09:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726626AbfFNIcL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jun 2019 04:32:11 -0400
-Received: from foss.arm.com ([217.140.110.172]:56980 "EHLO foss.arm.com"
+        id S1726827AbfFNJJ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jun 2019 05:09:29 -0400
+Received: from mga04.intel.com ([192.55.52.120]:52685 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726259AbfFNIcK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jun 2019 04:32:10 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E9D3F2B;
-        Fri, 14 Jun 2019 01:32:09 -0700 (PDT)
-Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1FEB43F246;
-        Fri, 14 Jun 2019 01:32:09 -0700 (PDT)
-Subject: Re: [PATCH kvmtool 08/16] arm/pci: Do not use first PCI IO space
- bytes for devices
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        will.deacon@arm.com, Sami.Mujawar@arm.com
-References: <1551947777-13044-1-git-send-email-julien.thierry@arm.com>
- <1551947777-13044-9-git-send-email-julien.thierry@arm.com>
- <20190405163127.4b10a581@donnerap.cambridge.arm.com>
-From:   Julien Thierry <julien.thierry@arm.com>
-Message-ID: <42fb92bf-e58a-41d0-0a7f-b72d7bca481c@arm.com>
-Date:   Fri, 14 Jun 2019 09:32:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726083AbfFNJJ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jun 2019 05:09:29 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Jun 2019 02:09:20 -0700
+X-ExtLoop1: 1
+Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
+  by FMSMGA003.fm.intel.com with ESMTP; 14 Jun 2019 02:09:19 -0700
+Message-ID: <5D03657B.1000704@intel.com>
+Date:   Fri, 14 Jun 2019 17:14:35 +0800
+From:   Wei Wang <wei.w.wang@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190405163127.4b10a581@donnerap.cambridge.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+To:     Eric Hankland <ehankland@google.com>
+CC:     Cfir Cohen <cfir@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        rkrcmar@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Stephane Eranian <eranian@google.com>
+Subject: Re: [PATCH v1] KVM: x86: PMU Whitelist
+References: <CAOyeoRWfPNmaWY6Lifdkdj3KPPM654vzDO+s3oduEMCJP+Asow@mail.gmail.com> <5CEC9667.30100@intel.com> <CAOyeoRWhfyuuYdguE6Wrzd7GOdow9qRE4MZ4OKkMc5cdhDT53g@mail.gmail.com> <5CEE3AC4.3020904@intel.com> <CAOyeoRW85jV=TW_xwSj0ZYwPj_L+G9wu+QPGEF3nBmPbWGX4_g@mail.gmail.com> <5CF07D37.9090805@intel.com> <CAOyeoRXWQaVYZSVL_LTTdAwJOEr+eCzhp1=_JcOX3i6_CJiD_g@mail.gmail.com> <5CF2599B.3030001@intel.com> <CAOyeoRWuHyhoy6NB=O+ekQMhBFngozKoanWzArxgBk4DH2hdtg@mail.gmail.com> <5CF5F6AE.90706@intel.com> <CAOyeoRW5wx0F=9B24h29KkhUrbaORXVSoJufb4d-XzKiAsz+NQ@mail.gmail.com> <CAEU=KTHsVmrAHXUKdHu_OwcrZoy-hgV7pk4UymtchGE5bGdUGA@mail.gmail.com> <CAOyeoRXFAQNNWRiHNtK3n17V0owBVNyKdv75xjt08Q_pC+XOXg@mail.gmail.com> <5CF8C272.7050808@intel.com> <CAOyeoRXPFgzthfO-Yz7L7ShO=jdYdsD7_UFPOrRFBtdA5jpf6A@mail.gmail.com>
+In-Reply-To: <CAOyeoRXPFgzthfO-Yz7L7ShO=jdYdsD7_UFPOrRFBtdA5jpf6A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Andre,
+On 06/14/2019 01:43 AM, Eric Hankland wrote:
+> Since we aren't using QEMU, I don't have those patches ready yet, but
+> I can work on them if you want to review them at the same time as this
+> patch. The architectural events (minus the LLC events) are probably a
+> reasonable starting point for the whitelist.
 
-(sorry for the delay in reply)
+Sounds good. Please help on the QEMU patches as well.
 
-On 05/04/2019 16:31, Andre Przywara wrote:
-> On Thu, 7 Mar 2019 08:36:09 +0000
-> Julien Thierry <julien.thierry@arm.com> wrote:
-> 
-> Hi,
-> 
->> Linux has this convention that the lower 0x1000 bytes of the IO space
->> should not be used. (cf PCIBIOS_MIN_IO).
->>
->> Just allocate those bytes to prevent future allocation assigning it to
->> devices.
->>
->> Signed-off-by: Julien Thierry <julien.thierry@arm.com>
->> ---
->>  arm/pci.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/arm/pci.c b/arm/pci.c
->> index 83238ca..559e0cf 100644
->> --- a/arm/pci.c
->> +++ b/arm/pci.c
->> @@ -37,6 +37,9 @@ void pci__arm_init(struct kvm *kvm)
->>  
->>  	/* Make PCI port allocation start at a properly aligned address */
->>  	pci_get_io_space_block(align_pad);
->> +
->> +	/* Convention, don't allocate first 0x1000 bytes of PCI IO */
->> +	pci_get_io_space_block(0x1000);
-> 
-> Is this the same problem with mixing up I/O and MMIO space as in the other patch?
-> io_space means MMIO, right?
-> 
-
-Oh yes, you're right. Thanks for catching that (and in the other patch
-as well).
-
-However, fixing it unveiled a bug which apparently requires me to change
-a bunch of things w.r.t. how we handle the configuration. At boot time,
-Linux (without probe only) reassigns bars without disabling the device
-response (it assumes that none of the devices it can configure are being
-used/accessed).
-
-This means that during the reassignment, bars from different or same
-devices can temporarily alias/overlap each other during boot time. And
-the current handling of PCI io/mmio region doesn't support that.
-
-I'll rework this to make things a little bit more flexible.
-
-Thanks,
-
--- 
-Julien Thierry
+Best,
+Wei
