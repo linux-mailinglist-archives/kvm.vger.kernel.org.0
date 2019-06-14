@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D56945BEF
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 13:57:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57B0145C0E
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 14:04:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727592AbfFNL5B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jun 2019 07:57:01 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:33744 "EHLO
+        id S1727787AbfFNMEb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jun 2019 08:04:31 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:38700 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727164AbfFNL5B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jun 2019 07:57:01 -0400
+        with ESMTP id S1727488AbfFNMEb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jun 2019 08:04:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=sguVOcCD8xzkuKBxAXbNwLoTIO2Bzo3Eiksza5G7pQs=; b=cSm5PBNCt4M8uJZY1qjBxCUXr
-        H5O87c2TUu73yBZbv+rbeId9QKYO7rcOoardZx9weKhgS+3hIMIFgLL4gq0VjjQ41UCQ0DZTJEvBE
-        v9L26qxOd+/i6m3ddYrH901cECMuXIRsttSXQbJ/ac3UCFB6SWlLjHy/J0weQblA0TThiRJPQeWkB
-        rU+VGSfcBuXDneU9uteMmYGcC+aTCn5DvWUt2neAkStNKIfgqTFlWpBFp4a4oUAtJ7MonQrarCOB8
-        l1CAdU/xZhFdBlq06gHnV/SuU6BN5256YqvNgiiialsn3ZXhyRUV73I2u1viT0U+EGpE+8IZxyp4+
-        NfcckPLsg==;
+         bh=alVHZlU/yeIna7DaDwxabV9QPdfrwUg7lNOiHL0K7hc=; b=jQiHhG3v7EnRCAKQJ2BUOiOxw
+        BldbzF3Z7igBVgDE13rSdJP5Xm+EPAMWgYZ7B948eJIxJR26at4A0gEjvCsyqG4jhIoSTRQTHy66F
+        q1Lp5wYqW5JnFDHmW9wfQvUH2yXpgHlV+3pK6H5xe+rfQxW6fSzVKBMZLKc2ykaJlJ5m30So5TAVR
+        s78XezV2gDn8USUKISzydWIp5yu23olD9M4tPQF/yw8sqkbQFdQ1mcpjttqeXZMNdqQDDP0SMA6ko
+        ZLAb6gdVgKb/pkijrewfJeEBT6079GT5Q4uuE2BiL2XhqJMetnqruL8j2dVPJTtj2Pm4gScClcHcm
+        iDydIt+cQ==;
 Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
         by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hbkp7-0003dw-4X; Fri, 14 Jun 2019 11:56:49 +0000
+        id 1hbkwT-0006qX-QL; Fri, 14 Jun 2019 12:04:25 +0000
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id A68CE20A29B4F; Fri, 14 Jun 2019 13:56:47 +0200 (CEST)
-Date:   Fri, 14 Jun 2019 13:56:47 +0200
+        id 4BD1920A29B58; Fri, 14 Jun 2019 14:04:24 +0200 (CEST)
+Date:   Fri, 14 Jun 2019 14:04:24 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 Cc:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
@@ -44,51 +44,39 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Alison Schofield <alison.schofield@intel.com>,
         linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH, RFC 49/62] mm, x86: export several MKTME variables
-Message-ID: <20190614115647.GI3436@hirez.programming.kicks-ass.net>
+Subject: Re: [PATCH, RFC 51/62] iommu/vt-d: Support MKTME in DMA remapping
+Message-ID: <20190614120424.GJ3436@hirez.programming.kicks-ass.net>
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
- <20190508144422.13171-50-kirill.shutemov@linux.intel.com>
+ <20190508144422.13171-52-kirill.shutemov@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190508144422.13171-50-kirill.shutemov@linux.intel.com>
+In-Reply-To: <20190508144422.13171-52-kirill.shutemov@linux.intel.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 08, 2019 at 05:44:09PM +0300, Kirill A. Shutemov wrote:
-> From: Kai Huang <kai.huang@linux.intel.com>
-> 
-> KVM needs those variables to get/set memory encryption mask.
-> 
-> Signed-off-by: Kai Huang <kai.huang@linux.intel.com>
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> ---
->  arch/x86/mm/mktme.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/arch/x86/mm/mktme.c b/arch/x86/mm/mktme.c
-> index df70651816a1..12f4266cf7ea 100644
-> --- a/arch/x86/mm/mktme.c
-> +++ b/arch/x86/mm/mktme.c
-> @@ -7,13 +7,16 @@
->  
->  /* Mask to extract KeyID from physical address. */
->  phys_addr_t mktme_keyid_mask;
-> +EXPORT_SYMBOL_GPL(mktme_keyid_mask);
->  /*
->   * Number of KeyIDs available for MKTME.
->   * Excludes KeyID-0 which used by TME. MKTME KeyIDs start from 1.
->   */
->  int mktme_nr_keyids;
-> +EXPORT_SYMBOL_GPL(mktme_nr_keyids);
->  /* Shift of KeyID within physical address. */
->  int mktme_keyid_shift;
-> +EXPORT_SYMBOL_GPL(mktme_keyid_shift);
->  
->  DEFINE_STATIC_KEY_FALSE(mktme_enabled_key);
->  EXPORT_SYMBOL_GPL(mktme_enabled_key);
+On Wed, May 08, 2019 at 05:44:11PM +0300, Kirill A. Shutemov wrote:
+> @@ -603,7 +605,12 @@ static inline void dma_clear_pte(struct dma_pte *pte)
+>  static inline u64 dma_pte_addr(struct dma_pte *pte)
+>  {
+>  #ifdef CONFIG_64BIT
+> -	return pte->val & VTD_PAGE_MASK;
 
-NAK, don't export variables. Who owns the values, who enforces this?
+I don't know this code, but going by the below cmpxchg64, this wants to
+be READ_ONCE().
+
+> +	u64 addr = pte->val;
+> +	addr &= VTD_PAGE_MASK;
+> +#ifdef CONFIG_X86_INTEL_MKTME
+> +	addr &= ~mktme_keyid_mask;
+> +#endif
+> +	return addr;
+>  #else
+>  	/* Must have a full atomic 64-bit read */
+>  	return  __cmpxchg64(&pte->val, 0ULL, 0ULL) & VTD_PAGE_MASK;
+> -- 
+> 2.20.1
+> 
