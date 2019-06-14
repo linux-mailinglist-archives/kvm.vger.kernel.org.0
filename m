@@ -2,124 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F08D45BB5
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 13:51:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E6E2245BC1
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 13:51:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727488AbfFNLu4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jun 2019 07:50:56 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:38447 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727217AbfFNLu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jun 2019 07:50:56 -0400
-Received: by mail-wr1-f66.google.com with SMTP id d18so2215838wrs.5
-        for <kvm@vger.kernel.org>; Fri, 14 Jun 2019 04:50:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=googlenew;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=j/mrTktDdZBIOs0fb7bg3GlLfNmxkoW9xlbMZCkSZ0I=;
-        b=X57dInWjSfJLzXwFIEJdQ5q6FsaS7CvV1EF+IkBVFhkzOOrUcEJ8GYohyKra30O9bL
-         DgC889Z97zOmyYvArr3dNR5uguITXF/4k25N90biUzdDwX1YLc0K55cClHn5hD/m9DQr
-         GdX6zoEcAVANQOs9OMkNUHsBNPvc6+jXi/+cnRu1AqqUYVMizGmHhzJuymsJAs72qSnY
-         e8F3/ZPbxbdHSq7MdgpmfoT4ec4DS0vA3tZVPQHXLmbCs/pEXNbRSZdJNq/EDlac9ieS
-         yGsbdUapKayV7E6lyKh04LQsF1MKh2CokJE48bCM7aGEJOUNIYWhm+teYHC79YzfoQJa
-         GwVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=j/mrTktDdZBIOs0fb7bg3GlLfNmxkoW9xlbMZCkSZ0I=;
-        b=I4nutNQ3XHKkQmCLTXPMz1a6C9N8edsKkyRWwhyFXKNOS0pPuaINOCjMDT1yKWGsLd
-         AV7pnuo+EPVPNfFKZBTP1fy1oUyNovphP4p6pX/moBJBlff1RAL40Mzj67Ri4Lwiw/i6
-         jQjIwekp7Y7maz4qzfTfKFqc5yOG2uw2k2Uw58W6E0tTrUFz+n8mShBiMCdGsgAWWdwu
-         2GXceO7VkhmYrtUE3G8u9NzjW689vRQyQswYRTRr58GiRVjqf2eSxfADTB0LUw3Dln+V
-         R2yU9RUdxR9O/Tnw2hMrt3i5+6p5mi9cusjjTyU67KT6SJWHSg1OUxMtn14pzNfFFRVl
-         c57g==
-X-Gm-Message-State: APjAAAXSpmlHDjvBSzvHmYUdxwjiI5PDy7JQ0PDft5fmQ0TX+qzTly6X
-        a9CWyJU4MwQSWJpXxro0K8it3Q==
-X-Google-Smtp-Source: APXvYqzAYHdO6w8DBfi5lPDXVFzFFl/H9Zr+6ay+lTLK6DZ+DrLmMao9TSeNccrggbh94rgdTebIrA==
-X-Received: by 2002:a5d:540e:: with SMTP id g14mr5857286wrv.346.1560513053775;
-        Fri, 14 Jun 2019 04:50:53 -0700 (PDT)
-Received: from [10.83.36.153] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id x129sm4138600wmg.44.2019.06.14.04.50.52
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Jun 2019 04:50:53 -0700 (PDT)
-Subject: Re: [PATCH] x86/hyperv: Disable preemption while setting
- reenlightenment vector
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Prasanna Panchamukhi <panchamukhi@arista.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Cathy Avery <cavery@redhat.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        "Michael Kelley (EOSG)" <Michael.H.Kelley@microsoft.com>,
-        Mohammed Gamal <mmorsy@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Roman Kagan <rkagan@virtuozzo.com>,
-        Sasha Levin <sashal@kernel.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
+        id S1727750AbfFNLvn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jun 2019 07:51:43 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:60196 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727629AbfFNLvn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jun 2019 07:51:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=6uPpBmRMCo+tgIg2r1zxKrPWw32mDCaK9zcJcUBOcWo=; b=jmYBMKhAa1UffRPdkK9RLJLOS
+        QdmfuTjDZ8NB4GXF/zHW3rz6cJWu+XpCEA1hAu19diiDUBsEXDoK+kKbI8a9yiKOyZQ3CF3PInIUQ
+        bKOZuduix2OL2GFE+f3y35ts/hSbBLpgUqg8O3tCDH3RTiaBrjM4qXKlUTnCQJVFClCitsescAugU
+        AbgEZ8MbL93i/TM4f15wK06QGyzT+L4W7JN9QCBJV7RMSy3QGXdpqnFVW5nBAktHuID4zk4rprhMt
+        eEEuT0d5NdtDREXGLMrP4AslnTeHOVmVmg5XQAU13Avb22U+SuiQ3YAgNOOKPZXwGMgaFoYBwddgg
+        aXV0xJdHA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hbkk6-0001vf-Lz; Fri, 14 Jun 2019 11:51:38 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 2E5292013F74A; Fri, 14 Jun 2019 13:51:37 +0200 (CEST)
+Date:   Fri, 14 Jun 2019 13:51:37 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
-        devel@linuxdriverproject.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, x86@kernel.org
-References: <20190611212003.26382-1-dima@arista.com>
- <8736kff6q3.fsf@vitty.brq.redhat.com>
- <20190614082807.GV3436@hirez.programming.kicks-ass.net>
- <877e9o7a4e.fsf@vitty.brq.redhat.com>
-From:   Dmitry Safonov <dima@arista.com>
-Message-ID: <cb9e1645-98c2-4341-d6da-4effa4f57fb1@arista.com>
-Date:   Fri, 14 Jun 2019 12:50:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@amacapital.net>,
+        David Howells <dhowells@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Kai Huang <kai.huang@linux.intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH, RFC 45/62] mm: Add the encrypt_mprotect() system call
+ for MKTME
+Message-ID: <20190614115137.GF3436@hirez.programming.kicks-ass.net>
+References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
+ <20190508144422.13171-46-kirill.shutemov@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <877e9o7a4e.fsf@vitty.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190508144422.13171-46-kirill.shutemov@linux.intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/14/19 11:08 AM, Vitaly Kuznetsov wrote:
-> Peter Zijlstra <peterz@infradead.org> writes:
-> 
->> @@ -182,7 +182,7 @@ void set_hv_tscchange_cb(void (*cb)(void))
->>  	struct hv_reenlightenment_control re_ctrl = {
->>  		.vector = HYPERV_REENLIGHTENMENT_VECTOR,
->>  		.enabled = 1,
->> -		.target_vp = hv_vp_index[smp_processor_id()]
->> +		.target_vp = hv_vp_index[raw_smp_processor_id()]
->>  	};
->>  	struct hv_tsc_emulation_control emu_ctrl = {.enabled = 1};
->>  
-> 
-> Yes, this should do, thanks! I'd also suggest to leave a comment like
-> 	/* 
->          * This function can get preemted and migrate to a different CPU
-> 	 * but this doesn't matter. We just need to assign
-> 	 * reenlightenment notification to some online CPU. In case this
->          * CPU goes offline, hv_cpu_die() will re-assign it to some
->  	 * other online CPU.
-> 	 */
+On Wed, May 08, 2019 at 05:44:05PM +0300, Kirill A. Shutemov wrote:
 
-What if the cpu goes down just before wrmsrl()?
-I mean, hv_cpu_die() will reassign another cpu, but this thread will be
-resumed on some other cpu and will write cpu number which is at that
-moment already down?
+> @@ -347,7 +348,8 @@ static int prot_none_walk(struct vm_area_struct *vma, unsigned long start,
+>  
+>  int
+>  mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
+> -	unsigned long start, unsigned long end, unsigned long newflags)
+> +	       unsigned long start, unsigned long end, unsigned long newflags,
+> +	       int newkeyid)
+>  {
+>  	struct mm_struct *mm = vma->vm_mm;
+>  	unsigned long oldflags = vma->vm_flags;
+> @@ -357,7 +359,14 @@ mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
+>  	int error;
+>  	int dirty_accountable = 0;
+>  
+> -	if (newflags == oldflags) {
+> +	/*
+> +	 * Flags match and Keyids match or we have NO_KEY.
+> +	 * This _fixup is usually called from do_mprotect_ext() except
+> +	 * for one special case: caller fs/exec.c/setup_arg_pages()
+> +	 * In that case, newkeyid is passed as -1 (NO_KEY).
+> +	 */
+> +	if (newflags == oldflags &&
+> +	    (newkeyid == vma_keyid(vma) || newkeyid == NO_KEY)) {
+>  		*pprev = vma;
+>  		return 0;
+>  	}
+> @@ -423,6 +432,8 @@ mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
+>  	}
+>  
+>  success:
+> +	if (newkeyid != NO_KEY)
+> +		mprotect_set_encrypt(vma, newkeyid, start, end);
+>  	/*
+>  	 * vm_flags and vm_page_prot are protected by the mmap_sem
+>  	 * held in write mode.
+> @@ -454,10 +465,15 @@ mprotect_fixup(struct vm_area_struct *vma, struct vm_area_struct **pprev,
+>  }
+>  
+>  /*
+> - * When pkey==NO_KEY we get legacy mprotect behavior here.
+> + * do_mprotect_ext() supports the legacy mprotect behavior plus extensions
+> + * for Protection Keys and Memory Encryption Keys. These extensions are
+> + * mutually exclusive and the behavior is:
+> + *	(pkey==NO_KEY && keyid==NO_KEY) ==> legacy mprotect
+> + *	(pkey is valid)  ==> legacy mprotect plus Protection Key extensions
+> + *	(keyid is valid) ==> legacy mprotect plus Encryption Key extensions
+>   */
+>  static int do_mprotect_ext(unsigned long start, size_t len,
+> -		unsigned long prot, int pkey)
+> +			   unsigned long prot, int pkey, int keyid)
+>  {
+>  	unsigned long nstart, end, tmp, reqprot;
+>  	struct vm_area_struct *vma, *prev;
+> @@ -555,7 +571,8 @@ static int do_mprotect_ext(unsigned long start, size_t len,
+>  		tmp = vma->vm_end;
+>  		if (tmp > end)
+>  			tmp = end;
+> -		error = mprotect_fixup(vma, &prev, nstart, tmp, newflags);
+> +		error = mprotect_fixup(vma, &prev, nstart, tmp, newflags,
+> +				       keyid);
+>  		if (error)
+>  			goto out;
+>  		nstart = tmp;
 
-(probably I miss something)
+I've missed the part where pkey && keyid results in a WARN or error or
+whatever.
 
-And I presume it's guaranteed that during hv_cpu_die() no other cpu may
-go down:
-:	new_cpu = cpumask_any_but(cpu_online_mask, cpu);
-:	re_ctrl.target_vp = hv_vp_index[new_cpu];
-:	wrmsrl(HV_X64_MSR_REENLIGHTENMENT_CONTROL, *((u64 *)&re_ctrl));
-
--- 
-          Dima
