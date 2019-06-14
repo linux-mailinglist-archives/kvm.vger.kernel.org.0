@@ -2,144 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 937AD459AB
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 11:55:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E03EB459C7
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 12:01:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727617AbfFNJyr convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 14 Jun 2019 05:54:47 -0400
-Received: from mail-wr1-f46.google.com ([209.85.221.46]:33007 "EHLO
-        mail-wr1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727059AbfFNJyr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jun 2019 05:54:47 -0400
-Received: by mail-wr1-f46.google.com with SMTP id n9so1869307wru.0
-        for <kvm@vger.kernel.org>; Fri, 14 Jun 2019 02:54:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=BKOmSvAQqs7e+hmjUgq+iWzt8I9C5915KyAol3sisdI=;
-        b=KJYPkdCAQ1FjvKHTcme4WihK2M8iJIK2bmSPwVXJbc465RCwHZeYE++vx53E8EppIj
-         iGW4if/mxpskaPX9aM7BG5o+8R60CjOAyAQnTayotev7bskkw7oHjoD8HI6136En3+TA
-         cd11JtmRvMB3Qv0F8D7fjzVe+GgYEaNi2XpykOEiSpnefjBHT4OU4cbbGlWqxDsJ8+vR
-         9FTYKhsyYTxUYRTBQ+eodLsLf0/FSA92ES0BAGfXoQleA6Aey5HjMwd5iT5fYyx3dUsA
-         18hNrcTaXMS/qmQgNmQ+51OnlD9CnExwGkfapJ28BC4myixGbSpjewyAHpMjj/xSa0Wd
-         jV1w==
-X-Gm-Message-State: APjAAAW0OUBrRvwu1P7ka6adZF8pHLniPbnnTVdQRyaBGIfQjlVEpIf+
-        E7UOMyc7g0ZKgihylM7dIPldKQ==
-X-Google-Smtp-Source: APXvYqzKFGUDa5/YIKgWbD65aAxLH11Th9p9SPCvxDkXtuzlQdTuJWp+yPPMs28jm91qwG/RrGAAPQ==
-X-Received: by 2002:a5d:49c4:: with SMTP id t4mr6458363wrs.318.1560506085030;
-        Fri, 14 Jun 2019 02:54:45 -0700 (PDT)
-Received: from ?IPv6:2a01:e35:8b6a:1220:f9e9:3f02:38a3:837b? ([2a01:e35:8b6a:1220:f9e9:3f02:38a3:837b])
-        by smtp.gmail.com with ESMTPSA id d10sm3548311wrp.74.2019.06.14.02.54.43
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Jun 2019 02:54:44 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [libvirt] mdevctl: A shoestring mediated device management and
- persistence utility
-From:   Christophe de Dinechin <cdupontd@redhat.com>
-In-Reply-To: <20190613103555.3923e078@x1.home>
-Date:   Fri, 14 Jun 2019 11:54:42 +0200
-Cc:     Sylvain Bauza <sbauza@redhat.com>,
-        Pavel Hrdina <phrdina@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Skultety <eskultet@redhat.com>,
-        Libvirt Devel <libvir-list@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Erik Skultety <eskultet@redhat.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <4C4B64A0-E017-436C-B13E-E60EABC6F5F1@redhat.com>
-References: <20190523172001.41f386d8@x1.home>
- <0358F503-E2C7-42DC-8186-34D1DA31F6D7@redhat.com>
- <20190613103555.3923e078@x1.home>
-To:     Alex Williamson <alex.williamson@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        id S1727335AbfFNKBP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jun 2019 06:01:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49912 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726951AbfFNKBP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jun 2019 06:01:15 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 38D7E308339B;
+        Fri, 14 Jun 2019 10:01:15 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 26234648C3;
+        Fri, 14 Jun 2019 10:01:14 +0000 (UTC)
+Date:   Fri, 14 Jun 2019 12:01:11 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Farhan Ali <alifm@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v2 9/9] s390/cio: Combine direct and indirect CCW paths
+Message-ID: <20190614120111.00b4bd48.cohuck@redhat.com>
+In-Reply-To: <20190606202831.44135-10-farman@linux.ibm.com>
+References: <20190606202831.44135-1-farman@linux.ibm.com>
+        <20190606202831.44135-10-farman@linux.ibm.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Fri, 14 Jun 2019 10:01:15 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu,  6 Jun 2019 22:28:31 +0200
+Eric Farman <farman@linux.ibm.com> wrote:
 
-
-> On 13 Jun 2019, at 18:35, Alex Williamson <alex.williamson@redhat.com> wrote:
+> With both the direct-addressed and indirect-addressed CCW paths
+> simplified to this point, the amount of shared code between them is
+> (hopefully) more easily visible.  Move the processing of IDA-specific
+> bits into the direct-addressed path, and add some useful commentary of
+> what the individual pieces are doing.  This allows us to remove the
+> entire ccwchain_fetch_idal() routine and maintain a single function
+> for any non-TIC CCW.
 > 
-> On Thu, 13 Jun 2019 18:17:53 +0200
-> Christophe de Dinechin <cdupontd@redhat.com> wrote:
-> 
->>> On 24 May 2019, at 01:20, Alex Williamson <alex.williamson@redhat.com> wrote:
->>> 
->>> Hi,
->>> 
->>> Currently mediated device management, much like SR-IOV VF management,
->>> is largely left as an exercise for the user.  This is an attempt to
->>> provide something and see where it goes.  I doubt we'll solve
->>> everyone's needs on the first pass, but maybe we'll solve enough and
->>> provide helpers for the rest.  Without further ado, I'll point to what
->>> I have so far:
->>> 
->>> https://github.com/awilliam/mdevctl  
->> 
->> While it’s still early, what about :
->> 
->> 	mdevctl create-mdev <parent-device> <mdev-type> [<mdev-uuid>]
->> 
->> where if the mdev-uuid is missing, you just run uuidgen within the script?
->> 
->> I sent a small PR in case you think it makes sense.
-> 
-> It sounds racy.  If the user doesn't provide the UUID then they need to
-> guess that an mdev device with the same parent and type is theirs.
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>  drivers/s390/cio/vfio_ccw_cp.c | 115 +++++++++++----------------------
+>  1 file changed, 39 insertions(+), 76 deletions(-)
 
-That is true irrespective of the usage, isn’t it? In other words, when you
-invoke `mdevctl create-mdev`, you assert “I own that specific parent/type”.
-At least, that’s how I read the way the script behaves today. Whether you
-invoke uuidgen inside or outside the script does not change that assertion
-(at least with today’s code).
-
->  How do you resolve two instances of this happening in parallel and both
-> coming to the same conclusion which is their device.  If a user wants
-> this sort of headache they can call mdevctl with `uuidgen` but I don't
-> think we should encourage it further.
-
-I agree there is a race, but if anything, having a usage where you don’t
-pass the UUID on the command line is a step in the right direction.
-It leaves the door open for the create-mdev script to do smarter things,
-like deferring the allocation of the mdevs to an entity that has slightly
-more knowledge of the global system state than uuidgen.
-
-In other words, in my mind, `mdevctl create-mdev parent type` does not
-imply “this will use uuidgen” but rather, if anything, implies “this will do the
-right thing to prevent the race in the future, even if that’s more complex
-than just calling uuidgen”.
-
-However, I believe that this means we should reorder the args further.
-I would suggest something like:
-
-	mdevctl create-mdev <mdev-type> [<parent-device> [<mdev-uuid>]]
-
-where
-
-1 arg means you let mdevctl choose the parent device for you (future)
-   (e.g. I want a VGPU of this type, I don’t really care where it comes from)
-2 args mean you want that specific type/parent combination
-3 args mean you assert you own that device
-
-That also implies that mdevctl create-mdev should output what it allocated
-so that some higher-level software can tell “OK, that’s the instance I got”.
-
-> BTW, I've moved the project to https://github.com/mdevctl/mdevctl, the
-> latest commit in the tree above makes that change, I've also updated
-> the description on my repo to point to the new location.  Thanks,
-
-Done.
+Another nice cleanup :)
 
 > 
-> Alex
-> 
-> --
-> libvir-list mailing list
-> libvir-list@redhat.com
-> https://www.redhat.com/mailman/listinfo/libvir-list
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index 8205d0b527fc..90d86e1354c1 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -534,10 +534,12 @@ static int ccwchain_fetch_direct(struct ccwchain *chain,
 
+The one minor thing I have is that the function name
+(ccwchain_fetch_direct) is now slightly confusing. But we can easily do
+a patch on top renaming it (if we can come up with a better name.)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
