@@ -2,101 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A392546449
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 18:34:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 923564644C
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 18:34:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725996AbfFNQeS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jun 2019 12:34:18 -0400
-Received: from mga02.intel.com ([134.134.136.20]:49731 "EHLO mga02.intel.com"
+        id S1726184AbfFNQer (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jun 2019 12:34:47 -0400
+Received: from mga09.intel.com ([134.134.136.24]:24843 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725808AbfFNQeR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jun 2019 12:34:17 -0400
+        id S1725808AbfFNQer (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jun 2019 12:34:47 -0400
 X-Amp-Result: UNSCANNABLE
 X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Jun 2019 09:34:16 -0700
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Jun 2019 09:34:46 -0700
 X-ExtLoop1: 1
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by fmsmga008.fm.intel.com with ESMTP; 14 Jun 2019 09:34:16 -0700
-Date:   Fri, 14 Jun 2019 09:34:16 -0700
+  by orsmga004.jf.intel.com with ESMTP; 14 Jun 2019 09:34:46 -0700
+Date:   Fri, 14 Jun 2019 09:34:46 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         vkuznets@redhat.com
-Subject: Re: [PATCH 42/43] KVM: VMX: Leave preemption timer running when it's
- disabled
-Message-ID: <20190614163416.GH12191@linux.intel.com>
+Subject: Re: [PATCH 43/43] KVM: nVMX: shadow pin based execution controls
+Message-ID: <20190614163446.GI12191@linux.intel.com>
 References: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
- <1560445409-17363-43-git-send-email-pbonzini@redhat.com>
+ <1560445409-17363-44-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1560445409-17363-43-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1560445409-17363-44-git-send-email-pbonzini@redhat.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 13, 2019 at 07:03:28PM +0200, Paolo Bonzini wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
+On Thu, Jun 13, 2019 at 07:03:29PM +0200, Paolo Bonzini wrote:
+> The VMX_PREEMPTION_TIMER flag may be toggled frequently, though not
+> *very* frequently.  Since it does not affect KVM's dirty logic, e.g.
+> the preemption timer value is loaded from vmcs12 even if vmcs12 is
+> "clean", there is no need to mark vmcs12 dirty when L1 writes pin
+> controls, and shadowing the field achieves that.
 > 
-> VMWRITEs to the major VMCS controls, pin controls included, are
-> deceptively expensive.  CPUs with VMCS caching (Westmere and later) also
-> optimize away consistency checks on VM-Entry, i.e. skip consistency
-> checks if the relevant fields have not changed since the last successful
-> VM-Entry (of the cached VMCS).  Because uops are a precious commodity,
-> uCode's dirty VMCS field tracking isn't as precise as software would
-> prefer.  Notably, writing any of the major VMCS fields effectively marks
-> the entire VMCS dirty, i.e. causes the next VM-Entry to perform all
-> consistency checks, which consumes several hundred cycles.
-> 
-> As it pertains to KVM, toggling PIN_BASED_VMX_PREEMPTION_TIMER more than
-> doubles the latency of the next VM-Entry (and again when/if the flag is
-> toggled back).  In a non-nested scenario, running a "standard" guest
-> with the preemption timer enabled, toggling the timer flag is uncommon
-> but not rare, e.g. roughly 1 in 10 entries.  Disabling the preemption
-> timer can change these numbers due to its use for "immediate exits",
-> even when explicitly disabled by userspace.
-> 
-> Nested virtualization in particular is painful, as the timer flag is set
-> for the majority of VM-Enters, but prepare_vmcs02() initializes vmcs02's
-> pin controls to *clear* the flag since its the timer's final state isn't
-> known until vmx_vcpu_run().  I.e. the majority of nested VM-Enters end
-> up unnecessarily writing pin controls *twice*.
-> 
-> Rather than toggle the timer flag in pin controls, set the timer value
-> itself to the largest allowed value to put it into a "soft disabled"
-> state, and ignore any spurious preemption timer exits.
-> 
-> Sadly, the timer is a 32-bit value and so theoretically it can fire
-> before the head death of the universe, i.e. spurious exits are possible.
-
-s/head/heat
-
-> But because KVM does *not* save the timer value on VM-Exit and because
-> the timer runs at a slower rate than the TSC, the maximuma timer value
-
-s/maximuma/maximum
-
-> is still sufficiently large for KVM's purposes.  E.g. on a modern CPU
-> with a timer that runs at 1/32 the frequency of a 2.4ghz constant-rate
-> TSC, the timer will fire after ~55 seconds of *uninterrupted* guest
-> execution.  In other words, spurious VM-Exits are effectively only
-> possible if the *host* is tickless on the logical CPU, the guest is
-> not using the preemption timer, and the guest is not generating VM-Exits
-> for *any* other reason.
-> 
-> To be safe from bad/weird hardware, disable the preemption timer if its
-> maximum delay is less than ten seconds.  Ten seconds is mostly arbitrary
-> and was selected in no small part because it's a nice round number.
-> For simplicity and paranoia, fall back to __kvm_request_immediate_exit()
-> if the preemption timer is disabled by KVM or userspace.  Previously
-> KVM continued to use the preemption timer to force immediate exits even
-> when the timer was disabled by userspace.  Now that KVM leaves the timer
-> running instead of truly disabling it, allow userspace to kill it
-> entirely in the unlikely event the timer (or KVM) malfunctions.
-> 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
+
+Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+
+>  arch/x86/kvm/vmx/vmcs_shadow_fields.h | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmcs_shadow_fields.h b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
+> index 4cea018ba285..eb1ecd16fd22 100644
+> --- a/arch/x86/kvm/vmx/vmcs_shadow_fields.h
+> +++ b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
+> @@ -47,6 +47,7 @@
+>  SHADOW_FIELD_RO(GUEST_CS_AR_BYTES, guest_cs_ar_bytes)
+>  SHADOW_FIELD_RO(GUEST_SS_AR_BYTES, guest_ss_ar_bytes)
+>  SHADOW_FIELD_RW(CPU_BASED_VM_EXEC_CONTROL, cpu_based_vm_exec_control)
+> +SHADOW_FIELD_RW(PIN_BASED_VM_EXEC_CONTROL, pin_based_vm_exec_control)
+>  SHADOW_FIELD_RW(EXCEPTION_BITMAP, exception_bitmap)
+>  SHADOW_FIELD_RW(VM_ENTRY_EXCEPTION_ERROR_CODE, vm_entry_exception_error_code)
+>  SHADOW_FIELD_RW(VM_ENTRY_INTR_INFO_FIELD, vm_entry_intr_info_field)
+> -- 
+> 1.8.3.1
+> 
