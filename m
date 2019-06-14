@@ -2,153 +2,251 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C122045621
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 09:25:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21C03457BD
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 10:38:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726238AbfFNHZS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jun 2019 03:25:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52198 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725944AbfFNHZS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jun 2019 03:25:18 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 61DA930917AF;
-        Fri, 14 Jun 2019 07:25:17 +0000 (UTC)
-Received: from [10.36.116.252] (ovpn-116-252.ams2.redhat.com [10.36.116.252])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8E6E3648C8;
-        Fri, 14 Jun 2019 07:24:56 +0000 (UTC)
-Subject: Re: [RFC][Patch v10 1/2] mm: page_hinting: core infrastructure
-To:     Nitesh Narayan Lal <nitesh@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        pbonzini@redhat.com, lcapitulino@redhat.com, pagupta@redhat.com,
-        wei.w.wang@intel.com, yang.zhang.wz@gmail.com, riel@surriel.com,
-        mst@redhat.com, dodgen@google.com, konrad.wilk@oracle.com,
-        dhildenb@redhat.com, aarcange@redhat.com, alexander.duyck@gmail.com
-References: <20190603170306.49099-1-nitesh@redhat.com>
- <20190603170306.49099-2-nitesh@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <c95b0419-85bb-2210-cd90-732447de8345@redhat.com>
-Date:   Fri, 14 Jun 2019 09:24:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726817AbfFNIi3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jun 2019 04:38:29 -0400
+Received: from kadath.azazel.net ([81.187.231.250]:38796 "EHLO
+        kadath.azazel.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726707AbfFNIi3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jun 2019 04:38:29 -0400
+X-Greylist: delayed 2370 seconds by postgrey-1.27 at vger.kernel.org; Fri, 14 Jun 2019 04:38:28 EDT
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=azazel.net;
+         s=20190108; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+        List-Post:List-Owner:List-Archive;
+        bh=G0kG6tqXXsRGIiO+BHcEtfpdFD2+yHGBJ6x5btZuxkA=; b=MvtV+EL3y940ymGGuOgSbcqr9G
+        kWmqZgj+RVG52zJpxNLvpASYK91l/pZPjyaRJKZ8gmulUwbkc96+v/Y3f8pcACZtbmAcrEkyPfmzj
+        +AF3DdZwZZal7wuKknrxWgnuWgI9dr1S1DdHvkdTXC5ulV+8gZwKxTLKaKMGgpkmVPrnFNn2sNQR4
+        n6CgI7c6q5ylvS9WiiibsXaUCeBCE7SBBBvAQsz5MT79+syCQmzKZ0tTFhsIhiHXI6yC2kzS7naSP
+        t/EBFrBKI1XUa2pswCGBzSodZA/OFsVixCOxd62s53RqKr5Oldky3picc/JNFMdCSIUwQqByoqJ4m
+        boLAhlMg==;
+Received: from kadath.azazel.net ([2001:8b0:135f:bcd1:e2cb:4eff:fedf:e608] helo=azazel.net)
+        by kadath.azazel.net with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <jeremy@azazel.net>)
+        id 1hbh6A-0001e9-VN; Fri, 14 Jun 2019 08:58:11 +0100
+Date:   Fri, 14 Jun 2019 08:58:09 +0100
+From:   Jeremy Sowden <jeremy@azazel.net>
+To:     syzbot <syzbot+0789f0c7e45efd7bb643@syzkaller.appspotmail.com>
+Cc:     ast@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
+        davem@davemloft.net, dvyukov@google.com, hawk@kernel.org,
+        hdanton@sina.com, jakub.kicinski@netronome.com,
+        jasowang@redhat.com, john.fastabend@gmail.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mst@redhat.com,
+        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        virtualization@lists.linux-foundation.org,
+        xdp-newbies@vger.kernel.org
+Subject: Re: memory leak in vhost_net_ioctl
+Message-ID: <20190614075809.32gnqqpzgl25gxmz@azazel.net>
+References: <20190614024519.6224-1-hdanton@sina.com>
+ <000000000000f9d056058b3fe507@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20190603170306.49099-2-nitesh@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Fri, 14 Jun 2019 07:25:17 +0000 (UTC)
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="mv67wdquhvqcpoxi"
+Content-Disposition: inline
+In-Reply-To: <000000000000f9d056058b3fe507@google.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-SA-Exim-Connect-IP: 2001:8b0:135f:bcd1:e2cb:4eff:fedf:e608
+X-SA-Exim-Mail-From: jeremy@azazel.net
+X-SA-Exim-Scanned: No (on kadath.azazel.net); SAEximRunCond expanded to false
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03.06.19 19:03, Nitesh Narayan Lal wrote:
-> This patch introduces the core infrastructure for free page hinting in
-> virtual environments. It enables the kernel to track the free pages which
-> can be reported to its hypervisor so that the hypervisor could
-> free and reuse that memory as per its requirement.
-> 
-> While the pages are getting processed in the hypervisor (e.g.,
-> via MADV_FREE), the guest must not use them, otherwise, data loss
-> would be possible. To avoid such a situation, these pages are
-> temporarily removed from the buddy. The amount of pages removed
-> temporarily from the buddy is governed by the backend(virtio-balloon
-> in our case).
-> 
-> To efficiently identify free pages that can to be hinted to the
-> hypervisor, bitmaps in a coarse granularity are used. Only fairly big
-> chunks are reported to the hypervisor - especially, to not break up THP
-> in the hypervisor - "MAX_ORDER - 2" on x86, and to save space. The bits
-> in the bitmap are an indication whether a page *might* be free, not a
-> guarantee. A new hook after buddy merging sets the bits.
-> 
-> Bitmaps are stored per zone, protected by the zone lock. A workqueue
-> asynchronously processes the bitmaps, trying to isolate and report pages
-> that are still free. The backend (virtio-balloon) is responsible for
-> reporting these batched pages to the host synchronously. Once reporting/
-> freeing is complete, isolated pages are returned back to the buddy.
-> 
-> There are still various things to look into (e.g., memory hotplug, more
-> efficient locking, possible races when disabling).
-> 
-> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
-> ---
->  drivers/virtio/Kconfig       |   1 +
->  include/linux/page_hinting.h |  46 +++++++
->  mm/Kconfig                   |   6 +
->  mm/Makefile                  |   2 +
->  mm/page_alloc.c              |  17 +--
->  mm/page_hinting.c            | 236 +++++++++++++++++++++++++++++++++++
->  6 files changed, 301 insertions(+), 7 deletions(-)
->  create mode 100644 include/linux/page_hinting.h
->  create mode 100644 mm/page_hinting.c
-> 
-> diff --git a/drivers/virtio/Kconfig b/drivers/virtio/Kconfig
-> index 35897649c24f..5a96b7a2ed1e 100644
-> --- a/drivers/virtio/Kconfig
-> +++ b/drivers/virtio/Kconfig
-> @@ -46,6 +46,7 @@ config VIRTIO_BALLOON
->  	tristate "Virtio balloon driver"
->  	depends on VIRTIO
->  	select MEMORY_BALLOON
-> +	select PAGE_HINTING
->  	---help---
->  	 This driver supports increasing and decreasing the amount
->  	 of memory within a KVM guest.
 
-BTW, this hunk belongs to the virtio-balloon patch.
+--mv67wdquhvqcpoxi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+On 2019-06-13, at 20:04:01 -0700, syzbot wrote:
+> syzbot has tested the proposed patch but the reproducer still
+> triggered crash: memory leak in batadv_tvlv_handler_register
 
--- 
+There's already a fix for this batman leak:
 
-Thanks,
+  https://lore.kernel.org/netdev/00000000000017d64c058965f966@google.com/
+  https://www.open-mesh.org/issues/378
 
-David / dhildenb
+>   484.626788][  T156] bond0 (unregistering): Releasing backup
+>   interface bond_slave_1
+> Warning: Permanently added '10.128.0.87' (ECDSA) to the list of known
+> hosts.
+> BUG: memory leak
+> unreferenced object 0xffff88811d25c4c0 (size 64):
+>   comm "softirq", pid 0, jiffies 4294943668 (age 434.830s)
+>   hex dump (first 32 bytes):
+>     00 00 00 00 00 00 00 00 e0 fc 5b 20 81 88 ff ff  ..........[ ....
+>     00 00 00 00 00 00 00 00 20 91 15 83 ff ff ff ff  ........ .......
+>   backtrace:
+>     [<000000000045bc9d>] kmemleak_alloc_recursive
+> include/linux/kmemleak.h:43 [inline]
+>     [<000000000045bc9d>] slab_post_alloc_hook mm/slab.h:439 [inline]
+>     [<000000000045bc9d>] slab_alloc mm/slab.c:3326 [inline]
+>     [<000000000045bc9d>] kmem_cache_alloc_trace+0x13d/0x280
+> mm/slab.c:3553
+>     [<00000000197d773e>] kmalloc include/linux/slab.h:547 [inline]
+>     [<00000000197d773e>] kzalloc include/linux/slab.h:742 [inline]
+>     [<00000000197d773e>] batadv_tvlv_handler_register+0xae/0x140
+> net/batman-adv/tvlv.c:529
+>     [<00000000fa9f11af>] batadv_tt_init+0x78/0x180
+> net/batman-adv/translation-table.c:4411
+>     [<000000008c50839d>] batadv_mesh_init+0x196/0x230
+> net/batman-adv/main.c:208
+>     [<000000001c5a74a3>] batadv_softif_init_late+0x1ca/0x220
+> net/batman-adv/soft-interface.c:861
+>     [<000000004e676cd1>] register_netdevice+0xbf/0x600
+> net/core/dev.c:8635
+>     [<000000005601497b>] __rtnl_newlink+0xaca/0xb30
+> net/core/rtnetlink.c:3199
+>     [<00000000ad02cf5e>] rtnl_newlink+0x4e/0x80
+> net/core/rtnetlink.c:3245
+>     [<00000000eceb53af>] rtnetlink_rcv_msg+0x178/0x4b0
+> net/core/rtnetlink.c:5214
+>     [<00000000140451f6>] netlink_rcv_skb+0x61/0x170
+> net/netlink/af_netlink.c:2482
+>     [<00000000237e38f7>] rtnetlink_rcv+0x1d/0x30
+> net/core/rtnetlink.c:5232
+>     [<000000000d47c000>] netlink_unicast_kernel
+> net/netlink/af_netlink.c:1307 [inline]
+>     [<000000000d47c000>] netlink_unicast+0x1ec/0x2d0
+> net/netlink/af_netlink.c:1333
+>     [<0000000098503d79>] netlink_sendmsg+0x26a/0x480
+> net/netlink/af_netlink.c:1922
+>     [<000000009263e868>] sock_sendmsg_nosec net/socket.c:646 [inline]
+>     [<000000009263e868>] sock_sendmsg+0x54/0x70 net/socket.c:665
+>     [<000000007791ad47>] __sys_sendto+0x148/0x1f0 net/socket.c:1958
+>     [<00000000d6f3807d>] __do_sys_sendto net/socket.c:1970 [inline]
+>     [<00000000d6f3807d>] __se_sys_sendto net/socket.c:1966 [inline]
+>     [<00000000d6f3807d>] __x64_sys_sendto+0x2a/0x30 net/socket.c:1966
+>
+> BUG: memory leak
+> unreferenced object 0xffff8881024a3340 (size 64):
+>   comm "softirq", pid 0, jiffies 4294943678 (age 434.730s)
+>   hex dump (first 32 bytes):
+>     00 00 00 00 00 00 00 00 e0 2c 66 04 81 88 ff ff  .........,f.....
+>     00 00 00 00 00 00 00 00 20 91 15 83 ff ff ff ff  ........ .......
+>   backtrace:
+>     [<000000000045bc9d>] kmemleak_alloc_recursive
+> include/linux/kmemleak.h:43 [inline]
+>     [<000000000045bc9d>] slab_post_alloc_hook mm/slab.h:439 [inline]
+>     [<000000000045bc9d>] slab_alloc mm/slab.c:3326 [inline]
+>     [<000000000045bc9d>] kmem_cache_alloc_trace+0x13d/0x280
+> mm/slab.c:3553
+>     [<00000000197d773e>] kmalloc include/linux/slab.h:547 [inline]
+>     [<00000000197d773e>] kzalloc include/linux/slab.h:742 [inline]
+>     [<00000000197d773e>] batadv_tvlv_handler_register+0xae/0x140
+> net/batman-adv/tvlv.c:529
+>     [<00000000fa9f11af>] batadv_tt_init+0x78/0x180
+> net/batman-adv/translation-table.c:4411
+>     [<000000008c50839d>] batadv_mesh_init+0x196/0x230
+> net/batman-adv/main.c:208
+>     [<000000001c5a74a3>] batadv_softif_init_late+0x1ca/0x220
+> net/batman-adv/soft-interface.c:861
+>     [<000000004e676cd1>] register_netdevice+0xbf/0x600
+> net/core/dev.c:8635
+>     [<000000005601497b>] __rtnl_newlink+0xaca/0xb30
+> net/core/rtnetlink.c:3199
+>     [<00000000ad02cf5e>] rtnl_newlink+0x4e/0x80
+> net/core/rtnetlink.c:3245
+>     [<00000000eceb53af>] rtnetlink_rcv_msg+0x178/0x4b0
+> net/core/rtnetlink.c:5214
+>     [<00000000140451f6>] netlink_rcv_skb+0x61/0x170
+> net/netlink/af_netlink.c:2482
+>     [<00000000237e38f7>] rtnetlink_rcv+0x1d/0x30
+> net/core/rtnetlink.c:5232
+>     [<000000000d47c000>] netlink_unicast_kernel
+> net/netlink/af_netlink.c:1307 [inline]
+>     [<000000000d47c000>] netlink_unicast+0x1ec/0x2d0
+> net/netlink/af_netlink.c:1333
+>     [<0000000098503d79>] netlink_sendmsg+0x26a/0x480
+> net/netlink/af_netlink.c:1922
+>     [<000000009263e868>] sock_sendmsg_nosec net/socket.c:646 [inline]
+>     [<000000009263e868>] sock_sendmsg+0x54/0x70 net/socket.c:665
+>     [<000000007791ad47>] __sys_sendto+0x148/0x1f0 net/socket.c:1958
+>     [<00000000d6f3807d>] __do_sys_sendto net/socket.c:1970 [inline]
+>     [<00000000d6f3807d>] __se_sys_sendto net/socket.c:1966 [inline]
+>     [<00000000d6f3807d>] __x64_sys_sendto+0x2a/0x30 net/socket.c:1966
+>
+> BUG: memory leak
+> unreferenced object 0xffff888108a71b80 (size 128):
+>   comm "syz-executor.3", pid 7367, jiffies 4294943696 (age 434.550s)
+>   hex dump (first 32 bytes):
+>     f0 f8 bf 02 81 88 ff ff f0 f8 bf 02 81 88 ff ff  ................
+>     1a dc 77 da 54 a0 be 41 64 20 e9 56 ff ff ff ff  ..w.T..Ad .V....
+>   backtrace:
+>     [<000000000045bc9d>] kmemleak_alloc_recursive
+> include/linux/kmemleak.h:43 [inline]
+>     [<000000000045bc9d>] slab_post_alloc_hook mm/slab.h:439 [inline]
+>     [<000000000045bc9d>] slab_alloc mm/slab.c:3326 [inline]
+>     [<000000000045bc9d>] kmem_cache_alloc_trace+0x13d/0x280
+> mm/slab.c:3553
+>     [<00000000cc6863ae>] kmalloc include/linux/slab.h:547 [inline]
+>     [<00000000cc6863ae>] hsr_create_self_node+0x42/0x150
+> net/hsr/hsr_framereg.c:84
+>     [<000000000e2bb6b0>] hsr_dev_finalize+0xa4/0x233
+> net/hsr/hsr_device.c:441
+>     [<000000003b100a4a>] hsr_newlink+0xf3/0x140
+> net/hsr/hsr_netlink.c:69
+>     [<00000000b5efb0eb>] __rtnl_newlink+0x892/0xb30
+> net/core/rtnetlink.c:3187
+>     [<00000000ad02cf5e>] rtnl_newlink+0x4e/0x80
+> net/core/rtnetlink.c:3245
+>     [<00000000eceb53af>] rtnetlink_rcv_msg+0x178/0x4b0
+> net/core/rtnetlink.c:5214
+>     [<00000000140451f6>] netlink_rcv_skb+0x61/0x170
+> net/netlink/af_netlink.c:2482
+>     [<00000000237e38f7>] rtnetlink_rcv+0x1d/0x30
+> net/core/rtnetlink.c:5232
+>     [<000000000d47c000>] netlink_unicast_kernel
+> net/netlink/af_netlink.c:1307 [inline]
+>     [<000000000d47c000>] netlink_unicast+0x1ec/0x2d0
+> net/netlink/af_netlink.c:1333
+>     [<0000000098503d79>] netlink_sendmsg+0x26a/0x480
+> net/netlink/af_netlink.c:1922
+>     [<000000009263e868>] sock_sendmsg_nosec net/socket.c:646 [inline]
+>     [<000000009263e868>] sock_sendmsg+0x54/0x70 net/socket.c:665
+>     [<000000007791ad47>] __sys_sendto+0x148/0x1f0 net/socket.c:1958
+>     [<00000000d6f3807d>] __do_sys_sendto net/socket.c:1970 [inline]
+>     [<00000000d6f3807d>] __se_sys_sendto net/socket.c:1966 [inline]
+>     [<00000000d6f3807d>] __x64_sys_sendto+0x2a/0x30 net/socket.c:1966
+>     [<000000003ba31db7>] do_syscall_64+0x76/0x1a0
+> arch/x86/entry/common.c:301
+>     [<0000000075c8daad>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>
+> Tested on:
+>
+> commit:         c11fb13a Merge branch 'for-linus' of git://git.kernel.org/..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=15c8f3b6a00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=cb38d33cd06d8d48
+> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+> patch:          https://syzkaller.appspot.com/x/patch.diff?x=12477101a00000
+
+J.
+
+--mv67wdquhvqcpoxi
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEZ8d+2N/NBLDbUxIF0Z7UzfnX9sMFAl0DU4oACgkQ0Z7UzfnX
+9sMn7g/8DSm3sIrrshWDSyy7szl4gf7yrszSZ+Dusy9+UNL7QnfrgTAgzFEESeBH
+D+mzA5Jnv/xZH6nBWwdo+hvOzVpOxJrK2vF1iLOC+6q0frEWN+626UUxjVN3q2dU
+lEpXnIsEY1j/G8fDXcWtvDuX40rCKbSYbCs0YHf/RxJRiCG4qHcISfwViOlvUryu
+9O+13yT82OwYjf8zg3Czgll3f67/tLMhcIXAztccMGJmzoIiqi9wu7VCLHO9WjaH
+OgqRYXow09VwBdm1SeX6RaiU0NKikPx0Cay59EHBUu4eVUs7dk2hHh2e8n5CRC8e
+fMx8zEDmc9/fU0t+iwekfjX5y4U3VvOks1i+EdzheClV8mLy3x4F9k0+3el3TgJF
+qmCV8SSjlmQJ11FCacd4HCJ+4miUF+Fz/G7ii5QiU+j/vsUEzBEIKDKAT5qsYUwL
+j7n1HsgRxX8GXA/7MqDo4+EwCZxWRXqTNqwG5FOfAoLq/eJk5y1DCRqWGFVPvTN8
+lskd/oo+fQ2sDf1YtI3Hm1ZppzbQYjwSUIQmEmA9PuWVR1QM85d2Jqwf+plFyKn6
+zJ+mFFv80h/k9o35VQaBOsHema+/lTVvOSaWwoys6njDMU2saYvtY9pRWkn0mNE4
+EbnPJb3JIj+0B/Lq/XgMoNIWutlwyeH5YOgnGGO4dcBuPMoiuBA=
+=QX3O
+-----END PGP SIGNATURE-----
+
+--mv67wdquhvqcpoxi--
