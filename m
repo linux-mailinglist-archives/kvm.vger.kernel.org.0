@@ -2,68 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 923564644C
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 18:34:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D7E8446546
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 19:01:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726184AbfFNQer (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Jun 2019 12:34:47 -0400
-Received: from mga09.intel.com ([134.134.136.24]:24843 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725808AbfFNQer (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Jun 2019 12:34:47 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Jun 2019 09:34:46 -0700
-X-ExtLoop1: 1
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.36])
-  by orsmga004.jf.intel.com with ESMTP; 14 Jun 2019 09:34:46 -0700
-Date:   Fri, 14 Jun 2019 09:34:46 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        vkuznets@redhat.com
-Subject: Re: [PATCH 43/43] KVM: nVMX: shadow pin based execution controls
-Message-ID: <20190614163446.GI12191@linux.intel.com>
-References: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
- <1560445409-17363-44-git-send-email-pbonzini@redhat.com>
+        id S1725942AbfFNRB5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jun 2019 13:01:57 -0400
+Received: from mail-wm1-f53.google.com ([209.85.128.53]:35010 "EHLO
+        mail-wm1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727064AbfFNRB5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jun 2019 13:01:57 -0400
+Received: by mail-wm1-f53.google.com with SMTP id c6so3029371wml.0
+        for <kvm@vger.kernel.org>; Fri, 14 Jun 2019 10:01:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=FDTPCht6DM0v96DbDzYCiGZJAIeuN8vGRfcypyzSQEQ=;
+        b=mLJc9Qtm4/hEeW51fbUs947grPKl9GAjEA8dCVAAwODNTt9bTREKo5cVQjLgek5Q7z
+         DNZ6+5QZzt5n2SxDX8nFZZUcvth5U00G1ARaMIlMpohNUFm5kyRk/AnhRYufXca1/Atr
+         1y8I8hszkOihHIJjb5Mu5Efg/OF14Fgdw1FLHhj53ffJ6q8Whz3/mpm+eDsMKYMogZjn
+         eWxKZk8Q3TvfTBE+k4VrsImz3zpXl19vLCKfb5BLJ6KLjzYeAaR2SA9h/3iaaa2FfCwX
+         cOxNp7TqemHHaFIV7JkMOFYokf5KbUq6XtHnQsKli0LqszbQePETJgo7AzK1D4Yd+8Hr
+         sxIg==
+X-Gm-Message-State: APjAAAUDIj99KqXMuDXXcVodqHKng9LnAu9t0tehTMIUOjDs2uYlA9n6
+        2RwjwwRp+NB5iqXmrVVk4P9EPWoOglA=
+X-Google-Smtp-Source: APXvYqxHZAuecCiZJ7O9d8PmWCmXdRWHQ1WocjBc8FoI9W1eMJA5anxIMC6YiewGHGPsZjh3+GtI+g==
+X-Received: by 2002:a1c:9a05:: with SMTP id c5mr8186532wme.36.1560531714639;
+        Fri, 14 Jun 2019 10:01:54 -0700 (PDT)
+Received: from vitty.brq.redhat.com (ip-78-102-201-117.net.upcbroadband.cz. [78.102.201.117])
+        by smtp.gmail.com with ESMTPSA id f197sm4536883wme.39.2019.06.14.10.01.53
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Fri, 14 Jun 2019 10:01:54 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>
+Subject: Re: What's with all of the hardcoded instruction lengths in svm.c?
+In-Reply-To: <CALMp9eTe_iSgn5ihod_B=H1JzXwc_=CW22u+5sQCyPT=EJuLPQ@mail.gmail.com>
+References: <CALMp9eQ4k71ox=0xQKM+CfOkFe6Vqp+0znJ3Ju4ZmyL9fgjm=w@mail.gmail.com> <87d0jhegjj.fsf@vitty.brq.redhat.com> <CALMp9eTe_iSgn5ihod_B=H1JzXwc_=CW22u+5sQCyPT=EJuLPQ@mail.gmail.com>
+Date:   Fri, 14 Jun 2019 19:01:48 +0200
+Message-ID: <87woho5ceb.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1560445409-17363-44-git-send-email-pbonzini@redhat.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 13, 2019 at 07:03:29PM +0200, Paolo Bonzini wrote:
-> The VMX_PREEMPTION_TIMER flag may be toggled frequently, though not
-> *very* frequently.  Since it does not affect KVM's dirty logic, e.g.
-> the preemption timer value is loaded from vmcs12 even if vmcs12 is
-> "clean", there is no need to mark vmcs12 dirty when L1 writes pin
-> controls, and shadowing the field achieves that.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+Jim Mattson <jmattson@google.com> writes:
 
-Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> On Thu, Jun 13, 2019 at 6:55 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+>> I can try sending a patch removing the manual advancement to see if
+>> anyone has any objections.
+>
+> That would be great!
+>
 
->  arch/x86/kvm/vmx/vmcs_shadow_fields.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmcs_shadow_fields.h b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-> index 4cea018ba285..eb1ecd16fd22 100644
-> --- a/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-> +++ b/arch/x86/kvm/vmx/vmcs_shadow_fields.h
-> @@ -47,6 +47,7 @@
->  SHADOW_FIELD_RO(GUEST_CS_AR_BYTES, guest_cs_ar_bytes)
->  SHADOW_FIELD_RO(GUEST_SS_AR_BYTES, guest_ss_ar_bytes)
->  SHADOW_FIELD_RW(CPU_BASED_VM_EXEC_CONTROL, cpu_based_vm_exec_control)
-> +SHADOW_FIELD_RW(PIN_BASED_VM_EXEC_CONTROL, pin_based_vm_exec_control)
->  SHADOW_FIELD_RW(EXCEPTION_BITMAP, exception_bitmap)
->  SHADOW_FIELD_RW(VM_ENTRY_EXCEPTION_ERROR_CODE, vm_entry_exception_error_code)
->  SHADOW_FIELD_RW(VM_ENTRY_INTR_INFO_FIELD, vm_entry_intr_info_field)
-> -- 
-> 1.8.3.1
-> 
+Turns out this is harder than I initially thought, in the emulator we
+don't emulate everything (e.g. XSETVB) and emulating some instructions
+(even with EMULTYPE_SKIP) gives us some unintended side-effects,
+e.g. I'm currently observing a hang when trying to apply
+kvm_emulate_instruction() to HLT.  
+
+Overall, I still think this is the right approach, we just need to make
+EMULTYPE_SKIP skip correctly. Stay tuned...
+
+-- 
+Vitaly
