@@ -2,202 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7962745254
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 05:04:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67398453DB
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2019 07:14:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726305AbfFNDEI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Jun 2019 23:04:08 -0400
-Received: from mail-io1-f72.google.com ([209.85.166.72]:35536 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726581AbfFNDEC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Jun 2019 23:04:02 -0400
-Received: by mail-io1-f72.google.com with SMTP id w17so1074612iom.2
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 20:04:01 -0700 (PDT)
+        id S1725826AbfFNFN5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Jun 2019 01:13:57 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:43912 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725858AbfFNFN5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Jun 2019 01:13:57 -0400
+Received: by mail-pf1-f194.google.com with SMTP id i189so662523pfg.10
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2019 22:13:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=7L7uajw4KCsbL/S4E35UjNUKEFnxH/l2jD/CiFHPlB4=;
+        b=iVgLfh3u2rK3LSidDHhJBtdtNtpSlz4dIEb1BDsj4Re2fjkTLPAq5VHIrDbtF7rfc6
+         5a9vwqPeA/oCez/a3NCM+60PRvHQV0ltptm4u18TbaZDEEEiYlVGWcXj0ugZtZMkqFnM
+         ltnmFCb7F68lK6w+sv8Frqic/ZXdf9np/Ivm0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=PHxaNNA+u/QED5OOo6diZIR8nbgzxac97BJz2T2vBYM=;
-        b=WH9veFh2pVueGKTBXqDIllcRc9prhoWGMu1M5HMtpX+mSQUHGNVJq/jh62vgLuKX5t
-         5jM7XRA/Wy86x1cO80bguyqbUfPs9AUTMOGd1aMy/ZHDoTS+Aa0VdZNmh30Bg2mQuaM+
-         eS7C56crS0f25C/VmWm2PXsV11wIrr0zWIDqet//vI/osYKfNpnuxQB6Qxg/NHL9Ci7+
-         azgqFcrJWd0WfckGrqLKx4lPLdgP8zdyYW472BSVj/JH2rC6eLkBOSvTsRn09Ek0fdEe
-         idhdfEe/2ihm30t7yE5NhlpmTdksEXgV8vyQKCEZWEay4Pk8bpp1L2qFchI0KhUIADWk
-         5BNw==
-X-Gm-Message-State: APjAAAVUYpiLDcu03yJKOCgyXHdVKsn+kSHCkK1R+0A+9WMuzmwehjuI
-        a3nnPFxfLuKkDJlm7mdHeezD4323iLwNKxhcDHyVIIz7K2kx
-X-Google-Smtp-Source: APXvYqx8b/cV+6qlNoRhaqUH0N8de515QwPf+Xv2nvU80JzlYAFYIaaW3fH3gbCXLbR9A4dtUXyuVwMGtTtkuP3r7VbjVUy8BlzK
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7L7uajw4KCsbL/S4E35UjNUKEFnxH/l2jD/CiFHPlB4=;
+        b=gv90lYS3LoMsZUpTX0DKr4Y+2d6HPuTrujw0NO0dOr4akBjp1w3+cTMRu9JSO6Gk57
+         I7gi17q8memQuR5IoFMTw0qcF8R7Z5UNpdMvlYrOKG2Ud1Nyd56rsZ4GSZ1YJYvoRQvV
+         TGGftpOE7oX7gc/lbNVf2ub84e2HFLJKIpa1cuCt2RQZHmrurVqCsNhoZDoejhP3q6IR
+         1n99z7OANb6tZ8/NFIHJItc8uAKZTLkHkcoyMr9OGfdOYYYuU4aaNujQjHqXzuAKJLrd
+         l+Pgwb4jmWhgUTqQ5ye34jVyvMPyI9gJ73x6EXAujYWkSYslZsNaAp6Wg8Bl44h6/EHa
+         Jpsw==
+X-Gm-Message-State: APjAAAWxS5T3XLPl0G7yKhXW6uWpkj5aXaeeh0F1g3sCUCet5bYRUgob
+        BIelfaKKj6hnMRakxeMNvc/nefzhJZpPeQ==
+X-Google-Smtp-Source: APXvYqzTfasIXQ0R9bH+BHnjS/rxhZOCyiy3olY/JYV+P2HTQ7p4rEZDPtcIb7Np5EQm4YDFboUW8Q==
+X-Received: by 2002:a63:6948:: with SMTP id e69mr23166361pgc.441.1560489236782;
+        Thu, 13 Jun 2019 22:13:56 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id f13sm1417022pje.11.2019.06.13.22.13.55
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 13 Jun 2019 22:13:55 -0700 (PDT)
+Date:   Thu, 13 Jun 2019 22:13:54 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Dave Martin <Dave.Martin@arm.com>,
+        Andrey Konovalov <andreyknvl@google.com>,
+        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+        linux-media@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: Re: [PATCH v17 03/15] arm64: Introduce prctl() options to control
+ the tagged user addresses ABI
+Message-ID: <201906132209.FC65A3C771@keescook>
+References: <cover.1560339705.git.andreyknvl@google.com>
+ <a7a2933bea5fe57e504891b7eec7e9432e5e1c1a.1560339705.git.andreyknvl@google.com>
+ <20190613110235.GW28398@e103592.cambridge.arm.com>
+ <20190613152632.GT28951@C02TF0J2HF1T.local>
 MIME-Version: 1.0
-X-Received: by 2002:a5d:9613:: with SMTP id w19mr35036580iol.140.1560481441104;
- Thu, 13 Jun 2019 20:04:01 -0700 (PDT)
-Date:   Thu, 13 Jun 2019 20:04:01 -0700
-In-Reply-To: <20190614024519.6224-1-hdanton@sina.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f9d056058b3fe507@google.com>
-Subject: Re: memory leak in vhost_net_ioctl
-From:   syzbot <syzbot+0789f0c7e45efd7bb643@syzkaller.appspotmail.com>
-To:     ast@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
-        davem@davemloft.net, dvyukov@google.com, hawk@kernel.org,
-        hdanton@sina.com, jakub.kicinski@netronome.com,
-        jasowang@redhat.com, john.fastabend@gmail.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mst@redhat.com,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        virtualization@lists.linux-foundation.org,
-        xdp-newbies@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190613152632.GT28951@C02TF0J2HF1T.local>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Thu, Jun 13, 2019 at 04:26:32PM +0100, Catalin Marinas wrote:
+> On Thu, Jun 13, 2019 at 12:02:35PM +0100, Dave P Martin wrote:
+> > On Wed, Jun 12, 2019 at 01:43:20PM +0200, Andrey Konovalov wrote:
+> > > +static int zero;
+> > > +static int one = 1;
+> > 
+> > !!!
+> > 
+> > And these can't even be const without a cast.  Yuk.
+> > 
+> > (Not your fault though, but it would be nice to have a proc_dobool() to
+> > avoid this.)
+> 
+> I had the same reaction. Maybe for another patch sanitising this pattern
+> across the kernel.
 
-syzbot has tested the proposed patch but the reproducer still triggered  
-crash:
-memory leak in batadv_tvlv_handler_register
+That's actually already happening (via -mm tree last I looked). tl;dr:
+it ends up using a cast hidden in a macro. It's in linux-next already
+along with a checkpatch.pl addition to yell about doing what's being
+done here. ;)
 
-   484.626788][  T156] bond0 (unregistering): Releasing backup interface  
-bond_slave_1
-Warning: Permanently added '10.128.0.87' (ECDSA) to the list of known hosts.
-BUG: memory leak
-unreferenced object 0xffff88811d25c4c0 (size 64):
-   comm "softirq", pid 0, jiffies 4294943668 (age 434.830s)
-   hex dump (first 32 bytes):
-     00 00 00 00 00 00 00 00 e0 fc 5b 20 81 88 ff ff  ..........[ ....
-     00 00 00 00 00 00 00 00 20 91 15 83 ff ff ff ff  ........ .......
-   backtrace:
-     [<000000000045bc9d>] kmemleak_alloc_recursive  
-include/linux/kmemleak.h:43 [inline]
-     [<000000000045bc9d>] slab_post_alloc_hook mm/slab.h:439 [inline]
-     [<000000000045bc9d>] slab_alloc mm/slab.c:3326 [inline]
-     [<000000000045bc9d>] kmem_cache_alloc_trace+0x13d/0x280 mm/slab.c:3553
-     [<00000000197d773e>] kmalloc include/linux/slab.h:547 [inline]
-     [<00000000197d773e>] kzalloc include/linux/slab.h:742 [inline]
-     [<00000000197d773e>] batadv_tvlv_handler_register+0xae/0x140  
-net/batman-adv/tvlv.c:529
-     [<00000000fa9f11af>] batadv_tt_init+0x78/0x180  
-net/batman-adv/translation-table.c:4411
-     [<000000008c50839d>] batadv_mesh_init+0x196/0x230  
-net/batman-adv/main.c:208
-     [<000000001c5a74a3>] batadv_softif_init_late+0x1ca/0x220  
-net/batman-adv/soft-interface.c:861
-     [<000000004e676cd1>] register_netdevice+0xbf/0x600 net/core/dev.c:8635
-     [<000000005601497b>] __rtnl_newlink+0xaca/0xb30  
-net/core/rtnetlink.c:3199
-     [<00000000ad02cf5e>] rtnl_newlink+0x4e/0x80 net/core/rtnetlink.c:3245
-     [<00000000eceb53af>] rtnetlink_rcv_msg+0x178/0x4b0  
-net/core/rtnetlink.c:5214
-     [<00000000140451f6>] netlink_rcv_skb+0x61/0x170  
-net/netlink/af_netlink.c:2482
-     [<00000000237e38f7>] rtnetlink_rcv+0x1d/0x30 net/core/rtnetlink.c:5232
-     [<000000000d47c000>] netlink_unicast_kernel  
-net/netlink/af_netlink.c:1307 [inline]
-     [<000000000d47c000>] netlink_unicast+0x1ec/0x2d0  
-net/netlink/af_netlink.c:1333
-     [<0000000098503d79>] netlink_sendmsg+0x26a/0x480  
-net/netlink/af_netlink.c:1922
-     [<000000009263e868>] sock_sendmsg_nosec net/socket.c:646 [inline]
-     [<000000009263e868>] sock_sendmsg+0x54/0x70 net/socket.c:665
-     [<000000007791ad47>] __sys_sendto+0x148/0x1f0 net/socket.c:1958
-     [<00000000d6f3807d>] __do_sys_sendto net/socket.c:1970 [inline]
-     [<00000000d6f3807d>] __se_sys_sendto net/socket.c:1966 [inline]
-     [<00000000d6f3807d>] __x64_sys_sendto+0x2a/0x30 net/socket.c:1966
+https://lore.kernel.org/lkml/20190430180111.10688-1-mcroce@redhat.com/#r
 
-BUG: memory leak
-unreferenced object 0xffff8881024a3340 (size 64):
-   comm "softirq", pid 0, jiffies 4294943678 (age 434.730s)
-   hex dump (first 32 bytes):
-     00 00 00 00 00 00 00 00 e0 2c 66 04 81 88 ff ff  .........,f.....
-     00 00 00 00 00 00 00 00 20 91 15 83 ff ff ff ff  ........ .......
-   backtrace:
-     [<000000000045bc9d>] kmemleak_alloc_recursive  
-include/linux/kmemleak.h:43 [inline]
-     [<000000000045bc9d>] slab_post_alloc_hook mm/slab.h:439 [inline]
-     [<000000000045bc9d>] slab_alloc mm/slab.c:3326 [inline]
-     [<000000000045bc9d>] kmem_cache_alloc_trace+0x13d/0x280 mm/slab.c:3553
-     [<00000000197d773e>] kmalloc include/linux/slab.h:547 [inline]
-     [<00000000197d773e>] kzalloc include/linux/slab.h:742 [inline]
-     [<00000000197d773e>] batadv_tvlv_handler_register+0xae/0x140  
-net/batman-adv/tvlv.c:529
-     [<00000000fa9f11af>] batadv_tt_init+0x78/0x180  
-net/batman-adv/translation-table.c:4411
-     [<000000008c50839d>] batadv_mesh_init+0x196/0x230  
-net/batman-adv/main.c:208
-     [<000000001c5a74a3>] batadv_softif_init_late+0x1ca/0x220  
-net/batman-adv/soft-interface.c:861
-     [<000000004e676cd1>] register_netdevice+0xbf/0x600 net/core/dev.c:8635
-     [<000000005601497b>] __rtnl_newlink+0xaca/0xb30  
-net/core/rtnetlink.c:3199
-     [<00000000ad02cf5e>] rtnl_newlink+0x4e/0x80 net/core/rtnetlink.c:3245
-     [<00000000eceb53af>] rtnetlink_rcv_msg+0x178/0x4b0  
-net/core/rtnetlink.c:5214
-     [<00000000140451f6>] netlink_rcv_skb+0x61/0x170  
-net/netlink/af_netlink.c:2482
-     [<00000000237e38f7>] rtnetlink_rcv+0x1d/0x30 net/core/rtnetlink.c:5232
-     [<000000000d47c000>] netlink_unicast_kernel  
-net/netlink/af_netlink.c:1307 [inline]
-     [<000000000d47c000>] netlink_unicast+0x1ec/0x2d0  
-net/netlink/af_netlink.c:1333
-     [<0000000098503d79>] netlink_sendmsg+0x26a/0x480  
-net/netlink/af_netlink.c:1922
-     [<000000009263e868>] sock_sendmsg_nosec net/socket.c:646 [inline]
-     [<000000009263e868>] sock_sendmsg+0x54/0x70 net/socket.c:665
-     [<000000007791ad47>] __sys_sendto+0x148/0x1f0 net/socket.c:1958
-     [<00000000d6f3807d>] __do_sys_sendto net/socket.c:1970 [inline]
-     [<00000000d6f3807d>] __se_sys_sendto net/socket.c:1966 [inline]
-     [<00000000d6f3807d>] __x64_sys_sendto+0x2a/0x30 net/socket.c:1966
-
-BUG: memory leak
-unreferenced object 0xffff888108a71b80 (size 128):
-   comm "syz-executor.3", pid 7367, jiffies 4294943696 (age 434.550s)
-   hex dump (first 32 bytes):
-     f0 f8 bf 02 81 88 ff ff f0 f8 bf 02 81 88 ff ff  ................
-     1a dc 77 da 54 a0 be 41 64 20 e9 56 ff ff ff ff  ..w.T..Ad .V....
-   backtrace:
-     [<000000000045bc9d>] kmemleak_alloc_recursive  
-include/linux/kmemleak.h:43 [inline]
-     [<000000000045bc9d>] slab_post_alloc_hook mm/slab.h:439 [inline]
-     [<000000000045bc9d>] slab_alloc mm/slab.c:3326 [inline]
-     [<000000000045bc9d>] kmem_cache_alloc_trace+0x13d/0x280 mm/slab.c:3553
-     [<00000000cc6863ae>] kmalloc include/linux/slab.h:547 [inline]
-     [<00000000cc6863ae>] hsr_create_self_node+0x42/0x150  
-net/hsr/hsr_framereg.c:84
-     [<000000000e2bb6b0>] hsr_dev_finalize+0xa4/0x233  
-net/hsr/hsr_device.c:441
-     [<000000003b100a4a>] hsr_newlink+0xf3/0x140 net/hsr/hsr_netlink.c:69
-     [<00000000b5efb0eb>] __rtnl_newlink+0x892/0xb30  
-net/core/rtnetlink.c:3187
-     [<00000000ad02cf5e>] rtnl_newlink+0x4e/0x80 net/core/rtnetlink.c:3245
-     [<00000000eceb53af>] rtnetlink_rcv_msg+0x178/0x4b0  
-net/core/rtnetlink.c:5214
-     [<00000000140451f6>] netlink_rcv_skb+0x61/0x170  
-net/netlink/af_netlink.c:2482
-     [<00000000237e38f7>] rtnetlink_rcv+0x1d/0x30 net/core/rtnetlink.c:5232
-     [<000000000d47c000>] netlink_unicast_kernel  
-net/netlink/af_netlink.c:1307 [inline]
-     [<000000000d47c000>] netlink_unicast+0x1ec/0x2d0  
-net/netlink/af_netlink.c:1333
-     [<0000000098503d79>] netlink_sendmsg+0x26a/0x480  
-net/netlink/af_netlink.c:1922
-     [<000000009263e868>] sock_sendmsg_nosec net/socket.c:646 [inline]
-     [<000000009263e868>] sock_sendmsg+0x54/0x70 net/socket.c:665
-     [<000000007791ad47>] __sys_sendto+0x148/0x1f0 net/socket.c:1958
-     [<00000000d6f3807d>] __do_sys_sendto net/socket.c:1970 [inline]
-     [<00000000d6f3807d>] __se_sys_sendto net/socket.c:1966 [inline]
-     [<00000000d6f3807d>] __x64_sys_sendto+0x2a/0x30 net/socket.c:1966
-     [<000000003ba31db7>] do_syscall_64+0x76/0x1a0  
-arch/x86/entry/common.c:301
-     [<0000000075c8daad>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-
-
-Tested on:
-
-commit:         c11fb13a Merge branch 'for-linus' of git://git.kernel.org/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15c8f3b6a00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cb38d33cd06d8d48
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=12477101a00000
-
+-- 
+Kees Cook
