@@ -2,91 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 16B5846E9D
-	for <lists+kvm@lfdr.de>; Sat, 15 Jun 2019 08:42:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D13834706F
+	for <lists+kvm@lfdr.de>; Sat, 15 Jun 2019 16:29:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726218AbfFOGml (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 15 Jun 2019 02:42:41 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:35261 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725848AbfFOGml (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 15 Jun 2019 02:42:41 -0400
-Received: by mail-pg1-f193.google.com with SMTP id s27so2791741pgl.2
-        for <kvm@vger.kernel.org>; Fri, 14 Jun 2019 23:42:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4hNHWrhfyzsV2n/wRn65uyM6GtYs6ZW3csZvNGHrW1M=;
-        b=SmfdGKEs9uPX16YgUrEx8uxW6d74F8JSAWtvzcoD+gYAubt5m7kLbAo3yn13CuIbXC
-         LcmpVrD/YFGRQ2uPnZ8E7HdD1vyh7X+TsUnB8/8s0kEQvA+Uy6XhVghwux+/uDWQMx6t
-         CA0eE1B4NKJOQWPT4O7Z+fdXwYC/6Ykz2Z89A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4hNHWrhfyzsV2n/wRn65uyM6GtYs6ZW3csZvNGHrW1M=;
-        b=MR/pflEMGygccknwzEZ5FcfvX94qwal6QTafpZ+WN9HQQawwrTcbB6ngzTs+1BtqmV
-         /QRleqY1At/tZAYV7EF8Hmdvq7Z3MtyNk2rpwP5p+hPt4faf8/lAnLpHf+ONMvyKw0sR
-         tdPn6s3Mxj4+L9iYJdXEsJetQ0JmmgCbn756zPM/1W+3foXvpeRII97podMEzSsHNS8Q
-         UppjY+JhTTu58I5gkH+elWH1Cf6MujD3uyLs4mGJ6d90XQCVtQdZUKTARIqakGT65NtT
-         Ffhy3tY/3tARKXT/vC8i3p+t/e2YLKqZLNQDnURnbymw4NOwJnhaSb6ONV0qdcmr3QWH
-         +GKQ==
-X-Gm-Message-State: APjAAAWVtRWErACLBlrTXEj5k4WaQC6HV90PrzHuzesZHZ9w3oqTbau7
-        VFh9omtSRjywOEQuqsdi6MpMkg==
-X-Google-Smtp-Source: APXvYqztVvlek2ciZ+0if+6HLcVw/2Jr58oCThu5McVtMseOVbl4zFUyuLV/sAQA79bZsV+yqr0xQg==
-X-Received: by 2002:a63:eb55:: with SMTP id b21mr38365372pgk.67.1560580960622;
-        Fri, 14 Jun 2019 23:42:40 -0700 (PDT)
-Received: from localhost ([2620:15c:202:1:942a:df4a:2beb:7e97])
-        by smtp.gmail.com with ESMTPSA id z126sm7025201pfb.100.2019.06.14.23.42.39
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Jun 2019 23:42:40 -0700 (PDT)
-From:   Stephen Barber <smbarber@chromium.org>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Stephen Barber <smbarber@chromium.org>
-Subject: [PATCH] vsock/virtio: set SOCK_DONE on peer shutdown
-Date:   Fri, 14 Jun 2019 23:42:37 -0700
-Message-Id: <20190615064237.73586-1-smbarber@chromium.org>
-X-Mailer: git-send-email 2.22.0.410.gd8fdbe21b5-goog
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1726523AbfFOO24 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 15 Jun 2019 10:28:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56114 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725944AbfFOO24 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 15 Jun 2019 10:28:56 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3C37F308FBA0;
+        Sat, 15 Jun 2019 14:28:56 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.31])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3D3565D9E2;
+        Sat, 15 Jun 2019 14:28:49 +0000 (UTC)
+Message-ID: <1d80a586342dfee0479db96a4457f7023b0260a9.camel@redhat.com>
+Subject: Re: [RFC PATCH 8/8] svm: Allow AVIC with in-kernel irqchip mode
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
+        "jsteckli@amazon.de" <jsteckli@amazon.de>,
+        "sironi@amazon.de" <sironi@amazon.de>,
+        "wawei@amazon.de" <wawei@amazon.de>
+Date:   Sat, 15 Jun 2019 17:28:50 +0300
+In-Reply-To: <d57a0843-061a-231a-9d50-d7e4d4d05d73@amd.com>
+References: <20190204144128.9489-1-suravee.suthikulpanit@amd.com>
+         <20190204144128.9489-9-suravee.suthikulpanit@amd.com>
+         <20190205113404.5c5382e6@w520.home>
+         <d57a0843-061a-231a-9d50-d7e4d4d05d73@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Sat, 15 Jun 2019 14:28:56 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set the SOCK_DONE flag to match the TCP_CLOSING state when a peer has
-shut down and there is nothing left to read.
+On Wed, 2019-02-06 at 11:20 +0000, Suthikulpanit, Suravee wrote:
+> Alex,
+> 
+> On 2/6/19 1:34 AM, Alex Williamson wrote:
+> > On Mon, 4 Feb 2019 14:42:32 +0000
+> > "Suthikulpanit, Suravee"<Suravee.Suthikulpanit@amd.com>  wrote:
+> > 
+> > > Once the IRQ ack notifier for in-kernel PIT is no longer required
+> > > and run-time AVIC activate/deactivate is supported, we can remove
+> > > the kernel irqchip split mode requirement for AVIC.
+> > > 
+> > > Hence, remove the check for irqchip split mode when enabling AVIC.
+> > 
+> > Yay!  Could we also at this point make avic enabled by default or are
+> > there remaining incompatibilities?  Thanks,
+> 
+> I'm looking into that next. I would need to ensure that enabling
+> AVIC would not cause issues with other features.
+> 
+> Suravee
 
-This fixes the following bug:
-1) Peer sends SHUTDOWN(RDWR).
-2) Socket enters TCP_CLOSING but SOCK_DONE is not set.
-3) read() returns -ENOTCONN until close() is called, then returns 0.
+Hi!
 
-Signed-off-by: Stephen Barber <smbarber@chromium.org>
----
- net/vmw_vsock/virtio_transport_common.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Do you have any update on the state of this patch? 
+I kind of stumbled on it accidently, while
+trying to understand why AVIC is only enabled in the split irqchip mode.
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index f3f3d06cb6d8..e30f53728725 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -871,8 +871,10 @@ virtio_transport_recv_connected(struct sock *sk,
- 		if (le32_to_cpu(pkt->hdr.flags) & VIRTIO_VSOCK_SHUTDOWN_SEND)
- 			vsk->peer_shutdown |= SEND_SHUTDOWN;
- 		if (vsk->peer_shutdown == SHUTDOWN_MASK &&
--		    vsock_stream_has_data(vsk) <= 0)
-+		    vsock_stream_has_data(vsk) <= 0) {
-+			sock_set_flag(sk, SOCK_DONE);
- 			sk->sk_state = TCP_CLOSING;
-+		}
- 		if (le32_to_cpu(pkt->hdr.flags))
- 			sk->sk_state_change(sk);
- 		break;
--- 
-2.22.0.410.gd8fdbe21b5-goog
+Best regards,
+	Maxim Levitsky
 
