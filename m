@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B710547413
+	by mail.lfdr.de (Postfix) with ESMTP id 4D63247412
 	for <lists+kvm@lfdr.de>; Sun, 16 Jun 2019 11:59:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727196AbfFPJ6n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 Jun 2019 05:58:43 -0400
-Received: from mga02.intel.com ([134.134.136.20]:28463 "EHLO mga02.intel.com"
+        id S1727206AbfFPJ6i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 Jun 2019 05:58:38 -0400
+Received: from mga02.intel.com ([134.134.136.20]:28471 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725888AbfFPJ6f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 16 Jun 2019 05:58:35 -0400
+        id S1727194AbfFPJ6i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 Jun 2019 05:58:38 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jun 2019 02:58:34 -0700
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jun 2019 02:58:37 -0700
 X-ExtLoop1: 1
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
-  by orsmga005.jf.intel.com with ESMTP; 16 Jun 2019 02:58:32 -0700
+  by orsmga005.jf.intel.com with ESMTP; 16 Jun 2019 02:58:35 -0700
 From:   Tao Xu <tao3.xu@intel.com>
 To:     pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net,
         tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
         sean.j.christopherson@intel.com, fenghua.yu@intel.com
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         tao3.xu@intel.com, jingqi.liu@intel.com
-Subject: [PATCH RESEND v3 2/3] KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
-Date:   Sun, 16 Jun 2019 17:55:54 +0800
-Message-Id: <20190616095555.20978-3-tao3.xu@intel.com>
+Subject: [PATCH RESEND v3 3/3] KVM: vmx: handle vm-exit for UMWAIT and TPAUSE
+Date:   Sun, 16 Jun 2019 17:55:55 +0800
+Message-Id: <20190616095555.20978-4-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190616095555.20978-1-tao3.xu@intel.com>
 References: <20190616095555.20978-1-tao3.xu@intel.com>
@@ -37,134 +37,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-UMWAIT and TPAUSE instructions use IA32_UMWAIT_CONTROL at MSR index E1H
-to determines the maximum time in TSC-quanta that the processor can reside
-in either C0.1 or C0.2.
+As the latest Intel 64 and IA-32 Architectures Software Developer's
+Manual, UMWAIT and TPAUSE instructions cause a VM exit if the
+RDTSC exiting and enable user wait and pause VM-execution
+controls are both 1.
 
-This patch emulates MSR IA32_UMWAIT_CONTROL in guest and differentiate
-IA32_UMWAIT_CONTROL between host and guest. The variable
-mwait_control_cached in arch/x86/power/umwait.c caches the MSR value, so
-this patch uses it to avoid frequently rdmsr of IA32_UMWAIT_CONTROL.
+This patch is to handle the vm-exit for UMWAIT and TPAUSE as this
+should never happen.
 
 Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
 Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
- arch/x86/kvm/vmx/vmx.c  | 36 ++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/vmx.h  |  3 +++
- arch/x86/power/umwait.c |  3 ++-
- 3 files changed, 41 insertions(+), 1 deletion(-)
+ arch/x86/include/uapi/asm/vmx.h |  6 +++++-
+ arch/x86/kvm/vmx/vmx.c          | 16 ++++++++++++++++
+ 2 files changed, 21 insertions(+), 1 deletion(-)
 
+diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
+index d213ec5c3766..d88d7a68849b 100644
+--- a/arch/x86/include/uapi/asm/vmx.h
++++ b/arch/x86/include/uapi/asm/vmx.h
+@@ -85,6 +85,8 @@
+ #define EXIT_REASON_PML_FULL            62
+ #define EXIT_REASON_XSAVES              63
+ #define EXIT_REASON_XRSTORS             64
++#define EXIT_REASON_UMWAIT              67
++#define EXIT_REASON_TPAUSE              68
+ 
+ #define VMX_EXIT_REASONS \
+ 	{ EXIT_REASON_EXCEPTION_NMI,         "EXCEPTION_NMI" }, \
+@@ -142,7 +144,9 @@
+ 	{ EXIT_REASON_RDSEED,                "RDSEED" }, \
+ 	{ EXIT_REASON_PML_FULL,              "PML_FULL" }, \
+ 	{ EXIT_REASON_XSAVES,                "XSAVES" }, \
+-	{ EXIT_REASON_XRSTORS,               "XRSTORS" }
++	{ EXIT_REASON_XRSTORS,               "XRSTORS" }, \
++	{ EXIT_REASON_UMWAIT,                "UMWAIT" }, \
++	{ EXIT_REASON_TPAUSE,                "TPAUSE" }
+ 
+ #define VMX_ABORT_SAVE_GUEST_MSR_FAIL        1
+ #define VMX_ABORT_LOAD_HOST_PDPTE_FAIL       2
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b35bfac30a34..f33a25e82cb8 100644
+index f33a25e82cb8..386bd68f8d0b 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1679,6 +1679,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- #endif
- 	case MSR_EFER:
- 		return kvm_get_msr_common(vcpu, msr_info);
-+	case MSR_IA32_UMWAIT_CONTROL:
-+		if (!vmx_waitpkg_supported())
-+			return 1;
-+
-+		msr_info->data = vmx->msr_ia32_umwait_control;
-+		break;
- 	case MSR_IA32_SPEC_CTRL:
- 		if (!msr_info->host_initiated &&
- 		    !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
-@@ -1841,6 +1847,15 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			return 1;
- 		vmcs_write64(GUEST_BNDCFGS, data);
- 		break;
-+	case MSR_IA32_UMWAIT_CONTROL:
-+		if (!vmx_waitpkg_supported())
-+			return 1;
-+
-+		if (!data)
-+			break;
-+
-+		vmx->msr_ia32_umwait_control = data;
-+		break;
- 	case MSR_IA32_SPEC_CTRL:
- 		if (!msr_info->host_initiated &&
- 		    !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
-@@ -4126,6 +4141,8 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	vmx->rmode.vm86_active = 0;
- 	vmx->spec_ctrl = 0;
- 
-+	vmx->msr_ia32_umwait_control = 0;
-+
- 	vcpu->arch.microcode_version = 0x100000000ULL;
- 	vmx->vcpu.arch.regs[VCPU_REGS_RDX] = get_rdx_init_val();
- 	kvm_set_cr8(vcpu, 0);
-@@ -6339,6 +6356,23 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
- 					msrs[i].host, false);
+@@ -5335,6 +5335,20 @@ static int handle_monitor(struct kvm_vcpu *vcpu)
+ 	return handle_nop(vcpu);
  }
  
-+static void atomic_switch_ia32_umwait_control(struct vcpu_vmx *vmx)
++static int handle_umwait(struct kvm_vcpu *vcpu)
 +{
-+	u64 host_umwait_control;
-+
-+	if (!vmx_waitpkg_supported())
-+		return;
-+
-+	host_umwait_control = umwait_control_cached;
-+
-+	if (vmx->msr_ia32_umwait_control != host_umwait_control)
-+		add_atomic_switch_msr(vmx, MSR_IA32_UMWAIT_CONTROL,
-+				      vmx->msr_ia32_umwait_control,
-+				      host_umwait_control, false);
-+	else
-+		clear_atomic_switch_msr(vmx, MSR_IA32_UMWAIT_CONTROL);
++	kvm_skip_emulated_instruction(vcpu);
++	WARN(1, "this should never happen\n");
++	return 1;
 +}
 +
- static void vmx_arm_hv_timer(struct vcpu_vmx *vmx, u32 val)
++static int handle_tpause(struct kvm_vcpu *vcpu)
++{
++	kvm_skip_emulated_instruction(vcpu);
++	WARN(1, "this should never happen\n");
++	return 1;
++}
++
+ static int handle_invpcid(struct kvm_vcpu *vcpu)
  {
- 	vmcs_write32(VMX_PREEMPTION_TIMER_VALUE, val);
-@@ -6447,6 +6481,8 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 	u32 vmx_instruction_info;
+@@ -5545,6 +5559,8 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+ 	[EXIT_REASON_VMFUNC]		      = handle_vmx_instruction,
+ 	[EXIT_REASON_PREEMPTION_TIMER]	      = handle_preemption_timer,
+ 	[EXIT_REASON_ENCLS]		      = handle_encls,
++	[EXIT_REASON_UMWAIT]                  = handle_umwait,
++	[EXIT_REASON_TPAUSE]                  = handle_tpause,
+ };
  
- 	atomic_switch_perf_msrs(vmx);
- 
-+	atomic_switch_ia32_umwait_control(vmx);
-+
- 	vmx_update_hv_timer(vcpu);
- 
- 	/*
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 61128b48c503..8485bec7c38a 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -14,6 +14,8 @@
- extern const u32 vmx_msr_index[];
- extern u64 host_efer;
- 
-+extern u32 umwait_control_cached;
-+
- #define MSR_TYPE_R	1
- #define MSR_TYPE_W	2
- #define MSR_TYPE_RW	3
-@@ -194,6 +196,7 @@ struct vcpu_vmx {
- #endif
- 
- 	u64		      spec_ctrl;
-+	u64		      msr_ia32_umwait_control;
- 
- 	u32 vm_entry_controls_shadow;
- 	u32 vm_exit_controls_shadow;
-diff --git a/arch/x86/power/umwait.c b/arch/x86/power/umwait.c
-index 7fa381e3fd4e..2e6ce4cbccb3 100644
---- a/arch/x86/power/umwait.c
-+++ b/arch/x86/power/umwait.c
-@@ -9,7 +9,8 @@
-  * MSR value. By default, umwait max time is 100000 in TSC-quanta and C0.2
-  * is enabled
-  */
--static u32 umwait_control_cached = 100000;
-+u32 umwait_control_cached = 100000;
-+EXPORT_SYMBOL_GPL(umwait_control_cached);
- 
- /*
-  * Serialize access to umwait_control_cached and IA32_UMWAIT_CONTROL MSR
+ static const int kvm_vmx_max_exit_handlers =
 -- 
 2.20.1
 
