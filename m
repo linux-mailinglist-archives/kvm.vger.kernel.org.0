@@ -2,117 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AF53473FE
-	for <lists+kvm@lfdr.de>; Sun, 16 Jun 2019 11:36:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 838924740E
+	for <lists+kvm@lfdr.de>; Sun, 16 Jun 2019 11:59:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727157AbfFPJg0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 Jun 2019 05:36:26 -0400
-Received: from mga12.intel.com ([192.55.52.136]:50557 "EHLO mga12.intel.com"
+        id S1726385AbfFPJ6a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 Jun 2019 05:58:30 -0400
+Received: from mga02.intel.com ([134.134.136.20]:28463 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726891AbfFPJgZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 16 Jun 2019 05:36:25 -0400
+        id S1725888AbfFPJ6a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 Jun 2019 05:58:30 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jun 2019 02:36:25 -0700
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jun 2019 02:58:29 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,381,1557212400"; 
-   d="scan'208";a="185427982"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
-  by fmsmga002.fm.intel.com with ESMTP; 16 Jun 2019 02:36:23 -0700
+  by orsmga005.jf.intel.com with ESMTP; 16 Jun 2019 02:58:27 -0700
 From:   Tao Xu <tao3.xu@intel.com>
 To:     pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net,
         tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
         sean.j.christopherson@intel.com, fenghua.yu@intel.com
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         tao3.xu@intel.com, jingqi.liu@intel.com
-Subject: [PATCH v3 3/3] KVM: vmx: handle vm-exit for UMWAIT and TPAUSE
-Date:   Sun, 16 Jun 2019 17:33:44 +0800
-Message-Id: <20190616093344.12582-4-tao3.xu@intel.com>
+Subject: [PATCH RESEND v3 0/3] KVM: x86: Enable user wait instructions
+Date:   Sun, 16 Jun 2019 17:55:52 +0800
+Message-Id: <20190616095555.20978-1-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190616093344.12582-1-tao3.xu@intel.com>
-References: <20190616093344.12582-1-tao3.xu@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As the latest Intel 64 and IA-32 Architectures Software Developer's
-Manual, UMWAIT and TPAUSE instructions cause a VM exit if the
-RDTSC exiting and enable user wait and pause VM-execution
-controls are both 1.
+UMONITOR, UMWAIT and TPAUSE are a set of user wait instructions.
 
-This patch is to handle the vm-exit for UMWAIT and TPAUSE as this
-should never happen.
+UMONITOR arms address monitoring hardware using an address. A store
+to an address within the specified address range triggers the
+monitoring hardware to wake up the processor waiting in umwait.
 
-Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
-Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
----
- arch/x86/include/uapi/asm/vmx.h |  6 +++++-
- arch/x86/kvm/vmx/vmx.c          | 16 ++++++++++++++++
- 2 files changed, 21 insertions(+), 1 deletion(-)
+UMWAIT instructs the processor to enter an implementation-dependent
+optimized state while monitoring a range of addresses. The optimized
+state may be either a light-weight power/performance optimized state
+(c0.1 state) or an improved power/performance optimized state
+(c0.2 state).
 
-diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
-index d213ec5c3766..d88d7a68849b 100644
---- a/arch/x86/include/uapi/asm/vmx.h
-+++ b/arch/x86/include/uapi/asm/vmx.h
-@@ -85,6 +85,8 @@
- #define EXIT_REASON_PML_FULL            62
- #define EXIT_REASON_XSAVES              63
- #define EXIT_REASON_XRSTORS             64
-+#define EXIT_REASON_UMWAIT              67
-+#define EXIT_REASON_TPAUSE              68
- 
- #define VMX_EXIT_REASONS \
- 	{ EXIT_REASON_EXCEPTION_NMI,         "EXCEPTION_NMI" }, \
-@@ -142,7 +144,9 @@
- 	{ EXIT_REASON_RDSEED,                "RDSEED" }, \
- 	{ EXIT_REASON_PML_FULL,              "PML_FULL" }, \
- 	{ EXIT_REASON_XSAVES,                "XSAVES" }, \
--	{ EXIT_REASON_XRSTORS,               "XRSTORS" }
-+	{ EXIT_REASON_XRSTORS,               "XRSTORS" }, \
-+	{ EXIT_REASON_UMWAIT,                "UMWAIT" }, \
-+	{ EXIT_REASON_TPAUSE,                "TPAUSE" }
- 
- #define VMX_ABORT_SAVE_GUEST_MSR_FAIL        1
- #define VMX_ABORT_LOAD_HOST_PDPTE_FAIL       2
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index f33a25e82cb8..386bd68f8d0b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5335,6 +5335,20 @@ static int handle_monitor(struct kvm_vcpu *vcpu)
- 	return handle_nop(vcpu);
- }
- 
-+static int handle_umwait(struct kvm_vcpu *vcpu)
-+{
-+	kvm_skip_emulated_instruction(vcpu);
-+	WARN(1, "this should never happen\n");
-+	return 1;
-+}
-+
-+static int handle_tpause(struct kvm_vcpu *vcpu)
-+{
-+	kvm_skip_emulated_instruction(vcpu);
-+	WARN(1, "this should never happen\n");
-+	return 1;
-+}
-+
- static int handle_invpcid(struct kvm_vcpu *vcpu)
- {
- 	u32 vmx_instruction_info;
-@@ -5545,6 +5559,8 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
- 	[EXIT_REASON_VMFUNC]		      = handle_vmx_instruction,
- 	[EXIT_REASON_PREEMPTION_TIMER]	      = handle_preemption_timer,
- 	[EXIT_REASON_ENCLS]		      = handle_encls,
-+	[EXIT_REASON_UMWAIT]                  = handle_umwait,
-+	[EXIT_REASON_TPAUSE]                  = handle_tpause,
- };
- 
- static const int kvm_vmx_max_exit_handlers =
+TPAUSE instructs the processor to enter an implementation-dependent
+optimized state c0.1 or c0.2 state and wake up when time-stamp counter
+reaches specified timeout.
+
+Availability of the user wait instructions is indicated by the presence
+of the CPUID feature flag WAITPKG CPUID.0x07.0x0:ECX[5].
+
+The patches enable the umonitor, umwait and tpause features in KVM.
+Because umwait and tpause can put a (psysical) CPU into a power saving
+state, by default we dont't expose it to kvm and enable it only when
+guest CPUID has it. If the instruction causes a delay, the amount
+of time delayed is called here the physical delay. The physical delay is
+first computed by determining the virtual delay (the time to delay
+relative to the VM’s timestamp counter). 
+
+The release document ref below link:
+Intel 64 and IA-32 Architectures Software Developer's Manual,
+https://software.intel.com/sites/default/files/\
+managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+This patch has a dependency on https://lkml.org/lkml/2019/6/7/1206
+
+Changelog:
+v3:
+	Simplify the patches, expose user wait instructions when the
+	guest has CPUID (Paolo)
+	Use mwait_control_cached to avoid frequently rdmsr of
+	IA32_UMWAIT_CONTROL (Paolo and Xiaoyao)
+	Handle vm-exit for UMWAIT and TPAUSE as "never happen" (Paolo)
+v2:
+	Separated from the series https://lkml.org/lkml/2018/7/10/160
+	Add provide a capability to enable UMONITOR, UMWAIT and TPAUSE 
+v1:
+	Sent out with MOVDIRI/MOVDIR64B instructions patches
+
+Tao Xu (3):
+  KVM: x86: add support for user wait instructions
+  KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
+  KVM: vmx: handle vm-exit for UMWAIT and TPAUSE
+
+ arch/x86/include/asm/vmx.h      |  1 +
+ arch/x86/include/uapi/asm/vmx.h |  6 +++-
+ arch/x86/kvm/cpuid.c            |  2 +-
+ arch/x86/kvm/vmx/capabilities.h |  6 ++++
+ arch/x86/kvm/vmx/vmx.c          | 56 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.h          |  3 ++
+ arch/x86/power/umwait.c         |  3 +-
+ 7 files changed, 74 insertions(+), 3 deletions(-)
+
 -- 
 2.20.1
 
