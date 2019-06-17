@@ -2,438 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1ABA0486A1
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 17:09:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56EBF486AD
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 17:11:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728470AbfFQPIV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jun 2019 11:08:21 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49956 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727417AbfFQPIU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 17 Jun 2019 11:08:20 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5HF7sDq138993;
-        Mon, 17 Jun 2019 11:08:02 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2t6bfrddn9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 17 Jun 2019 11:08:01 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x5HF2s8C003215;
-        Mon, 17 Jun 2019 15:08:00 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma04dal.us.ibm.com with ESMTP id 2t4ra62j80-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 17 Jun 2019 15:08:00 +0000
-Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5HF7s6A23396732
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 17 Jun 2019 15:07:55 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E492D6E053;
-        Mon, 17 Jun 2019 15:07:54 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D51366E04C;
-        Mon, 17 Jun 2019 15:07:53 +0000 (GMT)
-Received: from [9.60.84.60] (unknown [9.60.84.60])
-        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon, 17 Jun 2019 15:07:53 +0000 (GMT)
-Subject: Re: [PATCH v4 5/7] s390: vfio-ap: allow assignment of unavailable AP
- resources to mdev device
-To:     Harald Freudenberger <freude@linux.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, cohuck@redhat.com, frankja@linux.ibm.com,
-        david@redhat.com, mjrosato@linux.ibm.com, schwidefsky@de.ibm.com,
-        heiko.carstens@de.ibm.com, pmorel@linux.ibm.com,
-        pasic@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com
-References: <1560454780-20359-1-git-send-email-akrowiak@linux.ibm.com>
- <1560454780-20359-6-git-send-email-akrowiak@linux.ibm.com>
- <21cdd1ec-27aa-5f9a-8ac2-db2b2cef7d61@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <8c029b68-1084-8d17-6064-3209910c04b9@linux.ibm.com>
-Date:   Mon, 17 Jun 2019 11:07:53 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1728123AbfFQPKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jun 2019 11:10:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45398 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726215AbfFQPKl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jun 2019 11:10:41 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 795E82E97C8;
+        Mon, 17 Jun 2019 15:10:40 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.22.189])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1159991F37;
+        Mon, 17 Jun 2019 15:10:33 +0000 (UTC)
+Date:   Mon, 17 Jun 2019 16:10:30 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Libvirt Devel <libvir-list@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Erik Skultety <eskultet@redhat.com>,
+        Pavel Hrdina <phrdina@redhat.com>,
+        Sylvain Bauza <sbauza@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: mdevctl: A shoestring mediated device management and persistence
+ utility
+Message-ID: <20190617151030.GG3380@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20190523172001.41f386d8@x1.home>
+ <20190617140000.GA2021@redhat.com>
+ <20190617085438.07607e8b@x1.home>
 MIME-Version: 1.0
-In-Reply-To: <21cdd1ec-27aa-5f9a-8ac2-db2b2cef7d61@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-17_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906170136
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190617085438.07607e8b@x1.home>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Mon, 17 Jun 2019 15:10:40 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/17/19 6:05 AM, Harald Freudenberger wrote:
-> On 13.06.19 21:39, Tony Krowiak wrote:
->> The AP architecture does not preclude assignment of AP resources that are
->> not available. Let's go ahead and implement this facet of the AP
->> architecture for linux guests.
->>
->> The current implementation does not allow assignment of AP adapters or
->> domains to an mdev device if the APQNs resulting from the assignment
->> reference AP queue devices that are not bound to the vfio_ap device
->> driver. This patch allows assignment of AP resources to the mdev device as
->> long as the APQNs resulting from the assignment are not reserved by the AP
->> BUS for use by the zcrypt device drivers and the APQNs are not assigned to
->> another mdev device.
->>
->> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>   drivers/s390/crypto/vfio_ap_ops.c | 231 ++++++++------------------------------
->>   1 file changed, 44 insertions(+), 187 deletions(-)
->>
->> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
->> index 60efd3d7896d..9db86c0db52e 100644
->> --- a/drivers/s390/crypto/vfio_ap_ops.c
->> +++ b/drivers/s390/crypto/vfio_ap_ops.c
->> @@ -406,122 +406,6 @@ static struct attribute_group *vfio_ap_mdev_type_groups[] = {
->>   	NULL,
->>   };
->>   
->> -struct vfio_ap_queue_reserved {
->> -	unsigned long *apid;
->> -	unsigned long *apqi;
->> -	bool reserved;
->> -};
->> -
->> -/**
->> - * vfio_ap_has_queue
->> - *
->> - * @dev: an AP queue device
->> - * @data: a struct vfio_ap_queue_reserved reference
->> - *
->> - * Flags whether the AP queue device (@dev) has a queue ID containing the APQN,
->> - * apid or apqi specified in @data:
->> - *
->> - * - If @data contains both an apid and apqi value, then @data will be flagged
->> - *   as reserved if the APID and APQI fields for the AP queue device matches
->> - *
->> - * - If @data contains only an apid value, @data will be flagged as
->> - *   reserved if the APID field in the AP queue device matches
->> - *
->> - * - If @data contains only an apqi value, @data will be flagged as
->> - *   reserved if the APQI field in the AP queue device matches
->> - *
->> - * Returns 0 to indicate the input to function succeeded. Returns -EINVAL if
->> - * @data does not contain either an apid or apqi.
->> - */
->> -static int vfio_ap_has_queue(struct device *dev, void *data)
->> -{
->> -	struct vfio_ap_queue_reserved *qres = data;
->> -	struct ap_queue *ap_queue = to_ap_queue(dev);
->> -	ap_qid_t qid;
->> -	unsigned long id;
->> -
->> -	if (qres->apid && qres->apqi) {
->> -		qid = AP_MKQID(*qres->apid, *qres->apqi);
->> -		if (qid == ap_queue->qid)
->> -			qres->reserved = true;
->> -	} else if (qres->apid && !qres->apqi) {
->> -		id = AP_QID_CARD(ap_queue->qid);
->> -		if (id == *qres->apid)
->> -			qres->reserved = true;
->> -	} else if (!qres->apid && qres->apqi) {
->> -		id = AP_QID_QUEUE(ap_queue->qid);
->> -		if (id == *qres->apqi)
->> -			qres->reserved = true;
->> -	} else {
->> -		return -EINVAL;
->> -	}
->> -
->> -	return 0;
->> -}
->> -
->> -/**
->> - * vfio_ap_verify_queue_reserved
->> - *
->> - * @matrix_dev: a mediated matrix device
->> - * @apid: an AP adapter ID
->> - * @apqi: an AP queue index
->> - *
->> - * Verifies that the AP queue with @apid/@apqi is reserved by the VFIO AP device
->> - * driver according to the following rules:
->> - *
->> - * - If both @apid and @apqi are not NULL, then there must be an AP queue
->> - *   device bound to the vfio_ap driver with the APQN identified by @apid and
->> - *   @apqi
->> - *
->> - * - If only @apid is not NULL, then there must be an AP queue device bound
->> - *   to the vfio_ap driver with an APQN containing @apid
->> - *
->> - * - If only @apqi is not NULL, then there must be an AP queue device bound
->> - *   to the vfio_ap driver with an APQN containing @apqi
->> - *
->> - * Returns 0 if the AP queue is reserved; otherwise, returns -EADDRNOTAVAIL.
->> - */
->> -static int vfio_ap_verify_queue_reserved(unsigned long *apid,
->> -					 unsigned long *apqi)
->> -{
->> -	int ret;
->> -	struct vfio_ap_queue_reserved qres;
->> -
->> -	qres.apid = apid;
->> -	qres.apqi = apqi;
->> -	qres.reserved = false;
->> -
->> -	ret = driver_for_each_device(&matrix_dev->vfio_ap_drv->driver, NULL,
->> -				     &qres, vfio_ap_has_queue);
->> -	if (ret)
->> -		return ret;
->> -
->> -	if (qres.reserved)
->> -		return 0;
->> -
->> -	return -EADDRNOTAVAIL;
->> -}
->> -
->> -static int
->> -vfio_ap_mdev_verify_queues_reserved_for_apid(struct ap_matrix_mdev *matrix_mdev,
->> -					     unsigned long apid)
->> -{
->> -	int ret;
->> -	unsigned long apqi;
->> -	unsigned long nbits = matrix_mdev->matrix.aqm_max + 1;
->> -
->> -	if (find_first_bit_inv(matrix_mdev->matrix.aqm, nbits) >= nbits)
->> -		return vfio_ap_verify_queue_reserved(&apid, NULL);
->> -
->> -	for_each_set_bit_inv(apqi, matrix_mdev->matrix.aqm, nbits) {
->> -		ret = vfio_ap_verify_queue_reserved(&apid, &apqi);
->> -		if (ret)
->> -			return ret;
->> -	}
->> -
->> -	return 0;
->> -}
->> -
->>   /**
->>    * vfio_ap_mdev_verify_no_sharing
->>    *
->> @@ -529,18 +413,26 @@ vfio_ap_mdev_verify_queues_reserved_for_apid(struct ap_matrix_mdev *matrix_mdev,
->>    * and AP queue indexes comprising the AP matrix are not configured for another
->>    * mediated device. AP queue sharing is not allowed.
->>    *
->> - * @matrix_mdev: the mediated matrix device
->> + * @mdev_apm: the mask identifying the adapters assigned to mdev
->> + * @mdev_apm: the mask identifying the adapters assigned to mdev
-> I assume you wanted to write @mdev_aqm ... queues ... at the 2nd line.
-
-You assumed correctly. I also mean to say "domains assigned to mdev".
-
->>    *
->>    * Returns 0 if the APQNs are not shared, otherwise; returns -EADDRINUSE.
->>    */
->> -static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev)
->> +static int vfio_ap_mdev_verify_no_sharing(unsigned long *mdev_apm,
->> +					  unsigned long *mdev_aqm)
->>   {
->>   	struct ap_matrix_mdev *lstdev;
->>   	DECLARE_BITMAP(apm, AP_DEVICES);
->>   	DECLARE_BITMAP(aqm, AP_DOMAINS);
->>   
->>   	list_for_each_entry(lstdev, &matrix_dev->mdev_list, node) {
->> -		if (matrix_mdev == lstdev)
->> +		/*
->> +		 * If either of the input masks belongs to the mdev to which an
->> +		 * AP resource is being assigned, then we don't need to verify
->> +		 * that mdev's masks.
->> +		 */
->> +		if ((mdev_apm == lstdev->matrix.apm) ||
->> +		    (mdev_aqm == lstdev->matrix.aqm))
->>   			continue;
->>   
->>   		memset(apm, 0, sizeof(apm));
->> @@ -550,12 +442,10 @@ static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev)
->>   		 * We work on full longs, as we can only exclude the leftover
->>   		 * bits in non-inverse order. The leftover is all zeros.
->>   		 */
->> -		if (!bitmap_and(apm, matrix_mdev->matrix.apm,
->> -				lstdev->matrix.apm, AP_DEVICES))
->> +		if (!bitmap_and(apm, mdev_apm, lstdev->matrix.apm, AP_DEVICES))
->>   			continue;
->>   
->> -		if (!bitmap_and(aqm, matrix_mdev->matrix.aqm,
->> -				lstdev->matrix.aqm, AP_DOMAINS))
->> +		if (!bitmap_and(aqm, mdev_aqm, lstdev->matrix.aqm, AP_DOMAINS))
->>   			continue;
->>   
->>   		return -EADDRINUSE;
->> @@ -564,6 +454,17 @@ static int vfio_ap_mdev_verify_no_sharing(struct ap_matrix_mdev *matrix_mdev)
->>   	return 0;
->>   }
->>   
->> +static int vfio_ap_mdev_validate_masks(unsigned long *apm, unsigned long *aqm)
->> +{
->> +	int ret;
->> +
->> +	ret = ap_apqn_in_matrix_owned_by_def_drv(apm, aqm);
->> +	if (ret)
->> +		return (ret == 1) ? -EADDRNOTAVAIL : ret;
->> +
->> +	return vfio_ap_mdev_verify_no_sharing(apm, aqm);
->> +}
->> +
->>   /**
->>    * assign_adapter_store
->>    *
->> @@ -602,6 +503,7 @@ static ssize_t assign_adapter_store(struct device *dev,
->>   {
->>   	int ret;
->>   	unsigned long apid;
->> +	DECLARE_BITMAP(apm, AP_DEVICES);
->>   	struct mdev_device *mdev = mdev_from_dev(dev);
->>   	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->>   
->> @@ -616,32 +518,19 @@ static ssize_t assign_adapter_store(struct device *dev,
->>   	if (apid > matrix_mdev->matrix.apm_max)
->>   		return -ENODEV;
->>   
->> -	/*
->> -	 * Set the bit in the AP mask (APM) corresponding to the AP adapter
->> -	 * number (APID). The bits in the mask, from most significant to least
->> -	 * significant bit, correspond to APIDs 0-255.
->> -	 */
->> -	mutex_lock(&matrix_dev->lock);
->> -
->> -	ret = vfio_ap_mdev_verify_queues_reserved_for_apid(matrix_mdev, apid);
->> -	if (ret)
->> -		goto done;
->> +	memset(apm, 0, ARRAY_SIZE(apm) * sizeof(*apm));
-> What about just memset(apm, 0, sizeof(apm));
-
-apm is a pointer to an array of unsigned long, so sizeof(apm) will
-yield the number of bytes in the pointer (8), not the number of bytes in
-the array (32); or am I wrong about that?
-
->> +	set_bit_inv(apid, apm);
->>   
->> +	mutex_lock(&matrix_dev->lock);
->> +	ret = vfio_ap_mdev_validate_masks(apm, matrix_mdev->matrix.aqm);
->> +	if (ret) {
->> +		mutex_unlock(&matrix_dev->lock);
->> +		return ret;
->> +	}
->>   	set_bit_inv(apid, matrix_mdev->matrix.apm);
->> -
->> -	ret = vfio_ap_mdev_verify_no_sharing(matrix_mdev);
->> -	if (ret)
->> -		goto share_err;
->> -
->> -	ret = count;
->> -	goto done;
->> -
->> -share_err:
->> -	clear_bit_inv(apid, matrix_mdev->matrix.apm);
->> -done:
->>   	mutex_unlock(&matrix_dev->lock);
->>   
->> -	return ret;
->> +	return count;
->>   }
->>   static DEVICE_ATTR_WO(assign_adapter);
->>   
->> @@ -690,26 +579,6 @@ static ssize_t unassign_adapter_store(struct device *dev,
->>   }
->>   static DEVICE_ATTR_WO(unassign_adapter);
->>   
->> -static int
->> -vfio_ap_mdev_verify_queues_reserved_for_apqi(struct ap_matrix_mdev *matrix_mdev,
->> -					     unsigned long apqi)
->> -{
->> -	int ret;
->> -	unsigned long apid;
->> -	unsigned long nbits = matrix_mdev->matrix.apm_max + 1;
->> -
->> -	if (find_first_bit_inv(matrix_mdev->matrix.apm, nbits) >= nbits)
->> -		return vfio_ap_verify_queue_reserved(NULL, &apqi);
->> -
->> -	for_each_set_bit_inv(apid, matrix_mdev->matrix.apm, nbits) {
->> -		ret = vfio_ap_verify_queue_reserved(&apid, &apqi);
->> -		if (ret)
->> -			return ret;
->> -	}
->> -
->> -	return 0;
->> -}
->> -
->>   /**
->>    * assign_domain_store
->>    *
->> @@ -748,6 +617,7 @@ static ssize_t assign_domain_store(struct device *dev,
->>   {
->>   	int ret;
->>   	unsigned long apqi;
->> +	DECLARE_BITMAP(aqm, AP_DEVICES);
-> AP_DEVICES -> AP_DOMAINS
-
-Copy and paste error, it should be AP_DOMAINS.
-
->>   	struct mdev_device *mdev = mdev_from_dev(dev);
->>   	struct ap_matrix_mdev *matrix_mdev = mdev_get_drvdata(mdev);
->>   	unsigned long max_apqi = matrix_mdev->matrix.aqm_max;
->> @@ -762,27 +632,19 @@ static ssize_t assign_domain_store(struct device *dev,
->>   	if (apqi > max_apqi)
->>   		return -ENODEV;
->>   
->> -	mutex_lock(&matrix_dev->lock);
->> -
->> -	ret = vfio_ap_mdev_verify_queues_reserved_for_apqi(matrix_mdev, apqi);
->> -	if (ret)
->> -		goto done;
->> +	memset(aqm, 0, ARRAY_SIZE(aqm) * sizeof(*aqm));
-> memset(aqm, 0, sizeof(aqm));
-
-See response above.
-
->> +	set_bit_inv(apqi, aqm);
->>   
->> +	mutex_lock(&matrix_dev->lock);
->> +	ret = vfio_ap_mdev_validate_masks(matrix_mdev->matrix.apm, aqm);
->> +	if (ret) {
->> +		mutex_unlock(&matrix_dev->lock);
->> +		return ret;
->> +	}
->>   	set_bit_inv(apqi, matrix_mdev->matrix.aqm);
->> -
->> -	ret = vfio_ap_mdev_verify_no_sharing(matrix_mdev);
->> -	if (ret)
->> -		goto share_err;
->> -
->> -	ret = count;
->> -	goto done;
->> -
->> -share_err:
->> -	clear_bit_inv(apqi, matrix_mdev->matrix.aqm);
->> -done:
->>   	mutex_unlock(&matrix_dev->lock);
->>   
->> -	return ret;
->> +	return count;
->>   }
->>   static DEVICE_ATTR_WO(assign_domain);
->>   
->> @@ -868,11 +730,6 @@ static ssize_t assign_control_domain_store(struct device *dev,
->>   	if (id > matrix_mdev->matrix.adm_max)
->>   		return -ENODEV;
->>   
->> -	/* Set the bit in the ADM (bitmask) corresponding to the AP control
->> -	 * domain number (id). The bits in the mask, from most significant to
->> -	 * least significant, correspond to IDs 0 up to the one less than the
->> -	 * number of control domains that can be assigned.
->> -	 */
->>   	mutex_lock(&matrix_dev->lock);
->>   	set_bit_inv(id, matrix_mdev->matrix.adm);
->>   	mutex_unlock(&matrix_dev->lock);
+On Mon, Jun 17, 2019 at 08:54:38AM -0600, Alex Williamson wrote:
+> On Mon, 17 Jun 2019 15:00:00 +0100
+> Daniel P. Berrangé <berrange@redhat.com> wrote:
 > 
+> > On Thu, May 23, 2019 at 05:20:01PM -0600, Alex Williamson wrote:
+> > > Hi,
+> > > 
+> > > Currently mediated device management, much like SR-IOV VF management,
+> > > is largely left as an exercise for the user.  This is an attempt to
+> > > provide something and see where it goes.  I doubt we'll solve
+> > > everyone's needs on the first pass, but maybe we'll solve enough and
+> > > provide helpers for the rest.  Without further ado, I'll point to what
+> > > I have so far:
+> > > 
+> > > https://github.com/awilliam/mdevctl
+> > > 
+> > > This is inspired by driverctl, which is also a bash utility.  mdevctl
+> > > uses udev and systemd to record and recreate mdev devices for
+> > > persistence and provides a command line utility for querying, listing,
+> > > starting, stopping, adding, and removing mdev devices.  Currently, for
+> > > better or worse, it considers anything created to be persistent.  I can
+> > > imagine a global configuration option that might disable this and
+> > > perhaps an autostart flag per mdev device, such that mdevctl might
+> > > simply "know" about some mdevs but not attempt to create them
+> > > automatically.  Clearly command line usage help, man pages, and
+> > > packaging are lacking as well, release early, release often, plus this
+> > > is a discussion starter to see if perhaps this is sufficient to meet
+> > > some needs.  
+> > 
+> > I think from libvirt's POV, we would *not* want devices to be made
+> > unconditionally persistent. We usually wish to expose a choice to
+> > applications whether to have resources be transient or persistent.
+> > 
+> > So from that POV, a global config option to turn off persistence
+> > is not workable either. We would want control per-device, with
+> > autostart control per device too.
+> 
+> The code has progressed somewhat in the past 3+ weeks, we still persist
+> all devices, but the start-up mode can be selected per device or with a
+> global default mode.  Devices configured with 'auto' start-up
+> automatically while 'manual' devices are simply known and available to
+> be started.  I imagine we could add a 'transient' mode where we purge
+> the information about the device when it is removed or the next time
+> the parent device is added.
 
+Having a pesistent config written out & then purged later is still
+problematic. If the host crashes, nothing will purge the config file,
+so it will become a persistent device. Also when listing devices we
+want to be able to report whether it is persistent or transient. The
+obvious way todo that is to simply look if a config file exists or
+not.
+
+> > I would simply get rid of the udev rule that magically persists
+> > stuff. Any person/tool using sysfs right now expects devices to
+> > be transient. If they want to have persistence they can stop using
+> > sysfs & use higher level tools directly.
+> 
+> I think it's an interesting feature, but it's easy enough to control
+> via a global option in sysconfig with the default off if it's seen as
+> overstepping.
+
+A global option is really not desirable, as it means that the behaviour
+of the system that libvirt sees can silently change at any time. IMHO
+this udev hook is  intermixing the two layers in the stack - keep the
+low level sysfs layer completely separate from the higher level mgmt
+concepts provided by this mdevctrl.
+
+> > > Originally I thought about making a utility to manage both mdev and
+> > > SR-IOV VFs all in one, but it seemed more natural to start here
+> > > (besides, I couldn't think of a good name for the combined utility).
+> > > If this seems useful, maybe I'll start on a vfctl for SR-IOV and we'll
+> > > see whether they have enough synergy to become one.  
+> > 
+> > [snip]
+> > 
+> > > I'm also curious how or if libvirt or openstack might use this.  If
+> > > nothing else, it makes libvirt hook scripts easier to write, especially
+> > > if we add an option not to autostart mdevs, or if users don't mind
+> > > persistent mdevs, maybe there's nothing more to do.  
+> > 
+> > We currently have an API for creating host devices in libvirt which
+> > we use for NPIV devices only, which is where we'd like to put mdev
+> > creation support.  This API is for creating transient devices
+> > though, so we don't want anything created this way to magically
+> > become persistent.
+> > 
+> > For persistence we'd create a new API in libvirt allowing you to
+> > define & undefine the persistent config for a devices, and another
+> > set of APIs to create/delete from the persistent config.
+> > 
+> > As a general rule, libvirt would prefer to use an API rather than
+> > spawning external commands, but can live with either.
+
+Thinking some more, the key tasks that libvirt needs to deal
+with are
+
+ 1. Define a persistent config (Must not create any actual device)
+ 2. Undefine a persistent config (Must not delete any actual device)
+ 3. Create a device
+ 4. Delete a device
+ 5. Get list of all persistent configs
+ 6. Enable autostart of a device
+ 7. Disable autostart of a device
+
+For 1, 2, 5, 6 & 7 libvirt doesn't really need a command line tool. As
+long as there is a specification for the config file syntax and location
+we can directly read/write/stat files. This would be much more efficient
+and reliable for libvirt than spawning commands & parsing the output or
+exit status.
+
+For 3 & 4 we'd desire the command to accept a config file, either as a
+file on disk for persistent devices, or inline on stdin for transient
+devices.
+
+> > There's also the question of systemd integration - so far everything
+> > in libvirt still works on non-systemd based distros, but this new
+> > tool looks like it requires systemd.  Personally I'm not too bothered
+> > by this but others might be more concerned.
+> 
+> Yes, Pavel brought up this issue offline as well and it needs more
+> consideration.  The systemd support still needs work as well, I've
+> discovered it gets very confused when the mdev device is removed
+> outside of mdevctl, but I haven't yet been able to concoct a BindsTo=
+> line that can handle the hyphens in the uuid device name.  I'd say
+> mdevctl is not intentionally systemd specific, it's simply a byproduct
+> of the systems it was developed on.  Also, if libvirt were to focus
+> only on transient devices, then startup via systemctl doesn't make
+> sense, which probably means stopping via systemctl would also be unused
+> by libvirt.  So I think this means we just need to make systemd an
+> optional feature of mdevctl (or drop it) and if libvirt doesn't use it,
+> that's fine.  Thanks,
+
+I actually think the systemd integration is good, we just need to
+make sure things are still doable without it. This could be as simple
+as having an initscript that just iteates over the configs creating
+each one at startup.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
