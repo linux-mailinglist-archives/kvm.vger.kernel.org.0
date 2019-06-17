@@ -2,58 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C0C3648089
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 13:25:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DF6D4808A
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 13:25:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727910AbfFQLYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jun 2019 07:24:53 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:38999 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726605AbfFQLYx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jun 2019 07:24:53 -0400
-Received: by mail-pg1-f194.google.com with SMTP id 196so5658735pgc.6;
-        Mon, 17 Jun 2019 04:24:53 -0700 (PDT)
+        id S1728051AbfFQLY4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jun 2019 07:24:56 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:46815 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726605AbfFQLYz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jun 2019 07:24:55 -0400
+Received: by mail-pf1-f194.google.com with SMTP id 81so5512603pfy.13;
+        Mon, 17 Jun 2019 04:24:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=On7E7zmLSRgJj9Ttl1gLhH57uyxxO3PDcMqtYU/ZX3A=;
-        b=erP9kbch+/6D93JrTKRtB/9WivFEV597MDMtDcNbuA81UdsF/WYopiQgFtZt/DdMeJ
-         igUmflkUgVylTtJqDgqo86aOLhTQGCJ7asJo9ZxxpJNyOPfOm1OIL86ZhqEcpYGyxNwn
-         RgmP/UFuTIo6+AqSDR71wxFk4anXVEitvA1Ggvre3ObKdVFfbNVXAWJAfXPczB0Zt0r+
-         sqI4k3bOulwes5gH7cGUU5Nuw91afJmAXO2mwkgA2bZjSvcYyNCUVEH0g2m1isp2tK5Z
-         9bSyYcqbidNKrqcpufW0wwImIVaWzme2sQo4yjWHetsWgyzB6SolI40aNKagtB6l27j/
-         ZocA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=VPkm7l4VeiELN51pZzP+PaqYBLqHW5sgirUO1tigA+g=;
+        b=G87a2jhJkEOOjCiBrYGFMNC8zPCsOK6ab/xLFtyqdf/Z+1JP0TS2+X+eQQsE4OSQuV
+         y3xLkH6tCSUuwt+Mnk7qTewAYxeQrP5fV/SRqbP/tbae+cgYep8FNUamVLZgZGruWatV
+         g5ZluZPcmnd3Qd7swbFZabNlAxJJEjfjSfxOQWjph/ADFGlqztRCIfrjOOjR2UfRUBvv
+         dwpHyZYIDPq0qBbB9JSEpUqrJeoUengrwm9JjzfOihiGMkUYfgshw7ytWJaV3Vq9u1rx
+         enB5/neixifc+fl3UWSHPppFl+8clUxxtsWzNqWP0aLjycnlbK4lmr7nl0p9kBOZsb88
+         NgDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=On7E7zmLSRgJj9Ttl1gLhH57uyxxO3PDcMqtYU/ZX3A=;
-        b=fBps6dQCbTfl0wNkHDUHCI5Mg8ivyLWpha5zbIhQSdBEX/0e6askYd2kMrhGheVbFY
-         rqooEGEfgNhmsG344mpHeb6BtZy4O/RHhG3q/QCpjVlnyrB2Vma+ZRfWGlL89ebweJpE
-         170KFLDvjwX5qvT+E5QFL8odAbBh3ab3eIsnCPfRqheuEEzk7bjieS7rnUOYTOcgCLzl
-         2rmwWeXNbqxfpa8E38RKpyssehwRnZzHE9XlV+fyB7gCHYoYFfW/LbxeDdUwD2GbjVC2
-         X9AYAFJ0X77qhw7lBZHX+Mvp8v0sAar3Spbch3t4bzeoPLOSiAyqNcBjJYYPsJhMcknu
-         7abA==
-X-Gm-Message-State: APjAAAU2DegaufORrW1Z2N8ODfFKv4G6a+yVESCF0Xcvncjrp4Uguvne
-        utO7OhrFi+4oCChndOaZx6lGM7yb
-X-Google-Smtp-Source: APXvYqysEiwTEoKS6WXujqPEY+h+jIj4Y7EPTe8opfIL0Wz6ucLZLbcZCZDZnoYc5R9JgXPTEzT5DA==
-X-Received: by 2002:a17:90a:ad93:: with SMTP id s19mr1033613pjq.36.1560770692765;
-        Mon, 17 Jun 2019 04:24:52 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=VPkm7l4VeiELN51pZzP+PaqYBLqHW5sgirUO1tigA+g=;
+        b=QBKzKQAoMzgbZ+mA1DRPB8Xl2dUDUBQg4Se70Q6CiDPNFF292/067FHF08E4qyo1Ki
+         G/kVePHfcyetBc+XQH4qhdOG6leKg7auvmzE7UpFLVvcuEC1OAyHJFUx1FJftEqzyp1/
+         zQuEiw7I8uFHl8XJ0ogafNDq2U2BU32i2djJvBu8xZhTNI/afOeFs0+B7Sf78mJc/6je
+         UfCL+WcO89IJmr8kc0RA5CKxyyOk6bemp2adnABrtIDij+Jv5Oop1MwAIjJov/Eo1eia
+         WSBjVxJLTs25i3DuTCsleBuej/+ST2uG5UdlZzba/mKYCi7X5I5NdsWjwMc+yhNwYWEp
+         4WjA==
+X-Gm-Message-State: APjAAAXwRK+ewct+14vJkEF2vpdWvx1TTsiK/biqmgo4xfuHq6acI92Y
+        bOhx3TN6UjyIxq46OJtBzXEsxoTT
+X-Google-Smtp-Source: APXvYqwxhtoBEkhaFfY8r0zFwcCzukJ7n98p0AE6tvjddXpQIKC1jgoEx9ua8oayHUL6ZomMTNlKzA==
+X-Received: by 2002:a63:e50c:: with SMTP id r12mr48546521pgh.284.1560770694727;
+        Mon, 17 Jun 2019 04:24:54 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id d4sm12535751pfc.149.2019.06.17.04.24.50
+        by smtp.googlemail.com with ESMTPSA id d4sm12535751pfc.149.2019.06.17.04.24.52
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 17 Jun 2019 04:24:52 -0700 (PDT)
+        Mon, 17 Jun 2019 04:24:54 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [PATCH v4 0/5] KVM: LAPIC: Implement Exitless Timer
-Date:   Mon, 17 Jun 2019 19:24:42 +0800
-Message-Id: <1560770687-23227-1-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH v4 1/5] KVM: LAPIC: Make lapic timer unpinned
+Date:   Mon, 17 Jun 2019 19:24:43 +0800
+Message-Id: <1560770687-23227-2-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1560770687-23227-1-git-send-email-wanpengli@tencent.com>
+References: <1560770687-23227-1-git-send-email-wanpengli@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -62,76 +64,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dedicated instances are currently disturbed by unnecessary jitter due 
-to the emulated lapic timers fire on the same pCPUs which vCPUs resident.
-There is no hardware virtual timer on Intel for guest like ARM. Both 
-programming timer in guest and the emulated timer fires incur vmexits.
-This patchset tries to avoid vmexit which is incurred by the emulated 
-timer fires in dedicated instance scenario. 
+From: Wanpeng Li <wanpengli@tencent.com>
 
-When nohz_full is enabled in dedicated instances scenario, the unpinned 
-timer will be moved to the nearest busy housekeepers after commit
-9642d18eee2cd (nohz: Affine unpinned timers to housekeepers) and commit 
-444969223c8 ("sched/nohz: Fix affine unpinned timers mess"). However, 
-KVM always makes lapic timer pinned to the pCPU which vCPU residents, the 
-reason is explained by commit 61abdbe0 (kvm: x86: make lapic hrtimer 
-pinned). Actually, these emulated timers can be offload to the housekeeping 
-cpus since APICv is really common in recent years. The guest timer interrupt 
-is injected by posted-interrupt which is delivered by housekeeping cpu 
-once the emulated timer fires. 
-
-The host admin should fine tuned, e.g. dedicated instances scenario w/ 
-nohz_full cover the pCPUs which vCPUs resident, several pCPUs surplus 
-for busy housekeeping, disable mwait/hlt/pause vmexits to keep in non-root  
-mode, ~3% redis performance benefit can be observed on Skylake server.
-
-w/o patchset:
-
-            VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time   Avg time
-
-EXTERNAL_INTERRUPT    42916    49.43%   39.30%   0.47us   106.09us   0.71us ( +-   1.09% )
-
-w/ patchset:
-
-            VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time         Avg time
-
-EXTERNAL_INTERRUPT    6871     9.29%     2.96%   0.44us    57.88us   0.72us ( +-   4.02% )
+Make lapic timer unpinned when timer is injected by posted-interrupt,
+the emulated timer can be offload to the housekeeping cpus, kick after 
+setting the pending timer request as alternative to commit 61abdbe0bcc.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Radim Krčmář <rkrcmar@redhat.com>
 Cc: Marcelo Tosatti <mtosatti@redhat.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/lapic.c | 8 ++++----
+ arch/x86/kvm/x86.c   | 6 +-----
+ 2 files changed, 5 insertions(+), 9 deletions(-)
 
-v3 -> v4:
- * drop the HRTIMER_MODE_ABS_PINNED, add kick after set pending timer
- * don't posted inject already-expired timer
-
-v2 -> v3:
- * disarming the vmx preemption timer when posted_interrupt_inject_timer_enabled()
- * check kvm_hlt_in_guest instead
-
-v1 -> v2:
- * check vcpu_halt_in_guest
- * move module parameter from kvm-intel to kvm
- * add housekeeping_enabled
- * rename apic_timer_expired_pi to kvm_apic_inject_pending_timer_irqs
-
-Wanpeng Li (5):
-  KVM: LAPIC: Make lapic timer unpinned
-  KVM: LAPIC: inject lapic timer interrupt by posted interrupt
-  KVM: LAPIC: Ignore timer migration when lapic timer is injected by pi
-  KVM: LAPIC: Don't posted inject already-expired timer
-  KVM: LAPIC: add advance timer support to pi_inject_timer
-
- arch/x86/kvm/lapic.c            | 62 ++++++++++++++++++++++++++++-------------
- arch/x86/kvm/lapic.h            |  3 +-
- arch/x86/kvm/svm.c              |  2 +-
- arch/x86/kvm/vmx/vmx.c          |  5 ++--
- arch/x86/kvm/x86.c              | 11 ++++----
- arch/x86/kvm/x86.h              |  2 ++
- include/linux/sched/isolation.h |  2 ++
- kernel/sched/isolation.c        |  6 ++++
- 8 files changed, 64 insertions(+), 29 deletions(-)
-
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index e82a18c..87ecb56 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1578,7 +1578,7 @@ static void start_sw_tscdeadline(struct kvm_lapic *apic)
+ 	    likely(ns > apic->lapic_timer.timer_advance_ns)) {
+ 		expire = ktime_add_ns(now, ns);
+ 		expire = ktime_sub_ns(expire, ktimer->timer_advance_ns);
+-		hrtimer_start(&ktimer->timer, expire, HRTIMER_MODE_ABS_PINNED);
++		hrtimer_start(&ktimer->timer, expire, HRTIMER_MODE_ABS);
+ 	} else
+ 		apic_timer_expired(apic);
+ 
+@@ -1680,7 +1680,7 @@ static void start_sw_period(struct kvm_lapic *apic)
+ 
+ 	hrtimer_start(&apic->lapic_timer.timer,
+ 		apic->lapic_timer.target_expiration,
+-		HRTIMER_MODE_ABS_PINNED);
++		HRTIMER_MODE_ABS);
+ }
+ 
+ bool kvm_lapic_hv_timer_in_use(struct kvm_vcpu *vcpu)
+@@ -2317,7 +2317,7 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
+ 	apic->vcpu = vcpu;
+ 
+ 	hrtimer_init(&apic->lapic_timer.timer, CLOCK_MONOTONIC,
+-		     HRTIMER_MODE_ABS_PINNED);
++		     HRTIMER_MODE_ABS);
+ 	apic->lapic_timer.timer.function = apic_timer_fn;
+ 	if (timer_advance_ns == -1) {
+ 		apic->lapic_timer.timer_advance_ns = 1000;
+@@ -2506,7 +2506,7 @@ void __kvm_migrate_apic_timer(struct kvm_vcpu *vcpu)
+ 
+ 	timer = &vcpu->arch.apic->lapic_timer.timer;
+ 	if (hrtimer_cancel(timer))
+-		hrtimer_start_expires(timer, HRTIMER_MODE_ABS_PINNED);
++		hrtimer_start_expires(timer, HRTIMER_MODE_ABS);
+ }
+ 
+ /*
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 0a05a4e..9450a16 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1437,12 +1437,8 @@ static void update_pvclock_gtod(struct timekeeper *tk)
+ 
+ void kvm_set_pending_timer(struct kvm_vcpu *vcpu)
+ {
+-	/*
+-	 * Note: KVM_REQ_PENDING_TIMER is implicitly checked in
+-	 * vcpu_enter_guest.  This function is only called from
+-	 * the physical CPU that is running vcpu.
+-	 */
+ 	kvm_make_request(KVM_REQ_PENDING_TIMER, vcpu);
++	kvm_vcpu_kick(vcpu);
+ }
+ 
+ static void kvm_write_wall_clock(struct kvm *kvm, gpa_t wall_clock)
 -- 
 2.7.4
 
