@@ -2,102 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 63F2947DF9
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 11:10:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0581B47E2E
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 11:21:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727936AbfFQJKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jun 2019 05:10:50 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:58960 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726753AbfFQJKu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jun 2019 05:10:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=lSBxG3pslaMoZ4q5LfNT8Zk++zn3HV9csalZ1zH5zZQ=; b=F60cT2pWFaw+0bzwXk+QRPjac
-        SQSBB/T3pjj2vvFitGT/VQMox0OWHFlY644jDhByelCvdv36dXHlHs3LZfXBNZLOcSyAel99wBGkY
-        dFsCansXAOcFaLXJODF/MXDuQ8yJInHw7J7paI8oo77fjHJJkvvsAKzyfXfCipuAVRZfyrQpHtdD/
-        QM8OcVqmrDNHs8qOYqIJsH4Lf8t+jhkz5jV/yXzAdo16KalPAs6LpG1ubmATO7b7shkE064qeSkQM
-        bPPwCnc+sKzykEJ6dtXc1BDAiu59261Ly0WOF5HSco5f1OwG4zfFkrhkepGAG9wwbbdLQXTYyNU1T
-        uXZZrXUnQ==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hcnf0-0005x4-8P; Mon, 17 Jun 2019 09:10:42 +0000
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 0782E2025A803; Mon, 17 Jun 2019 11:10:41 +0200 (CEST)
-Date:   Mon, 17 Jun 2019 11:10:40 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Alison Schofield <alison.schofield@intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@amacapital.net>,
-        David Howells <dhowells@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Kai Huang <kai.huang@linux.intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>, linux-mm@kvack.org,
-        kvm@vger.kernel.org, keyrings@vger.kernel.org,
+        id S1728002AbfFQJVK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jun 2019 05:21:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50650 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726286AbfFQJVJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jun 2019 05:21:09 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 85F873086227;
+        Mon, 17 Jun 2019 09:21:03 +0000 (UTC)
+Received: from hp-dl380pg8-01.lab.eng.pek2.redhat.com (hp-dl380pg8-01.lab.eng.pek2.redhat.com [10.73.8.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C97613781;
+        Mon, 17 Jun 2019 09:20:56 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     jasowang@redhat.com, mst@redhat.com, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH, RFC 44/62] x86/mm: Set KeyIDs in encrypted VMAs for MKTME
-Message-ID: <20190617091040.GZ3436@hirez.programming.kicks-ass.net>
-References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
- <20190508144422.13171-45-kirill.shutemov@linux.intel.com>
- <20190614114408.GD3436@hirez.programming.kicks-ass.net>
- <20190614173345.GB5917@alison-desk.jf.intel.com>
- <e0884a6b-78bc-209d-bc9a-90f69839189e@intel.com>
- <20190614184602.GB7252@alison-desk.jf.intel.com>
- <ca62a921-e60c-6532-32c3-f02e15ba69aa@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ca62a921-e60c-6532-32c3-f02e15ba69aa@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc:     huhai@kylinos.cn
+Subject: [PATCH net-next] vhost_net: disable zerocopy by default
+Date:   Mon, 17 Jun 2019 05:20:54 -0400
+Message-Id: <20190617092054.12299-1-jasowang@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Mon, 17 Jun 2019 09:21:09 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 14, 2019 at 12:11:23PM -0700, Dave Hansen wrote:
-> On 6/14/19 11:46 AM, Alison Schofield wrote:
-> > On Fri, Jun 14, 2019 at 11:26:10AM -0700, Dave Hansen wrote:
-> >> On 6/14/19 10:33 AM, Alison Schofield wrote:
-> >>> Preserving the data across encryption key changes has not
-> >>> been a requirement. I'm not clear if it was ever considered
-> >>> and rejected. I believe that copying in order to preserve
-> >>> the data was never considered.
-> >>
-> >> We could preserve the data pretty easily.  It's just annoying, though.
-> >> Right now, our only KeyID conversions happen in the page allocator.  If
-> >> we were to convert in-place, we'd need something along the lines of:
-> >>
-> >> 	1. Allocate a scratch page
-> >> 	2. Unmap target page, or at least make it entirely read-only
-> >> 	3. Copy plaintext into scratch page
-> >> 	4. Do cache KeyID conversion of page being converted:
-> >> 	   Flush caches, change page_ext metadata
-> >> 	5. Copy plaintext back into target page from scratch area
-> >> 	6. Re-establish PTEs with new KeyID
-> > 
-> > Seems like the 'Copy plaintext' steps might disappoint the user, as
-> > much as the 'we don't preserve your data' design. Would users be happy
-> > w the plain text steps ?
-> 
-> Well, it got to be plaintext because they wrote it to memory in
-> plaintext in the first place, so it's kinda hard to disappoint them. :)
-> 
-> IMNHO, the *vast* majority of cases, folks will allocate memory and then
-> put a secret in it.  They aren't going to *get* a secret in some
-> mysterious fashion and then later decide they want to protect it.  In
-> other words, the inability to convert it is pretty academic and not
-> worth the complexity.
+Vhost_net was known to suffer from HOL[1] issues which is not easy to
+fix. Several downstream disable the feature by default. What's more,
+the datapath was split and datacopy path got the support of batching
+and XDP support recently which makes it faster than zerocopy part for
+small packets transmission.
 
-I'm not saying it is (required to preserve); but I do think it is
-somewhat surprising to have an mprotect() call destroy content. It's
-traditionally specified to not do that.
+It looks to me that disable zerocopy by default is more
+appropriate. It cold be enabled by default again in the future if we
+fix the above issues.
+
+[1] https://patchwork.kernel.org/patch/3787671/
+
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ drivers/vhost/net.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index 2d9df786a9d3..21e0805e5e60 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -36,7 +36,7 @@
+ 
+ #include "vhost.h"
+ 
+-static int experimental_zcopytx = 1;
++static int experimental_zcopytx = 0;
+ module_param(experimental_zcopytx, int, 0444);
+ MODULE_PARM_DESC(experimental_zcopytx, "Enable Zero Copy TX;"
+ 		                       " 1 -Enable; 0 - Disable");
+-- 
+2.18.1
 
