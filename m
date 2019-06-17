@@ -2,103 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 53BDD47B42
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 09:38:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D4FE47B90
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 09:47:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727333AbfFQHiO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jun 2019 03:38:14 -0400
-Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:17391 "EHLO
-        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725826AbfFQHiO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jun 2019 03:38:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1560757091; x=1592293091;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=8xZP6BRYVHqRBD1v3aCylovGhFA01FEft+IhJzUopnA=;
-  b=lU0A/K514EP44LlSbe7+gAvDPtiOstqo0LpUj+nsacdnconLiACx9kTw
-   eEJWABrBVCs6WKnRLtbqL40F8UG7SZxepHUItn1WHzLolesXSb+0g7L7t
-   TLozrtFQNGmrF+R8mNqUmlOaEDLmQ+H2hD2CseAUNBRXNguRMYNfyoZ+A
-   U=;
-X-IronPort-AV: E=Sophos;i="5.62,384,1554768000"; 
-   d="scan'208";a="737725018"
-Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1a-67b371d8.us-east-1.amazon.com) ([10.124.125.2])
-  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 17 Jun 2019 07:38:09 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1a-67b371d8.us-east-1.amazon.com (Postfix) with ESMTPS id 11569A2B0B;
-        Mon, 17 Jun 2019 07:38:07 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 17 Jun 2019 07:38:07 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.160.69) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 17 Jun 2019 07:38:04 +0000
-Subject: Re: [RFC 00/10] Process-local memory allocations for hiding KVM
- secrets
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Andy Lutomirski <luto@amacapital.net>
-CC:     Dave Hansen <dave.hansen@intel.com>,
-        Marius Hillenbrand <mhillenb@amazon.de>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        <kernel-hardening@lists.openwall.com>, <linux-mm@kvack.org>,
-        Alexander Graf <graf@amazon.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        "Peter Zijlstra" <peterz@infradead.org>
-References: <20190612170834.14855-1-mhillenb@amazon.de>
- <eecc856f-7f3f-ed11-3457-ea832351e963@intel.com>
- <A542C98B-486C-4849-9DAC-2355F0F89A20@amacapital.net>
- <alpine.DEB.2.21.1906141618000.1722@nanos.tec.linutronix.de>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <58788f05-04c3-e71c-12c3-0123be55012c@amazon.com>
-Date:   Mon, 17 Jun 2019 09:38:00 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.7.0
+        id S1726974AbfFQHq6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jun 2019 03:46:58 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:57968 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725884AbfFQHq6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jun 2019 03:46:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=YkzG8FgrjsJE2ZjG5g7hfYDZEeo6+OA/Btz/mk5jlNA=; b=rCvYNa7/NvaIcpx/eS9RsD3zq
+        AfDoAj5ne5PjHAPsNNRhWmX6hypo262EDdiDCPlHuxGce32uhXRLpzjvBzbikSRZJcmLtrNTtSVgW
+        rzcyk4RJqcl8vpfFlcjxtUDMDrotaRgaducgqtG9EcCMf9RifWeZ1/mUP1sMgYNYS63w2MB3TKhdV
+        WTha/hzgsuI74FPHTYlGXhMyYe7cAuTCkFuHtLtoZd2os6d3RGl5hn6JWfW+XwzYRRaOiCB6h5xJ3
+        17Zg4IQ1oDzAYtM1bSfmTqu6hvkkpvEX7pt8C43DWflPBRQghgLdhMs8wX6E+Du/mc5qmpWo/q3n6
+        YdnKS7szw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hcmLk-0005Pt-OF; Mon, 17 Jun 2019 07:46:44 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 3D54C20961A06; Mon, 17 Jun 2019 09:46:43 +0200 (CEST)
+Date:   Mon, 17 Jun 2019 09:46:43 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Kai Huang <kai.huang@linux.intel.com>
+Cc:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@amacapital.net>,
+        David Howells <dhowells@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH, RFC 49/62] mm, x86: export several MKTME variables
+Message-ID: <20190617074643.GW3436@hirez.programming.kicks-ass.net>
+References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
+ <20190508144422.13171-50-kirill.shutemov@linux.intel.com>
+ <20190614115647.GI3436@hirez.programming.kicks-ass.net>
+ <1560741269.5187.7.camel@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.21.1906141618000.1722@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Originating-IP: [10.43.160.69]
-X-ClientProxiedBy: EX13D20UWC004.ant.amazon.com (10.43.162.41) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1560741269.5187.7.camel@linux.intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jun 17, 2019 at 03:14:29PM +1200, Kai Huang wrote:
+> On Fri, 2019-06-14 at 13:56 +0200, Peter Zijlstra wrote:
+> > On Wed, May 08, 2019 at 05:44:09PM +0300, Kirill A. Shutemov wrote:
+> > > From: Kai Huang <kai.huang@linux.intel.com>
+> > > 
+> > > KVM needs those variables to get/set memory encryption mask.
+> > > 
+> > > Signed-off-by: Kai Huang <kai.huang@linux.intel.com>
+> > > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > > ---
+> > >  arch/x86/mm/mktme.c | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > > 
+> > > diff --git a/arch/x86/mm/mktme.c b/arch/x86/mm/mktme.c
+> > > index df70651816a1..12f4266cf7ea 100644
+> > > --- a/arch/x86/mm/mktme.c
+> > > +++ b/arch/x86/mm/mktme.c
+> > > @@ -7,13 +7,16 @@
+> > >  
+> > >  /* Mask to extract KeyID from physical address. */
+> > >  phys_addr_t mktme_keyid_mask;
+> > > +EXPORT_SYMBOL_GPL(mktme_keyid_mask);
+> > >  /*
+> > >   * Number of KeyIDs available for MKTME.
+> > >   * Excludes KeyID-0 which used by TME. MKTME KeyIDs start from 1.
+> > >   */
+> > >  int mktme_nr_keyids;
+> > > +EXPORT_SYMBOL_GPL(mktme_nr_keyids);
+> > >  /* Shift of KeyID within physical address. */
+> > >  int mktme_keyid_shift;
+> > > +EXPORT_SYMBOL_GPL(mktme_keyid_shift);
+> > >  
+> > >  DEFINE_STATIC_KEY_FALSE(mktme_enabled_key);
+> > >  EXPORT_SYMBOL_GPL(mktme_enabled_key);
+> > 
+> > NAK, don't export variables. Who owns the values, who enforces this?
+> > 
+> 
+> Both KVM and IOMMU driver need page_keyid() and mktme_keyid_shift to set page's keyID to the right
+> place in the PTE (of KVM EPT and VT-d DMA page table).
+> 
+> MKTME key type code need to know mktme_nr_keyids in order to alloc/free keyID.
+> 
+> Maybe better to introduce functions instead of exposing variables directly?
+> 
+> Or instead of introducing page_keyid(), we use page_encrypt_mask(), which essentially holds
+> "page_keyid() << mktme_keyid_shift"?
 
-On 14.06.19 16:21, Thomas Gleixner wrote:
-> On Wed, 12 Jun 2019, Andy Lutomirski wrote:
->>> On Jun 12, 2019, at 12:55 PM, Dave Hansen <dave.hansen@intel.com> wrote:
->>>
->>>> On 6/12/19 10:08 AM, Marius Hillenbrand wrote:
->>>> This patch series proposes to introduce a region for what we call
->>>> process-local memory into the kernel's virtual address space.
->>> It might be fun to cc some x86 folks on this series.  They might have
->>> some relevant opinions. ;)
->>>
->>> A few high-level questions:
->>>
->>> Why go to all this trouble to hide guest state like registers if all the
->>> guest data itself is still mapped?
->>>
->>> Where's the context-switching code?  Did I just miss it?
->>>
->>> We've discussed having per-cpu page tables where a given PGD is only in
->>> use from one CPU at a time.  I *think* this scheme still works in such a
->>> case, it just adds one more PGD entry that would have to context-switched.
->> Fair warning: Linus is on record as absolutely hating this idea. He might
->> change his mind, but it’s an uphill battle.
-> Yes I know, but as a benefit we could get rid of all the GSBASE horrors in
-> the entry code as we could just put the percpu space into the local PGD.
-
-
-Would that mean that with Meltdown affected CPUs we open speculation 
-attacks against the mmlocal memory from KVM user space?
-
-
-Alex
-
+Yes, that's much better, because that strictly limits the access to R/O.
