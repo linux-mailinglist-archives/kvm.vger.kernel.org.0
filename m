@@ -2,174 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D4D848080
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 13:20:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0C3648089
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 13:25:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727833AbfFQLTh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jun 2019 07:19:37 -0400
-Received: from foss.arm.com ([217.140.110.172]:45944 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726173AbfFQLTg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jun 2019 07:19:36 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D0179344;
-        Mon, 17 Jun 2019 04:19:35 -0700 (PDT)
-Received: from [10.1.196.105] (eglon.cambridge.arm.com [10.1.196.105])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 78CB23F246;
-        Mon, 17 Jun 2019 04:21:18 -0700 (PDT)
-Subject: Re: [PATCH v1 2/5] KVM: arm/arm64: Adjust entry/exit and trap related
- tracepoints
-To:     Zenghui Yu <yuzenghui@huawei.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, christoffer.dall@arm.com,
-        marc.zyngier@arm.com, acme@redhat.com, peterz@infradead.org,
-        mingo@redhat.com, ganapatrao.kulkarni@cavium.com,
-        catalin.marinas@arm.com, will.deacon@arm.com, mark.rutland@arm.com,
-        acme@kernel.org, alexander.shishkin@linux.intel.com,
-        jolsa@redhat.com, namhyung@kernel.org, wanghaibin.wang@huawei.com,
-        xiexiangyou@huawei.com, linuxarm@huawei.com
-References: <1560330526-15468-1-git-send-email-yuzenghui@huawei.com>
- <1560330526-15468-3-git-send-email-yuzenghui@huawei.com>
- <977f8f8c-72b4-0287-4b1c-47a0d6f1fd6e@arm.com>
- <e78a9798-cce3-a360-37c3-0ad359944b85@huawei.com>
-From:   James Morse <james.morse@arm.com>
-Message-ID: <4d16d690-e93b-7b89-3251-aa4bd8489715@arm.com>
-Date:   Mon, 17 Jun 2019 12:19:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1727910AbfFQLYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jun 2019 07:24:53 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:38999 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726605AbfFQLYx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jun 2019 07:24:53 -0400
+Received: by mail-pg1-f194.google.com with SMTP id 196so5658735pgc.6;
+        Mon, 17 Jun 2019 04:24:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=On7E7zmLSRgJj9Ttl1gLhH57uyxxO3PDcMqtYU/ZX3A=;
+        b=erP9kbch+/6D93JrTKRtB/9WivFEV597MDMtDcNbuA81UdsF/WYopiQgFtZt/DdMeJ
+         igUmflkUgVylTtJqDgqo86aOLhTQGCJ7asJo9ZxxpJNyOPfOm1OIL86ZhqEcpYGyxNwn
+         RgmP/UFuTIo6+AqSDR71wxFk4anXVEitvA1Ggvre3ObKdVFfbNVXAWJAfXPczB0Zt0r+
+         sqI4k3bOulwes5gH7cGUU5Nuw91afJmAXO2mwkgA2bZjSvcYyNCUVEH0g2m1isp2tK5Z
+         9bSyYcqbidNKrqcpufW0wwImIVaWzme2sQo4yjWHetsWgyzB6SolI40aNKagtB6l27j/
+         ZocA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=On7E7zmLSRgJj9Ttl1gLhH57uyxxO3PDcMqtYU/ZX3A=;
+        b=fBps6dQCbTfl0wNkHDUHCI5Mg8ivyLWpha5zbIhQSdBEX/0e6askYd2kMrhGheVbFY
+         rqooEGEfgNhmsG344mpHeb6BtZy4O/RHhG3q/QCpjVlnyrB2Vma+ZRfWGlL89ebweJpE
+         170KFLDvjwX5qvT+E5QFL8odAbBh3ab3eIsnCPfRqheuEEzk7bjieS7rnUOYTOcgCLzl
+         2rmwWeXNbqxfpa8E38RKpyssehwRnZzHE9XlV+fyB7gCHYoYFfW/LbxeDdUwD2GbjVC2
+         X9AYAFJ0X77qhw7lBZHX+Mvp8v0sAar3Spbch3t4bzeoPLOSiAyqNcBjJYYPsJhMcknu
+         7abA==
+X-Gm-Message-State: APjAAAU2DegaufORrW1Z2N8ODfFKv4G6a+yVESCF0Xcvncjrp4Uguvne
+        utO7OhrFi+4oCChndOaZx6lGM7yb
+X-Google-Smtp-Source: APXvYqysEiwTEoKS6WXujqPEY+h+jIj4Y7EPTe8opfIL0Wz6ucLZLbcZCZDZnoYc5R9JgXPTEzT5DA==
+X-Received: by 2002:a17:90a:ad93:: with SMTP id s19mr1033613pjq.36.1560770692765;
+        Mon, 17 Jun 2019 04:24:52 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+        by smtp.googlemail.com with ESMTPSA id d4sm12535751pfc.149.2019.06.17.04.24.50
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Mon, 17 Jun 2019 04:24:52 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Subject: [PATCH v4 0/5] KVM: LAPIC: Implement Exitless Timer
+Date:   Mon, 17 Jun 2019 19:24:42 +0800
+Message-Id: <1560770687-23227-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-In-Reply-To: <e78a9798-cce3-a360-37c3-0ad359944b85@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zenghui,
+Dedicated instances are currently disturbed by unnecessary jitter due 
+to the emulated lapic timers fire on the same pCPUs which vCPUs resident.
+There is no hardware virtual timer on Intel for guest like ARM. Both 
+programming timer in guest and the emulated timer fires incur vmexits.
+This patchset tries to avoid vmexit which is incurred by the emulated 
+timer fires in dedicated instance scenario. 
 
-On 13/06/2019 12:28, Zenghui Yu wrote:
-> On 2019/6/12 20:49, James Morse wrote:
->> On 12/06/2019 10:08, Zenghui Yu wrote:
->>> Currently, we use trace_kvm_exit() to report exception type (e.g.,
->>> "IRQ", "TRAP") and exception class (ESR_ELx's bit[31:26]) together.
->>> But hardware only saves the exit class to ESR_ELx on synchronous
->>> exceptions, not on asynchronous exceptions. When the guest exits
->>> due to external interrupts, we will get tracing output like:
->>>
->>>     "kvm_exit: IRQ: HSR_EC: 0x0000 (UNKNOWN), PC: 0xffff87259e30"
->>>
->>> Obviously, "HSR_EC" here is meaningless.
+When nohz_full is enabled in dedicated instances scenario, the unpinned 
+timer will be moved to the nearest busy housekeepers after commit
+9642d18eee2cd (nohz: Affine unpinned timers to housekeepers) and commit 
+444969223c8 ("sched/nohz: Fix affine unpinned timers mess"). However, 
+KVM always makes lapic timer pinned to the pCPU which vCPU residents, the 
+reason is explained by commit 61abdbe0 (kvm: x86: make lapic hrtimer 
+pinned). Actually, these emulated timers can be offload to the housekeeping 
+cpus since APICv is really common in recent years. The guest timer interrupt 
+is injected by posted-interrupt which is delivered by housekeeping cpu 
+once the emulated timer fires. 
 
->> I assume we do it this way so there is only one guest-exit tracepoint that catches all
->> exits.
->> I don't think its a problem if user-space has to know the EC isn't set for asynchronous
->> exceptions, this is a property of the architecture and anything using these trace-points
->> is already arch specific.
+The host admin should fine tuned, e.g. dedicated instances scenario w/ 
+nohz_full cover the pCPUs which vCPUs resident, several pCPUs surplus 
+for busy housekeeping, disable mwait/hlt/pause vmexits to keep in non-root  
+mode, ~3% redis performance benefit can be observed on Skylake server.
 
-> Actually, *no* problem in current implementation, and I'm OK to still
-> keep the EC in trace_kvm_exit().  What I really want to do is adding the
-> EC in trace_trap_enter (the new tracepoint), will explain it later.
+w/o patchset:
 
+            VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time   Avg time
 
->>> This patch splits "exit" and "trap" events by adding two tracepoints
->>> explicitly in handle_trap_exceptions(). Let trace_kvm_exit() report VM
->>> exit events, and trace_kvm_trap_exit() report VM trap events.
->>>
->>> These tracepoints are adjusted also in preparation for supporting
->>> 'perf kvm stat' on arm64.
->>
->> Because the existing tracepoints are ABI, I don't think we can change them.
->>
->> We can add new ones if there is something that a user reasonably needs to trace, and can't
->> be done any other way.
->>
->> What can't 'perf kvm stat' do with the existing trace points?
+EXTERNAL_INTERRUPT    42916    49.43%   39.30%   0.47us   106.09us   0.71us ( +-   1.09% )
 
-> First, how does 'perf kvm stat' interact with tracepoints?
+w/ patchset:
 
-Start at the beginning, good idea. (I've never used this thing!)
+            VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time         Avg time
 
+EXTERNAL_INTERRUPT    6871     9.29%     2.96%   0.44us    57.88us   0.72us ( +-   4.02% )
 
-> We have three handlers for a specific event (e.g., "VM-EXIT") --
-> "is_begin_event", "is_end_event", "decode_key". The first two handlers
-> make use of two existing tracepoints ("kvm:kvm_exit" & "kvm:kvm_entry")
-> to check when the VM-EXIT events started/ended, thus the time difference
-> stats, event start/end time etc. can be calculated.
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Cc: Marcelo Tosatti <mtosatti@redhat.com>
 
-> "is_begin_event" handler gets a *key* from the "ret" field (exit_code)
-> of "kvm:kvm_exit" payload, and "decode_key" handler makes use of the
-> *key* to find out the reason for the VM-EXIT event. Of course we should
-> maintain the mapping between exit_code and exit_reason in userspace.
+v3 -> v4:
+ * drop the HRTIMER_MODE_ABS_PINNED, add kick after set pending timer
+ * don't posted inject already-expired timer
 
-Interpreting 'ret' is going to get tricky if we change those values on a whim. Its
-internal to the KVM arch code.
+v2 -> v3:
+ * disarming the vmx preemption timer when posted_interrupt_inject_timer_enabled()
+ * check kvm_hlt_in_guest instead
 
+v1 -> v2:
+ * check vcpu_halt_in_guest
+ * move module parameter from kvm-intel to kvm
+ * add housekeeping_enabled
+ * rename apic_timer_expired_pi to kvm_apic_inject_pending_timer_irqs
 
-> These are all what *patch #4* had done, #4 is a simple patch to review!
+Wanpeng Li (5):
+  KVM: LAPIC: Make lapic timer unpinned
+  KVM: LAPIC: inject lapic timer interrupt by posted interrupt
+  KVM: LAPIC: Ignore timer migration when lapic timer is injected by pi
+  KVM: LAPIC: Don't posted inject already-expired timer
+  KVM: LAPIC: add advance timer support to pi_inject_timer
 
-> Oh, we can also set "vcpu_id_str" to achieve per vcpu event record, but
-> currently, we only have the "vcpu_pc" field in "kvm:kvm_entry", without
-> something like "vcpu_id".
+ arch/x86/kvm/lapic.c            | 62 ++++++++++++++++++++++++++++-------------
+ arch/x86/kvm/lapic.h            |  3 +-
+ arch/x86/kvm/svm.c              |  2 +-
+ arch/x86/kvm/vmx/vmx.c          |  5 ++--
+ arch/x86/kvm/x86.c              | 11 ++++----
+ arch/x86/kvm/x86.h              |  2 ++
+ include/linux/sched/isolation.h |  2 ++
+ kernel/sched/isolation.c        |  6 ++++
+ 8 files changed, 64 insertions(+), 29 deletions(-)
 
-Heh, so from the trace-point data, you can't know which on is vcpu-0 and which is vcpu-1.
+-- 
+2.7.4
 
-
-> OK, next comes the more important question - what should/can we do to
-> the tracepoints in preparation of 'perf kvm stat' on arm64?
-> 
-> From the article you've provided, it's clear that we can't remove the EC
-> from trace_kvm_exit(). But can we add something like "vcpu_id" into
-> (at least) trace_kvm_entry(), just like what this patch has done?
-
-Adding something is still likely to break a badly written user-space that is trying to
-parse the trace information. A regex picking out the last argument will now get a
-different value.
-
-
-> If not, which means we have to keep the existing tracepoints totally
-> unchanged, then 'perf kvm stat' will have no way to record/report per
-> vcpu VM-EXIT events (other arch like X86, powerpc, s390 etc. have this
-> capability, if I understand it correctly).
-
-Well, you get the events, but you don't know which vCPU is which. You can map this back to
-the pid of the host thread assuming user-space isn't moving vcpu between host threads.
-
-If we're really stuck: Adding tracepoints to KVM-core's vcpu get/put, that export the
-vcpu_id would let you map pid->vcpu_id, which you can then use for the batch of enter/exit
-events that come before a final vcpu put.
-grepping "vpu_id" shows perf has a mapping for which arch-specific argument in enter/exit
-is the vcpu-id. Done with this core-code mapping, you could drop that code...
-
-But I'd be a little nervous adding a new trace-point to work around an ABI problem, as we
-may have just moved the ABI problem! (What does a user of a vcpu_put tracepoint really need?)
-
-
-> As for TRAP events, should we consider adding two new tracepoints --
-> "kvm_trap_enter" and "kvm_trap_exit", to keep tracking of the trap
-> handling process? We should also record the EC in "kvm_trap_enter", which will be used as
-> *key* in TRAP event's "is_begin_event" handler.
-
-The EC can't change between trace_kvm_exit() and handle_exit(), so you already have this.
-
-What are the 'trap' trace points needed for? You get the timing and 'exception class' from
-the guest enter/exit tracepoints. What about handle_exit() can't you work out from this?
-
-
-> Patch #5 tells us the whole story, it's simple too.
-
-(I only skimmed the perf patches, I'll go back now that I know a little more about what
-you're doing)
-
-
-> What do you suggest?
-
-We can explore the vcpu_load()/vcpu_put() trace idea, (it may not work for some other
-reason). I'd like to understand what the 'trap' tracepoints are needed for.
-
-
-Thanks,
-
-James
