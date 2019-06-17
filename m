@@ -2,119 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D14548AFF
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 19:58:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8F4E48BB3
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 20:14:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728667AbfFQR6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jun 2019 13:58:39 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:54420 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728658AbfFQR6j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jun 2019 13:58:39 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HHrn7e137680;
-        Mon, 17 Jun 2019 17:57:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2018-07-02;
- bh=0RSntdRx6QqqhsqLWe/RLsVDuGaRBLAt8N9sd8tE1S4=;
- b=HzltViBkoKXPyI5dR4BHq1DuVsys/ffSnBvmKF006kBEtZwfdQI70LUJBhVeh6Sp7dD+
- /m7vxx0rFqGTIAv1BuT5yCK2h4EYPOU8oBQ4J8iaByUBFR4YneJAEtTSVZI/R4uKOvOg
- YnkjcpwJmLdO2j2I4UjOSBUyyEIqtUJiwfk7wAOZg7PVd942yE7PUL8JFLqrICi+nJRX
- fmOb1RjN2jDeDgHTODy9FzuDdTZfOxyPTk3NFOFgzV/vBAYHhPHEXNiKRUJj2TiHuN4E
- oMLoSIwd6XK9n7SWVao+I7Y2K4XB01Ry8t47S7OtcoahDceGScge7a8v3whe6FWCnhas cQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2t4r3tg0j0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 17 Jun 2019 17:57:49 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HHvhWB130990;
-        Mon, 17 Jun 2019 17:57:49 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2t59gdc0nw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 17 Jun 2019 17:57:49 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5HHvmdT017551;
-        Mon, 17 Jun 2019 17:57:48 GMT
-Received: from spark.ravello.local (/213.57.127.2)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 17 Jun 2019 10:57:48 -0700
-From:   Liran Alon <liran.alon@oracle.com>
-To:     qemu-devel@nongnu.org
-Cc:     pbonzini@redhat.com, mtosatti@redhat.com, rth@twiddle.net,
-        ehabkost@redhat.com, kvm@vger.kernel.org, jmattson@google.com,
-        maran.wilson@oracle.com, dgilbert@redhat.com,
-        Liran Alon <liran.alon@oracle.com>
-Subject: [QEMU PATCH v3 9/9] KVM: i386: Remove VMX migration blocker
-Date:   Mon, 17 Jun 2019 20:56:58 +0300
-Message-Id: <20190617175658.135869-10-liran.alon@oracle.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190617175658.135869-1-liran.alon@oracle.com>
-References: <20190617175658.135869-1-liran.alon@oracle.com>
+        id S1727145AbfFQSOj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jun 2019 14:14:39 -0400
+Received: from mga11.intel.com ([192.55.52.93]:40252 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726427AbfFQSOj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jun 2019 14:14:39 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jun 2019 11:07:46 -0700
+X-ExtLoop1: 1
+Received: from ray.jf.intel.com (HELO [10.7.201.126]) ([10.7.201.126])
+  by orsmga002.jf.intel.com with ESMTP; 17 Jun 2019 11:07:45 -0700
+Subject: Re: [RFC 00/10] Process-local memory allocations for hiding KVM
+ secrets
+To:     Nadav Amit <nadav.amit@gmail.com>,
+        Andy Lutomirski <luto@kernel.org>
+Cc:     Alexander Graf <graf@amazon.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marius Hillenbrand <mhillenb@amazon.de>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>,
+        Linux-MM <linux-mm@kvack.org>, Alexander Graf <graf@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>
+References: <20190612170834.14855-1-mhillenb@amazon.de>
+ <eecc856f-7f3f-ed11-3457-ea832351e963@intel.com>
+ <A542C98B-486C-4849-9DAC-2355F0F89A20@amacapital.net>
+ <alpine.DEB.2.21.1906141618000.1722@nanos.tec.linutronix.de>
+ <58788f05-04c3-e71c-12c3-0123be55012c@amazon.com>
+ <63b1b249-6bc7-ffd9-99db-d36dd3f1a962@intel.com>
+ <CALCETrXph3Zg907kWTn6gAsZVsPbCB3A2XuNf0hy5Ez2jm2aNQ@mail.gmail.com>
+ <698ca264-123d-46ae-c165-ed62ea149896@intel.com>
+ <CALCETrVt=X+FB2cM5hMN9okvbcROFfT4_KMwaKaN2YVvc7UQTw@mail.gmail.com>
+ <5AA8BF10-8987-4FCB-870C-667A5228D97B@gmail.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+Message-ID: <f6f352ed-750e-d735-a1c9-7ff133ca8aea@intel.com>
+Date:   Mon, 17 Jun 2019 11:07:45 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <5AA8BF10-8987-4FCB-870C-667A5228D97B@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=978
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906170161
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906170160
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This effectively reverts d98f26073beb ("target/i386: kvm: add VMX migration blocker").
-This can now be done because previous commits added support for Intel VMX migration.
+On 6/17/19 9:53 AM, Nadav Amit wrote:
+>>> For anyone following along at home, I'm going to go off into crazy
+>>> per-cpu-pgds speculation mode now...  Feel free to stop reading now. :)
+>>>
+>>> But, I was thinking we could get away with not doing this on _every_
+>>> context switch at least.  For instance, couldn't 'struct tlb_context'
+>>> have PGD pointer (or two with PTI) in addition to the TLB info?  That
+>>> way we only do the copying when we change the context.  Or does that tie
+>>> the implementation up too much with PCIDs?
+>> Hmm, that seems entirely reasonable.  I think the nasty bit would be
+>> figuring out all the interactions with PV TLB flushing.  PV TLB
+>> flushes already don't play so well with PCID tracking, and this will
+>> make it worse.  We probably need to rewrite all that code regardless.
+> How is PCID (as you implemented) related to TLB flushing of kernel (not
+> user) PTEs? These kernel PTEs would be global, so they would be invalidated
+> from all the address-spaces using INVLPG, I presume. No?
 
-AMD SVM migration is still blocked. This is because kernel
-KVM_CAP_{GET,SET}_NESTED_STATE in case of AMD SVM is not
-implemented yet. Therefore, required vCPU nested state is still
-missing in order to perform valid migration for vCPU exposed with SVM.
+The idea is that you have a per-cpu address space.  Certain kernel
+virtual addresses would map to different physical address based on where
+you are running.  Each of the physical addresses would be "owned" by a
+single CPU and would, by convention, never use a PGD that mapped an
+address unless that CPU that "owned" it.
 
-Signed-off-by: Liran Alon <liran.alon@oracle.com>
----
- target/i386/kvm.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 797f8ac46435..772c8619efc4 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -948,7 +948,7 @@ static int hyperv_init_vcpu(X86CPU *cpu)
- }
- 
- static Error *invtsc_mig_blocker;
--static Error *nested_virt_mig_blocker;
-+static Error *svm_mig_blocker;
- 
- #define KVM_MAX_CPUID_ENTRIES  100
- 
-@@ -1313,13 +1313,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
-                                   !!(c->ecx & CPUID_EXT_SMX);
-     }
- 
--    if (cpu_has_nested_virt(env) && !nested_virt_mig_blocker) {
--        error_setg(&nested_virt_mig_blocker,
--                   "Nested virtualization does not support live migration yet");
--        r = migrate_add_blocker(nested_virt_mig_blocker, &local_err);
-+    if (cpu_has_svm(env) && !svm_mig_blocker) {
-+        error_setg(&svm_mig_blocker,
-+                   "AMD SVM does not support live migration yet");
-+        r = migrate_add_blocker(svm_mig_blocker, &local_err);
-         if (local_err) {
-             error_report_err(local_err);
--            error_free(nested_virt_mig_blocker);
-+            error_free(svm_mig_blocker);
-             return r;
-         }
-     }
--- 
-2.20.1
-
+In that case, you never really invalidate those addresses.
