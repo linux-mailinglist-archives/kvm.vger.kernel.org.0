@@ -2,121 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 76A7C48976
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 18:57:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E9E74899B
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 19:05:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728467AbfFQQ5u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jun 2019 12:57:50 -0400
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:42240 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726005AbfFQQ5u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jun 2019 12:57:50 -0400
-Received: by mail-vs1-f65.google.com with SMTP id 190so6569781vsf.9
-        for <kvm@vger.kernel.org>; Mon, 17 Jun 2019 09:57:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=retltkRYeaxJ6adF3YGzOCqdGSJ+TnMcYlKByHm/5DU=;
-        b=HM9XZcRH7jNoUwKtDn/wkkMYYyg9wr6zjYQcvYAYvWF5M1tzrgs41DdFiwwTgvt1O5
-         KjOS0GHXaKxXHbuqb3yaHFY6s5m+GgG8jbRV5AKURRu+BUwOFgp4r3kAue00v9koQG1w
-         A3M5l+cF/ibNvE8yJCY4E6+A4Wcv9UTKgrtukbJgSFBngoBXKyC/nUsbJSqEshzxgU7v
-         OjkzG8cTM1db0z9+CHPRCzJf6yJOwQUirXZIKRWYCQ5D1XOdgX6CDWUq7ZrKtG2PzpGN
-         +3DiSEl9lQXDncbHpzuwreL+mokGyGGK7aL+x6DR/HBeGpJarIMjtc91XuMaEVI3t0qt
-         MUIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=retltkRYeaxJ6adF3YGzOCqdGSJ+TnMcYlKByHm/5DU=;
-        b=Jwfh2KxruZ9t8/dstnMOU8B9lgsuC1cTm9cQHPqc8LCXkW3MCy0tJBZ+LT5Lr6j+xc
-         dqw1trMswKvrofu44y8h7PBSpqiK644mSxjdzzHj0jRp+jNKM3b3BTqjFz8UymbSLRKd
-         7XR2cz0u2rsJUBgS1FSB6sbFDb+40oeLpIhx1q0HbmDFRsVh0q2K4X09xT/OnS+4CX6G
-         SIxsngamg/Eg7Q5i07Vh8Pl3en60iQ8i2nQOrtXaBLNg1KxcK6antK/05sC1hv5KFJam
-         xCS7GDbqvf+Nyu38UyP1bnFnxdkY4ruDQmL0TrMNROjU8XHkuYPiPVS1PUlAI/1RQSNR
-         FH3w==
-X-Gm-Message-State: APjAAAVRL8ydMLSRR/4qfHi6k8LdZNXnY2zbkxYUziWe5VEiZMhBNQN8
-        km5SQRYXGJtiC8yJHEeMzCegHM/wbXhJW7Bw0HP+vA==
-X-Google-Smtp-Source: APXvYqzrhGSVJ7DV/F7d51q9N5ZE/3Gdj+PUpdVhrLQtXpA774FgTPlA9JMz0E4zBMsomoYTx9It+Pl+lwBwRCw5EpI=
-X-Received: by 2002:a67:de99:: with SMTP id r25mr60881073vsk.215.1560790668543;
- Mon, 17 Jun 2019 09:57:48 -0700 (PDT)
+        id S1727936AbfFQRFW convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 17 Jun 2019 13:05:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48030 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725863AbfFQRFV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jun 2019 13:05:21 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E62D83084243;
+        Mon, 17 Jun 2019 17:05:20 +0000 (UTC)
+Received: from x1.home (ovpn-116-190.phx2.redhat.com [10.3.116.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 01ABE6728B;
+        Mon, 17 Jun 2019 17:05:17 +0000 (UTC)
+Date:   Mon, 17 Jun 2019 11:05:17 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Libvirt Devel <libvir-list@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Erik Skultety <eskultet@redhat.com>,
+        Pavel Hrdina <phrdina@redhat.com>,
+        Sylvain Bauza <sbauza@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: mdevctl: A shoestring mediated device management and
+ persistence utility
+Message-ID: <20190617110517.353b4f16@x1.home>
+In-Reply-To: <20190617151030.GG3380@redhat.com>
+References: <20190523172001.41f386d8@x1.home>
+        <20190617140000.GA2021@redhat.com>
+        <20190617085438.07607e8b@x1.home>
+        <20190617151030.GG3380@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <cover.1560339705.git.andreyknvl@google.com> <a7a2933bea5fe57e504891b7eec7e9432e5e1c1a.1560339705.git.andreyknvl@google.com>
- <20190617135636.GC1367@arrakis.emea.arm.com>
-In-Reply-To: <20190617135636.GC1367@arrakis.emea.arm.com>
-From:   Evgenii Stepanov <eugenis@google.com>
-Date:   Mon, 17 Jun 2019 09:57:36 -0700
-Message-ID: <CAFKCwrjJ+0ijNKa3ioOP7xa91QmZU0NhkO=tNC-Q_ThC69vTug@mail.gmail.com>
-Subject: Re: [PATCH v17 03/15] arm64: Introduce prctl() options to control the
- tagged user addresses ABI
-To:     Catalin Marinas <catalin.marinas@arm.com>
-Cc:     Andrey Konovalov <andreyknvl@google.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Mon, 17 Jun 2019 17:05:20 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 17, 2019 at 6:56 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
->
-> On Wed, Jun 12, 2019 at 01:43:20PM +0200, Andrey Konovalov wrote:
-> > From: Catalin Marinas <catalin.marinas@arm.com>
-> >
-> > It is not desirable to relax the ABI to allow tagged user addresses into
-> > the kernel indiscriminately. This patch introduces a prctl() interface
-> > for enabling or disabling the tagged ABI with a global sysctl control
-> > for preventing applications from enabling the relaxed ABI (meant for
-> > testing user-space prctl() return error checking without reconfiguring
-> > the kernel). The ABI properties are inherited by threads of the same
-> > application and fork()'ed children but cleared on execve().
-> >
-> > The PR_SET_TAGGED_ADDR_CTRL will be expanded in the future to handle
-> > MTE-specific settings like imprecise vs precise exceptions.
-> >
-> > Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
->
-> A question for the user-space folk: if an application opts in to this
-> ABI, would you want the sigcontext.fault_address and/or siginfo.si_addr
-> to contain the tag? We currently clear it early in the arm64 entry.S but
-> we could find a way to pass it down if needed.
+On Mon, 17 Jun 2019 16:10:30 +0100
+Daniel P. Berrangé <berrange@redhat.com> wrote:
 
-For HWASan this would not be useful because we instrument memory
-accesses with explicit checks anyway. For MTE, on the other hand, it
-would be very convenient to know the fault address tag without
-disassembling the code.
+> On Mon, Jun 17, 2019 at 08:54:38AM -0600, Alex Williamson wrote:
+> > On Mon, 17 Jun 2019 15:00:00 +0100
+> > Daniel P. Berrangé <berrange@redhat.com> wrote:
+> >   
+> > > On Thu, May 23, 2019 at 05:20:01PM -0600, Alex Williamson wrote:  
+> > > > Hi,
+> > > > 
+> > > > Currently mediated device management, much like SR-IOV VF management,
+> > > > is largely left as an exercise for the user.  This is an attempt to
+> > > > provide something and see where it goes.  I doubt we'll solve
+> > > > everyone's needs on the first pass, but maybe we'll solve enough and
+> > > > provide helpers for the rest.  Without further ado, I'll point to what
+> > > > I have so far:
+> > > > 
+> > > > https://github.com/awilliam/mdevctl
+> > > > 
+> > > > This is inspired by driverctl, which is also a bash utility.  mdevctl
+> > > > uses udev and systemd to record and recreate mdev devices for
+> > > > persistence and provides a command line utility for querying, listing,
+> > > > starting, stopping, adding, and removing mdev devices.  Currently, for
+> > > > better or worse, it considers anything created to be persistent.  I can
+> > > > imagine a global configuration option that might disable this and
+> > > > perhaps an autostart flag per mdev device, such that mdevctl might
+> > > > simply "know" about some mdevs but not attempt to create them
+> > > > automatically.  Clearly command line usage help, man pages, and
+> > > > packaging are lacking as well, release early, release often, plus this
+> > > > is a discussion starter to see if perhaps this is sufficient to meet
+> > > > some needs.    
+> > > 
+> > > I think from libvirt's POV, we would *not* want devices to be made
+> > > unconditionally persistent. We usually wish to expose a choice to
+> > > applications whether to have resources be transient or persistent.
+> > > 
+> > > So from that POV, a global config option to turn off persistence
+> > > is not workable either. We would want control per-device, with
+> > > autostart control per device too.  
+> > 
+> > The code has progressed somewhat in the past 3+ weeks, we still persist
+> > all devices, but the start-up mode can be selected per device or with a
+> > global default mode.  Devices configured with 'auto' start-up
+> > automatically while 'manual' devices are simply known and available to
+> > be started.  I imagine we could add a 'transient' mode where we purge
+> > the information about the device when it is removed or the next time
+> > the parent device is added.  
+> 
+> Having a pesistent config written out & then purged later is still
+> problematic. If the host crashes, nothing will purge the config file,
+> so it will become a persistent device. Also when listing devices we
+> want to be able to report whether it is persistent or transient. The
+> obvious way todo that is to simply look if a config file exists or
+> not.
+
+I was thinking that the config file would identify the device as
+transient, therefore if the system crashed we'd have the opportunity to
+purge those entries on the next boot as we're processing the entries
+for that parent device.  Clearly it has yet to be implemented, but I
+expect there are some advantages to tracking devices via a transient
+config entry or else we're constantly re-discovering foreign mdevs.
+
+> > > I would simply get rid of the udev rule that magically persists
+> > > stuff. Any person/tool using sysfs right now expects devices to
+> > > be transient. If they want to have persistence they can stop using
+> > > sysfs & use higher level tools directly.  
+> > 
+> > I think it's an interesting feature, but it's easy enough to control
+> > via a global option in sysconfig with the default off if it's seen as
+> > overstepping.  
+> 
+> A global option is really not desirable, as it means that the behaviour
+> of the system that libvirt sees can silently change at any time. IMHO
+> this udev hook is  intermixing the two layers in the stack - keep the
+> low level sysfs layer completely separate from the higher level mgmt
+> concepts provided by this mdevctrl.
+
+It seems like it just means that libvirt needs to be explicit such that
+it doesn't rely on a global preference, ex. always using a --transient
+option.
+
+> > > > Originally I thought about making a utility to manage both mdev and
+> > > > SR-IOV VFs all in one, but it seemed more natural to start here
+> > > > (besides, I couldn't think of a good name for the combined utility).
+> > > > If this seems useful, maybe I'll start on a vfctl for SR-IOV and we'll
+> > > > see whether they have enough synergy to become one.    
+> > > 
+> > > [snip]
+> > >   
+> > > > I'm also curious how or if libvirt or openstack might use this.  If
+> > > > nothing else, it makes libvirt hook scripts easier to write, especially
+> > > > if we add an option not to autostart mdevs, or if users don't mind
+> > > > persistent mdevs, maybe there's nothing more to do.    
+> > > 
+> > > We currently have an API for creating host devices in libvirt which
+> > > we use for NPIV devices only, which is where we'd like to put mdev
+> > > creation support.  This API is for creating transient devices
+> > > though, so we don't want anything created this way to magically
+> > > become persistent.
+> > > 
+> > > For persistence we'd create a new API in libvirt allowing you to
+> > > define & undefine the persistent config for a devices, and another
+> > > set of APIs to create/delete from the persistent config.
+> > > 
+> > > As a general rule, libvirt would prefer to use an API rather than
+> > > spawning external commands, but can live with either.  
+> 
+> Thinking some more, the key tasks that libvirt needs to deal
+> with are
+> 
+>  1. Define a persistent config (Must not create any actual device)
+>  2. Undefine a persistent config (Must not delete any actual device)
+>  3. Create a device
+>  4. Delete a device
+>  5. Get list of all persistent configs
+>  6. Enable autostart of a device
+>  7. Disable autostart of a device
+> 
+> For 1, 2, 5, 6 & 7 libvirt doesn't really need a command line tool. As
+> long as there is a specification for the config file syntax and location
+> we can directly read/write/stat files. This would be much more efficient
+> and reliable for libvirt than spawning commands & parsing the output or
+> exit status.
+
+True, but if the roles were reversed, would libvirt be as eager to have
+another tool writing into a config directory that it manages?  It's
+relatively harmless now, but it might set a bad precedent and lock us
+into config file formats that could otherwise be managed once at
+package upgrade time.
+
+> For 3 & 4 we'd desire the command to accept a config file, either as a
+> file on disk for persistent devices, or inline on stdin for transient
+> devices.
+> 
+> > > There's also the question of systemd integration - so far everything
+> > > in libvirt still works on non-systemd based distros, but this new
+> > > tool looks like it requires systemd.  Personally I'm not too bothered
+> > > by this but others might be more concerned.  
+> > 
+> > Yes, Pavel brought up this issue offline as well and it needs more
+> > consideration.  The systemd support still needs work as well, I've
+> > discovered it gets very confused when the mdev device is removed
+> > outside of mdevctl, but I haven't yet been able to concoct a BindsTo=
+> > line that can handle the hyphens in the uuid device name.  I'd say
+> > mdevctl is not intentionally systemd specific, it's simply a byproduct
+> > of the systems it was developed on.  Also, if libvirt were to focus
+> > only on transient devices, then startup via systemctl doesn't make
+> > sense, which probably means stopping via systemctl would also be unused
+> > by libvirt.  So I think this means we just need to make systemd an
+> > optional feature of mdevctl (or drop it) and if libvirt doesn't use it,
+> > that's fine.  Thanks,  
+> 
+> I actually think the systemd integration is good, we just need to
+> make sure things are still doable without it. This could be as simple
+> as having an initscript that just iteates over the configs creating
+> each one at startup.
+
+Ok, thanks,
+
+Alex
