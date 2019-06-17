@@ -2,99 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id ED6DE47892
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 05:14:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3B7D478AC
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 05:33:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727506AbfFQDOe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 Jun 2019 23:14:34 -0400
-Received: from mga03.intel.com ([134.134.136.65]:11096 "EHLO mga03.intel.com"
+        id S1727637AbfFQDc7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 Jun 2019 23:32:59 -0400
+Received: from mga11.intel.com ([192.55.52.93]:12378 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727383AbfFQDOe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 16 Jun 2019 23:14:34 -0400
+        id S1727518AbfFQDc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 Jun 2019 23:32:59 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jun 2019 20:14:33 -0700
-X-ExtLoop1: 1
-Received: from khuang2-desk.gar.corp.intel.com ([10.255.91.82])
-  by fmsmga004.fm.intel.com with ESMTP; 16 Jun 2019 20:14:30 -0700
-Message-ID: <1560741269.5187.7.camel@linux.intel.com>
-Subject: Re: [PATCH, RFC 49/62] mm, x86: export several MKTME variables
-From:   Kai Huang <kai.huang@linux.intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Andy Lutomirski <luto@amacapital.net>,
-        David Howells <dhowells@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Alison Schofield <alison.schofield@intel.com>,
-        linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Mon, 17 Jun 2019 15:14:29 +1200
-In-Reply-To: <20190614115647.GI3436@hirez.programming.kicks-ass.net>
-References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
-         <20190508144422.13171-50-kirill.shutemov@linux.intel.com>
-         <20190614115647.GI3436@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
-Mime-Version: 1.0
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jun 2019 20:32:58 -0700
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.123]) ([10.239.13.123])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 16 Jun 2019 20:32:56 -0700
+Subject: Re: [PATCH RESEND v3 2/3] KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
+To:     Tao Xu <tao3.xu@intel.com>, pbonzini@redhat.com,
+        rkrcmar@redhat.com, corbet@lwn.net, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        sean.j.christopherson@intel.com, fenghua.yu@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        jingqi.liu@intel.com
+References: <20190616095555.20978-1-tao3.xu@intel.com>
+ <20190616095555.20978-3-tao3.xu@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+Message-ID: <d99b2ae1-38fc-0b71-2613-8131decc923a@intel.com>
+Date:   Mon, 17 Jun 2019 11:32:54 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <20190616095555.20978-3-tao3.xu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2019-06-14 at 13:56 +0200, Peter Zijlstra wrote:
-> On Wed, May 08, 2019 at 05:44:09PM +0300, Kirill A. Shutemov wrote:
-> > From: Kai Huang <kai.huang@linux.intel.com>
-> > 
-> > KVM needs those variables to get/set memory encryption mask.
-> > 
-> > Signed-off-by: Kai Huang <kai.huang@linux.intel.com>
-> > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> > ---
-> >  arch/x86/mm/mktme.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/arch/x86/mm/mktme.c b/arch/x86/mm/mktme.c
-> > index df70651816a1..12f4266cf7ea 100644
-> > --- a/arch/x86/mm/mktme.c
-> > +++ b/arch/x86/mm/mktme.c
-> > @@ -7,13 +7,16 @@
-> >  
-> >  /* Mask to extract KeyID from physical address. */
-> >  phys_addr_t mktme_keyid_mask;
-> > +EXPORT_SYMBOL_GPL(mktme_keyid_mask);
-> >  /*
-> >   * Number of KeyIDs available for MKTME.
-> >   * Excludes KeyID-0 which used by TME. MKTME KeyIDs start from 1.
-> >   */
-> >  int mktme_nr_keyids;
-> > +EXPORT_SYMBOL_GPL(mktme_nr_keyids);
-> >  /* Shift of KeyID within physical address. */
-> >  int mktme_keyid_shift;
-> > +EXPORT_SYMBOL_GPL(mktme_keyid_shift);
-> >  
-> >  DEFINE_STATIC_KEY_FALSE(mktme_enabled_key);
-> >  EXPORT_SYMBOL_GPL(mktme_enabled_key);
+
+
+On 6/16/2019 5:55 PM, Tao Xu wrote:
+> UMWAIT and TPAUSE instructions use IA32_UMWAIT_CONTROL at MSR index E1H
+> to determines the maximum time in TSC-quanta that the processor can reside
+> in either C0.1 or C0.2.
 > 
-> NAK, don't export variables. Who owns the values, who enforces this?
+> This patch emulates MSR IA32_UMWAIT_CONTROL in guest and differentiate
+> IA32_UMWAIT_CONTROL between host and guest. The variable
+> mwait_control_cached in arch/x86/power/umwait.c caches the MSR value, so
+> this patch uses it to avoid frequently rdmsr of IA32_UMWAIT_CONTROL.
 > 
+> Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
+> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> ---
+>   arch/x86/kvm/vmx/vmx.c  | 36 ++++++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/vmx.h  |  3 +++
+>   arch/x86/power/umwait.c |  3 ++-
+>   3 files changed, 41 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index b35bfac30a34..f33a25e82cb8 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1679,6 +1679,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   #endif
+>   	case MSR_EFER:
+>   		return kvm_get_msr_common(vcpu, msr_info);
+> +	case MSR_IA32_UMWAIT_CONTROL:
+> +		if (!vmx_waitpkg_supported())
+> +			return 1;
+> +
+> +		msr_info->data = vmx->msr_ia32_umwait_control;
+> +		break;
+>   	case MSR_IA32_SPEC_CTRL:
+>   		if (!msr_info->host_initiated &&
+>   		    !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
+> @@ -1841,6 +1847,15 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   			return 1;
+>   		vmcs_write64(GUEST_BNDCFGS, data);
+>   		break;
+> +	case MSR_IA32_UMWAIT_CONTROL:
+> +		if (!vmx_waitpkg_supported())
+> +			return 1;
+> +
+> +		if (!data)
+> +			break;
+> +
 
-Both KVM and IOMMU driver need page_keyid() and mktme_keyid_shift to set page's keyID to the right
-place in the PTE (of KVM EPT and VT-d DMA page table).
+Why cannot clear it to zero?
 
-MKTME key type code need to know mktme_nr_keyids in order to alloc/free keyID.
+> +		vmx->msr_ia32_umwait_control = data;
+> +		break;
+>   	case MSR_IA32_SPEC_CTRL:
+>   		if (!msr_info->host_initiated &&
+>   		    !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
+> @@ -4126,6 +4141,8 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>   	vmx->rmode.vm86_active = 0;
+>   	vmx->spec_ctrl = 0;
+>   
+> +	vmx->msr_ia32_umwait_control = 0;
+> +
+>   	vcpu->arch.microcode_version = 0x100000000ULL;
+>   	vmx->vcpu.arch.regs[VCPU_REGS_RDX] = get_rdx_init_val();
+>   	kvm_set_cr8(vcpu, 0);
+> @@ -6339,6 +6356,23 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
+>   					msrs[i].host, false);
+>   }
+>   
+> +static void atomic_switch_ia32_umwait_control(struct vcpu_vmx *vmx)
+> +{
+> +	u64 host_umwait_control;
+> +
+> +	if (!vmx_waitpkg_supported())
+> +		return;
+> +
+> +	host_umwait_control = umwait_control_cached;
+> +
 
-Maybe better to introduce functions instead of exposing variables directly?
+It's redundant to define host_umwait_control and this line, we can just 
+use umwait_control_cached.
 
-Or instead of introducing page_keyid(), we use page_encrypt_mask(), which essentially holds
-"page_keyid() << mktme_keyid_shift"?
+> +	if (vmx->msr_ia32_umwait_control != host_umwait_control)
+> +		add_atomic_switch_msr(vmx, MSR_IA32_UMWAIT_CONTROL,
+> +				      vmx->msr_ia32_umwait_control,
+> +				      host_umwait_control, false);
 
-Thanks,
--Kai
+The bit 1 is reserved, at least, we need to do below to ensure not 
+modifying the reserved bit:
+
+	guest_val = (vmx->msr_ia32_umwait_control & ~BIT_ULL(1)) |
+		    (host_val & BIT_ULL(1))
+
+> +	else
+> +		clear_atomic_switch_msr(vmx, MSR_IA32_UMWAIT_CONTROL);
+> +}
+> +
+>   static void vmx_arm_hv_timer(struct vcpu_vmx *vmx, u32 val)
+>   {
+>   	vmcs_write32(VMX_PREEMPTION_TIMER_VALUE, val);
+> @@ -6447,6 +6481,8 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+>   
+>   	atomic_switch_perf_msrs(vmx);
+>   
+> +	atomic_switch_ia32_umwait_control(vmx);
+> +
+>   	vmx_update_hv_timer(vcpu);
+>   
+>   	/*
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index 61128b48c503..8485bec7c38a 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -14,6 +14,8 @@
+>   extern const u32 vmx_msr_index[];
+>   extern u64 host_efer;
+>   
+> +extern u32 umwait_control_cached;
+> +
+>   #define MSR_TYPE_R	1
+>   #define MSR_TYPE_W	2
+>   #define MSR_TYPE_RW	3
+> @@ -194,6 +196,7 @@ struct vcpu_vmx {
+>   #endif
+>   
+>   	u64		      spec_ctrl;
+> +	u64		      msr_ia32_umwait_control;
+>   
+>   	u32 vm_entry_controls_shadow;
+>   	u32 vm_exit_controls_shadow;
+> diff --git a/arch/x86/power/umwait.c b/arch/x86/power/umwait.c
+> index 7fa381e3fd4e..2e6ce4cbccb3 100644
+> --- a/arch/x86/power/umwait.c
+> +++ b/arch/x86/power/umwait.c
+> @@ -9,7 +9,8 @@
+>    * MSR value. By default, umwait max time is 100000 in TSC-quanta and C0.2
+>    * is enabled
+>    */
+> -static u32 umwait_control_cached = 100000;
+> +u32 umwait_control_cached = 100000;
+> +EXPORT_SYMBOL_GPL(umwait_control_cached);
+>   
+>   /*
+>    * Serialize access to umwait_control_cached and IA32_UMWAIT_CONTROL MSR
+> 
