@@ -2,37 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C3B7D478AC
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 05:33:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9DEA478B4
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 05:39:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727637AbfFQDc7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 16 Jun 2019 23:32:59 -0400
-Received: from mga11.intel.com ([192.55.52.93]:12378 "EHLO mga11.intel.com"
+        id S1727678AbfFQDjJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 16 Jun 2019 23:39:09 -0400
+Received: from mga14.intel.com ([192.55.52.115]:28077 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727518AbfFQDc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 16 Jun 2019 23:32:59 -0400
+        id S1727625AbfFQDjJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 16 Jun 2019 23:39:09 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jun 2019 20:32:58 -0700
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jun 2019 20:39:08 -0700
 Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.123]) ([10.239.13.123])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 16 Jun 2019 20:32:56 -0700
-Subject: Re: [PATCH RESEND v3 2/3] KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
-To:     Tao Xu <tao3.xu@intel.com>, pbonzini@redhat.com,
-        rkrcmar@redhat.com, corbet@lwn.net, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        sean.j.christopherson@intel.com, fenghua.yu@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jingqi.liu@intel.com
-References: <20190616095555.20978-1-tao3.xu@intel.com>
- <20190616095555.20978-3-tao3.xu@intel.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-Message-ID: <d99b2ae1-38fc-0b71-2613-8131decc923a@intel.com>
-Date:   Mon, 17 Jun 2019 11:32:54 +0800
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 16 Jun 2019 20:39:05 -0700
+Subject: Re: [PATCH v3 2/2] target/i386: Add support for save/load
+ IA32_UMWAIT_CONTROL MSR
+To:     Tao Xu <tao3.xu@intel.com>, pbonzini@redhat.com, rth@twiddle.net,
+        ehabkost@redhat.com
+Cc:     cohuck@redhat.com, mst@redhat.com, mtosatti@redhat.com,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org, jingqi.liu@intel.com
+References: <20190616153525.27072-1-tao3.xu@intel.com>
+ <20190616153525.27072-3-tao3.xu@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@linux.intel.com>
+Message-ID: <94f9e831-38a0-3cc3-f566-6c8e5909d0fd@linux.intel.com>
+Date:   Mon, 17 Jun 2019 11:39:04 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190616095555.20978-3-tao3.xu@intel.com>
+In-Reply-To: <20190616153525.27072-3-tao3.xu@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -43,147 +42,138 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 6/16/2019 5:55 PM, Tao Xu wrote:
-> UMWAIT and TPAUSE instructions use IA32_UMWAIT_CONTROL at MSR index E1H
-> to determines the maximum time in TSC-quanta that the processor can reside
-> in either C0.1 or C0.2.
+On 6/16/2019 11:35 PM, Tao Xu wrote:
+> UMWAIT and TPAUSE instructions use IA32_UMWAIT_CONTROL at MSR index
+> E1H to determines the maximum time in TSC-quanta that the processor
+> can reside in either C0.1 or C0.2.
 > 
-> This patch emulates MSR IA32_UMWAIT_CONTROL in guest and differentiate
-> IA32_UMWAIT_CONTROL between host and guest. The variable
-> mwait_control_cached in arch/x86/power/umwait.c caches the MSR value, so
-> this patch uses it to avoid frequently rdmsr of IA32_UMWAIT_CONTROL.
+> This patch is to Add support for save/load IA32_UMWAIT_CONTROL MSR in
+> guest.
 > 
 > Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
 > Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
 > Signed-off-by: Tao Xu <tao3.xu@intel.com>
 > ---
->   arch/x86/kvm/vmx/vmx.c  | 36 ++++++++++++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/vmx.h  |  3 +++
->   arch/x86/power/umwait.c |  3 ++-
->   3 files changed, 41 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index b35bfac30a34..f33a25e82cb8 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1679,6 +1679,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   #endif
->   	case MSR_EFER:
->   		return kvm_get_msr_common(vcpu, msr_info);
-> +	case MSR_IA32_UMWAIT_CONTROL:
-> +		if (!vmx_waitpkg_supported())
-> +			return 1;
-> +
-> +		msr_info->data = vmx->msr_ia32_umwait_control;
-> +		break;
->   	case MSR_IA32_SPEC_CTRL:
->   		if (!msr_info->host_initiated &&
->   		    !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
-> @@ -1841,6 +1847,15 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   			return 1;
->   		vmcs_write64(GUEST_BNDCFGS, data);
->   		break;
-> +	case MSR_IA32_UMWAIT_CONTROL:
-> +		if (!vmx_waitpkg_supported())
-> +			return 1;
-> +
-> +		if (!data)
-> +			break;
-> +
-
-Why cannot clear it to zero?
-
-> +		vmx->msr_ia32_umwait_control = data;
-> +		break;
->   	case MSR_IA32_SPEC_CTRL:
->   		if (!msr_info->host_initiated &&
->   		    !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
-> @@ -4126,6 +4141,8 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->   	vmx->rmode.vm86_active = 0;
->   	vmx->spec_ctrl = 0;
+> no changes in v3:
+> ---
+>   target/i386/cpu.h     |  2 ++
+>   target/i386/kvm.c     | 13 +++++++++++++
+>   target/i386/machine.c | 20 ++++++++++++++++++++
+>   3 files changed, 35 insertions(+)
+> 
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index 2f7c57a3c2..eb98b2e54a 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -450,6 +450,7 @@ typedef enum X86Seg {
 >   
-> +	vmx->msr_ia32_umwait_control = 0;
-> +
->   	vcpu->arch.microcode_version = 0x100000000ULL;
->   	vmx->vcpu.arch.regs[VCPU_REGS_RDX] = get_rdx_init_val();
->   	kvm_set_cr8(vcpu, 0);
-> @@ -6339,6 +6356,23 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
->   					msrs[i].host, false);
->   }
+>   #define MSR_IA32_BNDCFGS                0x00000d90
+>   #define MSR_IA32_XSS                    0x00000da0
+> +#define MSR_IA32_UMWAIT_CONTROL         0xe1
 >   
-> +static void atomic_switch_ia32_umwait_control(struct vcpu_vmx *vmx)
+>   #define XSTATE_FP_BIT                   0
+>   #define XSTATE_SSE_BIT                  1
+> @@ -1348,6 +1349,7 @@ typedef struct CPUX86State {
+>       uint16_t fpregs_format_vmstate;
+>   
+>       uint64_t xss;
+> +    uint64_t umwait;
+>   
+>       TPRAccess tpr_access_type;
+>   } CPUX86State;
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 3efdb90f11..506c7cd038 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -91,6 +91,7 @@ static bool has_msr_hv_stimer;
+>   static bool has_msr_hv_frequencies;
+>   static bool has_msr_hv_reenlightenment;
+>   static bool has_msr_xss;
+> +static bool has_msr_umwait;
+>   static bool has_msr_spec_ctrl;
+>   static bool has_msr_virt_ssbd;
+>   static bool has_msr_smi_count;
+> @@ -1486,6 +1487,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+>                   case MSR_IA32_XSS:
+>                       has_msr_xss = true;
+>                       break;
+> +                case MSR_IA32_UMWAIT_CONTROL:
+> +                    has_msr_umwait = true;
+> +                    break;
+
+Need to add MSR_IA32_UMWAIT_CONTROL into msrs_to_save[] in your kvm 
+patches, otherwise qemu never goes into this case.
+
+>                   case HV_X64_MSR_CRASH_CTL:
+>                       has_msr_hv_crash = true;
+>                       break;
+> @@ -2023,6 +2027,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+>       if (has_msr_xss) {
+>           kvm_msr_entry_add(cpu, MSR_IA32_XSS, env->xss);
+>       }
+> +    if (has_msr_umwait) {
+> +        kvm_msr_entry_add(cpu, MSR_IA32_UMWAIT_CONTROL, env->umwait);
+> +    }
+>       if (has_msr_spec_ctrl) {
+>           kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, env->spec_ctrl);
+>       }
+> @@ -2416,6 +2423,9 @@ static int kvm_get_msrs(X86CPU *cpu)
+>       if (has_msr_xss) {
+>           kvm_msr_entry_add(cpu, MSR_IA32_XSS, 0);
+>       }
+> +    if (has_msr_umwait) {
+> +        kvm_msr_entry_add(cpu, MSR_IA32_UMWAIT_CONTROL, 0);
+> +    }
+>       if (has_msr_spec_ctrl) {
+>           kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, 0);
+>       }
+> @@ -2665,6 +2675,9 @@ static int kvm_get_msrs(X86CPU *cpu)
+>           case MSR_IA32_XSS:
+>               env->xss = msrs[i].data;
+>               break;
+> +        case MSR_IA32_UMWAIT_CONTROL:
+> +            env->umwait = msrs[i].data;
+> +            break;
+>           default:
+>               if (msrs[i].index >= MSR_MC0_CTL &&
+>                   msrs[i].index < MSR_MC0_CTL + (env->mcg_cap & 0xff) * 4) {
+> diff --git a/target/i386/machine.c b/target/i386/machine.c
+> index 4aff1a763f..db388b6b85 100644
+> --- a/target/i386/machine.c
+> +++ b/target/i386/machine.c
+> @@ -810,6 +810,25 @@ static const VMStateDescription vmstate_xss = {
+>       }
+>   };
+>   
+> +static bool umwait_needed(void *opaque)
 > +{
-> +	u64 host_umwait_control;
+> +    X86CPU *cpu = opaque;
+> +    CPUX86State *env = &cpu->env;
 > +
-> +	if (!vmx_waitpkg_supported())
-> +		return;
-> +
-> +	host_umwait_control = umwait_control_cached;
-> +
-
-It's redundant to define host_umwait_control and this line, we can just 
-use umwait_control_cached.
-
-> +	if (vmx->msr_ia32_umwait_control != host_umwait_control)
-> +		add_atomic_switch_msr(vmx, MSR_IA32_UMWAIT_CONTROL,
-> +				      vmx->msr_ia32_umwait_control,
-> +				      host_umwait_control, false);
-
-The bit 1 is reserved, at least, we need to do below to ensure not 
-modifying the reserved bit:
-
-	guest_val = (vmx->msr_ia32_umwait_control & ~BIT_ULL(1)) |
-		    (host_val & BIT_ULL(1))
-
-> +	else
-> +		clear_atomic_switch_msr(vmx, MSR_IA32_UMWAIT_CONTROL);
+> +    return env->umwait != 0;
 > +}
 > +
->   static void vmx_arm_hv_timer(struct vcpu_vmx *vmx, u32 val)
+> +static const VMStateDescription vmstate_umwait = {
+> +    .name = "cpu/umwait",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = umwait_needed,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT64(env.umwait, X86CPU),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>   #ifdef TARGET_X86_64
+>   static bool pkru_needed(void *opaque)
 >   {
->   	vmcs_write32(VMX_PREEMPTION_TIMER_VALUE, val);
-> @@ -6447,6 +6481,8 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
->   
->   	atomic_switch_perf_msrs(vmx);
->   
-> +	atomic_switch_ia32_umwait_control(vmx);
-> +
->   	vmx_update_hv_timer(vcpu);
->   
->   	/*
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 61128b48c503..8485bec7c38a 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -14,6 +14,8 @@
->   extern const u32 vmx_msr_index[];
->   extern u64 host_efer;
->   
-> +extern u32 umwait_control_cached;
-> +
->   #define MSR_TYPE_R	1
->   #define MSR_TYPE_W	2
->   #define MSR_TYPE_RW	3
-> @@ -194,6 +196,7 @@ struct vcpu_vmx {
->   #endif
->   
->   	u64		      spec_ctrl;
-> +	u64		      msr_ia32_umwait_control;
->   
->   	u32 vm_entry_controls_shadow;
->   	u32 vm_exit_controls_shadow;
-> diff --git a/arch/x86/power/umwait.c b/arch/x86/power/umwait.c
-> index 7fa381e3fd4e..2e6ce4cbccb3 100644
-> --- a/arch/x86/power/umwait.c
-> +++ b/arch/x86/power/umwait.c
-> @@ -9,7 +9,8 @@
->    * MSR value. By default, umwait max time is 100000 in TSC-quanta and C0.2
->    * is enabled
->    */
-> -static u32 umwait_control_cached = 100000;
-> +u32 umwait_control_cached = 100000;
-> +EXPORT_SYMBOL_GPL(umwait_control_cached);
->   
->   /*
->    * Serialize access to umwait_control_cached and IA32_UMWAIT_CONTROL MSR
+> @@ -1100,6 +1119,7 @@ VMStateDescription vmstate_x86_cpu = {
+>           &vmstate_msr_hyperv_reenlightenment,
+>           &vmstate_avx512,
+>           &vmstate_xss,
+> +        &vmstate_umwait,
+>           &vmstate_tsc_khz,
+>           &vmstate_msr_smi_count,
+>   #ifdef TARGET_X86_64
 > 
