@@ -2,154 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5524548095
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 13:26:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AC8E48093
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 13:26:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728299AbfFQLZO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jun 2019 07:25:14 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:46385 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728238AbfFQLZD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jun 2019 07:25:03 -0400
-Received: by mail-pl1-f194.google.com with SMTP id e5so3958048pls.13;
-        Mon, 17 Jun 2019 04:25:03 -0700 (PDT)
+        id S1728247AbfFQLZN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jun 2019 07:25:13 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:40620 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728206AbfFQLZE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jun 2019 07:25:04 -0400
+Received: by mail-ed1-f65.google.com with SMTP id k8so15642137eds.7
+        for <kvm@vger.kernel.org>; Mon, 17 Jun 2019 04:25:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=eZ65YD0TXsz73f/6tJ4mNuZ4ortjaWiCfb0XlT1C3No=;
-        b=KFvxApUFU2jdrMZzwG8zwoApYbxhCFl2Mf6kylnwmR52M3nhzDpwBQerTUtwucpC4i
-         tw5O/FQa7NacWVi9PtIQJkKDD4hx3Cs7mcBGOA+bskO8poMUZqurksWBWmSOhincrRki
-         Qg1v4HbnOjHi46J53/Q61koI8DgRbNm06jWuG3/9bKkByglgnFmTT8tsOmYg4JyTfVkH
-         9OhzPQ8SofIZqfQkExyMm0u7gAcI6YymOmLvrK6ySy52FdsmkGcuuzYMIBHcpSlIOz4k
-         0aA6bh7dx4R9pp8Pb0dCHgC82VBmm+VQ/9qt1hCWVWx+LffxM6UANrlYhSaxl/iJvk4d
-         +POQ==
+        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=9AwinP98tyRtHdg0mJkLa6bfVqgtL4TsktjuNz76Who=;
+        b=uV36HBJjLuM8IaSJ5lnIjDPz/NT6Ima0VTqA5XgxtXzYGLtD5Zk1oOFcZIOs5eNXNV
+         pH0NKGr3K5PIEFLdfJ4QY5MASu8ZolMiISb4+T5+hLkqTyBzPrnUDdx/hU3vjrgigEg5
+         XFnoHWLNGGyz/u66QlR4uui8QiQ+svYc42qDT7NRAQYv6KgqnNwvy4xSWlxjmoYgo9KT
+         ekxQsjh1gx+i56hFixjDbLIdHmzETZGZXB2016IB59YaBabg47ntq/77FeVXdTQW9Mw5
+         aQMao99SPvxYN97xvhncTxzUgIhypTKI32Gazqeb0JGoQgELhGOXdv5DquuY1RhnraGV
+         TZKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=eZ65YD0TXsz73f/6tJ4mNuZ4ortjaWiCfb0XlT1C3No=;
-        b=E/EgXR3wNbtAo6MFJ6yuU5IwXoVbnR3ANrH6V8YqU2grsN2HnIclpvGRmJOU3L2vLj
-         LcVjy2WPv2+fvsXYSbTcKyOg/pq56vSOl1s1BJuMk4TtyE7fARVh4FYAIrMvbxEvll2p
-         UqxLyA7a8iAVsfxAcuZty+3vk1J46E8Fd4SuKdxad+USafkWqaoOFvA7sMn/cmStGbJq
-         4BnchHfkeM+tr0v//9XO/UkgZsu7mOHEx0SFU2C6mhsQjHuEsvJYIu9uasQEgXQ7M29g
-         iDkYXn4BAr5gj/BSVYdx64jn/anwukLKLqmAr1MLp8Gb3L7SltXorous/Mcm7Wppisvb
-         3b3g==
-X-Gm-Message-State: APjAAAVN/4eDYi2OT+e+fhyFh1qUJ85ibwgjE1GRD2HAmi8sYlk/laCM
-        jmsAouQLDJCgZQBObCfRLHSrhGkP
-X-Google-Smtp-Source: APXvYqw1hyCZYGABGQ3DwbQGYs4ers0cdgO62nY78GM5/ZbG9L7sIGDqz0je8gFhY2KiAD3s+u4DpQ==
-X-Received: by 2002:a17:902:1e6:: with SMTP id b93mr63747850plb.295.1560770702823;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=9AwinP98tyRtHdg0mJkLa6bfVqgtL4TsktjuNz76Who=;
+        b=baEytkI6usuI5rw0FL2ciHok5aqRrUTLr5IhWx6wYc1E4+6SRO2KVzYvkO0NpKVdeE
+         GuhNGd5qtO5VfXXw30GHiJeBUalqud3mhn9ZHAADHwi8kWhlmboxEC+VRo/RIbtw4K+c
+         1D8VcSUO08DLSmrY0vB4IIn1gHdtrIShEUbDyVpGQilq9srCc7UP2LThEd++jL04P7AN
+         Stf4wBeVx1zd0lB8htEQh1u9+8MtPOJPGw2jT18Dcrh9dIJm2m+PKY7sGZy8drFKCue+
+         MGSUHt3LM0PULZc8qKak5ynlY9UtgRjIdLFctyoXDLdCFGCv1Qn2XuByke3AmTocZJ4x
+         jE8w==
+X-Gm-Message-State: APjAAAWgllQ7MTWFJTWGePNxdT4Saj95bC6BW0mOuWZ11NQezt3hMFx/
+        wkZJhfIgZXBT0aMdVXBA1zk0vg==
+X-Google-Smtp-Source: APXvYqwcK64TzeBKKN7Kf5JNSHie2auwQpGxruSpvU1WBTnyHll+7eGrNwcSGlsUpIC9SxKCjImLYg==
+X-Received: by 2002:a50:a48a:: with SMTP id w10mr11385422edb.1.1560770702235;
         Mon, 17 Jun 2019 04:25:02 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id d4sm12535751pfc.149.2019.06.17.04.25.01
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 17 Jun 2019 04:25:02 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [PATCH v4 5/5] KVM: LAPIC: add advance timer support to pi_inject_timer
-Date:   Mon, 17 Jun 2019 19:24:47 +0800
-Message-Id: <1560770687-23227-6-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1560770687-23227-1-git-send-email-wanpengli@tencent.com>
-References: <1560770687-23227-1-git-send-email-wanpengli@tencent.com>
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id w35sm1152436edd.32.2019.06.17.04.25.00
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 17 Jun 2019 04:25:01 -0700 (PDT)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id 122F1100F6D; Mon, 17 Jun 2019 14:25:00 +0300 (+03)
+Date:   Mon, 17 Jun 2019 14:25:00 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Kai Huang <kai.huang@linux.intel.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@amacapital.net>,
+        David Howells <dhowells@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        linux-mm@kvack.org, kvm@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH, RFC 49/62] mm, x86: export several MKTME variables
+Message-ID: <20190617112500.vmuu4kcjoep34hwe@box>
+References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
+ <20190508144422.13171-50-kirill.shutemov@linux.intel.com>
+ <20190614115647.GI3436@hirez.programming.kicks-ass.net>
+ <1560741269.5187.7.camel@linux.intel.com>
+ <20190617074643.GW3436@hirez.programming.kicks-ass.net>
+ <1560760783.5187.10.camel@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1560760783.5187.10.camel@linux.intel.com>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Mon, Jun 17, 2019 at 08:39:43PM +1200, Kai Huang wrote:
+> On Mon, 2019-06-17 at 09:46 +0200, Peter Zijlstra wrote:
+> > On Mon, Jun 17, 2019 at 03:14:29PM +1200, Kai Huang wrote:
+> > > On Fri, 2019-06-14 at 13:56 +0200, Peter Zijlstra wrote:
+> > > > On Wed, May 08, 2019 at 05:44:09PM +0300, Kirill A. Shutemov wrote:
+> > > > > From: Kai Huang <kai.huang@linux.intel.com>
+> > > > > 
+> > > > > KVM needs those variables to get/set memory encryption mask.
+> > > > > 
+> > > > > Signed-off-by: Kai Huang <kai.huang@linux.intel.com>
+> > > > > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > > > > ---
+> > > > >  arch/x86/mm/mktme.c | 3 +++
+> > > > >  1 file changed, 3 insertions(+)
+> > > > > 
+> > > > > diff --git a/arch/x86/mm/mktme.c b/arch/x86/mm/mktme.c
+> > > > > index df70651816a1..12f4266cf7ea 100644
+> > > > > --- a/arch/x86/mm/mktme.c
+> > > > > +++ b/arch/x86/mm/mktme.c
+> > > > > @@ -7,13 +7,16 @@
+> > > > >  
+> > > > >  /* Mask to extract KeyID from physical address. */
+> > > > >  phys_addr_t mktme_keyid_mask;
+> > > > > +EXPORT_SYMBOL_GPL(mktme_keyid_mask);
+> > > > >  /*
+> > > > >   * Number of KeyIDs available for MKTME.
+> > > > >   * Excludes KeyID-0 which used by TME. MKTME KeyIDs start from 1.
+> > > > >   */
+> > > > >  int mktme_nr_keyids;
+> > > > > +EXPORT_SYMBOL_GPL(mktme_nr_keyids);
+> > > > >  /* Shift of KeyID within physical address. */
+> > > > >  int mktme_keyid_shift;
+> > > > > +EXPORT_SYMBOL_GPL(mktme_keyid_shift);
+> > > > >  
+> > > > >  DEFINE_STATIC_KEY_FALSE(mktme_enabled_key);
+> > > > >  EXPORT_SYMBOL_GPL(mktme_enabled_key);
+> > > > 
+> > > > NAK, don't export variables. Who owns the values, who enforces this?
+> > > > 
+> > > 
+> > > Both KVM and IOMMU driver need page_keyid() and mktme_keyid_shift to set page's keyID to the
+> > > right
+> > > place in the PTE (of KVM EPT and VT-d DMA page table).
+> > > 
+> > > MKTME key type code need to know mktme_nr_keyids in order to alloc/free keyID.
+> > > 
+> > > Maybe better to introduce functions instead of exposing variables directly?
+> > > 
+> > > Or instead of introducing page_keyid(), we use page_encrypt_mask(), which essentially holds
+> > > "page_keyid() << mktme_keyid_shift"?
+> > 
+> > Yes, that's much better, because that strictly limits the access to R/O.
+> > 
+> 
+> Thanks. I think Kirill will be the one to handle your suggestion. :)
+> 
+> Kirill?
 
-Wait before calling posted-interrupt deliver function directly to add 
-advance timer support to pi_inject_timer.
+Will do.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/lapic.c   | 6 ++++--
- arch/x86/kvm/lapic.h   | 2 +-
- arch/x86/kvm/svm.c     | 2 +-
- arch/x86/kvm/vmx/vmx.c | 2 +-
- 4 files changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 1a31389..1a31ba5 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1462,6 +1462,8 @@ static void apic_timer_expired(struct kvm_lapic *apic, bool can_pi_inject)
- 		return;
- 
- 	if (can_pi_inject && posted_interrupt_inject_timer(apic->vcpu)) {
-+		if (apic->lapic_timer.timer_advance_ns)
-+			kvm_wait_lapic_expire(vcpu, true);
- 		kvm_apic_inject_pending_timer_irqs(apic);
- 		return;
- 	}
-@@ -1553,7 +1555,7 @@ static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
- 	apic->lapic_timer.timer_advance_ns = timer_advance_ns;
- }
- 
--void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
-+void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu, bool pi_inject)
- {
- 	struct kvm_lapic *apic = vcpu->arch.apic;
- 	u64 guest_tsc, tsc_deadline;
-@@ -1561,7 +1563,7 @@ void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
- 	if (apic->lapic_timer.expired_tscdeadline == 0)
- 		return;
- 
--	if (!lapic_timer_int_injected(vcpu))
-+	if (!lapic_timer_int_injected(vcpu) && !pi_inject)
- 		return;
- 
- 	tsc_deadline = apic->lapic_timer.expired_tscdeadline;
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index e41936b..3d8a043 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -225,7 +225,7 @@ static inline int kvm_lapic_latched_init(struct kvm_vcpu *vcpu)
- 
- bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector);
- 
--void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
-+void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu, bool pi_inject);
- 
- bool kvm_intr_is_single_vcpu_fast(struct kvm *kvm, struct kvm_lapic_irq *irq,
- 			struct kvm_vcpu **dest_vcpu);
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index bbc31f7..7e65de4 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -5648,7 +5648,7 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
- 
- 	if (lapic_in_kernel(vcpu) &&
- 		vcpu->arch.apic->lapic_timer.timer_advance_ns)
--		kvm_wait_lapic_expire(vcpu);
-+		kvm_wait_lapic_expire(vcpu, false);
- 
- 	/*
- 	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index f45c51e..718a3ad 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6462,7 +6462,7 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 
- 	if (lapic_in_kernel(vcpu) &&
- 		vcpu->arch.apic->lapic_timer.timer_advance_ns)
--		kvm_wait_lapic_expire(vcpu);
-+		kvm_wait_lapic_expire(vcpu, false);
- 
- 	/*
- 	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
 -- 
-2.7.4
-
+ Kirill A. Shutemov
