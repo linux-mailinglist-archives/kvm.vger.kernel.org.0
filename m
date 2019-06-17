@@ -2,87 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E304487FA
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 17:55:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73CBD48813
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 17:57:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728477AbfFQPyr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jun 2019 11:54:47 -0400
-Received: from mga12.intel.com ([192.55.52.136]:5029 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726292AbfFQPyr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jun 2019 11:54:47 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jun 2019 08:54:46 -0700
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.171.113]) ([10.249.171.113])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 17 Jun 2019 08:54:43 -0700
-Subject: Re: [PATCH RESEND v3 2/3] KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
-To:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     Tao Xu <tao3.xu@intel.com>, pbonzini@redhat.com, corbet@lwn.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        sean.j.christopherson@intel.com, fenghua.yu@intel.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jingqi.liu@intel.com
-References: <20190616095555.20978-1-tao3.xu@intel.com>
- <20190616095555.20978-3-tao3.xu@intel.com>
- <d99b2ae1-38fc-0b71-2613-8131decc923a@intel.com>
- <ea1fc40b-8f80-d5f0-6c97-adb245599e07@linux.intel.com>
- <20190617155038.GA13955@flask>
-From:   Xiaoyao Li <xiaoyao.li@linux.intel.com>
-Message-ID: <5f34bd4b-b3d1-1950-e4d5-8e65c3809ab1@linux.intel.com>
-Date:   Mon, 17 Jun 2019 23:54:42 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1728307AbfFQP5r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jun 2019 11:57:47 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:44012 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726725AbfFQP5q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jun 2019 11:57:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=uJnkwvrHnUKeF2+PJ73eDxHxHEk2QRBcNkGJHa1Q1t8=; b=Fg0tPd9SH6JEk/y2kLvOjezKn
+        qzNtQKLAchQKIdhOcH6OJ9U3hTgnF5tOsi0RXbSeaJgkyipRo7MTCE48QTyN7otb6TJvfwNqTcXgB
+        IygIwTdS67RokzdzksBbyB0Tqy8cZl225lC/OzjiH2YikCJHdpSKjLe9zWy5T5u0CCaS6uxll7WN3
+        JygB3ckjImsyzI8bZg9Y3xnWqTtmdYvfMttc806rvZB1KCvnXGoHL5ABp994JB3TAC4JmwW72Nxrk
+        6AqP7fQvylUDKshgNX1OoxbRCGzX6qUNLgsifDcIeBqlcDhY30lmeB57Mn2snXjzhM/9UiAuzxSuY
+        w36NWpRLQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hcu0a-0001tY-6H; Mon, 17 Jun 2019 15:57:27 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id B0EBE201F4619; Mon, 17 Jun 2019 17:57:22 +0200 (CEST)
+Date:   Mon, 17 Jun 2019 17:57:22 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Rafael J. Wysocki" <rafael@kernel.org>
+Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?iso-8859-1?B?S3LEP23DocU/?= <rkrcmar@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Raslan KarimAllah <karahmed@amazon.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Linux PM <linux-pm@vger.kernel.org>
+Subject: Re: [patch 0/3] cpuidle-haltpoll driver (v2)
+Message-ID: <20190617155722.GJ3436@hirez.programming.kicks-ass.net>
+References: <20190603225242.289109849@amt.cnet>
+ <6c411948-9e32-9f41-351e-c9accd1facb0@intel.com>
+ <20190610145942.GA24553@amt.cnet>
+ <CAJZ5v0idYgETFg4scgvpJ-eGtFAx1Wi6hznXz7+XZAfKjiSAPA@mail.gmail.com>
+ <20190611142627.GB4791@amt.cnet>
+ <CAJZ5v0gPbSXB3r71XaT-4Q7LsiFO_UVymBwOmU8J1W5+COk_1g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190617155038.GA13955@flask>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJZ5v0gPbSXB3r71XaT-4Q7LsiFO_UVymBwOmU8J1W5+COk_1g@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jun 11, 2019 at 11:24:39PM +0200, Rafael J. Wysocki wrote:
+> > Peter Zijlstra suggested a cpuidle driver for this.
+> 
+> So I wonder what his rationale was.
 
-
-On 6/17/2019 11:50 PM, Radim Krčmář wrote:
-> 2019-06-17 14:31+0800, Xiaoyao Li:
->> On 6/17/2019 11:32 AM, Xiaoyao Li wrote:
->>> On 6/16/2019 5:55 PM, Tao Xu wrote:
->>>> +    if (vmx->msr_ia32_umwait_control != host_umwait_control)
->>>> +        add_atomic_switch_msr(vmx, MSR_IA32_UMWAIT_CONTROL,
->>>> +                      vmx->msr_ia32_umwait_control,
->>>> +                      host_umwait_control, false);
->>>
->>> The bit 1 is reserved, at least, we need to do below to ensure not
->>> modifying the reserved bit:
->>>
->>>       guest_val = (vmx->msr_ia32_umwait_control & ~BIT_ULL(1)) |
->>>               (host_val & BIT_ULL(1))
->>>
->>
->> I find a better solution to ensure reserved bit 1 not being modified in
->> vmx_set_msr() as below:
->>
->> 	if((data ^ umwait_control_cached) & BIT_ULL(1))
->> 		return 1;
-> 
-> We could just be checking
-> 
-> 	if (data & BIT_ULL(1))
-> 
-> because the guest cannot change its visible reserved value and KVM
-> currently initializes the value to 0.
-> 
-> The arch/x86/kernel/cpu/umwait.c series assumes that the reserved bit
-> is 0 (hopefully deliberately) and I would do the same in KVM as it
-> simplifies the logic.  (We don't have to even think about migrations
-> between machines with a different reserved value and making it play
-> nicely with possible future implementations of that bit.)
-> 
-
-Got it, thanks.
-
-> Thanks.
-> 
+I was thinking we don't need this hard-coded in the idle loop when virt
+can load a special driver.
