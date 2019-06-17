@@ -2,137 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 65F6D494AB
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 23:59:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83CC84951F
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 00:23:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727120AbfFQV7m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jun 2019 17:59:42 -0400
-Received: from mail-ua1-f65.google.com ([209.85.222.65]:45351 "EHLO
-        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726001AbfFQV7m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jun 2019 17:59:42 -0400
-Received: by mail-ua1-f65.google.com with SMTP id v18so4081677uad.12
-        for <kvm@vger.kernel.org>; Mon, 17 Jun 2019 14:59:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=EAhatab0HAVyw+PnT7+3nUVy3uXQEI6O1vd8Cnx2LKk=;
-        b=kvgoo1AWJ53ectZxNh7vumo7uHVF3ezzA+dmS6OCiyHy7q38adiyo8Mt48b9s1ecuS
-         8vbgSWAHi7F66ZbJb0OnnHkka0SZfIdhx44ptJvkStf7KSPyjOUktnOEWU+P5uVTHP64
-         eN+AH0Y198g5GhXwzgWWBTwbfohtVJT/rFQhRmBXLkxVDGhPtni3s7vOLmfSoppPuiMS
-         fw+6xL0t8nIg9W/VqAlmea2Xi/QAMj43r70NCnqPKdZOQ+k2pXu+G5fUMaRe8zFdt2fk
-         JWWQc2NJ/zMPTaMg9M5+VHQpiaQGfqqosa4YWPSG3qztsQIxZrsszWUCVKNg2vbMMWht
-         a6XA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=EAhatab0HAVyw+PnT7+3nUVy3uXQEI6O1vd8Cnx2LKk=;
-        b=DfWof7h5Fe2vpARw2Rv0B82tXrpO1l79Jq820dMMxT+U4a6FWiFw/eH0Yyrn2Mhm/P
-         hebSRes5e8T5Q9tG0FbzJ8MBiMPDK5lmrrNfhupUWqFy7htJ5L0JXOJbYEs7KDGxYXJE
-         AEooXUwXIq7BYcUvYwjwgmR5K3+RSV+JU1r2wPfVWDdsMNaf+ly0gfMTMFGT/AAnv3R5
-         ajxjVbekbPSOUllrLU4JSaQQqC/FkPVAehhpca1LeGEWuBpcBKtIRHKYeqSdiAancPxq
-         umaocZ2DMhBT4UZXkAVTRxVjr0jE7ReP6wsa7Bdv6BLk7OPufiC1a8II00CSzmxw0iAR
-         PPWw==
-X-Gm-Message-State: APjAAAUwSdhHNZokG7EcPCcczXq0uN93QkfZvdWeR/SjTEO2oXxhNRlQ
-        PLMzgj+yx1UEfm7m2MoMxeZkNKgrwMNwnG95wtNlAg==
-X-Google-Smtp-Source: APXvYqx2nWcd1UUVmxVOfqTdpy/EjWGEE63D+8CgDq6wsvkYXGUtTG/eldJ/84K4uXpb1xaJ0VQplOCTsiiUpsYmcEg=
-X-Received: by 2002:ab0:234e:: with SMTP id h14mr10788176uao.25.1560808781025;
- Mon, 17 Jun 2019 14:59:41 -0700 (PDT)
+        id S1728014AbfFQWXY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jun 2019 18:23:24 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:60616 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726797AbfFQWXX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jun 2019 18:23:23 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HML59B153781;
+        Mon, 17 Jun 2019 22:23:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=14ePqxfipwL/tsIaiw3rK/EDL+lbdm4jbslQBd7LCUw=;
+ b=p8zM9+n08ITK5rEFDxeF6ysfPhOzpXdasSuJUmS4OkY9oCvwHt1AW3yoQBqR5Khj+5gq
+ Ud+Qy880PHiIQfW1Z3BCBoL0LiFPyI0SuviN91/KganwyxPx3GCJTko7W6r58Dv1sAq+
+ DpXrm0zRCr62vMlyrm8bF5lSJSE4iePem3834GfhDOv9cymnfaRNgGSJCd0HNhF96WaW
+ 8Y0l2s078wFPSkVqlrgrfLosNzukmrzAA+QhHwzcqVSH4Bgsa4tLU4m2MFn6KIezR6tC
+ 82zfP7RwDh7OXvKf8uU5EoVjOqOExzeQ2xMTD8DUbJ3wv8SbJi1ba0doBnXbFQ0NzBiv bg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 2t4saq8wu3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 17 Jun 2019 22:23:01 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5HMMwkQ004721;
+        Mon, 17 Jun 2019 22:23:00 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 2t59gdfwg7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 17 Jun 2019 22:23:00 +0000
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5HMMxK0017075;
+        Mon, 17 Jun 2019 22:22:59 GMT
+Received: from dhcp-10-132-91-225.usdhcp.oraclecorp.com (/10.132.91.225)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 17 Jun 2019 15:22:59 -0700
+Subject: Re: [kvm-unit-tests PATCH] x86: vmx: Mask undefined bits in exit
+ qualifications
+To:     Nadav Amit <nadav.amit@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <20190503174919.13846-1-nadav.amit@gmail.com>
+ <A9500030-816E-49F7-84C7-6176C722C2B0@gmail.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <720b1ba2-11aa-6baf-9f21-aa3e1e324afa@oracle.com>
+Date:   Mon, 17 Jun 2019 15:22:58 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-References: <cover.1560339705.git.andreyknvl@google.com> <a7a2933bea5fe57e504891b7eec7e9432e5e1c1a.1560339705.git.andreyknvl@google.com>
- <20190617135636.GC1367@arrakis.emea.arm.com> <CAFKCwrjJ+0ijNKa3ioOP7xa91QmZU0NhkO=tNC-Q_ThC69vTug@mail.gmail.com>
- <20190617171813.GC34565@arrakis.emea.arm.com>
-In-Reply-To: <20190617171813.GC34565@arrakis.emea.arm.com>
-From:   Evgenii Stepanov <eugenis@google.com>
-Date:   Mon, 17 Jun 2019 14:59:29 -0700
-Message-ID: <CAFKCwrhuQ+x-KprJV=CPCrnQR9Ky9qL=M5q_pa3fGj27oo4mng@mail.gmail.com>
-Subject: Re: [PATCH v17 03/15] arm64: Introduce prctl() options to control the
- tagged user addresses ABI
-To:     Catalin Marinas <catalin.marinas@arm.com>
-Cc:     Andrey Konovalov <andreyknvl@google.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <A9500030-816E-49F7-84C7-6176C722C2B0@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906170193
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906170193
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 17, 2019 at 10:18 AM Catalin Marinas
-<catalin.marinas@arm.com> wrote:
->
-> On Mon, Jun 17, 2019 at 09:57:36AM -0700, Evgenii Stepanov wrote:
-> > On Mon, Jun 17, 2019 at 6:56 AM Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > > On Wed, Jun 12, 2019 at 01:43:20PM +0200, Andrey Konovalov wrote:
-> > > > From: Catalin Marinas <catalin.marinas@arm.com>
-> > > >
-> > > > It is not desirable to relax the ABI to allow tagged user addresses into
-> > > > the kernel indiscriminately. This patch introduces a prctl() interface
-> > > > for enabling or disabling the tagged ABI with a global sysctl control
-> > > > for preventing applications from enabling the relaxed ABI (meant for
-> > > > testing user-space prctl() return error checking without reconfiguring
-> > > > the kernel). The ABI properties are inherited by threads of the same
-> > > > application and fork()'ed children but cleared on execve().
-> > > >
-> > > > The PR_SET_TAGGED_ADDR_CTRL will be expanded in the future to handle
-> > > > MTE-specific settings like imprecise vs precise exceptions.
-> > > >
-> > > > Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
-> > >
-> > > A question for the user-space folk: if an application opts in to this
-> > > ABI, would you want the sigcontext.fault_address and/or siginfo.si_addr
-> > > to contain the tag? We currently clear it early in the arm64 entry.S but
-> > > we could find a way to pass it down if needed.
-> >
-> > For HWASan this would not be useful because we instrument memory
-> > accesses with explicit checks anyway. For MTE, on the other hand, it
-> > would be very convenient to know the fault address tag without
-> > disassembling the code.
->
-> I could as this differently: does anything break if, once the user
-> opts in to TBI, fault_address and/or si_addr have non-zero top byte?
 
-I think it would be fine.
 
-> Alternatively, we could present the original FAR_EL1 register as a
-> separate field as we do with ESR_EL1, independently of whether the user
-> opted in to TBI or not.
+On 06/17/2019 12:52 PM, Nadav Amit wrote:
+>> On May 3, 2019, at 10:49 AM, nadav.amit@gmail.com wrote:
+>>
+>> From: Nadav Amit <nadav.amit@gmail.com>
+>>
+>> On EPT violation, the exit qualifications may have some undefined bits.
+>>
+>> Bit 6 is undefined if "mode-based execute control" is 0.
+>>
+>> Bits 9-11 are undefined unless the processor supports advanced VM-exit
+>> information for EPT violations.
+>>
+>> Right now on KVM these bits are always undefined inside the VM (i.e., in
+>> an emulated VM-exit). Mask these bits to avoid potential false
+>> indication of failures.
+>>
+>> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+>> ---
+>> x86/vmx.h       | 20 ++++++++++++--------
+>> x86/vmx_tests.c |  4 ++++
+>> 2 files changed, 16 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/x86/vmx.h b/x86/vmx.h
+>> index cc377ef..5053d6f 100644
+>> --- a/x86/vmx.h
+>> +++ b/x86/vmx.h
+>> @@ -603,16 +603,20 @@ enum vm_instruction_error_number {
+>> #define EPT_ADDR_MASK		GENMASK_ULL(51, 12)
+>> #define PAGE_MASK_2M		(~(PAGE_SIZE_2M-1))
+>>
+>> -#define EPT_VLT_RD		1
+>> -#define EPT_VLT_WR		(1 << 1)
+>> -#define EPT_VLT_FETCH		(1 << 2)
+>> -#define EPT_VLT_PERM_RD		(1 << 3)
+>> -#define EPT_VLT_PERM_WR		(1 << 4)
+>> -#define EPT_VLT_PERM_EX		(1 << 5)
+>> +#define EPT_VLT_RD		(1ull << 0)
+>> +#define EPT_VLT_WR		(1ull << 1)
+>> +#define EPT_VLT_FETCH		(1ull << 2)
+>> +#define EPT_VLT_PERM_RD		(1ull << 3)
+>> +#define EPT_VLT_PERM_WR		(1ull << 4)
+>> +#define EPT_VLT_PERM_EX		(1ull << 5)
+>> +#define EPT_VLT_PERM_USER_EX	(1ull << 6)
+>> #define EPT_VLT_PERMS		(EPT_VLT_PERM_RD | EPT_VLT_PERM_WR | \
+>> 				 EPT_VLT_PERM_EX)
+>> -#define EPT_VLT_LADDR_VLD	(1 << 7)
+>> -#define EPT_VLT_PADDR		(1 << 8)
+>> +#define EPT_VLT_LADDR_VLD	(1ull << 7)
+>> +#define EPT_VLT_PADDR		(1ull << 8)
+>> +#define EPT_VLT_GUEST_USER	(1ull << 9)
+>> +#define EPT_VLT_GUEST_WR	(1ull << 10)
+
+This one should be named EPT_VLT_GUEST_RW,  assuming you are naming them 
+according to the 1-setting of the bits.
+
+>> +#define EPT_VLT_GUEST_EX	(1ull << 11)
+>>
+>> #define MAGIC_VAL_1		0x12345678ul
+>> #define MAGIC_VAL_2		0x87654321ul
+>> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+>> index c52ebc6..b4129e1 100644
+>> --- a/x86/vmx_tests.c
+>> +++ b/x86/vmx_tests.c
+>> @@ -2365,6 +2365,10 @@ static void do_ept_violation(bool leaf, enum ept_access_op op,
+>>
+>> 	qual = vmcs_read(EXI_QUALIFICATION);
+>>
+>> +	/* Mask undefined bits (which may later be defined in certain cases). */
+>> +	qual &= ~(EPT_VLT_GUEST_USER | EPT_VLT_GUEST_WR | EPT_VLT_GUEST_EX |
+>> +		 EPT_VLT_PERM_USER_EX);
+>> +
+
+The "DIAGNOSE" macro doesn't check any of these bits, so this masking 
+seems redundant.
+
+Also, don't we need to check for the relevant conditions before masking 
+the bits ? For example, EPT_VLT_PERM_USER_EX is dependent on "mode-based 
+execute control" VM-execution control"  and the other ones depend on bit 
+7 and 8 of the Exit Qualification field.
+
+>> 	diagnose_ept_violation_qual(expected_qual, qual);
+>> 	TEST_EXPECT_EQ(expected_qual, qual);
+>>
+>> -- 
+>> 2.17.1
+> Ping.
 >
-> --
-> Catalin
+
