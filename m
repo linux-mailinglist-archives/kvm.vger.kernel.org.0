@@ -2,73 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CC07147AD7
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 09:28:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53BDD47B42
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2019 09:38:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726455AbfFQH2k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jun 2019 03:28:40 -0400
-Received: from slot0.nejknio.cf ([89.32.41.233]:59590 "EHLO slot0.nejknio.cf"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726401AbfFQH2j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jun 2019 03:28:39 -0400
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; s=dkim; d=nejknio.cf;
- h=Content-Type:MIME-Version:Content-Transfer-Encoding:Content-Description:Subject:To:From:Date:Reply-To:Message-ID; i=trade1@nejknio.cf;
- bh=73Xs4LxjK+lP+h5mKCyFyWTpkoQ=;
- b=dwieWsemZwbR1G+juJzx7Bc362TXbgdtgn/57gWONXjNT6wwDhhKtB87KydtvBbFDiJTYSTe+VVX
-   8s6OkjFqBVOqAtgQKWw+h5MLyKkK1mE8LOs8m14Utq4wDfbGw9ryquqLPr2+8tTt8zjp1a/VvxZl
-   fR/TAZQ0gDCHfwSZys5tnwb5n1Dh03dwRhUh2/H7TxXdhdBRL8zbqlS0pDRgpnNMTWixngV8UNcR
-   VMpWhmAUxDWBySIIfIJv7K9DNbiMhD7V6B9tGPJUjTgN4AsJpbjMWXf9mtQLdRLv3VLSeX5h7yN/
-   YdMBQ+4+GTsHG4bGqTnS67gCiCyQwBaRSPQjWA==
-DomainKey-Signature: a=rsa-sha1; c=nofws; q=dns; s=dkim; d=nejknio.cf;
- b=RfenBZK081vwu3/mH+EdI9uGIZQayjj4wU04Xlh+zL5eKD34vJrPv1Ohsm82hJMhst5Z5DVqkUsi
-   kl9rStwBEyzaWkYfUDu4BJL7dQd+p5fHD0qCuFu0Rcveb4LnMr5nKNMmuhVWYgIiGJR2/fmi3b3V
-   mshmKRD0jcxSDcu3kO75GHYdMHrQv3LJtlgYBOKBx00kC8P6o0eauDN90K7auw3bdmSAheLOX3IN
-   HKW7x3XSYAdVx3jvM8WUmcghKyLoa5s2Ik3QtXE05POtF7wJdwy8IpNSgxJpYJm0Wrpd/dn5hfuy
-   tjhbz1lnvrw4wnMARISNRE12mJANKFoxBYuwVQ==;
-Content-Type: text/plain; charset="iso-8859-1"
+        id S1727333AbfFQHiO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jun 2019 03:38:14 -0400
+Received: from smtp-fw-2101.amazon.com ([72.21.196.25]:17391 "EHLO
+        smtp-fw-2101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725826AbfFQHiO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jun 2019 03:38:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1560757091; x=1592293091;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=8xZP6BRYVHqRBD1v3aCylovGhFA01FEft+IhJzUopnA=;
+  b=lU0A/K514EP44LlSbe7+gAvDPtiOstqo0LpUj+nsacdnconLiACx9kTw
+   eEJWABrBVCs6WKnRLtbqL40F8UG7SZxepHUItn1WHzLolesXSb+0g7L7t
+   TLozrtFQNGmrF+R8mNqUmlOaEDLmQ+H2hD2CseAUNBRXNguRMYNfyoZ+A
+   U=;
+X-IronPort-AV: E=Sophos;i="5.62,384,1554768000"; 
+   d="scan'208";a="737725018"
+Received: from iad6-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-1a-67b371d8.us-east-1.amazon.com) ([10.124.125.2])
+  by smtp-border-fw-out-2101.iad2.amazon.com with ESMTP; 17 Jun 2019 07:38:09 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1a-67b371d8.us-east-1.amazon.com (Postfix) with ESMTPS id 11569A2B0B;
+        Mon, 17 Jun 2019 07:38:07 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Mon, 17 Jun 2019 07:38:07 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.160.69) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Mon, 17 Jun 2019 07:38:04 +0000
+Subject: Re: [RFC 00/10] Process-local memory allocations for hiding KVM
+ secrets
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Andy Lutomirski <luto@amacapital.net>
+CC:     Dave Hansen <dave.hansen@intel.com>,
+        Marius Hillenbrand <mhillenb@amazon.de>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        <kernel-hardening@lists.openwall.com>, <linux-mm@kvack.org>,
+        Alexander Graf <graf@amazon.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        "Peter Zijlstra" <peterz@infradead.org>
+References: <20190612170834.14855-1-mhillenb@amazon.de>
+ <eecc856f-7f3f-ed11-3457-ea832351e963@intel.com>
+ <A542C98B-486C-4849-9DAC-2355F0F89A20@amacapital.net>
+ <alpine.DEB.2.21.1906141618000.1722@nanos.tec.linutronix.de>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <58788f05-04c3-e71c-12c3-0123be55012c@amazon.com>
+Date:   Mon, 17 Jun 2019 09:38:00 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: PRODUCT INQUIRY FOR EXPORT SHIPMENT
-To:     Recipients <trade1@nejknio.cf>
-From:   "Mark Maths" <trade1@nejknio.cf>
-Date:   Mon, 17 Jun 2019 10:08:52 +0300
-Reply-To: purchase_m.maths@aol.com
-Message-ID: <0.0.1.D83.1D524DB79F0ED1C.0@slot0.nejknio.cf>
+In-Reply-To: <alpine.DEB.2.21.1906141618000.1722@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [10.43.160.69]
+X-ClientProxiedBy: EX13D20UWC004.ant.amazon.com (10.43.162.41) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dear Sales team,
- =
 
-In furtherance to our market research, we have reviewed all your products t=
-ypes and we have finally interested in your product for our market here in =
+On 14.06.19 16:21, Thomas Gleixner wrote:
+> On Wed, 12 Jun 2019, Andy Lutomirski wrote:
+>>> On Jun 12, 2019, at 12:55 PM, Dave Hansen <dave.hansen@intel.com> wrote:
+>>>
+>>>> On 6/12/19 10:08 AM, Marius Hillenbrand wrote:
+>>>> This patch series proposes to introduce a region for what we call
+>>>> process-local memory into the kernel's virtual address space.
+>>> It might be fun to cc some x86 folks on this series.  They might have
+>>> some relevant opinions. ;)
+>>>
+>>> A few high-level questions:
+>>>
+>>> Why go to all this trouble to hide guest state like registers if all the
+>>> guest data itself is still mapped?
+>>>
+>>> Where's the context-switching code?  Did I just miss it?
+>>>
+>>> We've discussed having per-cpu page tables where a given PGD is only in
+>>> use from one CPU at a time.  I *think* this scheme still works in such a
+>>> case, it just adds one more PGD entry that would have to context-switched.
+>> Fair warning: Linus is on record as absolutely hating this idea. He might
+>> change his mind, but it’s an uphill battle.
+> Yes I know, but as a benefit we could get rid of all the GSBASE horrors in
+> the entry code as we could just put the percpu space into the local PGD.
 
 
-United State for your production. We introduce ourselves as Emilxa Tram SRL=
-, A general group of company located in the United State. =
+Would that mean that with Meltdown affected CPUs we open speculation 
+attacks against the mmlocal memory from KVM user space?
 
 
-We are sourcing for new suppliers from your location =
+Alex
 
-
-Kindly advice us if you accept new purchase orders, I will forward our PO f=
-or urgent order.
-
-Waiting for your response to send order. Reply to ( purchase_m.maths@aol.co=
-m)
-
-Best regards.
-Mark Maths
-Company Address:
-Emilxa Tram SRL Company Limited
-P.O. Box 978
-Road Town
-Tortola
-British Virgin Islands
-Contact information:
-Tel: +1 (284) 493 7235
-Email: purchase_m.maths@aol.com
-https://meridianbvi.com/contact-us/
