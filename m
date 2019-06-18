@@ -2,136 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CCC44A65F
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 18:15:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B76094A65C
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 18:15:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729849AbfFRQPM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 12:15:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36040 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729835AbfFRQPM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 12:15:12 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id EAF6F30C1AE7;
-        Tue, 18 Jun 2019 16:15:11 +0000 (UTC)
-Received: from gondolin (dhcp-192-192.str.redhat.com [10.33.192.192])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 13E425C225;
-        Tue, 18 Jun 2019 16:14:58 +0000 (UTC)
-Date:   Tue, 18 Jun 2019 18:14:56 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, mjrosato@linux.ibm.com,
-        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
-        pmorel@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com
-Subject: Re: [PATCH v4 1/7] s390: vfio-ap: Refactor vfio_ap driver probe and
- remove callbacks
-Message-ID: <20190618181456.0252227b.cohuck@redhat.com>
-In-Reply-To: <1560454780-20359-2-git-send-email-akrowiak@linux.ibm.com>
-References: <1560454780-20359-1-git-send-email-akrowiak@linux.ibm.com>
-        <1560454780-20359-2-git-send-email-akrowiak@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1729472AbfFRQPG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 12:15:06 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:38453 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729327AbfFRQPG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 12:15:06 -0400
+Received: by mail-ed1-f66.google.com with SMTP id r12so20341459edo.5
+        for <kvm@vger.kernel.org>; Tue, 18 Jun 2019 09:15:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shutemov-name.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=TV0b7JjOzi3iVkcg5Sm68/8xpqk1N7OtdOwvdmMSM/4=;
+        b=sp219fafTDU9AF/f/dDdjrZCyZ0ajovfZ5IsEGibzM7oT+JPXHoqtpUp9y+/FKsAwK
+         cLIQ+SaiFpOVgcfnmqkW9kh5ZPD933ncGaqvOqcRXz/pzYG3CBjS75hfB8b9mHWeavRe
+         9YN1tKGr4uMlODuJh8c/skxvKjR4ZWdBSfgEzgsswaLzfDNG+8bqhpgeVcbY2wroQOgm
+         m8yqhLkLzqsfAkLZhQk83MDmYYETbswPrTbUk+blwkZ74EGdHU7kVpaDKfhD/bL/qi0Z
+         PjZ6O9mRV5k2iiT8GT6xBwuzKmNmxmOfoNm4dcg+n+TIGqaR7jY0hQPi6Dux1UfSzHJt
+         f5iA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=TV0b7JjOzi3iVkcg5Sm68/8xpqk1N7OtdOwvdmMSM/4=;
+        b=nwql0pcU0hg5VU5pL9LedPFVBOo47ChhwKh6NKcHTkGtmp/d4NQ0s8O0Zqcy1585Jg
+         cPVimaPboHjXsiaGNcpoeEJ/qVIKJQN7+jMQatmR634U6KaUOaA4x8JGwZB28uRGLDdl
+         bp2FjDHPIQRV+Tn19gs6cjHI35eo4+Use8SPirk891akfgj9nMVWy79ED4HhTTLrAxVM
+         XcrRDsKpWWaLvYZKx0TwoCDGk+iZLVWKUhFg3avS7MiciJE0tGZBAo3TBJhHsU6aAUXn
+         yMm1qjuXz5gYuNNqj9XpyauzUYblw44jn2jgocClSw4jdVtpCPaqZBiFCkYdtnrQw9a7
+         xfFA==
+X-Gm-Message-State: APjAAAVohLQ5FKy2d6dfkhD/dSINiEFkwgcuWMXlI0dcsmQgZxSM/ORK
+        Ac8V9uc9Sp3XdF5yaphxM/Q/3A==
+X-Google-Smtp-Source: APXvYqxkJFdEknnrEDQYFG7Dsrv3QgF4P1fh93uo1KXJbSzbgkocrY1GYGzkIA2M5LkSkPJAL6JZ8Q==
+X-Received: by 2002:a17:906:2890:: with SMTP id o16mr76685704ejd.80.1560874504188;
+        Tue, 18 Jun 2019 09:15:04 -0700 (PDT)
+Received: from box.localdomain ([86.57.175.117])
+        by smtp.gmail.com with ESMTPSA id a6sm4612918eds.19.2019.06.18.09.15.03
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 18 Jun 2019 09:15:03 -0700 (PDT)
+Received: by box.localdomain (Postfix, from userid 1000)
+        id E6FF61036B4; Tue, 18 Jun 2019 19:15:02 +0300 (+03)
+Date:   Tue, 18 Jun 2019 19:15:02 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Kai Huang <kai.huang@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        X86 ML <x86@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        David Howells <dhowells@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        Linux-MM <linux-mm@kvack.org>, kvm list <kvm@vger.kernel.org>,
+        keyrings@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH, RFC 45/62] mm: Add the encrypt_mprotect() system call
+ for MKTME
+Message-ID: <20190618161502.jiuqhvs3wvnac5ow@box.shutemov.name>
+References: <CALCETrUPSv4Xae3iO+2i_HecJLfx4mqFfmtfp+cwBdab8JUZrg@mail.gmail.com>
+ <5cbfa2da-ba2e-ed91-d0e8-add67753fc12@intel.com>
+ <CALCETrWFXSndmPH0OH4DVVrAyPEeKUUfNwo_9CxO-3xy9awq0g@mail.gmail.com>
+ <1560816342.5187.63.camel@linux.intel.com>
+ <CALCETrVcrPYUUVdgnPZojhJLgEhKv5gNqnT6u2nFVBAZprcs5g@mail.gmail.com>
+ <1560821746.5187.82.camel@linux.intel.com>
+ <CALCETrUrFTFGhRMuNLxD9G9=GsR6U-THWn4AtminR_HU-nBj+Q@mail.gmail.com>
+ <1560824611.5187.100.camel@linux.intel.com>
+ <20190618091246.GM3436@hirez.programming.kicks-ass.net>
+ <2ec26c05-7c57-d0e0-a628-94d581b96b63@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Tue, 18 Jun 2019 16:15:12 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2ec26c05-7c57-d0e0-a628-94d581b96b63@intel.com>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 13 Jun 2019 15:39:34 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-
-> In order to limit the number of private mdev functions called from the
-> vfio_ap device driver as well as to provide a landing spot for dynamic
-> configuration code related to binding/unbinding AP queue devices to/from
-> the vfio_ap driver, the following changes are being introduced:
+On Tue, Jun 18, 2019 at 07:09:36AM -0700, Dave Hansen wrote:
+> On 6/18/19 2:12 AM, Peter Zijlstra wrote:
+> > On Tue, Jun 18, 2019 at 02:23:31PM +1200, Kai Huang wrote:
+> >> Assuming I am understanding the context correctly, yes from this perspective it seems having
+> >> sys_encrypt is annoying, and having ENCRYPT_ME should be better. But Dave said "nobody is going to
+> >> do what you suggest in the ptr1/ptr2 example"? 
+> > 
+> > You have to phrase that as: 'nobody who knows what he's doing is going
+> > to do that', which leaves lots of people and fuzzers.
+> > 
+> > Murphy states that if it is possible, someone _will_ do it. And this
+> > being something that causes severe data corruption on persistent
+> > storage,...
 > 
-> * Move code from the vfio_ap driver's probe callback into a function
->   defined in the mdev private operations file.
+> I actually think it's not a big deal at all to avoid the corruption that
+> would occur if it were allowed.  But, if you're even asking to map the
+> same data with two different keys, you're *asking* for data corruption.
+>  What we're doing here is continuing to  preserve cache coherency and
+> ensuring an early failure.
 > 
-> * Move code from the vfio_ap driver's remove callback into a function
->   defined in the mdev private operations file.
+> We'd need two rules:
+> 1. A page must not be faulted into a VMA if the page's page_keyid()
+>    is not consistent with the VMA's
+> 2. Upon changing the VMA's KeyID, all underlying PTEs must either be
+>    checked or zapped.
 > 
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->  drivers/s390/crypto/vfio_ap_drv.c     | 27 ++++++++++-----------------
->  drivers/s390/crypto/vfio_ap_ops.c     | 28 ++++++++++++++++++++++++++++
->  drivers/s390/crypto/vfio_ap_private.h |  6 +++---
->  3 files changed, 41 insertions(+), 20 deletions(-)
-> 
-> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
-> index 003662aa8060..3c60df70891b 100644
-> --- a/drivers/s390/crypto/vfio_ap_drv.c
-> +++ b/drivers/s390/crypto/vfio_ap_drv.c
-> @@ -49,15 +49,15 @@ MODULE_DEVICE_TABLE(vfio_ap, ap_queue_ids);
->   */
->  static int vfio_ap_queue_dev_probe(struct ap_device *apdev)
->  {
-> -	struct vfio_ap_queue *q;
-> -
-> -	q = kzalloc(sizeof(*q), GFP_KERNEL);
-> -	if (!q)
-> -		return -ENOMEM;
-> -	dev_set_drvdata(&apdev->device, q);
-> -	q->apqn = to_ap_queue(&apdev->device)->qid;
-> -	q->saved_isc = VFIO_AP_ISC_INVALID;
-> +	int ret;
-> +	struct ap_queue *queue = to_ap_queue(&apdev->device);
-> +
-> +	ret = vfio_ap_mdev_probe_queue(queue);
-> +	if (ret)
-> +		return ret;
-> +
->  	return 0;
-> +
+> If the rules are broken, we SIGBUS.  Andy's suggestion has the same
+> basic requirements.  But, with his scheme, the error can be to the
+> ioctl() instead of in the form of a SIGBUS.  I guess that makes the
+> fuzzers' lives a bit easier.
 
-Maybe you could even condense this into a simple
+I see a problem with the scheme: if we don't have a way to decide if the
+key is right for the file, user without access to the right key is able to
+prevent legitimate user from accessing the file. Attacker just need read
+access to the encrypted file to prevent any legitimate use to access it.
 
-return vfio_ap_mdev_probe_queue(to_ap_queue(&apdev->device));
+The problem applies to ioctl() too.
 
-(Unless you plan to do more things with queue in a future patch, of
-course.)
+To make sense of it we must have a way to distinguish right key from
+wrong. I don't see obvious solution with the current hardware design.
 
->  }
->  
->  /**
-
-(...)
-
-> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
-> index f46dde56b464..5cc3c2ebf151 100644
-> --- a/drivers/s390/crypto/vfio_ap_private.h
-> +++ b/drivers/s390/crypto/vfio_ap_private.h
-> @@ -90,8 +90,6 @@ struct ap_matrix_mdev {
->  
->  extern int vfio_ap_mdev_register(void);
->  extern void vfio_ap_mdev_unregister(void);
-> -int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
-> -			     unsigned int retry);
-
-If you don't need that function across files anymore, you probably want
-to make it static.
-
->  
->  struct vfio_ap_queue {
->  	struct ap_matrix_mdev *matrix_mdev;
-> @@ -100,5 +98,7 @@ struct vfio_ap_queue {
->  #define VFIO_AP_ISC_INVALID 0xff
->  	unsigned char saved_isc;
->  };
-> -struct ap_queue_status vfio_ap_irq_disable(struct vfio_ap_queue *q);
-
-Same here.
-
-> +int vfio_ap_mdev_probe_queue(struct ap_queue *queue);
-> +void vfio_ap_mdev_remove_queue(struct ap_queue *queue);
-> +
->  #endif /* _VFIO_AP_PRIVATE_H_ */
-
+-- 
+ Kirill A. Shutemov
