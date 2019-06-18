@@ -2,99 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 41BCF49C6F
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 10:55:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1D3849C82
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 10:59:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729242AbfFRIzo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 04:55:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37960 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728991AbfFRIzo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 04:55:44 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6EA593082231;
-        Tue, 18 Jun 2019 08:55:44 +0000 (UTC)
-Received: from work-vm (ovpn-117-76.ams2.redhat.com [10.36.117.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7196B1A8EC;
-        Tue, 18 Jun 2019 08:55:42 +0000 (UTC)
-Date:   Tue, 18 Jun 2019 09:55:40 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com,
-        rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org,
-        jmattson@google.com, maran.wilson@oracle.com,
-        Nikita Leshenko <nikita.leshchenko@oracle.com>
-Subject: Re: [QEMU PATCH v3 6/9] vmstate: Add support for kernel integer types
-Message-ID: <20190618085539.GB2850@work-vm>
-References: <20190617175658.135869-1-liran.alon@oracle.com>
- <20190617175658.135869-7-liran.alon@oracle.com>
+        id S1729017AbfFRI7V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 04:59:21 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:34619 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728385AbfFRI7U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 04:59:20 -0400
+Received: by mail-ot1-f65.google.com with SMTP id n5so13318388otk.1;
+        Tue, 18 Jun 2019 01:59:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=hIYswHQWRvAKNZqbn4aJZ16s+Ip2WBsvtLErDYbrWjo=;
+        b=nI+7vDq8KmgYzdN/88QoJEwpLDu7c9wN0Z9oFTjLx3fiKXZGL1MNGSlRw+LXS0+zJD
+         Q8kHby70w2ZUmsnYt8v/Oxc6LoDhUUIhgzexW+2+Q73WxbmDaNfl34d7qsd2fCmcWyaY
+         64nWptg+ucSZNY+zN4h9CYyv59TMitcrjv8CQJZRQ+nLDT+K/VmmNf8ljzYqA4EM2Vxh
+         dkdadBRES7VXSvJHzTIHn2/TAHaEpQ59Ja6wT1J4LBTkSQuR6mWPFe1HfRAyNgVy3nxJ
+         vUk9sPmYEqblaU8Pw+wXK6AkqvSPcsKpeVajUFUeMfDVY8D4YQL0Lutr8xwrbJnjobxj
+         r7hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hIYswHQWRvAKNZqbn4aJZ16s+Ip2WBsvtLErDYbrWjo=;
+        b=nGDnOFyJGRCn4wlIW1CYybeVjQUNm5Q22qdkD+/piK71fFxi9L/XdnVviOfMuEq5+T
+         M+/uxzqDUrMHOOHIOrXeSLa4z0UxbfSerEx1FA79RUzYcdM+zJgrZAAOqqG7tlClc9Vz
+         HrykLq34Q9ujXjgMUrMIX9srbm+fx1FbMnxGkb9hFWWcLLSIktNf/srTuQ8AtRDEdyvZ
+         ii6uFGHC0YIF/0OuOHxqkPdGO2fipas4qAV0yF0YXxCx8HAiLjFixdrd1POszCJk71m4
+         4YNNSRgPcC+9tnQ9KWTL6HD1wY+5KVcvEF9rJ3+pgWOwrBK8uSodouyqvNf4oTrWgDSk
+         o59A==
+X-Gm-Message-State: APjAAAW2HKl/oen3dll8XW3dnNNcS2FM5N/JoOiEtbF5FqrjkKxorJ0I
+        bx4EKw07WybfhmbYrbiOaExshSGcrOVilaoj7hym2w==
+X-Google-Smtp-Source: APXvYqzrVcFMt4Rsnpy0uddKn8mLlndrPPAnVmG02HEEf79JtuDS9uaEfXH6YYyvvYr501Pft2FSJ8MgbA9s9tt/szo=
+X-Received: by 2002:a9d:7b43:: with SMTP id f3mr45214796oto.337.1560848360040;
+ Tue, 18 Jun 2019 01:59:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190617175658.135869-7-liran.alon@oracle.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Tue, 18 Jun 2019 08:55:44 +0000 (UTC)
+References: <1560255830-8656-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <1560255830-8656-1-git-send-email-wanpengli@tencent.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 18 Jun 2019 17:00:36 +0800
+Message-ID: <CANRm+CwfXViF34eLma5ZnqjT96Sq=XehpBiTZTj1TfJnkevVMA@mail.gmail.com>
+Subject: Re: [PATCH v4 0/3] KVM: Yield to IPI target if necessary
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Liran Alon (liran.alon@oracle.com) wrote:
-> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
-> Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> ---
->  include/migration/vmstate.h | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
-> 
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index 9224370ed59a..a85424fb0483 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -797,6 +797,15 @@ extern const VMStateInfo vmstate_info_qtailq;
->  #define VMSTATE_UINT64_V(_f, _s, _v)                                  \
->      VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint64, uint64_t)
-
-A comment here stating they're for Linux kernel types would be nice.
-
-> +#define VMSTATE_U8_V(_f, _s, _v)                                   \
-> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint8, __u8)
-> +#define VMSTATE_U16_V(_f, _s, _v)                                  \
-> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint16, __u16)
-> +#define VMSTATE_U32_V(_f, _s, _v)                                  \
-> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint32, __u32)
-> +#define VMSTATE_U64_V(_f, _s, _v)                                  \
-> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint64, __u64)
-> +
-
-Have you checked that builds OK on a non-Linux system?
-
-Dave
-
->  #define VMSTATE_BOOL(_f, _s)                                          \
->      VMSTATE_BOOL_V(_f, _s, 0)
->  
-> @@ -818,6 +827,15 @@ extern const VMStateInfo vmstate_info_qtailq;
->  #define VMSTATE_UINT64(_f, _s)                                        \
->      VMSTATE_UINT64_V(_f, _s, 0)
->  
-> +#define VMSTATE_U8(_f, _s)                                         \
-> +    VMSTATE_U8_V(_f, _s, 0)
-> +#define VMSTATE_U16(_f, _s)                                        \
-> +    VMSTATE_U16_V(_f, _s, 0)
-> +#define VMSTATE_U32(_f, _s)                                        \
-> +    VMSTATE_U32_V(_f, _s, 0)
-> +#define VMSTATE_U64(_f, _s)                                        \
-> +    VMSTATE_U64_V(_f, _s, 0)
-> +
->  #define VMSTATE_UINT8_EQUAL(_f, _s, _err_hint)                        \
->      VMSTATE_SINGLE_FULL(_f, _s, 0, 0,                                 \
->                          vmstate_info_uint8_equal, uint8_t, _err_hint)
-> -- 
-> 2.20.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+ping, :)
+On Tue, 11 Jun 2019 at 20:23, Wanpeng Li <kernellwp@gmail.com> wrote:
+>
+> The idea is from Xen, when sending a call-function IPI-many to vCPUs,
+> yield if any of the IPI target vCPUs was preempted. 17% performance
+> increasement of ebizzy benchmark can be observed in an over-subscribe
+> environment. (w/ kvm-pv-tlb disabled, testing TLB flush call-function
+> IPI-many since call-function is not easy to be trigged by userspace
+> workload).
+>
+> v3 -> v4:
+>  * check map->phys_map[dest_id]
+>  * more cleaner kvm_sched_yield()
+>
+> v2 -> v3:
+>  * add bounds-check on dest_id
+>
+> v1 -> v2:
+>  * check map is not NULL
+>  * check map->phys_map[dest_id] is not NULL
+>  * make kvm_sched_yield static
+>  * change dest_id to unsinged long
+>
+> Wanpeng Li (3):
+>   KVM: X86: Yield to IPI target if necessary
+>   KVM: X86: Implement PV sched yield hypercall
+>   KVM: X86: Expose PV_SCHED_YIELD CPUID feature bit to guest
+>
+>  Documentation/virtual/kvm/cpuid.txt      |  4 ++++
+>  Documentation/virtual/kvm/hypercalls.txt | 11 +++++++++++
+>  arch/x86/include/uapi/asm/kvm_para.h     |  1 +
+>  arch/x86/kernel/kvm.c                    | 21 +++++++++++++++++++++
+>  arch/x86/kvm/cpuid.c                     |  3 ++-
+>  arch/x86/kvm/x86.c                       | 21 +++++++++++++++++++++
+>  include/uapi/linux/kvm_para.h            |  1 +
+>  7 files changed, 61 insertions(+), 1 deletion(-)
+>
+> --
+> 2.7.4
+>
