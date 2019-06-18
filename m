@@ -2,137 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D56244A5E2
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 17:52:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CCC44A65F
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 18:15:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729494AbfFRPv7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 11:51:59 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:55866 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729246AbfFRPv7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 11:51:59 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IFmbOe087115;
-        Tue, 18 Jun 2019 15:50:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2018-07-02; bh=0dQkZ5OV/BT2r87AQQsugZlj1F6vKRtcJ9ht0h0pUTQ=;
- b=QvL6hFJTidKvB2pFmtvpTMQAGn3YFv1kOUwrc4aOacIIvvvk4ImHUIHJ8RG35l9FWHyy
- NCArCN+k75zzadSZe+Dt9dVq5jQcGP2Ppx3QCy6h0RkBe9ORCk0+FUqpdHmVBnlGquPF
- qNn7pCEX4AxL/f1++/OkHXcUm59aUJ8AI2FNFzSXf3fYk1uYcpCuKcbDL5A0k7KwELXU
- I4hSVDchWqtIoI20tSfmMeAY6cVeyPyFwTI3flB/pUZ+z+1Udt1F+dJ9vM9EPduPmB4m
- erBnGQ2l5nqP329+TxcZZ6XlNqGgt+73bfmhT8Zax4KxcP+/WApsOImfItZ1oBaUl0he AQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 2t4rmp5cjp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Jun 2019 15:50:59 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IFnEdu133627;
-        Tue, 18 Jun 2019 15:50:58 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2t5cpe4k60-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Jun 2019 15:50:58 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5IFovZb030627;
-        Tue, 18 Jun 2019 15:50:57 GMT
-Received: from [192.168.14.112] (/109.67.217.108)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 18 Jun 2019 08:50:57 -0700
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [QEMU PATCH v3 7/9] KVM: i386: Add support for save and restore
- nested state
-From:   Liran Alon <liran.alon@oracle.com>
-In-Reply-To: <20190618154817.GI2850@work-vm>
-Date:   Tue, 18 Jun 2019 18:50:50 +0300
-Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com,
-        rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org,
-        jmattson@google.com, maran.wilson@oracle.com,
-        Nikita Leshenko <nikita.leshchenko@oracle.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <31104F26-B541-44CB-82D5-CABB033308E3@oracle.com>
-References: <20190617175658.135869-1-liran.alon@oracle.com>
- <20190617175658.135869-8-liran.alon@oracle.com>
- <20190618090316.GC2850@work-vm>
- <32C4B530-A135-475B-B6AF-9288D372920D@oracle.com>
- <20190618154817.GI2850@work-vm>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-X-Mailer: Apple Mail (2.3445.4.7)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=895
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906180125
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=934 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906180125
+        id S1729849AbfFRQPM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 12:15:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36040 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729835AbfFRQPM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 12:15:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id EAF6F30C1AE7;
+        Tue, 18 Jun 2019 16:15:11 +0000 (UTC)
+Received: from gondolin (dhcp-192-192.str.redhat.com [10.33.192.192])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 13E425C225;
+        Tue, 18 Jun 2019 16:14:58 +0000 (UTC)
+Date:   Tue, 18 Jun 2019 18:14:56 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, mjrosato@linux.ibm.com,
+        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
+        pmorel@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com
+Subject: Re: [PATCH v4 1/7] s390: vfio-ap: Refactor vfio_ap driver probe and
+ remove callbacks
+Message-ID: <20190618181456.0252227b.cohuck@redhat.com>
+In-Reply-To: <1560454780-20359-2-git-send-email-akrowiak@linux.ibm.com>
+References: <1560454780-20359-1-git-send-email-akrowiak@linux.ibm.com>
+        <1560454780-20359-2-git-send-email-akrowiak@linux.ibm.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Tue, 18 Jun 2019 16:15:12 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 13 Jun 2019 15:39:34 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
+> In order to limit the number of private mdev functions called from the
+> vfio_ap device driver as well as to provide a landing spot for dynamic
+> configuration code related to binding/unbinding AP queue devices to/from
+> the vfio_ap driver, the following changes are being introduced:
+> 
+> * Move code from the vfio_ap driver's probe callback into a function
+>   defined in the mdev private operations file.
+> 
+> * Move code from the vfio_ap driver's remove callback into a function
+>   defined in the mdev private operations file.
+> 
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>  drivers/s390/crypto/vfio_ap_drv.c     | 27 ++++++++++-----------------
+>  drivers/s390/crypto/vfio_ap_ops.c     | 28 ++++++++++++++++++++++++++++
+>  drivers/s390/crypto/vfio_ap_private.h |  6 +++---
+>  3 files changed, 41 insertions(+), 20 deletions(-)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_drv.c b/drivers/s390/crypto/vfio_ap_drv.c
+> index 003662aa8060..3c60df70891b 100644
+> --- a/drivers/s390/crypto/vfio_ap_drv.c
+> +++ b/drivers/s390/crypto/vfio_ap_drv.c
+> @@ -49,15 +49,15 @@ MODULE_DEVICE_TABLE(vfio_ap, ap_queue_ids);
+>   */
+>  static int vfio_ap_queue_dev_probe(struct ap_device *apdev)
+>  {
+> -	struct vfio_ap_queue *q;
+> -
+> -	q = kzalloc(sizeof(*q), GFP_KERNEL);
+> -	if (!q)
+> -		return -ENOMEM;
+> -	dev_set_drvdata(&apdev->device, q);
+> -	q->apqn = to_ap_queue(&apdev->device)->qid;
+> -	q->saved_isc = VFIO_AP_ISC_INVALID;
+> +	int ret;
+> +	struct ap_queue *queue = to_ap_queue(&apdev->device);
+> +
+> +	ret = vfio_ap_mdev_probe_queue(queue);
+> +	if (ret)
+> +		return ret;
+> +
+>  	return 0;
+> +
 
-> On 18 Jun 2019, at 18:48, Dr. David Alan Gilbert <dgilbert@redhat.com> =
-wrote:
->=20
-> * Liran Alon (liran.alon@oracle.com) wrote:
->>=20
->>> On 18 Jun 2019, at 12:03, Dr. David Alan Gilbert =
-<dgilbert@redhat.com> wrote:
->>>=20
->>> * Liran Alon (liran.alon@oracle.com) wrote:
->>>>=20
->>>> +static const VMStateDescription vmstate_vmx_vmcs12 =3D {
->>>> +	.name =3D "cpu/kvm_nested_state/vmx/vmcs12",
->>>> +	.version_id =3D 1,
->>>> +	.minimum_version_id =3D 1,
->>>> +	.needed =3D vmx_vmcs12_needed,
->>>> +	.fields =3D (VMStateField[]) {
->>>> +	    VMSTATE_UINT8_ARRAY(data.vmx[0].vmcs12,
->>>> +	                        struct kvm_nested_state, 0x1000),
->>>=20
->>> Where did that magic 0x1000 come from?
->>=20
->> Currently, KVM folks (including myself), haven=E2=80=99t decided yet =
-to expose vmcs12 struct layout to userspace but instead to still leave =
-it opaque.
->> The formal size of this size is VMCS12_SIZE (defined in kernel as =
-0x1000). I was wondering if we wish to expose VMCS12_SIZE constant to =
-userspace or not.
->> So currently I defined these __u8 arrays as 0x1000. But in case Paolo =
-agrees to expose VMCS12_SIZE, we can use that instead.
->=20
-> Well if it's not defined it's bound to change at some state!
+Maybe you could even condense this into a simple
 
-I agree it=E2=80=99s better to expose VMCS12_SIZE to userspace but I =
-didn=E2=80=99t want to be the one that decides this.
-Let=E2=80=99s let Paolo decide and modify this patch accordingly if he =
-decides to expose it.
+return vfio_ap_mdev_probe_queue(to_ap_queue(&apdev->device));
 
-> Also, do we need to clear it before we get it from the kernel - e.g.
-> is the kernel guaranteed to give us 0x1000 ?
+(Unless you plan to do more things with queue in a future patch, of
+course.)
 
-Userspace don=E2=80=99t need to clear it before getting it from kernel.
-It does guarantee to give you 0x1000. See vmx_get_nested_state() =
-implementation in kernel.
+>  }
+>  
+>  /**
 
--Liran
+(...)
 
->=20
-> Dave
->=20
->> -Liran
->>=20
->>> --
->>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->>=20
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> diff --git a/drivers/s390/crypto/vfio_ap_private.h b/drivers/s390/crypto/vfio_ap_private.h
+> index f46dde56b464..5cc3c2ebf151 100644
+> --- a/drivers/s390/crypto/vfio_ap_private.h
+> +++ b/drivers/s390/crypto/vfio_ap_private.h
+> @@ -90,8 +90,6 @@ struct ap_matrix_mdev {
+>  
+>  extern int vfio_ap_mdev_register(void);
+>  extern void vfio_ap_mdev_unregister(void);
+> -int vfio_ap_mdev_reset_queue(unsigned int apid, unsigned int apqi,
+> -			     unsigned int retry);
+
+If you don't need that function across files anymore, you probably want
+to make it static.
+
+>  
+>  struct vfio_ap_queue {
+>  	struct ap_matrix_mdev *matrix_mdev;
+> @@ -100,5 +98,7 @@ struct vfio_ap_queue {
+>  #define VFIO_AP_ISC_INVALID 0xff
+>  	unsigned char saved_isc;
+>  };
+> -struct ap_queue_status vfio_ap_irq_disable(struct vfio_ap_queue *q);
+
+Same here.
+
+> +int vfio_ap_mdev_probe_queue(struct ap_queue *queue);
+> +void vfio_ap_mdev_remove_queue(struct ap_queue *queue);
+> +
+>  #endif /* _VFIO_AP_PRIVATE_H_ */
 
