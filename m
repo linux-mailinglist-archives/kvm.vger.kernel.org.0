@@ -2,120 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D49C649C5F
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 10:50:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41BCF49C6F
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 10:55:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729175AbfFRIuV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 04:50:21 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:40658 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728918AbfFRIuV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 04:50:21 -0400
-Received: by mail-wm1-f65.google.com with SMTP id v19so2247671wmj.5
-        for <kvm@vger.kernel.org>; Tue, 18 Jun 2019 01:50:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=XaRQwyUTgn2L8cxm2l8iSyR5oTljpteKkzWOcGKtjWc=;
-        b=htg9qKYEY+TrgmNJ67Cr+g0bP7rhrloieYdW4zyrb1bDB4+L2DWiy7cVuuVHyph7+d
-         iDfs6RncQZXiPlxnN2SIw+WTbwmXTj4YE2UHsevViQw5Oe5hJ1oTqBD5xUYB2ZFOasFI
-         6mYFFfMSjdOtfldH1w+VPzmdN95AVohcRJ/rZHdjBeSjh3QH4k22DRX36J3D0/Ar5L4+
-         XNf6y9gNz5HwAL89Xr3NiQ6q638c0GzuAtVqiDKLunkuCVj6LjrtlPGMqN7qVrAjT1o+
-         dPWaqo7hvB45SOcuIWTMVbQLZhVzHgQ68t3WBlnSe1V2SY4UFyd1wb82FuxA8/uejH/s
-         i2Xw==
-X-Gm-Message-State: APjAAAWN6bJkzpkdr/5R3wH5ASxM6ZTZTvtdmkoqcA93mSyUH3Z40TMW
-        Qlj53gWV4SHUgipXKxtqILljKspl/Ps=
-X-Google-Smtp-Source: APXvYqzZGAzEwOQbHnAo4NEGyxeY8Rhb9eoy7zPk8ORLHQMa+HycqGYgiqCpgBpFzOUrxv1AdcNfWA==
-X-Received: by 2002:a7b:cae9:: with SMTP id t9mr2419484wml.126.1560847818835;
-        Tue, 18 Jun 2019 01:50:18 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:1da0:213e:1763:a1a8? ([2001:b07:6468:f312:1da0:213e:1763:a1a8])
-        by smtp.gmail.com with ESMTPSA id v67sm1569584wme.24.2019.06.18.01.50.18
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 18 Jun 2019 01:50:18 -0700 (PDT)
-Subject: Re: [kvm-unit-tests PATCH] x86: vmx: Mask undefined bits in exit
- qualifications
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Nadav Amit <nadav.amit@gmail.com>
-Cc:     kvm@vger.kernel.org
-References: <20190503174919.13846-1-nadav.amit@gmail.com>
- <A9500030-816E-49F7-84C7-6176C722C2B0@gmail.com>
- <720b1ba2-11aa-6baf-9f21-aa3e1e324afa@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cd192b1f-471d-bf05-7af2-b4a7761042b5@redhat.com>
-Date:   Tue, 18 Jun 2019 10:50:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1729242AbfFRIzo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 04:55:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37960 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728991AbfFRIzo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 04:55:44 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6EA593082231;
+        Tue, 18 Jun 2019 08:55:44 +0000 (UTC)
+Received: from work-vm (ovpn-117-76.ams2.redhat.com [10.36.117.76])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7196B1A8EC;
+        Tue, 18 Jun 2019 08:55:42 +0000 (UTC)
+Date:   Tue, 18 Jun 2019 09:55:40 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com,
+        rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org,
+        jmattson@google.com, maran.wilson@oracle.com,
+        Nikita Leshenko <nikita.leshchenko@oracle.com>
+Subject: Re: [QEMU PATCH v3 6/9] vmstate: Add support for kernel integer types
+Message-ID: <20190618085539.GB2850@work-vm>
+References: <20190617175658.135869-1-liran.alon@oracle.com>
+ <20190617175658.135869-7-liran.alon@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <720b1ba2-11aa-6baf-9f21-aa3e1e324afa@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190617175658.135869-7-liran.alon@oracle.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Tue, 18 Jun 2019 08:55:44 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/06/19 00:22, Krish Sadhukhan wrote:
+* Liran Alon (liran.alon@oracle.com) wrote:
+> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+> Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+> ---
+>  include/migration/vmstate.h | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 > 
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index 9224370ed59a..a85424fb0483 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -797,6 +797,15 @@ extern const VMStateInfo vmstate_info_qtailq;
+>  #define VMSTATE_UINT64_V(_f, _s, _v)                                  \
+>      VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint64, uint64_t)
+
+A comment here stating they're for Linux kernel types would be nice.
+
+> +#define VMSTATE_U8_V(_f, _s, _v)                                   \
+> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint8, __u8)
+> +#define VMSTATE_U16_V(_f, _s, _v)                                  \
+> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint16, __u16)
+> +#define VMSTATE_U32_V(_f, _s, _v)                                  \
+> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint32, __u32)
+> +#define VMSTATE_U64_V(_f, _s, _v)                                  \
+> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint64, __u64)
+> +
+
+Have you checked that builds OK on a non-Linux system?
+
+Dave
+
+>  #define VMSTATE_BOOL(_f, _s)                                          \
+>      VMSTATE_BOOL_V(_f, _s, 0)
+>  
+> @@ -818,6 +827,15 @@ extern const VMStateInfo vmstate_info_qtailq;
+>  #define VMSTATE_UINT64(_f, _s)                                        \
+>      VMSTATE_UINT64_V(_f, _s, 0)
+>  
+> +#define VMSTATE_U8(_f, _s)                                         \
+> +    VMSTATE_U8_V(_f, _s, 0)
+> +#define VMSTATE_U16(_f, _s)                                        \
+> +    VMSTATE_U16_V(_f, _s, 0)
+> +#define VMSTATE_U32(_f, _s)                                        \
+> +    VMSTATE_U32_V(_f, _s, 0)
+> +#define VMSTATE_U64(_f, _s)                                        \
+> +    VMSTATE_U64_V(_f, _s, 0)
+> +
+>  #define VMSTATE_UINT8_EQUAL(_f, _s, _err_hint)                        \
+>      VMSTATE_SINGLE_FULL(_f, _s, 0, 0,                                 \
+>                          vmstate_info_uint8_equal, uint8_t, _err_hint)
+> -- 
+> 2.20.1
 > 
-> On 06/17/2019 12:52 PM, Nadav Amit wrote:
->>> On May 3, 2019, at 10:49 AM, nadav.amit@gmail.com wrote:
->>>
->>> From: Nadav Amit <nadav.amit@gmail.com>
->>>
->>> On EPT violation, the exit qualifications may have some undefined bits.
->>>
->>> Bit 6 is undefined if "mode-based execute control" is 0.
->>>
->>> Bits 9-11 are undefined unless the processor supports advanced VM-exit
->>> information for EPT violations.
->>>
->>> Right now on KVM these bits are always undefined inside the VM (i.e., in
->>> an emulated VM-exit). Mask these bits to avoid potential false
->>> indication of failures.
->>>
->>> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
->>> ---
->>> x86/vmx.h       | 20 ++++++++++++--------
->>> x86/vmx_tests.c |  4 ++++
->>> 2 files changed, 16 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/x86/vmx.h b/x86/vmx.h
->>> index cc377ef..5053d6f 100644
->>> --- a/x86/vmx.h
->>> +++ b/x86/vmx.h
->>> @@ -603,16 +603,20 @@ enum vm_instruction_error_number {
->>> #define EPT_ADDR_MASK        GENMASK_ULL(51, 12)
->>> #define PAGE_MASK_2M        (~(PAGE_SIZE_2M-1))
->>>
->>> -#define EPT_VLT_RD        1
->>> -#define EPT_VLT_WR        (1 << 1)
->>> -#define EPT_VLT_FETCH        (1 << 2)
->>> -#define EPT_VLT_PERM_RD        (1 << 3)
->>> -#define EPT_VLT_PERM_WR        (1 << 4)
->>> -#define EPT_VLT_PERM_EX        (1 << 5)
->>> +#define EPT_VLT_RD        (1ull << 0)
->>> +#define EPT_VLT_WR        (1ull << 1)
->>> +#define EPT_VLT_FETCH        (1ull << 2)
->>> +#define EPT_VLT_PERM_RD        (1ull << 3)
->>> +#define EPT_VLT_PERM_WR        (1ull << 4)
->>> +#define EPT_VLT_PERM_EX        (1ull << 5)
->>> +#define EPT_VLT_PERM_USER_EX    (1ull << 6)
->>> #define EPT_VLT_PERMS        (EPT_VLT_PERM_RD | EPT_VLT_PERM_WR | \
->>>                  EPT_VLT_PERM_EX)
->>> -#define EPT_VLT_LADDR_VLD    (1 << 7)
->>> -#define EPT_VLT_PADDR        (1 << 8)
->>> +#define EPT_VLT_LADDR_VLD    (1ull << 7)
->>> +#define EPT_VLT_PADDR        (1ull << 8)
->>> +#define EPT_VLT_GUEST_USER    (1ull << 9)
->>> +#define EPT_VLT_GUEST_WR    (1ull << 10)
-> 
-> This one should be named EPT_VLT_GUEST_RW,  assuming you are naming them
-> according to the 1-setting of the bits.
-
-Applied with this change, thanks.
-
-Paolo
-
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
