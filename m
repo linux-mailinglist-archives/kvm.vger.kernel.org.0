@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C2A124AE35
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 00:52:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A2AC4AE31
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 00:51:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730990AbfFRWvr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 18:51:47 -0400
-Received: from mga02.intel.com ([134.134.136.20]:2939 "EHLO mga02.intel.com"
+        id S1731065AbfFRWvk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 18:51:40 -0400
+Received: from mga07.intel.com ([134.134.136.100]:48880 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730934AbfFRWvN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 18:51:13 -0400
+        id S1730936AbfFRWvO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 18:51:14 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 15:51:12 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 15:51:12 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,390,1557212400"; 
-   d="scan'208";a="358009368"
+   d="scan'208";a="358009371"
 Received: from romley-ivt3.sc.intel.com ([172.25.110.60])
   by fmsmga005.fm.intel.com with ESMTP; 18 Jun 2019 15:51:11 -0700
 From:   Fenghua Yu <fenghua.yu@intel.com>
@@ -38,10 +38,11 @@ To:     "Thomas Gleixner" <tglx@linutronix.de>,
         "Ravi V Shankar" <ravi.v.shankar@intel.com>
 Cc:     "linux-kernel" <linux-kernel@vger.kernel.org>,
         "x86" <x86@kernel.org>, kvm@vger.kernel.org,
+        Xiaoyao Li <xiaoyao.li@linux.intel.com>,
         Fenghua Yu <fenghua.yu@intel.com>
-Subject: [PATCH v9 09/17] x86/split_lock: Handle #AC exception for split lock
-Date:   Tue, 18 Jun 2019 15:41:11 -0700
-Message-Id: <1560897679-228028-10-git-send-email-fenghua.yu@intel.com>
+Subject: [PATCH v9 10/17] kvm/x86: Emulate MSR IA32_CORE_CAPABILITY
+Date:   Tue, 18 Jun 2019 15:41:12 -0700
+Message-Id: <1560897679-228028-11-git-send-email-fenghua.yu@intel.com>
 X-Mailer: git-send-email 2.5.0
 In-Reply-To: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
 References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
@@ -50,193 +51,137 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There may be different considerations on how to handle #AC for split lock,
-e.g. how to handle system hang caused by split lock issue in firmware,
-how to emulate faulting instruction, etc. We use a simple method to
-handle user and kernel split lock and may extend the method in the future.
+From: Xiaoyao Li <xiaoyao.li@linux.intel.com>
 
-When #AC exception for split lock is triggered from user process, the
-process is killed by SIGBUS. To execute the process properly, a user
-application developer needs to fix the split lock issue.
+MSR IA32_CORE_CAPABILITY is a feature-enumerating MSR, bit 5 of which
+reports the capability of enabling detection of split locks (will be
+supported on future processors based on Tremont microarchitecture and
+later).
 
-When #AC exception for split lock is triggered from a kernel instruction,
-disable split lock detection on local CPU and warn the split lock issue.
-After the exception, the faulting instruction will be executed and kernel
-execution continues. Split lock detection is only disabled on the local
-CPU, not globally. It will be re-enabled if the CPU is offline and then
-online or through debugfs interface.
+CPUID.(EAX=7H,ECX=0):EDX[30] enumerates the presence of the
+IA32_CORE_CAPABILITY MSR.
 
-A kernel/driver developer should check the warning, which contains helpful
-faulting address, context, and callstack info, and fix the split lock
-issues. Then further split lock issues may be captured and fixed.
+Please check the latest Intel 64 and IA-32 Architectures Software
+Developer's Manual for more detailed information on the MSR and
+the split lock bit.
 
-After bit 29 in MSR_TEST_CTL is set to 1 in kernel, firmware inherits
-the setting when firmware is executed in S4, S5, run time services, SMI,
-etc. If there is a split lock operation in firmware, it will triggers
-#AC and may hang the system depending on how firmware handles the #AC.
-It's up to a firmware developer to fix split lock issues in firmware.
+Since MSR_IA32_CORE_CAP is a feature-enumerating MSR that plays the
+similar role as CPUID, it can be emulated in software regardless of host's
+capability. What we need to do is to set the right value of it to report
+the capability of guest.
 
-MSR TEST_CTL value is cached in per CPU msr_test_ctl_cached which will be
-used in virtualization to avoid costly MSR read.
+In this patch, just set the guest's core_capability as 0, because we
+haven't added support of the features it indicates to guest. It's for
+bisectability.
 
-Ingo suggests to use global split_lock_debug flag to allow only one CPU to
-print split lock warning in the #AC handler because WARN_ONCE() and
-underlying BUGFLAG_ONCE mechanism are not atomic. This also solves
-the race if the split-lock #AC fault is re-triggered by NMI of perf
-context interrupting one split-lock warning execution while the original
-WARN_ON() is executing.
-
+Signed-off-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
 Signed-off-by: Fenghua Yu <fenghua.yu@intel.com>
 ---
- arch/x86/include/asm/cpu.h  |  3 +++
- arch/x86/kernel/cpu/intel.c | 38 +++++++++++++++++++++++++++++++++
- arch/x86/kernel/traps.c     | 42 ++++++++++++++++++++++++++++++++++++-
- 3 files changed, 82 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/cpuid.c            |  6 ++++++
+ arch/x86/kvm/x86.c              | 22 ++++++++++++++++++++++
+ 3 files changed, 29 insertions(+)
 
-diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
-index 4e03f53fc079..81710f2a3eea 100644
---- a/arch/x86/include/asm/cpu.h
-+++ b/arch/x86/include/asm/cpu.h
-@@ -42,7 +42,10 @@ unsigned int x86_model(unsigned int sig);
- unsigned int x86_stepping(unsigned int sig);
- #ifdef CONFIG_CPU_SUP_INTEL
- void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c);
-+DECLARE_PER_CPU(u64, msr_test_ctl_cached);
-+void split_lock_disable(void);
- #else
- static inline void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c) {}
-+static inline void split_lock_disable(void) {}
- #endif
- #endif /* _ASM_X86_CPU_H */
-diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
-index 7ae6cc22657d..16cf1631b7f9 100644
---- a/arch/x86/kernel/cpu/intel.c
-+++ b/arch/x86/kernel/cpu/intel.c
-@@ -31,6 +31,9 @@
- #include <asm/apic.h>
- #endif
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 450d69a1e6fa..ddac618e96a1 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -572,6 +572,7 @@ struct kvm_vcpu_arch {
+ 	u64 ia32_xss;
+ 	u64 microcode_version;
+ 	u64 arch_capabilities;
++	u64 core_capability;
  
-+DEFINE_PER_CPU(u64, msr_test_ctl_cached);
-+EXPORT_PER_CPU_SYMBOL_GPL(msr_test_ctl_cached);
-+
- /*
-  * Just in case our CPU detection goes bad, or you have a weird system,
-  * allow a way to override the automatic disabling of MPX.
-@@ -624,6 +627,17 @@ static void init_intel_misc_features(struct cpuinfo_x86 *c)
- 	wrmsrl(MSR_MISC_FEATURES_ENABLES, msr);
+ 	/*
+ 	 * Paging state of the vcpu
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index e18a9f9f65b5..7d064a7c5637 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -507,6 +507,12 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
+ 			 * if the host doesn't support it.
+ 			 */
+ 			entry->edx |= F(ARCH_CAPABILITIES);
++			/*
++			 * Since we emulate MSR IA32_CORE_CAPABILITY in
++			 * software, we can always enable it for guest
++			 * regardless of host's capability.
++			 */
++			entry->edx |= F(CORE_CAPABILITY);
+ 		} else {
+ 			entry->ebx = 0;
+ 			entry->ecx = 0;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 83aefd759846..dc4c72bd6781 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1165,6 +1165,7 @@ static u32 emulated_msrs[] = {
+ 	MSR_IA32_TSC_ADJUST,
+ 	MSR_IA32_TSCDEADLINE,
+ 	MSR_IA32_ARCH_CAPABILITIES,
++	MSR_IA32_CORE_CAP,
+ 	MSR_IA32_MISC_ENABLE,
+ 	MSR_IA32_MCG_STATUS,
+ 	MSR_IA32_MCG_CTL,
+@@ -1207,6 +1208,7 @@ static u32 msr_based_features[] = {
+ 
+ 	MSR_F10H_DECFG,
+ 	MSR_IA32_UCODE_REV,
++	MSR_IA32_CORE_CAP,
+ 	MSR_IA32_ARCH_CAPABILITIES,
+ };
+ 
+@@ -1234,9 +1236,17 @@ u64 kvm_get_arch_capabilities(void)
  }
+ EXPORT_SYMBOL_GPL(kvm_get_arch_capabilities);
  
-+static void split_lock_init(struct cpuinfo_x86 *c)
++static u64 kvm_get_core_capability(void)
 +{
-+	if (cpu_has(c, X86_FEATURE_SPLIT_LOCK_DETECT)) {
-+		u64 test_ctl_val;
-+
-+		/* Cache MSR TEST_CTL */
-+		rdmsrl(MSR_TEST_CTL, test_ctl_val);
-+		this_cpu_write(msr_test_ctl_cached, test_ctl_val);
-+	}
++	return 0;
 +}
 +
- static void init_intel(struct cpuinfo_x86 *c)
+ static int kvm_get_msr_feature(struct kvm_msr_entry *msr)
  {
- 	early_init_intel(c);
-@@ -734,6 +748,8 @@ static void init_intel(struct cpuinfo_x86 *c)
- 		detect_tme(c);
- 
- 	init_intel_misc_features(c);
-+
-+	split_lock_init(c);
- }
- 
- #ifdef CONFIG_X86_32
-@@ -1027,3 +1043,25 @@ void __init cpu_set_core_cap_bits(struct cpuinfo_x86 *c)
- 	if (ia32_core_cap & MSR_IA32_CORE_CAP_SPLIT_LOCK_DETECT)
- 		split_lock_setup();
- }
-+
-+static atomic_t split_lock_debug;
-+
-+void split_lock_disable(void)
-+{
-+	/* Disable split lock detection on this CPU */
-+	this_cpu_and(msr_test_ctl_cached, ~MSR_TEST_CTL_SPLIT_LOCK_DETECT);
-+	wrmsrl(MSR_TEST_CTL, this_cpu_read(msr_test_ctl_cached));
-+
-+	/*
-+	 * Use the atomic variable split_lock_debug to ensure only the
-+	 * first CPU hitting split lock issue prints one single complete
-+	 * warning. This also solves the race if the split-lock #AC fault
-+	 * is re-triggered by NMI of perf context interrupting one
-+	 * split-lock warning execution while the original WARN_ONCE() is
-+	 * executing.
-+	 */
-+	if (atomic_cmpxchg(&split_lock_debug, 0, 1) == 0) {
-+		WARN_ONCE(1, "split lock operation detected\n");
-+		atomic_set(&split_lock_debug, 0);
-+	}
-+}
-diff --git a/arch/x86/kernel/traps.c b/arch/x86/kernel/traps.c
-index 8b6d03e55d2f..38143c028f5a 100644
---- a/arch/x86/kernel/traps.c
-+++ b/arch/x86/kernel/traps.c
-@@ -61,6 +61,7 @@
- #include <asm/mpx.h>
- #include <asm/vm86.h>
- #include <asm/umip.h>
-+#include <asm/cpu.h>
- 
- #ifdef CONFIG_X86_64
- #include <asm/x86_init.h>
-@@ -293,9 +294,48 @@ DO_ERROR(X86_TRAP_OLD_MF, SIGFPE,           0, NULL, "coprocessor segment overru
- DO_ERROR(X86_TRAP_TS,     SIGSEGV,          0, NULL, "invalid TSS",         invalid_TSS)
- DO_ERROR(X86_TRAP_NP,     SIGBUS,           0, NULL, "segment not present", segment_not_present)
- DO_ERROR(X86_TRAP_SS,     SIGBUS,           0, NULL, "stack segment",       stack_segment)
--DO_ERROR(X86_TRAP_AC,     SIGBUS,  BUS_ADRALN, NULL, "alignment check",     alignment_check)
- #undef IP
- 
-+dotraplinkage void do_alignment_check(struct pt_regs *regs, long error_code)
-+{
-+	unsigned int trapnr = X86_TRAP_AC;
-+	char str[] = "alignment check";
-+	int signr = SIGBUS;
-+
-+	RCU_LOCKDEP_WARN(!rcu_is_watching(), "entry code didn't wake RCU");
-+
-+	if (notify_die(DIE_TRAP, str, regs, error_code, trapnr, signr) == NOTIFY_STOP)
-+		return;
-+
-+	cond_local_irq_enable(regs);
-+	if (!user_mode(regs) && static_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT)) {
-+		/*
-+		 * Only split locks can generate #AC from kernel mode.
-+		 *
-+		 * The split-lock detection feature is a one-shot
-+		 * debugging facility, so we disable it immediately and
-+		 * print a warning.
-+		 *
-+		 * This also solves the instruction restart problem: we
-+		 * return the faulting instruction right after this it
-+		 * will be executed without generating another #AC fault
-+		 * and getting into an infinite loop, instead it will
-+		 * continue without side effects to the interrupted
-+		 * execution context.
-+		 *
-+		 * Split-lock detection will remain disabled after this,
-+		 * until the next reboot.
-+		 */
-+		split_lock_disable();
-+
-+		return;
-+	}
-+
-+	/* Handle #AC generated in any other cases. */
-+	do_trap(X86_TRAP_AC, SIGBUS, "alignment check", regs,
-+		error_code, BUS_ADRALN, NULL);
-+}
-+
- #ifdef CONFIG_VMAP_STACK
- __visible void __noreturn handle_stack_overflow(const char *message,
- 						struct pt_regs *regs,
+ 	switch (msr->index) {
++	case MSR_IA32_CORE_CAP:
++		msr->data = kvm_get_core_capability();
++		break;
+ 	case MSR_IA32_ARCH_CAPABILITIES:
+ 		msr->data = kvm_get_arch_capabilities();
+ 		break;
+@@ -2495,6 +2505,11 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ 	case MSR_EFER:
+ 		return set_efer(vcpu, msr_info);
++	case MSR_IA32_CORE_CAP:
++		if (!msr_info->host_initiated)
++			return 1;
++		vcpu->arch.core_capability = data;
++		break;
+ 	case MSR_K7_HWCR:
+ 		data &= ~(u64)0x40;	/* ignore flush filter disable */
+ 		data &= ~(u64)0x100;	/* ignore ignne emulation enable */
+@@ -2808,6 +2823,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	case MSR_IA32_TSC:
+ 		msr_info->data = kvm_scale_tsc(vcpu, rdtsc()) + vcpu->arch.tsc_offset;
+ 		break;
++	case MSR_IA32_CORE_CAP:
++		if (!msr_info->host_initiated &&
++		    !guest_cpuid_has(vcpu, X86_FEATURE_CORE_CAPABILITY))
++			return 1;
++		msr_info->data = vcpu->arch.core_capability;
++		break;
+ 	case MSR_MTRRcap:
+ 	case 0x200 ... 0x2ff:
+ 		return kvm_mtrr_get_msr(vcpu, msr_info->index, &msr_info->data);
+@@ -8853,6 +8874,7 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
+ int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.arch_capabilities = kvm_get_arch_capabilities();
++	vcpu->arch.core_capability = kvm_get_core_capability();
+ 	vcpu->arch.msr_platform_info = MSR_PLATFORM_INFO_CPUID_FAULT;
+ 	kvm_vcpu_mtrr_init(vcpu);
+ 	vcpu_load(vcpu);
 -- 
 2.19.1
 
