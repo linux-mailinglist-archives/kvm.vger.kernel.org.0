@@ -2,335 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BED1D4A395
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 16:13:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D35A4A398
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 16:14:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729337AbfFRONp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 10:13:45 -0400
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:36279 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726248AbfFRONp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 10:13:45 -0400
-Received: by mail-lj1-f195.google.com with SMTP id i21so13318646ljj.3
-        for <kvm@vger.kernel.org>; Tue, 18 Jun 2019 07:13:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=kTF2KOba66vncg2OrIhfqhu+WMIDx8S8lB/RCQOcT1o=;
-        b=VTJmahoDDXaJEdnWBVjGVdBDD+VAGBP6UORvKubloOk2QZRp/om10Nq658z0WKVo6b
-         sOe92tsSx5+6/h5VbDf1JXnP2iL/xNmbXLTUs6duveS6J2Vj5JRBrUw5DKmyoOHYL5QN
-         GNtnpnMtMECLXSHotMG14UHjTaXbyn9M0F9/IDkRYSPVWgWAmtwxLXzGZ/eW9aZgC0+U
-         ud33wyATVPAkogMYKQRORdEwkARrG9L26e0puOfyMS9OhZLzhS5Ize0qp95YyzCBiEIF
-         NR7gh5qyj2MB/sXa2HGfmApAC+Thc6c7GbzUtX/g4QDa7bu1RVqvzxfP6qDNRKDZitBX
-         FSsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=kTF2KOba66vncg2OrIhfqhu+WMIDx8S8lB/RCQOcT1o=;
-        b=tRhHhk4SUjxh+566i4OaKwUckc9pT9HLftRWrj+CVy2ltzNdrjSevFmUKJOo3/ypg7
-         3M8TOEri8BxGByH2Jh344XjBHup49Ta+NQR8lgBIU6+sO7xz0aYd0Zm6JIs/Ig2QexJd
-         wQFx1ezOITrrwC8B61aEjxiVopVIQPKRaxvyC0FjS+ju/TwqHX7Z5ArF5YcGOX2pU1sQ
-         k0+jix7B7ubHFbHyeUf/1aiYfXGrPQhwvXUuH+A5Dnr1k2F21DB8EGMgnXsIfXCLd2Me
-         VMxgGnffinlA4MADEm/aJ8ngJUxnnbLDCgNDXDtCw7g/USbpaTnorl3xHvwo9nwEbFXN
-         hWtA==
-X-Gm-Message-State: APjAAAWz67MueAyLpLmj9209mtVoCO/JudIl0O4RC2ok9JqOssPTKlUz
-        7AHI4hipqDWfzmrkw2wtDHRV4kDi338bPuHknQb3Dsvc/to=
-X-Google-Smtp-Source: APXvYqwhmDKAyxi+XYA9xFZcOFpeloki6TLHkFqtvG7vJ6GaZeDa4hIugLmk2OFkKWF/ifklrXNkevg4BkCPTR17P0I=
-X-Received: by 2002:a2e:994:: with SMTP id 142mr32687591ljj.130.1560867222775;
- Tue, 18 Jun 2019 07:13:42 -0700 (PDT)
+        id S1729477AbfFRON6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 10:13:58 -0400
+Received: from mga07.intel.com ([134.134.136.100]:23544 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729078AbfFRON6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 10:13:58 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 07:13:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,389,1557212400"; 
+   d="scan'208";a="243003841"
+Received: from oamaslek-mobl.amr.corp.intel.com (HELO [10.251.9.224]) ([10.251.9.224])
+  by orsmga001.jf.intel.com with ESMTP; 18 Jun 2019 07:13:57 -0700
+Subject: Re: [PATCH, RFC 45/62] mm: Add the encrypt_mprotect() system call for
+ MKTME
+To:     Andy Lutomirski <luto@kernel.org>,
+        Kai Huang <kai.huang@linux.intel.com>
+Cc:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        X86 ML <x86@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        David Howells <dhowells@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        Linux-MM <linux-mm@kvack.org>, kvm list <kvm@vger.kernel.org>,
+        keyrings@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
+ <20190508144422.13171-46-kirill.shutemov@linux.intel.com>
+ <CALCETrVCdp4LyCasvGkc0+S6fvS+dna=_ytLdDPuD2xeAr5c-w@mail.gmail.com>
+ <3c658cce-7b7e-7d45-59a0-e17dae986713@intel.com>
+ <CALCETrUPSv4Xae3iO+2i_HecJLfx4mqFfmtfp+cwBdab8JUZrg@mail.gmail.com>
+ <5cbfa2da-ba2e-ed91-d0e8-add67753fc12@intel.com>
+ <CALCETrWFXSndmPH0OH4DVVrAyPEeKUUfNwo_9CxO-3xy9awq0g@mail.gmail.com>
+ <1560816342.5187.63.camel@linux.intel.com>
+ <CALCETrVcrPYUUVdgnPZojhJLgEhKv5gNqnT6u2nFVBAZprcs5g@mail.gmail.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+Message-ID: <32d5332d-b549-9ffd-b1d1-72dcd83bbb5f@intel.com>
+Date:   Tue, 18 Jun 2019 07:13:56 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190531141452.158909-1-aaronlewis@google.com>
-In-Reply-To: <20190531141452.158909-1-aaronlewis@google.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Tue, 18 Jun 2019 07:13:31 -0700
-Message-ID: <CAAAPnDHLk=8SMKVy9-mPWWt2t+WX4xS+BKLQJox7vbnHwK50BA@mail.gmail.com>
-Subject: Re: [PATCH] tests: kvm: Check for a kernel warning
-To:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
-        Marc Orr <marcorr@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CALCETrVcrPYUUVdgnPZojhJLgEhKv5gNqnT6u2nFVBAZprcs5g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, May 31, 2019 at 7:14 AM Aaron Lewis <aaronlewis@google.com> wrote:
->
-> When running with /sys/module/kvm_intel/parameters/unrestricted_guest=N,
-> test that a kernel warning does not occur informing us that
-> vcpu->mmio_needed=1.  This can happen when KVM_RUN is called after a
-> triple fault.
-> This test was made to detect a bug that was reported by Syzkaller
-> (https://groups.google.com/forum/#!topic/syzkaller/lHfau8E3SOE) and
-> fixed with commit bbeac2830f4de ("KVM: X86: Fix residual mmio emulation
-> request to userspace").
->
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Peter Shier <pshier@google.com>
-> ---
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../testing/selftests/kvm/include/kvm_util.h  |   2 +
->  .../selftests/kvm/include/x86_64/processor.h  |   2 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  36 +++++
->  .../selftests/kvm/lib/x86_64/processor.c      |  16 +++
->  .../selftests/kvm/x86_64/mmio_warning_test.c  | 126 ++++++++++++++++++
->  7 files changed, 184 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
->
-> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> index df1bf9230a74..41266af0d3dc 100644
-> --- a/tools/testing/selftests/kvm/.gitignore
-> +++ b/tools/testing/selftests/kvm/.gitignore
-> @@ -2,6 +2,7 @@
->  /x86_64/evmcs_test
->  /x86_64/hyperv_cpuid
->  /x86_64/kvm_create_max_vcpus
-> +/x86_64/mmio_warning_test
->  /x86_64/platform_info_test
->  /x86_64/set_sregs_test
->  /x86_64/smm_test
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 79c524395ebe..670b938f1049 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -22,6 +22,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
->  TEST_GEN_PROGS_x86_64 += x86_64/smm_test
->  TEST_GEN_PROGS_x86_64 += x86_64/kvm_create_max_vcpus
->  TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
-> +TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
->  TEST_GEN_PROGS_x86_64 += dirty_log_test
->  TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
->
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 8c6b9619797d..c5c427c86598 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -137,6 +137,8 @@ struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_size,
->                                  void *guest_code);
->  void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code);
->
-> +bool vm_is_unrestricted_guest(struct kvm_vm *vm);
-> +
->  struct kvm_userspace_memory_region *
->  kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
->                                  uint64_t end);
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> index 6063d5b2f356..af4d26de32d1 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> @@ -303,6 +303,8 @@ static inline unsigned long get_xmm(int n)
->         return 0;
->  }
->
-> +bool is_intel_cpu(void);
-> +
->  struct kvm_x86_state;
->  struct kvm_x86_state *vcpu_save_state(struct kvm_vm *vm, uint32_t vcpuid);
->  void vcpu_load_state(struct kvm_vm *vm, uint32_t vcpuid,
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index e9113857f44e..b93b09ad9a11 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -1584,3 +1584,39 @@ void *addr_gva2hva(struct kvm_vm *vm, vm_vaddr_t gva)
->  {
->         return addr_gpa2hva(vm, addr_gva2gpa(vm, gva));
->  }
-> +
-> +/*
-> + * Is Unrestricted Guest
-> + *
-> + * Input Args:
-> + *   vm - Virtual Machine
-> + *
-> + * Output Args: None
-> + *
-> + * Return: True if the unrestricted guest is set to 'Y', otherwise return false.
-> + *
-> + * Check if the unrestricted guest flag is enabled.
-> + */
-> +bool vm_is_unrestricted_guest(struct kvm_vm *vm)
-> +{
-> +       char val = 'N';
-> +       size_t count;
-> +       FILE *f;
-> +
-> +       if (vm == NULL) {
-> +               /* Ensure that the KVM vendor-specific module is loaded. */
-> +               f = fopen(KVM_DEV_PATH, "r");
-> +               TEST_ASSERT(f != NULL, "Error in opening KVM dev file: %d",
-> +                           errno);
-> +               fclose(f);
-> +       }
-> +
-> +       f = fopen("/sys/module/kvm_intel/parameters/unrestricted_guest", "r");
-> +       if (f) {
-> +               count = fread(&val, sizeof(char), 1, f);
-> +               TEST_ASSERT(count == 1, "Unable to read from param file.");
-> +               fclose(f);
-> +       }
-> +
-> +       return val == 'Y';
-> +}
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index dc7fae9fa424..bcc0e70e1856 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -1139,3 +1139,19 @@ void vcpu_load_state(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_x86_state *s
->                         r);
->         }
->  }
-> +
-> +bool is_intel_cpu(void)
-> +{
-> +       int eax, ebx, ecx, edx;
-> +       const uint32_t *chunk;
-> +       const int leaf = 0;
-> +
-> +       __asm__ __volatile__(
-> +               "cpuid"
-> +               : /* output */ "=a"(eax), "=b"(ebx),
-> +                 "=c"(ecx), "=d"(edx)
-> +               : /* input */ "0"(leaf), "2"(0));
-> +
-> +       chunk = (const uint32_t *)("GenuineIntel");
-> +       return (ebx == chunk[0] && edx == chunk[1] && ecx == chunk[2]);
-> +}
-> diff --git a/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c b/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-> new file mode 100644
-> index 000000000000..00bb97d76000
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-> @@ -0,0 +1,126 @@
-> +/*
-> + * mmio_warning_test
-> + *
-> + * Copyright (C) 2019, Google LLC.
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.
-> + *
-> + * Test that we don't get a kernel warning when we call KVM_RUN after a
-> + * triple fault occurs.  To get the triple fault to occur we call KVM_RUN
-> + * on a VCPU that hasn't been properly setup.
-> + *
-> + */
-> +
-> +#define _GNU_SOURCE
-> +#include <fcntl.h>
-> +#include <kvm_util.h>
-> +#include <linux/kvm.h>
-> +#include <processor.h>
-> +#include <pthread.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <sys/ioctl.h>
-> +#include <sys/mman.h>
-> +#include <sys/stat.h>
-> +#include <sys/types.h>
-> +#include <sys/wait.h>
-> +#include <test_util.h>
-> +#include <unistd.h>
-> +
-> +#define NTHREAD 4
-> +#define NPROCESS 5
-> +
-> +struct thread_context {
-> +       int kvmcpu;
-> +       struct kvm_run *run;
-> +};
-> +
-> +void *thr(void *arg)
-> +{
-> +       struct thread_context *tc = (struct thread_context *)arg;
-> +       int res;
-> +       int kvmcpu = tc->kvmcpu;
-> +       struct kvm_run *run = tc->run;
-> +
-> +       res = ioctl(kvmcpu, KVM_RUN, 0);
-> +       printf("ret1=%d exit_reason=%d suberror=%d\n",
-> +               res, run->exit_reason, run->internal.suberror);
-> +
-> +       return 0;
-> +}
-> +
-> +void test(void)
-> +{
-> +       int i, kvm, kvmvm, kvmcpu;
-> +       pthread_t th[NTHREAD];
-> +       struct kvm_run *run;
-> +       struct thread_context tc;
-> +
-> +       kvm = open("/dev/kvm", O_RDWR);
-> +       TEST_ASSERT(kvm != -1, "failed to open /dev/kvm");
-> +       kvmvm = ioctl(kvm, KVM_CREATE_VM, 0);
-> +       TEST_ASSERT(kvmvm != -1, "KVM_CREATE_VM failed");
-> +       kvmcpu = ioctl(kvmvm, KVM_CREATE_VCPU, 0);
-> +       TEST_ASSERT(kvmcpu != -1, "KVM_CREATE_VCPU failed");
-> +       run = (struct kvm_run *)mmap(0, 4096, PROT_READ|PROT_WRITE, MAP_SHARED,
-> +                                   kvmcpu, 0);
-> +       tc.kvmcpu = kvmcpu;
-> +       tc.run = run;
-> +       srand(getpid());
-> +       for (i = 0; i < NTHREAD; i++) {
-> +               pthread_create(&th[i], NULL, thr, (void *)(uintptr_t)&tc);
-> +               usleep(rand() % 10000);
-> +       }
-> +       for (i = 0; i < NTHREAD; i++)
-> +               pthread_join(th[i], NULL);
-> +}
-> +
-> +int get_warnings_count(void)
-> +{
-> +       int warnings;
-> +       FILE *f;
-> +
-> +       f = popen("dmesg | grep \"WARNING:\" | wc -l", "r");
-> +       fscanf(f, "%d", &warnings);
-> +       fclose(f);
-> +
-> +       return warnings;
-> +}
-> +
-> +int main(void)
-> +{
-> +       int warnings_before, warnings_after;
-> +
-> +       if (!is_intel_cpu()) {
-> +               printf("Must be run on an Intel CPU, skipping test\n");
-> +               exit(KSFT_SKIP);
-> +       }
-> +
-> +       if (vm_is_unrestricted_guest(NULL)) {
-> +               printf("Unrestricted guest must be disabled, skipping test\n");
-> +               exit(KSFT_SKIP);
-> +       }
-> +
-> +       warnings_before = get_warnings_count();
-> +
-> +       for (int i = 0; i < NPROCESS; ++i) {
-> +               int status;
-> +               int pid = fork();
-> +
-> +               if (pid < 0)
-> +                       exit(1);
-> +               if (pid == 0) {
-> +                       test();
-> +                       exit(0);
-> +               }
-> +               while (waitpid(pid, &status, __WALL) != pid)
-> +                       ;
-> +       }
-> +
-> +       warnings_after = get_warnings_count();
-> +       TEST_ASSERT(warnings_before == warnings_after,
-> +                  "Warnings found in kernel.  Run 'dmesg' to inspect them.");
-> +
-> +       return 0;
-> +}
-> --
-> 2.22.0.rc1.311.g5d7573a151-goog
->
+On 6/17/19 5:15 PM, Andy Lutomirski wrote:
+>>> But I really expect that the encryption of a DAX device will actually
+>>> be a block device setting and won't look like this at all.  It'll be
+>>> more like dm-crypt except without device mapper.
+>> Are you suggesting not to support MKTME for DAX, or adding MKTME support to dm-crypt?
+> I'm proposing exposing it by an interface that looks somewhat like
+> dm-crypt.  Either we could have a way to create a device layered on
+> top of the DAX devices that exposes a decrypted view or we add a way
+> to tell the DAX device to kindly use MKTME with such-and-such key.
 
-ping
+I think this basically implies that we need to settle (or at least
+present) on an interface for storage (FS-DAX, Device DAX, page cache)
+before we merge one for anonymous memory.
+
+That sounds like a reasonable exercise.
