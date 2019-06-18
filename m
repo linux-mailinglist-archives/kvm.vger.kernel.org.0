@@ -2,117 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B052E4A3BA
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 16:19:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01E4F4A417
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 16:34:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729095AbfFROTs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 10:19:48 -0400
-Received: from mga17.intel.com ([192.55.52.151]:5249 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726248AbfFROTs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 10:19:48 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 07:19:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,389,1557212400"; 
-   d="scan'208";a="243005454"
-Received: from oamaslek-mobl.amr.corp.intel.com (HELO [10.251.9.224]) ([10.251.9.224])
-  by orsmga001.jf.intel.com with ESMTP; 18 Jun 2019 07:19:47 -0700
-Subject: Re: [PATCH, RFC 45/62] mm: Add the encrypt_mprotect() system call for
- MKTME
-To:     Andy Lutomirski <luto@kernel.org>,
-        Kai Huang <kai.huang@linux.intel.com>
-Cc:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        X86 ML <x86@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        David Howells <dhowells@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Alison Schofield <alison.schofield@intel.com>,
-        Linux-MM <linux-mm@kvack.org>, kvm list <kvm@vger.kernel.org>,
-        keyrings@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
- <20190508144422.13171-46-kirill.shutemov@linux.intel.com>
- <CALCETrVCdp4LyCasvGkc0+S6fvS+dna=_ytLdDPuD2xeAr5c-w@mail.gmail.com>
- <3c658cce-7b7e-7d45-59a0-e17dae986713@intel.com>
- <CALCETrUPSv4Xae3iO+2i_HecJLfx4mqFfmtfp+cwBdab8JUZrg@mail.gmail.com>
- <5cbfa2da-ba2e-ed91-d0e8-add67753fc12@intel.com>
- <CALCETrWFXSndmPH0OH4DVVrAyPEeKUUfNwo_9CxO-3xy9awq0g@mail.gmail.com>
- <d599b1d7-9455-3012-0115-96ddbad31833@intel.com>
- <1560818931.5187.70.camel@linux.intel.com>
- <CALCETrXNCmSnrTwGiwuF9=wLu797WBPZ0gt92D-CyU+V3sq7hA@mail.gmail.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-Message-ID: <8dc08b4c-82ee-8458-6941-248141afa2a3@intel.com>
-Date:   Tue, 18 Jun 2019 07:19:46 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <CALCETrXNCmSnrTwGiwuF9=wLu797WBPZ0gt92D-CyU+V3sq7hA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+        id S1729320AbfFROer (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 10:34:47 -0400
+Received: from mail-eopbgr760049.outbound.protection.outlook.com ([40.107.76.49]:51919
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729078AbfFROeq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 10:34:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oswDUruvvq1JYnLIZg0WhwkiSrV1N/gfPxD0uked6M4=;
+ b=pplzPhSr5bHzMzZ2EQxQWW6NKdur3Jp3wuvK3wWeR516DF+8VzELEQhOxXqNJrDArFEOSI0QlnmE+EKAg7KfONBrtnz68HS0/3o6LHaDQxdNpyo68HrBqlMhhy4qVUxnq8l6ULSBZF2sYdXngSuLNxmMGJE3LcMkvjKjL7kYWUs=
+Received: from DM6PR12MB2844.namprd12.prod.outlook.com (20.176.117.96) by
+ DM6PR12MB3738.namprd12.prod.outlook.com (10.255.172.139) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1987.12; Tue, 18 Jun 2019 14:34:42 +0000
+Received: from DM6PR12MB2844.namprd12.prod.outlook.com
+ ([fe80::9b0:ee82:ca4b:a4e7]) by DM6PR12MB2844.namprd12.prod.outlook.com
+ ([fe80::9b0:ee82:ca4b:a4e7%6]) with mapi id 15.20.1987.014; Tue, 18 Jun 2019
+ 14:34:42 +0000
+From:   "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
+        "jsteckli@amazon.de" <jsteckli@amazon.de>,
+        "sironi@amazon.de" <sironi@amazon.de>,
+        "wawei@amazon.de" <wawei@amazon.de>
+Subject: Re: [RFC PATCH 8/8] svm: Allow AVIC with in-kernel irqchip mode
+Thread-Topic: [RFC PATCH 8/8] svm: Allow AVIC with in-kernel irqchip mode
+Thread-Index: AQHUvJfczoXgq9UCxES9CxFgBN3rJ6XRiY0AgAEZS4CAyvFEAIAEuJ4A
+Date:   Tue, 18 Jun 2019 14:34:42 +0000
+Message-ID: <200952f3-d09d-222f-7d07-99335f18b9da@amd.com>
+References: <20190204144128.9489-1-suravee.suthikulpanit@amd.com>
+ <20190204144128.9489-9-suravee.suthikulpanit@amd.com>
+ <20190205113404.5c5382e6@w520.home>
+ <d57a0843-061a-231a-9d50-d7e4d4d05d73@amd.com>
+ <1d80a586342dfee0479db96a4457f7023b0260a9.camel@redhat.com>
+In-Reply-To: <1d80a586342dfee0479db96a4457f7023b0260a9.camel@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.7.0
+x-originating-ip: [165.204.77.11]
+x-clientproxiedby: DM6PR10CA0023.namprd10.prod.outlook.com
+ (2603:10b6:5:60::36) To DM6PR12MB2844.namprd12.prod.outlook.com
+ (2603:10b6:5:45::32)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Suravee.Suthikulpanit@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8b20757d-7c65-402e-03af-08d6f3fa19e5
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM6PR12MB3738;
+x-ms-traffictypediagnostic: DM6PR12MB3738:
+x-microsoft-antispam-prvs: <DM6PR12MB37388A779D4F586A2062BB69F3EA0@DM6PR12MB3738.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 007271867D
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(39860400002)(396003)(366004)(376002)(136003)(346002)(199004)(189003)(446003)(68736007)(186003)(478600001)(14444005)(31696002)(71190400001)(81156014)(11346002)(81166006)(71200400001)(305945005)(14454004)(7736002)(5660300002)(229853002)(66446008)(64756008)(2616005)(65826007)(6506007)(256004)(66556008)(66476007)(73956011)(86362001)(31686004)(6246003)(476003)(25786009)(6436002)(6512007)(6486002)(66946007)(72206003)(4326008)(7416002)(54906003)(102836004)(316002)(58126008)(53936002)(486006)(65806001)(26005)(76176011)(99286004)(386003)(53546011)(8676002)(52116002)(36756003)(6116002)(3846002)(66066001)(65956001)(110136005)(2906002)(8936002)(64126003);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3738;H:DM6PR12MB2844.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: nhWyW5NapoyaLMQskiP+BUqeY3NpY6iGt+ricd3HgWfms6Lb/cVpkYLS41hmQOaX2Iy0sEPiBSroTwM2yxnoBA4EGlDiQKH6pnhmqtH6m5ZfAUOnfKWTD6NHHY0gvOCVSLm2fYnUzB1pTSO4FWmUWeTsjs1s6OqxwbqmXxC8WUjGl6qBhZhBVrgBHuQShw7cr3hfAK3iohOjlldKIYCJQH15/t9UQC9/m1UJ1oZ87MU7LrRx2g6JBVdhQeQ43luwGS15mVLc6R4pWbDf+QfibvAgTuKK6NraCmpg3LfXnC0ftb2XDdUDJ3Znon4QkO/5+XjVEQiUTQWxdSj8SFL30U0DjhhUF8ZSBkDK2z8bpGCN7kb8qAIpL1a+A4zwcc5ROnQ8CfRpllmXk7bJz4Va3fPdavV/K4z8fAaHTnN0PNg=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <92116DF47B673844B3DA53C40D5D1E9A@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b20757d-7c65-402e-03af-08d6f3fa19e5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jun 2019 14:34:42.3825
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ssuthiku@amd.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3738
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/17/19 6:50 PM, Andy Lutomirski wrote:
-> I'm also wondering whether the kernel will always be able to be a
-> one-stop shop for key allocation -- if the MKTME hardware gains
-> interesting new uses down the road, who knows how key allocation will
-> work?
-
-I can't share all the details on LKML, of course, but I can at least say
-that this model of allocating KeyID slots will continue to be used for a
-number of generations.
-
+SGksDQoNCk9uIDYvMTUvMTkgOToyOCBBTSwgTWF4aW0gTGV2aXRza3kgd3JvdGU6DQo+IE9uIFdl
+ZCwgMjAxOS0wMi0wNiBhdCAxMToyMCArMDAwMCwgU3V0aGlrdWxwYW5pdCwgU3VyYXZlZSB3cm90
+ZToNCj4+IEFsZXgsDQo+Pg0KPj4gT24gMi82LzE5IDE6MzQgQU0sIEFsZXggV2lsbGlhbXNvbiB3
+cm90ZToNCj4+PiBPbiBNb24sIDQgRmViIDIwMTkgMTQ6NDI6MzIgKzAwMDANCj4+PiAiU3V0aGlr
+dWxwYW5pdCwgU3VyYXZlZSI8U3VyYXZlZS5TdXRoaWt1bHBhbml0QGFtZC5jb20+ICB3cm90ZToN
+Cj4+Pg0KPj4+PiBPbmNlIHRoZSBJUlEgYWNrIG5vdGlmaWVyIGZvciBpbi1rZXJuZWwgUElUIGlz
+IG5vIGxvbmdlciByZXF1aXJlZA0KPj4+PiBhbmQgcnVuLXRpbWUgQVZJQyBhY3RpdmF0ZS9kZWFj
+dGl2YXRlIGlzIHN1cHBvcnRlZCwgd2UgY2FuIHJlbW92ZQ0KPj4+PiB0aGUga2VybmVsIGlycWNo
+aXAgc3BsaXQgbW9kZSByZXF1aXJlbWVudCBmb3IgQVZJQy4NCj4+Pj4NCj4+Pj4gSGVuY2UsIHJl
+bW92ZSB0aGUgY2hlY2sgZm9yIGlycWNoaXAgc3BsaXQgbW9kZSB3aGVuIGVuYWJsaW5nIEFWSUMu
+DQo+Pj4NCj4+PiBZYXkhICBDb3VsZCB3ZSBhbHNvIGF0IHRoaXMgcG9pbnQgbWFrZSBhdmljIGVu
+YWJsZWQgYnkgZGVmYXVsdCBvciBhcmUNCj4+PiB0aGVyZSByZW1haW5pbmcgaW5jb21wYXRpYmls
+aXRpZXM/ICBUaGFua3MsDQo+Pg0KPj4gSSdtIGxvb2tpbmcgaW50byB0aGF0IG5leHQuIEkgd291
+bGQgbmVlZCB0byBlbnN1cmUgdGhhdCBlbmFibGluZw0KPj4gQVZJQyB3b3VsZCBub3QgY2F1c2Ug
+aXNzdWVzIHdpdGggb3RoZXIgZmVhdHVyZXMuDQo+Pg0KPj4gU3VyYXZlZQ0KPiANCj4gSGkhDQo+
+IA0KPiBEbyB5b3UgaGF2ZSBhbnkgdXBkYXRlIG9uIHRoZSBzdGF0ZSBvZiB0aGlzIHBhdGNoPw0K
+PiBJIGtpbmQgb2Ygc3R1bWJsZWQgb24gaXQgYWNjaWRlbnRseSwgd2hpbGUNCj4gdHJ5aW5nIHRv
+IHVuZGVyc3RhbmQgd2h5IEFWSUMgaXMgb25seSBlbmFibGVkIGluIHRoZSBzcGxpdCBpcnFjaGlw
+IG1vZGUuDQoNCkknbSBzdGlsbCB3b3JraW5nIG9uIHRoaXMgYW5kIHRlc3RpbmcgdGhlIHNlcmll
+cy4NCkknbGwgcG9zdCB0aGlzIHNvb24uDQoNClRoYW5rcywNClN1cmF2ZWUNCg0KPiBCZXN0IHJl
+Z2FyZHMsDQo+IAlNYXhpbSBMZXZpdHNreQ0KPiANCg0K
