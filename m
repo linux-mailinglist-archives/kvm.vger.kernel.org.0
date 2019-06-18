@@ -2,201 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A9F42497AC
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 05:05:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4623749803
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 06:19:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726248AbfFRDE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jun 2019 23:04:59 -0400
-Received: from mga07.intel.com ([134.134.136.100]:60266 "EHLO mga07.intel.com"
+        id S1726428AbfFRET5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 00:19:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57436 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725829AbfFRDE7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jun 2019 23:04:59 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jun 2019 20:04:58 -0700
-X-ExtLoop1: 1
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.224]) ([10.239.196.224])
-  by orsmga003.jf.intel.com with ESMTP; 17 Jun 2019 20:04:55 -0700
-Subject: Re: [PATCH RESEND v3 2/3] KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
-To:     Xiaoyao Li <xiaoyao.li@intel.com>, pbonzini@redhat.com,
-        rkrcmar@redhat.com, corbet@lwn.net, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        sean.j.christopherson@intel.com, fenghua.yu@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jingqi.liu@intel.com
-References: <20190616095555.20978-1-tao3.xu@intel.com>
- <20190616095555.20978-3-tao3.xu@intel.com>
- <d99b2ae1-38fc-0b71-2613-8131decc923a@intel.com>
-From:   Tao Xu <tao3.xu@intel.com>
-Message-ID: <3468075c-9289-b2b5-8310-e1f39524a8e9@intel.com>
-Date:   Tue, 18 Jun 2019 11:04:54 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+        id S1725870AbfFRET5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 00:19:57 -0400
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F20FE20B1F
+        for <kvm@vger.kernel.org>; Tue, 18 Jun 2019 04:19:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1560831596;
+        bh=51rZ9e9LkNVBLGHAIif1eIVHEBL3AZLf/1gX1DPTttU=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=DuLk3e8EkWUmqjbMfqOhBVznVeVo0ij+gX+dBj6X0D/RiqGPAyRXac3zAcRajl+NC
+         rG8dKjmVC7cMcg+ACN+3b4bthSfnYsFrxPjfTgqhyZKFcThYwI8P3UENip/XJE3+MM
+         sTMSBKCyqPy5UWo0Vh97re/7Sj11UC+1Gd22CCLk=
+Received: by mail-wr1-f54.google.com with SMTP id f9so12222540wre.12
+        for <kvm@vger.kernel.org>; Mon, 17 Jun 2019 21:19:55 -0700 (PDT)
+X-Gm-Message-State: APjAAAXfg0P6Fg6T6gDCOwPMEia4zd9eL7/4IVqqbnmKMnNqY8uzN8Wk
+        rsZy8VT4RinUY9pupsPwa9gBtpjyhu9IvVGpRUtzAA==
+X-Google-Smtp-Source: APXvYqwkWC2giN5A08cpptwz3BEntUfKPcruY0ZN2y5TqsdMlC09wK5a0VuZQ+7Nz/i2Q9X96feEw9aA23jTO9Vxlx4=
+X-Received: by 2002:adf:a443:: with SMTP id e3mr26082705wra.221.1560831594613;
+ Mon, 17 Jun 2019 21:19:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d99b2ae1-38fc-0b71-2613-8131decc923a@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
+ <20190508144422.13171-46-kirill.shutemov@linux.intel.com> <CALCETrVCdp4LyCasvGkc0+S6fvS+dna=_ytLdDPuD2xeAr5c-w@mail.gmail.com>
+ <3c658cce-7b7e-7d45-59a0-e17dae986713@intel.com> <CALCETrUPSv4Xae3iO+2i_HecJLfx4mqFfmtfp+cwBdab8JUZrg@mail.gmail.com>
+ <5cbfa2da-ba2e-ed91-d0e8-add67753fc12@intel.com> <1560815959.5187.57.camel@linux.intel.com>
+ <cbbc6af7-36f8-a81f-48b1-2ad4eefc2417@amd.com> <CALCETrWq98--AgXXj=h1R70CiCWNncCThN2fEdxj2ZkedMw6=A@mail.gmail.com>
+In-Reply-To: <CALCETrWq98--AgXXj=h1R70CiCWNncCThN2fEdxj2ZkedMw6=A@mail.gmail.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Mon, 17 Jun 2019 21:19:42 -0700
+X-Gmail-Original-Message-ID: <CALCETrWX877XD=mivftv96y00tWxT5THFD5MgoF+c_BPqc4aDQ@mail.gmail.com>
+Message-ID: <CALCETrWX877XD=mivftv96y00tWxT5THFD5MgoF+c_BPqc4aDQ@mail.gmail.com>
+Subject: Re: [PATCH, RFC 45/62] mm: Add the encrypt_mprotect() system call for MKTME
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        Kai Huang <kai.huang@linux.intel.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        X86 ML <x86@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        David Howells <dhowells@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        Linux-MM <linux-mm@kvack.org>, kvm list <kvm@vger.kernel.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/17/2019 11:32 AM, Xiaoyao Li wrote:
-> 
-> 
-> On 6/16/2019 5:55 PM, Tao Xu wrote:
->> UMWAIT and TPAUSE instructions use IA32_UMWAIT_CONTROL at MSR index E1H
->> to determines the maximum time in TSC-quanta that the processor can 
->> reside
->> in either C0.1 or C0.2.
->>
->> This patch emulates MSR IA32_UMWAIT_CONTROL in guest and differentiate
->> IA32_UMWAIT_CONTROL between host and guest. The variable
->> mwait_control_cached in arch/x86/power/umwait.c caches the MSR value, so
->> this patch uses it to avoid frequently rdmsr of IA32_UMWAIT_CONTROL.
->>
->> Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
->> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
->> Signed-off-by: Tao Xu <tao3.xu@intel.com>
->> ---
->>   arch/x86/kvm/vmx/vmx.c  | 36 ++++++++++++++++++++++++++++++++++++
->>   arch/x86/kvm/vmx/vmx.h  |  3 +++
->>   arch/x86/power/umwait.c |  3 ++-
->>   3 files changed, 41 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index b35bfac30a34..f33a25e82cb8 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -1679,6 +1679,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, 
->> struct msr_data *msr_info)
->>   #endif
->>       case MSR_EFER:
->>           return kvm_get_msr_common(vcpu, msr_info);
->> +    case MSR_IA32_UMWAIT_CONTROL:
->> +        if (!vmx_waitpkg_supported())
->> +            return 1;
->> +
->> +        msr_info->data = vmx->msr_ia32_umwait_control;
->> +        break;
->>       case MSR_IA32_SPEC_CTRL:
->>           if (!msr_info->host_initiated &&
->>               !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
->> @@ -1841,6 +1847,15 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, 
->> struct msr_data *msr_info)
->>               return 1;
->>           vmcs_write64(GUEST_BNDCFGS, data);
->>           break;
->> +    case MSR_IA32_UMWAIT_CONTROL:
->> +        if (!vmx_waitpkg_supported())
->> +            return 1;
->> +
->> +        if (!data)
->> +            break;
->> +
-> 
-> Why cannot clear it to zero?
-> 
+On Mon, Jun 17, 2019 at 6:40 PM Andy Lutomirski <luto@kernel.org> wrote:
+>
+> On Mon, Jun 17, 2019 at 6:34 PM Lendacky, Thomas
+> <Thomas.Lendacky@amd.com> wrote:
+> >
+> > On 6/17/19 6:59 PM, Kai Huang wrote:
+> > > On Mon, 2019-06-17 at 11:27 -0700, Dave Hansen wrote:
+>
+> > >
+> > > And yes from my reading (better to have AMD guys to confirm) SEV guest uses anonymous memory, but it
+> > > also pins all guest memory (by calling GUP from KVM -- SEV specifically introduced 2 KVM ioctls for
+> > > this purpose), since SEV architecturally cannot support swapping, migraiton of SEV-encrypted guest
+> > > memory, because SME/SEV also uses physical address as "tweak", and there's no way that kernel can
+> > > get or use SEV-guest's memory encryption key. In order to swap/migrate SEV-guest memory, we need SGX
+> > > EPC eviction/reload similar thing, which SEV doesn't have today.
+> >
+> > Yes, all the guest memory is currently pinned by calling GUP when creating
+> > an SEV guest.
+>
+> Ick.
+>
+> What happens if QEMU tries to read the memory?  Does it just see
+> ciphertext?  Is cache coherency lost if QEMU writes it?
 
-After read the kernel code of umwait again and test it again, host can 
-set it to 0, when we set sys max_time to 0. So I am wondering to remove 
-the "if (!data)" and set the value of msr value to 0x186a0(maxtime = 
-100000) when KVM initialization.
-
-And considering we use "-overcommit cpu-pm=on" to use umwait in QEMU 
-side. It means guest can over-commit the host CPU, so set to 0 make sense.
-
->> +        vmx->msr_ia32_umwait_control = data;
->> +        break;
->>       case MSR_IA32_SPEC_CTRL:
->>           if (!msr_info->host_initiated &&
->>               !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
->> @@ -4126,6 +4141,8 @@ static void vmx_vcpu_reset(struct kvm_vcpu 
->> *vcpu, bool init_event)
->>       vmx->rmode.vm86_active = 0;
->>       vmx->spec_ctrl = 0;
->> +    vmx->msr_ia32_umwait_control = 0;
->> +
->>       vcpu->arch.microcode_version = 0x100000000ULL;
->>       vmx->vcpu.arch.regs[VCPU_REGS_RDX] = get_rdx_init_val();
->>       kvm_set_cr8(vcpu, 0);
->> @@ -6339,6 +6356,23 @@ static void atomic_switch_perf_msrs(struct 
->> vcpu_vmx *vmx)
->>                       msrs[i].host, false);
->>   }
->> +static void atomic_switch_ia32_umwait_control(struct vcpu_vmx *vmx)
->> +{
->> +    u64 host_umwait_control;
->> +
->> +    if (!vmx_waitpkg_supported())
->> +        return;
->> +
->> +    host_umwait_control = umwait_control_cached;
->> +
-> 
-> It's redundant to define host_umwait_control and this line, we can just 
-> use umwait_control_cached.
-
-Thanks for reminding.
-> 
->> +    if (vmx->msr_ia32_umwait_control != host_umwait_control)
->> +        add_atomic_switch_msr(vmx, MSR_IA32_UMWAIT_CONTROL,
->> +                      vmx->msr_ia32_umwait_control,
->> +                      host_umwait_control, false);
-> 
-> The bit 1 is reserved, at least, we need to do below to ensure not 
-> modifying the reserved bit:
-> 
->      guest_val = (vmx->msr_ia32_umwait_control & ~BIT_ULL(1)) |
->              (host_val & BIT_ULL(1))
-> 
->> +    else
->> +        clear_atomic_switch_msr(vmx, MSR_IA32_UMWAIT_CONTROL);
->> +}
->> +
->>   static void vmx_arm_hv_timer(struct vcpu_vmx *vmx, u32 val)
->>   {
->>       vmcs_write32(VMX_PREEMPTION_TIMER_VALUE, val);
->> @@ -6447,6 +6481,8 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
->>       atomic_switch_perf_msrs(vmx);
->> +    atomic_switch_ia32_umwait_control(vmx);
->> +
->>       vmx_update_hv_timer(vcpu);
->>       /*
->> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
->> index 61128b48c503..8485bec7c38a 100644
->> --- a/arch/x86/kvm/vmx/vmx.h
->> +++ b/arch/x86/kvm/vmx/vmx.h
->> @@ -14,6 +14,8 @@
->>   extern const u32 vmx_msr_index[];
->>   extern u64 host_efer;
->> +extern u32 umwait_control_cached;
->> +
->>   #define MSR_TYPE_R    1
->>   #define MSR_TYPE_W    2
->>   #define MSR_TYPE_RW    3
->> @@ -194,6 +196,7 @@ struct vcpu_vmx {
->>   #endif
->>       u64              spec_ctrl;
->> +    u64              msr_ia32_umwait_control;
->>       u32 vm_entry_controls_shadow;
->>       u32 vm_exit_controls_shadow;
->> diff --git a/arch/x86/power/umwait.c b/arch/x86/power/umwait.c
->> index 7fa381e3fd4e..2e6ce4cbccb3 100644
->> --- a/arch/x86/power/umwait.c
->> +++ b/arch/x86/power/umwait.c
->> @@ -9,7 +9,8 @@
->>    * MSR value. By default, umwait max time is 100000 in TSC-quanta 
->> and C0.2
->>    * is enabled
->>    */
->> -static u32 umwait_control_cached = 100000;
->> +u32 umwait_control_cached = 100000;
->> +EXPORT_SYMBOL_GPL(umwait_control_cached);
->>   /*
->>    * Serialize access to umwait_control_cached and IA32_UMWAIT_CONTROL 
->> MSR
->>
-
+I should add: is the current interface that SEV uses actually good, or
+should the kernel try to do something differently?  I've spent exactly
+zero time looking at SEV APIs or at how QEMU manages its memory.
