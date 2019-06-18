@@ -2,167 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AC2FB49C44
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 10:44:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D49C649C5F
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 10:50:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729205AbfFRIoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 04:44:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46522 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726330AbfFRIoe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 04:44:34 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 38BA8308FC4B;
-        Tue, 18 Jun 2019 08:44:26 +0000 (UTC)
-Received: from work-vm (ovpn-117-76.ams2.redhat.com [10.36.117.76])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B7F662926;
-        Tue, 18 Jun 2019 08:44:23 +0000 (UTC)
-Date:   Tue, 18 Jun 2019 09:44:20 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com,
-        rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org,
-        jmattson@google.com, maran.wilson@oracle.com
-Subject: Re: [QEMU PATCH v3 4/9] KVM: i386: Block migration for vCPUs exposed
- with nested virtualization
-Message-ID: <20190618084420.GA2850@work-vm>
-References: <20190617175658.135869-1-liran.alon@oracle.com>
- <20190617175658.135869-5-liran.alon@oracle.com>
+        id S1729175AbfFRIuV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 04:50:21 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:40658 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728918AbfFRIuV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 04:50:21 -0400
+Received: by mail-wm1-f65.google.com with SMTP id v19so2247671wmj.5
+        for <kvm@vger.kernel.org>; Tue, 18 Jun 2019 01:50:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XaRQwyUTgn2L8cxm2l8iSyR5oTljpteKkzWOcGKtjWc=;
+        b=htg9qKYEY+TrgmNJ67Cr+g0bP7rhrloieYdW4zyrb1bDB4+L2DWiy7cVuuVHyph7+d
+         iDfs6RncQZXiPlxnN2SIw+WTbwmXTj4YE2UHsevViQw5Oe5hJ1oTqBD5xUYB2ZFOasFI
+         6mYFFfMSjdOtfldH1w+VPzmdN95AVohcRJ/rZHdjBeSjh3QH4k22DRX36J3D0/Ar5L4+
+         XNf6y9gNz5HwAL89Xr3NiQ6q638c0GzuAtVqiDKLunkuCVj6LjrtlPGMqN7qVrAjT1o+
+         dPWaqo7hvB45SOcuIWTMVbQLZhVzHgQ68t3WBlnSe1V2SY4UFyd1wb82FuxA8/uejH/s
+         i2Xw==
+X-Gm-Message-State: APjAAAWN6bJkzpkdr/5R3wH5ASxM6ZTZTvtdmkoqcA93mSyUH3Z40TMW
+        Qlj53gWV4SHUgipXKxtqILljKspl/Ps=
+X-Google-Smtp-Source: APXvYqzZGAzEwOQbHnAo4NEGyxeY8Rhb9eoy7zPk8ORLHQMa+HycqGYgiqCpgBpFzOUrxv1AdcNfWA==
+X-Received: by 2002:a7b:cae9:: with SMTP id t9mr2419484wml.126.1560847818835;
+        Tue, 18 Jun 2019 01:50:18 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:1da0:213e:1763:a1a8? ([2001:b07:6468:f312:1da0:213e:1763:a1a8])
+        by smtp.gmail.com with ESMTPSA id v67sm1569584wme.24.2019.06.18.01.50.18
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Tue, 18 Jun 2019 01:50:18 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH] x86: vmx: Mask undefined bits in exit
+ qualifications
+To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Nadav Amit <nadav.amit@gmail.com>
+Cc:     kvm@vger.kernel.org
+References: <20190503174919.13846-1-nadav.amit@gmail.com>
+ <A9500030-816E-49F7-84C7-6176C722C2B0@gmail.com>
+ <720b1ba2-11aa-6baf-9f21-aa3e1e324afa@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cd192b1f-471d-bf05-7af2-b4a7761042b5@redhat.com>
+Date:   Tue, 18 Jun 2019 10:50:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190617175658.135869-5-liran.alon@oracle.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Tue, 18 Jun 2019 08:44:34 +0000 (UTC)
+In-Reply-To: <720b1ba2-11aa-6baf-9f21-aa3e1e324afa@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Liran Alon (liran.alon@oracle.com) wrote:
-> Commit d98f26073beb ("target/i386: kvm: add VMX migration blocker")
-> added a migration blocker for vCPU exposed with Intel VMX.
-> However, migration should also be blocked for vCPU exposed with
-> AMD SVM.
+On 18/06/19 00:22, Krish Sadhukhan wrote:
 > 
-> Both cases should be blocked because QEMU should extract additional
-> vCPU state from KVM that should be migrated as part of vCPU VMState.
-> E.g. Whether vCPU is running in guest-mode or host-mode.
 > 
-> Fixes: d98f26073beb ("target/i386: kvm: add VMX migration blocker")
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> ---
->  target/i386/cpu.c |  6 ------
->  target/i386/cpu.h | 24 ++++++++++++++++++++++++
->  target/i386/kvm.c | 12 ++++++------
->  3 files changed, 30 insertions(+), 12 deletions(-)
+> On 06/17/2019 12:52 PM, Nadav Amit wrote:
+>>> On May 3, 2019, at 10:49 AM, nadav.amit@gmail.com wrote:
+>>>
+>>> From: Nadav Amit <nadav.amit@gmail.com>
+>>>
+>>> On EPT violation, the exit qualifications may have some undefined bits.
+>>>
+>>> Bit 6 is undefined if "mode-based execute control" is 0.
+>>>
+>>> Bits 9-11 are undefined unless the processor supports advanced VM-exit
+>>> information for EPT violations.
+>>>
+>>> Right now on KVM these bits are always undefined inside the VM (i.e., in
+>>> an emulated VM-exit). Mask these bits to avoid potential false
+>>> indication of failures.
+>>>
+>>> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+>>> ---
+>>> x86/vmx.h       | 20 ++++++++++++--------
+>>> x86/vmx_tests.c |  4 ++++
+>>> 2 files changed, 16 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/x86/vmx.h b/x86/vmx.h
+>>> index cc377ef..5053d6f 100644
+>>> --- a/x86/vmx.h
+>>> +++ b/x86/vmx.h
+>>> @@ -603,16 +603,20 @@ enum vm_instruction_error_number {
+>>> #define EPT_ADDR_MASK        GENMASK_ULL(51, 12)
+>>> #define PAGE_MASK_2M        (~(PAGE_SIZE_2M-1))
+>>>
+>>> -#define EPT_VLT_RD        1
+>>> -#define EPT_VLT_WR        (1 << 1)
+>>> -#define EPT_VLT_FETCH        (1 << 2)
+>>> -#define EPT_VLT_PERM_RD        (1 << 3)
+>>> -#define EPT_VLT_PERM_WR        (1 << 4)
+>>> -#define EPT_VLT_PERM_EX        (1 << 5)
+>>> +#define EPT_VLT_RD        (1ull << 0)
+>>> +#define EPT_VLT_WR        (1ull << 1)
+>>> +#define EPT_VLT_FETCH        (1ull << 2)
+>>> +#define EPT_VLT_PERM_RD        (1ull << 3)
+>>> +#define EPT_VLT_PERM_WR        (1ull << 4)
+>>> +#define EPT_VLT_PERM_EX        (1ull << 5)
+>>> +#define EPT_VLT_PERM_USER_EX    (1ull << 6)
+>>> #define EPT_VLT_PERMS        (EPT_VLT_PERM_RD | EPT_VLT_PERM_WR | \
+>>>                  EPT_VLT_PERM_EX)
+>>> -#define EPT_VLT_LADDR_VLD    (1 << 7)
+>>> -#define EPT_VLT_PADDR        (1 << 8)
+>>> +#define EPT_VLT_LADDR_VLD    (1ull << 7)
+>>> +#define EPT_VLT_PADDR        (1ull << 8)
+>>> +#define EPT_VLT_GUEST_USER    (1ull << 9)
+>>> +#define EPT_VLT_GUEST_WR    (1ull << 10)
 > 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 536d7d152044..197201087e65 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -5170,12 +5170,6 @@ static int x86_cpu_filter_features(X86CPU *cpu)
->      return rv;
->  }
->  
-> -#define IS_INTEL_CPU(env) ((env)->cpuid_vendor1 == CPUID_VENDOR_INTEL_1 && \
-> -                           (env)->cpuid_vendor2 == CPUID_VENDOR_INTEL_2 && \
-> -                           (env)->cpuid_vendor3 == CPUID_VENDOR_INTEL_3)
-> -#define IS_AMD_CPU(env) ((env)->cpuid_vendor1 == CPUID_VENDOR_AMD_1 && \
-> -                         (env)->cpuid_vendor2 == CPUID_VENDOR_AMD_2 && \
-> -                         (env)->cpuid_vendor3 == CPUID_VENDOR_AMD_3)
->  static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
->  {
->      CPUState *cs = CPU(dev);
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index fce6660bac00..79d9495ceb0c 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -728,6 +728,13 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->  
->  #define CPUID_VENDOR_HYGON    "HygonGenuine"
->  
-> +#define IS_INTEL_CPU(env) ((env)->cpuid_vendor1 == CPUID_VENDOR_INTEL_1 && \
-> +                           (env)->cpuid_vendor2 == CPUID_VENDOR_INTEL_2 && \
-> +                           (env)->cpuid_vendor3 == CPUID_VENDOR_INTEL_3)
-> +#define IS_AMD_CPU(env) ((env)->cpuid_vendor1 == CPUID_VENDOR_AMD_1 && \
-> +                         (env)->cpuid_vendor2 == CPUID_VENDOR_AMD_2 && \
-> +                         (env)->cpuid_vendor3 == CPUID_VENDOR_AMD_3)
-> +
->  #define CPUID_MWAIT_IBE     (1U << 1) /* Interrupts can exit capability */
->  #define CPUID_MWAIT_EMX     (1U << 0) /* enumeration supported */
->  
-> @@ -1866,6 +1873,23 @@ static inline int32_t x86_get_a20_mask(CPUX86State *env)
->      }
->  }
->  
-> +static inline bool cpu_has_vmx(CPUX86State *env)
-> +{
-> +    return (IS_INTEL_CPU(env) &&
-> +            (env->features[FEAT_1_ECX] & CPUID_EXT_VMX));
-> +}
-> +
-> +static inline bool cpu_has_svm(CPUX86State *env)
-> +{
-> +    return (IS_AMD_CPU(env) &&
-> +            (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM));
+> This one should be named EPT_VLT_GUEST_RW,  assuming you are naming them
+> according to the 1-setting of the bits.
 
-Note that the Hygon Dhyana seems to have SVM set as well, see
-target/i386/cpu.c and search for "Dhyana"
+Applied with this change, thanks.
 
-(Note the AMD users are going to be a bit more surprised by this
-restriction than Intel users, since Nested has been enabled on AMD for a
-long time).
+Paolo
 
-Dave
-
-> +}
-> +
-> +static inline bool cpu_has_nested_virt(CPUX86State *env)
-> +{
-> +    return (cpu_has_vmx(env) || cpu_has_svm(env));
-> +}
-> +
->  /* fpu_helper.c */
->  void update_fp_status(CPUX86State *env);
->  void update_mxcsr_status(CPUX86State *env);
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index c8fd53055d37..f43e2d69859e 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -906,7 +906,7 @@ static int hyperv_init_vcpu(X86CPU *cpu)
->  }
->  
->  static Error *invtsc_mig_blocker;
-> -static Error *vmx_mig_blocker;
-> +static Error *nested_virt_mig_blocker;
->  
->  #define KVM_MAX_CPUID_ENTRIES  100
->  
-> @@ -1270,13 +1270,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
->                                    !!(c->ecx & CPUID_EXT_SMX);
->      }
->  
-> -    if ((env->features[FEAT_1_ECX] & CPUID_EXT_VMX) && !vmx_mig_blocker) {
-> -        error_setg(&vmx_mig_blocker,
-> -                   "Nested VMX virtualization does not support live migration yet");
-> -        r = migrate_add_blocker(vmx_mig_blocker, &local_err);
-> +    if (cpu_has_nested_virt(env) && !nested_virt_mig_blocker) {
-> +        error_setg(&nested_virt_mig_blocker,
-> +                   "Nested virtualization does not support live migration yet");
-> +        r = migrate_add_blocker(nested_virt_mig_blocker, &local_err);
->          if (local_err) {
->              error_report_err(local_err);
-> -            error_free(vmx_mig_blocker);
-> +            error_free(nested_virt_mig_blocker);
->              return r;
->          }
->      }
-> -- 
-> 2.20.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
