@@ -2,144 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BBF24A4D8
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 17:12:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83BB24A595
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 17:37:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729204AbfFRPMC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 11:12:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52764 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727097AbfFRPMC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 11:12:02 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 242CE3024552;
-        Tue, 18 Jun 2019 15:12:02 +0000 (UTC)
-Received: from gondolin (dhcp-192-192.str.redhat.com [10.33.192.192])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BF3A34D1;
-        Tue, 18 Jun 2019 15:11:56 +0000 (UTC)
-Date:   Tue, 18 Jun 2019 17:11:54 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, libvir-list@redhat.com,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH RFC 1/1] allow to specify additional config data
-Message-ID: <20190618171154.3828eb6b.cohuck@redhat.com>
-In-Reply-To: <20190606101552.6fc62bef@x1.home>
-References: <20190606144417.1824-1-cohuck@redhat.com>
-        <20190606144417.1824-2-cohuck@redhat.com>
-        <20190606093224.3ecb92c7@x1.home>
-        <20190606101552.6fc62bef@x1.home>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Tue, 18 Jun 2019 15:12:02 +0000 (UTC)
+        id S1729528AbfFRPhw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 11:37:52 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:54100 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729209AbfFRPhv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 11:37:51 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IFOVY1151641;
+        Tue, 18 Jun 2019 15:36:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=AApMw5TsMqN6YhoPm41GCwqHYefC7ikF/FburAdTeBc=;
+ b=JmmaQtHHEeTv8Q0MOzglhPEAuCKzTdKcD9OEfqLch2TLS0edOmkak2q3QEKb/gThXqbz
+ 7t10mOg1GlkPj2AosylouLRTA9qlwwPep/ubMKlqAs8mZiSTXXy1h9uvlLhujVt569mU
+ eqkuFbxhWZvg92iJnFFEgxqIFQ93EsahbDdRWD0gsfjsWssCOKQzQc7Ti4sPhygj9Arg
+ 1PBy9+ma15TZTU0mxQimAlXvaXubWWNZ9KUH/+X3OTOnY7K5p7BVBbgWbmWL/BP79gh9
+ D0a9nZI8wNrBTHNin0t+gxsNHCTwsHFHORKqKZXdQeRm+WS0tp4a5qaO14PcwTKqT1Gg kg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2t4r3tnbs6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Jun 2019 15:36:58 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IFZ7bu030672;
+        Tue, 18 Jun 2019 15:36:58 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2t5h5ttcxw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Jun 2019 15:36:57 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5IFauo6013961;
+        Tue, 18 Jun 2019 15:36:56 GMT
+Received: from [192.168.14.112] (/109.67.217.108)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 18 Jun 2019 08:36:56 -0700
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [QEMU PATCH v3 6/9] vmstate: Add support for kernel integer types
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20190618085539.GB2850@work-vm>
+Date:   Tue, 18 Jun 2019 18:36:51 +0300
+Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com,
+        rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org,
+        jmattson@google.com, maran.wilson@oracle.com,
+        Nikita Leshenko <nikita.leshchenko@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <AB34E76F-231C-4E66-B5CB-113AFCE7A20F@oracle.com>
+References: <20190617175658.135869-1-liran.alon@oracle.com>
+ <20190617175658.135869-7-liran.alon@oracle.com>
+ <20190618085539.GB2850@work-vm>
+To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906180123
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9291 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906180123
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 6 Jun 2019 10:15:52 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
 
-> On Thu, 6 Jun 2019 09:32:24 -0600
-> Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
-> > On Thu,  6 Jun 2019 16:44:17 +0200
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >   
-> > > Add a rough implementation for vfio-ap.
-> > > 
-> > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > > ---
-> > >  mdevctl.libexec | 25 ++++++++++++++++++++++
-> > >  mdevctl.sbin    | 56 ++++++++++++++++++++++++++++++++++++++++++++++++-
-> > >  2 files changed, 80 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/mdevctl.libexec b/mdevctl.libexec
-> > > index 804166b5086d..cc0546142924 100755
-> > > --- a/mdevctl.libexec
-> > > +++ b/mdevctl.libexec
-> > > @@ -54,6 +54,19 @@ wait_for_supported_types () {
-> > >      fi
-> > >  }
-> > >  
-> > > +# configure vfio-ap devices <config entry> <matrix attribute>
-> > > +configure_ap_devices() {
-> > > +    list="`echo "${config[$1]}" | sed 's/,/ /'`"
-> > > +    [ -z "$list" ] && return
-> > > +    for a in $list; do
-> > > +        echo "$a" > "$supported_types/${config[mdev_type]}/devices/$uuid/$2"
-> > > +        if [ $? -ne 0 ]; then
-> > > +            echo "Error writing '$a' to '$uuid/$2'" >&2
-> > > +            exit 1
-> > > +        fi
-> > > +    done
-> > > +}
-> > > +
-> > >  case ${1} in
-> > >      start-mdev|stop-mdev)
-> > >          if [ $# -ne 2 ]; then
-> > > @@ -148,6 +161,18 @@ case ${cmd} in
-> > >              echo "Error creating mdev type ${config[mdev_type]} on $parent" >&2
-> > >              exit 1
-> > >          fi
-> > > +
-> > > +        # some types may specify additional config data
-> > > +        case ${config[mdev_type]} in
-> > > +            vfio_ap-passthrough)    
-> > 
-> > I think this could have some application beyond ap too, I know NVIDIA
-> > GRID vGPUs do have some controls under the vendor hierarchy of the
-> > device, ex. setting the frame rate limiter.  The implementation here is
-> > a bit rigid, we know a specific protocol for a specific mdev type, but
-> > for supporting arbitrary vendor options we'd really just want to try to
-> > apply whatever options are provided.  If we didn't care about ordering,
-> > we could just look for keys for every file in the device's immediate
-> > sysfs hierarchy and apply any value we find, independent of the
-> > mdev_type, ex. intel_vgpu/foo=bar  Thanks,  
-> 
-> For example:
-> 
-> for key in find -P $mdev_base/$uuid/ \( -path
-> "$mdev_base/$uuid/power/*" -o -path $mdev_base/$uuid/uevent -o -path $mdev_base/$uuid/remove \) -prune -o -type f -print | sed -e "s|$mdev_base/$uuid/||g"); do
->   [ -z ${config[$key]} ] && continue
->   ... parse value(s) and iteratively apply to key
-> done
-> 
-> The find is a little ugly to exclude stuff, maybe we just let people do
-> screwy stuff like specify remove=1 in their config.  Also need to think
-> about whether we're imposing a delimiter to apply multiple values to a
-> key that conflicts with the attribute usage.  Thanks,
-> 
-> Alex
 
-Hm, so I tried to write something like that, but there's an obvious
-drawback for the vfio-ap use case: we want to specify a list of values
-to be written to an attribute. We would have to model that as a list of
-key=value pairs; but that would make it harder to remove a specific
-value. (I currently overwrite a given key=value pair with a new value
-or delete it.) We could specify something like ^key=value to cancel out
-key=value.
+> On 18 Jun 2019, at 11:55, Dr. David Alan Gilbert <dgilbert@redhat.com> =
+wrote:
+>=20
+> * Liran Alon (liran.alon@oracle.com) wrote:
+>> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+>> Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
+>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>> ---
+>> include/migration/vmstate.h | 18 ++++++++++++++++++
+>> 1 file changed, 18 insertions(+)
+>>=20
+>> diff --git a/include/migration/vmstate.h =
+b/include/migration/vmstate.h
+>> index 9224370ed59a..a85424fb0483 100644
+>> --- a/include/migration/vmstate.h
+>> +++ b/include/migration/vmstate.h
+>> @@ -797,6 +797,15 @@ extern const VMStateInfo vmstate_info_qtailq;
+>> #define VMSTATE_UINT64_V(_f, _s, _v)                                  =
+\
+>>     VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint64, uint64_t)
+>=20
+> A comment here stating they're for Linux kernel types would be nice.
 
-Does it make sense to write *all* values specified for a specific key
-to that attribute in sequence, or may this have surprising
-consequences? Can we live with those possible surprises?
+I didn=E2=80=99t want to state this because in theory these types can be =
+used not in kernel context=E2=80=A6
+I thought commit message is sufficient. I think comments in code should =
+be made to clarify
+things. But to justify existence I think commit message should be used.
+But if you insist, I have no strong objection of adding such comment.
 
-> 
-> > > +                configure_ap_devices ap_adapters assign_adapter
-> > > +                configure_ap_devices ap_domains assign_domain
-> > > +                configure_ap_devices ap_control_domains assign_control_domain
-> > > +                # TODO: is assigning idempotent? Should we unwind on error?
-> > > +                ;;
-> > > +            *)
-> > > +                ;;
-> > > +        esac
-> > >          ;;
-> > >  
-> > >      add-mdev)
+>=20
+>> +#define VMSTATE_U8_V(_f, _s, _v)                                   \
+>> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint8, __u8)
+>> +#define VMSTATE_U16_V(_f, _s, _v)                                  \
+>> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint16, __u16)
+>> +#define VMSTATE_U32_V(_f, _s, _v)                                  \
+>> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint32, __u32)
+>> +#define VMSTATE_U64_V(_f, _s, _v)                                  \
+>> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint64, __u64)
+>> +
+>=20
+> Have you checked that builds OK on a non-Linux system?
+
+Hmm that=E2=80=99s a good point. No. :P
+
+-Liran
+
+>=20
+> Dave
+>=20
+>> #define VMSTATE_BOOL(_f, _s)                                          =
+\
+>>     VMSTATE_BOOL_V(_f, _s, 0)
+>>=20
+>> @@ -818,6 +827,15 @@ extern const VMStateInfo vmstate_info_qtailq;
+>> #define VMSTATE_UINT64(_f, _s)                                        =
+\
+>>     VMSTATE_UINT64_V(_f, _s, 0)
+>>=20
+>> +#define VMSTATE_U8(_f, _s)                                         \
+>> +    VMSTATE_U8_V(_f, _s, 0)
+>> +#define VMSTATE_U16(_f, _s)                                        \
+>> +    VMSTATE_U16_V(_f, _s, 0)
+>> +#define VMSTATE_U32(_f, _s)                                        \
+>> +    VMSTATE_U32_V(_f, _s, 0)
+>> +#define VMSTATE_U64(_f, _s)                                        \
+>> +    VMSTATE_U64_V(_f, _s, 0)
+>> +
+>> #define VMSTATE_UINT8_EQUAL(_f, _s, _err_hint)                        =
+\
+>>     VMSTATE_SINGLE_FULL(_f, _s, 0, 0,                                 =
+\
+>>                         vmstate_info_uint8_equal, uint8_t, _err_hint)
+>> --=20
+>> 2.20.1
+>>=20
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
