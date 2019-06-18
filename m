@@ -2,50 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B363749716
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 03:43:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95AFE49725
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 03:51:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727711AbfFRBny (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Jun 2019 21:43:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56348 "EHLO mail.kernel.org"
+        id S1727105AbfFRBvA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Jun 2019 21:51:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59794 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726331AbfFRBny (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Jun 2019 21:43:54 -0400
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+        id S1726489AbfFRBvA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Jun 2019 21:51:00 -0400
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8513D21670
-        for <kvm@vger.kernel.org>; Tue, 18 Jun 2019 01:43:52 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9ED552183F
+        for <kvm@vger.kernel.org>; Tue, 18 Jun 2019 01:50:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560822232;
-        bh=UeYxzLzSuHkMsOuXwbF2xE8bLo2DE9Ww1ky5l8uVDBU=;
+        s=default; t=1560822658;
+        bh=9pADkGP6B9XPZnoSXHTdilPdPV8psk9Fh8iUhTu3lCw=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Bzbrz8OzybZx3nRD8sszmrux5YYYBpI0S2wK2zb8PyRZ4zcxsLG3dVRc64HvmE3Ui
-         M7Sl4fczjevhlcuk02zlNt8Ymdmk+E4IgnWBm+yXVqstWxyO3bf3QA3M9Q1RivuPh1
-         NnIRmdDmIbcCeiljctgQl+Clg5Pl3NWlQ2WIF1XA=
-Received: by mail-wr1-f42.google.com with SMTP id x4so12045779wrt.6
-        for <kvm@vger.kernel.org>; Mon, 17 Jun 2019 18:43:52 -0700 (PDT)
-X-Gm-Message-State: APjAAAVma3luK9FZKF/2RvxSpjOMe5THn2jlREqw+Q4F3UdE/rxLWgnd
-        i1A1DNSKlmTeJE2al6+KFCXbVmSH2aKxgeHQnvhw9A==
-X-Google-Smtp-Source: APXvYqy/3GwC+ybJPbiqUN4zJXNUsdh3MExSjxnPoCGxfyRLpGXNcW3WtovAJfnouA+Zf8by7BtMXSty6Yu+3bvUT+o=
-X-Received: by 2002:adf:a443:: with SMTP id e3mr25678448wra.221.1560822231037;
- Mon, 17 Jun 2019 18:43:51 -0700 (PDT)
+        b=aO3C7gusUpRN/F1U4OsRkHAd5bWRjQMfpkle66mvj1CdvoqtH8xKaAKZisXNpFECZ
+         QOlRO1ZyOcvCR5lcG2FzLXrziVwwb7nFPBKZOO+serlPcj/7WLJ2HliilezLLDjCa7
+         qcRrhJb8zqZ5haKe+GxoCxdEy5Z5yvR95St+9PVQ=
+Received: by mail-wm1-f41.google.com with SMTP id 207so1375678wma.1
+        for <kvm@vger.kernel.org>; Mon, 17 Jun 2019 18:50:58 -0700 (PDT)
+X-Gm-Message-State: APjAAAX/eBr9Fjy6YP5OOhocxCCnWOm9R2uAt0Blt4I/YENWkaQ7WR1J
+        QHa3A7ivb0/fIoKQXF868WPel0ERHP0mv6FNCEMEmw==
+X-Google-Smtp-Source: APXvYqwk/SrJSofnVqjpWG+yfZVhTrDqxfKgaT84Q/TstEFvioa01Y7VXX7BoP++q9pm0LhijDOAe1YMxOBvn+LL0vg=
+X-Received: by 2002:a7b:cd84:: with SMTP id y4mr951107wmj.79.1560822657085;
+ Mon, 17 Jun 2019 18:50:57 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
  <20190508144422.13171-46-kirill.shutemov@linux.intel.com> <CALCETrVCdp4LyCasvGkc0+S6fvS+dna=_ytLdDPuD2xeAr5c-w@mail.gmail.com>
  <3c658cce-7b7e-7d45-59a0-e17dae986713@intel.com> <CALCETrUPSv4Xae3iO+2i_HecJLfx4mqFfmtfp+cwBdab8JUZrg@mail.gmail.com>
  <5cbfa2da-ba2e-ed91-d0e8-add67753fc12@intel.com> <CALCETrWFXSndmPH0OH4DVVrAyPEeKUUfNwo_9CxO-3xy9awq0g@mail.gmail.com>
- <1560816342.5187.63.camel@linux.intel.com> <CALCETrVcrPYUUVdgnPZojhJLgEhKv5gNqnT6u2nFVBAZprcs5g@mail.gmail.com>
- <1560821746.5187.82.camel@linux.intel.com>
-In-Reply-To: <1560821746.5187.82.camel@linux.intel.com>
+ <d599b1d7-9455-3012-0115-96ddbad31833@intel.com> <1560818931.5187.70.camel@linux.intel.com>
+In-Reply-To: <1560818931.5187.70.camel@linux.intel.com>
 From:   Andy Lutomirski <luto@kernel.org>
-Date:   Mon, 17 Jun 2019 18:43:40 -0700
-X-Gmail-Original-Message-ID: <CALCETrUrFTFGhRMuNLxD9G9=GsR6U-THWn4AtminR_HU-nBj+Q@mail.gmail.com>
-Message-ID: <CALCETrUrFTFGhRMuNLxD9G9=GsR6U-THWn4AtminR_HU-nBj+Q@mail.gmail.com>
+Date:   Mon, 17 Jun 2019 18:50:46 -0700
+X-Gmail-Original-Message-ID: <CALCETrXNCmSnrTwGiwuF9=wLu797WBPZ0gt92D-CyU+V3sq7hA@mail.gmail.com>
+Message-ID: <CALCETrXNCmSnrTwGiwuF9=wLu797WBPZ0gt92D-CyU+V3sq7hA@mail.gmail.com>
 Subject: Re: [PATCH, RFC 45/62] mm: Add the encrypt_mprotect() system call for MKTME
 To:     Kai Huang <kai.huang@linux.intel.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@intel.com>,
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
         "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         X86 ML <x86@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
@@ -65,42 +64,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 17, 2019 at 6:35 PM Kai Huang <kai.huang@linux.intel.com> wrote:
+On Mon, Jun 17, 2019 at 5:48 PM Kai Huang <kai.huang@linux.intel.com> wrote:
 >
 >
-> > > >
-> > > > I'm having a hard time imagining that ever working -- wouldn't it blow
-> > > > up if someone did:
-> > > >
-> > > > fd = open("/dev/anything987");
-> > > > ptr1 = mmap(fd);
-> > > > ptr2 = mmap(fd);
-> > > > sys_encrypt(ptr1);
-> > > >
-> > > > So I think it really has to be:
-> > > > fd = open("/dev/anything987");
-> > > > ioctl(fd, ENCRYPT_ME);
-> > > > mmap(fd);
-> > >
-> > > This requires "/dev/anything987" to support ENCRYPT_ME ioctl, right?
-> > >
-> > > So to support NVDIMM (DAX), we need to add ENCRYPT_ME ioctl to DAX?
 > >
-> > Yes and yes, or we do it with layers -- see below.
+> > > And another silly argument: if we had /dev/mktme, then we could
+> > > possibly get away with avoiding all the keyring stuff entirely.
+> > > Instead, you open /dev/mktme and you get your own key under the hook.
+> > > If you want two keys, you open /dev/mktme twice.  If you want some
+> > > other program to be able to see your memory, you pass it the fd.
 > >
-> > I don't see how we can credibly avoid this.  If we try to do MKTME
-> > behind the DAX driver's back, aren't we going to end up with cache
-> > coherence problems?
+> > We still like the keyring because it's one-stop-shopping as the place
+> > that *owns* the hardware KeyID slots.  Those are global resources and
+> > scream for a single global place to allocate and manage them.  The
+> > hardware slots also need to be shared between any anonymous and
+> > file-based users, no matter what the APIs for the anonymous side.
 >
-> I am not sure whether I understand correctly but how is cache coherence problem related to putting
-> MKTME concept to different layers? To make MKTME work with DAX/NVDIMM, I think no matter which layer
-> MKTME concept resides, eventually we need to put keyID into PTE which maps to NVDIMM, and kernel
-> needs to manage cache coherence for NVDIMM just like for normal memory showed in this series?
+> MKTME driver (who creates /dev/mktme) can also be the one-stop-shopping. I think whether to choose
+> keyring to manage MKTME key should be based on whether we need/should take advantage of existing key
+> retention service functionalities. For example, with key retention service we can
+> revoke/invalidate/set expiry for a key (not sure whether MKTME needs those although), and we have
+> several keyrings -- thread specific keyring, process specific keyring, user specific keyring, etc,
+> thus we can control who can/cannot find the key, etc. I think managing MKTME key in MKTME driver
+> doesn't have those advantages.
 >
 
-I mean is that, to avoid cache coherence problems, something has to
-prevent user code from mapping the same page with two different key
-ids.  If the entire MKTME mechanism purely layers on top of DAX,
-something needs to prevent the underlying DAX device from being mapped
-at the same time as the MKTME-decrypted view.  This is obviously
-doable, but it's not automatic.
+Trying to evaluate this with the current proposed code is a bit odd, I
+think.  Suppose you create a thread-specific key and then fork().  The
+child can presumably still use the key regardless of whether the child
+can nominally access the key in the keyring because the PTEs are still
+there.
+
+More fundamentally, in some sense, the current code has no semantics.
+Associating a key with memory and "encrypting" it doesn't actually do
+anything unless you are attacking the memory bus but you haven't
+compromised the kernel.  There's no protection against a guest that
+can corrupt its EPT tables, there's no protection against kernel bugs
+(*especially* if the duplicate direct map design stays), and there
+isn't even any fd or other object around by which you can only access
+the data if you can see the key.
+
+I'm also wondering whether the kernel will always be able to be a
+one-stop shop for key allocation -- if the MKTME hardware gains
+interesting new uses down the road, who knows how key allocation will
+work?
