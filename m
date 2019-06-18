@@ -2,139 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 68E8C4AB2E
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 21:48:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 406714ABA0
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 22:24:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730506AbfFRTr7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 15:47:59 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:34918 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730176AbfFRTr7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 15:47:59 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IJcU6U166816;
-        Tue, 18 Jun 2019 19:47:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=sOgZwQp0gntXxyIlNbF6GqUizbh4O0zPdT0MNsHNs1s=;
- b=RfZy1hvplqGS882m8LtyldsOz1BIZVqO4Uw6zUbccQyzOE4m4TS1Ix8BzXiSo101oRgc
- e9yxAQw8hyrGvUSsb3SKw3BeFuWYSUywRiHIWtLXkcoYBdjbd1ZhBWlCKs4enZhKc6Oa
- eqCIfLRMW+lReJuJt2wXAhwYIN1zRckF6XW3o5VAlROFkuOQsX2WJtVPX+8Llkjj08+8
- maPQFXouqFItSXHr1lcBYNx/OHNjqQSI/sPo5/ieGY6+2SBcSKjj3xP37JzaVnDJ8MSW
- MWOWyWPnh0RdoatJLCMXH7Am6fYI5W+HbNNELqGzGrSmXDO1UNFDgxbwU7Zri+Gjij+r Vg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2t4r3tpj95-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Jun 2019 19:47:56 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5IJlRF4085833;
-        Tue, 18 Jun 2019 19:47:55 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2t5mgc5n5b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Jun 2019 19:47:55 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5IJlr1i017477;
-        Tue, 18 Jun 2019 19:47:54 GMT
-Received: from dhcp-10-132-91-225.usdhcp.oraclecorp.com (/10.132.91.225)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 18 Jun 2019 12:47:53 -0700
-Subject: Re: [PATCH] kvm: tests: Sort tests in the Makefile alphabetically
-To:     Aaron Lewis <aaronlewis@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>, Marc Orr <marcorr@google.com>,
-        kvm@vger.kernel.org
-References: <20190521171358.158429-1-aaronlewis@google.com>
- <CAAAPnDH1eiZf-HkT2T8aDBBU_TKV7Md=EBQymq9FDMZ7e4__6g@mail.gmail.com>
- <CAAAPnDHg6Qmwwuh3wGNdTXQ3C4hpSJo9D5bvZG4yX9s48DeSLQ@mail.gmail.com>
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Message-ID: <63c62aa7-2dd1-f133-d8bc-c7a3528b7598@oracle.com>
-Date:   Tue, 18 Jun 2019 12:47:52 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
-MIME-Version: 1.0
-In-Reply-To: <CAAAPnDHg6Qmwwuh3wGNdTXQ3C4hpSJo9D5bvZG4yX9s48DeSLQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9292 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906180156
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9292 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906180155
+        id S1730627AbfFRUYE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 16:24:04 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29904 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730571AbfFRUYE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 18 Jun 2019 16:24:04 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5IKH9Qv123861
+        for <kvm@vger.kernel.org>; Tue, 18 Jun 2019 16:24:03 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2t75c74j78-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 18 Jun 2019 16:24:01 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <farman@linux.ibm.com>;
+        Tue, 18 Jun 2019 21:23:59 +0100
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 18 Jun 2019 21:23:56 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5IKNk1w22348242
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Jun 2019 20:23:46 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4115E11C052;
+        Tue, 18 Jun 2019 20:23:54 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 379F711C04C;
+        Tue, 18 Jun 2019 20:23:54 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 18 Jun 2019 20:23:54 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+        id C813FE023C; Tue, 18 Jun 2019 22:23:53 +0200 (CEST)
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Cornelia Huck <cohuck@redhat.com>, Farhan Ali <alifm@linux.ibm.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
+Subject: [RFC PATCH v1 0/5] s390: more vfio-ccw code rework
+Date:   Tue, 18 Jun 2019 22:23:47 +0200
+X-Mailer: git-send-email 2.17.1
+X-TM-AS-GCONF: 00
+x-cbid: 19061820-0008-0000-0000-000002F4E2B7
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19061820-0009-0000-0000-00002261FBA2
+Message-Id: <20190618202352.39702-1-farman@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-18_09:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=941 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906180161
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+A couple little improvements to the malloc load in vfio-ccw.
+Really, there were just (the first) two patches, but then I
+got excited and added a few stylistic ones to the end.
 
+The routine ccwchain_calc_length() has this basic structure:
 
-On 06/18/2019 07:14 AM, Aaron Lewis wrote:
-> On Fri, May 31, 2019 at 9:37 AM Aaron Lewis <aaronlewis@google.com> wrote:
->> On Tue, May 21, 2019 at 10:14 AM Aaron Lewis <aaronlewis@google.com> wrote:
->>> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
->>> Reviewed-by: Peter Shier <pshier@google.com>
->>> ---
->>>   tools/testing/selftests/kvm/Makefile | 20 ++++++++++----------
->>>   1 file changed, 10 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
->>> index 79c524395ebe..234f679fa5ad 100644
->>> --- a/tools/testing/selftests/kvm/Makefile
->>> +++ b/tools/testing/selftests/kvm/Makefile
->>> @@ -10,23 +10,23 @@ LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/ucall.c lib/sparsebi
->>>   LIBKVM_x86_64 = lib/x86_64/processor.c lib/x86_64/vmx.c
->>>   LIBKVM_aarch64 = lib/aarch64/processor.c
->>>
->>> -TEST_GEN_PROGS_x86_64 = x86_64/platform_info_test
->>> -TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
->>> -TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
->>> -TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
->>> -TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
->>> -TEST_GEN_PROGS_x86_64 += x86_64/state_test
->>> +TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
->>>   TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
->>>   TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
->>> -TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
->>> -TEST_GEN_PROGS_x86_64 += x86_64/smm_test
->>>   TEST_GEN_PROGS_x86_64 += x86_64/kvm_create_max_vcpus
->>> +TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
->>> +TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
->>> +TEST_GEN_PROGS_x86_64 += x86_64/smm_test
->>> +TEST_GEN_PROGS_x86_64 += x86_64/state_test
->>> +TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
->>> +TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
->>>   TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
->>> -TEST_GEN_PROGS_x86_64 += dirty_log_test
->>> +TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
->>>   TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
->>> +TEST_GEN_PROGS_x86_64 += dirty_log_test
+  ccwchain_calc_length
+    a0 = kcalloc(CCWCHAIN_LEN_MAX, sizeof(struct ccw1))
+    copy_ccw_from_iova(a0, src)
+      copy_from_iova
+        pfn_array_alloc
+          b = kcalloc(len, sizeof(*pa_iova_pfn + *pa_pfn)
+        pfn_array_pin
+          vfio_pin_pages
+        memcpy(a0, src)
+        pfn_array_unpin_free
+          vfio_unpin_pages
+          kfree(b)
+    kfree(a0)
 
-May be, place the last two at the beginning if you are arranging them 
-alphabetically ?
+We do this EVERY time we process a new channel program chain,
+meaning at least once per SSCH and more if TICs are involved,
+to figure out how many CCWs are chained together.  Once that
+is determined, a new piece of memory is allocated (call it a1)
+and then passed to copy_ccw_from_iova() again, but for the
+value calculated by ccwchain_calc_length().
 
->>>
->>> -TEST_GEN_PROGS_aarch64 += dirty_log_test
->>>   TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
->>> +TEST_GEN_PROGS_aarch64 += dirty_log_test
+This seems inefficient.
 
-May be, put the aarch64 ones above the x86_64 ones to arrange them 
-alphabetically ?
+Patch 1 moves the malloc of a0 from the CCW processor to the
+initialization of the device.  Since only one SSCH can be
+handled concurrently, we can use this space safely to
+determine how long the chain being processed actually is.
 
->>>
->>>   TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
->>>   LIBKVM += $(LIBKVM_$(UNAME_M))
->>> --
->>> 2.21.0.1020.gf2820cf01a-goog
->>>
->> Does this look okay?  It's just a simple reordering of the list.  It
->> helps when adding new tests.
-> ping
+Patch 2 then removes the second copy_ccw_from_iova() call
+entirely, and replaces it with a memcpy from a0 to a1.  This
+is done before we process a TIC and thus a second chain, so
+there is no overlap in the storage in channel_program.
+
+Patches 3-5 clean up some things that aren't as clear as I'd
+like, but didn't want to pollute the first two changes.
+For example, patch 3 moves the population of guest_cp to the
+same routine that copies from it, rather than in a called
+function.  Meanwhile, patch 4 (and thus, 5) was something I
+had lying around for quite some time, because it looked to
+be structured weird.  Maybe that's one bridge too far.
+
+Eric Farman (5):
+  vfio-ccw: Move guest_cp storage into common struct
+  vfio-ccw: Skip second copy of guest cp to host
+  vfio-ccw: Copy CCW data outside length calculation
+  vfio-ccw: Factor out the ccw0-to-ccw1 transition
+  vfio-ccw: Remove copy_ccw_from_iova()
+
+ drivers/s390/cio/vfio_ccw_cp.c  | 108 +++++++++++---------------------
+ drivers/s390/cio/vfio_ccw_cp.h  |   7 +++
+ drivers/s390/cio/vfio_ccw_drv.c |   7 +++
+ 3 files changed, 52 insertions(+), 70 deletions(-)
+
+-- 
+2.17.1
 
