@@ -2,92 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 886EB4A3A7
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 16:16:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B052E4A3BA
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 16:19:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728991AbfFROQH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 10:16:07 -0400
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:43907 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726248AbfFROQG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 10:16:06 -0400
-Received: by mail-lf1-f66.google.com with SMTP id j29so9404779lfk.10
-        for <kvm@vger.kernel.org>; Tue, 18 Jun 2019 07:16:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Wd5FCsdf/yyWe8BwFl2FWSnHLz/m/HZuBW81us1Gqao=;
-        b=KlLi6tt6g2EoWQhVF9mPw5UDZ93LXSIgqMKpQrckdXEvDB0OryZsf7PUidYd59DKb1
-         uSEMtaQCL8pnSKbzrbWoz6SK/hdPjpAboGQNZawe1hzmQNK1eoxAjlSmqs2/tRaqxvr6
-         3qVoBOm1ydGjrxJ20z5OzwO+MnZwwLfv+XS9so8M3IqOI1fOqLbAQbtoFdoWrbCdF4l/
-         GwuabuUkZyUDrAipQRwSxWQuAfllBUmw+NbQxUWAm9WJLs0bbejiN/rBAko19louscah
-         GjjChC+GzhFWAGvEBhImUrsPszanyk88xI5zHm9IqIIsO/ESA/kDaT6KJnN/qH5toTsA
-         pu/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Wd5FCsdf/yyWe8BwFl2FWSnHLz/m/HZuBW81us1Gqao=;
-        b=O1pLVs6n+o2hy5li0vNPfROR6oDF7YcLpFA1EU9O9S8iYOFhiGMc3DNLrqgZb/S/9N
-         8zqzUrFYxscy9E/WrB7KNYFExevXooJY5aW1/7bghmiJUNbWU8PWNLqcoiGioiRMb00Y
-         nBkVnt7MCkYP+cci3MLsYQJ3yUug/bS31nAYmHQIY0B42fsdzkm2wh2VRKhWToKSAwTZ
-         q54mtKWOXrI2Z9pSo52YNagH7ojxSvv/docpNv/pQmDazqsYgr7z1/TEYZ0tYQYgP6c3
-         QOjlbiZ7GqeEDd537+cQD6TN7FFqMHI/R/Y96f9bUYXKQl5dtf6qQtfdP2e7yb8uayjo
-         JyWg==
-X-Gm-Message-State: APjAAAVF3u0kg3usPDt/Hl0+RaWBkeXwGIhtQoxP9kuaqkPAGcAIgHLv
-        QZN9+xkexRK7kCBRqiQAtFPeP3EqpU0TciFoK+yTag==
-X-Google-Smtp-Source: APXvYqzRxBHVZO4Eg1QZNmoaiBXqg44mVxhahfbFgdUhc1VBLqO9kA4ZF41fUp0faBJjm/6tB0bBfxt35yql5oWibRo=
-X-Received: by 2002:ac2:5231:: with SMTP id i17mr59395022lfl.39.1560867364264;
- Tue, 18 Jun 2019 07:16:04 -0700 (PDT)
+        id S1729095AbfFROTs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 10:19:48 -0400
+Received: from mga17.intel.com ([192.55.52.151]:5249 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726248AbfFROTs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 10:19:48 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 07:19:47 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,389,1557212400"; 
+   d="scan'208";a="243005454"
+Received: from oamaslek-mobl.amr.corp.intel.com (HELO [10.251.9.224]) ([10.251.9.224])
+  by orsmga001.jf.intel.com with ESMTP; 18 Jun 2019 07:19:47 -0700
+Subject: Re: [PATCH, RFC 45/62] mm: Add the encrypt_mprotect() system call for
+ MKTME
+To:     Andy Lutomirski <luto@kernel.org>,
+        Kai Huang <kai.huang@linux.intel.com>
+Cc:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        X86 ML <x86@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        David Howells <dhowells@redhat.com>,
+        Kees Cook <keescook@chromium.org>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Alison Schofield <alison.schofield@intel.com>,
+        Linux-MM <linux-mm@kvack.org>, kvm list <kvm@vger.kernel.org>,
+        keyrings@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+References: <20190508144422.13171-1-kirill.shutemov@linux.intel.com>
+ <20190508144422.13171-46-kirill.shutemov@linux.intel.com>
+ <CALCETrVCdp4LyCasvGkc0+S6fvS+dna=_ytLdDPuD2xeAr5c-w@mail.gmail.com>
+ <3c658cce-7b7e-7d45-59a0-e17dae986713@intel.com>
+ <CALCETrUPSv4Xae3iO+2i_HecJLfx4mqFfmtfp+cwBdab8JUZrg@mail.gmail.com>
+ <5cbfa2da-ba2e-ed91-d0e8-add67753fc12@intel.com>
+ <CALCETrWFXSndmPH0OH4DVVrAyPEeKUUfNwo_9CxO-3xy9awq0g@mail.gmail.com>
+ <d599b1d7-9455-3012-0115-96ddbad31833@intel.com>
+ <1560818931.5187.70.camel@linux.intel.com>
+ <CALCETrXNCmSnrTwGiwuF9=wLu797WBPZ0gt92D-CyU+V3sq7hA@mail.gmail.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+Message-ID: <8dc08b4c-82ee-8458-6941-248141afa2a3@intel.com>
+Date:   Tue, 18 Jun 2019 07:19:46 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190531184159.260151-1-aaronlewis@google.com> <4b50c550-308e-2b88-053e-c6933f9ed320@oracle.com>
-In-Reply-To: <4b50c550-308e-2b88-053e-c6933f9ed320@oracle.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Tue, 18 Jun 2019 07:15:53 -0700
-Message-ID: <CAAAPnDGbyVcxwGYcvZG2PJKxWSgJzHXV+q3uvH3mg6dmggBFyA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kvm: nVMX: Enforce must-be-zero bits in the
- IA32_VMX_VMCS_ENUM MSR
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
-        Marc Orr <marcorr@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CALCETrXNCmSnrTwGiwuF9=wLu797WBPZ0gt92D-CyU+V3sq7hA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 4, 2019 at 10:52 AM Krish Sadhukhan
-<krish.sadhukhan@oracle.com> wrote:
->
->
-> On 5/31/19 11:41 AM, Aaron Lewis wrote:
-> > According to the SDM, bit 0 and bits 63:10 of the IA32_VMX_VMCS_ENUM
-> > MSR are reserved and are read as 0.
-> >
-> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> > Reviewed-by: Jim Mattson <jmattson@google.com>
-> > Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> > ---
-> >   arch/x86/kvm/vmx/nested.c | 2 ++
-> >   1 file changed, 2 insertions(+)
-> >
-> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> > index 6401eb7ef19c..3438279e76bb 100644
-> > --- a/arch/x86/kvm/vmx/nested.c
-> > +++ b/arch/x86/kvm/vmx/nested.c
-> > @@ -1219,6 +1219,8 @@ int vmx_set_vmx_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 data)
-> >       case MSR_IA32_VMX_EPT_VPID_CAP:
-> >               return vmx_restore_vmx_ept_vpid_cap(vmx, data);
-> >       case MSR_IA32_VMX_VMCS_ENUM:
-> > +             if (data & (GENMASK_ULL(63, 10) | BIT_ULL(0)))
-> > +                     return -EINVAL;
-> >               vmx->nested.msrs.vmcs_enum = data;
-> >               return 0;
-> >       default:
->
->
-> Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
->
+On 6/17/19 6:50 PM, Andy Lutomirski wrote:
+> I'm also wondering whether the kernel will always be able to be a
+> one-stop shop for key allocation -- if the MKTME hardware gains
+> interesting new uses down the road, who knows how key allocation will
+> work?
 
-ping
+I can't share all the details on LKML, of course, but I can at least say
+that this model of allocating KeyID slots will continue to be used for a
+number of generations.
+
