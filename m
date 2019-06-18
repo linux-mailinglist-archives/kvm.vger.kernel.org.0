@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A2AC4AE31
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 00:51:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A16454AE3B
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 00:52:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731065AbfFRWvk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 18:51:40 -0400
-Received: from mga07.intel.com ([134.134.136.100]:48880 "EHLO mga07.intel.com"
+        id S1730946AbfFRWv5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 18:51:57 -0400
+Received: from mga02.intel.com ([134.134.136.20]:2940 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730936AbfFRWvO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 18:51:14 -0400
+        id S1730935AbfFRWvN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 18:51:13 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 15:51:12 -0700
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 15:51:12 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,390,1557212400"; 
-   d="scan'208";a="358009371"
+   d="scan'208";a="358009374"
 Received: from romley-ivt3.sc.intel.com ([172.25.110.60])
-  by fmsmga005.fm.intel.com with ESMTP; 18 Jun 2019 15:51:11 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 18 Jun 2019 15:51:12 -0700
 From:   Fenghua Yu <fenghua.yu@intel.com>
 To:     "Thomas Gleixner" <tglx@linutronix.de>,
         "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
@@ -40,9 +40,9 @@ Cc:     "linux-kernel" <linux-kernel@vger.kernel.org>,
         "x86" <x86@kernel.org>, kvm@vger.kernel.org,
         Xiaoyao Li <xiaoyao.li@linux.intel.com>,
         Fenghua Yu <fenghua.yu@intel.com>
-Subject: [PATCH v9 10/17] kvm/x86: Emulate MSR IA32_CORE_CAPABILITY
-Date:   Tue, 18 Jun 2019 15:41:12 -0700
-Message-Id: <1560897679-228028-11-git-send-email-fenghua.yu@intel.com>
+Subject: [PATCH v9 11/17] kvm/vmx: Emulate MSR TEST_CTL
+Date:   Tue, 18 Jun 2019 15:41:13 -0700
+Message-Id: <1560897679-228028-12-git-send-email-fenghua.yu@intel.com>
 X-Mailer: git-send-email 2.5.0
 In-Reply-To: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
 References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
@@ -53,135 +53,247 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Xiaoyao Li <xiaoyao.li@linux.intel.com>
 
-MSR IA32_CORE_CAPABILITY is a feature-enumerating MSR, bit 5 of which
-reports the capability of enabling detection of split locks (will be
-supported on future processors based on Tremont microarchitecture and
-later).
-
-CPUID.(EAX=7H,ECX=0):EDX[30] enumerates the presence of the
-IA32_CORE_CAPABILITY MSR.
+A control bit (bit 29) in TEST_CTL MSR 0x33 will be introduced in
+future x86 processors. When bit 29 is set, the processor causes #AC
+exception for split locked accesses at all CPL.
 
 Please check the latest Intel 64 and IA-32 Architectures Software
 Developer's Manual for more detailed information on the MSR and
 the split lock bit.
 
-Since MSR_IA32_CORE_CAP is a feature-enumerating MSR that plays the
-similar role as CPUID, it can be emulated in software regardless of host's
-capability. What we need to do is to set the right value of it to report
-the capability of guest.
+This patch emulates MSR_TEST_CTL with vmx->msr_test_ctl and does the
+following:
+1. As MSR TEST_CTL of guest is emulated, enable the related bit
+in CORE_CAPABILITY to correctly report this feature to guest.
 
-In this patch, just set the guest's core_capability as 0, because we
-haven't added support of the features it indicates to guest. It's for
-bisectability.
+2. If host has split lock detection enabled, forcing it enabled in
+guest to avoid guest's slowdown attack by using split lock.
+If host has it disabled, it can give control to guest that guest can
+enable it on its own purpose.
+
+Note: Guest can read and write bit 29 of MSR_TEST_CTL if hardware has
+feature split lock detection. But when guest running, the real value in
+hardware MSR will be different from the value read in guest when guest
+has it disabled and host has it enabled. It can be regarded as host's
+value overrides guest's value.
+
+To avoid costly RDMSR of TEST_CTL when switching between host and guest
+during vmentry, read per CPU variable msr_test_ctl_cached which caches
+the MSR value.
+
+Besides, only inject #AC exception back when guest can handle it.
+Otherwise, it must be a split lock caused #AC. In this case, print a hint.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
 Signed-off-by: Fenghua Yu <fenghua.yu@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/cpuid.c            |  6 ++++++
- arch/x86/kvm/x86.c              | 22 ++++++++++++++++++++++
- 3 files changed, 29 insertions(+)
+ arch/x86/kvm/vmx/vmx.c | 92 ++++++++++++++++++++++++++++++++++++++++--
+ arch/x86/kvm/vmx/vmx.h |  2 +
+ arch/x86/kvm/x86.c     | 19 ++++++++-
+ 3 files changed, 109 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 450d69a1e6fa..ddac618e96a1 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -572,6 +572,7 @@ struct kvm_vcpu_arch {
- 	u64 ia32_xss;
- 	u64 microcode_version;
- 	u64 arch_capabilities;
-+	u64 core_capability;
- 
- 	/*
- 	 * Paging state of the vcpu
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index e18a9f9f65b5..7d064a7c5637 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -507,6 +507,12 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
- 			 * if the host doesn't support it.
- 			 */
- 			entry->edx |= F(ARCH_CAPABILITIES);
-+			/*
-+			 * Since we emulate MSR IA32_CORE_CAPABILITY in
-+			 * software, we can always enable it for guest
-+			 * regardless of host's capability.
-+			 */
-+			entry->edx |= F(CORE_CAPABILITY);
- 		} else {
- 			entry->ebx = 0;
- 			entry->ecx = 0;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 83aefd759846..dc4c72bd6781 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1165,6 +1165,7 @@ static u32 emulated_msrs[] = {
- 	MSR_IA32_TSC_ADJUST,
- 	MSR_IA32_TSCDEADLINE,
- 	MSR_IA32_ARCH_CAPABILITIES,
-+	MSR_IA32_CORE_CAP,
- 	MSR_IA32_MISC_ENABLE,
- 	MSR_IA32_MCG_STATUS,
- 	MSR_IA32_MCG_CTL,
-@@ -1207,6 +1208,7 @@ static u32 msr_based_features[] = {
- 
- 	MSR_F10H_DECFG,
- 	MSR_IA32_UCODE_REV,
-+	MSR_IA32_CORE_CAP,
- 	MSR_IA32_ARCH_CAPABILITIES,
- };
- 
-@@ -1234,9 +1236,17 @@ u64 kvm_get_arch_capabilities(void)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index b93e36ddee5e..d096cee48a40 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1640,6 +1640,16 @@ static inline bool vmx_feature_control_msr_valid(struct kvm_vcpu *vcpu,
+ 	return !(val & ~valid_bits);
  }
- EXPORT_SYMBOL_GPL(kvm_get_arch_capabilities);
  
-+static u64 kvm_get_core_capability(void)
++static u64 vmx_get_msr_test_ctl_mask(struct kvm_vcpu *vcpu)
 +{
-+	return 0;
++	u64 mask = 0;
++
++	if (vcpu->arch.core_capability & MSR_IA32_CORE_CAP_SPLIT_LOCK_DETECT)
++		mask |= MSR_TEST_CTL_SPLIT_LOCK_DETECT;
++
++	return mask;
 +}
 +
- static int kvm_get_msr_feature(struct kvm_msr_entry *msr)
+ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
  {
  	switch (msr->index) {
-+	case MSR_IA32_CORE_CAP:
-+		msr->data = kvm_get_core_capability();
+@@ -1666,6 +1676,11 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	u32 index;
+ 
+ 	switch (msr_info->index) {
++	case MSR_TEST_CTL:
++		if (!vmx->msr_test_ctl_mask)
++			return 1;
++		msr_info->data = vmx->msr_test_ctl;
 +		break;
- 	case MSR_IA32_ARCH_CAPABILITIES:
- 		msr->data = kvm_get_arch_capabilities();
- 		break;
-@@ -2495,6 +2505,11 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		break;
- 	case MSR_EFER:
- 		return set_efer(vcpu, msr_info);
+ #ifdef CONFIG_X86_64
+ 	case MSR_FS_BASE:
+ 		msr_info->data = vmcs_readl(GUEST_FS_BASE);
+@@ -1803,6 +1818,18 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	u32 index;
+ 
+ 	switch (msr_index) {
++	case MSR_TEST_CTL:
++		if (!vmx->msr_test_ctl_mask ||
++		    (data & vmx->msr_test_ctl_mask) != data)
++			return 1;
++		vmx->msr_test_ctl = data;
++		break;
 +	case MSR_IA32_CORE_CAP:
 +		if (!msr_info->host_initiated)
 +			return 1;
 +		vcpu->arch.core_capability = data;
++		vmx->msr_test_ctl_mask = vmx_get_msr_test_ctl_mask(vcpu);
 +		break;
- 	case MSR_K7_HWCR:
- 		data &= ~(u64)0x40;	/* ignore flush filter disable */
- 		data &= ~(u64)0x100;	/* ignore ignne emulation enable */
-@@ -2808,6 +2823,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_IA32_TSC:
- 		msr_info->data = kvm_scale_tsc(vcpu, rdtsc()) + vcpu->arch.tsc_offset;
+ 	case MSR_EFER:
+ 		ret = kvm_set_msr_common(vcpu, msr_info);
  		break;
-+	case MSR_IA32_CORE_CAP:
-+		if (!msr_info->host_initiated &&
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_CORE_CAPABILITY))
-+			return 1;
-+		msr_info->data = vcpu->arch.core_capability;
-+		break;
- 	case MSR_MTRRcap:
- 	case 0x200 ... 0x2ff:
- 		return kvm_mtrr_get_msr(vcpu, msr_info->index, &msr_info->data);
-@@ -8853,6 +8874,7 @@ struct kvm_vcpu *kvm_arch_vcpu_create(struct kvm *kvm,
- int kvm_arch_vcpu_setup(struct kvm_vcpu *vcpu)
+@@ -4121,6 +4148,8 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 
+ 	vmx->rmode.vm86_active = 0;
+ 	vmx->spec_ctrl = 0;
++	vmx->msr_test_ctl = 0;
++	vmx->msr_test_ctl_mask = vmx_get_msr_test_ctl_mask(vcpu);
+ 
+ 	vcpu->arch.microcode_version = 0x100000000ULL;
+ 	vmx->vcpu.arch.regs[VCPU_REGS_RDX] = get_rdx_init_val();
+@@ -4449,6 +4478,28 @@ static int handle_machine_check(struct kvm_vcpu *vcpu)
+ 	return 1;
+ }
+ 
++/*
++ * In intel SDM, #AC can be caused in two way:
++ *	1. Unaligned memory access when CPL = 3 && CR0.AM == 1 && EFLAGS.AC == 1
++ *	2. Lock on crossing cache line memory access, when split lock detection
++ *	   is enabled (bit 29 of MSR_TEST_CTL is set). This #AC can be generated
++ *	   in any CPL.
++ *
++ * So, when guest's split lock detection is enabled, it can be assumed capable
++ * of handling #AC in any CPL.
++ * Or when guest's CR0.AM and EFLAGS.AC are both set, it can be assumed capable
++ * of handling #AC in CPL == 3.
++ */
++static bool guest_can_handle_ac(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++
++	return (vmx->msr_test_ctl & MSR_TEST_CTL_SPLIT_LOCK_DETECT) ||
++	       ((vmx_get_cpl(vcpu) == 3) &&
++		kvm_read_cr0_bits(vcpu, X86_CR0_AM) &&
++		(kvm_get_rflags(vcpu) & X86_EFLAGS_AC));
++}
++
+ static int handle_exception(struct kvm_vcpu *vcpu)
  {
- 	vcpu->arch.arch_capabilities = kvm_get_arch_capabilities();
-+	vcpu->arch.core_capability = kvm_get_core_capability();
- 	vcpu->arch.msr_platform_info = MSR_PLATFORM_INFO_CPUID_FAULT;
- 	kvm_vcpu_mtrr_init(vcpu);
- 	vcpu_load(vcpu);
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+@@ -4514,9 +4565,6 @@ static int handle_exception(struct kvm_vcpu *vcpu)
+ 		return handle_rmode_exception(vcpu, ex_no, error_code);
+ 
+ 	switch (ex_no) {
+-	case AC_VECTOR:
+-		kvm_queue_exception_e(vcpu, AC_VECTOR, error_code);
+-		return 1;
+ 	case DB_VECTOR:
+ 		dr6 = vmcs_readl(EXIT_QUALIFICATION);
+ 		if (!(vcpu->guest_debug &
+@@ -4545,6 +4593,15 @@ static int handle_exception(struct kvm_vcpu *vcpu)
+ 		kvm_run->debug.arch.pc = vmcs_readl(GUEST_CS_BASE) + rip;
+ 		kvm_run->debug.arch.exception = ex_no;
+ 		break;
++	case AC_VECTOR:
++		if (guest_can_handle_ac(vcpu)) {
++			kvm_queue_exception_e(vcpu, AC_VECTOR, error_code);
++			return 1;
++		}
++		pr_warn("kvm: %s[%d]: there is an #AC exception in guest due to split lock. "
++			"Please try to fix it, or disable the split lock detection in host to workaround.",
++			current->comm, current->pid);
++		/* fall through */
+ 	default:
+ 		kvm_run->exit_reason = KVM_EXIT_EXCEPTION;
+ 		kvm_run->ex.exception = ex_no;
+@@ -6335,6 +6392,33 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
+ 					msrs[i].host, false);
+ }
+ 
++static void atomic_switch_msr_test_ctl(struct vcpu_vmx *vmx)
++{
++	u64 guest_val;
++	u64 host_val = this_cpu_read(msr_test_ctl_cached);
++	u64 mask = vmx->msr_test_ctl_mask;
++
++	/*
++	 * Guest can cause overall system performance degradation (of host or
++	 * other guest) by using split lock. Hence, it takes following policy:
++	 *  - If host has split lock detection enabled, forcing it enabled in
++	 *    guest during vm entry.
++	 *  - If host has split lock detection disabled, guest can enable it for
++	 *    it's own purpose that it will load guest's value during vm entry.
++	 *
++	 * So use adjusted mask to achieve this.
++	 */
++	if (host_val & MSR_TEST_CTL_SPLIT_LOCK_DETECT)
++		mask &= ~MSR_TEST_CTL_SPLIT_LOCK_DETECT;
++
++	guest_val = (host_val & ~mask) | (vmx->msr_test_ctl & mask);
++
++	if (host_val == guest_val)
++		clear_atomic_switch_msr(vmx, MSR_TEST_CTL);
++	else
++		add_atomic_switch_msr(vmx, MSR_TEST_CTL, guest_val, host_val, false);
++}
++
+ static void vmx_arm_hv_timer(struct vcpu_vmx *vmx, u32 val)
+ {
+ 	vmcs_write32(VMX_PREEMPTION_TIMER_VALUE, val);
+@@ -6443,6 +6527,8 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	atomic_switch_perf_msrs(vmx);
+ 
++	atomic_switch_msr_test_ctl(vmx);
++
+ 	vmx_update_hv_timer(vcpu);
+ 
+ 	/*
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 61128b48c503..2a54b0b5741e 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -193,6 +193,8 @@ struct vcpu_vmx {
+ 	u64		      msr_guest_kernel_gs_base;
+ #endif
+ 
++	u64		      msr_test_ctl;
++	u64		      msr_test_ctl_mask;
+ 	u64		      spec_ctrl;
+ 
+ 	u32 vm_entry_controls_shadow;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index dc4c72bd6781..741ad4e61386 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1238,7 +1238,24 @@ EXPORT_SYMBOL_GPL(kvm_get_arch_capabilities);
+ 
+ static u64 kvm_get_core_capability(void)
+ {
+-	return 0;
++	u64 data = 0;
++
++	if (boot_cpu_has(X86_FEATURE_CORE_CAPABILITY)) {
++		rdmsrl(MSR_IA32_CORE_CAP, data);
++
++		/* mask non-virtualizable functions */
++		data &= MSR_IA32_CORE_CAP_SPLIT_LOCK_DETECT;
++	} else if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT)) {
++		/*
++		 * There will be a list of FMS values that have split lock
++		 * detection but lack the CORE CAPABILITY MSR. In this case,
++		 * set MSR_IA32_CORE_CAP_SPLIT_LOCK_DETECT since we emulate
++		 * MSR CORE_CAPABILITY.
++		 */
++		data |= MSR_IA32_CORE_CAP_SPLIT_LOCK_DETECT;
++	}
++
++	return data;
+ }
+ 
+ static int kvm_get_msr_feature(struct kvm_msr_entry *msr)
 -- 
 2.19.1
 
