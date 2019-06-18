@@ -2,104 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DB72A49CEC
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 11:18:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 822FA49DA9
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 11:43:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729413AbfFRJSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 05:18:20 -0400
-Received: from foss.arm.com ([217.140.110.172]:58798 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729137AbfFRJSU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 05:18:20 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D19DC344;
-        Tue, 18 Jun 2019 02:18:18 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2BBBB3F246;
-        Tue, 18 Jun 2019 02:18:14 -0700 (PDT)
-Date:   Tue, 18 Jun 2019 10:18:12 +0100
-From:   Dave Martin <Dave.Martin@arm.com>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        dri-devel@lists.freedesktop.org,
-        Kostya Serebryany <kcc@google.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>,
-        Lee Smith <Lee.Smith@arm.com>, linux-kselftest@vger.kernel.org,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        linux-media@vger.kernel.org,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Andrey Konovalov <andreyknvl@google.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        linux-kernel@vger.kernel.org,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Subject: Re: [PATCH v17 03/15] arm64: Introduce prctl() options to control
- the tagged user addresses ABI
-Message-ID: <20190618091811.GC2790@e103592.cambridge.arm.com>
-References: <cover.1560339705.git.andreyknvl@google.com>
- <a7a2933bea5fe57e504891b7eec7e9432e5e1c1a.1560339705.git.andreyknvl@google.com>
- <20190613110235.GW28398@e103592.cambridge.arm.com>
- <20190613152632.GT28951@C02TF0J2HF1T.local>
- <201906132209.FC65A3C771@keescook>
+        id S1729388AbfFRJna (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 05:43:30 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46523 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729281AbfFRJna (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 05:43:30 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n4so13147303wrw.13
+        for <kvm@vger.kernel.org>; Tue, 18 Jun 2019 02:43:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7H+CZItQJTM8gOKdEIO6tgbmZC/1DVL8U5ona3SCpCI=;
+        b=kf3hTooNbtNjz92KK7ESXdqvpBYRKiPcdw5LBs1wkpqw7yhcJ1oVi+cRlHghjJd5Dj
+         FaGpzz4KECdfpxVrWitCIzff8NbiZWcdU2wZM7jdVlS4qw5ds7zmo1WN7EcGOExwjq9d
+         u0SxvVUHQ0Hp9+nHPCk88GBeUwupPInyDLerso+r2A0BjyfE6Ag3Duac6pllz3Mrc1ZK
+         Wvj5ejSmYr/dWcs5e+MdVRhWUgzizMSJ3wz5iGuJGUpKea4G3VikMWTSUL0M4xOkx9fN
+         osTOXaygYrv/t8PPRLZk9uzIqNLb6atqdOuuNM+P7tJvdWfZDjWBxb6jdgunLjhuiHBS
+         44cQ==
+X-Gm-Message-State: APjAAAXwKwJQIVr0aVg74vBYnlEqcP2h589U4TERGUomYVtylKMaEUZU
+        d/GX4laD/+fRT3bHu7T7OiTn1w==
+X-Google-Smtp-Source: APXvYqx1u72NgLWUSb0cmYjIEFnfvl7lohvWUsuD8u7IfbzZrWhSU9lechEAXsHLnsuA/1rkasQ/sQ==
+X-Received: by 2002:adf:ff84:: with SMTP id j4mr2988875wrr.71.1560851007943;
+        Tue, 18 Jun 2019 02:43:27 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:1da0:213e:1763:a1a8? ([2001:b07:6468:f312:1da0:213e:1763:a1a8])
+        by smtp.gmail.com with ESMTPSA id x8sm1752029wmc.5.2019.06.18.02.43.22
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Tue, 18 Jun 2019 02:43:27 -0700 (PDT)
+Subject: Re: [PATCH 22/43] KVM: nVMX: Don't dump VMCS if virtual APIC page
+ can't be mapped
+To:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        vkuznets@redhat.com, stable@vger.kernel.org
+References: <1560445409-17363-1-git-send-email-pbonzini@redhat.com>
+ <1560445409-17363-23-git-send-email-pbonzini@redhat.com>
+ <20190617191724.GA26860@flask> <20190617200700.GA30158@linux.intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0d59375c-9313-d31a-4af9-d68115e05d55@redhat.com>
+Date:   Tue, 18 Jun 2019 11:43:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201906132209.FC65A3C771@keescook>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+In-Reply-To: <20190617200700.GA30158@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 13, 2019 at 10:13:54PM -0700, Kees Cook wrote:
-> On Thu, Jun 13, 2019 at 04:26:32PM +0100, Catalin Marinas wrote:
-> > On Thu, Jun 13, 2019 at 12:02:35PM +0100, Dave P Martin wrote:
-> > > On Wed, Jun 12, 2019 at 01:43:20PM +0200, Andrey Konovalov wrote:
-> > > > +static int zero;
-> > > > +static int one = 1;
-> > > 
-> > > !!!
-> > > 
-> > > And these can't even be const without a cast.  Yuk.
-> > > 
-> > > (Not your fault though, but it would be nice to have a proc_dobool() to
-> > > avoid this.)
-> > 
-> > I had the same reaction. Maybe for another patch sanitising this pattern
-> > across the kernel.
+On 17/06/19 22:07, Sean Christopherson wrote:
+> On Mon, Jun 17, 2019 at 09:17:24PM +0200, Radim Krčmář wrote:
+>> 2019-06-13 19:03+0200, Paolo Bonzini:
+>>> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>>>
+>>> ... as a malicious userspace can run a toy guest to generate invalid
+>>> virtual-APIC page addresses in L1, i.e. flood the kernel log with error
+>>> messages.
+>>>
+>>> Fixes: 690908104e39d ("KVM: nVMX: allow tests to use bad virtual-APIC page address")
+>>> Cc: stable@vger.kernel.org
+>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> ---
+>>
+>> Makes me wonder why it looks like this in kvm/queue. :)
 > 
-> That's actually already happening (via -mm tree last I looked). tl;dr:
-> it ends up using a cast hidden in a macro. It's in linux-next already
-> along with a checkpatch.pl addition to yell about doing what's being
-> done here. ;)
-> 
-> https://lore.kernel.org/lkml/20190430180111.10688-1-mcroce@redhat.com/#r
+> Presumably something is wonky in Paolo's workflow, this happened before.
 
-Hmmm, that is marginally less bad.
+It's more my non-workflow... when I cannot find a patch for some reason
+(deleted by mistake, eaten by Gmane, etc.), I search it with Google and
+sometimes spinics.net comes up which mangles the domain.  I should just
+subscribe to kvm@vger.kernel.org since Gmane has gotten less reliable,
+or set up a Patchew instance for it.
 
-Ideally we'd have a union in there, not just a bunch of void *.  I may
-look at that someday...
-
-Cheers
----Dave
+Paolo
