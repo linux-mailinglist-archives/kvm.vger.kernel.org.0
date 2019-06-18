@@ -2,80 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 61AB449CC5
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 11:13:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB72A49CEC
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2019 11:18:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728797AbfFRJNM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 05:13:12 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:44450 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728385AbfFRJNK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 05:13:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=DWxebD/lbygK+SpH9wnfp4x77thiB2bg6Ri9elX25UY=; b=uDQHwhGWJGqiGNlXRpc+k6mqb
-        T/OhF+fKkE9yW/1WzX5e5PKNLbvQaIEV8hjfnN19Gcy2xbw/eGs9cmZhzSw8M/dic5nZDgqvtKokl
-        Z6IMT2orRt1vL693hdvgisFLg0TYANLGdUAijz81Pu4wz3x0lSGQAtPaTZFsOA3d0MjysgSP50m5E
-        +nJQ6NHn87W710nEgSyxyCcyTiUu4cDdwAom6SIAGU5SekK6vxRPBlyjW5sJFJL7Mkjzt7B4keKc9
-        AEvw9JywQnLYrUBl+qghSJmrCZU8ZheGjH9rfN0/npezev7TcMgM94jN8FuanvHBJWWzT4IP6ikYK
-        aDaVJhvRA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hdAAZ-0000dX-Pu; Tue, 18 Jun 2019 09:12:48 +0000
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 7778620A3C471; Tue, 18 Jun 2019 11:12:46 +0200 (CEST)
-Date:   Tue, 18 Jun 2019 11:12:46 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Kai Huang <kai.huang@linux.intel.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        id S1729413AbfFRJSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 05:18:20 -0400
+Received: from foss.arm.com ([217.140.110.172]:58798 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729137AbfFRJSU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 05:18:20 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D19DC344;
+        Tue, 18 Jun 2019 02:18:18 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2BBBB3F246;
+        Tue, 18 Jun 2019 02:18:14 -0700 (PDT)
+Date:   Tue, 18 Jun 2019 10:18:12 +0100
+From:   Dave Martin <Dave.Martin@arm.com>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>, kvm@vger.kernel.org,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        dri-devel@lists.freedesktop.org,
+        Kostya Serebryany <kcc@google.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>,
+        Lee Smith <Lee.Smith@arm.com>, linux-kselftest@vger.kernel.org,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        linux-media@vger.kernel.org,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Andrey Konovalov <andreyknvl@google.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        linux-kernel@vger.kernel.org,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
         Andrew Morton <akpm@linux-foundation.org>,
-        X86 ML <x86@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        David Howells <dhowells@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Alison Schofield <alison.schofield@intel.com>,
-        Linux-MM <linux-mm@kvack.org>, kvm list <kvm@vger.kernel.org>,
-        keyrings@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH, RFC 45/62] mm: Add the encrypt_mprotect() system call
- for MKTME
-Message-ID: <20190618091246.GM3436@hirez.programming.kicks-ass.net>
-References: <CALCETrVCdp4LyCasvGkc0+S6fvS+dna=_ytLdDPuD2xeAr5c-w@mail.gmail.com>
- <3c658cce-7b7e-7d45-59a0-e17dae986713@intel.com>
- <CALCETrUPSv4Xae3iO+2i_HecJLfx4mqFfmtfp+cwBdab8JUZrg@mail.gmail.com>
- <5cbfa2da-ba2e-ed91-d0e8-add67753fc12@intel.com>
- <CALCETrWFXSndmPH0OH4DVVrAyPEeKUUfNwo_9CxO-3xy9awq0g@mail.gmail.com>
- <1560816342.5187.63.camel@linux.intel.com>
- <CALCETrVcrPYUUVdgnPZojhJLgEhKv5gNqnT6u2nFVBAZprcs5g@mail.gmail.com>
- <1560821746.5187.82.camel@linux.intel.com>
- <CALCETrUrFTFGhRMuNLxD9G9=GsR6U-THWn4AtminR_HU-nBj+Q@mail.gmail.com>
- <1560824611.5187.100.camel@linux.intel.com>
+        enh <enh@google.com>, Robin Murphy <robin.murphy@arm.com>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Subject: Re: [PATCH v17 03/15] arm64: Introduce prctl() options to control
+ the tagged user addresses ABI
+Message-ID: <20190618091811.GC2790@e103592.cambridge.arm.com>
+References: <cover.1560339705.git.andreyknvl@google.com>
+ <a7a2933bea5fe57e504891b7eec7e9432e5e1c1a.1560339705.git.andreyknvl@google.com>
+ <20190613110235.GW28398@e103592.cambridge.arm.com>
+ <20190613152632.GT28951@C02TF0J2HF1T.local>
+ <201906132209.FC65A3C771@keescook>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1560824611.5187.100.camel@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <201906132209.FC65A3C771@keescook>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 18, 2019 at 02:23:31PM +1200, Kai Huang wrote:
-> Assuming I am understanding the context correctly, yes from this perspective it seems having
-> sys_encrypt is annoying, and having ENCRYPT_ME should be better. But Dave said "nobody is going to
-> do what you suggest in the ptr1/ptr2 example"? 
+On Thu, Jun 13, 2019 at 10:13:54PM -0700, Kees Cook wrote:
+> On Thu, Jun 13, 2019 at 04:26:32PM +0100, Catalin Marinas wrote:
+> > On Thu, Jun 13, 2019 at 12:02:35PM +0100, Dave P Martin wrote:
+> > > On Wed, Jun 12, 2019 at 01:43:20PM +0200, Andrey Konovalov wrote:
+> > > > +static int zero;
+> > > > +static int one = 1;
+> > > 
+> > > !!!
+> > > 
+> > > And these can't even be const without a cast.  Yuk.
+> > > 
+> > > (Not your fault though, but it would be nice to have a proc_dobool() to
+> > > avoid this.)
+> > 
+> > I had the same reaction. Maybe for another patch sanitising this pattern
+> > across the kernel.
+> 
+> That's actually already happening (via -mm tree last I looked). tl;dr:
+> it ends up using a cast hidden in a macro. It's in linux-next already
+> along with a checkpatch.pl addition to yell about doing what's being
+> done here. ;)
+> 
+> https://lore.kernel.org/lkml/20190430180111.10688-1-mcroce@redhat.com/#r
 
-You have to phrase that as: 'nobody who knows what he's doing is going
-to do that', which leaves lots of people and fuzzers.
+Hmmm, that is marginally less bad.
 
-Murphy states that if it is possible, someone _will_ do it. And this
-being something that causes severe data corruption on persistent
-storage,...
+Ideally we'd have a union in there, not just a bunch of void *.  I may
+look at that someday...
+
+Cheers
+---Dave
