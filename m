@@ -2,160 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EECFC4AE26
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 00:51:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A82F4AEEC
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 02:16:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731010AbfFRWvQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 18:51:16 -0400
-Received: from mga07.intel.com ([134.134.136.100]:48880 "EHLO mga07.intel.com"
+        id S1726181AbfFSAP5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 20:15:57 -0400
+Received: from mga02.intel.com ([134.134.136.20]:6548 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730979AbfFRWvP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 18:51:15 -0400
+        id S1725988AbfFSAP5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 20:15:57 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 15:51:13 -0700
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 17:15:56 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,390,1557212400"; 
-   d="scan'208";a="358009395"
-Received: from romley-ivt3.sc.intel.com ([172.25.110.60])
-  by fmsmga005.fm.intel.com with ESMTP; 18 Jun 2019 15:51:13 -0700
-From:   Fenghua Yu <fenghua.yu@intel.com>
-To:     "Thomas Gleixner" <tglx@linutronix.de>,
-        "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
-        "H Peter Anvin" <hpa@zytor.com>,
-        "Peter Zijlstra" <peterz@infradead.org>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        "Dave Hansen" <dave.hansen@intel.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        "Radim Krcmar" <rkrcmar@redhat.com>,
-        "Christopherson Sean J" <sean.j.christopherson@intel.com>,
-        "Ashok Raj" <ashok.raj@intel.com>,
-        "Tony Luck" <tony.luck@intel.com>,
-        "Dan Williams" <dan.j.williams@intel.com>,
-        "Xiaoyao Li " <xiaoyao.li@intel.com>,
-        "Sai Praneeth Prakhya" <sai.praneeth.prakhya@intel.com>,
-        "Ravi V Shankar" <ravi.v.shankar@intel.com>
-Cc:     "linux-kernel" <linux-kernel@vger.kernel.org>,
-        "x86" <x86@kernel.org>, kvm@vger.kernel.org,
-        Fenghua Yu <fenghua.yu@intel.com>
-Subject: [PATCH v9 17/17] x86/split_lock: Warn on unaligned address in atomic bit operations
-Date:   Tue, 18 Jun 2019 15:41:19 -0700
-Message-Id: <1560897679-228028-18-git-send-email-fenghua.yu@intel.com>
-X-Mailer: git-send-email 2.5.0
-In-Reply-To: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
-References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
+   d="scan'208";a="153637382"
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.7.199.155])
+  by orsmga008.jf.intel.com with ESMTP; 18 Jun 2019 17:15:56 -0700
+Date:   Tue, 18 Jun 2019 17:19:08 -0700
+From:   Jacob Pan <jacob.jun.pan@linux.intel.com>
+To:     Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Cc:     "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "ashok.raj@intel.com" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Marc Zyngier <Marc.Zyngier@arm.com>,
+        Will Deacon <Will.Deacon@arm.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Vincent Stehle <Vincent.Stehle@arm.com>,
+        Robin Murphy <Robin.Murphy@arm.com>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>, jacob.jun.pan@linux.intel.com
+Subject: Re: [PATCH v8 26/29] vfio-pci: Register an iommu fault handler
+Message-ID: <20190618171908.76284cd7@jacob-builder>
+In-Reply-To: <77405d39-81a4-d9a8-5d35-27602199867a@arm.com>
+References: <20190526161004.25232-1-eric.auger@redhat.com>
+        <20190526161004.25232-27-eric.auger@redhat.com>
+        <20190603163139.70fe8839@x1.home>
+        <10dd60d9-4af0-c0eb-08c9-a0db7ee1925e@redhat.com>
+        <20190605154553.0d00ad8d@jacob-builder>
+        <2753d192-1c46-d78e-c425-0c828e48cde2@arm.com>
+        <20190606132903.064f7ac4@jacob-builder>
+        <dc051424-67d7-02ff-9b8e-0d7a8a4e59eb@arm.com>
+        <20190607104301.6b1bbd74@jacob-builder>
+        <e02b024f-6ebc-e8fa-c30c-5bf3f4b164d6@arm.com>
+        <20190610143134.7bff96e9@jacob-builder>
+        <905f130b-02dc-6971-8d5b-ce87d9bc96a4@arm.com>
+        <20190612115358.0d90b322@jacob-builder>
+        <77405d39-81a4-d9a8-5d35-27602199867a@arm.com>
+Organization: OTC
+X-Mailer: Claws Mail 3.13.2 (GTK+ 2.24.30; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-An atomic bit operation operates one bit in a single unsigned long location
-in a bitmap. In 64-bit mode, the location is at:
-base address of the bitmap + (bit offset in the bitmap / 64) * 8
+On Tue, 18 Jun 2019 15:04:36 +0100
+Jean-Philippe Brucker <jean-philippe.brucker@arm.com> wrote:
 
-If the base address is unaligned to unsigned long, each unsigned long
-location operated by the atomic operation will be unaligned to unsigned
-long and a split lock issue will happen if the unsigned long location
-crosses two cache lines.
+> On 12/06/2019 19:53, Jacob Pan wrote:
+> >>> You are right, the worst case of the spurious PS is to terminate
+> >>> the group prematurely. Need to know the scope of the HW damage in
+> >>> case of mdev where group IDs can be shared among mdevs belong to
+> >>> the same PF.    
+> >>
+> >> But from the IOMMU fault API point of view, the full page request
+> >> is identified by both PRGI and PASID. Given that each mdev has its
+> >> own set of PASIDs, it should be easy to isolate page responses per
+> >> mdev. 
+> > On Intel platform, devices sending page request with private data
+> > must receive page response with matching private data. If we solely
+> > depend on PRGI and PASID, we may send stale private data to the
+> > device in those incorrect page response. Since private data may
+> > represent PF device wide contexts, the consequence of sending page
+> > response with wrong private data may affect other mdev/PASID.
+> > 
+> > One solution we are thinking to do is to inject the sequence #(e.g.
+> > ktime raw mono clock) as vIOMMU private data into to the guest.
+> > Guest would return this fake private data in page response, then
+> > host will send page response back to the device that matches PRG1
+> > and PASID and private_data.
+> > 
+> > This solution does not expose HW context related private data to the
+> > guest but need to extend page response in iommu uapi.
+> > 
+> > /**
+> >  * struct iommu_page_response - Generic page response information
+> >  * @version: API version of this structure
+> >  * @flags: encodes whether the corresponding fields are valid
+> >  *         (IOMMU_FAULT_PAGE_RESPONSE_* values)
+> >  * @pasid: Process Address Space ID
+> >  * @grpid: Page Request Group Index
+> >  * @code: response code from &enum iommu_page_response_code
+> >  * @private_data: private data for the matching page request
+> >  */
+> > struct iommu_page_response {
+> > #define IOMMU_PAGE_RESP_VERSION_1	1
+> > 	__u32	version;
+> > #define IOMMU_PAGE_RESP_PASID_VALID	(1 << 0)
+> > #define IOMMU_PAGE_RESP_PRIVATE_DATA	(1 << 1)
+> > 	__u32	flags;
+> > 	__u32	pasid;
+> > 	__u32	grpid;
+> > 	__u32	code;
+> > 	__u32	padding;
+> > 	__u64	private_data[2];
+> > };
+> > 
+> > There is also the change needed for separating storage for the real
+> > and fake private data.
+> > 
+> > Sorry for the last minute change, did not realize the HW
+> > implications.
+> > 
+> > I see this as a future extension due to limited testing,   
+> 
+> I'm wondering how we deal with:
+> (1) old userspace that won't fill the new private_data field in
+> page_response. A new kernel still has to support it.
+> (2) old kernel that won't recognize the new PRIVATE_DATA flag.
+> Currently iommu_page_response() rejects page responses with unknown
+> flags.
+> 
+> I guess we'll need a two-way negotiation, where userspace queries
+> whether the kernel supports the flag (2), and the kernel learns
+> whether it should expect the private data to come back (1).
+> 
+I am not sure case (1) exist in that there is no existing user space
+supports PRQ w/o private data. Am I missing something?
 
-So checking alignment of the base address can proactively audit potential
-split lock issues in the atomic bit operation. A real split lock issue
-may or may not happen depending on the bit offset.
+For VT-d emulation, private data is always part of the scalable mode
+PASID capability. If vIOMMU query host supports PASID and scalable
+mode, it will always support private data once PRQ is enabled.
 
-Once analyzing the warning information, kernel developer can fix the
-potential split lock issue by aligning the base address to unsigned long
-instead of waiting for a real split lock issue happens.
+So I think we only need to negotiate (2) which should be covered by
+VT-d PASID cap.
 
-After applying this patch on 5.2-rc1, vmlinux size is increased by 0.2%
-and bzImage size is increased by 0.3% with allyesconfig.
+> > perhaps for
+> > now, can you add paddings similar to page request? Make it 64B as
+> > well.  
+> 
+> I don't think padding is necessary, because iommu_page_response is
+> sent by userspace to the kernel, unlike iommu_fault which is
+> allocated by userspace and filled by the kernel.
+> 
+> Page response looks a lot more like existing VFIO mechanisms, so I
+> suppose we'll wrap the iommu_page_response structure and include an
+> argsz parameter at the top:
+> 
+> 	struct vfio_iommu_page_response {
+> 		u32 argsz;
+> 		struct iommu_page_response pr;
+> 	};
+> 
+> 	struct vfio_iommu_page_response vpr = {
+> 		.argsz = sizeof(vpr),
+> 		.pr = ...
+> 		...
+> 	};
+> 
+> 	ioctl(devfd, VFIO_IOMMU_PAGE_RESPONSE, &vpr);
+> 
+> In that case supporting private data can be done by simply appending a
+> field at the end (plus the negotiation above).
+> 
+Do you mean at the end of struct vfio_iommu_page_response{}? or at
+the end of that seems struct iommu_page_response{}?
 
-Suggested-by: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Fenghua Yu <fenghua.yu@intel.com>
----
-
-FYI. After applying this patch, I haven't noticed any warning generated
-from this patch with booting and limited run time tests on a few platforms.
-
- arch/x86/include/asm/bitops.h | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/arch/x86/include/asm/bitops.h b/arch/x86/include/asm/bitops.h
-index 8e790ec219a5..44d7a353d6fd 100644
---- a/arch/x86/include/asm/bitops.h
-+++ b/arch/x86/include/asm/bitops.h
-@@ -14,6 +14,7 @@
- #endif
- 
- #include <linux/compiler.h>
-+#include <linux/bug.h>
- #include <asm/alternative.h>
- #include <asm/rmwcc.h>
- #include <asm/barrier.h>
-@@ -67,6 +68,8 @@
- static __always_inline void
- set_bit(long nr, volatile unsigned long *addr)
- {
-+	WARN_ON_ONCE(!IS_ALIGNED((unsigned long)addr, sizeof(unsigned long)));
-+
- 	if (IS_IMMEDIATE(nr)) {
- 		asm volatile(LOCK_PREFIX "orb %1,%0"
- 			: CONST_MASK_ADDR(nr, addr)
-@@ -105,6 +108,8 @@ static __always_inline void __set_bit(long nr, volatile unsigned long *addr)
- static __always_inline void
- clear_bit(long nr, volatile unsigned long *addr)
- {
-+	WARN_ON_ONCE(!IS_ALIGNED((unsigned long)addr, sizeof(unsigned long)));
-+
- 	if (IS_IMMEDIATE(nr)) {
- 		asm volatile(LOCK_PREFIX "andb %1,%0"
- 			: CONST_MASK_ADDR(nr, addr)
-@@ -137,6 +142,9 @@ static __always_inline void __clear_bit(long nr, volatile unsigned long *addr)
- static __always_inline bool clear_bit_unlock_is_negative_byte(long nr, volatile unsigned long *addr)
- {
- 	bool negative;
-+
-+	WARN_ON_ONCE(!IS_ALIGNED((unsigned long)addr, sizeof(unsigned long)));
-+
- 	asm volatile(LOCK_PREFIX "andb %2,%1"
- 		CC_SET(s)
- 		: CC_OUT(s) (negative), WBYTE_ADDR(addr)
-@@ -186,6 +194,8 @@ static __always_inline void __change_bit(long nr, volatile unsigned long *addr)
-  */
- static __always_inline void change_bit(long nr, volatile unsigned long *addr)
- {
-+	WARN_ON_ONCE(!IS_ALIGNED((unsigned long)addr, sizeof(unsigned long)));
-+
- 	if (IS_IMMEDIATE(nr)) {
- 		asm volatile(LOCK_PREFIX "xorb %1,%0"
- 			: CONST_MASK_ADDR(nr, addr)
-@@ -206,6 +216,8 @@ static __always_inline void change_bit(long nr, volatile unsigned long *addr)
-  */
- static __always_inline bool test_and_set_bit(long nr, volatile unsigned long *addr)
- {
-+	WARN_ON_ONCE(!IS_ALIGNED((unsigned long)addr, sizeof(unsigned long)));
-+
- 	return GEN_BINARY_RMWcc(LOCK_PREFIX __ASM_SIZE(bts), *addr, c, "Ir", nr);
- }
- 
-@@ -252,6 +264,8 @@ static __always_inline bool __test_and_set_bit(long nr, volatile unsigned long *
-  */
- static __always_inline bool test_and_clear_bit(long nr, volatile unsigned long *addr)
- {
-+	WARN_ON_ONCE(!IS_ALIGNED((unsigned long)addr, sizeof(unsigned long)));
-+
- 	return GEN_BINARY_RMWcc(LOCK_PREFIX __ASM_SIZE(btr), *addr, c, "Ir", nr);
- }
- 
-@@ -305,6 +319,8 @@ static __always_inline bool __test_and_change_bit(long nr, volatile unsigned lon
-  */
- static __always_inline bool test_and_change_bit(long nr, volatile unsigned long *addr)
- {
-+	WARN_ON_ONCE(!IS_ALIGNED((unsigned long)addr, sizeof(unsigned long)));
-+
- 	return GEN_BINARY_RMWcc(LOCK_PREFIX __ASM_SIZE(btc), *addr, c, "Ir", nr);
- }
- 
--- 
-2.19.1
-
+The consumer of the private data is iommu driver not vfio. So I think
+you want to add the new field at the end of struct iommu_page_response,
+right?
+I think that would work, just to clarify.
