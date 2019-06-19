@@ -2,290 +2,254 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 783F04B312
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 09:28:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A30614B3AD
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 10:11:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731066AbfFSH2O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jun 2019 03:28:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49474 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726246AbfFSH2N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jun 2019 03:28:13 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 32169C18B2C8;
-        Wed, 19 Jun 2019 07:28:13 +0000 (UTC)
-Received: from redhat.com (ovpn-112-48.ams2.redhat.com [10.36.112.48])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 507D62D1C0;
-        Wed, 19 Jun 2019 07:28:05 +0000 (UTC)
-Date:   Wed, 19 Jun 2019 08:28:02 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Sylvain Bauza <sbauza@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Libvirt Devel <libvir-list@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Erik Skultety <eskultet@redhat.com>,
-        Pavel Hrdina <phrdina@redhat.com>
-Subject: Re: mdevctl: A shoestring mediated device management and persistence
- utility
-Message-ID: <20190619072802.GA24236@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20190523172001.41f386d8@x1.home>
- <20190617140000.GA2021@redhat.com>
- <20190617085438.07607e8b@x1.home>
- <20190617151030.GG3380@redhat.com>
- <20190617110517.353b4f16@x1.home>
- <20190618130148.43ba5837.cohuck@redhat.com>
- <CALOCmukPWiXiM+mN0hCTvSwfdHy5UdERU8WnvOXiBrMQ9tH3VA@mail.gmail.com>
- <20190618161210.053d6550@x1.home>
+        id S1731134AbfFSILE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jun 2019 04:11:04 -0400
+Received: from mx2.suse.de ([195.135.220.15]:47182 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726142AbfFSILD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jun 2019 04:11:03 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 657F2AF1F;
+        Wed, 19 Jun 2019 08:11:01 +0000 (UTC)
+Subject: Re: [PATCH 1/2] scsi_host: add support for request batching
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     jejb@linux.ibm.com, martin.petersen@oracle.com,
+        linux-scsi@vger.kernel.org, stefanha@redhat.com
+References: <20190530112811.3066-1-pbonzini@redhat.com>
+ <20190530112811.3066-2-pbonzini@redhat.com>
+From:   Hannes Reinecke <hare@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
+ 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
+ azzYF4VRJsdl+d0MCaSy8mUh
+Message-ID: <760164a0-589d-d9fa-fb63-79b5e0899c00@suse.de>
+Date:   Wed, 19 Jun 2019 10:11:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <20190530112811.3066-2-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190618161210.053d6550@x1.home>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Wed, 19 Jun 2019 07:28:13 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 18, 2019 at 04:12:10PM -0600, Alex Williamson wrote:
-> On Tue, 18 Jun 2019 14:48:11 +0200
-> Sylvain Bauza <sbauza@redhat.com> wrote:
+On 5/30/19 1:28 PM, Paolo Bonzini wrote:
+> This allows a list of requests to be issued, with the LLD only writing
+> the hardware doorbell when necessary, after the last request was prepared.
+> This is more efficient if we have lists of requests to issue, particularly
+> on virtualized hardware, where writing the doorbell is more expensive than
+> on real hardware.
 > 
-> > On Tue, Jun 18, 2019 at 1:01 PM Cornelia Huck <cohuck@redhat.com> wrote:
-> > 
-> > > On Mon, 17 Jun 2019 11:05:17 -0600
-> > > Alex Williamson <alex.williamson@redhat.com> wrote:
-> > >  
-> > > > On Mon, 17 Jun 2019 16:10:30 +0100
-> > > > Daniel P. Berrangé <berrange@redhat.com> wrote:
-> > > >  
-> > > > > On Mon, Jun 17, 2019 at 08:54:38AM -0600, Alex Williamson wrote:  
-> > > > > > On Mon, 17 Jun 2019 15:00:00 +0100
-> > > > > > Daniel P. Berrangé <berrange@redhat.com> wrote:
-> > > > > >  
-> > > > > > > On Thu, May 23, 2019 at 05:20:01PM -0600, Alex Williamson wrote:  
-> > >  
-> > > > > > > > Hi,
-> > > > > > > >
-> > > > > > > > Currently mediated device management, much like SR-IOV VF  
-> > > management,  
-> > > > > > > > is largely left as an exercise for the user.  This is an attempt  
-> > > to  
-> > > > > > > > provide something and see where it goes.  I doubt we'll solve
-> > > > > > > > everyone's needs on the first pass, but maybe we'll solve enough  
-> > > and  
-> > > > > > > > provide helpers for the rest.  Without further ado, I'll point  
-> > > to what  
-> > > > > > > > I have so far:
-> > > > > > > >
-> > > > > > > > https://github.com/awilliam/mdevctl
-> > > > > > > >
-> > > > > > > > This is inspired by driverctl, which is also a bash utility.  
-> > > mdevctl  
-> > > > > > > > uses udev and systemd to record and recreate mdev devices for
-> > > > > > > > persistence and provides a command line utility for querying,  
-> > > listing,  
-> > > > > > > > starting, stopping, adding, and removing mdev devices.  
-> > > Currently, for  
-> > > > > > > > better or worse, it considers anything created to be  
-> > > persistent.  I can  
-> > > > > > > > imagine a global configuration option that might disable this and
-> > > > > > > > perhaps an autostart flag per mdev device, such that mdevctl  
-> > > might  
-> > > > > > > > simply "know" about some mdevs but not attempt to create them
-> > > > > > > > automatically.  Clearly command line usage help, man pages, and
-> > > > > > > > packaging are lacking as well, release early, release often,  
-> > > plus this  
-> > > > > > > > is a discussion starter to see if perhaps this is sufficient to  
-> > > meet  
-> > > > > > > > some needs.  
-> > > > > > >
-> > > > > > > I think from libvirt's POV, we would *not* want devices to be made
-> > > > > > > unconditionally persistent. We usually wish to expose a choice to
-> > > > > > > applications whether to have resources be transient or persistent.
-> > > > > > >
-> > > > > > > So from that POV, a global config option to turn off persistence
-> > > > > > > is not workable either. We would want control per-device, with
-> > > > > > > autostart control per device too.  
-> > > > > >
-> > > > > > The code has progressed somewhat in the past 3+ weeks, we still  
-> > > persist  
-> > > > > > all devices, but the start-up mode can be selected per device or  
-> > > with a  
-> > > > > > global default mode.  Devices configured with 'auto' start-up
-> > > > > > automatically while 'manual' devices are simply known and available  
-> > > to  
-> > > > > > be started.  I imagine we could add a 'transient' mode where we purge
-> > > > > > the information about the device when it is removed or the next time
-> > > > > > the parent device is added.  
-> > > > >
-> > > > > Having a pesistent config written out & then purged later is still
-> > > > > problematic. If the host crashes, nothing will purge the config file,
-> > > > > so it will become a persistent device. Also when listing devices we
-> > > > > want to be able to report whether it is persistent or transient. The
-> > > > > obvious way todo that is to simply look if a config file exists or
-> > > > > not.  
-> > > >
-> > > > I was thinking that the config file would identify the device as
-> > > > transient, therefore if the system crashed we'd have the opportunity to
-> > > > purge those entries on the next boot as we're processing the entries
-> > > > for that parent device.  Clearly it has yet to be implemented, but I
-> > > > expect there are some advantages to tracking devices via a transient
-> > > > config entry or else we're constantly re-discovering foreign mdevs.  
-> > >
-> > > I think we need to reach consensus about the actual scope of the
-> > > mdevctl tool.
-> > >
-> > >  
-> > Thanks Cornelia, my thoughts:
-> > 
-> > - Is it supposed to be responsible for managing *all* mdev devices in
-> > >   the system, or is it more supposed to be a convenience helper for
-> > >   users/software wanting to manage mdevs?
-> > >  
-> > 
-> > The latter. If an operator (or some software) wants to create mdevs by not
-> > using mdevctl (and rather directly calling the sysfs), I think it's OK.
-> > That said, mdevs created by mdevctl would be supported by systemctl, while
-> > the others not but I think it's okay.
+> The use case for this is plugged IO, where blk-mq flushes a batch of
+> requests all at once.
 > 
-> I agree (sort of), and I'm hearing that we should drop any sort of
-> automatic persistence of mdevs created outside of mdevctl.  The problem
-> comes when we try to draw the line between unmanaged and manged
-> devices.  For instance, if we have a command to list mdevs it would
-> feel incomplete if it didn't list all mdevs both those managed by
-> mdevctl and those created elsewhere.  For managed devices, I expect
-> we'll also have commands that allow the mode of the device to be
-> switched between transient, saved, and persistent.  Should a user then
-> be allowed to promote an unmanaged device to one of these modes via the
-> same command?  Should they be allowed to stop an unmanaged device
-> through driverctl?  Through systemctl?  These all seem like reasonable
-> things to do, so what then is the difference between transient and
-> unmanaged mdev and is mdevctl therefore managing all mdevs, not just
-> those it has created?
-
-To my mind there shouldn't really need to be a difference between
-transient mdevs created by mdevctrl and mdevs created by an user
-directly using sysfs. Both are mdevs on the running system with
-no config file that you have to enumerate by looking at sysfs.
-This ties back to my belief that we shouldn't need to have any
-config on disk for a transient mdev, just discover them all
-dynamically when required.
- 
-> > - Do we want mdevctl to manage config files for individual mdevs, or
-> > >   are they supposed to be in a common format that can also be managed
-> > >   by e.g. libvirt?
-> > >  
-> > 
-> > Unless I misunderstand, I think mdevctl just helps to create mdevs for
-> > being used by guests created either by libvirt or QEMU or even others.
-> > How a guest would allocate a mdev (ie. saying "I'll use this specific mdev
-> > UUID") is IMHO not something for mdevctl.
+> The API is the same as for blk-mq, just with blk-mq concepts tweaked to
+> fit the SCSI subsystem API: the "last" flag in blk_mq_queue_data becomes
+> a flag in scsi_cmnd, while the queue_num in the commit_rqs callback is
+> extracted from the hctx and passed as a parameter.
 > 
-> Right, mdevctl isn't concerned with how a specific mdev is used, but I
-> think what Connie is after is more the proposal from Daniel where
-> libvirt can essentially manage mdevctl config files itself and then
-> only invoke mdevctl for the dirty work of creating and deleting
-> devices.  In fact, assuming systemd, libvirt could avoid direct
-> interaction with mdevctl entirely, instead using systemctl device units
-> to start and stop the mdevs.  Maybe where that proposal takes a turn is
-> when we again consider non-systemd hosts, where maybe mdevctl needs to
-> write out an init script per mdev and libvirt injecting itself into
-> manipulation of the config files would either need to perform the same
-> or fall back to mdevctl.  Unfortunately there seems to be an ultimatum
-> to either condone external config file manipulation or expand the scope
-> of the project into becoming a library.
-
-Is mdevctl really tackling a problem that is complex enough that we
-will gain significantly by keeping the config files private and forcing
-use of a CLI or Library to access them ?  The amount of information
-that we need to store per mdev looks pretty small, with minimal
-compound structure. To me it feels like we can easily define a standard
-config format without suffering any serious long term pain, as the chances
-we'd need to radically change it look minimal.
-
-> > - Should mdevctl be a stand-alone tool, provide library functions, or
-> > >   both? Related: should it keep any internal state that is not written
-> > >   to disk? (I think that also plays into the transient vs. persistent
-> > >   question.)
+> The only complication is that blk-mq uses different plugging heuristics
+> depending on whether commit_rqs is present or not.  So we have two
+> different sets of blk_mq_ops and pick one depending on whether the
+> scsi_host template uses commit_rqs or not.
 > 
-> I don't think we want an mdevctld, if that's what you mean by internal
-> state not written to disk.  I think we ideally want all state in the
-> mdev config files or discerned through sysfs.  How we handle
-> non-systemd hosts may throw a wrench in that though since currently the
-> systemd integration relies on a template to support arbitrary mdevs and
-> I'm not sure how to replicate that in other init services.  If we need
-> to dynamically manage per mdev init files in addition to config files,
-> we're not so self contained.
-
-The most important part of the init script integration is just the bulk
-creation of mdevs on startup. I think this could be handled on non-systemd
-hosts via a fairly dumb init script that does this something approximating
-this:
-
-    for dev in `mdevctl list`
-    do
-        mdevctrl get-autostart $dev
-	test $? = 0 && mdevctrl start $dev
-    done
-
-ie, iterate over all configs. If the config is marked to autostart,
-then start it.
-
-> > FWIW, I'd love using mdevctl for OpenStack (Nova) just at least for
-> > creating persisted mdevs (ie. mdevs that would be recreated after rebooting
-> > using systemctl). That's the real use case I need.
-> > Whether libvirt would internally support mdevctl would be nice but that's
-> > not really something Nova needs, so I leave others providing their own
-> > thoughts.
-> > 
-> > 
-> > My personal opinion is that mdevctl should be able to tolerate mdevs
-> > > being configured by other means, but probably should not try to impose
-> > > its own configuration if it detects that (unless explicitly asked to do
-> > > so). Not sure how feasible that goal is.
-> > >
-> > > That's what I misunderstand : in order to have a guest using a vGPU, you  
-> > need to do two things :
-> > 1/ create the mdev
-> > 2/ allocate this created dev to a specific guest config
-> > 
-> > Of course, we could imagine a way to have both steps to be done directly by
-> > libvirt, but from my opinion, mdevctl is really helping 1/ and not 2/.
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  drivers/scsi/scsi_lib.c  | 37 ++++++++++++++++++++++++++++++++++---
+>  include/scsi/scsi_cmnd.h |  1 +
+>  include/scsi/scsi_host.h | 16 ++++++++++++++--
+>  3 files changed, 49 insertions(+), 5 deletions(-)
 > 
-> Yep, we also don't want to presume libvirt is the only consumer here.
-> mdevctl should also support other VM management tools, users who write
-> their own management scripts, and even non-VM related use cases.
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 601b9f1de267..eb4e67d02bfe 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -1673,10 +1673,11 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  		blk_mq_start_request(req);
+>  	}
+>  
+> +	cmd->flags &= SCMD_PRESERVED_FLAGS;
+>  	if (sdev->simple_tags)
+>  		cmd->flags |= SCMD_TAGGED;
+> -	else
+> -		cmd->flags &= ~SCMD_TAGGED;
+> +	if (bd->last)
+> +		cmd->flags |= SCMD_LAST;
+>  
+>  	scsi_init_cmd_errh(cmd);
+>  	cmd->scsi_done = scsi_mq_done;
+> @@ -1807,10 +1808,37 @@ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
+>  }
+>  EXPORT_SYMBOL_GPL(__scsi_init_queue);
+>  
+> +static const struct blk_mq_ops scsi_mq_ops_no_commit = {
+> +	.get_budget	= scsi_mq_get_budget,
+> +	.put_budget	= scsi_mq_put_budget,
+> +	.queue_rq	= scsi_queue_rq,
+> +	.complete	= scsi_softirq_done,
+> +	.timeout	= scsi_timeout,
+> +#ifdef CONFIG_BLK_DEBUG_FS
+> +	.show_rq	= scsi_show_rq,
+> +#endif
+> +	.init_request	= scsi_mq_init_request,
+> +	.exit_request	= scsi_mq_exit_request,
+> +	.initialize_rq_fn = scsi_initialize_rq,
+> +	.busy		= scsi_mq_lld_busy,
+> +	.map_queues	= scsi_map_queues,
+> +};
+> +
+> +
+> +static void scsi_commit_rqs(struct blk_mq_hw_ctx *hctx)
+> +{
+> +	struct request_queue *q = hctx->queue;
+> +	struct scsi_device *sdev = q->queuedata;
+> +	struct Scsi_Host *shost = sdev->host;
+> +
+> +	shost->hostt->commit_rqs(shost, hctx->queue_num);
+> +}
+> +
+>  static const struct blk_mq_ops scsi_mq_ops = {
+>  	.get_budget	= scsi_mq_get_budget,
+>  	.put_budget	= scsi_mq_put_budget,
+>  	.queue_rq	= scsi_queue_rq,
+> +	.commit_rqs	= scsi_commit_rqs,
+>  	.complete	= scsi_softirq_done,
+>  	.timeout	= scsi_timeout,
+>  #ifdef CONFIG_BLK_DEBUG_FS
+> @@ -1845,7 +1873,10 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
+>  		cmd_size += sizeof(struct scsi_data_buffer) + sgl_size;
+>  
+>  	memset(&shost->tag_set, 0, sizeof(shost->tag_set));
+> -	shost->tag_set.ops = &scsi_mq_ops;
+> +	if (shost->hostt->commit_rqs)
+> +		shost->tag_set.ops = &scsi_mq_ops;
+> +	else
+> +		shost->tag_set.ops = &scsi_mq_ops_no_commit;
+>  	shost->tag_set.nr_hw_queues = shost->nr_hw_queues ? : 1;
+>  	shost->tag_set.queue_depth = shost->can_queue;
+>  	shost->tag_set.cmd_size = cmd_size;
+> diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
+> index 76ed5e4acd38..91bd749a02f7 100644
+> --- a/include/scsi/scsi_cmnd.h
+> +++ b/include/scsi/scsi_cmnd.h
+> @@ -57,6 +57,7 @@ struct scsi_pointer {
+>  #define SCMD_TAGGED		(1 << 0)
+>  #define SCMD_UNCHECKED_ISA_DMA	(1 << 1)
+>  #define SCMD_INITIALIZED	(1 << 2)
+> +#define SCMD_LAST		(1 << 3)
+>  /* flags preserved across unprep / reprep */
+>  #define SCMD_PRESERVED_FLAGS	(SCMD_UNCHECKED_ISA_DMA | SCMD_INITIALIZED)
+>  
+> diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+> index 2b539a1b3f62..28f1c9177cd2 100644
+> --- a/include/scsi/scsi_host.h
+> +++ b/include/scsi/scsi_host.h
+> @@ -80,8 +80,10 @@ struct scsi_host_template {
+>  	 * command block to the LLDD.  When the driver finished
+>  	 * processing the command the done callback is invoked.
+>  	 *
+> -	 * If queuecommand returns 0, then the HBA has accepted the
+> -	 * command.  The done() function must be called on the command
+> +	 * If queuecommand returns 0, then the driver has accepted the
+> +	 * command.  It must also push it to the HBA if the scsi_cmnd
+> +	 * flag SCMD_LAST is set, or if the driver does not implement
+> +	 * commit_rqs.  The done() function must be called on the command
+>  	 * when the driver has finished with it. (you may call done on the
+>  	 * command before queuecommand returns, but in this case you
+>  	 * *must* return 0 from queuecommand).
+> @@ -109,6 +111,16 @@ struct scsi_host_template {
+>  	 */
+>  	int (* queuecommand)(struct Scsi_Host *, struct scsi_cmnd *);
+>  
+> +	/*
+> +	 * The commit_rqs function is used to trigger a hardware
+> +	 * doorbell after some requests have been queued with
+> +	 * queuecommand, when an error is encountered before sending
+> +	 * the request with SCMD_LAST set.
+> +	 *
+> +	 * STATUS: OPTIONAL
+> +	 */
+> +	void (*commit_rqs)(struct Scsi_Host *, u16);
+> +
+>  	/*
+>  	 * This is an error handling strategy routine.  You don't need to
+>  	 * define one of these if you don't want to - there is a default
 > 
-> > > A well-defined config file format is probably a win, even if it only
-> > > ends up being used by mdevctl itself.
-> 
-> Yes, regardless of whether others touch them, conversion scripts on
-> upgrade should be avoided.  Do we need something beyond a key=value
-> file?  So far we're only storing the mdev type and startup mode, but
-> vfio-ap clearly needs more, apparently key=value1,value2,... type
-> representation.  Still, I think I'd prefer simple over jumping to xml
-> or json or yaml.  Thanks,
+I'm a bit unsure if 'bd->last' is always set; it's quite obvious that
+it's present if set, but what about requests with 'bd->last == false' ?
+Is there a guarantee that they will _always_ be followed with a request
+with bd->last == true?
+And if so, is there a guarantee that this request is part of the same batch?
 
-For libvirt our preference would be something we can easily support
-without having to write new parsers. I'm not going to suggest XML,
-but JSON is probably our highest preference. If not then a simple
-flat file with one line of   key="value"  per setting is something
-we already parse for /etc/libvirt/libvirtd.conf file. For slightly
-more structure the .ini style file is also good. That's basically
-just flat  key=value  pairs, but with [section] headers so you can
-represent some level of structured data.
+Aside from it: I think it's a good idea to match the '->last' setting
+onto the SCMD_LAST flag; I would even go so far and make this an
+independent patch.
 
-Regards,
-Daniel
+Once to above points are cleared, that is.
+
+But if that one is in, why do we need to have the separate 'commit_rqs'
+callback?
+Can't we let the driver decide to issue a doorbell kick (or whatever the
+driver decides to do there)?
+If we ensure that the SCMD_LAST flag is always set for the end of a
+batch (even if this batch consists only of one request), the driver
+simply can evaluate the flag and do its actions.
+Why do we need a new callback here?
+
+Cheers,
+
+Hannes
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG Nürnberg)
