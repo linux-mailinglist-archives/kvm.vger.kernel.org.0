@@ -2,109 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FC5D4AF5D
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 03:12:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2684C4AFD6
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 04:07:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729736AbfFSBLw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 21:11:52 -0400
-Received: from mga02.intel.com ([134.134.136.20]:8904 "EHLO mga02.intel.com"
+        id S1729943AbfFSCEi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Jun 2019 22:04:38 -0400
+Received: from mga12.intel.com ([192.55.52.136]:50525 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725988AbfFSBLv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 21:11:51 -0400
+        id S1726047AbfFSCEi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Jun 2019 22:04:38 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 18:11:51 -0700
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 19:04:38 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,391,1557212400"; 
-   d="scan'208";a="170412612"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.224]) ([10.239.196.224])
-  by orsmga002.jf.intel.com with ESMTP; 18 Jun 2019 18:11:49 -0700
-Subject: Re: [PATCH v3 2/2] target/i386: Add support for save/load
- IA32_UMWAIT_CONTROL MSR
-To:     Xiaoyao Li <xiaoyao.li@linux.intel.com>, pbonzini@redhat.com,
-        rth@twiddle.net, ehabkost@redhat.com
-Cc:     cohuck@redhat.com, mst@redhat.com, mtosatti@redhat.com,
-        qemu-devel@nongnu.org, kvm@vger.kernel.org, jingqi.liu@intel.com
-References: <20190616153525.27072-1-tao3.xu@intel.com>
- <20190616153525.27072-3-tao3.xu@intel.com>
- <94f9e831-38a0-3cc3-f566-6c8e5909d0fd@linux.intel.com>
-From:   Tao Xu <tao3.xu@intel.com>
-Message-ID: <1bbe0308-6479-2a76-ba4e-f38203c975f7@intel.com>
-Date:   Wed, 19 Jun 2019 09:11:48 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
-MIME-Version: 1.0
-In-Reply-To: <94f9e831-38a0-3cc3-f566-6c8e5909d0fd@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+   d="scan'208";a="162064481"
+Received: from unknown (HELO localhost) ([10.239.159.128])
+  by orsmga003.jf.intel.com with ESMTP; 18 Jun 2019 19:04:36 -0700
+From:   Weijiang Yang <weijiang.yang@intel.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, mst@redhat.com, rkrcmar@redhat.com,
+        jmattson@google.com, yu.c.zhang@intel.com
+Cc:     Yang Weijiang <weijiang.yang@intel.com>
+Subject: [PATCH 0/1] selftest for SPP feature
+Date:   Wed, 19 Jun 2019 10:02:59 +0800
+Message-Id: <20190619020300.30392-1-weijiang.yang@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/17/2019 11:39 AM, Xiaoyao Li wrote:
-> 
-> 
-> On 6/16/2019 11:35 PM, Tao Xu wrote:
->> UMWAIT and TPAUSE instructions use IA32_UMWAIT_CONTROL at MSR index
->> E1H to determines the maximum time in TSC-quanta that the processor
->> can reside in either C0.1 or C0.2.
->>
->> This patch is to Add support for save/load IA32_UMWAIT_CONTROL MSR in
->> guest.
->>
->> Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
->> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
->> Signed-off-by: Tao Xu <tao3.xu@intel.com>
->> ---
->>
->> no changes in v3:
->> ---
->>   target/i386/cpu.h     |  2 ++
->>   target/i386/kvm.c     | 13 +++++++++++++
->>   target/i386/machine.c | 20 ++++++++++++++++++++
->>   3 files changed, 35 insertions(+)
->>
->> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
->> index 2f7c57a3c2..eb98b2e54a 100644
->> --- a/target/i386/cpu.h
->> +++ b/target/i386/cpu.h
->> @@ -450,6 +450,7 @@ typedef enum X86Seg {
->>   #define MSR_IA32_BNDCFGS                0x00000d90
->>   #define MSR_IA32_XSS                    0x00000da0
->> +#define MSR_IA32_UMWAIT_CONTROL         0xe1
->>   #define XSTATE_FP_BIT                   0
->>   #define XSTATE_SSE_BIT                  1
->> @@ -1348,6 +1349,7 @@ typedef struct CPUX86State {
->>       uint16_t fpregs_format_vmstate;
->>       uint64_t xss;
->> +    uint64_t umwait;
->>       TPRAccess tpr_access_type;
->>   } CPUX86State;
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index 3efdb90f11..506c7cd038 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -91,6 +91,7 @@ static bool has_msr_hv_stimer;
->>   static bool has_msr_hv_frequencies;
->>   static bool has_msr_hv_reenlightenment;
->>   static bool has_msr_xss;
->> +static bool has_msr_umwait;
->>   static bool has_msr_spec_ctrl;
->>   static bool has_msr_virt_ssbd;
->>   static bool has_msr_smi_count;
->> @@ -1486,6 +1487,9 @@ static int kvm_get_supported_msrs(KVMState *s)
->>                   case MSR_IA32_XSS:
->>                       has_msr_xss = true;
->>                       break;
->> +                case MSR_IA32_UMWAIT_CONTROL:
->> +                    has_msr_umwait = true;
->> +                    break;
-> 
-> Need to add MSR_IA32_UMWAIT_CONTROL into msrs_to_save[] in your kvm 
-> patches, otherwise qemu never goes into this case.
-> 
-OK, thank you for your suggestion. I will add it in the next version.
+From: Yang Weijiang <weijiang.yang@intel.com>
+
+Sub-Page Permission(SPP) is to protect finer granularity subpages
+(128Byte each) within a 4KB page. 
+There're three specific ioctls for the feature in KVM:
+KVM_INIT_SPP - initialize SPP runtime environment 
+KVM_SUBPAGES_SET_ACCESS - set SPP protection for guest page
+KVM_SUBPAGES_GET_ACCESS - get SPP permission bits for guest page
+This selftest uses these ioctls to verify whether SPP is working
+on SPP powered platforms.
+
+test results:
+--------------------------------------------------------------------------
+SPP protected zone: size = 4096, gva = 0x700000, gpa = 0x10001000, hva =
+0x0x7f6ff3b92000
+SPP initialized successfully.
+set spp protection info: gfn = 0x10001, access = 0x0, npages = 1
+get spp protection info: gfn = 0x10001, access = 0x0, npages = 1
+got matched subpage permission vector.
+expect VM exits caused by SPP below.
+1 - exit reason: SPP
+2 - exit reason: SPP
+3 - exit reason: SPP
+4 - exit reason: SPP
+5 - exit reason: SPP
+6 - exit reason: SPP
+7 - exit reason: SPP
+8 - exit reason: SPP
+9 - exit reason: SPP
+10 - exit reason: SPP
+11 - exit reason: SPP
+12 - exit reason: SPP
+13 - exit reason: SPP
+14 - exit reason: SPP
+15 - exit reason: SPP
+16 - exit reason: SPP
+17 - exit reason: SPP
+18 - exit reason: SPP
+19 - exit reason: SPP
+20 - exit reason: SPP
+21 - exit reason: SPP
+22 - exit reason: SPP
+23 - exit reason: SPP
+24 - exit reason: SPP
+25 - exit reason: SPP
+26 - exit reason: SPP
+27 - exit reason: SPP
+28 - exit reason: SPP
+29 - exit reason: SPP
+30 - exit reason: SPP
+31 - exit reason: SPP
+32 - exit reason: SPP
+total EPT violation count: 32
+unset SPP protection at gfn: 0x10001
+expect NO VM exits caused by SPP below.
+completed SPP test successfully!
+------------------------------------------------------------------------
+
+
+Yang Weijiang (1):
+  kvm: selftests: add selftest for SPP feature
+
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   1 +
+ tools/testing/selftests/kvm/x86_64/spp_test.c | 206 ++++++++++++++++++
+ 3 files changed, 208 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/spp_test.c
+
+-- 
+2.17.2
 
