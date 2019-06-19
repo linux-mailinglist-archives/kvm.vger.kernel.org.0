@@ -2,181 +2,232 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EA8394C211
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 22:06:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E790F4C221
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 22:13:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726482AbfFSUGS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jun 2019 16:06:18 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:34034 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726143AbfFSUGR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jun 2019 16:06:17 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JK3j9u107770;
-        Wed, 19 Jun 2019 20:05:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=T5/3kAdAeR6zFBROUWJvfOGR6wpTe6uJBD03+FJjR7Q=;
- b=JfZGTb/9vsPuTMYS8TLwO4D8maqLtaN37PWBviJWNWHwVHs6MQchbjnbIgEyT7QH5fPr
- RQaEqPDd4BLrljBr3UdRftu3+JLtrIljjKd9fnV8AG4CN4o7VCmxFBu3Cl8nvesNwCWz
- WIX9fL7RM27yvN1yXBV2ffc84cSXssCtprnFBx9JT9Dxvzwcw9BbBpKWzQE6w959cX3m
- 0wLk2hF0v2PhKsE/QLpTHqn5AFlUdUziXjHErCwZzqKM7mXOXE9LWChgFdAX1ktGhG2H
- kWc5j8nTubxy0mEzTZ/LFPGY/UPGDf6lLKUj2qzGz2XAU0UI7iXrVbiRGgfjIjj0yqPG dg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2t7809dft1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Jun 2019 20:05:27 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JK5FSV002705;
-        Wed, 19 Jun 2019 20:05:26 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2t7rdwu63d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Jun 2019 20:05:26 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5JK5NFI017703;
-        Wed, 19 Jun 2019 20:05:23 GMT
-Received: from [10.65.164.174] (/10.65.164.174)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 19 Jun 2019 13:05:23 -0700
-Subject: Re: [PATCH v17 12/15] media/v4l2-core, arm64: untag user pointers in
- videobuf_dma_contig_user_get
-To:     Andrey Konovalov <andreyknvl@google.com>,
-        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-References: <cover.1560339705.git.andreyknvl@google.com>
- <7fbcdbe16a2bd99e92eb4541248469738d89a122.1560339705.git.andreyknvl@google.com>
-From:   Khalid Aziz <khalid.aziz@oracle.com>
-Organization: Oracle Corp
-Message-ID: <5ea75db0-20e9-7423-8670-967eedd56440@oracle.com>
-Date:   Wed, 19 Jun 2019 14:05:20 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726689AbfFSUNh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jun 2019 16:13:37 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35448 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726175AbfFSUNg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jun 2019 16:13:36 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5JKC4k5080962;
+        Wed, 19 Jun 2019 16:13:12 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2t7ty7a7pc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jun 2019 16:13:11 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x5JK9o4e015565;
+        Wed, 19 Jun 2019 20:13:05 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma01dal.us.ibm.com with ESMTP id 2t75r0y98e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Jun 2019 20:13:05 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5JKD44h41681200
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Jun 2019 20:13:05 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DC154AE060;
+        Wed, 19 Jun 2019 20:13:04 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B5D6FAE05F;
+        Wed, 19 Jun 2019 20:13:04 +0000 (GMT)
+Received: from [9.80.202.78] (unknown [9.80.202.78])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 19 Jun 2019 20:13:04 +0000 (GMT)
+Subject: Re: [RFC PATCH v1 1/5] vfio-ccw: Move guest_cp storage into common
+ struct
+To:     Eric Farman <farman@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20190618202352.39702-1-farman@linux.ibm.com>
+ <20190618202352.39702-2-farman@linux.ibm.com>
+From:   Farhan Ali <alifm@linux.ibm.com>
+Message-ID: <0e55d558-08ee-996e-f9c2-f51e8695064a@linux.ibm.com>
+Date:   Wed, 19 Jun 2019 16:13:04 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-In-Reply-To: <7fbcdbe16a2bd99e92eb4541248469738d89a122.1560339705.git.andreyknvl@google.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190618202352.39702-2-farman@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906190165
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906190165
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-19_12:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906190166
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/12/19 5:43 AM, Andrey Konovalov wrote:
-> This patch is a part of a series that extends arm64 kernel ABI to allow=
- to
-> pass tagged user pointers (with the top byte set to something else othe=
-r
-> than 0x00) as syscall arguments.
->=20
-> videobuf_dma_contig_user_get() uses provided user pointers for vma
-> lookups, which can only by done with untagged pointers.
->=20
-> Untag the pointers in this function.
->=20
-> Reviewed-by: Kees Cook <keescook@chromium.org>
-> Acked-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+
+
+On 06/18/2019 04:23 PM, Eric Farman wrote:
+> Rather than allocating/freeing a piece of memory every time
+> we try to figure out how long a CCW chain is, let's use a piece
+> of memory allocated for each device.
+> 
+> The io_mutex added with commit 4f76617378ee9 ("vfio-ccw: protect
+> the I/O region") is held for the duration of the VFIO_CCW_EVENT_IO_REQ
+> event that accesses/uses this space, so there should be no race
+> concerns with another CPU attempting an (unexpected) SSCH for the
+> same device.
+> 
+> Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
 > ---
+> Conny, your suggestion [1] did not go unnoticed.  :)
+> 
+> [1] https://patchwork.kernel.org/comment/22312659/
+> ---
+>   drivers/s390/cio/vfio_ccw_cp.c  | 23 ++++-------------------
+>   drivers/s390/cio/vfio_ccw_cp.h  |  7 +++++++
+>   drivers/s390/cio/vfio_ccw_drv.c |  7 +++++++
+>   3 files changed, 18 insertions(+), 19 deletions(-)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index 90d86e1354c1..f358502376be 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -16,12 +16,6 @@
+>   
+>   #include "vfio_ccw_cp.h"
+>   
+> -/*
+> - * Max length for ccw chain.
+> - * XXX: Limit to 256, need to check more?
+> - */
+> -#define CCWCHAIN_LEN_MAX	256
+> -
+>   struct pfn_array {
+>   	/* Starting guest physical I/O address. */
+>   	unsigned long		pa_iova;
+> @@ -386,7 +380,7 @@ static void ccwchain_cda_free(struct ccwchain *chain, int idx)
+>    */
+>   static int ccwchain_calc_length(u64 iova, struct channel_program *cp)
+>   {
+> -	struct ccw1 *ccw, *p;
+> +	struct ccw1 *ccw = cp->guest_cp;
+>   	int cnt;
+>   
+>   	/*
+> @@ -394,15 +388,9 @@ static int ccwchain_calc_length(u64 iova, struct channel_program *cp)
+>   	 * Currently the chain length is limited to CCWCHAIN_LEN_MAX (256).
+>   	 * So copying 2K is enough (safe).
+>   	 */
+> -	p = ccw = kcalloc(CCWCHAIN_LEN_MAX, sizeof(*ccw), GFP_KERNEL);
+> -	if (!ccw)
+> -		return -ENOMEM;
+> -
+>   	cnt = copy_ccw_from_iova(cp, ccw, iova, CCWCHAIN_LEN_MAX);
 
-Patch looks good, but commit log should be updated to not be specific to
-arm64.
-
-Reviewed-by: Khalid Aziz <khalid.aziz@oracle.com>
-
-
-
->  drivers/media/v4l2-core/videobuf-dma-contig.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> exact_copy_from_user
-> diff --git a/drivers/media/v4l2-core/videobuf-dma-contig.c b/drivers/me=
-dia/v4l2-core/videobuf-dma-contig.c
-> index e1bf50df4c70..8a1ddd146b17 100644
-> --- a/drivers/media/v4l2-core/videobuf-dma-contig.c
-> +++ b/drivers/media/v4l2-core/videobuf-dma-contig.c
-> @@ -160,6 +160,7 @@ static void videobuf_dma_contig_user_put(struct vid=
-eobuf_dma_contig_memory *mem)
->  static int videobuf_dma_contig_user_get(struct videobuf_dma_contig_mem=
-ory *mem,
->  					struct videobuf_buffer *vb)
->  {
-> +	unsigned long untagged_baddr =3D untagged_addr(vb->baddr);
->  	struct mm_struct *mm =3D current->mm;
->  	struct vm_area_struct *vma;
->  	unsigned long prev_pfn, this_pfn;
-> @@ -167,22 +168,22 @@ static int videobuf_dma_contig_user_get(struct vi=
-deobuf_dma_contig_memory *mem,
->  	unsigned int offset;
->  	int ret;
-> =20
-> -	offset =3D vb->baddr & ~PAGE_MASK;
-> +	offset =3D untagged_baddr & ~PAGE_MASK;
->  	mem->size =3D PAGE_ALIGN(vb->size + offset);
->  	ret =3D -EINVAL;
-> =20
->  	down_read(&mm->mmap_sem);
-> =20
-> -	vma =3D find_vma(mm, vb->baddr);
-> +	vma =3D find_vma(mm, untagged_baddr);
->  	if (!vma)
->  		goto out_up;
-> =20
-> -	if ((vb->baddr + mem->size) > vma->vm_end)
-> +	if ((untagged_baddr + mem->size) > vma->vm_end)
->  		goto out_up;
-> =20
->  	pages_done =3D 0;
->  	prev_pfn =3D 0; /* kill warning */
-> -	user_address =3D vb->baddr;
-> +	user_address =3D untagged_baddr;
-> =20
->  	while (pages_done < (mem->size >> PAGE_SHIFT)) {
->  		ret =3D follow_pfn(vma, user_address, &this_pfn);
->=20
+Just a minor concern, should we clear out cp->guest_cp memory before we 
+do the copying? Given that the ccwchain_calc_length will also call be 
+called during tic handling, it's possible there might be some garbage 
+data in guest_cp, no?
 
 
+> -	if (cnt) {
+> -		kfree(ccw);
+> +	if (cnt)
+>   		return cnt;
+> -	}
+>   
+>   	cnt = 0;
+>   	do {
+> @@ -413,10 +401,8 @@ static int ccwchain_calc_length(u64 iova, struct channel_program *cp)
+>   		 * orb specified one of the unsupported formats, we defer
+>   		 * checking for IDAWs in unsupported formats to here.
+>   		 */
+> -		if ((!cp->orb.cmd.c64 || cp->orb.cmd.i2k) && ccw_is_idal(ccw)) {
+> -			kfree(p);
+> +		if ((!cp->orb.cmd.c64 || cp->orb.cmd.i2k) && ccw_is_idal(ccw))
+>   			return -EOPNOTSUPP;
+> -		}
+>   
+>   		/*
+>   		 * We want to keep counting if the current CCW has the
+> @@ -435,7 +421,6 @@ static int ccwchain_calc_length(u64 iova, struct channel_program *cp)
+>   	if (cnt == CCWCHAIN_LEN_MAX + 1)
+>   		cnt = -EINVAL;
+>   
+> -	kfree(p);
+>   	return cnt;
+>   }
+>   
+> @@ -461,7 +446,7 @@ static int ccwchain_handle_ccw(u32 cda, struct channel_program *cp)
+>   	struct ccwchain *chain;
+>   	int len, ret;
+>   
+> -	/* Get chain length. */
+> +	/* Copy the chain from cda to cp, and count the CCWs in it */
+>   	len = ccwchain_calc_length(cda, cp);
+>   	if (len < 0)
+>   		return len;
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.h b/drivers/s390/cio/vfio_ccw_cp.h
+> index 3c20cd208da5..7cdc38049033 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.h
+> +++ b/drivers/s390/cio/vfio_ccw_cp.h
+> @@ -16,6 +16,12 @@
+>   
+>   #include "orb.h"
+>   
+> +/*
+> + * Max length for ccw chain.
+> + * XXX: Limit to 256, need to check more?
+> + */
+> +#define CCWCHAIN_LEN_MAX	256
+> +
+>   /**
+>    * struct channel_program - manage information for channel program
+>    * @ccwchain_list: list head of ccwchains
+> @@ -32,6 +38,7 @@ struct channel_program {
+>   	union orb orb;
+>   	struct device *mdev;
+>   	bool initialized;
+> +	struct ccw1 *guest_cp;
+>   };
+>   
+>   extern int cp_init(struct channel_program *cp, struct device *mdev,
+> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+> index 66a66ac1f3d1..34a9a5e3fd36 100644
+> --- a/drivers/s390/cio/vfio_ccw_drv.c
+> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> @@ -129,6 +129,11 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+>   	if (!private)
+>   		return -ENOMEM;
+>   
+> +	private->cp.guest_cp = kcalloc(CCWCHAIN_LEN_MAX, sizeof(struct ccw1),
+> +				       GFP_KERNEL);
+> +	if (!private->cp.guest_cp)
+> +		goto out_free;
+> +
+>   	private->io_region = kmem_cache_zalloc(vfio_ccw_io_region,
+>   					       GFP_KERNEL | GFP_DMA);
+>   	if (!private->io_region)
+> @@ -169,6 +174,7 @@ static int vfio_ccw_sch_probe(struct subchannel *sch)
+>   		kmem_cache_free(vfio_ccw_cmd_region, private->cmd_region);
+>   	if (private->io_region)
+>   		kmem_cache_free(vfio_ccw_io_region, private->io_region);
+> +	kfree(private->cp.guest_cp);
+>   	kfree(private);
+>   	return ret;
+>   }
+> @@ -185,6 +191,7 @@ static int vfio_ccw_sch_remove(struct subchannel *sch)
+>   
+>   	kmem_cache_free(vfio_ccw_cmd_region, private->cmd_region);
+>   	kmem_cache_free(vfio_ccw_io_region, private->io_region);
+> +	kfree(private->cp.guest_cp);
+>   	kfree(private);
+>   
+>   	return 0;
+> 
