@@ -2,50 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C22414C3B3
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 00:33:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F29E4C3B0
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 00:33:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730860AbfFSWdU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jun 2019 18:33:20 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:45341 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730850AbfFSWdT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jun 2019 18:33:19 -0400
-Received: by mail-io1-f68.google.com with SMTP id e3so1255669ioc.12;
-        Wed, 19 Jun 2019 15:33:19 -0700 (PDT)
+        id S1730926AbfFSWd2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jun 2019 18:33:28 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:38348 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730914AbfFSWd1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jun 2019 18:33:27 -0400
+Received: by mail-io1-f67.google.com with SMTP id j6so436809ioa.5;
+        Wed, 19 Jun 2019 15:33:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:from:to:cc:date:message-id:in-reply-to:references
          :user-agent:mime-version:content-transfer-encoding;
-        bh=C0Bf7M/8cNMTOD5Oi+UUTlzGK+ofWvIbu+KdmI1IyVU=;
-        b=Eoulzf7P/OMOo6UZcSrsWbKXBQDMcqi3Lt3uX4516MwL+PQ9++SEChgXNQyFiosCTa
-         XTg4LkxnkpTckIHJnEJlp1MYaY4Lt9wnn8HkSZOd+pw3HaJjj732wmiSM4cNNILGt3j9
-         ob7q+r/GhMWZrGJXnvmKGggYinS7vRlPyrluqnSjmvM0S3oIFGkV/Y8T1hizTV1BXYdb
-         VtKWtXd+Vk/aqzxcjxtAP7m9CzCvIbAfYlzjvQWSXcgr9seH89NFUgRwO3gzSV3K4AsT
-         pXF8Foro/42GRqNcJN2OP1EPhgLYDRqVardVtEb7/SbHc5T2/log0PBLWrXz8DwOWHRm
-         B+fQ==
+        bh=uFIpek7shBaVr9DU13GRQZ4ibKs0x6v0iQmP4OpKI7k=;
+        b=k/OoraMNYNLWswsjRZR3jEbeHgciCrA3Pvkj8V+NcMuwZd4nDStE1mCeb2clq7uoPE
+         Bf0GYaBQ58HCl4cWZHr/PK4K4jEqlPVoK9CIq9gBKyQP+SAMwHApaOQ+/pM/boz+OI3N
+         Ddc47rKbDu9wx2/eEEMCGKLqNnTrNgKTd6Eb2XLmtry661w/558JU3OoCoNGpsOBoRAn
+         mhk+F4qr5+ZnCArtmzi2LJGPyjE7a2T+Bn/9P+Ib5zy4BsTFTShpemJziW9RGWAgDKkx
+         0qaUB6uoFgFyhUPIj/dCvXQQW9NCpd74Z4QihncLfIL8C1BwyheFscAO19MnmxiE0jYW
+         AH+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=C0Bf7M/8cNMTOD5Oi+UUTlzGK+ofWvIbu+KdmI1IyVU=;
-        b=L7DlA0aiCOXsTfs1AKvqzboW6z7PPI2qgDT/FUgosACqiN2a+VbBJ2pOiixJ0zG8X9
-         gPHfD5kbjzxfu94DHNhYA1we1Sy5vv99XGSdN/+ifQSqaHHGE00ho8MhEk7XcJbMfBF/
-         pNxE/ri5rzkABNb6SV7OI6KDZaPiosK6Hgn1Gn/y3YC9jEJO7JZuQaZmn1W1hRS+tT3H
-         Beq9bbHj+LbSErPDZpbpwwlS2lonwljqXNQeZQfruVXL715atDNgm2l5ZQtYp+s8fxXP
-         j2RbZEbOX0pWOrYr5SOge3GU2f5J6zmgZjq7BKgMB27C9tWiUor9KxaxSvnKEDubjaFI
-         Jl+g==
-X-Gm-Message-State: APjAAAUhT1JSyMew542sXgIVU58UK50lEQV+cv+bSUDt0vMCEwXPi9q2
-        Ifsy5J5s8EID4mQ156ACS0g=
-X-Google-Smtp-Source: APXvYqx79H8ElBelvGscKvVv57A/nzg/ZdF+AMPkeYAHiq1eEfYfdHd9cuqUI0iuasR1vsEvSUjDfQ==
-X-Received: by 2002:a5e:820a:: with SMTP id l10mr13256571iom.283.1560983598744;
-        Wed, 19 Jun 2019 15:33:18 -0700 (PDT)
+        bh=uFIpek7shBaVr9DU13GRQZ4ibKs0x6v0iQmP4OpKI7k=;
+        b=Alae/MRlkPe2T2dQ19GnGDhfV5rAVql1UkKno/m/uGlo02w8juQEk/mogfXYItpDmk
+         lF9U1TxQJ/Ghysudw/+lP5THPaPJ/l4YIOpsKEJf00pChAFyGQ1ZW8OhAK+QTfVpgE89
+         aBIr6tYqmTOnH7ILh9x/PdPVnmGakelmM9VVFXg9y9A80X9VUC2Bcf5pO6TmTsrF9nuO
+         6si8KiZMWMxaaBgVhcA6LPaDPvHaVqraAC5kHSo+nacvupKZco2QxkZdDp4oz5yYsJCh
+         reY+DayjxD/sQciYPRCcO0hDSCOMMNEQ0B9xrbDHzXM0FB+r+lijkmzsPoFaSQHLlNVg
+         b90w==
+X-Gm-Message-State: APjAAAUdnJKkEVnjkU0Qw2dcfZV3bIHszDmGWvHq23xLkV42D9CkrvYB
+        leXkRFyYMzJ+DVOruKdOUiU=
+X-Google-Smtp-Source: APXvYqyGIUEECip5yOIkf36i1rUmylXKTO5CxpW8E+NA2U4z3c9cYnuIYIokSVtGEOBlV0rtIuMF/Q==
+X-Received: by 2002:a02:ccd2:: with SMTP id k18mr1709593jaq.3.1560983605934;
+        Wed, 19 Jun 2019 15:33:25 -0700 (PDT)
 Received: from localhost.localdomain (50-126-100-225.drr01.csby.or.frontiernet.net. [50.126.100.225])
-        by smtp.gmail.com with ESMTPSA id p10sm12684507iob.54.2019.06.19.15.33.17
+        by smtp.gmail.com with ESMTPSA id a15sm13136500ioc.27.2019.06.19.15.33.24
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 19 Jun 2019 15:33:18 -0700 (PDT)
-Subject: [PATCH v1 3/6] mm: Use zone and order instead of free area in
- free_list manipulators
+        Wed, 19 Jun 2019 15:33:25 -0700 (PDT)
+Subject: [PATCH v1 4/6] mm: Introduce "aerated" pages
 From:   Alexander Duyck <alexander.duyck@gmail.com>
 To:     nitesh@redhat.com, kvm@vger.kernel.org, david@redhat.com,
         mst@redhat.com, dave.hansen@intel.com,
@@ -55,8 +54,8 @@ Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
         konrad.wilk@oracle.com, lcapitulino@redhat.com,
         wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
         dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
-Date:   Wed, 19 Jun 2019 15:33:16 -0700
-Message-ID: <20190619223316.1231.50329.stgit@localhost.localdomain>
+Date:   Wed, 19 Jun 2019 15:33:23 -0700
+Message-ID: <20190619223323.1231.86906.stgit@localhost.localdomain>
 In-Reply-To: <20190619222922.1231.27432.stgit@localhost.localdomain>
 References: <20190619222922.1231.27432.stgit@localhost.localdomain>
 User-Agent: StGit/0.17.1-dirty
@@ -70,249 +69,324 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-In order to enable the use of the zone from the list manipulator functions
-I will need access to the zone pointer. As it turns out most of the
-accessors were always just being directly passed &zone->free_area[order]
-anyway so it would make sense to just fold that into the function itself
-and pass the zone and order as arguments instead of the free area.
+In order to pave the way for free page hinting in virtualized environments
+we will need a way to get pages out of the free lists and identify those
+pages after they have been returned. To accomplish this patch adds the
+concept of an "aerated" flag, which is essentially meant to just be the
+Offline page type used in conjustion with the Buddy page type bit.
 
-In addition in order to be able to reference the zone we need to move the
-declaration of the functions down so that we have the zone defined before
-we define the list manipulation functions.
+For now we can just add the basic logic to set the flag and track the
+number of aerated pages per free area.
 
 Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 ---
- include/linux/mmzone.h |   72 +++++++++++++++++++++++++++---------------------
- mm/page_alloc.c        |   30 +++++++-------------
- 2 files changed, 51 insertions(+), 51 deletions(-)
+ include/linux/memory_aeration.h |   61 +++++++++++++++++++++++++
+ include/linux/mmzone.h          |   13 ++++-
+ mm/Kconfig                      |    5 ++
+ mm/page_alloc.c                 |   97 +++++++++++++++++++++++++++++++++++++--
+ 4 files changed, 168 insertions(+), 8 deletions(-)
+ create mode 100644 include/linux/memory_aeration.h
 
+diff --git a/include/linux/memory_aeration.h b/include/linux/memory_aeration.h
+new file mode 100644
+index 000000000000..44cfbc259778
+--- /dev/null
++++ b/include/linux/memory_aeration.h
+@@ -0,0 +1,61 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _LINUX_MEMORY_AERATION_H
++#define _LINUX_MEMORY_AERATION_H
++
++#include <linux/mmzone.h>
++#include <linux/pageblock-flags.h>
++
++struct page *get_aeration_page(struct zone *zone, unsigned int order,
++			       int migratetype);
++void put_aeration_page(struct zone *zone, struct page *page);
++
++static inline struct list_head *aerator_get_tail(struct zone *zone,
++						 unsigned int order,
++						 int migratetype)
++{
++	return &zone->free_area[order].free_list[migratetype];
++}
++
++static inline void set_page_aerated(struct page *page,
++				    struct zone *zone,
++				    unsigned int order,
++				    int migratetype)
++{
++#ifdef CONFIG_AERATION
++	/* update areated page accounting */
++	zone->free_area[order].nr_free_aerated++;
++
++	/* record migratetype and flag page as aerated */
++	set_pcppage_migratetype(page, migratetype);
++	__SetPageAerated(page);
++#endif
++}
++
++static inline void clear_page_aerated(struct page *page,
++				      struct zone *zone,
++				      struct free_area *area)
++{
++#ifdef CONFIG_AERATION
++	if (likely(!PageAerated(page)))
++		return;
++
++	__ClearPageAerated(page);
++	area->nr_free_aerated--;
++#endif
++}
++
++/**
++ * aerator_notify_free - Free page notification that will start page processing
++ * @zone: Pointer to current zone of last page processed
++ * @order: Order of last page added to zone
++ *
++ * This function is meant to act as a screener for __aerator_notify which
++ * will determine if a give zone has crossed over the high-water mark that
++ * will justify us beginning page treatment. If we have crossed that
++ * threshold then it will start the process of pulling some pages and
++ * placing them in the batch list for treatment.
++ */
++static inline void aerator_notify_free(struct zone *zone, int order)
++{
++}
++#endif /*_LINUX_MEMORY_AERATION_H */
 diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
-index 6f8fd5c1a286..c3597920a155 100644
+index c3597920a155..7d89722ae9eb 100644
 --- a/include/linux/mmzone.h
 +++ b/include/linux/mmzone.h
-@@ -118,29 +118,6 @@ struct free_area {
+@@ -116,6 +116,7 @@ static inline void set_pcppage_migratetype(struct page *page, int migratetype)
+ struct free_area {
+ 	struct list_head	free_list[MIGRATE_TYPES];
  	unsigned long		nr_free;
++	unsigned long		nr_free_aerated;
  };
  
--/* Used for pages not on another list */
--static inline void add_to_free_area(struct page *page, struct free_area *area,
--			     int migratetype)
--{
--	list_add(&page->lru, &area->free_list[migratetype]);
--	area->nr_free++;
--}
--
--/* Used for pages not on another list */
--static inline void add_to_free_area_tail(struct page *page, struct free_area *area,
--				  int migratetype)
--{
--	list_add_tail(&page->lru, &area->free_list[migratetype]);
--	area->nr_free++;
--}
--
--/* Used for pages which are on another list */
--static inline void move_to_free_area(struct page *page, struct free_area *area,
--			     int migratetype)
--{
--	list_move(&page->lru, &area->free_list[migratetype]);
--}
--
  static inline struct page *get_page_from_free_area(struct free_area *area,
- 					    int migratetype)
- {
-@@ -148,15 +125,6 @@ static inline struct page *get_page_from_free_area(struct free_area *area,
- 					struct page, lru);
- }
- 
--static inline void del_page_from_free_area(struct page *page,
--		struct free_area *area)
--{
--	list_del(&page->lru);
--	__ClearPageBuddy(page);
--	set_page_private(page, 0);
--	area->nr_free--;
--}
--
- static inline bool free_area_empty(struct free_area *area, int migratetype)
- {
- 	return list_empty(&area->free_list[migratetype]);
-@@ -805,6 +773,46 @@ static inline bool pgdat_is_empty(pg_data_t *pgdat)
+@@ -773,6 +774,8 @@ static inline bool pgdat_is_empty(pg_data_t *pgdat)
  	return !pgdat->node_start_pfn && !pgdat->node_spanned_pages;
  }
  
-+/* Used for pages not on another list */
-+static inline void add_to_free_area(struct page *page, struct zone *zone,
-+				    unsigned int order, int migratetype)
-+{
-+	struct free_area *area = &zone->free_area[order];
++#include <linux/memory_aeration.h>
 +
-+	list_add(&page->lru, &area->free_list[migratetype]);
-+	area->nr_free++;
-+}
-+
-+/* Used for pages not on another list */
-+static inline void add_to_free_area_tail(struct page *page, struct zone *zone,
-+					 unsigned int order, int migratetype)
-+{
-+	struct free_area *area = &zone->free_area[order];
-+
-+	list_add_tail(&page->lru, &area->free_list[migratetype]);
-+	area->nr_free++;
-+}
-+
-+/* Used for pages which are on another list */
-+static inline void move_to_free_area(struct page *page, struct zone *zone,
-+				     unsigned int order, int migratetype)
-+{
-+	struct free_area *area = &zone->free_area[order];
-+
-+	list_move(&page->lru, &area->free_list[migratetype]);
-+}
-+
-+static inline void del_page_from_free_area(struct page *page, struct zone *zone,
-+					   unsigned int order)
-+{
-+	struct free_area *area = &zone->free_area[order];
-+
-+	list_del(&page->lru);
-+	__ClearPageBuddy(page);
-+	set_page_private(page, 0);
-+	area->nr_free--;
-+}
-+
- #include <linux/memory_hotplug.h>
+ /* Used for pages not on another list */
+ static inline void add_to_free_area(struct page *page, struct zone *zone,
+ 				    unsigned int order, int migratetype)
+@@ -787,10 +790,10 @@ static inline void add_to_free_area(struct page *page, struct zone *zone,
+ static inline void add_to_free_area_tail(struct page *page, struct zone *zone,
+ 					 unsigned int order, int migratetype)
+ {
+-	struct free_area *area = &zone->free_area[order];
++	struct list_head *tail = aerator_get_tail(zone, order, migratetype);
  
- void build_all_zonelists(pg_data_t *pgdat);
+-	list_add_tail(&page->lru, &area->free_list[migratetype]);
+-	area->nr_free++;
++	list_add_tail(&page->lru, tail);
++	zone->free_area[order].nr_free++;
+ }
+ 
+ /* Used for pages which are on another list */
+@@ -799,6 +802,8 @@ static inline void move_to_free_area(struct page *page, struct zone *zone,
+ {
+ 	struct free_area *area = &zone->free_area[order];
+ 
++	clear_page_aerated(page, zone, area);
++
+ 	list_move(&page->lru, &area->free_list[migratetype]);
+ }
+ 
+@@ -807,6 +812,8 @@ static inline void del_page_from_free_area(struct page *page, struct zone *zone,
+ {
+ 	struct free_area *area = &zone->free_area[order];
+ 
++	clear_page_aerated(page, zone, area);
++
+ 	list_del(&page->lru);
+ 	__ClearPageBuddy(page);
+ 	set_page_private(page, 0);
+diff --git a/mm/Kconfig b/mm/Kconfig
+index 7c41d2300e07..209dc4bea481 100644
+--- a/mm/Kconfig
++++ b/mm/Kconfig
+@@ -236,6 +236,11 @@ config COMPACTION
+           linux-mm@kvack.org.
+ 
+ #
++# support for memory aeration
++config AERATION
++	bool
++
++#
+ # support for page migration
+ #
+ config MIGRATION
 diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 3e21e01f6165..aad2b2529ab7 100644
+index aad2b2529ab7..eb7ba8385374 100644
 --- a/mm/page_alloc.c
 +++ b/mm/page_alloc.c
-@@ -873,7 +873,6 @@ static inline void __free_one_page(struct page *page,
+@@ -68,6 +68,7 @@
+ #include <linux/lockdep.h>
+ #include <linux/nmi.h>
+ #include <linux/psi.h>
++#include <linux/memory_aeration.h>
+ 
+ #include <asm/sections.h>
+ #include <asm/tlbflush.h>
+@@ -868,10 +869,11 @@ static inline struct capture_control *task_capc(struct zone *zone)
+ static inline void __free_one_page(struct page *page,
+ 		unsigned long pfn,
+ 		struct zone *zone, unsigned int order,
+-		int migratetype)
++		int migratetype, bool aerated)
+ {
  	struct capture_control *capc = task_capc(zone);
  	unsigned long uninitialized_var(buddy_pfn);
++	bool fully_aerated = aerated;
  	unsigned long combined_pfn;
--	struct free_area *area;
  	unsigned int max_order;
  	struct page *buddy;
- 
-@@ -910,7 +909,7 @@ static inline void __free_one_page(struct page *page,
- 		if (page_is_guard(buddy))
- 			clear_page_guard(zone, buddy, order, migratetype);
- 		else
--			del_page_from_free_area(buddy, &zone->free_area[order]);
-+			del_page_from_free_area(buddy, zone, order);
- 		combined_pfn = buddy_pfn & pfn;
- 		page = page + (combined_pfn - pfn);
- 		pfn = combined_pfn;
-@@ -944,12 +943,11 @@ static inline void __free_one_page(struct page *page,
+@@ -902,6 +904,11 @@ static inline void __free_one_page(struct page *page,
+ 			goto done_merging;
+ 		if (!page_is_buddy(page, buddy, order))
+ 			goto done_merging;
++
++		/* assume buddy is not aerated */
++		if (aerated)
++			fully_aerated = false;
++
+ 		/*
+ 		 * Our buddy is free or it is CONFIG_DEBUG_PAGEALLOC guard page,
+ 		 * merge with it and move up one order.
+@@ -943,11 +950,17 @@ static inline void __free_one_page(struct page *page,
  done_merging:
  	set_page_order(page, order);
  
--	area = &zone->free_area[order];
- 	if (buddy_merge_likely(pfn, buddy_pfn, page, order) ||
+-	if (buddy_merge_likely(pfn, buddy_pfn, page, order) ||
++	if (aerated ||
++	    buddy_merge_likely(pfn, buddy_pfn, page, order) ||
  	    is_shuffle_tail_page(order))
--		add_to_free_area_tail(page, area, migratetype);
-+		add_to_free_area_tail(page, zone, order, migratetype);
+ 		add_to_free_area_tail(page, zone, order, migratetype);
  	else
--		add_to_free_area(page, area, migratetype);
-+		add_to_free_area(page, zone, order, migratetype);
+ 		add_to_free_area(page, zone, order, migratetype);
++
++	if (fully_aerated)
++		set_page_aerated(page, zone, order, migratetype);
++	else
++		aerator_notify_free(zone, order);
  }
  
  /*
-@@ -1941,13 +1939,11 @@ void __init init_cma_reserved_pageblock(struct page *page)
-  * -- nyc
-  */
- static inline void expand(struct zone *zone, struct page *page,
--	int low, int high, struct free_area *area,
--	int migratetype)
-+	int low, int high, int migratetype)
- {
- 	unsigned long size = 1 << high;
+@@ -1247,7 +1260,7 @@ static void free_pcppages_bulk(struct zone *zone, int count,
+ 		if (unlikely(isolated_pageblocks))
+ 			mt = get_pageblock_migratetype(page);
  
- 	while (high > low) {
--		area--;
- 		high--;
- 		size >>= 1;
- 		VM_BUG_ON_PAGE(bad_range(zone, &page[size]), &page[size]);
-@@ -1961,7 +1957,7 @@ static inline void expand(struct zone *zone, struct page *page,
- 		if (set_page_guard(zone, &page[size], high, migratetype))
- 			continue;
- 
--		add_to_free_area(&page[size], area, migratetype);
-+		add_to_free_area(&page[size], zone, high, migratetype);
- 		set_page_order(&page[size], high);
+-		__free_one_page(page, page_to_pfn(page), zone, 0, mt);
++		__free_one_page(page, page_to_pfn(page), zone, 0, mt, false);
+ 		trace_mm_page_pcpu_drain(page, 0, mt);
  	}
+ 	spin_unlock(&zone->lock);
+@@ -1263,7 +1276,7 @@ static void free_one_page(struct zone *zone,
+ 		is_migrate_isolate(migratetype))) {
+ 		migratetype = get_pfnblock_migratetype(page, pfn);
+ 	}
+-	__free_one_page(page, pfn, zone, order, migratetype);
++	__free_one_page(page, pfn, zone, order, migratetype, false);
+ 	spin_unlock(&zone->lock);
  }
-@@ -2122,8 +2118,8 @@ struct page *__rmqueue_smallest(struct zone *zone, unsigned int order,
- 		page = get_page_from_free_area(area, migratetype);
- 		if (!page)
- 			continue;
--		del_page_from_free_area(page, area);
--		expand(zone, page, order, current_order, area, migratetype);
-+		del_page_from_free_area(page, zone, current_order);
-+		expand(zone, page, order, current_order, migratetype);
- 		set_pcppage_migratetype(page, migratetype);
- 		return page;
- 	}
-@@ -2131,7 +2127,6 @@ struct page *__rmqueue_smallest(struct zone *zone, unsigned int order,
+ 
+@@ -2127,6 +2140,77 @@ struct page *__rmqueue_smallest(struct zone *zone, unsigned int order,
  	return NULL;
  }
  
--
++#ifdef CONFIG_AERATION
++/**
++ * get_aeration_page - Provide a "raw" page for aeration by the aerator
++ * @zone: Zone to draw pages from
++ * @order: Order to draw pages from
++ * @migratetype: Migratetype to draw pages from
++ *
++ * This function will obtain a page from above the boundary. As a result
++ * we can guarantee the page has not been aerated.
++ *
++ * The page will have the migrate type and order stored in the page
++ * metadata.
++ *
++ * Return: page pointer if raw page found, otherwise NULL
++ */
++struct page *get_aeration_page(struct zone *zone, unsigned int order,
++			       int migratetype)
++{
++	struct free_area *area = &(zone->free_area[order]);
++	struct list_head *list = &area->free_list[migratetype];
++	struct page *page;
++
++	/* Find a page of the appropriate size in the preferred list */
++	page = list_last_entry(aerator_get_tail(zone, order, migratetype),
++			       struct page, lru);
++	list_for_each_entry_from_reverse(page, list, lru) {
++		if (PageAerated(page)) {
++			page = list_first_entry(list, struct page, lru);
++			if (PageAerated(page))
++				break;
++		}
++
++		del_page_from_free_area(page, zone, order);
++
++		/* record migratetype and order within page */
++		set_pcppage_migratetype(page, migratetype);
++		set_page_private(page, order);
++		__mod_zone_freepage_state(zone, -(1 << order), migratetype);
++
++		return page;
++	}
++
++	return NULL;
++}
++
++/**
++ * put_aeration_page - Return a now-aerated "raw" page back where we got it
++ * @zone: Zone to return pages to
++ * @page: Previously "raw" page that can now be returned after aeration
++ *
++ * This function will pull the migratetype and order information out
++ * of the page and attempt to return it where it found it.
++ */
++void put_aeration_page(struct zone *zone, struct page *page)
++{
++	unsigned int order, mt;
++	unsigned long pfn;
++
++	mt = get_pcppage_migratetype(page);
++	pfn = page_to_pfn(page);
++
++	if (unlikely(has_isolate_pageblock(zone) || is_migrate_isolate(mt)))
++		mt = get_pfnblock_migratetype(page, pfn);
++
++	order = page_private(page);
++	set_page_private(page, 0);
++
++	__free_one_page(page, pfn, zone, order, mt, true);
++}
++#endif /* CONFIG_AERATION */
++
  /*
   * This array describes the order lists are fallen back to when
   * the free lists for the desirable migrate type are depleted
-@@ -2208,7 +2203,7 @@ static int move_freepages(struct zone *zone,
- 		}
- 
- 		order = page_order(page);
--		move_to_free_area(page, &zone->free_area[order], migratetype);
-+		move_to_free_area(page, zone, order, migratetype);
- 		page += 1 << order;
- 		pages_moved += 1 << order;
- 	}
-@@ -2324,7 +2319,6 @@ static void steal_suitable_fallback(struct zone *zone, struct page *page,
- 		unsigned int alloc_flags, int start_type, bool whole_block)
+@@ -5929,9 +6013,12 @@ void __ref memmap_init_zone_device(struct zone *zone,
+ static void __meminit zone_init_free_lists(struct zone *zone)
  {
- 	unsigned int current_order = page_order(page);
--	struct free_area *area;
- 	int free_pages, movable_pages, alike_pages;
- 	int old_block_type;
- 
-@@ -2395,8 +2389,7 @@ static void steal_suitable_fallback(struct zone *zone, struct page *page,
- 	return;
- 
- single_page:
--	area = &zone->free_area[current_order];
--	move_to_free_area(page, area, start_type);
-+	move_to_free_area(page, zone, current_order, start_type);
+ 	unsigned int order, t;
+-	for_each_migratetype_order(order, t) {
++	for_each_migratetype_order(order, t)
+ 		INIT_LIST_HEAD(&zone->free_area[order].free_list[t]);
++
++	for (order = MAX_ORDER; order--; ) {
+ 		zone->free_area[order].nr_free = 0;
++		zone->free_area[order].nr_free_aerated = 0;
+ 	}
  }
  
- /*
-@@ -3067,7 +3060,6 @@ void split_page(struct page *page, unsigned int order)
- 
- int __isolate_free_page(struct page *page, unsigned int order)
- {
--	struct free_area *area = &page_zone(page)->free_area[order];
- 	unsigned long watermark;
- 	struct zone *zone;
- 	int mt;
-@@ -3093,7 +3085,7 @@ int __isolate_free_page(struct page *page, unsigned int order)
- 
- 	/* Remove page from free list */
- 
--	del_page_from_free_area(page, area);
-+	del_page_from_free_area(page, zone, order);
- 
- 	/*
- 	 * Set the pageblock if the isolated page is at least half of a
-@@ -8513,7 +8505,7 @@ void zone_pcp_reset(struct zone *zone)
- 		pr_info("remove from free list %lx %d %lx\n",
- 			pfn, 1 << order, end_pfn);
- #endif
--		del_page_from_free_area(page, &zone->free_area[order]);
-+		del_page_from_free_area(page, zone, order);
- 		for (i = 0; i < (1 << order); i++)
- 			SetPageReserved((page+i));
- 		pfn += (1 << order);
 
