@@ -2,138 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C3284AFDF
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 04:09:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC9424B1FA
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 08:13:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729240AbfFSCJr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Jun 2019 22:09:47 -0400
-Received: from mga04.intel.com ([192.55.52.120]:42599 "EHLO mga04.intel.com"
+        id S1730428AbfFSGMW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jun 2019 02:12:22 -0400
+Received: from mga11.intel.com ([192.55.52.93]:30045 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726238AbfFSCJr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Jun 2019 22:09:47 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1725892AbfFSGMV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jun 2019 02:12:21 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 19:09:46 -0700
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 23:12:21 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,391,1557212400"; 
-   d="scan'208";a="243172405"
-Received: from unknown (HELO localhost) ([10.239.159.128])
-  by orsmga001.jf.intel.com with ESMTP; 18 Jun 2019 19:09:44 -0700
-Date:   Wed, 19 Jun 2019 10:08:24 +0800
-From:   Yang Weijiang <weijiang.yang@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Yang Weijiang <weijiang.yang@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mst@redhat.com, rkrcmar@redhat.com,
-        jmattson@google.com, yu.c.zhang@intel.com
-Subject: Re: [PATCH v3 0/9] Enable Sub-page Write Protection Support
-Message-ID: <20190619020824.GA30444@local-michael-cet-test>
-References: <20190606152812.13141-1-weijiang.yang@intel.com>
- <415e571a-47db-b0b5-0215-a7ef1b9be81d@redhat.com>
+X-IronPort-AV: E=Sophos;i="5.63,392,1557212400"; 
+   d="scan'208";a="311258882"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
+  by orsmga004.jf.intel.com with ESMTP; 18 Jun 2019 23:12:18 -0700
+From:   Tao Xu <tao3.xu@intel.com>
+To:     pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        sean.j.christopherson@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        fenghua.yu@intel.com, xiaoyao.li@linux.intel.com,
+        jingqi.liu@intel.com, tao3.xu@intel.com
+Subject: [PATCH v4 0/3] KVM: x86: Enable user wait instructions
+Date:   Wed, 19 Jun 2019 14:09:42 +0800
+Message-Id: <20190619060945.14104-1-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <415e571a-47db-b0b5-0215-a7ef1b9be81d@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 07, 2019 at 03:27:01PM +0200, Paolo Bonzini wrote:
-> On 06/06/19 17:28, Yang Weijiang wrote:
-> > EPT-Based Sub-Page write Protection(SPP)is a HW capability which
-> > allows Virtual Machine Monitor(VMM) to specify write-permission for
-> > guest physical memory at a sub-page(128 byte) granularity. When this
-> > capability is enabled, the CPU enforces write-access check for
-> > sub-pages within a 4KB page.
-> > 
-> > The feature is targeted to provide fine-grained memory protection
-> > for usages such as device virtualization, memory check-point and
-> > VM introspection etc.
-> > 
-> > SPP is active when the "sub-page write protection" (bit 23) is 1 in
-> > Secondary VM-Execution Controls. The feature is backed with a Sub-Page
-> > Permission Table(SPPT), SPPT is referenced via a 64-bit control field
-> > called Sub-Page Permission Table Pointer (SPPTP) which contains a
-> > 4K-aligned physical address.
-> > 
-> > Right now, only 4KB physical pages are supported for SPP. To enable SPP
-> > for certain physical page, we need to first make the physical page
-> > write-protected, then set bit 61 of the corresponding EPT leaf entry. 
-> > While HW walks EPT, if bit 61 is set, it traverses SPPT with the guset
-> > physical address to find out the sub-page permissions at the leaf entry.
-> > If the corresponding bit is set, write to sub-page is permitted,
-> > otherwise, SPP induced EPT vilation is generated.
-> > 
-> > Please refer to the SPP introduction document in this patch set and Intel SDM
-> > for details:
-> > 
-> > Intel SDM:
-> > https://software.intel.com/sites/default/files/managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
-> > 
-> > Previous patch:
-> > https://lkml.org/lkml/2018/11/30/605
-> > 
-> > Patch 1: Introduction to SPP.
-> > Patch 2: Add SPP related flags and control bits.
-> > Patch 3: Functions for SPPT setup.
-> > Patch 4: Add SPP access bitmaps for memslots.
-> > Patch 5: Low level implementation of SPP operations.
-> > Patch 6: Implement User space access IOCTLs.
-> > Patch 7: Handle SPP induced VMExit and EPT violation.
-> > Patch 8: Enable lazy mode SPPT setup.
-> > Patch 9: Handle memory remapping and reclaim.
-> > 
-> > 
-> > Change logs:
-> > 
-> > V2 - V3:                                                                
-> >  1. Rebased patches to kernel 5.1 release                                
-> >  2. Deferred SPPT setup to EPT fault handler if the page is not available
-> >     while set_subpage() is being called.                                 
-> >  3. Added init IOCTL to reduce extra cost if SPP is not used.            
-> >  4. Refactored patch structure, cleaned up cross referenced functions.    
-> >  5. Added code to deal with memory swapping/migration/shrinker cases.    
-> >                                                                            
-> > V2 - V1:                                                                
-> >  1. Rebased to 4.20-rc1                                                  
-> >  2. Move VMCS change to a separated patch.                               
-> >  3. Code refine and Bug fix 
-> > 
-> > 
-> > Yang Weijiang (9):
-> >   Documentation: Introduce EPT based Subpage Protection
-> >   KVM: VMX: Add control flags for SPP enabling
-> >   KVM: VMX: Implement functions for SPPT paging setup
-> >   KVM: VMX: Introduce SPP access bitmap and operation functions
-> >   KVM: VMX: Add init/set/get functions for SPP
-> >   KVM: VMX: Introduce SPP user-space IOCTLs
-> >   KVM: VMX: Handle SPP induced vmexit and page fault
-> >   KVM: MMU: Enable Lazy mode SPPT setup
-> >   KVM: MMU: Handle host memory remapping and reclaim
-> > 
-> >  Documentation/virtual/kvm/spp_kvm.txt | 216 ++++++++++++
-> >  arch/x86/include/asm/cpufeatures.h    |   1 +
-> >  arch/x86/include/asm/kvm_host.h       |  26 +-
-> >  arch/x86/include/asm/vmx.h            |  10 +
-> >  arch/x86/include/uapi/asm/vmx.h       |   2 +
-> >  arch/x86/kernel/cpu/intel.c           |   4 +
-> >  arch/x86/kvm/mmu.c                    | 469 ++++++++++++++++++++++++++
-> >  arch/x86/kvm/mmu.h                    |   1 +
-> >  arch/x86/kvm/vmx/capabilities.h       |   5 +
-> >  arch/x86/kvm/vmx/vmx.c                | 138 ++++++++
-> >  arch/x86/kvm/x86.c                    | 141 ++++++++
-> >  include/linux/kvm_host.h              |   9 +
-> >  include/uapi/linux/kvm.h              |  17 +
-> >  13 files changed, 1038 insertions(+), 1 deletion(-)
-> >  create mode 100644 Documentation/virtual/kvm/spp_kvm.txt
-> > 
-> 
-> Please add testcases in tools/testing/selftests/kvm.
-> 
-> Paolo
-Hi, Paolo,
-Selftest patch for SPP has been released to community,
-please check and review, thanks!
+UMONITOR, UMWAIT and TPAUSE are a set of user wait instructions.
+
+UMONITOR arms address monitoring hardware using an address. A store
+to an address within the specified address range triggers the
+monitoring hardware to wake up the processor waiting in umwait.
+
+UMWAIT instructs the processor to enter an implementation-dependent
+optimized state while monitoring a range of addresses. The optimized
+state may be either a light-weight power/performance optimized state
+(c0.1 state) or an improved power/performance optimized state
+(c0.2 state).
+
+TPAUSE instructs the processor to enter an implementation-dependent
+optimized state c0.1 or c0.2 state and wake up when time-stamp counter
+reaches specified timeout.
+
+Availability of the user wait instructions is indicated by the presence
+of the CPUID feature flag WAITPKG CPUID.0x07.0x0:ECX[5].
+
+The patches enable the umonitor, umwait and tpause features in KVM.
+Because umwait and tpause can put a (psysical) CPU into a power saving
+state, by default we dont't expose it to kvm and enable it only when
+guest CPUID has it. If the instruction causes a delay, the amount
+of time delayed is called here the physical delay. The physical delay is
+first computed by determining the virtual delay (the time to delay
+relative to the VM’s timestamp counter). 
+
+The release document ref below link:
+Intel 64 and IA-32 Architectures Software Developer's Manual,
+https://software.intel.com/sites/default/files/\
+managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+This patch has a dependency on https://lkml.org/lkml/2019/6/7/1206
+
+Changelog:
+v4:
+    Set msr of IA32_UMWAIT_CONTROL can be 0 and add the check of
+    reserved bit 1 (Radim and Xiaoyao)
+    Use umwait_control_cached directly and add the IA32_UMWAIT_CONTROL
+    in msrs_to_save[] to support migration (Xiaoyao)
+v3:
+	Simplify the patches, expose user wait instructions when the
+	guest has CPUID (Paolo)
+	Use mwait_control_cached to avoid frequently rdmsr of
+	IA32_UMWAIT_CONTROL (Paolo and Xiaoyao)
+	Handle vm-exit for UMWAIT and TPAUSE as "never happen" (Paolo)
+v2:
+	Separated from the series https://lkml.org/lkml/2018/7/10/160
+	Add provide a capability to enable UMONITOR, UMWAIT and TPAUSE 
+v1:
+	Sent out with MOVDIRI/MOVDIR64B instructions patches
+
+Tao Xu (3):
+  KVM: x86: add support for user wait instructions
+  KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
+  KVM: vmx: handle vm-exit for UMWAIT and TPAUSE
+
+ arch/x86/include/asm/vmx.h      |  1 +
+ arch/x86/include/uapi/asm/vmx.h |  6 +++-
+ arch/x86/kvm/cpuid.c            |  2 +-
+ arch/x86/kvm/vmx/capabilities.h |  6 ++++
+ arch/x86/kvm/vmx/vmx.c          | 53 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.h          |  3 ++
+ arch/x86/kvm/x86.c              |  1 +
+ arch/x86/power/umwait.c         |  3 +-
+ 8 files changed, 72 insertions(+), 3 deletions(-)
+
+-- 
+2.20.1
+
