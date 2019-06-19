@@ -2,49 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F29E4C3B0
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 00:33:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 580754C3B6
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 00:33:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730926AbfFSWd2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jun 2019 18:33:28 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:38348 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730914AbfFSWd1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jun 2019 18:33:27 -0400
-Received: by mail-io1-f67.google.com with SMTP id j6so436809ioa.5;
-        Wed, 19 Jun 2019 15:33:26 -0700 (PDT)
+        id S1730938AbfFSWdf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jun 2019 18:33:35 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:34378 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730504AbfFSWde (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jun 2019 18:33:34 -0400
+Received: by mail-io1-f68.google.com with SMTP id k8so187437iot.1;
+        Wed, 19 Jun 2019 15:33:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:from:to:cc:date:message-id:in-reply-to:references
          :user-agent:mime-version:content-transfer-encoding;
-        bh=uFIpek7shBaVr9DU13GRQZ4ibKs0x6v0iQmP4OpKI7k=;
-        b=k/OoraMNYNLWswsjRZR3jEbeHgciCrA3Pvkj8V+NcMuwZd4nDStE1mCeb2clq7uoPE
-         Bf0GYaBQ58HCl4cWZHr/PK4K4jEqlPVoK9CIq9gBKyQP+SAMwHApaOQ+/pM/boz+OI3N
-         Ddc47rKbDu9wx2/eEEMCGKLqNnTrNgKTd6Eb2XLmtry661w/558JU3OoCoNGpsOBoRAn
-         mhk+F4qr5+ZnCArtmzi2LJGPyjE7a2T+Bn/9P+Ib5zy4BsTFTShpemJziW9RGWAgDKkx
-         0qaUB6uoFgFyhUPIj/dCvXQQW9NCpd74Z4QihncLfIL8C1BwyheFscAO19MnmxiE0jYW
-         AH+g==
+        bh=OnfCOLVUM2RdwkrCGbwB+NaigOrBL5HPfiKOHiPEd+Q=;
+        b=VOj/Ebn5EmXVZGb7w3umnmzaylkU/2Mwo9MY4M7o56x1OkSv27WjZ+qp8OSOch2Kwg
+         uOHFWPdmdCJbtRsBpzIaWhLNmCjs0BmAfVDNwQ1+LnfFp0wHRWRs0tfTU4G5ZGolUo5q
+         kbiCoiPafMyGLqeXWRH5nbFk8fbtYK9rzwhm+GZWXoVUD2T7SuaM9uzpierFXpCjBakk
+         mEk1JuHBzZRaYDamWy4DRFni1oycKwq4u7sxLduBDo/Za9qyUACaAv5bV7Kf9ErOZIsa
+         zn9UNKNGz9LWE9g8NRzRjUa3MTd3hxH5zjZy2x0sqUeiznvSAAb1YMuzrHGDaCkUgWoi
+         naCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:from:to:cc:date:message-id:in-reply-to
          :references:user-agent:mime-version:content-transfer-encoding;
-        bh=uFIpek7shBaVr9DU13GRQZ4ibKs0x6v0iQmP4OpKI7k=;
-        b=Alae/MRlkPe2T2dQ19GnGDhfV5rAVql1UkKno/m/uGlo02w8juQEk/mogfXYItpDmk
-         lF9U1TxQJ/Ghysudw/+lP5THPaPJ/l4YIOpsKEJf00pChAFyGQ1ZW8OhAK+QTfVpgE89
-         aBIr6tYqmTOnH7ILh9x/PdPVnmGakelmM9VVFXg9y9A80X9VUC2Bcf5pO6TmTsrF9nuO
-         6si8KiZMWMxaaBgVhcA6LPaDPvHaVqraAC5kHSo+nacvupKZco2QxkZdDp4oz5yYsJCh
-         reY+DayjxD/sQciYPRCcO0hDSCOMMNEQ0B9xrbDHzXM0FB+r+lijkmzsPoFaSQHLlNVg
-         b90w==
-X-Gm-Message-State: APjAAAUdnJKkEVnjkU0Qw2dcfZV3bIHszDmGWvHq23xLkV42D9CkrvYB
-        leXkRFyYMzJ+DVOruKdOUiU=
-X-Google-Smtp-Source: APXvYqyGIUEECip5yOIkf36i1rUmylXKTO5CxpW8E+NA2U4z3c9cYnuIYIokSVtGEOBlV0rtIuMF/Q==
-X-Received: by 2002:a02:ccd2:: with SMTP id k18mr1709593jaq.3.1560983605934;
-        Wed, 19 Jun 2019 15:33:25 -0700 (PDT)
+        bh=OnfCOLVUM2RdwkrCGbwB+NaigOrBL5HPfiKOHiPEd+Q=;
+        b=cuZ4DnE+G+LDwmhbsYwGF/Pw3mw59kt+VYAjddgxelkzUUV7snGRqVaPXjI/yscrpb
+         vCiaFtgJN13mChHwnxlJDI9UEkZX/ZLjg7kbS+cNeLCRHO+Q+hHEloPm8bXudM7tgbJ+
+         qoigoOIJFqGolNng3SjZ7P7II9GO07rTvyv0QcD78PZiE67ti/FVu3hp8ETtre4bFWRR
+         VPk1535juSb46T1rx1en68hSDkCjzRr8QpE7VyelAtORBRFEZ6XPK08dt0eITi6iVTbz
+         4bjBlN4yrfaJTgnKWgoBwaYzDpoEacrHz0a6ZSJSC/WYmgJ11dGL4GA6vVYQRlRYbfBc
+         enzQ==
+X-Gm-Message-State: APjAAAUk5MLHM4hD3sitJf1FgaNAcepCXGfiArAE2dSMnksDn1IzHCoN
+        xpIR6QOgMGjGwmWgo5fEWnQ=
+X-Google-Smtp-Source: APXvYqzFzWntvUwa+A8P/XLBxNEA6gs2CvtTGf9vkOmTbbiqnl1BvbkUuEpkbUt2yQIUlkfCUmR2Yw==
+X-Received: by 2002:a6b:6409:: with SMTP id t9mr14858793iog.270.1560983613186;
+        Wed, 19 Jun 2019 15:33:33 -0700 (PDT)
 Received: from localhost.localdomain (50-126-100-225.drr01.csby.or.frontiernet.net. [50.126.100.225])
-        by smtp.gmail.com with ESMTPSA id a15sm13136500ioc.27.2019.06.19.15.33.24
+        by smtp.gmail.com with ESMTPSA id v25sm15370617ioh.25.2019.06.19.15.33.31
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 19 Jun 2019 15:33:25 -0700 (PDT)
-Subject: [PATCH v1 4/6] mm: Introduce "aerated" pages
+        Wed, 19 Jun 2019 15:33:32 -0700 (PDT)
+Subject: [PATCH v1 5/6] mm: Add logic for separating "aerated" pages from
+ "raw" pages
 From:   Alexander Duyck <alexander.duyck@gmail.com>
 To:     nitesh@redhat.com, kvm@vger.kernel.org, david@redhat.com,
         mst@redhat.com, dave.hansen@intel.com,
@@ -54,8 +55,8 @@ Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
         konrad.wilk@oracle.com, lcapitulino@redhat.com,
         wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
         dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
-Date:   Wed, 19 Jun 2019 15:33:23 -0700
-Message-ID: <20190619223323.1231.86906.stgit@localhost.localdomain>
+Date:   Wed, 19 Jun 2019 15:33:31 -0700
+Message-ID: <20190619223331.1231.39271.stgit@localhost.localdomain>
 In-Reply-To: <20190619222922.1231.27432.stgit@localhost.localdomain>
 References: <20190619222922.1231.27432.stgit@localhost.localdomain>
 User-Agent: StGit/0.17.1-dirty
@@ -69,324 +70,479 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-In order to pave the way for free page hinting in virtualized environments
-we will need a way to get pages out of the free lists and identify those
-pages after they have been returned. To accomplish this patch adds the
-concept of an "aerated" flag, which is essentially meant to just be the
-Offline page type used in conjustion with the Buddy page type bit.
+Add a set of pointers we shall call "boundary" which represents the upper
+boundary between the "raw" and "aerated" pages. The general idea is that in
+order for a page to cross from one side of the boundary to the other it
+will need to go through the aeration treatment.
 
-For now we can just add the basic logic to set the flag and track the
-number of aerated pages per free area.
+By doing this we should be able to make certain that we keep the aerated
+pages as one contiguous block on the end of each free list. This will allow
+us to efficiently walk the free lists whenever we need to go in and start
+processing hints to the hypervisor that the pages are no longer in use.
+
+And added advantage to this approach is that we should be reducing the
+overall memory footprint of the guest as it will be more likely to recycle
+warm pages versus the aerated pages that are likely to be cache cold.
+
+Since we will only be aerating one zone at a time we keep the boundary
+limited to being defined for just the zone we are currently placing aerated
+pages into. Doing this we can keep the number of additional poitners needed
+quite small.
 
 Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 ---
- include/linux/memory_aeration.h |   61 +++++++++++++++++++++++++
- include/linux/mmzone.h          |   13 ++++-
- mm/Kconfig                      |    5 ++
- mm/page_alloc.c                 |   97 +++++++++++++++++++++++++++++++++++++--
- 4 files changed, 168 insertions(+), 8 deletions(-)
- create mode 100644 include/linux/memory_aeration.h
+ include/linux/memory_aeration.h |   57 ++++++++
+ include/linux/mmzone.h          |    8 +
+ include/linux/page-flags.h      |    8 +
+ mm/Makefile                     |    1 
+ mm/aeration.c                   |  270 +++++++++++++++++++++++++++++++++++++++
+ mm/page_alloc.c                 |    4 -
+ 6 files changed, 347 insertions(+), 1 deletion(-)
+ create mode 100644 mm/aeration.c
 
 diff --git a/include/linux/memory_aeration.h b/include/linux/memory_aeration.h
-new file mode 100644
-index 000000000000..44cfbc259778
---- /dev/null
+index 44cfbc259778..2f45196218b1 100644
+--- a/include/linux/memory_aeration.h
 +++ b/include/linux/memory_aeration.h
-@@ -0,0 +1,61 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _LINUX_MEMORY_AERATION_H
-+#define _LINUX_MEMORY_AERATION_H
+@@ -3,19 +3,50 @@
+ #define _LINUX_MEMORY_AERATION_H
+ 
+ #include <linux/mmzone.h>
++#include <linux/jump_label.h>
+ #include <linux/pageblock-flags.h>
++#include <asm/pgtable_types.h>
+ 
++#define AERATOR_MIN_ORDER	pageblock_order
++#define AERATOR_HWM		32
 +
-+#include <linux/mmzone.h>
-+#include <linux/pageblock-flags.h>
++struct aerator_dev_info {
++	void (*react)(struct aerator_dev_info *a_dev_info);
++	struct list_head batch;
++	unsigned long capacity;
++	atomic_t refcnt;
++};
 +
-+struct page *get_aeration_page(struct zone *zone, unsigned int order,
-+			       int migratetype);
-+void put_aeration_page(struct zone *zone, struct page *page);
++extern struct static_key aerator_notify_enabled;
 +
-+static inline struct list_head *aerator_get_tail(struct zone *zone,
-+						 unsigned int order,
-+						 int migratetype)
-+{
-+	return &zone->free_area[order].free_list[migratetype];
-+}
++void __aerator_notify(struct zone *zone);
+ struct page *get_aeration_page(struct zone *zone, unsigned int order,
+ 			       int migratetype);
+ void put_aeration_page(struct zone *zone, struct page *page);
+ 
++void __aerator_del_from_boundary(struct page *page, struct zone *zone);
++void aerator_add_to_boundary(struct page *page, struct zone *zone);
 +
-+static inline void set_page_aerated(struct page *page,
-+				    struct zone *zone,
-+				    unsigned int order,
-+				    int migratetype)
-+{
++struct list_head *__aerator_get_tail(unsigned int order, int migratetype);
+ static inline struct list_head *aerator_get_tail(struct zone *zone,
+ 						 unsigned int order,
+ 						 int migratetype)
+ {
 +#ifdef CONFIG_AERATION
-+	/* update areated page accounting */
-+	zone->free_area[order].nr_free_aerated++;
-+
-+	/* record migratetype and flag page as aerated */
-+	set_pcppage_migratetype(page, migratetype);
-+	__SetPageAerated(page);
++	if (order >= AERATOR_MIN_ORDER &&
++	    test_bit(ZONE_AERATION_ACTIVE, &zone->flags))
++		return __aerator_get_tail(order, migratetype);
 +#endif
+ 	return &zone->free_area[order].free_list[migratetype];
+ }
+ 
++static inline void aerator_del_from_boundary(struct page *page,
++					     struct zone *zone)
++{
++	if (PageAerated(page) && test_bit(ZONE_AERATION_ACTIVE, &zone->flags))
++		__aerator_del_from_boundary(page, zone);
 +}
 +
-+static inline void clear_page_aerated(struct page *page,
-+				      struct zone *zone,
-+				      struct free_area *area)
+ static inline void set_page_aerated(struct page *page,
+ 				    struct zone *zone,
+ 				    unsigned int order,
+@@ -28,6 +59,9 @@ static inline void set_page_aerated(struct page *page,
+ 	/* record migratetype and flag page as aerated */
+ 	set_pcppage_migratetype(page, migratetype);
+ 	__SetPageAerated(page);
++
++	/* update boundary of new migratetype and record it */
++	aerator_add_to_boundary(page, zone);
+ #endif
+ }
+ 
+@@ -39,11 +73,19 @@ static inline void clear_page_aerated(struct page *page,
+ 	if (likely(!PageAerated(page)))
+ 		return;
+ 
++	/* push boundary back if we removed the upper boundary */
++	aerator_del_from_boundary(page, zone);
++
+ 	__ClearPageAerated(page);
+ 	area->nr_free_aerated--;
+ #endif
+ }
+ 
++static inline unsigned long aerator_raw_pages(struct free_area *area)
 +{
++	return area->nr_free - area->nr_free_aerated;
++}
++
+ /**
+  * aerator_notify_free - Free page notification that will start page processing
+  * @zone: Pointer to current zone of last page processed
+@@ -57,5 +99,20 @@ static inline void clear_page_aerated(struct page *page,
+  */
+ static inline void aerator_notify_free(struct zone *zone, int order)
+ {
 +#ifdef CONFIG_AERATION
-+	if (likely(!PageAerated(page)))
++	if (!static_key_false(&aerator_notify_enabled))
++		return;
++	if (order < AERATOR_MIN_ORDER)
++		return;
++	if (test_bit(ZONE_AERATION_REQUESTED, &zone->flags))
++		return;
++	if (aerator_raw_pages(&zone->free_area[order]) < AERATOR_HWM)
 +		return;
 +
-+	__ClearPageAerated(page);
-+	area->nr_free_aerated--;
++	__aerator_notify(zone);
 +#endif
-+}
+ }
 +
-+/**
-+ * aerator_notify_free - Free page notification that will start page processing
-+ * @zone: Pointer to current zone of last page processed
-+ * @order: Order of last page added to zone
-+ *
-+ * This function is meant to act as a screener for __aerator_notify which
-+ * will determine if a give zone has crossed over the high-water mark that
-+ * will justify us beginning page treatment. If we have crossed that
-+ * threshold then it will start the process of pulling some pages and
-+ * placing them in the batch list for treatment.
-+ */
-+static inline void aerator_notify_free(struct zone *zone, int order)
-+{
-+}
-+#endif /*_LINUX_MEMORY_AERATION_H */
++void aerator_shutdown(void);
++int aerator_startup(struct aerator_dev_info *sdev);
+ #endif /*_LINUX_MEMORY_AERATION_H */
 diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
-index c3597920a155..7d89722ae9eb 100644
+index 7d89722ae9eb..52190a791e63 100644
 --- a/include/linux/mmzone.h
 +++ b/include/linux/mmzone.h
-@@ -116,6 +116,7 @@ static inline void set_pcppage_migratetype(struct page *page, int migratetype)
- struct free_area {
- 	struct list_head	free_list[MIGRATE_TYPES];
- 	unsigned long		nr_free;
-+	unsigned long		nr_free_aerated;
+@@ -554,6 +554,14 @@ enum zone_flags {
+ 	ZONE_BOOSTED_WATERMARK,		/* zone recently boosted watermarks.
+ 					 * Cleared when kswapd is woken.
+ 					 */
++	ZONE_AERATION_REQUESTED,	/* zone enabled aeration and is
++					 * requesting scrubbing the data out of
++					 * higher order pages.
++					 */
++	ZONE_AERATION_ACTIVE,		/* zone enabled aeration and is
++					 * activly cleaning the data out of
++					 * higher order pages.
++					 */
  };
  
- static inline struct page *get_page_from_free_area(struct free_area *area,
-@@ -773,6 +774,8 @@ static inline bool pgdat_is_empty(pg_data_t *pgdat)
- 	return !pgdat->node_start_pfn && !pgdat->node_spanned_pages;
- }
- 
-+#include <linux/memory_aeration.h>
-+
- /* Used for pages not on another list */
- static inline void add_to_free_area(struct page *page, struct zone *zone,
- 				    unsigned int order, int migratetype)
-@@ -787,10 +790,10 @@ static inline void add_to_free_area(struct page *page, struct zone *zone,
- static inline void add_to_free_area_tail(struct page *page, struct zone *zone,
- 					 unsigned int order, int migratetype)
- {
--	struct free_area *area = &zone->free_area[order];
-+	struct list_head *tail = aerator_get_tail(zone, order, migratetype);
- 
--	list_add_tail(&page->lru, &area->free_list[migratetype]);
--	area->nr_free++;
-+	list_add_tail(&page->lru, tail);
-+	zone->free_area[order].nr_free++;
- }
- 
- /* Used for pages which are on another list */
-@@ -799,6 +802,8 @@ static inline void move_to_free_area(struct page *page, struct zone *zone,
- {
- 	struct free_area *area = &zone->free_area[order];
- 
-+	clear_page_aerated(page, zone, area);
-+
- 	list_move(&page->lru, &area->free_list[migratetype]);
- }
- 
-@@ -807,6 +812,8 @@ static inline void del_page_from_free_area(struct page *page, struct zone *zone,
- {
- 	struct free_area *area = &zone->free_area[order];
- 
-+	clear_page_aerated(page, zone, area);
-+
- 	list_del(&page->lru);
- 	__ClearPageBuddy(page);
- 	set_page_private(page, 0);
-diff --git a/mm/Kconfig b/mm/Kconfig
-index 7c41d2300e07..209dc4bea481 100644
---- a/mm/Kconfig
-+++ b/mm/Kconfig
-@@ -236,6 +236,11 @@ config COMPACTION
-           linux-mm@kvack.org.
- 
- #
-+# support for memory aeration
-+config AERATION
-+	bool
-+
-+#
- # support for page migration
- #
- config MIGRATION
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index aad2b2529ab7..eb7ba8385374 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -68,6 +68,7 @@
- #include <linux/lockdep.h>
- #include <linux/nmi.h>
- #include <linux/psi.h>
-+#include <linux/memory_aeration.h>
- 
- #include <asm/sections.h>
- #include <asm/tlbflush.h>
-@@ -868,10 +869,11 @@ static inline struct capture_control *task_capc(struct zone *zone)
- static inline void __free_one_page(struct page *page,
- 		unsigned long pfn,
- 		struct zone *zone, unsigned int order,
--		int migratetype)
-+		int migratetype, bool aerated)
- {
- 	struct capture_control *capc = task_capc(zone);
- 	unsigned long uninitialized_var(buddy_pfn);
-+	bool fully_aerated = aerated;
- 	unsigned long combined_pfn;
- 	unsigned int max_order;
- 	struct page *buddy;
-@@ -902,6 +904,11 @@ static inline void __free_one_page(struct page *page,
- 			goto done_merging;
- 		if (!page_is_buddy(page, buddy, order))
- 			goto done_merging;
-+
-+		/* assume buddy is not aerated */
-+		if (aerated)
-+			fully_aerated = false;
-+
- 		/*
- 		 * Our buddy is free or it is CONFIG_DEBUG_PAGEALLOC guard page,
- 		 * merge with it and move up one order.
-@@ -943,11 +950,17 @@ static inline void __free_one_page(struct page *page,
- done_merging:
- 	set_page_order(page, order);
- 
--	if (buddy_merge_likely(pfn, buddy_pfn, page, order) ||
-+	if (aerated ||
-+	    buddy_merge_likely(pfn, buddy_pfn, page, order) ||
- 	    is_shuffle_tail_page(order))
- 		add_to_free_area_tail(page, zone, order, migratetype);
- 	else
- 		add_to_free_area(page, zone, order, migratetype);
-+
-+	if (fully_aerated)
-+		set_page_aerated(page, zone, order, migratetype);
-+	else
-+		aerator_notify_free(zone, order);
- }
+ static inline unsigned long zone_managed_pages(struct zone *zone)
+diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+index b848517da64c..f16e73318d49 100644
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
+@@ -745,6 +745,14 @@ static inline int page_has_type(struct page *page)
+ PAGE_TYPE_OPS(Offline, offline)
  
  /*
-@@ -1247,7 +1260,7 @@ static void free_pcppages_bulk(struct zone *zone, int count,
- 		if (unlikely(isolated_pageblocks))
- 			mt = get_pageblock_migratetype(page);
- 
--		__free_one_page(page, page_to_pfn(page), zone, 0, mt);
-+		__free_one_page(page, page_to_pfn(page), zone, 0, mt, false);
- 		trace_mm_page_pcpu_drain(page, 0, mt);
- 	}
- 	spin_unlock(&zone->lock);
-@@ -1263,7 +1276,7 @@ static void free_one_page(struct zone *zone,
- 		is_migrate_isolate(migratetype))) {
- 		migratetype = get_pfnblock_migratetype(page, pfn);
- 	}
--	__free_one_page(page, pfn, zone, order, migratetype);
-+	__free_one_page(page, pfn, zone, order, migratetype, false);
- 	spin_unlock(&zone->lock);
- }
- 
-@@ -2127,6 +2140,77 @@ struct page *__rmqueue_smallest(struct zone *zone, unsigned int order,
- 	return NULL;
- }
- 
-+#ifdef CONFIG_AERATION
-+/**
-+ * get_aeration_page - Provide a "raw" page for aeration by the aerator
-+ * @zone: Zone to draw pages from
-+ * @order: Order to draw pages from
-+ * @migratetype: Migratetype to draw pages from
-+ *
-+ * This function will obtain a page from above the boundary. As a result
-+ * we can guarantee the page has not been aerated.
-+ *
-+ * The page will have the migrate type and order stored in the page
-+ * metadata.
-+ *
-+ * Return: page pointer if raw page found, otherwise NULL
++ * PageAerated() is an alias for Offline, however it is not meant to be an
++ * exclusive value. It should be combined with PageBuddy() when seen as it
++ * is meant to indicate that the page has been scrubbed while waiting in
++ * the buddy system.
 + */
-+struct page *get_aeration_page(struct zone *zone, unsigned int order,
-+			       int migratetype)
++PAGE_TYPE_OPS(Aerated, offline)
++
++/*
+  * If kmemcg is enabled, the buddy allocator will set PageKmemcg() on
+  * pages allocated with __GFP_ACCOUNT. It gets cleared on page free.
+  */
+diff --git a/mm/Makefile b/mm/Makefile
+index ac5e5ba78874..26c2fcd2b89d 100644
+--- a/mm/Makefile
++++ b/mm/Makefile
+@@ -104,3 +104,4 @@ obj-$(CONFIG_HARDENED_USERCOPY) += usercopy.o
+ obj-$(CONFIG_PERCPU_STATS) += percpu-stats.o
+ obj-$(CONFIG_HMM) += hmm.o
+ obj-$(CONFIG_MEMFD_CREATE) += memfd.o
++obj-$(CONFIG_AERATION) += aeration.o
+diff --git a/mm/aeration.c b/mm/aeration.c
+new file mode 100644
+index 000000000000..720dc51cb215
+--- /dev/null
++++ b/mm/aeration.c
+@@ -0,0 +1,270 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <linux/mm.h>
++#include <linux/mmzone.h>
++#include <linux/page-isolation.h>
++#include <linux/gfp.h>
++#include <linux/export.h>
++#include <linux/delay.h>
++#include <linux/slab.h>
++
++static struct aerator_dev_info *a_dev_info;
++struct static_key aerator_notify_enabled;
++
++struct list_head *boundary[MAX_ORDER - AERATOR_MIN_ORDER][MIGRATE_TYPES];
++
++static void aerator_reset_boundary(struct zone *zone, unsigned int order,
++				   unsigned int migratetype)
 +{
-+	struct free_area *area = &(zone->free_area[order]);
-+	struct list_head *list = &area->free_list[migratetype];
-+	struct page *page;
-+
-+	/* Find a page of the appropriate size in the preferred list */
-+	page = list_last_entry(aerator_get_tail(zone, order, migratetype),
-+			       struct page, lru);
-+	list_for_each_entry_from_reverse(page, list, lru) {
-+		if (PageAerated(page)) {
-+			page = list_first_entry(list, struct page, lru);
-+			if (PageAerated(page))
-+				break;
-+		}
-+
-+		del_page_from_free_area(page, zone, order);
-+
-+		/* record migratetype and order within page */
-+		set_pcppage_migratetype(page, migratetype);
-+		set_page_private(page, order);
-+		__mod_zone_freepage_state(zone, -(1 << order), migratetype);
-+
-+		return page;
-+	}
-+
-+	return NULL;
++	boundary[order - AERATOR_MIN_ORDER][migratetype] =
++			&zone->free_area[order].free_list[migratetype];
 +}
 +
-+/**
-+ * put_aeration_page - Return a now-aerated "raw" page back where we got it
-+ * @zone: Zone to return pages to
-+ * @page: Previously "raw" page that can now be returned after aeration
-+ *
-+ * This function will pull the migratetype and order information out
-+ * of the page and attempt to return it where it found it.
-+ */
-+void put_aeration_page(struct zone *zone, struct page *page)
++#define for_each_aerate_migratetype_order(_order, _type) \
++	for (_order = MAX_ORDER; _order-- != AERATOR_MIN_ORDER;) \
++		for (_type = MIGRATE_TYPES; _type--;)
++
++static void aerator_populate_boundaries(struct zone *zone)
 +{
 +	unsigned int order, mt;
-+	unsigned long pfn;
 +
-+	mt = get_pcppage_migratetype(page);
-+	pfn = page_to_pfn(page);
++	if (test_bit(ZONE_AERATION_ACTIVE, &zone->flags))
++		return;
 +
-+	if (unlikely(has_isolate_pageblock(zone) || is_migrate_isolate(mt)))
-+		mt = get_pfnblock_migratetype(page, pfn);
++	for_each_aerate_migratetype_order(order, mt)
++		aerator_reset_boundary(zone, order, mt);
 +
-+	order = page_private(page);
-+	set_page_private(page, 0);
-+
-+	__free_one_page(page, pfn, zone, order, mt, true);
++	set_bit(ZONE_AERATION_ACTIVE, &zone->flags);
 +}
-+#endif /* CONFIG_AERATION */
 +
- /*
-  * This array describes the order lists are fallen back to when
-  * the free lists for the desirable migrate type are depleted
-@@ -5929,9 +6013,12 @@ void __ref memmap_init_zone_device(struct zone *zone,
- static void __meminit zone_init_free_lists(struct zone *zone)
- {
- 	unsigned int order, t;
--	for_each_migratetype_order(order, t) {
-+	for_each_migratetype_order(order, t)
- 		INIT_LIST_HEAD(&zone->free_area[order].free_list[t]);
++struct list_head *__aerator_get_tail(unsigned int order, int migratetype)
++{
++	return boundary[order - AERATOR_MIN_ORDER][migratetype];
++}
 +
-+	for (order = MAX_ORDER; order--; ) {
- 		zone->free_area[order].nr_free = 0;
-+		zone->free_area[order].nr_free_aerated = 0;
- 	}
- }
++void __aerator_del_from_boundary(struct page *page, struct zone *zone)
++{
++	unsigned int order = page_private(page) - AERATOR_MIN_ORDER;
++	int mt = get_pcppage_migratetype(page);
++	struct list_head **tail = &boundary[order][mt];
++
++	if (*tail == &page->lru)
++		*tail = page->lru.next;
++}
++
++void aerator_add_to_boundary(struct page *page, struct zone *zone)
++{
++	unsigned int order = page_private(page) - AERATOR_MIN_ORDER;
++	int mt = get_pcppage_migratetype(page);
++	struct list_head **tail = &boundary[order][mt];
++
++	*tail = &page->lru;
++}
++
++void aerator_shutdown(void)
++{
++	static_key_slow_dec(&aerator_notify_enabled);
++
++	while (atomic_read(&a_dev_info->refcnt))
++		msleep(20);
++
++	WARN_ON(!list_empty(&a_dev_info->batch));
++
++	a_dev_info = NULL;
++}
++EXPORT_SYMBOL_GPL(aerator_shutdown);
++
++static void aerator_schedule_initial_aeration(void)
++{
++	struct zone *zone;
++
++	for_each_populated_zone(zone) {
++		spin_lock(&zone->lock);
++		__aerator_notify(zone);
++		spin_unlock(&zone->lock);
++	}
++}
++
++int aerator_startup(struct aerator_dev_info *sdev)
++{
++	if (a_dev_info)
++		return -EBUSY;
++
++	INIT_LIST_HEAD(&sdev->batch);
++	atomic_set(&sdev->refcnt, 0);
++
++	a_dev_info = sdev;
++	aerator_schedule_initial_aeration();
++
++	static_key_slow_inc(&aerator_notify_enabled);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(aerator_startup);
++
++static void aerator_fill(struct zone *zone)
++{
++	struct list_head *batch = &a_dev_info->batch;
++	int budget = a_dev_info->capacity;
++	unsigned int order, mt;
++
++	for_each_aerate_migratetype_order(order, mt) {
++		struct page *page;
++
++		/*
++		 * Pull pages from free list until we have drained
++		 * it or we have filled the batch reactor.
++		 */
++		while ((page = get_aeration_page(zone, order, mt))) {
++			list_add_tail(&page->lru, batch);
++
++			if (!--budget)
++				return;
++		}
++	}
++
++	/*
++	 * If there are no longer enough free pages to fully populate
++	 * the aerator, then we can just shut it down for this zone.
++	 */
++	clear_bit(ZONE_AERATION_REQUESTED, &zone->flags);
++	atomic_dec(&a_dev_info->refcnt);
++}
++
++static void aerator_drain(struct zone *zone)
++{
++	struct list_head *list = &a_dev_info->batch;
++	struct page *page;
++
++	/*
++	 * Drain the now aerated pages back into their respective
++	 * free lists/areas.
++	 */
++	while ((page = list_first_entry_or_null(list, struct page, lru))) {
++		list_del(&page->lru);
++		put_aeration_page(zone, page);
++	}
++}
++
++static void aerator_scrub_zone(struct zone *zone)
++{
++	/* See if there are any pages to pull */
++	if (!test_bit(ZONE_AERATION_REQUESTED, &zone->flags))
++		return;
++
++	spin_lock(&zone->lock);
++
++	do {
++		aerator_fill(zone);
++
++		if (list_empty(&a_dev_info->batch))
++			break;
++
++		spin_unlock(&zone->lock);
++
++		/*
++		 * Start aerating the pages in the batch, and then
++		 * once that is completed we can drain the reactor
++		 * and refill the reactor, restarting the cycle.
++		 */
++		a_dev_info->react(a_dev_info);
++
++		spin_lock(&zone->lock);
++
++		/*
++		 * Guarantee boundaries are populated before we
++		 * start placing aerated pages in the zone.
++		 */
++		aerator_populate_boundaries(zone);
++
++		/*
++		 * We should have a list of pages that have been
++		 * processed. Return them to their original free lists.
++		 */
++		aerator_drain(zone);
++
++		/* keep pulling pages till there are none to pull */
++	} while (test_bit(ZONE_AERATION_REQUESTED, &zone->flags));
++
++	clear_bit(ZONE_AERATION_ACTIVE, &zone->flags);
++
++	spin_unlock(&zone->lock);
++}
++
++/**
++ * aerator_cycle - start aerating a batch of pages, drain, and refill
++ *
++ * The aerator cycle consists of 4 stages, fill, react, drain, and idle.
++ * We will cycle through the first 3 stages until we fail to obtain any
++ * pages, in that case we will switch to idle and the thread will go back
++ * to sleep awaiting the next request for aeration.
++ */
++static void aerator_cycle(struct work_struct *work)
++{
++	struct zone *zone = first_online_pgdat()->node_zones;
++	int refcnt;
++
++	/*
++	 * We want to hold one additional reference against the number of
++	 * active hints as we may clear the hint that originally brought us
++	 * here. We will clear it after we have either vaporized the content
++	 * of the pages, or if we discover all pages were stolen out from
++	 * under us.
++	 */
++	atomic_inc(&a_dev_info->refcnt);
++
++	for (;;) {
++		aerator_scrub_zone(zone);
++
++		/*
++		 * Move to next zone, if at the end of the list
++		 * test to see if we can just go into idle.
++		 */
++		zone = next_zone(zone);
++		if (zone)
++			continue;
++		zone = first_online_pgdat()->node_zones;
++
++		/*
++		 * If we never generated any pages and we are
++		 * holding the only remaining reference to active
++		 * hints then we can just let this go for now and
++		 * go idle.
++		 */
++		refcnt = atomic_read(&a_dev_info->refcnt);
++		if (refcnt != 1)
++			continue;
++		if (atomic_try_cmpxchg(&a_dev_info->refcnt, &refcnt, 0))
++			break;
++	}
++}
++
++static DECLARE_DELAYED_WORK(aerator_work, &aerator_cycle);
++
++void __aerator_notify(struct zone *zone)
++{
++	/*
++	 * We can use separate test and set operations here as there
++	 * is nothing else that can set or clear this bit while we are
++	 * holding the zone lock. The advantage to doing it this way is
++	 * that we don't have to dirty the cacheline unless we are
++	 * changing the value.
++	 */
++	set_bit(ZONE_AERATION_REQUESTED, &zone->flags);
++
++	if (atomic_fetch_inc(&a_dev_info->refcnt))
++		return;
++
++	/*
++	 * We should never be calling this function while there are already
++	 * pages in the list being aerated. If we are called under such a
++	 * circumstance report an error.
++	 */
++	WARN_ON(!list_empty(&a_dev_info->batch));
++
++	/*
++	 * Delay the start of work to allow a sizable queue to build. For
++	 * now we are limiting this to running no more than 10 times per
++	 * second.
++	 */
++	schedule_delayed_work(&aerator_work, HZ / 10);
++}
+diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+index eb7ba8385374..45269c46c662 100644
+--- a/mm/page_alloc.c
++++ b/mm/page_alloc.c
+@@ -2168,8 +2168,10 @@ struct page *get_aeration_page(struct zone *zone, unsigned int order,
+ 	list_for_each_entry_from_reverse(page, list, lru) {
+ 		if (PageAerated(page)) {
+ 			page = list_first_entry(list, struct page, lru);
+-			if (PageAerated(page))
++			if (PageAerated(page)) {
++				aerator_add_to_boundary(page, zone);
+ 				break;
++			}
+ 		}
  
+ 		del_page_from_free_area(page, zone, order);
 
