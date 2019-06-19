@@ -2,149 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 94D6E4B6C9
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 13:12:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C33024B74E
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 13:45:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731593AbfFSLMG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jun 2019 07:12:06 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:11936 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726826AbfFSLMG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 19 Jun 2019 07:12:06 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5JB7qLo134311;
-        Wed, 19 Jun 2019 07:11:48 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2t7kq9903m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Jun 2019 07:11:47 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x5JBACHh027517;
-        Wed, 19 Jun 2019 11:11:47 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma03dal.us.ibm.com with ESMTP id 2t4ra62bh1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Jun 2019 11:11:46 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5JBBjiL24772960
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Jun 2019 11:11:45 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1DAD77805C;
-        Wed, 19 Jun 2019 11:11:45 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 088FC78063;
-        Wed, 19 Jun 2019 11:11:43 +0000 (GMT)
-Received: from [9.80.214.94] (unknown [9.80.214.94])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed, 19 Jun 2019 11:11:43 +0000 (GMT)
-Subject: Re: [RFC PATCH v1 0/5] s390: more vfio-ccw code rework
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Farhan Ali <alifm@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20190618202352.39702-1-farman@linux.ibm.com>
- <20190619102501.3be69000.cohuck@redhat.com>
-From:   Eric Farman <farman@linux.ibm.com>
-Message-ID: <9ea22f6e-d6df-3586-f4d5-23ee0df3ceb5@linux.ibm.com>
-Date:   Wed, 19 Jun 2019 07:11:43 -0400
+        id S1727591AbfFSLo4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jun 2019 07:44:56 -0400
+Received: from foss.arm.com ([217.140.110.172]:35194 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727067AbfFSLo4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jun 2019 07:44:56 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 284C7360;
+        Wed, 19 Jun 2019 04:44:55 -0700 (PDT)
+Received: from [10.1.196.129] (ostrya.cambridge.arm.com [10.1.196.129])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A30193F738;
+        Wed, 19 Jun 2019 04:46:39 -0700 (PDT)
+Subject: Re: [PATCH v8 26/29] vfio-pci: Register an iommu fault handler
+To:     Jacob Pan <jacob.jun.pan@linux.intel.com>
+Cc:     "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>,
+        "ashok.raj@intel.com" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Marc Zyngier <Marc.Zyngier@arm.com>,
+        Will Deacon <Will.Deacon@arm.com>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Vincent Stehle <Vincent.Stehle@arm.com>,
+        Robin Murphy <Robin.Murphy@arm.com>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+References: <20190526161004.25232-1-eric.auger@redhat.com>
+ <20190526161004.25232-27-eric.auger@redhat.com>
+ <20190603163139.70fe8839@x1.home>
+ <10dd60d9-4af0-c0eb-08c9-a0db7ee1925e@redhat.com>
+ <20190605154553.0d00ad8d@jacob-builder>
+ <2753d192-1c46-d78e-c425-0c828e48cde2@arm.com>
+ <20190606132903.064f7ac4@jacob-builder>
+ <dc051424-67d7-02ff-9b8e-0d7a8a4e59eb@arm.com>
+ <20190607104301.6b1bbd74@jacob-builder>
+ <e02b024f-6ebc-e8fa-c30c-5bf3f4b164d6@arm.com>
+ <20190610143134.7bff96e9@jacob-builder>
+ <905f130b-02dc-6971-8d5b-ce87d9bc96a4@arm.com>
+ <20190612115358.0d90b322@jacob-builder>
+ <77405d39-81a4-d9a8-5d35-27602199867a@arm.com>
+ <20190618171908.76284cd7@jacob-builder>
+From:   Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Message-ID: <138f6a16-d2ee-d7b8-7bfb-ac08b6cfb9da@arm.com>
+Date:   Wed, 19 Jun 2019 12:44:24 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190619102501.3be69000.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190618171908.76284cd7@jacob-builder>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-19_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906190093
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 19/06/2019 01:19, Jacob Pan wrote:
+>>> I see this as a future extension due to limited testing,   
+>>
+>> I'm wondering how we deal with:
+>> (1) old userspace that won't fill the new private_data field in
+>> page_response. A new kernel still has to support it.
+>> (2) old kernel that won't recognize the new PRIVATE_DATA flag.
+>> Currently iommu_page_response() rejects page responses with unknown
+>> flags.
+>>
+>> I guess we'll need a two-way negotiation, where userspace queries
+>> whether the kernel supports the flag (2), and the kernel learns
+>> whether it should expect the private data to come back (1).
+>>
+> I am not sure case (1) exist in that there is no existing user space
+> supports PRQ w/o private data. Am I missing something?
+> 
+> For VT-d emulation, private data is always part of the scalable mode
+> PASID capability. If vIOMMU query host supports PASID and scalable
+> mode, it will always support private data once PRQ is enabled.
 
+Right if VT-d won't ever support page_response without private data then
+I don't think we have to worry about (1).
 
-On 6/19/19 4:25 AM, Cornelia Huck wrote:
-> On Tue, 18 Jun 2019 22:23:47 +0200
-> Eric Farman <farman@linux.ibm.com> wrote:
+> So I think we only need to negotiate (2) which should be covered by
+> VT-d PASID cap.
 > 
->> A couple little improvements to the malloc load in vfio-ccw.
->> Really, there were just (the first) two patches, but then I
->> got excited and added a few stylistic ones to the end.
+>>> perhaps for
+>>> now, can you add paddings similar to page request? Make it 64B as
+>>> well.  
 >>
->> The routine ccwchain_calc_length() has this basic structure:
+>> I don't think padding is necessary, because iommu_page_response is
+>> sent by userspace to the kernel, unlike iommu_fault which is
+>> allocated by userspace and filled by the kernel.
 >>
->>   ccwchain_calc_length
->>     a0 = kcalloc(CCWCHAIN_LEN_MAX, sizeof(struct ccw1))
->>     copy_ccw_from_iova(a0, src)
->>       copy_from_iova
->>         pfn_array_alloc
->>           b = kcalloc(len, sizeof(*pa_iova_pfn + *pa_pfn)
->>         pfn_array_pin
->>           vfio_pin_pages
->>         memcpy(a0, src)
->>         pfn_array_unpin_free
->>           vfio_unpin_pages
->>           kfree(b)
->>     kfree(a0)
+>> Page response looks a lot more like existing VFIO mechanisms, so I
+>> suppose we'll wrap the iommu_page_response structure and include an
+>> argsz parameter at the top:
 >>
->> We do this EVERY time we process a new channel program chain,
->> meaning at least once per SSCH and more if TICs are involved,
->> to figure out how many CCWs are chained together.  Once that
->> is determined, a new piece of memory is allocated (call it a1)
->> and then passed to copy_ccw_from_iova() again, but for the
->> value calculated by ccwchain_calc_length().
+>> 	struct vfio_iommu_page_response {
+>> 		u32 argsz;
+>> 		struct iommu_page_response pr;
+>> 	};
 >>
->> This seems inefficient.
+>> 	struct vfio_iommu_page_response vpr = {
+>> 		.argsz = sizeof(vpr),
+>> 		.pr = ...
+>> 		...
+>> 	};
 >>
->> Patch 1 moves the malloc of a0 from the CCW processor to the
->> initialization of the device.  Since only one SSCH can be
->> handled concurrently, we can use this space safely to
->> determine how long the chain being processed actually is.
+>> 	ioctl(devfd, VFIO_IOMMU_PAGE_RESPONSE, &vpr);
 >>
->> Patch 2 then removes the second copy_ccw_from_iova() call
->> entirely, and replaces it with a memcpy from a0 to a1.  This
->> is done before we process a TIC and thus a second chain, so
->> there is no overlap in the storage in channel_program.
+>> In that case supporting private data can be done by simply appending a
+>> field at the end (plus the negotiation above).
 >>
->> Patches 3-5 clean up some things that aren't as clear as I'd
->> like, but didn't want to pollute the first two changes.
->> For example, patch 3 moves the population of guest_cp to the
->> same routine that copies from it, rather than in a called
->> function.  Meanwhile, patch 4 (and thus, 5) was something I
->> had lying around for quite some time, because it looked to
->> be structured weird.  Maybe that's one bridge too far.
+> Do you mean at the end of struct vfio_iommu_page_response{}? or at
+> the end of that seems struct iommu_page_response{}?
 > 
-> I think this is worthwhile.
-> 
->>
->> Eric Farman (5):
->>   vfio-ccw: Move guest_cp storage into common struct
->>   vfio-ccw: Skip second copy of guest cp to host
->>   vfio-ccw: Copy CCW data outside length calculation
->>   vfio-ccw: Factor out the ccw0-to-ccw1 transition
->>   vfio-ccw: Remove copy_ccw_from_iova()
->>
->>  drivers/s390/cio/vfio_ccw_cp.c  | 108 +++++++++++---------------------
->>  drivers/s390/cio/vfio_ccw_cp.h  |   7 +++
->>  drivers/s390/cio/vfio_ccw_drv.c |   7 +++
->>  3 files changed, 52 insertions(+), 70 deletions(-)
->>
-> 
-> Ok, so I just wanted to take a quick look, and then ended up reviewing
-> it all :)
+> The consumer of the private data is iommu driver not vfio. So I think
+> you want to add the new field at the end of struct iommu_page_response,
+> right?
 
-Haha, oops!  :)  Thank you!  That was a nice surprise.
+Yes that's what I meant
 
-> 
-> Will give others some time to look at this before I queue.
-> 
-
-Sounds great!  I'll get back to my own reviews (notes the gentle
-reminder on qemu :)
+Thanks,
+Jean
