@@ -2,121 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 36A864B1F7
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 08:12:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A97C4B212
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 08:24:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731066AbfFSGMa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jun 2019 02:12:30 -0400
-Received: from mga11.intel.com ([192.55.52.93]:30045 "EHLO mga11.intel.com"
+        id S1730502AbfFSGXl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jun 2019 02:23:41 -0400
+Received: from mga01.intel.com ([192.55.52.88]:3213 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725892AbfFSGM3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jun 2019 02:12:29 -0400
+        id S1725899AbfFSGXl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jun 2019 02:23:41 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 23:12:29 -0700
-X-ExtLoop1: 1
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jun 2019 23:23:40 -0700
 X-IronPort-AV: E=Sophos;i="5.63,392,1557212400"; 
-   d="scan'208";a="311258922"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
-  by orsmga004.jf.intel.com with ESMTP; 18 Jun 2019 23:12:27 -0700
-From:   Tao Xu <tao3.xu@intel.com>
-To:     pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+   d="scan'208";a="153709771"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.123]) ([10.239.13.123])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 18 Jun 2019 23:23:38 -0700
+Subject: Re: [PATCH v4 1/3] KVM: x86: add support for user wait instructions
+To:     Tao Xu <tao3.xu@intel.com>, pbonzini@redhat.com,
+        rkrcmar@redhat.com, corbet@lwn.net, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
         sean.j.christopherson@intel.com
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        fenghua.yu@intel.com, xiaoyao.li@linux.intel.com,
-        jingqi.liu@intel.com, tao3.xu@intel.com
-Subject: [PATCH v4 3/3] KVM: vmx: handle vm-exit for UMWAIT and TPAUSE
-Date:   Wed, 19 Jun 2019 14:09:45 +0800
-Message-Id: <20190619060945.14104-4-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190619060945.14104-1-tao3.xu@intel.com>
+        fenghua.yu@intel.com, jingqi.liu@intel.com
 References: <20190619060945.14104-1-tao3.xu@intel.com>
+ <20190619060945.14104-2-tao3.xu@intel.com>
+From:   Xiaoyao Li <xiaoyao.li@linux.intel.com>
+Message-ID: <7f6bc0fa-abcd-ce0a-19a0-a5767d094181@linux.intel.com>
+Date:   Wed, 19 Jun 2019 14:23:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <20190619060945.14104-2-tao3.xu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As the latest Intel 64 and IA-32 Architectures Software Developer's
-Manual, UMWAIT and TPAUSE instructions cause a VM exit if the
-RDTSC exiting and enable user wait and pause VM-execution
-controls are both 1.
 
-This patch is to handle the vm-exit for UMWAIT and TPAUSE as this
-should never happen.
 
-Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
-Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
----
+On 6/19/2019 2:09 PM, Tao Xu wrote:
+> UMONITOR, UMWAIT and TPAUSE are a set of user wait instructions.
+> This patch adds support for user wait instructions in KVM. Availability
+> of the user wait instructions is indicated by the presence of the CPUID
+> feature flag WAITPKG CPUID.0x07.0x0:ECX[5]. User wait instructions may
+> be executed at any privilege level, and use IA32_UMWAIT_CONTROL MSR to
+> set the maximum time.
+> 
+> The behavior of user wait instructions in VMX non-root operation is
+> determined first by the setting of the "enable user wait and pause"
+> secondary processor-based VM-execution control bit 26.
+> 	If the VM-execution control is 0, UMONITOR/UMWAIT/TPAUSE cause
+> an invalid-opcode exception (#UD).
+> 	If the VM-execution control is 1, treatment is based on the
+> setting of the “RDTSC exiting” VM-execution control. Because KVM never
+> enables RDTSC exiting, if the instruction causes a delay, the amount of
+> time delayed is called here the physical delay. The physical delay is
+> first computed by determining the virtual delay. If
+> IA32_UMWAIT_CONTROL[31:2] is zero, the virtual delay is the value in
+> EDX:EAX minus the value that RDTSC would return; if
+> IA32_UMWAIT_CONTROL[31:2] is not zero, the virtual delay is the minimum
+> of that difference and AND(IA32_UMWAIT_CONTROL,FFFFFFFCH).
+> 
+> Because umwait and tpause can put a (psysical) CPU into a power saving
+> state, by default we dont't expose it to kvm and enable it only when
+> guest CPUID has it.
+> 
+> Detailed information about user wait instructions can be found in the
+> latest Intel 64 and IA-32 Architectures Software Developer's Manual.
+> 
+> Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
+> Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> ---
+> 
+> no changes in v4.
+> ---
+>   arch/x86/include/asm/vmx.h      | 1 +
+>   arch/x86/kvm/cpuid.c            | 2 +-
+>   arch/x86/kvm/vmx/capabilities.h | 6 ++++++
+>   arch/x86/kvm/vmx/vmx.c          | 4 ++++
+>   4 files changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
+> index a39136b0d509..8f00882664d3 100644
+> --- a/arch/x86/include/asm/vmx.h
+> +++ b/arch/x86/include/asm/vmx.h
+> @@ -69,6 +69,7 @@
+>   #define SECONDARY_EXEC_PT_USE_GPA		0x01000000
+>   #define SECONDARY_EXEC_MODE_BASED_EPT_EXEC	0x00400000
+>   #define SECONDARY_EXEC_TSC_SCALING              0x02000000
+> +#define SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE	0x04000000
+>   
+>   #define PIN_BASED_EXT_INTR_MASK                 0x00000001
+>   #define PIN_BASED_NMI_EXITING                   0x00000008
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index e18a9f9f65b5..48bd851a6ae5 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -405,7 +405,7 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
+>   		F(AVX512VBMI) | F(LA57) | F(PKU) | 0 /*OSPKE*/ |
+>   		F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
+>   		F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
+> -		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B);
+> +		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/;
+>   
+>   	/* cpuid 7.0.edx*/
+>   	const u32 kvm_cpuid_7_0_edx_x86_features =
+> diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+> index d6664ee3d127..fd77e17651b4 100644
+> --- a/arch/x86/kvm/vmx/capabilities.h
+> +++ b/arch/x86/kvm/vmx/capabilities.h
+> @@ -253,6 +253,12 @@ static inline bool cpu_has_vmx_tsc_scaling(void)
+>   		SECONDARY_EXEC_TSC_SCALING;
+>   }
+>   
+> +static inline bool vmx_waitpkg_supported(void)
+> +{
+> +	return vmcs_config.cpu_based_2nd_exec_ctrl &
+> +		SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE;
 
-no changes in v4
----
- arch/x86/include/uapi/asm/vmx.h |  6 +++++-
- arch/x86/kvm/vmx/vmx.c          | 16 ++++++++++++++++
- 2 files changed, 21 insertions(+), 1 deletion(-)
+Shouldn't it be
+	return vmx->secondary_exec_control &
+                 SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE;   ?
 
-diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
-index d213ec5c3766..d88d7a68849b 100644
---- a/arch/x86/include/uapi/asm/vmx.h
-+++ b/arch/x86/include/uapi/asm/vmx.h
-@@ -85,6 +85,8 @@
- #define EXIT_REASON_PML_FULL            62
- #define EXIT_REASON_XSAVES              63
- #define EXIT_REASON_XRSTORS             64
-+#define EXIT_REASON_UMWAIT              67
-+#define EXIT_REASON_TPAUSE              68
- 
- #define VMX_EXIT_REASONS \
- 	{ EXIT_REASON_EXCEPTION_NMI,         "EXCEPTION_NMI" }, \
-@@ -142,7 +144,9 @@
- 	{ EXIT_REASON_RDSEED,                "RDSEED" }, \
- 	{ EXIT_REASON_PML_FULL,              "PML_FULL" }, \
- 	{ EXIT_REASON_XSAVES,                "XSAVES" }, \
--	{ EXIT_REASON_XRSTORS,               "XRSTORS" }
-+	{ EXIT_REASON_XRSTORS,               "XRSTORS" }, \
-+	{ EXIT_REASON_UMWAIT,                "UMWAIT" }, \
-+	{ EXIT_REASON_TPAUSE,                "TPAUSE" }
- 
- #define VMX_ABORT_SAVE_GUEST_MSR_FAIL        1
- #define VMX_ABORT_LOAD_HOST_PDPTE_FAIL       2
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index eb13ff9759d3..46125553b180 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5336,6 +5336,20 @@ static int handle_monitor(struct kvm_vcpu *vcpu)
- 	return handle_nop(vcpu);
- }
- 
-+static int handle_umwait(struct kvm_vcpu *vcpu)
-+{
-+	kvm_skip_emulated_instruction(vcpu);
-+	WARN(1, "this should never happen\n");
-+	return 1;
-+}
-+
-+static int handle_tpause(struct kvm_vcpu *vcpu)
-+{
-+	kvm_skip_emulated_instruction(vcpu);
-+	WARN(1, "this should never happen\n");
-+	return 1;
-+}
-+
- static int handle_invpcid(struct kvm_vcpu *vcpu)
- {
- 	u32 vmx_instruction_info;
-@@ -5546,6 +5560,8 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
- 	[EXIT_REASON_VMFUNC]		      = handle_vmx_instruction,
- 	[EXIT_REASON_PREEMPTION_TIMER]	      = handle_preemption_timer,
- 	[EXIT_REASON_ENCLS]		      = handle_encls,
-+	[EXIT_REASON_UMWAIT]                  = handle_umwait,
-+	[EXIT_REASON_TPAUSE]                  = handle_tpause,
- };
- 
- static const int kvm_vmx_max_exit_handlers =
--- 
-2.20.1
-
+> +}
+> +
+>   static inline bool cpu_has_vmx_apicv(void)
+>   {
+>   	return cpu_has_vmx_apic_register_virt() &&
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index b93e36ddee5e..b35bfac30a34 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2250,6 +2250,7 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+>   			SECONDARY_EXEC_RDRAND_EXITING |
+>   			SECONDARY_EXEC_ENABLE_PML |
+>   			SECONDARY_EXEC_TSC_SCALING |
+> +			SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE |
+>   			SECONDARY_EXEC_PT_USE_GPA |
+>   			SECONDARY_EXEC_PT_CONCEAL_VMX |
+>   			SECONDARY_EXEC_ENABLE_VMFUNC |
+> @@ -3987,6 +3988,9 @@ static void vmx_compute_secondary_exec_control(struct vcpu_vmx *vmx)
+>   		}
+>   	}
+>   
+> +	if (!guest_cpuid_has(vcpu, X86_FEATURE_WAITPKG))
+> +		exec_control &= ~SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE;
+> +
+>   	vmx->secondary_exec_control = exec_control;
+>   }
+>   
+> 
