@@ -2,148 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B30614BEEA
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 18:49:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB1BD4BFCA
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 19:37:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727584AbfFSQtW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jun 2019 12:49:22 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:44334 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726091AbfFSQtW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jun 2019 12:49:22 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JGmaMG059359;
-        Wed, 19 Jun 2019 16:48:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=LsU3zeuc/mQbMeWhWbxSsUGJ/a+JywecUJTpLD/kSKk=;
- b=FFTbHZpNpzyDwT0Eazo9mrp8/3iEXjHoS/+pgViSDegRiIT56LXTiOpOiVuZY+ZQJp61
- m4sxzqaSIXQJ/SNqXXdUE75HtjKtsGvWt+m0angb4oDvjsPt3ChVFepvLTUMeYu2AmQA
- KOIThCjgEPdAHaZQr8fjpYFx6RuSpFV664Ojvx7dJzjFYaZgZ8v+ut+4wPEKrogGjNl+
- i1EU20jY+j7nwoouOiJoyAdRJ+fRlBREi0LRdxAlvFYskldgAWupL25hV8oWKRFcveIM
- gaA0dcncPMEcbPFyAma5BHgtCt0ok39bxE3HWcxWo0yWTh+lwriwAD1pX2NKsRtjZpiB xg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 2t7809cjn6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Jun 2019 16:48:44 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JGlKWG054029;
-        Wed, 19 Jun 2019 16:48:44 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 2t77yn71um-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Jun 2019 16:48:43 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5JGmfkY007697;
-        Wed, 19 Jun 2019 16:48:41 GMT
-Received: from [10.65.164.174] (/10.65.164.174)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 19 Jun 2019 09:48:41 -0700
-Subject: Re: [PATCH v17 06/15] mm, arm64: untag user pointers in
- get_vaddr_frames
-To:     Andrey Konovalov <andreyknvl@google.com>,
-        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-References: <cover.1560339705.git.andreyknvl@google.com>
- <4c0b9a258e794437a1c6cec97585b4b5bd2d3bba.1560339705.git.andreyknvl@google.com>
-From:   Khalid Aziz <khalid.aziz@oracle.com>
-Organization: Oracle Corp
-Message-ID: <39b03c1b-d09c-4b29-0f62-337bf2382eb5@oracle.com>
-Date:   Wed, 19 Jun 2019 10:48:38 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1729098AbfFSRhf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jun 2019 13:37:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58332 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726380AbfFSRhf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jun 2019 13:37:35 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4CA6966995;
+        Wed, 19 Jun 2019 17:37:32 +0000 (UTC)
+Received: from work-vm (ovpn-117-113.ams2.redhat.com [10.36.117.113])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4207F5C205;
+        Wed, 19 Jun 2019 17:37:29 +0000 (UTC)
+Date:   Wed, 19 Jun 2019 18:37:26 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Liran Alon <liran.alon@oracle.com>
+Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com,
+        rth@twiddle.net, ehabkost@redhat.com, kvm@vger.kernel.org,
+        jmattson@google.com, maran.wilson@oracle.com,
+        Nikita Leshenko <nikita.leshchenko@oracle.com>
+Subject: Re: [QEMU PATCH v4 07/10] vmstate: Add support for kernel integer
+ types
+Message-ID: <20190619173726.GG2844@work-vm>
+References: <20190619162140.133674-1-liran.alon@oracle.com>
+ <20190619162140.133674-8-liran.alon@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <4c0b9a258e794437a1c6cec97585b4b5bd2d3bba.1560339705.git.andreyknvl@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906190135
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906190136
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190619162140.133674-8-liran.alon@oracle.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Wed, 19 Jun 2019 17:37:34 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/12/19 5:43 AM, Andrey Konovalov wrote:
-> This patch is a part of a series that extends arm64 kernel ABI to allow=
- to
-> pass tagged user pointers (with the top byte set to something else othe=
-r
-> than 0x00) as syscall arguments.
->=20
-> get_vaddr_frames uses provided user pointers for vma lookups, which can=
-
-> only by done with untagged pointers. Instead of locating and changing
-> all callers of this function, perform untagging in it.
->=20
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> Reviewed-by: Kees Cook <keescook@chromium.org>
-> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+* Liran Alon (liran.alon@oracle.com) wrote:
+> Reviewed-by: Nikita Leshenko <nikita.leshchenko@oracle.com>
+> Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
 > ---
-
-With the suggested change to commit log in my previous email:
-
-Reviewed-by: Khalid Aziz <khalid.aziz@oracle.com>
-
->  mm/frame_vector.c | 2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/mm/frame_vector.c b/mm/frame_vector.c
-> index c64dca6e27c2..c431ca81dad5 100644
-> --- a/mm/frame_vector.c
-> +++ b/mm/frame_vector.c
-> @@ -46,6 +46,8 @@ int get_vaddr_frames(unsigned long start, unsigned in=
-t nr_frames,
->  	if (WARN_ON_ONCE(nr_frames > vec->nr_allocated))
->  		nr_frames =3D vec->nr_allocated;
-> =20
-> +	start =3D untagged_addr(start);
+>  include/migration/vmstate.h | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+> 
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index 9224370ed59a..ca68584eba4d 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -797,6 +797,19 @@ extern const VMStateInfo vmstate_info_qtailq;
+>  #define VMSTATE_UINT64_V(_f, _s, _v)                                  \
+>      VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint64, uint64_t)
+>  
+> +#ifdef CONFIG_LINUX
 > +
->  	down_read(&mm->mmap_sem);
->  	locked =3D 1;
->  	vma =3D find_vma_intersection(mm, start, start + 1);
->=20
+> +#define VMSTATE_U8_V(_f, _s, _v)                                   \
+> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint8, __u8)
+> +#define VMSTATE_U16_V(_f, _s, _v)                                  \
+> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint16, __u16)
+> +#define VMSTATE_U32_V(_f, _s, _v)                                  \
+> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint32, __u32)
+> +#define VMSTATE_U64_V(_f, _s, _v)                                  \
+> +    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_uint64, __u64)
+> +
+> +#endif
+> +
 
+Right, and that works as well as the comment I suggested, so
 
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+>  #define VMSTATE_BOOL(_f, _s)                                          \
+>      VMSTATE_BOOL_V(_f, _s, 0)
+>  
+> @@ -818,6 +831,19 @@ extern const VMStateInfo vmstate_info_qtailq;
+>  #define VMSTATE_UINT64(_f, _s)                                        \
+>      VMSTATE_UINT64_V(_f, _s, 0)
+>  
+> +#ifdef CONFIG_LINUX
+> +
+> +#define VMSTATE_U8(_f, _s)                                         \
+> +    VMSTATE_U8_V(_f, _s, 0)
+> +#define VMSTATE_U16(_f, _s)                                        \
+> +    VMSTATE_U16_V(_f, _s, 0)
+> +#define VMSTATE_U32(_f, _s)                                        \
+> +    VMSTATE_U32_V(_f, _s, 0)
+> +#define VMSTATE_U64(_f, _s)                                        \
+> +    VMSTATE_U64_V(_f, _s, 0)
+> +
+> +#endif
+> +
+>  #define VMSTATE_UINT8_EQUAL(_f, _s, _err_hint)                        \
+>      VMSTATE_SINGLE_FULL(_f, _s, 0, 0,                                 \
+>                          vmstate_info_uint8_equal, uint8_t, _err_hint)
+> -- 
+> 2.20.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
