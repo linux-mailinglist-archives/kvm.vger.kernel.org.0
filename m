@@ -2,239 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 41F694C1BE
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 21:53:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41F494C1FD
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 22:02:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726322AbfFSTxe convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Wed, 19 Jun 2019 15:53:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41260 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726230AbfFSTxe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jun 2019 15:53:34 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D44907FD45;
-        Wed, 19 Jun 2019 19:53:33 +0000 (UTC)
-Received: from x1.home (ovpn-116-32.phx2.redhat.com [10.3.116.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 08CB15D71B;
-        Wed, 19 Jun 2019 19:53:30 +0000 (UTC)
-Date:   Wed, 19 Jun 2019 13:53:30 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Sylvain Bauza <sbauza@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Libvirt Devel <libvir-list@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Erik Skultety <eskultet@redhat.com>,
-        Pavel Hrdina <phrdina@redhat.com>
-Subject: Re: mdevctl: A shoestring mediated device management and
- persistence utility
-Message-ID: <20190619135330.5131d8d1@x1.home>
-In-Reply-To: <CALOCmu=6Xmw-_-SVXujCEcgPY2CQiBQKgfUMJ45WnZ_9XORyUw@mail.gmail.com>
-References: <20190523172001.41f386d8@x1.home>
-        <20190617140000.GA2021@redhat.com>
-        <20190617085438.07607e8b@x1.home>
-        <20190617151030.GG3380@redhat.com>
-        <20190617110517.353b4f16@x1.home>
-        <20190618130148.43ba5837.cohuck@redhat.com>
-        <CALOCmukPWiXiM+mN0hCTvSwfdHy5UdERU8WnvOXiBrMQ9tH3VA@mail.gmail.com>
-        <20190618161210.053d6550@x1.home>
-        <CALOCmu=6Xmw-_-SVXujCEcgPY2CQiBQKgfUMJ45WnZ_9XORyUw@mail.gmail.com>
-Organization: Red Hat
+        id S1726496AbfFSUCZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jun 2019 16:02:25 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:36286 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726143AbfFSUCY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jun 2019 16:02:24 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JJxCMh013084;
+        Wed, 19 Jun 2019 20:01:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=Vroyiiy2apNH9g1WQULlt3tAhqXh3qFzkC0thjbI/tY=;
+ b=tQKRrCMRIZFf76xHdG+OcQRJVCixkQdbl3HfJkhqJ6zQ5Fq71mORMALE81hvlqMU5cq2
+ K4F8SUycLHKVrHTiluUHLfebVsFtIV4u7NZst1BEEOGeJtKDYGfPNuGNBzsiq/6/sG1m
+ oHmWEWnqBcx8EHxc8VsLy1BXGGOzd4qHtZgUM3+RorIGLB7LeM8SEKQOzG7hpzi3tUIX
+ cBqz1T+7bPFIBDeruJWhgHUJUNTS7jmoeogb9Jt64Fnvc0VzloFKzLKS2q+3tVxVQSnx
+ bLlYN2Mg5EBeENllw30HSTJNHEAnYlsgKqvHUrkE60SZa/hI/hGzXCuuUFok8MhRdXuP yg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2t7809ddd7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Jun 2019 20:01:33 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JK0U82055051;
+        Wed, 19 Jun 2019 20:01:32 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2t77yp1s13-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Jun 2019 20:01:32 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5JK1P5e025354;
+        Wed, 19 Jun 2019 20:01:25 GMT
+Received: from [10.65.164.174] (/10.65.164.174)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 19 Jun 2019 13:01:25 -0700
+Subject: Re: [PATCH v17 07/15] fs, arm64: untag user pointers in
+ copy_mount_options
+To:     Andrey Konovalov <andreyknvl@google.com>,
+        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+        linux-media@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>, enh <enh@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+References: <cover.1560339705.git.andreyknvl@google.com>
+ <4ed871e14cc265a519c6ba8660a1827844371791.1560339705.git.andreyknvl@google.com>
+From:   Khalid Aziz <khalid.aziz@oracle.com>
+Organization: Oracle Corp
+Message-ID: <14e49054-01dc-dab5-40cc-71434ea3852a@oracle.com>
+Date:   Wed, 19 Jun 2019 14:01:22 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Wed, 19 Jun 2019 19:53:33 +0000 (UTC)
+In-Reply-To: <4ed871e14cc265a519c6ba8660a1827844371791.1560339705.git.andreyknvl@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906190164
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906190164
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 19 Jun 2019 11:04:15 +0200
-Sylvain Bauza <sbauza@redhat.com> wrote:
+On 6/12/19 5:43 AM, Andrey Konovalov wrote:
+> This patch is a part of a series that extends arm64 kernel ABI to allow=
+ to
+> pass tagged user pointers (with the top byte set to something else othe=
+r
+> than 0x00) as syscall arguments.
+>=20
+> In copy_mount_options a user address is being subtracted from TASK_SIZE=
+=2E
+> If the address is lower than TASK_SIZE, the size is calculated to not
+> allow the exact_copy_from_user() call to cross TASK_SIZE boundary.
+> However if the address is tagged, then the size will be calculated
+> incorrectly.
+>=20
+> Untag the address before subtracting.
+>=20
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> ---
 
-> On Wed, Jun 19, 2019 at 12:27 AM Alex Williamson <alex.williamson@redhat.com>
-> wrote:
-> 
-> > On Tue, 18 Jun 2019 14:48:11 +0200
-> > Sylvain Bauza <sbauza@redhat.com> wrote:
-> >  
-> > > On Tue, Jun 18, 2019 at 1:01 PM Cornelia Huck <cohuck@redhat.com> wrote:
-> > >  
-> > > > On Mon, 17 Jun 2019 11:05:17 -0600
-> > > > Alex Williamson <alex.williamson@redhat.com> wrote:
-> > > >  
-> > > > > On Mon, 17 Jun 2019 16:10:30 +0100
-> > > > > Daniel P. Berrangé <berrange@redhat.com> wrote:
-> > > > >  
-> > > > > > On Mon, Jun 17, 2019 at 08:54:38AM -0600, Alex Williamson wrote:  
-> > > > > > > On Mon, 17 Jun 2019 15:00:00 +0100
-> > > > > > > Daniel P. Berrangé <berrange@redhat.com> wrote:
-> > > > > > >  
-> > > > > > > > On Thu, May 23, 2019 at 05:20:01PM -0600, Alex Williamson  
-> > wrote:  
-> > > >  
-> > > > > > > > > Hi,
-> > > > > > > > >
-> > > > > > > > > Currently mediated device management, much like SR-IOV VF  
-> > > > management,  
-> > > > > > > > > is largely left as an exercise for the user.  This is an  
-> > attempt  
-> > > > to  
-> > > > > > > > > provide something and see where it goes.  I doubt we'll solve
-> > > > > > > > > everyone's needs on the first pass, but maybe we'll solve  
-> > enough  
-> > > > and  
-> > > > > > > > > provide helpers for the rest.  Without further ado, I'll  
-> > point  
-> > > > to what  
-> > > > > > > > > I have so far:
-> > > > > > > > >
-> > > > > > > > > https://github.com/awilliam/mdevctl
-> > > > > > > > >
-> > > > > > > > > This is inspired by driverctl, which is also a bash  
-> > utility.  
-> > > > mdevctl  
-> > > > > > > > > uses udev and systemd to record and recreate mdev devices for
-> > > > > > > > > persistence and provides a command line utility for  
-> > querying,  
-> > > > listing,  
-> > > > > > > > > starting, stopping, adding, and removing mdev devices.  
-> > > > Currently, for  
-> > > > > > > > > better or worse, it considers anything created to be  
-> > > > persistent.  I can  
-> > > > > > > > > imagine a global configuration option that might disable  
-> > this and  
-> > > > > > > > > perhaps an autostart flag per mdev device, such that  
-> > mdevctl  
-> > > > might  
-> > > > > > > > > simply "know" about some mdevs but not attempt to create them
-> > > > > > > > > automatically.  Clearly command line usage help, man pages,  
-> > and  
-> > > > > > > > > packaging are lacking as well, release early, release  
-> > often,  
-> > > > plus this  
-> > > > > > > > > is a discussion starter to see if perhaps this is sufficient  
-> > to  
-> > > > meet  
-> > > > > > > > > some needs.  
-> > > > > > > >
-> > > > > > > > I think from libvirt's POV, we would *not* want devices to be  
-> > made  
-> > > > > > > > unconditionally persistent. We usually wish to expose a choice  
-> > to  
-> > > > > > > > applications whether to have resources be transient or  
-> > persistent.  
-> > > > > > > >
-> > > > > > > > So from that POV, a global config option to turn off  
-> > persistence  
-> > > > > > > > is not workable either. We would want control per-device, with
-> > > > > > > > autostart control per device too.  
-> > > > > > >
-> > > > > > > The code has progressed somewhat in the past 3+ weeks, we still  
-> > > > persist  
-> > > > > > > all devices, but the start-up mode can be selected per device  
-> > or  
-> > > > with a  
-> > > > > > > global default mode.  Devices configured with 'auto' start-up
-> > > > > > > automatically while 'manual' devices are simply known and  
-> > available  
-> > > > to  
-> > > > > > > be started.  I imagine we could add a 'transient' mode where we  
-> > purge  
-> > > > > > > the information about the device when it is removed or the next  
-> > time  
-> > > > > > > the parent device is added.  
-> > > > > >
-> > > > > > Having a pesistent config written out & then purged later is still
-> > > > > > problematic. If the host crashes, nothing will purge the config  
-> > file,  
-> > > > > > so it will become a persistent device. Also when listing devices we
-> > > > > > want to be able to report whether it is persistent or transient.  
-> > The  
-> > > > > > obvious way todo that is to simply look if a config file exists or
-> > > > > > not.  
-> > > > >
-> > > > > I was thinking that the config file would identify the device as
-> > > > > transient, therefore if the system crashed we'd have the opportunity  
-> > to  
-> > > > > purge those entries on the next boot as we're processing the entries
-> > > > > for that parent device.  Clearly it has yet to be implemented, but I
-> > > > > expect there are some advantages to tracking devices via a transient
-> > > > > config entry or else we're constantly re-discovering foreign mdevs.  
-> > > >
-> > > > I think we need to reach consensus about the actual scope of the
-> > > > mdevctl tool.
-> > > >
-> > > >  
-> > > Thanks Cornelia, my thoughts:
-> > >
-> > > - Is it supposed to be responsible for managing *all* mdev devices in  
-> > > >   the system, or is it more supposed to be a convenience helper for
-> > > >   users/software wanting to manage mdevs?
-> > > >  
-> > >
-> > > The latter. If an operator (or some software) wants to create mdevs by  
-> > not  
-> > > using mdevctl (and rather directly calling the sysfs), I think it's OK.
-> > > That said, mdevs created by mdevctl would be supported by systemctl,  
-> > while  
-> > > the others not but I think it's okay.  
-> >
-> > I agree (sort of), and I'm hearing that we should drop any sort of
-> > automatic persistence of mdevs created outside of mdevctl.  The problem
-> > comes when we try to draw the line between unmanaged and manged
-> > devices.  For instance, if we have a command to list mdevs it would
-> > feel incomplete if it didn't list all mdevs both those managed by
-> > mdevctl and those created elsewhere.  For managed devices, I expect
-> > we'll also have commands that allow the mode of the device to be
-> > switched between transient, saved, and persistent.  Should a user then
-> > be allowed to promote an unmanaged device to one of these modes via the
-> > same command?  Should they be allowed to stop an unmanaged device
-> > through driverctl?  Through systemctl?  These all seem like reasonable
-> > things to do, so what then is the difference between transient and
-> > unmanaged mdev and is mdevctl therefore managing all mdevs, not just
-> > those it has created?
-> >
-> >  
-> Well, IMHO, mdevs created by mdevctl could all be persisted or transient
-> just by adding an option when calling mdevctl, like :
-> "mdevctl create-mdev [--transient] <uuid> <pci_id> <type>" where default
-> would be persisting the mdev.
-> 
-> For mdevs *not* created by mdevctl, then a usecase could be "I'd like to
-> ask mdevctl to manage mdevs I already created" and if so, a mdevctl command
-> like :
-> "mdevctl manage-mdev [--transient] <mdev_uuid>"
-> 
-> Of course, that would mean that when you list mdevs by "mdev list-all" you
-> wouldn't get mdevs managed by mdevctl.
-> Thoughts ?
+Please update commit log to make it not arm64 specific since this change
+affects other architectures as well. Other than that,
 
-Is there a missing 'not' in the previous sentence ("...wouldn't get
-mdevs *not* managed by mdevctl") or are you suggesting list-all is
-actually more like a list-foreign, or maybe list-unmanaged?  I think we
-want to provide an interface for a user to see all mdev devices,
-transient/{un}managed and defined so that they can make sense of
-available instances when we list the types.  Imagine an NVIDIA GRID
-environment which only supports heterogeneous mdev types per parent
-where unmanaged mdev instances exist.  The available instances fields
-when listing the types might show none available to create, but the mdev
-listing also shows none that have been created.  That's confusing.  So
-we need a way to list all mdevs, and you're even including a way to
-promote an unmanaged mdev to managed, so I think we're always managing
-all mdevs to some extent.  If we take Daniels suggestion that managed
-transient devices should have no on-disk config, then what does the
-following command actually do:
+Reviewed-by: Khalid Aziz <khalid.aziz@oracle.com>
 
-# mdevctl manage-mdev --transient <mdev_uuid>
 
-That would imply there's state that's not in a config file that
-differentiates this mdev from one created outside of mdevctl.  So all
-signs to me are pointing that there is not a clear separation of
-managed vs unmanaged devices.  Thanks,
+>  fs/namespace.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/fs/namespace.c b/fs/namespace.c
+> index b26778bdc236..2e85712a19ed 100644
+> --- a/fs/namespace.c
+> +++ b/fs/namespace.c
+> @@ -2993,7 +2993,7 @@ void *copy_mount_options(const void __user * data=
+)
+>  	 * the remainder of the page.
+>  	 */
+>  	/* copy_from_user cannot cross TASK_SIZE ! */
+> -	size =3D TASK_SIZE - (unsigned long)data;
+> +	size =3D TASK_SIZE - (unsigned long)untagged_addr(data);
+>  	if (size > PAGE_SIZE)
+>  		size =3D PAGE_SIZE;
+> =20
+>=20
 
-Alex
+
