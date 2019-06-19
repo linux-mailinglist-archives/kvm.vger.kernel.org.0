@@ -2,171 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A38F04C2D9
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2019 23:17:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D6554C3A8
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 00:33:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726246AbfFSVRs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jun 2019 17:17:48 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:55026 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726175AbfFSVRs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jun 2019 17:17:48 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JLAQvK157752;
-        Wed, 19 Jun 2019 21:17:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=dLcHinxAhc17xmJ4PH3I4zzI05fcUKqgiXIuoVoY4U4=;
- b=Kzi3AKHFHu/BOtu3/NgD5B+BlsWQLYC12Aj9iYe06lYUIIcMhpiv/8FdV8TH9Z57bCZn
- IBaFO7ose0FGUtIqL+v5tAB3fw+AcH6Qz2xHmFowyKeKuQ4tm1EIH2bwUe7OfI+H/DRc
- UwkJUPTHEhlQvTyCSH1f4nGx8iybk8Qy1Vrr5T3gMl2wlp4MkhbKZLqIGMhCXk4TVG54
- 9X67yZG+M3ET2/wi0Igf2Kom7w6AxVlxf0XC5wMWA+ARZbj067JA/8CBkjb4eEWT54GL
- 09gL986av6vrMI7yE512twqPKDV4G4Ow5uyoXgxhvF7cUb2cDkYz2K6NmqQ7dDKD/Mjf 7g== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 2t7809dqyr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Jun 2019 21:17:14 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JLGUDB022311;
-        Wed, 19 Jun 2019 21:17:14 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2t77yp2nsu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Jun 2019 21:17:13 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5JLH9EI014194;
-        Wed, 19 Jun 2019 21:17:09 GMT
-Received: from [10.141.197.71] (/10.141.197.71)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 19 Jun 2019 14:17:09 -0700
-Subject: Re: [Qemu-devel] [QEMU PATCH v4 06/10] linux-headers: i386: Modify
- struct kvm_nested_state to have explicit fields for data
-To:     Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
-Cc:     ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com,
-        dgilbert@redhat.com, pbonzini@redhat.com, rth@twiddle.net,
-        jmattson@google.com
-References: <20190619162140.133674-1-liran.alon@oracle.com>
- <20190619162140.133674-7-liran.alon@oracle.com>
-From:   Maran Wilson <maran.wilson@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <cc839d68-70f7-14f1-2313-fd8a8907b6d7@oracle.com>
-Date:   Wed, 19 Jun 2019 14:17:08 -0700
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1730626AbfFSWc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jun 2019 18:32:58 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:35970 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730182AbfFSWc6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jun 2019 18:32:58 -0400
+Received: by mail-io1-f68.google.com with SMTP id h6so506439ioh.3;
+        Wed, 19 Jun 2019 15:32:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:from:to:cc:date:message-id:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=7Bg82A9f7f4RunQMoMmcdR9mp3vDHwjyz3/uf1/B6Co=;
+        b=BUWIZKTclx11jnrux4XAhfYbZb9dSGSj1E/6bQvoHLxuhBPkUPu+YWpQ485Vs0fgH9
+         07d2hF9Ei42SbqfTz984tQe6vqxnkQskw3rVsNYEfHbaKnaapGBySK1QxiHzOTSkV97Y
+         6nBcXGDDUa6a3/FQJ75AFUZ8Tfqbp6W19XMBPKiy7uCayarvngTU14fVWpSfa9vbcxgq
+         itBs3i+QdUrBieBHvKaJFmqha5z4vfKkgEDoLx/lQq+jrJ9bUWhR/UDWckGSlqSqZ46R
+         5SNU3TaZX9oNwUrIneafyL+AqhBCgSHTL5ePKBzU0IIimsQwTAPNrEU9Z+BjjRxXXB4d
+         p6nQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:date:message-id:user-agent
+         :mime-version:content-transfer-encoding;
+        bh=7Bg82A9f7f4RunQMoMmcdR9mp3vDHwjyz3/uf1/B6Co=;
+        b=UtWEIBlx7k4gMxQ1hlhDzqLWN/e3Sf3fOYMbZavrRWhRLX4KGmipVt+4Nnq/vsmCWy
+         nzgo1Na601XlztFZQ+cUtD79dxp9MX8HV05Ad8RRYmJI63BsIUUqzLlXldFktnW+lVQi
+         1w3/8sx+7TJEitwqfzjzZAArnDFM9Nb6zPHaYf2FBWF51FtH4sy6FS8syWQ1eUCSNfyD
+         dSzH1dUalOetx/pOB/tgKDV+kd2YOUmPUVVgK1pQ1TtKJoAfvwriaO/xdwVeiTStrfDI
+         yIroWoviiwhTBVgRIoVoAlM5OzfFXuVCyKZ131+putwTtkZ3SPIq/ndC3pnVl6jdcmP3
+         Hveg==
+X-Gm-Message-State: APjAAAUwRPsBWeQyjz0ExJyQ0bYhd1zdgcj9cy74QxsjcgpcPhZKyzha
+        b9aa4QcOqkDTxgSGZlNpLh8=
+X-Google-Smtp-Source: APXvYqzc0qIqzB4wleX54UjkFOne7zbe/eiQNSOhbgTRX7xXVEA+CpQehXrV2IP+mVuZvNGNcBZyqg==
+X-Received: by 2002:a6b:7b09:: with SMTP id l9mr12963476iop.114.1560983577080;
+        Wed, 19 Jun 2019 15:32:57 -0700 (PDT)
+Received: from localhost.localdomain (50-126-100-225.drr01.csby.or.frontiernet.net. [50.126.100.225])
+        by smtp.gmail.com with ESMTPSA id e188sm21987403ioa.3.2019.06.19.15.32.55
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 19 Jun 2019 15:32:56 -0700 (PDT)
+Subject: [PATCH v1 0/6] mm / virtio: Provide support for paravirtual waste
+ page treatment
+From:   Alexander Duyck <alexander.duyck@gmail.com>
+To:     nitesh@redhat.com, kvm@vger.kernel.org, david@redhat.com,
+        mst@redhat.com, dave.hansen@intel.com,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org
+Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
+        konrad.wilk@oracle.com, lcapitulino@redhat.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
+Date:   Wed, 19 Jun 2019 15:32:54 -0700
+Message-ID: <20190619222922.1231.27432.stgit@localhost.localdomain>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-In-Reply-To: <20190619162140.133674-7-liran.alon@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906190174
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906190174
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/19/2019 9:21 AM, Liran Alon wrote:
-> Improve the KVM_{GET,SET}_NESTED_STATE structs by detailing the format
-> of VMX nested state data in a struct.
->
-> In order to avoid changing the ioctl values of
-> KVM_{GET,SET}_NESTED_STATE, there is a need to preserve
-> sizeof(struct kvm_nested_state). This is done by defining the data
-> struct as "data.vmx[0]". It was the most elegant way I found to
-> preserve struct size while still keeping struct readable and easy to
-> maintain. It does have a misfortunate side-effect that now it has to be
-> accessed as "data.vmx[0]" rather than just "data.vmx".
->
-> Because we are already modifying these structs, I also modified the
-> following:
-> * Define the "format" field values as macros.
-> * Rename vmcs_pa to vmcs12_pa for better readability.
->
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> ---
->   linux-headers/asm-x86/kvm.h | 33 ++++++++++++++++++++++-----------
->   1 file changed, 22 insertions(+), 11 deletions(-)
->
-> diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
-> index 7a0e64ccd6ff..6e7dd792e448 100644
-> --- a/linux-headers/asm-x86/kvm.h
-> +++ b/linux-headers/asm-x86/kvm.h
-> @@ -383,16 +383,26 @@ struct kvm_sync_regs {
->   #define KVM_X86_QUIRK_LAPIC_MMIO_HOLE	(1 << 2)
->   #define KVM_X86_QUIRK_OUT_7E_INC_RIP	(1 << 3)
->   
-> +#define KVM_STATE_NESTED_FORMAT_VMX	0
-> +#define KVM_STATE_NESTED_FORMAT_SVM	1
-> +
->   #define KVM_STATE_NESTED_GUEST_MODE	0x00000001
->   #define KVM_STATE_NESTED_RUN_PENDING	0x00000002
->   #define KVM_STATE_NESTED_EVMCS		0x00000004
->   
-> +#define KVM_STATE_NESTED_VMX_VMCS_SIZE	0x1000
-> +
->   #define KVM_STATE_NESTED_SMM_GUEST_MODE	0x00000001
->   #define KVM_STATE_NESTED_SMM_VMXON	0x00000002
->   
-> -struct kvm_vmx_nested_state {
-> +struct kvm_vmx_nested_state_data {
-> +	__u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
-> +	__u8 shadow_vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
-> +};
-> +
-> +struct kvm_vmx_nested_state_hdr {
->   	__u64 vmxon_pa;
-> -	__u64 vmcs_pa;
-> +	__u64 vmcs12_pa;
->   
->   	struct {
->   		__u16 flags;
-> @@ -401,24 +411,25 @@ struct kvm_vmx_nested_state {
->   
->   /* for KVM_CAP_NESTED_STATE */
->   struct kvm_nested_state {
-> -	/* KVM_STATE_* flags */
->   	__u16 flags;
-> -
-> -	/* 0 for VMX, 1 for SVM.  */
->   	__u16 format;
-> -
-> -	/* 128 for SVM, 128 + VMCS size for VMX.  */
->   	__u32 size;
->   
->   	union {
-> -		/* VMXON, VMCS */
-> -		struct kvm_vmx_nested_state vmx;
-> +		struct kvm_vmx_nested_state_hdr vmx;
->   
->   		/* Pad the header to 128 bytes.  */
->   		__u8 pad[120];
-> -	};
-> +	} hdr;
->   
-> -	__u8 data[0];
-> +	/*
-> +	 * Define data region as 0 bytes to preserve backwards-compatability
-> +	 * to old definition of kvm_nested_state in order to avoid changing
-> +	 * KVM_{GET,PUT}_NESTED_STATE ioctl values.
-> +	 */
-> +	union {
-> +		struct kvm_vmx_nested_state_data vmx[0];
-> +	} data;
->   };
->   
->   #endif /* _ASM_X86_KVM_H */
+This series provides an asynchronous means of hinting to a hypervisor
+that a guest page is no longer in use and can have the data associated
+with it dropped. To do this I have implemented functionality that allows
+for what I am referring to as waste page treatment.
 
-Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
+I have based many of the terms and functionality off of waste water
+treatment, the idea for the similarity occurred to me after I had reached
+the point of referring to the hints as "bubbles", as the hints used the
+same approach as the balloon functionality but would disappear if they
+were touched, as a result I started to think of the virtio device as an
+aerator. The general idea with all of this is that the guest should be
+treating the unused pages so that when they end up heading "downstream"
+to either another guest, or back at the host they will not need to be
+written to swap.
 
-Thanks,
--Maran
+When the number of "dirty" pages in a given free_area exceeds our high
+water mark, which is currently 32, we will schedule the aeration task to
+start going through and scrubbing the zone. While the scrubbing is taking
+place a boundary will be defined that we use to seperate the "aerated"
+pages from the "dirty" ones. We use the ZONE_AERATION_ACTIVE bit to flag
+when these boundaries are in place.
+
+I am leaving a number of things hard-coded such as limiting the lowest
+order processed to PAGEBLOCK_ORDER, and have left it up to the guest to
+determine what batch size it wants to allocate to process the hints.
+
+My primary testing has just been to verify the memory is being freed after
+allocation by running memhog 32g in the guest and watching the total free
+memory via /proc/meminfo on the host. With this I have verified most of
+the memory is freed after each iteration. As far as performance I have
+been mainly focusing on the will-it-scale/page_fault1 test running with
+16 vcpus. With that I have seen a less than 1% difference between the
+base kernel without these patches, with the patches and virtio-balloon
+disabled, and with the patches and virtio-balloon enabled with hinting.
+
+Changes from the RFC:
+Moved aeration requested flag out of aerator and into zone->flags.
+Moved boundary out of free_area and into local variables for aeration.
+Moved aeration cycle out of interrupt and into workqueue.
+Left nr_free as total pages instead of splitting it between raw and aerated.
+Combined size and physical address values in virtio ring into one 64b value.
+Restructured the patch set to reduce patches from 11 to 6.
+
+---
+
+Alexander Duyck (6):
+      mm: Adjust shuffle code to allow for future coalescing
+      mm: Move set/get_pcppage_migratetype to mmzone.h
+      mm: Use zone and order instead of free area in free_list manipulators
+      mm: Introduce "aerated" pages
+      mm: Add logic for separating "aerated" pages from "raw" pages
+      virtio-balloon: Add support for aerating memory via hinting
+
+
+ drivers/virtio/Kconfig              |    1 
+ drivers/virtio/virtio_balloon.c     |  110 ++++++++++++++
+ include/linux/memory_aeration.h     |  118 +++++++++++++++
+ include/linux/mmzone.h              |  113 +++++++++------
+ include/linux/page-flags.h          |    8 +
+ include/uapi/linux/virtio_balloon.h |    1 
+ mm/Kconfig                          |    5 +
+ mm/Makefile                         |    1 
+ mm/aeration.c                       |  270 +++++++++++++++++++++++++++++++++++
+ mm/page_alloc.c                     |  203 ++++++++++++++++++--------
+ mm/shuffle.c                        |   24 ---
+ mm/shuffle.h                        |   35 +++++
+ 12 files changed, 753 insertions(+), 136 deletions(-)
+ create mode 100644 include/linux/memory_aeration.h
+ create mode 100644 mm/aeration.c
+
+--
