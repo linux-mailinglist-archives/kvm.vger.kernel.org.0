@@ -2,136 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 318724D147
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 17:03:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FC934D1B5
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 17:09:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726773AbfFTPDQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 11:03:16 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:33276 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726661AbfFTPDQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 11:03:16 -0400
-Received: by mail-lj1-f194.google.com with SMTP id h10so3059513ljg.0
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2019 08:03:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qryYQIYqaMfgDNI3Y3pI3bEMZbqg5pRsTzyVnBW4EqU=;
-        b=hQMjcL9ckVxrJdvB0CYXcoLXWH9j1HQg6pzkGu6LeZrhpipQT2rt49fQIot/k7JhTL
-         9ZOSXBM8eJnpjECyUlOX4O15Ea1+EfA6uIMuJWEDzQzHpsXy9e21rTZl3i95lKHM+rmj
-         f15MIoikl82NOlRVTbfzUYoW9i/l4OQlvgyvtcPcfOJduLPPh0YycxMlht4yqzCq4bY1
-         tD9om5caof4GhwO6+16lY0t7g448iP6a1yJIeG79L/IDl9ajXj2U26hA6p6RSp6fk1nn
-         f1FbZWzeXyS7dgfz4ZkvGuo89vasKvB7sr0t1GSvWfwJCbMJ1Nt/yZNgwipuSWVV8KC/
-         oNJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qryYQIYqaMfgDNI3Y3pI3bEMZbqg5pRsTzyVnBW4EqU=;
-        b=VWolu/McScLE22cRtmz6PE55qEuUE/rgTM5A+MQ8EgNWnvccmz4zpcYL6o/VYKpOrm
-         3UEYzSqViJKbTblzmMoq5Gz2uS97tFiQoAG90XgVBYkiIuomgxtI0eqmwUpbRFi8YaH6
-         c2NR//503pixzucuZaCV76zZb7ckbqaHUBJvLqcSO9wAu3Y8pJYCRJV+PfthnfExrodU
-         LM1SHH3JsCgue47vCqeWXonyx9WQ0/Z4XZLQsY8GPSB+fOTdsDCJBjhsT/2u0tD709GI
-         Z262nD9Zq33GUe9TBoZ8uAkcLh/aOVI3XB+TAffJyhMSSpk8VRpCRWiFmH72lCEk0d2l
-         e1MQ==
-X-Gm-Message-State: APjAAAUJLoeczoUmY+zcQoN31Pb06OzBwfKpTi3Xh4otB6Y/Iy3IzTPM
-        uIagSu3O7VsjE6sLw2zgaYAqv7ILcVU6OwbnVcwZTw==
-X-Google-Smtp-Source: APXvYqwl5JIwBn/FSQ+ub94PXOTWAYkrFFxIEBKya32ZhaEpDaNrLtS3w4wS+0aqV9RxsktQrstnDfVv4LjUSUlqk3s=
-X-Received: by 2002:a2e:8681:: with SMTP id l1mr12696891lji.166.1561042994060;
- Thu, 20 Jun 2019 08:03:14 -0700 (PDT)
+        id S1731940AbfFTPJo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jun 2019 11:09:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51114 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726675AbfFTPJo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jun 2019 11:09:44 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 44F243082140;
+        Thu, 20 Jun 2019 15:09:44 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3279419C5B;
+        Thu, 20 Jun 2019 15:09:39 +0000 (UTC)
+Date:   Thu, 20 Jun 2019 17:09:34 +0200
+From:   Igor Mammedov <imammedo@redhat.com>
+To:     gengdongjiu <gengdongjiu@huawei.com>
+Cc:     <pbonzini@redhat.com>, <mst@redhat.com>,
+        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
+        <lersek@redhat.com>, <james.morse@arm.com>, <mtosatti@redhat.com>,
+        <rth@twiddle.net>, <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
+        <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
+        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v17 02/10] ACPI: add some GHES structures
+ and macros definition
+Message-ID: <20190620170934.39eae310@redhat.com>
+In-Reply-To: <f4f94ecb-200c-3e18-1a09-5fb6bc761834@huawei.com>
+References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
+        <1557832703-42620-3-git-send-email-gengdongjiu@huawei.com>
+        <20190620141052.370788fb@redhat.com>
+        <f4f94ecb-200c-3e18-1a09-5fb6bc761834@huawei.com>
 MIME-Version: 1.0
-References: <20190521171358.158429-1-aaronlewis@google.com>
- <CAAAPnDH1eiZf-HkT2T8aDBBU_TKV7Md=EBQymq9FDMZ7e4__6g@mail.gmail.com>
- <CAAAPnDHg6Qmwwuh3wGNdTXQ3C4hpSJo9D5bvZG4yX9s48DeSLQ@mail.gmail.com> <63c62aa7-2dd1-f133-d8bc-c7a3528b7598@oracle.com>
-In-Reply-To: <63c62aa7-2dd1-f133-d8bc-c7a3528b7598@oracle.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Thu, 20 Jun 2019 08:03:02 -0700
-Message-ID: <CAAAPnDFSRbYMwNrbTe-n7efwwD5KZJd2GebYwjWKKhh9QhtmXQ@mail.gmail.com>
-Subject: Re: [PATCH] kvm: tests: Sort tests in the Makefile alphabetically
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
-        Marc Orr <marcorr@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Thu, 20 Jun 2019 15:09:44 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 18, 2019 at 12:47 PM Krish Sadhukhan
-<krish.sadhukhan@oracle.com> wrote:
->
->
->
-> On 06/18/2019 07:14 AM, Aaron Lewis wrote:
-> > On Fri, May 31, 2019 at 9:37 AM Aaron Lewis <aaronlewis@google.com> wrote:
-> >> On Tue, May 21, 2019 at 10:14 AM Aaron Lewis <aaronlewis@google.com> wrote:
-> >>> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> >>> Reviewed-by: Peter Shier <pshier@google.com>
-> >>> ---
-> >>>   tools/testing/selftests/kvm/Makefile | 20 ++++++++++----------
-> >>>   1 file changed, 10 insertions(+), 10 deletions(-)
-> >>>
-> >>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> >>> index 79c524395ebe..234f679fa5ad 100644
-> >>> --- a/tools/testing/selftests/kvm/Makefile
-> >>> +++ b/tools/testing/selftests/kvm/Makefile
-> >>> @@ -10,23 +10,23 @@ LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/ucall.c lib/sparsebi
-> >>>   LIBKVM_x86_64 = lib/x86_64/processor.c lib/x86_64/vmx.c
-> >>>   LIBKVM_aarch64 = lib/aarch64/processor.c
-> >>>
-> >>> -TEST_GEN_PROGS_x86_64 = x86_64/platform_info_test
-> >>> -TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
-> >>> -TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
-> >>> -TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
-> >>> -TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
-> >>> -TEST_GEN_PROGS_x86_64 += x86_64/state_test
-> >>> +TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
-> >>>   TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
-> >>>   TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
-> >>> -TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
-> >>> -TEST_GEN_PROGS_x86_64 += x86_64/smm_test
-> >>>   TEST_GEN_PROGS_x86_64 += x86_64/kvm_create_max_vcpus
-> >>> +TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
-> >>> +TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
-> >>> +TEST_GEN_PROGS_x86_64 += x86_64/smm_test
-> >>> +TEST_GEN_PROGS_x86_64 += x86_64/state_test
-> >>> +TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
-> >>> +TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
-> >>>   TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
-> >>> -TEST_GEN_PROGS_x86_64 += dirty_log_test
-> >>> +TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
-> >>>   TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
-> >>> +TEST_GEN_PROGS_x86_64 += dirty_log_test
->
-> May be, place the last two at the beginning if you are arranging them
-> alphabetically ?
+On Thu, 20 Jun 2019 22:04:01 +0800
+gengdongjiu <gengdongjiu@huawei.com> wrote:
 
-The original scheme had everything in x86_64 first then everything in
-the root folder second.  I wanted to maintain this scheme, so that's
-why it is sorted this way.
+> Hi Igor,
+>    Thanks for your review.
+> 
+> On 2019/6/20 20:10, Igor Mammedov wrote:
+> >> + */
+> >> +struct AcpiGenericErrorStatus {
+> >> +    /* It is a bitmask composed of ACPI_GEBS_xxx macros */
+> >> +    uint32_t block_status;
+> >> +    uint32_t raw_data_offset;
+> >> +    uint32_t raw_data_length;
+> >> +    uint32_t data_length;
+> >> +    uint32_t error_severity;
+> >> +} QEMU_PACKED;
+> >> +typedef struct AcpiGenericErrorStatus AcpiGenericErrorStatus;  
+> > there shouldn't be packed structures,
+> > is it a leftover from previous version?  
+> 
+> I remember some people suggest to add QEMU_PACKED before, anyway I will remove it in my next version patch.
 
->
-> >>>
-> >>> -TEST_GEN_PROGS_aarch64 += dirty_log_test
-> >>>   TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
-> >>> +TEST_GEN_PROGS_aarch64 += dirty_log_test
->
-> May be, put the aarch64 ones above the x86_64 ones to arrange them
-> alphabetically ?
+Question is why it's  there and where it is used?
 
-I want to make a minimal change, so sorting the tags isn't a priority,
-just the files.  The goal is to have a more predictable place to add
-new tests, and I think this helps.
+BTW:
+series doesn't apply to master anymore.
+Do you have a repo somewhere available for testing?
 
->
-> >>>
-> >>>   TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
-> >>>   LIBKVM += $(LIBKVM_$(UNAME_M))
-> >>> --
-> >>> 2.21.0.1020.gf2820cf01a-goog
-> >>>
-> >> Does this look okay?  It's just a simple reordering of the list.  It
-> >> helps when adding new tests.
-> > ping
->
+> 
+> >   
+> >> +
+> >> +/*
+> >> + * Masks for block_status flags above
+> >> + */
+> >> +#define ACPI_GEBS_UNCORRECTABLE         1
+> >> +
+> >> +/*  
+> 
+
