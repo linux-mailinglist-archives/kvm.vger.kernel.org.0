@@ -2,121 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 273F44C9B8
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 10:49:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D2E64C9FF
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 10:55:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731352AbfFTItH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 04:49:07 -0400
-Received: from mga12.intel.com ([192.55.52.136]:39500 "EHLO mga12.intel.com"
+        id S1731751AbfFTIzL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jun 2019 04:55:11 -0400
+Received: from mga09.intel.com ([134.134.136.24]:60921 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725966AbfFTItG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 04:49:06 -0400
+        id S1731736AbfFTIzJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jun 2019 04:55:09 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Jun 2019 01:49:06 -0700
-X-ExtLoop1: 1
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Jun 2019 01:55:09 -0700
 X-IronPort-AV: E=Sophos;i="5.63,396,1557212400"; 
-   d="scan'208";a="243566376"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
-  by orsmga001.jf.intel.com with ESMTP; 20 Jun 2019 01:49:03 -0700
-From:   Tao Xu <tao3.xu@intel.com>
-To:     pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        sean.j.christopherson@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        fenghua.yu@intel.com, xiaoyao.li@linux.intel.com,
-        jingqi.liu@intel.com, tao3.xu@intel.com
-Subject: [PATCH v5 3/3] KVM: vmx: handle vm-exit for UMWAIT and TPAUSE
-Date:   Thu, 20 Jun 2019 16:46:20 +0800
-Message-Id: <20190620084620.17974-4-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190620084620.17974-1-tao3.xu@intel.com>
-References: <20190620084620.17974-1-tao3.xu@intel.com>
+   d="scan'208";a="154057431"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.123]) ([10.239.13.123])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/AES256-SHA; 20 Jun 2019 01:55:07 -0700
+Subject: Re: [PATCH] KVM: vmx: Fix the broken usage of vmx_xsaves_supported
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <kernellwp@gmail.com>, Tao Xu <tao3.xu@intel.com>
+Cc:     Radim Krcmar <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <20190620050301.1149-1-tao3.xu@intel.com>
+ <CANRm+Cwg7ogTN1w=xNyn+8CfxwofdxRykULFe217pXidzEhh6Q@mail.gmail.com>
+ <f358c914-ae58-9889-a8ef-6ea9f3b2650e@linux.intel.com>
+ <b3f76acd-cc7e-9cd7-d7f7-404ba756ab87@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@linux.intel.com>
+Message-ID: <2032f811-b583-eca1-3ece-d1e95738ff64@linux.intel.com>
+Date:   Thu, 20 Jun 2019 16:55:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <b3f76acd-cc7e-9cd7-d7f7-404ba756ab87@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As the latest Intel 64 and IA-32 Architectures Software Developer's
-Manual, UMWAIT and TPAUSE instructions cause a VM exit if the
-RDTSC exiting and enable user wait and pause VM-execution
-controls are both 1.
+On 6/20/2019 4:17 PM, Paolo Bonzini wrote:
+> On 20/06/19 08:46, Xiaoyao Li wrote:
+>>>
+>>> It depends on whether or not processors support the 1-setting instead
+>>> of “enable XSAVES/XRSTORS” is 1 in VM-exection control field. Anyway,
+>>
+>> Yes, whether this field exist or not depends on whether processors
+>> support the 1-setting.
+>>
+>> But if "enable XSAVES/XRSTORS" is clear to 0, XSS_EXIT_BITMAP doesn't
+>> work. I think in this case, there is no need to set this vmcs field?
+> 
+> vmx->secondary_exec_control can change; you are making the code more
+> complex by relying on the value of the field at the point of vmx_vcpu_setup.
+> 
+At this point. Agreed. It's harmless to set a default value.
 
-This patch is to handle the vm-exit for UMWAIT and TPAUSE as this
-should never happen.
+> I do _think_ your version is incorrect, because at this point CPUID has
+> not been initialized yet and therefore
+> vmx_compute_secondary_exec_control has not set SECONDARY_EXEC_XSAVES.
 
-Co-developed-by: Jingqi Liu <jingqi.liu@intel.com>
-Signed-off-by: Jingqi Liu <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
----
+SECONDARY_EXEC_XSAVES is in the opt when setup_vmcs_config, and 
+vmx_compute_secondary_exec_control() is to clear SECONDARY_EXEC_XSAVES 
+based on guest cpuid.
 
-No changes in v5.
----
- arch/x86/include/uapi/asm/vmx.h |  6 +++++-
- arch/x86/kvm/vmx/vmx.c          | 16 ++++++++++++++++
- 2 files changed, 21 insertions(+), 1 deletion(-)
+> However I may be wrong because I didn't review the code very closely:
+> the old code is obvious and so there is no point in changing it.
 
-diff --git a/arch/x86/include/uapi/asm/vmx.h b/arch/x86/include/uapi/asm/vmx.h
-index d213ec5c3766..d88d7a68849b 100644
---- a/arch/x86/include/uapi/asm/vmx.h
-+++ b/arch/x86/include/uapi/asm/vmx.h
-@@ -85,6 +85,8 @@
- #define EXIT_REASON_PML_FULL            62
- #define EXIT_REASON_XSAVES              63
- #define EXIT_REASON_XRSTORS             64
-+#define EXIT_REASON_UMWAIT              67
-+#define EXIT_REASON_TPAUSE              68
- 
- #define VMX_EXIT_REASONS \
- 	{ EXIT_REASON_EXCEPTION_NMI,         "EXCEPTION_NMI" }, \
-@@ -142,7 +144,9 @@
- 	{ EXIT_REASON_RDSEED,                "RDSEED" }, \
- 	{ EXIT_REASON_PML_FULL,              "PML_FULL" }, \
- 	{ EXIT_REASON_XSAVES,                "XSAVES" }, \
--	{ EXIT_REASON_XRSTORS,               "XRSTORS" }
-+	{ EXIT_REASON_XRSTORS,               "XRSTORS" }, \
-+	{ EXIT_REASON_UMWAIT,                "UMWAIT" }, \
-+	{ EXIT_REASON_TPAUSE,                "TPAUSE" }
- 
- #define VMX_ABORT_SAVE_GUEST_MSR_FAIL        1
- #define VMX_ABORT_LOAD_HOST_PDPTE_FAIL       2
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 0fb55c8426e2..d9d4977195ef 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -5342,6 +5342,20 @@ static int handle_monitor(struct kvm_vcpu *vcpu)
- 	return handle_nop(vcpu);
- }
- 
-+static int handle_umwait(struct kvm_vcpu *vcpu)
-+{
-+	kvm_skip_emulated_instruction(vcpu);
-+	WARN(1, "this should never happen\n");
-+	return 1;
-+}
-+
-+static int handle_tpause(struct kvm_vcpu *vcpu)
-+{
-+	kvm_skip_emulated_instruction(vcpu);
-+	WARN(1, "this should never happen\n");
-+	return 1;
-+}
-+
- static int handle_invpcid(struct kvm_vcpu *vcpu)
- {
- 	u32 vmx_instruction_info;
-@@ -5552,6 +5566,8 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
- 	[EXIT_REASON_VMFUNC]		      = handle_vmx_instruction,
- 	[EXIT_REASON_PREEMPTION_TIMER]	      = handle_preemption_timer,
- 	[EXIT_REASON_ENCLS]		      = handle_encls,
-+	[EXIT_REASON_UMWAIT]                  = handle_umwait,
-+	[EXIT_REASON_TPAUSE]                  = handle_tpause,
- };
- 
- static const int kvm_vmx_max_exit_handlers =
--- 
-2.20.1
+you mean this part about XSS_EXIT_BITMAP? how about the other part in 
+vmx_set/get_msr() in this patch?
 
+> Paolo
+> 
