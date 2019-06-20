@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 91AC74CCC8
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 13:23:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 11DFA4CCC9
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 13:23:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726435AbfFTLXM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 07:23:12 -0400
-Received: from foss.arm.com ([217.140.110.172]:60526 "EHLO foss.arm.com"
+        id S1726562AbfFTLXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jun 2019 07:23:14 -0400
+Received: from foss.arm.com ([217.140.110.172]:60542 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726371AbfFTLXM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 07:23:12 -0400
+        id S1726371AbfFTLXN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jun 2019 07:23:13 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 26A53360;
-        Thu, 20 Jun 2019 04:23:11 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C7EA8C0A;
+        Thu, 20 Jun 2019 04:23:12 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A77BC3F718;
-        Thu, 20 Jun 2019 04:23:09 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 57FE23F718;
+        Thu, 20 Jun 2019 04:23:11 -0700 (PDT)
 From:   Marc Zyngier <marc.zyngier@arm.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
@@ -28,10 +28,12 @@ Cc:     Andrew Jones <drjones@redhat.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm fixes for 5.2-rc6
-Date:   Thu, 20 Jun 2019 12:22:57 +0100
-Message-Id: <20190620112301.138137-1-marc.zyngier@arm.com>
+Subject: [PATCH 1/4] KVM: arm64: Implement vq_present() as a macro
+Date:   Thu, 20 Jun 2019 12:22:58 +0100
+Message-Id: <20190620112301.138137-2-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190620112301.138137-1-marc.zyngier@arm.com>
+References: <20190620112301.138137-1-marc.zyngier@arm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -39,48 +41,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo, Radim,
+From: Viresh Kumar <viresh.kumar@linaro.org>
 
-Here's the second (and hopefully last) set of fixes for v5.2. We have
-our usual timer fix (we obviously will never get it right), a memory
-leak plug, a sysreg reporting fix, and an small SVE cleanup.
+This routine is a one-liner and doesn't really need to be function and
+can be implemented as a macro.
 
-Please pull.
+Suggested-by: Dave Martin <Dave.Martin@arm.com>
+Reviewed-by: Dave Martin <Dave.Martin@arm.com>
+Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/kvm/guest.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-	M.
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 3ae2f82fca46..ae734fcfd4ea 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -207,13 +207,7 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 
+ #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
+ #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
+-
+-static bool vq_present(
+-	const u64 (*const vqs)[KVM_ARM64_SVE_VLS_WORDS],
+-	unsigned int vq)
+-{
+-	return (*vqs)[vq_word(vq)] & vq_mask(vq);
+-}
++#define vq_present(vqs, vq) ((vqs)[vq_word(vq)] & vq_mask(vq))
+ 
+ static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ {
+@@ -258,7 +252,7 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 
+ 	max_vq = 0;
+ 	for (vq = SVE_VQ_MIN; vq <= SVE_VQ_MAX; ++vq)
+-		if (vq_present(&vqs, vq))
++		if (vq_present(vqs, vq))
+ 			max_vq = vq;
+ 
+ 	if (max_vq > sve_vq_from_vl(kvm_sve_max_vl))
+@@ -272,7 +266,7 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 	 * maximum:
+ 	 */
+ 	for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
+-		if (vq_present(&vqs, vq) != sve_vq_available(vq))
++		if (vq_present(vqs, vq) != sve_vq_available(vq))
+ 			return -EINVAL;
+ 
+ 	/* Can't run with no vector lengths at all: */
+-- 
+2.20.1
 
-The following changes since commit 623e1528d4090bd1abaf93ec46f047dee9a6fb32:
-
-  KVM: arm/arm64: Move cc/it checks under hyp's Makefile to avoid instrumentation (2019-05-24 14:53:20 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-for-5.2-2
-
-for you to fetch changes up to e4e5a865e9a9e8e47ac1959b629e9f3ae3b062f2:
-
-  KVM: arm/arm64: Fix emulated ptimer irq injection (2019-06-19 15:47:52 +0100)
-
-----------------------------------------------------------------
-KVM/arm fixes for 5.2, take #2
-
-- SVE cleanup killing a warning with ancient GCC versions
-- Don't report non-existent system registers to userspace
-- Fix memory leak when freeing the vgic ITS
-- Properly lower the interrupt on the emulated physical timer
-
-----------------------------------------------------------------
-Andrew Jones (1):
-      KVM: arm/arm64: Fix emulated ptimer irq injection
-
-Dave Martin (2):
-      KVM: arm64: Filter out invalid core register IDs in KVM_GET_REG_LIST
-      KVM: arm/arm64: vgic: Fix kvm_device leak in vgic_its_destroy
-
-Viresh Kumar (1):
-      KVM: arm64: Implement vq_present() as a macro
-
- arch/arm64/kvm/guest.c       | 65 +++++++++++++++++++++++++++++---------------
- virt/kvm/arm/arch_timer.c    |  5 ++--
- virt/kvm/arm/vgic/vgic-its.c |  1 +
- 3 files changed, 47 insertions(+), 24 deletions(-)
