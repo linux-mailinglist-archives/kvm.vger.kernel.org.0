@@ -2,52 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B6894D017
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 16:12:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 318724D147
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 17:03:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726836AbfFTOMP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 10:12:15 -0400
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:33253 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726492AbfFTOMP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 10:12:15 -0400
-Received: by mail-lf1-f66.google.com with SMTP id y17so2579303lfe.0
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2019 07:12:13 -0700 (PDT)
+        id S1726773AbfFTPDQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jun 2019 11:03:16 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:33276 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726661AbfFTPDQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jun 2019 11:03:16 -0400
+Received: by mail-lj1-f194.google.com with SMTP id h10so3059513ljg.0
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2019 08:03:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=otUvfHvg+Bk2seJN6V8Qus82ERDSfjRBGSNzKYN/CdU=;
-        b=OAI8qFtmp0fcSi5cUpU1sX4LpKUtBSZXApTV3/Mtn45aUCnBWYSuUjYMhgccnnhkV7
-         5DJy0ogN7TVFgYl1/IAhdKvK5tFAznNWGajo9Wfof907pFH8+2NOG0bsM9LJhjuHVIQB
-         44vTNC46FDUF5fCuLn+Kpn/19Jd0/Av44TKu8n+6Rj9EoFMtAto4WFkbQrxm7yPsWoFS
-         V0zO3arwbcLn9FmYhU41/IVuPPpf4jYaDYt0NpWcxuMEXwgaALd/xbY/XJ/aoC96/388
-         MhLK0vqtUmSHLc4VKkkyQtlf20BmC7NnlftFp3P/0q/NOgDb35FE5ztIPE/59xys3Vjt
-         xqmQ==
+        bh=qryYQIYqaMfgDNI3Y3pI3bEMZbqg5pRsTzyVnBW4EqU=;
+        b=hQMjcL9ckVxrJdvB0CYXcoLXWH9j1HQg6pzkGu6LeZrhpipQT2rt49fQIot/k7JhTL
+         9ZOSXBM8eJnpjECyUlOX4O15Ea1+EfA6uIMuJWEDzQzHpsXy9e21rTZl3i95lKHM+rmj
+         f15MIoikl82NOlRVTbfzUYoW9i/l4OQlvgyvtcPcfOJduLPPh0YycxMlht4yqzCq4bY1
+         tD9om5caof4GhwO6+16lY0t7g448iP6a1yJIeG79L/IDl9ajXj2U26hA6p6RSp6fk1nn
+         f1FbZWzeXyS7dgfz4ZkvGuo89vasKvB7sr0t1GSvWfwJCbMJ1Nt/yZNgwipuSWVV8KC/
+         oNJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=otUvfHvg+Bk2seJN6V8Qus82ERDSfjRBGSNzKYN/CdU=;
-        b=cWyAD6f+fvFBcQCr+tb0d3K+GBfr9NRcgeOhbSuehKP2ZFKcmqUDl6DM0+kD1xkUJc
-         w4l/qrzvoyOH6vowe2UPL7BRHtMY429Hm5yylnNznFygxDnD/c9pZ9PFh1D65xAaSvj9
-         7Wb5oR0NJSAwWArzoaxWNqHvKtVLVkIXDltqbYeyxoaksM9SdJi/AxcSNnJLX9zmObdM
-         VWnG1++I2T2beVmZRosFIfTziqOb3lRCJBAs4BWzcaA2trH1HOdrLJKBVBLaM/Jp8WI3
-         xLbx6O1pVvfT9dHCyAlkWFG2iOjCRnEdSk2GBimQ+JbHe49YCvQbRg2ywJbwF1k7wp8G
-         zRbQ==
-X-Gm-Message-State: APjAAAUtRhLi7tomukWTL3HI/6XW67RBM5UGV2XPQQM6aFv2cO3OIAnb
-        W0avCiLyTBBV8CCR/JaeiGogdKPZBkQkm1nLB7Fs6Q==
-X-Google-Smtp-Source: APXvYqzo3/n6pqB+azu/rRHw1mV92FVbc/1PyZKl1qXKG4vqNtoDgnm76LOvcbhPCx7VTPjVKTDW7rc0vkWE+2NvXDs=
-X-Received: by 2002:ac2:48a5:: with SMTP id u5mr60053606lfg.62.1561039932586;
- Thu, 20 Jun 2019 07:12:12 -0700 (PDT)
+        bh=qryYQIYqaMfgDNI3Y3pI3bEMZbqg5pRsTzyVnBW4EqU=;
+        b=VWolu/McScLE22cRtmz6PE55qEuUE/rgTM5A+MQ8EgNWnvccmz4zpcYL6o/VYKpOrm
+         3UEYzSqViJKbTblzmMoq5Gz2uS97tFiQoAG90XgVBYkiIuomgxtI0eqmwUpbRFi8YaH6
+         c2NR//503pixzucuZaCV76zZb7ckbqaHUBJvLqcSO9wAu3Y8pJYCRJV+PfthnfExrodU
+         LM1SHH3JsCgue47vCqeWXonyx9WQ0/Z4XZLQsY8GPSB+fOTdsDCJBjhsT/2u0tD709GI
+         Z262nD9Zq33GUe9TBoZ8uAkcLh/aOVI3XB+TAffJyhMSSpk8VRpCRWiFmH72lCEk0d2l
+         e1MQ==
+X-Gm-Message-State: APjAAAUJLoeczoUmY+zcQoN31Pb06OzBwfKpTi3Xh4otB6Y/Iy3IzTPM
+        uIagSu3O7VsjE6sLw2zgaYAqv7ILcVU6OwbnVcwZTw==
+X-Google-Smtp-Source: APXvYqwl5JIwBn/FSQ+ub94PXOTWAYkrFFxIEBKya32ZhaEpDaNrLtS3w4wS+0aqV9RxsktQrstnDfVv4LjUSUlqk3s=
+X-Received: by 2002:a2e:8681:: with SMTP id l1mr12696891lji.166.1561042994060;
+ Thu, 20 Jun 2019 08:03:14 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190531141452.158909-1-aaronlewis@google.com>
- <CAAAPnDHLk=8SMKVy9-mPWWt2t+WX4xS+BKLQJox7vbnHwK50BA@mail.gmail.com> <4fdb4b8f-2c8e-c148-6f94-cb51d620a49b@oracle.com>
-In-Reply-To: <4fdb4b8f-2c8e-c148-6f94-cb51d620a49b@oracle.com>
+References: <20190521171358.158429-1-aaronlewis@google.com>
+ <CAAAPnDH1eiZf-HkT2T8aDBBU_TKV7Md=EBQymq9FDMZ7e4__6g@mail.gmail.com>
+ <CAAAPnDHg6Qmwwuh3wGNdTXQ3C4hpSJo9D5bvZG4yX9s48DeSLQ@mail.gmail.com> <63c62aa7-2dd1-f133-d8bc-c7a3528b7598@oracle.com>
+In-Reply-To: <63c62aa7-2dd1-f133-d8bc-c7a3528b7598@oracle.com>
 From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Thu, 20 Jun 2019 07:12:01 -0700
-Message-ID: <CAAAPnDERqGrYJoe4nUP9FefHGx4Wx=ioKiiSwBy0iimbvqwJLw@mail.gmail.com>
-Subject: Re: [PATCH] tests: kvm: Check for a kernel warning
+Date:   Thu, 20 Jun 2019 08:03:02 -0700
+Message-ID: <CAAAPnDFSRbYMwNrbTe-n7efwwD5KZJd2GebYwjWKKhh9QhtmXQ@mail.gmail.com>
+Subject: Re: [PATCH] kvm: tests: Sort tests in the Makefile alphabetically
 To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
 Cc:     Jim Mattson <jmattson@google.com>, Peter Shier <pshier@google.com>,
         Marc Orr <marcorr@google.com>, kvm@vger.kernel.org
@@ -57,300 +58,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 18, 2019 at 12:38 PM Krish Sadhukhan
+On Tue, Jun 18, 2019 at 12:47 PM Krish Sadhukhan
 <krish.sadhukhan@oracle.com> wrote:
 >
 >
 >
-> On 06/18/2019 07:13 AM, Aaron Lewis wrote:
-> > On Fri, May 31, 2019 at 7:14 AM Aaron Lewis <aaronlewis@google.com> wrote:
-> >> When running with /sys/module/kvm_intel/parameters/unrestricted_guest=N,
-> >> test that a kernel warning does not occur informing us that
-> >> vcpu->mmio_needed=1.  This can happen when KVM_RUN is called after a
-> >> triple fault.
-> >> This test was made to detect a bug that was reported by Syzkaller
-> >> (https://groups.google.com/forum/#!topic/syzkaller/lHfau8E3SOE) and
-> >> fixed with commit bbeac2830f4de ("KVM: X86: Fix residual mmio emulation
-> >> request to userspace").
-> >>
-> >> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> >> Reviewed-by: Jim Mattson <jmattson@google.com>
-> >> Reviewed-by: Peter Shier <pshier@google.com>
-> >> ---
-> >>   tools/testing/selftests/kvm/.gitignore        |   1 +
-> >>   tools/testing/selftests/kvm/Makefile          |   1 +
-> >>   .../testing/selftests/kvm/include/kvm_util.h  |   2 +
-> >>   .../selftests/kvm/include/x86_64/processor.h  |   2 +
-> >>   tools/testing/selftests/kvm/lib/kvm_util.c    |  36 +++++
-> >>   .../selftests/kvm/lib/x86_64/processor.c      |  16 +++
-> >>   .../selftests/kvm/x86_64/mmio_warning_test.c  | 126 ++++++++++++++++++
-> >>   7 files changed, 184 insertions(+)
-> >>   create mode 100644 tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-> >>
-> >> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-> >> index df1bf9230a74..41266af0d3dc 100644
-> >> --- a/tools/testing/selftests/kvm/.gitignore
-> >> +++ b/tools/testing/selftests/kvm/.gitignore
-> >> @@ -2,6 +2,7 @@
-> >>   /x86_64/evmcs_test
-> >>   /x86_64/hyperv_cpuid
-> >>   /x86_64/kvm_create_max_vcpus
-> >> +/x86_64/mmio_warning_test
-> >>   /x86_64/platform_info_test
-> >>   /x86_64/set_sregs_test
-> >>   /x86_64/smm_test
-> >> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> >> index 79c524395ebe..670b938f1049 100644
-> >> --- a/tools/testing/selftests/kvm/Makefile
-> >> +++ b/tools/testing/selftests/kvm/Makefile
-> >> @@ -22,6 +22,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
-> >>   TEST_GEN_PROGS_x86_64 += x86_64/smm_test
-> >>   TEST_GEN_PROGS_x86_64 += x86_64/kvm_create_max_vcpus
-> >>   TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
-> >> +TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
-> >>   TEST_GEN_PROGS_x86_64 += dirty_log_test
-> >>   TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
-> >>
-> >> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> >> index 8c6b9619797d..c5c427c86598 100644
-> >> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> >> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> >> @@ -137,6 +137,8 @@ struct kvm_vm *vm_create_default(uint32_t vcpuid, uint64_t extra_mem_size,
-> >>                                   void *guest_code);
-> >>   void vm_vcpu_add_default(struct kvm_vm *vm, uint32_t vcpuid, void *guest_code);
-> >>
-> >> +bool vm_is_unrestricted_guest(struct kvm_vm *vm);
-> >> +
-> >>   struct kvm_userspace_memory_region *
-> >>   kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
-> >>                                   uint64_t end);
-> >> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> >> index 6063d5b2f356..af4d26de32d1 100644
-> >> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> >> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> >> @@ -303,6 +303,8 @@ static inline unsigned long get_xmm(int n)
-> >>          return 0;
-> >>   }
-> >>
-> >> +bool is_intel_cpu(void);
-> >> +
-> >>   struct kvm_x86_state;
-> >>   struct kvm_x86_state *vcpu_save_state(struct kvm_vm *vm, uint32_t vcpuid);
-> >>   void vcpu_load_state(struct kvm_vm *vm, uint32_t vcpuid,
-> >> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> >> index e9113857f44e..b93b09ad9a11 100644
-> >> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> >> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> >> @@ -1584,3 +1584,39 @@ void *addr_gva2hva(struct kvm_vm *vm, vm_vaddr_t gva)
-> >>   {
-> >>          return addr_gpa2hva(vm, addr_gva2gpa(vm, gva));
-> >>   }
-> >> +
-> >> +/*
-> >> + * Is Unrestricted Guest
-> >> + *
-> >> + * Input Args:
-> >> + *   vm - Virtual Machine
-> >> + *
-> >> + * Output Args: None
-> >> + *
-> >> + * Return: True if the unrestricted guest is set to 'Y', otherwise return false.
-> >> + *
-> >> + * Check if the unrestricted guest flag is enabled.
-> >> + */
-> >> +bool vm_is_unrestricted_guest(struct kvm_vm *vm)
-> >> +{
-> >> +       char val = 'N';
-> >> +       size_t count;
-> >> +       FILE *f;
-> >> +
-> >> +       if (vm == NULL) {
-> >> +               /* Ensure that the KVM vendor-specific module is loaded. */
-> >> +               f = fopen(KVM_DEV_PATH, "r");
-> >> +               TEST_ASSERT(f != NULL, "Error in opening KVM dev file: %d",
-> >> +                           errno);
-> >> +               fclose(f);
-> >> +       }
-> >> +
-> >> +       f = fopen("/sys/module/kvm_intel/parameters/unrestricted_guest", "r");
-> >> +       if (f) {
-> >> +               count = fread(&val, sizeof(char), 1, f);
-> >> +               TEST_ASSERT(count == 1, "Unable to read from param file.");
-> >> +               fclose(f);
-> >> +       }
-> >> +
-> >> +       return val == 'Y';
-> >> +}
-> >> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> >> index dc7fae9fa424..bcc0e70e1856 100644
-> >> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> >> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> >> @@ -1139,3 +1139,19 @@ void vcpu_load_state(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_x86_state *s
-> >>                          r);
-> >>          }
-> >>   }
-> >> +
-> >> +bool is_intel_cpu(void)
-> >> +{
-> >> +       int eax, ebx, ecx, edx;
-> >> +       const uint32_t *chunk;
-> >> +       const int leaf = 0;
-> >> +
-> >> +       __asm__ __volatile__(
-> >> +               "cpuid"
-> >> +               : /* output */ "=a"(eax), "=b"(ebx),
-> >> +                 "=c"(ecx), "=d"(edx)
-> >> +               : /* input */ "0"(leaf), "2"(0));
-> >> +
-> >> +       chunk = (const uint32_t *)("GenuineIntel");
-> >> +       return (ebx == chunk[0] && edx == chunk[1] && ecx == chunk[2]);
-> >> +}
-> >> diff --git a/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c b/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-> >> new file mode 100644
-> >> index 000000000000..00bb97d76000
-> >> --- /dev/null
-> >> +++ b/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-> >> @@ -0,0 +1,126 @@
-> >> +/*
-> >> + * mmio_warning_test
-> >> + *
-> >> + * Copyright (C) 2019, Google LLC.
-> >> + *
-> >> + * This work is licensed under the terms of the GNU GPL, version 2.
-> >> + *
-> >> + * Test that we don't get a kernel warning when we call KVM_RUN after a
-> >> + * triple fault occurs.  To get the triple fault to occur we call KVM_RUN
-> >> + * on a VCPU that hasn't been properly setup.
-> >> + *
-> >> + */
-> >> +
-> >> +#define _GNU_SOURCE
-> >> +#include <fcntl.h>
-> >> +#include <kvm_util.h>
-> >> +#include <linux/kvm.h>
-> >> +#include <processor.h>
-> >> +#include <pthread.h>
-> >> +#include <stdio.h>
-> >> +#include <stdlib.h>
-> >> +#include <string.h>
-> >> +#include <sys/ioctl.h>
-> >> +#include <sys/mman.h>
-> >> +#include <sys/stat.h>
-> >> +#include <sys/types.h>
-> >> +#include <sys/wait.h>
-> >> +#include <test_util.h>
-> >> +#include <unistd.h>
-> >> +
-> >> +#define NTHREAD 4
-> >> +#define NPROCESS 5
-> >> +
-> >> +struct thread_context {
-> >> +       int kvmcpu;
-> >> +       struct kvm_run *run;
-> >> +};
-> >> +
-> >> +void *thr(void *arg)
-> >> +{
-> >> +       struct thread_context *tc = (struct thread_context *)arg;
-> >> +       int res;
-> >> +       int kvmcpu = tc->kvmcpu;
-> >> +       struct kvm_run *run = tc->run;
-> >> +
-> >> +       res = ioctl(kvmcpu, KVM_RUN, 0);
-> >> +       printf("ret1=%d exit_reason=%d suberror=%d\n",
-> >> +               res, run->exit_reason, run->internal.suberror);
-> >> +
-> >> +       return 0;
-> >> +}
-> >> +
-> >> +void test(void)
-> >> +{
-> >> +       int i, kvm, kvmvm, kvmcpu;
-> >> +       pthread_t th[NTHREAD];
-> >> +       struct kvm_run *run;
-> >> +       struct thread_context tc;
-> >> +
-> >> +       kvm = open("/dev/kvm", O_RDWR);
-> >> +       TEST_ASSERT(kvm != -1, "failed to open /dev/kvm");
-> >> +       kvmvm = ioctl(kvm, KVM_CREATE_VM, 0);
-> >> +       TEST_ASSERT(kvmvm != -1, "KVM_CREATE_VM failed");
-> >> +       kvmcpu = ioctl(kvmvm, KVM_CREATE_VCPU, 0);
-> >> +       TEST_ASSERT(kvmcpu != -1, "KVM_CREATE_VCPU failed");
-> >> +       run = (struct kvm_run *)mmap(0, 4096, PROT_READ|PROT_WRITE, MAP_SHARED,
-> >> +                                   kvmcpu, 0);
-> >> +       tc.kvmcpu = kvmcpu;
-> >> +       tc.run = run;
-> >> +       srand(getpid());
-> >> +       for (i = 0; i < NTHREAD; i++) {
-> >> +               pthread_create(&th[i], NULL, thr, (void *)(uintptr_t)&tc);
-> >> +               usleep(rand() % 10000);
-> >> +       }
-> >> +       for (i = 0; i < NTHREAD; i++)
-> >> +               pthread_join(th[i], NULL);
-> >> +}
-> >> +
-> >> +int get_warnings_count(void)
-> >> +{
-> >> +       int warnings;
-> >> +       FILE *f;
-> >> +
-> >> +       f = popen("dmesg | grep \"WARNING:\" | wc -l", "r");
-> >> +       fscanf(f, "%d", &warnings);
-> >> +       fclose(f);
-> >> +
-> >> +       return warnings;
-> >> +}
-> >> +
-> >> +int main(void)
-> >> +{
-> >> +       int warnings_before, warnings_after;
-> >> +
-> >> +       if (!is_intel_cpu()) {
-> >> +               printf("Must be run on an Intel CPU, skipping test\n");
-> >> +               exit(KSFT_SKIP);
-> >> +       }
-> >> +
-> >> +       if (vm_is_unrestricted_guest(NULL)) {
-> >> +               printf("Unrestricted guest must be disabled, skipping test\n");
-> >> +               exit(KSFT_SKIP);
-> >> +       }
-> >> +
-> >> +       warnings_before = get_warnings_count();
-> >> +
-> >> +       for (int i = 0; i < NPROCESS; ++i) {
-> >> +               int status;
-> >> +               int pid = fork();
-> >> +
-> >> +               if (pid < 0)
-> >> +                       exit(1);
-> >> +               if (pid == 0) {
-> >> +                       test();
-> >> +                       exit(0);
-> >> +               }
-> >> +               while (waitpid(pid, &status, __WALL) != pid)
-> >> +                       ;
-> >> +       }
-> >> +
-> >> +       warnings_after = get_warnings_count();
+> On 06/18/2019 07:14 AM, Aaron Lewis wrote:
+> > On Fri, May 31, 2019 at 9:37 AM Aaron Lewis <aaronlewis@google.com> wrote:
+> >> On Tue, May 21, 2019 at 10:14 AM Aaron Lewis <aaronlewis@google.com> wrote:
+> >>> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> >>> Reviewed-by: Peter Shier <pshier@google.com>
+> >>> ---
+> >>>   tools/testing/selftests/kvm/Makefile | 20 ++++++++++----------
+> >>>   1 file changed, 10 insertions(+), 10 deletions(-)
+> >>>
+> >>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> >>> index 79c524395ebe..234f679fa5ad 100644
+> >>> --- a/tools/testing/selftests/kvm/Makefile
+> >>> +++ b/tools/testing/selftests/kvm/Makefile
+> >>> @@ -10,23 +10,23 @@ LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/ucall.c lib/sparsebi
+> >>>   LIBKVM_x86_64 = lib/x86_64/processor.c lib/x86_64/vmx.c
+> >>>   LIBKVM_aarch64 = lib/aarch64/processor.c
+> >>>
+> >>> -TEST_GEN_PROGS_x86_64 = x86_64/platform_info_test
+> >>> -TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
+> >>> -TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
+> >>> -TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
+> >>> -TEST_GEN_PROGS_x86_64 += x86_64/cr4_cpuid_sync_test
+> >>> -TEST_GEN_PROGS_x86_64 += x86_64/state_test
+> >>> +TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
+> >>>   TEST_GEN_PROGS_x86_64 += x86_64/evmcs_test
+> >>>   TEST_GEN_PROGS_x86_64 += x86_64/hyperv_cpuid
+> >>> -TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
+> >>> -TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+> >>>   TEST_GEN_PROGS_x86_64 += x86_64/kvm_create_max_vcpus
+> >>> +TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
+> >>> +TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
+> >>> +TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+> >>> +TEST_GEN_PROGS_x86_64 += x86_64/state_test
+> >>> +TEST_GEN_PROGS_x86_64 += x86_64/sync_regs_test
+> >>> +TEST_GEN_PROGS_x86_64 += x86_64/vmx_close_while_nested_test
+> >>>   TEST_GEN_PROGS_x86_64 += x86_64/vmx_set_nested_state_test
+> >>> -TEST_GEN_PROGS_x86_64 += dirty_log_test
+> >>> +TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
+> >>>   TEST_GEN_PROGS_x86_64 += clear_dirty_log_test
+> >>> +TEST_GEN_PROGS_x86_64 += dirty_log_test
 >
-> Since you are grep'ing for the word "WARNING",  is there a possibility
-> that the test can detect a false positive based on Warnings generated
-> due to some other cause while it ran ?
+> May be, place the last two at the beginning if you are arranging them
+> alphabetically ?
+
+The original scheme had everything in x86_64 first then everything in
+the root folder second.  I wanted to maintain this scheme, so that's
+why it is sorted this way.
+
 >
+> >>>
+> >>> -TEST_GEN_PROGS_aarch64 += dirty_log_test
+> >>>   TEST_GEN_PROGS_aarch64 += clear_dirty_log_test
+> >>> +TEST_GEN_PROGS_aarch64 += dirty_log_test
+>
+> May be, put the aarch64 ones above the x86_64 ones to arrange them
+> alphabetically ?
 
-Yes, this is a possibility, however, it is still a warning and should
-still be dealt with.  We could special case the grep message to be
-more specific to the case we are dealing with here, but I'd prefer to
-keep it this way to alert on any warning.  That way other warnings,
-should they occur, are brought to our attention.
+I want to make a minimal change, so sorting the tags isn't a priority,
+just the files.  The goal is to have a more predictable place to add
+new tests, and I think this helps.
 
-> >> +       TEST_ASSERT(warnings_before == warnings_after,
-> >> +                  "Warnings found in kernel.  Run 'dmesg' to inspect them.");
-> >> +
-> >> +       return 0;
-> >> +}
-> >> --
-> >> 2.22.0.rc1.311.g5d7573a151-goog
-> >>
+>
+> >>>
+> >>>   TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
+> >>>   LIBKVM += $(LIBKVM_$(UNAME_M))
+> >>> --
+> >>> 2.21.0.1020.gf2820cf01a-goog
+> >>>
+> >> Does this look okay?  It's just a simple reordering of the list.  It
+> >> helps when adding new tests.
 > > ping
 >
