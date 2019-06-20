@@ -2,124 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EA254C439
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 01:53:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F9974C49A
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 02:51:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730068AbfFSXx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Jun 2019 19:53:58 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:40128 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726322AbfFSXx6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Jun 2019 19:53:58 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JNnZXI076903;
-        Wed, 19 Jun 2019 23:53:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=juZE9Qg2p6QoV0FADmXwZn45FspqngSNBEE+z0aiHAE=;
- b=n6+72eiI8B1UIGb08xvUPZz2XxuTbdrLFsVEu7FHkUN/7gz6NlvcDkqo8gKT8Ja5iZQR
- v4vxA8R2a0LmBkgn2H2+59zQ42SMhThbEmKzT45l4XXh7Xl+d2amHUF4TSe8dwCHjdHP
- oqAHvAYFeP3QwKiUAMIGs1JccBwH93PtCIL4k6+1FEuZ4Gt6K0i5e8CZMVK2tH2oiGVj
- SHHhF4ZmIfn3l0+n9umXuclcKMZaeIhgZIVP20Y3y5Jmu8PJfgh0orwz2ai6hZbN5Pwh
- C+1Xvr8N+1SY46SvJa4EGvAQgJFs8AJkKssrWg0FJ+P2PF3vltz49/PXbrFvzCnsL90X Iw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 2t7809e4bj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Jun 2019 23:53:04 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5JNpdDg106385;
-        Wed, 19 Jun 2019 23:53:03 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 2t77ync13w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Jun 2019 23:53:03 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5JNr1KK008938;
-        Wed, 19 Jun 2019 23:53:01 GMT
-Received: from [10.159.140.81] (/10.159.140.81)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 19 Jun 2019 16:53:01 -0700
-Subject: Re: [Qemu-devel] [QEMU PATCH v4 10/10] target/i386: kvm: Add nested
- migration blocker only when kernel lacks required capabilities
-To:     Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
-Cc:     ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com,
-        dgilbert@redhat.com, pbonzini@redhat.com, rth@twiddle.net,
-        jmattson@google.com
-References: <20190619162140.133674-1-liran.alon@oracle.com>
- <20190619162140.133674-11-liran.alon@oracle.com>
-From:   Maran Wilson <maran.wilson@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <5ae979fd-39e0-50e2-df53-c6f70f939dd2@oracle.com>
-Date:   Wed, 19 Jun 2019 16:52:59 -0700
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726705AbfFTAvO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Jun 2019 20:51:14 -0400
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:34832 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726072AbfFTAvO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Jun 2019 20:51:14 -0400
+Received: by mail-oi1-f193.google.com with SMTP id a127so848209oii.2;
+        Wed, 19 Jun 2019 17:51:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=O2Z3TaFkFdhHBnHs8vQwybNpADodYwyp1V3FBbvLHOs=;
+        b=gBHnC9wKfsQjLNlqWDrbhfdKLC5eqzWYGmWuFSjrewwVSKabzK7Tyubls5bNzg0+7J
+         HDK0zm1oczErhbJpXQT6soG4dNWYAWnFjUQvIRxlMjozSQrmrA9zEpw66ygmJO7I3d6R
+         k/MPjIuV1SkX6DkIXIK38ZNhHQdRjULWuksIVVBdC7jdRi9iuwbpFn3xKT4x6VCqceDj
+         B78Y3man1sDanou3NH1duf9Xm27Szki+nVOnDEi8KV0Jsv/uDX+Y33JyfnAPF2RAS7Bo
+         QMbojRivjFuEMecVo8XV+yeKqpP6EW/ufcV4ZWoPofuUxsnUYJNP5jyfuC29iCGDts9h
+         Adgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=O2Z3TaFkFdhHBnHs8vQwybNpADodYwyp1V3FBbvLHOs=;
+        b=V8Yk3Xbh6kGrqLK04NoJkQ2rTgl4rkMxaPxzbHTRXW2SPNuKj+ZRHpdS0dJASYamnp
+         C1K9WnTzHa73DVcVfkpKkUC0vkKmO1kpbmkg9cl/kO6hRwYtFLy+K3MOsWsXrFNWtUjr
+         lrDVLb8QhT2xJ8rlxzJRCRx5CPStHLdehYSC6U0BZ0N1dcCULnr/Qliqn0hpRNzRDo/2
+         VCCmprw1yovg4GljKfpQRkNsOI/k55CLscIBLWFZxIDlt88o6VTCTwXnH7HZcerfL7mn
+         2oNGNXXnE0N19Oy71CqmPEUq22XUvjNYGGpHMHSivlc03hhwPmQtpbZbaw12p3W+NewS
+         OzyQ==
+X-Gm-Message-State: APjAAAVkkSyJvZZsc3jfg9ddnSJ7U7tD5Ybpe1mwMf9yYk1AD/g0l6OF
+        pIk/FgJjL4NcgzEs73bCbbD85o92o4Q3Xf2+Nsbm99PZ
+X-Google-Smtp-Source: APXvYqyfKbiTIUPFcGi7oC4n2TKUY6yMwh9vzktDJIMFhZSzH0b4SeqUqwjyA12fZm0aMLqvNbZdZzjbVZ/viD5WQCU=
+X-Received: by 2002:aca:3dd7:: with SMTP id k206mr4408735oia.47.1560991873232;
+ Wed, 19 Jun 2019 17:51:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190619162140.133674-11-liran.alon@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906190193
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9293 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906190193
+References: <1560770687-23227-1-git-send-email-wanpengli@tencent.com>
+ <1560770687-23227-3-git-send-email-wanpengli@tencent.com> <20190618133541.GA3932@amt.cnet>
+ <CANRm+Cz0v1VfDaCCWX+5RzCusTV7g9Hwr+OLGDRijeyqFx=Kzw@mail.gmail.com> <20190619210346.GA13033@amt.cnet>
+In-Reply-To: <20190619210346.GA13033@amt.cnet>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Thu, 20 Jun 2019 08:52:27 +0800
+Message-ID: <CANRm+CytP4cvzYhM64opQdKgzrLtXUa4qxky_pDvVciQJd+WPw@mail.gmail.com>
+Subject: Re: [PATCH v4 2/5] KVM: LAPIC: inject lapic timer interrupt by posted interrupt
+To:     Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/19/2019 9:21 AM, Liran Alon wrote:
-> Previous commits have added support for migration of nested virtualization
-> workloads. This was done by utilising two new KVM capabilities:
-> KVM_CAP_NESTED_STATE and KVM_CAP_EXCEPTION_PAYLOAD. Both which are
-> required in order to correctly migrate such workloads.
+On Thu, 20 Jun 2019 at 05:04, Marcelo Tosatti <mtosatti@redhat.com> wrote:
 >
-> Therefore, change code to add a migration blocker for vCPUs exposed with
-> Intel VMX or AMD SVM in case one of these kernel capabilities is
-> missing.
+> Hi Li,
 >
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> ---
->   target/i386/kvm.c | 9 +++++++--
->   1 file changed, 7 insertions(+), 2 deletions(-)
+> On Wed, Jun 19, 2019 at 08:36:06AM +0800, Wanpeng Li wrote:
+> > On Tue, 18 Jun 2019 at 21:36, Marcelo Tosatti <mtosatti@redhat.com> wro=
+te:
+> > >
+> > > On Mon, Jun 17, 2019 at 07:24:44PM +0800, Wanpeng Li wrote:
+> > > > From: Wanpeng Li <wanpengli@tencent.com>
+> > > >
+> > > > Dedicated instances are currently disturbed by unnecessary jitter d=
+ue
+> > > > to the emulated lapic timers fire on the same pCPUs which vCPUs res=
+ident.
+> > > > There is no hardware virtual timer on Intel for guest like ARM. Bot=
+h
+> > > > programming timer in guest and the emulated timer fires incur vmexi=
+ts.
+> > > > This patch tries to avoid vmexit which is incurred by the emulated
+> > > > timer fires in dedicated instance scenario.
+> > > >
+> > > > When nohz_full is enabled in dedicated instances scenario, the emul=
+ated
+> > > > timers can be offload to the nearest busy housekeeping cpus since A=
+PICv
+> > > > is really common in recent years. The guest timer interrupt is inje=
+cted
+> > > > by posted-interrupt which is delivered by housekeeping cpu once the=
+ emulated
+> > > > timer fires.
+> > > >
+> > > > The host admin should fine tuned, e.g. dedicated instances scenario=
+ w/
+> > > > nohz_full cover the pCPUs which vCPUs resident, several pCPUs surpl=
+us
+> > > > for busy housekeeping, disable mwait/hlt/pause vmexits to keep in n=
+on-root
+> > > > mode, ~3% redis performance benefit can be observed on Skylake serv=
+er.
+> > > >
+> > > > w/o patch:
+> > > >
+> > > >             VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time =
+  Avg time
+> > > >
+> > > > EXTERNAL_INTERRUPT    42916    49.43%   39.30%   0.47us   106.09us =
+  0.71us ( +-   1.09% )
+> > > >
+> > > > w/ patch:
+> > > >
+> > > >             VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time =
+        Avg time
+> > > >
+> > > > EXTERNAL_INTERRUPT    6871     9.29%     2.96%   0.44us    57.88us =
+  0.72us ( +-   4.02% )
+> > > >
+> > > > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > > > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+> > > > Cc: Marcelo Tosatti <mtosatti@redhat.com>
+> > > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > > > ---
+> > > >  arch/x86/kvm/lapic.c            | 33 ++++++++++++++++++++++++++---=
+----
+> > > >  arch/x86/kvm/lapic.h            |  1 +
+> > > >  arch/x86/kvm/vmx/vmx.c          |  3 ++-
+> > > >  arch/x86/kvm/x86.c              |  5 +++++
+> > > >  arch/x86/kvm/x86.h              |  2 ++
+> > > >  include/linux/sched/isolation.h |  2 ++
+> > > >  kernel/sched/isolation.c        |  6 ++++++
+> > > >  7 files changed, 44 insertions(+), 8 deletions(-)
+> > > >
+> > > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > > > index 87ecb56..9ceeee5 100644
+> > > > --- a/arch/x86/kvm/lapic.c
+> > > > +++ b/arch/x86/kvm/lapic.c
+> > > > @@ -122,6 +122,13 @@ static inline u32 kvm_x2apic_id(struct kvm_lap=
+ic *apic)
+> > > >       return apic->vcpu->vcpu_id;
+> > > >  }
+> > > >
+> > > > +bool posted_interrupt_inject_timer(struct kvm_vcpu *vcpu)
+> > > > +{
+> > > > +     return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
+> > > > +             kvm_hlt_in_guest(vcpu->kvm);
+> > > > +}
+> > > > +EXPORT_SYMBOL_GPL(posted_interrupt_inject_timer);
+> > >
+> > > Paolo, can you explain the reasoning behind this?
+> > >
+> > > Should not be necessary...
+> >
+> > Here some new discussions:
+> > https://lkml.org/lkml/2019/6/13/1423
 >
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 99480a52ad33..a3d0fbed3b35 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1313,9 +1313,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
->                                     !!(c->ecx & CPUID_EXT_SMX);
->       }
->   
-> -    if (cpu_has_nested_virt(env) && !nested_virt_mig_blocker) {
-> +    if (cpu_has_nested_virt(env) && !nested_virt_mig_blocker &&
-> +        ((kvm_max_nested_state_length() <= 0) || !has_exception_payload)) {
->           error_setg(&nested_virt_mig_blocker,
-> -                   "Nested virtualization does not support live migration yet");
-> +                   "Kernel do not provide required capabilities for "
+> Not sure what this has to do with injecting timer
+> interrupts via posted interrupts ?
 
-s/do/does/
+Yeah, need more explain from Paolo! Ping Paolo,
 
-And with that change:
+>
+> > https://lkml.org/lkml/2019/6/13/1420
+>
+> Two things (unrelated to the above):
+>
+> 1) hrtimer_reprogram is unable to wakeup a remote vCPU, therefore
+> i believe execution of apic_timer_expired can be delayed.
+> Should wakeup the CPU which hosts apic_timer_expired.
+>
+>
+>         /*
+>          * If the timer is not on the current cpu, we cannot reprogram
+>          * the other cpus clock event device.
+>          */
+>         if (base->cpu_base !=3D cpu_base)
+>                 return;
 
-Reviewed-by: Maran Wilson <maran.wilson@oracle.com>
+If it is not the first expiring timer on the new target, we don't need
+to reprogram. It can't be the first expired timer on the new target
+since below:
 
-Thanks,
--Maran
+/*
+ * We switch the timer base to a power-optimized selected CPU target,
+ * if:
+ * - NO_HZ_COMMON is enabled
+ * - timer migration is enabled
+ * - the timer callback is not running
+ * - the timer is not the first expiring timer on the new target
+ *
+ * If one of the above requirements is not fulfilled we move the timer
+ * to the current CPU or leave it on the previously assigned CPU if
+ * the timer callback is currently running.
+ */
+static inline struct hrtimer_clock_base *
+switch_hrtimer_base(struct hrtimer *timer, struct hrtimer_clock_base *base,
+   int pinned)
 
+>
+> 2) Getting an oops when running cyclictest, debugging...
 
-> +                   "nested virtualization migration. "
-> +                   "(CAP_NESTED_STATE=%d, CAP_EXCEPTION_PAYLOAD=%d)",
-> +                   kvm_max_nested_state_length() > 0,
-> +                   has_exception_payload);
->           r = migrate_add_blocker(nested_virt_mig_blocker, &local_err);
->           if (local_err) {
->               error_report_err(local_err);
+Radim point out one issue in patch 5/5, not sure that is cause.
 
+Regards,
+Wanpeng Li
