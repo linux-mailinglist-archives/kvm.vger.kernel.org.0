@@ -2,121 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 51A7D4CD80
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 14:13:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 243E14CD82
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 14:14:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731724AbfFTMNi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 08:13:38 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:34603 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726874AbfFTMNi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 08:13:38 -0400
-Received: by mail-wr1-f66.google.com with SMTP id k11so2819487wrl.1;
-        Thu, 20 Jun 2019 05:13:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:subject:date:message-id;
-        bh=b6QfbK+zg+CntQ2YnFA9EsYYsbhSbAKbyatBLLsVS6o=;
-        b=E3VyLGyXBRciniccq2xfnnDJ3KEBTKwNxEIMDG8aeHSgCgrA4l/llxQuU9bNLgJ4IU
-         yBXGW13NFJS0AXY5AxC1J8UHqWdwXuqSK2EE0yj6CG23qHonx/8WatFfAJLzMjWuOGjb
-         O01hXtoIH8HBiEJ071hcaelr/8phQA6qymOmggqs5BRxSGPDhoOt8UwBf9pm99jnKMh5
-         LPq7FoEG0F8vsrHTr0+t8uZhENtc+IQH1EKdXgYywN865fOETmu0IEv/ez+L8z4hgIDv
-         np9aaSgdBDPuGJ0UmFmCBxT+nr9/cOk+QeNpUsa8ZTCsIAsVyfBvIgJ5ug7k7wlSvKFI
-         SYHg==
+        id S1731784AbfFTMOL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jun 2019 08:14:11 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:33391 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730886AbfFTMOL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jun 2019 08:14:11 -0400
+Received: by mail-wm1-f67.google.com with SMTP id h19so6794022wme.0
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2019 05:14:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:subject:date:message-id;
-        bh=b6QfbK+zg+CntQ2YnFA9EsYYsbhSbAKbyatBLLsVS6o=;
-        b=l/EeKOMcsZz7Tx1ixy7YrStqsb6aAgNNDqPtpFEJEvHqxXUh5K8G2QdXGskoNmDH5G
-         SJivsnyY+l4fGInCOiBZAzk8N9evJPtuDIg9IMxIQ8F5DjLwX2g7teF5l7cI7Q/qi2Xj
-         bf+cIqaS/Al+CYGdMOiDynvhc6uTkRXRdbe/Z3aEtMefSx7G6/hejiJJJmfwKevVqJKM
-         h7BBurB+Q8QNnEj3sobCx+CBnp1lLf7ROniwKa6sx3g2V50qcu032nuF2MbzSNUcyoE5
-         IQogq4UBDTxvDRKCb+7/hBIScX+fd9FNvgIZ8CYHwJx/RDFCCnXCkCIVyoT0YzvTXtC1
-         DoMg==
-X-Gm-Message-State: APjAAAWt8YolQIoLOboLnOWi2d7S52L/AKpsTNBOnAdC4AsnPBSYJVar
-        xfBKaqK+nh0ltK1u3o5Ti5ysDYIH
-X-Google-Smtp-Source: APXvYqz8eIsNCFktOotZ5v5T4ToB/P2JaF1GzsBr9KUGro69jplOWK8feo66DzLVbIhqZJaoccIdAw==
-X-Received: by 2002:adf:ed41:: with SMTP id u1mr44066764wro.162.1561032815742;
-        Thu, 20 Jun 2019 05:13:35 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id j4sm16720548wrx.57.2019.06.20.05.13.34
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 20 Jun 2019 05:13:35 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=j6RqlD3tjx4apx8Dop5hpUBnB0AsX4GUNp1imsaFEWU=;
+        b=ft7gQ3BGPXCHt+X/vgGmABVhYmoLHoz25BKE9LIHZAi6hCDeYahltHlvzJhwXoZFRX
+         AKdJ2paF9DdaVxDzvkFcgKGzXtfFEgGNnRqSvaa6e0pUNFFlrO5KW2LjZPSFvwBGlQ0v
+         Rau3lMOwJP+O0qfnwpKAIyAlksOMATzXsedwZLX/Tc2vF5dHVTmWFhCGRkB/ZXgouWsx
+         RAmXGb38SFUMYDjUwvF+4DEyYYM0QR/xuhrXsBiGTtnr2kQKrBm9H37gJmBhH8jb7BEe
+         k2TABheS0IZ95oCb0bZp1XZ20VZ0Hb5HoRxI4rUN+eXcNrmY880Ca1QpBL1CEq23ckbQ
+         ZL9g==
+X-Gm-Message-State: APjAAAXWGu1CC1+7AJyWdHHco1Ze0oqV0tLTrLmU4OgJHktBtkAW7eO0
+        M+OqwkZzydSLoZ5zb9yi1iCtiw==
+X-Google-Smtp-Source: APXvYqwqNN7z4fPCN4X79oZjI2lnVPj/ReOJhcvL+WrOsnOt4/UEvzaGwgwU76LsXJVRmVm2vDz7Eg==
+X-Received: by 2002:a05:600c:228b:: with SMTP id 11mr2745365wmf.26.1561032849420;
+        Thu, 20 Jun 2019 05:14:09 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7822:aa18:a9d8:39ab? ([2001:b07:6468:f312:7822:aa18:a9d8:39ab])
+        by smtp.gmail.com with ESMTPSA id h133sm2091970wme.28.2019.06.20.05.14.08
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 20 Jun 2019 05:14:08 -0700 (PDT)
+Subject: Re: [PATCH RFC 0/5] x86/KVM/svm: get rid of hardcoded instructions
+ lengths
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>
+References: <20190620110240.25799-1-vkuznets@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH] KVM: svm: add nrips module parameter
-Date:   Thu, 20 Jun 2019 14:13:33 +0200
-Message-Id: <1561032813-16698-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+Message-ID: <3515d812-e5dd-4436-b73f-1d64bc93b079@redhat.com>
+Date:   Thu, 20 Jun 2019 14:14:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190620110240.25799-1-vkuznets@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Allow testing code for old processors that lack the next RIP save
-feature, by disabling usage of the next_rip field.
+On 20/06/19 13:02, Vitaly Kuznetsov wrote:
+> 
+> P.S. If you'd like to test the series you'll have to have a CPU without
+> NRIP_SAVE feature or forcefully disable it, something like:
+> 
+> index 8d4e50428b68..93c7eaad7915 100644
+> --- a/arch/x86/kernel/cpu/amd.c
+> +++ b/arch/x86/kernel/cpu/amd.c
+> @@ -922,6 +922,9 @@ static void init_amd(struct cpuinfo_x86 *c)
+>         /* AMD CPUs don't reset SS attributes on SYSRET, Xen does. */
+>         if (!cpu_has(c, X86_FEATURE_XENPV))
+>                 set_cpu_bug(c, X86_BUG_SYSRET_SS_ATTRS);
+> +
+> +       /* No nrips */
+> +       clear_cpu_cap(c, X86_FEATURE_NRIPS);
+>  }
+>  
+>  #ifdef CONFIG_X86_32
 
-Nested hypervisors however get the feature unconditionally.
+Let's add a module parameter instead.  Patch sent (forgot to Cc you).
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/svm.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-index 735b8c01895e..fe046c13f03b 100644
---- a/arch/x86/kvm/svm.c
-+++ b/arch/x86/kvm/svm.c
-@@ -367,6 +367,10 @@ struct amd_svm_iommu_ir {
- module_param(avic, int, S_IRUGO);
- #endif
- 
-+/* enable/disable Next RIP Save */
-+static int nrips = true;
-+module_param(nrips, int, 0444);
-+
- /* enable/disable Virtual VMLOAD VMSAVE */
- static int vls = true;
- module_param(vls, int, 0444);
-@@ -773,7 +777,7 @@ static void skip_emulated_instruction(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
--	if (svm->vmcb->control.next_rip != 0) {
-+	if (nrips && svm->vmcb->control.next_rip != 0) {
- 		WARN_ON_ONCE(!static_cpu_has(X86_FEATURE_NRIPS));
- 		svm->next_rip = svm->vmcb->control.next_rip;
- 	}
-@@ -810,7 +814,7 @@ static void svm_queue_exception(struct kvm_vcpu *vcpu)
- 
- 	kvm_deliver_exception_payload(&svm->vcpu);
- 
--	if (nr == BP_VECTOR && !static_cpu_has(X86_FEATURE_NRIPS)) {
-+	if (nr == BP_VECTOR && !nrips) {
- 		unsigned long rip, old_rip = kvm_rip_read(&svm->vcpu);
- 
- 		/*
-@@ -1367,6 +1371,11 @@ static __init int svm_hardware_setup(void)
- 	} else
- 		kvm_disable_tdp();
- 
-+	if (nrips) {
-+		if (!boot_cpu_has(X86_FEATURE_NRIPS))
-+			nrips = false;
-+	}
-+
- 	if (avic) {
- 		if (!npt_enabled ||
- 		    !boot_cpu_has(X86_FEATURE_AVIC) ||
-@@ -3938,7 +3947,7 @@ static int rdpmc_interception(struct vcpu_svm *svm)
- {
- 	int err;
- 
--	if (!static_cpu_has(X86_FEATURE_NRIPS))
-+	if (!nrips)
- 		return emulate_on_interception(svm);
- 
- 	err = kvm_rdpmc(&svm->vcpu);
--- 
-1.8.3.1
-
+Paolo
