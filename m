@@ -2,138 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A6634CDB7
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 14:28:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A4194CDD2
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 14:38:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731736AbfFTM2i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 08:28:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40110 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731682AbfFTM2i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 08:28:38 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A6470301EA90;
-        Thu, 20 Jun 2019 12:28:26 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B572F608A7;
-        Thu, 20 Jun 2019 12:28:18 +0000 (UTC)
-Date:   Thu, 20 Jun 2019 14:28:14 +0200
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     Dongjiu Geng <gengdongjiu@huawei.com>
-Cc:     <pbonzini@redhat.com>, <mst@redhat.com>,
-        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
-        <lersek@redhat.com>, <james.morse@arm.com>, <mtosatti@redhat.com>,
-        <rth@twiddle.net>, <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
-        <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
-        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
-        <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
-Subject: Re: [PATCH v17 04/10] acpi: add build_append_ghes_generic_data()
- helper for Generic Error Data Entry
-Message-ID: <20190620142814.7caf9c3c@redhat.com>
-In-Reply-To: <1557832703-42620-5-git-send-email-gengdongjiu@huawei.com>
-References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
-        <1557832703-42620-5-git-send-email-gengdongjiu@huawei.com>
+        id S1726874AbfFTMiK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jun 2019 08:38:10 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:41094 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726238AbfFTMiK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jun 2019 08:38:10 -0400
+Received: by mail-wr1-f68.google.com with SMTP id c2so2853601wrm.8
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2019 05:38:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PBe9hQeFMayLD/0ZRDInVi5N4QsHohL3ze/iPL3VAN0=;
+        b=W/02szwKDeaZZYNBot3BzAgDp7M9sQr5ck77vndybF1i09lcfd/MHWtUWvi9bKjGdt
+         PaKApIEKG9NPErErDRJlgXgLcVpXP4SA9tZk4LGrds2D3RzbCw7KwSBxEg7TBR1Dpinc
+         r1nf8FMx9OLFXa07tCym6Z3FuKZZV+9X9huTony3zQRoX0kNOI3l3KK3eCurX7PNkp2k
+         UaN4X+N3N3pe5AP9LmZyjqECsZfnrMpkwOPTNCQ0hgfdMIXYSv8dcQ8zrpqeTAuS41MB
+         030gXhcmR/Bx39WFpETwmjq4H/U5XuvUyIoDuLE+uAvy9U9J/+AyiKJGfEwvvaFb1ygo
+         +hAw==
+X-Gm-Message-State: APjAAAWtV0LdCzjbn9kP3vAo01Xv3hTDvVy1uQ+Khy/UTwJ9jWOWwqJF
+        +hADhiLO4dPLzwXYxKoNmDRkjQ==
+X-Google-Smtp-Source: APXvYqy1Jw/TS72GgFtDeH8i1rM2d4XdyxY4oOs6mdaUyGtOWtneGJJdreyqFL2pxbg4xntCGufPBA==
+X-Received: by 2002:a5d:620f:: with SMTP id y15mr13438905wru.262.1561034287746;
+        Thu, 20 Jun 2019 05:38:07 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7822:aa18:a9d8:39ab? ([2001:b07:6468:f312:7822:aa18:a9d8:39ab])
+        by smtp.gmail.com with ESMTPSA id c17sm15734547wrv.82.2019.06.20.05.38.06
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 20 Jun 2019 05:38:07 -0700 (PDT)
+Subject: Re: [Qemu-devel] [QEMU PATCH v4 0/10]: target/i386: kvm: Add support
+ for save and restore of nested state
+To:     Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
+Cc:     ehabkost@redhat.com, kvm@vger.kernel.org, maran.wilson@oracle.com,
+        mtosatti@redhat.com, dgilbert@redhat.com, rth@twiddle.net,
+        jmattson@google.com
+References: <20190619162140.133674-1-liran.alon@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bcb617b1-7d20-d2ff-81c5-9f165eae5683@redhat.com>
+Date:   Thu, 20 Jun 2019 14:38:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190619162140.133674-1-liran.alon@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Thu, 20 Jun 2019 12:28:38 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 14 May 2019 04:18:17 -0700
-Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-
-> It will help to add Generic Error Data Entry to ACPI tables
-> without using packed C structures and avoid endianness
-> issues as API doesn't need explicit conversion.
+On 19/06/19 18:21, Liran Alon wrote:
+> Hi,
 > 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> ---
->  hw/acpi/aml-build.c         | 32 ++++++++++++++++++++++++++++++++
->  include/hw/acpi/aml-build.h |  6 ++++++
->  2 files changed, 38 insertions(+)
+> This series aims to add support for QEMU to be able to migrate VMs that
+> are running nested hypervisors. In order to do so, it utilizes the new
+> IOCTLs introduced in KVM commit 8fcc4b5923af ("kvm: nVMX: Introduce
+> KVM_CAP_NESTED_STATE") which was created for this purpose.
+
+Applied with just three minor changes that should be uncontroversial:
+
+> 6rd patch updates linux-headers to have updated struct kvm_nested_state.
+> The updated struct now have explicit fields for the data portion.
+
+Changed patch title to "linux-headers: sync with latest KVM headers from
+Linux 5.2"
+
+> 7rd patch add vmstate support for saving/restoring kernel integer types (e.g. __u16).
 > 
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index fb53f21..102a288 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -296,6 +296,38 @@ void build_append_ghes_notify(GArray *table, const uint8_t type,
->          build_append_int_noprefix(table, error_threshold_window, 4);
->  }
->  
-> +/* Generic Error Data Entry
-> + * ACPI 4.0: 17.3.2.6.1 Generic Error Data
-> + */
-> +void build_append_ghes_generic_data(GArray *table, const char *section_type,
-s/build_append_ghes_generic_data/build_append_ghes_generic_error_data/
+> 8th patch adds support for saving and restoring nested state in order to migrate
+> guests which run a nested hypervisor.
 
-> +                                    uint32_t error_severity, uint16_t revision,
-> +                                    uint8_t validation_bits, uint8_t flags,
-> +                                    uint32_t error_data_length, uint8_t *fru_id,
-> +                                    uint8_t *fru_text, uint64_t time_stamp)
-checkpatch probably will complain due to too long lines
-you can use:
-void build_append_ghe...
-         uint32_t error_severity, uint16_t revision,
-         ...
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index e924663f32..f3cf6e1b27 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1671,10 +1671,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
+             struct kvm_vmx_nested_state_hdr *vmx_hdr =
+                 &env->nested_state->hdr.vmx;
 
-> +{
-> +    int i;
-> +
-> +    for (i = 0; i < 16; i++) {
-> +        build_append_int_noprefix(table, section_type[i], 1);
-                                            ^^^
-use QemuUUID instead, see vmgenid_build_acpi
++            env->nested_state->format = KVM_STATE_NESTED_FORMAT_VMX;
+             vmx_hdr->vmxon_pa = -1ull;
+             vmx_hdr->vmcs12_pa = -1ull;
+         }
+-
+     }
 
-> +    }
-> +
-> +    build_append_int_noprefix(table, error_severity, 4);
-> +    build_append_int_noprefix(table, revision, 2);
-> +    build_append_int_noprefix(table, validation_bits, 1);
-> +    build_append_int_noprefix(table, flags, 1);
-> +    build_append_int_noprefix(table, error_data_length, 4);
-> +
-> +    for (i = 0; i < 16; i++) {
-> +        build_append_int_noprefix(table, fru_id[i], 1);
-same as section_type
+     cpu->kvm_msr_buf = g_malloc0(MSR_BUF_SIZE);
 
-> +    }
-> +
-> +    for (i = 0; i < 20; i++) {
-> +        build_append_int_noprefix(table, fru_text[i], 1);
-> +    }
-instead of loop use g_array_insert_vals()
+which is a no-op since KVM_STATE_NESTED_FORMAT_VMX is zero, but it's tidy.
 
-> +
-> +    build_append_int_noprefix(table, time_stamp, 8);
-that's not part of 'Table 17-13'
-where does it come from?
+> 9th patch add support for KVM_CAP_EXCEPTION_PAYLOAD. This new KVM capability
+> allows userspace to properly distingiush between pending and injecting exceptions.
+> 
+> 10th patch changes the nested virtualization migration blocker to only
+> be added when kernel lack support for one of the capabilities required
+> for correct nested migration. i.e. Either KVM_CAP_NESTED_STATE or
+> KVM_CAP_EXCEPTION_PAYLOAD.
 
-> +}
-> +
->  /*
->   * Build NAME(XXXX, 0x00000000) where 0x00000000 is encoded as a dword,
->   * and return the offset to 0x00000000 for runtime patching.
-> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> index 90c8ef8..a71db2f 100644
-> --- a/include/hw/acpi/aml-build.h
-> +++ b/include/hw/acpi/aml-build.h
-> @@ -419,6 +419,12 @@ void build_append_ghes_notify(GArray *table, const uint8_t type,
->                                uint32_t error_threshold_value,
->                                uint32_t error_threshold_window);
->  
-> +void build_append_ghes_generic_data(GArray *table, const char *section_type,
-> +                                    uint32_t error_severity, uint16_t revision,
-> +                                    uint8_t validation_bits, uint8_t flags,
-> +                                    uint32_t error_data_length, uint8_t *fru_id,
-> +                                    uint8_t *fru_text, uint64_t time_stamp);
-> +
->  void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
->                         uint64_t len, int node, MemoryAffinityFlags flags);
->  
-
+Had to disable this for SVM unfortunately.
