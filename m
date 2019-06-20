@@ -2,87 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FC934D1B5
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 17:09:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C4FDF4D1B6
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 17:09:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731940AbfFTPJo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 11:09:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51114 "EHLO mx1.redhat.com"
+        id S1732054AbfFTPJq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jun 2019 11:09:46 -0400
+Received: from mga11.intel.com ([192.55.52.93]:54938 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726675AbfFTPJo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 11:09:44 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 44F243082140;
-        Thu, 20 Jun 2019 15:09:44 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3279419C5B;
-        Thu, 20 Jun 2019 15:09:39 +0000 (UTC)
-Date:   Thu, 20 Jun 2019 17:09:34 +0200
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     gengdongjiu <gengdongjiu@huawei.com>
-Cc:     <pbonzini@redhat.com>, <mst@redhat.com>,
-        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
-        <lersek@redhat.com>, <james.morse@arm.com>, <mtosatti@redhat.com>,
-        <rth@twiddle.net>, <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
-        <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
-        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
-        <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v17 02/10] ACPI: add some GHES structures
- and macros definition
-Message-ID: <20190620170934.39eae310@redhat.com>
-In-Reply-To: <f4f94ecb-200c-3e18-1a09-5fb6bc761834@huawei.com>
-References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
-        <1557832703-42620-3-git-send-email-gengdongjiu@huawei.com>
-        <20190620141052.370788fb@redhat.com>
-        <f4f94ecb-200c-3e18-1a09-5fb6bc761834@huawei.com>
+        id S1726675AbfFTPJq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jun 2019 11:09:46 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Jun 2019 08:09:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,397,1557212400"; 
+   d="scan'208";a="186834808"
+Received: from liujing-mobl.ccr.corp.intel.com (HELO [10.255.31.204]) ([10.255.31.204])
+  by fmsmga002.fm.intel.com with ESMTP; 20 Jun 2019 08:09:42 -0700
+Subject: Re: [PATCH RFC] kvm: x86: Expose AVX512_BF16 feature to guest
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, jing2.liu@intel.com
+References: <1561029712-11848-1-git-send-email-jing2.liu@linux.intel.com>
+ <1561029712-11848-2-git-send-email-jing2.liu@linux.intel.com>
+ <fd861e94-3ea5-3976-9855-05375f869f00@redhat.com>
+From:   "Liu, Jing2" <jing2.liu@linux.intel.com>
+Message-ID: <384bc07d-6105-d380-cd44-4518870c15f1@linux.intel.com>
+Date:   Thu, 20 Jun 2019 23:09:42 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <fd861e94-3ea5-3976-9855-05375f869f00@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Thu, 20 Jun 2019 15:09:44 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 20 Jun 2019 22:04:01 +0800
-gengdongjiu <gengdongjiu@huawei.com> wrote:
+Hi Paolo,
 
-> Hi Igor,
->    Thanks for your review.
+On 6/20/2019 8:16 PM, Paolo Bonzini wrote:
+> On 20/06/19 13:21, Jing Liu wrote:
+>> +		for (i = 1; i <= times; i++) {
+>> +			if (*nent >= maxnent)
+>> +				goto out;
+>> +			do_cpuid_1_ent(&entry[i], function, i);
+>> +			entry[i].eax &= F(AVX512_BF16);
+>> +			entry[i].ebx = 0;
+>> +			entry[i].ecx = 0;
+>> +			entry[i].edx = 0;
+>> +			entry[i].flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+>> +			++*nent;
 > 
-> On 2019/6/20 20:10, Igor Mammedov wrote:
-> >> + */
-> >> +struct AcpiGenericErrorStatus {
-> >> +    /* It is a bitmask composed of ACPI_GEBS_xxx macros */
-> >> +    uint32_t block_status;
-> >> +    uint32_t raw_data_offset;
-> >> +    uint32_t raw_data_length;
-> >> +    uint32_t data_length;
-> >> +    uint32_t error_severity;
-> >> +} QEMU_PACKED;
-> >> +typedef struct AcpiGenericErrorStatus AcpiGenericErrorStatus;  
-> > there shouldn't be packed structures,
-> > is it a leftover from previous version?  
+> This woud be wrong for i > 1, so instead make this
 > 
-> I remember some people suggest to add QEMU_PACKED before, anyway I will remove it in my next version patch.
-
-Question is why it's  there and where it is used?
-
-BTW:
-series doesn't apply to master anymore.
-Do you have a repo somewhere available for testing?
-
-> 
-> >   
-> >> +
-> >> +/*
-> >> + * Masks for block_status flags above
-> >> + */
-> >> +#define ACPI_GEBS_UNCORRECTABLE         1
-> >> +
-> >> +/*  
+> 	if (entry->eax >= 1)
 > 
 
+I am confused about the @index parameter. @index seems not used for
+every case except 0x07. Since the caller function only has @index=0, so
+all other cases except 0x07 put cpuid info from subleaf=0 to max subleaf.
+
+What do you think about @index in current function? Does it mean, we
+need put cpuid from index to max subleaf to @entry[i]? If so, the logic
+seems as follows,
+
+if (index == 0) {
+     // Put subleaf 0 into @entry
+     // Put subleaf 1 into @entry[1]
+} else if (index < entry->eax) {
+     // Put subleaf 1 into @entry
+} else {
+     // Put all zero into @entry
+}
+
+But this seems not identical with other cases, for current caller
+function. Or we can simply ignore @index in 0x07 and just put all possible
+subleaf info back?
+
+> and define F(AVX512_BF16) as a new constant kvm_cpuid_7_1_eax_features.
+> 
+Got it.
+
+
+Thanks,
+Jing
+
+> Paolo
+> 
