@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DBE74D222
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 17:27:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1EC344D225
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 17:28:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726686AbfFTP1z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 11:27:55 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:36363 "EHLO
+        id S1726740AbfFTP2h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jun 2019 11:28:37 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:34044 "EHLO
         mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726428AbfFTP1y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 11:27:54 -0400
-Received: by mail-qt1-f193.google.com with SMTP id p15so3606711qtl.3
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2019 08:27:54 -0700 (PDT)
+        with ESMTP id S1726428AbfFTP2g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jun 2019 11:28:36 -0400
+Received: by mail-qt1-f193.google.com with SMTP id m29so3634084qtu.1
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2019 08:28:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=JAcKHy1FRAtW0JEnhHKGbjx3Sy0ZWxrGVRh9A8UVyZY=;
-        b=rNI9U6cvH2o7Tnoavstyd6N/8Qp8M7UNG7tfBOZSDNNS/wkdnMAinO3nuEaEwmIIKQ
-         7MHpmOSxCFI9n3dTG10fNITeFAiQ/WDg3wPw7Tw05eoQCFNrqZxlZnJGP8ScHNkPbL7y
-         vkdqSmHDfKDR/Eh6o4J8i2Jt6Ivl0vmMbQqmXXF7BrWKpddPqgZ32gAbvtUwm+jriiJr
-         e7mjCVkgfzGLpsJHM6eVTWhQTSK0Hv6hU5M1Riw8/B2i7wg/pAt3dboNA9VH54hOTG9w
-         itSE8XOUJjL7j5+l/54rbimYQzfqMRHizEAt71cgaCrHvieL0OVVwOCXazBfPGWswUsL
-         1xQA==
-X-Gm-Message-State: APjAAAU4nRYefBVs8oX4xZXHMt/GJNa2oghX1tRHSF6KS66rqGSEwh7v
-        W7XM4fH1bZ6Nqf6a4uuDFN+Z7pmK/QElBA==
-X-Google-Smtp-Source: APXvYqxpLs2C5Gy8h4gWf0WS9cA4AFjodndt+QmKZvo4EmyB20KX1/URQU2oRJ3ithnPgGiwltjNCQ==
-X-Received: by 2002:ac8:70cf:: with SMTP id g15mr106409493qtp.254.1561044474136;
-        Thu, 20 Jun 2019 08:27:54 -0700 (PDT)
+        bh=OXpyqTPfcCFAyup/Rem/hnqL4o2lUHl+0SS7S+RDPtQ=;
+        b=dWXQ69PoS/NumVDRloMmAdVKXgKBuxBmEWmS7s0vy7zAQPJw4du3a5V/Y/NOaA5TcI
+         qHqccgixWJ6wKytbRoWo2yyQn/VxSFJZ6iWsQoCnQAyEIpdm/y3oXBrfxTuI/sKwCX3s
+         cvFigOLrTVueFbcVdOfrvNQo9D1SXLKAU99UiRWEFNOrAGC/fyVDOuNLZclK3ZUjg29a
+         FXwRB5IjUonzOahp3yi1Qn4O3vBfqG/Z/zd+wWvSawIO8Uemw1rocPer239ojfKJC20u
+         ThVkCdq9unPfik1NA6ZAq4o9wLhrZ4s74xu53wR2qvtQyT90ZqsGEysE37s3d2cfCH3X
+         euVQ==
+X-Gm-Message-State: APjAAAUyDEJFHOfkA7adPmPFuKtytyomHvFBYoefINu/fr2SxE2VO1IW
+        bstHwxwf9+iE3Ddpl0QlBBi0Nw==
+X-Google-Smtp-Source: APXvYqw6U+ujCDYl8JDjyAvOha99GgNxtK3nTZ98iWonOXXm4upHK15s2RBeRUfwLEN01Xt787R1xQ==
+X-Received: by 2002:ac8:323a:: with SMTP id x55mr21388069qta.211.1561044515947;
+        Thu, 20 Jun 2019 08:28:35 -0700 (PDT)
 Received: from redhat.com ([64.63.146.106])
-        by smtp.gmail.com with ESMTPSA id e18sm1247qkm.49.2019.06.20.08.27.52
+        by smtp.gmail.com with ESMTPSA id j66sm12441042qkf.86.2019.06.20.08.28.34
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 20 Jun 2019 08:27:53 -0700 (PDT)
-Date:   Thu, 20 Jun 2019 11:27:50 -0400
+        Thu, 20 Jun 2019 08:28:35 -0700 (PDT)
+Date:   Thu, 20 Jun 2019 11:28:32 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Cc:     qemu-devel@nongnu.org,
@@ -47,67 +47,66 @@ Cc:     qemu-devel@nongnu.org,
         Yang Zhong <yang.zhong@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Li Qiang <liq3ea@gmail.com>
-Subject: Re: [PATCH v2 01/20] hw/i386/pc: Use unsigned type to index arrays
-Message-ID: <20190620112729-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH v2 02/20] hw/i386/pc: Use size_t type to hold/return a
+ size of array
+Message-ID: <20190620112805-mutt-send-email-mst@kernel.org>
 References: <20190613143446.23937-1-philmd@redhat.com>
- <20190613143446.23937-2-philmd@redhat.com>
+ <20190613143446.23937-3-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190613143446.23937-2-philmd@redhat.com>
+In-Reply-To: <20190613143446.23937-3-philmd@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 13, 2019 at 04:34:27PM +0200, Philippe Mathieu-Daudé wrote:
+On Thu, Jun 13, 2019 at 04:34:28PM +0200, Philippe Mathieu-Daudé wrote:
 > Reviewed-by: Li Qiang <liq3ea@gmail.com>
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Motivation?  Is this a bugfix?
-
+Motivation? do you expect more than 2^31 entries?
 
 > ---
->  hw/i386/pc.c         | 5 +++--
+>  hw/i386/pc.c         | 4 ++--
 >  include/hw/i386/pc.h | 2 +-
->  2 files changed, 4 insertions(+), 3 deletions(-)
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 > 
 > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 2c5446b095..bb3c74f4ca 100644
+> index bb3c74f4ca..ff0f6bbbb3 100644
 > --- a/hw/i386/pc.c
 > +++ b/hw/i386/pc.c
-> @@ -874,7 +874,7 @@ static void handle_a20_line_change(void *opaque, int irq, int level)
+> @@ -105,7 +105,7 @@ struct e820_table {
 >  
->  int e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
->  {
-> -    int index = le32_to_cpu(e820_reserve.count);
-> +    unsigned int index = le32_to_cpu(e820_reserve.count);
->      struct e820_entry *entry;
+>  static struct e820_table e820_reserve;
+>  static struct e820_entry *e820_table;
+> -static unsigned e820_entries;
+> +static size_t e820_entries;
+>  struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
 >  
->      if (type != E820_RAM) {
-> @@ -906,7 +906,8 @@ int e820_get_num_entries(void)
+>  /* Physical Address of PVH entry point read from kernel ELF NOTE */
+> @@ -901,7 +901,7 @@ int e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
 >      return e820_entries;
 >  }
 >  
-> -bool e820_get_entry(int idx, uint32_t type, uint64_t *address, uint64_t *length)
-> +bool e820_get_entry(unsigned int idx, uint32_t type,
-> +                    uint64_t *address, uint64_t *length)
+> -int e820_get_num_entries(void)
+> +size_t e820_get_num_entries(void)
 >  {
->      if (idx < e820_entries && e820_table[idx].type == cpu_to_le32(type)) {
->          *address = le64_to_cpu(e820_table[idx].address);
+>      return e820_entries;
+>  }
 > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index a7d0b87166..3b3a0d6e59 100644
+> index 3b3a0d6e59..fc29893624 100644
 > --- a/include/hw/i386/pc.h
 > +++ b/include/hw/i386/pc.h
-> @@ -291,7 +291,7 @@ void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+> @@ -290,7 +290,7 @@ void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+>  #define E820_UNUSABLE   5
 >  
 >  int e820_add_entry(uint64_t, uint64_t, uint32_t);
->  int e820_get_num_entries(void);
-> -bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> +bool e820_get_entry(unsigned int, uint32_t, uint64_t *, uint64_t *);
+> -int e820_get_num_entries(void);
+> +size_t e820_get_num_entries(void);
+>  bool e820_get_entry(unsigned int, uint32_t, uint64_t *, uint64_t *);
 >  
 >  extern GlobalProperty pc_compat_4_0_1[];
->  extern const size_t pc_compat_4_0_1_len;
 > -- 
 > 2.20.1
