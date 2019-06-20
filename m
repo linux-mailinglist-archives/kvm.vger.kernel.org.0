@@ -2,82 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C0C3E4C775
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 08:26:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 232A84C790
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 08:39:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725977AbfFTGZ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 02:25:59 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:37425 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725871AbfFTGZ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 02:25:59 -0400
-Received: by mail-pf1-f195.google.com with SMTP id 19so1068908pfa.4
-        for <kvm@vger.kernel.org>; Wed, 19 Jun 2019 23:25:58 -0700 (PDT)
+        id S1725977AbfFTGjC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jun 2019 02:39:02 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:47034 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725872AbfFTGjC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jun 2019 02:39:02 -0400
+Received: by mail-ot1-f66.google.com with SMTP id z23so1617732ote.13;
+        Wed, 19 Jun 2019 23:39:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=IGLcxi13YQpGmz2iYHuA5KftYdvj4Iolhk4M1Lmi3sI=;
-        b=HCwZI061L1anZnswV0RlaX0n65sNinKOrr+C7TmKCP09tOpY1Ak40fUmKsXCLyZtQg
-         aq1Z0UU41888Ad7+dzzSQLNJT6MMqxe1cyAMLr0209VLxj8HFcDdhxeX/xoDNMlJLsPH
-         5d8fEcTjHLZF8aNBXInl7z90RMLlvSRx4XkKVwL1hMGWqnCBo0+65ql6s2a8pyXOJgpD
-         U34fVP2nRfc+8AiL3xn2CC4R9nW/gCUdaXUmQHohetq3JNhwLHlTCfZEPfmupBasnDfT
-         jd3NJHOL4ET91N+a55DLCMODNZKlPmqMMJGVz87ujbWOwW0cJ3pyfvo5DIf3kK1q0O45
-         FsnA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=sp3vep+gecWojxrD/V4sJjEZ27G+QN44xZ3oaMA/Ab0=;
+        b=McnCESmTtUQidbJqVN+hlYStLub6uVMispeub6VN4PS4aQOWB07bhjrnzsFg9A+6Cj
+         O+wq4kGPWxH9FJVRcHF9VN7cPYjb/oq4DHJruxjO8Vr5kVYRU9+043OQo/b4qne42uqh
+         xh/KmLE+qjMKbLfp6vD4lbww1gin6SIo1VrgyxnhslR92bVhq3cBbSmzpg7iUaxBMINW
+         wXC+HlvxqCsLg4QVUQ71NBWBjFnikrbyHNlkDPHry/61gsgoNUA89ctmVOmfqHsF4jpO
+         wpo0Tl6SEpULkB9e2GlzMTiPSX9DUUUpmN6GtwV3LQiVRHkj+IcVZvQ4Sy8m5Xtuu8i9
+         PbJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=IGLcxi13YQpGmz2iYHuA5KftYdvj4Iolhk4M1Lmi3sI=;
-        b=qVn5nE4fG0MImpcX5rEG8PoPWSG3G/itdMw7qWfT9rQqqxRBpl6JvsAuDfLfQhheWK
-         +j29iM/Eko2ecVBaxDnHhk2DNPegpDuQCDGd6wCVV6BoRov3ojXdmmAP+UCqq3qZ4eua
-         iCJnL2D6VT88Ro8pWQ1KAq0GjdQRpbV1MSf0TGWefQIZAAhHf2kMEv4HWulCYwK1eubv
-         UtxofQyr5TTnpgRWvmg6yXPgP6r+8jE2BNwB2+qv99TcyVaSlJsavWngDF7y2EqN72Ht
-         4ZU/pnkFDUH5d/tVslKcofvh8Ev+gANKBz0+8C/IUQCJEPKwh6mZV3MBphvaAhuFxSsV
-         R48w==
-X-Gm-Message-State: APjAAAV++27inUE1qf4vo7un3xB3BG3pr70MXbpItbSiAHNn8g4LSM7x
-        ScqkRpg9o7xOpWIEloyUPn4=
-X-Google-Smtp-Source: APXvYqxVzbq1iCFhiSI2h/imNXUolwSz/xpmVLL1+zpGNs6jkWM5f94oRYWmfV9TpS7wA0qUQ4nF0g==
-X-Received: by 2002:a63:e317:: with SMTP id f23mr11574402pgh.142.1561011958327;
-        Wed, 19 Jun 2019 23:25:58 -0700 (PDT)
-Received: from surajjs2.ozlabs.ibm.com ([122.99.82.10])
-        by smtp.googlemail.com with ESMTPSA id m19sm10359270pjn.3.2019.06.19.23.25.55
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 19 Jun 2019 23:25:57 -0700 (PDT)
-Message-ID: <1561011953.4771.2.camel@gmail.com>
-Subject: Re: [PATCH] kvm: add kvm cap values to debugfs
-From:   Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     rkrcmar@redhat.com, paulus@ozlabs.org, dja@axtens.net
-Date:   Thu, 20 Jun 2019 16:25:53 +1000
-In-Reply-To: <8f6429ac-f6a5-bf24-59c5-a101b75bfd40@redhat.com>
-References: <20190528083535.27643-1-sjitindarsingh@gmail.com>
-         <8f6429ac-f6a5-bf24-59c5-a101b75bfd40@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=sp3vep+gecWojxrD/V4sJjEZ27G+QN44xZ3oaMA/Ab0=;
+        b=rXfQuL6nQzc/IyJWr+QdJgLdLrug+fxGrnxnxcPQ0HvxEeSO5tCFun+rrff9jv8ADI
+         5z2+EwT+jmXdd1uu5OJe5CgBe5kbsRk2lg7tnk5AZO+0TMYn5cQoNb6oof0rjM83r4CU
+         IPseRLRhfUjKpWUEIz3gypPX0h33UlXQVx8ajBUViBn+WRfZRUEPN0pFO40kKLdnMk0S
+         erYgWpvNn1P2BZGf4/t5eXnSMSYzC2JQjXzx6nxBwqiLYIcVNgiJnQwMMWdvloq8ekgq
+         Fr7kdOsHXNeuFWuQ59utCQ9Jt/fW70PyI9rOy/wNShjco9zBg4GN+ukR9ltBs0Ri/cUY
+         t5hA==
+X-Gm-Message-State: APjAAAVOmtoH1Uzb23pSo7mdvf2mJH0jsWxb+p6Sigw2fQgD4oPYno4W
+        J7XPLXnjmYI3GNhTOAHtsaSWqQHCQxFk/shYwfM=
+X-Google-Smtp-Source: APXvYqxo9G2P53t/pGrnKhAN3uBijKmUC0uAx7nWK4vX6b3m+C0zos3yAdPBRGpSuICJBBhyxMAUxICKjoSGfb0nXj4=
+X-Received: by 2002:a9d:62c4:: with SMTP id z4mr2248300otk.56.1561012742013;
+ Wed, 19 Jun 2019 23:39:02 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190620050301.1149-1-tao3.xu@intel.com>
+In-Reply-To: <20190620050301.1149-1-tao3.xu@intel.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Thu, 20 Jun 2019 14:40:15 +0800
+Message-ID: <CANRm+Cwg7ogTN1w=xNyn+8CfxwofdxRykULFe217pXidzEhh6Q@mail.gmail.com>
+Subject: Re: [PATCH] KVM: vmx: Fix the broken usage of vmx_xsaves_supported
+To:     Tao Xu <tao3.xu@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, xiaoyao.li@linux.intel.com
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.24.6 (3.24.6-1.fc26) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2019-05-28 at 12:35 +0200, Paolo Bonzini wrote:
-> On 28/05/19 10:35, Suraj Jitindar Singh wrote:
-> > KVM capabilities are used to communicate the availability of
-> > certain
-> > capabilities to userspace.
-> > 
-> > It might be nice to know these values without having to add debug
-> > printing to the userspace tool consuming this data.
-> 
-> Why not write a separate script that prints the capability values?
+Hi,
+On Thu, 20 Jun 2019 at 13:06, Tao Xu <tao3.xu@intel.com> wrote:
+>
+> The helper vmx_xsaves_supported() returns the bit value of
+> SECONDARY_EXEC_XSAVES in vmcs_config.cpu_based_2nd_exec_ctrl, which
+> remains unchanged true if vmcs supports 1-setting of this bit after
+> setup_vmcs_config(). It should check the guest's cpuid not this
+> unchanged value when get/set msr.
+>
+> Besides, vmx_compute_secondary_exec_control() adjusts
+> SECONDARY_EXEC_XSAVES bit based on guest cpuid's X86_FEATURE_XSAVE
+> and X86_FEATURE_XSAVES, it should use updated value to decide whether
+> set XSS_EXIT_BITMAP.
+>
+> Co-developed-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
+> Signed-off-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index b93e36ddee5e..935cf72439a9 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1721,7 +1721,8 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struc=
+t msr_data *msr_info)
+>                 return vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index=
+,
+>                                        &msr_info->data);
+>         case MSR_IA32_XSS:
+> -               if (!vmx_xsaves_supported())
+> +               if (!guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) ||
+> +                       !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
+>                         return 1;
+>                 msr_info->data =3D vcpu->arch.ia32_xss;
+>                 break;
+> @@ -1935,7 +1936,8 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struc=
+t msr_data *msr_info)
+>                         return 1;
+>                 return vmx_set_vmx_msr(vcpu, msr_index, data);
+>         case MSR_IA32_XSS:
+> -               if (!vmx_xsaves_supported())
+> +               if (!guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) ||
+> +                       !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
+>                         return 1;
 
-I agree that this makes more sense as a standalone userspace script.
-Dropping this patch.
+Not complete true.
 
-Thanks,
-Suraj
+>                 /*
+>                  * The only supported bit as of Skylake is bit 8, but
+> @@ -4094,7 +4096,7 @@ static void vmx_vcpu_setup(struct vcpu_vmx *vmx)
+>
+>         set_cr4_guest_host_mask(vmx);
+>
+> -       if (vmx_xsaves_supported())
+> +       if (vmx->secondary_exec_control & SECONDARY_EXEC_XSAVES)
+>                 vmcs_write64(XSS_EXIT_BITMAP, VMX_XSS_EXIT_BITMAP);
 
-> 
-> Paolo
+This is not true.
+
+SDM 24.6.20:
+On processors that support the 1-setting of the =E2=80=9Cenable
+XSAVES/XRSTORS=E2=80=9D VM-execution control, the VM-execution control fiel=
+ds
+include a 64-bit XSS-exiting bitmap.
+
+It depends on whether or not processors support the 1-setting instead
+of =E2=80=9Cenable XSAVES/XRSTORS=E2=80=9D is 1 in VM-exection control fiel=
+d. Anyway,
+I will send a patch to fix the msr read/write for commit
+203000993de5(kvm: vmx: add MSR logic for XSAVES), thanks for the
+report.
+
+Regards,
+Wanpeng Li
