@@ -2,209 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B1AE44CD8C
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 14:18:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE66C4CD8F
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 14:18:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731823AbfFTMSp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 08:18:45 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:33226 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730886AbfFTMSo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 08:18:44 -0400
-Received: by mail-wr1-f66.google.com with SMTP id n9so2844256wru.0
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2019 05:18:41 -0700 (PDT)
+        id S1731837AbfFTMSs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jun 2019 08:18:48 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:38453 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730886AbfFTMSs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jun 2019 08:18:48 -0400
+Received: by mail-wr1-f68.google.com with SMTP id d18so2812379wrs.5
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2019 05:18:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=4Enp7W0ESdkTTd9HBh/ANelF/DbInTnKEbgmPM5TYt4=;
-        b=b0Z6O3OS7N847rUz8k6kvcybzEogwQWVNQN2H/fbyWDhG2kzk11CJqZ3VWxRDAJznO
-         TUchu9ABmJdgqggE8D/95ZgUDU81u1l3sYVDT0hR06snkawEKF9FeXFKUDn8GF0oOAre
-         X9MFnwzPo+Ol0knk+/i20rXP8EG2hc1xcq7fZx7q3IiYdErWnjAogArCTaL95AZpBxM4
-         +k7zXTVudG1ijJKa2dDlTzz3r4WT0l84kEXI2tkzjTGDGsEFYwZwqtf8UpCJH1P+tXr9
-         ug2q3Phb5s4Dn40RK3CjsdGgeK+fI+TtwaAPJ4LjFOt2RGcF26EB0mqi5Ay8HrbQEyd4
-         w/BA==
-X-Gm-Message-State: APjAAAVSWg2gDIZUASwrKDDA+bu5UjmqpwLtZQZ3poh2XFqqx4ekwd+o
-        xy+4NcqjSdG+pmuyhMU1514vmggGdEA=
-X-Google-Smtp-Source: APXvYqw0a0Atzq/xJ79+F6gAc8zeGL5JH3frFK3lbZdQKk6lxNUQWMXbkclgr9eyYNAX/Q6pZQKdcA==
-X-Received: by 2002:adf:eacd:: with SMTP id o13mr19533546wrn.91.1561033120821;
-        Thu, 20 Jun 2019 05:18:40 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id r5sm30834313wrg.10.2019.06.20.05.18.39
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 20 Jun 2019 05:18:40 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: nVMX: reorganize initial steps of vmx_set_nested_state
-In-Reply-To: <1560959396-13969-1-git-send-email-pbonzini@redhat.com>
-References: <1560959396-13969-1-git-send-email-pbonzini@redhat.com>
-Date:   Thu, 20 Jun 2019 14:18:39 +0200
-Message-ID: <87zhmcfo0w.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=YOyay7L+Ug00icQt9/AuolC+PTU/k20bZjxiFL/LzXw=;
+        b=OnJPUV3iENe2WpAi2z4/mp4yRLDB0ke+uIs15hrBvyZp/496ADE1NB4n/K9VbvEvrc
+         c9pxCnb9OiBwmQ4qSkaiKl2k0XgFQBQ8qcQVbvnClZAJLrPkJI8Y6sDspxzBePjdsUOF
+         DJx0F6JVN7NMWVXL/FGenJGB6FkFeuwIJTbCOBAJzYDBbd3L8IhgrRQvtTXkD7eparCo
+         h6ux5LI+7xpqLkXMSFNsBLHCL0d1otEeTGPdR4lVk5qhRD5moMSojyL+4Q6S7eUKDmTG
+         bLRTk6F+fRp9N8mnSJm3RYLQkJ3egvJnDcFlHLDIyRxAn4WqAqCxSE21EOfX0gM8oPgw
+         wZQw==
+X-Gm-Message-State: APjAAAXCGeSaORSRjiTJCl5WkwK3PUZ19UB2RO2BbC+pqBjjpWvI5xvf
+        AvGp8dY2iYyyNlSM5Q1M56bZTw==
+X-Google-Smtp-Source: APXvYqynay/wtRGlHY6FX1KkqdtL1giCC9W9+5OV9fapZCTz3X+ZA5NlxK69UqxLBRK68aPNscyTPg==
+X-Received: by 2002:a05:6000:128d:: with SMTP id f13mr4144690wrx.39.1561033126353;
+        Thu, 20 Jun 2019 05:18:46 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7822:aa18:a9d8:39ab? ([2001:b07:6468:f312:7822:aa18:a9d8:39ab])
+        by smtp.gmail.com with ESMTPSA id r4sm45526075wra.96.2019.06.20.05.18.45
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 20 Jun 2019 05:18:45 -0700 (PDT)
+Subject: Re: [PATCH RFC 4/5] x86: KVM: add xsetbv to the emulator
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>
+References: <20190620110240.25799-1-vkuznets@redhat.com>
+ <20190620110240.25799-5-vkuznets@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a86ca8b7-0333-398b-7bf6-90cb79366226@redhat.com>
+Date:   Thu, 20 Jun 2019 14:18:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20190620110240.25799-5-vkuznets@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On 20/06/19 13:02, Vitaly Kuznetsov wrote:
+> To avoid hardcoding xsetbv length to '3' we need to support decoding it in
+> the emulator.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-> Commit 332d079735f5 ("KVM: nVMX: KVM_SET_NESTED_STATE - Tear down old EVMCS
-> state before setting new state", 2019-05-02) broke evmcs_test because the
-> eVMCS setup must be performed even if there is no VMXON region defined,
-> as long as the eVMCS bit is set in the assist page.
->
-> While the simplest possible fix would be to add a check on
-> kvm_state->flags & KVM_STATE_NESTED_EVMCS in the initial "if" that
-> covers kvm_state->hdr.vmx.vmxon_pa == -1ull, that is quite ugly.
->
-> Instead, this patch moves checks earlier in the function and
-> conditionalizes them on kvm_state->hdr.vmx.vmxon_pa, so that
-> vmx_set_nested_state always goes through vmx_leave_nested
-> and nested_enable_evmcs.
->
-> Fixes: 332d079735f5
+Can you also emulate it properly?  The code from QEMU's
+target/i386/fpu_helper.c can help. :)
 
-checkpatch.pl will likely complain here asking for full description, e.g.
-
-Fixes: 332d079735f5 ("KVM: nVMX: KVM_SET_NESTED_STATE - Tear down old EVMCS state before setting new state")
-
-There's also something wrong with the patch as it fails to apply because
-of (not only?) whitespace issues or maybe I'm just applying it to the
-wrong tree...
-
-> Cc: Aaron Lewis <aaronlewis@google.com>
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Enlightened VMCS migration is just a 'theoretical' feature atm, we don't
-know if it actually works but it's good we have a selftest for it so we
-know when it definitely doesn't :-)
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Paolo
 
 > ---
->  arch/x86/kvm/vmx/nested.c                          | 26 ++++++++++--------
->  .../kvm/x86_64/vmx_set_nested_state_test.c         | 32 ++++++++++++++--------
->  2 files changed, 35 insertions(+), 23 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index fb6d1f7b43f3..5f9c1a200201 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -5343,9 +5343,6 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->  	if (kvm_state->format != KVM_STATE_NESTED_FORMAT_VMX)
->  		return -EINVAL;
+>  arch/x86/include/asm/kvm_emulate.h | 1 +
+>  arch/x86/kvm/emulate.c             | 9 ++++++++-
+>  arch/x86/kvm/svm.c                 | 1 +
+>  3 files changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_emulate.h b/arch/x86/include/asm/kvm_emulate.h
+> index feab24cac610..478f76b0122d 100644
+> --- a/arch/x86/include/asm/kvm_emulate.h
+> +++ b/arch/x86/include/asm/kvm_emulate.h
+> @@ -429,6 +429,7 @@ enum x86_intercept {
+>  	x86_intercept_ins,
+>  	x86_intercept_out,
+>  	x86_intercept_outs,
+> +	x86_intercept_xsetbv,
 >  
-> -	if (!nested_vmx_allowed(vcpu))
-> -		return kvm_state->hdr.vmx.vmxon_pa == -1ull ? 0 : -EINVAL;
-> -
->  	if (kvm_state->hdr.vmx.vmxon_pa == -1ull) {
->  		if (kvm_state->hdr.vmx.smm.flags)
->  			return -EINVAL;
-> @@ -5353,12 +5350,15 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->  		if (kvm_state->hdr.vmx.vmcs12_pa != -1ull)
->  			return -EINVAL;
+>  	nr_x86_intercepts
+>  };
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index d0d5dd44b4f4..ff25d94df684 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -4393,6 +4393,12 @@ static const struct opcode group7_rm1[] = {
+>  	N, N, N, N, N, N,
+>  };
 >  
-> -		vmx_leave_nested(vcpu);
-> -		return 0;
-> -	}
-> +		if (kvm_state->flags & ~KVM_STATE_NESTED_EVMCS)
-> +			return -EINVAL;
-> +	} else {
-> +		if (!nested_vmx_allowed(vcpu))
-> +			return -EINVAL;
->  
-> -	if (!page_address_valid(vcpu, kvm_state->hdr.vmx.vmxon_pa))
-> -		return -EINVAL;
-> +		if (!page_address_valid(vcpu, kvm_state->hdr.vmx.vmxon_pa))
-> +			return -EINVAL;
-> +    	}
->  
->  	if ((kvm_state->hdr.vmx.smm.flags & KVM_STATE_NESTED_SMM_GUEST_MODE) &&
->  	    (kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE))
-> @@ -5381,11 +5381,15 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
->  		return -EINVAL;
->  
->  	vmx_leave_nested(vcpu);
-> -	if (kvm_state->hdr.vmx.vmxon_pa == -1ull)
-> -		return 0;
-> +	if (kvm_state->flags & KVM_STATE_NESTED_EVMCS) {
-> +		if (!nested_vmx_allowed(vcpu))
-> +			return -EINVAL;
->  
-> -	if (kvm_state->flags & KVM_STATE_NESTED_EVMCS)
->  		nested_enable_evmcs(vcpu, NULL);
-> +	}
+> +static const struct opcode group7_rm2[] = {
+> +	N,
+> +	DI(SrcNone | Priv, xsetbv),
+> +	N, N, N, N, N, N,
+> +};
 > +
-> +	if (kvm_state->hdr.vmx.vmxon_pa == -1ull)
-> +		return 0;
+>  static const struct opcode group7_rm3[] = {
+>  	DIP(SrcNone | Prot | Priv,		vmrun,		check_svme_pa),
+>  	II(SrcNone  | Prot | EmulateOnUD,	em_hypercall,	vmmcall),
+> @@ -4482,7 +4488,8 @@ static const struct group_dual group7 = { {
+>  }, {
+>  	EXT(0, group7_rm0),
+>  	EXT(0, group7_rm1),
+> -	N, EXT(0, group7_rm3),
+> +	EXT(0, group7_rm2),
+> +	EXT(0, group7_rm3),
+>  	II(SrcNone | DstMem | Mov,		em_smsw, smsw), N,
+>  	II(SrcMem16 | Mov | Priv,		em_lmsw, lmsw),
+>  	EXT(0, group7_rm7),
+> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+> index f980fc43372d..39e61029f401 100644
+> --- a/arch/x86/kvm/svm.c
+> +++ b/arch/x86/kvm/svm.c
+> @@ -6041,6 +6041,7 @@ static const struct __x86_intercept {
+>  	[x86_intercept_ins]		= POST_EX(SVM_EXIT_IOIO),
+>  	[x86_intercept_out]		= POST_EX(SVM_EXIT_IOIO),
+>  	[x86_intercept_outs]		= POST_EX(SVM_EXIT_IOIO),
+> +	[x86_intercept_xsetbv]		= PRE_EX(SVM_EXIT_XSETBV),
+>  };
 >  
->  	vmx->nested.vmxon_ptr = kvm_state->hdr.vmx.vmxon_pa;
->  	ret = enter_vmx_operation(vcpu);
-> diff --git a/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c b/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
-> index 0648fe6df5a8..e64ca20b315a 100644
-> --- a/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/vmx_set_nested_state_test.c
-> @@ -123,36 +123,44 @@ void test_vmx_nested_state(struct kvm_vm *vm)
->  	/*
->  	 * We cannot virtualize anything if the guest does not have VMX
->  	 * enabled.  We expect KVM_SET_NESTED_STATE to return 0 if vmxon_pa
-> -	 * is set to -1ull.
-> +	 * is set to -1ull, but the flags must be zero.
->  	 */
->  	set_default_vmx_state(state, state_sz);
->  	state->hdr.vmx.vmxon_pa = -1ull;
-> +	test_nested_state_expect_einval(vm, state);
-> +
-> +	state->hdr.vmx.vmcs12_pa = -1ull;
-> +	state->flags = KVM_STATE_NESTED_EVMCS;
-> +	test_nested_state_expect_einval(vm, state);
-> +
-> +	state->flags = 0;
->  	test_nested_state(vm, state);
->  
->  	/* Enable VMX in the guest CPUID. */
->  	vcpu_set_cpuid(vm, VCPU_ID, kvm_get_supported_cpuid());
->  
-> -	/* It is invalid to have vmxon_pa == -1ull and SMM flags non-zero. */
-> +	/*
-> +	 * Setting vmxon_pa == -1ull and vmcs_pa == -1ull exits early without
-> +	 * setting the nested state but flags other than eVMCS must be clear.
-> +	 */
->  	set_default_vmx_state(state, state_sz);
->  	state->hdr.vmx.vmxon_pa = -1ull;
-> +	state->hdr.vmx.vmcs12_pa = -1ull;
-> +	test_nested_state_expect_einval(vm, state);
-> +
-> +	state->flags = KVM_STATE_NESTED_EVMCS;
-> +	test_nested_state(vm, state);
-> +
-> +	/* It is invalid to have vmxon_pa == -1ull and SMM flags non-zero. */
->  	state->hdr.vmx.smm.flags = 1;
->  	test_nested_state_expect_einval(vm, state);
->  
->  	/* It is invalid to have vmxon_pa == -1ull and vmcs_pa != -1ull. */
->  	set_default_vmx_state(state, state_sz);
->  	state->hdr.vmx.vmxon_pa = -1ull;
-> -	state->hdr.vmx.vmcs12_pa = 0;
-> +	state->flags = 0;
->  	test_nested_state_expect_einval(vm, state);
->  
-> -	/*
-> -	 * Setting vmxon_pa == -1ull and vmcs_pa == -1ull exits early without
-> -	 * setting the nested state.
-> -	 */
-> -	set_default_vmx_state(state, state_sz);
-> -	state->hdr.vmx.vmxon_pa = -1ull;
-> -	state->hdr.vmx.vmcs12_pa = -1ull;
-> -	test_nested_state(vm, state);
-> -
->  	/* It is invalid to have vmxon_pa set to a non-page aligned address. */
->  	set_default_vmx_state(state, state_sz);
->  	state->hdr.vmx.vmxon_pa = 1;
+>  #undef PRE_EX
+> 
 
--- 
-Vitaly
