@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 11DFA4CCC9
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 13:23:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1442A4CCCB
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 13:23:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726562AbfFTLXO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 07:23:14 -0400
-Received: from foss.arm.com ([217.140.110.172]:60542 "EHLO foss.arm.com"
+        id S1726704AbfFTLXP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jun 2019 07:23:15 -0400
+Received: from foss.arm.com ([217.140.110.172]:60556 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726371AbfFTLXN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 07:23:13 -0400
+        id S1726602AbfFTLXP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jun 2019 07:23:15 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C7EA8C0A;
-        Thu, 20 Jun 2019 04:23:12 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7A2EF11B3;
+        Thu, 20 Jun 2019 04:23:14 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 57FE23F718;
-        Thu, 20 Jun 2019 04:23:11 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 082F73F718;
+        Thu, 20 Jun 2019 04:23:12 -0700 (PDT)
 From:   Marc Zyngier <marc.zyngier@arm.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
@@ -28,9 +28,9 @@ Cc:     Andrew Jones <drjones@redhat.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 1/4] KVM: arm64: Implement vq_present() as a macro
-Date:   Thu, 20 Jun 2019 12:22:58 +0100
-Message-Id: <20190620112301.138137-2-marc.zyngier@arm.com>
+Subject: [PATCH 2/4] KVM: arm64: Filter out invalid core register IDs in KVM_GET_REG_LIST
+Date:   Thu, 20 Jun 2019 12:22:59 +0100
+Message-Id: <20190620112301.138137-3-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190620112301.138137-1-marc.zyngier@arm.com>
 References: <20190620112301.138137-1-marc.zyngier@arm.com>
@@ -41,56 +41,134 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Viresh Kumar <viresh.kumar@linaro.org>
+From: Dave Martin <Dave.Martin@arm.com>
 
-This routine is a one-liner and doesn't really need to be function and
-can be implemented as a macro.
+Since commit d26c25a9d19b ("arm64: KVM: Tighten guest core register
+access from userspace"), KVM_{GET,SET}_ONE_REG rejects register IDs
+that do not correspond to a single underlying architectural register.
 
-Suggested-by: Dave Martin <Dave.Martin@arm.com>
-Reviewed-by: Dave Martin <Dave.Martin@arm.com>
-Signed-off-by: Viresh Kumar <viresh.kumar@linaro.org>
+KVM_GET_REG_LIST was not changed to match however: instead, it
+simply yields a list of 32-bit register IDs that together cover the
+whole kvm_regs struct.  This means that if userspace tries to use
+the resulting list of IDs directly to drive calls to KVM_*_ONE_REG,
+some of those calls will now fail.
+
+This was not the intention.  Instead, iterating KVM_*_ONE_REG over
+the list of IDs returned by KVM_GET_REG_LIST should be guaranteed
+to work.
+
+This patch fixes the problem by splitting validate_core_offset()
+into a backend core_reg_size_from_offset() which does all of the
+work except for checking that the size field in the register ID
+matches, and kvm_arm_copy_reg_indices() and num_core_regs() are
+converted to use this to enumerate the valid offsets.
+
+kvm_arm_copy_reg_indices() now also sets the register ID size field
+appropriately based on the value returned, so the register ID
+supplied to userspace is fully qualified for use with the register
+access ioctls.
+
+Cc: stable@vger.kernel.org
+Fixes: d26c25a9d19b ("arm64: KVM: Tighten guest core register access from userspace")
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Tested-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/guest.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/guest.c | 53 +++++++++++++++++++++++++++++++-----------
+ 1 file changed, 40 insertions(+), 13 deletions(-)
 
 diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 3ae2f82fca46..ae734fcfd4ea 100644
+index ae734fcfd4ea..c8aa00179363 100644
 --- a/arch/arm64/kvm/guest.c
 +++ b/arch/arm64/kvm/guest.c
-@@ -207,13 +207,7 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+@@ -70,10 +70,8 @@ static u64 core_reg_offset_from_id(u64 id)
+ 	return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_CORE);
+ }
  
- #define vq_word(vq) (((vq) - SVE_VQ_MIN) / 64)
- #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
--
--static bool vq_present(
--	const u64 (*const vqs)[KVM_ARM64_SVE_VLS_WORDS],
--	unsigned int vq)
--{
--	return (*vqs)[vq_word(vq)] & vq_mask(vq);
--}
-+#define vq_present(vqs, vq) ((vqs)[vq_word(vq)] & vq_mask(vq))
- 
- static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+-static int validate_core_offset(const struct kvm_vcpu *vcpu,
+-				const struct kvm_one_reg *reg)
++static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
  {
-@@ -258,7 +252,7 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+-	u64 off = core_reg_offset_from_id(reg->id);
+ 	int size;
  
- 	max_vq = 0;
- 	for (vq = SVE_VQ_MIN; vq <= SVE_VQ_MAX; ++vq)
--		if (vq_present(&vqs, vq))
-+		if (vq_present(vqs, vq))
- 			max_vq = vq;
+ 	switch (off) {
+@@ -103,8 +101,7 @@ static int validate_core_offset(const struct kvm_vcpu *vcpu,
+ 		return -EINVAL;
+ 	}
  
- 	if (max_vq > sve_vq_from_vl(kvm_sve_max_vl))
-@@ -272,7 +266,7 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	 * maximum:
- 	 */
- 	for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
--		if (vq_present(&vqs, vq) != sve_vq_available(vq))
-+		if (vq_present(vqs, vq) != sve_vq_available(vq))
- 			return -EINVAL;
+-	if (KVM_REG_SIZE(reg->id) != size ||
+-	    !IS_ALIGNED(off, size / sizeof(__u32)))
++	if (!IS_ALIGNED(off, size / sizeof(__u32)))
+ 		return -EINVAL;
  
- 	/* Can't run with no vector lengths at all: */
+ 	/*
+@@ -115,6 +112,21 @@ static int validate_core_offset(const struct kvm_vcpu *vcpu,
+ 	if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(off))
+ 		return -EINVAL;
+ 
++	return size;
++}
++
++static int validate_core_offset(const struct kvm_vcpu *vcpu,
++				const struct kvm_one_reg *reg)
++{
++	u64 off = core_reg_offset_from_id(reg->id);
++	int size = core_reg_size_from_offset(vcpu, off);
++
++	if (size < 0)
++		return -EINVAL;
++
++	if (KVM_REG_SIZE(reg->id) != size)
++		return -EINVAL;
++
+ 	return 0;
+ }
+ 
+@@ -447,19 +459,34 @@ static int copy_core_reg_indices(const struct kvm_vcpu *vcpu,
+ {
+ 	unsigned int i;
+ 	int n = 0;
+-	const u64 core_reg = KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE;
+ 
+ 	for (i = 0; i < sizeof(struct kvm_regs) / sizeof(__u32); i++) {
+-		/*
+-		 * The KVM_REG_ARM64_SVE regs must be used instead of
+-		 * KVM_REG_ARM_CORE for accessing the FPSIMD V-registers on
+-		 * SVE-enabled vcpus:
+-		 */
+-		if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(i))
++		u64 reg = KVM_REG_ARM64 | KVM_REG_ARM_CORE | i;
++		int size = core_reg_size_from_offset(vcpu, i);
++
++		if (size < 0)
++			continue;
++
++		switch (size) {
++		case sizeof(__u32):
++			reg |= KVM_REG_SIZE_U32;
++			break;
++
++		case sizeof(__u64):
++			reg |= KVM_REG_SIZE_U64;
++			break;
++
++		case sizeof(__uint128_t):
++			reg |= KVM_REG_SIZE_U128;
++			break;
++
++		default:
++			WARN_ON(1);
+ 			continue;
++		}
+ 
+ 		if (uindices) {
+-			if (put_user(core_reg | i, uindices))
++			if (put_user(reg, uindices))
+ 				return -EFAULT;
+ 			uindices++;
+ 		}
 -- 
 2.20.1
 
