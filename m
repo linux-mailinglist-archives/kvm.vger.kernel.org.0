@@ -2,116 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BFF364DA16
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 21:18:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 661094DA6A
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 21:40:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726514AbfFTTSN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 15:18:13 -0400
-Received: from mail-eopbgr820047.outbound.protection.outlook.com ([40.107.82.47]:11675
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725897AbfFTTSN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 15:18:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=suR3vIpR2MAng/ZLvAGVHPBJ5O757B+AoQWyeHlSQps=;
- b=R1zKgPjXNb9dhJdXaUufUGM/ntfqQTn1IqS4Vkt9qQpD15C5nn0/3wEwDIEFFc93of7fd3m8p6U28VFsYTXs/JYnmGmgQi1tCJGmXdv7CgmrHhGUKrA+QQ+W79Zr1O9z6qVFYOFFrrEg/dyLly9avX8t1NeJsKndoWCaiuWQf+U=
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.116.31) by
- DM6PR12MB2746.namprd12.prod.outlook.com (20.176.118.88) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.15; Thu, 20 Jun 2019 19:18:10 +0000
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com
- ([fe80::b9c1:b235:fff3:dba2]) by DM6PR12MB2682.namprd12.prod.outlook.com
- ([fe80::b9c1:b235:fff3:dba2%6]) with mapi id 15.20.1987.014; Thu, 20 Jun 2019
- 19:18:10 +0000
-From:   "Singh, Brijesh" <brijesh.singh@amd.com>
-To:     Eric Blake <eblake@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-CC:     "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [Qemu-devel] [RFC PATCH v1 08/12] target.json: add
- migrate-set-sev-info command
-Thread-Topic: [Qemu-devel] [RFC PATCH v1 08/12] target.json: add
- migrate-set-sev-info command
-Thread-Index: AQHVJ5JxxSpSr3fdPkCv1Ymp5YKU2qak6W2AgAABNwA=
-Date:   Thu, 20 Jun 2019 19:18:10 +0000
-Message-ID: <8d743a07-9561-4b8f-89e0-3322356f630e@amd.com>
-References: <20190620180247.8825-1-brijesh.singh@amd.com>
- <20190620180247.8825-9-brijesh.singh@amd.com>
- <7bade677-369a-74a5-206d-700626354028@redhat.com>
-In-Reply-To: <7bade677-369a-74a5-206d-700626354028@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: DM5PR22CA0010.namprd22.prod.outlook.com
- (2603:10b6:3:101::20) To DM6PR12MB2682.namprd12.prod.outlook.com
- (2603:10b6:5:4a::31)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brijesh.singh@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [165.204.77.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 327b7c1a-0786-414a-cd40-08d6f5b4086b
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM6PR12MB2746;
-x-ms-traffictypediagnostic: DM6PR12MB2746:
-x-microsoft-antispam-prvs: <DM6PR12MB27469A0E7EDAB20CD413A0DAE5E40@DM6PR12MB2746.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 0074BBE012
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(346002)(366004)(396003)(39860400002)(376002)(199004)(189003)(486006)(229853002)(81156014)(81166006)(6486002)(478600001)(11346002)(446003)(31686004)(54906003)(8936002)(2501003)(110136005)(4326008)(53936002)(186003)(66066001)(8676002)(6246003)(14454004)(25786009)(7736002)(6512007)(6436002)(316002)(305945005)(99286004)(66446008)(64756008)(66476007)(36756003)(66556008)(66946007)(102836004)(71190400001)(52116002)(73956011)(53546011)(71200400001)(6506007)(76176011)(386003)(476003)(14444005)(256004)(31696002)(68736007)(2906002)(26005)(2616005)(3846002)(86362001)(6116002)(5660300002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB2746;H:DM6PR12MB2682.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: fYOWHfnu3a68XBw51M9+m/+NmBsxYBusIIjkOOPHQlshbkEOdPP7Xnjf3csoNst28n70KNu/aGH3sL14vjQoeVq8BZcDjnrRYPOm9YmML15YofdEtKo688Fb/V80lsAwcXOP6QT6NQPM0vQuynAWO9iKxBIYGq4xidPz8p3Nicq1rpnK2c++FFGXz7FrtlYeCHFENgeg367kAkO5aPjbBRXQ9mYGArrAlnkQ9uAPOfgut1ptLWdQklWHIDl14XOQxVgCcbt7IpZtoWxGIwURhJwdENAwWo0irPNIxArGnqsTluTm8LXE8AIg362AT2IF50mMo7hs8tAZAEDEE+E5lQTKiJZ5P7xapfkX4TiWaZ+p1IfdMdHkukh/Jtu9WXTatMbTCnU3zf3bnLqPrBkcYEpaxG26/Jv76SaRKbbrlck=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E52CE6588423D0428541204F416FF1D0@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 327b7c1a-0786-414a-cd40-08d6f5b4086b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jun 2019 19:18:10.6053
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: sbrijesh@amd.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2746
+        id S1726596AbfFTTkp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jun 2019 15:40:45 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34314 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726169AbfFTTkp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 20 Jun 2019 15:40:45 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5KJblN5039949;
+        Thu, 20 Jun 2019 15:40:29 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2t8fv9hfbe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jun 2019 15:40:29 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x5KJUqLP014311;
+        Thu, 20 Jun 2019 19:40:28 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma04dal.us.ibm.com with ESMTP id 2t4ra6kmaw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Jun 2019 19:40:28 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5KJeQkl61931974
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 Jun 2019 19:40:26 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1715A136051;
+        Thu, 20 Jun 2019 19:40:26 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3BFAE13604F;
+        Thu, 20 Jun 2019 19:40:25 +0000 (GMT)
+Received: from alifm-ThinkPad-T470p.ibm.com (unknown [9.85.195.114])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTPS;
+        Thu, 20 Jun 2019 19:40:25 +0000 (GMT)
+From:   Farhan Ali <alifm@linux.ibm.com>
+To:     cohuck@redhat.com, farman@linux.ibm.com
+Cc:     pasic@linux.ibm.com, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, alifm@linux.ibm.com
+Subject: [RFC v1 1/1] vfio-ccw: Don't call cp_free if we are processing a channel program
+Date:   Thu, 20 Jun 2019 15:40:24 -0400
+Message-Id: <46dc0cbdcb8a414d70b7807fceb1cca6229408d5.1561055076.git.alifm@linux.ibm.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <cover.1561055076.git.alifm@linux.ibm.com>
+References: <cover.1561055076.git.alifm@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-20_13:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=860 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906200139
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCk9uIDYvMjAvMTkgMjoxMyBQTSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gNi8yMC8xOSAx
-OjAzIFBNLCBTaW5naCwgQnJpamVzaCB3cm90ZToNCj4+IFRoZSBjb21tYW5kIGNhbiBiZSB1c2Vk
-IGJ5IHRoZSBoeXBlcnZpc29yIHRvIHNwZWNpZnkgdGhlIHRhcmdldCBQbGF0Zm9ybQ0KPj4gRGlm
-ZmllLUhlbGxtYW4ga2V5IChQREgpIGFuZCBjZXJ0aWZpY2F0ZSBjaGFpbiBiZWZvcmUgc3RhcnRp
-bmcgdGhlIFNFVg0KPj4gZ3Vlc3QgbWlncmF0aW9uLiBUaGUgdmFsdWVzIHBhc3NlZCB0aHJvdWdo
-IHRoZSBjb21tYW5kIHdpbGwgYmUgdXNlZCB3aGlsZQ0KPj4gY3JlYXRpbmcgdGhlIG91dGdvaW5n
-IGVuY3J5cHRpb24gY29udGV4dC4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBCcmlqZXNoIFNpbmdo
-IDxicmlqZXNoLnNpbmdoQGFtZC5jb20+DQo+PiAtLS0NCj4+ICAgcWFwaS90YXJnZXQuanNvbiAg
-ICAgICB8IDE4ICsrKysrKysrKysrKysrKysrKw0KPj4gICB0YXJnZXQvaTM4Ni9tb25pdG9yLmMg
-IHwgMTAgKysrKysrKysrKw0KPj4gICB0YXJnZXQvaTM4Ni9zZXYtc3R1Yi5jIHwgIDUgKysrKysN
-Cj4+ICAgdGFyZ2V0L2kzODYvc2V2LmMgICAgICB8IDExICsrKysrKysrKysrDQo+PiAgIHRhcmdl
-dC9pMzg2L3Nldl9pMzg2LmggfCAgOSArKysrKysrKy0NCj4+ICAgNSBmaWxlcyBjaGFuZ2VkLCA1
-MiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+Pg0KPiANCj4+ICsrKyBiL3FhcGkvdGFy
-Z2V0Lmpzb24NCj4+IEBAIC01MTIsMyArNTEyLDIxIEBADQo+PiAgICMjDQo+PiAgIHsgJ2NvbW1h
-bmQnOiAncXVlcnktY3B1LWRlZmluaXRpb25zJywgJ3JldHVybnMnOiBbJ0NwdURlZmluaXRpb25J
-bmZvJ10sDQo+PiAgICAgJ2lmJzogJ2RlZmluZWQoVEFSR0VUX1BQQykgfHwgZGVmaW5lZChUQVJH
-RVRfQVJNKSB8fCBkZWZpbmVkKFRBUkdFVF9JMzg2KSB8fCBkZWZpbmVkKFRBUkdFVF9TMzkwWCkg
-fHwgZGVmaW5lZChUQVJHRVRfTUlQUyknIH0NCj4+ICsNCj4+ICsjIw0KPj4gKyMgQG1pZ3JhdGUt
-c2V0LXNldi1pbmZvOg0KPj4gKyMNCj4+ICsjIFRoZSBjb21tYW5kIGlzIHVzZWQgdG8gcHJvdmlk
-ZSB0aGUgdGFyZ2V0IGhvc3QgaW5mb3JtYXRpb24gdXNlZCBkdXJpbmcgdGhlDQo+PiArIyBTRVYg
-Z3Vlc3QuDQo+PiArIw0KPj4gKyMgQHBkaCB0aGUgdGFyZ2V0IGhvc3QgcGxhdGZvcm0gZGlmZmll
-LWhlbGxtYW4ga2V5IGVuY29kZWQgaW4gYmFzZTY0DQo+PiArIw0KPj4gKyMgQHBsYXQtY2VydCB0
-aGUgdGFyZ2V0IGhvc3QgcGxhdGZvcm0gY2VydGlmaWNhdGUgY2hhaW4gZW5jb2RlZCBpbiBiYXNl
-NjQNCj4+ICsjDQo+PiArIyBAYW1kLWNlcnQgQU1EIGNlcnRpZmljYXRlIGNoYWluIHdoaWNoIGlu
-Y2x1ZGUgQVNLIGFuZCBPQ0EgZW5jb2RlZCBpbiBiYXNlNjQNCj4+ICsjDQo+PiArIyBTaW5jZSA0
-LjMNCj4gDQo+IFRoZSBuZXh0IHJlbGVhc2UgaXMgNC4xLCB0aGVuIGxpa2VseSA0LjIgbmVhciB0
-aGUgZW5kIG9mIHRoZSBjYWxlbmRhcg0KPiB5ZWFyLCB0aGVuIDUuMCBpbiAyMDIwLiBUaGVyZSBp
-cyBubyBwbGFubmVkIDQuMyByZWxlYXNlLiAgQXJlIHlvdSB0cnlpbmcNCj4gdG8gZ2V0IHRoaXMg
-aW4gNC4xPw0KDQoNCkFoLCBJIHdhcyBtZWFuaW5nIHRvIHR5cGUgNC4yIGFuZCBub3QgNC4zLiBU
-aGUgc2VyaWVzIGhhcyBkZXBlbmRlbmN5IG9uDQprZXJuZWwgcGF0Y2hlcywgbXkgYmVzdCBlZmZv
-cnQgaXQgdG8gZ2V0IGl0IHJlYWR5IGZvciA0LjIgbWVyZ2UNCndpbmRvdy4NCg==
+There is a small window where it's possible that an interrupt can
+arrive and can call cp_free, while we are still processing a channel
+program (i.e allocating memory, pinnging pages, translating
+addresses etc). This can lead to allocating and freeing at the same
+time and can cause memory corruption.
+
+Let's not call cp_free if we are currently processing a channel program.
+
+Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+---
+
+I have been running my test overnight with this patch and I haven't
+seen the stack traces that I mentioned about earlier. I would like
+to get some reviews on this and also if this is the right thing to
+do?
+
+Thanks
+Farhan
+
+ drivers/s390/cio/vfio_ccw_drv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+index 66a66ac..61ece3f 100644
+--- a/drivers/s390/cio/vfio_ccw_drv.c
++++ b/drivers/s390/cio/vfio_ccw_drv.c
+@@ -88,7 +88,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+ 		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
+ 	if (scsw_is_solicited(&irb->scsw)) {
+ 		cp_update_scsw(&private->cp, &irb->scsw);
+-		if (is_final)
++		if (is_final && private->state != VFIO_CCW_STATE_CP_PROCESSING)
+ 			cp_free(&private->cp);
+ 	}
+ 	mutex_lock(&private->io_mutex);
+-- 
+2.7.4
+
