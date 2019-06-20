@@ -2,93 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C4FDF4D1B6
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 17:09:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DBE74D222
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 17:27:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732054AbfFTPJq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 11:09:46 -0400
-Received: from mga11.intel.com ([192.55.52.93]:54938 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726675AbfFTPJq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 11:09:46 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Jun 2019 08:09:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,397,1557212400"; 
-   d="scan'208";a="186834808"
-Received: from liujing-mobl.ccr.corp.intel.com (HELO [10.255.31.204]) ([10.255.31.204])
-  by fmsmga002.fm.intel.com with ESMTP; 20 Jun 2019 08:09:42 -0700
-Subject: Re: [PATCH RFC] kvm: x86: Expose AVX512_BF16 feature to guest
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, jing2.liu@intel.com
-References: <1561029712-11848-1-git-send-email-jing2.liu@linux.intel.com>
- <1561029712-11848-2-git-send-email-jing2.liu@linux.intel.com>
- <fd861e94-3ea5-3976-9855-05375f869f00@redhat.com>
-From:   "Liu, Jing2" <jing2.liu@linux.intel.com>
-Message-ID: <384bc07d-6105-d380-cd44-4518870c15f1@linux.intel.com>
-Date:   Thu, 20 Jun 2019 23:09:42 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726686AbfFTP1z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jun 2019 11:27:55 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:36363 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726428AbfFTP1y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jun 2019 11:27:54 -0400
+Received: by mail-qt1-f193.google.com with SMTP id p15so3606711qtl.3
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2019 08:27:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=JAcKHy1FRAtW0JEnhHKGbjx3Sy0ZWxrGVRh9A8UVyZY=;
+        b=rNI9U6cvH2o7Tnoavstyd6N/8Qp8M7UNG7tfBOZSDNNS/wkdnMAinO3nuEaEwmIIKQ
+         7MHpmOSxCFI9n3dTG10fNITeFAiQ/WDg3wPw7Tw05eoQCFNrqZxlZnJGP8ScHNkPbL7y
+         vkdqSmHDfKDR/Eh6o4J8i2Jt6Ivl0vmMbQqmXXF7BrWKpddPqgZ32gAbvtUwm+jriiJr
+         e7mjCVkgfzGLpsJHM6eVTWhQTSK0Hv6hU5M1Riw8/B2i7wg/pAt3dboNA9VH54hOTG9w
+         itSE8XOUJjL7j5+l/54rbimYQzfqMRHizEAt71cgaCrHvieL0OVVwOCXazBfPGWswUsL
+         1xQA==
+X-Gm-Message-State: APjAAAU4nRYefBVs8oX4xZXHMt/GJNa2oghX1tRHSF6KS66rqGSEwh7v
+        W7XM4fH1bZ6Nqf6a4uuDFN+Z7pmK/QElBA==
+X-Google-Smtp-Source: APXvYqxpLs2C5Gy8h4gWf0WS9cA4AFjodndt+QmKZvo4EmyB20KX1/URQU2oRJ3ithnPgGiwltjNCQ==
+X-Received: by 2002:ac8:70cf:: with SMTP id g15mr106409493qtp.254.1561044474136;
+        Thu, 20 Jun 2019 08:27:54 -0700 (PDT)
+Received: from redhat.com ([64.63.146.106])
+        by smtp.gmail.com with ESMTPSA id e18sm1247qkm.49.2019.06.20.08.27.52
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 20 Jun 2019 08:27:53 -0700 (PDT)
+Date:   Thu, 20 Jun 2019 11:27:50 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <rth@twiddle.net>,
+        Rob Bradford <robert.bradford@intel.com>,
+        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Samuel Ortiz <sameo@linux.intel.com>,
+        Yang Zhong <yang.zhong@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Li Qiang <liq3ea@gmail.com>
+Subject: Re: [PATCH v2 01/20] hw/i386/pc: Use unsigned type to index arrays
+Message-ID: <20190620112729-mutt-send-email-mst@kernel.org>
+References: <20190613143446.23937-1-philmd@redhat.com>
+ <20190613143446.23937-2-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <fd861e94-3ea5-3976-9855-05375f869f00@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190613143446.23937-2-philmd@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Thu, Jun 13, 2019 at 04:34:27PM +0200, Philippe Mathieu-Daudé wrote:
+> Reviewed-by: Li Qiang <liq3ea@gmail.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-On 6/20/2019 8:16 PM, Paolo Bonzini wrote:
-> On 20/06/19 13:21, Jing Liu wrote:
->> +		for (i = 1; i <= times; i++) {
->> +			if (*nent >= maxnent)
->> +				goto out;
->> +			do_cpuid_1_ent(&entry[i], function, i);
->> +			entry[i].eax &= F(AVX512_BF16);
->> +			entry[i].ebx = 0;
->> +			entry[i].ecx = 0;
->> +			entry[i].edx = 0;
->> +			entry[i].flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
->> +			++*nent;
+Motivation?  Is this a bugfix?
+
+
+> ---
+>  hw/i386/pc.c         | 5 +++--
+>  include/hw/i386/pc.h | 2 +-
+>  2 files changed, 4 insertions(+), 3 deletions(-)
 > 
-> This woud be wrong for i > 1, so instead make this
-> 
-> 	if (entry->eax >= 1)
-> 
-
-I am confused about the @index parameter. @index seems not used for
-every case except 0x07. Since the caller function only has @index=0, so
-all other cases except 0x07 put cpuid info from subleaf=0 to max subleaf.
-
-What do you think about @index in current function? Does it mean, we
-need put cpuid from index to max subleaf to @entry[i]? If so, the logic
-seems as follows,
-
-if (index == 0) {
-     // Put subleaf 0 into @entry
-     // Put subleaf 1 into @entry[1]
-} else if (index < entry->eax) {
-     // Put subleaf 1 into @entry
-} else {
-     // Put all zero into @entry
-}
-
-But this seems not identical with other cases, for current caller
-function. Or we can simply ignore @index in 0x07 and just put all possible
-subleaf info back?
-
-> and define F(AVX512_BF16) as a new constant kvm_cpuid_7_1_eax_features.
-> 
-Got it.
-
-
-Thanks,
-Jing
-
-> Paolo
-> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 2c5446b095..bb3c74f4ca 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -874,7 +874,7 @@ static void handle_a20_line_change(void *opaque, int irq, int level)
+>  
+>  int e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
+>  {
+> -    int index = le32_to_cpu(e820_reserve.count);
+> +    unsigned int index = le32_to_cpu(e820_reserve.count);
+>      struct e820_entry *entry;
+>  
+>      if (type != E820_RAM) {
+> @@ -906,7 +906,8 @@ int e820_get_num_entries(void)
+>      return e820_entries;
+>  }
+>  
+> -bool e820_get_entry(int idx, uint32_t type, uint64_t *address, uint64_t *length)
+> +bool e820_get_entry(unsigned int idx, uint32_t type,
+> +                    uint64_t *address, uint64_t *length)
+>  {
+>      if (idx < e820_entries && e820_table[idx].type == cpu_to_le32(type)) {
+>          *address = le64_to_cpu(e820_table[idx].address);
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index a7d0b87166..3b3a0d6e59 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -291,7 +291,7 @@ void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+>  
+>  int e820_add_entry(uint64_t, uint64_t, uint32_t);
+>  int e820_get_num_entries(void);
+> -bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+> +bool e820_get_entry(unsigned int, uint32_t, uint64_t *, uint64_t *);
+>  
+>  extern GlobalProperty pc_compat_4_0_1[];
+>  extern const size_t pc_compat_4_0_1_len;
+> -- 
+> 2.20.1
