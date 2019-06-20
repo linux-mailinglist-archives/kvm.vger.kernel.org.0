@@ -2,109 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 742564CA26
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 11:00:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 264334CA2F
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2019 11:01:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731364AbfFTJAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 05:00:23 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:41927 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726539AbfFTJAX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 05:00:23 -0400
-Received: by mail-pf1-f196.google.com with SMTP id m30so1283072pff.8;
-        Thu, 20 Jun 2019 02:00:22 -0700 (PDT)
+        id S1731360AbfFTJBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Jun 2019 05:01:46 -0400
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:33687 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725939AbfFTJBp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Jun 2019 05:01:45 -0400
+Received: by mail-ot1-f68.google.com with SMTP id i4so2064588otk.0;
+        Thu, 20 Jun 2019 02:01:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=9mZWqiev/Unq+yxOlmq3nGcEHMBANDGewZajCQ6YEDc=;
-        b=L+l5mzWSPYtd/+Wi+/zSnb5yNtada/zpZySwqsUYKxYWVBKOEHKvVYyZlCcYP9FgSx
-         iZ8sn1PyIlIsNgAZwv5u3ACfuqqRYXRK4F66zRUOO2GV8E4JzC7aGd7CIvtJP+SnnuW4
-         k7btPQZ9mYK+zfe0aD9zT44YutP+6UfBkpyRM2WtFVV04IjBTyBzOuW9G1L4NRun8shm
-         AOxFkJJWtrD/bjNkJw0kpsHPt8LCoPPr5r6nLWr/ip0SWUtFq/1G3hnwt5EgGiZBF62+
-         q1fkVqvKcyCNhrcgQTc6tkYd2f3batVtm/coERP1czagBsyyvLPnBiIrpEFhIM4mGoNz
-         pjZw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9XWALfDZsuDseMJ4aeFkChWWJWcZ4a9nteKLEt49TTw=;
+        b=qrr7l1CioNR8wIDkHD1EIRbzrQW1RxP5Hz3hm/662yglpTWvNKcW92yKLXiHIy/vEs
+         4WQEMK3OwEsAcQS/P2A7tNYixmS87ThBPQfjCpy8KcWRdBpjN1isNVjhnzZH6YeRW+jv
+         tebU05wd+GKmL5PrLPzewMTSHpO3B2o/EZ6mZWfyeKb1AAqJBiX6lBBcWEt+ZVOmoCsd
+         a+FALgnN31H8fup1wDenMvMG1BEm0ho5ZXezWF7SETv5CWXGMh3d+9bPMOWmIpjwD7gZ
+         mAHpDG9fyfV+ysI/gGjME78ayzQUu8gEqgIBwRTm4NaX0ynXfhCHxAXS18jQahGo96a6
+         cauA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=9mZWqiev/Unq+yxOlmq3nGcEHMBANDGewZajCQ6YEDc=;
-        b=D/pP/4kEj0TN6Rty6IuvZY96yYPdUbeCCOgzfOmt1yNeImXmWJCdUinuWSR7L3VLlq
-         YBZZRQUtbGmjOX18ADu7y0v1eBoEWw1D/UyIHPHrhG/diX/RMYT0hI3Oy3yDP5eIbRpQ
-         e0b9kr/A7WCVXo06wqySvXsVmK8bN7jAWhNqel/Xpok6N0fxrl8yPGrOIrL9sZH0irps
-         aEY08ml7+19rtifelSBKoQdkQ/3Ghdba2fhhLgBRoK8G3MmQiZ8sU+WPn4mlHGOXe2lF
-         5f9kdtNMyVi1a4x+kfPXqZyIaUjcdJBudDXja8t2XqVxgIed4A9Gum5Cvkjt0b573vhq
-         tQcg==
-X-Gm-Message-State: APjAAAVYr/IMZ1CMwO4y1IJsLCKvMyrWZRkGXqFb050rGVqOxFVEYqsr
-        i+g/TkXRPuC9YH1DjPaEsYQ4DDHZ
-X-Google-Smtp-Source: APXvYqzo+rTxgjrUjGfk8CKkbLda89Le3yKz/DFV96t5ocCNur5kDi3FfMOVzimVD6FNIpdb75xktQ==
-X-Received: by 2002:aa7:8294:: with SMTP id s20mr119818264pfm.75.1561021222275;
-        Thu, 20 Jun 2019 02:00:22 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id h62sm23183321pgc.54.2019.06.20.02.00.20
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Thu, 20 Jun 2019 02:00:21 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        stable@vger.kernel.org
-Subject: [PATCH] KVM: VMX: Raise #GP when guest read/write forbidden IA32_XSS
-Date:   Thu, 20 Jun 2019 17:00:02 +0800
-Message-Id: <1561021202-13789-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9XWALfDZsuDseMJ4aeFkChWWJWcZ4a9nteKLEt49TTw=;
+        b=AQwtCgcRbrTB65Q5RP/DqQUD8iPoldwILkfwvjfTrraY6YIs1UG1vQQaId71HHheWf
+         eC6bELBUvFJ4Zu06puq+IBUrUHBQH7LumqzWwwKNgld1tv0huCFKo+pvcGDTq9SdZ/Ou
+         32jadjQl50HoEnpL6a4KqdW6/Ici+9UFsPKiwqLoNdqdp8yDKr00DzrATDH0ppcfsGh6
+         n1PTtcNoZDTI5PwIKMXXCgkUxwvMWgpK2tQcurnbSMODccjRlCJG0lfKG+rFR4V7dgGs
+         dhXlICcwhesHNX5BCf3lBzlxqKnVBXEt5rajVPk1im1H5vfXXIZj4fM2GfBur5J+1xtq
+         fOUw==
+X-Gm-Message-State: APjAAAV51HDxbBAVte0hVrQyqYS6Go48OC80Ia9BVCWkLu8yQNvvNjhC
+        plLON6+P5Perv7UL3cvqmHzFb8Rm/oY1OK8pR04=
+X-Google-Smtp-Source: APXvYqwWsIIp/o0pN10sFuCvbSWrFLP/so3UOmDqaKG5SeJWGBQd2M4ahM1uMfnCI4vJRjkEmfHH/DmQ3kI8JZc/VL4=
+X-Received: by 2002:a9d:62c4:: with SMTP id z4mr2613071otk.56.1561021304529;
+ Thu, 20 Jun 2019 02:01:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20190620050301.1149-1-tao3.xu@intel.com> <CANRm+Cwg7ogTN1w=xNyn+8CfxwofdxRykULFe217pXidzEhh6Q@mail.gmail.com>
+ <f358c914-ae58-9889-a8ef-6ea9f3b2650e@linux.intel.com> <b3f76acd-cc7e-9cd7-d7f7-404ba756ab87@redhat.com>
+ <2032f811-b583-eca1-3ece-d1e95738ff64@linux.intel.com> <d9b3e4ff-e14b-1bc5-2a7e-c89b545bb2fc@redhat.com>
+In-Reply-To: <d9b3e4ff-e14b-1bc5-2a7e-c89b545bb2fc@redhat.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Thu, 20 Jun 2019 17:02:56 +0800
+Message-ID: <CANRm+Cx2qsBJkauu9OryN7mR_dEgyha_KUZC=5-uqc5JoSgvPA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: vmx: Fix the broken usage of vmx_xsaves_supported
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Xiaoyao Li <xiaoyao.li@linux.intel.com>,
+        Tao Xu <tao3.xu@intel.com>, Radim Krcmar <rkrcmar@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On Thu, 20 Jun 2019 at 16:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 20/06/19 10:55, Xiaoyao Li wrote:
+> >
+> >> However I may be wrong because I didn't review the code very closely:
+> >> the old code is obvious and so there is no point in changing it.
+> >
+> > you mean this part about XSS_EXIT_BITMAP? how about the other part in
+> > vmx_set/get_msr() in this patch?
+>
+> Yes, only the XSS_EXIT_BITMAP part.  The other is a bugfix, I didn't
+> understand Wanpeng's objection very well.
 
-Raise #GP when guest read/write forbidden IA32_XSS.  
+https://lkml.org/lkml/2019/6/20/227 A more complete one.
 
-Fixes: 203000993de5 (kvm: vmx: add MSR logic for XSAVES) 
-Reported-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
-Reported-by: Tao Xu <tao3.xu@intel.com>
-Cc: Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/vmx/vmx.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b939a68..d174b62 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1732,7 +1732,10 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		return vmx_get_vmx_msr(&vmx->nested.msrs, msr_info->index,
- 				       &msr_info->data);
- 	case MSR_IA32_XSS:
--		if (!vmx_xsaves_supported())
-+		if (!vmx_xsaves_supported() ||
-+			(!msr_info->host_initiated &&
-+			!(guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
-+			guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))))
- 			return 1;
- 		msr_info->data = vcpu->arch.ia32_xss;
- 		break;
-@@ -1962,7 +1965,10 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			return 1;
- 		return vmx_set_vmx_msr(vcpu, msr_index, data);
- 	case MSR_IA32_XSS:
--		if (!vmx_xsaves_supported())
-+		if (!vmx_xsaves_supported() ||
-+			(!msr_info->host_initiated &&
-+			!(guest_cpuid_has(vcpu, X86_FEATURE_XSAVE) &&
-+			guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))))
- 			return 1;
- 		/*
- 		 * The only supported bit as of Skylake is bit 8, but
--- 
-2.7.4
-
+Regards,
+Wanpeng Li
