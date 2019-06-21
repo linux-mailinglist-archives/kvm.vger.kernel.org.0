@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1457D4E3EA
+	by mail.lfdr.de (Postfix) with ESMTP id 8764B4E3EB
 	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2019 11:39:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726711AbfFUJjl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jun 2019 05:39:41 -0400
-Received: from foss.arm.com ([217.140.110.172]:54006 "EHLO foss.arm.com"
+        id S1726715AbfFUJjn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jun 2019 05:39:43 -0400
+Received: from foss.arm.com ([217.140.110.172]:54014 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726706AbfFUJjl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jun 2019 05:39:41 -0400
+        id S1726706AbfFUJjn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jun 2019 05:39:43 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE61B14F6;
-        Fri, 21 Jun 2019 02:39:40 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 54252142F;
+        Fri, 21 Jun 2019 02:39:42 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 655163F246;
-        Fri, 21 Jun 2019 02:39:39 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F3ADA3F246;
+        Fri, 21 Jun 2019 02:39:40 -0700 (PDT)
 From:   Marc Zyngier <marc.zyngier@arm.com>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -27,9 +27,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         Julien Thierry <julien.thierry@arm.com>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 18/59] KVM: arm64: nv: Trap EL1 VM register accesses in virtual EL2
-Date:   Fri, 21 Jun 2019 10:38:02 +0100
-Message-Id: <20190621093843.220980-19-marc.zyngier@arm.com>
+Subject: [PATCH 19/59] KVM: arm64: nv: Trap SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
+Date:   Fri, 21 Jun 2019 10:38:03 +0100
+Message-Id: <20190621093843.220980-20-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190621093843.220980-1-marc.zyngier@arm.com>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
@@ -40,59 +40,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+From: Jintack Lim <jintack.lim@linaro.org>
 
-When running in virtual EL2 mode, we actually run the hardware in EL1
-and therefore have to use the EL1 registers to ensure correct operation.
+For the same reason we trap virtual memory register accesses at virtual
+EL2, we need to trap SPSR_EL1, ELR_EL1 and VBAR_EL1 accesses. ARM v8.3
+introduces the HCR_EL2.NV1 bit to be able to trap on those register
+accesses in EL1. Do not set this bit until the whole nesting support is
+completed.
 
-By setting the HCR.TVM and HCR.TVRM we ensure that the virtual EL2 mode
-doesn't shoot itself in the foot when setting up what it believes to be
-a different mode's system register state (for example when preparing to
-switch to a VM).
-
-We can leverage the existing sysregs infrastructure to support trapped
-accesses to these registers.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/switch.c | 4 ++++
- arch/arm64/kvm/sys_regs.c   | 7 ++++++-
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 7b55c11b30fb..791b26570347 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -135,6 +135,10 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 hcr = vcpu->arch.hcr_el2;
- 
-+	/* Trap VM sysreg accesses if an EL2 guest is not using VHE. */
-+	if (vcpu_mode_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
-+		hcr |= HCR_TVM | HCR_TRVM;
-+
- 	write_sysreg(hcr, hcr_el2);
- 
- 	if (cpus_have_const_cap(ARM64_HAS_RAS_EXTN) && (hcr & HCR_VSE))
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index e181359adadf..0464d8e29cba 100644
+index 0464d8e29cba..7fc87657382d 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -440,7 +440,12 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
- 	u64 val;
- 	int reg = r->reg;
+@@ -1606,6 +1606,30 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
  
--	BUG_ON(!p->is_write);
-+	BUG_ON(!vcpu_mode_el2(vcpu) && !p->is_write);
++static bool access_elr(struct kvm_vcpu *vcpu,
++		       struct sys_reg_params *p,
++		       const struct sys_reg_desc *r)
++{
++	if (p->is_write)
++		vcpu->arch.ctxt.gp_regs.elr_el1 = p->regval;
++	else
++		p->regval = vcpu->arch.ctxt.gp_regs.elr_el1;
 +
-+	if (!p->is_write) {
-+		p->regval = vcpu_read_sys_reg(vcpu, reg);
-+		return true;
-+	}
++	return true;
++}
++
++static bool access_spsr(struct kvm_vcpu *vcpu,
++			struct sys_reg_params *p,
++			const struct sys_reg_desc *r)
++{
++	if (p->is_write)
++		vcpu->arch.ctxt.gp_regs.spsr[KVM_SPSR_EL1] = p->regval;
++	else
++		p->regval = vcpu->arch.ctxt.gp_regs.spsr[KVM_SPSR_EL1];
++
++	return true;
++}
++
+ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
+ 			    struct sys_reg_params *p,
+ 			    const struct sys_reg_desc *r)
+@@ -1761,6 +1785,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	PTRAUTH_KEY(APDB),
+ 	PTRAUTH_KEY(APGA),
  
- 	/* See the 32bit mapping in kvm_host.h */
- 	if (p->is_aarch32)
++	{ SYS_DESC(SYS_SPSR_EL1), access_spsr},
++	{ SYS_DESC(SYS_ELR_EL1), access_elr},
++
+ 	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
+ 	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
+ 	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
+@@ -1789,7 +1816,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
+ 	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
+ 
+-	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
++	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
+ 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
+ 
+ 	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
 -- 
 2.20.1
 
