@@ -2,105 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DFB064E7F5
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2019 14:25:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAA674E88F
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2019 15:08:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726372AbfFUMZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jun 2019 08:25:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47204 "EHLO mx1.redhat.com"
+        id S1726974AbfFUNIP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jun 2019 09:08:15 -0400
+Received: from foss.arm.com ([217.140.110.172]:60162 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726260AbfFUMZn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jun 2019 08:25:43 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9C583AC2E5;
-        Fri, 21 Jun 2019 12:25:43 +0000 (UTC)
-Received: from gondolin (dhcp-192-192.str.redhat.com [10.33.192.192])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B06A819C4F;
-        Fri, 21 Jun 2019 12:25:42 +0000 (UTC)
-Date:   Fri, 21 Jun 2019 14:25:40 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Farhan Ali <alifm@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        id S1726311AbfFUNIO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jun 2019 09:08:14 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F03B2142F;
+        Fri, 21 Jun 2019 06:08:13 -0700 (PDT)
+Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C25193F246;
+        Fri, 21 Jun 2019 06:08:06 -0700 (PDT)
+Subject: Re: [PATCH 03/59] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+To:     Marc Zyngier <marc.zyngier@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v1 0/5] s390: more vfio-ccw code rework
-Message-ID: <20190621142540.4ed5f943.cohuck@redhat.com>
-In-Reply-To: <20190618202352.39702-1-farman@linux.ibm.com>
-References: <20190618202352.39702-1-farman@linux.ibm.com>
-Organization: Red Hat GmbH
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-4-marc.zyngier@arm.com>
+From:   Julien Thierry <julien.thierry@arm.com>
+Message-ID: <41b1ae35-5b48-7118-3d3e-e227af43010e@arm.com>
+Date:   Fri, 21 Jun 2019 14:08:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190621093843.220980-4-marc.zyngier@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Fri, 21 Jun 2019 12:25:43 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 18 Jun 2019 22:23:47 +0200
-Eric Farman <farman@linux.ibm.com> wrote:
 
-> A couple little improvements to the malloc load in vfio-ccw.
-> Really, there were just (the first) two patches, but then I
-> got excited and added a few stylistic ones to the end.
-> 
-> The routine ccwchain_calc_length() has this basic structure:
-> 
->   ccwchain_calc_length
->     a0 = kcalloc(CCWCHAIN_LEN_MAX, sizeof(struct ccw1))
->     copy_ccw_from_iova(a0, src)
->       copy_from_iova
->         pfn_array_alloc
->           b = kcalloc(len, sizeof(*pa_iova_pfn + *pa_pfn)
->         pfn_array_pin
->           vfio_pin_pages
->         memcpy(a0, src)
->         pfn_array_unpin_free
->           vfio_unpin_pages
->           kfree(b)
->     kfree(a0)
-> 
-> We do this EVERY time we process a new channel program chain,
-> meaning at least once per SSCH and more if TICs are involved,
-> to figure out how many CCWs are chained together.  Once that
-> is determined, a new piece of memory is allocated (call it a1)
-> and then passed to copy_ccw_from_iova() again, but for the
-> value calculated by ccwchain_calc_length().
-> 
-> This seems inefficient.
-> 
-> Patch 1 moves the malloc of a0 from the CCW processor to the
-> initialization of the device.  Since only one SSCH can be
-> handled concurrently, we can use this space safely to
-> determine how long the chain being processed actually is.
-> 
-> Patch 2 then removes the second copy_ccw_from_iova() call
-> entirely, and replaces it with a memcpy from a0 to a1.  This
-> is done before we process a TIC and thus a second chain, so
-> there is no overlap in the storage in channel_program.
-> 
-> Patches 3-5 clean up some things that aren't as clear as I'd
-> like, but didn't want to pollute the first two changes.
-> For example, patch 3 moves the population of guest_cp to the
-> same routine that copies from it, rather than in a called
-> function.  Meanwhile, patch 4 (and thus, 5) was something I
-> had lying around for quite some time, because it looked to
-> be structured weird.  Maybe that's one bridge too far.
-> 
-> Eric Farman (5):
->   vfio-ccw: Move guest_cp storage into common struct
->   vfio-ccw: Skip second copy of guest cp to host
->   vfio-ccw: Copy CCW data outside length calculation
->   vfio-ccw: Factor out the ccw0-to-ccw1 transition
->   vfio-ccw: Remove copy_ccw_from_iova()
-> 
->  drivers/s390/cio/vfio_ccw_cp.c  | 108 +++++++++++---------------------
->  drivers/s390/cio/vfio_ccw_cp.h  |   7 +++
->  drivers/s390/cio/vfio_ccw_drv.c |   7 +++
->  3 files changed, 52 insertions(+), 70 deletions(-)
-> 
 
-Thanks, applied.
+On 21/06/2019 10:37, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
+> 
+> Add a new ARM64_HAS_NESTED_VIRT feature to indicate that the
+> CPU has the ARMv8.3 nested virtualization capability.
+> 
+> This will be used to support nested virtualization in KVM.
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  .../admin-guide/kernel-parameters.txt         |  4 +++
+>  arch/arm64/include/asm/cpucaps.h              |  3 ++-
+>  arch/arm64/include/asm/sysreg.h               |  1 +
+>  arch/arm64/kernel/cpufeature.c                | 26 +++++++++++++++++++
+>  4 files changed, 33 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index 138f6664b2e2..202bb2115d83 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -2046,6 +2046,10 @@
+>  			[KVM,ARM] Allow use of GICv4 for direct injection of
+>  			LPIs.
+>  
+> +	kvm-arm.nested=
+> +			[KVM,ARM] Allow nested virtualization in KVM/ARM.
+> +			Default is 0 (disabled)
+> +
+
+Once the kernel has been built with nested guest support, what do we
+gain from having it disabled by default?
+
+It seems a bit odd since the guests have to opt-in for the capability of
+running guests of their own.
+
+Is it it likely to have negative impact a negative impact on the host
+kernel? Or on guests that do not request use of nested virt?
+
+If not I feel that this kernel parameter should be dropped.
+
+Cheers,
+
+-- 
+Julien Thierry
