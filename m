@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 970764E451
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2019 11:42:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12B954E41A
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2019 11:40:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726811AbfFUJkN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jun 2019 05:40:13 -0400
-Received: from foss.arm.com ([217.140.110.172]:54190 "EHLO foss.arm.com"
+        id S1726833AbfFUJkQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jun 2019 05:40:16 -0400
+Received: from foss.arm.com ([217.140.110.172]:54202 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726795AbfFUJkM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jun 2019 05:40:12 -0400
+        id S1726822AbfFUJkP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jun 2019 05:40:15 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2E40014FF;
-        Fri, 21 Jun 2019 02:40:12 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B93461500;
+        Fri, 21 Jun 2019 02:40:13 -0700 (PDT)
 Received: from filthy-habits.cambridge.arm.com (filthy-habits.cambridge.arm.com [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CE03B3F246;
-        Fri, 21 Jun 2019 02:40:10 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 650273F246;
+        Fri, 21 Jun 2019 02:40:12 -0700 (PDT)
 From:   Marc Zyngier <marc.zyngier@arm.com>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -27,9 +27,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         Julien Thierry <julien.thierry@arm.com>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 38/59] KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
-Date:   Fri, 21 Jun 2019 10:38:22 +0100
-Message-Id: <20190621093843.220980-39-marc.zyngier@arm.com>
+Subject: [PATCH 39/59] KVM: arm64: nv: Move last_vcpu_ran to be per s2 mmu
+Date:   Fri, 21 Jun 2019 10:38:23 +0100
+Message-Id: <20190621093843.220980-40-marc.zyngier@arm.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190621093843.220980-1-marc.zyngier@arm.com>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
@@ -40,265 +40,260 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+last_vcpu_ran has to be per s2 mmu now that we can have multiple S2
+per VM. Let's take this opportunity to perform some cleanup.
 
-Unmap/flush shadow stage 2 page tables for the nested VMs as well as the
-stage 2 page table for the guest hypervisor.
-
-Note: A bunch of the code in mmu.c relating to MMU notifiers is
-currently dealt with in an extremely abrupt way, for example by clearing
-out an entire shadow stage-2 table. This will be handled in a more
-efficient way using the reverse mapping feature in a later version of
-the patch series.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h    |  3 +++
- arch/arm64/include/asm/kvm_nested.h |  3 +++
- arch/arm64/kvm/nested.c             | 39 +++++++++++++++++++++++++++
- virt/kvm/arm/arm.c                  |  4 ++-
- virt/kvm/arm/mmu.c                  | 42 +++++++++++++++++++++++------
- 5 files changed, 82 insertions(+), 9 deletions(-)
+ arch/arm/include/asm/kvm_host.h   |  6 +++---
+ arch/arm/include/asm/kvm_mmu.h    |  2 +-
+ arch/arm64/include/asm/kvm_host.h |  6 +++---
+ arch/arm64/include/asm/kvm_mmu.h  |  2 +-
+ arch/arm64/kvm/nested.c           | 13 ++++++-------
+ virt/kvm/arm/arm.c                | 22 ++++------------------
+ virt/kvm/arm/mmu.c                | 26 ++++++++++++++++++++------
+ 7 files changed, 38 insertions(+), 39 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 32bcaa1845dc..f4c5ac5eb95f 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -163,6 +163,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
- 			   void __iomem **haddr);
- int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
- 			     void **haddr);
-+void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu,
-+			    phys_addr_t addr, phys_addr_t end);
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index b821eb2383ad..cc761610e41e 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -63,15 +63,15 @@ struct kvm_s2_mmu {
+ 	pgd_t *pgd;
+ 	phys_addr_t pgd_phys;
+ 
++	/* The last vcpu id that ran on each physical CPU */
++	int __percpu *last_vcpu_ran;
++
+ 	struct kvm *kvm;
+ };
+ 
+ struct kvm_arch {
+ 	struct kvm_s2_mmu mmu;
+ 
+-	/* The last vcpu id that ran on each physical CPU */
+-	int __percpu *last_vcpu_ran;
+-
+ 	/* Stage-2 page table */
+ 	pgd_t *pgd;
+ 	phys_addr_t pgd_phys;
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index afabf1fd1d17..7a6e9008ed45 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -52,7 +52,7 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
  void free_hyp_pgds(void);
  
- void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
-@@ -171,6 +173,7 @@ int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu);
+ void stage2_unmap_vm(struct kvm *kvm);
+-int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu);
++int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu);
  void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
  			  phys_addr_t pa, unsigned long size, bool writable);
-+void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index cc238de170d2..b71a7a237f95 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -104,6 +104,9 @@ struct kvm_s2_mmu {
+ 	 * >0: Somebody is actively using this.
+ 	 */
+ 	atomic_t refcnt;
++
++	/* The last vcpu id that ran on each physical CPU */
++	int __percpu *last_vcpu_ran;
+ };
  
- int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
+@@ -124,9 +127,6 @@ struct kvm_arch {
+ 	/* VTCR_EL2 value for this VM */
+ 	u64    vtcr;
  
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 052d46d96201..3b415bc76ced 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -48,6 +48,9 @@ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
- 				    struct kvm_s2_trans *trans);
- extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
-+extern void kvm_nested_s2_wp(struct kvm *kvm);
-+extern void kvm_nested_s2_clear(struct kvm *kvm);
-+extern void kvm_nested_s2_flush(struct kvm *kvm);
- int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
- extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
- extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+-	/* The last vcpu id that ran on each physical CPU */
+-	int __percpu *last_vcpu_ran;
+-
+ 	/* The maximum number of vCPUs depends on the used GIC model */
+ 	int max_vcpus;
+ 
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index f4c5ac5eb95f..53103607065a 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -169,7 +169,7 @@ void free_hyp_pgds(void);
+ 
+ void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
+ void stage2_unmap_vm(struct kvm *kvm);
+-int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu);
++int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu);
+ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 			  phys_addr_t pa, unsigned long size, bool writable);
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 023027fa2db5..8880033fb6e0 100644
+index 8880033fb6e0..09afafbdc8fe 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -456,6 +456,45 @@ int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2)
- 	return kvm_inject_nested_sync(vcpu, esr_el2);
- }
+@@ -52,18 +52,17 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+ 			 GFP_KERNEL | __GFP_ZERO);
  
-+/* expects kvm->mmu_lock to be held */
-+void kvm_nested_s2_wp(struct kvm *kvm)
-+{
-+	int i;
-+
-+	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-+		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-+
-+		if (kvm_s2_mmu_valid(mmu))
-+			kvm_stage2_wp_range(mmu, 0, kvm_phys_size(kvm));
-+	}
-+}
-+
-+/* expects kvm->mmu_lock to be held */
-+void kvm_nested_s2_clear(struct kvm *kvm)
-+{
-+	int i;
-+
-+	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-+		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-+
-+		if (kvm_s2_mmu_valid(mmu))
-+			kvm_unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
-+	}
-+}
-+
-+/* expects kvm->mmu_lock to be held */
-+void kvm_nested_s2_flush(struct kvm *kvm)
-+{
-+	int i;
-+
-+	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-+		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-+
-+		if (kvm_s2_mmu_valid(mmu))
-+			kvm_stage2_flush_range(mmu, 0, kvm_phys_size(kvm));
-+	}
-+}
-+
- /*
-  * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
-  * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
+ 	if (tmp) {
+-		if (tmp != kvm->arch.nested_mmus)
++		if (tmp != kvm->arch.nested_mmus) {
+ 			kfree(kvm->arch.nested_mmus);
++			kvm->arch.nested_mmus = NULL;
++			kvm->arch.nested_mmus_size = 0;
++		}
+ 
+-		tmp[num_mmus - 1].kvm = kvm;
+-		atomic_set(&tmp[num_mmus - 1].refcnt, 0);
+-		ret = kvm_alloc_stage2_pgd(&tmp[num_mmus - 1]);
++		ret = kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1]);
+ 		if (ret)
+ 			goto out;
+ 
+-		tmp[num_mmus - 2].kvm = kvm;
+-		atomic_set(&tmp[num_mmus - 2].refcnt, 0);
+-		ret = kvm_alloc_stage2_pgd(&tmp[num_mmus - 2]);
++		ret = kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2]);
+ 		if (ret) {
+ 			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
+ 			goto out;
 diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index 4e3cbfa1ecbe..bcca27d5c481 100644
+index bcca27d5c481..e8b584b79847 100644
 --- a/virt/kvm/arm/arm.c
 +++ b/virt/kvm/arm/arm.c
-@@ -1005,8 +1005,10 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
- 	 * Ensure a rebooted VM will fault in RAM pages and detect if the
- 	 * guest MMU is turned off and flush the caches as needed.
- 	 */
--	if (vcpu->arch.has_run_once)
-+	if (vcpu->arch.has_run_once) {
- 		stage2_unmap_vm(vcpu->kvm);
-+		kvm_nested_s2_clear(vcpu->kvm);
-+	}
+@@ -99,29 +99,21 @@ void kvm_arch_check_processor_compat(void *rtn)
+ 	*(int *)rtn = 0;
+ }
  
- 	vcpu_reset_hcr(vcpu);
+-
+ /**
+  * kvm_arch_init_vm - initializes a VM data structure
+  * @kvm:	pointer to the KVM struct
+  */
+ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ {
+-	int ret, cpu;
++	int ret;
  
+ 	ret = kvm_arm_setup_stage2(kvm, type);
+ 	if (ret)
+ 		return ret;
+ 
+-	kvm->arch.last_vcpu_ran = alloc_percpu(typeof(*kvm->arch.last_vcpu_ran));
+-	if (!kvm->arch.last_vcpu_ran)
+-		return -ENOMEM;
+-
+-	for_each_possible_cpu(cpu)
+-		*per_cpu_ptr(kvm->arch.last_vcpu_ran, cpu) = -1;
+-
+-	ret = kvm_alloc_stage2_pgd(&kvm->arch.mmu);
++	ret = kvm_init_stage2_mmu(kvm, &kvm->arch.mmu);
+ 	if (ret)
+-		goto out_fail_alloc;
++		return ret;
+ 
+ 	/* Mark the initial VMID generation invalid */
+ 	kvm->arch.mmu.vmid.vmid_gen = 0;
+@@ -142,9 +134,6 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	return ret;
+ out_free_stage2_pgd:
+ 	kvm_free_stage2_pgd(&kvm->arch.mmu);
+-out_fail_alloc:
+-	free_percpu(kvm->arch.last_vcpu_ran);
+-	kvm->arch.last_vcpu_ran = NULL;
+ 	return ret;
+ }
+ 
+@@ -174,9 +163,6 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 
+ 	kvm_vgic_destroy(kvm);
+ 
+-	free_percpu(kvm->arch.last_vcpu_ran);
+-	kvm->arch.last_vcpu_ran = NULL;
+-
+ 	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+ 		if (kvm->vcpus[i]) {
+ 			kvm_arch_vcpu_free(kvm->vcpus[i]);
+@@ -359,7 +345,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	if (nested_virt_in_use(vcpu))
+ 		kvm_vcpu_load_hw_mmu(vcpu);
+ 
+-	last_ran = this_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran);
++	last_ran = this_cpu_ptr(vcpu->arch.hw_mmu->last_vcpu_ran);
+ 	cpu_data = this_cpu_ptr(&kvm_host_data);
+ 
+ 	/*
 diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 3c7845832db8..94d400e7af57 100644
+index 94d400e7af57..6a7cba077bce 100644
 --- a/virt/kvm/arm/mmu.c
 +++ b/virt/kvm/arm/mmu.c
-@@ -416,12 +416,10 @@ static void stage2_flush_puds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
- 	} while (pud++, addr = next, addr != end);
- }
- 
--static void stage2_flush_memslot(struct kvm_s2_mmu *mmu,
--				 struct kvm_memory_slot *memslot)
-+void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu,
-+			    phys_addr_t addr, phys_addr_t end)
- {
- 	struct kvm *kvm = mmu->kvm;
--	phys_addr_t addr = memslot->base_gfn << PAGE_SHIFT;
--	phys_addr_t end = addr + PAGE_SIZE * memslot->npages;
- 	phys_addr_t next;
- 	pgd_t *pgd;
- 
-@@ -433,6 +431,15 @@ static void stage2_flush_memslot(struct kvm_s2_mmu *mmu,
- 	} while (pgd++, addr = next, addr != end);
- }
- 
-+static void stage2_flush_memslot(struct kvm_s2_mmu *mmu,
-+				 struct kvm_memory_slot *memslot)
-+{
-+	phys_addr_t addr = memslot->base_gfn << PAGE_SHIFT;
-+	phys_addr_t end = addr + PAGE_SIZE * memslot->npages;
-+
-+	kvm_stage2_flush_range(mmu, addr, end);
-+}
-+
- /**
-  * stage2_flush_vm - Invalidate cache for pages mapped in stage 2
-  * @kvm: The struct kvm pointer
-@@ -453,6 +460,8 @@ static void stage2_flush_vm(struct kvm *kvm)
- 	kvm_for_each_memslot(memslot, slots)
- 		stage2_flush_memslot(&kvm->arch.mmu, memslot);
- 
-+	kvm_nested_s2_flush(kvm);
-+
- 	spin_unlock(&kvm->mmu_lock);
- 	srcu_read_unlock(&kvm->srcu, idx);
- }
-@@ -1509,12 +1518,12 @@ static void  stage2_wp_puds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
+@@ -903,8 +903,9 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
  }
  
  /**
-- * stage2_wp_range() - write protect stage2 memory region range
-+ * kvm_stage2_wp_range() - write protect stage2 memory region range
-  * @kvm:	The KVM pointer
-  * @addr:	Start address of range
-  * @end:	End address of range
+- * kvm_alloc_stage2_pgd - allocate level-1 table for stage-2 translation.
+- * @mmu:	The stage 2 mmu struct pointer
++ * kvm_init_stage2_mmu - Initialise a S2 MMU strucrure
++ * @kvm:	The pointer to the KVM structure
++ * @mmu:	The pointer to the s2 MMU structure
+  *
+  * Allocates only the stage-2 HW PGD level table(s) of size defined by
+  * stage2_pgd_size(mmu->kvm).
+@@ -912,10 +913,11 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+  * Note we don't need locking here as this is only called when the VM is
+  * created, which can only be done once.
   */
--static void stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
-+void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
+-int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu)
++int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
  {
- 	struct kvm *kvm = mmu->kvm;
+ 	phys_addr_t pgd_phys;
  	pgd_t *pgd;
-@@ -1561,7 +1570,8 @@ void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
- 	phys_addr_t end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
++	int cpu;
  
- 	spin_lock(&kvm->mmu_lock);
--	stage2_wp_range(&kvm->arch.mmu, start, end);
-+	kvm_stage2_wp_range(&kvm->arch.mmu, start, end);
-+	kvm_nested_s2_wp(kvm);
- 	spin_unlock(&kvm->mmu_lock);
- 	kvm_flush_remote_tlbs(kvm);
- }
-@@ -1585,7 +1595,7 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
- 	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
- 	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
+ 	if (mmu->pgd != NULL) {
+ 		kvm_err("kvm_arch already initialized?\n");
+@@ -923,18 +925,28 @@ int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu)
+ 	}
  
--	stage2_wp_range(&kvm->arch.mmu, start, end);
-+	kvm_stage2_wp_range(&kvm->arch.mmu, start, end);
- }
+ 	/* Allocate the HW PGD, making sure that each page gets its own refcount */
+-	pgd = alloc_pages_exact(stage2_pgd_size(mmu->kvm), GFP_KERNEL | __GFP_ZERO);
++	pgd = alloc_pages_exact(stage2_pgd_size(kvm), GFP_KERNEL | __GFP_ZERO);
+ 	if (!pgd)
+ 		return -ENOMEM;
  
- /*
-@@ -1600,6 +1610,7 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 		gfn_t gfn_offset, unsigned long mask)
- {
- 	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
-+	kvm_nested_s2_wp(kvm);
- }
+ 	pgd_phys = virt_to_phys(pgd);
+-	if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(mmu->kvm)))
++	if (WARN_ON(pgd_phys & ~kvm_vttbr_baddr_mask(kvm)))
+ 		return -EINVAL;
  
- static void clean_dcache_guest_page(kvm_pfn_t pfn, unsigned long size)
-@@ -2111,6 +2122,7 @@ static int handle_hva_to_gpa(struct kvm *kvm,
- static int kvm_unmap_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
- {
- 	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
-+	kvm_nested_s2_clear(kvm);
++	mmu->last_vcpu_ran = alloc_percpu(typeof(*mmu->last_vcpu_ran));
++	if (!mmu->last_vcpu_ran) {
++		free_pages_exact(pgd, stage2_pgd_size(kvm));
++		return -ENOMEM;
++	}
++
++	mmu->kvm = kvm;
+ 	mmu->pgd = pgd;
+ 	mmu->pgd_phys = pgd_phys;
+ 	mmu->vmid.vmid_gen = 0;
+ 
++	for_each_possible_cpu(cpu)
++		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
++
+ 	kvm_init_s2_mmu(mmu);
+ 
  	return 0;
- }
- 
-@@ -2138,6 +2150,7 @@ static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data
- 	 * through this calling path.
- 	 */
- 	stage2_set_pte(&kvm->arch.mmu, NULL, gpa, pte, 0);
-+	kvm_nested_s2_clear(kvm);
- 	return 0;
- }
- 
-@@ -2180,6 +2193,13 @@ static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
- 		return stage2_pmdp_test_and_clear_young(pmd);
- 	else
- 		return stage2_ptep_test_and_clear_young(pte);
-+
-+	/*
-+	 * TODO: Handle nested_mmu structures here using the reverse mapping in
-+	 * a later version of patch series.
-+	 */
-+
-+	return stage2_ptep_test_and_clear_young(pte);
- }
- 
- static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
-@@ -2198,6 +2218,11 @@ static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *
- 		return pmd_young(*pmd);
- 	else
- 		return pte_young(*pte);
-+
-+	/*
-+	 * TODO: Handle nested_mmu structures here using the reverse mapping in
-+	 * a later version of patch series.
-+	 */
- }
- 
- int kvm_age_hva(struct kvm *kvm, unsigned long start, unsigned long end)
-@@ -2455,6 +2480,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
- 
- 	spin_lock(&kvm->mmu_lock);
- 	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
-+	kvm_nested_s2_clear(kvm);
+@@ -1021,8 +1033,10 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
  	spin_unlock(&kvm->mmu_lock);
+ 
+ 	/* Free the HW pgd, one page at a time */
+-	if (pgd)
++	if (pgd) {
+ 		free_pages_exact(pgd, stage2_pgd_size(kvm));
++		free_percpu(mmu->last_vcpu_ran);
++	}
  }
  
+ static pud_t *stage2_get_pud(struct kvm_s2_mmu *mmu, struct kvm_mmu_memory_cache *cache,
 -- 
 2.20.1
 
