@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CDD4C4E456
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2019 11:42:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 647594E450
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2019 11:41:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726834AbfFUJmB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Jun 2019 05:42:01 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:42652 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726780AbfFUJkP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jun 2019 05:40:15 -0400
-Received: by mail-pf1-f196.google.com with SMTP id q10so3302354pff.9;
-        Fri, 21 Jun 2019 02:40:15 -0700 (PDT)
+        id S1726385AbfFUJlu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jun 2019 05:41:50 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:33271 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726841AbfFUJkS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jun 2019 05:40:18 -0400
+Received: by mail-pg1-f194.google.com with SMTP id m4so2495982pgk.0;
+        Fri, 21 Jun 2019 02:40:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=VFFDwCFq2HrwKhsHNYdr3dT1d0gmmMXbwXl7POD+wiY=;
-        b=sbgpcQM2m9MBSvQd3EUe0CH/Mk4+9lsnZbyu5Mu/IkNvbK4yFK8dEevd3McuKRNa2f
-         a9RGuZ9PaUsNqOBjv6djvkLxwtprLnPhhERbPWDLVYh/ZBKgdeacG/G0IKAkPEqKIlE9
-         sZLPEcaPSJMQgVcyOPlZA2/MRc7GEp2a0s6bqpFJWPAksLT2QgK6j4qxwkbONTAOJ1GN
-         kKtnyYYcI9d9Y0vzOaFN2P4gip/9QgWNsyCC8PyLJJ5C/rDUEKR1rF1A5msD/eFEkdsp
-         l1nnuQ8lWndjdxsQ8nps+mDjxGIitmLZbhaJd5ehXGINdOpuF2QFk+Br+V1Bqp1+6yI5
-         l5QQ==
+        bh=FMsOX5W0VOv0pdIuUXbwft5LV3vGdPWiASZUECTOpTc=;
+        b=eXAfwgNxx6BzNPECHfq21KTuG0a/N4DDkLFbeQq+oblCmRZie1bN8eSzc827+ir+/Z
+         kPielmq5MQJBg0bChJdkfba3swQZCTaLZm2FQiH4oK+vsVY/GPIhsO0VcdAFPDS2uVhG
+         tJWMHs6IdZS3rAB8s3c9rywEDa9D+snQ87mn2rTyUstTGcnpfBfn4j9Gx09Zxm39RrVm
+         e0kjQcgH21x0GA1LdKXzJx7D59HkACBMcyc+0NX1Po2FYZuqzh2BeNAV2huvwNUNaEVE
+         YIVlJsdinpWrII7ds4/bJulSzLgJzbXGcUpnJ+n5/C9fOEw0eKXbVkFe6Am2Pr/L7OnB
+         a4yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=VFFDwCFq2HrwKhsHNYdr3dT1d0gmmMXbwXl7POD+wiY=;
-        b=W4qcF5LHgsAVuWCYBpPpyXt7/BEGQgg+HDuPldMiZz0f1oirI6YnzDZz3S7siot4UU
-         PGZIsf0JoP7XVVALH9NphMPgH5wXyN9vNNvD5A4CIrW3IWxhkl6tsocCBsgsjVHHnrmg
-         jWI1uD6hU7oFLd9PJZwLosi89K/N9HTAYvZpqexBQYRvwxufFEZQwwAUVZ9VwJ1rD+ap
-         UlxdO2L53qmPjVZx1meZhALkWuFHshBz4ti61lI9oc5DUuNK3E1ZRepXRfSVt/M9S1Qx
-         +DIYGQbFjIqwSIKI/Qs1Gwt9Cbe3ZyKDr2xkIaCOaCoG0V1elezacLORaBnK+unbdgsO
-         HBSA==
-X-Gm-Message-State: APjAAAWXV+/6fFBjr7FaU1ut4tziUWP8YcnIlp6aDTKtETjpXP8kUCnE
-        WDVVof5DlY5GVpFSZfXKupBVHtBu
-X-Google-Smtp-Source: APXvYqyHehEeolnb2QZc6Z006tgVoFjj482pMwpaJUF2twxMM4abrBgp+fBdMFxhFpPjJwxEYg6xxQ==
-X-Received: by 2002:a17:90a:bb8b:: with SMTP id v11mr5356446pjr.64.1561110014949;
-        Fri, 21 Jun 2019 02:40:14 -0700 (PDT)
+        bh=FMsOX5W0VOv0pdIuUXbwft5LV3vGdPWiASZUECTOpTc=;
+        b=TVlrKQienAGeOxPKVHwyvsOFDfR+xSvTjLkh/2BU3sOrgtxqtyiFXEy/M9zftqMgCj
+         d9vrsZEH46HuIfbmIAEgd4hfKmorJB6f4JX0YtpDUDYk9dvpvh8X2xR8Eo82y69RPoZC
+         UPcOU9eQ5liZqOI+zzj2cYec1qgJ73IVpMJsqP/6Xkq3cilf5w4IxL22ZVZxhVPZ+gUl
+         ofF5soZOyO2vicOfWNysk0tKgtu+VUizQgtxY3WTc41LgmtExdqnj3zrPZsCTUOTW85h
+         Rx7rA9JGvsNkayAGabcsMLkvsbeFzNmwjECyfcpwGZ+d3nrGDxyy3hEqmEeZ4gTftAcD
+         7QAw==
+X-Gm-Message-State: APjAAAUPLYI8hLnMFElKLFLbdeqnpUbbtPe9liQoEhtttCkKpbxSOt3o
+        jrsnqVvtcgynYuEX9A3fiepdqSHH
+X-Google-Smtp-Source: APXvYqzeNO+RM+TprbZpIPWE1sKx5Wpe1LnsPcmLzc2hgSwupLyjVvnOM0CqOfkCtjh/YP6s7fH56Q==
+X-Received: by 2002:a17:90a:5d0a:: with SMTP id s10mr5379341pji.94.1561110016931;
+        Fri, 21 Jun 2019 02:40:16 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id y14sm1999506pjr.13.2019.06.21.02.40.13
+        by smtp.googlemail.com with ESMTPSA id y14sm1999506pjr.13.2019.06.21.02.40.15
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Fri, 21 Jun 2019 02:40:14 -0700 (PDT)
+        Fri, 21 Jun 2019 02:40:16 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [PATCH v5 1/4] KVM: LAPIC: Make lapic timer unpinned
-Date:   Fri, 21 Jun 2019 17:39:59 +0800
-Message-Id: <1561110002-4438-2-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH v5 2/4] KVM: LAPIC: Inject timer interrupt via posted interrupt
+Date:   Fri, 21 Jun 2019 17:40:00 +0800
+Message-Id: <1561110002-4438-3-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1561110002-4438-1-git-send-email-wanpengli@tencent.com>
 References: <1561110002-4438-1-git-send-email-wanpengli@tencent.com>
@@ -66,79 +66,286 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-Commit 61abdbe0bcc2 ("kvm: x86: make lapic hrtimer pinned") pinned the 
-lapic timer to avoid to wait until the next kvm exit for the guest to 
-see KVM_REQ_PENDING_TIMER set. There is another solution to give a kick 
-after setting the KVM_REQ_PENDING_TIMER bit, make lapic timer unpinned 
-will be used in follow up patches.
+Dedicated instances are currently disturbed by unnecessary jitter due 
+to the emulated lapic timers fire on the same pCPUs which vCPUs resident.
+There is no hardware virtual timer on Intel for guest like ARM. Both 
+programming timer in guest and the emulated timer fires incur vmexits.
+This patch tries to avoid vmexit which is incurred by the emulated 
+timer fires in dedicated instance scenario. 
+
+When nohz_full is enabled in dedicated instances scenario, the emulated 
+timers can be offload to the nearest busy housekeeping cpus since APICv 
+is really common in recent years. The guest timer interrupt is injected 
+by posted-interrupt which is delivered by housekeeping cpu once the emulated 
+timer fires. 
+
+The host admin should fine tuned, e.g. dedicated instances scenario w/ 
+nohz_full cover the pCPUs which vCPUs resident, several pCPUs surplus 
+for busy housekeeping, disable mwait/hlt/pause vmexits to keep in non-root  
+mode, ~3% redis performance benefit can be observed on Skylake server.
+
+w/o patch:
+
+            VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time   Avg time
+
+EXTERNAL_INTERRUPT    42916    49.43%   39.30%   0.47us   106.09us   0.71us ( +-   1.09% )
+
+w/ patch:
+
+            VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time         Avg time
+
+EXTERNAL_INTERRUPT    6871     9.29%     2.96%   0.44us    57.88us   0.72us ( +-   4.02% )
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Radim Krčmář <rkrcmar@redhat.com>
 Cc: Marcelo Tosatti <mtosatti@redhat.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- arch/x86/kvm/lapic.c | 8 ++++----
- arch/x86/kvm/x86.c   | 6 +-----
- 2 files changed, 5 insertions(+), 9 deletions(-)
+ arch/x86/kvm/lapic.c            | 45 ++++++++++++++++++++++++++++++-----------
+ arch/x86/kvm/lapic.h            |  3 ++-
+ arch/x86/kvm/svm.c              |  2 +-
+ arch/x86/kvm/vmx/vmx.c          |  5 +++--
+ arch/x86/kvm/x86.c              |  5 +++++
+ arch/x86/kvm/x86.h              |  2 ++
+ include/linux/sched/isolation.h |  2 ++
+ kernel/sched/isolation.c        |  6 ++++++
+ 8 files changed, 54 insertions(+), 16 deletions(-)
 
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index e82a18c..87ecb56 100644
+index 87ecb56..8869d30 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -1578,7 +1578,7 @@ static void start_sw_tscdeadline(struct kvm_lapic *apic)
- 	    likely(ns > apic->lapic_timer.timer_advance_ns)) {
- 		expire = ktime_add_ns(now, ns);
- 		expire = ktime_sub_ns(expire, ktimer->timer_advance_ns);
--		hrtimer_start(&ktimer->timer, expire, HRTIMER_MODE_ABS_PINNED);
-+		hrtimer_start(&ktimer->timer, expire, HRTIMER_MODE_ABS);
- 	} else
- 		apic_timer_expired(apic);
- 
-@@ -1680,7 +1680,7 @@ static void start_sw_period(struct kvm_lapic *apic)
- 
- 	hrtimer_start(&apic->lapic_timer.timer,
- 		apic->lapic_timer.target_expiration,
--		HRTIMER_MODE_ABS_PINNED);
-+		HRTIMER_MODE_ABS);
+@@ -122,6 +122,13 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
+ 	return apic->vcpu->vcpu_id;
  }
  
- bool kvm_lapic_hv_timer_in_use(struct kvm_vcpu *vcpu)
-@@ -2317,7 +2317,7 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
- 	apic->vcpu = vcpu;
++bool posted_interrupt_inject_timer(struct kvm_vcpu *vcpu)
++{
++	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
++		kvm_hlt_in_guest(vcpu->kvm);
++}
++EXPORT_SYMBOL_GPL(posted_interrupt_inject_timer);
++
+ static inline bool kvm_apic_map_get_logical_dest(struct kvm_apic_map *map,
+ 		u32 dest_id, struct kvm_lapic ***cluster, u16 *mask) {
+ 	switch (map->mode) {
+@@ -1432,6 +1439,19 @@ static void apic_update_lvtt(struct kvm_lapic *apic)
+ 	}
+ }
  
- 	hrtimer_init(&apic->lapic_timer.timer, CLOCK_MONOTONIC,
--		     HRTIMER_MODE_ABS_PINNED);
-+		     HRTIMER_MODE_ABS);
- 	apic->lapic_timer.timer.function = apic_timer_fn;
- 	if (timer_advance_ns == -1) {
- 		apic->lapic_timer.timer_advance_ns = 1000;
-@@ -2506,7 +2506,7 @@ void __kvm_migrate_apic_timer(struct kvm_vcpu *vcpu)
++static void kvm_apic_inject_pending_timer_irqs(struct kvm_lapic *apic)
++{
++	struct kvm_timer *ktimer = &apic->lapic_timer;
++
++	kvm_apic_local_deliver(apic, APIC_LVTT);
++	if (apic_lvtt_tscdeadline(apic))
++		ktimer->tscdeadline = 0;
++	if (apic_lvtt_oneshot(apic)) {
++		ktimer->tscdeadline = 0;
++		ktimer->target_expiration = 0;
++	}
++}
++
+ static void apic_timer_expired(struct kvm_lapic *apic)
+ {
+ 	struct kvm_vcpu *vcpu = apic->vcpu;
+@@ -1441,6 +1461,16 @@ static void apic_timer_expired(struct kvm_lapic *apic)
+ 	if (atomic_read(&apic->lapic_timer.pending))
+ 		return;
  
- 	timer = &vcpu->arch.apic->lapic_timer.timer;
- 	if (hrtimer_cancel(timer))
--		hrtimer_start_expires(timer, HRTIMER_MODE_ABS_PINNED);
-+		hrtimer_start_expires(timer, HRTIMER_MODE_ABS);
++	if (apic_lvtt_tscdeadline(apic) || ktimer->hv_timer_in_use)
++		ktimer->expired_tscdeadline = ktimer->tscdeadline;
++
++	if (posted_interrupt_inject_timer(apic->vcpu)) {
++		if (apic->lapic_timer.timer_advance_ns)
++			kvm_wait_lapic_expire(vcpu, true);
++		kvm_apic_inject_pending_timer_irqs(apic);
++		return;
++	}
++
+ 	atomic_inc(&apic->lapic_timer.pending);
+ 	kvm_set_pending_timer(vcpu);
+ 
+@@ -1450,9 +1480,6 @@ static void apic_timer_expired(struct kvm_lapic *apic)
+ 	 */
+ 	if (swait_active(q))
+ 		swake_up_one(q);
+-
+-	if (apic_lvtt_tscdeadline(apic) || ktimer->hv_timer_in_use)
+-		ktimer->expired_tscdeadline = ktimer->tscdeadline;
  }
  
  /*
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index eb5cd25..d7c757d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1437,12 +1437,8 @@ static void update_pvclock_gtod(struct timekeeper *tk)
- 
- void kvm_set_pending_timer(struct kvm_vcpu *vcpu)
- {
--	/*
--	 * Note: KVM_REQ_PENDING_TIMER is implicitly checked in
--	 * vcpu_enter_guest.  This function is only called from
--	 * the physical CPU that is running vcpu.
--	 */
- 	kvm_make_request(KVM_REQ_PENDING_TIMER, vcpu);
-+	kvm_vcpu_kick(vcpu);
+@@ -1528,7 +1555,7 @@ static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
+ 	apic->lapic_timer.timer_advance_ns = timer_advance_ns;
  }
  
- static void kvm_write_wall_clock(struct kvm *kvm, gpa_t wall_clock)
+-void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
++void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu, bool pi_inject)
+ {
+ 	struct kvm_lapic *apic = vcpu->arch.apic;
+ 	u64 guest_tsc, tsc_deadline;
+@@ -1536,7 +1563,7 @@ void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
+ 	if (apic->lapic_timer.expired_tscdeadline == 0)
+ 		return;
+ 
+-	if (!lapic_timer_int_injected(vcpu))
++	if (!lapic_timer_int_injected(vcpu) && !pi_inject)
+ 		return;
+ 
+ 	tsc_deadline = apic->lapic_timer.expired_tscdeadline;
+@@ -2373,13 +2400,7 @@ void kvm_inject_apic_timer_irqs(struct kvm_vcpu *vcpu)
+ 	struct kvm_lapic *apic = vcpu->arch.apic;
+ 
+ 	if (atomic_read(&apic->lapic_timer.pending) > 0) {
+-		kvm_apic_local_deliver(apic, APIC_LVTT);
+-		if (apic_lvtt_tscdeadline(apic))
+-			apic->lapic_timer.tscdeadline = 0;
+-		if (apic_lvtt_oneshot(apic)) {
+-			apic->lapic_timer.tscdeadline = 0;
+-			apic->lapic_timer.target_expiration = 0;
+-		}
++		kvm_apic_inject_pending_timer_irqs(apic);
+ 		atomic_set(&apic->lapic_timer.pending, 0);
+ 	}
+ }
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index 3674717..3d8a043 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -225,7 +225,7 @@ static inline int kvm_lapic_latched_init(struct kvm_vcpu *vcpu)
+ 
+ bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector);
+ 
+-void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
++void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu, bool pi_inject);
+ 
+ bool kvm_intr_is_single_vcpu_fast(struct kvm *kvm, struct kvm_lapic_irq *irq,
+ 			struct kvm_vcpu **dest_vcpu);
+@@ -236,6 +236,7 @@ void kvm_lapic_switch_to_hv_timer(struct kvm_vcpu *vcpu);
+ void kvm_lapic_expired_hv_timer(struct kvm_vcpu *vcpu);
+ bool kvm_lapic_hv_timer_in_use(struct kvm_vcpu *vcpu);
+ void kvm_lapic_restart_hv_timer(struct kvm_vcpu *vcpu);
++bool posted_interrupt_inject_timer(struct kvm_vcpu *vcpu);
+ 
+ static inline enum lapic_mode kvm_apic_mode(u64 apic_base)
+ {
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index bbc31f7..7e65de4 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -5648,7 +5648,7 @@ static void svm_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	if (lapic_in_kernel(vcpu) &&
+ 		vcpu->arch.apic->lapic_timer.timer_advance_ns)
+-		kvm_wait_lapic_expire(vcpu);
++		kvm_wait_lapic_expire(vcpu, false);
+ 
+ 	/*
+ 	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index d174b62..f74eb6a 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6468,7 +6468,7 @@ static void vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	if (lapic_in_kernel(vcpu) &&
+ 		vcpu->arch.apic->lapic_timer.timer_advance_ns)
+-		kvm_wait_lapic_expire(vcpu);
++		kvm_wait_lapic_expire(vcpu, false);
+ 
+ 	/*
+ 	 * If this vCPU has touched SPEC_CTRL, restore the guest's value if
+@@ -7065,7 +7065,8 @@ static int vmx_set_hv_timer(struct kvm_vcpu *vcpu, u64 guest_deadline_tsc,
+ 	u64 tscl, guest_tscl, delta_tsc, lapic_timer_advance_cycles;
+ 	struct kvm_timer *ktimer = &vcpu->arch.apic->lapic_timer;
+ 
+-	if (kvm_mwait_in_guest(vcpu->kvm))
++	if (kvm_mwait_in_guest(vcpu->kvm) ||
++		posted_interrupt_inject_timer(vcpu))
+ 		return -EOPNOTSUPP;
+ 
+ 	vmx = to_vmx(vcpu);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index d7c757d..74ee1f4 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -54,6 +54,7 @@
+ #include <linux/kvm_irqfd.h>
+ #include <linux/irqbypass.h>
+ #include <linux/sched/stat.h>
++#include <linux/sched/isolation.h>
+ #include <linux/mem_encrypt.h>
+ 
+ #include <trace/events/kvm.h>
+@@ -155,6 +156,9 @@ EXPORT_SYMBOL_GPL(enable_vmware_backdoor);
+ static bool __read_mostly force_emulation_prefix = false;
+ module_param(force_emulation_prefix, bool, S_IRUGO);
+ 
++bool __read_mostly pi_inject_timer = 0;
++module_param(pi_inject_timer, bool, S_IRUGO | S_IWUSR);
++
+ #define KVM_NR_SHARED_MSRS 16
+ 
+ struct kvm_shared_msrs_global {
+@@ -7032,6 +7036,7 @@ int kvm_arch_init(void *opaque)
+ 		host_xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
+ 
+ 	kvm_lapic_init();
++	pi_inject_timer = housekeeping_enabled(HK_FLAG_TIMER);
+ #ifdef CONFIG_X86_64
+ 	pvclock_gtod_register_notifier(&pvclock_gtod_notifier);
+ 
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index e08a128..10b26f4 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -301,6 +301,8 @@ extern unsigned int min_timer_period_us;
+ 
+ extern bool enable_vmware_backdoor;
+ 
++extern bool pi_inject_timer;
++
+ extern struct static_key kvm_no_apic_vcpu;
+ 
+ static inline u64 nsec_to_cycles(struct kvm_vcpu *vcpu, u64 nsec)
+diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
+index b0fb144..6fc5407 100644
+--- a/include/linux/sched/isolation.h
++++ b/include/linux/sched/isolation.h
+@@ -19,6 +19,7 @@ enum hk_flags {
+ DECLARE_STATIC_KEY_FALSE(housekeeping_overridden);
+ extern int housekeeping_any_cpu(enum hk_flags flags);
+ extern const struct cpumask *housekeeping_cpumask(enum hk_flags flags);
++extern bool housekeeping_enabled(enum hk_flags flags);
+ extern void housekeeping_affine(struct task_struct *t, enum hk_flags flags);
+ extern bool housekeeping_test_cpu(int cpu, enum hk_flags flags);
+ extern void __init housekeeping_init(void);
+@@ -38,6 +39,7 @@ static inline const struct cpumask *housekeeping_cpumask(enum hk_flags flags)
+ static inline void housekeeping_affine(struct task_struct *t,
+ 				       enum hk_flags flags) { }
+ static inline void housekeeping_init(void) { }
++static inline bool housekeeping_enabled(enum hk_flags flags) { }
+ #endif /* CONFIG_CPU_ISOLATION */
+ 
+ static inline bool housekeeping_cpu(int cpu, enum hk_flags flags)
+diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+index 123ea07..ccb2808 100644
+--- a/kernel/sched/isolation.c
++++ b/kernel/sched/isolation.c
+@@ -14,6 +14,12 @@ EXPORT_SYMBOL_GPL(housekeeping_overridden);
+ static cpumask_var_t housekeeping_mask;
+ static unsigned int housekeeping_flags;
+ 
++bool housekeeping_enabled(enum hk_flags flags)
++{
++	return !!(housekeeping_flags & flags);
++}
++EXPORT_SYMBOL_GPL(housekeeping_enabled);
++
+ int housekeeping_any_cpu(enum hk_flags flags)
+ {
+ 	if (static_branch_unlikely(&housekeeping_overridden))
 -- 
 2.7.4
 
