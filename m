@@ -2,162 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CBB24DEBB
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2019 03:41:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B1EF24E02A
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2019 08:00:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726304AbfFUBl2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Jun 2019 21:41:28 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:46280 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725936AbfFUBl1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Jun 2019 21:41:27 -0400
-Received: by mail-ot1-f67.google.com with SMTP id z23so4688915ote.13;
-        Thu, 20 Jun 2019 18:41:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=5K99qU465Y/n1tzLPu9YxwdgC2mSpe51ZhWRmC2pnwU=;
-        b=AYwGRLvpyHTyDwk5RUElurCTbQV5qtO9iO1tbPbw6cEWRiofvEQ7QuT/WxmI9SXcg8
-         PfkrzmiqwtTtreLYNSg4hmjtXwVZJQgjAOHZVdr5lZ2hGTSZd4hx98eRQQErSBtO8CEo
-         b+SDQaN4l6OvDVq7u1H9arQcgb8287eYIP5VmWXJqkpo52/x0zpNBGM4nWRkoxbJbzAv
-         +JFX5Gv5y6kJrwzPTl4j/COxk4GtABFanM5XYU8KCDw9Iysls++BvyZkgNmgJPkcfx+q
-         rDYhF+fexvoCJ7ssv+02EMWrSS3owS9SAFlUnIl3ux/zuZZ39prHaqUMw7ND9gpqdk+L
-         MCGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=5K99qU465Y/n1tzLPu9YxwdgC2mSpe51ZhWRmC2pnwU=;
-        b=HZGXF4c9sreM+DhkxgL8O4LyivEUlWEE0FFYDg/G3tnbZazmuCJT+laQe9d8j3SXXZ
-         Q7vp+VgSVwz7QrMPLOEl7bgxl6xV7ZgfhvvYHmepNDQ2wVoIcMdkzeRvPHaleoC1pMju
-         29PLM7qgnyaeHaYYLeEaaEYpXRYJbBUWVAYrVE8zQcwr2dR30fwgy5tLRLFaEh7Ry7ZF
-         jwXre//6WWjQD2y5IajiGKPGt1crypYaaYfIf8BOiOhZ0O1r63S6GxpO5ii7G0LQu/Gm
-         R2XrpyBJHe/NClhWmlM3SPbjeiNBFro6VSmmRwY7TdHl7LzUM/KO/7gctYYF2YNDDdaZ
-         RvBw==
-X-Gm-Message-State: APjAAAWur0s2WWCpSDsMs4NjSk0TVbcEmuvRdzar0BTA9KjpETCDwrZr
-        ODqHi/8Ro0l7SBU/n041vUNqqabEaj/jn76H02Q=
-X-Google-Smtp-Source: APXvYqwNyZyAKX6IT31Y1GxMTo6SUdAmyZewWriWRLYIAR4AtWJVG3Aup0uectw1fN8YKxZgIsshrr+N5jyD+xzFeHM=
-X-Received: by 2002:a9d:2c47:: with SMTP id f65mr78355040otb.185.1561081286628;
- Thu, 20 Jun 2019 18:41:26 -0700 (PDT)
+        id S1726055AbfFUGAY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jun 2019 02:00:24 -0400
+Received: from mga04.intel.com ([192.55.52.120]:51060 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726008AbfFUGAX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Jun 2019 02:00:23 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Jun 2019 23:00:23 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,399,1557212400"; 
+   d="scan'208";a="165563305"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.13.104])
+  by orsmga006.jf.intel.com with ESMTP; 20 Jun 2019 23:00:20 -0700
+From:   Tao Xu <tao3.xu@intel.com>
+To:     pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        sean.j.christopherson@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        fenghua.yu@intel.com, xiaoyao.li@linux.intel.com,
+        jingqi.liu@intel.com, tao3.xu@intel.com
+Subject: [PATCH v6 0/3] KVM: x86: Enable user wait instructions
+Date:   Fri, 21 Jun 2019 13:57:44 +0800
+Message-Id: <20190621055747.17060-1-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <1560770687-23227-1-git-send-email-wanpengli@tencent.com>
- <1560770687-23227-3-git-send-email-wanpengli@tencent.com> <20190618133541.GA3932@amt.cnet>
- <CANRm+Cz0v1VfDaCCWX+5RzCusTV7g9Hwr+OLGDRijeyqFx=Kzw@mail.gmail.com> <20190619210346.GA13033@amt.cnet>
-In-Reply-To: <20190619210346.GA13033@amt.cnet>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 21 Jun 2019 09:42:39 +0800
-Message-ID: <CANRm+Cwxz7rR3o2m1HKg0-0z30B8-O-i4RrVC6EMG1jgBRxWPg@mail.gmail.com>
-Subject: Re: [PATCH v4 2/5] KVM: LAPIC: inject lapic timer interrupt by posted interrupt
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 20 Jun 2019 at 05:04, Marcelo Tosatti <mtosatti@redhat.com> wrote:
->
-> Hi Li,
->
-> On Wed, Jun 19, 2019 at 08:36:06AM +0800, Wanpeng Li wrote:
-> > On Tue, 18 Jun 2019 at 21:36, Marcelo Tosatti <mtosatti@redhat.com> wro=
-te:
-> > >
-> > > On Mon, Jun 17, 2019 at 07:24:44PM +0800, Wanpeng Li wrote:
-> > > > From: Wanpeng Li <wanpengli@tencent.com>
-> > > >
-> > > > Dedicated instances are currently disturbed by unnecessary jitter d=
-ue
-> > > > to the emulated lapic timers fire on the same pCPUs which vCPUs res=
-ident.
-> > > > There is no hardware virtual timer on Intel for guest like ARM. Bot=
-h
-> > > > programming timer in guest and the emulated timer fires incur vmexi=
-ts.
-> > > > This patch tries to avoid vmexit which is incurred by the emulated
-> > > > timer fires in dedicated instance scenario.
-> > > >
-> > > > When nohz_full is enabled in dedicated instances scenario, the emul=
-ated
-> > > > timers can be offload to the nearest busy housekeeping cpus since A=
-PICv
-> > > > is really common in recent years. The guest timer interrupt is inje=
-cted
-> > > > by posted-interrupt which is delivered by housekeeping cpu once the=
- emulated
-> > > > timer fires.
-> > > >
-> > > > The host admin should fine tuned, e.g. dedicated instances scenario=
- w/
-> > > > nohz_full cover the pCPUs which vCPUs resident, several pCPUs surpl=
-us
-> > > > for busy housekeeping, disable mwait/hlt/pause vmexits to keep in n=
-on-root
-> > > > mode, ~3% redis performance benefit can be observed on Skylake serv=
-er.
-> > > >
-> > > > w/o patch:
-> > > >
-> > > >             VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time =
-  Avg time
-> > > >
-> > > > EXTERNAL_INTERRUPT    42916    49.43%   39.30%   0.47us   106.09us =
-  0.71us ( +-   1.09% )
-> > > >
-> > > > w/ patch:
-> > > >
-> > > >             VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time =
-        Avg time
-> > > >
-> > > > EXTERNAL_INTERRUPT    6871     9.29%     2.96%   0.44us    57.88us =
-  0.72us ( +-   4.02% )
-> > > >
-> > > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> > > > Cc: Marcelo Tosatti <mtosatti@redhat.com>
-> > > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > > > ---
-> > > >  arch/x86/kvm/lapic.c            | 33 ++++++++++++++++++++++++++---=
-----
-> > > >  arch/x86/kvm/lapic.h            |  1 +
-> > > >  arch/x86/kvm/vmx/vmx.c          |  3 ++-
-> > > >  arch/x86/kvm/x86.c              |  5 +++++
-> > > >  arch/x86/kvm/x86.h              |  2 ++
-> > > >  include/linux/sched/isolation.h |  2 ++
-> > > >  kernel/sched/isolation.c        |  6 ++++++
-> > > >  7 files changed, 44 insertions(+), 8 deletions(-)
-> > > >
-> > > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > > > index 87ecb56..9ceeee5 100644
-> > > > --- a/arch/x86/kvm/lapic.c
-> > > > +++ b/arch/x86/kvm/lapic.c
-> > > > @@ -122,6 +122,13 @@ static inline u32 kvm_x2apic_id(struct kvm_lap=
-ic *apic)
-> > > >       return apic->vcpu->vcpu_id;
-> > > >  }
-> > > >
-> > > > +bool posted_interrupt_inject_timer(struct kvm_vcpu *vcpu)
-> > > > +{
-> > > > +     return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
-> > > > +             kvm_hlt_in_guest(vcpu->kvm);
-> > > > +}
-> > > > +EXPORT_SYMBOL_GPL(posted_interrupt_inject_timer);
-> > >
-> > > Paolo, can you explain the reasoning behind this?
-> > >
-> > > Should not be necessary...
+UMONITOR, UMWAIT and TPAUSE are a set of user wait instructions.
 
-https://lkml.org/lkml/2019/6/5/436  "Here you need to check
-kvm_halt_in_guest, not kvm_mwait_in_guest, because you need to go
-through kvm_apic_expired if the guest needs to be woken up from
-kvm_vcpu_block."
+UMONITOR arms address monitoring hardware using an address. A store
+to an address within the specified address range triggers the
+monitoring hardware to wake up the processor waiting in umwait.
 
-I think we can still be woken up from kvm_vcpu_block() if pir is set.
+UMWAIT instructs the processor to enter an implementation-dependent
+optimized state while monitoring a range of addresses. The optimized
+state may be either a light-weight power/performance optimized state
+(c0.1 state) or an improved power/performance optimized state
+(c0.2 state).
 
-Regards,
-Wanpeng Li
+TPAUSE instructs the processor to enter an implementation-dependent
+optimized state c0.1 or c0.2 state and wake up when time-stamp counter
+reaches specified timeout.
+
+Availability of the user wait instructions is indicated by the presence
+of the CPUID feature flag WAITPKG CPUID.0x07.0x0:ECX[5].
+
+The patches enable the umonitor, umwait and tpause features in KVM.
+Because umwait and tpause can put a (psysical) CPU into a power saving
+state, by default we dont't expose it to kvm and enable it only when
+guest CPUID has it. If the instruction causes a delay, the amount
+of time delayed is called here the physical delay. The physical delay is
+first computed by determining the virtual delay (the time to delay
+relative to the VM’s timestamp counter). 
+
+The release document ref below link:
+Intel 64 and IA-32 Architectures Software Developer's Manual,
+https://software.intel.com/sites/default/files/\
+managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+This patch has a dependency on https://lkml.org/lkml/2019/6/19/972
+
+Changelog:
+v6:
+	add check msr_info->host_initiated in get/set msr(Xiaoyao)
+	restore the atomic_switch_umwait_control_msr()(Xiaoyao)
+v5:
+	remove vmx_waitpkg_supported() to fix guest can rdmsr or wrmsr
+	when the feature is off (Xiaoyao)
+	rebase the patch because the kernel dependcy patch updated to
+	v5: https://lkml.org/lkml/2019/6/19/972
+v4:
+	Set msr of IA32_UMWAIT_CONTROL can be 0 and add the check of
+	reserved bit 1 (Radim and Xiaoyao)
+	Use umwait_control_cached directly and add the IA32_UMWAIT_CONTROL
+	in msrs_to_save[] to support migration (Xiaoyao)
+v3:
+	Simplify the patches, expose user wait instructions when the
+	guest has CPUID (Paolo)
+	Use mwait_control_cached to avoid frequently rdmsr of
+	IA32_UMWAIT_CONTROL (Paolo and Xiaoyao)
+	Handle vm-exit for UMWAIT and TPAUSE as "never happen" (Paolo)
+v2:
+	Separated from the series https://lkml.org/lkml/2018/7/10/160
+	Add provide a capability to enable UMONITOR, UMWAIT and TPAUSE 
+v1:
+	Sent out with MOVDIRI/MOVDIR64B instructions patches
+
+Tao Xu (3):
+  KVM: x86: add support for user wait instructions
+  KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
+  KVM: vmx: handle vm-exit for UMWAIT and TPAUSE
+
+ arch/x86/include/asm/vmx.h      |  1 +
+ arch/x86/include/uapi/asm/vmx.h |  6 +++-
+ arch/x86/kernel/cpu/umwait.c    |  3 +-
+ arch/x86/kvm/cpuid.c            |  2 +-
+ arch/x86/kvm/vmx/vmx.c          | 53 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.h          |  3 ++
+ arch/x86/kvm/x86.c              |  1 +
+ 7 files changed, 66 insertions(+), 3 deletions(-)
+
+-- 
+2.20.1
+
