@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D1054E41B
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2019 11:40:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B62D4E44E
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2019 11:41:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726879AbfFUJkV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1726920AbfFUJlf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Jun 2019 05:41:35 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:34080 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726877AbfFUJkV (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 21 Jun 2019 05:40:21 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:40654 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726865AbfFUJkT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Jun 2019 05:40:19 -0400
-Received: by mail-pf1-f196.google.com with SMTP id p184so3306145pfp.7;
-        Fri, 21 Jun 2019 02:40:19 -0700 (PDT)
+Received: by mail-pf1-f195.google.com with SMTP id c85so3324146pfc.1;
+        Fri, 21 Jun 2019 02:40:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=ssaxVBt+HOJY4o+CcZ+fgzEAeEFqlrU5oDky1MfeR1M=;
-        b=JlLciLFGVNmSPEBs57P33zbvteXJEkeu+WrbmyatPqD8Mg9AN+UqZA2g5FWmLR4Dyb
-         Houb6v583jQlKk45alE6qTKaVl4Tb3r7W5uerz0PnvRmwrflTCK8uytJ0poonhntA1rO
-         Dn1Nayq356GS2lCYztCe2aiMn/5GijTJNYNrVomSScfPR/w45f+S4tYpPbXHnVVUf0M3
-         ctlu/muNpdWYFRHNC7zx6ScKlDiaA2ahZ73E7N0EogB0R5hBciRXNsPMt9e8JFhPUMSY
-         dwid76yUq4Urec+KE3apkBjdIAbDB3kzxDvYM0kC85jyB+M5Tq9+Hk1u445QL9NkLA3r
-         sObw==
+        bh=gDChq3jgrlh7Kfl67z51Bq3UYV+aDXpvLz2pr3LXsbw=;
+        b=atUeVU1wcczoU76Kdq0ubtl5EaLRaarzaAxHhV7CRiTol2lTgAi9mSfuHgTZ4jKcj0
+         jWsm59MMmrpQlZaBYrKadRnDSwL6g0pmpPvaQtwuaR6FC3AZ+mSoKRamYX4T8dGWFWQH
+         XTjaJUe0QI7NHZcmtnAQthuYuXr5FeKtPUNEqo6E2SYRKGV5I2om1c8raJLtJlcKKCGu
+         +KCqV1Auk6nxjztT0Izd9sbJnH3S74UFGKxP00k2HT883OVeZkzArgneusEK8A4+RO7c
+         oNkB5OOftcpimbjwsuXTAAZ8VK2LneXxrWqyuw6QdVDA36ixe73J6xaF41jOmcSNErN9
+         rXfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ssaxVBt+HOJY4o+CcZ+fgzEAeEFqlrU5oDky1MfeR1M=;
-        b=AfaLg9S3MQkEVmIJyD88f97qyyjjs97j9ZKXdAc0CyRBK2RGEoJYqpSDqNZSqkhJqM
-         WHnQmSgEzPce8m4vEXIjUgFqhY7aXrFn2MLSc5SoW2IMXGq2qMcxP69vfj0XQe2+s1oe
-         W7L2u5dQvf0Q/mmQcyZRsGLTEkMc5YCuCCkNigdTNs4T3YSO6lN9AT8KuYhla0T0IS9E
-         oyjJfhuC0Kgyad2JcEXX3QkD50IMIoCvJ6jO2EFwHO72NZH6T/0TcwhIkxDYPJwenpdx
-         EW3AtV5ttx8DibJcimN1311SfLk68kttrMoG7kd7DiydEHNYmCPd/57WUu1mL/QvGozh
-         me1A==
-X-Gm-Message-State: APjAAAUZ+j8RlP/uq+U/8Q4oCIquDu7Lqq8hKg0XLJPeODyeydfqlzlD
-        XN3C93mTS9MnQ16+YxdZOfagF3/H
-X-Google-Smtp-Source: APXvYqwmZ13S/4DNBKZTJLsbvlfecUprbxubEC/r1spqJpjqv0ZEQyKq22ydotn+96NRSpJr9pd9Jw==
-X-Received: by 2002:a17:90a:214e:: with SMTP id a72mr5610906pje.0.1561110018979;
-        Fri, 21 Jun 2019 02:40:18 -0700 (PDT)
+        bh=gDChq3jgrlh7Kfl67z51Bq3UYV+aDXpvLz2pr3LXsbw=;
+        b=FZMW3GkllWkTb3eF/zqt4/LPMIVRIBzmTG7IdqgEUPFnoewUNrTpRneaDvudfhxpt+
+         oBbjjvZVXqj6vwy62x4KwqvUjWbZ02WqMqu0yhrUEgcHFBxfdOcXPevZLkxCYJZeoGrZ
+         1eL9UNN3PDvpRXmt6y9IYOUEr0BwSDU15In5KcWkUKpjNmmeDAcf1Wubxws0EK2zPVm0
+         Mw6czHqFIi4dIc8H+1PxEbYBP+yXqy6yoqnnjZHzPU0oA+OHFqQQVzCKuucmBWGNKL2p
+         4Ouj02Ax8toe/DXkpbW6pAc/KceipuDbfvZcYf06oPlJUN/RWmY7SE19JbRB/yitrnYv
+         Yung==
+X-Gm-Message-State: APjAAAWELRfHiG3io65i8yuZv87dhMEXX5n5/NRhMnTuhnxo2PxRsSmH
+        sfH9HRcUsjv83v7R1PWtZkXpV2NW
+X-Google-Smtp-Source: APXvYqzSpDiVbBYFbXVJ82vVhV16mKsR/7Exr86GibnvfdCZ6k7SBKf0ewTsP0MSq+vCZSjvt2AhHQ==
+X-Received: by 2002:a17:90a:22ef:: with SMTP id s102mr5601135pjc.2.1561110021153;
+        Fri, 21 Jun 2019 02:40:21 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id y14sm1999506pjr.13.2019.06.21.02.40.17
+        by smtp.googlemail.com with ESMTPSA id y14sm1999506pjr.13.2019.06.21.02.40.19
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Fri, 21 Jun 2019 02:40:18 -0700 (PDT)
+        Fri, 21 Jun 2019 02:40:20 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
         Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [PATCH v5 3/4] KVM: LAPIC: Ignore timer migration when lapic timer is injected by pi
-Date:   Fri, 21 Jun 2019 17:40:01 +0800
-Message-Id: <1561110002-4438-4-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH v5 4/4] KVM: LAPIC: Don't inject already-expired timer via posted interrupt
+Date:   Fri, 21 Jun 2019 17:40:02 +0800
+Message-Id: <1561110002-4438-5-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1561110002-4438-1-git-send-email-wanpengli@tencent.com>
 References: <1561110002-4438-1-git-send-email-wanpengli@tencent.com>
@@ -66,32 +66,84 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Wanpeng Li <wanpengli@tencent.com>
 
-When lapic timer is injected by posted-interrupt, the emulated timer is
-offload to the housekeeping cpu. The timer interrupt will be delivered
-properly, no need to migrate timer.
+already-expired timer interrupt can be injected to guest when vCPU who 
+arms the lapic timer re-vmentry, don't posted inject in this case.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Radim Krčmář <rkrcmar@redhat.com>
 Cc: Marcelo Tosatti <mtosatti@redhat.com>
 Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- arch/x86/kvm/lapic.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/x86/kvm/lapic.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 8869d30..ae575c0 100644
+index ae575c0..7cd95ea 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -2522,7 +2522,8 @@ void __kvm_migrate_apic_timer(struct kvm_vcpu *vcpu)
+@@ -1452,7 +1452,7 @@ static void kvm_apic_inject_pending_timer_irqs(struct kvm_lapic *apic)
+ 	}
+ }
+ 
+-static void apic_timer_expired(struct kvm_lapic *apic)
++static void apic_timer_expired(struct kvm_lapic *apic, bool can_pi_inject)
  {
- 	struct hrtimer *timer;
+ 	struct kvm_vcpu *vcpu = apic->vcpu;
+ 	struct swait_queue_head *q = &vcpu->wq;
+@@ -1464,7 +1464,7 @@ static void apic_timer_expired(struct kvm_lapic *apic)
+ 	if (apic_lvtt_tscdeadline(apic) || ktimer->hv_timer_in_use)
+ 		ktimer->expired_tscdeadline = ktimer->tscdeadline;
  
--	if (!lapic_in_kernel(vcpu))
-+	if (!lapic_in_kernel(vcpu) ||
-+		posted_interrupt_inject_timer(vcpu))
- 		return;
+-	if (posted_interrupt_inject_timer(apic->vcpu)) {
++	if (can_pi_inject && posted_interrupt_inject_timer(apic->vcpu)) {
+ 		if (apic->lapic_timer.timer_advance_ns)
+ 			kvm_wait_lapic_expire(vcpu, true);
+ 		kvm_apic_inject_pending_timer_irqs(apic);
+@@ -1607,7 +1607,7 @@ static void start_sw_tscdeadline(struct kvm_lapic *apic)
+ 		expire = ktime_sub_ns(expire, ktimer->timer_advance_ns);
+ 		hrtimer_start(&ktimer->timer, expire, HRTIMER_MODE_ABS);
+ 	} else
+-		apic_timer_expired(apic);
++		apic_timer_expired(apic, false);
  
- 	timer = &vcpu->arch.apic->lapic_timer.timer;
+ 	local_irq_restore(flags);
+ }
+@@ -1697,7 +1697,7 @@ static void start_sw_period(struct kvm_lapic *apic)
+ 
+ 	if (ktime_after(ktime_get(),
+ 			apic->lapic_timer.target_expiration)) {
+-		apic_timer_expired(apic);
++		apic_timer_expired(apic, false);
+ 
+ 		if (apic_lvtt_oneshot(apic))
+ 			return;
+@@ -1759,7 +1759,7 @@ static bool start_hv_timer(struct kvm_lapic *apic)
+ 		if (atomic_read(&ktimer->pending)) {
+ 			cancel_hv_timer(apic);
+ 		} else if (expired) {
+-			apic_timer_expired(apic);
++			apic_timer_expired(apic, false);
+ 			cancel_hv_timer(apic);
+ 		}
+ 	}
+@@ -1809,7 +1809,7 @@ void kvm_lapic_expired_hv_timer(struct kvm_vcpu *vcpu)
+ 		goto out;
+ 	WARN_ON(swait_active(&vcpu->wq));
+ 	cancel_hv_timer(apic);
+-	apic_timer_expired(apic);
++	apic_timer_expired(apic, false);
+ 
+ 	if (apic_lvtt_period(apic) && apic->lapic_timer.period) {
+ 		advance_periodic_target_expiration(apic);
+@@ -2312,7 +2312,7 @@ static enum hrtimer_restart apic_timer_fn(struct hrtimer *data)
+ 	struct kvm_timer *ktimer = container_of(data, struct kvm_timer, timer);
+ 	struct kvm_lapic *apic = container_of(ktimer, struct kvm_lapic, lapic_timer);
+ 
+-	apic_timer_expired(apic);
++	apic_timer_expired(apic, true);
+ 
+ 	if (lapic_is_periodic(apic)) {
+ 		advance_periodic_target_expiration(apic);
 -- 
 2.7.4
 
