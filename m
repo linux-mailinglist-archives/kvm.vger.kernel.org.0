@@ -2,92 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A04899966
-	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 18:39:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 148529996F
+	for <lists+kvm@lfdr.de>; Thu, 22 Aug 2019 18:41:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390136AbfHVQiz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Aug 2019 12:38:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60806 "EHLO mx1.redhat.com"
+        id S2390146AbfHVQkl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Aug 2019 12:40:41 -0400
+Received: from mout.web.de ([212.227.15.4]:40865 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390109AbfHVQip (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Aug 2019 12:38:45 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 86A59A707
-        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 16:38:45 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id k14so3450458wrv.2
-        for <kvm@vger.kernel.org>; Thu, 22 Aug 2019 09:38:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=p5sLbnKK73dG+WxnSvZUshy8YsfyiA1ug3q0iFIQR/I=;
-        b=gQXcnOVZGiizoGQt9Lc218t5T33Qzpv9uWiJ1wwkx889NZ5ocgXcoPch+g59rSV/F0
-         0UIIhizLukHPcdAbuhVORPLumwZMhsrr3KMHzk2JYJ5FvD6pitT2M5OyFMTNq6t4r7z2
-         +xb5SGDV8vUJLvLVdnQhfwelqz+Jj4tQP7RjhYsIfGW5xGJP3Oa8gh/1T2FyMMSqfkSc
-         b5c6JuUzt1B8q/+d61giybFxkGqFvdj5CWhTaIGQY32c3pkHhvCNneruIknPywDpmw7I
-         uBQKWcgUTC8e7bWsON5bbLRKTk5Qk8fOT65KZI9r6eJRw6jS2plU5evGKFFL6p1wv74i
-         LSMw==
-X-Gm-Message-State: APjAAAVxRkUywQMMAnvDZd7qlH1zEq/1UsjPJny6lv0HUMF6ERDXK1mh
-        ijZa3ha4+FxQQh7GyO4BM9EJVLCxe7UJ/j6kC/G7MFIOtgf0mAYTDFIOQy9ca3HtaodW8aqzXvF
-        6AmbIr6REU64V
-X-Received: by 2002:adf:f287:: with SMTP id k7mr48635366wro.183.1566491924174;
-        Thu, 22 Aug 2019 09:38:44 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxnHZQBEz+AELXL/+aERKQQWBN+cLv9cZ3o9ly5EUJLMLeOXkg28ajJSSLGxuDTGkPLbyHorQ==
-X-Received: by 2002:adf:f287:: with SMTP id k7mr48635337wro.183.1566491923863;
-        Thu, 22 Aug 2019 09:38:43 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:21b9:ff1f:a96c:9fb3? ([2001:b07:6468:f312:21b9:ff1f:a96c:9fb3])
-        by smtp.gmail.com with ESMTPSA id e11sm355752wrc.4.2019.08.22.09.38.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Aug 2019 09:38:43 -0700 (PDT)
-Subject: Re: [PATCH RESEND v4 7/9] KVM: VMX: Handle SPP induced vmexit and
- page fault
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        sean.j.christopherson@intel.com, mst@redhat.com,
-        rkrcmar@redhat.com, jmattson@google.com, yu.c.zhang@intel.com,
-        alazar@bitdefender.com
-References: <20190814070403.6588-1-weijiang.yang@intel.com>
- <20190814070403.6588-8-weijiang.yang@intel.com>
- <5f6ba406-17c4-a552-2352-2ff50569aac0@redhat.com>
- <fb6cd8b4-eee9-6e58-4047-550811bffd58@redhat.com>
- <20190820134435.GE4828@local-michael-cet-test.sh.intel.com>
- <20190822131745.GA20168@local-michael-cet-test>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <62748fe8-0a3b-0554-452e-3bb5ebaf0466@redhat.com>
-Date:   Thu, 22 Aug 2019 18:38:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190822131745.GA20168@local-michael-cet-test>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1733046AbfHVQkj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Aug 2019 12:40:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+        s=dbaedf251592; t=1566492032;
+        bh=m5Jw6rwKzXsB4kkDsNZcCpmkYQpZwvyqQ7u2l1d2Tgg=;
+        h=X-UI-Sender-Class:Resent-From:Resent-Date:Resent-To:From:Date:To:
+         Cc:Subject;
+        b=TtICLJEjHZedCbNjN8EEfhxehgB2llsmkeYMNZK4QuTrsKlZjGehxc33xDEkfkVVZ
+         K/94SF2rr2vkF/s076TwjuR6X9TOHkk1UdkCCg2Tgw9kvcyrQ03ED5P/pOp3HVuCGy
+         ch8HI5NnH1gwRp/SAeBVXqy0XYJqh1IDmesoHus4=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from debian ([85.71.157.74]) by smtp.web.de (mrweb001
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0M3Bv5-1iGr1L2SYh-00svlh; Thu, 22
+ Aug 2019 18:40:32 +0200
+Message-Id: <87lfvl5f28.fsf@debian>
+From:   =?iso8859-2?q?Ji=F8=ED=20Pale=E8ek?= <jpalecek@web.de>
+Date:   Sat, 22 Jun 2019 19:42:04 +0200
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+Content-type: text/plain; charset=iso-8859-2
+Subject: [PATCH] kvm: Nested KVM MMUs need PAE root too
+X-RMAIL-ATTRIBUTES: --E-----
+X-Provags-ID: V03:K1:PkHIcnd2bnprl9kM/lwr5agQlKeVGdSnrszNOPC0RylERjRxlnI
+ +Ab21HCatTXxNWC0d+DEjWAvFyNElKsb9byXrzu2bR1tIQ1NQjOJs2rTpFOzw9Vu7n4yQIV
+ 0YAUOhDVl3yLla1iRh9bC8mm0CwEETmCSZGcNAKBsT0KFEb+xTjheJ3UUFSRbazaQ0QoJ8/
+ Uc+v7+qxE7Yr4MX2nFcFA==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:cM0ZNgKhMj4=:FjYgCwhlJPxpGCKf256gVT
+ qhp2YWJ760ddPetAQhx+e05cIDAVSxJwiGtw05Shy5DTAJ0inkLRLEC/6mNVeuVeDg0Jmj0aU
+ YfFZnqRgPdCsfxck9qnyuqEOP3+4OchuxwVZ0iXBuy6gClXbn0QRMGhrz5HXp3ckbPXP4ujSl
+ /BmS+Fx53wUiQEgTuyLvGsaA5/AHuAZHtja9VnDtopDolfDWI31m3OlsDu0Qjs48ytNT/Sbf3
+ BECC4mU3c8YaueWFQl/lf5zkN1cexOPbdMxiV+v0EUi5pEKfejMWadgeYKqvb/zKVMZuTpB7S
+ CMd383ZIai8dL3F9V5QzzE863vTB/RJTlg4NaYJQeNdUuqD1VopziHvcpCwe/p5/x4csrmj78
+ 7X0J0NZqC8rWiJFc1W+X7kCRWm0GSLt0mVvz/tf3F/CJUjGTXAW/66ofDUMLzY93uZmvMjPXn
+ Yq9/glhnxYpPgGtKa1gGteQPl47UQuZQMn6ccyVSIbj29SzxVtSexD4vg1JAhPQMoLh9sMJ5y
+ 5Nkn4JtpDpN4Z5AaMiCTY5h0HjBw7LCTVz3e28A2qPuMXPiYYG558OLK7h6GufVOCSZIJH2vI
+ i7FwtnNUtjcLQn1KMHBdeunGKU83iO4FA/bXl/ZhEwDUw1+byvzP6F8iSMtYFwnF+Oz4jjufb
+ 15PI9eV2yuHNEzBDMSqdkr5L0vP81laVKTP7hsHBLNgP0Oswwga2E3/0fNjlKky2dVcUwa2h8
+ Kw9WUBXzXWIO8GH8Y+G6PrSMUdoF1L2T+b0Ai578lLgGa5btXkmnbTuDSiOOlHealEefBbBqV
+ 9CPMPusRzZV3fdiKBDgOVIph8V2ftvxX8IiyQM6nMRu33BQGQIwK2cC5iKt8hmnFVWi23gwQF
+ bqtOgwT4V8rqG9EJ4UuEs2kRt0JPlA68+/Lpo6i5gYXK3AwKgxZ+zvBPFRZ8TiJlR9j3yezHf
+ CsYss7StsAqra/7x5ZoGl2Ful6uwbT3cWPIcEQGeYW+jO56YFtmxVrn2R0MZZ+fKw3d45AHYO
+ sO5SdiMhk4+/uZ3Guvw83Ue7eCY8uitrZa5ZCyoUKU1M4zkgqVB1BJ2Lnb15/l69H0VJ5SKbN
+ 3JWmeDy0advrZaWPZtFTbJa21ZwQU3fVIj8ijhhS/Hp+Sr5yINmgP54GPyakxdaHSDehCBvGZ
+ u8Shg=
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/08/19 15:17, Yang Weijiang wrote:
-> On Tue, Aug 20, 2019 at 09:44:35PM +0800, Yang Weijiang wrote:
->> On Mon, Aug 19, 2019 at 05:04:23PM +0200, Paolo Bonzini wrote:
->>> fast_page_fault should never trigger an SPP userspace exit on its own,
->>> all the SPP handling should go through handle_spp.
->  Hi, Paolo,
->  According to the latest SDM(28.2.4), handle_spp only handles SPPT miss and SPPT
->  misconfig(exit_reason==66), subpage write access violation causes EPT violation,
->  so have to deal with the two cases into handlers.
+On AMD processors, in PAE 32bit mode, nested KVM instances don't
+work. The L0 host get a kernel OOPS, which is related to
+arch.mmu->pae_root being NULL.
 
-Ok, so this part has to remain, though you do have to save/restore
-PT_SPP_MASK according to the rest of the email.
+The reason for this is that when setting up nested KVM instance,
+arch.mmu is set to &arch.guest_mmu (while normally, it would be
+&arch.root_mmu). However, the initialization and allocation of
+pae_root only creates it in root_mmu. KVM code (ie. in
+mmu_alloc_shadow_roots) then accesses arch.mmu->pae_root, which is the
+unallocated arch.guest_mmu->pae_root.
 
-Paolo
+This fix just allocates (and frees) pae_root in both guest_mmu and
+root_mmu (and also lm_root if it was allocated). The allocation is
+subject to previous restrictions ie. it won't allocate anything on
+64-bit and AFAIK not on Intel.
 
->>> So I think that when KVM wants to write-protect the whole page
->>> (wrprot_ad_disabled_spte) it must also clear PT_SPP_MASK; for example it
->>> could save it in bit 53 (PT64_SECOND_AVAIL_BITS_SHIFT + 1).  If the
->>> saved bit is set, fast_page_fault must then set PT_SPP_MASK instead of
->>> PT_WRITABLE_MASK.
+See bug 203923 for details.
+
+Signed-off-by: Jiri Palecek <jpalecek@web.de>
+Tested-by: Jiri Palecek <jpalecek@web.de>
+
+=2D--
+ arch/x86/kvm/mmu.c | 30 ++++++++++++++++++++++--------
+ 1 file changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
+index 24843cf49579..efa8285bb56d 100644
+=2D-- a/arch/x86/kvm/mmu.c
++++ b/arch/x86/kvm/mmu.c
+@@ -5592,13 +5592,13 @@ slot_handle_leaf(struct kvm *kvm, struct kvm_memor=
+y_slot *memslot,
+ 				 PT_PAGE_TABLE_LEVEL, lock_flush_tlb);
+ }
+
+-static void free_mmu_pages(struct kvm_vcpu *vcpu)
++static void free_mmu_pages(struct kvm_mmu *mmu)
+ {
+-	free_page((unsigned long)vcpu->arch.mmu->pae_root);
+-	free_page((unsigned long)vcpu->arch.mmu->lm_root);
++	free_page((unsigned long)mmu->pae_root);
++	free_page((unsigned long)mmu->lm_root);
+ }
+
+-static int alloc_mmu_pages(struct kvm_vcpu *vcpu)
++static int alloc_mmu_pages(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
+ {
+ 	struct page *page;
+ 	int i;
+@@ -5619,9 +5619,9 @@ static int alloc_mmu_pages(struct kvm_vcpu *vcpu)
+ 	if (!page)
+ 		return -ENOMEM;
+
+-	vcpu->arch.mmu->pae_root =3D page_address(page);
++	mmu->pae_root =3D page_address(page);
+ 	for (i =3D 0; i < 4; ++i)
+-		vcpu->arch.mmu->pae_root[i] =3D INVALID_PAGE;
++		mmu->pae_root[i] =3D INVALID_PAGE;
+
+ 	return 0;
+ }
+@@ -5629,6 +5629,7 @@ static int alloc_mmu_pages(struct kvm_vcpu *vcpu)
+ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+ {
+ 	uint i;
++	int ret;
+
+ 	vcpu->arch.mmu =3D &vcpu->arch.root_mmu;
+ 	vcpu->arch.walk_mmu =3D &vcpu->arch.root_mmu;
+@@ -5646,7 +5647,19 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.guest_mmu.prev_roots[i] =3D KVM_MMU_ROOT_INFO_INVALID;
+
+ 	vcpu->arch.nested_mmu.translate_gpa =3D translate_nested_gpa;
+-	return alloc_mmu_pages(vcpu);
++
++	ret =3D alloc_mmu_pages(vcpu, &vcpu->arch.guest_mmu);
++	if (ret)
++		return ret;
++
++	ret =3D alloc_mmu_pages(vcpu, &vcpu->arch.root_mmu);
++	if (ret)
++		goto fail_allocate_root;
++
++	return ret;
++ fail_allocate_root:
++	free_mmu_pages(&vcpu->arch.guest_mmu);
++	return ret;
+ }
+
+ static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
+@@ -6102,7 +6115,8 @@ unsigned long kvm_mmu_calculate_default_mmu_pages(st=
+ruct kvm *kvm)
+ void kvm_mmu_destroy(struct kvm_vcpu *vcpu)
+ {
+ 	kvm_mmu_unload(vcpu);
+-	free_mmu_pages(vcpu);
++	free_mmu_pages(&vcpu->arch.root_mmu);
++	free_mmu_pages(&vcpu->arch.guest_mmu);
+ 	mmu_free_memory_caches(vcpu);
+ }
+
+=2D-
+2.23.0.rc1
+
