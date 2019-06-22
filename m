@@ -2,210 +2,331 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D1864F789
-	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2019 19:51:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4325F4F7E2
+	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2019 21:11:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726424AbfFVRvo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Jun 2019 13:51:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46272 "EHLO mx1.redhat.com"
+        id S1726326AbfFVTLj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Jun 2019 15:11:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50466 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726276AbfFVRvo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Jun 2019 13:51:44 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S1725995AbfFVTLi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Jun 2019 15:11:38 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id BF1B981F0F;
-        Sat, 22 Jun 2019 17:51:43 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 066EBB5BA;
+        Sat, 22 Jun 2019 19:11:38 +0000 (UTC)
 Received: from ultra.random (ovpn-125-188.rdu2.redhat.com [10.10.125.188])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 42033601A0;
-        Sat, 22 Jun 2019 17:51:43 +0000 (UTC)
-Date:   Sat, 22 Jun 2019 13:51:42 -0400
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D2D6608A7;
+        Sat, 22 Jun 2019 19:11:37 +0000 (UTC)
+Date:   Sat, 22 Jun 2019 15:11:36 -0400
 From:   Andrea Arcangeli <aarcange@redhat.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Mike Rapoport <rppt@linux.ibm.com>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Borislav Petkov <bp@suse.de>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH] mm/gup: continue VM_FAULT_RETRY processing event for
- pre-faults
-Message-ID: <20190622175142.GA32455@redhat.com>
-References: <1557844195-18882-1-git-send-email-rppt@linux.ibm.com>
- <20190522122113.a2edc8aba32f0fad189bae21@linux-foundation.org>
- <20190522203828.GC18865@rapoport-lnx>
- <20190522141803.c6714f96f57612caaac5d19b@linux-foundation.org>
+To:     Christoffer Dall <christoffer.dall@arm.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, Jerome Glisse <jglisse@redhat.com>
+Subject: Re: Reference count on pages held in secondary MMUs
+Message-ID: <20190622191136.GB32455@redhat.com>
+References: <20190609081805.GC21798@e113682-lin.lund.arm.com>
+ <3ca445bb-0f48-3e39-c371-dd197375c966@redhat.com>
+ <20190609174024.GA4785@redhat.com>
+ <20190611115132.GB5318@e113682-lin.lund.arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190522141803.c6714f96f57612caaac5d19b@linux-foundation.org>
+In-Reply-To: <20190611115132.GB5318@e113682-lin.lund.arm.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Sat, 22 Jun 2019 17:51:43 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Sat, 22 Jun 2019 19:11:38 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello everyone,
+Hello Christoffer,
 
-On Wed, May 22, 2019 at 02:18:03PM -0700, Andrew Morton wrote:
-> > arch/x86/kernel/fpu/signal.c:198:8-31:  -> gup with !pages
+On Tue, Jun 11, 2019 at 01:51:32PM +0200, Christoffer Dall wrote:
+> Sorry, what does this mean?  Do you mean that we can either do:
+> 
+>   on_vm_s2_fault() {
+>       page = gup();
+>       map_page_in_s2_mmu();
+>       put_page();
+>   }
+> 
+>   mmu_notifier_invalidate() {
+>       unmap_page_in_s2_mmu();
+>   }
+> 
+> or
+> 
+>   on_vm_s2_fault() {
+>       page = gup();
+>       map_page_in_s2_mmu();
+>   }
+> 
+>   mmu_notifier_invalidate() {
+>       unmap_page_in_s2_mmu();
+>       put_page();
+>   }
 
-This simply had not to return -EFAULT if ret < nr_pages.. but ret >= 0.
+Yes both work, refcounting always works.
 
-Instead it did:
+> > and in fact Jerome also thinks
+> > like me that we should eventually optimize away the FOLL_GET and not
+> > take the refcount in the first place, 
+> 
+> So if I understood the above correct, the next point is that there are
+> advantages to avoiding keeping the extra reference on that page, because
+> we have problematic race conditions related to set_page_dirty(), and we
+> can reduce the problem of race conditions further by not getting a
+> reference on the page at all when going GUP as part of a KVM fault?
 
-               if (ret == nr_pages)
-                       goto retry;
-               return -EFAULT;
+You could still keep the extra reference until the
+invalidate.
 
-That was the bug and the correct code would have been:
+The set_page_dirty however if you do in the context of the secondary
+MMU fault (i.e. atomically with the mapping of the page in the
+secondary MMU, with respect of MMU notifier invalidates), it solves
+the whole problem with the ->mkwrite/mkclean and then you can keep a
+GUP long term pin fully safely already. That is a solution that always
+works and becomes guaranteed by design by the MMU notifier not to
+interfere with the _current_ writeback code in the filesystem. It also
+already provides stable pages.
 
-    	    ret = get_user_pages_unlocked(pages=NULL)
-	    if (ret < 0)
-	       return -EFAULT;
-	    goto retry;
+> Can you explain, or provide a pointer to, the root cause of the
+> problem with holding a reference on the page and setting it dirty?
 
-This eventually should have worked fine but it was less efficient
-because it's still acting in a full prefault mode and it just tells
-GUP that pages = NULL and so all it is trying to do is to issue the
-blocking I/O after the mmap_sem has been released already.
+The filesystem/VM doesn't possibly expect set_page_dirty to be called
+again after it called page_mkclean. Supposedly a wrprotect fault
+should have been generated if somebody tried to write to the page
+under writeback, so page_mkwrite should have run again before you
+could have called set_page_dirty.
 
-Overall the solution applied in commit
-b81ff1013eb8eef2934ca7e8cf53d553c1029e84 looks nicer.
+Instead page_mkclean failed to get rid of the long term GUP obtained
+with FOLL_WRITE because it simply can't ask the device to release it
+without MMU notifier, so the device can later still call
+set_page_dirty despite page_mkclean already run.
 
-Alternatively it could have used down_read(); get_user_pages(); which
-prevents get_user_pages to drop the mmap_sem and break the loop if
-some blocking I/O had to be executed outside mmap_sem. But that would
-have the side effect of breaking userfaultfd (uffd requires
-gup_locked/unlocked and FAULT_FLAG_ALLOW_RETRY to be set in the fault
-flags).
+> > but a whole different chapter is
+> > dedicated on the set_page_dirty_lock crash on MAP_SHARED mappings
+> > after long term GUP pins. So since you're looking into how to handle
+> > the page struct in the MMU notifier it's worth mentioning the issues
+> > related to set_page_dirty too.
+> 
+> Is there some background info on the "set_page_dirty_lock crash on
+> MAP_SHARED" ?  I'm having trouble following this without the background.
 
-Eventually we need to allow VM_FAULT_RETRY to be returned even if
-FOLL_TRIED is set, so in theory get_user_pages_unlocked(pages=NULL) in
-a loop must eventually stop returning VM_FAULT_RETRY. FOLL_TRIED could
-still disambiguate if VM_FAULT_RETRY should or should not be returned
-so that it is only returned only if it cannnot be avoided
-(i.e. userfaultfd case).
+Jan Kara leaded the topic explained all the details on this filesystem
+issue at the LSF-MM and also last year.
 
-With gup_unlocked(pages=NULL) however all we are interested about is
-to execute the blocking I/O and we don't care to map anything in the
-pagetables. A later page fault has to happen anyway for sure because
-pages was == NULL, it just needs to be a fast one.
+Which is what makes me think there can't be too many uses cases that
+require writback to work while long term GUP pin allow some device to
+write to the pages at any given time, if nobody requires this to be
+urgently fixed.
 
-> > arch/x86/mm/mpx.c:423:11-25:  -> gup with !pages
-
-Note that get_user_pages is never affected by whatever change after
-the below, !locked check in gup_locked:
-
-		if (!locked)
-			/* VM_FAULT_RETRY couldn't trigger, bypass */
-			return ret;
-
-The bypass means when locked is NULL, there is a 1:1 bypass from
-__get_user_pages<->get_user_pages and the VM_FAULT_RETRY dance never
-runs.
-
-get_user_pages in fact can't support userfaultfd, which makes ptrace
-and core dump and the hwpoison non blocking in VM_FAULT_RETRY.
-
-All places that must support userfaultfd must use
-get_user_pages_unlocked/locked or somehow end up with
-FAULT_FLAG_ALLOW_RETRY set in the fault flags.
-
-> > virt/kvm/async_pf.c:90:1-22:  -> gup with !pages
-
-Didn't this get slowed down with the commit
-df17277b2a85c00f5710e33ce238ba4114687a28?
-
-I mean it was a feature not a bug to skip that additional
-__get_user_pages(FOLL_TRIED).
-
-> > virt/kvm/kvm_main.c:1437:6-20:  -> gup with !pages
-
-Like for mpx.c get_user_pages is agnostic to all these gup_locked
-changes because it sets locked = NULL, it couldn't break the loop
-early because it couldn't return VM_FAULT_RETRY.
+You can find coverage on lwn and on linux-mm.
 
 > 
-> OK.
+> > 
+> > To achieve the cleanest writeback fix to avoid crashes in
+> > set_page_dirty_lock on long term secondary MMU mappings that supports
+> > MMU notifier like KVM shadow MMU, the ideal is to mark the page dirty
+> > before establishing a writable the mapping in the secondary MMU like
+> > in the model below.
+> > 
+> > The below solution works also for those secondary MMU that are like a
+> > TLB and if there are two concurrent invalidates on the same page
+> > invoked at the same time (a potential problem Jerome noticed), you
+> > don't know which come out first and you would risk to call
+> > set_page_dirty twice, which would be still potentially kernel crashing
+> > (even if only a theoretical issue like O_DIRECT).
+> 
+> Why is it problematic to call set_page_dirty() twice?  I thought that at
+> worst it would only lead to writing out data to disk unnecessarily ?
 
-Commit df17277b2a85c00f5710e33ce238ba4114687a28 is now applied.
+According to Jerome, after the first set_page_dirty returns, writeback
+could start before the second set_page_dirty has been called. So if
+there are additional random later invalidates the next ones shouldn't
+call set_page_dirty again.
 
-So I think the effect it has is to make async_pf.c slower and we
-didn't solve anything.
+The problem is if you call set_page_dirty in the invalidate, you've
+also to make sure set_page_dirty is being called only once.
 
-There are two __get_user_pages:
+There can be concurrent invalidates for the same page running at the
+same time, while the page fault there is only one that runs atomically
+with respect to the mmu notifier invalidates (under whatever lock that
+serializes the MMU notifier invalidates vs the secondary MMU page fault).
 
-1)		ret = __get_user_pages(tsk, mm, start, nr_pages, flags, pages,
-				       vmas, locked);
+If you call set_page_dirty twice in a row, you again open the window
+for the writeback to have already called ->page_mkclean on the page
+after the first set_page_dirty, so the second set_page_dirty will
+then crash.
 
+You can enforce to call it only once if you have sptes (shadow
+pagetables) like in KVM has, so this is not an issue for KVM.
 
-		if (called by get_user_pages)
-		    return ret; /* bypass the whole VM_FAULT_RETRY logic */
+> I am also not familiar with a problem related to KVM and O_DIRECT, so
+> I'm having trouble keeping up here as well :(
 
+There's no problem in KVM and O_DIRECT.
 
-		*locked = 1;
-		lock_dropped = true;
-		down_read(&mm->mmap_sem);
-2)		ret = __get_user_pages(tsk, mm, start, 1, flags | FOLL_TRIED,
-				       pages, NULL, NULL);
+There's a problem in O_DIRECT itself regardless if it's qemu or any
+other app using it: just the time window is too low to be
+noticeable. It's still a corollary of why we can't run two
+set_page_dirty per page, if there are concurrent MMU notifier
+invalidates.
 
+> > So the below model
+> > will solve that and it's also valid for KVM/vhost accelleration,
+> > despite KVM can figure out how to issue a single set_page_dirty call
+> > for each spte that gets invalidated by concurrent invalidates on the
+> > same page because it has shadow pagetables and it's not just a TLB.
+> > 
+> >   access = FOLL_WRITE|FOLL_GET
+> > 
+> > repeat:
+> >   page = gup(access)
+> >   put_page(page)
+> > 
+> >   spin_lock(mmu_notifier_lock);
+> >   if (race with invalidate) {
+> >     spin_unlock..
+> >     goto repeat;
+> >   }
+> >   if (access == FOLL_WRITE)
+> >     set_page_dirty(page)
+> >   establish writable mapping in secondary MMU on page
+> >   spin_unlock
+> > 
+> > The above solves the crash in set_page_dirty_lock without having to
+> > modify any filesystem, it should work theoretically safer than the
+> > O_DIRECT short term GUP pin.
+> 
+> That is not exactly how we do things today on the arm64 side.  We do
+> something that looks like:
 
-The problem introduced is that 2) is getting executed with pages==NULL
-but there's no point to ever run 2) with pages = NULL.
+The above is the model that solves all problems with writeback
+page_mkclean/mkwrite, provides stable pages to current filesystems,
+regardless of lowlevel implementation details of the mmu notifier
+methods.
 
-async_pf especially uses nr_pages == 1, so it couldn't get any more
-optimal than it already was.
+For KVM all models works not only the above one because we have sptes
+to disambiguate which is the first invalidate that has to run
+set_page_dirty.
 
-Before df17277b2a85c00f5710e33ce238ba4114687a28 we broke the loop as
-soon as the first __get_user_pages returned VM_FAULT_RETRY.
+> 
+>   /*
+>    * user_mem_abort is our function for a secondary MMU fault that
+>    * resolves to a memslot.
+>    */
+>   user_mem_abort() {
+>       page = gup(access, &writable);
+>       spin_lock(&kvm->mmu_lock);
+>       if (mmu_notifier_retry(kvm, mmu_seq))
+>           goto out; /* run the VM again and see what happens */
+> 
+>       if (writable)
+>           kvm_set_pfn_dirty(page_to_pfn(page));
+>       stage2_set_pte(); /* establish_writable mapping in secondary MMU on page */
+> 
+>   out:
+>       spin_unlock(&kvm_mmu_lock);
+>       put_page(page);
+>   }
+> 
+> Should we rework this to address the race you are refering to, and are
+> other architectures already safe against this?
 
-We can argue if we shouldn't have broken the loop and we should have
-kept executing only the first __get_user_pages (marked "1)" above) for
-the whole range, but nr_pages == 1 is common and in such case there's
-no difference between the two behaviors.
+Actually it seems you mark the page dirty exactly where I suggested
+above: i.e. atomically with the secondary MMU mapping establishment
+with respect to the mmu notifier invalidates.
 
-The prefetch callers with nr_pages == 1, didn't even check the retval
-at all:
+I don't see any problem with the above (well you need to have a way to
+track if you run stage2_set_pte or if you taken "goto out" but the
+above is pseudocode).
 
-	down_read(&mm->mmap_sem);
-	get_user_pages_remote(NULL, mm, addr, 1, FOLL_WRITE, NULL, NULL,
-			&locked);                            ^^^^ pages NULL
+There's a problem however in kvm_set_pfn_dirty common code, it should
+call set_page_dirty not SetPageDirty or it won't do anything in the
+MAP_SHARED filebacked case. The current code is perfectly ok for anon and
+MAP_PRIVATE write=1 cases.
 
-	// retval ignored
+However FOLL_TOUCH in gup already either calls set_page_dirty or it
+marks the linux pte as dirty, so that's working around the lack of
+set_page_dirty... I wonder if we could just rely on the set_page_dirty
+in gup with FOLL_TOUCH and drop SetPageDirty as a whole in KVM in fact.
 
-It should probably check for retval < 0... but the fault will be
-retried for good later still with get_user_pages_unlocked() but with
-pages != NULL, so it'll find out later if it's a segfault.
+> > With regard to KVM this should be enough, but we also look for a crash
+> > avoidance solution for those devices that cannot support the MMU
+> > notifier for short and long term GUP pins.
+> 
+> Sorry, can you define short and long term GUP pins, and do we have
+> current examples of both?
 
-Now if we change the code to skip the second __get_user_pages it's not
-clear if we can return nr_pages because we may still not have faulted
-in the whole range in the pagetables. I guess we could still return
-nr_pages even if we scanned the whole range with only the first of the
-two __get_user_pages. However if you had mmu notifier registered in
-the range nr_pages would have stronger semantics if you would execute
-2) too, but then without pages array not-NULL such stronger semantics
-cannot be taken advantage of anyway, because you don't know where
-those pages are and you can't map them in a secondary MMU even if you
-execute the line 2).
+Long term as in mm/gup.c:FOLL_LONGTERM, means you expect to call some
+get_user_pages with FOLL_GET and not release the refcount immediately
+after I/O completion, the page could remain indefinitely pinned,
+virt example: vfio device assignment.
 
-I personally preferred the older code which should at least in theory
-run faster, it just required documentation that if "pages == NULL"
-we'll break the loop early because it has to be a "prefetch" attempt
-and it must be retried until nr_pages == ret.
+The most common example of short term GUP (i.e. default behavior of
+GPU) is O_DIRECT. I/O completion takes short time (depends on the
+buffer size of course.. could be 1TB of buffer I/O) but it's still
+going to be released ASAP.
 
-Either that or add a "continue" to skip the second __get_user_pages in
-line 2) above and then returning nr_pages to indicate VM_FAULT_RETRY
-may very well have been returned on all page offsets in the virtual
-range. That will behave the same for async_pf.c because nr_pages == 1.
+> > There's lots of work going on on linux-mm, to try to let those devices
+> > support writeback in a safe way (also with stable pages so all fs
+> > integrity checks will pass) using bounce buffer if a long term GUP pin
+> > is detected by the filesystem. In addition there's other work to make
+> > the short term GUP pin theoretically safe by delaying the writeback
+> > for the short window the GUP pin is taken by O_DIRECT, so it becomes
+> > theoretically safe too (currently it's only practically safe).
+> > 
+> > However I'm not sure if the long term GUP pins really needs to support
+> > writeback.
+> > 
+> 
+> I don't think I understand the distinction between a long term GUP pin
+> that supports writeback vs. a short term GUP pin.  My question was
+> whether or not the pin could be dropped at the time the mapping was torn
+> down, or if it has to be done at the same time the mapping is
+> established, for things to work properly wrt. the semantics of memory
+> behavior of the rest of the kernel.
 
-When VM_FAULT_RETRY is returned all I/O should be complete (no matter
-if network or disk with userfaultfd or just pagecache readpage on
-filebacked kernel faults) and only a minor fault is required to obtain
-the page. But it is better to defer that second minor fault to the
-point where "pages" already become != NULL, so we end up calling
-__get_user_pages 2 times instead of 3 times.
+Yes sorry, the question about the refcounting was just trivial to
+answer: it always works, you can drop the refcount anywhere.
+
+I just thought if there was any doubt on the refcounting issue which
+had an immediate black and white answer, it was safer to raise
+awareness about the much more troubling and subtle issues with
+set_page_dirty caused by GUP refcounts.
+
+> I'm not sure if we're talking about the same thing here, or if you're
+> explaining a different scenario?
+
+Simply KVM secondary MMU fault has to mark the page dirty somehow
+(either in gup itself or in the fault or in the invalidates) in
+addition to dealing the refcount. That's the connection.
+
+However this set_page_dirty issue needs solution that works both for
+short term GPU pins that can't use mmu notifier (O_DIRECT), long term
+GUP pins that can't use mmu notifier (vfio) and the MMU notifier
+mappings (KVM page fault, whose refcount can be implicitly hold on by
+the MMU notifier itself and in turn the put_page can go anywhere).
+
+The solution to the O_DIRECT gup pin is also highly connected with the
+GUP refcounting, because the solution is to alter the refcount so that
+the filesystem learns that there's a special refcounting and
+->page_mkclean can be then deferred as long as the special refcount is
+hold by O_DIRECT. I argue the same special refcount can be also hold
+by long term GUP pins and the MMU notifier KVM page fault case (which
+will either drop FOLL_GET ideally) so we can defer the page_mkwrite
+indefinitely for long term GUP pins too (there will be no deferred
+write in MMU Notifier case because ->page_mkclean invokes the MMU
+notifier invalidates).
+
+If one wants to flush to disk the dirty MAP_SHARED periodically the
+device needs to be told to drop the refcounts and stop writing to the
+memory. If the device isn't told to stop writing to the memory what
+comes out is only coherent at 512 bytes units or maybe less anyway.
 
 Thanks,
 Andrea
