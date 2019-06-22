@@ -2,115 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 92D964F460
-	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2019 10:38:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6065B4F640
+	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2019 16:38:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726285AbfFVIii (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Jun 2019 04:38:38 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44398 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726274AbfFVIii (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 22 Jun 2019 04:38:38 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5M8aduW094600
-        for <kvm@vger.kernel.org>; Sat, 22 Jun 2019 04:38:37 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2t9d7tdmmu-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Sat, 22 Jun 2019 04:38:37 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
-        Sat, 22 Jun 2019 09:38:35 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Sat, 22 Jun 2019 09:38:32 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5M8cVoV33620202
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 22 Jun 2019 08:38:31 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E987552050;
-        Sat, 22 Jun 2019 08:38:30 +0000 (GMT)
-Received: from osiris (unknown [9.152.212.21])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id A02B65204F;
-        Sat, 22 Jun 2019 08:38:30 +0000 (GMT)
-Date:   Sat, 22 Jun 2019 10:38:29 +0200
-From:   Heiko Carstens <heiko.carstens@de.ibm.com>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PULL 13/14] vfio-ccw: Factor out the ccw0-to-ccw1 transition
-References: <20190621143355.29175-1-cohuck@redhat.com>
- <20190621143355.29175-14-cohuck@redhat.com>
- <2129b739-6722-123f-ec7d-f751557de7a0@linux.ibm.com>
+        id S1726138AbfFVOiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Jun 2019 10:38:11 -0400
+Received: from sonic303-2.consmr.mail.bf2.yahoo.com ([74.6.131.41]:44234 "EHLO
+        sonic303-2.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726276AbfFVOiL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 22 Jun 2019 10:38:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1561214289; bh=3fXYToOZXvh5MOJ1JSawYDThjnynC/Ekt2gucIg6zZg=; h=Date:From:Reply-To:Subject:From:Subject; b=drNAGbXF8Rm0D1utDg11UciDUgVYypm0wXEUkBEmLoKGzwbruQAQSip9D6U+70o7XTNb+xV2MzT4sFIiC6BwPo3bK1X1HoL/BTLKkK8Kt8nHoxS7+hUtooyIh6UDYB8cXE6Qdtqm0Iy31yy4lmazVUPDcoThXTIWc+om04kxd3yvep2zvqItqzFJS+irfPglP/a684mulTq9qpDA4Ec6JSMRohiayaYJbn+Q8CwfnzbAyLD8vzpxK6XI1mVBknIK2wcUdkJobbtNO8gEM0Y3ua4TgFIosU525yG70DpJgFP2luRHIuiWbPDw6JDBbGezX306Pa8u+WxFcLejM2jptg==
+X-YMail-OSG: jgN7BSMVM1k1hG5xptM9CZs7jNUXn8Z2QkzXMMoZGwowejlx0pgYzJi4IJJekUK
+ PyhPoCZvGvxf7jkyfvcFh4YstunywgsVDpeHnHyOrq4_kZIlxqI58U4AlwECjPrNgUkK56HoV0SR
+ udEJanEurUew74KAmJ0yD533R597p5spd2jiL3GA2hP.aJOZXfkfHXZHEjmWr5nPKVbUlUAIz1ky
+ inRlQiIoFwduKfLRWKowgVGVbvSlPCUsm3mDTSULFmFzobLgTzwL0.Vwtq9QaqRf54xG7E3AZ4dD
+ CJaiXWSZJo0wNMqiBxkssMis_w2MmtS3HYcUSEe.NY_.yJpQ.cOrHg09hk2R.obcFbCdLY2bsekO
+ Xvlwb_YOkv3CNZNLkGPfyzj1zhfSC9sD_jtDdvVbWqTAkVU0cyS3YyqTzvC8aY4.dKLVX36Nvbrn
+ uKA8bOUaD_Xt2TYtlQJxz4usUjE7QO08jwKysv_Bxqx7egiG2vyMEETv9Yx6q.2WElH2UtxnXcII
+ EMXRXhcdKLl9Nu5ydnKFhI7.gOyZ8CN6F3BjdYYamU6Q6PRmky7wf3AiKFxN1260vJD0_9h3udZU
+ VkQtm2My.FbbC87IPbND32ShHpA0L6N9KJWWj4Pbg1W3CBj8q5VVab10lel9vPOgjQgVbCoodxwX
+ RTM6FurZMIte2EporPZNPMus9Pqg7kt7Ggr1P.0mWS1j3XRmljI.yQRYmepdvEXFi1.Srn6JfCr4
+ AxTKnlE0_Mymj49moFwkAsHckQPF2xY5xDEH1vDZqCqK4TdRLvlm1U_2I8o_.XIRwAFdOzzDujvT
+ 0ItoG_izcQjwggH12etti8976ChXDVeSx76eeZQlDamDcPl4bLLliZlH.15EYPRq2ubex8I6DPUO
+ cg49_vZc4XY..N9kKtswGiB4pikzQ59MnjvJfhk2P8RmVyki.aQZc9pNmmN8wkXyS3UbPuhqSzWa
+ o1cKUwkUqe8Au6odheu08qpV3zvkN2pugTemjM7xY5OhgcaC_RCkIcl39q9XLyYK6qKMctpsLcnE
+ m1RvA9B6K8ye4De7He3Pl9RnO60dIYDduimdSx36B9KR__mY2hMjGjSn3Ae8zMwgkJ92_tzExVgp
+ IB8iuy7kcVAcC3zm5HHGL4HTHPYdBVCids4T1IASXMA1dhLqsraIm9cTwW7gkRS5SMZlZbeTDI7p
+ b1ZSxNCl33r848.oYj5Hmn8Vy01yOZiIbRMWK8XE5x6ejJn9htUapTtZg
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic303.consmr.mail.bf2.yahoo.com with HTTP; Sat, 22 Jun 2019 14:38:09 +0000
+Date:   Sat, 22 Jun 2019 14:38:06 +0000 (UTC)
+From:   "Miss.Fatima Yusuf" <fatimayusuf5@outlook.fr>
+Reply-To: miss.fmayusuf11@gmail.com
+Message-ID: <1358850798.259423.1561214286867@mail.yahoo.com>
+Subject: From:Miss: Fatima Yusuf.
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2129b739-6722-123f-ec7d-f751557de7a0@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19062208-0008-0000-0000-000002F60B93
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19062208-0009-0000-0000-00002263325C
-Message-Id: <20190622083829.GA3456@osiris>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-22_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906220079
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 21, 2019 at 03:13:20PM -0400, Eric Farman wrote:
-> Conny,
-> 
-> I'm bad at things, because I thought for sure I had checked for and
-> fixed this before I sent the patches.  This one gets a sparse warning,
-> fixed below.
-> 
-> Eric
-> 
-> On 6/21/19 10:33 AM, Cornelia Huck wrote:
-> > From: Eric Farman <farman@linux.ibm.com>
-> > 
-> > This is a really useful function, but it's buried in the
-> > copy_ccw_from_iova() routine so that ccwchain_calc_length()
-> > can just work with Format-1 CCWs while doing its counting.
-> > But it means we're translating a full 2K of "CCWs" to Format-1,
-> > when in reality there's probably far fewer in that space.
-> > 
-> > Let's factor it out, so maybe we can do something with it later.
-> > 
-> > Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> > Message-Id: <20190618202352.39702-5-farman@linux.ibm.com>
-> > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> > Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> >  drivers/s390/cio/vfio_ccw_cp.c | 48 ++++++++++++++++++----------------
-> >  1 file changed, 25 insertions(+), 23 deletions(-)
-> > 
-> > diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-> > index a55f8d110920..9a8bf06281e0 100644
-> > --- a/drivers/s390/cio/vfio_ccw_cp.c
-> > +++ b/drivers/s390/cio/vfio_ccw_cp.c
-> > @@ -161,6 +161,27 @@ static inline void pfn_array_idal_create_words(
-> >  	idaws[0] += pa->pa_iova & (PAGE_SIZE - 1);
-> >  }
-> >  
-> > +void convert_ccw0_to_ccw1(struct ccw1 *source, unsigned long len)
-> 
-> static void convert_...
 
-Please send an add-on patch. Code is already in our internal tree for
-testing purposes and will be push out next week.
 
+From:Miss: Fatima Yusuf.
+
+For sure this mail would definitely come to you as a surprise, but do take your good time to go through it, My name is Ms. Fatima Yusuf,i am from Ivory Coast.
+
+I lost my parents a year and couple of months ago. My father was a serving director of the Agro-exporting board until his death. He was assassinated by his business partners.Before his death, he made a deposit of US$9.7 Million Dollars here in Cote d'ivoire which was for the purchase of cocoa processing machine and development of another factory before his untimely death.
+
+Being that this part of the world experiences political and crises time without number, there is no guarantee of lives and properties. I cannot invest this money here any long, despite the fact it had been my late father's industrial plans.
+
+I want you to do me a favor to receive this funds into your country or any safer place as the beneficiary, I have plans to invest this money in continuation with the investment vision of my late father, but not in this place again rather in your country. I have the vision of going into real estate and industrial production or any profitable business venture.
+
+I will be ready to compensate you with 20% of the total Amount, now all my hope is banked on you and i really wants to invest this money in your country, where there is stability of Government, political and economic welfare.
+
+My greatest worry now is how to move out of this country because my uncle is threatening to kill me as he killed my father,Please do not let anybody hear about this, it is between me and you alone because of my security reason.
+
+I am waiting to hear from you.
+Yours Sincerely,
+Miss.Fatima Yusuf.
