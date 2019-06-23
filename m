@@ -2,111 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AA2DB4F960
-	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2019 02:23:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F13724FBC0
+	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2019 15:15:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726413AbfFWAW5 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sat, 22 Jun 2019 20:22:57 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:36780 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725844AbfFWAW5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 22 Jun 2019 20:22:57 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id F2B0928B6E
-        for <kvm@vger.kernel.org>; Sun, 23 Jun 2019 00:22:56 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id E73F528B8A; Sun, 23 Jun 2019 00:22:56 +0000 (UTC)
-X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
-        pdx-wl-mail.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-1.9 required=2.0 tests=BAYES_00,NO_RECEIVED,
-        NO_RELAYS autolearn=unavailable version=3.3.1
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 203957] New: AGESA 0.0.7.2. based BIOS update broke IOMMU
- redirection
-Date:   Sun, 23 Jun 2019 00:22:56 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: anjan@momi.ca
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-203957-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1726466AbfFWNPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 23 Jun 2019 09:15:23 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:35881 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725963AbfFWNPW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 23 Jun 2019 09:15:22 -0400
+Received: by mail-io1-f65.google.com with SMTP id h6so242150ioh.3
+        for <kvm@vger.kernel.org>; Sun, 23 Jun 2019 06:15:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oGBAVMzjO/rR0DdPnEAKQWgObypUtRNC5C7SVEEpyh0=;
+        b=rYSvF9BZJ5M8ivt01DVcOMv9kGDH+ID+xWJsxc/V9D1Hebo6lEr1o8VdxZ2C+waoxA
+         WrwNhfNM73618YgS8k0w/Nhfe+o5pN4LTHingdi59WX3Ut7yDSQx/fb15Cm/IXBf0u6l
+         z2qfPPT4+oreEhFkWLka0akRs/73RzqlsAlY/dondQ6CY3h7KuZCgnKw4scg5+j93Wyl
+         FsW7ARdi+tzqoCXJhHLXpxdSer/uEYHwKO7sq+ou964qS5GtoiyyH47MEPHTNOd4ytiQ
+         VTJcx47Bo/PHULqZBlZd6sDmx9VdtqPyhEQpi/2uReoQCqEQFoNm5Pu9IgDFixfPcc2X
+         G4dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oGBAVMzjO/rR0DdPnEAKQWgObypUtRNC5C7SVEEpyh0=;
+        b=PRpp1E8apRKuDSBydhGYQY8ol03r7/Bw1q+UIfwoWqaGvLBJYsywGH40lM+JMYpSf2
+         2CumhVdl++qWEcnwBNCIYgabhVUzVmKTOppICQsbPRek8jHifxaaSJ3EhZGhQ74ioW84
+         bxhVbLmrAkrEnP/J1xfXlNdOn75rttX8vzuU2OC9nVnfkSFd4uKQ/scF+2e4AdGpVvYJ
+         Iy1H3s2PW0G4nqzQ9C1Z4ATHz5VuHxVdKloAqMZvGh/FDr0rfpt1DRH5U/0BoG+xAmQP
+         lX9yVa8ljDTrLHm8LYW+emqRuBoL/L6UgXPCqzY6SpIRwuMSOCc6TjEHGbu/krlud1KW
+         GDkA==
+X-Gm-Message-State: APjAAAUjyGk1W+oSmx/dMhHzrXBvUl7x2o3kJcPt9coJ/8TI+Pm7CHLk
+        Qxx+lSlesK1E1USm14/PtWWwtOg6Ptat4SfFkxa7WA==
+X-Google-Smtp-Source: APXvYqyuVG6E3R7fQONRX5XyFNYlaFarskiAI1WT00v5gOo+hxtT9WEnH+uejdMVvJkZDWu0YkPSwoCbnRc2LX5DlBg=
+X-Received: by 2002:a02:c7c9:: with SMTP id s9mr118924663jao.82.1561295721860;
+ Sun, 23 Jun 2019 06:15:21 -0700 (PDT)
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+References: <37952f51-7687-672c-45d9-92ba418c9133@oracle.com>
+ <20190612161255.GN32652@zn.tnic> <af0054d1-1fc8-c106-b503-ca91da5a6fee@oracle.com>
+ <20190612195152.GQ32652@zn.tnic> <20190612205430.GA26320@linux.intel.com>
+ <20190613071805.GA11598@zn.tnic> <df80299b-8e1f-f48b-a26b-c163b4018d01@oracle.com>
+ <20190618175153.GC26346@zn.tnic> <CACT4Y+bnKwniAikESjDckaTW=vE1hu8yc4DuoSFwP3qTS4NpmA@mail.gmail.com>
+ <20190618182733.GD26346@zn.tnic>
+In-Reply-To: <20190618182733.GD26346@zn.tnic>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Sun, 23 Jun 2019 15:15:10 +0200
+Message-ID: <CACT4Y+ZKcbcZmMs_PMJuofieLeugkFjx6CDQertWYhxiF9aTvg@mail.gmail.com>
+Subject: Re: kernel BUG at arch/x86/kvm/x86.c:361! on AMD CPU
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     George Kennedy <george.kennedy@oracle.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, KVM list <kvm@vger.kernel.org>,
+        syzkaller <syzkaller@googlegroups.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=203957
+On Tue, Jun 18, 2019 at 8:27 PM Borislav Petkov <bp@alien8.de> wrote:
+>
+> On Tue, Jun 18, 2019 at 08:01:06PM +0200, Dmitry Vyukov wrote:
+> > I am not a KVM folk either, but FWIW syzkaller is capable of creating
+> > a double-nested VM.
+>
+> Aaaha, there it is. :)
+>
+> > The code is somewhat VMX-specific, but it should
+> > be capable at least executing some SVM instructions inside of guest.
+> > This code setups VM to run a given instruction sequences (should be generic):
+> > https://github.com/google/syzkaller/blob/34bf9440bd06034f86b5d9ac8afbf078129cbdae/executor/common_kvm_amd64.h
+> > The instruction generator is based on Intel XED so it may be somewhat
+> > Intel-biased, but at least I see some mentions of SVM there:
+> > https://raw.githubusercontent.com/google/syzkaller/34bf9440bd06034f86b5d9ac8afbf078129cbdae/pkg/ifuzz/gen/all-enc-instructions.txt
+>
+> Right, and that right there looks wrong:
+>
+> ICLASS    : VMLOAD
+> CPL       : 3
+> CATEGORY  : SYSTEM
+> EXTENSION : SVM
+> ATTRIBUTES: PROTECTED_MODE
+> PATTERN   : 0x0F 0x01 MOD[0b11] MOD=3 REG[0b011] RM[0b010]
+> OPERANDS  : REG0=OrAX():r:IMPL
+>
+> That is, *if* "CPL: 3" above means in XED context that VMLOAD is
+> supposed to be run in CPL3, then this is wrong because VMLOAD #GPs if
+> CPL was not 0. Ditto for VMRUN and a couple of others.
+>
+> Perhaps that support was added at some point but not really run on AMD
+> hw yet...
 
-            Bug ID: 203957
-           Summary: AGESA 0.0.7.2. based BIOS update broke IOMMU
-                    redirection
-           Product: Virtualization
-           Version: unspecified
-    Kernel Version: 5.1.12
-          Hardware: x86-64
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: anjan@momi.ca
-        Regression: No
 
-Created attachment 283395
-  --> https://bugzilla.kernel.org/attachment.cgi?id=283395&action=edit
-pci patch that fixes pci passthrough for newer AMD Bios
+Interesting. I've updated to the latest Intel XED:
+https://github.com/google/syzkaller/commit/472f0082fd8a2f82b85ab0682086e10b71529a51
 
-Hello,
+And I actually see a number of changes around this for the VMX instructions:
 
-I am using a "AMD Ryzen 7 1700" on a "GA-AX370-Gaming 5". I recently updated to
-the latest BIOS from an older BIOS. Updating my bios broke PCI passthrough.
+ ICLASS    : VMPTRLD
+-CPL       : 3
++CPL       : 0
 
-Everytime I would try to start my virtual machine from virt-manager, I would
-get "Unknown PCI header type '127'" and my virtual machines would refuse to
-boot.
+ ICLASS    : VMXON
+-CPL       : 3
++CPL       : 0
 
-It seems this is a common issue:
-1.
-https://forum.manjaro.org/t/solved-agesa-0-0-7-2-based-bios-update-broke-iommu-redirection/88909
+ ICLASS    : VMLAUNCH
+-CPL       : 3
++CPL       : 0
 
-2. https://www.reddit.com/r/Amd/comments/bh3qqz/agesa_0072_pci_quirk/
-
-However, following the solution in thread 1, I was able to fix pci passthrough.
-
-I simply applied this patch:
-https://clbin.com/VCiYJ
-
-to kernel 5.1.12 and it fixed PCI passthrough. This patch is also attached to
-this bug as a mirror.
-
-It would be great if this patch could get merged into upstream. Please let me
-know if I can provide any further information or assist in any way to make this
-happen.
-
-Thank you.
-
--- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+But VMLOAD is still marked as CPL 3.
+Perhaps it's something to fix in Intel XED. But for syzkaller it
+should not matter much, it's a fuzzer and it will do all kinds of
+crazy non-conforming stuff. These CPLs are only used as hints at best
+if at all. It should sure try CPL=0 instructions in CPL3 regardless.
