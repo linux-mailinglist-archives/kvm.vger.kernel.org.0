@@ -2,153 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 46CBB50FD9
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 17:10:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EDD951005
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 17:12:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730757AbfFXPJm convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 24 Jun 2019 11:09:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37620 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730741AbfFXPJl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jun 2019 11:09:41 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 01E7C30C0DC8;
-        Mon, 24 Jun 2019 15:09:41 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E3DD019C6A;
-        Mon, 24 Jun 2019 15:09:39 +0000 (UTC)
-Date:   Mon, 24 Jun 2019 17:09:37 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Farhan Ali <alifm@linux.ibm.com>
-Cc:     Eric Farman <farman@linux.ibm.com>, pasic@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [RFC v1 1/1] vfio-ccw: Don't call cp_free if we are processing
- a channel program
-Message-ID: <20190624170937.4c76de8d.cohuck@redhat.com>
-In-Reply-To: <3e93215c-c11a-d0bb-8982-be3f2b467e13@linux.ibm.com>
-References: <cover.1561055076.git.alifm@linux.ibm.com>
-        <46dc0cbdcb8a414d70b7807fceb1cca6229408d5.1561055076.git.alifm@linux.ibm.com>
-        <638804dc-53c0-ff2f-d123-13c257ad593f@linux.ibm.com>
-        <581d756d-7418-cd67-e0e8-f9e4fe10b22d@linux.ibm.com>
-        <2d9c04ba-ee50-2f9b-343a-5109274ff52d@linux.ibm.com>
-        <56ced048-8c66-a030-af35-8afbbd2abea8@linux.ibm.com>
-        <20190624114231.2d81e36f.cohuck@redhat.com>
-        <20190624120514.4b528db5.cohuck@redhat.com>
-        <20190624134622.2bb3bba2.cohuck@redhat.com>
-        <20190624140723.5aa7b0b1.cohuck@redhat.com>
-        <3e93215c-c11a-d0bb-8982-be3f2b467e13@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1729946AbfFXPML convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 24 Jun 2019 11:12:11 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([146.101.78.151]:43070 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727957AbfFXPMK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 Jun 2019 11:12:10 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-143-5aPUt60zN6uguMOtfab1og-1; Mon, 24 Jun 2019 16:12:06 +0100
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Mon, 24 Jun 2019 16:12:05 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Mon, 24 Jun 2019 16:12:05 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Fenghua Yu' <fenghua.yu@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        H Peter Anvin <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Christopherson Sean J <sean.j.christopherson@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        "Xiaoyao Li " <xiaoyao.li@intel.com>,
+        "Sai Praneeth Prakhya" <sai.praneeth.prakhya@intel.com>,
+        Ravi V Shankar <ravi.v.shankar@intel.com>
+CC:     linux-kernel <linux-kernel@vger.kernel.org>, x86 <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: RE: [PATCH v9 02/17] drivers/net/b44: Align pwol_mask to unsigned
+ long for better performance
+Thread-Topic: [PATCH v9 02/17] drivers/net/b44: Align pwol_mask to unsigned
+ long for better performance
+Thread-Index: AQHVJiiMr9gB8h3g0E+XfoKMzxMCiqaq8WpA
+Date:   Mon, 24 Jun 2019 15:12:05 +0000
+Message-ID: <fce80c42ba1949fd8d7924786bbf0ec8@AcuMS.aculab.com>
+References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
+ <1560897679-228028-3-git-send-email-fenghua.yu@intel.com>
+In-Reply-To: <1560897679-228028-3-git-send-email-fenghua.yu@intel.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
+X-MC-Unique: 5aPUt60zN6uguMOtfab1og-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8BIT
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Mon, 24 Jun 2019 15:09:41 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 24 Jun 2019 10:44:17 -0400
-Farhan Ali <alifm@linux.ibm.com> wrote:
-
-> On 06/24/2019 08:07 AM, Cornelia Huck wrote:
-> > On Mon, 24 Jun 2019 13:46:22 +0200
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >   
-> >> On Mon, 24 Jun 2019 12:05:14 +0200
-> >> Cornelia Huck <cohuck@redhat.com> wrote:
-> >>  
-> >>> On Mon, 24 Jun 2019 11:42:31 +0200
-> >>> Cornelia Huck <cohuck@redhat.com> wrote:
-> >>>      
-> >>>> On Fri, 21 Jun 2019 14:34:10 -0400
-> >>>> Farhan Ali <alifm@linux.ibm.com> wrote:
-> >>>>        
-> >>>>> On 06/21/2019 01:40 PM, Eric Farman wrote:  
-> >>>>>>
-> >>>>>>
-> >>>>>> On 6/21/19 10:17 AM, Farhan Ali wrote:  
-> >>>>>>>
-> >>>>>>>
-> >>>>>>> On 06/20/2019 04:27 PM, Eric Farman wrote:  
-> >>>>>>>>
-> >>>>>>>>
-> >>>>>>>> On 6/20/19 3:40 PM, Farhan Ali wrote:  
-> >>  
-> >>>>>>>>> diff --git a/drivers/s390/cio/vfio_ccw_drv.c
-> >>>>>>>>> b/drivers/s390/cio/vfio_ccw_drv.c
-> >>>>>>>>> index 66a66ac..61ece3f 100644
-> >>>>>>>>> --- a/drivers/s390/cio/vfio_ccw_drv.c
-> >>>>>>>>> +++ b/drivers/s390/cio/vfio_ccw_drv.c
-> >>>>>>>>> @@ -88,7 +88,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct
-> >>>>>>>>> *work)
-> >>>>>>>>>                  (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
-> >>>>>>>>>         if (scsw_is_solicited(&irb->scsw)) {
-> >>>>>>>>>             cp_update_scsw(&private->cp, &irb->scsw);  
-> >>>>>>>>
-> >>>>>>>> As I alluded earlier, do we know this irb is for this cp?  If no, what
-> >>>>>>>> does this function end up putting in the scsw?  
-> >>>>
-> >>>> Yes, I think this also needs to check whether we have at least a prior
-> >>>> start function around. (We use the orb provided by the guest; maybe we
-> >>>> should check if that intparm is set in the irb?)  
-> >>>
-> >>> Hrm; not so easy as we always set the intparm to the address of the
-> >>> subchannel structure...
-> >>>
-> >>> Maybe check if we have have one of the conditions of the large table
-> >>> 16-6 and correlate to the ccw address? Or is it enough to check the
-> >>> function control? (Don't remember when the hardware resets it.)  
-> >>
-> >> Nope, we cannot look at the function control, as csch clears any set
-> >> start function bit :( (see "Function Control", pg 16-13)
-> >>
-> >> I think this problem mostly boils down to "csch clears pending status;
-> >> therefore, we may only get one interrupt, even though there had been a
-> >> start function going on". If we only go with what the hardware gives
-> >> us, I don't see a way to distinguish "clear with a prior start" from
-> >> "clear only". Maybe we want to track an "issued" status in the cp?  
-> > 
-> > Sorry for replying to myself again :), but maybe we should simply call
-> > cp_free() if we got cc 0 from a csch? Any start function has been
-> > terminated at the subchannel during successful execution of csch, and
-> > cp_free does nothing if !cp->initialized, so we should hopefully be
-> > safe there as well. We can then add a check for the start function in
-> > the function control in the check above and should be fine, I think.
-> > 
-> >   
+From: Fenghua Yu
+> Sent: 18 June 2019 23:41
+> From: Peter Zijlstra <peterz@infradead.org>
 > 
-> So you mean not call cp_free in vfio_ccw_sch_io_todo, and instead call 
-> cp_free for a cc=0 for csch (and hsch) ?
+> A bit in pwol_mask is set in b44_magic_pattern() by atomic set_bit().
+> But since pwol_mask is local and never exposed to concurrency, there is
+> no need to set bit in pwol_mask atomically.
 > 
-> Won't we end up with memory leak for a successful for ssch then?
-
-No; both:
-
-- free if cc=0 for csch (as this clears the status; hsch doesn't)
-- free in _todo if the start function is set in the irb and the status
-  is final
-
+> set_bit() sets the bit in a single unsigned long location. Because
+> pwol_mask may not be aligned to unsigned long, the location may cross two
+> cache lines. On x86, accessing two cache lines in locked instruction in
+> set_bit() is called split locked access and can cause overall performance
+> degradation.
 > 
-> But even if we don't remove the cp_free from vfio_ccw_sch_io_todo, I am 
-> not sure if your suggestion will fix the problem. The problem here is 
-> that we can call vfio_ccw_sch_io_todo (for a clear or halt interrupt) at 
-> the same time we are handling an ssch request. So depending on the order 
-> of the operations we could still end up calling cp_free from both from 
-> threads (i refer to the threads I mentioned in response to Eric's 
-> earlier email).
-
-What I don't see is why this is a problem with ->initialized; wasn't
-the problem that we misinterpreted an interrupt for csch as one for a
-not-yet-issued ssch?
-
+> So use non atomic __set_bit() to set pwol_mask bits. __set_bit() won't hit
+> split lock issue on x86.
 > 
-> Another thing that concerns me is that vfio-ccw can also issue csch/hsch 
-> in the quiesce path, independently of what the guest issues. So in that 
-> case we could have a similar scenario to processing an ssch request and 
-> issuing halt/clear in parallel. But maybe I am being paranoid :)
+> Signed-off-by: Peter Zijlstra <peterz@infradead.org>
+> Signed-off-by: Fenghua Yu <fenghua.yu@intel.com>
+> ---
+>  drivers/net/ethernet/broadcom/b44.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/b44.c b/drivers/net/ethernet/broadcom/b44.c
+> index 97ab0dd25552..5738ab963dfb 100644
+> --- a/drivers/net/ethernet/broadcom/b44.c
+> +++ b/drivers/net/ethernet/broadcom/b44.c
+> @@ -1520,7 +1520,7 @@ static int b44_magic_pattern(u8 *macaddr, u8 *ppattern, u8 *pmask, int offset)
+> 
+>  	memset(ppattern + offset, 0xff, magicsync);
+>  	for (j = 0; j < magicsync; j++)
+> -		set_bit(len++, (unsigned long *) pmask);
+> +		__set_bit(len++, (unsigned long *)pmask);
+> 
+>  	for (j = 0; j < B44_MAX_PATTERNS; j++) {
+>  		if ((B44_PATTERN_SIZE - len) >= ETH_ALEN)
+> @@ -1532,7 +1532,7 @@ static int b44_magic_pattern(u8 *macaddr, u8 *ppattern, u8 *pmask, int offset)
+>  		for (k = 0; k< ethaddr_bytes; k++) {
+>  			ppattern[offset + magicsync +
+>  				(j * ETH_ALEN) + k] = macaddr[k];
+> -			set_bit(len++, (unsigned long *) pmask);
+> +			__set_bit(len++, (unsigned long *)pmask);
 
-I think the root problem is really trying to clear a cp while another
-thread is trying to set it up. Should we maybe use something like rcu?
+Is this code expected to do anything sensible on BE systems?
+Casting the bitmask[] argument to any of the set_bit() functions is dubious at best.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
+
