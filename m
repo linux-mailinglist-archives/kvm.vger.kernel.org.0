@@ -2,79 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E06F350A59
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 14:06:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C572D50A5E
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 14:07:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728766AbfFXMGh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jun 2019 08:06:37 -0400
-Received: from mga09.intel.com ([134.134.136.24]:53063 "EHLO mga09.intel.com"
+        id S1728147AbfFXMH1 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 24 Jun 2019 08:07:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42162 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726923AbfFXMGh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jun 2019 08:06:37 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Jun 2019 05:06:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,412,1557212400"; 
-   d="scan'208";a="166312876"
-Received: from liujing-mobl.ccr.corp.intel.com (HELO [10.238.129.47]) ([10.238.129.47])
-  by orsmga006.jf.intel.com with ESMTP; 24 Jun 2019 05:06:34 -0700
-Subject: Re: [PATCH RFC] kvm: x86: Expose AVX512_BF16 feature to guest
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, jing2.liu@intel.com
-References: <1561029712-11848-1-git-send-email-jing2.liu@linux.intel.com>
- <1561029712-11848-2-git-send-email-jing2.liu@linux.intel.com>
- <fd861e94-3ea5-3976-9855-05375f869f00@redhat.com>
- <384bc07d-6105-d380-cd44-4518870c15f1@linux.intel.com>
- <fb749626-1d9e-138f-c673-14b52fe7170c@linux.intel.com>
- <7d304ae7-73c0-d2a9-cd3e-975941a91266@redhat.com>
-From:   Jing Liu <jing2.liu@linux.intel.com>
-Message-ID: <2a2b395b-0bad-5022-9698-9beb87f55ec6@linux.intel.com>
-Date:   Mon, 24 Jun 2019 20:06:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726923AbfFXMH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jun 2019 08:07:26 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9278880F6D;
+        Mon, 24 Jun 2019 12:07:26 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 83A755D9C8;
+        Mon, 24 Jun 2019 12:07:25 +0000 (UTC)
+Date:   Mon, 24 Jun 2019 14:07:23 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Farhan Ali <alifm@linux.ibm.com>
+Cc:     Eric Farman <farman@linux.ibm.com>, pasic@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC v1 1/1] vfio-ccw: Don't call cp_free if we are processing
+ a channel program
+Message-ID: <20190624140723.5aa7b0b1.cohuck@redhat.com>
+In-Reply-To: <20190624134622.2bb3bba2.cohuck@redhat.com>
+References: <cover.1561055076.git.alifm@linux.ibm.com>
+        <46dc0cbdcb8a414d70b7807fceb1cca6229408d5.1561055076.git.alifm@linux.ibm.com>
+        <638804dc-53c0-ff2f-d123-13c257ad593f@linux.ibm.com>
+        <581d756d-7418-cd67-e0e8-f9e4fe10b22d@linux.ibm.com>
+        <2d9c04ba-ee50-2f9b-343a-5109274ff52d@linux.ibm.com>
+        <56ced048-8c66-a030-af35-8afbbd2abea8@linux.ibm.com>
+        <20190624114231.2d81e36f.cohuck@redhat.com>
+        <20190624120514.4b528db5.cohuck@redhat.com>
+        <20190624134622.2bb3bba2.cohuck@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <7d304ae7-73c0-d2a9-cd3e-975941a91266@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Mon, 24 Jun 2019 12:07:26 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Mon, 24 Jun 2019 13:46:22 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-On 6/24/2019 4:33 PM, Paolo Bonzini wrote:
-> On 24/06/19 05:10, Jing Liu wrote:
->>> What do you think about @index in current function? Does it mean, we
->>> need put cpuid from index to max subleaf to @entry[i]? If so, the logic
->>> seems as follows,
->>>
->>> if (index == 0) {
->>>       // Put subleaf 0 into @entry
->>>       // Put subleaf 1 into @entry[1]
->>> } else if (index < entry->eax) {
->>>       // Put subleaf 1 into @entry
->>> } else {
->>>       // Put all zero into @entry
->>> }
->>>
->>> But this seems not identical with other cases, for current caller
->>> function. Or we can simply ignore @index in 0x07 and just put all
->>> possible subleaf info back?
+> On Mon, 24 Jun 2019 12:05:14 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
 > 
-> There are indeed quite some cleanups to be made there.  Let me post a
-> series as soon as possible, and you can base your work on it.
+> > On Mon, 24 Jun 2019 11:42:31 +0200
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> >   
+> > > On Fri, 21 Jun 2019 14:34:10 -0400
+> > > Farhan Ali <alifm@linux.ibm.com> wrote:
+> > >     
+> > > > On 06/21/2019 01:40 PM, Eric Farman wrote:    
+> > > > > 
+> > > > > 
+> > > > > On 6/21/19 10:17 AM, Farhan Ali wrote:      
+> > > > >>
+> > > > >>
+> > > > >> On 06/20/2019 04:27 PM, Eric Farman wrote:      
+> > > > >>>
+> > > > >>>
+> > > > >>> On 6/20/19 3:40 PM, Farhan Ali wrote:      
 > 
-
-Thanks. I just had another mail (replying you in this serial) appending
-some codes to deal with case 7. If you prefer to firstly cleanup, I can
-wait for the patch then. :)
-
-Thanks,
-Jing
-
-> Paolo
+> > > > >>>> diff --git a/drivers/s390/cio/vfio_ccw_drv.c
+> > > > >>>> b/drivers/s390/cio/vfio_ccw_drv.c
+> > > > >>>> index 66a66ac..61ece3f 100644
+> > > > >>>> --- a/drivers/s390/cio/vfio_ccw_drv.c
+> > > > >>>> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> > > > >>>> @@ -88,7 +88,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct
+> > > > >>>> *work)
+> > > > >>>>                 (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
+> > > > >>>>        if (scsw_is_solicited(&irb->scsw)) {
+> > > > >>>>            cp_update_scsw(&private->cp, &irb->scsw);      
+> > > > >>>
+> > > > >>> As I alluded earlier, do we know this irb is for this cp?  If no, what
+> > > > >>> does this function end up putting in the scsw?    
+> > > 
+> > > Yes, I think this also needs to check whether we have at least a prior
+> > > start function around. (We use the orb provided by the guest; maybe we
+> > > should check if that intparm is set in the irb?)    
+> > 
+> > Hrm; not so easy as we always set the intparm to the address of the
+> > subchannel structure... 
+> > 
+> > Maybe check if we have have one of the conditions of the large table
+> > 16-6 and correlate to the ccw address? Or is it enough to check the
+> > function control? (Don't remember when the hardware resets it.)  
 > 
+> Nope, we cannot look at the function control, as csch clears any set
+> start function bit :( (see "Function Control", pg 16-13)
+> 
+> I think this problem mostly boils down to "csch clears pending status;
+> therefore, we may only get one interrupt, even though there had been a
+> start function going on". If we only go with what the hardware gives
+> us, I don't see a way to distinguish "clear with a prior start" from
+> "clear only". Maybe we want to track an "issued" status in the cp?
+
+Sorry for replying to myself again :), but maybe we should simply call
+cp_free() if we got cc 0 from a csch? Any start function has been
+terminated at the subchannel during successful execution of csch, and
+cp_free does nothing if !cp->initialized, so we should hopefully be
+safe there as well. We can then add a check for the start function in
+the function control in the check above and should be fine, I think.
