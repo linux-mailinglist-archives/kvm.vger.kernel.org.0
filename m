@@ -2,170 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B71E51A02
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 19:51:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE4AB51AE5
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 20:43:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732627AbfFXRv3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jun 2019 13:51:29 -0400
-Received: from foss.arm.com ([217.140.110.172]:56092 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726451AbfFXRv3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jun 2019 13:51:29 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 25DB8360;
-        Mon, 24 Jun 2019 10:51:28 -0700 (PDT)
-Received: from arrakis.emea.arm.com (arrakis.cambridge.arm.com [10.1.196.78])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 606C33F718;
-        Mon, 24 Jun 2019 10:51:23 -0700 (PDT)
-Date:   Mon, 24 Jun 2019 18:51:21 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
+        id S1727283AbfFXSnh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jun 2019 14:43:37 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34694 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726287AbfFXSng (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jun 2019 14:43:36 -0400
+Received: by mail-wr1-f68.google.com with SMTP id k11so15034247wrl.1
+        for <kvm@vger.kernel.org>; Mon, 24 Jun 2019 11:43:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=GfjEkDFqzgTZBEb7tk5FQBBfhGJ6qrc4fpvCj0iHlvg=;
+        b=lfXrlJnF8UoyfVYIvsVegIAjcXn02kXESNSVDNZMoAkbQ4wYpBn+dEu3S05W3RVpso
+         gjQWcKHmOvVz1nu+YMtYuI/PcFtqi78XgL2Q9/7buRXe1gXbv3s9TP5BNkAkZCVNjlx0
+         5MTOm6n0V/jb6IB2fkMjMzH8PZKZKNYtgCWglx7yBXHBDKlFrBWlgMxwvk98oqxw+mKF
+         J/O1BgWrCo4M+m5LTObCIzzD6oAnlLMfaEKbnPcII8kUDTQMNRCjPvIF4r76OR1js1eZ
+         3p3qiYrXvEYerR8w8NyltmKyfH7+yB+hDC8uOTAS9aOs0vrYmHXcsnbaRDEcoq0nNRi/
+         vaaA==
+X-Gm-Message-State: APjAAAUArNMOz/3XnRJs1tQ5vwApOZ+1HRzvF1yIDGCWu7b+yMgxhAHP
+        y24F8/U1oDYyC9a1PO1jmK6KzFZb8G8=
+X-Google-Smtp-Source: APXvYqw37VJQFJbX+dUabx4CSUB5gIDbQkk/Rk2XlTrf2S7d3VSRR3BHYb/8IS7tK0hRyAS3jV9ftA==
+X-Received: by 2002:a5d:66ce:: with SMTP id k14mr45670884wrw.308.1561401815379;
+        Mon, 24 Jun 2019 11:43:35 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:45fb:a0de:928e:79e8? ([2001:b07:6468:f312:45fb:a0de:928e:79e8])
+        by smtp.gmail.com with ESMTPSA id y19sm397750wmc.21.2019.06.24.11.43.33
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Mon, 24 Jun 2019 11:43:34 -0700 (PDT)
+Subject: Re: [PATCH v9 02/17] drivers/net/b44: Align pwol_mask to unsigned
+ long for better performance
+To:     David Laight <David.Laight@ACULAB.COM>,
+        'Fenghua Yu' <fenghua.yu@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        H Peter Anvin <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
         Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Al Viro <viro@zeniv.linux.org.uk>
-Subject: Re: [PATCH v18 08/15] userfaultfd: untag user pointers
-Message-ID: <20190624175120.GN29120@arrakis.emea.arm.com>
-References: <cover.1561386715.git.andreyknvl@google.com>
- <d8e3b9a819e98d6527e506027b173b128a148d3c.1561386715.git.andreyknvl@google.com>
+        Dave Hansen <dave.hansen@intel.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Christopherson Sean J <sean.j.christopherson@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
+        Ravi V Shankar <ravi.v.shankar@intel.com>
+Cc:     linux-kernel <linux-kernel@vger.kernel.org>, x86 <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
+ <1560897679-228028-3-git-send-email-fenghua.yu@intel.com>
+ <fce80c42ba1949fd8d7924786bbf0ec8@AcuMS.aculab.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <4cd9d48f-e655-4943-2ec9-1b74a77e317c@redhat.com>
+Date:   Mon, 24 Jun 2019 20:43:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d8e3b9a819e98d6527e506027b173b128a148d3c.1561386715.git.andreyknvl@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <fce80c42ba1949fd8d7924786bbf0ec8@AcuMS.aculab.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 24, 2019 at 04:32:53PM +0200, Andrey Konovalov wrote:
-> This patch is a part of a series that extends kernel ABI to allow to pass
-> tagged user pointers (with the top byte set to something else other than
-> 0x00) as syscall arguments.
+On 24/06/19 17:12, David Laight wrote:
+> From: Fenghua Yu
+>> Sent: 18 June 2019 23:41
+>> From: Peter Zijlstra <peterz@infradead.org>
+>>
+>> A bit in pwol_mask is set in b44_magic_pattern() by atomic set_bit().
+>> But since pwol_mask is local and never exposed to concurrency, there is
+>> no need to set bit in pwol_mask atomically.
+>>
+>> set_bit() sets the bit in a single unsigned long location. Because
+>> pwol_mask may not be aligned to unsigned long, the location may cross two
+>> cache lines. On x86, accessing two cache lines in locked instruction in
+>> set_bit() is called split locked access and can cause overall performance
+>> degradation.
+>>
+>> So use non atomic __set_bit() to set pwol_mask bits. __set_bit() won't hit
+>> split lock issue on x86.
+>>
+>> Signed-off-by: Peter Zijlstra <peterz@infradead.org>
+>> Signed-off-by: Fenghua Yu <fenghua.yu@intel.com>
+>> ---
+>>  drivers/net/ethernet/broadcom/b44.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/broadcom/b44.c b/drivers/net/ethernet/broadcom/b44.c
+>> index 97ab0dd25552..5738ab963dfb 100644
+>> --- a/drivers/net/ethernet/broadcom/b44.c
+>> +++ b/drivers/net/ethernet/broadcom/b44.c
+>> @@ -1520,7 +1520,7 @@ static int b44_magic_pattern(u8 *macaddr, u8 *ppattern, u8 *pmask, int offset)
+>>
+>>  	memset(ppattern + offset, 0xff, magicsync);
+>>  	for (j = 0; j < magicsync; j++)
+>> -		set_bit(len++, (unsigned long *) pmask);
+>> +		__set_bit(len++, (unsigned long *)pmask);
+>>
+>>  	for (j = 0; j < B44_MAX_PATTERNS; j++) {
+>>  		if ((B44_PATTERN_SIZE - len) >= ETH_ALEN)
+>> @@ -1532,7 +1532,7 @@ static int b44_magic_pattern(u8 *macaddr, u8 *ppattern, u8 *pmask, int offset)
+>>  		for (k = 0; k< ethaddr_bytes; k++) {
+>>  			ppattern[offset + magicsync +
+>>  				(j * ETH_ALEN) + k] = macaddr[k];
+>> -			set_bit(len++, (unsigned long *) pmask);
+>> +			__set_bit(len++, (unsigned long *)pmask);
 > 
-> userfaultfd code use provided user pointers for vma lookups, which can
-> only by done with untagged pointers.
-> 
-> Untag user pointers in validate_range().
-> 
-> Reviewed-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> Reviewed-by: Kees Cook <keescook@chromium.org>
-> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> ---
->  fs/userfaultfd.c | 22 ++++++++++++----------
->  1 file changed, 12 insertions(+), 10 deletions(-)
+> Is this code expected to do anything sensible on BE systems?
 
-Same here, it needs an ack from Al Viro.
+Probably not, but it's not wrong in different ways before/after the patch.
 
-> diff --git a/fs/userfaultfd.c b/fs/userfaultfd.c
-> index ae0b8b5f69e6..c2be36a168ca 100644
-> --- a/fs/userfaultfd.c
-> +++ b/fs/userfaultfd.c
-> @@ -1261,21 +1261,23 @@ static __always_inline void wake_userfault(struct userfaultfd_ctx *ctx,
->  }
->  
->  static __always_inline int validate_range(struct mm_struct *mm,
-> -					  __u64 start, __u64 len)
-> +					  __u64 *start, __u64 len)
->  {
->  	__u64 task_size = mm->task_size;
->  
-> -	if (start & ~PAGE_MASK)
-> +	*start = untagged_addr(*start);
-> +
-> +	if (*start & ~PAGE_MASK)
->  		return -EINVAL;
->  	if (len & ~PAGE_MASK)
->  		return -EINVAL;
->  	if (!len)
->  		return -EINVAL;
-> -	if (start < mmap_min_addr)
-> +	if (*start < mmap_min_addr)
->  		return -EINVAL;
-> -	if (start >= task_size)
-> +	if (*start >= task_size)
->  		return -EINVAL;
-> -	if (len > task_size - start)
-> +	if (len > task_size - *start)
->  		return -EINVAL;
->  	return 0;
->  }
-> @@ -1325,7 +1327,7 @@ static int userfaultfd_register(struct userfaultfd_ctx *ctx,
->  		goto out;
->  	}
->  
-> -	ret = validate_range(mm, uffdio_register.range.start,
-> +	ret = validate_range(mm, &uffdio_register.range.start,
->  			     uffdio_register.range.len);
->  	if (ret)
->  		goto out;
-> @@ -1514,7 +1516,7 @@ static int userfaultfd_unregister(struct userfaultfd_ctx *ctx,
->  	if (copy_from_user(&uffdio_unregister, buf, sizeof(uffdio_unregister)))
->  		goto out;
->  
-> -	ret = validate_range(mm, uffdio_unregister.start,
-> +	ret = validate_range(mm, &uffdio_unregister.start,
->  			     uffdio_unregister.len);
->  	if (ret)
->  		goto out;
-> @@ -1665,7 +1667,7 @@ static int userfaultfd_wake(struct userfaultfd_ctx *ctx,
->  	if (copy_from_user(&uffdio_wake, buf, sizeof(uffdio_wake)))
->  		goto out;
->  
-> -	ret = validate_range(ctx->mm, uffdio_wake.start, uffdio_wake.len);
-> +	ret = validate_range(ctx->mm, &uffdio_wake.start, uffdio_wake.len);
->  	if (ret)
->  		goto out;
->  
-> @@ -1705,7 +1707,7 @@ static int userfaultfd_copy(struct userfaultfd_ctx *ctx,
->  			   sizeof(uffdio_copy)-sizeof(__s64)))
->  		goto out;
->  
-> -	ret = validate_range(ctx->mm, uffdio_copy.dst, uffdio_copy.len);
-> +	ret = validate_range(ctx->mm, &uffdio_copy.dst, uffdio_copy.len);
->  	if (ret)
->  		goto out;
->  	/*
-> @@ -1761,7 +1763,7 @@ static int userfaultfd_zeropage(struct userfaultfd_ctx *ctx,
->  			   sizeof(uffdio_zeropage)-sizeof(__s64)))
->  		goto out;
->  
-> -	ret = validate_range(ctx->mm, uffdio_zeropage.range.start,
-> +	ret = validate_range(ctx->mm, &uffdio_zeropage.range.start,
->  			     uffdio_zeropage.range.len);
->  	if (ret)
->  		goto out;
-> -- 
-> 2.22.0.410.gd8fdbe21b5-goog
+Paolo
+
+> Casting the bitmask[] argument to any of the set_bit() functions is dubious at best.
