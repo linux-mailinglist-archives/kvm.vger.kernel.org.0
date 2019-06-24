@@ -2,112 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C572D50A5E
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 14:07:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C26350A95
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 14:19:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728147AbfFXMH1 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 24 Jun 2019 08:07:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42162 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726923AbfFXMH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jun 2019 08:07:26 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9278880F6D;
-        Mon, 24 Jun 2019 12:07:26 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 83A755D9C8;
-        Mon, 24 Jun 2019 12:07:25 +0000 (UTC)
-Date:   Mon, 24 Jun 2019 14:07:23 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Farhan Ali <alifm@linux.ibm.com>
-Cc:     Eric Farman <farman@linux.ibm.com>, pasic@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [RFC v1 1/1] vfio-ccw: Don't call cp_free if we are processing
- a channel program
-Message-ID: <20190624140723.5aa7b0b1.cohuck@redhat.com>
-In-Reply-To: <20190624134622.2bb3bba2.cohuck@redhat.com>
-References: <cover.1561055076.git.alifm@linux.ibm.com>
-        <46dc0cbdcb8a414d70b7807fceb1cca6229408d5.1561055076.git.alifm@linux.ibm.com>
-        <638804dc-53c0-ff2f-d123-13c257ad593f@linux.ibm.com>
-        <581d756d-7418-cd67-e0e8-f9e4fe10b22d@linux.ibm.com>
-        <2d9c04ba-ee50-2f9b-343a-5109274ff52d@linux.ibm.com>
-        <56ced048-8c66-a030-af35-8afbbd2abea8@linux.ibm.com>
-        <20190624114231.2d81e36f.cohuck@redhat.com>
-        <20190624120514.4b528db5.cohuck@redhat.com>
-        <20190624134622.2bb3bba2.cohuck@redhat.com>
-Organization: Red Hat GmbH
+        id S1730143AbfFXMTd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jun 2019 08:19:33 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:43308 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726984AbfFXMTd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jun 2019 08:19:33 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 2BC7AF8DB1BAB1C616A2;
+        Mon, 24 Jun 2019 20:19:28 +0800 (CST)
+Received: from [127.0.0.1] (10.142.68.147) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Mon, 24 Jun 2019
+ 20:19:21 +0800
+Subject: Re: [PATCH v17 01/10] hw/arm/virt: Add RAS platform version for
+ migration
+To:     Igor Mammedov <imammedo@redhat.com>
+CC:     <pbonzini@redhat.com>, <mst@redhat.com>,
+        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
+        <lersek@redhat.com>, <james.morse@arm.com>, <mtosatti@redhat.com>,
+        <rth@twiddle.net>, <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
+        <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
+        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
+References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
+ <1557832703-42620-2-git-send-email-gengdongjiu@huawei.com>
+ <20190620140409.3c713760@redhat.com>
+From:   gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <fbd558d5-03b7-df5c-e781-549261207221@huawei.com>
+Date:   Mon, 24 Jun 2019 20:19:12 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Mon, 24 Jun 2019 12:07:26 +0000 (UTC)
+In-Reply-To: <20190620140409.3c713760@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.142.68.147]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 24 Jun 2019 13:46:22 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
 
-> On Mon, 24 Jun 2019 12:05:14 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > On Mon, 24 Jun 2019 11:42:31 +0200
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >   
-> > > On Fri, 21 Jun 2019 14:34:10 -0400
-> > > Farhan Ali <alifm@linux.ibm.com> wrote:
-> > >     
-> > > > On 06/21/2019 01:40 PM, Eric Farman wrote:    
-> > > > > 
-> > > > > 
-> > > > > On 6/21/19 10:17 AM, Farhan Ali wrote:      
-> > > > >>
-> > > > >>
-> > > > >> On 06/20/2019 04:27 PM, Eric Farman wrote:      
-> > > > >>>
-> > > > >>>
-> > > > >>> On 6/20/19 3:40 PM, Farhan Ali wrote:      
-> 
-> > > > >>>> diff --git a/drivers/s390/cio/vfio_ccw_drv.c
-> > > > >>>> b/drivers/s390/cio/vfio_ccw_drv.c
-> > > > >>>> index 66a66ac..61ece3f 100644
-> > > > >>>> --- a/drivers/s390/cio/vfio_ccw_drv.c
-> > > > >>>> +++ b/drivers/s390/cio/vfio_ccw_drv.c
-> > > > >>>> @@ -88,7 +88,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct
-> > > > >>>> *work)
-> > > > >>>>                 (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
-> > > > >>>>        if (scsw_is_solicited(&irb->scsw)) {
-> > > > >>>>            cp_update_scsw(&private->cp, &irb->scsw);      
-> > > > >>>
-> > > > >>> As I alluded earlier, do we know this irb is for this cp?  If no, what
-> > > > >>> does this function end up putting in the scsw?    
-> > > 
-> > > Yes, I think this also needs to check whether we have at least a prior
-> > > start function around. (We use the orb provided by the guest; maybe we
-> > > should check if that intparm is set in the irb?)    
-> > 
-> > Hrm; not so easy as we always set the intparm to the address of the
-> > subchannel structure... 
-> > 
-> > Maybe check if we have have one of the conditions of the large table
-> > 16-6 and correlate to the ccw address? Or is it enough to check the
-> > function control? (Don't remember when the hardware resets it.)  
-> 
-> Nope, we cannot look at the function control, as csch clears any set
-> start function bit :( (see "Function Control", pg 16-13)
-> 
-> I think this problem mostly boils down to "csch clears pending status;
-> therefore, we may only get one interrupt, even though there had been a
-> start function going on". If we only go with what the hardware gives
-> us, I don't see a way to distinguish "clear with a prior start" from
-> "clear only". Maybe we want to track an "issued" status in the cp?
 
-Sorry for replying to myself again :), but maybe we should simply call
-cp_free() if we got cc 0 from a csch? Any start function has been
-terminated at the subchannel during successful execution of csch, and
-cp_free does nothing if !cp->initialized, so we should hopefully be
-safe there as well. We can then add a check for the start function in
-the function control in the check above and should be fine, I think.
+On 2019/6/20 20:04, Igor Mammedov wrote:
+> On Tue, 14 May 2019 04:18:14 -0700
+> Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> 
+>> Support this feature since version 4.1, disable it by
+>> default in the old version.
+>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> ---
+>>  hw/arm/virt.c         | 6 ++++++
+>>  include/hw/arm/virt.h | 1 +
+>>  2 files changed, 7 insertions(+)
+>>
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index 5331ab7..7bdd41b 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -2043,8 +2043,14 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 1)
+>>  
+>>  static void virt_machine_4_0_options(MachineClass *mc)
+>>  {
+>> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
+>> +
+>>      virt_machine_4_1_options(mc);
+>>      compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len);
+>> +    /* Disable memory recovery feature for 4.0 as RAS support was
+>> +     * introduced with 4.1.
+>> +     */
+>> +    vmc->no_ras = true;
+> 
+> So it would mean that the feature is enabled unconditionally for
+> new machine types and consumes resources whether user needs it or not.
+> 
+> In light of the race for leaner QEMU and faster startup times,
+> it might be better to make RAS optional and make user explicitly
+> enable it using a machine option.
+
+I will add a machine option to make RAS optional, do you think we should enable or disable it by default? I think it is better if we enable it by default.
+
+> 
+> 
+>>  }
+>>  DEFINE_VIRT_MACHINE(4, 0)
+>>  
+>> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+>> index 4240709..7f1a033 100644
+>> --- a/include/hw/arm/virt.h
+>> +++ b/include/hw/arm/virt.h
+>> @@ -104,6 +104,7 @@ typedef struct {
+>>      bool disallow_affinity_adjustment;
+>>      bool no_its;
+>>      bool no_pmu;
+>> +    bool no_ras;
+>>      bool claim_edge_triggered_timers;
+>>      bool smbios_old_sys_ver;
+>>      bool no_highmem_ecam;
+> 
+> .
+> 
+
