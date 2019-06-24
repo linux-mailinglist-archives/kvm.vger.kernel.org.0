@@ -2,85 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 525D8509F9
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 13:43:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E116650A0B
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 13:46:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728020AbfFXLne (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jun 2019 07:43:34 -0400
-Received: from foss.arm.com ([217.140.110.172]:47914 "EHLO foss.arm.com"
+        id S1729791AbfFXLq0 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 24 Jun 2019 07:46:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40134 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726887AbfFXLne (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jun 2019 07:43:34 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7DF202B;
-        Mon, 24 Jun 2019 04:43:33 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 288DC3F718;
-        Mon, 24 Jun 2019 04:43:32 -0700 (PDT)
-Date:   Mon, 24 Jun 2019 12:43:30 +0100
-From:   Dave Martin <Dave.Martin@arm.com>
-To:     Marc Zyngier <marc.zyngier@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Julien Thierry <julien.thierry@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>
-Subject: Re: [PATCH 04/59] KVM: arm64: nv: Introduce nested virtualization
- VCPU feature
-Message-ID: <20190624114329.GO2790@e103592.cambridge.arm.com>
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-5-marc.zyngier@arm.com>
+        id S1729143AbfFXLq0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jun 2019 07:46:26 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 908203086202;
+        Mon, 24 Jun 2019 11:46:25 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A53E660BFC;
+        Mon, 24 Jun 2019 11:46:24 +0000 (UTC)
+Date:   Mon, 24 Jun 2019 13:46:22 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Farhan Ali <alifm@linux.ibm.com>
+Cc:     Eric Farman <farman@linux.ibm.com>, pasic@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC v1 1/1] vfio-ccw: Don't call cp_free if we are processing
+ a channel program
+Message-ID: <20190624134622.2bb3bba2.cohuck@redhat.com>
+In-Reply-To: <20190624120514.4b528db5.cohuck@redhat.com>
+References: <cover.1561055076.git.alifm@linux.ibm.com>
+        <46dc0cbdcb8a414d70b7807fceb1cca6229408d5.1561055076.git.alifm@linux.ibm.com>
+        <638804dc-53c0-ff2f-d123-13c257ad593f@linux.ibm.com>
+        <581d756d-7418-cd67-e0e8-f9e4fe10b22d@linux.ibm.com>
+        <2d9c04ba-ee50-2f9b-343a-5109274ff52d@linux.ibm.com>
+        <56ced048-8c66-a030-af35-8afbbd2abea8@linux.ibm.com>
+        <20190624114231.2d81e36f.cohuck@redhat.com>
+        <20190624120514.4b528db5.cohuck@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190621093843.220980-5-marc.zyngier@arm.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Mon, 24 Jun 2019 11:46:25 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 21, 2019 at 10:37:48AM +0100, Marc Zyngier wrote:
-> From: Christoffer Dall <christoffer.dall@arm.com>
+On Mon, 24 Jun 2019 12:05:14 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Mon, 24 Jun 2019 11:42:31 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
 > 
-> Introduce the feature bit and a primitive that checks if the feature is
-> set behind a static key check based on the cpus_have_const_cap check.
+> > On Fri, 21 Jun 2019 14:34:10 -0400
+> > Farhan Ali <alifm@linux.ibm.com> wrote:
+> >   
+> > > On 06/21/2019 01:40 PM, Eric Farman wrote:  
+> > > > 
+> > > > 
+> > > > On 6/21/19 10:17 AM, Farhan Ali wrote:    
+> > > >>
+> > > >>
+> > > >> On 06/20/2019 04:27 PM, Eric Farman wrote:    
+> > > >>>
+> > > >>>
+> > > >>> On 6/20/19 3:40 PM, Farhan Ali wrote:    
+
+> > > >>>> diff --git a/drivers/s390/cio/vfio_ccw_drv.c
+> > > >>>> b/drivers/s390/cio/vfio_ccw_drv.c
+> > > >>>> index 66a66ac..61ece3f 100644
+> > > >>>> --- a/drivers/s390/cio/vfio_ccw_drv.c
+> > > >>>> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> > > >>>> @@ -88,7 +88,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct
+> > > >>>> *work)
+> > > >>>>                 (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
+> > > >>>>        if (scsw_is_solicited(&irb->scsw)) {
+> > > >>>>            cp_update_scsw(&private->cp, &irb->scsw);    
+> > > >>>
+> > > >>> As I alluded earlier, do we know this irb is for this cp?  If no, what
+> > > >>> does this function end up putting in the scsw?  
+> > 
+> > Yes, I think this also needs to check whether we have at least a prior
+> > start function around. (We use the orb provided by the guest; maybe we
+> > should check if that intparm is set in the irb?)  
 > 
-> Checking nested_virt_in_use() on systems without nested virt enabled
-> should have neglgible overhead.
+> Hrm; not so easy as we always set the intparm to the address of the
+> subchannel structure... 
 > 
-> We don't yet allow userspace to actually set this feature.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
+> Maybe check if we have have one of the conditions of the large table
+> 16-6 and correlate to the ccw address? Or is it enough to check the
+> function control? (Don't remember when the hardware resets it.)
 
-[...]
+Nope, we cannot look at the function control, as csch clears any set
+start function bit :( (see "Function Control", pg 16-13)
 
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> new file mode 100644
-> index 000000000000..8a3d121a0b42
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -0,0 +1,13 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef __ARM64_KVM_NESTED_H
-> +#define __ARM64_KVM_NESTED_H
-> +
-> +#include <linux/kvm_host.h>
-> +
-> +static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
-> +{
-> +	return cpus_have_const_cap(ARM64_HAS_NESTED_VIRT) &&
-> +		test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features);
-> +}
-
-Also, is it worth having a vcpu->arch.flags flag for this, similarly to
-SVE and ptrauth?
-
-[...]
-
-Cheers
----Dave
+I think this problem mostly boils down to "csch clears pending status;
+therefore, we may only get one interrupt, even though there had been a
+start function going on". If we only go with what the hardware gives
+us, I don't see a way to distinguish "clear with a prior start" from
+"clear only". Maybe we want to track an "issued" status in the cp?
