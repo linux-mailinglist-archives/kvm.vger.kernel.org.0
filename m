@@ -2,103 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F4C2509E6
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 13:38:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C19D509EB
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 13:39:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727082AbfFXLiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jun 2019 07:38:22 -0400
-Received: from foss.arm.com ([217.140.110.172]:47802 "EHLO foss.arm.com"
+        id S1727722AbfFXLjU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jun 2019 07:39:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53042 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726887AbfFXLiW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jun 2019 07:38:22 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 98B262B;
-        Mon, 24 Jun 2019 04:38:21 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 438093F718;
-        Mon, 24 Jun 2019 04:38:20 -0700 (PDT)
-Date:   Mon, 24 Jun 2019 12:38:18 +0100
-From:   Dave Martin <Dave.Martin@arm.com>
-To:     Marc Zyngier <marc.zyngier@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Julien Thierry <julien.thierry@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>
-Subject: Re: [PATCH 05/59] KVM: arm64: nv: Reset VCPU to EL2 registers if
- VCPU nested virt is set
-Message-ID: <20190624113817.GN2790@e103592.cambridge.arm.com>
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-6-marc.zyngier@arm.com>
+        id S1726887AbfFXLjU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jun 2019 07:39:20 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id BB4353082B46;
+        Mon, 24 Jun 2019 11:39:19 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 31715608D0;
+        Mon, 24 Jun 2019 11:39:13 +0000 (UTC)
+Date:   Mon, 24 Jun 2019 13:39:08 +0200
+From:   Igor Mammedov <imammedo@redhat.com>
+To:     Dongjiu Geng <gengdongjiu@huawei.com>
+Cc:     <pbonzini@redhat.com>, <mst@redhat.com>,
+        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
+        <lersek@redhat.com>, <james.morse@arm.com>, <mtosatti@redhat.com>,
+        <rth@twiddle.net>, <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
+        <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
+        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
+Subject: Re: [PATCH v17 06/10] docs: APEI GHES generation and CPER record
+ description
+Message-ID: <20190624133908.635ff763@redhat.com>
+In-Reply-To: <1557832703-42620-7-git-send-email-gengdongjiu@huawei.com>
+References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
+        <1557832703-42620-7-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190621093843.220980-6-marc.zyngier@arm.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Mon, 24 Jun 2019 11:39:19 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 21, 2019 at 10:37:49AM +0100, Marc Zyngier wrote:
-> From: Christoffer Dall <christoffer.dall@arm.com>
+On Tue, 14 May 2019 04:18:19 -0700
+Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+
+> Add APEI/GHES detailed design document
 > 
-> Reset the VCPU with PSTATE.M = EL2h when the nested virtualization
-> feature is enabled on the VCPU.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 > ---
->  arch/arm64/kvm/reset.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  docs/specs/acpi_hest_ghes.txt | 97 +++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 97 insertions(+)
+>  create mode 100644 docs/specs/acpi_hest_ghes.txt
 > 
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 1140b4485575..675ca07dbb05 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -52,6 +52,11 @@ static const struct kvm_regs default_regs_reset = {
->  			PSR_F_BIT | PSR_D_BIT),
->  };
->  
-> +static const struct kvm_regs default_regs_reset_el2 = {
-> +	.regs.pstate = (PSR_MODE_EL2h | PSR_A_BIT | PSR_I_BIT |
-> +			PSR_F_BIT | PSR_D_BIT),
-> +};
+> diff --git a/docs/specs/acpi_hest_ghes.txt b/docs/specs/acpi_hest_ghes.txt
+> new file mode 100644
+> index 0000000..fbfc787
+> --- /dev/null
+> +++ b/docs/specs/acpi_hest_ghes.txt
+> @@ -0,0 +1,97 @@
+> +APEI tables generating and CPER record
+> +=============================
 > +
+> +Copyright (C) 2017 HuaWei Corporation.
+> +
+> +Design Details:
+> +-------------------
+> +
+> +       etc/acpi/tables                                 etc/hardware_errors
+> +    ====================                      ==========================================
+> ++ +--------------------------+            +-----------------------+
+> +| | HEST                     |            |    address            |            +--------------+
+> +| +--------------------------+            |    registers          |            | Error Status |
+> +| | GHES1                    |            | +---------------------+            | Data Block 1 |
+> +| +--------------------------+ +--------->| |error_block_address1 |----------->| +------------+
+> +| | .................        | |          | +---------------------+            | |  CPER      |
+> +| | error_status_address-----+-+ +------->| |error_block_address2 |--------+   | |  CPER      |
+> +| | .................        |   |        | +---------------------+        |   | |  ....      |
+> +| | read_ack_register--------+-+ |        | |    ..............   |        |   | |  CPER      |
+> +| | read_ack_preserve        | | |        +-----------------------+        |   | +------------+
+> +| | read_ack_write           | | | +----->| |error_block_addressN |------+ |   | Error Status |
+> ++ +--------------------------+ | | |      | +---------------------+      | |   | Data Block 2 |
+> +| | GHES2                    | +-+-+----->| |read_ack_register1   |      | +-->| +------------+
+> ++ +--------------------------+   | |      | +---------------------+      |     | |  CPER      |
+> +| | .................        |   | | +--->| |read_ack_register2   |      |     | |  CPER      |
+> +| | error_status_address-----+---+ | |    | +---------------------+      |     | |  ....      |
+> +| | .................        |     | |    | |  .............      |      |     | |  CPER      |
+> +| | read_ack_register--------+-----+-+    | +---------------------+      |     +-+------------+
+> +| | read_ack_preserve        |     |   +->| |read_ack_registerN   |      |     | |..........  |
+> +| | read_ack_write           |     |   |  | +---------------------+      |     | +------------+
+> ++ +--------------------------|     |   |                                 |     | Error Status |
+> +| | ...............          |     |   |                                 |     | Data Block N |
+> ++ +--------------------------+     |   |                                 +---->| +------------+
+> +| | GHESN                    |     |   |                                       | |  CPER      |
+> ++ +--------------------------+     |   |                                       | |  CPER      |
+> +| | .................        |     |   |                                       | |  ....      |
+> +| | error_status_address-----+-----+   |                                       | |  CPER      |
+> +| | .................        |         |                                       +-+------------+
+> +| | read_ack_register--------+---------+
+> +| | read_ack_preserve        |
+> +| | read_ack_write           |
+> ++ +--------------------------+
+> +
+> +(1) QEMU generates the ACPI HEST table. This table goes in the current
+> +    "etc/acpi/tables" fw_cfg blob. Each error source has different
+> +    notification type.
+> +
+> +(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
+> +    also need to populate this blob. The "etc/hardwre_errors" fw_cfg blob
+> +    contains one address registers table and one Error Status Data Block
 
-Is it worth having a #define for the common non-mode bits?  It's a bit
-weird for EL2 and EL1 to have indepedent DAIF defaults.
+s/one/a/
+in both cases
 
-Putting a big block of zeros in the kernel text just to initialise one
-register seems overkill.  Now we're adding a third block of zeros,
-maybe this is worth refactoring?  We really just need a memset(0)
-followed by config-dependent initialisation of regs.pstate AFAICT.
+> +    table, all of which are pre-allocated.
 
-Not a big deal though: this doesn't look like a high risk for
-maintainability.
+drop /, all of which are pre-allocated./
 
-Cheers
----Dave
+> +
+> +(3) The address registers table contains N Error Block Address entries
+> +    and N Read Ack Address entries, the size for each entry is 8-byte.
+> +    The Error Status Data Block table contains N Error Status Data Block
+> +    entries, the size for each entry is 4096(0x1000) bytes. The total size
+> +    for "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
+where 'N' is specified?
 
->  static const struct kvm_regs default_regs_reset32 = {
->  	.regs.pstate = (PSR_AA32_MODE_SVC | PSR_AA32_A_BIT |
->  			PSR_AA32_I_BIT | PSR_AA32_F_BIT),
-> @@ -302,6 +307,8 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->  			if (!cpu_has_32bit_el1())
->  				goto out;
->  			cpu_reset = &default_regs_reset32;
-> +		} else if (test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features)) {
-> +			cpu_reset = &default_regs_reset_el2;
->  		} else {
->  			cpu_reset = &default_regs_reset;
->  		}
-> -- 
-> 2.20.1
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> +
+> +(4) QEMU generates the ACPI linker/loader script for the firmware
+> +
+> +(4a) The HEST table is part of "etc/acpi/tables", the firmware already
+> +    allocates the memory for it, because QEMU already generates an ALLOCATE
+> +    linker/loader command for it
+> +
+> +(4b) QEMU creates another ALLOCATE command for the "etc/hardware_errors"
+> +    blob. The firmware allocates memory for this blob and downloads it.
+may be merge both points, like:
+
+    the firmware pre-allocates memory for "etc/acpi/tables", "etc/hardware_errors"
+    and copies blobs content there.
+
+> +
+> +(5) QEMU generates N ADD_POINTER commands, which patch address in the
+> +    "error_status_address" fields of the HEST table with a pointer to the
+> +    corresponding "address registers" in the downloaded "etc/hardware_errors"
+> +    blob.
+
+s/the downloaded//
+the same applies to to other similar occurrences below
+
+> +
+> +(6) QEMU generates N ADD_POINTER commands, which patch address in the
+> +    "read_ack_register" fields of the HEST table with a pointer to the
+> +    corresponding "address registers" in the downloaded "etc/hardware_errors" blob.
+> +
+> +(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
+> +    address in the " error_block_address" fields with a pointer to the
+> +    respective "Error Status Data Block" in the downloaded "etc/hardware_errors"
+> +    blob.
+> +
+> +(8) QEMU Defines a third and write-only fw_cfg blob which is called
+> +    "etc/hardware_errors_addr". Through that blob, the firmware can send back
+> +    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
+> +    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER commands
+> +    for the firmware, the firmware will write back the start address of
+> +    "etc/hardware_errors" blob to fw_cfg file "etc/hardware_errors_addr". 
+
+> Then
+> +    Qemu will know the Error Status Data Block for every error source. Each of
+> +    Error Status Data Block has fixed size which is 4096(0x1000).
+
+this probably is not necessary.
+
+> +
+> +(9) When QEMU gets SIGBUS from the kernel, QEMU formats the CPER right into
+> +    guest memory, and then injects whatever interrupt (or assert whatever GPIO line)
+> +    as a notification which is necessary for notifying the guest.
+> +
+> +(10) This notification (in virtual hardware) will be handled by guest kernel,
+> +    guest APEI driver will read the CPER which is recorded by QEMU and do the
+> +    recovery.
+
