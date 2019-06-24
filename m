@@ -2,243 +2,272 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AB75E50DA9
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 16:16:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99F1250DC4
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 16:22:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726385AbfFXOQk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jun 2019 10:16:40 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:34621 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725784AbfFXOQf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jun 2019 10:16:35 -0400
-Received: by mail-wm1-f68.google.com with SMTP id w9so74756wmd.1
-        for <kvm@vger.kernel.org>; Mon, 24 Jun 2019 07:16:33 -0700 (PDT)
+        id S1728122AbfFXOWw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jun 2019 10:22:52 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:40517 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727170AbfFXOWr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jun 2019 10:22:47 -0400
+Received: by mail-pl1-f195.google.com with SMTP id a93so6995309pla.7
+        for <kvm@vger.kernel.org>; Mon, 24 Jun 2019 07:22:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gAszyd6Rkh0AyBVnY2MGQeafDGFV/B/Xjwc7nOHGBTU=;
+        b=km7JeQ3vyTD2UtwSHCAAp4q4at1sY/ltJPO5wzrrkqMzNLeQZPjXSnOQ7VtkWA81dl
+         HEFVLO9l5VlkdkocDhA+ezC7dKtBn4IeaF4UZLWnOmGq0Ok4r2E9GR7Hoa79HLNOGJVe
+         0AHZ3EJWZEjcDwF6xOVW5nBJXR6vOtRMH7oBaouWSEKGFrWAIrbWb9kQA+Hlo7SIhUEB
+         uGLPh5fQQfh1ibByxQrZM4UE+cDk+UJmRIBMFqrJwcIDdYtIIT+tU41CsIi86+tplFna
+         0qMXAZhS5viMtSm5pwtZ6YrDben3dB8l27s4Hd+Xtz7mclZlxhwdWOJHEC5Ft/EzKQyl
+         VZSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=hSk6AE3sbQCAIoBtKIdZqdvHi2gn9KW0bMwzPsLPB2Y=;
-        b=DBJg0jIzQ5VXA9FEd/4TLzVONcX5Hf9y12mgo76yEYYof9iAsRubO0ftB7KdH0He5s
-         kBiiWgcltd/56W0LEWvtRSltZPUEsBfsj8N5mg/YZuEO25Z+Fsknfh+l09b9IoC8hjBq
-         lCFKRiMfgjkoHH/ZsgY+j697UCgwgnq76QrHW49jaXLlEDrrvqXI/CyM4vKBHE75pbyr
-         hfXPt83bHu88C1EyFi18NImsbNUCZNf0JdqEJvTjyQDM7aMDegi2eV6fTlRMlpFYbi+z
-         7FfRd6hfzhaSZCzSMivCVS/dq05ry68uxYXZZ93AvpKKXudT7JVKpPyO4x+RfFiS2O7T
-         5MUw==
-X-Gm-Message-State: APjAAAURUnm4sg/pwemB2yJptJpKZP3MUM5GNI0cu4YvSbRtOKFpBIy9
-        HAPfFuDHjcIf4gKQwUIqS7GUmg==
-X-Google-Smtp-Source: APXvYqwxhltrQvnUOGQ838zdFDCyaoakfZQwDFHcjuC4zhxp6GhRmKpHb3kDVinsmaaNjyJ5up5jNA==
-X-Received: by 2002:a1c:1947:: with SMTP id 68mr16215464wmz.171.1561385793113;
-        Mon, 24 Jun 2019 07:16:33 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id s10sm10868351wrt.49.2019.06.24.07.16.32
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 24 Jun 2019 07:16:32 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Liran Alon <liran.alon@oracle.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH] x86/kvm/nVMCS: fix VMCLEAR when Enlightened VMCS is in use
-In-Reply-To: <CEFF2A14-611A-417C-BC0A-8814862F26C6@oracle.com>
-References: <20190624133028.3710-1-vkuznets@redhat.com> <CEFF2A14-611A-417C-BC0A-8814862F26C6@oracle.com>
-Date:   Mon, 24 Jun 2019 16:16:31 +0200
-Message-ID: <87r27jdq68.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=gAszyd6Rkh0AyBVnY2MGQeafDGFV/B/Xjwc7nOHGBTU=;
+        b=fDoBtXnupCbevTHGqVZWyqrIBSjuNhvQwsTXM3K1xlR+i1ZS0rfFO/cLNTUEYtxRp0
+         ZbAQv7grv6+yi44zgb47QBXvDUBHJBSId4BVQQONM0ZiHgtyF6p3gBxZtua0j/Vu7SFr
+         Zvs2bs//Q8nzF1OqQOPsaRend3yiWnOYKX3g+oNbJnfxy1ZtXOsxLnn+bntkCy2risNf
+         t1u6LfoQ2oWD0F53yTYjO6upi3GQm80syunjYRg1E6/PBNjwoGuKTolw/XLeG3GQOy5l
+         qAtltJiQhfrU8jRP5QtWTXJ6UsmugHlj85PupiA04gl+YynCVSYz6HrC3EBQz3S0Muju
+         6R0g==
+X-Gm-Message-State: APjAAAXcVD3q/BJkl26yqdHatXJYY2yl2PlKnpq5+JAUxnyWGvPbSJ72
+        mD75xTMOGgUDpJuycZZp0lRpkqLLmvk5OcAey823vw==
+X-Google-Smtp-Source: APXvYqx/7NbeFZuwI48tclTUh11xegUV5UsdKc2ldTOnN03zOVYnpDOwlkZEMuzBYRoM7kFvSzXnjLxRZwjrOwVDnPw=
+X-Received: by 2002:a17:902:4183:: with SMTP id f3mr32179784pld.336.1561386165165;
+ Mon, 24 Jun 2019 07:22:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+References: <cover.1560339705.git.andreyknvl@google.com> <f9b50767d639b7116aa986dc67f158131b8d4169.1560339705.git.andreyknvl@google.com>
+ <a5e0e465-89d5-91d0-c6a4-39674269bbf2@oracle.com> <c4bdd767-eb3f-6668-0f49-4aaf4bc7689d@oracle.com>
+In-Reply-To: <c4bdd767-eb3f-6668-0f49-4aaf4bc7689d@oracle.com>
+From:   Andrey Konovalov <andreyknvl@google.com>
+Date:   Mon, 24 Jun 2019 16:22:34 +0200
+Message-ID: <CAAeHK+zceAZ0Mqhz3t6Ob71-Dgk4DNHRrzr72r+qEsUugwzTsg@mail.gmail.com>
+Subject: Re: [PATCH v17 04/15] mm, arm64: untag user pointers passed to memory syscalls
+To:     Khalid Aziz <khalid.aziz@oracle.com>
+Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>, enh <enh@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Liran Alon <liran.alon@oracle.com> writes:
-
->> On 24 Jun 2019, at 16:30, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
->> 
->> When Enlightened VMCS is in use, it is valid to do VMCLEAR and,
->> according to TLFS, this should "transition an enlightened VMCS from the
->> active to the non-active state". It is, however, wrong to assume that
->> it is only valid to do VMCLEAR for the eVMCS which is currently active
->> on the vCPU performing VMCLEAR.
->> 
->> Currently, the logic in handle_vmclear() is broken: in case, there is no
->> active eVMCS on the vCPU doing VMCLEAR we treat the argument as a 'normal'
->> VMCS and kvm_vcpu_write_guest() to the 'launch_state' field irreversibly
->> corrupts the memory area.
->> 
->> So, in case the VMCLEAR argument is not the current active eVMCS on the
->> vCPU, how can we know if the area it is pointing to is a normal or an
->> enlightened VMCS?
->> Thanks to the bug in Hyper-V (see commit 72aeb60c52bf7 ("KVM: nVMX: Verify
->> eVMCS revision id match supported eVMCS version on eVMCS VMPTRLD")) we can
->> not, the revision can't be used to distinguish between them. So let's
->> assume it is always enlightened in case enlightened vmentry is enabled in
->> the assist page. Also, check if vmx->nested.enlightened_vmcs_enabled to
->> minimize the impact for 'unenlightened' workloads.
->> 
->> Fixes: b8bbab928fb1 ("KVM: nVMX: implement enlightened VMPTRLD and VMCLEAR")
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->> arch/x86/kvm/vmx/evmcs.c  | 18 ++++++++++++++++++
->> arch/x86/kvm/vmx/evmcs.h  |  1 +
->> arch/x86/kvm/vmx/nested.c | 19 ++++++++-----------
->> 3 files changed, 27 insertions(+), 11 deletions(-)
->> 
->> diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
->> index 1a6b3e1581aa..eae636ec0cc8 100644
->> --- a/arch/x86/kvm/vmx/evmcs.c
->> +++ b/arch/x86/kvm/vmx/evmcs.c
->> @@ -3,6 +3,7 @@
->> #include <linux/errno.h>
->> #include <linux/smp.h>
->> 
->> +#include "../hyperv.h"
->> #include "evmcs.h"
->> #include "vmcs.h"
->> #include "vmx.h"
->> @@ -309,6 +310,23 @@ void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf)
->> }
->> #endif
->> 
->> +bool nested_enlightened_vmentry(struct kvm_vcpu *vcpu, u64 *evmptr)
+On Wed, Jun 19, 2019 at 6:46 PM Khalid Aziz <khalid.aziz@oracle.com> wrote:
 >
-> I prefer to rename evmptr to evmcs_ptr. I think it’s more readable and sufficiently short.
-> In addition, I think you should return either -1ull or assist_page.current_nested_vmcs.
-> i.e. Don’t return evmcs_ptr by pointer but instead as a return-value
-> and get rid of the bool.
+> On 6/19/19 9:55 AM, Khalid Aziz wrote:
+> > On 6/12/19 5:43 AM, Andrey Konovalov wrote:
+> >> This patch is a part of a series that extends arm64 kernel ABI to allow to
+> >> pass tagged user pointers (with the top byte set to something else other
+> >> than 0x00) as syscall arguments.
+> >>
+> >> This patch allows tagged pointers to be passed to the following memory
+> >> syscalls: get_mempolicy, madvise, mbind, mincore, mlock, mlock2, mprotect,
+> >> mremap, msync, munlock, move_pages.
+> >>
+> >> The mmap and mremap syscalls do not currently accept tagged addresses.
+> >> Architectures may interpret the tag as a background colour for the
+> >> corresponding vma.
+> >>
+> >> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> >> Reviewed-by: Kees Cook <keescook@chromium.org>
+> >> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> >> ---
+> >
+> > Reviewed-by: Khalid Aziz <khalid.aziz@oracle.com>
+> >
+> >
+>
+> I would also recommend updating commit log for all the patches in this
+> series that are changing files under mm/ as opposed to arch/arm64 to not
+> reference arm64 kernel ABI since the change applies to every
+> architecture. So something along the lines of "This patch is part of a
+> series that extends kernel ABI to allow......."
 
-Sure, can do in v2.
+Sure, will do in v18, thanks!
 
 >
->> +{
->> +	struct hv_vp_assist_page assist_page;
->> +
->> +	*evmptr = -1ull;
->> +
->> +	if (unlikely(!kvm_hv_get_assist_page(vcpu, &assist_page)))
->> +		return false;
->> +
->> +	if (unlikely(!assist_page.enlighten_vmentry))
->> +		return false;
->> +
->> +	*evmptr = assist_page.current_nested_vmcs;
->> +
->> +	return true;
->> +}
->> +
->> uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu)
->> {
->>        struct vcpu_vmx *vmx = to_vmx(vcpu);
->> diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
->> index e0fcef85b332..c449e79a9c4a 100644
->> --- a/arch/x86/kvm/vmx/evmcs.h
->> +++ b/arch/x86/kvm/vmx/evmcs.h
->> @@ -195,6 +195,7 @@ static inline void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf) {}
->> static inline void evmcs_touch_msr_bitmap(void) {}
->> #endif /* IS_ENABLED(CONFIG_HYPERV) */
->> 
->> +bool nested_enlightened_vmentry(struct kvm_vcpu *vcpu, u64 *evmptr);
->> uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu);
->> int nested_enable_evmcs(struct kvm_vcpu *vcpu,
->> 			uint16_t *vmcs_version);
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index 9214b3aea1f9..ee8dda7d8a03 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -1765,26 +1765,21 @@ static int nested_vmx_handle_enlightened_vmptrld(struct kvm_vcpu *vcpu,
->> 						 bool from_launch)
->> {
->> 	struct vcpu_vmx *vmx = to_vmx(vcpu);
->> -	struct hv_vp_assist_page assist_page;
->> +	u64 evmptr;
+> --
+> Khalid
 >
-> I prefer to rename evmptr to evmcs_ptr. I think it’s more readable and sufficiently short.
 >
-
-Sure.
-
->> 
->> 	if (likely(!vmx->nested.enlightened_vmcs_enabled))
->> 		return 1;
->> 
->> -	if (unlikely(!kvm_hv_get_assist_page(vcpu, &assist_page)))
->> +	if (!nested_enlightened_vmentry(vcpu, &evmptr))
->> 		return 1;
->> 
->> -	if (unlikely(!assist_page.enlighten_vmentry))
->> -		return 1;
->> -
->> -	if (unlikely(assist_page.current_nested_vmcs !=
->> -		     vmx->nested.hv_evmcs_vmptr)) {
->> -
->> +	if (unlikely(evmptr != vmx->nested.hv_evmcs_vmptr)) {
->> 		if (!vmx->nested.hv_evmcs)
->> 			vmx->nested.current_vmptr = -1ull;
->> 
->> 		nested_release_evmcs(vcpu);
->> 
->> -		if (kvm_vcpu_map(vcpu, gpa_to_gfn(assist_page.current_nested_vmcs),
->> +		if (kvm_vcpu_map(vcpu, gpa_to_gfn(evmptr),
->> 				 &vmx->nested.hv_evmcs_map))
->> 			return 0;
->> 
->> @@ -1826,7 +1821,7 @@ static int nested_vmx_handle_enlightened_vmptrld(struct kvm_vcpu *vcpu,
->> 		 */
->> 		vmx->nested.hv_evmcs->hv_clean_fields &=
->> 			~HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL;
->> -		vmx->nested.hv_evmcs_vmptr = assist_page.current_nested_vmcs;
->> +		vmx->nested.hv_evmcs_vmptr = evmptr;
->> 
->> 		/*
->> 		 * Unlike normal vmcs12, enlightened vmcs12 is not fully
->> @@ -4331,6 +4326,7 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
->> 	struct vcpu_vmx *vmx = to_vmx(vcpu);
->> 	u32 zero = 0;
->> 	gpa_t vmptr;
->> +	u64 evmptr;
+> >>  mm/madvise.c   | 2 ++
+> >>  mm/mempolicy.c | 3 +++
+> >>  mm/migrate.c   | 2 +-
+> >>  mm/mincore.c   | 2 ++
+> >>  mm/mlock.c     | 4 ++++
+> >>  mm/mprotect.c  | 2 ++
+> >>  mm/mremap.c    | 7 +++++++
+> >>  mm/msync.c     | 2 ++
+> >>  8 files changed, 23 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/mm/madvise.c b/mm/madvise.c
+> >> index 628022e674a7..39b82f8a698f 100644
+> >> --- a/mm/madvise.c
+> >> +++ b/mm/madvise.c
+> >> @@ -810,6 +810,8 @@ SYSCALL_DEFINE3(madvise, unsigned long, start, size_t, len_in, int, behavior)
+> >>      size_t len;
+> >>      struct blk_plug plug;
+> >>
+> >> +    start = untagged_addr(start);
+> >> +
+> >>      if (!madvise_behavior_valid(behavior))
+> >>              return error;
+> >>
+> >> diff --git a/mm/mempolicy.c b/mm/mempolicy.c
+> >> index 01600d80ae01..78e0a88b2680 100644
+> >> --- a/mm/mempolicy.c
+> >> +++ b/mm/mempolicy.c
+> >> @@ -1360,6 +1360,7 @@ static long kernel_mbind(unsigned long start, unsigned long len,
+> >>      int err;
+> >>      unsigned short mode_flags;
+> >>
+> >> +    start = untagged_addr(start);
+> >>      mode_flags = mode & MPOL_MODE_FLAGS;
+> >>      mode &= ~MPOL_MODE_FLAGS;
+> >>      if (mode >= MPOL_MAX)
+> >> @@ -1517,6 +1518,8 @@ static int kernel_get_mempolicy(int __user *policy,
+> >>      int uninitialized_var(pval);
+> >>      nodemask_t nodes;
+> >>
+> >> +    addr = untagged_addr(addr);
+> >> +
+> >>      if (nmask != NULL && maxnode < nr_node_ids)
+> >>              return -EINVAL;
+> >>
+> >> diff --git a/mm/migrate.c b/mm/migrate.c
+> >> index f2ecc2855a12..d22c45cf36b2 100644
+> >> --- a/mm/migrate.c
+> >> +++ b/mm/migrate.c
+> >> @@ -1616,7 +1616,7 @@ static int do_pages_move(struct mm_struct *mm, nodemask_t task_nodes,
+> >>                      goto out_flush;
+> >>              if (get_user(node, nodes + i))
+> >>                      goto out_flush;
+> >> -            addr = (unsigned long)p;
+> >> +            addr = (unsigned long)untagged_addr(p);
+> >>
+> >>              err = -ENODEV;
+> >>              if (node < 0 || node >= MAX_NUMNODES)
+> >> diff --git a/mm/mincore.c b/mm/mincore.c
+> >> index c3f058bd0faf..64c322ed845c 100644
+> >> --- a/mm/mincore.c
+> >> +++ b/mm/mincore.c
+> >> @@ -249,6 +249,8 @@ SYSCALL_DEFINE3(mincore, unsigned long, start, size_t, len,
+> >>      unsigned long pages;
+> >>      unsigned char *tmp;
+> >>
+> >> +    start = untagged_addr(start);
+> >> +
+> >>      /* Check the start address: needs to be page-aligned.. */
+> >>      if (start & ~PAGE_MASK)
+> >>              return -EINVAL;fixup_user_fault
+> >> diff --git a/mm/mlock.c b/mm/mlock.c
+> >> index 080f3b36415b..e82609eaa428 100644
+> >> --- a/mm/mlock.c
+> >> +++ b/mm/mlock.c
+> >> @@ -674,6 +674,8 @@ static __must_check int do_mlock(unsigned long start, size_t len, vm_flags_t fla
+> >>      unsigned long lock_limit;
+> >>      int error = -ENOMEM;
+> >>
+> >> +    start = untagged_addr(start);
+> >> +
+> >>      if (!can_do_mlock())
+> >>              return -EPERM;
+> >>
+> >> @@ -735,6 +737,8 @@ SYSCALL_DEFINE2(munlock, unsigned long, start, size_t, len)
+> >>  {
+> >>      int ret;
+> >>
+> >> +    start = untagged_addr(start);
+> >> +
+> >>      len = PAGE_ALIGN(len + (offset_in_page(start)));
+> >>      start &= PAGE_MASK;
+> >>
+> >> diff --git a/mm/mprotect.c b/mm/mprotect.c
+> >> index bf38dfbbb4b4..19f981b733bc 100644
+> >> --- a/mm/mprotect.c
+> >> +++ b/mm/mprotect.c
+> >> @@ -465,6 +465,8 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
+> >>      const bool rier = (current->personality & READ_IMPLIES_EXEC) &&
+> >>                              (prot & PROT_READ);
+> >>
+> >> +    start = untagged_addr(start);
+> >> +
+> >>      prot &= ~(PROT_GROWSDOWN|PROT_GROWSUP);
+> >>      if (grows == (PROT_GROWSDOWN|PROT_GROWSUP)) /* can't be both */
+> >>              return -EINVAL;
+> >> diff --git a/mm/mremap.c b/mm/mremap.c
+> >> index fc241d23cd97..64c9a3b8be0a 100644
+> >> --- a/mm/mremap.c
+> >> +++ b/mm/mremap.c
+> >> @@ -606,6 +606,13 @@ SYSCALL_DEFINE5(mremap, unsigned long, addr, unsigned long, old_len,
+> >>      LIST_HEAD(uf_unmap_early);
+> >>      LIST_HEAD(uf_unmap);
+> >>
+> >> +    /*
+> >> +     * Architectures may interpret the tag passed to mmap as a background
+> >> +     * colour for the corresponding vma. For mremap we don't allow tagged
+> >> +     * new_addr to preserve similar behaviour to mmap.
+> >> +     */
+> >> +    addr = untagged_addr(addr);
+> >> +
+> >>      if (flags & ~(MREMAP_FIXED | MREMAP_MAYMOVE))
+> >>              return ret;
+> >>
+> >> diff --git a/mm/msync.c b/mm/msync.c
+> >> index ef30a429623a..c3bd3e75f687 100644
+> >> --- a/mm/msync.c
+> >> +++ b/mm/msync.c
+> >> @@ -37,6 +37,8 @@ SYSCALL_DEFINE3(msync, unsigned long, start, size_t, len, int, flags)
+> >>      int unmapped_error = 0;
+> >>      int error = -EINVAL;
+> >>
+> >> +    start = untagged_addr(start);
+> >> +
+> >>      if (flags & ~(MS_ASYNC | MS_INVALIDATE | MS_SYNC))
+> >>              goto out;
+> >>      if (offset_in_page(start))
+> >>
+> >
+> >
 >
-> I prefer to rename evmptr to evmcs_ptr. I think it’s more readable and sufficiently short.
 >
-
-Sure.
-
->> 
->> 	if (!nested_vmx_check_permission(vcpu))
->> 		return 1;
->> @@ -4346,7 +4342,8 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
->> 		return nested_vmx_failValid(vcpu,
->> 			VMXERR_VMCLEAR_VMXON_POINTER);
->> 
->> -	if (vmx->nested.hv_evmcs_map.hva) {
->> +	if (unlikely(vmx->nested.enlightened_vmcs_enabled) &&
->> +	    nested_enlightened_vmentry(vcpu, &evmptr)) {
->> 		if (vmptr == vmx->nested.hv_evmcs_vmptr)
->
-> Shouldn’t you also remove the (vmptr == vmx->nested.hv_evmcs_vmptr) condition?
-> To my understanding, vmx->nested.hv_evmcs_vmptr represents the address of the loaded eVMCS on current vCPU.
-> But according to commit message, it is valid for vCPU to perform
-> VMCLEAR on eVMCS that differ from loaded eVMCS on vCPU.
-> E.g. The current vCPU may even have vmx->nested.hv_evmcs_vmptr set to
-> -1ull.
-
-nested_release_evmcs() unmaps current eVMCS on the vCPU, we can't easily
-unmap eVMCS on other vCPUs without somehow synchronizing with
-them. Actually, if we remove nested_release_evmcs() from here nothing is
-going to change: the fact that eVMCS is mapped doesn't hurt much. If the
-next enlightened vmentry is going to happen with the same evmptr we'll
-have to map it back, in case a different one will be used - we'll unmap
-the old.
-
-In KVM, there's nothing we *have* to do to transition an eVMCS from
-active to non-activer state. We, for example, don't enforce the
-requirement that it can only be active on one vCPU at a time. Enforcing
-it is expensive (some synchronization is required) and if L1 hypervisor
-is misbehaving than, well, things are not going to work anyway.
-
-That said I'm ok with dropping nested_release_evmcs() for consistency
-but we can't just drop 'if (vmptr == vmx->nested.hv_evmcs_vmptr)'.
-
-Thanks for your review!
-
--- 
-Vitaly
