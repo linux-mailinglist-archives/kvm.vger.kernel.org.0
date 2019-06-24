@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A27D550DDF
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 16:25:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE62950DE1
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 16:25:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728703AbfFXOZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jun 2019 10:25:04 -0400
-Received: from smtp-fw-9101.amazon.com ([207.171.184.25]:7287 "EHLO
-        smtp-fw-9101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728535AbfFXOZD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jun 2019 10:25:03 -0400
+        id S1728924AbfFXOZN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jun 2019 10:25:13 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:55786 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728610AbfFXOZM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jun 2019 10:25:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1561386301; x=1592922301;
+  t=1561386311; x=1592922311;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version;
-  bh=IiutmOqWx07Vhkhld9CusBzqI7cRQ/7MV7vdxiYNi+k=;
-  b=uiXaY8P5CpYcMlx8hnxvZnENQpqVYQqrG14OEa21N7Wa1JaXU1vSylsR
-   Eoq0WDVVCAW/jA0uN/r35CmdUxMXERc1G8t4h4wNg0Fh8nXHR8qPv5zKI
-   eDbP7Xft+rJ6snZzHDM9qi3guFL24ksYLEMuww8zQVvG0QFgmb+xxz4ho
-   k=;
+  bh=yaQAXworocGm7R2TINDI0hGKhCHD7XX0PtX7y1HukTE=;
+  b=eBk2MYpPoKE1KhMDxpIVZaGlc8oIryuZCvb3kqg9sG/IaAAc3bI4hBCn
+   CZR+nFvGRtR81hlrNeY6FkcXPEKdOTl5pa2nYRLqTJg3vHVyhM7JXazG7
+   iBgt/kioMa1xyPjVKvOxOMN/qlWCvsvP73fegR2gdknJd5DVehdZvPLgj
+   E=;
 X-IronPort-AV: E=Sophos;i="5.62,412,1554768000"; 
-   d="scan'208";a="812308123"
-Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-2a-538b0bfb.us-west-2.amazon.com) ([10.47.22.34])
-  by smtp-border-fw-out-9101.sea19.amazon.com with ESMTP; 24 Jun 2019 14:25:00 +0000
-Received: from EX13MTAUEB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2a-538b0bfb.us-west-2.amazon.com (Postfix) with ESMTPS id 4C660A1B7D;
-        Mon, 24 Jun 2019 14:24:59 +0000 (UTC)
-Received: from EX13D08UEB001.ant.amazon.com (10.43.60.245) by
- EX13MTAUEB001.ant.amazon.com (10.43.60.129) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 24 Jun 2019 14:24:43 +0000
+   d="scan'208";a="771743168"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1d-38ae4ad2.us-east-1.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 24 Jun 2019 14:25:11 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1d-38ae4ad2.us-east-1.amazon.com (Postfix) with ESMTPS id 17D01A2719;
+        Mon, 24 Jun 2019 14:25:06 +0000 (UTC)
+Received: from EX13D08UEE002.ant.amazon.com (10.43.62.92) by
+ EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Mon, 24 Jun 2019 14:24:50 +0000
 Received: from EX13MTAUWC001.ant.amazon.com (10.43.162.135) by
- EX13D08UEB001.ant.amazon.com (10.43.60.245) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 24 Jun 2019 14:24:43 +0000
+ EX13D08UEE002.ant.amazon.com (10.43.62.92) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Mon, 24 Jun 2019 14:24:48 +0000
 Received: from u6cf1b7119fa15b.ant.amazon.com (10.28.85.98) by
  mail-relay.amazon.com (10.43.162.232) with Microsoft SMTP Server id
- 15.0.1367.3 via Frontend Transport; Mon, 24 Jun 2019 14:24:38 +0000
+ 15.0.1367.3 via Frontend Transport; Mon, 24 Jun 2019 14:24:43 +0000
 From:   Sam Caccavale <samcacc@amazon.de>
 CC:     <samcaccavale@gmail.com>, <nmanthey@amazon.de>,
         <wipawel@amazon.de>, <dwmw@amazon.co.uk>, <mpohlack@amazon.de>,
@@ -47,9 +47,9 @@ CC:     <samcaccavale@gmail.com>, <nmanthey@amazon.de>,
         <paullangton4@gmail.com>, <anirudhkaushik@google.com>,
         <x86@kernel.org>, <kvm@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, Sam Caccavale <samcacc@amazon.de>
-Subject: [PATCH v3 4/5] Added build and install scripts
-Date:   Mon, 24 Jun 2019 16:24:13 +0200
-Message-ID: <20190624142414.22096-5-samcacc@amazon.de>
+Subject: [PATCH v3 5/5] Development scripts for crash triage and deploy
+Date:   Mon, 24 Jun 2019 16:24:14 +0200
+Message-ID: <20190624142414.22096-6-samcacc@amazon.de>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190624142414.22096-1-samcacc@amazon.de>
 References: <20190624142414.22096-1-samcacc@amazon.de>
@@ -61,144 +61,184 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-install_afl.sh installs AFL locally and emits AFLPATH,
-build.sh, and run.sh build and run respectively
+Not meant for upstream consumption.
 
 ---
 
-v1 -> v2:
- - Introduced this patch
-
 v2 -> v3:
- - Moved non-essential development scripts to a later patch
+ - Introduced this patch as a place for non-essential dev scripts
 
 Signed-off-by: Sam Caccavale <samcacc@amazon.de>
 ---
- tools/fuzz/x86ie/scripts/afl-many       | 31 +++++++++++++++++++++++
- tools/fuzz/x86ie/scripts/build.sh       | 33 +++++++++++++++++++++++++
- tools/fuzz/x86ie/scripts/install_afl.sh | 17 +++++++++++++
- tools/fuzz/x86ie/scripts/run.sh         | 10 ++++++++
- 4 files changed, 91 insertions(+)
- create mode 100755 tools/fuzz/x86ie/scripts/afl-many
- create mode 100755 tools/fuzz/x86ie/scripts/build.sh
- create mode 100755 tools/fuzz/x86ie/scripts/install_afl.sh
- create mode 100755 tools/fuzz/x86ie/scripts/run.sh
+ tools/fuzz/x86ie/scripts/bin.sh               | 49 +++++++++++++++++++
+ tools/fuzz/x86ie/scripts/coalesce.sh          |  5 ++
+ tools/fuzz/x86ie/scripts/deploy.sh            |  9 ++++
+ tools/fuzz/x86ie/scripts/deploy_remote.sh     |  9 ++++
+ tools/fuzz/x86ie/scripts/gen_output.sh        | 11 +++++
+ .../fuzz/x86ie/scripts/install_deps_ubuntu.sh |  5 ++
+ tools/fuzz/x86ie/scripts/rebuild.sh           |  6 +++
+ tools/fuzz/x86ie/scripts/summarize.sh         |  9 ++++
+ 8 files changed, 103 insertions(+)
+ create mode 100755 tools/fuzz/x86ie/scripts/bin.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/coalesce.sh
+ create mode 100644 tools/fuzz/x86ie/scripts/deploy.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/deploy_remote.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/gen_output.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/install_deps_ubuntu.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/rebuild.sh
+ create mode 100755 tools/fuzz/x86ie/scripts/summarize.sh
 
-diff --git a/tools/fuzz/x86ie/scripts/afl-many b/tools/fuzz/x86ie/scripts/afl-many
+diff --git a/tools/fuzz/x86ie/scripts/bin.sh b/tools/fuzz/x86ie/scripts/bin.sh
 new file mode 100755
-index 000000000000..e55ff115a777
+index 000000000000..6383a883ff33
 --- /dev/null
-+++ b/tools/fuzz/x86ie/scripts/afl-many
-@@ -0,0 +1,31 @@
++++ b/tools/fuzz/x86ie/scripts/bin.sh
+@@ -0,0 +1,49 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-2.0+
-+# This is for running AFL over NPROC or `nproc` cores with normal AFL options ex:
-+# ulimit -Sv $[21999999999 << 10]; ./tools/fuzz/x86ie/scripts/afl-many -m 22000000000 -i $FUZZDIR/in -o $FUZZDIR/out tools/fuzz/x86ie/afl-harness @@ 
 +
-+export AFL_NO_AFFINITY=1
++if [ "$#" -lt 3 ]; then
++  echo "Usage: './bin path/to/afl-harness path/to/afl_crash [path/to/linux/src/root]'"
++  exit
++fi
 +
-+while [ -z "$sync_dir" ]; do
-+  while getopts ":o:" opt; do
-+    case "${opt}" in
-+      o)
-+        sync_dir="${OPTARG}"
-+        ;;
-+      *)
-+        ;;
-+    esac
-+  done
-+  ((OPTIND++))
-+  [ $OPTIND -gt $# ] && break
-+done
++export AFL_HARNESS="$1"
++export LINUX_SRC="$3"
 +
-+# AFL/linux do some weird stuff with core affinity and will often run
-+# N processes over < N virtual cores.  In order to avoid that, we taskset
-+# each process to its own core.
-+for i in $(seq 1 $(( ${NPROC:-$(nproc)} - 1)) ); do
-+    taskset -c "$i" ./afl-fuzz -S "slave$i" $@ >/dev/null 2>&1 &
-+done
-+taskset -c 0 ./afl-fuzz -M master $@ >/dev/null 2>&1 &
++diagnose_segfault() {
++  SOURCE=$(gdb -batch -ex r -ex 'bt 2' --args $@ 2>&1 | grep -Po '#1.* \K([^ ]+:[0-9]+)');
++  IFS=: read FILE LINE <<< "$SOURCE"
 +
-+watch -n1 "echo \"Executing '$AFLPATH/afl-fuzz $@' on ${NPROC:-$(nproc)} cores.\" && $AFLPATH/afl-whatsup -s ${sync_dir}"
-+pkill afl-fuzz
-diff --git a/tools/fuzz/x86ie/scripts/build.sh b/tools/fuzz/x86ie/scripts/build.sh
-new file mode 100755
-index 000000000000..032762bf56ef
---- /dev/null
-+++ b/tools/fuzz/x86ie/scripts/build.sh
-@@ -0,0 +1,33 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0+
-+# Run from root of linux via `./tools/fuzz/x86ie/scripts/build.sh`
++  OP="$(sed -n "${LINE}p" "$LINUX_SRC/$FILE" 2>/dev/null)"
++  if [ $? -ne 0 ]; then
++    OP="$(sed -n "${LINE}p" "$LINUX_SRC/tools/fuzz/x86_instruction_emulation/$FILE" 2>/dev/null)"
++  fi
 +
-+kernel_objects="arch/x86/kvm/emulate.o arch/x86/lib/retpoline.o lib/find_bit.o"
-+
-+disable() { sed -i -r "/\b$1\b/c\# $1" .config; }
-+enable() { sed -i -r "/\b$1\b/c\\$1=y" .config; }
-+
-+make ${CC:+ "CC=$CC"} ${DEBUG:+ "DEBUG=1"} defconfig
-+
-+enable "CONFIG_DEBUG_INFO"
-+enable "CONFIG_STACKPROTECTOR"
-+
-+yes ' ' | make ${CC:+ "CC=$CC"} ${DEBUG:+ "DEBUG=1"} $kernel_objects
-+
-+omit_arg () { args=$(echo "$args" | sed "s/ $1//g"); }
-+add_arg () { args+=" $1"; }
-+
-+rebuild () {
-+  args="$(head -1 $(dirname $1)/.$(basename $1).cmd | sed -e 's/.*:= //g')"
-+  omit_arg "-mcmodel=kernel"
-+  omit_arg "-mpreferred-stack-boundary=3"
-+  add_arg "-fsanitize=address"
-+  echo -e "Rebuilding $1 with \n$args"
-+  eval "$args"
++  OP="$(echo $OP | grep -Po 'ops->\K([^(]+)')"
++  if [ -z "$OP" ]; then
++    echo "SEGV: unknown, in $FILE:$LINE"
++  else
++    echo "Expected: segfaulting on emulator->$OP"
++  fi
 +}
++export -f diagnose_segfault
 +
-+for object in $kernel_objects; do
-+  rebuild $object
-+done
++bin() {
++  OUTPUT=$(bash -c "timeout 1s $AFL_HARNESS $1 2>&1" 2>&1)
++  RETVAL=$?
 +
-+make ${CC:+ "CC=$CC"} ${DEBUG:+ "DEBUG=1"} tools/fuzz
-diff --git a/tools/fuzz/x86ie/scripts/install_afl.sh b/tools/fuzz/x86ie/scripts/install_afl.sh
++  echo "$OUTPUT"
++  if [ $RETVAL -eq 0 ]; then
++    echo "Terminated successfully"
++  elif [ $RETVAL -eq 124 ]; then
++    echo "Unknown: killed due to timeout.  Loop likely."
++  elif echo "$OUTPUT" | grep -q "SEGV"; then
++    echo "$(diagnose_segfault $AFL_HARNESS $1)"
++  elif echo "$OUTPUT" | grep -q "FPE"; then
++    echo "Expected: floating point exception."
++  else
++    echo "Unknown cause of crash."
++  fi
++}
++export -f bin
++
++echo "$(bin $2 2>&1)"
+diff --git a/tools/fuzz/x86ie/scripts/coalesce.sh b/tools/fuzz/x86ie/scripts/coalesce.sh
 new file mode 100755
-index 000000000000..3bdbdf2a040b
+index 000000000000..b15d583c2c32
 --- /dev/null
-+++ b/tools/fuzz/x86ie/scripts/install_afl.sh
-@@ -0,0 +1,17 @@
++++ b/tools/fuzz/x86ie/scripts/coalesce.sh
+@@ -0,0 +1,5 @@
++#!/bin/bash
++
++mkdir -p all
++rm -rf all/*
++find . -type f -wholename '*crashes/id*' | parallel 'cp {} ./all/$(basename $(dirname {//})):{/}'
+diff --git a/tools/fuzz/x86ie/scripts/deploy.sh b/tools/fuzz/x86ie/scripts/deploy.sh
+new file mode 100644
+index 000000000000..f95c3aa2b5b5
+--- /dev/null
++++ b/tools/fuzz/x86ie/scripts/deploy.sh
+@@ -0,0 +1,9 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-2.0+
-+# Can be run where ever, but usually run from linux root:
-+# `source ./tools/fuzz/x86ie/scripts/install_afl.sh`
-+# (must be sourced to get the AFLPATH envvar, otherwise set manually)
 +
-+wget http://lcamtuf.coredump.cx/afl/releases/afl-latest.tgz
-+mkdir -p afl
-+tar xzf afl-latest.tgz -C afl --strip-components 1
++REMOTE=$1
++DSTDIR=/dev/shm
 +
-+pushd afl
-+set AFL_USE_ASAN
-+make clean all
-+export AFLPATH="$(pwd)"
-+popd
++rsync -av $(pwd) $REMOTE:$DSTDIR
 +
-+sudo bash -c "echo core >/proc/sys/kernel/core_pattern"
-diff --git a/tools/fuzz/x86ie/scripts/run.sh b/tools/fuzz/x86ie/scripts/run.sh
++ssh $REMOTE "cd $DSTDIR/$(basename $(pwd)); bash -s tools/fuzz/x86_instruction_emulation/scripts/deploy_remote.sh"
+diff --git a/tools/fuzz/x86ie/scripts/deploy_remote.sh b/tools/fuzz/x86ie/scripts/deploy_remote.sh
 new file mode 100755
-index 000000000000..0571cd524c01
+index 000000000000..1279ad6eadb2
 --- /dev/null
-+++ b/tools/fuzz/x86ie/scripts/run.sh
-@@ -0,0 +1,10 @@
++++ b/tools/fuzz/x86ie/scripts/deploy_remote.sh
+@@ -0,0 +1,9 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-2.0+
 +
-+FUZZDIR="${FUZZDIR:-$(pwd)/fuzz}"
++SCRIPTDIR=$(pwd)/tools/fuzz/x86ie/scripts
 +
-+mkdir -p $FUZZDIR/in
-+cp tools/fuzz/x86ie/rand_sample.bin $FUZZDIR/in
-+mkdir -p $FUZZDIR/out
++$SCRIPTDIR/install_deps_ubuntu.sh
++source $SCRIPTDIR/install_afl.sh
++CC=$AFLPATH/afl-gcc $SCRIPTDIR/build.sh
++FUZZDIR="${FUZZDIR:-$(pwd)/fuzz}" $SCRIPTDIR/run.sh
+diff --git a/tools/fuzz/x86ie/scripts/gen_output.sh b/tools/fuzz/x86ie/scripts/gen_output.sh
+new file mode 100755
+index 000000000000..6c0707eb6d08
+--- /dev/null
++++ b/tools/fuzz/x86ie/scripts/gen_output.sh
+@@ -0,0 +1,11 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0+
 +
-+screen bash -c "ulimit -Sv $[21999999999 << 10]; ./tools/fuzz/x86ie/scripts/afl-many -m 22000000000 -i $FUZZDIR/in -o $FUZZDIR/out tools/fuzz/x86ie/afl-harness @@"
++if [ "$#" -lt 3 ]; then
++  echo "Usage: '$0 path/to/afl-harness path/to/afl_crash_dir path/to/linux/src/root'"
++  exit
++fi
++
++mkdir -p output
++rm -rf output/*
++find $2 -type f | parallel ./bin.sh $1 {} $3 '>' ./output/{/}.out
+diff --git a/tools/fuzz/x86ie/scripts/install_deps_ubuntu.sh b/tools/fuzz/x86ie/scripts/install_deps_ubuntu.sh
+new file mode 100755
+index 000000000000..5525bc8b659c
+--- /dev/null
++++ b/tools/fuzz/x86ie/scripts/install_deps_ubuntu.sh
+@@ -0,0 +1,5 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0+
++
++sudo apt update
++sudo apt install -y make gcc wget screen build-essential libssh-dev flex bison libelf-dev bc
+diff --git a/tools/fuzz/x86ie/scripts/rebuild.sh b/tools/fuzz/x86ie/scripts/rebuild.sh
+new file mode 100755
+index 000000000000..809a4551cb0c
+--- /dev/null
++++ b/tools/fuzz/x86ie/scripts/rebuild.sh
+@@ -0,0 +1,6 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0+
++
++make clean
++make tools/fuzz_clean
++FUZZDIR="./fuzz" ./tools/fuzz/x86ie/scripts/build.sh
+diff --git a/tools/fuzz/x86ie/scripts/summarize.sh b/tools/fuzz/x86ie/scripts/summarize.sh
+new file mode 100755
+index 000000000000..27761f283ee3
+--- /dev/null
++++ b/tools/fuzz/x86ie/scripts/summarize.sh
+@@ -0,0 +1,9 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0+
++
++if [ "$#" -lt 1 ]; then
++  echo "Usage: '$0 path/to/output/dir'"
++  exit
++fi
++
++time bash -c "find $1 -type f -exec tail -n 1 {} \; | sort | uniq -c | sort -rn"
 -- 
 2.17.1
 
