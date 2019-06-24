@@ -2,340 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 97E0350F98
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 17:04:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29D1B50FB3
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 17:07:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728122AbfFXPEO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jun 2019 11:04:14 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:44031 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728646AbfFXPEN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jun 2019 11:04:13 -0400
-Received: by mail-pf1-f195.google.com with SMTP id i189so7653744pfg.10
-        for <kvm@vger.kernel.org>; Mon, 24 Jun 2019 08:04:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=4fUtk2X/B8EA5bC3OoTiCOMWUPKtO10Ph33S+4u9cmM=;
-        b=Unq9Tc/tyYLcrlDiUHjqb3TVsHvcrSGxzFku5zQQaJFanNh7cZPh8q46hVjZps1z81
-         uDB0Xtq6gfRGjJJixib0RhA2G8JO+YeJ0PEaotZK6musiMYDSPvWh+qB6jxY0/COcLnq
-         l3/ss6tf0ZUQLieVDIxu7IvLQn6FFv2JGvXLY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4fUtk2X/B8EA5bC3OoTiCOMWUPKtO10Ph33S+4u9cmM=;
-        b=Yt0e6E3aZGiOEX8HsPf4hy4BQjNe0kEKXEoP6RtthRqvQzbxIPnlK0Jh8seIaaUwFK
-         rFJygNKqpGykceny9JSrmqljjjMGTT0zfvvxaV/gz0zgxHdnr6IxJBybjApAUakvByxR
-         YsGObNtbfVN8qdbpxOqDZqRsJExtSeoMVKCQcjAMTncGW/BkMOmjceWj351nweIpJ6pE
-         zz1FwZKI+Wcna74Xx+VCVhil+V3IopvXTQf48MazKnZyiHnuObKhYuBytWS3/pIKt9Gf
-         VHN6/SHTgGdWEB/GzU/HilvHYqYUmOca70Hn8P2iTf6jdJ+HZBLqzIbD09IFT4UEU/5T
-         1HMw==
-X-Gm-Message-State: APjAAAUi8SO+wZirDC3CeIhAMOMYMbwq24TxhTHutBl5IVigctk7WBZC
-        Agt3kiVLeeTldulk0sKa8RTd5g==
-X-Google-Smtp-Source: APXvYqwuadhAXWHIlg6sacPEdNNPqhO7/afynu04PvpO/WXneR7cKybll9iRuNlplQEsgibh+dZilg==
-X-Received: by 2002:a63:d415:: with SMTP id a21mr32379347pgh.229.1561388652708;
-        Mon, 24 Jun 2019 08:04:12 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id r4sm10229549pjd.28.2019.06.24.08.04.11
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 24 Jun 2019 08:04:11 -0700 (PDT)
-Date:   Mon, 24 Jun 2019 08:04:10 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-        linux-media@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        id S1729562AbfFXPHy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jun 2019 11:07:54 -0400
+Received: from foss.arm.com ([217.140.110.172]:53092 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727947AbfFXPHy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jun 2019 11:07:54 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8CB8D344;
+        Mon, 24 Jun 2019 08:07:53 -0700 (PDT)
+Received: from [192.168.1.34] (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1DE383F71E;
+        Mon, 24 Jun 2019 08:07:51 -0700 (PDT)
+Subject: Re: [PATCH 15/59] KVM: arm64: nv: Refactor vcpu_{read,write}_sys_reg
+To:     Marc Zyngier <marc.zyngier@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
         Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
-Subject: Re: [PATCH v18 02/15] arm64: Introduce prctl() options to control
- the tagged user addresses ABI
-Message-ID: <201906240804.899CE7BE3@keescook>
-References: <cover.1561386715.git.andreyknvl@google.com>
- <653598b3cfcd80f0cc69f72a214e156bb1afde68.1561386715.git.andreyknvl@google.com>
+        Jintack Lim <jintack@cs.columbia.edu>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-16-marc.zyngier@arm.com>
+From:   Julien Thierry <julien.thierry@arm.com>
+Message-ID: <a64c85c3-0230-d9d0-aea6-b8a4196e62b2@arm.com>
+Date:   Mon, 24 Jun 2019 16:07:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <653598b3cfcd80f0cc69f72a214e156bb1afde68.1561386715.git.andreyknvl@google.com>
+In-Reply-To: <20190621093843.220980-16-marc.zyngier@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jun 24, 2019 at 04:32:47PM +0200, Andrey Konovalov wrote:
-> From: Catalin Marinas <catalin.marinas@arm.com>
-> 
-> It is not desirable to relax the ABI to allow tagged user addresses into
-> the kernel indiscriminately. This patch introduces a prctl() interface
-> for enabling or disabling the tagged ABI with a global sysctl control
-> for preventing applications from enabling the relaxed ABI (meant for
-> testing user-space prctl() return error checking without reconfiguring
-> the kernel). The ABI properties are inherited by threads of the same
-> application and fork()'ed children but cleared on execve(). A Kconfig
-> option allows the overall disabling of the relaxed ABI.
-> 
-> The PR_SET_TAGGED_ADDR_CTRL will be expanded in the future to handle
-> MTE-specific settings like imprecise vs precise exceptions.
-> 
-> Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
 
--Kees
-
-> Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+On 06/21/2019 10:37 AM, Marc Zyngier wrote:
+> Extract the direct HW accessors for later reuse.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm64/Kconfig                   |  9 ++++
->  arch/arm64/include/asm/processor.h   |  8 ++++
->  arch/arm64/include/asm/thread_info.h |  1 +
->  arch/arm64/include/asm/uaccess.h     |  4 +-
->  arch/arm64/kernel/process.c          | 72 ++++++++++++++++++++++++++++
->  include/uapi/linux/prctl.h           |  5 ++
->  kernel/sys.c                         | 12 +++++
->  7 files changed, 110 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/sys_regs.c | 247 +++++++++++++++++++++-----------------
+>  1 file changed, 139 insertions(+), 108 deletions(-)
 > 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 697ea0510729..55fbaf20af2d 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -1107,6 +1107,15 @@ config ARM64_SW_TTBR0_PAN
->  	  zeroed area and reserved ASID. The user access routines
->  	  restore the valid TTBR0_EL1 temporarily.
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 2b8734f75a09..e181359adadf 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -182,99 +182,161 @@ const struct el2_sysreg_map *find_el2_sysreg(const struct el2_sysreg_map *map,
+>  	return entry;
+>  }
 >  
-> +config ARM64_TAGGED_ADDR_ABI
-> +	bool "Enable the tagged user addresses syscall ABI"
-> +	default y
-> +	help
-> +	  When this option is enabled, user applications can opt in to a
-> +	  relaxed ABI via prctl() allowing tagged addresses to be passed
-> +	  to system calls as pointer arguments. For details, see
-> +	  Documentation/arm64/tagged-address-abi.txt.
+> +static bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
+> +{
+> +	/*
+> +	 * System registers listed in the switch are not saved on every
+> +	 * exit from the guest but are only saved on vcpu_put.
+> +	 *
+> +	 * Note that MPIDR_EL1 for the guest is set by KVM via VMPIDR_EL2 but
+> +	 * should never be listed below, because the guest cannot modify its
+> +	 * own MPIDR_EL1 and MPIDR_EL1 is accessed for VCPU A from VCPU B's
+> +	 * thread when emulating cross-VCPU communication.
+> +	 */
+> +	switch (reg) {
+> +	case CSSELR_EL1:	*val = read_sysreg_s(SYS_CSSELR_EL1);	break;
+> +	case SCTLR_EL1:		*val = read_sysreg_s(SYS_SCTLR_EL12);	break;
+> +	case ACTLR_EL1:		*val = read_sysreg_s(SYS_ACTLR_EL1);	break;
+> +	case CPACR_EL1:		*val = read_sysreg_s(SYS_CPACR_EL12);	break;
+> +	case TTBR0_EL1:		*val = read_sysreg_s(SYS_TTBR0_EL12);	break;
+> +	case TTBR1_EL1:		*val = read_sysreg_s(SYS_TTBR1_EL12);	break;
+> +	case TCR_EL1:		*val = read_sysreg_s(SYS_TCR_EL12);	break;
+> +	case ESR_EL1:		*val = read_sysreg_s(SYS_ESR_EL12);	break;
+> +	case AFSR0_EL1:		*val = read_sysreg_s(SYS_AFSR0_EL12);	break;
+> +	case AFSR1_EL1:		*val = read_sysreg_s(SYS_AFSR1_EL12);	break;
+> +	case FAR_EL1:		*val = read_sysreg_s(SYS_FAR_EL12);	break;
+> +	case MAIR_EL1:		*val = read_sysreg_s(SYS_MAIR_EL12);	break;
+> +	case VBAR_EL1:		*val = read_sysreg_s(SYS_VBAR_EL12);	break;
+> +	case CONTEXTIDR_EL1:	*val = read_sysreg_s(SYS_CONTEXTIDR_EL12);break;
+> +	case TPIDR_EL0:		*val = read_sysreg_s(SYS_TPIDR_EL0);	break;
+> +	case TPIDRRO_EL0:	*val = read_sysreg_s(SYS_TPIDRRO_EL0);	break;
+> +	case TPIDR_EL1:		*val = read_sysreg_s(SYS_TPIDR_EL1);	break;
+> +	case AMAIR_EL1:		*val = read_sysreg_s(SYS_AMAIR_EL12);	break;
+> +	case CNTKCTL_EL1:	*val = read_sysreg_s(SYS_CNTKCTL_EL12);	break;
+> +	case PAR_EL1:		*val = read_sysreg_s(SYS_PAR_EL1);	break;
+> +	case DACR32_EL2:	*val = read_sysreg_s(SYS_DACR32_EL2);	break;
+> +	case IFSR32_EL2:	*val = read_sysreg_s(SYS_IFSR32_EL2);	break;
+> +	case DBGVCR32_EL2:	*val = read_sysreg_s(SYS_DBGVCR32_EL2);	break;
+> +	default:		return false;
+> +	}
 > +
->  menuconfig COMPAT
->  	bool "Kernel support for 32-bit EL0"
->  	depends on ARM64_4K_PAGES || EXPERT
-> diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
-> index fd5b1a4efc70..ee86070a28d4 100644
-> --- a/arch/arm64/include/asm/processor.h
-> +++ b/arch/arm64/include/asm/processor.h
-> @@ -296,6 +296,14 @@ extern void __init minsigstksz_setup(void);
->  /* PR_PAC_RESET_KEYS prctl */
->  #define PAC_RESET_KEYS(tsk, arg)	ptrauth_prctl_reset_keys(tsk, arg)
->  
-> +#ifdef CONFIG_ARM64_TAGGED_ADDR_ABI
-> +/* PR_{SET,GET}_TAGGED_ADDR_CTRL prctl */
-> +long set_tagged_addr_ctrl(unsigned long arg);
-> +long get_tagged_addr_ctrl(void);
-> +#define SET_TAGGED_ADDR_CTRL(arg)	set_tagged_addr_ctrl(arg)
-> +#define GET_TAGGED_ADDR_CTRL()		get_tagged_addr_ctrl()
-> +#endif
+> +	return true;
+> +}
 > +
->  /*
->   * For CONFIG_GCC_PLUGIN_STACKLEAK
->   *
-> diff --git a/arch/arm64/include/asm/thread_info.h b/arch/arm64/include/asm/thread_info.h
-> index 2372e97db29c..4f81c4f15404 100644
-> --- a/arch/arm64/include/asm/thread_info.h
-> +++ b/arch/arm64/include/asm/thread_info.h
-> @@ -88,6 +88,7 @@ void arch_release_task_struct(struct task_struct *tsk);
->  #define TIF_SVE			23	/* Scalable Vector Extension in use */
->  #define TIF_SVE_VL_INHERIT	24	/* Inherit sve_vl_onexec across exec */
->  #define TIF_SSBD		25	/* Wants SSB mitigation */
-> +#define TIF_TAGGED_ADDR		26	/* Allow tagged user addresses */
->  
->  #define _TIF_SIGPENDING		(1 << TIF_SIGPENDING)
->  #define _TIF_NEED_RESCHED	(1 << TIF_NEED_RESCHED)
-> diff --git a/arch/arm64/include/asm/uaccess.h b/arch/arm64/include/asm/uaccess.h
-> index a138e3b4f717..097d6bfac0b7 100644
-> --- a/arch/arm64/include/asm/uaccess.h
-> +++ b/arch/arm64/include/asm/uaccess.h
-> @@ -62,7 +62,9 @@ static inline unsigned long __range_ok(const void __user *addr, unsigned long si
+> +static bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
+> +{
+> +	/*
+> +	 * System registers listed in the switch are not restored on every
+> +	 * entry to the guest but are only restored on vcpu_load.
+> +	 *
+> +	 * Note that MPIDR_EL1 for the guest is set by KVM via VMPIDR_EL2 but
+> +	 * should never be listed below, because the the MPIDR should only be
+> +	 * set once, before running the VCPU, and never changed later.
+> +	 */
+> +	switch (reg) {
+> +	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	break;
+> +	case SCTLR_EL1:		write_sysreg_s(val, SYS_SCTLR_EL12);	break;
+> +	case ACTLR_EL1:		write_sysreg_s(val, SYS_ACTLR_EL1);	break;
+> +	case CPACR_EL1:		write_sysreg_s(val, SYS_CPACR_EL12);	break;
+> +	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	break;
+> +	case TTBR1_EL1:		write_sysreg_s(val, SYS_TTBR1_EL12);	break;
+> +	case TCR_EL1:		write_sysreg_s(val, SYS_TCR_EL12);	break;
+> +	case ESR_EL1:		write_sysreg_s(val, SYS_ESR_EL12);	break;
+> +	case AFSR0_EL1:		write_sysreg_s(val, SYS_AFSR0_EL12);	break;
+> +	case AFSR1_EL1:		write_sysreg_s(val, SYS_AFSR1_EL12);	break;
+> +	case FAR_EL1:		write_sysreg_s(val, SYS_FAR_EL12);	break;
+> +	case MAIR_EL1:		write_sysreg_s(val, SYS_MAIR_EL12);	break;
+> +	case VBAR_EL1:		write_sysreg_s(val, SYS_VBAR_EL12);	break;
+> +	case CONTEXTIDR_EL1:	write_sysreg_s(val, SYS_CONTEXTIDR_EL12);break;
+> +	case TPIDR_EL0:		write_sysreg_s(val, SYS_TPIDR_EL0);	break;
+> +	case TPIDRRO_EL0:	write_sysreg_s(val, SYS_TPIDRRO_EL0);	break;
+> +	case TPIDR_EL1:		write_sysreg_s(val, SYS_TPIDR_EL1);	break;
+> +	case AMAIR_EL1:		write_sysreg_s(val, SYS_AMAIR_EL12);	break;
+> +	case CNTKCTL_EL1:	write_sysreg_s(val, SYS_CNTKCTL_EL12);	break;
+> +	case PAR_EL1:		write_sysreg_s(val, SYS_PAR_EL1);	break;
+> +	case DACR32_EL2:	write_sysreg_s(val, SYS_DACR32_EL2);	break;
+> +	case IFSR32_EL2:	write_sysreg_s(val, SYS_IFSR32_EL2);	break;
+> +	case DBGVCR32_EL2:	write_sysreg_s(val, SYS_DBGVCR32_EL2);	break;
+> +	default:		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
 >  {
->  	unsigned long ret, limit = current_thread_info()->addr_limit;
+> -	u64 val;
+> +	u64 val = 0x8badf00d8badf00d;
 >  
-> -	addr = untagged_addr(addr);
-> +	if (IS_ENABLED(CONFIG_ARM64_TAGGED_ADDR_ABI) &&
-> +	    test_thread_flag(TIF_TAGGED_ADDR))
-> +		addr = untagged_addr(addr);
+>  	if (!vcpu->arch.sysregs_loaded_on_cpu)
+> -		goto immediate_read;
+> +		goto memory_read;
 >  
->  	__chk_user_ptr(addr);
->  	asm volatile(
-> diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c
-> index 9856395ccdb7..60e70158a4a1 100644
-> --- a/arch/arm64/kernel/process.c
-> +++ b/arch/arm64/kernel/process.c
-> @@ -19,6 +19,7 @@
->  #include <linux/kernel.h>
->  #include <linux/mm.h>
->  #include <linux/stddef.h>
-> +#include <linux/sysctl.h>
->  #include <linux/unistd.h>
->  #include <linux/user.h>
->  #include <linux/delay.h>
-> @@ -307,11 +308,18 @@ static void tls_thread_flush(void)
->  	}
->  }
+>  	if (unlikely(sysreg_is_el2(reg))) {
+>  		const struct el2_sysreg_map *el2_reg;
 >  
-> +static void flush_tagged_addr_state(void)
-> +{
-> +	if (IS_ENABLED(CONFIG_ARM64_TAGGED_ADDR_ABI))
-> +		clear_thread_flag(TIF_TAGGED_ADDR);
-> +}
-> +
->  void flush_thread(void)
->  {
->  	fpsimd_flush_thread();
->  	tls_thread_flush();
->  	flush_ptrace_hw_breakpoint(current);
-> +	flush_tagged_addr_state();
->  }
+>  		if (!is_hyp_ctxt(vcpu))
+> -			goto immediate_read;
+> +			goto memory_read;
 >  
->  void release_thread(struct task_struct *dead_task)
-> @@ -541,3 +549,67 @@ void arch_setup_new_exec(void)
->  
->  	ptrauth_thread_init_user(current);
->  }
-> +
-> +#ifdef CONFIG_ARM64_TAGGED_ADDR_ABI
-> +/*
-> + * Control the relaxed ABI allowing tagged user addresses into the kernel.
-> + */
-> +static unsigned int tagged_addr_prctl_allowed = 1;
-> +
-> +long set_tagged_addr_ctrl(unsigned long arg)
-> +{
-> +	if (!tagged_addr_prctl_allowed)
-> +		return -EINVAL;
-> +	if (is_compat_task())
-> +		return -EINVAL;
-> +	if (arg & ~PR_TAGGED_ADDR_ENABLE)
-> +		return -EINVAL;
-> +
-> +	update_thread_flag(TIF_TAGGED_ADDR, arg & PR_TAGGED_ADDR_ENABLE);
-> +
-> +	return 0;
-> +}
-> +
-> +long get_tagged_addr_ctrl(void)
-> +{
-> +	if (!tagged_addr_prctl_allowed)
-> +		return -EINVAL;
-> +	if (is_compat_task())
-> +		return -EINVAL;
-> +
-> +	if (test_thread_flag(TIF_TAGGED_ADDR))
-> +		return PR_TAGGED_ADDR_ENABLE;
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * Global sysctl to disable the tagged user addresses support. This control
-> + * only prevents the tagged address ABI enabling via prctl() and does not
-> + * disable it for tasks that already opted in to the relaxed ABI.
-> + */
-> +static int zero;
-> +static int one = 1;
-> +
-> +static struct ctl_table tagged_addr_sysctl_table[] = {
-> +	{
-> +		.procname	= "tagged_addr",
-> +		.mode		= 0644,
-> +		.data		= &tagged_addr_prctl_allowed,
-> +		.maxlen		= sizeof(int),
-> +		.proc_handler	= proc_dointvec_minmax,
-> +		.extra1		= &zero,
-> +		.extra2		= &one,
-> +	},
-> +	{ }
-> +};
-> +
-> +static int __init tagged_addr_init(void)
-> +{
-> +	if (!register_sysctl("abi", tagged_addr_sysctl_table))
-> +		return -EINVAL;
-> +	return 0;
-> +}
-> +
-> +core_initcall(tagged_addr_init);
-> +#endif	/* CONFIG_ARM64_TAGGED_ADDR_ABI */
-> diff --git a/include/uapi/linux/prctl.h b/include/uapi/linux/prctl.h
-> index 094bb03b9cc2..2e927b3e9d6c 100644
-> --- a/include/uapi/linux/prctl.h
-> +++ b/include/uapi/linux/prctl.h
-> @@ -229,4 +229,9 @@ struct prctl_mm_map {
->  # define PR_PAC_APDBKEY			(1UL << 3)
->  # define PR_PAC_APGAKEY			(1UL << 4)
->  
-> +/* Tagged user address controls for arm64 */
-> +#define PR_SET_TAGGED_ADDR_CTRL		55
-> +#define PR_GET_TAGGED_ADDR_CTRL		56
-> +# define PR_TAGGED_ADDR_ENABLE		(1UL << 0)
-> +
->  #endif /* _LINUX_PRCTL_H */
-> diff --git a/kernel/sys.c b/kernel/sys.c
-> index 2969304c29fe..c6c4d5358bd3 100644
-> --- a/kernel/sys.c
-> +++ b/kernel/sys.c
-> @@ -124,6 +124,12 @@
->  #ifndef PAC_RESET_KEYS
->  # define PAC_RESET_KEYS(a, b)	(-EINVAL)
->  #endif
-> +#ifndef SET_TAGGED_ADDR_CTRL
-> +# define SET_TAGGED_ADDR_CTRL(a)	(-EINVAL)
-> +#endif
-> +#ifndef GET_TAGGED_ADDR_CTRL
-> +# define GET_TAGGED_ADDR_CTRL()		(-EINVAL)
-> +#endif
->  
->  /*
->   * this is where the system-wide overflow UID and GID are defined, for
-> @@ -2492,6 +2498,12 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
->  			return -EINVAL;
->  		error = PAC_RESET_KEYS(me, arg2);
->  		break;
-> +	case PR_SET_TAGGED_ADDR_CTRL:
-> +		error = SET_TAGGED_ADDR_CTRL(arg2);
-> +		break;
-> +	case PR_GET_TAGGED_ADDR_CTRL:
-> +		error = GET_TAGGED_ADDR_CTRL();
-> +		break;
->  	default:
->  		error = -EINVAL;
->  		break;
-> -- 
-> 2.22.0.410.gd8fdbe21b5-goog
-> 
+>  		switch (reg) {
+> +		case ELR_EL2:
+> +			return read_sysreg_el1(SYS_ELR);
+
+Hmmm, This change feels a bit out of place.
+
+Also, patch 13 added ELR_EL2 and SP_EL2 to the switch cases for physical
+sysreg accesses. Now ELR_EL2 is moved out of the main switch cases and
+SP_EL2 is completely omitted.
+
+I'd say either patch 13 needs to be reworked or there is a separate
+patch that should be extracted from this patch to have an intermediate
+state, or the commit message on this patch should be more detailed.
+
+Cheers,
 
 -- 
-Kees Cook
+Julien Thierry
