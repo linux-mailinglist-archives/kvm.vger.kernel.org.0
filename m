@@ -2,211 +2,341 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 66CD75103D
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 17:24:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A505151792
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 17:47:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730736AbfFXPYY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jun 2019 11:24:24 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52354 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729026AbfFXPYX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 Jun 2019 11:24:23 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5OFIiS6055294
-        for <kvm@vger.kernel.org>; Mon, 24 Jun 2019 11:24:22 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2tb0tyh6au-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 24 Jun 2019 11:24:22 -0400
-Received: from localhost
-        by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <alifm@linux.ibm.com>;
-        Mon, 24 Jun 2019 16:24:21 +0100
-Received: from b01cxnp22033.gho.pok.ibm.com (9.57.198.23)
-        by e16.ny.us.ibm.com (146.89.104.203) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 24 Jun 2019 16:24:18 +0100
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5OFOH2x47055218
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 24 Jun 2019 15:24:17 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 15845124058;
-        Mon, 24 Jun 2019 15:24:17 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 077BE124055;
-        Mon, 24 Jun 2019 15:24:17 +0000 (GMT)
-Received: from [9.56.58.42] (unknown [9.56.58.42])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 24 Jun 2019 15:24:16 +0000 (GMT)
-Subject: Re: [RFC v1 1/1] vfio-ccw: Don't call cp_free if we are processing a
- channel program
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Eric Farman <farman@linux.ibm.com>, pasic@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-References: <cover.1561055076.git.alifm@linux.ibm.com>
- <46dc0cbdcb8a414d70b7807fceb1cca6229408d5.1561055076.git.alifm@linux.ibm.com>
- <638804dc-53c0-ff2f-d123-13c257ad593f@linux.ibm.com>
- <581d756d-7418-cd67-e0e8-f9e4fe10b22d@linux.ibm.com>
- <2d9c04ba-ee50-2f9b-343a-5109274ff52d@linux.ibm.com>
- <56ced048-8c66-a030-af35-8afbbd2abea8@linux.ibm.com>
- <20190624114231.2d81e36f.cohuck@redhat.com>
- <20190624120514.4b528db5.cohuck@redhat.com>
- <20190624134622.2bb3bba2.cohuck@redhat.com>
- <20190624140723.5aa7b0b1.cohuck@redhat.com>
- <3e93215c-c11a-d0bb-8982-be3f2b467e13@linux.ibm.com>
- <20190624170937.4c76de8d.cohuck@redhat.com>
-From:   Farhan Ali <alifm@linux.ibm.com>
-Date:   Mon, 24 Jun 2019 11:24:16 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
+        id S1729005AbfFXPrx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jun 2019 11:47:53 -0400
+Received: from foss.arm.com ([217.140.110.172]:53790 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726862AbfFXPrw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jun 2019 11:47:52 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E766C2B;
+        Mon, 24 Jun 2019 08:47:51 -0700 (PDT)
+Received: from [10.1.215.72] (e121566-lin.cambridge.arm.com [10.1.215.72])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 04FF83F71E;
+        Mon, 24 Jun 2019 08:47:50 -0700 (PDT)
+Subject: Re: [PATCH 07/59] KVM: arm64: nv: Add EL2 system registers to vcpu
+ context
+To:     Marc Zyngier <marc.zyngier@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-8-marc.zyngier@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <83f3352a-0a9d-3373-87b8-162f2648dc88@arm.com>
+Date:   Mon, 24 Jun 2019 16:47:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190624170937.4c76de8d.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190621093843.220980-8-marc.zyngier@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19062415-0072-0000-0000-00000440048F
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011321; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01222649; UDB=6.00643356; IPR=6.01003810;
- MB=3.00027446; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-24 15:24:19
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19062415-0073-0000-0000-00004CB021ED
-Message-Id: <7841b312-13ad-a4b3-85d9-1f5a4991f7fd@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-24_10:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906240123
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 06/24/2019 11:09 AM, Cornelia Huck wrote:
-> On Mon, 24 Jun 2019 10:44:17 -0400
-> Farhan Ali <alifm@linux.ibm.com> wrote:
-> 
->> On 06/24/2019 08:07 AM, Cornelia Huck wrote:
->>> On Mon, 24 Jun 2019 13:46:22 +0200
->>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>    
->>>> On Mon, 24 Jun 2019 12:05:14 +0200
->>>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>>   
->>>>> On Mon, 24 Jun 2019 11:42:31 +0200
->>>>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>>>       
->>>>>> On Fri, 21 Jun 2019 14:34:10 -0400
->>>>>> Farhan Ali <alifm@linux.ibm.com> wrote:
->>>>>>         
->>>>>>> On 06/21/2019 01:40 PM, Eric Farman wrote:
->>>>>>>>
->>>>>>>>
->>>>>>>> On 6/21/19 10:17 AM, Farhan Ali wrote:
->>>>>>>>>
->>>>>>>>>
->>>>>>>>> On 06/20/2019 04:27 PM, Eric Farman wrote:
->>>>>>>>>>
->>>>>>>>>>
->>>>>>>>>> On 6/20/19 3:40 PM, Farhan Ali wrote:
->>>>   
->>>>>>>>>>> diff --git a/drivers/s390/cio/vfio_ccw_drv.c
->>>>>>>>>>> b/drivers/s390/cio/vfio_ccw_drv.c
->>>>>>>>>>> index 66a66ac..61ece3f 100644
->>>>>>>>>>> --- a/drivers/s390/cio/vfio_ccw_drv.c
->>>>>>>>>>> +++ b/drivers/s390/cio/vfio_ccw_drv.c
->>>>>>>>>>> @@ -88,7 +88,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct
->>>>>>>>>>> *work)
->>>>>>>>>>>                   (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
->>>>>>>>>>>          if (scsw_is_solicited(&irb->scsw)) {
->>>>>>>>>>>              cp_update_scsw(&private->cp, &irb->scsw);
->>>>>>>>>>
->>>>>>>>>> As I alluded earlier, do we know this irb is for this cp?  If no, what
->>>>>>>>>> does this function end up putting in the scsw?
->>>>>>
->>>>>> Yes, I think this also needs to check whether we have at least a prior
->>>>>> start function around. (We use the orb provided by the guest; maybe we
->>>>>> should check if that intparm is set in the irb?)
->>>>>
->>>>> Hrm; not so easy as we always set the intparm to the address of the
->>>>> subchannel structure...
->>>>>
->>>>> Maybe check if we have have one of the conditions of the large table
->>>>> 16-6 and correlate to the ccw address? Or is it enough to check the
->>>>> function control? (Don't remember when the hardware resets it.)
->>>>
->>>> Nope, we cannot look at the function control, as csch clears any set
->>>> start function bit :( (see "Function Control", pg 16-13)
->>>>
->>>> I think this problem mostly boils down to "csch clears pending status;
->>>> therefore, we may only get one interrupt, even though there had been a
->>>> start function going on". If we only go with what the hardware gives
->>>> us, I don't see a way to distinguish "clear with a prior start" from
->>>> "clear only". Maybe we want to track an "issued" status in the cp?
->>>
->>> Sorry for replying to myself again :), but maybe we should simply call
->>> cp_free() if we got cc 0 from a csch? Any start function has been
->>> terminated at the subchannel during successful execution of csch, and
->>> cp_free does nothing if !cp->initialized, so we should hopefully be
->>> safe there as well. We can then add a check for the start function in
->>> the function control in the check above and should be fine, I think.
->>>
->>>    
->>
->> So you mean not call cp_free in vfio_ccw_sch_io_todo, and instead call
->> cp_free for a cc=0 for csch (and hsch) ?
->>
->> Won't we end up with memory leak for a successful for ssch then?
-> 
-> No; both:
-> 
-> - free if cc=0 for csch (as this clears the status; hsch doesn't)
-> - free in _todo if the start function is set in the irb and the status
->    is final
-> 
->>
->> But even if we don't remove the cp_free from vfio_ccw_sch_io_todo, I am
->> not sure if your suggestion will fix the problem. The problem here is
->> that we can call vfio_ccw_sch_io_todo (for a clear or halt interrupt) at
->> the same time we are handling an ssch request. So depending on the order
->> of the operations we could still end up calling cp_free from both from
->> threads (i refer to the threads I mentioned in response to Eric's
->> earlier email).
-> 
-> What I don't see is why this is a problem with ->initialized; wasn't
-> the problem that we misinterpreted an interrupt for csch as one for a
-> not-yet-issued ssch?
-> 
-
-It's the order in which we do things, which could cause the problem. 
-Since we queue interrupt handling in the workqueue, we could delay 
-processing the csch interrupt. During this delay if ssch comes through, 
-we might have already set ->initialized to true.
-
-So when we get around to handling the interrupt in io_todo, we would go 
-ahead and call cp_free. This would cause the problem of freeing the 
-ccwchain list while we might be adding to it.
-
->>
->> Another thing that concerns me is that vfio-ccw can also issue csch/hsch
->> in the quiesce path, independently of what the guest issues. So in that
->> case we could have a similar scenario to processing an ssch request and
->> issuing halt/clear in parallel. But maybe I am being paranoid :)
-> 
-> I think the root problem is really trying to clear a cp while another
-> thread is trying to set it up. Should we maybe use something like rcu?
-> 
-> 
-
-Yes, this is the root problem. I am not too familiar with rcu locking, 
-but what would be the benefit over a traditional mutex?
-
-Thanks
-Farhan
-
+On 6/21/19 10:37 AM, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
+>
+> ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
+> this bit is set, accessing EL2 registers in EL1 traps to EL2. In
+> addition, executing the following instructions in EL1 will trap to EL2:
+> tlbi, at, eret, and msr/mrs instructions to access SP_EL1. Most of the
+> instructions that trap to EL2 with the NV bit were undef at EL1 prior to
+> ARM v8.3. The only instruction that was not undef is eret.
+>
+> This patch sets up a handler for EL2 registers and SP_EL1 register
+> accesses at EL1. The host hypervisor keeps those register values in
+> memory, and will emulate their behavior.
+>
+> This patch doesn't set the NV bit yet. It will be set in a later patch
+> once nested virtualization support is completed.
+>
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 37 +++++++++++++++-
+>  arch/arm64/include/asm/sysreg.h   | 50 ++++++++++++++++++++-
+>  arch/arm64/kvm/sys_regs.c         | 74 ++++++++++++++++++++++++++++---
+>  3 files changed, 154 insertions(+), 7 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 4bcd9c1291d5..2d4290d2513a 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -173,12 +173,47 @@ enum vcpu_sysreg {
+>  	APGAKEYLO_EL1,
+>  	APGAKEYHI_EL1,
+>  
+> -	/* 32bit specific registers. Keep them at the end of the range */
+> +	/* 32bit specific registers. */
+>  	DACR32_EL2,	/* Domain Access Control Register */
+>  	IFSR32_EL2,	/* Instruction Fault Status Register */
+>  	FPEXC32_EL2,	/* Floating-Point Exception Control Register */
+>  	DBGVCR32_EL2,	/* Debug Vector Catch Register */
+>  
+> +	/* EL2 registers sorted ascending by Op0, Op1, CRn, CRm, Op2 */
+> +	FIRST_EL2_SYSREG,
+> +	VPIDR_EL2 = FIRST_EL2_SYSREG,
+> +			/* Virtualization Processor ID Register */
+> +	VMPIDR_EL2,	/* Virtualization Multiprocessor ID Register */
+> +	SCTLR_EL2,	/* System Control Register (EL2) */
+> +	ACTLR_EL2,	/* Auxiliary Control Register (EL2) */
+> +	HCR_EL2,	/* Hypervisor Configuration Register */
+> +	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
+> +	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
+> +	HSTR_EL2,	/* Hypervisor System Trap Register */
+> +	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
+> +	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
+> +	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
+> +	TCR_EL2,	/* Translation Control Register (EL2) */
+> +	VTTBR_EL2,	/* Virtualization Translation Table Base Register */
+> +	VTCR_EL2,	/* Virtualization Translation Control Register */
+> +	SPSR_EL2,	/* EL2 saved program status register */
+> +	ELR_EL2,	/* EL2 exception link register */
+> +	AFSR0_EL2,	/* Auxiliary Fault Status Register 0 (EL2) */
+> +	AFSR1_EL2,	/* Auxiliary Fault Status Register 1 (EL2) */
+> +	ESR_EL2,	/* Exception Syndrome Register (EL2) */
+> +	FAR_EL2,	/* Hypervisor IPA Fault Address Register */
+> +	HPFAR_EL2,	/* Hypervisor IPA Fault Address Register */
+> +	MAIR_EL2,	/* Memory Attribute Indirection Register (EL2) */
+> +	AMAIR_EL2,	/* Auxiliary Memory Attribute Indirection Register (EL2) */
+> +	VBAR_EL2,	/* Vector Base Address Register (EL2) */
+> +	RVBAR_EL2,	/* Reset Vector Base Address Register */
+> +	RMR_EL2,	/* Reset Management Register */
+> +	CONTEXTIDR_EL2,	/* Context ID Register (EL2) */
+> +	TPIDR_EL2,	/* EL2 Software Thread ID Register */
+> +	CNTVOFF_EL2,	/* Counter-timer Virtual Offset register */
+> +	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
+> +	SP_EL2,		/* EL2 Stack Pointer */
+> +
+>  	NR_SYS_REGS	/* Nothing after this line! */
+>  };
+>  
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index f3ca7e4796ab..8b95f2c42c3d 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -411,17 +411,49 @@
+>  
+>  #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
+>  
+> +#define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
+> +#define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
+> +
+> +#define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
+> +#define SYS_ACTLR_EL2			sys_reg(3, 4, 1, 0, 1)
+> +#define SYS_HCR_EL2			sys_reg(3, 4, 1, 1, 0)
+> +#define SYS_MDCR_EL2			sys_reg(3, 4, 1, 1, 1)
+> +#define SYS_CPTR_EL2			sys_reg(3, 4, 1, 1, 2)
+> +#define SYS_HSTR_EL2			sys_reg(3, 4, 1, 1, 3)
+> +#define SYS_HACR_EL2			sys_reg(3, 4, 1, 1, 7)
+> +
+>  #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
+> +
+> +#define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
+> +#define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
+> +#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+> +#define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+> +#define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+> +
+>  #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
+> +
+>  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+>  #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
+> +#define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
+> +
+>  #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
+> +#define SYS_AFSR0_EL2			sys_reg(3, 4, 5, 1, 0)
+> +#define SYS_AFSR1_EL2			sys_reg(3, 4, 5, 1, 1)
+>  #define SYS_ESR_EL2			sys_reg(3, 4, 5, 2, 0)
+>  #define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
+>  #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
+>  #define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
+>  
+> -#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1,  1)
+> +#define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
+> +#define SYS_HPFAR_EL2			sys_reg(3, 4, 6, 0, 4)
+> +
+> +#define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
+> +#define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
+> +
+> +#define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
+> +#define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
+> +#define SYS_RMR_EL2			sys_reg(3, 4, 12, 0, 2)
+> +#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1, 1)
+>  #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
+>  #define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
+>  #define SYS_ICH_AP0R1_EL2		__SYS__AP0Rx_EL2(1)
+> @@ -463,23 +495,37 @@
+>  #define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
+>  #define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
+>  
+> +#define SYS_CONTEXTIDR_EL2		sys_reg(3, 4, 13, 0, 1)
+> +#define SYS_TPIDR_EL2			sys_reg(3, 4, 13, 0, 2)
+> +
+> +#define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
+> +#define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
+> +
+>  /* VHE encodings for architectural EL0/1 system registers */
+>  #define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
+>  #define SYS_CPACR_EL12			sys_reg(3, 5, 1, 0, 2)
+>  #define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
+> +
+>  #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
+>  #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
+>  #define SYS_TCR_EL12			sys_reg(3, 5, 2, 0, 2)
+> +
+>  #define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
+>  #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
+> +
+>  #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
+>  #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
+>  #define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
+> +
+>  #define SYS_FAR_EL12			sys_reg(3, 5, 6, 0, 0)
+> +
+>  #define SYS_MAIR_EL12			sys_reg(3, 5, 10, 2, 0)
+>  #define SYS_AMAIR_EL12			sys_reg(3, 5, 10, 3, 0)
+> +
+>  #define SYS_VBAR_EL12			sys_reg(3, 5, 12, 0, 0)
+> +
+>  #define SYS_CONTEXTIDR_EL12		sys_reg(3, 5, 13, 0, 1)
+> +
+>  #define SYS_CNTKCTL_EL12		sys_reg(3, 5, 14, 1, 0)
+>  #define SYS_CNTP_TVAL_EL02		sys_reg(3, 5, 14, 2, 0)
+>  #define SYS_CNTP_CTL_EL02		sys_reg(3, 5, 14, 2, 1)
+> @@ -488,6 +534,8 @@
+>  #define SYS_CNTV_CTL_EL02		sys_reg(3, 5, 14, 3, 1)
+>  #define SYS_CNTV_CVAL_EL02		sys_reg(3, 5, 14, 3, 2)
+>  
+> +#define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
+> +
+>  /* Common SCTLR_ELx flags. */
+>  #define SCTLR_ELx_DSSBS	(_BITUL(44))
+>  #define SCTLR_ELx_ENIA	(_BITUL(31))
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index adb8a7e9c8e4..e81be6debe07 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -184,6 +184,18 @@ static u32 get_ccsidr(u32 csselr)
+>  	return ccsidr;
+>  }
+>  
+> +static bool access_rw(struct kvm_vcpu *vcpu,
+> +		      struct sys_reg_params *p,
+> +		      const struct sys_reg_desc *r)
+> +{
+> +	if (p->is_write)
+> +		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
+> +	else
+> +		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
+> +
+> +	return true;
+> +}
+> +
+>  /*
+>   * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
+>   */
+> @@ -394,12 +406,9 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
+>  			    struct sys_reg_params *p,
+>  			    const struct sys_reg_desc *r)
+>  {
+> -	if (p->is_write) {
+> -		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
+> +	access_rw(vcpu, p, r);
+> +	if (p->is_write)
+>  		vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
+> -	} else {
+> -		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
+> -	}
+>  
+>  	trace_trap_reg(__func__, r->reg, p->is_write, p->regval);
+>  
+> @@ -1354,6 +1363,19 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	.set_user = set_raz_id_reg,		\
+>  }
+>  
+> +static bool access_sp_el1(struct kvm_vcpu *vcpu,
+> +			  struct sys_reg_params *p,
+> +			  const struct sys_reg_desc *r)
+> +{
+> +	/* SP_EL1 is NOT maintained in sys_regs array */
+> +	if (p->is_write)
+> +		vcpu->arch.ctxt.gp_regs.sp_el1 = p->regval;
+> +	else
+> +		p->regval = vcpu->arch.ctxt.gp_regs.sp_el1;
+> +
+> +	return true;
+> +}
+> +
+>  /*
+>   * Architected system registers.
+>   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+> @@ -1646,9 +1668,51 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	 */
+>  	{ SYS_DESC(SYS_PMCCFILTR_EL0), access_pmu_evtyper, reset_val, PMCCFILTR_EL0, 0 },
+I have to admit I haven't gone through all the patches, or maybe this is part of
+the bits that will be added at a later date, but some of the reset values seem
+incorrect according to ARM DDI 0487D.a. I'll comment below the relevant registers.
+>  
+> +	{ SYS_DESC(SYS_VPIDR_EL2), access_rw, reset_val, VPIDR_EL2, 0 },
+> +	{ SYS_DESC(SYS_VMPIDR_EL2), access_rw, reset_val, VMPIDR_EL2, 0 },
+> +
+> +	{ SYS_DESC(SYS_SCTLR_EL2), access_rw, reset_val, SCTLR_EL2, 0 },
+Some bits are RES1 for SCTLR_EL2.
+> +	{ SYS_DESC(SYS_ACTLR_EL2), access_rw, reset_val, ACTLR_EL2, 0 },
+> +	{ SYS_DESC(SYS_HCR_EL2), access_rw, reset_val, HCR_EL2, 0 },
+> +	{ SYS_DESC(SYS_MDCR_EL2), access_rw, reset_val, MDCR_EL2, 0 },
+> +	{ SYS_DESC(SYS_CPTR_EL2), access_rw, reset_val, CPTR_EL2, 0 },
+Some bits are RES1 for CPTR_EL2 if HCR_EL2.E2H == 0, which the reset value for
+HCR_EL2 seems to imply.
+> +	{ SYS_DESC(SYS_HSTR_EL2), access_rw, reset_val, HSTR_EL2, 0 },
+> +	{ SYS_DESC(SYS_HACR_EL2), access_rw, reset_val, HACR_EL2, 0 },
+> +
+> +	{ SYS_DESC(SYS_TTBR0_EL2), access_rw, reset_val, TTBR0_EL2, 0 },
+> +	{ SYS_DESC(SYS_TTBR1_EL2), access_rw, reset_val, TTBR1_EL2, 0 },
+> +	{ SYS_DESC(SYS_TCR_EL2), access_rw, reset_val, TCR_EL2, 0 },
+Same here, bits 31 and 23 are RES1 for TCR_EL2 when HCR_EL2.E2H == 0.
+> +	{ SYS_DESC(SYS_VTTBR_EL2), access_rw, reset_val, VTTBR_EL2, 0 },
+> +	{ SYS_DESC(SYS_VTCR_EL2), access_rw, reset_val, VTCR_EL2, 0 },
+> +
+>  	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
+> +	{ SYS_DESC(SYS_SPSR_EL2), access_rw, reset_val, SPSR_EL2, 0 },
+> +	{ SYS_DESC(SYS_ELR_EL2), access_rw, reset_val, ELR_EL2, 0 },
+> +	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
+> +
+>  	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
+> +	{ SYS_DESC(SYS_AFSR0_EL2), access_rw, reset_val, AFSR0_EL2, 0 },
+> +	{ SYS_DESC(SYS_AFSR1_EL2), access_rw, reset_val, AFSR1_EL2, 0 },
+> +	{ SYS_DESC(SYS_ESR_EL2), access_rw, reset_val, ESR_EL2, 0 },
+>  	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
+> +
+> +	{ SYS_DESC(SYS_FAR_EL2), access_rw, reset_val, FAR_EL2, 0 },
+> +	{ SYS_DESC(SYS_HPFAR_EL2), access_rw, reset_val, HPFAR_EL2, 0 },
+> +
+> +	{ SYS_DESC(SYS_MAIR_EL2), access_rw, reset_val, MAIR_EL2, 0 },
+> +	{ SYS_DESC(SYS_AMAIR_EL2), access_rw, reset_val, AMAIR_EL2, 0 },
+> +
+> +	{ SYS_DESC(SYS_VBAR_EL2), access_rw, reset_val, VBAR_EL2, 0 },
+> +	{ SYS_DESC(SYS_RVBAR_EL2), access_rw, reset_val, RVBAR_EL2, 0 },
+> +	{ SYS_DESC(SYS_RMR_EL2), access_rw, reset_val, RMR_EL2, 0 },
+Bit AA64 [0] for RMR_EL2 is RAO/WI for EL2 cannot aarch32, which is what the
+patches seem to enforce.
+> +
+> +	{ SYS_DESC(SYS_CONTEXTIDR_EL2), access_rw, reset_val, CONTEXTIDR_EL2, 0 },
+> +	{ SYS_DESC(SYS_TPIDR_EL2), access_rw, reset_val, TPIDR_EL2, 0 },
+> +
+> +	{ SYS_DESC(SYS_CNTVOFF_EL2), access_rw, reset_val, CNTVOFF_EL2, 0 },
+> +	{ SYS_DESC(SYS_CNTHCTL_EL2), access_rw, reset_val, CNTHCTL_EL2, 0 },
+> +
+> +	{ SYS_DESC(SYS_SP_EL2), NULL, reset_unknown, SP_EL2 },
+>  };
+>  
+>  static bool trap_dbgidr(struct kvm_vcpu *vcpu,
