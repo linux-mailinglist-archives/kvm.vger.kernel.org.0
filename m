@@ -2,140 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 46E4F51B39
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 21:09:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22D1451EEC
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 01:07:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729083AbfFXTJr convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 24 Jun 2019 15:09:47 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:59250 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725881AbfFXTJr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 24 Jun 2019 15:09:47 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id A5F9028BAC
-        for <kvm@vger.kernel.org>; Mon, 24 Jun 2019 19:09:45 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 9964F28B7B; Mon, 24 Jun 2019 19:09:45 +0000 (UTC)
-X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
-        pdx-wl-mail.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-1.9 required=2.0 tests=BAYES_00,NO_RECEIVED,
-        NO_RELAYS autolearn=unavailable version=3.3.1
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 203979] New: kvm_spurious_fault in L1 when running a nested kvm
- instance on AMD i686-pae
-Date:   Mon, 24 Jun 2019 19:09:44 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: jpalecek@web.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-203979-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S1728044AbfFXXHd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jun 2019 19:07:33 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:55690 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726486AbfFXXHd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jun 2019 19:07:33 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5OMxd9U036398;
+        Mon, 24 Jun 2019 23:05:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2018-07-02; bh=yUBEZia5gsuqxQ69vNng00iBJBoO065TVcwKIsFBCF0=;
+ b=4AMs/1XWaPckBZwOgJMgOaZLtE4WpFsA1IdegEGmRkTmLPVc1A15OUIGzAXsG4Yb91un
+ DsH9ZfYASvGkFQE2EiAyZpOuGO5XWuKdo78FtW6aBAgMB5MdnaK0sN6Gq5dM7q7yw7Cj
+ 1HwzJ5nPjfR7mW1ZziRBnpqNbnJ9AKbyN/98mV6NbzNHB73u8EdsI9xEv4/uVU6zImXo
+ 1mNG7AEAdKHE/d1X78v6ifGBLWdohL4bICiyv0g+F6niWlOEDoHs0lmHmzuR6s6nNIx1
+ /4T2CfFO9OgL/1ExHspeu1K/+t/NfrFezB719qL/OUaJnLnatLQJucvsRLIJNoESnBCs Zg== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 2t9cyq8vyp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 24 Jun 2019 23:05:24 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5ON4mh6024774;
+        Mon, 24 Jun 2019 23:05:24 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2t9p6tuhge-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 24 Jun 2019 23:05:23 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5ON5MpY000353;
+        Mon, 24 Jun 2019 23:05:22 GMT
+Received: from Lirans-MBP.Home (/109.64.216.174)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 24 Jun 2019 16:05:21 -0700
+From:   Liran Alon <liran.alon@oracle.com>
+To:     qemu-devel@nongnu.org
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        Liran Alon <liran.alon@oracle.com>,
+        Karl Heubaum <karl.heubaum@oracle.com>
+Subject: [PATCH] target/i386: kvm: Fix when nested state is needed for migration
+Date:   Tue, 25 Jun 2019 02:05:14 +0300
+Message-Id: <20190624230514.53326-1-liran.alon@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9298 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=991
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906240181
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9298 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906240181
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=203979
+When vCPU is in VMX operation and enters SMM mode,
+it temporarily exits VMX operation but KVM maintained nested-state
+still stores the VMXON region physical address, i.e. even when the
+vCPU is in SMM mode then (nested_state->hdr.vmx.vmxon_pa != -1ull).
 
-            Bug ID: 203979
-           Summary: kvm_spurious_fault in L1 when running a nested kvm
-                    instance on AMD i686-pae
-           Product: Virtualization
-           Version: unspecified
-    Kernel Version: 5.2-rc6
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: jpalecek@web.de
-        Regression: No
+Therefore, there is no need to explicitly check for
+KVM_STATE_NESTED_SMM_VMXON to determine if it is necessary
+to save nested-state as part of migration stream.
 
-Hello,
+In addition, destination must enable eVMCS if it is enabled on
+source as specified by the KVM_STATE_NESTED_EVMCS flag, even if
+the VMXON region is not set. Thus, change the code to require saving
+nested-state as part of migration stream in case it is set.
 
-when I try to run a freedos nested in linux kvm guest on kernel 5.2-rc6, I get
-this message in L1 guest:
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Signed-off-by: Liran Alon <liran.alon@oracle.com>
+---
+ target/i386/machine.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-debian login: [   13.291265] FS-Cache: Loaded
-[   13.295627] 9p: Installing v9fs 9p2000 file system support
-[   13.296946] FS-Cache: Netfs '9p' registered for caching
-[   19.200271] ------------[ cut here ]------------
-[   19.201265] kernel BUG at arch/x86/kvm/x86.c:358!
-[   19.202069] invalid opcode: 0000 [#1] SMP NOPTI
-[   19.202850] CPU: 0 PID: 270 Comm: qemu-system-i38 Not tainted
-5.2.0-rc6-bughunt+ #1
-[   19.203568] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-1.12.0-1 04/01/2014
-[   19.203568] EIP: kvm_spurious_fault+0x8/0x10 [kvm]
-[   19.203568] Code: 08 ff 75 18 ff 75 14 ff 75 10 ff 75 0c 57 56 e8 5e 09 3d
-fa 83 c4 30 8d 65 f8 5e 5f 5d c3 8d 74 26 00 0f 1f 44 00 00 55 89 e5 <0f> 0b 8d
-b6 00 00 00 00 0f 1f 44 00 00 55 89 e5 57 56 53 83 ec 04
-[   19.203568] EAX: 0004c000 EBX: 00000000 ECX: 00000000 EDX: 00000663
-[   19.203568] ESI: 00000000 EDI: 00000000 EBP: c0037da4 ESP: c0037da4
-[   19.203568] DS: 007b ES: 007b FS: 0000 GS: 00e0 SS: 0068 EFLAGS: 00210246
-[   19.203568] CR0: 80050033 CR2: 00cd813b CR3: 04e7f820 CR4: 000006f0
-[   19.203568] Call Trace:
-[   19.203568]  svm_vcpu_run+0x1a5/0x650 [kvm_amd]
-[   19.203568]  ? kvm_ioapic_scan_entry+0x62/0xe0 [kvm]
-[   19.203568]  ? kvm_arch_vcpu_ioctl_run+0x596/0x1a80 [kvm]
-[   19.203568]  ? _cond_resched+0x17/0x30
-[   19.203568]  ? kvm_vcpu_ioctl+0x214/0x590 [kvm]
-[   19.203568]  ? kvm_vcpu_ioctl+0x214/0x590 [kvm]
-[   19.203568]  ? __bpf_trace_kvm_async_pf_nopresent_ready+0x20/0x20 [kvm]
-[   19.203568]  ? do_vfs_ioctl+0x9a/0x6c0
-[   19.203568]  ? tomoyo_path_chmod+0x20/0x20
-[   19.203568]  ? tomoyo_file_ioctl+0x19/0x20
-[   19.203568]  ? security_file_ioctl+0x30/0x50
-[   19.203568]  ? ksys_ioctl+0x56/0x80
-[   19.203568]  ? sys_ioctl+0x16/0x20
-[   19.203568]  ? do_fast_syscall_32+0x87/0x1df
-[   19.203568]  ? entry_SYSENTER_32+0x6b/0xbe
-[   19.203568] Modules linked in: 9p fscache ppdev edac_mce_amd kvm_amd
-9pnet_virtio kvm bochs_drm 9pnet irqbypass ttm snd_pcm snd_timer snd
-drm_kms_helper soundcore joydev pcspkr evdev serio_raw drm sg parport_pc
-parport button ip_tables x_tables autofs4 ext4 crc32c_generic crc16 mbcache
-jbd2 sr_mod cdrom sd_mod ata_generic ata_piix libata psmouse virtio_pci
-virtio_ring virtio e1000 scsi_mod i2c_piix4 floppy
-[   19.203568] ---[ end trace c0c327b925400cd6 ]---
-[   19.203568] EIP: kvm_spurious_fault+0x8/0x10 [kvm]
-[   19.203568] Code: 08 ff 75 18 ff 75 14 ff 75 10 ff 75 0c 57 56 e8 5e 09 3d
-fa 83 c4 30 8d 65 f8 5e 5f 5d c3 8d 74 26 00 0f 1f 44 00 00 55 89 e5 <0f> 0b 8d
-b6 00 00 00 00 0f 1f 44 00 00 55 89 e5 57 56 53 83 ec 04
-[   19.203568] EAX: 0004c000 EBX: 00000000 ECX: 00000000 EDX: 00000663
-[   19.203568] ESI: 00000000 EDI: 00000000 EBP: c0037da4 ESP: c3a71dfc
-[   19.203568] DS: 007b ES: 007b FS: 0000 GS: 00e0 SS: 0068 EFLAGS: 00210246
-[   19.203568] CR0: 80050033 CR2: 00cd813b CR3: 04e7f820 CR4: 000006f0
-
-svm_vcpu_run+0x1a5 is the vmsave instruction. The bug seems to be only
-dependent on the L0 host, where version 5.1 works, but 5.2 fails. Linux version
-of the L1 guest doesn't seem to matter. (I'm running a pae system but didn't
-actually test if it has anything to do with pae)
-
-Any ideas about what could have caused it?
-
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 851b249d1a39..e7d72faf9e24 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -999,7 +999,7 @@ static bool vmx_nested_state_needed(void *opaque)
+ 
+     return ((nested_state->format == KVM_STATE_NESTED_FORMAT_VMX) &&
+             ((nested_state->hdr.vmx.vmxon_pa != -1ull) ||
+-             (nested_state->hdr.vmx.smm.flags & KVM_STATE_NESTED_SMM_VMXON)));
++             (nested_state->flags & KVM_STATE_NESTED_EVMCS)));
+ }
+ 
+ static const VMStateDescription vmstate_vmx_nested_state = {
 -- 
-You are receiving this mail because:
-You are watching the assignee of the bug.
+2.20.1
+
