@@ -2,117 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B1FC509A6
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 13:22:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EBF67509B2
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 13:24:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728871AbfFXLWB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jun 2019 07:22:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34492 "EHLO mx1.redhat.com"
+        id S1729745AbfFXLYT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jun 2019 07:24:19 -0400
+Received: from foss.arm.com ([217.140.110.172]:47526 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727722AbfFXLWB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jun 2019 07:22:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B8A61368FF;
-        Mon, 24 Jun 2019 11:21:59 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8CD8B608D0;
-        Mon, 24 Jun 2019 11:21:53 +0000 (UTC)
-Date:   Mon, 24 Jun 2019 13:21:49 +0200
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     Dongjiu Geng <gengdongjiu@huawei.com>
-Cc:     <pbonzini@redhat.com>, <mst@redhat.com>,
-        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
-        <lersek@redhat.com>, <james.morse@arm.com>, <mtosatti@redhat.com>,
-        <rth@twiddle.net>, <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
-        <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
-        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
-        <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
-Subject: Re: [PATCH v17 03/10] acpi: add build_append_ghes_notify() helper
- for Hardware Error Notification
-Message-ID: <20190624132149.3c79fadc@redhat.com>
-In-Reply-To: <1557832703-42620-4-git-send-email-gengdongjiu@huawei.com>
-References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
-        <1557832703-42620-4-git-send-email-gengdongjiu@huawei.com>
+        id S1727722AbfFXLYT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jun 2019 07:24:19 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43C16C15;
+        Mon, 24 Jun 2019 04:24:18 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E37FC3F762;
+        Mon, 24 Jun 2019 04:24:16 -0700 (PDT)
+Date:   Mon, 24 Jun 2019 12:24:14 +0100
+From:   Dave Martin <Dave.Martin@arm.com>
+To:     Marc Zyngier <marc.zyngier@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Julien Thierry <julien.thierry@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>
+Subject: Re: [PATCH 03/59] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+Message-ID: <20190624112414.GL2790@e103592.cambridge.arm.com>
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-4-marc.zyngier@arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Mon, 24 Jun 2019 11:22:01 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190621093843.220980-4-marc.zyngier@arm.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 14 May 2019 04:18:16 -0700
-Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-
-> It will help to add Hardware Error Notification to ACPI tables
-> without using packed C structures and avoid endianness
-> issues as API doesn't need explicit conversion.
+On Fri, Jun 21, 2019 at 10:37:47AM +0100, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
 > 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> Add a new ARM64_HAS_NESTED_VIRT feature to indicate that the
+> CPU has the ARMv8.3 nested virtualization capability.
+> 
+> This will be used to support nested virtualization in KVM.
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  hw/acpi/aml-build.c         | 22 ++++++++++++++++++++++
->  include/hw/acpi/aml-build.h |  8 ++++++++
->  2 files changed, 30 insertions(+)
+>  .../admin-guide/kernel-parameters.txt         |  4 +++
+>  arch/arm64/include/asm/cpucaps.h              |  3 ++-
+>  arch/arm64/include/asm/sysreg.h               |  1 +
+>  arch/arm64/kernel/cpufeature.c                | 26 +++++++++++++++++++
+>  4 files changed, 33 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index 555c24f..fb53f21 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -274,6 +274,28 @@ void build_append_gas(GArray *table, AmlAddressSpace as,
->      build_append_int_noprefix(table, address, 8);
->  }
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index 138f6664b2e2..202bb2115d83 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -2046,6 +2046,10 @@
+>  			[KVM,ARM] Allow use of GICv4 for direct injection of
+>  			LPIs.
 >  
-> +/* Hardware Error Notification
-> + * ACPI 4.0: 17.3.2.7 Hardware Error Notification
-> + */
-> +void build_append_ghes_notify(GArray *table, const uint8_t type,
-> +                              uint8_t length, uint16_t config_write_enable,
-> +                              uint32_t poll_interval, uint32_t vector,
-> +                              uint32_t polling_threshold_value,
-> +                              uint32_t polling_threshold_window,
-> +                              uint32_t error_threshold_value,
-> +                              uint32_t error_threshold_window)
-> +{
-> +        build_append_int_noprefix(table, type, 1); /* type */
-comment should be verbatim copy from spec, in this case /* Type */
-also do the same for other fields below
-
-other than that patch looks good to me
-
-> +        build_append_int_noprefix(table, length, 1);
-> +        build_append_int_noprefix(table, config_write_enable, 2);
-> +        build_append_int_noprefix(table, poll_interval, 4);
-> +        build_append_int_noprefix(table, vector, 4);
-> +        build_append_int_noprefix(table, polling_threshold_value, 4);
-> +        build_append_int_noprefix(table, polling_threshold_window, 4);
-> +        build_append_int_noprefix(table, error_threshold_value, 4);
-> +        build_append_int_noprefix(table, error_threshold_window, 4);
-> +}
+> +	kvm-arm.nested=
+> +			[KVM,ARM] Allow nested virtualization in KVM/ARM.
+> +			Default is 0 (disabled)
 > +
->  /*
->   * Build NAME(XXXX, 0x00000000) where 0x00000000 is encoded as a dword,
->   * and return the offset to 0x00000000 for runtime patching.
-> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> index 1a563ad..90c8ef8 100644
-> --- a/include/hw/acpi/aml-build.h
-> +++ b/include/hw/acpi/aml-build.h
-> @@ -411,6 +411,14 @@ build_append_gas_from_struct(GArray *table, const struct AcpiGenericAddress *s)
->                       s->access_width, s->address);
->  }
->  
-> +void build_append_ghes_notify(GArray *table, const uint8_t type,
-> +                              uint8_t length, uint16_t config_write_enable,
-> +                              uint32_t poll_interval, uint32_t vector,
-> +                              uint32_t polling_threshold_value,
-> +                              uint32_t polling_threshold_window,
-> +                              uint32_t error_threshold_value,
-> +                              uint32_t error_threshold_window);
-> +
->  void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
->                         uint64_t len, int node, MemoryAffinityFlags flags);
->  
 
+In light of the discussion on this patch, is it worth making 0 not
+guarantee that nested is allowed, rather than guaranteeing to disable
+nested?
+
+This would allow the option to be turned into a no-op later once the NV
+code is considered mature enough to rip out all the conditionality.
+
+[...]
+
+Cheers
+---Dave
