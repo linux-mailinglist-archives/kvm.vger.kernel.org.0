@@ -2,565 +2,291 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C8B1C500F0
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 07:21:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EB185045C
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 10:20:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726370AbfFXFVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jun 2019 01:21:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54302 "EHLO mail.kernel.org"
+        id S1727592AbfFXIUr convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 24 Jun 2019 04:20:47 -0400
+Received: from mga09.intel.com ([134.134.136.24]:41178 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726312AbfFXFVF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jun 2019 01:21:05 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 82550208C3;
-        Mon, 24 Jun 2019 05:21:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1561353662;
-        bh=Sywvl8QUIWbXm3ut6KnxLqPmIbYE/gyJP0Sm97cDki8=;
-        h=Date:From:To:Cc:Subject:From;
-        b=lx2h0REDu/DkRTFpVLrzaN42VfRY1vwN3GIb5oyJ6HWUN5jMjZgKKU0d/YSNfDJMw
-         azLHwzsMkqvkl5IQLaOTiPkmdKpTTWskwZxLHHegpafZcOlj0ULYAE6AIDnU5ie+rV
-         8wrhbQQf8i9R2s2YWI4X7p49MZfCv6aPcEYlmU7g=
-Date:   Sun, 23 Jun 2019 22:21:01 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Reminder: 25 open syzbot bugs in kvm subsystem
-Message-ID: <20190624052101.GD30702@sol.localdomain>
+        id S1727223AbfFXIUq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jun 2019 04:20:46 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Jun 2019 01:20:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,411,1557212400"; 
+   d="scan'208";a="359489354"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+  by fmsmga005.fm.intel.com with ESMTP; 24 Jun 2019 01:20:41 -0700
+Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 24 Jun 2019 01:20:40 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.185]) by
+ SHSMSX153.ccr.corp.intel.com ([169.254.12.76]) with mapi id 14.03.0439.000;
+ Mon, 24 Jun 2019 16:20:38 +0800
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: RE: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
+Thread-Topic: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
+Thread-Index: AQHVHsiVLTtm/WvGlEKSmQ2lKcl2F6ajfRGAgAC0NOCAAGOFgIABGcaQgAAh3QCABKzV8A==
+Date:   Mon, 24 Jun 2019 08:20:38 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257439F05415@SHSMSX104.ccr.corp.intel.com>
+References: <1560000071-3543-1-git-send-email-yi.l.liu@intel.com>
+        <1560000071-3543-10-git-send-email-yi.l.liu@intel.com>
+        <20190619222647.72efc76a@x1.home>
+        <A2975661238FB949B60364EF0F2C257439F0164E@SHSMSX104.ccr.corp.intel.com>
+        <20190620150757.7b2fa405@x1.home>
+        <A2975661238FB949B60364EF0F2C257439F02663@SHSMSX104.ccr.corp.intel.com>
+ <20190621095740.41e6e98e@x1.home>
+In-Reply-To: <20190621095740.41e6e98e@x1.home>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.0.600.7
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNTZlZDhiNjUtNGY3ZC00NWY5LWJlMTAtNzM4ZWFjMWU4YWJjIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiajJ1bUxoOUlLSk1xeThZbCs5MlZcL3R0dURLU0dUVHVsSndpTTVyVzJTbmU5d3pyUGlwM3Q0NU9yZUU2UTIyRkcifQ==
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[This email was generated by a script.  Let me know if you have any suggestions
-to make it better.]
-
-Of the currently open syzbot reports against the upstream kernel, I've manually
-marked 25 of them as possibly being bugs in the kvm subsystem.  I've listed
-these reports below, sorted by an algorithm that tries to list first the reports
-most likely to be still valid, important, and actionable.
-
-Of these 25 bugs, 4 were seen in mainline in the last week.
-
-If you believe a bug is no longer valid, please close the syzbot report by
-sending a '#syz fix', '#syz dup', or '#syz invalid' command in reply to the
-original thread, as explained at https://goo.gl/tpsmEJ#status
-
-If you believe I misattributed a bug to the kvm subsystem, please let me know,
-and if possible forward the report to the correct people or mailing list.
-
-Here are the bugs:
-
---------------------------------------------------------------------------------
-Title:              unexpected kernel reboot (3)
-Last occurred:      0 days ago
-Reported:           345 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=321861b1588b44d064b779b92293c5d55cfe8430
-Original thread:    https://lkml.kernel.org/lkml/000000000000eb546f0570e84e90@google.com/T/#u
-
-This bug has a C reproducer.
-
-The original thread for this bug received 2 replies; the last was 342 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+cce9ef2dd25246f815ee@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000eb546f0570e84e90@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING in kvm_arch_vcpu_ioctl_run (3)
-Last occurred:      6 days ago
-Reported:           452 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=4d7de0e6a195b6a5ffef01d2776e737a52c7de60
-Original thread:    https://lkml.kernel.org/lkml/000000000000d05a78056873bc47@google.com/T/#u
-
-This bug has a C reproducer.
-
-syzbot has bisected this bug, but I think the bisection result is incorrect.
-
-The original thread for this bug received 1 reply, 452 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+760a73552f47a8cd0fd9@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000d05a78056873bc47@google.com
-
---------------------------------------------------------------------------------
-Title:              INFO: rcu detected stall in kvm_vcpu_ioctl
-Last occurred:      6 days ago
-Reported:           285 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=ab7b91f104d7f018e85924d8d109ec7f895d8b61
-Original thread:    https://lkml.kernel.org/lkml/000000000000e0d794057592192b@google.com/T/#u
-
-This bug has a syzkaller reproducer only.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+e9b1e8f574404b6e4ed3@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000e0d794057592192b@google.com
-
---------------------------------------------------------------------------------
-Title:              BUG: unable to handle kernel paging request in init_srcu_struct_fields
-Last occurred:      0 days ago
-Reported:           174 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=213ca2ed63e07dd093373791a18f27ad08e91820
-Original thread:    https://lkml.kernel.org/lkml/00000000000023f74b057e4c0890@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+010232b93d20ef8abde5@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/00000000000023f74b057e4c0890@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Read in do_general_protection
-Last occurred:      62 days ago
-Reported:           393 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=d5d780ebdea00d45e7dcca8b25d9d7d2aff7da6c
-Original thread:    https://lkml.kernel.org/lkml/0000000000006370c3056d1855e7@google.com/T/#u
-
-This bug has a C reproducer.
-
-The original thread for this bug received 4 replies; the last was 368 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+a1264132fc103340628f@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000006370c3056d1855e7@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Write in preempt_notifier_register (2)
-Last occurred:      275 days ago
-Reported:           316 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=29b67450152e0c106ab336b5bf3ccd58a91ecc62
-Original thread:    https://lkml.kernel.org/lkml/000000000000dcf0c905732d9766@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+d5d3b529a776503b24a2@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000dcf0c905732d9766@google.com
-
---------------------------------------------------------------------------------
-Title:              BUG: soft lockup in kvm_vm_ioctl
-Last occurred:      57 days ago
-Reported:           53 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=60ff874c7b251129e028c90b5d4926c5b3fccbe2
-Original thread:    https://lkml.kernel.org/lkml/000000000000fb78720587d46fe9@google.com/T/#u
-
-This bug has a syzkaller reproducer only.
-
-syzbot has bisected this bug, but I think the bisection result is incorrect.
-
-The original thread for this bug has received 8 replies; the last was 45 days
-ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+8d9bb6157e7b379f740e@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000fb78720587d46fe9@google.com
-
---------------------------------------------------------------------------------
-Title:              KMSAN: uninit-value in vmx_queue_exception
-Last occurred:      110 days ago
-Reported:           202 days ago
-Branches:           Mainline (with KMSAN patches)
-Dashboard link:     https://syzkaller.appspot.com/bug?id=50d43beb06a4fa9c4f118b91a40782190b7a24df
-Original thread:    https://lkml.kernel.org/lkml/000000000000ba5be2057c1e01fa@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+788c6e0a154504bd4b99@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000ba5be2057c1e01fa@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Read in kvm_write_guest_offset_cached
-Last occurred:      201 days ago
-Reported:           208 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=afea9ed76a23a523078c90db91357c7f63019754
-Original thread:    https://lkml.kernel.org/lkml/000000000000ce78d7057b9e2ee1@google.com/T/#u
-
-This bug has a syzkaller reproducer only.
-
-The original thread for this bug received 2 replies; the last was 208 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+ff40b9bc4835ea83211c@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000ce78d7057b9e2ee1@google.com
-
---------------------------------------------------------------------------------
-Title:              KASAN: use-after-free Read in __schedule (2)
-Last occurred:      107 days ago
-Reported:           325 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=8f063539d4ecf1faf3132624b57a641e923ee25a
-Original thread:    https://lkml.kernel.org/lkml/0000000000000cc0de0572736043@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+ceded3495a1d59f2d244@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000000cc0de0572736043@google.com
-
---------------------------------------------------------------------------------
-Title:              BUG: unable to handle kernel paging request in vmx_vcpu_run
-Last occurred:      324 days ago
-Reported:           438 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=b67fcc95c0d84ea5424813a0d8703fc5c06de7ee
-Original thread:    https://lkml.kernel.org/lkml/001a113fe6c049450f05699315cb@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+ef99b30646419e80cae3@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/001a113fe6c049450f05699315cb@google.com
-
---------------------------------------------------------------------------------
-Title:              BUG: soft lockup in kvm_vm_release
-Last occurred:      130 days ago
-Reported:           130 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=eff432af8dea9e5e0d14acdae66b51ef49ccb5ee
-Original thread:    https://lkml.kernel.org/lkml/00000000000071be120581ca41ed@google.com/T/#u
-
-This bug has a syzkaller reproducer only.
-
-syzbot has bisected this bug, but I think the bisection result is incorrect.
-
-The original thread for this bug received 2 replies; the last was 89 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+6349a512c2938b2ad058@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/00000000000071be120581ca41ed@google.com
-
---------------------------------------------------------------------------------
-Title:              BUG: spinlock cpu recursion on CPU, syz-executor
-Last occurred:      230 days ago
-Reported:           229 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=f01676cbfa1ad4601b3c7e31384ff0ba286eeb46
-Original thread:    https://lkml.kernel.org/lkml/000000000000645f00057a092b8c@google.com/T/#u
-
-This bug has a syzkaller reproducer only.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+e9a3960298616a5a5abc@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000645f00057a092b8c@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING: kernel stack regs has bad value (2)
-Last occurred:      331 days ago
-Reported:           343 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=0afc6db1b73dfa1659778cf6d03184bc5e4c2120
-Original thread:    https://lkml.kernel.org/lkml/00000000000063079a057109b225@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+adcfacd9eff46da50187@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/00000000000063079a057109b225@google.com
-
---------------------------------------------------------------------------------
-Title:              general protection fault in __schedule (2)
-Last occurred:      273 days ago
-Reported:           317 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=90cd06695bd4650a5228385b4b02f370ef9c219f
-Original thread:    https://lkml.kernel.org/lkml/000000000000e67a05057314ddf6@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+7e2ab84953e4084a638d@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000e67a05057314ddf6@google.com
-
---------------------------------------------------------------------------------
-Title:              BUG: unable to handle kernel paging request in mmu_page_zap_pte
-Last occurred:      112 days ago
-Reported:           242 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=9b2a57e149a6feaa03d7b21b17cff6d62f090ed4
-Original thread:    https://lkml.kernel.org/lkml/000000000000ba0e9c0578f7460f@google.com/T/#u
-
-This bug has a syzkaller reproducer only.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+ba439f0471266afef763@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000ba0e9c0578f7460f@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING in mmu_spte_clear_track_bits (2)
-Last occurred:      164 days ago
-Reported:           176 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=921b1c05b62b10255ce0107b9ac04a3528861d40
-Original thread:    https://lkml.kernel.org/lkml/0000000000006f735c057e312722@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+9aaa207a0b90b704eeda@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000006f735c057e312722@google.com
-
---------------------------------------------------------------------------------
-Title:              general protection fault in kvm_pv_send_ipi
-Last occurred:      199 days ago
-Reported:           298 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=f8d5004f6f749ecefaa2843e429848795cc2023f
-Original thread:    https://lkml.kernel.org/lkml/000000000000a819440574900515@google.com/T/#u
-
-This bug has a syzkaller reproducer only.
-
-syzbot has bisected this bug, but I think the bisection result is incorrect.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+86c0a866f80d88349f1f@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/000000000000a819440574900515@google.com
-
---------------------------------------------------------------------------------
-Title:              INFO: rcu detected stall in vcpu_enter_guest
-Last occurred:      287 days ago
-Reported:           413 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=1fac0fd91219f3f2a03d6fa7deafc95fbed79cc2
-Original thread:    https://lkml.kernel.org/lkml/0000000000002b8fac056b863655@google.com/T/#u
-
-This bug has a syzkaller reproducer only.
-
-The original thread for this bug received 1 reply, 413 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+f58b8603b48434ef07d3@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000002b8fac056b863655@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING in x86_emulate_insn
-Last occurred:      519 days ago
-Reported:           565 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=c71f503ed91564f669d67ea159101451973968ef
-Original thread:    https://lkml.kernel.org/lkml/001a1143d526c5b1aa055f9d604c@google.com/T/#u
-
-This bug has a C reproducer.
-
-The original thread for this bug received 14 replies; the last was 558 days ago.
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/001a1143d526c5b1aa055f9d604c@google.com
-
---------------------------------------------------------------------------------
-Title:              BUG: unable to handle kernel paging request in __kvm_mmu_prepare_zap_page
-Last occurred:      107 days ago
-Reported:           118 days ago
-Branches:           linux-next
-Dashboard link:     https://syzkaller.appspot.com/bug?id=341c5e4453a8c9943babf25c9d32ff11f81c805c
-Original thread:    https://lkml.kernel.org/lkml/00000000000062c2f60582b90e7d@google.com/T/#u
-
-This bug has a syzkaller reproducer only.
-
-The original thread for this bug received 1 reply, 118 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+222746e0104bbb617d51@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/00000000000062c2f60582b90e7d@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING in _cleanup_srcu_struct
-Last occurred:      154 days ago
-Reported:           167 days ago
-Branches:           Mainline
-Dashboard link:     https://syzkaller.appspot.com/bug?id=91cf59ba0ce7dd171877f2ec35d53e5e661033ba
-Original thread:    https://lkml.kernel.org/lkml/00000000000015955c057edb3905@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+5a1bbe3f318ef61ece61@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/00000000000015955c057edb3905@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING in kvm_set_tsc_khz
-Last occurred:      319 days ago
-Reported:           316 days ago
-Branches:           linux-next
-Dashboard link:     https://syzkaller.appspot.com/bug?id=0b7ea1ad0e2fa94a69f950c44da50bfe99298d1d
-Original thread:    https://lkml.kernel.org/lkml/0000000000007fc64805732b7f38@google.com/T/#u
-
-This bug has a C reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+c03f30b4f4c46bdf8575@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000007fc64805732b7f38@google.com
-
---------------------------------------------------------------------------------
-Title:              WARNING: kernel stack regs has bad 'bp' value (4)
-Last occurred:      118 days ago
-Reported:           342 days ago
-Branches:           Mainline and others
-Dashboard link:     https://syzkaller.appspot.com/bug?id=f2be2d01521281be5055a39ed0cbdbfce0d31e30
-Original thread:    https://lkml.kernel.org/lkml/0000000000000696430571197fe9@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-The original thread for this bug received 1 reply, 342 days ago.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+f337218531b644bdeb70@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000000696430571197fe9@google.com
-
---------------------------------------------------------------------------------
-Title:              kernel BUG at arch/x86/kvm/x86.c:LINE! (3)
-Last occurred:      107 days ago
-Reported:           107 days ago
-Branches:           linux-next
-Dashboard link:     https://syzkaller.appspot.com/bug?id=913a2603278d2a0656f8112cc9c229241d68fea9
-Original thread:    https://lkml.kernel.org/lkml/0000000000008adf52058398fa93@google.com/T/#u
-
-Unfortunately, this bug does not have a reproducer.
-
-No one replied to the original thread for this bug.
-
-If you fix this bug, please add the following tag to the commit:
-    Reported-by: syzbot+83a3e122f8c1b25b3111@syzkaller.appspotmail.com
-
-If you send any email or patch for this bug, please consider replying to the
-original thread.  For the git send-email command to use, or tips on how to reply
-if the thread isn't in your mailbox, see the "Reply instructions" at
-https://lkml.kernel.org/r/0000000000008adf52058398fa93@google.com
-
+Hi Alex,
+
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: Friday, June 21, 2019 11:58 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>
+> Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
+> 
+> On Fri, 21 Jun 2019 10:23:10 +0000
+> "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> 
+> > Hi Alex,
+> >
+> > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > > Sent: Friday, June 21, 2019 5:08 AM
+> > > To: Liu, Yi L <yi.l.liu@intel.com>
+> > > Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
+> > >
+> > > On Thu, 20 Jun 2019 13:00:34 +0000
+> > > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> > >
+> > > > Hi Alex,
+> > > >
+> > > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > > > > Sent: Thursday, June 20, 2019 12:27 PM
+> > > > > To: Liu, Yi L <yi.l.liu@intel.com>
+> > > > > Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
+> > > > >
+> > > > > On Sat,  8 Jun 2019 21:21:11 +0800
+> > > > > Liu Yi L <yi.l.liu@intel.com> wrote:
+> > > > >
+> > > > > > This patch adds sample driver named vfio-mdev-pci. It is to wrap
+> > > > > > a PCI device as a mediated device. For a pci device, once bound
+> > > > > > to vfio-mdev-pci driver, user space access of this device will
+> > > > > > go through vfio mdev framework. The usage of the device follows
+> > > > > > mdev management method. e.g. user should create a mdev before
+> > > > > > exposing the device to user-space.
+> > [...]
+> > > >
+> > > > > However, the patch below just makes the mdev interface behave
+> > > > > correctly, I can't make it work on my system because commit
+> > > > > 7bd50f0cd2fd ("vfio/type1: Add domain at(de)taching group helpers")
+> > > >
+> > > > What error did you encounter. I tested the patch with a device in a
+> > > > singleton iommu group. I'm also searching a proper machine with
+> > > > multiple devices in an iommu group and test it.
+> > >
+> > > In vfio_iommu_type1, iommu backed mdev devices use the
+> > > iommu_attach_device() interface, which includes:
+> > >
+> > >         if (iommu_group_device_count(group) != 1)
+> > >                 goto out_unlock;
+> > >
+> > > So it's impossible to use with non-singleton groups currently.
+> >
+> > Hmmm, I think it is no longer good to use iommu_attach_device() for iommu
+> > backed mdev devices now. In this flow, the purpose here is to attach a device
+> > to a domain and no need to check whether the device is in a singleton iommu
+> > group. I think it would be better to use __iommu_attach_device() instead of
+> > iommu_attach_device().
+> 
+> That's a static and unexported, it's intentionally not an exposed
+> interface.  We can't attach devices in the same group to separate
+> domains allocated through iommu_domain_alloc(), this would violate the
+> iommu group isolation principles.
+
+Go it. :-) Then not good to expose such interface. But to support devices in
+non-singleton iommu group, we need to have a new interface which doesn't
+count the devices but attach all the devices.
+
+> > Also I found a potential mutex lock issue if using iommu_attach_device().
+> > In vfio_iommu_attach_group(), it uses iommu_group_for_each_dev() to loop
+> > all the devices in the group. It holds group->mutex. And then
+> vfio_mdev_attach_domain()
+> > calls iommu_attach_device() which also tries to get group->mutex. This would be
+> > an issue. If you are fine with it, I may post another patch for it. :-)
+> 
+> Gack, yes, please send a patch.
+
+Would do it, may be together with the support of vfio-mdev-pci on devices in
+non-singleton iommu group.
+
+> 
+> > > > > used iommu_attach_device() rather than iommu_attach_group() for non-aux
+> > > > > mdev iommu_device.  Is there a requirement that the mdev parent device
+> > > > > is in a singleton iommu group?
+> > > >
+> > > > I don't think there should have such limitation. Per my understanding,
+> > > > vfio-mdev-pci should also be able to bind to devices which shares
+> > > > iommu group with other devices. vfio-pci works well for such devices.
+> > > > And since the two drivers share most of the codes, I think vfio-mdev-pci
+> > > > should naturally support it as well.
+> > >
+> > > Yes, the difference though is that vfio.c knows when devices are in the
+> > > same group, which mdev vfio.c only knows about the non-iommu backed
+> > > group, not the group that is actually used for the iommu backing.  So
+> > > we either need to enlighten vfio.c or further abstract those details in
+> > > vfio_iommu_type1.c.
+> >
+> > Not sure if it is necessary to introduce more changes to vfio.c or
+> > vfio_iommu_type1.c. If it's only for the scenario which two devices share an
+> > iommu_group, I guess it could be supported by using __iommu_attach_device()
+> > which has no device counting for the group. But maybe I missed something
+> > here. It would be great if you can elaborate a bit for it. :-)
+> 
+> We need to use the group semantics, there's a reason
+> __iommu_attach_device() is not exposed, it's an internal helper.  I
+> think there's no way around that we need to somewhere track the actual
+> group we're attaching to and have the smarts to re-use it for other
+> devices in the same group.
+
+Hmmm, exposing __iommu_attach_device() is not good, let's forget it. :-)
+
+> > > > > If this is a simplification, then
+> > > > > vfio-mdev-pci should not bind to devices where this is violated since
+> > > > > there's no way to use the device.  Can we support it though?
+> > > >
+> > > > yeah, I think we need to support it.
+> > > >
+> > > > > If I have two devices in the same group and bind them both to
+> > > > > vfio-mdev-pci, I end up with three groups, one for each mdev device and
+> > > > > the original physical device group.  vfio.c works with the mdev groups
+> > > > > and will try to match both groups to the container.  vfio_iommu_type1.c
+> > > > > also works with the mdev groups, except for the point where we actually
+> > > > > try to attach a group to a domain, which is the only window where we use
+> > > > > the iommu_device rather than the provided group, but we don't record
+> > > > > that anywhere.  Should struct vfio_group have a pointer to a reference
+> > > > > counted object that tracks the actual iommu_group attached, such that
+> > > > > we can determine that the group is already attached to the domain and
+> > > > > not try to attach again?
+> > > >
+> > > > Agreed, we need to avoid such duplicated attach. Instead of adding
+> > > > reference counted object in vfio_group. I'm also considering the logic
+> > > > below:
+> >
+> > Re-walked the code, I find the duplicated attach will happen on the vfio-mdev-pci
+> > device as vfio_mdev_attach_domain() only attaches the parent devices of
+> > iommu backed mdevs instead of all the devices within the physical iommu_group.
+> > While for a vfio-pci device, it will use iommu_attach_group() which attaches all the
+> > devices within the iommu backed group. The same with detach,
+> > vfio_mdev_detach_domain() detaches selective devices instead of all devices
+> within
+> > the iommu backed group.
+> 
+> Yep, that's not good, for the non-aux case we need to follow the usual
+> group semantics or else we're limited to singleton groups.
+
+yep.
+
+> 
+> > > >     /*
+> > > >       * Do this check in vfio_iommu_type1_attach_group(), after mdev_group
+> > > >       * is initialized.
+> > > >       */
+> > > >     if (vfio_group->mdev_group) {
+> > > >          /*
+> > > >            * vfio_group->mdev_group is true means vfio_group->iommu_group
+> > > >            * is not the actual iommu_group which is going to be attached to
+> > > >            * domain. To avoid duplicate iommu_group attach, needs to check if
+> > > >            * the actual iommu_group. vfio_get_parent_iommu_group() is a
+> > > >            * newly added helper function which returns the actual attach
+> > > >            * iommu_group going to be attached for this mdev group.
+> > > >               */
+> > > >          p_iommu_group = vfio_get_parent_iommu_group(
+> > > >                                                                          vfio_group->iommu_group);
+> > > >          list_for_each_entry(d, &iommu->domain_list, next) {
+> > > >                  if (find_iommu_group(d, p_iommu_group)) {
+> > > >                          mutex_unlock(&iommu->lock);
+> > > >                          // skip group attach;
+> > > >                  }
+> > > >          }
+> > >
+> > > We don't currently create a struct vfio_group for the parent, only for
+> > > the mdev iommu group.  The iommu_attach for an iommu backed mdev
+> > > doesn't leave any traces of where it is actually attached, we just
+> > > count on retracing our steps for the detach.  That's why I'm thinking
+> > > we need an object somewhere to track it and it needs to be reference
+> > > counted so that if both a vfio-mdev-pci device and a vfio-pci device
+> > > are using it, we leave it in place if either one is removed.
+> >
+> > Hmmm, here we are talking about tracking in iommu_group level though
+> > no good idea on where the object should  be placed yet. However, we may
+> > need to tack in device level as I mentioned in above paragraph. If not,
+> > there may be sequence issue. e.g. if vfio-mdev-pci device is attached
+> > firstly, then the object will be initialized, and when vfio-pci device is
+> > attached, we will find the attach should be skipped and just inc the ref count.
+> > But actually it should not be skipped since the vfio-mdev-pci attach does not
+> > attach all devices within the iommu backed group.
+> 
+> We can't do that though, the entire group needs to be attached.
+
+Agree, may be getting another interface which is similar with
+iommu_attach_device(), but works for devices which is in non-singleton
+groups. So the attach for iommu backed mdev will also result in a sound
+attach to all the devices which share iommu group with the parent device.
+This is just like vfio-pci devices. For the object for tracking purpose may be
+as below:
+
+struct vfio_iommu_object {
+	struct iommu_group *group;
+	struct kref kref;
+};
+
+And I think it should be per-domain and per-iommu backed group since
+aux-domain support allows a iommu backed group to be attached to
+multiple domains. I'm considering if it is ok to have a list in vfio_domain.
+Before each domain attach, vfio should do a check in the list if the iommu
+backed group has been attached already. For vfio-pci devices, use its iommu
+group to do a search in the list. For vfio-mdev-pci devices, use its parent
+devices iommu group to do a search. Thus avoid duplicate attach. Thoughts?
+ 
+> > What's more, regards to sIOV case,  a parent devices may have multiple
+> > mdevs and the mdevs may be assigned to the same VM. Thus there will be multiple
+> > attach on this parent device. This also makes me believe track in device level would
+> > be better.
+> 
+> The aux domain support essentially specifies that the device can be
+> attached to multiple domains, so I think we're ok for device-level
+> group attach there, but not for bare iommu backed devices.  Thanks,
+
+Got it.
+
+Thanks,
+Yi Liu
