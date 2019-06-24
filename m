@@ -2,101 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E116650A0B
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 13:46:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DADA750A32
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2019 13:55:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729791AbfFXLq0 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Mon, 24 Jun 2019 07:46:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40134 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729143AbfFXLq0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jun 2019 07:46:26 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 908203086202;
-        Mon, 24 Jun 2019 11:46:25 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A53E660BFC;
-        Mon, 24 Jun 2019 11:46:24 +0000 (UTC)
-Date:   Mon, 24 Jun 2019 13:46:22 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Farhan Ali <alifm@linux.ibm.com>
-Cc:     Eric Farman <farman@linux.ibm.com>, pasic@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [RFC v1 1/1] vfio-ccw: Don't call cp_free if we are processing
- a channel program
-Message-ID: <20190624134622.2bb3bba2.cohuck@redhat.com>
-In-Reply-To: <20190624120514.4b528db5.cohuck@redhat.com>
-References: <cover.1561055076.git.alifm@linux.ibm.com>
-        <46dc0cbdcb8a414d70b7807fceb1cca6229408d5.1561055076.git.alifm@linux.ibm.com>
-        <638804dc-53c0-ff2f-d123-13c257ad593f@linux.ibm.com>
-        <581d756d-7418-cd67-e0e8-f9e4fe10b22d@linux.ibm.com>
-        <2d9c04ba-ee50-2f9b-343a-5109274ff52d@linux.ibm.com>
-        <56ced048-8c66-a030-af35-8afbbd2abea8@linux.ibm.com>
-        <20190624114231.2d81e36f.cohuck@redhat.com>
-        <20190624120514.4b528db5.cohuck@redhat.com>
-Organization: Red Hat GmbH
+        id S1729791AbfFXLzL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jun 2019 07:55:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58220 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729664AbfFXLzK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 24 Jun 2019 07:55:10 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5OBqmQY178417
+        for <kvm@vger.kernel.org>; Mon, 24 Jun 2019 07:55:09 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2taumcq0vn-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 24 Jun 2019 07:55:09 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
+        Mon, 24 Jun 2019 12:55:07 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 24 Jun 2019 12:55:05 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5OBt42T52822230
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 24 Jun 2019 11:55:04 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2C03042047;
+        Mon, 24 Jun 2019 11:55:04 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CBBA742041;
+        Mon, 24 Jun 2019 11:55:03 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.87])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 24 Jun 2019 11:55:03 +0000 (GMT)
+Subject: Re: [PATCH] vfio-ccw: make convert_ccw0_to_ccw1 static
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>
+Cc:     Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20190624090721.16241-1-cohuck@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ mQINBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
+ J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
+ CmUXDYq9J7uOyQQ7TNVoQejmpp5ifR4EzwIFfmYDekxRVZDJygD0wL/EzUr8Je3/j548NLyL
+ 4Uhv6CIPf3TY3/aLVKXdxz/ntbLgMcfZsDoHgDk3lY3r1iwbWwEM2+eYRdSZaR4VD+JRD7p8
+ 0FBadNwWnBce1fmQp3EklodGi5y7TNZ/CKdJ+jRPAAnw7SINhSd7PhJMruDAJaUlbYaIm23A
+ +82g+IGe4z9tRGQ9TAflezVMhT5J3ccu6cpIjjvwDlbxucSmtVi5VtPAMTLmfjYp7VY2Tgr+
+ T92v7+V96jAfE3Zy2nq52e8RDdUo/F6faxcumdl+aLhhKLXgrozpoe2nL0Nyc2uqFjkjwXXI
+ OBQiaqGeWtxeKJP+O8MIpjyGuHUGzvjNx5S/592TQO3phpT5IFWfMgbu4OreZ9yekDhf7Cvn
+ /fkYsiLDz9W6Clihd/xlpm79+jlhm4E3xBPiQOPCZowmHjx57mXVAypOP2Eu+i2nyQrkapaY
+ IdisDQfWPdNeHNOiPnPS3+GhVlPcqSJAIWnuO7Ofw1ZVOyg/jwARAQABtDRDaHJpc3RpYW4g
+ Qm9ybnRyYWVnZXIgKElCTSkgPGJvcm50cmFlZ2VyQGRlLmlibS5jb20+iQI4BBMBAgAiBQJO
+ nDz4AhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRARe7yAtaYcfOYVD/9sqc6ZdYKD
+ bmDIvc2/1LL0g7OgiA8pHJlYN2WHvIhUoZUIqy8Sw2EFny/nlpPVWfG290JizNS2LZ0mCeGZ
+ 80yt0EpQNR8tLVzLSSr0GgoY0lwsKhAnx3p3AOrA8WXsPL6prLAu3yJI5D0ym4MJ6KlYVIjU
+ ppi4NLWz7ncA2nDwiIqk8PBGxsjdc/W767zOOv7117rwhaGHgrJ2tLxoGWj0uoH3ZVhITP1z
+ gqHXYaehPEELDV36WrSKidTarfThCWW0T3y4bH/mjvqi4ji9emp1/pOWs5/fmd4HpKW+44tD
+ Yt4rSJRSa8lsXnZaEPaeY3nkbWPcy3vX6qafIey5d8dc8Uyaan39WslnJFNEx8cCqJrC77kI
+ vcnl65HaW3y48DezrMDH34t3FsNrSVv5fRQ0mbEed8hbn4jguFAjPt4az1xawSp0YvhzwATJ
+ YmZWRMa3LPx/fAxoolq9cNa0UB3D3jmikWktm+Jnp6aPeQ2Db3C0cDyxcOQY/GASYHY3KNra
+ z8iwS7vULyq1lVhOXg1EeSm+lXQ1Ciz3ub3AhzE4c0ASqRrIHloVHBmh4favY4DEFN19Xw1p
+ 76vBu6QjlsJGjvROW3GRKpLGogQTLslbjCdIYyp3AJq2KkoKxqdeQYm0LZXjtAwtRDbDo71C
+ FxS7i/qfvWJv8ie7bE9A6Wsjn7kCDQROnDz4ARAAmPI1e8xB0k23TsEg8O1sBCTXkV8HSEq7
+ JlWz7SWyM8oFkJqYAB7E1GTXV5UZcr9iurCMKGSTrSu3ermLja4+k0w71pLxws859V+3z1jr
+ nhB3dGzVZEUhCr3EuN0t8eHSLSMyrlPL5qJ11JelnuhToT6535cLOzeTlECc51bp5Xf6/XSx
+ SMQaIU1nDM31R13o98oRPQnvSqOeljc25aflKnVkSfqWSrZmb4b0bcWUFFUKVPfQ5Z6JEcJg
+ Hp7qPXHW7+tJTgmI1iM/BIkDwQ8qe3Wz8R6rfupde+T70NiId1M9w5rdo0JJsjKAPePKOSDo
+ RX1kseJsTZH88wyJ30WuqEqH9zBxif0WtPQUTjz/YgFbmZ8OkB1i+lrBCVHPdcmvathknAxS
+ bXL7j37VmYNyVoXez11zPYm+7LA2rvzP9WxR8bPhJvHLhKGk2kZESiNFzP/E4r4Wo24GT4eh
+ YrDo7GBHN82V4O9JxWZtjpxBBl8bH9PvGWBmOXky7/bP6h96jFu9ZYzVgIkBP3UYW+Pb1a+b
+ w4A83/5ImPwtBrN324bNUxPPqUWNW0ftiR5b81ms/rOcDC/k/VoN1B+IHkXrcBf742VOLID4
+ YP+CB9GXrwuF5KyQ5zEPCAjlOqZoq1fX/xGSsumfM7d6/OR8lvUPmqHfAzW3s9n4lZOW5Jfx
+ bbkAEQEAAYkCHwQYAQIACQUCTpw8+AIbDAAKCRARe7yAtaYcfPzbD/9WNGVf60oXezNzSVCL
+ hfS36l/zy4iy9H9rUZFmmmlBufWOATjiGAXnn0rr/Jh6Zy9NHuvpe3tyNYZLjB9pHT6mRZX7
+ Z1vDxeLgMjTv983TQ2hUSlhRSc6e6kGDJyG1WnGQaqymUllCmeC/p9q5m3IRxQrd0skfdN1V
+ AMttRwvipmnMduy5SdNayY2YbhWLQ2wS3XHJ39a7D7SQz+gUQfXgE3pf3FlwbwZhRtVR3z5u
+ aKjxqjybS3Ojimx4NkWjidwOaUVZTqEecBV+QCzi2oDr9+XtEs0m5YGI4v+Y/kHocNBP0myd
+ pF3OoXvcWdTb5atk+OKcc8t4TviKy1WCNujC+yBSq3OM8gbmk6NwCwqhHQzXCibMlVF9hq5a
+ FiJb8p4QKSVyLhM8EM3HtiFqFJSV7F+h+2W0kDyzBGyE0D8z3T+L3MOj3JJJkfCwbEbTpk4f
+ n8zMboekuNruDw1OADRMPlhoWb+g6exBWx/YN4AY9LbE2KuaScONqph5/HvJDsUldcRN3a5V
+ RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
+ oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
+ syiRa+UVlsKmx1hsEg==
+Date:   Mon, 24 Jun 2019 13:55:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Mon, 24 Jun 2019 11:46:25 +0000 (UTC)
+In-Reply-To: <20190624090721.16241-1-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19062411-0016-0000-0000-0000028BDC5E
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19062411-0017-0000-0000-000032E9481A
+Message-Id: <dceaeaf9-b961-c4c7-45e5-d8dc31b68b31@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-24_09:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906240099
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 24 Jun 2019 12:05:14 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
 
-> On Mon, 24 Jun 2019 11:42:31 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
+On 24.06.19 11:07, Cornelia Huck wrote:
+> Reported by sparse.
 > 
-> > On Fri, 21 Jun 2019 14:34:10 -0400
-> > Farhan Ali <alifm@linux.ibm.com> wrote:
-> >   
-> > > On 06/21/2019 01:40 PM, Eric Farman wrote:  
-> > > > 
-> > > > 
-> > > > On 6/21/19 10:17 AM, Farhan Ali wrote:    
-> > > >>
-> > > >>
-> > > >> On 06/20/2019 04:27 PM, Eric Farman wrote:    
-> > > >>>
-> > > >>>
-> > > >>> On 6/20/19 3:40 PM, Farhan Ali wrote:    
-
-> > > >>>> diff --git a/drivers/s390/cio/vfio_ccw_drv.c
-> > > >>>> b/drivers/s390/cio/vfio_ccw_drv.c
-> > > >>>> index 66a66ac..61ece3f 100644
-> > > >>>> --- a/drivers/s390/cio/vfio_ccw_drv.c
-> > > >>>> +++ b/drivers/s390/cio/vfio_ccw_drv.c
-> > > >>>> @@ -88,7 +88,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct
-> > > >>>> *work)
-> > > >>>>                 (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
-> > > >>>>        if (scsw_is_solicited(&irb->scsw)) {
-> > > >>>>            cp_update_scsw(&private->cp, &irb->scsw);    
-> > > >>>
-> > > >>> As I alluded earlier, do we know this irb is for this cp?  If no, what
-> > > >>> does this function end up putting in the scsw?  
-> > 
-> > Yes, I think this also needs to check whether we have at least a prior
-> > start function around. (We use the orb provided by the guest; maybe we
-> > should check if that intparm is set in the irb?)  
+> Fixes: 7f8e89a8f2fd ("vfio-ccw: Factor out the ccw0-to-ccw1 transition")
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+> On top of my vfio-ccw branch.
 > 
-> Hrm; not so easy as we always set the intparm to the address of the
-> subchannel structure... 
+> s390 arch maintainers: let me know if I should queue it and send
+> a pull request, or if you prefer to apply it directly.
+
+I still have to sort out some tooling for the s390 tree and I applied it directly.
+Thanks
+
+> ---
+>  drivers/s390/cio/vfio_ccw_cp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Maybe check if we have have one of the conditions of the large table
-> 16-6 and correlate to the ccw address? Or is it enough to check the
-> function control? (Don't remember when the hardware resets it.)
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index 9cddc1288059..a7b9dfd5b464 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -161,7 +161,7 @@ static inline void pfn_array_idal_create_words(
+>  	idaws[0] += pa->pa_iova & (PAGE_SIZE - 1);
+>  }
+>  
+> -void convert_ccw0_to_ccw1(struct ccw1 *source, unsigned long len)
+> +static void convert_ccw0_to_ccw1(struct ccw1 *source, unsigned long len)
+>  {
+>  	struct ccw0 ccw0;
+>  	struct ccw1 *pccw1 = source;
+> 
 
-Nope, we cannot look at the function control, as csch clears any set
-start function bit :( (see "Function Control", pg 16-13)
-
-I think this problem mostly boils down to "csch clears pending status;
-therefore, we may only get one interrupt, even though there had been a
-start function going on". If we only go with what the hardware gives
-us, I don't see a way to distinguish "clear with a prior start" from
-"clear only". Maybe we want to track an "issued" status in the cp?
