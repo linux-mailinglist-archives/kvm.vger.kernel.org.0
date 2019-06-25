@@ -2,187 +2,440 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3915A55894
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 22:15:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34802558B2
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 22:24:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727210AbfFYUPx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 16:15:53 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9540 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726414AbfFYUPx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jun 2019 16:15:53 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5PKD2fo106566
-        for <kvm@vger.kernel.org>; Tue, 25 Jun 2019 16:15:52 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2tbs0uujqh-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 25 Jun 2019 16:15:51 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 25 Jun 2019 21:15:50 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 25 Jun 2019 21:15:38 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5PKFZPg49283318
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Jun 2019 20:15:36 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C91614C062;
-        Tue, 25 Jun 2019 20:15:35 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3C4864C04E;
-        Tue, 25 Jun 2019 20:15:35 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.159.147])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 25 Jun 2019 20:15:35 +0000 (GMT)
-Subject: Re: [PATCH v9 4/4] s390: ap: kvm: Enable PQAP/AQIC facility for the
- guest
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, frankja@linux.ibm.com, akrowiak@linux.ibm.com,
-        pasic@linux.ibm.com, david@redhat.com, heiko.carstens@de.ibm.com,
-        freude@linux.ibm.com, mimu@linux.ibm.com
-References: <1558452877-27822-1-git-send-email-pmorel@linux.ibm.com>
- <1558452877-27822-5-git-send-email-pmorel@linux.ibm.com>
- <69ca50bd-3f5c-98b1-3b39-04af75151baf@de.ibm.com>
+        id S1726712AbfFYUYp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 16:24:45 -0400
+Received: from mga01.intel.com ([192.55.52.88]:57808 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726053AbfFYUYo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 16:24:44 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Jun 2019 13:24:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,417,1557212400"; 
+   d="scan'208";a="172486070"
+Received: from ray.jf.intel.com (HELO [10.7.201.139]) ([10.7.201.139])
+  by orsmga002.jf.intel.com with ESMTP; 25 Jun 2019 13:24:43 -0700
+Subject: Re: [PATCH v1 5/6] mm: Add logic for separating "aerated" pages from
+ "raw" pages
+To:     Alexander Duyck <alexander.duyck@gmail.com>, nitesh@redhat.com,
+        kvm@vger.kernel.org, david@redhat.com, mst@redhat.com,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org
+Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
+        konrad.wilk@oracle.com, lcapitulino@redhat.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
+References: <20190619222922.1231.27432.stgit@localhost.localdomain>
+ <20190619223331.1231.39271.stgit@localhost.localdomain>
+From:   Dave Hansen <dave.hansen@intel.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Tue, 25 Jun 2019 22:15:34 +0200
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+Message-ID: <f704f160-49fb-2fdf-e8ac-44b47245a75c@intel.com>
+Date:   Tue, 25 Jun 2019 13:24:42 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <69ca50bd-3f5c-98b1-3b39-04af75151baf@de.ibm.com>
+In-Reply-To: <20190619223331.1231.39271.stgit@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19062520-0016-0000-0000-0000028C503F
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19062520-0017-0000-0000-000032E9C494
-Message-Id: <25a9ff69-47f0-fcba-e1fe-f0cc9914acba@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-25_13:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906250151
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 6/19/19 3:33 PM, Alexander Duyck wrote:
+> Add a set of pointers we shall call "boundary" which represents the upper
+> boundary between the "raw" and "aerated" pages. The general idea is that in
+> order for a page to cross from one side of the boundary to the other it
+> will need to go through the aeration treatment.
 
+Aha!  The mysterious "boundary"!
 
-On 25.06.19 22:13, Christian Borntraeger wrote:
-> 
-> 
-> On 21.05.19 17:34, Pierre Morel wrote:
->> AP Queue Interruption Control (AQIC) facility gives
->> the guest the possibility to control interruption for
->> the Cryptographic Adjunct Processor queues.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
->> ---
->>  arch/s390/tools/gen_facilities.c | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/arch/s390/tools/gen_facilities.c b/arch/s390/tools/gen_facilities.c
->> index 61ce5b5..aed14fc 100644
->> --- a/arch/s390/tools/gen_facilities.c
->> +++ b/arch/s390/tools/gen_facilities.c
->> @@ -114,6 +114,7 @@ static struct facility_def facility_defs[] = {
->>  		.bits = (int[]){
->>  			12, /* AP Query Configuration Information */
->>  			15, /* AP Facilities Test */
->> +			65, /* AP Queue Interruption Control */
->>  			156, /* etoken facility */
->>  			-1  /* END */
->>  		}
->>
-> 
-> I think we should only set stfle.65 if we have the aiv facility (Because we do not
-> have a GISA otherwise)
-> 
-> So something like this instead?
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 28ebd64..1501cd6 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2461,6 +2461,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->                 set_kvm_facility(kvm->arch.model.fac_list, 147);
->         }
+But, how can you introduce code that deals with boundaries before
+introducing the boundary itself?  Or was that comment misplaced?
+
+FWIW, I'm not a fan of these commit messages.  They are really hard to
+map to the data structures.
+
+	One goal in this set is to avoid creating new data structures.
+	We accomplish that by reusing the free lists to hold aerated and
+	non-aerated pages.  But, in order to use the existing free list,
+	we need a boundary to separate aerated from raw.
+
+Further:
+
+	Pages are temporarily removed from the free lists while aerating
+	them.
+
+This needs a justification why you chose this path, and also what the
+larger implications are.
+
+> By doing this we should be able to make certain that we keep the aerated
+> pages as one contiguous block on the end of each free list. This will allow
+> us to efficiently walk the free lists whenever we need to go in and start
+> processing hints to the hypervisor that the pages are no longer in use.
+
+You don't really walk them though, right?  It *keeps* you from having to
+ever walk the lists.
+
+I also don't see what the boundary has to do with aerated pages being on
+the tail of the list.  If you want them on the tail, you just always
+list_add_tail() them.
+
+> And added advantage to this approach is that we should be reducing the
+> overall memory footprint of the guest as it will be more likely to recycle
+> warm pages versus the aerated pages that are likely to be cache cold.
+
+I'm confused.  Isn't an aerated page non-present on the guest?  That's
+worse than cache cold.  It costs a VMEXIT to bring back in.
+
+> Since we will only be aerating one zone at a time we keep the boundary
+> limited to being defined for just the zone we are currently placing aerated
+> pages into. Doing this we can keep the number of additional poitners needed
+> quite small.
+
+							pointers ^
+
+> +struct list_head *__aerator_get_tail(unsigned int order, int migratetype);
+>  static inline struct list_head *aerator_get_tail(struct zone *zone,
+>  						 unsigned int order,
+>  						 int migratetype)
+>  {
+> +#ifdef CONFIG_AERATION
+> +	if (order >= AERATOR_MIN_ORDER &&
+> +	    test_bit(ZONE_AERATION_ACTIVE, &zone->flags))
+> +		return __aerator_get_tail(order, migratetype);
+> +#endif
+>  	return &zone->free_area[order].free_list[migratetype];
+>  }
+
+Logically, I have no idea what this is doing.  "Go get pages out of the
+aerated list?"  "raw list"?  Needs comments.
+
+> +static inline void aerator_del_from_boundary(struct page *page,
+> +					     struct zone *zone)
+> +{
+> +	if (PageAerated(page) && test_bit(ZONE_AERATION_ACTIVE, &zone->flags))
+> +		__aerator_del_from_boundary(page, zone);
+> +}
+> +
+>  static inline void set_page_aerated(struct page *page,
+>  				    struct zone *zone,
+>  				    unsigned int order,
+> @@ -28,6 +59,9 @@ static inline void set_page_aerated(struct page *page,
+>  	/* record migratetype and flag page as aerated */
+>  	set_pcppage_migratetype(page, migratetype);
+>  	__SetPageAerated(page);
+> +
+> +	/* update boundary of new migratetype and record it */
+> +	aerator_add_to_boundary(page, zone);
+>  #endif
+>  }
 >  
-> +       if (css_general_characteristics.aiv)
-> +               set_kvm_facility(kvm->arch.model.fac_mask, 65);
-> +       
->         kvm->arch.model.cpuid = kvm_s390_get_initial_cpuid();
->         kvm->arch.model.ibc = sclp.ibc & 0x0fff;
+> @@ -39,11 +73,19 @@ static inline void clear_page_aerated(struct page *page,
+>  	if (likely(!PageAerated(page)))
+>  		return;
 >  
-> 
+> +	/* push boundary back if we removed the upper boundary */
+> +	aerator_del_from_boundary(page, zone);
+> +
+>  	__ClearPageAerated(page);
+>  	area->nr_free_aerated--;
+>  #endif
+>  }
+>  
+> +static inline unsigned long aerator_raw_pages(struct free_area *area)
+> +{
+> +	return area->nr_free - area->nr_free_aerated;
+> +}
+> +
+>  /**
+>   * aerator_notify_free - Free page notification that will start page processing
+>   * @zone: Pointer to current zone of last page processed
+> @@ -57,5 +99,20 @@ static inline void clear_page_aerated(struct page *page,
+>   */
+>  static inline void aerator_notify_free(struct zone *zone, int order)
+>  {
+> +#ifdef CONFIG_AERATION
+> +	if (!static_key_false(&aerator_notify_enabled))
+> +		return;
+> +	if (order < AERATOR_MIN_ORDER)
+> +		return;
+> +	if (test_bit(ZONE_AERATION_REQUESTED, &zone->flags))
+> +		return;
+> +	if (aerator_raw_pages(&zone->free_area[order]) < AERATOR_HWM)
+> +		return;
+> +
+> +	__aerator_notify(zone);
+> +#endif
+>  }
 
-Maybe even just piggyback on gisa init (it will bail out early).
+Again, this is really hard to review.  I see some possible overhead in a
+fast path here, but only if aerator_notify_free() is called in a fast
+path.  Is it?  I have to go digging in the previous patches to figure
+that out.
 
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index 9dde4d7..9182a04 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -3100,6 +3100,7 @@ void kvm_s390_gisa_init(struct kvm *kvm)
-        gi->timer.function = gisa_vcpu_kicker;
-        memset(gi->origin, 0, sizeof(struct kvm_s390_gisa));
-        gi->origin->next_alert = (u32)(u64)gi->origin;
-+       set_kvm_facility(kvm->arch.model.fac_mask, 65);
-        VM_EVENT(kvm, 3, "gisa 0x%pK initialized", gi->origin);
- }
- 
+> +static struct aerator_dev_info *a_dev_info;
+> +struct static_key aerator_notify_enabled;
+> +
+> +struct list_head *boundary[MAX_ORDER - AERATOR_MIN_ORDER][MIGRATE_TYPES];
+> +
+> +static void aerator_reset_boundary(struct zone *zone, unsigned int order,
+> +				   unsigned int migratetype)
+> +{
+> +	boundary[order - AERATOR_MIN_ORDER][migratetype] =
+> +			&zone->free_area[order].free_list[migratetype];
+> +}
+> +
+> +#define for_each_aerate_migratetype_order(_order, _type) \
+> +	for (_order = MAX_ORDER; _order-- != AERATOR_MIN_ORDER;) \
+> +		for (_type = MIGRATE_TYPES; _type--;)
+> +
+> +static void aerator_populate_boundaries(struct zone *zone)
+> +{
+> +	unsigned int order, mt;
+> +
+> +	if (test_bit(ZONE_AERATION_ACTIVE, &zone->flags))
+> +		return;
+> +
+> +	for_each_aerate_migratetype_order(order, mt)
+> +		aerator_reset_boundary(zone, order, mt);
+> +
+> +	set_bit(ZONE_AERATION_ACTIVE, &zone->flags);
+> +}
 
+This function appears misnamed as it's doing more than boundary
+manipulation.
+
+> +struct list_head *__aerator_get_tail(unsigned int order, int migratetype)
+> +{
+> +	return boundary[order - AERATOR_MIN_ORDER][migratetype];
+> +}
+> +
+> +void __aerator_del_from_boundary(struct page *page, struct zone *zone)
+> +{
+> +	unsigned int order = page_private(page) - AERATOR_MIN_ORDER;
+> +	int mt = get_pcppage_migratetype(page);
+> +	struct list_head **tail = &boundary[order][mt];
+> +
+> +	if (*tail == &page->lru)
+> +		*tail = page->lru.next;
+> +}
+
+Ewww.  Please just track the page that's the boundary, not the list head
+inside the page that's the boundary.
+
+This also at least needs one comment along the lines of: Move the
+boundary if the page representing the boundary is being removed.
+
+
+> +void aerator_add_to_boundary(struct page *page, struct zone *zone)
+> +{
+> +	unsigned int order = page_private(page) - AERATOR_MIN_ORDER;
+> +	int mt = get_pcppage_migratetype(page);
+> +	struct list_head **tail = &boundary[order][mt];
+> +
+> +	*tail = &page->lru;
+> +}
+> +
+> +void aerator_shutdown(void)
+> +{
+> +	static_key_slow_dec(&aerator_notify_enabled);
+> +
+> +	while (atomic_read(&a_dev_info->refcnt))
+> +		msleep(20);
+
+We generally frown on open-coded check/sleep loops.  What is this for?
+
+> +	WARN_ON(!list_empty(&a_dev_info->batch));
+> +
+> +	a_dev_info = NULL;
+> +}
+> +EXPORT_SYMBOL_GPL(aerator_shutdown);
+> +
+> +static void aerator_schedule_initial_aeration(void)
+> +{
+> +	struct zone *zone;
+> +
+> +	for_each_populated_zone(zone) {
+> +		spin_lock(&zone->lock);
+> +		__aerator_notify(zone);
+> +		spin_unlock(&zone->lock);
+> +	}
+> +}
+
+Why do we need an initial aeration?
+
+> +int aerator_startup(struct aerator_dev_info *sdev)
+> +{
+> +	if (a_dev_info)
+> +		return -EBUSY;
+> +
+> +	INIT_LIST_HEAD(&sdev->batch);
+> +	atomic_set(&sdev->refcnt, 0);
+> +
+> +	a_dev_info = sdev;
+> +	aerator_schedule_initial_aeration();
+> +
+> +	static_key_slow_inc(&aerator_notify_enabled);
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(aerator_startup);
+> +
+> +static void aerator_fill(struct zone *zone)
+> +{
+> +	struct list_head *batch = &a_dev_info->batch;
+> +	int budget = a_dev_info->capacity;
+
+Where does capacity come from?
+
+> +	unsigned int order, mt;
+> +
+> +	for_each_aerate_migratetype_order(order, mt) {
+> +		struct page *page;
+> +
+> +		/*
+> +		 * Pull pages from free list until we have drained
+> +		 * it or we have filled the batch reactor.
+> +		 */
+
+What's a reactor?
+
+> +		while ((page = get_aeration_page(zone, order, mt))) {
+> +			list_add_tail(&page->lru, batch);
+> +
+> +			if (!--budget)
+> +				return;
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * If there are no longer enough free pages to fully populate
+> +	 * the aerator, then we can just shut it down for this zone.
+> +	 */
+> +	clear_bit(ZONE_AERATION_REQUESTED, &zone->flags);
+> +	atomic_dec(&a_dev_info->refcnt);
+> +}
+
+Huh, so this is the number of threads doing aeration?  Didn't we just
+make a big deal about there only being one zone being aerated at a time?
+ Or, did I misunderstand what refcnt is from its lack of clear
+documentation?
+
+> +static void aerator_drain(struct zone *zone)
+> +{
+> +	struct list_head *list = &a_dev_info->batch;
+> +	struct page *page;
+> +
+> +	/*
+> +	 * Drain the now aerated pages back into their respective
+> +	 * free lists/areas.
+> +	 */
+> +	while ((page = list_first_entry_or_null(list, struct page, lru))) {
+> +		list_del(&page->lru);
+> +		put_aeration_page(zone, page);
+> +	}
+> +}
+> +
+> +static void aerator_scrub_zone(struct zone *zone)
+> +{
+> +	/* See if there are any pages to pull */
+> +	if (!test_bit(ZONE_AERATION_REQUESTED, &zone->flags))
+> +		return;
+
+How would someone ask for the zone to be scrubbed when aeration has not
+been requested?
+
+> +	spin_lock(&zone->lock);
+> +
+> +	do {
+> +		aerator_fill(zone);
+
+Should this say:
+
+		/* Pull pages out of the allocator into a local list */
+
+?
+
+> +		if (list_empty(&a_dev_info->batch))
+> +			break;
+
+		/* no pages were acquired, give up */
+
+> +		spin_unlock(&zone->lock);
+> +
+> +		/*
+> +		 * Start aerating the pages in the batch, and then
+> +		 * once that is completed we can drain the reactor
+> +		 * and refill the reactor, restarting the cycle.
+> +		 */
+> +		a_dev_info->react(a_dev_info);
+
+After reading (most of) this set, I'm going to reiterate my suggestion:
+please find new nomenclature.  I can't parse that comment and I don't
+know whether that's because it's a bad comment or whether you really
+mean "cycle" the english word or "cycle" referring to some new
+definition relating to this patch set.
+
+I've asked quite nicely a few times now.
+
+> +		spin_lock(&zone->lock);
+> +
+> +		/*
+> +		 * Guarantee boundaries are populated before we
+> +		 * start placing aerated pages in the zone.
+> +		 */
+> +		aerator_populate_boundaries(zone);
+
+aerator_populate_boundaries() has apparent concurrency checks via
+ZONE_AERATION_ACTIVE.  Why are those needed when this is called under a
+spinlock?
