@@ -2,106 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A13E557CE
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 21:32:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7146554E77
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 14:11:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727686AbfFYTcx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 15:32:53 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:43734 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726393AbfFYTcw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jun 2019 15:32:52 -0400
-Received: by mail-pf1-f196.google.com with SMTP id i189so9988190pfg.10
-        for <kvm@vger.kernel.org>; Tue, 25 Jun 2019 12:32:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=DOSmBNtGVGiKZQlIkSIiudQMAdtpDAF3oUbvXblt2VE=;
-        b=Bjhs6k/0JrBulBvg8q71WoreZ6NJLY+Sb7dhd2Q6dF5VzvzLXfMuAEfCjLHWQMP2ua
-         x9Sk+Z1LzQbf7Yk79dGUC0pkoCPJ8QLb0kW0BhGPSj9sXJ+i0kNyhsGV/8TWidgzy9F5
-         gt0lYx2vjtR2j7q3E3rhClTadIPaoPUlVgtkmy/QLOJ869DBS6eGmHz9eH6vjTyDR+vj
-         vEUpBqVUEi7P374vMosyVp9rPUhuI19E/7HbMvekZ/ZM/Ctv6tqRQGayW5AG1aZzXnA4
-         X12EIT/eMdRPZ7jvY1NGgyhYfmYhhZ9rIvYqte9VDbM+y+PQLW5XgEaBoAGhLvyh5cOi
-         d7Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=DOSmBNtGVGiKZQlIkSIiudQMAdtpDAF3oUbvXblt2VE=;
-        b=o5zzm9MmeQymsBa5wP2JYO+plt6thP/rRNC3o3ozL+LvFCUI4RiOBG5GneJYWZWD9M
-         pVvni9dyR7lDLn+ur/UzbLxYLn66/0Uhp/3Xjp9CEdZn0M9r0+j5vabWst7ApALzfd8b
-         lF1DPNMqbCQas/W2SvNXKcoG8C+ZIQwOyXYRzgfAS8Q0gwHxeZ4D2+q3MqEp0qWBdKQ1
-         2XI0EdseZLoGb6v+qb1Q9n+GTvQf4Z2QiPvRg5zY0JPuX8H8AGmAqqxbf9EPmfqgjzCd
-         NTIvHDaBQWBkwsdsKxr7im768ExLchVg4KtAaBgSm5OMYheh4f18aeBcNR60DMl1S25i
-         To/A==
-X-Gm-Message-State: APjAAAU2pCzpT9C+O3tpMNheYeb3+qylcWqSaOrzQp8DUMebE+/8Osk+
-        Je7dybsIKLcEtCpPps0VbOk=
-X-Google-Smtp-Source: APXvYqyL5XKcggaJIvZliTKed0sgMzlhE1nrhEdbrtCOe4U0rHQ1ZMhRhcV6I5+oisw7zYQKsvW2Lg==
-X-Received: by 2002:a63:1962:: with SMTP id 34mr1736471pgz.175.1561491172143;
-        Tue, 25 Jun 2019 12:32:52 -0700 (PDT)
-Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id o12sm25645pjr.22.2019.06.25.12.32.51
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 25 Jun 2019 12:32:51 -0700 (PDT)
-From:   Nadav Amit <nadav.amit@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>
-Subject: [kvm-unit-tests PATCH] x86: Reset lapic after boot
-Date:   Tue, 25 Jun 2019 05:10:42 -0700
-Message-Id: <20190625121042.8957-1-nadav.amit@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        id S1726930AbfFYMLY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 08:11:24 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:19108 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726532AbfFYMLY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 08:11:24 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id AC84597342FD98737BF6;
+        Tue, 25 Jun 2019 20:11:20 +0800 (CST)
+Received: from [127.0.0.1] (10.142.68.147) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Tue, 25 Jun 2019
+ 20:11:13 +0800
+Subject: Re: [PATCH v17 05/10] acpi: add build_append_ghes_generic_status()
+ helper for Generic Error Status Block
+To:     Igor Mammedov <imammedo@redhat.com>
+CC:     <pbonzini@redhat.com>, <mst@redhat.com>,
+        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
+        <lersek@redhat.com>, <james.morse@arm.com>, <mtosatti@redhat.com>,
+        <rth@twiddle.net>, <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
+        <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
+        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
+References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
+ <1557832703-42620-6-git-send-email-gengdongjiu@huawei.com>
+ <20190620144257.7400b0a7@redhat.com>
+From:   gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <93dcd75e-77e4-8813-beef-7939cdb75413@huawei.com>
+Date:   Tue, 25 Jun 2019 20:11:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.3.0
+MIME-Version: 1.0
+In-Reply-To: <20190620144257.7400b0a7@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.142.68.147]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Do not assume that the local APIC is in a xAPIC mode after reset.
-Instead reset it first, since it might be in x2APIC mode, from which a
-transition in xAPIC is invalid.
 
-Note that we do not use the existing disable_apic() for the matter,
-since it also re-initializes apic_ops.
 
-Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
----
- x86/cstart64.S | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+On 2019/6/20 20:42, Igor Mammedov wrote:
+> On Tue, 14 May 2019 04:18:18 -0700
+> Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> 
+>> It will help to add Generic Error Status Block to ACPI tables
+>> without using packed C structures and avoid endianness
+>> issues as API doesn't need explicit conversion.
+>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> ---
+>>  hw/acpi/aml-build.c         | 14 ++++++++++++++
+>>  include/hw/acpi/aml-build.h |  6 ++++++
+>>  2 files changed, 20 insertions(+)
+>>
+>> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+>> index 102a288..ce90970 100644
+>> --- a/hw/acpi/aml-build.c
+>> +++ b/hw/acpi/aml-build.c
+>> @@ -296,6 +296,20 @@ void build_append_ghes_notify(GArray *table, const uint8_t type,
+>>          build_append_int_noprefix(table, error_threshold_window, 4);
+>>  }
+>>  
+>> +/* Generic Error Status Block
+>> + * ACPI 4.0: 17.3.2.6.1 Generic Error Data
+>> + */
+>> +void build_append_ghes_generic_status(GArray *table, uint32_t block_status,
+> maybe ..._generic_error_status???
+good point, the build_append_ghes_generic_error_status() is better than build_append_ghes_generic_status()
 
-diff --git a/x86/cstart64.S b/x86/cstart64.S
-index 9791282..03726a6 100644
---- a/x86/cstart64.S
-+++ b/x86/cstart64.S
-@@ -118,6 +118,15 @@ MSR_GS_BASE = 0xc0000101
- 	wrmsr
- .endm
- 
-+lapic_reset:
-+	mov $0x1b, %ecx
-+	rdmsr
-+	and $~(APIC_EN | APIC_EXTD), %eax
-+	wrmsr
-+	or $(APIC_EN), %eax
-+	wrmsr
-+	ret
-+
- .macro setup_segments
- 	mov $MSR_GS_BASE, %ecx
- 	rdmsr
-@@ -228,6 +237,7 @@ save_id:
- 	retq
- 
- ap_start64:
-+	call lapic_reset
- 	call load_tss
- 	call enable_apic
- 	call save_id
-@@ -240,6 +250,7 @@ ap_start64:
- 	jmp 1b
- 
- start64:
-+	call lapic_reset
- 	call load_tss
- 	call mask_pic_interrupts
- 	call enable_apic
--- 
-2.17.1
+> 
+>> +                      uint32_t raw_data_offset, uint32_t raw_data_length,
+>> +                      uint32_t data_length, uint32_t error_severity)
+> see CODING_STYLE, 1.1 Multiline Indent
+> 
+>> +{
+> when describing filds from spec try to add 'verbatim' copy of the name from spec
+> so it would be esy to grep for it. Like:
+>        /* Block Status */
+>> +    build_append_int_noprefix(table, block_status, 4);
+>        /* Raw Data Offset */
+> 
+> note applies all other places where you compose ACPI tables
+ok
+
+> 
+>> +    build_append_int_noprefix(table, raw_data_offset, 4);
+>> +    build_append_int_noprefix(table, raw_data_length, 4);
+>> +    build_append_int_noprefix(table, data_length, 4);
+>> +    build_append_int_noprefix(table, error_severity, 4);
+>> +}
+>> +
+>>  /* Generic Error Data Entry
+>>   * ACPI 4.0: 17.3.2.6.1 Generic Error Data
+>>   */
+>> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+>> index a71db2f..1ec7e1b 100644
+>> --- a/include/hw/acpi/aml-build.h
+>> +++ b/include/hw/acpi/aml-build.h
+>> @@ -425,6 +425,12 @@ void build_append_ghes_generic_data(GArray *table, const char *section_type,
+>>                                      uint32_t error_data_length, uint8_t *fru_id,
+>>                                      uint8_t *fru_text, uint64_t time_stamp);
+>>  
+>> +void
+>> +build_append_ghes_generic_status(GArray *table, uint32_t block_status,
+>> +                                 uint32_t raw_data_offset,
+>> +                                 uint32_t raw_data_length,
+>> +                                 uint32_t data_length, uint32_t error_severity);
+> this and previous patch, it might be better to to move declaration
+> to its own header, for example to include/hw/acpi/acpi_ghes.h
+> that you are adding later in the series.
+> And maybe move helpers to hw/acpi/acpi_ghes.c
+> They are not really independent ACPI primitives that are shared
+> with other tables, aren't they?
+Some ACPI primitives are shared with other table, such as Notification Structure.
+we have 10 types of error sources, some error source will share the  Notification Structure primitives.
+Now I only implement Generic Hardware Error Source version 2 (GHESv2 - Type 10)
+
+> .
+>> +
+>>  void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+>>                         uint64_t len, int node, MemoryAffinityFlags flags);
+>>  
+> 
+> .
+> 
 
