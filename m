@@ -2,45 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B38B5587E
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 22:13:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3915A55894
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 22:15:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726443AbfFYUNV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 16:13:21 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30990 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726274AbfFYUNV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jun 2019 16:13:21 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5PKBn3t040646
-        for <kvm@vger.kernel.org>; Tue, 25 Jun 2019 16:13:20 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2tbtasgb5n-1
+        id S1727210AbfFYUPx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 16:15:53 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9540 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726414AbfFYUPx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jun 2019 16:15:53 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5PKD2fo106566
+        for <kvm@vger.kernel.org>; Tue, 25 Jun 2019 16:15:52 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2tbs0uujqh-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 25 Jun 2019 16:13:20 -0400
+        for <kvm@vger.kernel.org>; Tue, 25 Jun 2019 16:15:51 -0400
 Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Tue, 25 Jun 2019 21:13:18 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Tue, 25 Jun 2019 21:15:50 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 25 Jun 2019 21:13:15 +0100
+        Tue, 25 Jun 2019 21:15:38 +0100
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5PKDDQh61866160
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5PKFZPg49283318
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Jun 2019 20:13:13 GMT
+        Tue, 25 Jun 2019 20:15:36 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1AD1A4C046;
-        Tue, 25 Jun 2019 20:13:13 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id C91614C062;
+        Tue, 25 Jun 2019 20:15:35 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 841114C050;
-        Tue, 25 Jun 2019 20:13:12 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 3C4864C04E;
+        Tue, 25 Jun 2019 20:15:35 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.159.147])
         by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 25 Jun 2019 20:13:12 +0000 (GMT)
+        Tue, 25 Jun 2019 20:15:35 +0000 (GMT)
 Subject: Re: [PATCH v9 4/4] s390: ap: kvm: Enable PQAP/AQIC facility for the
  guest
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
 To:     Pierre Morel <pmorel@linux.ibm.com>
 Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
         linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
@@ -49,7 +50,7 @@ Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
         freude@linux.ibm.com, mimu@linux.ibm.com
 References: <1558452877-27822-1-git-send-email-pmorel@linux.ibm.com>
  <1558452877-27822-5-git-send-email-pmorel@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
+ <69ca50bd-3f5c-98b1-3b39-04af75151baf@de.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
@@ -94,19 +95,19 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
  oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
  syiRa+UVlsKmx1hsEg==
-Date:   Tue, 25 Jun 2019 22:13:12 +0200
+Date:   Tue, 25 Jun 2019 22:15:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <1558452877-27822-5-git-send-email-pmorel@linux.ibm.com>
+In-Reply-To: <69ca50bd-3f5c-98b1-3b39-04af75151baf@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19062520-0020-0000-0000-0000034D561F
+x-cbid: 19062520-0016-0000-0000-0000028C503F
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19062520-0021-0000-0000-000021A0C76F
-Message-Id: <69ca50bd-3f5c-98b1-3b39-04af75151baf@de.ibm.com>
+x-cbparentid: 19062520-0017-0000-0000-000032E9C494
+Message-Id: <25a9ff69-47f0-fcba-e1fe-f0cc9914acba@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-25_13:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
@@ -121,48 +122,67 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 21.05.19 17:34, Pierre Morel wrote:
-> AP Queue Interruption Control (AQIC) facility gives
-> the guest the possibility to control interruption for
-> the Cryptographic Adjunct Processor queues.
+On 25.06.19 22:13, Christian Borntraeger wrote:
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> ---
->  arch/s390/tools/gen_facilities.c | 1 +
->  1 file changed, 1 insertion(+)
 > 
-> diff --git a/arch/s390/tools/gen_facilities.c b/arch/s390/tools/gen_facilities.c
-> index 61ce5b5..aed14fc 100644
-> --- a/arch/s390/tools/gen_facilities.c
-> +++ b/arch/s390/tools/gen_facilities.c
-> @@ -114,6 +114,7 @@ static struct facility_def facility_defs[] = {
->  		.bits = (int[]){
->  			12, /* AP Query Configuration Information */
->  			15, /* AP Facilities Test */
-> +			65, /* AP Queue Interruption Control */
->  			156, /* etoken facility */
->  			-1  /* END */
->  		}
+> On 21.05.19 17:34, Pierre Morel wrote:
+>> AP Queue Interruption Control (AQIC) facility gives
+>> the guest the possibility to control interruption for
+>> the Cryptographic Adjunct Processor queues.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> ---
+>>  arch/s390/tools/gen_facilities.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/arch/s390/tools/gen_facilities.c b/arch/s390/tools/gen_facilities.c
+>> index 61ce5b5..aed14fc 100644
+>> --- a/arch/s390/tools/gen_facilities.c
+>> +++ b/arch/s390/tools/gen_facilities.c
+>> @@ -114,6 +114,7 @@ static struct facility_def facility_defs[] = {
+>>  		.bits = (int[]){
+>>  			12, /* AP Query Configuration Information */
+>>  			15, /* AP Facilities Test */
+>> +			65, /* AP Queue Interruption Control */
+>>  			156, /* etoken facility */
+>>  			-1  /* END */
+>>  		}
+>>
+> 
+> I think we should only set stfle.65 if we have the aiv facility (Because we do not
+> have a GISA otherwise)
+> 
+> So something like this instead?
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 28ebd64..1501cd6 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2461,6 +2461,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>                 set_kvm_facility(kvm->arch.model.fac_list, 147);
+>         }
+>  
+> +       if (css_general_characteristics.aiv)
+> +               set_kvm_facility(kvm->arch.model.fac_mask, 65);
+> +       
+>         kvm->arch.model.cpuid = kvm_s390_get_initial_cpuid();
+>         kvm->arch.model.ibc = sclp.ibc & 0x0fff;
+>  
 > 
 
-I think we should only set stfle.65 if we have the aiv facility (Because we do not
-have a GISA otherwise)
+Maybe even just piggyback on gisa init (it will bail out early).
 
-So something like this instead?
-
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 28ebd64..1501cd6 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -2461,6 +2461,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-                set_kvm_facility(kvm->arch.model.fac_list, 147);
-        }
- 
-+       if (css_general_characteristics.aiv)
-+               set_kvm_facility(kvm->arch.model.fac_mask, 65);
-+       
-        kvm->arch.model.cpuid = kvm_s390_get_initial_cpuid();
-        kvm->arch.model.ibc = sclp.ibc & 0x0fff;
+diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+index 9dde4d7..9182a04 100644
+--- a/arch/s390/kvm/interrupt.c
++++ b/arch/s390/kvm/interrupt.c
+@@ -3100,6 +3100,7 @@ void kvm_s390_gisa_init(struct kvm *kvm)
+        gi->timer.function = gisa_vcpu_kicker;
+        memset(gi->origin, 0, sizeof(struct kvm_s390_gisa));
+        gi->origin->next_alert = (u32)(u64)gi->origin;
++       set_kvm_facility(kvm->arch.model.fac_mask, 65);
+        VM_EVENT(kvm, 3, "gisa 0x%pK initialized", gi->origin);
+ }
  
 
