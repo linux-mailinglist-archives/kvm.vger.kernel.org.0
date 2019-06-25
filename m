@@ -2,25 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BBA3555733
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 20:28:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01A2D5574A
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 20:36:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732921AbfFYS2J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 14:28:09 -0400
-Received: from mga03.intel.com ([134.134.136.65]:16203 "EHLO mga03.intel.com"
+        id S1730417AbfFYSgD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 14:36:03 -0400
+Received: from mga09.intel.com ([134.134.136.24]:28508 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727138AbfFYS2J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jun 2019 14:28:09 -0400
+        id S1729912AbfFYSgD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 14:36:03 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Jun 2019 11:28:08 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Jun 2019 11:36:02 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,416,1557212400"; 
-   d="scan'208";a="172456454"
+   d="scan'208";a="172458221"
 Received: from ray.jf.intel.com (HELO [10.7.201.139]) ([10.7.201.139])
-  by orsmga002.jf.intel.com with ESMTP; 25 Jun 2019 11:28:08 -0700
-Subject: Re: [PATCH v1 2/6] mm: Move set/get_pcppage_migratetype to mmzone.h
+  by orsmga002.jf.intel.com with ESMTP; 25 Jun 2019 11:36:02 -0700
+Subject: Re: [PATCH v1 3/6] mm: Use zone and order instead of free area in
+ free_list manipulators
 To:     Alexander Duyck <alexander.duyck@gmail.com>, nitesh@redhat.com,
         kvm@vger.kernel.org, david@redhat.com, mst@redhat.com,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
@@ -30,7 +31,7 @@ Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
         wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
         dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
 References: <20190619222922.1231.27432.stgit@localhost.localdomain>
- <20190619223309.1231.16506.stgit@localhost.localdomain>
+ <20190619223316.1231.50329.stgit@localhost.localdomain>
 From:   Dave Hansen <dave.hansen@intel.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -76,29 +77,27 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-Message-ID: <68ed3507-16dd-2ea3-4a12-09d04a8dd028@intel.com>
-Date:   Tue, 25 Jun 2019 11:28:08 -0700
+Message-ID: <810257c3-216a-d029-9360-508a9aa8c2dd@intel.com>
+Date:   Tue, 25 Jun 2019 11:36:02 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <20190619223309.1231.16506.stgit@localhost.localdomain>
+In-Reply-To: <20190619223316.1231.50329.stgit@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 6/19/19 3:33 PM, Alexander Duyck wrote:
-> In order to support page aeration it will be necessary to store and
-> retrieve the migratetype of a page. To enable that I am moving the set and
-> get operations for pcppage_migratetype into the mmzone header so that they
-> can be used when adding or removing pages from the free lists.
-...
-> diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
-> index 4c07af2cfc2f..6f8fd5c1a286 100644
-> --- a/include/linux/mmzone.h
-> +++ b/include/linux/mmzone.h
+> -		move_to_free_area(page, &zone->free_area[order], migratetype);
+> +		move_to_free_area(page, zone, order, migratetype);
 
-Not mm/internal.h?
+This certainly looks nicer.  But the naming is a bit goofy now because
+you're talking about free areas, but there's no free area to be seen.
+If anything, isn't it moving to a free_list[]?  It's actually going to
+zone->free_area[]->free_list[], so the free area seems rather
+inconsequential in the entire thing.  The (zone/order/migratetype)
+combination specifies a free_list[] not a free area anyway.
