@@ -2,561 +2,383 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BCB354EAC
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 14:19:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39D9754EBA
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 14:24:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729914AbfFYMTt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 08:19:49 -0400
-Received: from foss.arm.com ([217.140.110.172]:40476 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727872AbfFYMTt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jun 2019 08:19:49 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 038622B;
-        Tue, 25 Jun 2019 05:19:47 -0700 (PDT)
-Received: from [10.1.215.72] (e121566-lin.cambridge.arm.com [10.1.215.72])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 13C993F71E;
-        Tue, 25 Jun 2019 05:19:45 -0700 (PDT)
-Subject: Re: [PATCH 35/59] KVM: arm/arm64: nv: Support multiple nested stage 2
- mmu structures
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-36-marc.zyngier@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <6a59df67-1b5e-6737-449c-d779537adf3e@arm.com>
-Date:   Tue, 25 Jun 2019 13:19:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1727261AbfFYMYu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 08:24:50 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:19109 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726506AbfFYMYu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 08:24:50 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id B59C77A453E4B3F2400D;
+        Tue, 25 Jun 2019 20:24:44 +0800 (CST)
+Received: from [127.0.0.1] (10.142.68.147) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Tue, 25 Jun 2019
+ 20:24:34 +0800
+Subject: Re: [PATCH v17 10/10] target-arm: kvm64: handle SIGBUS signal from
+ kernel or KVM
+To:     Igor Mammedov <imammedo@redhat.com>
+CC:     <pbonzini@redhat.com>, <mst@redhat.com>,
+        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
+        <lersek@redhat.com>, <james.morse@arm.com>, <mtosatti@redhat.com>,
+        <rth@twiddle.net>, <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
+        <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
+        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
+References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
+ <1557832703-42620-11-git-send-email-gengdongjiu@huawei.com>
+ <20190624150810.1287160e@redhat.com>
+From:   gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <3059ee08-c041-2006-36b5-fd0e53c08e79@huawei.com>
+Date:   Tue, 25 Jun 2019 20:24:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.3.0
 MIME-Version: 1.0
-In-Reply-To: <20190621093843.220980-36-marc.zyngier@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190624150810.1287160e@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.142.68.147]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/21/19 10:38 AM, Marc Zyngier wrote:
-> From: Christoffer Dall <christoffer.dall@arm.com>
->
-> Add stage 2 mmu data structures for virtual EL2 and for nested guests.
-> We don't yet populate shadow stage 2 page tables, but we now have a
-> framework for getting to a shadow stage 2 pgd.
->
-> We allocate twice the number of vcpus as stage 2 mmu structures because
-> that's sufficient for each vcpu running two VMs without having to flush
-> the stage 2 page tables.
->
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm/include/asm/kvm_host.h     |   4 +
->  arch/arm/include/asm/kvm_mmu.h      |   3 +
->  arch/arm64/include/asm/kvm_host.h   |  28 +++++
->  arch/arm64/include/asm/kvm_mmu.h    |   8 ++
->  arch/arm64/include/asm/kvm_nested.h |   7 ++
->  arch/arm64/kvm/nested.c             | 172 ++++++++++++++++++++++++++++
->  virt/kvm/arm/arm.c                  |  16 ++-
->  virt/kvm/arm/mmu.c                  |  31 ++---
->  8 files changed, 254 insertions(+), 15 deletions(-)
->
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index e3217c4ad25b..b821eb2383ad 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -424,4 +424,8 @@ static inline bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
->  	return true;
->  }
->  
-> +static inline void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu) {}
-> +static inline void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu) {}
-> +static inline int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu) { return 0; }
-> +
->  #endif /* __ARM_KVM_HOST_H__ */
-> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> index be23e3f8e08c..e6984b6da2ce 100644
-> --- a/arch/arm/include/asm/kvm_mmu.h
-> +++ b/arch/arm/include/asm/kvm_mmu.h
-> @@ -420,6 +420,9 @@ static inline int hyp_map_aux_data(void)
->  
->  static inline void kvm_set_ipa_limit(void) {}
->  
-> +static inline void kvm_init_s2_mmu(struct kvm_s2_mmu *mmu) {}
-> +static inline void kvm_init_nested(struct kvm *kvm) {}
-> +
->  static __always_inline u64 kvm_get_vttbr(struct kvm_s2_mmu *mmu)
->  {
->  	struct kvm_vmid *vmid = &mmu->vmid;
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 3dee5e17a4ee..cc238de170d2 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -88,11 +88,39 @@ struct kvm_s2_mmu {
->  	phys_addr_t	pgd_phys;
->  
->  	struct kvm *kvm;
-> +
-> +	/*
-> +	 * For a shadow stage-2 MMU, the virtual vttbr programmed by the guest
-> +	 * hypervisor.  Unused for kvm_arch->mmu. Set to 1 when the structure
-> +	 * contains no valid information.
-> +	 */
-> +	u64	vttbr;
-> +
-> +	/* true when this represents a nested context where virtual HCR_EL2.VM == 1 */
-> +	bool	nested_stage2_enabled;
-> +
-> +	/*
-> +	 *  0: Nobody is currently using this, check vttbr for validity
-> +	 * >0: Somebody is actively using this.
-> +	 */
-> +	atomic_t refcnt;
->  };
->  
-> +static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
-> +{
-> +	return !(mmu->vttbr & 1);
-> +}
-> +
->  struct kvm_arch {
->  	struct kvm_s2_mmu mmu;
->  
-> +	/*
-> +	 * Stage 2 paging stage for VMs with nested virtual using a virtual
-> +	 * VMID.
-> +	 */
-> +	struct kvm_s2_mmu *nested_mmus;
-> +	size_t nested_mmus_size;
-> +
->  	/* VTCR_EL2 value for this VM */
->  	u64    vtcr;
->  
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 1eb6e0ca61c2..32bcaa1845dc 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -100,6 +100,7 @@ alternative_cb_end
->  #include <asm/mmu_context.h>
->  #include <asm/pgtable.h>
->  #include <asm/kvm_emulate.h>
-> +#include <asm/kvm_nested.h>
->  
->  void kvm_update_va_mask(struct alt_instr *alt,
->  			__le32 *origptr, __le32 *updptr, int nr_inst);
-> @@ -164,6 +165,7 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
->  			     void **haddr);
->  void free_hyp_pgds(void);
->  
-> +void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
->  void stage2_unmap_vm(struct kvm *kvm);
->  int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu);
->  void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
-> @@ -635,5 +637,11 @@ static __always_inline void __load_guest_stage2(struct kvm_s2_mmu *mmu)
->  	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_1165522));
->  }
->  
-> +static inline u64 get_vmid(u64 vttbr)
-> +{
-> +	return (vttbr & VTTBR_VMID_MASK(kvm_get_vmid_bits())) >>
-> +		VTTBR_VMID_SHIFT;
-> +}
-> +
->  #endif /* __ASSEMBLY__ */
->  #endif /* __ARM64_KVM_MMU_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index 61e71d0d2151..d4021d0892bd 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -10,6 +10,13 @@ static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
->  		test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features);
->  }
->  
-> +extern void kvm_init_nested(struct kvm *kvm);
-> +extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
-> +extern void kvm_init_s2_mmu(struct kvm_s2_mmu *mmu);
-> +extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr);
-> +extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
-> +extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
-> +
->  int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
->  extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
->  extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 3872e3cf1691..4b38dc5c0be3 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -18,7 +18,161 @@
->  #include <linux/kvm.h>
->  #include <linux/kvm_host.h>
->  
-> +#include <asm/kvm_arm.h>
->  #include <asm/kvm_emulate.h>
-> +#include <asm/kvm_mmu.h>
-> +#include <asm/kvm_nested.h>
-> +
-> +void kvm_init_nested(struct kvm *kvm)
-> +{
-> +	kvm_init_s2_mmu(&kvm->arch.mmu);
-> +
-> +	kvm->arch.nested_mmus = NULL;
-> +	kvm->arch.nested_mmus_size = 0;
-> +}
-> +
-> +int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct kvm_s2_mmu *tmp;
-> +	int num_mmus;
-> +	int ret = -ENOMEM;
-> +
-> +	if (!test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features))
-> +		return 0;
-> +
-> +	if (!cpus_have_const_cap(ARM64_HAS_NESTED_VIRT))
-> +		return -EINVAL;
+On 2019/6/24 21:08, Igor Mammedov wrote:
+> On Tue, 14 May 2019 04:18:23 -0700
+> Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> 
+>> Add SIGBUS signal handler. In this handler, it checks the SIGBUS type,
+>> translates the host VA delivered by host to guest PA, then fill this PA
+>> to guest APEI GHES memory, then notify guest according to the SIGBUS type.
+>>
+>> If guest accesses the poisoned memory, it generates Synchronous External
+>> Abort(SEA). Then host kernel gets an APEI notification and call memory_failure()
+>> to unmapped the affected page for the guest's stage 2, finally return
+>> to guest.
+>>
+>> Guest continues to access PG_hwpoison page, it will trap to KVM as stage2 fault,
+>> then a SIGBUS_MCEERR_AR synchronous signal is delivered to Qemu, Qemu record this
+>> error address into guest APEI GHES memory and notify guest using
+>> Synchronous-External-Abort(SEA).
+>>
+>> Suggested-by: James Morse <james.morse@arm.com>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> ---
+>>  hw/acpi/acpi_ghes.c         | 177 ++++++++++++++++++++++++++++++++++++++++++++
+>>  include/hw/acpi/acpi_ghes.h |   6 +-
+>>  include/sysemu/kvm.h        |   2 +-
+>>  target/arm/kvm64.c          |  39 ++++++++++
+>>  4 files changed, 222 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/acpi/acpi_ghes.c b/hw/acpi/acpi_ghes.c
+>> index d03e797..06b7374 100644
+>> --- a/hw/acpi/acpi_ghes.c
+>> +++ b/hw/acpi/acpi_ghes.c
+>> @@ -26,6 +26,101 @@
+>>  #include "sysemu/sysemu.h"
+>>  #include "qemu/error-report.h"
+>>  
+>> +/* UEFI 2.6: N.2.5 Memory Error Section */
+>> +static void build_append_mem_cper(GArray *table, uint64_t error_physical_addr)
+>> +{
+>> +    /*
+>> +     * Memory Error Record
+>> +     */
+>> +    build_append_int_noprefix(table,
+>> +                 (1UL << 14) | /* Type Valid */
+>> +                 (1UL << 1) /* Physical Address Valid */,
+>> +                 8);
+> bad indent
+I will update it
 
-Here we fail if KVM_ARM_VCPU_NESTED_VIRT features was requested from the virtual
-vcpu, but the nested capability isn't present. This function is called as a
-result of the KVM_ARM_VCPU_INIT, and when this function fails, the
-KVM_ARM_VCPU_INIT ioctl will also fail. This means that we cannot have a vcpu
-with the nested virt feature on a system which doesn't support nested
-virtualization.
+> 
+>> +    /* Memory error status information */
+>> +    build_append_int_noprefix(table, 0, 8);
+>> +    /* The physical address at which the memory error occurred */
+>> +    build_append_int_noprefix(table, error_physical_addr, 8);
+>> +    build_append_int_noprefix(table, 0, 48);
+>> +    build_append_int_noprefix(table, 0 /* Unknown error */, 1);
+>> +    build_append_int_noprefix(table, 0, 7);
+>> +}
+>> +
+>> +static int ghes_record_mem_error(uint64_t error_block_address,
+>> +                                    uint64_t error_physical_addr)
+> bad indent
+I will update it
 
-However, commit 04/59 "KVM: arm64: nv: Introduce nested virtualization VCPU
-feature" added the function nested_virt_in_use (in
-arch/arm64/include/asm/kvm_nested.h) which checks for **both** conditions before
-returning true. I believe the capability check is not required in
-nested_virt_in_use.
+> 
+> 
+>> +{
+>> +    GArray *block;
+>> +    uint64_t current_block_length;
+>> +    uint32_t data_length;
+>> +    /* Memory section */
+>> +    char mem_section_id_le[] = {0x14, 0x11, 0xBC, 0xA5, 0x64, 0x6F, 0xDE,
+>> +                                0x4E, 0xB8, 0x63, 0x3E, 0x83, 0xED, 0x7C,
+>> +                                0x83, 0xB1};
+>> +    uint8_t fru_id[16] = {0};
+>> +    uint8_t fru_text[20] = {0};
+>> +
+>> +    /* Generic Error Status Block
+>> +     * | +---------------------+
+>> +     * | |     block_status    |
+>> +     * | +---------------------+
+>> +     * | |    raw_data_offset  |
+>> +     * | +---------------------+
+>> +     * | |    raw_data_length  |
+>> +     * | +---------------------+
+>> +     * | |     data_length     |
+>> +     * | +---------------------+
+>> +     * | |   error_severity    |
+>> +     * | +---------------------+
+>> +     */
+>> +    block = g_array_new(false, true /* clear */, 1);
+>> +
+>> +    /* Get the length of the Generic Error Data Entries */
+>> +    cpu_physical_memory_read(error_block_address +
+>> +        offsetof(AcpiGenericErrorStatus, data_length), &data_length, 4);
+>> +    /* The current whole length of the generic error status block */
+>> +    current_block_length = sizeof(AcpiGenericErrorStatus) + le32_to_cpu(data_length);
+> I might be missing something but why do you read length from guest?
+> Isn't it something provided by QEMU/host?
+The length of the Generic Error Data Entries is not fixed, as the CPER number increases, the length will increase.
+there is already a member to record the length for the CPER in the table, this table is in the guest.
+so it is better directly read the length from the table instead of providing by QEMU/host.
 
-> +
-> +	mutex_lock(&kvm->lock);
-> +
-> +	num_mmus = atomic_read(&kvm->online_vcpus) * 2;
-> +	tmp = __krealloc(kvm->arch.nested_mmus,
-> +			 num_mmus * sizeof(*kvm->arch.nested_mmus),
-> +			 GFP_KERNEL | __GFP_ZERO);
-> +
-> +	if (tmp) {
-> +		if (tmp != kvm->arch.nested_mmus)
-> +			kfree(kvm->arch.nested_mmus);
-> +
-> +		tmp[num_mmus - 1].kvm = kvm;
-> +		atomic_set(&tmp[num_mmus - 1].refcnt, 0);
-> +		ret = kvm_alloc_stage2_pgd(&tmp[num_mmus - 1]);
-> +		if (ret)
-> +			goto out;
-> +
-> +		tmp[num_mmus - 2].kvm = kvm;
-> +		atomic_set(&tmp[num_mmus - 2].refcnt, 0);
-> +		ret = kvm_alloc_stage2_pgd(&tmp[num_mmus - 2]);
-> +		if (ret) {
-> +			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
-> +			goto out;
-> +		}
-> +
-> +		kvm->arch.nested_mmus_size = num_mmus;
-> +		kvm->arch.nested_mmus = tmp;
-> +		tmp = NULL;
-> +	}
-> +
-> +out:
-> +	kfree(tmp);
-> +	mutex_unlock(&kvm->lock);
-> +	return ret;
-> +}
-> +
-> +/* Must be called with kvm->lock held */
-> +struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
-> +{
-> +	bool nested_stage2_enabled = hcr & HCR_VM;
-> +	int i;
-> +
-> +	/* Don't consider the CnP bit for the vttbr match */
-> +	vttbr = vttbr & ~1UL;
-> +
-> +	/* Search a mmu in the list using the virtual VMID as a key */
-> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-> +
-> +		if (!kvm_s2_mmu_valid(mmu))
-> +			continue;
-> +
-> +		if (nested_stage2_enabled &&
-> +		    mmu->nested_stage2_enabled &&
-> +		    vttbr == mmu->vttbr)
-> +			return mmu;
-> +
-> +		if (!nested_stage2_enabled &&
-> +		    !mmu->nested_stage2_enabled &&
-> +		    get_vmid(vttbr) == get_vmid(mmu->vttbr))
-> +			return mmu;
-> +	}
-> +	return NULL;
-> +}
-> +
-> +static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = vcpu->kvm;
-> +	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-> +	u64 hcr= vcpu_read_sys_reg(vcpu, HCR_EL2);
-> +	struct kvm_s2_mmu *s2_mmu;
-> +	int i;
-> +
-> +	s2_mmu = lookup_s2_mmu(kvm, vttbr, hcr);
-> +	if (s2_mmu)
-> +		goto out;
-> +
-> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> +		s2_mmu = &kvm->arch.nested_mmus[i];
-> +
-> +		if (atomic_read(&s2_mmu->refcnt) == 0)
-> +			break;
-> +	}
-> +	BUG_ON(atomic_read(&s2_mmu->refcnt)); /* We have struct MMUs to spare */
-> +
-> +	if (kvm_s2_mmu_valid(s2_mmu)) {
-> +		/* Clear the old state */
-> +		kvm_unmap_stage2_range(s2_mmu, 0, kvm_phys_size(kvm));
-> +		if (s2_mmu->vmid.vmid_gen)
-> +			kvm_call_hyp(__kvm_tlb_flush_vmid, s2_mmu);
-> +	}
-> +
-> +	/*
-> +	 * The virtual VMID (modulo CnP) will be used as a key when matching
-> +	 * an existing kvm_s2_mmu.
-> +	 */
-> +	s2_mmu->vttbr = vttbr & ~1UL;
-> +	s2_mmu->nested_stage2_enabled = hcr & HCR_VM;
-> +
-> +out:
-> +	atomic_inc(&s2_mmu->refcnt);
-> +	return s2_mmu;
-> +}
-> +
-> +void kvm_init_s2_mmu(struct kvm_s2_mmu *mmu)
-> +{
-> +	mmu->vttbr = 1;
-> +	mmu->nested_stage2_enabled = false;
-> +	atomic_set(&mmu->refcnt, 0);
-> +}
-> +
-> +void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
-> +{
-> +	if (is_hyp_ctxt(vcpu)) {
-> +		vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
-> +	} else {
-> +		spin_lock(&vcpu->kvm->mmu_lock);
-> +		vcpu->arch.hw_mmu = get_s2_mmu_nested(vcpu);
-> +		spin_unlock(&vcpu->kvm->mmu_lock);
-> +	}
-> +}
-> +
-> +void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu)
-> +{
-> +	if (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu) {
-> +		atomic_dec(&vcpu->arch.hw_mmu->refcnt);
-> +		vcpu->arch.hw_mmu = NULL;
-> +	}
-> +}
->  
->  /*
->   * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
-> @@ -37,3 +191,21 @@ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
->  
->  	return -EINVAL;
->  }
-> +
-> +void kvm_arch_flush_shadow_all(struct kvm *kvm)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-> +
-> +		WARN_ON(atomic_read(&mmu->refcnt));
-> +
-> +		if (!atomic_read(&mmu->refcnt))
-> +			kvm_free_stage2_pgd(mmu);
-> +	}
-> +	kfree(kvm->arch.nested_mmus);
-> +	kvm->arch.nested_mmus = NULL;
-> +	kvm->arch.nested_mmus_size = 0;
-> +	kvm_free_stage2_pgd(&kvm->arch.mmu);
-> +}
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index 5d4371633e1c..4e3cbfa1ecbe 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -36,6 +36,7 @@
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_mmu.h>
-> +#include <asm/kvm_nested.h>
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_coproc.h>
->  #include <asm/sections.h>
-> @@ -126,6 +127,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	kvm->arch.mmu.vmid.vmid_gen = 0;
->  	kvm->arch.mmu.kvm = kvm;
->  
-> +	kvm_init_nested(kvm);
-> +
->  	ret = create_hyp_mappings(kvm, kvm + 1, PAGE_HYP);
->  	if (ret)
->  		goto out_free_stage2_pgd;
-> @@ -353,6 +356,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	int *last_ran;
->  	kvm_host_data_t *cpu_data;
->  
-> +	if (nested_virt_in_use(vcpu))
-> +		kvm_vcpu_load_hw_mmu(vcpu);
-> +
->  	last_ran = this_cpu_ptr(vcpu->kvm->arch.last_vcpu_ran);
->  	cpu_data = this_cpu_ptr(&kvm_host_data);
->  
-> @@ -391,6 +397,9 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  	kvm_vgic_put(vcpu);
->  	kvm_vcpu_pmu_restore_host(vcpu);
->  
-> +	if (nested_virt_in_use(vcpu))
-> +		kvm_vcpu_put_hw_mmu(vcpu);
-> +
->  	vcpu->cpu = -1;
->  
->  	kvm_arm_set_running_vcpu(NULL);
-> @@ -968,8 +977,13 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
->  
->  	vcpu->arch.target = phys_target;
->  
-> +	/* Prepare for nested if required */
-> +	ret = kvm_vcpu_init_nested(vcpu);
-> +
->  	/* Now we know what it is, we can reset it. */
-> -	ret = kvm_reset_vcpu(vcpu);
-> +	if (!ret)
-> +		ret = kvm_reset_vcpu(vcpu);
-> +
->  	if (ret) {
->  		vcpu->arch.target = -1;
->  		bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index bb1be4ea55ec..faa61a81c8cc 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -325,7 +325,7 @@ static void unmap_stage2_puds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
->  }
->  
->  /**
-> - * unmap_stage2_range -- Clear stage2 page table entries to unmap a range
-> + * kvm_unmap_stage2_range -- Clear stage2 page table entries to unmap a range
->   * @kvm:   The VM pointer
->   * @start: The intermediate physical base address of the range to unmap
->   * @size:  The size of the area to unmap
-> @@ -335,7 +335,7 @@ static void unmap_stage2_puds(struct kvm_s2_mmu *mmu, pgd_t *pgd,
->   * destroying the VM), otherwise another faulting VCPU may come in and mess
->   * with things behind our backs.
->   */
-> -static void unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
-> +void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
->  {
->  	struct kvm *kvm = mmu->kvm;
->  	pgd_t *pgd;
-> @@ -924,6 +924,10 @@ int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu)
->  
->  	mmu->pgd = pgd;
->  	mmu->pgd_phys = pgd_phys;
-> +	mmu->vmid.vmid_gen = 0;
-> +
-> +	kvm_init_s2_mmu(mmu);
-> +
->  	return 0;
->  }
->  
-> @@ -962,7 +966,7 @@ static void stage2_unmap_memslot(struct kvm *kvm,
->  
->  		if (!(vma->vm_flags & VM_PFNMAP)) {
->  			gpa_t gpa = addr + (vm_start - memslot->userspace_addr);
-> -			unmap_stage2_range(&kvm->arch.mmu, gpa, vm_end - vm_start);
-> +			kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, vm_end - vm_start);
->  		}
->  		hva = vm_end;
->  	} while (hva < reg_end);
-> @@ -1001,7 +1005,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
->  
->  	spin_lock(&kvm->mmu_lock);
->  	if (mmu->pgd) {
-> -		unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
-> +		kvm_unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
->  		pgd = READ_ONCE(mmu->pgd);
->  		mmu->pgd = NULL;
->  	}
-> @@ -1093,7 +1097,7 @@ static int stage2_set_pmd_huge(struct kvm_s2_mmu *mmu,
->  		 * get handled accordingly.
->  		 */
->  		if (!pmd_thp_or_huge(old_pmd)) {
-> -			unmap_stage2_range(mmu, addr & S2_PMD_MASK, S2_PMD_SIZE);
-> +			kvm_unmap_stage2_range(mmu, addr & S2_PMD_MASK, S2_PMD_SIZE);
->  			goto retry;
->  		}
->  		/*
-> @@ -1145,7 +1149,7 @@ static int stage2_set_pud_huge(struct kvm_s2_mmu *mmu,
->  		 * the range for this block and retry.
->  		 */
->  		if (!stage2_pud_huge(kvm, old_pud)) {
-> -			unmap_stage2_range(mmu, addr & S2_PUD_MASK, S2_PUD_SIZE);
-> +			kvm_unmap_stage2_range(mmu, addr & S2_PUD_MASK, S2_PUD_SIZE);
->  			goto retry;
->  		}
->  
-> @@ -2047,7 +2051,7 @@ static int handle_hva_to_gpa(struct kvm *kvm,
->  
->  static int kvm_unmap_hva_handler(struct kvm *kvm, gpa_t gpa, u64 size, void *data)
->  {
-> -	unmap_stage2_range(&kvm->arch.mmu, gpa, size);
-> +	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
->  	return 0;
->  }
->  
-> @@ -2360,7 +2364,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
->  
->  	spin_lock(&kvm->mmu_lock);
->  	if (ret)
-> -		unmap_stage2_range(&kvm->arch.mmu, mem->guest_phys_addr, mem->memory_size);
-> +		kvm_unmap_stage2_range(&kvm->arch.mmu, mem->guest_phys_addr, mem->memory_size);
->  	else
->  		stage2_flush_memslot(&kvm->arch.mmu, memslot);
->  	spin_unlock(&kvm->mmu_lock);
-> @@ -2384,11 +2388,6 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
->  {
->  }
->  
-> -void kvm_arch_flush_shadow_all(struct kvm *kvm)
-> -{
-> -	kvm_free_stage2_pgd(&kvm->arch.mmu);
-> -}
-> -
->  void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
->  				   struct kvm_memory_slot *slot)
->  {
-> @@ -2396,7 +2395,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
->  	phys_addr_t size = slot->npages << PAGE_SHIFT;
->  
->  	spin_lock(&kvm->mmu_lock);
-> -	unmap_stage2_range(&kvm->arch.mmu, gpa, size);
-> +	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
->  	spin_unlock(&kvm->mmu_lock);
->  }
->  
-> @@ -2467,3 +2466,7 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
->  
->  	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
->  }
-> +
-> +__weak void kvm_arch_flush_shadow_all(struct kvm *kvm)
-> +{
-> +}
+
+> 
+>> +
+>> +    /* This is the length if adding a new generic error data entry*/
+>> +    data_length += GHES_DATA_LENGTH;
+>> +    data_length += GHES_MEM_CPER_LENGTH;
+>> +
+>> +    /* Check whether it will run out of the preallocated memory if adding a new
+>> +     * generic error data entry
+>> +     */
+>> +    if ((data_length + sizeof(AcpiGenericErrorStatus)) > GHES_MAX_RAW_DATA_LENGTH) {
+>> +        error_report("Record CPER out of boundary!!!");
+>> +        return GHES_CPER_FAIL;
+>> +    }
+>> +
+>> +    /* Build the new generic error status block header */
+>> +    build_append_ghes_generic_status(block, cpu_to_le32(ACPI_GEBS_UNCORRECTABLE), 0, 0,
+>> +        cpu_to_le32(data_length), cpu_to_le32(ACPI_CPER_SEV_RECOVERABLE));
+>> +
+>> +    /* Write back above generic error status block header to guest memory */
+>> +    cpu_physical_memory_write(error_block_address, block->data,
+>> +                              block->len);
+>> +
+>> +    /* Add a new generic error data entry */
+>> +
+>> +    data_length = block->len;
+>> +    /* Build this new generic error data entry header */
+>> +    build_append_ghes_generic_data(block, mem_section_id_le,
+>> +                    cpu_to_le32(ACPI_CPER_SEV_RECOVERABLE), cpu_to_le32(0x300), 0, 0,
+>> +                    cpu_to_le32(80)/* the total size of Memory Error Record */, fru_id,
+>> +                    fru_text, 0);
+>> +
+>> +    /* Build the memory section CPER for above new generic error data entry */
+>> +    build_append_mem_cper(block, error_physical_addr);
+>> +
+>> +    /* Write back above this new generic error data entry to guest memory */
+>> +    cpu_physical_memory_write(error_block_address + current_block_length,
+>> +                    block->data + data_length, block->len - data_length);
+>> +
+>> +    g_array_free(block, true);
+>> +
+>> +    return GHES_CPER_OK;
+>> +}
+>> +
+>>  /* Build table for the hardware error fw_cfg blob */
+>>  void build_hardware_error_table(GArray *hardware_errors, BIOSLinker *linker)
+>>  {
+>> @@ -169,3 +264,85 @@ void ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_error)
+>>      fw_cfg_add_file_callback(s, GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL, NULL,
+>>          &ges.ghes_addr_le, sizeof(ges.ghes_addr_le), false);
+>>  }
+>> +
+>> +bool ghes_record_errors(uint32_t notify, uint64_t physical_address)
+>> +{
+>> +    uint64_t error_block_addr, read_ack_register_addr;
+>> +    int read_ack_register = 0, loop = 0;
+>> +    uint64_t start_addr = le32_to_cpu(ges.ghes_addr_le);
+>> +    bool ret = GHES_CPER_FAIL;
+>> +    const uint8_t error_source_id[] = { 0xff, 0xff, 0xff, 0xff,
+>> +                                        0xff, 0xff, 0xff, 0, 1};
+>> +
+>> +    /*
+>> +     * | +---------------------+ ges.ghes_addr_le
+>> +     * | |error_block_address0 |
+>> +     * | +---------------------+ --+--
+>> +     * | |    .............    | GHES_ADDRESS_SIZE
+>> +     * | +---------------------+ --+--
+>> +     * | |error_block_addressN |
+>> +     * | +---------------------+
+>> +     * | | read_ack_register0  |
+>> +     * | +---------------------+ --+--
+>> +     * | |   .............     | GHES_ADDRESS_SIZE
+>> +     * | +---------------------+ --+--
+>> +     * | | read_ack_registerN  |
+>> +     * | +---------------------+ --+--
+>> +     * | |      CPER           |   |
+>> +     * | |      ....           | GHES_MAX_RAW_DATA_LENGT
+>> +     * | |      CPER           |   |
+>> +     * | +---------------------+ --+--
+>> +     * | |    ..........       |
+>> +     * | +---------------------+
+>> +     * | |      CPER           |
+>> +     * | |      ....           |
+>> +     * | |      CPER           |
+>> +     * | +---------------------+
+>> +     */
+>> +    if (physical_address && notify < ACPI_HEST_NOTIFY_RESERVED) {
+>> +        /* Find and check the source id for this new CPER */
+>> +        if (error_source_id[notify] != 0xff) {
+>> +            start_addr += error_source_id[notify] * GHES_ADDRESS_SIZE;
+>> +        } else {
+>> +            goto out;
+>> +        }
+>> +
+>> +        cpu_physical_memory_read(start_addr, &error_block_addr,
+>> +                                    GHES_ADDRESS_SIZE);
+>> +
+>> +        read_ack_register_addr = start_addr +
+>> +                        ACPI_HEST_ERROR_SOURCE_COUNT * GHES_ADDRESS_SIZE;
+>> +retry:
+>> +        cpu_physical_memory_read(read_ack_register_addr,
+>> +                                 &read_ack_register, GHES_ADDRESS_SIZE);
+>> +
+>> +        /* zero means OSPM does not acknowledge the error */
+>> +        if (!read_ack_register) {
+>> +            if (loop < 3) {
+>> +                usleep(100 * 1000);
+>> +                loop++;
+>> +                goto retry;
+>> +            } else {
+>> +                error_report("OSPM does not acknowledge previous error,"
+>> +                    " so can not record CPER for current error, forcibly acknowledge"
+>> +                    " previous error to avoid blocking next time CPER record! Exit");
+>> +                read_ack_register = 1;
+>> +                cpu_physical_memory_write(read_ack_register_addr,
+>> +                    &read_ack_register, GHES_ADDRESS_SIZE);
+>> +            }
+>> +        } else {
+>> +            if (error_block_addr) {
+>> +                read_ack_register = 0;
+>> +                /* Clear the Read Ack Register, OSPM will write it to 1 when
+>> +                 * acknowledge this error.
+>> +                 */
+>> +                cpu_physical_memory_write(read_ack_register_addr,
+>> +                    &read_ack_register, GHES_ADDRESS_SIZE);
+>> +                ret = ghes_record_mem_error(error_block_addr, physical_address);
+>> +            }
+>> +        }
+>> +    }
+>> +
+>> +out:
+>> +    return ret;
+>> +}
+>> diff --git a/include/hw/acpi/acpi_ghes.h b/include/hw/acpi/acpi_ghes.h
+>> index 38fd87c..6b38097 100644
+>> --- a/include/hw/acpi/acpi_ghes.h
+>> +++ b/include/hw/acpi/acpi_ghes.h
+>> @@ -32,11 +32,14 @@
+>>  #define GHES_ADDRESS_SIZE           8
+>>  
+>>  #define GHES_DATA_LENGTH            72
+>> -#define GHES_CPER_LENGTH            80
+>> +#define GHES_MEM_CPER_LENGTH        80
+>>  
+>>  #define ReadAckPreserve             0xfffffffe
+>>  #define ReadAckWrite                0x1
+>>  
+>> +#define GHES_CPER_OK                1
+>> +#define GHES_CPER_FAIL              0
+>> +
+>>  /* The max size in bytes for one error block */
+>>  #define GHES_MAX_RAW_DATA_LENGTH        0x1000
+>>  /* Now only have GPIO-Signal and ARMv8 SEA notification types error sources
+>> @@ -76,4 +79,5 @@ void build_apei_hest(GArray *table_data, GArray *hardware_error,
+>>  
+>>  void build_hardware_error_table(GArray *hardware_errors, BIOSLinker *linker);
+>>  void ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_errors);
+>> +bool ghes_record_errors(uint32_t notify, uint64_t error_physical_addr);
+>>  #endif
+>> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+>> index a6d1cd1..1d1a7a8 100644
+>> --- a/include/sysemu/kvm.h
+>> +++ b/include/sysemu/kvm.h
+>> @@ -377,7 +377,7 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
+>>  /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
+>>  unsigned long kvm_arch_vcpu_id(CPUState *cpu);
+>>  
+>> -#ifdef TARGET_I386
+>> +#if defined(TARGET_I386) || defined(TARGET_AARCH64)
+>>  #define KVM_HAVE_MCE_INJECTION 1
+>>  void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
+>>  #endif
+>> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+>> index c7bdc6a..d2eac28 100644
+>> --- a/target/arm/kvm64.c
+>> +++ b/target/arm/kvm64.c
+>> @@ -27,6 +27,10 @@
+>>  #include "kvm_arm.h"
+>>  #include "internals.h"
+>>  #include "hw/arm/arm.h"
+>> +#include "exec/ram_addr.h"
+>> +#include "hw/acpi/acpi-defs.h"
+>> +#include "hw/acpi/acpi_ghes.h"
+>> +#include "hw/acpi/acpi.h"
+>>  
+>>  static bool have_guest_debug;
+>>  
+>> @@ -1029,6 +1033,41 @@ int kvm_arch_get_registers(CPUState *cs)
+>>      return ret;
+>>  }
+>>  
+>> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+>> +{
+>> +    ram_addr_t ram_addr;
+>> +    hwaddr paddr;
+>> +
+>> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
+>> +
+>> +    if (acpi_enabled && addr) {
+>> +        ram_addr = qemu_ram_addr_from_host(addr);
+>> +        if (ram_addr != RAM_ADDR_INVALID &&
+>> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+>> +            kvm_hwpoison_page_add(ram_addr);
+>> +            /* Asynchronous signal will be masked by main thread, so
+>> +             * only handle synchronous signal.
+>> +             */
+>> +            if (code == BUS_MCEERR_AR) {
+>> +                kvm_cpu_synchronize_state(c);
+>> +                if (GHES_CPER_FAIL != ghes_record_errors(ACPI_HEST_NOTIFY_SEA, paddr)) {
+>> +                    kvm_inject_arm_sea(c);
+>> +                } else {
+>> +                    fprintf(stderr, "failed to record the error\n");
+>> +                }
+>> +            }
+>> +            return;
+>> +        }
+>> +        fprintf(stderr, "Hardware memory error for memory used by "
+>> +                "QEMU itself instead of guest system!\n");
+>> +    }
+>> +
+>> +    if (code == BUS_MCEERR_AR) {
+>> +        fprintf(stderr, "Hardware memory error!\n");
+>> +        exit(1);
+>> +    }
+>> +}
+>> +
+>>  /* C6.6.29 BRK instruction */
+>>  static const uint32_t brk_insn = 0xd4200000;
+>>  
+> 
+> .
+> 
+
