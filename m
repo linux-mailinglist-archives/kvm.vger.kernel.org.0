@@ -2,36 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 34802558B2
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 22:24:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A937A559F0
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 23:29:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726712AbfFYUYp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 16:24:45 -0400
-Received: from mga01.intel.com ([192.55.52.88]:57808 "EHLO mga01.intel.com"
+        id S1726287AbfFYV33 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 17:29:29 -0400
+Received: from mga11.intel.com ([192.55.52.93]:5376 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726053AbfFYUYo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jun 2019 16:24:44 -0400
+        id S1725782AbfFYV33 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 17:29:29 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Jun 2019 13:24:43 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Jun 2019 14:29:24 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,417,1557212400"; 
-   d="scan'208";a="172486070"
+   d="scan'208";a="172501044"
 Received: from ray.jf.intel.com (HELO [10.7.201.139]) ([10.7.201.139])
-  by orsmga002.jf.intel.com with ESMTP; 25 Jun 2019 13:24:43 -0700
-Subject: Re: [PATCH v1 5/6] mm: Add logic for separating "aerated" pages from
- "raw" pages
-To:     Alexander Duyck <alexander.duyck@gmail.com>, nitesh@redhat.com,
-        kvm@vger.kernel.org, david@redhat.com, mst@redhat.com,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        akpm@linux-foundation.org
-Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
-        konrad.wilk@oracle.com, lcapitulino@redhat.com,
-        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
-References: <20190619222922.1231.27432.stgit@localhost.localdomain>
- <20190619223331.1231.39271.stgit@localhost.localdomain>
+  by orsmga002.jf.intel.com with ESMTP; 25 Jun 2019 14:29:23 -0700
+Subject: Re: [PATCH 4/9] x86/mm/tlb: Flush remote and local TLBs concurrently
+To:     Nadav Amit <namit@vmware.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andy Lutomirski <luto@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>,
+        Juergen Gross <jgross@suse.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        linux-hyperv@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org
+References: <20190613064813.8102-1-namit@vmware.com>
+ <20190613064813.8102-5-namit@vmware.com>
 From:   Dave Hansen <dave.hansen@intel.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -77,12 +85,12 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-Message-ID: <f704f160-49fb-2fdf-e8ac-44b47245a75c@intel.com>
-Date:   Tue, 25 Jun 2019 13:24:42 -0700
+Message-ID: <723d63ee-c8cb-14a1-0eb9-265e580360f4@intel.com>
+Date:   Tue, 25 Jun 2019 14:29:24 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <20190619223331.1231.39271.stgit@localhost.localdomain>
+In-Reply-To: <20190613064813.8102-5-namit@vmware.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -91,351 +99,326 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/19/19 3:33 PM, Alexander Duyck wrote:
-> Add a set of pointers we shall call "boundary" which represents the upper
-> boundary between the "raw" and "aerated" pages. The general idea is that in
-> order for a page to cross from one side of the boundary to the other it
-> will need to go through the aeration treatment.
-
-Aha!  The mysterious "boundary"!
-
-But, how can you introduce code that deals with boundaries before
-introducing the boundary itself?  Or was that comment misplaced?
-
-FWIW, I'm not a fan of these commit messages.  They are really hard to
-map to the data structures.
-
-	One goal in this set is to avoid creating new data structures.
-	We accomplish that by reusing the free lists to hold aerated and
-	non-aerated pages.  But, in order to use the existing free list,
-	we need a boundary to separate aerated from raw.
-
-Further:
-
-	Pages are temporarily removed from the free lists while aerating
-	them.
-
-This needs a justification why you chose this path, and also what the
-larger implications are.
-
-> By doing this we should be able to make certain that we keep the aerated
-> pages as one contiguous block on the end of each free list. This will allow
-> us to efficiently walk the free lists whenever we need to go in and start
-> processing hints to the hypervisor that the pages are no longer in use.
-
-You don't really walk them though, right?  It *keeps* you from having to
-ever walk the lists.
-
-I also don't see what the boundary has to do with aerated pages being on
-the tail of the list.  If you want them on the tail, you just always
-list_add_tail() them.
-
-> And added advantage to this approach is that we should be reducing the
-> overall memory footprint of the guest as it will be more likely to recycle
-> warm pages versus the aerated pages that are likely to be cache cold.
-
-I'm confused.  Isn't an aerated page non-present on the guest?  That's
-worse than cache cold.  It costs a VMEXIT to bring back in.
-
-> Since we will only be aerating one zone at a time we keep the boundary
-> limited to being defined for just the zone we are currently placing aerated
-> pages into. Doing this we can keep the number of additional poitners needed
-> quite small.
-
-							pointers ^
-
-> +struct list_head *__aerator_get_tail(unsigned int order, int migratetype);
->  static inline struct list_head *aerator_get_tail(struct zone *zone,
->  						 unsigned int order,
->  						 int migratetype)
->  {
-> +#ifdef CONFIG_AERATION
-> +	if (order >= AERATOR_MIN_ORDER &&
-> +	    test_bit(ZONE_AERATION_ACTIVE, &zone->flags))
-> +		return __aerator_get_tail(order, migratetype);
-> +#endif
->  	return &zone->free_area[order].free_list[migratetype];
+On 6/12/19 11:48 PM, Nadav Amit wrote:
+> To improve TLB shootdown performance, flush the remote and local TLBs
+> concurrently. Introduce flush_tlb_multi() that does so. The current
+> flush_tlb_others() interface is kept, since paravirtual interfaces need
+> to be adapted first before it can be removed. This is left for future
+> work. In such PV environments, TLB flushes are not performed, at this
+> time, concurrently.
+> 
+> Add a static key to tell whether this new interface is supported.
+> 
+> Cc: "K. Y. Srinivasan" <kys@microsoft.com>
+> Cc: Haiyang Zhang <haiyangz@microsoft.com>
+> Cc: Stephen Hemminger <sthemmin@microsoft.com>
+> Cc: Sasha Levin <sashal@kernel.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: x86@kernel.org
+> Cc: Juergen Gross <jgross@suse.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: Andy Lutomirski <luto@kernel.org>
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+> Cc: linux-hyperv@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: virtualization@lists.linux-foundation.org
+> Cc: kvm@vger.kernel.org
+> Cc: xen-devel@lists.xenproject.org
+> Signed-off-by: Nadav Amit <namit@vmware.com>
+> ---
+>  arch/x86/hyperv/mmu.c                 |  2 +
+>  arch/x86/include/asm/paravirt.h       |  8 +++
+>  arch/x86/include/asm/paravirt_types.h |  6 +++
+>  arch/x86/include/asm/tlbflush.h       |  6 +++
+>  arch/x86/kernel/kvm.c                 |  1 +
+>  arch/x86/kernel/paravirt.c            |  3 ++
+>  arch/x86/mm/tlb.c                     | 71 ++++++++++++++++++++++-----
+>  arch/x86/xen/mmu_pv.c                 |  2 +
+>  8 files changed, 87 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/x86/hyperv/mmu.c b/arch/x86/hyperv/mmu.c
+> index e65d7fe6489f..ca28b400c87c 100644
+> --- a/arch/x86/hyperv/mmu.c
+> +++ b/arch/x86/hyperv/mmu.c
+> @@ -233,4 +233,6 @@ void hyperv_setup_mmu_ops(void)
+>  	pr_info("Using hypercall for remote TLB flush\n");
+>  	pv_ops.mmu.flush_tlb_others = hyperv_flush_tlb_others;
+>  	pv_ops.mmu.tlb_remove_table = tlb_remove_table;
+> +
+> +	static_key_disable(&flush_tlb_multi_enabled.key);
 >  }
-
-Logically, I have no idea what this is doing.  "Go get pages out of the
-aerated list?"  "raw list"?  Needs comments.
-
-> +static inline void aerator_del_from_boundary(struct page *page,
-> +					     struct zone *zone)
-> +{
-> +	if (PageAerated(page) && test_bit(ZONE_AERATION_ACTIVE, &zone->flags))
-> +		__aerator_del_from_boundary(page, zone);
-> +}
-> +
->  static inline void set_page_aerated(struct page *page,
->  				    struct zone *zone,
->  				    unsigned int order,
-> @@ -28,6 +59,9 @@ static inline void set_page_aerated(struct page *page,
->  	/* record migratetype and flag page as aerated */
->  	set_pcppage_migratetype(page, migratetype);
->  	__SetPageAerated(page);
-> +
-> +	/* update boundary of new migratetype and record it */
-> +	aerator_add_to_boundary(page, zone);
+> diff --git a/arch/x86/include/asm/paravirt.h b/arch/x86/include/asm/paravirt.h
+> index c25c38a05c1c..192be7254457 100644
+> --- a/arch/x86/include/asm/paravirt.h
+> +++ b/arch/x86/include/asm/paravirt.h
+> @@ -47,6 +47,8 @@ static inline void slow_down_io(void)
 >  #endif
 >  }
 >  
-> @@ -39,11 +73,19 @@ static inline void clear_page_aerated(struct page *page,
->  	if (likely(!PageAerated(page)))
->  		return;
->  
-> +	/* push boundary back if we removed the upper boundary */
-> +	aerator_del_from_boundary(page, zone);
+> +DECLARE_STATIC_KEY_TRUE(flush_tlb_multi_enabled);
 > +
->  	__ClearPageAerated(page);
->  	area->nr_free_aerated--;
->  #endif
->  }
->  
-> +static inline unsigned long aerator_raw_pages(struct free_area *area)
-> +{
-> +	return area->nr_free - area->nr_free_aerated;
-> +}
-> +
->  /**
->   * aerator_notify_free - Free page notification that will start page processing
->   * @zone: Pointer to current zone of last page processed
-> @@ -57,5 +99,20 @@ static inline void clear_page_aerated(struct page *page,
->   */
->  static inline void aerator_notify_free(struct zone *zone, int order)
+>  static inline void __flush_tlb(void)
 >  {
-> +#ifdef CONFIG_AERATION
-> +	if (!static_key_false(&aerator_notify_enabled))
-> +		return;
-> +	if (order < AERATOR_MIN_ORDER)
-> +		return;
-> +	if (test_bit(ZONE_AERATION_REQUESTED, &zone->flags))
-> +		return;
-> +	if (aerator_raw_pages(&zone->free_area[order]) < AERATOR_HWM)
-> +		return;
+>  	PVOP_VCALL0(mmu.flush_tlb_user);
+> @@ -62,6 +64,12 @@ static inline void __flush_tlb_one_user(unsigned long addr)
+>  	PVOP_VCALL1(mmu.flush_tlb_one_user, addr);
+>  }
+>  
+> +static inline void flush_tlb_multi(const struct cpumask *cpumask,
+> +				   const struct flush_tlb_info *info)
+> +{
+> +	PVOP_VCALL2(mmu.flush_tlb_multi, cpumask, info);
+> +}
 > +
-> +	__aerator_notify(zone);
-> +#endif
+>  static inline void flush_tlb_others(const struct cpumask *cpumask,
+>  				    const struct flush_tlb_info *info)
+>  {
+> diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm/paravirt_types.h
+> index 946f8f1f1efc..b93b3d90729a 100644
+> --- a/arch/x86/include/asm/paravirt_types.h
+> +++ b/arch/x86/include/asm/paravirt_types.h
+> @@ -211,6 +211,12 @@ struct pv_mmu_ops {
+>  	void (*flush_tlb_user)(void);
+>  	void (*flush_tlb_kernel)(void);
+>  	void (*flush_tlb_one_user)(unsigned long addr);
+> +	/*
+> +	 * flush_tlb_multi() is the preferred interface, which is capable to
+> +	 * flush both local and remote CPUs.
+> +	 */
+> +	void (*flush_tlb_multi)(const struct cpumask *cpus,
+> +				const struct flush_tlb_info *info);
+>  	void (*flush_tlb_others)(const struct cpumask *cpus,
+>  				 const struct flush_tlb_info *info);
+>  
+> diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflush.h
+> index dee375831962..79272938cf79 100644
+> --- a/arch/x86/include/asm/tlbflush.h
+> +++ b/arch/x86/include/asm/tlbflush.h
+> @@ -569,6 +569,9 @@ static inline void flush_tlb_page(struct vm_area_struct *vma, unsigned long a)
+>  	flush_tlb_mm_range(vma->vm_mm, a, a + PAGE_SIZE, PAGE_SHIFT, false);
+>  }
+>  
+> +void native_flush_tlb_multi(const struct cpumask *cpumask,
+> +			     const struct flush_tlb_info *info);
+> +
+>  void native_flush_tlb_others(const struct cpumask *cpumask,
+>  			     const struct flush_tlb_info *info);
+>  
+> @@ -593,6 +596,9 @@ static inline void arch_tlbbatch_add_mm(struct arch_tlbflush_unmap_batch *batch,
+>  extern void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch);
+>  
+>  #ifndef CONFIG_PARAVIRT
+> +#define flush_tlb_multi(mask, info)	\
+> +	native_flush_tlb_multi(mask, info)
+> +
+>  #define flush_tlb_others(mask, info)	\
+>  	native_flush_tlb_others(mask, info)
+>  
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index 5169b8cc35bb..00d81e898717 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -630,6 +630,7 @@ static void __init kvm_guest_init(void)
+>  	    kvm_para_has_feature(KVM_FEATURE_STEAL_TIME)) {
+>  		pv_ops.mmu.flush_tlb_others = kvm_flush_tlb_others;
+>  		pv_ops.mmu.tlb_remove_table = tlb_remove_table;
+> +		static_key_disable(&flush_tlb_multi_enabled.key);
+>  	}
+>  
+>  	if (kvm_para_has_feature(KVM_FEATURE_PV_EOI))
+> diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
+> index 98039d7fb998..ac00afed5570 100644
+> --- a/arch/x86/kernel/paravirt.c
+> +++ b/arch/x86/kernel/paravirt.c
+> @@ -159,6 +159,8 @@ unsigned paravirt_patch_insns(void *insn_buff, unsigned len,
+>  	return insn_len;
+>  }
+>  
+> +DEFINE_STATIC_KEY_TRUE(flush_tlb_multi_enabled);
+> +
+>  static void native_flush_tlb(void)
+>  {
+>  	__native_flush_tlb();
+> @@ -363,6 +365,7 @@ struct paravirt_patch_template pv_ops = {
+>  	.mmu.flush_tlb_user	= native_flush_tlb,
+>  	.mmu.flush_tlb_kernel	= native_flush_tlb_global,
+>  	.mmu.flush_tlb_one_user	= native_flush_tlb_one_user,
+> +	.mmu.flush_tlb_multi	= native_flush_tlb_multi,
+>  	.mmu.flush_tlb_others	= native_flush_tlb_others,
+>  	.mmu.tlb_remove_table	=
+>  			(void (*)(struct mmu_gather *, void *))tlb_remove_page,
+> diff --git a/arch/x86/mm/tlb.c b/arch/x86/mm/tlb.c
+> index c34bcf03f06f..db73d5f1dd43 100644
+> --- a/arch/x86/mm/tlb.c
+> +++ b/arch/x86/mm/tlb.c
+> @@ -551,7 +551,7 @@ static void flush_tlb_func_common(const struct flush_tlb_info *f,
+>  		 * garbage into our TLB.  Since switching to init_mm is barely
+>  		 * slower than a minimal flush, just switch to init_mm.
+>  		 *
+> -		 * This should be rare, with native_flush_tlb_others skipping
+> +		 * This should be rare, with native_flush_tlb_multi skipping
+>  		 * IPIs to lazy TLB mode CPUs.
+>  		 */
+
+Nit, since we're messing with this, it can now be
+"native_flush_tlb_multi()" since it is a function.
+
+>  		switch_mm_irqs_off(NULL, &init_mm, NULL);
+> @@ -635,9 +635,12 @@ static void flush_tlb_func_common(const struct flush_tlb_info *f,
+>  	this_cpu_write(cpu_tlbstate.ctxs[loaded_mm_asid].tlb_gen, mm_tlb_gen);
+>  }
+>  
+> -static void flush_tlb_func_local(const void *info, enum tlb_flush_reason reason)
+> +static void flush_tlb_func_local(void *info)
+>  {
+>  	const struct flush_tlb_info *f = info;
+> +	enum tlb_flush_reason reason;
+> +
+> +	reason = (f->mm == NULL) ? TLB_LOCAL_SHOOTDOWN : TLB_LOCAL_MM_SHOOTDOWN;
+
+Should we just add the "reason" to flush_tlb_info?  It's OK-ish to imply
+it like this, but seems like it would be nicer and easier to track down
+the origins of these things if we did this at the caller.
+
+>  	flush_tlb_func_common(f, true, reason);
+>  }
+> @@ -655,14 +658,21 @@ static void flush_tlb_func_remote(void *info)
+>  	flush_tlb_func_common(f, false, TLB_REMOTE_SHOOTDOWN);
+>  }
+>  
+> -static bool tlb_is_not_lazy(int cpu, void *data)
+> +static inline bool tlb_is_not_lazy(int cpu)
+>  {
+>  	return !per_cpu(cpu_tlbstate.is_lazy, cpu);
 >  }
 
-Again, this is really hard to review.  I see some possible overhead in a
-fast path here, but only if aerator_notify_free() is called in a fast
-path.  Is it?  I have to go digging in the previous patches to figure
-that out.
+Nit: the compiler will probably inline this sucker anyway.  So, for
+these kinds of patches, I'd resist the urge to do these kinds of tweaks,
+especially since it starts to hide the important change on the line.
 
-> +static struct aerator_dev_info *a_dev_info;
-> +struct static_key aerator_notify_enabled;
+> -void native_flush_tlb_others(const struct cpumask *cpumask,
+> -			     const struct flush_tlb_info *info)
+> +static DEFINE_PER_CPU(cpumask_t, flush_tlb_mask);
 > +
-> +struct list_head *boundary[MAX_ORDER - AERATOR_MIN_ORDER][MIGRATE_TYPES];
+> +void native_flush_tlb_multi(const struct cpumask *cpumask,
+> +			    const struct flush_tlb_info *info)
+>  {
+> +	/*
+> +	 * Do accounting and tracing. Note that there are (and have always been)
+> +	 * cases in which a remote TLB flush will be traced, but eventually
+> +	 * would not happen.
+> +	 */
+>  	count_vm_tlb_event(NR_TLB_REMOTE_FLUSH);
+>  	if (info->end == TLB_FLUSH_ALL)
+>  		trace_tlb_flush(TLB_REMOTE_SEND_IPI, TLB_FLUSH_ALL);
+> @@ -682,10 +692,14 @@ void native_flush_tlb_others(const struct cpumask *cpumask,
+>  		 * means that the percpu tlb_gen variables won't be updated
+>  		 * and we'll do pointless flushes on future context switches.
+>  		 *
+> -		 * Rather than hooking native_flush_tlb_others() here, I think
+> +		 * Rather than hooking native_flush_tlb_multi() here, I think
+>  		 * that UV should be updated so that smp_call_function_many(),
+>  		 * etc, are optimal on UV.
+>  		 */
+> +		local_irq_disable();
+> +		flush_tlb_func_local((__force void *)info);
+> +		local_irq_enable();
 > +
-> +static void aerator_reset_boundary(struct zone *zone, unsigned int order,
-> +				   unsigned int migratetype)
-> +{
-> +	boundary[order - AERATOR_MIN_ORDER][migratetype] =
-> +			&zone->free_area[order].free_list[migratetype];
-> +}
-> +
-> +#define for_each_aerate_migratetype_order(_order, _type) \
-> +	for (_order = MAX_ORDER; _order-- != AERATOR_MIN_ORDER;) \
-> +		for (_type = MIGRATE_TYPES; _type--;)
-> +
-> +static void aerator_populate_boundaries(struct zone *zone)
-> +{
-> +	unsigned int order, mt;
-> +
-> +	if (test_bit(ZONE_AERATION_ACTIVE, &zone->flags))
-> +		return;
-> +
-> +	for_each_aerate_migratetype_order(order, mt)
-> +		aerator_reset_boundary(zone, order, mt);
-> +
-> +	set_bit(ZONE_AERATION_ACTIVE, &zone->flags);
-> +}
+>  		cpumask = uv_flush_tlb_others(cpumask, info);
+>  		if (cpumask)
+>  			smp_call_function_many(cpumask, flush_tlb_func_remote,
+> @@ -704,11 +718,39 @@ void native_flush_tlb_others(const struct cpumask *cpumask,
+>  	 * doing a speculative memory access.
+>  	 */
+>  	if (info->freed_tables)
+> -		smp_call_function_many(cpumask, flush_tlb_func_remote,
+> -			       (void *)info, 1);
+> -	else
+> -		on_each_cpu_cond_mask(tlb_is_not_lazy, flush_tlb_func_remote,
+> -				(void *)info, 1, GFP_ATOMIC, cpumask);
+> +		__smp_call_function_many(cpumask, flush_tlb_func_remote,
+> +					 flush_tlb_func_local, (void *)info, 1);
+> +	else {
 
-This function appears misnamed as it's doing more than boundary
-manipulation.
+I prefer brackets be added for 'if' blocks like this since it doesn't
+take up any meaningful space and makes it less prone to compile errors.
 
-> +struct list_head *__aerator_get_tail(unsigned int order, int migratetype)
-> +{
-> +	return boundary[order - AERATOR_MIN_ORDER][migratetype];
-> +}
-> +
-> +void __aerator_del_from_boundary(struct page *page, struct zone *zone)
-> +{
-> +	unsigned int order = page_private(page) - AERATOR_MIN_ORDER;
-> +	int mt = get_pcppage_migratetype(page);
-> +	struct list_head **tail = &boundary[order][mt];
-> +
-> +	if (*tail == &page->lru)
-> +		*tail = page->lru.next;
-> +}
-
-Ewww.  Please just track the page that's the boundary, not the list head
-inside the page that's the boundary.
-
-This also at least needs one comment along the lines of: Move the
-boundary if the page representing the boundary is being removed.
-
-
-> +void aerator_add_to_boundary(struct page *page, struct zone *zone)
-> +{
-> +	unsigned int order = page_private(page) - AERATOR_MIN_ORDER;
-> +	int mt = get_pcppage_migratetype(page);
-> +	struct list_head **tail = &boundary[order][mt];
-> +
-> +	*tail = &page->lru;
-> +}
-> +
-> +void aerator_shutdown(void)
-> +{
-> +	static_key_slow_dec(&aerator_notify_enabled);
-> +
-> +	while (atomic_read(&a_dev_info->refcnt))
-> +		msleep(20);
-
-We generally frown on open-coded check/sleep loops.  What is this for?
-
-> +	WARN_ON(!list_empty(&a_dev_info->batch));
-> +
-> +	a_dev_info = NULL;
-> +}
-> +EXPORT_SYMBOL_GPL(aerator_shutdown);
-> +
-> +static void aerator_schedule_initial_aeration(void)
-> +{
-> +	struct zone *zone;
-> +
-> +	for_each_populated_zone(zone) {
-> +		spin_lock(&zone->lock);
-> +		__aerator_notify(zone);
-> +		spin_unlock(&zone->lock);
-> +	}
-> +}
-
-Why do we need an initial aeration?
-
-> +int aerator_startup(struct aerator_dev_info *sdev)
-> +{
-> +	if (a_dev_info)
-> +		return -EBUSY;
-> +
-> +	INIT_LIST_HEAD(&sdev->batch);
-> +	atomic_set(&sdev->refcnt, 0);
-> +
-> +	a_dev_info = sdev;
-> +	aerator_schedule_initial_aeration();
-> +
-> +	static_key_slow_inc(&aerator_notify_enabled);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(aerator_startup);
-> +
-> +static void aerator_fill(struct zone *zone)
-> +{
-> +	struct list_head *batch = &a_dev_info->batch;
-> +	int budget = a_dev_info->capacity;
-
-Where does capacity come from?
-
-> +	unsigned int order, mt;
-> +
-> +	for_each_aerate_migratetype_order(order, mt) {
-> +		struct page *page;
-> +
 > +		/*
-> +		 * Pull pages from free list until we have drained
-> +		 * it or we have filled the batch reactor.
+> +		 * Although we could have used on_each_cpu_cond_mask(),
+> +		 * open-coding it has several performance advantages: (1) we can
+> +		 * use specialized functions for remote and local flushes; (2)
+> +		 * no need for indirect branch to test if TLB is lazy; (3) we
+> +		 * can use a designated cpumask for evaluating the condition
+> +		 * instead of allocating a new one.
+> +		 *
+> +		 * This works under the assumption that there are no nested TLB
+> +		 * flushes, an assumption that is already made in
+> +		 * flush_tlb_mm_range().
 > +		 */
+> +		struct cpumask *cond_cpumask = this_cpu_ptr(&flush_tlb_mask);
 
-What's a reactor?
+This is logically a stack-local variable, right?  But, since we've got
+preempt off and cpumasks can be huge, we don't want to allocate it on
+the stack.  That might be worth a comment somewhere.
 
-> +		while ((page = get_aeration_page(zone, order, mt))) {
-> +			list_add_tail(&page->lru, batch);
+> +		int cpu;
 > +
-> +			if (!--budget)
-> +				return;
+> +		cpumask_clear(cond_cpumask);
+> +
+> +		for_each_cpu(cpu, cpumask) {
+> +			if (tlb_is_not_lazy(cpu))
+> +				__cpumask_set_cpu(cpu, cond_cpumask);
 > +		}
-> +	}
-> +
-> +	/*
-> +	 * If there are no longer enough free pages to fully populate
-> +	 * the aerator, then we can just shut it down for this zone.
-> +	 */
-> +	clear_bit(ZONE_AERATION_REQUESTED, &zone->flags);
-> +	atomic_dec(&a_dev_info->refcnt);
-> +}
 
-Huh, so this is the number of threads doing aeration?  Didn't we just
-make a big deal about there only being one zone being aerated at a time?
- Or, did I misunderstand what refcnt is from its lack of clear
-documentation?
+FWIW, it's probably worth calling out in the changelog that this loop
+exists in on_each_cpu_cond_mask() too.  It looks bad here, but it's no
+worse than what it replaces.
 
-> +static void aerator_drain(struct zone *zone)
-> +{
-> +	struct list_head *list = &a_dev_info->batch;
-> +	struct page *page;
-> +
-> +	/*
-> +	 * Drain the now aerated pages back into their respective
-> +	 * free lists/areas.
-> +	 */
-> +	while ((page = list_first_entry_or_null(list, struct page, lru))) {
-> +		list_del(&page->lru);
-> +		put_aeration_page(zone, page);
+> +		__smp_call_function_many(cond_cpumask, flush_tlb_func_remote,
+> +					 flush_tlb_func_local, (void *)info, 1);
 > +	}
 > +}
-> +
-> +static void aerator_scrub_zone(struct zone *zone)
+
+There was a __force on an earlier 'info' cast.  Could you talk about
+that for a minute an explain why that one is needed?
+
+> +void native_flush_tlb_others(const struct cpumask *cpumask,
+> +			     const struct flush_tlb_info *info)
 > +{
-> +	/* See if there are any pages to pull */
-> +	if (!test_bit(ZONE_AERATION_REQUESTED, &zone->flags))
+> +	native_flush_tlb_multi(cpumask, info);
+>  }
+>  
+>  /*
+> @@ -774,10 +816,15 @@ static void flush_tlb_on_cpus(const cpumask_t *cpumask,
+>  {
+>  	int this_cpu = smp_processor_id();
+>  
+> +	if (static_branch_likely(&flush_tlb_multi_enabled)) {
+> +		flush_tlb_multi(cpumask, info);
 > +		return;
+> +	}
 
-How would someone ask for the zone to be scrubbed when aeration has not
-been requested?
+Probably needs a comment for posterity above the if()^^:
 
-> +	spin_lock(&zone->lock);
+	/* Use the optimized flush_tlb_multi() where we can. */
+
+> --- a/arch/x86/xen/mmu_pv.c
+> +++ b/arch/x86/xen/mmu_pv.c
+> @@ -2474,6 +2474,8 @@ void __init xen_init_mmu_ops(void)
+>  
+>  	pv_ops.mmu = xen_mmu_ops;
+>  
+> +	static_key_disable(&flush_tlb_multi_enabled.key);
 > +
-> +	do {
-> +		aerator_fill(zone);
+>  	memset(dummy_mapping, 0xff, PAGE_SIZE);
+>  }
 
-Should this say:
+More comments, please.  Perhaps:
 
-		/* Pull pages out of the allocator into a local list */
-
-?
-
-> +		if (list_empty(&a_dev_info->batch))
-> +			break;
-
-		/* no pages were acquired, give up */
-
-> +		spin_unlock(&zone->lock);
-> +
-> +		/*
-> +		 * Start aerating the pages in the batch, and then
-> +		 * once that is completed we can drain the reactor
-> +		 * and refill the reactor, restarting the cycle.
-> +		 */
-> +		a_dev_info->react(a_dev_info);
-
-After reading (most of) this set, I'm going to reiterate my suggestion:
-please find new nomenclature.  I can't parse that comment and I don't
-know whether that's because it's a bad comment or whether you really
-mean "cycle" the english word or "cycle" referring to some new
-definition relating to this patch set.
-
-I've asked quite nicely a few times now.
-
-> +		spin_lock(&zone->lock);
-> +
-> +		/*
-> +		 * Guarantee boundaries are populated before we
-> +		 * start placing aerated pages in the zone.
-> +		 */
-> +		aerator_populate_boundaries(zone);
-
-aerator_populate_boundaries() has apparent concurrency checks via
-ZONE_AERATION_ACTIVE.  Why are those needed when this is called under a
-spinlock?
+	Existing paravirt TLB flushes are incompatible with
+	flush_tlb_multi() because....  Disable it when they are
+	in use.
