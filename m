@@ -2,111 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 24A4251FFB
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 02:33:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C30505209A
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 04:28:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729204AbfFYAcz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Jun 2019 20:32:55 -0400
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:39086 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726395AbfFYAcz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Jun 2019 20:32:55 -0400
-Received: by mail-ed1-f65.google.com with SMTP id m10so24332386edv.6
-        for <kvm@vger.kernel.org>; Mon, 24 Jun 2019 17:32:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nBkBYYZc0s8xxqgkIM92IszAEEryF8hhcj8JV1SU20A=;
-        b=UXhIQBFYD2yMmcFMLp1puhsD2i9OksoE0tmnxr7K5BnwgNkxdyzcQboUIz9i20Lsz4
-         3m1RTIe30lWE24I7cvsZZLLhkZgDOCOIkk9ZbG6EosmpUQjxEvoya52YQrtLyV7zH9ed
-         epQ9slu7TgFvXvJ/O6QSeC0l0d5tfQ1BjsfsF+SeCivQZbElS/gZ18iF66YuOrQ/JcOD
-         zhFe4na0F79DpVOMYVK7Dpm3S34HraMbgjpZtfCF2h2d+s5CnnYrRGOohH7RQ9Wj0HSM
-         Xurwf4MZJZS7xJOqWZLSW/LSVgkO36dAgq2GlDTSVHZBaAcm83Tu0TMT9EcFBYadyl+r
-         OB+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nBkBYYZc0s8xxqgkIM92IszAEEryF8hhcj8JV1SU20A=;
-        b=t67lPZghke1gol0eWUOUqNCiPVrozu2/ta4JW59BWH53VEmPx1lY9W2ytGqe+l9aY2
-         AyvEfXS3Ghxtd74HjF2Q5SOfO/klAKVYJ76VN/c53u+YaVatTSytDqMOER4wl+DpzYvY
-         AKfa4Q8tQHSO2q8jZAavnT2QjrxQ9c4LR/u9kE82AJgyJyQWrjIc8MRjMUIuzDrpS/7i
-         7ktjMinoIvN1vlIeGZ4cJJgA8nMNL0t5MLtgPu807DOWAqqgPWKR2xa3gfmZ2ZUgATHL
-         Iyy+lw7icBNrL2RBwJVUCU8y0LD/aOoBtJUfOJHFbPGYZaCjRzph3NYqP8fpcuHyKYf1
-         AsLA==
-X-Gm-Message-State: APjAAAUGIcXj8gOrbjYnN5cQqaz7uY7XsWiFUNuKh/OAxsJRFPhp+zpS
-        3rGBvu8ULKxWKBSgrCS8uuC9Ke2W55JTejvsspODAg==
-X-Google-Smtp-Source: APXvYqzllDy+o0mw3P7xV2FKxd3VIsRlZU7rPG+3/Ts1FSD6sOvt+xhoMTQM+Dp6LA2x/CQ75QeVvVj+dgN2KOP+P5k=
-X-Received: by 2002:aa7:cdc6:: with SMTP id h6mr80176428edw.5.1561422773047;
- Mon, 24 Jun 2019 17:32:53 -0700 (PDT)
+        id S1730400AbfFYC2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Jun 2019 22:28:13 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:19071 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726774AbfFYC2N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Jun 2019 22:28:13 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id CF33BFD7A6B6E20086B8;
+        Tue, 25 Jun 2019 10:28:10 +0800 (CST)
+Received: from [127.0.0.1] (10.74.191.121) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Tue, 25 Jun 2019
+ 10:28:04 +0800
+Subject: Re: [PATCH net-next] net: link_watch: prevent starvation when
+ processing linkwatch wq
+From:   Yunsheng Lin <linyunsheng@huawei.com>
+To:     David Miller <davem@davemloft.net>
+CC:     <hkallweit1@gmail.com>, <f.fainelli@gmail.com>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linuxarm@huawei.com>, <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
+        <kvm@vger.kernel.org>, "xuwei (O)" <xuwei5@huawei.com>
+References: <1558921674-158349-1-git-send-email-linyunsheng@huawei.com>
+ <20190528.235806.323127882998745493.davem@davemloft.net>
+ <6e9b41c9-6edb-be7f-07ee-5480162a227e@huawei.com>
+Message-ID: <5c06e5dd-cfb1-870c-a0a3-42397b59c734@huawei.com>
+Date:   Tue, 25 Jun 2019 10:28:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 MIME-Version: 1.0
-References: <CAOyeoRWfPNmaWY6Lifdkdj3KPPM654vzDO+s3oduEMCJP+Asow@mail.gmail.com>
- <5D036843.2010607@intel.com>
-In-Reply-To: <5D036843.2010607@intel.com>
-From:   Eric Hankland <ehankland@google.com>
-Date:   Mon, 24 Jun 2019 17:32:41 -0700
-Message-ID: <CAOyeoRXr4gmbBPq1RsStoPguiZB8Jxod-irYd3Dm_AGVcQRGSQ@mail.gmail.com>
-Subject: Re: [PATCH v1] KVM: x86: PMU Whitelist
-To:     Wei Wang <wei.w.wang@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <6e9b41c9-6edb-be7f-07ee-5480162a227e@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.74.191.121]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thanks for your feedback - I'll send out an updated version
-incorporating your comments shortly (assuming you don't have more
-after this).
+On 2019/5/29 16:59, Yunsheng Lin wrote:
+> On 2019/5/29 14:58, David Miller wrote:
+>> From: Yunsheng Lin <linyunsheng@huawei.com>
+>> Date: Mon, 27 May 2019 09:47:54 +0800
+>>
+>>> When user has configured a large number of virtual netdev, such
+>>> as 4K vlans, the carrier on/off operation of the real netdev
+>>> will also cause it's virtual netdev's link state to be processed
+>>> in linkwatch. Currently, the processing is done in a work queue,
+>>> which may cause worker starvation problem for other work queue.
+>>>
+>>> This patch releases the cpu when link watch worker has processed
+>>> a fixed number of netdev' link watch event, and schedule the
+>>> work queue again when there is still link watch event remaining.
+>>>
+>>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+>>
+>> Why not rtnl_unlock(); yield(); rtnl_lock(); every "100" events
+>> processed?
+>>
+>> That seems better than adding all of this overhead to reschedule the
+>> workqueue every 100 items.
+> 
+> One minor concern, the above solution does not seem to solve the cpu
+> starvation for other normal workqueue which was scheduled on the same
+> cpu as linkwatch. Maybe I misunderstand the workqueue or there is other
+> consideration here? :)
+> 
+> Anyway, I will implemet it as you suggested and test it before posting V2.
+> Thanks.
 
-> > +struct kvm_pmu_whitelist {
-> > +       __u64 event_mask;
->
-> Is this "ARCH_PERFMON_EVENTSEL_EVENT | ARCH_PERFMON_EVENTSEL_UMASK"?
+Hi, David
 
-In most cases, I envision this being the case, but it's possible users
-may want other bits - see response to the next question below.
+I stress tested the above solution with a lot of vlan dev and qemu-kvm with
+vf passthrongh mode, the linkwatch wq sometimes block the irqfd_inject wq
+when they are scheduled on the same cpu, which may cause interrupt delay
+problem for vm.
 
-> > +       __u16 num_events;
-> > +       __u64 events[0];
->
-> Can this be __u16?
-> The lower 16 bits (umask+eventsel) already determines what the event is.
+Rescheduling workqueue every 100 items does give irqfd_inject wq to run sooner,
+which alleviate the interrupt delay problems for vm.
 
-It looks like newer AMD processors also use bits 32-35 for eventsel
-(see AMD64_EVENTSEL_EVENT/AMD64_RAW_EVENT_MASK in
-arch/x86/include/asm/perf_event.h or a recent reference guide), though
-it doesn't look like this has made it to pmu_amd.c in kvm yet.
-Further, including the whole 64 bits could enable whitelisting some
-events with particular modifiers (e.g. in_tx=0, but not in_tx=1). I'm
-not sure if whitelisting with specific modifiers will be necessary,
-but we definitely need more than u16 if we want to support any AMD
-events that make use of those bits in the future.
+So It is ok for me to fall back to reschedule the link watch wq every 100 items,
+or is there a better way to fix it properly?
 
-> > +       struct kvm_pmu_whitelist *whitelist;
->
-> This could be per-VM and under rcu?
-I'll try this out in the next version.
 
-> Why not moving this filter to reprogram_gp_counter?
->
-> You could directly compare "unit_mask, event_sel"  with whitelist->events[i]
-The reason is that this approach provides uniform behavior whether an
-event is programmed on a fixed purpose counter vs a general purpose
-one. Though I admit it's unlikely that instructions retired/cycles
-wouldn't be whitelisted (and ref cycles can't be programmed on gp
-counters), so it wouldn't be missing too much if I do move this to
-reprogram_gp_counter. What do you think?
 
-> I would directly return -EFAULT here.
->
-> Same here.
+> 
+>>
+>> .
+>>
+> 
+> 
+> .
+> 
 
-Sounds good - I'll fix that in the next version.
-
-> > +       pmu->whitelist = new;
->
-> Forgot to copy the whitelist-ed events to new?
-Yep, somehow I deleted the lines that did this - thanks for pointing it out.
