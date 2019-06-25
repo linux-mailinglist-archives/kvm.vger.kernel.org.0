@@ -2,230 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DFAE154ED4
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 14:28:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8C6454EEA
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 14:31:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731263AbfFYM2s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 08:28:48 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:19075 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726653AbfFYM2r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jun 2019 08:28:47 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 3820CEB960A9AD7D3429;
-        Tue, 25 Jun 2019 20:28:45 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Tue, 25 Jun 2019
- 20:28:38 +0800
-Subject: Re: [PATCH v17 08/10] KVM: Move related hwpoison page functions to
- accel/kvm/ folder
-To:     Igor Mammedov <imammedo@redhat.com>, <pbonzini@redhat.com>
-CC:     <mst@redhat.com>, <shannon.zhaosl@gmail.com>,
-        <peter.maydell@linaro.org>, <lersek@redhat.com>,
-        <james.morse@arm.com>, <mtosatti@redhat.com>, <rth@twiddle.net>,
-        <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
-        <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
-        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
-        <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
-References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
- <1557832703-42620-9-git-send-email-gengdongjiu@huawei.com>
- <20190624143249.37a5e6d5@redhat.com>
-From:   gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <d7edd19e-340f-98ff-6613-34a5e85c05e2@huawei.com>
-Date:   Tue, 25 Jun 2019 20:28:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+        id S1729264AbfFYMbq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 08:31:46 -0400
+Received: from foss.arm.com ([217.140.110.172]:40736 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728101AbfFYMbq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 08:31:46 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3FAF12B;
+        Tue, 25 Jun 2019 05:31:45 -0700 (PDT)
+Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1FB683F71E;
+        Tue, 25 Jun 2019 05:31:43 -0700 (PDT)
+Subject: Re: [PATCH v2 7/9] KVM: arm/arm64: vgic-its: Cache successful
+ MSI->LPI translation
+To:     Zenghui Yu <yuzenghui@huawei.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Julien Thierry <julien.thierry@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Raslan, KarimAllah" <karahmed@amazon.de>,
+        "Saidi, Ali" <alisaidi@amazon.com>
+References: <20190611170336.121706-1-marc.zyngier@arm.com>
+ <20190611170336.121706-8-marc.zyngier@arm.com>
+ <53de88e9-3550-bd7f-8266-35c5e75fae4e@huawei.com>
+From:   Marc Zyngier <marc.zyngier@arm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
+ 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
+ Z46HaNmN2hZS/oJ69c1DI5Rcww==
+Organization: ARM Ltd
+Message-ID: <169cc847-ebfa-44b6-00e7-c69dccdbbd62@arm.com>
+Date:   Tue, 25 Jun 2019 13:31:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190624143249.37a5e6d5@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <53de88e9-3550-bd7f-8266-35c5e75fae4e@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Zenghui,
 
-
-On 2019/6/24 20:32, Igor Mammedov wrote:
-> On Tue, 14 May 2019 04:18:21 -0700
-> Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+On 25/06/2019 12:50, Zenghui Yu wrote:
+> Hi Marc,
 > 
->> kvm_hwpoison_page_add() and kvm_unpoison_all() will be used both
->> by X86 and ARM platforms, so move these functions to a common
->> accel/kvm/ folder to avoid duplicate code.
+> On 2019/6/12 1:03, Marc Zyngier wrote:
+>> On a successful translation, preserve the parameters in the LPI
+>> translation cache. Each translation is reusing the last slot
+>> in the list, naturally evincting the least recently used entry.
 >>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >> ---
->>  accel/kvm/kvm-all.c     | 33 +++++++++++++++++++++++++++++++++
->>  include/exec/ram_addr.h | 24 ++++++++++++++++++++++++
->>  target/arm/kvm.c        |  3 +++
->>  target/i386/kvm.c       | 34 +---------------------------------
->>  4 files changed, 61 insertions(+), 33 deletions(-)
+>>   virt/kvm/arm/vgic/vgic-its.c | 86 ++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 86 insertions(+)
 >>
->> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
->> index 524c4dd..b9f9f29 100644
->> --- a/accel/kvm/kvm-all.c
->> +++ b/accel/kvm/kvm-all.c
->> @@ -625,6 +625,39 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension)
->>      return ret;
->>  }
->>  
->> +typedef struct HWPoisonPage {
->> +    ram_addr_t ram_addr;
->> +    QLIST_ENTRY(HWPoisonPage) list;
->> +} HWPoisonPage;
->> +
->> +static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
->> +    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
->> +
->> +void kvm_unpoison_all(void *param)
+>> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
+>> index 0aa0cbbc3af6..62932458476a 100644
+>> --- a/virt/kvm/arm/vgic/vgic-its.c
+>> +++ b/virt/kvm/arm/vgic/vgic-its.c
+>> @@ -546,6 +546,90 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+>>   	return 0;
+>>   }
+>>   
+>> +static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
+>> +					       phys_addr_t db,
+>> +					       u32 devid, u32 eventid)
 >> +{
->> +    HWPoisonPage *page, *next_page;
+>> +	struct vgic_translation_cache_entry *cte;
+>> +	struct vgic_irq *irq = NULL;
 >> +
->> +    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
->> +        QLIST_REMOVE(page, list);
->> +        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
->> +        g_free(page);
->> +    }
->> +}
+>> +	list_for_each_entry(cte, &dist->lpi_translation_cache, entry) {
+>> +		/*
+>> +		 * If we hit a NULL entry, there is nothing after this
+>> +		 * point.
+>> +		 */
+>> +		if (!cte->irq)
+>> +			break;
 >> +
->> +void kvm_hwpoison_page_add(ram_addr_t ram_addr)
->> +{
->> +    HWPoisonPage *page;
->> +
->> +    QLIST_FOREACH(page, &hwpoison_page_list, list) {
->> +        if (page->ram_addr == ram_addr) {
->> +            return;
->> +        }
->> +    }
->> +    page = g_new(HWPoisonPage, 1);
->> +    page->ram_addr = ram_addr;
->> +    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
->> +}
->> +
->>  static uint32_t adjust_ioeventfd_endianness(uint32_t val, uint32_t size)
->>  {
->>  #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
->> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
->> index 139ad79..193b0a7 100644
->> --- a/include/exec/ram_addr.h
->> +++ b/include/exec/ram_addr.h
+>> +		if (cte->db == db &&
+>> +		    cte->devid == devid &&
+>> +		    cte->eventid == eventid) {
+>> +			/*
+>> +			 * Move this entry to the head, as it is the
+>> +			 * most recently used.
+>> +			 */
+>> +			list_move(&cte->entry, &dist->lpi_translation_cache);
 > 
-> it's not file for KVM specific code,
-> maybe Paolo could suggest a bettor place ...
-I remember some people suggests me to move the code to KVM before, may be he is Peter.
-Paolo, can you give a better place?
+> Only for performance reasons: if we hit at the "head" of the list, we
+> don't need to do a list_move().
+> In our tests, we found that a single list_move() takes nearly (sometimes
+> even more than) one microsecond, for some unknown reason...
 
-> 
-> 
->> @@ -116,6 +116,30 @@ void qemu_ram_free(RAMBlock *block);
->>  
->>  int qemu_ram_resize(RAMBlock *block, ram_addr_t newsize, Error **errp);
->>  
->> +/**
->> + * kvm_hwpoison_page_add:
->> + *
->> + * Parameters:
->> + *  @ram_addr: the address in the RAM for the poisoned page
->> + *
->> + * Add a poisoned page to the list
->> + *
->> + * Return: None.
->> + */
->> +void kvm_hwpoison_page_add(ram_addr_t ram_addr);
->> +
->> +/**
->> + * kvm_unpoison_all:
->> + *
->> + * Parameters:
->> + *  @param: some data may be passed to this function
->> + *
->> + * Free and remove all the poisoned pages in the list
->> + *
->> + * Return: None.
->> + */
->> +void kvm_unpoison_all(void *param);
->> +
->>  #define DIRTY_CLIENTS_ALL     ((1 << DIRTY_MEMORY_NUM) - 1)
->>  #define DIRTY_CLIENTS_NOCODE  (DIRTY_CLIENTS_ALL & ~(1 << DIRTY_MEMORY_CODE))
->>  
->> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->> index 5995634..6d3b25b 100644
->> --- a/target/arm/kvm.c
->> +++ b/target/arm/kvm.c
->> @@ -29,6 +29,7 @@
->>  #include "exec/address-spaces.h"
->>  #include "hw/boards.h"
->>  #include "qemu/log.h"
->> +#include "exec/ram_addr.h"
->>  
->>  const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
->>      KVM_CAP_LAST_INFO
->> @@ -187,6 +188,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->>  
->>      cap_has_mp_state = kvm_check_extension(s, KVM_CAP_MP_STATE);
->>  
->> +    qemu_register_reset(kvm_unpoison_all, NULL);
->> +
->>      return 0;
->>  }
->>  
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index 3b29ce5..9bdb879 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -46,6 +46,7 @@
->>  #include "migration/blocker.h"
->>  #include "exec/memattrs.h"
->>  #include "trace.h"
->> +#include "exec/ram_addr.h"
->>  
->>  //#define DEBUG_KVM
->>  
->> @@ -467,39 +468,6 @@ uint32_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
->>  }
->>  
->>  
->> -typedef struct HWPoisonPage {
->> -    ram_addr_t ram_addr;
->> -    QLIST_ENTRY(HWPoisonPage) list;
->> -} HWPoisonPage;
->> -
->> -static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
->> -    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
->> -
->> -static void kvm_unpoison_all(void *param)
->> -{
->> -    HWPoisonPage *page, *next_page;
->> -
->> -    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
->> -        QLIST_REMOVE(page, list);
->> -        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
->> -        g_free(page);
->> -    }
->> -}
->> -
->> -static void kvm_hwpoison_page_add(ram_addr_t ram_addr)
->> -{
->> -    HWPoisonPage *page;
->> -
->> -    QLIST_FOREACH(page, &hwpoison_page_list, list) {
->> -        if (page->ram_addr == ram_addr) {
->> -            return;
->> -        }
->> -    }
->> -    page = g_new(HWPoisonPage, 1);
->> -    page->ram_addr = ram_addr;
->> -    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
->> -}
->> -
->>  static int kvm_get_mce_cap_supported(KVMState *s, uint64_t *mce_cap,
->>                                       int *max_banks)
->>  {
-> 
-> .
-> 
+Huh... That's odd.
 
+Can you narrow down under which conditions this happens? I'm not sure if
+checking for the list head would be more efficient, as you end-up
+fetching the head anyway. Can you try replacing this line with:
+
+	if (!list_is_first(&cte->entry, &dist->lpi_translation_cache))
+		list_move(&cte->entry, &dist->lpi_translation_cache);
+
+and let me know whether it helps?
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
