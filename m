@@ -2,26 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E7C095572B
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 20:26:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBA3555733
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 20:28:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730922AbfFYS0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 14:26:47 -0400
-Received: from mga14.intel.com ([192.55.52.115]:40351 "EHLO mga14.intel.com"
+        id S1732921AbfFYS2J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 14:28:09 -0400
+Received: from mga03.intel.com ([134.134.136.65]:16203 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727138AbfFYS0r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jun 2019 14:26:47 -0400
+        id S1727138AbfFYS2J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 14:28:09 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Jun 2019 11:26:46 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Jun 2019 11:28:08 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,416,1557212400"; 
-   d="scan'208";a="172456162"
+   d="scan'208";a="172456454"
 Received: from ray.jf.intel.com (HELO [10.7.201.139]) ([10.7.201.139])
-  by orsmga002.jf.intel.com with ESMTP; 25 Jun 2019 11:26:46 -0700
-Subject: Re: [PATCH v1 1/6] mm: Adjust shuffle code to allow for future
- coalescing
+  by orsmga002.jf.intel.com with ESMTP; 25 Jun 2019 11:28:08 -0700
+Subject: Re: [PATCH v1 2/6] mm: Move set/get_pcppage_migratetype to mmzone.h
 To:     Alexander Duyck <alexander.duyck@gmail.com>, nitesh@redhat.com,
         kvm@vger.kernel.org, david@redhat.com, mst@redhat.com,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
@@ -31,7 +30,7 @@ Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
         wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
         dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
 References: <20190619222922.1231.27432.stgit@localhost.localdomain>
- <20190619223302.1231.51136.stgit@localhost.localdomain>
+ <20190619223309.1231.16506.stgit@localhost.localdomain>
 From:   Dave Hansen <dave.hansen@intel.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -77,12 +76,12 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-Message-ID: <d8287bfe-8b34-895c-eff2-c88d0a3f76ae@intel.com>
-Date:   Tue, 25 Jun 2019 11:26:46 -0700
+Message-ID: <68ed3507-16dd-2ea3-4a12-09d04a8dd028@intel.com>
+Date:   Tue, 25 Jun 2019 11:28:08 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <20190619223302.1231.51136.stgit@localhost.localdomain>
+In-Reply-To: <20190619223309.1231.16506.stgit@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -92,12 +91,14 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 6/19/19 3:33 PM, Alexander Duyck wrote:
-> This patch is meant to move the head/tail adding logic out of the shuffle
-> code and into the __free_one_page function since ultimately that is where
-> it is really needed anyway. By doing this we should be able to reduce the
-> overhead and can consolidate all of the list addition bits in one spot.
+> In order to support page aeration it will be necessary to store and
+> retrieve the migratetype of a page. To enable that I am moving the set and
+> get operations for pcppage_migratetype into the mmzone header so that they
+> can be used when adding or removing pages from the free lists.
+...
+> diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
+> index 4c07af2cfc2f..6f8fd5c1a286 100644
+> --- a/include/linux/mmzone.h
+> +++ b/include/linux/mmzone.h
 
-This looks like a sane cleanup that can stand on its own.  It gives nice
-names (buddy_merge_likely()) to things that were just code blobs before.
-
-Reviewed-by: Dave Hansen <dave.hansen@intel.com>
+Not mm/internal.h?
