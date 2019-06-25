@@ -2,86 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 706C054FF2
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 15:13:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 730E555009
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 15:16:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726931AbfFYNNV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 09:13:21 -0400
-Received: from foss.arm.com ([217.140.110.172]:41728 "EHLO foss.arm.com"
+        id S1727457AbfFYNQ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 09:16:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56858 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726448AbfFYNNV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jun 2019 09:13:21 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7002F2B;
-        Tue, 25 Jun 2019 06:13:20 -0700 (PDT)
-Received: from [10.1.215.72] (e121566-lin.cambridge.arm.com [10.1.215.72])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9A4A43F718;
-        Tue, 25 Jun 2019 06:13:19 -0700 (PDT)
-Subject: Re: [PATCH 11/59] KVM: arm64: nv: Inject HVC exceptions to the
- virtual EL2
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-12-marc.zyngier@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <c83d9421-a027-9edf-021b-5d41a7a1884b@arm.com>
-Date:   Tue, 25 Jun 2019 14:13:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726009AbfFYNQ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 09:16:28 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id BE3F030F1BDC;
+        Tue, 25 Jun 2019 13:16:27 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2C4565D9C5;
+        Tue, 25 Jun 2019 13:16:21 +0000 (UTC)
+Date:   Tue, 25 Jun 2019 15:16:16 +0200
+From:   Igor Mammedov <imammedo@redhat.com>
+To:     gengdongjiu <gengdongjiu@huawei.com>
+Cc:     <pbonzini@redhat.com>, <mst@redhat.com>,
+        <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>,
+        <lersek@redhat.com>, <james.morse@arm.com>, <mtosatti@redhat.com>,
+        <rth@twiddle.net>, <ehabkost@redhat.com>, <zhengxiang9@huawei.com>,
+        <jonathan.cameron@huawei.com>, <xuwei5@huawei.com>,
+        <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+        <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
+Subject: Re: [PATCH v17 01/10] hw/arm/virt: Add RAS platform version for
+ migration
+Message-ID: <20190625151616.12e46566@redhat.com>
+In-Reply-To: <fbd558d5-03b7-df5c-e781-549261207221@huawei.com>
+References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
+        <1557832703-42620-2-git-send-email-gengdongjiu@huawei.com>
+        <20190620140409.3c713760@redhat.com>
+        <fbd558d5-03b7-df5c-e781-549261207221@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20190621093843.220980-12-marc.zyngier@arm.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Tue, 25 Jun 2019 13:16:27 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/21/19 10:37 AM, Marc Zyngier wrote:
-> From: Jintack Lim <jintack.lim@linaro.org>
->
-> Now that the psci call is done by the smc instruction when nested
-This suggests that we have support for PSCI calls using SMC as the conduit, but
-that is not the case, as the handle_smc function is not changed by this commit,
-and support for PSCI via SMC is added later in patch 22/59 "KVM: arm64: nv:
-Handle PSCI call via smc from the guest". Perhaps the commit message should be
-reworded to reflect that?
-> virtualization is enabled, it is clear that all hvc instruction from the
-> VM (including from the virtual EL2) are supposed to handled in the
-> virtual EL2.
->
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/kvm/handle_exit.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 516aead3c2a9..6c0ac52b34cc 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -30,6 +30,7 @@
->  #include <asm/kvm_coproc.h>
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_mmu.h>
-> +#include <asm/kvm_nested.h>
->  #include <asm/debug-monitors.h>
->  #include <asm/traps.h>
->  
-> @@ -52,6 +53,12 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  			    kvm_vcpu_hvc_get_imm(vcpu));
->  	vcpu->stat.hvc_exit_stat++;
->  
-> +	/* Forward hvc instructions to the virtual EL2 if the guest has EL2. */
-> +	if (nested_virt_in_use(vcpu)) {
-> +		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
-> +		return 1;
-> +	}
-> +
->  	ret = kvm_hvc_call_handler(vcpu);
->  	if (ret < 0) {
->  		vcpu_set_reg(vcpu, 0, ~0UL);
+On Mon, 24 Jun 2019 20:19:12 +0800
+gengdongjiu <gengdongjiu@huawei.com> wrote:
+
+> On 2019/6/20 20:04, Igor Mammedov wrote:
+> > On Tue, 14 May 2019 04:18:14 -0700
+> > Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> >   
+> >> Support this feature since version 4.1, disable it by
+> >> default in the old version.
+> >>
+> >> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> >> ---
+> >>  hw/arm/virt.c         | 6 ++++++
+> >>  include/hw/arm/virt.h | 1 +
+> >>  2 files changed, 7 insertions(+)
+> >>
+> >> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> >> index 5331ab7..7bdd41b 100644
+> >> --- a/hw/arm/virt.c
+> >> +++ b/hw/arm/virt.c
+> >> @@ -2043,8 +2043,14 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 1)
+> >>  
+> >>  static void virt_machine_4_0_options(MachineClass *mc)
+> >>  {
+> >> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
+> >> +
+> >>      virt_machine_4_1_options(mc);
+> >>      compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len);
+> >> +    /* Disable memory recovery feature for 4.0 as RAS support was
+> >> +     * introduced with 4.1.
+> >> +     */
+> >> +    vmc->no_ras = true;  
+> > 
+> > So it would mean that the feature is enabled unconditionally for
+> > new machine types and consumes resources whether user needs it or not.
+> > 
+> > In light of the race for leaner QEMU and faster startup times,
+> > it might be better to make RAS optional and make user explicitly
+> > enable it using a machine option.  
+> 
+> I will add a machine option to make RAS optional, do you think we should enable or disable it by default? I think it is better if we enable it by default.
+I'd start with disabled by default as it's easy to make it
+enabled by default later and we can't do so other way around.
+
+ 
+> > 
+> >   
+> >>  }
+> >>  DEFINE_VIRT_MACHINE(4, 0)
+> >>  
+> >> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> >> index 4240709..7f1a033 100644
+> >> --- a/include/hw/arm/virt.h
+> >> +++ b/include/hw/arm/virt.h
+> >> @@ -104,6 +104,7 @@ typedef struct {
+> >>      bool disallow_affinity_adjustment;
+> >>      bool no_its;
+> >>      bool no_pmu;
+> >> +    bool no_ras;
+> >>      bool claim_edge_triggered_timers;
+> >>      bool smbios_old_sys_ver;
+> >>      bool no_highmem_ecam;  
+> > 
+> > .
+> >   
+> 
+
