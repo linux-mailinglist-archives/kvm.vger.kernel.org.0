@@ -2,177 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C2D1C54DF6
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 13:50:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB6D8557C0
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 21:25:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732190AbfFYLuh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 07:50:37 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:19074 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1732183AbfFYLuh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jun 2019 07:50:37 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id D2A5EB1D8DF8C982AA7F;
-        Tue, 25 Jun 2019 19:50:32 +0800 (CST)
-Received: from [127.0.0.1] (10.184.12.158) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Tue, 25 Jun 2019
- 19:50:26 +0800
-Subject: Re: [PATCH v2 7/9] KVM: arm/arm64: vgic-its: Cache successful
- MSI->LPI translation
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
-CC:     Julien Thierry <julien.thierry@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        "Christoffer Dall" <christoffer.dall@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        "Raslan, KarimAllah" <karahmed@amazon.de>,
-        "Saidi, Ali" <alisaidi@amazon.com>
-References: <20190611170336.121706-1-marc.zyngier@arm.com>
- <20190611170336.121706-8-marc.zyngier@arm.com>
-From:   Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <53de88e9-3550-bd7f-8266-35c5e75fae4e@huawei.com>
-Date:   Tue, 25 Jun 2019 19:50:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
- Thunderbird/64.0
-MIME-Version: 1.0
-In-Reply-To: <20190611170336.121706-8-marc.zyngier@arm.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.184.12.158]
-X-CFilter-Loop: Reflected
+        id S1727472AbfFYTZi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 15:25:38 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:35160 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726393AbfFYTZi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 15:25:38 -0400
+Received: by mail-pl1-f196.google.com with SMTP id w24so1478936plp.2
+        for <kvm@vger.kernel.org>; Tue, 25 Jun 2019 12:25:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=i+J0SKmGw6ZEpgEH930eO6KcIrrYT2XoE9OZaoJqIn4=;
+        b=by7wxIt6zTKugGwlTbYo0dbHP0KO6n5tEuoKMTzXKmWRiWdfpGmLP2QqpKatcakJMz
+         v5hv+8gXwiMhan+snRoOknwnCBZusH0/5Dedxbs/KmuI1B3VzOFk9IwvDqg1gktsEsjP
+         dI58fhEA0FNjsNmK7vpuwUGDzWndUPaQAbH2on68Jldk63JS/O5ZmeNB++pQm2uRNHFp
+         ajiUhE9fD0zfpCEwMkiBhQvS1gG4NRwvL7iHroprRCCKRMRAytqYBXe5yDxF1igJp9Tz
+         rCkUqZZAt/y8oO8++V1f3BTIO+zbKdG5c8pElHfFqYxmbCoqadRTb5bjTGyt12bR3M23
+         s3CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=i+J0SKmGw6ZEpgEH930eO6KcIrrYT2XoE9OZaoJqIn4=;
+        b=JyiUIAB6iw6ohAZA4ptbZTnjoQpPT0tm3PSdWnYqUZovnOwbZInoEq2lMWizmFDYrl
+         CMRlOlGgGBK6BA47OqCO0wHVIT2lRXQTVuNFApqNiqImltDFzTc46k0Fn0w1ofiEB0z0
+         lmOIDGIWqUUnqvGWR/1/p8rt4Dx7pc93XXnSN+B5xI92QZWYn7u97NByugSsNYGc00oG
+         OW7ODzHu3UDS9m46iPzXe3IkgnOc6zH9Mp1IkEegwAjKhnpSYIT6JrogYQbm8T5m9LbW
+         T0+qJ57zVFZPMwjBVn9NfM3NJMw2kCrTsY6UBmOeYbimLOPr/zh0sTQt2wjhfee0DVcv
+         cuFw==
+X-Gm-Message-State: APjAAAUBIOm68GOFZjG2TaxBBcGQgzH7wU6+U86XPIKFXgJ2PwBJfKvD
+        ygNl63cecovL5pvdElITsU8=
+X-Google-Smtp-Source: APXvYqzlxEyBvhw3fNCgoDHqB2MUre/EDdT95TvPC2HwlY6XgHFZSxRHZZjqwb6BGLIt//aHR675xA==
+X-Received: by 2002:a17:902:2ba7:: with SMTP id l36mr346194plb.334.1561490737335;
+        Tue, 25 Jun 2019 12:25:37 -0700 (PDT)
+Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id x14sm17922158pfq.158.2019.06.25.12.25.36
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 25 Jun 2019 12:25:36 -0700 (PDT)
+From:   Nadav Amit <nadav.amit@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
+        Marc Orr <marcorr@google.com>
+Subject: [kvm-unit-tests PATCH] x86: Remove assumptions on CR4.MCE
+Date:   Tue, 25 Jun 2019 05:03:22 -0700
+Message-Id: <20190625120322.8483-1-nadav.amit@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+CR4.MCE might be set after boot. Remove the assertion that checks that
+it is clear. Change the test to toggle the bit instead of setting it.
 
-On 2019/6/12 1:03, Marc Zyngier wrote:
-> On a successful translation, preserve the parameters in the LPI
-> translation cache. Each translation is reusing the last slot
-> in the list, naturally evincting the least recently used entry.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->   virt/kvm/arm/vgic/vgic-its.c | 86 ++++++++++++++++++++++++++++++++++++
->   1 file changed, 86 insertions(+)
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-> index 0aa0cbbc3af6..62932458476a 100644
-> --- a/virt/kvm/arm/vgic/vgic-its.c
-> +++ b/virt/kvm/arm/vgic/vgic-its.c
-> @@ -546,6 +546,90 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
->   	return 0;
->   }
->   
-> +static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
-> +					       phys_addr_t db,
-> +					       u32 devid, u32 eventid)
-> +{
-> +	struct vgic_translation_cache_entry *cte;
-> +	struct vgic_irq *irq = NULL;
-> +
-> +	list_for_each_entry(cte, &dist->lpi_translation_cache, entry) {
-> +		/*
-> +		 * If we hit a NULL entry, there is nothing after this
-> +		 * point.
-> +		 */
-> +		if (!cte->irq)
-> +			break;
-> +
-> +		if (cte->db == db &&
-> +		    cte->devid == devid &&
-> +		    cte->eventid == eventid) {
-> +			/*
-> +			 * Move this entry to the head, as it is the
-> +			 * most recently used.
-> +			 */
-> +			list_move(&cte->entry, &dist->lpi_translation_cache);
+Cc: Marc Orr <marcorr@google.com>
+Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+---
+ x86/vmx_tests.c | 29 +++++++++++++++--------------
+ 1 file changed, 15 insertions(+), 14 deletions(-)
 
-Only for performance reasons: if we hit at the "head" of the list, we
-don't need to do a list_move().
-In our tests, we found that a single list_move() takes nearly (sometimes
-even more than) one microsecond, for some unknown reason...
-
-
-Thanks,
-zenghui
-
-> +			irq = cte->irq;
-> +			break;
-> +		}
-> +	}
-> +
-> +	return irq;
-> +}
-> +
-> +static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
-> +				       u32 devid, u32 eventid,
-> +				       struct vgic_irq *irq)
-> +{
-> +	struct vgic_dist *dist = &kvm->arch.vgic;
-> +	struct vgic_translation_cache_entry *cte;
-> +	unsigned long flags;
-> +	phys_addr_t db;
-> +
-> +	/* Do not cache a directly injected interrupt */
-> +	if (irq->hw)
-> +		return;
-> +
-> +	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
-> +
-> +	if (unlikely(list_empty(&dist->lpi_translation_cache)))
-> +		goto out;
-> +
-> +	/*
-> +	 * We could have raced with another CPU caching the same
-> +	 * translation behind our back, so let's check it is not in
-> +	 * already
-> +	 */
-> +	db = its->vgic_its_base + GITS_TRANSLATER;
-> +	if (__vgic_its_check_cache(dist, db, devid, eventid))
-> +		goto out;
-> +
-> +	/* Always reuse the last entry (LRU policy) */
-> +	cte = list_last_entry(&dist->lpi_translation_cache,
-> +			      typeof(*cte), entry);
-> +
-> +	/*
-> +	 * Caching the translation implies having an extra reference
-> +	 * to the interrupt, so drop the potential reference on what
-> +	 * was in the cache, and increment it on the new interrupt.
-> +	 */
-> +	if (cte->irq)
-> +		__vgic_put_lpi_locked(kvm, cte->irq);
-> +
-> +	vgic_get_irq_kref(irq);
-> +
-> +	cte->db		= db;
-> +	cte->devid	= devid;
-> +	cte->eventid	= eventid;
-> +	cte->irq	= irq;
-> +
-> +	/* Move the new translation to the head of the list */
-> +	list_move(&cte->entry, &dist->lpi_translation_cache);
-> +
-> +out:
-> +	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-> +}
-> +
->   void vgic_its_invalidate_cache(struct kvm *kvm)
->   {
->   	struct vgic_dist *dist = &kvm->arch.vgic;
-> @@ -589,6 +673,8 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
->   	if (!vcpu->arch.vgic_cpu.lpis_enabled)
->   		return -EBUSY;
->   
-> +	vgic_its_cache_translation(kvm, its, devid, eventid, ite->irq);
-> +
->   	*irq = ite->irq;
->   	return 0;
->   }
-> 
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index b50d858..3731757 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -7096,8 +7096,11 @@ static int write_cr4_checking(unsigned long val)
+ 
+ static void vmx_cr_load_test(void)
+ {
++	unsigned long cr3, cr4, orig_cr3, orig_cr4;
+ 	struct cpuid _cpuid = cpuid(1);
+-	unsigned long cr4 = read_cr4(), cr3 = read_cr3();
++
++	orig_cr4 = read_cr4();
++	orig_cr3 = read_cr3();
+ 
+ 	if (!(_cpuid.c & X86_FEATURE_PCID)) {
+ 		report_skip("PCID not detected");
+@@ -7108,12 +7111,11 @@ static void vmx_cr_load_test(void)
+ 		return;
+ 	}
+ 
+-	TEST_ASSERT(!(cr4 & (X86_CR4_PCIDE | X86_CR4_MCE)));
+-	TEST_ASSERT(!(cr3 & X86_CR3_PCID_MASK));
++	TEST_ASSERT(!(orig_cr3 & X86_CR3_PCID_MASK));
+ 
+ 	/* Enable PCID for L1. */
+-	cr4 |= X86_CR4_PCIDE;
+-	cr3 |= 0x1;
++	cr4 = orig_cr4 | X86_CR4_PCIDE;
++	cr3 = orig_cr3 | 0x1;
+ 	TEST_ASSERT(!write_cr4_checking(cr4));
+ 	write_cr3(cr3);
+ 
+@@ -7126,17 +7128,16 @@ static void vmx_cr_load_test(void)
+ 	 * No exception is expected.
+ 	 *
+ 	 * NB. KVM loads the last guest write to CR4 into CR4 read
+-	 *     shadow. In order to trigger an exit to KVM, we can set a
+-	 *     bit that was zero in the above CR4 write and is owned by
+-	 *     KVM. We choose to set CR4.MCE, which shall have no side
+-	 *     effect because normally no guest MCE (e.g., as the result
+-	 *     of bad memory) would happen during this test.
++	 *     shadow. In order to trigger an exit to KVM, we can toggle a
++	 *     bit that is owned by KVM. We choose to set CR4.MCE, which shall
++	 *     have no side effect because normally no guest MCE (e.g., as the
++	 *     result of bad memory) would happen during this test.
+ 	 */
+-	TEST_ASSERT(!write_cr4_checking(cr4 | X86_CR4_MCE));
++	TEST_ASSERT(!write_cr4_checking(cr4 ^ X86_CR4_MCE));
+ 
+-	/* Cleanup L1 state: disable PCID. */
+-	write_cr3(cr3 & ~X86_CR3_PCID_MASK);
+-	TEST_ASSERT(!write_cr4_checking(cr4 & ~X86_CR4_PCIDE));
++	/* Cleanup L1 state. */
++	write_cr3(orig_cr3);
++	TEST_ASSERT(!write_cr4_checking(orig_cr4));
+ }
+ 
+ static void vmx_nm_test_guest(void)
+-- 
+2.17.1
 
