@@ -2,172 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EF87B55BAA
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 00:53:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37BA455CC6
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 02:04:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726304AbfFYWw7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 18:52:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35790 "EHLO mx1.redhat.com"
+        id S1726432AbfFZAEd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 20:04:33 -0400
+Received: from mga09.intel.com ([134.134.136.24]:45807 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725782AbfFYWw7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jun 2019 18:52:59 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 00E1E3082E25;
-        Tue, 25 Jun 2019 22:52:59 +0000 (UTC)
-Received: from x1.home (ovpn-117-35.phx2.redhat.com [10.3.117.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AB58B5D9C5;
-        Tue, 25 Jun 2019 22:52:51 +0000 (UTC)
-Date:   Tue, 25 Jun 2019 16:52:51 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     Libvirt Devel <libvir-list@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Erik Skultety <eskultet@redhat.com>,
-        Pavel Hrdina <phrdina@redhat.com>,
-        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-        Sylvain Bauza <sbauza@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>
-Subject: Re: mdevctl: A shoestring mediated device management and
- persistence utility
-Message-ID: <20190625165251.609f6266@x1.home>
-In-Reply-To: <20190523172001.41f386d8@x1.home>
-References: <20190523172001.41f386d8@x1.home>
-Organization: Red Hat
+        id S1726402AbfFZAEc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 20:04:32 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Jun 2019 17:04:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,417,1557212400"; 
+   d="scan'208";a="188466243"
+Received: from romley-ivt3.sc.intel.com ([172.25.110.60])
+  by fmsmga002.fm.intel.com with ESMTP; 25 Jun 2019 17:04:30 -0700
+Date:   Tue, 25 Jun 2019 16:54:47 -0700
+From:   Fenghua Yu <fenghua.yu@intel.com>
+To:     David Laight <David.Laight@ACULAB.COM>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        H Peter Anvin <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Christopherson Sean J <sean.j.christopherson@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
+        Ravi V Shankar <ravi.v.shankar@intel.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        x86 <x86@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v9 03/17] x86/split_lock: Align x86_capability to
+ unsigned long to avoid split locked access
+Message-ID: <20190625235447.GB245468@romley-ivt3.sc.intel.com>
+References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
+ <1560897679-228028-4-git-send-email-fenghua.yu@intel.com>
+ <746b5a8752cc40b1b954913f786ed9a6@AcuMS.aculab.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Tue, 25 Jun 2019 22:52:59 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <746b5a8752cc40b1b954913f786ed9a6@AcuMS.aculab.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Mon, Jun 24, 2019 at 03:12:49PM +0000, David Laight wrote:
+> From: Fenghua Yu
+> > Sent: 18 June 2019 23:41
+> > 
+> > set_cpu_cap() calls locked BTS and clear_cpu_cap() calls locked BTR to
+> > operate on bitmap defined in x86_capability.
+> > 
+> > Locked BTS/BTR accesses a single unsigned long location. In 64-bit mode,
+> > the location is at:
+> > base address of x86_capability + (bit offset in x86_capability / 64) * 8
+> > 
+> > Since base address of x86_capability may not be aligned to unsigned long,
+> > the single unsigned long location may cross two cache lines and
+> > accessing the location by locked BTS/BTR introductions will cause
+> > split lock.
+> > 
+> > To fix the split lock issue, align x86_capability to size of unsigned long
+> > so that the location will be always within one cache line.
+> > 
+> > Changing x86_capability's type to unsigned long may also fix the issue
+> > because x86_capability will be naturally aligned to size of unsigned long.
+> > But this needs additional code changes. So choose the simpler solution
+> > by setting the array's alignment to size of unsigned long.
+> 
+> As I've pointed out several times before this isn't the only int[] data item
+> in this code that gets passed to the bit operations.
+> Just because you haven't got a 'splat' from the others doesn't mean they don't
+> need fixing at the same time.
 
-Based on the discussions we've had, I've rewritten the bulk of
-mdevctl.  I think it largely does everything we want now, modulo
-devices that will need some sort of 1:N values per key for
-configuration in the config file versus the 1:1 key:value setup we
-currently have (so don't consider the format final just yet).
+As Thomas suggested in https://lkml.org/lkml/2019/4/25/353, patch #0017
+in this patch set implements WARN_ON_ONCE() to audit possible unalignment
+in atomic bit ops.
 
-We now support "transient" devices and there's no distinction or
-difference in handling of such devices whether they're created by
-mdevctl or externally.  All devices will also have systemd management,
-though systemd is no longer required, it's used if available.  The
-instance name used for systemd device units has also changed to allow
-us to use BindsTo= such that services are not only created, but are
-also removed if the device is removed.  Unfortunately it's not a simple
-UUID via the systemd route any longer.
+This patch set just enables split lock detection first. Fixing ALL split
+lock issues might be practical after the patch is upstreamed and used widely.
 
-Since the original posting, the project has moved from my personal
-github to here:
+> 
+> > Signed-off-by: Fenghua Yu <fenghua.yu@intel.com>
+> > ---
+> >  arch/x86/include/asm/processor.h | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
+> > index c34a35c78618..d3e017723634 100644
+> > --- a/arch/x86/include/asm/processor.h
+> > +++ b/arch/x86/include/asm/processor.h
+> > @@ -93,7 +93,9 @@ struct cpuinfo_x86 {
+> >  	__u32			extended_cpuid_level;
+> >  	/* Maximum supported CPUID level, -1=no CPUID: */
+> >  	int			cpuid_level;
+> > -	__u32			x86_capability[NCAPINTS + NBUGINTS];
+> > +	/* Aligned to size of unsigned long to avoid split lock in atomic ops */
+> 
+> Wrong comment.
+> Something like:
+> 	/* Align to sizeof (unsigned long) because the array is passed to the
+> 	 * atomic bit-op functions which require an aligned unsigned long []. */
 
-https://github.com/mdevctl/mdevctl
+The problem we try to fix here is not because "the array is passed to the
+atomic bit-op functions which require an aligned unsigned long []".
 
-Please see the README there for overview of the new commands and
-example of their usage.  There is no attempt to maintain backwards
-compatibility with previous versions, this tool is in its infancy.
-Also since the original posting, RPM packaging is included, so simply
-run 'make rpm' and install the resulting package.
+The problem is because of the possible split lock issue. If it's not because
+of split lock issue, there is no need to have this patch.
 
-Highlights of this version include proper argument parsing via getopts
-so that options can be provided in any order.  I'm still using the
-format 'mdevctl {command} [options]' but now it's consistent that all
-the options come after the command, in any order.  I think this is
-relatively consistent with a variety of other tools.
+So I would think my comment is right to point out explicitly why we need
+this alignment.
 
-Devices are no longer automatically persisted, we handle them as
-transient, but we also can promote them to persistent through the
-'define' command.  The define, undefine, and modify commands all
-operate only on the config file, so that we can define separate from
-creating.  When promoting from a transient to defined device, we can
-use the existing device to create the config.  Both the type and the
-startup of a device can be modified in the config, without affecting
-the running device.
+> 
+> > +	__u32			x86_capability[NCAPINTS + NBUGINTS]
+> > +				__aligned(sizeof(unsigned long));
+> 
+> It might be better to use a union (maybe unnamed) here.
 
-Starting an mdev device no longer relies exclusively on a saved config,
-the device can be fully specified via options to create a transient
-device.  Specifying only a uuid is also sufficient for a defined
-device.  Some consideration has also been given to uuid collisions.
-The mdev interface in the kernel prevents multiple mdevs with the same
-uuid running concurrently, but mdevctl allows mdevs to be defined with
-the same uuid under separate parent devices.  Some options therefore
-allow both a uuid and parent to be specified and require this if the
-uuid alone is ambiguous.  Clearly starting two such devices at the same
-time will fail and is left to higher level tools to manage, just like
-the ability to define more devices than there are available instances on
-the host system.
+That would be another patch. This patch just simply fixes the split lock
+issue.
 
-The stop and list commands are largely the same ideas as previous
-though the semantics are completely different.  Listing running devices
-now notes which are defined versus transient.  Perhaps it might also be
-useful when listing defined devices to note which are running.
+Thanks.
 
-The sbin/libexec split of mdevctl has been squashed.  There are some
-commands in the script that are currently only intended to be used from
-udev or systemd, these are simply excluded from the help.  It's
-possible we may want to promote the start-parent-mdevs command out of
-this class, but the rest are specifically systemd helpers.
-
-I'll include the current help test message below for further semantic
-details, but please have a look-see, or better yet give it a try.
-Thanks,
-
-Alex
-
-PS - I'm looking at adding udev change events when a device registers
-or unregisters with the mdev core, which should help us know when to
-trigger creation of persistent, auto started devices.  That support is
-included here with the MDEV_STATE="registered|unregistered" environment
-values.  Particularly, kvmgt now supports dynamic loading an unloading,
-so as long as the enable_gvt=1 option is provided to the i915 driver
-mdev support can come and go independent of the parent device.  The
-change uevents are necessary to trigger on that, so I'd appreciate any
-feedback on those as well.  Until then, the persistence of mdevctl
-really depends on mdev support on the parent device being _completely_
-setup prior to processing the udev rules.
-
-# mdevctl
-Usage: mdevctl {COMMAND} [options...]
-
-Available commands:
-define		Define a config for an mdev device.  Options:
-	<-u|--uuid=UUID> [<-p|--parent=PARENT> <-t|--type=TYPE>] [-a|--auto]
-		If the device specified by the UUID currently exists, parent
-		and type may be omitted to use the existing values. The auto
-		option marks the device to start on parent availability.
-		Running devices are unaffected by this command.
-undefine	Undefine, or remove a config for an mdev device.  Options:
-	<-u|--uuid=UUID> [-p|--parent=PARENT]
-		If a UUID exists for multiple parents, all will be removed
-		unless a parent is specified.  Running devices are unaffected
-		by this command.
-modify		Modify the config for a defined mdev device.  Options:
-	<-u|--uuid=UUID> [-p|--parent=PARENT] [-t|--type=TYPE] \
-	[[-a|--auto]|[-m|--manual]]
-		The parent option further identifies a UUID if it is not
-		unique, the parent for a device cannot be modified via this
-		command, undefine and re-define should be used instead.  The
-		mdev type and startup mode can be modified.  Running devices
-		are unaffected by this command.
-start		Start an mdev device.  Options:
-	<-u|--uuid=UUID> [-p|--parent=PARENT] [-t|--type=TYPE]
-		If the UUID is previously defined and unique, the UUID is
-		sufficient to start the device (UUIDs may not collide between
-		running devices).  If a UUID is used in multiple defined
-		configs, the parent device is necessary to identify the config.
-		Specifying UUID, PARENT, and TYPE allows devices to be started
-		regardless of a previously defined config (ie. transient mdevs).
-stop		Stop an mdev device.  Options:
-	<-u|--uuid=UUID>
-list		List mdev devices.  Options:
-	[-d|--defined]|[-t|--types]
-		With no options, information about the currently running mdev
-		devices is provided.  Specifing DEFINED lists the configuration
-		of defined devices, regardless of their running state.
-		Specifying TYPES lists the mdev types provided by the currently
-		registered mdev parent devices on the system.
+-Fenghua
