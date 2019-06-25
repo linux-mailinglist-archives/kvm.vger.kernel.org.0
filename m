@@ -2,357 +2,348 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D4AA552D1
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 17:05:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7A5555325
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 17:18:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731366AbfFYPE7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 11:04:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2028 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730607AbfFYPE7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 25 Jun 2019 11:04:59 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5PF4Str101065;
-        Tue, 25 Jun 2019 11:04:37 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2tbkamfrc9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jun 2019 11:04:35 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x5PExdtx005085;
-        Tue, 25 Jun 2019 15:04:06 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma01wdc.us.ibm.com with ESMTP id 2t9by6rug2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Jun 2019 15:04:06 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5PF45ZZ11928542
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Jun 2019 15:04:05 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CBDA4B2064;
-        Tue, 25 Jun 2019 15:04:05 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B1772B2065;
-        Tue, 25 Jun 2019 15:04:05 +0000 (GMT)
-Received: from collin-T470p.pok.ibm.com (unknown [9.63.14.221])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 25 Jun 2019 15:04:05 +0000 (GMT)
-From:   Collin Walling <walling@linux.ibm.com>
-To:     cohuck@redhat.com, david@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [PATCH v5 2/2] s390/kvm: diagnose 318 handling
-Date:   Tue, 25 Jun 2019 11:03:42 -0400
-Message-Id: <1561475022-18348-3-git-send-email-walling@linux.ibm.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1561475022-18348-1-git-send-email-walling@linux.ibm.com>
-References: <1561475022-18348-1-git-send-email-walling@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-25_11:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906250116
+        id S1732137AbfFYPSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 11:18:32 -0400
+Received: from foss.arm.com ([217.140.110.172]:43944 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728199AbfFYPSc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 11:18:32 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B6E942B;
+        Tue, 25 Jun 2019 08:18:31 -0700 (PDT)
+Received: from [10.1.215.72] (e121566-lin.cambridge.arm.com [10.1.215.72])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 95D7D3F718;
+        Tue, 25 Jun 2019 08:18:30 -0700 (PDT)
+Subject: Re: [PATCH 13/59] KVM: arm64: nv: Handle virtual EL2 registers in
+ vcpu_read/write_sys_reg()
+To:     Marc Zyngier <marc.zyngier@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-14-marc.zyngier@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <6a866fda-a332-9881-b466-2a855deea6a5@arm.com>
+Date:   Tue, 25 Jun 2019 16:18:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <20190621093843.220980-14-marc.zyngier@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DIAGNOSE 0x318 (diag318) is a privileged s390x instruction that must
-be intercepted by SIE and handled via KVM. Let's introduce some
-functions to communicate between userspace and KVM via ioctls. These
-will be used to get/set the diag318 related information, as well as
-check the system if KVM supports handling this instruction.
+Hi Marc,
 
-This information can help with diagnosing the environment the VM is
-running in (Linux, z/VM, etc) if the OS calls this instruction.
+A question regarding this patch. This patch modifies vcpu_{read,write}_sys_reg
+to handle virtual EL2 registers. However, the file kvm/emulate-nested.c added by
+patch 10/59 "KVM: arm64: nv: Support virtual EL2 exceptions" already uses
+vcpu_{read,write}_sys_reg to access EL2 registers. In my opinion, it doesn't
+really matter which comes first because nested support is only enabled in the
+last patch of the series, but I thought I should bring this up in case it is not
+what you intended.
 
-The get/set functions are introduced primarily for VM migration and
-reset, though no harm could be done to the system if a userspace
-program decides to alter this data (this is highly discouraged).
+On 6/21/19 10:37 AM, Marc Zyngier wrote:
+> From: Andre Przywara <andre.przywara@arm.com>
+>
+> KVM internally uses accessor functions when reading or writing the
+> guest's system registers. This takes care of accessing either the stored
+> copy or using the "live" EL1 system registers when the host uses VHE.
+>
+> With the introduction of virtual EL2 we add a bunch of EL2 system
+> registers, which now must also be taken care of:
+> - If the guest is running in vEL2, and we access an EL1 sysreg, we must
+>   revert to the stored version of that, and not use the CPU's copy.
+> - If the guest is running in vEL1, and we access an EL2 sysreg, we must
+>   also use the stored version, since the CPU carries the EL1 copy.
+> - Some EL2 system registers are supposed to affect the current execution
+>   of the system, so we need to put them into their respective EL1
+>   counterparts. For this we need to define a mapping between the two.
+>   This is done using the newly introduced struct el2_sysreg_map.
+> - Some EL2 system registers have a different format than their EL1
+>   counterpart, so we need to translate them before writing them to the
+>   CPU. This is done using an (optional) translate function in the map.
+> - There are the three special registers SP_EL2, SPSR_EL2 and ELR_EL2,
+>   which need some separate handling.
+I see no change in this patch related to SPSR_EL2. Special handling of SPSR_EL2
+is added in the next patch, patch 14/59 "KVM: arm64: nv: Handle SPSR_EL2 specially".
+>
+> All of these cases are now wrapped into the existing accessor functions,
+> so KVM users wouldn't need to care whether they access EL2 or EL1
+> registers and also which state the guest is in.
+>
+> This handles what was formerly known as the "shadow state" dynamically,
+> without requiring a separate copy for each vCPU EL.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |   6 +
+>  arch/arm64/include/asm/kvm_host.h    |   5 +
+>  arch/arm64/kvm/sys_regs.c            | 163 +++++++++++++++++++++++++++
+>  3 files changed, 174 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index c43aac5fed69..f37006b6eec4 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -70,6 +70,12 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
+>  int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
+>  int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
+>  
+> +u64 translate_tcr(u64 tcr);
+> +u64 translate_cptr(u64 tcr);
+> +u64 translate_sctlr(u64 tcr);
+> +u64 translate_ttbr0(u64 tcr);
+> +u64 translate_cnthctl(u64 tcr);
+> +
+>  static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+>  {
+>  	return !(vcpu->arch.hcr_el2 & HCR_RW);
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 2d4290d2513a..dae9c42a7219 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -217,6 +217,11 @@ enum vcpu_sysreg {
+>  	NR_SYS_REGS	/* Nothing after this line! */
+>  };
+>  
+> +static inline bool sysreg_is_el2(int reg)
+> +{
+> +	return reg >= FIRST_EL2_SYSREG && reg < NR_SYS_REGS;
+> +}
+> +
+>  /* 32bit mapping */
+>  #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
+>  #define c0_CSSELR	(CSSELR_EL1 * 2)/* Cache Size Selection Register */
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 693dd063c9c2..d024114da162 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -76,11 +76,142 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
+>  	return false;
+>  }
+>  
+> +static u64 tcr_el2_ips_to_tcr_el1_ps(u64 tcr_el2)
+The code seems to suggest that you are translating TCR_EL2.PS to TCR_EL1.IPS.
+Perhaps the function should be named tcr_el2_ps_to_tcr_el1_ips?
+> +{
+> +	return ((tcr_el2 & TCR_EL2_PS_MASK) >> TCR_EL2_PS_SHIFT)
+> +		<< TCR_IPS_SHIFT;
+> +}
+> +
+> +u64 translate_tcr(u64 tcr)
+> +{
+> +	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
+> +	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
+> +	       tcr_el2_ips_to_tcr_el1_ps(tcr) |
+> +	       (tcr & TCR_EL2_TG0_MASK) |
+> +	       (tcr & TCR_EL2_ORGN0_MASK) |
+> +	       (tcr & TCR_EL2_IRGN0_MASK) |
+> +	       (tcr & TCR_EL2_T0SZ_MASK);
+> +}
+> +
+> +u64 translate_cptr(u64 cptr_el2)
+The argument name is not consistent with the other translate_* functions. I
+think it is reasonably obvious that you are translating an EL2 register.
+> +{
+> +	u64 cpacr_el1 = 0;
+> +
+> +	if (!(cptr_el2 & CPTR_EL2_TFP))
+> +		cpacr_el1 |= CPACR_EL1_FPEN;
+> +	if (cptr_el2 & CPTR_EL2_TTA)
+> +		cpacr_el1 |= CPACR_EL1_TTA;
+> +	if (!(cptr_el2 & CPTR_EL2_TZ))
+> +		cpacr_el1 |= CPACR_EL1_ZEN;
+> +
+> +	return cpacr_el1;
+> +}
+> +
+> +u64 translate_sctlr(u64 sctlr)
+> +{
+> +	/* Bit 20 is RES1 in SCTLR_EL1, but RES0 in SCTLR_EL2 */
+> +	return sctlr | BIT(20);
+> +}
+> +
+> +u64 translate_ttbr0(u64 ttbr0)
+> +{
+> +	/* Force ASID to 0 (ASID 0 or RES0) */
+Are you forcing ASID to 0 because you are only expecting a non-vhe guest
+hypervisor to access ttbr0_el2, in which case the architecture says that the
+ASID field is RES0? Is it so unlikely that a vhe guest hypervisor will access
+ttbr0_el2 directly that it's not worth adding a check for that?
+> +	return ttbr0 & ~GENMASK_ULL(63, 48);
+> +}
+> +
+> +u64 translate_cnthctl(u64 cnthctl)
+> +{
+> +	return ((cnthctl & 0x3) << 10) | (cnthctl & 0xfc);
 
-The Control Program Name Code (CPNC) is stored in the SIE block (if
-host hardware supports it) and a copy is retained in each VCPU. The
-Control Program Version Code (CPVC) is not designed to be stored in
-the SIE block, so we retain a copy in each VCPU next to the CPNC.
+Patch 16/59 "KVM: arm64: nv: Save/Restore vEL2 sysregs" suggests that you are
+translating CNTHCTL to write it to CNTKCTL_EL1. Looking at ARM DDI 0487D.b,
+CNTKCTL_EL1 has bits 63:10 RES0. I think the correct value should be ((cnthctl &
+0x3) << 8) | (cnthctl & 0xfc).
 
-At this time, the CPVC is not reported during a VM_EVENT as its
-format is yet to be properly defined.
-
-Signed-off-by: Collin Walling <walling@linux.ibm.com>
----
- Documentation/virtual/kvm/devices/vm.txt | 14 ++++++
- arch/s390/include/asm/kvm_host.h         |  5 +-
- arch/s390/include/uapi/asm/kvm.h         |  4 ++
- arch/s390/kvm/diag.c                     | 17 +++++++
- arch/s390/kvm/kvm-s390.c                 | 81 ++++++++++++++++++++++++++++++++
- arch/s390/kvm/kvm-s390.h                 |  1 +
- arch/s390/kvm/vsie.c                     |  2 +
- 7 files changed, 123 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/virtual/kvm/devices/vm.txt b/Documentation/virtual/kvm/devices/vm.txt
-index 4ffb82b..56f7d9c 100644
---- a/Documentation/virtual/kvm/devices/vm.txt
-+++ b/Documentation/virtual/kvm/devices/vm.txt
-@@ -268,3 +268,17 @@ Parameters: address of a buffer in user space to store the data (u64) to;
- 	    if it is enabled
- Returns:    -EFAULT if the given address is not accessible from kernel space
- 	    0 in case of success.
-+
-+6. GROUP: KVM_S390_VM_MISC
-+Architectures: s390
-+
-+6.1. KVM_S390_VM_MISC_DIAG318 (r/w)
-+
-+Allows userspace to access the DIAGNOSE 0x318 information which consists of a
-+1-byte "Control Program Name Code" and a 7-byte "Control Program Version Code".
-+This information is initialized during IPL and must be preserved during
-+migration.
-+
-+Parameters: address of a buffer in user space to store the data (u64) to
-+Returns:    -EFAULT if the given address is not accessible from kernel space
-+	     0 in case of success.
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index 2b00a3e..b70e8a4 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -229,7 +229,8 @@ struct kvm_s390_sie_block {
- 	__u32	scaol;			/* 0x0064 */
- 	__u8	reserved68;		/* 0x0068 */
- 	__u8    epdx;			/* 0x0069 */
--	__u8    reserved6a[2];		/* 0x006a */
-+	__u8	cpnc;			/* 0x006a */
-+	__u8	reserved6b;		/* 0x006b */
- 	__u32	todpr;			/* 0x006c */
- #define GISA_FORMAT1 0x00000001
- 	__u32	gd;			/* 0x0070 */
-@@ -393,6 +394,7 @@ struct kvm_vcpu_stat {
- 	u64 diagnose_9c;
- 	u64 diagnose_258;
- 	u64 diagnose_308;
-+	u64 diagnose_318;
- 	u64 diagnose_500;
- 	u64 diagnose_other;
- };
-@@ -868,6 +870,7 @@ struct kvm_arch{
- 	DECLARE_BITMAP(cpu_feat, KVM_S390_VM_CPU_FEAT_NR_BITS);
- 	DECLARE_BITMAP(idle_mask, KVM_MAX_VCPUS);
- 	struct kvm_s390_gisa_interrupt gisa_int;
-+	union diag318_info diag318_info;
- };
- 
- #define KVM_HVA_ERR_BAD		(-1UL)
-diff --git a/arch/s390/include/uapi/asm/kvm.h b/arch/s390/include/uapi/asm/kvm.h
-index 47104e5..e0684da 100644
---- a/arch/s390/include/uapi/asm/kvm.h
-+++ b/arch/s390/include/uapi/asm/kvm.h
-@@ -74,6 +74,7 @@ struct kvm_s390_io_adapter_req {
- #define KVM_S390_VM_CRYPTO		2
- #define KVM_S390_VM_CPU_MODEL		3
- #define KVM_S390_VM_MIGRATION		4
-+#define KVM_S390_VM_MISC		5
- 
- /* kvm attributes for mem_ctrl */
- #define KVM_S390_VM_MEM_ENABLE_CMMA	0
-@@ -171,6 +172,9 @@ struct kvm_s390_vm_cpu_subfunc {
- #define KVM_S390_VM_MIGRATION_START	1
- #define KVM_S390_VM_MIGRATION_STATUS	2
- 
-+/* kvm attributes for KVM_S390_VM_MISC */
-+#define KVM_S390_VM_MISC_DIAG318	0
-+
- /* for KVM_GET_REGS and KVM_SET_REGS */
- struct kvm_regs {
- 	/* general purpose regs for s390 */
-diff --git a/arch/s390/kvm/diag.c b/arch/s390/kvm/diag.c
-index 45634b3d..42a8db3 100644
---- a/arch/s390/kvm/diag.c
-+++ b/arch/s390/kvm/diag.c
-@@ -235,6 +235,21 @@ static int __diag_virtio_hypercall(struct kvm_vcpu *vcpu)
- 	return ret < 0 ? ret : 0;
- }
- 
-+static int __diag_set_diag318_info(struct kvm_vcpu *vcpu)
-+{
-+	unsigned int reg = (vcpu->arch.sie_block->ipa & 0xf0) >> 4;
-+	u64 info = vcpu->run->s.regs.gprs[reg];
-+
-+	vcpu->stat.diagnose_318++;
-+	kvm_s390_set_diag318_info(vcpu->kvm, info);
-+
-+	VCPU_EVENT(vcpu, 3, "diag 0x318 cpnc: 0x%x cpvc: 0x%llx",
-+		   vcpu->kvm->arch.diag318_info.cpnc,
-+		   (u64)vcpu->kvm->arch.diag318_info.cpvc);
-+
-+	return 0;
-+}
-+
- int kvm_s390_handle_diag(struct kvm_vcpu *vcpu)
- {
- 	int code = kvm_s390_get_base_disp_rs(vcpu, NULL) & 0xffff;
-@@ -254,6 +269,8 @@ int kvm_s390_handle_diag(struct kvm_vcpu *vcpu)
- 		return __diag_page_ref_service(vcpu);
- 	case 0x308:
- 		return __diag_ipl_functions(vcpu);
-+	case 0x318:
-+		return __diag_set_diag318_info(vcpu);
- 	case 0x500:
- 		return __diag_virtio_hypercall(vcpu);
- 	default:
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 28ebd64..8be9867 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -157,6 +157,7 @@ struct kvm_stats_debugfs_item debugfs_entries[] = {
- 	{ "instruction_diag_9c", VCPU_STAT(diagnose_9c) },
- 	{ "instruction_diag_258", VCPU_STAT(diagnose_258) },
- 	{ "instruction_diag_308", VCPU_STAT(diagnose_308) },
-+	{ "instruction_diag_318", VCPU_STAT(diagnose_318) },
- 	{ "instruction_diag_500", VCPU_STAT(diagnose_500) },
- 	{ "instruction_diag_other", VCPU_STAT(diagnose_other) },
- 	{ NULL }
-@@ -1228,6 +1229,68 @@ static int kvm_s390_get_tod(struct kvm *kvm, struct kvm_device_attr *attr)
- 	return ret;
- }
- 
-+void kvm_s390_set_diag318_info(struct kvm *kvm, u64 info)
-+{
-+	struct kvm_vcpu *vcpu;
-+	int i;
-+
-+	kvm->arch.diag318_info.val = info;
-+
-+	VM_EVENT(kvm, 3, "SET: CPNC: 0x%x CPVC: 0x%llx",
-+		 kvm->arch.diag318_info.cpnc, (u64)kvm->arch.diag318_info.cpvc);
-+
-+	if (sclp.has_diag318) {
-+		kvm_for_each_vcpu(i, vcpu, kvm) {
-+			vcpu->arch.sie_block->cpnc = kvm->arch.diag318_info.cpnc;
-+		}
-+	}
-+}
-+
-+static int kvm_s390_set_misc(struct kvm *kvm, struct kvm_device_attr *attr)
-+{
-+	int ret;
-+	u64 diag318_info;
-+
-+	switch (attr->attr) {
-+	case KVM_S390_VM_MISC_DIAG318:
-+		ret = -EFAULT;
-+		if (get_user(diag318_info, (u64 __user *)attr->addr))
-+			break;
-+		kvm_s390_set_diag318_info(kvm, diag318_info);
-+		ret = 0;
-+		break;
-+	default:
-+		ret = -ENXIO;
-+		break;
-+	}
-+	return ret;
-+}
-+
-+static int kvm_s390_get_diag318_info(struct kvm *kvm, struct kvm_device_attr *attr)
-+{
-+	if (put_user(kvm->arch.diag318_info.val, (u64 __user *)attr->addr))
-+		return -EFAULT;
-+
-+	VM_EVENT(kvm, 3, "QUERY: CPNC: 0x%x, CPVC: 0x%llx",
-+		 kvm->arch.diag318_info.cpnc, (u64)kvm->arch.diag318_info.cpvc);
-+	return 0;
-+}
-+
-+static int kvm_s390_get_misc(struct kvm *kvm, struct kvm_device_attr *attr)
-+{
-+	int ret;
-+
-+	switch (attr->attr) {
-+	case KVM_S390_VM_MISC_DIAG318:
-+		ret = kvm_s390_get_diag318_info(kvm, attr);
-+		break;
-+	default:
-+		ret = -ENXIO;
-+		break;
-+	}
-+	return ret;
-+}
-+
- static int kvm_s390_set_processor(struct kvm *kvm, struct kvm_device_attr *attr)
- {
- 	struct kvm_s390_vm_cpu_processor *proc;
-@@ -1674,6 +1737,9 @@ static int kvm_s390_vm_set_attr(struct kvm *kvm, struct kvm_device_attr *attr)
- 	case KVM_S390_VM_MIGRATION:
- 		ret = kvm_s390_vm_set_migration(kvm, attr);
- 		break;
-+	case KVM_S390_VM_MISC:
-+		ret = kvm_s390_set_misc(kvm, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -1699,6 +1765,9 @@ static int kvm_s390_vm_get_attr(struct kvm *kvm, struct kvm_device_attr *attr)
- 	case KVM_S390_VM_MIGRATION:
- 		ret = kvm_s390_vm_get_migration(kvm, attr);
- 		break;
-+	case KVM_S390_VM_MISC:
-+		ret = kvm_s390_get_misc(kvm, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -1772,6 +1841,16 @@ static int kvm_s390_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
- 	case KVM_S390_VM_MIGRATION:
- 		ret = 0;
- 		break;
-+	case KVM_S390_VM_MISC:
-+		switch (attr->attr) {
-+		case KVM_S390_VM_MISC_DIAG318:
-+			ret = 0;
-+			break;
-+		default:
-+			ret = -ENXIO;
-+			break;
-+		}
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -2892,6 +2971,8 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
- 		vcpu->arch.sie_block->ictl |= ICTL_OPEREXC;
- 	/* make vcpu_load load the right gmap on the first trigger */
- 	vcpu->arch.enabled_gmap = vcpu->arch.gmap;
-+	if (sclp.has_diag318)
-+		vcpu->arch.sie_block->cpnc = vcpu->kvm->arch.diag318_info.cpnc;
- }
- 
- static bool kvm_has_pckmo_subfunc(struct kvm *kvm, unsigned long nr)
-diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-index 6d9448d..70a21b4 100644
---- a/arch/s390/kvm/kvm-s390.h
-+++ b/arch/s390/kvm/kvm-s390.h
-@@ -281,6 +281,7 @@ int kvm_s390_handle_sigp(struct kvm_vcpu *vcpu);
- int kvm_s390_handle_sigp_pei(struct kvm_vcpu *vcpu);
- 
- /* implemented in kvm-s390.c */
-+void kvm_s390_set_diag318_info(struct kvm *kvm, u64 info);
- void kvm_s390_set_tod_clock(struct kvm *kvm,
- 			    const struct kvm_s390_vm_tod_clock *gtod);
- long kvm_arch_fault_in_page(struct kvm_vcpu *vcpu, gpa_t gpa, int writable);
-diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-index 076090f..50e522e0 100644
---- a/arch/s390/kvm/vsie.c
-+++ b/arch/s390/kvm/vsie.c
-@@ -548,6 +548,8 @@ static int shadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
- 		scb_s->ecd |= scb_o->ecd & ECD_ETOKENF;
- 
- 	scb_s->hpid = HPID_VSIE;
-+	if (sclp.has_diag318)
-+		scb_s->cpnc = scb_o->cpnc;
- 
- 	prepare_ibc(vcpu, vsie_page);
- 	rc = shadow_crycb(vcpu, vsie_page);
--- 
-2.7.4
-
+> +}
+> +
+> +#define EL2_SYSREG(el2, el1, translate)	\
+> +	[el2 - FIRST_EL2_SYSREG] = { el2, el1, translate }
+> +#define PURE_EL2_SYSREG(el2) \
+> +	[el2 - FIRST_EL2_SYSREG] = { el2,__INVALID_SYSREG__, NULL }
+> +/*
+> + * Associate vEL2 registers to their EL1 counterparts on the CPU.
+> + * The translate function can be NULL, when the register layout is identical.
+> + */
+> +struct el2_sysreg_map {
+> +	int sysreg;	/* EL2 register index into the array above */
+> +	int mapping;	/* associated EL1 register */
+> +	u64 (*translate)(u64 value);
+> +} nested_sysreg_map[NR_SYS_REGS - FIRST_EL2_SYSREG] = {
+> +	PURE_EL2_SYSREG( VPIDR_EL2 ),
+> +	PURE_EL2_SYSREG( VMPIDR_EL2 ),
+> +	PURE_EL2_SYSREG( ACTLR_EL2 ),
+> +	PURE_EL2_SYSREG( HCR_EL2 ),
+> +	PURE_EL2_SYSREG( MDCR_EL2 ),
+> +	PURE_EL2_SYSREG( HSTR_EL2 ),
+> +	PURE_EL2_SYSREG( HACR_EL2 ),
+> +	PURE_EL2_SYSREG( VTTBR_EL2 ),
+> +	PURE_EL2_SYSREG( VTCR_EL2 ),
+> +	PURE_EL2_SYSREG( RVBAR_EL2 ),
+> +	PURE_EL2_SYSREG( RMR_EL2 ),
+> +	PURE_EL2_SYSREG( TPIDR_EL2 ),
+> +	PURE_EL2_SYSREG( CNTVOFF_EL2 ),
+> +	PURE_EL2_SYSREG( CNTHCTL_EL2 ),
+> +	PURE_EL2_SYSREG( HPFAR_EL2 ),
+> +	EL2_SYSREG(      SCTLR_EL2,  SCTLR_EL1,      translate_sctlr ),
+> +	EL2_SYSREG(      CPTR_EL2,   CPACR_EL1,      translate_cptr  ),
+> +	EL2_SYSREG(      TTBR0_EL2,  TTBR0_EL1,      translate_ttbr0 ),
+> +	EL2_SYSREG(      TTBR1_EL2,  TTBR1_EL1,      NULL            ),
+> +	EL2_SYSREG(      TCR_EL2,    TCR_EL1,        translate_tcr   ),
+> +	EL2_SYSREG(      VBAR_EL2,   VBAR_EL1,       NULL            ),
+> +	EL2_SYSREG(      AFSR0_EL2,  AFSR0_EL1,      NULL            ),
+> +	EL2_SYSREG(      AFSR1_EL2,  AFSR1_EL1,      NULL            ),
+> +	EL2_SYSREG(      ESR_EL2,    ESR_EL1,        NULL            ),
+> +	EL2_SYSREG(      FAR_EL2,    FAR_EL1,        NULL            ),
+> +	EL2_SYSREG(      MAIR_EL2,   MAIR_EL1,       NULL            ),
+> +	EL2_SYSREG(      AMAIR_EL2,  AMAIR_EL1,      NULL            ),
+> +};
+Figuring out which registers are in this map and which aren't and are supposed
+to be treated differently is really cumbersome because they are split into two
+types of el2 registers and their order is different from the order in enum
+vcpu_sysreg (in kvm_host.h). Perhaps adding a comment about what registers will
+be treated differently would make the code a bit easier to follow?
+> +
+> +static
+> +const struct el2_sysreg_map *find_el2_sysreg(const struct el2_sysreg_map *map,
+> +					     int reg)
+> +{
+> +	const struct el2_sysreg_map *entry;
+> +
+> +	if (!sysreg_is_el2(reg))
+> +		return NULL;
+> +
+> +	entry = &nested_sysreg_map[reg - FIRST_EL2_SYSREG];
+> +	if (entry->sysreg == __INVALID_SYSREG__)
+> +		return NULL;
+> +
+> +	return entry;
+> +}
+> +
+>  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>  {
+> +
+>  	if (!vcpu->arch.sysregs_loaded_on_cpu)
+>  		goto immediate_read;
+>  
+> +	if (unlikely(sysreg_is_el2(reg))) {
+> +		const struct el2_sysreg_map *el2_reg;
+> +
+> +		if (!is_hyp_ctxt(vcpu))
+> +			goto immediate_read;
+I'm confused by this. is_hyp_ctxt returns false when the guest is not in vEL2
+AND HCR_EL.E2H or HCR_EL2.TGE are not set. In this case, the NV bit will not be
+set and the hardware will raise an undefined instruction exception when
+accessing an EL2 register from EL1. What am I missing?
+> +
+> +		el2_reg = find_el2_sysreg(nested_sysreg_map, reg);
+> +		if (el2_reg) {
+> +			/*
+> +			 * If this register does not have an EL1 counterpart,
+> +			 * then read the stored EL2 version.
+> +			 */
+> +			if (el2_reg->mapping == __INVALID_SYSREG__)
+> +				goto immediate_read;
+> +
+> +			/* Get the current version of the EL1 counterpart. */
+> +			reg = el2_reg->mapping;
+> +		}
+> +	} else {
+> +		/* EL1 register can't be on the CPU if the guest is in vEL2. */
+> +		if (unlikely(is_hyp_ctxt(vcpu)))
+> +			goto immediate_read;
+> +	}
+> +
+>  	/*
+>  	 * System registers listed in the switch are not saved on every
+>  	 * exit from the guest but are only saved on vcpu_put.
+> @@ -114,6 +245,8 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>  	case DACR32_EL2:	return read_sysreg_s(SYS_DACR32_EL2);
+>  	case IFSR32_EL2:	return read_sysreg_s(SYS_IFSR32_EL2);
+>  	case DBGVCR32_EL2:	return read_sysreg_s(SYS_DBGVCR32_EL2);
+> +	case SP_EL2:		return read_sysreg(sp_el1);
+> +	case ELR_EL2:		return read_sysreg_el1(SYS_ELR);
+>  	}
+>  
+>  immediate_read:
+> @@ -125,6 +258,34 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>  	if (!vcpu->arch.sysregs_loaded_on_cpu)
+>  		goto immediate_write;
+>  
+> +	if (unlikely(sysreg_is_el2(reg))) {
+> +		const struct el2_sysreg_map *el2_reg;
+> +
+> +		if (!is_hyp_ctxt(vcpu))
+> +			goto immediate_write;
+> +
+> +		/* Store the EL2 version in the sysregs array. */
+> +		__vcpu_sys_reg(vcpu, reg) = val;
+> +
+> +		el2_reg = find_el2_sysreg(nested_sysreg_map, reg);
+> +		if (el2_reg) {
+> +			/* Does this register have an EL1 counterpart? */
+> +			if (el2_reg->mapping == __INVALID_SYSREG__)
+> +				return;
+> +
+> +			if (!vcpu_el2_e2h_is_set(vcpu) &&
+> +			    el2_reg->translate)
+> +				val = el2_reg->translate(val);
+> +
+> +			/* Redirect this to the EL1 version of the register. */
+> +			reg = el2_reg->mapping;
+> +		}
+> +	} else {
+> +		/* EL1 register can't be on the CPU if the guest is in vEL2. */
+> +		if (unlikely(is_hyp_ctxt(vcpu)))
+> +			goto immediate_write;
+> +	}
+> +
+>  	/*
+>  	 * System registers listed in the switch are not restored on every
+>  	 * entry to the guest but are only restored on vcpu_load.
+> @@ -157,6 +318,8 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>  	case DACR32_EL2:	write_sysreg_s(val, SYS_DACR32_EL2);	return;
+>  	case IFSR32_EL2:	write_sysreg_s(val, SYS_IFSR32_EL2);	return;
+>  	case DBGVCR32_EL2:	write_sysreg_s(val, SYS_DBGVCR32_EL2);	return;
+> +	case SP_EL2:		write_sysreg(val, sp_el1);		return;
+> +	case ELR_EL2:		write_sysreg_el1(val, SYS_ELR);		return;
+>  	}
+>  
+>  immediate_write:
