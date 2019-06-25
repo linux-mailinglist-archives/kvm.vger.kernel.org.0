@@ -2,107 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BBAA55A1E
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 23:40:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 441A355A2E
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 23:47:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726429AbfFYVkt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 17:40:49 -0400
-Received: from mga07.intel.com ([134.134.136.100]:17285 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726014AbfFYVkt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jun 2019 17:40:49 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Jun 2019 14:40:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,417,1557212400"; 
-   d="scan'208";a="172504772"
-Received: from ray.jf.intel.com (HELO [10.7.201.139]) ([10.7.201.139])
-  by orsmga002.jf.intel.com with ESMTP; 25 Jun 2019 14:40:48 -0700
-Subject: Re: [PATCH 6/9] KVM: x86: Provide paravirtualized flush_tlb_multi()
-To:     Nadav Amit <namit@vmware.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <20190613064813.8102-1-namit@vmware.com>
- <20190613064813.8102-7-namit@vmware.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-Message-ID: <cb28f2b4-92f0-f075-648e-dddfdbdd2e3c@intel.com>
-Date:   Tue, 25 Jun 2019 14:40:48 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+        id S1726520AbfFYVrI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 17:47:08 -0400
+Received: from mail-io1-f69.google.com ([209.85.166.69]:45167 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726455AbfFYVrI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 17:47:08 -0400
+Received: by mail-io1-f69.google.com with SMTP id b197so10157iof.12
+        for <kvm@vger.kernel.org>; Tue, 25 Jun 2019 14:47:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=UJMkyJRfZAWiYHQO3lkQRyIVJFbkUi74TqZBHCN7Auo=;
+        b=o9o5sTxUsENxAvuEWLPx1b4zTfgo+g5hGHwDq/OtysLs8ocjoT/SNVyKrZ6Unh6Vkm
+         wlX5+fKedD49oPOCWTKvtEv8JVGYPXYx1maW8yInLP2HZQPCLsBMvVD4qDbATeIl+DSP
+         i+wzHhDgzZjTT48TQUKKP2aLvUMs+qfHG/A1/mDXjNSKaCeVNGDChR7K2wOgOjEiUZQO
+         VEkWGQjpUfZYzm0973dY3g8Ms3os+eGlVW+xzkCTEEBq9LlqnH846oeesefRHFu7u0Ar
+         /qoVpgV6iIIDHvgoTikjWtsyk0nqWWLgIlt8aikg7Cg1JPpRUxHlKuyWzUyRCwM3ndEh
+         7yyg==
+X-Gm-Message-State: APjAAAUgnvEEn0jrZH4RV9qRbW2Ehh51PUoq5TXIIxTNLyr9xculgl3o
+        4zgOVtNTjruOLdkdr4ucgUfmwakohVOXLHnRbP9xjotm+kDV
+X-Google-Smtp-Source: APXvYqyAaDeug+XSRMcY1hscRo0iI/PV7iVIJW/oB23694qZ8/PtfaNdxgoEdPyLafLNk9QV+H3egweaSrcC+TxpiPmjoWOpCZk4
 MIME-Version: 1.0
-In-Reply-To: <20190613064813.8102-7-namit@vmware.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a6b:b497:: with SMTP id d145mr1044980iof.17.1561499227149;
+ Tue, 25 Jun 2019 14:47:07 -0700 (PDT)
+Date:   Tue, 25 Jun 2019 14:47:07 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c05b7b058c2cde8a@google.com>
+Subject: BUG: unable to handle kernel paging request in coalesced_mmio_write
+From:   syzbot <syzbot+983c866c3dd6efa3662a@syzkaller.appspotmail.com>
+To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, rkrcmar@redhat.com,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/12/19 11:48 PM, Nadav Amit wrote:
-> Support the new interface of flush_tlb_multi, which also flushes the
-> local CPU's TLB, instead of flush_tlb_others that does not. This
-> interface is more performant since it parallelize remote and local TLB
-> flushes.
-> 
-> The actual implementation of flush_tlb_multi() is almost identical to
-> that of flush_tlb_others().
+Hello,
 
-This confused me a bit.  I thought we didn't support paravirtualized
-flush_tlb_multi() from reading earlier in the series.
+syzbot found the following crash on:
 
-But, it seems like that might be Xen-only and doesn't apply to KVM and
-paravirtualized KVM has no problem supporting flush_tlb_multi().  Is
-that right?  It might be good to include some of that background in the
-changelog to set the context.
+HEAD commit:    abf02e29 Merge tag 'pm-5.2-rc6' of git://git.kernel.org/pu..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=111932b1a00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e5c77f8090a3b96b
+dashboard link: https://syzkaller.appspot.com/bug?extid=983c866c3dd6efa3662a
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13299fc9a00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=134b2826a00000
+
+Bisection is inconclusive: the bug happens on the oldest tested release.
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=108f9e06a00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=148f9e06a00000
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+983c866c3dd6efa3662a@syzkaller.appspotmail.com
+
+L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and  
+https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for  
+details.
+BUG: unable to handle page fault for address: ffffed12fb15ea1f
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 21fff0067 P4D 21fff0067 PUD 0
+Oops: 0000 [#1] PREEMPT SMP KASAN
+CPU: 0 PID: 8945 Comm: syz-executor116 Not tainted 5.2.0-rc5+ #57
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+RIP: 0010:coalesced_mmio_write+0x28a/0x4d0  
+arch/x86/kvm/../../../virt/kvm/coalesced_mmio.c:83
+Code: 38 d0 7c 08 84 d2 0f 85 55 02 00 00 41 8b 47 04 48 8d 14 40 49 8d 7c  
+d7 08 48 ba 00 00 00 00 00 fc ff df 48 89 fe 48 c1 ee 03 <80> 3c 16 00 0f  
+85 1b 02 00 00 48 8d 14 40 48 be 00 00 00 00 00 fc
+RSP: 0018:ffff8880a045f170 EFLAGS: 00010a02
+RAX: 00000000f7d5760a RBX: 0000000000000000 RCX: ffffffff81080faa
+RDX: dffffc0000000000 RSI: 1ffff112fb15ea1f RDI: ffff8897d8af50f8
+RBP: ffff8880a045f1c0 R08: ffff888089e483c0 R09: 0000000000000000
+R10: ffffed101408be1b R11: 0000000000000003 R12: 0000000000000001
+R13: ffff8880a55dbf10 R14: 0000000000000001 R15: ffff88809cac4000
+FS:  000055555573a940(0000) GS:ffff8880ae800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffed12fb15ea1f CR3: 00000000a0aee000 CR4: 00000000001426f0
+Call Trace:
+  kvm_iodevice_write include/kvm/iodev.h:54 [inline]
+  __kvm_io_bus_write+0x29b/0x380  
+arch/x86/kvm/../../../virt/kvm/kvm_main.c:3701
+  kvm_io_bus_write+0x15c/0x290 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3726
+  vcpu_mmio_write arch/x86/kvm/x86.c:5029 [inline]
+  write_mmio+0x175/0x4e0 arch/x86/kvm/x86.c:5391
+  emulator_read_write_onepage+0x429/0xd50 arch/x86/kvm/x86.c:5460
+  emulator_read_write+0x1b7/0x5a0 arch/x86/kvm/x86.c:5509
+  emulator_write_emulated+0x3c/0x50 arch/x86/kvm/x86.c:5546
+  segmented_write+0xf0/0x150 arch/x86/kvm/emulate.c:1446
+  writeback arch/x86/kvm/emulate.c:1808 [inline]
+  writeback+0x3f4/0x6a0 arch/x86/kvm/emulate.c:1794
+  x86_emulate_insn+0x1de1/0x48f0 arch/x86/kvm/emulate.c:5695
+  x86_emulate_instruction+0xca3/0x1c50 arch/x86/kvm/x86.c:6509
+  kvm_mmu_page_fault+0x370/0x1870 arch/x86/kvm/mmu.c:5430
+  handle_ept_violation+0x1c8/0x500 arch/x86/kvm/vmx/vmx.c:5099
+  vmx_handle_exit+0x280/0x1540 arch/x86/kvm/vmx/vmx.c:5861
+  vcpu_enter_guest+0x1174/0x5f40 arch/x86/kvm/x86.c:8035
+  vcpu_run arch/x86/kvm/x86.c:8099 [inline]
+  kvm_arch_vcpu_ioctl_run+0x423/0x1740 arch/x86/kvm/x86.c:8307
+  kvm_vcpu_ioctl+0x4dc/0xf90 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2755
+  vfs_ioctl fs/ioctl.c:46 [inline]
+  file_ioctl fs/ioctl.c:509 [inline]
+  do_vfs_ioctl+0xd5f/0x1380 fs/ioctl.c:696
+  ksys_ioctl+0xab/0xd0 fs/ioctl.c:713
+  __do_sys_ioctl fs/ioctl.c:720 [inline]
+  __se_sys_ioctl fs/ioctl.c:718 [inline]
+  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:718
+  do_syscall_64+0xfd/0x680 arch/x86/entry/common.c:301
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x4444e9
+Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7  
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
+ff 0f 83 1b 0c fc ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007fff46b48808 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007fff46b48810 RCX: 00000000004444e9
+RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000005
+RBP: 0000000000000000 R08: 0000000000402240 R09: 0000000000402240
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000405590
+R13: 0000000000405620 R14: 0000000000000000 R15: 0000000000000000
+Modules linked in:
+CR2: ffffed12fb15ea1f
+---[ end trace 84ecc85af6872381 ]---
+RIP: 0010:coalesced_mmio_write+0x28a/0x4d0  
+arch/x86/kvm/../../../virt/kvm/coalesced_mmio.c:83
+Code: 38 d0 7c 08 84 d2 0f 85 55 02 00 00 41 8b 47 04 48 8d 14 40 49 8d 7c  
+d7 08 48 ba 00 00 00 00 00 fc ff df 48 89 fe 48 c1 ee 03 <80> 3c 16 00 0f  
+85 1b 02 00 00 48 8d 14 40 48 be 00 00 00 00 00 fc
+RSP: 0018:ffff8880a045f170 EFLAGS: 00010a02
+RAX: 00000000f7d5760a RBX: 0000000000000000 RCX: ffffffff81080faa
+RDX: dffffc0000000000 RSI: 1ffff112fb15ea1f RDI: ffff8897d8af50f8
+RBP: ffff8880a045f1c0 R08: ffff888089e483c0 R09: 0000000000000000
+R10: ffffed101408be1b R11: 0000000000000003 R12: 0000000000000001
+R13: ffff8880a55dbf10 R14: 0000000000000001 R15: ffff88809cac4000
+FS:  000055555573a940(0000) GS:ffff8880ae800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffed12fb15ea1f CR3: 00000000a0aee000 CR4: 00000000001426f0
+
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
