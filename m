@@ -2,45 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3254755715
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 20:23:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2A1C55729
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2019 20:25:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732903AbfFYSW7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 14:22:59 -0400
-Received: from mga06.intel.com ([134.134.136.31]:41971 "EHLO mga06.intel.com"
+        id S1730581AbfFYSZx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 14:25:53 -0400
+Received: from mga05.intel.com ([192.55.52.43]:25643 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727138AbfFYSW7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jun 2019 14:22:59 -0400
+        id S1727070AbfFYSZx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 14:25:53 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Jun 2019 11:22:58 -0700
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Jun 2019 11:25:52 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,416,1557212400"; 
-   d="scan'208";a="172454799"
+   d="scan'208";a="172455613"
 Received: from ray.jf.intel.com (HELO [10.7.201.139]) ([10.7.201.139])
-  by orsmga002.jf.intel.com with ESMTP; 25 Jun 2019 11:22:58 -0700
-Subject: Re: [PATCH v1 0/6] mm / virtio: Provide support for paravirtual waste
- page treatment
-To:     Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Nitesh Narayan Lal <nitesh@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yang Zhang <yang.zhang.wz@gmail.com>, pagupta@redhat.com,
-        Rik van Riel <riel@surriel.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        lcapitulino@redhat.com, wei.w.wang@intel.com,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, dan.j.williams@intel.com,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>
+  by orsmga002.jf.intel.com with ESMTP; 25 Jun 2019 11:25:51 -0700
+Subject: Re: [PATCH v1 1/6] mm: Adjust shuffle code to allow for future
+ coalescing
+To:     Alexander Duyck <alexander.duyck@gmail.com>, nitesh@redhat.com,
+        kvm@vger.kernel.org, david@redhat.com, mst@redhat.com,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        akpm@linux-foundation.org
+Cc:     yang.zhang.wz@gmail.com, pagupta@redhat.com, riel@surriel.com,
+        konrad.wilk@oracle.com, lcapitulino@redhat.com,
+        wei.w.wang@intel.com, aarcange@redhat.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, alexander.h.duyck@linux.intel.com
 References: <20190619222922.1231.27432.stgit@localhost.localdomain>
- <ff133df4-6291-bece-3d8d-dc3f12f398cf@redhat.com>
- <8fea71ba-2464-ead8-3802-2241805283cc@intel.com>
- <CAKgT0UdAj4Kq8qHKkaiB3z08gCQh-jovNpos45VcGHa_v5aFGg@mail.gmail.com>
+ <20190619223302.1231.51136.stgit@localhost.localdomain>
 From:   Dave Hansen <dave.hansen@intel.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -86,31 +77,24 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-Message-ID: <bc4bb663-585b-bee0-1310-b149382047d0@intel.com>
-Date:   Tue, 25 Jun 2019 11:22:58 -0700
+Message-ID: <dd694406-6384-d859-6ac6-ec6e6cffe4e8@intel.com>
+Date:   Tue, 25 Jun 2019 11:25:51 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <CAKgT0UdAj4Kq8qHKkaiB3z08gCQh-jovNpos45VcGHa_v5aFGg@mail.gmail.com>
+In-Reply-To: <20190619223302.1231.51136.stgit@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/25/19 10:00 AM, Alexander Duyck wrote:
-> Basically what we are doing is inflating the memory size we can report
-> by inserting voids into the free memory areas. In my mind that matches
-> up very well with what "aeration" is. It is similar to balloon in
-> functionality, however instead of inflating the balloon we are
-> inflating the free_list for higher order free areas by creating voids
-> where the madvised pages were.
-
-OK, then call it "free page auto ballooning" or "auto ballooning" or
-"allocator ballooning".  s390 calls them "unused pages".
-
-Any of those things are clearer and more meaningful than "page aeration"
-to me.
+On 6/19/19 3:33 PM, Alexander Duyck wrote:
+> 
+> This patch is meant to move the head/tail adding logic out of the shuffle
+> code and into the __free_one_page function since ultimately that is where
+> it is really needed anyway. By doing this we should be able to reduce the
+> overhead and can consolidate all of the list addition bits in one spot.
 
