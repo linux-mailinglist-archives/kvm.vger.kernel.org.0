@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D37F7573DD
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 23:48:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABC0B573ED
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 23:52:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726439AbfFZVr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jun 2019 17:47:56 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:50412 "EHLO
+        id S1726362AbfFZVwP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jun 2019 17:52:15 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:50424 "EHLO
         Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726223AbfFZVr4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 17:47:56 -0400
+        with ESMTP id S1726289AbfFZVwO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jun 2019 17:52:14 -0400
 Received: from p5b06daab.dip0.t-ipconnect.de ([91.6.218.171] helo=nanos)
         by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
         (Exim 4.80)
         (envelope-from <tglx@linutronix.de>)
-        id 1hgFlW-00088d-0n; Wed, 26 Jun 2019 23:47:42 +0200
-Date:   Wed, 26 Jun 2019 23:47:40 +0200 (CEST)
+        id 1hgFpg-0008Cm-OQ; Wed, 26 Jun 2019 23:52:00 +0200
+Date:   Wed, 26 Jun 2019 23:51:59 +0200 (CEST)
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     Fenghua Yu <fenghua.yu@intel.com>
 cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -35,11 +35,11 @@ cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Ravi V Shankar <ravi.v.shankar@intel.com>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         x86 <x86@kernel.org>, kvm@vger.kernel.org
-Subject: Re: [PATCH v9 09/17] x86/split_lock: Handle #AC exception for split
- lock
-In-Reply-To: <20190626203637.GC245468@romley-ivt3.sc.intel.com>
-Message-ID: <alpine.DEB.2.21.1906262338220.32342@nanos.tec.linutronix.de>
-References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com> <1560897679-228028-10-git-send-email-fenghua.yu@intel.com> <alpine.DEB.2.21.1906262209590.32342@nanos.tec.linutronix.de> <20190626203637.GC245468@romley-ivt3.sc.intel.com>
+Subject: Re: [PATCH v9 15/17] x86/split_lock: Add documentation for split
+ lock detection interface
+In-Reply-To: <1560897679-228028-16-git-send-email-fenghua.yu@intel.com>
+Message-ID: <alpine.DEB.2.21.1906262348540.32342@nanos.tec.linutronix.de>
+References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com> <1560897679-228028-16-git-send-email-fenghua.yu@intel.com>
 User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -51,60 +51,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 26 Jun 2019, Fenghua Yu wrote:
+On Tue, 18 Jun 2019, Fenghua Yu wrote:
 
-> On Wed, Jun 26, 2019 at 10:20:05PM +0200, Thomas Gleixner wrote:
-> > On Tue, 18 Jun 2019, Fenghua Yu wrote:
-> > > +
-> > > +static atomic_t split_lock_debug;
-> > > +
-> > > +void split_lock_disable(void)
-> > > +{
-> > > +	/* Disable split lock detection on this CPU */
-> > > +	this_cpu_and(msr_test_ctl_cached, ~MSR_TEST_CTL_SPLIT_LOCK_DETECT);
-> > > +	wrmsrl(MSR_TEST_CTL, this_cpu_read(msr_test_ctl_cached));
-> > > +
-> > > +	/*
-> > > +	 * Use the atomic variable split_lock_debug to ensure only the
-> > > +	 * first CPU hitting split lock issue prints one single complete
-> > > +	 * warning. This also solves the race if the split-lock #AC fault
-> > > +	 * is re-triggered by NMI of perf context interrupting one
-> > > +	 * split-lock warning execution while the original WARN_ONCE() is
-> > > +	 * executing.
-> > > +	 */
-> > > +	if (atomic_cmpxchg(&split_lock_debug, 0, 1) == 0) {
-> > > +		WARN_ONCE(1, "split lock operation detected\n");
-> > > +		atomic_set(&split_lock_debug, 0);
-> > 
-> > What's the purpose of this atomic_set()?
+> It is useful for development and debugging to document the new debugfs
+> interface /sys/kernel/debug/x86/split_lock_detect.
 > 
-> atomic_set() releases the split_lock_debug flag after WARN_ONCE() is done.
-> The same split_lock_debug flag will be used in sysfs write for atomic
-> operation as well, as proposed by Ingo in https://lkml.org/lkml/2019/4/25/48
+> A new debugfs documentation is created to describe the split lock detection
+> interface. In the future, more entries may be added in the documentation to
+> describe other interfaces under /sys/kernel/debug/x86 directory.
+> 
+> Signed-off-by: Fenghua Yu <fenghua.yu@intel.com>
+> ---
+>  Documentation/ABI/testing/debugfs-x86 | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>  create mode 100644 Documentation/ABI/testing/debugfs-x86
+> 
+> diff --git a/Documentation/ABI/testing/debugfs-x86 b/Documentation/ABI/testing/debugfs-x86
+> new file mode 100644
+> index 000000000000..17a1e9ed6712
+> --- /dev/null
+> +++ b/Documentation/ABI/testing/debugfs-x86
+> @@ -0,0 +1,21 @@
+> +What:		/sys/kernel/debugfs/x86/split_lock_detect
+> +Date:		May 2019
+> +Contact:	Linux kernel mailing list <linux-kernel@vger.kernel.org>
+> +Description:	(RW) Control split lock detection on Intel Tremont and
+> +		future CPUs
+> +
+> +		Reads return split lock detection status:
+> +			0: disabled
+> +			1: enabled
+> +
+> +		Writes enable or disable split lock detection:
+> +			The first character is one of 'Nn0' or [oO][fF] for off
+> +			disables the feature.
+> +			The first character is one of 'Yy1' or [oO][nN] for on
+> +			enables the feature.
+> +
+> +		Please note the interface only shows or controls global setting.
+> +		During run time, split lock detection on one CPU may be
+> +		disabled if split lock operation in kernel code happens on
+> +		the CPU. The interface doesn't show or control split lock
+> +		detection on individual CPU.
 
-Your comment above lacks any useful information about that whole thing.
-
-> So that's why the flag needs to be cleared, right?
-
-Errm. No.
-
-CPU 0					CPU 1
-					
-hits AC					hits AC
-  if (atomic_cmpxchg() == success)	  if (atomic_cmpxchg() == success)
-  	warn()	       	  		     warn()
-
-So only one of the CPUs will win the cmpxchg race, set te variable to 1 and
-warn, the other and any subsequent AC on any other CPU will not warn
-either. So you don't need WARN_ONCE() at all. It's redundant and confusing
-along with the atomic_set().
-
-Whithout reading that link [1], what Ingo proposed was surely not the
-trainwreck which you decided to put into that debugfs thing.
+But it should show that the debug output for the kernel has been globally
+disabled instead of merily stating 'enabled' while it's already disabled on
+a bunch on CPUs. I fundamentally despise inconsistent information. Even in
+debugfs files inconsistency is a pain because it make debugging via mail/
+bugzille etc. unnecessarily cumbersome.
 
 Thanks,
 
 	tglx
 
-[1] lkml.org sucks. We have https://lkml.kernel.org/r/$MESSAGEID for
-    that. That actually works.
+
