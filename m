@@ -2,117 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C1FCC57122
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 20:59:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CDD0757141
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 21:04:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726328AbfFZS7b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jun 2019 14:59:31 -0400
-Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:15928 "EHLO
-        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726227AbfFZS7b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 14:59:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1561575570; x=1593111570;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:mime-version:
-   content-transfer-encoding;
-  bh=CT6ElSc2GZ3wKXKC1lG5OYakWHL+cI1N18YJRLUfo44=;
-  b=qZbBS4qlNvX9DF+8WpiLjCdNUGAs5JI4+EyrnTv13Y+y6VcpnPOPw0Rm
-   qsKuWhAZe/4QL82dVC/IfCytnOsM35Ptntq6QSwZP0iruWqGigY/BQn4d
-   Xox3xyYIWo3pRehInF8tQnPOYhoLjSU2T/HOAwd+kriOdsiN6T2vHRuNb
-   g=;
-X-IronPort-AV: E=Sophos;i="5.62,420,1554768000"; 
-   d="scan'208";a="682321801"
-Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-1d-2c665b5d.us-east-1.amazon.com) ([10.47.22.34])
-  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 26 Jun 2019 18:59:02 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
-        by email-inbound-relay-1d-2c665b5d.us-east-1.amazon.com (Postfix) with ESMTPS id 195AFA1F6A;
-        Wed, 26 Jun 2019 18:58:58 +0000 (UTC)
-Received: from EX13D01EUB004.ant.amazon.com (10.43.166.180) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 26 Jun 2019 18:58:58 +0000
-Received: from EX13D01EUB003.ant.amazon.com (10.43.166.248) by
- EX13D01EUB004.ant.amazon.com (10.43.166.180) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 26 Jun 2019 18:58:57 +0000
-Received: from EX13D01EUB003.ant.amazon.com ([10.43.166.248]) by
- EX13D01EUB003.ant.amazon.com ([10.43.166.248]) with mapi id 15.00.1367.000;
- Wed, 26 Jun 2019 18:58:57 +0000
-From:   "Raslan, KarimAllah" <karahmed@amazon.de>
-To:     "tglx@linutronix.de" <tglx@linutronix.de>,
-        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        "ankur.a.arora@oracle.com" <ankur.a.arora@oracle.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kernellwp@gmail.com" <kernellwp@gmail.com>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>
-Subject: Re: cputime takes cstate into consideration
-Thread-Topic: cputime takes cstate into consideration
-Thread-Index: AQHVLAPB6iUJbr9/fEyB9GgoQyBOoKatvSkAgABI2ICAAERgAA==
-Date:   Wed, 26 Jun 2019 18:58:57 +0000
-Message-ID: <1561575536.25880.10.camel@amazon.de>
-References: <CANRm+Cyge6viybs63pt7W-cRdntx+wfyOq5EWE2qmEQ71SzMHg@mail.gmail.com>
-         <alpine.DEB.2.21.1906261211410.32342@nanos.tec.linutronix.de>
-         <20190626145413.GE6753@char.us.oracle.com>
-In-Reply-To: <20190626145413.GE6753@char.us.oracle.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.166.107]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6054BA1676D0AB47AD5D503A03CE81D1@amazon.com>
+        id S1726385AbfFZTEH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jun 2019 15:04:07 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:13879 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726289AbfFZTEG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jun 2019 15:04:06 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d13c1a30001>; Wed, 26 Jun 2019 12:04:03 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Wed, 26 Jun 2019 12:04:05 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Wed, 26 Jun 2019 12:04:05 -0700
+Received: from [10.24.71.21] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 26 Jun
+ 2019 19:04:03 +0000
+Subject: Re: [PATCH] mdev: Send uevents around parent device registration
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <156155924767.11505.11457229921502145577.stgit@gimli.home>
+ <1ea5c171-cd42-1c10-966e-1b82a27351d9@nvidia.com>
+ <20190626120551.788fa5ed@x1.home>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <a6c2ec9e-b949-4346-13bc-4d7f9c35ea8b@nvidia.com>
+Date:   Thu, 27 Jun 2019 00:33:59 +0530
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+In-Reply-To: <20190626120551.788fa5ed@x1.home>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL106.nvidia.com (172.18.146.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1561575843; bh=jZA/XDQ4US9Ng8Ww5WujClRmd4XFP4iAZ65KheJ7Nh4=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:MIME-Version:In-Reply-To:X-Originating-IP:
+         X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=clB/q5G7SbjTlRjSpGBni2WC8guLbfo2PMHjtJcTu6thvaVpKoIDJq1vi21LLfisR
+         IqjYoxJnEuuIrGkJOlfxLPAnsNbnLZmTlsmPpwbvJgZf374V4ZZKBQwzpKaAcvfmYy
+         5JBpeHnt2RDuby3m0SPKrewFS83fzjzAC+vfpygO3+loJdiZ8TBNkuxbZzmDUCn/yW
+         lSolvAYARHTFQt/OwD1hyBPFahD7giYcsjq7hW+hBg+2whM47nvHhToCYDvzLMYDIE
+         pdxSF2cDLwKCvYjVyDLXaKtHWvDBybWyBxeneiYQXlL71BSpmpYyFy1ZNVZfaWPmHl
+         17+htJ5JXZ1ZA==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gV2VkLCAyMDE5LTA2LTI2IGF0IDEwOjU0IC0wNDAwLCBLb25yYWQgUnplc3p1dGVrIFdpbGsg
-d3JvdGU6DQo+IE9uIFdlZCwgSnVuIDI2LCAyMDE5IGF0IDEyOjMzOjMwUE0gKzAyMDAsIFRob21h
-cyBHbGVpeG5lciB3cm90ZToNCj4gPiANCj4gPiBPbiBXZWQsIDI2IEp1biAyMDE5LCBXYW5wZW5n
-IExpIHdyb3RlOg0KPiA+ID4gDQo+ID4gPiBBZnRlciBleHBvc2luZyBtd2FpdC9tb25pdG9yIGlu
-dG8ga3ZtIGd1ZXN0LCB0aGUgZ3Vlc3QgY2FuIG1ha2UNCj4gPiA+IHBoeXNpY2FsIGNwdSBlbnRl
-ciBkZWVwZXIgY3N0YXRlIHRocm91Z2ggbXdhaXQgaW5zdHJ1Y3Rpb24sIGhvd2V2ZXIsDQo+ID4g
-PiB0aGUgdG9wIGNvbW1hbmQgb24gaG9zdCBzdGlsbCBvYnNlcnZlIDEwMCUgY3B1IHV0aWxpemF0
-aW9uIHNpbmNlIHFlbXUNCj4gPiA+IHByb2Nlc3MgaXMgcnVubmluZyBldmVuIHRob3VnaCBndWVz
-dCB3aG8gaGFzIHRoZSBwb3dlciBtYW5hZ2VtZW50DQo+ID4gPiBjYXBhYmlsaXR5IGV4ZWN1dGVz
-IG13YWl0LiBBY3R1YWxseSB3ZSBjYW4gb2JzZXJ2ZSB0aGUgcGh5c2ljYWwgY3B1DQo+ID4gPiBo
-YXMgYWxyZWFkeSBlbnRlciBkZWVwZXIgY3N0YXRlIGJ5IHBvd2VydG9wIG9uIGhvc3QuIENvdWxk
-IHdlIHRha2UNCj4gPiA+IGNzdGF0ZSBpbnRvIGNvbnNpZGVyYXRpb24gd2hlbiBhY2NvdW50aW5n
-IGNwdXRpbWUgZXRjPw0KPiA+IA0KPiA+IElmIE1XQUlUIGNhbiBiZSB1c2VkIGluc2lkZSB0aGUg
-Z3Vlc3QgdGhlbiB0aGUgaG9zdCBjYW5ub3QgZGlzdGluZ3Vpc2gNCj4gPiBiZXR3ZWVuIGV4ZWN1
-dGlvbiBhbmQgc3R1Y2sgaW4gbXdhaXQuDQo+ID4gDQo+ID4gSXQnZCBuZWVkIHRvIHBvbGwgdGhl
-IHBvd2VyIG1vbml0b3JpbmcgTVNScyBvbiBldmVyeSBvY2Nhc2lvbiB3aGVyZSB0aGUNCj4gPiBh
-Y2NvdW50aW5nIGhhcHBlbnMuDQo+ID4gDQo+ID4gVGhpcyBjb21wbGV0ZWx5IGZhbGxzIGFwYXJ0
-IHdoZW4geW91IGhhdmUgemVybyBleGl0IGd1ZXN0LiAodGhpbmsNCj4gPiBOT0haX0ZVTEwpLiBU
-aGVuIHlvdSdkIGhhdmUgdG8gYnJpbmcgdGhlIGd1ZXN0IG91dCB3aXRoIGFuIElQSSB0byBhY2Nl
-c3MNCj4gPiB0aGUgcGVyIENQVSBNU1JzLg0KPiA+IA0KPiA+IEkgYXNzdW1lIGEgbG90IG9mIHBl
-b3BsZSB3aWxsIGJlIGhhcHB5IGFib3V0IGFsbCB0aGF0IDopDQo+IA0KPiBUaGVyZSB3ZXJlIHNv
-bWUgaWRlYXMgdGhhdCBBbmt1ciAoQ0MtZWQpIG1lbnRpb25lZCB0byBtZSBvZiB1c2luZyB0aGUg
-cGVyZg0KPiBjb3VudGVycyAoaW4gdGhlIGhvc3QpIHRvIHNhbXBsZSB0aGUgZ3Vlc3QgYW5kIGNv
-bnN0cnVjdCBhIGJldHRlcg0KPiBhY2NvdW50aW5nIGlkZWEgb2Ygd2hhdCB0aGUgZ3Vlc3QgZG9l
-cy4gVGhhdCB3YXkgdGhlIGRhc2hib2FyZA0KPiBmcm9tIHRoZSBob3N0IHdvdWxkIG5vdCBzaG93
-IDEwMCUgQ1BVIHV0aWxpemF0aW9uLg0KDQpZb3UgY2FuIGVpdGhlciB1c2UgdGhlIFVOSEFMVEVE
-IGN5Y2xlcyBwZXJmLWNvdW50ZXIgb3IgeW91IGNhbiB1c2UgTVBFUkYvQVBFUkbCoA0KTVNScyBm
-b3IgdGhhdC4gKHNvcnJ5IEkgZ290IGRpc3RyYWN0ZWQgYW5kIGZvcmdvdCB0byBzZW5kIHRoZSBw
-YXRjaCkNCg0KPiANCj4gQnV0IHRoZSBwYXRjaGVzIHRoYXQgTWFyY2VsbyBwb3N0ZWQgKCIgY3B1
-aWRsZS1oYWx0cG9sbCBkcml2ZXIiKSBpbiANCj4gInNvbHZlcyIgdGhlIHByb2JsZW0gZm9yIExp
-bnV4LiBUaGF0IGlzIHRoZSBndWVzdCB3YW50cyBhd2Vzb21lIGxhdGVuY3kgYW5kDQo+IG9uZSB3
-YXkgd2FzIHRvIGV4cG9zZSBNV0FJVCB0byB0aGUgZ3Vlc3QsIG9yIGp1c3QgdHdlYWsgdGhlIGd1
-ZXN0IHRvIGRvIHRoZQ0KPiBpZGxpbmcgYSBiaXQgZGlmZmVyZW50Lg0KPiANCj4gTWFyY2VsbyBw
-YXRjaGVzIGFyZSBhbGwgZ29vZCBmb3IgTGludXgsIGJ1dCBXaW5kb3dzIGlzIHN0aWxsIGFuIGlz
-c3VlLg0KPiANCj4gQW5rdXIsIHdvdWxkIHlvdSBiZSBPSyBzaGFyaW5nIHNvbWUgb2YgeW91ciBp
-ZGVhcz8NCj4gPiANCj4gPiANCj4gPiBUaGFua3MsDQo+ID4gDQo+ID4gCXRnbHgNCj4gPiANCgoK
-CkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBHbWJICktyYXVzZW5zdHIuIDM4CjEw
-MTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlzdGlhbiBTY2hsYWVnZXIsIFJhbGYg
-SGVyYnJpY2gKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQgQ2hhcmxvdHRlbmJ1cmcgdW50ZXIg
-SFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERFIDI4OSAyMzcgODc5CgoK
 
+
+On 6/26/2019 11:35 PM, Alex Williamson wrote:
+> On Wed, 26 Jun 2019 23:23:00 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+>> On 6/26/2019 7:57 PM, Alex Williamson wrote:
+>>> This allows udev to trigger rules when a parent device is registered
+>>> or unregistered from mdev.
+>>>
+>>> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+>>> ---
+>>>  drivers/vfio/mdev/mdev_core.c |   10 ++++++++--
+>>>  1 file changed, 8 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+>>> index ae23151442cb..ecec2a3b13cb 100644
+>>> --- a/drivers/vfio/mdev/mdev_core.c
+>>> +++ b/drivers/vfio/mdev/mdev_core.c
+>>> @@ -146,6 +146,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+>>>  {
+>>>  	int ret;
+>>>  	struct mdev_parent *parent;
+>>> +	char *env_string = "MDEV_STATE=registered";
+>>> +	char *envp[] = { env_string, NULL };
+>>>  
+>>>  	/* check for mandatory ops */
+>>>  	if (!ops || !ops->create || !ops->remove || !ops->supported_type_groups)
+>>> @@ -196,7 +198,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+>>>  	list_add(&parent->next, &parent_list);
+>>>  	mutex_unlock(&parent_list_lock);
+>>>  
+>>> -	dev_info(dev, "MDEV: Registered\n");
+>>> +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+>>> +  
+>>
+>> Its good to have udev event, but don't remove debug print from dmesg.
+>> Same for unregister.
+> 
+> Who consumes these?  They seem noisy.  Thanks,
+> 
+
+I don't think its noisy, its more of logging purpose. This is seen in
+kernel log only when physical device is registered to mdev.
+
+Thanks,
+Kirti
+
+
+> Alex
+> 
+>>>  	return 0;
+>>>  
+>>>  add_dev_err:
+>>> @@ -220,6 +223,8 @@ EXPORT_SYMBOL(mdev_register_device);
+>>>  void mdev_unregister_device(struct device *dev)
+>>>  {
+>>>  	struct mdev_parent *parent;
+>>> +	char *env_string = "MDEV_STATE=unregistered";
+>>> +	char *envp[] = { env_string, NULL };
+>>>  
+>>>  	mutex_lock(&parent_list_lock);
+>>>  	parent = __find_parent_device(dev);
+>>> @@ -228,7 +233,6 @@ void mdev_unregister_device(struct device *dev)
+>>>  		mutex_unlock(&parent_list_lock);
+>>>  		return;
+>>>  	}
+>>> -	dev_info(dev, "MDEV: Unregistering\n");
+>>>  
+>>>  	list_del(&parent->next);
+>>>  	mutex_unlock(&parent_list_lock);
+>>> @@ -243,6 +247,8 @@ void mdev_unregister_device(struct device *dev)
+>>>  	up_write(&parent->unreg_sem);
+>>>  
+>>>  	mdev_put_parent(parent);
+>>> +
+>>> +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+>>>  }
+>>>  EXPORT_SYMBOL(mdev_unregister_device);
+>>>  
+>>>   
+> 
