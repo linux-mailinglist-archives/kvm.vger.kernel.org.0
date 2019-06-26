@@ -2,101 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id EE0D556CD8
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 16:51:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C978956CE5
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 16:54:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728189AbfFZOu5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jun 2019 10:50:57 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:39699 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726948AbfFZOu4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 10:50:56 -0400
-Received: by mail-wr1-f65.google.com with SMTP id x4so3078598wrt.6
-        for <kvm@vger.kernel.org>; Wed, 26 Jun 2019 07:50:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zKwCVXqNSdxUFQzItp//hcjzWX/6aPHoSCaD5m20WdA=;
-        b=QD/0rJt2zWKJaQNSvvWwBfNxhqgro7wNk6F1oFE0WWDoXqC7glDhg5ltUCr4q3NeM3
-         ccOHEheeUp4YwZF7pWsPyMyUjaswN3ZeOYs8PY+ssrWqd2VXCSaieSKZZr3hMWvi7qwn
-         NgxpcLkXP2C1JPOm5rgySVMdoLuZ9dNhZhRq4NmhKVyJxpcc8hnM/SJZO+dHHtinYW6T
-         C2oePr6IzR+bJkAO5qBnycUoiPQ/SovuLxGOubgEWRZ3BV+6LUiLxIhAXxn+cRvBfQFW
-         Ydgk64JSasLs+1RUPmv2MYa2y161J7KMPsoi4J8VoitPMY5wV/RGjaaVH+b/QrlFZc6t
-         t8kA==
-X-Gm-Message-State: APjAAAXqGcuhVzf+xAvEOopFFwLMU9Dw4y+eN6VTyOq39A+/lQ9aOuU2
-        XsR/znu5qSQKGIP5W80Xf/ThTA==
-X-Google-Smtp-Source: APXvYqxycRsvlbgRNY6d2pMyCqDyrY9jNh7mW02JEED6LFOHbbuBdjHos3+Fqpxmv1eNh3joycNHMQ==
-X-Received: by 2002:a5d:5143:: with SMTP id u3mr3622743wrt.118.1561560653972;
-        Wed, 26 Jun 2019 07:50:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e88d:856c:e081:f67d? ([2001:b07:6468:f312:e88d:856c:e081:f67d])
-        by smtp.gmail.com with ESMTPSA id x129sm2501891wmg.44.2019.06.26.07.50.53
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 26 Jun 2019 07:50:53 -0700 (PDT)
-Subject: Re: [PATCH 0/2] scsi: add support for request batching
-To:     dgilbert@interlog.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jejb@linux.ibm.com, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, stefanha@redhat.com
-References: <20190530112811.3066-1-pbonzini@redhat.com>
- <746ad64a-4047-1597-a0d4-f14f3529cc19@redhat.com>
- <65e5ad25-a475-989a-ce3d-400a8c90cb61@interlog.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cbb24317-7682-a854-4460-e8828db1eb25@redhat.com>
-Date:   Wed, 26 Jun 2019 16:50:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1727959AbfFZOx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jun 2019 10:53:58 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:60106 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726948AbfFZOx5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jun 2019 10:53:57 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5QEn0u0115886;
+        Wed, 26 Jun 2019 14:52:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=O8gsLAnKvEJnxFFzMobAjm8cu3fNADVN1xEFWlBOGbk=;
+ b=NUkq18lOFFDWIv9CTLHNhjC+dTnEhg5+Sp2EPg1lNCYslPeZx79gEYt6+PICxltUHb7x
+ 4OW7B5GmqcMkuDWq13q9q0VlmCnrsv6KVUfOy6nmNo40x/ImzH52Iwp1jUQ/p0IlaEuU
+ Q/mTqg6aRbc5nDqUcfrFWrc1hngRRhNpUzWDZ9LOBQhVZb4C/5p55lqB4fSvmh2lu4Rs
+ CStecoPZ+OftnKBUbXPFDpJ+yCH4lCdMJi/XsAi8LeQPvKA/HJIexEIz0t+m5s2ErXyz
+ 9uJg0qq9NpBrPB+ppBig1llbzOHuXsqEDV6KhekjuyjOcfCjRe1DTuk12NwzkJpoVTb/ IQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2120.oracle.com with ESMTP id 2t9cyqjsa5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 26 Jun 2019 14:52:58 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5QEqfSM175391;
+        Wed, 26 Jun 2019 14:52:58 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2tat7cv8ys-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 26 Jun 2019 14:52:58 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5QEqnwe005115;
+        Wed, 26 Jun 2019 14:52:49 GMT
+Received: from char.us.oracle.com (/10.152.32.25)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 26 Jun 2019 07:52:49 -0700
+Received: by char.us.oracle.com (Postfix, from userid 1000)
+        id 6B9A06A0150; Wed, 26 Jun 2019 10:54:13 -0400 (EDT)
+Date:   Wed, 26 Jun 2019 10:54:13 -0400
+From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>
+Cc:     Wanpeng Li <kernellwp@gmail.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        KarimAllah <karahmed@amazon.de>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Subject: Re: cputime takes cstate into consideration
+Message-ID: <20190626145413.GE6753@char.us.oracle.com>
+References: <CANRm+Cyge6viybs63pt7W-cRdntx+wfyOq5EWE2qmEQ71SzMHg@mail.gmail.com>
+ <alpine.DEB.2.21.1906261211410.32342@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <65e5ad25-a475-989a-ce3d-400a8c90cb61@interlog.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.21.1906261211410.32342@nanos.tec.linutronix.de>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9299 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906260176
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9299 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906260175
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/06/19 16:14, Douglas Gilbert wrote:
+On Wed, Jun 26, 2019 at 12:33:30PM +0200, Thomas Gleixner wrote:
+> On Wed, 26 Jun 2019, Wanpeng Li wrote:
+> > After exposing mwait/monitor into kvm guest, the guest can make
+> > physical cpu enter deeper cstate through mwait instruction, however,
+> > the top command on host still observe 100% cpu utilization since qemu
+> > process is running even though guest who has the power management
+> > capability executes mwait. Actually we can observe the physical cpu
+> > has already enter deeper cstate by powertop on host. Could we take
+> > cstate into consideration when accounting cputime etc?
 > 
-> I have no objections, just a few questions.
+> If MWAIT can be used inside the guest then the host cannot distinguish
+> between execution and stuck in mwait.
 > 
-> To implement this is the scsi_debug driver, a per device queue would
-> need to be added, correct?
+> It'd need to poll the power monitoring MSRs on every occasion where the
+> accounting happens.
+> 
+> This completely falls apart when you have zero exit guest. (think
+> NOHZ_FULL). Then you'd have to bring the guest out with an IPI to access
+> the per CPU MSRs.
+> 
+> I assume a lot of people will be happy about all that :)
 
-Yes, queuecommand would then return before calling schedule_resp (for
-all requests except the one with SCMD_LAST, see later).  schedule_resp
-would then be called for all requests in a batch.
+There were some ideas that Ankur (CC-ed) mentioned to me of using the perf
+counters (in the host) to sample the guest and construct a better
+accounting idea of what the guest does. That way the dashboard
+from the host would not show 100% CPU utilization.
 
-> Then a 'commit_rqs' call would be expected
-> at some later point and it would drain that queue and submit each
-> command. Or is the queue draining ongoing in the LLD and 'commit_rqs'
-> means: don't return until that queue is empty?
+But the patches that Marcelo posted (" cpuidle-haltpoll driver") in 
+"solves" the problem for Linux. That is the guest wants awesome latency and
+one way was to expose MWAIT to the guest, or just tweak the guest to do the
+idling a bit different.
 
-commit_rqs means the former; it is asynchronous.
+Marcelo patches are all good for Linux, but Windows is still an issue.
 
-However, commit_rqs is only called if a request batch fails submission
-in the middle of the batch, so the request batch must be sent to the
-HBA.  If the whole request batch is sent successfully, then the LLD
-takes care of sending the batch to the HBA when it sees SCMD_LAST in the
-request.
-
-So, in the scsi_debug case schedule_resp would be called for the whole
-batch from commit_rqs *and* when queuecommand sees a command with the
-SCMD_LAST flag set.  This is exactly to avoid having two calls to the
-LLD in the case of no request batching.
-
-> So does that mean in the normal (i.e. non request batching) case
-> there are two calls to the LLD for each submitted command? Or is
-> 'commit_rqs' optional, a sync-ing type command?
-
-It's not syncing.  It's mandatory if the queuecommand function observes
-SCMD_LAST, not needed at all if queuecommand ignores it.  So it's not
-needed at all until your driver adds support for batched submission of
-requests to the HBA.
-
-(All this is documented by the patches in the comments for struct
-scsi_host_template, if those are not clear please reply to patch 1 with
-your doubts).
-
-Paolo
+Ankur, would you be OK sharing some of your ideas?
+> 
+> Thanks,
+> 
+> 	tglx
+> 
