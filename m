@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 497FD56D6C
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 17:14:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 21A5756D61
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 17:13:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728378AbfFZPNz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1728363AbfFZPNz (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Wed, 26 Jun 2019 11:13:55 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:40826 "EHLO huawei.com"
+Received: from szxga04-in.huawei.com ([45.249.212.190]:19083 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728283AbfFZPNw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 11:13:52 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 616A5788C24F903C57E1;
-        Wed, 26 Jun 2019 23:13:47 +0800 (CST)
+        id S1726157AbfFZPNy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jun 2019 11:13:54 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 6AF3767679FA3F4B31A8;
+        Wed, 26 Jun 2019 23:13:52 +0800 (CST)
 Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
  DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 26 Jun 2019 23:13:39 +0800
+ 14.3.439.0; Wed, 26 Jun 2019 23:13:42 +0800
 From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To:     <alex.williamson@redhat.com>, <eric.auger@redhat.com>,
         <pmorel@linux.vnet.ibm.com>
@@ -25,9 +25,9 @@ CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <john.garry@huawei.com>, <xuwei5@hisilicon.com>,
         <kevin.tian@intel.com>,
         Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Subject: [PATCH v7 3/6] vfio/type1: Update iova list on detach
-Date:   Wed, 26 Jun 2019 16:12:45 +0100
-Message-ID: <20190626151248.11776-4-shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH v7 4/6] vfio/type1: check dma map request is within a valid iova range
+Date:   Wed, 26 Jun 2019 16:12:46 +0100
+Message-ID: <20190626151248.11776-5-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20190626151248.11776-1-shameerali.kolothum.thodi@huawei.com>
 References: <20190626151248.11776-1-shameerali.kolothum.thodi@huawei.com>
@@ -40,141 +40,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Get a copy of iova list on _group_detach and try to update the list.
-On success replace the current one with the copy. Leave the list as
-it is if update fails.
+This checks and rejects any dma map request outside valid iova
+range.
 
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 91 +++++++++++++++++++++++++++++++++
- 1 file changed, 91 insertions(+)
+v6 --> v7
+
+Addressed the case where a container with only an mdev device will
+have an empty list(Suggested by Alex).
+---
+ drivers/vfio/vfio_iommu_type1.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index b6bfdfa16c33..e872fb3a0f39 100644
+index e872fb3a0f39..89ad0da7152c 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -1873,12 +1873,88 @@ static void vfio_sanity_check_pfn_list(struct vfio_iommu *iommu)
- 	WARN_ON(iommu->notifier.head);
+@@ -1050,6 +1050,27 @@ static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
+ 	return ret;
  }
  
 +/*
-+ * Called when a domain is removed in detach. It is possible that
-+ * the removed domain decided the iova aperture window. Modify the
-+ * iova aperture with the smallest window among existing domains.
++ * Check dma map request is within a valid iova range
 + */
-+static void vfio_iommu_aper_expand(struct vfio_iommu *iommu,
-+				   struct list_head *iova_copy)
++static bool vfio_iommu_iova_dma_valid(struct vfio_iommu *iommu,
++				      dma_addr_t start, dma_addr_t end)
 +{
-+	struct vfio_domain *domain;
-+	struct iommu_domain_geometry geo;
++	struct list_head *iova = &iommu->iova_list;
 +	struct vfio_iova *node;
-+	dma_addr_t start = 0;
-+	dma_addr_t end = (dma_addr_t)~0;
 +
-+	list_for_each_entry(domain, &iommu->domain_list, next) {
-+		iommu_domain_get_attr(domain->domain, DOMAIN_ATTR_GEOMETRY,
-+				      &geo);
-+		if (geo.aperture_start > start)
-+			start = geo.aperture_start;
-+		if (geo.aperture_end < end)
-+			end = geo.aperture_end;
++	list_for_each_entry(node, iova, list) {
++		if (start >= node->start && end <= node->end)
++			return true;
 +	}
 +
-+	/* Modify aperture limits. The new aper is either same or bigger */
-+	node = list_first_entry(iova_copy, struct vfio_iova, list);
-+	node->start = start;
-+	node = list_last_entry(iova_copy, struct vfio_iova, list);
-+	node->end = end;
-+}
-+
-+/*
-+ * Called when a group is detached. The reserved regions for that
-+ * group can be part of valid iova now. But since reserved regions
-+ * may be duplicated among groups, populate the iova valid regions
-+ * list again.
-+ */
-+static int vfio_iommu_resv_refresh(struct vfio_iommu *iommu,
-+				   struct list_head *iova_copy)
-+{
-+	struct vfio_domain *d;
-+	struct vfio_group *g;
-+	struct vfio_iova *node;
-+	dma_addr_t start, end;
-+	LIST_HEAD(resv_regions);
-+	int ret;
-+
-+	list_for_each_entry(d, &iommu->domain_list, next) {
-+		list_for_each_entry(g, &d->group_list, next)
-+			iommu_get_group_resv_regions(g->iommu_group,
-+						     &resv_regions);
-+	}
-+
-+	if (list_empty(&resv_regions))
-+		return 0;
-+
-+	node = list_first_entry(iova_copy, struct vfio_iova, list);
-+	start = node->start;
-+	node = list_last_entry(iova_copy, struct vfio_iova, list);
-+	end = node->end;
-+
-+	/* purge the iova list and create new one */
-+	vfio_iommu_iova_free(iova_copy);
-+
-+	ret = vfio_iommu_aper_resize(iova_copy, start, end);
-+	if (ret)
-+		goto done;
-+
-+	/* Exclude current reserved regions from iova ranges */
-+	ret = vfio_iommu_resv_exclude(iova_copy, &resv_regions);
-+done:
-+	vfio_iommu_resv_free(&resv_regions);
-+	return ret;
-+}
-+
- static void vfio_iommu_type1_detach_group(void *iommu_data,
- 					  struct iommu_group *iommu_group)
- {
- 	struct vfio_iommu *iommu = iommu_data;
- 	struct vfio_domain *domain;
- 	struct vfio_group *group;
-+	bool iova_copy_fail;
-+	LIST_HEAD(iova_copy);
- 
- 	mutex_lock(&iommu->lock);
- 
-@@ -1901,6 +1977,12 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 		}
- 	}
- 
 +	/*
-+	 * Get a copy of iova list. If success, use copy to update the
-+	 * list and to replace the current one.
++	 * Check for list_empty() as well since a container with
++	 * only an mdev device will have an empty list.
 +	 */
-+	iova_copy_fail = !!vfio_iommu_iova_get_copy(iommu, &iova_copy);
++	return list_empty(&iommu->iova_list);
++}
 +
- 	list_for_each_entry(domain, &iommu->domain_list, next) {
- 		group = find_iommu_group(domain, iommu_group);
- 		if (!group)
-@@ -1926,10 +2008,19 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 			iommu_domain_free(domain->domain);
- 			list_del(&domain->next);
- 			kfree(domain);
-+			if (!iova_copy_fail && !list_empty(&iommu->domain_list))
-+				vfio_iommu_aper_expand(iommu, &iova_copy);
- 		}
- 		break;
+ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ 			   struct vfio_iommu_type1_dma_map *map)
+ {
+@@ -1093,6 +1114,11 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ 		goto out_unlock;
  	}
  
-+	if (!iova_copy_fail && !list_empty(&iommu->domain_list)) {
-+		if (!vfio_iommu_resv_refresh(iommu, &iova_copy))
-+			vfio_iommu_iova_insert_copy(iommu, &iova_copy);
-+		else
-+			vfio_iommu_iova_free(&iova_copy);
++	if (!vfio_iommu_iova_dma_valid(iommu, iova, iova + size - 1)) {
++		ret = -EINVAL;
++		goto out_unlock;
 +	}
 +
- detach_group_done:
- 	mutex_unlock(&iommu->lock);
- }
+ 	dma = kzalloc(sizeof(*dma), GFP_KERNEL);
+ 	if (!dma) {
+ 		ret = -ENOMEM;
 -- 
 2.17.1
 
