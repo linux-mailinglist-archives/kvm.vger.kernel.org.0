@@ -2,95 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C510856BE3
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 16:28:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19CBE56C1B
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 16:35:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728046AbfFZO2E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jun 2019 10:28:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42070 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728022AbfFZO2B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 10:28:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E71FE81DE3;
-        Wed, 26 Jun 2019 14:28:00 +0000 (UTC)
-Received: from gimli.home (ovpn-117-35.phx2.redhat.com [10.3.117.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6CB0860852;
-        Wed, 26 Jun 2019 14:27:58 +0000 (UTC)
-Subject: [PATCH] mdev: Send uevents around parent device registration
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     kwankhede@nvidia.com, alex.williamson@redhat.com, cohuck@redhat.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 26 Jun 2019 08:27:58 -0600
-Message-ID: <156155924767.11505.11457229921502145577.stgit@gimli.home>
-User-Agent: StGit/0.19-dirty
+        id S1726948AbfFZOfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jun 2019 10:35:18 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53342 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725958AbfFZOfS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 26 Jun 2019 10:35:18 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5QEYX7o045881
+        for <kvm@vger.kernel.org>; Wed, 26 Jun 2019 10:35:17 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tc9y8a023-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 26 Jun 2019 10:35:16 -0400
+Received: from localhost
+        by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <walling@linux.ibm.com>;
+        Wed, 26 Jun 2019 15:30:12 +0100
+Received: from b01cxnp23034.gho.pok.ibm.com (9.57.198.29)
+        by e13.ny.us.ibm.com (146.89.104.200) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 26 Jun 2019 15:30:09 +0100
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5QEU8H820840778
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 26 Jun 2019 14:30:08 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 66E282806F;
+        Wed, 26 Jun 2019 14:30:08 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 60B9828072;
+        Wed, 26 Jun 2019 14:30:08 +0000 (GMT)
+Received: from [9.63.14.61] (unknown [9.63.14.61])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 26 Jun 2019 14:30:08 +0000 (GMT)
+Subject: Re: [PATCH v5 2/2] s390/kvm: diagnose 318 handling
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        David Hildenbrand <david@redhat.com>, cohuck@redhat.com,
+        pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <1561475022-18348-1-git-send-email-walling@linux.ibm.com>
+ <1561475022-18348-3-git-send-email-walling@linux.ibm.com>
+ <19c73246-48dd-ddc6-c5b1-b93f15cbf2f0@redhat.com>
+ <17fe3423-91b1-2351-54cb-26cd9e1b0e3f@de.ibm.com>
+From:   Collin Walling <walling@linux.ibm.com>
+Date:   Wed, 26 Jun 2019 10:30:08 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <17fe3423-91b1-2351-54cb-26cd9e1b0e3f@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Wed, 26 Jun 2019 14:28:00 +0000 (UTC)
+X-TM-AS-GCONF: 00
+x-cbid: 19062614-0064-0000-0000-000003F3F395
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011334; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01223565; UDB=6.00643918; IPR=6.01004745;
+ MB=3.00027476; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-26 14:30:11
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19062614-0065-0000-0000-00003E0A3875
+Message-Id: <dd1f4c39-9937-b223-adc8-01a764cf9462@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-26_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=733 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906260172
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This allows udev to trigger rules when a parent device is registered
-or unregistered from mdev.
-
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- drivers/vfio/mdev/mdev_core.c |   10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index ae23151442cb..ecec2a3b13cb 100644
---- a/drivers/vfio/mdev/mdev_core.c
-+++ b/drivers/vfio/mdev/mdev_core.c
-@@ -146,6 +146,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
- {
- 	int ret;
- 	struct mdev_parent *parent;
-+	char *env_string = "MDEV_STATE=registered";
-+	char *envp[] = { env_string, NULL };
- 
- 	/* check for mandatory ops */
- 	if (!ops || !ops->create || !ops->remove || !ops->supported_type_groups)
-@@ -196,7 +198,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
- 	list_add(&parent->next, &parent_list);
- 	mutex_unlock(&parent_list_lock);
- 
--	dev_info(dev, "MDEV: Registered\n");
-+	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
-+
- 	return 0;
- 
- add_dev_err:
-@@ -220,6 +223,8 @@ EXPORT_SYMBOL(mdev_register_device);
- void mdev_unregister_device(struct device *dev)
- {
- 	struct mdev_parent *parent;
-+	char *env_string = "MDEV_STATE=unregistered";
-+	char *envp[] = { env_string, NULL };
- 
- 	mutex_lock(&parent_list_lock);
- 	parent = __find_parent_device(dev);
-@@ -228,7 +233,6 @@ void mdev_unregister_device(struct device *dev)
- 		mutex_unlock(&parent_list_lock);
- 		return;
- 	}
--	dev_info(dev, "MDEV: Unregistering\n");
- 
- 	list_del(&parent->next);
- 	mutex_unlock(&parent_list_lock);
-@@ -243,6 +247,8 @@ void mdev_unregister_device(struct device *dev)
- 	up_write(&parent->unreg_sem);
- 
- 	mdev_put_parent(parent);
-+
-+	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
- }
- EXPORT_SYMBOL(mdev_unregister_device);
- 
+On 6/26/19 6:28 AM, Christian Borntraeger wrote:
+> 
+> 
+> On 26.06.19 11:45, David Hildenbrand wrote:
+> 
+>>
+>> BTW. there is currently no mechanism to fake absence of diag318. Should
+>> we have one? (in contrast, for CMMA we have, which is also a CPU feature)
+> 
+> Yes, we want to be able to disable diag318 via a CPU model feature. That actually
+> means that the kernel must not answer this if we disable it.
+> 
+Correct. If the guest specifies diag318=off, then the instruction 
+shouldn't be executed (it is fenced off in the kernel by checking the 
+Read SCP Info bit).
 
