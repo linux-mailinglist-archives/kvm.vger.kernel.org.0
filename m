@@ -2,121 +2,319 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C978956CE5
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 16:54:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A00A56D20
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 17:04:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727959AbfFZOx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jun 2019 10:53:58 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:60106 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726948AbfFZOx5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 10:53:57 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5QEn0u0115886;
-        Wed, 26 Jun 2019 14:52:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2018-07-02;
- bh=O8gsLAnKvEJnxFFzMobAjm8cu3fNADVN1xEFWlBOGbk=;
- b=NUkq18lOFFDWIv9CTLHNhjC+dTnEhg5+Sp2EPg1lNCYslPeZx79gEYt6+PICxltUHb7x
- 4OW7B5GmqcMkuDWq13q9q0VlmCnrsv6KVUfOy6nmNo40x/ImzH52Iwp1jUQ/p0IlaEuU
- Q/mTqg6aRbc5nDqUcfrFWrc1hngRRhNpUzWDZ9LOBQhVZb4C/5p55lqB4fSvmh2lu4Rs
- CStecoPZ+OftnKBUbXPFDpJ+yCH4lCdMJi/XsAi8LeQPvKA/HJIexEIz0t+m5s2ErXyz
- 9uJg0qq9NpBrPB+ppBig1llbzOHuXsqEDV6KhekjuyjOcfCjRe1DTuk12NwzkJpoVTb/ IQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2t9cyqjsa5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Jun 2019 14:52:58 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5QEqfSM175391;
-        Wed, 26 Jun 2019 14:52:58 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 2tat7cv8ys-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Jun 2019 14:52:58 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5QEqnwe005115;
-        Wed, 26 Jun 2019 14:52:49 GMT
-Received: from char.us.oracle.com (/10.152.32.25)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 26 Jun 2019 07:52:49 -0700
-Received: by char.us.oracle.com (Postfix, from userid 1000)
-        id 6B9A06A0150; Wed, 26 Jun 2019 10:54:13 -0400 (EDT)
-Date:   Wed, 26 Jun 2019 10:54:13 -0400
-From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>
-Cc:     Wanpeng Li <kernellwp@gmail.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        KarimAllah <karahmed@amazon.de>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Subject: Re: cputime takes cstate into consideration
-Message-ID: <20190626145413.GE6753@char.us.oracle.com>
-References: <CANRm+Cyge6viybs63pt7W-cRdntx+wfyOq5EWE2qmEQ71SzMHg@mail.gmail.com>
- <alpine.DEB.2.21.1906261211410.32342@nanos.tec.linutronix.de>
+        id S1728362AbfFZPEO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jun 2019 11:04:14 -0400
+Received: from foss.arm.com ([217.140.110.172]:35200 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726984AbfFZPEN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jun 2019 11:04:13 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 033012B;
+        Wed, 26 Jun 2019 08:04:13 -0700 (PDT)
+Received: from [10.1.215.72] (e121566-lin.cambridge.arm.com [10.1.215.72])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E3D73F706;
+        Wed, 26 Jun 2019 08:04:12 -0700 (PDT)
+Subject: Re: [PATCH 13/59] KVM: arm64: nv: Handle virtual EL2 registers in
+ vcpu_read/write_sys_reg()
+To:     Marc Zyngier <marc.zyngier@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-14-marc.zyngier@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <d5d263d6-0c1f-ae53-80f4-f650c1d25c70@arm.com>
+Date:   Wed, 26 Jun 2019 16:04:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.21.1906261211410.32342@nanos.tec.linutronix.de>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9299 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906260176
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9299 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906260175
+In-Reply-To: <20190621093843.220980-14-marc.zyngier@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 26, 2019 at 12:33:30PM +0200, Thomas Gleixner wrote:
-> On Wed, 26 Jun 2019, Wanpeng Li wrote:
-> > After exposing mwait/monitor into kvm guest, the guest can make
-> > physical cpu enter deeper cstate through mwait instruction, however,
-> > the top command on host still observe 100% cpu utilization since qemu
-> > process is running even though guest who has the power management
-> > capability executes mwait. Actually we can observe the physical cpu
-> > has already enter deeper cstate by powertop on host. Could we take
-> > cstate into consideration when accounting cputime etc?
-> 
-> If MWAIT can be used inside the guest then the host cannot distinguish
-> between execution and stuck in mwait.
-> 
-> It'd need to poll the power monitoring MSRs on every occasion where the
-> accounting happens.
-> 
-> This completely falls apart when you have zero exit guest. (think
-> NOHZ_FULL). Then you'd have to bring the guest out with an IPI to access
-> the per CPU MSRs.
-> 
-> I assume a lot of people will be happy about all that :)
-
-There were some ideas that Ankur (CC-ed) mentioned to me of using the perf
-counters (in the host) to sample the guest and construct a better
-accounting idea of what the guest does. That way the dashboard
-from the host would not show 100% CPU utilization.
-
-But the patches that Marcelo posted (" cpuidle-haltpoll driver") in 
-"solves" the problem for Linux. That is the guest wants awesome latency and
-one way was to expose MWAIT to the guest, or just tweak the guest to do the
-idling a bit different.
-
-Marcelo patches are all good for Linux, but Windows is still an issue.
-
-Ankur, would you be OK sharing some of your ideas?
-> 
-> Thanks,
-> 
-> 	tglx
-> 
+On 6/21/19 10:37 AM, Marc Zyngier wrote:
+> From: Andre Przywara <andre.przywara@arm.com>
+>
+> KVM internally uses accessor functions when reading or writing the
+> guest's system registers. This takes care of accessing either the stored
+> copy or using the "live" EL1 system registers when the host uses VHE.
+>
+> With the introduction of virtual EL2 we add a bunch of EL2 system
+> registers, which now must also be taken care of:
+> - If the guest is running in vEL2, and we access an EL1 sysreg, we must
+>   revert to the stored version of that, and not use the CPU's copy.
+> - If the guest is running in vEL1, and we access an EL2 sysreg, we must
+>   also use the stored version, since the CPU carries the EL1 copy.
+> - Some EL2 system registers are supposed to affect the current execution
+>   of the system, so we need to put them into their respective EL1
+>   counterparts. For this we need to define a mapping between the two.
+>   This is done using the newly introduced struct el2_sysreg_map.
+> - Some EL2 system registers have a different format than their EL1
+>   counterpart, so we need to translate them before writing them to the
+>   CPU. This is done using an (optional) translate function in the map.
+> - There are the three special registers SP_EL2, SPSR_EL2 and ELR_EL2,
+>   which need some separate handling.
+>
+> All of these cases are now wrapped into the existing accessor functions,
+> so KVM users wouldn't need to care whether they access EL2 or EL1
+> registers and also which state the guest is in.
+>
+> This handles what was formerly known as the "shadow state" dynamically,
+> without requiring a separate copy for each vCPU EL.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |   6 +
+>  arch/arm64/include/asm/kvm_host.h    |   5 +
+>  arch/arm64/kvm/sys_regs.c            | 163 +++++++++++++++++++++++++++
+>  3 files changed, 174 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index c43aac5fed69..f37006b6eec4 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -70,6 +70,12 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
+>  int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
+>  int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
+>  
+> +u64 translate_tcr(u64 tcr);
+> +u64 translate_cptr(u64 tcr);
+> +u64 translate_sctlr(u64 tcr);
+> +u64 translate_ttbr0(u64 tcr);
+> +u64 translate_cnthctl(u64 tcr);
+> +
+>  static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+>  {
+>  	return !(vcpu->arch.hcr_el2 & HCR_RW);
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 2d4290d2513a..dae9c42a7219 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -217,6 +217,11 @@ enum vcpu_sysreg {
+>  	NR_SYS_REGS	/* Nothing after this line! */
+>  };
+>  
+> +static inline bool sysreg_is_el2(int reg)
+> +{
+> +	return reg >= FIRST_EL2_SYSREG && reg < NR_SYS_REGS;
+> +}
+> +
+>  /* 32bit mapping */
+>  #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
+>  #define c0_CSSELR	(CSSELR_EL1 * 2)/* Cache Size Selection Register */
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 693dd063c9c2..d024114da162 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -76,11 +76,142 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
+>  	return false;
+>  }
+>  
+> +static u64 tcr_el2_ips_to_tcr_el1_ps(u64 tcr_el2)
+> +{
+> +	return ((tcr_el2 & TCR_EL2_PS_MASK) >> TCR_EL2_PS_SHIFT)
+> +		<< TCR_IPS_SHIFT;
+> +}
+> +
+> +u64 translate_tcr(u64 tcr)
+> +{
+> +	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
+> +	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
+> +	       tcr_el2_ips_to_tcr_el1_ps(tcr) |
+> +	       (tcr & TCR_EL2_TG0_MASK) |
+> +	       (tcr & TCR_EL2_ORGN0_MASK) |
+> +	       (tcr & TCR_EL2_IRGN0_MASK) |
+> +	       (tcr & TCR_EL2_T0SZ_MASK);
+> +}
+> +
+> +u64 translate_cptr(u64 cptr_el2)
+> +{
+> +	u64 cpacr_el1 = 0;
+> +
+> +	if (!(cptr_el2 & CPTR_EL2_TFP))
+> +		cpacr_el1 |= CPACR_EL1_FPEN;
+> +	if (cptr_el2 & CPTR_EL2_TTA)
+> +		cpacr_el1 |= CPACR_EL1_TTA;
+> +	if (!(cptr_el2 & CPTR_EL2_TZ))
+> +		cpacr_el1 |= CPACR_EL1_ZEN;
+> +
+> +	return cpacr_el1;
+> +}
+> +
+> +u64 translate_sctlr(u64 sctlr)
+> +{
+> +	/* Bit 20 is RES1 in SCTLR_EL1, but RES0 in SCTLR_EL2 */
+> +	return sctlr | BIT(20);
+> +}
+> +
+> +u64 translate_ttbr0(u64 ttbr0)
+> +{
+> +	/* Force ASID to 0 (ASID 0 or RES0) */
+> +	return ttbr0 & ~GENMASK_ULL(63, 48);
+> +}
+> +
+> +u64 translate_cnthctl(u64 cnthctl)
+> +{
+> +	return ((cnthctl & 0x3) << 10) | (cnthctl & 0xfc);
+> +}
+> +
+> +#define EL2_SYSREG(el2, el1, translate)	\
+> +	[el2 - FIRST_EL2_SYSREG] = { el2, el1, translate }
+> +#define PURE_EL2_SYSREG(el2) \
+> +	[el2 - FIRST_EL2_SYSREG] = { el2,__INVALID_SYSREG__, NULL }
+> +/*
+> + * Associate vEL2 registers to their EL1 counterparts on the CPU.
+> + * The translate function can be NULL, when the register layout is identical.
+> + */
+> +struct el2_sysreg_map {
+> +	int sysreg;	/* EL2 register index into the array above */
+> +	int mapping;	/* associated EL1 register */
+> +	u64 (*translate)(u64 value);
+> +} nested_sysreg_map[NR_SYS_REGS - FIRST_EL2_SYSREG] = {
+> +	PURE_EL2_SYSREG( VPIDR_EL2 ),
+> +	PURE_EL2_SYSREG( VMPIDR_EL2 ),
+> +	PURE_EL2_SYSREG( ACTLR_EL2 ),
+> +	PURE_EL2_SYSREG( HCR_EL2 ),
+> +	PURE_EL2_SYSREG( MDCR_EL2 ),
+> +	PURE_EL2_SYSREG( HSTR_EL2 ),
+> +	PURE_EL2_SYSREG( HACR_EL2 ),
+> +	PURE_EL2_SYSREG( VTTBR_EL2 ),
+> +	PURE_EL2_SYSREG( VTCR_EL2 ),
+> +	PURE_EL2_SYSREG( RVBAR_EL2 ),
+> +	PURE_EL2_SYSREG( RMR_EL2 ),
+> +	PURE_EL2_SYSREG( TPIDR_EL2 ),
+> +	PURE_EL2_SYSREG( CNTVOFF_EL2 ),
+> +	PURE_EL2_SYSREG( CNTHCTL_EL2 ),
+> +	PURE_EL2_SYSREG( HPFAR_EL2 ),
+> +	EL2_SYSREG(      SCTLR_EL2,  SCTLR_EL1,      translate_sctlr ),
+> +	EL2_SYSREG(      CPTR_EL2,   CPACR_EL1,      translate_cptr  ),
+> +	EL2_SYSREG(      TTBR0_EL2,  TTBR0_EL1,      translate_ttbr0 ),
+> +	EL2_SYSREG(      TTBR1_EL2,  TTBR1_EL1,      NULL            ),
+> +	EL2_SYSREG(      TCR_EL2,    TCR_EL1,        translate_tcr   ),
+> +	EL2_SYSREG(      VBAR_EL2,   VBAR_EL1,       NULL            ),
+> +	EL2_SYSREG(      AFSR0_EL2,  AFSR0_EL1,      NULL            ),
+> +	EL2_SYSREG(      AFSR1_EL2,  AFSR1_EL1,      NULL            ),
+> +	EL2_SYSREG(      ESR_EL2,    ESR_EL1,        NULL            ),
+> +	EL2_SYSREG(      FAR_EL2,    FAR_EL1,        NULL            ),
+> +	EL2_SYSREG(      MAIR_EL2,   MAIR_EL1,       NULL            ),
+> +	EL2_SYSREG(      AMAIR_EL2,  AMAIR_EL1,      NULL            ),
+> +};
+> +
+> +static
+> +const struct el2_sysreg_map *find_el2_sysreg(const struct el2_sysreg_map *map,
+> +					     int reg)
+> +{
+> +	const struct el2_sysreg_map *entry;
+> +
+> +	if (!sysreg_is_el2(reg))
+> +		return NULL;
+> +
+> +	entry = &nested_sysreg_map[reg - FIRST_EL2_SYSREG];
+> +	if (entry->sysreg == __INVALID_SYSREG__)
+> +		return NULL;
+> +
+> +	return entry;
+> +}
+> +
+>  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>  {
+> +
+>  	if (!vcpu->arch.sysregs_loaded_on_cpu)
+>  		goto immediate_read;
+>  
+> +	if (unlikely(sysreg_is_el2(reg))) {
+> +		const struct el2_sysreg_map *el2_reg;
+> +
+> +		if (!is_hyp_ctxt(vcpu))
+> +			goto immediate_read;
+> +
+> +		el2_reg = find_el2_sysreg(nested_sysreg_map, reg);
+> +		if (el2_reg) {
+> +			/*
+> +			 * If this register does not have an EL1 counterpart,
+> +			 * then read the stored EL2 version.
+> +			 */
+> +			if (el2_reg->mapping == __INVALID_SYSREG__)
+> +				goto immediate_read;
+> +
+> +			/* Get the current version of the EL1 counterpart. */
+> +			reg = el2_reg->mapping;
+> +		}
+> +	} else {
+> +		/* EL1 register can't be on the CPU if the guest is in vEL2. */
+> +		if (unlikely(is_hyp_ctxt(vcpu)))
+> +			goto immediate_read;
+> +	}
+> +
+>  	/*
+>  	 * System registers listed in the switch are not saved on every
+>  	 * exit from the guest but are only saved on vcpu_put.
+> @@ -114,6 +245,8 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>  	case DACR32_EL2:	return read_sysreg_s(SYS_DACR32_EL2);
+>  	case IFSR32_EL2:	return read_sysreg_s(SYS_IFSR32_EL2);
+>  	case DBGVCR32_EL2:	return read_sysreg_s(SYS_DBGVCR32_EL2);
+> +	case SP_EL2:		return read_sysreg(sp_el1);
+From ARM DDI 0487D.b, section Behavior when HCR_EL2.NV == 1: "Reads or writes to
+any allocated and implemented System register or Special-purpose register named
+*_EL2, *_EL02, or *_EL12 in the MRS or MSR instruction, other than SP_EL2, are
+trapped to EL2 rather than being UNDEFINED" (page D5-2480). My interpretation of
+the text is that attempted reads of SP_EL2 from virtual EL2 cause an undefined
+instruction exception.
+> +	case ELR_EL2:		return read_sysreg_el1(SYS_ELR);
+>  	}
+>  
+>  immediate_read:
+> @@ -125,6 +258,34 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>  	if (!vcpu->arch.sysregs_loaded_on_cpu)
+>  		goto immediate_write;
+>  
+> +	if (unlikely(sysreg_is_el2(reg))) {
+> +		const struct el2_sysreg_map *el2_reg;
+> +
+> +		if (!is_hyp_ctxt(vcpu))
+> +			goto immediate_write;
+> +
+> +		/* Store the EL2 version in the sysregs array. */
+> +		__vcpu_sys_reg(vcpu, reg) = val;
+> +
+> +		el2_reg = find_el2_sysreg(nested_sysreg_map, reg);
+> +		if (el2_reg) {
+> +			/* Does this register have an EL1 counterpart? */
+> +			if (el2_reg->mapping == __INVALID_SYSREG__)
+> +				return;
+> +
+> +			if (!vcpu_el2_e2h_is_set(vcpu) &&
+> +			    el2_reg->translate)
+> +				val = el2_reg->translate(val);
+> +
+> +			/* Redirect this to the EL1 version of the register. */
+> +			reg = el2_reg->mapping;
+> +		}
+> +	} else {
+> +		/* EL1 register can't be on the CPU if the guest is in vEL2. */
+> +		if (unlikely(is_hyp_ctxt(vcpu)))
+> +			goto immediate_write;
+> +	}
+> +
+>  	/*
+>  	 * System registers listed in the switch are not restored on every
+>  	 * entry to the guest but are only restored on vcpu_load.
+> @@ -157,6 +318,8 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>  	case DACR32_EL2:	write_sysreg_s(val, SYS_DACR32_EL2);	return;
+>  	case IFSR32_EL2:	write_sysreg_s(val, SYS_IFSR32_EL2);	return;
+>  	case DBGVCR32_EL2:	write_sysreg_s(val, SYS_DBGVCR32_EL2);	return;
+> +	case SP_EL2:		write_sysreg(val, sp_el1);		return;
+> +	case ELR_EL2:		write_sysreg_el1(val, SYS_ELR);		return;
+>  	}
+>  
+>  immediate_write:
