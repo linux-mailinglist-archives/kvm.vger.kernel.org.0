@@ -2,96 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B872E56D6D
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 17:14:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C957656E8B
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 18:16:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728437AbfFZPOG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jun 2019 11:14:06 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:19114 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728430AbfFZPOE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 11:14:04 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 7C79BCA769915FB85BF2;
-        Wed, 26 Jun 2019 23:13:57 +0800 (CST)
-Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
- DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 26 Jun 2019 23:13:49 +0800
-From:   Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-To:     <alex.williamson@redhat.com>, <eric.auger@redhat.com>,
-        <pmorel@linux.vnet.ibm.com>
-CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <iommu@lists.linux-foundation.org>, <linuxarm@huawei.com>,
-        <john.garry@huawei.com>, <xuwei5@hisilicon.com>,
-        <kevin.tian@intel.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Subject: [PATCH v7 6/6] vfio/type1: remove duplicate retrieval of reserved regions
-Date:   Wed, 26 Jun 2019 16:12:48 +0100
-Message-ID: <20190626151248.11776-7-shameerali.kolothum.thodi@huawei.com>
-X-Mailer: git-send-email 2.12.0.windows.1
-In-Reply-To: <20190626151248.11776-1-shameerali.kolothum.thodi@huawei.com>
-References: <20190626151248.11776-1-shameerali.kolothum.thodi@huawei.com>
+        id S1726447AbfFZQQ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jun 2019 12:16:28 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:45898 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725958AbfFZQQ1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jun 2019 12:16:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=kp5vQ7g7PZjn2bwIYsd/b7jSyWQLrC+PRo907sE6ngQ=; b=q8fUaCvbwsnyax89+ww7wBhkQ
+        cotQb54IGOruOk0WHbZBW4F8odZTwG6CKyM6IfY9n8qSiEjwZ5NZtv2mrp8vgjFse37dmeUIZuZMB
+        +coVcpzIHhL7t+5fMi+8+y3EhoBLdyY0bv+kEqpVSzjgwlNgdLINKm+BkkkKLGiYV5Ljr89Rn50YX
+        4zkmNYGeJkf4rF5aBN6VEFnPaiInhulHuB5CxnqdNjQy+1gtd8xxNGVRGjz65PUa/QhBn0+N4iGkE
+        HMwLyUsh+jZx621iVYWq8KBQj8zT+oA+7+G1DGrfIyn31vveAyB/HDeZ6vgpotJ1d2IJiRL0j/G/m
+        M9hR18mRg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hgAah-0008EN-Bs; Wed, 26 Jun 2019 16:16:11 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id AC90F209CEDB5; Wed, 26 Jun 2019 18:16:08 +0200 (CEST)
+Date:   Wed, 26 Jun 2019 18:16:08 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        KarimAllah <karahmed@amazon.de>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Subject: Re: cputime takes cstate into consideration
+Message-ID: <20190626161608.GM3419@hirez.programming.kicks-ass.net>
+References: <CANRm+Cyge6viybs63pt7W-cRdntx+wfyOq5EWE2qmEQ71SzMHg@mail.gmail.com>
+ <alpine.DEB.2.21.1906261211410.32342@nanos.tec.linutronix.de>
+ <20190626145413.GE6753@char.us.oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.202.227.237]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190626145413.GE6753@char.us.oracle.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As we now already have the reserved regions list, just pass that into
-vfio_iommu_has_sw_msi() fn.
+On Wed, Jun 26, 2019 at 10:54:13AM -0400, Konrad Rzeszutek Wilk wrote:
+> On Wed, Jun 26, 2019 at 12:33:30PM +0200, Thomas Gleixner wrote:
+> > On Wed, 26 Jun 2019, Wanpeng Li wrote:
+> > > After exposing mwait/monitor into kvm guest, the guest can make
+> > > physical cpu enter deeper cstate through mwait instruction, however,
+> > > the top command on host still observe 100% cpu utilization since qemu
+> > > process is running even though guest who has the power management
+> > > capability executes mwait. Actually we can observe the physical cpu
+> > > has already enter deeper cstate by powertop on host. Could we take
+> > > cstate into consideration when accounting cputime etc?
+> > 
+> > If MWAIT can be used inside the guest then the host cannot distinguish
+> > between execution and stuck in mwait.
+> > 
+> > It'd need to poll the power monitoring MSRs on every occasion where the
+> > accounting happens.
+> > 
+> > This completely falls apart when you have zero exit guest. (think
+> > NOHZ_FULL). Then you'd have to bring the guest out with an IPI to access
+> > the per CPU MSRs.
+> > 
+> > I assume a lot of people will be happy about all that :)
+> 
+> There were some ideas that Ankur (CC-ed) mentioned to me of using the perf
+> counters (in the host) to sample the guest and construct a better
+> accounting idea of what the guest does. That way the dashboard
+> from the host would not show 100% CPU utilization.
 
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
----
- drivers/vfio/vfio_iommu_type1.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 450081802dcd..43b1e68ebce9 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -1308,15 +1308,13 @@ static struct vfio_group *find_iommu_group(struct vfio_domain *domain,
- 	return NULL;
- }
- 
--static bool vfio_iommu_has_sw_msi(struct iommu_group *group, phys_addr_t *base)
-+static bool vfio_iommu_has_sw_msi(struct list_head *group_resv_regions,
-+				  phys_addr_t *base)
- {
--	struct list_head group_resv_regions;
--	struct iommu_resv_region *region, *next;
-+	struct iommu_resv_region *region;
- 	bool ret = false;
- 
--	INIT_LIST_HEAD(&group_resv_regions);
--	iommu_get_group_resv_regions(group, &group_resv_regions);
--	list_for_each_entry(region, &group_resv_regions, list) {
-+	list_for_each_entry(region, group_resv_regions, list) {
- 		/*
- 		 * The presence of any 'real' MSI regions should take
- 		 * precedence over the software-managed one if the
-@@ -1332,8 +1330,7 @@ static bool vfio_iommu_has_sw_msi(struct iommu_group *group, phys_addr_t *base)
- 			ret = true;
- 		}
- 	}
--	list_for_each_entry_safe(region, next, &group_resv_regions, list)
--		kfree(region);
-+
- 	return ret;
- }
- 
-@@ -1774,7 +1771,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	if (ret)
- 		goto out_detach;
- 
--	resv_msi = vfio_iommu_has_sw_msi(iommu_group, &resv_msi_base);
-+	resv_msi = vfio_iommu_has_sw_msi(&group_resv_regions, &resv_msi_base);
- 
- 	INIT_LIST_HEAD(&domain->group_list);
- 	list_add(&group->next, &domain->group_list);
--- 
-2.17.1
-
-
+But then you generate extra noise and vmexits on those cpus, just to get
+this accounting sorted, which sounds like a bad trade.
