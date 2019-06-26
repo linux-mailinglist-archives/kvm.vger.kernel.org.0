@@ -2,119 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A7D2568B9
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 14:24:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F8F456981
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 14:41:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727323AbfFZMYX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jun 2019 08:24:23 -0400
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:42517 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726157AbfFZMYW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 08:24:22 -0400
-Received: by mail-vs1-f65.google.com with SMTP id 190so1419433vsf.9
-        for <kvm@vger.kernel.org>; Wed, 26 Jun 2019 05:24:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=CT1Gv4AMdpnoqpjWY2ev6cLuFa53kAL9ZaegsrQDcUw=;
-        b=bTKfyPyfUWE9WU0gz42tUqzN3p/2GZckP1UIz2ihopb0QhJTKc9oVGpLDVMmBppyV3
-         hnAYcdI355svogcdqWz54JU3DaO7EH24gjLL+UCxBU2NIlFAt7f/oxGPBvLVtfG9nb/k
-         nqqoqY6aEuY6mUy6yJ8kDNCKsMDGFYbH+HZisj3GW5vVixuY+8k/9yvhdiofbqivC6iT
-         gb3ITTI/wslLqxGkcW7XPYXyoTOYOLx99TAYUDFmhrzkEEsT/K4pAK7WIhl3O5ww6kzW
-         D5lFxw+6Ts9Iz9lViwcpz0cSUfzEDMh41S5zgdcU0+mIH/dCxRGE4r3zWrylNOCvXkEU
-         G55Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=CT1Gv4AMdpnoqpjWY2ev6cLuFa53kAL9ZaegsrQDcUw=;
-        b=OkyU0TDLFKCXexBEoCeoNBICfHHjM5FKg0OV2yB5fDt3YYmiAgIfjAGSSc1HxbEB1+
-         /dngsZYgAqiBt2RUloSv8o4ts5CL2JftbjNN1qFJUEKmkatAFJLpcGNLTG3BNOdX+du/
-         tUca9Vei8oDCHmf39HjBbuzym2pQs4THh3/uTAeSkcCr2lBIyGqqaxxCHVaOZBF9wET5
-         ocxU6uXUeHNQW0VErX6vROaPtZRz0S8JymECzqbAFSwCKohKJzbPiSfDtJ1y4Ibb0d+v
-         5Ukjt+dQTYAv8Gbw75PbWQMCVMba7fdksMFIIPFRRaiTCSEckENoLpIbw3xjh7QwgDAn
-         rFtw==
-X-Gm-Message-State: APjAAAXhwXmWSLxocSqRDe3sMS7D7ZtJlZ4vhUpr6AkH1KzVESnzUszf
-        GQ3ISPhs6Z6N2H1BGZ7pNqlMQRUnTrVxem3IIo27sq0shqyaCA==
-X-Google-Smtp-Source: APXvYqwWhfJFPRJFZc3jcdaHqCNzTd8XU5d9G89vRba9t/r3cKI/rxrN4UtcGcnp3FAa/7lrDQENl0r1gvkUOqZENvw=
-X-Received: by 2002:a67:11c1:: with SMTP id 184mr2726115vsr.217.1561551861586;
- Wed, 26 Jun 2019 05:24:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <1561551539-18251-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1561551539-18251-1-git-send-email-pbonzini@redhat.com>
-From:   Alexander Potapenko <glider@google.com>
-Date:   Wed, 26 Jun 2019 14:24:10 +0200
-Message-ID: <CAG_fn=UdN-nPHGBT_t7Dco3287=kGhy5VUOwvKJo4mFY2RZ8Fw@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: x86: degrade WARN to pr_warn_ratelimited
+        id S1727464AbfFZMll (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jun 2019 08:41:41 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:47672 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726242AbfFZMll (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jun 2019 08:41:41 -0400
+Received: from p5b06daab.dip0.t-ipconnect.de ([91.6.218.171] helo=nanos)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1hg7Ex-0008O6-0e; Wed, 26 Jun 2019 14:41:31 +0200
+Date:   Wed, 26 Jun 2019 14:41:29 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+cc:     Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        mingo@redhat.com, Borislav Petkov <bp@alien8.de>,
+        rkrcmar@redhat.com, x86@kernel.org, kvm@vger.kernel.org,
+        stable <stable@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Jon Masters <jcm@redhat.com>
+Subject: Re: [PATCH 1/1] kvm/speculation: Allow KVM guests to use SSBD even
+ if host does not
+In-Reply-To: <b6c2ac14-d647-0fa2-f19d-88944c63c37a@redhat.com>
+Message-ID: <alpine.DEB.2.21.1906261440570.32342@nanos.tec.linutronix.de>
+References: <1560187210-11054-1-git-send-email-alejandro.j.jimenez@oracle.com> <1c9d4047-e54c-8d4b-13b1-020864f2f5bf@redhat.com> <alpine.DEB.2.21.1906251750140.32342@nanos.tec.linutronix.de> <56fa2729-52a7-3994-5f7c-bc308da7d710@oracle.com>
+ <alpine.DEB.2.21.1906252019460.32342@nanos.tec.linutronix.de> <b6c2ac14-d647-0fa2-f19d-88944c63c37a@redhat.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="8323329-1516349069-1561552891=:32342"
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 26, 2019 at 2:19 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> This warning can be triggered easily by userspace, so it should certainly=
- not
-> cause a panic if panic_on_warn is set.
->
-Can you please also add the Reported-by tag here?
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Reported-by: syzbot+c03f30b4f4c46bdf8575@syzkaller.appspotmail.com
-> Suggested-by: Alexander Potapenko <glider@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Acked-by: Alexander Potapenko <glider@google.com>
-> ---
->  arch/x86/kvm/x86.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 83aefd759846..66585cf42d7f 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1557,7 +1557,7 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 u=
-ser_tsc_khz, bool scale)
->                         vcpu->arch.tsc_always_catchup =3D 1;
->                         return 0;
->                 } else {
-> -                       WARN(1, "user requested TSC rate below hardware s=
-peed\n");
-> +                       pr_warn_ratelimited("user requested TSC rate belo=
-w hardware speed\n");
->                         return -1;
->                 }
->         }
-> @@ -1567,8 +1567,8 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 u=
-ser_tsc_khz, bool scale)
->                                 user_tsc_khz, tsc_khz);
->
->         if (ratio =3D=3D 0 || ratio >=3D kvm_max_tsc_scaling_ratio) {
-> -               WARN_ONCE(1, "Invalid TSC scaling ratio - virtual-tsc-khz=
-=3D%u\n",
-> -                         user_tsc_khz);
-> +               pr_warn_ratelimited("Invalid TSC scaling ratio - virtual-=
-tsc-khz=3D%u\n",
-> +                                   user_tsc_khz);
->                 return -1;
->         }
->
-> --
-> 1.8.3.1
->
+--8323329-1516349069-1561552891=:32342
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8BIT
 
+On Wed, 26 Jun 2019, Paolo Bonzini wrote:
+> On 25/06/19 20:22, Thomas Gleixner wrote:
+> >> I think that even with that approach there is still an unsolved problem, as I
+> >> believe guests are allowed to write directly to SPEC_CTRL MSR without causing
+> >> a VMEXIT, which bypasses the host masking entirely.  e.g. a guest using IBRS
+> >> writes frequently to SPEC_CTRL, and could turn off SSBD on the VPCU while is
+> >> running after the first non-zero write to the MSR. Do you agree?
+> > Indeed. Of course that was a decision we made _before_ all the other fancy
+> > things came around. Looks like we have to reopen that discussion.
+> 
+> It's not just that, it's a decision that was made because otherwise
+> performance is absolutely horrible (like 4-5x slower syscalls if the
+> guest is using IBRS).
+> 
+> I think it's better to leave the guest in control of SSBD even if it's
+> globally disabled.  The harm cannot escape the guest and in particular
+> it cannot escape to the sibling hyperthread.
 
---=20
-Alexander Potapenko
-Software Engineer
+SSB allows guest to guest attacks IIRC
 
-Google Germany GmbH
-Erika-Mann-Stra=C3=9Fe, 33
-80636 M=C3=BCnchen
+Thanks,
 
-Gesch=C3=A4ftsf=C3=BChrer: Paul Manicle, Halimah DeLaine Prado
-Registergericht und -nummer: Hamburg, HRB 86891
-Sitz der Gesellschaft: Hamburg
+	tglx
+--8323329-1516349069-1561552891=:32342--
