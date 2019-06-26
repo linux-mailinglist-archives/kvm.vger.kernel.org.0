@@ -2,195 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A29F56F06
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 18:44:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D35A856F75
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 19:18:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726620AbfFZQoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jun 2019 12:44:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42468 "EHLO mx1.redhat.com"
+        id S1726478AbfFZRS1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jun 2019 13:18:27 -0400
+Received: from foss.arm.com ([217.140.110.172]:37610 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726006AbfFZQoe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 12:44:34 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1282C309175F;
-        Wed, 26 Jun 2019 16:44:34 +0000 (UTC)
-Received: from amt.cnet (ovpn-112-3.gru2.redhat.com [10.97.112.3])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0B2A45D717;
-        Wed, 26 Jun 2019 16:44:31 +0000 (UTC)
-Received: from amt.cnet (localhost [127.0.0.1])
-        by amt.cnet (Postfix) with ESMTP id A14F510517A;
-        Wed, 26 Jun 2019 13:44:12 -0300 (BRT)
-Received: (from marcelo@localhost)
-        by amt.cnet (8.14.7/8.14.7/Submit) id x5QGi8LV002573;
-        Wed, 26 Jun 2019 13:44:08 -0300
-Date:   Wed, 26 Jun 2019 13:44:08 -0300
-From:   Marcelo Tosatti <mtosatti@redhat.com>
-To:     Wanpeng Li <kernellwp@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Subject: Re: [PATCH v4 2/5] KVM: LAPIC: inject lapic timer interrupt by
- posted interrupt
-Message-ID: <20190626164401.GA2211@amt.cnet>
-References: <1560770687-23227-1-git-send-email-wanpengli@tencent.com>
- <1560770687-23227-3-git-send-email-wanpengli@tencent.com>
- <20190618133541.GA3932@amt.cnet>
- <CANRm+Cz0v1VfDaCCWX+5RzCusTV7g9Hwr+OLGDRijeyqFx=Kzw@mail.gmail.com>
- <20190619210346.GA13033@amt.cnet>
- <CANRm+Cwxz7rR3o2m1HKg0-0z30B8-O-i4RrVC6EMG1jgBRxWPg@mail.gmail.com>
- <20190621214205.GA4751@amt.cnet>
- <CANRm+CxUgkF7zRmHC_MD2s00waj6qztWdPAm_u9Rhk34_bevfQ@mail.gmail.com>
- <20190625190010.GA3377@amt.cnet>
- <CANRm+CzmraRUNQfTWNZ3Bu5dJhjvL1eE9+=c2i_vwtYYT9ao2w@mail.gmail.com>
+        id S1726006AbfFZRS1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jun 2019 13:18:27 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3BC85360;
+        Wed, 26 Jun 2019 10:18:26 -0700 (PDT)
+Received: from arrakis.emea.arm.com (arrakis.cambridge.arm.com [10.1.196.78])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 876353F718;
+        Wed, 26 Jun 2019 10:18:21 -0700 (PDT)
+Date:   Wed, 26 Jun 2019 18:18:19 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Andrey Konovalov <andreyknvl@google.com>,
+        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+        linux-media@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Subject: Re: [PATCH v18 00/15] arm64: untag user pointers passed to the kernel
+Message-ID: <20190626171819.GG29672@arrakis.emea.arm.com>
+References: <cover.1561386715.git.andreyknvl@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANRm+CzmraRUNQfTWNZ3Bu5dJhjvL1eE9+=c2i_vwtYYT9ao2w@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 26 Jun 2019 16:44:34 +0000 (UTC)
+In-Reply-To: <cover.1561386715.git.andreyknvl@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 26, 2019 at 07:02:13PM +0800, Wanpeng Li wrote:
-> On Wed, 26 Jun 2019 at 03:03, Marcelo Tosatti <mtosatti@redhat.com> wrote:
-> >
-> > On Mon, Jun 24, 2019 at 04:53:53PM +0800, Wanpeng Li wrote:
-> > > On Sat, 22 Jun 2019 at 06:11, Marcelo Tosatti <mtosatti@redhat.com> wrote:
-> > > >
-> > > > On Fri, Jun 21, 2019 at 09:42:39AM +0800, Wanpeng Li wrote:
-> > > > > On Thu, 20 Jun 2019 at 05:04, Marcelo Tosatti <mtosatti@redhat.com> wrote:
-> > > > > >
-> > > > > > Hi Li,
-> > > > > >
-> > > > > > On Wed, Jun 19, 2019 at 08:36:06AM +0800, Wanpeng Li wrote:
-> > > > > > > On Tue, 18 Jun 2019 at 21:36, Marcelo Tosatti <mtosatti@redhat.com> wrote:
-> > > > > > > >
-> > > > > > > > On Mon, Jun 17, 2019 at 07:24:44PM +0800, Wanpeng Li wrote:
-> > > > > > > > > From: Wanpeng Li <wanpengli@tencent.com>
-> > > > > > > > >
-> > > > > > > > > Dedicated instances are currently disturbed by unnecessary jitter due
-> > > > > > > > > to the emulated lapic timers fire on the same pCPUs which vCPUs resident.
-> > > > > > > > > There is no hardware virtual timer on Intel for guest like ARM. Both
-> > > > > > > > > programming timer in guest and the emulated timer fires incur vmexits.
-> > > > > > > > > This patch tries to avoid vmexit which is incurred by the emulated
-> > > > > > > > > timer fires in dedicated instance scenario.
-> > > > > > > > >
-> > > > > > > > > When nohz_full is enabled in dedicated instances scenario, the emulated
-> > > > > > > > > timers can be offload to the nearest busy housekeeping cpus since APICv
-> > > > > > > > > is really common in recent years. The guest timer interrupt is injected
-> > > > > > > > > by posted-interrupt which is delivered by housekeeping cpu once the emulated
-> > > > > > > > > timer fires.
-> > > > > > > > >
-> > > > > > > > > The host admin should fine tuned, e.g. dedicated instances scenario w/
-> > > > > > > > > nohz_full cover the pCPUs which vCPUs resident, several pCPUs surplus
-> > > > > > > > > for busy housekeeping, disable mwait/hlt/pause vmexits to keep in non-root
-> > > > > > > > > mode, ~3% redis performance benefit can be observed on Skylake server.
-> > > > > > > > >
-> > > > > > > > > w/o patch:
-> > > > > > > > >
-> > > > > > > > >             VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time   Avg time
-> > > > > > > > >
-> > > > > > > > > EXTERNAL_INTERRUPT    42916    49.43%   39.30%   0.47us   106.09us   0.71us ( +-   1.09% )
-> > > > > > > > >
-> > > > > > > > > w/ patch:
-> > > > > > > > >
-> > > > > > > > >             VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time         Avg time
-> > > > > > > > >
-> > > > > > > > > EXTERNAL_INTERRUPT    6871     9.29%     2.96%   0.44us    57.88us   0.72us ( +-   4.02% )
-> > > > > > > > >
-> > > > > > > > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > > > > > > > Cc: Radim Krčmář <rkrcmar@redhat.com>
-> > > > > > > > > Cc: Marcelo Tosatti <mtosatti@redhat.com>
-> > > > > > > > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > > > > > > > > ---
-> > > > > > > > >  arch/x86/kvm/lapic.c            | 33 ++++++++++++++++++++++++++-------
-> > > > > > > > >  arch/x86/kvm/lapic.h            |  1 +
-> > > > > > > > >  arch/x86/kvm/vmx/vmx.c          |  3 ++-
-> > > > > > > > >  arch/x86/kvm/x86.c              |  5 +++++
-> > > > > > > > >  arch/x86/kvm/x86.h              |  2 ++
-> > > > > > > > >  include/linux/sched/isolation.h |  2 ++
-> > > > > > > > >  kernel/sched/isolation.c        |  6 ++++++
-> > > > > > > > >  7 files changed, 44 insertions(+), 8 deletions(-)
-> > > > > > > > >
-> > > > > > > > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > > > > > > > > index 87ecb56..9ceeee5 100644
-> > > > > > > > > --- a/arch/x86/kvm/lapic.c
-> > > > > > > > > +++ b/arch/x86/kvm/lapic.c
-> > > > > > > > > @@ -122,6 +122,13 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
-> > > > > > > > >       return apic->vcpu->vcpu_id;
-> > > > > > > > >  }
-> > > > > > > > >
-> > > > > > > > > +bool posted_interrupt_inject_timer(struct kvm_vcpu *vcpu)
-> > > > > > > > > +{
-> > > > > > > > > +     return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
-> > > > > > > > > +             kvm_hlt_in_guest(vcpu->kvm);
-> > > > > > > > > +}
-> > > > > > > > > +EXPORT_SYMBOL_GPL(posted_interrupt_inject_timer);
-> > > > > > > >
-> > > > > > > > Paolo, can you explain the reasoning behind this?
-> > > > > > > >
-> > > > > > > > Should not be necessary...
-> > > > >
-> > > > > https://lkml.org/lkml/2019/6/5/436  "Here you need to check
-> > > > > kvm_halt_in_guest, not kvm_mwait_in_guest, because you need to go
-> > > > > through kvm_apic_expired if the guest needs to be woken up from
-> > > > > kvm_vcpu_block."
-> > > >
-> > > > Ah, i think he means that a sleeping vcpu (in kvm_vcpu_block) must
-> > > > be woken up, if it receives a timer interrupt.
-> > > >
-> > > > But your patch will go through:
-> > > >
-> > > > kvm_apic_inject_pending_timer_irqs
-> > > > __apic_accept_irq ->
-> > > > vmx_deliver_posted_interrupt ->
-> > > > kvm_vcpu_trigger_posted_interrupt returns false
-> > > > (because vcpu->mode != IN_GUEST_MODE) ->
-> > > > kvm_vcpu_kick
-> > > >
-> > > > Which will wakeup the vcpu.
-> > >
-> > > Hi Marcelo,
-> > >
-> > > >
-> > > > Apart from this oops, which triggers when running:
-> > > > taskset -c 1 ./cyclictest -D 3600 -p 99 -t 1 -h 30 -m -n  -i 50000 -b 40
-> > >
-> > > I try both host and guest use latest kvm/queue  w/ CONFIG_PREEMPT
-> > > enabled, and expose mwait as your config, however, there is no oops.
-> > > Can you reproduce steadily or encounter casually? Can you reproduce
-> > > w/o the patchset?
-> >
-> > Hi Li,
+Hi Andrew,
+
+On Mon, Jun 24, 2019 at 04:32:45PM +0200, Andrey Konovalov wrote:
+> Andrey Konovalov (14):
+>   arm64: untag user pointers in access_ok and __uaccess_mask_ptr
+>   lib: untag user pointers in strn*_user
+>   mm: untag user pointers passed to memory syscalls
+>   mm: untag user pointers in mm/gup.c
+>   mm: untag user pointers in get_vaddr_frames
+>   fs/namespace: untag user pointers in copy_mount_options
+>   userfaultfd: untag user pointers
+>   drm/amdgpu: untag user pointers
+>   drm/radeon: untag user pointers in radeon_gem_userptr_ioctl
+>   IB/mlx4: untag user pointers in mlx4_get_umem_mr
+>   media/v4l2-core: untag user pointers in videobuf_dma_contig_user_get
+>   tee/shm: untag user pointers in tee_shm_register
+>   vfio/type1: untag user pointers in vaddr_get_pfn
+>   selftests, arm64: add a selftest for passing tagged pointers to kernel
 > 
-> Hi Marcelo,
+> Catalin Marinas (1):
+>   arm64: Introduce prctl() options to control the tagged user addresses
+>     ABI
 > 
-> >
-> > Steadily.
-> >
-> > Do you have this as well:
-> 
-> w/ or w/o below diff, testing on both SKX and HSW servers on hand, I
-> didn't see any oops. Could you observe the oops disappear when w/o
-> below diff? If the answer is yes, then the oops will not block to
-> merge the patchset since Paolo prefers to add the kvm_hlt_in_guest()
-> condition to guarantee be woken up from kvm_vcpu_block(). 
+>  arch/arm64/Kconfig                            |  9 +++
+>  arch/arm64/include/asm/processor.h            |  8 +++
+>  arch/arm64/include/asm/thread_info.h          |  1 +
+>  arch/arm64/include/asm/uaccess.h              | 12 +++-
+>  arch/arm64/kernel/process.c                   | 72 +++++++++++++++++++
+>  .../gpu/drm/amd/amdgpu/amdgpu_amdkfd_gpuvm.c  |  2 +-
+>  drivers/gpu/drm/amd/amdgpu/amdgpu_gem.c       |  2 +
+>  drivers/gpu/drm/radeon/radeon_gem.c           |  2 +
+>  drivers/infiniband/hw/mlx4/mr.c               |  7 +-
+>  drivers/media/v4l2-core/videobuf-dma-contig.c |  9 +--
+>  drivers/tee/tee_shm.c                         |  1 +
+>  drivers/vfio/vfio_iommu_type1.c               |  2 +
+>  fs/namespace.c                                |  2 +-
+>  fs/userfaultfd.c                              | 22 +++---
+>  include/uapi/linux/prctl.h                    |  5 ++
+>  kernel/sys.c                                  | 12 ++++
+>  lib/strncpy_from_user.c                       |  3 +-
+>  lib/strnlen_user.c                            |  3 +-
+>  mm/frame_vector.c                             |  2 +
+>  mm/gup.c                                      |  4 ++
+>  mm/madvise.c                                  |  2 +
+>  mm/mempolicy.c                                |  3 +
+>  mm/migrate.c                                  |  2 +-
+>  mm/mincore.c                                  |  2 +
+>  mm/mlock.c                                    |  4 ++
+>  mm/mprotect.c                                 |  2 +
+>  mm/mremap.c                                   |  7 ++
+>  mm/msync.c                                    |  2 +
+>  tools/testing/selftests/arm64/.gitignore      |  1 +
+>  tools/testing/selftests/arm64/Makefile        | 11 +++
+>  .../testing/selftests/arm64/run_tags_test.sh  | 12 ++++
+>  tools/testing/selftests/arm64/tags_test.c     | 29 ++++++++
+>  32 files changed, 232 insertions(+), 25 deletions(-)
 
-He agreed that its not necessary. Removing the HLT in guest widens 
-the scope of the patch greatly.
+It looks like we got to an agreement on how to deal with tagged user
+addresses between SPARC ADI and ARM Memory Tagging. If there are no
+other objections, what's your preferred way of getting this series into
+-next first and then mainline? Are you ok to merge them into the mm
+tree?
 
-> For the
-> exitless injection if the guest is running(DPDK style workloads that
-> busy-spin on network card) scenarios, we can find a solution later.
+Thanks.
 
-What is the use-case for HLT in guest again?
-
-I'll find the source for the oops (or confirm can't reproduce with 
-kvm/queue RSN).
-
+-- 
+Catalin
