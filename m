@@ -2,93 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A8F2955F8D
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 05:35:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71C1555F99
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 05:37:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726401AbfFZDf2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 23:35:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46450 "EHLO mail.kernel.org"
+        id S1726673AbfFZDhM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 23:37:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48362 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726339AbfFZDf2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jun 2019 23:35:28 -0400
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+        id S1726339AbfFZDhM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 23:37:12 -0400
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7AD8A2168B
-        for <kvm@vger.kernel.org>; Wed, 26 Jun 2019 03:35:27 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5319C20883
+        for <kvm@vger.kernel.org>; Wed, 26 Jun 2019 03:37:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1561520127;
-        bh=bwu3JRlFer6tfX9zJIfIQ3eGTj7LyoViGNSc3TpVHm8=;
+        s=default; t=1561520231;
+        bh=JmzGPKsmUvSdNsSmIymUCFxAhA+cTqqTboCcY+e/GPI=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=WE58dK3c6MNpnTrS4KSJWik2GvESmqMTeagxMaC8n8fZVsXqOhTRbSE+b6G+zmuAl
-         PDMkTukU98Ue+cYhuXEnR4lgQHD5JaeNV7j9TsgLPQK1OmJw81wwx1hDPP293Ci8z6
-         nS9R+PbHInk//CeqpJJYUqDPB4kFAPh1XswQ71T4=
-Received: by mail-wm1-f54.google.com with SMTP id s15so503297wmj.3
-        for <kvm@vger.kernel.org>; Tue, 25 Jun 2019 20:35:27 -0700 (PDT)
-X-Gm-Message-State: APjAAAUWo1mnNFvz6/pQ9jnrskd8uYXfo9sXIaAI4h4s/lrUEdBXpskP
-        4uZ5dM8mwbGmEFpNzYTkVm8kHOq7aCppNkK5TpdbfQ==
-X-Google-Smtp-Source: APXvYqyZfAzCoJd4al+vWzkiAXWWs0slSD3ODOvqgBz63WxXJbiB546K22w0eDleP0Lby5Z7+6R6o3RBB/Hb4ZSAXVI=
-X-Received: by 2002:a7b:cd84:: with SMTP id y4mr755114wmj.79.1561520125983;
- Tue, 25 Jun 2019 20:35:25 -0700 (PDT)
+        b=mpIGug1BN7TkavcEanSgy9S5TtgTAZM159v3f/R0RGk2ktaFcZBiwXCLs/azsmbLf
+         uUPFAtrSsYkESs/Ex05eq88JFcXbg2ESx8nqbaF8XaupoKVIi7fl+KcUqLwW38K/ma
+         gTC6bPVOCj3EOyALXyVKo6/zCvdWEcp4HhF6RByI=
+Received: by mail-wr1-f47.google.com with SMTP id p13so865993wru.10
+        for <kvm@vger.kernel.org>; Tue, 25 Jun 2019 20:37:11 -0700 (PDT)
+X-Gm-Message-State: APjAAAVq++lOGhZGHAktjq16IzwFtNxxIx2yvO0jaRys1BNZhvwAZfv3
+        O+jkVxodOl8ppl6On/4ciNsxc8/ONcGL6loy1B+Onw==
+X-Google-Smtp-Source: APXvYqwElpql8oD8RU81s8JM59UICeBjuSUCnq2AkPAPHmk5YrgJh6ZyasGJxpLlUDzaC8WV+AQ53SYq53YWmoIFgSg=
+X-Received: by 2002:adf:f28a:: with SMTP id k10mr1277832wro.343.1561520229959;
+ Tue, 25 Jun 2019 20:37:09 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190613064813.8102-1-namit@vmware.com> <20190613064813.8102-7-namit@vmware.com>
- <cb28f2b4-92f0-f075-648e-dddfdbdd2e3c@intel.com> <401C4384-98A1-4C27-8F71-4848F4B4A440@vmware.com>
-In-Reply-To: <401C4384-98A1-4C27-8F71-4848F4B4A440@vmware.com>
+References: <20190613064813.8102-1-namit@vmware.com> <20190613064813.8102-5-namit@vmware.com>
+In-Reply-To: <20190613064813.8102-5-namit@vmware.com>
 From:   Andy Lutomirski <luto@kernel.org>
-Date:   Tue, 25 Jun 2019 20:35:12 -0700
-X-Gmail-Original-Message-ID: <CALCETrWcUWw8ep-n6RaOeojnL924xOM7g7eb9g=3DRwOHQAgnA@mail.gmail.com>
-Message-ID: <CALCETrWcUWw8ep-n6RaOeojnL924xOM7g7eb9g=3DRwOHQAgnA@mail.gmail.com>
-Subject: Re: [PATCH 6/9] KVM: x86: Provide paravirtualized flush_tlb_multi()
+Date:   Tue, 25 Jun 2019 20:36:59 -0700
+X-Gmail-Original-Message-ID: <CALCETrXyJ8y7PSqf+RmGKjM4VSLXmNEGi6K=Jzw4jmckRQECTg@mail.gmail.com>
+Message-ID: <CALCETrXyJ8y7PSqf+RmGKjM4VSLXmNEGi6K=Jzw4jmckRQECTg@mail.gmail.com>
+Subject: Re: [PATCH 4/9] x86/mm/tlb: Flush remote and local TLBs concurrently
 To:     Nadav Amit <namit@vmware.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
+Cc:     Peter Zijlstra <peterz@infradead.org>,
         Andy Lutomirski <luto@kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
+        X86 ML <x86@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>,
+        Juergen Gross <jgross@suse.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        linux-hyperv@vger.kernel.org,
+        Linux Virtualization <virtualization@lists.linux-foundation.org>,
+        kvm list <kvm@vger.kernel.org>,
+        xen-devel <xen-devel@lists.xenproject.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 25, 2019 at 7:39 PM Nadav Amit <namit@vmware.com> wrote:
+On Wed, Jun 12, 2019 at 11:49 PM Nadav Amit <namit@vmware.com> wrote:
 >
-> > On Jun 25, 2019, at 2:40 PM, Dave Hansen <dave.hansen@intel.com> wrote:
-> >
-> > On 6/12/19 11:48 PM, Nadav Amit wrote:
-> >> Support the new interface of flush_tlb_multi, which also flushes the
-> >> local CPU's TLB, instead of flush_tlb_others that does not. This
-> >> interface is more performant since it parallelize remote and local TLB
-> >> flushes.
-> >>
-> >> The actual implementation of flush_tlb_multi() is almost identical to
-> >> that of flush_tlb_others().
-> >
-> > This confused me a bit.  I thought we didn't support paravirtualized
-> > flush_tlb_multi() from reading earlier in the series.
-> >
-> > But, it seems like that might be Xen-only and doesn't apply to KVM and
-> > paravirtualized KVM has no problem supporting flush_tlb_multi().  Is
-> > that right?  It might be good to include some of that background in the
-> > changelog to set the context.
->
-> I=E2=80=99ll try to improve the change-logs a bit. There is no inherent r=
-eason for
-> PV TLB-flushers not to implement their own flush_tlb_multi(). It is left
-> for future work, and here are some reasons:
->
-> 1. Hyper-V/Xen TLB-flushing code is not very simple
-> 2. I don=E2=80=99t have a proper setup
-> 3. I am lazy
->
+> To improve TLB shootdown performance, flush the remote and local TLBs
+> concurrently. Introduce flush_tlb_multi() that does so. The current
+> flush_tlb_others() interface is kept, since paravirtual interfaces need
+> to be adapted first before it can be removed. This is left for future
+> work. In such PV environments, TLB flushes are not performed, at this
+> time, concurrently.
 
-In the long run, I think that we're going to want a way for one CPU to
-do a remote flush and then, with appropriate locking, update the
-tlb_gen fields for the remote CPU.  Getting this right may be a bit
-nontrivial.
+Would it be straightforward to have a default PV flush_tlb_multi()
+that uses flush_tlb_others() under the hood?
