@@ -2,187 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DE03456EEA
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 18:37:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A29F56F06
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 18:44:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726518AbfFZQhf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jun 2019 12:37:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34482 "EHLO mail.kernel.org"
+        id S1726620AbfFZQoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jun 2019 12:44:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42468 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726006AbfFZQhe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 12:37:34 -0400
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1726006AbfFZQoe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jun 2019 12:44:34 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4CFA4217D9
-        for <kvm@vger.kernel.org>; Wed, 26 Jun 2019 16:37:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1561567052;
-        bh=Bwoi/52zO9ILP6ACaFflaMC9eRq2pCusKuY50s//+DY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=TUyISNDxdFqIEgj3On1gDi9E1NP3HQUJ5IyOaYpw+o0hjYu8F0CAfEa4YKLYjVGRP
-         4jDZEyFOiVZvdZ+V/2oAS2z+/t/pU/Wh0n0NNHmhd4+f9xF98meomjXsPt+aLxb4HE
-         55pOOm2B0L7f0xQg6cjPdhqwBAW2pYEEkgzhCeXA=
-Received: by mail-wm1-f44.google.com with SMTP id 207so2798746wma.1
-        for <kvm@vger.kernel.org>; Wed, 26 Jun 2019 09:37:32 -0700 (PDT)
-X-Gm-Message-State: APjAAAWKkPUefaUJs9m+ek4x+KxKJEuxjsoJX306zeWvzy1MaD1jo8zd
-        oLS1EX9Zl3xUJlWBf+8rJraanFgYfce6os2G+abhww==
-X-Google-Smtp-Source: APXvYqxRwb5cr2qiC3vK3YEiw0qCxogxmQvuNJwcAjmGFoynNsZ1yT+YsDO3pvTXiSN/dydwD1e10qbPtEzxcgjXXCM=
-X-Received: by 2002:a1c:1a56:: with SMTP id a83mr3567922wma.161.1561567050755;
- Wed, 26 Jun 2019 09:37:30 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1282C309175F;
+        Wed, 26 Jun 2019 16:44:34 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-3.gru2.redhat.com [10.97.112.3])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0B2A45D717;
+        Wed, 26 Jun 2019 16:44:31 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id A14F510517A;
+        Wed, 26 Jun 2019 13:44:12 -0300 (BRT)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id x5QGi8LV002573;
+        Wed, 26 Jun 2019 13:44:08 -0300
+Date:   Wed, 26 Jun 2019 13:44:08 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Wanpeng Li <kernellwp@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PATCH v4 2/5] KVM: LAPIC: inject lapic timer interrupt by
+ posted interrupt
+Message-ID: <20190626164401.GA2211@amt.cnet>
+References: <1560770687-23227-1-git-send-email-wanpengli@tencent.com>
+ <1560770687-23227-3-git-send-email-wanpengli@tencent.com>
+ <20190618133541.GA3932@amt.cnet>
+ <CANRm+Cz0v1VfDaCCWX+5RzCusTV7g9Hwr+OLGDRijeyqFx=Kzw@mail.gmail.com>
+ <20190619210346.GA13033@amt.cnet>
+ <CANRm+Cwxz7rR3o2m1HKg0-0z30B8-O-i4RrVC6EMG1jgBRxWPg@mail.gmail.com>
+ <20190621214205.GA4751@amt.cnet>
+ <CANRm+CxUgkF7zRmHC_MD2s00waj6qztWdPAm_u9Rhk34_bevfQ@mail.gmail.com>
+ <20190625190010.GA3377@amt.cnet>
+ <CANRm+CzmraRUNQfTWNZ3Bu5dJhjvL1eE9+=c2i_vwtYYT9ao2w@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190613064813.8102-1-namit@vmware.com> <20190613064813.8102-7-namit@vmware.com>
- <cb28f2b4-92f0-f075-648e-dddfdbdd2e3c@intel.com> <401C4384-98A1-4C27-8F71-4848F4B4A440@vmware.com>
- <CALCETrWcUWw8ep-n6RaOeojnL924xOM7g7eb9g=3DRwOHQAgnA@mail.gmail.com>
- <35755C67-E8EB-48C3-8343-BB9ABEB4E32C@vmware.com> <CALCETrUPKj1rRn1bKDYkwZ8cv1navBne72kTCtGHjnhTM0cOVw@mail.gmail.com>
- <A52332CE-80A2-4705-ABB0-3CDDB7AEC889@vmware.com>
-In-Reply-To: <A52332CE-80A2-4705-ABB0-3CDDB7AEC889@vmware.com>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Wed, 26 Jun 2019 09:37:19 -0700
-X-Gmail-Original-Message-ID: <CALCETrW2kudQ-nt7KFKRizNjBAzDVfLW7qQRJmkuigSmsYBFhg@mail.gmail.com>
-Message-ID: <CALCETrW2kudQ-nt7KFKRizNjBAzDVfLW7qQRJmkuigSmsYBFhg@mail.gmail.com>
-Subject: Re: [PATCH 6/9] KVM: x86: Provide paravirtualized flush_tlb_multi()
-To:     Nadav Amit <namit@vmware.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANRm+CzmraRUNQfTWNZ3Bu5dJhjvL1eE9+=c2i_vwtYYT9ao2w@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 26 Jun 2019 16:44:34 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 25, 2019 at 11:30 PM Nadav Amit <namit@vmware.com> wrote:
->
-> > On Jun 25, 2019, at 8:56 PM, Andy Lutomirski <luto@kernel.org> wrote:
+On Wed, Jun 26, 2019 at 07:02:13PM +0800, Wanpeng Li wrote:
+> On Wed, 26 Jun 2019 at 03:03, Marcelo Tosatti <mtosatti@redhat.com> wrote:
 > >
-> > On Tue, Jun 25, 2019 at 8:41 PM Nadav Amit <namit@vmware.com> wrote:
-> >>> On Jun 25, 2019, at 8:35 PM, Andy Lutomirski <luto@kernel.org> wrote:
-> >>>
-> >>> On Tue, Jun 25, 2019 at 7:39 PM Nadav Amit <namit@vmware.com> wrote:
-> >>>>> On Jun 25, 2019, at 2:40 PM, Dave Hansen <dave.hansen@intel.com> wr=
-ote:
-> >>>>>
-> >>>>> On 6/12/19 11:48 PM, Nadav Amit wrote:
-> >>>>>> Support the new interface of flush_tlb_multi, which also flushes t=
-he
-> >>>>>> local CPU's TLB, instead of flush_tlb_others that does not. This
-> >>>>>> interface is more performant since it parallelize remote and local=
- TLB
-> >>>>>> flushes.
-> >>>>>>
-> >>>>>> The actual implementation of flush_tlb_multi() is almost identical=
- to
-> >>>>>> that of flush_tlb_others().
-> >>>>>
-> >>>>> This confused me a bit.  I thought we didn't support paravirtualize=
-d
-> >>>>> flush_tlb_multi() from reading earlier in the series.
-> >>>>>
-> >>>>> But, it seems like that might be Xen-only and doesn't apply to KVM =
-and
-> >>>>> paravirtualized KVM has no problem supporting flush_tlb_multi().  I=
-s
-> >>>>> that right?  It might be good to include some of that background in=
- the
-> >>>>> changelog to set the context.
-> >>>>
-> >>>> I=E2=80=99ll try to improve the change-logs a bit. There is no inher=
-ent reason for
-> >>>> PV TLB-flushers not to implement their own flush_tlb_multi(). It is =
-left
-> >>>> for future work, and here are some reasons:
-> >>>>
-> >>>> 1. Hyper-V/Xen TLB-flushing code is not very simple
-> >>>> 2. I don=E2=80=99t have a proper setup
-> >>>> 3. I am lazy
-> >>>
-> >>> In the long run, I think that we're going to want a way for one CPU t=
-o
-> >>> do a remote flush and then, with appropriate locking, update the
-> >>> tlb_gen fields for the remote CPU.  Getting this right may be a bit
-> >>> nontrivial.
-> >>
-> >> What do you mean by =E2=80=9Cdo a remote flush=E2=80=9D?
+> > On Mon, Jun 24, 2019 at 04:53:53PM +0800, Wanpeng Li wrote:
+> > > On Sat, 22 Jun 2019 at 06:11, Marcelo Tosatti <mtosatti@redhat.com> wrote:
+> > > >
+> > > > On Fri, Jun 21, 2019 at 09:42:39AM +0800, Wanpeng Li wrote:
+> > > > > On Thu, 20 Jun 2019 at 05:04, Marcelo Tosatti <mtosatti@redhat.com> wrote:
+> > > > > >
+> > > > > > Hi Li,
+> > > > > >
+> > > > > > On Wed, Jun 19, 2019 at 08:36:06AM +0800, Wanpeng Li wrote:
+> > > > > > > On Tue, 18 Jun 2019 at 21:36, Marcelo Tosatti <mtosatti@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > On Mon, Jun 17, 2019 at 07:24:44PM +0800, Wanpeng Li wrote:
+> > > > > > > > > From: Wanpeng Li <wanpengli@tencent.com>
+> > > > > > > > >
+> > > > > > > > > Dedicated instances are currently disturbed by unnecessary jitter due
+> > > > > > > > > to the emulated lapic timers fire on the same pCPUs which vCPUs resident.
+> > > > > > > > > There is no hardware virtual timer on Intel for guest like ARM. Both
+> > > > > > > > > programming timer in guest and the emulated timer fires incur vmexits.
+> > > > > > > > > This patch tries to avoid vmexit which is incurred by the emulated
+> > > > > > > > > timer fires in dedicated instance scenario.
+> > > > > > > > >
+> > > > > > > > > When nohz_full is enabled in dedicated instances scenario, the emulated
+> > > > > > > > > timers can be offload to the nearest busy housekeeping cpus since APICv
+> > > > > > > > > is really common in recent years. The guest timer interrupt is injected
+> > > > > > > > > by posted-interrupt which is delivered by housekeeping cpu once the emulated
+> > > > > > > > > timer fires.
+> > > > > > > > >
+> > > > > > > > > The host admin should fine tuned, e.g. dedicated instances scenario w/
+> > > > > > > > > nohz_full cover the pCPUs which vCPUs resident, several pCPUs surplus
+> > > > > > > > > for busy housekeeping, disable mwait/hlt/pause vmexits to keep in non-root
+> > > > > > > > > mode, ~3% redis performance benefit can be observed on Skylake server.
+> > > > > > > > >
+> > > > > > > > > w/o patch:
+> > > > > > > > >
+> > > > > > > > >             VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time   Avg time
+> > > > > > > > >
+> > > > > > > > > EXTERNAL_INTERRUPT    42916    49.43%   39.30%   0.47us   106.09us   0.71us ( +-   1.09% )
+> > > > > > > > >
+> > > > > > > > > w/ patch:
+> > > > > > > > >
+> > > > > > > > >             VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time         Avg time
+> > > > > > > > >
+> > > > > > > > > EXTERNAL_INTERRUPT    6871     9.29%     2.96%   0.44us    57.88us   0.72us ( +-   4.02% )
+> > > > > > > > >
+> > > > > > > > > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > > > > > > > > Cc: Radim Krčmář <rkrcmar@redhat.com>
+> > > > > > > > > Cc: Marcelo Tosatti <mtosatti@redhat.com>
+> > > > > > > > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> > > > > > > > > ---
+> > > > > > > > >  arch/x86/kvm/lapic.c            | 33 ++++++++++++++++++++++++++-------
+> > > > > > > > >  arch/x86/kvm/lapic.h            |  1 +
+> > > > > > > > >  arch/x86/kvm/vmx/vmx.c          |  3 ++-
+> > > > > > > > >  arch/x86/kvm/x86.c              |  5 +++++
+> > > > > > > > >  arch/x86/kvm/x86.h              |  2 ++
+> > > > > > > > >  include/linux/sched/isolation.h |  2 ++
+> > > > > > > > >  kernel/sched/isolation.c        |  6 ++++++
+> > > > > > > > >  7 files changed, 44 insertions(+), 8 deletions(-)
+> > > > > > > > >
+> > > > > > > > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > > > > > > > > index 87ecb56..9ceeee5 100644
+> > > > > > > > > --- a/arch/x86/kvm/lapic.c
+> > > > > > > > > +++ b/arch/x86/kvm/lapic.c
+> > > > > > > > > @@ -122,6 +122,13 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
+> > > > > > > > >       return apic->vcpu->vcpu_id;
+> > > > > > > > >  }
+> > > > > > > > >
+> > > > > > > > > +bool posted_interrupt_inject_timer(struct kvm_vcpu *vcpu)
+> > > > > > > > > +{
+> > > > > > > > > +     return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
+> > > > > > > > > +             kvm_hlt_in_guest(vcpu->kvm);
+> > > > > > > > > +}
+> > > > > > > > > +EXPORT_SYMBOL_GPL(posted_interrupt_inject_timer);
+> > > > > > > >
+> > > > > > > > Paolo, can you explain the reasoning behind this?
+> > > > > > > >
+> > > > > > > > Should not be necessary...
+> > > > >
+> > > > > https://lkml.org/lkml/2019/6/5/436  "Here you need to check
+> > > > > kvm_halt_in_guest, not kvm_mwait_in_guest, because you need to go
+> > > > > through kvm_apic_expired if the guest needs to be woken up from
+> > > > > kvm_vcpu_block."
+> > > >
+> > > > Ah, i think he means that a sleeping vcpu (in kvm_vcpu_block) must
+> > > > be woken up, if it receives a timer interrupt.
+> > > >
+> > > > But your patch will go through:
+> > > >
+> > > > kvm_apic_inject_pending_timer_irqs
+> > > > __apic_accept_irq ->
+> > > > vmx_deliver_posted_interrupt ->
+> > > > kvm_vcpu_trigger_posted_interrupt returns false
+> > > > (because vcpu->mode != IN_GUEST_MODE) ->
+> > > > kvm_vcpu_kick
+> > > >
+> > > > Which will wakeup the vcpu.
+> > >
+> > > Hi Marcelo,
+> > >
+> > > >
+> > > > Apart from this oops, which triggers when running:
+> > > > taskset -c 1 ./cyclictest -D 3600 -p 99 -t 1 -h 30 -m -n  -i 50000 -b 40
+> > >
+> > > I try both host and guest use latest kvm/queue  w/ CONFIG_PREEMPT
+> > > enabled, and expose mwait as your config, however, there is no oops.
+> > > Can you reproduce steadily or encounter casually? Can you reproduce
+> > > w/o the patchset?
 > >
-> > I mean a PV-assisted flush on a CPU other than the CPU that started
-> > it.  If you look at flush_tlb_func_common(), it's doing some work that
-> > is rather fancier than just flushing the TLB.  By replacing it with
-> > just a pure flush on Xen or Hyper-V, we're losing the potential CR3
-> > switch and this bit:
+> > Hi Li,
+> 
+> Hi Marcelo,
+> 
 > >
-> >        /* Both paths above update our state to mm_tlb_gen. */
-> >        this_cpu_write(cpu_tlbstate.ctxs[loaded_mm_asid].tlb_gen, mm_tlb=
-_gen);
+> > Steadily.
 > >
-> > Skipping the former can hurt idle performance, although we should
-> > consider just disabling all the lazy optimizations on systems with PV
-> > flush.  (And I've asked Intel to help us out here in future hardware.
-> > I have no idea what the result of asking will be.)  Skipping the
-> > cpu_tlbstate write means that we will do unnecessary flushes in the
-> > future, and that's not doing us any favors.
-> >
-> > In principle, we should be able to do something like:
-> >
-> > flush_tlb_multi(...);
-> > for(each CPU that got flushed) {
-> >  spin_lock(something appropriate?);
-> >  per_cpu_write(cpu, cpu_tlbstate.ctxs[loaded_mm_asid].tlb_gen, f->new_t=
-lb_gen);
-> >  spin_unlock(...);
-> > }
-> >
-> > with the caveat that it's more complicated than this if the flush is a
-> > partial flush, and that we'll want to check that the ctx_id still
-> > matches, etc.
-> >
-> > Does this make sense?
->
-> Thanks for the detailed explanation. Let me check that I got it right.
->
-> You want to optimize cases in which:
->
-> 1. A virtual machine
+> > Do you have this as well:
+> 
+> w/ or w/o below diff, testing on both SKX and HSW servers on hand, I
+> didn't see any oops. Could you observe the oops disappear when w/o
+> below diff? If the answer is yes, then the oops will not block to
+> merge the patchset since Paolo prefers to add the kvm_hlt_in_guest()
+> condition to guarantee be woken up from kvm_vcpu_block(). 
 
-Yes.
+He agreed that its not necessary. Removing the HLT in guest widens 
+the scope of the patch greatly.
 
->
-> 2. Which issues mtultiple (remote) TLB shootdowns
+> For the
+> exitless injection if the guest is running(DPDK style workloads that
+> busy-spin on network card) scenarios, we can find a solution later.
 
-Yes.  Or just one followed by a context switch.  Right now it's
-suboptimal with just two vCPUs and a single remote flush.  If CPU 0
-does a remote PV flush of CPU1 and then CPU1 context switches away
-from the running mm and back, it will do an unnecessary flush on the
-way back because the tlb_gen won't match.
+What is the use-case for HLT in guest again?
 
->
-> 2. To remote vCPU which is preempted by the hypervisor
+I'll find the source for the oops (or confirm can't reproduce with 
+kvm/queue RSN).
 
-Yes, or even one that isn't preempted.
-
->
-> 4. And unlike KVM, the hypervisor does not provide facilities for the VM =
-to
-> know which vCPU is preempted, and atomically request TLB flush when the v=
-CPU
-> is scheduled.
->
-
-I'm not sure this makes much difference to the case I'm thinking of.
-
-All this being said, do we currently have any system that supports
-PCID *and* remote flushes?  I guess KVM has some mechanism, but I'm
-not that familiar with its exact capabilities.  If I remember right,
-Hyper-V doesn't expose PCID yet.
-
-
-> Right?
->
