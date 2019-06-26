@@ -2,75 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AFC5A57179
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 21:21:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46416571A6
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 21:23:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726476AbfFZTVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jun 2019 15:21:21 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:47614 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726227AbfFZTVV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 15:21:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=V0jLxYAn+nqGzG0R8aNQz9MoPnspgo1/uyky7k+5p+k=; b=uxdz562loKTGsLdJtWlp/cwLTe
-        GT+1eM+P/R1wFx79woFof2wJjB3Y9vYfQmzpdcIaIU83pKIZREcTNlzD+0rQbxJwujSJKNBgvz9IV
-        LfVVZ6NxKM9RyPIIiCojd62gd1v+4J2V/GBk5FOPvpYUHzl3whUUNTdAOcHZTcjTpPdM/mz61drdu
-        oo61DWBQRp82BvcQCC0MBkBHPF41qM8CnNL0XyGaV4JF23Vez0fIIQIxizHvdYj+Y5W2IPqa2Beyi
-        zcX6IUhMf3KUcXS+1oP8DCrEk6svsMb7I5V++fYKN5uW4u74Lcyxrw/VVZ73r6dddBMWyTsKxrZL5
-        l/KTyAEg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hgDTb-0001Mk-E0; Wed, 26 Jun 2019 19:21:03 +0000
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id A49CC209CEDA7; Wed, 26 Jun 2019 21:21:00 +0200 (CEST)
-Date:   Wed, 26 Jun 2019 21:21:00 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
+        id S1726553AbfFZTXR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jun 2019 15:23:17 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:50184 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726339AbfFZTXQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jun 2019 15:23:16 -0400
+Received: from p5b06daab.dip0.t-ipconnect.de ([91.6.218.171] helo=nanos)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1hgDVf-0004JZ-MD; Wed, 26 Jun 2019 21:23:11 +0200
+Date:   Wed, 26 Jun 2019 21:23:10 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
 To:     "Raslan, KarimAllah" <karahmed@amazon.de>
-Cc:     "tglx@linutronix.de" <tglx@linutronix.de>,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+cc:     "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
         "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kernellwp@gmail.com" <kernellwp@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
         "ankur.a.arora@oracle.com" <ankur.a.arora@oracle.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kernellwp@gmail.com" <kernellwp@gmail.com>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>
 Subject: Re: cputime takes cstate into consideration
-Message-ID: <20190626192100.GP3419@hirez.programming.kicks-ass.net>
-References: <CANRm+Cyge6viybs63pt7W-cRdntx+wfyOq5EWE2qmEQ71SzMHg@mail.gmail.com>
- <alpine.DEB.2.21.1906261211410.32342@nanos.tec.linutronix.de>
- <20190626145413.GE6753@char.us.oracle.com>
- <20190626161608.GM3419@hirez.programming.kicks-ass.net>
- <20190626183016.GA16439@char.us.oracle.com>
- <alpine.DEB.2.21.1906262038040.32342@nanos.tec.linutronix.de>
- <1561575336.25880.7.camel@amazon.de>
+In-Reply-To: <1561575536.25880.10.camel@amazon.de>
+Message-ID: <alpine.DEB.2.21.1906262119430.32342@nanos.tec.linutronix.de>
+References: <CANRm+Cyge6viybs63pt7W-cRdntx+wfyOq5EWE2qmEQ71SzMHg@mail.gmail.com>  <alpine.DEB.2.21.1906261211410.32342@nanos.tec.linutronix.de>  <20190626145413.GE6753@char.us.oracle.com> <1561575536.25880.10.camel@amazon.de>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1561575336.25880.7.camel@amazon.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: multipart/mixed; boundary="8323329-836335723-1561576991=:32342"
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jun 26, 2019 at 06:55:36PM +0000, Raslan, KarimAllah wrote:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-> If the host is completely in no_full_hz mode and the pCPU is dedicated to a 
-> single vCPU/task (and the guest is 100% CPU bound and never exits), you would 
-> still be ticking in the host once every second for housekeeping, right? Would 
-> not updating the mwait-time once a second be enough here?
+--8323329-836335723-1561576991=:32342
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 
-People are trying very hard to get rid of that remnant tick. Lets not
-add dependencies to it.
+On Wed, 26 Jun 2019, Raslan, KarimAllah wrote:
+> On Wed, 2019-06-26 at 10:54 -0400, Konrad Rzeszutek Wilk wrote:
+> > There were some ideas that Ankur (CC-ed) mentioned to me of using the perf
+> > counters (in the host) to sample the guest and construct a better
+> > accounting idea of what the guest does. That way the dashboard
+> > from the host would not show 100% CPU utilization.
+> 
+> You can either use the UNHALTED cycles perf-counter or you can use MPERF/APERFÂ 
+> MSRs for that. (sorry I got distracted and forgot to send the patch)
 
-IMO this is a really stupid issue, 100% time is correct if the guest
-does idle in pinned vcpu mode.
+Sure, but then you conflict with the other people who fight tooth and nail
+over every single performance counter.
+
+Thanks,
+
+	tglx
+--8323329-836335723-1561576991=:32342--
