@@ -2,88 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7077656BC4
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 16:22:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3722756BC6
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 16:24:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727139AbfFZOWy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jun 2019 10:22:54 -0400
-Received: from smtp.infotech.no ([82.134.31.41]:32887 "EHLO smtp.infotech.no"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725958AbfFZOWx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 10:22:53 -0400
-X-Greylist: delayed 503 seconds by postgrey-1.27 at vger.kernel.org; Wed, 26 Jun 2019 10:22:52 EDT
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id 70355204192;
-        Wed, 26 Jun 2019 16:14:28 +0200 (CEST)
-X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
-Received: from smtp.infotech.no ([127.0.0.1])
-        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id PwazqP0WQn-2; Wed, 26 Jun 2019 16:14:26 +0200 (CEST)
-Received: from [192.168.48.23] (host-45-58-224-183.dyn.295.ca [45.58.224.183])
-        by smtp.infotech.no (Postfix) with ESMTPA id CFD38204153;
-        Wed, 26 Jun 2019 16:14:25 +0200 (CEST)
-Reply-To: dgilbert@interlog.com
-Subject: Re: [PATCH 0/2] scsi: add support for request batching
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jejb@linux.ibm.com, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, stefanha@redhat.com
-References: <20190530112811.3066-1-pbonzini@redhat.com>
- <746ad64a-4047-1597-a0d4-f14f3529cc19@redhat.com>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <65e5ad25-a475-989a-ce3d-400a8c90cb61@interlog.com>
-Date:   Wed, 26 Jun 2019 10:14:23 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+        id S1727146AbfFZOYG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jun 2019 10:24:06 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:48648 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726157AbfFZOYG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jun 2019 10:24:06 -0400
+Received: from p5b06daab.dip0.t-ipconnect.de ([91.6.218.171] helo=nanos)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1hg8q6-0003Sq-Hc; Wed, 26 Jun 2019 16:23:58 +0200
+Date:   Wed, 26 Jun 2019 16:23:57 +0200 (CEST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+cc:     Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        mingo@redhat.com, Borislav Petkov <bp@alien8.de>,
+        rkrcmar@redhat.com, x86@kernel.org, kvm@vger.kernel.org,
+        stable <stable@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Jon Masters <jcm@redhat.com>
+Subject: Re: [PATCH 1/1] kvm/speculation: Allow KVM guests to use SSBD even
+ if host does not
+In-Reply-To: <f258b10f-dae3-7cf4-5a0c-47fe067065b4@redhat.com>
+Message-ID: <alpine.DEB.2.21.1906261622570.32342@nanos.tec.linutronix.de>
+References: <1560187210-11054-1-git-send-email-alejandro.j.jimenez@oracle.com> <1c9d4047-e54c-8d4b-13b1-020864f2f5bf@redhat.com> <alpine.DEB.2.21.1906251750140.32342@nanos.tec.linutronix.de> <56fa2729-52a7-3994-5f7c-bc308da7d710@oracle.com>
+ <alpine.DEB.2.21.1906252019460.32342@nanos.tec.linutronix.de> <b6c2ac14-d647-0fa2-f19d-88944c63c37a@redhat.com> <alpine.DEB.2.21.1906261440570.32342@nanos.tec.linutronix.de> <f258b10f-dae3-7cf4-5a0c-47fe067065b4@redhat.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <746ad64a-4047-1597-a0d4-f14f3529cc19@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2019-06-26 9:51 a.m., Paolo Bonzini wrote:
-> On 30/05/19 13:28, Paolo Bonzini wrote:
->> This allows a list of requests to be issued, with the LLD only writing
->> the hardware doorbell when necessary, after the last request was prepared.
->> This is more efficient if we have lists of requests to issue, particularly
->> on virtualized hardware, where writing the doorbell is more expensive than
->> on real hardware.
->>
->> This applies to any HBA, either singlequeue or multiqueue; the second
->> patch implements it for virtio-scsi.
->>
->> Paolo
->>
->> Paolo Bonzini (2):
->>    scsi_host: add support for request batching
->>    virtio_scsi: implement request batching
->>
->>   drivers/scsi/scsi_lib.c    | 37 ++++++++++++++++++++++---
->>   drivers/scsi/virtio_scsi.c | 55 +++++++++++++++++++++++++++-----------
->>   include/scsi/scsi_cmnd.h   |  1 +
->>   include/scsi/scsi_host.h   | 16 +++++++++--
->>   4 files changed, 89 insertions(+), 20 deletions(-)
->>
+On Wed, 26 Jun 2019, Paolo Bonzini wrote:
+> On 26/06/19 14:41, Thomas Gleixner wrote:
+> >> I think it's better to leave the guest in control of SSBD even if it's
+> >> globally disabled.  The harm cannot escape the guest and in particular
+> >> it cannot escape to the sibling hyperthread.
+> >
+> > SSB allows guest to guest attacks IIRC
 > 
+> SSB requires something like
 > 
-> Ping?  Are there any more objections?
+>    p = &foo;
+>    ...
+>    p = &bar;
+>    q = *p;
+> 
+> where "p = &foo;" is executed from one privilege domain and the others
+> are executed by another process or privilege domain.  Unless two guests
+> share memory, it is not possible to use it for guest-to-guest attacks.
 
-I have no objections, just a few questions.
+Fair enough. It's way too hot to think clearly about these kind of problems
+and there are simply way too many of them...
 
-To implement this is the scsi_debug driver, a per device queue would
-need to be added, correct? Then a 'commit_rqs' call would be expected
-at some later point and it would drain that queue and submit each
-command. Or is the queue draining ongoing in the LLD and 'commit_rqs'
-means: don't return until that queue is empty?
+Thanks,
 
-So does that mean in the normal (i.e. non request batching) case
-there are two calls to the LLD for each submitted command? Or is
-'commit_rqs' optional, a sync-ing type command?
-
-Doug Gilbert
-
-
+	tglx
