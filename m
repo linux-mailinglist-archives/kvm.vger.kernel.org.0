@@ -2,141 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 41A9156106
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 05:55:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69DF45610A
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2019 05:56:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726734AbfFZDzb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Jun 2019 23:55:31 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:19078 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726525AbfFZDzb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Jun 2019 23:55:31 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 1FC7BE4B79234D7E47FC;
-        Wed, 26 Jun 2019 11:55:29 +0800 (CST)
-Received: from [127.0.0.1] (10.184.12.158) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Wed, 26 Jun 2019
- 11:55:22 +0800
-Subject: Re: [PATCH v2 7/9] KVM: arm/arm64: vgic-its: Cache successful
- MSI->LPI translation
-From:   Zenghui Yu <yuzenghui@huawei.com>
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>
-CC:     Julien Thierry <julien.thierry@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        "Christoffer Dall" <christoffer.dall@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        "Raslan, KarimAllah" <karahmed@amazon.de>,
-        "Saidi, Ali" <alisaidi@amazon.com>
-References: <20190611170336.121706-1-marc.zyngier@arm.com>
- <20190611170336.121706-8-marc.zyngier@arm.com>
- <53de88e9-3550-bd7f-8266-35c5e75fae4e@huawei.com>
- <169cc847-ebfa-44b6-00e7-c69dccdbbd62@arm.com>
- <7af32ebf-91a8-ef63-6108-4ca506fd364e@huawei.com>
-Message-ID: <dd1b71c0-46fb-29f2-2fbc-2689c22ca8d7@huawei.com>
-Date:   Wed, 26 Jun 2019 11:54:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:64.0) Gecko/20100101
- Thunderbird/64.0
+        id S1726778AbfFZD4s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Jun 2019 23:56:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42406 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726619AbfFZD4s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Jun 2019 23:56:48 -0400
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C703D21738
+        for <kvm@vger.kernel.org>; Wed, 26 Jun 2019 03:56:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1561521407;
+        bh=m/TvZtPmYzBwsHH7PDZA6nQYn+T03CeNEhiZVVnWsKY=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=hqIVIEiOJwZdhDQAjpk4J8je2WINB7pB8kOy5+53nJpdRQoCFFAzS9UoK/oUJuVmj
+         d8/Hz60QbKRbQkFSxbFVYOQ5K4Bo0X3gnpSoCcNnR0066qL5c+udfr/f1We43mMJ3F
+         yCJMBQr1TP68VNycX8kFHUH1SXoG3VTxGF8xv3YU=
+Received: by mail-wr1-f41.google.com with SMTP id n4so942129wrs.3
+        for <kvm@vger.kernel.org>; Tue, 25 Jun 2019 20:56:46 -0700 (PDT)
+X-Gm-Message-State: APjAAAWIEkFDUQJofZrcZ1YcRhtFGekJEnClp88SPNkI+Btk6G3GYbAx
+        oWDz6MUewT0TnUx1Hpg8NFKFchg1SbIpU478SFlMNw==
+X-Google-Smtp-Source: APXvYqzBKxXRyJ7+G7lM4wmtqaiyQkbPGzCk4bXMoyeBgLmv7h+moXJc4QyB84kKQyi9VQBMgXJ4YdzUaq1onQW2rF8=
+X-Received: by 2002:adf:f606:: with SMTP id t6mr1202807wrp.265.1561521405326;
+ Tue, 25 Jun 2019 20:56:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <7af32ebf-91a8-ef63-6108-4ca506fd364e@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.184.12.158]
-X-CFilter-Loop: Reflected
+References: <20190613064813.8102-1-namit@vmware.com> <20190613064813.8102-7-namit@vmware.com>
+ <cb28f2b4-92f0-f075-648e-dddfdbdd2e3c@intel.com> <401C4384-98A1-4C27-8F71-4848F4B4A440@vmware.com>
+ <CALCETrWcUWw8ep-n6RaOeojnL924xOM7g7eb9g=3DRwOHQAgnA@mail.gmail.com> <35755C67-E8EB-48C3-8343-BB9ABEB4E32C@vmware.com>
+In-Reply-To: <35755C67-E8EB-48C3-8343-BB9ABEB4E32C@vmware.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Tue, 25 Jun 2019 20:56:34 -0700
+X-Gmail-Original-Message-ID: <CALCETrUPKj1rRn1bKDYkwZ8cv1navBne72kTCtGHjnhTM0cOVw@mail.gmail.com>
+Message-ID: <CALCETrUPKj1rRn1bKDYkwZ8cv1navBne72kTCtGHjnhTM0cOVw@mail.gmail.com>
+Subject: Re: [PATCH 6/9] KVM: x86: Provide paravirtualized flush_tlb_multi()
+To:     Nadav Amit <namit@vmware.com>
+Cc:     Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Jun 25, 2019 at 8:41 PM Nadav Amit <namit@vmware.com> wrote:
+>
+> > On Jun 25, 2019, at 8:35 PM, Andy Lutomirski <luto@kernel.org> wrote:
+> >
+> > On Tue, Jun 25, 2019 at 7:39 PM Nadav Amit <namit@vmware.com> wrote:
+> >>> On Jun 25, 2019, at 2:40 PM, Dave Hansen <dave.hansen@intel.com> wrot=
+e:
+> >>>
+> >>> On 6/12/19 11:48 PM, Nadav Amit wrote:
+> >>>> Support the new interface of flush_tlb_multi, which also flushes the
+> >>>> local CPU's TLB, instead of flush_tlb_others that does not. This
+> >>>> interface is more performant since it parallelize remote and local T=
+LB
+> >>>> flushes.
+> >>>>
+> >>>> The actual implementation of flush_tlb_multi() is almost identical t=
+o
+> >>>> that of flush_tlb_others().
+> >>>
+> >>> This confused me a bit.  I thought we didn't support paravirtualized
+> >>> flush_tlb_multi() from reading earlier in the series.
+> >>>
+> >>> But, it seems like that might be Xen-only and doesn't apply to KVM an=
+d
+> >>> paravirtualized KVM has no problem supporting flush_tlb_multi().  Is
+> >>> that right?  It might be good to include some of that background in t=
+he
+> >>> changelog to set the context.
+> >>
+> >> I=E2=80=99ll try to improve the change-logs a bit. There is no inheren=
+t reason for
+> >> PV TLB-flushers not to implement their own flush_tlb_multi(). It is le=
+ft
+> >> for future work, and here are some reasons:
+> >>
+> >> 1. Hyper-V/Xen TLB-flushing code is not very simple
+> >> 2. I don=E2=80=99t have a proper setup
+> >> 3. I am lazy
+> >
+> > In the long run, I think that we're going to want a way for one CPU to
+> > do a remote flush and then, with appropriate locking, update the
+> > tlb_gen fields for the remote CPU.  Getting this right may be a bit
+> > nontrivial.
+>
+> What do you mean by =E2=80=9Cdo a remote flush=E2=80=9D?
+>
 
-On 2019/6/26 0:00, Zenghui Yu wrote:
-> Hi Marc,
-> 
-> On 2019/6/25 20:31, Marc Zyngier wrote:
->> Hi Zenghui,
->>
->> On 25/06/2019 12:50, Zenghui Yu wrote:
->>> Hi Marc,
->>>
->>> On 2019/6/12 1:03, Marc Zyngier wrote:
->>>> On a successful translation, preserve the parameters in the LPI
->>>> translation cache. Each translation is reusing the last slot
->>>> in the list, naturally evincting the least recently used entry.
->>>>
->>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>> ---
->>>>    virt/kvm/arm/vgic/vgic-its.c | 86 
->>>> ++++++++++++++++++++++++++++++++++++
->>>>    1 file changed, 86 insertions(+)
->>>>
->>>> diff --git a/virt/kvm/arm/vgic/vgic-its.c 
->>>> b/virt/kvm/arm/vgic/vgic-its.c
->>>> index 0aa0cbbc3af6..62932458476a 100644
->>>> --- a/virt/kvm/arm/vgic/vgic-its.c
->>>> +++ b/virt/kvm/arm/vgic/vgic-its.c
->>>> @@ -546,6 +546,90 @@ static unsigned long 
->>>> vgic_mmio_read_its_idregs(struct kvm *kvm,
->>>>        return 0;
->>>>    }
->>>> +static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
->>>> +                           phys_addr_t db,
->>>> +                           u32 devid, u32 eventid)
->>>> +{
->>>> +    struct vgic_translation_cache_entry *cte;
->>>> +    struct vgic_irq *irq = NULL;
->>>> +
->>>> +    list_for_each_entry(cte, &dist->lpi_translation_cache, entry) {
->>>> +        /*
->>>> +         * If we hit a NULL entry, there is nothing after this
->>>> +         * point.
->>>> +         */
->>>> +        if (!cte->irq)
->>>> +            break;
->>>> +
->>>> +        if (cte->db == db &&
->>>> +            cte->devid == devid &&
->>>> +            cte->eventid == eventid) {
->>>> +            /*
->>>> +             * Move this entry to the head, as it is the
->>>> +             * most recently used.
->>>> +             */
->>>> +            list_move(&cte->entry, &dist->lpi_translation_cache);
->>>
->>> Only for performance reasons: if we hit at the "head" of the list, we
->>> don't need to do a list_move().
->>> In our tests, we found that a single list_move() takes nearly (sometimes
->>> even more than) one microsecond, for some unknown reason...
+I mean a PV-assisted flush on a CPU other than the CPU that started
+it.  If you look at flush_tlb_func_common(), it's doing some work that
+is rather fancier than just flushing the TLB.  By replacing it with
+just a pure flush on Xen or Hyper-V, we're losing the potential CR3
+switch and this bit:
 
-s/one microsecond/500 nanoseconds/
-(I got the value of CNTFRQ wrong, sorry.)
+        /* Both paths above update our state to mm_tlb_gen. */
+        this_cpu_write(cpu_tlbstate.ctxs[loaded_mm_asid].tlb_gen, mm_tlb_ge=
+n);
 
->>
->> Huh... That's odd.
->>
->> Can you narrow down under which conditions this happens? I'm not sure if
->> checking for the list head would be more efficient, as you end-up
->> fetching the head anyway. Can you try replacing this line with:
->>
->>     if (!list_is_first(&cte->entry, &dist->lpi_translation_cache))
->>         list_move(&cte->entry, &dist->lpi_translation_cache);
->>
->> and let me know whether it helps?
-> 
-> It helps. With this change, the overhead of list_move() is gone.
-> 
-> We run 16 4-vcpu VMs on the host, each with a vhost-user nic, and run
-> "iperf" in pairs between them.  It's likely to hit at the head of the
-> cache list in our tests.
-> With this change, the sys% utilization of vhostdpfwd threads will
-> decrease by about 10%.  But I don't know the reason exactly (I haven't
-> found any clues in code yet, in implementation of list_move...).
-> 
-> 
-> Thanks,
-> zenghui
-> 
-> 
+Skipping the former can hurt idle performance, although we should
+consider just disabling all the lazy optimizations on systems with PV
+flush.  (And I've asked Intel to help us out here in future hardware.
+I have no idea what the result of asking will be.)  Skipping the
+cpu_tlbstate write means that we will do unnecessary flushes in the
+future, and that's not doing us any favors.
 
+In principle, we should be able to do something like:
+
+flush_tlb_multi(...);
+for(each CPU that got flushed) {
+  spin_lock(something appropriate?);
+  per_cpu_write(cpu, cpu_tlbstate.ctxs[loaded_mm_asid].tlb_gen, f->new_tlb_=
+gen);
+  spin_unlock(...);
+}
+
+with the caveat that it's more complicated than this if the flush is a
+partial flush, and that we'll want to check that the ctx_id still
+matches, etc.
+
+Does this make sense?
