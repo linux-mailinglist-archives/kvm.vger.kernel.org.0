@@ -2,83 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 90DA857A1C
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 05:37:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6E4657A2B
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 05:44:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726809AbfF0Dhp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jun 2019 23:37:45 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:38718 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726462AbfF0Dhp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 23:37:45 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5R3Y2ko095743;
-        Thu, 27 Jun 2019 03:37:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=nxMs4h/6RcJBUFEIvJBgo9aJwQP29EP3zQ4e3KQb5VQ=;
- b=km8f7oZ3aB83RO1CQMYX9+GN0qW7qia7dHvNVe4nfJyyfLWh9C5Bied10WW3/OO+5til
- TYwF7HZIykSG2G3TwRj+uxcB3ax6AJbPjMzrkY+F1e/PJQUGq1bR1MLat/XtGHlC5TrO
- Oz2hdJg6q59SaLFIwVuAz9ZkBaMTd6BoPKCJr/uBMog7tNBRytXODuuUb/kRcyy4ZeNo
- /KJLVkvQFDM5VGmzUd0YihQdwqFWFvnFNCshcL9NScArhrJtQFOscHUbbpyjTkLxBUuf
- TKOXw5G7YFOiHRQaKjqr18yg+VaOIncP1wPsbJtH7Jo7BmhKFFooD0ygRXPZ0GE3KPrm og== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2t9cyqnm13-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Jun 2019 03:37:37 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5R3bZbq099738;
-        Thu, 27 Jun 2019 03:37:37 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 2t9acd15hk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Jun 2019 03:37:36 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x5R3bZwH019756;
-        Thu, 27 Jun 2019 03:37:36 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 26 Jun 2019 20:37:34 -0700
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, stefanha@redhat.com
-Subject: Re: [PATCH 0/2] scsi: add support for request batching
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20190530112811.3066-1-pbonzini@redhat.com>
-        <746ad64a-4047-1597-a0d4-f14f3529cc19@redhat.com>
-Date:   Wed, 26 Jun 2019 23:37:32 -0400
-In-Reply-To: <746ad64a-4047-1597-a0d4-f14f3529cc19@redhat.com> (Paolo
-        Bonzini's message of "Wed, 26 Jun 2019 15:51:32 +0200")
-Message-ID: <yq1lfxnk8ar.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9300 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=808
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1906270039
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9300 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=874 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1906270039
+        id S1726816AbfF0DoC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jun 2019 23:44:02 -0400
+Received: from mga17.intel.com ([192.55.52.151]:21244 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726447AbfF0DoC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jun 2019 23:44:02 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Jun 2019 20:44:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,422,1557212400"; 
+   d="scan'208";a="360560931"
+Received: from gvt.bj.intel.com ([10.238.158.187])
+  by fmsmga005.fm.intel.com with ESMTP; 26 Jun 2019 20:43:59 -0700
+From:   Tina Zhang <tina.zhang@intel.com>
+To:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Tina Zhang <tina.zhang@intel.com>, kraxel@redhat.com,
+        zhenyuw@linux.intel.com, zhiyuan.lv@intel.com,
+        zhi.a.wang@intel.com, kevin.tian@intel.com, hang.yuan@intel.com,
+        alex.williamson@redhat.com
+Subject: [RFC PATCH v3 0/4] Deliver vGPU display vblank event to userspace
+Date:   Thu, 27 Jun 2019 11:37:58 +0800
+Message-Id: <20190627033802.1663-1-tina.zhang@intel.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This series tries to send the vGPU display vblank event to user land.
 
-Paolo,
+Instead of delivering page flip events, we choose to post display vblank
+event. Handling page flip events for both primary plane and cursor plane
+may make user space quite busy, although we have the mask/unmask mechansim
+for mitigation. Besides, there are some cases that guest app only uses
+one framebuffer for both drawing and display. In such case, guest OS won't
+do the plane page flip when the framebuffer is updated, thus the user
+land won't be notified about the updated framebuffer.
 
-> Ping?  Are there any more objections?
+With vGPU's vblank event working as a timer, userspace still needs to
+query the framebuffer first, before getting a new dma-buf for it.
 
-It's a core change so we'll need some more reviews. I suggest you
-resubmit.
+v3:
+- Deliver display vblank event instead of page flip event. (Zhenyu)
+v2:
+- Use VFIO irq chain to get eventfds from userspace instead of adding
+a new ABI. (Alex)
+v1:
+- https://patchwork.kernel.org/cover/10962341/
+
+
+Tina Zhang (4):
+  vfio: Define device specific irq type capability
+  vfio: Introduce vGPU display irq type
+  drm/i915/gvt: Register vGPU display vblank irq
+  drm/i915/gvt: Deliver vGPU vblank event to userspace
+
+ drivers/gpu/drm/i915/gvt/display.c   |  14 +-
+ drivers/gpu/drm/i915/gvt/gvt.h       |   6 +
+ drivers/gpu/drm/i915/gvt/hypercall.h |   1 +
+ drivers/gpu/drm/i915/gvt/kvmgt.c     | 193 +++++++++++++++++++++++++--
+ drivers/gpu/drm/i915/gvt/mpt.h       |  17 +++
+ include/uapi/linux/vfio.h            |  22 ++-
+ 6 files changed, 241 insertions(+), 12 deletions(-)
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.17.1
+
