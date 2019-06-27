@@ -2,93 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CBE4958296
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 14:27:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01E7E5828E
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 14:26:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726888AbfF0M12 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jun 2019 08:27:28 -0400
-Received: from mga11.intel.com ([192.55.52.93]:46490 "EHLO mga11.intel.com"
+        id S1726443AbfF0M0k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jun 2019 08:26:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52658 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726059AbfF0M12 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jun 2019 08:27:28 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Jun 2019 05:27:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,423,1557212400"; 
-   d="scan'208";a="164321091"
-Received: from lxy-dell.sh.intel.com ([10.239.159.145])
-  by fmsmga007.fm.intel.com with ESMTP; 27 Jun 2019 05:27:24 -0700
-Message-ID: <3c53ec41a1cdf668f3d849c2177fff3098347fbb.camel@intel.com>
-Subject: Re: [PATCH v9 11/17] kvm/vmx: Emulate MSR TEST_CTL
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Fenghua Yu <fenghua.yu@intel.com>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, H Peter Anvin <hpa@zytor.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Christopherson Sean J <sean.j.christopherson@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Sai Praneeth Prakhya <sai.praneeth.prakhya@intel.com>,
-        Ravi V Shankar <ravi.v.shankar@intel.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        x86 <x86@kernel.org>, kvm@vger.kernel.org
-Date:   Thu, 27 Jun 2019 20:22:28 +0800
-In-Reply-To: <alpine.DEB.2.21.1906271408380.32342@nanos.tec.linutronix.de>
-References: <1560897679-228028-1-git-send-email-fenghua.yu@intel.com>
-         <1560897679-228028-12-git-send-email-fenghua.yu@intel.com>
-         <b52b0f72-e242-68b1-640c-85759bdce869@linux.intel.com>
-         <alpine.DEB.2.21.1906270901120.32342@nanos.tec.linutronix.de>
-         <fa53c72c-b1af-7d77-d39c-a9401dc65e27@linux.intel.com>
-         <alpine.DEB.2.21.1906271408380.32342@nanos.tec.linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-2.el7) 
-Mime-Version: 1.0
+        id S1726059AbfF0M0k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 08:26:40 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 27516CA36F;
+        Thu, 27 Jun 2019 12:26:40 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 53930196F8;
+        Thu, 27 Jun 2019 12:26:28 +0000 (UTC)
+Date:   Thu, 27 Jun 2019 14:26:26 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Libvirt Devel <libvir-list@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Erik Skultety <eskultet@redhat.com>,
+        Pavel Hrdina <phrdina@redhat.com>,
+        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+        Sylvain Bauza <sbauza@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>
+Subject: Re: mdevctl: A shoestring mediated device management and
+ persistence utility
+Message-ID: <20190627142626.415138da.cohuck@redhat.com>
+In-Reply-To: <20190626195350.2e9c81d3@x1.home>
+References: <20190523172001.41f386d8@x1.home>
+        <20190625165251.609f6266@x1.home>
+        <20190626115806.3435c45c.cohuck@redhat.com>
+        <20190626083720.42a2b5d4@x1.home>
+        <20190626195350.2e9c81d3@x1.home>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Thu, 27 Jun 2019 12:26:40 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2019-06-27 at 14:11 +0200, Thomas Gleixner wrote:
-> On Thu, 27 Jun 2019, Xiaoyao Li wrote:
-> > On 6/27/2019 3:12 PM, Thomas Gleixner wrote:
-> > > The real interesting question is whether the #AC on split lock prevents
-> > > the
-> > > actual bus lock or not. If it does then the above is fine.
+On Wed, 26 Jun 2019 19:53:50 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
+
+> On Wed, 26 Jun 2019 08:37:20 -0600
+> Alex Williamson <alex.williamson@redhat.com> wrote:
+> 
+> > On Wed, 26 Jun 2019 11:58:06 +0200
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> >   
+> > > On Tue, 25 Jun 2019 16:52:51 -0600
+> > > Alex Williamson <alex.williamson@redhat.com> wrote:
+> > >     
+> > > > Hi,
+> > > > 
+> > > > Based on the discussions we've had, I've rewritten the bulk of
+> > > > mdevctl.  I think it largely does everything we want now, modulo
+> > > > devices that will need some sort of 1:N values per key for
+> > > > configuration in the config file versus the 1:1 key:value setup we
+> > > > currently have (so don't consider the format final just yet).      
 > > > 
-> > > If not, then it would be trivial for a malicious guest to set the
-> > > SPLIT_LOCK_ENABLE bit and "handle" the exception pro forma, return to the
-> > > offending instruction and trigger another one. It lowers the rate, but
-> > > that
-> > > doesn't make it any better.
+> > > We might want to factor out that config format handling while we're
+> > > trying to finalize it.
 > > > 
-> > > The SDM is as usual too vague to be useful. Please clarify.
-> > > 
+> > > cc:ing Matt for his awareness. I'm currently not quite sure how to
+> > > handle those vfio-ap "write several values to an attribute one at a
+> > > time" requirements. Maybe 1:N key:value is the way to go; maybe we
+> > > need/want JSON or something like that.    
 > > 
-> > This feature is to ensure no bus lock (due to split lock) in hardware, that
-> > to
-> > say, when bit 29 of TEST_CTL is set, there is no bus lock due to split lock
-> > can be acquired.
+> > Maybe we should just do JSON for future flexibility.  I assume there
+> > are lots of helpers that should make it easy even from a bash script.
+> > I'll look at that next.  
 > 
-> So enabling this prevents the bus lock, i.e. the exception is raised before
-> that happens.
+> Done.  Throw away any old mdev config files, we use JSON now. 
+
+The code changes look quite straightforward, thanks.
+
+> The per
+> mdev config now looks like this:
 > 
-exactly.
-
-> Please add that information to the changelog as well because that's
-> important to know and makes me much more comfortable handing the #AC back
-> into the guest when it has it enabled.
+> {
+>   "mdev_type": "i915-GVTg_V4_8",
+>   "start": "auto"
+> }
 > 
-Will add it in next version.
+> My expectation, and what I've already pre-enabled support in set_key
+> and get_key functions, is that we'd use arrays for values, so we might
+> have:
+> 
+>   "new_key": ["value1", "value2"]
+> 
+> set_key will automatically convert a comma separated list of values
+> into such an array, so I'm thinking this would be specified by the user
+> as:
+> 
+> # mdevctl modify -u UUID --key=new_key --value=value1,value2
 
-Thanks.
+Looks sensible.
 
+For vfio-ap, we'd probably end up with something like the following:
 
+{
+  "mdev_type": "vfio_ap-passthrough",
+  "start": "auto",
+  "assign_adapter": ["5", "6"],
+  "assign_domain": ["4", "0xab"]
+}
 
+(following the Guest1 example in the kernel documentation)
+
+<As an aside, what should happen if e.g "assign_adapter" is set to
+["6", "7"]? Remove 5, add 7? Remove all values, then set the new ones?
+Similar for deleting the "assign_adapter" key. We have an
+"unassign_adapter" attribute, but this is not something we can infer
+automatically; we need to know that we're dealing with an vfio-ap
+matrix device...>
+
+> 
+> We should think about whether ordering is important and maybe
+> incorporate that into key naming conventions or come up with some
+> syntax for specifying startup blocks.  Thanks,
+> 
+> Alex
+
+Hm...
+
+{
+  "foo": "1",
+  "bar": "42",
+  "baz": {
+    "depends": ["foo", "bar"],
+    "value": "plahh"
+  }
+}
+
+Something like that?
