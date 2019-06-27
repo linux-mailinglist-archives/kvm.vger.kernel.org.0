@@ -2,102 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B545B57F04
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 11:11:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5241957F0B
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 11:15:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726401AbfF0JLq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jun 2019 05:11:46 -0400
-Received: from mga04.intel.com ([192.55.52.120]:60140 "EHLO mga04.intel.com"
+        id S1726382AbfF0JPA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jun 2019 05:15:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53668 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725385AbfF0JLp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jun 2019 05:11:45 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Jun 2019 02:11:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,423,1557212400"; 
-   d="scan'208";a="167366720"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
-  by orsmga006.jf.intel.com with ESMTP; 27 Jun 2019 02:11:44 -0700
-Received: from fmsmsx113.amr.corp.intel.com (10.18.116.7) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 27 Jun 2019 02:11:44 -0700
-Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
- FMSMSX113.amr.corp.intel.com (10.18.116.7) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 27 Jun 2019 02:11:44 -0700
-Received: from shsmsx101.ccr.corp.intel.com ([169.254.1.87]) by
- SHSMSX154.ccr.corp.intel.com ([169.254.7.156]) with mapi id 14.03.0439.000;
- Thu, 27 Jun 2019 17:11:41 +0800
-From:   "Zhang, Tina" <tina.zhang@intel.com>
-To:     Gerd Hoffmann <kraxel@redhat.com>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Yuan, Hang" <hang.yuan@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>
-Subject: RE: [RFC PATCH v3 2/4] vfio: Introduce vGPU display irq type
-Thread-Topic: [RFC PATCH v3 2/4] vfio: Introduce vGPU display irq type
-Thread-Index: AQHVLJqW0JiZUS7UW0uPEvNgUIeas6augZSAgACxdSA=
-Date:   Thu, 27 Jun 2019 09:11:40 +0000
-Message-ID: <237F54289DF84E4997F34151298ABEBC876836C6@SHSMSX101.ccr.corp.intel.com>
-References: <20190627033802.1663-1-tina.zhang@intel.com>
- <20190627033802.1663-3-tina.zhang@intel.com>
- <20190627062043.63wpwgefbsnackbg@sirius.home.kraxel.org>
-In-Reply-To: <20190627062043.63wpwgefbsnackbg@sirius.home.kraxel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZTZmZWE0MzgtODUyMi00ZDY4LWFlMTAtZjgxMzVlNzFkMTY0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiVWttS050MFdHZ3c1VXFJdVpxeDgzWnNMNWVOQm1nNmEwMFpRYVJsXC9ZT2s1cU1pWnNubUJTOG1cL0RcL1REaE1EZSJ9
-x-ctpclassification: CTP_NT
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1726293AbfF0JPA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 05:15:00 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A425DA70E;
+        Thu, 27 Jun 2019 09:14:59 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B44B260BE0;
+        Thu, 27 Jun 2019 09:14:58 +0000 (UTC)
+Date:   Thu, 27 Jun 2019 11:14:56 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Farhan Ali <alifm@linux.ibm.com>
+Cc:     Eric Farman <farman@linux.ibm.com>, pasic@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC v1 1/1] vfio-ccw: Don't call cp_free if we are processing
+ a channel program
+Message-ID: <20190627111456.3e6da01c.cohuck@redhat.com>
+In-Reply-To: <7841b312-13ad-a4b3-85d9-1f5a4991f7fd@linux.ibm.com>
+References: <cover.1561055076.git.alifm@linux.ibm.com>
+        <46dc0cbdcb8a414d70b7807fceb1cca6229408d5.1561055076.git.alifm@linux.ibm.com>
+        <638804dc-53c0-ff2f-d123-13c257ad593f@linux.ibm.com>
+        <581d756d-7418-cd67-e0e8-f9e4fe10b22d@linux.ibm.com>
+        <2d9c04ba-ee50-2f9b-343a-5109274ff52d@linux.ibm.com>
+        <56ced048-8c66-a030-af35-8afbbd2abea8@linux.ibm.com>
+        <20190624114231.2d81e36f.cohuck@redhat.com>
+        <20190624120514.4b528db5.cohuck@redhat.com>
+        <20190624134622.2bb3bba2.cohuck@redhat.com>
+        <20190624140723.5aa7b0b1.cohuck@redhat.com>
+        <3e93215c-c11a-d0bb-8982-be3f2b467e13@linux.ibm.com>
+        <20190624170937.4c76de8d.cohuck@redhat.com>
+        <7841b312-13ad-a4b3-85d9-1f5a4991f7fd@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Thu, 27 Jun 2019 09:14:59 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogaW50ZWwtZ3Z0LWRldiBb
-bWFpbHRvOmludGVsLWd2dC1kZXYtYm91bmNlc0BsaXN0cy5mcmVlZGVza3RvcC5vcmddIE9uDQo+
-IEJlaGFsZiBPZiBHZXJkIEhvZmZtYW5uDQo+IFNlbnQ6IFRodXJzZGF5LCBKdW5lIDI3LCAyMDE5
-IDI6MjEgUE0NCj4gVG86IFpoYW5nLCBUaW5hIDx0aW5hLnpoYW5nQGludGVsLmNvbT4NCj4gQ2M6
-IFRpYW4sIEtldmluIDxrZXZpbi50aWFuQGludGVsLmNvbT47IGt2bUB2Z2VyLmtlcm5lbC5vcmc7
-IGxpbnV4LQ0KPiBrZXJuZWxAdmdlci5rZXJuZWwub3JnOyB6aGVueXV3QGxpbnV4LmludGVsLmNv
-bTsgWXVhbiwgSGFuZw0KPiA8aGFuZy55dWFuQGludGVsLmNvbT47IGFsZXgud2lsbGlhbXNvbkBy
-ZWRoYXQuY29tOyBMdiwgWmhpeXVhbg0KPiA8emhpeXVhbi5sdkBpbnRlbC5jb20+OyBpbnRlbC1n
-dnQtZGV2QGxpc3RzLmZyZWVkZXNrdG9wLm9yZzsgV2FuZywgWmhpIEENCj4gPHpoaS5hLndhbmdA
-aW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1JGQyBQQVRDSCB2MyAyLzRdIHZmaW86IEludHJv
-ZHVjZSB2R1BVIGRpc3BsYXkgaXJxIHR5cGUNCj4gDQo+IE9uIFRodSwgSnVuIDI3LCAyMDE5IGF0
-IDExOjM4OjAwQU0gKzA4MDAsIFRpbmEgWmhhbmcgd3JvdGU6DQo+ID4gSW50cm9kdWNlIHZHUFUg
-c3BlY2lmaWMgaXJxIHR5cGUgVkZJT19JUlFfVFlQRV9HRlgsIGFuZA0KPiA+IFZGSU9fSVJRX1NV
-QlRZUEVfR0ZYX0RJU1BMQVlfSVJRIGFzIHRoZSBzdWJ0eXBlIGZvciB2R1BVIGRpc3BsYXkNCj4g
-Pg0KPiA+IFNpZ25lZC1vZmYtYnk6IFRpbmEgWmhhbmcgPHRpbmEuemhhbmdAaW50ZWwuY29tPg0K
-PiA+IC0tLQ0KPiA+ICBpbmNsdWRlL3VhcGkvbGludXgvdmZpby5oIHwgMyArKysNCj4gPiAgMSBm
-aWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2luY2x1
-ZGUvdWFwaS9saW51eC92ZmlvLmggYi9pbmNsdWRlL3VhcGkvbGludXgvdmZpby5oDQo+ID4gaW5k
-ZXggNjAwNzg0YWNjNGFjLi5jM2U5YzgyMWE1Y2IgMTAwNjQ0DQo+ID4gLS0tIGEvaW5jbHVkZS91
-YXBpL2xpbnV4L3ZmaW8uaA0KPiA+ICsrKyBiL2luY2x1ZGUvdWFwaS9saW51eC92ZmlvLmgNCj4g
-PiBAQCAtNDY1LDYgKzQ2NSw5IEBAIHN0cnVjdCB2ZmlvX2lycV9pbmZvX2NhcF90eXBlIHsNCj4g
-PiAgCV9fdTMyIHN1YnR5cGU7ICAvKiB0eXBlIHNwZWNpZmljICovDQo+ID4gIH07DQo+ID4NCj4g
-PiArI2RlZmluZSBWRklPX0lSUV9UWVBFX0dGWAkJCQkoMSkNCj4gPiArI2RlZmluZSBWRklPX0lS
-UV9TVUJUWVBFX0dGWF9ESVNQTEFZX0lSUQkJKDEpDQo+IA0KPiBWRklPX0lSUV9UWVBFX0dGWF9W
-QkxBTksgPw0KVkZJT19JUlFfU1VCVFlQRV9HRlhfRElTUExBWV9JUlEgaXMgcHJvcG9zZWQgdG8g
-Y292ZXIgYWxsIHRoZSBkaXNwbGF5IHJlbGF0ZWQgZXZlbnRzLiBJbiB0aGlzIHZlcnNpb24sIHdl
-IG9ubHkgdXNlIFZGSU9fSVJRX1NVQlRZUEVfR0ZYX0RJU1BMQVlfSVJRIHRvIGRlbGl2ZXIgdmJs
-YW5rIGV2ZW50LiBIb3dldmVyLCB3ZSBtaWdodCBzdGlsbCB3YW50IHRvIHJlc2VydmUgc2VhdCBm
-b3Igb3RoZXIgZGlzcGxheSBldmVudCwgbGlrZSBwYWdlIGZsaXAgZXZlbnQuDQpUaGFua3MuDQoN
-CkJSLA0KVGluYQ0KPiANCj4gY2hlZXJzLA0KPiAgIEdlcmQNCj4gDQo+IF9fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fDQo+IGludGVsLWd2dC1kZXYgbWFpbGlu
-ZyBsaXN0DQo+IGludGVsLWd2dC1kZXZAbGlzdHMuZnJlZWRlc2t0b3Aub3JnDQo+IGh0dHBzOi8v
-bGlzdHMuZnJlZWRlc2t0b3Aub3JnL21haWxtYW4vbGlzdGluZm8vaW50ZWwtZ3Z0LWRldg0K
+On Mon, 24 Jun 2019 11:24:16 -0400
+Farhan Ali <alifm@linux.ibm.com> wrote:
+
+> On 06/24/2019 11:09 AM, Cornelia Huck wrote:
+> > On Mon, 24 Jun 2019 10:44:17 -0400
+> > Farhan Ali <alifm@linux.ibm.com> wrote:
+
+> >> But even if we don't remove the cp_free from vfio_ccw_sch_io_todo, I am
+> >> not sure if your suggestion will fix the problem. The problem here is
+> >> that we can call vfio_ccw_sch_io_todo (for a clear or halt interrupt) at
+> >> the same time we are handling an ssch request. So depending on the order
+> >> of the operations we could still end up calling cp_free from both from
+> >> threads (i refer to the threads I mentioned in response to Eric's
+> >> earlier email).  
+> > 
+> > What I don't see is why this is a problem with ->initialized; wasn't
+> > the problem that we misinterpreted an interrupt for csch as one for a
+> > not-yet-issued ssch?
+> >   
+> 
+> It's the order in which we do things, which could cause the problem. 
+> Since we queue interrupt handling in the workqueue, we could delay 
+> processing the csch interrupt. During this delay if ssch comes through, 
+> we might have already set ->initialized to true.
+> 
+> So when we get around to handling the interrupt in io_todo, we would go 
+> ahead and call cp_free. This would cause the problem of freeing the 
+> ccwchain list while we might be adding to it.
+> 
+> >>
+> >> Another thing that concerns me is that vfio-ccw can also issue csch/hsch
+> >> in the quiesce path, independently of what the guest issues. So in that
+> >> case we could have a similar scenario to processing an ssch request and
+> >> issuing halt/clear in parallel. But maybe I am being paranoid :)  
+> > 
+> > I think the root problem is really trying to clear a cp while another
+> > thread is trying to set it up. Should we maybe use something like rcu?
+> > 
+> >   
+> 
+> Yes, this is the root problem. I am not too familiar with rcu locking, 
+> but what would be the benefit over a traditional mutex?
+
+I don't quite remember what I had been envisioning at the time (sorry,
+the heat seems to make my brain a bit slushy :/), but I think we might
+have two copies of the cp and use an rcu-ed pointer in the private
+structure to point to one of the copies. If we make sure we've
+synchronized on the pointer at interrupt time, we should be able to
+free the old one in _todo and act on the new on when doing ssch. And
+yes, I realize that this is awfully vague :)
