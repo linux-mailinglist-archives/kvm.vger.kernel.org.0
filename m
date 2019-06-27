@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C6E4657A2B
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 05:44:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C97C57A2C
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 05:44:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726816AbfF0DoC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jun 2019 23:44:02 -0400
+        id S1726913AbfF0DoE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jun 2019 23:44:04 -0400
 Received: from mga17.intel.com ([192.55.52.151]:21244 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726447AbfF0DoC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 23:44:02 -0400
+        id S1726447AbfF0DoE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jun 2019 23:44:04 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Jun 2019 20:44:01 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Jun 2019 20:44:04 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,422,1557212400"; 
-   d="scan'208";a="360560931"
+   d="scan'208";a="360560962"
 Received: from gvt.bj.intel.com ([10.238.158.187])
-  by fmsmga005.fm.intel.com with ESMTP; 26 Jun 2019 20:43:59 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 26 Jun 2019 20:44:01 -0700
 From:   Tina Zhang <tina.zhang@intel.com>
 To:     intel-gvt-dev@lists.freedesktop.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
@@ -27,51 +27,67 @@ Cc:     Tina Zhang <tina.zhang@intel.com>, kraxel@redhat.com,
         zhenyuw@linux.intel.com, zhiyuan.lv@intel.com,
         zhi.a.wang@intel.com, kevin.tian@intel.com, hang.yuan@intel.com,
         alex.williamson@redhat.com
-Subject: [RFC PATCH v3 0/4] Deliver vGPU display vblank event to userspace
-Date:   Thu, 27 Jun 2019 11:37:58 +0800
-Message-Id: <20190627033802.1663-1-tina.zhang@intel.com>
+Subject: [RFC PATCH v3 1/4] vfio: Define device specific irq type capability
+Date:   Thu, 27 Jun 2019 11:37:59 +0800
+Message-Id: <20190627033802.1663-2-tina.zhang@intel.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190627033802.1663-1-tina.zhang@intel.com>
+References: <20190627033802.1663-1-tina.zhang@intel.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series tries to send the vGPU display vblank event to user land.
+Cap the number of irqs with fixed indexes and use capability chains
+to chain device specific irqs.
 
-Instead of delivering page flip events, we choose to post display vblank
-event. Handling page flip events for both primary plane and cursor plane
-may make user space quite busy, although we have the mask/unmask mechansim
-for mitigation. Besides, there are some cases that guest app only uses
-one framebuffer for both drawing and display. In such case, guest OS won't
-do the plane page flip when the framebuffer is updated, thus the user
-land won't be notified about the updated framebuffer.
+Signed-off-by: Tina Zhang <tina.zhang@intel.com>
+---
+ include/uapi/linux/vfio.h | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-With vGPU's vblank event working as a timer, userspace still needs to
-query the framebuffer first, before getting a new dma-buf for it.
-
-v3:
-- Deliver display vblank event instead of page flip event. (Zhenyu)
-v2:
-- Use VFIO irq chain to get eventfds from userspace instead of adding
-a new ABI. (Alex)
-v1:
-- https://patchwork.kernel.org/cover/10962341/
-
-
-Tina Zhang (4):
-  vfio: Define device specific irq type capability
-  vfio: Introduce vGPU display irq type
-  drm/i915/gvt: Register vGPU display vblank irq
-  drm/i915/gvt: Deliver vGPU vblank event to userspace
-
- drivers/gpu/drm/i915/gvt/display.c   |  14 +-
- drivers/gpu/drm/i915/gvt/gvt.h       |   6 +
- drivers/gpu/drm/i915/gvt/hypercall.h |   1 +
- drivers/gpu/drm/i915/gvt/kvmgt.c     | 193 +++++++++++++++++++++++++--
- drivers/gpu/drm/i915/gvt/mpt.h       |  17 +++
- include/uapi/linux/vfio.h            |  22 ++-
- 6 files changed, 241 insertions(+), 12 deletions(-)
-
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 02bb7ad6e986..600784acc4ac 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -444,11 +444,27 @@ struct vfio_irq_info {
+ #define VFIO_IRQ_INFO_MASKABLE		(1 << 1)
+ #define VFIO_IRQ_INFO_AUTOMASKED	(1 << 2)
+ #define VFIO_IRQ_INFO_NORESIZE		(1 << 3)
++#define VFIO_IRQ_INFO_FLAG_CAPS		(1 << 4) /* Info supports caps */
+ 	__u32	index;		/* IRQ index */
++	__u32	cap_offset;	/* Offset within info struct of first cap */
+ 	__u32	count;		/* Number of IRQs within this index */
+ };
+ #define VFIO_DEVICE_GET_IRQ_INFO	_IO(VFIO_TYPE, VFIO_BASE + 9)
+ 
++/*
++ * The irq type capability allows irqs unique to a specific device or
++ * class of devices to be exposed.
++ *
++ * The structures below define version 1 of this capability.
++ */
++#define VFIO_IRQ_INFO_CAP_TYPE      3
++
++struct vfio_irq_info_cap_type {
++	struct vfio_info_cap_header header;
++	__u32 type;     /* global per bus driver */
++	__u32 subtype;  /* type specific */
++};
++
+ /**
+  * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct vfio_irq_set)
+  *
+@@ -550,7 +566,8 @@ enum {
+ 	VFIO_PCI_MSIX_IRQ_INDEX,
+ 	VFIO_PCI_ERR_IRQ_INDEX,
+ 	VFIO_PCI_REQ_IRQ_INDEX,
+-	VFIO_PCI_NUM_IRQS
++	VFIO_PCI_NUM_IRQS = 5	/* Fixed user ABI, IRQ indexes >=5 use   */
++				/* device specific cap to define content */
+ };
+ 
+ /*
 -- 
 2.17.1
 
