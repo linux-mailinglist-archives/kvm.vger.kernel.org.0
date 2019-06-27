@@ -2,66 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 00DCA57E09
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 10:17:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0296E57E12
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 10:17:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726429AbfF0IRA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jun 2019 04:17:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51762 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726382AbfF0IQ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jun 2019 04:16:59 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 85F7F81DFE;
-        Thu, 27 Jun 2019 08:16:55 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D00AC5D71D;
-        Thu, 27 Jun 2019 08:16:52 +0000 (UTC)
-Date:   Thu, 27 Jun 2019 10:16:50 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        lkft-triage@lists.linaro.org,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        karl.heubaum@oracle.com, andre.przywara@arm.com, cdall@kernel.org
-Subject: Re: Pre-required Kconfigs for kvm unit tests
-Message-ID: <20190627081650.frxivyrykze5mqdv@kamzik.brq.redhat.com>
-References: <CA+G9fYtVU2FoQ_cH71edFH-YfyFWZwi4s7tPxMW6aFG0pDEjPA@mail.gmail.com>
+        id S1726565AbfF0IRw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jun 2019 04:17:52 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:37466 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726487AbfF0IRs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 04:17:48 -0400
+Received: by mail-wm1-f65.google.com with SMTP id f17so4686093wme.2
+        for <kvm@vger.kernel.org>; Thu, 27 Jun 2019 01:17:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=RmjFFyBvDQn6Xfu0Q/BuVkvS+UCn+TuhSSD5OUjhRJI=;
+        b=EO3CbAlQVnGRegZI22j9ujthi9ZBm0hOoVxPWLx9ZIIuaKXftwbtXqvV7YdVHDnTX8
+         MCkR1qUF5OAxe2F3y8Rgh+biGldQcRnW9RdPC1ukxWzVSFfzsAqXMxwI57wHy2cqt3dU
+         FUKbRyPfYlUstZI8rjRcFFN9zGQG0QKuVVnhmbwlPs97ICa7X5sud6dXkG8/DPrDJIcp
+         W5OsDdrLGFVIohlXg3PH79x4jka/GiS8gyVAKIOUDjbNbqtaHaVSVfmusn4PvKcrXpPN
+         BUnABZQMrnEhdIfpZp5IrwuXB4+5f533NTP//rFDxjCdfyrpfYMbsur65UYaMu+Kwh+f
+         feCw==
+X-Gm-Message-State: APjAAAWZwgUWGCF2xggxNGXvtbK6ZO578jcpb2rRW+TlFNYGWIHfMbsF
+        zVax1tFeGaNOifsHQREI+MQTSw==
+X-Google-Smtp-Source: APXvYqz3R18OS3WEjLZ+sqKqP/ULCckrvtGOJ16Yd4BZO4NaYsCWsUcLjTip7leqUVtkXS2VltM4KA==
+X-Received: by 2002:a7b:c3d5:: with SMTP id t21mr2010355wmj.87.1561623466915;
+        Thu, 27 Jun 2019 01:17:46 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:41bc:c7e6:75c9:c69f? ([2001:b07:6468:f312:41bc:c7e6:75c9:c69f])
+        by smtp.gmail.com with ESMTPSA id i25sm1753308wrc.91.2019.06.27.01.17.45
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 27 Jun 2019 01:17:46 -0700 (PDT)
+Subject: Re: [PATCH 0/2] scsi: add support for request batching
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        jejb@linux.ibm.com, linux-scsi@vger.kernel.org, stefanha@redhat.com
+References: <20190530112811.3066-1-pbonzini@redhat.com>
+ <746ad64a-4047-1597-a0d4-f14f3529cc19@redhat.com>
+ <yq1lfxnk8ar.fsf@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <48c7d581-6ec8-260a-b4ba-217aef516305@redhat.com>
+Date:   Thu, 27 Jun 2019 10:17:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+G9fYtVU2FoQ_cH71edFH-YfyFWZwi4s7tPxMW6aFG0pDEjPA@mail.gmail.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Thu, 27 Jun 2019 08:16:59 +0000 (UTC)
+In-Reply-To: <yq1lfxnk8ar.fsf@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 27, 2019 at 12:45:18PM +0530, Naresh Kamboju wrote:
-> Hi,
-> 
-> We (kernel validation team) at Linaro running KVM unit tests [1] on arm64
-> and x86_64 architectures. Please share the Kernel configs fragments required
-> for better testing coverage.
-> Thank you.
-> 
-> [1] https://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
->
+On 27/06/19 05:37, Martin K. Petersen wrote:
+>> Ping?  Are there any more objections?
+> It's a core change so we'll need some more reviews. I suggest you
+> resubmit.
 
-For arm64 if you're testing on a host with a latest kernel installed,
-which of course has KVM enabled, and all the kvm-unit-tests test are
-passing (except for the GIC tests that are not appropriate for your
-host, which will be skipped), then you're getting all the coverage
-those tests provide.
+Resubmit exactly the same patches?
 
-I'm not sure about x86_64, but I imagine a similar statement to what
-I said for arm64 applies. If you don't get all passes, then you can
-check your host's config to see if there are KVM* symbols disabled
-that look relevant.
-
-drew
+Paolo
