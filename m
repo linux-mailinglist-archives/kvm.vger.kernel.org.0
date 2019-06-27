@@ -2,102 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 001B1589BE
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 20:20:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCBC458A15
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 20:36:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726786AbfF0ST6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jun 2019 14:19:58 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:37066 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726774AbfF0ST6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jun 2019 14:19:58 -0400
-Received: by mail-pl1-f195.google.com with SMTP id bh12so1726096plb.4
-        for <kvm@vger.kernel.org>; Thu, 27 Jun 2019 11:19:57 -0700 (PDT)
+        id S1726563AbfF0Sg5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jun 2019 14:36:57 -0400
+Received: from mail-vs1-f73.google.com ([209.85.217.73]:53969 "EHLO
+        mail-vs1-f73.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726384AbfF0Sg5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 14:36:57 -0400
+Received: by mail-vs1-f73.google.com with SMTP id b23so1040154vsl.20
+        for <kvm@vger.kernel.org>; Thu, 27 Jun 2019 11:36:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=7KJ/0lAbZ/7y/XSZllCDvs93clOM3RgHbDtSd5VENeM=;
-        b=LHOlBNSb+PZMNsESPkQ6LUjryGRHflCwWaYjNNJmU8heJUHffKa2OvRD6HcAT2eQOJ
-         XXFBEYtxNG3Lz/9WXxUB6Ifb3SZowwGMe+e0XC+QOhk/O02HLQ7mFK/GgVagyGsAPRet
-         JNC7ulyDMoACxSvv2/KAcui07yuYPe9lcczFfx/J1TbQmfauIMl4Od+kAZVUDQm8oIzR
-         MZkQW3Z84QT67GY6ehmfxB5n6yb4za5ZAT2Nym5GF8QsgkovzlfhRaZ8YdDrjSMOKmOW
-         7JXoIKW05bXwHnrNFZSgXM56UaCgF9TgKDYfeOB2ybyzUrCd2/E/Qf9Wj/hJEGiNB71h
-         j9yA==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=uSmJJmNgOKMeUBo8e/RmP5gdCOAkqrM+tp6lYtgcfRA=;
+        b=BMJ/RW0y5XM8Z1KyNi9ofcOGbxX7E1myXdVhf1cnnvCqqodqZ/4Ve59eEeFldg1ESK
+         wbjmw+DYCwv2gdl5ESrU0M3jfwfih6HIBe7fxm9MpF8NsJFQ8rboU39ZiUyfVbdtFAfp
+         v6L14/uJvduXiBELpV65W7bJTvKCOl7yOfxrIrn53BCycHmyKXLCX0odJOKxwS/WOPcW
+         88T9pTDSCq0msehb/QiiOMjaPYP5nV43KrgDPETWtuqc48v7idoLlMtCDAblXkvsC/Vb
+         acEHKz64405Wx3sPRyrmYDDqKQODaCJn8t1PRmFb8OztYBfRvl5dMpRgWZHf3uFArDEl
+         BKmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=7KJ/0lAbZ/7y/XSZllCDvs93clOM3RgHbDtSd5VENeM=;
-        b=g7IfRCeBWFbgQImQGuLdFuAexOnTwGH/K8NzNddLQCGC6QQWprJqfi8u41wD2DXqTP
-         O3xpqWlT+oXkNmjeqMNMqNNo9HTzG1N3KkLM8yU0VCZY7v9KW4ftO4OhgHkK/2/ibGEb
-         DRNcUhxErMSFPDaeVzJD1+gr8lcai7lwL5Z052d99IUPNmRBMsc71MJEZDjetVW/k2R/
-         w/MXQwHifjGbteKACacxUVPyaEm/u4mpZ5SaoCyTz+ukpK1t/+zqTSdscWRo4FJ87Zxi
-         2hE7sfaS7CHB1VSfm3YDz++HU3gbrjcwEZsPLphvxxaWX5leJ4WcVHFoZgvw8d6DV4fe
-         yK1Q==
-X-Gm-Message-State: APjAAAWym8uENeU/ew8apihLG7OBWjLkg21niQcSKKpyrP4Kvj+tnG0A
-        5b9yIFu6BcTzYcmg5XiqeZkCfxJd/40=
-X-Google-Smtp-Source: APXvYqwOIPnDo34jDaJw2pO/dR2yO0/0zXZJEYMGwMdzDbg2z3l89kguGJIqjeve2SdE00UrphXNDA==
-X-Received: by 2002:a17:902:3341:: with SMTP id a59mr6122118plc.186.1561659597223;
-        Thu, 27 Jun 2019 11:19:57 -0700 (PDT)
-Received: from [10.33.114.148] ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id f10sm3761474pfd.151.2019.06.27.11.19.56
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 27 Jun 2019 11:19:56 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [kvm-unit-tests PATCH] x86: Mark APR as reserved in x2APIC
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <367500e0-c8f8-f7ca-7f07-5424a05eea80@oracle.com>
-Date:   Thu, 27 Jun 2019 11:19:50 -0700
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Marc Orr <marcorr@google.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <BABD010E-DF8D-46F1-B279-4357690261A3@gmail.com>
-References: <20190625120627.8705-1-nadav.amit@gmail.com>
- <367500e0-c8f8-f7ca-7f07-5424a05eea80@oracle.com>
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=uSmJJmNgOKMeUBo8e/RmP5gdCOAkqrM+tp6lYtgcfRA=;
+        b=r5v+a7LAs3xPsGKgitwjS0BoP1G+D5cAKlhXmllBCb5BegzEr+LoAonw6aoPAOyuxq
+         UI0Dp9QVCFdirJWZvEVNFOdXYy+vs9ld5zA64smpGMzrPem69q2Hvx/5noZqKCBQgM1z
+         akDgNcncML/O71YXvJ4gzXaItTd4BHbWKhNG94AJEfhObIT8nLM67qH4Rby6vd0CTl+u
+         vboZdBPnNHOumOUpm8rYBkNCinfwV+NtlShlfgLOQk+LWI7m0xGTJqyF0JcVJeROsMeb
+         rZmff/c5uM2awAuCbrLIYd6zgpVBBL2N8tq3ieB15yF6rOserP0RRNGT2MdKSwjkb16c
+         qmeg==
+X-Gm-Message-State: APjAAAVf2BOqRzR/ghEElGSg7jT22cbVwnjSlXtai7aQ/5FFqTfDbckk
+        9vnmZ07qYbToOYfO139T2t2xirlc2RvqjHXT5vk+i0aYXhx6mBeJxfDbkimGwFjWPU1fsVrjLNO
+        ecPSn3Ep3rGe/fWZ8+AA4lGBaux6TlS84mFFKuW5nl7+JlbyqYCuP+GhOP8DoZFo=
+X-Google-Smtp-Source: APXvYqyVcdJ27CjdqEZzUSD43I0HtxjtTbGBCTJuI2jcF74KVTtdCQgRJwoBHjk3dilVaQQzD+0rRNKvTnWaxg==
+X-Received: by 2002:a1f:8ad0:: with SMTP id m199mr2097373vkd.80.1561660615992;
+ Thu, 27 Jun 2019 11:36:55 -0700 (PDT)
+Date:   Thu, 27 Jun 2019 11:36:51 -0700
+Message-Id: <20190627183651.130922-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.22.0.410.gd8fdbe21b5-goog
+Subject: [PATCH] kvm: x86: Pass through AMD_STIBP_ALWAYS_ON in GET_SUPPORTED_CPUID
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Jun 26, 2019, at 3:32 PM, Krish Sadhukhan =
-<krish.sadhukhan@oracle.com> wrote:
->=20
->=20
-> On 6/25/19 5:06 AM, Nadav Amit wrote:
->> Cc: Marc Orr <marcorr@google.com>
->> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
->> ---
->>  lib/x86/apic.h | 1 +
->>  1 file changed, 1 insertion(+)
->>=20
->> diff --git a/lib/x86/apic.h b/lib/x86/apic.h
->> index 537fdfb..b5bf208 100644
->> --- a/lib/x86/apic.h
->> +++ b/lib/x86/apic.h
->> @@ -75,6 +75,7 @@ static inline bool x2apic_reg_reserved(u32 reg)
->>  	switch (reg) {
->>  	case 0x000 ... 0x010:
->>  	case 0x040 ... 0x070:
->> +	case 0x090:
->>  	case 0x0c0:
->>  	case 0x0e0:
->>  	case 0x290 ... 0x2e0:
->=20
->=20
->  0x02f0 which is also reserved, is missing from the above list.
+This bit is purely advisory. Passing it through to the guest indicates
+that the virtual processor, like the physical processor, prefers that
+STIBP is only set once during boot and not changed.
 
-I tried adding it, and I get on bare-metal:
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ arch/x86/kvm/cpuid.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  FAIL: x2apic - reading 0x2f0: x2APIC op triggered GP.
-
-And actually, the SDM table 10-6 =E2=80=9CLocal APIC Register Address =
-Map Supported
-by x2APIC=E2=80=9D also shows this register (LVT CMCI) as =
-"Read/write=E2=80=9D. So I don=E2=80=99t
-know why you say it is reserved.
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 4992e7c99588..e52f0b20d2f0 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -377,7 +377,7 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
+ 	/* cpuid 0x80000008.ebx */
+ 	const u32 kvm_cpuid_8000_0008_ebx_x86_features =
+ 		F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSBD) |
+-		F(AMD_SSB_NO) | F(AMD_STIBP);
++		F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON);
+ 
+ 	/* cpuid 0xC0000001.edx */
+ 	const u32 kvm_cpuid_C000_0001_edx_x86_features =
+-- 
+2.22.0.410.gd8fdbe21b5-goog
 
