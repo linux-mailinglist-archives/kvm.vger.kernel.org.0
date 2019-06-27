@@ -2,104 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 756FA57E75
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 10:44:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E34957E7B
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 10:49:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726431AbfF0IoT convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 27 Jun 2019 04:44:19 -0400
-Received: from mga09.intel.com ([134.134.136.24]:17919 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725385AbfF0IoT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jun 2019 04:44:19 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Jun 2019 01:44:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,423,1557212400"; 
-   d="scan'208";a="185197942"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
-  by fmsmga004.fm.intel.com with ESMTP; 27 Jun 2019 01:44:18 -0700
-Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 27 Jun 2019 01:44:18 -0700
-Received: from shsmsx101.ccr.corp.intel.com ([169.254.1.87]) by
- SHSMSX106.ccr.corp.intel.com ([169.254.10.89]) with mapi id 14.03.0439.000;
- Thu, 27 Jun 2019 16:44:16 +0800
-From:   "Zhang, Tina" <tina.zhang@intel.com>
-To:     Gerd Hoffmann <kraxel@redhat.com>
-CC:     "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yuan, Hang" <hang.yuan@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-Subject: RE: [RFC PATCH v3 0/4] Deliver vGPU display vblank event to
- userspace
-Thread-Topic: [RFC PATCH v3 0/4] Deliver vGPU display vblank event to
- userspace
-Thread-Index: AQHVLJqUUSM/9sKZ/UyimYY5z7yeLaaughWAgACsmuA=
-Date:   Thu, 27 Jun 2019 08:44:15 +0000
-Message-ID: <237F54289DF84E4997F34151298ABEBC876835E5@SHSMSX101.ccr.corp.intel.com>
-References: <20190627033802.1663-1-tina.zhang@intel.com>
- <20190627062231.57tywityo6uyhmyd@sirius.home.kraxel.org>
-In-Reply-To: <20190627062231.57tywityo6uyhmyd@sirius.home.kraxel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiOGRkMjk1OGYtYWY4My00ODBkLWFlNTMtYjZhZjIwM2Y5NTVlIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiSjliTHc4bVZ4QTlUZWp0ZVwvd1dydjhaTW42UVZqWmt3bFVEVWVSRU1ZelJxXC9YWXB1Ymw0T3Y5XC82S2hOZ0QrSyJ9
-x-ctpclassification: CTP_NT
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1726425AbfF0ItR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jun 2019 04:49:17 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43228 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725385AbfF0ItR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 04:49:17 -0400
+Received: by mail-wr1-f65.google.com with SMTP id p13so1524478wru.10
+        for <kvm@vger.kernel.org>; Thu, 27 Jun 2019 01:49:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=aweQbVBefN+UFMcwTZu0tWlyLGn7KoCwWsCPZKw0Gj4=;
+        b=ky+Cy1hTPtJTB14SgdK1Nt7DiHHd/QImuviGYn1Ew4XAoow/VtiBqzTElcLFFYVqS9
+         ogPUfFAoa5lt+FW0EdaCMrRlU+LNjHkhAK4Bz/adTPGW8YfFoaEdKTTewLksIC8gwMXo
+         afpG0eqOgoPp5cfMycIAV29qmLcpf+yszvUuw3U5w1cyDnQdh1eyx7gZadJYbHyjDfra
+         nnugYi0Y+fFH9Su63cH8jztSqQNieXj7rjnjKxC5nnLtacS2EPyqmHI94rl/XXCihe3B
+         DIqexIP9LfcVvdLdXv/Jl2ikJklj3Kfx0MC4Hnys5uiemwwE758MqcXsCny/r2oHFhbn
+         pDBw==
+X-Gm-Message-State: APjAAAUmv4G/L+9Rx810RNXS41FM5pHcD4OV0GT+Oj3/Ha7hz+TlFtEs
+        bKc5dWy0Y0xq4rVbT5T5kOjOtA==
+X-Google-Smtp-Source: APXvYqwI3WkrkC4bFyrFtLsBLqBOYVkMeSComD2UhbzClVCfvtfgNjQdVY32oANQOAKYi/OcHBQdvw==
+X-Received: by 2002:a5d:43d0:: with SMTP id v16mr2110270wrr.252.1561625355456;
+        Thu, 27 Jun 2019 01:49:15 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:41bc:c7e6:75c9:c69f? ([2001:b07:6468:f312:41bc:c7e6:75c9:c69f])
+        by smtp.gmail.com with ESMTPSA id p4sm1778473wrx.97.2019.06.27.01.49.14
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 27 Jun 2019 01:49:14 -0700 (PDT)
+Subject: Re: Pre-required Kconfigs for kvm unit tests
+To:     Andrew Jones <drjones@redhat.com>,
+        Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc:     kvm list <kvm@vger.kernel.org>, lkft-triage@lists.linaro.org,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        karl.heubaum@oracle.com, andre.przywara@arm.com, cdall@kernel.org
+References: <CA+G9fYtVU2FoQ_cH71edFH-YfyFWZwi4s7tPxMW6aFG0pDEjPA@mail.gmail.com>
+ <20190627081650.frxivyrykze5mqdv@kamzik.brq.redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e10ac8cc-9bf6-b07d-00d9-83d9cc0f4b98@redhat.com>
+Date:   Thu, 27 Jun 2019 10:49:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
+In-Reply-To: <20190627081650.frxivyrykze5mqdv@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: Gerd Hoffmann [mailto:kraxel@redhat.com]
-> Sent: Thursday, June 27, 2019 2:23 PM
-> To: Zhang, Tina <tina.zhang@intel.com>
-> Cc: intel-gvt-dev@lists.freedesktop.org; kvm@vger.kernel.org; linux-
-> kernel@vger.kernel.org; zhenyuw@linux.intel.com; Lv, Zhiyuan
-> <zhiyuan.lv@intel.com>; Wang, Zhi A <zhi.a.wang@intel.com>; Tian, Kevin
-> <kevin.tian@intel.com>; Yuan, Hang <hang.yuan@intel.com>;
-> alex.williamson@redhat.com
-> Subject: Re: [RFC PATCH v3 0/4] Deliver vGPU display vblank event to
-> userspace
+On 27/06/19 10:16, Andrew Jones wrote:
+> On Thu, Jun 27, 2019 at 12:45:18PM +0530, Naresh Kamboju wrote:
+>> Hi,
+>>
+>> We (kernel validation team) at Linaro running KVM unit tests [1] on arm64
+>> and x86_64 architectures. Please share the Kernel configs fragments required
+>> for better testing coverage.
+>> Thank you.
+>>
+>> [1] https://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
+>>
+> For arm64 if you're testing on a host with a latest kernel installed,
+> which of course has KVM enabled, and all the kvm-unit-tests test are
+> passing (except for the GIC tests that are not appropriate for your
+> host, which will be skipped), then you're getting all the coverage
+> those tests provide.
 > 
->   Hi,
-> 
-> > Instead of delivering page flip events, we choose to post display
-> > vblank event. Handling page flip events for both primary plane and
-> > cursor plane may make user space quite busy, although we have the
-> > mask/unmask mechansim for mitigation. Besides, there are some cases
-> > that guest app only uses one framebuffer for both drawing and display.
-> > In such case, guest OS won't do the plane page flip when the
-> > framebuffer is updated, thus the user land won't be notified about the
-> updated framebuffer.
-> 
-> What happens when the guest is idle and doesn't draw anything to the
-> framebuffer?
-The vblank event will be delivered to userspace as well, unless guest OS disable the pipe.
-Does it make sense to vfio/display?
-Thanks.
+> I'm not sure about x86_64, but I imagine a similar statement to what
+> I said for arm64 applies. If you don't get all passes, then you can
+> check your host's config to see if there are KVM* symbols disabled
+> that look relevant.
 
-BR,
-Tina
-> 
-> cheers,
->   Gerd
+For x86 there's just CONFIG_KVM_INTEL and CONFIG_KVM_AMD.
 
+Paolo
