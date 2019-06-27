@@ -2,65 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0296E57E12
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 10:17:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EE60E57E1F
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 10:19:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726565AbfF0IRw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jun 2019 04:17:52 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:37466 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726487AbfF0IRs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jun 2019 04:17:48 -0400
-Received: by mail-wm1-f65.google.com with SMTP id f17so4686093wme.2
-        for <kvm@vger.kernel.org>; Thu, 27 Jun 2019 01:17:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=RmjFFyBvDQn6Xfu0Q/BuVkvS+UCn+TuhSSD5OUjhRJI=;
-        b=EO3CbAlQVnGRegZI22j9ujthi9ZBm0hOoVxPWLx9ZIIuaKXftwbtXqvV7YdVHDnTX8
-         MCkR1qUF5OAxe2F3y8Rgh+biGldQcRnW9RdPC1ukxWzVSFfzsAqXMxwI57wHy2cqt3dU
-         FUKbRyPfYlUstZI8rjRcFFN9zGQG0QKuVVnhmbwlPs97ICa7X5sud6dXkG8/DPrDJIcp
-         W5OsDdrLGFVIohlXg3PH79x4jka/GiS8gyVAKIOUDjbNbqtaHaVSVfmusn4PvKcrXpPN
-         BUnABZQMrnEhdIfpZp5IrwuXB4+5f533NTP//rFDxjCdfyrpfYMbsur65UYaMu+Kwh+f
-         feCw==
-X-Gm-Message-State: APjAAAWZwgUWGCF2xggxNGXvtbK6ZO578jcpb2rRW+TlFNYGWIHfMbsF
-        zVax1tFeGaNOifsHQREI+MQTSw==
-X-Google-Smtp-Source: APXvYqz3R18OS3WEjLZ+sqKqP/ULCckrvtGOJ16Yd4BZO4NaYsCWsUcLjTip7leqUVtkXS2VltM4KA==
-X-Received: by 2002:a7b:c3d5:: with SMTP id t21mr2010355wmj.87.1561623466915;
-        Thu, 27 Jun 2019 01:17:46 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:41bc:c7e6:75c9:c69f? ([2001:b07:6468:f312:41bc:c7e6:75c9:c69f])
-        by smtp.gmail.com with ESMTPSA id i25sm1753308wrc.91.2019.06.27.01.17.45
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 27 Jun 2019 01:17:46 -0700 (PDT)
-Subject: Re: [PATCH 0/2] scsi: add support for request batching
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        jejb@linux.ibm.com, linux-scsi@vger.kernel.org, stefanha@redhat.com
-References: <20190530112811.3066-1-pbonzini@redhat.com>
- <746ad64a-4047-1597-a0d4-f14f3529cc19@redhat.com>
- <yq1lfxnk8ar.fsf@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <48c7d581-6ec8-260a-b4ba-217aef516305@redhat.com>
-Date:   Thu, 27 Jun 2019 10:17:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1726599AbfF0ITU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jun 2019 04:19:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43624 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726370AbfF0ITU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 04:19:20 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 17B5130C1AFC;
+        Thu, 27 Jun 2019 08:19:20 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BC41960856;
+        Thu, 27 Jun 2019 08:19:16 +0000 (UTC)
+Date:   Thu, 27 Jun 2019 10:19:14 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kwankhede@nvidia.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] mdev: Send uevents around parent device registration
+Message-ID: <20190627101914.32829440.cohuck@redhat.com>
+In-Reply-To: <156155924767.11505.11457229921502145577.stgit@gimli.home>
+References: <156155924767.11505.11457229921502145577.stgit@gimli.home>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <yq1lfxnk8ar.fsf@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Thu, 27 Jun 2019 08:19:20 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/06/19 05:37, Martin K. Petersen wrote:
->> Ping?  Are there any more objections?
-> It's a core change so we'll need some more reviews. I suggest you
-> resubmit.
+On Wed, 26 Jun 2019 08:27:58 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-Resubmit exactly the same patches?
+> This allows udev to trigger rules when a parent device is registered
+> or unregistered from mdev.
+> 
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  drivers/vfio/mdev/mdev_core.c |   10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+> index ae23151442cb..ecec2a3b13cb 100644
+> --- a/drivers/vfio/mdev/mdev_core.c
+> +++ b/drivers/vfio/mdev/mdev_core.c
+> @@ -146,6 +146,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+>  {
+>  	int ret;
+>  	struct mdev_parent *parent;
+> +	char *env_string = "MDEV_STATE=registered";
 
-Paolo
+This string is probably reasonable enough.
+
+> +	char *envp[] = { env_string, NULL };
+>  
+>  	/* check for mandatory ops */
+>  	if (!ops || !ops->create || !ops->remove || !ops->supported_type_groups)
+> @@ -196,7 +198,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+>  	list_add(&parent->next, &parent_list);
+>  	mutex_unlock(&parent_list_lock);
+>  
+> -	dev_info(dev, "MDEV: Registered\n");
+> +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+
+I also agree with the positioning here.
+
+> +
+>  	return 0;
+>  
+>  add_dev_err:
+> @@ -220,6 +223,8 @@ EXPORT_SYMBOL(mdev_register_device);
+>  void mdev_unregister_device(struct device *dev)
+>  {
+>  	struct mdev_parent *parent;
+> +	char *env_string = "MDEV_STATE=unregistered";
+
+Ok.
+
+> +	char *envp[] = { env_string, NULL };
+>  
+>  	mutex_lock(&parent_list_lock);
+>  	parent = __find_parent_device(dev);
+> @@ -228,7 +233,6 @@ void mdev_unregister_device(struct device *dev)
+>  		mutex_unlock(&parent_list_lock);
+>  		return;
+>  	}
+> -	dev_info(dev, "MDEV: Unregistering\n");
+>  
+>  	list_del(&parent->next);
+>  	mutex_unlock(&parent_list_lock);
+> @@ -243,6 +247,8 @@ void mdev_unregister_device(struct device *dev)
+>  	up_write(&parent->unreg_sem);
+>  
+>  	mdev_put_parent(parent);
+> +
+> +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+
+I'm wondering whether we should indicate this uevent earlier: Once we
+have detached from the parent list, we're basically done for all
+practical purposes. So maybe move this right before we grab the
+unreg_sem?
+
+>  }
+>  EXPORT_SYMBOL(mdev_unregister_device);
+>  
+> 
+
