@@ -2,181 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1095E586C9
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 18:14:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73021587CD
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 18:58:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726590AbfF0QOR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jun 2019 12:14:17 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42024 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726487AbfF0QOQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jun 2019 12:14:16 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5RGDW2i056242;
-        Thu, 27 Jun 2019 12:13:40 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2td0jh9qnc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jun 2019 12:13:38 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x5RGA16K015831;
-        Thu, 27 Jun 2019 16:13:03 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma01wdc.us.ibm.com with ESMTP id 2t9by77fs0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jun 2019 16:13:03 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5RGD3LQ13173718
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Jun 2019 16:13:03 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0599D112069;
-        Thu, 27 Jun 2019 16:13:03 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B730D112064;
-        Thu, 27 Jun 2019 16:13:02 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.60.84.198])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 27 Jun 2019 16:13:02 +0000 (GMT)
-Subject: Re: mdevctl: A shoestring mediated device management and persistence
- utility
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Libvirt Devel <libvir-list@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Erik Skultety <eskultet@redhat.com>,
-        Pavel Hrdina <phrdina@redhat.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Sylvain Bauza <sbauza@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-References: <20190523172001.41f386d8@x1.home>
- <20190625165251.609f6266@x1.home> <20190626115806.3435c45c.cohuck@redhat.com>
- <20190626083720.42a2b5d4@x1.home> <20190626195350.2e9c81d3@x1.home>
- <20190627142626.415138da.cohuck@redhat.com>
- <06114b39-69c2-3fa0-d0b3-aa96a44ae2ce@linux.ibm.com>
- <20190627093832.064a346f@x1.home>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Openpgp: preference=signencrypt
-Message-ID: <6fc477e0-c9ff-321b-e2dd-f0cc4b701b13@linux.ibm.com>
-Date:   Thu, 27 Jun 2019 12:13:02 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726514AbfF0Q6L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jun 2019 12:58:11 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:47996 "EHLO
+        smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726425AbfF0Q6L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 12:58:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1561654689; x=1593190689;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=bSTBBNAfMQJYKBrNLp5ZpVMPDUXmFDWBqbuxlfFG2gs=;
+  b=Hcr8R3+KsshbrbQ7j6oFF2hP/NbVINCSk1UkppWL1UDjNn2djBIcNgu2
+   9MaHTxuYzlJneiH/CuO7fbk7pH19NLo8M5yF/elojtm9+XIUEvExNh00w
+   nHZt2TgFx2pvsM55k/KiJ/ZAl9i4ihF1Y0a/zsGHlT4If05q+odZwVzia
+   A=;
+X-IronPort-AV: E=Sophos;i="5.62,424,1554768000"; 
+   d="scan'208";a="772347404"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1a-821c648d.us-east-1.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP; 27 Jun 2019 16:58:08 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan3.iad.amazon.com [10.40.159.166])
+        by email-inbound-relay-1a-821c648d.us-east-1.amazon.com (Postfix) with ESMTPS id C5C98A2075;
+        Thu, 27 Jun 2019 16:58:03 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 27 Jun 2019 16:58:03 +0000
+Received: from 38f9d3867b82.ant.amazon.com (10.43.162.128) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Thu, 27 Jun 2019 16:57:58 +0000
+Subject: Re: [PATCH v3 4/5] Added build and install scripts
+To:     Sam Caccavale <samcacc@amazon.de>
+CC:     <samcaccavale@gmail.com>, <nmanthey@amazon.de>,
+        <wipawel@amazon.de>, <dwmw@amazon.co.uk>, <mpohlack@amazon.de>,
+        <karahmed@amazon.de>, <andrew.cooper3@citrix.com>,
+        <JBeulich@suse.com>, <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
+        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <hpa@zytor.com>, <paullangton4@gmail.com>,
+        <anirudhkaushik@google.com>, <x86@kernel.org>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20190624142414.22096-1-samcacc@amazon.de>
+ <20190624142414.22096-5-samcacc@amazon.de>
+From:   Alexander Graf <graf@amazon.com>
+Message-ID: <e0b29f4d-7471-c5d8-c9d4-2a352831a4bd@amazon.com>
+Date:   Thu, 27 Jun 2019 18:57:57 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190627093832.064a346f@x1.home>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190624142414.22096-5-samcacc@amazon.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-27_10:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906270185
+X-Originating-IP: [10.43.162.128]
+X-ClientProxiedBy: EX13D01UWA003.ant.amazon.com (10.43.160.107) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/27/19 11:38 AM, Alex Williamson wrote:
-> On Thu, 27 Jun 2019 11:00:31 -0400
-> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-> 
->> On 6/27/19 8:26 AM, Cornelia Huck wrote:
->>> On Wed, 26 Jun 2019 19:53:50 -0600
->>> Alex Williamson <alex.williamson@redhat.com> wrote:
->>>   
->>>> On Wed, 26 Jun 2019 08:37:20 -0600
->>>> Alex Williamson <alex.williamson@redhat.com> wrote:
->>>>  
->>>>> On Wed, 26 Jun 2019 11:58:06 +0200
->>>>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>>>     
->>>>>> On Tue, 25 Jun 2019 16:52:51 -0600
->>>>>> Alex Williamson <alex.williamson@redhat.com> wrote:
->>>>>>       
->>>>>>> Hi,
->>>>>>>
->>>>>>> Based on the discussions we've had, I've rewritten the bulk of
->>>>>>> mdevctl.  I think it largely does everything we want now, modulo
->>>>>>> devices that will need some sort of 1:N values per key for
->>>>>>> configuration in the config file versus the 1:1 key:value setup we
->>>>>>> currently have (so don't consider the format final just yet).        
->>>>>>
->>>>>> We might want to factor out that config format handling while we're
->>>>>> trying to finalize it.
->>>>>>
->>>>>> cc:ing Matt for his awareness. I'm currently not quite sure how to
->>>>>> handle those vfio-ap "write several values to an attribute one at a
->>>>>> time" requirements. Maybe 1:N key:value is the way to go; maybe we
->>>>>> need/want JSON or something like that.      
->>>>>
->>>>> Maybe we should just do JSON for future flexibility.  I assume there
->>>>> are lots of helpers that should make it easy even from a bash script.
->>>>> I'll look at that next.    
->>>>
->>>> Done.  Throw away any old mdev config files, we use JSON now.   
->>>
->>> The code changes look quite straightforward, thanks.
->>>   
->>>> The per
->>>> mdev config now looks like this:
->>>>
->>>> {
->>>>   "mdev_type": "i915-GVTg_V4_8",
->>>>   "start": "auto"
->>>> }
->>>>
->>>> My expectation, and what I've already pre-enabled support in set_key
->>>> and get_key functions, is that we'd use arrays for values, so we might
->>>> have:
->>>>
->>>>   "new_key": ["value1", "value2"]
->>>>
->>>> set_key will automatically convert a comma separated list of values
->>>> into such an array, so I'm thinking this would be specified by the user
->>>> as:
->>>>
->>>> # mdevctl modify -u UUID --key=new_key --value=value1,value2  
->>>
->>> Looks sensible.
->>>
->>> For vfio-ap, we'd probably end up with something like the following:
->>>
->>> {
->>>   "mdev_type": "vfio_ap-passthrough",
->>>   "start": "auto",
->>>   "assign_adapter": ["5", "6"],
->>>   "assign_domain": ["4", "0xab"]
->>> }
->>>
->>> (following the Guest1 example in the kernel documentation)
->>>
->>> <As an aside, what should happen if e.g "assign_adapter" is set to
->>> ["6", "7"]? Remove 5, add 7? Remove all values, then set the new ones?  
->>
->> IMO remove 5, add 7 would make the most sense.  I'm not sure that doing
->> an unassign of all adapters (effectively removing all APQNs) followed by
->> an assign of the new ones would work nicely with Tony's vfio-ap dynamic
->> configuration patches.
-> 
-> Are we conflating operating on the config file versus operating on the
-> device?  I was thinking that setting a new key value replaces the
-> existing key, because anything else adds unnecessary complication to
-> the code and command line.  So in the above example, if the user
-> specified:
-> 
->   mdevctl modify -u UUID --key=assign_adapter --value=6,7
-> 
-> The new value is simply ["6", "7"].  This would take effect the next
-> time the device is started.  We haven't yet considered how to change
-> running devices, but I think the semantics we have since the respin of
-> mdevctl separate saved config vs running devices in order to generalize
-> the support of transient devices.
 
-Yeah, my comment was aimed specifically at changes to a running device.
- When considering only the config file I agree: the new key value can
-just replace the existing key value.
+
+On 24.06.19 16:24, Sam Caccavale wrote:
+> install_afl.sh installs AFL locally and emits AFLPATH,
+> build.sh, and run.sh build and run respectively
+> 
+> ---
+> 
+> v1 -> v2:
+>   - Introduced this patch
+> 
+> v2 -> v3:
+>   - Moved non-essential development scripts to a later patch
+> 
+> Signed-off-by: Sam Caccavale <samcacc@amazon.de>
+> ---
+>   tools/fuzz/x86ie/scripts/afl-many       | 31 +++++++++++++++++++++++
+>   tools/fuzz/x86ie/scripts/build.sh       | 33 +++++++++++++++++++++++++
+>   tools/fuzz/x86ie/scripts/install_afl.sh | 17 +++++++++++++
+>   tools/fuzz/x86ie/scripts/run.sh         | 10 ++++++++
+>   4 files changed, 91 insertions(+)
+>   create mode 100755 tools/fuzz/x86ie/scripts/afl-many
+>   create mode 100755 tools/fuzz/x86ie/scripts/build.sh
+>   create mode 100755 tools/fuzz/x86ie/scripts/install_afl.sh
+>   create mode 100755 tools/fuzz/x86ie/scripts/run.sh
+> 
+> diff --git a/tools/fuzz/x86ie/scripts/afl-many b/tools/fuzz/x86ie/scripts/afl-many
+> new file mode 100755
+> index 000000000000..e55ff115a777
+> --- /dev/null
+> +++ b/tools/fuzz/x86ie/scripts/afl-many
+> @@ -0,0 +1,31 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0+
+> +# This is for running AFL over NPROC or `nproc` cores with normal AFL options ex:
+> +# ulimit -Sv $[21999999999 << 10]; ./tools/fuzz/x86ie/scripts/afl-many -m 22000000000 -i $FUZZDIR/in -o $FUZZDIR/out tools/fuzz/x86ie/afl-harness @@
+> +
+> +export AFL_NO_AFFINITY=1
+> +
+> +while [ -z "$sync_dir" ]; do
+> +  while getopts ":o:" opt; do
+> +    case "${opt}" in
+> +      o)
+> +        sync_dir="${OPTARG}"
+> +        ;;
+> +      *)
+> +        ;;
+> +    esac
+> +  done
+> +  ((OPTIND++))
+> +  [ $OPTIND -gt $# ] && break
+> +done
+> +
+> +# AFL/linux do some weird stuff with core affinity and will often run
+> +# N processes over < N virtual cores.  In order to avoid that, we taskset
+> +# each process to its own core.
+> +for i in $(seq 1 $(( ${NPROC:-$(nproc)} - 1)) ); do
+> +    taskset -c "$i" ./afl-fuzz -S "slave$i" $@ >/dev/null 2>&1 &
+> +done
+> +taskset -c 0 ./afl-fuzz -M master $@ >/dev/null 2>&1 &
+> +
+> +watch -n1 "echo \"Executing '$AFLPATH/afl-fuzz $@' on ${NPROC:-$(nproc)} cores.\" && $AFLPATH/afl-whatsup -s ${sync_dir}"
+> +pkill afl-fuzz
+> diff --git a/tools/fuzz/x86ie/scripts/build.sh b/tools/fuzz/x86ie/scripts/build.sh
+> new file mode 100755
+> index 000000000000..032762bf56ef
+> --- /dev/null
+> +++ b/tools/fuzz/x86ie/scripts/build.sh
+> @@ -0,0 +1,33 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0+
+> +# Run from root of linux via `./tools/fuzz/x86ie/scripts/build.sh`
+> +
+> +kernel_objects="arch/x86/kvm/emulate.o arch/x86/lib/retpoline.o lib/find_bit.o"
+> +
+> +disable() { sed -i -r "/\b$1\b/c\# $1" .config; }
+> +enable() { sed -i -r "/\b$1\b/c\\$1=y" .config; }
+> +
+> +make ${CC:+ "CC=$CC"} ${DEBUG:+ "DEBUG=1"} defconfig
+> +
+> +enable "CONFIG_DEBUG_INFO"
+> +enable "CONFIG_STACKPROTECTOR"
+> +
+> +yes ' ' | make ${CC:+ "CC=$CC"} ${DEBUG:+ "DEBUG=1"} $kernel_objects
+> +
+> +omit_arg () { args=$(echo "$args" | sed "s/ $1//g"); }
+> +add_arg () { args+=" $1"; }
+> +
+> +rebuild () {
+> +  args="$(head -1 $(dirname $1)/.$(basename $1).cmd | sed -e 's/.*:= //g')"
+> +  omit_arg "-mcmodel=kernel"
+> +  omit_arg "-mpreferred-stack-boundary=3"
+> +  add_arg "-fsanitize=address"
+> +  echo -e "Rebuilding $1 with \n$args"
+> +  eval "$args"
+> +}
+> +
+> +for object in $kernel_objects; do
+> +  rebuild $object
+> +done
+> +
+> +make ${CC:+ "CC=$CC"} ${DEBUG:+ "DEBUG=1"} tools/fuzz
+> diff --git a/tools/fuzz/x86ie/scripts/install_afl.sh b/tools/fuzz/x86ie/scripts/install_afl.sh
+> new file mode 100755
+> index 000000000000..3bdbdf2a040b
+> --- /dev/null
+> +++ b/tools/fuzz/x86ie/scripts/install_afl.sh
+> @@ -0,0 +1,17 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0+
+> +# Can be run where ever, but usually run from linux root:
+> +# `source ./tools/fuzz/x86ie/scripts/install_afl.sh`
+> +# (must be sourced to get the AFLPATH envvar, otherwise set manually)
+> +
+> +wget http://lcamtuf.coredump.cx/afl/releases/afl-latest.tgz
+> +mkdir -p afl
+> +tar xzf afl-latest.tgz -C afl --strip-components 1
+> +
+> +pushd afl
+> +set AFL_USE_ASAN
+> +make clean all
+> +export AFLPATH="$(pwd)"
+> +popd
+> +
+> +sudo bash -c "echo core >/proc/sys/kernel/core_pattern"
+
+What is this? :)
+
+Surely if it's important to generate core dumps, it's not only important 
+during installation, no?
+
+Alex
+
+> diff --git a/tools/fuzz/x86ie/scripts/run.sh b/tools/fuzz/x86ie/scripts/run.sh
+> new file mode 100755
+> index 000000000000..0571cd524c01
+> --- /dev/null
+> +++ b/tools/fuzz/x86ie/scripts/run.sh
+> @@ -0,0 +1,10 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0+
+> +
+> +FUZZDIR="${FUZZDIR:-$(pwd)/fuzz}"
+> +
+> +mkdir -p $FUZZDIR/in
+> +cp tools/fuzz/x86ie/rand_sample.bin $FUZZDIR/in
+> +mkdir -p $FUZZDIR/out
+> +
+> +screen bash -c "ulimit -Sv $[21999999999 << 10]; ./tools/fuzz/x86ie/scripts/afl-many -m 22000000000 -i $FUZZDIR/in -o $FUZZDIR/out tools/fuzz/x86ie/afl-harness @@"
+> 
