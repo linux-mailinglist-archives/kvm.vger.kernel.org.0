@@ -2,140 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B708A58CE2
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 23:15:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0737458CF6
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 23:23:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726525AbfF0VPS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jun 2019 17:15:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46256 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726441AbfF0VPS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jun 2019 17:15:18 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A384B308FED5;
-        Thu, 27 Jun 2019 21:15:17 +0000 (UTC)
-Received: from x1.home (ovpn-117-35.phx2.redhat.com [10.3.117.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CA47D600CC;
-        Thu, 27 Jun 2019 21:15:02 +0000 (UTC)
-Date:   Thu, 27 Jun 2019 15:15:02 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Libvirt Devel <libvir-list@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Erik Skultety <eskultet@redhat.com>,
-        Pavel Hrdina <phrdina@redhat.com>,
-        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-        Sylvain Bauza <sbauza@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: Re: mdevctl: A shoestring mediated device management and
- persistence utility
-Message-ID: <20190627151502.2ae5314f@x1.home>
-In-Reply-To: <20190627093832.064a346f@x1.home>
-References: <20190523172001.41f386d8@x1.home>
-        <20190625165251.609f6266@x1.home>
-        <20190626115806.3435c45c.cohuck@redhat.com>
-        <20190626083720.42a2b5d4@x1.home>
-        <20190626195350.2e9c81d3@x1.home>
-        <20190627142626.415138da.cohuck@redhat.com>
-        <06114b39-69c2-3fa0-d0b3-aa96a44ae2ce@linux.ibm.com>
-        <20190627093832.064a346f@x1.home>
-Organization: Red Hat
+        id S1726502AbfF0VX6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jun 2019 17:23:58 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:48850 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726384AbfF0VX5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 17:23:57 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5RLABfB067251;
+        Thu, 27 Jun 2019 21:23:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=OG/yAtE0V66aA6eHGMhAUNMmdSTdLq6xhWm+8tHMTHo=;
+ b=LeKkh7fIpnD9umHcZoOmadI46H4yaaA8jFjGJBc5EPfiH9Oa90aqaPIA7XcFdk0ko5MS
+ /YPkh4nn9j6SBDpG6SXdjiBfSwOYPAW5k+XnQsU+VyDrPekAGg+RdV8bDhwpcVNXpHWk
+ Q1iN2UHXk6Ybl+SRv/WWbon32//Pp2IdnCLrdrCpkegWn8VR4irMkGwVXkQ5wcOO0OJB
+ A4s4FWd15sR+gZDc5SGhlsKVMc4r+hj0lOumJbEVSQSTGNKriGjIjQ0s8YeDa1ida4Az
+ kvg2mJsNnciGFwPfe+pEYfhSDU7Z1aO/SJ4Q0/nEHtfm+aPozatavwpPS05sDV4azTlo hA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2t9c9q2hum-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Jun 2019 21:23:21 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5RLMti0139029;
+        Thu, 27 Jun 2019 21:23:20 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 2t9p6vjh1k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Jun 2019 21:23:20 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5RLNJRC029744;
+        Thu, 27 Jun 2019 21:23:19 GMT
+Received: from dhcp-10-132-91-225.usdhcp.oraclecorp.com (/10.132.91.225)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 27 Jun 2019 14:23:19 -0700
+Subject: Re: [kvm-unit-tests PATCH v2] x86: Reset lapic after boot
+To:     Nadav Amit <nadav.amit@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <20190627103937.3842-1-nadav.amit@gmail.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <415e1969-2777-e78a-51dd-be3bd2b5cfda@oracle.com>
+Date:   Thu, 27 Jun 2019 14:23:18 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190627103937.3842-1-nadav.amit@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Thu, 27 Jun 2019 21:15:17 +0000 (UTC)
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9301 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906270245
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9301 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906270244
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 27 Jun 2019 09:38:32 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
-> > On 6/27/19 8:26 AM, Cornelia Huck wrote:  
-> > > 
-> > > {
-> > >   "foo": "1",
-> > >   "bar": "42",
-> > >   "baz": {
-> > >     "depends": ["foo", "bar"],
-> > >     "value": "plahh"
-> > >   }
-> > > }
-> > > 
-> > > Something like that?  
-> 
-> I'm not sure yet.  I think we need to look at what's feasible (and
-> easy) with jq.  Thanks,
 
-I think it's not too much trouble to remove and insert into arrays, so
-what if we were to define the config as:
 
-{
-  "mdev_type":"vendor-type",
-  "start":"auto",
-  "attrs": [
-      {"attrX":["Xvalue1","Xvalue2"]},
-      {"dir/attrY": "Yvalue1"},
-      {"attrX": "Xvalue3"}
-    ]
-}
+On 06/27/2019 03:39 AM, Nadav Amit wrote:
+> Do not assume that the local APIC is in a xAPIC mode after reset.
+> Instead reset it first, since it might be in x2APIC mode, from which a
+> transition in xAPIC is invalid.
 
-"attr" here would define sysfs attributes under the device.  The array
-would be processed in order, so in the above example we'd do the
-following:
+s/transition in/transition to/
 
- 1. echo Xvalue1 > attrX
- 2. echo Xvalue2 > attrX
- 3. echo Yvalue1 > dir/attrY
- 4. echo Xvalue3 > attrX
+>
+> To use reset_apic(), change it to use xapic_write(), in order to make safe to use
+> while apic_ops might change concurrently by x2apic_enable().
 
-When starting the device mdevctl would simply walk the array, if the
-attribute key exists write the value(s).  If a write fails or the
-attribute doesn't exist, remove the device and report error.
+s/x2apic_enable/enable_x2apic/
 
-I think it's easiest with jq to manipulate arrays by removing and
-inserting by index.  Also if we end up with something like above, it's
-ambiguous if we reference the "attrX" key.  So perhaps we add the
-following options to the modify command:
+>
+> Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+> Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+> ---
+>   lib/x86/apic.c | 2 +-
+>   x86/cstart64.S | 2 ++
+>   2 files changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/lib/x86/apic.c b/lib/x86/apic.c
+> index 1514730..b3e39ae 100644
+> --- a/lib/x86/apic.c
+> +++ b/lib/x86/apic.c
+> @@ -164,7 +164,7 @@ void reset_apic(void)
+>   {
+>       disable_apic();
+>       wrmsr(MSR_IA32_APICBASE, rdmsr(MSR_IA32_APICBASE) | APIC_EN);
+> -    apic_write(APIC_SPIV, 0x1ff);
+> +    xapic_write(APIC_SPIV, 0x1ff);
+>   }
+>   
+>   u32 ioapic_read_reg(unsigned reg)
+> diff --git a/x86/cstart64.S b/x86/cstart64.S
+> index 9791282..1889c6b 100644
+> --- a/x86/cstart64.S
+> +++ b/x86/cstart64.S
+> @@ -228,6 +228,7 @@ save_id:
+>   	retq
+>   
+>   ap_start64:
+> +	call reset_apic
+>   	call load_tss
+>   	call enable_apic
+>   	call save_id
+> @@ -240,6 +241,7 @@ ap_start64:
+>   	jmp 1b
+>   
+>   start64:
+> +	call reset_apic
+>   	call load_tss
+>   	call mask_pic_interrupts
+>   	call enable_apic
 
---addattr=ATTRIBUTE --delattr --index=INDEX --value=VALUE1[,VALUE2]
+Except the above minor things,
 
-We could handle it like a stack, so if --index is not supplied, add to
-the end or remove from the end.  If --index is provided, delete that
-index or add the attribute at that index.  So if you had the above and
-wanted to remove Xvalue1 but keep the ordering, you'd do:
-
---delattr --index=0
---addattr --index=0 --value=Xvalue2
-
-Which should results in:
-
-  "attrs": [
-      {"attrX": "Xvalue2"},
-      {"dir/attrY": "Yvalue1"},
-      {"attrX": "Xvalue3"}
-    ]
-
-If we want to modify a running device, I'm thinking we probably want a
-new command and options --attr=ATTRIBUTE --value=VALUE might suffice.
-
-Do we need to support something like this for the 'start' command or
-should we leave that for simple devices and require a sequence of:
-
-# mdevctl define ...
-# mdevctl modify --addattr...
-...
-# mdevctl start
-# mdevctl undefine
-
-This is effectively the long way to get a transient device.  Otherwise
-we'd need to figure out how to have --attr --value appear multiple
-times on the start command line.  Thanks,
-
-Alex
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
