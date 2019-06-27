@@ -2,117 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FED858A27
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 20:46:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4DCA58226
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 14:04:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726484AbfF0SqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jun 2019 14:46:12 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:40438 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726426AbfF0SqM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jun 2019 14:46:12 -0400
-Received: by mail-pg1-f194.google.com with SMTP id w10so1416532pgj.7
-        for <kvm@vger.kernel.org>; Thu, 27 Jun 2019 11:46:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=b9WcdNAe93dgqdjuKIeOt+ko1Bg0iziPDcAFVrdFnSQ=;
-        b=BFSZgXtWuw0zcAfXSQlD6E080SBXS3ekp1rhJt8nKr/Qq1LG2QFXmi6kHgLPa6UUwt
-         tTlgZFnS3vHD4CWZdM9Qf5abjEveA8PpZw9W939g9zwCWCnfrsf3TMw93IOzYIcFVXwW
-         0aoaif5HZ4FlToJIZAd2DfT7QpNr8KSHDOGQoj1N3jEjdpxRiChX45C1DRgFTN6WW10E
-         8vyU/BOZX/PG+FGiZaBfVbnfB0/5hMf51du3Tj4rqxuwcJNlre5L8/nvJNFVJJG16S0a
-         PGFYwCSgkebyr4NZJGAxNqganF40Ol03J2XCi8k5vjUbu+YE6bKsTPsJX4kQC2D0xznl
-         XF3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=b9WcdNAe93dgqdjuKIeOt+ko1Bg0iziPDcAFVrdFnSQ=;
-        b=iH8qtq1buhCQBGPU8ypnc3s7O0D74y9T+F0iaajW60Ly92G5ql9eUyYQc4WOP0LDuk
-         ZUm4LcFHXqYn9prDkGz+DmsLx23YcAJzS6kV1cZL2Dtncs7xS5IVIyh4PlvgLPzp9w6G
-         jZ1AAEW1r2hRoeBaAy04i9CFssR0bNQtaPUz8ugq9isfWz3h1HZRAK0H43oo+4dhWjWQ
-         qfCZg5+EeBZQH+fg1qqOwLNEvsHwaZaAX1zY9hruFEZlYJt1A9/B9R6RL6yPVPmcqzai
-         sKG65WynGMQWIUkTQ2j72lhNoMKFAIagmxKdRpZUObh4BXhEZFRhJTB4lptFT5sh3qXF
-         stOQ==
-X-Gm-Message-State: APjAAAWUmldLgwV5m79FMT3LgjX6BpCpT+MgxVElj8v2z+l+JvseEzkl
-        nQDDy3VpHpthyAlqEjiYAxLToDNRm0o=
-X-Google-Smtp-Source: APXvYqzKeTutXnioAbenMcbn+ji3hNnUDLZ7SswmJ04xcIod6MRBAh+BxxNs3dJRt4hqBsPq63dp4Q==
-X-Received: by 2002:a63:460c:: with SMTP id t12mr2175301pga.69.1561661171143;
-        Thu, 27 Jun 2019 11:46:11 -0700 (PDT)
-Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id cx22sm6212515pjb.25.2019.06.27.11.46.10
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 27 Jun 2019 11:46:10 -0700 (PDT)
-From:   Nadav Amit <nadav.amit@gmail.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>
-Subject: [kvm-unit-tests PATCH] x86: Load segments after GDT loading
-Date:   Thu, 27 Jun 2019 04:23:34 -0700
-Message-Id: <20190627112334.3293-1-nadav.amit@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        id S1726920AbfF0ME3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jun 2019 08:04:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37886 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726905AbfF0ME3 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jun 2019 08:04:29 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5RBwEUS098232
+        for <kvm@vger.kernel.org>; Thu, 27 Jun 2019 08:04:28 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tcvwpsubs-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 27 Jun 2019 08:04:28 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <pasic@linux.ibm.com>;
+        Thu, 27 Jun 2019 13:04:25 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 27 Jun 2019 13:04:23 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5RC4L9026018156
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Jun 2019 12:04:21 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 190C3A4066;
+        Thu, 27 Jun 2019 12:04:21 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AA0B8A4067;
+        Thu, 27 Jun 2019 12:04:20 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.115])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 27 Jun 2019 12:04:20 +0000 (GMT)
+Date:   Thu, 27 Jun 2019 14:04:19 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Pierre Morel <pmorel@linux.ibm.com>, alex.williamson@redhat.com,
+        cohuck@redhat.com, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        frankja@linux.ibm.com, akrowiak@linux.ibm.com, david@redhat.com,
+        heiko.carstens@de.ibm.com, freude@linux.ibm.com, mimu@linux.ibm.com
+Subject: Re: [PATCH v9 4/4] s390: ap: kvm: Enable PQAP/AQIC facility for the
+ guest
+In-Reply-To: <69ca50bd-3f5c-98b1-3b39-04af75151baf@de.ibm.com>
+References: <1558452877-27822-1-git-send-email-pmorel@linux.ibm.com>
+        <1558452877-27822-5-git-send-email-pmorel@linux.ibm.com>
+        <69ca50bd-3f5c-98b1-3b39-04af75151baf@de.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19062712-0020-0000-0000-0000034DE34E
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19062712-0021-0000-0000-000021A15DED
+Message-Id: <20190627140419.1df5f519.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-27_07:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906270140
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Whenever we load the GDT, we need to reload the segment selectors so
-their hidden data (base, limit, type, etc.) would be reloaded.
+On Tue, 25 Jun 2019 22:13:12 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-It appears that loading GS overwrites the GS bases, so reload GS base
-after loading the segment to prevent per-cpu variable corruption.
+> 
+> 
+> On 21.05.19 17:34, Pierre Morel wrote:
+> > AP Queue Interruption Control (AQIC) facility gives
+> > the guest the possibility to control interruption for
+> > the Cryptographic Adjunct Processor queues.
+> > 
+> > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> > Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> > ---
+> >  arch/s390/tools/gen_facilities.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/arch/s390/tools/gen_facilities.c b/arch/s390/tools/gen_facilities.c
+> > index 61ce5b5..aed14fc 100644
+> > --- a/arch/s390/tools/gen_facilities.c
+> > +++ b/arch/s390/tools/gen_facilities.c
+> > @@ -114,6 +114,7 @@ static struct facility_def facility_defs[] = {
+> >  		.bits = (int[]){
+> >  			12, /* AP Query Configuration Information */
+> >  			15, /* AP Facilities Test */
+> > +			65, /* AP Queue Interruption Control */
+> >  			156, /* etoken facility */
+> >  			-1  /* END */
+> >  		}
+> > 
+> 
+> I think we should only set stfle.65 if we have the aiv facility (Because we do not
+> have a GISA otherwise)
+> 
+> So something like this instead?
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 28ebd64..1501cd6 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -2461,6 +2461,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>                 set_kvm_facility(kvm->arch.model.fac_list, 147);
+>         }
+>  
+> +       if (css_general_characteristics.aiv)
+> +               set_kvm_facility(kvm->arch.model.fac_mask, 65);
+> +       
+>         kvm->arch.model.cpuid = kvm_s390_get_initial_cpuid();
+>         kvm->arch.model.ibc = sclp.ibc & 0x0fff;
 
-Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
----
- x86/cstart64.S | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
+I will go with this option because it is more readable (easier to find)
+IMHO. Will also add a chech for host sltfle.65. So I end up with:
 
-diff --git a/x86/cstart64.S b/x86/cstart64.S
-index c5561e7..9791282 100644
---- a/x86/cstart64.S
-+++ b/x86/cstart64.S
-@@ -118,6 +118,21 @@ MSR_GS_BASE = 0xc0000101
- 	wrmsr
- .endm
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 28ebd647784c..1c4113f0f2a8 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -2461,6 +2461,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+                set_kvm_facility(kvm->arch.model.fac_list, 147);
+        }
  
-+.macro setup_segments
-+	mov $MSR_GS_BASE, %ecx
-+	rdmsr
++       if (css_general_characteristics.aiv && test_facility(65))
++               set_kvm_facility(kvm->arch.model.fac_mask, 65);
 +
-+	mov $0x10, %bx
-+	mov %bx, %ds
-+	mov %bx, %es
-+	mov %bx, %fs
-+	mov %bx, %gs
-+	mov %bx, %ss
-+
-+	/* restore MSR_GS_BASE */
-+	wrmsr
-+.endm
-+
- .globl start
- start:
- 	mov %ebx, mb_boot_info
-@@ -149,6 +164,7 @@ switch_to_5level:
+        kvm->arch.model.cpuid = kvm_s390_get_initial_cpuid();
+        kvm->arch.model.ibc = sclp.ibc & 0x0fff;
  
- prepare_64:
- 	lgdt gdt64_desc
-+	setup_segments
- 
- enter_long_mode:
- 	mov %cr4, %eax
-@@ -196,12 +212,7 @@ sipi_end:
- 
- .code32
- ap_start32:
--	mov $0x10, %ax
--	mov %ax, %ds
--	mov %ax, %es
--	mov %ax, %fs
--	mov %ax, %gs
--	mov %ax, %ss
-+	setup_segments
- 	mov $-4096, %esp
- 	lock/xaddl %esp, smp_stacktop
- 	setup_percpu_area
--- 
-2.17.1
+diff --git a/arch/s390/tools/gen_facilities.c b/arch/s390/tools/gen_facilities.c
+index d52f537b7169..cead9e0dcffb 100644
+--- a/arch/s390/tools/gen_facilities.c
++++ b/arch/s390/tools/gen_facilities.c
+@@ -111,7 +111,6 @@ static struct facility_def facility_defs[] = {
+                .bits = (int[]){
+                        12, /* AP Query Configuration Information */
+                        15, /* AP Facilities Test */
+-                       65, /* AP Queue Interruption Control */
+                        156, /* etoken facility */
+                        -1  /* END */
+
 
