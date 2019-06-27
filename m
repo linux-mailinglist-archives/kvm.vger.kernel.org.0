@@ -2,81 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A8D3A58071
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 12:31:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BAA6D5896B
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 20:01:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726595AbfF0Kbh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jun 2019 06:31:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47994 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726315AbfF0Kbh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jun 2019 06:31:37 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id BFEE43082E06;
-        Thu, 27 Jun 2019 10:31:36 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-96.ams2.redhat.com [10.36.116.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2BB685C1B4;
-        Thu, 27 Jun 2019 10:31:34 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id 5DDE011AAF; Thu, 27 Jun 2019 12:31:33 +0200 (CEST)
-Date:   Thu, 27 Jun 2019 12:31:33 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     "Zhang, Tina" <tina.zhang@intel.com>
-Cc:     "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yuan, Hang" <hang.yuan@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-Subject: Re: [RFC PATCH v3 0/4] Deliver vGPU display vblank event to userspace
-Message-ID: <20190627103133.6ekdwazggi5j5lcl@sirius.home.kraxel.org>
-References: <20190627033802.1663-1-tina.zhang@intel.com>
- <20190627062231.57tywityo6uyhmyd@sirius.home.kraxel.org>
- <237F54289DF84E4997F34151298ABEBC876835E5@SHSMSX101.ccr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <237F54289DF84E4997F34151298ABEBC876835E5@SHSMSX101.ccr.corp.intel.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Thu, 27 Jun 2019 10:31:36 +0000 (UTC)
+        id S1726543AbfF0SBu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jun 2019 14:01:50 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:44534 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726502AbfF0SBu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 14:01:50 -0400
+Received: by mail-pf1-f193.google.com with SMTP id t16so1600836pfe.11
+        for <kvm@vger.kernel.org>; Thu, 27 Jun 2019 11:01:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=nzDqGzdl7G2ODy1DKC/5xLs0B4YLweJhbbu3iqVK++M=;
+        b=ZQMt1q4RhXW3ZQ42Dwwl2Q8UOsRd+0xC0c318NlRT/5fB04TpB1fkOb98WkZ2qhyED
+         qRyFAMf/spieKkB8n3Qb2fbXEgVznip1aUV7W9J5b5F4FZmc6UWEyN3nvcXklh42VGbt
+         WCz4f+iiBBOI8jP74K1rhSGoIovUsvBNMJDMTzPPx13C/ZhMwVHRJfGBRSYVOgBZyMp2
+         N06zKAA0NIMhtDq661gAjbcXOdgG4a3iy317lxOE1wPLAOfxWQPToGL2ginm3BmoOCs8
+         7bE7FkREEXXyYG6l7uba5R32oB1ffMIv3AYKJ6ch5Wz1X8YqnjcLpQPVcFsMp3YVP/HN
+         sOiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=nzDqGzdl7G2ODy1DKC/5xLs0B4YLweJhbbu3iqVK++M=;
+        b=m9YY7Yat5Pdms/mea+2tTHkS1GvzWEAOSk/i9MB8uh1+mUoTj8AOVFy+H2CY4Rbbhn
+         YEzGpPzbxdrCcAL/qYhR65rJMq89BP80dm1/q2WuH1X6oEUk4e5FfBEuCWn6B/vgk/Jj
+         HE8CMulje+uMu3OQ4tifkQCGnFKn7cf00m4gLIX8F+IiEwSrfSnsZzP+RftR9JVbYpCW
+         g4oaXZxYYjnHDFTKL44OSKgPf7Pk/uhL8nDYn/4TwG+Irt6xJrO4AwG+l2kyCubcu4Pe
+         k55hSoKyUvcmGUMF1w+m7fIBLgV9YDQy1d8S13ZX6FfVhVDYOe2I3MksZRT94QZE6gYx
+         ocLw==
+X-Gm-Message-State: APjAAAUpRp+zuK0VM1b7nVv6h3Qa0QVgnQ/LbFFSkvesDHP5cbk4/dLf
+        JtUWDZWehc6uTSRBGeQfOTU=
+X-Google-Smtp-Source: APXvYqzEj6VykwQ4lvb7sCDvkNH4pizyZwrYOo7xD7aDyoAjXibE/puaP5AkRBSOKry0vUjdr1BVaA==
+X-Received: by 2002:a17:90a:a00d:: with SMTP id q13mr7473623pjp.80.1561658509514;
+        Thu, 27 Jun 2019 11:01:49 -0700 (PDT)
+Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
+        by smtp.gmail.com with ESMTPSA id p68sm4058512pfb.80.2019.06.27.11.01.48
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 27 Jun 2019 11:01:48 -0700 (PDT)
+From:   Nadav Amit <nadav.amit@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Subject: [kvm-unit-tests PATCH v2] x86: Reset lapic after boot
+Date:   Thu, 27 Jun 2019 03:39:37 -0700
+Message-Id: <20190627103937.3842-1-nadav.amit@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> >   Hi,
-> > 
-> > > Instead of delivering page flip events, we choose to post display
-> > > vblank event. Handling page flip events for both primary plane and
-> > > cursor plane may make user space quite busy, although we have the
-> > > mask/unmask mechansim for mitigation. Besides, there are some cases
-> > > that guest app only uses one framebuffer for both drawing and display.
-> > > In such case, guest OS won't do the plane page flip when the
-> > > framebuffer is updated, thus the user land won't be notified about the
-> > updated framebuffer.
-> > 
-> > What happens when the guest is idle and doesn't draw anything to the
-> > framebuffer?
-> The vblank event will be delivered to userspace as well, unless guest OS disable the pipe.
-> Does it make sense to vfio/display?
+Do not assume that the local APIC is in a xAPIC mode after reset.
+Instead reset it first, since it might be in x2APIC mode, from which a
+transition in xAPIC is invalid.
 
-Getting notified only in case there are actual display updates would be
-a nice optimization, assuming the hardware is able to do that.  If the
-guest pageflips this is obviously trivial.  Not sure this is possible in
-case the guest renders directly to the frontbuffer.
+To use reset_apic(), change it to use xapic_write(), in order to make safe to use
+while apic_ops might change concurrently by x2apic_enable().
 
-What exactly happens when the guest OS disables the pipe?  Is a vblank
-event delivered at least once?  That would be very useful because it
-will be possible for userspace to stop polling altogether without
-missing the "guest disabled pipe" event.
+Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
+---
+ lib/x86/apic.c | 2 +-
+ x86/cstart64.S | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-cheers,
-  Gerd
+diff --git a/lib/x86/apic.c b/lib/x86/apic.c
+index 1514730..b3e39ae 100644
+--- a/lib/x86/apic.c
++++ b/lib/x86/apic.c
+@@ -164,7 +164,7 @@ void reset_apic(void)
+ {
+     disable_apic();
+     wrmsr(MSR_IA32_APICBASE, rdmsr(MSR_IA32_APICBASE) | APIC_EN);
+-    apic_write(APIC_SPIV, 0x1ff);
++    xapic_write(APIC_SPIV, 0x1ff);
+ }
+ 
+ u32 ioapic_read_reg(unsigned reg)
+diff --git a/x86/cstart64.S b/x86/cstart64.S
+index 9791282..1889c6b 100644
+--- a/x86/cstart64.S
++++ b/x86/cstart64.S
+@@ -228,6 +228,7 @@ save_id:
+ 	retq
+ 
+ ap_start64:
++	call reset_apic
+ 	call load_tss
+ 	call enable_apic
+ 	call save_id
+@@ -240,6 +241,7 @@ ap_start64:
+ 	jmp 1b
+ 
+ start64:
++	call reset_apic
+ 	call load_tss
+ 	call mask_pic_interrupts
+ 	call enable_apic
+-- 
+2.17.1
 
