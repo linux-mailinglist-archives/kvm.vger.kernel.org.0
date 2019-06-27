@@ -2,66 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AB33357CF5
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 09:15:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B733A57D18
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 09:25:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726369AbfF0HPc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jun 2019 03:15:32 -0400
-Received: from mail-lf1-f53.google.com ([209.85.167.53]:38478 "EHLO
-        mail-lf1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725787AbfF0HPc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jun 2019 03:15:32 -0400
-Received: by mail-lf1-f53.google.com with SMTP id b11so827499lfa.5
-        for <kvm@vger.kernel.org>; Thu, 27 Jun 2019 00:15:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=MoCioRtjfr92xRy8ifd6iLuVSMBFG72GsMszTDcLRjQ=;
-        b=J6RwYKvFnh4WTeVauSiBEUHITQ1iGL/oAcqMh3B5jh/Vdf4ypIDZQPX++SU2bL8QKf
-         e/lJoGOrtrFP3ZL/o03hRa4wWc/2uwN3V4obwsx7kanaFKVfV38+Xi2B+OtBpX97nM5O
-         YMtmH4UJTV6A03ed2h745l5TPg43mmLaYC8zAlF2pIi6UitaE+hC9gyqZGqtC9gufsYw
-         SGH5bCN/DONtdcDcwXs4oCYnOWBg1sYQOc4rwhL+OnAmJ9yUgxFPnSkqGzPyNhXrgiAy
-         V+uBj+VaD8pKUKMLom0a82Pl7GghFNc0AGO7ikq+B1cCEJ0BDZVLPRJJmU0rqvP7Y5aH
-         J0gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=MoCioRtjfr92xRy8ifd6iLuVSMBFG72GsMszTDcLRjQ=;
-        b=TaS6r79gL25L2iIdPRx0eBQDFvQXmnq9n3pjDG4aMcnS30PR8t0pZBn4VT6q0tzR1c
-         LxbAvJ45g4F5t2HOVhh4vafKWsLpgLkXpyxvZwN+f2F4X1E6IfVkqmPKpUI3ZCiqQTS/
-         UpnbtFD7m0li1vMcfvX2Z08vGZOFViwYRmBIji+8T5CQVmgmztevx11KFCkrTDY22jfu
-         iQJPke8k30nEoW4paANA+HkyksqflVF8STEAEPK2lvpZnjobFxjZRX0k/VribFTMHr2o
-         +VqOytop1D8bP0jkt31zinznWtsHDtv/HBz4F6lkwVk+9Ct76q21gQ+lRxUTvJLytOiC
-         0nvg==
-X-Gm-Message-State: APjAAAWNTm2goPy4UYYvokeQt9Tojl89E6cp7e89C8YIJKZNG1CzTE9r
-        87soAqzachtltYEJw8iZPe9LOjk/tw3qzhp9tBiUeKZRmZA=
-X-Google-Smtp-Source: APXvYqxjC5gx6iYYr+9dmnowqsBqEqUCKA9f/AiJjGvyCuIe4fkCX6YLBwq7noHRsYAzHQh4Nscf8nskYXe4S8lzxlU=
-X-Received: by 2002:ac2:482d:: with SMTP id 13mr1200357lft.132.1561619729527;
- Thu, 27 Jun 2019 00:15:29 -0700 (PDT)
+        id S1726422AbfF0HZ3 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 27 Jun 2019 03:25:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52370 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726054AbfF0HZ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 03:25:28 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id AB95430820DD;
+        Thu, 27 Jun 2019 07:25:27 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BEB3B60856;
+        Thu, 27 Jun 2019 07:25:20 +0000 (UTC)
+Date:   Thu, 27 Jun 2019 09:25:18 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, mjrosato@linux.ibm.com,
+        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
+        pmorel@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com
+Subject: Re: [PATCH v4 3/7] s390: zcrypt: driver callback to indicate
+ resource in use
+Message-ID: <20190627092518.1f8d7d48.cohuck@redhat.com>
+In-Reply-To: <44f13e89-2fb4-bf8c-7849-641aae8d08cc@linux.ibm.com>
+References: <1560454780-20359-1-git-send-email-akrowiak@linux.ibm.com>
+        <1560454780-20359-4-git-send-email-akrowiak@linux.ibm.com>
+        <20190618182558.7d7e025a.cohuck@redhat.com>
+        <2366c6b6-fd9e-0c32-0e9d-018cd601a0ad@linux.ibm.com>
+        <44f13e89-2fb4-bf8c-7849-641aae8d08cc@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Thu, 27 Jun 2019 12:45:18 +0530
-Message-ID: <CA+G9fYtVU2FoQ_cH71edFH-YfyFWZwi4s7tPxMW6aFG0pDEjPA@mail.gmail.com>
-Subject: Pre-required Kconfigs for kvm unit tests
-To:     kvm list <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, lkft-triage@lists.linaro.org,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        karl.heubaum@oracle.com, drjones@redhat.com,
-        andre.przywara@arm.com, cdall@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Thu, 27 Jun 2019 07:25:27 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Wed, 26 Jun 2019 17:13:50 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
 
-We (kernel validation team) at Linaro running KVM unit tests [1] on arm64
-and x86_64 architectures. Please share the Kernel configs fragments required
-for better testing coverage.
-Thank you.
+> On 6/19/19 9:04 AM, Tony Krowiak wrote:
+> > On 6/18/19 12:25 PM, Cornelia Huck wrote:  
+> >> On Thu, 13 Jun 2019 15:39:36 -0400
+> >> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+> >>  
+> >>> Introduces a new driver callback to prevent a root user from unbinding
+> >>> an AP queue from its device driver if the queue is in use. This prevents
+> >>> a root user from inadvertently taking a queue away from a guest and
+> >>> giving it to the host, or vice versa. The callback will be invoked
+> >>> whenever a change to the AP bus's apmask or aqmask sysfs interfaces may
+> >>> result in one or more AP queues being removed from its driver. If the
+> >>> callback responds in the affirmative for any driver queried, the change
+> >>> to the apmask or aqmask will be rejected with a device in use error.
+> >>>
+> >>> For this patch, only non-default drivers will be queried. Currently,
+> >>> there is only one non-default driver, the vfio_ap device driver. The
+> >>> vfio_ap device driver manages AP queues passed through to one or more
+> >>> guests and we don't want to unexpectedly take AP resources away from
+> >>> guests which are most likely independently administered.
+> >>>
+> >>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> >>> ---
+> >>>   drivers/s390/crypto/ap_bus.c | 138 
+> >>> +++++++++++++++++++++++++++++++++++++++++--
+> >>>   drivers/s390/crypto/ap_bus.h |   3 +
+> >>>   2 files changed, 135 insertions(+), 6 deletions(-)  
+> >>
+> >> Hm... I recall objecting to this patch before, fearing that it makes it
+> >> possible for a bad actor to hog resources that can't be removed by
+> >> root, even forcefully. (I have not had time to look at the intervening
+> >> versions, so I might be missing something.)
+> >>
+> >> Is there a way for root to forcefully override this?  
+> > 
+> > You recall correctly; however, after many internal crypto team
+> > discussions, it was decided that this feature was important
+> > and should be kept.
+> > 
+> > Allow me to first address your fear that a bad actor can hog
+> > resources that can't be removed by root. With this enhancement,
+> > there is nothing preventing a root user from taking resources
+> > from a matrix mdev, it simply forces him/her to follow the
+> > proper procedure. The resources to be removed must first be
+> > unassigned from the matrix mdev to which they are assigned.
+> > The AP bus's /sys/bus/ap/apmask and /sys/bus/ap/aqmask
+> > sysfs attributes can then be edited to transfer ownership
+> > of the resources to zcrypt.
+> > 
+> > The rationale for keeping this feature is:
+> > 
+> > * It is a bad idea to steal an adapter in use from a guest. In the worst
+> >    case, the guest could end up without access to any crypto adapters
+> >    without knowing why. This could lead to performance issues on guests
+> >    that rely heavily on crypto such as guests used for blockchain
+> >    transactions.
+> > 
+> > * There are plenty of examples in linux of the kernel preventing a root
+> >    user from performing a task. For example, a module can't be removed
+> >    if references are still held for it. Another example would be trying
+> >    to bind a CEX4 adapter to a device driver not registered for CEX4;
+> >    this action will also be rejected.
+> > 
+> > * The semantics are much cleaner and the logic is far less complicated.
+> > 
+> > * It forces the use of the proper procedure to change ownership of AP
+> >    queues.
+> >  
+> 
+> Any feedback on this?
 
-[1] https://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git
+Had not yet time to look at this, sorry.
 
-Best regards
-Naresh Kamboju
+
+> 
+> Tony K
+> 
+> >   
+> >>  
+> >   
+> 
+
