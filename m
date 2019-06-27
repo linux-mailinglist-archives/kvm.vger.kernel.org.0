@@ -2,135 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E47AF57631
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 02:37:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05E0A578D8
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 03:08:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727441AbfF0AgH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Jun 2019 20:36:07 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45964 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727780AbfF0AgG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Jun 2019 20:36:06 -0400
-Received: by mail-wr1-f67.google.com with SMTP id f9so339844wre.12
-        for <kvm@vger.kernel.org>; Wed, 26 Jun 2019 17:36:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=FRoD7AUpZmXDhHlNec7uMX/D0ig/kc9/wKYHHdNDwfQ=;
-        b=ua8Wj8Gwr/xlUwKFC2KuWGjnWYW9tjX3c2MwoMRVaxtIrONnmOE/EZ1k/STnGnFbL7
-         Gg2RiluU26fLgtRyo4fyY+sJSkVaxQCgy1JvlaVcRppKWfQDzD+dIIXg29Z/OpUf37Ec
-         JdTQsem14wH4dzUAGYwKpKK04Ioxec6ojq28mwcSfyaAR+aKRRdOoeT1mDV685hFag4e
-         AMKl8iLCuykGUdAMOS4qVvboyYT7ik4cWJO9/4+mTHyWCVEZFdFEoW50Rq9MOsWS2VvS
-         lxH6qlLP8LaMFhn4L2cmHvzHoUC7klDEHIHK17ZRDLuXEsa3G7FYet3VAkBV0JxP/str
-         IG1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FRoD7AUpZmXDhHlNec7uMX/D0ig/kc9/wKYHHdNDwfQ=;
-        b=DRHXz+DJi6oWUO/K3K816sciKd6X0M8hMfTTLoUWM30Fk5r8vD8xOF5WLrqrVL5h3S
-         CdTrexH5iwCVxEHeueXF7sPHCpd519LjzaGNycRVffnyN8/LLU7d9bkBsmY0eB5Jyvtt
-         5y/O109hJVa2WHtSrtHIIkPD4l43AXBut5pSb5kA7K5plCR6g4tei5n7c6mnuGGAmysF
-         3DUMDd8BE+sHp6M7tjOlCk0xsAB/041wJZYAHmeiE5UDTSC5DrWI+Z+at0ORqnyUX5AJ
-         yB0RpsH5w8x1yLB4DFY1JoiTB3DOyb7+nlgZ07bP/kar0zgK2F3//KTQgNOK177e91Zm
-         5jog==
-X-Gm-Message-State: APjAAAUNagdlFp7dii1bPRFykYzhRusVunM3Yf2BE1aigkkPHXaLLbaO
-        rDck2tap3CCizQll7LqtQMAvj4Vq38Fz2/fhprDDcQ==
-X-Google-Smtp-Source: APXvYqwly0tHPm1FjG9Liv13IjdwNPcOVJQxLYlilJlhUxl/QtrTjmiYXQ3ahtE+ir4ZwS0GVUA9VuVNFfxv8X8IYP4=
-X-Received: by 2002:a5d:528d:: with SMTP id c13mr346296wrv.247.1561595763728;
- Wed, 26 Jun 2019 17:36:03 -0700 (PDT)
+        id S1726912AbfF0BIC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Jun 2019 21:08:02 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:50220 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726373AbfF0BIC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Jun 2019 21:08:02 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5R14xS7188474;
+        Thu, 27 Jun 2019 01:07:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=CeLLz03ZgSO0Ksp8Dbp0fH75miUBXWgEiH4GER/2PKk=;
+ b=s+4vT1E84GpYWG0GkoB/55zu2xUxEowReYbOcwXxfe3BaE1tF/XwZrAkdRhRqIdGqtoq
+ lBd1ChhrI/A9OLLV4CPDmMUDCVYKnTjrGy37NDygYHHsUbmbcvThwrQB6Ym4XhmTu+QS
+ E0E6eckHl/0yTWjbvK4WgHRrjh0LrjWzi2X6kACgCrEizXZC3OJTehCztaezOhF57XQw
+ NHyQsoO0RnVyQZAMxW13BQ6npvcLVySO52Z2NlZmK8zBhJIXtbr7uxbZ/rW+7tG75Qq1
+ oERT0vtj79nkhic0YahYhQB+AXuy0mQ/BI8jAV/tEkhgqcvQTv7xofjFPiJm/r1bsz4x yw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2130.oracle.com with ESMTP id 2t9brtdcgb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Jun 2019 01:07:40 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x5R17dH0052674;
+        Thu, 27 Jun 2019 01:07:39 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2t9acd00x6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Jun 2019 01:07:39 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x5R17ZaM028475;
+        Thu, 27 Jun 2019 01:07:35 GMT
+Received: from localhost.localdomain (/10.159.235.117)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 26 Jun 2019 18:07:35 -0700
+Subject: Re: [kvm-unit-tests PATCH] x86: Memory barrier before setting ICR
+To:     Nadav Amit <nadav.amit@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org
+References: <20190625125836.9149-1-nadav.amit@gmail.com>
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Message-ID: <e7ff39ef-5d09-6aa0-a3ac-e23707355e99@oracle.com>
+Date:   Wed, 26 Jun 2019 18:07:34 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <20190625120322.8483-1-nadav.amit@gmail.com>
-In-Reply-To: <20190625120322.8483-1-nadav.amit@gmail.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Wed, 26 Jun 2019 17:35:52 -0700
-Message-ID: <CAA03e5EZTQbX_-_=KKcOaVgMUDS2=MO6CgdnOO8yHt+9v5zK6w@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: Remove assumptions on CR4.MCE
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190625125836.9149-1-nadav.amit@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9300 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=895
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1906270011
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9300 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=963 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1906270010
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 25, 2019 at 12:25 PM Nadav Amit <nadav.amit@gmail.com> wrote:
+
+On 6/25/19 5:58 AM, Nadav Amit wrote:
+> The wrmsr that is used in x2apic ICR programming does not behave as a
+> memory barrier. There is a hidden assumption that it is. Add an explicit
+> memory barrier for this reason.
 >
-> CR4.MCE might be set after boot. Remove the assertion that checks that
-> it is clear. Change the test to toggle the bit instead of setting it.
->
-> Cc: Marc Orr <marcorr@google.com>
 > Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
 > ---
->  x86/vmx_tests.c | 29 +++++++++++++++--------------
->  1 file changed, 15 insertions(+), 14 deletions(-)
+>   lib/x86/apic.c | 2 ++
+>   1 file changed, 2 insertions(+)
 >
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index b50d858..3731757 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -7096,8 +7096,11 @@ static int write_cr4_checking(unsigned long val)
->
->  static void vmx_cr_load_test(void)
->  {
-> +       unsigned long cr3, cr4, orig_cr3, orig_cr4;
->         struct cpuid _cpuid = cpuid(1);
-> -       unsigned long cr4 = read_cr4(), cr3 = read_cr3();
-> +
-> +       orig_cr4 = read_cr4();
-> +       orig_cr3 = read_cr3();
->
->         if (!(_cpuid.c & X86_FEATURE_PCID)) {
->                 report_skip("PCID not detected");
-> @@ -7108,12 +7111,11 @@ static void vmx_cr_load_test(void)
->                 return;
->         }
->
-> -       TEST_ASSERT(!(cr4 & (X86_CR4_PCIDE | X86_CR4_MCE)));
-> -       TEST_ASSERT(!(cr3 & X86_CR3_PCID_MASK));
-> +       TEST_ASSERT(!(orig_cr3 & X86_CR3_PCID_MASK));
->
->         /* Enable PCID for L1. */
-> -       cr4 |= X86_CR4_PCIDE;
-> -       cr3 |= 0x1;
-> +       cr4 = orig_cr4 | X86_CR4_PCIDE;
-> +       cr3 = orig_cr3 | 0x1;
->         TEST_ASSERT(!write_cr4_checking(cr4));
->         write_cr3(cr3);
->
-> @@ -7126,17 +7128,16 @@ static void vmx_cr_load_test(void)
->          * No exception is expected.
->          *
->          * NB. KVM loads the last guest write to CR4 into CR4 read
-> -        *     shadow. In order to trigger an exit to KVM, we can set a
-> -        *     bit that was zero in the above CR4 write and is owned by
-> -        *     KVM. We choose to set CR4.MCE, which shall have no side
-> -        *     effect because normally no guest MCE (e.g., as the result
-> -        *     of bad memory) would happen during this test.
-> +        *     shadow. In order to trigger an exit to KVM, we can toggle a
-> +        *     bit that is owned by KVM. We choose to set CR4.MCE, which shall
+> diff --git a/lib/x86/apic.c b/lib/x86/apic.c
+> index bc2706e..1514730 100644
+> --- a/lib/x86/apic.c
+> +++ b/lib/x86/apic.c
+> @@ -2,6 +2,7 @@
+>   #include "apic.h"
+>   #include "msr.h"
+>   #include "processor.h"
+> +#include "asm/barrier.h"
+>   
+>   void *g_apic = (void *)0xfee00000;
+>   void *g_ioapic = (void *)0xfec00000;
+> @@ -71,6 +72,7 @@ static void x2apic_write(unsigned reg, u32 val)
+>   
+>   static void x2apic_icr_write(u32 val, u32 dest)
+>   {
+> +    mb();
+>       asm volatile ("wrmsr" : : "a"(val), "d"(dest),
+>                     "c"(APIC_BASE_MSR + APIC_ICR/16));
+>   }
 
-"set ..." doesn't make sense, right? Maybe just delete "We choose to
-... during this test.".
 
-> +        *     have no side effect because normally no guest MCE (e.g., as the
-> +        *     result of bad memory) would happen during this test.
->          */
-> -       TEST_ASSERT(!write_cr4_checking(cr4 | X86_CR4_MCE));
-> +       TEST_ASSERT(!write_cr4_checking(cr4 ^ X86_CR4_MCE));
->
-> -       /* Cleanup L1 state: disable PCID. */
-> -       write_cr3(cr3 & ~X86_CR3_PCID_MASK);
-> -       TEST_ASSERT(!write_cr4_checking(cr4 & ~X86_CR4_PCIDE));
-> +       /* Cleanup L1 state. */
-> +       write_cr3(orig_cr3);
-> +       TEST_ASSERT(!write_cr4_checking(orig_cr4));
->  }
->
->  static void vmx_nm_test_guest(void)
-> --
-> 2.17.1
->
+Regarding non-serializing forms, the SDM mentions,
 
-Reviewed-by: Marc Orr <marcorr@google.com>
+         "X2APIC MSRs (MSR indices 802H to 83FH)"
+
+
+(APIC_BASE_MSR + APIC_ICR/16) is a different value. So I am wondering 
+why we need a barrier here.
+
