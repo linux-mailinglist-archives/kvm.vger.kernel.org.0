@@ -2,85 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A870A58A36
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 20:52:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B708A58CE2
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 23:15:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726550AbfF0Swf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jun 2019 14:52:35 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:33794 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726426AbfF0Swf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jun 2019 14:52:35 -0400
-Received: by mail-wr1-f67.google.com with SMTP id k11so3732731wrl.1
-        for <kvm@vger.kernel.org>; Thu, 27 Jun 2019 11:52:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hd3Spk/P7VWQnCphu6aJi1EWnlma1ycX1TNYRdNKZhs=;
-        b=pR6NQ9Ay9gPL8DjEd8OKx4+AkV1ZRU/w1k9xXU0pwi/UN3SSCg3QjeeHUYlXilbT0h
-         QDMf5ggA3Cn8ED+C9DE4S8EcCPZMSLzBfcD3xw1ZBn661n2h9MgEW8GvHK+nnPQYLHZY
-         3FY+tl4FrSv6Ker2l8EPcfZe9SGqmvWujy4wfeu7iCfD0Es3N52hLb5jC3jasvpI4CSq
-         vZlY0b6ssCLwMcsJazcB3lAaopKp4GP+iKGzzUqjoIjJEA/KJslAsrPj71UoQwwk6GpV
-         0KBtDfuXAoxdgS7pkn8K1kof3O/qUDenEwMSTCOu6dBUWFjcNtd1rpmRxqLBUEyK+z6n
-         bh9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hd3Spk/P7VWQnCphu6aJi1EWnlma1ycX1TNYRdNKZhs=;
-        b=dcWlFQ972NX+bO7zq3eapOXYT+IscLIAy0fNlgJK0joOWTwp2tMU8/FW0v5hqsE/Vc
-         ubv/xYBS1yM1DAmrhCxjujpR1CyG/xvNtnp1pfAZwijZTlpHGBqRcuBpmylOOEWyy/Cb
-         lOCbuboTXc7ZmkdNCe58ndedeXL+47+GG6rfU2VxTtV5HLdS+25bM0cKcbTEbt/pLR/9
-         5OZmNjBEStfLArjDGgqZmRCeP8BZ3OuAPr8McLbRp8aliyS4bJ+nOzoE4bI+14QwOFBF
-         MpEfpUmVdt3UrJ3AyeImBaT297vc72MVyegCOA1I0BLV3uCdk+2YGhneRAX0OfY7Fnsy
-         0cBQ==
-X-Gm-Message-State: APjAAAU3wpZoo+7zkEkhIpfMqWRzgBjZbsC4hAqZm6Jg7WBW/a3ZKsrI
-        CgDTtjlWvyS0pT5w+zEi2moQlXyHiTp8kcY2B/2zWw==
-X-Google-Smtp-Source: APXvYqxF6c/DcihWiLaMHDSig+V2e6X5lRPmRO22lLnN8SRW2CsElaYe99U953Ep7HYH59YSkQcWvrJH2dAe3ywr5Ug=
-X-Received: by 2002:adf:c614:: with SMTP id n20mr4658901wrg.17.1561661552513;
- Thu, 27 Jun 2019 11:52:32 -0700 (PDT)
+        id S1726525AbfF0VPS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jun 2019 17:15:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46256 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726441AbfF0VPS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 17:15:18 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A384B308FED5;
+        Thu, 27 Jun 2019 21:15:17 +0000 (UTC)
+Received: from x1.home (ovpn-117-35.phx2.redhat.com [10.3.117.35])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CA47D600CC;
+        Thu, 27 Jun 2019 21:15:02 +0000 (UTC)
+Date:   Thu, 27 Jun 2019 15:15:02 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Libvirt Devel <libvir-list@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Erik Skultety <eskultet@redhat.com>,
+        Pavel Hrdina <phrdina@redhat.com>,
+        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+        Sylvain Bauza <sbauza@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>
+Subject: Re: mdevctl: A shoestring mediated device management and
+ persistence utility
+Message-ID: <20190627151502.2ae5314f@x1.home>
+In-Reply-To: <20190627093832.064a346f@x1.home>
+References: <20190523172001.41f386d8@x1.home>
+        <20190625165251.609f6266@x1.home>
+        <20190626115806.3435c45c.cohuck@redhat.com>
+        <20190626083720.42a2b5d4@x1.home>
+        <20190626195350.2e9c81d3@x1.home>
+        <20190627142626.415138da.cohuck@redhat.com>
+        <06114b39-69c2-3fa0-d0b3-aa96a44ae2ce@linux.ibm.com>
+        <20190627093832.064a346f@x1.home>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20190627183651.130922-1-jmattson@google.com>
-In-Reply-To: <20190627183651.130922-1-jmattson@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Thu, 27 Jun 2019 11:52:21 -0700
-Message-ID: <CAA03e5FQs5GT5R3nwkON+zvNEm8fqUpwTgm6tcv1CS+ohsJAzQ@mail.gmail.com>
-Subject: Re: [PATCH] kvm: x86: Pass through AMD_STIBP_ALWAYS_ON in GET_SUPPORTED_CPUID
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Thu, 27 Jun 2019 21:15:17 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 27, 2019 at 11:37 AM Jim Mattson <jmattson@google.com> wrote:
->
-> This bit is purely advisory. Passing it through to the guest indicates
-> that the virtual processor, like the physical processor, prefers that
-> STIBP is only set once during boot and not changed.
->
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
->  arch/x86/kvm/cpuid.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 4992e7c99588..e52f0b20d2f0 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -377,7 +377,7 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
->         /* cpuid 0x80000008.ebx */
->         const u32 kvm_cpuid_8000_0008_ebx_x86_features =
->                 F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSBD) |
-> -               F(AMD_SSB_NO) | F(AMD_STIBP);
-> +               F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON);
->
->         /* cpuid 0xC0000001.edx */
->         const u32 kvm_cpuid_C000_0001_edx_x86_features =
-> --
-> 2.22.0.410.gd8fdbe21b5-goog
->
+On Thu, 27 Jun 2019 09:38:32 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
+> > On 6/27/19 8:26 AM, Cornelia Huck wrote:  
+> > > 
+> > > {
+> > >   "foo": "1",
+> > >   "bar": "42",
+> > >   "baz": {
+> > >     "depends": ["foo", "bar"],
+> > >     "value": "plahh"
+> > >   }
+> > > }
+> > > 
+> > > Something like that?  
+> 
+> I'm not sure yet.  I think we need to look at what's feasible (and
+> easy) with jq.  Thanks,
 
-Reviewed-by: Marc Orr <marcorr@google.com>
+I think it's not too much trouble to remove and insert into arrays, so
+what if we were to define the config as:
+
+{
+  "mdev_type":"vendor-type",
+  "start":"auto",
+  "attrs": [
+      {"attrX":["Xvalue1","Xvalue2"]},
+      {"dir/attrY": "Yvalue1"},
+      {"attrX": "Xvalue3"}
+    ]
+}
+
+"attr" here would define sysfs attributes under the device.  The array
+would be processed in order, so in the above example we'd do the
+following:
+
+ 1. echo Xvalue1 > attrX
+ 2. echo Xvalue2 > attrX
+ 3. echo Yvalue1 > dir/attrY
+ 4. echo Xvalue3 > attrX
+
+When starting the device mdevctl would simply walk the array, if the
+attribute key exists write the value(s).  If a write fails or the
+attribute doesn't exist, remove the device and report error.
+
+I think it's easiest with jq to manipulate arrays by removing and
+inserting by index.  Also if we end up with something like above, it's
+ambiguous if we reference the "attrX" key.  So perhaps we add the
+following options to the modify command:
+
+--addattr=ATTRIBUTE --delattr --index=INDEX --value=VALUE1[,VALUE2]
+
+We could handle it like a stack, so if --index is not supplied, add to
+the end or remove from the end.  If --index is provided, delete that
+index or add the attribute at that index.  So if you had the above and
+wanted to remove Xvalue1 but keep the ordering, you'd do:
+
+--delattr --index=0
+--addattr --index=0 --value=Xvalue2
+
+Which should results in:
+
+  "attrs": [
+      {"attrX": "Xvalue2"},
+      {"dir/attrY": "Yvalue1"},
+      {"attrX": "Xvalue3"}
+    ]
+
+If we want to modify a running device, I'm thinking we probably want a
+new command and options --attr=ATTRIBUTE --value=VALUE might suffice.
+
+Do we need to support something like this for the 'start' command or
+should we leave that for simple devices and require a sequence of:
+
+# mdevctl define ...
+# mdevctl modify --addattr...
+...
+# mdevctl start
+# mdevctl undefine
+
+This is effectively the long way to get a transient device.  Otherwise
+we'd need to figure out how to have --attr --value appear multiple
+times on the start command line.  Thanks,
+
+Alex
