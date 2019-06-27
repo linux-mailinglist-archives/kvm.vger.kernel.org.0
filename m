@@ -2,106 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BAA6D5896B
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 20:01:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB03C58978
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 20:07:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726543AbfF0SBu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jun 2019 14:01:50 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:44534 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726502AbfF0SBu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jun 2019 14:01:50 -0400
-Received: by mail-pf1-f193.google.com with SMTP id t16so1600836pfe.11
-        for <kvm@vger.kernel.org>; Thu, 27 Jun 2019 11:01:50 -0700 (PDT)
+        id S1726558AbfF0SHF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jun 2019 14:07:05 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:42488 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726498AbfF0SHF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 14:07:05 -0400
+Received: by mail-pg1-f196.google.com with SMTP id k13so1364935pgq.9
+        for <kvm@vger.kernel.org>; Thu, 27 Jun 2019 11:07:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id;
-        bh=nzDqGzdl7G2ODy1DKC/5xLs0B4YLweJhbbu3iqVK++M=;
-        b=ZQMt1q4RhXW3ZQ42Dwwl2Q8UOsRd+0xC0c318NlRT/5fB04TpB1fkOb98WkZ2qhyED
-         qRyFAMf/spieKkB8n3Qb2fbXEgVznip1aUV7W9J5b5F4FZmc6UWEyN3nvcXklh42VGbt
-         WCz4f+iiBBOI8jP74K1rhSGoIovUsvBNMJDMTzPPx13C/ZhMwVHRJfGBRSYVOgBZyMp2
-         N06zKAA0NIMhtDq661gAjbcXOdgG4a3iy317lxOE1wPLAOfxWQPToGL2ginm3BmoOCs8
-         7bE7FkREEXXyYG6l7uba5R32oB1ffMIv3AYKJ6ch5Wz1X8YqnjcLpQPVcFsMp3YVP/HN
-         sOiQ==
+        bh=KvpccCGbIR5vR1fU6mkTYmo6UymuiN0W8cf9VwXY0Qs=;
+        b=BmtkaUOpf5LIahpaLqBpBJBz/sxamYhhY6w1zckw+AvG4vbEUsQfP08zZcho+D/k48
+         076aK4LCZ0l8huTeM6PUmsWvigaxLBJSH9XhLO2i/peeBYTtoVaJ3gQtZMhhz8pv/6le
+         BbGdEHfxR6PyWtF92R2LwE0YBK57VIcZkyjs76q1SihzM0DNAzLGCqFWc19JfCPPI66r
+         dHNlSQzHvAZt7pcY/4jJiHMOCIC2lXhw70Y48yO+/TuIFjRm1NIl1geO054hxrLuA7Wv
+         1JQXTGB6HPVNi3/FT3LF4O2cFvPHfKEk287aeL6qmcyaxvdTn2vdlMECaSmZorc3E3pM
+         frRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=nzDqGzdl7G2ODy1DKC/5xLs0B4YLweJhbbu3iqVK++M=;
-        b=m9YY7Yat5Pdms/mea+2tTHkS1GvzWEAOSk/i9MB8uh1+mUoTj8AOVFy+H2CY4Rbbhn
-         YEzGpPzbxdrCcAL/qYhR65rJMq89BP80dm1/q2WuH1X6oEUk4e5FfBEuCWn6B/vgk/Jj
-         HE8CMulje+uMu3OQ4tifkQCGnFKn7cf00m4gLIX8F+IiEwSrfSnsZzP+RftR9JVbYpCW
-         g4oaXZxYYjnHDFTKL44OSKgPf7Pk/uhL8nDYn/4TwG+Irt6xJrO4AwG+l2kyCubcu4Pe
-         k55hSoKyUvcmGUMF1w+m7fIBLgV9YDQy1d8S13ZX6FfVhVDYOe2I3MksZRT94QZE6gYx
-         ocLw==
-X-Gm-Message-State: APjAAAUpRp+zuK0VM1b7nVv6h3Qa0QVgnQ/LbFFSkvesDHP5cbk4/dLf
-        JtUWDZWehc6uTSRBGeQfOTU=
-X-Google-Smtp-Source: APXvYqzEj6VykwQ4lvb7sCDvkNH4pizyZwrYOo7xD7aDyoAjXibE/puaP5AkRBSOKry0vUjdr1BVaA==
-X-Received: by 2002:a17:90a:a00d:: with SMTP id q13mr7473623pjp.80.1561658509514;
-        Thu, 27 Jun 2019 11:01:49 -0700 (PDT)
+        bh=KvpccCGbIR5vR1fU6mkTYmo6UymuiN0W8cf9VwXY0Qs=;
+        b=J5awWMFSNjiwmmG6Zav71E1Ai1Nc3wumh1qDBsO3Yf4bwyRDPIcTRoQO763pGcbd9v
+         AAI47R1x4/UAeZiNkTkr8bZRZbTwqT06S4MIo7ioNKmGbTC9MDrkVEi1f/9lnoT9vYps
+         dtwmSgMz9J7AHABlvVsyySkHTsPV5pCDLBfHIXs58mA1pbpCEGiyPPNznJRK1sKzTJdp
+         nvBmZGksNuFvLTPfEuP/oW8f77+n1INpkV++XwplAXMYEY6LbCLYYFW98yWb/ANqFXYy
+         A7MROvbpV7lGq09IZgSHy/Br2zW4ptGF9duSIouMKfhcjhXIrI9z/05uCDY3t1chB3rc
+         llGw==
+X-Gm-Message-State: APjAAAVK6DIK0EsJNIOsDhpxotCtXQfYFhxWJQiKYijhxCwQEh3sAKlv
+        Hlm0v0nZWgbzdanfN4NMGVc=
+X-Google-Smtp-Source: APXvYqzdFCUu4dgcewRq8k3L3UKHskJ+PPWrHmI2DGt5wnNv1Be2+3rEdrp0LSd/CgZytNDKBK9AQw==
+X-Received: by 2002:a63:8f09:: with SMTP id n9mr4878631pgd.249.1561658824250;
+        Thu, 27 Jun 2019 11:07:04 -0700 (PDT)
 Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id p68sm4058512pfb.80.2019.06.27.11.01.48
+        by smtp.gmail.com with ESMTPSA id w22sm3263982pfi.175.2019.06.27.11.07.02
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 27 Jun 2019 11:01:48 -0700 (PDT)
+        Thu, 27 Jun 2019 11:07:03 -0700 (PDT)
 From:   Nadav Amit <nadav.amit@gmail.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Subject: [kvm-unit-tests PATCH v2] x86: Reset lapic after boot
-Date:   Thu, 27 Jun 2019 03:39:37 -0700
-Message-Id: <20190627103937.3842-1-nadav.amit@gmail.com>
+        Marc Orr <marcorr@google.com>
+Subject: [kvm-unit-tests PATCH v2] x86: Remove assumptions on CR4.MCE
+Date:   Thu, 27 Jun 2019 03:44:53 -0700
+Message-Id: <20190627104453.4182-1-nadav.amit@gmail.com>
 X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Do not assume that the local APIC is in a xAPIC mode after reset.
-Instead reset it first, since it might be in x2APIC mode, from which a
-transition in xAPIC is invalid.
+CR4.MCE might be set after boot. Remove the assertion that checks that
+it is clear. Change the test to toggle the bit instead of setting it.
 
-To use reset_apic(), change it to use xapic_write(), in order to make safe to use
-while apic_ops might change concurrently by x2apic_enable().
-
-Cc: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+Cc: Marc Orr <marcorr@google.com>
+Reviewed-by: Marc Orr <marcorr@google.com>
+Reviewed-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
 Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
 ---
- lib/x86/apic.c | 2 +-
- x86/cstart64.S | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ x86/vmx_tests.c | 27 +++++++++++++--------------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
 
-diff --git a/lib/x86/apic.c b/lib/x86/apic.c
-index 1514730..b3e39ae 100644
---- a/lib/x86/apic.c
-+++ b/lib/x86/apic.c
-@@ -164,7 +164,7 @@ void reset_apic(void)
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index b50d858..329bafa 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -7096,8 +7096,11 @@ static int write_cr4_checking(unsigned long val)
+ 
+ static void vmx_cr_load_test(void)
  {
-     disable_apic();
-     wrmsr(MSR_IA32_APICBASE, rdmsr(MSR_IA32_APICBASE) | APIC_EN);
--    apic_write(APIC_SPIV, 0x1ff);
-+    xapic_write(APIC_SPIV, 0x1ff);
++	unsigned long cr3, cr4, orig_cr3, orig_cr4;
+ 	struct cpuid _cpuid = cpuid(1);
+-	unsigned long cr4 = read_cr4(), cr3 = read_cr3();
++
++	orig_cr4 = read_cr4();
++	orig_cr3 = read_cr3();
+ 
+ 	if (!(_cpuid.c & X86_FEATURE_PCID)) {
+ 		report_skip("PCID not detected");
+@@ -7108,12 +7111,11 @@ static void vmx_cr_load_test(void)
+ 		return;
+ 	}
+ 
+-	TEST_ASSERT(!(cr4 & (X86_CR4_PCIDE | X86_CR4_MCE)));
+-	TEST_ASSERT(!(cr3 & X86_CR3_PCID_MASK));
++	TEST_ASSERT(!(orig_cr3 & X86_CR3_PCID_MASK));
+ 
+ 	/* Enable PCID for L1. */
+-	cr4 |= X86_CR4_PCIDE;
+-	cr3 |= 0x1;
++	cr4 = orig_cr4 | X86_CR4_PCIDE;
++	cr3 = orig_cr3 | 0x1;
+ 	TEST_ASSERT(!write_cr4_checking(cr4));
+ 	write_cr3(cr3);
+ 
+@@ -7126,17 +7128,14 @@ static void vmx_cr_load_test(void)
+ 	 * No exception is expected.
+ 	 *
+ 	 * NB. KVM loads the last guest write to CR4 into CR4 read
+-	 *     shadow. In order to trigger an exit to KVM, we can set a
+-	 *     bit that was zero in the above CR4 write and is owned by
+-	 *     KVM. We choose to set CR4.MCE, which shall have no side
+-	 *     effect because normally no guest MCE (e.g., as the result
+-	 *     of bad memory) would happen during this test.
++	 *     shadow. In order to trigger an exit to KVM, we can toggle a
++	 *     bit that is owned by KVM.
+ 	 */
+-	TEST_ASSERT(!write_cr4_checking(cr4 | X86_CR4_MCE));
++	TEST_ASSERT(!write_cr4_checking(cr4 ^ X86_CR4_MCE));
+ 
+-	/* Cleanup L1 state: disable PCID. */
+-	write_cr3(cr3 & ~X86_CR3_PCID_MASK);
+-	TEST_ASSERT(!write_cr4_checking(cr4 & ~X86_CR4_PCIDE));
++	/* Cleanup L1 state. */
++	write_cr3(orig_cr3);
++	TEST_ASSERT(!write_cr4_checking(orig_cr4));
  }
  
- u32 ioapic_read_reg(unsigned reg)
-diff --git a/x86/cstart64.S b/x86/cstart64.S
-index 9791282..1889c6b 100644
---- a/x86/cstart64.S
-+++ b/x86/cstart64.S
-@@ -228,6 +228,7 @@ save_id:
- 	retq
- 
- ap_start64:
-+	call reset_apic
- 	call load_tss
- 	call enable_apic
- 	call save_id
-@@ -240,6 +241,7 @@ ap_start64:
- 	jmp 1b
- 
- start64:
-+	call reset_apic
- 	call load_tss
- 	call mask_pic_interrupts
- 	call enable_apic
+ static void vmx_nm_test_guest(void)
 -- 
 2.17.1
 
