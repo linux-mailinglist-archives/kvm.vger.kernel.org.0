@@ -2,61 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 764AE57E65
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 10:40:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 756FA57E75
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 10:44:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726425AbfF0IkH convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 27 Jun 2019 04:40:07 -0400
-Received: from mga14.intel.com ([192.55.52.115]:57246 "EHLO mga14.intel.com"
+        id S1726431AbfF0IoT convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 27 Jun 2019 04:44:19 -0400
+Received: from mga09.intel.com ([134.134.136.24]:17919 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725385AbfF0IkH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jun 2019 04:40:07 -0400
+        id S1725385AbfF0IoT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 04:44:19 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Jun 2019 01:40:06 -0700
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Jun 2019 01:44:18 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,423,1557212400"; 
-   d="scan'208";a="245743492"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga001.jf.intel.com with ESMTP; 27 Jun 2019 01:40:05 -0700
-Received: from fmsmsx111.amr.corp.intel.com (10.18.116.5) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 27 Jun 2019 01:40:05 -0700
-Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
- fmsmsx111.amr.corp.intel.com (10.18.116.5) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Thu, 27 Jun 2019 01:40:05 -0700
+   d="scan'208";a="185197942"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+  by fmsmga004.fm.intel.com with ESMTP; 27 Jun 2019 01:44:18 -0700
+Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 27 Jun 2019 01:44:18 -0700
 Received: from shsmsx101.ccr.corp.intel.com ([169.254.1.87]) by
- SHSMSX152.ccr.corp.intel.com ([169.254.6.225]) with mapi id 14.03.0439.000;
- Thu, 27 Jun 2019 16:40:03 +0800
+ SHSMSX106.ccr.corp.intel.com ([169.254.10.89]) with mapi id 14.03.0439.000;
+ Thu, 27 Jun 2019 16:44:16 +0800
 From:   "Zhang, Tina" <tina.zhang@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
+To:     Gerd Hoffmann <kraxel@redhat.com>
 CC:     "intel-gvt-dev@lists.freedesktop.org" 
         <intel-gvt-dev@lists.freedesktop.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kraxel@redhat.com" <kraxel@redhat.com>,
         "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
         "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
         "Wang, Zhi A" <zhi.a.wang@intel.com>,
         "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yuan, Hang" <hang.yuan@intel.com>
-Subject: RE: [RFC PATCH v3 1/4] vfio: Define device specific irq type
- capability
-Thread-Topic: [RFC PATCH v3 1/4] vfio: Define device specific irq type
- capability
-Thread-Index: AQHVLJqY892xL/jYXUCHg0oNNo51Q6auXGaAgADSDfA=
-Date:   Thu, 27 Jun 2019 08:40:03 +0000
-Message-ID: <237F54289DF84E4997F34151298ABEBC876835C6@SHSMSX101.ccr.corp.intel.com>
+        "Yuan, Hang" <hang.yuan@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
+Subject: RE: [RFC PATCH v3 0/4] Deliver vGPU display vblank event to
+ userspace
+Thread-Topic: [RFC PATCH v3 0/4] Deliver vGPU display vblank event to
+ userspace
+Thread-Index: AQHVLJqUUSM/9sKZ/UyimYY5z7yeLaaughWAgACsmuA=
+Date:   Thu, 27 Jun 2019 08:44:15 +0000
+Message-ID: <237F54289DF84E4997F34151298ABEBC876835E5@SHSMSX101.ccr.corp.intel.com>
 References: <20190627033802.1663-1-tina.zhang@intel.com>
-        <20190627033802.1663-2-tina.zhang@intel.com>
- <20190626220739.578c518b@x1.home>
-In-Reply-To: <20190626220739.578c518b@x1.home>
+ <20190627062231.57tywityo6uyhmyd@sirius.home.kraxel.org>
+In-Reply-To: <20190627062231.57tywityo6uyhmyd@sirius.home.kraxel.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiOTAyNTlkNDctMGNhZC00Y2Q4LWI3OGUtODYyODM4MzBkZDkyIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiQThXNStVZE1cL2ViRzJFRXVRa0pwbVZSVjdXY2Z5bTQ3UEhlUmVPdUU1MVczWmlCTEVRZmJ1dnpEcmh0bFZvdEgifQ==
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiOGRkMjk1OGYtYWY4My00ODBkLWFlNTMtYjZhZjIwM2Y5NTVlIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiSjliTHc4bVZ4QTlUZWp0ZVwvd1dydjhaTW42UVZqWmt3bFVEVWVSRU1ZelJxXC9YWXB1Ymw0T3Y5XC82S2hOZ0QrSyJ9
 x-ctpclassification: CTP_NT
 dlp-product: dlpe-windows
 dlp-version: 11.0.600.7
@@ -73,81 +69,37 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 > -----Original Message-----
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: Thursday, June 27, 2019 12:08 PM
+> From: Gerd Hoffmann [mailto:kraxel@redhat.com]
+> Sent: Thursday, June 27, 2019 2:23 PM
 > To: Zhang, Tina <tina.zhang@intel.com>
 > Cc: intel-gvt-dev@lists.freedesktop.org; kvm@vger.kernel.org; linux-
-> kernel@vger.kernel.org; kraxel@redhat.com; zhenyuw@linux.intel.com; Lv,
-> Zhiyuan <zhiyuan.lv@intel.com>; Wang, Zhi A <zhi.a.wang@intel.com>; Tian,
-> Kevin <kevin.tian@intel.com>; Yuan, Hang <hang.yuan@intel.com>
-> Subject: Re: [RFC PATCH v3 1/4] vfio: Define device specific irq type
-> capability
+> kernel@vger.kernel.org; zhenyuw@linux.intel.com; Lv, Zhiyuan
+> <zhiyuan.lv@intel.com>; Wang, Zhi A <zhi.a.wang@intel.com>; Tian, Kevin
+> <kevin.tian@intel.com>; Yuan, Hang <hang.yuan@intel.com>;
+> alex.williamson@redhat.com
+> Subject: Re: [RFC PATCH v3 0/4] Deliver vGPU display vblank event to
+> userspace
 > 
-> On Thu, 27 Jun 2019 11:37:59 +0800
-> Tina Zhang <tina.zhang@intel.com> wrote:
+>   Hi,
 > 
-> > Cap the number of irqs with fixed indexes and use capability chains to
-> > chain device specific irqs.
-> >
-> > Signed-off-by: Tina Zhang <tina.zhang@intel.com>
-> > ---
-> >  include/uapi/linux/vfio.h | 19 ++++++++++++++++++-
-> >  1 file changed, 18 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index 02bb7ad6e986..600784acc4ac 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -444,11 +444,27 @@ struct vfio_irq_info {
-> >  #define VFIO_IRQ_INFO_MASKABLE		(1 << 1)
-> >  #define VFIO_IRQ_INFO_AUTOMASKED	(1 << 2)
-> >  #define VFIO_IRQ_INFO_NORESIZE		(1 << 3)
-> > +#define VFIO_IRQ_INFO_FLAG_CAPS		(1 << 4) /* Info
-> supports caps */
-> >  	__u32	index;		/* IRQ index */
-> > +	__u32	cap_offset;	/* Offset within info struct of first cap */
-> >  	__u32	count;		/* Number of IRQs within this index */
-> >  };
+> > Instead of delivering page flip events, we choose to post display
+> > vblank event. Handling page flip events for both primary plane and
+> > cursor plane may make user space quite busy, although we have the
+> > mask/unmask mechansim for mitigation. Besides, there are some cases
+> > that guest app only uses one framebuffer for both drawing and display.
+> > In such case, guest OS won't do the plane page flip when the
+> > framebuffer is updated, thus the user land won't be notified about the
+> updated framebuffer.
 > 
-> 
-> This cannot be inserted into the middle of the structure, it breaks
-> compatibility with all existing userspace binaries.  I must be added to the end
-> of the structure.
-Indeed. Thanks.
+> What happens when the guest is idle and doesn't draw anything to the
+> framebuffer?
+The vblank event will be delivered to userspace as well, unless guest OS disable the pipe.
+Does it make sense to vfio/display?
+Thanks.
 
 BR,
 Tina
 > 
-> >  #define VFIO_DEVICE_GET_IRQ_INFO	_IO(VFIO_TYPE, VFIO_BASE +
-> 9)
-> >
-> > +/*
-> > + * The irq type capability allows irqs unique to a specific device or
-> > + * class of devices to be exposed.
-> > + *
-> > + * The structures below define version 1 of this capability.
-> > + */
-> > +#define VFIO_IRQ_INFO_CAP_TYPE      3
-> > +
-> > +struct vfio_irq_info_cap_type {
-> > +	struct vfio_info_cap_header header;
-> > +	__u32 type;     /* global per bus driver */
-> > +	__u32 subtype;  /* type specific */
-> > +};
-> > +
-> >  /**
-> >   * VFIO_DEVICE_SET_IRQS - _IOW(VFIO_TYPE, VFIO_BASE + 10, struct
-> vfio_irq_set)
-> >   *
-> > @@ -550,7 +566,8 @@ enum {
-> >  	VFIO_PCI_MSIX_IRQ_INDEX,
-> >  	VFIO_PCI_ERR_IRQ_INDEX,
-> >  	VFIO_PCI_REQ_IRQ_INDEX,
-> > -	VFIO_PCI_NUM_IRQS
-> > +	VFIO_PCI_NUM_IRQS = 5	/* Fixed user ABI, IRQ indexes >=5
-> use   */
-> > +				/* device specific cap to define content */
-> >  };
-> >
-> >  /*
+> cheers,
+>   Gerd
 
