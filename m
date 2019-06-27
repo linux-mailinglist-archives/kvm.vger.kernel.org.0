@@ -2,166 +2,400 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FD465830B
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 15:00:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DD3D5832F
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2019 15:16:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726540AbfF0NAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jun 2019 09:00:23 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:64718 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726375AbfF0NAX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 27 Jun 2019 09:00:23 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5RCx0N2076326;
-        Thu, 27 Jun 2019 09:00:03 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2tcx3crqyj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jun 2019 09:00:03 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x5RCxOBL003367;
-        Thu, 27 Jun 2019 13:00:01 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma04dal.us.ibm.com with ESMTP id 2t9by76dx1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jun 2019 13:00:01 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5RCxxMt53215686
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Jun 2019 12:59:59 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1B59AAE060;
-        Thu, 27 Jun 2019 12:59:59 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AD20EAE066;
-        Thu, 27 Jun 2019 12:59:58 +0000 (GMT)
-Received: from [9.60.85.213] (unknown [9.60.85.213])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 27 Jun 2019 12:59:58 +0000 (GMT)
-Subject: Re: [PATCH v4 3/7] s390: zcrypt: driver callback to indicate resource
- in use
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, mjrosato@linux.ibm.com,
-        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
-        pmorel@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com
-References: <1560454780-20359-1-git-send-email-akrowiak@linux.ibm.com>
- <1560454780-20359-4-git-send-email-akrowiak@linux.ibm.com>
- <20190618182558.7d7e025a.cohuck@redhat.com>
- <2366c6b6-fd9e-0c32-0e9d-018cd601a0ad@linux.ibm.com>
- <44f13e89-2fb4-bf8c-7849-641aae8d08cc@linux.ibm.com>
- <20190627092518.1f8d7d48.cohuck@redhat.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <315c8220-3dfa-1b19-266a-b9d9069bbe73@linux.ibm.com>
-Date:   Thu, 27 Jun 2019 08:59:59 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726443AbfF0NQG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jun 2019 09:16:06 -0400
+Received: from foss.arm.com ([217.140.110.172]:54158 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726059AbfF0NQG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 09:16:06 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E939A360;
+        Thu, 27 Jun 2019 06:16:04 -0700 (PDT)
+Received: from [10.37.8.60] (unknown [10.37.8.60])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 299C43F246;
+        Thu, 27 Jun 2019 06:16:01 -0700 (PDT)
+Subject: Re: [PATCH 35/59] KVM: arm/arm64: nv: Support multiple nested stage 2
+ mmu structures
+To:     Marc Zyngier <marc.zyngier@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-36-marc.zyngier@arm.com>
+From:   Julien Thierry <julien.thierry@arm.com>
+Message-ID: <87564216-c7d0-351f-b3a6-1826706df89b@arm.com>
+Date:   Thu, 27 Jun 2019 14:15:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <20190627092518.1f8d7d48.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190621093843.220980-36-marc.zyngier@arm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-27_07:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906270152
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/27/19 3:25 AM, Cornelia Huck wrote:
-> On Wed, 26 Jun 2019 17:13:50 -0400
-> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
-> 
->> On 6/19/19 9:04 AM, Tony Krowiak wrote:
->>> On 6/18/19 12:25 PM, Cornelia Huck wrote:
->>>> On Thu, 13 Jun 2019 15:39:36 -0400
->>>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->>>>   
->>>>> Introduces a new driver callback to prevent a root user from unbinding
->>>>> an AP queue from its device driver if the queue is in use. This prevents
->>>>> a root user from inadvertently taking a queue away from a guest and
->>>>> giving it to the host, or vice versa. The callback will be invoked
->>>>> whenever a change to the AP bus's apmask or aqmask sysfs interfaces may
->>>>> result in one or more AP queues being removed from its driver. If the
->>>>> callback responds in the affirmative for any driver queried, the change
->>>>> to the apmask or aqmask will be rejected with a device in use error.
->>>>>
->>>>> For this patch, only non-default drivers will be queried. Currently,
->>>>> there is only one non-default driver, the vfio_ap device driver. The
->>>>> vfio_ap device driver manages AP queues passed through to one or more
->>>>> guests and we don't want to unexpectedly take AP resources away from
->>>>> guests which are most likely independently administered.
->>>>>
->>>>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
->>>>> ---
->>>>>    drivers/s390/crypto/ap_bus.c | 138
->>>>> +++++++++++++++++++++++++++++++++++++++++--
->>>>>    drivers/s390/crypto/ap_bus.h |   3 +
->>>>>    2 files changed, 135 insertions(+), 6 deletions(-)
->>>>
->>>> Hm... I recall objecting to this patch before, fearing that it makes it
->>>> possible for a bad actor to hog resources that can't be removed by
->>>> root, even forcefully. (I have not had time to look at the intervening
->>>> versions, so I might be missing something.)
->>>>
->>>> Is there a way for root to forcefully override this?
->>>
->>> You recall correctly; however, after many internal crypto team
->>> discussions, it was decided that this feature was important
->>> and should be kept.
->>>
->>> Allow me to first address your fear that a bad actor can hog
->>> resources that can't be removed by root. With this enhancement,
->>> there is nothing preventing a root user from taking resources
->>> from a matrix mdev, it simply forces him/her to follow the
->>> proper procedure. The resources to be removed must first be
->>> unassigned from the matrix mdev to which they are assigned.
->>> The AP bus's /sys/bus/ap/apmask and /sys/bus/ap/aqmask
->>> sysfs attributes can then be edited to transfer ownership
->>> of the resources to zcrypt.
->>>
->>> The rationale for keeping this feature is:
->>>
->>> * It is a bad idea to steal an adapter in use from a guest. In the worst
->>>     case, the guest could end up without access to any crypto adapters
->>>     without knowing why. This could lead to performance issues on guests
->>>     that rely heavily on crypto such as guests used for blockchain
->>>     transactions.
->>>
->>> * There are plenty of examples in linux of the kernel preventing a root
->>>     user from performing a task. For example, a module can't be removed
->>>     if references are still held for it. Another example would be trying
->>>     to bind a CEX4 adapter to a device driver not registered for CEX4;
->>>     this action will also be rejected.
->>>
->>> * The semantics are much cleaner and the logic is far less complicated.
->>>
->>> * It forces the use of the proper procedure to change ownership of AP
->>>     queues.
->>>   
->>
->> Any feedback on this?
-> 
-> Had not yet time to look at this, sorry.
 
-No problem, just wanted to make sure it didn't get lost in the shuffle.
 
+On 06/21/2019 10:38 AM, Marc Zyngier wrote:
+> From: Christoffer Dall <christoffer.dall@arm.com>
 > 
+> Add stage 2 mmu data structures for virtual EL2 and for nested guests.
+> We don't yet populate shadow stage 2 page tables, but we now have a
+> framework for getting to a shadow stage 2 pgd.
 > 
->>
->> Tony K
->>
->>>    
->>>>   
->>>    
->>
+> We allocate twice the number of vcpus as stage 2 mmu structures because
+> that's sufficient for each vcpu running two VMs without having to flush
+> the stage 2 page tables.
 > 
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm/include/asm/kvm_host.h     |   4 +
+>  arch/arm/include/asm/kvm_mmu.h      |   3 +
+>  arch/arm64/include/asm/kvm_host.h   |  28 +++++
+>  arch/arm64/include/asm/kvm_mmu.h    |   8 ++
+>  arch/arm64/include/asm/kvm_nested.h |   7 ++
+>  arch/arm64/kvm/nested.c             | 172 ++++++++++++++++++++++++++++
+>  virt/kvm/arm/arm.c                  |  16 ++-
+>  virt/kvm/arm/mmu.c                  |  31 ++---
+>  8 files changed, 254 insertions(+), 15 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index e3217c4ad25b..b821eb2383ad 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -424,4 +424,8 @@ static inline bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
+>  	return true;
+>  }
+>  
+> +static inline void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu) {}
+> +static inline void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu) {}
+> +static inline int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu) { return 0; }
+> +
+>  #endif /* __ARM_KVM_HOST_H__ */
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index be23e3f8e08c..e6984b6da2ce 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -420,6 +420,9 @@ static inline int hyp_map_aux_data(void)
+>  
+>  static inline void kvm_set_ipa_limit(void) {}
+>  
+> +static inline void kvm_init_s2_mmu(struct kvm_s2_mmu *mmu) {}
+> +static inline void kvm_init_nested(struct kvm *kvm) {}
+> +
+>  static __always_inline u64 kvm_get_vttbr(struct kvm_s2_mmu *mmu)
+>  {
+>  	struct kvm_vmid *vmid = &mmu->vmid;
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 3dee5e17a4ee..cc238de170d2 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -88,11 +88,39 @@ struct kvm_s2_mmu {
+>  	phys_addr_t	pgd_phys;
+>  
+>  	struct kvm *kvm;
+> +
+> +	/*
+> +	 * For a shadow stage-2 MMU, the virtual vttbr programmed by the guest
+> +	 * hypervisor.  Unused for kvm_arch->mmu. Set to 1 when the structure
+> +	 * contains no valid information.
+> +	 */
+> +	u64	vttbr;
+> +
+> +	/* true when this represents a nested context where virtual HCR_EL2.VM == 1 */
+> +	bool	nested_stage2_enabled;
+> +
+> +	/*
+> +	 *  0: Nobody is currently using this, check vttbr for validity
+> +	 * >0: Somebody is actively using this.
+> +	 */
+> +	atomic_t refcnt;
+>  };
+>  
+> +static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
+> +{
+> +	return !(mmu->vttbr & 1);
+> +}
+> +
+>  struct kvm_arch {
+>  	struct kvm_s2_mmu mmu;
+>  
+> +	/*
+> +	 * Stage 2 paging stage for VMs with nested virtual using a virtual
+> +	 * VMID.
+> +	 */
+> +	struct kvm_s2_mmu *nested_mmus;
+> +	size_t nested_mmus_size;
+> +
+>  	/* VTCR_EL2 value for this VM */
+>  	u64    vtcr;
+>  
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 1eb6e0ca61c2..32bcaa1845dc 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -100,6 +100,7 @@ alternative_cb_end
+>  #include <asm/mmu_context.h>
+>  #include <asm/pgtable.h>
+>  #include <asm/kvm_emulate.h>
+> +#include <asm/kvm_nested.h>
+>  
+>  void kvm_update_va_mask(struct alt_instr *alt,
+>  			__le32 *origptr, __le32 *updptr, int nr_inst);
+> @@ -164,6 +165,7 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+>  			     void **haddr);
+>  void free_hyp_pgds(void);
+>  
+> +void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
+>  void stage2_unmap_vm(struct kvm *kvm);
+>  int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu);
+>  void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+> @@ -635,5 +637,11 @@ static __always_inline void __load_guest_stage2(struct kvm_s2_mmu *mmu)
+>  	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_1165522));
+>  }
+>  
+> +static inline u64 get_vmid(u64 vttbr)
+> +{
+> +	return (vttbr & VTTBR_VMID_MASK(kvm_get_vmid_bits())) >>
+> +		VTTBR_VMID_SHIFT;
+> +}
+> +
+>  #endif /* __ASSEMBLY__ */
+>  #endif /* __ARM64_KVM_MMU_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 61e71d0d2151..d4021d0892bd 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -10,6 +10,13 @@ static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
+>  		test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features);
+>  }
+>  
+> +extern void kvm_init_nested(struct kvm *kvm);
+> +extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
+> +extern void kvm_init_s2_mmu(struct kvm_s2_mmu *mmu);
+> +extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr);
+> +extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
+> +extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
+> +
+>  int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+>  extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+>  extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 3872e3cf1691..4b38dc5c0be3 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -18,7 +18,161 @@
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+>  
+> +#include <asm/kvm_arm.h>
+>  #include <asm/kvm_emulate.h>
+> +#include <asm/kvm_mmu.h>
+> +#include <asm/kvm_nested.h>
+> +
+> +void kvm_init_nested(struct kvm *kvm)
+> +{
+> +	kvm_init_s2_mmu(&kvm->arch.mmu);
+> +
+> +	kvm->arch.nested_mmus = NULL;
+> +	kvm->arch.nested_mmus_size = 0;
+> +}
+> +
+> +int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	struct kvm_s2_mmu *tmp;
+> +	int num_mmus;
+> +	int ret = -ENOMEM;
+> +
+> +	if (!test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features))
+> +		return 0;
+> +
+> +	if (!cpus_have_const_cap(ARM64_HAS_NESTED_VIRT))
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&kvm->lock);
+> +
+> +	num_mmus = atomic_read(&kvm->online_vcpus) * 2;
+> +	tmp = __krealloc(kvm->arch.nested_mmus,
+> +			 num_mmus * sizeof(*kvm->arch.nested_mmus),
+> +			 GFP_KERNEL | __GFP_ZERO);
+> +
+> +	if (tmp) {
+> +		if (tmp != kvm->arch.nested_mmus)
+> +			kfree(kvm->arch.nested_mmus);
+> +
+> +		tmp[num_mmus - 1].kvm = kvm;
+> +		atomic_set(&tmp[num_mmus - 1].refcnt, 0);
+> +		ret = kvm_alloc_stage2_pgd(&tmp[num_mmus - 1]);
+> +		if (ret)
+> +			goto out;
+> +
+> +		tmp[num_mmus - 2].kvm = kvm;
+> +		atomic_set(&tmp[num_mmus - 2].refcnt, 0);
+> +		ret = kvm_alloc_stage2_pgd(&tmp[num_mmus - 2]);
+> +		if (ret) {
+> +			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
+> +			goto out;
+> +		}
+> +
+> +		kvm->arch.nested_mmus_size = num_mmus;
+> +		kvm->arch.nested_mmus = tmp;
+> +		tmp = NULL;
+> +	}
+> +
+> +out:
+> +	kfree(tmp);
+> +	mutex_unlock(&kvm->lock);
+> +	return ret;
+> +}
+> +
+> +/* Must be called with kvm->lock held */
+> +struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
+> +{
+> +	bool nested_stage2_enabled = hcr & HCR_VM;
+> +	int i;
+> +
+> +	/* Don't consider the CnP bit for the vttbr match */
+> +	vttbr = vttbr & ~1UL;
+> +
+> +	/* Search a mmu in the list using the virtual VMID as a key */
+> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +
+> +		if (!kvm_s2_mmu_valid(mmu))
+> +			continue;
+> +
+> +		if (nested_stage2_enabled &&
+> +		    mmu->nested_stage2_enabled &&
+> +		    vttbr == mmu->vttbr)
+> +			return mmu;
+> +
+> +		if (!nested_stage2_enabled &&
+> +		    !mmu->nested_stage2_enabled &&
+> +		    get_vmid(vttbr) == get_vmid(mmu->vttbr))
+> +			return mmu;
+> +	}
+> +	return NULL;
+> +}
+> +
+> +static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+> +	u64 hcr= vcpu_read_sys_reg(vcpu, HCR_EL2);
+> +	struct kvm_s2_mmu *s2_mmu;
+> +	int i;
+> +
+> +	s2_mmu = lookup_s2_mmu(kvm, vttbr, hcr);
+> +	if (s2_mmu)
+> +		goto out;
+> +
+> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> +		s2_mmu = &kvm->arch.nested_mmus[i];
+> +
+> +		if (atomic_read(&s2_mmu->refcnt) == 0)
+> +			break;
+> +	}
+> +	BUG_ON(atomic_read(&s2_mmu->refcnt)); /* We have struct MMUs to spare */
+> +
+> +	if (kvm_s2_mmu_valid(s2_mmu)) {
+> +		/* Clear the old state */
+> +		kvm_unmap_stage2_range(s2_mmu, 0, kvm_phys_size(kvm));
+> +		if (s2_mmu->vmid.vmid_gen)
+> +			kvm_call_hyp(__kvm_tlb_flush_vmid, s2_mmu);
+> +	}
+> +
+> +	/*
+> +	 * The virtual VMID (modulo CnP) will be used as a key when matching
+> +	 * an existing kvm_s2_mmu.
+> +	 */
+> +	s2_mmu->vttbr = vttbr & ~1UL;
+> +	s2_mmu->nested_stage2_enabled = hcr & HCR_VM;
+> +
+> +out:
+> +	atomic_inc(&s2_mmu->refcnt);
+> +	return s2_mmu;
+> +}
+> +
+> +void kvm_init_s2_mmu(struct kvm_s2_mmu *mmu)
+> +{
+> +	mmu->vttbr = 1;
+> +	mmu->nested_stage2_enabled = false;
+> +	atomic_set(&mmu->refcnt, 0);
+> +}
+> +
+> +void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
+> +{
+> +	if (is_hyp_ctxt(vcpu)) {
+> +		vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
+> +	} else {
+> +		spin_lock(&vcpu->kvm->mmu_lock);
 
+For the allocation + initialization of s2 mmus, kvm->lock is taken in
+kvm_vcpu_init_nested(). But here we take kvm->mmu_lock.
+
+Are we in trouble? Or are we expecting
+get_s2_mmu_nested()/lookup_s2_mmu() to be called only after
+kvm_vcpu_init_nested() has completed on all vcpus of the VM? Otherwise
+we could end up using the kvm->arch.nested_mmus when it has been freed
+and before it is updated with the new pointer.
+
+(I feel we should be taking kvm->mmu_lock in kvm_vcpu_init_nested() )
+
+> +		vcpu->arch.hw_mmu = get_s2_mmu_nested(vcpu);
+> +		spin_unlock(&vcpu->kvm->mmu_lock);
+> +	}
+> +}
+> +
+> +void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu)
+> +{
+> +	if (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu) {
+> +		atomic_dec(&vcpu->arch.hw_mmu->refcnt);
+> +		vcpu->arch.hw_mmu = NULL;
+> +	}
+> +}
+>  
+>  /*
+>   * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+> @@ -37,3 +191,21 @@ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
+>  
+>  	return -EINVAL;
+>  }
+> +
+> +void kvm_arch_flush_shadow_all(struct kvm *kvm)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +
+> +		WARN_ON(atomic_read(&mmu->refcnt));
+> +
+> +		if (!atomic_read(&mmu->refcnt))
+> +			kvm_free_stage2_pgd(mmu);
+> +	}
+> +	kfree(kvm->arch.nested_mmus);
+> +	kvm->arch.nested_mmus = NULL;
+> +	kvm->arch.nested_mmus_size = 0;
+
+Don't we need also to take the lock before modifying those? (Apprently
+we're killing the VM, so there shouldn't be other user, but just want to
+make sure...)
+
+Cheers,
+
+-- 
+Julien Thierry
