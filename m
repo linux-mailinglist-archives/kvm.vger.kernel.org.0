@@ -2,165 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FFC159C87
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 15:05:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29B4E59D3F
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 15:53:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726731AbfF1NFR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jun 2019 09:05:17 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3808 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726590AbfF1NFQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 28 Jun 2019 09:05:16 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5SD3eDM034064
-        for <kvm@vger.kernel.org>; Fri, 28 Jun 2019 09:05:15 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2tdjtt1pgd-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 28 Jun 2019 09:05:15 -0400
-Received: from localhost
-        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <alifm@linux.ibm.com>;
-        Fri, 28 Jun 2019 14:05:14 +0100
-Received: from b01cxnp22036.gho.pok.ibm.com (9.57.198.26)
-        by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 28 Jun 2019 14:05:12 +0100
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5SD5BXk7209600
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Jun 2019 13:05:11 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 28B34112065;
-        Fri, 28 Jun 2019 13:05:11 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 022B311206B;
-        Fri, 28 Jun 2019 13:05:10 +0000 (GMT)
-Received: from [9.80.218.122] (unknown [9.80.218.122])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri, 28 Jun 2019 13:05:10 +0000 (GMT)
-Subject: Re: [RFC v1 1/1] vfio-ccw: Don't call cp_free if we are processing a
- channel program
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Eric Farman <farman@linux.ibm.com>, pasic@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-References: <cover.1561055076.git.alifm@linux.ibm.com>
- <46dc0cbdcb8a414d70b7807fceb1cca6229408d5.1561055076.git.alifm@linux.ibm.com>
- <638804dc-53c0-ff2f-d123-13c257ad593f@linux.ibm.com>
- <581d756d-7418-cd67-e0e8-f9e4fe10b22d@linux.ibm.com>
- <2d9c04ba-ee50-2f9b-343a-5109274ff52d@linux.ibm.com>
- <56ced048-8c66-a030-af35-8afbbd2abea8@linux.ibm.com>
- <20190624114231.2d81e36f.cohuck@redhat.com>
- <20190624120514.4b528db5.cohuck@redhat.com>
- <20190624134622.2bb3bba2.cohuck@redhat.com>
- <20190624140723.5aa7b0b1.cohuck@redhat.com>
- <3e93215c-c11a-d0bb-8982-be3f2b467e13@linux.ibm.com>
- <20190624170937.4c76de8d.cohuck@redhat.com>
- <7841b312-13ad-a4b3-85d9-1f5a4991f7fd@linux.ibm.com>
- <20190627111456.3e6da01c.cohuck@redhat.com>
-From:   Farhan Ali <alifm@linux.ibm.com>
-Date:   Fri, 28 Jun 2019 09:05:10 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.4.0
+        id S1726672AbfF1Nxb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jun 2019 09:53:31 -0400
+Received: from connect.ultra-secure.de ([88.198.71.201]:64721 "EHLO
+        connect.ultra-secure.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726655AbfF1Nxb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jun 2019 09:53:31 -0400
+Received: (Haraka outbound); Fri, 28 Jun 2019 15:51:14 +0200
+Authentication-Results: connect.ultra-secure.de; auth=pass (login); spf=none smtp.mailfrom=ultra-secure.de
+Received-SPF: None (connect.ultra-secure.de: domain of ultra-secure.de does not designate 127.0.0.10 as permitted sender) receiver=connect.ultra-secure.de; identity=mailfrom; client-ip=127.0.0.10; helo=connect.ultra-secure.de; envelope-from=<rainer@ultra-secure.de>
+Received: from connect.ultra-secure.de (webmail [127.0.0.10])
+        by connect.ultra-secure.de (Haraka/2.6.2-toaster) with ESMTPSA id 2268CF70-C6A2-4981-9F26-DB2F0C892FEC.1
+        envelope-from <rainer@ultra-secure.de> (authenticated bits=0)
+        (version=TLSv1/SSLv3 cipher=AES256-SHA verify=NO);
+        Fri, 28 Jun 2019 15:51:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <20190627111456.3e6da01c.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19062813-0052-0000-0000-000003D80424
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011346; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01224482; UDB=6.00644477; IPR=6.01005674;
- MB=3.00027507; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-28 13:05:13
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19062813-0053-0000-0000-0000617E2016
-Message-Id: <f42fa379-470a-c14a-a120-c4221029076d@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-28_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906280156
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Fri, 28 Jun 2019 15:51:04 +0200
+From:   rainer@ultra-secure.de
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: Question about KVM IO performance with FreeBSD as a guest OS
+In-Reply-To: <20190628095340.GE3316@stefanha-x1.localdomain>
+References: <3924BBFC-42B2-4A28-9BAF-018AA1561CAF@ultra-secure.de>
+ <20190628095340.GE3316@stefanha-x1.localdomain>
+Message-ID: <b76013f0d3ed9c3eec92c885734a6534@ultra-secure.de>
+X-Sender: rainer@ultra-secure.de
+User-Agent: Roundcube Webmail/1.2.0
+X-Haraka-GeoIP: --, , NaNkm
+X-Haraka-GeoIP-Received: 
+X-Haraka-p0f: os="undefined undefined" link_type="undefined" distance=undefined total_conn=undefined shared_ip=Y
+X-Spam-Checker-Version: SpamAssassin 3.4.1 (2015-04-28) on spamassassin
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.9 required=5.0 tests=ALL_TRUSTED,BAYES_00,SPF_NONE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.1
+X-Haraka-Karma: score: 6, good: 954, bad: 0, connections: 960, history: 954, pass:all_good, relaying
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 06/27/2019 05:14 AM, Cornelia Huck wrote:
-> On Mon, 24 Jun 2019 11:24:16 -0400
-> Farhan Ali <alifm@linux.ibm.com> wrote:
+Am 2019-06-28 11:53, schrieb Stefan Hajnoczi:
+> On Sun, Jun 23, 2019 at 03:46:29PM +0200, Rainer Duffner wrote:
+>> I have huge problems running FreeBSD 12 (amd64) as a KVM guest.
+>> 
+>> KVM is running on Ubuntu 18 LTS, in an OpenStack setup with dedicated 
+>> Ceph-Storage (NVMe SSDs).
+>> 
+>> The VM „flavor" as such is that IOPs are limited to 2000/s - and I do 
+>> get those 2k IOPs when I run e.g. CentOS 7.
+>> 
+>> But on FreeBSD, I get way less.
+>> 
+>> E.g. running dc3dd to write zeros to a disk, I get 120 MB/s on CentOS 
+>> 7.
+>> With FreeBSD, I get 9 MB/s.
+>> 
+>> 
+>> The VMs were created on an OpenSuSE 42.3 host with the commands 
+>> described here:
+>> 
+>> https://docs.openstack.org/image-guide/freebsd-image.html
+>> 
+>> 
+>> This mimics the results we got on XenServer, where also some people 
+>> reported the same problems but other people had no problems at all.
+>> 
+>> Feedback from the FreeBSD community suggests that the problem is not 
+>> unheard of, but also not universally reproducible.
+>> So, I assume it must be some hypervisor misconfiguration?
+>> 
+>> I’m NOT the administrator of the KVM hosts. I can ask them tomorrow, 
+>> though.
+>> 
+>> I’d like to get some ideas on what to look for on the hosts directly, 
+>> if that makes sense.
 > 
->> On 06/24/2019 11:09 AM, Cornelia Huck wrote:
->>> On Mon, 24 Jun 2019 10:44:17 -0400
->>> Farhan Ali <alifm@linux.ibm.com> wrote:
+> Hi Rainer,
+> Maybe it's the benchmark.  Can you share the exact command-line you are
+> running on CentOS 7 and FreeBSD?
 > 
->>>> But even if we don't remove the cp_free from vfio_ccw_sch_io_todo, I am
->>>> not sure if your suggestion will fix the problem. The problem here is
->>>> that we can call vfio_ccw_sch_io_todo (for a clear or halt interrupt) at
->>>> the same time we are handling an ssch request. So depending on the order
->>>> of the operations we could still end up calling cp_free from both from
->>>> threads (i refer to the threads I mentioned in response to Eric's
->>>> earlier email).
->>>
->>> What I don't see is why this is a problem with ->initialized; wasn't
->>> the problem that we misinterpreted an interrupt for csch as one for a
->>> not-yet-issued ssch?
->>>    
->>
->> It's the order in which we do things, which could cause the problem.
->> Since we queue interrupt handling in the workqueue, we could delay
->> processing the csch interrupt. During this delay if ssch comes through,
->> we might have already set ->initialized to true.
->>
->> So when we get around to handling the interrupt in io_todo, we would go
->> ahead and call cp_free. This would cause the problem of freeing the
->> ccwchain list while we might be adding to it.
->>
->>>>
->>>> Another thing that concerns me is that vfio-ccw can also issue csch/hsch
->>>> in the quiesce path, independently of what the guest issues. So in that
->>>> case we could have a similar scenario to processing an ssch request and
->>>> issuing halt/clear in parallel. But maybe I am being paranoid :)
->>>
->>> I think the root problem is really trying to clear a cp while another
->>> thread is trying to set it up. Should we maybe use something like rcu?
->>>
->>>    
->>
->> Yes, this is the root problem. I am not too familiar with rcu locking,
->> but what would be the benefit over a traditional mutex?
+> The blocksize and amount of parallelism (queue depth or number of
+> processes/threads) should be identical on CentOS and FreeBSD.  The
+> benchmark should open the file with O_DIRECT.  It should not fsync()
+> (flush) after every write request.
 > 
-> I don't quite remember what I had been envisioning at the time (sorry,
-> the heat seems to make my brain a bit slushy :/), but I think we might
-> have two copies of the cp and use an rcu-ed pointer in the private
-> structure to point to one of the copies. If we make sure we've
-> synchronized on the pointer at interrupt time, we should be able to
-> free the old one in _todo and act on the new on when doing ssch. And
-> yes, I realize that this is awfully vague :)
+> If you are using large blocksizes (>256 KB) then perhaps the guest I/O
+> stack is splitting them up differently on FreeBSD and Linux.
 > 
+> Here is a sequential write benchmark using dd:
 > 
+>   dd if=/dev/zero of=/dev/vdX oflag=direct bs=4k count=1048576
+> 
+> Stefan
 
-Sorry for the delayed response. I was trying out few ideas, and I think 
-the simplest one for me that worked and that makes sense is to 
-explicitly add the check to see if the state == CP_PENDING when trying 
-to free the cp (as mentioned by Halil in a separate thread).
 
-When we are in the CP_PENDING state then we know for sure that we have a 
-currently allocated cp and no other thread is working on it. So in the 
-interrupt context, it should be okay to free cp.
 
-I have prototyped with the mutex, but the code becomes too hairy. I 
-looked into the rcu api and from what I understand about rcu it would 
-provide advantage if we more readers than updaters. But in our case we 
-really have 2 updaters, updating the cp at the same time.
 
-In the meantime I also have some minor fixes while going over the code 
-again :). I will post a v2 soon for review.
+Hi,
 
-Thanks
-Farhan
+
+on advice from my coworker, I created the image like this:
+
+openstack image create --file ../freebsd-image/freebsd12_v1.41.qcow2 
+--disk-format qcow2 --min-disk 6 --min-ram 512 --private --protected 
+--property hw_scsi_model=virtio-scsi --property hw_disk_bus=scsi 
+--property hw_qemu_guest_agent=yes --property os_distro=freebsd 
+--property os_version="12.0" "FreeBSD 12.0 amd 64 take3"
+
+
+This time, I got a bit better results:
+
+
+root@rdu5:~ # fio -filename=/srv/test2.fio_test_file -direct=1 -iodepth 
+4 -thread -rw=randrw -ioengine=psync -bs=4k -size 8G -numjobs=4 
+-runtime=60 -group_reporting -name=pleasehelpme
+pleasehelpme: (g=0): rw=randrw, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 
+4096B-4096B, ioengine=psync, iodepth=4
+...
+fio-3.13
+Starting 4 threads
+pleasehelpme: Laying out IO file (1 file / 8192MiB)
+Jobs: 4 (f=4): [m(4)][100.0%][r=1461KiB/s,w=1409KiB/s][r=365,w=352 
+IOPS][eta 00m:00s]
+pleasehelpme: (groupid=0, jobs=4): err= 0: pid=100120: Fri Jun 28 
+15:44:42 2019
+   read: IOPS=368, BW=1473KiB/s (1508kB/s)(86.3MiB/60005msec)
+     clat (usec): min=8, max=139540, avg=6534.89, stdev=5761.10
+      lat (usec): min=13, max=139548, avg=6542.68, stdev=5761.00
+     clat percentiles (usec):
+      |  1.00th=[   13],  5.00th=[   17], 10.00th=[   25], 20.00th=[ 
+1827],
+      | 30.00th=[ 3032], 40.00th=[ 4555], 50.00th=[ 5538], 60.00th=[ 
+6718],
+      | 70.00th=[ 8160], 80.00th=[10290], 90.00th=[13829], 
+95.00th=[17433],
+      | 99.00th=[25822], 99.50th=[28967], 99.90th=[37487], 
+99.95th=[40633],
+      | 99.99th=[51643]
+    bw (  KiB/s): min=  972, max= 2135, per=97.21%, avg=1430.93, 
+stdev=55.37, samples=476
+    iops        : min=  242, max=  532, avg=356.10, stdev=13.86, 
+samples=476
+   write: IOPS=373, BW=1496KiB/s (1532kB/s)(87.6MiB/60005msec)
+     clat (usec): min=13, max=46140, avg=4174.36, stdev=2834.86
+      lat (usec): min=19, max=46146, avg=4182.13, stdev=2835.08
+     clat percentiles (usec):
+      |  1.00th=[   40],  5.00th=[   90], 10.00th=[ 1012], 20.00th=[ 
+2008],
+      | 30.00th=[ 2474], 40.00th=[ 3097], 50.00th=[ 3949], 60.00th=[ 
+4555],
+      | 70.00th=[ 5145], 80.00th=[ 6063], 90.00th=[ 7439], 95.00th=[ 
+9110],
+      | 99.00th=[13435], 99.50th=[15401], 99.90th=[20055], 
+99.95th=[22152],
+      | 99.99th=[36439]
+    bw (  KiB/s): min=  825, max= 2295, per=97.26%, avg=1453.99, 
+stdev=66.67, samples=476
+    iops        : min=  206, max=  572, avg=361.90, stdev=16.66, 
+samples=476
+   lat (usec)   : 10=0.03%, 20=4.14%, 50=3.47%, 100=2.29%, 250=2.04%
+   lat (usec)   : 500=0.06%, 750=0.51%, 1000=0.71%
+   lat (msec)   : 2=7.38%, 4=22.88%, 10=44.07%, 20=10.86%, 50=1.55%
+   lat (msec)   : 100=0.01%, 250=0.01%
+   cpu          : usr=0.11%, sys=2.08%, ctx=83384, majf=0, minf=0
+   IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, 
+ >=64=0.0%
+      submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, 
+ >=64=0.0%
+      complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, 
+ >=64=0.0%
+      issued rwts: total=22092,22436,0,0 short=0,0,0,0 dropped=0,0,0,0
+      latency   : target=0, window=0, percentile=100.00%, depth=4
+
+Run status group 0 (all jobs):
+    READ: bw=1473KiB/s (1508kB/s), 1473KiB/s-1473KiB/s 
+(1508kB/s-1508kB/s), io=86.3MiB (90.5MB), run=60005-60005msec
+   WRITE: bw=1496KiB/s (1532kB/s), 1496KiB/s-1496KiB/s 
+(1532kB/s-1532kB/s), io=87.6MiB (91.9MB), run=60005-60005msec
+
+
+
+Which is more or less half (or a third) of what I got on CentOS.
+
+Still, that's not acceptable for us.
+
+In any case, the documentation on the OpenStack website is outdated at 
+best.
+
+
+
+Regards
+Rainer
+
+
+
+
+
 
