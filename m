@@ -2,155 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 32E51594D0
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 09:26:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E238594F3
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 09:30:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726463AbfF1H0F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jun 2019 03:26:05 -0400
-Received: from mga14.intel.com ([192.55.52.115]:36076 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726315AbfF1H0E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jun 2019 03:26:04 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Jun 2019 00:26:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,426,1557212400"; 
-   d="asc'?scan'208";a="337831152"
-Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.13.116])
-  by orsmga005.jf.intel.com with ESMTP; 28 Jun 2019 00:26:01 -0700
-Date:   Fri, 28 Jun 2019 15:23:36 +0800
-From:   Zhenyu Wang <zhenyuw@linux.intel.com>
-To:     Gerd Hoffmann <kraxel@redhat.com>
-Cc:     Zhenyu Wang <zhenyuw@linux.intel.com>,
-        "Zhang, Tina" <tina.zhang@intel.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Yuan, Hang" <hang.yuan@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-Subject: Re: [RFC PATCH v3 0/4] Deliver vGPU display vblank event to userspace
-Message-ID: <20190628072336.GI9684@zhen-hp.sh.intel.com>
-Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-References: <20190627033802.1663-1-tina.zhang@intel.com>
- <20190627062231.57tywityo6uyhmyd@sirius.home.kraxel.org>
- <237F54289DF84E4997F34151298ABEBC876835E5@SHSMSX101.ccr.corp.intel.com>
- <20190627103133.6ekdwazggi5j5lcl@sirius.home.kraxel.org>
- <20190628032149.GD9684@zhen-hp.sh.intel.com>
- <20190628054346.3uc3k4c4cffrqcy3@sirius.home.kraxel.org>
+        id S1726874AbfF1HaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jun 2019 03:30:11 -0400
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:40444 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726465AbfF1HaK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jun 2019 03:30:10 -0400
+Received: by mail-oi1-f193.google.com with SMTP id w196so3572490oie.7;
+        Fri, 28 Jun 2019 00:30:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rPmAc12QB/dObXVaxjhcY1vUDZ7bOEFU41CSHx26tMU=;
+        b=XFw2v0vUl8eRU/wUY4labQGC/L3Xpzfs0JErb+60DwJAFeE71kvau/gD2oXLIvctoJ
+         wLnkCpZ0WoE3jJt2GlComIIxLpzIsjP4ZIBuQMdkwFGB2rj+ETsNSCuH+hYVOByQPSYz
+         Uwr8ogq5xo/jiXPV0GkONlcLvUzzWYxYN68s7Hzu767HeNiNOvBH+KH6lmUm80Q3Gdi8
+         BXtnkifah9yfJAWxdLth5dWVhb9CKWZqhaEMOU+Dc1ApZoSiDsDLmGKVm5igVdxjvQ5Q
+         K82ZuIJMdcI7ek+r64pQ0eYvotbuAV/IS8gexPBJFeAdRv5qcrl6XCJwsqo45OkzNYgL
+         +Qfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rPmAc12QB/dObXVaxjhcY1vUDZ7bOEFU41CSHx26tMU=;
+        b=YUnQITPBEV2RUb2krGGU7zQHevrNxrNe0pFiM7rZ/UhXM0lUXZnvNi5qbU5Po9k69i
+         1M6s2EiUYvRLnCa4xkrmEzB0ouWIUYYQPxJqlwjrJqlmfM5Gv4jinpFGR6PvApQXgTCd
+         +oKv5Z+zQGtKkS/0sPc8sc99AAZcXlSom7EBtP7c8GzinTkJ3jJn4VPnbqMx90INGLTc
+         rLShRcLv9+nBnJs+MGG9yZc0DEosKb6dEQgPUuSSOFQInH4hCscLCH6gV0tI8TfuUNik
+         14/V6Yo9qOuLKLgqZDBiYmuOCwkhcjdgGI3wtoAcfisTa6T/0RdOOCoJp5PPuWXT834Y
+         h3Cw==
+X-Gm-Message-State: APjAAAV8l1sG/itWGnoRDsVdE4J5WkJq+2bnsYBI2H0ux7Fft26peGe7
+        AMROpIWWQuTsc9A3ubDky1mSZHVxT6K46ukeUE5gG3Zx
+X-Google-Smtp-Source: APXvYqxceegnIIzidgYPuyNqFkqwb4errG5wPWapwIBSFWnQsfooB5k7ZDHMtD1YCtRxXhmdT7wAuB4Thjs6r4joL2s=
+X-Received: by 2002:aca:544b:: with SMTP id i72mr909821oib.174.1561707009875;
+ Fri, 28 Jun 2019 00:30:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="rKA5vZE+r0k9Fj4x"
-Content-Disposition: inline
-In-Reply-To: <20190628054346.3uc3k4c4cffrqcy3@sirius.home.kraxel.org>
-User-Agent: Mutt/1.10.0 (2018-05-17)
+References: <1560255830-8656-1-git-send-email-wanpengli@tencent.com> <CANRm+CwfXViF34eLma5ZnqjT96Sq=XehpBiTZTj1TfJnkevVMA@mail.gmail.com>
+In-Reply-To: <CANRm+CwfXViF34eLma5ZnqjT96Sq=XehpBiTZTj1TfJnkevVMA@mail.gmail.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Fri, 28 Jun 2019 15:29:58 +0800
+Message-ID: <CANRm+Cz6vX587uLV__FheXuiOe7pzfGeUZb++ZJ1y9Cmk6GkoA@mail.gmail.com>
+Subject: Re: [PATCH v4 0/3] KVM: Yield to IPI target if necessary
+To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---rKA5vZE+r0k9Fj4x
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 2019.06.28 07:43:46 +0200, Gerd Hoffmann wrote:
-> On Fri, Jun 28, 2019 at 11:21:49AM +0800, Zhenyu Wang wrote:
-> > On 2019.06.27 12:31:33 +0200, Gerd Hoffmann wrote:
-> > > > >   Hi,
-> > > > >=20
-> > > > > > Instead of delivering page flip events, we choose to post displ=
-ay
-> > > > > > vblank event. Handling page flip events for both primary plane =
-and
-> > > > > > cursor plane may make user space quite busy, although we have t=
-he
-> > > > > > mask/unmask mechansim for mitigation. Besides, there are some c=
-ases
-> > > > > > that guest app only uses one framebuffer for both drawing and d=
-isplay.
-> > > > > > In such case, guest OS won't do the plane page flip when the
-> > > > > > framebuffer is updated, thus the user land won't be notified ab=
-out the
-> > > > > updated framebuffer.
-> > > > >=20
-> > > > > What happens when the guest is idle and doesn't draw anything to =
-the
-> > > > > framebuffer?
-> > > > The vblank event will be delivered to userspace as well, unless gue=
-st OS disable the pipe.
-> > > > Does it make sense to vfio/display?
-> > >=20
-> > > Getting notified only in case there are actual display updates would =
-be
-> > > a nice optimization, assuming the hardware is able to do that.  If the
-> > > guest pageflips this is obviously trivial.  Not sure this is possible=
- in
-> > > case the guest renders directly to the frontbuffer.
-> > >=20
-> > > What exactly happens when the guest OS disables the pipe?  Is a vblank
-> > > event delivered at least once?  That would be very useful because it
-> > > will be possible for userspace to stop polling altogether without
-> > > missing the "guest disabled pipe" event.
-> > >=20
-> >=20
-> > It looks like purpose to use vblank here is to replace user space
-> > polling totally by kernel event? Which just act as display update
-> > event to replace user space timer to make it query and update
-> > planes?
->=20
-> I think it makes sense to design it that way, so userspace will either
-> use the events (when supported by the driver) or a timer (fallback if
-> not) but not both.
-
-Agree. It's more of a userspace choice.
-
->=20
-> > Although in theory vblank is not appropriate for this which
-> > doesn't align with plane update or possible front buffer rendering at
-> > all, but looks it's just a compromise e.g not sending event for every
-> > cursor position change, etc.
-> >=20
-> > I think we need to define semantics for this event properly, e.g user
-> > space purely depends on this event for display update, the opportunity
-> > for issuing this event is controlled by driver when it's necessary for
-> > update, etc. Definitely not named as vblank event or only issue at vbla=
-nk,
-> > that need to happen for other plane change too.
->=20
-> I think it should be "display update notification", i.e. userspace
-> should check for plane changes and update the display.
->=20
-> Most events will probably come from vblank (typically plane update are
-> actually committed at vblank time to avoid tearing, right?).  That is an
-> implementation detail though.
->=20
-
-Yeah, vblank should be a good time, although driver might also do
-optimization e.g checking actual plane change between vblank to see if
-there's any real change, etc. Also that will depend on driver
-implementation.
-
---=20
-Open Source Technology Center, Intel ltd.
-
-$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
-
---rKA5vZE+r0k9Fj4x
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCXRXAeAAKCRCxBBozTXgY
-JzcJAJ99sboSlBBi5kAeve4/+OCTN6lXIACdGzcAGEF9FVJ0lUnUKRRsuvkmp/Y=
-=qe3W
------END PGP SIGNATURE-----
-
---rKA5vZE+r0k9Fj4x--
+ping again,
+On Tue, 18 Jun 2019 at 17:00, Wanpeng Li <kernellwp@gmail.com> wrote:
+>
+> ping, :)
+> On Tue, 11 Jun 2019 at 20:23, Wanpeng Li <kernellwp@gmail.com> wrote:
+> >
+> > The idea is from Xen, when sending a call-function IPI-many to vCPUs,
+> > yield if any of the IPI target vCPUs was preempted. 17% performance
+> > increasement of ebizzy benchmark can be observed in an over-subscribe
+> > environment. (w/ kvm-pv-tlb disabled, testing TLB flush call-function
+> > IPI-many since call-function is not easy to be trigged by userspace
+> > workload).
+> >
+> > v3 -> v4:
+> >  * check map->phys_map[dest_id]
+> >  * more cleaner kvm_sched_yield()
+> >
+> > v2 -> v3:
+> >  * add bounds-check on dest_id
+> >
+> > v1 -> v2:
+> >  * check map is not NULL
+> >  * check map->phys_map[dest_id] is not NULL
+> >  * make kvm_sched_yield static
+> >  * change dest_id to unsinged long
+> >
+> > Wanpeng Li (3):
+> >   KVM: X86: Yield to IPI target if necessary
+> >   KVM: X86: Implement PV sched yield hypercall
+> >   KVM: X86: Expose PV_SCHED_YIELD CPUID feature bit to guest
+> >
+> >  Documentation/virtual/kvm/cpuid.txt      |  4 ++++
+> >  Documentation/virtual/kvm/hypercalls.txt | 11 +++++++++++
+> >  arch/x86/include/uapi/asm/kvm_para.h     |  1 +
+> >  arch/x86/kernel/kvm.c                    | 21 +++++++++++++++++++++
+> >  arch/x86/kvm/cpuid.c                     |  3 ++-
+> >  arch/x86/kvm/x86.c                       | 21 +++++++++++++++++++++
+> >  include/uapi/linux/kvm_para.h            |  1 +
+> >  7 files changed, 61 insertions(+), 1 deletion(-)
+> >
+> > --
+> > 2.7.4
+> >
