@@ -2,216 +2,279 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4541F59D6E
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 16:01:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3127859E6D
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 17:07:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726722AbfF1OBP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jun 2019 10:01:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50628 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726616AbfF1OBO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 28 Jun 2019 10:01:14 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5SDveVL093538
-        for <kvm@vger.kernel.org>; Fri, 28 Jun 2019 10:01:13 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2tdhndf3qj-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 28 Jun 2019 10:01:13 -0400
-Received: from localhost
-        by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <mjrosato@linux.ibm.com>;
-        Fri, 28 Jun 2019 15:01:12 +0100
-Received: from b03cxnp08027.gho.boulder.ibm.com (9.17.130.19)
-        by e33.co.us.ibm.com (192.168.1.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 28 Jun 2019 15:01:09 +0100
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5SE17T050790876
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Jun 2019 14:01:07 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 797B6C606D;
-        Fri, 28 Jun 2019 14:01:07 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6468EC6063;
-        Fri, 28 Jun 2019 14:01:05 +0000 (GMT)
-Received: from oc4221205838.ibm.com (unknown [9.80.239.94])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 28 Jun 2019 14:01:05 +0000 (GMT)
-Subject: Re: mdevctl: A shoestring mediated device management and persistence
- utility
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Libvirt Devel <libvir-list@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Erik Skultety <eskultet@redhat.com>,
-        Pavel Hrdina <phrdina@redhat.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Sylvain Bauza <sbauza@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-References: <20190523172001.41f386d8@x1.home>
- <20190625165251.609f6266@x1.home> <20190626115806.3435c45c.cohuck@redhat.com>
- <20190626083720.42a2b5d4@x1.home> <20190626195350.2e9c81d3@x1.home>
- <20190627142626.415138da.cohuck@redhat.com>
- <06114b39-69c2-3fa0-d0b3-aa96a44ae2ce@linux.ibm.com>
- <20190627093832.064a346f@x1.home> <20190627151502.2ae5314f@x1.home>
- <20190627195704.66be88c8@x1.home> <20190628110648.40e0607d.cohuck@redhat.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-Openpgp: preference=signencrypt
-Date:   Fri, 28 Jun 2019 10:01:05 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726766AbfF1PHw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jun 2019 11:07:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60008 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726686AbfF1PHw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jun 2019 11:07:52 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5C828307CDF0;
+        Fri, 28 Jun 2019 15:07:51 +0000 (UTC)
+Received: from x1.home (ovpn-117-35.phx2.redhat.com [10.3.117.35])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3C9156012E;
+        Fri, 28 Jun 2019 15:07:49 +0000 (UTC)
+Date:   Fri, 28 Jun 2019 09:07:41 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
+Message-ID: <20190628090741.51e8d18e@x1.home>
+In-Reply-To: <A2975661238FB949B60364EF0F2C257439F05415@SHSMSX104.ccr.corp.intel.com>
+References: <1560000071-3543-1-git-send-email-yi.l.liu@intel.com>
+        <1560000071-3543-10-git-send-email-yi.l.liu@intel.com>
+        <20190619222647.72efc76a@x1.home>
+        <A2975661238FB949B60364EF0F2C257439F0164E@SHSMSX104.ccr.corp.intel.com>
+        <20190620150757.7b2fa405@x1.home>
+        <A2975661238FB949B60364EF0F2C257439F02663@SHSMSX104.ccr.corp.intel.com>
+        <20190621095740.41e6e98e@x1.home>
+        <A2975661238FB949B60364EF0F2C257439F05415@SHSMSX104.ccr.corp.intel.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20190628110648.40e0607d.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19062814-0036-0000-0000-00000AD1ACC3
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011346; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01224501; UDB=6.00644488; IPR=6.01005693;
- MB=3.00027507; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-28 14:01:12
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19062814-0037-0000-0000-00004C64D6EB
-Message-Id: <4df06b68-4977-7285-c598-11e582ceb7d5@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-28_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906280165
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Fri, 28 Jun 2019 15:07:51 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/28/19 5:06 AM, Cornelia Huck wrote:
-> On Thu, 27 Jun 2019 19:57:04 -0600
-> Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
->> On Thu, 27 Jun 2019 15:15:02 -0600
->> Alex Williamson <alex.williamson@redhat.com> wrote:
->>
->>> On Thu, 27 Jun 2019 09:38:32 -0600
->>> Alex Williamson <alex.williamson@redhat.com> wrote:  
->>>>> On 6/27/19 8:26 AM, Cornelia Huck wrote:      
->>>>>>
->>>>>> {
->>>>>>   "foo": "1",
->>>>>>   "bar": "42",
->>>>>>   "baz": {
->>>>>>     "depends": ["foo", "bar"],
->>>>>>     "value": "plahh"
->>>>>>   }
->>>>>> }
->>>>>>
->>>>>> Something like that?      
->>>>
->>>> I'm not sure yet.  I think we need to look at what's feasible (and
->>>> easy) with jq.  Thanks,    
->>>
->>> I think it's not too much trouble to remove and insert into arrays, so
->>> what if we were to define the config as:
->>>
->>> {
->>>   "mdev_type":"vendor-type",
->>>   "start":"auto",
->>>   "attrs": [
->>>       {"attrX":["Xvalue1","Xvalue2"]},
->>>       {"dir/attrY": "Yvalue1"},
->>>       {"attrX": "Xvalue3"}
->>>     ]
->>> }
->>>
->>> "attr" here would define sysfs attributes under the device.  The array
->>> would be processed in order, so in the above example we'd do the
->>> following:
->>>
->>>  1. echo Xvalue1 > attrX
->>>  2. echo Xvalue2 > attrX
->>>  3. echo Yvalue1 > dir/attrY
->>>  4. echo Xvalue3 > attrX
->>>
->>> When starting the device mdevctl would simply walk the array, if the
->>> attribute key exists write the value(s).  If a write fails or the
->>> attribute doesn't exist, remove the device and report error.
-> 
-> Yes, I think it makes sense to fail the startup of a device where we
-> cannot set all attributes to the requested values.
-> 
->>>
->>> I think it's easiest with jq to manipulate arrays by removing and
->>> inserting by index.  Also if we end up with something like above, it's
->>> ambiguous if we reference the "attrX" key.  So perhaps we add the
->>> following options to the modify command:
->>>
->>> --addattr=ATTRIBUTE --delattr --index=INDEX --value=VALUE1[,VALUE2]
->>>
->>> We could handle it like a stack, so if --index is not supplied, add to
->>> the end or remove from the end.  If --index is provided, delete that
->>> index or add the attribute at that index.  So if you had the above and
->>> wanted to remove Xvalue1 but keep the ordering, you'd do:
->>>
->>> --delattr --index=0
->>> --addattr --index=0 --value=Xvalue2
->>>
->>> Which should results in:
->>>
->>>   "attrs": [
->>>       {"attrX": "Xvalue2"},
->>>       {"dir/attrY": "Yvalue1"},
->>>       {"attrX": "Xvalue3"}
->>>     ]
-> 
-> Modifying by index looks reasonable; I just sent a pull request to
-> print the index of an attribute out as well, so it is easier to specify
-> the right attribute to modify.
-> 
->>>
->>> If we want to modify a running device, I'm thinking we probably want a
->>> new command and options --attr=ATTRIBUTE --value=VALUE might suffice.
->>>
->>> Do we need to support something like this for the 'start' command or
->>> should we leave that for simple devices and require a sequence of:
->>>
->>> # mdevctl define ...
->>> # mdevctl modify --addattr...
->>> ...
->>> # mdevctl start
->>> # mdevctl undefine
->>>
->>> This is effectively the long way to get a transient device.  Otherwise
->>> we'd need to figure out how to have --attr --value appear multiple
->>> times on the start command line.  Thanks,  
-> 
-> What do you think of a way to specify JSON for the attributes directly
-> on the command line? Or would it be better to just edit the config
-> files directly?
-> 
->>
->> This is now implemented, and yes you can specify '--addattr remove
->> --value 1' and mdevctl will immediately remove the device after it's
->> created (more power to the admin).  Listing defined devices also lists
-> 
-> Fun ;)
-> 
->> any attributes defined for easy inspection.  It is also possible to
->> override the conversion of comma separated values into an array by
->> encoding and escaping the comma.  It's a little cumbersome, but
->> possible in case a driver isn't fully on board with the one attribute,
->> one value rule of sysfs.  Does this work for vfio-ap?  I also still
-> 
-> I do not have ap devices to actually test this with; but defining a
-> device and adding attributes seems to work.
-> 
+On Mon, 24 Jun 2019 08:20:38 +0000
+"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-I pulled and did a quick test with vfio-ap, it's working.  I was able to
-define, modify with the appropriate attributes and start, resulting in a
-correctly-configured device.
+> Hi Alex,
+> 
+> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > Sent: Friday, June 21, 2019 11:58 PM
+> > To: Liu, Yi L <yi.l.liu@intel.com>
+> > Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
+> > 
+> > On Fri, 21 Jun 2019 10:23:10 +0000
+> > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> >   
+> > > Hi Alex,
+> > >  
+> > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > > > Sent: Friday, June 21, 2019 5:08 AM
+> > > > To: Liu, Yi L <yi.l.liu@intel.com>
+> > > > Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
+> > > >
+> > > > On Thu, 20 Jun 2019 13:00:34 +0000
+> > > > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> > > >  
+> > > > > Hi Alex,
+> > > > >  
+> > > > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > > > > > Sent: Thursday, June 20, 2019 12:27 PM
+> > > > > > To: Liu, Yi L <yi.l.liu@intel.com>
+> > > > > > Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
+> > > > > >
+> > > > > > On Sat,  8 Jun 2019 21:21:11 +0800
+> > > > > > Liu Yi L <yi.l.liu@intel.com> wrote:
+> > > > > >  
+> > > > > > > This patch adds sample driver named vfio-mdev-pci. It is to wrap
+> > > > > > > a PCI device as a mediated device. For a pci device, once bound
+> > > > > > > to vfio-mdev-pci driver, user space access of this device will
+> > > > > > > go through vfio mdev framework. The usage of the device follows
+> > > > > > > mdev management method. e.g. user should create a mdev before
+> > > > > > > exposing the device to user-space.  
+> > > [...]  
+> > > > >  
+> > > > > > However, the patch below just makes the mdev interface behave
+> > > > > > correctly, I can't make it work on my system because commit
+> > > > > > 7bd50f0cd2fd ("vfio/type1: Add domain at(de)taching group helpers")  
+> > > > >
+> > > > > What error did you encounter. I tested the patch with a device in a
+> > > > > singleton iommu group. I'm also searching a proper machine with
+> > > > > multiple devices in an iommu group and test it.  
+> > > >
+> > > > In vfio_iommu_type1, iommu backed mdev devices use the
+> > > > iommu_attach_device() interface, which includes:
+> > > >
+> > > >         if (iommu_group_device_count(group) != 1)
+> > > >                 goto out_unlock;
+> > > >
+> > > > So it's impossible to use with non-singleton groups currently.  
+> > >
+> > > Hmmm, I think it is no longer good to use iommu_attach_device() for iommu
+> > > backed mdev devices now. In this flow, the purpose here is to attach a device
+> > > to a domain and no need to check whether the device is in a singleton iommu
+> > > group. I think it would be better to use __iommu_attach_device() instead of
+> > > iommu_attach_device().  
+> > 
+> > That's a static and unexported, it's intentionally not an exposed
+> > interface.  We can't attach devices in the same group to separate
+> > domains allocated through iommu_domain_alloc(), this would violate the
+> > iommu group isolation principles.  
+> 
+> Go it. :-) Then not good to expose such interface. But to support devices in
+> non-singleton iommu group, we need to have a new interface which doesn't
+> count the devices but attach all the devices.
 
+We have iommu_attach_group(), we just need to track which groups are
+attached.
+ 
+> > > Also I found a potential mutex lock issue if using iommu_attach_device().
+> > > In vfio_iommu_attach_group(), it uses iommu_group_for_each_dev() to loop
+> > > all the devices in the group. It holds group->mutex. And then  
+> > vfio_mdev_attach_domain()  
+> > > calls iommu_attach_device() which also tries to get group->mutex. This would be
+> > > an issue. If you are fine with it, I may post another patch for it. :-)  
+> > 
+> > Gack, yes, please send a patch.  
+> 
+> Would do it, may be together with the support of vfio-mdev-pci on devices in
+> non-singleton iommu group.
+> 
+> >   
+> > > > > > used iommu_attach_device() rather than iommu_attach_group() for non-aux
+> > > > > > mdev iommu_device.  Is there a requirement that the mdev parent device
+> > > > > > is in a singleton iommu group?  
+> > > > >
+> > > > > I don't think there should have such limitation. Per my understanding,
+> > > > > vfio-mdev-pci should also be able to bind to devices which shares
+> > > > > iommu group with other devices. vfio-pci works well for such devices.
+> > > > > And since the two drivers share most of the codes, I think vfio-mdev-pci
+> > > > > should naturally support it as well.  
+> > > >
+> > > > Yes, the difference though is that vfio.c knows when devices are in the
+> > > > same group, which mdev vfio.c only knows about the non-iommu backed
+> > > > group, not the group that is actually used for the iommu backing.  So
+> > > > we either need to enlighten vfio.c or further abstract those details in
+> > > > vfio_iommu_type1.c.  
+> > >
+> > > Not sure if it is necessary to introduce more changes to vfio.c or
+> > > vfio_iommu_type1.c. If it's only for the scenario which two devices share an
+> > > iommu_group, I guess it could be supported by using __iommu_attach_device()
+> > > which has no device counting for the group. But maybe I missed something
+> > > here. It would be great if you can elaborate a bit for it. :-)  
+> > 
+> > We need to use the group semantics, there's a reason
+> > __iommu_attach_device() is not exposed, it's an internal helper.  I
+> > think there's no way around that we need to somewhere track the actual
+> > group we're attaching to and have the smarts to re-use it for other
+> > devices in the same group.  
+> 
+> Hmmm, exposing __iommu_attach_device() is not good, let's forget it. :-)
+> 
+> > > > > > If this is a simplification, then
+> > > > > > vfio-mdev-pci should not bind to devices where this is violated since
+> > > > > > there's no way to use the device.  Can we support it though?  
+> > > > >
+> > > > > yeah, I think we need to support it.
+> > > > >  
+> > > > > > If I have two devices in the same group and bind them both to
+> > > > > > vfio-mdev-pci, I end up with three groups, one for each mdev device and
+> > > > > > the original physical device group.  vfio.c works with the mdev groups
+> > > > > > and will try to match both groups to the container.  vfio_iommu_type1.c
+> > > > > > also works with the mdev groups, except for the point where we actually
+> > > > > > try to attach a group to a domain, which is the only window where we use
+> > > > > > the iommu_device rather than the provided group, but we don't record
+> > > > > > that anywhere.  Should struct vfio_group have a pointer to a reference
+> > > > > > counted object that tracks the actual iommu_group attached, such that
+> > > > > > we can determine that the group is already attached to the domain and
+> > > > > > not try to attach again?  
+> > > > >
+> > > > > Agreed, we need to avoid such duplicated attach. Instead of adding
+> > > > > reference counted object in vfio_group. I'm also considering the logic
+> > > > > below:  
+> > >
+> > > Re-walked the code, I find the duplicated attach will happen on the vfio-mdev-pci
+> > > device as vfio_mdev_attach_domain() only attaches the parent devices of
+> > > iommu backed mdevs instead of all the devices within the physical iommu_group.
+> > > While for a vfio-pci device, it will use iommu_attach_group() which attaches all the
+> > > devices within the iommu backed group. The same with detach,
+> > > vfio_mdev_detach_domain() detaches selective devices instead of all devices  
+> > within  
+> > > the iommu backed group.  
+> > 
+> > Yep, that's not good, for the non-aux case we need to follow the usual
+> > group semantics or else we're limited to singleton groups.  
+> 
+> yep.
+> 
+> >   
+> > > > >     /*
+> > > > >       * Do this check in vfio_iommu_type1_attach_group(), after mdev_group
+> > > > >       * is initialized.
+> > > > >       */
+> > > > >     if (vfio_group->mdev_group) {
+> > > > >          /*
+> > > > >            * vfio_group->mdev_group is true means vfio_group->iommu_group
+> > > > >            * is not the actual iommu_group which is going to be attached to
+> > > > >            * domain. To avoid duplicate iommu_group attach, needs to check if
+> > > > >            * the actual iommu_group. vfio_get_parent_iommu_group() is a
+> > > > >            * newly added helper function which returns the actual attach
+> > > > >            * iommu_group going to be attached for this mdev group.
+> > > > >               */
+> > > > >          p_iommu_group = vfio_get_parent_iommu_group(
+> > > > >                                                                          vfio_group->iommu_group);
+> > > > >          list_for_each_entry(d, &iommu->domain_list, next) {
+> > > > >                  if (find_iommu_group(d, p_iommu_group)) {
+> > > > >                          mutex_unlock(&iommu->lock);
+> > > > >                          // skip group attach;
+> > > > >                  }
+> > > > >          }  
+> > > >
+> > > > We don't currently create a struct vfio_group for the parent, only for
+> > > > the mdev iommu group.  The iommu_attach for an iommu backed mdev
+> > > > doesn't leave any traces of where it is actually attached, we just
+> > > > count on retracing our steps for the detach.  That's why I'm thinking
+> > > > we need an object somewhere to track it and it needs to be reference
+> > > > counted so that if both a vfio-mdev-pci device and a vfio-pci device
+> > > > are using it, we leave it in place if either one is removed.  
+> > >
+> > > Hmmm, here we are talking about tracking in iommu_group level though
+> > > no good idea on where the object should  be placed yet. However, we may
+> > > need to tack in device level as I mentioned in above paragraph. If not,
+> > > there may be sequence issue. e.g. if vfio-mdev-pci device is attached
+> > > firstly, then the object will be initialized, and when vfio-pci device is
+> > > attached, we will find the attach should be skipped and just inc the ref count.
+> > > But actually it should not be skipped since the vfio-mdev-pci attach does not
+> > > attach all devices within the iommu backed group.  
+> > 
+> > We can't do that though, the entire group needs to be attached.  
+> 
+> Agree, may be getting another interface which is similar with
+> iommu_attach_device(), but works for devices which is in non-singleton
+> groups. So the attach for iommu backed mdev will also result in a sound
+> attach to all the devices which share iommu group with the parent device.
 
+iommu_attach_group()...
+
+> This is just like vfio-pci devices. For the object for tracking purpose may be
+> as below:
+> 
+> struct vfio_iommu_object {
+> 	struct iommu_group *group;
+> 	struct kref kref;
+> };
+> 
+> And I think it should be per-domain and per-iommu backed group since
+> aux-domain support allows a iommu backed group to be attached to
+> multiple domains. I'm considering if it is ok to have a list in vfio_domain.
+> Before each domain attach, vfio should do a check in the list if the iommu
+> backed group has been attached already. For vfio-pci devices, use its iommu
+> group to do a search in the list. For vfio-mdev-pci devices, use its parent
+> devices iommu group to do a search. Thus avoid duplicate attach. Thoughts?
+
+vfio_iommu_type1 already creates a struct vfio_iommu per container,
+which includes a linked list of struct vfio_domain objects, where each
+vfio_domain has a list of struct vfio_group objects.  So we need to
+include the iommu device iommu group in that latter list somehow.
+Thanks,
+
+Alex
