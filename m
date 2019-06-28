@@ -2,181 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 46FF0596E7
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 11:07:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0EE36596FE
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 11:12:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726542AbfF1JG7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jun 2019 05:06:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42372 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726431AbfF1JG7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jun 2019 05:06:59 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5806D308339F;
-        Fri, 28 Jun 2019 09:06:59 +0000 (UTC)
-Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0319760600;
-        Fri, 28 Jun 2019 09:06:50 +0000 (UTC)
-Date:   Fri, 28 Jun 2019 11:06:48 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Libvirt Devel <libvir-list@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Erik Skultety <eskultet@redhat.com>,
-        Pavel Hrdina <phrdina@redhat.com>,
-        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-        Sylvain Bauza <sbauza@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: Re: mdevctl: A shoestring mediated device management and
- persistence utility
-Message-ID: <20190628110648.40e0607d.cohuck@redhat.com>
-In-Reply-To: <20190627195704.66be88c8@x1.home>
-References: <20190523172001.41f386d8@x1.home>
-        <20190625165251.609f6266@x1.home>
-        <20190626115806.3435c45c.cohuck@redhat.com>
-        <20190626083720.42a2b5d4@x1.home>
-        <20190626195350.2e9c81d3@x1.home>
-        <20190627142626.415138da.cohuck@redhat.com>
-        <06114b39-69c2-3fa0-d0b3-aa96a44ae2ce@linux.ibm.com>
-        <20190627093832.064a346f@x1.home>
-        <20190627151502.2ae5314f@x1.home>
-        <20190627195704.66be88c8@x1.home>
-Organization: Red Hat GmbH
+        id S1726558AbfF1JMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jun 2019 05:12:36 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:34691 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726502AbfF1JMg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jun 2019 05:12:36 -0400
+Received: by mail-oi1-f196.google.com with SMTP id l12so3775631oil.1;
+        Fri, 28 Jun 2019 02:12:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=wJy0ShVCPuRJt2ekXMAtR/Y2ur+z0e0mc3qX7mlZ/Ng=;
+        b=EaPzFbKnQkZ1Wu1UqvnLqRHXla+DOPY+BVh3mY4rVjnB8Y1ezRLVEjKTyv/HzP4AAt
+         T2Czb32Y+aDvaYaSGnq5Pix+NTsBiTZTV4IKqPFUc6Fn+JlxWpeUqZHQ25Qx62ZjenwU
+         X1e3jt8FPYeyhBITx8rTwSENMm91a0uvSGhHH9d2H4BOg7xZ/x7r6HgW7auT/TIhs1Gj
+         Ws2tWStY0xQ1QFNkyXiZ4YxHgDGRM2h2sHhkqs1M1htop1FPC5b+lPYfNBGScHH2MWCG
+         mrKCVGm539ufiBygOapBmmETx9nk43bQiriCjf0p7smFXcwiYDDvUadlt1NdUCPVDvu3
+         krbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=wJy0ShVCPuRJt2ekXMAtR/Y2ur+z0e0mc3qX7mlZ/Ng=;
+        b=c7n8ZlFuKlwxw2UiqbsUdDDvqTdvXPAVa49Hy9WRAgSO5z48ODhWHM1TnHnMZspe1I
+         0dTMudmS+OnW4gMEvKXoedQaizmwpuxmxdkYajM9DOy/+JpdiAlKaiFSQAvfsbEqzQ+J
+         d4Cf8ismP/6Obw8UyFRn/YX4Jwp5Xj9Ely4OhnOvP4zUaTqeQRZvl4t4r+X2EftaGjqp
+         exqcGvDg43EQVj8MRElw6bstYtFRC+VUy8rtzhTCHeihExfVmceHCPR6jgcjmfXe99Y7
+         jEw6URT/aW0qqb/kYFhK3F4sLnfU5zUunVd3+n0YuiveD1X1O5WcH/af4dHClGsUjeYA
+         71Vg==
+X-Gm-Message-State: APjAAAWje39nSW3THDxyhbrwaBx2y5qV8JkZqnVYyeTGXONPhY7EcfEa
+        65q+cxX0u9LXBPDuOdcYXwIrMM7gu4WNuAePtxM=
+X-Google-Smtp-Source: APXvYqzXAEzxbJ/ThObRmHO6WgbC4Wu5Ba1vNRMnK+ZZPW8aqljOvjyTdBvddhB7GSOu8EE+wEJpwXV8nc94Ce12rS4=
+X-Received: by 2002:aca:51ce:: with SMTP id f197mr1088398oib.33.1561713155301;
+ Fri, 28 Jun 2019 02:12:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Fri, 28 Jun 2019 09:06:59 +0000 (UTC)
+References: <1559178307-6835-1-git-send-email-wanpengli@tencent.com>
+ <20190610143420.GA6594@flask> <20190611011100.GB24835@linux.intel.com>
+ <CANRm+Cwv5jqxBW=Ss5nkX7kZM3_Y-Ucs66yx5+wN09=W4pUdzA@mail.gmail.com>
+ <F136E492-5350-49EE-A856-FBAEDB12FF99@gmail.com> <CANRm+CyZcvuT80ixp9f0FNmjN+rTUtw8MshtBG0Uk4L1B1UjDw@mail.gmail.com>
+ <153047ED-75E2-4E70-BC33-C5FF27C08638@gmail.com> <CANRm+Cx6Z=jxLaXqwhBDpVTsKH8mgoo4iC=U8GbAAJz-5gk5ZA@mail.gmail.com>
+ <28BF5471-57E8-41FE-B401-D49D57D01A63@gmail.com>
+In-Reply-To: <28BF5471-57E8-41FE-B401-D49D57D01A63@gmail.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Fri, 28 Jun 2019 17:12:23 +0800
+Message-ID: <CANRm+CwnShNXmDi7yCZNc=oWrmFO7BTQ-MHxd1f5LRV8+YMJEg@mail.gmail.com>
+Subject: Re: [PATCH v3 0/3] KVM: Yield to IPI target if necessary
+To:     Nadav Amit <nadav.amit@gmail.com>
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 27 Jun 2019 19:57:04 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
+On Wed, 12 Jun 2019 at 09:37, Nadav Amit <nadav.amit@gmail.com> wrote:
+>
+> > On Jun 11, 2019, at 6:18 PM, Wanpeng Li <kernellwp@gmail.com> wrote:
+> >
+> > On Wed, 12 Jun 2019 at 00:57, Nadav Amit <nadav.amit@gmail.com> wrote:
+> >>> On Jun 11, 2019, at 3:02 AM, Wanpeng Li <kernellwp@gmail.com> wrote:
+> >>>
+> >>> On Tue, 11 Jun 2019 at 09:48, Nadav Amit <nadav.amit@gmail.com> wrote=
+:
+> >>>>> On Jun 10, 2019, at 6:45 PM, Wanpeng Li <kernellwp@gmail.com> wrote=
+:
+> >>>>>
+> >>>>> On Tue, 11 Jun 2019 at 09:11, Sean Christopherson
+> >>>>> <sean.j.christopherson@intel.com> wrote:
+> >>>>>> On Mon, Jun 10, 2019 at 04:34:20PM +0200, Radim Kr=C4=8Dm=C3=A1=C5=
+=99 wrote:
+> >>>>>>> 2019-05-30 09:05+0800, Wanpeng Li:
+> >>>>>>>> The idea is from Xen, when sending a call-function IPI-many to v=
+CPUs,
+> >>>>>>>> yield if any of the IPI target vCPUs was preempted. 17% performa=
+nce
+> >>>>>>>> increasement of ebizzy benchmark can be observed in an over-subs=
+cribe
+> >>>>>>>> environment. (w/ kvm-pv-tlb disabled, testing TLB flush call-fun=
+ction
+> >>>>>>>> IPI-many since call-function is not easy to be trigged by usersp=
+ace
+> >>>>>>>> workload).
+> >>>>>>>
+> >>>>>>> Have you checked if we could gain performance by having the yield=
+ as an
+> >>>>>>> extension to our PV IPI call?
+> >>>>>>>
+> >>>>>>> It would allow us to skip the VM entry/exit overhead on the calle=
+r.
+> >>>>>>> (The benefit of that might be negligible and it also poses a
+> >>>>>>> complication when splitting the target mask into several PV IPI
+> >>>>>>> hypercalls.)
+> >>>>>>
+> >>>>>> Tangetially related to splitting PV IPI hypercalls, are there any =
+major
+> >>>>>> hurdles to supporting shorthand?  Not having to generate the mask =
+for
+> >>>>>> ->send_IPI_allbutself and ->kvm_send_ipi_all seems like an easy to=
+ way
+> >>>>>> shave cycles for affected flows.
+> >>>>>
+> >>>>> Not sure why shorthand is not used for native x2apic mode.
+> >>>>
+> >>>> Why do you say so? native_send_call_func_ipi() checks if allbutself
+> >>>> shorthand should be used and does so (even though the check can be m=
+ore
+> >>>> efficient - I=E2=80=99m looking at that code right now=E2=80=A6)
+> >>>
+> >>> Please continue to follow the apic/x2apic driver. Just apic_flat set
+> >>> APIC_DEST_ALLBUT/APIC_DEST_ALLINC to ICR.
+> >>
+> >> Indeed - I was sure by the name that it does it correctly. That=E2=80=
+=99s stupid.
+> >>
+> >> I=E2=80=99ll add it to the patch-set I am working on (TLB shootdown im=
+provements),
+> >> if you don=E2=80=99t mind.
+> >
+> > Original for hotplug cpu safe.
+> > https://lwn.net/Articles/138365/
+> > https://lwn.net/Articles/138368/
+> > Not sure shortcut native support is acceptable, I will play my
+> > kvm_send_ipi_allbutself and kvm_send_ipi_all. :)
+>
+> Yes, I saw these threads before. But I think the test in
+> native_send_call_func_ipi() should take care of it.
 
-> On Thu, 27 Jun 2019 15:15:02 -0600
-> Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
-> > On Thu, 27 Jun 2019 09:38:32 -0600
-> > Alex Williamson <alex.williamson@redhat.com> wrote:  
-> > > > On 6/27/19 8:26 AM, Cornelia Huck wrote:      
-> > > > > 
-> > > > > {
-> > > > >   "foo": "1",
-> > > > >   "bar": "42",
-> > > > >   "baz": {
-> > > > >     "depends": ["foo", "bar"],
-> > > > >     "value": "plahh"
-> > > > >   }
-> > > > > }
-> > > > > 
-> > > > > Something like that?      
-> > > 
-> > > I'm not sure yet.  I think we need to look at what's feasible (and
-> > > easy) with jq.  Thanks,    
-> > 
-> > I think it's not too much trouble to remove and insert into arrays, so
-> > what if we were to define the config as:
-> > 
-> > {
-> >   "mdev_type":"vendor-type",
-> >   "start":"auto",
-> >   "attrs": [
-> >       {"attrX":["Xvalue1","Xvalue2"]},
-> >       {"dir/attrY": "Yvalue1"},
-> >       {"attrX": "Xvalue3"}
-> >     ]
-> > }
-> > 
-> > "attr" here would define sysfs attributes under the device.  The array
-> > would be processed in order, so in the above example we'd do the
-> > following:
-> > 
-> >  1. echo Xvalue1 > attrX
-> >  2. echo Xvalue2 > attrX
-> >  3. echo Yvalue1 > dir/attrY
-> >  4. echo Xvalue3 > attrX
-> > 
-> > When starting the device mdevctl would simply walk the array, if the
-> > attribute key exists write the value(s).  If a write fails or the
-> > attribute doesn't exist, remove the device and report error.
+Good news, https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/log/=
+?h=3DWIP.x86/ipi
+Thomas who also is the hotplug state machine author introduces
+shorthands support to native kernel now, I will add the support to
+kvm_send_ipi_allbutself() and kvm_send_ipi_all() after his work
+complete.
 
-Yes, I think it makes sense to fail the startup of a device where we
-cannot set all attributes to the requested values.
-
-> > 
-> > I think it's easiest with jq to manipulate arrays by removing and
-> > inserting by index.  Also if we end up with something like above, it's
-> > ambiguous if we reference the "attrX" key.  So perhaps we add the
-> > following options to the modify command:
-> > 
-> > --addattr=ATTRIBUTE --delattr --index=INDEX --value=VALUE1[,VALUE2]
-> > 
-> > We could handle it like a stack, so if --index is not supplied, add to
-> > the end or remove from the end.  If --index is provided, delete that
-> > index or add the attribute at that index.  So if you had the above and
-> > wanted to remove Xvalue1 but keep the ordering, you'd do:
-> > 
-> > --delattr --index=0
-> > --addattr --index=0 --value=Xvalue2
-> > 
-> > Which should results in:
-> > 
-> >   "attrs": [
-> >       {"attrX": "Xvalue2"},
-> >       {"dir/attrY": "Yvalue1"},
-> >       {"attrX": "Xvalue3"}
-> >     ]
-
-Modifying by index looks reasonable; I just sent a pull request to
-print the index of an attribute out as well, so it is easier to specify
-the right attribute to modify.
-
-> > 
-> > If we want to modify a running device, I'm thinking we probably want a
-> > new command and options --attr=ATTRIBUTE --value=VALUE might suffice.
-> > 
-> > Do we need to support something like this for the 'start' command or
-> > should we leave that for simple devices and require a sequence of:
-> > 
-> > # mdevctl define ...
-> > # mdevctl modify --addattr...
-> > ...
-> > # mdevctl start
-> > # mdevctl undefine
-> > 
-> > This is effectively the long way to get a transient device.  Otherwise
-> > we'd need to figure out how to have --attr --value appear multiple
-> > times on the start command line.  Thanks,  
-
-What do you think of a way to specify JSON for the attributes directly
-on the command line? Or would it be better to just edit the config
-files directly?
-
-> 
-> This is now implemented, and yes you can specify '--addattr remove
-> --value 1' and mdevctl will immediately remove the device after it's
-> created (more power to the admin).  Listing defined devices also lists
-
-Fun ;)
-
-> any attributes defined for easy inspection.  It is also possible to
-> override the conversion of comma separated values into an array by
-> encoding and escaping the comma.  It's a little cumbersome, but
-> possible in case a driver isn't fully on board with the one attribute,
-> one value rule of sysfs.  Does this work for vfio-ap?  I also still
-
-I do not have ap devices to actually test this with; but defining a
-device and adding attributes seems to work.
-
-> need to check if this allows an NVIDIA vGPU mdev to be configured such
-> that the framerate limiter can be automatically controlled.  Thanks,
-> 
-> Alex
-
+Regards,
+Wanpeng Li
