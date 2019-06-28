@@ -2,248 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 43D7D5960C
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 10:26:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C2CC59612
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 10:27:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726536AbfF1I0d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jun 2019 04:26:33 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:41617 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726056AbfF1I0d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jun 2019 04:26:33 -0400
-Received: by mail-ot1-f67.google.com with SMTP id o101so4858887ota.8;
-        Fri, 28 Jun 2019 01:26:32 -0700 (PDT)
+        id S1726559AbfF1I1q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jun 2019 04:27:46 -0400
+Received: from smtp-fw-9102.amazon.com ([207.171.184.29]:16802 "EHLO
+        smtp-fw-9102.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726385AbfF1I1p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jun 2019 04:27:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=yv6CgnWPC6xWm8QD/szBDMm8993i38/ihT9u27h0IHg=;
-        b=H/GoLEaonyeEZGb/WdSNNwT0RKBkwJ+epaDaWfsOguW1ydhvWbSbwKtl33NMN9i2m8
-         4YgucQRpRpAj11NGAPXL1N6Upj0r4fa4YR6t0s5wOFoljLN+EmakXd1tfahz1hCskGtv
-         d7xiJM8RVgBagmJlykCsk+u67mBH37AiwXILVK83OKJGYlFGuyQ+1DkSGU/2cGs9S5FK
-         KxxmtUL5bRKoGEoaz8tSikz12ZSqU84znM7sD62zx2lL3V+VqRCP232O1crpiURARA9r
-         l1BuLi3QAgDiuXPbyUpZcCqFVO/FhwNpXYyD1DSxHzknKJSGlebq6X4RuPzP0nzmNkDZ
-         04Xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=yv6CgnWPC6xWm8QD/szBDMm8993i38/ihT9u27h0IHg=;
-        b=TWj+2af4txb6fz1QktR4XaQE11ffW9bVY0n5kdV12hXjyaBwSZATPGeChqHeajAvea
-         Pe/O9hpbe0di7WWLwqS1UHcEIeFt/kPrcW89xkekAWm7mSWgZ32Ze53cKnAxHedmzFqQ
-         VjlEl+QsaSgyulErDqKmQLomCvVHF78wSVYNwkmgOXiwUDAkkTqFYF8ud5nXjNrXm5V3
-         wP5BmNVKL3AW+EcTcj++rD+2roKghjEOFONvT9mDJnnIlm4S4cHP7fTRttyd9+r7exmM
-         2fri1uDrpo4qJdWRJG7K9LzL3vnlusjLkoX3R0Q8eCHvKSBObrxQD+YLcSi6GmekouyD
-         xPag==
-X-Gm-Message-State: APjAAAUO9RXaXr+wjUkMFeGSGcihYBeqUbFsaKKiDYnXo4PRcUQ5dc0g
-        M05deLYsskoTq2f3V0vovxFS9S81OMplydWeiHisKsU7q2I=
-X-Google-Smtp-Source: APXvYqz/O75u9syzUZvnyk6BcL7Q+bOdMy3y6p5OqPd/UERUb8K0K03+LcpR7BORZfLKctoLiq90hrg13YbDW4N5BoM=
-X-Received: by 2002:a9d:62c4:: with SMTP id z4mr6806096otk.56.1561710392254;
- Fri, 28 Jun 2019 01:26:32 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1561710465; x=1593246465;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=oIjjlNBlwRk0e8pvJQOPWBRb0qZbjdv8AQ9bfQPJjOM=;
+  b=MmI04jRs5RB4pVOLH+CeZDCKbUr1BmxCRVbEgTJVd6TkUgqV8+vblP07
+   JXVlzWL9EKTXHqUTKtxqbjG5bvFO5b71E/rj9JyW+khC7iSPwY7IFrVfE
+   1iT01EsUHK4pcLd6AaiKKt8jjT1O7ojWtPn93oXTk92D6Z+nNqpBptWgM
+   I=;
+X-IronPort-AV: E=Sophos;i="5.62,426,1554768000"; 
+   d="scan'208";a="682652138"
+Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-2a-1c1b5cdd.us-west-2.amazon.com) ([10.47.22.34])
+  by smtp-border-fw-out-9102.sea19.amazon.com with ESMTP; 28 Jun 2019 08:27:37 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
+        by email-inbound-relay-2a-1c1b5cdd.us-west-2.amazon.com (Postfix) with ESMTPS id A1129A20B5;
+        Fri, 28 Jun 2019 08:27:36 +0000 (UTC)
+Received: from EX13D20UWC004.ant.amazon.com (10.43.162.41) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 28 Jun 2019 08:27:36 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (10.43.162.135) by
+ EX13D20UWC004.ant.amazon.com (10.43.162.41) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 28 Jun 2019 08:27:35 +0000
+Received: from u6cf1b7119fa15b.ant.amazon.com (10.28.85.98) by
+ mail-relay.amazon.com (10.43.162.232) with Microsoft SMTP Server (TLS) id
+ 15.0.1367.3 via Frontend Transport; Fri, 28 Jun 2019 08:27:32 +0000
+Subject: Re: [PATCH v3 4/5] Added build and install scripts
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Alexander Graf <graf@amazon.com>,
+        Sam Caccavale <samcacc@amazon.de>
+CC:     <samcaccavale@gmail.com>, <nmanthey@amazon.de>,
+        <wipawel@amazon.de>, <dwmw@amazon.co.uk>, <mpohlack@amazon.de>,
+        <karahmed@amazon.de>, <andrew.cooper3@citrix.com>,
+        <JBeulich@suse.com>, <rkrcmar@redhat.com>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <bp@alien8.de>, <hpa@zytor.com>,
+        <paullangton4@gmail.com>, <x86@kernel.org>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20190624142414.22096-1-samcacc@amazon.de>
+ <20190624142414.22096-5-samcacc@amazon.de>
+ <e0b29f4d-7471-c5d8-c9d4-2a352831a4bd@amazon.com>
+ <6fa5e9de-7b66-76ba-0b98-e11f890e076a@amazon.com>
+ <4438c94e-a0ed-0e5c-0a74-02aed8949b24@redhat.com>
+From:   <samcacc@amazon.com>
+Message-ID: <8f9e2dd8-f83f-0685-5939-33e77d97a6c6@amazon.com>
+Date:   Fri, 28 Jun 2019 10:27:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-References: <1560770687-23227-1-git-send-email-wanpengli@tencent.com>
- <1560770687-23227-3-git-send-email-wanpengli@tencent.com> <20190618133541.GA3932@amt.cnet>
- <CANRm+Cz0v1VfDaCCWX+5RzCusTV7g9Hwr+OLGDRijeyqFx=Kzw@mail.gmail.com>
- <20190619210346.GA13033@amt.cnet> <CANRm+Cwxz7rR3o2m1HKg0-0z30B8-O-i4RrVC6EMG1jgBRxWPg@mail.gmail.com>
- <20190621214205.GA4751@amt.cnet> <CANRm+CxUgkF7zRmHC_MD2s00waj6qztWdPAm_u9Rhk34_bevfQ@mail.gmail.com>
- <20190625190010.GA3377@amt.cnet> <CANRm+CzmraRUNQfTWNZ3Bu5dJhjvL1eE9+=c2i_vwtYYT9ao2w@mail.gmail.com>
- <20190626164401.GA2211@amt.cnet>
-In-Reply-To: <20190626164401.GA2211@amt.cnet>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 28 Jun 2019 16:26:20 +0800
-Message-ID: <CANRm+Cy0FFqoUuFsLGxGFN04wYaX_1y2t--EXacdwj7Q3wbOLQ@mail.gmail.com>
-Subject: Re: [PATCH v4 2/5] KVM: LAPIC: inject lapic timer interrupt by posted interrupt
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <4438c94e-a0ed-0e5c-0a74-02aed8949b24@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 27 Jun 2019 at 00:44, Marcelo Tosatti <mtosatti@redhat.com> wrote:
->
-> On Wed, Jun 26, 2019 at 07:02:13PM +0800, Wanpeng Li wrote:
-> > On Wed, 26 Jun 2019 at 03:03, Marcelo Tosatti <mtosatti@redhat.com> wro=
-te:
-> > >
-> > > On Mon, Jun 24, 2019 at 04:53:53PM +0800, Wanpeng Li wrote:
-> > > > On Sat, 22 Jun 2019 at 06:11, Marcelo Tosatti <mtosatti@redhat.com>=
- wrote:
-> > > > >
-> > > > > On Fri, Jun 21, 2019 at 09:42:39AM +0800, Wanpeng Li wrote:
-> > > > > > On Thu, 20 Jun 2019 at 05:04, Marcelo Tosatti <mtosatti@redhat.=
-com> wrote:
-> > > > > > >
-> > > > > > > Hi Li,
-> > > > > > >
-> > > > > > > On Wed, Jun 19, 2019 at 08:36:06AM +0800, Wanpeng Li wrote:
-> > > > > > > > On Tue, 18 Jun 2019 at 21:36, Marcelo Tosatti <mtosatti@red=
-hat.com> wrote:
-> > > > > > > > >
-> > > > > > > > > On Mon, Jun 17, 2019 at 07:24:44PM +0800, Wanpeng Li wrot=
-e:
-> > > > > > > > > > From: Wanpeng Li <wanpengli@tencent.com>
-> > > > > > > > > >
-> > > > > > > > > > Dedicated instances are currently disturbed by unnecess=
-ary jitter due
-> > > > > > > > > > to the emulated lapic timers fire on the same pCPUs whi=
-ch vCPUs resident.
-> > > > > > > > > > There is no hardware virtual timer on Intel for guest l=
-ike ARM. Both
-> > > > > > > > > > programming timer in guest and the emulated timer fires=
- incur vmexits.
-> > > > > > > > > > This patch tries to avoid vmexit which is incurred by t=
-he emulated
-> > > > > > > > > > timer fires in dedicated instance scenario.
-> > > > > > > > > >
-> > > > > > > > > > When nohz_full is enabled in dedicated instances scenar=
-io, the emulated
-> > > > > > > > > > timers can be offload to the nearest busy housekeeping =
-cpus since APICv
-> > > > > > > > > > is really common in recent years. The guest timer inter=
-rupt is injected
-> > > > > > > > > > by posted-interrupt which is delivered by housekeeping =
-cpu once the emulated
-> > > > > > > > > > timer fires.
-> > > > > > > > > >
-> > > > > > > > > > The host admin should fine tuned, e.g. dedicated instan=
-ces scenario w/
-> > > > > > > > > > nohz_full cover the pCPUs which vCPUs resident, several=
- pCPUs surplus
-> > > > > > > > > > for busy housekeeping, disable mwait/hlt/pause vmexits =
-to keep in non-root
-> > > > > > > > > > mode, ~3% redis performance benefit can be observed on =
-Skylake server.
-> > > > > > > > > >
-> > > > > > > > > > w/o patch:
-> > > > > > > > > >
-> > > > > > > > > >             VM-EXIT  Samples  Samples%  Time%   Min Tim=
-e  Max Time   Avg time
-> > > > > > > > > >
-> > > > > > > > > > EXTERNAL_INTERRUPT    42916    49.43%   39.30%   0.47us=
-   106.09us   0.71us ( +-   1.09% )
-> > > > > > > > > >
-> > > > > > > > > > w/ patch:
-> > > > > > > > > >
-> > > > > > > > > >             VM-EXIT  Samples  Samples%  Time%   Min Tim=
-e  Max Time         Avg time
-> > > > > > > > > >
-> > > > > > > > > > EXTERNAL_INTERRUPT    6871     9.29%     2.96%   0.44us=
-    57.88us   0.72us ( +-   4.02% )
-> > > > > > > > > >
-> > > > > > > > > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > > > > > > > > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> > > > > > > > > > Cc: Marcelo Tosatti <mtosatti@redhat.com>
-> > > > > > > > > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > > > > > > > > > ---
-> > > > > > > > > >  arch/x86/kvm/lapic.c            | 33 +++++++++++++++++=
-+++++++++-------
-> > > > > > > > > >  arch/x86/kvm/lapic.h            |  1 +
-> > > > > > > > > >  arch/x86/kvm/vmx/vmx.c          |  3 ++-
-> > > > > > > > > >  arch/x86/kvm/x86.c              |  5 +++++
-> > > > > > > > > >  arch/x86/kvm/x86.h              |  2 ++
-> > > > > > > > > >  include/linux/sched/isolation.h |  2 ++
-> > > > > > > > > >  kernel/sched/isolation.c        |  6 ++++++
-> > > > > > > > > >  7 files changed, 44 insertions(+), 8 deletions(-)
-> > > > > > > > > >
-> > > > > > > > > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.=
-c
-> > > > > > > > > > index 87ecb56..9ceeee5 100644
-> > > > > > > > > > --- a/arch/x86/kvm/lapic.c
-> > > > > > > > > > +++ b/arch/x86/kvm/lapic.c
-> > > > > > > > > > @@ -122,6 +122,13 @@ static inline u32 kvm_x2apic_id(st=
-ruct kvm_lapic *apic)
-> > > > > > > > > >       return apic->vcpu->vcpu_id;
-> > > > > > > > > >  }
-> > > > > > > > > >
-> > > > > > > > > > +bool posted_interrupt_inject_timer(struct kvm_vcpu *vc=
-pu)
-> > > > > > > > > > +{
-> > > > > > > > > > +     return pi_inject_timer && kvm_vcpu_apicv_active(v=
-cpu) &&
-> > > > > > > > > > +             kvm_hlt_in_guest(vcpu->kvm);
-> > > > > > > > > > +}
-> > > > > > > > > > +EXPORT_SYMBOL_GPL(posted_interrupt_inject_timer);
-> > > > > > > > >
-> > > > > > > > > Paolo, can you explain the reasoning behind this?
-> > > > > > > > >
-> > > > > > > > > Should not be necessary...
-> > > > > >
-> > > > > > https://lkml.org/lkml/2019/6/5/436  "Here you need to check
-> > > > > > kvm_halt_in_guest, not kvm_mwait_in_guest, because you need to =
-go
-> > > > > > through kvm_apic_expired if the guest needs to be woken up from
-> > > > > > kvm_vcpu_block."
-> > > > >
-> > > > > Ah, i think he means that a sleeping vcpu (in kvm_vcpu_block) mus=
-t
-> > > > > be woken up, if it receives a timer interrupt.
-> > > > >
-> > > > > But your patch will go through:
-> > > > >
-> > > > > kvm_apic_inject_pending_timer_irqs
-> > > > > __apic_accept_irq ->
-> > > > > vmx_deliver_posted_interrupt ->
-> > > > > kvm_vcpu_trigger_posted_interrupt returns false
-> > > > > (because vcpu->mode !=3D IN_GUEST_MODE) ->
-> > > > > kvm_vcpu_kick
-> > > > >
-> > > > > Which will wakeup the vcpu.
-> > > >
-> > > > Hi Marcelo,
-> > > >
-> > > > >
-> > > > > Apart from this oops, which triggers when running:
-> > > > > taskset -c 1 ./cyclictest -D 3600 -p 99 -t 1 -h 30 -m -n  -i 5000=
-0 -b 40
-> > > >
-> > > > I try both host and guest use latest kvm/queue  w/ CONFIG_PREEMPT
-> > > > enabled, and expose mwait as your config, however, there is no oops=
-.
-> > > > Can you reproduce steadily or encounter casually? Can you reproduce
-> > > > w/o the patchset?
-> > >
-> > > Hi Li,
-> >
-> > Hi Marcelo,
-> >
-> > >
-> > > Steadily.
-> > >
-> > > Do you have this as well:
-> >
-> > w/ or w/o below diff, testing on both SKX and HSW servers on hand, I
-> > didn't see any oops. Could you observe the oops disappear when w/o
-> > below diff? If the answer is yes, then the oops will not block to
-> > merge the patchset since Paolo prefers to add the kvm_hlt_in_guest()
-> > condition to guarantee be woken up from kvm_vcpu_block().
->
-> He agreed that its not necessary. Removing the HLT in guest widens
-> the scope of the patch greatly.
->
-> > For the
-> > exitless injection if the guest is running(DPDK style workloads that
-> > busy-spin on network card) scenarios, we can find a solution later.
->
-> What is the use-case for HLT in guest again?
+On 6/28/19 10:17 AM, Paolo Bonzini wrote:
+> On 28/06/19 09:59, samcacc@amazon.com wrote:
+>>> Surely if it's important to generate core dumps, it's not only important
+>>> during installation, no?
+>> Yep... missed this.  I'll move it to run.sh right before alf-many is
+>> invoked.  It would be nice to not have to sudo but it seems the only
+>> alternative is an envvar AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES which
+>> just ignores AFL's warning if your system isn't going to produce core
+>> dumps (which will cause AFL to miss some crashes, as the name suggests).
+> 
+> Can you do this only if /proc/sys/kernel/core_pattern starts with a pipe
+> sign?
+> 
 
-Together w/ mwait/hlt/pause no vmexits for dedicated instances. In
-addition, hlt in guest will disable pv qspinlock which is not optimal
-for dedicated instance. Refer to commit
-b2798ba0b876 (KVM: X86: Choose qspinlock when dedicated physical CPUs
-are available) and commit caa057a2cad64 (KVM: X86: Provide a
-capability to disable HLT intercepts).
+I think I'll just remove the `echo > ...core_pattern` step from both the
+build.sh and run.sh scripts and instead document it as a setup step in
+the README.  This also sidesteps the sudo use.
 
->
-> I'll find the source for the oops (or confirm can't reproduce with
-> kvm/queue RSN).
+- Sam
 
-Looking forward to it, thanks Marcelo, hope we can catch the upcoming
-merge window. :)
+> Thanks,
+> 
+> Paolo
+> 
 
-Regards,
-Wanpeng Li
