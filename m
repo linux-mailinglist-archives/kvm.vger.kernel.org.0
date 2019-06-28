@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 498E65A8CE
-	for <lists+kvm@lfdr.de>; Sat, 29 Jun 2019 05:53:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 188BB5A8CF
+	for <lists+kvm@lfdr.de>; Sat, 29 Jun 2019 05:53:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726752AbfF2DxN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jun 2019 23:53:13 -0400
-Received: from mail-pf1-f181.google.com ([209.85.210.181]:38093 "EHLO
-        mail-pf1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726702AbfF2DxM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jun 2019 23:53:12 -0400
-Received: by mail-pf1-f181.google.com with SMTP id y15so3928140pfn.5
-        for <kvm@vger.kernel.org>; Fri, 28 Jun 2019 20:53:12 -0700 (PDT)
+        id S1726796AbfF2DxO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jun 2019 23:53:14 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:37942 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726762AbfF2DxO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jun 2019 23:53:14 -0400
+Received: by mail-pl1-f194.google.com with SMTP id 9so3534609ple.5
+        for <kvm@vger.kernel.org>; Fri, 28 Jun 2019 20:53:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=+9qYG8HpSyGgSBE+SHs7lVfiRzAcIP8cCs8Yp2gW3/M=;
-        b=geBE2xNDJAdwhS0VoWpLBSNOSXluklWjtrIUHER3GhIk/GfmVUB/JES+Xn1KOBNTCb
-         W3mYe7Xrrr9Ue7qYp/s31Z+qKYewJd9ZLx9/p2cCtJBIHVOdif1jAKj71cVz8+6OUncL
-         QhUsodlg6PBx90Nw5CJsiU5mDeayV19ybEyX3C2k+/pWbd8qLrhXZVbe8roANR02cORT
-         VROcT+gNoJbfYGe9uQ4N1YHEIDMzr3BX0T0lkb1AE4kr8BSQM8u7CTK1m+6UKm1sMOWh
-         +XvXwcbwXknRwBa5JQkzPm91usGZXGrZD53JaFo6vEcS7opx58sa6ldq9fx6h4m/Xlbp
-         wBIg==
+        bh=kg9cnhfWN92/dS8254v6me5wI97CqKprJYMTUglwb9U=;
+        b=MGP5B2704yGyNXdggsl8qxtBCfU+GUokWXioeIOLudoFxBYsSQPOsXG2AaJ28cYCEc
+         FRgt3d5/50IAiH1teixRxEH6ZsTNJQws51ejZBCA1sXV4ksQk/wppB2I4mUgks+Lk8iM
+         w/WksduNTI4fcUhCfXZYkgf4HjniJy5RW+4GBfp+puJJCb4p9P8saHWg02mObpdfimPb
+         +1NSUyhic0e7e+btphdsj0joGMcuYEMDYTY1HD1T4/ZVdTxItI4FYA0xWB/tzWLwiisA
+         6jvHnqQnJOQiB3CGu+ksSBT0pwYGnW+J8YUOzK5xVL6/cBuv1hDGq6htRMXKhcN2Wo4z
+         nRdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=+9qYG8HpSyGgSBE+SHs7lVfiRzAcIP8cCs8Yp2gW3/M=;
-        b=pjGOXBJo68SNOV3xcetq4x6jyNHd80aYCgmT0yOtEwz97gtze+sVR9/Rvxl2w9RD3X
-         WA7/SlL8I+Se1NM1qU2FlzhV8hC8ocBQm+IgeklWUxrRNICKHuXFw9Dz9YSAYEYqphYU
-         Gz/EWdzyIS8DX0dZHQZ5uLo1KNrectLL3Rsae4Hb8YzqR7vqsbxtINQmVURMo1T9s3AZ
-         z5nSCecNsGm95aAnzTYSE7lGq0PImRBApRQOJgY92XDKi46h3aHSwGmYOwc0fmn86gIZ
-         OGV7cbBab5FHsynbCmH4TW396naVo66bPFTSisJzkx1WuGRZyMltfE5UOJhHSZlC6u4c
-         3NIA==
-X-Gm-Message-State: APjAAAWGzaaKHqIiFNLNIOWTN7O1Lq7iUoZ6CSbms3X9q8RhwO0GRwqp
-        ZMGfqivGoAHX4ZChwhZnpWU=
-X-Google-Smtp-Source: APXvYqx/n9BIsat5VaTVFg7jRmSFl4XF+3JSbwGnOrPYcsNGT4Nam8wgqUXaV4sQT0dNUARdLKIIZg==
-X-Received: by 2002:a63:78ca:: with SMTP id t193mr12374233pgc.10.1561780392006;
-        Fri, 28 Jun 2019 20:53:12 -0700 (PDT)
+        bh=kg9cnhfWN92/dS8254v6me5wI97CqKprJYMTUglwb9U=;
+        b=T9uxv1YVEBMzo4oqCwWtsh5lwiIHvmW7GrXa+rrwZZmwmiXlLULMWGNeDtUtYf+jpG
+         rSG9WtqIVEutntcgHEOS43x+OOP0yAKmonrE70Lth/ER38C89deUwcY+TidzIv2BtXro
+         Yu+PoIz5boVDNYoJ9YQxVbUpz3NRnqdS7R+9aTode8Uk3lD4295QMyVshfUUQjXfmnE3
+         QtXm7kvrEHg7bdlIIZJpfkinVN/AkMhvZHaNjx5tzv6l3JRZXs/57MCdgaOc3pYxFWwu
+         iVmXPpo1UfWc3UX6eEj3nsFVkmFkRPx1mTbITcE36L/YQqocIDFzAsSlOeR30loQdY/x
+         KH7Q==
+X-Gm-Message-State: APjAAAVlxXgtIphj1LOQgaLojv8pO9F76polqGLsL1hTybjMmEh0XEmY
+        kV3mMve7oVXkECO98DYqtMc=
+X-Google-Smtp-Source: APXvYqxXnEIEy73Hu/wps0mZPeVGh0ERbrnCDlsFuZbsCHjP6WGG9kovK/qdqSC28dlPTNNYVQxD2A==
+X-Received: by 2002:a17:902:7295:: with SMTP id d21mr14474835pll.299.1561780393221;
+        Fri, 28 Jun 2019 20:53:13 -0700 (PDT)
 Received: from sc2-haas01-esx0118.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id p27sm5597052pfq.136.2019.06.28.20.53.10
+        by smtp.gmail.com with ESMTPSA id p27sm5597052pfq.136.2019.06.28.20.53.12
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Fri, 28 Jun 2019 20:53:11 -0700 (PDT)
+        Fri, 28 Jun 2019 20:53:12 -0700 (PDT)
 From:   Nadav Amit <nadav.amit@gmail.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Nadav Amit <nadav.amit@gmail.com>
-Subject: [kvm-unit-tests PATCH 1/3] libcflat: use stdbool
-Date:   Fri, 28 Jun 2019 13:30:17 -0700
-Message-Id: <20190628203019.3220-2-nadav.amit@gmail.com>
+Subject: [kvm-unit-tests PATCH 2/3] x86/vmx: Use plus for positive filters
+Date:   Fri, 28 Jun 2019 13:30:18 -0700
+Message-Id: <20190628203019.3220-3-nadav.amit@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190628203019.3220-1-nadav.amit@gmail.com>
 References: <20190628203019.3220-1-nadav.amit@gmail.com>
@@ -57,37 +57,151 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To avoid any future build errors, using stdbool instead of defining
-bool.
+To introduce general boot parameters, avoid vmx boot parameters from
+colliding with the general ones. Precede the vmx test names with a plus
+sign ('+') to indicate a test should be executed in vmx, and ignore
+those that are not preceded with '-' or '+'.
 
 Signed-off-by: Nadav Amit <nadav.amit@gmail.com>
 ---
- lib/libcflat.h | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ x86/unittests.cfg | 32 ++++++++++++++++----------------
+ x86/vmx.c         |  4 ++--
+ 2 files changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/lib/libcflat.h b/lib/libcflat.h
-index 7529958..b94d0ac 100644
---- a/lib/libcflat.h
-+++ b/lib/libcflat.h
-@@ -24,6 +24,7 @@
- #include <stddef.h>
- #include <stdint.h>
- #include <string.h>
-+#include <stdbool.h>
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 694ee3d..dc7a85d 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -58,55 +58,55 @@ smp = 3
  
- #define __unused __attribute__((__unused__))
+ [vmexit_cpuid]
+ file = vmexit.flat
+-extra_params = -append 'cpuid'
++extra_params = -append '+cpuid'
+ groups = vmexit
  
-@@ -53,10 +54,6 @@ typedef uint64_t	u64;
- typedef int64_t		s64;
- typedef unsigned long	ulong;
+ [vmexit_vmcall]
+ file = vmexit.flat
+-extra_params = -append 'vmcall'
++extra_params = -append '+vmcall'
+ groups = vmexit
  
--typedef _Bool		bool;
--#define false 0
--#define true  1
--
- #if __SIZEOF_LONG__ == 8
- #  define __PRI32_PREFIX
- #  define __PRI64_PREFIX	"l"
+ [vmexit_mov_from_cr8]
+ file = vmexit.flat
+-extra_params = -append 'mov_from_cr8'
++extra_params = -append '+mov_from_cr8'
+ groups = vmexit
+ 
+ [vmexit_mov_to_cr8]
+ file = vmexit.flat
+-extra_params = -append 'mov_to_cr8'
++extra_params = -append '+mov_to_cr8'
+ groups = vmexit
+ 
+ [vmexit_inl_pmtimer]
+ file = vmexit.flat
+-extra_params = -append 'inl_from_pmtimer'
++extra_params = -append '+inl_from_pmtimer'
+ groups = vmexit
+ 
+ [vmexit_ipi]
+ file = vmexit.flat
+ smp = 2
+-extra_params = -append 'ipi'
++extra_params = -append '+ipi'
+ groups = vmexit
+ 
+ [vmexit_ipi_halt]
+ file = vmexit.flat
+ smp = 2
+-extra_params = -append 'ipi_halt'
++extra_params = -append '+ipi_halt'
+ groups = vmexit
+ 
+ [vmexit_ple_round_robin]
+ file = vmexit.flat
+-extra_params = -append 'ple_round_robin'
++extra_params = -append '+ple_round_robin'
+ groups = vmexit
+ 
+ [vmexit_tscdeadline]
+ file = vmexit.flat
+ groups = vmexit
+-extra_params = -cpu qemu64,+x2apic,+tsc-deadline -append tscdeadline
++extra_params = -cpu qemu64,+x2apic,+tsc-deadline -append '+tscdeadline'
+ 
+ [vmexit_tscdeadline_immed]
+ file = vmexit.flat
+ groups = vmexit
+-extra_params = -cpu qemu64,+x2apic,+tsc-deadline -append tscdeadline_immed
++extra_params = -cpu qemu64,+x2apic,+tsc-deadline -append '+tscdeadline_immed'
+ 
+ [access]
+ file = access.flat
+@@ -233,27 +233,27 @@ groups = vmx
+ 
+ [ept]
+ file = vmx.flat
+-extra_params = -cpu host,host-phys-bits,+vmx -m 2560 -append "ept_access*"
++extra_params = -cpu host,host-phys-bits,+vmx -m 2560 -append "+ept_access*"
+ arch = x86_64
+ groups = vmx
+ 
+ [vmx_eoi_bitmap_ioapic_scan]
+ file = vmx.flat
+ smp = 2
+-extra_params = -cpu host,+vmx -m 2048 -append vmx_eoi_bitmap_ioapic_scan_test
++extra_params = -cpu host,+vmx -m 2048 -append '+vmx_eoi_bitmap_ioapic_scan_test'
+ arch = x86_64
+ groups = vmx
+ 
+ [vmx_hlt_with_rvi_test]
+ file = vmx.flat
+-extra_params = -cpu host,+vmx -append vmx_hlt_with_rvi_test
++extra_params = -cpu host,+vmx -append '+vmx_hlt_with_rvi_test'
+ arch = x86_64
+ groups = vmx
+ timeout = 10
+ 
+ [vmx_apicv_test]
+ file = vmx.flat
+-extra_params = -cpu host,+vmx -append "apic_reg_virt_test virt_x2apic_mode_test"
++extra_params = -cpu host,+vmx -append "+apic_reg_virt_test +virt_x2apic_mode_test"
+ arch = x86_64
+ groups = vmx
+ timeout = 10
+@@ -261,13 +261,13 @@ timeout = 10
+ [vmx_apic_passthrough_thread]
+ file = vmx.flat
+ smp = 2
+-extra_params = -cpu host,+vmx -m 2048 -append vmx_apic_passthrough_thread_test
++extra_params = -cpu host,+vmx -m 2048 -append '+vmx_apic_passthrough_thread_test'
+ arch = x86_64
+ groups = vmx
+ 
+ [vmx_vmcs_shadow_test]
+ file = vmx.flat
+-extra_params = -cpu host,+vmx -append vmx_vmcs_shadow_test
++extra_params = -cpu host,+vmx -append '+vmx_vmcs_shadow_test'
+ arch = x86_64
+ groups = vmx
+ 
+diff --git a/x86/vmx.c b/x86/vmx.c
+index 872ba11..1aa1ade 100644
+--- a/x86/vmx.c
++++ b/x86/vmx.c
+@@ -1894,9 +1894,9 @@ test_wanted(const char *name, const char *filters[], int filter_count)
+ 		if (filter[0] == '-') {
+ 			if (simple_glob(clean_name, filter + 1))
+ 				return false;
+-		} else {
++		} else if (filter[0] == '+') {
+ 			positive = true;
+-			match |= simple_glob(clean_name, filter);
++			match |= simple_glob(clean_name, filter + 1);
+ 		}
+ 	}
+ 
 -- 
 2.17.1
 
