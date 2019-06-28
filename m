@@ -2,95 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D07A959BA3
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 14:37:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 542B459BE3
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 14:43:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727068AbfF1Mha (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jun 2019 08:37:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45224 "EHLO mx1.redhat.com"
+        id S1726874AbfF1Mnx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jun 2019 08:43:53 -0400
+Received: from mga02.intel.com ([134.134.136.20]:34087 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727023AbfF1MhZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jun 2019 08:37:25 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C5146C059B9F;
-        Fri, 28 Jun 2019 12:37:24 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-117-102.ams2.redhat.com [10.36.117.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CC67C5D98E;
-        Fri, 28 Jun 2019 12:37:18 +0000 (UTC)
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     netdev@vger.kernel.org
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/3] vsock/virtio: fix flush of works during the .remove()
-Date:   Fri, 28 Jun 2019 14:36:59 +0200
-Message-Id: <20190628123659.139576-4-sgarzare@redhat.com>
-In-Reply-To: <20190628123659.139576-1-sgarzare@redhat.com>
-References: <20190628123659.139576-1-sgarzare@redhat.com>
+        id S1726788AbfF1Mnw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jun 2019 08:43:52 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Jun 2019 05:43:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,427,1557212400"; 
+   d="scan'208";a="173467031"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by orsmga002.jf.intel.com with ESMTP; 28 Jun 2019 05:43:51 -0700
+Received: from fmsmsx154.amr.corp.intel.com (10.18.116.70) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 28 Jun 2019 05:43:50 -0700
+Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
+ FMSMSX154.amr.corp.intel.com (10.18.116.70) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 28 Jun 2019 05:43:49 -0700
+Received: from shsmsx101.ccr.corp.intel.com ([169.254.1.87]) by
+ SHSMSX108.ccr.corp.intel.com ([169.254.8.236]) with mapi id 14.03.0439.000;
+ Fri, 28 Jun 2019 20:43:48 +0800
+From:   "Zhang, Tina" <tina.zhang@intel.com>
+To:     Gerd Hoffmann <kraxel@redhat.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
+        "Yuan, Hang" <hang.yuan@intel.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>
+Subject: RE: [RFC PATCH v3 0/4] Deliver vGPU display vblank event to
+ userspace
+Thread-Topic: [RFC PATCH v3 0/4] Deliver vGPU display vblank event to
+ userspace
+Thread-Index: AQHVLJqUUSM/9sKZ/UyimYY5z7yeLaaughWAgACsmuD//5j6gIABGkSAgAAnqQCAALSSsIAAQxiw
+Date:   Fri, 28 Jun 2019 12:43:47 +0000
+Message-ID: <237F54289DF84E4997F34151298ABEBC87685825@SHSMSX101.ccr.corp.intel.com>
+References: <20190627033802.1663-1-tina.zhang@intel.com>
+ <20190627062231.57tywityo6uyhmyd@sirius.home.kraxel.org>
+ <237F54289DF84E4997F34151298ABEBC876835E5@SHSMSX101.ccr.corp.intel.com>
+ <20190627103133.6ekdwazggi5j5lcl@sirius.home.kraxel.org>
+ <20190628032149.GD9684@zhen-hp.sh.intel.com>
+ <20190628054346.3uc3k4c4cffrqcy3@sirius.home.kraxel.org> 
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZDM1MmJmNzYtNDAzNy00ZjdhLWJkZjgtM2RjZGZjZDI4YjExIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiODQrZjRmeVNpSUdJUTlPTFVNdDFCWGt1SUl3Y3k2OHRSdHgyOHZSMVlPQ3Y2aSsyOENSVExmVk43S3MxakZHVCJ9
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.0.600.7
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Fri, 28 Jun 2019 12:37:24 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch moves the flush of works after vdev->config->del_vqs(vdev),
-because we need to be sure that no workers run before to free the
-'vsock' object.
-
-Since we stopped the workers using the [tx|rx|event]_run flags,
-we are sure no one is accessing the device while we are calling
-vdev->config->reset(vdev), so we can safely move the workers' flush.
-
-Before the vdev->config->del_vqs(vdev), workers can be scheduled
-by VQ callbacks, so we must flush them after del_vqs(), to avoid
-use-after-free of 'vsock' object.
-
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- net/vmw_vsock/virtio_transport.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
-
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index 1b44ec6f3f6c..96dafa978268 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -680,12 +680,6 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
- 	rcu_assign_pointer(the_virtio_vsock, NULL);
- 	synchronize_rcu();
- 
--	flush_work(&vsock->loopback_work);
--	flush_work(&vsock->rx_work);
--	flush_work(&vsock->tx_work);
--	flush_work(&vsock->event_work);
--	flush_work(&vsock->send_pkt_work);
--
- 	/* Reset all connected sockets when the device disappear */
- 	vsock_for_each_connected_socket(virtio_vsock_reset_sock);
- 
-@@ -740,6 +734,15 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
- 	/* Delete virtqueues and flush outstanding callbacks if any */
- 	vdev->config->del_vqs(vdev);
- 
-+	/* Other works can be queued before 'config->del_vqs()', so we flush
-+	 * all works before to free the vsock object to avoid use after free.
-+	 */
-+	flush_work(&vsock->loopback_work);
-+	flush_work(&vsock->rx_work);
-+	flush_work(&vsock->tx_work);
-+	flush_work(&vsock->event_work);
-+	flush_work(&vsock->send_pkt_work);
-+
- 	mutex_unlock(&the_virtio_vsock_mutex);
- 
- 	kfree(vsock);
--- 
-2.20.1
-
+SGksDQoNCkhvdyBhYm91dCBHVlQtZyBzdXBwb3J0cyBib3RoIHZibGFuayBhbmQgcGFnZSBmbGlw
+IGV2ZW50cy4gVGhlbiBRRU1VIFVJIGNhbiBtYXNrL3VubWFzayB0aGUgZXZlbnRzIHRvIGRlY2lk
+ZSB3aGljaCBraW5kIG9mIGV2ZW50IGlzIGV4cGVjdGVkLg0KRm9yIERSTSBVSSwgaXQgY2FuIGRl
+Y2lkZSB0byBtYXNrIHZibGFuayBldmVudCBhbmQgdXNlIHBhZ2UgZmxpcCBldmVudHMuIFdlIHRy
+aWVkIERSTSBVSSB3aXRoIHBhZ2UgZmxpcCBldmVudHMsIHRoZSBwZXJmb3JtYW5jZSBpcyBncmVh
+dCwgZXZlbiBpbiB0aGUgY2FzZSBvZiBmcm9udCBidWZmZXIgcmVuZGVyaW5nLiBGb3IgdGhlIFVJ
+IGxpa2UgR1RLLCB2YmxhbmsgZXZlbnQgaXMgYmV0dGVyLiANCg0KQmVzaWRlcywgd2l0aCB0aGUg
+aXJxIG1hc2svdW5tYXNrIG1lY2hhbmlzbSwgdXNlcnNwYWNlIGNhbiBkeW5hbWljYWxseSBjaG9v
+c2UgYmV0d2VlbiB0aGUgVUkgdGltZXIgYW5kIHRoZSBldmVudHMuIA0KDQpUaGFua3MuDQoNCkJS
+LA0KVGluYQ0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFpoYW5nLCBU
+aW5hDQo+IFNlbnQ6IEZyaWRheSwgSnVuZSAyOCwgMjAxOSA0OjQ1IFBNDQo+IFRvOiAnR2VyZCBI
+b2ZmbWFubicgPGtyYXhlbEByZWRoYXQuY29tPjsgWmhlbnl1IFdhbmcNCj4gPHpoZW55dXdAbGlu
+dXguaW50ZWwuY29tPg0KPiBDYzogVGlhbiwgS2V2aW4gPGtldmluLnRpYW5AaW50ZWwuY29tPjsg
+a3ZtQHZnZXIua2VybmVsLm9yZzsgbGludXgtDQo+IGtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGFs
+ZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBMdiwgWmhpeXVhbg0KPiA8emhpeXVhbi5sdkBpbnRl
+bC5jb20+OyBZdWFuLCBIYW5nIDxoYW5nLnl1YW5AaW50ZWwuY29tPjsgaW50ZWwtZ3Z0LQ0KPiBk
+ZXZAbGlzdHMuZnJlZWRlc2t0b3Aub3JnOyBXYW5nLCBaaGkgQSA8emhpLmEud2FuZ0BpbnRlbC5j
+b20+DQo+IFN1YmplY3Q6IFJFOiBbUkZDIFBBVENIIHYzIDAvNF0gRGVsaXZlciB2R1BVIGRpc3Bs
+YXkgdmJsYW5rIGV2ZW50IHRvDQo+IHVzZXJzcGFjZQ0KPiANCj4gDQo+IA0KPiA+IC0tLS0tT3Jp
+Z2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gRnJvbTogaW50ZWwtZ3Z0LWRldg0KPiA+IFttYWlsdG86
+aW50ZWwtZ3Z0LWRldi1ib3VuY2VzQGxpc3RzLmZyZWVkZXNrdG9wLm9yZ10gT24gQmVoYWxmIE9m
+IEdlcmQNCj4gPiBIb2ZmbWFubg0KPiA+IFNlbnQ6IEZyaWRheSwgSnVuZSAyOCwgMjAxOSAxOjQ0
+IFBNDQo+ID4gVG86IFpoZW55dSBXYW5nIDx6aGVueXV3QGxpbnV4LmludGVsLmNvbT4NCj4gPiBD
+YzogVGlhbiwgS2V2aW4gPGtldmluLnRpYW5AaW50ZWwuY29tPjsga3ZtQHZnZXIua2VybmVsLm9y
+ZzsgbGludXgtDQo+ID4ga2VybmVsQHZnZXIua2VybmVsLm9yZzsgWmhhbmcsIFRpbmEgPHRpbmEu
+emhhbmdAaW50ZWwuY29tPjsNCj4gPiBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbTsgTHYsIFpo
+aXl1YW4gPHpoaXl1YW4ubHZAaW50ZWwuY29tPjsgWXVhbiwNCj4gPiBIYW5nIDxoYW5nLnl1YW5A
+aW50ZWwuY29tPjsgaW50ZWwtZ3Z0LWRldkBsaXN0cy5mcmVlZGVza3RvcC5vcmc7IFdhbmcsDQo+
+ID4gWmhpIEEgPHpoaS5hLndhbmdAaW50ZWwuY29tPg0KPiA+IFN1YmplY3Q6IFJlOiBbUkZDIFBB
+VENIIHYzIDAvNF0gRGVsaXZlciB2R1BVIGRpc3BsYXkgdmJsYW5rIGV2ZW50IHRvDQo+ID4gdXNl
+cnNwYWNlDQo+ID4NCj4gPiBPbiBGcmksIEp1biAyOCwgMjAxOSBhdCAxMToyMTo0OUFNICswODAw
+LCBaaGVueXUgV2FuZyB3cm90ZToNCj4gPiA+IE9uIDIwMTkuMDYuMjcgMTI6MzE6MzMgKzAyMDAs
+IEdlcmQgSG9mZm1hbm4gd3JvdGU6DQo+ID4gPiA+ID4gPiAgIEhpLA0KPiA+ID4gPiA+ID4NCj4g
+PiA+ID4gPiA+ID4gSW5zdGVhZCBvZiBkZWxpdmVyaW5nIHBhZ2UgZmxpcCBldmVudHMsIHdlIGNo
+b29zZSB0byBwb3N0DQo+ID4gPiA+ID4gPiA+IGRpc3BsYXkgdmJsYW5rIGV2ZW50LiBIYW5kbGlu
+ZyBwYWdlIGZsaXAgZXZlbnRzIGZvciBib3RoDQo+ID4gPiA+ID4gPiA+IHByaW1hcnkgcGxhbmUg
+YW5kIGN1cnNvciBwbGFuZSBtYXkgbWFrZSB1c2VyIHNwYWNlIHF1aXRlDQo+ID4gPiA+ID4gPiA+
+IGJ1c3ksIGFsdGhvdWdoIHdlIGhhdmUgdGhlIG1hc2svdW5tYXNrIG1lY2hhbnNpbSBmb3INCj4g
+bWl0aWdhdGlvbi4NCj4gPiA+ID4gPiA+ID4gQmVzaWRlcywgdGhlcmUgYXJlIHNvbWUgY2FzZXMg
+dGhhdCBndWVzdCBhcHAgb25seSB1c2VzIG9uZQ0KPiA+IGZyYW1lYnVmZmVyIGZvciBib3RoIGRy
+YXdpbmcgYW5kIGRpc3BsYXkuDQo+ID4gPiA+ID4gPiA+IEluIHN1Y2ggY2FzZSwgZ3Vlc3QgT1Mg
+d29uJ3QgZG8gdGhlIHBsYW5lIHBhZ2UgZmxpcCB3aGVuIHRoZQ0KPiA+ID4gPiA+ID4gPiBmcmFt
+ZWJ1ZmZlciBpcyB1cGRhdGVkLCB0aHVzIHRoZSB1c2VyIGxhbmQgd29uJ3QgYmUgbm90aWZpZWQN
+Cj4gPiA+ID4gPiA+ID4gYWJvdXQgdGhlDQo+ID4gPiA+ID4gPiB1cGRhdGVkIGZyYW1lYnVmZmVy
+Lg0KPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+IFdoYXQgaGFwcGVucyB3aGVuIHRoZSBndWVzdCBp
+cyBpZGxlIGFuZCBkb2Vzbid0IGRyYXcgYW55dGhpbmcNCj4gPiA+ID4gPiA+IHRvIHRoZSBmcmFt
+ZWJ1ZmZlcj8NCj4gPiA+ID4gPiBUaGUgdmJsYW5rIGV2ZW50IHdpbGwgYmUgZGVsaXZlcmVkIHRv
+IHVzZXJzcGFjZSBhcyB3ZWxsLCB1bmxlc3MNCj4gPiA+ID4gPiBndWVzdCBPUw0KPiA+IGRpc2Fi
+bGUgdGhlIHBpcGUuDQo+ID4gPiA+ID4gRG9lcyBpdCBtYWtlIHNlbnNlIHRvIHZmaW8vZGlzcGxh
+eT8NCj4gPiA+ID4NCj4gPiA+ID4gR2V0dGluZyBub3RpZmllZCBvbmx5IGluIGNhc2UgdGhlcmUg
+YXJlIGFjdHVhbCBkaXNwbGF5IHVwZGF0ZXMNCj4gPiA+ID4gd291bGQgYmUgYSBuaWNlIG9wdGlt
+aXphdGlvbiwgYXNzdW1pbmcgdGhlIGhhcmR3YXJlIGlzIGFibGUgdG8gZG8gdGhhdC4NCj4gPiA+
+ID4gSWYgdGhlIGd1ZXN0IHBhZ2VmbGlwcyB0aGlzIGlzIG9idmlvdXNseSB0cml2aWFsLiAgTm90
+IHN1cmUgdGhpcw0KPiA+ID4gPiBpcyBwb3NzaWJsZSBpbiBjYXNlIHRoZSBndWVzdCByZW5kZXJz
+IGRpcmVjdGx5IHRvIHRoZSBmcm9udGJ1ZmZlci4NCj4gPiA+ID4NCj4gPiA+ID4gV2hhdCBleGFj
+dGx5IGhhcHBlbnMgd2hlbiB0aGUgZ3Vlc3QgT1MgZGlzYWJsZXMgdGhlIHBpcGU/ICBJcyBhDQo+
+ID4gPiA+IHZibGFuayBldmVudCBkZWxpdmVyZWQgYXQgbGVhc3Qgb25jZT8gIFRoYXQgd291bGQg
+YmUgdmVyeSB1c2VmdWwNCj4gPiA+ID4gYmVjYXVzZSBpdCB3aWxsIGJlIHBvc3NpYmxlIGZvciB1
+c2Vyc3BhY2UgdG8gc3RvcCBwb2xsaW5nDQo+ID4gPiA+IGFsdG9nZXRoZXIgd2l0aG91dCBtaXNz
+aW5nIHRoZSAiZ3Vlc3QgZGlzYWJsZWQgcGlwZSIgZXZlbnQuDQo+ID4gPiA+DQo+ID4gPg0KPiA+
+ID4gSXQgbG9va3MgbGlrZSBwdXJwb3NlIHRvIHVzZSB2YmxhbmsgaGVyZSBpcyB0byByZXBsYWNl
+IHVzZXIgc3BhY2UNCj4gPiA+IHBvbGxpbmcgdG90YWxseSBieSBrZXJuZWwgZXZlbnQ/IFdoaWNo
+IGp1c3QgYWN0IGFzIGRpc3BsYXkgdXBkYXRlDQo+ID4gPiBldmVudCB0byByZXBsYWNlIHVzZXIg
+c3BhY2UgdGltZXIgdG8gbWFrZSBpdCBxdWVyeSBhbmQgdXBkYXRlIHBsYW5lcz8NCj4gPg0KPiA+
+IEkgdGhpbmsgaXQgbWFrZXMgc2Vuc2UgdG8gZGVzaWduIGl0IHRoYXQgd2F5LCBzbyB1c2Vyc3Bh
+Y2Ugd2lsbCBlaXRoZXINCj4gPiB1c2UgdGhlIGV2ZW50cyAod2hlbiBzdXBwb3J0ZWQgYnkgdGhl
+IGRyaXZlcikgb3IgYSB0aW1lciAoZmFsbGJhY2sgaWYNCj4gPiBub3QpIGJ1dCBub3QgYm90aC4N
+Cj4gPg0KPiA+ID4gQWx0aG91Z2ggaW4gdGhlb3J5IHZibGFuayBpcyBub3QgYXBwcm9wcmlhdGUg
+Zm9yIHRoaXMgd2hpY2ggZG9lc24ndA0KPiA+ID4gYWxpZ24gd2l0aCBwbGFuZSB1cGRhdGUgb3Ig
+cG9zc2libGUgZnJvbnQgYnVmZmVyIHJlbmRlcmluZyBhdCBhbGwsDQo+ID4gPiBidXQgbG9va3Mg
+aXQncyBqdXN0IGEgY29tcHJvbWlzZSBlLmcgbm90IHNlbmRpbmcgZXZlbnQgZm9yIGV2ZXJ5DQo+
+ID4gPiBjdXJzb3IgcG9zaXRpb24gY2hhbmdlLCBldGMuDQo+ID4gPg0KPiA+ID4gSSB0aGluayB3
+ZSBuZWVkIHRvIGRlZmluZSBzZW1hbnRpY3MgZm9yIHRoaXMgZXZlbnQgcHJvcGVybHksIGUuZw0K
+PiA+ID4gdXNlciBzcGFjZSBwdXJlbHkgZGVwZW5kcyBvbiB0aGlzIGV2ZW50IGZvciBkaXNwbGF5
+IHVwZGF0ZSwgdGhlDQo+ID4gPiBvcHBvcnR1bml0eSBmb3IgaXNzdWluZyB0aGlzIGV2ZW50IGlz
+IGNvbnRyb2xsZWQgYnkgZHJpdmVyIHdoZW4gaXQncw0KPiA+ID4gbmVjZXNzYXJ5IGZvciB1cGRh
+dGUsIGV0Yy4gRGVmaW5pdGVseSBub3QgbmFtZWQgYXMgdmJsYW5rIGV2ZW50IG9yDQo+ID4gPiBv
+bmx5IGlzc3VlIGF0IHZibGFuaywgdGhhdCBuZWVkIHRvIGhhcHBlbiBmb3Igb3RoZXIgcGxhbmUg
+Y2hhbmdlIHRvby4NCj4gPg0KPiA+IEkgdGhpbmsgaXQgc2hvdWxkIGJlICJkaXNwbGF5IHVwZGF0
+ZSBub3RpZmljYXRpb24iLCBpLmUuIHVzZXJzcGFjZQ0KPiA+IHNob3VsZCBjaGVjayBmb3IgcGxh
+bmUgY2hhbmdlcyBhbmQgdXBkYXRlIHRoZSBkaXNwbGF5Lg0KPiA+DQo+ID4gTW9zdCBldmVudHMg
+d2lsbCBwcm9iYWJseSBjb21lIGZyb20gdmJsYW5rICh0eXBpY2FsbHkgcGxhbmUgdXBkYXRlIGFy
+ZQ0KPiA+IGFjdHVhbGx5IGNvbW1pdHRlZCBhdCB2YmxhbmsgdGltZSB0byBhdm9pZCB0ZWFyaW5n
+LCByaWdodD8pLiAgVGhhdCBpcw0KPiA+IGFuDQo+IFllcy4NCj4gPiBpbXBsZW1lbnRhdGlvbiBk
+ZXRhaWwgdGhvdWdoLg0KPiANCj4gV2UgaGF2ZSB0d28gV0lQIGJyYW5jaGVzOiBvbmUgaXMgZm9y
+IHZibGFuayBldmVudCBkZWxpdmVyeSBhbmQgdGhlIG90aGVyDQo+IG9uZSBpcyBmb3IgcGFnZSBm
+bGlwIGV2ZW50IGRlbGl2ZXJ5Lg0KPiBSZXBvOg0KPiAtIFFFTVU6IGh0dHBzOi8vZ2l0aHViLmNv
+bS9pbnRlbC9JZ3Z0Zy1xZW11LmdpdA0KPiAtIEtlcm5lbDogaHR0cHM6Ly9naXRodWIuY29tL2lu
+dGVsL2d2dC1saW51eC5naXQNCj4gVHdvIGJyYW5jaGVzOiB0b3BpYy91c2Vyc3BhY2VfZGlyZWN0
+X2ZsaXBfcGFnZV9ldmVudCBhbmQNCj4gdG9waWMvdXNlcnNwYWNlX2RpcmVjdF9mbGlwX3ZibGFu
+a19ldmVudA0KPiANCj4gV2l0aCBHVEsgVUksIHRoZSB1c2VyIGV4cGVyaWVuY2UgaXMgYmFkIG9u
+IGJyYW5jaA0KPiB0b3BpYy91c2Vyc3BhY2VfZGlyZWN0X2ZsaXBfcGFnZV9ldmVudCwgYXMgbW9z
+dCBvZiB0aGUgQ1BVIGVmZm9ydHMgYXJlDQo+IHNwZW50IG9uIGV2ZW50IGhhbmRsaW5nIGluIHVz
+ZXIgc3BhY2UuDQo+IEhvd2V2ZXIsIHdpdGggdGhlIERSTSBVSSBib3RoIG9mIHRoZSB0d28gYnJh
+bmNoZXMgaGF2ZSBnb29kIHVzZXINCj4gZXhwZXJpZW5jZSwgYXMgdGhlIGV2ZW50IGhhbmRsaW5n
+IGluIERSTSBVSSBpcyBwcmV0dHkgc2ltcGxlLg0KPiANCj4gVGhhbmtzLg0KPiANCj4gQlIsDQo+
+IFRpbmENCj4gDQo+ID4NCj4gPiBjaGVlcnMsDQo+ID4gICBHZXJkDQo+ID4NCj4gPiBfX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KPiA+IGludGVsLWd2dC1k
+ZXYgbWFpbGluZyBsaXN0DQo+ID4gaW50ZWwtZ3Z0LWRldkBsaXN0cy5mcmVlZGVza3RvcC5vcmcN
+Cj4gPiBodHRwczovL2xpc3RzLmZyZWVkZXNrdG9wLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2ludGVs
+LWd2dC1kZXYNCg==
