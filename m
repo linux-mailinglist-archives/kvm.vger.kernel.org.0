@@ -2,176 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 729765978F
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 11:34:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D046C597F5
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 11:53:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726574AbfF1JeF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jun 2019 05:34:05 -0400
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:17969 "EHLO
-        smtp-fw-6002.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726385AbfF1JeF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jun 2019 05:34:05 -0400
+        id S1726597AbfF1Jxo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jun 2019 05:53:44 -0400
+Received: from mail-wm1-f51.google.com ([209.85.128.51]:32787 "EHLO
+        mail-wm1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726487AbfF1Jxo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jun 2019 05:53:44 -0400
+Received: by mail-wm1-f51.google.com with SMTP id h19so8979261wme.0
+        for <kvm@vger.kernel.org>; Fri, 28 Jun 2019 02:53:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1561714444; x=1593250444;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=sSKEUVaTdyL6t5ZO2NW3uKuh1AeVNjk+FHaRRO4KGtI=;
-  b=NijCFQlkyyK7FfvWXmgNHYE0bJIap9oSNNMq9l6hELAx5Xct/iEnSozP
-   WkQW7lzlLaMbI/nG3tC97HAqXxEjfLXGLsM77tWoMtnkewrXJexAWsAzG
-   mBrZeFi0Ti4udYx8FrRDm79mYVNZv1ChSOsk+lbJq2gBn/pUAQ2dcWifl
-   M=;
-X-IronPort-AV: E=Sophos;i="5.62,427,1554768000"; 
-   d="scan'208";a="408520324"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1e-97fdccfd.us-east-1.amazon.com) ([10.124.125.6])
-  by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP; 28 Jun 2019 09:33:56 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1e-97fdccfd.us-east-1.amazon.com (Postfix) with ESMTPS id EB7E1A1DFF;
-        Fri, 28 Jun 2019 09:33:52 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 28 Jun 2019 09:33:51 +0000
-Received: from 38f9d3867b82.ant.amazon.com (10.43.161.16) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 28 Jun 2019 09:33:47 +0000
-Subject: Re: [PATCH v4 0/5] x86 instruction emulator fuzzing
-To:     Sam Caccavale <samcacc@amazon.de>
-CC:     <samcaccavale@gmail.com>, <nmanthey@amazon.de>,
-        <wipawel@amazon.de>, <dwmw@amazon.co.uk>, <mpohlack@amazon.de>,
-        <karahmed@amazon.de>, <andrew.cooper3@citrix.com>,
-        <JBeulich@suse.com>, <pbonzini@redhat.com>, <rkrcmar@redhat.com>,
-        <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-        <hpa@zytor.com>, <paullangton4@gmail.com>, <x86@kernel.org>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20190628092621.17823-1-samcacc@amazon.de>
-From:   Alexander Graf <graf@amazon.com>
-Message-ID: <caaeb546-9aa1-7fd5-496d-a0ec1f759d10@amazon.com>
-Date:   Fri, 28 Jun 2019 11:33:45 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.7.2
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=04xiGCjwKtalfzFHKvcZ2CGOE0X4TsPj68ZsmH1QQbg=;
+        b=L6c3VribSQEdsUuII5wjTxSN/8F7PDYk9n/P/7QjPi29iokpZU0WhBI9PhxbgX/WnA
+         EXebdCR9F0VAzzJsIjboLvFd+Qqe35YjqbgGTNt0O9Zq3L6Z+zXCJ7x2fG4Kn01DvE3q
+         jydjvLangvp0t6x1TSEJuli5Yr3JbJ56UT0q3uEU0pV8YECAB6A6UdP8HybsAZqFTPhV
+         a/Lf6eC8IHXysSyYpVkQHEG3OjSjxIfs4u0xQSUuK+FQBsvZuOkXs5ucTnzjpLOiiWAD
+         XhyzVfL7tr70oFVAYnC5rt8QaVrv6iHoC6jO5CCNOMif7oVH34b3HADdz6UFYayDkijx
+         5BNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=04xiGCjwKtalfzFHKvcZ2CGOE0X4TsPj68ZsmH1QQbg=;
+        b=goVRi4mK0RibF7K0wKf9aYFEjsBMZi2fwPL/KpuT+QHXatP5Wq0SVhv170lzgHBBA3
+         1pSlNWEYcfZhyoHi+61jn1R6btuGJ3pWkHKh2n3Ju64bTpX328AY0TL7Uri6zB0B46TX
+         k4qLaBDNmwkqH8Bdooqt+P22CCSUr2HBVFuaW5uuoMqH2EZ/BttcN42Plsca72B2gFaH
+         llXDRckT8SCxVchp0Hs0wYEHdkhNapILpc5ht9iq1fv0M50GxnLnVDMwlaH+HxgSBnm6
+         aD26KdX7veyUzsrG2nT2IKSCV7684P7/1K6F2tXx2vvbL4RONJw4zedGfoC8MNkuvLN/
+         eoGw==
+X-Gm-Message-State: APjAAAWJB29Ne37JZ9RqXkCVLeRwUdHXCGOOP2s04J8EWdFW2h9+UW0Z
+        rUqgZC71RV5EJPt7Z7m0DIh/pzCixAQ=
+X-Google-Smtp-Source: APXvYqxQLAfzlpd4vUShwv9ToCthz5bmjcwP+QBIPUNHTdSTUpLHRl03Ugi9XE0rEGEVwd81qvCUSQ==
+X-Received: by 2002:a1c:968c:: with SMTP id y134mr6217182wmd.122.1561715621726;
+        Fri, 28 Jun 2019 02:53:41 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+        by smtp.gmail.com with ESMTPSA id o2sm1992252wrq.56.2019.06.28.02.53.40
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Fri, 28 Jun 2019 02:53:41 -0700 (PDT)
+Date:   Fri, 28 Jun 2019 10:53:40 +0100
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+To:     Rainer Duffner <rainer@ultra-secure.de>
+Cc:     kvm@vger.kernel.org
+Subject: Re: Question about KVM IO performance with FreeBSD as a guest OS
+Message-ID: <20190628095340.GE3316@stefanha-x1.localdomain>
+References: <3924BBFC-42B2-4A28-9BAF-018AA1561CAF@ultra-secure.de>
 MIME-Version: 1.0
-In-Reply-To: <20190628092621.17823-1-samcacc@amazon.de>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.43.161.16]
-X-ClientProxiedBy: EX13D18UWC004.ant.amazon.com (10.43.162.77) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="BQPnanjtCNWHyqYD"
+Content-Disposition: inline
+In-Reply-To: <3924BBFC-42B2-4A28-9BAF-018AA1561CAF@ultra-secure.de>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+--BQPnanjtCNWHyqYD
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 28.06.19 11:26, Sam Caccavale wrote:
-> Dear all,
-> 
-> This series aims to provide an entrypoint for, and fuzz KVM's x86 instruction
-> emulator from userspace.  It mirrors Xen's application of the AFL fuzzer to
-> it's instruction emulator in the hopes of discovering vulnerabilities.
-> Since this entrypoint also allows arbitrary execution of the emulators code
-> from userspace, it may also be useful for testing.
-> 
-> The current 4 patches build the emulator and 2 harnesses: simple-harness is
-> an example of unit testing; afl-harness is a frontend for the AFL fuzzer.
-> The fifth patch contains useful scripts for development but is not intended
-> for usptream consumption.
-> 
-> Patches
-> =======
-> 
-> - 01: Builds and links afl-harness with the required kernel objects.
-> - 02: Introduces the minimal set of emulator operations and supporting code
-> to emulate simple instructions.
-> - 03: Demonstrates simple-harness as a unit test.
-> - 04: Adds scripts for install and building.
-> - 05: Useful scripts for development
-> 
-> 
-> Issues
-> =======
-> 
-> Currently, fuzzing results in a large amount of FPU related crashes.  Xen's
-> fuzzing efforts had this issue too.  Their (temporary?) solution was to
-> disable FPU exceptions after every instruction iteration?  Some solution
-> is desired for this project.
-> 
-> 
-> Changelog
-> =======
-> 
-> v1 -> v2:
->   - Moved -O0 to ifdef DEBUG
->   - Building with ASAN by default
->   - Removed a number of macros from emulator_ops.c and moved them as
->     static inline functions in emulator_ops.h
->   - Accidentally changed the example in simple-harness (reverted in v3)
->   - Introduced patch 4 for scripts
-> 
-> v2 -> v3:
->   - Removed a workaround for printf smashing the stack when compiled
->     with -mcmodel=kernel, and stopped compiling with -mcmodel=kernel
->   - Added a null check for malloc's return value
->   - Moved more macros from emulator_ops.c into emulator_ops.h as
->     static inline functions
->   - Removed commented out code
->   - Moved changes to emulator_ops.h into the first patch
->   - Moved addition of afl-many script to the script patch
->   - Fixed spelling mistakes in documentation
->   - Reverted the simple-harness example back to the more useful original one
->   - Moved non-essential development scripts from patch 4 to new patch 5
-> 
-> v3 -> v4:
->   - Stubbed out all unimplemented emulator_ops with a unimplemented_op macro
->   - Setting FAIL_ON_UNIMPLEMENTED_OP on compile decides whether calling these
->     is treated as a crash or ignored
->   - Moved setting up core dumps out of the default build/install path and
->     detailed this change in the README
->   - Added a .sh extention to afl-many
->   - Added an optional timeout to afl-many.sh and made deploy_remote.sh use it
->   - Building no longer creates a new .config each time and does not force any
->     config options
->   - Fixed a path bug in afl-many.sh
-> 
-> Any comments/suggestions are greatly appreciated.
-> 
-> Best,
-> Sam Caccavale
-> 
-> Sam Caccavale (5):
->    Build target for emulate.o as a userspace binary
->    Emulate simple x86 instructions in userspace
->    Demonstrating unit testing via simple-harness
->    Added build and install scripts
->    Development scripts for crash triage and deploy
-> 
->   tools/Makefile                                |   9 +
->   tools/fuzz/x86ie/.gitignore                   |   2 +
->   tools/fuzz/x86ie/Makefile                     |  54 ++
->   tools/fuzz/x86ie/README.md                    |  21 +
->   tools/fuzz/x86ie/afl-harness.c                | 151 +++++
->   tools/fuzz/x86ie/common.h                     |  87 +++
->   tools/fuzz/x86ie/emulator_ops.c               | 590 ++++++++++++++++++
->   tools/fuzz/x86ie/emulator_ops.h               | 134 ++++
->   tools/fuzz/x86ie/scripts/afl-many.sh          |  31 +
->   tools/fuzz/x86ie/scripts/bin.sh               |  49 ++
->   tools/fuzz/x86ie/scripts/build.sh             |  34 +
->   tools/fuzz/x86ie/scripts/coalesce.sh          |   5 +
->   tools/fuzz/x86ie/scripts/deploy.sh            |   9 +
->   tools/fuzz/x86ie/scripts/deploy_remote.sh     |  10 +
->   tools/fuzz/x86ie/scripts/gen_output.sh        |  11 +
->   tools/fuzz/x86ie/scripts/install_afl.sh       |  15 +
->   .../fuzz/x86ie/scripts/install_deps_ubuntu.sh |   5 +
->   tools/fuzz/x86ie/scripts/rebuild.sh           |   6 +
->   tools/fuzz/x86ie/scripts/run.sh               |  10 +
->   tools/fuzz/x86ie/scripts/summarize.sh         |   9 +
->   tools/fuzz/x86ie/simple-harness.c             |  49 ++
->   tools/fuzz/x86ie/stubs.c                      |  59 ++
->   tools/fuzz/x86ie/stubs.h                      |  52 ++
+On Sun, Jun 23, 2019 at 03:46:29PM +0200, Rainer Duffner wrote:
+> I have huge problems running FreeBSD 12 (amd64) as a KVM guest.
+>=20
+> KVM is running on Ubuntu 18 LTS, in an OpenStack setup with dedicated Cep=
+h-Storage (NVMe SSDs).
+>=20
+> The VM =E2=80=9Eflavor" as such is that IOPs are limited to 2000/s - and =
+I do get those 2k IOPs when I run e.g. CentOS 7.
+>=20
+> But on FreeBSD, I get way less.
+>=20
+> E.g. running dc3dd to write zeros to a disk, I get 120 MB/s on CentOS 7.
+> With FreeBSD, I get 9 MB/s.
+>=20
+>=20
+> The VMs were created on an OpenSuSE 42.3 host with the commands described=
+ here:
+>=20
+> https://docs.openstack.org/image-guide/freebsd-image.html
+>=20
+>=20
+> This mimics the results we got on XenServer, where also some people repor=
+ted the same problems but other people had no problems at all.
+>=20
+> Feedback from the FreeBSD community suggests that the problem is not unhe=
+ard of, but also not universally reproducible.
+> So, I assume it must be some hypervisor misconfiguration?
+>=20
+> I=E2=80=99m NOT the administrator of the KVM hosts. I can ask them tomorr=
+ow, though.
+>=20
+> I=E2=80=99d like to get some ideas on what to look for on the hosts direc=
+tly, if that makes sense.
 
-Sorry I didn't realize it before. Isn't that missing a patch to the 
-MAINTAINERS file?
+Hi Rainer,
+Maybe it's the benchmark.  Can you share the exact command-line you are
+running on CentOS 7 and FreeBSD?
 
+The blocksize and amount of parallelism (queue depth or number of
+processes/threads) should be identical on CentOS and FreeBSD.  The
+benchmark should open the file with O_DIRECT.  It should not fsync()
+(flush) after every write request.
 
-Alex
+If you are using large blocksizes (>256 KB) then perhaps the guest I/O
+stack is splitting them up differently on FreeBSD and Linux.
+
+Here is a sequential write benchmark using dd:
+
+  dd if=3D/dev/zero of=3D/dev/vdX oflag=3Ddirect bs=3D4k count=3D1048576
+
+Stefan
+
+--BQPnanjtCNWHyqYD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0V46MACgkQnKSrs4Gr
+c8jpdwf8Co7WqfAy9AvneYXB+JjvDgtZzxsWnurbliJbY2Kq0I36AVcQO85m3BQG
+no9Wl1DPFds8VLCRL5hc7KjzmYSSchZh3WuIBSyQCH8L7bnNH4yMIAWOsw4oHnD8
++T+8SJIlAPs6EXjN5w5xpSxlrz9X30l31m/n9NMka0cR7JDM/4qxZrV75N6EZaBT
+vdr4a0oEEPKMGyLkSqj0YnDdhlyglf7s1bcO8LOxhp4ORe39CpxITIU59jYHdNkU
+3TnHz5FbUd/oiizrvWoTMirMNll8tiKzLs3zLNdwtvKk6sLLcd+8euGWvL+gM2zJ
+qsZZsMCPRDLjWKH+DYkDgaWLyef1pw==
+=aJfE
+-----END PGP SIGNATURE-----
+
+--BQPnanjtCNWHyqYD--
