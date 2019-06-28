@@ -2,291 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 25ADD5A382
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 20:25:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 540125A3A5
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 20:33:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726597AbfF1SZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jun 2019 14:25:54 -0400
-Received: from mail-io1-f45.google.com ([209.85.166.45]:44049 "EHLO
-        mail-io1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726498AbfF1SZx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jun 2019 14:25:53 -0400
-Received: by mail-io1-f45.google.com with SMTP id s7so14425501iob.11;
-        Fri, 28 Jun 2019 11:25:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NdjWQOf/yOx5ZW0w8+A5hA2av2WUhbolbuF5akIF1VY=;
-        b=r6+g2L5rqKXu/g2S/ETP5H5BKttxzeG1ZI4/XWzYLvYRQV+Zj9x4T0uwmtGvOCGP+5
-         tVaRuyUEBs+IAwv3AUvHUkV9KJuitmmge9/AxAuuuPZ5QXRpZxzb9Av8lTTH7i+hNUnl
-         seii6jde8L44EbD8745YRip2UWXJcO75TSe4wVh/GE8bjUSnS/pQoZglMROqaRkJiCbG
-         NCLjDDpCDqERsEBiyGENkIHlbUDnPLctc16eenGCSzDpO+Q/sWpv7F/y4l78429gZT58
-         f+Hqmi+ulRNn96GPWtDS9mdK/xEDSmroi376Jp55zW323JkYbQLJHyi4mFTUUn5aoJ+9
-         3LZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NdjWQOf/yOx5ZW0w8+A5hA2av2WUhbolbuF5akIF1VY=;
-        b=BtgMAG1+Dcrp0KEj+jhIMBjx/8f9aHuwq8/orV3V5l34DsKT/gZh3vu2VG7EgYGkfh
-         XKzHj83OhS4s97ZoTsb8gvfsqLTUWSMR4mVattP8LjFXS7UuK+SFgvsB24WQznrKBaji
-         Phujd5dXv2Z1QrwdqtH0LX93v3qqw6y8xnc0ygC6f4lRyOqLEG1YqfcDc08Y3MKZidzJ
-         Wkajr8kD3mSHWRu0VbUukVzain07/sMd2fNRcR62Fu6JLTO1gXdWJhDjVSEwA7acbSXo
-         r3lRjckYrnbqNHBc62+Lf+1Di++FYnZAa95dNCIpwMZBRClvqXmIFGO+X+PyzA2f+zje
-         1hmw==
-X-Gm-Message-State: APjAAAX5eu2jyjvrn/Wl36c46XXfOsaOyHZrVNE0LehNt7WtN71ANnV3
-        BX+AcBnbpX5Ykhhkyc224ui7msziRZ9+SW1nBm0=
-X-Google-Smtp-Source: APXvYqzsCCS7suEEDv1ctetOh+HYaqDjC7aQq+cRFaNaEWH1OHFRfIz+86nsi4xUSxd/kmrgVnuVAXElrYURYb/lrnY=
-X-Received: by 2002:a6b:b790:: with SMTP id h138mr11996522iof.64.1561746352253;
- Fri, 28 Jun 2019 11:25:52 -0700 (PDT)
+        id S1726557AbfF1Sdy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jun 2019 14:33:54 -0400
+Received: from mail-eopbgr770129.outbound.protection.outlook.com ([40.107.77.129]:44558
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725783AbfF1Sdy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jun 2019 14:33:54 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hwuSEc1a21ae+NZhQzAVbDuY8laT/xOpjo63M2q9Iyt9TropxbJpTJv23DAjwCKH62OhC8ivyo/jYR9bQAZi6dO7E/3wuadl81zjBKSRliZ99G324Zrj1U+G6wAExVFoZZ4fMBmmHofLEKMkV8yZwwNXn/nHGJOwAVWRYnKmqAg9s+g3u/uti1/9nLfJJtcsn/5+0b4BOtGm396ozOdhVnjgi8gocGH7uk9TVX7LD1AxEPCaXVE0+s1hwqV3naNQ7TGLu7PGUwsqfyHfkx9rWYW47XGZVwAV5gxwSBD2hW//GVy+Re7LY/a/YTyBagjGb3z3kr6M5EVzJKPvIuy2zQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=34yH1k0ByhdX0SL4JskX1hR+6/uCYYhisYC1pTFuUq4=;
+ b=Xve4PS/X1XNXJAfopXKb0kCcSw598S6J6rH0Fe3XPrlAd6e8bYkycCSEfpu+zywk8eAbP9jYG2DhjkdR7YoUzyG6SWwltDe2UrRzah2J0otJmN0ZCW8HKMExv2emm4eVN33YIP9g7lyoC8cRMGvjjCp46wZR7JxB2CUcO8Nf1NFvDqXlGEuekxd1lM8jpSccgnGMMBFXF7yWj+Nea8bdTI9t+WQo+V5qqKWx6q3e4vBshDdwuTmAq1s2ftuMb0swgNjfYsjo+PRV6mi6qfzumbw6zMKipOi8tSrA/70cJuI0B/7sZVrChwd8eZKEeODLkRAnCmFVepvJazBoz9+ZtQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=microsoft.com;dmarc=pass action=none
+ header.from=microsoft.com;dkim=pass header.d=microsoft.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=34yH1k0ByhdX0SL4JskX1hR+6/uCYYhisYC1pTFuUq4=;
+ b=T98Rkstw7eRVwCT/Ul/P3J1HWJqL/uvaH7BSd3tAi4eaS4iJQO4dpcq0FzcXgDVFMbs6RtRb0LttZnjE3o3mN9AYj9RnKXfJfFSNU0WNhAoaG21cySxTnZXCBfjl1LZ1uRvl7XeP5jHFh2tkY6trZdmCiWAhFGHnCxvCURjxGu8=
+Received: from DM6PR21MB1340.namprd21.prod.outlook.com (20.179.53.83) by
+ DM6PR21MB1145.namprd21.prod.outlook.com (20.179.50.138) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2052.4; Fri, 28 Jun 2019 18:33:50 +0000
+Received: from DM6PR21MB1340.namprd21.prod.outlook.com
+ ([fe80::c817:8ed1:5d04:5a95]) by DM6PR21MB1340.namprd21.prod.outlook.com
+ ([fe80::c817:8ed1:5d04:5a95%6]) with mapi id 15.20.2052.005; Fri, 28 Jun 2019
+ 18:33:50 +0000
+From:   Michael Kelley <mikelley@microsoft.com>
+To:     "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>
+CC:     Michael Kelley <mikelley@microsoft.com>,
+        "will.deacon@arm.com" <will.deacon@arm.com>,
+        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+        "mark.rutland@arm.com" <mark.rutland@arm.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "olaf@aepfle.de" <olaf@aepfle.de>,
+        "apw@canonical.com" <apw@canonical.com>,
+        vkuznets <vkuznets@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "marcelo.cerri@canonical.com" <marcelo.cerri@canonical.com>,
+        Sunil Muthuswamy <sunilmut@microsoft.com>,
+        KY Srinivasan <kys@microsoft.com>,
+        "sashal@kernel.org" <sashal@kernel.org>,
+        "vincenzo.frascino@arm.com" <vincenzo.frascino@arm.com>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "arnd@arndb.de" <arnd@arndb.de>,
+        "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+        "ralf@linux-mips.org" <ralf@linux-mips.org>,
+        "paul.burton@mips.com" <paul.burton@mips.com>,
+        "daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>,
+        "salyzyn@android.com" <salyzyn@android.com>,
+        "pcc@google.com" <pcc@google.com>,
+        "shuah@kernel.org" <shuah@kernel.org>,
+        "0x7f454c46@gmail.com" <0x7f454c46@gmail.com>,
+        "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>,
+        "huw@codeweavers.com" <huw@codeweavers.com>,
+        "sfr@canb.auug.org.au" <sfr@canb.auug.org.au>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: [PATCH v4 0/2] Drivers: hv: Move Hyper-V clock/timer code to separate
+ clocksource driver
+Thread-Topic: [PATCH v4 0/2] Drivers: hv: Move Hyper-V clock/timer code to
+ separate clocksource driver
+Thread-Index: AQHVLeAHtKnubHleu0muzknyz7e1vg==
+Date:   Fri, 28 Jun 2019 18:33:50 +0000
+Message-ID: <1561746758-23216-1-git-send-email-mikelley@microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: CY4PR06CA0043.namprd06.prod.outlook.com
+ (2603:10b6:903:77::29) To DM6PR21MB1340.namprd21.prod.outlook.com
+ (2603:10b6:5:175::19)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=mikelley@microsoft.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 1.8.3.1
+x-originating-ip: [131.107.174.8]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a7da63b7-23c8-47ad-6e38-08d6fbf72a27
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM6PR21MB1145;
+x-ms-traffictypediagnostic: DM6PR21MB1145:
+x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
+x-microsoft-antispam-prvs: <DM6PR21MB11450539151E6D2C2F579373D7FC0@DM6PR21MB1145.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2399;
+x-forefront-prvs: 00826B6158
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(396003)(376002)(366004)(39860400002)(346002)(199004)(189003)(386003)(86362001)(2616005)(54906003)(256004)(110136005)(478600001)(316002)(7416002)(7406005)(6486002)(486006)(14454004)(50226002)(2201001)(52116002)(476003)(6512007)(99286004)(4720700003)(6436002)(10290500003)(53936002)(4326008)(22452003)(25786009)(305945005)(6116002)(102836004)(5660300002)(71200400001)(71190400001)(14444005)(26005)(73956011)(66556008)(64756008)(66446008)(66476007)(186003)(36756003)(3846002)(66946007)(6506007)(7736002)(8676002)(81156014)(81166006)(66066001)(2906002)(68736007)(2501003)(10090500001)(8936002);DIR:OUT;SFP:1102;SCL:1;SRVR:DM6PR21MB1145;H:DM6PR21MB1340.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: microsoft.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: nwrSxzjT2z1O2DIkxuKdKVv1HHBcJz9ThYMHCx4x4zfDtBTqUU8S/LldNWxPAvecfduTgccH4S+9ckY0Bv7Oxvwk4NbZr6KhYb1sxus0/uERws1AIgrDBmeod439Uh4X+l5gKlDDbTVLSXN2Tbn/OpTkdCkZ8kqqXwp/ddL+C0G9cw8xIG1IxiTOugQVY2baqwGXJS3LXwnhVDB6jYOaGotpCjE984aBL1iUkyd7wm65Y9RHTwu7QZgk4bsD4Qq2gFCCFGq1hQeQ79Tq2Z0hng8ykXn1Mk4Wovu2Ix+YORhTU30ZB9+wsFBofkoBuV6SOuvuLt/GGH7uLwGNDWnU4WZ8Rk9ODP6YYnN0ZpWTT1rIARZQ2iAULIccOdyhFIpSeZObnb98caUD2qt7tKtRsMWpRNWmFaCD+ASt+bbTfH4=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20190603170306.49099-1-nitesh@redhat.com> <20190603140304-mutt-send-email-mst@kernel.org>
- <afac6f92-74f5-4580-0303-12b7374e5011@redhat.com> <CAKgT0UdK2v+xTwzjLfc69Baz0iDp7GnGRdUacQPue5XHFfQxHg@mail.gmail.com>
- <cc20a6d2-9e95-3de4-301a-f2a6a5b025e4@redhat.com>
-In-Reply-To: <cc20a6d2-9e95-3de4-301a-f2a6a5b025e4@redhat.com>
-From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Fri, 28 Jun 2019 11:25:41 -0700
-Message-ID: <CAKgT0UfMGXQWzS7=UVquCPECEpPZ1DHzmoH9aOz=r-Di=OKFrA@mail.gmail.com>
-Subject: Re: [RFC][Patch v10 0/2] mm: Support for page hinting
-To:     Nitesh Narayan Lal <nitesh@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, lcapitulino@redhat.com,
-        pagupta@redhat.com, wei.w.wang@intel.com,
-        Yang Zhang <yang.zhang.wz@gmail.com>,
-        Rik van Riel <riel@surriel.com>,
-        David Hildenbrand <david@redhat.com>, dodgen@google.com,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        dhildenb@redhat.com, Andrea Arcangeli <aarcange@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a7da63b7-23c8-47ad-6e38-08d6fbf72a27
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jun 2019 18:33:50.3409
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: lkmlmhk@microsoft.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR21MB1145
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jun 25, 2019 at 10:32 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
->
-> On 6/25/19 1:10 PM, Alexander Duyck wrote:
-> > On Tue, Jun 25, 2019 at 7:49 AM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
-> >>
-> >> On 6/3/19 2:04 PM, Michael S. Tsirkin wrote:
-> >>> On Mon, Jun 03, 2019 at 01:03:04PM -0400, Nitesh Narayan Lal wrote:
-> >>>> This patch series proposes an efficient mechanism for communicating free memory
-> >>>> from a guest to its hypervisor. It especially enables guests with no page cache
-> >>>> (e.g., nvdimm, virtio-pmem) or with small page caches (e.g., ram > disk) to
-> >>>> rapidly hand back free memory to the hypervisor.
-> >>>> This approach has a minimal impact on the existing core-mm infrastructure.
-> >>> Could you help us compare with Alex's series?
-> >>> What are the main differences?
-> >> Results on comparing the benefits/performance of Alexander's v1
-> >> (bubble-hinting)[1], Page-Hinting (includes some of the upstream
-> >> suggested changes on v10) over an unmodified Kernel.
-> >>
-> >> Test1 - Number of guests that can be launched without swap usage.
-> >> Guest size: 5GB
-> >> Cores: 4
-> >> Total NUMA Node Memory ~ 15 GB (All guests are running on a single node)
-> >> Process: Guest is launched sequentially after running an allocation
-> >> program with 4GB request.
-> >>
-> >> Results:
-> >> unmodified kernel: 2 guests without swap usage and 3rd guest with a swap
-> >> usage of 2.3GB.
-> >> bubble-hinting v1: 4 guests without swap usage and 5th guest with a swap
-> >> usage of 1MB.
-> >> Page-hinting: 5 guests without swap usage and 6th guest with a swap
-> >> usage of 8MB.
-> >>
-> >>
-> >> Test2 - Memhog execution time
-> >> Guest size: 6GB
-> >> Cores: 4
-> >> Total NUMA Node Memory ~ 15 GB (All guests are running on a single node)
-> >> Process: 3 guests are launched and "time memhog 6G" is launched in each
-> >> of them sequentially.
-> >>
-> >> Results:
-> >> unmodified kernel: Guest1-40s, Guest2-1m5s, Guest3-6m38s (swap usage at
-> >> the end-3.6G)
-> >> bubble-hinting v1: Guest1-32s, Guest2-58s, Guest3-35s (swap usage at the
-> >> end-0)
-> >> Page-hinting: Guest1-42s, Guest2-47s, Guest3-32s (swap usage at the end-0)
-> >>
-> >>
-> >> Test3 - Will-it-scale's page_fault1
-> >> Guest size: 6GB
-> >> Cores: 24
-> >> Total NUMA Node Memory ~ 15 GB (All guests are running on a single node)
-> >>
-> >> unmodified kernel:
-> >> tasks,processes,processes_idle,threads,threads_idle,linear
-> >> 0,0,100,0,100,0
-> >> 1,459168,95.83,459315,95.83,459315
-> >> 2,956272,91.68,884643,91.72,918630
-> >> 3,1407811,87.53,1267948,87.69,1377945
-> >> 4,1755744,83.39,1562471,83.73,1837260
-> >> 5,2056741,79.24,1812309,80.00,2296575
-> >> 6,2393759,75.09,2025719,77.02,2755890
-> >> 7,2754403,70.95,2238180,73.72,3215205
-> >> 8,2947493,66.81,2369686,70.37,3674520
-> >> 9,3063579,62.68,2321148,68.84,4133835
-> >> 10,3229023,58.54,2377596,65.84,4593150
-> >> 11,3337665,54.40,2429818,64.01,5052465
-> >> 12,3255140,50.28,2395070,61.63,5511780
-> >> 13,3260721,46.11,2402644,59.77,5971095
-> >> 14,3210590,42.02,2390806,57.46,6430410
-> >> 15,3164811,37.88,2265352,51.39,6889725
-> >> 16,3144764,33.77,2335028,54.07,7349040
-> >> 17,3128839,29.63,2328662,49.52,7808355
-> >> 18,3133344,25.50,2301181,48.01,8267670
-> >> 19,3135979,21.38,2343003,43.66,8726985
-> >> 20,3136448,17.27,2306109,40.81,9186300
-> >> 21,3130324,13.16,2403688,35.84,9645615
-> >> 22,3109883,9.04,2290808,36.24,10104930
-> >> 23,3136805,4.94,2263818,35.43,10564245
-> >> 24,3118949,0.78,2252891,31.03,11023560
-> >>
-> >> bubble-hinting v1:
-> >> tasks,processes,processes_idle,threads,threads_idle,linear
-> >> 0,0,100,0,100,0
-> >> 1,292183,95.83,292428,95.83,292428
-> >> 2,540606,91.67,501887,91.91,584856
-> >> 3,821748,87.53,735244,88.31,877284
-> >> 4,1033782,83.38,839925,85.59,1169712
-> >> 5,1261352,79.25,896464,83.86,1462140
-> >> 6,1459544,75.12,1050094,80.93,1754568
-> >> 7,1686537,70.97,1112202,79.23,2046996
-> >> 8,1866892,66.83,1083571,78.48,2339424
-> >> 9,2056887,62.72,1101660,77.94,2631852
-> >> 10,2252955,58.57,1097439,77.36,2924280
-> >> 11,2413907,54.40,1088583,76.72,3216708
-> >> 12,2596504,50.35,1117474,76.01,3509136
-> >> 13,2715338,46.21,1087666,75.32,3801564
-> >> 14,2861697,42.08,1084692,74.35,4093992
-> >> 15,2964620,38.02,1087910,73.40,4386420
-> >> 16,3065575,33.84,1099406,71.07,4678848
-> >> 17,3107674,29.76,1056948,71.36,4971276
-> >> 18,3144963,25.71,1094883,70.14,5263704
-> >> 19,3173468,21.61,1073049,66.21,5556132
-> >> 20,3173233,17.55,1072417,67.16,5848560
-> >> 21,3209710,13.37,1079147,65.64,6140988
-> >> 22,3182958,9.37,1085872,65.95,6433416
-> >> 23,3200747,5.23,1076414,59.40,6725844
-> >> 24,3181699,1.04,1051233,65.62,7018272
-> >>
-> >> Page-hinting:
-> >> tasks,processes,processes_idle,threads,threads_idle,linear
-> >> 0,0,100,0,100,0
-> >> 1,467693,95.83,467970,95.83,467970
-> >> 2,967860,91.68,895883,91.70,935940
-> >> 3,1408191,87.53,1279602,87.68,1403910
-> >> 4,1766250,83.39,1557224,83.93,1871880
-> >> 5,2124689,79.24,1834625,80.35,2339850
-> >> 6,2413514,75.10,1989557,77.00,2807820
-> >> 7,2644648,70.95,2158055,73.73,3275790
-> >> 8,2896483,66.81,2305785,70.85,3743760
-> >> 9,3157796,62.67,2304083,69.49,4211730
-> >> 10,3251633,58.53,2379589,66.43,4679700
-> >> 11,3313704,54.41,2349310,64.76,5147670
-> >> 12,3285612,50.30,2362013,62.63,5615640
-> >> 13,3207275,46.17,2377760,59.94,6083610
-> >> 14,3221727,42.02,2416278,56.70,6551580
-> >> 15,3194781,37.91,2334552,54.96,7019550
-> >> 16,3211818,33.78,2399077,52.75,7487520
-> >> 17,3172664,29.65,2337660,50.27,7955490
-> >> 18,3177152,25.49,2349721,47.02,8423460
-> >> 19,3149924,21.36,2319286,40.16,8891430
-> >> 20,3166910,17.30,2279719,43.23,9359400
-> >> 21,3159464,13.19,2342849,34.84,9827370
-> >> 22,3167091,9.06,2285156,37.97,10295340
-> >> 23,3174137,4.96,2365448,33.74,10763310
-> >> 24,3161629,0.86,2253813,32.38,11231280
-> >>
-> >>
-> >> Test4: Netperf
-> >> Guest size: 5GB
-> >> Cores: 4
-> >> Total NUMA Node Memory ~ 15 GB (All guests are running on a single node)
-> >> Netserver: Running on core 0
-> >> Netperf: Running on core 1
-> >> Recv Socket Size bytes: 131072
-> >> Send Socket Size bytes:16384
-> >> Send Message Size bytes:1000000000
-> >> Time: 900s
-> >> Process: netperf is run 3 times sequentially in the same guest with the
-> >> same inputs mentioned above and throughput (10^6bits/sec) is observed.
-> >> unmodified kernel: 1st Run-14769.60, 2nd Run-14849.18, 3rd Run-14842.02
-> >> bubble-hinting v1: 1st Run-13441.77, 2nd Run-13487.81, 3rd Run-13503.87
-> >> Page-hinting: 1st Run-14308.20, 2nd Run-14344.36, 3rd Run-14450.07
-> >>
-> >> Drawback with bubble-hinting:
-> >> More invasive.
-> >>
-> >> Drawback with page-hinting:
-> >> Additional bitmap required, including growing/shrinking the bitmap on
-> >> memory hotplug.
-> >>
-> >>
-> >> [1] https://lkml.org/lkml/2019/6/19/926
-> > Any chance you could provide a .config for your kernel? I'm wondering
-> > what is different between the two as it seems like you are showing a
-> > significant regression in terms of performance for the bubble
-> > hinting/aeration approach versus a stock kernel without the patches
-> > and that doesn't match up with what I have been seeing.
-> I have attached the config which I was using.
-
-Were all of these runs with the same config? I ask because I noticed
-the config you provided had a number of quite expensive memory debug
-options enabled:
-
-#
-# Memory Debugging
-#
-CONFIG_PAGE_EXTENSION=y
-CONFIG_DEBUG_PAGEALLOC=y
-CONFIG_DEBUG_PAGEALLOC_ENABLE_DEFAULT=y
-CONFIG_PAGE_OWNER=y
-# CONFIG_PAGE_POISONING is not set
-CONFIG_DEBUG_PAGE_REF=y
-# CONFIG_DEBUG_RODATA_TEST is not set
-CONFIG_DEBUG_OBJECTS=y
-# CONFIG_DEBUG_OBJECTS_SELFTEST is not set
-# CONFIG_DEBUG_OBJECTS_FREE is not set
-# CONFIG_DEBUG_OBJECTS_TIMERS is not set
-# CONFIG_DEBUG_OBJECTS_WORK is not set
-# CONFIG_DEBUG_OBJECTS_RCU_HEAD is not set
-# CONFIG_DEBUG_OBJECTS_PERCPU_COUNTER is not set
-CONFIG_DEBUG_OBJECTS_ENABLE_DEFAULT=1
-CONFIG_SLUB_DEBUG_ON=y
-# CONFIG_SLUB_STATS is not set
-CONFIG_HAVE_DEBUG_KMEMLEAK=y
-CONFIG_DEBUG_KMEMLEAK=y
-CONFIG_DEBUG_KMEMLEAK_EARLY_LOG_SIZE=400
-# CONFIG_DEBUG_KMEMLEAK_TEST is not set
-# CONFIG_DEBUG_KMEMLEAK_DEFAULT_OFF is not set
-CONFIG_DEBUG_KMEMLEAK_AUTO_SCAN=y
-CONFIG_DEBUG_STACK_USAGE=y
-CONFIG_DEBUG_VM=y
-# CONFIG_DEBUG_VM_VMACACHE is not set
-# CONFIG_DEBUG_VM_RB is not set
-# CONFIG_DEBUG_VM_PGFLAGS is not set
-CONFIG_ARCH_HAS_DEBUG_VIRTUAL=y
-CONFIG_DEBUG_VIRTUAL=y
-CONFIG_DEBUG_MEMORY_INIT=y
-CONFIG_DEBUG_PER_CPU_MAPS=y
-CONFIG_HAVE_ARCH_KASAN=y
-CONFIG_CC_HAS_KASAN_GENERIC=y
-# CONFIG_KASAN is not set
-CONFIG_KASAN_STACK=1
-# end of Memory Debugging
-
-When I went through and enabled these then my results for the bubble
-hinting matched pretty closely to what you reported. However, when I
-compiled without the patches and this config enabled the results were
-still about what was reported with the bubble hinting but were maybe
-5% improved. I'm just wondering if you were doing some additional
-debugging and left those options enabled for the bubble hinting test
-run.
+VGhpcyBwYXRjaCBzZXJpZXMgbW92ZXMgSHlwZXItViBjbG9jay90aW1lciBjb2RlIHRvIGEgc2Vw
+YXJhdGUgSHlwZXItVg0KY2xvY2tzb3VyY2UgZHJpdmVyLiBQcmV2aW91c2x5LCBIeXBlci1WIGNs
+b2NrL3RpbWVyIGNvZGUgYW5kIGRhdGENCnN0cnVjdHVyZXMgd2VyZSBtaXhlZCBpbiB3aXRoIG90
+aGVyIEh5cGVyLVYgY29kZSBpbiB0aGUgSVNBIGluZGVwZW5kZW50DQpkcml2ZXJzL2h2IGNvZGUg
+YXMgd2VsbCBhcyBpbiBJU0EgZGVwZW5kZW50IGNvZGUuIFRoZSBuZXcgSHlwZXItVg0KY2xvY2tz
+b3VyY2UgZHJpdmVyIGlzIElTQSBpbmRlcGVuZGVudCwgd2l0aCBhIGp1c3QgZmV3IGRlcGVuZGVu
+Y2llcyBvbg0KSVNBIHNwZWNpZmljIGZ1bmN0aW9ucy4gVGhlIHBhdGNoIHNlcmllcyBkb2VzIG5v
+dCBjaGFuZ2UgYW55IGJlaGF2aW9yDQpvciBmdW5jdGlvbmFsaXR5IC0tIGl0IG9ubHkgcmVvcmdh
+bml6ZXMgdGhlIGV4aXN0aW5nIGNvZGUgYW5kIGZpeGVzIHVwDQp0aGUgbGlua2FnZXMuIEEgZmV3
+IHBsYWNlcyBvdXRzaWRlIG9mIEh5cGVyLVYgY29kZSBhcmUgZml4ZWQgdXAgdG8gdXNlDQp0aGUg
+bmV3ICNpbmNsdWRlIGZpbGUgc3RydWN0dXJlLg0KDQpUaGlzIHJlc3RydWN0dXJpbmcgaXMgaW4g
+cmVzcG9uc2UgdG8gTWFyYyBaeW5naWVyJ3MgcmV2aWV3IGNvbW1lbnRzDQpvbiBzdXBwb3J0aW5n
+IEh5cGVyLVYgcnVubmluZyBvbiBBUk02NCwgYW5kIGlzIGEgZ29vZCBpZGVhIGluIGdlbmVyYWwu
+DQpJdCBpbmNyZWFzZXMgdGhlIGFtb3VudCBvZiBjb2RlIHNoYXJlZCBiZXR3ZWVuIHRoZSB4ODYg
+YW5kIEFSTTY0DQphcmNoaXRlY3R1cmVzLCBhbmQgcmVkdWNlcyB0aGUgc2l6ZSBvZiB0aGUgbmV3
+IGNvZGUgZm9yIHN1cHBvcnRpbmcNCkh5cGVyLVYgb24gQVJNNjQuIEEgbmV3IHZlcnNpb24gb2Yg
+dGhlIEh5cGVyLVYgb24gQVJNNjQgcGF0Y2hlcyB3aWxsDQpmb2xsb3cgb25jZSB0aGlzIGNsb2Nr
+c291cmNlIHJlc3RydWN0dXJpbmcgaXMgYWNjZXB0ZWQuDQoNClRoZSBjb2RlIGlzIGRpZmYnZWQg
+YWdhaW5zdCB0aGUgdXBzdHJlYW0gdGlwIHRyZWU6DQpnaXQ6Ly9naXQua2VybmVsLm9yZy9wdWIv
+c2NtL2xpbnV4L2tlcm5lbC9naXQvdGlwL3RpcC5naXQgdGltZXJzL3Zkc28NCg0KQ2hhbmdlcyBp
+biB2NDoNCiogUmV2aXNlZCBjb21taXQgbWVzc2FnZXMNCiogUmViYXNlZCB0byB1cHN0cmVhbSB0
+aXAgdHJlZQ0KDQpDaGFuZ2VzIGluIHYzOg0KKiBSZW1vdmVkIGJvb2xlYW4gYXJndW1lbnQgdG8g
+aHZfaW5pdF9jbG9ja3NvdXJjZSgpLiBBbHdheXMgY2FsbA0Kc2NoZWRfY2xvY2tfcmVnaXN0ZXIs
+IHdoaWNoIGlzIG5lZWRlZCBvbiBBUk02NCBidXQgYSBuby1vcCBvbiB4ODYuDQoqIFJlbW92ZWQg
+c2VwYXJhdGUgY3B1aHAgc2V0dXAgaW4gaHZfc3RpbWVyX2FsbG9jKCkgYW5kIGluc3RlYWQNCmRp
+cmVjdGx5IGNhbGwgaHZfc3RpbWVyX2luaXQoKSBhbmQgaHZfc3RpbWVyX2NsZWFudXAoKSBmcm9t
+DQpjb3JyZXNwb25kaW5nIFZNYnVzIGZ1bmN0aW9ucy4gIFRoaXMgbW9yZSBjbG9zZWx5IG1hdGNo
+ZXMgb3JpZ2luYWwNCmNvZGUgYW5kIGF2b2lkcyBjbG9ja3NvdXJjZSBzdG9wL3Jlc3RhcnQgcHJv
+YmxlbXMgb24gQVJNNjQgd2hlbg0KVk1idXMgY29kZSBkZW5pZXMgQ1BVIG9mZmxpbmluZyByZXF1
+ZXN0Lg0KDQpDaGFuZ2VzIGluIHYyOg0KKiBSZXZpc2VkIGNvbW1pdCBzaG9ydCBkZXNjcmlwdGlv
+bnMgc28gdGhlIGRpc3RpbmN0aW9uIGJldHdlZW4NCnRoZSBmaXJzdCBhbmQgc2Vjb25kIHBhdGNo
+ZXMgaXMgY2xlYXJlciBbR3JlZ0tIXQ0KKiBSZW5hbWVkIG5ldyBjbG9ja3NvdXJjZSBkcml2ZXIg
+ZmlsZXMgYW5kIGZ1bmN0aW9ucyB0byB1c2UNCmV4aXN0aW5nICJ0aW1lciIgYW5kICJzdGltZXIi
+IG5hbWVzIGluc3RlYWQgb2YgaW50cm9kdWNpbmcNCiJzeW50aW1lciIuIFtWaXRhbHkgS3V6bmV0
+c292XQ0KKiBJbnRyb2R1Y2VkIENPTkZJR19IWVBFUl9USU1FUiB0byBmaXggYnVpbGQgcHJvYmxl
+bSB3aGVuDQpDT05GSUdfSFlQRVJWPW0gW1ZpdGFseSBLdXpuZXRzb3ZdDQoqIEFkZGVkICJTdWdn
+ZXN0ZWQtYnk6IE1hcmMgWnluZ2llciINCg0KTWljaGFlbCBLZWxsZXkgKDIpOg0KICBEcml2ZXJz
+OiBodjogQ3JlYXRlIEh5cGVyLVYgY2xvY2tzb3VyY2UgZHJpdmVyIGZyb20gZXhpc3RpbmcNCiAg
+ICBjbG9ja2V2ZW50cyBjb2RlDQogIERyaXZlcnM6IGh2OiBNb3ZlIEh5cGVyLVYgY2xvY2tzb3Vy
+Y2UgY29kZSB0byBuZXcgY2xvY2tzb3VyY2UgZHJpdmVyDQoNCiBNQUlOVEFJTkVSUyAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHwgICAyICsNCiBhcmNoL3g4Ni9lbnRyeS92ZHNvL3ZtYS5j
+ICAgICAgICAgICAgICAgIHwgICAyICstDQogYXJjaC94ODYvaHlwZXJ2L2h2X2luaXQuYyAgICAg
+ICAgICAgICAgICB8ICA5MSArLS0tLS0tLS0NCiBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9oeXBlcnYt
+dGxmcy5oICAgICAgIHwgICA2ICsNCiBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9tc2h5cGVydi5oICAg
+ICAgICAgIHwgIDgxICsrLS0tLS0tDQogYXJjaC94ODYvaW5jbHVkZS9hc20vdmRzby9nZXR0aW1l
+b2ZkYXkuaCB8ICAgMiArLQ0KIGFyY2gveDg2L2tlcm5lbC9jcHUvbXNoeXBlcnYuYyAgICAgICAg
+ICAgfCAgIDIgKw0KIGFyY2gveDg2L2t2bS94ODYuYyAgICAgICAgICAgICAgICAgICAgICAgfCAg
+IDEgKw0KIGRyaXZlcnMvY2xvY2tzb3VyY2UvTWFrZWZpbGUgICAgICAgICAgICAgfCAgIDEgKw0K
+IGRyaXZlcnMvY2xvY2tzb3VyY2UvaHlwZXJ2X3RpbWVyLmMgICAgICAgfCAzMjEgKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKw0KIGRyaXZlcnMvaHYvS2NvbmZpZyAgICAgICAgICAgICAg
+ICAgICAgICAgfCAgIDMgKw0KIGRyaXZlcnMvaHYvaHYuYyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgfCAxNTYgKy0tLS0tLS0tLS0tLS0tDQogZHJpdmVycy9odi9oeXBlcnZfdm1idXMuaCAgICAg
+ICAgICAgICAgICB8ICAgMyAtDQogZHJpdmVycy9odi92bWJ1c19kcnYuYyAgICAgICAgICAgICAg
+ICAgICB8ICA0MiArKy0tDQogaW5jbHVkZS9jbG9ja3NvdXJjZS9oeXBlcnZfdGltZXIuaCAgICAg
+ICB8IDEwNSArKysrKysrKysrDQogMTUgZmlsZXMgY2hhbmdlZCwgNDgzIGluc2VydGlvbnMoKyks
+IDMzNSBkZWxldGlvbnMoLSkNCiBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy9jbG9ja3NvdXJj
+ZS9oeXBlcnZfdGltZXIuYw0KIGNyZWF0ZSBtb2RlIDEwMDY0NCBpbmNsdWRlL2Nsb2Nrc291cmNl
+L2h5cGVydl90aW1lci5oDQoNCi0tIA0KMS44LjMuMQ0KDQo=
