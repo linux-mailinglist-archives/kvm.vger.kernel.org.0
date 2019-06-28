@@ -2,174 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 542B459BE3
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 14:43:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FFC159C87
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 15:05:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726874AbfF1Mnx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jun 2019 08:43:53 -0400
-Received: from mga02.intel.com ([134.134.136.20]:34087 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726788AbfF1Mnw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jun 2019 08:43:52 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Jun 2019 05:43:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,427,1557212400"; 
-   d="scan'208";a="173467031"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
-  by orsmga002.jf.intel.com with ESMTP; 28 Jun 2019 05:43:51 -0700
-Received: from fmsmsx154.amr.corp.intel.com (10.18.116.70) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 28 Jun 2019 05:43:50 -0700
-Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
- FMSMSX154.amr.corp.intel.com (10.18.116.70) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Fri, 28 Jun 2019 05:43:49 -0700
-Received: from shsmsx101.ccr.corp.intel.com ([169.254.1.87]) by
- SHSMSX108.ccr.corp.intel.com ([169.254.8.236]) with mapi id 14.03.0439.000;
- Fri, 28 Jun 2019 20:43:48 +0800
-From:   "Zhang, Tina" <tina.zhang@intel.com>
-To:     Gerd Hoffmann <kraxel@redhat.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>
-CC:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "Lv, Zhiyuan" <zhiyuan.lv@intel.com>,
-        "Yuan, Hang" <hang.yuan@intel.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>
-Subject: RE: [RFC PATCH v3 0/4] Deliver vGPU display vblank event to
- userspace
-Thread-Topic: [RFC PATCH v3 0/4] Deliver vGPU display vblank event to
- userspace
-Thread-Index: AQHVLJqUUSM/9sKZ/UyimYY5z7yeLaaughWAgACsmuD//5j6gIABGkSAgAAnqQCAALSSsIAAQxiw
-Date:   Fri, 28 Jun 2019 12:43:47 +0000
-Message-ID: <237F54289DF84E4997F34151298ABEBC87685825@SHSMSX101.ccr.corp.intel.com>
-References: <20190627033802.1663-1-tina.zhang@intel.com>
- <20190627062231.57tywityo6uyhmyd@sirius.home.kraxel.org>
- <237F54289DF84E4997F34151298ABEBC876835E5@SHSMSX101.ccr.corp.intel.com>
- <20190627103133.6ekdwazggi5j5lcl@sirius.home.kraxel.org>
- <20190628032149.GD9684@zhen-hp.sh.intel.com>
- <20190628054346.3uc3k4c4cffrqcy3@sirius.home.kraxel.org> 
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZDM1MmJmNzYtNDAzNy00ZjdhLWJkZjgtM2RjZGZjZDI4YjExIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiODQrZjRmeVNpSUdJUTlPTFVNdDFCWGt1SUl3Y3k2OHRSdHgyOHZSMVlPQ3Y2aSsyOENSVExmVk43S3MxakZHVCJ9
-x-ctpclassification: CTP_NT
-dlp-product: dlpe-windows
-dlp-version: 11.0.600.7
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1726731AbfF1NFR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jun 2019 09:05:17 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3808 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726590AbfF1NFQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 28 Jun 2019 09:05:16 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5SD3eDM034064
+        for <kvm@vger.kernel.org>; Fri, 28 Jun 2019 09:05:15 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2tdjtt1pgd-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 28 Jun 2019 09:05:15 -0400
+Received: from localhost
+        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <alifm@linux.ibm.com>;
+        Fri, 28 Jun 2019 14:05:14 +0100
+Received: from b01cxnp22036.gho.pok.ibm.com (9.57.198.26)
+        by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 28 Jun 2019 14:05:12 +0100
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5SD5BXk7209600
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 28 Jun 2019 13:05:11 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 28B34112065;
+        Fri, 28 Jun 2019 13:05:11 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 022B311206B;
+        Fri, 28 Jun 2019 13:05:10 +0000 (GMT)
+Received: from [9.80.218.122] (unknown [9.80.218.122])
+        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 28 Jun 2019 13:05:10 +0000 (GMT)
+Subject: Re: [RFC v1 1/1] vfio-ccw: Don't call cp_free if we are processing a
+ channel program
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Eric Farman <farman@linux.ibm.com>, pasic@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+References: <cover.1561055076.git.alifm@linux.ibm.com>
+ <46dc0cbdcb8a414d70b7807fceb1cca6229408d5.1561055076.git.alifm@linux.ibm.com>
+ <638804dc-53c0-ff2f-d123-13c257ad593f@linux.ibm.com>
+ <581d756d-7418-cd67-e0e8-f9e4fe10b22d@linux.ibm.com>
+ <2d9c04ba-ee50-2f9b-343a-5109274ff52d@linux.ibm.com>
+ <56ced048-8c66-a030-af35-8afbbd2abea8@linux.ibm.com>
+ <20190624114231.2d81e36f.cohuck@redhat.com>
+ <20190624120514.4b528db5.cohuck@redhat.com>
+ <20190624134622.2bb3bba2.cohuck@redhat.com>
+ <20190624140723.5aa7b0b1.cohuck@redhat.com>
+ <3e93215c-c11a-d0bb-8982-be3f2b467e13@linux.ibm.com>
+ <20190624170937.4c76de8d.cohuck@redhat.com>
+ <7841b312-13ad-a4b3-85d9-1f5a4991f7fd@linux.ibm.com>
+ <20190627111456.3e6da01c.cohuck@redhat.com>
+From:   Farhan Ali <alifm@linux.ibm.com>
+Date:   Fri, 28 Jun 2019 09:05:10 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
+In-Reply-To: <20190627111456.3e6da01c.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19062813-0052-0000-0000-000003D80424
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011346; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01224482; UDB=6.00644477; IPR=6.01005674;
+ MB=3.00027507; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-28 13:05:13
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19062813-0053-0000-0000-0000617E2016
+Message-Id: <f42fa379-470a-c14a-a120-c4221029076d@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-28_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906280156
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGksDQoNCkhvdyBhYm91dCBHVlQtZyBzdXBwb3J0cyBib3RoIHZibGFuayBhbmQgcGFnZSBmbGlw
-IGV2ZW50cy4gVGhlbiBRRU1VIFVJIGNhbiBtYXNrL3VubWFzayB0aGUgZXZlbnRzIHRvIGRlY2lk
-ZSB3aGljaCBraW5kIG9mIGV2ZW50IGlzIGV4cGVjdGVkLg0KRm9yIERSTSBVSSwgaXQgY2FuIGRl
-Y2lkZSB0byBtYXNrIHZibGFuayBldmVudCBhbmQgdXNlIHBhZ2UgZmxpcCBldmVudHMuIFdlIHRy
-aWVkIERSTSBVSSB3aXRoIHBhZ2UgZmxpcCBldmVudHMsIHRoZSBwZXJmb3JtYW5jZSBpcyBncmVh
-dCwgZXZlbiBpbiB0aGUgY2FzZSBvZiBmcm9udCBidWZmZXIgcmVuZGVyaW5nLiBGb3IgdGhlIFVJ
-IGxpa2UgR1RLLCB2YmxhbmsgZXZlbnQgaXMgYmV0dGVyLiANCg0KQmVzaWRlcywgd2l0aCB0aGUg
-aXJxIG1hc2svdW5tYXNrIG1lY2hhbmlzbSwgdXNlcnNwYWNlIGNhbiBkeW5hbWljYWxseSBjaG9v
-c2UgYmV0d2VlbiB0aGUgVUkgdGltZXIgYW5kIHRoZSBldmVudHMuIA0KDQpUaGFua3MuDQoNCkJS
-LA0KVGluYQ0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFpoYW5nLCBU
-aW5hDQo+IFNlbnQ6IEZyaWRheSwgSnVuZSAyOCwgMjAxOSA0OjQ1IFBNDQo+IFRvOiAnR2VyZCBI
-b2ZmbWFubicgPGtyYXhlbEByZWRoYXQuY29tPjsgWmhlbnl1IFdhbmcNCj4gPHpoZW55dXdAbGlu
-dXguaW50ZWwuY29tPg0KPiBDYzogVGlhbiwgS2V2aW4gPGtldmluLnRpYW5AaW50ZWwuY29tPjsg
-a3ZtQHZnZXIua2VybmVsLm9yZzsgbGludXgtDQo+IGtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGFs
-ZXgud2lsbGlhbXNvbkByZWRoYXQuY29tOyBMdiwgWmhpeXVhbg0KPiA8emhpeXVhbi5sdkBpbnRl
-bC5jb20+OyBZdWFuLCBIYW5nIDxoYW5nLnl1YW5AaW50ZWwuY29tPjsgaW50ZWwtZ3Z0LQ0KPiBk
-ZXZAbGlzdHMuZnJlZWRlc2t0b3Aub3JnOyBXYW5nLCBaaGkgQSA8emhpLmEud2FuZ0BpbnRlbC5j
-b20+DQo+IFN1YmplY3Q6IFJFOiBbUkZDIFBBVENIIHYzIDAvNF0gRGVsaXZlciB2R1BVIGRpc3Bs
-YXkgdmJsYW5rIGV2ZW50IHRvDQo+IHVzZXJzcGFjZQ0KPiANCj4gDQo+IA0KPiA+IC0tLS0tT3Jp
-Z2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gRnJvbTogaW50ZWwtZ3Z0LWRldg0KPiA+IFttYWlsdG86
-aW50ZWwtZ3Z0LWRldi1ib3VuY2VzQGxpc3RzLmZyZWVkZXNrdG9wLm9yZ10gT24gQmVoYWxmIE9m
-IEdlcmQNCj4gPiBIb2ZmbWFubg0KPiA+IFNlbnQ6IEZyaWRheSwgSnVuZSAyOCwgMjAxOSAxOjQ0
-IFBNDQo+ID4gVG86IFpoZW55dSBXYW5nIDx6aGVueXV3QGxpbnV4LmludGVsLmNvbT4NCj4gPiBD
-YzogVGlhbiwgS2V2aW4gPGtldmluLnRpYW5AaW50ZWwuY29tPjsga3ZtQHZnZXIua2VybmVsLm9y
-ZzsgbGludXgtDQo+ID4ga2VybmVsQHZnZXIua2VybmVsLm9yZzsgWmhhbmcsIFRpbmEgPHRpbmEu
-emhhbmdAaW50ZWwuY29tPjsNCj4gPiBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbTsgTHYsIFpo
-aXl1YW4gPHpoaXl1YW4ubHZAaW50ZWwuY29tPjsgWXVhbiwNCj4gPiBIYW5nIDxoYW5nLnl1YW5A
-aW50ZWwuY29tPjsgaW50ZWwtZ3Z0LWRldkBsaXN0cy5mcmVlZGVza3RvcC5vcmc7IFdhbmcsDQo+
-ID4gWmhpIEEgPHpoaS5hLndhbmdAaW50ZWwuY29tPg0KPiA+IFN1YmplY3Q6IFJlOiBbUkZDIFBB
-VENIIHYzIDAvNF0gRGVsaXZlciB2R1BVIGRpc3BsYXkgdmJsYW5rIGV2ZW50IHRvDQo+ID4gdXNl
-cnNwYWNlDQo+ID4NCj4gPiBPbiBGcmksIEp1biAyOCwgMjAxOSBhdCAxMToyMTo0OUFNICswODAw
-LCBaaGVueXUgV2FuZyB3cm90ZToNCj4gPiA+IE9uIDIwMTkuMDYuMjcgMTI6MzE6MzMgKzAyMDAs
-IEdlcmQgSG9mZm1hbm4gd3JvdGU6DQo+ID4gPiA+ID4gPiAgIEhpLA0KPiA+ID4gPiA+ID4NCj4g
-PiA+ID4gPiA+ID4gSW5zdGVhZCBvZiBkZWxpdmVyaW5nIHBhZ2UgZmxpcCBldmVudHMsIHdlIGNo
-b29zZSB0byBwb3N0DQo+ID4gPiA+ID4gPiA+IGRpc3BsYXkgdmJsYW5rIGV2ZW50LiBIYW5kbGlu
-ZyBwYWdlIGZsaXAgZXZlbnRzIGZvciBib3RoDQo+ID4gPiA+ID4gPiA+IHByaW1hcnkgcGxhbmUg
-YW5kIGN1cnNvciBwbGFuZSBtYXkgbWFrZSB1c2VyIHNwYWNlIHF1aXRlDQo+ID4gPiA+ID4gPiA+
-IGJ1c3ksIGFsdGhvdWdoIHdlIGhhdmUgdGhlIG1hc2svdW5tYXNrIG1lY2hhbnNpbSBmb3INCj4g
-bWl0aWdhdGlvbi4NCj4gPiA+ID4gPiA+ID4gQmVzaWRlcywgdGhlcmUgYXJlIHNvbWUgY2FzZXMg
-dGhhdCBndWVzdCBhcHAgb25seSB1c2VzIG9uZQ0KPiA+IGZyYW1lYnVmZmVyIGZvciBib3RoIGRy
-YXdpbmcgYW5kIGRpc3BsYXkuDQo+ID4gPiA+ID4gPiA+IEluIHN1Y2ggY2FzZSwgZ3Vlc3QgT1Mg
-d29uJ3QgZG8gdGhlIHBsYW5lIHBhZ2UgZmxpcCB3aGVuIHRoZQ0KPiA+ID4gPiA+ID4gPiBmcmFt
-ZWJ1ZmZlciBpcyB1cGRhdGVkLCB0aHVzIHRoZSB1c2VyIGxhbmQgd29uJ3QgYmUgbm90aWZpZWQN
-Cj4gPiA+ID4gPiA+ID4gYWJvdXQgdGhlDQo+ID4gPiA+ID4gPiB1cGRhdGVkIGZyYW1lYnVmZmVy
-Lg0KPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+IFdoYXQgaGFwcGVucyB3aGVuIHRoZSBndWVzdCBp
-cyBpZGxlIGFuZCBkb2Vzbid0IGRyYXcgYW55dGhpbmcNCj4gPiA+ID4gPiA+IHRvIHRoZSBmcmFt
-ZWJ1ZmZlcj8NCj4gPiA+ID4gPiBUaGUgdmJsYW5rIGV2ZW50IHdpbGwgYmUgZGVsaXZlcmVkIHRv
-IHVzZXJzcGFjZSBhcyB3ZWxsLCB1bmxlc3MNCj4gPiA+ID4gPiBndWVzdCBPUw0KPiA+IGRpc2Fi
-bGUgdGhlIHBpcGUuDQo+ID4gPiA+ID4gRG9lcyBpdCBtYWtlIHNlbnNlIHRvIHZmaW8vZGlzcGxh
-eT8NCj4gPiA+ID4NCj4gPiA+ID4gR2V0dGluZyBub3RpZmllZCBvbmx5IGluIGNhc2UgdGhlcmUg
-YXJlIGFjdHVhbCBkaXNwbGF5IHVwZGF0ZXMNCj4gPiA+ID4gd291bGQgYmUgYSBuaWNlIG9wdGlt
-aXphdGlvbiwgYXNzdW1pbmcgdGhlIGhhcmR3YXJlIGlzIGFibGUgdG8gZG8gdGhhdC4NCj4gPiA+
-ID4gSWYgdGhlIGd1ZXN0IHBhZ2VmbGlwcyB0aGlzIGlzIG9idmlvdXNseSB0cml2aWFsLiAgTm90
-IHN1cmUgdGhpcw0KPiA+ID4gPiBpcyBwb3NzaWJsZSBpbiBjYXNlIHRoZSBndWVzdCByZW5kZXJz
-IGRpcmVjdGx5IHRvIHRoZSBmcm9udGJ1ZmZlci4NCj4gPiA+ID4NCj4gPiA+ID4gV2hhdCBleGFj
-dGx5IGhhcHBlbnMgd2hlbiB0aGUgZ3Vlc3QgT1MgZGlzYWJsZXMgdGhlIHBpcGU/ICBJcyBhDQo+
-ID4gPiA+IHZibGFuayBldmVudCBkZWxpdmVyZWQgYXQgbGVhc3Qgb25jZT8gIFRoYXQgd291bGQg
-YmUgdmVyeSB1c2VmdWwNCj4gPiA+ID4gYmVjYXVzZSBpdCB3aWxsIGJlIHBvc3NpYmxlIGZvciB1
-c2Vyc3BhY2UgdG8gc3RvcCBwb2xsaW5nDQo+ID4gPiA+IGFsdG9nZXRoZXIgd2l0aG91dCBtaXNz
-aW5nIHRoZSAiZ3Vlc3QgZGlzYWJsZWQgcGlwZSIgZXZlbnQuDQo+ID4gPiA+DQo+ID4gPg0KPiA+
-ID4gSXQgbG9va3MgbGlrZSBwdXJwb3NlIHRvIHVzZSB2YmxhbmsgaGVyZSBpcyB0byByZXBsYWNl
-IHVzZXIgc3BhY2UNCj4gPiA+IHBvbGxpbmcgdG90YWxseSBieSBrZXJuZWwgZXZlbnQ/IFdoaWNo
-IGp1c3QgYWN0IGFzIGRpc3BsYXkgdXBkYXRlDQo+ID4gPiBldmVudCB0byByZXBsYWNlIHVzZXIg
-c3BhY2UgdGltZXIgdG8gbWFrZSBpdCBxdWVyeSBhbmQgdXBkYXRlIHBsYW5lcz8NCj4gPg0KPiA+
-IEkgdGhpbmsgaXQgbWFrZXMgc2Vuc2UgdG8gZGVzaWduIGl0IHRoYXQgd2F5LCBzbyB1c2Vyc3Bh
-Y2Ugd2lsbCBlaXRoZXINCj4gPiB1c2UgdGhlIGV2ZW50cyAod2hlbiBzdXBwb3J0ZWQgYnkgdGhl
-IGRyaXZlcikgb3IgYSB0aW1lciAoZmFsbGJhY2sgaWYNCj4gPiBub3QpIGJ1dCBub3QgYm90aC4N
-Cj4gPg0KPiA+ID4gQWx0aG91Z2ggaW4gdGhlb3J5IHZibGFuayBpcyBub3QgYXBwcm9wcmlhdGUg
-Zm9yIHRoaXMgd2hpY2ggZG9lc24ndA0KPiA+ID4gYWxpZ24gd2l0aCBwbGFuZSB1cGRhdGUgb3Ig
-cG9zc2libGUgZnJvbnQgYnVmZmVyIHJlbmRlcmluZyBhdCBhbGwsDQo+ID4gPiBidXQgbG9va3Mg
-aXQncyBqdXN0IGEgY29tcHJvbWlzZSBlLmcgbm90IHNlbmRpbmcgZXZlbnQgZm9yIGV2ZXJ5DQo+
-ID4gPiBjdXJzb3IgcG9zaXRpb24gY2hhbmdlLCBldGMuDQo+ID4gPg0KPiA+ID4gSSB0aGluayB3
-ZSBuZWVkIHRvIGRlZmluZSBzZW1hbnRpY3MgZm9yIHRoaXMgZXZlbnQgcHJvcGVybHksIGUuZw0K
-PiA+ID4gdXNlciBzcGFjZSBwdXJlbHkgZGVwZW5kcyBvbiB0aGlzIGV2ZW50IGZvciBkaXNwbGF5
-IHVwZGF0ZSwgdGhlDQo+ID4gPiBvcHBvcnR1bml0eSBmb3IgaXNzdWluZyB0aGlzIGV2ZW50IGlz
-IGNvbnRyb2xsZWQgYnkgZHJpdmVyIHdoZW4gaXQncw0KPiA+ID4gbmVjZXNzYXJ5IGZvciB1cGRh
-dGUsIGV0Yy4gRGVmaW5pdGVseSBub3QgbmFtZWQgYXMgdmJsYW5rIGV2ZW50IG9yDQo+ID4gPiBv
-bmx5IGlzc3VlIGF0IHZibGFuaywgdGhhdCBuZWVkIHRvIGhhcHBlbiBmb3Igb3RoZXIgcGxhbmUg
-Y2hhbmdlIHRvby4NCj4gPg0KPiA+IEkgdGhpbmsgaXQgc2hvdWxkIGJlICJkaXNwbGF5IHVwZGF0
-ZSBub3RpZmljYXRpb24iLCBpLmUuIHVzZXJzcGFjZQ0KPiA+IHNob3VsZCBjaGVjayBmb3IgcGxh
-bmUgY2hhbmdlcyBhbmQgdXBkYXRlIHRoZSBkaXNwbGF5Lg0KPiA+DQo+ID4gTW9zdCBldmVudHMg
-d2lsbCBwcm9iYWJseSBjb21lIGZyb20gdmJsYW5rICh0eXBpY2FsbHkgcGxhbmUgdXBkYXRlIGFy
-ZQ0KPiA+IGFjdHVhbGx5IGNvbW1pdHRlZCBhdCB2YmxhbmsgdGltZSB0byBhdm9pZCB0ZWFyaW5n
-LCByaWdodD8pLiAgVGhhdCBpcw0KPiA+IGFuDQo+IFllcy4NCj4gPiBpbXBsZW1lbnRhdGlvbiBk
-ZXRhaWwgdGhvdWdoLg0KPiANCj4gV2UgaGF2ZSB0d28gV0lQIGJyYW5jaGVzOiBvbmUgaXMgZm9y
-IHZibGFuayBldmVudCBkZWxpdmVyeSBhbmQgdGhlIG90aGVyDQo+IG9uZSBpcyBmb3IgcGFnZSBm
-bGlwIGV2ZW50IGRlbGl2ZXJ5Lg0KPiBSZXBvOg0KPiAtIFFFTVU6IGh0dHBzOi8vZ2l0aHViLmNv
-bS9pbnRlbC9JZ3Z0Zy1xZW11LmdpdA0KPiAtIEtlcm5lbDogaHR0cHM6Ly9naXRodWIuY29tL2lu
-dGVsL2d2dC1saW51eC5naXQNCj4gVHdvIGJyYW5jaGVzOiB0b3BpYy91c2Vyc3BhY2VfZGlyZWN0
-X2ZsaXBfcGFnZV9ldmVudCBhbmQNCj4gdG9waWMvdXNlcnNwYWNlX2RpcmVjdF9mbGlwX3ZibGFu
-a19ldmVudA0KPiANCj4gV2l0aCBHVEsgVUksIHRoZSB1c2VyIGV4cGVyaWVuY2UgaXMgYmFkIG9u
-IGJyYW5jaA0KPiB0b3BpYy91c2Vyc3BhY2VfZGlyZWN0X2ZsaXBfcGFnZV9ldmVudCwgYXMgbW9z
-dCBvZiB0aGUgQ1BVIGVmZm9ydHMgYXJlDQo+IHNwZW50IG9uIGV2ZW50IGhhbmRsaW5nIGluIHVz
-ZXIgc3BhY2UuDQo+IEhvd2V2ZXIsIHdpdGggdGhlIERSTSBVSSBib3RoIG9mIHRoZSB0d28gYnJh
-bmNoZXMgaGF2ZSBnb29kIHVzZXINCj4gZXhwZXJpZW5jZSwgYXMgdGhlIGV2ZW50IGhhbmRsaW5n
-IGluIERSTSBVSSBpcyBwcmV0dHkgc2ltcGxlLg0KPiANCj4gVGhhbmtzLg0KPiANCj4gQlIsDQo+
-IFRpbmENCj4gDQo+ID4NCj4gPiBjaGVlcnMsDQo+ID4gICBHZXJkDQo+ID4NCj4gPiBfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KPiA+IGludGVsLWd2dC1k
-ZXYgbWFpbGluZyBsaXN0DQo+ID4gaW50ZWwtZ3Z0LWRldkBsaXN0cy5mcmVlZGVza3RvcC5vcmcN
-Cj4gPiBodHRwczovL2xpc3RzLmZyZWVkZXNrdG9wLm9yZy9tYWlsbWFuL2xpc3RpbmZvL2ludGVs
-LWd2dC1kZXYNCg==
+
+
+On 06/27/2019 05:14 AM, Cornelia Huck wrote:
+> On Mon, 24 Jun 2019 11:24:16 -0400
+> Farhan Ali <alifm@linux.ibm.com> wrote:
+> 
+>> On 06/24/2019 11:09 AM, Cornelia Huck wrote:
+>>> On Mon, 24 Jun 2019 10:44:17 -0400
+>>> Farhan Ali <alifm@linux.ibm.com> wrote:
+> 
+>>>> But even if we don't remove the cp_free from vfio_ccw_sch_io_todo, I am
+>>>> not sure if your suggestion will fix the problem. The problem here is
+>>>> that we can call vfio_ccw_sch_io_todo (for a clear or halt interrupt) at
+>>>> the same time we are handling an ssch request. So depending on the order
+>>>> of the operations we could still end up calling cp_free from both from
+>>>> threads (i refer to the threads I mentioned in response to Eric's
+>>>> earlier email).
+>>>
+>>> What I don't see is why this is a problem with ->initialized; wasn't
+>>> the problem that we misinterpreted an interrupt for csch as one for a
+>>> not-yet-issued ssch?
+>>>    
+>>
+>> It's the order in which we do things, which could cause the problem.
+>> Since we queue interrupt handling in the workqueue, we could delay
+>> processing the csch interrupt. During this delay if ssch comes through,
+>> we might have already set ->initialized to true.
+>>
+>> So when we get around to handling the interrupt in io_todo, we would go
+>> ahead and call cp_free. This would cause the problem of freeing the
+>> ccwchain list while we might be adding to it.
+>>
+>>>>
+>>>> Another thing that concerns me is that vfio-ccw can also issue csch/hsch
+>>>> in the quiesce path, independently of what the guest issues. So in that
+>>>> case we could have a similar scenario to processing an ssch request and
+>>>> issuing halt/clear in parallel. But maybe I am being paranoid :)
+>>>
+>>> I think the root problem is really trying to clear a cp while another
+>>> thread is trying to set it up. Should we maybe use something like rcu?
+>>>
+>>>    
+>>
+>> Yes, this is the root problem. I am not too familiar with rcu locking,
+>> but what would be the benefit over a traditional mutex?
+> 
+> I don't quite remember what I had been envisioning at the time (sorry,
+> the heat seems to make my brain a bit slushy :/), but I think we might
+> have two copies of the cp and use an rcu-ed pointer in the private
+> structure to point to one of the copies. If we make sure we've
+> synchronized on the pointer at interrupt time, we should be able to
+> free the old one in _todo and act on the new on when doing ssch. And
+> yes, I realize that this is awfully vague :)
+> 
+> 
+
+Sorry for the delayed response. I was trying out few ideas, and I think 
+the simplest one for me that worked and that makes sense is to 
+explicitly add the check to see if the state == CP_PENDING when trying 
+to free the cp (as mentioned by Halil in a separate thread).
+
+When we are in the CP_PENDING state then we know for sure that we have a 
+currently allocated cp and no other thread is working on it. So in the 
+interrupt context, it should be okay to free cp.
+
+I have prototyped with the mutex, but the code becomes too hairy. I 
+looked into the rcu api and from what I understand about rcu it would 
+provide advantage if we more readers than updaters. But in our case we 
+really have 2 updaters, updating the cp at the same time.
+
+In the meantime I also have some minor fixes while going over the code 
+again :). I will post a v2 soon for review.
+
+Thanks
+Farhan
+
