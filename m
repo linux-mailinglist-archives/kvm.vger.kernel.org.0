@@ -2,80 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 07CD959A31
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 14:13:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E0BFE59B99
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 14:37:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726849AbfF1MMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Jun 2019 08:12:37 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:58240 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726706AbfF1MMg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Jun 2019 08:12:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=BRhHz3Zw8Cudo+QmQC79lXuaDoT+57RtewzsL6NN1jA=; b=RnhO1Y33qlk3+N8twDif0uUGKV
-        hfM9jNrow1RIXLXTJGSHGwv2o8UT07u1QkJ9ROOanEeYXEC15ayTlvgxNzh2Y4tp3aOWt51EQswyv
-        QJuQZ1ea8GxpR/YDlpX3SIHuzR/i7tIixU2GDIgDqdyHmG3urPlPb9y2GguLjzc7rv1UPbAyYhfVC
-        Zh6WW/DAd6aKzNAZ/1RuZillWWpptj2Vjd6SUE/JPLf0cRGqBJz9/EkeDWTYT6ACiHuzXqWUIxNcI
-        sfW0dmw5aYj73gGrBixatipnQCjuiYJvi1IfOwk1eX5eGEhutDprBwOXsiELSOpB/2eYWBwBq/quu
-        VnaTGczw==;
-Received: from [186.213.242.156] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hgpk3-0005BX-Am; Fri, 28 Jun 2019 12:12:35 +0000
-Received: from mchehab by bombadil.infradead.org with local (Exim 4.92)
-        (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1hgpk0-0004zf-B8; Fri, 28 Jun 2019 09:12:32 -0300
-From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Mauro Carvalho Chehab <mchehab@infradead.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Subject: [PATCH 6/9] docs: virtual: there are two orphan docs there
-Date:   Fri, 28 Jun 2019 09:12:28 -0300
-Message-Id: <9cbd8c9704ed264c133dc7bd310ede56d1e9c836.1561723736.git.mchehab+samsung@kernel.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <cover.1561723736.git.mchehab+samsung@kernel.org>
-References: <cover.1561723736.git.mchehab+samsung@kernel.org>
+        id S1726883AbfF1MhR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Jun 2019 08:37:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38734 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726578AbfF1MhP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Jun 2019 08:37:15 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8D9CE87633;
+        Fri, 28 Jun 2019 12:37:10 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-117-102.ams2.redhat.com [10.36.117.102])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 950825DA96;
+        Fri, 28 Jun 2019 12:37:00 +0000 (UTC)
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     netdev@vger.kernel.org
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/3] vsock/virtio: several fixes in the .probe() and .remove()
+Date:   Fri, 28 Jun 2019 14:36:56 +0200
+Message-Id: <20190628123659.139576-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Fri, 28 Jun 2019 12:37:15 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
----
- Documentation/virtual/kvm/amd-memory-encryption.rst | 2 ++
- Documentation/virtual/kvm/vcpu-requests.rst         | 2 ++
- 2 files changed, 4 insertions(+)
+During the review of "[PATCH] vsock/virtio: Initialize core virtio vsock
+before registering the driver", Stefan pointed out some possible issues
+in the .probe() and .remove() callbacks of the virtio-vsock driver.
 
-diff --git a/Documentation/virtual/kvm/amd-memory-encryption.rst b/Documentation/virtual/kvm/amd-memory-encryption.rst
-index d18c97b4e140..6c37ff9a0a3c 100644
---- a/Documentation/virtual/kvm/amd-memory-encryption.rst
-+++ b/Documentation/virtual/kvm/amd-memory-encryption.rst
-@@ -1,3 +1,5 @@
-+:orphan:
-+
- ======================================
- Secure Encrypted Virtualization (SEV)
- ======================================
-diff --git a/Documentation/virtual/kvm/vcpu-requests.rst b/Documentation/virtual/kvm/vcpu-requests.rst
-index 5feb3706a7ae..c1807a1b92e6 100644
---- a/Documentation/virtual/kvm/vcpu-requests.rst
-+++ b/Documentation/virtual/kvm/vcpu-requests.rst
-@@ -1,3 +1,5 @@
-+:orphan:
-+
- =================
- KVM VCPU Requests
- =================
+This series tries to solve these issues:
+- Patch 1 adds RCU critical sections to avoid use-after-free of
+  'the_virtio_vsock' pointer.
+- Patch 2 stops workers before to call vdev->config->reset(vdev) to
+  be sure that no one is accessing the device.
+- Patch 3 moves the works flush at the end of the .remove() to avoid
+  use-after-free of 'vsock' object.
+
+v2:
+- Patch 1: use RCU to protect 'the_virtio_vsock' pointer
+- Patch 2: no changes
+- Patch 3: flush works only at the end of .remove()
+- Removed patch 4 because virtqueue_detach_unused_buf() returns all the buffers
+  allocated.
+
+v1: https://patchwork.kernel.org/cover/10964733/
+
+Stefano Garzarella (3):
+  vsock/virtio: use RCU to avoid use-after-free on the_virtio_vsock
+  vsock/virtio: stop workers during the .remove()
+  vsock/virtio: fix flush of works during the .remove()
+
+ net/vmw_vsock/virtio_transport.c | 131 ++++++++++++++++++++++++-------
+ 1 file changed, 102 insertions(+), 29 deletions(-)
+
 -- 
-2.21.0
+2.20.1
 
