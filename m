@@ -2,92 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E49758E11
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 00:39:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C27E58F91
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2019 03:14:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726672AbfF0Wjy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Jun 2019 18:39:54 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:60004 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726463AbfF0Wjy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Jun 2019 18:39:54 -0400
-Received: from p5b06daab.dip0.t-ipconnect.de ([91.6.218.171] helo=nanos)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1hgd3D-0001yR-93; Fri, 28 Jun 2019 00:39:31 +0200
-Date:   Fri, 28 Jun 2019 00:39:30 +0200 (CEST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Dmitry Safonov <dima@arista.com>
-cc:     linux-kernel@vger.kernel.org,
-        Dmitry Safonov <0x7f454c46@gmail.com>,
-        Prasanna Panchamukhi <panchamukhi@arista.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Cathy Avery <cavery@redhat.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        "Michael Kelley (EOSG)" <Michael.H.Kelley@microsoft.com>,
-        Mohammed Gamal <mmorsy@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        =?ISO-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
-        Roman Kagan <rkagan@virtuozzo.com>,
-        Sasha Levin <sashal@kernel.org>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        devel@linuxdriverproject.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCHv2] x86/hyperv: Hold cpus_read_lock() on assigning
- reenlightenment vector
-In-Reply-To: <20190617163955.25659-1-dima@arista.com>
-Message-ID: <alpine.DEB.2.21.1906280033510.32342@nanos.tec.linutronix.de>
-References: <20190617163955.25659-1-dima@arista.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        id S1726657AbfF1BOl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Jun 2019 21:14:41 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:52498 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726605AbfF1BOl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Jun 2019 21:14:41 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id D1238800C514BC90051C;
+        Fri, 28 Jun 2019 09:14:38 +0800 (CST)
+Received: from localhost.localdomain (10.67.212.75) by
+ DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
+ 14.3.439.0; Fri, 28 Jun 2019 09:14:35 +0800
+From:   Yunsheng Lin <linyunsheng@huawei.com>
+To:     <davem@davemloft.net>
+CC:     <hkallweit1@gmail.com>, <gregkh@linuxfoundation.org>,
+        <tglx@linutronix.de>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <pbonzini@redhat.com>,
+        <rkrcmar@redhat.com>, <kvm@vger.kernel.org>
+Subject: [PATCH v3 net-next] net: link_watch: prevent starvation when processing linkwatch wq
+Date:   Fri, 28 Jun 2019 09:13:19 +0800
+Message-ID: <1561684399-235123-1-git-send-email-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+Content-Type: text/plain
+X-Originating-IP: [10.67.212.75]
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 17 Jun 2019, Dmitry Safonov wrote:
-> @@ -196,7 +196,16 @@ void set_hv_tscchange_cb(void (*cb)(void))
->  	/* Make sure callback is registered before we write to MSRs */
->  	wmb();
->  
-> +	/*
-> +	 * As reenlightenment vector is global, there is no difference which
-> +	 * CPU will register MSR, though it should be an online CPU.
-> +	 * hv_cpu_die() callback guarantees that on CPU teardown
-> +	 * another CPU will re-register MSR back.
-> +	 */
-> +	cpus_read_lock();
-> +	re_ctrl.target_vp = hv_vp_index[raw_smp_processor_id()];
->  	wrmsrl(HV_X64_MSR_REENLIGHTENMENT_CONTROL, *((u64 *)&re_ctrl));
-> +	cpus_read_unlock();
+When user has configured a large number of virtual netdev, such
+as 4K vlans, the carrier on/off operation of the real netdev
+will also cause it's virtual netdev's link state to be processed
+in linkwatch. Currently, the processing is done in a work queue,
+which may cause rtnl locking starvation problem and worker
+starvation problem for other work queue, such as irqfd_inject wq.
 
-Should work
+This patch releases the cpu when link watch worker has processed
+a fixed number of netdev' link watch event, and schedule the
+work queue again when there is still link watch event remaining.
 
->  	wrmsrl(HV_X64_MSR_TSC_EMULATION_CONTROL, *((u64 *)&emu_ctrl));
->  }
->  EXPORT_SYMBOL_GPL(set_hv_tscchange_cb);
-> @@ -239,6 +248,7 @@ static int hv_cpu_die(unsigned int cpu)
->  
->  	rdmsrl(HV_X64_MSR_REENLIGHTENMENT_CONTROL, *((u64 *)&re_ctrl));
->  	if (re_ctrl.target_vp == hv_vp_index[cpu]) {
-> +		lockdep_assert_cpus_held();
+Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+---
+V2: use cond_resched and rtnl_unlock after processing a fixed
+    number of events
+V3: fall back to v1 and change commit log to reflect that.
+---
+---
+ net/core/link_watch.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-So you're not trusting the hotplug core code to hold the lock when it
-brings a CPU down and invokes that callback? Come on
+diff --git a/net/core/link_watch.c b/net/core/link_watch.c
+index 04fdc95..f153e06 100644
+--- a/net/core/link_watch.c
++++ b/net/core/link_watch.c
+@@ -163,9 +163,16 @@ static void linkwatch_do_dev(struct net_device *dev)
+ 
+ static void __linkwatch_run_queue(int urgent_only)
+ {
++#define MAX_DO_DEV_PER_LOOP	100
++
++	int do_dev = MAX_DO_DEV_PER_LOOP;
+ 	struct net_device *dev;
+ 	LIST_HEAD(wrk);
+ 
++	/* Give urgent case more budget */
++	if (urgent_only)
++		do_dev += MAX_DO_DEV_PER_LOOP;
++
+ 	/*
+ 	 * Limit the number of linkwatch events to one
+ 	 * per second so that a runaway driver does not
+@@ -184,7 +191,7 @@ static void __linkwatch_run_queue(int urgent_only)
+ 	spin_lock_irq(&lweventlist_lock);
+ 	list_splice_init(&lweventlist, &wrk);
+ 
+-	while (!list_empty(&wrk)) {
++	while (!list_empty(&wrk) && do_dev > 0) {
+ 
+ 		dev = list_first_entry(&wrk, struct net_device, link_watch_list);
+ 		list_del_init(&dev->link_watch_list);
+@@ -195,9 +202,13 @@ static void __linkwatch_run_queue(int urgent_only)
+ 		}
+ 		spin_unlock_irq(&lweventlist_lock);
+ 		linkwatch_do_dev(dev);
++		do_dev--;
+ 		spin_lock_irq(&lweventlist_lock);
+ 	}
+ 
++	/* Add the remaining work back to lweventlist */
++	list_splice_init(&wrk, &lweventlist);
++
+ 	if (!list_empty(&lweventlist))
+ 		linkwatch_schedule_work(0);
+ 	spin_unlock_irq(&lweventlist_lock);
+-- 
+2.8.1
 
->  		/* Reassign to some other online CPU */
->  		new_cpu = cpumask_any_but(cpu_online_mask, cpu);
-
-Thanks,
-
-	tglx
