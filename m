@@ -2,88 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 454FC5AC9A
-	for <lists+kvm@lfdr.de>; Sat, 29 Jun 2019 18:45:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63BCE5ACAA
+	for <lists+kvm@lfdr.de>; Sat, 29 Jun 2019 19:11:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726892AbfF2Qpf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 29 Jun 2019 12:45:35 -0400
-Received: from smtprelay0042.hostedemail.com ([216.40.44.42]:48378 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726837AbfF2Qpe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 29 Jun 2019 12:45:34 -0400
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay08.hostedemail.com (Postfix) with ESMTP id 72872182CF666;
-        Sat, 29 Jun 2019 16:45:32 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-Spam-Summary: 2,0,0,,d41d8cd98f00b204,joe@perches.com,:::::::::::::::::::::::::::::::::::::::,RULES_HIT:41:355:379:599:800:960:968:973:982:988:989:1260:1277:1311:1313:1314:1345:1359:1431:1437:1515:1516:1518:1534:1541:1593:1594:1711:1730:1747:1777:1792:2393:2553:2559:2562:2828:3138:3139:3140:3141:3142:3353:3622:3865:3866:3867:3868:3870:3871:3872:3874:4037:4321:5007:6742:10004:10400:10848:10967:11232:11658:11914:12043:12297:12663:12740:12760:12895:13069:13138:13231:13311:13357:13439:14096:14097:14181:14659:14721:21080:21433:21627:30034:30054:30070:30090:30091,0,RBL:23.242.196.136:@perches.com:.lbl8.mailshell.net-62.14.0.180 64.201.201.201,CacheIP:none,Bayesian:0.5,0.5,0.5,Netcheck:none,DomainCache:0,MSF:not bulk,SPF:fn,MSBL:0,DNSBL:neutral,Custom_rules:0:0:0,LFtime:24,LUA_SUMMARY:none
-X-HE-Tag: wood26_67b7f2b025644
-X-Filterd-Recvd-Size: 3038
-Received: from XPS-9350 (cpe-23-242-196-136.socal.res.rr.com [23.242.196.136])
-        (Authenticated sender: joe@perches.com)
-        by omf01.hostedemail.com (Postfix) with ESMTPA;
-        Sat, 29 Jun 2019 16:45:12 +0000 (UTC)
-Message-ID: <c3b83ba7f9b003dd4fb9cad885461ce93165dc04.camel@perches.com>
-Subject: Re: [PATCH V2] include: linux: Regularise the use of FIELD_SIZEOF
- macro
-From:   Joe Perches <joe@perches.com>
-To:     Alexey Dobriyan <adobriyan@gmail.com>,
-        Andreas Dilger <adilger@dilger.ca>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Shyam Saini <shyam.saini@amarulasolutions.com>,
-        kernel-hardening@lists.openwall.com, linux-kernel@vger.kernel.org,
-        keescook@chromium.org, linux-arm-kernel@lists.infradead.org,
-        linux-mips@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        netdev@vger.kernel.org, linux-ext4 <linux-ext4@vger.kernel.org>,
-        devel@lists.orangefs.org, linux-mm@kvack.org,
-        linux-sctp@vger.kernel.org, bpf@vger.kernel.org,
-        kvm@vger.kernel.org, mayhs11saini@gmail.com
-Date:   Sat, 29 Jun 2019 09:45:10 -0700
-In-Reply-To: <20190629142510.GA10629@avx2>
-References: <20190611193836.2772-1-shyam.saini@amarulasolutions.com>
-         <20190611134831.a60c11f4b691d14d04a87e29@linux-foundation.org>
-         <6DCAE4F8-3BEC-45F2-A733-F4D15850B7F3@dilger.ca>
-         <20190629142510.GA10629@avx2>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.30.5-0ubuntu0.18.10.1 
+        id S1726864AbfF2RJq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 29 Jun 2019 13:09:46 -0400
+Received: from mout.web.de ([212.227.17.12]:56611 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726837AbfF2RJp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 29 Jun 2019 13:09:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+        s=dbaedf251592; t=1561828180;
+        bh=4g8o7N9kO6/TudrbsrFQpqNziwZxgieXoxJSedctBCI=;
+        h=X-UI-Sender-Class:To:Cc:From:Subject:Date;
+        b=sfNEpmNBMoIX/K+Uisxi3Ya/l+My1swXKylpdMbrq35CkiWG/f5oVsqZnCSTmf7BQ
+         AXLXIfUthpTsrjyFbrLY/3gIEzepLMaJguZsL/whXWNBVJzcjqT8PMTIsn8MD/tmE2
+         IP5eo2g/KA9AeL6i+UmZyNYYEtFBmVbhzz52Z/fs=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.10] ([95.157.54.22]) by smtp.web.de (mrweb102
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0LilNJ-1iH9RO2mSL-00cvOE; Sat, 29
+ Jun 2019 19:09:39 +0200
+To:     kvmarm@lists.cs.columbia.edu, kvm <kvm@vger.kernel.org>
+Cc:     Marc Zyngier <marc.zyngier@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>
+From:   Jan Kiszka <jan.kiszka@web.de>
+Subject: KVM works on RPi4
+Message-ID: <1d1198c2-f362-840d-cb14-9a6d74da745c@web.de>
+Date:   Sat, 29 Jun 2019 19:09:37 +0200
+User-Agent: Mozilla/5.0 (X11; U; Linux i686 (x86_64); de; rv:1.8.1.12)
+ Gecko/20080226 SUSE/2.0.0.12-1.1 Thunderbird/2.0.0.12 Mnenhy/0.7.5.666
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:lJD3HwWiZIS+ktns/En0V1mv1r5HAF8MxcHtk5MRNm8fyWiwNx2
+ AAJ53ExrLi73373hHIUUxkiK8V9+/XHf+OmbIfejE4tvuQ5+ow8PLoiqYF86E5rETuFsdpy
+ UVzLU+5wXGoAuJmxfWHebctALWafJy7T246ZR9OdeL60ZnqocmAYqXzfSGamSWdkGo5d8On
+ M+Q8o6k73zOrp1MxTqvfg==
+X-Spam-Flag: NO
+X-UI-Out-Filterresults: notjunk:1;V03:K0:N1G+NOT5bLE=:Uu0c0qqlJCTJ3qaS0/fxEg
+ FMSSZfijxJ8IP0xIjG69+/FoGbBPHVeWBgGpqKm+MqruY1oWDjFxT3VqFWSZvuPV8jfWcW0Vq
+ HaKF0qn528u0ApAF5Kim5YqnUyMhvSHEi4q3UuzvrSzuPnMCfzQh8k2bVCnjXJC1hoiihPvdI
+ HDSBdHsk1fP11xuTWx9o6gctW5cNKvPF1L4/EX4TduTHQvQtaidIRKZYOxDpx+GEGlhETo++v
+ LKtzjz+m6uSv6nrhxLT6+GHH68Pgs2JhCRmYRne5BU8u6k/9+TvyGAnexoG8+p3nnfP72l1qj
+ rnV2pFX4xMd+GY3gNUeU2pS1WQz1tUFz3X7nnfvueBEVacbo8LXBHgkPVxDTOkgd+C7phfAXF
+ oTwdhCAOf/VsPaVQ6YYOjvCtrxk2Tjd02LaevOTwDi/SoSyFwcon6K2ZbXUnNcLF7k4NvpkFI
+ dvusxL+I5OGkzt9iXrJy9cSqVxJglwvVgQIDoeUcwYeMS5BE//8gKkPCYUarn0v0V3MSHIQWE
+ ZhYH8oDXVR5rcs5RlsMKFCH6lnhqmKeOynJakjNrWgpiCpqhX/LrAYcXyYh39CUn99kY0RHW6
+ RHi5EwmZZiy6v5LVhMqPeFtqns5opVKmoTWwdk4ej0LLXYKM53PpjG6fHbF8dnHb4J1Aj6hRE
+ iVuneiPnyXRYKh6uaO6oBfbzyM9otpTTMlly+3jz/GP38VMOikJvSbPdiTG6pLBIu5Q8j2UzF
+ AJXd+9CN3ClsLwncpmNDAIbV2eidYyOfCqofzBcSlvo2ohsgi8kP2TBiseqKWmPEXQFNDeqit
+ pzmyT88zqj90Rs6TNLYBFop2C5oqQB4xIiCaxDj6r7V0EGBIBD2Rndmfxg0Me0akRj+TKhwVR
+ zkxgdQ3PVf8lCbZBjggvM9afVoPg5pjLEOJ10uv6EQUUHDjFqDxylpFhnCS/UoNVHsLfbO0U4
+ eKMBARa7w4V4UIl5G7vUT52pnXhZnGOb9YvhQqOGCbe+2B28lAlfFoWcAXZl0wy8B3yFkw6Rz
+ kzQN0Ah81whB5uwL0l2GoPVsXNzIdaqgbZNfzi8XDhGhwxC/rxWad8uY5hzG+1n3GDt4MpDn7
+ 2DALFF0IlGyjsG7cMTOHFuFtLsNeod87G2F
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 2019-06-29 at 17:25 +0300, Alexey Dobriyan wrote:
-> On Tue, Jun 11, 2019 at 03:00:10PM -0600, Andreas Dilger wrote:
-> > On Jun 11, 2019, at 2:48 PM, Andrew Morton <akpm@linux-foundation.org> wrote:
-> > > On Wed, 12 Jun 2019 01:08:36 +0530 Shyam Saini <shyam.saini@amarulasolutions.com> wrote:
-> > I did a check, and FIELD_SIZEOF() is used about 350x, while sizeof_field()
-> > is about 30x, and SIZEOF_FIELD() is only about 5x.
-> > 
-> > That said, I'm much more in favour of "sizeof_field()" or "sizeof_member()"
-> > than FIELD_SIZEOF().  Not only does that better match "offsetof()", with
-> > which it is closely related, but is also closer to the original "sizeof()".
-> > 
-> > Since this is a rather trivial change, it can be split into a number of
-> > patches to get approval/landing via subsystem maintainers, and there is no
-> > huge urgency to remove the original macros until the users are gone.  It
-> > would make sense to remove SIZEOF_FIELD() and sizeof_field() quickly so
-> > they don't gain more users, and the remaining FIELD_SIZEOF() users can be
-> > whittled away as the patches come through the maintainer trees.
-> 
-> The signature should be
-> 
-> 	sizeof_member(T, m)
-> 
-> it is proper English,
-> it is lowercase, so is easier to type,
-> it uses standard term (member, not field),
-> it blends in with standard "sizeof" operator,
+Hi all,
 
-yes please.
+just got KVM running on the Raspberry Pi4. Seems they now embedded all
+required logic into that new SoC.
 
-Also, a simple script conversion applied
-immediately after an rc1 might be easiest
-rather than individual patches.
+However, as the Raspberry kernel is not yet ready for 64-bit (and
+upstream is not in sight), I had to use legacy 32-bit mode. And there we
+stumble over the core detection. This little patch made it work, though:
 
+diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
+index 2b8de885b2bf..01606aad73cc 100644
+--- a/arch/arm/kvm/guest.c
++++ b/arch/arm/kvm/guest.c
+@@ -290,6 +290,7 @@ int __attribute_const__ kvm_target_cpu(void)
+ 	case ARM_CPU_PART_CORTEX_A7:
+ 		return KVM_ARM_TARGET_CORTEX_A7;
+ 	case ARM_CPU_PART_CORTEX_A15:
++	case ARM_CPU_PART_CORTEX_A72:
+ 		return KVM_ARM_TARGET_CORTEX_A15;
+ 	default:
+ 		return -EINVAL;
 
+That raises the question if this is hack or a valid change and if there
+is general interest in mapping 64-bit cores on 32-bit if they happen to
+run in 32-bit mode.
+
+Jan
+
+PS: The RPi device tree lacks description of the GICH maintenance
+interrupts. Seems KVM is fine without that - because it has the
+information hard-coded or because it can live without that interrupt?
