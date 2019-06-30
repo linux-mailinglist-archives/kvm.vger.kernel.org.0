@@ -2,195 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CEF75B05A
-	for <lists+kvm@lfdr.de>; Sun, 30 Jun 2019 17:19:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6B935B08B
+	for <lists+kvm@lfdr.de>; Sun, 30 Jun 2019 18:19:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726557AbfF3PTK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Jun 2019 11:19:10 -0400
-Received: from mout.web.de ([212.227.15.4]:59785 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726500AbfF3PTK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 30 Jun 2019 11:19:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1561907945;
-        bh=1hzO1yqzuoU2fg4Q62rIyXmu6NICF9gBDI9a9A6JwII=;
-        h=X-UI-Sender-Class:To:Cc:From:Subject:Date;
-        b=pVCmD1l5uDu3WLPNPKm/whdFq6I0+2mJNVv/+ad2kSC6P529pHX4kSqudpJNreQGd
-         MrP/bI1lNh5Kijk8L+jAKocefQV6loNePWpyepm54aBe62NVJEZtIoWTrPDybuVm2t
-         1Q5SEKGqGi+A+DP/uhV68DuM3vMlXEWSopvmchI0=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.10] ([95.157.54.22]) by smtp.web.de (mrweb003
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0LkPmd-1iFIWo0xdj-00cUJS; Sun, 30
- Jun 2019 17:19:05 +0200
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        kvmarm <kvmarm@lists.cs.columbia.edu>
-Cc:     kvm <kvm@vger.kernel.org>,
-        Christoffer Dall <christoffer.dall@arm.com>
-From:   Jan Kiszka <jan.kiszka@web.de>
-Subject: [PATCH] kvm: arm: Promote KVM_ARM_TARGET_CORTEX_A7 to generic V7 core
-Message-ID: <b486cb75-4b8e-c847-a019-81e822223fb6@web.de>
-Date:   Sun, 30 Jun 2019 17:19:04 +0200
-User-Agent: Mozilla/5.0 (X11; U; Linux i686 (x86_64); de; rv:1.8.1.12)
- Gecko/20080226 SUSE/2.0.0.12-1.1 Thunderbird/2.0.0.12 Mnenhy/0.7.5.666
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        id S1726617AbfF3QTv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Jun 2019 12:19:51 -0400
+Received: from mail-eopbgr800077.outbound.protection.outlook.com ([40.107.80.77]:23808
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726520AbfF3QTv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 30 Jun 2019 12:19:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=34g7r27o4aZkGzZ0SrpnDYOutRqJR8LCtIXpwMYWBmg=;
+ b=0IUNIBpyuQBB7BJf23G1osRrrsJUMM7Xx/oFBaJvcpCYgsRl+cnzD8T1PeXVa/AUJsUPnnQP4hrMWuPz3Ist7uf+1LTYVAq4ecekyvln7thVFWzf2LfV8lwPD/XtenwJ7nlqeKMWuTkuKWgetXxZxP3o8FRKXGtwOnl9U62HX7Q=
+Received: from DM6PR12MB2844.namprd12.prod.outlook.com (20.176.117.96) by
+ DM6PR12MB4091.namprd12.prod.outlook.com (10.141.8.144) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2032.20; Sun, 30 Jun 2019 16:19:48 +0000
+Received: from DM6PR12MB2844.namprd12.prod.outlook.com
+ ([fe80::9b0:ee82:ca4b:a4e7]) by DM6PR12MB2844.namprd12.prod.outlook.com
+ ([fe80::9b0:ee82:ca4b:a4e7%6]) with mapi id 15.20.2008.020; Sun, 30 Jun 2019
+ 16:19:47 +0000
+From:   "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>
+To:     =?utf-8?B?SmFuIEguIFNjaMO2bmhlcnI=?= <jschoenh@amazon.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "joro@8bytes.org" <joro@8bytes.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>
+Subject: Re: [PATCH 3/6] svm: Add support for APIC_ACCESS_PAGE_PRIVATE_MEMSLOT
+ setup/destroy
+Thread-Topic: [PATCH 3/6] svm: Add support for
+ APIC_ACCESS_PAGE_PRIVATE_MEMSLOT setup/destroy
+Thread-Index: AQHU4KZuc7R0vj5ZskiFGY4oB385JqZh40iAgFMarAA=
+Date:   Sun, 30 Jun 2019 16:19:47 +0000
+Message-ID: <7215044a-af35-49a6-771d-1f1a5ec72bfd@amd.com>
+References: <20190322115702.10166-1-suravee.suthikulpanit@amd.com>
+ <20190322115702.10166-4-suravee.suthikulpanit@amd.com>
+ <5b786dde-1fc4-9abc-ae95-8360e033fb97@amazon.de>
+In-Reply-To: <5b786dde-1fc4-9abc-ae95-8360e033fb97@amazon.de>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:S/S0poinZh/eiAEBjJJ0x7oxvYcEnjk1BZhcitM7MWJPf1wBfWi
- NFNdMcBhXkBPLCP4AHhDp7SNb4R8VWOkRuz15H1J5qoRkj1QfHWZjPo5WiU2+PX7nN2kbm1
- 0N7LKvU23eSq2fAKgp0QNYpPFXgyUMP/url3E2b60JSJoNNOh+JtyzvSVtBydpgau7ZDbRr
- YK2ude4yZhRZjSUrvlNWw==
-X-Spam-Flag: NO
-X-UI-Out-Filterresults: notjunk:1;V03:K0:gLP2ToO4w7w=:ON/U2A/drwShL7xPSuBFGP
- A/OvLkrdrrtCntIWy6CCzL9bTvacCA2vlT1paz9PNJfWJjoxYQiOBfKkDyUg8s+dk4gDe9pcn
- FeaAi74ZfjTFbkISsKoAOz9HZfHSeOLyU4aZDjJrIXntVOpYaFjVkYUg0tS2RfVYcChon3VOg
- z4FpRFUjRGKHjBEB1NbfY6pjQo4//fiqPbZZAxjG28Gj5qrNdYNN4lQHZGFSzz3navIdcVt9k
- fSycbG4kqZ3Nj1eit9E+Ce/rrUrdZ7o9qKdVg679wR0ABAj1iUHZ+f+EQIKBppUX1kGOFpCy2
- jg0NO0NiUNcbgex2bDC5Wqqk9aLWoHuX/YKhWBInNVUHofzgp0T5bvYA2qV7q9BpYJsoxsmxP
- D+5ledQi3cT2GoXrSGqlucRwit3Q06ZPBEG5ytsdiUP1q1jrTGSU4YFXsLwyEnPFRSqJry0gi
- 8jAFlsHek9ue80tJyUJHwWfKPktomHhlY8OXy/3rkNE5d1OE18RY5WiTiA6/28zC8xnKyaVT2
- hT2t5StbfutwE1yuS0q3Qmebpn57biad4sQRy90fE9dyb1wEWxfYPR92s/jCEeoD4GPAwoyDf
- RCFsDI4QxN0n7AbOvfGCpjdOq6J3zMsl5VWvHGY+YyOINfj7RYS2SsBMKrcSea6TlPz4okhcd
- RjEs05GyrBRnWzBaaRqPNe0C1VSgKhiRn68AnW1c7GGoutF+UpfT3LNrjekNd//y5lgCqg7Wn
- 08HtkRS78Urt51jYf+AIUp2TJqFPsXpYDtVBRjBWr3k2f5K17G58U+u89gnlDiohuIaaPw1nh
- BUpQwgP9Vj9lXv6l6GPQZTHcPxJdrIFHjhFOY3n26Hq1HYi4rVUUmIq99nDUlMyO/GiTRZdHs
- Rce2WEprzXH+QCFrA93HdId4t23jgXsYYXfWI/UAbi004uUL5yELObz29kaeRb6cETAG9i3Qa
- 0CqryFNu/r/2IyyyA6ZsOfHXdJdt/xdPZKE29xLC/0R8HmP0+I0+nkF+tbEBKcGVHhOhjjWIj
- JEnvebU01s7akPL+9fM/OCcXRLQUEernPwqboJRIUBI5KyW8kDRVnsTn/watvgi5nrtomCVZj
- 38FbLOt7v8f57n/cNtZZcC0IRSah8TT0LWo
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
+x-originating-ip: [165.204.77.11]
+x-clientproxiedby: SN4PR0401CA0028.namprd04.prod.outlook.com
+ (2603:10b6:803:2a::14) To DM6PR12MB2844.namprd12.prod.outlook.com
+ (2603:10b6:5:45::32)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Suravee.Suthikulpanit@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 89b8bf0b-011f-4893-92a9-08d6fd76c517
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM6PR12MB4091;
+x-ms-traffictypediagnostic: DM6PR12MB4091:
+x-microsoft-antispam-prvs: <DM6PR12MB4091AB7166AC699B08288479F3FE0@DM6PR12MB4091.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 008421A8FF
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(376002)(396003)(39860400002)(346002)(136003)(189003)(199004)(31686004)(81166006)(81156014)(54906003)(8676002)(6486002)(110136005)(58126008)(316002)(2906002)(8936002)(229853002)(305945005)(53936002)(6246003)(2501003)(6512007)(486006)(64126003)(72206003)(6436002)(7736002)(446003)(11346002)(71190400001)(71200400001)(478600001)(476003)(2616005)(4326008)(256004)(14444005)(66446008)(73956011)(66476007)(66556008)(64756008)(66946007)(66574012)(36756003)(5660300002)(186003)(26005)(65806001)(65956001)(2201001)(25786009)(99286004)(76176011)(6506007)(6116002)(65826007)(86362001)(386003)(53546011)(102836004)(68736007)(66066001)(3846002)(31696002)(52116002)(14454004)(60764002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB4091;H:DM6PR12MB2844.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 8N9QxMSLoq2SuL8YaQ7+c7RruWNsXw+ZEIi4LhvO7RBBzZ9YPEJrPK1TwAvoSOyRT8ngwhj/y2LcHRJZx1M1y660/argVZ2dy3awWMgPmX6xz1GqnqFJnqyKEpEN0ntTwiw7Dktzn1X0hMtpfR9OA6RFOQvkGOQ1LiTWr78a4FZo/A23sbyWYdqXhxKrPUwkuq+riTR2owukBUkcUQopPZcB7dRFqigSowBxBFhWcteAWT+5EGZnhXjxjbsGGhl05LZojtrDomzzJ/Y506nRTB42IPpDUtwwQxdIg5If9o2qJNnxNHVBOk16NJ0S6/FyyLTj3NboslqUJVCk3Hnimx3GPWnDAe/xtXwRfMrX8Kspw4zdlp37AAYcDen1VAHOo7+9DpSK+VsiYm6L8Sv1sHUp/Bi8hzS8788sfioF1xU=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5107C47AF54A2A4B85FC6206576D0287@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 89b8bf0b-011f-4893-92a9-08d6fd76c517
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jun 2019 16:19:47.7746
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ssuthiku@amd.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4091
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jan Kiszka <jan.kiszka@siemens.com>
-
-The only difference between the currently supported A15 and A7 target
-cores is the reset state of bit 11 in SCTLR. This bit is RES1 or RAO/WI
-in other ARM cores, including ARMv8 ones. By promoting A7 to a generic
-default target, this allows to use yet unsupported core types. E.g.,
-this enables KVM on the A72 of the RPi4.
-
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-=2D--
- arch/arm/include/uapi/asm/kvm.h                |  1 +
- arch/arm/kvm/Makefile                          |  2 +-
- arch/arm/kvm/{coproc_a7.c =3D> coproc_generic.c} | 18 +++++++++---------
- arch/arm/kvm/guest.c                           |  4 +---
- arch/arm/kvm/reset.c                           |  5 +----
- 5 files changed, 13 insertions(+), 17 deletions(-)
- rename arch/arm/kvm/{coproc_a7.c =3D> coproc_generic.c} (70%)
-
-diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/k=
-vm.h
-index 4602464ebdfb..e0c5bbec3d3d 100644
-=2D-- a/arch/arm/include/uapi/asm/kvm.h
-+++ b/arch/arm/include/uapi/asm/kvm.h
-@@ -70,6 +70,7 @@ struct kvm_regs {
- /* Supported Processor Types */
- #define KVM_ARM_TARGET_CORTEX_A15	0
- #define KVM_ARM_TARGET_CORTEX_A7	1
-+#define KVM_ARM_TARGET_GENERIC_V7	KVM_ARM_TARGET_CORTEX_A7
- #define KVM_ARM_NUM_TARGETS		2
-
- /* KVM_ARM_SET_DEVICE_ADDR ioctl id encoding */
-diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
-index 531e59f5be9c..d959f89135d6 100644
-=2D-- a/arch/arm/kvm/Makefile
-+++ b/arch/arm/kvm/Makefile
-@@ -21,7 +21,7 @@ obj-$(CONFIG_KVM_ARM_HOST) +=3D hyp/
-
- obj-y +=3D kvm-arm.o init.o interrupts.o
- obj-y +=3D handle_exit.o guest.o emulate.o reset.o
--obj-y +=3D coproc.o coproc_a15.o coproc_a7.o   vgic-v3-coproc.o
-+obj-y +=3D coproc.o coproc_a15.o coproc_generic.o   vgic-v3-coproc.o
- obj-y +=3D $(KVM)/arm/arm.o $(KVM)/arm/mmu.o $(KVM)/arm/mmio.o
- obj-y +=3D $(KVM)/arm/psci.o $(KVM)/arm/perf.o
- obj-y +=3D $(KVM)/arm/aarch32.o
-diff --git a/arch/arm/kvm/coproc_a7.c b/arch/arm/kvm/coproc_generic.c
-similarity index 70%
-rename from arch/arm/kvm/coproc_a7.c
-rename to arch/arm/kvm/coproc_generic.c
-index 40f643e1e05c..b32a541ad7bf 100644
-=2D-- a/arch/arm/kvm/coproc_a7.c
-+++ b/arch/arm/kvm/coproc_generic.c
-@@ -15,28 +15,28 @@
- #include "coproc.h"
-
- /*
-- * Cortex-A7 specific CP15 registers.
-+ * Generic CP15 registers.
-  * CRn denotes the primary register number, but is copied to the CRm in t=
-he
-  * user space API for 64-bit register access in line with the terminology=
- used
-  * in the ARM ARM.
-  * Important: Must be sorted ascending by CRn, CRM, Op1, Op2 and with 64-=
-bit
-  *            registers preceding 32-bit ones.
-  */
--static const struct coproc_reg a7_regs[] =3D {
-+static const struct coproc_reg generic_regs[] =3D {
- 	/* SCTLR: swapped by interrupt.S. */
- 	{ CRn( 1), CRm( 0), Op1( 0), Op2( 0), is32,
- 			access_vm_reg, reset_val, c1_SCTLR, 0x00C50878 },
- };
-
--static struct kvm_coproc_target_table a7_target_table =3D {
--	.target =3D KVM_ARM_TARGET_CORTEX_A7,
--	.table =3D a7_regs,
--	.num =3D ARRAY_SIZE(a7_regs),
-+static struct kvm_coproc_target_table generic_target_table =3D {
-+	.target =3D KVM_ARM_TARGET_GENERIC_V7,
-+	.table =3D generic_regs,
-+	.num =3D ARRAY_SIZE(generic_regs),
- };
-
--static int __init coproc_a7_init(void)
-+static int __init coproc_generic_init(void)
- {
--	kvm_register_target_coproc_table(&a7_target_table);
-+	kvm_register_target_coproc_table(&generic_target_table);
- 	return 0;
- }
--late_initcall(coproc_a7_init);
-+late_initcall(coproc_generic_init);
-diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-index 684cf64b4033..d33a24e70f49 100644
-=2D-- a/arch/arm/kvm/guest.c
-+++ b/arch/arm/kvm/guest.c
-@@ -275,12 +275,10 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
- int __attribute_const__ kvm_target_cpu(void)
- {
- 	switch (read_cpuid_part()) {
--	case ARM_CPU_PART_CORTEX_A7:
--		return KVM_ARM_TARGET_CORTEX_A7;
- 	case ARM_CPU_PART_CORTEX_A15:
- 		return KVM_ARM_TARGET_CORTEX_A15;
- 	default:
--		return -EINVAL;
-+		return KVM_ARM_TARGET_GENERIC_V7;
- 	}
- }
-
-diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
-index eb4174f6ebbd..d6e07500bab4 100644
-=2D-- a/arch/arm/kvm/reset.c
-+++ b/arch/arm/kvm/reset.c
-@@ -43,13 +43,10 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	struct kvm_regs *reset_regs;
-
- 	switch (vcpu->arch.target) {
--	case KVM_ARM_TARGET_CORTEX_A7:
--	case KVM_ARM_TARGET_CORTEX_A15:
-+	default:
- 		reset_regs =3D &cortexa_regs_reset;
- 		vcpu->arch.midr =3D read_cpuid_id();
- 		break;
--	default:
--		return -ENODEV;
- 	}
-
- 	/* Reset core registers */
-=2D-
-2.16.4
+SmFuLA0KDQpPbiA1LzgvMjAxOSAyOjE0IFBNLCBKYW4gSC4gU2Now7ZuaGVyciB3cm90ZToNCj4g
+T24gMjIvMDMvMjAxOSAxMi41NywgU3V0aGlrdWxwYW5pdCwgU3VyYXZlZSB3cm90ZToNCj4+IEFj
+dGl2YXRlL2RlYWN0aXZhdGUgQVZJQyByZXF1aXJlcyBzZXR0aW5nL3Vuc2V0dGluZyB0aGUgbWVt
+b3J5IHJlZ2lvbiB1c2VkDQo+PiBmb3IgQVBJQ19BQ0NFU1NfUEFHRV9QUklWQVRFX01FTVNMT1Qu
+IFNvLCByZS1mYWN0b3IgYXZpY19pbml0X2FjY2Vzc19wYWdlKCkNCj4+IHRvIGF2aWNfc2V0dXBf
+YWNjZXNzX3BhZ2UoKSBhbmQgYWRkIHNyY3VfcmVhZF9sb2NrL3VubG9jaywgd2hpY2ggYXJlIG5l
+ZWRlZA0KPj4gdG8gYWxsb3cgdGhpcyBmdW5jdGlvbiB0byBiZSBjYWxsZWQgZHVyaW5nIHJ1bi10
+aW1lLg0KPj4NCj4+IEFsc28sIGludHJvZHVjZSBhdmljX2Rlc3Ryb3lfYWNjZXNzX3BhZ2UoKSB0
+byB1bnNldCB0aGUgcGFnZSB3aGVuDQo+PiBkZWFjdGl2YXRlIEFWSUMuDQo+Pg0KPj4gU2lnbmVk
+LW9mZi1ieTogU3VyYXZlZSBTdXRoaWt1bHBhbml0PHN1cmF2ZWUuc3V0aGlrdWxwYW5pdEBhbWQu
+Y29tPg0KPj4gLS0tDQo+PiAgIGFyY2gveDg2L2t2bS9zdm0uYyB8IDI4ICsrKysrKysrKysrKysr
+KysrKysrKysrKysrLS0NCj4+ICAgMSBmaWxlIGNoYW5nZWQsIDI2IGluc2VydGlvbnMoKyksIDIg
+ZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS9zdm0uYyBiL2Fy
+Y2gveDg2L2t2bS9zdm0uYw0KPj4gaW5kZXggNGNmOTNhNzI5YWQ4Li5mNDFmMzRmNzBkZGUgMTAw
+NjQ0DQo+PiAtLS0gYS9hcmNoL3g4Ni9rdm0vc3ZtLmMNCj4+ICsrKyBiL2FyY2gveDg2L2t2bS9z
+dm0uYw0KPj4gQEAgLTE2NjYsNyArMTY2Niw3IEBAIHN0YXRpYyB1NjQgKmF2aWNfZ2V0X3BoeXNp
+Y2FsX2lkX2VudHJ5KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwNCj4+ICAgICogZmllbGQgb2YgdGhl
+IFZNQ0IuIFRoZXJlZm9yZSwgd2Ugc2V0IHVwIHRoZQ0KPj4gICAgKiBBUElDX0FDQ0VTU19QQUdF
+X1BSSVZBVEVfTUVNU0xPVCAoNEtCKSBoZXJlLg0KPj4gICAgKi8NCj4+IC1zdGF0aWMgaW50IGF2
+aWNfaW5pdF9hY2Nlc3NfcGFnZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+PiArc3RhdGljIGlu
+dCBhdmljX3NldHVwX2FjY2Vzc19wYWdlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgYm9vbCBpbml0
+KQ0KPj4gICB7DQo+PiAgICAgICAgc3RydWN0IGt2bSAqa3ZtID0gdmNwdS0+a3ZtOw0KPj4gICAg
+ICAgIGludCByZXQgPSAwOw0KPj4gQEAgLTE2NzUsMTAgKzE2NzUsMTQgQEAgc3RhdGljIGludCBh
+dmljX2luaXRfYWNjZXNzX3BhZ2Uoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPj4gICAgICAgIGlm
+IChrdm0tPmFyY2guYXBpY19hY2Nlc3NfcGFnZV9kb25lKQ0KPj4gICAgICAgICAgICAgICAgZ290
+byBvdXQ7DQo+Pg0KPj4gKyAgICAgaWYgKCFpbml0KQ0KPj4gKyAgICAgICAgICAgICBzcmN1X3Jl
+YWRfdW5sb2NrKCZrdm0tPnNyY3UsIHZjcHUtPnNyY3VfaWR4KTsNCj4+ICAgICAgICByZXQgPSBf
+X3g4Nl9zZXRfbWVtb3J5X3JlZ2lvbihrdm0sDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgQVBJQ19BQ0NFU1NfUEFHRV9QUklWQVRFX01FTVNMT1QsDQo+PiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQVBJQ19ERUZBVUxUX1BIWVNfQkFTRSwNCj4+
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBQQUdFX1NJWkUpOw0KPj4gKyAg
+ICAgaWYgKCFpbml0KQ0KPj4gKyAgICAgICAgICAgICB2Y3B1LT5zcmN1X2lkeCA9IHNyY3VfcmVh
+ZF9sb2NrKCZrdm0tPnNyY3UpOw0KPj4gICAgICAgIGlmIChyZXQpDQo+PiAgICAgICAgICAgICAg
+ICBnb3RvIG91dDsNCj4+DQo+PiBAQCAtMTY4OCw2ICsxNjkyLDI2IEBAIHN0YXRpYyBpbnQgYXZp
+Y19pbml0X2FjY2Vzc19wYWdlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkNCj4+ICAgICAgICByZXR1
+cm4gcmV0Ow0KPj4gICB9DQo+Pg0KPj4gK3N0YXRpYyB2b2lkIGF2aWNfZGVzdHJveV9hY2Nlc3Nf
+cGFnZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+PiArew0KPj4gKyAgICAgc3RydWN0IGt2bSAq
+a3ZtID0gdmNwdS0+a3ZtOw0KPj4gKw0KPj4gKyAgICAgbXV0ZXhfbG9jaygma3ZtLT5zbG90c19s
+b2NrKTsNCj4+ICsNCj4+ICsgICAgIGlmICgha3ZtLT5hcmNoLmFwaWNfYWNjZXNzX3BhZ2VfZG9u
+ZSkNCj4+ICsgICAgICAgICAgICAgZ290byBvdXQ7DQo+PiArDQo+PiArICAgICBzcmN1X3JlYWRf
+dW5sb2NrKCZrdm0tPnNyY3UsIHZjcHUtPnNyY3VfaWR4KTsNCj4+ICsgICAgIF9feDg2X3NldF9t
+ZW1vcnlfcmVnaW9uKGt2bSwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEFQSUNf
+QUNDRVNTX1BBR0VfUFJJVkFURV9NRU1TTE9ULA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgQVBJQ19ERUZBVUxUX1BIWVNfQkFTRSwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIDApOw0KPj4gKyAgICAgdmNwdS0+c3JjdV9pZHggPSBzcmN1X3JlYWRfbG9jaygma3Zt
+LT5zcmN1KTsNCj4gVGhpcyBwYXR0ZXJuIG9mICJ1bmxvY2ssIGRvIHNvbWV0aGluZywgcmUtbG9j
+ayIgc3RyaWtlcyBtZSBhcyBvZGQgLS0NCj4gaGVyZSBhbmQgaW4gdGhlIHNldHVwIGZ1bmN0aW9u
+Lg0KPiANCj4gVGhlcmUgc2VlbSB0byBiZSBhIGZldyBhc3N1bXB0aW9ucyBmb3IgdGhpcyB0byB3
+b3JrOg0KPiBhKSBTUkNVIHJlYWQtc2lkZSBjcml0aWNhbCBzZWN0aW9ucyBtdXN0IG5vdCBiZSBu
+ZXN0ZWQuDQo+IGIpIFdlIG11c3Qgbm90IGtlZXAgYW55IHBvaW50ZXIgdG8gYSBTUkNVIHByb3Rl
+Y3RlZCBzdHJ1Y3R1cmUNCj4gICAgIGFjcm9zcyBhIGNhbGwgdG8gdGhpcyBmdW5jdGlvbi4NCj4g
+DQo+IENhbiB3ZSBndWFyYW50ZWUgdGhlc2UgYXNzdW1wdGlvbnM/IE5vdyBhbmQgaW4gdGhlIGZ1
+dHVyZSAoZ2l2ZW4gdGhhdCB0aGlzIGlzIGFscmVhZHkNCj4gYSBiaXQgaGlkZGVuIGluIHRoZSBj
+YWxsIHN0YWNrKT8NCj4gDQo+IChBbmQgaWYgd2UgY2FuIGd1YXJhbnRlZSB0aGVtLCB3aHkgYXJl
+IHdlIGhvbGRpbmcgdGhlIFNSQ1UgbG9jayBpbiB0aGUgZmlyc3QgcGxhY2U/KQ0KDQpUaGUgcmVh
+c29uIHdlIG5lZWQgdG8gY2FsbCBzcmN1X3JlYWRfdW5sb2NrKCkgaGVyZSBpcyBiZWNhdXNlIHRo
+ZSBzcmN1X3JlYWRfbG9jaygpIGlzDQpjYWxsZWQgYXQgdGhlIGJlZ2lubmluZyBvZiB2Y3B1X3J1
+bigpIGJlZm9yZSBnb2luZyBpbnRvIHZjcHVfZW50ZXJfZ3Vlc3QoKS4NCg0KSGVyZSwgc2luY2Ug
+d2UgbmVlZCB0byBfX3g4Nl9zZXRfbWVtb3J5X3JlZ2lvbigpLCB3aGljaCB1cGRhdGUgdGhlIHBh
+Z2UgdGFibGUuDQpJZiB3ZSBkbyBub3QgY2FsbCBzcmN1X3JlYWRfdW5sb2NrKCksIHdlIGVuZCB1
+cCB3aXRoIHRoZSBmb2xsb3dpbmcgY2FsbCB0cmFjZToNCg0KWzk0NjE3Ljk5MjgzNV0gSU5GTzog
+dGFzayBxZW11LXN5c3RlbS14ODY6MjQ2Nzk5IGJsb2NrZWQgZm9yIG1vcmUgdGhhbiAxMjAgc2Vj
+b25kcy4NCls5NDYxOC4wMDE2MzVdICAgICAgIE5vdCB0YWludGVkIDUuMS4wLWF2aWMrICMxNA0K
+Wzk0NjE4LjAwNjkzNF0gImVjaG8gMCA+IC9wcm9jL3N5cy9rZXJuZWwvaHVuZ190YXNrX3RpbWVv
+dXRfc2VjcyIgZGlzYWJsZXMgdGhpcyBtZXNzYWdlLg0KWzk0NjE4LjAxNjExNF0gcWVtdS1zeXN0
+ZW0teDg2IEQgICAgMCAyNDY3OTkgMjQ2Nzg4IDB4MDAwMDAwODQNCls5NDYxOC4wMjI3NzNdIENh
+bGwgVHJhY2U6DQpbOTQ2MTguMDI1OTE5XSAgPyBfX3NjaGVkdWxlKzB4MmY5LzB4ODYwDQpbOTQ2
+MTguMDMwNDE2XSAgc2NoZWR1bGUrMHgzMi8weDcwDQpbOTQ2MTguMDM0MzM1XSAgc2NoZWR1bGVf
+dGltZW91dCsweDFkOC8weDMwMA0KWzk0NjE4LjAzOTIzNF0gID8gX19xdWV1ZV93b3JrKzB4MTJj
+LzB4M2IwDQpbOTQ2MTguMDQzOTM4XSAgd2FpdF9mb3JfY29tcGxldGlvbisweGI5LzB4MTQwDQpb
+OTQ2MTguMDQ5MDM2XSAgPyB3YWtlX3VwX3ErMHg3MC8weDcwDQpbOTQ2MTguMDUzMjY1XSAgX19z
+eW5jaHJvbml6ZV9zcmN1LnBhcnQuMTcrMHg4YS8weGMwDQpbOTQ2MTguMDU4OTU5XSAgPyBfX2Jw
+Zl90cmFjZV9yY3VfaW52b2tlX2NhbGxiYWNrKzB4MTAvMHgxMA0KWzk0NjE4LjA2NTM1OV0gIGlu
+c3RhbGxfbmV3X21lbXNsb3RzKzB4NTYvMHg5MCBba3ZtXQ0KWzk0NjE4LjA3MTA4MF0gIF9fa3Zt
+X3NldF9tZW1vcnlfcmVnaW9uKzB4N2RmLzB4OGMwIFtrdm1dDQpbOTQ2MTguMDc3Mjc1XSAgX194
+ODZfc2V0X21lbW9yeV9yZWdpb24rMHhiNi8weDE5MCBba3ZtXQ0KWzk0NjE4LjA4MzM0N10gIHN2
+bV9wcmVfdXBkYXRlX2FwaWN2X2V4ZWNfY3RybCsweDQyLzB4NzAgW2t2bV9hbWRdDQpbOTQ2MTgu
+MDkwNDEwXSAga3ZtX21ha2VfYXBpY3ZfZGVhY3RpdmF0ZV9yZXF1ZXN0KzB4YTQvMHhkMCBba3Zt
+XQ0KWzk0NjE4LjA5NzQ1MF0gIGVuYWJsZV9pcnFfd2luZG93KzB4MTE5LzB4MTcwIFtrdm1fYW1k
+XQ0KWzk0NjE4LjEwMzQ2MV0gIGt2bV9hcmNoX3ZjcHVfaW9jdGxfcnVuKzB4OGJmLzB4MWE4MCBb
+a3ZtXQ0KWzk0NjE4LjEwOTc3NF0gIGt2bV92Y3B1X2lvY3RsKzB4M2FiLzB4NWQwIFtrdm1dDQpb
+OTQ2MTguMTE1MTE5XSAgZG9fdmZzX2lvY3RsKzB4YTkvMHg2MzANCls5NDYxOC4xMTk1OTNdICBr
+c3lzX2lvY3RsKzB4NjAvMHg5MA0KWzk0NjE4LjEyMzc4MF0gIF9feDY0X3N5c19pb2N0bCsweDE2
+LzB4MjANCls5NDYxOC4xMjg0NTldICBkb19zeXNjYWxsXzY0KzB4NTUvMHgxMTANCls5NDYxOC4x
+MzMwMzddICBlbnRyeV9TWVNDQUxMXzY0X2FmdGVyX2h3ZnJhbWUrMHg0NC8weGE5DQpbOTQ2MTgu
+MTM5MTYzXSBSSVA6IDAwMzM6MHg3ZjJhOWQ1NDc4ZDcNCls5NDYxOC4xNDM2MzBdIENvZGU6IEJh
+ZCBSSVAgdmFsdWUuDQpbOTQ2MTguMTQ3NzA3XSBSU1A6IDAwMmI6MDAwMDdmMmE5YWRlNDk4OCBF
+RkxBR1M6IDAwMDAwMjQ2IE9SSUdfUkFYOiAwMDAwMDAwMDAwMDAwMDEwDQpbOTQ2MTguMTU2NjYw
+XSBSQVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAwMDAwMDAwMDAwMDAwIFJDWDogMDAwMDdm
+MmE5ZDU0NzhkNw0KWzk0NjE4LjE2NTE2MF0gUkRYOiAwMDAwMDAwMDAwMDAwMDAwIFJTSTogMDAw
+MDAwMDAwMDAwYWU4MCBSREk6IDAwMDAwMDAwMDAwMDAwMTENCls5NDYxOC4xNzM2NDldIFJCUDog
+MDAwMDdmMmE5YWRlNGE5MCBSMDg6IDAwMDAwMDAwMDAwMDAwMDAgUjA5OiAwMDAwMDAwMDAwMDAw
+MGZmDQpbOTQ2MTguMTgyMTQyXSBSMTA6IDAwMDAwMDAwMDAwMDAwMDEgUjExOiAwMDAwMDAwMDAw
+MDAwMjQ2IFIxMjogMDAwMDAwMDAwMDAwMDAwMA0KWzk0NjE4LjE5MDY0MV0gUjEzOiAwMDAwMDAw
+MDAwODAxMDAwIFIxNDogMDAwMDAwMDAwMDAwMDAwMCBSMTU6IDAwMDA3ZjJhOWFkZTU3MDANCg0K
+UmVnYXJkcywNClN1cmF2ZWUNCg==
