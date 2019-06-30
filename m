@@ -2,146 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FE6F5AF92
-	for <lists+kvm@lfdr.de>; Sun, 30 Jun 2019 11:34:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A3CBD5AFA4
+	for <lists+kvm@lfdr.de>; Sun, 30 Jun 2019 12:31:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726586AbfF3Jec (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 30 Jun 2019 05:34:32 -0400
-Received: from mout.web.de ([212.227.15.3]:52177 "EHLO mout.web.de"
+        id S1726531AbfF3KTF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 30 Jun 2019 06:19:05 -0400
+Received: from mout.web.de ([212.227.15.3]:38479 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726482AbfF3Jec (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 30 Jun 2019 05:34:32 -0400
+        id S1726482AbfF3KTE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 30 Jun 2019 06:19:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1561887267;
-        bh=7JfDrC9uP9c3hnWWgcrZIsPj6pfmHbWDcl5DMU+xFH4=;
-        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=GWYiWnjkxOwZqVVMX23ffnq49RJmi6tb7czBzVnotcJ9o9Kzoe6K5NQQoWwzsV+vj
-         kVMhF5kLn6/cFOToOnEN+h6MR55RYE1Jp+DYDqtBhgaAMTrDtGNtaFmY5AYA8JeVkW
-         w7QiD8696adFP82BPYqzFykL4mFELoIIIgNAp23Q=
+        s=dbaedf251592; t=1561889940;
+        bh=bLhlpcS3Du6/J70yEMs1c6ggw5kDdNhYdM136+k71T0=;
+        h=X-UI-Sender-Class:Subject:From:To:Cc:References:Date:In-Reply-To;
+        b=EkWw07tLAGMWKqKCDSX+ZxU6TJyESeJfwIJfmz+QuLc+hWLRD9GVOegvn01L1NH1x
+         EWq6FeDdjWRDy00Z1qlV/OfJaBnQMlWwQU5UAKPan6IdxSfR3KTVmblhiiDT8HwZq+
+         jW/mliXV3hd3rXPiVUBh3mcNwm4x0SzW4F9mD8a0=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.10] ([95.157.54.22]) by smtp.web.de (mrweb001
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0MhlT9-1hvd0C1NnX-00MuWQ; Sun, 30
- Jun 2019 11:34:27 +0200
+Received: from [192.168.1.10] ([95.157.54.22]) by smtp.web.de (mrweb002
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MI6JC-1hgy9y0ZEU-003xRY; Sun, 30
+ Jun 2019 12:19:00 +0200
 Subject: Re: KVM works on RPi4
+From:   Jan Kiszka <jan.kiszka@web.de>
 To:     Marc Zyngier <marc.zyngier@arm.com>
 Cc:     kvmarm@lists.cs.columbia.edu, kvm <kvm@vger.kernel.org>,
         Christoffer Dall <christoffer.dall@arm.com>
 References: <1d1198c2-f362-840d-cb14-9a6d74da745c@web.de>
- <20190629234232.484ca3c0@why>
-From:   Jan Kiszka <jan.kiszka@web.de>
-Message-ID: <9fa56744-9925-6f49-b2a4-368e13fbbc41@web.de>
-Date:   Sun, 30 Jun 2019 11:34:25 +0200
+ <20190629234232.484ca3c0@why> <9fa56744-9925-6f49-b2a4-368e13fbbc41@web.de>
+Message-ID: <3f6ea07b-975b-3d66-e12d-f0a9cadb83a9@web.de>
+Date:   Sun, 30 Jun 2019 12:18:59 +0200
 User-Agent: Mozilla/5.0 (X11; U; Linux i686 (x86_64); de; rv:1.8.1.12)
  Gecko/20080226 SUSE/2.0.0.12-1.1 Thunderbird/2.0.0.12 Mnenhy/0.7.5.666
 MIME-Version: 1.0
-In-Reply-To: <20190629234232.484ca3c0@why>
+In-Reply-To: <9fa56744-9925-6f49-b2a4-368e13fbbc41@web.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:tyRIyK9SNwr5ypgeQQsNhbL9DVzUZo/Ya6rlq54GMLJKiiRWh7D
- ARU9W0m1TJtH1mRGdCdo/LIxT6XmMBAMqPkHMh3NQbYaXwSS+EJPKJLXUmG09NAMU+7PGnG
- UZEhjhHhs1ghDR4tfxeTuHPtecwF56EJspp9i4idfr0N025+o+IoGfCn16v3oT6tARGRfq8
- sp+Cee1edjotk5yVg4LKg==
+X-Provags-ID: V03:K1:04w92vQEYTT8pNExe/B59Ak2jCirTtbX1hTIl64kTfUc7ZuF4Vr
+ SxiGs7y7wzi28iWqyJcckIkR6VcRkFIoPDrTpCK7RY9wXeU6vmxxBBIfKywQfagu4FLiW18
+ cOoZj3h1lxVC0VuZPF+TmUbF5jH4lcBGv4z98vqcS9mHdUIOq75l+2RD7rD/MBEt/LETara
+ c3DXmhO/9RbiSq5KLMlRg==
 X-Spam-Flag: NO
-X-UI-Out-Filterresults: notjunk:1;V03:K0:FubqFI9F6s0=:WvGcBqr+FAmFglGaVzebEK
- WHPLtzq3vErPW+vL3gUgL/9UnbZ7CUByd2UC0hbi3meqe9VPdD+3csSw69g35gkphiciVDyOO
- TtHcW/6r9lxPl44ECLJsD/h7pfl4nNm2q/NVEELkDBsyiT/k65tLp4PabBmFF9/Ee7ED3o2iL
- PYCkVL5Jb2tWGUnjGRg/JjBG2T4luuyBZKBSDavR3t9+XDR6RW89rJ0Gp/7er71IsHeajP4h6
- pAmSz13CNISHFbGZ9kOyTWbBdeWZTmu/ngU10KrJXqnHmM1riIHD8+FtFVGiZKBUrV3AFBHou
- +1SGxkMUVxY731xEmqEgSUJPRLTSf8ZlG8CERnKNe2gqNWTJDt8fwJv2GBour21X0S7Dd09qp
- wlB88lOH7tNK1K3ZUQU755ytw3YToD7Os995VfMHIi87sj5QP9PAbtTUkCraKV/MRhKtKgxvL
- Nmp38B/20Dcl1DN/bTxraEyaGyAIlt0snVw8blK3duGipvNin3mpiJ9yA7L/fErXNQwPVZRHr
- +XvwyByUCpKReE1terSEvbkYUhxNak/h7k4w6iCoUKxWypQIpzQ5zgaXbwzLmCFXh+gzmpwTO
- xaFMSyqHQ/RcsXM9Q4tEVQeMFig9OBtCUM6pHp2OY8X/xjMpTpO4ZQh4ugC1lxcosLx9H1ggw
- yq8EJww9bPgpWghalZNJMz3Wq+UxgoNGcwXTfKgJ7dZNXpxk+D4jzHBOzBkUxrHjAj7hWd88L
- wM8EOyUWb4f5NEJqrIA41Z4KVJmOdDkMu+Q8/kU7bGDrHtv1CfrEuiDiDZ/uwTok8iWYfLdE1
- J28nfxFTqqCkFAHLqlQ7vh0PEWmz8bQ+Fagk6OkL0FGN8lHAJ9QNemBlhVU7F013NqnmO3EZV
- SpBmXsRIW7XZKlWZClOBGKdUDjiuMUglzehLZ7A7QFSA01hI44ZSJWcLNqtcXAPQ2e55Nc0B+
- JZoiVlMl/Xl7yIT/OzNx86/fYmpID9DLxnR6UHCWmZPVKk1SvbEi0FJhlFl4t6Qp7Pp+iX2Bk
- oncQZa7w5OK6GFy8RFrBpwKbrPUMxSQ0u9JhtPM/rU7EEWBVYqPJeUigvdso7P95LmJGUQBXG
- 7Kx56vI9Vy+1lFSw6M6f/rVK+D0kREkq+2u
+X-UI-Out-Filterresults: notjunk:1;V03:K0:/GDKbidp1Og=:Ja3BHrbn2HKwBierKeWW8y
+ 4iEhhs80n2S9VGeo69lEeF+uUr3T+VX6e0vjsFZIgUIZn3NlfPE+L+FDDkgpkMpZdRHToSRaS
+ KTWnyp+pRtFe/TiWfPVpsrp8+r5ZqilaiAkQuMkjyGwrZpKMJuv9UkiUBsJpjTCgrMxVDWxHO
+ 7jTc0bo9YymEJzdJBY4SLnTXwgpcdnFzEwmw48ZSv1SEn45/iCXVFACl4XOGlc0J7sgKxj1Tc
+ Z1VnEImlO9FLjWIx8Xpj2hCv7ZZyyyHtFuCtOw2nFUORnPsAc/w/q/5W98fEfFs/0oRrLR7Ss
+ XyUSKB0+T/HSFnmVJpCiu7fya4oq3gjsSAgDZbhuzCHmDmPpxdz8+PJX1cOBL48UznJR+se1r
+ rwknjiMa9kyq0v9WUhjUqcElAjqcf3lpg8dmx7Vz+psmC5Ki6o2kgygzTvIjjmSGjIukMD0zk
+ txKPqpvQh3cqj5iX72PnJAbfTHAaWrBdxsgpjad/pY2BQd6GvZYHSxb6/DxnmuW0Amo5ZhVUZ
+ xat3Ne9ohcDZ2nkHzOG1BJh2ihrFzIeLKiYCNHY2dFCGKCy0DD/jsItfO1gT/fOEUkYQE7izJ
+ MK1D2hg1S44RS33em5dSLAafmviyBab0nXCxwVO9NkmHcvsU3Wqaz7nmG5AYESaXwIYHjqKWa
+ eVBisu4Wm7zkj2oqdJ88O5y7Ze09KGlIzM4aaG7U6divYz3u2nYKRHUf2zoMXwofy4ROEiwpO
+ ziABfimhOheWmC6b1L49nzMbSnOA4UKH2YfdLi2TIkFo57equUUjJ9/9INpltPhPj74qUZgnx
+ c3tSU8C6hm48RLdrdKsmfbxt2TqEcw9BBwWVSBd1r48ai8ZSMfqqBjgYDdtDQ+az1j5OVagnu
+ P0kOKdqOyo+FjP9mfvkk6QsTdWA08VnOzDtsq7KW2/Oq7LGbfAX3BQZ05FZzqUsBhb8gQ8n2P
+ TM0E6A0OclPesK3taqhcnS2WMmIVwVjRvUbHK5qujZRACIGOYByfdzBy5v+wAYzEOhOBNlXXP
+ 9GfBNzKl4Y62zEYcowdhvsFYkMpJKTw16j7paYuHy07UJdOOZBGDGaBD/QvdON0mnCtDF9KRt
+ Pa6VsOqt9o0HNfoioIXRzN7RI6phMQDm2MB
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30.06.19 00:42, Marc Zyngier wrote:
-> On Sat, 29 Jun 2019 19:09:37 +0200
-> Jan Kiszka <jan.kiszka@web.de> wrote:
->
-> Hi Jan,
->
->> Hi all,
->>
->> just got KVM running on the Raspberry Pi4. Seems they now embedded all
->> required logic into that new SoC.
->
-> Yeah, someone saw the light and decided to enter the 21st century by
-> attaching a GICv2 to the thing. Who knows, they may plug a GICv3 and a
-> SMMU in 2050 at that rate! ;-)
->
-
-Optimistic.
-
->> However, as the Raspberry kernel is not yet ready for 64-bit (and
->> upstream is not in sight), I had to use legacy 32-bit mode. And there w=
+On 30.06.19 11:34, Jan Kiszka wrote:
+> On 30.06.19 00:42, Marc Zyngier wrote:
+>> On Sat, 29 Jun 2019 19:09:37 +0200
+>> Jan Kiszka <jan.kiszka@web.de> wrote:
+>>> However, as the Raspberry kernel is not yet ready for 64-bit (and
+>>> upstream is not in sight), I had to use legacy 32-bit mode. And there =
+we
+>>> stumble over the core detection. This little patch made it work, thoug=
+h:
+>>>
+>>> diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
+>>> index 2b8de885b2bf..01606aad73cc 100644
+>>> --- a/arch/arm/kvm/guest.c
+>>> +++ b/arch/arm/kvm/guest.c
+>>> @@ -290,6 +290,7 @@ int __attribute_const__ kvm_target_cpu(void)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case ARM_CPU_PART_CORTEX_A7:
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return KVM_ARM_=
+TARGET_CORTEX_A7;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case ARM_CPU_PART_CORTEX_A15:
+>>> +=C2=A0=C2=A0=C2=A0 case ARM_CPU_PART_CORTEX_A72:
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return KVM_ARM_=
+TARGET_CORTEX_A15;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default:
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
+>>>
+>>> That raises the question if this is hack or a valid change and if ther=
 e
->> stumble over the core detection. This little patch made it work, though=
-:
+>>> is general interest in mapping 64-bit cores on 32-bit if they happen t=
+o
+>>> run in 32-bit mode.
 >>
->> diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
->> index 2b8de885b2bf..01606aad73cc 100644
->> --- a/arch/arm/kvm/guest.c
->> +++ b/arch/arm/kvm/guest.c
->> @@ -290,6 +290,7 @@ int __attribute_const__ kvm_target_cpu(void)
->>   	case ARM_CPU_PART_CORTEX_A7:
->>   		return KVM_ARM_TARGET_CORTEX_A7;
->>   	case ARM_CPU_PART_CORTEX_A15:
->> +	case ARM_CPU_PART_CORTEX_A72:
->>   		return KVM_ARM_TARGET_CORTEX_A15;
->>   	default:
->>   		return -EINVAL;
->>
->> That raises the question if this is hack or a valid change and if there
->> is general interest in mapping 64-bit cores on 32-bit if they happen to
->> run in 32-bit mode.
+>> The real thing to do here would be to move to a generic target, much
+>> like we did on the 64bit side. Could you investigate that instead? It
+>> would also allow KVM to be used on other 32bit cores such as
+>> A12/A17/A32.
 >
-> The real thing to do here would be to move to a generic target, much
-> like we did on the 64bit side. Could you investigate that instead? It
-> would also allow KVM to be used on other 32bit cores such as
-> A12/A17/A32.
-
-You mean something like KVM_ARM_TARGET_GENERIC_V8? Need to study that...
-
+> You mean something like KVM_ARM_TARGET_GENERIC_V8? Need to study that...
 >
-> Although some would argue that the *real* real thing to do would be "rm
-> -rf arch/arm/kvm" and be done with it, but that's a discussion for next
-> week... ;-)
->
->> Jan
->>
->> PS: The RPi device tree lacks description of the GICH maintenance
->> interrupts. Seems KVM is fine without that - because it has the
->> information hard-coded or because it can live without that interrupt?
->
-> Nah, it really should have an interrupt here. You can end-up in
-> situation where new virtual interrupts are delayed until the next
-> natural exit if you don't get a maintenance interrupt. Feels like a bug.
 
-Probably just in their DT. How can I check if the maintenance IRQ is worki=
-ng?
+Hmm, looking at what KVM_ARM_TARGET_CORTEX_A7 and ..._A15 differentiates, =
+I
+found nothing so far:
 
->
-> Anyway, if you know of any effort to get a 64bit kernel on that thing,
-> I'm interested in helping. I bought one on Monday, but didn't get a
-> change to do any hacking on it just yet...
+kvm_reset_vcpu:
+         switch (vcpu->arch.target) {
+         case KVM_ARM_TARGET_CORTEX_A7:
+         case KVM_ARM_TARGET_CORTEX_A15:
+                 reset_regs =3D &cortexa_regs_reset;
+                 vcpu->arch.midr =3D read_cpuid_id();
+                 break;
 
-I played with compiling the rpi kernel for 64-bit. Lots of pieces from the
-graphic drivers are falling from the truck, but you can make it build at l=
-east.
-Not that it boots so far or gives any early messages. Probably that is the=
- reason:
+And arch/arm/kvm/coproc_a15.c looks like a copy of coproc_a7.c, just with =
+some
+symbols renamed.
 
-https://github.com/raspberrypi/linux/issues/3032
+What's the purpose of all that? Planned for something bigger but never
+implemented? From that perspective, there seems to be no need to arch.targ=
+et and
+kvm_coproc_target_table at all.
 
 Jan
