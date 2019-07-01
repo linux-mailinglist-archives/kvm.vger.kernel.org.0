@@ -2,112 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C45345C1CD
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 19:13:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 229265C1EA
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 19:24:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728625AbfGARN2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jul 2019 13:13:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39564 "EHLO mx1.redhat.com"
+        id S1729259AbfGARYn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jul 2019 13:24:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33350 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728591AbfGARN1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jul 2019 13:13:27 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        id S1727702AbfGARYn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jul 2019 13:24:43 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4FB6030C3183;
-        Mon,  1 Jul 2019 17:13:27 +0000 (UTC)
-Received: from gondolin (ovpn-117-220.ams2.redhat.com [10.36.117.220])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 52C971001B20;
-        Mon,  1 Jul 2019 17:13:17 +0000 (UTC)
-Date:   Mon, 1 Jul 2019 19:13:14 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Libvirt Devel <libvir-list@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Erik Skultety <eskultet@redhat.com>,
-        Pavel Hrdina <phrdina@redhat.com>,
-        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-        Sylvain Bauza <sbauza@redhat.com>,
-        Christophe de Dinechin <dinechin@redhat.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>
-Subject: Re: mdevctl: A shoestring mediated device management and
- persistence utility
-Message-ID: <20190701191314.2ad25782.cohuck@redhat.com>
-In-Reply-To: <20190701084051.7f2bbc24@x1.home>
-References: <20190523172001.41f386d8@x1.home>
-        <20190625165251.609f6266@x1.home>
-        <20190626115806.3435c45c.cohuck@redhat.com>
-        <20190626083720.42a2b5d4@x1.home>
-        <20190626195350.2e9c81d3@x1.home>
-        <20190627142626.415138da.cohuck@redhat.com>
-        <06114b39-69c2-3fa0-d0b3-aa96a44ae2ce@linux.ibm.com>
-        <20190627093832.064a346f@x1.home>
-        <20190627151502.2ae5314f@x1.home>
-        <20190627195704.66be88c8@x1.home>
-        <20190628110648.40e0607d.cohuck@redhat.com>
-        <20190628110546.4d3ce595@x1.home>
-        <20190701102043.61afa0da.cohuck@redhat.com>
-        <20190701084051.7f2bbc24@x1.home>
-Organization: Red Hat GmbH
+        by mx1.redhat.com (Postfix) with ESMTPS id 1ACDDC057F2E;
+        Mon,  1 Jul 2019 17:24:43 +0000 (UTC)
+Received: from x1.home (ovpn-116-83.phx2.redhat.com [10.3.116.83])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C25185D70D;
+        Mon,  1 Jul 2019 17:24:42 +0000 (UTC)
+Date:   Mon, 1 Jul 2019 11:24:42 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] mdev: Send uevents around parent device registration
+Message-ID: <20190701112442.176a8407@x1.home>
+In-Reply-To: <08597ab4-cc37-3973-8927-f1bc430f6185@nvidia.com>
+References: <156199271955.1646.13321360197612813634.stgit@gimli.home>
+        <08597ab4-cc37-3973-8927-f1bc430f6185@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Mon, 01 Jul 2019 17:13:27 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Mon, 01 Jul 2019 17:24:43 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 1 Jul 2019 08:40:51 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
+On Mon, 1 Jul 2019 22:43:10 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-> On Mon, 1 Jul 2019 10:20:43 +0200
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > On Fri, 28 Jun 2019 11:05:46 -0600
-> > Alex Williamson <alex.williamson@redhat.com> wrote:
-> >   
-> > > On Fri, 28 Jun 2019 11:06:48 +0200
-> > > Cornelia Huck <cohuck@redhat.com> wrote:    
-> >   
-> > > > What do you think of a way to specify JSON for the attributes directly
-> > > > on the command line? Or would it be better to just edit the config
-> > > > files directly?      
-> > > 
-> > > Supplying json on the command like seems difficult, even doing so with
-> > > with jq requires escaping quotes.  It's not a very friendly
-> > > experience.  Maybe something more like how virsh allows snippets of xml
-> > > to be included, we could use jq to validate a json snippet provided
-> > > as a file and add it to the attributes... of course if we need to allow
-> > > libvirt to modify the json config files directly, the user could do
-> > > that as well.  Is there a use case you're thinking of?  Maybe we could
-> > > augment the 'list' command to take a --uuid and --dumpjson option and
-> > > the 'define' command to accept a --jsonfile.  Maybe the 'start' command
-> > > could accept the same, so a transient device could define attributes
-> > > w/o excessive command line options.  Thanks,
-> > > 
-> > > Alex    
+> On 7/1/2019 8:24 PM, Alex Williamson wrote:
+> > This allows udev to trigger rules when a parent device is registered
+> > or unregistered from mdev.
 > > 
-> > I was mostly thinking about complex configurations where writing a JSON
-> > config would be simpler than adding a lot of command line options.
-> > Something like dumping a JSON file and allowing to refer to a JSON file
-> > as you suggested could be useful; but then, those very complex use
-> > cases are probably already covered by editing the config file directly.
-> > Not sure if it is worth the effort; maybe just leave it as it is for
-> > now.  
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > ---
+> > 
+> > v2: Don't remove the dev_info(), Kirti requested they stay and
+> >     removing them is only tangential to the goal of this change.
+> >   
 > 
-> Well, I already did it.  It seems useful for creating transient devices
-> with attribute specifications.  If it's too ugly we can drop it.
-
-I should probably look at the repository before I reply :)
-
-Anyway, this doesn't look too ugly to me; but I think it would benefit
-from some usage examples (which I just sent you a pull request for :)
-
-> Thanks,
+> Thanks.
 > 
-> Alex
+> 
+> >  drivers/vfio/mdev/mdev_core.c |    8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> > 
+> > diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+> > index ae23151442cb..7fb268136c62 100644
+> > --- a/drivers/vfio/mdev/mdev_core.c
+> > +++ b/drivers/vfio/mdev/mdev_core.c
+> > @@ -146,6 +146,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+> >  {
+> >  	int ret;
+> >  	struct mdev_parent *parent;
+> > +	char *env_string = "MDEV_STATE=registered";
+> > +	char *envp[] = { env_string, NULL };
+> >  
+> >  	/* check for mandatory ops */
+> >  	if (!ops || !ops->create || !ops->remove || !ops->supported_type_groups)
+> > @@ -197,6 +199,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+> >  	mutex_unlock(&parent_list_lock);
+> >  
+> >  	dev_info(dev, "MDEV: Registered\n");
+> > +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+> > +
+> >  	return 0;
+> >  
+> >  add_dev_err:
+> > @@ -220,6 +224,8 @@ EXPORT_SYMBOL(mdev_register_device);
+> >  void mdev_unregister_device(struct device *dev)
+> >  {
+> >  	struct mdev_parent *parent;
+> > +	char *env_string = "MDEV_STATE=unregistered";
+> > +	char *envp[] = { env_string, NULL };
+> >  
+> >  	mutex_lock(&parent_list_lock);
+> >  	parent = __find_parent_device(dev);
+> > @@ -243,6 +249,8 @@ void mdev_unregister_device(struct device *dev)
+> >  	up_write(&parent->unreg_sem);
+> >  
+> >  	mdev_put_parent(parent);
+> > +
+> > +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);  
+> 
+> mdev_put_parent() calls put_device(dev). If this is the last instance
+> holding device, then on put_device(dev) dev would get freed.
+> 
+> This event should be before mdev_put_parent()
 
+So you're suggesting the vendor driver is calling
+mdev_unregister_device() without a reference to the struct device that
+it's passing to unregister?  Sounds bogus to me.  We take a
+reference to the device so that it can't disappear out from under us,
+the caller cannot rely on our reference and the caller provided the
+struct device.  Thanks,
+
+Alex
