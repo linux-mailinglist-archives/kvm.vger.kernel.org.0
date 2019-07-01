@@ -2,121 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 44A575BEC7
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 16:54:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AFFC35BECC
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 16:54:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729912AbfGAOyR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jul 2019 10:54:17 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:50262 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726967AbfGAOyQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jul 2019 10:54:16 -0400
-Received: by mail-wm1-f65.google.com with SMTP id n9so4303587wmi.0;
-        Mon, 01 Jul 2019 07:54:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=CAXSIF6Ao3g4SuCwb5RSzByJ3Q/JacDT0Jn2E1kcim4=;
-        b=vV0wO44KZqDziwzq3iRnqdyJDdA7zcKHMyjALa20OiZd2Ci2laoS0ILAuulyy/SSsa
-         9zJzGSGle3y/YQ5lmhnTvY8Qobmy/oAC/Stk7bKFaDja/e4Y48k4D5iRBkZDqqCBGd8Y
-         73qJfTbJt81QTHdmrK+KP8PbOtNPIG4U+xawb+Sz1OAYyIr0SDFcg2TM64vZHRQK771x
-         uoB6p9fjQVCDITV/KB3pwXIum83iJ1J+cGX1Uini9VlwlB+QYsM0xf48QTiXbmIZcVtX
-         dNsyL3XMPHLaMRgWYQIeUgz27ZKezCSpUIZfimoyzjaUBiw16SeQ99AtCvgofSnsef1r
-         WKgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=CAXSIF6Ao3g4SuCwb5RSzByJ3Q/JacDT0Jn2E1kcim4=;
-        b=SeKUxvs+PzVhdp1jzj5PJxo0dOCvB/dAgyTPc5jKS+hra+9nOPe/oK0G8+kP3+oEqt
-         oapxWcL9UbfGSMXjyT+ddpYlrfmr1ud6U3OLWYy1AcLpMI8nGf4KgijfV+CmisMqe+Z1
-         /QXDGsIDrtZV40MrxKeVGeXJafs5tLW+zyb9RlJvAWhykWsMEkZgf6MthbRYTMRA1ElU
-         BKHFBNfo9fw9yCaASOfV3J6hgtStlCLddyeERnCvos2Y9wYxjvoZu6IfH3fMgzHH+OEp
-         3JoCsvXizBujHxLaaKhbIi/W2Z3HU8GtLQU/wUVXtEHlaWNdaJ7UBzIc8lnpWLPG6yBx
-         ONqA==
-X-Gm-Message-State: APjAAAVhXw6jCrHexg6qm3pmKefaAFnZNeU5zKKsT94jy+IUNMnRU9MU
-        oAohHyxW8fv1eHaunNB5rj0UZWaUdgOAJg==
-X-Google-Smtp-Source: APXvYqzNw+l/hQ290ZZxE7dWlMt05RbBEfvm60/xqqW6qlfwCFjaO2VCtbx4Ol6vrWUk5mD2SswNow==
-X-Received: by 2002:a1c:b146:: with SMTP id a67mr17097250wmf.124.1561992854086;
-        Mon, 01 Jul 2019 07:54:14 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
-        by smtp.gmail.com with ESMTPSA id 32sm22933497wra.35.2019.07.01.07.54.13
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 01 Jul 2019 07:54:13 -0700 (PDT)
-Date:   Mon, 1 Jul 2019 15:54:12 +0100
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     netdev@vger.kernel.org, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v2 1/3] vsock/virtio: use RCU to avoid use-after-free on
- the_virtio_vsock
-Message-ID: <20190701145412.GA11900@stefanha-x1.localdomain>
-References: <20190628123659.139576-1-sgarzare@redhat.com>
- <20190628123659.139576-2-sgarzare@redhat.com>
+        id S1729907AbfGAOyt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jul 2019 10:54:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27119 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728453AbfGAOyt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jul 2019 10:54:49 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2062A3082A27;
+        Mon,  1 Jul 2019 14:54:49 +0000 (UTC)
+Received: from gimli.home (ovpn-116-83.phx2.redhat.com [10.3.116.83])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 735897E8F7;
+        Mon,  1 Jul 2019 14:54:44 +0000 (UTC)
+Subject: [PATCH v2] mdev: Send uevents around parent device registration
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     kwankhede@nvidia.com, alex.williamson@redhat.com, cohuck@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Mon, 01 Jul 2019 08:54:44 -0600
+Message-ID: <156199271955.1646.13321360197612813634.stgit@gimli.home>
+User-Agent: StGit/0.19-dirty
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="fdj2RfSjLxBAspz7"
-Content-Disposition: inline
-In-Reply-To: <20190628123659.139576-2-sgarzare@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Mon, 01 Jul 2019 14:54:49 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This allows udev to trigger rules when a parent device is registered
+or unregistered from mdev.
 
---fdj2RfSjLxBAspz7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
 
-On Fri, Jun 28, 2019 at 02:36:57PM +0200, Stefano Garzarella wrote:
-> Some callbacks used by the upper layers can run while we are in the
-> .remove(). A potential use-after-free can happen, because we free
-> the_virtio_vsock without knowing if the callbacks are over or not.
->=20
-> To solve this issue we move the assignment of the_virtio_vsock at the
-> end of .probe(), when we finished all the initialization, and at the
-> beginning of .remove(), before to release resources.
-> For the same reason, we do the same also for the vdev->priv.
->=20
-> We use RCU to be sure that all callbacks that use the_virtio_vsock
-> ended before freeing it. This is not required for callbacks that
-> use vdev->priv, because after the vdev->config->del_vqs() we are sure
-> that they are ended and will no longer be invoked.
+v2: Don't remove the dev_info(), Kirti requested they stay and
+    removing them is only tangential to the goal of this change.
 
-->del_vqs() is only called at the very end, did you forget to move it
-earlier?
+ drivers/vfio/mdev/mdev_core.c |    8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-In particular, the virtqueue handler callbacks schedule a workqueue.
-The work functions use container_of() to get vsock.  We need to be sure
-that the work item isn't freed along with vsock while the work item is
-still pending.
+diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+index ae23151442cb..7fb268136c62 100644
+--- a/drivers/vfio/mdev/mdev_core.c
++++ b/drivers/vfio/mdev/mdev_core.c
+@@ -146,6 +146,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+ {
+ 	int ret;
+ 	struct mdev_parent *parent;
++	char *env_string = "MDEV_STATE=registered";
++	char *envp[] = { env_string, NULL };
+ 
+ 	/* check for mandatory ops */
+ 	if (!ops || !ops->create || !ops->remove || !ops->supported_type_groups)
+@@ -197,6 +199,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+ 	mutex_unlock(&parent_list_lock);
+ 
+ 	dev_info(dev, "MDEV: Registered\n");
++	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
++
+ 	return 0;
+ 
+ add_dev_err:
+@@ -220,6 +224,8 @@ EXPORT_SYMBOL(mdev_register_device);
+ void mdev_unregister_device(struct device *dev)
+ {
+ 	struct mdev_parent *parent;
++	char *env_string = "MDEV_STATE=unregistered";
++	char *envp[] = { env_string, NULL };
+ 
+ 	mutex_lock(&parent_list_lock);
+ 	parent = __find_parent_device(dev);
+@@ -243,6 +249,8 @@ void mdev_unregister_device(struct device *dev)
+ 	up_write(&parent->unreg_sem);
+ 
+ 	mdev_put_parent(parent);
++
++	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+ }
+ EXPORT_SYMBOL(mdev_unregister_device);
+ 
 
-How do we know that the virtqueue handler is never called in such a way
-that it sees vsock !=3D NULL (there is no explicit memory barrier on the
-read side) and then schedules a work item after flush_work() has run?
-
-Stefan
-
---fdj2RfSjLxBAspz7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0aHpQACgkQnKSrs4Gr
-c8h3iggAyuubhQSWc2lhNVpR8Iy+q+vzwq6cn2HkKAJfd12b4HEHPiQthM2torlj
-Bv8w164J+O/rOon9ZrilyvFEgF2NuQbHiyd7REvtp4tKyZow9wVqj4VT2s0CIxAM
-5w3ijDBYRXnC2YmnnjJLJb/xhmkrjboxZcX7BuPjNbsNtkxcVer9KlOZOp9tjL7N
-OYm4hhy/aHydI1SwBIbVYNvyWGvjhpZqYixHr2uOB/Xd/kisVztQoJE77oRPD6IS
-3kScisIJxoNurY1izyyJfSI0OJ+chyeGNLeR/NzvMGiPRUeEIZCC/Z2jGGBGD7WU
-re2dtf93pyrxquVVa7nd39azFSXO3w==
-=NQ6E
------END PGP SIGNATURE-----
-
---fdj2RfSjLxBAspz7--
