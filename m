@@ -2,118 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DADA5BDA1
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 16:07:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6963D5BE7E
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 16:40:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729377AbfGAOHe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jul 2019 10:07:34 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45162 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729271AbfGAOHe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jul 2019 10:07:34 -0400
-Received: by mail-wr1-f65.google.com with SMTP id f9so13996087wre.12
-        for <kvm@vger.kernel.org>; Mon, 01 Jul 2019 07:07:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nFgxD9rL23Oz9CPZh09yHtmosD6ueKCUCwoA/+ADGM0=;
-        b=EX6GiqCZ1rllUQkL9z9Rp0xsNFb2HjaZGt9oDbrVeBgzj27Gm6FdUhsobt2Kiks6D3
-         FtbqM4hFFLd4AsR09oO4MGlYffUYMkiuxmuBbIG05NJ5lIMw2QrivZRSGtZcQdsjo2kn
-         zj5GkyoZWaXLSsWRJCTlz4qTZP6XE743cjhY0uuz/kQnyzwSk3UdZzgwgBel6uiepQw6
-         wcsAMHl9ARrsGvXcT14nLw0MEf3Pb+wxRM1VPXJ0wOXsVdZexzX3PgC2A1C/QTtEp9ci
-         WAACTYItX1mQGyfx7wEh+6zBfcp5K0/U5z7x+/gRHvqEPnv/ta3Ofs4cdYi0yTLlecj4
-         0gaQ==
-X-Gm-Message-State: APjAAAXacfjOKEuNZSVIvJxi7WJwri6DVx17VarYRvsFZ11MaOILGucd
-        LCz0I+R3ErNVSUvnfKOza9aEiA==
-X-Google-Smtp-Source: APXvYqyuAvyUqXtxSLleXgKlPKlCIaoTVNUM59318FW5rEe1Qw7U6WXaWQ67sDcZwRJQrwlecV/cOg==
-X-Received: by 2002:a5d:6182:: with SMTP id j2mr9142312wru.275.1561990052171;
-        Mon, 01 Jul 2019 07:07:32 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:5d4d:4830:bcdf:9bf9? ([2001:b07:6468:f312:5d4d:4830:bcdf:9bf9])
-        by smtp.gmail.com with ESMTPSA id t1sm15622481wra.74.2019.07.01.07.07.31
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 01 Jul 2019 07:07:31 -0700 (PDT)
-Subject: Re: [GIT PULL 0/7] KVM: s390: add kselftests
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-References: <20190701125848.276133-1-borntraeger@de.ibm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b5f74797-1ff7-26fc-4a5a-1fdabef22671@redhat.com>
-Date:   Mon, 1 Jul 2019 16:07:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1728179AbfGAOk5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jul 2019 10:40:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55584 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726840AbfGAOk4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jul 2019 10:40:56 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8A61759464;
+        Mon,  1 Jul 2019 14:40:56 +0000 (UTC)
+Received: from x1.home (ovpn-116-83.phx2.redhat.com [10.3.116.83])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 689D217AB6;
+        Mon,  1 Jul 2019 14:40:51 +0000 (UTC)
+Date:   Mon, 1 Jul 2019 08:40:51 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Libvirt Devel <libvir-list@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Erik Skultety <eskultet@redhat.com>,
+        Pavel Hrdina <phrdina@redhat.com>,
+        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+        Sylvain Bauza <sbauza@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>
+Subject: Re: mdevctl: A shoestring mediated device management and
+ persistence utility
+Message-ID: <20190701084051.7f2bbc24@x1.home>
+In-Reply-To: <20190701102043.61afa0da.cohuck@redhat.com>
+References: <20190523172001.41f386d8@x1.home>
+        <20190625165251.609f6266@x1.home>
+        <20190626115806.3435c45c.cohuck@redhat.com>
+        <20190626083720.42a2b5d4@x1.home>
+        <20190626195350.2e9c81d3@x1.home>
+        <20190627142626.415138da.cohuck@redhat.com>
+        <06114b39-69c2-3fa0-d0b3-aa96a44ae2ce@linux.ibm.com>
+        <20190627093832.064a346f@x1.home>
+        <20190627151502.2ae5314f@x1.home>
+        <20190627195704.66be88c8@x1.home>
+        <20190628110648.40e0607d.cohuck@redhat.com>
+        <20190628110546.4d3ce595@x1.home>
+        <20190701102043.61afa0da.cohuck@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20190701125848.276133-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Mon, 01 Jul 2019 14:40:56 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/07/19 14:58, Christian Borntraeger wrote:
-> Paolo, Radim,
-> 
-> kselftest for s390x. There is a small conflict with Linus tree due to
-> 61cfcd545e42 ("kvm: tests: Sort tests in the Makefile alphabetically")
-> which is part of kvm/master but not kvm/next.
-> Other than that this looks good.
+On Mon, 1 Jul 2019 10:20:43 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Thanks! I'll delay this to after the first merge window pull request to
-avoid the conflict.
+> On Fri, 28 Jun 2019 11:05:46 -0600
+> Alex Williamson <alex.williamson@redhat.com> wrote:
+> 
+> > On Fri, 28 Jun 2019 11:06:48 +0200
+> > Cornelia Huck <cohuck@redhat.com> wrote:  
+> 
+> > > What do you think of a way to specify JSON for the attributes directly
+> > > on the command line? Or would it be better to just edit the config
+> > > files directly?    
+> > 
+> > Supplying json on the command like seems difficult, even doing so with
+> > with jq requires escaping quotes.  It's not a very friendly
+> > experience.  Maybe something more like how virsh allows snippets of xml
+> > to be included, we could use jq to validate a json snippet provided
+> > as a file and add it to the attributes... of course if we need to allow
+> > libvirt to modify the json config files directly, the user could do
+> > that as well.  Is there a use case you're thinking of?  Maybe we could
+> > augment the 'list' command to take a --uuid and --dumpjson option and
+> > the 'define' command to accept a --jsonfile.  Maybe the 'start' command
+> > could accept the same, so a transient device could define attributes
+> > w/o excessive command line options.  Thanks,
+> > 
+> > Alex  
+> 
+> I was mostly thinking about complex configurations where writing a JSON
+> config would be simpler than adding a lot of command line options.
+> Something like dumping a JSON file and allowing to refer to a JSON file
+> as you suggested could be useful; but then, those very complex use
+> cases are probably already covered by editing the config file directly.
+> Not sure if it is worth the effort; maybe just leave it as it is for
+> now.
 
-Paolo
+Well, I already did it.  It seems useful for creating transient devices
+with attribute specifications.  If it's too ugly we can drop it.
+Thanks,
 
-> 
-> The following changes since commit f2c7c76c5d0a443053e94adb9f0918fa2fb85c3a:
-> 
->   Linux 5.2-rc3 (2019-06-02 13:55:33 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.3-1
-> 
-> for you to fetch changes up to 8343ba2d4820b1738bbb7cb40ec18ea0a3b0b331:
-> 
->   KVM: selftests: enable pgste option for the linker on s390 (2019-06-04 14:05:38 +0200)
-> 
-> ----------------------------------------------------------------
-> KVM: s390: add kselftests
-> 
-> This is the initial implementation for KVM selftests on s390.
-> 
-> ----------------------------------------------------------------
-> Christian Borntraeger (1):
->       KVM: selftests: enable pgste option for the linker on s390
-> 
-> Thomas Huth (6):
->       KVM: selftests: Guard struct kvm_vcpu_events with __KVM_HAVE_VCPU_EVENTS
->       KVM: selftests: Introduce a VM_MODE_DEFAULT macro for the default bits
->       KVM: selftests: Align memory region addresses to 1M on s390x
->       KVM: selftests: Add processor code for s390x
->       KVM: selftests: Add the sync_regs test for s390x
->       KVM: selftests: Move kvm_create_max_vcpus test to generic code
-> 
->  MAINTAINERS                                        |   2 +
->  tools/testing/selftests/kvm/Makefile               |  14 +-
->  tools/testing/selftests/kvm/include/kvm_util.h     |   8 +
->  .../selftests/kvm/include/s390x/processor.h        |  22 ++
->  .../kvm/{x86_64 => }/kvm_create_max_vcpus.c        |   3 +-
->  .../testing/selftests/kvm/lib/aarch64/processor.c  |   2 +-
->  tools/testing/selftests/kvm/lib/kvm_util.c         |  23 +-
->  tools/testing/selftests/kvm/lib/s390x/processor.c  | 286 +++++++++++++++++++++
->  tools/testing/selftests/kvm/lib/x86_64/processor.c |   2 +-
->  tools/testing/selftests/kvm/s390x/sync_regs_test.c | 151 +++++++++++
->  10 files changed, 503 insertions(+), 10 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/include/s390x/processor.h
->  rename tools/testing/selftests/kvm/{x86_64 => }/kvm_create_max_vcpus.c (93%)
->  create mode 100644 tools/testing/selftests/kvm/lib/s390x/processor.c
->  create mode 100644 tools/testing/selftests/kvm/s390x/sync_regs_test.c
-> 
-
+Alex
