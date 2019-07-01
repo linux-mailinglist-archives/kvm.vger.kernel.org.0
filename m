@@ -2,119 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D771A5C1B1
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 19:04:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FCED5C1CC
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 19:13:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729449AbfGAREC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jul 2019 13:04:02 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:37434 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728739AbfGAREC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jul 2019 13:04:02 -0400
-Received: by mail-wm1-f65.google.com with SMTP id f17so290216wme.2
-        for <kvm@vger.kernel.org>; Mon, 01 Jul 2019 10:04:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Ld/S+VVZs8pmZedqdnP/S9bHBpKYWy8WRk/m3Q5+2LI=;
-        b=uRnnLctutb6bY7HIsQK5J5gnFyXak0eI+QBAcLcoFD+4F2MeDzem3r97pyxwpb5zwj
-         tHIUIXBvlcL24N6mG3kDRK8HxJxCTA3R7iBG6UxomSEZPV4Ue0YUSsAlfa6lA1lYheMo
-         ARMQfk9/7YZqQVlCf1IU6RFxRwE8InYnW2/AdVhe0mT/BpwqfjcSOrl3GRan/XX0jFI9
-         jGwHJzfi7YpM8eXE9iG8GgiMekN0mdYcnbRnHDxjXkcalscZuv14dLeEbq5Z4UDp6+5D
-         P2HlRISPCMp3qD+HbY8x2H11uegBeEu/+YB6tyU0xPV1S/N2ISGcN6oDuHLonsiPO0cr
-         rBQQ==
-X-Gm-Message-State: APjAAAX8ElHupn6SjpQE1SlkR6N+iN5PgV8Uq2gd89XR9ucH2dRJNvqz
-        P4V5AKlOMIvtgBpEVnFfYYHkKA==
-X-Google-Smtp-Source: APXvYqwBOYSxwelsum2oddoo+4pw1dZnLt7m1hYtVtolWxEgwL2beWLJsaejVTIBg02GC95ss28lWA==
-X-Received: by 2002:a1c:7503:: with SMTP id o3mr183987wmc.170.1562000640687;
-        Mon, 01 Jul 2019 10:04:00 -0700 (PDT)
-Received: from steredhat (host21-207-dynamic.52-79-r.retail.telecomitalia.it. [79.52.207.21])
-        by smtp.gmail.com with ESMTPSA id q18sm9950224wrj.65.2019.07.01.10.03.59
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 01 Jul 2019 10:04:00 -0700 (PDT)
-Date:   Mon, 1 Jul 2019 19:03:57 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Stefan Hajnoczi <stefanha@gmail.com>
-Cc:     netdev@vger.kernel.org, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v2 0/3] vsock/virtio: several fixes in the .probe() and
- .remove()
-Message-ID: <20190701170357.jtuhy3ank7mv6izb@steredhat>
-References: <20190628123659.139576-1-sgarzare@redhat.com>
- <20190701151113.GE11900@stefanha-x1.localdomain>
+        id S1727825AbfGARNX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jul 2019 13:13:23 -0400
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:4261 "EHLO
+        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726840AbfGARNW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jul 2019 13:13:22 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d1a3f350001>; Mon, 01 Jul 2019 10:13:25 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 01 Jul 2019 10:13:21 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 01 Jul 2019 10:13:21 -0700
+Received: from [10.24.70.16] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 1 Jul
+ 2019 17:13:19 +0000
+Subject: Re: [PATCH v2] mdev: Send uevents around parent device registration
+To:     Alex Williamson <alex.williamson@redhat.com>, <cohuck@redhat.com>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <156199271955.1646.13321360197612813634.stgit@gimli.home>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <08597ab4-cc37-3973-8927-f1bc430f6185@nvidia.com>
+Date:   Mon, 1 Jul 2019 22:43:10 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190701151113.GE11900@stefanha-x1.localdomain>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <156199271955.1646.13321360197612813634.stgit@gimli.home>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1562001205; bh=0lQwhe1HpiNpeWtAVtJVyaJWhoLA1XtQt05bVEOWBik=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:MIME-Version:In-Reply-To:X-Originating-IP:
+         X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=buAojMM4bUC1AwNXGNxq2pfeUu3nBRvD9hvUtsuiOw8AQW6p4wEimtn2xmmKNe0Ml
+         1/1YPBvz/V2Z6FSrLiCl58gYCDExQXXnqDA1oZLypnhiBoJ/V8qXqj8Aa+GwGRXvTw
+         sx5e3BwpDLQ1sftAYwcs2r1aEC/5fl1PGyPMKvk8J6+fongHgfKgGZ36D0Lhg52b3S
+         Yx7QQ/PMQNX9KNnoqZMdG4XXtAWA8xW69ZpWjzeUppW78gprAXfUv0X7N6GKWy8abR
+         V8PLaTUA12EIreJWTD0fmQqh/QjaVBCrtEXmtUxLPJ9y/eGt4Grbz8DcaH1jbgsso/
+         Gx++K//Lck7gg==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 01, 2019 at 04:11:13PM +0100, Stefan Hajnoczi wrote:
-> On Fri, Jun 28, 2019 at 02:36:56PM +0200, Stefano Garzarella wrote:
-> > During the review of "[PATCH] vsock/virtio: Initialize core virtio vsock
-> > before registering the driver", Stefan pointed out some possible issues
-> > in the .probe() and .remove() callbacks of the virtio-vsock driver.
-> > 
-> > This series tries to solve these issues:
-> > - Patch 1 adds RCU critical sections to avoid use-after-free of
-> >   'the_virtio_vsock' pointer.
-> > - Patch 2 stops workers before to call vdev->config->reset(vdev) to
-> >   be sure that no one is accessing the device.
-> > - Patch 3 moves the works flush at the end of the .remove() to avoid
-> >   use-after-free of 'vsock' object.
-> > 
-> > v2:
-> > - Patch 1: use RCU to protect 'the_virtio_vsock' pointer
-> > - Patch 2: no changes
-> > - Patch 3: flush works only at the end of .remove()
-> > - Removed patch 4 because virtqueue_detach_unused_buf() returns all the buffers
-> >   allocated.
-> > 
-> > v1: https://patchwork.kernel.org/cover/10964733/
+
+
+On 7/1/2019 8:24 PM, Alex Williamson wrote:
+> This allows udev to trigger rules when a parent device is registered
+> or unregistered from mdev.
 > 
-> This looks good to me.
-
-Thanks for the review!
-
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
 > 
-> Did you run any stress tests?  For example an SMP guest constantly
-> connecting and sending packets together with a script that
-> hotplug/unplugs vhost-vsock-pci from the host side.
+> v2: Don't remove the dev_info(), Kirti requested they stay and
+>     removing them is only tangential to the goal of this change.
+> 
 
-Yes, I started an SMP guest (-smp 4 -monitor tcp:127.0.0.1:1234,server,nowait)
-and I run these scripts to stress the .probe()/.remove() path:
+Thanks.
 
-- guest
-  while true; do
-      cat /dev/urandom | nc-vsock -l 4321 > /dev/null &
-      cat /dev/urandom | nc-vsock -l 5321 > /dev/null &
-      cat /dev/urandom | nc-vsock -l 6321 > /dev/null &
-      cat /dev/urandom | nc-vsock -l 7321 > /dev/null &
-      wait
-  done
 
-- host
-  while true; do
-      cat /dev/urandom | nc-vsock 3 4321 > /dev/null &
-      cat /dev/urandom | nc-vsock 3 5321 > /dev/null &
-      cat /dev/urandom | nc-vsock 3 6321 > /dev/null &
-      cat /dev/urandom | nc-vsock 3 7321 > /dev/null &
-      sleep 2
-      echo "device_del v1" | nc 127.0.0.1 1234
-      sleep 1
-      echo "device_add vhost-vsock-pci,id=v1,guest-cid=3" | nc 127.0.0.1 1234
-      sleep 1
-  done
+>  drivers/vfio/mdev/mdev_core.c |    8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+> index ae23151442cb..7fb268136c62 100644
+> --- a/drivers/vfio/mdev/mdev_core.c
+> +++ b/drivers/vfio/mdev/mdev_core.c
+> @@ -146,6 +146,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+>  {
+>  	int ret;
+>  	struct mdev_parent *parent;
+> +	char *env_string = "MDEV_STATE=registered";
+> +	char *envp[] = { env_string, NULL };
+>  
+>  	/* check for mandatory ops */
+>  	if (!ops || !ops->create || !ops->remove || !ops->supported_type_groups)
+> @@ -197,6 +199,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+>  	mutex_unlock(&parent_list_lock);
+>  
+>  	dev_info(dev, "MDEV: Registered\n");
+> +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+> +
+>  	return 0;
+>  
+>  add_dev_err:
+> @@ -220,6 +224,8 @@ EXPORT_SYMBOL(mdev_register_device);
+>  void mdev_unregister_device(struct device *dev)
+>  {
+>  	struct mdev_parent *parent;
+> +	char *env_string = "MDEV_STATE=unregistered";
+> +	char *envp[] = { env_string, NULL };
+>  
+>  	mutex_lock(&parent_list_lock);
+>  	parent = __find_parent_device(dev);
+> @@ -243,6 +249,8 @@ void mdev_unregister_device(struct device *dev)
+>  	up_write(&parent->unreg_sem);
+>  
+>  	mdev_put_parent(parent);
+> +
+> +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
 
-Do you think is enough or is better to have a test more accurate?
+mdev_put_parent() calls put_device(dev). If this is the last instance
+holding device, then on put_device(dev) dev would get freed.
+
+This event should be before mdev_put_parent()
 
 Thanks,
-Stefano
+Kirti
+
+>  }
+>  EXPORT_SYMBOL(mdev_unregister_device);
+>  
+> 
