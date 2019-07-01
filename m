@@ -2,127 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 268675B4FD
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 08:24:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C04E5B640
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 10:03:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727395AbfGAGX7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jul 2019 02:23:59 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:41454 "EHLO mxhk.zte.com.cn"
+        id S1727434AbfGAIDM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jul 2019 04:03:12 -0400
+Received: from foss.arm.com ([217.140.110.172]:57122 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725616AbfGAGX6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jul 2019 02:23:58 -0400
-Received: from mse-fl1.zte.com.cn (unknown [10.30.14.238])
-        by Forcepoint Email with ESMTPS id D26B3C151C38B5507445;
-        Mon,  1 Jul 2019 14:23:55 +0800 (CST)
-Received: from notes_smtp.zte.com.cn ([10.30.1.239])
-        by mse-fl1.zte.com.cn with ESMTP id x616Mhka033824;
-        Mon, 1 Jul 2019 14:22:43 +0800 (GMT-8)
-        (envelope-from wang.yi59@zte.com.cn)
-Received: from fox-host8.localdomain ([10.74.120.8])
-          by szsmtp06.zte.com.cn (Lotus Domino Release 8.5.3FP6)
-          with ESMTP id 2019070114224699-1995718 ;
-          Mon, 1 Jul 2019 14:22:46 +0800 
-From:   Yi Wang <wang.yi59@zte.com.cn>
-To:     pbonzini@redhat.com
-Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
-        wang.yi59@zte.com.cn, up2wing@gmail.com, wang.liang82@zte.com.cn
-Subject: [PATCH 4/4] kvm: x86: convert TSC pr_debugs to be gated by CONFIG_KVM_DEBUG
-Date:   Mon, 1 Jul 2019 14:21:11 +0800
-Message-Id: <1561962071-25974-5-git-send-email-wang.yi59@zte.com.cn>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1561962071-25974-1-git-send-email-wang.yi59@zte.com.cn>
-References: <1561962071-25974-1-git-send-email-wang.yi59@zte.com.cn>
-X-MIMETrack: Itemize by SMTP Server on SZSMTP06/server/zte_ltd(Release 8.5.3FP6|November
- 21, 2013) at 2019-07-01 14:22:47,
-        Serialize by Router on notes_smtp/zte_ltd(Release 9.0.1FP7|August  17, 2016) at
- 2019-07-01 14:22:44,
-        Serialize complete at 2019-07-01 14:22:44
-X-MAIL: mse-fl1.zte.com.cn x616Mhka033824
+        id S1726036AbfGAIDL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jul 2019 04:03:11 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 41CA72B;
+        Mon,  1 Jul 2019 01:03:11 -0700 (PDT)
+Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ECB0D3F718;
+        Mon,  1 Jul 2019 01:03:09 -0700 (PDT)
+Subject: Re: [PATCH 38/59] KVM: arm64: nv: Unmap/flush shadow stage 2 page
+ tables
+To:     Marc Zyngier <marc.zyngier@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-39-marc.zyngier@arm.com>
+From:   Julien Thierry <julien.thierry@arm.com>
+Message-ID: <d17216b4-59c7-5993-85d0-6ee7aa532852@arm.com>
+Date:   Mon, 1 Jul 2019 09:03:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190621093843.220980-39-marc.zyngier@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are some pr_debug in TSC code, which may affect
-performance, so it may make sense to wrap them using a new
-macro tsc_debug which takes effect only when CONFIG_KVM_DEBUG
-is defined.
 
-Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
----
- arch/x86/kvm/x86.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 83aefd7..1505e53 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -74,6 +74,12 @@
- #define CREATE_TRACE_POINTS
- #include "trace.h"
- 
-+#ifdef CONFIG_KVM_DEBUG
-+#define tsc_debug(x...) pr_debug(x)
-+#else
-+#define tsc_debug(x...)
-+#endif
-+
- #define MAX_IO_MSRS 256
- #define KVM_MAX_MCE_BANKS 32
- u64 __read_mostly kvm_mce_cap_supported = MCG_CTL_P | MCG_SER_P;
-@@ -1522,7 +1528,7 @@ static void kvm_get_time_scale(uint64_t scaled_hz, uint64_t base_hz,
- 	*pshift = shift;
- 	*pmultiplier = div_frac(scaled64, tps32);
- 
--	pr_debug("%s: base_hz %llu => %llu, shift %d, mul %u\n",
-+	tsc_debug("%s: base_hz %llu => %llu, shift %d, mul %u\n",
- 		 __func__, base_hz, scaled_hz, shift, *pmultiplier);
- }
- 
-@@ -1603,7 +1609,7 @@ static int kvm_set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz)
- 	thresh_lo = adjust_tsc_khz(tsc_khz, -tsc_tolerance_ppm);
- 	thresh_hi = adjust_tsc_khz(tsc_khz, tsc_tolerance_ppm);
- 	if (user_tsc_khz < thresh_lo || user_tsc_khz > thresh_hi) {
--		pr_debug("kvm: requested TSC rate %u falls outside tolerance [%u,%u]\n", user_tsc_khz, thresh_lo, thresh_hi);
-+		tsc_debug("kvm: requested TSC rate %u falls outside tolerance [%u,%u]\n", user_tsc_khz, thresh_lo, thresh_hi);
- 		use_scaling = 1;
- 	}
- 	return set_tsc_khz(vcpu, user_tsc_khz, use_scaling);
-@@ -1766,12 +1772,12 @@ void kvm_write_tsc(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 	    vcpu->arch.virtual_tsc_khz == kvm->arch.last_tsc_khz) {
- 		if (!kvm_check_tsc_unstable()) {
- 			offset = kvm->arch.cur_tsc_offset;
--			pr_debug("kvm: matched tsc offset for %llu\n", data);
-+			tsc_debug("kvm: matched tsc offset for %llu\n", data);
- 		} else {
- 			u64 delta = nsec_to_cycles(vcpu, elapsed);
- 			data += delta;
- 			offset = kvm_compute_tsc_offset(vcpu, data);
--			pr_debug("kvm: adjusted tsc offset by %llu\n", delta);
-+			tsc_debug("kvm: adjusted tsc offset by %llu\n", delta);
- 		}
- 		matched = true;
- 		already_matched = (vcpu->arch.this_tsc_generation == kvm->arch.cur_tsc_generation);
-@@ -1790,7 +1796,7 @@ void kvm_write_tsc(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 		kvm->arch.cur_tsc_write = data;
- 		kvm->arch.cur_tsc_offset = offset;
- 		matched = false;
--		pr_debug("kvm: new tsc generation %llu, clock %llu\n",
-+		tsc_debug("kvm: new tsc generation %llu, clock %llu\n",
- 			 kvm->arch.cur_tsc_generation, data);
- 	}
- 
-@@ -6860,7 +6866,7 @@ static void kvm_timer_init(void)
- 		cpufreq_register_notifier(&kvmclock_cpufreq_notifier_block,
- 					  CPUFREQ_TRANSITION_NOTIFIER);
- 	}
--	pr_debug("kvm: max_tsc_khz = %ld\n", max_tsc_khz);
-+	tsc_debug("kvm: max_tsc_khz = %ld\n", max_tsc_khz);
- 
- 	cpuhp_setup_state(CPUHP_AP_X86_KVM_CLK_ONLINE, "x86/kvm/clk:online",
- 			  kvmclock_cpu_online, kvmclock_cpu_down_prep);
+On 21/06/2019 10:38, Marc Zyngier wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+> Unmap/flush shadow stage 2 page tables for the nested VMs as well as the
+> stage 2 page table for the guest hypervisor.
+> 
+> Note: A bunch of the code in mmu.c relating to MMU notifiers is
+> currently dealt with in an extremely abrupt way, for example by clearing
+> out an entire shadow stage-2 table. This will be handled in a more
+> efficient way using the reverse mapping feature in a later version of
+> the patch series.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_mmu.h    |  3 +++
+>  arch/arm64/include/asm/kvm_nested.h |  3 +++
+>  arch/arm64/kvm/nested.c             | 39 +++++++++++++++++++++++++++
+>  virt/kvm/arm/arm.c                  |  4 ++-
+>  virt/kvm/arm/mmu.c                  | 42 +++++++++++++++++++++++------
+>  5 files changed, 82 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 32bcaa1845dc..f4c5ac5eb95f 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -163,6 +163,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+>  			   void __iomem **haddr);
+>  int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+>  			     void **haddr);
+> +void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu,
+> +			    phys_addr_t addr, phys_addr_t end);
+>  void free_hyp_pgds(void);
+>  
+>  void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
+> @@ -171,6 +173,7 @@ int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu);
+>  void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+>  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  			  phys_addr_t pa, unsigned long size, bool writable);
+> +void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end);
+>  
+>  int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>  
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 052d46d96201..3b415bc76ced 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -48,6 +48,9 @@ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+>  extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+>  				    struct kvm_s2_trans *trans);
+>  extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
+> +extern void kvm_nested_s2_wp(struct kvm *kvm);
+> +extern void kvm_nested_s2_clear(struct kvm *kvm);
+> +extern void kvm_nested_s2_flush(struct kvm *kvm);
+>  int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+>  extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+>  extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 023027fa2db5..8880033fb6e0 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -456,6 +456,45 @@ int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2)
+>  	return kvm_inject_nested_sync(vcpu, esr_el2);
+>  }
+>  
+> +/* expects kvm->mmu_lock to be held */
+> +void kvm_nested_s2_wp(struct kvm *kvm)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +
+> +		if (kvm_s2_mmu_valid(mmu))
+> +			kvm_stage2_wp_range(mmu, 0, kvm_phys_size(kvm));
+> +	}
+> +}
+> +
+> +/* expects kvm->mmu_lock to be held */
+> +void kvm_nested_s2_clear(struct kvm *kvm)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +
+> +		if (kvm_s2_mmu_valid(mmu))
+> +			kvm_unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
+> +	}
+> +}
+> +
+> +/* expects kvm->mmu_lock to be held */
+> +void kvm_nested_s2_flush(struct kvm *kvm)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +
+> +		if (kvm_s2_mmu_valid(mmu))
+> +			kvm_stage2_flush_range(mmu, 0, kvm_phys_size(kvm));
+> +	}
+> +}
+> +
+>  /*
+>   * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+>   * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
+> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+> index 4e3cbfa1ecbe..bcca27d5c481 100644
+> --- a/virt/kvm/arm/arm.c
+> +++ b/virt/kvm/arm/arm.c
+> @@ -1005,8 +1005,10 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  	 * Ensure a rebooted VM will fault in RAM pages and detect if the
+>  	 * guest MMU is turned off and flush the caches as needed.
+>  	 */
+> -	if (vcpu->arch.has_run_once)
+> +	if (vcpu->arch.has_run_once) {
+>  		stage2_unmap_vm(vcpu->kvm);
+> +		kvm_nested_s2_clear(vcpu->kvm);
+
+The comment above kvm_nested_s2_clear() states that kvm->mmu_lock needs
+to be taken, but in this state it isn't (stage2_unmap_vm() acquies the
+lock and releases it).
+
+Cheers,
+
 -- 
-1.8.3.1
-
+Julien Thierry
