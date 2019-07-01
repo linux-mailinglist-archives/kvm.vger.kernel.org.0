@@ -2,116 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B0E25C406
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 21:57:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 77CA35C420
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 22:04:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726803AbfGAT4X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jul 2019 15:56:23 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:33518 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726586AbfGAT4W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jul 2019 15:56:22 -0400
-Received: by mail-wr1-f66.google.com with SMTP id n9so15183667wru.0
-        for <kvm@vger.kernel.org>; Mon, 01 Jul 2019 12:56:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1wfRyxHjaqIfCvUIJ03z9Pt6+BqqMhUX9dFlDyzKWS4=;
-        b=ifOcCtBGPm+973a4Qk+IK5lrGbY27fT6DnLArOAWeLDnJU8JEI8YbpX9mxyOjUqKPL
-         /e8sjhGjaQNVkcz6qywU8bR9yo35cKd72dXU6Wdcat0GNdGnMrcyLoZYoabFOqiArxbg
-         A/aUAEEQJyxCnV8nQiZgJfpxXrz5HiElv6oEG55BGS4Vu0rw5Ln7kuujQ+omvrZ2Y/B5
-         m5qWeWEEL4ZWx2kAyuehQKRt9iHA0SQnsyHVAb7BD1rAwMKT2bxF+7B+uRda79Msr3BY
-         915r0NATIHyVgPd3/VmBIjJaaGxV6szxVyCOW/OSiAFsj9Spc/unSaSNJ/VGHu0cbiTJ
-         w3hQ==
-X-Gm-Message-State: APjAAAVxfMcdmBuu9xIdsZUEcAIADRypgoh3BBOPGyMDVZ7Z0G8zOuz1
-        gLfKTPNI/7DgPiArvZN2Qvte1A==
-X-Google-Smtp-Source: APXvYqxSmcR30ge/EyBOXwxbAdhKB7iKdhT2IxmLNpMTB2qzCpAPeviMne5HP/Gg7blDKXCbYCWV9w==
-X-Received: by 2002:a5d:53c2:: with SMTP id a2mr20819742wrw.8.1562010980796;
-        Mon, 01 Jul 2019 12:56:20 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net. [88.21.202.183])
-        by smtp.gmail.com with ESMTPSA id e6sm1110355wrw.23.2019.07.01.12.56.19
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 01 Jul 2019 12:56:19 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 08/15] hw/i386/pc: Let fw_cfg_init() use
- the generic MachineState
-To:     Christophe de Dinechin <dinechin@redhat.com>, qemu-devel@nongnu.org
-Cc:     Yang Zhong <yang.zhong@intel.com>,
-        Samuel Ortiz <sameo@linux.intel.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Rob Bradford <robert.bradford@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Eduardo Habkost <ehabkost@redhat.com>
-References: <20190701133536.28946-1-philmd@redhat.com>
- <20190701133536.28946-9-philmd@redhat.com> <m1d0ithhhv.fsf@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <f3a567a4-496b-9158-1173-7c399a1fa3ee@redhat.com>
-Date:   Mon, 1 Jul 2019 21:56:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726673AbfGAUEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jul 2019 16:04:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40678 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726586AbfGAUEo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jul 2019 16:04:44 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 754C230872EA;
+        Mon,  1 Jul 2019 20:04:38 +0000 (UTC)
+Received: from x1.home (ovpn-116-83.phx2.redhat.com [10.3.116.83])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1F1B117BB2;
+        Mon,  1 Jul 2019 20:04:37 +0000 (UTC)
+Date:   Mon, 1 Jul 2019 14:04:36 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] mdev: Send uevents around parent device registration
+Message-ID: <20190701140436.45eabf07@x1.home>
+In-Reply-To: <3b338e73-7929-df20-ca2b-3223ba4ead39@nvidia.com>
+References: <156199271955.1646.13321360197612813634.stgit@gimli.home>
+        <08597ab4-cc37-3973-8927-f1bc430f6185@nvidia.com>
+        <20190701112442.176a8407@x1.home>
+        <3b338e73-7929-df20-ca2b-3223ba4ead39@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <m1d0ithhhv.fsf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Mon, 01 Jul 2019 20:04:43 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/1/19 6:01 PM, Christophe de Dinechin wrote:
-> Philippe Mathieu-Daudé writes:
-> 
->> We removed the PCMachineState access, we can now let the fw_cfg_init()
->> function to take a generic MachineState object.
-> 
-> to take -> take
-> 
->>
->> Suggested-by: Samuel Ortiz <sameo@linux.intel.com>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  hw/i386/pc.c | 5 +++--
->>  1 file changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 1e856704e1..60ee71924a 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -929,7 +929,7 @@ static void pc_build_smbios(PCMachineState *pcms)
->>      }
->>  }
->>
->> -static FWCfgState *fw_cfg_arch_create(PCMachineState *pcms,
->> +static FWCfgState *fw_cfg_arch_create(MachineState *ms,
-> 
-> I don't see where ms is used in the function. Maybe in a later patch,
-> I did not receive patches 09-15 yet.
+On Mon, 1 Jul 2019 23:20:35 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-You are right, it is not used (even if the following patches).
+> On 7/1/2019 10:54 PM, Alex Williamson wrote:
+> > On Mon, 1 Jul 2019 22:43:10 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> On 7/1/2019 8:24 PM, Alex Williamson wrote:  
+> >>> This allows udev to trigger rules when a parent device is registered
+> >>> or unregistered from mdev.
+> >>>
+> >>> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> >>> ---
+> >>>
+> >>> v2: Don't remove the dev_info(), Kirti requested they stay and
+> >>>     removing them is only tangential to the goal of this change.
+> >>>     
+> >>
+> >> Thanks.
+> >>
+> >>  
+> >>>  drivers/vfio/mdev/mdev_core.c |    8 ++++++++
+> >>>  1 file changed, 8 insertions(+)
+> >>>
+> >>> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+> >>> index ae23151442cb..7fb268136c62 100644
+> >>> --- a/drivers/vfio/mdev/mdev_core.c
+> >>> +++ b/drivers/vfio/mdev/mdev_core.c
+> >>> @@ -146,6 +146,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+> >>>  {
+> >>>  	int ret;
+> >>>  	struct mdev_parent *parent;
+> >>> +	char *env_string = "MDEV_STATE=registered";
+> >>> +	char *envp[] = { env_string, NULL };
+> >>>  
+> >>>  	/* check for mandatory ops */
+> >>>  	if (!ops || !ops->create || !ops->remove || !ops->supported_type_groups)
+> >>> @@ -197,6 +199,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+> >>>  	mutex_unlock(&parent_list_lock);
+> >>>  
+> >>>  	dev_info(dev, "MDEV: Registered\n");
+> >>> +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+> >>> +
+> >>>  	return 0;
+> >>>  
+> >>>  add_dev_err:
+> >>> @@ -220,6 +224,8 @@ EXPORT_SYMBOL(mdev_register_device);
+> >>>  void mdev_unregister_device(struct device *dev)
+> >>>  {
+> >>>  	struct mdev_parent *parent;
+> >>> +	char *env_string = "MDEV_STATE=unregistered";
+> >>> +	char *envp[] = { env_string, NULL };
+> >>>  
+> >>>  	mutex_lock(&parent_list_lock);
+> >>>  	parent = __find_parent_device(dev);
+> >>> @@ -243,6 +249,8 @@ void mdev_unregister_device(struct device *dev)
+> >>>  	up_write(&parent->unreg_sem);
+> >>>  
+> >>>  	mdev_put_parent(parent);
+> >>> +
+> >>> +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);    
+> >>
+> >> mdev_put_parent() calls put_device(dev). If this is the last instance
+> >> holding device, then on put_device(dev) dev would get freed.
+> >>
+> >> This event should be before mdev_put_parent()  
+> > 
+> > So you're suggesting the vendor driver is calling
+> > mdev_unregister_device() without a reference to the struct device that
+> > it's passing to unregister?  Sounds bogus to me.  We take a
+> > reference to the device so that it can't disappear out from under us,
+> > the caller cannot rely on our reference and the caller provided the
+> > struct device.  Thanks,
+> >   
+> 
+> 1. Register uevent is sent after mdev holding reference to device, then
+> ideally, unregister path should be mirror of register path, send uevent
+> and then release the reference to device.
 
->>                                        const CPUArchIdList *cpus,
->>                                        uint16_t boot_cpus,
->>                                        uint16_t apic_id_limit)
->> @@ -1667,6 +1667,7 @@ void pc_memory_init(PCMachineState *pcms,
->>      MemoryRegion *ram_below_4g, *ram_above_4g;
->>      FWCfgState *fw_cfg;
->>      MachineState *machine = MACHINE(pcms);
->> +    MachineClass *mc = MACHINE_GET_CLASS(machine);
->>      PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
->>
->>      assert(machine->ram_size == pcms->below_4g_mem_size +
->> @@ -1763,7 +1764,7 @@ void pc_memory_init(PCMachineState *pcms,
->>                                          option_rom_mr,
->>                                          1);
->>
->> -    fw_cfg = fw_cfg_arch_create(pcms, mc->possible_cpu_arch_ids(machine),
->> +    fw_cfg = fw_cfg_arch_create(machine, mc->possible_cpu_arch_ids(machine),
->>                                  pcms->boot_cpus, pcms->apic_id_limit);
->>
->>      rom_set_fw(fw_cfg);
+I don't see the relevance here.  We're marking an event, not unwinding
+state of the device from the registration process.  Additionally, the
+event we're trying to mark is the completion of each process, so the
+notion that we need to mirror the ordering between the two is invalid.
+
+> 2. I agree that vendor driver shouldn't call mdev_unregister_device()
+> without holding reference to device. But to be on safer side, if ever
+> such case occur, to avoid any segmentation fault in kernel, better to
+> send event before mdev release the reference to device.
+
+I know that get_device() and put_device() are GPL symbols and that's a
+bit of an issue, but I don't think we should be kludging the code for a
+vendor driver that might have problems with that.  A) we're using the
+caller provided device  for the uevent, B) we're only releasing our own
+reference to the device that was acquired during registration, the
+vendor driver must have other references, C) the parent device
+generally lives on a bus, with a vendor driver, there's an entire
+ecosystem of references to the device below mdev.  Is this a paranoia
+request or are you really concerned that your PCI device suddenly
+disappears when mdev's reference to it disappears.  Let's flush those
+bugs out if they exist, not mask them behind obscure ordering
+dependencies.  Thanks,
+
+Alex
