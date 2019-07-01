@@ -2,106 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 50A305C14E
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 18:40:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D771A5C1B1
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 19:04:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729567AbfGAQkQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jul 2019 12:40:16 -0400
-Received: from foss.arm.com ([217.140.110.172]:37510 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727671AbfGAQkQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jul 2019 12:40:16 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 81FC92B;
-        Mon,  1 Jul 2019 09:40:15 -0700 (PDT)
-Received: from [10.1.31.185] (unknown [10.1.31.185])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ABACA3F703;
-        Mon,  1 Jul 2019 09:40:14 -0700 (PDT)
-Subject: Re: [PATCH 20/59] KVM: arm64: nv: Trap CPACR_EL1 access in virtual
- EL2
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-21-marc.zyngier@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <a7b309a6-83c1-27cc-f587-17389ccfd857@arm.com>
-Date:   Mon, 1 Jul 2019 17:40:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1729449AbfGAREC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jul 2019 13:04:02 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:37434 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728739AbfGAREC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jul 2019 13:04:02 -0400
+Received: by mail-wm1-f65.google.com with SMTP id f17so290216wme.2
+        for <kvm@vger.kernel.org>; Mon, 01 Jul 2019 10:04:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=Ld/S+VVZs8pmZedqdnP/S9bHBpKYWy8WRk/m3Q5+2LI=;
+        b=uRnnLctutb6bY7HIsQK5J5gnFyXak0eI+QBAcLcoFD+4F2MeDzem3r97pyxwpb5zwj
+         tHIUIXBvlcL24N6mG3kDRK8HxJxCTA3R7iBG6UxomSEZPV4Ue0YUSsAlfa6lA1lYheMo
+         ARMQfk9/7YZqQVlCf1IU6RFxRwE8InYnW2/AdVhe0mT/BpwqfjcSOrl3GRan/XX0jFI9
+         jGwHJzfi7YpM8eXE9iG8GgiMekN0mdYcnbRnHDxjXkcalscZuv14dLeEbq5Z4UDp6+5D
+         P2HlRISPCMp3qD+HbY8x2H11uegBeEu/+YB6tyU0xPV1S/N2ISGcN6oDuHLonsiPO0cr
+         rBQQ==
+X-Gm-Message-State: APjAAAX8ElHupn6SjpQE1SlkR6N+iN5PgV8Uq2gd89XR9ucH2dRJNvqz
+        P4V5AKlOMIvtgBpEVnFfYYHkKA==
+X-Google-Smtp-Source: APXvYqwBOYSxwelsum2oddoo+4pw1dZnLt7m1hYtVtolWxEgwL2beWLJsaejVTIBg02GC95ss28lWA==
+X-Received: by 2002:a1c:7503:: with SMTP id o3mr183987wmc.170.1562000640687;
+        Mon, 01 Jul 2019 10:04:00 -0700 (PDT)
+Received: from steredhat (host21-207-dynamic.52-79-r.retail.telecomitalia.it. [79.52.207.21])
+        by smtp.gmail.com with ESMTPSA id q18sm9950224wrj.65.2019.07.01.10.03.59
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 01 Jul 2019 10:04:00 -0700 (PDT)
+Date:   Mon, 1 Jul 2019 19:03:57 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     netdev@vger.kernel.org, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH v2 0/3] vsock/virtio: several fixes in the .probe() and
+ .remove()
+Message-ID: <20190701170357.jtuhy3ank7mv6izb@steredhat>
+References: <20190628123659.139576-1-sgarzare@redhat.com>
+ <20190701151113.GE11900@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20190621093843.220980-21-marc.zyngier@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190701151113.GE11900@stefanha-x1.localdomain>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jul 01, 2019 at 04:11:13PM +0100, Stefan Hajnoczi wrote:
+> On Fri, Jun 28, 2019 at 02:36:56PM +0200, Stefano Garzarella wrote:
+> > During the review of "[PATCH] vsock/virtio: Initialize core virtio vsock
+> > before registering the driver", Stefan pointed out some possible issues
+> > in the .probe() and .remove() callbacks of the virtio-vsock driver.
+> > 
+> > This series tries to solve these issues:
+> > - Patch 1 adds RCU critical sections to avoid use-after-free of
+> >   'the_virtio_vsock' pointer.
+> > - Patch 2 stops workers before to call vdev->config->reset(vdev) to
+> >   be sure that no one is accessing the device.
+> > - Patch 3 moves the works flush at the end of the .remove() to avoid
+> >   use-after-free of 'vsock' object.
+> > 
+> > v2:
+> > - Patch 1: use RCU to protect 'the_virtio_vsock' pointer
+> > - Patch 2: no changes
+> > - Patch 3: flush works only at the end of .remove()
+> > - Removed patch 4 because virtqueue_detach_unused_buf() returns all the buffers
+> >   allocated.
+> > 
+> > v1: https://patchwork.kernel.org/cover/10964733/
+> 
+> This looks good to me.
 
-On 6/21/19 10:38 AM, Marc Zyngier wrote:
-> From: Jintack Lim <jintack.lim@linaro.org>
->
-> For the same reason we trap virtual memory register accesses in virtual
-> EL2, we trap CPACR_EL1 access too; We allow the virtual EL2 mode to
-> access EL1 system register state instead of the virtual EL2 one.
->
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_arm.h | 3 ++-
->  arch/arm64/kvm/hyp/switch.c      | 2 ++
->  arch/arm64/kvm/sys_regs.c        | 2 +-
->  3 files changed, 5 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index b2e363ac624d..48e15af2bece 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -278,12 +278,13 @@
->  #define CPTR_EL2_TFP_SHIFT 10
->  
->  /* Hyp Coprocessor Trap Register */
-> -#define CPTR_EL2_TCPAC	(1 << 31)
-> +#define CPTR_EL2_TCPAC	(1U << 31)
->  #define CPTR_EL2_TTA	(1 << 20)
->  #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
->  #define CPTR_EL2_TZ	(1 << 8)
->  #define CPTR_EL2_RES1	0x000032ff /* known RES1 bits in CPTR_EL2 */
->  #define CPTR_EL2_DEFAULT	CPTR_EL2_RES1
-> +#define CPTR_EL2_E2H_TCPAC	(1U << 31)
-I'm not sure why CPTR_EL2_TCPAC is being renamed to CPTR_EL2_E2H_TCPAC.
-CPTR_EL2.TCPAC is always bit 31, regardless of the value of HCR_EL2.E2H. I also
-did a grep and it's only used in the one place added by this patch.
->  
->  /* Hyp Debug Configuration Register bits */
->  #define MDCR_EL2_TPMS		(1 << 14)
-> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-> index 791b26570347..62359c7c3d6b 100644
-> --- a/arch/arm64/kvm/hyp/switch.c
-> +++ b/arch/arm64/kvm/hyp/switch.c
-> @@ -108,6 +108,8 @@ static void activate_traps_vhe(struct kvm_vcpu *vcpu)
->  		val &= ~CPACR_EL1_FPEN;
->  		__activate_traps_fpsimd32(vcpu);
->  	}
-> +	if (vcpu_mode_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
-> +		val |= CPTR_EL2_E2H_TCPAC;
->  
->  	write_sysreg(val, cpacr_el1);
->  
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 7fc87657382d..1d1312425cf2 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1773,7 +1773,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	ID_UNALLOCATED(7,7),
->  
->  	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
-> -	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
-> +	{ SYS_DESC(SYS_CPACR_EL1), access_rw, reset_val, CPACR_EL1, 0 },
->  	{ SYS_DESC(SYS_ZCR_EL1), NULL, reset_val, ZCR_EL1, 0, .visibility = sve_visibility },
->  	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
->  	{ SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
+Thanks for the review!
+
+> 
+> Did you run any stress tests?  For example an SMP guest constantly
+> connecting and sending packets together with a script that
+> hotplug/unplugs vhost-vsock-pci from the host side.
+
+Yes, I started an SMP guest (-smp 4 -monitor tcp:127.0.0.1:1234,server,nowait)
+and I run these scripts to stress the .probe()/.remove() path:
+
+- guest
+  while true; do
+      cat /dev/urandom | nc-vsock -l 4321 > /dev/null &
+      cat /dev/urandom | nc-vsock -l 5321 > /dev/null &
+      cat /dev/urandom | nc-vsock -l 6321 > /dev/null &
+      cat /dev/urandom | nc-vsock -l 7321 > /dev/null &
+      wait
+  done
+
+- host
+  while true; do
+      cat /dev/urandom | nc-vsock 3 4321 > /dev/null &
+      cat /dev/urandom | nc-vsock 3 5321 > /dev/null &
+      cat /dev/urandom | nc-vsock 3 6321 > /dev/null &
+      cat /dev/urandom | nc-vsock 3 7321 > /dev/null &
+      sleep 2
+      echo "device_del v1" | nc 127.0.0.1 1234
+      sleep 1
+      echo "device_add vhost-vsock-pci,id=v1,guest-cid=3" | nc 127.0.0.1 1234
+      sleep 1
+  done
+
+Do you think is enough or is better to have a test more accurate?
+
+Thanks,
+Stefano
