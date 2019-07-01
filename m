@@ -2,395 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9444C5BD16
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 15:37:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DADA5BDA1
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 16:07:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729125AbfGANhP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jul 2019 09:37:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52308 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728843AbfGANhP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jul 2019 09:37:15 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B58E830C4F41;
-        Mon,  1 Jul 2019 13:37:09 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.205.170])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BEC2B6085B;
-        Mon,  1 Jul 2019 13:36:57 +0000 (UTC)
-From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Samuel Ortiz <sameo@linux.intel.com>, kvm@vger.kernel.org,
-        Yang Zhong <yang.zhong@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Rob Bradford <robert.bradford@intel.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH v3 15/15] hw/i386/pc: Extract the x86 generic fw_cfg code
-Date:   Mon,  1 Jul 2019 15:35:36 +0200
-Message-Id: <20190701133536.28946-16-philmd@redhat.com>
-In-Reply-To: <20190701133536.28946-1-philmd@redhat.com>
-References: <20190701133536.28946-1-philmd@redhat.com>
+        id S1729377AbfGAOHe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jul 2019 10:07:34 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45162 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729271AbfGAOHe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jul 2019 10:07:34 -0400
+Received: by mail-wr1-f65.google.com with SMTP id f9so13996087wre.12
+        for <kvm@vger.kernel.org>; Mon, 01 Jul 2019 07:07:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nFgxD9rL23Oz9CPZh09yHtmosD6ueKCUCwoA/+ADGM0=;
+        b=EX6GiqCZ1rllUQkL9z9Rp0xsNFb2HjaZGt9oDbrVeBgzj27Gm6FdUhsobt2Kiks6D3
+         FtbqM4hFFLd4AsR09oO4MGlYffUYMkiuxmuBbIG05NJ5lIMw2QrivZRSGtZcQdsjo2kn
+         zj5GkyoZWaXLSsWRJCTlz4qTZP6XE743cjhY0uuz/kQnyzwSk3UdZzgwgBel6uiepQw6
+         wcsAMHl9ARrsGvXcT14nLw0MEf3Pb+wxRM1VPXJ0wOXsVdZexzX3PgC2A1C/QTtEp9ci
+         WAACTYItX1mQGyfx7wEh+6zBfcp5K0/U5z7x+/gRHvqEPnv/ta3Ofs4cdYi0yTLlecj4
+         0gaQ==
+X-Gm-Message-State: APjAAAXacfjOKEuNZSVIvJxi7WJwri6DVx17VarYRvsFZ11MaOILGucd
+        LCz0I+R3ErNVSUvnfKOza9aEiA==
+X-Google-Smtp-Source: APXvYqyuAvyUqXtxSLleXgKlPKlCIaoTVNUM59318FW5rEe1Qw7U6WXaWQ67sDcZwRJQrwlecV/cOg==
+X-Received: by 2002:a5d:6182:: with SMTP id j2mr9142312wru.275.1561990052171;
+        Mon, 01 Jul 2019 07:07:32 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:5d4d:4830:bcdf:9bf9? ([2001:b07:6468:f312:5d4d:4830:bcdf:9bf9])
+        by smtp.gmail.com with ESMTPSA id t1sm15622481wra.74.2019.07.01.07.07.31
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Mon, 01 Jul 2019 07:07:31 -0700 (PDT)
+Subject: Re: [GIT PULL 0/7] KVM: s390: add kselftests
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Janosch Frank <frankja@linux.vnet.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+References: <20190701125848.276133-1-borntraeger@de.ibm.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b5f74797-1ff7-26fc-4a5a-1fdabef22671@redhat.com>
+Date:   Mon, 1 Jul 2019 16:07:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Mon, 01 Jul 2019 13:37:14 +0000 (UTC)
+In-Reply-To: <20190701125848.276133-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Extract all the functions that are not PC-machine specific into
-the (arch-specific) fw_cfg.c file. This will allow other X86-machine
-to reuse these functions.
+On 01/07/19 14:58, Christian Borntraeger wrote:
+> Paolo, Radim,
+> 
+> kselftest for s390x. There is a small conflict with Linus tree due to
+> 61cfcd545e42 ("kvm: tests: Sort tests in the Makefile alphabetically")
+> which is part of kvm/master but not kvm/next.
+> Other than that this looks good.
 
-Suggested-by: Samuel Ortiz <sameo@linux.intel.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- hw/i386/fw_cfg.c | 137 +++++++++++++++++++++++++++++++++++++++++++++++
- hw/i386/fw_cfg.h |   8 +++
- hw/i386/pc.c     | 130 +-------------------------------------------
- 3 files changed, 146 insertions(+), 129 deletions(-)
+Thanks! I'll delay this to after the first merge window pull request to
+avoid the conflict.
 
-diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
-index 380a819230..b033d99bc4 100644
---- a/hw/i386/fw_cfg.c
-+++ b/hw/i386/fw_cfg.c
-@@ -13,8 +13,15 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "sysemu/numa.h"
-+#include "hw/acpi/acpi.h"
-+#include "hw/firmware/smbios.h"
-+#include "hw/i386/pc.h"
- #include "hw/i386/fw_cfg.h"
-+#include "hw/timer/hpet.h"
- #include "hw/nvram/fw_cfg.h"
-+#include "e820_memory_layout.h"
-+#include "kvm_i386.h"
- 
- const char *fw_cfg_arch_key_name(uint16_t key)
- {
-@@ -36,3 +43,133 @@ const char *fw_cfg_arch_key_name(uint16_t key)
-     }
-     return NULL;
- }
-+
-+FWCfgState *fw_cfg_arch_create(MachineState *ms,
-+                               const CPUArchIdList *cpus,
-+                               uint16_t boot_cpus,
-+                               uint16_t apic_id_limit)
-+{
-+    FWCfgState *fw_cfg;
-+    uint64_t *numa_fw_cfg;
-+    int i;
-+
-+    fw_cfg = fw_cfg_init_io_dma(FW_CFG_IO_BASE, FW_CFG_IO_BASE + 4,
-+                                &address_space_memory);
-+    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, boot_cpus);
-+
-+    /*
-+     * FW_CFG_MAX_CPUS is a bit confusing/problematic on x86:
-+     *
-+     * For machine types prior to 1.8, SeaBIOS needs FW_CFG_MAX_CPUS for
-+     * building MPTable, ACPI MADT, ACPI CPU hotplug and ACPI SRAT table,
-+     * that tables are based on xAPIC ID and QEMU<->SeaBIOS interface
-+     * for CPU hotplug also uses APIC ID and not "CPU index".
-+     * This means that FW_CFG_MAX_CPUS is not the "maximum number of CPUs",
-+     * but the "limit to the APIC ID values SeaBIOS may see".
-+     *
-+     * So for compatibility reasons with old BIOSes we are stuck with
-+     * "etc/max-cpus" actually being apic_id_limit
-+     */
-+    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, apic_id_limit);
-+    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
-+    fw_cfg_add_bytes(fw_cfg, FW_CFG_ACPI_TABLES,
-+                     acpi_tables, acpi_tables_len);
-+    fw_cfg_add_i32(fw_cfg, FW_CFG_IRQ0_OVERRIDE, kvm_allows_irq0_override());
-+
-+    fw_cfg_add_bytes(fw_cfg, FW_CFG_E820_TABLE,
-+                     &e820_reserve, sizeof(e820_reserve));
-+    fw_cfg_add_file(fw_cfg, "etc/e820", e820_table,
-+                    sizeof(struct e820_entry) * e820_get_num_entries());
-+
-+    fw_cfg_add_bytes(fw_cfg, FW_CFG_HPET, &hpet_cfg, sizeof(hpet_cfg));
-+    /*
-+     * allocate memory for the NUMA channel: one (64bit) word for the number
-+     * of nodes, one word for each VCPU->node and one word for each node to
-+     * hold the amount of memory.
-+     */
-+    numa_fw_cfg = g_new0(uint64_t, 1 + apic_id_limit + nb_numa_nodes);
-+    numa_fw_cfg[0] = cpu_to_le64(nb_numa_nodes);
-+    for (i = 0; i < cpus->len; i++) {
-+        unsigned int apic_id = cpus->cpus[i].arch_id;
-+        assert(apic_id < apic_id_limit);
-+        numa_fw_cfg[apic_id + 1] = cpu_to_le64(cpus->cpus[i].props.node_id);
-+    }
-+    for (i = 0; i < nb_numa_nodes; i++) {
-+        numa_fw_cfg[apic_id_limit + 1 + i] =
-+            cpu_to_le64(numa_info[i].node_mem);
-+    }
-+    fw_cfg_add_bytes(fw_cfg, FW_CFG_NUMA, numa_fw_cfg,
-+                     (1 + apic_id_limit + nb_numa_nodes) *
-+                     sizeof(*numa_fw_cfg));
-+
-+    return fw_cfg;
-+}
-+
-+void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg)
-+{
-+    uint8_t *smbios_tables, *smbios_anchor;
-+    size_t smbios_tables_len, smbios_anchor_len;
-+    struct smbios_phys_mem_area *mem_array;
-+    unsigned i, array_count;
-+    X86CPU *cpu = X86_CPU(ms->possible_cpus->cpus[0].cpu);
-+
-+    /* tell smbios about cpuid version and features */
-+    smbios_set_cpuid(cpu->env.cpuid_version, cpu->env.features[FEAT_1_EDX]);
-+
-+    smbios_tables = smbios_get_table_legacy(&smbios_tables_len);
-+    if (smbios_tables) {
-+        fw_cfg_add_bytes(fw_cfg, FW_CFG_SMBIOS_ENTRIES,
-+                         smbios_tables, smbios_tables_len);
-+    }
-+
-+    /* build the array of physical mem area from e820 table */
-+    mem_array = g_malloc0(sizeof(*mem_array) * e820_get_num_entries());
-+    for (i = 0, array_count = 0; i < e820_get_num_entries(); i++) {
-+        uint64_t addr, len;
-+
-+        if (e820_get_entry(i, E820_RAM, &addr, &len)) {
-+            mem_array[array_count].address = addr;
-+            mem_array[array_count].length = len;
-+            array_count++;
-+        }
-+    }
-+    smbios_get_tables(mem_array, array_count,
-+                      &smbios_tables, &smbios_tables_len,
-+                      &smbios_anchor, &smbios_anchor_len);
-+    g_free(mem_array);
-+
-+    if (smbios_anchor) {
-+        fw_cfg_add_file(fw_cfg, "etc/smbios/smbios-tables",
-+                        smbios_tables, smbios_tables_len);
-+        fw_cfg_add_file(fw_cfg, "etc/smbios/smbios-anchor",
-+                        smbios_anchor, smbios_anchor_len);
-+    }
-+}
-+
-+void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg)
-+{
-+    X86CPU *cpu = X86_CPU(ms->possible_cpus->cpus[0].cpu);
-+    CPUX86State *env = &cpu->env;
-+    uint32_t unused, ecx, edx;
-+    uint64_t feature_control_bits = 0;
-+    uint64_t *val;
-+
-+    cpu_x86_cpuid(env, 1, 0, &unused, &unused, &ecx, &edx);
-+    if (ecx & CPUID_EXT_VMX) {
-+        feature_control_bits |= FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX;
-+    }
-+
-+    if ((edx & (CPUID_EXT2_MCE | CPUID_EXT2_MCA)) ==
-+        (CPUID_EXT2_MCE | CPUID_EXT2_MCA) &&
-+        (env->mcg_cap & MCG_LMCE_P)) {
-+        feature_control_bits |= FEATURE_CONTROL_LMCE;
-+    }
-+
-+    if (!feature_control_bits) {
-+        return;
-+    }
-+
-+    val = g_malloc(sizeof(*val));
-+    *val = cpu_to_le64(feature_control_bits | FEATURE_CONTROL_LOCKED);
-+    fw_cfg_add_file(fw_cfg, "etc/msr_feature_control", val, sizeof(*val));
-+}
-diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
-index 17a4bc32f2..f9047a74e8 100644
---- a/hw/i386/fw_cfg.h
-+++ b/hw/i386/fw_cfg.h
-@@ -9,6 +9,7 @@
- #ifndef HW_I386_FW_CFG_H
- #define HW_I386_FW_CFG_H
- 
-+#include "hw/boards.h"
- #include "hw/nvram/fw_cfg.h"
- 
- #define FW_CFG_ACPI_TABLES      (FW_CFG_ARCH_LOCAL + 0)
-@@ -17,4 +18,11 @@
- #define FW_CFG_E820_TABLE       (FW_CFG_ARCH_LOCAL + 3)
- #define FW_CFG_HPET             (FW_CFG_ARCH_LOCAL + 4)
- 
-+FWCfgState *fw_cfg_arch_create(MachineState *ms,
-+                               const CPUArchIdList *cpus,
-+                               uint16_t boot_cpus,
-+                               uint16_t apic_id_limit);
-+void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg);
-+void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg);
-+
- #endif
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index ea895d0192..d00279bf22 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -80,6 +80,7 @@
- #include "hw/net/ne2000-isa.h"
- #include "standard-headers/asm-x86/bootparam.h"
- #include "e820_memory_layout.h"
-+#include "fw_cfg.h"
- 
- /* debug PC/ISA interrupts */
- //#define DEBUG_IRQ
-@@ -887,106 +888,6 @@ static uint32_t x86_cpu_apic_id_from_index(unsigned int cpu_index)
-     }
- }
- 
--static void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg)
--{
--    uint8_t *smbios_tables, *smbios_anchor;
--    size_t smbios_tables_len, smbios_anchor_len;
--    struct smbios_phys_mem_area *mem_array;
--    unsigned i, array_count;
--    X86CPU *cpu = X86_CPU(ms->possible_cpus->cpus[0].cpu);
--
--    /* tell smbios about cpuid version and features */
--    smbios_set_cpuid(cpu->env.cpuid_version, cpu->env.features[FEAT_1_EDX]);
--
--    smbios_tables = smbios_get_table_legacy(&smbios_tables_len);
--    if (smbios_tables) {
--        fw_cfg_add_bytes(fw_cfg, FW_CFG_SMBIOS_ENTRIES,
--                         smbios_tables, smbios_tables_len);
--    }
--
--    /* build the array of physical mem area from e820 table */
--    mem_array = g_malloc0(sizeof(*mem_array) * e820_get_num_entries());
--    for (i = 0, array_count = 0; i < e820_get_num_entries(); i++) {
--        uint64_t addr, len;
--
--        if (e820_get_entry(i, E820_RAM, &addr, &len)) {
--            mem_array[array_count].address = addr;
--            mem_array[array_count].length = len;
--            array_count++;
--        }
--    }
--    smbios_get_tables(mem_array, array_count,
--                      &smbios_tables, &smbios_tables_len,
--                      &smbios_anchor, &smbios_anchor_len);
--    g_free(mem_array);
--
--    if (smbios_anchor) {
--        fw_cfg_add_file(fw_cfg, "etc/smbios/smbios-tables",
--                        smbios_tables, smbios_tables_len);
--        fw_cfg_add_file(fw_cfg, "etc/smbios/smbios-anchor",
--                        smbios_anchor, smbios_anchor_len);
--    }
--}
--
--static FWCfgState *fw_cfg_arch_create(MachineState *ms,
--                                      const CPUArchIdList *cpus,
--                                      uint16_t boot_cpus,
--                                      uint16_t apic_id_limit)
--{
--    FWCfgState *fw_cfg;
--    uint64_t *numa_fw_cfg;
--    int i;
--
--    fw_cfg = fw_cfg_init_io_dma(FW_CFG_IO_BASE, FW_CFG_IO_BASE + 4,
--                                &address_space_memory);
--    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, boot_cpus);
--
--    /* FW_CFG_MAX_CPUS is a bit confusing/problematic on x86:
--     *
--     * For machine types prior to 1.8, SeaBIOS needs FW_CFG_MAX_CPUS for
--     * building MPTable, ACPI MADT, ACPI CPU hotplug and ACPI SRAT table,
--     * that tables are based on xAPIC ID and QEMU<->SeaBIOS interface
--     * for CPU hotplug also uses APIC ID and not "CPU index".
--     * This means that FW_CFG_MAX_CPUS is not the "maximum number of CPUs",
--     * but the "limit to the APIC ID values SeaBIOS may see".
--     *
--     * So for compatibility reasons with old BIOSes we are stuck with
--     * "etc/max-cpus" actually being apic_id_limit
--     */
--    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, apic_id_limit);
--    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
--    fw_cfg_add_bytes(fw_cfg, FW_CFG_ACPI_TABLES,
--                     acpi_tables, acpi_tables_len);
--    fw_cfg_add_i32(fw_cfg, FW_CFG_IRQ0_OVERRIDE, kvm_allows_irq0_override());
--
--    fw_cfg_add_bytes(fw_cfg, FW_CFG_E820_TABLE,
--                     &e820_reserve, sizeof(e820_reserve));
--    fw_cfg_add_file(fw_cfg, "etc/e820", e820_table,
--                    sizeof(struct e820_entry) * e820_get_num_entries());
--
--    fw_cfg_add_bytes(fw_cfg, FW_CFG_HPET, &hpet_cfg, sizeof(hpet_cfg));
--    /* allocate memory for the NUMA channel: one (64bit) word for the number
--     * of nodes, one word for each VCPU->node and one word for each node to
--     * hold the amount of memory.
--     */
--    numa_fw_cfg = g_new0(uint64_t, 1 + apic_id_limit + nb_numa_nodes);
--    numa_fw_cfg[0] = cpu_to_le64(nb_numa_nodes);
--    for (i = 0; i < cpus->len; i++) {
--        unsigned int apic_id = cpus->cpus[i].arch_id;
--        assert(apic_id < apic_id_limit);
--        numa_fw_cfg[apic_id + 1] = cpu_to_le64(cpus->cpus[i].props.node_id);
--    }
--    for (i = 0; i < nb_numa_nodes; i++) {
--        numa_fw_cfg[apic_id_limit + 1 + i] =
--            cpu_to_le64(numa_info[i].node_mem);
--    }
--    fw_cfg_add_bytes(fw_cfg, FW_CFG_NUMA, numa_fw_cfg,
--                     (1 + apic_id_limit + nb_numa_nodes) *
--                     sizeof(*numa_fw_cfg));
--
--    return fw_cfg;
--}
--
- static long get_file_size(FILE *f)
- {
-     long where, size;
-@@ -1518,35 +1419,6 @@ void pc_cpus_init(PCMachineState *pcms)
-     }
- }
- 
--static void fw_cfg_build_feature_control(MachineState *ms,
--                                         FWCfgState *fw_cfg)
--{
--    X86CPU *cpu = X86_CPU(ms->possible_cpus->cpus[0].cpu);
--    CPUX86State *env = &cpu->env;
--    uint32_t unused, ecx, edx;
--    uint64_t feature_control_bits = 0;
--    uint64_t *val;
--
--    cpu_x86_cpuid(env, 1, 0, &unused, &unused, &ecx, &edx);
--    if (ecx & CPUID_EXT_VMX) {
--        feature_control_bits |= FEATURE_CONTROL_VMXON_ENABLED_OUTSIDE_SMX;
--    }
--
--    if ((edx & (CPUID_EXT2_MCE | CPUID_EXT2_MCA)) ==
--        (CPUID_EXT2_MCE | CPUID_EXT2_MCA) &&
--        (env->mcg_cap & MCG_LMCE_P)) {
--        feature_control_bits |= FEATURE_CONTROL_LMCE;
--    }
--
--    if (!feature_control_bits) {
--        return;
--    }
--
--    val = g_malloc(sizeof(*val));
--    *val = cpu_to_le64(feature_control_bits | FEATURE_CONTROL_LOCKED);
--    fw_cfg_add_file(fw_cfg, "etc/msr_feature_control", val, sizeof(*val));
--}
--
- static void rtc_set_cpus_count(ISADevice *rtc, uint16_t cpus_count)
- {
-     if (cpus_count > 0xff) {
--- 
-2.20.1
+Paolo
+
+> 
+> The following changes since commit f2c7c76c5d0a443053e94adb9f0918fa2fb85c3a:
+> 
+>   Linux 5.2-rc3 (2019-06-02 13:55:33 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.3-1
+> 
+> for you to fetch changes up to 8343ba2d4820b1738bbb7cb40ec18ea0a3b0b331:
+> 
+>   KVM: selftests: enable pgste option for the linker on s390 (2019-06-04 14:05:38 +0200)
+> 
+> ----------------------------------------------------------------
+> KVM: s390: add kselftests
+> 
+> This is the initial implementation for KVM selftests on s390.
+> 
+> ----------------------------------------------------------------
+> Christian Borntraeger (1):
+>       KVM: selftests: enable pgste option for the linker on s390
+> 
+> Thomas Huth (6):
+>       KVM: selftests: Guard struct kvm_vcpu_events with __KVM_HAVE_VCPU_EVENTS
+>       KVM: selftests: Introduce a VM_MODE_DEFAULT macro for the default bits
+>       KVM: selftests: Align memory region addresses to 1M on s390x
+>       KVM: selftests: Add processor code for s390x
+>       KVM: selftests: Add the sync_regs test for s390x
+>       KVM: selftests: Move kvm_create_max_vcpus test to generic code
+> 
+>  MAINTAINERS                                        |   2 +
+>  tools/testing/selftests/kvm/Makefile               |  14 +-
+>  tools/testing/selftests/kvm/include/kvm_util.h     |   8 +
+>  .../selftests/kvm/include/s390x/processor.h        |  22 ++
+>  .../kvm/{x86_64 => }/kvm_create_max_vcpus.c        |   3 +-
+>  .../testing/selftests/kvm/lib/aarch64/processor.c  |   2 +-
+>  tools/testing/selftests/kvm/lib/kvm_util.c         |  23 +-
+>  tools/testing/selftests/kvm/lib/s390x/processor.c  | 286 +++++++++++++++++++++
+>  tools/testing/selftests/kvm/lib/x86_64/processor.c |   2 +-
+>  tools/testing/selftests/kvm/s390x/sync_regs_test.c | 151 +++++++++++
+>  10 files changed, 503 insertions(+), 10 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/include/s390x/processor.h
+>  rename tools/testing/selftests/kvm/{x86_64 => }/kvm_create_max_vcpus.c (93%)
+>  create mode 100644 tools/testing/selftests/kvm/lib/s390x/processor.c
+>  create mode 100644 tools/testing/selftests/kvm/s390x/sync_regs_test.c
+> 
 
