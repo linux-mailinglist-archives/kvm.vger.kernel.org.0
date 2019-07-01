@@ -2,151 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DD33B5C5B7
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 00:41:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 378E75C5E5
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 01:17:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726478AbfGAWlx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jul 2019 18:41:53 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:42414 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726341AbfGAWlx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jul 2019 18:41:53 -0400
-Received: from pd9ef1cb8.dip0.t-ipconnect.de ([217.239.28.184] helo=nanos)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1hi4zV-0004Dh-BP; Tue, 02 Jul 2019 00:41:41 +0200
-Date:   Tue, 2 Jul 2019 00:41:40 +0200 (CEST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Rong Chen <rong.a.chen@intel.com>
-cc:     Feng Tang <feng.tang@intel.com>, x86@kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "tipbuild@zytor.com" <tipbuild@zytor.com>,
-        "lkp@01.org" <lkp@01.org>, Ingo Molnar <mingo@kernel.org>,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        =?ISO-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
-        Fenghua Yu <fenghua.yu@intel.com>
-Subject: [BUG] kvm: APIC emulation problem - was Re: [LKP] [x86/hotplug]
- ...
-In-Reply-To: <d08d55c5-bb02-f832-4306-9daf234428a8@intel.com>
-Message-ID: <alpine.DEB.2.21.1907012011460.1802@nanos.tec.linutronix.de>
-References: <alpine.DEB.2.21.1906250821220.32342@nanos.tec.linutronix.de> <f5c36f89-61bf-a82e-3d3b-79720b2da2ef@intel.com> <alpine.DEB.2.21.1906251330330.32342@nanos.tec.linutronix.de> <20190628063231.GA7766@shbuild999.sh.intel.com>
- <alpine.DEB.2.21.1906280929010.32342@nanos.tec.linutronix.de> <alpine.DEB.2.21.1906290912390.1802@nanos.tec.linutronix.de> <alpine.DEB.2.21.1906301334290.1802@nanos.tec.linutronix.de> <20190630130347.GB93752@shbuild999.sh.intel.com>
- <alpine.DEB.2.21.1906302021320.1802@nanos.tec.linutronix.de> <alpine.DEB.2.21.1907010829590.1802@nanos.tec.linutronix.de> <20190701083654.GB12486@shbuild999.sh.intel.com> <alpine.DEB.2.21.1907011123220.1802@nanos.tec.linutronix.de>
- <d08d55c5-bb02-f832-4306-9daf234428a8@intel.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+        id S1726664AbfGAXRC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jul 2019 19:17:02 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:32770 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726347AbfGAXRC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jul 2019 19:17:02 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x61NEHfk185532;
+        Mon, 1 Jul 2019 23:16:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=7VyQuE4gHj74PtiPDgjcTu/bvClU4yb3B+z1KW7EEB4=;
+ b=h9O914llJUHbaRrVQmH0UofduAOF4oo9A1E5t+/t7HDNX3n8o4w/x1PdxVBiWHeUr2YT
+ Xo9W9kIo2+d3TB/n466ssWnClpEmzgACqAnIIzUUU1YWXvZ6WlVlo5JeEGlWYLMYYWGD
+ QNQOOaZtY1Xj9mwkbUE1letBm4OGpvJcxVTSzWktt8dWKZOyaZhZ20b3nywDuxhpul9p
+ 8Z4ZnXJoQRL5cx0HvxaWE5bGdTGaX5ZJpsZcMWebVNUpSl+YKSxidmSlviCrSMXtyp2K
+ MmTqfsYZTQmhU08g37k9pZfiXX9UHaShYuwrOWNES4CMYiqHj6zieAoWLO15FxyEsvCF ow== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2te5tbga80-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 01 Jul 2019 23:16:36 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x61NDK7g032640;
+        Mon, 1 Jul 2019 23:16:35 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2tebktxncq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 01 Jul 2019 23:16:35 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x61NGZOC021999;
+        Mon, 1 Jul 2019 23:16:35 GMT
+Received: from [192.168.14.112] (/79.183.235.16)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 01 Jul 2019 16:16:34 -0700
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH] KVM: nVMX: Allow restore nested-state to enable eVMCS
+ when vCPU in SMM
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <878stpern4.fsf@vitty.brq.redhat.com>
+Date:   Tue, 2 Jul 2019 02:16:31 +0300
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, rkrcmar@redhat.com,
+        Joao Martins <joao.m.martins@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <23369D92-B93B-4A96-84DA-55093234DA11@oracle.com>
+References: <20190625112642.113460-1-liran.alon@oracle.com>
+ <878stpern4.fsf@vitty.brq.redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9305 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=627
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907010270
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9305 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=680 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907010270
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Folks,
+Gentle ping.
 
-after chasing a 0-day test failure for a couple of days, I was finally able
-to reproduce the issue.
+> On 25 Jun 2019, at 16:11, Vitaly Kuznetsov <vkuznets@redhat.com> =
+wrote:
+>=20
+> Liran Alon <liran.alon@oracle.com> writes:
+>=20
+>> As comment in code specifies, SMM temporarily disables VMX so we =
+cannot
+>> be in guest mode, nor can VMLAUNCH/VMRESUME be pending.
+>>=20
+>> However, code currently assumes that these are the only flags that =
+can be
+>> set on kvm_state->flags. This is not true as KVM_STATE_NESTED_EVMCS
+>> can also be set on this field to signal that eVMCS should be enabled.
+>>=20
+>> Therefore, fix code to check for guest-mode and pending =
+VMLAUNCH/VMRESUME
+>> explicitly.
+>>=20
+>> Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
+>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>> ---
+>> arch/x86/kvm/vmx/nested.c | 5 ++++-
+>> 1 file changed, 4 insertions(+), 1 deletion(-)
+>>=20
+>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> index 5c470db311f7..27ff04874f67 100644
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -5373,7 +5373,10 @@ static int vmx_set_nested_state(struct =
+kvm_vcpu *vcpu,
+>> 	 * nor can VMLAUNCH/VMRESUME be pending.  Outside SMM, SMM flags
+>> 	 * must be zero.
+>> 	 */
+>> -	if (is_smm(vcpu) ? kvm_state->flags : =
+kvm_state->hdr.vmx.smm.flags)
+>> +	if (is_smm(vcpu) ?
+>> +		(kvm_state->flags &
+>> +		 (KVM_STATE_NESTED_GUEST_MODE | =
+KVM_STATE_NESTED_RUN_PENDING))
+>> +		: kvm_state->hdr.vmx.smm.flags)
+>> 		return -EINVAL;
+>>=20
+>> 	if ((kvm_state->hdr.vmx.smm.flags & =
+KVM_STATE_NESTED_SMM_GUEST_MODE) &&
+>=20
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>=20
+> --=20
+> Vitaly
 
-Background:
-
-   In preparation of supporting IPI shorthands I changed the CPU offline
-   code to software disable the local APIC instead of just masking it.
-   That's done by clearing the APIC_SPIV_APIC_ENABLED bit in the APIC_SPIV
-   register.
-
-Failure:
-
-   When the CPU comes back online the startup code triggers occasionally
-   the warning in apic_pending_intr_clear(). That complains that the IRRs
-   are not empty.
-
-   The offending vector is the local APIC timer vector who's IRR bit is set
-   and stays set.
-
-It took me quite some time to reproduce the issue locally, but now I can
-see what happens.
-
-It requires apicv_enabled=0, i.e. full apic emulation. With apicv_enabled=1
-(and hardware support) it behaves correctly.
-
-Here is the series of events:
-
-    Guest CPU
-
-    goes down
-
-      native_cpu_disable()		
-
-	apic_soft_disable();
-
-    play_dead()
-
-    ....
-
-    startup()
-
-      if (apic_enabled())
-        apic_pending_intr_clear()	<- Not taken
-
-     enable APIC
-
-        apic_pending_intr_clear()	<- Triggers warning because IRR is stale
-
-When this happens then the deadline timer or the regular APIC timer -
-happens with both, has fired shortly before the APIC is disabled, but the
-interrupt was not serviced because the guest CPU was in an interrupt
-disabled region at that point.
-
-The state of the timer vector ISR/IRR bits:
-
-    	     	       	      ISR     IRR
-before apic_soft_disable()    0	      1
-after apic_soft_disable()     0	      1
-
-On startup		      0	      1
-
-Now one would assume that the IRR is cleared after the INIT reset, but this
-happens only on CPU0.
-
-Why?
-
-Because our CPU0 hotplug is just for testing to make sure nothing breaks
-and goes through an NMI wakeup vehicle because INIT would send it through
-the boots-trap code which is not really working if that CPU was not
-physically unplugged.
-
-Now looking at a real world APIC the situation in that case is:
-
-    	     	       	      ISR     IRR
-before apic_soft_disable()    0	      1
-after apic_soft_disable()     0	      1
-
-On startup		      0	      0
-
-Why?
-
-Once the dying CPU reenables interrupts the pending interrupt gets
-delivered as a spurious interupt and then the state is clear.
-
-While that CPU0 hotplug test case is surely an esoteric issue, the APIC
-emulation is still wrong, Even if the play_dead() code would not enable
-interrupts then the pending IRR bit would turn into an ISR .. interrupt
-when the APIC is reenabled on startup.
-
-Thanks,
-
-	tglx
-
- 
-
-
-
-
-	
-     
-    
-   
