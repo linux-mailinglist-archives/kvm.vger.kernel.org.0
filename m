@@ -2,129 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 161E45BC4B
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 14:59:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FB305BD04
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 15:35:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728096AbfGAM7h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jul 2019 08:59:37 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61940 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727667AbfGAM7g (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Jul 2019 08:59:36 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x61Cvefo139556
-        for <kvm@vger.kernel.org>; Mon, 1 Jul 2019 08:59:36 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2tfhssu9jn-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 01 Jul 2019 08:59:35 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 1 Jul 2019 13:59:33 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 1 Jul 2019 13:59:31 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x61CxUDa47448282
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Jul 2019 12:59:30 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BB35B4C04E;
-        Mon,  1 Jul 2019 12:59:30 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8BB204C046;
-        Mon,  1 Jul 2019 12:59:30 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.87])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  1 Jul 2019 12:59:30 +0000 (GMT)
-Subject: Re: [GIT PULL 0/7] KVM: s390: add kselftests
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>, Cornelia Huck <cohuck@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Janosch Frank <frankja@linux.vnet.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-References: <20190701125848.276133-1-borntraeger@de.ibm.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date:   Mon, 1 Jul 2019 14:59:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1728562AbfGANfr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jul 2019 09:35:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53386 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727486AbfGANfr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jul 2019 09:35:47 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A2D925857F;
+        Mon,  1 Jul 2019 13:35:46 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.170])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A89B608C2;
+        Mon,  1 Jul 2019 13:35:38 +0000 (UTC)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Samuel Ortiz <sameo@linux.intel.com>, kvm@vger.kernel.org,
+        Yang Zhong <yang.zhong@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Rob Bradford <robert.bradford@intel.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <rth@twiddle.net>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: [PATCH v3 00/15] hw/i386/pc: Do not restrict the fw_cfg functions to the PC machine
+Date:   Mon,  1 Jul 2019 15:35:21 +0200
+Message-Id: <20190701133536.28946-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190701125848.276133-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19070112-0020-0000-0000-0000034F2B0C
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19070112-0021-0000-0000-000021A2B5BC
-Message-Id: <a6946a5b-9c95-9239-afe5-5e53316039d4@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-01_09:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=749 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907010160
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Mon, 01 Jul 2019 13:35:46 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01.07.19 14:58, Christian Borntraeger wrote:
-> Paolo, Radim,
-> 
-> kselftest for s390x. There is a small conflict with Linus tree due to
-> 61cfcd545e42 ("kvm: tests: Sort tests in the Makefile alphabetically")
-> which is part of kvm/master but not kvm/next.
-> Other than that this looks good.
+Hi,
 
+This is my take at salvaging some NEMU good work.
+Samuel worked in adding the fw_cfg device to the x86-virt NEMU machine.
+This series is inspired by NEMU's commit 3cb92d080835 [0] and adapted
+to upstream style. The result makes the upstream codebase more
+modularizable.
+There are very little logical changes, this is mostly a cleanup
+refactor.
 
-This is for kvm/next.
+Since v2 [2]:
+- Addressed MST comments from v2 (only patch #2 modified)
+  - do not use unsigned for enum
+  - do not add unuseful documentation
+
+Since v1 [1]:
+- Addressed Li and MST comments
+
+$ git backport-diff -u v2
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/15:[----] [--] 'hw/i386/pc: Use e820_get_num_entries() to access e820_entries'
+002/15:[0131] [FC] 'hw/i386/pc: Extract e820 memory layout code'
+003/15:[----] [--] 'hw/i386/pc: Use address_space_memory in place'
+004/15:[----] [--] 'hw/i386/pc: Rename bochs_bios_init as more generic fw_cfg_arch_create'
+005/15:[----] [--] 'hw/i386/pc: Pass the boot_cpus value by argument'
+006/15:[----] [--] 'hw/i386/pc: Pass the apic_id_limit value by argument'
+007/15:[----] [--] 'hw/i386/pc: Pass the CPUArchIdList array by argument'
+008/15:[----] [--] 'hw/i386/pc: Let fw_cfg_init() use the generic MachineState'
+009/15:[----] [--] 'hw/i386/pc: Let pc_build_smbios() take a FWCfgState argument'
+010/15:[----] [--] 'hw/i386/pc: Let pc_build_smbios() take a generic MachineState argument'
+011/15:[----] [--] 'hw/i386/pc: Rename pc_build_smbios() as generic fw_cfg_build_smbios()'
+012/15:[----] [--] 'hw/i386/pc: Let pc_build_feature_control() take a FWCfgState argument'
+013/15:[----] [--] 'hw/i386/pc: Let pc_build_feature_control() take a MachineState argument'
+014/15:[----] [--] 'hw/i386/pc: Rename pc_build_feature_control() as generic fw_cfg_build_*'
+015/15:[----] [--] 'hw/i386/pc: Extract the x86 generic fw_cfg code'
+
+Regards,
+
+Phil.
+
+[0] https://github.com/intel/nemu/commit/3cb92d080835ac8d47c8b713156338afa33cff5c
+[1] https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg05759.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg02786.html
+
+Philippe Mathieu-Daudé (15):
+  hw/i386/pc: Use e820_get_num_entries() to access e820_entries
+  hw/i386/pc: Extract e820 memory layout code
+  hw/i386/pc: Use address_space_memory in place
+  hw/i386/pc: Rename bochs_bios_init as more generic fw_cfg_arch_create
+  hw/i386/pc: Pass the boot_cpus value by argument
+  hw/i386/pc: Pass the apic_id_limit value by argument
+  hw/i386/pc: Pass the CPUArchIdList array by argument
+  hw/i386/pc: Let fw_cfg_init() use the generic MachineState
+  hw/i386/pc: Let pc_build_smbios() take a FWCfgState argument
+  hw/i386/pc: Let pc_build_smbios() take a generic MachineState argument
+  hw/i386/pc: Rename pc_build_smbios() as generic fw_cfg_build_smbios()
+  hw/i386/pc: Let pc_build_feature_control() take a FWCfgState argument
+  hw/i386/pc: Let pc_build_feature_control() take a MachineState
+    argument
+  hw/i386/pc: Rename pc_build_feature_control() as generic
+    fw_cfg_build_*
+  hw/i386/pc: Extract the x86 generic fw_cfg code
+
+ hw/i386/Makefile.objs        |   2 +-
+ hw/i386/e820_memory_layout.c |  59 ++++++++++
+ hw/i386/e820_memory_layout.h |  42 ++++++++
+ hw/i386/fw_cfg.c             | 137 ++++++++++++++++++++++++
+ hw/i386/fw_cfg.h             |   8 ++
+ hw/i386/pc.c                 | 201 ++---------------------------------
+ include/hw/i386/pc.h         |  11 --
+ target/i386/kvm.c            |   1 +
+ 8 files changed, 256 insertions(+), 205 deletions(-)
+ create mode 100644 hw/i386/e820_memory_layout.c
+ create mode 100644 hw/i386/e820_memory_layout.h
+
+-- 
+2.20.1
 
