@@ -2,114 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 828F35B6A8
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 10:18:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27B395B6B4
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2019 10:20:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727162AbfGAISZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jul 2019 04:18:25 -0400
-Received: from foss.arm.com ([217.140.110.172]:57382 "EHLO foss.arm.com"
+        id S1727176AbfGAIU5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Jul 2019 04:20:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59918 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726840AbfGAISZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jul 2019 04:18:25 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4FF132B;
-        Mon,  1 Jul 2019 01:18:24 -0700 (PDT)
-Received: from [10.1.35.148] (James-iPhone8.cambridge.arm.com [10.1.35.148])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0C583F718;
-        Mon,  1 Jul 2019 01:18:23 -0700 (PDT)
-Subject: Re: KVM works on RPi4
-To:     Jan Kiszka <jan.kiszka@web.de>, Marc Zyngier <marc.zyngier@arm.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm <kvm@vger.kernel.org>
-References: <1d1198c2-f362-840d-cb14-9a6d74da745c@web.de>
- <20190629234232.484ca3c0@why> <9fa56744-9925-6f49-b2a4-368e13fbbc41@web.de>
- <3f6ea07b-975b-3d66-e12d-f0a9cadb83a9@web.de>
- <cbbeb948-23e5-97d9-2410-ef804ae2b80d@web.de>
-From:   Vladimir Murzin <vladimir.murzin@arm.com>
-Message-ID: <3fa336f7-0089-ae4a-a616-a000214fc1d1@arm.com>
-Date:   Mon, 1 Jul 2019 09:18:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726076AbfGAIU5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Jul 2019 04:20:57 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4AE59308FEC0;
+        Mon,  1 Jul 2019 08:20:57 +0000 (UTC)
+Received: from gondolin (ovpn-117-220.ams2.redhat.com [10.36.117.220])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 46F6C38E3F;
+        Mon,  1 Jul 2019 08:20:47 +0000 (UTC)
+Date:   Mon, 1 Jul 2019 10:20:43 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Libvirt Devel <libvir-list@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Erik Skultety <eskultet@redhat.com>,
+        Pavel Hrdina <phrdina@redhat.com>,
+        "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+        Sylvain Bauza <sbauza@redhat.com>,
+        Christophe de Dinechin <dinechin@redhat.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>
+Subject: Re: mdevctl: A shoestring mediated device management and
+ persistence utility
+Message-ID: <20190701102043.61afa0da.cohuck@redhat.com>
+In-Reply-To: <20190628110546.4d3ce595@x1.home>
+References: <20190523172001.41f386d8@x1.home>
+        <20190625165251.609f6266@x1.home>
+        <20190626115806.3435c45c.cohuck@redhat.com>
+        <20190626083720.42a2b5d4@x1.home>
+        <20190626195350.2e9c81d3@x1.home>
+        <20190627142626.415138da.cohuck@redhat.com>
+        <06114b39-69c2-3fa0-d0b3-aa96a44ae2ce@linux.ibm.com>
+        <20190627093832.064a346f@x1.home>
+        <20190627151502.2ae5314f@x1.home>
+        <20190627195704.66be88c8@x1.home>
+        <20190628110648.40e0607d.cohuck@redhat.com>
+        <20190628110546.4d3ce595@x1.home>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <cbbeb948-23e5-97d9-2410-ef804ae2b80d@web.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Mon, 01 Jul 2019 08:20:57 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/30/19 11:49 AM, Jan Kiszka wrote:
-> On 30.06.19 12:18, Jan Kiszka wrote:
->> On 30.06.19 11:34, Jan Kiszka wrote:
->>> On 30.06.19 00:42, Marc Zyngier wrote:
->>>> On Sat, 29 Jun 2019 19:09:37 +0200
->>>> Jan Kiszka <jan.kiszka@web.de> wrote:
->>>>> However, as the Raspberry kernel is not yet ready for 64-bit (and
->>>>> upstream is not in sight), I had to use legacy 32-bit mode. And there we
->>>>> stumble over the core detection. This little patch made it work, though:
->>>>>
->>>>> diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
->>>>> index 2b8de885b2bf..01606aad73cc 100644
->>>>> --- a/arch/arm/kvm/guest.c
->>>>> +++ b/arch/arm/kvm/guest.c
->>>>> @@ -290,6 +290,7 @@ int __attribute_const__ kvm_target_cpu(void)
->>>>>       case ARM_CPU_PART_CORTEX_A7:
->>>>>           return KVM_ARM_TARGET_CORTEX_A7;
->>>>>       case ARM_CPU_PART_CORTEX_A15:
->>>>> +    case ARM_CPU_PART_CORTEX_A72:
->>>>>           return KVM_ARM_TARGET_CORTEX_A15;
->>>>>       default:
->>>>>           return -EINVAL;
->>>>>
->>>>> That raises the question if this is hack or a valid change and if there
->>>>> is general interest in mapping 64-bit cores on 32-bit if they happen to
->>>>> run in 32-bit mode.
->>>>
->>>> The real thing to do here would be to move to a generic target, much
->>>> like we did on the 64bit side. Could you investigate that instead? It
->>>> would also allow KVM to be used on other 32bit cores such as
->>>> A12/A17/A32.
->>>
->>> You mean something like KVM_ARM_TARGET_GENERIC_V8? Need to study that...
->>>
->>
->> Hmm, looking at what KVM_ARM_TARGET_CORTEX_A7 and ..._A15 differentiates, I
->> found nothing so far:
->>
->> kvm_reset_vcpu:
->>          switch (vcpu->arch.target) {
->>          case KVM_ARM_TARGET_CORTEX_A7:
->>          case KVM_ARM_TARGET_CORTEX_A15:
->>                  reset_regs = &cortexa_regs_reset;
->>                  vcpu->arch.midr = read_cpuid_id();
->>                  break;
->>
->> And arch/arm/kvm/coproc_a15.c looks like a copy of coproc_a7.c, just with some
->> symbols renamed.
+On Fri, 28 Jun 2019 11:05:46 -0600
+Alex Williamson <alex.williamson@redhat.com> wrote:
+
+> On Fri, 28 Jun 2019 11:06:48 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+
+> > What do you think of a way to specify JSON for the attributes directly
+> > on the command line? Or would it be better to just edit the config
+> > files directly?  
 > 
-> OK, found it: The reset values of SCTLR differ, in one bit. A15 starts with
-> branch prediction (11) off, A7 with that feature enabled. Quite some boilerplate
-> code for managing a single bit.
+> Supplying json on the command like seems difficult, even doing so with
+> with jq requires escaping quotes.  It's not a very friendly
+> experience.  Maybe something more like how virsh allows snippets of xml
+> to be included, we could use jq to validate a json snippet provided
+> as a file and add it to the attributes... of course if we need to allow
+> libvirt to modify the json config files directly, the user could do
+> that as well.  Is there a use case you're thinking of?  Maybe we could
+> augment the 'list' command to take a --uuid and --dumpjson option and
+> the 'define' command to accept a --jsonfile.  Maybe the 'start' command
+> could accept the same, so a transient device could define attributes
+> w/o excessive command line options.  Thanks,
 > 
-> For a generic target, can we simply assume A15 reset behaviour?
+> Alex
 
-IIUC, it'd work only for ARCH_VIRT guest, which is known not to touch IMP_DEF
-registers. Unfortunately, other variants of guests (ARCH_VEXPRESS?) might touch
-such registers, for instance, l2ctlr is often used for querying number of populated
-cpus, and it might not be present at all on v8. Also, content of IMP_DEF register
-is not fixed and meaning of the bits may wary between different implementations, so
-guests may react differently.
-
-Just my 2p.
-
-Cheers
-Vladimir
-
-> 
-> Jan
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
+I was mostly thinking about complex configurations where writing a JSON
+config would be simpler than adding a lot of command line options.
+Something like dumping a JSON file and allowing to refer to a JSON file
+as you suggested could be useful; but then, those very complex use
+cases are probably already covered by editing the config file directly.
+Not sure if it is worth the effort; maybe just leave it as it is for
+now.
