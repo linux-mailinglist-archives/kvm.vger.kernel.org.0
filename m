@@ -2,181 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 68C725D3F4
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 18:11:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C52A5D411
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 18:15:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726951AbfGBQLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 12:11:37 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39623 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725922AbfGBQLg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 12:11:36 -0400
-Received: by mail-wr1-f68.google.com with SMTP id x4so18502979wrt.6
-        for <kvm@vger.kernel.org>; Tue, 02 Jul 2019 09:11:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=oyhCl+Mrz4L1wckzE8zfYLH2ZwFXAn4MRZ3itjkcqYo=;
-        b=A7e/VR2RCNXyWkoCNC6XeNrmMDitdVLPnr+9XUxEx78Nr/NcG8ci6nlrm2CRb+yHl6
-         nzYtBhhh6puqq9IVc35Zho76E1lvwsBDk7sUgUpR6tHJuscFq6B2VnSM0G19u3auwhA2
-         Vv75vr7roI5NtU48fSbKW3oEDDYX99NwkbegnWThiqxZEpwsNafi6c82j44uVPC0G6rU
-         UzQTO0izobLpQHQ4VzejWc75VFjA4J2XI8RZZWZRSWP+aFVEUGMkK1Bjw9BIjtC6xiXo
-         DBKS6q4il09YbBrt+OTiTRF+kflI5FWIJXeZAOjNabgvC9rsdNMIF9z4EiIX1RahJ4D4
-         mn0Q==
-X-Gm-Message-State: APjAAAW5OCd4yOzbDNtLGOo8VccZ1dJP/3r7S3J+/e/8TE+FjQYuzskM
-        Gyy6NmSu/sfr7oFkUuAn/Egag1zf1gg=
-X-Google-Smtp-Source: APXvYqxRDDaaSVHihgQQjtMMT2IFEeIbEU/KVNPgxbUCshT4n1fDX/QZVSHNrjbDpCLzmeA4/zDIYw==
-X-Received: by 2002:a05:6000:11ca:: with SMTP id i10mr4668932wrx.56.1562083894263;
-        Tue, 02 Jul 2019 09:11:34 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b8:794:183e:9e2a? ([2001:b07:6468:f312:b8:794:183e:9e2a])
-        by smtp.gmail.com with ESMTPSA id n14sm30974607wra.75.2019.07.02.09.11.33
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 02 Jul 2019 09:11:33 -0700 (PDT)
-Subject: Re: [PATCH] kvm-unit-test: x86: Remove duplicate definitions of
- write_cr4_checking() and put it in library
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>, kvm@vger.kernel.org
-References: <20190628212108.23203-1-krish.sadhukhan@oracle.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ef77eff1-9b26-f097-d48f-c4f8daa42098@redhat.com>
-Date:   Tue, 2 Jul 2019 18:11:32 +0200
+        id S1726305AbfGBQPb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 12:15:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1338 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725996AbfGBQPb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Jul 2019 12:15:31 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x62G9Xpq058705;
+        Tue, 2 Jul 2019 12:15:10 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tg9nx2r27-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Jul 2019 12:15:10 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x62G9RTt011190;
+        Tue, 2 Jul 2019 16:15:07 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma03dal.us.ibm.com with ESMTP id 2tdym6y6ym-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Jul 2019 16:15:07 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x62GF75Y50921906
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 2 Jul 2019 16:15:07 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E18C8AE05C;
+        Tue,  2 Jul 2019 16:15:06 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C2431AE060;
+        Tue,  2 Jul 2019 16:15:06 +0000 (GMT)
+Received: from [9.60.84.127] (unknown [9.60.84.127])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue,  2 Jul 2019 16:15:06 +0000 (GMT)
+Subject: Re: [RFC v1 2/4] vfio-ccw: No need to call cp_free on an error in
+ cp_init
+To:     Farhan Ali <alifm@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc:     pasic@linux.ibm.com, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <cover.1561997809.git.alifm@linux.ibm.com>
+ <5f1b69cd3a52e367f9f5014a3613768c8634408c.1561997809.git.alifm@linux.ibm.com>
+ <20190702104257.102f32d3.cohuck@redhat.com>
+ <66d92fe7-6395-46a6-b9bc-b76cbe7fb48e@linux.ibm.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Message-ID: <4f7e52bd-6b22-90b0-ab7b-f9c5c3ccac3f@linux.ibm.com>
+Date:   Tue, 2 Jul 2019 12:15:06 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190628212108.23203-1-krish.sadhukhan@oracle.com>
+In-Reply-To: <66d92fe7-6395-46a6-b9bc-b76cbe7fb48e@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-02_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907020176
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/06/19 23:21, Krish Sadhukhan wrote:
->  ..so that it can be re-used.
-> 
-> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-> 
-> ---
->  lib/x86/desc.c  | 8 ++++++++
->  lib/x86/desc.h  | 1 +
->  x86/access.c    | 8 --------
->  x86/pcid.c      | 8 --------
->  x86/vmx_tests.c | 8 --------
->  x86/xsave.c     | 8 --------
->  6 files changed, 9 insertions(+), 32 deletions(-)
-> 
-> diff --git a/lib/x86/desc.c b/lib/x86/desc.c
-> index 0108555..5f37cef 100644
-> --- a/lib/x86/desc.c
-> +++ b/lib/x86/desc.c
-> @@ -251,6 +251,14 @@ unsigned exception_vector(void)
->      return vector;
->  }
->  
-> +int write_cr4_checking(unsigned long val)
-> +{
-> +    asm volatile(ASM_TRY("1f")
-> +            "mov %0,%%cr4\n\t"
-> +            "1:": : "r" (val));
-> +    return exception_vector();
-> +}
-> +
->  unsigned exception_error_code(void)
->  {
->      unsigned short error_code;
-> diff --git a/lib/x86/desc.h b/lib/x86/desc.h
-> index 7a7358a..9cf823a 100644
-> --- a/lib/x86/desc.h
-> +++ b/lib/x86/desc.h
-> @@ -207,6 +207,7 @@ extern tss64_t tss;
->  #endif
->  
->  unsigned exception_vector(void);
-> +int write_cr4_checking(unsigned long val);
->  unsigned exception_error_code(void);
->  bool exception_rflags_rf(void);
->  void set_idt_entry(int vec, void *addr, int dpl);
-> diff --git a/x86/access.c b/x86/access.c
-> index 9412300..f0d1879 100644
-> --- a/x86/access.c
-> +++ b/x86/access.c
-> @@ -171,14 +171,6 @@ typedef struct {
->  
->  static void ac_test_show(ac_test_t *at);
->  
-> -static int write_cr4_checking(unsigned long val)
-> -{
-> -    asm volatile(ASM_TRY("1f")
-> -            "mov %0,%%cr4\n\t"
-> -            "1:": : "r" (val));
-> -    return exception_vector();
-> -}
-> -
->  static void set_cr0_wp(int wp)
->  {
->      unsigned long cr0 = read_cr0();
-> diff --git a/x86/pcid.c b/x86/pcid.c
-> index c04fd09..dfabe0e 100644
-> --- a/x86/pcid.c
-> +++ b/x86/pcid.c
-> @@ -21,14 +21,6 @@ static int write_cr0_checking(unsigned long val)
->      return exception_vector();
->  }
->  
-> -static int write_cr4_checking(unsigned long val)
-> -{
-> -    asm volatile(ASM_TRY("1f")
-> -                 "mov %0, %%cr4\n\t"
-> -                 "1:": : "r" (val));
-> -    return exception_vector();
-> -}
-> -
->  static int invpcid_checking(unsigned long type, void *desc)
->  {
->      asm volatile (ASM_TRY("1f")
-> diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-> index c48e7fc..7184b06 100644
-> --- a/x86/vmx_tests.c
-> +++ b/x86/vmx_tests.c
-> @@ -7090,14 +7090,6 @@ static void vmentry_movss_shadow_test(void)
->  	vmcs_write(GUEST_RFLAGS, X86_EFLAGS_FIXED);
->  }
->  
-> -static int write_cr4_checking(unsigned long val)
-> -{
-> -	asm volatile(ASM_TRY("1f")
-> -		     "mov %0, %%cr4\n\t"
-> -		     "1:": : "r" (val));
-> -	return exception_vector();
-> -}
-> -
->  static void vmx_cr_load_test(void)
->  {
->  	struct cpuid _cpuid = cpuid(1);
-> diff --git a/x86/xsave.c b/x86/xsave.c
-> index 00787bb..ca41bbf 100644
-> --- a/x86/xsave.c
-> +++ b/x86/xsave.c
-> @@ -33,14 +33,6 @@ static int xsetbv_checking(u32 index, u64 value)
->      return exception_vector();
->  }
->  
-> -static int write_cr4_checking(unsigned long val)
-> -{
-> -    asm volatile(ASM_TRY("1f")
-> -            "mov %0,%%cr4\n\t"
-> -            "1:": : "r" (val));
-> -    return exception_vector();
-> -}
-> -
->  #define CPUID_1_ECX_XSAVE	    (1 << 26)
->  #define CPUID_1_ECX_OSXSAVE	    (1 << 27)
->  static int check_cpuid_1_ecx(unsigned int bit)
-> 
 
-Queued, thanks.
 
-Paolo
+On 7/2/19 9:58 AM, Farhan Ali wrote:
+> 
+> 
+> On 07/02/2019 04:42 AM, Cornelia Huck wrote:
+>> On Mon,  1 Jul 2019 12:23:44 -0400
+>> Farhan Ali <alifm@linux.ibm.com> wrote:
+>>
+>>> We don't set cp->initialized to true so calling cp_free
+>>> will just return and not do anything.
+>>>
+>>> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+>>> ---
+>>>   drivers/s390/cio/vfio_ccw_cp.c | 2 --
+>>>   1 file changed, 2 deletions(-)
+>>>
+>>> diff --git a/drivers/s390/cio/vfio_ccw_cp.c
+>>> b/drivers/s390/cio/vfio_ccw_cp.c
+>>> index 5ac4c1e..cab1be9 100644
+>>> --- a/drivers/s390/cio/vfio_ccw_cp.c
+>>> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+>>> @@ -647,8 +647,6 @@ int cp_init(struct channel_program *cp, struct
+>>> device *mdev, union orb *orb)
+>>>         /* Build a ccwchain for the first CCW segment */
+>>>       ret = ccwchain_handle_ccw(orb->cmd.cpa, cp);
+>>> -    if (ret)
+>>> -        cp_free(cp);
+>>
+>> Makes sense; hopefully ccwchain_handle_ccw() cleans up correctly on
+>> error :) (I think it does)
+>>
+> 
+> I have checked that it does as well, but wouldn't hurt if someone else
+> also glances over once again :)
+
+Oh noes.  What happens once we start encountering TICs?  If we do:
+
+ccwchain_handle_ccw()	(OK)
+ccwchain_loop_tic()	(OK)
+ccwchain_handle_ccw()	(FAIL)
+
+The first _handle_ccw() will have added a ccwchain to the cp list, which
+doesn't appear to get cleaned up now.  That used to be done in cp_init()
+until I squashed cp_free and cp_unpin_free.  :(
+
+> 
+>> Maybe add a comment
+>>
+>> /* ccwchain_handle_ccw() already cleans up on error */
+>>
+>> so we don't stumble over this in the future?
+> 
+> Sure.
+> 
+>>
+>> (Also, does this want a Fixes: tag?)
+> 
+> This might warrant a fixes tag as well.
+>>
+>>>         if (!ret)
+>>>           cp->initialized = true;
+>>
+>>
