@@ -2,176 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 009545CFD1
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 14:54:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9729D5D031
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 15:09:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726779AbfGBMyj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 08:54:39 -0400
-Received: from foss.arm.com ([217.140.110.172]:49158 "EHLO foss.arm.com"
+        id S1727040AbfGBNI6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 09:08:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60366 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725922AbfGBMyj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 08:54:39 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86BF2344;
-        Tue,  2 Jul 2019 05:54:38 -0700 (PDT)
-Received: from [10.1.31.185] (unknown [10.1.31.185])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5AB993F703;
-        Tue,  2 Jul 2019 05:54:36 -0700 (PDT)
-Subject: Re: [PATCH 23/59] KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
-To:     Julien Thierry <julien.thierry@arm.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-24-marc.zyngier@arm.com>
- <53793288-0d5d-4212-c1f4-ffa6a790d1c4@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <1ba3a46e-d8cd-d6c9-c1dc-2fe9ad309497@arm.com>
-Date:   Tue, 2 Jul 2019 13:54:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        id S1726993AbfGBNI6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jul 2019 09:08:58 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 72C513001808;
+        Tue,  2 Jul 2019 13:08:57 +0000 (UTC)
+Received: from x1.home (ovpn-116-83.phx2.redhat.com [10.3.116.83])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0BE066F94F;
+        Tue,  2 Jul 2019 13:08:56 +0000 (UTC)
+Date:   Tue, 2 Jul 2019 07:08:56 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kirti Wankhede <kwankhede@nvidia.com>
+Cc:     Parav Pandit <parav@mellanox.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] mdev: Send uevents around parent device registration
+Message-ID: <20190702070856.75c23a0c@x1.home>
+In-Reply-To: <b6afb6a7-0bd8-dff3-4a4b-a6bb34ccb61d@nvidia.com>
+References: <156199271955.1646.13321360197612813634.stgit@gimli.home>
+        <08597ab4-cc37-3973-8927-f1bc430f6185@nvidia.com>
+        <20190701112442.176a8407@x1.home>
+        <3b338e73-7929-df20-ca2b-3223ba4ead39@nvidia.com>
+        <20190701140436.45eabf07@x1.home>
+        <14783c81-0236-2f25-6193-c06aa83392c9@nvidia.com>
+        <20190701234201.47b6f23a@x1.home>
+        <AM0PR05MB48669DA5993C68765397AF1BD1F80@AM0PR05MB4866.eurprd05.prod.outlook.com>
+        <b6afb6a7-0bd8-dff3-4a4b-a6bb34ccb61d@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <53793288-0d5d-4212-c1f4-ffa6a790d1c4@arm.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Tue, 02 Jul 2019 13:08:57 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 2 Jul 2019 18:17:41 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-On 6/25/19 3:19 PM, Julien Thierry wrote:
->
-> On 06/21/2019 10:38 AM, Marc Zyngier wrote:
->> From: Jintack Lim <jintack.lim@linaro.org>
->>
->> Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
->> they are not coming from the virtual EL2 and virtual HCR_EL2.TWX is set.
->>
->> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm64/include/asm/kvm_nested.h |  2 ++
->>  arch/arm64/kvm/Makefile             |  1 +
->>  arch/arm64/kvm/handle_exit.c        | 13 +++++++++-
->>  arch/arm64/kvm/nested.c             | 39 +++++++++++++++++++++++++++++
->>  4 files changed, 54 insertions(+), 1 deletion(-)
->>  create mode 100644 arch/arm64/kvm/nested.c
->>
->> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
->> index 8a3d121a0b42..645e5e11b749 100644
->> --- a/arch/arm64/include/asm/kvm_nested.h
->> +++ b/arch/arm64/include/asm/kvm_nested.h
->> @@ -10,4 +10,6 @@ static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
->>  		test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features);
->>  }
->>  
->> +int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
->> +
->>  #endif /* __ARM64_KVM_NESTED_H */
->> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
->> index 9e450aea7db6..f11bd8b0d837 100644
->> --- a/arch/arm64/kvm/Makefile
->> +++ b/arch/arm64/kvm/Makefile
->> @@ -36,4 +36,5 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/irqchip.o
->>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
->>  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
->>  
->> +kvm-$(CONFIG_KVM_ARM_HOST) += nested.o
->>  kvm-$(CONFIG_KVM_ARM_HOST) += emulate-nested.o
->> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
->> index e348c15c81bc..ddba212fd6ec 100644
->> --- a/arch/arm64/kvm/handle_exit.c
->> +++ b/arch/arm64/kvm/handle_exit.c
->> @@ -127,7 +127,18 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>   */
->>  static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>  {
->> -	if (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
->> +	bool is_wfe = !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE);
->> +
->> +	if (nested_virt_in_use(vcpu)) {
->> +		int ret = handle_wfx_nested(vcpu, is_wfe);
->> +
->> +		if (ret < 0 && ret != -EINVAL)
->> +			return ret;
->> +		else if (ret >= 0)
->> +			return ret;
-> I think you can simplify this:
->
-> 	if (ret != -EINVAL)
-> 		return ret;
+> On 7/2/2019 12:43 PM, Parav Pandit wrote:
+> > 
+> >   
+> >> -----Original Message-----
+> >> From: linux-kernel-owner@vger.kernel.org <linux-kernel-  
+> >> owner@vger.kernel.org> On Behalf Of Alex Williamson  
+> >> Sent: Tuesday, July 2, 2019 11:12 AM
+> >> To: Kirti Wankhede <kwankhede@nvidia.com>
+> >> Cc: cohuck@redhat.com; kvm@vger.kernel.org; linux-kernel@vger.kernel.org
+> >> Subject: Re: [PATCH v2] mdev: Send uevents around parent device registration
+> >>
+> >> On Tue, 2 Jul 2019 10:25:04 +0530
+> >> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>  
+> >>> On 7/2/2019 1:34 AM, Alex Williamson wrote:  
+> >>>> On Mon, 1 Jul 2019 23:20:35 +0530
+> >>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>>  
+> >>>>> On 7/1/2019 10:54 PM, Alex Williamson wrote:  
+> >>>>>> On Mon, 1 Jul 2019 22:43:10 +0530
+> >>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>>>>  
+> >>>>>>> On 7/1/2019 8:24 PM, Alex Williamson wrote:  
+> >>>>>>>> This allows udev to trigger rules when a parent device is
+> >>>>>>>> registered or unregistered from mdev.
+> >>>>>>>>
+> >>>>>>>> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> >>>>>>>> ---
+> >>>>>>>>
+> >>>>>>>> v2: Don't remove the dev_info(), Kirti requested they stay and
+> >>>>>>>>     removing them is only tangential to the goal of this change.
+> >>>>>>>>  
+> >>>>>>>
+> >>>>>>> Thanks.
+> >>>>>>>
+> >>>>>>>  
+> >>>>>>>>  drivers/vfio/mdev/mdev_core.c |    8 ++++++++
+> >>>>>>>>  1 file changed, 8 insertions(+)
+> >>>>>>>>
+> >>>>>>>> diff --git a/drivers/vfio/mdev/mdev_core.c
+> >>>>>>>> b/drivers/vfio/mdev/mdev_core.c index ae23151442cb..7fb268136c62
+> >>>>>>>> 100644
+> >>>>>>>> --- a/drivers/vfio/mdev/mdev_core.c
+> >>>>>>>> +++ b/drivers/vfio/mdev/mdev_core.c
+> >>>>>>>> @@ -146,6 +146,8 @@ int mdev_register_device(struct device *dev,
+> >>>>>>>> const struct mdev_parent_ops *ops)  {
+> >>>>>>>>  	int ret;
+> >>>>>>>>  	struct mdev_parent *parent;
+> >>>>>>>> +	char *env_string = "MDEV_STATE=registered";
+> >>>>>>>> +	char *envp[] = { env_string, NULL };
+> >>>>>>>>
+> >>>>>>>>  	/* check for mandatory ops */
+> >>>>>>>>  	if (!ops || !ops->create || !ops->remove ||
+> >>>>>>>> !ops->supported_type_groups) @@ -197,6 +199,8 @@ int  
+> >> mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)  
+> >>>>>>>>  	mutex_unlock(&parent_list_lock);
+> >>>>>>>>
+> >>>>>>>>  	dev_info(dev, "MDEV: Registered\n");
+> >>>>>>>> +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+> >>>>>>>> +
+> >>>>>>>>  	return 0;
+> >>>>>>>>
+> >>>>>>>>  add_dev_err:
+> >>>>>>>> @@ -220,6 +224,8 @@ EXPORT_SYMBOL(mdev_register_device);
+> >>>>>>>>  void mdev_unregister_device(struct device *dev)  {
+> >>>>>>>>  	struct mdev_parent *parent;
+> >>>>>>>> +	char *env_string = "MDEV_STATE=unregistered";
+> >>>>>>>> +	char *envp[] = { env_string, NULL };
+> >>>>>>>>
+> >>>>>>>>  	mutex_lock(&parent_list_lock);
+> >>>>>>>>  	parent = __find_parent_device(dev); @@ -243,6 +249,8 @@  
+> >> void  
+> >>>>>>>> mdev_unregister_device(struct device *dev)
+> >>>>>>>>  	up_write(&parent->unreg_sem);
+> >>>>>>>>
+> >>>>>>>>  	mdev_put_parent(parent);
+> >>>>>>>> +
+> >>>>>>>> +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);  
+> >>>>>>>
+> >>>>>>> mdev_put_parent() calls put_device(dev). If this is the last
+> >>>>>>> instance holding device, then on put_device(dev) dev would get freed.
+> >>>>>>>
+> >>>>>>> This event should be before mdev_put_parent()  
+> >>>>>>
+> >>>>>> So you're suggesting the vendor driver is calling
+> >>>>>> mdev_unregister_device() without a reference to the struct device
+> >>>>>> that it's passing to unregister?  Sounds bogus to me.  We take a
+> >>>>>> reference to the device so that it can't disappear out from under
+> >>>>>> us, the caller cannot rely on our reference and the caller
+> >>>>>> provided the struct device.  Thanks,
+> >>>>>>  
+> >>>>>
+> >>>>> 1. Register uevent is sent after mdev holding reference to device,
+> >>>>> then ideally, unregister path should be mirror of register path,
+> >>>>> send uevent and then release the reference to device.  
+> >>>>
+> >>>> I don't see the relevance here.  We're marking an event, not
+> >>>> unwinding state of the device from the registration process.
+> >>>> Additionally, the event we're trying to mark is the completion of
+> >>>> each process, so the notion that we need to mirror the ordering between  
+> >> the two is invalid.  
+> >>>>  
+> >>>>> 2. I agree that vendor driver shouldn't call
+> >>>>> mdev_unregister_device() without holding reference to device. But
+> >>>>> to be on safer side, if ever such case occur, to avoid any
+> >>>>> segmentation fault in kernel, better to send event before mdev release the  
+> >> reference to device.  
+> >>>>
+> >>>> I know that get_device() and put_device() are GPL symbols and that's
+> >>>> a bit of an issue, but I don't think we should be kludging the code
+> >>>> for a vendor driver that might have problems with that.  A) we're
+> >>>> using the caller provided device  for the uevent, B) we're only
+> >>>> releasing our own reference to the device that was acquired during
+> >>>> registration, the vendor driver must have other references,  
+> >>>
+> >>> Are you going to assume that someone/vendor driver is always going to
+> >>> do right thing?  
+> >>
+> >> mdev is a kernel driver, we make reasonable assumptions that other drivers
+> >> interact with it correctly.
+> >>  
+> > That is right.
+> > Vendor drivers must invoke mdev_register_device() and mdev_unregister_device() only once.
+> > And it must have a valid reference to the device for which it is invoking it.
+> > This is basic programming practice that a given driver has to follow.
+> > mdev_register_device() has a loop to check. It needs to WARN_ON there if there are duplicate registration.
+> > Similarly on mdev_unregister_device() to have WARN_ON if device is not found.  
+> 
+> If assumption is vendor driver is always going to do right way, then why
+> need check for duplicate registration? vendor driver is always going to
+> do it right way, right?
 
-And handle_wfx_nested can only return -EINVAL or 1 (from
-kvm_inject_nested_sync), so the condition is not only complicated, but also
-misleading.
+Are we intentionally misinterpreting "reasonable assumptions" here?
 
-Thanks,
+> > It was in my TODO list to submit those patches.
+> > I was still thinking to that mdev_register_device() should return mdev_parent and mdev_unregister_device() should accept mdev_parent pointer, instead of WARN_ON on unregister().
+> > 
+> >   
+> >>>> C) the parent device
+> >>>> generally lives on a bus, with a vendor driver, there's an entire
+> >>>> ecosystem of references to the device below mdev.  Is this a
+> >>>> paranoia request or are you really concerned that your PCI device suddenly
+> >>>> disappears when mdev's reference to it disappears.  
+> >>>
+> >>> mdev infrastructure is not always used by PCI devices. It is designed
+> >>> to be generic, so that other devices (other than PCI devices) can also
+> >>> use this framework.  
+> >>
+> >> Obviously mdev is not PCI specific, I only mention it because I'm asking if you
+> >> have a specific concern in mind.  If you did, I'd assume it's related to a PCI
+> >> backed vGPU.  
+> 
+> Its not always good to assume certain things.
+
+It was only an attempt to relate to a specific issue that might concern
+you.
+
+> >> Any physical parent device of an mdev is likely to have some sort
+> >> of bus infrastructure behind it holding references to the device (ie. a probe and
+> >> release where an implicit reference is held between these points).  A virtual
+> >> device would be similar, it's created as part of a module init and destroyed as
+> >> part of a module exit, where mdev registration would exist between these
+> >> points.
+> >>  
+> >>> If there is a assumption that user of mdev framework or vendor drivers
+> >>> are always going to use mdev in right way, then there is no need for
+> >>> mdev core to held reference of the device?
+> >>> This is not a "paranoia request". This is more of a ideal scenario,
+> >>> mdev should use device by holding its reference rather than assuming
+> >>> (or relying on) someone else holding the reference of device.  
+> >>
+> >> In fact, at one point Parav was proposing removing these references entirely,
+> >> but Connie and I both felt uncomfortable about that.  I think it's good practice
+> >> that mdev indicates the use of the parent device by incrementing the reference
+> >> count, with each child mdev device also taking a reference, but those
+> >> references balance out within the mdev core.  Their purpose is not to maintain
+> >> the device for outside callers, nor should outside callers assume mdev's use of
+> >> references to release their own.  I don't think it's unreasonable to assume that
+> >> the caller should have a legitimate reference to the object it's providing to this
+> >> function and therefore we should be able to use it after mdev's internal
+> >> references are balanced out.  Thanks,
+> >>  
+> 
+> I'm not fully convinced with what is the advantage of sending uevent
+> after releasing reference to device or disadvantage of sending uevent
+> before releasing reference to device.
+
+If mdev-core still holds a reference to the device, is it fully
+unregistered?  Why not send the uevent at the point where the
+notification is actually true?
+
+> Still if you want to go ahead with this change, please add a check or
+> assert if (dev != NULL) and add an comment highlighting the assumption.
+
+If CONFIG_DEBUG_KOBJECT_RELEASE is enabled then the deletion of the
+kobject can occur at some random delay after the last reference is
+removed via a workqueue, so such a test would only introduce a false
+sense of security for an issue that should not exist anyway.  Thanks,
 
 Alex
-
->
-> Cheers,
->
-> Julien
->
->
->> +	}
->> +
->> +	if (is_wfe) {
->>  		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
->>  		vcpu->stat.wfe_exit_stat++;
->>  		kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
->> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
->> new file mode 100644
->> index 000000000000..3872e3cf1691
->> --- /dev/null
->> +++ b/arch/arm64/kvm/nested.c
->> @@ -0,0 +1,39 @@
->> +/*
->> + * Copyright (C) 2017 - Columbia University and Linaro Ltd.
->> + * Author: Jintack Lim <jintack.lim@linaro.org>
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 as
->> + * published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + *
->> + * You should have received a copy of the GNU General Public License
->> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#include <linux/kvm.h>
->> +#include <linux/kvm_host.h>
->> +
->> +#include <asm/kvm_emulate.h>
->> +
->> +/*
->> + * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
->> + * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
->> + * handle this.
->> + */
->> +int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
->> +{
->> +	u64 hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
->> +
->> +	if (vcpu_mode_el2(vcpu))
->> +		return -EINVAL;
->> +
->> +	if ((is_wfe && (hcr_el2 & HCR_TWE)) || (!is_wfe && (hcr_el2 & HCR_TWI)))
->> +		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
->> +
->> +	return -EINVAL;
->> +}
->>
