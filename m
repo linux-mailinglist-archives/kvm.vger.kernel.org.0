@@ -2,243 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 08DFC5C7EE
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 05:44:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CC9CE5C88B
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 06:55:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727033AbfGBDn1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Jul 2019 23:43:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53544 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726434AbfGBDnZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Jul 2019 23:43:25 -0400
-Received: from localhost (c-67-180-165-146.hsd1.ca.comcast.net [67.180.165.146])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4223C2183F;
-        Tue,  2 Jul 2019 03:43:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1562039004;
-        bh=0YIrxv9I7RI0x/7wdAUptcwM2tZFC1S4qN00UgGW3+M=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=xKDpMMVWIMdPIaEtKarV9tNj73I+0UAgbPw9YuAVoGSqATzGYKOmHm3Xt2SVI1bAP
-         QhEhHAzN/dNyRfjbz3jNc6CTAErhMWDPawtj9yi0qIu35+9OCW269Z7U3zLT0WGtP8
-         ashaCYHbeqKE6/q8hMaxb/itHbPh6q5XCBBHGK+I=
-From:   Andy Lutomirski <luto@kernel.org>
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     x86@kernel.org, "Bae, Chang Seok" <chang.seok.bae@intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Vegard Nossum <vegard.nossum@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: [PATCH 1/3] selftests/x86: Test SYSCALL and SYSENTER manually with TF set
-Date:   Mon,  1 Jul 2019 20:43:19 -0700
-Message-Id: <5f5de10441ab2e3005538b4c33be9b1965d1bb63.1562035429.git.luto@kernel.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <cover.1562035429.git.luto@kernel.org>
-References: <cover.1562035429.git.luto@kernel.org>
+        id S1725991AbfGBEzU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 00:55:20 -0400
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:8794 "EHLO
+        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725922AbfGBEzU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jul 2019 00:55:20 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d1ae3b90000>; Mon, 01 Jul 2019 21:55:21 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 01 Jul 2019 21:55:18 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 01 Jul 2019 21:55:18 -0700
+Received: from [10.24.70.16] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 2 Jul
+ 2019 04:55:14 +0000
+Subject: Re: [PATCH v2] mdev: Send uevents around parent device registration
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <156199271955.1646.13321360197612813634.stgit@gimli.home>
+ <08597ab4-cc37-3973-8927-f1bc430f6185@nvidia.com>
+ <20190701112442.176a8407@x1.home>
+ <3b338e73-7929-df20-ca2b-3223ba4ead39@nvidia.com>
+ <20190701140436.45eabf07@x1.home>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <14783c81-0236-2f25-6193-c06aa83392c9@nvidia.com>
+Date:   Tue, 2 Jul 2019 10:25:04 +0530
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190701140436.45eabf07@x1.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1562043321; bh=CZdkaj0XFhhMmhaSOWFllFY14IofOj9ERRNjXuWdkfg=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:MIME-Version:In-Reply-To:X-Originating-IP:
+         X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=QIrRc4ZnpGTLVdr9l5Wjq+vybQ4zVvZMBW5EsWqoAQQnsO7IfBggAnJHVeCemexGA
+         V1XJdaFuT+hrBxWpf+ePfP7gt/nag0d9V4XTJ1bKEuXWy+PC54Mo0HiFzX8E36oBpR
+         S8P15hTvlWPSW9I38n2/nCX6p+Y08dUmet0CbpmDTaZ4I7E7/wkMa65vrQBM7QBX4b
+         kJPe0dzyqFQGa8kbwb3y14MFxYPqBTiBYnFol+pbHj9gNL36Chp35Kj7HuAH+xG95Z
+         YPsuozpHiEKs0ESkxoR9XD4OU+DiKdCXGz2qtlEjZeuoCdA5u+kHpdN9nkWCoi1H1k
+         HzDvy8hIs7PqA==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Make sure that we exercise both variants of the nasty
-TF-in-compat-syscall regardless of what vendor's CPU is running the
-tests.
 
-Also change the intentional signal after SYSCALL to use ud2, which
-is a lot more comprehensible.
 
-This crashes the kernel due to an FSGSBASE bug right now.
+On 7/2/2019 1:34 AM, Alex Williamson wrote:
+> On Mon, 1 Jul 2019 23:20:35 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+>> On 7/1/2019 10:54 PM, Alex Williamson wrote:
+>>> On Mon, 1 Jul 2019 22:43:10 +0530
+>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>   
+>>>> On 7/1/2019 8:24 PM, Alex Williamson wrote:  
+>>>>> This allows udev to trigger rules when a parent device is registered
+>>>>> or unregistered from mdev.
+>>>>>
+>>>>> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+>>>>> ---
+>>>>>
+>>>>> v2: Don't remove the dev_info(), Kirti requested they stay and
+>>>>>     removing them is only tangential to the goal of this change.
+>>>>>     
+>>>>
+>>>> Thanks.
+>>>>
+>>>>  
+>>>>>  drivers/vfio/mdev/mdev_core.c |    8 ++++++++
+>>>>>  1 file changed, 8 insertions(+)
+>>>>>
+>>>>> diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+>>>>> index ae23151442cb..7fb268136c62 100644
+>>>>> --- a/drivers/vfio/mdev/mdev_core.c
+>>>>> +++ b/drivers/vfio/mdev/mdev_core.c
+>>>>> @@ -146,6 +146,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+>>>>>  {
+>>>>>  	int ret;
+>>>>>  	struct mdev_parent *parent;
+>>>>> +	char *env_string = "MDEV_STATE=registered";
+>>>>> +	char *envp[] = { env_string, NULL };
+>>>>>  
+>>>>>  	/* check for mandatory ops */
+>>>>>  	if (!ops || !ops->create || !ops->remove || !ops->supported_type_groups)
+>>>>> @@ -197,6 +199,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+>>>>>  	mutex_unlock(&parent_list_lock);
+>>>>>  
+>>>>>  	dev_info(dev, "MDEV: Registered\n");
+>>>>> +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+>>>>> +
+>>>>>  	return 0;
+>>>>>  
+>>>>>  add_dev_err:
+>>>>> @@ -220,6 +224,8 @@ EXPORT_SYMBOL(mdev_register_device);
+>>>>>  void mdev_unregister_device(struct device *dev)
+>>>>>  {
+>>>>>  	struct mdev_parent *parent;
+>>>>> +	char *env_string = "MDEV_STATE=unregistered";
+>>>>> +	char *envp[] = { env_string, NULL };
+>>>>>  
+>>>>>  	mutex_lock(&parent_list_lock);
+>>>>>  	parent = __find_parent_device(dev);
+>>>>> @@ -243,6 +249,8 @@ void mdev_unregister_device(struct device *dev)
+>>>>>  	up_write(&parent->unreg_sem);
+>>>>>  
+>>>>>  	mdev_put_parent(parent);
+>>>>> +
+>>>>> +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);    
+>>>>
+>>>> mdev_put_parent() calls put_device(dev). If this is the last instance
+>>>> holding device, then on put_device(dev) dev would get freed.
+>>>>
+>>>> This event should be before mdev_put_parent()  
+>>>
+>>> So you're suggesting the vendor driver is calling
+>>> mdev_unregister_device() without a reference to the struct device that
+>>> it's passing to unregister?  Sounds bogus to me.  We take a
+>>> reference to the device so that it can't disappear out from under us,
+>>> the caller cannot rely on our reference and the caller provided the
+>>> struct device.  Thanks,
+>>>   
+>>
+>> 1. Register uevent is sent after mdev holding reference to device, then
+>> ideally, unregister path should be mirror of register path, send uevent
+>> and then release the reference to device.
+> 
+> I don't see the relevance here.  We're marking an event, not unwinding
+> state of the device from the registration process.  Additionally, the
+> event we're trying to mark is the completion of each process, so the
+> notion that we need to mirror the ordering between the two is invalid.
+> 
+>> 2. I agree that vendor driver shouldn't call mdev_unregister_device()
+>> without holding reference to device. But to be on safer side, if ever
+>> such case occur, to avoid any segmentation fault in kernel, better to
+>> send event before mdev release the reference to device.
+> 
+> I know that get_device() and put_device() are GPL symbols and that's a
+> bit of an issue, but I don't think we should be kludging the code for a
+> vendor driver that might have problems with that.  A) we're using the
+> caller provided device  for the uevent, B) we're only releasing our own
+> reference to the device that was acquired during registration, the
+> vendor driver must have other references,
 
-This test *also* detects a bug in KVM when run on an Intel host.
-KVM people, feel free to use it to help debug.  There's a bunch of
-code in this test to warn instead of infinite looping when the bug
-gets triggered.
+Are you going to assume that someone/vendor driver is always going to do
+right thing?
 
-Reported-by: Vegard Nossum <vegard.nossum@oracle.com>
-Cc: "Bae, Chang Seok" <chang.seok.bae@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
-Signed-off-by: Andy Lutomirski <luto@kernel.org>
----
- tools/testing/selftests/x86/Makefile          |   5 +-
- .../testing/selftests/x86/syscall_arg_fault.c | 112 +++++++++++++++++-
- 2 files changed, 110 insertions(+), 7 deletions(-)
+> C) the parent device
+> generally lives on a bus, with a vendor driver, there's an entire
+> ecosystem of references to the device below mdev.  Is this a paranoia
+> request or are you really concerned that your PCI device suddenly
+> disappears when mdev's reference to it disappears. 
 
-diff --git a/tools/testing/selftests/x86/Makefile b/tools/testing/selftests/x86/Makefile
-index 186520198de7..fa07d526fe39 100644
---- a/tools/testing/selftests/x86/Makefile
-+++ b/tools/testing/selftests/x86/Makefile
-@@ -12,8 +12,9 @@ CAN_BUILD_WITH_NOPIE := $(shell ./check_cc.sh $(CC) trivial_program.c -no-pie)
- 
- TARGETS_C_BOTHBITS := single_step_syscall sysret_ss_attrs syscall_nt test_mremap_vdso \
- 			check_initial_reg_state sigreturn iopl mpx-mini-test ioperm \
--			protection_keys test_vdso test_vsyscall mov_ss_trap
--TARGETS_C_32BIT_ONLY := entry_from_vm86 syscall_arg_fault test_syscall_vdso unwind_vdso \
-+			protection_keys test_vdso test_vsyscall mov_ss_trap \
-+			syscall_arg_fault
-+TARGETS_C_32BIT_ONLY := entry_from_vm86 test_syscall_vdso unwind_vdso \
- 			test_FCMOV test_FCOMI test_FISTTP \
- 			vdso_restorer
- TARGETS_C_64BIT_ONLY := fsgsbase sysret_rip
-diff --git a/tools/testing/selftests/x86/syscall_arg_fault.c b/tools/testing/selftests/x86/syscall_arg_fault.c
-index 4e25d38c8bbd..bc0ecc2e862e 100644
---- a/tools/testing/selftests/x86/syscall_arg_fault.c
-+++ b/tools/testing/selftests/x86/syscall_arg_fault.c
-@@ -15,9 +15,30 @@
- #include <setjmp.h>
- #include <errno.h>
- 
-+#ifdef __x86_64__
-+# define WIDTH "q"
-+#else
-+# define WIDTH "l"
-+#endif
-+
- /* Our sigaltstack scratch space. */
- static unsigned char altstack_data[SIGSTKSZ];
- 
-+static unsigned long get_eflags(void)
-+{
-+	unsigned long eflags;
-+	asm volatile ("pushf" WIDTH "\n\tpop" WIDTH " %0" : "=rm" (eflags));
-+	return eflags;
-+}
-+
-+static void set_eflags(unsigned long eflags)
-+{
-+	asm volatile ("push" WIDTH " %0\n\tpopf" WIDTH
-+		      : : "rm" (eflags) : "flags");
-+}
-+
-+#define X86_EFLAGS_TF (1UL << 8)
-+
- static void sethandler(int sig, void (*handler)(int, siginfo_t *, void *),
- 		       int flags)
- {
-@@ -35,13 +56,22 @@ static sigjmp_buf jmpbuf;
- 
- static volatile sig_atomic_t n_errs;
- 
-+#ifdef __x86_64__
-+#define REG_AX REG_RAX
-+#define REG_IP REG_RIP
-+#else
-+#define REG_AX REG_EAX
-+#define REG_IP REG_EIP
-+#endif
-+
- static void sigsegv_or_sigbus(int sig, siginfo_t *info, void *ctx_void)
- {
- 	ucontext_t *ctx = (ucontext_t*)ctx_void;
-+	long ax = (long)ctx->uc_mcontext.gregs[REG_AX];
- 
--	if (ctx->uc_mcontext.gregs[REG_EAX] != -EFAULT) {
--		printf("[FAIL]\tAX had the wrong value: 0x%x\n",
--		       ctx->uc_mcontext.gregs[REG_EAX]);
-+	if (ax != -EFAULT && ax != -ENOSYS) {
-+		printf("[FAIL]\tAX had the wrong value: 0x%lx\n",
-+		       (unsigned long)ax);
- 		n_errs++;
- 	} else {
- 		printf("[OK]\tSeems okay\n");
-@@ -50,9 +80,42 @@ static void sigsegv_or_sigbus(int sig, siginfo_t *info, void *ctx_void)
- 	siglongjmp(jmpbuf, 1);
- }
- 
-+static volatile sig_atomic_t sigtrap_consecutive_syscalls;
-+
-+static void sigtrap(int sig, siginfo_t *info, void *ctx_void)
-+{
-+	/*
-+	 * KVM has some bugs that can cause us to stop making progress.
-+	 * detect them and complain, but don't infinite loop or fail the
-+	 * test.
-+	 */
-+
-+	ucontext_t *ctx = (ucontext_t*)ctx_void;
-+	unsigned short *ip = (unsigned short *)ctx->uc_mcontext.gregs[REG_IP];
-+
-+	if (*ip == 0x340f || *ip == 0x050f) {
-+		/* The trap was on SYSCALL or SYSENTER */
-+		sigtrap_consecutive_syscalls++;
-+		if (sigtrap_consecutive_syscalls > 3) {
-+			printf("[WARN]\tGot stuck single-stepping -- you probably have a KVM bug\n");
-+			siglongjmp(jmpbuf, 1);
-+		}
-+	} else {
-+		sigtrap_consecutive_syscalls = 0;
-+	}
-+}
-+
- static void sigill(int sig, siginfo_t *info, void *ctx_void)
- {
--	printf("[SKIP]\tIllegal instruction\n");
-+	ucontext_t *ctx = (ucontext_t*)ctx_void;
-+	unsigned short *ip = (unsigned short *)ctx->uc_mcontext.gregs[REG_IP];
-+
-+	if (*ip == 0x0b0f) {
-+		/* one of the ud2 instructions faulted */
-+		printf("[OK]\tSYSCALL returned normally\n");
-+	} else {
-+		printf("[SKIP]\tIllegal instruction\n");
-+	}
- 	siglongjmp(jmpbuf, 1);
- }
- 
-@@ -120,9 +183,48 @@ int main()
- 			"movl $-1, %%ebp\n\t"
- 			"movl $-1, %%esp\n\t"
- 			"syscall\n\t"
--			"pushl $0"	/* make sure we segfault cleanly */
-+			"ud2"		/* make sure we recover cleanly */
-+			: : : "memory", "flags");
-+	}
-+
-+	printf("[RUN]\tSYSENTER with TF and invalid state\n");
-+	sethandler(SIGTRAP, sigtrap, SA_ONSTACK);
-+
-+	if (sigsetjmp(jmpbuf, 1) == 0) {
-+		sigtrap_consecutive_syscalls = 0;
-+		set_eflags(get_eflags() | X86_EFLAGS_TF);
-+		asm volatile (
-+			"movl $-1, %%eax\n\t"
-+			"movl $-1, %%ebx\n\t"
-+			"movl $-1, %%ecx\n\t"
-+			"movl $-1, %%edx\n\t"
-+			"movl $-1, %%esi\n\t"
-+			"movl $-1, %%edi\n\t"
-+			"movl $-1, %%ebp\n\t"
-+			"movl $-1, %%esp\n\t"
-+			"sysenter"
-+			: : : "memory", "flags");
-+	}
-+	set_eflags(get_eflags() & ~X86_EFLAGS_TF);
-+
-+	printf("[RUN]\tSYSCALL with TF and invalid state\n");
-+	if (sigsetjmp(jmpbuf, 1) == 0) {
-+		sigtrap_consecutive_syscalls = 0;
-+		set_eflags(get_eflags() | X86_EFLAGS_TF);
-+		asm volatile (
-+			"movl $-1, %%eax\n\t"
-+			"movl $-1, %%ebx\n\t"
-+			"movl $-1, %%ecx\n\t"
-+			"movl $-1, %%edx\n\t"
-+			"movl $-1, %%esi\n\t"
-+			"movl $-1, %%edi\n\t"
-+			"movl $-1, %%ebp\n\t"
-+			"movl $-1, %%esp\n\t"
-+			"syscall\n\t"
-+			"ud2"		/* make sure we recover cleanly */
- 			: : : "memory", "flags");
- 	}
-+	set_eflags(get_eflags() & ~X86_EFLAGS_TF);
- 
- 	return 0;
- }
--- 
-2.21.0
+mdev infrastructure is not always used by PCI devices. It is designed to
+be generic, so that other devices (other than PCI devices) can also use
+this framework.
+If there is a assumption that user of mdev framework or vendor drivers
+are always going to use mdev in right way, then there is no need for
+mdev core to held reference of the device?
+This is not a "paranoia request". This is more of a ideal scenario, mdev
+should use device by holding its reference rather than assuming (or
+relying on) someone else holding the reference of device.
 
+Thanks,
+Kirti
