@@ -2,116 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3ECBE5CB08
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 10:10:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 428685CBFF
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 10:26:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728850AbfGBIKj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 04:10:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59050 "EHLO mail.kernel.org"
+        id S1727033AbfGBI0J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 04:26:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49050 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727844AbfGBIKe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 04:10:34 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1725940AbfGBI0J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jul 2019 04:26:09 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C7E1021852;
-        Tue,  2 Jul 2019 08:10:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1562055033;
-        bh=JzhaEiPOMzUPEDdCttlNaZQHACR4FpyS+c4Ey6GXKhw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UYaL0caHGGZOPL/IAH/RHafBj3bu7CKbFJz+CnsML+dIdn4TPTBlUU5kxaH6WEuPP
-         NP1JzQO7D2CTnZiLWDZtHfinsDReQthsk/KSURifvcOquAbxwEog2YYB8xo4HrSVk0
-         xrkldG0C7WslH/7awFqRIxDOgU740ayAI3WUwWjQ=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Mark Kanda <mark.kanda@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, bp@alien8.de,
-        rkrcmar@redhat.com, kvm@vger.kernel.org
-Subject: [PATCH 4.14 22/43] x86/speculation: Allow guests to use SSBD even if host does not
-Date:   Tue,  2 Jul 2019 10:02:02 +0200
-Message-Id: <20190702080124.964149146@linuxfoundation.org>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190702080123.904399496@linuxfoundation.org>
-References: <20190702080123.904399496@linuxfoundation.org>
-User-Agent: quilt/0.66
+        by mx1.redhat.com (Postfix) with ESMTPS id 6FD1686679;
+        Tue,  2 Jul 2019 08:26:09 +0000 (UTC)
+Received: from gondolin (dhcp-192-192.str.redhat.com [10.33.192.192])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 802605C296;
+        Tue,  2 Jul 2019 08:26:08 +0000 (UTC)
+Date:   Tue, 2 Jul 2019 10:26:06 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Farhan Ali <alifm@linux.ibm.com>
+Cc:     farman@linux.ibm.com, pasic@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC v1 1/4] vfio-ccw: Set orb.cmd.c64 before calling
+ ccwchain_handle_ccw
+Message-ID: <20190702102606.2e9cfed3.cohuck@redhat.com>
+In-Reply-To: <050943a6f5a427317ea64100bc2b4ec6394a4411.1561997809.git.alifm@linux.ibm.com>
+References: <cover.1561997809.git.alifm@linux.ibm.com>
+        <050943a6f5a427317ea64100bc2b4ec6394a4411.1561997809.git.alifm@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 02 Jul 2019 08:26:09 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+On Mon,  1 Jul 2019 12:23:43 -0400
+Farhan Ali <alifm@linux.ibm.com> wrote:
 
-commit c1f7fec1eb6a2c86d01bc22afce772c743451d88 upstream.
+> Because ccwchain_handle_ccw calls ccwchain_calc_length and
+> as per the comment we should set orb.cmd.c64 before calling
+> ccwchanin_calc_length.
+> 
+> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> ---
+>  drivers/s390/cio/vfio_ccw_cp.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index d6a8dff..5ac4c1e 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -640,16 +640,16 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+>  	memcpy(&cp->orb, orb, sizeof(*orb));
+>  	cp->mdev = mdev;
+>  
+> -	/* Build a ccwchain for the first CCW segment */
+> -	ret = ccwchain_handle_ccw(orb->cmd.cpa, cp);
+> -	if (ret)
+> -		cp_free(cp);
+> -
+>  	/* It is safe to force: if not set but idals used
+>  	 * ccwchain_calc_length returns an error.
+>  	 */
+>  	cp->orb.cmd.c64 = 1;
+>  
+> +	/* Build a ccwchain for the first CCW segment */
+> +	ret = ccwchain_handle_ccw(orb->cmd.cpa, cp);
+> +	if (ret)
+> +		cp_free(cp);
+> +
+>  	if (!ret)
+>  		cp->initialized = true;
+>  
 
-The bits set in x86_spec_ctrl_mask are used to calculate the guest's value
-of SPEC_CTRL that is written to the MSR before VMENTRY, and control which
-mitigations the guest can enable.  In the case of SSBD, unless the host has
-enabled SSBD always on mode (by passing "spec_store_bypass_disable=on" in
-the kernel parameters), the SSBD bit is not set in the mask and the guest
-can not properly enable the SSBD always on mitigation mode.
+Hm... has this ever been correct, or did this break only with the
+recent refactorings?
 
-This has been confirmed by running the SSBD PoC on a guest using the SSBD
-always on mitigation mode (booted with kernel parameter
-"spec_store_bypass_disable=on"), and verifying that the guest is vulnerable
-unless the host is also using SSBD always on mode. In addition, the guest
-OS incorrectly reports the SSB vulnerability as mitigated.
-
-Always set the SSBD bit in x86_spec_ctrl_mask when the host CPU supports
-it, allowing the guest to use SSBD whether or not the host has chosen to
-enable the mitigation in any of its modes.
-
-Fixes: be6fcb5478e9 ("x86/bugs: Rework spec_ctrl base and mask logic")
-Signed-off-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
-Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Cc: bp@alien8.de
-Cc: rkrcmar@redhat.com
-Cc: kvm@vger.kernel.org
-Cc: stable@vger.kernel.org
-Link: https://lkml.kernel.org/r/1560187210-11054-1-git-send-email-alejandro.j.jimenez@oracle.com
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
----
- arch/x86/kernel/cpu/bugs.c |   11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
---- a/arch/x86/kernel/cpu/bugs.c
-+++ b/arch/x86/kernel/cpu/bugs.c
-@@ -821,6 +821,16 @@ static enum ssb_mitigation __init __ssb_
- 	}
- 
- 	/*
-+	 * If SSBD is controlled by the SPEC_CTRL MSR, then set the proper
-+	 * bit in the mask to allow guests to use the mitigation even in the
-+	 * case where the host does not enable it.
-+	 */
-+	if (static_cpu_has(X86_FEATURE_SPEC_CTRL_SSBD) ||
-+	    static_cpu_has(X86_FEATURE_AMD_SSBD)) {
-+		x86_spec_ctrl_mask |= SPEC_CTRL_SSBD;
-+	}
-+
-+	/*
- 	 * We have three CPU feature flags that are in play here:
- 	 *  - X86_BUG_SPEC_STORE_BYPASS - CPU is susceptible.
- 	 *  - X86_FEATURE_SSBD - CPU is able to turn off speculative store bypass
-@@ -837,7 +847,6 @@ static enum ssb_mitigation __init __ssb_
- 			x86_amd_ssb_disable();
- 		} else {
- 			x86_spec_ctrl_base |= SPEC_CTRL_SSBD;
--			x86_spec_ctrl_mask |= SPEC_CTRL_SSBD;
- 			wrmsrl(MSR_IA32_SPEC_CTRL, x86_spec_ctrl_base);
- 		}
- 	}
-
-
+(IOW, what should Fixes: point to?)
