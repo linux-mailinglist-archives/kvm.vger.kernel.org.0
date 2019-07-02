@@ -2,118 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DCCC5D46F
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 18:39:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FC595D472
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 18:40:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726605AbfGBQjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 12:39:31 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:35611 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725972AbfGBQja (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 12:39:30 -0400
-Received: by mail-io1-f65.google.com with SMTP id m24so38572808ioo.2
-        for <kvm@vger.kernel.org>; Tue, 02 Jul 2019 09:39:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cJKujP4fkM3z2RD8g5Cwbhd6zL26dOcsHa0bH40LmNQ=;
-        b=Eb5/A+Rsp6mvOjKb1VDybsOmEm5JhKIyMZG0BUXzXpckh4kpfVbcqTl9x/IR0BDNGE
-         Xd3OdFDiNSSo216z/VfeWXTnTY2lfZTsoY74m3aweU9GRTVu1di6pzvjm8vUn+PYN27/
-         gLz8qBDPP9lYqO2uznXig6mgNakHnBi6iOU4rEPPZSrk9riBC5zivncswET7AzYV+aqW
-         x9sepQTTQVR/jtj6v7GVFAIqBEtB7Pl4juUhCPPTTPdn3DNdVsnXZcdUTb7C28mdTsfX
-         MHDuaET+tmXRNbg7ITs+S3Hr1xsGZ5Tkuyz9n4XfF331rE4wUbMTufzr+6Ib/6jR2+62
-         ojRg==
+        id S1726404AbfGBQkB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 12:40:01 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:43231 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726413AbfGBQkB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jul 2019 12:40:01 -0400
+Received: by mail-wr1-f68.google.com with SMTP id p13so18588613wru.10
+        for <kvm@vger.kernel.org>; Tue, 02 Jul 2019 09:40:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cJKujP4fkM3z2RD8g5Cwbhd6zL26dOcsHa0bH40LmNQ=;
-        b=nzOGRG3zxuUkT1oAicgbMaS9gG9ctZTLV7DpdAPGA/bnPOrsoo2SLr5OyPmWokYs86
-         NXp8zb74AKAjcf18lPRhiEzJQn01qAS7/0J/pFC2VYWv8KZVucb/BwzOwZ2zBYOEJMbC
-         kO6s2mOE/4AoDtmTZbSDNw+Q6Mer37sxClmjNQEjPtx/ixSrux1pEmQR+1gB26pubEgT
-         qcK4vrg+y2K8kmxevPiMR9TGT0A/LF2KHoyS1yD8fMu/NKPRF/9eZ65e0l8KEThkrPK7
-         fw7cDEdojbx++G3CMpDcld2s+oa/qSeeEcpWCljodjGFaXhjNOs/IISJPO+nl+tr4tcp
-         I27g==
-X-Gm-Message-State: APjAAAUozthMoHY6Krc332zflWQjBvlskRUgp9RGSfDymxXC2hVLcxv9
-        lhoFnODsTqYdlR36lEA++vlG5E+VeAggKakO4Cll6HgO
-X-Google-Smtp-Source: APXvYqzy2Ae7R1BoOpMWCkUcy8MxPE79laybLlT2s/2EzaUn1+cV9fZb6XylHdhwCCrHzcBTawPmq3BLRJC2SqhrOnA=
-X-Received: by 2002:a5e:8508:: with SMTP id i8mr2877980ioj.108.1562085569425;
- Tue, 02 Jul 2019 09:39:29 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=89JzHazKkLt0rnC7Q/hksVSrRUZdomcRTw+AhbuGiRM=;
+        b=k9f0GLOcnSr4+8t/dkcaX5eBgCZhS2Jwjqrf4GtJumVVe/w59mqwEP/ZVUd5Udjd+f
+         S2ikIdpQtrfYGVIkz7j4mmAqqmIL68XbDqF8Wwvv50kraVYvq9GjyLbUvxJb+Mldawsp
+         sh54hEHjIliYBjbJ8D3YMVb9KwF75bmV9uylIWrJxoKD0BUnf1kXIm/mU8ykMuIki7cK
+         IVkZ/Cpw89okTlA8qFI0LkG+X/tZ7ZLz7+/eQE3+KHbb3yWUvBDvBXK7TvvEIO00kgr5
+         9LWY5p7Whj23U2gaDsrwqjFVkagySa72+FfpPFBCoj2z8dDd8pnTpTNkML0SYgZfeqF4
+         NBZQ==
+X-Gm-Message-State: APjAAAVEldIDChUrgW0JmdEyWm2GKmm8W2oSfmTYFxFQ6iNcHMcdfv4q
+        t4tC74eFI7GEOotqOA39OfTbww==
+X-Google-Smtp-Source: APXvYqy5EHQlpOFDkiKzKqbJ6+g1TVh8VsVpOr4feuxwdnA1jIV4TrmY3bMpw/b27dqFIiJf+ZfKjA==
+X-Received: by 2002:a5d:470d:: with SMTP id y13mr19747003wrq.81.1562085599683;
+        Tue, 02 Jul 2019 09:39:59 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:b8:794:183e:9e2a? ([2001:b07:6468:f312:b8:794:183e:9e2a])
+        by smtp.gmail.com with ESMTPSA id d201sm2155255wmd.19.2019.07.02.09.39.58
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Tue, 02 Jul 2019 09:39:58 -0700 (PDT)
+Subject: Re: [PATCH] target/i386: kvm: Fix when nested state is needed for
+ migration
+To:     Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
+Cc:     kvm@vger.kernel.org, Karl Heubaum <karl.heubaum@oracle.com>
+References: <20190624230514.53326-1-liran.alon@oracle.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6499083f-c159-1c3e-0339-87aa5b13c2c0@redhat.com>
+Date:   Tue, 2 Jul 2019 18:39:58 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-References: <20190613161608.120838-1-jmattson@google.com>
-In-Reply-To: <20190613161608.120838-1-jmattson@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 2 Jul 2019 09:39:18 -0700
-Message-ID: <CALMp9eRRnpywexfc78Mb=VR7OyLCjUKe_zJ8aBGqJoc5DzDDAA@mail.gmail.com>
-Subject: Re: [PATCH] kvm: nVMX: Remove unnecessary sync_roots from handle_invept
-To:     kvm list <kvm@vger.kernel.org>
-Cc:     Junaid Shahid <junaids@google.com>,
-        Xiao Guangrong <xiaoguangrong@linux.vnet.ibm.com>,
-        Jun Nakajima <jun.nakajima@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190624230514.53326-1-liran.alon@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jun 13, 2019 at 9:16 AM Jim Mattson <jmattson@google.com> wrote:
->
-> When L0 is executing handle_invept(), the TDP MMU is active. Emulating
-> an L1 INVEPT does require synchronizing the appropriate shadow EPT
-> root(s), but a call to kvm_mmu_sync_roots in this context won't do
-> that. Similarly, the hardware TLB and paging-structure-cache entries
-> associated with the appropriate shadow EPT root(s) must be flushed,
-> but requesting a TLB_FLUSH from this context won't do that either.
->
-> How did this ever work? KVM always does a sync_roots and TLB flush (in
-> the correct context) when transitioning from L1 to L2. That isn't the
-> best choice for nested VM performance, but it effectively papers over
-> the mistakes here.
->
-> Remove the unnecessary operations and leave a comment to try to do
-> better in the future.
->
-> Reported-by: Junaid Shahid <junaids@google.com>
-> Fixes: bfd0a56b90005f ("nEPT: Nested INVEPT")
-> Cc: Xiao Guangrong <xiaoguangrong@linux.vnet.ibm.com>
-> Cc: Nadav Har'El <nyh@il.ibm.com>
-> Cc: Jun Nakajima <jun.nakajima@intel.com>
-> Cc: Xinhao Xu <xinhao.xu@intel.com>
-> Cc: Yang Zhang <yang.z.zhang@Intel.com>
-> Cc: Gleb Natapov <gleb@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by Peter Shier <pshier@google.com>
-> Reviewed-by: Junaid Shahid <junaids@google.com>
-> Signed-off-by: Jim Mattson <jmattson@google.com>
+On 25/06/19 01:05, Liran Alon wrote:
+> When vCPU is in VMX operation and enters SMM mode,
+> it temporarily exits VMX operation but KVM maintained nested-state
+> still stores the VMXON region physical address, i.e. even when the
+> vCPU is in SMM mode then (nested_state->hdr.vmx.vmxon_pa != -1ull).
+> 
+> Therefore, there is no need to explicitly check for
+> KVM_STATE_NESTED_SMM_VMXON to determine if it is necessary
+> to save nested-state as part of migration stream.
+> 
+> In addition, destination must enable eVMCS if it is enabled on
+> source as specified by the KVM_STATE_NESTED_EVMCS flag, even if
+> the VMXON region is not set. Thus, change the code to require saving
+> nested-state as part of migration stream in case it is set.
+> 
+> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+> Signed-off-by: Liran Alon <liran.alon@oracle.com>
 > ---
->  arch/x86/kvm/vmx/nested.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 1032f068f0b9..35621e73e726 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -4670,13 +4670,11 @@ static int handle_invept(struct kvm_vcpu *vcpu)
->
->         switch (type) {
->         case VMX_EPT_EXTENT_GLOBAL:
-> +       case VMX_EPT_EXTENT_CONTEXT:
->         /*
-> -        * TODO: track mappings and invalidate
-> -        * single context requests appropriately
-> +        * TODO: Sync the necessary shadow EPT roots here, rather than
-> +        * at the next emulated VM-entry.
->          */
-> -       case VMX_EPT_EXTENT_CONTEXT:
-> -               kvm_mmu_sync_roots(vcpu);
-> -               kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
->                 break;
->         default:
->                 BUG_ON(1);
-> --
-> 2.22.0.rc2.383.gf4fbbf30c2-goog
->
+>  target/i386/machine.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/i386/machine.c b/target/i386/machine.c
+> index 851b249d1a39..e7d72faf9e24 100644
+> --- a/target/i386/machine.c
+> +++ b/target/i386/machine.c
+> @@ -999,7 +999,7 @@ static bool vmx_nested_state_needed(void *opaque)
+>  
+>      return ((nested_state->format == KVM_STATE_NESTED_FORMAT_VMX) &&
+>              ((nested_state->hdr.vmx.vmxon_pa != -1ull) ||
+> -             (nested_state->hdr.vmx.smm.flags & KVM_STATE_NESTED_SMM_VMXON)));
+> +             (nested_state->flags & KVM_STATE_NESTED_EVMCS)));
+>  }
+>  
+>  static const VMStateDescription vmstate_vmx_nested_state = {
+> 
 
-Ping.
+Queued, thanks.
+
+Paolo
