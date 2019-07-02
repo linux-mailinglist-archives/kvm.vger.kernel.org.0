@@ -2,141 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 858D15D469
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 18:39:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DCCC5D46F
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 18:39:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727017AbfGBQjA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 12:39:00 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:36979 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726291AbfGBQjA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 12:39:00 -0400
-Received: by mail-wm1-f66.google.com with SMTP id f17so1750507wme.2
-        for <kvm@vger.kernel.org>; Tue, 02 Jul 2019 09:38:58 -0700 (PDT)
+        id S1726605AbfGBQjb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 12:39:31 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:35611 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725972AbfGBQja (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jul 2019 12:39:30 -0400
+Received: by mail-io1-f65.google.com with SMTP id m24so38572808ioo.2
+        for <kvm@vger.kernel.org>; Tue, 02 Jul 2019 09:39:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cJKujP4fkM3z2RD8g5Cwbhd6zL26dOcsHa0bH40LmNQ=;
+        b=Eb5/A+Rsp6mvOjKb1VDybsOmEm5JhKIyMZG0BUXzXpckh4kpfVbcqTl9x/IR0BDNGE
+         Xd3OdFDiNSSo216z/VfeWXTnTY2lfZTsoY74m3aweU9GRTVu1di6pzvjm8vUn+PYN27/
+         gLz8qBDPP9lYqO2uznXig6mgNakHnBi6iOU4rEPPZSrk9riBC5zivncswET7AzYV+aqW
+         x9sepQTTQVR/jtj6v7GVFAIqBEtB7Pl4juUhCPPTTPdn3DNdVsnXZcdUTb7C28mdTsfX
+         MHDuaET+tmXRNbg7ITs+S3Hr1xsGZ5Tkuyz9n4XfF331rE4wUbMTufzr+6Ib/6jR2+62
+         ojRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=kQCwhDkd+adrjWulJDMrfB6RaCVRg+9pt7Pln9EQadU=;
-        b=AG9N26OiubaIkYx2jRgkyBVD3jWXJYk8L6975TXD9duwc9JTzoAeaVhVu5PZKd5a/P
-         EiW7/X29mC0l7sdSplcvqqaULojm9e+mwQoqyZoHS/DeyH+G7Hvsc6Uume8bjyYJmLIO
-         9hovXGLtSN9KsSzegGQNysv7sW/9Swz8aUl1cLQMKO+3vxF0TawnhV6tGYTMVt1oLjgN
-         Z/lURc3PScj5863pTW52/tH8dZhxXmIGY6HFO1AnlLftJxlSAGFoCUCcm6uUuVBm/dLh
-         HjiYHIQ57DIoBLugvUbWeqc0cX8rCm7CAxJIxlzB0eU+prR8vhlxwMt1W0cxM2Sv4/Oa
-         y5CA==
-X-Gm-Message-State: APjAAAWKqGuh/w3kIeNW//TaRlXpIO61NZ99NoE3nloABaaqmfmLcyoX
-        0KxihAddaw6LAEbrYeJ1+fjchA==
-X-Google-Smtp-Source: APXvYqxPnamW93gW07ox1CwpZBoHKRzOdtXDqbFbqsJ7PrXNkj4xiKRuUFDtjNygF4OYLSfBPSizDw==
-X-Received: by 2002:a1c:67c2:: with SMTP id b185mr3812943wmc.98.1562085537670;
-        Tue, 02 Jul 2019 09:38:57 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b8:794:183e:9e2a? ([2001:b07:6468:f312:b8:794:183e:9e2a])
-        by smtp.gmail.com with ESMTPSA id f7sm3111041wrp.55.2019.07.02.09.38.56
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 02 Jul 2019 09:38:57 -0700 (PDT)
-Subject: Re: [PATCH v5 0/4] KVM: LAPIC: Implement Exitless Timer
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-References: <1561110002-4438-1-git-send-email-wanpengli@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1fbd236a-f7f9-e66a-e08c-bf2bac901d15@redhat.com>
-Date:   Tue, 2 Jul 2019 18:38:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cJKujP4fkM3z2RD8g5Cwbhd6zL26dOcsHa0bH40LmNQ=;
+        b=nzOGRG3zxuUkT1oAicgbMaS9gG9ctZTLV7DpdAPGA/bnPOrsoo2SLr5OyPmWokYs86
+         NXp8zb74AKAjcf18lPRhiEzJQn01qAS7/0J/pFC2VYWv8KZVucb/BwzOwZ2zBYOEJMbC
+         kO6s2mOE/4AoDtmTZbSDNw+Q6Mer37sxClmjNQEjPtx/ixSrux1pEmQR+1gB26pubEgT
+         qcK4vrg+y2K8kmxevPiMR9TGT0A/LF2KHoyS1yD8fMu/NKPRF/9eZ65e0l8KEThkrPK7
+         fw7cDEdojbx++G3CMpDcld2s+oa/qSeeEcpWCljodjGFaXhjNOs/IISJPO+nl+tr4tcp
+         I27g==
+X-Gm-Message-State: APjAAAUozthMoHY6Krc332zflWQjBvlskRUgp9RGSfDymxXC2hVLcxv9
+        lhoFnODsTqYdlR36lEA++vlG5E+VeAggKakO4Cll6HgO
+X-Google-Smtp-Source: APXvYqzy2Ae7R1BoOpMWCkUcy8MxPE79laybLlT2s/2EzaUn1+cV9fZb6XylHdhwCCrHzcBTawPmq3BLRJC2SqhrOnA=
+X-Received: by 2002:a5e:8508:: with SMTP id i8mr2877980ioj.108.1562085569425;
+ Tue, 02 Jul 2019 09:39:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1561110002-4438-1-git-send-email-wanpengli@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20190613161608.120838-1-jmattson@google.com>
+In-Reply-To: <20190613161608.120838-1-jmattson@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 2 Jul 2019 09:39:18 -0700
+Message-ID: <CALMp9eRRnpywexfc78Mb=VR7OyLCjUKe_zJ8aBGqJoc5DzDDAA@mail.gmail.com>
+Subject: Re: [PATCH] kvm: nVMX: Remove unnecessary sync_roots from handle_invept
+To:     kvm list <kvm@vger.kernel.org>
+Cc:     Junaid Shahid <junaids@google.com>,
+        Xiao Guangrong <xiaoguangrong@linux.vnet.ibm.com>,
+        Jun Nakajima <jun.nakajima@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21/06/19 11:39, Wanpeng Li wrote:
-> Dedicated instances are currently disturbed by unnecessary jitter due 
-> to the emulated lapic timers fire on the same pCPUs which vCPUs resident.
-> There is no hardware virtual timer on Intel for guest like ARM. Both 
-> programming timer in guest and the emulated timer fires incur vmexits.
-> This patchset tries to avoid vmexit which is incurred by the emulated 
-> timer fires in dedicated instance scenario. 
-> 
-> When nohz_full is enabled in dedicated instances scenario, the unpinned 
-> timer will be moved to the nearest busy housekeepers after commit
-> 9642d18eee2cd (nohz: Affine unpinned timers to housekeepers) and commit 
-> 444969223c8 ("sched/nohz: Fix affine unpinned timers mess"). However, 
-> KVM always makes lapic timer pinned to the pCPU which vCPU residents, the 
-> reason is explained by commit 61abdbe0 (kvm: x86: make lapic hrtimer 
-> pinned). Actually, these emulated timers can be offload to the housekeeping 
-> cpus since APICv is really common in recent years. The guest timer interrupt 
-> is injected by posted-interrupt which is delivered by housekeeping cpu 
-> once the emulated timer fires. 
-> 
-> The host admin should fine tuned, e.g. dedicated instances scenario w/ 
-> nohz_full cover the pCPUs which vCPUs resident, several pCPUs surplus 
-> for busy housekeeping, disable mwait/hlt/pause vmexits to keep in non-root  
-> mode, ~3% redis performance benefit can be observed on Skylake server.
-
-Marcelo,
-
-does this patch work for you or can you still see the oops?
-
-Thanks,
-
-Paolo
-
-> w/o patchset:
-> 
->             VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time   Avg time
-> 
-> EXTERNAL_INTERRUPT    42916    49.43%   39.30%   0.47us   106.09us   0.71us ( +-   1.09% )
-> 
-> w/ patchset:
-> 
->             VM-EXIT  Samples  Samples%  Time%   Min Time  Max Time         Avg time
-> 
-> EXTERNAL_INTERRUPT    6871     9.29%     2.96%   0.44us    57.88us   0.72us ( +-   4.02% )
-> 
+On Thu, Jun 13, 2019 at 9:16 AM Jim Mattson <jmattson@google.com> wrote:
+>
+> When L0 is executing handle_invept(), the TDP MMU is active. Emulating
+> an L1 INVEPT does require synchronizing the appropriate shadow EPT
+> root(s), but a call to kvm_mmu_sync_roots in this context won't do
+> that. Similarly, the hardware TLB and paging-structure-cache entries
+> associated with the appropriate shadow EPT root(s) must be flushed,
+> but requesting a TLB_FLUSH from this context won't do that either.
+>
+> How did this ever work? KVM always does a sync_roots and TLB flush (in
+> the correct context) when transitioning from L1 to L2. That isn't the
+> best choice for nested VM performance, but it effectively papers over
+> the mistakes here.
+>
+> Remove the unnecessary operations and leave a comment to try to do
+> better in the future.
+>
+> Reported-by: Junaid Shahid <junaids@google.com>
+> Fixes: bfd0a56b90005f ("nEPT: Nested INVEPT")
+> Cc: Xiao Guangrong <xiaoguangrong@linux.vnet.ibm.com>
+> Cc: Nadav Har'El <nyh@il.ibm.com>
+> Cc: Jun Nakajima <jun.nakajima@intel.com>
+> Cc: Xinhao Xu <xinhao.xu@intel.com>
+> Cc: Yang Zhang <yang.z.zhang@Intel.com>
+> Cc: Gleb Natapov <gleb@redhat.com>
 > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> Cc: Marcelo Tosatti <mtosatti@redhat.com>
-> 
-> v4 -> v5:
->  * update patch description in patch 1/4
->  * feed latest apic->lapic_timer.expired_tscdeadline to kvm_wait_lapic_expire()
->  * squash advance timer handling to patch 2/4
-> 
-> v3 -> v4:
->  * drop the HRTIMER_MODE_ABS_PINNED, add kick after set pending timer
->  * don't posted inject already-expired timer
-> 
-> v2 -> v3:
->  * disarming the vmx preemption timer when posted_interrupt_inject_timer_enabled()
->  * check kvm_hlt_in_guest instead
-> 
-> v1 -> v2:
->  * check vcpu_halt_in_guest
->  * move module parameter from kvm-intel to kvm
->  * add housekeeping_enabled
->  * rename apic_timer_expired_pi to kvm_apic_inject_pending_timer_irqs
-> 
-> 
-> Wanpeng Li (4):
->   KVM: LAPIC: Make lapic timer unpinned
->   KVM: LAPIC: Inject timer interrupt via posted interrupt
->   KVM: LAPIC: Ignore timer migration when lapic timer is injected by pi
->   KVM: LAPIC: Don't inject already-expired timer via posted interrupt
-> 
->  arch/x86/kvm/lapic.c            | 68 +++++++++++++++++++++++++++--------------
->  arch/x86/kvm/lapic.h            |  3 +-
->  arch/x86/kvm/svm.c              |  2 +-
->  arch/x86/kvm/vmx/vmx.c          |  5 +--
->  arch/x86/kvm/x86.c              | 11 ++++---
->  arch/x86/kvm/x86.h              |  2 ++
->  include/linux/sched/isolation.h |  2 ++
->  kernel/sched/isolation.c        |  6 ++++
->  8 files changed, 67 insertions(+), 32 deletions(-)
-> 
+> Reviewed-by Peter Shier <pshier@google.com>
+> Reviewed-by: Junaid Shahid <junaids@google.com>
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 1032f068f0b9..35621e73e726 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -4670,13 +4670,11 @@ static int handle_invept(struct kvm_vcpu *vcpu)
+>
+>         switch (type) {
+>         case VMX_EPT_EXTENT_GLOBAL:
+> +       case VMX_EPT_EXTENT_CONTEXT:
+>         /*
+> -        * TODO: track mappings and invalidate
+> -        * single context requests appropriately
+> +        * TODO: Sync the necessary shadow EPT roots here, rather than
+> +        * at the next emulated VM-entry.
+>          */
+> -       case VMX_EPT_EXTENT_CONTEXT:
+> -               kvm_mmu_sync_roots(vcpu);
+> -               kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+>                 break;
+>         default:
+>                 BUG_ON(1);
+> --
+> 2.22.0.rc2.383.gf4fbbf30c2-goog
+>
 
+Ping.
