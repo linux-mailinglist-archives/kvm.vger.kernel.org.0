@@ -2,50 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D49695D4AA
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 18:49:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 050DF5D4B5
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 18:50:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726977AbfGBQtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 12:49:13 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:36848 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725996AbfGBQtG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 12:49:06 -0400
-Received: by mail-wr1-f67.google.com with SMTP id n4so18672741wrs.3
-        for <kvm@vger.kernel.org>; Tue, 02 Jul 2019 09:49:04 -0700 (PDT)
+        id S1726413AbfGBQul (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 12:50:41 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:35825 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725996AbfGBQul (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jul 2019 12:50:41 -0400
+Received: by mail-wr1-f66.google.com with SMTP id c27so10959040wrb.2
+        for <kvm@vger.kernel.org>; Tue, 02 Jul 2019 09:50:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=L8PStjvboUT/+LsWfO344ZFdlV2FoYNdqOo4jKO0aLo=;
-        b=dRICstsa6taA/9Loxp8BWy2TActeIqDi/xLhe6osK6T+mDiJ2yI/RplG4Q8j2APvai
-         zp8liYnmLNV8s6XW8aaMuSA86muixSo/EkLQVoGg7DGAbI0lIhKqDW1sOY2Sm4NUlHtR
-         euceMGAkkt9d6RMaGVjrKlqu1rQHS/bXB+gccqiwz8fdveIClLLrHSlCJt1zS/hpk2E8
-         hQ+x1P1qyllIazaLguQaBOsDJvu+2KRxRhIP9HdlOY1tJo4Op+PodlNDgrvvss2hb2V9
-         YCOVOsaI6rNeCgK/LFiFmxZPLkrXzHTr+yoZ2+Vt9p/e7VhWTY9T71lEim4MeCKRaP6D
-         qCdg==
-X-Gm-Message-State: APjAAAWUbCaXIzh23aX/pXuSkHW79+TixoojwfOduEP8dOiQX2gc/ezy
-        gSGWaWQTvB1bGxKrgM9bpiiE1w==
-X-Google-Smtp-Source: APXvYqwr+enPM4CfxjAPQwVlFShYpATWpOcix3c812+nWUEb4JvmVIMVWPpXgyeOAShcBDM5FO2KTw==
-X-Received: by 2002:adf:efc8:: with SMTP id i8mr24861513wrp.220.1562086144142;
-        Tue, 02 Jul 2019 09:49:04 -0700 (PDT)
+        bh=ZaeCbDgmf98qwd0keV/0bxBU+bvtrqjhrhzMzVcLt/4=;
+        b=aWe3QaZzkFbnhrJV103kujVGn/5WqL4FdbTDED1as7olTpNYQBMRAbgQ12OkLYpQou
+         iicihlF/k+B89/ep+G3TNKhzz5g01T+LUsHT3DCljdsI4oIFOAnATzA5FgJHnGbOzrdL
+         vOw7NgpU6wc8mvZVc1jH5P90DQ1HkN3fSQHDulQ8dcOx84b3l2qAbt9hwDtg9NEi/Au+
+         PR95faGlxvQ7TlBEuE1u2ypw0+hbX+sxI6xgSdKTgXg5U+aeXt26E3dKyTS3HP8Aqfi1
+         pOIWpmUH7Mgx5Vcn7ZYLpEbUGRudQvk6bz5TvgG6TsoOq+2St6gRK/4rqNrQE9aZupD+
+         paHA==
+X-Gm-Message-State: APjAAAX+urW1eOLZo8HodNe21WFcsdp8R3JZxAQOhLe+FUPjGNYLR/Rh
+        CrHycAd4+iSCoiVZpgmjdf+YKQ==
+X-Google-Smtp-Source: APXvYqyGwqzZrLmFmeaOlYrmR1/e8LvBMOuAAGUh3dnVWWQ7asSZTAGVomHWoePm7wIAGaS6PIkynA==
+X-Received: by 2002:adf:f542:: with SMTP id j2mr17273466wrp.16.1562086239509;
+        Tue, 02 Jul 2019 09:50:39 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:b8:794:183e:9e2a? ([2001:b07:6468:f312:b8:794:183e:9e2a])
-        by smtp.gmail.com with ESMTPSA id j189sm3079828wmb.48.2019.07.02.09.49.01
+        by smtp.gmail.com with ESMTPSA id o6sm32692245wra.27.2019.07.02.09.50.38
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 02 Jul 2019 09:49:01 -0700 (PDT)
-Subject: Re: [PATCH v4 0/3] KVM: Yield to IPI target if necessary
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-References: <1560255830-8656-1-git-send-email-wanpengli@tencent.com>
+        Tue, 02 Jul 2019 09:50:38 -0700 (PDT)
+Subject: Re: [PATCH] kvm: nVMX: Remove unnecessary sync_roots from
+ handle_invept
+To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
+Cc:     Junaid Shahid <junaids@google.com>,
+        Xiao Guangrong <xiaoguangrong@linux.vnet.ibm.com>,
+        Nadav Har'El <nyh@il.ibm.com>,
+        Jun Nakajima <jun.nakajima@intel.com>,
+        Xinhao Xu <xinhao.xu@intel.com>,
+        Yang Zhang <yang.z.zhang@Intel.com>,
+        Gleb Natapov <gleb@redhat.com>
+References: <20190613161608.120838-1-jmattson@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0b42a3b4-91eb-4cc8-201a-8da0a944403a@redhat.com>
-Date:   Tue, 2 Jul 2019 18:49:00 +0200
+Message-ID: <7caa0e52-2b2f-9706-e117-abef3aa98a5b@redhat.com>
+Date:   Tue, 2 Jul 2019 18:50:37 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <1560255830-8656-1-git-send-email-wanpengli@tencent.com>
+In-Reply-To: <20190613161608.120838-1-jmattson@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -54,41 +60,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/06/19 14:23, Wanpeng Li wrote:
-> The idea is from Xen, when sending a call-function IPI-many to vCPUs, 
-> yield if any of the IPI target vCPUs was preempted. 17% performance 
-> increasement of ebizzy benchmark can be observed in an over-subscribe 
-> environment. (w/ kvm-pv-tlb disabled, testing TLB flush call-function 
-> IPI-many since call-function is not easy to be trigged by userspace 
-> workload).
+On 13/06/19 18:16, Jim Mattson wrote:
+> When L0 is executing handle_invept(), the TDP MMU is active. Emulating
+> an L1 INVEPT does require synchronizing the appropriate shadow EPT
+> root(s), but a call to kvm_mmu_sync_roots in this context won't do
+> that. Similarly, the hardware TLB and paging-structure-cache entries
+> associated with the appropriate shadow EPT root(s) must be flushed,
+> but requesting a TLB_FLUSH from this context won't do that either.
 > 
-> v3 -> v4: 
->  * check map->phys_map[dest_id]
->  * more cleaner kvm_sched_yield()
+> How did this ever work? KVM always does a sync_roots and TLB flush (in
+> the correct context) when transitioning from L1 to L2. That isn't the
+> best choice for nested VM performance, but it effectively papers over
+> the mistakes here.
 > 
-> v2 -> v3:
->  * add bounds-check on dest_id
+> Remove the unnecessary operations and leave a comment to try to do
+> better in the future.
 > 
-> v1 -> v2:
->  * check map is not NULL
->  * check map->phys_map[dest_id] is not NULL
->  * make kvm_sched_yield static
->  * change dest_id to unsinged long
-> 
-> Wanpeng Li (3):
->   KVM: X86: Yield to IPI target if necessary
->   KVM: X86: Implement PV sched yield hypercall
->   KVM: X86: Expose PV_SCHED_YIELD CPUID feature bit to guest
-> 
->  Documentation/virtual/kvm/cpuid.txt      |  4 ++++
->  Documentation/virtual/kvm/hypercalls.txt | 11 +++++++++++
->  arch/x86/include/uapi/asm/kvm_para.h     |  1 +
->  arch/x86/kernel/kvm.c                    | 21 +++++++++++++++++++++
->  arch/x86/kvm/cpuid.c                     |  3 ++-
->  arch/x86/kvm/x86.c                       | 21 +++++++++++++++++++++
->  include/uapi/linux/kvm_para.h            |  1 +
->  7 files changed, 61 insertions(+), 1 deletion(-)
-> 
+> Reported-by: Junaid Shahid <junaids@google.com>
+> Fixes: bfd0a56b90005f ("nEPT: Nested INVEPT")
+> Cc: Xiao Guangrong <xiaoguangrong@linux.vnet.ibm.com>
+> Cc: Nadav Har'El <nyh@il.ibm.com>
+> Cc: Jun Nakajima <jun.nakajima@intel.com>
+> Cc: Xinhao Xu <xinhao.xu@intel.com>
+> Cc: Yang Zhang <yang.z.zhang@Intel.com>
+> Cc: Gleb Natapov <gleb@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Reviewed-by Peter Shier <pshier@google.com>
+> Reviewed-by: Junaid Shahid <junaids@google.com>
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
 
 Queued, thanks.
 
