@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D94A85C8E7
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 07:42:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E06815C8F4
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 07:47:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725858AbfGBFmD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 01:42:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40888 "EHLO mx1.redhat.com"
+        id S1725996AbfGBFrG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 01:47:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46502 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725775AbfGBFmC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 01:42:02 -0400
+        id S1725789AbfGBFrG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jul 2019 01:47:06 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 26186308429B;
-        Tue,  2 Jul 2019 05:42:02 +0000 (UTC)
-Received: from x1.home (ovpn-116-83.phx2.redhat.com [10.3.116.83])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C431160BF3;
-        Tue,  2 Jul 2019 05:42:01 +0000 (UTC)
-Date:   Mon, 1 Jul 2019 23:42:01 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
+        by mx1.redhat.com (Postfix) with ESMTPS id CD8D987632;
+        Tue,  2 Jul 2019 05:47:05 +0000 (UTC)
+Received: from gondolin (ovpn-116-124.ams2.redhat.com [10.36.116.124])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4917A60BF3;
+        Tue,  2 Jul 2019 05:47:02 +0000 (UTC)
+Date:   Tue, 2 Jul 2019 07:46:58 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
 To:     Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     <cohuck@redhat.com>, <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH v2] mdev: Send uevents around parent device registration
-Message-ID: <20190701234201.47b6f23a@x1.home>
+Message-ID: <20190702074658.4abedcdf.cohuck@redhat.com>
 In-Reply-To: <14783c81-0236-2f25-6193-c06aa83392c9@nvidia.com>
 References: <156199271955.1646.13321360197612813634.stgit@gimli.home>
         <08597ab4-cc37-3973-8927-f1bc430f6185@nvidia.com>
@@ -33,12 +33,12 @@ References: <156199271955.1646.13321360197612813634.stgit@gimli.home>
         <3b338e73-7929-df20-ca2b-3223ba4ead39@nvidia.com>
         <20190701140436.45eabf07@x1.home>
         <14783c81-0236-2f25-6193-c06aa83392c9@nvidia.com>
-Organization: Red Hat
+Organization: Red Hat GmbH
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Tue, 02 Jul 2019 05:42:02 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 02 Jul 2019 05:47:05 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -146,10 +146,7 @@ Kirti Wankhede <kwankhede@nvidia.com> wrote:
 > 
 > Are you going to assume that someone/vendor driver is always going to do
 > right thing?
-
-mdev is a kernel driver, we make reasonable assumptions that other
-drivers interact with it correctly.
-
+> 
 > > C) the parent device
 > > generally lives on a bus, with a vendor driver, there's an entire
 > > ecosystem of references to the device below mdev.  Is this a paranoia
@@ -160,33 +157,18 @@ drivers interact with it correctly.
 > be generic, so that other devices (other than PCI devices) can also use
 > this framework.
 
-Obviously mdev is not PCI specific, I only mention it because I'm
-asking if you have a specific concern in mind.  If you did, I'd assume
-it's related to a PCI backed vGPU.  Any physical parent device of an
-mdev is likely to have some sort of bus infrastructure behind it
-holding references to the device (ie. a probe and release where an
-implicit reference is held between these points).  A virtual device
-would be similar, it's created as part of a module init and destroyed
-as part of a module exit, where mdev registration would exist between
-these points.
+But the same argument holds there: There's a whole ecosystem of
+references for other devices as well.
 
 > If there is a assumption that user of mdev framework or vendor drivers
 > are always going to use mdev in right way, then there is no need for
 > mdev core to held reference of the device?
+
+Confused. How does this follow for the general case?
+
 > This is not a "paranoia request". This is more of a ideal scenario, mdev
 > should use device by holding its reference rather than assuming (or
 > relying on) someone else holding the reference of device.
 
-In fact, at one point Parav was proposing removing these references
-entirely, but Connie and I both felt uncomfortable about that.  I think
-it's good practice that mdev indicates the use of the parent device by
-incrementing the reference count, with each child mdev device also
-taking a reference, but those references balance out within the mdev
-core.  Their purpose is not to maintain the device for outside callers,
-nor should outside callers assume mdev's use of references to release
-their own.  I don't think it's unreasonable to assume that the caller
-should have a legitimate reference to the object it's providing to this
-function and therefore we should be able to use it after mdev's
-internal references are balanced out.  Thanks,
-
-Alex
+I'm not really opposed to switching this around, although it's probably
+not needed.
