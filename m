@@ -2,116 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C41745D483
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 18:43:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 559E75D495
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 18:48:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726664AbfGBQno (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 12:43:44 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:45037 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726252AbfGBQno (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 12:43:44 -0400
-Received: by mail-pl1-f194.google.com with SMTP id t7so649886plr.11
-        for <kvm@vger.kernel.org>; Tue, 02 Jul 2019 09:43:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=EhbxKamQ/0wcCBw8Yoh4Shb8CTX+GKo2JiJWkV2KXHc=;
-        b=lFvpgI2pyYrEOdvzBQyY1JqSyHkiYhPWrQGc0QhVS00M3WsXtcN8C78mjb1+wL9NKl
-         LpYnmaACHpMp74bZ+XLWDw3/IW8MGb3jz23AAIag6RQ8enzeuA7c2vDAnPYkTnsOVAEb
-         1cdmIXelSyhWJ/yewQDOKka+JQ7VHWZ7ib3V9tAXRwuwhpJMgpM4af3W/XV6/KPlsTc7
-         FEG7O0g6V4hFXqNKSREGuYUr/RB2YuIpAyEKBQKwI9nbXv+u5P2z1IU6mnKXPA3VJv1b
-         v8INRjikKJH/s2cwCTCxH7ZIXTFgRX62MYerEx98/7z22SM9xhTozTlvSsgK6lbgJXUZ
-         9Abg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=EhbxKamQ/0wcCBw8Yoh4Shb8CTX+GKo2JiJWkV2KXHc=;
-        b=ACG17PdWTG/DN+xepNkq98zaHmZNlbZvBeQC3la73PanFTo0MkrcPAH47b7xjZGuGl
-         imRt5vstzD/4FuTl9yNvARinRLiL2PKqjH04UWOUykjoN6IKThjjIcn2OI3HWSGNSbQP
-         tTlZjtmkdP9WNng9GkUwfAW+8RhwsiiYxCs/KfcXd2OP6G2qDfUDm25wVQeLW+Vn9wYz
-         /FbkGVPV3NDk6+GLe+qDuW6HUimri2CrXOIcnqgXFK035YLm5LBbmGT6sHXNYyyf1/qq
-         3FdUtO/k7dYYsVfVoVJsP1E3tHbwwJ4E50zMiO8Y86TEdmO1NYk/Giy2Do2BQ2M80i9N
-         +Igg==
-X-Gm-Message-State: APjAAAW5sicp9wGBNgLu0x2N6Ag8NaqeG8VKQmar4uHFYlaGWtIpxRvH
-        RL9vqzUEDUAaVRc52syrkAeUQpi+z9k=
-X-Google-Smtp-Source: APXvYqyX81k8OvnUq31pNmGqIXZOrhiR4cB2Szi500LwBOwDAzHpIgJHwAFKAuKx54uGSF2sYjTfrw==
-X-Received: by 2002:a17:902:4643:: with SMTP id o61mr35930144pld.101.1562085823316;
-        Tue, 02 Jul 2019 09:43:43 -0700 (PDT)
-Received: from [10.2.189.129] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id o13sm3107398pje.28.2019.07.02.09.43.41
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 02 Jul 2019 09:43:41 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [kvm-unit-tests PATCH 3/3] x86: Support environments without
- test-devices
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <2e359eb2-4b2a-0a52-6c43-cd6037bb72ae@redhat.com>
-Date:   Tue, 2 Jul 2019 09:43:40 -0700
-Cc:     kvm@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F3480C92-28D8-470A-9E34-E87ECCE4FDD1@gmail.com>
-References: <20190628203019.3220-1-nadav.amit@gmail.com>
- <20190628203019.3220-4-nadav.amit@gmail.com>
- <2e359eb2-4b2a-0a52-6c43-cd6037bb72ae@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        id S1726486AbfGBQs1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 12:48:27 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46234 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726046AbfGBQs1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Jul 2019 12:48:27 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x62GgfFi146747;
+        Tue, 2 Jul 2019 12:48:04 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tga7f2dkh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Jul 2019 12:48:04 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x62Gijo4014574;
+        Tue, 2 Jul 2019 16:48:03 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma01dal.us.ibm.com with ESMTP id 2tdym6ycjv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 Jul 2019 16:48:03 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x62Gm2rt25887182
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 2 Jul 2019 16:48:02 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5D3BAB2064;
+        Tue,  2 Jul 2019 16:48:02 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4444EB205F;
+        Tue,  2 Jul 2019 16:48:02 +0000 (GMT)
+Received: from [9.56.58.42] (unknown [9.56.58.42])
+        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue,  2 Jul 2019 16:48:02 +0000 (GMT)
+Subject: Re: [RFC v1 2/4] vfio-ccw: No need to call cp_free on an error in
+ cp_init
+To:     Eric Farman <farman@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     pasic@linux.ibm.com, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <cover.1561997809.git.alifm@linux.ibm.com>
+ <5f1b69cd3a52e367f9f5014a3613768c8634408c.1561997809.git.alifm@linux.ibm.com>
+ <20190702104257.102f32d3.cohuck@redhat.com>
+ <66d92fe7-6395-46a6-b9bc-b76cbe7fb48e@linux.ibm.com>
+ <4f7e52bd-6b22-90b0-ab7b-f9c5c3ccac3f@linux.ibm.com>
+From:   Farhan Ali <alifm@linux.ibm.com>
+Message-ID: <9bc36261-194c-635e-b0b8-a4b71b031c2f@linux.ibm.com>
+Date:   Tue, 2 Jul 2019 12:48:02 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
+MIME-Version: 1.0
+In-Reply-To: <4f7e52bd-6b22-90b0-ab7b-f9c5c3ccac3f@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-02_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907020183
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Jul 2, 2019, at 9:08 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
-> On 28/06/19 22:30, Nadav Amit wrote:
->> Enable to run the tests when test-device is not present (e.g.,
->> bare-metal). Users can provide the number of CPUs and ram size =
-through
->> kernel parameters.
->>=20
->> On Ubuntu, for example, the tests can be run by copying a test to the
->> boot directory (/boot) and adding a menuentry to grub (editing
->> /etc/grub.d/40_custom):
->>=20
->>  menuentry 'idt_test' {
->> 	set root=3D'ROOT'
->> 	multiboot BOOT_RELATIVE/idt_test.flat ignore nb_cpus=3D48 \
->> 		ram_size=3D4294967296 no-test-device
->>  }
->>=20
->> Replace ROOT with `grub-probe --target=3Dbios_hints /boot` and
->> BOOT_RELATIVE with `grub-mkrelpath /boot`, and run update-grub.
->>=20
->> Note that the first kernel parameter is ignored for compatibility =
-with
->> test executions through QEMU.
->>=20
->> Remember that the output goes to the serial port.
->=20
-> RAM size can use the multiboot info (see lib/x86/setup.c).
 
-The multiboot info, as provided by the boot-loader is not good enough as =
-far
-as I remember. The info just defines where to kernel can be loaded, but =
-does
-not say how big the memory is. For that, e820 decoding is needed, which =
-I
-was too lazy to do.
 
-> For the # of CPUs I'm not sure what you're supposed to do on bare =
-metal
-> though. :)
+On 07/02/2019 12:15 PM, Eric Farman wrote:
+> 
+> 
+> On 7/2/19 9:58 AM, Farhan Ali wrote:
+>>
+>>
+>> On 07/02/2019 04:42 AM, Cornelia Huck wrote:
+>>> On Mon,  1 Jul 2019 12:23:44 -0400
+>>> Farhan Ali <alifm@linux.ibm.com> wrote:
+>>>
+>>>> We don't set cp->initialized to true so calling cp_free
+>>>> will just return and not do anything.
+>>>>
+>>>> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+>>>> ---
+>>>>    drivers/s390/cio/vfio_ccw_cp.c | 2 --
+>>>>    1 file changed, 2 deletions(-)
+>>>>
+>>>> diff --git a/drivers/s390/cio/vfio_ccw_cp.c
+>>>> b/drivers/s390/cio/vfio_ccw_cp.c
+>>>> index 5ac4c1e..cab1be9 100644
+>>>> --- a/drivers/s390/cio/vfio_ccw_cp.c
+>>>> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+>>>> @@ -647,8 +647,6 @@ int cp_init(struct channel_program *cp, struct
+>>>> device *mdev, union orb *orb)
+>>>>          /* Build a ccwchain for the first CCW segment */
+>>>>        ret = ccwchain_handle_ccw(orb->cmd.cpa, cp);
+>>>> -    if (ret)
+>>>> -        cp_free(cp);
+>>>
+>>> Makes sense; hopefully ccwchain_handle_ccw() cleans up correctly on
+>>> error :) (I think it does)
+>>>
+>>
+>> I have checked that it does as well, but wouldn't hurt if someone else
+>> also glances over once again :)
+> 
+> Oh noes.  What happens once we start encountering TICs?  If we do:
+> 
+> ccwchain_handle_ccw()	(OK)
+> ccwchain_loop_tic()	(OK)
+> ccwchain_handle_ccw()	(FAIL)
+> 
+> The first _handle_ccw() will have added a ccwchain to the cp list, which
+> doesn't appear to get cleaned up now.  That used to be done in cp_init()
+> until I squashed cp_free and cp_unpin_free.  :(
 
-I know you are not =E2=80=9Cserious=E2=80=9D, but I=E2=80=99ll use this =
-opportunity for a small
-clarification. You do need to provide the real number of CPUs as =
-otherwise
-things will fail. I do not use cpuid, as my machine, for example has two
-sockets. Decoding the ACPI tables is the right way, but I was too lazy =
-to
-implement it.
-
+Yup, you are right we are not freeing the chain correctly. Will fix it 
+in v2.
+> 
+>>
+>>> Maybe add a comment
+>>>
+>>> /* ccwchain_handle_ccw() already cleans up on error */
+>>>
+>>> so we don't stumble over this in the future?
+>>
+>> Sure.
+>>
+>>>
+>>> (Also, does this want a Fixes: tag?)
+>>
+>> This might warrant a fixes tag as well.
+>>>
+>>>>          if (!ret)
+>>>>            cp->initialized = true;
+>>>
+>>>
+> 
