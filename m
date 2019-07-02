@@ -2,81 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AF5085C9E4
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 09:23:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FBB65CBE1
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 10:17:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725991AbfGBHXJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 03:23:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39528 "EHLO mx1.redhat.com"
+        id S1727354AbfGBIDM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 04:03:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48004 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725845AbfGBHXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 03:23:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1727346AbfGBIDK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jul 2019 04:03:10 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 919BBA3B5E;
-        Tue,  2 Jul 2019 07:23:08 +0000 (UTC)
-Received: from [10.72.12.205] (ovpn-12-205.pek2.redhat.com [10.72.12.205])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 915B75D9D3;
-        Tue,  2 Jul 2019 07:23:03 +0000 (UTC)
-Subject: Re: INFO: task hung in vhost_init_device_iotlb
-To:     Dmitry Vyukov <dvyukov@google.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     syzbot <syzbot+40e28a8bd59d10ed0c42@syzkaller.appspotmail.com>,
-        KVM list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        virtualization@lists.linux-foundation.org
-References: <0000000000007e86fd058095533f@google.com>
- <20190129105957-mutt-send-email-mst@kernel.org>
- <CACT4Y+Yiz2NpDMNLSP+Z-qf9Swo56Yhb0CbmrUyPHojmMZzCAQ@mail.gmail.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <0d542a30-7122-aea7-07fe-b49dedcd9daf@redhat.com>
-Date:   Tue, 2 Jul 2019 15:23:01 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        by mail.kernel.org (Postfix) with ESMTPSA id DB13021855;
+        Tue,  2 Jul 2019 08:03:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1562054589;
+        bh=ncsY3koxNbozow26+6W2J19rN2kZ2ukHfPyYZVg5NmI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=1yQRhmJcVTFfxYKhQBsefpwJcRdwcG9MzNs1hsYww4WJ9qDwJ2YL2SeUZar8h6M+z
+         xWdiJvd3cEHQFprKXQX7mcA0+4NjRmfF5occjecEcQXVSqBXbfqoEUBZfPmk+KTBMi
+         YomTZVaVln67D909iQuMyuZjmVnzTWhxdEep8SQA=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org,
+        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Mark Kanda <mark.kanda@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, bp@alien8.de,
+        rkrcmar@redhat.com, kvm@vger.kernel.org
+Subject: [PATCH 5.1 21/55] x86/speculation: Allow guests to use SSBD even if host does not
+Date:   Tue,  2 Jul 2019 10:01:29 +0200
+Message-Id: <20190702080125.142975123@linuxfoundation.org>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190702080124.103022729@linuxfoundation.org>
+References: <20190702080124.103022729@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-In-Reply-To: <CACT4Y+Yiz2NpDMNLSP+Z-qf9Swo56Yhb0CbmrUyPHojmMZzCAQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Tue, 02 Jul 2019 07:23:08 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+From: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
 
-On 2019/1/30 下午4:12, Dmitry Vyukov wrote:
-> On Tue, Jan 29, 2019 at 5:06 PM Michael S. Tsirkin<mst@redhat.com>  wrote:
->> On Tue, Jan 29, 2019 at 01:22:02AM -0800, syzbot wrote:
->>> Hello,
->>>
->>> syzbot found the following crash on:
->>>
->>> HEAD commit:    983542434e6b Merge tag 'edac_fix_for_5.0' of git://git.ker..
->>> git tree:       upstream
->>> console output:https://syzkaller.appspot.com/x/log.txt?x=17476498c00000
->>> kernel config:https://syzkaller.appspot.com/x/.config?x=505743eba4e4f68
->>> dashboard link:https://syzkaller.appspot.com/bug?extid=40e28a8bd59d10ed0c42
->>> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
->>>
->>> Unfortunately, I don't have any reproducer for this crash yet.
->> Hmm nothing obvious below. Generic corruption elsewhere?
-> Hard to say, a silent memory corruption is definitely possible.
-> If there is nothing obvious let's wait, maybe syzbot will come up with
-> a repro or we get more such hangs so that it will be possible to rule
-> out flakes/corruptions.
->
+commit c1f7fec1eb6a2c86d01bc22afce772c743451d88 upstream.
 
-It hasn't been reproduced for a while. We can invalid this and see if we 
-can get it again.
+The bits set in x86_spec_ctrl_mask are used to calculate the guest's value
+of SPEC_CTRL that is written to the MSR before VMENTRY, and control which
+mitigations the guest can enable.  In the case of SSBD, unless the host has
+enabled SSBD always on mode (by passing "spec_store_bypass_disable=on" in
+the kernel parameters), the SSBD bit is not set in the mask and the guest
+can not properly enable the SSBD always on mitigation mode.
 
-So
+This has been confirmed by running the SSBD PoC on a guest using the SSBD
+always on mitigation mode (booted with kernel parameter
+"spec_store_bypass_disable=on"), and verifying that the guest is vulnerable
+unless the host is also using SSBD always on mode. In addition, the guest
+OS incorrectly reports the SSB vulnerability as mitigated.
 
-#syz invalid
+Always set the SSBD bit in x86_spec_ctrl_mask when the host CPU supports
+it, allowing the guest to use SSBD whether or not the host has chosen to
+enable the mitigation in any of its modes.
 
-Thanks
+Fixes: be6fcb5478e9 ("x86/bugs: Rework spec_ctrl base and mask logic")
+Signed-off-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Cc: bp@alien8.de
+Cc: rkrcmar@redhat.com
+Cc: kvm@vger.kernel.org
+Cc: stable@vger.kernel.org
+Link: https://lkml.kernel.org/r/1560187210-11054-1-git-send-email-alejandro.j.jimenez@oracle.com
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+---
+ arch/x86/kernel/cpu/bugs.c |   11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -836,6 +836,16 @@ static enum ssb_mitigation __init __ssb_
+ 	}
+ 
+ 	/*
++	 * If SSBD is controlled by the SPEC_CTRL MSR, then set the proper
++	 * bit in the mask to allow guests to use the mitigation even in the
++	 * case where the host does not enable it.
++	 */
++	if (static_cpu_has(X86_FEATURE_SPEC_CTRL_SSBD) ||
++	    static_cpu_has(X86_FEATURE_AMD_SSBD)) {
++		x86_spec_ctrl_mask |= SPEC_CTRL_SSBD;
++	}
++
++	/*
+ 	 * We have three CPU feature flags that are in play here:
+ 	 *  - X86_BUG_SPEC_STORE_BYPASS - CPU is susceptible.
+ 	 *  - X86_FEATURE_SSBD - CPU is able to turn off speculative store bypass
+@@ -852,7 +862,6 @@ static enum ssb_mitigation __init __ssb_
+ 			x86_amd_ssb_disable();
+ 		} else {
+ 			x86_spec_ctrl_base |= SPEC_CTRL_SSBD;
+-			x86_spec_ctrl_mask |= SPEC_CTRL_SSBD;
+ 			wrmsrl(MSR_IA32_SPEC_CTRL, x86_spec_ctrl_base);
+ 		}
+ 	}
+
 
