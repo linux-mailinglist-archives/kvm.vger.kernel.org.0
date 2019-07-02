@@ -2,96 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0179E5D58B
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 19:46:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8C285D5D3
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 20:02:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726635AbfGBRq3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 13:46:29 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:43515 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726529AbfGBRq3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 13:46:29 -0400
-Received: by mail-ed1-f66.google.com with SMTP id e3so28078475edr.10
-        for <kvm@vger.kernel.org>; Tue, 02 Jul 2019 10:46:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=62xeVPs21E5ReOKr0PeNYmMpHFedVY8IfymEZkh+FCQ=;
-        b=S62756i4kfBhwvThdrp/bluvzbNlIQhGr2N54PhVXSt+bW0Fi/DqOASwTjFn0iK8pH
-         O4scfXJPkY3GXcYQW2rzoHqJyot3S894FWcAdSIEqZk4YStXK4NAY1qtHaa05VSYEVQw
-         ypFocTubeKx4UpSHTcIfHAVwLY+DfTPdFB/QPPA/6io5p/bC36vp16JpzDFaICzTEYpn
-         pUnjF49M/4lXBLlpaUm/pUbCp3kS/HQu191UUJFGzCeemFPZg40bEiZ5sElzpVhhBUto
-         Ii0pKGfpV/f83Cx6GZSfpDb78rXAwFs7DvSh+JbVnTg2ezwdco08A8C/48egMrQr6M2O
-         knkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=62xeVPs21E5ReOKr0PeNYmMpHFedVY8IfymEZkh+FCQ=;
-        b=qye4/AoynkeAIEHcBwLIgYP+sZuXMHqcUQpppIzI6P+RFppj5+4z5tHifUZdHNVCWw
-         HNR/U8UJR96MNYNrDFVpY0lkkz2cBm9lkFVLEphZMntyKZfgLV2ehp/IHoHe26dOJWAM
-         4oEzSkZ7YUk78+VWAB8QnY8El4Mvbuw5Abaeys3J4Ge7sh10YP8kM2ZCTgtV3jmxC6jS
-         O+qKkBBM1qbMBhoReF8Fgfttd2dC44R4NZWL1AHXCz+NxeBIRQZIufzt9ehRfYoWgcH1
-         byJozXAlbOwQOngeWNL3Pxn2i8X3qQOLLB9wn5IKwkjLQLtLPJ/pHMZSGJbTphLiBAS8
-         h4ww==
-X-Gm-Message-State: APjAAAWhTQtTN98s8aAmI/NcRkuITgFFSNaB+IOX+9eBpilwu0gL1p4w
-        mQJHw3hyW6+KK8EASHe2T2LROGTD2aMizdkYmCTR+w==
-X-Google-Smtp-Source: APXvYqx5heTU3G2wcqJHU6kEnhITccuBT2in9TxF+0f1OMcZoamtL9MEX0jLGTQHsk/kPYuoYfPBgiTBJt5KlB/HUw8=
-X-Received: by 2002:aa7:d845:: with SMTP id f5mr37202330eds.78.1562089587822;
- Tue, 02 Jul 2019 10:46:27 -0700 (PDT)
+        id S1726821AbfGBSCT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 14:02:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50968 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726329AbfGBSCS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jul 2019 14:02:18 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B10E687620;
+        Tue,  2 Jul 2019 18:02:18 +0000 (UTC)
+Received: from x1.home (ovpn-116-83.phx2.redhat.com [10.3.116.83])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 644741799F;
+        Tue,  2 Jul 2019 18:02:18 +0000 (UTC)
+Date:   Tue, 2 Jul 2019 12:02:17 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     YueHaibing <yuehaibing@huawei.com>
+Cc:     <kwankhede@nvidia.com>, <linux-kernel@vger.kernel.org>,
+        <kvm@vger.kernel.org>
+Subject: Re: [PATCH -next] sample/mdev/mbochs: remove set but not used
+ variable 'mdev_state'
+Message-ID: <20190702120217.51ca4dfa@x1.home>
+In-Reply-To: <20190525135349.16488-1-yuehaibing@huawei.com>
+References: <20190525135349.16488-1-yuehaibing@huawei.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <CAOyeoRWfPNmaWY6Lifdkdj3KPPM654vzDO+s3oduEMCJP+Asow@mail.gmail.com>
- <5D036843.2010607@intel.com> <CAOyeoRXr4gmbBPq1RsStoPguiZB8Jxod-irYd3Dm_AGVcQRGSQ@mail.gmail.com>
- <5D11E58B.1060306@intel.com>
-In-Reply-To: <5D11E58B.1060306@intel.com>
-From:   Eric Hankland <ehankland@google.com>
-Date:   Tue, 2 Jul 2019 10:46:16 -0700
-Message-ID: <CAOyeoRUy6R0YzcMajRAhzss321p6G=LMrR63oPQCYFwaK6SMvA@mail.gmail.com>
-Subject: Re: [PATCH v1] KVM: x86: PMU Whitelist
-To:     Wei Wang <wei.w.wang@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 02 Jul 2019 18:02:18 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Actually I have another thing to discuss:
-> probably we could consider to make this filter list white/black configurable
-> from userspace. For example, userspace option: filter-list=white/black
+On Sat, 25 May 2019 21:53:49 +0800
+YueHaibing <yuehaibing@huawei.com> wrote:
 
-Works for me. I'll include this in the next version.
+> Fixes gcc '-Wunused-but-set-variable' warning:
+> 
+> samples/vfio-mdev/mbochs.c: In function mbochs_ioctl:
+> samples/vfio-mdev/mbochs.c:1188:21: warning: variable mdev_state set but not used [-Wunused-but-set-variable]
+> 
+> It's not used any more since commit 104c7405a64d ("vfio:
+> add edid support to mbochs sample driver")
+> 
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> ---
+>  samples/vfio-mdev/mbochs.c | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+> index b038aa9f5a70..ac5c8c17b1ff 100644
+> --- a/samples/vfio-mdev/mbochs.c
+> +++ b/samples/vfio-mdev/mbochs.c
+> @@ -1185,9 +1185,6 @@ static long mbochs_ioctl(struct mdev_device *mdev, unsigned int cmd,
+>  {
+>  	int ret = 0;
+>  	unsigned long minsz, outsz;
+> -	struct mdev_state *mdev_state;
+> -
+> -	mdev_state = mdev_get_drvdata(mdev);
+>  
+>  	switch (cmd) {
+>  	case VFIO_DEVICE_GET_INFO:
 
-> Probably we don't need this field to be passed from userspace?
->
-> We could directly use AMD64_RAW_EVENTMASK_NB, which includes bit[35:32].
-> Since those bits are reserved on Intel CPUs, have them as mask should be
-> fine.
->
-> Alternatively, we could add this event_mask field to struct kvm_pmu, and
-> initalize
-> it in the vendor specific intel_pmu_init or amd_pmu_init.
->
-> Both options above look good to me.
+Applied to vfio next branch for 5.3.  Thanks!
 
-Sounds good. I'll go with the first suggestion for now since it's
-simpler. If other reviewers prefer the second I can implement that.
-
-> For the fixed counter, we could add a bitmap flag to kvm_arch,
-> indicating which counter is whitelist-ed based on the
-> "eventsel+umask" value passed from userspace. This flag is
-> updated when updating the whitelist-ed events to kvm.
-> For example, if userspace gives "00+01" (INST_RETIRED_ANY),
-> then we enable fixed counter0 in the flag.
->
-> When reprogram_fixed_counter, we check the flag and return
-> if the related counter isn't whitelisted.
-
-Sounds good to me.
-
-If you don't have any more comments I'll send out the next version
-with all the requested changes.
-
-Eric
+Alex
