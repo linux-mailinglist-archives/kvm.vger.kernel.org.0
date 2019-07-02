@@ -2,126 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B987A5CCD6
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 11:44:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 309805CCF4
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 11:51:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726544AbfGBJoJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 05:44:09 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:39605 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726011AbfGBJoJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 05:44:09 -0400
-Received: by mail-ot1-f65.google.com with SMTP id r21so15869833otq.6;
-        Tue, 02 Jul 2019 02:44:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9j8FE0yS4BbQGQXPJ0hZG1mtgrc4IiA+27vNRTbC7BM=;
-        b=MFTUdMwnRK0dv3ncQrDorUTNSubUaJIKovgpe0ebHT/lHHEzS9ley4sjjDyRQ6p9r7
-         /Tu/aApwhLdkmRoSJN5WsN+Zj+FGxxOkIZ+Ap8Dh5tX8qejcx9L+Ki/NkPTTfDg8MQ2f
-         Z7Uyoa8oObRyeCzQF1acxlZRyBDFGcQH5BWg8Hi55T+EFfm+6iKggus2e28roR8iOkfN
-         FTi3LKPJIkMTUWbN+Uanu31H8V+ITbLmIQtLX3/5yeYb4TIsYM6+8tTTLwSJ7SRslVJd
-         rH8D9C5XyvwNH9ihcwuj4BW3YxTGskpa4bT/LdHfr/dyihKV0ygXgKNqLnFjn+yFYtqP
-         aMNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9j8FE0yS4BbQGQXPJ0hZG1mtgrc4IiA+27vNRTbC7BM=;
-        b=eWT9PQqzojqRucB8WPOEvEBkjd3NnPnCBIC14CUryvhQw9JZmLajAfqRLIH5Cit89+
-         Uqnc1IsbhkS/2SsRut9hddJxdDbUHzoaey74rbzNHpN+K97Dc47LtqHw6AvVXWjdmJXQ
-         llqTnmT63/R+NXhqKfLn5CoKs/JLfQ6OVSJ1THS+IxKqPVxkzep3Q5sL84uTsSSz55Aw
-         L/KIszUaMMqyIPE7W0WW4HNXawXzimvtP7muCsTc4MWigwyxlmDxwv7CS5wHrN+CYiPU
-         u6K0x84NNk0EbY5HWDH1YBW8MCFFuorqtMEUQfRSx7w/cP5qLxc1usOjGjzqR3zI3fyd
-         4Hgg==
-X-Gm-Message-State: APjAAAW/4ZuQcTTj10LtKI30bX4JbvBWpq/wzISvMNZUWE2DhHUkkMgY
-        6zeoEbrf5K/l1O6UivlSJj3GB0W52HCeKusChgw=
-X-Google-Smtp-Source: APXvYqwa+Dq/l4kHweyQkXdMAVKhDZdjuNNm0Cj3TNuPwW4T2lv4ATydcstAKkx8Mk73a7zTXAOwyo4ptQ+FeJk3avk=
-X-Received: by 2002:a9d:6312:: with SMTP id q18mr16540158otk.45.1562060648265;
- Tue, 02 Jul 2019 02:44:08 -0700 (PDT)
+        id S1727188AbfGBJvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 05:51:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43440 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727128AbfGBJvi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jul 2019 05:51:38 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 184B1C02938A;
+        Tue,  2 Jul 2019 09:51:38 +0000 (UTC)
+Received: from gondolin (dhcp-192-192.str.redhat.com [10.33.192.192])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E60A6F93D;
+        Tue,  2 Jul 2019 09:51:37 +0000 (UTC)
+Date:   Tue, 2 Jul 2019 11:51:34 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Farhan Ali <alifm@linux.ibm.com>
+Cc:     farman@linux.ibm.com, pasic@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC v1 4/4] vfio-ccw: Don't call cp_free if we are processing
+ a channel program
+Message-ID: <20190702115134.790f8891.cohuck@redhat.com>
+In-Reply-To: <31c3c29e3e9c4f0312f9363a1c3a5d22b74f68cb.1561997809.git.alifm@linux.ibm.com>
+References: <cover.1561997809.git.alifm@linux.ibm.com>
+        <31c3c29e3e9c4f0312f9363a1c3a5d22b74f68cb.1561997809.git.alifm@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <alpine.DEB.2.21.1906250821220.32342@nanos.tec.linutronix.de>
- <f5c36f89-61bf-a82e-3d3b-79720b2da2ef@intel.com> <alpine.DEB.2.21.1906251330330.32342@nanos.tec.linutronix.de>
- <20190628063231.GA7766@shbuild999.sh.intel.com> <alpine.DEB.2.21.1906280929010.32342@nanos.tec.linutronix.de>
- <alpine.DEB.2.21.1906290912390.1802@nanos.tec.linutronix.de>
- <alpine.DEB.2.21.1906301334290.1802@nanos.tec.linutronix.de>
- <20190630130347.GB93752@shbuild999.sh.intel.com> <alpine.DEB.2.21.1906302021320.1802@nanos.tec.linutronix.de>
- <alpine.DEB.2.21.1907010829590.1802@nanos.tec.linutronix.de>
- <20190701083654.GB12486@shbuild999.sh.intel.com> <alpine.DEB.2.21.1907011123220.1802@nanos.tec.linutronix.de>
- <d08d55c5-bb02-f832-4306-9daf234428a8@intel.com> <alpine.DEB.2.21.1907012011460.1802@nanos.tec.linutronix.de>
- <CANRm+CyQy+=fzY7jn6Q=q6C4ucHS-Z37rq87sOJT-yO0ECiHFw@mail.gmail.com> <alpine.DEB.2.21.1907020837020.1802@nanos.tec.linutronix.de>
-In-Reply-To: <alpine.DEB.2.21.1907020837020.1802@nanos.tec.linutronix.de>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 2 Jul 2019 17:44:00 +0800
-Message-ID: <CANRm+CwttRaBUgL=OO0MkziD+qkj2GEXaDZfAZ9ZHAcC736kLA@mail.gmail.com>
-Subject: Re: [BUG] kvm: APIC emulation problem - was Re: [LKP] [x86/hotplug] ...
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Rong Chen <rong.a.chen@intel.com>, Feng Tang <feng.tang@intel.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "tipbuild@zytor.com" <tipbuild@zytor.com>,
-        "lkp@01.org" <lkp@01.org>, Ingo Molnar <mingo@kernel.org>,
-        kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Fenghua Yu <fenghua.yu@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Tue, 02 Jul 2019 09:51:38 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2 Jul 2019 at 14:40, Thomas Gleixner <tglx@linutronix.de> wrote:
->
-> Wanpeng,
->
-> On Tue, 2 Jul 2019, Wanpeng Li wrote:
-> > On Tue, 2 Jul 2019 at 06:44, Thomas Gleixner <tglx@linutronix.de> wrote:
-> > >
-> > > While that CPU0 hotplug test case is surely an esoteric issue, the APIC
-> > > emulation is still wrong, Even if the play_dead() code would not enable
-> > > interrupts then the pending IRR bit would turn into an ISR .. interrupt
-> > > when the APIC is reenabled on startup.
-> >
-> > >From SDM 10.4.7.2 Local APIC State After It Has Been Software Disabled
-> > * Pending interrupts in the IRR and ISR registers are held and require
-> > masking or handling by the CPU.
->
-> Correct.
->
-> > In your testing, hardware cpu will not respect soft disable APIC when
-> > IRR has already been set or APICv posted-interrupt is in flight, so we
-> > can skip soft disable APIC checking when clearing IRR and set ISR,
-> > continue to respect soft disable APIC when attempting to set IRR.
-> > Could you try below fix?
->
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 05d8934..f857a12 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2376,7 +2376,7 @@ int kvm_apic_has_interrupt(struct kvm_vcpu *vcpu)
-> >      struct kvm_lapic *apic = vcpu->arch.apic;
-> >      u32 ppr;
-> >
-> > -    if (!apic_enabled(apic))
-> > +    if (!kvm_apic_hw_enabled(apic))
-> >          return -1;
-> >
-> >      __apic_update_ppr(apic, &ppr);
->
-> Yes. That fixes it and works as expected. Thanks for the quick resolution.
+On Mon,  1 Jul 2019 12:23:46 -0400
+Farhan Ali <alifm@linux.ibm.com> wrote:
 
-No problem. :)
+> There is a small window where it's possible that we could be working
+> on an interrupt (queued in the workqueue) and setting up a channel
+> program (i.e allocating memory, pinning pages, translating address).
+> This can lead to allocating and freeing the channel program at the
+> same time and can cause memory corruption.
 
-> I surely stared at that function, but was not sure how to fix
-> it proper.
->
-> Tested-by: Thomas Gleixner <tglx@linutronix.de>
->
-> Please add a Cc: stable... tag when you post the patch.
+This can only happen if the interrupt is for a halt/clear operation,
+right?
 
-Ok.
+> 
+> Let's not call cp_free if we are currently processing a channel program.
+> The only way we know for sure that we don't have a thread setting
+> up a channel program is when the state is set to VFIO_CCW_STATE_CP_PENDING.
 
-Regards,
-Wanpeng Li
+I have looked through the code again and I think you are right.
+
+> 
+> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> ---
+>  drivers/s390/cio/vfio_ccw_drv.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+> index 4e3a903..0357165 100644
+> --- a/drivers/s390/cio/vfio_ccw_drv.c
+> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> @@ -92,7 +92,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+>  		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
+>  	if (scsw_is_solicited(&irb->scsw)) {
+>  		cp_update_scsw(&private->cp, &irb->scsw);
+> -		if (is_final)
+> +		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING)
+
+Do we actually want to call cp_update_scsw() unconditionally?
+
+At this point, we know that we have a solicited interrupt; that may be
+for several reasons:
+- Interrupt for something we issued via ssch; it makes sense to update
+  the scsw with the cpa address.
+- Interrupt for a csch; the cpa address will be unpredictable, even if
+  we did a ssch before. cp_update_scsw() hopefully can deal with that?
+  Given that its purpose is to translate the cpa back, any
+  unpredictable value in the scsw should be fine in the end.
+- Interrupt for a hsch after we did a ssch; the cpa might be valid (see
+  figure 16-6).
+- Interrupt for a hsch without a prior ssch; we'll end up with an
+  unpredictable cpa, again.
+
+So I *think* we're fine with calling cp_update_scsw() in all cases,
+even if there's junk in the cpa of the scsw we get from the hardware.
+Opinions?
+
+>  			cp_free(&private->cp);
+>  	}
+>  	mutex_lock(&private->io_mutex);
+
