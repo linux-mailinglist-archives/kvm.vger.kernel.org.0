@@ -2,116 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DAC035D58A
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 19:45:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0179E5D58B
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 19:46:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726486AbfGBRpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 13:45:44 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:36787 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726193AbfGBRpo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 13:45:44 -0400
-Received: by mail-pf1-f196.google.com with SMTP id r7so8628673pfl.3
-        for <kvm@vger.kernel.org>; Tue, 02 Jul 2019 10:45:43 -0700 (PDT)
+        id S1726635AbfGBRq3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 13:46:29 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:43515 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726529AbfGBRq3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jul 2019 13:46:29 -0400
+Received: by mail-ed1-f66.google.com with SMTP id e3so28078475edr.10
+        for <kvm@vger.kernel.org>; Tue, 02 Jul 2019 10:46:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=1hvWk2dmaR3L/ph3+393c1HUZUvwBsMa4MDeML4wjGc=;
-        b=Xw1brA/78L/+d12bf3Cd6fiaMDMG/bqfbvUqpGemSc/drQs/pTPu04WPQoMoZlZVSF
-         787wlJNhkBqGbGvSh824P0+EcW2ICty5QMiNFnDPUMuGdVGEs/iTYSDp/QJhuw2Xxi6W
-         IlyuSTXkAMaefv926WX4v70Um4C0u/T3pQsjV1KcnAG5KeAHiiEA0/9pfI8vJbXVyKtY
-         5Vkbh0Cn3lJqd5hCQsIrzHSB2BmQsj1ZW4wroQHR28XwosuIzWGlMOaVeAAp4kP7zgGu
-         IozGNUNRvZ36datAw3KDt8w5BbTmqZORMpPNcY7zIyQGaUCPj5P9fHqdkwfWJw9SSfXp
-         3DWw==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=62xeVPs21E5ReOKr0PeNYmMpHFedVY8IfymEZkh+FCQ=;
+        b=S62756i4kfBhwvThdrp/bluvzbNlIQhGr2N54PhVXSt+bW0Fi/DqOASwTjFn0iK8pH
+         O4scfXJPkY3GXcYQW2rzoHqJyot3S894FWcAdSIEqZk4YStXK4NAY1qtHaa05VSYEVQw
+         ypFocTubeKx4UpSHTcIfHAVwLY+DfTPdFB/QPPA/6io5p/bC36vp16JpzDFaICzTEYpn
+         pUnjF49M/4lXBLlpaUm/pUbCp3kS/HQu191UUJFGzCeemFPZg40bEiZ5sElzpVhhBUto
+         Ii0pKGfpV/f83Cx6GZSfpDb78rXAwFs7DvSh+JbVnTg2ezwdco08A8C/48egMrQr6M2O
+         knkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=1hvWk2dmaR3L/ph3+393c1HUZUvwBsMa4MDeML4wjGc=;
-        b=clTUiLVHUYDB2oS/GEpWquitfG/HulIZqJKsl29xwXgK1w+oaPxDFDS59omlxyEEqB
-         UF0CXjle9OVTUeklE3uGePqyKshZ5cA9/NKmCeNOqoT5JdvI/BmoBYT8gKT6oD4gUko7
-         C7nHf6UEJBfI3wVoXmBK/7JfYFTVMTbjGDNVrpi1mEHGRPfJsn4Xq+pp7TD9H36bqmSq
-         de6dr2OCQB7R825y68pEgX2Y6Aa2tIfLtjotqL2uoWI9o+P5/43Kh7ifhjIrdGBpo2qD
-         QG6mSPec1dFgoLexVFvV0JmKxEdtLreIt5s0bB8fpx74svg7nqj1nV4/8mh14aq3Ivr5
-         4EEg==
-X-Gm-Message-State: APjAAAU0FBRpU2ehSjzJPXYVyTKiud1Pznylz39leRxyg96cJGXIrkSb
-        DpjiffegBDRFcUeJBwMUKIo=
-X-Google-Smtp-Source: APXvYqwHh/rMVM1hqPLygFBKHyc2sQOqHfPLHl9O9+4IrvhWf8I4jCtSBwFaZeoH2T9i5qEI1tGmEg==
-X-Received: by 2002:a63:490a:: with SMTP id w10mr31325421pga.6.1562089543351;
-        Tue, 02 Jul 2019 10:45:43 -0700 (PDT)
-Received: from [10.2.189.129] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id f17sm11985654pgv.16.2019.07.02.10.45.42
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 02 Jul 2019 10:45:42 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [kvm-unit-tests PATCH 3/3] x86: Support environments without
- test-devices
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <73f56921-cb61-92fa-018a-5673e721dbef@redhat.com>
-Date:   Tue, 2 Jul 2019 10:45:41 -0700
-Cc:     kvm@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <39BF29A2-D14B-4AC7-AE19-66EA8C136D98@gmail.com>
-References: <20190628203019.3220-1-nadav.amit@gmail.com>
- <20190628203019.3220-4-nadav.amit@gmail.com>
- <2e359eb2-4b2a-0a52-6c43-cd6037bb72ae@redhat.com>
- <F3480C92-28D8-470A-9E34-E87ECCE4FDD1@gmail.com>
- <73f56921-cb61-92fa-018a-5673e721dbef@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=62xeVPs21E5ReOKr0PeNYmMpHFedVY8IfymEZkh+FCQ=;
+        b=qye4/AoynkeAIEHcBwLIgYP+sZuXMHqcUQpppIzI6P+RFppj5+4z5tHifUZdHNVCWw
+         HNR/U8UJR96MNYNrDFVpY0lkkz2cBm9lkFVLEphZMntyKZfgLV2ehp/IHoHe26dOJWAM
+         4oEzSkZ7YUk78+VWAB8QnY8El4Mvbuw5Abaeys3J4Ge7sh10YP8kM2ZCTgtV3jmxC6jS
+         O+qKkBBM1qbMBhoReF8Fgfttd2dC44R4NZWL1AHXCz+NxeBIRQZIufzt9ehRfYoWgcH1
+         byJozXAlbOwQOngeWNL3Pxn2i8X3qQOLLB9wn5IKwkjLQLtLPJ/pHMZSGJbTphLiBAS8
+         h4ww==
+X-Gm-Message-State: APjAAAWhTQtTN98s8aAmI/NcRkuITgFFSNaB+IOX+9eBpilwu0gL1p4w
+        mQJHw3hyW6+KK8EASHe2T2LROGTD2aMizdkYmCTR+w==
+X-Google-Smtp-Source: APXvYqx5heTU3G2wcqJHU6kEnhITccuBT2in9TxF+0f1OMcZoamtL9MEX0jLGTQHsk/kPYuoYfPBgiTBJt5KlB/HUw8=
+X-Received: by 2002:aa7:d845:: with SMTP id f5mr37202330eds.78.1562089587822;
+ Tue, 02 Jul 2019 10:46:27 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAOyeoRWfPNmaWY6Lifdkdj3KPPM654vzDO+s3oduEMCJP+Asow@mail.gmail.com>
+ <5D036843.2010607@intel.com> <CAOyeoRXr4gmbBPq1RsStoPguiZB8Jxod-irYd3Dm_AGVcQRGSQ@mail.gmail.com>
+ <5D11E58B.1060306@intel.com>
+In-Reply-To: <5D11E58B.1060306@intel.com>
+From:   Eric Hankland <ehankland@google.com>
+Date:   Tue, 2 Jul 2019 10:46:16 -0700
+Message-ID: <CAOyeoRUy6R0YzcMajRAhzss321p6G=LMrR63oPQCYFwaK6SMvA@mail.gmail.com>
+Subject: Re: [PATCH v1] KVM: x86: PMU Whitelist
+To:     Wei Wang <wei.w.wang@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Jul 2, 2019, at 10:24 AM, Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->=20
-> On 02/07/19 18:43, Nadav Amit wrote:
->>>> Remember that the output goes to the serial port.
->>>=20
->>> RAM size can use the multiboot info (see lib/x86/setup.c).
->>=20
->> The multiboot info, as provided by the boot-loader is not good enough =
-as far
->> as I remember. The info just defines where to kernel can be loaded, =
-but does
->> not say how big the memory is. For that, e820 decoding is needed, =
-which I
->> was too lazy to do.
->=20
-> The multiboot info has both e801 memory size and e820 memory map info.
-> e801 is basically the first contiguous chunk of memory below 4GB, it
-> should be enough for kvm-unit-tests.
+> Actually I have another thing to discuss:
+> probably we could consider to make this filter list white/black configurable
+> from userspace. For example, userspace option: filter-list=white/black
 
-It is not enough for some of the access/ept_access tests, and 1GB page
-allocation can fail on certain configurations. But anyhow I didn=E2=80=99t=
- solve
-this problem (IIRC the allocator only allocates from addresses that are
-below 4GB). So, I can do that (using e801).
+Works for me. I'll include this in the next version.
 
->>> For the # of CPUs I'm not sure what you're supposed to do on bare =
-metal
->>> though. :)
->>=20
->> I know you are not =E2=80=9Cserious=E2=80=9D, but I=E2=80=99ll use =
-this opportunity for a small
->> clarification. You do need to provide the real number of CPUs as =
-otherwise
->> things will fail. I do not use cpuid, as my machine, for example has =
-two
->> sockets. Decoding the ACPI tables is the right way, but I was too =
-lazy to
->> implement it.
->=20
-> What about the mptables, too?
+> Probably we don't need this field to be passed from userspace?
+>
+> We could directly use AMD64_RAW_EVENTMASK_NB, which includes bit[35:32].
+> Since those bits are reserved on Intel CPUs, have them as mask should be
+> fine.
+>
+> Alternatively, we could add this event_mask field to struct kvm_pmu, and
+> initalize
+> it in the vendor specific intel_pmu_init or amd_pmu_init.
+>
+> Both options above look good to me.
 
-If you mean to reuse mptable.c from [1] or [2] - I can give it a shot. I =
-am
-not about to write my own parser.
+Sounds good. I'll go with the first suggestion for now since it's
+simpler. If other reviewers prefer the second I can implement that.
 
-[1] https://github.com/kernelslacker/x86info/blob/master/mptable.c
-[2] https://people.freebsd.org/~fsmp/SMP/mptable/mptable.c=
+> For the fixed counter, we could add a bitmap flag to kvm_arch,
+> indicating which counter is whitelist-ed based on the
+> "eventsel+umask" value passed from userspace. This flag is
+> updated when updating the whitelist-ed events to kvm.
+> For example, if userspace gives "00+01" (INST_RETIRED_ANY),
+> then we enable fixed counter0 in the flag.
+>
+> When reprogram_fixed_counter, we check the flag and return
+> if the related counter isn't whitelisted.
+
+Sounds good to me.
+
+If you don't have any more comments I'll send out the next version
+with all the requested changes.
+
+Eric
