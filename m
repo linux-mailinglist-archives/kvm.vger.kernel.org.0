@@ -2,44 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C7A985CF98
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 14:37:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23D4B5CFBF
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 14:48:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726686AbfGBMhi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 08:37:38 -0400
-Received: from foss.arm.com ([217.140.110.172]:48866 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726167AbfGBMhi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 08:37:38 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E4B76344;
-        Tue,  2 Jul 2019 05:37:36 -0700 (PDT)
-Received: from [10.1.197.45] (e112298-lin.cambridge.arm.com [10.1.197.45])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8ACBB3F703;
-        Tue,  2 Jul 2019 05:37:35 -0700 (PDT)
-Subject: Re: [PATCH 44/59] KVM: arm64: nv: Trap and emulate TLBI instructions
- from virtual EL2
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-45-marc.zyngier@arm.com>
-From:   Julien Thierry <julien.thierry@arm.com>
-Message-ID: <f12d61fd-d280-108c-d015-030ec8ca1a47@arm.com>
-Date:   Tue, 2 Jul 2019 13:37:33 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726623AbfGBMsA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 08:48:00 -0400
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:17418 "EHLO
+        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726362AbfGBMsA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jul 2019 08:48:00 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d1b52810000>; Tue, 02 Jul 2019 05:48:01 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Tue, 02 Jul 2019 05:47:57 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Tue, 02 Jul 2019 05:47:57 -0700
+Received: from [10.24.70.16] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 2 Jul
+ 2019 12:47:51 +0000
+Subject: Re: [PATCH v2] mdev: Send uevents around parent device registration
+To:     Parav Pandit <parav@mellanox.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <156199271955.1646.13321360197612813634.stgit@gimli.home>
+ <08597ab4-cc37-3973-8927-f1bc430f6185@nvidia.com>
+ <20190701112442.176a8407@x1.home>
+ <3b338e73-7929-df20-ca2b-3223ba4ead39@nvidia.com>
+ <20190701140436.45eabf07@x1.home>
+ <14783c81-0236-2f25-6193-c06aa83392c9@nvidia.com>
+ <20190701234201.47b6f23a@x1.home>
+ <AM0PR05MB48669DA5993C68765397AF1BD1F80@AM0PR05MB4866.eurprd05.prod.outlook.com>
+X-Nvconfidentiality: public
+From:   Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <b6afb6a7-0bd8-dff3-4a4b-a6bb34ccb61d@nvidia.com>
+Date:   Tue, 2 Jul 2019 18:17:41 +0530
 MIME-Version: 1.0
-In-Reply-To: <20190621093843.220980-45-marc.zyngier@arm.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <AM0PR05MB48669DA5993C68765397AF1BD1F80@AM0PR05MB4866.eurprd05.prod.outlook.com>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1562071681; bh=QFqGAwMIsHGGtBPBnOvo50744kDSorV5Tle+D/3Dojo=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:MIME-Version:In-Reply-To:X-Originating-IP:
+         X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=U4vb5pB7jZcWFlC5ABbXH6cXuT9L/87QUHdS48jMfdLoWszrW3i7FYEjCQE76+QBO
+         a4BetUb+cz8Ml3Nwbc4Twfbc4RNNqhgTXWX5s+QFHQsJipdqCB0BhlxoYctVoC3tj3
+         Dkz2r8/8g/b8d6FHVk3y6to58d/iWiacA+dwCi4ISLSnPRt+XAJeXZyryH4lIo1yh8
+         f0NnXXXJAe6UXuTS47wETJRWqryIqZZiL2nf882yeORKgiMahArC22KPYVmawJyDO2
+         wuWnLToDTaGckyUoK2kY35i84ZyoXq4LSMwNF4ihN7oBxKpF/ChNmUyxQzCoJgN5hC
+         wtlczNRQIW11Q==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -47,566 +66,191 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 21/06/2019 10:38, Marc Zyngier wrote:
-> From: Jintack Lim <jintack.lim@linaro.org>
+On 7/2/2019 12:43 PM, Parav Pandit wrote:
 > 
-> When supporting nested virtualization a guest hypervisor executing TLBI
-> instructions must be trapped and emulated by the host hypervisor,
-> because the guest hypervisor can only affect physical TLB entries
-> relating to its own execution environment (virtual EL2 in EL1) but not
-> to the nested guests as required by the semantics of the instructions
-> and TLBI instructions might also result in updates (invalidations) to
-> shadow page tables.
 > 
-> This patch does several things.
-> 
-> 1. List and define all TLBI system instructions to emulate.
-> 
-> 2. Emulate TLBI ALLE2(IS) instruction executed in the virtual EL2. Since
-> we emulate the virtual EL2 in the EL1, we invalidate EL1&0 regime stage
-> 1 TLB entries with setting vttbr_el2 having the VMID of the virtual EL2.
-> 
-> 3. Emulate TLBI VAE2* instruction executed in the virtual EL2. Based on the
-> same principle as TLBI ALLE2 instruction, we can simply emulate those
-> instructions by executing corresponding VAE1* instructions with the
-> virtual EL2's VMID assigned by the host hypervisor.
-> 
-> Note that we are able to emulate TLBI ALLE2IS precisely by only
-> invalidating stage 1 TLB entries via TLBI VMALL1IS instruction, but to
-> make it simeple, we reuse the existing function, __kvm_tlb_flush_vmid(),
-> which invalidates both of stage 1 and 2 TLB entries.
-> 
-> 4. TLBI ALLE1(IS) instruction invalidates all EL1&0 regime stage 1 and 2
-> TLB entries (on all PEs in the same Inner Shareable domain). To emulate
-> these instructions, we first need to clear all the mappings in the
-> shadow page tables since executing those instructions implies the change
-> of mappings in the stage 2 page tables maintained by the guest
-> hypervisor.  We then need to invalidate all EL1&0 regime stage 1 and 2
-> TLB entries of all VMIDs, which are assigned by the host hypervisor, for
-> this VM.
-> 
-> 5. Based on the same principle as TLBI ALLE1(IS) emulation, we clear the
-> mappings in the shadow stage-2 page tables and invalidate TLB entries.
-> But this time we do it only for the current VMID from the guest
-> hypervisor's perspective, not for all VMIDs.
-> 
-> 6. Based on the same principle as TLBI ALLE1(IS) and TLBI VMALLS12E1(IS)
-> emulation, we clear the mappings in the shadow stage-2 page tables and
-> invalidate TLB entries. We do it only for one mapping for the current
-> VMID from the guest hypervisor's view.
-> 
-> 7. Forward system instruction traps to the virtual EL2 if a
-> corresponding bit in the virtual HCR_EL2 is set.
-> 
-> 8. Even though a guest hypervisor can execute TLBI instructions that are
-> accesible at EL1 without trap, it's wrong; All those TLBI instructions
-> work based on current VMID, and when running a guest hypervisor current
-> VMID is the one for itself, not the one from the virtual vttbr_el2. So
-> letting a guest hypervisor execute those TLBI instructions results in
-> invalidating its own TLB entries and leaving invalid TLB entries
-> unhandled.
-> 
-> Therefore we trap and emulate those TLBI instructions. The emulation is
-> simple; we find a shadow VMID mapped to the virtual vttbr_el2, set it in
-> the physical vttbr_el2, then execute the same instruction in EL2.
-> 
-> We don't set HCR_EL2.TTLB bit yet.
-> 
->   [ Changes performed by Marc Zynger:
-> 
->     The TLBI handling code more or less directly execute the same
->     instruction that has been trapped (with an EL2->EL1 conversion
->     in the case of an EL2 TLBI), but that's unfortunately not enough:
-> 
->     - TLBIs must be upgraded to the Inner Shareable domain to account
->       for vcpu migration, just like we already have with HCR_EL2.FB.
-> 
->     - The DSB instruction that synchronises these must thus be on
->       the Inner Shareable domain as well.
-> 
->     - Prior to executing the TLBI, we need another DSB ISHST to make
->       sure that the update to the page tables is now visible.
-> 
->       Ordering of system instructions fixed
-> 
->     - The current TLB invalidation code is pretty buggy, as it assume a
->       page mapping. On the contrary, it is likely that TLB invalidation
->       will cover more than a single page, and the size should be decided
->       by the guests configuration (and not the host's).
-> 
->       Since we don't cache the guest mapping sizes in the shadow PT yet,
->       let's assume the worse case (a block mapping) and invalidate that.
-> 
->       Take this opportunity to fix the decoding of the parameter (it
->       isn't a straight IPA).
-> 
->     - In general, we always emulate local TBL invalidations as being
->       as upgraded to the Inner Shareable domain so that we can easily
->       deal with vcpu migration. This is consistent with the fact that
->       we set HCR_EL2.FB when running non-nested VMs.
-> 
->       So let's emulate TLBI ALLE2 as ALLE2IS.
->   ]
-> 
->   [ Changes performed by Christoffer Dall:
-> 
->     Sometimes when we are invalidating the TLB for a certain S2 MMU
->     context, this context can also have EL2 context associated with it
->     and we have to invalidate this too.
->   ]
-> 
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_asm.h |   2 +
->  arch/arm64/include/asm/sysreg.h  |  36 ++++++
->  arch/arm64/kvm/hyp/tlb.c         |  81 +++++++++++++
->  arch/arm64/kvm/sys_regs.c        | 201 +++++++++++++++++++++++++++++++
->  virt/kvm/arm/mmu.c               |  18 ++-
->  5 files changed, 337 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 1cfa4d2cf772..9cb9ab066ebc 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -67,6 +67,8 @@ extern void __kvm_flush_vm_context(void);
->  extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa);
->  extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
->  extern void __kvm_tlb_flush_local_vmid(struct kvm_vcpu *vcpu);
-> +extern void __kvm_tlb_vae2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding);
-> +extern void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding);
->  
->  extern void __kvm_timer_set_cntvoff(u32 cntvoff_low, u32 cntvoff_high);
->  extern void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index b3a8d21c07b3..e0912ececd92 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -553,6 +553,42 @@
->  #define OP_AT_S12E0R	sys_insn(AT_Op0, 4, AT_CRn, 8, 6)
->  #define OP_AT_S12E0W	sys_insn(AT_Op0, 4, AT_CRn, 8, 7)
->  
-> +/* TLBI instructions */
-> +#define TLBI_Op0	1
-> +#define TLBI_Op1_EL1	0	/* Accessible from EL1 or higher */
-> +#define TLBI_Op1_EL2	4	/* Accessible from EL2 or higher */
-> +#define TLBI_CRn	8
-> +#define tlbi_insn_el1(CRm, Op2)	sys_insn(TLBI_Op0, TLBI_Op1_EL1, TLBI_CRn, (CRm), (Op2))
-> +#define tlbi_insn_el2(CRm, Op2)	sys_insn(TLBI_Op0, TLBI_Op1_EL2, TLBI_CRn, (CRm), (Op2))
-> +
-> +#define OP_TLBI_VMALLE1IS	tlbi_insn_el1(3, 0)
-> +#define OP_TLBI_VAE1IS		tlbi_insn_el1(3, 1)
-> +#define OP_TLBI_ASIDE1IS	tlbi_insn_el1(3, 2)
-> +#define OP_TLBI_VAAE1IS		tlbi_insn_el1(3, 3)
-> +#define OP_TLBI_VALE1IS		tlbi_insn_el1(3, 5)
-> +#define OP_TLBI_VAALE1IS	tlbi_insn_el1(3, 7)
-> +#define OP_TLBI_VMALLE1		tlbi_insn_el1(7, 0)
-> +#define OP_TLBI_VAE1		tlbi_insn_el1(7, 1)
-> +#define OP_TLBI_ASIDE1		tlbi_insn_el1(7, 2)
-> +#define OP_TLBI_VAAE1		tlbi_insn_el1(7, 3)
-> +#define OP_TLBI_VALE1		tlbi_insn_el1(7, 5)
-> +#define OP_TLBI_VAALE1		tlbi_insn_el1(7, 7)
-> +
-> +#define OP_TLBI_IPAS2E1IS	tlbi_insn_el2(0, 1)
-> +#define OP_TLBI_IPAS2LE1IS	tlbi_insn_el2(0, 5)
-> +#define OP_TLBI_ALLE2IS		tlbi_insn_el2(3, 0)
-> +#define OP_TLBI_VAE2IS		tlbi_insn_el2(3, 1)
-> +#define OP_TLBI_ALLE1IS		tlbi_insn_el2(3, 4)
-> +#define OP_TLBI_VALE2IS		tlbi_insn_el2(3, 5)
-> +#define OP_TLBI_VMALLS12E1IS	tlbi_insn_el2(3, 6)
-> +#define OP_TLBI_IPAS2E1		tlbi_insn_el2(4, 1)
-> +#define OP_TLBI_IPAS2LE1	tlbi_insn_el2(4, 5)
-> +#define OP_TLBI_ALLE2		tlbi_insn_el2(7, 0)
-> +#define OP_TLBI_VAE2		tlbi_insn_el2(7, 1)
-> +#define OP_TLBI_ALLE1		tlbi_insn_el2(7, 4)
-> +#define OP_TLBI_VALE2		tlbi_insn_el2(7, 5)
-> +#define OP_TLBI_VMALLS12E1	tlbi_insn_el2(7, 6)
-> +
->  /* Common SCTLR_ELx flags. */
->  #define SCTLR_ELx_DSSBS	(_BITUL(44))
->  #define SCTLR_ELx_ENIA	(_BITUL(31))
-> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-> index 779405db3fb3..026afbf1a697 100644
-> --- a/arch/arm64/kvm/hyp/tlb.c
-> +++ b/arch/arm64/kvm/hyp/tlb.c
-> @@ -205,3 +205,84 @@ void __hyp_text __kvm_flush_vm_context(void)
->  	asm volatile("ic ialluis" : : );
->  	dsb(ish);
->  }
-> +
-> +void __hyp_text __kvm_tlb_vae2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding)
-> +{
-> +	struct tlb_inv_context cxt;
-> +
-> +	dsb(ishst);
-> +
-> +	/* Switch to requested VMID */
-> +	__tlb_switch_to_guest()(mmu, &cxt);
-> +
-> +	/*
-> +	 * Execute the EL1 version of TLBI VAE2* instruction, forcing
-> +	 * an upgrade to the Inner Shareable domain in order to
-> +	 * perform the invalidation on all CPUs.
-> +	 */
-> +	switch (sys_encoding) {
-> +	case OP_TLBI_VAE2:
-> +	case OP_TLBI_VAE2IS:
-> +		__tlbi(vae1is, va);
-> +		break;
-> +	case OP_TLBI_VALE2:
-> +	case OP_TLBI_VALE2IS:
-> +		__tlbi(vale1is, va);
-> +		break;
-> +	default:
-> +		break;
-> +	}
-> +	dsb(ish);
-> +	isb();
-> +
-> +	__tlb_switch_to_host()(&cxt);
-> +}
-> +
-> +void __hyp_text __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
-> +{
-> +	struct tlb_inv_context cxt;
-> +
-> +	dsb(ishst);
-> +
-> +	/* Switch to requested VMID */
-> +	__tlb_switch_to_guest()(mmu, &cxt);
-> +
-> +	/*
-> +	 * Execute the same instruction as the guest hypervisor did,
-> +	 * expanding the scope of local TLB invalidations to the Inner
-> +	 * Shareable domain so that it takes place on all CPUs. This
-> +	 * is equivalent to having HCR_EL2.FB set.
-> +	 */
-> +	switch (sys_encoding) {
-> +	case OP_TLBI_VMALLE1:
-> +	case OP_TLBI_VMALLE1IS:
-> +		__tlbi(vmalle1is);
-> +		break;
-> +	case OP_TLBI_VAE1:
-> +	case OP_TLBI_VAE1IS:
-> +		__tlbi(vae1is, val);
-> +		break;
-> +	case OP_TLBI_ASIDE1:
-> +	case OP_TLBI_ASIDE1IS:
-> +		__tlbi(aside1is, val);
-> +		break;
-> +	case OP_TLBI_VAAE1:
-> +	case OP_TLBI_VAAE1IS:
-> +		__tlbi(vaae1is, val);
-> +		break;
-> +	case OP_TLBI_VALE1:
-> +	case OP_TLBI_VALE1IS:
-> +		__tlbi(vale1is, val);
-> +		break;
-> +	case OP_TLBI_VAALE1:
-> +	case OP_TLBI_VAALE1IS:
-> +		__tlbi(vaale1is, val);
-> +		break;
-> +	default:
-> +		break;
-> +	}
-> +	dsb(ish);
-> +	isb();
-> +
-> +	__tlb_switch_to_host()(&cxt);
-> +}
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 102419b837e8..0343682fe47f 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1661,6 +1661,11 @@ static bool forward_at_traps(struct kvm_vcpu *vcpu)
->  	return forward_traps(vcpu, HCR_AT);
->  }
->  
-> +static bool forward_ttlb_traps(struct kvm_vcpu *vcpu)
-> +{
-> +	return forward_traps(vcpu, HCR_TTLB);
-> +}
-> +
->  /* This function is to support the recursive nested virtualization */
->  static bool forward_nv1_traps(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
->  {
-> @@ -2251,6 +2256,174 @@ static bool handle_s12w(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	return handle_s12(vcpu, p, r, true);
->  }
->  
-> +static bool handle_alle2is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			   const struct sys_reg_desc *r)
-> +{
-> +	/*
-> +	 * To emulate invalidating all EL2 regime stage 1 TLB entries for all
-> +	 * PEs, executing TLBI VMALLE1IS is enough. But reuse the existing
-> +	 * interface for the simplicity; invalidating stage 2 entries doesn't
-> +	 * affect the correctness.
-> +	 */
-> +	kvm_call_hyp(__kvm_tlb_flush_vmid, &vcpu->kvm->arch.mmu);
-> +	return true;
-> +}
-> +
-> +static bool handle_vae2(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +		       const struct sys_reg_desc *r)
-> +{
-> +	int sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-> +
-> +	/*
-> +	 * Based on the same principle as TLBI ALLE2 instruction emulation, we
-> +	 * emulate TLBI VAE2* instructions by executing corresponding TLBI VAE1*
-> +	 * instructions with the virtual EL2's VMID assigned by the host
-> +	 * hypervisor.
-> +	 */
-> +	kvm_call_hyp(__kvm_tlb_vae2, &vcpu->kvm->arch.mmu,
-> +		     p->regval, sys_encoding);
-> +	return true;
-> +}
-> +
-> +static bool handle_alle1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			   const struct sys_reg_desc *r)
-> +{
-> +	struct kvm_s2_mmu *mmu = &vcpu->kvm->arch.mmu;
-> +	spin_lock(&vcpu->kvm->mmu_lock);
-> +
-> +	/*
-> +	 * Clear all mappings in the shadow page tables and invalidate the stage
-> +	 * 1 and 2 TLB entries via kvm_tlb_flush_vmid_ipa().
-> +	 */
-> +	kvm_nested_s2_clear(vcpu->kvm);
-> +
-> +	if (mmu->vmid.vmid_gen) {
-> +		/*
-> +		 * Invalidate the stage 1 and 2 TLB entries for the host OS
-> +		 * in a VM only if there is one.
-> +		 */
-> +		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> +	}
-> +
-> +	spin_unlock(&vcpu->kvm->mmu_lock);
-> +
-> +	return true;
-> +}
-> +
-> +static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +				const struct sys_reg_desc *r)
-> +{
-> +	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-> +	struct kvm_s2_mmu *mmu;
-> +
-> +	spin_lock(&vcpu->kvm->mmu_lock);
-> +
-> +	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
-> +	if (mmu)
-> +		kvm_unmap_stage2_range(mmu, 0, kvm_phys_size(vcpu->kvm));
-> +
-> +	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, 0);
-> +	if (mmu)
-> +		kvm_unmap_stage2_range(mmu, 0, kvm_phys_size(vcpu->kvm));
-> +
-> +	spin_unlock(&vcpu->kvm->mmu_lock);
-> +
-> +	return true;
-> +}
-> +
-> +static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			     const struct sys_reg_desc *r)
-> +{
-> +	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-> +	u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
-> +	struct kvm_s2_mmu *mmu;
-> +	u64 base_addr;
-> +	int max_size;
-> +
-> +	/*
-> +	 * We drop a number of things from the supplied value:
-> +	 *
-> +	 * - NS bit: we're non-secure only.
-> +	 *
-> +	 * - TTL field: We already have the granule size from the
-> +	 *   VTCR_EL2.TG0 field, and the level is only relevant to the
-> +	 *   guest's S2PT.
-> +	 *
-> +	 * - IPA[51:48]: We don't support 52bit IPA just yet...
-> +	 *
-> +	 * And of course, adjust the IPA to be on an actual address.
-> +	 */
-> +	base_addr = (p->regval & GENMASK_ULL(35, 0)) << 12;
-> +
-> +	/* Compute the maximum extent of the invalidation */
-> +	switch ((vtcr & VTCR_EL2_TG0_MASK)) {
-> +	case VTCR_EL2_TG0_4K:
-> +		max_size = SZ_1G;
-> +		break;
-> +	case VTCR_EL2_TG0_16K:
-> +		max_size = SZ_32M;
-> +		break;
-> +	case VTCR_EL2_TG0_64K:
-> +		/*
-> +		 * No, we do not support 52bit IPA in nested yet. Once
-> +		 * we do, this should be 4TB.
-> +		 */
-> +		/* FIXME: remove the 52bit PA support from the IDregs */
-> +		max_size = SZ_512M;
-> +		break;
-> +	default:
-> +		BUG();
-> +	}
-> +
-> +	spin_lock(&vcpu->kvm->mmu_lock);
-> +
-> +	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
-> +	if (mmu)
-> +		kvm_unmap_stage2_range(mmu, base_addr, max_size);
-> +
-> +	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, 0);
-> +	if (mmu)
-> +		kvm_unmap_stage2_range(mmu, base_addr, max_size);
-> +
-> +	spin_unlock(&vcpu->kvm->mmu_lock);
+>> -----Original Message-----
+>> From: linux-kernel-owner@vger.kernel.org <linux-kernel-
+>> owner@vger.kernel.org> On Behalf Of Alex Williamson
+>> Sent: Tuesday, July 2, 2019 11:12 AM
+>> To: Kirti Wankhede <kwankhede@nvidia.com>
+>> Cc: cohuck@redhat.com; kvm@vger.kernel.org; linux-kernel@vger.kernel.org
+>> Subject: Re: [PATCH v2] mdev: Send uevents around parent device registration
+>>
+>> On Tue, 2 Jul 2019 10:25:04 +0530
+>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>
+>>> On 7/2/2019 1:34 AM, Alex Williamson wrote:
+>>>> On Mon, 1 Jul 2019 23:20:35 +0530
+>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>>
+>>>>> On 7/1/2019 10:54 PM, Alex Williamson wrote:
+>>>>>> On Mon, 1 Jul 2019 22:43:10 +0530
+>>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>>>>
+>>>>>>> On 7/1/2019 8:24 PM, Alex Williamson wrote:
+>>>>>>>> This allows udev to trigger rules when a parent device is
+>>>>>>>> registered or unregistered from mdev.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+>>>>>>>> ---
+>>>>>>>>
+>>>>>>>> v2: Don't remove the dev_info(), Kirti requested they stay and
+>>>>>>>>     removing them is only tangential to the goal of this change.
+>>>>>>>>
+>>>>>>>
+>>>>>>> Thanks.
+>>>>>>>
+>>>>>>>
+>>>>>>>>  drivers/vfio/mdev/mdev_core.c |    8 ++++++++
+>>>>>>>>  1 file changed, 8 insertions(+)
+>>>>>>>>
+>>>>>>>> diff --git a/drivers/vfio/mdev/mdev_core.c
+>>>>>>>> b/drivers/vfio/mdev/mdev_core.c index ae23151442cb..7fb268136c62
+>>>>>>>> 100644
+>>>>>>>> --- a/drivers/vfio/mdev/mdev_core.c
+>>>>>>>> +++ b/drivers/vfio/mdev/mdev_core.c
+>>>>>>>> @@ -146,6 +146,8 @@ int mdev_register_device(struct device *dev,
+>>>>>>>> const struct mdev_parent_ops *ops)  {
+>>>>>>>>  	int ret;
+>>>>>>>>  	struct mdev_parent *parent;
+>>>>>>>> +	char *env_string = "MDEV_STATE=registered";
+>>>>>>>> +	char *envp[] = { env_string, NULL };
+>>>>>>>>
+>>>>>>>>  	/* check for mandatory ops */
+>>>>>>>>  	if (!ops || !ops->create || !ops->remove ||
+>>>>>>>> !ops->supported_type_groups) @@ -197,6 +199,8 @@ int
+>> mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+>>>>>>>>  	mutex_unlock(&parent_list_lock);
+>>>>>>>>
+>>>>>>>>  	dev_info(dev, "MDEV: Registered\n");
+>>>>>>>> +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+>>>>>>>> +
+>>>>>>>>  	return 0;
+>>>>>>>>
+>>>>>>>>  add_dev_err:
+>>>>>>>> @@ -220,6 +224,8 @@ EXPORT_SYMBOL(mdev_register_device);
+>>>>>>>>  void mdev_unregister_device(struct device *dev)  {
+>>>>>>>>  	struct mdev_parent *parent;
+>>>>>>>> +	char *env_string = "MDEV_STATE=unregistered";
+>>>>>>>> +	char *envp[] = { env_string, NULL };
+>>>>>>>>
+>>>>>>>>  	mutex_lock(&parent_list_lock);
+>>>>>>>>  	parent = __find_parent_device(dev); @@ -243,6 +249,8 @@
+>> void
+>>>>>>>> mdev_unregister_device(struct device *dev)
+>>>>>>>>  	up_write(&parent->unreg_sem);
+>>>>>>>>
+>>>>>>>>  	mdev_put_parent(parent);
+>>>>>>>> +
+>>>>>>>> +	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+>>>>>>>
+>>>>>>> mdev_put_parent() calls put_device(dev). If this is the last
+>>>>>>> instance holding device, then on put_device(dev) dev would get freed.
+>>>>>>>
+>>>>>>> This event should be before mdev_put_parent()
+>>>>>>
+>>>>>> So you're suggesting the vendor driver is calling
+>>>>>> mdev_unregister_device() without a reference to the struct device
+>>>>>> that it's passing to unregister?  Sounds bogus to me.  We take a
+>>>>>> reference to the device so that it can't disappear out from under
+>>>>>> us, the caller cannot rely on our reference and the caller
+>>>>>> provided the struct device.  Thanks,
+>>>>>>
+>>>>>
+>>>>> 1. Register uevent is sent after mdev holding reference to device,
+>>>>> then ideally, unregister path should be mirror of register path,
+>>>>> send uevent and then release the reference to device.
+>>>>
+>>>> I don't see the relevance here.  We're marking an event, not
+>>>> unwinding state of the device from the registration process.
+>>>> Additionally, the event we're trying to mark is the completion of
+>>>> each process, so the notion that we need to mirror the ordering between
+>> the two is invalid.
+>>>>
+>>>>> 2. I agree that vendor driver shouldn't call
+>>>>> mdev_unregister_device() without holding reference to device. But
+>>>>> to be on safer side, if ever such case occur, to avoid any
+>>>>> segmentation fault in kernel, better to send event before mdev release the
+>> reference to device.
+>>>>
+>>>> I know that get_device() and put_device() are GPL symbols and that's
+>>>> a bit of an issue, but I don't think we should be kludging the code
+>>>> for a vendor driver that might have problems with that.  A) we're
+>>>> using the caller provided device  for the uevent, B) we're only
+>>>> releasing our own reference to the device that was acquired during
+>>>> registration, the vendor driver must have other references,
+>>>
+>>> Are you going to assume that someone/vendor driver is always going to
+>>> do right thing?
+>>
+>> mdev is a kernel driver, we make reasonable assumptions that other drivers
+>> interact with it correctly.
+>>
+> That is right.
+> Vendor drivers must invoke mdev_register_device() and mdev_unregister_device() only once.
+> And it must have a valid reference to the device for which it is invoking it.
+> This is basic programming practice that a given driver has to follow.
+> mdev_register_device() has a loop to check. It needs to WARN_ON there if there are duplicate registration.
+> Similarly on mdev_unregister_device() to have WARN_ON if device is not found.
 
-For lookup_s2_mmu(), sometimes we take kvm->lock, sometimes we take
-kvm->mmu_lock instead (without the other being taken). The comment above
-lookup_s2_mmu() suggest kvm->lock is the one that should be taken, but
-I'm not sure which is the correct one.
-
-Should the code here be something like the following?
-
-	mutex_lock(&vcpu->kvm->lock);
-
-	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
-	if (!mmu)
-		mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
-
-	if (mmu) {
-		spin_lock(&vcpu->kvm->mmu_lock);
-		kvm_unmap_stage2_range(...);
-		spin_unlock(&vcpu->kvm_mmu_lock);
-	}
-	mutex_unlock(&vcpu->kvm->lock);
+If assumption is vendor driver is always going to do right way, then why
+need check for duplicate registration? vendor driver is always going to
+do it right way, right?
 
 
-Overall, there seems to be other places where lookup_s2_mmu() is called
-only with kvm->mmu_lock taken instead of kvm->lock. Should the comment
-be fixed to kvm->mmu_lock and callers taking only kvm->lock (i.e.
-creation/destruction of s2_mmu) be updated?
-
-
-> +
-> +	return true;
-> +}
-> +
-> +static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			    const struct sys_reg_desc *r)
-> +{
-> +	u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-> +	struct kvm_s2_mmu *mmu;
-> +	int sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-> +
-> +	/*
-> +	 * TODO: Revisit this comment:
-> +	 *
-> +	 * If we can't find a shadow VMID, it is either the virtual
-> +	 * VMID is for the host OS or the nested VM having the virtual
-> +	 * VMID is never executed. (Note that we create a showdow VMID
-> +	 * when entering a VM.) For the former, we can flush TLB
-> +	 * entries belonging to the host OS in a VM. For the latter, we
-> +	 * don't have to do anything. Since we can't differentiate
-> +	 * between those cases, just do what we can do for the former.
-> +	 */
-> +
-> +	mutex_lock(&vcpu->kvm->lock);
-> +	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
-> +	if (mmu)
-> +		kvm_call_hyp(__kvm_tlb_el1_instr,
-> +			     mmu, p->regval, sys_encoding);
-> +
-> +	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
-> +	if (mmu)
-> +		kvm_call_hyp(__kvm_tlb_el1_instr,
-> +			     mmu, p->regval, sys_encoding);
-> +	mutex_unlock(&vcpu->kvm->lock);
-> +
-> +	return true;
-> +}
-> +
->  /*
->   * AT instruction emulation
->   *
-> @@ -2333,12 +2506,40 @@ static struct sys_reg_desc sys_insn_descs[] = {
->  	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
->  	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
->  
-> +	SYS_INSN_TO_DESC(TLBI_VMALLE1IS, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAE1IS, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_ASIDE1IS, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAAE1IS, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VALE1IS, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAALE1IS, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VMALLE1, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAE1, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_ASIDE1, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAAE1, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VALE1, handle_tlbi_el1, forward_ttlb_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAALE1, handle_tlbi_el1, forward_ttlb_traps),
-> +
->  	SYS_INSN_TO_DESC(AT_S1E2R, handle_s1e2, forward_nv_traps),
->  	SYS_INSN_TO_DESC(AT_S1E2W, handle_s1e2, forward_nv_traps),
->  	SYS_INSN_TO_DESC(AT_S12E1R, handle_s12r, forward_nv_traps),
->  	SYS_INSN_TO_DESC(AT_S12E1W, handle_s12w, forward_nv_traps),
->  	SYS_INSN_TO_DESC(AT_S12E0R, handle_s12r, forward_nv_traps),
->  	SYS_INSN_TO_DESC(AT_S12E0W, handle_s12w, forward_nv_traps),
-> +
-> +	SYS_INSN_TO_DESC(TLBI_IPAS2E1IS, handle_ipas2e1is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_IPAS2LE1IS, handle_ipas2e1is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_ALLE2IS, handle_alle2is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAE2IS, handle_vae2, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_ALLE1IS, handle_alle1is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VALE2IS, handle_vae2, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VMALLS12E1IS, handle_vmalls12e1is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_IPAS2E1, handle_ipas2e1is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_IPAS2LE1, handle_ipas2e1is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_ALLE2, handle_alle2is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VAE2, handle_vae2, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_ALLE1, handle_alle1is, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VALE2, handle_vae2, forward_nv_traps),
-> +	SYS_INSN_TO_DESC(TLBI_VMALLS12E1, handle_vmalls12e1is, forward_nv_traps),
->  };
->  
->  static bool trap_dbgidr(struct kvm_vcpu *vcpu,
-> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-> index 6a7cba077bce..0ea79e543b29 100644
-> --- a/virt/kvm/arm/mmu.c
-> +++ b/virt/kvm/arm/mmu.c
-> @@ -51,7 +51,23 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
->   */
->  void kvm_flush_remote_tlbs(struct kvm *kvm)
->  {
-> -	kvm_call_hyp(__kvm_tlb_flush_vmid, &kvm->arch.mmu);
-> +	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-> +
-> +	if (mmu == &kvm->arch.mmu) {
-> +		/*
-> +		 * For a normal (i.e. non-nested) guest, flush entries for the
-> +		 * given VMID *
-> +		 */
-> +		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> +	} else {
-> +		/*
-> +		 * When supporting nested virtualization, we can have multiple
-> +		 * VMIDs in play for each VCPU in the VM, so it's really not
-> +		 * worth it to try to quiesce the system and flush all the
-> +		 * VMIDs that may be in use, instead just nuke the whole thing.
-> +		 */
-> +		kvm_call_hyp(__kvm_flush_vm_context);
-> +	}
->  }
->  
->  static void kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa)
+> It was in my TODO list to submit those patches.
+> I was still thinking to that mdev_register_device() should return mdev_parent and mdev_unregister_device() should accept mdev_parent pointer, instead of WARN_ON on unregister().
 > 
+> 
+>>>> C) the parent device
+>>>> generally lives on a bus, with a vendor driver, there's an entire
+>>>> ecosystem of references to the device below mdev.  Is this a
+>>>> paranoia request or are you really concerned that your PCI device suddenly
+>>>> disappears when mdev's reference to it disappears.
+>>>
+>>> mdev infrastructure is not always used by PCI devices. It is designed
+>>> to be generic, so that other devices (other than PCI devices) can also
+>>> use this framework.
+>>
+>> Obviously mdev is not PCI specific, I only mention it because I'm asking if you
+>> have a specific concern in mind.  If you did, I'd assume it's related to a PCI
+>> backed vGPU.
 
-Cheers,
+Its not always good to assume certain things.
 
--- 
-Julien Thierry
+>> Any physical parent device of an mdev is likely to have some sort
+>> of bus infrastructure behind it holding references to the device (ie. a probe and
+>> release where an implicit reference is held between these points).  A virtual
+>> device would be similar, it's created as part of a module init and destroyed as
+>> part of a module exit, where mdev registration would exist between these
+>> points.
+>>
+>>> If there is a assumption that user of mdev framework or vendor drivers
+>>> are always going to use mdev in right way, then there is no need for
+>>> mdev core to held reference of the device?
+>>> This is not a "paranoia request". This is more of a ideal scenario,
+>>> mdev should use device by holding its reference rather than assuming
+>>> (or relying on) someone else holding the reference of device.
+>>
+>> In fact, at one point Parav was proposing removing these references entirely,
+>> but Connie and I both felt uncomfortable about that.  I think it's good practice
+>> that mdev indicates the use of the parent device by incrementing the reference
+>> count, with each child mdev device also taking a reference, but those
+>> references balance out within the mdev core.  Their purpose is not to maintain
+>> the device for outside callers, nor should outside callers assume mdev's use of
+>> references to release their own.  I don't think it's unreasonable to assume that
+>> the caller should have a legitimate reference to the object it's providing to this
+>> function and therefore we should be able to use it after mdev's internal
+>> references are balanced out.  Thanks,
+>>
+
+I'm not fully convinced with what is the advantage of sending uevent
+after releasing reference to device or disadvantage of sending uevent
+before releasing reference to device.
+
+Still if you want to go ahead with this change, please add a check or
+assert if (dev != NULL) and add an comment highlighting the assumption.
+
+Thanks,
+Kirti
