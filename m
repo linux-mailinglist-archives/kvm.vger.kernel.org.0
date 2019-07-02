@@ -2,193 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D5D45D480
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 18:43:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C41745D483
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2019 18:43:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726401AbfGBQnh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 12:43:37 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:41068 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726150AbfGBQng (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 12:43:36 -0400
-Received: by mail-wr1-f65.google.com with SMTP id c2so18627376wrm.8
-        for <kvm@vger.kernel.org>; Tue, 02 Jul 2019 09:43:34 -0700 (PDT)
+        id S1726664AbfGBQno (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 12:43:44 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:45037 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726252AbfGBQno (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jul 2019 12:43:44 -0400
+Received: by mail-pl1-f194.google.com with SMTP id t7so649886plr.11
+        for <kvm@vger.kernel.org>; Tue, 02 Jul 2019 09:43:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=EhbxKamQ/0wcCBw8Yoh4Shb8CTX+GKo2JiJWkV2KXHc=;
+        b=lFvpgI2pyYrEOdvzBQyY1JqSyHkiYhPWrQGc0QhVS00M3WsXtcN8C78mjb1+wL9NKl
+         LpYnmaACHpMp74bZ+XLWDw3/IW8MGb3jz23AAIag6RQ8enzeuA7c2vDAnPYkTnsOVAEb
+         1cdmIXelSyhWJ/yewQDOKka+JQ7VHWZ7ib3V9tAXRwuwhpJMgpM4af3W/XV6/KPlsTc7
+         FEG7O0g6V4hFXqNKSREGuYUr/RB2YuIpAyEKBQKwI9nbXv+u5P2z1IU6mnKXPA3VJv1b
+         v8INRjikKJH/s2cwCTCxH7ZIXTFgRX62MYerEx98/7z22SM9xhTozTlvSsgK6lbgJXUZ
+         9Abg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=kV2rDBr8f3q9kLby6YRxl8ZXleRdsPAklKANirTDrb4=;
-        b=Flv+06URQWeDgFUDdvWF6ibY1zu2+BnyZEyaXf4eSpzj16Pf5KM9DcZ7gyXIGW5KFu
-         90/PowyqsBRGeUDJy4GwCbnUqzfO/mVJKKwzzG/K4I4gehqsYxprjpsq9lSXvWCduKvr
-         S0jo6nzfyiCpRyYW2CJrDClEjfB2Ijd8zWoIjRx0H/ltCdWd9dNqndJ4MwM23eYsevsR
-         qf7oxJcnmBqCN01XIktPQ+7fG0N9TJHVOWR1oxuAF3sDa7TpZrwWU9Mi7m96hhxwhWsS
-         V2gMtdgYkXEfFPOXMXWTRiKChooSNpYqpxsL6C9JUxeXpWmRjiXN9/KIzFM+K0woV3Er
-         xiww==
-X-Gm-Message-State: APjAAAX7C5oA9a2KsH8X+jln93lYKoknqxutXlKSsrpLe2mDaAHS6Hn8
-        ePqkbQvVJe6M4fWs7eyYJ+heOQ==
-X-Google-Smtp-Source: APXvYqyCjkw4IWIQFh2eWCekFXDCVrk3wVqWTz5BvaxR3YLEORVKvovktt+CsNcs/+L6TdZmGAhXPg==
-X-Received: by 2002:a5d:500f:: with SMTP id e15mr12587591wrt.41.1562085814230;
-        Tue, 02 Jul 2019 09:43:34 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b8:794:183e:9e2a? ([2001:b07:6468:f312:b8:794:183e:9e2a])
-        by smtp.gmail.com with ESMTPSA id z1sm15403353wrv.90.2019.07.02.09.43.33
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 02 Jul 2019 09:43:33 -0700 (PDT)
-Subject: Re: [PATCH] KVM: LAPIC: Fix pending interrupt in IRR blocked by
- software disable LAPIC
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Rong Chen <rong.a.chen@intel.com>,
-        Feng Tang <feng.tang@intel.com>, stable@vger.kernel.org
-References: <1562059502-8581-1-git-send-email-wanpengli@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c75371c8-7dbc-7ce8-c0f3-0396305b896b@redhat.com>
-Date:   Tue, 2 Jul 2019 18:43:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <1562059502-8581-1-git-send-email-wanpengli@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=EhbxKamQ/0wcCBw8Yoh4Shb8CTX+GKo2JiJWkV2KXHc=;
+        b=ACG17PdWTG/DN+xepNkq98zaHmZNlbZvBeQC3la73PanFTo0MkrcPAH47b7xjZGuGl
+         imRt5vstzD/4FuTl9yNvARinRLiL2PKqjH04UWOUykjoN6IKThjjIcn2OI3HWSGNSbQP
+         tTlZjtmkdP9WNng9GkUwfAW+8RhwsiiYxCs/KfcXd2OP6G2qDfUDm25wVQeLW+Vn9wYz
+         /FbkGVPV3NDk6+GLe+qDuW6HUimri2CrXOIcnqgXFK035YLm5LBbmGT6sHXNYyyf1/qq
+         3FdUtO/k7dYYsVfVoVJsP1E3tHbwwJ4E50zMiO8Y86TEdmO1NYk/Giy2Do2BQ2M80i9N
+         +Igg==
+X-Gm-Message-State: APjAAAW5sicp9wGBNgLu0x2N6Ag8NaqeG8VKQmar4uHFYlaGWtIpxRvH
+        RL9vqzUEDUAaVRc52syrkAeUQpi+z9k=
+X-Google-Smtp-Source: APXvYqyX81k8OvnUq31pNmGqIXZOrhiR4cB2Szi500LwBOwDAzHpIgJHwAFKAuKx54uGSF2sYjTfrw==
+X-Received: by 2002:a17:902:4643:: with SMTP id o61mr35930144pld.101.1562085823316;
+        Tue, 02 Jul 2019 09:43:43 -0700 (PDT)
+Received: from [10.2.189.129] ([66.170.99.2])
+        by smtp.gmail.com with ESMTPSA id o13sm3107398pje.28.2019.07.02.09.43.41
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 02 Jul 2019 09:43:41 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [kvm-unit-tests PATCH 3/3] x86: Support environments without
+ test-devices
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <2e359eb2-4b2a-0a52-6c43-cd6037bb72ae@redhat.com>
+Date:   Tue, 2 Jul 2019 09:43:40 -0700
+Cc:     kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <F3480C92-28D8-470A-9E34-E87ECCE4FDD1@gmail.com>
+References: <20190628203019.3220-1-nadav.amit@gmail.com>
+ <20190628203019.3220-4-nadav.amit@gmail.com>
+ <2e359eb2-4b2a-0a52-6c43-cd6037bb72ae@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/07/19 11:25, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
-> 
-> Thomas reported that:
-> 
->  | Background:
->  | 
->  |    In preparation of supporting IPI shorthands I changed the CPU offline
->  |    code to software disable the local APIC instead of just masking it.
->  |    That's done by clearing the APIC_SPIV_APIC_ENABLED bit in the APIC_SPIV
->  |    register.
->  | 
->  | Failure:
->  | 
->  |    When the CPU comes back online the startup code triggers occasionally
->  |    the warning in apic_pending_intr_clear(). That complains that the IRRs
->  |    are not empty.
->  | 
->  |    The offending vector is the local APIC timer vector who's IRR bit is set
->  |    and stays set.
->  | 
->  | It took me quite some time to reproduce the issue locally, but now I can
->  | see what happens.
->  | 
->  | It requires apicv_enabled=0, i.e. full apic emulation. With apicv_enabled=1
->  | (and hardware support) it behaves correctly.
->  | 
->  | Here is the series of events:
->  | 
->  |     Guest CPU
->  | 
->  |     goes down
->  | 
->  |       native_cpu_disable()		
->  | 
->  | 			apic_soft_disable();
->  | 
->  |     play_dead()
->  | 
->  |     ....
->  | 
->  |     startup()
->  | 
->  |       if (apic_enabled())
->  |         apic_pending_intr_clear()	<- Not taken
->  | 
->  |      enable APIC
->  | 
->  |         apic_pending_intr_clear()	<- Triggers warning because IRR is stale
->  | 
->  | When this happens then the deadline timer or the regular APIC timer -
->  | happens with both, has fired shortly before the APIC is disabled, but the
->  | interrupt was not serviced because the guest CPU was in an interrupt
->  | disabled region at that point.
->  | 
->  | The state of the timer vector ISR/IRR bits:
->  | 
->  |     	     	       	        ISR     IRR
->  | before apic_soft_disable()    0	      1
->  | after apic_soft_disable()     0	      1
->  | 
->  | On startup		      		 0	      1
->  | 
->  | Now one would assume that the IRR is cleared after the INIT reset, but this
->  | happens only on CPU0.
->  | 
->  | Why?
->  | 
->  | Because our CPU0 hotplug is just for testing to make sure nothing breaks
->  | and goes through an NMI wakeup vehicle because INIT would send it through
->  | the boots-trap code which is not really working if that CPU was not
->  | physically unplugged.
->  | 
->  | Now looking at a real world APIC the situation in that case is:
->  | 
->  |     	     	       	      	ISR     IRR
->  | before apic_soft_disable()    0	      1
->  | after apic_soft_disable()     0	      1
->  | 
->  | On startup		      		 0	      0
->  | 
->  | Why?
->  | 
->  | Once the dying CPU reenables interrupts the pending interrupt gets
->  | delivered as a spurious interupt and then the state is clear.
->  | 
->  | While that CPU0 hotplug test case is surely an esoteric issue, the APIC
->  | emulation is still wrong, Even if the play_dead() code would not enable
->  | interrupts then the pending IRR bit would turn into an ISR .. interrupt
->  | when the APIC is reenabled on startup.
-> 
-> 
-> From SDM 10.4.7.2 Local APIC State After It Has Been Software Disabled
-> * Pending interrupts in the IRR and ISR registers are held and require
->   masking or handling by the CPU.
-> 
-> In Thomas's testing, hardware cpu will not respect soft disable LAPIC 
-> when IRR has already been set or APICv posted-interrupt is in flight, 
-> so we can skip soft disable APIC checking when clearing IRR and set ISR,
-> continue to respect soft disable APIC when attempting to set IRR.
-> 
-> Reported-by: Rong Chen <rong.a.chen@intel.com>
-> Reported-by: Feng Tang <feng.tang@intel.com>
-> Reported-by: Thomas Gleixner <tglx@linutronix.de>
-> Tested-by: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Rong Chen <rong.a.chen@intel.com>
-> Cc: Feng Tang <feng.tang@intel.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/lapic.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 05d8934..f857a12 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2376,7 +2376,7 @@ int kvm_apic_has_interrupt(struct kvm_vcpu *vcpu)
->  	struct kvm_lapic *apic = vcpu->arch.apic;
->  	u32 ppr;
->  
-> -	if (!apic_enabled(apic))
-> +	if (!kvm_apic_hw_enabled(apic))
->  		return -1;
->  
->  	__apic_update_ppr(apic, &ppr);
-> 
+> On Jul 2, 2019, at 9:08 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 28/06/19 22:30, Nadav Amit wrote:
+>> Enable to run the tests when test-device is not present (e.g.,
+>> bare-metal). Users can provide the number of CPUs and ram size =
+through
+>> kernel parameters.
+>>=20
+>> On Ubuntu, for example, the tests can be run by copying a test to the
+>> boot directory (/boot) and adding a menuentry to grub (editing
+>> /etc/grub.d/40_custom):
+>>=20
+>>  menuentry 'idt_test' {
+>> 	set root=3D'ROOT'
+>> 	multiboot BOOT_RELATIVE/idt_test.flat ignore nb_cpus=3D48 \
+>> 		ram_size=3D4294967296 no-test-device
+>>  }
+>>=20
+>> Replace ROOT with `grub-probe --target=3Dbios_hints /boot` and
+>> BOOT_RELATIVE with `grub-mkrelpath /boot`, and run update-grub.
+>>=20
+>> Note that the first kernel parameter is ignored for compatibility =
+with
+>> test executions through QEMU.
+>>=20
+>> Remember that the output goes to the serial port.
+>=20
+> RAM size can use the multiboot info (see lib/x86/setup.c).
 
-Queued, thanks.
+The multiboot info, as provided by the boot-loader is not good enough as =
+far
+as I remember. The info just defines where to kernel can be loaded, but =
+does
+not say how big the memory is. For that, e820 decoding is needed, which =
+I
+was too lazy to do.
 
-Paolo
+> For the # of CPUs I'm not sure what you're supposed to do on bare =
+metal
+> though. :)
+
+I know you are not =E2=80=9Cserious=E2=80=9D, but I=E2=80=99ll use this =
+opportunity for a small
+clarification. You do need to provide the real number of CPUs as =
+otherwise
+things will fail. I do not use cpuid, as my machine, for example has two
+sockets. Decoding the ACPI tables is the right way, but I was too lazy =
+to
+implement it.
+
