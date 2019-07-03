@@ -2,191 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D7605EDAD
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 22:35:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 92F605EE36
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 23:16:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727384AbfGCUfB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 16:35:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43944 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727340AbfGCUfA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 16:35:00 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 434955944C;
-        Wed,  3 Jul 2019 20:34:55 +0000 (UTC)
-Received: from x1.home (ovpn-116-83.phx2.redhat.com [10.3.116.83])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3E4FC18248;
-        Wed,  3 Jul 2019 20:34:52 +0000 (UTC)
-Date:   Wed, 3 Jul 2019 14:34:51 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc:     <eric.auger@redhat.com>, <pmorel@linux.vnet.ibm.com>,
-        <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <iommu@lists.linux-foundation.org>, <linuxarm@huawei.com>,
-        <john.garry@huawei.com>, <xuwei5@hisilicon.com>,
-        <kevin.tian@intel.com>
-Subject: Re: [PATCH v7 3/6] vfio/type1: Update iova list on detach
-Message-ID: <20190703143451.0ae4e9f7@x1.home>
-In-Reply-To: <20190626151248.11776-4-shameerali.kolothum.thodi@huawei.com>
-References: <20190626151248.11776-1-shameerali.kolothum.thodi@huawei.com>
-        <20190626151248.11776-4-shameerali.kolothum.thodi@huawei.com>
-Organization: Red Hat
+        id S1727123AbfGCVQr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 17:16:47 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:38453 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726736AbfGCVQr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 17:16:47 -0400
+Received: by mail-wm1-f67.google.com with SMTP id s15so3851967wmj.3
+        for <kvm@vger.kernel.org>; Wed, 03 Jul 2019 14:16:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Cb6cs+J8YgtLbQvkaF4nD0BlhdTGhrZKIXbtXveX9a0=;
+        b=HAqygQmOwbYK/XxVD+AoK+rQzC+/5sa9jxlOZlFhRJIDATvSXCkhR07w7eZAXG/yuP
+         /DVShsoREuO9gl9wkuOogAvPqK6PzcufgmEoASIgmAZ9XjZqHgMa9uJ95M8KPoRJSJ5g
+         HNAv99ukpGwpgbjggMGYu7NuzViDUG5EnPYGMs2zGkjj/AweXDfggukkd3T9VvYfQo5+
+         hjDD0ajWSY6DlJUz+nydZv+hy0AspFFai6+KljDi6VN+GxlLEzMYoFmcby9AIvIxlegM
+         4hMT24hTxweEKY9MHWnsXCwFbEyu4/ihTYJUyG++dZL3alxOnzvdi5mE69p7B7fLzHu6
+         3Bjg==
+X-Gm-Message-State: APjAAAVmkteZtuWJNErtPQqGPFPMAhN8xz/KO/YmSQvNZ/xLxMpoRbfi
+        2hIpBxXKSwJ84fiorftJVWoGQLNxl+lUsQ==
+X-Google-Smtp-Source: APXvYqwQk4FOnYNfUTTlQZmZVProuL9/nRP3ceH5DgB4GJIhMd/A2hZ8UKJXPf7P1xf8IuAEA+BG6Q==
+X-Received: by 2002:a7b:cd9a:: with SMTP id y26mr9758082wmj.44.1562188605235;
+        Wed, 03 Jul 2019 14:16:45 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e5b7:d6bb:ed2d:4d20? ([2001:b07:6468:f312:e5b7:d6bb:ed2d:4d20])
+        by smtp.gmail.com with ESMTPSA id v4sm3501094wmg.22.2019.07.03.14.16.44
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Wed, 03 Jul 2019 14:16:44 -0700 (PDT)
+Subject: Re: [PATCH 1/6] KVM: x86: Add callback functions for handling APIC
+ ID, DFR and LDR update
+To:     "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     "joro@8bytes.org" <joro@8bytes.org>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>
+References: <20190322115702.10166-1-suravee.suthikulpanit@amd.com>
+ <20190322115702.10166-2-suravee.suthikulpanit@amd.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <15e1b25c-906a-03dd-cb69-6b99c8c98ff7@redhat.com>
+Date:   Wed, 3 Jul 2019 23:16:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190322115702.10166-2-suravee.suthikulpanit@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Wed, 03 Jul 2019 20:35:00 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 26 Jun 2019 16:12:45 +0100
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+On 22/03/19 12:57, Suthikulpanit, Suravee wrote:
+> Add hooks for handling the case when guest VM update APIC ID, DFR and LDR.
+> This is needed during AMD AVIC is temporary deactivated.
+> 
+> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 
-> Get a copy of iova list on _group_detach and try to update the list.
-> On success replace the current one with the copy. Leave the list as
-> it is if update fails.
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Why not do this later when AVIC is reactivated, in
+svm_refresh_apicv_exec_ctrl?
+
+Thanks,
+
+Paolo
+
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 91 +++++++++++++++++++++++++++++++++
->  1 file changed, 91 insertions(+)
+>  arch/x86/include/asm/kvm_host.h | 3 +++
+>  arch/x86/kvm/lapic.c            | 6 ++++++
+>  2 files changed, 9 insertions(+)
 > 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index b6bfdfa16c33..e872fb3a0f39 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -1873,12 +1873,88 @@ static void vfio_sanity_check_pfn_list(struct vfio_iommu *iommu)
->  	WARN_ON(iommu->notifier.head);
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index a5db4475e72d..1906e205e6a3 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1077,6 +1077,9 @@ struct kvm_x86_ops {
+>  	void (*refresh_apicv_exec_ctrl)(struct kvm_vcpu *vcpu);
+>  	void (*hwapic_irr_update)(struct kvm_vcpu *vcpu, int max_irr);
+>  	void (*hwapic_isr_update)(struct kvm_vcpu *vcpu, int isr);
+> +	void (*hwapic_apic_id_update)(struct kvm_vcpu *vcpu);
+> +	void (*hwapic_dfr_update)(struct kvm_vcpu *vcpu);
+> +	void (*hwapic_ldr_update)(struct kvm_vcpu *vcpu);
+>  	bool (*guest_apic_has_interrupt)(struct kvm_vcpu *vcpu);
+>  	void (*load_eoi_exitmap)(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap);
+>  	void (*set_virtual_apic_mode)(struct kvm_vcpu *vcpu);
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 991fdf7fc17f..95295cf81283 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -262,12 +262,16 @@ static inline void apic_set_spiv(struct kvm_lapic *apic, u32 val)
+>  static inline void kvm_apic_set_xapic_id(struct kvm_lapic *apic, u8 id)
+>  {
+>  	kvm_lapic_set_reg(apic, APIC_ID, id << 24);
+> +	if (kvm_x86_ops->hwapic_apic_id_update)
+> +		kvm_x86_ops->hwapic_apic_id_update(apic->vcpu);
+>  	recalculate_apic_map(apic->vcpu->kvm);
 >  }
 >  
-> +/*
-> + * Called when a domain is removed in detach. It is possible that
-> + * the removed domain decided the iova aperture window. Modify the
-> + * iova aperture with the smallest window among existing domains.
-> + */
-> +static void vfio_iommu_aper_expand(struct vfio_iommu *iommu,
-> +				   struct list_head *iova_copy)
-> +{
-> +	struct vfio_domain *domain;
-> +	struct iommu_domain_geometry geo;
-> +	struct vfio_iova *node;
-> +	dma_addr_t start = 0;
-> +	dma_addr_t end = (dma_addr_t)~0;
-> +
-> +	list_for_each_entry(domain, &iommu->domain_list, next) {
-> +		iommu_domain_get_attr(domain->domain, DOMAIN_ATTR_GEOMETRY,
-> +				      &geo);
-> +		if (geo.aperture_start > start)
-> +			start = geo.aperture_start;
-> +		if (geo.aperture_end < end)
-> +			end = geo.aperture_end;
-> +	}
-> +
-> +	/* Modify aperture limits. The new aper is either same or bigger */
-> +	node = list_first_entry(iova_copy, struct vfio_iova, list);
-> +	node->start = start;
-> +	node = list_last_entry(iova_copy, struct vfio_iova, list);
-> +	node->end = end;
-> +}
-> +
-> +/*
-> + * Called when a group is detached. The reserved regions for that
-> + * group can be part of valid iova now. But since reserved regions
-> + * may be duplicated among groups, populate the iova valid regions
-> + * list again.
-> + */
-> +static int vfio_iommu_resv_refresh(struct vfio_iommu *iommu,
-> +				   struct list_head *iova_copy)
-> +{
-> +	struct vfio_domain *d;
-> +	struct vfio_group *g;
-> +	struct vfio_iova *node;
-> +	dma_addr_t start, end;
-> +	LIST_HEAD(resv_regions);
-> +	int ret;
-> +
-> +	list_for_each_entry(d, &iommu->domain_list, next) {
-> +		list_for_each_entry(g, &d->group_list, next)
-> +			iommu_get_group_resv_regions(g->iommu_group,
-> +						     &resv_regions);
-
-Need to account for failure case here too.
-
-> +	}
-> +
-> +	if (list_empty(&resv_regions))
-> +		return 0;
-> +
-> +	node = list_first_entry(iova_copy, struct vfio_iova, list);
-> +	start = node->start;
-> +	node = list_last_entry(iova_copy, struct vfio_iova, list);
-> +	end = node->end;
-> +
-> +	/* purge the iova list and create new one */
-> +	vfio_iommu_iova_free(iova_copy);
-> +
-> +	ret = vfio_iommu_aper_resize(iova_copy, start, end);
-> +	if (ret)
-> +		goto done;
-> +
-> +	/* Exclude current reserved regions from iova ranges */
-> +	ret = vfio_iommu_resv_exclude(iova_copy, &resv_regions);
-> +done:
-> +	vfio_iommu_resv_free(&resv_regions);
-> +	return ret;
-> +}
-> +
->  static void vfio_iommu_type1_detach_group(void *iommu_data,
->  					  struct iommu_group *iommu_group)
+>  static inline void kvm_apic_set_ldr(struct kvm_lapic *apic, u32 id)
 >  {
->  	struct vfio_iommu *iommu = iommu_data;
->  	struct vfio_domain *domain;
->  	struct vfio_group *group;
-> +	bool iova_copy_fail;
-> +	LIST_HEAD(iova_copy);
+>  	kvm_lapic_set_reg(apic, APIC_LDR, id);
+> +	if (kvm_x86_ops->hwapic_ldr_update)
+> +		kvm_x86_ops->hwapic_ldr_update(apic->vcpu);
+>  	recalculate_apic_map(apic->vcpu->kvm);
+>  }
 >  
->  	mutex_lock(&iommu->lock);
->  
-> @@ -1901,6 +1977,12 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  		}
->  	}
->  
-> +	/*
-> +	 * Get a copy of iova list. If success, use copy to update the
-> +	 * list and to replace the current one.
-> +	 */
-> +	iova_copy_fail = !!vfio_iommu_iova_get_copy(iommu, &iova_copy);
-> +
->  	list_for_each_entry(domain, &iommu->domain_list, next) {
->  		group = find_iommu_group(domain, iommu_group);
->  		if (!group)
-> @@ -1926,10 +2008,19 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
->  			iommu_domain_free(domain->domain);
->  			list_del(&domain->next);
->  			kfree(domain);
-> +			if (!iova_copy_fail && !list_empty(&iommu->domain_list))
-> +				vfio_iommu_aper_expand(iommu, &iova_copy);
->  		}
->  		break;
->  	}
->  
-> +	if (!iova_copy_fail && !list_empty(&iommu->domain_list)) {
-> +		if (!vfio_iommu_resv_refresh(iommu, &iova_copy))
-> +			vfio_iommu_iova_insert_copy(iommu, &iova_copy);
-> +		else
-> +			vfio_iommu_iova_free(&iova_copy);
-> +	}
+> @@ -1836,6 +1840,8 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
+>  	case APIC_DFR:
+>  		if (!apic_x2apic_mode(apic)) {
+>  			kvm_lapic_set_reg(apic, APIC_DFR, val | 0x0FFFFFFF);
+> +			if (kvm_x86_ops->hwapic_dfr_update)
+> +				kvm_x86_ops->hwapic_dfr_update(apic->vcpu);
+>  			recalculate_apic_map(apic->vcpu->kvm);
+>  		} else
+>  			ret = 1;
+> 
 
-The iova_copy_fail and list_empty tests are rather ugly, could we avoid
-them by pushing the tests to the expand and refresh functions?  ie. it
-looks like vfio_iommu_aper_expand() could test list_empty(iova_copy),
-the list_for_each on domain_list doesn't need special handling.  Same
-for vfio_iommu_resv_refresh().  This would also fix the bug above that
-I think we don't free iova_copy if domain_list becomes empty during
-this operation.  Thanks,
-
-Alex
