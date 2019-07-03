@@ -2,34 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CD7ED5E5A8
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 15:43:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19D8D5E5B6
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 15:47:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726217AbfGCNnA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 09:43:00 -0400
-Received: from foss.arm.com ([217.140.110.172]:48302 "EHLO foss.arm.com"
+        id S1726255AbfGCNri (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 09:47:38 -0400
+Received: from foss.arm.com ([217.140.110.172]:48412 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725830AbfGCNnA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 09:43:00 -0400
+        id S1725830AbfGCNri (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 09:47:38 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E6A202B;
-        Wed,  3 Jul 2019 06:42:58 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C075A2B;
+        Wed,  3 Jul 2019 06:47:36 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 76CD23F718;
-        Wed,  3 Jul 2019 06:42:57 -0700 (PDT)
-Subject: Re: [PATCH 16/59] KVM: arm64: nv: Save/Restore vEL2 sysregs
-To:     Julien Thierry <julien.thierry@arm.com>,
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EFE253F718;
+        Wed,  3 Jul 2019 06:47:35 -0700 (PDT)
+Subject: Re: [PATCH 35/59] KVM: arm/arm64: nv: Support multiple nested stage 2
+ mmu structures
+To:     Alexandru Elisei <alexandru.elisei@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
 Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
+        Dave Martin <Dave.Martin@arm.com>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-17-marc.zyngier@arm.com>
- <800f3e9a-5b67-951b-34c2-60367c0697f9@arm.com>
+ <20190621093843.220980-36-marc.zyngier@arm.com>
+ <6a59df67-1b5e-6737-449c-d779537adf3e@arm.com>
 From:   Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
@@ -76,12 +73,12 @@ Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
  Z46HaNmN2hZS/oJ69c1DI5Rcww==
 Organization: ARM Ltd
-Message-ID: <7102a9ab-ede8-bd08-ce9b-12e3f36e40e1@arm.com>
-Date:   Wed, 3 Jul 2019 14:42:55 +0100
+Message-ID: <0e0de9a8-b165-572e-af8f-6828e7aee49f@arm.com>
+Date:   Wed, 3 Jul 2019 14:47:33 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <800f3e9a-5b67-951b-34c2-60367c0697f9@arm.com>
+In-Reply-To: <6a59df67-1b5e-6737-449c-d779537adf3e@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -90,136 +87,203 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/06/2019 09:48, Julien Thierry wrote:
-> 
-> 
-> On 06/21/2019 10:38 AM, Marc Zyngier wrote:
->> From: Andre Przywara <andre.przywara@arm.com>
+On 25/06/2019 13:19, Alexandru Elisei wrote:
+> On 6/21/19 10:38 AM, Marc Zyngier wrote:
+>> From: Christoffer Dall <christoffer.dall@arm.com>
 >>
->> Whenever we need to restore the guest's system registers to the CPU, we
->> now need to take care of the EL2 system registers as well. Most of them
->> are accessed via traps only, but some have an immediate effect and also
->> a guest running in VHE mode would expect them to be accessible via their
->> EL1 encoding, which we do not trap.
+>> Add stage 2 mmu data structures for virtual EL2 and for nested guests.
+>> We don't yet populate shadow stage 2 page tables, but we now have a
+>> framework for getting to a shadow stage 2 pgd.
 >>
->> Split the current __sysreg_{save,restore}_el1_state() functions into
->> handling common sysregs, then differentiate between the guest running in
->> vEL2 and vEL1.
+>> We allocate twice the number of vcpus as stage 2 mmu structures because
+>> that's sufficient for each vcpu running two VMs without having to flush
+>> the stage 2 page tables.
 >>
->> For vEL2 we write the virtual EL2 registers with an identical format directly
->> into their EL1 counterpart, and translate the few registers that have a
->> different format for the same effect on the execution when running a
->> non-VHE guest guest hypervisor.
->>
->>   [ Commit message reworked and many bug fixes applied by Marc Zyngier
->>     and Christoffer Dall. ]
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >> ---
->>  arch/arm64/kvm/hyp/sysreg-sr.c | 160 +++++++++++++++++++++++++++++++--
->>  1 file changed, 153 insertions(+), 7 deletions(-)
+>>  arch/arm/include/asm/kvm_host.h     |   4 +
+>>  arch/arm/include/asm/kvm_mmu.h      |   3 +
+>>  arch/arm64/include/asm/kvm_host.h   |  28 +++++
+>>  arch/arm64/include/asm/kvm_mmu.h    |   8 ++
+>>  arch/arm64/include/asm/kvm_nested.h |   7 ++
+>>  arch/arm64/kvm/nested.c             | 172 ++++++++++++++++++++++++++++
+>>  virt/kvm/arm/arm.c                  |  16 ++-
+>>  virt/kvm/arm/mmu.c                  |  31 ++---
+>>  8 files changed, 254 insertions(+), 15 deletions(-)
 >>
->> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
->> index 62866a68e852..2abb9c3ff24f 100644
->> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
->> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-> 
-> [...]
-> 
->> @@ -124,10 +167,91 @@ static void __hyp_text __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
->>  	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0],	tpidrro_el0);
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>> index e3217c4ad25b..b821eb2383ad 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -424,4 +424,8 @@ static inline bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
+>>  	return true;
 >>  }
 >>  
->> -static void __hyp_text __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
->> +static void __sysreg_restore_vel2_state(struct kvm_cpu_context *ctxt)
+>> +static inline void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu) {}
+>> +static inline void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu) {}
+>> +static inline int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu) { return 0; }
+>> +
+>>  #endif /* __ARM_KVM_HOST_H__ */
+>> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+>> index be23e3f8e08c..e6984b6da2ce 100644
+>> --- a/arch/arm/include/asm/kvm_mmu.h
+>> +++ b/arch/arm/include/asm/kvm_mmu.h
+>> @@ -420,6 +420,9 @@ static inline int hyp_map_aux_data(void)
+>>  
+>>  static inline void kvm_set_ipa_limit(void) {}
+>>  
+>> +static inline void kvm_init_s2_mmu(struct kvm_s2_mmu *mmu) {}
+>> +static inline void kvm_init_nested(struct kvm *kvm) {}
+>> +
+>>  static __always_inline u64 kvm_get_vttbr(struct kvm_s2_mmu *mmu)
 >>  {
->> +	u64 val;
->> +
->> +	write_sysreg(read_cpuid_id(),			vpidr_el2);
->>  	write_sysreg(ctxt->sys_regs[MPIDR_EL1],		vmpidr_el2);
->> -	write_sysreg(ctxt->sys_regs[CSSELR_EL1],	csselr_el1);
->> +	write_sysreg_el1(ctxt->sys_regs[MAIR_EL2],	SYS_MAIR);
->> +	write_sysreg_el1(ctxt->sys_regs[VBAR_EL2],	SYS_VBAR);
->> +	write_sysreg_el1(ctxt->sys_regs[CONTEXTIDR_EL2],SYS_CONTEXTIDR);
->> +	write_sysreg_el1(ctxt->sys_regs[AMAIR_EL2],	SYS_AMAIR);
->> +
->> +	if (__vcpu_el2_e2h_is_set(ctxt)) {
->> +		/*
->> +		 * In VHE mode those registers are compatible between
->> +		 * EL1 and EL2.
->> +		 */
->> +		write_sysreg_el1(ctxt->sys_regs[SCTLR_EL2],	SYS_SCTLR);
->> +		write_sysreg_el1(ctxt->sys_regs[CPTR_EL2],	SYS_CPACR);
->> +		write_sysreg_el1(ctxt->sys_regs[TTBR0_EL2],	SYS_TTBR0);
->> +		write_sysreg_el1(ctxt->sys_regs[TTBR1_EL2],	SYS_TTBR1);
->> +		write_sysreg_el1(ctxt->sys_regs[TCR_EL2],	SYS_TCR);
->> +		write_sysreg_el1(ctxt->sys_regs[CNTHCTL_EL2],	SYS_CNTKCTL);
->> +	} else {
->> +		write_sysreg_el1(translate_sctlr(ctxt->sys_regs[SCTLR_EL2]),
->> +				 SYS_SCTLR);
->> +		write_sysreg_el1(translate_cptr(ctxt->sys_regs[CPTR_EL2]),
->> +				 SYS_CPACR);
->> +		write_sysreg_el1(translate_ttbr0(ctxt->sys_regs[TTBR0_EL2]),
->> +				 SYS_TTBR0);
->> +		write_sysreg_el1(translate_tcr(ctxt->sys_regs[TCR_EL2]),
->> +				 SYS_TCR);
->> +		write_sysreg_el1(translate_cnthctl(ctxt->sys_regs[CNTHCTL_EL2]),
->> +				 SYS_CNTKCTL);
->> +	}
+>>  	struct kvm_vmid *vmid = &mmu->vmid;
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 3dee5e17a4ee..cc238de170d2 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -88,11 +88,39 @@ struct kvm_s2_mmu {
+>>  	phys_addr_t	pgd_phys;
+>>  
+>>  	struct kvm *kvm;
 >> +
 >> +	/*
->> +	 * These registers can be modified behind our back by a fault
->> +	 * taken inside vEL2. Save them, always.
+>> +	 * For a shadow stage-2 MMU, the virtual vttbr programmed by the guest
+>> +	 * hypervisor.  Unused for kvm_arch->mmu. Set to 1 when the structure
+>> +	 * contains no valid information.
 >> +	 */
->> +	write_sysreg_el1(ctxt->sys_regs[ESR_EL2],	SYS_ESR);
->> +	write_sysreg_el1(ctxt->sys_regs[AFSR0_EL2],	SYS_AFSR0);
->> +	write_sysreg_el1(ctxt->sys_regs[AFSR1_EL2],	SYS_AFSR1);
->> +	write_sysreg_el1(ctxt->sys_regs[FAR_EL2],	SYS_FAR);
->> +	write_sysreg(ctxt->sys_regs[SP_EL2],		sp_el1);
->> +	write_sysreg_el1(ctxt->sys_regs[ELR_EL2],	SYS_ELR);
+>> +	u64	vttbr;
 >> +
->> +	val = __fixup_spsr_el2_write(ctxt, ctxt->sys_regs[SPSR_EL2]);
->> +	write_sysreg_el1(val,	SYS_SPSR);
+>> +	/* true when this represents a nested context where virtual HCR_EL2.VM == 1 */
+>> +	bool	nested_stage2_enabled;
+>> +
+>> +	/*
+>> +	 *  0: Nobody is currently using this, check vttbr for validity
+>> +	 * >0: Somebody is actively using this.
+>> +	 */
+>> +	atomic_t refcnt;
+>>  };
+>>  
+>> +static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
+>> +{
+>> +	return !(mmu->vttbr & 1);
 >> +}
 >> +
->> +static void __hyp_text __sysreg_restore_vel1_state(struct kvm_cpu_context *ctxt)
+>>  struct kvm_arch {
+>>  	struct kvm_s2_mmu mmu;
+>>  
+>> +	/*
+>> +	 * Stage 2 paging stage for VMs with nested virtual using a virtual
+>> +	 * VMID.
+>> +	 */
+>> +	struct kvm_s2_mmu *nested_mmus;
+>> +	size_t nested_mmus_size;
+>> +
+>>  	/* VTCR_EL2 value for this VM */
+>>  	u64    vtcr;
+>>  
+>> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+>> index 1eb6e0ca61c2..32bcaa1845dc 100644
+>> --- a/arch/arm64/include/asm/kvm_mmu.h
+>> +++ b/arch/arm64/include/asm/kvm_mmu.h
+>> @@ -100,6 +100,7 @@ alternative_cb_end
+>>  #include <asm/mmu_context.h>
+>>  #include <asm/pgtable.h>
+>>  #include <asm/kvm_emulate.h>
+>> +#include <asm/kvm_nested.h>
+>>  
+>>  void kvm_update_va_mask(struct alt_instr *alt,
+>>  			__le32 *origptr, __le32 *updptr, int nr_inst);
+>> @@ -164,6 +165,7 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+>>  			     void **haddr);
+>>  void free_hyp_pgds(void);
+>>  
+>> +void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
+>>  void stage2_unmap_vm(struct kvm *kvm);
+>>  int kvm_alloc_stage2_pgd(struct kvm_s2_mmu *mmu);
+>>  void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+>> @@ -635,5 +637,11 @@ static __always_inline void __load_guest_stage2(struct kvm_s2_mmu *mmu)
+>>  	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_1165522));
+>>  }
+>>  
+>> +static inline u64 get_vmid(u64 vttbr)
 >> +{
->> +	u64 mpidr;
+>> +	return (vttbr & VTTBR_VMID_MASK(kvm_get_vmid_bits())) >>
+>> +		VTTBR_VMID_SHIFT;
+>> +}
 >> +
->> +	if (has_vhe()) {
->> +		struct kvm_vcpu *vcpu;
+>>  #endif /* __ASSEMBLY__ */
+>>  #endif /* __ARM64_KVM_MMU_H__ */
+>> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+>> index 61e71d0d2151..d4021d0892bd 100644
+>> --- a/arch/arm64/include/asm/kvm_nested.h
+>> +++ b/arch/arm64/include/asm/kvm_nested.h
+>> @@ -10,6 +10,13 @@ static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
+>>  		test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features);
+>>  }
+>>  
+>> +extern void kvm_init_nested(struct kvm *kvm);
+>> +extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
+>> +extern void kvm_init_s2_mmu(struct kvm_s2_mmu *mmu);
+>> +extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr);
+>> +extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
+>> +extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
 >> +
->> +		/*
->> +		 * Warning: this hack only works on VHE, because we only
->> +		 * call this with the *guest* context, which is part of
->> +		 * struct kvm_vcpu. On a host context, you'd get pure junk.
->> +		 */
->> +		vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
+>>  int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+>>  extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+>>  extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+>> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+>> index 3872e3cf1691..4b38dc5c0be3 100644
+>> --- a/arch/arm64/kvm/nested.c
+>> +++ b/arch/arm64/kvm/nested.c
+>> @@ -18,7 +18,161 @@
+>>  #include <linux/kvm.h>
+>>  #include <linux/kvm_host.h>
+>>  
+>> +#include <asm/kvm_arm.h>
+>>  #include <asm/kvm_emulate.h>
+>> +#include <asm/kvm_mmu.h>
+>> +#include <asm/kvm_nested.h>
+>> +
+>> +void kvm_init_nested(struct kvm *kvm)
+>> +{
+>> +	kvm_init_s2_mmu(&kvm->arch.mmu);
+>> +
+>> +	kvm->arch.nested_mmus = NULL;
+>> +	kvm->arch.nested_mmus_size = 0;
+>> +}
+>> +
+>> +int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct kvm *kvm = vcpu->kvm;
+>> +	struct kvm_s2_mmu *tmp;
+>> +	int num_mmus;
+>> +	int ret = -ENOMEM;
+>> +
+>> +	if (!test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features))
+>> +		return 0;
+>> +
+>> +	if (!cpus_have_const_cap(ARM64_HAS_NESTED_VIRT))
+>> +		return -EINVAL;
 > 
-> This seems very fragile, just to find out whether the guest has hyp
-> capabilities. It would be at least nice to make sure this is indeed a
-> guest context.
+> Here we fail if KVM_ARM_VCPU_NESTED_VIRT features was requested from the virtual
+> vcpu, but the nested capability isn't present. This function is called as a
+> result of the KVM_ARM_VCPU_INIT, and when this function fails, the
+> KVM_ARM_VCPU_INIT ioctl will also fail. This means that we cannot have a vcpu
+> with the nested virt feature on a system which doesn't support nested
+> virtualization.
+> 
+> However, commit 04/59 "KVM: arm64: nv: Introduce nested virtualization VCPU
+> feature" added the function nested_virt_in_use (in
+> arch/arm64/include/asm/kvm_nested.h) which checks for **both** conditions before
+> returning true. I believe the capability check is not required in
+> nested_virt_in_use.
 
-Oh come on! It is such a nice hack! ;-) I distinctly remember
-Christoffer being >that< close to vomiting when he saw that first.
-
-More seriously, we know what the context is by construction.
-
-> The *clean* way to do it could be to have a pointer to kvm_vcpu in the
-> kvm_cpu_context which would be NULL for host contexts.
-
-Funny you mention that. We have the exact opposite (host context
-pointing to the running vcpu, and NULL in the guest context). Maybe we
-can come up with something that always point to the vcpu, assuming
-nothing yet checks for NULL to identify a guest context! ;-)
-
-> Otherwise, I'm under the impression that for a host context,
-> ctxt->sys_reg[HCR_EL2] == 0 and that this would also be true for a guest
-> without nested virt capability. Could we use something like that here?
-
-Urgh. I think I'd prefer the above suggestion. Or even my hack.
+The capability check is a static branch, meaning that if there is no
+actual evaluation, just a branch. If you remove this branch, you end-up
+checking the feature bit even on systems that do not have NV, and that'd
+be a measurable performance drag.
 
 Thanks,
 
