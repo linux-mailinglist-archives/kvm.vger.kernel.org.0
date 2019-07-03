@@ -2,123 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 92F605EE36
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 23:16:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF63F5EECC
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 23:49:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727123AbfGCVQr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 17:16:47 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:38453 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726736AbfGCVQr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 17:16:47 -0400
-Received: by mail-wm1-f67.google.com with SMTP id s15so3851967wmj.3
-        for <kvm@vger.kernel.org>; Wed, 03 Jul 2019 14:16:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Cb6cs+J8YgtLbQvkaF4nD0BlhdTGhrZKIXbtXveX9a0=;
-        b=HAqygQmOwbYK/XxVD+AoK+rQzC+/5sa9jxlOZlFhRJIDATvSXCkhR07w7eZAXG/yuP
-         /DVShsoREuO9gl9wkuOogAvPqK6PzcufgmEoASIgmAZ9XjZqHgMa9uJ95M8KPoRJSJ5g
-         HNAv99ukpGwpgbjggMGYu7NuzViDUG5EnPYGMs2zGkjj/AweXDfggukkd3T9VvYfQo5+
-         hjDD0ajWSY6DlJUz+nydZv+hy0AspFFai6+KljDi6VN+GxlLEzMYoFmcby9AIvIxlegM
-         4hMT24hTxweEKY9MHWnsXCwFbEyu4/ihTYJUyG++dZL3alxOnzvdi5mE69p7B7fLzHu6
-         3Bjg==
-X-Gm-Message-State: APjAAAVmkteZtuWJNErtPQqGPFPMAhN8xz/KO/YmSQvNZ/xLxMpoRbfi
-        2hIpBxXKSwJ84fiorftJVWoGQLNxl+lUsQ==
-X-Google-Smtp-Source: APXvYqwQk4FOnYNfUTTlQZmZVProuL9/nRP3ceH5DgB4GJIhMd/A2hZ8UKJXPf7P1xf8IuAEA+BG6Q==
-X-Received: by 2002:a7b:cd9a:: with SMTP id y26mr9758082wmj.44.1562188605235;
-        Wed, 03 Jul 2019 14:16:45 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e5b7:d6bb:ed2d:4d20? ([2001:b07:6468:f312:e5b7:d6bb:ed2d:4d20])
-        by smtp.gmail.com with ESMTPSA id v4sm3501094wmg.22.2019.07.03.14.16.44
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 03 Jul 2019 14:16:44 -0700 (PDT)
-Subject: Re: [PATCH 1/6] KVM: x86: Add callback functions for handling APIC
- ID, DFR and LDR update
-To:     "Suthikulpanit, Suravee" <Suravee.Suthikulpanit@amd.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     "joro@8bytes.org" <joro@8bytes.org>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>
-References: <20190322115702.10166-1-suravee.suthikulpanit@amd.com>
- <20190322115702.10166-2-suravee.suthikulpanit@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <15e1b25c-906a-03dd-cb69-6b99c8c98ff7@redhat.com>
-Date:   Wed, 3 Jul 2019 23:16:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1727129AbfGCVtO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 17:49:14 -0400
+Received: from ozlabs.org ([203.11.71.1]:56685 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726550AbfGCVtO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 17:49:14 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 45fF9z1y9kz9s8m;
+        Thu,  4 Jul 2019 07:49:11 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1562190551;
+        bh=ogYrAdqmBL5sV/Ifv2mvi7wFD/kypvfY6pwW/9HHGMY=;
+        h=Date:From:To:Cc:Subject:From;
+        b=YnADNR5aXZq0RBozBxpyZRbBUhE18DQHskZE8/xRalMseUrvh7vA43ympqxzEm348
+         UBrkTnRCkrpl+pDakNk5nStyIHeI80uyW9lqSmWrbF6x2cOo1J+eu9r9cVzvBGMtAT
+         HxWpSZt0jyHwErnXuvnuulUjaYB4/UyIBBTuSO6QmPx49S78f2PTL3J0HVR3RjYzsj
+         9WBHrzV5jq5ubwXCT1/yM/8coPxhR4CDobL17fR1bCzVORjy9T43jC5zRVz+Pt4zWk
+         DrFYwaE9g86F0zAvRQswD8bfXmbZ6xMgSIbjc90ApRApxA16uKmD0BmoTDH4a7KCyo
+         nzwl0bIfG1rDA==
+Date:   Thu, 4 Jul 2019 07:49:08 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Radim =?UTF-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        KVM <kvm@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: linux-next: Fixes tags need some work in the kvm tree
+Message-ID: <20190704074908.5fb3d184@canb.auug.org.au>
 MIME-Version: 1.0
-In-Reply-To: <20190322115702.10166-2-suravee.suthikulpanit@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/.bYtCXpIAYKBGltV7yY8X/U"; protocol="application/pgp-signature"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/03/19 12:57, Suthikulpanit, Suravee wrote:
-> Add hooks for handling the case when guest VM update APIC ID, DFR and LDR.
-> This is needed during AMD AVIC is temporary deactivated.
-> 
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+--Sig_/.bYtCXpIAYKBGltV7yY8X/U
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Why not do this later when AVIC is reactivated, in
-svm_refresh_apicv_exec_ctrl?
+Hi all,
 
-Thanks,
+In commit
 
-Paolo
+  e8a70bd4e925 ("KVM: nVMX: allow setting the VMFUNC controls MSR")
 
-> ---
->  arch/x86/include/asm/kvm_host.h | 3 +++
->  arch/x86/kvm/lapic.c            | 6 ++++++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index a5db4475e72d..1906e205e6a3 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1077,6 +1077,9 @@ struct kvm_x86_ops {
->  	void (*refresh_apicv_exec_ctrl)(struct kvm_vcpu *vcpu);
->  	void (*hwapic_irr_update)(struct kvm_vcpu *vcpu, int max_irr);
->  	void (*hwapic_isr_update)(struct kvm_vcpu *vcpu, int isr);
-> +	void (*hwapic_apic_id_update)(struct kvm_vcpu *vcpu);
-> +	void (*hwapic_dfr_update)(struct kvm_vcpu *vcpu);
-> +	void (*hwapic_ldr_update)(struct kvm_vcpu *vcpu);
->  	bool (*guest_apic_has_interrupt)(struct kvm_vcpu *vcpu);
->  	void (*load_eoi_exitmap)(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap);
->  	void (*set_virtual_apic_mode)(struct kvm_vcpu *vcpu);
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 991fdf7fc17f..95295cf81283 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -262,12 +262,16 @@ static inline void apic_set_spiv(struct kvm_lapic *apic, u32 val)
->  static inline void kvm_apic_set_xapic_id(struct kvm_lapic *apic, u8 id)
->  {
->  	kvm_lapic_set_reg(apic, APIC_ID, id << 24);
-> +	if (kvm_x86_ops->hwapic_apic_id_update)
-> +		kvm_x86_ops->hwapic_apic_id_update(apic->vcpu);
->  	recalculate_apic_map(apic->vcpu->kvm);
->  }
->  
->  static inline void kvm_apic_set_ldr(struct kvm_lapic *apic, u32 id)
->  {
->  	kvm_lapic_set_reg(apic, APIC_LDR, id);
-> +	if (kvm_x86_ops->hwapic_ldr_update)
-> +		kvm_x86_ops->hwapic_ldr_update(apic->vcpu);
->  	recalculate_apic_map(apic->vcpu->kvm);
->  }
->  
-> @@ -1836,6 +1840,8 @@ int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
->  	case APIC_DFR:
->  		if (!apic_x2apic_mode(apic)) {
->  			kvm_lapic_set_reg(apic, APIC_DFR, val | 0x0FFFFFFF);
-> +			if (kvm_x86_ops->hwapic_dfr_update)
-> +				kvm_x86_ops->hwapic_dfr_update(apic->vcpu);
->  			recalculate_apic_map(apic->vcpu->kvm);
->  		} else
->  			ret = 1;
-> 
+Fixes tag
 
+  Fixes: 27c42a1bb ("KVM: nVMX: Enable VMFUNC for the L1 hypervisor", 2017-=
+08-03)
+
+has these problem(s):
+
+  - SHA1 should be at least 12 digits long
+    Can be fixed by setting core.abbrev to 12 (or more) or (for git v2.11
+    or later) just making sure it is not set (or set to "auto").
+  - The trailing date is unexpected.
+    Just use
+	git log -1 --format=3D'Fixes: %h ("%s")'
+
+In commit
+
+  6defc591846d ("KVM: nVMX: include conditional controls in /dev/kvm KVM_GE=
+T_MSRS")
+
+Fixes tag
+
+  Fixes: 1389309c811 ("KVM: nVMX: expose VMX capabilities for nested hyperv=
+isors to userspace", 2018-02-26)
+
+has these problem(s):
+
+  - SHA1 should be at least 12 digits long
+    Can be fixed by setting core.abbrev to 12 (or more) or (for git v2.11
+    or later) just making sure it is not set (or set to "auto").
+  - The trailing date is unexpected.
+    Just use
+	git log -1 --format=3D'Fixes: %h ("%s")'
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/.bYtCXpIAYKBGltV7yY8X/U
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl0dItQACgkQAVBC80lX
+0Gwv5wf9FteVffOioPU1RApnBCZ95sSTsrIv9feDYWWXcAB6wtw7eDLCrczS3Uda
++rT2sPpC9gkgsJXX6BnQ01FjOhbg1I8QTBTp9yJtOWNLxNxTlz94Vwz7YBmwjMCo
+SRPyLE4TUVGnb7v+T9Ge1AWHhQ1EgsU+l5JAGdiGIfzJ1m1NU1c3Xb172DBey1Pk
+VsuOwXbAjDE7YnL5PZF0dGDcqUly1SQ+CkB439DWf5YVutMCQLVP8cvKaHS3gyIS
+eq+po8CUylXVFVB/jjD03FGIyPDXBDAnHmqcgoQryxyQTy5XFnr/uB5GTLxXOZ9A
+kaOBIrrXWuirTQgGdSUYq0QedIq4+g==
+=zY54
+-----END PGP SIGNATURE-----
+
+--Sig_/.bYtCXpIAYKBGltV7yY8X/U--
