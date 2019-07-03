@@ -2,214 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B203B5E8A4
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 18:20:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 691605E8AD
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 18:23:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726656AbfGCQUZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 12:20:25 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:40676 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726473AbfGCQUZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 12:20:25 -0400
-Received: by mail-wr1-f68.google.com with SMTP id p11so3491836wre.7
-        for <kvm@vger.kernel.org>; Wed, 03 Jul 2019 09:20:23 -0700 (PDT)
+        id S1726876AbfGCQXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 12:23:07 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:52436 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725933AbfGCQXH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 12:23:07 -0400
+Received: by mail-wm1-f67.google.com with SMTP id s3so2838280wms.2
+        for <kvm@vger.kernel.org>; Wed, 03 Jul 2019 09:23:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=nQQIzDBT5ulmvCv1mGA/eYyAvfwknQmSWGz/saY1kAc=;
-        b=UW1OKI89lOWxIqO9ohUp/Wuzeo/7NjZp9uhfgGWJ/w1G3bM88vKKXSHrGZwCD6LaI5
-         BXycW/fPUPMu4b1tLVUcGc53vB/+6LZRY5+exepR81VXXxvSRYx95Zv9y1RvGTbDPJCR
-         yQJgQiFCaF3yiSpJykEBcPSLkdk2CnMIXmCwRru+bf0Jmkg+eUxqCP3DxqalaGeBdVKc
-         6SUtn9fUuO0L8jVmlHrjg/c8gOFfy35Je1mo8c/tAoWA78m4hm83rh/Qh6llZqZNu8kl
-         H4W3qxUHwo7dbXkMY/TEivaAhPVCIzKMrXzRHtuTwhTXhzNASsldo5rPW3Eh56FaKcQ+
-         BUyQ==
-X-Gm-Message-State: APjAAAUcdeYZ3td4I/78yJB0N5J+5IS2iBk0kdoUJOTiTxCNlt36g3Fg
-        5gKygxWGfeUjZQ5VmRMu2dZm2Q==
-X-Google-Smtp-Source: APXvYqyqSE6CiCMaA3tE51IMPrW8jI0NMG5fLN7BNkcYFfVOQTNzchZ43TBtON7ulLvYVDu5oG/5iA==
-X-Received: by 2002:a5d:4681:: with SMTP id u1mr29031344wrq.102.1562170822816;
-        Wed, 03 Jul 2019 09:20:22 -0700 (PDT)
+        bh=6axsB7tTSVN9+THoYftvz6QjMoumSr7HZztyJRyLa40=;
+        b=r/nUtPJiPf99FL7F4QxfE6lDK4SrZCNda+1v6ghWWAgs59h2jtLynT1gnF8ofmbqHv
+         sQIxAempgT/66PN0txsRFLzA04q1EQnk3/2V7urehj8QRVuQ+MOqw9MkgjpLDlJ9oY3/
+         7EQCFDqNtL9XSD6mQiPICGo1FYGDgaBcK8myPTQf5B8GEWr+RKoL8Gm9TCdN92215Oj9
+         0911A2q+19OKnfLaINSxOTtvH4eeqlK0GM1dHPBpo1nc4BRA0uG92UVYpqfxmh/Gd+bk
+         dOSk645GRfv87c/7VhFUQtX2jaknwrjJ/oE88ZsBuAocL7K3e5epEgujSXxaE2ieg/33
+         TELg==
+X-Gm-Message-State: APjAAAXmOLz4A/P4vgQkj+oWAr5H/ZrlB0MQe73aY7cfrL3aAg6XdU2+
+        GR1igpq0x0gT9H56vE6lQEqANg==
+X-Google-Smtp-Source: APXvYqygT9WZyOJ4nfYw9a8h6FDTp6c08dZZj8PBT3AKeUmifPjaTG+t58PWdB/deIRlSKNZg6wJOw==
+X-Received: by 2002:a1c:9a53:: with SMTP id c80mr8150575wme.173.1562170985443;
+        Wed, 03 Jul 2019 09:23:05 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:6c1d:63cc:b81d:e1a9? ([2001:b07:6468:f312:6c1d:63cc:b81d:e1a9])
-        by smtp.gmail.com with ESMTPSA id y24sm2136601wmi.10.2019.07.03.09.20.21
+        by smtp.gmail.com with ESMTPSA id b2sm3582556wrp.72.2019.07.03.09.23.04
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 03 Jul 2019 09:20:22 -0700 (PDT)
-Subject: Re: [PATCH v4 0/5] x86 instruction emulator fuzzing
-To:     Alexander Graf <graf@amazon.com>, Sam Caccavale <samcacc@amazon.de>
-Cc:     samcaccavale@gmail.com, nmanthey@amazon.de, wipawel@amazon.de,
-        dwmw@amazon.co.uk, mpohlack@amazon.de, karahmed@amazon.de,
-        andrew.cooper3@citrix.com, JBeulich@suse.com, rkrcmar@redhat.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        paullangton4@gmail.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20190628092621.17823-1-samcacc@amazon.de>
- <caaeb546-9aa1-7fd5-496d-a0ec1f759d10@amazon.com>
+        Wed, 03 Jul 2019 09:23:04 -0700 (PDT)
+Subject: Re: [PATCH 2/4] kvm: x86: allow set apic and ioapic debug dynamically
+To:     Yi Wang <wang.yi59@zte.com.cn>
+Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
+        up2wing@gmail.com, wang.liang82@zte.com.cn
+References: <1561962071-25974-1-git-send-email-wang.yi59@zte.com.cn>
+ <1561962071-25974-3-git-send-email-wang.yi59@zte.com.cn>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <537c4950-8b22-c28f-c248-504f8396dd5a@redhat.com>
-Date:   Wed, 3 Jul 2019 18:20:20 +0200
+Message-ID: <685680d5-f642-0c48-08f2-8c73026ccaf0@redhat.com>
+Date:   Wed, 3 Jul 2019 18:23:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <caaeb546-9aa1-7fd5-496d-a0ec1f759d10@amazon.com>
+In-Reply-To: <1561962071-25974-3-git-send-email-wang.yi59@zte.com.cn>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/06/19 11:33, Alexander Graf wrote:
+On 01/07/19 08:21, Yi Wang wrote:
+> There are two *_debug() macros in kvm apic source file:
+> - ioapic_debug, which is disable using #if 0
+> - apic_debug, which is commented
 > 
+> Maybe it's better to control these two macros using CONFIG_KVM_DEBUG,
+> which can be set in make menuconfig.
 > 
-> On 28.06.19 11:26, Sam Caccavale wrote:
->> Dear all,
->>
->> This series aims to provide an entrypoint for, and fuzz KVM's x86
->> instruction
->> emulator from userspace.  It mirrors Xen's application of the AFL
->> fuzzer to
->> it's instruction emulator in the hopes of discovering vulnerabilities.
->> Since this entrypoint also allows arbitrary execution of the emulators
->> code
->> from userspace, it may also be useful for testing.
->>
->> The current 4 patches build the emulator and 2 harnesses:
->> simple-harness is
->> an example of unit testing; afl-harness is a frontend for the AFL fuzzer.
->> The fifth patch contains useful scripts for development but is not
->> intended
->> for usptream consumption.
->>
->> Patches
->> =======
->>
->> - 01: Builds and links afl-harness with the required kernel objects.
->> - 02: Introduces the minimal set of emulator operations and supporting
->> code
->> to emulate simple instructions.
->> - 03: Demonstrates simple-harness as a unit test.
->> - 04: Adds scripts for install and building.
->> - 05: Useful scripts for development
->>
->>
->> Issues
->> =======
->>
->> Currently, fuzzing results in a large amount of FPU related crashes. 
->> Xen's
->> fuzzing efforts had this issue too.  Their (temporary?) solution was to
->> disable FPU exceptions after every instruction iteration?  Some solution
->> is desired for this project.
->>
->>
->> Changelog
->> =======
->>
->> v1 -> v2:
->>   - Moved -O0 to ifdef DEBUG
->>   - Building with ASAN by default
->>   - Removed a number of macros from emulator_ops.c and moved them as
->>     static inline functions in emulator_ops.h
->>   - Accidentally changed the example in simple-harness (reverted in v3)
->>   - Introduced patch 4 for scripts
->>
->> v2 -> v3:
->>   - Removed a workaround for printf smashing the stack when compiled
->>     with -mcmodel=kernel, and stopped compiling with -mcmodel=kernel
->>   - Added a null check for malloc's return value
->>   - Moved more macros from emulator_ops.c into emulator_ops.h as
->>     static inline functions
->>   - Removed commented out code
->>   - Moved changes to emulator_ops.h into the first patch
->>   - Moved addition of afl-many script to the script patch
->>   - Fixed spelling mistakes in documentation
->>   - Reverted the simple-harness example back to the more useful
->> original one
->>   - Moved non-essential development scripts from patch 4 to new patch 5
->>
->> v3 -> v4:
->>   - Stubbed out all unimplemented emulator_ops with a unimplemented_op
->> macro
->>   - Setting FAIL_ON_UNIMPLEMENTED_OP on compile decides whether
->> calling these
->>     is treated as a crash or ignored
->>   - Moved setting up core dumps out of the default build/install path and
->>     detailed this change in the README
->>   - Added a .sh extention to afl-many
->>   - Added an optional timeout to afl-many.sh and made deploy_remote.sh
->> use it
->>   - Building no longer creates a new .config each time and does not
->> force any
->>     config options
->>   - Fixed a path bug in afl-many.sh
->>
->> Any comments/suggestions are greatly appreciated.
->>
->> Best,
->> Sam Caccavale
->>
->> Sam Caccavale (5):
->>    Build target for emulate.o as a userspace binary
->>    Emulate simple x86 instructions in userspace
->>    Demonstrating unit testing via simple-harness
->>    Added build and install scripts
->>    Development scripts for crash triage and deploy
->>
->>   tools/Makefile                                |   9 +
->>   tools/fuzz/x86ie/.gitignore                   |   2 +
->>   tools/fuzz/x86ie/Makefile                     |  54 ++
->>   tools/fuzz/x86ie/README.md                    |  21 +
->>   tools/fuzz/x86ie/afl-harness.c                | 151 +++++
->>   tools/fuzz/x86ie/common.h                     |  87 +++
->>   tools/fuzz/x86ie/emulator_ops.c               | 590 ++++++++++++++++++
->>   tools/fuzz/x86ie/emulator_ops.h               | 134 ++++
->>   tools/fuzz/x86ie/scripts/afl-many.sh          |  31 +
->>   tools/fuzz/x86ie/scripts/bin.sh               |  49 ++
->>   tools/fuzz/x86ie/scripts/build.sh             |  34 +
->>   tools/fuzz/x86ie/scripts/coalesce.sh          |   5 +
->>   tools/fuzz/x86ie/scripts/deploy.sh            |   9 +
->>   tools/fuzz/x86ie/scripts/deploy_remote.sh     |  10 +
->>   tools/fuzz/x86ie/scripts/gen_output.sh        |  11 +
->>   tools/fuzz/x86ie/scripts/install_afl.sh       |  15 +
->>   .../fuzz/x86ie/scripts/install_deps_ubuntu.sh |   5 +
->>   tools/fuzz/x86ie/scripts/rebuild.sh           |   6 +
->>   tools/fuzz/x86ie/scripts/run.sh               |  10 +
->>   tools/fuzz/x86ie/scripts/summarize.sh         |   9 +
->>   tools/fuzz/x86ie/simple-harness.c             |  49 ++
->>   tools/fuzz/x86ie/stubs.c                      |  59 ++
->>   tools/fuzz/x86ie/stubs.h                      |  52 ++
+> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+> ---
+>  arch/x86/kvm/ioapic.c | 2 +-
+>  arch/x86/kvm/lapic.c  | 5 ++++-
+>  2 files changed, 5 insertions(+), 2 deletions(-)
 > 
-> Sorry I didn't realize it before. Isn't that missing a patch to the
-> MAINTAINERS file?
+> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+> index 1add1bc..8099253 100644
+> --- a/arch/x86/kvm/ioapic.c
+> +++ b/arch/x86/kvm/ioapic.c
+> @@ -45,7 +45,7 @@
+>  #include "lapic.h"
+>  #include "irq.h"
+>  
+> -#if 0
+> +#ifdef CONFIG_KVM_DEBUG
+>  #define ioapic_debug(fmt,arg...) printk(KERN_WARNING fmt,##arg)
+>  #else
+>  #define ioapic_debug(fmt, arg...)
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 4924f83..dfff5c6 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -54,8 +54,11 @@
+>  #define PRIu64 "u"
+>  #define PRIo64 "o"
+>  
+> -/* #define apic_debug(fmt,arg...) printk(KERN_WARNING fmt,##arg) */
+> +#ifdef CONFIG_KVM_DEBUG
+> +#define apic_debug(fmt,arg...) printk(KERN_WARNING fmt,##arg)
+> +#else
+>  #define apic_debug(fmt, arg...) do {} while (0)
+> +#endif
+>  
+>  /* 14 is the version for Xeon and Pentium 8.4.8*/
+>  #define APIC_VERSION			(0x14UL | ((KVM_APIC_LVT_NUM - 1) << 16))
+> 
 
-Yeah, and the directory should probably be tools/fuzz/kvm_emulate so as
-not to puzzle people.  Also:
-
-- let's limit the scripts to the minimum, i.e. only the run script which
-should be something like
-
-#!/bin/bash
-# SPDX-License-Identifier: GPL-2.0+
-
-FUZZDIR="${FUZZDIR:-$(pwd)/fuzz}"
-
-mkdir -p $FUZZDIR/in
-cp tools/fuzz/kvm_emulate/rand_sample.bin $FUZZDIR/in
-mkdir -p $FUZZDIR/out
-
-${TIMEOUT:+TIMEOUT=$TIMEOUT} ${AFL_FUZZ-afl-fuzz} "$@" \
-  -i $FUZZDIR/in -o $FUZZDIR/out tools/fuzz/kvm_emulate/afl-harness @@
-
-where people can substitute afl-many.sh or add their own options using
-the AFL_FUZZ variable or the command line.  Likewise for screen.
-
-- the build should be just "make -C tools/fuzz/kvm_emulate" and it
-should just work.  Feel free to steal the Makefile magic from other
-tools/ directories.
-
-- finally, rand_sample.bin is missing.
-
-Otherwise, it looks very nice.
+I would just drop all of them.  I've never used them in years, the kvm
+tracepoints are enough.
 
 Paolo
