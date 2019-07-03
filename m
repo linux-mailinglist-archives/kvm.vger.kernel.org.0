@@ -2,264 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BF9775EA5C
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 19:22:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AD8A5EADC
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 19:51:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727013AbfGCRWR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 13:22:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58046 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726721AbfGCRWQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 13:22:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4D110308621B;
-        Wed,  3 Jul 2019 17:22:15 +0000 (UTC)
-Received: from x1.home (ovpn-116-83.phx2.redhat.com [10.3.116.83])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7A58B7D547;
-        Wed,  3 Jul 2019 17:22:12 +0000 (UTC)
-Date:   Wed, 3 Jul 2019 11:22:12 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
+        id S1727034AbfGCRvG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 13:51:06 -0400
+Received: from esa2.hc3370-68.iphmx.com ([216.71.145.153]:10066 "EHLO
+        esa2.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726550AbfGCRvG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 13:51:06 -0400
+X-Greylist: delayed 426 seconds by postgrey-1.27 at vger.kernel.org; Wed, 03 Jul 2019 13:51:05 EDT
+Authentication-Results: esa2.hc3370-68.iphmx.com; dkim=none (message not signed) header.i=none; spf=None smtp.pra=andrew.cooper3@citrix.com; spf=Pass smtp.mailfrom=Andrew.Cooper3@citrix.com; spf=None smtp.helo=postmaster@mail.citrix.com
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  andrew.cooper3@citrix.com) identity=pra;
+  client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+  envelope-from="Andrew.Cooper3@citrix.com";
+  x-sender="andrew.cooper3@citrix.com";
+  x-conformance=sidf_compatible
+Received-SPF: Pass (esa2.hc3370-68.iphmx.com: domain of
+  Andrew.Cooper3@citrix.com designates 162.221.158.21 as
+  permitted sender) identity=mailfrom;
+  client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+  envelope-from="Andrew.Cooper3@citrix.com";
+  x-sender="Andrew.Cooper3@citrix.com";
+  x-conformance=sidf_compatible; x-record-type="v=spf1";
+  x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
+  ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
+  ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
+  ip4:216.52.6.188 ip4:162.221.158.21 ip4:162.221.156.83 ~all"
+Received-SPF: None (esa2.hc3370-68.iphmx.com: no sender
+  authenticity information available from domain of
+  postmaster@mail.citrix.com) identity=helo;
+  client-ip=162.221.158.21; receiver=esa2.hc3370-68.iphmx.com;
+  envelope-from="Andrew.Cooper3@citrix.com";
+  x-sender="postmaster@mail.citrix.com";
+  x-conformance=sidf_compatible
+IronPort-SDR: rE1PPiUYLx+553PsS26Oksn7RexOFKwbp8ae46DhGB/64c3y1B8aHgZXiE5SGq0Sa9UxFpVlt+
+ ZL/6ZbYqHeMlMEgoRzBmrALe/TKpJWXvXTpxmgqCCESMqSpp5w0X44Cf0OwaVFjqLZYNLA0Jbq
+ 2NKHealGMif/ysgufrg943fsEX4QlejwJ6OyjEhnJtOjUKjrtL1bJAPtzWo28FZOG8LkOlynZh
+ 77t6DNBpk49LLY7g5mUU8wqd+T8ymlTKYnuD76xnUKLBc0yn+8s/WYsfT6bJ633QmHXWm6xBm/
+ mPw=
+X-SBRS: 2.7
+X-MesageID: 2556619
+X-Ironport-Server: esa2.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.63,446,1557201600"; 
+   d="scan'208";a="2556619"
+Subject: Re: [Xen-devel] [PATCH v2 4/9] x86/mm/tlb: Flush remote and local
+ TLBs concurrently
+To:     Nadav Amit <namit@vmware.com>, Juergen Gross <jgross@suse.com>
+CC:     Sasha Levin <sashal@kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
-Message-ID: <20190703112212.146ac71c@x1.home>
-In-Reply-To: <A2975661238FB949B60364EF0F2C257439F1E9EC@SHSMSX104.ccr.corp.intel.com>
-References: <1560000071-3543-1-git-send-email-yi.l.liu@intel.com>
-        <1560000071-3543-10-git-send-email-yi.l.liu@intel.com>
-        <20190619222647.72efc76a@x1.home>
-        <A2975661238FB949B60364EF0F2C257439F0164E@SHSMSX104.ccr.corp.intel.com>
-        <20190620150757.7b2fa405@x1.home>
-        <A2975661238FB949B60364EF0F2C257439F02663@SHSMSX104.ccr.corp.intel.com>
-        <20190621095740.41e6e98e@x1.home>
-        <A2975661238FB949B60364EF0F2C257439F05415@SHSMSX104.ccr.corp.intel.com>
-        <20190628090741.51e8d18e@x1.home>
-        <A2975661238FB949B60364EF0F2C257439F1E9EC@SHSMSX104.ccr.corp.intel.com>
-Organization: Red Hat
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        xen-devel <xen-devel@lists.xenproject.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>
+References: <20190702235151.4377-1-namit@vmware.com>
+ <20190702235151.4377-5-namit@vmware.com>
+ <d89e2b57-8682-153e-33d8-98084e9983d6@suse.com>
+ <A4BC0EDE-71F0-455D-964A-7250D005FB56@vmware.com>
+From:   Andrew Cooper <andrew.cooper3@citrix.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=andrew.cooper3@citrix.com; prefer-encrypt=mutual; keydata=
+ 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
+ 6+ahAA==
+Message-ID: <6038042c-917f-d361-5d79-f0205152fe00@citrix.com>
+Date:   Wed, 3 Jul 2019 18:43:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Wed, 03 Jul 2019 17:22:16 +0000 (UTC)
+In-Reply-To: <A4BC0EDE-71F0-455D-964A-7250D005FB56@vmware.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+X-ClientProxiedBy: AMSPEX02CAS01.citrite.net (10.69.22.112) To
+ AMSPEX02CL02.citrite.net (10.69.22.126)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 3 Jul 2019 08:25:25 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
+On 03/07/2019 18:02, Nadav Amit wrote:
+>> On Jul 3, 2019, at 7:04 AM, Juergen Gross <jgross@suse.com> wrote:
+>>
+>> On 03.07.19 01:51, Nadav Amit wrote:
+>>> To improve TLB shootdown performance, flush the remote and local TLBs
+>>> concurrently. Introduce flush_tlb_multi() that does so. Introduce
+>>> paravirtual versions of flush_tlb_multi() for KVM, Xen and hyper-v (Xen
+>>> and hyper-v are only compile-tested).
+>>> While the updated smp infrastructure is capable of running a function on
+>>> a single local core, it is not optimized for this case. The multiple
+>>> function calls and the indirect branch introduce some overhead, and
+>>> might make local TLB flushes slower than they were before the recent
+>>> changes.
+>>> Before calling the SMP infrastructure, check if only a local TLB flush
+>>> is needed to restore the lost performance in this common case. This
+>>> requires to check mm_cpumask() one more time, but unless this mask is
+>>> updated very frequently, this should impact performance negatively.
+>>> Cc: "K. Y. Srinivasan" <kys@microsoft.com>
+>>> Cc: Haiyang Zhang <haiyangz@microsoft.com>
+>>> Cc: Stephen Hemminger <sthemmin@microsoft.com>
+>>> Cc: Sasha Levin <sashal@kernel.org>
+>>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>>> Cc: Ingo Molnar <mingo@redhat.com>
+>>> Cc: Borislav Petkov <bp@alien8.de>
+>>> Cc: x86@kernel.org
+>>> Cc: Juergen Gross <jgross@suse.com>
+>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+>>> Cc: Andy Lutomirski <luto@kernel.org>
+>>> Cc: Peter Zijlstra <peterz@infradead.org>
+>>> Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+>>> Cc: linux-hyperv@vger.kernel.org
+>>> Cc: linux-kernel@vger.kernel.org
+>>> Cc: virtualization@lists.linux-foundation.org
+>>> Cc: kvm@vger.kernel.org
+>>> Cc: xen-devel@lists.xenproject.org
+>>> Signed-off-by: Nadav Amit <namit@vmware.com>
+>>> ---
+>>>  arch/x86/hyperv/mmu.c                 | 13 +++---
+>>>  arch/x86/include/asm/paravirt.h       |  6 +--
+>>>  arch/x86/include/asm/paravirt_types.h |  4 +-
+>>>  arch/x86/include/asm/tlbflush.h       |  9 ++--
+>>>  arch/x86/include/asm/trace/hyperv.h   |  2 +-
+>>>  arch/x86/kernel/kvm.c                 | 11 +++--
+>>>  arch/x86/kernel/paravirt.c            |  2 +-
+>>>  arch/x86/mm/tlb.c                     | 65 ++++++++++++++++++++-------
+>>>  arch/x86/xen/mmu_pv.c                 | 20 ++++++---
+>>>  include/trace/events/xen.h            |  2 +-
+>>>  10 files changed, 91 insertions(+), 43 deletions(-)
+>> ...
+>>
+>>> diff --git a/arch/x86/xen/mmu_pv.c b/arch/x86/xen/mmu_pv.c
+>>> index beb44e22afdf..19e481e6e904 100644
+>>> --- a/arch/x86/xen/mmu_pv.c
+>>> +++ b/arch/x86/xen/mmu_pv.c
+>>> @@ -1355,8 +1355,8 @@ static void xen_flush_tlb_one_user(unsigned long addr)
+>>>  	preempt_enable();
+>>>  }
+>>>  -static void xen_flush_tlb_others(const struct cpumask *cpus,
+>>> -				 const struct flush_tlb_info *info)
+>>> +static void xen_flush_tlb_multi(const struct cpumask *cpus,
+>>> +				const struct flush_tlb_info *info)
+>>>  {
+>>>  	struct {
+>>>  		struct mmuext_op op;
+>>> @@ -1366,7 +1366,7 @@ static void xen_flush_tlb_others(const struct cpumask *cpus,
+>>>  	const size_t mc_entry_size = sizeof(args->op) +
+>>>  		sizeof(args->mask[0]) * BITS_TO_LONGS(num_possible_cpus());
+>>>  -	trace_xen_mmu_flush_tlb_others(cpus, info->mm, info->start, info->end);
+>>> +	trace_xen_mmu_flush_tlb_multi(cpus, info->mm, info->start, info->end);
+>>>    	if (cpumask_empty(cpus))
+>>>  		return;		/* nothing to do */
+>>> @@ -1375,9 +1375,17 @@ static void xen_flush_tlb_others(const struct cpumask *cpus,
+>>>  	args = mcs.args;
+>>>  	args->op.arg2.vcpumask = to_cpumask(args->mask);
+>>>  -	/* Remove us, and any offline CPUS. */
+>>> +	/* Flush locally if needed and remove us */
+>>> +	if (cpumask_test_cpu(smp_processor_id(), to_cpumask(args->mask))) {
+>>> +		local_irq_disable();
+>>> +		flush_tlb_func_local(info);
+>> I think this isn't the correct function for PV guests.
+>>
+>> In fact it should be much easier: just don't clear the own cpu from the
+>> mask, that's all what's needed. The hypervisor is just fine having the
+>> current cpu in the mask and it will do the right thing.
+> Thanks. I will do so in v3. I don’t think Hyper-V people would want to do
+> the same, unfortunately, since it would induce VM-exit on TLB flushes.
 
-> Hi Alex,
-> 
-> Thanks for the comments. Have four inline responses below. And one
-> of them need your further help. :-)
-> .
-> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > Sent: Friday, June 28, 2019 11:08 PM
-> > To: Liu, Yi L <yi.l.liu@intel.com>
-> > Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
-> > 
-> > On Mon, 24 Jun 2019 08:20:38 +0000
-> > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> >   
-> > > Hi Alex,
-> > >  
-> > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > > Sent: Friday, June 21, 2019 11:58 PM
-> > > > To: Liu, Yi L <yi.l.liu@intel.com>
-> > > > Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
-> > > >
-> > > > On Fri, 21 Jun 2019 10:23:10 +0000
-> > > > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> > > >  
-> > > > > Hi Alex,
-> > > > >  
-> > > > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > > > > Sent: Friday, June 21, 2019 5:08 AM
-> > > > > > To: Liu, Yi L <yi.l.liu@intel.com>
-> > > > > > Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
-> > > > > >
-> > > > > > On Thu, 20 Jun 2019 13:00:34 +0000 "Liu, Yi L"
-> > > > > > <yi.l.liu@intel.com> wrote:
-> > > > > >  
-> > > > > > > Hi Alex,
-> > > > > > >  
-> > > > > > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > > > > > > Sent: Thursday, June 20, 2019 12:27 PM
-> > > > > > > > To: Liu, Yi L <yi.l.liu@intel.com>
-> > > > > > > > Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci
-> > > > > > > > driver
-> > > > > > > >
-> > > > > > > > On Sat,  8 Jun 2019 21:21:11 +0800 Liu Yi L
-> > > > > > > > <yi.l.liu@intel.com> wrote:
-> > > > > > > >  
-> > > > > > > > > This patch adds sample driver named vfio-mdev-pci. It is
-> > > > > > > > > to wrap a PCI device as a mediated device. For a pci
-> > > > > > > > > device, once bound to vfio-mdev-pci driver, user space
-> > > > > > > > > access of this device will go through vfio mdev framework.
-> > > > > > > > > The usage of the device follows mdev management method.
-> > > > > > > > > e.g. user should create a mdev before exposing the device to user-space.  
-> > > > > [...]  
-> > > > > > >  
-> > > > > > > > However, the patch below just makes the mdev interface
-> > > > > > > > behave correctly, I can't make it work on my system because
-> > > > > > > > commit 7bd50f0cd2fd ("vfio/type1: Add domain at(de)taching
-> > > > > > > > group helpers")  
-> > > > > > >
-> > > > > > > What error did you encounter. I tested the patch with a device
-> > > > > > > in a singleton iommu group. I'm also searching a proper
-> > > > > > > machine with multiple devices in an iommu group and test it.  
-> > > > > >
-> > > > > > In vfio_iommu_type1, iommu backed mdev devices use the
-> > > > > > iommu_attach_device() interface, which includes:
-> > > > > >
-> > > > > >         if (iommu_group_device_count(group) != 1)
-> > > > > >                 goto out_unlock;
-> > > > > >
-> > > > > > So it's impossible to use with non-singleton groups currently.  
-> > > > >
-> > > > > Hmmm, I think it is no longer good to use iommu_attach_device()
-> > > > > for iommu backed mdev devices now. In this flow, the purpose here
-> > > > > is to attach a device to a domain and no need to check whether the
-> > > > > device is in a singleton iommu group. I think it would be better
-> > > > > to use __iommu_attach_device() instead of iommu_attach_device().  
-> > > >
-> > > > That's a static and unexported, it's intentionally not an exposed
-> > > > interface.  We can't attach devices in the same group to separate
-> > > > domains allocated through iommu_domain_alloc(), this would violate
-> > > > the iommu group isolation principles.  
-> > >
-> > > Go it. :-) Then not good to expose such interface. But to support
-> > > devices in non-singleton iommu group, we need to have a new interface
-> > > which doesn't count the devices but attach all the devices.  
-> > 
-> > We have iommu_attach_group(), we just need to track which groups are attached.  
-> 
-> yep.
-> 
-> > > > > Also I found a potential mutex lock issue if using iommu_attach_device().
-> > > > > In vfio_iommu_attach_group(), it uses iommu_group_for_each_dev()
-> > > > > to loop all the devices in the group. It holds group->mutex. And
-> > > > > then  
-> > > > vfio_mdev_attach_domain()  
-> > > > > calls iommu_attach_device() which also tries to get group->mutex.
-> > > > > This would be an issue. If you are fine with it, I may post
-> > > > > another patch for it. :-)  
-> > > >
-> > > > Gack, yes, please send a patch.  
-> > >
-> > > Would do it, may be together with the support of vfio-mdev-pci on
-> > > devices in non-singleton iommu group.
-> > >  
-> > > >  
-> > > > > > > > used iommu_attach_device() rather than iommu_attach_group()
-> > > > > > > > for non-aux mdev iommu_device.  Is there a requirement that
-> > > > > > > > the mdev parent device is in a singleton iommu group?  
-> > > > > > >
-> > > > > > > I don't think there should have such limitation. Per my
-> > > > > > > understanding, vfio-mdev-pci should also be able to bind to
-> > > > > > > devices which shares iommu group with other devices. vfio-pci works well  
-> > for such devices.  
-> > > > > > > And since the two drivers share most of the codes, I think
-> > > > > > > vfio-mdev-pci should naturally support it as well.  
-> > > > > >
-> > > > > > Yes, the difference though is that vfio.c knows when devices are
-> > > > > > in the same group, which mdev vfio.c only knows about the
-> > > > > > non-iommu backed group, not the group that is actually used for
-> > > > > > the iommu backing.  So we either need to enlighten vfio.c or
-> > > > > > further abstract those details in vfio_iommu_type1.c.  
-> > > > >
-> > > > > Not sure if it is necessary to introduce more changes to vfio.c or
-> > > > > vfio_iommu_type1.c. If it's only for the scenario which two
-> > > > > devices share an iommu_group, I guess it could be supported by
-> > > > > using __iommu_attach_device() which has no device counting for the
-> > > > > group. But maybe I missed something here. It would be great if you
-> > > > > can elaborate a bit for it. :-)  
-> > > >
-> > > > We need to use the group semantics, there's a reason
-> > > > __iommu_attach_device() is not exposed, it's an internal helper.  I
-> > > > think there's no way around that we need to somewhere track the
-> > > > actual group we're attaching to and have the smarts to re-use it for
-> > > > other devices in the same group.  
-> > >
-> > > Hmmm, exposing __iommu_attach_device() is not good, let's forget it.
-> > > :-)
-> > >  
-> > > > > > > > If this is a simplification, then vfio-mdev-pci should not
-> > > > > > > > bind to devices where this is violated since there's no way
-> > > > > > > > to use the device.  Can we support it though?  
-> > > > > > > 
-> > > > > > > yeah, I think we need to support it.  
-> 
-> I've already made vfio-mdev-pci driver work for non-singleton iommu
-> group. e.g. for devices in a single iommu group, I can bind the devices
-> to eithervfio-pci or vfio-mdev-pci and then passthru them to a VM. And
-> it will fail if user tries to passthru a vfio-mdev-pci device via vfio-pci
-> manner "-device vfio-pci,host=01:00.1". In other words, vfio-mdev-pci
-> device can only passthru via
-> "-device vfio-pci,sysfsdev=/sys/bus/mdev/devices/UUID". This is what
-> we expect.
-> 
-> However, I encountered a problem when trying to prevent user from
-> passthru these devices to different VMs. I've tried in my side, and I
-> can passthru vfio-pci device and vfio-mdev-pci device to different
-> VMs. But actually this operation should be failed. If all the devices
-> are bound to vfio-pci, Qemu will open iommu backed group. So
-> Qemu can check if a given group has already been used by an
-> AddressSpace (a.ka. VM) in vfio_get_group() thus to prevent
-> user from passthru these devices to different VMs if the devices
-> are in the same iommu backed group. However, here for a
-> vfio-mdev-pci device, it has a new group and group ID, Qemu
-> will not be able to detect if the other devices (share iommu group
-> with vfio-mdev-pci device) are passthru to existing VMs. This is the
-> major problem for vfio-mdev-pci to support non-singleton group
-> in my side now. Even all devices are bound to vfio-mdev-pci driver,
-> Qemu is still unable to check since all the vfio-mdev-pci devices
-> have a separate mdev group.
-> 
-> To fix it, may need Qemu to do more things. E.g. If it tries to use a
-> non-singleton iommu backed group, it needs to check if any mdev
-> group is created and used by an existing VM. Also it needs check if
-> iommu backed group is passthru to an existing VM when trying to
-> use a mdev group. For singleton iommu backed group and
-> aux-domain enabled physical device, still allow to passthru mdev
-> group to different VMs. To achieve these checks, Qemu may need
-> to have knowledge whether a group is iommu backed and singleton
-> or not. Do you think it is good to expose such info to userspace? or
-> any other idea? :-)
+Why do you believe the vmexit matters?  You're talking one anyway for
+the IPI.
 
-QEMU is never responsible for isolating a group, QEMU is just a
-userspace driver, it's vfio's responsibility to prevent the user from
-splitting groups in ways that are not allowed.  QEMU does not know the
-true group association, it only knows the "virtual" group of the mdev
-device.  QEMU will create a container and add the mdev virtual group to
-the container.  In the kernel, the type1 backend should actually do an
-iommu_attach_group(), attaching the iommu_device group to the domain.
-When QEMU processes the next device, it will have a different group,
-but (assuming no vIOMMU) it will try to attach it to the same
-container, which should work because the iommu_device group backing the
-mdev virtual group is already attached to this domain.
+Intel only have virtualised self-IPI, and while AMD do have working
+non-self IPIs, you still take a vmexit anyway if any destination vcpu
+isn't currently running in non-root mode (IIRC).
 
-If we had two separate QEMU processes, each with an mdev device from a
-common group at the iommu_device level, the type1 backend should fail
-to attach the group to the container for the later caller.  I'd think
-this should fail at the iommu_attach_group() call since the group we're
-trying to attach is already attached to another domain.
+At that point, you might as well have the hypervisor do all the hard
+work via a multi-cpu shootdown/flush hypercall, rather than trying to
+arrange it locally.
 
-It's really unfortunate that we don't have the mdev inheriting the
-iommu group of the iommu_device so that userspace can really understand
-this relationship.  A separate group makes sense for the aux-domain
-case, and is (I guess) not a significant issue in the case of a
-singleton iommu_device group, but it's pretty awkward here.  Perhaps
-this is something we should correct in design of iommu backed mdevs.
-Thanks,
-
-Alex
+~Andrew
