@@ -2,21 +2,21 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C5B55E33D
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 13:54:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D85835E34F
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 13:56:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726486AbfGCLyC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 07:54:02 -0400
-Received: from foss.arm.com ([217.140.110.172]:45464 "EHLO foss.arm.com"
+        id S1726550AbfGCL4z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 07:56:55 -0400
+Received: from foss.arm.com ([217.140.110.172]:45572 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725786AbfGCLyB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 07:54:01 -0400
+        id S1725944AbfGCL4z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 07:56:55 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 18C68344;
-        Wed,  3 Jul 2019 04:54:01 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3CC43344;
+        Wed,  3 Jul 2019 04:56:54 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B48D33F703;
-        Wed,  3 Jul 2019 04:53:59 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 020983F703;
+        Wed,  3 Jul 2019 04:56:52 -0700 (PDT)
 Subject: Re: [PATCH 04/59] KVM: arm64: nv: Introduce nested virtualization
  VCPU feature
 To:     Dave Martin <Dave.Martin@arm.com>
@@ -29,7 +29,7 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         Jintack Lim <jintack@cs.columbia.edu>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
  <20190621093843.220980-5-marc.zyngier@arm.com>
- <20190624112851.GM2790@e103592.cambridge.arm.com>
+ <20190624114329.GO2790@e103592.cambridge.arm.com>
 From:   Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
@@ -76,12 +76,12 @@ Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
  Z46HaNmN2hZS/oJ69c1DI5Rcww==
 Organization: ARM Ltd
-Message-ID: <01e61a51-5bf0-8943-6f68-7a5cea59f093@arm.com>
-Date:   Wed, 3 Jul 2019 12:53:58 +0100
+Message-ID: <5bd65cc0-89a1-0849-2041-b6016d58e4f2@arm.com>
+Date:   Wed, 3 Jul 2019 12:56:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190624112851.GM2790@e103592.cambridge.arm.com>
+In-Reply-To: <20190624114329.GO2790@e103592.cambridge.arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -90,7 +90,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/06/2019 12:28, Dave Martin wrote:
+On 24/06/2019 12:43, Dave Martin wrote:
 > On Fri, Jun 21, 2019 at 10:37:48AM +0100, Marc Zyngier wrote:
 >> From: Christoffer Dall <christoffer.dall@arm.com>
 >>
@@ -105,28 +105,9 @@ On 24/06/2019 12:28, Dave Martin wrote:
 >> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >> ---
->>  arch/arm/include/asm/kvm_nested.h   |  9 +++++++++
->>  arch/arm64/include/asm/kvm_nested.h | 13 +++++++++++++
->>  arch/arm64/include/uapi/asm/kvm.h   |  1 +
->>  3 files changed, 23 insertions(+)
->>  create mode 100644 arch/arm/include/asm/kvm_nested.h
->>  create mode 100644 arch/arm64/include/asm/kvm_nested.h
->>
->> diff --git a/arch/arm/include/asm/kvm_nested.h b/arch/arm/include/asm/kvm_nested.h
->> new file mode 100644
->> index 000000000000..124ff6445f8f
->> --- /dev/null
->> +++ b/arch/arm/include/asm/kvm_nested.h
->> @@ -0,0 +1,9 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +#ifndef __ARM_KVM_NESTED_H
->> +#define __ARM_KVM_NESTED_H
->> +
->> +#include <linux/kvm_host.h>
->> +
->> +static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu) { return false; }
->> +
->> +#endif /* __ARM_KVM_NESTED_H */
+> 
+> [...]
+> 
 >> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
 >> new file mode 100644
 >> index 000000000000..8a3d121a0b42
@@ -144,33 +125,11 @@ On 24/06/2019 12:28, Dave Martin wrote:
 >> +	return cpus_have_const_cap(ARM64_HAS_NESTED_VIRT) &&
 >> +		test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features);
 >> +}
->> +
->> +#endif /* __ARM64_KVM_NESTED_H */
->> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
->> index d819a3e8b552..563e2a8bae93 100644
->> --- a/arch/arm64/include/uapi/asm/kvm.h
->> +++ b/arch/arm64/include/uapi/asm/kvm.h
->> @@ -106,6 +106,7 @@ struct kvm_regs {
->>  #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
->>  #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
->>  #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
->> +#define KVM_ARM_VCPU_NESTED_VIRT	7 /* Support nested virtualization */
 > 
-> This seems weirdly named:
-> 
-> Isn't the feature we're exposing here really EL2?  In that case, the
-> feature the guest gets with this flag enabled is plain virtualisation,
-> possibly with the option to nest further.
-> 
-> Does the guest also get nested virt (i.e., recursively nested virt from
-> the host's PoV) as a side effect, or would require an explicit extra
-> flag?
+> Also, is it worth having a vcpu->arch.flags flag for this, similarly to
+> SVE and ptrauth?
 
-So far, there is no extra flag to describe further nesting, and it
-directly comes from EL2 being emulated. I don't mind renaming this to
-KVM_ARM_VCPU_HAS_EL2, or something similar... Whether we want userspace
-to control the exposure of the nesting capability (i.e. EL2 with
-ARMv8.3-NV) is another question.
+What would we expose through this flag?
 
 Thanks,
 
