@@ -2,32 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EF0F5E0EB
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 11:22:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49B2F5E10B
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 11:30:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727108AbfGCJWB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 05:22:01 -0400
-Received: from foss.arm.com ([217.140.110.172]:42306 "EHLO foss.arm.com"
+        id S1726544AbfGCJaH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 05:30:07 -0400
+Received: from foss.arm.com ([217.140.110.172]:42504 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727004AbfGCJWA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 05:22:00 -0400
+        id S1725847AbfGCJaH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 05:30:07 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE9D7344;
-        Wed,  3 Jul 2019 02:21:59 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42C11344;
+        Wed,  3 Jul 2019 02:30:06 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E3DEE3F246;
-        Wed,  3 Jul 2019 02:21:58 -0700 (PDT)
-Subject: Re: [PATCH 06/59] KVM: arm64: nv: Allow userspace to set
- PSR_MODE_EL2x
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EAAE53F246;
+        Wed,  3 Jul 2019 02:30:04 -0700 (PDT)
+Subject: Re: [PATCH 02/59] KVM: arm64: Move __load_guest_stage2 to kvm_mmu.h
 To:     Dave Martin <Dave.Martin@arm.com>
-Cc:     Julien Thierry <julien.thierry@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Julien Thierry <julien.thierry@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-7-marc.zyngier@arm.com>
- <7f8a9d76-6087-b8d9-3571-074a08d08ec8@arm.com>
- <3a68e4e6-878f-7272-4e2d-8768680287fd@arm.com>
- <20190624124859.GP2790@e103592.cambridge.arm.com>
+ <20190621093843.220980-3-marc.zyngier@arm.com>
+ <20190624111924.GK2790@e103592.cambridge.arm.com>
 From:   Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
@@ -74,12 +75,12 @@ Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
  Z46HaNmN2hZS/oJ69c1DI5Rcww==
 Organization: ARM Ltd
-Message-ID: <09dca509-9696-d224-22d2-4d5b0a0d9161@arm.com>
-Date:   Wed, 3 Jul 2019 10:21:57 +0100
+Message-ID: <bf4e43db-a0ea-9489-1a8c-280a72950cad@arm.com>
+Date:   Wed, 3 Jul 2019 10:30:03 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190624124859.GP2790@e103592.cambridge.arm.com>
+In-Reply-To: <20190624111924.GK2790@e103592.cambridge.arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -88,81 +89,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/06/2019 13:48, Dave Martin wrote:
-> On Fri, Jun 21, 2019 at 02:50:08PM +0100, Marc Zyngier wrote:
->> On 21/06/2019 14:24, Julien Thierry wrote:
->>>
->>>
->>> On 21/06/2019 10:37, Marc Zyngier wrote:
->>>> From: Christoffer Dall <christoffer.dall@linaro.org>
->>>>
->>>> We were not allowing userspace to set a more privileged mode for the VCPU
->>>> than EL1, but we should allow this when nested virtualization is enabled
->>>> for the VCPU.
->>>>
->>>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
->>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>> ---
->>>>  arch/arm64/kvm/guest.c | 6 ++++++
->>>>  1 file changed, 6 insertions(+)
->>>>
->>>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
->>>> index 3ae2f82fca46..4c35b5d51e21 100644
->>>> --- a/arch/arm64/kvm/guest.c
->>>> +++ b/arch/arm64/kvm/guest.c
->>>> @@ -37,6 +37,7 @@
->>>>  #include <asm/kvm_emulate.h>
->>>>  #include <asm/kvm_coproc.h>
->>>>  #include <asm/kvm_host.h>
->>>> +#include <asm/kvm_nested.h>
->>>>  #include <asm/sigcontext.h>
->>>>  
->>>>  #include "trace.h"
->>>> @@ -194,6 +195,11 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->>>>  			if (vcpu_el1_is_32bit(vcpu))
->>>>  				return -EINVAL;
->>>>  			break;
->>>> +		case PSR_MODE_EL2h:
->>>> +		case PSR_MODE_EL2t:
->>>> +			if (vcpu_el1_is_32bit(vcpu) || !nested_virt_in_use(vcpu))
->>>
->>> This condition reads a bit weirdly. Why do we care about anything else
->>> than !nested_virt_in_use() ?
->>>
->>> If nested virt is not in use then obviously we return the error.
->>>
->>> If nested virt is in use then why do we care about EL1? Or should this
->>> test read as "highest_el_is_32bit" ?
+On 24/06/2019 12:19, Dave Martin wrote:
+> On Fri, Jun 21, 2019 at 10:37:46AM +0100, Marc Zyngier wrote:
+>> Having __load_guest_stage2 in kvm_hyp.h is quickly going to trigger
+>> a circular include problem. In order to avoid this, let's move
+>> it to kvm_mmu.h, where it will be a better fit anyway.
 >>
->> There are multiple things at play here:
->>
->> - MODE_EL2x is not a valid 32bit mode
->> - The architecture forbids nested virt with 32bit EL2
->>
->> The code above is a simplification of these two conditions. But
->> certainly we can do a bit better, as kvm_reset_cpu() doesn't really
->> check that we don't create a vcpu with both 32bit+NV. These two bits
->> should really be exclusive.
+>> In the process, drop the __hyp_text annotation, which doesn't help
+>> as the function is marked as __always_inline.
 > 
-> This code is safe for now because KVM_VCPU_MAX_FEATURES <=
-> KVM_ARM_VCPU_NESTED_VIRT, right, i.e., nested_virt_in_use() cannot be
-> true?
+> Does GCC always inline things marked __always_inline?
 > 
-> This makes me a little uneasy, but I think that's paranoia talking: we
-> want bisectably, but no sane person should ship with just half of this
-> series.  So I guess this is fine.
-> 
-> We could stick something like
-> 
-> 	if (WARN_ON(...))
-> 		return false;
-> 
-> in nested_virt_in_use() and then remove it in the final patch, but it's
-> probably overkill.
+> I seem to remember some gotchas in this area, but I may be being
+> paranoid.
 
-The only case I can imagine something going wrong is if this series is
-only applied halfway, and another series bumps the maximum feature to
-something that includes NV. I guess your suggestion would solve that.
+Yes, this is a strong guarantee. Things like static keys rely on that,
+for example.
+
+> 
+> If this still only called from hyp, I'd be tempted to heep the
+> __hyp_text annotation just to be on the safe side.
+
+The trouble with that is that re-introduces the circular dependency with
+kvm_hyp.h that this patch is trying to break...
 
 Thanks,
 
