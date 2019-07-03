@@ -2,286 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B84875D9A2
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 02:49:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DF4CF5DA1F
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 03:01:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727349AbfGCAs4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Jul 2019 20:48:56 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:32893 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727127AbfGCAs4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Jul 2019 20:48:56 -0400
-Received: by mail-ot1-f65.google.com with SMTP id q20so536403otl.0;
-        Tue, 02 Jul 2019 17:48:55 -0700 (PDT)
+        id S1727432AbfGCBBr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Jul 2019 21:01:47 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:41238 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727059AbfGCBBr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Jul 2019 21:01:47 -0400
+Received: by mail-oi1-f195.google.com with SMTP id g7so595183oia.8;
+        Tue, 02 Jul 2019 18:01:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=45BsG3LbCDzj8igWscjEhFYwH/bXI9tYws0EYmAe5o0=;
-        b=RlR5HeXAIYRo74Y047tIsFyMhy8MF7pMRB+B3vI6PB3OjxaPM01VHlefj6Q18IxGGH
-         tkHARN2W1bhlG++JE0W4+JmMuZw9SFQayKTjVeYkCxhsZ/FhIL6HLCxb4lmkHw6oj1eH
-         VHQp4IQXTG63WzPE7mNhZyIoFbkWmjcHIT8V6YUVlZxa8I8Hs4nZBQmt9th4/YEszsEj
-         qs5qLwZx6+/prjQKBbwrN4UKxuqE5v9F953CYVzpumZ4JoSpRgmVwGo9EcgQBSob2JBG
-         0ZdC5ml+/anJ6itiDTwlTJMFW/gRhwLebMsZmIrgLqVo71hR3NMG2i/kemeS/ER7Tpec
-         FFJQ==
+         :cc;
+        bh=6/KKy82yrOyc29Ht7hH/jAIFLpMnSWEdvNOCoBZFw1Q=;
+        b=jhKjrysD7F3YEX73eCP0zuxoN6eVgP3fOptbLegmT5vwCHuRLQkMVOkWYkMbzxl5yH
+         MAPKEPsSy88O1W93Pwyqx6t6PdfVij0gqHjeTlllhAT5xXjk4vC0e0xS2YOVznLEohJ0
+         Ol7aRIz74oGk5py35ew6KskxFs0Ciul9PxBuG0YoYFJE1XIJ/VoiQnZYH02UTVhMVqKL
+         sP3hxGTSAew8NrQ9BVm3xIGmkltHe4zXtNxc7+yKFYfDf1ix7rwEtdxEzVegKYG6rfFX
+         HqKH2vVeJXRjHd0nOKULDjPbGIVfyVIBVZ8FF7n3v/uOw7hIcJu/CPMd+U85C+CCnpNl
+         PDzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=45BsG3LbCDzj8igWscjEhFYwH/bXI9tYws0EYmAe5o0=;
-        b=CYkrbXDuPrvMFYTr1S1FAq2eoBcemNBcrOP64LcsYiNK0BMTsXZV5pQAVb1ZFbaQqx
-         H8ZnDfx78/jHe+FOhEGzcVGhFX9MMFVd7BQYYxl0A9MCU3gUylhJJI6mwoBNIefWPUQw
-         O8aMoxoPNvw/WxUjJH9v0Hph+ngWrVLc6hcUVxcxqeZ6BruxUblgcAptHslu71iJ9ZD1
-         9D2+5OPzmvjRtlC/wPv2IhbFohGzncuVYHL50bLP4SmBvtLHrcaYta388nfZXhoKup34
-         pMY+rorFGjYncAqOzCX2XOe2MblNZY2YL31HMMajHDmmES0HXS+QWiGv9lMFVcA9ACk8
-         WvFQ==
-X-Gm-Message-State: APjAAAXBuTVhKPPsbHoSGVfB5j1dX6jrgEszRmk3L9C1kQXDXz5h4iy/
-        Do2CraTPvVwrJhQEXv0iD7szMc2y9pxzO6srzNKudA==
-X-Google-Smtp-Source: APXvYqyYH9ZkrslDEpoYp8hkvS7yhfva8jU9IqK0d8MGe6sZMgWnpUiyyuJo3saUDZI6ZXXv0stu7i7XIs+SoUse5FI=
-X-Received: by 2002:a9d:62c4:: with SMTP id z4mr25845573otk.56.1562114935125;
- Tue, 02 Jul 2019 17:48:55 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=6/KKy82yrOyc29Ht7hH/jAIFLpMnSWEdvNOCoBZFw1Q=;
+        b=pNNa2BLLH8j0w2xCDeDNwYRmeTAUZ7p912N2tq+K6rD76Zdy4gZX09nSdtl7UzF+Kp
+         BCuwWW+sBtDLfnuHijo94ZtugEHElxVALxdzfCDjxbAk8LA83XBPX4ZC3W+mEpQT8MpD
+         Umx2eK0bK4Xfdu4AwfeyqvskBRc5295O3W9IATTw8kD+Xz0UDsT9TJNzXPT4GGB1jX4c
+         RjTcJMmgpIYW0XNWCM05x3Oy9MN/wp7kRXF1u5QPDKSI7XXBWE8sDSZH/oD1y8uEretZ
+         xeLKSRerPa5fcyuDzxYflCpp5G0GwaQdbiqiG7r2PJKmoHTNp9U92V1ymYvvxRRPnzW8
+         Pgyw==
+X-Gm-Message-State: APjAAAVjuP8qmeyQmSK7y17+f09nZcDSh8f+WZy/4ZBQcVyA6+W/QFpF
+        95dGRf1pNwFLAIAsR4ITF+bF82s+p800gCTonP02bQ==
+X-Google-Smtp-Source: APXvYqz/BvsXGBiKuGtL9K1WWZnAhl10U8iozK1Qx/ukOJphcCT5NdWPIUM19XiKiGta7BHHDLEmcIg8i8/9HNaV+Ks=
+X-Received: by 2002:aca:544b:: with SMTP id i72mr5142037oib.174.1562115706420;
+ Tue, 02 Jul 2019 18:01:46 -0700 (PDT)
 MIME-Version: 1.0
-References: <1560474949-20497-1-git-send-email-wanpengli@tencent.com>
- <1560474949-20497-2-git-send-email-wanpengli@tencent.com> <CANRm+CzUvTTOuYhsGErSDxdNSmxVr7o8d66DF0KOk4v3Meajmg@mail.gmail.com>
- <CANRm+Cw0vmqi4s4HhnMqs=hZZixHmU87CGO_ujTGoN_Osjx76g@mail.gmail.com>
-In-Reply-To: <CANRm+Cw0vmqi4s4HhnMqs=hZZixHmU87CGO_ujTGoN_Osjx76g@mail.gmail.com>
+References: <1561110002-4438-1-git-send-email-wanpengli@tencent.com>
+ <1fbd236a-f7f9-e66a-e08c-bf2bac901d15@redhat.com> <20190702222330.GB26621@amt.cnet>
+ <CANRm+CyBjfa5LsMx87faKUO8XwHkNVrq4+P+vBuFGwjuFC1jxA@mail.gmail.com>
+In-Reply-To: <CANRm+CyBjfa5LsMx87faKUO8XwHkNVrq4+P+vBuFGwjuFC1jxA@mail.gmail.com>
 From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Wed, 3 Jul 2019 08:48:47 +0800
-Message-ID: <CANRm+Cz9Lc5rA7-2yLLX7wiemM-gdvWvQQdGVrvkYanYO9TwgA@mail.gmail.com>
-Subject: Re: [PATCH v4 1/2] KVM: LAPIC: Optimize timer latency consider world
- switch time
-To:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Date:   Wed, 3 Jul 2019 09:01:39 +0800
+Message-ID: <CANRm+CwtWnfLmwKJSW1o3v2E6WOrKWE-iMo46tKKhERZPe+1VA@mail.gmail.com>
+Subject: Re: [PATCH v5 0/4] KVM: LAPIC: Implement Exitless Timer
+To:     Marcelo Tosatti <mtosatti@redhat.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
+        LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo, how about this patchset? Patch 2/2 is easy to take, do you
-have more concern about patch 1/2?
-On Fri, 28 Jun 2019 at 16:29, Wanpeng Li <kernellwp@gmail.com> wrote:
+On Wed, 3 Jul 2019 at 08:47, Wanpeng Li <kernellwp@gmail.com> wrote:
 >
-> ping again,
-> On Fri, 21 Jun 2019 at 17:44, Wanpeng Li <kernellwp@gmail.com> wrote:
+> On Wed, 3 Jul 2019 at 06:23, Marcelo Tosatti <mtosatti@redhat.com> wrote:
 > >
-> > ping,
-> > On Fri, 14 Jun 2019 at 09:15, Wanpeng Li <kernellwp@gmail.com> wrote:
+> > On Tue, Jul 02, 2019 at 06:38:56PM +0200, Paolo Bonzini wrote:
+> > > On 21/06/19 11:39, Wanpeng Li wrote:
+> > > > Dedicated instances are currently disturbed by unnecessary jitter due
+> > > > to the emulated lapic timers fire on the same pCPUs which vCPUs resident.
+> > > > There is no hardware virtual timer on Intel for guest like ARM. Both
+> > > > programming timer in guest and the emulated timer fires incur vmexits.
+> > > > This patchset tries to avoid vmexit which is incurred by the emulated
+> > > > timer fires in dedicated instance scenario.
+> > > >
+> > > > When nohz_full is enabled in dedicated instances scenario, the unpinned
+> > > > timer will be moved to the nearest busy housekeepers after commit
+> > > > 9642d18eee2cd (nohz: Affine unpinned timers to housekeepers) and commit
+> > > > 444969223c8 ("sched/nohz: Fix affine unpinned timers mess"). However,
+> > > > KVM always makes lapic timer pinned to the pCPU which vCPU residents, the
+> > > > reason is explained by commit 61abdbe0 (kvm: x86: make lapic hrtimer
+> > > > pinned). Actually, these emulated timers can be offload to the housekeeping
+> > > > cpus since APICv is really common in recent years. The guest timer interrupt
+> > > > is injected by posted-interrupt which is delivered by housekeeping cpu
+> > > > once the emulated timer fires.
+> > > >
+> > > > The host admin should fine tuned, e.g. dedicated instances scenario w/
+> > > > nohz_full cover the pCPUs which vCPUs resident, several pCPUs surplus
+> > > > for busy housekeeping, disable mwait/hlt/pause vmexits to keep in non-root
+> > > > mode, ~3% redis performance benefit can be observed on Skylake server.
 > > >
-> > > From: Wanpeng Li <wanpengli@tencent.com>
+> > > Marcelo,
 > > >
-> > > Advance lapic timer tries to hidden the hypervisor overhead between t=
-he
-> > > host emulated timer fires and the guest awares the timer is fired. Ho=
-wever,
-> > > even though after more sustaining optimizations, kvm-unit-tests/tscde=
-adline_latency
-> > > still awares ~1000 cycles latency since we lost the time between the =
-end of
-> > > wait_lapic_expire and the guest awares the timer is fired. There are
-> > > codes between the end of wait_lapic_expire and the world switch, furt=
-hermore,
-> > > the world switch itself also has overhead. Actually the guest_tsc is =
-equal
-> > > to the target deadline time in wait_lapic_expire is too late, guest w=
-ill
-> > > aware the latency between the end of wait_lapic_expire() and after vm=
-entry
-> > > to the guest. This patch takes this time into consideration.
-> > >
-> > > The vmentry_advance_ns module parameter is conservative 25ns by defau=
-lt(thanks
-> > > to Radim's kvm-unit-tests/vmentry_latency.flat), it can be tuned/rewo=
-rked in
-> > > the future.
-> > >
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Cc: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> > > Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > > ---
-> > > v3 -> v4:
-> > >  * default value is 25ns
-> > >  * compute vmentry_advance_cycles in kvm_set_tsc_khz() path
-> > > v2 -> v3:
-> > >  * read-only module parameter
-> > >  * get_vmentry_advance_cycles() not inline
-> > > v1 -> v2:
-> > >  * rename get_vmentry_advance_delta to get_vmentry_advance_cycles
-> > >  * cache vmentry_advance_cycles by setting param bit 0
-> > >  * add param max limit
-> > >
-> > >  arch/x86/kvm/lapic.c   | 21 ++++++++++++++++++---
-> > >  arch/x86/kvm/lapic.h   |  2 ++
-> > >  arch/x86/kvm/vmx/vmx.c |  3 ++-
-> > >  arch/x86/kvm/x86.c     | 12 ++++++++++--
-> > >  arch/x86/kvm/x86.h     |  2 ++
-> > >  5 files changed, 34 insertions(+), 6 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > > index e82a18c..e92e4e5 100644
-> > > --- a/arch/x86/kvm/lapic.c
-> > > +++ b/arch/x86/kvm/lapic.c
-> > > @@ -1528,6 +1528,19 @@ static inline void adjust_lapic_timer_advance(=
-struct kvm_vcpu *vcpu,
-> > >         apic->lapic_timer.timer_advance_ns =3D timer_advance_ns;
-> > >  }
-> > >
-> > > +u64 compute_vmentry_advance_cycles(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +       u64 cycles;
-> > > +       struct kvm_lapic *apic =3D vcpu->arch.apic;
-> > > +
-> > > +       cycles =3D vmentry_advance_ns * vcpu->arch.virtual_tsc_khz;
-> > > +       do_div(cycles, 1000000);
-> > > +
-> > > +       apic->lapic_timer.vmentry_advance_cycles =3D cycles;
-> > > +
-> > > +       return cycles;
-> > > +}
-> > > +
-> > >  void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu)
-> > >  {
-> > >         struct kvm_lapic *apic =3D vcpu->arch.apic;
-> > > @@ -1541,7 +1554,8 @@ void kvm_wait_lapic_expire(struct kvm_vcpu *vcp=
-u)
-> > >
-> > >         tsc_deadline =3D apic->lapic_timer.expired_tscdeadline;
-> > >         apic->lapic_timer.expired_tscdeadline =3D 0;
-> > > -       guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc());
-> > > +       guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc()) +
-> > > +               apic->lapic_timer.vmentry_advance_cycles;
-> > >         apic->lapic_timer.advance_expire_delta =3D guest_tsc - tsc_de=
-adline;
-> > >
-> > >         if (guest_tsc < tsc_deadline)
-> > > @@ -1569,7 +1583,8 @@ static void start_sw_tscdeadline(struct kvm_lap=
-ic *apic)
-> > >         local_irq_save(flags);
-> > >
-> > >         now =3D ktime_get();
-> > > -       guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc());
-> > > +       guest_tsc =3D kvm_read_l1_tsc(vcpu, rdtsc()) +
-> > > +               apic->lapic_timer.vmentry_advance_cycles;
-> > >
-> > >         ns =3D (tscdeadline - guest_tsc) * 1000000ULL;
-> > >         do_div(ns, this_tsc_khz);
-> > > @@ -2326,7 +2341,7 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int=
- timer_advance_ns)
-> > >                 apic->lapic_timer.timer_advance_ns =3D timer_advance_=
-ns;
-> > >                 apic->lapic_timer.timer_advance_adjust_done =3D true;
-> > >         }
-> > > -
-> > > +       apic->lapic_timer.vmentry_advance_cycles =3D 0;
-> > >
-> > >         /*
-> > >          * APIC is created enabled. This will prevent kvm_lapic_set_b=
-ase from
-> > > diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-> > > index 3674717..7c38950 100644
-> > > --- a/arch/x86/kvm/lapic.h
-> > > +++ b/arch/x86/kvm/lapic.h
-> > > @@ -33,6 +33,7 @@ struct kvm_timer {
-> > >         u64 expired_tscdeadline;
-> > >         u32 timer_advance_ns;
-> > >         s64 advance_expire_delta;
-> > > +       u64 vmentry_advance_cycles;
-> > >         atomic_t pending;                       /* accumulated trigge=
-red timers */
-> > >         bool hv_timer_in_use;
-> > >         bool timer_advance_adjust_done;
-> > > @@ -226,6 +227,7 @@ static inline int kvm_lapic_latched_init(struct k=
-vm_vcpu *vcpu)
-> > >  bool kvm_apic_pending_eoi(struct kvm_vcpu *vcpu, int vector);
-> > >
-> > >  void kvm_wait_lapic_expire(struct kvm_vcpu *vcpu);
-> > > +u64 compute_vmentry_advance_cycles(struct kvm_vcpu *vcpu);
-> > >
-> > >  bool kvm_intr_is_single_vcpu_fast(struct kvm *kvm, struct kvm_lapic_=
-irq *irq,
-> > >                         struct kvm_vcpu **dest_vcpu);
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index 8fbea03..dc81c78 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -7064,7 +7064,8 @@ static int vmx_set_hv_timer(struct kvm_vcpu *vc=
-pu, u64 guest_deadline_tsc,
-> > >
-> > >         vmx =3D to_vmx(vcpu);
-> > >         tscl =3D rdtsc();
-> > > -       guest_tscl =3D kvm_read_l1_tsc(vcpu, tscl);
-> > > +       guest_tscl =3D kvm_read_l1_tsc(vcpu, tscl) +
-> > > +               vcpu->arch.apic->lapic_timer.vmentry_advance_cycles;
-> > >         delta_tsc =3D max(guest_deadline_tsc, guest_tscl) - guest_tsc=
-l;
-> > >         lapic_timer_advance_cycles =3D nsec_to_cycles(vcpu,
-> > >                                                     ktimer->timer_adv=
-ance_ns);
-> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > > index 0a05a4e..5e79b6c 100644
-> > > --- a/arch/x86/kvm/x86.c
-> > > +++ b/arch/x86/kvm/x86.c
-> > > @@ -145,6 +145,12 @@ module_param(tsc_tolerance_ppm, uint, S_IRUGO | =
-S_IWUSR);
-> > >  static int __read_mostly lapic_timer_advance_ns =3D -1;
-> > >  module_param(lapic_timer_advance_ns, int, S_IRUGO | S_IWUSR);
-> > >
-> > > +/*
-> > > + * lapic timer vmentry advance (tscdeadline mode only) in nanosecond=
-s.
-> > > + */
-> > > +u32 __read_mostly vmentry_advance_ns =3D 25;
-> > > +module_param(vmentry_advance_ns, uint, S_IRUGO);
-> > > +
-> > >  static bool __read_mostly vector_hashing =3D true;
-> > >  module_param(vector_hashing, bool, S_IRUGO);
-> > >
-> > > @@ -1592,6 +1598,8 @@ static int kvm_set_tsc_khz(struct kvm_vcpu *vcp=
-u, u32 user_tsc_khz)
-> > >         kvm_get_time_scale(user_tsc_khz * 1000LL, NSEC_PER_SEC,
-> > >                            &vcpu->arch.virtual_tsc_shift,
-> > >                            &vcpu->arch.virtual_tsc_mult);
-> > > +       if (user_tsc_khz !=3D vcpu->arch.virtual_tsc_khz)
-> > > +               compute_vmentry_advance_cycles(vcpu);
-> > >         vcpu->arch.virtual_tsc_khz =3D user_tsc_khz;
-> > >
-> > >         /*
-> > > @@ -9134,8 +9142,6 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
-> > >         }
-> > >         vcpu->arch.pio_data =3D page_address(page);
-> > >
-> > > -       kvm_set_tsc_khz(vcpu, max_tsc_khz);
-> > > -
-> > >         r =3D kvm_mmu_create(vcpu);
-> > >         if (r < 0)
-> > >                 goto fail_free_pio_data;
-> > > @@ -9148,6 +9154,8 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
-> > >         } else
-> > >                 static_key_slow_inc(&kvm_no_apic_vcpu);
-> > >
-> > > +       kvm_set_tsc_khz(vcpu, max_tsc_khz);
-> > > +
-> > >         vcpu->arch.mce_banks =3D kzalloc(KVM_MAX_MCE_BANKS * sizeof(u=
-64) * 4,
-> > >                                        GFP_KERNEL_ACCOUNT);
-> > >         if (!vcpu->arch.mce_banks) {
-> > > diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> > > index e08a128..9998989 100644
-> > > --- a/arch/x86/kvm/x86.h
-> > > +++ b/arch/x86/kvm/x86.h
-> > > @@ -299,6 +299,8 @@ extern u64 kvm_supported_xcr0(void);
-> > >
-> > >  extern unsigned int min_timer_period_us;
-> > >
-> > > +extern unsigned int vmentry_advance_ns;
-> > > +
-> > >  extern bool enable_vmware_backdoor;
-> > >
-> > >  extern struct static_key kvm_no_apic_vcpu;
-> > > --
-> > > 2.7.4
-> > >
+> > > does this patch work for you or can you still see the oops?
+> >
+> > Hi Paolo,
+> >
+> > No more oopses with kvm/queue. Can you include:
+>
+> Cool, thanks for the confirm, Marcelo!
+>
+> >
+> > Index: kvm/arch/x86/kvm/lapic.c
+> > ===================================================================
+> > --- kvm.orig/arch/x86/kvm/lapic.c
+> > +++ kvm/arch/x86/kvm/lapic.c
+> > @@ -124,8 +124,7 @@ static inline u32 kvm_x2apic_id(struct k
+> >
+> >  bool posted_interrupt_inject_timer(struct kvm_vcpu *vcpu)
+> >  {
+> > -       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
+> > -               kvm_hlt_in_guest(vcpu->kvm);
+> > +       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
+> >  }
+> >  EXPORT_SYMBOL_GPL(posted_interrupt_inject_timer);
+> >
+> > However, for some reason (hrtimer subsystems responsability) with cyclictest -i 200
+> > on the guest, the timer runs on the local CPU:
+> >
+> >        CPU 1/KVM-9454  [003] d..2   881.674196: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >        CPU 1/KVM-9454  [003] d..2   881.674200: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >        CPU 1/KVM-9454  [003] d.h.   881.674387: apic_timer_fn <-__hrtimer_run_queues
+> >        CPU 1/KVM-9454  [003] d..2   881.674393: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >        CPU 1/KVM-9454  [003] d..2   881.674395: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >        CPU 1/KVM-9454  [003] d..2   881.674399: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >        CPU 1/KVM-9454  [003] d.h.   881.674586: apic_timer_fn <-__hrtimer_run_queues
+> >        CPU 1/KVM-9454  [003] d..2   881.674593: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >        CPU 1/KVM-9454  [003] d..2   881.674595: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >        CPU 1/KVM-9454  [003] d..2   881.674599: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >        CPU 1/KVM-9454  [003] d.h.   881.674787: apic_timer_fn <-__hrtimer_run_queues
+> >        CPU 1/KVM-9454  [003] d..2   881.674793: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >        CPU 1/KVM-9454  [003] d..2   881.674795: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >
+> > But on boot:
+> >
+> >        CPU 1/KVM-9454  [003] d..2   578.625394: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >           <idle>-0     [000] d.h1   578.626390: apic_timer_fn <-__hrtimer_run_queues
+> >           <idle>-0     [000] d.h1   578.626394: apic_timer_fn<-__hrtimer_run_queues
+> >        CPU 1/KVM-9454  [003] d..2   578.626401: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >           <idle>-0     [000] d.h1   578.628397: apic_timer_fn <-__hrtimer_run_queues
+> >        CPU 1/KVM-9454  [003] d..2   578.628407: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >           <idle>-0     [000] d.h1   578.631403: apic_timer_fn <-__hrtimer_run_queues
+> >        CPU 1/KVM-9454  [003] d..2   578.631413: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >           <idle>-0     [000] d.h1   578.635409: apic_timer_fn <-__hrtimer_run_queues
+> >        CPU 1/KVM-9454  [003] d..2   578.635419: get_nohz_timer_target: get_nohz_timer_target 3->0
+> >           <idle>-0     [000] d.h1   578.640415: apic_timer_fn <-__hrtimer_run_queues
+>
+> You have an idle housekeeping cpu(cpu 0), however, most of
+> housekeeping cpus will be busy in product environment to avoid to
+> waste money. get_nohz_timer_target() will find a busy housekeeping cpu
+> but the timer migration will fail if the timer is the first expiring
+> timer on the new target(as the comments above the function
+> switch_hrtimer_base()). Please try taskset -c 0 stress --cpu 1 on your
+> host, you can observe(through /proc/timer_list) apic_timer_fn running
+> on cpu 0 most of the time and sporadically on local cpu.
+
+Or if you have a little bigger VM/multiple VMs, the apic_timer_fn from
+all virtual lapics will make a housekeeping cpu busy. :)
+
+Regards,
+Wanpeng Li
