@@ -2,284 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 949615F008
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 02:23:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60E4D5EFCD
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 01:57:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727520AbfGDAXD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 20:23:03 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:51706 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727521AbfGDAXC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 20:23:02 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x640J7VG195251;
-        Thu, 4 Jul 2019 00:22:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2018-07-02;
- bh=IjKSzdPyPZlOz7B2rDuxhHtOS7NFoiMRTKtJcj1TDU0=;
- b=ZO9GO/Ce1srCKk1UtP78MbozuvTImbiYt94C2oEZ+4OJb19kfEfsv2V7ZXY4NvIPlzNL
- uVS5loVfc2TcbgQ1QDoS0ocC8F96+j52NXtcn6LyduqeCZRU6CUeKWctcjiNMFeiRjPM
- Bm6SYAzNQvgjV7GRAK+YEkgwvDAgKzhI3d71Pn1hdFDP+lN50fyBqZcU2KrKKPB+YZBc
- E4bOHrfEX1OkY4N5WmXWTCy9dm4fwzopwDxrDggq8D2Rvdj+FWfH+qwqpgW0a4TLkbig
- K8ddATfvb5y/eCxmAQudA2dXMJ2CsbC9O/FhqGt3yCtw0MxOvpHTWhqSFh1N3pXF5dDs lw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2te61q42w6-1
+        id S1727345AbfGCX56 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 19:57:58 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:46478 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726988AbfGCX55 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 19:57:57 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x63NsYJP168403;
+        Wed, 3 Jul 2019 23:57:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=wq2XcNNeWcA+SYEe+XQeP1Ou6qKU0kk/7Hd2qQh1a8E=;
+ b=3UC413p7xyT8hKKKUG9p6EHV641ANkWBa4tTpRcuTUaFhS02R6FFVNisEQWFg6W8GeiN
+ tGNFBFMw4tjLsYskhAZWiRS2CFuz8m1e8huUeBAHnDam7bjPnOHbecRxGtD2mUqpB4N3
+ QWCHI04Ya9glKgMSuTq1x84d+FVCqzspgJ/3evlPTKELNReDFDoprq1KtP2TNEzZ3ZH7
+ cIWw55yk8ndisXW9P0QP3sPjSAREcVQKPwN4AF9c+vjSum//PszHc5cAelYUByPpcX4+
+ ItjZP0DV1Gbo41MtjEBFG29AFTrdtJABUI83WryG6mgFTfOKK4McN8kvVGmB7xppzxY5 Nw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 2te61ec0cb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 04 Jul 2019 00:22:38 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x640MWn8016629;
-        Thu, 4 Jul 2019 00:22:38 GMT
+        Wed, 03 Jul 2019 23:57:42 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x63NqQVT096911;
+        Wed, 3 Jul 2019 23:57:42 GMT
 Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2tebbkn6c1-1
+        by userp3030.oracle.com with ESMTP id 2th5qkrg1f-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 04 Jul 2019 00:22:38 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x640Mb86008436;
-        Thu, 4 Jul 2019 00:22:37 GMT
-Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
+        Wed, 03 Jul 2019 23:57:41 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x63Nvfcp009935;
+        Wed, 3 Jul 2019 23:57:41 GMT
+Received: from dhcp-10-132-91-225.usdhcp.oraclecorp.com (/10.132.91.225)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 03 Jul 2019 17:22:37 -0700
+        with ESMTP ; Wed, 03 Jul 2019 16:57:40 -0700
+Subject: Re: [PATCH 1/2] KVM nVMX: Check Host Segment Registers and Descriptor
+ Tables on vmentry of nested guests
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     rkrcmar@redhat.com, jmattson@google.com
+References: <20190628221447.23498-1-krish.sadhukhan@oracle.com>
+ <20190628221447.23498-2-krish.sadhukhan@oracle.com>
+ <00f32b48-28e9-2502-5145-52150f0307ca@redhat.com>
 From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     rkrcmar@redhat.com, pbonzini@redhat.com, jmattson@google.com
-Subject: [PATCH 2/2 v2]kvm-unit-test: nVMX: Test Host Segment Registers and Descriptor Tables on vmentry of nested guests
-Date:   Wed,  3 Jul 2019 19:54:36 -0400
-Message-Id: <20190703235437.13429-3-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190703235437.13429-1-krish.sadhukhan@oracle.com>
-References: <20190703235437.13429-1-krish.sadhukhan@oracle.com>
+Message-ID: <722eb7f6-7617-f45a-4a3a-baa6952f7445@oracle.com>
+Date:   Wed, 3 Jul 2019 16:57:39 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <00f32b48-28e9-2502-5145-52150f0307ca@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9307 signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=13 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=719
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=979
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1907040003
+ engine=8.0.1-1810050000 definitions=main-1907030294
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9307 signatures=668688
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=13 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=772 adultscore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1907040002
+ definitions=main-1907030294
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-According to section "Checks on Host Segment and Descriptor-Table
-Registers" in Intel SDM vol 3C, the following checks are performed on
-vmentry of nested guests:
 
-    - In the selector field for each of CS, SS, DS, ES, FS, GS and TR, the
-      RPL (bits 1:0) and the TI flag (bit 2) must be 0.
-    - The selector fields for CS and TR cannot be 0000H.
-    - The selector field for SS cannot be 0000H if the "host address-space
-      size" VM-exit control is 0.
-    - On processors that support Intel 64 architecture, the base-address
-      fields for FS, GS, GDTR, IDTR, and TR must contain canonical
-      addresses.
 
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
----
- lib/x86/processor.h |   5 ++
- x86/vmx_tests.c     | 159 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 164 insertions(+)
+On 07/02/2019 09:25 AM, Paolo Bonzini wrote:
+> On 29/06/19 00:14, Krish Sadhukhan wrote:
+>> According to section "Checks on Host Segment and Descriptor-Table
+>> Registers" in Intel SDM vol 3C, the following checks are performed on
+>> vmentry of nested guests:
+>>
+>>     - In the selector field for each of CS, SS, DS, ES, FS, GS and TR, the
+>>       RPL (bits 1:0) and the TI flag (bit 2) must be 0.
+>>     - The selector fields for CS and TR cannot be 0000H.
+>>     - The selector field for SS cannot be 0000H if the "host address-space
+>>       size" VM-exit control is 0.
+>>     - On processors that support Intel 64 architecture, the base-address
+>>       fields for FS, GS and TR must contain canonical addresses.
+>>
+>> Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
+>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+> All these tests are getting expensive.  Can you look into skipping them
+> whenever dirty_vmcs12 is clear?
 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 4fef0bc..8b8bb7a 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -461,6 +461,11 @@ static inline void write_pkru(u32 pkru)
-         : : "a" (eax), "c" (ecx), "d" (edx));
- }
- 
-+static inline u64 make_non_canonical(u64 addr)
-+{
-+	return (addr | 1ull << 48);
-+}
-+
- static inline bool is_canonical(u64 addr)
- {
- 	return (s64)(addr << 16) >> 16 == addr;
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index b50d858..5911a60 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -6938,6 +6938,163 @@ static void test_load_host_pat(void)
- 	test_pat(HOST_PAT, "HOST_PAT", EXI_CONTROLS, EXI_LOAD_PAT);
- }
- 
-+/*
-+ * Test a value for the given VMCS field.
-+ *
-+ *  "field" - VMCS field
-+ *  "field_name" - string name of VMCS field
-+ *  "bit_start" - starting bit
-+ *  "bit_end" - ending bit
-+ *  "val" - value that the bit range must or must not contain
-+ *  "valid_val" - whether value given in 'val' must be valid or not
-+ *  "error" - expected VMCS error when vmentry fails for an invalid value
-+ */
-+static void test_vmcs_field(u64 field, const char *field_name, u32 bit_start,
-+			    u32 bit_end, u64 val, bool valid_val, u32 error)
-+{
-+	u64 field_saved = vmcs_read(field);
-+	u32 i;
-+	u64 tmp;
-+	u32 bit_on;
-+	u64 mask = ~0ull;
-+
-+	mask = (mask >> bit_end) << bit_end;
-+	mask = mask | ((1 << bit_start) - 1);
-+	tmp = (field_saved & mask) | (val << bit_start);
-+
-+	vmcs_write(field, tmp);
-+	report_prefix_pushf("%s %lx", field_name, tmp);
-+	if (valid_val)
-+		test_vmx_vmlaunch(0, false);
-+	else
-+		test_vmx_vmlaunch(error, false);
-+	report_prefix_pop();
-+
-+	for (i = bit_start; i <= bit_end; i = i + 2) {
-+		bit_on = ((1ull < i) & (val << bit_start)) ? 0 : 1;
-+		if (bit_on)
-+			tmp = field_saved | (1ull << i);
-+		else
-+			tmp = field_saved & ~(1ull << i);
-+		vmcs_write(field, tmp);
-+		report_prefix_pushf("%s %lx", field_name, tmp);
-+		if (valid_val)
-+			test_vmx_vmlaunch(error, false);
-+		else
-+			test_vmx_vmlaunch(0, false);
-+		report_prefix_pop();
-+	}
-+
-+	vmcs_write(field, field_saved);
-+}
-+
-+static void test_canonical(u64 field, const char * field_name)
-+{
-+	u64 addr_saved = vmcs_read(field);
-+	u64 addr = addr_saved;
-+
-+	report_prefix_pushf("%s %lx", field_name, addr);
-+	if (is_canonical(addr)) {
-+		test_vmx_vmlaunch(0, false);
-+		report_prefix_pop();
-+
-+		addr = make_non_canonical(addr);
-+		vmcs_write(field, addr);
-+		report_prefix_pushf("%s %lx", field_name, addr);
-+		test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD,
-+				  false);
-+
-+		vmcs_write(field, addr_saved);
-+	} else {
-+		test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD,
-+				  false);
-+	}
-+	report_prefix_pop();
-+}
-+
-+/*
-+ * 1. In the selector field for each of CS, SS, DS, ES, FS, GS and TR, the
-+ *    RPL (bits 1:0) and the TI flag (bit 2) must be 0.
-+ * 2. The selector fields for CS and TR cannot be 0000H.
-+ * 3. The selector field for SS cannot be 0000H if the "host address-space
-+ *    size" VM-exit control is 0.
-+ * 4. On processors that support Intel 64 architecture, the base-address
-+ *    fields for FS, GS and TR must contain canonical addresses.
-+ */
-+static void test_host_segment_regs(void)
-+{
-+	u32 exit_ctrl_saved = vmcs_read(EXI_CONTROLS);
-+	u16 selector_saved;
-+
-+	/*
-+	 * Test RPL and TI flags
-+	 */
-+	test_vmcs_field(HOST_SEL_CS, "HOST_SEL_CS", 0, 2, 0x0, true,
-+		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-+	test_vmcs_field(HOST_SEL_SS, "HOST_SEL_SS", 0, 2, 0x0, true,
-+		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-+	test_vmcs_field(HOST_SEL_DS, "HOST_SEL_DS", 0, 2, 0x0, true,
-+		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-+	test_vmcs_field(HOST_SEL_ES, "HOST_SEL_ES", 0, 2, 0x0, true,
-+		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-+	test_vmcs_field(HOST_SEL_FS, "HOST_SEL_FS", 0, 2, 0x0, true,
-+		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-+	test_vmcs_field(HOST_SEL_GS, "HOST_SEL_GS", 0, 2, 0x0, true,
-+		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-+	test_vmcs_field(HOST_SEL_TR, "HOST_SEL_TR", 0, 2, 0x0, true,
-+		     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-+
-+	/*
-+	 * Test that CS and TR fields can not be 0x0000
-+	 */
-+	test_vmcs_field(HOST_SEL_CS, "HOST_SEL_CS", 3, 15, 0x0000, false,
-+			     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-+	test_vmcs_field(HOST_SEL_TR, "HOST_SEL_TR", 3, 15, 0x0000, false,
-+			     VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-+
-+	/*
-+	 * SS field can not be 0x0000 if "host address-space size" VM-exit
-+	 * control is 0
-+	 */
-+	selector_saved = vmcs_read(HOST_SEL_SS);
-+	vmcs_write(HOST_SEL_SS, 0);
-+	if (exit_ctrl_saved & EXI_HOST_64) {
-+		report_prefix_pushf("HOST_SEL_SS 0");
-+		test_vmx_vmlaunch(0, false);
-+		report_prefix_pop();
-+
-+		vmcs_write(EXI_CONTROLS, exit_ctrl_saved & ~EXI_HOST_64);
-+	}
-+
-+	report_prefix_pushf("HOST_SEL_SS 0");
-+	test_vmx_vmlaunch(VMXERR_ENTRY_INVALID_HOST_STATE_FIELD, false);
-+	report_prefix_pop();
-+
-+	vmcs_write(HOST_SEL_SS, selector_saved);
-+	vmcs_write(EXI_CONTROLS, exit_ctrl_saved);
-+
-+#ifdef __x86_64__
-+	/*
-+	 * Base address for FS, GS and TR must be canonical
-+	 */
-+	test_canonical(HOST_BASE_FS, "HOST_BASE_FS");
-+	test_canonical(HOST_BASE_GS, "HOST_BASE_GS");
-+	test_canonical(HOST_BASE_TR, "HOST_BASE_TR");
-+#endif
-+}
-+
-+/*
-+ *  On processors that support Intel 64 architecture, the base-address
-+ *  fields for GDTR and IDTR must contain canonical addresses.
-+ */
-+static void test_host_desc_tables(void)
-+{
-+#ifdef __x86_64__
-+	test_canonical(HOST_BASE_GDTR, "HOST_BASE_GDTR");
-+	test_canonical(HOST_BASE_IDTR, "HOST_BASE_IDTR");
-+#endif
-+}
-+
- /*
-  * Check that the virtual CPU checks the VMX Host State Area as
-  * documented in the Intel SDM.
-@@ -6958,6 +7115,8 @@ static void vmx_host_state_area_test(void)
- 
- 	test_host_efer();
- 	test_load_host_pat();
-+	test_host_segment_regs();
-+	test_host_desc_tables();
- }
- 
- /*
--- 
-2.20.1
+OK. I am working on it and will send a separate patch-set for that. In 
+the meantime, I will send v2 of this patchset containing a fix for a 
+compilation error.
+
+Thanks.
+
+> Thanks,
+>
+> Paolo
+>
+>> ---
+>>   arch/x86/kvm/vmx/nested.c | 26 ++++++++++++++++++++++++--
+>>   1 file changed, 24 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> index f1a69117ac0f..856a83aa42f5 100644
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -2609,6 +2609,30 @@ static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
+>>   	    !kvm_pat_valid(vmcs12->host_ia32_pat))
+>>   		return -EINVAL;
+>>   
+>> +	ia32e = (vmcs12->vm_exit_controls &
+>> +		 VM_EXIT_HOST_ADDR_SPACE_SIZE) != 0;
+>> +
+>> +	if (vmcs12->host_cs_selector & (SEGMENT_RPL_MASK | SEGMENT_TI_MASK) ||
+>> +	    vmcs12->host_ss_selector & (SEGMENT_RPL_MASK | SEGMENT_TI_MASK) ||
+>> +	    vmcs12->host_ds_selector & (SEGMENT_RPL_MASK | SEGMENT_TI_MASK) ||
+>> +	    vmcs12->host_es_selector & (SEGMENT_RPL_MASK | SEGMENT_TI_MASK) ||
+>> +	    vmcs12->host_fs_selector & (SEGMENT_RPL_MASK | SEGMENT_TI_MASK) ||
+>> +	    vmcs12->host_gs_selector & (SEGMENT_RPL_MASK | SEGMENT_TI_MASK) ||
+>> +	    vmcs12->host_tr_selector & (SEGMENT_RPL_MASK | SEGMENT_TI_MASK) ||
+>> +	    vmcs12->host_cs_selector == 0 ||
+>> +	    vmcs12->host_tr_selector == 0 ||
+>> +	    (vmcs12->host_ss_selector == 0 && !ia32e))
+>> +		return -EINVAL;
+>> +
+>> +#ifdef CONFIG_X86_64
+>> +	if (is_noncanonical_address(vmcs12->host_fs_base, vcpu) ||
+>> +	    is_noncanonical_address(vmcs12->host_gs_base, vcpu) ||
+>> +	    is_noncanonical_address(vmcs12->host_gdtr_base, vcpu) ||
+>> +	    is_noncanonical_address(vmcs12->host_idtr_base, vcpu) ||
+>> +	    is_noncanonical_address(vmcs12->host_tr_base, vcpu))
+>> +		return -EINVAL;
+>> +#endif
+>> +
+>>   	/*
+>>   	 * If the load IA32_EFER VM-exit control is 1, bits reserved in the
+>>   	 * IA32_EFER MSR must be 0 in the field for that register. In addition,
+>> @@ -2616,8 +2640,6 @@ static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
+>>   	 * the host address-space size VM-exit control.
+>>   	 */
+>>   	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_EFER) {
+>> -		ia32e = (vmcs12->vm_exit_controls &
+>> -			 VM_EXIT_HOST_ADDR_SPACE_SIZE) != 0;
+>>   		if (!kvm_valid_efer(vcpu, vmcs12->host_ia32_efer) ||
+>>   		    ia32e != !!(vmcs12->host_ia32_efer & EFER_LMA) ||
+>>   		    ia32e != !!(vmcs12->host_ia32_efer & EFER_LME))
+>>
 
