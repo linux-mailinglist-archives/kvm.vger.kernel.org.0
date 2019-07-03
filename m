@@ -2,34 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BD7D5E4D9
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 15:09:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 169625E542
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 15:20:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726635AbfGCNJg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 09:09:36 -0400
-Received: from foss.arm.com ([217.140.110.172]:47548 "EHLO foss.arm.com"
+        id S1726991AbfGCNUo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 09:20:44 -0400
+Received: from foss.arm.com ([217.140.110.172]:47828 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726581AbfGCNJg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 09:09:36 -0400
+        id S1725830AbfGCNUo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 09:20:44 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 165972B;
-        Wed,  3 Jul 2019 06:09:35 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 922072B;
+        Wed,  3 Jul 2019 06:20:42 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B08DA3F718;
-        Wed,  3 Jul 2019 06:09:33 -0700 (PDT)
-Subject: Re: [PATCH 15/59] KVM: arm64: nv: Refactor vcpu_{read,write}_sys_reg
-To:     Julien Thierry <julien.thierry@arm.com>,
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8F0A13F718;
+        Wed,  3 Jul 2019 06:20:41 -0700 (PDT)
+Subject: Re: [PATCH 07/59] KVM: arm64: nv: Add EL2 system registers to vcpu
+ context
+To:     Alexandru Elisei <alexandru.elisei@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
 Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
+        Dave Martin <Dave.Martin@arm.com>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-16-marc.zyngier@arm.com>
- <a64c85c3-0230-d9d0-aea6-b8a4196e62b2@arm.com>
+ <20190621093843.220980-8-marc.zyngier@arm.com>
+ <83f3352a-0a9d-3373-87b8-162f2648dc88@arm.com>
 From:   Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
@@ -76,12 +73,12 @@ Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
  Z46HaNmN2hZS/oJ69c1DI5Rcww==
 Organization: ARM Ltd
-Message-ID: <94b1665e-f365-da5e-f47d-8cddd21643eb@arm.com>
-Date:   Wed, 3 Jul 2019 14:09:32 +0100
+Message-ID: <a05950b4-400f-4605-6163-2d5611359ff1@arm.com>
+Date:   Wed, 3 Jul 2019 14:20:40 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <a64c85c3-0230-d9d0-aea6-b8a4196e62b2@arm.com>
+In-Reply-To: <83f3352a-0a9d-3373-87b8-162f2648dc88@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -90,139 +87,320 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24/06/2019 16:07, Julien Thierry wrote:
-> 
-> 
-> On 06/21/2019 10:37 AM, Marc Zyngier wrote:
->> Extract the direct HW accessors for later reuse.
+On 24/06/2019 16:47, Alexandru Elisei wrote:
+> On 6/21/19 10:37 AM, Marc Zyngier wrote:
+>> From: Jintack Lim <jintack.lim@linaro.org>
 >>
+>> ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
+>> this bit is set, accessing EL2 registers in EL1 traps to EL2. In
+>> addition, executing the following instructions in EL1 will trap to EL2:
+>> tlbi, at, eret, and msr/mrs instructions to access SP_EL1. Most of the
+>> instructions that trap to EL2 with the NV bit were undef at EL1 prior to
+>> ARM v8.3. The only instruction that was not undef is eret.
+>>
+>> This patch sets up a handler for EL2 registers and SP_EL1 register
+>> accesses at EL1. The host hypervisor keeps those register values in
+>> memory, and will emulate their behavior.
+>>
+>> This patch doesn't set the NV bit yet. It will be set in a later patch
+>> once nested virtualization support is completed.
+>>
+>> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >> ---
->>  arch/arm64/kvm/sys_regs.c | 247 +++++++++++++++++++++-----------------
->>  1 file changed, 139 insertions(+), 108 deletions(-)
+>>  arch/arm64/include/asm/kvm_host.h | 37 +++++++++++++++-
+>>  arch/arm64/include/asm/sysreg.h   | 50 ++++++++++++++++++++-
+>>  arch/arm64/kvm/sys_regs.c         | 74 ++++++++++++++++++++++++++++---
+>>  3 files changed, 154 insertions(+), 7 deletions(-)
 >>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 4bcd9c1291d5..2d4290d2513a 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -173,12 +173,47 @@ enum vcpu_sysreg {
+>>  	APGAKEYLO_EL1,
+>>  	APGAKEYHI_EL1,
+>>  
+>> -	/* 32bit specific registers. Keep them at the end of the range */
+>> +	/* 32bit specific registers. */
+>>  	DACR32_EL2,	/* Domain Access Control Register */
+>>  	IFSR32_EL2,	/* Instruction Fault Status Register */
+>>  	FPEXC32_EL2,	/* Floating-Point Exception Control Register */
+>>  	DBGVCR32_EL2,	/* Debug Vector Catch Register */
+>>  
+>> +	/* EL2 registers sorted ascending by Op0, Op1, CRn, CRm, Op2 */
+>> +	FIRST_EL2_SYSREG,
+>> +	VPIDR_EL2 = FIRST_EL2_SYSREG,
+>> +			/* Virtualization Processor ID Register */
+>> +	VMPIDR_EL2,	/* Virtualization Multiprocessor ID Register */
+>> +	SCTLR_EL2,	/* System Control Register (EL2) */
+>> +	ACTLR_EL2,	/* Auxiliary Control Register (EL2) */
+>> +	HCR_EL2,	/* Hypervisor Configuration Register */
+>> +	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
+>> +	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
+>> +	HSTR_EL2,	/* Hypervisor System Trap Register */
+>> +	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
+>> +	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
+>> +	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
+>> +	TCR_EL2,	/* Translation Control Register (EL2) */
+>> +	VTTBR_EL2,	/* Virtualization Translation Table Base Register */
+>> +	VTCR_EL2,	/* Virtualization Translation Control Register */
+>> +	SPSR_EL2,	/* EL2 saved program status register */
+>> +	ELR_EL2,	/* EL2 exception link register */
+>> +	AFSR0_EL2,	/* Auxiliary Fault Status Register 0 (EL2) */
+>> +	AFSR1_EL2,	/* Auxiliary Fault Status Register 1 (EL2) */
+>> +	ESR_EL2,	/* Exception Syndrome Register (EL2) */
+>> +	FAR_EL2,	/* Hypervisor IPA Fault Address Register */
+>> +	HPFAR_EL2,	/* Hypervisor IPA Fault Address Register */
+>> +	MAIR_EL2,	/* Memory Attribute Indirection Register (EL2) */
+>> +	AMAIR_EL2,	/* Auxiliary Memory Attribute Indirection Register (EL2) */
+>> +	VBAR_EL2,	/* Vector Base Address Register (EL2) */
+>> +	RVBAR_EL2,	/* Reset Vector Base Address Register */
+>> +	RMR_EL2,	/* Reset Management Register */
+>> +	CONTEXTIDR_EL2,	/* Context ID Register (EL2) */
+>> +	TPIDR_EL2,	/* EL2 Software Thread ID Register */
+>> +	CNTVOFF_EL2,	/* Counter-timer Virtual Offset register */
+>> +	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
+>> +	SP_EL2,		/* EL2 Stack Pointer */
+>> +
+>>  	NR_SYS_REGS	/* Nothing after this line! */
+>>  };
+>>  
+>> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+>> index f3ca7e4796ab..8b95f2c42c3d 100644
+>> --- a/arch/arm64/include/asm/sysreg.h
+>> +++ b/arch/arm64/include/asm/sysreg.h
+>> @@ -411,17 +411,49 @@
+>>  
+>>  #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
+>>  
+>> +#define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
+>> +#define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
+>> +
+>> +#define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
+>> +#define SYS_ACTLR_EL2			sys_reg(3, 4, 1, 0, 1)
+>> +#define SYS_HCR_EL2			sys_reg(3, 4, 1, 1, 0)
+>> +#define SYS_MDCR_EL2			sys_reg(3, 4, 1, 1, 1)
+>> +#define SYS_CPTR_EL2			sys_reg(3, 4, 1, 1, 2)
+>> +#define SYS_HSTR_EL2			sys_reg(3, 4, 1, 1, 3)
+>> +#define SYS_HACR_EL2			sys_reg(3, 4, 1, 1, 7)
+>> +
+>>  #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
+>> +
+>> +#define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
+>> +#define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
+>> +#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+>> +#define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+>> +#define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+>> +
+>>  #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
+>> +
+>>  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+>>  #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
+>> +#define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
+>> +
+>>  #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
+>> +#define SYS_AFSR0_EL2			sys_reg(3, 4, 5, 1, 0)
+>> +#define SYS_AFSR1_EL2			sys_reg(3, 4, 5, 1, 1)
+>>  #define SYS_ESR_EL2			sys_reg(3, 4, 5, 2, 0)
+>>  #define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
+>>  #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
+>>  #define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
+>>  
+>> -#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1,  1)
+>> +#define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
+>> +#define SYS_HPFAR_EL2			sys_reg(3, 4, 6, 0, 4)
+>> +
+>> +#define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
+>> +#define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
+>> +
+>> +#define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
+>> +#define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
+>> +#define SYS_RMR_EL2			sys_reg(3, 4, 12, 0, 2)
+>> +#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1, 1)
+>>  #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
+>>  #define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
+>>  #define SYS_ICH_AP0R1_EL2		__SYS__AP0Rx_EL2(1)
+>> @@ -463,23 +495,37 @@
+>>  #define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
+>>  #define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
+>>  
+>> +#define SYS_CONTEXTIDR_EL2		sys_reg(3, 4, 13, 0, 1)
+>> +#define SYS_TPIDR_EL2			sys_reg(3, 4, 13, 0, 2)
+>> +
+>> +#define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
+>> +#define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
+>> +
+>>  /* VHE encodings for architectural EL0/1 system registers */
+>>  #define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
+>>  #define SYS_CPACR_EL12			sys_reg(3, 5, 1, 0, 2)
+>>  #define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
+>> +
+>>  #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
+>>  #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
+>>  #define SYS_TCR_EL12			sys_reg(3, 5, 2, 0, 2)
+>> +
+>>  #define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
+>>  #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
+>> +
+>>  #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
+>>  #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
+>>  #define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
+>> +
+>>  #define SYS_FAR_EL12			sys_reg(3, 5, 6, 0, 0)
+>> +
+>>  #define SYS_MAIR_EL12			sys_reg(3, 5, 10, 2, 0)
+>>  #define SYS_AMAIR_EL12			sys_reg(3, 5, 10, 3, 0)
+>> +
+>>  #define SYS_VBAR_EL12			sys_reg(3, 5, 12, 0, 0)
+>> +
+>>  #define SYS_CONTEXTIDR_EL12		sys_reg(3, 5, 13, 0, 1)
+>> +
+>>  #define SYS_CNTKCTL_EL12		sys_reg(3, 5, 14, 1, 0)
+>>  #define SYS_CNTP_TVAL_EL02		sys_reg(3, 5, 14, 2, 0)
+>>  #define SYS_CNTP_CTL_EL02		sys_reg(3, 5, 14, 2, 1)
+>> @@ -488,6 +534,8 @@
+>>  #define SYS_CNTV_CTL_EL02		sys_reg(3, 5, 14, 3, 1)
+>>  #define SYS_CNTV_CVAL_EL02		sys_reg(3, 5, 14, 3, 2)
+>>  
+>> +#define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
+>> +
+>>  /* Common SCTLR_ELx flags. */
+>>  #define SCTLR_ELx_DSSBS	(_BITUL(44))
+>>  #define SCTLR_ELx_ENIA	(_BITUL(31))
 >> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 2b8734f75a09..e181359adadf 100644
+>> index adb8a7e9c8e4..e81be6debe07 100644
 >> --- a/arch/arm64/kvm/sys_regs.c
 >> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -182,99 +182,161 @@ const struct el2_sysreg_map *find_el2_sysreg(const struct el2_sysreg_map *map,
->>  	return entry;
+>> @@ -184,6 +184,18 @@ static u32 get_ccsidr(u32 csselr)
+>>  	return ccsidr;
 >>  }
 >>  
->> +static bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
+>> +static bool access_rw(struct kvm_vcpu *vcpu,
+>> +		      struct sys_reg_params *p,
+>> +		      const struct sys_reg_desc *r)
 >> +{
->> +	/*
->> +	 * System registers listed in the switch are not saved on every
->> +	 * exit from the guest but are only saved on vcpu_put.
->> +	 *
->> +	 * Note that MPIDR_EL1 for the guest is set by KVM via VMPIDR_EL2 but
->> +	 * should never be listed below, because the guest cannot modify its
->> +	 * own MPIDR_EL1 and MPIDR_EL1 is accessed for VCPU A from VCPU B's
->> +	 * thread when emulating cross-VCPU communication.
->> +	 */
->> +	switch (reg) {
->> +	case CSSELR_EL1:	*val = read_sysreg_s(SYS_CSSELR_EL1);	break;
->> +	case SCTLR_EL1:		*val = read_sysreg_s(SYS_SCTLR_EL12);	break;
->> +	case ACTLR_EL1:		*val = read_sysreg_s(SYS_ACTLR_EL1);	break;
->> +	case CPACR_EL1:		*val = read_sysreg_s(SYS_CPACR_EL12);	break;
->> +	case TTBR0_EL1:		*val = read_sysreg_s(SYS_TTBR0_EL12);	break;
->> +	case TTBR1_EL1:		*val = read_sysreg_s(SYS_TTBR1_EL12);	break;
->> +	case TCR_EL1:		*val = read_sysreg_s(SYS_TCR_EL12);	break;
->> +	case ESR_EL1:		*val = read_sysreg_s(SYS_ESR_EL12);	break;
->> +	case AFSR0_EL1:		*val = read_sysreg_s(SYS_AFSR0_EL12);	break;
->> +	case AFSR1_EL1:		*val = read_sysreg_s(SYS_AFSR1_EL12);	break;
->> +	case FAR_EL1:		*val = read_sysreg_s(SYS_FAR_EL12);	break;
->> +	case MAIR_EL1:		*val = read_sysreg_s(SYS_MAIR_EL12);	break;
->> +	case VBAR_EL1:		*val = read_sysreg_s(SYS_VBAR_EL12);	break;
->> +	case CONTEXTIDR_EL1:	*val = read_sysreg_s(SYS_CONTEXTIDR_EL12);break;
->> +	case TPIDR_EL0:		*val = read_sysreg_s(SYS_TPIDR_EL0);	break;
->> +	case TPIDRRO_EL0:	*val = read_sysreg_s(SYS_TPIDRRO_EL0);	break;
->> +	case TPIDR_EL1:		*val = read_sysreg_s(SYS_TPIDR_EL1);	break;
->> +	case AMAIR_EL1:		*val = read_sysreg_s(SYS_AMAIR_EL12);	break;
->> +	case CNTKCTL_EL1:	*val = read_sysreg_s(SYS_CNTKCTL_EL12);	break;
->> +	case PAR_EL1:		*val = read_sysreg_s(SYS_PAR_EL1);	break;
->> +	case DACR32_EL2:	*val = read_sysreg_s(SYS_DACR32_EL2);	break;
->> +	case IFSR32_EL2:	*val = read_sysreg_s(SYS_IFSR32_EL2);	break;
->> +	case DBGVCR32_EL2:	*val = read_sysreg_s(SYS_DBGVCR32_EL2);	break;
->> +	default:		return false;
->> +	}
+>> +	if (p->is_write)
+>> +		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
+>> +	else
+>> +		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
 >> +
 >> +	return true;
 >> +}
 >> +
->> +static bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
->> +{
->> +	/*
->> +	 * System registers listed in the switch are not restored on every
->> +	 * entry to the guest but are only restored on vcpu_load.
->> +	 *
->> +	 * Note that MPIDR_EL1 for the guest is set by KVM via VMPIDR_EL2 but
->> +	 * should never be listed below, because the the MPIDR should only be
->> +	 * set once, before running the VCPU, and never changed later.
->> +	 */
->> +	switch (reg) {
->> +	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	break;
->> +	case SCTLR_EL1:		write_sysreg_s(val, SYS_SCTLR_EL12);	break;
->> +	case ACTLR_EL1:		write_sysreg_s(val, SYS_ACTLR_EL1);	break;
->> +	case CPACR_EL1:		write_sysreg_s(val, SYS_CPACR_EL12);	break;
->> +	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	break;
->> +	case TTBR1_EL1:		write_sysreg_s(val, SYS_TTBR1_EL12);	break;
->> +	case TCR_EL1:		write_sysreg_s(val, SYS_TCR_EL12);	break;
->> +	case ESR_EL1:		write_sysreg_s(val, SYS_ESR_EL12);	break;
->> +	case AFSR0_EL1:		write_sysreg_s(val, SYS_AFSR0_EL12);	break;
->> +	case AFSR1_EL1:		write_sysreg_s(val, SYS_AFSR1_EL12);	break;
->> +	case FAR_EL1:		write_sysreg_s(val, SYS_FAR_EL12);	break;
->> +	case MAIR_EL1:		write_sysreg_s(val, SYS_MAIR_EL12);	break;
->> +	case VBAR_EL1:		write_sysreg_s(val, SYS_VBAR_EL12);	break;
->> +	case CONTEXTIDR_EL1:	write_sysreg_s(val, SYS_CONTEXTIDR_EL12);break;
->> +	case TPIDR_EL0:		write_sysreg_s(val, SYS_TPIDR_EL0);	break;
->> +	case TPIDRRO_EL0:	write_sysreg_s(val, SYS_TPIDRRO_EL0);	break;
->> +	case TPIDR_EL1:		write_sysreg_s(val, SYS_TPIDR_EL1);	break;
->> +	case AMAIR_EL1:		write_sysreg_s(val, SYS_AMAIR_EL12);	break;
->> +	case CNTKCTL_EL1:	write_sysreg_s(val, SYS_CNTKCTL_EL12);	break;
->> +	case PAR_EL1:		write_sysreg_s(val, SYS_PAR_EL1);	break;
->> +	case DACR32_EL2:	write_sysreg_s(val, SYS_DACR32_EL2);	break;
->> +	case IFSR32_EL2:	write_sysreg_s(val, SYS_IFSR32_EL2);	break;
->> +	case DBGVCR32_EL2:	write_sysreg_s(val, SYS_DBGVCR32_EL2);	break;
->> +	default:		return false;
->> +	}
->> +
->> +	return true;
->> +}
->> +
->>  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>>  /*
+>>   * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
+>>   */
+>> @@ -394,12 +406,9 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
+>>  			    struct sys_reg_params *p,
+>>  			    const struct sys_reg_desc *r)
 >>  {
->> -	u64 val;
->> +	u64 val = 0x8badf00d8badf00d;
+>> -	if (p->is_write) {
+>> -		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
+>> +	access_rw(vcpu, p, r);
+>> +	if (p->is_write)
+>>  		vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
+>> -	} else {
+>> -		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
+>> -	}
 >>  
->>  	if (!vcpu->arch.sysregs_loaded_on_cpu)
->> -		goto immediate_read;
->> +		goto memory_read;
+>>  	trace_trap_reg(__func__, r->reg, p->is_write, p->regval);
 >>  
->>  	if (unlikely(sysreg_is_el2(reg))) {
->>  		const struct el2_sysreg_map *el2_reg;
+>> @@ -1354,6 +1363,19 @@ static bool access_ccsidr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>>  	.set_user = set_raz_id_reg,		\
+>>  }
 >>  
->>  		if (!is_hyp_ctxt(vcpu))
->> -			goto immediate_read;
->> +			goto memory_read;
+>> +static bool access_sp_el1(struct kvm_vcpu *vcpu,
+>> +			  struct sys_reg_params *p,
+>> +			  const struct sys_reg_desc *r)
+>> +{
+>> +	/* SP_EL1 is NOT maintained in sys_regs array */
+>> +	if (p->is_write)
+>> +		vcpu->arch.ctxt.gp_regs.sp_el1 = p->regval;
+>> +	else
+>> +		p->regval = vcpu->arch.ctxt.gp_regs.sp_el1;
+>> +
+>> +	return true;
+>> +}
+>> +
+>>  /*
+>>   * Architected system registers.
+>>   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+>> @@ -1646,9 +1668,51 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>>  	 */
+>>  	{ SYS_DESC(SYS_PMCCFILTR_EL0), access_pmu_evtyper, reset_val, PMCCFILTR_EL0, 0 },
+> I have to admit I haven't gone through all the patches, or maybe this is part of
+> the bits that will be added at a later date, but some of the reset values seem
+> incorrect according to ARM DDI 0487D.a. I'll comment below the relevant registers.
 >>  
->>  		switch (reg) {
->> +		case ELR_EL2:
->> +			return read_sysreg_el1(SYS_ELR);
-> 
-> Hmmm, This change feels a bit out of place.
-> 
-> Also, patch 13 added ELR_EL2 and SP_EL2 to the switch cases for physical
-> sysreg accesses. Now ELR_EL2 is moved out of the main switch cases and
-> SP_EL2 is completely omitted.
-> 
-> I'd say either patch 13 needs to be reworked or there is a separate
-> patch that should be extracted from this patch to have an intermediate
-> state, or the commit message on this patch should be more detailed.
+>> +	{ SYS_DESC(SYS_VPIDR_EL2), access_rw, reset_val, VPIDR_EL2, 0 },
+>> +	{ SYS_DESC(SYS_VMPIDR_EL2), access_rw, reset_val, VMPIDR_EL2, 0 },
+>> +
+>> +	{ SYS_DESC(SYS_SCTLR_EL2), access_rw, reset_val, SCTLR_EL2, 0 },
+> Some bits are RES1 for SCTLR_EL2.
 
-Yeah, I wanted to actually squash most of this patch into #13, and got
-sidetracked. Definitely room for improvement. I may even bring in the
-rework I mentioned against #13.
+See Patch #67.
+>> +	{ SYS_DESC(SYS_ACTLR_EL2), access_rw, reset_val, ACTLR_EL2, 0 },
+>> +	{ SYS_DESC(SYS_HCR_EL2), access_rw, reset_val, HCR_EL2, 0 },
+>> +	{ SYS_DESC(SYS_MDCR_EL2), access_rw, reset_val, MDCR_EL2, 0 },
+>> +	{ SYS_DESC(SYS_CPTR_EL2), access_rw, reset_val, CPTR_EL2, 0 },
+> Some bits are RES1 for CPTR_EL2 if HCR_EL2.E2H == 0, which the reset value for
+> HCR_EL2 seems to imply.
+
+Correct.
+
+>> +	{ SYS_DESC(SYS_HSTR_EL2), access_rw, reset_val, HSTR_EL2, 0 },
+>> +	{ SYS_DESC(SYS_HACR_EL2), access_rw, reset_val, HACR_EL2, 0 },
+>> +
+>> +	{ SYS_DESC(SYS_TTBR0_EL2), access_rw, reset_val, TTBR0_EL2, 0 },
+>> +	{ SYS_DESC(SYS_TTBR1_EL2), access_rw, reset_val, TTBR1_EL2, 0 },
+>> +	{ SYS_DESC(SYS_TCR_EL2), access_rw, reset_val, TCR_EL2, 0 },
+> Same here, bits 31 and 23 are RES1 for TCR_EL2 when HCR_EL2.E2H == 0.
+
+Indeed. This requires separate handling altogether.
+
+>> +	{ SYS_DESC(SYS_VTTBR_EL2), access_rw, reset_val, VTTBR_EL2, 0 },
+>> +	{ SYS_DESC(SYS_VTCR_EL2), access_rw, reset_val, VTCR_EL2, 0 },
+>> +
+>>  	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
+>> +	{ SYS_DESC(SYS_SPSR_EL2), access_rw, reset_val, SPSR_EL2, 0 },
+>> +	{ SYS_DESC(SYS_ELR_EL2), access_rw, reset_val, ELR_EL2, 0 },
+>> +	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
+>> +
+>>  	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
+>> +	{ SYS_DESC(SYS_AFSR0_EL2), access_rw, reset_val, AFSR0_EL2, 0 },
+>> +	{ SYS_DESC(SYS_AFSR1_EL2), access_rw, reset_val, AFSR1_EL2, 0 },
+>> +	{ SYS_DESC(SYS_ESR_EL2), access_rw, reset_val, ESR_EL2, 0 },
+>>  	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
+>> +
+>> +	{ SYS_DESC(SYS_FAR_EL2), access_rw, reset_val, FAR_EL2, 0 },
+>> +	{ SYS_DESC(SYS_HPFAR_EL2), access_rw, reset_val, HPFAR_EL2, 0 },
+>> +
+>> +	{ SYS_DESC(SYS_MAIR_EL2), access_rw, reset_val, MAIR_EL2, 0 },
+>> +	{ SYS_DESC(SYS_AMAIR_EL2), access_rw, reset_val, AMAIR_EL2, 0 },
+>> +
+>> +	{ SYS_DESC(SYS_VBAR_EL2), access_rw, reset_val, VBAR_EL2, 0 },
+>> +	{ SYS_DESC(SYS_RVBAR_EL2), access_rw, reset_val, RVBAR_EL2, 0 },
+>> +	{ SYS_DESC(SYS_RMR_EL2), access_rw, reset_val, RMR_EL2, 0 },
+> Bit AA64 [0] for RMR_EL2 is RAO/WI for EL2 cannot aarch32, which is what the
+> patches seem to enforce.
+
+Yup.
+
+I guess I'll end-up spitting those registers out of this patch and
+handle them separately.
+
+>> +
+>> +	{ SYS_DESC(SYS_CONTEXTIDR_EL2), access_rw, reset_val, CONTEXTIDR_EL2, 0 },
+>> +	{ SYS_DESC(SYS_TPIDR_EL2), access_rw, reset_val, TPIDR_EL2, 0 },
+>> +
+>> +	{ SYS_DESC(SYS_CNTVOFF_EL2), access_rw, reset_val, CNTVOFF_EL2, 0 },
+>> +	{ SYS_DESC(SYS_CNTHCTL_EL2), access_rw, reset_val, CNTHCTL_EL2, 0 },
+>> +
+>> +	{ SYS_DESC(SYS_SP_EL2), NULL, reset_unknown, SP_EL2 },
+>>  };
+>>  
+>>  static bool trap_dbgidr(struct kvm_vcpu *vcpu,
 
 Thanks,
 
