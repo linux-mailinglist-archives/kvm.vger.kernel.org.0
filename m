@@ -2,238 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D7475E172
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 11:54:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D86595E176
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 11:54:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727031AbfGCJyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 05:54:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55126 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726434AbfGCJyV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 05:54:21 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id AC33330BF1B2;
-        Wed,  3 Jul 2019 09:54:14 +0000 (UTC)
-Received: from [10.72.12.173] (ovpn-12-173.pek2.redhat.com [10.72.12.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B68E27F248;
-        Wed,  3 Jul 2019 09:54:00 +0000 (UTC)
-Subject: Re: [PATCH v2 1/3] vsock/virtio: use RCU to avoid use-after-free on
- the_virtio_vsock
-To:     Stefano Garzarella <sgarzare@redhat.com>, netdev@vger.kernel.org
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org
-References: <20190628123659.139576-1-sgarzare@redhat.com>
- <20190628123659.139576-2-sgarzare@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <05311244-ed23-d061-a620-7b83d83c11f5@redhat.com>
-Date:   Wed, 3 Jul 2019 17:53:58 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1726686AbfGCJyy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 05:54:54 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:34197 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725820AbfGCJyy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 05:54:54 -0400
+Received: by mail-ot1-f65.google.com with SMTP id n5so1739164otk.1;
+        Wed, 03 Jul 2019 02:54:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VaTxAIN0pDHUzuzL+NSP80OSIfX+XiV7VjvWB84HnSM=;
+        b=d1DrVrKmy8NZUd31P7C4cEv/l7shpXlV4s3l1LIdV3rBH/V3vEZXpts6FUKnEBQr+o
+         K71z9Nl8pIypwBYxy8Uq/b9+Ev9FKG3yMcoYTiL24Co3cu31fUnVFJYBtwAG87wIWYYy
+         pHNEKi5kX12NYnuWm4XbTurxVmivsLWugVP5JQxQawVXT7tCnGjWhJxRAwHgtSLSjvK/
+         +I9q1VpVLiWk0rjH20SJQXjB6T3DufMwgf6FGBUcUEyQum0m2LJF0J/MCUjH//X4DBfF
+         PfWS//uI4UYgdYurPEROy/06t8QD/btzpJ2hzbffwdzcNCzb91z+GMo7B7dVsSkH7buB
+         d1Qw==
+X-Gm-Message-State: APjAAAXlTwk3DZfFtPmdfvsqPhx7gygzQHfKwPAFmrpsha4hX98spXVe
+        OlVQQJzsTI7PLSxXuuIHmBRkb1cYudHZwXnVDMk=
+X-Google-Smtp-Source: APXvYqxSMGBc9GvsapfI+f6+YWH7rqqjRbHUNO8qO6Fmw0BKpBQ0N7qVphlZ8aT04uFN9XSO+AV67jip+4faOjM7EgE=
+X-Received: by 2002:a05:6830:8a:: with SMTP id a10mr10589100oto.167.1562147693136;
+ Wed, 03 Jul 2019 02:54:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190628123659.139576-2-sgarzare@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Wed, 03 Jul 2019 09:54:20 +0000 (UTC)
+References: <20190701185310.540706841@asus.localdomain> <20190701185528.078114514@asus.localdomain>
+In-Reply-To: <20190701185528.078114514@asus.localdomain>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Wed, 3 Jul 2019 11:54:42 +0200
+Message-ID: <CAJZ5v0h30V5pvZoUHuC8Ct7RNLGV8u-CEFSgwfa0_A3kqsRC_A@mail.gmail.com>
+Subject: Re: [patch 1/5] add cpuidle-haltpoll driver
+To:     Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     kvm-devel <kvm@vger.kernel.org>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Raslan KarimAllah <karahmed@amazon.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jul 1, 2019 at 8:57 PM Marcelo Tosatti <mtosatti@redhat.com> wrote:
+>
+> Add a cpuidle driver that calls the architecture default_idle routine.
+>
+> To be used in conjunction with the haltpoll governor.
+>
+> Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
-On 2019/6/28 下午8:36, Stefano Garzarella wrote:
-> Some callbacks used by the upper layers can run while we are in the
-> .remove(). A potential use-after-free can happen, because we free
-> the_virtio_vsock without knowing if the callbacks are over or not.
+Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+
 >
-> To solve this issue we move the assignment of the_virtio_vsock at the
-> end of .probe(), when we finished all the initialization, and at the
-> beginning of .remove(), before to release resources.
-> For the same reason, we do the same also for the vdev->priv.
->
-> We use RCU to be sure that all callbacks that use the_virtio_vsock
-> ended before freeing it. This is not required for callbacks that
-> use vdev->priv, because after the vdev->config->del_vqs() we are sure
-> that they are ended and will no longer be invoked.
->
-> We also take the mutex during the .remove() to avoid that .probe() can
-> run while we are resetting the device.
->
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
->   net/vmw_vsock/virtio_transport.c | 67 +++++++++++++++++++++-----------
->   1 file changed, 44 insertions(+), 23 deletions(-)
+>  arch/x86/kernel/process.c          |    2 -
+>  drivers/cpuidle/Kconfig            |    9 +++++
+>  drivers/cpuidle/Makefile           |    1
+>  drivers/cpuidle/cpuidle-haltpoll.c |   65 +++++++++++++++++++++++++++++++++++++
+>  4 files changed, 76 insertions(+), 1 deletion(-)
 >
-> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> index 9c287e3e393c..7ad510ec12e0 100644
-> --- a/net/vmw_vsock/virtio_transport.c
-> +++ b/net/vmw_vsock/virtio_transport.c
-> @@ -65,19 +65,22 @@ struct virtio_vsock {
->   	u32 guest_cid;
->   };
->   
-> -static struct virtio_vsock *virtio_vsock_get(void)
-> -{
-> -	return the_virtio_vsock;
-> -}
-> -
->   static u32 virtio_transport_get_local_cid(void)
->   {
-> -	struct virtio_vsock *vsock = virtio_vsock_get();
-> +	struct virtio_vsock *vsock;
-> +	u32 ret;
->   
-> -	if (!vsock)
-> -		return VMADDR_CID_ANY;
-> +	rcu_read_lock();
-> +	vsock = rcu_dereference(the_virtio_vsock);
-> +	if (!vsock) {
-> +		ret = VMADDR_CID_ANY;
-> +		goto out_rcu;
-> +	}
->   
-> -	return vsock->guest_cid;
-> +	ret = vsock->guest_cid;
-> +out_rcu:
-> +	rcu_read_unlock();
-> +	return ret;
->   }
->   
->   static void virtio_transport_loopback_work(struct work_struct *work)
-> @@ -197,14 +200,18 @@ virtio_transport_send_pkt(struct virtio_vsock_pkt *pkt)
->   	struct virtio_vsock *vsock;
->   	int len = pkt->len;
->   
-> -	vsock = virtio_vsock_get();
-> +	rcu_read_lock();
-> +	vsock = rcu_dereference(the_virtio_vsock);
->   	if (!vsock) {
->   		virtio_transport_free_pkt(pkt);
-> -		return -ENODEV;
-> +		len = -ENODEV;
-> +		goto out_rcu;
->   	}
->   
-> -	if (le64_to_cpu(pkt->hdr.dst_cid) == vsock->guest_cid)
-> -		return virtio_transport_send_pkt_loopback(vsock, pkt);
-> +	if (le64_to_cpu(pkt->hdr.dst_cid) == vsock->guest_cid) {
-> +		len = virtio_transport_send_pkt_loopback(vsock, pkt);
-> +		goto out_rcu;
-> +	}
->   
->   	if (pkt->reply)
->   		atomic_inc(&vsock->queued_replies);
-> @@ -214,6 +221,9 @@ virtio_transport_send_pkt(struct virtio_vsock_pkt *pkt)
->   	spin_unlock_bh(&vsock->send_pkt_list_lock);
->   
->   	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+> Index: linux-2.6-newcpuidle.git/arch/x86/kernel/process.c
+> ===================================================================
+> --- linux-2.6-newcpuidle.git.orig/arch/x86/kernel/process.c
+> +++ linux-2.6-newcpuidle.git/arch/x86/kernel/process.c
+> @@ -580,7 +580,7 @@ void __cpuidle default_idle(void)
+>         safe_halt();
+>         trace_cpu_idle_rcuidle(PWR_EVENT_EXIT, smp_processor_id());
+>  }
+> -#ifdef CONFIG_APM_MODULE
+> +#if defined(CONFIG_APM_MODULE) || defined(CONFIG_HALTPOLL_CPUIDLE_MODULE)
+>  EXPORT_SYMBOL(default_idle);
+>  #endif
+>
+> Index: linux-2.6-newcpuidle.git/drivers/cpuidle/Kconfig
+> ===================================================================
+> --- linux-2.6-newcpuidle.git.orig/drivers/cpuidle/Kconfig
+> +++ linux-2.6-newcpuidle.git/drivers/cpuidle/Kconfig
+> @@ -51,6 +51,15 @@ depends on PPC
+>  source "drivers/cpuidle/Kconfig.powerpc"
+>  endmenu
+>
+> +config HALTPOLL_CPUIDLE
+> +       tristate "Halt poll cpuidle driver"
+> +       depends on X86 && KVM_GUEST
+> +       default y
+> +       help
+> +         This option enables halt poll cpuidle driver, which allows to poll
+> +         before halting in the guest (more efficient than polling in the
+> +         host via halt_poll_ns for some scenarios).
 > +
-> +out_rcu:
-> +	rcu_read_unlock();
->   	return len;
->   }
->   
-> @@ -222,12 +232,14 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
->   {
->   	struct virtio_vsock *vsock;
->   	struct virtio_vsock_pkt *pkt, *n;
-> -	int cnt = 0;
-> +	int cnt = 0, ret;
->   	LIST_HEAD(freeme);
->   
-> -	vsock = virtio_vsock_get();
-> +	rcu_read_lock();
-> +	vsock = rcu_dereference(the_virtio_vsock);
->   	if (!vsock) {
-> -		return -ENODEV;
-> +		ret = -ENODEV;
-> +		goto out_rcu;
->   	}
->   
->   	spin_lock_bh(&vsock->send_pkt_list_lock);
-> @@ -255,7 +267,11 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
->   			queue_work(virtio_vsock_workqueue, &vsock->rx_work);
->   	}
->   
-> -	return 0;
-> +	ret = 0;
+>  endif
+>
+>  config ARCH_NEEDS_CPU_IDLE_COUPLED
+> Index: linux-2.6-newcpuidle.git/drivers/cpuidle/Makefile
+> ===================================================================
+> --- linux-2.6-newcpuidle.git.orig/drivers/cpuidle/Makefile
+> +++ linux-2.6-newcpuidle.git/drivers/cpuidle/Makefile
+> @@ -7,6 +7,7 @@ obj-y += cpuidle.o driver.o governor.o s
+>  obj-$(CONFIG_ARCH_NEEDS_CPU_IDLE_COUPLED) += coupled.o
+>  obj-$(CONFIG_DT_IDLE_STATES)             += dt_idle_states.o
+>  obj-$(CONFIG_ARCH_HAS_CPU_RELAX)         += poll_state.o
+> +obj-$(CONFIG_HALTPOLL_CPUIDLE)           += cpuidle-haltpoll.o
+>
+>  ##################################################################################
+>  # ARM SoC drivers
+> Index: linux-2.6-newcpuidle.git/drivers/cpuidle/cpuidle-haltpoll.c
+> ===================================================================
+> --- /dev/null
+> +++ linux-2.6-newcpuidle.git/drivers/cpuidle/cpuidle-haltpoll.c
+> @@ -0,0 +1,69 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * cpuidle driver for haltpoll governor.
+> + *
+> + * Copyright 2019 Red Hat, Inc. and/or its affiliates.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> + * the COPYING file in the top-level directory.
+> + *
+> + * Authors: Marcelo Tosatti <mtosatti@redhat.com>
+> + */
 > +
-> +out_rcu:
-> +	rcu_read_unlock();
-> +	return ret;
->   }
->   
->   static void virtio_vsock_rx_fill(struct virtio_vsock *vsock)
-> @@ -590,8 +606,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
->   	vsock->rx_buf_max_nr = 0;
->   	atomic_set(&vsock->queued_replies, 0);
->   
-> -	vdev->priv = vsock;
-> -	the_virtio_vsock = vsock;
->   	mutex_init(&vsock->tx_lock);
->   	mutex_init(&vsock->rx_lock);
->   	mutex_init(&vsock->event_lock);
-> @@ -613,6 +627,9 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
->   	virtio_vsock_event_fill(vsock);
->   	mutex_unlock(&vsock->event_lock);
->   
-> +	vdev->priv = vsock;
-> +	rcu_assign_pointer(the_virtio_vsock, vsock);
-
-
-You probably need to use rcu_dereference_protected() to access 
-the_virtio_vsock in the function in order to survive from sparse.
-
-
+> +#include <linux/init.h>
+> +#include <linux/cpuidle.h>
+> +#include <linux/module.h>
+> +#include <linux/sched/idle.h>
+> +#include <linux/kvm_para.h>
 > +
->   	mutex_unlock(&the_virtio_vsock_mutex);
->   	return 0;
->   
-> @@ -627,6 +644,12 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
->   	struct virtio_vsock *vsock = vdev->priv;
->   	struct virtio_vsock_pkt *pkt;
->   
-> +	mutex_lock(&the_virtio_vsock_mutex);
+> +static int default_enter_idle(struct cpuidle_device *dev,
+> +                             struct cpuidle_driver *drv, int index)
+> +{
+> +       if (current_clr_polling_and_test()) {
+> +               local_irq_enable();
+> +               return index;
+> +       }
+> +       default_idle();
+> +       return index;
+> +}
 > +
-> +	vdev->priv = NULL;
-> +	rcu_assign_pointer(the_virtio_vsock, NULL);
-
-
-This is still suspicious, can we access the_virtio_vsock through 
-vdev->priv? If yes, we may still get use-after-free since it was not 
-protected by RCU.
-
-Another more interesting question, I believe we will do singleton for 
-virtio_vsock structure. Then what's the point of using vdev->priv to 
-access the_virtio_vsock? It looks to me we can it brings extra troubles 
-for doing synchronization.
-
-Thanks
-
-
-> +	synchronize_rcu();
+> +static struct cpuidle_driver haltpoll_driver = {
+> +       .name = "haltpoll",
+> +       .owner = THIS_MODULE,
+> +       .states = {
+> +               { /* entry 0 is for polling */ },
+> +               {
+> +                       .enter                  = default_enter_idle,
+> +                       .exit_latency           = 1,
+> +                       .target_residency       = 1,
+> +                       .power_usage            = -1,
+> +                       .name                   = "haltpoll idle",
+> +                       .desc                   = "default architecture idle",
+> +               },
+> +       },
+> +       .safe_state_index = 0,
+> +       .state_count = 2,
+> +};
 > +
->   	flush_work(&vsock->loopback_work);
->   	flush_work(&vsock->rx_work);
->   	flush_work(&vsock->tx_work);
-> @@ -666,12 +689,10 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
->   	}
->   	spin_unlock_bh(&vsock->loopback_list_lock);
->   
-> -	mutex_lock(&the_virtio_vsock_mutex);
-> -	the_virtio_vsock = NULL;
-> -	mutex_unlock(&the_virtio_vsock_mutex);
-> -
->   	vdev->config->del_vqs(vdev);
->   
-> +	mutex_unlock(&the_virtio_vsock_mutex);
+> +static int __init haltpoll_init(void)
+> +{
+> +       struct cpuidle_driver *drv = &haltpoll_driver;
 > +
->   	kfree(vsock);
->   }
->   
+> +       cpuidle_poll_state_init(drv);
+> +
+> +       if (!kvm_para_available())
+> +               return 0;
+> +
+> +       return cpuidle_register(&haltpoll_driver, NULL);
+> +}
+> +
+> +static void __exit haltpoll_exit(void)
+> +{
+> +       cpuidle_unregister(&haltpoll_driver);
+> +}
+> +
+> +module_init(haltpoll_init);
+> +module_exit(haltpoll_exit);
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Marcelo Tosatti <mtosatti@redhat.com>");
+> +
+>
+>
