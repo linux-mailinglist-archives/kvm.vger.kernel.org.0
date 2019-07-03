@@ -2,339 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D7B1B5E923
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 18:32:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 338965E9FD
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 19:02:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727049AbfGCQcx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 12:32:53 -0400
-Received: from foss.arm.com ([217.140.110.172]:52296 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726721AbfGCQcx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 12:32:53 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CCDF4344;
-        Wed,  3 Jul 2019 09:32:51 -0700 (PDT)
-Received: from [10.1.31.185] (unknown [10.1.31.185])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5EDFD3F718;
-        Wed,  3 Jul 2019 09:32:50 -0700 (PDT)
-Subject: Re: [PATCH 13/59] KVM: arm64: nv: Handle virtual EL2 registers in
- vcpu_read/write_sys_reg()
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-14-marc.zyngier@arm.com>
- <6a866fda-a332-9881-b466-2a855deea6a5@arm.com>
- <13886346-cbbc-a17c-b83d-e189a30e0696@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <c3138f83-ccfb-5d01-3cac-be47f1eb916c@arm.com>
-Date:   Wed, 3 Jul 2019 17:32:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <13886346-cbbc-a17c-b83d-e189a30e0696@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+        id S1727393AbfGCRCm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 13:02:42 -0400
+Received: from mail-eopbgr810079.outbound.protection.outlook.com ([40.107.81.79]:37275
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726955AbfGCRCl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 13:02:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VYACtzuCqZCMdBkx4JyJnIh+w5U5BfxfyyJHVo0MWCg=;
+ b=uoDqfXvxfGYiGTt8PHF9Xri4FaHBqvz9zfPL/34ySWV6uTldy0SaZQFleAg6vfWhsTrDwxBY5nfOnHTyTR0h13zWNWXftC/6qwZelF18DiNXxzagZhN1dE/RZ+/7Klz0nzJO1C1GmLdw7R6EuyFAfx4VZnoM22XXBkYyE0f4B3M=
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com (52.135.233.146) by
+ BYASPR01MB0055.namprd05.prod.outlook.com (20.179.90.138) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2052.15; Wed, 3 Jul 2019 17:02:36 +0000
+Received: from BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::f493:3bba:aabf:dd58]) by BYAPR05MB4776.namprd05.prod.outlook.com
+ ([fe80::f493:3bba:aabf:dd58%7]) with mapi id 15.20.2052.010; Wed, 3 Jul 2019
+ 17:02:36 +0000
+From:   Nadav Amit <namit@vmware.com>
+To:     Juergen Gross <jgross@suse.com>
+CC:     Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sasha Levin <sashal@kernel.org>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        xen-devel <xen-devel@lists.xenproject.org>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 4/9] x86/mm/tlb: Flush remote and local TLBs
+ concurrently
+Thread-Topic: [PATCH v2 4/9] x86/mm/tlb: Flush remote and local TLBs
+ concurrently
+Thread-Index: AQHVMW7qykCnng2DBUWUciRHoRZgF6a47Y6AgAAxzIA=
+Date:   Wed, 3 Jul 2019 17:02:36 +0000
+Message-ID: <A4BC0EDE-71F0-455D-964A-7250D005FB56@vmware.com>
+References: <20190702235151.4377-1-namit@vmware.com>
+ <20190702235151.4377-5-namit@vmware.com>
+ <d89e2b57-8682-153e-33d8-98084e9983d6@suse.com>
+In-Reply-To: <d89e2b57-8682-153e-33d8-98084e9983d6@suse.com>
+Accept-Language: en-US
 Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=namit@vmware.com; 
+x-originating-ip: [66.170.99.2]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d82937b5-c8e6-4324-35e4-08d6ffd83fa0
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:BYASPR01MB0055;
+x-ms-traffictypediagnostic: BYASPR01MB0055:
+x-microsoft-antispam-prvs: <BYASPR01MB0055AFF4910456681FF84AACD0FB0@BYASPR01MB0055.namprd05.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 00872B689F
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(396003)(376002)(346002)(136003)(366004)(199004)(189003)(73956011)(76116006)(6246003)(54906003)(6512007)(316002)(486006)(6116002)(3846002)(6916009)(99286004)(25786009)(305945005)(86362001)(7736002)(66556008)(53936002)(64756008)(2906002)(66446008)(4326008)(66946007)(66476007)(76176011)(6506007)(102836004)(53546011)(5660300002)(33656002)(186003)(68736007)(26005)(256004)(478600001)(14454004)(6486002)(14444005)(6436002)(7416002)(2616005)(11346002)(446003)(476003)(229853002)(8936002)(36756003)(66066001)(81166006)(81156014)(8676002)(71200400001)(71190400001);DIR:OUT;SFP:1101;SCL:1;SRVR:BYASPR01MB0055;H:BYAPR05MB4776.namprd05.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: vmware.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: bRkigeJHw+1MMReuCCKlpf/jW5QN+am0Y3t/Esa7tmebdn6NUVB3VTOWpnn2pbhfNpzpPRe3bLWsJ49SQHNrwiS/m3Xq4jDfwuNC0gsHwa6cFz1bEPaKae9kjRhZ3PEdKVTe6t0Xnz3ukKIVk+0pDK5/q0bfRKfNopygiNHysDi9mEOc2WPj+4y5EoEISvWDCmP4csLEiiSD/XxYJThdMNlwNBrhMNmm6YDsKR4s96dwVfF3FkA/HjV9pNnz9XmlpzijiEKfJush7LAMC5rsGZuOBBFFmOr1FfA+NqNG3eDUGcfU2m2r2nRjmVyYKkdcSpmqU7KmQHM1PMjtxmxEEPkXyfiQLTtVt9SNiLEkg+s+4SeS9R0XbJpCadeeedenZY9f9XkPtKcxQ/1PGKwPQa/s6Jyiny0UPiN1VfQd31o=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4011894573807D4C87553D9A4DFD3426@namprd05.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: vmware.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d82937b5-c8e6-4324-35e4-08d6ffd83fa0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2019 17:02:36.3417
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: namit@vmware.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYASPR01MB0055
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 7/3/19 4:59 PM, Marc Zyngier wrote:
-> On 25/06/2019 16:18, Alexandru Elisei wrote:
->> Hi Marc,
->>
->> A question regarding this patch. This patch modifies vcpu_{read,write}_sys_reg
->> to handle virtual EL2 registers. However, the file kvm/emulate-nested.c added by
->> patch 10/59 "KVM: arm64: nv: Support virtual EL2 exceptions" already uses
->> vcpu_{read,write}_sys_reg to access EL2 registers. In my opinion, it doesn't
->> really matter which comes first because nested support is only enabled in the
->> last patch of the series, but I thought I should bring this up in case it is not
->> what you intended.
-> It doesn't really matter at that stage. The only thing I'm trying to
-> achieve in the middle of the series is not to break the build, and not
-> to cause non-NV to fail.
->
->> On 6/21/19 10:37 AM, Marc Zyngier wrote:
->>> From: Andre Przywara <andre.przywara@arm.com>
->>>
->>> KVM internally uses accessor functions when reading or writing the
->>> guest's system registers. This takes care of accessing either the stored
->>> copy or using the "live" EL1 system registers when the host uses VHE.
->>>
->>> With the introduction of virtual EL2 we add a bunch of EL2 system
->>> registers, which now must also be taken care of:
->>> - If the guest is running in vEL2, and we access an EL1 sysreg, we must
->>>   revert to the stored version of that, and not use the CPU's copy.
->>> - If the guest is running in vEL1, and we access an EL2 sysreg, we must
->>>   also use the stored version, since the CPU carries the EL1 copy.
->>> - Some EL2 system registers are supposed to affect the current execution
->>>   of the system, so we need to put them into their respective EL1
->>>   counterparts. For this we need to define a mapping between the two.
->>>   This is done using the newly introduced struct el2_sysreg_map.
->>> - Some EL2 system registers have a different format than their EL1
->>>   counterpart, so we need to translate them before writing them to the
->>>   CPU. This is done using an (optional) translate function in the map.
->>> - There are the three special registers SP_EL2, SPSR_EL2 and ELR_EL2,
->>>   which need some separate handling.
->> I see no change in this patch related to SPSR_EL2. Special handling of SPSR_EL2
->> is added in the next patch, patch 14/59 "KVM: arm64: nv: Handle SPSR_EL2 specially".
-> Indeed, this needs rewriting (we ended-up splitting the SPSR stuff out
-> as it was messy and not completely correct). I may take the rest of the
-> special stuff out as well.
->
->>> All of these cases are now wrapped into the existing accessor functions,
->>> so KVM users wouldn't need to care whether they access EL2 or EL1
->>> registers and also which state the guest is in.
->>>
->>> This handles what was formerly known as the "shadow state" dynamically,
->>> without requiring a separate copy for each vCPU EL.
->>>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>> ---
->>>  arch/arm64/include/asm/kvm_emulate.h |   6 +
->>>  arch/arm64/include/asm/kvm_host.h    |   5 +
->>>  arch/arm64/kvm/sys_regs.c            | 163 +++++++++++++++++++++++++++
->>>  3 files changed, 174 insertions(+)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->>> index c43aac5fed69..f37006b6eec4 100644
->>> --- a/arch/arm64/include/asm/kvm_emulate.h
->>> +++ b/arch/arm64/include/asm/kvm_emulate.h
->>> @@ -70,6 +70,12 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
->>>  int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
->>>  int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
->>>  
->>> +u64 translate_tcr(u64 tcr);
->>> +u64 translate_cptr(u64 tcr);
->>> +u64 translate_sctlr(u64 tcr);
->>> +u64 translate_ttbr0(u64 tcr);
->>> +u64 translate_cnthctl(u64 tcr);
->>> +
->>>  static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
->>>  {
->>>  	return !(vcpu->arch.hcr_el2 & HCR_RW);
->>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>> index 2d4290d2513a..dae9c42a7219 100644
->>> --- a/arch/arm64/include/asm/kvm_host.h
->>> +++ b/arch/arm64/include/asm/kvm_host.h
->>> @@ -217,6 +217,11 @@ enum vcpu_sysreg {
->>>  	NR_SYS_REGS	/* Nothing after this line! */
->>>  };
->>>  
->>> +static inline bool sysreg_is_el2(int reg)
->>> +{
->>> +	return reg >= FIRST_EL2_SYSREG && reg < NR_SYS_REGS;
->>> +}
->>> +
->>>  /* 32bit mapping */
->>>  #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
->>>  #define c0_CSSELR	(CSSELR_EL1 * 2)/* Cache Size Selection Register */
->>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>> index 693dd063c9c2..d024114da162 100644
->>> --- a/arch/arm64/kvm/sys_regs.c
->>> +++ b/arch/arm64/kvm/sys_regs.c
->>> @@ -76,11 +76,142 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
->>>  	return false;
->>>  }
->>>  
->>> +static u64 tcr_el2_ips_to_tcr_el1_ps(u64 tcr_el2)
->> The code seems to suggest that you are translating TCR_EL2.PS to TCR_EL1.IPS.
->> Perhaps the function should be named tcr_el2_ps_to_tcr_el1_ips?
-> yup.
->
->>> +{
->>> +	return ((tcr_el2 & TCR_EL2_PS_MASK) >> TCR_EL2_PS_SHIFT)
->>> +		<< TCR_IPS_SHIFT;
->>> +}
->>> +
->>> +u64 translate_tcr(u64 tcr)
->>> +{
->>> +	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
->>> +	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
->>> +	       tcr_el2_ips_to_tcr_el1_ps(tcr) |
->>> +	       (tcr & TCR_EL2_TG0_MASK) |
->>> +	       (tcr & TCR_EL2_ORGN0_MASK) |
->>> +	       (tcr & TCR_EL2_IRGN0_MASK) |
->>> +	       (tcr & TCR_EL2_T0SZ_MASK);
->>> +}
->>> +
->>> +u64 translate_cptr(u64 cptr_el2)
->> The argument name is not consistent with the other translate_* functions. I
->> think it is reasonably obvious that you are translating an EL2 register.
-> That's pretty much immaterial, and the variable could be called zorglub.
-> Consistency is good, but I don't think we need to worry about that level
-> of detail.
-
-Sure.
-
->
->>> +{
->>> +	u64 cpacr_el1 = 0;
->>> +
->>> +	if (!(cptr_el2 & CPTR_EL2_TFP))
->>> +		cpacr_el1 |= CPACR_EL1_FPEN;
->>> +	if (cptr_el2 & CPTR_EL2_TTA)
->>> +		cpacr_el1 |= CPACR_EL1_TTA;
->>> +	if (!(cptr_el2 & CPTR_EL2_TZ))
->>> +		cpacr_el1 |= CPACR_EL1_ZEN;
->>> +
->>> +	return cpacr_el1;
->>> +}
->>> +
->>> +u64 translate_sctlr(u64 sctlr)
->>> +{
->>> +	/* Bit 20 is RES1 in SCTLR_EL1, but RES0 in SCTLR_EL2 */
->>> +	return sctlr | BIT(20);
->>> +}
->>> +
->>> +u64 translate_ttbr0(u64 ttbr0)
->>> +{
->>> +	/* Force ASID to 0 (ASID 0 or RES0) */
->> Are you forcing ASID to 0 because you are only expecting a non-vhe guest
->> hypervisor to access ttbr0_el2, in which case the architecture says that the
->> ASID field is RES0? Is it so unlikely that a vhe guest hypervisor will access
->> ttbr0_el2 directly that it's not worth adding a check for that?
-> Like all the translate_* function, this is only called when running a
-> non-VHE guest so that the EL2 register is translated to the EL1 format.
-> A VHE guest usually has its sysregs in the EL1 format, and certainly
-> does for TTBR0_EL2.
-
-Yeah, figured that out after I sent this patch.
-
->
->>> +	return ttbr0 & ~GENMASK_ULL(63, 48);
->>> +}
->>> +
->>> +u64 translate_cnthctl(u64 cnthctl)
->>> +{
->>> +	return ((cnthctl & 0x3) << 10) | (cnthctl & 0xfc);
->> Patch 16/59 "KVM: arm64: nv: Save/Restore vEL2 sysregs" suggests that you are
->> translating CNTHCTL to write it to CNTKCTL_EL1. Looking at ARM DDI 0487D.b,
->> CNTKCTL_EL1 has bits 63:10 RES0. I think the correct value should be ((cnthctl &
->> 0x3) << 8) | (cnthctl & 0xfc).
-> Rookie mistake! When HCR_EL2.E2h==1 (which is always the case for NV),
-> CNTKCTL_EL1 accesses CNTHCTL_EL2. What you have here is the translation
-> of non-VHE CNTHCTL_EL2 to its VHE equivalent.
-
-Indeed! Thank you for pointing it out.
-
->
->>> +}
->>> +
->>> +#define EL2_SYSREG(el2, el1, translate)	\
->>> +	[el2 - FIRST_EL2_SYSREG] = { el2, el1, translate }
->>> +#define PURE_EL2_SYSREG(el2) \
->>> +	[el2 - FIRST_EL2_SYSREG] = { el2,__INVALID_SYSREG__, NULL }
->>> +/*
->>> + * Associate vEL2 registers to their EL1 counterparts on the CPU.
->>> + * The translate function can be NULL, when the register layout is identical.
->>> + */
->>> +struct el2_sysreg_map {
->>> +	int sysreg;	/* EL2 register index into the array above */
->>> +	int mapping;	/* associated EL1 register */
->>> +	u64 (*translate)(u64 value);
->>> +} nested_sysreg_map[NR_SYS_REGS - FIRST_EL2_SYSREG] = {
->>> +	PURE_EL2_SYSREG( VPIDR_EL2 ),
->>> +	PURE_EL2_SYSREG( VMPIDR_EL2 ),
->>> +	PURE_EL2_SYSREG( ACTLR_EL2 ),
->>> +	PURE_EL2_SYSREG( HCR_EL2 ),
->>> +	PURE_EL2_SYSREG( MDCR_EL2 ),
->>> +	PURE_EL2_SYSREG( HSTR_EL2 ),
->>> +	PURE_EL2_SYSREG( HACR_EL2 ),
->>> +	PURE_EL2_SYSREG( VTTBR_EL2 ),
->>> +	PURE_EL2_SYSREG( VTCR_EL2 ),
->>> +	PURE_EL2_SYSREG( RVBAR_EL2 ),
->>> +	PURE_EL2_SYSREG( RMR_EL2 ),
->>> +	PURE_EL2_SYSREG( TPIDR_EL2 ),
->>> +	PURE_EL2_SYSREG( CNTVOFF_EL2 ),
->>> +	PURE_EL2_SYSREG( CNTHCTL_EL2 ),
->>> +	PURE_EL2_SYSREG( HPFAR_EL2 ),
->>> +	EL2_SYSREG(      SCTLR_EL2,  SCTLR_EL1,      translate_sctlr ),
->>> +	EL2_SYSREG(      CPTR_EL2,   CPACR_EL1,      translate_cptr  ),
->>> +	EL2_SYSREG(      TTBR0_EL2,  TTBR0_EL1,      translate_ttbr0 ),
->>> +	EL2_SYSREG(      TTBR1_EL2,  TTBR1_EL1,      NULL            ),
->>> +	EL2_SYSREG(      TCR_EL2,    TCR_EL1,        translate_tcr   ),
->>> +	EL2_SYSREG(      VBAR_EL2,   VBAR_EL1,       NULL            ),
->>> +	EL2_SYSREG(      AFSR0_EL2,  AFSR0_EL1,      NULL            ),
->>> +	EL2_SYSREG(      AFSR1_EL2,  AFSR1_EL1,      NULL            ),
->>> +	EL2_SYSREG(      ESR_EL2,    ESR_EL1,        NULL            ),
->>> +	EL2_SYSREG(      FAR_EL2,    FAR_EL1,        NULL            ),
->>> +	EL2_SYSREG(      MAIR_EL2,   MAIR_EL1,       NULL            ),
->>> +	EL2_SYSREG(      AMAIR_EL2,  AMAIR_EL1,      NULL            ),
->>> +};
->> Figuring out which registers are in this map and which aren't and are supposed
->> to be treated differently is really cumbersome because they are split into two
->> types of el2 registers and their order is different from the order in enum
->> vcpu_sysreg (in kvm_host.h). Perhaps adding a comment about what registers will
->> be treated differently would make the code a bit easier to follow?
-> I'm not sure what this buys us. We have 3 categories of EL2 sysregs:
-> - Purely emulated
-> - Directly mapped onto an EL1 sysreg
-> - Translated from EL2 to EL1
->
-> I think the wrappers represent that pretty well, although we could split
-> EL2_SYSREG into DIRECT_EL2_SYSREG and TRANSLATE_EL2_SYSREG. As for the
-> order, does it really matter? We also have the trap table order, which
-> is also different from the enum. Do you propose we reorder everything?
-
-The wrappers and the naming are fine.
-
-I was trying to figure out which EL2 registers are in the nested_sysreg_map and
-which aren't (that's what I meant by "two types of registers") by looking at the
-vcpu_sysreg enum. Because the order in the map is different than the order in
-the enum, I was having a difficult time figuring out which registers are not in
-the nested_sysreg_map to make sure we haven't somehow forgot to emulate a register.
-
-So no, I wasn't asking to reorder everything. I was asking if it would be
-appropriate to write a comment stating the intention to treat registers X, Y and
-Z separately from the registers in nested_sysreg_map.
-
->
->>> +
->>> +static
->>> +const struct el2_sysreg_map *find_el2_sysreg(const struct el2_sysreg_map *map,
->>> +					     int reg)
->>> +{
->>> +	const struct el2_sysreg_map *entry;
->>> +
->>> +	if (!sysreg_is_el2(reg))
->>> +		return NULL;
->>> +
->>> +	entry = &nested_sysreg_map[reg - FIRST_EL2_SYSREG];
->>> +	if (entry->sysreg == __INVALID_SYSREG__)
->>> +		return NULL;
->>> +
->>> +	return entry;
->>> +}
->>> +
->>>  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
->>>  {
->>> +
->>>  	if (!vcpu->arch.sysregs_loaded_on_cpu)
->>>  		goto immediate_read;
->>>  
->>> +	if (unlikely(sysreg_is_el2(reg))) {
->>> +		const struct el2_sysreg_map *el2_reg;
->>> +
->>> +		if (!is_hyp_ctxt(vcpu))
->>> +			goto immediate_read;
->> I'm confused by this. is_hyp_ctxt returns false when the guest is not in vEL2
->> AND HCR_EL.E2H or HCR_EL2.TGE are not set. In this case, the NV bit will not be
->> set and the hardware will raise an undefined instruction exception when
->> accessing an EL2 register from EL1. What am I missing?
-> You don't necessarily access an EL2 register just because you run at
-> EL2. You also access it because you emulate an EL1 instruction whose
-> behaviour is conditioned by an EL2 register.
-
-Got it, now it makes a lot more sense.
-
->
-> Thanks,
->
-> 	M.
+PiBPbiBKdWwgMywgMjAxOSwgYXQgNzowNCBBTSwgSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2Uu
+Y29tPiB3cm90ZToNCj4gDQo+IE9uIDAzLjA3LjE5IDAxOjUxLCBOYWRhdiBBbWl0IHdyb3RlOg0K
+Pj4gVG8gaW1wcm92ZSBUTEIgc2hvb3Rkb3duIHBlcmZvcm1hbmNlLCBmbHVzaCB0aGUgcmVtb3Rl
+IGFuZCBsb2NhbCBUTEJzDQo+PiBjb25jdXJyZW50bHkuIEludHJvZHVjZSBmbHVzaF90bGJfbXVs
+dGkoKSB0aGF0IGRvZXMgc28uIEludHJvZHVjZQ0KPj4gcGFyYXZpcnR1YWwgdmVyc2lvbnMgb2Yg
+Zmx1c2hfdGxiX211bHRpKCkgZm9yIEtWTSwgWGVuIGFuZCBoeXBlci12IChYZW4NCj4+IGFuZCBo
+eXBlci12IGFyZSBvbmx5IGNvbXBpbGUtdGVzdGVkKS4NCj4+IFdoaWxlIHRoZSB1cGRhdGVkIHNt
+cCBpbmZyYXN0cnVjdHVyZSBpcyBjYXBhYmxlIG9mIHJ1bm5pbmcgYSBmdW5jdGlvbiBvbg0KPj4g
+YSBzaW5nbGUgbG9jYWwgY29yZSwgaXQgaXMgbm90IG9wdGltaXplZCBmb3IgdGhpcyBjYXNlLiBU
+aGUgbXVsdGlwbGUNCj4+IGZ1bmN0aW9uIGNhbGxzIGFuZCB0aGUgaW5kaXJlY3QgYnJhbmNoIGlu
+dHJvZHVjZSBzb21lIG92ZXJoZWFkLCBhbmQNCj4+IG1pZ2h0IG1ha2UgbG9jYWwgVExCIGZsdXNo
+ZXMgc2xvd2VyIHRoYW4gdGhleSB3ZXJlIGJlZm9yZSB0aGUgcmVjZW50DQo+PiBjaGFuZ2VzLg0K
+Pj4gQmVmb3JlIGNhbGxpbmcgdGhlIFNNUCBpbmZyYXN0cnVjdHVyZSwgY2hlY2sgaWYgb25seSBh
+IGxvY2FsIFRMQiBmbHVzaA0KPj4gaXMgbmVlZGVkIHRvIHJlc3RvcmUgdGhlIGxvc3QgcGVyZm9y
+bWFuY2UgaW4gdGhpcyBjb21tb24gY2FzZS4gVGhpcw0KPj4gcmVxdWlyZXMgdG8gY2hlY2sgbW1f
+Y3B1bWFzaygpIG9uZSBtb3JlIHRpbWUsIGJ1dCB1bmxlc3MgdGhpcyBtYXNrIGlzDQo+PiB1cGRh
+dGVkIHZlcnkgZnJlcXVlbnRseSwgdGhpcyBzaG91bGQgaW1wYWN0IHBlcmZvcm1hbmNlIG5lZ2F0
+aXZlbHkuDQo+PiBDYzogIksuIFkuIFNyaW5pdmFzYW4iIDxreXNAbWljcm9zb2Z0LmNvbT4NCj4+
+IENjOiBIYWl5YW5nIFpoYW5nIDxoYWl5YW5nekBtaWNyb3NvZnQuY29tPg0KPj4gQ2M6IFN0ZXBo
+ZW4gSGVtbWluZ2VyIDxzdGhlbW1pbkBtaWNyb3NvZnQuY29tPg0KPj4gQ2M6IFNhc2hhIExldmlu
+IDxzYXNoYWxAa2VybmVsLm9yZz4NCj4+IENjOiBUaG9tYXMgR2xlaXhuZXIgPHRnbHhAbGludXRy
+b25peC5kZT4NCj4+IENjOiBJbmdvIE1vbG5hciA8bWluZ29AcmVkaGF0LmNvbT4NCj4+IENjOiBC
+b3Jpc2xhdiBQZXRrb3YgPGJwQGFsaWVuOC5kZT4NCj4+IENjOiB4ODZAa2VybmVsLm9yZw0KPj4g
+Q2M6IEp1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT4NCj4+IENjOiBQYW9sbyBCb256aW5p
+IDxwYm9uemluaUByZWRoYXQuY29tPg0KPj4gQ2M6IERhdmUgSGFuc2VuIDxkYXZlLmhhbnNlbkBs
+aW51eC5pbnRlbC5jb20+DQo+PiBDYzogQW5keSBMdXRvbWlyc2tpIDxsdXRvQGtlcm5lbC5vcmc+
+DQo+PiBDYzogUGV0ZXIgWmlqbHN0cmEgPHBldGVyekBpbmZyYWRlYWQub3JnPg0KPj4gQ2M6IEJv
+cmlzIE9zdHJvdnNreSA8Ym9yaXMub3N0cm92c2t5QG9yYWNsZS5jb20+DQo+PiBDYzogbGludXgt
+aHlwZXJ2QHZnZXIua2VybmVsLm9yZw0KPj4gQ2M6IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5v
+cmcNCj4+IENjOiB2aXJ0dWFsaXphdGlvbkBsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9yZw0KPj4g
+Q2M6IGt2bUB2Z2VyLmtlcm5lbC5vcmcNCj4+IENjOiB4ZW4tZGV2ZWxAbGlzdHMueGVucHJvamVj
+dC5vcmcNCj4+IFNpZ25lZC1vZmYtYnk6IE5hZGF2IEFtaXQgPG5hbWl0QHZtd2FyZS5jb20+DQo+
+PiAtLS0NCj4+ICBhcmNoL3g4Ni9oeXBlcnYvbW11LmMgICAgICAgICAgICAgICAgIHwgMTMgKysr
+LS0tDQo+PiAgYXJjaC94ODYvaW5jbHVkZS9hc20vcGFyYXZpcnQuaCAgICAgICB8ICA2ICstLQ0K
+Pj4gIGFyY2gveDg2L2luY2x1ZGUvYXNtL3BhcmF2aXJ0X3R5cGVzLmggfCAgNCArLQ0KPj4gIGFy
+Y2gveDg2L2luY2x1ZGUvYXNtL3RsYmZsdXNoLmggICAgICAgfCAgOSArKy0tDQo+PiAgYXJjaC94
+ODYvaW5jbHVkZS9hc20vdHJhY2UvaHlwZXJ2LmggICB8ICAyICstDQo+PiAgYXJjaC94ODYva2Vy
+bmVsL2t2bS5jICAgICAgICAgICAgICAgICB8IDExICsrKy0tDQo+PiAgYXJjaC94ODYva2VybmVs
+L3BhcmF2aXJ0LmMgICAgICAgICAgICB8ICAyICstDQo+PiAgYXJjaC94ODYvbW0vdGxiLmMgICAg
+ICAgICAgICAgICAgICAgICB8IDY1ICsrKysrKysrKysrKysrKysrKysrLS0tLS0tLQ0KPj4gIGFy
+Y2gveDg2L3hlbi9tbXVfcHYuYyAgICAgICAgICAgICAgICAgfCAyMCArKysrKystLS0NCj4+ICBp
+bmNsdWRlL3RyYWNlL2V2ZW50cy94ZW4uaCAgICAgICAgICAgIHwgIDIgKy0NCj4+ICAxMCBmaWxl
+cyBjaGFuZ2VkLCA5MSBpbnNlcnRpb25zKCspLCA0MyBkZWxldGlvbnMoLSkNCj4gDQo+IC4uLg0K
+PiANCj4+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni94ZW4vbW11X3B2LmMgYi9hcmNoL3g4Ni94ZW4v
+bW11X3B2LmMNCj4+IGluZGV4IGJlYjQ0ZTIyYWZkZi4uMTllNDgxZTZlOTA0IDEwMDY0NA0KPj4g
+LS0tIGEvYXJjaC94ODYveGVuL21tdV9wdi5jDQo+PiArKysgYi9hcmNoL3g4Ni94ZW4vbW11X3B2
+LmMNCj4+IEBAIC0xMzU1LDggKzEzNTUsOCBAQCBzdGF0aWMgdm9pZCB4ZW5fZmx1c2hfdGxiX29u
+ZV91c2VyKHVuc2lnbmVkIGxvbmcgYWRkcikNCj4+ICAJcHJlZW1wdF9lbmFibGUoKTsNCj4+ICB9
+DQo+PiAgLXN0YXRpYyB2b2lkIHhlbl9mbHVzaF90bGJfb3RoZXJzKGNvbnN0IHN0cnVjdCBjcHVt
+YXNrICpjcHVzLA0KPj4gLQkJCQkgY29uc3Qgc3RydWN0IGZsdXNoX3RsYl9pbmZvICppbmZvKQ0K
+Pj4gK3N0YXRpYyB2b2lkIHhlbl9mbHVzaF90bGJfbXVsdGkoY29uc3Qgc3RydWN0IGNwdW1hc2sg
+KmNwdXMsDQo+PiArCQkJCWNvbnN0IHN0cnVjdCBmbHVzaF90bGJfaW5mbyAqaW5mbykNCj4+ICB7
+DQo+PiAgCXN0cnVjdCB7DQo+PiAgCQlzdHJ1Y3QgbW11ZXh0X29wIG9wOw0KPj4gQEAgLTEzNjYs
+NyArMTM2Niw3IEBAIHN0YXRpYyB2b2lkIHhlbl9mbHVzaF90bGJfb3RoZXJzKGNvbnN0IHN0cnVj
+dCBjcHVtYXNrICpjcHVzLA0KPj4gIAljb25zdCBzaXplX3QgbWNfZW50cnlfc2l6ZSA9IHNpemVv
+ZihhcmdzLT5vcCkgKw0KPj4gIAkJc2l6ZW9mKGFyZ3MtPm1hc2tbMF0pICogQklUU19UT19MT05H
+UyhudW1fcG9zc2libGVfY3B1cygpKTsNCj4+ICAtCXRyYWNlX3hlbl9tbXVfZmx1c2hfdGxiX290
+aGVycyhjcHVzLCBpbmZvLT5tbSwgaW5mby0+c3RhcnQsIGluZm8tPmVuZCk7DQo+PiArCXRyYWNl
+X3hlbl9tbXVfZmx1c2hfdGxiX211bHRpKGNwdXMsIGluZm8tPm1tLCBpbmZvLT5zdGFydCwgaW5m
+by0+ZW5kKTsNCj4+ICAgIAlpZiAoY3B1bWFza19lbXB0eShjcHVzKSkNCj4+ICAJCXJldHVybjsJ
+CS8qIG5vdGhpbmcgdG8gZG8gKi8NCj4+IEBAIC0xMzc1LDkgKzEzNzUsMTcgQEAgc3RhdGljIHZv
+aWQgeGVuX2ZsdXNoX3RsYl9vdGhlcnMoY29uc3Qgc3RydWN0IGNwdW1hc2sgKmNwdXMsDQo+PiAg
+CWFyZ3MgPSBtY3MuYXJnczsNCj4+ICAJYXJncy0+b3AuYXJnMi52Y3B1bWFzayA9IHRvX2NwdW1h
+c2soYXJncy0+bWFzayk7DQo+PiAgLQkvKiBSZW1vdmUgdXMsIGFuZCBhbnkgb2ZmbGluZSBDUFVT
+LiAqLw0KPj4gKwkvKiBGbHVzaCBsb2NhbGx5IGlmIG5lZWRlZCBhbmQgcmVtb3ZlIHVzICovDQo+
+PiArCWlmIChjcHVtYXNrX3Rlc3RfY3B1KHNtcF9wcm9jZXNzb3JfaWQoKSwgdG9fY3B1bWFzayhh
+cmdzLT5tYXNrKSkpIHsNCj4+ICsJCWxvY2FsX2lycV9kaXNhYmxlKCk7DQo+PiArCQlmbHVzaF90
+bGJfZnVuY19sb2NhbChpbmZvKTsNCj4gDQo+IEkgdGhpbmsgdGhpcyBpc24ndCB0aGUgY29ycmVj
+dCBmdW5jdGlvbiBmb3IgUFYgZ3Vlc3RzLg0KPiANCj4gSW4gZmFjdCBpdCBzaG91bGQgYmUgbXVj
+aCBlYXNpZXI6IGp1c3QgZG9uJ3QgY2xlYXIgdGhlIG93biBjcHUgZnJvbSB0aGUNCj4gbWFzaywg
+dGhhdCdzIGFsbCB3aGF0J3MgbmVlZGVkLiBUaGUgaHlwZXJ2aXNvciBpcyBqdXN0IGZpbmUgaGF2
+aW5nIHRoZQ0KPiBjdXJyZW50IGNwdSBpbiB0aGUgbWFzayBhbmQgaXQgd2lsbCBkbyB0aGUgcmln
+aHQgdGhpbmcuDQoNClRoYW5rcy4gSSB3aWxsIGRvIHNvIGluIHYzLiBJIGRvbuKAmXQgdGhpbmsg
+SHlwZXItViBwZW9wbGUgd291bGQgd2FudCB0byBkbw0KdGhlIHNhbWUsIHVuZm9ydHVuYXRlbHks
+IHNpbmNlIGl0IHdvdWxkIGluZHVjZSBWTS1leGl0IG9uIFRMQiBmbHVzaGVzLiBCdXQNCmlmIHRo
+ZXkgZG8gLSBJ4oCZbGwgYmUgYWJsZSBub3QgdG8gZXhwb3NlIGZsdXNoX3RsYl9mdW5jX2xvY2Fs
+KCkuDQoNCg==
