@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A1425EFD2
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 01:59:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D17B5EFD0
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 01:59:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727487AbfGCX7v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1727503AbfGCX7v (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Wed, 3 Jul 2019 19:59:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40276 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:34634 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727398AbfGCX7u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 19:59:50 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S1727100AbfGCX7v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 19:59:51 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 21E83C04FFEF;
-        Wed,  3 Jul 2019 23:59:50 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id F1F9A859FB;
+        Wed,  3 Jul 2019 23:59:49 +0000 (UTC)
 Received: from amt.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8AFE58351E;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7E02F1001B1B;
         Wed,  3 Jul 2019 23:59:49 +0000 (UTC)
 Received: from amt.cnet (localhost [127.0.0.1])
-        by amt.cnet (Postfix) with ESMTP id 2EBDA10516E;
-        Wed,  3 Jul 2019 20:59:00 -0300 (BRT)
+        by amt.cnet (Postfix) with ESMTP id 3F4A9105171;
+        Wed,  3 Jul 2019 20:59:01 -0300 (BRT)
 Received: (from marcelo@localhost)
-        by amt.cnet (8.14.7/8.14.7/Submit) id x63NwxJm023712;
-        Wed, 3 Jul 2019 20:58:59 -0300
-Message-Id: <20190703235828.340866829@amt.cnet>
+        by amt.cnet (8.14.7/8.14.7/Submit) id x63Nx03M023713;
+        Wed, 3 Jul 2019 20:59:00 -0300
+Message-Id: <20190703235828.405864213@amt.cnet>
 User-Agent: quilt/0.60-1
-Date:   Wed, 03 Jul 2019 20:51:25 -0300
+Date:   Wed, 03 Jul 2019 20:51:26 -0300
 From:   Marcelo Tosatti <mtosatti@redhat.com>
 To:     kvm-devel <kvm@vger.kernel.org>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -42,147 +42,168 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Ankur Arora <ankur.a.arora@oracle.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         linux-pm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [patch 1/5] add cpuidle-haltpoll driver
+Subject: [patch 2/5] cpuidle: add poll_limit_ns to cpuidle_device structure
 References: <20190703235124.783034907@amt.cnet>
-Content-Disposition: inline; filename=00-cpuidle-haltpoll
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Wed, 03 Jul 2019 23:59:50 +0000 (UTC)
+Content-Disposition: inline; filename=01-poll-time
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Wed, 03 Jul 2019 23:59:50 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a cpuidle driver that calls the architecture default_idle routine.
+Add a poll_limit_ns variable to cpuidle_device structure. 
 
-To be used in conjunction with the haltpoll governor.
+Calculate and configure it in the new cpuidle_poll_time
+function, in case its zero.
+
+Individual governors are allowed to override this value.
 
 Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
 ---
- arch/x86/kernel/process.c          |    2 -
- drivers/cpuidle/Kconfig            |    9 +++++
- drivers/cpuidle/Makefile           |    1 
- drivers/cpuidle/cpuidle-haltpoll.c |   65 +++++++++++++++++++++++++++++++++++++
- 4 files changed, 76 insertions(+), 1 deletion(-)
+ drivers/cpuidle/cpuidle.c    |   40 ++++++++++++++++++++++++++++++++++++++++
+ drivers/cpuidle/poll_state.c |   11 ++---------
+ include/linux/cpuidle.h      |    8 ++++++++
+ 3 files changed, 50 insertions(+), 9 deletions(-)
 
-Index: linux-2.6-newcpuidle.git/arch/x86/kernel/process.c
+Index: linux-2.6-newcpuidle.git/drivers/cpuidle/cpuidle.c
 ===================================================================
---- linux-2.6-newcpuidle.git.orig/arch/x86/kernel/process.c
-+++ linux-2.6-newcpuidle.git/arch/x86/kernel/process.c
-@@ -580,7 +580,7 @@ void __cpuidle default_idle(void)
- 	safe_halt();
- 	trace_cpu_idle_rcuidle(PWR_EVENT_EXIT, smp_processor_id());
+--- linux-2.6-newcpuidle.git.orig/drivers/cpuidle/cpuidle.c
++++ linux-2.6-newcpuidle.git/drivers/cpuidle/cpuidle.c
+@@ -362,6 +362,36 @@ void cpuidle_reflect(struct cpuidle_devi
  }
--#ifdef CONFIG_APM_MODULE
-+#if defined(CONFIG_APM_MODULE) || defined(CONFIG_HALTPOLL_CPUIDLE_MODULE)
- EXPORT_SYMBOL(default_idle);
- #endif
  
-Index: linux-2.6-newcpuidle.git/drivers/cpuidle/Kconfig
-===================================================================
---- linux-2.6-newcpuidle.git.orig/drivers/cpuidle/Kconfig
-+++ linux-2.6-newcpuidle.git/drivers/cpuidle/Kconfig
-@@ -51,6 +51,15 @@ depends on PPC
- source "drivers/cpuidle/Kconfig.powerpc"
- endmenu
- 
-+config HALTPOLL_CPUIDLE
-+       tristate "Halt poll cpuidle driver"
-+       depends on X86 && KVM_GUEST
-+       default y
-+       help
-+         This option enables halt poll cpuidle driver, which allows to poll
-+         before halting in the guest (more efficient than polling in the
-+         host via halt_poll_ns for some scenarios).
-+
- endif
- 
- config ARCH_NEEDS_CPU_IDLE_COUPLED
-Index: linux-2.6-newcpuidle.git/drivers/cpuidle/Makefile
-===================================================================
---- linux-2.6-newcpuidle.git.orig/drivers/cpuidle/Makefile
-+++ linux-2.6-newcpuidle.git/drivers/cpuidle/Makefile
-@@ -7,6 +7,7 @@ obj-y += cpuidle.o driver.o governor.o s
- obj-$(CONFIG_ARCH_NEEDS_CPU_IDLE_COUPLED) += coupled.o
- obj-$(CONFIG_DT_IDLE_STATES)		  += dt_idle_states.o
- obj-$(CONFIG_ARCH_HAS_CPU_RELAX)	  += poll_state.o
-+obj-$(CONFIG_HALTPOLL_CPUIDLE)		  += cpuidle-haltpoll.o
- 
- ##################################################################################
- # ARM SoC drivers
-Index: linux-2.6-newcpuidle.git/drivers/cpuidle/cpuidle-haltpoll.c
-===================================================================
---- /dev/null
-+++ linux-2.6-newcpuidle.git/drivers/cpuidle/cpuidle-haltpoll.c
-@@ -0,0 +1,69 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * cpuidle driver for haltpoll governor.
+ /**
++ * cpuidle_poll_time - return amount of time to poll for,
++ * governors can override dev->poll_limit_ns if necessary
 + *
-+ * Copyright 2019 Red Hat, Inc. and/or its affiliates.
++ * @drv:   the cpuidle driver tied with the cpu
++ * @dev:   the cpuidle device
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ * Authors: Marcelo Tosatti <mtosatti@redhat.com>
 + */
-+
-+#include <linux/init.h>
-+#include <linux/cpuidle.h>
-+#include <linux/module.h>
-+#include <linux/sched/idle.h>
-+#include <linux/kvm_para.h>
-+
-+static int default_enter_idle(struct cpuidle_device *dev,
-+			      struct cpuidle_driver *drv, int index)
++u64 cpuidle_poll_time(struct cpuidle_driver *drv,
++		      struct cpuidle_device *dev)
 +{
-+	if (current_clr_polling_and_test()) {
-+		local_irq_enable();
-+		return index;
++	int i;
++	u64 limit_ns;
++
++	if (dev->poll_limit_ns)
++		return dev->poll_limit_ns;
++
++	limit_ns = TICK_NSEC;
++	for (i = 1; i < drv->state_count; i++) {
++		if (drv->states[i].disabled || dev->states_usage[i].disable)
++			continue;
++
++		limit_ns = (u64)drv->states[i].target_residency * NSEC_PER_USEC;
 +	}
-+	default_idle();
-+	return index;
++
++	dev->poll_limit_ns = limit_ns;
++
++	return dev->poll_limit_ns;
 +}
 +
-+static struct cpuidle_driver haltpoll_driver = {
-+	.name = "haltpoll",
-+	.owner = THIS_MODULE,
-+	.states = {
-+		{ /* entry 0 is for polling */ },
-+		{
-+			.enter			= default_enter_idle,
-+			.exit_latency		= 1,
-+			.target_residency	= 1,
-+			.power_usage		= -1,
-+			.name			= "haltpoll idle",
-+			.desc			= "default architecture idle",
-+		},
-+	},
-+	.safe_state_index = 0,
-+	.state_count = 2,
-+};
++/**
+  * cpuidle_install_idle_handler - installs the cpuidle idle loop handler
+  */
+ void cpuidle_install_idle_handler(void)
+Index: linux-2.6-newcpuidle.git/drivers/cpuidle/poll_state.c
+===================================================================
+--- linux-2.6-newcpuidle.git.orig/drivers/cpuidle/poll_state.c
++++ linux-2.6-newcpuidle.git/drivers/cpuidle/poll_state.c
+@@ -20,16 +20,9 @@ static int __cpuidle poll_idle(struct cp
+ 	local_irq_enable();
+ 	if (!current_set_polling_and_test()) {
+ 		unsigned int loop_count = 0;
+-		u64 limit = TICK_NSEC;
+-		int i;
++		u64 limit;
+ 
+-		for (i = 1; i < drv->state_count; i++) {
+-			if (drv->states[i].disabled || dev->states_usage[i].disable)
+-				continue;
+-
+-			limit = (u64)drv->states[i].target_residency * NSEC_PER_USEC;
+-			break;
+-		}
++		limit = cpuidle_poll_time(drv, dev);
+ 
+ 		while (!need_resched()) {
+ 			cpu_relax();
+Index: linux-2.6-newcpuidle.git/include/linux/cpuidle.h
+===================================================================
+--- linux-2.6-newcpuidle.git.orig/include/linux/cpuidle.h
++++ linux-2.6-newcpuidle.git/include/linux/cpuidle.h
+@@ -86,6 +86,7 @@ struct cpuidle_device {
+ 	ktime_t			next_hrtimer;
+ 
+ 	int			last_residency;
++	u64			poll_limit_ns;
+ 	struct cpuidle_state_usage	states_usage[CPUIDLE_STATE_MAX];
+ 	struct cpuidle_state_kobj *kobjs[CPUIDLE_STATE_MAX];
+ 	struct cpuidle_driver_kobj *kobj_driver;
+@@ -132,6 +133,8 @@ extern int cpuidle_select(struct cpuidle
+ extern int cpuidle_enter(struct cpuidle_driver *drv,
+ 			 struct cpuidle_device *dev, int index);
+ extern void cpuidle_reflect(struct cpuidle_device *dev, int index);
++extern u64 cpuidle_poll_time(struct cpuidle_driver *drv,
++			     struct cpuidle_device *dev);
+ 
+ extern int cpuidle_register_driver(struct cpuidle_driver *drv);
+ extern struct cpuidle_driver *cpuidle_get_driver(void);
+@@ -166,6 +169,9 @@ static inline int cpuidle_enter(struct c
+ 				struct cpuidle_device *dev, int index)
+ {return -ENODEV; }
+ static inline void cpuidle_reflect(struct cpuidle_device *dev, int index) { }
++extern u64 cpuidle_poll_time(struct cpuidle_driver *drv,
++			     struct cpuidle_device *dev)
++{return 0; }
+ static inline int cpuidle_register_driver(struct cpuidle_driver *drv)
+ {return -ENODEV; }
+ static inline struct cpuidle_driver *cpuidle_get_driver(void) {return NULL; }
+Index: linux-2.6-newcpuidle.git/drivers/cpuidle/sysfs.c
+===================================================================
+--- linux-2.6-newcpuidle.git.orig/drivers/cpuidle/sysfs.c
++++ linux-2.6-newcpuidle.git/drivers/cpuidle/sysfs.c
+@@ -334,6 +334,7 @@ struct cpuidle_state_kobj {
+ 	struct cpuidle_state_usage *state_usage;
+ 	struct completion kobj_unregister;
+ 	struct kobject kobj;
++	struct cpuidle_device *device;
+ };
+ 
+ #ifdef CONFIG_SUSPEND
+@@ -391,6 +392,7 @@ static inline void cpuidle_remove_s2idle
+ #define kobj_to_state_obj(k) container_of(k, struct cpuidle_state_kobj, kobj)
+ #define kobj_to_state(k) (kobj_to_state_obj(k)->state)
+ #define kobj_to_state_usage(k) (kobj_to_state_obj(k)->state_usage)
++#define kobj_to_device(k) (kobj_to_state_obj(k)->device)
+ #define attr_to_stateattr(a) container_of(a, struct cpuidle_state_attr, attr)
+ 
+ static ssize_t cpuidle_state_show(struct kobject *kobj, struct attribute *attr,
+@@ -414,10 +416,14 @@ static ssize_t cpuidle_state_store(struc
+ 	struct cpuidle_state *state = kobj_to_state(kobj);
+ 	struct cpuidle_state_usage *state_usage = kobj_to_state_usage(kobj);
+ 	struct cpuidle_state_attr *cattr = attr_to_stateattr(attr);
++	struct cpuidle_device *dev = kobj_to_device(kobj);
+ 
+ 	if (cattr->store)
+ 		ret = cattr->store(state, state_usage, buf, size);
+ 
++	/* reset poll time cache */
++	dev->poll_limit_ns = 0;
 +
-+static int __init haltpoll_init(void)
-+{
-+	struct cpuidle_driver *drv = &haltpoll_driver;
-+
-+	cpuidle_poll_state_init(drv);
-+
-+	if (!kvm_para_available())
-+		return 0;
-+
-+	return cpuidle_register(&haltpoll_driver, NULL);
-+}
-+
-+static void __exit haltpoll_exit(void)
-+{
-+	cpuidle_unregister(&haltpoll_driver);
-+}
-+
-+module_init(haltpoll_init);
-+module_exit(haltpoll_exit);
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Marcelo Tosatti <mtosatti@redhat.com>");
-+
+ 	return ret;
+ }
+ 
+@@ -468,6 +474,7 @@ static int cpuidle_add_state_sysfs(struc
+ 		}
+ 		kobj->state = &drv->states[i];
+ 		kobj->state_usage = &device->states_usage[i];
++		kobj->device = device;
+ 		init_completion(&kobj->kobj_unregister);
+ 
+ 		ret = kobject_init_and_add(&kobj->kobj, &ktype_state_cpuidle,
 
 
