@@ -2,31 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 25E395E648
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 16:16:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C11605E658
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 16:18:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726305AbfGCOQn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 10:16:43 -0400
-Received: from foss.arm.com ([217.140.110.172]:49148 "EHLO foss.arm.com"
+        id S1726915AbfGCOSS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 10:18:18 -0400
+Received: from foss.arm.com ([217.140.110.172]:49250 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725944AbfGCOQn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 10:16:43 -0400
+        id S1726430AbfGCOSS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 10:18:18 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A3962B;
-        Wed,  3 Jul 2019 07:16:43 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86C382B;
+        Wed,  3 Jul 2019 07:18:17 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7CB8F3F718;
-        Wed,  3 Jul 2019 07:16:42 -0700 (PDT)
-Subject: Re: [PATCH 11/59] KVM: arm64: nv: Inject HVC exceptions to the
- virtual EL2
-To:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4CBB43F718;
+        Wed,  3 Jul 2019 07:18:16 -0700 (PDT)
+Subject: Re: [PATCH 23/59] KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
+To:     Julien Thierry <julien.thierry@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
 Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-12-marc.zyngier@arm.com>
- <c83d9421-a027-9edf-021b-5d41a7a1884b@arm.com>
+ <20190621093843.220980-24-marc.zyngier@arm.com>
+ <53793288-0d5d-4212-c1f4-ffa6a790d1c4@arm.com>
 From:   Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
@@ -73,12 +76,12 @@ Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
  Z46HaNmN2hZS/oJ69c1DI5Rcww==
 Organization: ARM Ltd
-Message-ID: <21117a32-b892-3c45-5e4c-fe5dc6fb372f@arm.com>
-Date:   Wed, 3 Jul 2019 15:16:41 +0100
+Message-ID: <f64eff4e-54ad-343a-c384-e2e5cc22d136@arm.com>
+Date:   Wed, 3 Jul 2019 15:18:15 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <c83d9421-a027-9edf-021b-5d41a7a1884b@arm.com>
+In-Reply-To: <53793288-0d5d-4212-c1f4-ffa6a790d1c4@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -87,20 +90,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/06/2019 14:13, Alexandru Elisei wrote:
-> On 6/21/19 10:37 AM, Marc Zyngier wrote:
+On 25/06/2019 15:19, Julien Thierry wrote:
+> 
+> 
+> On 06/21/2019 10:38 AM, Marc Zyngier wrote:
 >> From: Jintack Lim <jintack.lim@linaro.org>
 >>
->> Now that the psci call is done by the smc instruction when nested
-> This suggests that we have support for PSCI calls using SMC as the conduit, but
-> that is not the case, as the handle_smc function is not changed by this commit,
-> and support for PSCI via SMC is added later in patch 22/59 "KVM: arm64: nv:
-> Handle PSCI call via smc from the guest". Perhaps the commit message should be
-> reworded to reflect that?
+>> Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
+>> they are not coming from the virtual EL2 and virtual HCR_EL2.TWX is set.
+>>
+>> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_nested.h |  2 ++
+>>  arch/arm64/kvm/Makefile             |  1 +
+>>  arch/arm64/kvm/handle_exit.c        | 13 +++++++++-
+>>  arch/arm64/kvm/nested.c             | 39 +++++++++++++++++++++++++++++
+>>  4 files changed, 54 insertions(+), 1 deletion(-)
+>>  create mode 100644 arch/arm64/kvm/nested.c
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+>> index 8a3d121a0b42..645e5e11b749 100644
+>> --- a/arch/arm64/include/asm/kvm_nested.h
+>> +++ b/arch/arm64/include/asm/kvm_nested.h
+>> @@ -10,4 +10,6 @@ static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
+>>  		test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features);
+>>  }
+>>  
+>> +int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+>> +
+>>  #endif /* __ARM64_KVM_NESTED_H */
+>> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+>> index 9e450aea7db6..f11bd8b0d837 100644
+>> --- a/arch/arm64/kvm/Makefile
+>> +++ b/arch/arm64/kvm/Makefile
+>> @@ -36,4 +36,5 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/irqchip.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+>>  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
+>>  
+>> +kvm-$(CONFIG_KVM_ARM_HOST) += nested.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += emulate-nested.o
+>> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+>> index e348c15c81bc..ddba212fd6ec 100644
+>> --- a/arch/arm64/kvm/handle_exit.c
+>> +++ b/arch/arm64/kvm/handle_exit.c
+>> @@ -127,7 +127,18 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>>   */
+>>  static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>>  {
+>> -	if (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
+>> +	bool is_wfe = !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE);
+>> +
+>> +	if (nested_virt_in_use(vcpu)) {
+>> +		int ret = handle_wfx_nested(vcpu, is_wfe);
+>> +
+>> +		if (ret < 0 && ret != -EINVAL)
+>> +			return ret;
+>> +		else if (ret >= 0)
+>> +			return ret;
+> 
+> I think you can simplify this:
+> 
+> 	if (ret != -EINVAL)
+> 		return ret;
 
-Sure.
-
-Thanks,
+Ah! Yes. ;-)
 
 	M.
 -- 
