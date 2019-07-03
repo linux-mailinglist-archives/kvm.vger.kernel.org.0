@@ -2,88 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4432B5E8C4
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 18:26:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B31135E8CF
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 18:27:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726991AbfGCQ0d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 12:26:33 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:50432 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725847AbfGCQ0c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 12:26:32 -0400
-Received: by mail-wm1-f68.google.com with SMTP id n9so2867859wmi.0
-        for <kvm@vger.kernel.org>; Wed, 03 Jul 2019 09:26:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=j0uQRQKTOHPyvW++bkZoZSJYlgdc10E2ew9Dkx6AQzM=;
-        b=l+RbfDwTosvgCH2NNYWZAGYp3DSs+hzsconIP/l1QZyj8qJG5VDftyNmQYD50k2PUw
-         hDTM8nAq5ye7zqRmHRNThETy8cHpJES5wIeuFJ+rQdJzqnlivS8beAOqLL83kUMi5bIa
-         H/eFJ76MEm7STSLBzevniz36zPZIeq8of2aZmjs4AeQyeMs7IKbFyWAFsavaPtfkI1fy
-         JlCrndLHPyYIsDb8f/NlWsjZC7lGAzhrQc1gPXm9d6uoSiKjqUvpwQkk+BQzi3YKeahB
-         6CBiwc81MzYTRnD3OmTjKojBc5q1bs2gghRtNwC8KC1P2ImXtdkCxVg0SuOg/ZyRGUpX
-         yAJg==
-X-Gm-Message-State: APjAAAUJrgG9u9gWCnK3B+LxQ1ayPrVCiWS9lURkb24/hzSwg3m7jF1z
-        7ssQqzk/hnGZ9InPQ5l/YBDguw==
-X-Google-Smtp-Source: APXvYqypcIe+Lp1N6JnMUycjOTqMPC65guVqIADpiZsYa4a0AtGoL+IeIfdUyq7itqBmG+HNyDsFsg==
-X-Received: by 2002:a1c:343:: with SMTP id 64mr9106444wmd.116.1562171190283;
-        Wed, 03 Jul 2019 09:26:30 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:6c1d:63cc:b81d:e1a9? ([2001:b07:6468:f312:6c1d:63cc:b81d:e1a9])
-        by smtp.gmail.com with ESMTPSA id l8sm5392733wrg.40.2019.07.03.09.26.29
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 03 Jul 2019 09:26:29 -0700 (PDT)
-Subject: Re: [PATCH 0/4] kvm: x86: introduce CONFIG_KVM_DEBUG
-To:     Yi Wang <wang.yi59@zte.com.cn>
-Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
-        up2wing@gmail.com, wang.liang82@zte.com.cn
-References: <1561962071-25974-1-git-send-email-wang.yi59@zte.com.cn>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0b4c7169-1f3b-af5e-fb89-52f7d9363a6c@redhat.com>
-Date:   Wed, 3 Jul 2019 18:26:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1727117AbfGCQ1L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 12:27:11 -0400
+Received: from foss.arm.com ([217.140.110.172]:52062 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726881AbfGCQ1K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 12:27:10 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DF292344;
+        Wed,  3 Jul 2019 09:27:09 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E05F3F718;
+        Wed,  3 Jul 2019 09:27:09 -0700 (PDT)
+Date:   Wed, 3 Jul 2019 17:27:07 +0100
+From:   Dave Martin <Dave.Martin@arm.com>
+To:     Marc Zyngier <marc.zyngier@arm.com>
+Cc:     kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 04/59] KVM: arm64: nv: Introduce nested virtualization
+ VCPU feature
+Message-ID: <20190703162706.GV2790@e103592.cambridge.arm.com>
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-5-marc.zyngier@arm.com>
+ <20190624112851.GM2790@e103592.cambridge.arm.com>
+ <01e61a51-5bf0-8943-6f68-7a5cea59f093@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <1561962071-25974-1-git-send-email-wang.yi59@zte.com.cn>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <01e61a51-5bf0-8943-6f68-7a5cea59f093@arm.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/07/19 08:21, Yi Wang wrote:
-> This series introduce CONFIG_KVM_DEBUG, using which we can make
-> the invoking *_debug in KVM simly and uniform.
+On Wed, Jul 03, 2019 at 12:53:58PM +0100, Marc Zyngier wrote:
+> On 24/06/2019 12:28, Dave Martin wrote:
+> > On Fri, Jun 21, 2019 at 10:37:48AM +0100, Marc Zyngier wrote:
+> >> From: Christoffer Dall <christoffer.dall@arm.com>
+> >>
+> >> Introduce the feature bit and a primitive that checks if the feature is
+> >> set behind a static key check based on the cpus_have_const_cap check.
+> >>
+> >> Checking nested_virt_in_use() on systems without nested virt enabled
+> >> should have neglgible overhead.
+> >>
+> >> We don't yet allow userspace to actually set this feature.
+> >>
+> >> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> >> ---
+> >>  arch/arm/include/asm/kvm_nested.h   |  9 +++++++++
+> >>  arch/arm64/include/asm/kvm_nested.h | 13 +++++++++++++
+> >>  arch/arm64/include/uapi/asm/kvm.h   |  1 +
+> >>  3 files changed, 23 insertions(+)
+> >>  create mode 100644 arch/arm/include/asm/kvm_nested.h
+> >>  create mode 100644 arch/arm64/include/asm/kvm_nested.h
+> >>
+> >> diff --git a/arch/arm/include/asm/kvm_nested.h b/arch/arm/include/asm/kvm_nested.h
+> >> new file mode 100644
+> >> index 000000000000..124ff6445f8f
+> >> --- /dev/null
+> >> +++ b/arch/arm/include/asm/kvm_nested.h
+> >> @@ -0,0 +1,9 @@
+> >> +/* SPDX-License-Identifier: GPL-2.0 */
+> >> +#ifndef __ARM_KVM_NESTED_H
+> >> +#define __ARM_KVM_NESTED_H
+> >> +
+> >> +#include <linux/kvm_host.h>
+> >> +
+> >> +static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu) { return false; }
+> >> +
+> >> +#endif /* __ARM_KVM_NESTED_H */
+> >> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> >> new file mode 100644
+> >> index 000000000000..8a3d121a0b42
+> >> --- /dev/null
+> >> +++ b/arch/arm64/include/asm/kvm_nested.h
+> >> @@ -0,0 +1,13 @@
+> >> +/* SPDX-License-Identifier: GPL-2.0 */
+> >> +#ifndef __ARM64_KVM_NESTED_H
+> >> +#define __ARM64_KVM_NESTED_H
+> >> +
+> >> +#include <linux/kvm_host.h>
+> >> +
+> >> +static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	return cpus_have_const_cap(ARM64_HAS_NESTED_VIRT) &&
+> >> +		test_bit(KVM_ARM_VCPU_NESTED_VIRT, vcpu->arch.features);
+> >> +}
+> >> +
+> >> +#endif /* __ARM64_KVM_NESTED_H */
+> >> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> >> index d819a3e8b552..563e2a8bae93 100644
+> >> --- a/arch/arm64/include/uapi/asm/kvm.h
+> >> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> >> @@ -106,6 +106,7 @@ struct kvm_regs {
+> >>  #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
+> >>  #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
+> >>  #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
+> >> +#define KVM_ARM_VCPU_NESTED_VIRT	7 /* Support nested virtualization */
+> > 
+> > This seems weirdly named:
+> > 
+> > Isn't the feature we're exposing here really EL2?  In that case, the
+> > feature the guest gets with this flag enabled is plain virtualisation,
+> > possibly with the option to nest further.
+> > 
+> > Does the guest also get nested virt (i.e., recursively nested virt from
+> > the host's PoV) as a side effect, or would require an explicit extra
+> > flag?
 > 
-> FYI: the former discussion can been found in:
-> https://www.spinics.net/lists/kvm/msg187026.html
+> So far, there is no extra flag to describe further nesting, and it
+> directly comes from EL2 being emulated. I don't mind renaming this to
+> KVM_ARM_VCPU_HAS_EL2, or something similar... Whether we want userspace
+> to control the exposure of the nesting capability (i.e. EL2 with
+> ARMv8.3-NV) is another question.
 
-Basically everything except MMU_DEBUG can just be deleted, they are
-little more than debugging printk that were left in the code.
+Agreed.
 
-For MMU_DEBUG, the way to go is to add more tracepoints, but then
-converting all pgprintk occurrences to tracepoints would be wrong.  You
-can only find the "right" tracepoints when debugging MMU code.  I do
-have a couple patches in this area, I will send them when possible.
+KVM_ARM_VCPU_HAS_EL2 seems a reasonable name to me.
 
-Paolo
+If we have have an internal flag in vcpu_arch.flags we could call that
+something different (i.e., keep the NESTED_VIRT naming) if it's natural
+to do so.
 
-> Yi Wang (4):
->   kvm: x86: Add CONFIG_KVM_DEBUG
->   kvm: x86: allow set apic and ioapic debug dynamically
->   kvm: x86: replace MMU_DEBUG with CONFIG_KVM_DEBUG
->   kvm: x86: convert TSC pr_debugs to be gated by CONFIG_KVM_DEBUG
-> 
->  arch/x86/kvm/Kconfig  |  8 ++++++++
->  arch/x86/kvm/ioapic.c |  2 +-
->  arch/x86/kvm/lapic.c  |  5 ++++-
->  arch/x86/kvm/mmu.c    |  5 ++---
->  arch/x86/kvm/x86.c    | 18 ++++++++++++------
->  5 files changed, 27 insertions(+), 11 deletions(-)
-> 
-
+Cheers
+---Dave
