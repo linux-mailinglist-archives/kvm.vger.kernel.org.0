@@ -2,144 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 89CB55E5FA
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 16:04:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 949975E62E
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2019 16:13:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726823AbfGCOEY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 10:04:24 -0400
-Received: from mx2.suse.de ([195.135.220.15]:60202 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725847AbfGCOEY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 10:04:24 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id B1869AE14;
-        Wed,  3 Jul 2019 14:04:22 +0000 (UTC)
-Subject: Re: [PATCH v2 4/9] x86/mm/tlb: Flush remote and local TLBs
- concurrently
-To:     Nadav Amit <namit@vmware.com>, Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Sasha Levin <sashal@kernel.org>, x86@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190702235151.4377-1-namit@vmware.com>
- <20190702235151.4377-5-namit@vmware.com>
-From:   Juergen Gross <jgross@suse.com>
-Message-ID: <d89e2b57-8682-153e-33d8-98084e9983d6@suse.com>
-Date:   Wed, 3 Jul 2019 16:04:21 +0200
+        id S1726675AbfGCONL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 10:13:11 -0400
+Received: from foss.arm.com ([217.140.110.172]:49006 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726255AbfGCONL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 10:13:11 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AED2B2B;
+        Wed,  3 Jul 2019 07:13:10 -0700 (PDT)
+Received: from [10.1.31.185] (unknown [10.1.31.185])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3F9943F718;
+        Wed,  3 Jul 2019 07:13:09 -0700 (PDT)
+Subject: Re: [PATCH 33/59] KVM: arm64: nv: Pretend we only support
+ larger-than-host page sizes
+To:     Marc Zyngier <marc.zyngier@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-34-marc.zyngier@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <f99c2f11-a59c-485f-a264-69848e1e40c7@arm.com>
+Date:   Wed, 3 Jul 2019 15:13:07 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190702235151.4377-5-namit@vmware.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: de-DE
+In-Reply-To: <20190621093843.220980-34-marc.zyngier@arm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03.07.19 01:51, Nadav Amit wrote:
-> To improve TLB shootdown performance, flush the remote and local TLBs
-> concurrently. Introduce flush_tlb_multi() that does so. Introduce
-> paravirtual versions of flush_tlb_multi() for KVM, Xen and hyper-v (Xen
-> and hyper-v are only compile-tested).
-> 
-> While the updated smp infrastructure is capable of running a function on
-> a single local core, it is not optimized for this case. The multiple
-> function calls and the indirect branch introduce some overhead, and
-> might make local TLB flushes slower than they were before the recent
-> changes.
-> 
-> Before calling the SMP infrastructure, check if only a local TLB flush
-> is needed to restore the lost performance in this common case. This
-> requires to check mm_cpumask() one more time, but unless this mask is
-> updated very frequently, this should impact performance negatively.
-> 
-> Cc: "K. Y. Srinivasan" <kys@microsoft.com>
-> Cc: Haiyang Zhang <haiyangz@microsoft.com>
-> Cc: Stephen Hemminger <sthemmin@microsoft.com>
-> Cc: Sasha Levin <sashal@kernel.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: x86@kernel.org
-> Cc: Juergen Gross <jgross@suse.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> Cc: Andy Lutomirski <luto@kernel.org>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> Cc: linux-hyperv@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: virtualization@lists.linux-foundation.org
-> Cc: kvm@vger.kernel.org
-> Cc: xen-devel@lists.xenproject.org
-> Signed-off-by: Nadav Amit <namit@vmware.com>
+
+On 6/21/19 10:38 AM, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
+>
+> Exposing memory management support to the virtual EL2 as is exposed to
+> the host hypervisor would make the implementation too complex and
+> inefficient. Therefore expose limited memory management support for the
+> following two cases.
+>
+> We expose same or larger page granules than the one host uses.  We can
+> theoretically support a guest hypervisor having smaller-than-host
+> granularities but it is not worth it since it makes the implementation
+> complicated and it would waste memory.
+>
+> We expose 40 bits of physical address range to the virtual EL2, because
+> we only support a 40bit IPA for the guest. Eventually, this will change.
+>
+>   [ This was only trapping on the 32-bit encoding, also using the
+>     current target register value as a base for the sanitisation.
+>
+>     Use as the handler for the 64-bit sysreg as well, also load the
+>     sanitised version of the sysreg before clearing and setting bits.
+>
+>     -- Andre Przywara ]
+>
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->   arch/x86/hyperv/mmu.c                 | 13 +++---
->   arch/x86/include/asm/paravirt.h       |  6 +--
->   arch/x86/include/asm/paravirt_types.h |  4 +-
->   arch/x86/include/asm/tlbflush.h       |  9 ++--
->   arch/x86/include/asm/trace/hyperv.h   |  2 +-
->   arch/x86/kernel/kvm.c                 | 11 +++--
->   arch/x86/kernel/paravirt.c            |  2 +-
->   arch/x86/mm/tlb.c                     | 65 ++++++++++++++++++++-------
->   arch/x86/xen/mmu_pv.c                 | 20 ++++++---
->   include/trace/events/xen.h            |  2 +-
->   10 files changed, 91 insertions(+), 43 deletions(-)
+>  arch/arm64/kvm/sys_regs.c | 50 ++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 49 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index ec34b81da936..cc994ec3c121 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1710,6 +1710,54 @@ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> +static bool access_id_aa64mmfr0_el1(struct kvm_vcpu *v,
+> +				    struct sys_reg_params *p,
+> +				    const struct sys_reg_desc *r)
+> +{
+> +	u64 val;
+> +
+> +	if (p->is_write)
+> +		return write_to_read_only(v, p, r);
+> +
+> +	val = read_id_reg(v, r, false);
+> +
+> +	if (!nested_virt_in_use(v))
+> +		goto out;
+> +
+> +	/*
+> +	 * Don't expose granules smaller than the host's granule to the guest.
+> +	 * We can theoretically support a guest hypervisor having
+> +	 * smaller-than-host granularities but it is not worth it since it
+> +	 * makes the implementation complicated and it would waste memory.
+> +	 */
+> +	switch (PAGE_SIZE) {
+> +	case SZ_64K:
+> +		/* 16KB granule not supported */
+> +		val &= ~(0xf << ID_AA64MMFR0_TGRAN16_SHIFT);
+> +		val |= (ID_AA64MMFR0_TGRAN16_NI << ID_AA64MMFR0_TGRAN16_SHIFT);
+> +		/* fall through */
+> +	case SZ_16K:
+> +		/* 4KB granule not supported */
+> +		val &= ~(0xf << ID_AA64MMFR0_TGRAN4_SHIFT);
+> +		val |= (ID_AA64MMFR0_TGRAN4_NI << ID_AA64MMFR0_TGRAN4_SHIFT);
+> +		break;
+> +	case SZ_4K:
+> +		/* All granule sizes are supported */
+> +		break;
+> +	default:
+> +		unreachable();
+> +	}
+> +
+> +	/* Expose only 40 bits physical address range to the guest hypervisor */
+> +	val &= ~(0xf << ID_AA64MMFR0_PARANGE_SHIFT);
+> +	val |= (0x2 << ID_AA64MMFR0_PARANGE_SHIFT); /* 40 bits */
 
-...
+There are already defines for ID_AA64MMFR0_PARANGE_48 and
+ID_AA64MMFR0_PARANGE_52 in sysreg.h, perhaps a similar define for
+ID_AA64MMFR0_PARANGE_40 would be appropriate?
 
-> diff --git a/arch/x86/xen/mmu_pv.c b/arch/x86/xen/mmu_pv.c
-> index beb44e22afdf..19e481e6e904 100644
-> --- a/arch/x86/xen/mmu_pv.c
-> +++ b/arch/x86/xen/mmu_pv.c
-> @@ -1355,8 +1355,8 @@ static void xen_flush_tlb_one_user(unsigned long addr)
->   	preempt_enable();
->   }
->   
-> -static void xen_flush_tlb_others(const struct cpumask *cpus,
-> -				 const struct flush_tlb_info *info)
-> +static void xen_flush_tlb_multi(const struct cpumask *cpus,
-> +				const struct flush_tlb_info *info)
->   {
->   	struct {
->   		struct mmuext_op op;
-> @@ -1366,7 +1366,7 @@ static void xen_flush_tlb_others(const struct cpumask *cpus,
->   	const size_t mc_entry_size = sizeof(args->op) +
->   		sizeof(args->mask[0]) * BITS_TO_LONGS(num_possible_cpus());
->   
-> -	trace_xen_mmu_flush_tlb_others(cpus, info->mm, info->start, info->end);
-> +	trace_xen_mmu_flush_tlb_multi(cpus, info->mm, info->start, info->end);
->   
->   	if (cpumask_empty(cpus))
->   		return;		/* nothing to do */
-> @@ -1375,9 +1375,17 @@ static void xen_flush_tlb_others(const struct cpumask *cpus,
->   	args = mcs.args;
->   	args->op.arg2.vcpumask = to_cpumask(args->mask);
->   
-> -	/* Remove us, and any offline CPUS. */
-> +	/* Flush locally if needed and remove us */
-> +	if (cpumask_test_cpu(smp_processor_id(), to_cpumask(args->mask))) {
-> +		local_irq_disable();
-> +		flush_tlb_func_local(info);
-
-I think this isn't the correct function for PV guests.
-
-In fact it should be much easier: just don't clear the own cpu from the
-mask, that's all what's needed. The hypervisor is just fine having the
-current cpu in the mask and it will do the right thing.
-
-
-Juergen
+> +
+> +out:
+> +	p->regval = val;
+> +
+> +	return true;
+> +}
+> +
+>  static bool access_id_aa64pfr0_el1(struct kvm_vcpu *v,
+>  				   struct sys_reg_params *p,
+>  				   const struct sys_reg_desc *r)
+> @@ -1846,7 +1894,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	ID_UNALLOCATED(6,7),
+>  
+>  	/* CRm=7 */
+> -	ID_SANITISED(ID_AA64MMFR0_EL1),
+> +	ID_SANITISED_FN(ID_AA64MMFR0_EL1, access_id_aa64mmfr0_el1),
+>  	ID_SANITISED(ID_AA64MMFR1_EL1),
+>  	ID_SANITISED(ID_AA64MMFR2_EL1),
+>  	ID_UNALLOCATED(7,3),
