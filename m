@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D43B65F9B0
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 16:07:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AD505F9BB
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 16:07:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727801AbfGDOHX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1727861AbfGDOHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jul 2019 10:07:38 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:51912 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727789AbfGDOHX (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 4 Jul 2019 10:07:23 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:38039 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727780AbfGDOHW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jul 2019 10:07:22 -0400
-Received: by mail-wm1-f65.google.com with SMTP id s15so6322846wmj.3;
-        Thu, 04 Jul 2019 07:07:21 -0700 (PDT)
+Received: by mail-wm1-f68.google.com with SMTP id 207so5897990wma.1;
+        Thu, 04 Jul 2019 07:07:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=dE95kEfeLxRq5/Aw3fUKbbO7rlglotHNzErpcx0ZLL4=;
-        b=TPJ0MKPP/78c1zv8QTa1Li+Mze4a/pK7Uj5Ph8vLoK5j0w2S9IpB6+bqQKbM5zUMph
-         Wn9CPNM0tkotJFBcwDKTVcdt4RMBubEhnd+w9CLsyl/p/pRUl+aUrGcz86u0tP9HJ2kn
-         wO8JNQmc8tYpEtNAWHyYbV7kFmO5azscxtbwtr43i/n1SvKRwC1kgO8cG4wH6qTjPvNH
-         6oOaSbyUGqMWrmghUGqAegLwXdUWsUWFaY8jFSObI8rbgj6soccY3eI3tTrJSRUQhikI
-         HF9yZlkWP2gamUplzs08xw1LstYC/SWlhU7dYXshaqDR9z+9IJEayXVsAT0HUfnNJt0k
-         Xx4A==
+        bh=ECChYGSgqPJWyIb7qwTvg49fGB2JZ3kEyqx7NGS7lF4=;
+        b=Qsieq6booTxze/yJXXGgq8HBRJiBCmV/chqDyZsuIE4TM/4htz/KQzyKRQatL1ioEh
+         nxpa+ZWtK2v60W5W5KRWFFSjpkT2cRyokzUlOlZFbVywBqeBQu+buUOrL0jgSSN/QL1a
+         jaiJq7FQVJ3Iqssy7oXB2xGOu/amsQzktyfRXndX/CSZQVLtuy1Ku6MCOL2UPlZ+CQa5
+         pbPh+W1IMrpXXxC654uMUmUo1dRHFlso8pGG80nTojkHbGeXQn6lLqgIL0F1d/AlwGox
+         zs5acLAv4VLQiiG6xb4T6NTjH+heg8ah9I/ftHFEeN9e18KhktTihfcst0r3qZF5e7MK
+         iwUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=dE95kEfeLxRq5/Aw3fUKbbO7rlglotHNzErpcx0ZLL4=;
-        b=nVjtaMOQYn96YfWZz22oC7k5EHNF7z5G4Mk3aFTo71yXMfaSqQiQ+Tl6eE8AvOflGX
-         T/3VUcE4eW5DdivnVPf0u4fFNVMxx9bofrW0Kt5oyKlQLm6LY5y8U7F7IzuukG0aYYW3
-         7HV3o9lvpWL2iXmJNbUfhggQTaGBG1EXNgiz37ccZjWZFH/ipKXK/GqWeTd2mzoyL3m+
-         UBju5MFvVvr0a83bdK5YwKfkXugrgkQIghIOajl77MAmZ7vgDvDl2/s3jodK2O1Ljuvb
-         mMJ96YjJjdQUqNYmt7sJ/IBfPy9ebz2jJ7FhADzztORceDquCbhc2NM+pnErVMrDwrqR
-         bq5g==
-X-Gm-Message-State: APjAAAVU4+YChpNY352BIA6NjiH133xuFWJ5LKJvvSOjM6Rv+TfMj4+I
-        lP6bx3D4bnBjN75IQy1Fjm2cT38gVkM=
-X-Google-Smtp-Source: APXvYqxh+WgZYqGfDyEocMu0NUZdV5E7qFTcawdOdIhuANRjt1F9+bkIL6eYUkxnDkXqux3enHGmCw==
-X-Received: by 2002:a1c:9a03:: with SMTP id c3mr12892796wme.101.1562249240187;
-        Thu, 04 Jul 2019 07:07:20 -0700 (PDT)
+        bh=ECChYGSgqPJWyIb7qwTvg49fGB2JZ3kEyqx7NGS7lF4=;
+        b=rCKdpQZZf42FC/bLvP2zCFoe1RLjvL2tjUVdoa7ZBwg1eTynl5H2pgLbs344LNHh/s
+         fNmP8PFMvUJnR7pDRGrMdQdpcL9BtaRS14QVhaYmRdaQ+Qz1ClUPuo6njKEMfzQ+wz9Q
+         Pn+xVO6PTpFxWQ/IugCiibpqKIy4uau17HqiTNaAWRUEZie8zdfCf8ZQDfG2lG3Ge0aA
+         48UgsRHem+xPAbhdaKE9Xplaqde4LLOgPtLhQHaooOoA/AL09CNIuPCaV9DLTxaFp3dW
+         2xleHaIsN5hR1FZjKyPw6xX7vzR+p0XF+V/VToohjY/jvB2p36SUIvb5dTr4Pc0gRHU9
+         fXOQ==
+X-Gm-Message-State: APjAAAWxillH0/vi46lEd2PtsR1GJzyd+zcJWnxQGtThbg2VbXz/mJTd
+        9uFZwURLZymyLWYflw5kdoO/qDLWZeo=
+X-Google-Smtp-Source: APXvYqyT87GQgKhopyeSqmmY/O6fjvFFd98RkF1ZyRUuGVRuCt0weOWYn3s9DSrRVKrcOfGrsjKBWg==
+X-Received: by 2002:a05:600c:23d2:: with SMTP id p18mr2147263wmb.160.1562249241150;
+        Thu, 04 Jul 2019 07:07:21 -0700 (PDT)
 Received: from donizetti.redhat.com (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-        by smtp.gmail.com with ESMTPSA id n5sm4458060wmi.21.2019.07.04.07.07.19
+        by smtp.gmail.com with ESMTPSA id n5sm4458060wmi.21.2019.07.04.07.07.20
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 04 Jul 2019 07:07:19 -0700 (PDT)
+        Thu, 04 Jul 2019 07:07:20 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     jing2.liu@linux.intel.com
-Subject: [PATCH 3/5] KVM: cpuid: set struct kvm_cpuid_entry2 flags in do_cpuid_1_ent
-Date:   Thu,  4 Jul 2019 16:07:13 +0200
-Message-Id: <20190704140715.31181-4-pbonzini@redhat.com>
+Subject: [PATCH 4/5] KVM: cpuid: rename do_cpuid_1_ent
+Date:   Thu,  4 Jul 2019 16:07:14 +0200
+Message-Id: <20190704140715.31181-5-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190704140715.31181-1-pbonzini@redhat.com>
 References: <20190704140715.31181-1-pbonzini@redhat.com>
@@ -60,134 +60,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-do_cpuid_1_ent is typically called in two places by __do_cpuid_func
-for CPUID functions that have subleafs.  Both places have to set
-the KVM_CPUID_FLAG_SIGNIFCANT_INDEX.  Set that flag, and
-KVM_CPUID_FLAG_STATEFUL_FUNC as well, directly in do_cpuid_1_ent.
+do_cpuid_1_ent does not do the entire processing for a CPUID entry, it
+only retrieves the host's values.  Rename it to match reality.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/cpuid.c | 30 ++++++++++++++----------------
- 1 file changed, 14 insertions(+), 16 deletions(-)
+ arch/x86/kvm/cpuid.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 1c6b9a4a74de..9ebc5ae7fa0e 100644
+index 9ebc5ae7fa0e..d403695f2f3b 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -298,6 +298,20 @@ static void do_cpuid_1_ent(struct kvm_cpuid_entry2 *entry, u32 function,
- 
- 	cpuid_count(entry->function, entry->index,
- 		    &entry->eax, &entry->ebx, &entry->ecx, &entry->edx);
-+
-+	switch (function) {
-+	case 2:
-+		entry->flags |= KVM_CPUID_FLAG_STATEFUL_FUNC;
-+		break;
-+	case 4:
-+	case 7:
-+	case 0xb:
-+	case 0xd:
-+	case 0x14:
-+	case 0x8000001d:
-+		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-+		break;
-+	}
+@@ -289,7 +289,7 @@ static void cpuid_mask(u32 *word, int wordnum)
+ 	*word &= boot_cpu_data.x86_capability[wordnum];
  }
  
- static int __do_cpuid_func_emulated(struct kvm_cpuid_entry2 *entry,
-@@ -497,14 +511,12 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 	case 2: {
- 		int t, times = entry->eax & 0xff;
+-static void do_cpuid_1_ent(struct kvm_cpuid_entry2 *entry, u32 function,
++static void do_host_cpuid(struct kvm_cpuid_entry2 *entry, u32 function,
+ 			   u32 index)
+ {
+ 	entry->function = function;
+@@ -487,7 +487,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+ 	if (*nent >= maxnent)
+ 		goto out;
  
--		entry->flags |= KVM_CPUID_FLAG_STATEFUL_FUNC;
- 		entry->flags |= KVM_CPUID_FLAG_STATE_READ_NEXT;
- 		for (t = 1; t < times; ++t) {
+-	do_cpuid_1_ent(entry, function, 0);
++	do_host_cpuid(entry, function, 0);
+ 	++*nent;
+ 
+ 	switch (function) {
+@@ -516,7 +516,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
  			if (*nent >= maxnent)
  				goto out;
  
- 			do_cpuid_1_ent(&entry[t], function, 0);
--			entry[t].flags |= KVM_CPUID_FLAG_STATEFUL_FUNC;
+-			do_cpuid_1_ent(&entry[t], function, 0);
++			do_host_cpuid(&entry[t], function, 0);
  			++*nent;
  		}
  		break;
-@@ -514,7 +526,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 	case 0x8000001d: {
- 		int i, cache_type;
- 
--		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
- 		/* read more entries until cache_type is zero */
- 		for (i = 1; ; ++i) {
- 			if (*nent >= maxnent)
-@@ -524,8 +535,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+@@ -534,7 +534,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+ 			cache_type = entry[i - 1].eax & 0x1f;
  			if (!cache_type)
  				break;
- 			do_cpuid_1_ent(&entry[i], function, i);
--			entry[i].flags |=
--			       KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+-			do_cpuid_1_ent(&entry[i], function, i);
++			do_host_cpuid(&entry[i], function, i);
  			++*nent;
  		}
  		break;
-@@ -540,7 +549,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 	case 7: {
- 		int i;
- 
--		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
- 		for (i = 0; ; ) {
- 			do_cpuid_7_mask(&entry[i], i);
- 			if (i == entry->eax)
-@@ -550,8 +558,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+@@ -557,7 +557,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+ 				goto out;
  
  			++i;
- 			do_cpuid_1_ent(&entry[i], function, i);
--			entry[i].flags |=
--			       KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+-			do_cpuid_1_ent(&entry[i], function, i);
++			do_host_cpuid(&entry[i], function, i);
  			++*nent;
  		}
  		break;
-@@ -595,7 +601,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 	case 0xb: {
- 		int i, level_type;
- 
--		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
- 		/* read more entries until level_type is zero */
- 		for (i = 1; ; ++i) {
- 			if (*nent >= maxnent)
-@@ -605,8 +610,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+@@ -609,7 +609,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+ 			level_type = entry[i - 1].ecx & 0xff00;
  			if (!level_type)
  				break;
- 			do_cpuid_1_ent(&entry[i], function, i);
--			entry[i].flags |=
--			       KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+-			do_cpuid_1_ent(&entry[i], function, i);
++			do_host_cpuid(&entry[i], function, i);
  			++*nent;
  		}
  		break;
-@@ -619,7 +622,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 		entry->ebx = xstate_required_size(supported, false);
- 		entry->ecx = entry->ebx;
- 		entry->edx &= supported >> 32;
--		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
- 		if (!supported)
- 			break;
+@@ -630,7 +630,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
+ 			if (*nent >= maxnent)
+ 				goto out;
  
-@@ -645,8 +647,6 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 			}
- 			entry[i].ecx = 0;
- 			entry[i].edx = 0;
--			entry[i].flags |=
--			       KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
- 			++*nent;
- 			++i;
- 		}
-@@ -659,12 +659,10 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
- 		if (!f_intel_pt)
- 			break;
- 
--		entry->flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+-			do_cpuid_1_ent(&entry[i], function, idx);
++			do_host_cpuid(&entry[i], function, idx);
+ 			if (idx == 1) {
+ 				entry[i].eax &= kvm_cpuid_D_1_eax_x86_features;
+ 				cpuid_mask(&entry[i].eax, CPUID_D_1_EAX);
+@@ -662,7 +662,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 function,
  		for (t = 1; t <= times; ++t) {
  			if (*nent >= maxnent)
  				goto out;
- 			do_cpuid_1_ent(&entry[t], function, t);
--			entry[t].flags |= KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
+-			do_cpuid_1_ent(&entry[t], function, t);
++			do_host_cpuid(&entry[t], function, t);
  			++*nent;
  		}
  		break;
