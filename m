@@ -2,123 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D60275F627
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 12:00:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FB745F676
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 12:17:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727460AbfGDKAN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jul 2019 06:00:13 -0400
-Received: from foss.arm.com ([217.140.110.172]:38256 "EHLO foss.arm.com"
+        id S1727530AbfGDKRG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jul 2019 06:17:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49152 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727298AbfGDKAN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jul 2019 06:00:13 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 52016360;
-        Thu,  4 Jul 2019 03:00:12 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 84C643F703;
-        Thu,  4 Jul 2019 03:00:11 -0700 (PDT)
-Date:   Thu, 4 Jul 2019 11:00:09 +0100
-From:   Dave Martin <Dave.Martin@arm.com>
-To:     Marc Zyngier <marc.zyngier@arm.com>
-Cc:     kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 06/59] KVM: arm64: nv: Allow userspace to set
- PSR_MODE_EL2x
-Message-ID: <20190704100009.GZ2790@e103592.cambridge.arm.com>
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-7-marc.zyngier@arm.com>
- <7f8a9d76-6087-b8d9-3571-074a08d08ec8@arm.com>
- <3a68e4e6-878f-7272-4e2d-8768680287fd@arm.com>
- <20190624124859.GP2790@e103592.cambridge.arm.com>
- <09dca509-9696-d224-22d2-4d5b0a0d9161@arm.com>
+        id S1727249AbfGDKRG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jul 2019 06:17:06 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 824E930001E2;
+        Thu,  4 Jul 2019 10:17:05 +0000 (UTC)
+Received: from localhost (ovpn-117-206.ams2.redhat.com [10.36.117.206])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6416118B93;
+        Thu,  4 Jul 2019 10:17:02 +0000 (UTC)
+Date:   Thu, 4 Jul 2019 11:17:01 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] vsock/virtio: use RCU to avoid use-after-free on
+ the_virtio_vsock
+Message-ID: <20190704101701.GD1609@stefanha-x1.localdomain>
+References: <20190628123659.139576-1-sgarzare@redhat.com>
+ <20190628123659.139576-2-sgarzare@redhat.com>
+ <05311244-ed23-d061-a620-7b83d83c11f5@redhat.com>
+ <20190703104135.wg34dobv64k7u4jo@steredhat>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="tEFtbjk+mNEviIIX"
 Content-Disposition: inline
-In-Reply-To: <09dca509-9696-d224-22d2-4d5b0a0d9161@arm.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+In-Reply-To: <20190703104135.wg34dobv64k7u4jo@steredhat>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Thu, 04 Jul 2019 10:17:05 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 03, 2019 at 10:21:57AM +0100, Marc Zyngier wrote:
-> On 24/06/2019 13:48, Dave Martin wrote:
-> > On Fri, Jun 21, 2019 at 02:50:08PM +0100, Marc Zyngier wrote:
-> >> On 21/06/2019 14:24, Julien Thierry wrote:
-> >>>
-> >>>
-> >>> On 21/06/2019 10:37, Marc Zyngier wrote:
-> >>>> From: Christoffer Dall <christoffer.dall@linaro.org>
-> >>>>
-> >>>> We were not allowing userspace to set a more privileged mode for the VCPU
-> >>>> than EL1, but we should allow this when nested virtualization is enabled
-> >>>> for the VCPU.
-> >>>>
-> >>>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> >>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> >>>> ---
-> >>>>  arch/arm64/kvm/guest.c | 6 ++++++
-> >>>>  1 file changed, 6 insertions(+)
-> >>>>
-> >>>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> >>>> index 3ae2f82fca46..4c35b5d51e21 100644
-> >>>> --- a/arch/arm64/kvm/guest.c
-> >>>> +++ b/arch/arm64/kvm/guest.c
-> >>>> @@ -37,6 +37,7 @@
-> >>>>  #include <asm/kvm_emulate.h>
-> >>>>  #include <asm/kvm_coproc.h>
-> >>>>  #include <asm/kvm_host.h>
-> >>>> +#include <asm/kvm_nested.h>
-> >>>>  #include <asm/sigcontext.h>
-> >>>>  
-> >>>>  #include "trace.h"
-> >>>> @@ -194,6 +195,11 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >>>>  			if (vcpu_el1_is_32bit(vcpu))
-> >>>>  				return -EINVAL;
-> >>>>  			break;
-> >>>> +		case PSR_MODE_EL2h:
-> >>>> +		case PSR_MODE_EL2t:
-> >>>> +			if (vcpu_el1_is_32bit(vcpu) || !nested_virt_in_use(vcpu))
-> >>>
-> >>> This condition reads a bit weirdly. Why do we care about anything else
-> >>> than !nested_virt_in_use() ?
-> >>>
-> >>> If nested virt is not in use then obviously we return the error.
-> >>>
-> >>> If nested virt is in use then why do we care about EL1? Or should this
-> >>> test read as "highest_el_is_32bit" ?
-> >>
-> >> There are multiple things at play here:
-> >>
-> >> - MODE_EL2x is not a valid 32bit mode
-> >> - The architecture forbids nested virt with 32bit EL2
-> >>
-> >> The code above is a simplification of these two conditions. But
-> >> certainly we can do a bit better, as kvm_reset_cpu() doesn't really
-> >> check that we don't create a vcpu with both 32bit+NV. These two bits
-> >> should really be exclusive.
-> > 
-> > This code is safe for now because KVM_VCPU_MAX_FEATURES <=
-> > KVM_ARM_VCPU_NESTED_VIRT, right, i.e., nested_virt_in_use() cannot be
-> > true?
-> > 
-> > This makes me a little uneasy, but I think that's paranoia talking: we
-> > want bisectably, but no sane person should ship with just half of this
-> > series.  So I guess this is fine.
-> > 
-> > We could stick something like
-> > 
-> > 	if (WARN_ON(...))
-> > 		return false;
-> > 
-> > in nested_virt_in_use() and then remove it in the final patch, but it's
-> > probably overkill.
-> 
-> The only case I can imagine something going wrong is if this series is
-> only applied halfway, and another series bumps the maximum feature to
-> something that includes NV. I guess your suggestion would solve that.
 
-I won't lose sleep over it either way.
+--tEFtbjk+mNEviIIX
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Cheers
----Dave
+On Wed, Jul 03, 2019 at 12:41:35PM +0200, Stefano Garzarella wrote:
+> On Wed, Jul 03, 2019 at 05:53:58PM +0800, Jason Wang wrote:
+> > On 2019/6/28 =E4=B8=8B=E5=8D=888:36, Stefano Garzarella wrote:
+> > Another more interesting question, I believe we will do singleton for
+> > virtio_vsock structure. Then what's the point of using vdev->priv to ac=
+cess
+> > the_virtio_vsock? It looks to me we can it brings extra troubles for do=
+ing
+> > synchronization.
+>=20
+> I thought about it when I tried to use RCU to stop the worker and I
+> think make sense. Maybe can be another series after this will be merged.
+>=20
+> @Stefan, what do you think about that?
+
+Yes, let's make it a singleton and keep no other references to it.
+
+Stefan
+
+--tEFtbjk+mNEviIIX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0d0h0ACgkQnKSrs4Gr
+c8i7uAf/QXuDj1LvILBy4mvMHIq38SqbW5mFIsodkTbGDB7yc/P8sUakOgHd3iqg
+B7T4t6bHfBmin86sSvgINZoQ2Ce0Cl5gfAUArX22oxCNNwo5U0rb6uLLj0aIi66M
+JgXi44ww1uhDIqrgJAVltxIQCV6jjLNNR0Qz19oTEV1qNl4UkY4+iew3ebbt/sid
+lBqxCSTTuA6dhA2R74j7mNtahfRXHiKqfz/fvnMIt6eayMHvx9cIpGJn+ZcJ5wNr
+n55WOBLvBc+xom4siTtiE+R5ZOATuxyfbvCncpj5a6p3wfMDtYIWTh/UeAEyDesp
+lL1CmfZat5mLZ1F0gxgjgE5alpkjuw==
+=02pH
+-----END PGP SIGNATURE-----
+
+--tEFtbjk+mNEviIIX--
