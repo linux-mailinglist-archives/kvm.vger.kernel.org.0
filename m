@@ -2,82 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 276765F907
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 15:19:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAE7E5F9AE
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 16:07:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727171AbfGDNTM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jul 2019 09:19:12 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:37255 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725945AbfGDNTM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jul 2019 09:19:12 -0400
-Received: by mail-wr1-f67.google.com with SMTP id v14so6629033wrr.4
-        for <kvm@vger.kernel.org>; Thu, 04 Jul 2019 06:19:11 -0700 (PDT)
+        id S1727772AbfGDOHU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jul 2019 10:07:20 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:35533 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727365AbfGDOHT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jul 2019 10:07:19 -0400
+Received: by mail-wr1-f65.google.com with SMTP id c27so6811450wrb.2;
+        Thu, 04 Jul 2019 07:07:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=MvfpCcwP28+TBmBj1O3oyBlPKHN+Je1C3rbxB2DoDSc=;
+        b=A2is8hAeYQZz0wjbz2Th3XTbRIeoNaAluBRG0B2DSDo0JEXXhGAboJ9m7jqJlBLUan
+         xhgtxN0HVVlDwB857d2rVSH7nDSeEBx6eHV5U3K8vavHXgerjwjlXS0fIVSNOcX+UA5J
+         NtJENYskL9ixZbIuwjEURe4wPm71OqgMHri5p+krUpHxw37diSAFzax4s9ebntrWUWdC
+         V+xlObHRnvp9L3xlVAgp1GRvdKCCPDeIgGBp0DBJaQJFWRv8lDzfJYx8uLtKGcYWV379
+         MfrIW65N7rcMCq1P5f+GURCoT79OjPob0zbAdP5ww94+nhTM82BGcQe/C8saiS/CDtzy
+         oJ9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cb7K86i4xSjnh5aO2/GCpQl2NYXJ9GZdRLXhfhoypnU=;
-        b=tr4Ep7iaacYBY851O73mK2sRlhVcG12asB8fyDLn3B+jhCNX4AsiBBDsA9ZZ2FxI26
-         O6iVXjnzervB/40h5+PLSKy/i0CaeFJN92eVK9z9npEADvmAmY8RNkhEZki/9eyfUpfC
-         lxeKfh4wur+p/aXs9Vw88163h2qv6LJ2lneLmGp+CvjgAg7B9Ux35KM5rvKv99Gp6aak
-         hauyTvH2ZNRwZ7L5cHmlGum2Z5vSmcnqJlvePcSvwv7U5BkzMW2/dK22PdnF8Gmtms9u
-         79C1sDMEYPXWqday8dUoeJPIREfedsH0q4c7s2yjs50RukSVN0rnf/4N0k3EZteekp9j
-         WMUQ==
-X-Gm-Message-State: APjAAAW/9xszgL12P6JngS9iIGhTa91aXSg4t8Sx1UbHCLQ67LZQ/ZzX
-        DDPLcxBA6IsVVqFHtdZXQLcV5w==
-X-Google-Smtp-Source: APXvYqwnnWTvg4XiNApaaKbLCKKQnP2Dttz0Wp5dirkAI4GqqKYrAYZTEHuEKyVf9YNKab5gwyCQUA==
-X-Received: by 2002:a5d:6190:: with SMTP id j16mr35368415wru.49.1562246350384;
-        Thu, 04 Jul 2019 06:19:10 -0700 (PDT)
-Received: from [10.201.49.68] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-        by smtp.gmail.com with ESMTPSA id l13sm121009wrt.16.2019.07.04.06.19.09
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 04 Jul 2019 06:19:09 -0700 (PDT)
-Subject: Re: [PATCH 1/2] scsi_host: add support for request batching
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=MvfpCcwP28+TBmBj1O3oyBlPKHN+Je1C3rbxB2DoDSc=;
+        b=H7mxLL6A092I5WmXtVdYuALlEXGWtsrOS1ASicEqwvV4BbKkGnh90iKhHpqYO7NdV/
+         lAn/MJe0pHxKBMFSeEShlN76iHWxmQ/bojY9WFwFhSUftCa4wSW/GqxKPmmfH+9zT2sL
+         CY7RWo2QHrJak1IrKD2l4EfnxobOEIaykeIykzR28wuHAEWQmP9MpcHYvdaMVzCpL3lv
+         JvhE6UrMS9FZy7l7zeRaT2oddGHXY81TzybxOIl6pWK6CJuMj9fSsoUx4J9/jesn2aNq
+         uPjxiND/uaVsdsrKniHoN0jMS9gZgClCypwKZxX5MqSA2uwWYiMer4yzb9bm+ECMbBPa
+         U4AA==
+X-Gm-Message-State: APjAAAW0Z/SgBaZFDmmsakk7M4V4BAvEG4hNi29a2nZa3p2iB7ddRkxg
+        52gLN3fia6lHzYRxlJptL115bfnd0cI=
+X-Google-Smtp-Source: APXvYqxk/4aVoqyEb13bwLt2Cf1DTcN4wHc6o3km4sCHW9KFJH3uv9xMvDiD2XtNYSuVvqcDqgtjmw==
+X-Received: by 2002:a5d:53c1:: with SMTP id a1mr3492555wrw.185.1562249237169;
+        Thu, 04 Jul 2019 07:07:17 -0700 (PDT)
+Received: from donizetti.redhat.com (nat-pool-mxp-u.redhat.com. [149.6.153.187])
+        by smtp.gmail.com with ESMTPSA id n5sm4458060wmi.21.2019.07.04.07.07.16
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 04 Jul 2019 07:07:16 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Hannes Reinecke <hare@suse.de>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jejb@linux.ibm.com, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, stefanha@redhat.com
-References: <20190530112811.3066-1-pbonzini@redhat.com>
- <20190530112811.3066-2-pbonzini@redhat.com>
- <760164a0-589d-d9fa-fb63-79b5e0899c00@suse.de>
- <aaa344bf-af29-0485-4e83-5442331a2c9c@redhat.com>
-Message-ID: <afea12a1-47b3-0ebe-a3c2-6adc615bbddf@redhat.com>
-Date:   Thu, 4 Jul 2019 15:19:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     jing2.liu@linux.intel.com
+Subject: [PATCH 0/5] KVM: cpuid: cleanups, simplify multi-index CPUID leaves
+Date:   Thu,  4 Jul 2019 16:07:10 +0200
+Message-Id: <20190704140715.31181-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <aaa344bf-af29-0485-4e83-5442331a2c9c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19/06/19 12:31, Paolo Bonzini wrote:
->> I'm a bit unsure if 'bd->last' is always set; it's quite obvious that
->> it's present if set, but what about requests with 'bd->last == false' ?
->> Is there a guarantee that they will _always_ be followed with a request
->> with bd->last == true?
->> And if so, is there a guarantee that this request is part of the same batch?
-> It's complicated.  A request with bd->last == false _will_ always be
-> followed by a request with bd->last == true in the same batch.  However,
-> due to e.g. errors it may be possible that the last request is not sent.
->  In that case, the block layer sends commit_rqs, as documented in the
-> comment above, to flush the requests that have been sent already.
-> 
-> So, a driver that obeys bd->last (or SCMD_LAST) but does not implement
-> commit_rqs is bound to have bugs, which is why this patch was not split
-> further.
-> 
-> Makes sense?
+While reviewing the AVX512_BF16, Jing Liu and I noted that the handling of
+CPUID leaf 7 is quite messy, and in general the handling of multi-index
+CPUID leaves is confusing.  These patches clean the code to prepare
+for adding CPUID leaf 7 subleaf 1.
 
-Hannes, can you provide your Reviewed-by?
+Paolo Bonzini (5):
+  KVM: cpuid: do_cpuid_ent works on a whole CPUID function
+  KVM: cpuid: extract do_cpuid_7_mask and support multiple subleafs
+  KVM: cpuid: set struct kvm_cpuid_entry2 flags in do_cpuid_1_ent
+  KVM: cpuid: rename do_cpuid_1_ent
+  KVM: cpuid: remove has_leaf_count from struct kvm_cpuid_param
 
-Thanks,
+ arch/x86/kvm/cpuid.c | 222 ++++++++++++++++++++++++-------------------
+ 1 file changed, 122 insertions(+), 100 deletions(-)
 
-Paolo
+-- 
+2.21.0
+
