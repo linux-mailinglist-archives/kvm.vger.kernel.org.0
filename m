@@ -2,223 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E0025F898
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 14:53:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C04295F8DE
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 15:09:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727185AbfGDMxw convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 4 Jul 2019 08:53:52 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:33052 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725945AbfGDMxw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jul 2019 08:53:52 -0400
-Received: from lhreml709-cah.china.huawei.com (unknown [172.18.7.107])
-        by Forcepoint Email with ESMTP id 3DA421FEFF57E93EA4C0;
-        Thu,  4 Jul 2019 13:53:51 +0100 (IST)
-Received: from LHREML524-MBS.china.huawei.com ([169.254.2.154]) by
- lhreml709-cah.china.huawei.com ([10.201.108.32]) with mapi id 14.03.0415.000;
- Thu, 4 Jul 2019 13:53:41 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        "John Garry" <john.garry@huawei.com>,
-        "xuwei (O)" <xuwei5@huawei.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>
-Subject: RE: [PATCH v7 3/6] vfio/type1: Update iova list on detach
-Thread-Topic: [PATCH v7 3/6] vfio/type1: Update iova list on detach
-Thread-Index: AQHVLDHlzsp7WZ6o0k2WlwGboVZ1gKa5VF+AgAEhqmA=
-Date:   Thu, 4 Jul 2019 12:53:41 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA83F2DDB80@lhreml524-mbs.china.huawei.com>
-References: <20190626151248.11776-1-shameerali.kolothum.thodi@huawei.com>
-        <20190626151248.11776-4-shameerali.kolothum.thodi@huawei.com>
- <20190703143451.0ae4e9f7@x1.home>
-In-Reply-To: <20190703143451.0ae4e9f7@x1.home>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.34.206.221]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1727044AbfGDNJL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jul 2019 09:09:11 -0400
+Received: from mail-lf1-f43.google.com ([209.85.167.43]:33268 "EHLO
+        mail-lf1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726994AbfGDNJL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jul 2019 09:09:11 -0400
+Received: by mail-lf1-f43.google.com with SMTP id y17so4238107lfe.0
+        for <kvm@vger.kernel.org>; Thu, 04 Jul 2019 06:09:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=6Rl7ZE2p5oqBeq4Sb78kTphgrtz1wgjRVIAbyeObPYc=;
+        b=iK3n1keE4uNcZxEU7Kn3/dyct5CnVCVuDW7zJKFbtRT2ND5ZRxmMaa8TcGdeD4f1SA
+         zSZGxRv5zW+2wmooPbYrQBGuLpEWWAdj6eUXKemWZvUitFbJKv6hdxNggZo4fyTze8tn
+         5g0HrNOua13SFM+0ccDQmcf0MT9BRF9Ljk+GgbsQ6AsJfiVCV490PTUCuU/TY9TRbYLf
+         2X5m3cbacqnYT+2NWBMoaV4GsNfe3P7jqjQwc/7g0IP7q4G99A5Nha2TBNwz+rNXcRco
+         TMa/ZebgOkHr4L7JVQ1UNwjfnk1KXQgyvobDrQbn2G7rer1KvzVlsBUnC2FixQXNSXVR
+         Ly0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6Rl7ZE2p5oqBeq4Sb78kTphgrtz1wgjRVIAbyeObPYc=;
+        b=jKFzyamyr5HcA7tF9Z9DSf2O1/nRpAfn7mTIFj1PAQebWSB8jjle525+suNMTp7RVE
+         bpa7Vn4hKSrSHPBO6DKLr5w5lk8qa59/Ce8t5j1dq9v/owaH/HWcZTp4imkTqGOV7/N4
+         re4fUwmnT/ZuePyv/uPh30EyWkcyWJaqQ5l64sgJiSkJVAJtFX517vb2yHD28iADH+KS
+         v0V+d37VRViyrQbS4N/dociw0X0IiIrX/rxPnXxA4PqeAMwtKVfoSkx+ACk8vr1RADz5
+         mWdlfHPGh4LnCnSFfmCs23XFxx+arRx29SEbhGOGe/a2j33kcTzhBmU9anPpFMa3eVOO
+         bBjg==
+X-Gm-Message-State: APjAAAXB/YDryz407eZgAb6/TC/mTigZ0aDZIkvrmV00yijXnbb4Etsv
+        9L4ig3Z2B/TftMwgzVboTcfxKWR+41IuCCxcbOwwNg==
+X-Google-Smtp-Source: APXvYqx8o/c2n8pkABbYeKvByIRzXvFsOALTe0pBu65vHSLco8W0JmPx6iPFxRD+BithHcdmXcOUDUbbPJuPRPwBLlM=
+X-Received: by 2002:ac2:482d:: with SMTP id 13mr1755610lft.132.1562245749209;
+ Thu, 04 Jul 2019 06:09:09 -0700 (PDT)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+References: <CA+G9fYtVU2FoQ_cH71edFH-YfyFWZwi4s7tPxMW6aFG0pDEjPA@mail.gmail.com>
+ <20190627081650.frxivyrykze5mqdv@kamzik.brq.redhat.com> <e10ac8cc-9bf6-b07d-00d9-83d9cc0f4b98@redhat.com>
+In-Reply-To: <e10ac8cc-9bf6-b07d-00d9-83d9cc0f4b98@redhat.com>
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Thu, 4 Jul 2019 18:38:57 +0530
+Message-ID: <CA+G9fYuuOX7URAPdzR-xEAZBWLsdSLV9-UBrP0L5nAXOK94Baw@mail.gmail.com>
+Subject: Re: Pre-required Kconfigs for kvm unit tests
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Andrew Jones <drjones@redhat.com>, kvm list <kvm@vger.kernel.org>,
+        lkft-triage@lists.linaro.org,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        karl.heubaum@oracle.com, andre.przywara@arm.com, cdall@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Paolo,
 
+On Thu, 27 Jun 2019 at 14:19, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+on x86_64,
 
-> -----Original Message-----
-> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On
-> Behalf Of Alex Williamson
-> Sent: 03 July 2019 21:35
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: eric.auger@redhat.com; pmorel@linux.vnet.ibm.com;
-> kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> iommu@lists.linux-foundation.org; Linuxarm <linuxarm@huawei.com>; John
-> Garry <john.garry@huawei.com>; xuwei (O) <xuwei5@huawei.com>;
-> kevin.tian@intel.com
-> Subject: Re: [PATCH v7 3/6] vfio/type1: Update iova list on detach
-> 
-> On Wed, 26 Jun 2019 16:12:45 +0100
-> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-> 
-> > Get a copy of iova list on _group_detach and try to update the list.
-> > On success replace the current one with the copy. Leave the list as
-> > it is if update fails.
-> >
-> > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > ---
-> >  drivers/vfio/vfio_iommu_type1.c | 91
-> +++++++++++++++++++++++++++++++++
-> >  1 file changed, 91 insertions(+)
-> >
-> > diff --git a/drivers/vfio/vfio_iommu_type1.c
-> b/drivers/vfio/vfio_iommu_type1.c
-> > index b6bfdfa16c33..e872fb3a0f39 100644
-> > --- a/drivers/vfio/vfio_iommu_type1.c
-> > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > @@ -1873,12 +1873,88 @@ static void vfio_sanity_check_pfn_list(struct
-> vfio_iommu *iommu)
-> >  	WARN_ON(iommu->notifier.head);
-> >  }
-> >
-> > +/*
-> > + * Called when a domain is removed in detach. It is possible that
-> > + * the removed domain decided the iova aperture window. Modify the
-> > + * iova aperture with the smallest window among existing domains.
-> > + */
-> > +static void vfio_iommu_aper_expand(struct vfio_iommu *iommu,
-> > +				   struct list_head *iova_copy)
-> > +{
-> > +	struct vfio_domain *domain;
-> > +	struct iommu_domain_geometry geo;
-> > +	struct vfio_iova *node;
-> > +	dma_addr_t start = 0;
-> > +	dma_addr_t end = (dma_addr_t)~0;
-> > +
-> > +	list_for_each_entry(domain, &iommu->domain_list, next) {
-> > +		iommu_domain_get_attr(domain->domain,
-> DOMAIN_ATTR_GEOMETRY,
-> > +				      &geo);
-> > +		if (geo.aperture_start > start)
-> > +			start = geo.aperture_start;
-> > +		if (geo.aperture_end < end)
-> > +			end = geo.aperture_end;
-> > +	}
-> > +
-> > +	/* Modify aperture limits. The new aper is either same or bigger */
-> > +	node = list_first_entry(iova_copy, struct vfio_iova, list);
-> > +	node->start = start;
-> > +	node = list_last_entry(iova_copy, struct vfio_iova, list);
-> > +	node->end = end;
-> > +}
-> > +
-> > +/*
-> > + * Called when a group is detached. The reserved regions for that
-> > + * group can be part of valid iova now. But since reserved regions
-> > + * may be duplicated among groups, populate the iova valid regions
-> > + * list again.
-> > + */
-> > +static int vfio_iommu_resv_refresh(struct vfio_iommu *iommu,
-> > +				   struct list_head *iova_copy)
-> > +{
-> > +	struct vfio_domain *d;
-> > +	struct vfio_group *g;
-> > +	struct vfio_iova *node;
-> > +	dma_addr_t start, end;
-> > +	LIST_HEAD(resv_regions);
-> > +	int ret;
-> > +
-> > +	list_for_each_entry(d, &iommu->domain_list, next) {
-> > +		list_for_each_entry(g, &d->group_list, next)
-> > +			iommu_get_group_resv_regions(g->iommu_group,
-> > +						     &resv_regions);
-> 
-> Need to account for failure case here too.
+> For x86 there's just CONFIG_KVM_INTEL and CONFIG_KVM_AMD.
 
-Ok.
+As per your suggestions I have to enabled KVM configs.
+Which auto enabled below list of configs.
+With these config changes the number of test pass increased from 23 to 45.
 
-> > +	}
-> > +
-> > +	if (list_empty(&resv_regions))
-> > +		return 0;
-> > +
-> > +	node = list_first_entry(iova_copy, struct vfio_iova, list);
-> > +	start = node->start;
-> > +	node = list_last_entry(iova_copy, struct vfio_iova, list);
-> > +	end = node->end;
-> > +
-> > +	/* purge the iova list and create new one */
-> > +	vfio_iommu_iova_free(iova_copy);
-> > +
-> > +	ret = vfio_iommu_aper_resize(iova_copy, start, end);
-> > +	if (ret)
-> > +		goto done;
-> > +
-> > +	/* Exclude current reserved regions from iova ranges */
-> > +	ret = vfio_iommu_resv_exclude(iova_copy, &resv_regions);
-> > +done:
-> > +	vfio_iommu_resv_free(&resv_regions);
-> > +	return ret;
-> > +}
-> > +
-> >  static void vfio_iommu_type1_detach_group(void *iommu_data,
-> >  					  struct iommu_group *iommu_group)
-> >  {
-> >  	struct vfio_iommu *iommu = iommu_data;
-> >  	struct vfio_domain *domain;
-> >  	struct vfio_group *group;
-> > +	bool iova_copy_fail;
-> > +	LIST_HEAD(iova_copy);
-> >
-> >  	mutex_lock(&iommu->lock);
-> >
-> > @@ -1901,6 +1977,12 @@ static void vfio_iommu_type1_detach_group(void
-> *iommu_data,
-> >  		}
-> >  	}
-> >
-> > +	/*
-> > +	 * Get a copy of iova list. If success, use copy to update the
-> > +	 * list and to replace the current one.
-> > +	 */
-> > +	iova_copy_fail = !!vfio_iommu_iova_get_copy(iommu, &iova_copy);
-> > +
-> >  	list_for_each_entry(domain, &iommu->domain_list, next) {
-> >  		group = find_iommu_group(domain, iommu_group);
-> >  		if (!group)
-> > @@ -1926,10 +2008,19 @@ static void
-> vfio_iommu_type1_detach_group(void *iommu_data,
-> >  			iommu_domain_free(domain->domain);
-> >  			list_del(&domain->next);
-> >  			kfree(domain);
-> > +			if (!iova_copy_fail && !list_empty(&iommu->domain_list))
-> > +				vfio_iommu_aper_expand(iommu, &iova_copy);
-> >  		}
-> >  		break;
-> >  	}
-> >
-> > +	if (!iova_copy_fail && !list_empty(&iommu->domain_list)) {
-> > +		if (!vfio_iommu_resv_refresh(iommu, &iova_copy))
-> > +			vfio_iommu_iova_insert_copy(iommu, &iova_copy);
-> > +		else
-> > +			vfio_iommu_iova_free(&iova_copy);
-> > +	}
-> 
-> The iova_copy_fail and list_empty tests are rather ugly, could we avoid
-> them by pushing the tests to the expand and refresh functions?  ie. it
-> looks like vfio_iommu_aper_expand() could test list_empty(iova_copy),
-> the list_for_each on domain_list doesn't need special handling.  Same
-> for vfio_iommu_resv_refresh().  This would also fix the bug above that
-> I think we don't free iova_copy if domain_list becomes empty during
-> this operation.  Thanks,
+PASS 45
+FAIL  1
+SKIP 10
+Total 56
 
-Agree. I will change that in next revision.
+FAILED:
+--------------
+vmware_backdoors
 
-Thanks,
-Shameer
+SKIPPED:
+--------------
+pku
+svm
+taskswitch
+taskswitch2
+ept
+vmx_eoi_bitmap_ioapic_scan
+vmx_hlt_with_rvi_test
+vmx_apicv_test
+hyperv_connections
+pmu
+
+Extra configs enabled:
+-------------------------------
+CONFIG_HAVE_KVM_IRQCHIP=y
+CONFIG_HAVE_KVM_IRQFD=y
+CONFIG_HAVE_KVM_IRQ_ROUTING=y
+CONFIG_HAVE_KVM_EVENTFD=y
+CONFIG_KVM_MMIO=y
+CONFIG_KVM_ASYNC_PF=y
+CONFIG_HAVE_KVM_MSI=y
+CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT=y
+CONFIG_KVM_VFIO=y
+CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT=y
+CONFIG_KVM_COMPAT=y
+CONFIG_HAVE_KVM_IRQ_BYPASS=y
+CONFIG_KVM=y
+CONFIG_KVM_INTEL=y
+CONFIG_KVM_AMD=y
+CONFIG_KVM_MMU_AUDIT=y
+CONFIG_USER_RETURN_NOTIFIER=y
+CONFIG_PREEMPT_NOTIFIERS=y
+CONFIG_IRQ_BYPASS_MANAGER=y
+
+>
+> Paolo
+
+Thanks for great help.
+
+Best regards
+Naresh Kamboju
