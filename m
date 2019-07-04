@@ -2,108 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A310B5F844
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 14:36:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4202A5F87A
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 14:47:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727785AbfGDMge convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 4 Jul 2019 08:36:34 -0400
-Received: from lhrrgout.huawei.com ([185.176.76.210]:33050 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727686AbfGDMgd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jul 2019 08:36:33 -0400
-Received: from lhreml709-cah.china.huawei.com (unknown [172.18.7.107])
-        by Forcepoint Email with ESMTP id E916422570C208935E2E;
-        Thu,  4 Jul 2019 13:36:31 +0100 (IST)
-Received: from LHREML524-MBS.china.huawei.com ([169.254.2.154]) by
- lhreml709-cah.china.huawei.com ([10.201.108.32]) with mapi id 14.03.0415.000;
- Thu, 4 Jul 2019 13:36:24 +0100
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-CC:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "pmorel@linux.vnet.ibm.com" <pmorel@linux.vnet.ibm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        "John Garry" <john.garry@huawei.com>,
-        "xuwei (O)" <xuwei5@huawei.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>
-Subject: RE: [PATCH v7 1/6] vfio/type1: Introduce iova list and add iommu
- aperture validity check
-Thread-Topic: [PATCH v7 1/6] vfio/type1: Introduce iova list and add iommu
- aperture validity check
-Thread-Index: AQHVLDHPKQQdUzHkf0S0a1+iQm67I6a5VDgAgAEdS/A=
-Date:   Thu, 4 Jul 2019 12:36:24 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA83F2DDB26@lhreml524-mbs.china.huawei.com>
-References: <20190626151248.11776-1-shameerali.kolothum.thodi@huawei.com>
-        <20190626151248.11776-2-shameerali.kolothum.thodi@huawei.com>
- <20190703143418.34a0f1c6@x1.home>
-In-Reply-To: <20190703143418.34a0f1c6@x1.home>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.34.206.221]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S1726120AbfGDMrP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jul 2019 08:47:15 -0400
+Received: from foss.arm.com ([217.140.110.172]:40654 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725860AbfGDMrP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jul 2019 08:47:15 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5368928;
+        Thu,  4 Jul 2019 05:47:14 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 820843F718;
+        Thu,  4 Jul 2019 05:47:12 -0700 (PDT)
+Date:   Thu, 4 Jul 2019 13:47:10 +0100
+From:   Dave Martin <Dave.Martin@arm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <marc.zyngier@arm.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        Okamoto Takayuki <tokamoto@jp.fujitsu.com>,
+        Christoffer Dall <cdall@kernel.org>, kvm <kvm@vger.kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Zhang Lei <zhang.lei@jp.fujitsu.com>,
+        Julien Grall <julien.grall@arm.com>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] KVM: arm64/sve: Fix vq_present() macro to yield a bool
+Message-ID: <20190704124709.GB2790@e103592.cambridge.arm.com>
+References: <1562175770-10952-1-git-send-email-Dave.Martin@arm.com>
+ <86wogynrbt.wl-marc.zyngier@arm.com>
+ <1f39cc48-12d5-2e56-c218-b6b0dd05d8ce@redhat.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1f39cc48-12d5-2e56-c218-b6b0dd05d8ce@redhat.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: 03 July 2019 21:34
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: eric.auger@redhat.com; pmorel@linux.vnet.ibm.com;
-> kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
-> iommu@lists.linux-foundation.org; Linuxarm <linuxarm@huawei.com>; John
-> Garry <john.garry@huawei.com>; xuwei (O) <xuwei5@huawei.com>;
-> kevin.tian@intel.com
-> Subject: Re: [PATCH v7 1/6] vfio/type1: Introduce iova list and add iommu
-> aperture validity check
+On Thu, Jul 04, 2019 at 02:24:42PM +0200, Paolo Bonzini wrote:
+> On 04/07/19 10:20, Marc Zyngier wrote:
+> > +KVM, Paolo and Radim,
+> > 
+> > Guys, do you mind picking this single patch and sending it to Linus?
+> > That's the only fix left for 5.2. Alternatively, I can send you a pull
+> > request, but it feels overkill.
 > 
+> Sure, will do.
 > 
-> Welcome back Shameer ;)
+> Paolo
 
-Thanks Alex :)
+Thanks all for the quick turnaround!
 
-> 
-> On Wed, 26 Jun 2019 16:12:43 +0100
-> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-> 
-> > This introduces an iova list that is valid for dma mappings. Make sure
-> > the new iommu aperture window doesn't conflict with the current one or
-> > with any existing dma mappings during attach.
-> >
-> > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > ---
-> >  drivers/vfio/vfio_iommu_type1.c | 181
-> > +++++++++++++++++++++++++++++++-
-> >  1 file changed, 177 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/vfio/vfio_iommu_type1.c
-> > b/drivers/vfio/vfio_iommu_type1.c index add34adfadc7..970d1ec06aed
-> > 100644
-> > --- a/drivers/vfio/vfio_iommu_type1.c
-> > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > @@ -1,4 +1,3 @@
-> > -// SPDX-License-Identifier: GPL-2.0-only
-> >  /*
-> >   * VFIO: IOMMU DMA mapping support for Type1 IOMMU
-> >   *
-> 
-> Accidental merge deletion?  Thanks,
->
+[...]
 
-Yes it is. I will fix it.
-
-Thanks,
-Shameer
-
- 
-> Alex
+Cheers
+---Dave
