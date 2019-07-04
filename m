@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 68D7B5F7E2
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 14:22:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2609C5F7E7
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 14:22:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727721AbfGDMVz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jul 2019 08:21:55 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:43483 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727680AbfGDMVz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jul 2019 08:21:55 -0400
-Received: by mail-wr1-f67.google.com with SMTP id p13so6403399wru.10
-        for <kvm@vger.kernel.org>; Thu, 04 Jul 2019 05:21:54 -0700 (PDT)
+        id S1727614AbfGDMWI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jul 2019 08:22:08 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:37302 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727639AbfGDMWE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jul 2019 08:22:04 -0400
+Received: by mail-wm1-f67.google.com with SMTP id f17so5945396wme.2
+        for <kvm@vger.kernel.org>; Thu, 04 Jul 2019 05:22:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=IH5zFYo1I5yjDEFdSVBMphkk2e8qYCoEzKFKC+uCucg=;
-        b=sqF2m8TJ7Jg7jd5ub8dAaohx1H7T8xl7i5IEcQq8Joox85umKKwylbDDEhTj44xKDX
-         dHBNdu9kE2QTqeQo4M7o0AtKc06tsC5zduJ7x3cNfjMdKkTPS4u6roquZYvO0P5dNOEz
-         0jlKp9uMD96g+UEDDGe5DWUquMYxWXCeLjUouiVozEy1TSeqWjmUsFpucCANobOypQJG
-         /yqTqFVWLDSpzjYr2QWav7bfCqTiPG8roafBIKzxX1Ozr1ogwVFd26Cb5Yr2Mz61hIuN
-         Ds4nE6OPL6ngyU64Sjtym6P2bw098QYTdy+BMotMhXKmrIovDPgsJXDxXDOYgMR6kai7
-         dt/A==
-X-Gm-Message-State: APjAAAXgfSRmHmbCfXES9AZX5dTv44PgPvFInWP9xcdvl+qj3zqqZ7xh
-        ztHSwSisEKKEMyn/5wuApRsAmw==
-X-Google-Smtp-Source: APXvYqyjO1a9mpW7A6dWRWc0jAR3JNhppp4YOZ0mcNfqSvhVO8tXA5JBoRVCHUfbrijja++M6EUxeg==
-X-Received: by 2002:adf:f591:: with SMTP id f17mr35262462wro.119.1562242913349;
-        Thu, 04 Jul 2019 05:21:53 -0700 (PDT)
+        bh=XKbnehwrHnUHczUaGoUWYJWgHNQXTFxulxqCc3Hc+74=;
+        b=QiHoPcZVW9+g17ElBUdYlejJL6MRgiqf2+UVABaoj6VZel/+jkZRE/KPTIHK8tlZog
+         cmfVRaWAZ5sEPlrDm8swJVRSIDDGwHDAO/+uGwJbFBfgRugnnoVfxb1wjKA4qYRvQ7I2
+         3Z5NcR8esadoGy/+hjLrX/hee/rG8kPk7gqZzYz82mad66fR/GNJOGue8xffB1cfMH1O
+         asOmNs4Uj3Ow0NZ6U1TGMC+9IKzXQ66iJarHfFvRtZ3d84xVhTzVE1IiYzY2kBEKdL+4
+         vFmmMn+Xp1SI0Uf8EiEen4FhPywVuYjj6hjtBd+gUh1Qgt1iujNBLn7Bq8QOgTiAXMmx
+         HgWg==
+X-Gm-Message-State: APjAAAWJrm1dxrYCGdJme0EMAC+48h7y3er2RSad1pf3+KFLzcX/Y46H
+        4E4ZPvERmZVdQ9KS4smpgGc+BA==
+X-Google-Smtp-Source: APXvYqwj8nhEg9up1PX7rhJtJY7HWdQo+Hl8grcttWDYO0WeJw/d9esHC4Y09B4q6vNRUfhOC0su1A==
+X-Received: by 2002:a1c:a503:: with SMTP id o3mr11839100wme.37.1562242921860;
+        Thu, 04 Jul 2019 05:22:01 -0700 (PDT)
 Received: from [10.201.49.68] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-        by smtp.gmail.com with ESMTPSA id u6sm1683941wrw.15.2019.07.04.05.21.52
+        by smtp.gmail.com with ESMTPSA id a84sm6182916wmf.29.2019.07.04.05.22.00
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 04 Jul 2019 05:21:52 -0700 (PDT)
+        Thu, 04 Jul 2019 05:22:01 -0700 (PDT)
 Subject: Re: [PATCH 0/4] kvm: x86: introduce CONFIG_KVM_DEBUG
 To:     wang.yi59@zte.com.cn
 Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
@@ -42,8 +42,8 @@ Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
         up2wing@gmail.com, wang.liang82@zte.com.cn
 References: <201907041011168747592@zte.com.cn>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <02bdc233-b846-3350-2f6c-2d578d735c0e@redhat.com>
-Date:   Thu, 4 Jul 2019 14:21:51 +0200
+Message-ID: <5d3b2e72-ca07-2b85-d978-f026c608ff48@redhat.com>
+Date:   Thu, 4 Jul 2019 14:22:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
@@ -64,6 +64,6 @@ On 04/07/19 04:11, wang.yi59@zte.com.cn wrote:
 > 
 > Agreed. Hoping your patches.
 
-I sent them earlier, see "KVM: some x86 MMU cleanup and new tracepoints".
+I have now sent them, see "KVM: some x86 MMU cleanup and new tracepoints".
 
 Paolo
