@@ -2,77 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 66D025F056
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 02:37:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D31C5F0FF
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 03:38:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727309AbfGDAh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Jul 2019 20:37:57 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:40445 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727264AbfGDAhw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Jul 2019 20:37:52 -0400
-Received: by mail-ot1-f68.google.com with SMTP id e8so4296136otl.7;
-        Wed, 03 Jul 2019 17:37:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kxKadiwStil9way1kU8jzMyzFN0LuSwbCGE20CmySOI=;
-        b=jjed64kf8UigzT5xPFuCz/Amv7WWAE+6rjJhQtW2VDYH4cmOmzA1vr44kYsoBJTpaz
-         dJmiqSYb2ZTRxwDk5JuHdcjKJ1tt72V4tLsn/8xmWsM/qHhCw/Cr1Qs+zLIW2q8s5iuC
-         MQSfIJ+VsVcLXWy+RUH9ED/MSwMEMEBjK/KP6ffPBTB6e6uWXWZI1ifhvzW58Qyx7Vvr
-         ZN22H0p7boLb9J44FTlPFArT0f5wu4yteSCNHHpkeNr7RTHwux9vATkCmlo8CEGbSew4
-         kx97el09vrfVjyi0FZbZgiXfUR+fVhTswAljsD+iQn2erhsvaOybMBJU1fF8SS6VWd8c
-         arOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kxKadiwStil9way1kU8jzMyzFN0LuSwbCGE20CmySOI=;
-        b=GZNbAhG8AcZHCLBvgKQYZPJTL++tg0X+IJIBWg3JPvxf6pRS0J5DkaFxt1RJdWAcv6
-         UINOVLTMl0NrN3dtjKglmu56T1jV5gd8KLdFIKbBJ8d6hmc5mvep9tqS20oWznIWbWQT
-         y3LAa5GNeTiP76NcRYmBI3GNLgF7IpVciMp91Qxy2D+FWixTupvVGZTJxyhwzlnhFJ4/
-         1sA/8MEvEhDqDgF1i26BQh70rbt4wOxk2EWkSgcj6OsTjKFN7ncFKZQUeVwbx+EKx5UP
-         u5UaxhjcG6aC0vzR6bhNBbhGzMKGW2GuPX+gaDb2ZSQCGIHDih5whw0qau5UbKYo+7MJ
-         a4Ww==
-X-Gm-Message-State: APjAAAWJSl1JNPLnJs4jTfBYbLh3WkFAN8CJsixLDzAPJMalVETjrhs3
-        gpCQwV61xjAp0c26Iwy9z+oY1GDaslJvqIUL1YQ=
-X-Google-Smtp-Source: APXvYqzeYi0PDoaiISTn2M9/7d/KVcBfQ7O2/IKHGPqh7tH9DMLVPheOsLoY4L/bml6SlwrjRhF2NNyFcfJgV6g/VzA=
-X-Received: by 2002:a9d:6959:: with SMTP id p25mr12145726oto.118.1562200672188;
- Wed, 03 Jul 2019 17:37:52 -0700 (PDT)
+        id S1727146AbfGDBiD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Jul 2019 21:38:03 -0400
+Received: from mga14.intel.com ([192.55.52.115]:20681 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726574AbfGDBiD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Jul 2019 21:38:03 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Jul 2019 18:38:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,449,1557212400"; 
+   d="scan'208";a="169312757"
+Received: from npg-dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.151])
+  by orsmga006.jf.intel.com with ESMTP; 03 Jul 2019 18:38:00 -0700
+Date:   Thu, 4 Jul 2019 09:36:36 +0800
+From:   Tiwei Bie <tiwei.bie@intel.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, maxime.coquelin@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        dan.daly@intel.com, cunming.liang@intel.com, zhihong.wang@intel.com
+Subject: Re: [RFC v2] vhost: introduce mdev based hardware vhost backend
+Message-ID: <20190704013636.GA26992@___>
+References: <20190703091339.1847-1-tiwei.bie@intel.com>
+ <20190703123157.2452bf95@x1.home>
 MIME-Version: 1.0
-References: <1560474949-20497-1-git-send-email-wanpengli@tencent.com>
- <1560474949-20497-2-git-send-email-wanpengli@tencent.com> <CANRm+CzUvTTOuYhsGErSDxdNSmxVr7o8d66DF0KOk4v3Meajmg@mail.gmail.com>
- <CANRm+Cw0vmqi4s4HhnMqs=hZZixHmU87CGO_ujTGoN_Osjx76g@mail.gmail.com>
- <CANRm+Cz9Lc5rA7-2yLLX7wiemM-gdvWvQQdGVrvkYanYO9TwgA@mail.gmail.com> <18fd2372-45d8-0bff-79e7-373a8b7d129c@redhat.com>
-In-Reply-To: <18fd2372-45d8-0bff-79e7-373a8b7d129c@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Thu, 4 Jul 2019 08:37:44 +0800
-Message-ID: <CANRm+CyykkkvCP0sS6SBOMO_XFYVviOGNcQOMuudGZ3y0y1YQg@mail.gmail.com>
-Subject: Re: [PATCH v4 1/2] KVM: LAPIC: Optimize timer latency consider world
- switch time
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190703123157.2452bf95@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 3 Jul 2019 at 22:13, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 03/07/19 02:48, Wanpeng Li wrote:
-> > Hi Paolo, how about this patchset? Patch 2/2 is easy to take, do you
-> > have more concern about patch 1/2?
->
-> I don't know.  It seems somewhat hard to tune and in cyclictest it only
-> happens for preemption_timer=N.  Are you using preemption_timer=N
-> together with the LAPIC-timer-on-service-CPU patches?
+On Wed, Jul 03, 2019 at 12:31:57PM -0600, Alex Williamson wrote:
+> On Wed,  3 Jul 2019 17:13:39 +0800
+> Tiwei Bie <tiwei.bie@intel.com> wrote:
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index 8f10748dac79..6c5718ab7eeb 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -201,6 +201,7 @@ struct vfio_device_info {
+> >  #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
+> >  #define VFIO_DEVICE_FLAGS_CCW	(1 << 4)	/* vfio-ccw device */
+> >  #define VFIO_DEVICE_FLAGS_AP	(1 << 5)	/* vfio-ap device */
+> > +#define VFIO_DEVICE_FLAGS_VHOST	(1 << 6)	/* vfio-vhost device */
+> >  	__u32	num_regions;	/* Max region index + 1 */
+> >  	__u32	num_irqs;	/* Max IRQ index + 1 */
+> >  };
+> > @@ -217,6 +218,7 @@ struct vfio_device_info {
+> >  #define VFIO_DEVICE_API_AMBA_STRING		"vfio-amba"
+> >  #define VFIO_DEVICE_API_CCW_STRING		"vfio-ccw"
+> >  #define VFIO_DEVICE_API_AP_STRING		"vfio-ap"
+> > +#define VFIO_DEVICE_API_VHOST_STRING		"vfio-vhost"
+> >  
+> >  /**
+> >   * VFIO_DEVICE_GET_REGION_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 8,
+> > @@ -573,6 +575,23 @@ enum {
+> >  	VFIO_CCW_NUM_IRQS
+> >  };
+> >  
+> > +/*
+> > + * The vfio-vhost bus driver makes use of the following fixed region and
+> > + * IRQ index mapping. Unimplemented regions return a size of zero.
+> > + * Unimplemented IRQ types return a count of zero.
+> > + */
+> > +
+> > +enum {
+> > +	VFIO_VHOST_CONFIG_REGION_INDEX,
+> > +	VFIO_VHOST_NOTIFY_REGION_INDEX,
+> > +	VFIO_VHOST_NUM_REGIONS
+> > +};
+> > +
+> > +enum {
+> > +	VFIO_VHOST_VQ_IRQ_INDEX,
+> > +	VFIO_VHOST_NUM_IRQS
+> > +};
+> > +
+> 
+> Note that the vfio API has evolved a bit since vfio-pci started this
+> way, with fixed indexes for pre-defined region types.  We now support
+> device specific regions which can be identified by a capability within
+> the REGION_INFO ioctl return data.  This allows a bit more flexibility,
+> at the cost of complexity, but the infrastructure already exists in
+> kernel and QEMU to make it relatively easy.  I think we'll have the
+> same support for interrupts soon too.  If you continue to pursue the
+> vfio-vhost direction you might want to consider these before committing
+> to fixed indexes.  Thanks,
 
-A 25ns conservative value makes no benefit for cyclictest any more
-even when preemption_timer=N. Btw, maybe it is the time to merge the
-LAPIC-timer-on-service-CPU patches now. :)
+Thanks for the details! Will give it a try!
 
-Regards,
-Wanpeng Li
+Thanks,
+Tiwei
