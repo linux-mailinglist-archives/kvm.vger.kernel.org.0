@@ -2,89 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FB745F676
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 12:17:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 15A045F723
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 13:14:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727530AbfGDKRG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jul 2019 06:17:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49152 "EHLO mx1.redhat.com"
+        id S1727544AbfGDLOR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jul 2019 07:14:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45160 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727249AbfGDKRG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jul 2019 06:17:06 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S1727436AbfGDLOR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jul 2019 07:14:17 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 824E930001E2;
-        Thu,  4 Jul 2019 10:17:05 +0000 (UTC)
-Received: from localhost (ovpn-117-206.ams2.redhat.com [10.36.117.206])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6416118B93;
-        Thu,  4 Jul 2019 10:17:02 +0000 (UTC)
-Date:   Thu, 4 Jul 2019 11:17:01 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] vsock/virtio: use RCU to avoid use-after-free on
- the_virtio_vsock
-Message-ID: <20190704101701.GD1609@stefanha-x1.localdomain>
-References: <20190628123659.139576-1-sgarzare@redhat.com>
- <20190628123659.139576-2-sgarzare@redhat.com>
- <05311244-ed23-d061-a620-7b83d83c11f5@redhat.com>
- <20190703104135.wg34dobv64k7u4jo@steredhat>
+        by mx1.redhat.com (Postfix) with ESMTPS id 6AAF9C057F3B;
+        Thu,  4 Jul 2019 11:14:10 +0000 (UTC)
+Received: from amt.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 288AB1001B16;
+        Thu,  4 Jul 2019 11:14:08 +0000 (UTC)
+Received: from amt.cnet (localhost [127.0.0.1])
+        by amt.cnet (Postfix) with ESMTP id 363A110516E;
+        Thu,  4 Jul 2019 08:13:46 -0300 (BRT)
+Received: (from marcelo@localhost)
+        by amt.cnet (8.14.7/8.14.7/Submit) id x64BDfL3001599;
+        Thu, 4 Jul 2019 08:13:41 -0300
+Date:   Thu, 4 Jul 2019 08:13:41 -0300
+From:   Marcelo Tosatti <mtosatti@redhat.com>
+To:     Joao Martins <joao.m.martins@oracle.com>
+Cc:     kvm-devel <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Radim Krcmar <rkrcmar@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Raslan KarimAllah <karahmed@amazon.de>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-pm@vger.kernel.org
+Subject: Re: [patch 1/5] add cpuidle-haltpoll driver
+Message-ID: <20190704111341.GA1249@amt.cnet>
+References: <20190703235124.783034907@amt.cnet>
+ <20190703235828.340866829@amt.cnet>
+ <db95f834-0307-813a-323c-c5e23c90e3f5@oracle.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="tEFtbjk+mNEviIIX"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190703104135.wg34dobv64k7u4jo@steredhat>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Thu, 04 Jul 2019 10:17:05 +0000 (UTC)
+In-Reply-To: <db95f834-0307-813a-323c-c5e23c90e3f5@oracle.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 04 Jul 2019 11:14:17 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Jul 04, 2019 at 10:16:47AM +0100, Joao Martins wrote:
+> On 7/4/19 12:51 AM, Marcelo Tosatti wrote:
+> > +++ linux-2.6-newcpuidle.git/drivers/cpuidle/cpuidle-haltpoll.c
+> > @@ -0,0 +1,69 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * cpuidle driver for haltpoll governor.
+> > + *
+> > + * Copyright 2019 Red Hat, Inc. and/or its affiliates.
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2.  See
+> > + * the COPYING file in the top-level directory.
+> > + *
+> > + * Authors: Marcelo Tosatti <mtosatti@redhat.com>
+> > + */
+> > +
+> > +#include <linux/init.h>
+> > +#include <linux/cpuidle.h>
+> > +#include <linux/module.h>
+> > +#include <linux/sched/idle.h>
+> > +#include <linux/kvm_para.h>
+> > +
+> > +static int default_enter_idle(struct cpuidle_device *dev,
+> > +			      struct cpuidle_driver *drv, int index)
+> > +{
+> > +	if (current_clr_polling_and_test()) {
+> > +		local_irq_enable();
+> > +		return index;
+> > +	}
+> > +	default_idle();
+> > +	return index;
+> > +}
+> > +
+> > +static struct cpuidle_driver haltpoll_driver = {
+> > +	.name = "haltpoll",
+> > +	.owner = THIS_MODULE,
+> > +	.states = {
+> > +		{ /* entry 0 is for polling */ },
+> > +		{
+> > +			.enter			= default_enter_idle,
+> > +			.exit_latency		= 1,
+> > +			.target_residency	= 1,
+> > +			.power_usage		= -1,
+> > +			.name			= "haltpoll idle",
+> > +			.desc			= "default architecture idle",
+> > +		},
+> > +	},
+> > +	.safe_state_index = 0,
+> > +	.state_count = 2,
+> > +};
+> > +
+> > +static int __init haltpoll_init(void)
+> > +{
+> > +	struct cpuidle_driver *drv = &haltpoll_driver;
+> > +
+> > +	cpuidle_poll_state_init(drv);
+> > +
+> > +	if (!kvm_para_available())
+> > +		return 0;
+> > +
+> 
+> Isn't this meant to return -ENODEV value if the module is meant to not load?
 
---tEFtbjk+mNEviIIX
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Well, the cpuidle drivers return an error only if registration fails.
 
-On Wed, Jul 03, 2019 at 12:41:35PM +0200, Stefano Garzarella wrote:
-> On Wed, Jul 03, 2019 at 05:53:58PM +0800, Jason Wang wrote:
-> > On 2019/6/28 =E4=B8=8B=E5=8D=888:36, Stefano Garzarella wrote:
-> > Another more interesting question, I believe we will do singleton for
-> > virtio_vsock structure. Then what's the point of using vdev->priv to ac=
-cess
-> > the_virtio_vsock? It looks to me we can it brings extra troubles for do=
-ing
-> > synchronization.
->=20
-> I thought about it when I tried to use RCU to stop the worker and I
-> think make sense. Maybe can be another series after this will be merged.
->=20
-> @Stefan, what do you think about that?
+> Also this check should probably be placed before initializing the poll state,
+> provided poll state isn't used anyways if you're not a kvm guest.
 
-Yes, let's make it a singleton and keep no other references to it.
-
-Stefan
-
---tEFtbjk+mNEviIIX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0d0h0ACgkQnKSrs4Gr
-c8i7uAf/QXuDj1LvILBy4mvMHIq38SqbW5mFIsodkTbGDB7yc/P8sUakOgHd3iqg
-B7T4t6bHfBmin86sSvgINZoQ2Ce0Cl5gfAUArX22oxCNNwo5U0rb6uLLj0aIi66M
-JgXi44ww1uhDIqrgJAVltxIQCV6jjLNNR0Qz19oTEV1qNl4UkY4+iew3ebbt/sid
-lBqxCSTTuA6dhA2R74j7mNtahfRXHiKqfz/fvnMIt6eayMHvx9cIpGJn+ZcJ5wNr
-n55WOBLvBc+xom4siTtiE+R5ZOATuxyfbvCncpj5a6p3wfMDtYIWTh/UeAEyDesp
-lL1CmfZat5mLZ1F0gxgjgE5alpkjuw==
-=02pH
------END PGP SIGNATURE-----
-
---tEFtbjk+mNEviIIX--
+Poll state init is only local variable initialization, it does not
+have any external effect.
