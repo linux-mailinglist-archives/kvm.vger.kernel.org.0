@@ -2,33 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 429385FA30
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 16:39:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C02935FA5E
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 16:57:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727345AbfGDOjK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jul 2019 10:39:10 -0400
-Received: from foss.arm.com ([217.140.110.172]:42882 "EHLO foss.arm.com"
+        id S1727543AbfGDO5n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jul 2019 10:57:43 -0400
+Received: from foss.arm.com ([217.140.110.172]:43270 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727246AbfGDOjK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jul 2019 10:39:10 -0400
+        id S1727180AbfGDO5n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jul 2019 10:57:43 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A173528;
-        Thu,  4 Jul 2019 07:39:09 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 66E6B28;
+        Thu,  4 Jul 2019 07:57:42 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A738F3F738;
-        Thu,  4 Jul 2019 07:39:08 -0700 (PDT)
-Subject: Re: [PATCH 13/59] KVM: arm64: nv: Handle virtual EL2 registers in
- vcpu_read/write_sys_reg()
-To:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D44893F738;
+        Thu,  4 Jul 2019 07:57:40 -0700 (PDT)
+Subject: Re: [PATCH 27/59] KVM: arm64: nv: Respect virtual HCR_EL2.TVM and
+ TRVM settings
+To:     Julien Thierry <julien.thierry@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
 Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-14-marc.zyngier@arm.com>
- <6a866fda-a332-9881-b466-2a855deea6a5@arm.com>
- <13886346-cbbc-a17c-b83d-e189a30e0696@arm.com>
- <c3138f83-ccfb-5d01-3cac-be47f1eb916c@arm.com>
+ <20190621093843.220980-28-marc.zyngier@arm.com>
+ <b34ac199-4d12-74b7-3f78-acd871707296@arm.com>
 From:   Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
@@ -75,12 +77,12 @@ Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
  Z46HaNmN2hZS/oJ69c1DI5Rcww==
 Organization: ARM Ltd
-Message-ID: <a22b4745-7fa1-554b-c897-9359fffa3a1f@arm.com>
-Date:   Thu, 4 Jul 2019 15:39:07 +0100
+Message-ID: <b3f14d64-4b4c-23b0-2199-804f92feb381@arm.com>
+Date:   Thu, 4 Jul 2019 15:57:39 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <c3138f83-ccfb-5d01-3cac-be47f1eb916c@arm.com>
+In-Reply-To: <b34ac199-4d12-74b7-3f78-acd871707296@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -89,81 +91,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03/07/2019 17:32, Alexandru Elisei wrote:
-
-[...]
-
->>>> +}
->>>> +
->>>> +#define EL2_SYSREG(el2, el1, translate)	\
->>>> +	[el2 - FIRST_EL2_SYSREG] = { el2, el1, translate }
->>>> +#define PURE_EL2_SYSREG(el2) \
->>>> +	[el2 - FIRST_EL2_SYSREG] = { el2,__INVALID_SYSREG__, NULL }
->>>> +/*
->>>> + * Associate vEL2 registers to their EL1 counterparts on the CPU.
->>>> + * The translate function can be NULL, when the register layout is identical.
->>>> + */
->>>> +struct el2_sysreg_map {
->>>> +	int sysreg;	/* EL2 register index into the array above */
->>>> +	int mapping;	/* associated EL1 register */
->>>> +	u64 (*translate)(u64 value);
->>>> +} nested_sysreg_map[NR_SYS_REGS - FIRST_EL2_SYSREG] = {
->>>> +	PURE_EL2_SYSREG( VPIDR_EL2 ),
->>>> +	PURE_EL2_SYSREG( VMPIDR_EL2 ),
->>>> +	PURE_EL2_SYSREG( ACTLR_EL2 ),
->>>> +	PURE_EL2_SYSREG( HCR_EL2 ),
->>>> +	PURE_EL2_SYSREG( MDCR_EL2 ),
->>>> +	PURE_EL2_SYSREG( HSTR_EL2 ),
->>>> +	PURE_EL2_SYSREG( HACR_EL2 ),
->>>> +	PURE_EL2_SYSREG( VTTBR_EL2 ),
->>>> +	PURE_EL2_SYSREG( VTCR_EL2 ),
->>>> +	PURE_EL2_SYSREG( RVBAR_EL2 ),
->>>> +	PURE_EL2_SYSREG( RMR_EL2 ),
->>>> +	PURE_EL2_SYSREG( TPIDR_EL2 ),
->>>> +	PURE_EL2_SYSREG( CNTVOFF_EL2 ),
->>>> +	PURE_EL2_SYSREG( CNTHCTL_EL2 ),
->>>> +	PURE_EL2_SYSREG( HPFAR_EL2 ),
->>>> +	EL2_SYSREG(      SCTLR_EL2,  SCTLR_EL1,      translate_sctlr ),
->>>> +	EL2_SYSREG(      CPTR_EL2,   CPACR_EL1,      translate_cptr  ),
->>>> +	EL2_SYSREG(      TTBR0_EL2,  TTBR0_EL1,      translate_ttbr0 ),
->>>> +	EL2_SYSREG(      TTBR1_EL2,  TTBR1_EL1,      NULL            ),
->>>> +	EL2_SYSREG(      TCR_EL2,    TCR_EL1,        translate_tcr   ),
->>>> +	EL2_SYSREG(      VBAR_EL2,   VBAR_EL1,       NULL            ),
->>>> +	EL2_SYSREG(      AFSR0_EL2,  AFSR0_EL1,      NULL            ),
->>>> +	EL2_SYSREG(      AFSR1_EL2,  AFSR1_EL1,      NULL            ),
->>>> +	EL2_SYSREG(      ESR_EL2,    ESR_EL1,        NULL            ),
->>>> +	EL2_SYSREG(      FAR_EL2,    FAR_EL1,        NULL            ),
->>>> +	EL2_SYSREG(      MAIR_EL2,   MAIR_EL1,       NULL            ),
->>>> +	EL2_SYSREG(      AMAIR_EL2,  AMAIR_EL1,      NULL            ),
->>>> +};
->>> Figuring out which registers are in this map and which aren't and are supposed
->>> to be treated differently is really cumbersome because they are split into two
->>> types of el2 registers and their order is different from the order in enum
->>> vcpu_sysreg (in kvm_host.h). Perhaps adding a comment about what registers will
->>> be treated differently would make the code a bit easier to follow?
->> I'm not sure what this buys us. We have 3 categories of EL2 sysregs:
->> - Purely emulated
->> - Directly mapped onto an EL1 sysreg
->> - Translated from EL2 to EL1
+On 26/06/2019 07:55, Julien Thierry wrote:
+> 
+> 
+> On 06/21/2019 10:38 AM, Marc Zyngier wrote:
+>> From: Jintack Lim <jintack.lim@linaro.org>
 >>
->> I think the wrappers represent that pretty well, although we could split
->> EL2_SYSREG into DIRECT_EL2_SYSREG and TRANSLATE_EL2_SYSREG. As for the
->> order, does it really matter? We also have the trap table order, which
->> is also different from the enum. Do you propose we reorder everything?
+>> Forward the EL1 virtual memory register traps to the virtual EL2 if they
+>> are not coming from the virtual EL2 and the virtual HCR_EL2.TVM or TRVM
+>> bit is set.
+>>
+>> This is for recursive nested virtualization.
+>>
+>> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  arch/arm64/kvm/sys_regs.c | 24 ++++++++++++++++++++++++
+>>  1 file changed, 24 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index 582d62aa48b7..0f74b9277a86 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -436,6 +436,27 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
+>>  	return true;
+>>  }
+>>  
+>> +/* This function is to support the recursive nested virtualization */
+>> +static bool forward_vm_traps(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
+>> +{
+>> +	u64 hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
+>> +
+>> +	/* If a trap comes from the virtual EL2, the host hypervisor handles. */
+>> +	if (vcpu_mode_el2(vcpu))
+>> +		return false;
+>> +
+>> +	/*
+>> +	 * If the virtual HCR_EL2.TVM or TRVM bit is set, we need to foward
+>> +	 * this trap to the virtual EL2.
+>> +	 */
+>> +	if ((hcr_el2 & HCR_TVM) && p->is_write)
+>> +		return true;
+>> +	else if ((hcr_el2 & HCR_TRVM) && !p->is_write)
+>> +		return true;
+>> +
+>> +	return false;
+>> +}
+>> +
+>>  /*
+>>   * Generic accessor for VM registers. Only called as long as HCR_TVM
+>>   * is set. If the guest enables the MMU, we stop trapping the VM
+>> @@ -452,6 +473,9 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+>>  	if (el12_reg(p) && forward_nv_traps(vcpu))
+>>  		return false;
+>>  
+>> +	if (!el12_reg(p) && forward_vm_traps(vcpu, p))
+>> +		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_hsr(vcpu));
 > 
-> The wrappers and the naming are fine.
+> Since we already have forward_traps(), isn't this just:
 > 
-> I was trying to figure out which EL2 registers are in the nested_sysreg_map and
-> which aren't (that's what I meant by "two types of registers") by looking at the
-> vcpu_sysreg enum. Because the order in the map is different than the order in
-> the enum, I was having a difficult time figuring out which registers are not in
-> the nested_sysreg_map to make sure we haven't somehow forgot to emulate a register.
+> 	if (!el12_reg(p) && forward_traps(vcpu, p->is_write ? HCR_TVM : HCR_TRVM))
+> 		return true;
 > 
-> So no, I wasn't asking to reorder everything. I was asking if it would be
-> appropriate to write a comment stating the intention to treat registers X, Y and
-> Z separately from the registers in nested_sysreg_map.
+> We could maybe simplify forward_vm_traps() to just call forward_traps()
+> similar to forward_nv_traps().
 
-Ah, fair enough. Yes, that's a very reasonable suggestion.
+Odd. I remember doing something like that. Where has it gone? Yes, this
+looks sensible.
 
 Thanks,
 
