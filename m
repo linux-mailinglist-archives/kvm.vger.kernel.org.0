@@ -2,31 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D699F5FA9A
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 17:05:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FE0E5FAB7
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 17:15:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727447AbfGDPFj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jul 2019 11:05:39 -0400
-Received: from foss.arm.com ([217.140.110.172]:43580 "EHLO foss.arm.com"
+        id S1727313AbfGDPP4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jul 2019 11:15:56 -0400
+Received: from foss.arm.com ([217.140.110.172]:43784 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727180AbfGDPFj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jul 2019 11:05:39 -0400
+        id S1727066AbfGDPP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jul 2019 11:15:56 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A0F9E28;
-        Thu,  4 Jul 2019 08:05:38 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6E8282B;
+        Thu,  4 Jul 2019 08:15:54 -0700 (PDT)
 Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B61143F738;
-        Thu,  4 Jul 2019 08:05:37 -0700 (PDT)
-Subject: Re: [PATCH 13/59] KVM: arm64: nv: Handle virtual EL2 registers in
- vcpu_read/write_sys_reg()
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 610313F703;
+        Thu,  4 Jul 2019 08:15:53 -0700 (PDT)
+Subject: Re: [PATCH 15/59] KVM: arm64: nv: Refactor vcpu_{read,write}_sys_reg
 To:     Alexandru Elisei <alexandru.elisei@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
 Cc:     Andre Przywara <andre.przywara@arm.com>,
         Dave Martin <Dave.Martin@arm.com>
 References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-14-marc.zyngier@arm.com>
- <d5d263d6-0c1f-ae53-80f4-f650c1d25c70@arm.com>
+ <20190621093843.220980-16-marc.zyngier@arm.com>
+ <2935ccb4-2fac-a618-0f04-15a3c1759a46@arm.com>
 From:   Marc Zyngier <marc.zyngier@arm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
@@ -73,254 +72,229 @@ Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
  Wvu5Li5PpY/t/M7AAkLiVTtlhZnJWyEJrQi9O2nXTzlG1PeqGH2ahuRxn7txA5j5PHZEZdL1
  Z46HaNmN2hZS/oJ69c1DI5Rcww==
 Organization: ARM Ltd
-Message-ID: <9209a8e4-ab0d-9c9e-4207-0649b84ba806@arm.com>
-Date:   Thu, 4 Jul 2019 16:05:36 +0100
+Message-ID: <89b7a64e-3f71-bfb3-3959-5edf838352fb@arm.com>
+Date:   Thu, 4 Jul 2019 16:15:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <d5d263d6-0c1f-ae53-80f4-f650c1d25c70@arm.com>
+In-Reply-To: <2935ccb4-2fac-a618-0f04-15a3c1759a46@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/06/2019 16:04, Alexandru Elisei wrote:
+On 27/06/2019 10:21, Alexandru Elisei wrote:
 > On 6/21/19 10:37 AM, Marc Zyngier wrote:
->> From: Andre Przywara <andre.przywara@arm.com>
+>> Extract the direct HW accessors for later reuse.
 >>
->> KVM internally uses accessor functions when reading or writing the
->> guest's system registers. This takes care of accessing either the stored
->> copy or using the "live" EL1 system registers when the host uses VHE.
->>
->> With the introduction of virtual EL2 we add a bunch of EL2 system
->> registers, which now must also be taken care of:
->> - If the guest is running in vEL2, and we access an EL1 sysreg, we must
->>   revert to the stored version of that, and not use the CPU's copy.
->> - If the guest is running in vEL1, and we access an EL2 sysreg, we must
->>   also use the stored version, since the CPU carries the EL1 copy.
->> - Some EL2 system registers are supposed to affect the current execution
->>   of the system, so we need to put them into their respective EL1
->>   counterparts. For this we need to define a mapping between the two.
->>   This is done using the newly introduced struct el2_sysreg_map.
->> - Some EL2 system registers have a different format than their EL1
->>   counterpart, so we need to translate them before writing them to the
->>   CPU. This is done using an (optional) translate function in the map.
->> - There are the three special registers SP_EL2, SPSR_EL2 and ELR_EL2,
->>   which need some separate handling.
->>
->> All of these cases are now wrapped into the existing accessor functions,
->> so KVM users wouldn't need to care whether they access EL2 or EL1
->> registers and also which state the guest is in.
->>
->> This handles what was formerly known as the "shadow state" dynamically,
->> without requiring a separate copy for each vCPU EL.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >> ---
->>  arch/arm64/include/asm/kvm_emulate.h |   6 +
->>  arch/arm64/include/asm/kvm_host.h    |   5 +
->>  arch/arm64/kvm/sys_regs.c            | 163 +++++++++++++++++++++++++++
->>  3 files changed, 174 insertions(+)
+>>  arch/arm64/kvm/sys_regs.c | 247 +++++++++++++++++++++-----------------
+>>  1 file changed, 139 insertions(+), 108 deletions(-)
 >>
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->> index c43aac5fed69..f37006b6eec4 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> @@ -70,6 +70,12 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
->>  int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
->>  int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
->>  
->> +u64 translate_tcr(u64 tcr);
->> +u64 translate_cptr(u64 tcr);
->> +u64 translate_sctlr(u64 tcr);
->> +u64 translate_ttbr0(u64 tcr);
->> +u64 translate_cnthctl(u64 tcr);
->> +
->>  static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
->>  {
->>  	return !(vcpu->arch.hcr_el2 & HCR_RW);
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 2d4290d2513a..dae9c42a7219 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -217,6 +217,11 @@ enum vcpu_sysreg {
->>  	NR_SYS_REGS	/* Nothing after this line! */
->>  };
->>  
->> +static inline bool sysreg_is_el2(int reg)
->> +{
->> +	return reg >= FIRST_EL2_SYSREG && reg < NR_SYS_REGS;
->> +}
->> +
->>  /* 32bit mapping */
->>  #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
->>  #define c0_CSSELR	(CSSELR_EL1 * 2)/* Cache Size Selection Register */
 >> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 693dd063c9c2..d024114da162 100644
+>> index 2b8734f75a09..e181359adadf 100644
 >> --- a/arch/arm64/kvm/sys_regs.c
 >> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -76,11 +76,142 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
->>  	return false;
+>> @@ -182,99 +182,161 @@ const struct el2_sysreg_map *find_el2_sysreg(const struct el2_sysreg_map *map,
+>>  	return entry;
 >>  }
 >>  
->> +static u64 tcr_el2_ips_to_tcr_el1_ps(u64 tcr_el2)
+>> +static bool __vcpu_read_sys_reg_from_cpu(int reg, u64 *val)
 >> +{
->> +	return ((tcr_el2 & TCR_EL2_PS_MASK) >> TCR_EL2_PS_SHIFT)
->> +		<< TCR_IPS_SHIFT;
+>> +	/*
+>> +	 * System registers listed in the switch are not saved on every
+>> +	 * exit from the guest but are only saved on vcpu_put.
+>> +	 *
+>> +	 * Note that MPIDR_EL1 for the guest is set by KVM via VMPIDR_EL2 but
+>> +	 * should never be listed below, because the guest cannot modify its
+>> +	 * own MPIDR_EL1 and MPIDR_EL1 is accessed for VCPU A from VCPU B's
+>> +	 * thread when emulating cross-VCPU communication.
+>> +	 */
+>> +	switch (reg) {
+>> +	case CSSELR_EL1:	*val = read_sysreg_s(SYS_CSSELR_EL1);	break;
+>> +	case SCTLR_EL1:		*val = read_sysreg_s(SYS_SCTLR_EL12);	break;
+>> +	case ACTLR_EL1:		*val = read_sysreg_s(SYS_ACTLR_EL1);	break;
+>> +	case CPACR_EL1:		*val = read_sysreg_s(SYS_CPACR_EL12);	break;
+>> +	case TTBR0_EL1:		*val = read_sysreg_s(SYS_TTBR0_EL12);	break;
+>> +	case TTBR1_EL1:		*val = read_sysreg_s(SYS_TTBR1_EL12);	break;
+>> +	case TCR_EL1:		*val = read_sysreg_s(SYS_TCR_EL12);	break;
+>> +	case ESR_EL1:		*val = read_sysreg_s(SYS_ESR_EL12);	break;
+>> +	case AFSR0_EL1:		*val = read_sysreg_s(SYS_AFSR0_EL12);	break;
+>> +	case AFSR1_EL1:		*val = read_sysreg_s(SYS_AFSR1_EL12);	break;
+>> +	case FAR_EL1:		*val = read_sysreg_s(SYS_FAR_EL12);	break;
+>> +	case MAIR_EL1:		*val = read_sysreg_s(SYS_MAIR_EL12);	break;
+>> +	case VBAR_EL1:		*val = read_sysreg_s(SYS_VBAR_EL12);	break;
+>> +	case CONTEXTIDR_EL1:	*val = read_sysreg_s(SYS_CONTEXTIDR_EL12);break;
+>> +	case TPIDR_EL0:		*val = read_sysreg_s(SYS_TPIDR_EL0);	break;
+>> +	case TPIDRRO_EL0:	*val = read_sysreg_s(SYS_TPIDRRO_EL0);	break;
+>> +	case TPIDR_EL1:		*val = read_sysreg_s(SYS_TPIDR_EL1);	break;
+>> +	case AMAIR_EL1:		*val = read_sysreg_s(SYS_AMAIR_EL12);	break;
+>> +	case CNTKCTL_EL1:	*val = read_sysreg_s(SYS_CNTKCTL_EL12);	break;
+>> +	case PAR_EL1:		*val = read_sysreg_s(SYS_PAR_EL1);	break;
+>> +	case DACR32_EL2:	*val = read_sysreg_s(SYS_DACR32_EL2);	break;
+>> +	case IFSR32_EL2:	*val = read_sysreg_s(SYS_IFSR32_EL2);	break;
+>> +	case DBGVCR32_EL2:	*val = read_sysreg_s(SYS_DBGVCR32_EL2);	break;
+>> +	default:		return false;
+>> +	}
+>> +
+>> +	return true;
 >> +}
 >> +
->> +u64 translate_tcr(u64 tcr)
+>> +static bool __vcpu_write_sys_reg_to_cpu(u64 val, int reg)
 >> +{
->> +	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
->> +	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
->> +	       tcr_el2_ips_to_tcr_el1_ps(tcr) |
->> +	       (tcr & TCR_EL2_TG0_MASK) |
->> +	       (tcr & TCR_EL2_ORGN0_MASK) |
->> +	       (tcr & TCR_EL2_IRGN0_MASK) |
->> +	       (tcr & TCR_EL2_T0SZ_MASK);
->> +}
+>> +	/*
+>> +	 * System registers listed in the switch are not restored on every
+>> +	 * entry to the guest but are only restored on vcpu_load.
+>> +	 *
+>> +	 * Note that MPIDR_EL1 for the guest is set by KVM via VMPIDR_EL2 but
+>> +	 * should never be listed below, because the the MPIDR should only be
+>> +	 * set once, before running the VCPU, and never changed later.
+>> +	 */
+>> +	switch (reg) {
+>> +	case CSSELR_EL1:	write_sysreg_s(val, SYS_CSSELR_EL1);	break;
+>> +	case SCTLR_EL1:		write_sysreg_s(val, SYS_SCTLR_EL12);	break;
+>> +	case ACTLR_EL1:		write_sysreg_s(val, SYS_ACTLR_EL1);	break;
+>> +	case CPACR_EL1:		write_sysreg_s(val, SYS_CPACR_EL12);	break;
+>> +	case TTBR0_EL1:		write_sysreg_s(val, SYS_TTBR0_EL12);	break;
+>> +	case TTBR1_EL1:		write_sysreg_s(val, SYS_TTBR1_EL12);	break;
+>> +	case TCR_EL1:		write_sysreg_s(val, SYS_TCR_EL12);	break;
+>> +	case ESR_EL1:		write_sysreg_s(val, SYS_ESR_EL12);	break;
+>> +	case AFSR0_EL1:		write_sysreg_s(val, SYS_AFSR0_EL12);	break;
+>> +	case AFSR1_EL1:		write_sysreg_s(val, SYS_AFSR1_EL12);	break;
+>> +	case FAR_EL1:		write_sysreg_s(val, SYS_FAR_EL12);	break;
+>> +	case MAIR_EL1:		write_sysreg_s(val, SYS_MAIR_EL12);	break;
+>> +	case VBAR_EL1:		write_sysreg_s(val, SYS_VBAR_EL12);	break;
+>> +	case CONTEXTIDR_EL1:	write_sysreg_s(val, SYS_CONTEXTIDR_EL12);break;
+>> +	case TPIDR_EL0:		write_sysreg_s(val, SYS_TPIDR_EL0);	break;
+>> +	case TPIDRRO_EL0:	write_sysreg_s(val, SYS_TPIDRRO_EL0);	break;
+>> +	case TPIDR_EL1:		write_sysreg_s(val, SYS_TPIDR_EL1);	break;
+>> +	case AMAIR_EL1:		write_sysreg_s(val, SYS_AMAIR_EL12);	break;
+>> +	case CNTKCTL_EL1:	write_sysreg_s(val, SYS_CNTKCTL_EL12);	break;
+>> +	case PAR_EL1:		write_sysreg_s(val, SYS_PAR_EL1);	break;
+>> +	case DACR32_EL2:	write_sysreg_s(val, SYS_DACR32_EL2);	break;
+>> +	case IFSR32_EL2:	write_sysreg_s(val, SYS_IFSR32_EL2);	break;
+>> +	case DBGVCR32_EL2:	write_sysreg_s(val, SYS_DBGVCR32_EL2);	break;
+>> +	default:		return false;
+>> +	}
 >> +
->> +u64 translate_cptr(u64 cptr_el2)
->> +{
->> +	u64 cpacr_el1 = 0;
->> +
->> +	if (!(cptr_el2 & CPTR_EL2_TFP))
->> +		cpacr_el1 |= CPACR_EL1_FPEN;
->> +	if (cptr_el2 & CPTR_EL2_TTA)
->> +		cpacr_el1 |= CPACR_EL1_TTA;
->> +	if (!(cptr_el2 & CPTR_EL2_TZ))
->> +		cpacr_el1 |= CPACR_EL1_ZEN;
->> +
->> +	return cpacr_el1;
->> +}
->> +
->> +u64 translate_sctlr(u64 sctlr)
->> +{
->> +	/* Bit 20 is RES1 in SCTLR_EL1, but RES0 in SCTLR_EL2 */
->> +	return sctlr | BIT(20);
->> +}
->> +
->> +u64 translate_ttbr0(u64 ttbr0)
->> +{
->> +	/* Force ASID to 0 (ASID 0 or RES0) */
->> +	return ttbr0 & ~GENMASK_ULL(63, 48);
->> +}
->> +
->> +u64 translate_cnthctl(u64 cnthctl)
->> +{
->> +	return ((cnthctl & 0x3) << 10) | (cnthctl & 0xfc);
->> +}
->> +
->> +#define EL2_SYSREG(el2, el1, translate)	\
->> +	[el2 - FIRST_EL2_SYSREG] = { el2, el1, translate }
->> +#define PURE_EL2_SYSREG(el2) \
->> +	[el2 - FIRST_EL2_SYSREG] = { el2,__INVALID_SYSREG__, NULL }
->> +/*
->> + * Associate vEL2 registers to their EL1 counterparts on the CPU.
->> + * The translate function can be NULL, when the register layout is identical.
->> + */
->> +struct el2_sysreg_map {
->> +	int sysreg;	/* EL2 register index into the array above */
->> +	int mapping;	/* associated EL1 register */
->> +	u64 (*translate)(u64 value);
->> +} nested_sysreg_map[NR_SYS_REGS - FIRST_EL2_SYSREG] = {
->> +	PURE_EL2_SYSREG( VPIDR_EL2 ),
->> +	PURE_EL2_SYSREG( VMPIDR_EL2 ),
->> +	PURE_EL2_SYSREG( ACTLR_EL2 ),
->> +	PURE_EL2_SYSREG( HCR_EL2 ),
->> +	PURE_EL2_SYSREG( MDCR_EL2 ),
->> +	PURE_EL2_SYSREG( HSTR_EL2 ),
->> +	PURE_EL2_SYSREG( HACR_EL2 ),
->> +	PURE_EL2_SYSREG( VTTBR_EL2 ),
->> +	PURE_EL2_SYSREG( VTCR_EL2 ),
->> +	PURE_EL2_SYSREG( RVBAR_EL2 ),
->> +	PURE_EL2_SYSREG( RMR_EL2 ),
->> +	PURE_EL2_SYSREG( TPIDR_EL2 ),
->> +	PURE_EL2_SYSREG( CNTVOFF_EL2 ),
->> +	PURE_EL2_SYSREG( CNTHCTL_EL2 ),
->> +	PURE_EL2_SYSREG( HPFAR_EL2 ),
->> +	EL2_SYSREG(      SCTLR_EL2,  SCTLR_EL1,      translate_sctlr ),
->> +	EL2_SYSREG(      CPTR_EL2,   CPACR_EL1,      translate_cptr  ),
->> +	EL2_SYSREG(      TTBR0_EL2,  TTBR0_EL1,      translate_ttbr0 ),
->> +	EL2_SYSREG(      TTBR1_EL2,  TTBR1_EL1,      NULL            ),
->> +	EL2_SYSREG(      TCR_EL2,    TCR_EL1,        translate_tcr   ),
->> +	EL2_SYSREG(      VBAR_EL2,   VBAR_EL1,       NULL            ),
->> +	EL2_SYSREG(      AFSR0_EL2,  AFSR0_EL1,      NULL            ),
->> +	EL2_SYSREG(      AFSR1_EL2,  AFSR1_EL1,      NULL            ),
->> +	EL2_SYSREG(      ESR_EL2,    ESR_EL1,        NULL            ),
->> +	EL2_SYSREG(      FAR_EL2,    FAR_EL1,        NULL            ),
->> +	EL2_SYSREG(      MAIR_EL2,   MAIR_EL1,       NULL            ),
->> +	EL2_SYSREG(      AMAIR_EL2,  AMAIR_EL1,      NULL            ),
->> +};
->> +
->> +static
->> +const struct el2_sysreg_map *find_el2_sysreg(const struct el2_sysreg_map *map,
->> +					     int reg)
->> +{
->> +	const struct el2_sysreg_map *entry;
->> +
->> +	if (!sysreg_is_el2(reg))
->> +		return NULL;
->> +
->> +	entry = &nested_sysreg_map[reg - FIRST_EL2_SYSREG];
->> +	if (entry->sysreg == __INVALID_SYSREG__)
->> +		return NULL;
->> +
->> +	return entry;
+>> +	return true;
 >> +}
 >> +
 >>  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
 >>  {
->> +
->>  	if (!vcpu->arch.sysregs_loaded_on_cpu)
->>  		goto immediate_read;
+>> -	u64 val;
+>> +	u64 val = 0x8badf00d8badf00d;
 >>  
->> +	if (unlikely(sysreg_is_el2(reg))) {
->> +		const struct el2_sysreg_map *el2_reg;
+>>  	if (!vcpu->arch.sysregs_loaded_on_cpu)
+>> -		goto immediate_read;
+>> +		goto memory_read;
+>>  
+>>  	if (unlikely(sysreg_is_el2(reg))) {
+>>  		const struct el2_sysreg_map *el2_reg;
+>>  
+>>  		if (!is_hyp_ctxt(vcpu))
+>> -			goto immediate_read;
+>> +			goto memory_read;
+>>  
+>>  		switch (reg) {
+>> +		case ELR_EL2:
+>> +			return read_sysreg_el1(SYS_ELR);
+>>  		case SPSR_EL2:
+>>  			val = read_sysreg_el1(SYS_SPSR);
+>>  			return __fixup_spsr_el2_read(&vcpu->arch.ctxt, val);
+>>  		}
+>>  
+>>  		el2_reg = find_el2_sysreg(nested_sysreg_map, reg);
+>> -		if (el2_reg) {
+>> -			/*
+>> -			 * If this register does not have an EL1 counterpart,
+>> -			 * then read the stored EL2 version.
+>> -			 */
+>> -			if (el2_reg->mapping == __INVALID_SYSREG__)
+>> -				goto immediate_read;
+>> -
+>> -			/* Get the current version of the EL1 counterpart. */
+>> -			reg = el2_reg->mapping;
+>> -		}
+>> -	} else {
+>> -		/* EL1 register can't be on the CPU if the guest is in vEL2. */
+>> -		if (unlikely(is_hyp_ctxt(vcpu)))
+>> -			goto immediate_read;
+>> +		BUG_ON(!el2_reg);
 >> +
->> +		if (!is_hyp_ctxt(vcpu))
->> +			goto immediate_read;
+>> +		/*
+>> +		 * If this register does not have an EL1 counterpart,
+>> +		 * then read the stored EL2 version.
+>> +		 */
+>> +		if (el2_reg->mapping == __INVALID_SYSREG__)
+>> +			goto memory_read;
 >> +
->> +		el2_reg = find_el2_sysreg(nested_sysreg_map, reg);
->> +		if (el2_reg) {
->> +			/*
->> +			 * If this register does not have an EL1 counterpart,
->> +			 * then read the stored EL2 version.
->> +			 */
->> +			if (el2_reg->mapping == __INVALID_SYSREG__)
->> +				goto immediate_read;
->> +
->> +			/* Get the current version of the EL1 counterpart. */
->> +			reg = el2_reg->mapping;
->> +		}
->> +	} else {
->> +		/* EL1 register can't be on the CPU if the guest is in vEL2. */
->> +		if (unlikely(is_hyp_ctxt(vcpu)))
->> +			goto immediate_read;
->> +	}
->> +
->>  	/*
->>  	 * System registers listed in the switch are not saved on every
->>  	 * exit from the guest but are only saved on vcpu_put.
->> @@ -114,6 +245,8 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
->>  	case DACR32_EL2:	return read_sysreg_s(SYS_DACR32_EL2);
->>  	case IFSR32_EL2:	return read_sysreg_s(SYS_IFSR32_EL2);
->>  	case DBGVCR32_EL2:	return read_sysreg_s(SYS_DBGVCR32_EL2);
->> +	case SP_EL2:		return read_sysreg(sp_el1);
-> From ARM DDI 0487D.b, section Behavior when HCR_EL2.NV == 1: "Reads or writes to
-> any allocated and implemented System register or Special-purpose register named
-> *_EL2, *_EL02, or *_EL12 in the MRS or MSR instruction, other than SP_EL2, are
-> trapped to EL2 rather than being UNDEFINED" (page D5-2480). My interpretation of
-> the text is that attempted reads of SP_EL2 from virtual EL2 cause an undefined
-> instruction exception.
+>> +		if (!vcpu_el2_e2h_is_set(vcpu) &&
+>> +		    el2_reg->translate)
+>> +			goto memory_read;
+> 
+> Nit: the condition can be written on one line.
+> 
+> This condition wasn't present in patch 13 which introduced EL2 register
+> handling, and I'm struggling to understand what it does. As I understand the
+> code, this condition basically translates into:
+> 
+> - if the register is one of SCTLR_EL2, TTBR0_EL2, CPTR_EL2 or TCR_EL2, then read
+> it from memory.
+> 
+> - if the register is an EL2 register whose value is written unmodified to the
+> corresponding EL1 register, then read the corresponding EL1 register and return
+> that value.
+> 
+> Looking at vcpu_write_sys_reg, the values for the EL2 registers are always saved
+> in memory. The guest is a non-vhe guest, so writes to EL1 registers shouldn't be
+> reflected in the corresponding EL2 register. I think it's safe to always return
+> the value from memory.
+> 
+> I tried testing this with the following patch:
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 1235a88ec575..27d39bb9564d 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -290,6 +290,9 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>                 el2_reg = find_el2_sysreg(nested_sysreg_map, reg);
+>                 BUG_ON(!el2_reg);
+>  
+> +               if (!vcpu_el2_e2h_is_set(vcpu))
+> +                       goto memory_read;
+> +
+>                 /*
+>                  * If this register does not have an EL1 counterpart,
+>                  * then read the stored EL2 version.
+> @@ -297,10 +300,6 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>                 if (el2_reg->mapping == __INVALID_SYSREG__)
+>                         goto memory_read;
+>  
+> -               if (!vcpu_el2_e2h_is_set(vcpu) &&
+> -                   el2_reg->translate)
+> -                       goto memory_read;
+> -
+>                 /* Get the current version of the EL1 counterpart. */
+>                 reg = el2_reg->mapping;
+>                 WARN_ON(!__vcpu_read_sys_reg_from_cpu(reg, &val));
+> 
+> I know it's not conclusive, but I was able to boot a L2 guest under a L1 non-vhe
+> hypervisor.
 
-Sure. Nonetheless, the virtual EL2 has a stack pointer, accessible via
-SP_EL1 when it is loaded on the CPU. Somehow, this gets dropped later in
-the series (which is a bit wrong). I definitely should bring it back.
+And now you can't properly handle the terrible ARMv8.3 business of
+SPSR_EL1 being changed behind your back if you get an exception at vEL2
+to vEL2 on non-VHE. To handle this, you need both the live system
+register and the memory backup (see __fixup_spsr_el2_read and co).
+
+More generally, some registers can be modified behind your back. That's
+ELR, SPSR, FAR, ESR.  Anything related to taking an exception. No, this
+can't be observed with KVM because we don't allow exception to be taken
+at EL2 in the absence of RAS errors.
 
 Thanks,
 
