@@ -2,204 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 466985F5A9
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 11:34:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D60275F627
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 12:00:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727509AbfGDJdH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jul 2019 05:33:07 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:38851 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727446AbfGDJdG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jul 2019 05:33:06 -0400
-Received: by mail-wm1-f66.google.com with SMTP id s15so5359599wmj.3;
-        Thu, 04 Jul 2019 02:33:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=vD2wscCUTIxvAcaXu6IxNc1J6EFhwYX7r/38KI9pR+A=;
-        b=j0ZDqOUpfrhRUxEypZP6NYNfLcN5su/X3Se4lbNuQuCfLNkXqr5TLDcxY1vhd25xNq
-         Ic1D0M+DucKf9HblggnpwDrKKCATcFdrQ7zgsdK09CTFodFE1bXbgjM5X2aoQkHmh21K
-         2MbwjfkJzx55ws9QmVN526HKLwesuHmiJK2kWxMGzJZTjXFndOgKRVPJyb4n2nu0DVCl
-         DIWMDl3a14dAgsVLgJ99pXSxBPw2DiMPlMgs0FCX5ngq4ye0OaGpStArVq8gpCzDiJND
-         lq4Kn0UyWxaYAoV6KYTiuNeyUwH/7uQlIPbv7sC0agG5CHTyjaAiqlYmSq4zeHZ++nDP
-         TbyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=vD2wscCUTIxvAcaXu6IxNc1J6EFhwYX7r/38KI9pR+A=;
-        b=DejbJG1WF6uK0WI9hxSYl/PyRAg//G9i6iqbg+Ha3ZuLJOYqW6HFUHYevFGz0ntxCR
-         VIvWl6N493W5UTMS/7ATQXb61sDqsL5ah2260wNglVZHGx7vnFl5+pETcc+2cQ/ef9sD
-         Qf2ClW8qRMTJhf1Kum6UfI+L/LGl4OpdAOG643HemuMn+9ZY27wWC0MC0kVJcuMWEc3J
-         Y3/MXjQ85sNiX+p6m+/nASm55cnzfY+Go9aPFF4zP65zsMGbHYG7VkY2hARA+lBhrFPM
-         SYOUsOTpP8wILJEpHDmHK4OE+artO9BD22krbQ0Kqu+3CFnndb+pqU6UESfPJPnzMpeo
-         +T1Q==
-X-Gm-Message-State: APjAAAUL8sNxZ6VHHq0JB2ZgqcWawVTcZmfpfY5GVSSxOW3KjL9yG8Ao
-        Wr3nPdF5AIXfjxhAnfjQ61V67yCFwmQ=
-X-Google-Smtp-Source: APXvYqzuzhFqsgGVplP6ATDYoIicFVUCLYT7WgdWgZEfRZpkUpqfibtezWWUXoLWy9SvEpe9FaqCKQ==
-X-Received: by 2002:a1c:2e09:: with SMTP id u9mr11819125wmu.137.1562232783514;
-        Thu, 04 Jul 2019 02:33:03 -0700 (PDT)
-Received: from donizetti.redhat.com (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-        by smtp.gmail.com with ESMTPSA id m9sm4868320wrn.92.2019.07.04.02.33.02
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 04 Jul 2019 02:33:02 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     sean.j.christopherson@intel.com, vkuznets@redhat.com
-Subject: [PATCH 5/5] KVM: x86: add tracepoints around __direct_map and FNAME(fetch)
-Date:   Thu,  4 Jul 2019 11:32:56 +0200
-Message-Id: <20190704093256.12989-6-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190704093256.12989-1-pbonzini@redhat.com>
-References: <20190704093256.12989-1-pbonzini@redhat.com>
+        id S1727460AbfGDKAN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jul 2019 06:00:13 -0400
+Received: from foss.arm.com ([217.140.110.172]:38256 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727298AbfGDKAN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jul 2019 06:00:13 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 52016360;
+        Thu,  4 Jul 2019 03:00:12 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 84C643F703;
+        Thu,  4 Jul 2019 03:00:11 -0700 (PDT)
+Date:   Thu, 4 Jul 2019 11:00:09 +0100
+From:   Dave Martin <Dave.Martin@arm.com>
+To:     Marc Zyngier <marc.zyngier@arm.com>
+Cc:     kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 06/59] KVM: arm64: nv: Allow userspace to set
+ PSR_MODE_EL2x
+Message-ID: <20190704100009.GZ2790@e103592.cambridge.arm.com>
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-7-marc.zyngier@arm.com>
+ <7f8a9d76-6087-b8d9-3571-074a08d08ec8@arm.com>
+ <3a68e4e6-878f-7272-4e2d-8768680287fd@arm.com>
+ <20190624124859.GP2790@e103592.cambridge.arm.com>
+ <09dca509-9696-d224-22d2-4d5b0a0d9161@arm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <09dca509-9696-d224-22d2-4d5b0a0d9161@arm.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These are useful in debugging shadow paging.
+On Wed, Jul 03, 2019 at 10:21:57AM +0100, Marc Zyngier wrote:
+> On 24/06/2019 13:48, Dave Martin wrote:
+> > On Fri, Jun 21, 2019 at 02:50:08PM +0100, Marc Zyngier wrote:
+> >> On 21/06/2019 14:24, Julien Thierry wrote:
+> >>>
+> >>>
+> >>> On 21/06/2019 10:37, Marc Zyngier wrote:
+> >>>> From: Christoffer Dall <christoffer.dall@linaro.org>
+> >>>>
+> >>>> We were not allowing userspace to set a more privileged mode for the VCPU
+> >>>> than EL1, but we should allow this when nested virtualization is enabled
+> >>>> for the VCPU.
+> >>>>
+> >>>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> >>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> >>>> ---
+> >>>>  arch/arm64/kvm/guest.c | 6 ++++++
+> >>>>  1 file changed, 6 insertions(+)
+> >>>>
+> >>>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> >>>> index 3ae2f82fca46..4c35b5d51e21 100644
+> >>>> --- a/arch/arm64/kvm/guest.c
+> >>>> +++ b/arch/arm64/kvm/guest.c
+> >>>> @@ -37,6 +37,7 @@
+> >>>>  #include <asm/kvm_emulate.h>
+> >>>>  #include <asm/kvm_coproc.h>
+> >>>>  #include <asm/kvm_host.h>
+> >>>> +#include <asm/kvm_nested.h>
+> >>>>  #include <asm/sigcontext.h>
+> >>>>  
+> >>>>  #include "trace.h"
+> >>>> @@ -194,6 +195,11 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >>>>  			if (vcpu_el1_is_32bit(vcpu))
+> >>>>  				return -EINVAL;
+> >>>>  			break;
+> >>>> +		case PSR_MODE_EL2h:
+> >>>> +		case PSR_MODE_EL2t:
+> >>>> +			if (vcpu_el1_is_32bit(vcpu) || !nested_virt_in_use(vcpu))
+> >>>
+> >>> This condition reads a bit weirdly. Why do we care about anything else
+> >>> than !nested_virt_in_use() ?
+> >>>
+> >>> If nested virt is not in use then obviously we return the error.
+> >>>
+> >>> If nested virt is in use then why do we care about EL1? Or should this
+> >>> test read as "highest_el_is_32bit" ?
+> >>
+> >> There are multiple things at play here:
+> >>
+> >> - MODE_EL2x is not a valid 32bit mode
+> >> - The architecture forbids nested virt with 32bit EL2
+> >>
+> >> The code above is a simplification of these two conditions. But
+> >> certainly we can do a bit better, as kvm_reset_cpu() doesn't really
+> >> check that we don't create a vcpu with both 32bit+NV. These two bits
+> >> should really be exclusive.
+> > 
+> > This code is safe for now because KVM_VCPU_MAX_FEATURES <=
+> > KVM_ARM_VCPU_NESTED_VIRT, right, i.e., nested_virt_in_use() cannot be
+> > true?
+> > 
+> > This makes me a little uneasy, but I think that's paranoia talking: we
+> > want bisectably, but no sane person should ship with just half of this
+> > series.  So I guess this is fine.
+> > 
+> > We could stick something like
+> > 
+> > 	if (WARN_ON(...))
+> > 		return false;
+> > 
+> > in nested_virt_in_use() and then remove it in the final patch, but it's
+> > probably overkill.
+> 
+> The only case I can imagine something going wrong is if this series is
+> only applied halfway, and another series bumps the maximum feature to
+> something that includes NV. I guess your suggestion would solve that.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/mmu.c         | 13 ++++-----
- arch/x86/kvm/mmutrace.h    | 59 ++++++++++++++++++++++++++++++++++++++
- arch/x86/kvm/paging_tmpl.h |  2 ++
- 3 files changed, 67 insertions(+), 7 deletions(-)
+I won't lose sleep over it either way.
 
-diff --git a/arch/x86/kvm/mmu.c b/arch/x86/kvm/mmu.c
-index 0629a89bb070..6248c39a33ef 100644
---- a/arch/x86/kvm/mmu.c
-+++ b/arch/x86/kvm/mmu.c
-@@ -143,9 +143,6 @@ module_param(dbg, bool, 0644);
- 
- #include <trace/events/kvm.h>
- 
--#define CREATE_TRACE_POINTS
--#include "mmutrace.h"
--
- #define SPTE_HOST_WRITEABLE	(1ULL << PT_FIRST_AVAIL_BITS_SHIFT)
- #define SPTE_MMU_WRITEABLE	(1ULL << (PT_FIRST_AVAIL_BITS_SHIFT + 1))
- 
-@@ -269,9 +266,13 @@ static u64 __read_mostly shadow_nonpresent_or_rsvd_lower_gfn_mask;
- static u8 __read_mostly shadow_phys_bits;
- 
- static void mmu_spte_set(u64 *sptep, u64 spte);
-+static bool is_executable_pte(u64 spte);
- static union kvm_mmu_page_role
- kvm_mmu_calc_root_page_role(struct kvm_vcpu *vcpu);
- 
-+#define CREATE_TRACE_POINTS
-+#include "mmutrace.h"
-+
- 
- static inline bool kvm_available_flush_tlb_with_range(void)
- {
-@@ -3086,10 +3087,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, u64 *sptep, unsigned pte_access,
- 		ret = RET_PF_EMULATE;
- 
- 	pgprintk("%s: setting spte %llx\n", __func__, *sptep);
--	pgprintk("instantiating %s PTE (%s) at %llx (%llx) addr %p\n",
--		 is_large_pte(*sptep)? "2MB" : "4kB",
--		 *sptep & PT_WRITABLE_MASK ? "RW" : "R", gfn,
--		 *sptep, sptep);
-+	trace_kvm_mmu_set_spte(level, gfn, sptep);
- 	if (!was_rmapped && is_large_pte(*sptep))
- 		++vcpu->kvm->stat.lpages;
- 
-@@ -3200,6 +3198,7 @@ static int __direct_map(struct kvm_vcpu *vcpu, gpa_t gpa, int write,
- 	if (!VALID_PAGE(vcpu->arch.mmu->root_hpa))
- 		return RET_PF_RETRY;
- 
-+	trace_kvm_mmu_spte_requested(gpa, level, pfn);
- 	for_each_shadow_entry(vcpu, gpa, it) {
- 		base_gfn = gfn & ~(KVM_PAGES_PER_HPAGE(it.level) - 1);
- 		if (it.level == level)
-diff --git a/arch/x86/kvm/mmutrace.h b/arch/x86/kvm/mmutrace.h
-index dd30dccd2ad5..d8001b4bca05 100644
---- a/arch/x86/kvm/mmutrace.h
-+++ b/arch/x86/kvm/mmutrace.h
-@@ -301,6 +301,65 @@ TRACE_EVENT(
- 		  __entry->kvm_gen == __entry->spte_gen
- 	)
- );
-+
-+TRACE_EVENT(
-+	kvm_mmu_set_spte,
-+	TP_PROTO(int level, gfn_t gfn, u64 *sptep),
-+	TP_ARGS(level, gfn, sptep),
-+
-+	TP_STRUCT__entry(
-+		__field(u64, gfn)
-+		__field(u64, spte)
-+		__field(u64, sptep)
-+		__field(u8, level)
-+		/* These depend on page entry type, so compute them now.  */
-+		__field(bool, r)
-+		__field(bool, x)
-+		__field(u8, u)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->gfn = gfn;
-+		__entry->spte = *sptep;
-+		__entry->sptep = virt_to_phys(sptep);
-+		__entry->level = level;
-+		__entry->r = shadow_present_mask || (__entry->spte & PT_PRESENT_MASK);
-+		__entry->x = is_executable_pte(__entry->spte);
-+		__entry->u = shadow_user_mask ? !!(__entry->spte & shadow_user_mask) : -1;
-+	),
-+
-+	TP_printk("gfn %llx spte %llx (%s%s%s%s) level %d at %llx",
-+		  __entry->gfn, __entry->spte,
-+		  __entry->r ? "r" : "-",
-+		  __entry->spte & PT_WRITABLE_MASK ? "w" : "-",
-+		  __entry->x ? "x" : "-",
-+		  __entry->u == -1 ? "" : (__entry->u ? "u" : "-"),
-+		  __entry->level, __entry->sptep
-+	)
-+);
-+
-+TRACE_EVENT(
-+	kvm_mmu_spte_requested,
-+	TP_PROTO(gpa_t addr, int level, kvm_pfn_t pfn),
-+	TP_ARGS(addr, level, pfn),
-+
-+	TP_STRUCT__entry(
-+		__field(u64, gfn)
-+		__field(u64, pfn)
-+		__field(u8, level)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->gfn = addr >> PAGE_SHIFT;
-+		__entry->pfn = pfn | (__entry->gfn & (KVM_PAGES_PER_HPAGE(level) - 1));
-+		__entry->level = level;
-+	),
-+
-+	TP_printk("gfn %llx pfn %llx level %d",
-+		  __entry->gfn, __entry->pfn, __entry->level
-+	)
-+);
-+
- #endif /* _TRACE_KVMMMU_H */
- 
- #undef TRACE_INCLUDE_PATH
-diff --git a/arch/x86/kvm/paging_tmpl.h b/arch/x86/kvm/paging_tmpl.h
-index f39b381a8b88..e9d110fdcb8e 100644
---- a/arch/x86/kvm/paging_tmpl.h
-+++ b/arch/x86/kvm/paging_tmpl.h
-@@ -670,6 +670,8 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, gva_t addr,
- 
- 	base_gfn = gw->gfn;
- 
-+	trace_kvm_mmu_spte_requested(addr, gw->level, pfn);
-+
- 	for (; shadow_walk_okay(&it); shadow_walk_next(&it)) {
- 		clear_sp_write_flooding_count(it.sptep);
- 		base_gfn = gw->gfn & ~(KVM_PAGES_PER_HPAGE(it.level) - 1);
--- 
-2.21.0
-
+Cheers
+---Dave
