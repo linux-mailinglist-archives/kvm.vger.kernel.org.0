@@ -2,148 +2,248 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 352795F554
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 11:17:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B88F25F567
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 11:20:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727247AbfGDJR2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jul 2019 05:17:28 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:57378 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727196AbfGDJR2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jul 2019 05:17:28 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x649EMsa081959;
-        Thu, 4 Jul 2019 09:16:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=xp3cbvS9v8hYznHo4qbu7l3B3aVHsVMqtVioUPtKRSc=;
- b=KKj54mdD64Z1FlD+/ydYmMOtj76k1C2kVnF51cbk+yL5RVqkbSSYI1/z+BSKQQ9OShCl
- ghPGqxD2l2TVQvMCS5K8yMUHem6LO2XUF82iahhaeYJP9MqF4PBbX2YgfOTUVeMuxy/x
- +16PqxcNZpuIsioCTHHA645AeaJx6hIbUbkHOVBYdGvvzIzXpZMEgGqUpHGl9pbkscSr
- 3u7Sn1ArL4tBVLJX02n5hpOz6zAisFIF7AWNpz2uv83yuRZSDyeB5j2bS6LmD8Unx76R
- p7WGinG9c+y1Q9nqRkRD/uP0uU2w0hUtG8kQkwGHktY22rJmmvPIHp07FwDWpM6R8df0 Sg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2te5tbwvfv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 04 Jul 2019 09:16:41 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x649CmVN059451;
-        Thu, 4 Jul 2019 09:16:40 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 2th9ebvmks-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 04 Jul 2019 09:16:40 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x649GbPL006616;
-        Thu, 4 Jul 2019 09:16:39 GMT
-Received: from [10.175.206.207] (/10.175.206.207)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 04 Jul 2019 02:16:36 -0700
-Subject: Re: [patch 1/5] add cpuidle-haltpoll driver
-To:     Marcelo Tosatti <mtosatti@redhat.com>
-Cc:     kvm-devel <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Raslan KarimAllah <karahmed@amazon.de>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-pm@vger.kernel.org
-References: <20190703235124.783034907@amt.cnet>
- <20190703235828.340866829@amt.cnet>
-From:   Joao Martins <joao.m.martins@oracle.com>
-Message-ID: <db95f834-0307-813a-323c-c5e23c90e3f5@oracle.com>
-Date:   Thu, 4 Jul 2019 10:16:47 +0100
+        id S1727368AbfGDJUv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jul 2019 05:20:51 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34776 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727196AbfGDJUu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jul 2019 05:20:50 -0400
+Received: by mail-wr1-f68.google.com with SMTP id u18so5834863wru.1
+        for <kvm@vger.kernel.org>; Thu, 04 Jul 2019 02:20:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=f1r99RR7Q+xI/HzT6VXzcxAxrKbEaF2CKUPs7/mZplQ=;
+        b=oLLfdl5bXbErMN8XKOnHgVu8CCEHKXPxmqfPydI/k4LSFvDzF90LaYodJ0DvMbzvhV
+         du72qmg3w8+oBi+rYaL8DVz3iz4LzLOPzkGTh+zkotHT/J28Myt2QJKDqEWsS+PKH/AS
+         TXl5vJFCOmzINlPl1y2bLVnixzyKIe9xdxYjuGLwc4HJkLNq1bV7qyRoAja1DjGwAdjs
+         00SjETLwGNvzSseyra624ymqU+hwiKKOGjFCZtiAIJQcF0ExUVaghhcW/nZYmap3BXEp
+         9u2HY6OO7SuHT1NRHPkVOSZWoGMJmMzcCD8sGjYNuIe2oSTW/zCtjtkHs7QHYQOYG/R/
+         0A+g==
+X-Gm-Message-State: APjAAAUnlWN6jcpwVylhDsXcbI4T2mpPbYeyntW0RHX8fV39loAB8VMo
+        NwZw+aEkZ/u/HB41mAUGcnpu2g==
+X-Google-Smtp-Source: APXvYqzoACtOvMPdg2pePxgdM0+1il13ShO5vkXimvj9VVxQkaROxCTCtnUfc8x4OnP7UGJOttUN6w==
+X-Received: by 2002:adf:b64b:: with SMTP id i11mr33084792wre.205.1562232047694;
+        Thu, 04 Jul 2019 02:20:47 -0700 (PDT)
+Received: from steredhat.homenet.telecomitalia.it (host21-207-dynamic.52-79-r.retail.telecomitalia.it. [79.52.207.21])
+        by smtp.gmail.com with ESMTPSA id z25sm4919093wmf.38.2019.07.04.02.20.46
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 04 Jul 2019 02:20:47 -0700 (PDT)
+Date:   Thu, 4 Jul 2019 11:20:44 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] vsock/virtio: use RCU to avoid use-after-free on
+ the_virtio_vsock
+Message-ID: <20190704092044.23gd5o2rhqarisgg@steredhat.homenet.telecomitalia.it>
+References: <20190628123659.139576-1-sgarzare@redhat.com>
+ <20190628123659.139576-2-sgarzare@redhat.com>
+ <05311244-ed23-d061-a620-7b83d83c11f5@redhat.com>
+ <20190703104135.wg34dobv64k7u4jo@steredhat>
+ <07e5bc00-ebde-4dac-d38c-f008fa230b5f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190703235828.340866829@amt.cnet>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9307 signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1907040121
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9307 signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1907040121
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <07e5bc00-ebde-4dac-d38c-f008fa230b5f@redhat.com>
+User-Agent: NeoMutt/20180716
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/4/19 12:51 AM, Marcelo Tosatti wrote:
-> +++ linux-2.6-newcpuidle.git/drivers/cpuidle/cpuidle-haltpoll.c
-> @@ -0,0 +1,69 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * cpuidle driver for haltpoll governor.
-> + *
-> + * Copyright 2019 Red Hat, Inc. and/or its affiliates.
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.  See
-> + * the COPYING file in the top-level directory.
-> + *
-> + * Authors: Marcelo Tosatti <mtosatti@redhat.com>
-> + */
-> +
-> +#include <linux/init.h>
-> +#include <linux/cpuidle.h>
-> +#include <linux/module.h>
-> +#include <linux/sched/idle.h>
-> +#include <linux/kvm_para.h>
-> +
-> +static int default_enter_idle(struct cpuidle_device *dev,
-> +			      struct cpuidle_driver *drv, int index)
-> +{
-> +	if (current_clr_polling_and_test()) {
-> +		local_irq_enable();
-> +		return index;
-> +	}
-> +	default_idle();
-> +	return index;
-> +}
-> +
-> +static struct cpuidle_driver haltpoll_driver = {
-> +	.name = "haltpoll",
-> +	.owner = THIS_MODULE,
-> +	.states = {
-> +		{ /* entry 0 is for polling */ },
-> +		{
-> +			.enter			= default_enter_idle,
-> +			.exit_latency		= 1,
-> +			.target_residency	= 1,
-> +			.power_usage		= -1,
-> +			.name			= "haltpoll idle",
-> +			.desc			= "default architecture idle",
-> +		},
-> +	},
-> +	.safe_state_index = 0,
-> +	.state_count = 2,
-> +};
-> +
-> +static int __init haltpoll_init(void)
-> +{
-> +	struct cpuidle_driver *drv = &haltpoll_driver;
-> +
-> +	cpuidle_poll_state_init(drv);
-> +
-> +	if (!kvm_para_available())
-> +		return 0;
-> +
+On Thu, Jul 04, 2019 at 11:58:00AM +0800, Jason Wang wrote:
+> 
+> On 2019/7/3 下午6:41, Stefano Garzarella wrote:
+> > On Wed, Jul 03, 2019 at 05:53:58PM +0800, Jason Wang wrote:
+> > > On 2019/6/28 下午8:36, Stefano Garzarella wrote:
+> > > > Some callbacks used by the upper layers can run while we are in the
+> > > > .remove(). A potential use-after-free can happen, because we free
+> > > > the_virtio_vsock without knowing if the callbacks are over or not.
+> > > > 
+> > > > To solve this issue we move the assignment of the_virtio_vsock at the
+> > > > end of .probe(), when we finished all the initialization, and at the
+> > > > beginning of .remove(), before to release resources.
+> > > > For the same reason, we do the same also for the vdev->priv.
+> > > > 
+> > > > We use RCU to be sure that all callbacks that use the_virtio_vsock
+> > > > ended before freeing it. This is not required for callbacks that
+> > > > use vdev->priv, because after the vdev->config->del_vqs() we are sure
+> > > > that they are ended and will no longer be invoked.
+> > > > 
+> > > > We also take the mutex during the .remove() to avoid that .probe() can
+> > > > run while we are resetting the device.
+> > > > 
+> > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > > ---
+> > > >    net/vmw_vsock/virtio_transport.c | 67 +++++++++++++++++++++-----------
+> > > >    1 file changed, 44 insertions(+), 23 deletions(-)
+> > > > 
+> > > > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> > > > index 9c287e3e393c..7ad510ec12e0 100644
+> > > > --- a/net/vmw_vsock/virtio_transport.c
+> > > > +++ b/net/vmw_vsock/virtio_transport.c
+> > > > @@ -65,19 +65,22 @@ struct virtio_vsock {
+> > > >    	u32 guest_cid;
+> > > >    };
+> > > > -static struct virtio_vsock *virtio_vsock_get(void)
+> > > > -{
+> > > > -	return the_virtio_vsock;
+> > > > -}
+> > > > -
+> > > >    static u32 virtio_transport_get_local_cid(void)
+> > > >    {
+> > > > -	struct virtio_vsock *vsock = virtio_vsock_get();
+> > > > +	struct virtio_vsock *vsock;
+> > > > +	u32 ret;
+> > > > -	if (!vsock)
+> > > > -		return VMADDR_CID_ANY;
+> > > > +	rcu_read_lock();
+> > > > +	vsock = rcu_dereference(the_virtio_vsock);
+> > > > +	if (!vsock) {
+> > > > +		ret = VMADDR_CID_ANY;
+> > > > +		goto out_rcu;
+> > > > +	}
+> > > > -	return vsock->guest_cid;
+> > > > +	ret = vsock->guest_cid;
+> > > > +out_rcu:
+> > > > +	rcu_read_unlock();
+> > > > +	return ret;
+> > > >    }
+> > > >    static void virtio_transport_loopback_work(struct work_struct *work)
+> > > > @@ -197,14 +200,18 @@ virtio_transport_send_pkt(struct virtio_vsock_pkt *pkt)
+> > > >    	struct virtio_vsock *vsock;
+> > > >    	int len = pkt->len;
+> > > > -	vsock = virtio_vsock_get();
+> > > > +	rcu_read_lock();
+> > > > +	vsock = rcu_dereference(the_virtio_vsock);
+> > > >    	if (!vsock) {
+> > > >    		virtio_transport_free_pkt(pkt);
+> > > > -		return -ENODEV;
+> > > > +		len = -ENODEV;
+> > > > +		goto out_rcu;
+> > > >    	}
+> > > > -	if (le64_to_cpu(pkt->hdr.dst_cid) == vsock->guest_cid)
+> > > > -		return virtio_transport_send_pkt_loopback(vsock, pkt);
+> > > > +	if (le64_to_cpu(pkt->hdr.dst_cid) == vsock->guest_cid) {
+> > > > +		len = virtio_transport_send_pkt_loopback(vsock, pkt);
+> > > > +		goto out_rcu;
+> > > > +	}
+> > > >    	if (pkt->reply)
+> > > >    		atomic_inc(&vsock->queued_replies);
+> > > > @@ -214,6 +221,9 @@ virtio_transport_send_pkt(struct virtio_vsock_pkt *pkt)
+> > > >    	spin_unlock_bh(&vsock->send_pkt_list_lock);
+> > > >    	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+> > > > +
+> > > > +out_rcu:
+> > > > +	rcu_read_unlock();
+> > > >    	return len;
+> > > >    }
+> > > > @@ -222,12 +232,14 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
+> > > >    {
+> > > >    	struct virtio_vsock *vsock;
+> > > >    	struct virtio_vsock_pkt *pkt, *n;
+> > > > -	int cnt = 0;
+> > > > +	int cnt = 0, ret;
+> > > >    	LIST_HEAD(freeme);
+> > > > -	vsock = virtio_vsock_get();
+> > > > +	rcu_read_lock();
+> > > > +	vsock = rcu_dereference(the_virtio_vsock);
+> > > >    	if (!vsock) {
+> > > > -		return -ENODEV;
+> > > > +		ret = -ENODEV;
+> > > > +		goto out_rcu;
+> > > >    	}
+> > > >    	spin_lock_bh(&vsock->send_pkt_list_lock);
+> > > > @@ -255,7 +267,11 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
+> > > >    			queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+> > > >    	}
+> > > > -	return 0;
+> > > > +	ret = 0;
+> > > > +
+> > > > +out_rcu:
+> > > > +	rcu_read_unlock();
+> > > > +	return ret;
+> > > >    }
+> > > >    static void virtio_vsock_rx_fill(struct virtio_vsock *vsock)
+> > > > @@ -590,8 +606,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+> > > >    	vsock->rx_buf_max_nr = 0;
+> > > >    	atomic_set(&vsock->queued_replies, 0);
+> > > > -	vdev->priv = vsock;
+> > > > -	the_virtio_vsock = vsock;
+> > > >    	mutex_init(&vsock->tx_lock);
+> > > >    	mutex_init(&vsock->rx_lock);
+> > > >    	mutex_init(&vsock->event_lock);
+> > > > @@ -613,6 +627,9 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+> > > >    	virtio_vsock_event_fill(vsock);
+> > > >    	mutex_unlock(&vsock->event_lock);
+> > > > +	vdev->priv = vsock;
+> > > > +	rcu_assign_pointer(the_virtio_vsock, vsock);
+> > > 
+> > > You probably need to use rcu_dereference_protected() to access
+> > > the_virtio_vsock in the function in order to survive from sparse.
+> > > 
+> > Ooo, thanks!
+> > 
+> > Do you mean when we check if the_virtio_vsock is not null at the beginning of
+> > virtio_vsock_probe()?
+> 
+> 
+> I mean instead of:
+> 
+>     /* Only one virtio-vsock device per guest is supported */
+>     if (the_virtio_vsock) {
+>         ret = -EBUSY;
+>         goto out;
+>     }
+> 
+> you should use:
+> 
+> if (rcu_dereference_protected(the_virtio_vosck,
+> lock_dep_is_held(&the_virtio_vsock_mutex))
+> 
+> ...
 
-Isn't this meant to return -ENODEV value if the module is meant to not load?
+Okay, thanks for confirming! I'll send a v3 to fix this!
 
-Also this check should probably be placed before initializing the poll state,
-provided poll state isn't used anyways if you're not a kvm guest.
+> 
+> 
+> > 
+> > > > +
+> > > >    	mutex_unlock(&the_virtio_vsock_mutex);
+> > > >    	return 0;
+> > > > @@ -627,6 +644,12 @@ static void virtio_vsock_remove(struct virtio_device *vdev)
+> > > >    	struct virtio_vsock *vsock = vdev->priv;
+> > > >    	struct virtio_vsock_pkt *pkt;
+> > > > +	mutex_lock(&the_virtio_vsock_mutex);
+> > > > +
+> > > > +	vdev->priv = NULL;
+> > > > +	rcu_assign_pointer(the_virtio_vsock, NULL);
+> > > 
+> > > This is still suspicious, can we access the_virtio_vsock through vdev->priv?
+> > > If yes, we may still get use-after-free since it was not protected by RCU.
+> > We will free the object only after calling the del_vqs(), so we are sure
+> > that the vq_callbacks ended and will no longer be invoked.
+> > So, IIUC it shouldn't happen.
+> 
+> 
+> Yes, but any dereference that is not done in vq_callbacks will be very
+> dangerous in the future.
 
-	Joao
+Right.
+
+Do you think make sense to continue with this series in order to fix the
+hot-unplug issue, then I'll work to refactor the driver code to use the refcnt
+(as you suggested in patch 2) and singleton for the_virtio_vsock?
+
+Thanks,
+Stefano
