@@ -2,110 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 735AD5F9B9
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 16:07:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B38415FA26
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2019 16:33:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727851AbfGDOHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Jul 2019 10:07:37 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:53212 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727796AbfGDOHY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Jul 2019 10:07:24 -0400
-Received: by mail-wm1-f68.google.com with SMTP id s3so5878935wms.2;
-        Thu, 04 Jul 2019 07:07:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=3gBAtjCyB1jrwqmoh6QmCHwkfZISQRiVeu5oDYjwX/Q=;
-        b=ehHn/PYWRVFpRj+83eCrNV/3QBLL2DW7nvMsj9XWw458nYGRvi9s2l2GMvp4Vissyj
-         vvREul25ttaQoHWHd6L4x/K5PWLGWB3LPb3QckaqkaZVeRSTQ/rcEJrTX12E7oAXjlvA
-         b4TmPcl9IpBKeNq1FO7Va+sS0emrK+2/5T9VqsOEhQLvDAz5YecGt791CeeiJ2RTIg4m
-         EivsERRAyLGupGgXyaR7MWmw76Dhc629IozrAZ/z02mAQDHmUbyKeyiLpIeFvUR7tl6B
-         K5xYIdQybCyEefGP1PVGiBlXPbBlLkRrAOqaKyLjyLLi9bpErwfW/pcU0ViGKnmu+gYq
-         XNiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=3gBAtjCyB1jrwqmoh6QmCHwkfZISQRiVeu5oDYjwX/Q=;
-        b=akK55PSkFB6YKQk8RJ/3QkfXhbqml3rjI6dGeeXxq9YghG5JAaLfADumeqhHx6eRgM
-         LB2gm5h6okPXnB4+VJSpHrN9l2vtwO26M1vNvUo3B5nsM09CHjp/gkZeCyZAX7HQfHsw
-         Mc1AbEoM4p5NN1dU6DKOoKqoPi4Pl+hhxPmReTfj1hm2p3O1Aulpw1zIUq7HvaTPzVon
-         5zK8kNW0qJn3je1VG7Mj2D/nMDcGXSW0wHWYOo5sbB9xjbBKBndYeQX3tGnDH87y6N+P
-         zJsg6i9It3vttOrjEzvhbAfzzBbihKfHyDhr3Q6kfZP6yeRQH/nITkxsx6m0q6iXjdX0
-         wUBg==
-X-Gm-Message-State: APjAAAUjnLaQiZfwkZWVIs8Dw/nNHzrGB6QxoGy0EPvUBvZvLnSfPesN
-        KeVYqlpRXOwVzkrJkFH1MA4J0Lm1gfc=
-X-Google-Smtp-Source: APXvYqzA0oGvMnlxC+wQBSZY14og5z8OQCs7HbzUrr6q4tHQOfzS/Sp/SFmYQeUsEo61JH0ZfsheaA==
-X-Received: by 2002:a7b:c774:: with SMTP id x20mr12619743wmk.30.1562249242148;
-        Thu, 04 Jul 2019 07:07:22 -0700 (PDT)
-Received: from donizetti.redhat.com (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-        by smtp.gmail.com with ESMTPSA id n5sm4458060wmi.21.2019.07.04.07.07.21
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 04 Jul 2019 07:07:21 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     jing2.liu@linux.intel.com
-Subject: [PATCH 5/5] KVM: cpuid: remove has_leaf_count from struct kvm_cpuid_param
-Date:   Thu,  4 Jul 2019 16:07:15 +0200
-Message-Id: <20190704140715.31181-6-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190704140715.31181-1-pbonzini@redhat.com>
-References: <20190704140715.31181-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1727769AbfGDOdu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Jul 2019 10:33:50 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:41198 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727246AbfGDOdu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Jul 2019 10:33:50 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x64ESpDc039062;
+        Thu, 4 Jul 2019 14:33:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=SYkJRChKr5OFaHNsQCl7CS4H4WHEPPFFCS9F8ZVEN6Q=;
+ b=RfYAQdKqNo+ijKvg6FiF+WDqUMauQyNdrMusYvn9CVKoL4EOEQaillZWkZZQ1dj1cizY
+ 4vrmEUqAryNTRs3+Xs2fHOvvN+9PzsTUhQQSm3vmem+kDU7Z1f6QL4/5iYSDDmMSj6dw
+ VHAoF2CLF5j0gna+5j9vtRS0k0p34xNO3MHXC1hb1S3HW+YqIsY2S39m82/MifOMIrdp
+ tPKWaDhrG0x4MY/vzVS4qaLNgS01bPwfy+cbZzae+qhhaUwNqP49XtBLk1HalFH0lNLb
+ xsMcoMCN928R5YbYSPYnu7eOwmorOqY47VLl8Rxn8q6iQ9ty/JGpTfUUodIE4BjuATTF SA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 2te61q76pc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 04 Jul 2019 14:33:11 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x64ESLkQ070103;
+        Thu, 4 Jul 2019 14:31:11 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 2th5qm306b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 04 Jul 2019 14:31:10 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x64EV95F027849;
+        Thu, 4 Jul 2019 14:31:09 GMT
+Received: from [10.30.3.14] (/213.57.127.2)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 04 Jul 2019 07:31:09 -0700
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH] target/i386: kvm: Fix when nested state is needed for
+ migration
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <6499083f-c159-1c3e-0339-87aa5b13c2c0@redhat.com>
+Date:   Thu, 4 Jul 2019 17:31:06 +0300
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Karl Heubaum <karl.heubaum@oracle.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <432511A2-C6B4-4B03-87A5-176D886C0BF2@oracle.com>
+References: <20190624230514.53326-1-liran.alon@oracle.com>
+ <6499083f-c159-1c3e-0339-87aa5b13c2c0@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9307 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907040182
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9307 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907040182
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The has_leaf_count member was originally added for KVM's paravirtualization
-CPUID leaves.  However, since then the leaf count _has_ been added to those
-leaves as well, so we can drop that special case.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/cpuid.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index d403695f2f3b..243613bf5978 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -791,7 +791,6 @@ static int do_cpuid_func(struct kvm_cpuid_entry2 *entry, u32 func,
- 
- struct kvm_cpuid_param {
- 	u32 func;
--	bool has_leaf_count;
- 	bool (*qualifier)(const struct kvm_cpuid_param *param);
- };
- 
-@@ -835,11 +834,10 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
- 	int limit, nent = 0, r = -E2BIG, i;
- 	u32 func;
- 	static const struct kvm_cpuid_param param[] = {
--		{ .func = 0, .has_leaf_count = true },
--		{ .func = 0x80000000, .has_leaf_count = true },
--		{ .func = 0xC0000000, .qualifier = is_centaur_cpu, .has_leaf_count = true },
-+		{ .func = 0 },
-+		{ .func = 0x80000000 },
-+		{ .func = 0xC0000000, .qualifier = is_centaur_cpu },
- 		{ .func = KVM_CPUID_SIGNATURE },
--		{ .func = KVM_CPUID_FEATURES },
- 	};
- 
- 	if (cpuid->nent < 1)
-@@ -869,9 +867,6 @@ int kvm_dev_ioctl_get_cpuid(struct kvm_cpuid2 *cpuid,
- 		if (r)
- 			goto out_free;
- 
--		if (!ent->has_leaf_count)
--			continue;
--
- 		limit = cpuid_entries[nent - 1].eax;
- 		for (func = ent->func + 1; func <= limit && nent < cpuid->nent && r == 0; ++func)
- 			r = do_cpuid_func(&cpuid_entries[nent], func,
--- 
-2.21.0
+> On 2 Jul 2019, at 19:39, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 25/06/19 01:05, Liran Alon wrote:
+>> When vCPU is in VMX operation and enters SMM mode,
+>> it temporarily exits VMX operation but KVM maintained nested-state
+>> still stores the VMXON region physical address, i.e. even when the
+>> vCPU is in SMM mode then (nested_state->hdr.vmx.vmxon_pa !=3D -1ull).
+>>=20
+>> Therefore, there is no need to explicitly check for
+>> KVM_STATE_NESTED_SMM_VMXON to determine if it is necessary
+>> to save nested-state as part of migration stream.
+>>=20
+>> In addition, destination must enable eVMCS if it is enabled on
+>> source as specified by the KVM_STATE_NESTED_EVMCS flag, even if
+>> the VMXON region is not set. Thus, change the code to require saving
+>> nested-state as part of migration stream in case it is set.
+>>=20
+>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+>> Signed-off-by: Liran Alon <liran.alon@oracle.com>
+>> ---
+>> target/i386/machine.c | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>=20
+>> diff --git a/target/i386/machine.c b/target/i386/machine.c
+>> index 851b249d1a39..e7d72faf9e24 100644
+>> --- a/target/i386/machine.c
+>> +++ b/target/i386/machine.c
+>> @@ -999,7 +999,7 @@ static bool vmx_nested_state_needed(void *opaque)
+>>=20
+>>     return ((nested_state->format =3D=3D KVM_STATE_NESTED_FORMAT_VMX) =
+&&
+>>             ((nested_state->hdr.vmx.vmxon_pa !=3D -1ull) ||
+>> -             (nested_state->hdr.vmx.smm.flags & =
+KVM_STATE_NESTED_SMM_VMXON)));
+>> +             (nested_state->flags & KVM_STATE_NESTED_EVMCS)));
+>> }
+>>=20
+>> static const VMStateDescription vmstate_vmx_nested_state =3D {
+>>=20
+>=20
+> Queued, thanks.
+>=20
+> Paolo
+
+Actually Paolo after I have created KVM patch
+("KVM: nVMX: Change KVM_STATE_NESTED_EVMCS to signal vmcs12 is copied =
+from eVMCS=E2=80=9D)
+I think I realised that KVM_STATE_NESTED_EVMCS is actually not a =
+requirement for nested-state to be sent.
+I suggest to replace this commit with another one that just change =
+vmx_nested_state_needed() to return true
+In case format is FORMAT_VMX and vmxon_pa !=3D -1ull and that=E2=80=99s =
+it.
+
+As anyway, QEMU provisioned on destination side is going to enable the =
+relevant eVMCS capability.
+I=E2=80=99m going to send another series that refines QEMU =
+nested-migration a bit more so I will do it along the way.
+But I think this patch should be un-queued. Sorry for realizing this =
+later but at least it=E2=80=99s before it was merged to master :)
+
+-Liran
 
