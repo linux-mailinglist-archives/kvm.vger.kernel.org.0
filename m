@@ -2,89 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 15DA360368
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 11:51:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49CAF603AE
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 11:59:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728359AbfGEJut (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jul 2019 05:50:49 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:35469 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728344AbfGEJut (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jul 2019 05:50:49 -0400
-Received: by mail-wr1-f67.google.com with SMTP id y4so653846wrm.2
-        for <kvm@vger.kernel.org>; Fri, 05 Jul 2019 02:50:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=YUgV9oyAP3Ji8jA9MSEhvMmGZhPCnmuMeRDLIoIYTW0=;
-        b=EtGDm2NOtJhJV/AFwwMKc8FBuVDJrqc24+/esp+zt3X9N2gWMBjH4h5zzA234m940M
-         85K/0BszSFnbZl0efmVogRWMg41d80KyEIKmHWTfGdll9Mwi5+Xp0lkP4GNoFJZG6G14
-         U4jjzUOL8GDkrPMg2CtY6IyJl6B5WdX8vbpvFm458Sk4ccoIzcA7MwZREOKft22McIST
-         tCV0vNd2kZ/8yipCEfmIaUjZkE+vE3yawXNI5/D6DKI5PoifUHlGlYeYU+2d+CxJQaMe
-         A9tZwWS/YzWL/ApnqDPawef+AMfOiv61PPjI3OMUzZd4IxHNZDqoRFjQXOEbauoygbwB
-         UBDw==
-X-Gm-Message-State: APjAAAVoZ/qktq3nOB0cQ/aKDWss4ivVm2Ft/VmFNjZbuVNs10DRSUC4
-        QIQ/tsnAP17dMtBctFVfwffczA==
-X-Google-Smtp-Source: APXvYqypJu/BEjih6IidHXtaQ3xrNB0U+85zf/Y9MMWD6a3bCmLx/E4SeqEvaBrNU348XT146MdsGQ==
-X-Received: by 2002:a5d:5492:: with SMTP id h18mr3261472wrv.212.1562320246561;
-        Fri, 05 Jul 2019 02:50:46 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:19db:ad53:90ea:9423? ([2001:b07:6468:f312:19db:ad53:90ea:9423])
-        by smtp.gmail.com with ESMTPSA id z1sm8749189wrv.90.2019.07.05.02.50.45
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Jul 2019 02:50:46 -0700 (PDT)
-Subject: Re: [PATCH] KVM: LAPIC: Reset timer_advance_ns to 1000 after adaptive
- tuning goes insane
-To:     Wanpeng Li <kernellwp@gmail.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-References: <1562319651-6992-1-git-send-email-wanpengli@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dfdce82d-7cea-9b8d-0187-906b777d494d@redhat.com>
-Date:   Fri, 5 Jul 2019 11:50:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <1562319651-6992-1-git-send-email-wanpengli@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S1727263AbfGEJ7V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jul 2019 05:59:21 -0400
+Received: from foss.arm.com ([217.140.110.172]:34682 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727991AbfGEJ7U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jul 2019 05:59:20 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C3F0B1477;
+        Fri,  5 Jul 2019 02:59:19 -0700 (PDT)
+Received: from donnerap.arm.com (donnerap.cambridge.arm.com [10.1.197.44])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 022663F246;
+        Fri,  5 Jul 2019 02:59:18 -0700 (PDT)
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Will Deacon <will@kernel.org>,
+        Julien Thierry <julien.thierry@arm.com>
+Cc:     kvm@vger.kernel.org, Dave Martin <dave.martin@arm.com>
+Subject: [PATCH kvmtool 0/2] Add terminal detach feature
+Date:   Fri,  5 Jul 2019 10:59:12 +0100
+Message-Id: <20190705095914.151056-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.17.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/07/19 11:40, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
-> 
-> Reset timer_advance_ns to the default value 1000ns after adaptive tuning 
-> goes insane which can happen sporadically in product environment.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  arch/x86/kvm/lapic.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 05d8934..454d3dd 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1549,7 +1549,7 @@ static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
->  	if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
->  		apic->lapic_timer.timer_advance_adjust_done = true;
->  	if (unlikely(timer_advance_ns > 5000)) {
-> -		timer_advance_ns = 0;
-> +		timer_advance_ns = 1000;
->  		apic->lapic_timer.timer_advance_adjust_done = true;
+At the moment running a guest will tie it to the console where kvmtool
+is running on. So one cannot logout of the terminal without killing the
+guest. Existing workarounds are running in a terminal multiplexer like
+screen or using the --tty option to detach kvmtool from the very
+beginning.
 
-Do you also want to reset timer_advance_adjust_done to false?
+Both of these solutions need to be invoked at guest creation time,
+though. Patch 2 introduces a "detach" command, which can be invoked at
+any point during the guest's runtime using the terminal escape sequence
+("Ctrl+A d" by default). This will redirect the guest's serial output
+to pseudo-terminals and detach the process from the console. More
+details in the commit message.
 
-Paolo
+Patch 1 contains a bugfix, which avoids the kvmtool terminal thread to
+hog the full CPU time because poll() is not exactly doing what we think
+it does.
 
->  	}
->  	apic->lapic_timer.timer_advance_ns = timer_advance_ns;
-> 
+Please have a look and comment!
+
+Cheers,
+Andre
+
+Andre Przywara (2):
+  term: Avoid busy loop with unconnected pseudoterminals
+  Add detach feature
+
+ builtin-run.c     |   3 +
+ include/kvm/kvm.h |   2 +
+ term.c            | 139 +++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 141 insertions(+), 3 deletions(-)
+
+-- 
+2.17.1
 
