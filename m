@@ -2,93 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 34A7C60C5E
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 22:29:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 372AF60CEF
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 23:07:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727171AbfGEU3f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jul 2019 16:29:35 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:54772 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725813AbfGEU3e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jul 2019 16:29:34 -0400
-Received: by mail-wm1-f65.google.com with SMTP id p74so7255465wme.4;
-        Fri, 05 Jul 2019 13:29:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=M3dkrI3CMPn3rN9TDQJJwhfDQQ8sL5SyNtyTfXwJzzo=;
-        b=Mc08+EVTa3nQ+N8+MKpSDN7Tab6Zpb0xuoryurg+TQJ5MpCPe55jIGSYqXHmkRNBFu
-         qn2ONSrBwuQfL0mvmLQ6Bhhcgee1NJUfT3TdvTvzBc9HrnGx1yrEvvu/cS35/D5FB2Wj
-         rJhxT5ZtTQzjov88N9PHw5SOHq0KLL+WX1BcbcO7zTks51pbK5K8UKWrLSQHUSzAlTai
-         Tip4FJku2QFicbOdQNjYKN+l4pVtTmdfGAq7JGE5k56H1CHXLes6K8eJXTBN0a7FpGcP
-         fDG7JvlI1AtyqQXi5gMPAdzcNphkuoeeVPdtXpR1bCCBlm3AodwZvYtY1uVBC4/dqmtj
-         3B7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=M3dkrI3CMPn3rN9TDQJJwhfDQQ8sL5SyNtyTfXwJzzo=;
-        b=QDrFtWkK+wqRrkkJ8DfO7ehe9ePx+EK3n++me6r9xz5XklGm1T9WD7A49zuKPu7O9c
-         WQ3FQXZQU1pDLPojSHa+qiCPXfdGjxMs8kLLv2vuDFwk1f9mSk9YaQ7tM4aEgcp2/mlo
-         NhSYpJwBziW69R7cjXui7Owh2IFXXOZgIY3OF1DumyAeeyHv5tzFnjmIEOIZJ8c55iFR
-         PHi5VelCKs6wyI+H7CR2LByGsM3aP1P6T2+F/i7+LENeBtCG66otwPh/mpCchTdJk1m/
-         PqH83T/Q07gl2aTDPrBVnGwW92G8p2HOluS1g/HHGM6oslO/gcYJTKC6u5qZieeiuwno
-         ij3Q==
-X-Gm-Message-State: APjAAAVStODeIJD8bRG+B2l0021onk+AgJCi9t5k4FhGsIZ95nXwenH1
-        WQcYdNzv9r2VwJpoE9aPjzWt6bDJ9/M=
-X-Google-Smtp-Source: APXvYqy1vKnVPyrO0/F6dzES3KaiZnIr+MsNh3p70HMZ3qLIwOqc5RJ4dxIhIsB2sHolVwCuhmXupQ==
-X-Received: by 2002:a05:600c:20c3:: with SMTP id y3mr4739636wmm.3.1562358572643;
-        Fri, 05 Jul 2019 13:29:32 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id h11sm11090408wrx.93.2019.07.05.13.29.31
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Jul 2019 13:29:31 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, rkrcmar@redhat.com,
-        kvm@vger.kernel.org
-Subject: [GIT PULL] Final KVM changes for 5.2
-Date:   Fri,  5 Jul 2019 22:29:30 +0200
-Message-Id: <1562358570-30670-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1727008AbfGEVHS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jul 2019 17:07:18 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:38136 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725894AbfGEVHS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jul 2019 17:07:18 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x65L3vPY025585;
+        Fri, 5 Jul 2019 21:06:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2018-07-02; bh=bJXeKOcF+TXIe3UVh8CqtegBOh7vgPVZcG5BmVQ7yYo=;
+ b=lxvSAqcyHOyvap1hgeVAXdOQJwkuhzOJQ5byYPPrkz1FN46j49qsuSeFmYFfarc3OiAP
+ v3xCAiARWGXMUB+FYAmBWfZki/+EqH4fBIizVCVF4OJW09IgK+VTD5iq16Jj8f4faVAg
+ PYI1UV/lmmhFkSNwfmXd5jYlWOtbZIDX7kvqLTauablF+WVq+xjcg5b7Yc4JtyreDbm/
+ H6sV6GRAKlPlwacBTfcKoU1mOWixifdJhNafEqBrIIUW8fZ6e2IZZ3zR9Faj5eqr0CiT
+ XY8DhgPrt1rTVLIiTNxyu/Ayl+DlJmVdkYocsK9ILniSAVId6oDpidPbl6mv3nWy2iNt jA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2te5tc4j6a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 05 Jul 2019 21:06:57 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x65L2X1t107403;
+        Fri, 5 Jul 2019 21:06:57 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2thxrvm47h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 05 Jul 2019 21:06:57 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x65L6tgQ030839;
+        Fri, 5 Jul 2019 21:06:56 GMT
+Received: from spark.ravello.local (/213.57.127.2)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 05 Jul 2019 14:06:55 -0700
+From:   Liran Alon <liran.alon@oracle.com>
+To:     qemu-devel@nongnu.org
+Cc:     pbonzini@redhat.com, ehabkost@redhat.com, kvm@vger.kernel.org
+Subject: [PATCH 0/4] target/i386: kvm: Various nested-state fixes
+Date:   Sat,  6 Jul 2019 00:06:32 +0300
+Message-Id: <20190705210636.3095-1-liran.alon@oracle.com>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9309 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907050266
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9309 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907050266
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+Hi,
 
-The following changes since commit 6fbc7275c7a9ba97877050335f290341a1fd8dbf:
+This series is just a bunch of small fixes to recent QEMU nested-state
+migration support.
 
-  Linux 5.2-rc7 (2019-06-30 11:25:36 +0800)
+1st and 2nd patch can be considered as trivial refactoring patches.
 
-are available in the git repository at:
+3rd patch fixes a bug of requiring to save VMX nested-state when it is
+not needed.
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+4rd patch removes migration blocker when vCPU is exposed with VMX and
+instead demand nested migration kernel capabilities only when vCPU may
+have enabled VMX. To provide for better backwards-compatible migration
+scenarios. For more info, refer to relevant commit message.
 
-for you to fetch changes up to e644fa18e2ffc8895ca30dade503ae10128573a6:
+Thanks,
+-Liran
 
-  KVM: arm64/sve: Fix vq_present() macro to yield a bool (2019-07-05 12:07:51 +0200)
-
-----------------------------------------------------------------
-x86 bugfix patches and one compilation fix for ARM.
-
-----------------------------------------------------------------
-Liran Alon (2):
-      KVM: nVMX: Allow restore nested-state to enable eVMCS when vCPU in SMM
-      KVM: nVMX: Change KVM_STATE_NESTED_EVMCS to signal vmcs12 is copied from eVMCS
-
-Paolo Bonzini (1):
-      KVM: x86: degrade WARN to pr_warn_ratelimited
-
-Wanpeng Li (1):
-      KVM: LAPIC: Fix pending interrupt in IRR blocked by software disable LAPIC
-
-Zhang Lei (1):
-      KVM: arm64/sve: Fix vq_present() macro to yield a bool
-
- arch/arm64/kvm/guest.c                          |  2 +-
- arch/x86/kvm/lapic.c                            |  2 +-
- arch/x86/kvm/vmx/nested.c                       | 30 ++++++++++++++++---------
- arch/x86/kvm/x86.c                              |  6 ++---
- tools/testing/selftests/kvm/x86_64/evmcs_test.c |  1 +
- 5 files changed, 26 insertions(+), 15 deletions(-)
