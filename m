@@ -2,270 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D42DF607E3
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 16:30:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E2AE6084C
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 16:50:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727053AbfGEOaC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jul 2019 10:30:02 -0400
-Received: from foss.arm.com ([217.140.110.172]:39948 "EHLO foss.arm.com"
+        id S1726851AbfGEOuI convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 5 Jul 2019 10:50:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46202 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725813AbfGEOaC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jul 2019 10:30:02 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A339128;
-        Fri,  5 Jul 2019 07:30:01 -0700 (PDT)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E37A43F718;
-        Fri,  5 Jul 2019 07:30:00 -0700 (PDT)
-Date:   Fri, 5 Jul 2019 15:29:58 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Dave Martin <Dave.Martin@arm.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Julien Thierry <Julien.Thierry@arm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH kvmtool 2/2] Add detach feature
-Message-ID: <20190705152958.251667e6@donnerap.cambridge.arm.com>
-In-Reply-To: <20190705110438.GC2790@e103592.cambridge.arm.com>
-References: <20190705095914.151056-1-andre.przywara@arm.com>
-        <20190705095914.151056-3-andre.przywara@arm.com>
-        <20190705110438.GC2790@e103592.cambridge.arm.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S1725730AbfGEOuI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jul 2019 10:50:08 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 65412308213B;
+        Fri,  5 Jul 2019 14:49:57 +0000 (UTC)
+Received: from x1.home (ovpn-116-83.phx2.redhat.com [10.3.116.83])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D63269D90A;
+        Fri,  5 Jul 2019 14:49:47 +0000 (UTC)
+Date:   Fri, 5 Jul 2019 08:49:46 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Tiwei Bie <tiwei.bie@intel.com>
+Cc:     Jason Wang <jasowang@redhat.com>, mst@redhat.com,
+        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, dan.daly@intel.com,
+        cunming.liang@intel.com, zhihong.wang@intel.com
+Subject: Re: [RFC v2] vhost: introduce mdev based hardware vhost backend
+Message-ID: <20190705084946.67b8f9f5@x1.home>
+In-Reply-To: <20190704062134.GA21116@___>
+References: <20190703091339.1847-1-tiwei.bie@intel.com>
+        <7b8279b2-aa7e-7adc-eeff-20dfaf4400d0@redhat.com>
+        <20190703115245.GA22374@___>
+        <64833f91-02cd-7143-f12e-56ab93b2418d@redhat.com>
+        <20190703130817.GA1978@___>
+        <b01b8e28-8d96-31dd-56f4-ca7793498c55@redhat.com>
+        <20190704062134.GA21116@___>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Fri, 05 Jul 2019 14:50:07 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 5 Jul 2019 12:04:41 +0100
-Dave Martin <Dave.Martin@arm.com> wrote:
+On Thu, 4 Jul 2019 14:21:34 +0800
+Tiwei Bie <tiwei.bie@intel.com> wrote:
 
-Hi Dave,
-
-thanks for having a look!
-
-> On Fri, Jul 05, 2019 at 10:59:14AM +0100, Andre Przywara wrote:
-> > At the moment a kvmtool process started on a terminal has no way of
-> > detaching from the terminal without killing the guest. Existing
-> > workarounds are starting kvmtool in a screen/tmux session or using a
-> > pseudoterminal (--tty 0), both of which have to be done upon guest
-> > creation.
+> On Thu, Jul 04, 2019 at 12:31:48PM +0800, Jason Wang wrote:
+> > On 2019/7/3 下午9:08, Tiwei Bie wrote:  
+> > > On Wed, Jul 03, 2019 at 08:16:23PM +0800, Jason Wang wrote:  
+> > > > On 2019/7/3 下午7:52, Tiwei Bie wrote:  
+> > > > > On Wed, Jul 03, 2019 at 06:09:51PM +0800, Jason Wang wrote:  
+> > > > > > On 2019/7/3 下午5:13, Tiwei Bie wrote:  
+> > > > > > > Details about this can be found here:
+> > > > > > > 
+> > > > > > > https://lwn.net/Articles/750770/
+> > > > > > > 
+> > > > > > > What's new in this version
+> > > > > > > ==========================
+> > > > > > > 
+> > > > > > > A new VFIO device type is introduced - vfio-vhost. This addressed
+> > > > > > > some comments from here:https://patchwork.ozlabs.org/cover/984763/
+> > > > > > > 
+> > > > > > > Below is the updated device interface:
+> > > > > > > 
+> > > > > > > Currently, there are two regions of this device: 1) CONFIG_REGION
+> > > > > > > (VFIO_VHOST_CONFIG_REGION_INDEX), which can be used to setup the
+> > > > > > > device; 2) NOTIFY_REGION (VFIO_VHOST_NOTIFY_REGION_INDEX), which
+> > > > > > > can be used to notify the device.
+> > > > > > > 
+> > > > > > > 1. CONFIG_REGION
+> > > > > > > 
+> > > > > > > The region described by CONFIG_REGION is the main control interface.
+> > > > > > > Messages will be written to or read from this region.
+> > > > > > > 
+> > > > > > > The message type is determined by the `request` field in message
+> > > > > > > header. The message size is encoded in the message header too.
+> > > > > > > The message format looks like this:
+> > > > > > > 
+> > > > > > > struct vhost_vfio_op {
+> > > > > > > 	__u64 request;
+> > > > > > > 	__u32 flags;
+> > > > > > > 	/* Flag values: */
+> > > > > > >     #define VHOST_VFIO_NEED_REPLY 0x1 /* Whether need reply */
+> > > > > > > 	__u32 size;
+> > > > > > > 	union {
+> > > > > > > 		__u64 u64;
+> > > > > > > 		struct vhost_vring_state state;
+> > > > > > > 		struct vhost_vring_addr addr;
+> > > > > > > 	} payload;
+> > > > > > > };
+> > > > > > > 
+> > > > > > > The existing vhost-kernel ioctl cmds are reused as the message
+> > > > > > > requests in above structure.  
+> > > > > > Still a comments like V1. What's the advantage of inventing a new protocol?  
+> > > > > I'm trying to make it work in VFIO's way..
+> > > > >   
+> > > > > > I believe either of the following should be better:
+> > > > > > 
+> > > > > > - using vhost ioctl,  we can start from SET_VRING_KICK/SET_VRING_CALL and
+> > > > > > extend it with e.g notify region. The advantages is that all exist userspace
+> > > > > > program could be reused without modification (or minimal modification). And
+> > > > > > vhost API hides lots of details that is not necessary to be understood by
+> > > > > > application (e.g in the case of container).  
+> > > > > Do you mean reusing vhost's ioctl on VFIO device fd directly,
+> > > > > or introducing another mdev driver (i.e. vhost_mdev instead of
+> > > > > using the existing vfio_mdev) for mdev device?  
+> > > > Can we simply add them into ioctl of mdev_parent_ops?  
+> > > Right, either way, these ioctls have to be and just need to be
+> > > added in the ioctl of the mdev_parent_ops. But another thing we
+> > > also need to consider is that which file descriptor the userspace
+> > > will do the ioctl() on. So I'm wondering do you mean let the
+> > > userspace do the ioctl() on the VFIO device fd of the mdev
+> > > device?
+> > >   
 > > 
-> > Introduce a terminal command to create a pseudoterminal during the
-> > guest's runtime and redirect the console output to that. This will be
-> > triggered by typing the letter 'd' after the kvmtool escape sequence
-> > (default Ctrl+a). This also daemonises kvmtool, so gives back the shell
-> > prompt, and the user can log out without affecting the guest.
-> > 
-> > Naively daemonising kvmtool at that point doesn't work, though, as the
-> > fork() doesn't inherit the threads, so they keep running in the
-> > grandparent process and would be killed by its exit.
-> > The trick used here is to do the double fork() already right at the
-> > beginning of kvmtool's runtime, before spawning the first thread.
-> > We then don't end the parent and grandparent processes yet, instead let
-> > them block until the user actually requests the detach.
-> > This will let all the threads be created in the grandchild process, but
-> > keeps kvmtool still attached to the terminal until the user requests a
-> > detach.
-> > 
-> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > ---
-> >  builtin-run.c     |  3 ++
-> >  include/kvm/kvm.h |  2 ++
-> >  term.c            | 91 +++++++++++++++++++++++++++++++++++++++++++++++
-> >  3 files changed, 96 insertions(+)
-> > 
-> > diff --git a/builtin-run.c b/builtin-run.c
-> > index f8dc6c72..fa391419 100644
-> > --- a/builtin-run.c
-> > +++ b/builtin-run.c
-> > @@ -592,6 +592,9 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
-> >  		}
-> >  	}
-> >  
-> > +	/* Fork twice already now to create the threads in the right process. */
-> > +	kvm__prepare_daemonize();
-> > +
-> >  	if (!kvm->cfg.guest_name) {
-> >  		if (kvm->cfg.custom_rootfs) {
-> >  			kvm->cfg.guest_name = kvm->cfg.custom_rootfs_name;
-> > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> > index 7a738183..801f9474 100644
-> > --- a/include/kvm/kvm.h
-> > +++ b/include/kvm/kvm.h
-> > @@ -90,6 +90,8 @@ struct kvm {
-> >  void kvm__set_dir(const char *fmt, ...);
-> >  const char *kvm__get_dir(void);
-> >  
-> > +int kvm__prepare_daemonize(void);
-> > +
-> >  int kvm__init(struct kvm *kvm);
-> >  struct kvm *kvm__new(void);
-> >  int kvm__recommended_cpus(struct kvm *kvm);
-> > diff --git a/term.c b/term.c
-> > index 7fbd98c6..df8328f8 100644
-> > --- a/term.c
-> > +++ b/term.c
-> > @@ -22,6 +22,7 @@ static struct termios	orig_term;
-> >  
-> >  static int term_fds[TERM_MAX_DEVS][2];
-> >  
-> > +static int daemon_fd;
-> >  static int inotify_fd;
-> >  
-> >  static pthread_t term_poll_thread;
-> > @@ -29,6 +30,92 @@ static pthread_t term_poll_thread;
-> >  /* ctrl-a is used for escape */
-> >  #define term_escape_char	0x01
-> >  
-> > +/* This needs to be called *before* we create any threads. */
-> > +int kvm__prepare_daemonize(void)
-> > +{
-> > +	pid_t pid;
-> > +	char dummy;
-> > +	int child_pipe[2], parent_pipe[2];
-> > +
-> > +	if (pipe(parent_pipe))
-> > +		return -1;
-> > +
-> > +	pid = fork();
-> > +	if (pid < 0)
-> > +		return pid;
-> > +	if (pid > 0) {			/* parent process */
-> > +
-> > +		close(parent_pipe[1]);
-> > +
-> > +		/* Block until we are told to exit. */
-> > +		if (read(parent_pipe[0], &dummy, 1) != 1)
-> > +			perror("reading exit pipe");
-> > +
-> > +		exit(0);  
+> > Yes.  
 > 
-> Can we have the child write some status value instead?
+> Got it! I'm not sure what's Alex opinion on this. If we all
+> agree with this, I can do it in this way.
 > 
-> Right now, if the child goes wrong after forking we will just exit with
-> status 0 regardless.
-
-Sure, but what would we do in this case and why would we care? The child
-is just a "trick", so if this somehow fails, it does early and we are
-screwed anyways.
-
-> Instead, we could have the child send us the exit status... or if
-> the child disappears we'll just get EOF and can return failure
-> appropriately.
+> > Is there any other way btw?  
 > 
-> Also, how does the invoker kill the guest now that kvmtool has exited?
-
-Either by using "lkvm stop -n ..." or by exiting from within the guest.
-This would be the same as one would create a guest with --tty and put that
-in the background right now.
-
-> > +	}
-> > +
-> > +	close(parent_pipe[0]);
-> > +	if (pipe(child_pipe))
-> > +		return -1;
-> > +	daemon_fd = child_pipe[1];
-> > +
-> > +	/* Become a session leader. */
-> > +	setsid();
-> > +	pid = fork();
-> > +	if (pid > 0) {
-> > +		close(child_pipe[1]);
-> > +
-> > +		/* Block until we are told to exit. */
-> > +		if (read(child_pipe[0], &dummy, 1) != 1)
-> > +			perror("reading child exit pipe");
-> > +
-> > +		if (write(parent_pipe[1], &dummy, 1) != 1)
-> > +			pr_warning("could not kill daemon's parent");
-> > +
-> > +		exit(0);
-> > +	}
-> > +	close(child_pipe[0]);
-> > +	close(parent_pipe[1]);  
+> Just a quick thought.. Maybe totally a bad idea. I was thinking
+> whether it would be odd to do non-VFIO's ioctls on VFIO's device
+> fd. So I was wondering whether it's possible to allow binding
+> another mdev driver (e.g. vhost_mdev) to the supported mdev
+> devices. The new mdev driver, vhost_mdev, can provide similar
+> ways to let userspace open the mdev device and do the vhost ioctls
+> on it. To distinguish with the vfio_mdev compatible mdev devices,
+> the device API of the new vhost_mdev compatible mdev devices
+> might be e.g. "vhost-net" for net?
 > 
-> Why do we need to fork twice?  The extra process seems redundant.
-
-This is the ~50 year old textbook method of creating a UNIX daemon: By
-forking twice and killing the child (the "middle" process), the grandchild
-becomes an orphan, and will be picked up by PID 1 (init). This prevents
-any interactions with controlling terminals in the future. Dr. Google or a
-local library should have more information.
-
-> > +
-> > +	/* Only the grandchild returns here, to do the actual work. */
-> > +	return 0;
-> > +}
-> > +
-> > +static void term_set_tty(int term);
-> > +
-> > +static void detach_terminal(int term)
-> > +{
-> > +	char dummy = 0;
-> > +
-> > +	/* Detaching only make sense if we use the process' terminal. */
-> > +	if (term_fds[term][TERM_FD_IN] != STDIN_FILENO)
-> > +		return;
-> > +
-> > +	/* Clean up just this terminal, leave the others alone. */
-> > +	tcsetattr(term_fds[term][TERM_FD_IN], TCSANOW, &orig_term);
-> > +
-> > +	/* Redirect this terminal to a PTY */
-> > +	term_set_tty(term);
-> > +
-> > +	/*
-> > +	 * Replace STDIN/STDOUT with this new PTY. This will automatically
-> > +	 * transfer all the other serial terminals over.
-> > +	 */
-> > +	dup2(term_fds[term][TERM_FD_IN], STDIN_FILENO);
-> > +	dup2(term_fds[term][TERM_FD_OUT], STDOUT_FILENO);  
+> So in VFIO case, the device will be for passthru directly. And
+> in VHOST case, the device can be used to accelerate the existing
+> virtualized devices.
 > 
-> Output to a pty master before the slave is opened just disappears.
+> How do you think?
 
-Not always, it seems. When I do:
-$ lkvm run -k Image --tty 0
-then wait for a bit and open the pseudo-terminal, I get the full boot log
-"replayed". Not sure who in the chain is actually buffering this, though?
+VFIO really can't prevent vendor specific ioctls on the device file
+descriptor for mdevs, but a) we'd want to be sure the ioctl address
+space can't collide with ioctls we'd use for vfio defined purposes and
+b) maybe the VFIO user API isn't what you want in the first place if
+you intend to mostly/entirely ignore the defined ioctl set and replace
+them with your own.  In the case of the latter, you're also not getting
+the advantages of the existing VFIO userspace code, so why expose a
+VFIO device at all.
 
-> Possibly it would be useful to buffer it somewhere.
+The mdev interface does provide a general interface for creating and
+managing virtual devices, vfio-mdev is just one driver on the mdev
+bus.  Parav (Mellanox) has been doing work on mdev-core to help clean
+out vfio-isms from the interface, aiui, with the intent of implementing
+another mdev bus driver for using the devices within the kernel.  It
+seems like this vhost-mdev driver might be similar, using mdev but not
+necessarily vfio-mdev to expose devices.  Thanks,
 
-Sounds useful, but it's more a story for another time, I guess, since we
-have the same issue with --tty already.
-One related problem is the gap between starting/detaching a guest and
-connecting to the terminal for the first time, as one cannot do this fast
-and reliable enough without loosing characters, I guess. Maybe it's worth
-to introduce something like "start as paused", so we can connect to the
-terminal and then do a "lkvm resume".
-
-> I wonder whether it would make sense to redirect to a notional dummy
-> terminal (which might or might not buffer output), and start talking to
-> a pty or socket only once opened by a client.
-
-Mmmh, sounds like that would fit in nicely since with patch 1/2 we now
-know about connects and possibly even disconnects.
-
-Cheers,
-Andre.
-
-> > +
-> > +	/* Tell the (waiting) child process to exit now. */
-> > +	if (write(daemon_fd, &dummy, 1) != 1)
-> > +		pr_warning("could not kill daemon's parent");
-> > +
-> > +	/* To not hog the current directory unnecessarily. */
-> > +	if (chdir("/"))
-> > +		perror("changing to root directory");
-> > +	umask(0);
-> > +
-> > +	close(STDERR_FILENO);
-> > +}
-> > +  
-> 
-> [...]
-> 
-> Cheers
-> ---Dave
-
+Alex
