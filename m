@@ -2,31 +2,26 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 92E42601C1
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 09:52:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 096E4601C4
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 09:52:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728039AbfGEHvz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jul 2019 03:51:55 -0400
-Received: from mx2.suse.de ([195.135.220.15]:34860 "EHLO mx1.suse.de"
+        id S1728058AbfGEHwT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jul 2019 03:52:19 -0400
+Received: from mx2.suse.de ([195.135.220.15]:34922 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727587AbfGEHvy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jul 2019 03:51:54 -0400
+        id S1727455AbfGEHwT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jul 2019 03:52:19 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id A8DBCACD4;
-        Fri,  5 Jul 2019 07:51:52 +0000 (UTC)
-Subject: Re: [PATCH 1/2] scsi_host: add support for request batching
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, linux-scsi@vger.kernel.org
+        by mx1.suse.de (Postfix) with ESMTP id 5D76BACD4;
+        Fri,  5 Jul 2019 07:52:17 +0000 (UTC)
+Subject: Re: [PATCH 2/2] virtio_scsi: implement request batching
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     jejb@linux.ibm.com, martin.petersen@oracle.com,
+        linux-scsi@vger.kernel.org, stefanha@redhat.com
 References: <20190530112811.3066-1-pbonzini@redhat.com>
- <20190530112811.3066-2-pbonzini@redhat.com>
- <760164a0-589d-d9fa-fb63-79b5e0899c00@suse.de>
- <aaa344bf-af29-0485-4e83-5442331a2c9c@redhat.com>
- <afea12a1-47b3-0ebe-a3c2-6adc615bbddf@redhat.com>
- <c1d16dbf-713d-3528-78d7-a3f49c056f74@suse.de>
- <20190705074418.GB10995@stefanha-x1.localdomain>
+ <20190530112811.3066-3-pbonzini@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -72,13 +67,13 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <141b9bec-77e5-4b99-a494-642bc88bb1a2@suse.de>
-Date:   Fri, 5 Jul 2019 09:51:52 +0200
+Message-ID: <ec1a4902-d661-3a63-2dca-ca7692e225ae@suse.de>
+Date:   Fri, 5 Jul 2019 09:52:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190705074418.GB10995@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20190530112811.3066-3-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -86,51 +81,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/5/19 9:44 AM, Stefan Hajnoczi wrote:
-> On Fri, Jul 05, 2019 at 09:12:37AM +0200, Hannes Reinecke wrote:
->> On 7/4/19 3:19 PM, Paolo Bonzini wrote:
->>> On 19/06/19 12:31, Paolo Bonzini wrote:
->>>>> I'm a bit unsure if 'bd->last' is always set; it's quite obvious that
->>>>> it's present if set, but what about requests with 'bd->last == false' ?
->>>>> Is there a guarantee that they will _always_ be followed with a request
->>>>> with bd->last == true?
->>>>> And if so, is there a guarantee that this request is part of the same batch?
->>>> It's complicated.  A request with bd->last == false _will_ always be
->>>> followed by a request with bd->last == true in the same batch.  However,
->>>> due to e.g. errors it may be possible that the last request is not sent.
->>>>  In that case, the block layer sends commit_rqs, as documented in the
->>>> comment above, to flush the requests that have been sent already.
->>>>
->>>> So, a driver that obeys bd->last (or SCMD_LAST) but does not implement
->>>> commit_rqs is bound to have bugs, which is why this patch was not split
->>>> further.
->>>>
->>>> Makes sense?
->>>
->>> Hannes, can you provide your Reviewed-by?
->>>
->> Well ... since you asked for it:
->>
->> Where is the 'commit_rqs' callback actually used?
->> I seem to be going blind, but I can't find it; should be somewhere in
->> the first patch, no?
->> As per description:
->>
->>  * The commit_rqs function is used to trigger a hardware
->>  * doorbell after some requests have been queued with
->>  * queuecommand, when an error is encountered before sending
->>  * the request with SCMD_LAST set.
->>
->> So it should be somewhere in the error path, probably scsi_error or
->> something. But I don't seem to be able to find it ...
+On 5/30/19 1:28 PM, Paolo Bonzini wrote:
+> Adding the command and kicking the virtqueue so far was done one after
+> another.  Make the kick optional, so that we can take into account SCMD_LAST.
+> We also need a commit_rqs callback to kick the device if blk-mq aborts
+> the submission before the last request is reached.
 > 
-> The block layer calls scsi_mq_ops->commit_rqs() from
-> blk_mq_dispatch_rq_list() and blk_mq_try_issue_list_directly().
+> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  drivers/scsi/virtio_scsi.c | 55 +++++++++++++++++++++++++++-----------
+>  1 file changed, 40 insertions(+), 15 deletions(-)
 > 
-Ah, right.
-
-Now, then:
-
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
 Cheers,
@@ -139,6 +101,6 @@ Hannes
 -- 
 Dr. Hannes Reinecke		   Teamlead Storage & Networking
 hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 NÃ¼rnberg
+GF: Felix ImendÃ¶rffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG NÃ¼rnberg)
