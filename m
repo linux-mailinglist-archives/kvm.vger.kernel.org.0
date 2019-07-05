@@ -2,71 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E988D60648
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 15:00:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 10D0460688
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 15:24:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728933AbfGENAr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jul 2019 09:00:47 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:32855 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728012AbfGENAr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jul 2019 09:00:47 -0400
-Received: by mail-wm1-f66.google.com with SMTP id h19so7448491wme.0
-        for <kvm@vger.kernel.org>; Fri, 05 Jul 2019 06:00:45 -0700 (PDT)
+        id S1728545AbfGENYP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jul 2019 09:24:15 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:44999 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727638AbfGENYO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jul 2019 09:24:14 -0400
+Received: by mail-wr1-f65.google.com with SMTP id b2so8709321wrx.11;
+        Fri, 05 Jul 2019 06:24:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=TJB2RTWPulLTRLLXY7TRiipk7F2VO6sEuWjT2mECMZc=;
+        b=eBaJj5t9Vh7vXV+6/AWcm3bcSY6qaQpVxzf5xY0+RCnz9c6aW0RbG5zntpnmE8/lKh
+         vm18z1/ac0HjV6KPkcJGv4T7XB/2/rzVVeqvXKo5CqlGMvsxE/DLC0MAd6qSGteSPF5P
+         ggOKk4R9cebWHOAseQroACiL9Xr9iDk/TXWyH7qsjjM9BzcPMTLQKwsRdErjr8RkeJBj
+         CKAH6H5sH3ijZHpD4tM3KEBLt9zcLN5YS1teO5LMSK+8/J1VIKzY3XlnXXVrSGK6imAe
+         5vJIf1+h3tGfrw7xGbKnTqJnrBiA67ZYMiAVXCfEngxVrq7IRasgGrPhfwj7+FZaPewh
+         D6xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=LkjJN9pn3JzWHjcbg2XmZ5SMAe2wfwVxdSS9lT7yctY=;
-        b=bstdnY2S9PvIX1JqIWVzLDt/WwBVDf2AKi9pu1Ii7hw5ZD8la/SUc11yosIa8s+xXT
-         OisaG//a6ESPzyK2FnEwgdLf7NWMPnwo4TU0O7fLQcXuUjzGI5mKAhOCbx74VXMSTBRd
-         Tphcm+hZ9r5vmWaAn/ry549x69kZwVf8bymh9Z3VIFXTlNUaV9BlbFQ7J80q7AF+7Sh+
-         9GtzqOki8+BEpF/4z4mb/qjM37xO5iNdI+njYJsEtdkPbTBKxYgGRvg7pHXhiyzkCeir
-         GSslwQ+Z5ai4N64Z97jgq5N6bVeVRO0LqtWy33Eo+u4i5MgFZrnHDQpFZWET/0wBQLAV
-         k3VQ==
-X-Gm-Message-State: APjAAAV64aCa3qYsBy+fX6nAtaXBtCNfKaNsTcoIX7G1Z5IaNmQdwQl6
-        ddWRYRevNt76BQX0zdzHG6V1Vg==
-X-Google-Smtp-Source: APXvYqy0PtZB/6YxP9lkmvnMNPYrehBnhSukC5m5JWWRYdRBvtZJYSigB53fBVEQSPMi4BkFUu/fIA==
-X-Received: by 2002:a1c:4803:: with SMTP id v3mr3562900wma.49.1562331644991;
-        Fri, 05 Jul 2019 06:00:44 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e943:5a4e:e068:244a? ([2001:b07:6468:f312:e943:5a4e:e068:244a])
-        by smtp.gmail.com with ESMTPSA id m24sm7280293wmi.39.2019.07.05.06.00.44
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Jul 2019 06:00:44 -0700 (PDT)
-Subject: Re: [PATCH v5 2/4] KVM: LAPIC: Inject timer interrupt via posted
- interrupt
-To:     Wanpeng Li <wanpeng.li@hotmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-References: <1561110002-4438-1-git-send-email-wanpengli@tencent.com>
- <1561110002-4438-3-git-send-email-wanpengli@tencent.com>
- <587f329a-4920-fcbf-b2b1-9265a1d6d364@redhat.com>
- <HK2PR02MB4145E122DC5AC2445137A10F80F50@HK2PR02MB4145.apcprd02.prod.outlook.com>
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=TJB2RTWPulLTRLLXY7TRiipk7F2VO6sEuWjT2mECMZc=;
+        b=EfiSv9nAjpgVZQUPNLfr/PQRxmdb5gIde9pMz2Q4ywJEiEp6Si+ogSHoIsjSBS6400
+         gJpi1/6CkYbJzgP6Lmi2dXbQziBaeTpyCccB+YTN0ZYET9D8zbbkcU+iMebC5JMH86Tg
+         RgUnAbBVe0NWc9vrctsyt5lcOgReeSAmq4l8x0bnozcZqftgKZ+bP1YYYyDzyleRyrtN
+         oBPl4jfrdCPnjXgC7r3+HuSNdcXU4XU5DgcuMDDyrI6Hq3BCe5+vMl/pevf8hiOjpz0E
+         VHtshk/Ok7VGVAKELbcNorIRUWEShaJeMkOmUdKN84iij76OOCHvyKp5c27LWsNNK+Co
+         4wHg==
+X-Gm-Message-State: APjAAAUSYGYeNOW2xMT5ZksFkO2+ijHLW0w8qrO4DLw9IUIRYFA9SYCn
+        PkvOBdHiY1TN9p9Bxi4aBGs+HS+/WaY=
+X-Google-Smtp-Source: APXvYqztVaMAws9Nkb+c/1WXl9AxD1Zq34BWkiRhVLpdovI5Ur6r8SsqGJqDgtDNcJ8fVlAD/dxbhg==
+X-Received: by 2002:adf:e588:: with SMTP id l8mr2570227wrm.139.1562333052230;
+        Fri, 05 Jul 2019 06:24:12 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id y7sm3649664wmm.19.2019.07.05.06.24.11
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 05 Jul 2019 06:24:11 -0700 (PDT)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8e57b9a2-28e3-13b9-969a-ef1e3f55067e@redhat.com>
-Date:   Fri, 5 Jul 2019 15:00:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <HK2PR02MB4145E122DC5AC2445137A10F80F50@HK2PR02MB4145.apcprd02.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     liran.alon@oracle.com
+Subject: [PATCH] kvm: LAPIC: write down valid APIC registers
+Date:   Fri,  5 Jul 2019 15:24:10 +0200
+Message-Id: <1562333050-4745-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/07/19 14:52, Wanpeng Li wrote:
->> Also, do you want to disable the preemption timer if pi_inject_timer and
->> enable_apicv are both true?
-> 
-> I have already done this in vmx_set_hv_timer().
+Replace a magic 64-bit mask with a list of valid registers, computing
+the same mask in the end.
 
-Right, sorry!
+Suggested-by: Liran Alon <liran.alon@oracle.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/lapic.c | 44 ++++++++++++++++++++++++++++++++------------
+ 1 file changed, 32 insertions(+), 12 deletions(-)
 
-Paolo
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 2e4470f2685a..e4227ceab0c6 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1312,25 +1312,45 @@ static inline struct kvm_lapic *to_lapic(struct kvm_io_device *dev)
+ 	return container_of(dev, struct kvm_lapic, dev);
+ }
+ 
++#define APIC_REG_MASK(reg)	(1ull << ((reg) >> 4))
++#define APIC_REGS_MASK(first, count) \
++	(APIC_REG_MASK(first) * ((1ull << (count)) - 1))
++
+ int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
+ 		void *data)
+ {
+ 	unsigned char alignment = offset & 0xf;
+ 	u32 result;
+ 	/* this bitmask has a bit cleared for each reserved register */
+-	u64 rmask = 0x43ff01ffffffe70cULL;
+-
+-	if ((alignment + len) > 4) {
+-		apic_debug("KVM_APIC_READ: alignment error %x %d\n",
+-			   offset, len);
+-		return 1;
+-	}
+-
+-	/* ARBPRI is also reserved on x2APIC */
+-	if (apic_x2apic_mode(apic))
+-		rmask &= ~(1 << (APIC_ARBPRI >> 4));
++	u64 valid_reg_mask =
++		APIC_REG_MASK(APIC_ID) |
++		APIC_REG_MASK(APIC_LVR) |
++		APIC_REG_MASK(APIC_TASKPRI) |
++		APIC_REG_MASK(APIC_PROCPRI) |
++		APIC_REG_MASK(APIC_LDR) |
++		APIC_REG_MASK(APIC_DFR) |
++		APIC_REG_MASK(APIC_SPIV) |
++		APIC_REGS_MASK(APIC_ISR, APIC_ISR_NR) |
++		APIC_REGS_MASK(APIC_TMR, APIC_ISR_NR) |
++		APIC_REGS_MASK(APIC_IRR, APIC_ISR_NR) |
++		APIC_REG_MASK(APIC_ESR) |
++		APIC_REG_MASK(APIC_ICR) |
++		APIC_REG_MASK(APIC_ICR2) |
++		APIC_REG_MASK(APIC_LVTT) |
++		APIC_REG_MASK(APIC_LVTTHMR) |
++		APIC_REG_MASK(APIC_LVTPC) |
++		APIC_REG_MASK(APIC_LVT0) |
++		APIC_REG_MASK(APIC_LVT1) |
++		APIC_REG_MASK(APIC_LVTERR) |
++		APIC_REG_MASK(APIC_TMICT) |
++		APIC_REG_MASK(APIC_TMCCT) |
++		APIC_REG_MASK(APIC_TDCR);
++
++	/* ARBPRI is not valid on x2APIC */
++	if (!apic_x2apic_mode(apic))
++		valid_reg_mask |= APIC_REG_MASK(APIC_ARBPRI);
+ 
+-	if (offset > 0x3f0 || !(rmask & (1ULL << (offset >> 4)))) {
++	if (offset > 0x3f0 || !(valid_reg_mask & APIC_REG_MASK(offset))) {
+ 		apic_debug("KVM_APIC_READ: read reserved register %x\n",
+ 			   offset);
+ 		return 1;
+-- 
+1.8.3.1
+
