@@ -2,29 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 61ADA6014B
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 09:12:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 02C0D6014E
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 09:14:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727159AbfGEHMl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jul 2019 03:12:41 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56066 "EHLO mx1.suse.de"
+        id S1727879AbfGEHOT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jul 2019 03:14:19 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56500 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725862AbfGEHMk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jul 2019 03:12:40 -0400
+        id S1726427AbfGEHOT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jul 2019 03:14:19 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 89C00AFA9;
-        Fri,  5 Jul 2019 07:12:38 +0000 (UTC)
-Subject: Re: [PATCH 1/2] scsi_host: add support for request batching
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jejb@linux.ibm.com, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, stefanha@redhat.com
+        by mx1.suse.de (Postfix) with ESMTP id 2DE28B016;
+        Fri,  5 Jul 2019 07:13:59 +0000 (UTC)
+Subject: Re: [PATCH 0/2] scsi: add support for request batching
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        jejb@linux.ibm.com, linux-scsi@vger.kernel.org, stefanha@redhat.com
 References: <20190530112811.3066-1-pbonzini@redhat.com>
- <20190530112811.3066-2-pbonzini@redhat.com>
- <760164a0-589d-d9fa-fb63-79b5e0899c00@suse.de>
- <aaa344bf-af29-0485-4e83-5442331a2c9c@redhat.com>
- <afea12a1-47b3-0ebe-a3c2-6adc615bbddf@redhat.com>
+ <746ad64a-4047-1597-a0d4-f14f3529cc19@redhat.com>
+ <yq1lfxnk8ar.fsf@oracle.com>
+ <48c7d581-6ec8-260a-b4ba-217aef516305@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
@@ -70,12 +69,12 @@ Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
  ZtWlhGRERnDH17PUXDglsOA08HCls0PHx8itYsjYCAyETlxlLApXWdVl9YVwbQpQ+i693t/Y
  PGu8jotn0++P19d3JwXW8t6TVvBIQ1dRZHx1IxGLMn+CkDJMOmHAUMWTAXX2rf5tUjas8/v2
  azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <c1d16dbf-713d-3528-78d7-a3f49c056f74@suse.de>
-Date:   Fri, 5 Jul 2019 09:12:37 +0200
+Message-ID: <80dd68bf-a544-25ec-568f-cee1cf0c8cfd@suse.de>
+Date:   Fri, 5 Jul 2019 09:13:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <afea12a1-47b3-0ebe-a3c2-6adc615bbddf@redhat.com>
+In-Reply-To: <48c7d581-6ec8-260a-b4ba-217aef516305@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -84,41 +83,15 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/4/19 3:19 PM, Paolo Bonzini wrote:
-> On 19/06/19 12:31, Paolo Bonzini wrote:
->>> I'm a bit unsure if 'bd->last' is always set; it's quite obvious that
->>> it's present if set, but what about requests with 'bd->last == false' ?
->>> Is there a guarantee that they will _always_ be followed with a request
->>> with bd->last == true?
->>> And if so, is there a guarantee that this request is part of the same batch?
->> It's complicated.  A request with bd->last == false _will_ always be
->> followed by a request with bd->last == true in the same batch.  However,
->> due to e.g. errors it may be possible that the last request is not sent.
->>  In that case, the block layer sends commit_rqs, as documented in the
->> comment above, to flush the requests that have been sent already.
->>
->> So, a driver that obeys bd->last (or SCMD_LAST) but does not implement
->> commit_rqs is bound to have bugs, which is why this patch was not split
->> further.
->>
->> Makes sense?
+On 6/27/19 10:17 AM, Paolo Bonzini wrote:
+> On 27/06/19 05:37, Martin K. Petersen wrote:
+>>> Ping?  Are there any more objections?
+>> It's a core change so we'll need some more reviews. I suggest you
+>> resubmit.
 > 
-> Hannes, can you provide your Reviewed-by?
-> 
-Well ... since you asked for it:
-
-Where is the 'commit_rqs' callback actually used?
-I seem to be going blind, but I can't find it; should be somewhere in
-the first patch, no?
-As per description:
-
- * The commit_rqs function is used to trigger a hardware
- * doorbell after some requests have been queued with
- * queuecommand, when an error is encountered before sending
- * the request with SCMD_LAST set.
-
-So it should be somewhere in the error path, probably scsi_error or
-something. But I don't seem to be able to find it ...
+> Resubmit exactly the same patches?
+> Where is the ->commit_rqs() callback invoked?
+I don't seem to be able to find it...
 
 Cheers,
 
