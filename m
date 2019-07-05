@@ -2,99 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 044BE60AC9
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 19:12:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34A7C60C5E
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 22:29:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727656AbfGERMQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jul 2019 13:12:16 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:29402 "EHLO mxhk.zte.com.cn"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726903AbfGERMQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jul 2019 13:12:16 -0400
-Received: from mse-fl2.zte.com.cn (unknown [10.30.14.239])
-        by Forcepoint Email with ESMTPS id 888BA60F1E79325F9FB0;
-        Sat,  6 Jul 2019 01:12:14 +0800 (CST)
-Received: from notes_smtp.zte.com.cn ([10.30.1.239])
-        by mse-fl2.zte.com.cn with ESMTP id x65HC1g4011035;
-        Sat, 6 Jul 2019 01:12:01 +0800 (GMT-8)
-        (envelope-from wang.yi59@zte.com.cn)
-Received: from fox-host8.localdomain ([10.74.120.8])
-          by szsmtp06.zte.com.cn (Lotus Domino Release 8.5.3FP6)
-          with ESMTP id 2019070601124094-2115158 ;
-          Sat, 6 Jul 2019 01:12:40 +0800 
-From:   Yi Wang <wang.yi59@zte.com.cn>
-To:     pbonzini@redhat.com
-Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
-        wang.yi59@zte.com.cn, up2wing@gmail.com, wang.liang82@zte.com.cn
-Subject: [PATCH] kvm: x86: some tsc debug cleanup
-Date:   Sat, 6 Jul 2019 01:10:22 +0800
-Message-Id: <1562346622-1003-1-git-send-email-wang.yi59@zte.com.cn>
+        id S1727171AbfGEU3f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jul 2019 16:29:35 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:54772 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725813AbfGEU3e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jul 2019 16:29:34 -0400
+Received: by mail-wm1-f65.google.com with SMTP id p74so7255465wme.4;
+        Fri, 05 Jul 2019 13:29:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=M3dkrI3CMPn3rN9TDQJJwhfDQQ8sL5SyNtyTfXwJzzo=;
+        b=Mc08+EVTa3nQ+N8+MKpSDN7Tab6Zpb0xuoryurg+TQJ5MpCPe55jIGSYqXHmkRNBFu
+         qn2ONSrBwuQfL0mvmLQ6Bhhcgee1NJUfT3TdvTvzBc9HrnGx1yrEvvu/cS35/D5FB2Wj
+         rJhxT5ZtTQzjov88N9PHw5SOHq0KLL+WX1BcbcO7zTks51pbK5K8UKWrLSQHUSzAlTai
+         Tip4FJku2QFicbOdQNjYKN+l4pVtTmdfGAq7JGE5k56H1CHXLes6K8eJXTBN0a7FpGcP
+         fDG7JvlI1AtyqQXi5gMPAdzcNphkuoeeVPdtXpR1bCCBlm3AodwZvYtY1uVBC4/dqmtj
+         3B7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=M3dkrI3CMPn3rN9TDQJJwhfDQQ8sL5SyNtyTfXwJzzo=;
+        b=QDrFtWkK+wqRrkkJ8DfO7ehe9ePx+EK3n++me6r9xz5XklGm1T9WD7A49zuKPu7O9c
+         WQ3FQXZQU1pDLPojSHa+qiCPXfdGjxMs8kLLv2vuDFwk1f9mSk9YaQ7tM4aEgcp2/mlo
+         NhSYpJwBziW69R7cjXui7Owh2IFXXOZgIY3OF1DumyAeeyHv5tzFnjmIEOIZJ8c55iFR
+         PHi5VelCKs6wyI+H7CR2LByGsM3aP1P6T2+F/i7+LENeBtCG66otwPh/mpCchTdJk1m/
+         PqH83T/Q07gl2aTDPrBVnGwW92G8p2HOluS1g/HHGM6oslO/gcYJTKC6u5qZieeiuwno
+         ij3Q==
+X-Gm-Message-State: APjAAAVStODeIJD8bRG+B2l0021onk+AgJCi9t5k4FhGsIZ95nXwenH1
+        WQcYdNzv9r2VwJpoE9aPjzWt6bDJ9/M=
+X-Google-Smtp-Source: APXvYqy1vKnVPyrO0/F6dzES3KaiZnIr+MsNh3p70HMZ3qLIwOqc5RJ4dxIhIsB2sHolVwCuhmXupQ==
+X-Received: by 2002:a05:600c:20c3:: with SMTP id y3mr4739636wmm.3.1562358572643;
+        Fri, 05 Jul 2019 13:29:32 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id h11sm11090408wrx.93.2019.07.05.13.29.31
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 05 Jul 2019 13:29:31 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, rkrcmar@redhat.com,
+        kvm@vger.kernel.org
+Subject: [GIT PULL] Final KVM changes for 5.2
+Date:   Fri,  5 Jul 2019 22:29:30 +0200
+Message-Id: <1562358570-30670-1-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
-X-MIMETrack: Itemize by SMTP Server on SZSMTP06/server/zte_ltd(Release 8.5.3FP6|November
- 21, 2013) at 2019-07-06 01:12:41,
-        Serialize by Router on notes_smtp/zte_ltd(Release 9.0.1FP7|August  17, 2016) at
- 2019-07-06 01:12:07,
-        Serialize complete at 2019-07-06 01:12:07
-X-MAIL: mse-fl2.zte.com.cn x65HC1g4011035
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are some pr_debug in TSC code, which may have
-been no use, so remove them as Paolo suggested.
+Linus,
 
-Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
----
- arch/x86/kvm/x86.c | 8 --------
- 1 file changed, 8 deletions(-)
+The following changes since commit 6fbc7275c7a9ba97877050335f290341a1fd8dbf:
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fafd81d..86f9861 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1518,9 +1518,6 @@ static void kvm_get_time_scale(uint64_t scaled_hz, uint64_t base_hz,
- 
- 	*pshift = shift;
- 	*pmultiplier = div_frac(scaled64, tps32);
--
--	pr_debug("%s: base_hz %llu => %llu, shift %d, mul %u\n",
--		 __func__, base_hz, scaled_hz, shift, *pmultiplier);
- }
- 
- #ifdef CONFIG_X86_64
-@@ -1763,12 +1760,10 @@ void kvm_write_tsc(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 	    vcpu->arch.virtual_tsc_khz == kvm->arch.last_tsc_khz) {
- 		if (!kvm_check_tsc_unstable()) {
- 			offset = kvm->arch.cur_tsc_offset;
--			pr_debug("kvm: matched tsc offset for %llu\n", data);
- 		} else {
- 			u64 delta = nsec_to_cycles(vcpu, elapsed);
- 			data += delta;
- 			offset = kvm_compute_tsc_offset(vcpu, data);
--			pr_debug("kvm: adjusted tsc offset by %llu\n", delta);
- 		}
- 		matched = true;
- 		already_matched = (vcpu->arch.this_tsc_generation == kvm->arch.cur_tsc_generation);
-@@ -1787,8 +1782,6 @@ void kvm_write_tsc(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 		kvm->arch.cur_tsc_write = data;
- 		kvm->arch.cur_tsc_offset = offset;
- 		matched = false;
--		pr_debug("kvm: new tsc generation %llu, clock %llu\n",
--			 kvm->arch.cur_tsc_generation, data);
- 	}
- 
- 	/*
-@@ -6857,7 +6850,6 @@ static void kvm_timer_init(void)
- 		cpufreq_register_notifier(&kvmclock_cpufreq_notifier_block,
- 					  CPUFREQ_TRANSITION_NOTIFIER);
- 	}
--	pr_debug("kvm: max_tsc_khz = %ld\n", max_tsc_khz);
- 
- 	cpuhp_setup_state(CPUHP_AP_X86_KVM_CLK_ONLINE, "x86/kvm/clk:online",
- 			  kvmclock_cpu_online, kvmclock_cpu_down_prep);
--- 
-1.8.3.1
+  Linux 5.2-rc7 (2019-06-30 11:25:36 +0800)
 
+are available in the git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to e644fa18e2ffc8895ca30dade503ae10128573a6:
+
+  KVM: arm64/sve: Fix vq_present() macro to yield a bool (2019-07-05 12:07:51 +0200)
+
+----------------------------------------------------------------
+x86 bugfix patches and one compilation fix for ARM.
+
+----------------------------------------------------------------
+Liran Alon (2):
+      KVM: nVMX: Allow restore nested-state to enable eVMCS when vCPU in SMM
+      KVM: nVMX: Change KVM_STATE_NESTED_EVMCS to signal vmcs12 is copied from eVMCS
+
+Paolo Bonzini (1):
+      KVM: x86: degrade WARN to pr_warn_ratelimited
+
+Wanpeng Li (1):
+      KVM: LAPIC: Fix pending interrupt in IRR blocked by software disable LAPIC
+
+Zhang Lei (1):
+      KVM: arm64/sve: Fix vq_present() macro to yield a bool
+
+ arch/arm64/kvm/guest.c                          |  2 +-
+ arch/x86/kvm/lapic.c                            |  2 +-
+ arch/x86/kvm/vmx/nested.c                       | 30 ++++++++++++++++---------
+ arch/x86/kvm/x86.c                              |  6 ++---
+ tools/testing/selftests/kvm/x86_64/evmcs_test.c |  1 +
+ 5 files changed, 26 insertions(+), 15 deletions(-)
