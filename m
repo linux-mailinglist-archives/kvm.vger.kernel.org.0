@@ -2,129 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EFB4605B7
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 14:10:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 15D6D605C8
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 14:14:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728335AbfGEMJu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jul 2019 08:09:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47170 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727700AbfGEMJt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jul 2019 08:09:49 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 63664C057F3C;
-        Fri,  5 Jul 2019 12:09:41 +0000 (UTC)
-Received: from [10.36.116.95] (ovpn-116-95.ams2.redhat.com [10.36.116.95])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 366B88227E;
-        Fri,  5 Jul 2019 12:09:33 +0000 (UTC)
-Subject: Re: [PATCH v7 2/6] vfio/type1: Check reserve region conflict and
- update iova list
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        John Garry <john.garry@huawei.com>,
-        "xuwei (O)" <xuwei5@huawei.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>
-References: <20190626151248.11776-1-shameerali.kolothum.thodi@huawei.com>
- <20190626151248.11776-3-shameerali.kolothum.thodi@huawei.com>
- <20190703143427.2d63c15f@x1.home>
- <5FC3163CFD30C246ABAA99954A238FA83F2DDB68@lhreml524-mbs.china.huawei.com>
-From:   Auger Eric <eric.auger@redhat.com>
-Message-ID: <d70c59ec-e837-7697-acb1-c2b5027570ee@redhat.com>
-Date:   Fri, 5 Jul 2019 14:09:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA83F2DDB68@lhreml524-mbs.china.huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Fri, 05 Jul 2019 12:09:49 +0000 (UTC)
+        id S1727212AbfGEMOg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jul 2019 08:14:36 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:38338 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726505AbfGEMOg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jul 2019 08:14:36 -0400
+Received: by mail-wr1-f68.google.com with SMTP id p11so4215863wro.5;
+        Fri, 05 Jul 2019 05:14:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:subject:date:message-id;
+        bh=YWCq9LHp/N7/bCAEwSiCjpeKgXe91A7xdO5EBeT5qNo=;
+        b=DddSeVtcAHiOFI1GKWwgDQxmwKiNsHet8Xya9b69KEV1zIgD6L1wWTenwMtsGmyVrC
+         NpxNcpQ91pWP8mtMNB8Wl/3zwbhfXxdgqyDucSlnYEvFzA/+IuHG1DJ5dMcClMRMwhus
+         zelPU1PfnoVOsyGef8bTPU6L47noBQuRfNU9w88ZPg6VZvI0MZzY1fcZzqihLLii3UEH
+         13G5Ap2iQBhDfL42DpmtnCM6+LYwQP8Dm+NP7+w79C3DzsiINfiH8WGbSZ3NovYAa6g+
+         0ywce1UWx4sV2Lu8K2O4/jys/5rvNYFJ3inboI/vh4XA2+BxOb3YwQhRKTb76W2QQcmU
+         LaQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:from:to:subject:date:message-id;
+        bh=YWCq9LHp/N7/bCAEwSiCjpeKgXe91A7xdO5EBeT5qNo=;
+        b=Sa/qKZykpo5t9n07BQ2DgoxfTpn5Q+cb3lyJgeo6bdWMefUlLgG572rJ0qkRRh3P7C
+         tjnfk8XiBuORNreyNsq0yg465dEMXPvgiFtZMdVZNnVksPVWW7rJ9YhlukE5IEDZZ1B2
+         DRqHv2amyspkL3JmceOEPoLFG1TNEwFuMF56fzwSPqoT5TJUWTCmgrdRs9pHikgs0xEr
+         WKLLe0i5HsITaoQFHRvBT/KXh99O6Jmt84gv/WR8rJ55aKVcWn8a16aCxebFGfXjbbIx
+         t0/z5VzjGQV7TY4gur28o8mniOQEF5Y5l0kgiZDi6vOxsuerc9tZi3flNftTdFvEn2VJ
+         N3OQ==
+X-Gm-Message-State: APjAAAVGpga3vlmdD3CWJOdH1nN/UQ5MvU0Ll4M1B+ifGOfNYd8KvZLE
+        2wlB/k2u4jYq2IkqqNBSxG8cm2wppg4=
+X-Google-Smtp-Source: APXvYqxAPpdp9JtNRaOCMhTUrGE5InJ9RWwI6TW5HjOmqXw6RHHEuuvz7aPNuERMGDv2ZQnvdwLkMQ==
+X-Received: by 2002:a5d:6406:: with SMTP id z6mr3931535wru.280.1562328873969;
+        Fri, 05 Jul 2019 05:14:33 -0700 (PDT)
+Received: from 640k.lan ([93.56.166.5])
+        by smtp.gmail.com with ESMTPSA id b71sm6058378wmb.7.2019.07.05.05.14.32
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 05 Jul 2019 05:14:33 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [PATCH] KVM: LAPIC: ARBPRI is a reserved register for x2APIC
+Date:   Fri,  5 Jul 2019 14:14:32 +0200
+Message-Id: <1562328872-27659-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shameer,
+kvm-unit-tests were adjusted to match bare metal behavior, but KVM
+itself was not doing what bare metal does; fix that.
 
-On 7/4/19 2:51 PM, Shameerali Kolothum Thodi wrote:
-> 
-> 
->> -----Original Message-----
->> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On
->> Behalf Of Alex Williamson
->> Sent: 03 July 2019 21:34
->> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
->> Cc: eric.auger@redhat.com; pmorel@linux.vnet.ibm.com;
->> kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
->> iommu@lists.linux-foundation.org; Linuxarm <linuxarm@huawei.com>; John
->> Garry <john.garry@huawei.com>; xuwei (O) <xuwei5@huawei.com>;
->> kevin.tian@intel.com
->> Subject: Re: [PATCH v7 2/6] vfio/type1: Check reserve region conflict and
->> update iova list
->>
->> On Wed, 26 Jun 2019 16:12:44 +0100
->> Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
->>
->>> This retrieves the reserved regions associated with dev group and
->>> checks for conflicts with any existing dma mappings. Also update
->>> the iova list excluding the reserved regions.
->>>
->>> Reserved regions with type IOMMU_RESV_DIRECT_RELAXABLE are
->>> excluded from above checks as they are considered as directly
->>> mapped regions which are known to be relaxable.
->>>
->>> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
->>> ---
->>>  drivers/vfio/vfio_iommu_type1.c | 96
->> +++++++++++++++++++++++++++++++++
->>>  1 file changed, 96 insertions(+)
->>>
->>> diff --git a/drivers/vfio/vfio_iommu_type1.c
->> b/drivers/vfio/vfio_iommu_type1.c
->>> index 970d1ec06aed..b6bfdfa16c33 100644
->>> --- a/drivers/vfio/vfio_iommu_type1.c
->>> +++ b/drivers/vfio/vfio_iommu_type1.c
->>> @@ -1559,6 +1641,7 @@ static int vfio_iommu_type1_attach_group(void
->> *iommu_data,
->>>  	phys_addr_t resv_msi_base;
->>>  	struct iommu_domain_geometry geo;
->>>  	LIST_HEAD(iova_copy);
->>> +	LIST_HEAD(group_resv_regions);
->>>
->>>  	mutex_lock(&iommu->lock);
->>>
->>> @@ -1644,6 +1727,13 @@ static int vfio_iommu_type1_attach_group(void
->> *iommu_data,
->>>  		goto out_detach;
->>>  	}
->>>
->>> +	iommu_get_group_resv_regions(iommu_group, &group_resv_regions);
->>
->> This can fail and should have an error case.  I assume we'd fail the
->> group attach on failure.  Thanks,
-> 
-> Right. I will add the check. Do you think we should do the same in vfio_iommu_has_sw_msi()
-> as well? (In fact, it looks like iommu_get_group_resv_regions() ret is not checked anywhere in
-> kernel). 
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/lapic.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-I think the can be the topic of another series. I just noticed that in
-iommu_insert_resv_region(), which is recursive in case ot merge, I
-failed to propagate returned value or recursive calls. This also needs
-to be fixed. I volunteer to work on those changes if you prefer. Just
-let me know.
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index d6ca5c4f29f1..2e4470f2685a 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1318,7 +1318,7 @@ int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
+ 	unsigned char alignment = offset & 0xf;
+ 	u32 result;
+ 	/* this bitmask has a bit cleared for each reserved register */
+-	static const u64 rmask = 0x43ff01ffffffe70cULL;
++	u64 rmask = 0x43ff01ffffffe70cULL;
+ 
+ 	if ((alignment + len) > 4) {
+ 		apic_debug("KVM_APIC_READ: alignment error %x %d\n",
+@@ -1326,6 +1326,10 @@ int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
+ 		return 1;
+ 	}
+ 
++	/* ARBPRI is also reserved on x2APIC */
++	if (apic_x2apic_mode(apic))
++		rmask &= ~(1 << (APIC_ARBPRI >> 4));
++
+ 	if (offset > 0x3f0 || !(rmask & (1ULL << (offset >> 4)))) {
+ 		apic_debug("KVM_APIC_READ: read reserved register %x\n",
+ 			   offset);
+-- 
+1.8.3.1
 
-Thanks
-
-Eric
-> 
-> Thanks,
-> Shameer
-> 
-> 
