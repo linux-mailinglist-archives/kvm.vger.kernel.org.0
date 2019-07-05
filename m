@@ -2,111 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3546660690
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 15:26:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C97E8606BB
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 15:40:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728849AbfGEN0G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jul 2019 09:26:06 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:45417 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726765AbfGEN0F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jul 2019 09:26:05 -0400
-Received: by mail-wr1-f65.google.com with SMTP id f9so9920212wre.12
-        for <kvm@vger.kernel.org>; Fri, 05 Jul 2019 06:26:04 -0700 (PDT)
+        id S1728684AbfGENj4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jul 2019 09:39:56 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:35192 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728244AbfGENj4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jul 2019 09:39:56 -0400
+Received: by mail-pg1-f196.google.com with SMTP id s27so4348984pgl.2;
+        Fri, 05 Jul 2019 06:39:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Yz/bvXxfkDYqJoVFft3aC1vVTiMIeTWz1wlVELmSGYQ=;
+        b=Kh6G9QxSOQPflRqPMW3xsfPNqflJLlV0SWqmKw3ii2M4XMDwfbCD5fGl/ryOMj7bpq
+         cDcKcB39t8nsxr/eJeoxTU4YXhaQnkfQZHb14mcyAxjpXaMSBahlof31ZonHhSZ40NPk
+         Ftfnj3/OlRjMN1HRNEvGRzORywGU8owZ0nG6zrFDPiXhacpZDD44hwY89bLBMuBFHIJi
+         5D0SKKqAICvhT/WpDstuV1/+1bQqI5x+hisWHSFuvyJdyyhV4j7eJNyRIg+KoA3mPXNp
+         aOhw2e68JnxXXePgqe9+pVxS/RhkbLXvypLGnIhWdNh/+w0j2DQ272lJoX3Aszeu6uu8
+         T6bQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5QNK02sutwjpQD4Kojggq80G41ltWM2v/J3VAs0y3RE=;
-        b=X9vmuWyWyekVan1VT6z7ouFbsz7vgcWk+fhKJA0wQwIkIuQLVxeYXp0G5p8BL94lfs
-         gu/WX0j7GWHWrr/FfAtLe48XUfVT7NixSOjTjMk8jasG2TIf4MBnxh4To+QFfCLbKLBO
-         3oozMXldihhE0CQHdhP4Fq9tzehTUdLEPoCGB9FE9oPd70taHnvNOatCGJl7hea8f5ps
-         0eRhJmfVa/PpghLcDJSjqz139BZ//yXhU6Pr5yBUMk1hwpsbqYAPC+WPiwdzurvmjXUk
-         TFJ6xYCvFSPS3PxoLPgjeas3zDS/HDQW+I56uzQzD2clV/7P9zDTn8i0+Lr3Ko336KD0
-         MGIQ==
-X-Gm-Message-State: APjAAAV0sGw+hdCES1HDH/fzVLIZH6ECNtZADplSXcjOLa2HF/T7OAKd
-        oEXkmR94+zuwDO9Y2nF9/sPTkA==
-X-Google-Smtp-Source: APXvYqzKhj5sL/IxIleuiZ5IX5haQeq0M7D55wlrZJL3O4fo1x/nntdB9V+CG2PaHhNPuAuvfVvc+A==
-X-Received: by 2002:a5d:5510:: with SMTP id b16mr4165583wrv.267.1562333163572;
-        Fri, 05 Jul 2019 06:26:03 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:e943:5a4e:e068:244a? ([2001:b07:6468:f312:e943:5a4e:e068:244a])
-        by smtp.gmail.com with ESMTPSA id y7sm3656457wmm.19.2019.07.05.06.26.02
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Jul 2019 06:26:03 -0700 (PDT)
-Subject: Re: [PATCH v5 4/4] KVM: LAPIC: Don't inject already-expired timer via
- posted interrupt
-To:     Wanpeng Li <wanpeng.li@hotmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>
-References: <1561110002-4438-1-git-send-email-wanpengli@tencent.com>
- <1561110002-4438-5-git-send-email-wanpengli@tencent.com>
- <67fad01b-8a77-5892-d963-77a3d321bb65@redhat.com>
- <HK2PR02MB4145B13227997511174DBFA480F50@HK2PR02MB4145.apcprd02.prod.outlook.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <847fc9bd-c0b9-0f7b-f029-9a5499f2c74e@redhat.com>
-Date:   Fri, 5 Jul 2019 15:26:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <HK2PR02MB4145B13227997511174DBFA480F50@HK2PR02MB4145.apcprd02.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Yz/bvXxfkDYqJoVFft3aC1vVTiMIeTWz1wlVELmSGYQ=;
+        b=NqLl6EYB2D4Uo3ufpHNLJcjpPH5ba0skgmsSzuIoje/276MVF5KYlSQ+5tUL4ULACx
+         OVyQ2uR4ZhOrhKi/p93n7+4ADd0DUZlOFCA3IDfg43Eczpikn0WSMQ3adruf+t+7qQFH
+         ji40d/I4A0qbzgizWJmj23AwSqQmSI/dqZaUVxuwdDZoZiYJftNCLTYJ1OJLoLLJUobM
+         2VSjlqtV9QmUkp9B/z7r4QHweho6K00laSgcHoxPqNoKXcm5yJx7toC6QA5G2o/lVaJX
+         X5apghF88BAY+Yfkf/JgFXYOBtANWpZkPqhnUKp+YvX0kK9ea8onPnkZHtXefJE/eklj
+         zIpw==
+X-Gm-Message-State: APjAAAUNilD8vFlrQPCLzOhwY95igSIaCD9gKfQOyt1XhoX2frle5FNK
+        6awSBjOJPJO0/jVQHkb8iTs=
+X-Google-Smtp-Source: APXvYqyRcWrfurmLqtOm81P0n5PYS395MdcibqcOdy+Y59FXFo4mkF7bmglv+2to5uKrUa1fFZH+bA==
+X-Received: by 2002:a65:6406:: with SMTP id a6mr5494274pgv.393.1562333994885;
+        Fri, 05 Jul 2019 06:39:54 -0700 (PDT)
+Received: from ?IPv6:2601:647:4580:b719:ac8c:5fbe:1262:33d4? ([2601:647:4580:b719:ac8c:5fbe:1262:33d4])
+        by smtp.gmail.com with ESMTPSA id v10sm9676088pfe.163.2019.07.05.06.39.53
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 05 Jul 2019 06:39:54 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH] KVM: LAPIC: ARBPRI is a reserved register for x2APIC
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <1562328872-27659-1-git-send-email-pbonzini@redhat.com>
+Date:   Fri, 5 Jul 2019 06:37:30 -0700
+Cc:     LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <2624F5BF-1601-4A7B-8CA2-7D3328184E46@gmail.com>
+References: <1562328872-27659-1-git-send-email-pbonzini@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/07/19 15:11, Wanpeng Li wrote:
-> On 7/5/19 8:40 PM, Paolo Bonzini wrote:
+> On Jul 5, 2019, at 5:14 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
 > 
->> On 21/06/19 11:40, Wanpeng Li wrote:
->>> From: Wanpeng Li <wanpengli@tencent.com>
->>>
->>> already-expired timer interrupt can be injected to guest when vCPU who
->>> arms the lapic timer re-vmentry, don't posted inject in this case.
->>>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Cc: Radim Krčmář <rkrcmar@redhat.com>
->>> Cc: Marcelo Tosatti <mtosatti@redhat.com>
->>> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
->>> ---
->>>   arch/x86/kvm/lapic.c | 14 +++++++-------
->>>   1 file changed, 7 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
->>> index ae575c0..7cd95ea 100644
->>> --- a/arch/x86/kvm/lapic.c
->>> +++ b/arch/x86/kvm/lapic.c
->>> @@ -1452,7 +1452,7 @@ static void kvm_apic_inject_pending_timer_irqs(struct kvm_lapic *apic)
->>>   	}
->>>   }
->>>   
->>> -static void apic_timer_expired(struct kvm_lapic *apic)
->>> +static void apic_timer_expired(struct kvm_lapic *apic, bool can_pi_inject)
->>>   {
->>>   	struct kvm_vcpu *vcpu = apic->vcpu;
->>>   	struct swait_queue_head *q = &vcpu->wq;
->>> @@ -1464,7 +1464,7 @@ static void apic_timer_expired(struct kvm_lapic *apic)
->>>   	if (apic_lvtt_tscdeadline(apic) || ktimer->hv_timer_in_use)
->>>   		ktimer->expired_tscdeadline = ktimer->tscdeadline;
->>>   
->>> -	if (posted_interrupt_inject_timer(apic->vcpu)) {
->>> +	if (can_pi_inject && posted_interrupt_inject_timer(apic->vcpu)) {
->> Perhaps it should use a posted interrupt if kvm_arch_should_kick(vcpu),
->> i.e. just add kvm_arch_vcpu_should_kick(apic->vcpu) to
->> posted_interrupt_inject_timer?
+> kvm-unit-tests were adjusted to match bare metal behavior, but KVM
+> itself was not doing what bare metal does; fix that.
 > 
-> So do you mean not nohz_full setup? An external interrupt is incurred 
-> here and preemption timer is better.
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-No, I mean instead of adding can_pi_inject, just test
-kvm_arch_should_kick in posted_interrupt_inject_timer, skipping the PI
-if the vCPU is not running.  Instead just go down the normal path and
-the guest will get the interrupt by checking the timer-pending flag.
-
-Paolo
+Reported-by ?
