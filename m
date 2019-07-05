@@ -2,79 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 94242600FD
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 08:21:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8699660105
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 08:30:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727837AbfGEGVn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jul 2019 02:21:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53980 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727753AbfGEGVn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jul 2019 02:21:43 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 59B798762F;
-        Fri,  5 Jul 2019 06:21:43 +0000 (UTC)
-Received: from localhost (ovpn-116-51.ams2.redhat.com [10.36.116.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BDE68E9F8;
-        Fri,  5 Jul 2019 06:21:41 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Farhan Ali <alifm@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
-Subject: [PULL 1/1] vfio-ccw: Fix the conversion of Format-0 CCWs to Format-1
-Date:   Fri,  5 Jul 2019 08:21:32 +0200
-Message-Id: <20190705062132.20755-2-cohuck@redhat.com>
-In-Reply-To: <20190705062132.20755-1-cohuck@redhat.com>
-References: <20190705062132.20755-1-cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Fri, 05 Jul 2019 06:21:43 +0000 (UTC)
+        id S1727795AbfGEGaf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jul 2019 02:30:35 -0400
+Received: from mx57.baidu.com ([61.135.168.57]:33648 "EHLO
+        tc-sys-mailedm05.tc.baidu.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726004AbfGEGae (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Jul 2019 02:30:34 -0400
+X-Greylist: delayed 331 seconds by postgrey-1.27 at vger.kernel.org; Fri, 05 Jul 2019 02:30:34 EDT
+Received: from localhost (cp01-cos-dev01.cp01.baidu.com [10.92.119.46])
+        by tc-sys-mailedm05.tc.baidu.com (Postfix) with ESMTP id 898451EBA003;
+        Fri,  5 Jul 2019 14:24:49 +0800 (CST)
+From:   Li RongQing <lirongqing@baidu.com>
+To:     pbonzini@redhat.com, x86@kernel.org, kvm@vger.kernel.org,
+        vkuznets@redhat.com
+Subject: [PATCH][resend] KVM: fix error handling in svm_hardware_setup
+Date:   Fri,  5 Jul 2019 14:24:49 +0800
+Message-Id: <1562307889-4133-1-git-send-email-lirongqing@baidu.com>
+X-Mailer: git-send-email 1.7.1
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Eric Farman <farman@linux.ibm.com>
+rename svm_hardware_unsetup as svm_hardware_teardown, move
+it before svm_hardware_setup, and call it to free all memory
+if fail to setup in svm_hardware_setup, otherwise memory will
+be leaked
 
-When processing Format-0 CCWs, we use the "len" variable as the
-number of CCWs to convert to Format-1.  But that variable
-contains zero here, and is not a meaningful CCW count until
-ccwchain_calc_length() returns.  Since that routine requires and
-expects Format-1 CCWs to identify the chaining behavior, the
-format conversion must be done first.
+remove __exit attribute for it since it is called in __init
+function
 
-Convert the 2KB we copied even if it's more than we need.
-
-Fixes: 7f8e89a8f2fd ("vfio-ccw: Factor out the ccw0-to-ccw1 transition")
-Reported-by: Farhan Ali <alifm@linux.ibm.com>
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20190702180928.18113-1-farman@linux.ibm.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Li RongQing <lirongqing@baidu.com>
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- drivers/s390/cio/vfio_ccw_cp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/svm.c | 33 ++++++++++++++++-----------------
+ 1 file changed, 16 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-index a7b9dfd5b464..1d4c893ead23 100644
---- a/drivers/s390/cio/vfio_ccw_cp.c
-+++ b/drivers/s390/cio/vfio_ccw_cp.c
-@@ -431,7 +431,7 @@ static int ccwchain_handle_ccw(u32 cda, struct channel_program *cp)
+diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
+index a69eff0aa40b..b9e83a21e35f 100644
+--- a/arch/x86/kvm/svm.c
++++ b/arch/x86/kvm/svm.c
+@@ -1292,6 +1292,20 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
+ 				    control->pause_filter_count, old);
+ }
  
- 	/* Convert any Format-0 CCWs to Format-1 */
- 	if (!cp->orb.cmd.fmt)
--		convert_ccw0_to_ccw1(cp->guest_cp, len);
-+		convert_ccw0_to_ccw1(cp->guest_cp, CCWCHAIN_LEN_MAX);
++static void svm_hardware_teardown(void)
++{
++	int cpu;
++
++	if (svm_sev_enabled())
++		bitmap_free(sev_asid_bitmap);
++
++	for_each_possible_cpu(cpu)
++		svm_cpu_uninit(cpu);
++
++	__free_pages(pfn_to_page(iopm_base >> PAGE_SHIFT), IOPM_ALLOC_ORDER);
++	iopm_base = 0;
++}
++
+ static __init int svm_hardware_setup(void)
+ {
+ 	int cpu;
+@@ -1398,25 +1412,10 @@ static __init int svm_hardware_setup(void)
+ 	return 0;
  
- 	/* Count the CCWs in the current chain */
- 	len = ccwchain_calc_length(cda, cp);
+ err:
+-	__free_pages(iopm_pages, IOPM_ALLOC_ORDER);
+-	iopm_base = 0;
++	svm_hardware_teardown();
+ 	return r;
+ }
+ 
+-static __exit void svm_hardware_unsetup(void)
+-{
+-	int cpu;
+-
+-	if (svm_sev_enabled())
+-		bitmap_free(sev_asid_bitmap);
+-
+-	for_each_possible_cpu(cpu)
+-		svm_cpu_uninit(cpu);
+-
+-	__free_pages(pfn_to_page(iopm_base >> PAGE_SHIFT), IOPM_ALLOC_ORDER);
+-	iopm_base = 0;
+-}
+-
+ static void init_seg(struct vmcb_seg *seg)
+ {
+ 	seg->selector = 0;
+@@ -7151,7 +7150,7 @@ static struct kvm_x86_ops svm_x86_ops __ro_after_init = {
+ 	.cpu_has_kvm_support = has_svm,
+ 	.disabled_by_bios = is_disabled,
+ 	.hardware_setup = svm_hardware_setup,
+-	.hardware_unsetup = svm_hardware_unsetup,
++	.hardware_unsetup = svm_hardware_teardown,
+ 	.check_processor_compatibility = svm_check_processor_compat,
+ 	.hardware_enable = svm_hardware_enable,
+ 	.hardware_disable = svm_hardware_disable,
 -- 
-2.20.1
+2.16.2
 
