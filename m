@@ -2,89 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 15D6D605C8
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 14:14:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E507605D6
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 14:20:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727212AbfGEMOg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jul 2019 08:14:36 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:38338 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726505AbfGEMOg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jul 2019 08:14:36 -0400
-Received: by mail-wr1-f68.google.com with SMTP id p11so4215863wro.5;
-        Fri, 05 Jul 2019 05:14:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:subject:date:message-id;
-        bh=YWCq9LHp/N7/bCAEwSiCjpeKgXe91A7xdO5EBeT5qNo=;
-        b=DddSeVtcAHiOFI1GKWwgDQxmwKiNsHet8Xya9b69KEV1zIgD6L1wWTenwMtsGmyVrC
-         NpxNcpQ91pWP8mtMNB8Wl/3zwbhfXxdgqyDucSlnYEvFzA/+IuHG1DJ5dMcClMRMwhus
-         zelPU1PfnoVOsyGef8bTPU6L47noBQuRfNU9w88ZPg6VZvI0MZzY1fcZzqihLLii3UEH
-         13G5Ap2iQBhDfL42DpmtnCM6+LYwQP8Dm+NP7+w79C3DzsiINfiH8WGbSZ3NovYAa6g+
-         0ywce1UWx4sV2Lu8K2O4/jys/5rvNYFJ3inboI/vh4XA2+BxOb3YwQhRKTb76W2QQcmU
-         LaQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:subject:date:message-id;
-        bh=YWCq9LHp/N7/bCAEwSiCjpeKgXe91A7xdO5EBeT5qNo=;
-        b=Sa/qKZykpo5t9n07BQ2DgoxfTpn5Q+cb3lyJgeo6bdWMefUlLgG572rJ0qkRRh3P7C
-         tjnfk8XiBuORNreyNsq0yg465dEMXPvgiFtZMdVZNnVksPVWW7rJ9YhlukE5IEDZZ1B2
-         DRqHv2amyspkL3JmceOEPoLFG1TNEwFuMF56fzwSPqoT5TJUWTCmgrdRs9pHikgs0xEr
-         WKLLe0i5HsITaoQFHRvBT/KXh99O6Jmt84gv/WR8rJ55aKVcWn8a16aCxebFGfXjbbIx
-         t0/z5VzjGQV7TY4gur28o8mniOQEF5Y5l0kgiZDi6vOxsuerc9tZi3flNftTdFvEn2VJ
-         N3OQ==
-X-Gm-Message-State: APjAAAVGpga3vlmdD3CWJOdH1nN/UQ5MvU0Ll4M1B+ifGOfNYd8KvZLE
-        2wlB/k2u4jYq2IkqqNBSxG8cm2wppg4=
-X-Google-Smtp-Source: APXvYqxAPpdp9JtNRaOCMhTUrGE5InJ9RWwI6TW5HjOmqXw6RHHEuuvz7aPNuERMGDv2ZQnvdwLkMQ==
-X-Received: by 2002:a5d:6406:: with SMTP id z6mr3931535wru.280.1562328873969;
-        Fri, 05 Jul 2019 05:14:33 -0700 (PDT)
-Received: from 640k.lan ([93.56.166.5])
-        by smtp.gmail.com with ESMTPSA id b71sm6058378wmb.7.2019.07.05.05.14.32
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Jul 2019 05:14:33 -0700 (PDT)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH] KVM: LAPIC: ARBPRI is a reserved register for x2APIC
-Date:   Fri,  5 Jul 2019 14:14:32 +0200
-Message-Id: <1562328872-27659-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1727326AbfGEMUa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jul 2019 08:20:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38670 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725730AbfGEMU3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jul 2019 08:20:29 -0400
+Received: from localhost (deibp9eh1--blueice1n7.emea.ibm.com [195.212.29.161])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 706642147A;
+        Fri,  5 Jul 2019 12:20:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1562329229;
+        bh=FvcAYMrwn+ocFjV0CkPScRrtGx5+x9Q9eo+5jIIZC54=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=i5KD2kyqpd7Thrp5ooeCtvC5Zce8EDphZj3afgOlcx9TCyshFYKG6804h5b+7ZtCB
+         hEkAH5lZ4bm3sAGwQXvBSofHM+DYq6LkDYb6SWK+RvCC5HAfSjGHNgFGzMN5PhhjnV
+         /5BJgfRZduwmC3h6DR517XXGqMoSKGpYS+VewBCQ=
+Date:   Fri, 5 Jul 2019 14:20:24 +0200
+From:   Vasily Gorbik <gor@kernel.org>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Farhan Ali <alifm@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PULL 0/1] vfio-ccw fix for 5.3
+Message-ID: <your-ad-here.call-01562329224-ext-7594@work.hours>
+References: <20190705062132.20755-1-cohuck@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190705062132.20755-1-cohuck@redhat.com>
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm-unit-tests were adjusted to match bare metal behavior, but KVM
-itself was not doing what bare metal does; fix that.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/lapic.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index d6ca5c4f29f1..2e4470f2685a 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1318,7 +1318,7 @@ int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
- 	unsigned char alignment = offset & 0xf;
- 	u32 result;
- 	/* this bitmask has a bit cleared for each reserved register */
--	static const u64 rmask = 0x43ff01ffffffe70cULL;
-+	u64 rmask = 0x43ff01ffffffe70cULL;
- 
- 	if ((alignment + len) > 4) {
- 		apic_debug("KVM_APIC_READ: alignment error %x %d\n",
-@@ -1326,6 +1326,10 @@ int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
- 		return 1;
- 	}
- 
-+	/* ARBPRI is also reserved on x2APIC */
-+	if (apic_x2apic_mode(apic))
-+		rmask &= ~(1 << (APIC_ARBPRI >> 4));
-+
- 	if (offset > 0x3f0 || !(rmask & (1ULL << (offset >> 4)))) {
- 		apic_debug("KVM_APIC_READ: read reserved register %x\n",
- 			   offset);
--- 
-1.8.3.1
-
+On Fri, Jul 05, 2019 at 08:21:31AM +0200, Cornelia Huck wrote:
+> The following changes since commit 05f31e3bf6b34fe6e4922868d132f6455f81d5bf:
+> 
+>   s390: ap: kvm: Enable PQAP/AQIC facility for the guest (2019-07-02 16:00:28 +0200)
+> 
+> are available in the Git repository at:
+> 
+>   https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/vfio-ccw.git tags/vfio-ccw-20190705
+> 
+> for you to fetch changes up to c382cbc6dbf513d73cf896ad43a3789ad42c2e2f:
+> 
+>   vfio-ccw: Fix the conversion of Format-0 CCWs to Format-1 (2019-07-05 07:58:53 +0200)
+> 
+> ----------------------------------------------------------------
+> Fix a bug introduced in the refactoring.
+> 
+> ----------------------------------------------------------------
+> 
+> Eric Farman (1):
+>   vfio-ccw: Fix the conversion of Format-0 CCWs to Format-1
+> 
+>  drivers/s390/cio/vfio_ccw_cp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> -- 
+> 2.20.1
+> 
+Applied, thanks.
