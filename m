@@ -2,105 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 096E4601C4
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 09:52:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B346E60341
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2019 11:41:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728058AbfGEHwT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jul 2019 03:52:19 -0400
-Received: from mx2.suse.de ([195.135.220.15]:34922 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727455AbfGEHwT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jul 2019 03:52:19 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 5D76BACD4;
-        Fri,  5 Jul 2019 07:52:17 +0000 (UTC)
-Subject: Re: [PATCH 2/2] virtio_scsi: implement request batching
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jejb@linux.ibm.com, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, stefanha@redhat.com
-References: <20190530112811.3066-1-pbonzini@redhat.com>
- <20190530112811.3066-3-pbonzini@redhat.com>
-From:   Hannes Reinecke <hare@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=hare@suse.de; prefer-encrypt=mutual; keydata=
- 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
- azzYF4VRJsdl+d0MCaSy8mUh
-Message-ID: <ec1a4902-d661-3a63-2dca-ca7692e225ae@suse.de>
-Date:   Fri, 5 Jul 2019 09:52:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1728300AbfGEJlA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Jul 2019 05:41:00 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:41589 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728297AbfGEJlA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Jul 2019 05:41:00 -0400
+Received: by mail-pg1-f194.google.com with SMTP id q4so4060434pgj.8;
+        Fri, 05 Jul 2019 02:41:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=gErflyqehGD0sY8p/Fmz9ZhIWtAMGhTaOwLvVAXdYkQ=;
+        b=oBd6ONFXQPL1sC/m7kSQNNC4AGu1AnVJHpUuLq1hj+Jx6Jze/Dc29bIvEylmTA7JLZ
+         sslJWE8VclaRnWjs98KVbCeUWDmnJeKDnrvVignVkC17co4esfmHnQ+TnSMUVD2QHS8K
+         kv5c/eguiFujpRFACPnJpQYY/TuS8Xo/XrD7VtLqI1et7w4tFaF0IMSyxhsVGSrILCak
+         PLQxuX0sHT78Kbx4DMpSRAcxEP+Pmz7InIQL8vzTgYK6yr0DgkJV1ERGTGZlOQ5pnF8w
+         /paUhE5nG4TV2j0W3zJZ0obPkC8qSIs1KF/bOpR3caUbsad1ZKBE7WTfJ57QphdkPtTh
+         YHyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=gErflyqehGD0sY8p/Fmz9ZhIWtAMGhTaOwLvVAXdYkQ=;
+        b=mlVFw5PV0EynEIR6HOsHDmq6r1/GF/xeK0JF/P4AOqqVcyLYDPhfN4f48x/IUCbdND
+         vD49rx882UosJY7nbBZoU+yrBMKmsWiIBoq3ZYNEOsSSFTwYD/tFp9tvyoqLIpOYv9RQ
+         Cd7m8b8Dz/77DJGKnJeXHSJ1LxzV8ZKHDJxZTcn5c4QeglWT7CqjOEuIhd9AzB0Gmrb4
+         QckIbbDblxW+cFqpIT4+2kMcHx/uV2A5GC2wg/jem2ijDVsHXJV/f2J+Ym1/TfTm4BFG
+         AvQReZpXpMcEw1EnJg0mTEbOpt8l3B9XrkDDD9Xtvpyj1Q6Kuj+ozXQu4K4+BG4Y0/wQ
+         cn9g==
+X-Gm-Message-State: APjAAAVOU6m6g5a8wuUyuYMmRLRDW/pLREsiabvnU0N5waXfi/TNmqbD
+        yIAmS8vEsw7m3d5i4iGHCEmTvQerxSg=
+X-Google-Smtp-Source: APXvYqyEyy3haoucnzMEm3SvjxWvnWO7frvWk+0jC8LnlTLVN5QJBuxe6s3pUM46EV7SPaTeJ1BSRA==
+X-Received: by 2002:a63:2326:: with SMTP id j38mr4384426pgj.134.1562319659550;
+        Fri, 05 Jul 2019 02:40:59 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+        by smtp.googlemail.com with ESMTPSA id i1sm11298877pjt.3.2019.07.05.02.40.57
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Fri, 05 Jul 2019 02:40:59 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Subject: [PATCH] KVM: LAPIC: Reset timer_advance_ns to 1000 after adaptive tuning goes insane
+Date:   Fri,  5 Jul 2019 17:40:51 +0800
+Message-Id: <1562319651-6992-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-In-Reply-To: <20190530112811.3066-3-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=y
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 5/30/19 1:28 PM, Paolo Bonzini wrote:
-> Adding the command and kicking the virtqueue so far was done one after
-> another.  Make the kick optional, so that we can take into account SCMD_LAST.
-> We also need a commit_rqs callback to kick the device if blk-mq aborts
-> the submission before the last request is reached.
-> 
-> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  drivers/scsi/virtio_scsi.c | 55 +++++++++++++++++++++++++++-----------
->  1 file changed, 40 insertions(+), 15 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Cheers,
+Reset timer_advance_ns to the default value 1000ns after adaptive tuning 
+goes insane which can happen sporadically in product environment.
 
-Hannes
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/lapic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 05d8934..454d3dd 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1549,7 +1549,7 @@ static inline void adjust_lapic_timer_advance(struct kvm_vcpu *vcpu,
+ 	if (abs(advance_expire_delta) < LAPIC_TIMER_ADVANCE_ADJUST_DONE)
+ 		apic->lapic_timer.timer_advance_adjust_done = true;
+ 	if (unlikely(timer_advance_ns > 5000)) {
+-		timer_advance_ns = 0;
++		timer_advance_ns = 1000;
+ 		apic->lapic_timer.timer_advance_adjust_done = true;
+ 	}
+ 	apic->lapic_timer.timer_advance_ns = timer_advance_ns;
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
+2.7.4
+
