@@ -2,63 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E73160FC1
-	for <lists+kvm@lfdr.de>; Sat,  6 Jul 2019 12:05:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4524660FCA
+	for <lists+kvm@lfdr.de>; Sat,  6 Jul 2019 12:13:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725973AbfGFKFA convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Sat, 6 Jul 2019 06:05:00 -0400
-Received: from mx1.gabinetemilitar.go.gov.br ([177.69.118.33]:55819 "EHLO
-        webmail.palacio.go.gov.br" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725957AbfGFKE7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Jul 2019 06:04:59 -0400
-X-Greylist: delayed 596 seconds by postgrey-1.27 at vger.kernel.org; Sat, 06 Jul 2019 06:04:58 EDT
-Received: from localhost (localhost [127.0.0.1])
-        by webmail.palacio.go.gov.br (Postfix) with ESMTP id 6BDA0340AF3;
-        Sat,  6 Jul 2019 06:53:50 -0300 (BRT)
-Received: from webmail.palacio.go.gov.br ([127.0.0.1])
-        by localhost (webmail.palacio.go.gov.br [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id l327nIIDbqHo; Sat,  6 Jul 2019 06:53:50 -0300 (BRT)
-Received: from localhost (localhost [127.0.0.1])
-        by webmail.palacio.go.gov.br (Postfix) with ESMTP id C337A340AF7;
-        Sat,  6 Jul 2019 06:53:49 -0300 (BRT)
-X-Virus-Scanned: amavisd-new at palacio.go.gov.br
-Received: from webmail.palacio.go.gov.br ([127.0.0.1])
-        by localhost (webmail.palacio.go.gov.br [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 0L-QhXFzPSSq; Sat,  6 Jul 2019 06:53:49 -0300 (BRT)
-Received: from [100.118.76.173] (unknown [106.202.73.75])
-        by webmail.palacio.go.gov.br (Postfix) with ESMTPSA id 9486B340AF3;
-        Sat,  6 Jul 2019 06:53:27 -0300 (BRT)
-Content-Type: text/plain; charset="iso-8859-1"
+        id S1726012AbfGFKNX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 Jul 2019 06:13:23 -0400
+Received: from foss.arm.com ([217.140.110.172]:59624 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725962AbfGFKNX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 Jul 2019 06:13:23 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABF5728;
+        Sat,  6 Jul 2019 03:13:22 -0700 (PDT)
+Received: from why.lan (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 60AD03F703;
+        Sat,  6 Jul 2019 03:13:21 -0700 (PDT)
+From:   Marc Zyngier <marc.zyngier@arm.com>
+To:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu
+Cc:     Andre Przywara <Andre.Przywara@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [PATCH] KVM: arm/arm64: Initialise host's MPIDRs by reading the actual register
+Date:   Sat,  6 Jul 2019 11:13:11 +0100
+Message-Id: <20190706101311.15500-1-marc.zyngier@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Description: Mail message body
-Subject: =?utf-8?b?Q0jDmiDDnTs=?=
-To:     Recipients <Faleconosco@casacivil.go.gov.br>
-From:   Qu?n tr? h? th?ng <Faleconosco@casacivil.go.gov.br>
-Date:   Sat, 06 Jul 2019 15:23:01 +0530
-Reply-To: mailsss@mail2world.com
-Message-Id: <20190706095327.9486B340AF3@webmail.palacio.go.gov.br>
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-CHÚ Ý;
+As part of setting up the host context, we populate its
+MPIDR by using cpu_logical_map(). It turns out that contrary
+to arm64, cpu_logical_map() on 32bit ARM doesn't return the
+*full* MPIDR, but a truncated version.
 
-H?p thu c?a b?n dã vu?t quá gi?i h?n luu tr?, là 5 GB theo quy d?nh c?a qu?n tr? viên, ngu?i hi?n dang ch?y trên 10,9 GB, b?n không th? g?i ho?c nh?n thu m?i cho d?n khi b?n xác th?c l?i h?p thu c?a mình. Ð? xác nh?n l?i h?p thu c?a b?n, g?i thông tin sau dây:
+This leaves the host MPIDR slightly corrupted after the first
+run of a VM, since we won't correctly restore the MPIDR on
+exit. Oops.
 
-Tên:
-Tên dang nh?p:
-m?t kh?u:
-Xác nh?n m?t kh?u:
-E-mail:
-di?n tho?i:
+Since we cannot trust cpu_logical_map(), let's adopt a different
+strategy. We move the initialization of the host CPU context as
+part of the per-CPU initialization (which, in retrospect, makes
+a lot of sense), and directly read the MPIDR from the HW. This
+is guaranteed to work on both arm and arm64.
 
-N?u b?n không th? xác nh?n l?i h?p thu c?a mình, h?p thu c?a b?n s? b? vô hi?u hóa!
+Reported-by: Andre Przywara <Andre.Przywara@arm.com>
+Fixes: 32f139551954 ("arm/arm64: KVM: Statically configure the host's view of MPIDR")
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/include/asm/kvm_host.h   | 5 ++---
+ arch/arm64/include/asm/kvm_host.h | 5 ++---
+ virt/kvm/arm/arm.c                | 3 ++-
+ 3 files changed, 6 insertions(+), 7 deletions(-)
 
-Xin l?i vì s? b?t ti?n.
-Mã xác minh: en: 006,524.RU
-H? tr? k? thu?t thu © 2019
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index e74e8f408987..df515dff536d 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -147,11 +147,10 @@ struct kvm_host_data {
+ 
+ typedef struct kvm_host_data kvm_host_data_t;
+ 
+-static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt,
+-					     int cpu)
++static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
+ {
+ 	/* The host's MPIDR is immutable, so let's set it up at boot time */
+-	cpu_ctxt->cp15[c0_MPIDR] = cpu_logical_map(cpu);
++	cpu_ctxt->cp15[c0_MPIDR] = read_cpuid_mpidr();
+ }
+ 
+ struct vcpu_reset_state {
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index d9770daf3d7d..d1167fe71f9a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -484,11 +484,10 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+ 
+ DECLARE_PER_CPU(kvm_host_data_t, kvm_host_data);
+ 
+-static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt,
+-					     int cpu)
++static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
+ {
+ 	/* The host's MPIDR is immutable, so let's set it up at boot time */
+-	cpu_ctxt->sys_regs[MPIDR_EL1] = cpu_logical_map(cpu);
++	cpu_ctxt->sys_regs[MPIDR_EL1] = read_cpuid_mpidr();
+ }
+ 
+ void __kvm_enable_ssbs(void);
+diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
+index bd5c55916d0d..f149c79fd6ef 100644
+--- a/virt/kvm/arm/arm.c
++++ b/virt/kvm/arm/arm.c
+@@ -1332,6 +1332,8 @@ static void cpu_hyp_reset(void)
+ 
+ static void cpu_hyp_reinit(void)
+ {
++	kvm_init_host_cpu_context(&this_cpu_ptr(&kvm_host_data)->host_ctxt);
++
+ 	cpu_hyp_reset();
+ 
+ 	if (is_kernel_in_hyp_mode())
+@@ -1569,7 +1571,6 @@ static int init_hyp_mode(void)
+ 		kvm_host_data_t *cpu_data;
+ 
+ 		cpu_data = per_cpu_ptr(&kvm_host_data, cpu);
+-		kvm_init_host_cpu_context(&cpu_data->host_ctxt, cpu);
+ 		err = create_hyp_mappings(cpu_data, cpu_data + 1, PAGE_HYP);
+ 
+ 		if (err) {
+-- 
+2.20.1
 
-c?m on b?n
-Qu?n tr? h? th?ng.
