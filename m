@@ -2,31 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4524660FCA
-	for <lists+kvm@lfdr.de>; Sat,  6 Jul 2019 12:13:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 536D56130A
+	for <lists+kvm@lfdr.de>; Sat,  6 Jul 2019 23:38:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726012AbfGFKNX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 Jul 2019 06:13:23 -0400
-Received: from foss.arm.com ([217.140.110.172]:59624 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725962AbfGFKNX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Jul 2019 06:13:23 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ABF5728;
-        Sat,  6 Jul 2019 03:13:22 -0700 (PDT)
-Received: from why.lan (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 60AD03F703;
-        Sat,  6 Jul 2019 03:13:21 -0700 (PDT)
-From:   Marc Zyngier <marc.zyngier@arm.com>
-To:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     Andre Przywara <Andre.Przywara@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH] KVM: arm/arm64: Initialise host's MPIDRs by reading the actual register
-Date:   Sat,  6 Jul 2019 11:13:11 +0100
-Message-Id: <20190706101311.15500-1-marc.zyngier@arm.com>
+        id S1726934AbfGFVik (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 Jul 2019 17:38:40 -0400
+Received: from mail-lf1-f52.google.com ([209.85.167.52]:45676 "EHLO
+        mail-lf1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726714AbfGFVik (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 Jul 2019 17:38:40 -0400
+Received: by mail-lf1-f52.google.com with SMTP id u10so8382381lfm.12
+        for <kvm@vger.kernel.org>; Sat, 06 Jul 2019 14:38:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=eng.ucsd.edu; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=klb+7J069cJ1+W8hoxNmMJE/f3+e7sMU5jQjfpO6ZKA=;
+        b=gcNScJKAmpy1kf8vVcMzN+g1N9MS6ViUZVLp5nOG/S28mbRuaiwE0Uf6o3frgKibOB
+         v8swGHCOOVm5EdfB6Upb1A21DDOHapT3yw2xMYFr1tpLDFuBO70BnCV47hV7jb+Tvry2
+         8oqpD1UGNgUMKeAl+KHGVDlRN2er2rqQqR/5Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=klb+7J069cJ1+W8hoxNmMJE/f3+e7sMU5jQjfpO6ZKA=;
+        b=M3SD2WnuyKsURWIpzZzDxLCQXZUkksX2XAZCoxuLpMI/uxtfY4srEPy5y7dC6az8Ug
+         P6uahoHNlx08vFo3IZV0JS0C65gvXZvciOW3rXyLGeeA9ETxJnQSR7zZ0tZVuz/FDFHa
+         rDTIa5BC6qoS4CbU12RFghniX6LmkDptlqkfmbR3A0zW8AaVVQnh98C/1g07TRMNog/v
+         YbG+g1A5y/USIzqETvyW1MhzV0/IoDenHkoinoXSE/QTPXXtBkhrtz7jLDp+tBPlAJ65
+         OS9zI3qsBiLYyqGZzgQzsqRn6uBRcAfY+f3XDL9g41KiBL8jVL1wAs2POUGmLG+ani3N
+         aTKg==
+X-Gm-Message-State: APjAAAUo6a9NfvQPjUjA3V7F7vw9JUpaxc60BhYxXXEcDaT2acKFTwRB
+        URPAAA1D7W7CvhuICwcI5bUq0Q==
+X-Google-Smtp-Source: APXvYqwRcsj1CJEmIMUMPbBTnuoCBgtBVHN4Fk94h3PaTJLuEU3Zn3Xy7JrHphpeqZ2n3ekNC1yvSw==
+X-Received: by 2002:a19:ccc6:: with SMTP id c189mr4895103lfg.160.1562449117840;
+        Sat, 06 Jul 2019 14:38:37 -0700 (PDT)
+Received: from luke-XPS-13.home (77-255-206-190.adsl.inetia.pl. [77.255.206.190])
+        by smtp.gmail.com with ESMTPSA id j3sm1322449lfp.34.2019.07.06.14.38.34
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Sat, 06 Jul 2019 14:38:36 -0700 (PDT)
+From:   Luke Nowakowski-Krijger <lnowakow@eng.ucsd.edu>
+X-Google-Original-From: Luke Nowakowski-Krijger <lnowakow@neg.ucsd.edu>
+To:     linux-kernel-mentees@lists.linuxfoundation.org
+Cc:     Luke Nowakowski-Krijger <lnowakow@eng.ucsd.edu>,
+        pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] [PATCH 0/3] Documentation: virtual: convert files from .txt to
+Date:   Sat,  6 Jul 2019 14:38:12 -0700
+Message-Id: <cover.1562448500.git.lnowakow@eng.ucsd.edu>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -35,87 +59,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As part of setting up the host context, we populate its
-MPIDR by using cpu_logical_map(). It turns out that contrary
-to arm64, cpu_logical_map() on 32bit ARM doesn't return the
-*full* MPIDR, but a truncated version.
+From: Luke Nowakowski-Krijger <lnowakow@eng.ucsd.edu>
 
-This leaves the host MPIDR slightly corrupted after the first
-run of a VM, since we won't correctly restore the MPIDR on
-exit. Oops.
+Converted a few documents in virtual and virtual/kvm to .rst format.
+Also added toctree hooks wherever there were .rst files. Adding hooks to
+the main doc tree should be in another patch series once there are more
+files in the directory. 
 
-Since we cannot trust cpu_logical_map(), let's adopt a different
-strategy. We move the initialization of the host CPU context as
-part of the per-CPU initialization (which, in retrospect, makes
-a lot of sense), and directly read the MPIDR from the HW. This
-is guaranteed to work on both arm and arm64.
+After confirming with the appropriate lists that all the 
+Documentation/virtual/* files are not obsolete I will continue
+converting the rest of the .txt files to .rst. 
 
-Reported-by: Andre Przywara <Andre.Przywara@arm.com>
-Fixes: 32f139551954 ("arm/arm64: KVM: Statically configure the host's view of MPIDR")
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/include/asm/kvm_host.h   | 5 ++---
- arch/arm64/include/asm/kvm_host.h | 5 ++---
- virt/kvm/arm/arm.c                | 3 ++-
- 3 files changed, 6 insertions(+), 7 deletions(-)
+Luke Nowakowski-Krijger (3):
+  Documentation: virtual: Add toctree hooks
+  Documentation: kvm: Convert cpuid.txt to .rst
+  Documentation: virtual: Convert paravirt_ops.txt to .rst
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index e74e8f408987..df515dff536d 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -147,11 +147,10 @@ struct kvm_host_data {
- 
- typedef struct kvm_host_data kvm_host_data_t;
- 
--static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt,
--					     int cpu)
-+static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
- {
- 	/* The host's MPIDR is immutable, so let's set it up at boot time */
--	cpu_ctxt->cp15[c0_MPIDR] = cpu_logical_map(cpu);
-+	cpu_ctxt->cp15[c0_MPIDR] = read_cpuid_mpidr();
- }
- 
- struct vcpu_reset_state {
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d9770daf3d7d..d1167fe71f9a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -484,11 +484,10 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
- 
- DECLARE_PER_CPU(kvm_host_data_t, kvm_host_data);
- 
--static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt,
--					     int cpu)
-+static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
- {
- 	/* The host's MPIDR is immutable, so let's set it up at boot time */
--	cpu_ctxt->sys_regs[MPIDR_EL1] = cpu_logical_map(cpu);
-+	cpu_ctxt->sys_regs[MPIDR_EL1] = read_cpuid_mpidr();
- }
- 
- void __kvm_enable_ssbs(void);
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index bd5c55916d0d..f149c79fd6ef 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -1332,6 +1332,8 @@ static void cpu_hyp_reset(void)
- 
- static void cpu_hyp_reinit(void)
- {
-+	kvm_init_host_cpu_context(&this_cpu_ptr(&kvm_host_data)->host_ctxt);
-+
- 	cpu_hyp_reset();
- 
- 	if (is_kernel_in_hyp_mode())
-@@ -1569,7 +1571,6 @@ static int init_hyp_mode(void)
- 		kvm_host_data_t *cpu_data;
- 
- 		cpu_data = per_cpu_ptr(&kvm_host_data, cpu);
--		kvm_init_host_cpu_context(&cpu_data->host_ctxt, cpu);
- 		err = create_hyp_mappings(cpu_data, cpu_data + 1, PAGE_HYP);
- 
- 		if (err) {
+ Documentation/virtual/index.rst               | 18 ++++
+ Documentation/virtual/kvm/cpuid.rst           | 99 +++++++++++++++++++
+ Documentation/virtual/kvm/cpuid.txt           | 83 ----------------
+ Documentation/virtual/kvm/index.rst           | 12 +++
+ .../{paravirt_ops.txt => paravirt_ops.rst}    | 19 ++--
+ 5 files changed, 140 insertions(+), 91 deletions(-)
+ create mode 100644 Documentation/virtual/index.rst
+ create mode 100644 Documentation/virtual/kvm/cpuid.rst
+ delete mode 100644 Documentation/virtual/kvm/cpuid.txt
+ create mode 100644 Documentation/virtual/kvm/index.rst
+ rename Documentation/virtual/{paravirt_ops.txt => paravirt_ops.rst} (65%)
+
 -- 
 2.20.1
 
