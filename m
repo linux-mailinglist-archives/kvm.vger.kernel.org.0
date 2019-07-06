@@ -2,53 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id CBB3260E82
-	for <lists+kvm@lfdr.de>; Sat,  6 Jul 2019 04:35:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8450A60F76
+	for <lists+kvm@lfdr.de>; Sat,  6 Jul 2019 10:32:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726907AbfGFCfH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Jul 2019 22:35:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48460 "EHLO mail.kernel.org"
+        id S1725973AbfGFIc0 convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 6 Jul 2019 04:32:26 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:42402 "EHLO mxct.zte.com.cn"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726722AbfGFCfG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Jul 2019 22:35:06 -0400
-Subject: Re: [GIT PULL] Final KVM changes for 5.2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1562380505;
-        bh=gxOXfyqZ4mCJRsIHx8JOT5PxKHa87DM2FX7okPEq6Bw=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=cK+WcEZvB8dx8D0DWLz+pgDxEn4NlJ85xwB4qCKo/BhwPtRYaNNhxVA9RuH2bsXdh
-         oX+hRmFEeAxXAUmZNDuosOgXnrgq/+uQv8l/WBIqZmqDeiCUq0rgg+LIPibIprtF4e
-         USVAbMpA0+ZRIjXIVSrhUnlbeLWd3ZRJR1/l+bSU=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <1562358570-30670-1-git-send-email-pbonzini@redhat.com>
-References: <1562358570-30670-1-git-send-email-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <1562358570-30670-1-git-send-email-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git
- tags/for-linus
-X-PR-Tracked-Commit-Id: e644fa18e2ffc8895ca30dade503ae10128573a6
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 9fdb86c8cf9ae201d97334ecc2d1918800cac424
-Message-Id: <156238050551.5324.18308686881980395353.pr-tracker-bot@kernel.org>
-Date:   Sat, 06 Jul 2019 02:35:05 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        rkrcmar@redhat.com, kvm@vger.kernel.org
+        id S1725900AbfGFIc0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 Jul 2019 04:32:26 -0400
+Received: from mse-fl2.zte.com.cn (unknown [10.30.14.239])
+        by Forcepoint Email with ESMTPS id A9F99EBE0698D4D08D85;
+        Sat,  6 Jul 2019 16:32:19 +0800 (CST)
+Received: from notes_smtp.zte.com.cn ([10.30.1.239])
+        by mse-fl2.zte.com.cn with ESMTP id x668Vowc018517;
+        Sat, 6 Jul 2019 16:31:50 +0800 (GMT-8)
+        (envelope-from wang.yi59@zte.com.cn)
+Received: from fox-host8.localdomain ([10.74.120.8])
+          by szsmtp06.zte.com.cn (Lotus Domino Release 8.5.3FP6)
+          with ESMTP id 2019070616323549-2128101 ;
+          Sat, 6 Jul 2019 16:32:35 +0800 
+From:   Yi Wang <wang.yi59@zte.com.cn>
+To:     pbonzini@redhat.com
+Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
+        wang.yi59@zte.com.cn, up2wing@gmail.com, wang.liang82@zte.com.cn
+Subject: [PATCH] kvm: x86: Fix -Wmissing-prototypes warnings
+Date:   Sat, 6 Jul 2019 16:29:50 +0800
+Message-Id: <1562401790-49030-1-git-send-email-wang.yi59@zte.com.cn>
+X-Mailer: git-send-email 1.8.3.1
+MIME-Version: 1.0
+X-MIMETrack: Itemize by SMTP Server on SZSMTP06/server/zte_ltd(Release 8.5.3FP6|November
+ 21, 2013) at 2019-07-06 16:32:35,
+        Serialize by Router on notes_smtp/zte_ltd(Release 9.0.1FP7|August  17, 2016) at
+ 2019-07-06 16:31:57
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+X-MAIL: mse-fl2.zte.com.cn x668Vowc018517
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Fri,  5 Jul 2019 22:29:30 +0200:
+We get a warning when build kernel W=1:
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+arch/x86/kvm/../../../virt/kvm/eventfd.c:48:1: warning: no previous prototype for ‘kvm_arch_irqfd_allowed’ [-Wmissing-prototypes]
+ kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
+ ^
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/9fdb86c8cf9ae201d97334ecc2d1918800cac424
+The reason is kvm_arch_irqfd_allowed is declared in arch/x86/kvm/irq.h,
+which is not included by eventfd.c. Remove the declaration to kvm_host.h
+can fix this.
 
-Thank you!
+Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+---
+ arch/x86/kvm/irq.h       | 1 -
+ include/linux/kvm_host.h | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
+index d6519a3..7c6233d 100644
+--- a/arch/x86/kvm/irq.h
++++ b/arch/x86/kvm/irq.h
+@@ -102,7 +102,6 @@ static inline int irqchip_in_kernel(struct kvm *kvm)
+ 	return mode != KVM_IRQCHIP_NONE;
+ }
+ 
+-bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
+ void kvm_inject_pending_timer_irqs(struct kvm_vcpu *vcpu);
+ void kvm_inject_apic_timer_irqs(struct kvm_vcpu *vcpu);
+ void kvm_apic_nmi_wd_deliver(struct kvm_vcpu *vcpu);
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index d1ad38a..5f04005 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -990,6 +990,7 @@ void kvm_unregister_irq_ack_notifier(struct kvm *kvm,
+ 				   struct kvm_irq_ack_notifier *kian);
+ int kvm_request_irq_source_id(struct kvm *kvm);
+ void kvm_free_irq_source_id(struct kvm *kvm, int irq_source_id);
++bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
+ 
+ /*
+  * search_memslots() and __gfn_to_memslot() are here because they are
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+1.8.3.1
+
