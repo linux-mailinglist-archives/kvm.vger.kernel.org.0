@@ -2,79 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E85666136E
-	for <lists+kvm@lfdr.de>; Sun,  7 Jul 2019 03:19:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F019861444
+	for <lists+kvm@lfdr.de>; Sun,  7 Jul 2019 09:41:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727180AbfGGBTb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 Jul 2019 21:19:31 -0400
-Received: from mail-wr1-f50.google.com ([209.85.221.50]:33601 "EHLO
-        mail-wr1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727003AbfGGBTb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Jul 2019 21:19:31 -0400
-Received: by mail-wr1-f50.google.com with SMTP id n9so13435857wru.0
-        for <kvm@vger.kernel.org>; Sat, 06 Jul 2019 18:19:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=mHGaMIkIHgR5W5GBE4MbBOlXpjzscLPMPDa9lxC5WZ0=;
-        b=X7ShMRw9E11Qqa0KY7/Efwg1OYn5A5SFM9xhQ4zfzva+zdqj49Ma7wcqV7mIhLmZ9R
-         suQMn3NgaY8SVs2PR/uhI+/lfhYFnUQM+1EFf2aPw8BrRfI0NS5uzNo7CRtI2arkC/R3
-         f8PJwPdZbKMcEVFVbOfhZWy9iDkj5LI+7Ol/0bi+yER+3NZUTjOYezEqACSxZ5JPCWRE
-         GtXQBN3LOs22oPQDDnhs78jkc8TbWehbrIkfl1eCB9gRBoqN2Yrep4Lyha4ctZ16xR17
-         cYf5PP/WaTSVPoI1uFdcEK0XodseFdK4NcarXxLqrdEWTICduEwGTR+kR71GVSe8HJVB
-         qwpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=mHGaMIkIHgR5W5GBE4MbBOlXpjzscLPMPDa9lxC5WZ0=;
-        b=HANwfKWIqSySa4VIpSMt0cUIsmR2semoRsMYnFhpLT0KWqpeZTBe4/UWdW6498k8Ff
-         7pYukQmgM6jxrAdvOTJSTtXdED4waLFuH75qMcDhbYyl/1KQUhb/j0Yz6dqzgLGeo4FC
-         7dJtTeLixibEEZ5Y5tLUIU+bzygUUhAb4JRuWFJgwqLkQAjahjQtX4wp/ultcCFiV7Wj
-         gC7L73qGtc1nlPysx17d3YWypC3GGd93yHr9H+/nKMKYKpAR+1DQMDVNYQ0OQ25aXLbO
-         Ek18i7/P+phWq3Kc83220vag+eaX9aTSyLiJ/vb+evnY9QiOiCRYLePweGL1gIyHG0aP
-         dnig==
-X-Gm-Message-State: APjAAAXcvCSmf1/VE6h2eFjiyNeFydIweXGoGVfOAgWHKYrvEsjgh9d3
-        okgPGZyawLTOh5fXlg67yVacH6WX4wwLUobPszgVFMD2
-X-Google-Smtp-Source: APXvYqy5h3w+hBaWCn9KCSqxcfKxtt4AW/rylPotZEwuHbVmm89HPZpyuhfCP22l2POX7oWEIiylFzQWffqdgtcE5j8=
-X-Received: by 2002:adf:db12:: with SMTP id s18mr10235515wri.335.1562462368644;
- Sat, 06 Jul 2019 18:19:28 -0700 (PDT)
+        id S1726742AbfGGHle (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Jul 2019 03:41:34 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:36754 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726191AbfGGHle (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Jul 2019 03:41:34 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x677d3tn162955;
+        Sun, 7 Jul 2019 07:41:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2018-07-02; bh=Ya8c2WvPLtn5i5rAFBSXIiY+pNSri0h+wqokQKn4M8g=;
+ b=IhcD754gRijbmoNazIKXQOFECvsm6ErDQFSGM1YDoMZj//gvpryuWHjixLI9tAZIk9tR
+ QhmjCIb+oX9zRUTYDnfXtgUYcQ8ZQL8j207UljAvcN+eQaoLKjJcQqi0XqZyD/yG9RZ+
+ MLqtbIJoZqNcSCGGOY84qb6yB3jxteVgQj01ZkQLpM43QTd5Ia67oZl3ZRSIUCEeMHTN
+ jZLDukOObloM1uIvaHC71912DxdU7xPt7H7XpZamgtlOFIQUHn+C+slSm3eo9p+o30hu
+ LlmAcLqoD7XFUizSpb7kfBeOzqTx+9/wHPBAwaUt7/T9BCnK611dMBxlxs6baNgPEG9W ow== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 2tjk2taay9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 07 Jul 2019 07:41:22 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x677bulI058158;
+        Sun, 7 Jul 2019 07:39:22 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 2tjgrt3x1y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sun, 07 Jul 2019 07:39:22 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x677dLBt014572;
+        Sun, 7 Jul 2019 07:39:21 GMT
+Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sun, 07 Jul 2019 07:39:20 +0000
+From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     rkrcmar@redhat.com, pbonzini@redhat.com, jmattson@google.com
+Subject: [PATCH 0/5] KVM: nVMX: Skip vmentry checks that are necessary only if VMCS12 is dirty
+Date:   Sun,  7 Jul 2019 03:11:42 -0400
+Message-Id: <20190707071147.11651-1-krish.sadhukhan@oracle.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-From:   Jidong Xiao <jidong.xiao@gmail.com>
-Date:   Sat, 6 Jul 2019 19:20:31 -0600
-Message-ID: <CAG4AFWag_Q44SetzaZBpD8963NG-H9ajc8GHq07zVv_xaE9WKA@mail.gmail.com>
-Subject: Nested virtual machine introspection
-To:     KVM <kvm@vger.kernel.org>, qemu-devel <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9310 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=319
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907070104
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9310 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=367 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907070104
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+The following functions,
 
-We are working on a project where we need to explore the virtual
-machine introspection technique in a nested environment. More
-specifically, we want to know if from L0, we can reconstruct the
-process list of L2. And to begin with, we just want to explore a
-relatively simple case, i.e., only one virtual machine at L1, and only
-one virtual machine at L2.
+	nested_vmx_check_controls
+	nested_vmx_check_host_state
+	nested_vmx_check_guest_state
 
-Several studies have shown that from L0, people can reconstruct the
-process list of L1. For example, in the context of Qemu/KVM, the
-process linked list of L1 basically is existing in the L1's kernel
-space. And in Qemu, the function cpu_memory_rw_debug() allows us to
-access the virtual memory of L1. With the help of this function, we
-will be able to scan L1's kernel space thus reconstruct the process
-linked list.
+do a number of vmentry checks for VMCS12. However, not all of these checks need
+to be executed on every vmentry. This patchset makes some of these vmentry
+checks optional based on the state of VMCS12 in that if VMCS12 is dirty, only
+then the checks will be executed. This will reduce performance impact on
+vmentry of nested guests.
 
-Now considering there is L2, can we still use cpu_memory_rw_debug() to
-scan somewhere and find out L2's process linked list? We have tried,
-but it doesn't work. Any hints on this? Like where exactly shall we
-search?
 
-We have been stuck in here for quite a while, any suggestions would be
-truly appreciated.
+[PATCH 1/5] KVM: nVMX: Skip VM-Execution Control vmentry checks that are
+[PATCH 2/5] KVM: nVMX: Skip VM-Exit Control vmentry checks that are
+[PATCH 3/5] KVM: nVMX: Skip VM-Entry Control checks that are necessary
+[PATCH 4/5] KVM: nVMX: Skip Host State Area vmentry checks that are
+[PATCH 5/5] KVM: nVMX: Skip Guest State Area vmentry checks that are
 
-Thanks!
+ arch/x86/kvm/vmx/nested.c | 149 ++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 111 insertions(+), 38 deletions(-)
 
--Jidong
+Krish Sadhukhan (5):
+      nVMX: Skip VM-Execution Control vmentry checks that are necessary only if VMCS12 is dirty
+      nVMX: Skip VM-Exit Control vmentry checks that are necessary only if VMCS12 is dirty
+      nVMX: Skip VM-Entry Control checks that are necessary only if VMCS12 is dirty
+      nVMX: Skip Host State Area vmentry checks that are necessary only if VMCS12 is dirty
+      nVMX: Skip Guest State Area vmentry checks that are necessary only if VMCS12 is dirty
+
