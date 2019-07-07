@@ -2,117 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D6DA61313
-	for <lists+kvm@lfdr.de>; Sat,  6 Jul 2019 23:39:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E85666136E
+	for <lists+kvm@lfdr.de>; Sun,  7 Jul 2019 03:19:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727180AbfGFVjG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 Jul 2019 17:39:06 -0400
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:41599 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727147AbfGFVi7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Jul 2019 17:38:59 -0400
-Received: by mail-lj1-f195.google.com with SMTP id d24so3227686ljg.8
-        for <kvm@vger.kernel.org>; Sat, 06 Jul 2019 14:38:58 -0700 (PDT)
+        id S1727180AbfGGBTb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 6 Jul 2019 21:19:31 -0400
+Received: from mail-wr1-f50.google.com ([209.85.221.50]:33601 "EHLO
+        mail-wr1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727003AbfGGBTb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 Jul 2019 21:19:31 -0400
+Received: by mail-wr1-f50.google.com with SMTP id n9so13435857wru.0
+        for <kvm@vger.kernel.org>; Sat, 06 Jul 2019 18:19:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=eng.ucsd.edu; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Bfvjrsks1RUnIEvn0hCGuNZczvVTBiXDr5mImW45S1o=;
-        b=T5hJy5VwX4Yi2YSs8M9tdGzLdBr0DMzcD1H8KQDcqt5tlOuObylrEK9pxa6ls7RlSu
-         uDzE1ESX3c8T3+wOaOXscu4VM6nFpw0hphU7ffrU8D5F/sMc5mPDcjVYL1abYK4phRFo
-         C7WRF2uKjvUDmxWY8qj/AD6KhfBFQKaWL0mjE=
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=mHGaMIkIHgR5W5GBE4MbBOlXpjzscLPMPDa9lxC5WZ0=;
+        b=X7ShMRw9E11Qqa0KY7/Efwg1OYn5A5SFM9xhQ4zfzva+zdqj49Ma7wcqV7mIhLmZ9R
+         suQMn3NgaY8SVs2PR/uhI+/lfhYFnUQM+1EFf2aPw8BrRfI0NS5uzNo7CRtI2arkC/R3
+         f8PJwPdZbKMcEVFVbOfhZWy9iDkj5LI+7Ol/0bi+yER+3NZUTjOYezEqACSxZ5JPCWRE
+         GtXQBN3LOs22oPQDDnhs78jkc8TbWehbrIkfl1eCB9gRBoqN2Yrep4Lyha4ctZ16xR17
+         cYf5PP/WaTSVPoI1uFdcEK0XodseFdK4NcarXxLqrdEWTICduEwGTR+kR71GVSe8HJVB
+         qwpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Bfvjrsks1RUnIEvn0hCGuNZczvVTBiXDr5mImW45S1o=;
-        b=ITvux0c1Y4x3SP2Hn/aZRFSnKk7pdzM2wSUR4K2SFcjt2AaSsxFxLRLInIveT7x4nw
-         JWxBvVUacjwJFBEimHkHlGKPWJx6slJFx/dr4gis70xKHiiVj9fixDolq29oHwjfquyR
-         DiybKPkx8W0cpyaCNcirnPYbxEqlwzPGsO4K+ed+NbxvsxzG6vaPr45QwJp2cSL9WJ9F
-         GC1NUBFxT/3xA0/FsFGlJ/Q75fsDlSHFlA0hRL/5I5A36J19yXB9XPdrfzIWFr1ObiuI
-         EqHKczBdUXwRdSA8azXC08V+2jYu5zhePhvUdc2BU88KryqzM9Nq2sV3o/5uJIuEEAVJ
-         RYKQ==
-X-Gm-Message-State: APjAAAU5km9ImNbEi6bYdmmqV2JPjmw3eGfmxZ8ZcT00yn3i9nUIWxog
-        dwtKIyx+L1M0eSgsaEYT9w3pEo6rBqHoDg==
-X-Google-Smtp-Source: APXvYqwpQ+/j2fYajARlIcrAGWPhBHN6vqvnRmqCuuQr+jB2jWY16xCq3+XpE3CneUnHa1lfsCd9kQ==
-X-Received: by 2002:a2e:8e90:: with SMTP id z16mr5892942ljk.4.1562449137491;
-        Sat, 06 Jul 2019 14:38:57 -0700 (PDT)
-Received: from luke-XPS-13.home (77-255-206-190.adsl.inetia.pl. [77.255.206.190])
-        by smtp.gmail.com with ESMTPSA id j3sm1322449lfp.34.2019.07.06.14.38.55
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Sat, 06 Jul 2019 14:38:57 -0700 (PDT)
-From:   Luke Nowakowski-Krijger <lnowakow@eng.ucsd.edu>
-X-Google-Original-From: Luke Nowakowski-Krijger <lnowakow@neg.ucsd.edu>
-To:     linux-kernel-mentees@lists.linuxfoundation.org
-Cc:     Luke Nowakowski-Krijger <lnowakow@eng.ucsd.edu>,
-        pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] Documentation: virtual: Convert paravirt_ops.txt to .rst
-Date:   Sat,  6 Jul 2019 14:38:15 -0700
-Message-Id: <90496dad48588db8822f89b120c7cf2d3ce12078.1562448500.git.lnowakow@eng.ucsd.edu>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <cover.1562448500.git.lnowakow@eng.ucsd.edu>
-References: <cover.1562448500.git.lnowakow@eng.ucsd.edu>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=mHGaMIkIHgR5W5GBE4MbBOlXpjzscLPMPDa9lxC5WZ0=;
+        b=HANwfKWIqSySa4VIpSMt0cUIsmR2semoRsMYnFhpLT0KWqpeZTBe4/UWdW6498k8Ff
+         7pYukQmgM6jxrAdvOTJSTtXdED4waLFuH75qMcDhbYyl/1KQUhb/j0Yz6dqzgLGeo4FC
+         7dJtTeLixibEEZ5Y5tLUIU+bzygUUhAb4JRuWFJgwqLkQAjahjQtX4wp/ultcCFiV7Wj
+         gC7L73qGtc1nlPysx17d3YWypC3GGd93yHr9H+/nKMKYKpAR+1DQMDVNYQ0OQ25aXLbO
+         Ek18i7/P+phWq3Kc83220vag+eaX9aTSyLiJ/vb+evnY9QiOiCRYLePweGL1gIyHG0aP
+         dnig==
+X-Gm-Message-State: APjAAAXcvCSmf1/VE6h2eFjiyNeFydIweXGoGVfOAgWHKYrvEsjgh9d3
+        okgPGZyawLTOh5fXlg67yVacH6WX4wwLUobPszgVFMD2
+X-Google-Smtp-Source: APXvYqy5h3w+hBaWCn9KCSqxcfKxtt4AW/rylPotZEwuHbVmm89HPZpyuhfCP22l2POX7oWEIiylFzQWffqdgtcE5j8=
+X-Received: by 2002:adf:db12:: with SMTP id s18mr10235515wri.335.1562462368644;
+ Sat, 06 Jul 2019 18:19:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Jidong Xiao <jidong.xiao@gmail.com>
+Date:   Sat, 6 Jul 2019 19:20:31 -0600
+Message-ID: <CAG4AFWag_Q44SetzaZBpD8963NG-H9ajc8GHq07zVv_xaE9WKA@mail.gmail.com>
+Subject: Nested virtual machine introspection
+To:     KVM <kvm@vger.kernel.org>, qemu-devel <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Luke Nowakowski-Krijger <lnowakow@eng.ucsd.edu>
+Hi,
 
-Convert paravirt_opts.txt to .rst format to be able to be parsed by
-sphinx. 
+We are working on a project where we need to explore the virtual
+machine introspection technique in a nested environment. More
+specifically, we want to know if from L0, we can reconstruct the
+process list of L2. And to begin with, we just want to explore a
+relatively simple case, i.e., only one virtual machine at L1, and only
+one virtual machine at L2.
 
-Made some minor spacing and formatting corrections to make defintions
-much more clear and easy to read. 
+Several studies have shown that from L0, people can reconstruct the
+process list of L1. For example, in the context of Qemu/KVM, the
+process linked list of L1 basically is existing in the L1's kernel
+space. And in Qemu, the function cpu_memory_rw_debug() allows us to
+access the virtual memory of L1. With the help of this function, we
+will be able to scan L1's kernel space thus reconstruct the process
+linked list.
 
-Signed-off-by: Luke Nowakowski-Krijger <lnowakow@eng.ucsd.edu>
----
- .../{paravirt_ops.txt => paravirt_ops.rst}    | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
- rename Documentation/virtual/{paravirt_ops.txt => paravirt_ops.rst} (65%)
+Now considering there is L2, can we still use cpu_memory_rw_debug() to
+scan somewhere and find out L2's process linked list? We have tried,
+but it doesn't work. Any hints on this? Like where exactly shall we
+search?
 
-diff --git a/Documentation/virtual/paravirt_ops.txt b/Documentation/virtual/paravirt_ops.rst
-similarity index 65%
-rename from Documentation/virtual/paravirt_ops.txt
-rename to Documentation/virtual/paravirt_ops.rst
-index d4881c00e339..6b789d27cead 100644
---- a/Documentation/virtual/paravirt_ops.txt
-+++ b/Documentation/virtual/paravirt_ops.rst
-@@ -1,3 +1,6 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+============
- Paravirt_ops
- ============
- 
-@@ -18,15 +21,15 @@ at boot time.
- pv_ops operations are classified into three categories:
- 
- - simple indirect call
--  These operations correspond to high level functionality where it is
--  known that the overhead of indirect call isn't very important.
-+   These operations correspond to high level functionality where it is
-+   known that the overhead of indirect call isn't very important.
- 
- - indirect call which allows optimization with binary patch
--  Usually these operations correspond to low level critical instructions. They
--  are called frequently and are performance critical. The overhead is
--  very important.
-+   Usually these operations correspond to low level critical instructions. They
-+   are called frequently and are performance critical. The overhead is
-+   very important.
- 
- - a set of macros for hand written assembly code
--  Hand written assembly codes (.S files) also need paravirtualization
--  because they include sensitive instructions or some of code paths in
--  them are very performance critical.
-+   Hand written assembly codes (.S files) also need paravirtualization
-+   because they include sensitive instructions or some of code paths in
-+   them are very performance critical.
--- 
-2.20.1
+We have been stuck in here for quite a while, any suggestions would be
+truly appreciated.
 
+Thanks!
+
+-Jidong
