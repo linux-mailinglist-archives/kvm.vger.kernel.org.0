@@ -2,120 +2,332 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B79561442
-	for <lists+kvm@lfdr.de>; Sun,  7 Jul 2019 09:39:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B66661554
+	for <lists+kvm@lfdr.de>; Sun,  7 Jul 2019 17:03:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725808AbfGGHjt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 7 Jul 2019 03:39:49 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:43890 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726705AbfGGHjs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 7 Jul 2019 03:39:48 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x677cXIg175016;
-        Sun, 7 Jul 2019 07:39:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2018-07-02;
- bh=fRVAMtzp3zOS3FgUa85hrL6mViG9ufwtVo8zTnt+bos=;
- b=DbcYqz3P2sQ8HZeu79VKWvjvq97/oC4ZERRvKMaZ4t6SuN0UuTuKKAWafUDfFflSGSNe
- sO2GdbFsnxiYmshmgnWtRzmkaaEMyDoGIa0/PTblImf8iU4JsYTpmmofwZkgUSe75yju
- 4Xzbe/MxyrLTVWW03XiTNz4KBUcvIvky6uziVx+sG1noB/lIUJvBxEzcGAdvFLXnRrZc
- 2hdL9uX+oIzotOCqn8wqmTDaq/CH4x4AD1TShg8Mklkc46lB8V+qObDSjo76ofZ9wRNQ
- QsWGPgxMb0Ejv5TRcVZiMltRB6DTtzB5eJcvJQLelunlPYwpeC5skFmxuXSENX/JvXKf jQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2tjm9qa8ae-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 07 Jul 2019 07:39:25 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x677c8hM180642;
-        Sun, 7 Jul 2019 07:39:24 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 2tjhpc39s2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 07 Jul 2019 07:39:24 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x677dNpN023828;
-        Sun, 7 Jul 2019 07:39:23 GMT
-Received: from ban25x6uut29.us.oracle.com (/10.153.73.29)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 07 Jul 2019 07:39:23 +0000
-From:   Krish Sadhukhan <krish.sadhukhan@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     rkrcmar@redhat.com, pbonzini@redhat.com, jmattson@google.com
-Subject: [PATCH 5/5] KVM: nVMX: Skip Guest State Area vmentry checks that are necessary only if VMCS12 is dirty
-Date:   Sun,  7 Jul 2019 03:11:47 -0400
-Message-Id: <20190707071147.11651-6-krish.sadhukhan@oracle.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190707071147.11651-1-krish.sadhukhan@oracle.com>
-References: <20190707071147.11651-1-krish.sadhukhan@oracle.com>
+        id S1726989AbfGGPDJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 7 Jul 2019 11:03:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40584 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725928AbfGGPDI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Jul 2019 11:03:08 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0E035308792F;
+        Sun,  7 Jul 2019 15:02:59 +0000 (UTC)
+Received: from [10.36.116.46] (ovpn-116-46.ams2.redhat.com [10.36.116.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A4AE519C79;
+        Sun,  7 Jul 2019 15:02:49 +0000 (UTC)
+Subject: Re: [PATCH v7 1/6] vfio/type1: Introduce iova list and add iommu
+ aperture validity check
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linuxarm@huawei.com,
+        john.garry@huawei.com, xuwei5@hisilicon.com, kevin.tian@intel.com
+References: <20190626151248.11776-1-shameerali.kolothum.thodi@huawei.com>
+ <20190626151248.11776-2-shameerali.kolothum.thodi@huawei.com>
+From:   Auger Eric <eric.auger@redhat.com>
+Message-ID: <9ae8755a-9a2a-da76-e0c1-0f36f75ec2b3@redhat.com>
+Date:   Sun, 7 Jul 2019 17:02:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9310 signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=803
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1907070104
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9310 signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=850 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1907070104
+In-Reply-To: <20190626151248.11776-2-shameerali.kolothum.thodi@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Sun, 07 Jul 2019 15:03:08 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-  ..so that every nested vmentry is not slowed down by those checks.
+Hi Shameer,
 
-Signed-off-by: Krish Sadhukhan <krish.sadhukhan@oracle.com>
----
- arch/x86/kvm/vmx/nested.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+On 6/26/19 5:12 PM, Shameer Kolothum wrote:
+> This introduces an iova list that is valid for dma mappings. Make
+> sure the new iommu aperture window doesn't conflict with the current
+> one or with any existing dma mappings during attach.
+> 
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 181 +++++++++++++++++++++++++++++++-
+>  1 file changed, 177 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index add34adfadc7..970d1ec06aed 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -1,4 +1,3 @@
+> -// SPDX-License-Identifier: GPL-2.0-only
+>  /*
+>   * VFIO: IOMMU DMA mapping support for Type1 IOMMU
+>   *
+> @@ -62,6 +61,7 @@ MODULE_PARM_DESC(dma_entry_limit,
+>  
+>  struct vfio_iommu {
+>  	struct list_head	domain_list;
+> +	struct list_head	iova_list;
+>  	struct vfio_domain	*external_domain; /* domain for external user */
+>  	struct mutex		lock;
+>  	struct rb_root		dma_list;
+> @@ -97,6 +97,12 @@ struct vfio_group {
+>  	bool			mdev_group;	/* An mdev group */
+>  };
+>  
+> +struct vfio_iova {
+> +	struct list_head	list;
+> +	dma_addr_t		start;
+> +	dma_addr_t		end;
+> +};
+> +
+>  /*
+>   * Guest RAM pinning working set or DMA target
+>   */
+> @@ -1401,6 +1407,146 @@ static int vfio_mdev_iommu_device(struct device *dev, void *data)
+>  	return 0;
+>  }
+>  
+> +/*
+> + * This is a helper function to insert an address range to iova list.
+> + * The list starts with a single entry corresponding to the IOMMU
+The list is initially created with a single entry ../..
+> + * domain geometry to which the device group is attached. The list
+> + * aperture gets modified when a new domain is added to the container
+> + * if the new aperture doesn't conflict with the current one or with
+> + * any existing dma mappings. The list is also modified to exclude
+> + * any reserved regions associated with the device group.
+> + */
+> +static int vfio_iommu_iova_insert(struct list_head *head,
+> +				  dma_addr_t start, dma_addr_t end)
+> +{
+> +	struct vfio_iova *region;
+> +
+> +	region = kmalloc(sizeof(*region), GFP_KERNEL);
+> +	if (!region)
+> +		return -ENOMEM;
+> +
+> +	INIT_LIST_HEAD(&region->list);
+> +	region->start = start;
+> +	region->end = end;
+> +
+> +	list_add_tail(&region->list, head);
+> +	return 0;
+> +}
+> +
+> +/*
+> + * Check the new iommu aperture conflicts with existing aper or with any
+> + * existing dma mappings.
+> + */
+> +static bool vfio_iommu_aper_conflict(struct vfio_iommu *iommu,
+> +				     dma_addr_t start, dma_addr_t end)
+> +{
+> +	struct vfio_iova *first, *last;
+> +	struct list_head *iova = &iommu->iova_list;
+> +
+> +	if (list_empty(iova))
+> +		return false;
+> +
+> +	/* Disjoint sets, return conflict */
+> +	first = list_first_entry(iova, struct vfio_iova, list);
+> +	last = list_last_entry(iova, struct vfio_iova, list);
+> +	if (start > last->end || end < first->start)
+> +		return true;
+> +
+> +	/* Check for any existing dma mappings outside the new start */
+s/outside/below
+> +	if (start > first->start) {
+> +		if (vfio_find_dma(iommu, first->start, start - first->start))
+> +			return true;
+> +	}
+> +
+> +	/* Check for any existing dma mappings outside the new end */
+s/outside/beyond
+> +	if (end < last->end) {
+> +		if (vfio_find_dma(iommu, end + 1, last->end - end))
+> +			return true;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +/*
+> + * Resize iommu iova aperture window. This is called only if the new
+> + * aperture has no conflict with existing aperture and dma mappings.
+> + */
+> +static int vfio_iommu_aper_resize(struct list_head *iova,
+> +				  dma_addr_t start, dma_addr_t end)
+> +{
+> +	struct vfio_iova *node, *next;
+> +
+> +	if (list_empty(iova))
+> +		return vfio_iommu_iova_insert(iova, start, end);
+> +
+> +	/* Adjust iova list start */
+> +	list_for_each_entry_safe(node, next, iova, list) {
+> +		if (start < node->start)
+> +			break;
+> +		if (start >= node->start && start < node->end) {
+> +			node->start = start;
+> +			break;
+> +		}
+> +		/* Delete nodes before new start */
+> +		list_del(&node->list);
+> +		kfree(node);
+> +	}
+> +
+> +	/* Adjust iova list end */
+> +	list_for_each_entry_safe(node, next, iova, list) {
+> +		if (end > node->end)
+> +			continue;
+> +		if (end > node->start && end <= node->end) {
+> +			node->end = end;
+> +			continue;
+> +		}
+> +		/* Delete nodes after new end */
+> +		list_del(&node->list);
+> +		kfree(node);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void vfio_iommu_iova_free(struct list_head *iova)
+> +{
+> +	struct vfio_iova *n, *next;
+> +
+> +	list_for_each_entry_safe(n, next, iova, list) {
+> +		list_del(&n->list);
+> +		kfree(n);
+> +	}
+> +}
+> +
+> +static int vfio_iommu_iova_get_copy(struct vfio_iommu *iommu,
+> +				    struct list_head *iova_copy)
+> +{
+> +	struct list_head *iova = &iommu->iova_list;
+> +	struct vfio_iova *n;
+> +	int ret;
+> +
+> +	list_for_each_entry(n, iova, list) {
+> +		ret = vfio_iommu_iova_insert(iova_copy, n->start, n->end);
+> +		if (ret)
+> +			goto out_free;
+> +	}
+> +
+> +	return 0;
+> +
+> +out_free:
+> +	vfio_iommu_iova_free(iova_copy);
+> +	return ret;
+> +}
+> +
+> +static void vfio_iommu_iova_insert_copy(struct vfio_iommu *iommu,
+> +					struct list_head *iova_copy)
+> +{
+> +	struct list_head *iova = &iommu->iova_list;
+> +
+> +	vfio_iommu_iova_free(iova);
+> +
+> +	list_splice_tail(iova_copy, iova);
+> +}
+>  static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  					 struct iommu_group *iommu_group)
+>  {
+> @@ -1411,6 +1557,8 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  	int ret;
+>  	bool resv_msi, msi_remap;
+>  	phys_addr_t resv_msi_base;
+> +	struct iommu_domain_geometry geo;
+> +	LIST_HEAD(iova_copy);
+>  
+>  	mutex_lock(&iommu->lock);
+>  
+> @@ -1487,6 +1635,25 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  	if (ret)
+>  		goto out_domain;
+>  
+> +	/* Get aperture info */
+> +	iommu_domain_get_attr(domain->domain, DOMAIN_ATTR_GEOMETRY, &geo);
+> +
+> +	if (vfio_iommu_aper_conflict(iommu, geo.aperture_start,
+> +				     geo.aperture_end)) {
+> +		ret = -EINVAL;
+> +		goto out_detach;
+> +	}
+> +
+> +	/* Get a copy of the current iova list and work on it */
+At this stage of the reading it is not obvious why you need a copy of
+the list. rationale can be found when reading further or in the series
+history ("Use of iova list copy so that original is not altered in case
+of failure").
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index b610f389a01b..095923b1d765 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2748,10 +2748,23 @@ static int nested_check_guest_non_reg_state(struct vmcs12 *vmcs12)
- 	return 0;
- }
- 
-+static int nested_vmx_check_guest_state_full(struct kvm_vcpu *vcpu,
-+					     struct vmcs12 *vmcs12,
-+					     u32 *exit_qual)
-+{
-+	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS) &&
-+	    (is_noncanonical_address(vmcs12->guest_bndcfgs & PAGE_MASK, vcpu) ||
-+	     (vmcs12->guest_bndcfgs & MSR_IA32_BNDCFGS_RSVD)))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
- 					struct vmcs12 *vmcs12,
- 					u32 *exit_qual)
- {
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 	bool ia32e;
- 
- 	*exit_qual = ENTRY_FAIL_DEFAULT;
-@@ -2788,10 +2801,9 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
- 			return -EINVAL;
- 	}
- 
--	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_BNDCFGS) &&
--	    (is_noncanonical_address(vmcs12->guest_bndcfgs & PAGE_MASK, vcpu) ||
--	     (vmcs12->guest_bndcfgs & MSR_IA32_BNDCFGS_RSVD)))
--		return -EINVAL;
-+	if (vmx->nested.dirty_vmcs12 &&
-+	    nested_vmx_check_guest_state_full(vcpu, vmcs12, exit_qual))
-+			return -EINVAL;
- 
- 	if (nested_check_guest_non_reg_state(vmcs12))
- 		return -EINVAL;
--- 
-2.20.1
+Adding a comment in the code would be useful I think.
 
+Thanks
+
+Eric
+
+> +	ret = vfio_iommu_iova_get_copy(iommu, &iova_copy);
+> +	if (ret)
+> +		goto out_detach;
+> +
+> +	ret = vfio_iommu_aper_resize(&iova_copy, geo.aperture_start,
+> +				     geo.aperture_end);
+> +	if (ret)
+> +		goto out_detach;
+> +
+>  	resv_msi = vfio_iommu_has_sw_msi(iommu_group, &resv_msi_base);
+>  
+>  	INIT_LIST_HEAD(&domain->group_list);
+> @@ -1520,8 +1687,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  				list_add(&group->next, &d->group_list);
+>  				iommu_domain_free(domain->domain);
+>  				kfree(domain);
+> -				mutex_unlock(&iommu->lock);
+> -				return 0;
+> +				goto done;
+>  			}
+>  
+>  			ret = vfio_iommu_attach_group(domain, group);
+> @@ -1544,7 +1710,9 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  	}
+>  
+>  	list_add(&domain->next, &iommu->domain_list);
+> -
+> +done:
+> +	/* Delete the old one and insert new iova list */
+> +	vfio_iommu_iova_insert_copy(iommu, &iova_copy);
+>  	mutex_unlock(&iommu->lock);
+>  
+>  	return 0;
+> @@ -1553,6 +1721,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  	vfio_iommu_detach_group(domain, group);
+>  out_domain:
+>  	iommu_domain_free(domain->domain);
+> +	vfio_iommu_iova_free(&iova_copy);
+>  out_free:
+>  	kfree(domain);
+>  	kfree(group);
+> @@ -1692,6 +1861,7 @@ static void *vfio_iommu_type1_open(unsigned long arg)
+>  	}
+>  
+>  	INIT_LIST_HEAD(&iommu->domain_list);
+> +	INIT_LIST_HEAD(&iommu->iova_list);
+>  	iommu->dma_list = RB_ROOT;
+>  	iommu->dma_avail = dma_entry_limit;
+>  	mutex_init(&iommu->lock);
+> @@ -1735,6 +1905,9 @@ static void vfio_iommu_type1_release(void *iommu_data)
+>  		list_del(&domain->next);
+>  		kfree(domain);
+>  	}
+> +
+> +	vfio_iommu_iova_free(&iommu->iova_list);
+> +
+>  	kfree(iommu);
+>  }
+>  
+> 
