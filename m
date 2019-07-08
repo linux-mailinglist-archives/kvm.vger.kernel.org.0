@@ -2,281 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D2BD61DC4
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2019 13:24:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F11161F5F
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2019 15:13:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730465AbfGHLYN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jul 2019 07:24:13 -0400
-Received: from foss.arm.com ([217.140.110.172]:45306 "EHLO foss.arm.com"
+        id S1729686AbfGHNNs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jul 2019 09:13:48 -0400
+Received: from foss.arm.com ([217.140.110.172]:47728 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728141AbfGHLYN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jul 2019 07:24:13 -0400
+        id S1726284AbfGHNNr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jul 2019 09:13:47 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D0D7B360;
-        Mon,  8 Jul 2019 04:24:11 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 098A02B;
+        Mon,  8 Jul 2019 06:13:47 -0700 (PDT)
 Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2A7E63F738;
-        Mon,  8 Jul 2019 04:24:11 -0700 (PDT)
-Date:   Mon, 8 Jul 2019 12:24:09 +0100
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 55EE63F738;
+        Mon,  8 Jul 2019 06:13:46 -0700 (PDT)
+Date:   Mon, 8 Jul 2019 14:13:44 +0100
 From:   Dave Martin <Dave.Martin@arm.com>
 To:     Andre Przywara <andre.przywara@arm.com>
 Cc:     Will Deacon <will@kernel.org>,
         Julien Thierry <Julien.Thierry@arm.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH kvmtool 2/2] Add detach feature
-Message-ID: <20190708112407.GD2790@e103592.cambridge.arm.com>
+Subject: Re: [PATCH kvmtool 1/2] term: Avoid busy loop with unconnected
+ pseudoterminals
+Message-ID: <20190708131343.GE2790@e103592.cambridge.arm.com>
 References: <20190705095914.151056-1-andre.przywara@arm.com>
- <20190705095914.151056-3-andre.przywara@arm.com>
- <20190705110438.GC2790@e103592.cambridge.arm.com>
- <20190705152958.251667e6@donnerap.cambridge.arm.com>
+ <20190705095914.151056-2-andre.przywara@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190705152958.251667e6@donnerap.cambridge.arm.com>
+In-Reply-To: <20190705095914.151056-2-andre.przywara@arm.com>
 User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 05, 2019 at 03:29:58PM +0100, Andre Przywara wrote:
-> On Fri, 5 Jul 2019 12:04:41 +0100
-> Dave Martin <Dave.Martin@arm.com> wrote:
+On Fri, Jul 05, 2019 at 10:59:13AM +0100, Andre Przywara wrote:
+> Currently when kvmtool is creating a pseudoterminal (--tty x), the
+> terminal thread will consume 100% of its CPU time as long as no slave
+> is connected to the other end. This is due to the fact that poll()
+> unconditonally sets the POLLHUP bit in revents and returns immediately,
+> regardless of the events we are querying for.
 > 
-> Hi Dave,
+> There does not seem to be a solution to this with just poll() alone.
+> Using the TIOCPKT ioctl sounds promising, but doesn't help either,
+> as poll still detects the HUP condition.
+
+Are you sure?  I couldn't observe this unless I also passed POLLOUT in
+events.  poll(2) describes POLLHUP as only applying to writes.
+
+The behaviour of select() though seems to be that once the slave has
+been closed for the first time, reading the master fd screams EIO until
+the slave is opened again, so you have to fall back to periodically
+polling until the EIO goes away.
+
+I'm guessing poll() doesn't provide a reliable way to work around this
+either, hence this patch.
+
+> So apart from chickening out with some poll() timeout tricks, inotify
+> seems to be the way to go:
+> Each time poll() returns with the POLLHUP bit set, we disable this
+> file descriptor in the poll() array and rely on the inotify IN_OPEN
+> watch to fire on the slave end of the pseudoterminal. We then enable the
+> file descriptor again.
 > 
-> thanks for having a look!
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  term.c | 48 +++++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 45 insertions(+), 3 deletions(-)
 > 
-> > On Fri, Jul 05, 2019 at 10:59:14AM +0100, Andre Przywara wrote:
-> > > At the moment a kvmtool process started on a terminal has no way of
-> > > detaching from the terminal without killing the guest. Existing
-> > > workarounds are starting kvmtool in a screen/tmux session or using a
-> > > pseudoterminal (--tty 0), both of which have to be done upon guest
-> > > creation.
-> > > 
-> > > Introduce a terminal command to create a pseudoterminal during the
-> > > guest's runtime and redirect the console output to that. This will be
-> > > triggered by typing the letter 'd' after the kvmtool escape sequence
-> > > (default Ctrl+a). This also daemonises kvmtool, so gives back the shell
-> > > prompt, and the user can log out without affecting the guest.
-> > > 
-> > > Naively daemonising kvmtool at that point doesn't work, though, as the
-> > > fork() doesn't inherit the threads, so they keep running in the
-> > > grandparent process and would be killed by its exit.
-> > > The trick used here is to do the double fork() already right at the
-> > > beginning of kvmtool's runtime, before spawning the first thread.
-> > > We then don't end the parent and grandparent processes yet, instead let
-> > > them block until the user actually requests the detach.
-> > > This will let all the threads be created in the grandchild process, but
-> > > keeps kvmtool still attached to the terminal until the user requests a
-> > > detach.
-> > > 
-> > > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > > ---
-> > >  builtin-run.c     |  3 ++
-> > >  include/kvm/kvm.h |  2 ++
-> > >  term.c            | 91 +++++++++++++++++++++++++++++++++++++++++++++++
-> > >  3 files changed, 96 insertions(+)
-> > > 
-> > > diff --git a/builtin-run.c b/builtin-run.c
-> > > index f8dc6c72..fa391419 100644
-> > > --- a/builtin-run.c
-> > > +++ b/builtin-run.c
-> > > @@ -592,6 +592,9 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
-> > >  		}
-> > >  	}
-> > >  
-> > > +	/* Fork twice already now to create the threads in the right process. */
-> > > +	kvm__prepare_daemonize();
-> > > +
-> > >  	if (!kvm->cfg.guest_name) {
-> > >  		if (kvm->cfg.custom_rootfs) {
-> > >  			kvm->cfg.guest_name = kvm->cfg.custom_rootfs_name;
-> > > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> > > index 7a738183..801f9474 100644
-> > > --- a/include/kvm/kvm.h
-> > > +++ b/include/kvm/kvm.h
-> > > @@ -90,6 +90,8 @@ struct kvm {
-> > >  void kvm__set_dir(const char *fmt, ...);
-> > >  const char *kvm__get_dir(void);
-> > >  
-> > > +int kvm__prepare_daemonize(void);
-> > > +
-> > >  int kvm__init(struct kvm *kvm);
-> > >  struct kvm *kvm__new(void);
-> > >  int kvm__recommended_cpus(struct kvm *kvm);
-> > > diff --git a/term.c b/term.c
-> > > index 7fbd98c6..df8328f8 100644
-> > > --- a/term.c
-> > > +++ b/term.c
-> > > @@ -22,6 +22,7 @@ static struct termios	orig_term;
-> > >  
-> > >  static int term_fds[TERM_MAX_DEVS][2];
-> > >  
-> > > +static int daemon_fd;
-> > >  static int inotify_fd;
-> > >  
-> > >  static pthread_t term_poll_thread;
-> > > @@ -29,6 +30,92 @@ static pthread_t term_poll_thread;
-> > >  /* ctrl-a is used for escape */
-> > >  #define term_escape_char	0x01
-> > >  
-> > > +/* This needs to be called *before* we create any threads. */
-> > > +int kvm__prepare_daemonize(void)
-> > > +{
-> > > +	pid_t pid;
-> > > +	char dummy;
-> > > +	int child_pipe[2], parent_pipe[2];
-> > > +
-> > > +	if (pipe(parent_pipe))
-> > > +		return -1;
-> > > +
-> > > +	pid = fork();
-> > > +	if (pid < 0)
-> > > +		return pid;
-> > > +	if (pid > 0) {			/* parent process */
-> > > +
-> > > +		close(parent_pipe[1]);
-> > > +
-> > > +		/* Block until we are told to exit. */
-> > > +		if (read(parent_pipe[0], &dummy, 1) != 1)
-> > > +			perror("reading exit pipe");
-> > > +
-> > > +		exit(0);  
-> > 
-> > Can we have the child write some status value instead?
-> > 
-> > Right now, if the child goes wrong after forking we will just exit with
-> > status 0 regardless.
-> 
-> Sure, but what would we do in this case and why would we care? The child
-> is just a "trick", so if this somehow fails, it does early and we are
-> screwed anyways.
+> diff --git a/term.c b/term.c
+> index b8a70fe2..7fbd98c6 100644
+> --- a/term.c
+> +++ b/term.c
+> @@ -7,6 +7,7 @@
+>  #include <signal.h>
+>  #include <pty.h>
+>  #include <utmp.h>
+> +#include <sys/inotify.h>
+>  
+>  #include "kvm/read-write.h"
+>  #include "kvm/term.h"
+> @@ -21,6 +22,8 @@ static struct termios	orig_term;
+>  
+>  static int term_fds[TERM_MAX_DEVS][2];
+>  
+> +static int inotify_fd;
+> +
+>  static pthread_t term_poll_thread;
+>  
+>  /* ctrl-a is used for escape */
+> @@ -100,7 +103,7 @@ bool term_readable(int term)
+>  
+>  static void *term_poll_thread_loop(void *param)
+>  {
+> -	struct pollfd fds[TERM_MAX_DEVS];
+> +	struct pollfd fds[TERM_MAX_DEVS + 1];
+>  	struct kvm *kvm = (struct kvm *) param;
+>  	int i;
+>  
+> @@ -111,11 +114,42 @@ static void *term_poll_thread_loop(void *param)
+>  		fds[i].events = POLLIN;
+>  		fds[i].revents = 0;
+>  	}
+> +	fds[i].fd = inotify_fd;
+> +	fds[i].events = POLLIN;
+> +	fds[i].revents = 0;
+>  
+>  	while (1) {
+> +		int i;
+> +
+>  		/* Poll with infinite timeout */
+> -		if(poll(fds, TERM_MAX_DEVS, -1) < 1)
+> +		if(poll(fds, TERM_MAX_DEVS + 1, -1) < 1)
+>  			break;
+> +
+> +		for (i = 0; i < TERM_MAX_DEVS; i++) {
+> +			/*
+> +			 * Check for unconnected pseudoterminals. They will
+> +			 * make poll() return immediately, so we have to
+> +			 * disable those fds and rely on inotify to tell us
+> +			 * when the slave side gets opened.
+> +			 */
+> +			if (fds[i].revents == POLLHUP)
 
-It's preferable to return with failure status from the parent if the
-payload (wiether a child process or not) failed to start up properly.
+Should this be & ?  Or is POLLHUP always delivered by itself?
 
-I haven't looked at the bigger picture here though: if we have already
-fired up the VM by this point, there's not interesting that can go
-wrong, I guess.
+> +				fds[i].fd = ~fds[i].fd;
+> +		}
+> +		if (fds[TERM_MAX_DEVS].revents) {	/* inotify fd */
+> +			struct inotify_event event;
+> +
+> +			/*
+> +			 * Just enable all fds that we previously disabled,
+> +			 * still unconnected ones will be disabled again on
+> +			 * the next poll() call.
+> +			 */
+> +			for (i = 0; i < TERM_MAX_DEVS; i++)
+> +				if (fds[i].fd < 0)
+> +					fds[i].fd = ~fds[i].fd;
+> +			/* Consume at least one inotify event. */
+> +			i = read(inotify_fd, &event, sizeof(event));
 
-> > Instead, we could have the child send us the exit status... or if
-> > the child disappears we'll just get EOF and can return failure
-> > appropriately.
-> > 
-> > Also, how does the invoker kill the guest now that kvmtool has exited?
-> 
-> Either by using "lkvm stop -n ..." or by exiting from within the guest.
-> This would be the same as one would create a guest with --tty and put that
-> in the background right now.
+Are there raciness / event loss issues here?
 
-OK, I guess lkvm stop works sufficiently for that, then.
+If we just toggle the fds on each open, then opening the slave again
+when it is already open will break things, no?  (This is peephole
+review, so I may be missing some wider context.)
 
-> > > +	}
-> > > +
-> > > +	close(parent_pipe[0]);
-> > > +	if (pipe(child_pipe))
-> > > +		return -1;
-> > > +	daemon_fd = child_pipe[1];
-> > > +
-> > > +	/* Become a session leader. */
-> > > +	setsid();
-> > > +	pid = fork();
-> > > +	if (pid > 0) {
-> > > +		close(child_pipe[1]);
-> > > +
-> > > +		/* Block until we are told to exit. */
-> > > +		if (read(child_pipe[0], &dummy, 1) != 1)
-> > > +			perror("reading child exit pipe");
-> > > +
-> > > +		if (write(parent_pipe[1], &dummy, 1) != 1)
-> > > +			pr_warning("could not kill daemon's parent");
-> > > +
-> > > +		exit(0);
-> > > +	}
-> > > +	close(child_pipe[0]);
-> > > +	close(parent_pipe[1]);  
-> > 
-> > Why do we need to fork twice?  The extra process seems redundant.
-> 
-> This is the ~50 year old textbook method of creating a UNIX daemon: By
-> forking twice and killing the child (the "middle" process), the grandchild
-> becomes an orphan, and will be picked up by PID 1 (init). This prevents
-> any interactions with controlling terminals in the future. Dr. Google or a
-> local library should have more information.
+Also, I'm not sure (actually, I strongly doubt) that anything guarantees
+that we see the EIO/POLLHUP for a hung-up slave before the inotify()
+notify notification that reopens it.
 
-Hmmm, I vaguely remember that now.
+Maybe I'm being too paranoid (as often the case).
 
-I'm not sure there's much actual reason to do that except to ensure that
-the new process isn't a session leader, because session leaders with no
-terminal may acquire any tty they open as a controlling tty, unless they
-pass O_NOCTTY all the time to open() and friends.
+We could try to maintain a counter if we also track IN_CLOSE, but
+inotify queue overflows are still a potential problem.
 
-Running ps -Aj suggests that not all daemons do this, but if we might
-open stuff after forking, I guess it's best to be safe.
+Even if we get this working, we're relying on a bunch of undocumented
+behaviour that could drift in future.
 
-> > > +	/* Only the grandchild returns here, to do the actual work. */
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +static void term_set_tty(int term);
-> > > +
-> > > +static void detach_terminal(int term)
-> > > +{
-> > > +	char dummy = 0;
-> > > +
-> > > +	/* Detaching only make sense if we use the process' terminal. */
-> > > +	if (term_fds[term][TERM_FD_IN] != STDIN_FILENO)
-> > > +		return;
-> > > +
-> > > +	/* Clean up just this terminal, leave the others alone. */
-> > > +	tcsetattr(term_fds[term][TERM_FD_IN], TCSANOW, &orig_term);
-> > > +
-> > > +	/* Redirect this terminal to a PTY */
-> > > +	term_set_tty(term);
-> > > +
-> > > +	/*
-> > > +	 * Replace STDIN/STDOUT with this new PTY. This will automatically
-> > > +	 * transfer all the other serial terminals over.
-> > > +	 */
-> > > +	dup2(term_fds[term][TERM_FD_IN], STDIN_FILENO);
-> > > +	dup2(term_fds[term][TERM_FD_OUT], STDOUT_FILENO);  
-> > 
-> > Output to a pty master before the slave is opened just disappears.
-> 
-> Not always, it seems. When I do:
-> $ lkvm run -k Image --tty 0
-> then wait for a bit and open the pseudo-terminal, I get the full boot log
-> "replayed". Not sure who in the chain is actually buffering this, though?
 
-Hmmm, dunno.  Last time I experimented, I didn't see this.
+I'd like all this to work ... but given that ptys don't appear well
+designed to solve this kind of problem, I wonder whether it's really
+worth trying to support them?
 
-But I can't see what could be buffering it unless the kernel does it or
-the writes just block until the slave is opened.  Or we simply don't
-consider the pty master writable until the slave is opened, resulting
-in kvmtool buffering the output as a side-effect.
+Sockets OTOH are designed for this use case and support remote access at
+no extra cost.
 
-Maybe the kernel's behaviour on this point has changed over time.
+Do we need genuine terminal emulation for something?
 
-> > Possibly it would be useful to buffer it somewhere.
-> 
-> Sounds useful, but it's more a story for another time, I guess, since we
-> have the same issue with --tty already.
-> One related problem is the gap between starting/detaching a guest and
-> connecting to the terminal for the first time, as one cannot do this fast
-> and reliable enough without loosing characters, I guess. Maybe it's worth
-> to introduce something like "start as paused", so we can connect to the
-> terminal and then do a "lkvm resume".
-> 
-> > I wonder whether it would make sense to redirect to a notional dummy
-> > terminal (which might or might not buffer output), and start talking to
-> > a pty or socket only once opened by a client.
-> 
-> Mmmh, sounds like that would fit in nicely since with patch 1/2 we now
-> know about connects and possibly even disconnects.
-
-OK, I guess this comes under future ehancements (if we need to do it at
-all).
+[...]
 
 Cheers
 ---Dave
