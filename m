@@ -2,185 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 04EF161A8D
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2019 08:18:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9FB061AD4
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2019 09:00:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729032AbfGHGSC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jul 2019 02:18:02 -0400
-Received: from mga09.intel.com ([134.134.136.24]:6540 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727218AbfGHGSC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jul 2019 02:18:02 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Jul 2019 23:18:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,465,1557212400"; 
-   d="scan'208";a="173175976"
-Received: from npg-dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.66])
-  by FMSMGA003.fm.intel.com with ESMTP; 07 Jul 2019 23:17:58 -0700
-Date:   Mon, 8 Jul 2019 14:16:25 +0800
-From:   Tiwei Bie <tiwei.bie@intel.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, mst@redhat.com,
-        maxime.coquelin@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, dan.daly@intel.com,
-        cunming.liang@intel.com, zhihong.wang@intel.com
-Subject: Re: [RFC v2] vhost: introduce mdev based hardware vhost backend
-Message-ID: <20190708061625.GA15936@___>
-References: <20190703091339.1847-1-tiwei.bie@intel.com>
- <7b8279b2-aa7e-7adc-eeff-20dfaf4400d0@redhat.com>
- <20190703115245.GA22374@___>
- <64833f91-02cd-7143-f12e-56ab93b2418d@redhat.com>
- <20190703130817.GA1978@___>
- <b01b8e28-8d96-31dd-56f4-ca7793498c55@redhat.com>
- <20190704062134.GA21116@___>
- <20190705084946.67b8f9f5@x1.home>
+        id S1729234AbfGHG7v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jul 2019 02:59:51 -0400
+Received: from lhrrgout.huawei.com ([185.176.76.210]:33058 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729189AbfGHG7v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jul 2019 02:59:51 -0400
+Received: from lhreml703-cah.china.huawei.com (unknown [172.18.7.108])
+        by Forcepoint Email with ESMTP id 2CD05F0471F05A2FC7B9;
+        Mon,  8 Jul 2019 07:59:49 +0100 (IST)
+Received: from LHREML524-MBS.china.huawei.com ([169.254.2.154]) by
+ lhreml703-cah.china.huawei.com ([10.201.108.44]) with mapi id 14.03.0415.000;
+ Mon, 8 Jul 2019 07:59:40 +0100
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Auger Eric <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Linuxarm <linuxarm@huawei.com>,
+        John Garry <john.garry@huawei.com>,
+        "xuwei (O)" <xuwei5@huawei.com>,
+        "kevin.tian@intel.com" <kevin.tian@intel.com>
+Subject: RE: [PATCH v7 2/6] vfio/type1: Check reserve region conflict and
+ update iova list
+Thread-Topic: [PATCH v7 2/6] vfio/type1: Check reserve region conflict and
+ update iova list
+Thread-Index: AQHVLDHlfv32Tq6P8k2BSud+nbtQFqa5VEOAgAEf3kCAAXe2AIAEcOwg
+Date:   Mon, 8 Jul 2019 06:59:39 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA83F2E198C@lhreml524-mbs.china.huawei.com>
+References: <20190626151248.11776-1-shameerali.kolothum.thodi@huawei.com>
+ <20190626151248.11776-3-shameerali.kolothum.thodi@huawei.com>
+ <20190703143427.2d63c15f@x1.home>
+ <5FC3163CFD30C246ABAA99954A238FA83F2DDB68@lhreml524-mbs.china.huawei.com>
+ <d70c59ec-e837-7697-acb1-c2b5027570ee@redhat.com>
+In-Reply-To: <d70c59ec-e837-7697-acb1-c2b5027570ee@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.34.206.221]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190705084946.67b8f9f5@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-CFilter-Loop: Reflected
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 05, 2019 at 08:49:46AM -0600, Alex Williamson wrote:
-> On Thu, 4 Jul 2019 14:21:34 +0800
-> Tiwei Bie <tiwei.bie@intel.com> wrote:
-> > On Thu, Jul 04, 2019 at 12:31:48PM +0800, Jason Wang wrote:
-> > > On 2019/7/3 下午9:08, Tiwei Bie wrote:  
-> > > > On Wed, Jul 03, 2019 at 08:16:23PM +0800, Jason Wang wrote:  
-> > > > > On 2019/7/3 下午7:52, Tiwei Bie wrote:  
-> > > > > > On Wed, Jul 03, 2019 at 06:09:51PM +0800, Jason Wang wrote:  
-> > > > > > > On 2019/7/3 下午5:13, Tiwei Bie wrote:  
-> > > > > > > > Details about this can be found here:
-> > > > > > > > 
-> > > > > > > > https://lwn.net/Articles/750770/
-> > > > > > > > 
-> > > > > > > > What's new in this version
-> > > > > > > > ==========================
-> > > > > > > > 
-> > > > > > > > A new VFIO device type is introduced - vfio-vhost. This addressed
-> > > > > > > > some comments from here:https://patchwork.ozlabs.org/cover/984763/
-> > > > > > > > 
-> > > > > > > > Below is the updated device interface:
-> > > > > > > > 
-> > > > > > > > Currently, there are two regions of this device: 1) CONFIG_REGION
-> > > > > > > > (VFIO_VHOST_CONFIG_REGION_INDEX), which can be used to setup the
-> > > > > > > > device; 2) NOTIFY_REGION (VFIO_VHOST_NOTIFY_REGION_INDEX), which
-> > > > > > > > can be used to notify the device.
-> > > > > > > > 
-> > > > > > > > 1. CONFIG_REGION
-> > > > > > > > 
-> > > > > > > > The region described by CONFIG_REGION is the main control interface.
-> > > > > > > > Messages will be written to or read from this region.
-> > > > > > > > 
-> > > > > > > > The message type is determined by the `request` field in message
-> > > > > > > > header. The message size is encoded in the message header too.
-> > > > > > > > The message format looks like this:
-> > > > > > > > 
-> > > > > > > > struct vhost_vfio_op {
-> > > > > > > > 	__u64 request;
-> > > > > > > > 	__u32 flags;
-> > > > > > > > 	/* Flag values: */
-> > > > > > > >     #define VHOST_VFIO_NEED_REPLY 0x1 /* Whether need reply */
-> > > > > > > > 	__u32 size;
-> > > > > > > > 	union {
-> > > > > > > > 		__u64 u64;
-> > > > > > > > 		struct vhost_vring_state state;
-> > > > > > > > 		struct vhost_vring_addr addr;
-> > > > > > > > 	} payload;
-> > > > > > > > };
-> > > > > > > > 
-> > > > > > > > The existing vhost-kernel ioctl cmds are reused as the message
-> > > > > > > > requests in above structure.  
-> > > > > > > Still a comments like V1. What's the advantage of inventing a new protocol?  
-> > > > > > I'm trying to make it work in VFIO's way..
-> > > > > >   
-> > > > > > > I believe either of the following should be better:
-> > > > > > > 
-> > > > > > > - using vhost ioctl,  we can start from SET_VRING_KICK/SET_VRING_CALL and
-> > > > > > > extend it with e.g notify region. The advantages is that all exist userspace
-> > > > > > > program could be reused without modification (or minimal modification). And
-> > > > > > > vhost API hides lots of details that is not necessary to be understood by
-> > > > > > > application (e.g in the case of container).  
-> > > > > > Do you mean reusing vhost's ioctl on VFIO device fd directly,
-> > > > > > or introducing another mdev driver (i.e. vhost_mdev instead of
-> > > > > > using the existing vfio_mdev) for mdev device?  
-> > > > > Can we simply add them into ioctl of mdev_parent_ops?  
-> > > > Right, either way, these ioctls have to be and just need to be
-> > > > added in the ioctl of the mdev_parent_ops. But another thing we
-> > > > also need to consider is that which file descriptor the userspace
-> > > > will do the ioctl() on. So I'm wondering do you mean let the
-> > > > userspace do the ioctl() on the VFIO device fd of the mdev
-> > > > device?
-> > > >   
-> > > 
-> > > Yes.  
-> > 
-> > Got it! I'm not sure what's Alex opinion on this. If we all
-> > agree with this, I can do it in this way.
-> > 
-> > > Is there any other way btw?  
-> > 
-> > Just a quick thought.. Maybe totally a bad idea. I was thinking
-> > whether it would be odd to do non-VFIO's ioctls on VFIO's device
-> > fd. So I was wondering whether it's possible to allow binding
-> > another mdev driver (e.g. vhost_mdev) to the supported mdev
-> > devices. The new mdev driver, vhost_mdev, can provide similar
-> > ways to let userspace open the mdev device and do the vhost ioctls
-> > on it. To distinguish with the vfio_mdev compatible mdev devices,
-> > the device API of the new vhost_mdev compatible mdev devices
-> > might be e.g. "vhost-net" for net?
-> > 
-> > So in VFIO case, the device will be for passthru directly. And
-> > in VHOST case, the device can be used to accelerate the existing
-> > virtualized devices.
-> > 
-> > How do you think?
-> 
-> VFIO really can't prevent vendor specific ioctls on the device file
-> descriptor for mdevs, but a) we'd want to be sure the ioctl address
-> space can't collide with ioctls we'd use for vfio defined purposes and
-> b) maybe the VFIO user API isn't what you want in the first place if
-> you intend to mostly/entirely ignore the defined ioctl set and replace
-> them with your own.  In the case of the latter, you're also not getting
-> the advantages of the existing VFIO userspace code, so why expose a
-> VFIO device at all.
-
-Yeah, I totally agree.
-
-> 
-> The mdev interface does provide a general interface for creating and
-> managing virtual devices, vfio-mdev is just one driver on the mdev
-> bus.  Parav (Mellanox) has been doing work on mdev-core to help clean
-> out vfio-isms from the interface, aiui, with the intent of implementing
-> another mdev bus driver for using the devices within the kernel.
-
-Great to know this! I found below series after some searching:
-
-https://lkml.org/lkml/2019/3/8/821
-
-In above series, the new mlx5_core mdev driver will do the probe
-by calling mlx5_get_core_dev() first on the parent device of the
-mdev device. In vhost_mdev, maybe we can also keep track of all
-the compatible mdev devices and use this info to do the probe.
-But we also need a way to allow vfio_mdev driver to distinguish
-and reject the incompatible mdev devices.
-
-> It
-> seems like this vhost-mdev driver might be similar, using mdev but not
-> necessarily vfio-mdev to expose devices.  Thanks,
-
-Yeah, I also think so!
-
-Thanks!
-Tiwei
-
-> 
-> Alex
+SGkgRXJpYw0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEF1Z2VyIEVy
+aWMgW21haWx0bzplcmljLmF1Z2VyQHJlZGhhdC5jb21dDQo+IFNlbnQ6IDA1IEp1bHkgMjAxOSAx
+MzoxMA0KPiBUbzogU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaSA8c2hhbWVlcmFsaS5rb2xvdGh1
+bS50aG9kaUBodWF3ZWkuY29tPjsNCj4gQWxleCBXaWxsaWFtc29uIDxhbGV4LndpbGxpYW1zb25A
+cmVkaGF0LmNvbT4NCj4gQ2M6IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2Vy
+Lmtlcm5lbC5vcmc7DQo+IGlvbW11QGxpc3RzLmxpbnV4LWZvdW5kYXRpb24ub3JnOyBMaW51eGFy
+bSA8bGludXhhcm1AaHVhd2VpLmNvbT47IEpvaG4NCj4gR2FycnkgPGpvaG4uZ2FycnlAaHVhd2Vp
+LmNvbT47IHh1d2VpIChPKSA8eHV3ZWk1QGh1YXdlaS5jb20+Ow0KPiBrZXZpbi50aWFuQGludGVs
+LmNvbQ0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHY3IDIvNl0gdmZpby90eXBlMTogQ2hlY2sgcmVz
+ZXJ2ZSByZWdpb24gY29uZmxpY3QgYW5kDQo+IHVwZGF0ZSBpb3ZhIGxpc3QNCj4gDQo+IEhpIFNo
+YW1lZXIsDQo+IA0KPiBPbiA3LzQvMTkgMjo1MSBQTSwgU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9k
+aSB3cm90ZToNCj4gPg0KPiA+DQo+ID4+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4+
+IEZyb206IGt2bS1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzprdm0tb3duZXJAdmdlci5r
+ZXJuZWwub3JnXSBPbg0KPiA+PiBCZWhhbGYgT2YgQWxleCBXaWxsaWFtc29uDQo+ID4+IFNlbnQ6
+IDAzIEp1bHkgMjAxOSAyMTozNA0KPiA+PiBUbzogU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaSA8
+c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPg0KPiA+PiBDYzogZXJpYy5hdWdl
+ckByZWRoYXQuY29tOyBwbW9yZWxAbGludXgudm5ldC5pYm0uY29tOw0KPiA+PiBrdm1Admdlci5r
+ZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOw0KPiA+PiBpb21tdUBsaXN0
+cy5saW51eC1mb3VuZGF0aW9uLm9yZzsgTGludXhhcm0gPGxpbnV4YXJtQGh1YXdlaS5jb20+Ow0K
+PiBKb2huDQo+ID4+IEdhcnJ5IDxqb2huLmdhcnJ5QGh1YXdlaS5jb20+OyB4dXdlaSAoTykgPHh1
+d2VpNUBodWF3ZWkuY29tPjsNCj4gPj4ga2V2aW4udGlhbkBpbnRlbC5jb20NCj4gPj4gU3ViamVj
+dDogUmU6IFtQQVRDSCB2NyAyLzZdIHZmaW8vdHlwZTE6IENoZWNrIHJlc2VydmUgcmVnaW9uIGNv
+bmZsaWN0IGFuZA0KPiA+PiB1cGRhdGUgaW92YSBsaXN0DQo+ID4+DQo+ID4+IE9uIFdlZCwgMjYg
+SnVuIDIwMTkgMTY6MTI6NDQgKzAxMDANCj4gPj4gU2hhbWVlciBLb2xvdGh1bSA8c2hhbWVlcmFs
+aS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPiB3cm90ZToNCj4gPj4NCj4gPj4+IFRoaXMgcmV0
+cmlldmVzIHRoZSByZXNlcnZlZCByZWdpb25zIGFzc29jaWF0ZWQgd2l0aCBkZXYgZ3JvdXAgYW5k
+DQo+ID4+PiBjaGVja3MgZm9yIGNvbmZsaWN0cyB3aXRoIGFueSBleGlzdGluZyBkbWEgbWFwcGlu
+Z3MuIEFsc28gdXBkYXRlDQo+ID4+PiB0aGUgaW92YSBsaXN0IGV4Y2x1ZGluZyB0aGUgcmVzZXJ2
+ZWQgcmVnaW9ucy4NCj4gPj4+DQo+ID4+PiBSZXNlcnZlZCByZWdpb25zIHdpdGggdHlwZSBJT01N
+VV9SRVNWX0RJUkVDVF9SRUxBWEFCTEUgYXJlDQo+ID4+PiBleGNsdWRlZCBmcm9tIGFib3ZlIGNo
+ZWNrcyBhcyB0aGV5IGFyZSBjb25zaWRlcmVkIGFzIGRpcmVjdGx5DQo+ID4+PiBtYXBwZWQgcmVn
+aW9ucyB3aGljaCBhcmUga25vd24gdG8gYmUgcmVsYXhhYmxlLg0KPiA+Pj4NCj4gPj4+IFNpZ25l
+ZC1vZmYtYnk6IFNoYW1lZXIgS29sb3RodW0NCj4gPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlA
+aHVhd2VpLmNvbT4NCj4gPj4+IC0tLQ0KPiA+Pj4gIGRyaXZlcnMvdmZpby92ZmlvX2lvbW11X3R5
+cGUxLmMgfCA5Ng0KPiA+PiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gPj4+
+ICAxIGZpbGUgY2hhbmdlZCwgOTYgaW5zZXJ0aW9ucygrKQ0KPiA+Pj4NCj4gPj4+IGRpZmYgLS1n
+aXQgYS9kcml2ZXJzL3ZmaW8vdmZpb19pb21tdV90eXBlMS5jDQo+ID4+IGIvZHJpdmVycy92Zmlv
+L3ZmaW9faW9tbXVfdHlwZTEuYw0KPiA+Pj4gaW5kZXggOTcwZDFlYzA2YWVkLi5iNmJmZGZhMTZj
+MzMgMTAwNjQ0DQo+ID4+PiAtLS0gYS9kcml2ZXJzL3ZmaW8vdmZpb19pb21tdV90eXBlMS5jDQo+
+ID4+PiArKysgYi9kcml2ZXJzL3ZmaW8vdmZpb19pb21tdV90eXBlMS5jDQo+ID4+PiBAQCAtMTU1
+OSw2ICsxNjQxLDcgQEAgc3RhdGljIGludCB2ZmlvX2lvbW11X3R5cGUxX2F0dGFjaF9ncm91cCh2
+b2lkDQo+ID4+ICppb21tdV9kYXRhLA0KPiA+Pj4gIAlwaHlzX2FkZHJfdCByZXN2X21zaV9iYXNl
+Ow0KPiA+Pj4gIAlzdHJ1Y3QgaW9tbXVfZG9tYWluX2dlb21ldHJ5IGdlbzsNCj4gPj4+ICAJTElT
+VF9IRUFEKGlvdmFfY29weSk7DQo+ID4+PiArCUxJU1RfSEVBRChncm91cF9yZXN2X3JlZ2lvbnMp
+Ow0KPiA+Pj4NCj4gPj4+ICAJbXV0ZXhfbG9jaygmaW9tbXUtPmxvY2spOw0KPiA+Pj4NCj4gPj4+
+IEBAIC0xNjQ0LDYgKzE3MjcsMTMgQEAgc3RhdGljIGludA0KPiB2ZmlvX2lvbW11X3R5cGUxX2F0
+dGFjaF9ncm91cCh2b2lkDQo+ID4+ICppb21tdV9kYXRhLA0KPiA+Pj4gIAkJZ290byBvdXRfZGV0
+YWNoOw0KPiA+Pj4gIAl9DQo+ID4+Pg0KPiA+Pj4gKwlpb21tdV9nZXRfZ3JvdXBfcmVzdl9yZWdp
+b25zKGlvbW11X2dyb3VwLA0KPiAmZ3JvdXBfcmVzdl9yZWdpb25zKTsNCj4gPj4NCj4gPj4gVGhp
+cyBjYW4gZmFpbCBhbmQgc2hvdWxkIGhhdmUgYW4gZXJyb3IgY2FzZS4gIEkgYXNzdW1lIHdlJ2Qg
+ZmFpbCB0aGUNCj4gPj4gZ3JvdXAgYXR0YWNoIG9uIGZhaWx1cmUuICBUaGFua3MsDQo+ID4NCj4g
+PiBSaWdodC4gSSB3aWxsIGFkZCB0aGUgY2hlY2suIERvIHlvdSB0aGluayB3ZSBzaG91bGQgZG8g
+dGhlIHNhbWUgaW4NCj4gdmZpb19pb21tdV9oYXNfc3dfbXNpKCkNCj4gPiBhcyB3ZWxsPyAoSW4g
+ZmFjdCwgaXQgbG9va3MgbGlrZSBpb21tdV9nZXRfZ3JvdXBfcmVzdl9yZWdpb25zKCkgcmV0IGlz
+IG5vdA0KPiBjaGVja2VkIGFueXdoZXJlIGluDQo+ID4ga2VybmVsKS4NCj4gDQo+IEkgdGhpbmsg
+dGhlIGNhbiBiZSB0aGUgdG9waWMgb2YgYW5vdGhlciBzZXJpZXMuIEkganVzdCBub3RpY2VkIHRo
+YXQgaW4NCj4gaW9tbXVfaW5zZXJ0X3Jlc3ZfcmVnaW9uKCksIHdoaWNoIGlzIHJlY3Vyc2l2ZSBp
+biBjYXNlIG90IG1lcmdlLCBJDQo+IGZhaWxlZCB0byBwcm9wYWdhdGUgcmV0dXJuZWQgdmFsdWUg
+b3IgcmVjdXJzaXZlIGNhbGxzLiBUaGlzIGFsc28gbmVlZHMNCj4gdG8gYmUgZml4ZWQuIEkgdm9s
+dW50ZWVyIHRvIHdvcmsgb24gdGhvc2UgY2hhbmdlcyBpZiB5b3UgcHJlZmVyLiBKdXN0DQo+IGxl
+dCBtZSBrbm93Lg0KDQpPay4gUGxlYXNlIGdvIGFoZWFkLg0KDQpUaGFua3MsDQpTaGFtZWVyDQoN
+Cg==
