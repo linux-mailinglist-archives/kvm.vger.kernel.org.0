@@ -2,196 +2,281 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F39B61C8E
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2019 11:48:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D2BD61DC4
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2019 13:24:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729963AbfGHJsJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jul 2019 05:48:09 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:44943 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728720AbfGHJsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jul 2019 05:48:09 -0400
-Received: by mail-wr1-f65.google.com with SMTP id p17so5118759wrf.11;
-        Mon, 08 Jul 2019 02:48:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NwlWZnZ7zBN6lMDrY9iRaKbV18Be9yKKcDp04eaQZqw=;
-        b=L4X9uWXbU6RiKrYoUg2tgRwaWORYDiSTVLOeYpeJuxAruwz0azPyvOk8Jf4yhJqizT
-         Sjoag1bsd1lnxDMWoqWXLrdD3yVIUh57JZAPA2c3H3H2zbBYt8B67jd6Pel/2AgEa4gP
-         UaPzoeGUom5LJOBnL8pK/c/SnqUrKVpurbOn9VAskieXCXaYvjvzLjXxB8RiP3Z+TCF2
-         +S//IhKshMXkeWfHs9dFTv19u1RT3CyGreaY1P1dNUic3NzRB4JNQfiBJ+2VqzfRAsMr
-         ppKkr0g9JXj/PxeiIUrvGdln+1TpbzM9iqSsIbUChjswX3i3/1qDjh4PNGHFEs0oVxrK
-         0PxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NwlWZnZ7zBN6lMDrY9iRaKbV18Be9yKKcDp04eaQZqw=;
-        b=EXHQ+bBHIbGMhQofgKY3URGs8vyMe7T5152Tt0f7vnrrin8aXb4Ca6e2QpZ7b0oHf3
-         uODp1M5mHGFGob6HxziiEcZ7r+C1CsG1l1Y6tZkSyXvI1sYwOpvW4eBWN7hs21S5eXMB
-         2JnEnVf4d6Qdr7U3BpTS13v8EWCuAVC5f9Jga3PxLyCvV78YUKf/e7ZqmbSh+lJQDw4F
-         F5s/f5ZL1o3UgecaTTZf2XqyffBYfbFPraTPx7QnrAvL0H5NpTsH+T49loAkacY0K9Dw
-         0TjWlJjora6uBqH5mAjRcMV/7mIAX/4qv4EVyBg9FVX6mwXAe0woswjM8eWjo+7KpXwn
-         jy5Q==
-X-Gm-Message-State: APjAAAWSECR/XzS8smlkSYFIvxBw7hSF1oxU53U8vwsYPEshKCgTZvJt
-        F1ZTjDqoImPY9WU0f7xT2FSmJXemPFBFbM22L3o=
-X-Google-Smtp-Source: APXvYqxE67dD1GsBy6jRCG+SGo9SeaPdmJ0+fghvBxDKCiPovhUbI/A/avBvpADnzJyDg0CyZ7K+xQiy1/iVQCXybjo=
-X-Received: by 2002:a05:6000:1011:: with SMTP id a17mr18005281wrx.0.1562579286243;
- Mon, 08 Jul 2019 02:48:06 -0700 (PDT)
+        id S1730465AbfGHLYN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jul 2019 07:24:13 -0400
+Received: from foss.arm.com ([217.140.110.172]:45306 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728141AbfGHLYN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jul 2019 07:24:13 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D0D7B360;
+        Mon,  8 Jul 2019 04:24:11 -0700 (PDT)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2A7E63F738;
+        Mon,  8 Jul 2019 04:24:11 -0700 (PDT)
+Date:   Mon, 8 Jul 2019 12:24:09 +0100
+From:   Dave Martin <Dave.Martin@arm.com>
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     Will Deacon <will@kernel.org>,
+        Julien Thierry <Julien.Thierry@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH kvmtool 2/2] Add detach feature
+Message-ID: <20190708112407.GD2790@e103592.cambridge.arm.com>
+References: <20190705095914.151056-1-andre.przywara@arm.com>
+ <20190705095914.151056-3-andre.przywara@arm.com>
+ <20190705110438.GC2790@e103592.cambridge.arm.com>
+ <20190705152958.251667e6@donnerap.cambridge.arm.com>
 MIME-Version: 1.0
-References: <20190530112811.3066-1-pbonzini@redhat.com> <20190530112811.3066-3-pbonzini@redhat.com>
-In-Reply-To: <20190530112811.3066-3-pbonzini@redhat.com>
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Mon, 8 Jul 2019 17:47:54 +0800
-Message-ID: <CACVXFVPE7vX1pEPH0G_C_eZW8eztdTEg8Xr=8+D=9-eVeMNZ_g@mail.gmail.com>
-Subject: Re: [PATCH 2/2] virtio_scsi: implement request batching
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        KVM General <kvm@vger.kernel.org>, jejb@linux.ibm.com,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190705152958.251667e6@donnerap.cambridge.arm.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, May 30, 2019 at 7:28 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> Adding the command and kicking the virtqueue so far was done one after
-> another.  Make the kick optional, so that we can take into account SCMD_LAST.
-> We also need a commit_rqs callback to kick the device if blk-mq aborts
-> the submission before the last request is reached.
->
-> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  drivers/scsi/virtio_scsi.c | 55 +++++++++++++++++++++++++++-----------
->  1 file changed, 40 insertions(+), 15 deletions(-)
->
-> diff --git a/drivers/scsi/virtio_scsi.c b/drivers/scsi/virtio_scsi.c
-> index 8af01777d09c..918c811cea95 100644
-> --- a/drivers/scsi/virtio_scsi.c
-> +++ b/drivers/scsi/virtio_scsi.c
-> @@ -375,14 +375,7 @@ static void virtscsi_event_done(struct virtqueue *vq)
->         virtscsi_vq_done(vscsi, &vscsi->event_vq, virtscsi_complete_event);
->  };
->
-> -/**
-> - * virtscsi_add_cmd - add a virtio_scsi_cmd to a virtqueue
-> - * @vq         : the struct virtqueue we're talking about
-> - * @cmd                : command structure
-> - * @req_size   : size of the request buffer
-> - * @resp_size  : size of the response buffer
-> - */
-> -static int virtscsi_add_cmd(struct virtqueue *vq,
-> +static int __virtscsi_add_cmd(struct virtqueue *vq,
->                             struct virtio_scsi_cmd *cmd,
->                             size_t req_size, size_t resp_size)
->  {
-> @@ -427,17 +420,39 @@ static int virtscsi_add_cmd(struct virtqueue *vq,
->         return virtqueue_add_sgs(vq, sgs, out_num, in_num, cmd, GFP_ATOMIC);
->  }
->
-> -static int virtscsi_kick_cmd(struct virtio_scsi_vq *vq,
-> +static void virtscsi_kick_vq(struct virtio_scsi_vq *vq)
-> +{
-> +       bool needs_kick;
-> +       unsigned long flags;
-> +
-> +       spin_lock_irqsave(&vq->vq_lock, flags);
-> +       needs_kick = virtqueue_kick_prepare(vq->vq);
-> +       spin_unlock_irqrestore(&vq->vq_lock, flags);
-> +
-> +       if (needs_kick)
-> +               virtqueue_notify(vq->vq);
-> +}
-> +
-> +/**
-> + * virtscsi_add_cmd - add a virtio_scsi_cmd to a virtqueue, optionally kick it
-> + * @vq         : the struct virtqueue we're talking about
-> + * @cmd                : command structure
-> + * @req_size   : size of the request buffer
-> + * @resp_size  : size of the response buffer
-> + * @kick       : whether to kick the virtqueue immediately
-> + */
-> +static int virtscsi_add_cmd(struct virtio_scsi_vq *vq,
->                              struct virtio_scsi_cmd *cmd,
-> -                            size_t req_size, size_t resp_size)
-> +                            size_t req_size, size_t resp_size,
-> +                            bool kick)
->  {
->         unsigned long flags;
->         int err;
->         bool needs_kick = false;
->
->         spin_lock_irqsave(&vq->vq_lock, flags);
-> -       err = virtscsi_add_cmd(vq->vq, cmd, req_size, resp_size);
-> -       if (!err)
-> +       err = __virtscsi_add_cmd(vq->vq, cmd, req_size, resp_size);
-> +       if (!err && kick)
->                 needs_kick = virtqueue_kick_prepare(vq->vq);
->
->         spin_unlock_irqrestore(&vq->vq_lock, flags);
-> @@ -502,6 +517,7 @@ static int virtscsi_queuecommand(struct Scsi_Host *shost,
->         struct virtio_scsi *vscsi = shost_priv(shost);
->         struct virtio_scsi_vq *req_vq = virtscsi_pick_vq_mq(vscsi, sc);
->         struct virtio_scsi_cmd *cmd = scsi_cmd_priv(sc);
-> +       bool kick;
->         unsigned long flags;
->         int req_size;
->         int ret;
-> @@ -531,7 +547,8 @@ static int virtscsi_queuecommand(struct Scsi_Host *shost,
->                 req_size = sizeof(cmd->req.cmd);
->         }
->
-> -       ret = virtscsi_kick_cmd(req_vq, cmd, req_size, sizeof(cmd->resp.cmd));
-> +       kick = (sc->flags & SCMD_LAST) != 0;
-> +       ret = virtscsi_add_cmd(req_vq, cmd, req_size, sizeof(cmd->resp.cmd), kick);
->         if (ret == -EIO) {
->                 cmd->resp.cmd.response = VIRTIO_SCSI_S_BAD_TARGET;
->                 spin_lock_irqsave(&req_vq->vq_lock, flags);
-> @@ -549,8 +566,8 @@ static int virtscsi_tmf(struct virtio_scsi *vscsi, struct virtio_scsi_cmd *cmd)
->         int ret = FAILED;
->
->         cmd->comp = &comp;
-> -       if (virtscsi_kick_cmd(&vscsi->ctrl_vq, cmd,
-> -                             sizeof cmd->req.tmf, sizeof cmd->resp.tmf) < 0)
-> +       if (virtscsi_add_cmd(&vscsi->ctrl_vq, cmd,
-> +                             sizeof cmd->req.tmf, sizeof cmd->resp.tmf, true) < 0)
->                 goto out;
->
->         wait_for_completion(&comp);
-> @@ -664,6 +681,13 @@ static int virtscsi_map_queues(struct Scsi_Host *shost)
->         return blk_mq_virtio_map_queues(qmap, vscsi->vdev, 2);
->  }
->
-> +static void virtscsi_commit_rqs(struct Scsi_Host *shost, u16 hwq)
-> +{
-> +       struct virtio_scsi *vscsi = shost_priv(shost);
-> +
-> +       virtscsi_kick_vq(&vscsi->req_vqs[hwq]);
-> +}
-> +
->  /*
->   * The host guarantees to respond to each command, although I/O
->   * latencies might be higher than on bare metal.  Reset the timer
-> @@ -681,6 +705,7 @@ static struct scsi_host_template virtscsi_host_template = {
->         .this_id = -1,
->         .cmd_size = sizeof(struct virtio_scsi_cmd),
->         .queuecommand = virtscsi_queuecommand,
-> +       .commit_rqs = virtscsi_commit_rqs,
->         .change_queue_depth = virtscsi_change_queue_depth,
->         .eh_abort_handler = virtscsi_abort,
->         .eh_device_reset_handler = virtscsi_device_reset,
-> --
-> 2.21.0
->
+On Fri, Jul 05, 2019 at 03:29:58PM +0100, Andre Przywara wrote:
+> On Fri, 5 Jul 2019 12:04:41 +0100
+> Dave Martin <Dave.Martin@arm.com> wrote:
+> 
+> Hi Dave,
+> 
+> thanks for having a look!
+> 
+> > On Fri, Jul 05, 2019 at 10:59:14AM +0100, Andre Przywara wrote:
+> > > At the moment a kvmtool process started on a terminal has no way of
+> > > detaching from the terminal without killing the guest. Existing
+> > > workarounds are starting kvmtool in a screen/tmux session or using a
+> > > pseudoterminal (--tty 0), both of which have to be done upon guest
+> > > creation.
+> > > 
+> > > Introduce a terminal command to create a pseudoterminal during the
+> > > guest's runtime and redirect the console output to that. This will be
+> > > triggered by typing the letter 'd' after the kvmtool escape sequence
+> > > (default Ctrl+a). This also daemonises kvmtool, so gives back the shell
+> > > prompt, and the user can log out without affecting the guest.
+> > > 
+> > > Naively daemonising kvmtool at that point doesn't work, though, as the
+> > > fork() doesn't inherit the threads, so they keep running in the
+> > > grandparent process and would be killed by its exit.
+> > > The trick used here is to do the double fork() already right at the
+> > > beginning of kvmtool's runtime, before spawning the first thread.
+> > > We then don't end the parent and grandparent processes yet, instead let
+> > > them block until the user actually requests the detach.
+> > > This will let all the threads be created in the grandchild process, but
+> > > keeps kvmtool still attached to the terminal until the user requests a
+> > > detach.
+> > > 
+> > > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > > ---
+> > >  builtin-run.c     |  3 ++
+> > >  include/kvm/kvm.h |  2 ++
+> > >  term.c            | 91 +++++++++++++++++++++++++++++++++++++++++++++++
+> > >  3 files changed, 96 insertions(+)
+> > > 
+> > > diff --git a/builtin-run.c b/builtin-run.c
+> > > index f8dc6c72..fa391419 100644
+> > > --- a/builtin-run.c
+> > > +++ b/builtin-run.c
+> > > @@ -592,6 +592,9 @@ static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
+> > >  		}
+> > >  	}
+> > >  
+> > > +	/* Fork twice already now to create the threads in the right process. */
+> > > +	kvm__prepare_daemonize();
+> > > +
+> > >  	if (!kvm->cfg.guest_name) {
+> > >  		if (kvm->cfg.custom_rootfs) {
+> > >  			kvm->cfg.guest_name = kvm->cfg.custom_rootfs_name;
+> > > diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+> > > index 7a738183..801f9474 100644
+> > > --- a/include/kvm/kvm.h
+> > > +++ b/include/kvm/kvm.h
+> > > @@ -90,6 +90,8 @@ struct kvm {
+> > >  void kvm__set_dir(const char *fmt, ...);
+> > >  const char *kvm__get_dir(void);
+> > >  
+> > > +int kvm__prepare_daemonize(void);
+> > > +
+> > >  int kvm__init(struct kvm *kvm);
+> > >  struct kvm *kvm__new(void);
+> > >  int kvm__recommended_cpus(struct kvm *kvm);
+> > > diff --git a/term.c b/term.c
+> > > index 7fbd98c6..df8328f8 100644
+> > > --- a/term.c
+> > > +++ b/term.c
+> > > @@ -22,6 +22,7 @@ static struct termios	orig_term;
+> > >  
+> > >  static int term_fds[TERM_MAX_DEVS][2];
+> > >  
+> > > +static int daemon_fd;
+> > >  static int inotify_fd;
+> > >  
+> > >  static pthread_t term_poll_thread;
+> > > @@ -29,6 +30,92 @@ static pthread_t term_poll_thread;
+> > >  /* ctrl-a is used for escape */
+> > >  #define term_escape_char	0x01
+> > >  
+> > > +/* This needs to be called *before* we create any threads. */
+> > > +int kvm__prepare_daemonize(void)
+> > > +{
+> > > +	pid_t pid;
+> > > +	char dummy;
+> > > +	int child_pipe[2], parent_pipe[2];
+> > > +
+> > > +	if (pipe(parent_pipe))
+> > > +		return -1;
+> > > +
+> > > +	pid = fork();
+> > > +	if (pid < 0)
+> > > +		return pid;
+> > > +	if (pid > 0) {			/* parent process */
+> > > +
+> > > +		close(parent_pipe[1]);
+> > > +
+> > > +		/* Block until we are told to exit. */
+> > > +		if (read(parent_pipe[0], &dummy, 1) != 1)
+> > > +			perror("reading exit pipe");
+> > > +
+> > > +		exit(0);  
+> > 
+> > Can we have the child write some status value instead?
+> > 
+> > Right now, if the child goes wrong after forking we will just exit with
+> > status 0 regardless.
+> 
+> Sure, but what would we do in this case and why would we care? The child
+> is just a "trick", so if this somehow fails, it does early and we are
+> screwed anyways.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+It's preferable to return with failure status from the parent if the
+payload (wiether a child process or not) failed to start up properly.
 
-Thanks,
-Ming Lei
+I haven't looked at the bigger picture here though: if we have already
+fired up the VM by this point, there's not interesting that can go
+wrong, I guess.
+
+> > Instead, we could have the child send us the exit status... or if
+> > the child disappears we'll just get EOF and can return failure
+> > appropriately.
+> > 
+> > Also, how does the invoker kill the guest now that kvmtool has exited?
+> 
+> Either by using "lkvm stop -n ..." or by exiting from within the guest.
+> This would be the same as one would create a guest with --tty and put that
+> in the background right now.
+
+OK, I guess lkvm stop works sufficiently for that, then.
+
+> > > +	}
+> > > +
+> > > +	close(parent_pipe[0]);
+> > > +	if (pipe(child_pipe))
+> > > +		return -1;
+> > > +	daemon_fd = child_pipe[1];
+> > > +
+> > > +	/* Become a session leader. */
+> > > +	setsid();
+> > > +	pid = fork();
+> > > +	if (pid > 0) {
+> > > +		close(child_pipe[1]);
+> > > +
+> > > +		/* Block until we are told to exit. */
+> > > +		if (read(child_pipe[0], &dummy, 1) != 1)
+> > > +			perror("reading child exit pipe");
+> > > +
+> > > +		if (write(parent_pipe[1], &dummy, 1) != 1)
+> > > +			pr_warning("could not kill daemon's parent");
+> > > +
+> > > +		exit(0);
+> > > +	}
+> > > +	close(child_pipe[0]);
+> > > +	close(parent_pipe[1]);  
+> > 
+> > Why do we need to fork twice?  The extra process seems redundant.
+> 
+> This is the ~50 year old textbook method of creating a UNIX daemon: By
+> forking twice and killing the child (the "middle" process), the grandchild
+> becomes an orphan, and will be picked up by PID 1 (init). This prevents
+> any interactions with controlling terminals in the future. Dr. Google or a
+> local library should have more information.
+
+Hmmm, I vaguely remember that now.
+
+I'm not sure there's much actual reason to do that except to ensure that
+the new process isn't a session leader, because session leaders with no
+terminal may acquire any tty they open as a controlling tty, unless they
+pass O_NOCTTY all the time to open() and friends.
+
+Running ps -Aj suggests that not all daemons do this, but if we might
+open stuff after forking, I guess it's best to be safe.
+
+> > > +	/* Only the grandchild returns here, to do the actual work. */
+> > > +	return 0;
+> > > +}
+> > > +
+> > > +static void term_set_tty(int term);
+> > > +
+> > > +static void detach_terminal(int term)
+> > > +{
+> > > +	char dummy = 0;
+> > > +
+> > > +	/* Detaching only make sense if we use the process' terminal. */
+> > > +	if (term_fds[term][TERM_FD_IN] != STDIN_FILENO)
+> > > +		return;
+> > > +
+> > > +	/* Clean up just this terminal, leave the others alone. */
+> > > +	tcsetattr(term_fds[term][TERM_FD_IN], TCSANOW, &orig_term);
+> > > +
+> > > +	/* Redirect this terminal to a PTY */
+> > > +	term_set_tty(term);
+> > > +
+> > > +	/*
+> > > +	 * Replace STDIN/STDOUT with this new PTY. This will automatically
+> > > +	 * transfer all the other serial terminals over.
+> > > +	 */
+> > > +	dup2(term_fds[term][TERM_FD_IN], STDIN_FILENO);
+> > > +	dup2(term_fds[term][TERM_FD_OUT], STDOUT_FILENO);  
+> > 
+> > Output to a pty master before the slave is opened just disappears.
+> 
+> Not always, it seems. When I do:
+> $ lkvm run -k Image --tty 0
+> then wait for a bit and open the pseudo-terminal, I get the full boot log
+> "replayed". Not sure who in the chain is actually buffering this, though?
+
+Hmmm, dunno.  Last time I experimented, I didn't see this.
+
+But I can't see what could be buffering it unless the kernel does it or
+the writes just block until the slave is opened.  Or we simply don't
+consider the pty master writable until the slave is opened, resulting
+in kvmtool buffering the output as a side-effect.
+
+Maybe the kernel's behaviour on this point has changed over time.
+
+> > Possibly it would be useful to buffer it somewhere.
+> 
+> Sounds useful, but it's more a story for another time, I guess, since we
+> have the same issue with --tty already.
+> One related problem is the gap between starting/detaching a guest and
+> connecting to the terminal for the first time, as one cannot do this fast
+> and reliable enough without loosing characters, I guess. Maybe it's worth
+> to introduce something like "start as paused", so we can connect to the
+> terminal and then do a "lkvm resume".
+> 
+> > I wonder whether it would make sense to redirect to a notional dummy
+> > terminal (which might or might not buffer output), and start talking to
+> > a pty or socket only once opened by a client.
+> 
+> Mmmh, sounds like that would fit in nicely since with patch 1/2 we now
+> know about connects and possibly even disconnects.
+
+OK, I guess this comes under future ehancements (if we need to do it at
+all).
+
+Cheers
+---Dave
