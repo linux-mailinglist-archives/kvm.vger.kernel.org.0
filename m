@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FB38624B3
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2019 17:45:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C264862174
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2019 17:16:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388025AbfGHPWm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jul 2019 11:22:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49352 "EHLO mail.kernel.org"
+        id S1732544AbfGHPQ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jul 2019 11:16:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39246 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388018AbfGHPWl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jul 2019 11:22:41 -0400
+        id S1732518AbfGHPQT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jul 2019 11:16:19 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DF280216C4;
-        Mon,  8 Jul 2019 15:22:39 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 27A4E216F4;
+        Mon,  8 Jul 2019 15:16:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1562599360;
-        bh=3OOO7NvkNSeJp6gSWkgAG1k2KMdEBv/7K2mAQpAKhZs=;
+        s=default; t=1562598978;
+        bh=4Ahg2GXYYsHUau4Ok8zIOt9qfq6O1JPEwBm4JbHt6iM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=NZU8ERAHxV9YRYeqKiV4cI7BgWQP38Z941pis2aoouMOM29SLLEnH0PwSqGkbglTz
-         4sFLY0o3B+uyFeimp9aozOHX9An/Dzo8kKBuR/45NM/i4R8NPqEQnF3istTeWatZoG
-         t6lQPq1+f9tUFpS2wSkC5qy7hUEMYP5My+93z1Cs=
+        b=wADDV46KuZsm5fjLWjwotkorSttdf2NnALgmosPSt6AePCAnpt8zfIGp12Yx3G0z6
+         cch+kVU/m66FEQGpPA2xlHTJC/KNfqzTymy4nO632IYOFMgSkY0AUOem+5anEg8E4v
+         /6fXw1Yn9Bwl8ZDk4o5o4Yfc3Q+Gy1aj0lgs82oI=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -33,12 +33,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Mark Kanda <mark.kanda@oracle.com>,
         Paolo Bonzini <pbonzini@redhat.com>, bp@alien8.de,
         rkrcmar@redhat.com, kvm@vger.kernel.org
-Subject: [PATCH 4.9 049/102] x86/speculation: Allow guests to use SSBD even if host does not
-Date:   Mon,  8 Jul 2019 17:12:42 +0200
-Message-Id: <20190708150528.978179446@linuxfoundation.org>
+Subject: [PATCH 4.4 38/73] x86/speculation: Allow guests to use SSBD even if host does not
+Date:   Mon,  8 Jul 2019 17:12:48 +0200
+Message-Id: <20190708150523.343123789@linuxfoundation.org>
 X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190708150525.973820964@linuxfoundation.org>
-References: <20190708150525.973820964@linuxfoundation.org>
+In-Reply-To: <20190708150513.136580595@linuxfoundation.org>
+References: <20190708150513.136580595@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -88,7 +88,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/arch/x86/kernel/cpu/bugs.c
 +++ b/arch/x86/kernel/cpu/bugs.c
-@@ -829,6 +829,16 @@ static enum ssb_mitigation __init __ssb_
+@@ -807,6 +807,16 @@ static enum ssb_mitigation __init __ssb_
  	}
  
  	/*
@@ -105,7 +105,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  	 * We have three CPU feature flags that are in play here:
  	 *  - X86_BUG_SPEC_STORE_BYPASS - CPU is susceptible.
  	 *  - X86_FEATURE_SSBD - CPU is able to turn off speculative store bypass
-@@ -845,7 +855,6 @@ static enum ssb_mitigation __init __ssb_
+@@ -823,7 +833,6 @@ static enum ssb_mitigation __init __ssb_
  			x86_amd_ssb_disable();
  		} else {
  			x86_spec_ctrl_base |= SPEC_CTRL_SSBD;
