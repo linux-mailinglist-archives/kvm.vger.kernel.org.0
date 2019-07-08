@@ -2,59 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9445B62138
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2019 17:11:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FB38624B3
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2019 17:45:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732176AbfGHPLp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jul 2019 11:11:45 -0400
-Received: from mga09.intel.com ([134.134.136.24]:58570 "EHLO mga09.intel.com"
+        id S2388025AbfGHPWm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jul 2019 11:22:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49352 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732162AbfGHPLm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jul 2019 11:11:42 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jul 2019 08:11:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,466,1557212400"; 
-   d="scan'208";a="165482391"
-Received: from tassilo.jf.intel.com (HELO tassilo.localdomain) ([10.7.201.137])
-  by fmsmga008.fm.intel.com with ESMTP; 08 Jul 2019 08:11:40 -0700
-Received: by tassilo.localdomain (Postfix, from userid 1000)
-        id 3F381301BB6; Mon,  8 Jul 2019 08:11:41 -0700 (PDT)
-Date:   Mon, 8 Jul 2019 08:11:41 -0700
-From:   Andi Kleen <ak@linux.intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Wei Wang <wei.w.wang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, pbonzini@redhat.com, kan.liang@intel.com,
-        mingo@redhat.com, rkrcmar@redhat.com, like.xu@intel.com,
-        jannh@google.com, arei.gonglei@huawei.com, jmattson@google.com
-Subject: Re: [PATCH v7 10/12] KVM/x86/lbr: lazy save the guest lbr stack
-Message-ID: <20190708151141.GL31027@tassilo.jf.intel.com>
-References: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com>
- <1562548999-37095-11-git-send-email-wei.w.wang@intel.com>
- <20190708145326.GO3402@hirez.programming.kicks-ass.net>
+        id S2388018AbfGHPWl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jul 2019 11:22:41 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id DF280216C4;
+        Mon,  8 Jul 2019 15:22:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1562599360;
+        bh=3OOO7NvkNSeJp6gSWkgAG1k2KMdEBv/7K2mAQpAKhZs=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=NZU8ERAHxV9YRYeqKiV4cI7BgWQP38Z941pis2aoouMOM29SLLEnH0PwSqGkbglTz
+         4sFLY0o3B+uyFeimp9aozOHX9An/Dzo8kKBuR/45NM/i4R8NPqEQnF3istTeWatZoG
+         t6lQPq1+f9tUFpS2wSkC5qy7hUEMYP5My+93z1Cs=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org,
+        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Liam Merwick <liam.merwick@oracle.com>,
+        Mark Kanda <mark.kanda@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, bp@alien8.de,
+        rkrcmar@redhat.com, kvm@vger.kernel.org
+Subject: [PATCH 4.9 049/102] x86/speculation: Allow guests to use SSBD even if host does not
+Date:   Mon,  8 Jul 2019 17:12:42 +0200
+Message-Id: <20190708150528.978179446@linuxfoundation.org>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190708150525.973820964@linuxfoundation.org>
+References: <20190708150525.973820964@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190708145326.GO3402@hirez.programming.kicks-ass.net>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> I don't understand a word of that.
-> 
-> Who cares if the LBR MSRs are touched; the guest expects up-to-date
-> values when it does reads them.
+From: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
 
-This is for only when the LBRs are disabled in the guest.
+commit c1f7fec1eb6a2c86d01bc22afce772c743451d88 upstream.
 
-It doesn't make sense to constantly save/restore disabled LBRs, which
-would be a large overhead for guests that don't use LBRs. 
+The bits set in x86_spec_ctrl_mask are used to calculate the guest's value
+of SPEC_CTRL that is written to the MSR before VMENTRY, and control which
+mitigations the guest can enable.  In the case of SSBD, unless the host has
+enabled SSBD always on mode (by passing "spec_store_bypass_disable=on" in
+the kernel parameters), the SSBD bit is not set in the mask and the guest
+can not properly enable the SSBD always on mitigation mode.
 
-When the LBRs are enabled they always need to be saved/restored as you
-say.
+This has been confirmed by running the SSBD PoC on a guest using the SSBD
+always on mitigation mode (booted with kernel parameter
+"spec_store_bypass_disable=on"), and verifying that the guest is vulnerable
+unless the host is also using SSBD always on mode. In addition, the guest
+OS incorrectly reports the SSB vulnerability as mitigated.
 
--Andi
+Always set the SSBD bit in x86_spec_ctrl_mask when the host CPU supports
+it, allowing the guest to use SSBD whether or not the host has chosen to
+enable the mitigation in any of its modes.
+
+Fixes: be6fcb5478e9 ("x86/bugs: Rework spec_ctrl base and mask logic")
+Signed-off-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Reviewed-by: Mark Kanda <mark.kanda@oracle.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Cc: bp@alien8.de
+Cc: rkrcmar@redhat.com
+Cc: kvm@vger.kernel.org
+Cc: stable@vger.kernel.org
+Link: https://lkml.kernel.org/r/1560187210-11054-1-git-send-email-alejandro.j.jimenez@oracle.com
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+---
+ arch/x86/kernel/cpu/bugs.c |   11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+--- a/arch/x86/kernel/cpu/bugs.c
++++ b/arch/x86/kernel/cpu/bugs.c
+@@ -829,6 +829,16 @@ static enum ssb_mitigation __init __ssb_
+ 	}
+ 
+ 	/*
++	 * If SSBD is controlled by the SPEC_CTRL MSR, then set the proper
++	 * bit in the mask to allow guests to use the mitigation even in the
++	 * case where the host does not enable it.
++	 */
++	if (static_cpu_has(X86_FEATURE_SPEC_CTRL_SSBD) ||
++	    static_cpu_has(X86_FEATURE_AMD_SSBD)) {
++		x86_spec_ctrl_mask |= SPEC_CTRL_SSBD;
++	}
++
++	/*
+ 	 * We have three CPU feature flags that are in play here:
+ 	 *  - X86_BUG_SPEC_STORE_BYPASS - CPU is susceptible.
+ 	 *  - X86_FEATURE_SSBD - CPU is able to turn off speculative store bypass
+@@ -845,7 +855,6 @@ static enum ssb_mitigation __init __ssb_
+ 			x86_amd_ssb_disable();
+ 		} else {
+ 			x86_spec_ctrl_base |= SPEC_CTRL_SSBD;
+-			x86_spec_ctrl_mask |= SPEC_CTRL_SSBD;
+ 			wrmsrl(MSR_IA32_SPEC_CTRL, x86_spec_ctrl_base);
+ 		}
+ 	}
+
+
