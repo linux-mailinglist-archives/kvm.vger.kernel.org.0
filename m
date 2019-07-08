@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C70B61934
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2019 04:07:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BED4E6192F
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2019 04:07:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728603AbfGHCGf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1728616AbfGHCGf (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Sun, 7 Jul 2019 22:06:35 -0400
 Received: from mga17.intel.com ([192.55.52.151]:44745 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728556AbfGHCGc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 7 Jul 2019 22:06:32 -0400
+        id S1728595AbfGHCGf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 7 Jul 2019 22:06:35 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Jul 2019 19:06:32 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Jul 2019 19:06:34 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,464,1557212400"; 
-   d="scan'208";a="364083555"
+   d="scan'208";a="364083564"
 Received: from devel-ww.sh.intel.com ([10.239.48.128])
-  by fmsmga006.fm.intel.com with ESMTP; 07 Jul 2019 19:06:30 -0700
+  by fmsmga006.fm.intel.com with ESMTP; 07 Jul 2019 19:06:32 -0700
 From:   Wei Wang <wei.w.wang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         pbonzini@redhat.com, ak@linux.intel.com, peterz@infradead.org
 Cc:     kan.liang@intel.com, mingo@redhat.com, rkrcmar@redhat.com,
         like.xu@intel.com, wei.w.wang@intel.com, jannh@google.com,
         arei.gonglei@huawei.com, jmattson@google.com
-Subject: [PATCH v7 06/12] KVM/x86: expose MSR_IA32_PERF_CAPABILITIES to the guest
-Date:   Mon,  8 Jul 2019 09:23:13 +0800
-Message-Id: <1562548999-37095-7-git-send-email-wei.w.wang@intel.com>
+Subject: [PATCH v7 07/12] perf/x86: no counter allocation support
+Date:   Mon,  8 Jul 2019 09:23:14 +0800
+Message-Id: <1562548999-37095-8-git-send-email-wei.w.wang@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com>
 References: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com>
@@ -37,86 +37,159 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Bits [0, 5] of MSR_IA32_PERF_CAPABILITIES tell about the format of
-the addresses stored in the LBR stack. Expose those bits to the guest
-when the guest lbr feature is enabled.
+In some cases, an event may be created without needing a counter
+allocation. For example, an lbr event may be created by the host
+only to help save/restore the lbr stack on the vCPU context switching.
+
+This patch adds a new interface to allow users to create a perf event
+without the need of counter assignment.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Andi Kleen <ak@linux.intel.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
 ---
- arch/x86/include/asm/perf_event.h |  2 ++
- arch/x86/kvm/cpuid.c              |  2 +-
- arch/x86/kvm/vmx/pmu_intel.c      | 16 ++++++++++++++++
- 3 files changed, 19 insertions(+), 1 deletion(-)
+ arch/x86/events/core.c     | 12 ++++++++++++
+ include/linux/perf_event.h | 13 +++++++++++++
+ kernel/events/core.c       | 37 +++++++++++++++++++++++++------------
+ 3 files changed, 50 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-index 2606100..aa77da2 100644
---- a/arch/x86/include/asm/perf_event.h
-+++ b/arch/x86/include/asm/perf_event.h
-@@ -95,6 +95,8 @@
- #define PEBS_DATACFG_LBRS	BIT_ULL(3)
- #define PEBS_DATACFG_LBR_SHIFT	24
+diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+index f315425..eebbd65 100644
+--- a/arch/x86/events/core.c
++++ b/arch/x86/events/core.c
+@@ -410,6 +410,9 @@ int x86_setup_perfctr(struct perf_event *event)
+ 	struct hw_perf_event *hwc = &event->hw;
+ 	u64 config;
  
-+#define X86_PERF_CAP_MASK_LBR_FMT			0x3f
++	if (is_no_counter_event(event))
++		return 0;
++
+ 	if (!is_sampling_event(event)) {
+ 		hwc->sample_period = x86_pmu.max_period;
+ 		hwc->last_period = hwc->sample_period;
+@@ -1248,6 +1251,12 @@ static int x86_pmu_add(struct perf_event *event, int flags)
+ 	hwc = &event->hw;
+ 
+ 	n0 = cpuc->n_events;
++
++	if (is_no_counter_event(event)) {
++		n = n0;
++		goto done_collect;
++	}
++
+ 	ret = n = collect_events(cpuc, event, false);
+ 	if (ret < 0)
+ 		goto out;
+@@ -1422,6 +1431,9 @@ static void x86_pmu_del(struct perf_event *event, int flags)
+ 	if (cpuc->txn_flags & PERF_PMU_TXN_ADD)
+ 		goto do_del;
+ 
++	if (is_no_counter_event(event))
++		goto do_del;
++
+ 	/*
+ 	 * Not a TXN, therefore cleanup properly.
+ 	 */
+diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+index 0ab99c7..19e6593 100644
+--- a/include/linux/perf_event.h
++++ b/include/linux/perf_event.h
+@@ -528,6 +528,7 @@ typedef void (*perf_overflow_handler_t)(struct perf_event *,
+  */
+ #define PERF_EV_CAP_SOFTWARE		BIT(0)
+ #define PERF_EV_CAP_READ_ACTIVE_PKG	BIT(1)
++#define PERF_EV_CAP_NO_COUNTER		BIT(2)
+ 
+ #define SWEVENT_HLIST_BITS		8
+ #define SWEVENT_HLIST_SIZE		(1 << SWEVENT_HLIST_BITS)
+@@ -895,6 +896,13 @@ extern int perf_event_refresh(struct perf_event *event, int refresh);
+ extern void perf_event_update_userpage(struct perf_event *event);
+ extern int perf_event_release_kernel(struct perf_event *event);
+ extern struct perf_event *
++perf_event_create(struct perf_event_attr *attr,
++		  int cpu,
++		  struct task_struct *task,
++		  perf_overflow_handler_t overflow_handler,
++		  void *context,
++		  bool counter_assignment);
++extern struct perf_event *
+ perf_event_create_kernel_counter(struct perf_event_attr *attr,
+ 				int cpu,
+ 				struct task_struct *task,
+@@ -1032,6 +1040,11 @@ static inline bool is_sampling_event(struct perf_event *event)
+ 	return event->attr.sample_period != 0;
+ }
+ 
++static inline bool is_no_counter_event(struct perf_event *event)
++{
++	return !!(event->event_caps & PERF_EV_CAP_NO_COUNTER);
++}
 +
  /*
-  * Intel "Architectural Performance Monitoring" CPUID
-  * detection/enumeration details:
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 4992e7c..4b9e713 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -361,7 +361,7 @@ static inline int __do_cpuid_ent(struct kvm_cpuid_entry2 *entry, u32 function,
- 		F(XMM3) | F(PCLMULQDQ) | 0 /* DTES64, MONITOR */ |
- 		0 /* DS-CPL, VMX, SMX, EST */ |
- 		0 /* TM2 */ | F(SSSE3) | 0 /* CNXT-ID */ | 0 /* Reserved */ |
--		F(FMA) | F(CX16) | 0 /* xTPR Update, PDCM */ |
-+		F(FMA) | F(CX16) | 0 /* xTPR Update*/ | F(PDCM) |
- 		F(PCID) | 0 /* Reserved, DCA */ | F(XMM4_1) |
- 		F(XMM4_2) | F(X2APIC) | F(MOVBE) | F(POPCNT) |
- 		0 /* Reserved*/ | F(AES) | F(XSAVE) | 0 /* OSXSAVE */ | F(AVX) |
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 1e19b01..09ae6ff 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -151,6 +151,7 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
- 	case MSR_CORE_PERF_GLOBAL_STATUS:
- 	case MSR_CORE_PERF_GLOBAL_CTRL:
- 	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
-+	case MSR_IA32_PERF_CAPABILITIES:
- 		ret = pmu->version > 1;
- 		break;
- 	default:
-@@ -316,6 +317,19 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
- 		msr_info->data = pmu->global_ovf_ctrl;
- 		return 0;
-+	case MSR_IA32_PERF_CAPABILITIES: {
-+		u64 data;
+  * Return 1 for a software event, 0 for a hardware event
+  */
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index abbd4b3..70884df 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -11162,18 +11162,10 @@ SYSCALL_DEFINE5(perf_event_open,
+ 	return err;
+ }
+ 
+-/**
+- * perf_event_create_kernel_counter
+- *
+- * @attr: attributes of the counter to create
+- * @cpu: cpu in which the counter is bound
+- * @task: task to profile (NULL for percpu)
+- */
+-struct perf_event *
+-perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
+-				 struct task_struct *task,
+-				 perf_overflow_handler_t overflow_handler,
+-				 void *context)
++struct perf_event *perf_event_create(struct perf_event_attr *attr, int cpu,
++				     struct task_struct *task,
++				     perf_overflow_handler_t overflow_handler,
++				     void *context, bool need_counter)
+ {
+ 	struct perf_event_context *ctx;
+ 	struct perf_event *event;
+@@ -11193,6 +11185,9 @@ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
+ 	/* Mark owner so we could distinguish it from user events. */
+ 	event->owner = TASK_TOMBSTONE;
+ 
++	if (!need_counter)
++		event->event_caps |= PERF_EV_CAP_NO_COUNTER;
 +
-+		if (!boot_cpu_has(X86_FEATURE_PDCM) ||
-+		    (!msr_info->host_initiated &&
-+		     !guest_cpuid_has(vcpu, X86_FEATURE_PDCM)))
-+			return 1;
-+		data = native_read_msr(MSR_IA32_PERF_CAPABILITIES);
-+		msr_info->data = 0;
-+		if (vcpu->kvm->arch.lbr_in_guest)
-+			msr_info->data |= (data & X86_PERF_CAP_MASK_LBR_FMT);
-+		return 0;
-+	}
- 	default:
- 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))) {
- 			u64 val = pmc_read_counter(pmc);
-@@ -374,6 +388,8 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			return 0;
- 		}
- 		break;
-+	case MSR_IA32_PERF_CAPABILITIES:
-+		return 1; /* RO MSR */
- 	default:
- 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0))) {
- 			if (msr_info->host_initiated)
+ 	ctx = find_get_context(event->pmu, task, event);
+ 	if (IS_ERR(ctx)) {
+ 		err = PTR_ERR(ctx);
+@@ -11241,6 +11236,24 @@ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
+ err:
+ 	return ERR_PTR(err);
+ }
++EXPORT_SYMBOL_GPL(perf_event_create);
++
++/**
++ * perf_event_create_kernel_counter
++ *
++ * @attr: attributes of the counter to create
++ * @cpu: cpu in which the counter is bound
++ * @task: task to profile (NULL for percpu)
++ */
++struct perf_event *
++perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
++				 struct task_struct *task,
++				 perf_overflow_handler_t overflow_handler,
++				 void *context)
++{
++	return perf_event_create(attr, cpu, task, overflow_handler,
++				 context, true);
++}
+ EXPORT_SYMBOL_GPL(perf_event_create_kernel_counter);
+ 
+ void perf_pmu_migrate_context(struct pmu *pmu, int src_cpu, int dst_cpu)
 -- 
 2.7.4
 
