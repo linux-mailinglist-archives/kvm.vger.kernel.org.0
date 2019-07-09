@@ -2,212 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A84462E4E
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 04:51:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB5CE62E54
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 04:54:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726358AbfGICvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jul 2019 22:51:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36738 "EHLO mx1.redhat.com"
+        id S1727152AbfGICxS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jul 2019 22:53:18 -0400
+Received: from mga05.intel.com ([192.55.52.43]:44565 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725886AbfGICvE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jul 2019 22:51:04 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 31FF888311;
-        Tue,  9 Jul 2019 02:50:56 +0000 (UTC)
-Received: from [10.72.12.197] (ovpn-12-197.pek2.redhat.com [10.72.12.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 18CD4381A9;
-        Tue,  9 Jul 2019 02:50:39 +0000 (UTC)
-Subject: Re: [RFC v2] vhost: introduce mdev based hardware vhost backend
-To:     Tiwei Bie <tiwei.bie@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>
-Cc:     mst@redhat.com, maxime.coquelin@redhat.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        dan.daly@intel.com, cunming.liang@intel.com,
-        zhihong.wang@intel.com, idos@mellanox.com,
-        Rob Miller <rob.miller@broadcom.com>,
-        Ariel Adam <aadam@redhat.com>
-References: <20190703091339.1847-1-tiwei.bie@intel.com>
- <7b8279b2-aa7e-7adc-eeff-20dfaf4400d0@redhat.com>
- <20190703115245.GA22374@___>
- <64833f91-02cd-7143-f12e-56ab93b2418d@redhat.com> <20190703130817.GA1978@___>
- <b01b8e28-8d96-31dd-56f4-ca7793498c55@redhat.com>
- <20190704062134.GA21116@___> <20190705084946.67b8f9f5@x1.home>
- <20190708061625.GA15936@___>
-From:   Jason Wang <jasowang@redhat.com>
-Message-ID: <deae5ede-57e9-41e6-ea42-d84e07ca480a@redhat.com>
-Date:   Tue, 9 Jul 2019 10:50:38 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1725886AbfGICxS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jul 2019 22:53:18 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jul 2019 19:53:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,469,1557212400"; 
+   d="scan'208";a="364443279"
+Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
+  by fmsmga006.fm.intel.com with ESMTP; 08 Jul 2019 19:53:16 -0700
+Message-ID: <5D2402E6.7060104@intel.com>
+Date:   Tue, 09 Jul 2019 10:58:46 +0800
+From:   Wei Wang <wei.w.wang@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190708061625.GA15936@___>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Tue, 09 Jul 2019 02:51:04 +0000 (UTC)
+To:     Peter Zijlstra <peterz@infradead.org>
+CC:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com, ak@linux.intel.com, kan.liang@intel.com,
+        mingo@redhat.com, rkrcmar@redhat.com, like.xu@intel.com,
+        jannh@google.com, arei.gonglei@huawei.com, jmattson@google.com
+Subject: Re: [PATCH v7 07/12] perf/x86: no counter allocation support
+References: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com> <1562548999-37095-8-git-send-email-wei.w.wang@intel.com> <20190708142947.GM3402@hirez.programming.kicks-ass.net>
+In-Reply-To: <20190708142947.GM3402@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 07/08/2019 10:29 PM, Peter Zijlstra wrote:
 
-On 2019/7/8 下午2:16, Tiwei Bie wrote:
-> On Fri, Jul 05, 2019 at 08:49:46AM -0600, Alex Williamson wrote:
->> On Thu, 4 Jul 2019 14:21:34 +0800
->> Tiwei Bie <tiwei.bie@intel.com> wrote:
->>> On Thu, Jul 04, 2019 at 12:31:48PM +0800, Jason Wang wrote:
->>>> On 2019/7/3 下午9:08, Tiwei Bie wrote:
->>>>> On Wed, Jul 03, 2019 at 08:16:23PM +0800, Jason Wang wrote:
->>>>>> On 2019/7/3 下午7:52, Tiwei Bie wrote:
->>>>>>> On Wed, Jul 03, 2019 at 06:09:51PM +0800, Jason Wang wrote:
->>>>>>>> On 2019/7/3 下午5:13, Tiwei Bie wrote:
->>>>>>>>> Details about this can be found here:
->>>>>>>>>
->>>>>>>>> https://lwn.net/Articles/750770/
->>>>>>>>>
->>>>>>>>> What's new in this version
->>>>>>>>> ==========================
->>>>>>>>>
->>>>>>>>> A new VFIO device type is introduced - vfio-vhost. This addressed
->>>>>>>>> some comments from here:https://patchwork.ozlabs.org/cover/984763/
->>>>>>>>>
->>>>>>>>> Below is the updated device interface:
->>>>>>>>>
->>>>>>>>> Currently, there are two regions of this device: 1) CONFIG_REGION
->>>>>>>>> (VFIO_VHOST_CONFIG_REGION_INDEX), which can be used to setup the
->>>>>>>>> device; 2) NOTIFY_REGION (VFIO_VHOST_NOTIFY_REGION_INDEX), which
->>>>>>>>> can be used to notify the device.
->>>>>>>>>
->>>>>>>>> 1. CONFIG_REGION
->>>>>>>>>
->>>>>>>>> The region described by CONFIG_REGION is the main control interface.
->>>>>>>>> Messages will be written to or read from this region.
->>>>>>>>>
->>>>>>>>> The message type is determined by the `request` field in message
->>>>>>>>> header. The message size is encoded in the message header too.
->>>>>>>>> The message format looks like this:
->>>>>>>>>
->>>>>>>>> struct vhost_vfio_op {
->>>>>>>>> 	__u64 request;
->>>>>>>>> 	__u32 flags;
->>>>>>>>> 	/* Flag values: */
->>>>>>>>>      #define VHOST_VFIO_NEED_REPLY 0x1 /* Whether need reply */
->>>>>>>>> 	__u32 size;
->>>>>>>>> 	union {
->>>>>>>>> 		__u64 u64;
->>>>>>>>> 		struct vhost_vring_state state;
->>>>>>>>> 		struct vhost_vring_addr addr;
->>>>>>>>> 	} payload;
->>>>>>>>> };
->>>>>>>>>
->>>>>>>>> The existing vhost-kernel ioctl cmds are reused as the message
->>>>>>>>> requests in above structure.
->>>>>>>> Still a comments like V1. What's the advantage of inventing a new protocol?
->>>>>>> I'm trying to make it work in VFIO's way..
->>>>>>>    
->>>>>>>> I believe either of the following should be better:
->>>>>>>>
->>>>>>>> - using vhost ioctl,  we can start from SET_VRING_KICK/SET_VRING_CALL and
->>>>>>>> extend it with e.g notify region. The advantages is that all exist userspace
->>>>>>>> program could be reused without modification (or minimal modification). And
->>>>>>>> vhost API hides lots of details that is not necessary to be understood by
->>>>>>>> application (e.g in the case of container).
->>>>>>> Do you mean reusing vhost's ioctl on VFIO device fd directly,
->>>>>>> or introducing another mdev driver (i.e. vhost_mdev instead of
->>>>>>> using the existing vfio_mdev) for mdev device?
->>>>>> Can we simply add them into ioctl of mdev_parent_ops?
->>>>> Right, either way, these ioctls have to be and just need to be
->>>>> added in the ioctl of the mdev_parent_ops. But another thing we
->>>>> also need to consider is that which file descriptor the userspace
->>>>> will do the ioctl() on. So I'm wondering do you mean let the
->>>>> userspace do the ioctl() on the VFIO device fd of the mdev
->>>>> device?
->>>>>    
->>>> Yes.
->>> Got it! I'm not sure what's Alex opinion on this. If we all
->>> agree with this, I can do it in this way.
->>>
->>>> Is there any other way btw?
->>> Just a quick thought.. Maybe totally a bad idea. I was thinking
->>> whether it would be odd to do non-VFIO's ioctls on VFIO's device
->>> fd. So I was wondering whether it's possible to allow binding
->>> another mdev driver (e.g. vhost_mdev) to the supported mdev
->>> devices. The new mdev driver, vhost_mdev, can provide similar
->>> ways to let userspace open the mdev device and do the vhost ioctls
->>> on it. To distinguish with the vfio_mdev compatible mdev devices,
->>> the device API of the new vhost_mdev compatible mdev devices
->>> might be e.g. "vhost-net" for net?
->>>
->>> So in VFIO case, the device will be for passthru directly. And
->>> in VHOST case, the device can be used to accelerate the existing
->>> virtualized devices.
->>>
->>> How do you think?
->> VFIO really can't prevent vendor specific ioctls on the device file
->> descriptor for mdevs, but a) we'd want to be sure the ioctl address
->> space can't collide with ioctls we'd use for vfio defined purposes and
->> b) maybe the VFIO user API isn't what you want in the first place if
->> you intend to mostly/entirely ignore the defined ioctl set and replace
->> them with your own.  In the case of the latter, you're also not getting
->> the advantages of the existing VFIO userspace code, so why expose a
->> VFIO device at all.
-> Yeah, I totally agree.
-
-
-I guess the original idea is to reuse the VFIO DMA/IOMMU API for this. 
-Then we have the chance to reuse vfio codes in qemu for dealing with e.g 
-vIOMMU.
-
+Thanks for the comments.
 
 >
->> The mdev interface does provide a general interface for creating and
->> managing virtual devices, vfio-mdev is just one driver on the mdev
->> bus.  Parav (Mellanox) has been doing work on mdev-core to help clean
->> out vfio-isms from the interface, aiui, with the intent of implementing
->> another mdev bus driver for using the devices within the kernel.
-> Great to know this! I found below series after some searching:
->
-> https://lkml.org/lkml/2019/3/8/821
->
-> In above series, the new mlx5_core mdev driver will do the probe
-> by calling mlx5_get_core_dev() first on the parent device of the
-> mdev device. In vhost_mdev, maybe we can also keep track of all
-> the compatible mdev devices and use this info to do the probe.
+>> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+>> index 0ab99c7..19e6593 100644
+>> --- a/include/linux/perf_event.h
+>> +++ b/include/linux/perf_event.h
+>> @@ -528,6 +528,7 @@ typedef void (*perf_overflow_handler_t)(struct perf_event *,
+>>    */
+>>   #define PERF_EV_CAP_SOFTWARE		BIT(0)
+>>   #define PERF_EV_CAP_READ_ACTIVE_PKG	BIT(1)
+>> +#define PERF_EV_CAP_NO_COUNTER		BIT(2)
+>>   
+>>   #define SWEVENT_HLIST_BITS		8
+>>   #define SWEVENT_HLIST_SIZE		(1 << SWEVENT_HLIST_BITS)
+>> @@ -895,6 +896,13 @@ extern int perf_event_refresh(struct perf_event *event, int refresh);
+>>   extern void perf_event_update_userpage(struct perf_event *event);
+>>   extern int perf_event_release_kernel(struct perf_event *event);
+>>   extern struct perf_event *
+>> +perf_event_create(struct perf_event_attr *attr,
+>> +		  int cpu,
+>> +		  struct task_struct *task,
+>> +		  perf_overflow_handler_t overflow_handler,
+>> +		  void *context,
+>> +		  bool counter_assignment);
+>> +extern struct perf_event *
+>>   perf_event_create_kernel_counter(struct perf_event_attr *attr,
+>>   				int cpu,
+>>   				struct task_struct *task,
+> Why the heck are you creating this wrapper nonsense?
 
+(please see early discussions: https://lkml.org/lkml/2018/9/20/868)
+I thought we agreed that the perf event created here don't need to consume
+an extra counter.
 
-I don't get why this is needed. My understanding is if we want to go 
-this way, there're actually two parts. 1) Vhost mdev that implements the 
-device managements and vhost ioctl. 2) Vhost it self, which can accept 
-mdev fd as it backend through VHOST_NET_SET_BACKEND.
+In the previous version, we added a "no_counter" bit to perf_event_attr, and
+that will be exposed to user ABI, which seems not good.
+(https://lkml.org/lkml/2019/2/14/791)
+So we wrap a new kernel API above to support this.
 
+Do you have a different suggestion to do this?
+(exclude host/guest just clears the enable bit when on VM-exit/entry,
+still consumes the counter)
 
-> But we also need a way to allow vfio_mdev driver to distinguish
-> and reject the incompatible mdev devices.
-
-
-One issue for this series is that it doesn't consider DMA isolation at all.
-
-
->
->> It
->> seems like this vhost-mdev driver might be similar, using mdev but not
->> necessarily vfio-mdev to expose devices.  Thanks,
-> Yeah, I also think so!
-
-
-I've cced some driver developers for their inputs. I think we need a 
-sample parent drivers in the next version for us to understand the full 
-picture.
-
-
-Thanks
-
-
->
-> Thanks!
-> Tiwei
->
->> Alex
+Best,
+Wei
