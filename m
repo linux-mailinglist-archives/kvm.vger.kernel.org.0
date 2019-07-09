@@ -2,153 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C5C263A19
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 19:24:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E63863AF1
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 20:28:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726660AbfGIRYG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jul 2019 13:24:06 -0400
-Received: from mga11.intel.com ([192.55.52.93]:18135 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726560AbfGIRYF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jul 2019 13:24:05 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jul 2019 10:24:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,470,1557212400"; 
-   d="scan'208";a="176562861"
-Received: from sjchrist-coffee.jf.intel.com ([10.54.74.165])
-  by orsmga002.jf.intel.com with ESMTP; 09 Jul 2019 10:24:03 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     kvm@vger.kernel.org
-Subject: [PATCH v2 2/2] KVM: nVMX: trace nested VM-Enter failures detected by H/W
-Date:   Tue,  9 Jul 2019 10:24:02 -0700
-Message-Id: <20190709172402.2934-3-sean.j.christopherson@intel.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190709172402.2934-1-sean.j.christopherson@intel.com>
-References: <20190709172402.2934-1-sean.j.christopherson@intel.com>
+        id S1728676AbfGIS20 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jul 2019 14:28:26 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:53378 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726618AbfGIS20 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jul 2019 14:28:26 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x69IOJ71146036;
+        Tue, 9 Jul 2019 18:27:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=ZuuBmd+hn0gNy1yFa1x6CDg54lC3wgXrt5IpUQJMaw8=;
+ b=lRX0A7gL0wgwbmshdLkJUR2nj6Nkv0327AL5K1+MgOC/0emwkvWtP24UtlurMRGDHP+8
+ 3sKCLAT/0m+YdzcMvusZtNfGFsvBPgpSVbtNF8lbJSfJzm1P9qoxZvpFjZADFI84SZ9U
+ hIVeITJmHqlhA1wH8rLYqIXinP7/oAKZKrCjmb8bNmdVljnM7c+gDv6rNypd0DOp34Sa
+ +r2eXShIlfFW4wHe8xtLXa2bWI4nvSoqHFSfL6XHiB3Zijd1wqGrpLbhH+lH8D3Iv7Wy
+ S04ZamFBMOiywBd63+jP0fCC6yrZ505RRPJIgyAiRDiiTOBmYfEAXsDPi9L9Rc6wBQPY gA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 2tjk2tp0s8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 09 Jul 2019 18:27:03 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x69IIhwl138656;
+        Tue, 9 Jul 2019 18:27:02 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2tmmh3474u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 09 Jul 2019 18:27:02 +0000
+Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x69IR19r025057;
+        Tue, 9 Jul 2019 18:27:01 GMT
+Received: from [10.156.75.135] (/10.156.75.135)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 09 Jul 2019 11:27:01 -0700
+Subject: Re: cputime takes cstate into consideration
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        "Raslan, KarimAllah" <karahmed@amazon.de>,
+        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kernellwp@gmail.com" <kernellwp@gmail.com>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>
+References: <CANRm+Cyge6viybs63pt7W-cRdntx+wfyOq5EWE2qmEQ71SzMHg@mail.gmail.com>
+ <alpine.DEB.2.21.1906261211410.32342@nanos.tec.linutronix.de>
+ <20190626145413.GE6753@char.us.oracle.com>
+ <1561575536.25880.10.camel@amazon.de>
+ <alpine.DEB.2.21.1906262119430.32342@nanos.tec.linutronix.de>
+ <7f721d94-aa19-20a4-6930-9ed4d1cd4834@oracle.com>
+ <20190709123838.GA3402@hirez.programming.kicks-ass.net>
+From:   Ankur Arora <ankur.a.arora@oracle.com>
+Message-ID: <a1dbbed2-17e4-89e5-d141-9c30dc352c5f@oracle.com>
+Date:   Tue, 9 Jul 2019 11:27:54 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190709123838.GA3402@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9313 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=565
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907090215
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9313 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=606 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907090216
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the recently added tracepoint for logging nested VM-Enter failures
-instead of spamming the kernel log when hardware detects a consistency
-check failure.  Take the opportunity to print the name of the error code
-instead of dumping the raw hex number, but limit the symbol table to
-error codes that can reasonably be encountered by KVM.
+On 7/9/19 5:38 AM, Peter Zijlstra wrote:
+> On Mon, Jul 08, 2019 at 07:00:08PM -0700, Ankur Arora wrote:
+>> On 2019-06-26 12:23 p.m., Thomas Gleixner wrote:
+>>> On Wed, 26 Jun 2019, Raslan, KarimAllah wrote:
+>>>> On Wed, 2019-06-26 at 10:54 -0400, Konrad Rzeszutek Wilk wrote:
+>>>>> There were some ideas that Ankur (CC-ed) mentioned to me of using the perf
+>>>>> counters (in the host) to sample the guest and construct a better
+>>>>> accounting idea of what the guest does. That way the dashboard
+>>>>> from the host would not show 100% CPU utilization.
+>>>>
+>>>> You can either use the UNHALTED cycles perf-counter or you can use MPERF/APERF
+>>>> MSRs for that. (sorry I got distracted and forgot to send the patch)
+>>>
+>>> Sure, but then you conflict with the other people who fight tooth and nail
+>>> over every single performance counter.
+>> How about using Intel PT PwrEvt extensions? This should allow us to
+>> precisely track idle residency via just MWAIT and TSC packets. Should
+>> be pretty cheap too. It's post Cascade Lake though.
+> 
+> That would fully claim PT just for this stupid accounting thing and be
+> completely Intel specific.
+> 
+> Just stop this madness already.
+I see the point about just accruing guest time (in mwait or not) as
+guest CPU time.
+But, to take this madness a little further, I'm not sure I see why it
+fully claims PT. AFAICS, we should be able to enable PwrEvt and whatever
+else simultaneously.
 
-Add an equivalent tracepoint in nested_vmx_check_vmentry_hw(), e.g. so
-that tracing of "invalid control field" errors isn't suppressed when
-nested early checks are enabled.
+Ankur
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
----
- arch/x86/include/asm/vmx.h | 14 ++++++++++++++
- arch/x86/kvm/trace.h       |  9 ++++++---
- arch/x86/kvm/vmx/nested.c  | 15 ++++++++++-----
- 3 files changed, 30 insertions(+), 8 deletions(-)
-
-diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-index 4e4133e86484..038ab715307f 100644
---- a/arch/x86/include/asm/vmx.h
-+++ b/arch/x86/include/asm/vmx.h
-@@ -575,6 +575,20 @@ enum vm_instruction_error_number {
- 	VMXERR_INVALID_OPERAND_TO_INVEPT_INVVPID = 28,
- };
- 
-+/*
-+ * VM-instruction errors that can be encountered on VM-Enter, used to trace
-+ * nested VM-Enter failures reported by hardware.  Errors unique to VM-Enter
-+ * from a SMI Transfer Monitor are not included as things have gone seriously
-+ * sideways if we get one of those...
-+ */
-+#define VMX_VMENTER_INSTRUCTION_ERRORS \
-+	{ VMXERR_VMLAUNCH_NONCLEAR_VMCS,		"VMLAUNCH_NONCLEAR_VMCS" }, \
-+	{ VMXERR_VMRESUME_NONLAUNCHED_VMCS,		"VMRESUME_NONLAUNCHED_VMCS" }, \
-+	{ VMXERR_VMRESUME_AFTER_VMXOFF,			"VMRESUME_AFTER_VMXOFF" }, \
-+	{ VMXERR_ENTRY_INVALID_CONTROL_FIELD,		"VMENTRY_INVALID_CONTROL_FIELD" }, \
-+	{ VMXERR_ENTRY_INVALID_HOST_STATE_FIELD,	"VMENTRY_INVALID_HOST_STATE_FIELD" }, \
-+	{ VMXERR_ENTRY_EVENTS_BLOCKED_BY_MOV_SS,	"VMENTRY_EVENTS_BLOCKED_BY_MOV_SS" }
-+
- enum vmx_l1d_flush_state {
- 	VMENTER_L1D_FLUSH_AUTO,
- 	VMENTER_L1D_FLUSH_NEVER,
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 50fbe2d5db83..755daab45f24 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -1467,18 +1467,21 @@ TRACE_EVENT(kvm_hv_send_ipi_ex,
-  * Tracepoint for failed nested VMX VM-Enter.
-  */
- TRACE_EVENT(kvm_nested_vmenter_failed,
--	TP_PROTO(const char *msg),
--	TP_ARGS(msg),
-+	TP_PROTO(const char *msg, u32 err),
-+	TP_ARGS(msg, err),
- 
- 	TP_STRUCT__entry(
- 		__field(const char *, msg)
-+		__field(u32, err)
- 	),
- 
- 	TP_fast_assign(
- 		__entry->msg = msg;
-+		__entry->err = err;
- 	),
- 
--	TP_printk("%s", __entry->msg)
-+	TP_printk("%s%s", __entry->msg, !__entry->err ? "" :
-+		__print_symbolic(__entry->err, VMX_VMENTER_INSTRUCTION_ERRORS))
- );
- 
- #endif /* _TRACE_KVM_H */
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 3bfce3f507c7..9a0dd784bca0 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -23,7 +23,7 @@ module_param(nested_early_check, bool, S_IRUGO);
- ({									\
- 	bool failed = (consistency_check);				\
- 	if (failed)							\
--		trace_kvm_nested_vmenter_failed(#consistency_check);	\
-+		trace_kvm_nested_vmenter_failed(#consistency_check, 0);	\
- 	failed;								\
- })
- 
-@@ -2840,9 +2840,13 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
- 		vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
- 
- 	if (vm_fail) {
-+		u32 error = vmcs_read32(VM_INSTRUCTION_ERROR);
-+
- 		preempt_enable();
--		WARN_ON_ONCE(vmcs_read32(VM_INSTRUCTION_ERROR) !=
--			     VMXERR_ENTRY_INVALID_CONTROL_FIELD);
-+
-+		trace_kvm_nested_vmenter_failed(
-+			"early hardware check VM-instruction error: ", error);
-+		WARN_ON_ONCE(error != VMXERR_ENTRY_INVALID_CONTROL_FIELD);
- 		return 1;
- 	}
- 
-@@ -5256,8 +5260,9 @@ bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 exit_reason)
- 		return false;
- 
- 	if (unlikely(vmx->fail)) {
--		pr_info_ratelimited("%s failed vm entry %x\n", __func__,
--				    vmcs_read32(VM_INSTRUCTION_ERROR));
-+		trace_kvm_nested_vmenter_failed(
-+			"hardware VM-instruction error: ",
-+			vmcs_read32(VM_INSTRUCTION_ERROR));
- 		return true;
- 	}
- 
--- 
-2.22.0
-
+> 
