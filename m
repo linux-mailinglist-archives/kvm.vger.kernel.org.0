@@ -2,94 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D4FB637DA
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 16:23:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D09FB63845
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 16:56:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726530AbfGIOXR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jul 2019 10:23:17 -0400
-Received: from mga18.intel.com ([134.134.136.126]:44877 "EHLO mga18.intel.com"
+        id S1726060AbfGIO4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jul 2019 10:56:51 -0400
+Received: from mga03.intel.com ([134.134.136.65]:54008 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726025AbfGIOXR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jul 2019 10:23:17 -0400
+        id S1726055AbfGIO4v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jul 2019 10:56:51 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jul 2019 07:23:16 -0700
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jul 2019 07:56:50 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,470,1557212400"; 
-   d="scan'208";a="159463566"
+   d="scan'208";a="168003295"
 Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.165])
-  by orsmga008.jf.intel.com with ESMTP; 09 Jul 2019 07:23:16 -0700
-Date:   Tue, 9 Jul 2019 07:23:16 -0700
+  by orsmga003.jf.intel.com with ESMTP; 09 Jul 2019 07:56:50 -0700
+Date:   Tue, 9 Jul 2019 07:56:50 -0700
 From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Yi Wang <wang.yi59@zte.com.cn>
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        xue.zhihong@zte.com.cn, up2wing@gmail.com, wang.liang82@zte.com.cn
-Subject: Re: [PATCH] kvm: x86: Fix -Wmissing-prototypes warnings
-Message-ID: <20190709142316.GB25369@linux.intel.com>
-References: <1562401790-49030-1-git-send-email-wang.yi59@zte.com.cn>
+To:     Wei Yang <w90p710@gmail.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH] KVM: x86: Fix guest time accounting with
+ VIRT_CPU_ACCOUNTING_GEN
+Message-ID: <20190709145650.GC25369@linux.intel.com>
+References: <20190708164751.88385-1-w90p710@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1562401790-49030-1-git-send-email-wang.yi59@zte.com.cn>
+In-Reply-To: <20190708164751.88385-1-w90p710@gmail.com>
 User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jul 06, 2019 at 04:29:50PM +0800, Yi Wang wrote:
-> We get a warning when build kernel W=1:
+On Tue, Jul 09, 2019 at 12:47:51AM +0800, Wei Yang wrote:
+> move guest_exit() after local_irq_eanbled() so that the timer interrupt
+> hits we account that tick as spent in the guest.
 > 
-> arch/x86/kvm/../../../virt/kvm/eventfd.c:48:1: warning: no previous prototype for ‘kvm_arch_irqfd_allowed’ [-Wmissing-prototypes]
->  kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
->  ^
-> 
-> The reason is kvm_arch_irqfd_allowed is declared in arch/x86/kvm/irq.h,
-> which is not included by eventfd.c. Remove the declaration to kvm_host.h
-> can fix this.
-
-It'd be nice to note in the changelog that kvm_arch_irqfd_allowed() is a
-weakly defined function in eventfd.c.  Without that info, one might wonder
-why it's ok to move a function declaration from x86 code to generic code.
-
-Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
-
-> 
-> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Wei Yang <w90p710@gmail.com>
 > ---
->  arch/x86/kvm/irq.h       | 1 -
->  include/linux/kvm_host.h | 1 +
->  2 files changed, 1 insertion(+), 1 deletion(-)
+>  arch/x86/kvm/x86.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
-> index d6519a3..7c6233d 100644
-> --- a/arch/x86/kvm/irq.h
-> +++ b/arch/x86/kvm/irq.h
-> @@ -102,7 +102,6 @@ static inline int irqchip_in_kernel(struct kvm *kvm)
->  	return mode != KVM_IRQCHIP_NONE;
->  }
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 2e302e977dac..04a2913f9226 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8044,7 +8044,6 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 >  
-> -bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
->  void kvm_inject_pending_timer_irqs(struct kvm_vcpu *vcpu);
->  void kvm_inject_apic_timer_irqs(struct kvm_vcpu *vcpu);
->  void kvm_apic_nmi_wd_deliver(struct kvm_vcpu *vcpu);
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index d1ad38a..5f04005 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -990,6 +990,7 @@ void kvm_unregister_irq_ack_notifier(struct kvm *kvm,
->  				   struct kvm_irq_ack_notifier *kian);
->  int kvm_request_irq_source_id(struct kvm *kvm);
->  void kvm_free_irq_source_id(struct kvm *kvm, int irq_source_id);
-> +bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
+>  	++vcpu->stat.exits;
 >  
->  /*
->   * search_memslots() and __gfn_to_memslot() are here because they are
+> -	guest_exit_irqoff();
+>  	if (lapic_in_kernel(vcpu)) {
+>  		s64 delta = vcpu->arch.apic->lapic_timer.advance_expire_delta;
+>  		if (delta != S64_MIN) {
+> @@ -8054,6 +8053,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  	}
+>  
+>  	local_irq_enable();
+> +	guest_exit();
+
+The tracing invoked by trace_kvm_wait_lapic_expire() needs to be done
+after guest exit, otherwise it will violate the RCU quiescent state.  See
+commits:
+
+  8b89fe1f6c43 ("kvm: x86: move tracepoints outside extended quiescent state")
+  ec0671d5684a ("KVM: LAPIC: Delay trace_kvm_wait_lapic_expire tracepoint to after vmexit")
+
+Is this an actual issue in practice, or was this prompted by code
+inspection?
+
+On SVM, this patch is essentially a nop as irqs are temporarily enabled by
+svm_handle_exit_irqoff().  On VMX, this only applies to ticks that occur
+between VM-Exit and local_irq_enable(), which is a fairly small window all
+things considered.  Toggling irqs off and back on in guest_exit() seems
+like a waste of cycles, and could introduce other inaccuracies on VMX,
+e.g. if non-tick interrupts are taken and cause the tick to expire.
+
+>  	preempt_enable();
+>  
+>  	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
 > -- 
-> 1.8.3.1
+> 2.14.1.40.g8e62ba1
 > 
