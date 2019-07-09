@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A46D63521
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 13:46:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BE5EA63582
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 14:19:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726380AbfGILqP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jul 2019 07:46:15 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:37700 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726010AbfGILqO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jul 2019 07:46:14 -0400
+        id S1726411AbfGIMT2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jul 2019 08:19:28 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:38406 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726010AbfGIMT2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jul 2019 08:19:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=RhpUavX3vbcOLn7vixcej5cSL4YtkOwjsTEyylpANYk=; b=Rwzl/RiBE0JKBZle7CY/uKMh9
-        3rMg/EFkiJOgN7xmvsg60CfJr527j4CZPmkaYWQUwXyD/S4gQv5DBZ4HaUrNKzquxKbWHKkdEkNTG
-        I/KfWe7GeaJrlEiPibsqmgT30bYh7vVdVYfUQjVyPy9GSf/ge+0hfZJVrb+OhMYNgKL/QTcL+UqrX
-        Ut5DPG7WblBnaoYXLCt4l3uNkdsgz0A4JJUePbUsn1rMHInzZKepet0tBYw+eALEQAA6ZX62tGr8L
-        GNbk6/ozZS4sHc5fi2ppq0OeqaqTNt8iZBe1JXkVUSFGibMbdT6vgdiSPHpsXApESWmKC8NkMx/jq
-        kuIfY8YKA==;
+         bh=MyOM/2+Oky6LA/ruPYXuAPmONroqpqYRgUXxYrFYTtU=; b=KfuIHfV3koXqt/Jts8MD8/W13
+        kcWhPz76IGYboyZ91/lOMi79ryn1hSa5CrP8xODQz7iu6znhrFfbKx9pGQQ3K2XV4OS3LhllSSx9P
+        jSCCnwXHtnqWh/mEXk4b3twzA4+txHM9evX3i0hVznLo13nEqPhIxDGP2muJu2JOUDo2SOMe+y670
+        HUO0FO9aunk8oyURXUG3rkcVJ7PaDMBJB5Xb8cMhzQ+QnBhlqLALcqOPUPC6Nje3HmHmLpFnB3aY3
+        Sdn2AnUFb07o379hd7WwHPgavnSx8vu+T9E+N+uo7cdDQX2KqDyX1ZLzUTKDjBnvS6aQPW/2uIz4+
+        EPEycpoWw==;
 Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hkoZI-0006My-2z; Tue, 09 Jul 2019 11:45:56 +0000
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hkp5W-0003r6-Kz; Tue, 09 Jul 2019 12:19:14 +0000
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id CD84020120CB1; Tue,  9 Jul 2019 13:45:54 +0200 (CEST)
-Date:   Tue, 9 Jul 2019 13:45:54 +0200
+        id E28E320976D87; Tue,  9 Jul 2019 14:19:12 +0200 (CEST)
+Date:   Tue, 9 Jul 2019 14:19:12 +0200
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     Wei Wang <wei.w.wang@intel.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -37,82 +37,65 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         jannh@google.com, arei.gonglei@huawei.com, jmattson@google.com
 Subject: Re: [PATCH v7 08/12] KVM/x86/vPMU: Add APIs to support host
  save/restore the guest lbr stack
-Message-ID: <20190709114554.GW3402@hirez.programming.kicks-ass.net>
+Message-ID: <20190709121912.GY3402@hirez.programming.kicks-ass.net>
 References: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com>
  <1562548999-37095-9-git-send-email-wei.w.wang@intel.com>
+ <20190708144831.GN3402@hirez.programming.kicks-ass.net>
+ <5D240435.2040801@intel.com>
+ <20190709093917.GS3402@hirez.programming.kicks-ass.net>
+ <5D247BC2.70104@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1562548999-37095-9-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <5D247BC2.70104@intel.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 08, 2019 at 09:23:15AM +0800, Wei Wang wrote:
-> +int intel_pmu_enable_save_guest_lbr(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> +	struct perf_event *event;
-> +
-> +	/*
-> +	 * The main purpose of this perf event is to have the host perf core
-> +	 * help save/restore the guest lbr stack on vcpu switching. There is
-> +	 * no perf counters allocated for the event.
-> +	 *
-> +	 * About the attr:
-> +	 * exclude_guest: set to true to indicate that the event runs on the
-> +	 *                host only.
+On Tue, Jul 09, 2019 at 07:34:26PM +0800, Wei Wang wrote:
 
-That's a lie; it _never_ runs. You specifically don't want the host to
-enable LBR so as not to corrupt the guest state.
+> > But what about the counter scheduling rules;
+> 
+> The counter is emulated independent of the lbr emulation.
 
-> +	 * pinned:        set to false, so that the FLEXIBLE events will not
-> +	 *                be rescheduled for this event which actually doesn't
-> +	 *                need a perf counter.
+> > what happens when a CPU
+> > event claims the LBR before the task event can claim it? CPU events have
+> > precedence over task events.
+> 
+> I think the precedence (cpu pined and task pined) is for the counter
+> multiplexing,
+> right?
 
-Unparsable gibberish. Specifically by making it flexible it is
-susceptible to rotation and there's no guarantee it will actually get
-scheduled.
+No; for all scheduling. The order is:
 
-> +	 * config:        Actually this field won't be used by the perf core
-> +	 *                as this event doesn't have a perf counter.
-> +	 * sample_period: Same as above.
+  CPU-pinned
+  Task-pinned
+  CPU-flexible
+  Task-flexible
 
-If it's unused; why do we need to set it at all?
+The way you created the event it would land in 'task-flexible', but even
+if you make it task-pinned, a CPU (or CPU-pinned) event could claim the
+LBR before your fake event.
 
-> +	 * sample_type:   tells the perf core that it is an lbr event.
-> +	 * branch_sample_type: tells the perf core that the lbr event works in
-> +	 *                the user callstack mode so that the lbr stack will be
-> +	 *                saved/restored on vCPU switching.
+> For the lbr feature, could we thought of it as first come, first served?
+> For example, if we have 2 host threads who want to use lbr at the same time,
+> I think one of them would simply fail to use.
+>
+> So if guest first gets the lbr, host wouldn't take over unless some
+> userspace command (we added to QEMU) is executed to have the vCPU
+> actively stop using lbr.
 
-Again; doesn't make sense. What does the user part have to do with
-save/restore? What happens when this vcpu thread drops to userspace for
-an assist?
+Doesn't work that way.
 
-> +	 */
-> +	struct perf_event_attr attr = {
-> +		.type = PERF_TYPE_RAW,
-> +		.size = sizeof(attr),
-> +		.exclude_guest = true,
-> +		.pinned = false,
-> +		.config = 0,
-> +		.sample_period = 0,
-> +		.sample_type = PERF_SAMPLE_BRANCH_STACK,
-> +		.branch_sample_type = PERF_SAMPLE_BRANCH_CALL_STACK |
-> +				      PERF_SAMPLE_BRANCH_USER,
-> +	};
-> +
-> +	if (pmu->vcpu_lbr_event)
-> +		return 0;
-> +
-> +	event = perf_event_create(&attr, -1, current, NULL, NULL, false);
-> +	if (IS_ERR(event)) {
-> +		pr_err("%s: failed %ld\n", __func__, PTR_ERR(event));
-> +		return -ENOENT;
-> +	}
-> +	pmu->vcpu_lbr_event = event;
-> +
-> +	return 0;
-> +}
+Say you start KVM with LBR emulation, it creates this task event, it
+gets the LBR (nobody else wants it) and the guest works and starts using
+the LBR.
+
+Then the host creates a CPU LBR event and the vCPU suddenly gets denied
+the LBR and the guest no longer functions correctly.
+
+Or you should fail to VMENTER, in which case you starve the guest, but
+at least it doesn't malfunction.
+
