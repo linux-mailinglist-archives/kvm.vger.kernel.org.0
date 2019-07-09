@@ -2,100 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BE5EA63582
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 14:19:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 487466358F
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 14:25:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726411AbfGIMT2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jul 2019 08:19:28 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:38406 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726010AbfGIMT2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jul 2019 08:19:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=MyOM/2+Oky6LA/ruPYXuAPmONroqpqYRgUXxYrFYTtU=; b=KfuIHfV3koXqt/Jts8MD8/W13
-        kcWhPz76IGYboyZ91/lOMi79ryn1hSa5CrP8xODQz7iu6znhrFfbKx9pGQQ3K2XV4OS3LhllSSx9P
-        jSCCnwXHtnqWh/mEXk4b3twzA4+txHM9evX3i0hVznLo13nEqPhIxDGP2muJu2JOUDo2SOMe+y670
-        HUO0FO9aunk8oyURXUG3rkcVJ7PaDMBJB5Xb8cMhzQ+QnBhlqLALcqOPUPC6Nje3HmHmLpFnB3aY3
-        Sdn2AnUFb07o379hd7WwHPgavnSx8vu+T9E+N+uo7cdDQX2KqDyX1ZLzUTKDjBnvS6aQPW/2uIz4+
-        EPEycpoWw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hkp5W-0003r6-Kz; Tue, 09 Jul 2019 12:19:14 +0000
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id E28E320976D87; Tue,  9 Jul 2019 14:19:12 +0200 (CEST)
-Date:   Tue, 9 Jul 2019 14:19:12 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Wei Wang <wei.w.wang@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, ak@linux.intel.com, kan.liang@intel.com,
-        mingo@redhat.com, rkrcmar@redhat.com, like.xu@intel.com,
-        jannh@google.com, arei.gonglei@huawei.com, jmattson@google.com
-Subject: Re: [PATCH v7 08/12] KVM/x86/vPMU: Add APIs to support host
- save/restore the guest lbr stack
-Message-ID: <20190709121912.GY3402@hirez.programming.kicks-ass.net>
-References: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com>
- <1562548999-37095-9-git-send-email-wei.w.wang@intel.com>
- <20190708144831.GN3402@hirez.programming.kicks-ass.net>
- <5D240435.2040801@intel.com>
- <20190709093917.GS3402@hirez.programming.kicks-ass.net>
- <5D247BC2.70104@intel.com>
+        id S1726501AbfGIMZV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jul 2019 08:25:21 -0400
+Received: from foss.arm.com ([217.140.110.172]:42632 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726025AbfGIMZV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jul 2019 08:25:21 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 29AE52B;
+        Tue,  9 Jul 2019 05:25:20 -0700 (PDT)
+Received: from filthy-habits.cambridge.arm.com (unknown [10.1.197.61])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5CA153F59C;
+        Tue,  9 Jul 2019 05:25:18 -0700 (PDT)
+From:   Marc Zyngier <marc.zyngier@arm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Andrew Murray <andrew.murray@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry@arm.com>,
+        Steven Price <steven.price@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm updates for Linux 5.3
+Date:   Tue,  9 Jul 2019 13:24:49 +0100
+Message-Id: <20190709122507.214494-1-marc.zyngier@arm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5D247BC2.70104@intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jul 09, 2019 at 07:34:26PM +0800, Wei Wang wrote:
+Radim, Paolo,
 
-> > But what about the counter scheduling rules;
-> 
-> The counter is emulated independent of the lbr emulation.
+This is the (slightly delayed) KVM/arm updates for 5.3. This time
+around, some PMU emulation improvements, the ability to save/restore
+the Spectre mitigation state, better SError handling that double as
+the workaround for a N1 erratum, a 32bit fix for a corrupted MPIDR,
+and yet another pre-NV cleanup.
 
-> > what happens when a CPU
-> > event claims the LBR before the task event can claim it? CPU events have
-> > precedence over task events.
-> 
-> I think the precedence (cpu pined and task pined) is for the counter
-> multiplexing,
-> right?
+Please pull,
 
-No; for all scheduling. The order is:
+	M.
 
-  CPU-pinned
-  Task-pinned
-  CPU-flexible
-  Task-flexible
+The following changes since commit 4b972a01a7da614b4796475f933094751a295a2f:
 
-The way you created the event it would land in 'task-flexible', but even
-if you make it task-pinned, a CPU (or CPU-pinned) event could claim the
-LBR before your fake event.
+  Linux 5.2-rc6 (2019-06-22 16:01:36 -0700)
 
-> For the lbr feature, could we thought of it as first come, first served?
-> For example, if we have 2 host threads who want to use lbr at the same time,
-> I think one of them would simply fail to use.
->
-> So if guest first gets the lbr, host wouldn't take over unless some
-> userspace command (we added to QEMU) is executed to have the vCPU
-> actively stop using lbr.
+are available in the Git repository at:
 
-Doesn't work that way.
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-5.3
 
-Say you start KVM with LBR emulation, it creates this task event, it
-gets the LBR (nobody else wants it) and the guest works and starts using
-the LBR.
+for you to fetch changes up to 1e0cf16cdad1ba53e9eeee8746fe57de42f20c97:
 
-Then the host creates a CPU LBR event and the vCPU suddenly gets denied
-the LBR and the guest no longer functions correctly.
+  KVM: arm/arm64: Initialise host's MPIDRs by reading the actual register (2019-07-08 16:29:48 +0100)
 
-Or you should fail to VMENTER, in which case you starve the guest, but
-at least it doesn't malfunction.
+----------------------------------------------------------------
+KVM/arm updates for 5.3
 
+- Add support for chained PMU counters in guests
+- Improve SError handling
+- Handle Neoverse N1 erratum #1349291
+- Allow side-channel mitigation status to be migrated
+- Standardise most AArch64 system register accesses to msr_s/mrs_s
+- Fix host MPIDR corruption on 32bit
+
+----------------------------------------------------------------
+Andre Przywara (3):
+      arm64: KVM: Propagate full Spectre v2 workaround state to KVM guests
+      KVM: arm/arm64: Add save/restore support for firmware workaround state
+      KVM: doc: Add API documentation on the KVM_REG_ARM_WORKAROUNDS register
+
+Andrew Murray (5):
+      KVM: arm/arm64: Rename kvm_pmu_{enable/disable}_counter functions
+      KVM: arm/arm64: Extract duplicated code to own function
+      KVM: arm/arm64: Re-create event when setting counter value
+      KVM: arm/arm64: Remove pmc->bitmask
+      KVM: arm/arm64: Support chained PMU counters
+
+Dave Martin (1):
+      KVM: arm64: Migrate _elx sysreg accessors to msr_s/mrs_s
+
+James Morse (8):
+      arm64: assembler: Switch ESB-instruction with a vanilla nop if !ARM64_HAS_RAS
+      KVM: arm64: Abstract the size of the HYP vectors pre-amble
+      KVM: arm64: Make indirect vectors preamble behaviour symmetric
+      KVM: arm64: Consume pending SError as early as possible
+      KVM: arm64: Defer guest entry when an asynchronous exception is pending
+      arm64: Update silicon-errata.txt for Neoverse-N1 #1349291
+      KVM: arm64: Re-mask SError after the one instruction window
+      KVM: arm64: Skip more of the SError vaxorcism
+
+Marc Zyngier (1):
+      KVM: arm/arm64: Initialise host's MPIDRs by reading the actual register
+
+ Documentation/arm64/silicon-errata.txt   |   1 +
+ Documentation/virtual/kvm/arm/psci.txt   |  31 +++
+ arch/arm/include/asm/kvm_emulate.h       |  10 +
+ arch/arm/include/asm/kvm_host.h          |  18 +-
+ arch/arm/include/asm/kvm_hyp.h           |  13 +-
+ arch/arm/include/uapi/asm/kvm.h          |  12 ++
+ arch/arm64/include/asm/assembler.h       |   4 +
+ arch/arm64/include/asm/cpufeature.h      |   6 +
+ arch/arm64/include/asm/kvm_asm.h         |   6 +
+ arch/arm64/include/asm/kvm_emulate.h     |  30 ++-
+ arch/arm64/include/asm/kvm_host.h        |  23 +-
+ arch/arm64/include/asm/kvm_hyp.h         |  50 +----
+ arch/arm64/include/asm/sysreg.h          |  35 +++-
+ arch/arm64/include/uapi/asm/kvm.h        |  10 +
+ arch/arm64/kernel/cpu_errata.c           |  23 +-
+ arch/arm64/kernel/traps.c                |   4 +
+ arch/arm64/kvm/hyp/entry.S               |  36 +++-
+ arch/arm64/kvm/hyp/hyp-entry.S           |  30 ++-
+ arch/arm64/kvm/hyp/switch.c              |  14 +-
+ arch/arm64/kvm/hyp/sysreg-sr.c           |  78 +++----
+ arch/arm64/kvm/hyp/tlb.c                 |  12 +-
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c |   2 +-
+ arch/arm64/kvm/regmap.c                  |   4 +-
+ arch/arm64/kvm/sys_regs.c                |  60 +++---
+ arch/arm64/kvm/va_layout.c               |   7 +-
+ include/kvm/arm_pmu.h                    |  11 +-
+ virt/kvm/arm/arch_timer.c                |  24 +--
+ virt/kvm/arm/arm.c                       |   3 +-
+ virt/kvm/arm/pmu.c                       | 350 +++++++++++++++++++++++++------
+ virt/kvm/arm/psci.c                      | 149 +++++++++++--
+ 30 files changed, 775 insertions(+), 281 deletions(-)
