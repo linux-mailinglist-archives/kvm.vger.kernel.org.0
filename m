@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C7B462DF2
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 04:13:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F1FA62DFA
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 04:16:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726133AbfGICMV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jul 2019 22:12:21 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:36819 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725941AbfGICMV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jul 2019 22:12:21 -0400
-Received: by mail-pl1-f194.google.com with SMTP id k8so9248254plt.3
-        for <kvm@vger.kernel.org>; Mon, 08 Jul 2019 19:12:21 -0700 (PDT)
+        id S1727127AbfGICQH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jul 2019 22:16:07 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:46813 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725905AbfGICQH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jul 2019 22:16:07 -0400
+Received: by mail-pf1-f194.google.com with SMTP id c73so3831594pfb.13
+        for <kvm@vger.kernel.org>; Mon, 08 Jul 2019 19:16:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:date:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=p4fDztI4yK31b1rF1iA4XA0Zx6iti4MMOhx5dDcCLyE=;
-        b=pUuF6KVSey85tyHZ27aBtUS1uz6T6c6w6YCybtxxKYE+EVQJYpeOwKU0SebcSLLwmd
-         rZvFzvZeBptJWPYNwKs6BMduNs89tMoX82ik7O7BoFK0PGnj/YultkmA/1Jwk+FP5HmV
-         qQiziFf1LzN+FJpquKqS4JACxsKqbeM0EMcuNdc1EKZdZBpuPjLH53XQHkt8kZfm7qW5
-         xs8U2+YL2i3mX82rIoD4ictzA9rCyYLpeJOl7kc2nhnMyZMLcSL9fpHOSgBRgqQCMHrr
-         UFuAOeWqIDum1XhK4wA3CtAlCD05JocZg/E0z0i3uVWTHmDVDd7sFv1qMv2L7bZM3mE2
-         du8A==
-X-Gm-Message-State: APjAAAU/p8AjFLPi2yZ+MAy9xLjaRVQfgUD23heGXAnx6xRr7XpResyC
-        0CLlL9oajFNBUFu1a+/6wXeZWg==
-X-Google-Smtp-Source: APXvYqyDXF+Yj2ZJU2o9g+rr0hX8h4xaruANo3s6o4ynyp6Dm020aqXWZ83GJ+YvwWGkq45XhF1A5A==
-X-Received: by 2002:a17:902:7043:: with SMTP id h3mr29873175plt.10.1562638340979;
-        Mon, 08 Jul 2019 19:12:20 -0700 (PDT)
+        bh=AejX9I0nPw0C0alAPdpDESjIN8ZZo4n3Ywa8AB9AMrA=;
+        b=TEAskN8XoMTMG+FmHbhQcgG/torQQeH6g2BjQiLXPuLgWcjGCEznFkPfTP41HytR2m
+         V4EwXDo/tsUtfye49Q0dor3EmPJZu5rxRX0zf2Hxrx4PK2hiqFiJpT0p3f3zg34nepSv
+         NsSfMgFdTIR6aAVZPkBTH08yN7qu8rvOPm64rm4zLBV/VAg3FMtcW7PF/p/SUIebrPQK
+         XygYJFpxI1LS5I3d2LI8maeNqcyJbWqVjXtilllq5cqg0l4PwFma7O3+Var4dk9kwypU
+         VLIt1HCgyrEJcH7Mh3IxALfbNio3ykvz2VBTllnQnh2Cyfcvm1mlfOdfO+J++/5Am4Nl
+         qOHA==
+X-Gm-Message-State: APjAAAX5ZCT+i5Tj8nS6I0ikqz7iYXhj9eaa/AOgyNmEUrZkILddih0w
+        wPQvN2rhXa+LPplrZkxF+8eOKg==
+X-Google-Smtp-Source: APXvYqwiHBXdfW1lQRsPP9qtg3vYT14hpbHkuAdm3AVWoWrwhMRY7huqrXfHQq6nGgsXieZZDbWI9w==
+X-Received: by 2002:a17:90a:ac0e:: with SMTP id o14mr30006833pjq.142.1562638566419;
+        Mon, 08 Jul 2019 19:16:06 -0700 (PDT)
 Received: from xz-x1 ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id 34sm7144861pgl.15.2019.07.08.19.12.16
+        by smtp.gmail.com with ESMTPSA id 11sm19146288pfw.33.2019.07.08.19.16.01
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 08 Jul 2019 19:12:20 -0700 (PDT)
+        Mon, 08 Jul 2019 19:16:05 -0700 (PDT)
 From:   Peter Xu <zhexu@redhat.com>
 X-Google-Original-From: Peter Xu <peterx@redhat.com>
-Date:   Tue, 9 Jul 2019 10:12:09 +0800
+Date:   Tue, 9 Jul 2019 10:15:54 +0800
 To:     Liu Yi L <yi.l.liu@intel.com>
 Cc:     qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
         alex.williamson@redhat.com, eric.auger@redhat.com,
@@ -43,126 +43,150 @@ Cc:     qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
         kevin.tian@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
         kvm@vger.kernel.org, Jacob Pan <jacob.jun.pan@linux.intel.com>,
         Yi Sun <yi.y.sun@linux.intel.com>
-Subject: Re: [RFC v1 03/18] hw/pci: introduce PCIPASIDOps to PCIDevice
-Message-ID: <20190709021209.GA5178@xz-x1>
+Subject: Re: [RFC v1 04/18] intel_iommu: add "sm_model" option
+Message-ID: <20190709021554.GB5178@xz-x1>
 References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
- <1562324511-2910-4-git-send-email-yi.l.liu@intel.com>
+ <1562324511-2910-5-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1562324511-2910-4-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1562324511-2910-5-git-send-email-yi.l.liu@intel.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 05, 2019 at 07:01:36PM +0800, Liu Yi L wrote:
-> +void pci_setup_pasid_ops(PCIDevice *dev, PCIPASIDOps *ops)
-> +{
-> +    assert(ops && !dev->pasid_ops);
-> +    dev->pasid_ops = ops;
-> +}
-> +
-> +bool pci_device_is_ops_set(PCIBus *bus, int32_t devfn)
+On Fri, Jul 05, 2019 at 07:01:37PM +0800, Liu Yi L wrote:
+> Intel VT-d 3.0 introduces scalable mode, and it has a bunch of
+> capabilities related to scalable mode translation, thus there
+> are multiple combinations. While this vIOMMU implementation
+> wants simplify it for user by providing typical combinations.
+> User could config it by "sm_model" option. The usage is as
+> below:
+> 
+> "-device intel-iommu,x-scalable-mode=on,sm_model=["legacy"|"scalable"]"
 
-Name should be "pci_device_is_pasid_ops_set".  Or maybe you can simply
-drop this function because as long as you check it in helper functions
-like [1] below always then it seems even unecessary.
+Is it a requirement to split into two parameters, instead of just
+exposing everything about scalable mode when x-scalable-mode is set?
 
-> +{
-> +    PCIDevice *dev;
-> +
-> +    if (!bus) {
-> +        return false;
-> +    }
-> +
-> +    dev = bus->devices[devfn];
-> +    return !!(dev && dev->pasid_ops);
-> +}
-> +
-> +int pci_device_request_pasid_alloc(PCIBus *bus, int32_t devfn,
-> +                                   uint32_t min_pasid, uint32_t max_pasid)
+> 
+>  - "legacy": gives support for SL page table
+>  - "scalable": gives support for FL page table, pasid, virtual command
+>  - default to be "legacy" if "x-scalable-mode=on while no sm_model is
+>    configured
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> ---
+>  hw/i386/intel_iommu.c          | 28 +++++++++++++++++++++++++++-
+>  hw/i386/intel_iommu_internal.h |  2 ++
+>  include/hw/i386/intel_iommu.h  |  1 +
+>  3 files changed, 30 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 44b1231..3160a05 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -3014,6 +3014,7 @@ static Property vtd_properties[] = {
+>      DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
+>      DEFINE_PROP_BOOL("x-scalable-mode", IntelIOMMUState, scalable_mode, FALSE),
+>      DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
+> +    DEFINE_PROP_STRING("sm_model", IntelIOMMUState, sm_model),
 
-From VT-d spec I see that the virtual command "allocate pasid" does
-not have bdf information so it's global, but here we've got bus/devfn.
-I'm curious is that reserved for ARM or some other arch?
+Can do 's/-/_/' to follow the rest if we need it.
 
-> +{
-> +    PCIDevice *dev;
-> +
-> +    if (!bus) {
-> +        return -1;
-> +    }
-> +
-> +    dev = bus->devices[devfn];
-> +    if (dev && dev->pasid_ops && dev->pasid_ops->alloc_pasid) {
-
-[1]
-
-> +        return dev->pasid_ops->alloc_pasid(bus, devfn, min_pasid, max_pasid);
-> +    }
-> +    return -1;
-> +}
-> +
-> +int pci_device_request_pasid_free(PCIBus *bus, int32_t devfn,
-> +                                  uint32_t pasid)
-> +{
-> +    PCIDevice *dev;
-> +
-> +    if (!bus) {
-> +        return -1;
-> +    }
-> +
-> +    dev = bus->devices[devfn];
-> +    if (dev && dev->pasid_ops && dev->pasid_ops->free_pasid) {
-> +        return dev->pasid_ops->free_pasid(bus, devfn, pasid);
-> +    }
-> +    return -1;
-> +}
-> +
->  static void pci_dev_get_w64(PCIBus *b, PCIDevice *dev, void *opaque)
->  {
->      Range *range = opaque;
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index d082707..16e5b8e 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -262,6 +262,13 @@ struct PCIReqIDCache {
->  };
->  typedef struct PCIReqIDCache PCIReqIDCache;
->  
-> +typedef struct PCIPASIDOps PCIPASIDOps;
-> +struct PCIPASIDOps {
-> +    int (*alloc_pasid)(PCIBus *bus, int32_t devfn,
-> +                         uint32_t min_pasid, uint32_t max_pasid);
-> +    int (*free_pasid)(PCIBus *bus, int32_t devfn, uint32_t pasid);
-> +};
-> +
->  struct PCIDevice {
->      DeviceState qdev;
->  
-> @@ -351,6 +358,7 @@ struct PCIDevice {
->      MSIVectorUseNotifier msix_vector_use_notifier;
->      MSIVectorReleaseNotifier msix_vector_release_notifier;
->      MSIVectorPollNotifier msix_vector_poll_notifier;
-> +    PCIPASIDOps *pasid_ops;
+>      DEFINE_PROP_END_OF_LIST(),
 >  };
 >  
->  void pci_register_bar(PCIDevice *pci_dev, int region_num,
-> @@ -484,6 +492,12 @@ typedef AddressSpace *(*PCIIOMMUFunc)(PCIBus *, void *, int);
->  AddressSpace *pci_device_iommu_address_space(PCIDevice *dev);
->  void pci_setup_iommu(PCIBus *bus, PCIIOMMUFunc fn, void *opaque);
+> @@ -3489,6 +3490,14 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+>      return;
+>  }
 >  
-> +void pci_setup_pasid_ops(PCIDevice *dev, PCIPASIDOps *ops);
-> +bool pci_device_is_ops_set(PCIBus *bus, int32_t devfn);
-> +int pci_device_request_pasid_alloc(PCIBus *bus, int32_t devfn,
-> +                                   uint32_t min_pasid, uint32_t max_pasid);
-> +int pci_device_request_pasid_free(PCIBus *bus, int32_t devfn, uint32_t pasid);
+> +const char sm_model_manual[] =
+> +        "\"-device intel-iommu,x-scalable-mode=on,"
+> +        "sm_model=[\"legacy\"|\"scalable\"]\"\n"
+> +        " - \"legacy\" gives support for SL page table based IOVA\n"
+> +        " - \"scalable\" gives support for FL page table based IOVA and SVA\n"
+> +        " - default to be \"legacy\" if \"x-scalable-mode=on\""
+> +        " while no sm_model is configured\n";
 > +
->  static inline void
->  pci_set_byte(uint8_t *config, uint8_t val)
->  {
+>  /* Do the initialization. It will also be called when reset, so pay
+>   * attention when adding new initialization stuff.
+>   */
+> @@ -3557,9 +3566,26 @@ static void vtd_init(IntelIOMMUState *s)
+>          s->cap |= VTD_CAP_CM;
+>      }
+>  
+> +    if (s->sm_model && !s->scalable_mode) {
+> +        printf("\n\"sm_model\" depends on \"x-scalable-mode\"\n"
+> +               "please check if \"x-scalable-mode\" is expected\n"
+> +               "\"sm_model\" manual:\n%s", sm_model_manual);
+> +        exit(1);
+
+Let's avoid calling exit() directly considering that we've had things
+like vtd_decide_config() already which allows an Error**.  We can also
+introduce that too into vtd_init() and pass the error to upper to
+handle the failure.
+
+> +    }
+> +
+>      /* TODO: read cap/ecap from host to decide which cap to be exposed. */
+>      if (s->scalable_mode) {
+> -        s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
+> +        if (!s->sm_model || !strcmp(s->sm_model, "legacy")) {
+> +            s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
+> +        } else if (!strcmp(s->sm_model, "scalable")) {
+> +            s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_PASID
+> +                       | VTD_ECAP_FLTS;
+
+Do you also need VTD_ECAP_SLTS here?
+
+> +        } else {
+> +            printf("\n!!!!! Invalid sm_model config !!!!!\n"
+> +                "Please config sm_model=[\"legacy\"|\"scalable\"]\n"
+> +                "\"sm_model\" manual:\n%s", sm_model_manual);
+> +            exit(1);
+
+Same here.
+
+Thanks,
+
+> +        }
+>      }
+>  
+>      vtd_reset_caches(s);
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+> index c1235a7..adae198 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -190,8 +190,10 @@
+>  #define VTD_ECAP_PT                 (1ULL << 6)
+>  #define VTD_ECAP_MHMV               (15ULL << 20)
+>  #define VTD_ECAP_SRS                (1ULL << 31)
+> +#define VTD_ECAP_PASID              (1ULL << 40)
+>  #define VTD_ECAP_SMTS               (1ULL << 43)
+>  #define VTD_ECAP_SLTS               (1ULL << 46)
+> +#define VTD_ECAP_FLTS               (1ULL << 47)
+>  
+>  /* CAP_REG */
+>  /* (offset >> 4) << 24 */
+> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> index 12f3d26..b51cc9f 100644
+> --- a/include/hw/i386/intel_iommu.h
+> +++ b/include/hw/i386/intel_iommu.h
+> @@ -270,6 +270,7 @@ struct IntelIOMMUState {
+>      bool buggy_eim;                 /* Force buggy EIM unless eim=off */
+>      uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
+>      bool dma_drain;                 /* Whether DMA r/w draining enabled */
+> +    char *sm_model;          /* identify actual scalable mode iommu model*/
+>  
+>      /*
+>       * Protects IOMMU states in general.  Currently it protects the
 > -- 
 > 2.7.4
 > 
