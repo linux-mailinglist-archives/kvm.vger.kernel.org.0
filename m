@@ -2,90 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C7D21633C4
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 11:57:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 383A7633C8
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 11:59:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726666AbfGIJ5i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jul 2019 05:57:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57038 "EHLO mx1.redhat.com"
+        id S1726679AbfGIJ7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jul 2019 05:59:10 -0400
+Received: from foss.arm.com ([217.140.110.172]:40624 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726126AbfGIJ5i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jul 2019 05:57:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6516519CF51;
-        Tue,  9 Jul 2019 09:57:38 +0000 (UTC)
-Received: from gondolin (unknown [10.40.205.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ECCF35DA97;
-        Tue,  9 Jul 2019 09:57:36 +0000 (UTC)
-Date:   Tue, 9 Jul 2019 11:57:33 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Farhan Ali <alifm@linux.ibm.com>
-Cc:     farman@linux.ibm.com, pasic@linux.ibm.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [RFC v2 1/5] vfio-ccw: Fix misleading comment when setting
- orb.cmd.c64
-Message-ID: <20190709115733.40eb8db5.cohuck@redhat.com>
-In-Reply-To: <25a5bf8ae538a392f8483e6fd4b9b165de40bfce.1562616169.git.alifm@linux.ibm.com>
-References: <cover.1562616169.git.alifm@linux.ibm.com>
-        <25a5bf8ae538a392f8483e6fd4b9b165de40bfce.1562616169.git.alifm@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1726126AbfGIJ7K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jul 2019 05:59:10 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3D0AE28;
+        Tue,  9 Jul 2019 02:59:09 -0700 (PDT)
+Received: from [10.1.196.217] (unassigned-hostname.cambridge.arm.com [10.1.196.217])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 67F323F738;
+        Tue,  9 Jul 2019 02:59:08 -0700 (PDT)
+Subject: Re: [PATCH 40/59] KVM: arm64: nv: Don't always start an S2 MMU search
+ from the beginning
+To:     Marc Zyngier <marc.zyngier@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>
+References: <20190621093843.220980-1-marc.zyngier@arm.com>
+ <20190621093843.220980-41-marc.zyngier@arm.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <ccb11c22-0aa9-7e6a-98b2-acdfa0603eb0@arm.com>
+Date:   Tue, 9 Jul 2019 10:59:03 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190621093843.220980-41-marc.zyngier@arm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Tue, 09 Jul 2019 09:57:38 +0000 (UTC)
+Content-Language: en-US
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  8 Jul 2019 16:10:34 -0400
-Farhan Ali <alifm@linux.ibm.com> wrote:
-
-> The comment is misleading because it tells us that
-> we should set orb.cmd.c64 before calling ccwchain_calc_length,
-> otherwise the function ccwchain_calc_length would return an
-> error. This is not completely accurate.
-> 
-> We want to allow an orb without cmd.c64, and this is fine
-> as long as the channel program does not use IDALs. But we do
-> want to reject any channel program that uses IDALs and does
-> not set the flag, which what we do in ccwchain_calc_length.
-> 
-> After we have done the ccw processing, it should be safe
-> to set cmd.c64, since we will convert them into IDALs.
-
-"After we have done the ccw processing, we need to set cmd.c64, as we
-use IDALs for all translated channel programs." ?
-
+On 6/21/19 10:38 AM, Marc Zyngier wrote:
+> Starting a S2 MMU search from the beginning all the time means that
+> we're potentially nuking a useful context (like we'd potentially
+> have on a !VHE KVM guest).
 >
-
-Fixes: fb9e7880af35 ("vfio: ccw: push down unsupported IDA check")
- 
-> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> Instead, let's always start the search from the point *after* the
+> last allocated context. This should ensure that alternating between
+> two EL1 contexts will not result in nuking the whole S2 each time.
+>
+> lookup_s2_mmu now has a chance to provide a hit.
+>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  drivers/s390/cio/vfio_ccw_cp.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-> index d6a8dff..7622b72 100644
-> --- a/drivers/s390/cio/vfio_ccw_cp.c
-> +++ b/drivers/s390/cio/vfio_ccw_cp.c
-> @@ -645,8 +645,8 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
->  	if (ret)
->  		cp_free(cp);
->  
-> -	/* It is safe to force: if not set but idals used
-> -	 * ccwchain_calc_length returns an error.
-> +	/* It is safe to force: if it was not set but idals used
-> +	 * ccwchain_calc_length would have returned an error.
-
-Thanks, much clearer.
-
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/kvm/nested.c           | 14 ++++++++++++--
+>  2 files changed, 13 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index b71a7a237f95..b7c44adcdbf3 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -123,6 +123,7 @@ struct kvm_arch {
 >  	 */
->  	cp->orb.cmd.c64 = 1;
->  
+>  	struct kvm_s2_mmu *nested_mmus;
+>  	size_t nested_mmus_size;
+> +	int nested_mmus_next;
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+For consistency, shouldn't nested_mmus_next be zero initialized in
+kvm_init_nested (arch/arm64/kvm/nested.c), like nested_mmus and
+nested_mmus_size? Not a big deal either way, since struct kvm is allocated using
+vzalloc.
+
+>  really
+>  	/* VTCR_EL2 value for this VM */
+>  	u64    vtcr;
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 09afafbdc8fe..214d59019935 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -363,14 +363,24 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+>  	if (s2_mmu)
+>  		goto out;
+>  
+> -	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> -		s2_mmu = &kvm->arch.nested_mmus[i];
+> +	/*
+> +	 * Make sure we don't always search from the same point, or we
+> +	 * will always reuse a potentially active context, leaving
+> +	 * free contexts unused.
+> +	 */
+> +	for (i = kvm->arch.nested_mmus_next;
+> +	     i < (kvm->arch.nested_mmus_size + kvm->arch.nested_mmus_next);
+> +	     i++) {
+> +		s2_mmu = &kvm->arch.nested_mmus[i % kvm->arch.nested_mmus_size];
+>  
+>  		if (atomic_read(&s2_mmu->refcnt) == 0)
+>  			break;
+>  	}
+>  	BUG_ON(atomic_read(&s2_mmu->refcnt)); /* We have struct MMUs to spare */
+>  
+> +	/* Set the scene for the next search */
+> +	kvm->arch.nested_mmus_next = (i + 1) % kvm->arch.nested_mmus_size;
+> +
+>  	if (kvm_s2_mmu_valid(s2_mmu)) {
+>  		/* Clear the old state */
+>  		kvm_unmap_stage2_range(s2_mmu, 0, kvm_phys_size(kvm));
