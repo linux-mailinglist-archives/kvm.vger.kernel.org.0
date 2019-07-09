@@ -2,170 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D884562E11
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 04:24:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A84462E4E
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 04:51:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727015AbfGICXp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jul 2019 22:23:45 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:36699 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726917AbfGICXp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jul 2019 22:23:45 -0400
-Received: by mail-pl1-f193.google.com with SMTP id k8so9261322plt.3
-        for <kvm@vger.kernel.org>; Mon, 08 Jul 2019 19:23:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=FftJaRbYWHNa3kHaHykrZd5QPuju+ZHzp0iECf6zExs=;
-        b=sO22OKEkWiL+1NR6BcKR5nB2tczjZTKLIRDw5sTckotWAVi2Ds+tmtq+lrUWyaGGZV
-         rEtiZXd1hIvZbaq7L0MJ6G+Aw/x0ZDZwkLF+8jAiZsGPUvS2hWxrzzogkJA1G4BIvqAU
-         sNg52lro0WJMsLflYpnW3r1PjPG8y4Mo9eQXyqJMZFJmiksLuU/to6qQwi4+SdeLOAM5
-         ySO8fsT34QB+jiWPlvEvUQn/zih8N/US7n33Ivew9V59IUKS47IJ2mPGzXx9nYu/DnQ9
-         2Nw870sPv1LEk3l9DtB5NR8IlGUW9C+HeW5WURuSgDO2O+Rx3CPqQiz7u0MbSpKCn99p
-         RTdQ==
-X-Gm-Message-State: APjAAAXcFpMfLMPbDKlOjJNREdq8iibewpWIOCGHOEBJnUObUkbMPRLj
-        E950q9kKEgq1kAsMIuG62yabDQ==
-X-Google-Smtp-Source: APXvYqwzmKpI5EesOO0vk+59pI/520HJ89u6q7GGPvTwITw0dJNDabjnRhXuYY8/ZwR5FdtuFXypUQ==
-X-Received: by 2002:a17:902:b944:: with SMTP id h4mr28322101pls.179.1562639024360;
-        Mon, 08 Jul 2019 19:23:44 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id 30sm881340pjk.17.2019.07.08.19.23.39
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 08 Jul 2019 19:23:43 -0700 (PDT)
-From:   Peter Xu <zhexu@redhat.com>
-X-Google-Original-From: Peter Xu <peterx@redhat.com>
-Date:   Tue, 9 Jul 2019 10:23:32 +0800
-To:     Liu Yi L <yi.l.liu@intel.com>
-Cc:     qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
-        alex.williamson@redhat.com, eric.auger@redhat.com,
-        david@gibson.dropbear.id.au, tianyu.lan@intel.com,
-        kevin.tian@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
-        kvm@vger.kernel.org, Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
-Message-ID: <20190709022332.GC5178@xz-x1>
-References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
- <1562324511-2910-6-git-send-email-yi.l.liu@intel.com>
+        id S1726358AbfGICvF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Jul 2019 22:51:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36738 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725886AbfGICvE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Jul 2019 22:51:04 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 31FF888311;
+        Tue,  9 Jul 2019 02:50:56 +0000 (UTC)
+Received: from [10.72.12.197] (ovpn-12-197.pek2.redhat.com [10.72.12.197])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 18CD4381A9;
+        Tue,  9 Jul 2019 02:50:39 +0000 (UTC)
+Subject: Re: [RFC v2] vhost: introduce mdev based hardware vhost backend
+To:     Tiwei Bie <tiwei.bie@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     mst@redhat.com, maxime.coquelin@redhat.com,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        dan.daly@intel.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, idos@mellanox.com,
+        Rob Miller <rob.miller@broadcom.com>,
+        Ariel Adam <aadam@redhat.com>
+References: <20190703091339.1847-1-tiwei.bie@intel.com>
+ <7b8279b2-aa7e-7adc-eeff-20dfaf4400d0@redhat.com>
+ <20190703115245.GA22374@___>
+ <64833f91-02cd-7143-f12e-56ab93b2418d@redhat.com> <20190703130817.GA1978@___>
+ <b01b8e28-8d96-31dd-56f4-ca7793498c55@redhat.com>
+ <20190704062134.GA21116@___> <20190705084946.67b8f9f5@x1.home>
+ <20190708061625.GA15936@___>
+From:   Jason Wang <jasowang@redhat.com>
+Message-ID: <deae5ede-57e9-41e6-ea42-d84e07ca480a@redhat.com>
+Date:   Tue, 9 Jul 2019 10:50:38 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1562324511-2910-6-git-send-email-yi.l.liu@intel.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <20190708061625.GA15936@___>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Tue, 09 Jul 2019 02:51:04 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 05, 2019 at 07:01:38PM +0800, Liu Yi L wrote:
-> This patch adds vfio implementation PCIPASIDOps.alloc_pasid/free_pasid().
-> These two functions are used to propagate guest pasid allocation and
-> free requests to host via vfio container ioctl.
-> 
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> ---
->  hw/vfio/pci.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 61 insertions(+)
-> 
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index ce3fe96..ab184ad 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2690,6 +2690,65 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
->      vdev->req_enabled = false;
->  }
->  
-> +static int vfio_pci_device_request_pasid_alloc(PCIBus *bus,
-> +                                               int32_t devfn,
-> +                                               uint32_t min_pasid,
-> +                                               uint32_t max_pasid)
-> +{
-> +    PCIDevice *pdev = bus->devices[devfn];
-> +    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> +    VFIOContainer *container = vdev->vbasedev.group->container;
-> +    struct vfio_iommu_type1_pasid_request req;
-> +    unsigned long argsz;
-> +    int pasid;
-> +
-> +    argsz = sizeof(req);
-> +    req.argsz = argsz;
-> +    req.flag = VFIO_IOMMU_PASID_ALLOC;
-> +    req.min_pasid = min_pasid;
-> +    req.max_pasid = max_pasid;
-> +
-> +    rcu_read_lock();
 
-Could I ask what's this RCU lock protecting?
+On 2019/7/8 下午2:16, Tiwei Bie wrote:
+> On Fri, Jul 05, 2019 at 08:49:46AM -0600, Alex Williamson wrote:
+>> On Thu, 4 Jul 2019 14:21:34 +0800
+>> Tiwei Bie <tiwei.bie@intel.com> wrote:
+>>> On Thu, Jul 04, 2019 at 12:31:48PM +0800, Jason Wang wrote:
+>>>> On 2019/7/3 下午9:08, Tiwei Bie wrote:
+>>>>> On Wed, Jul 03, 2019 at 08:16:23PM +0800, Jason Wang wrote:
+>>>>>> On 2019/7/3 下午7:52, Tiwei Bie wrote:
+>>>>>>> On Wed, Jul 03, 2019 at 06:09:51PM +0800, Jason Wang wrote:
+>>>>>>>> On 2019/7/3 下午5:13, Tiwei Bie wrote:
+>>>>>>>>> Details about this can be found here:
+>>>>>>>>>
+>>>>>>>>> https://lwn.net/Articles/750770/
+>>>>>>>>>
+>>>>>>>>> What's new in this version
+>>>>>>>>> ==========================
+>>>>>>>>>
+>>>>>>>>> A new VFIO device type is introduced - vfio-vhost. This addressed
+>>>>>>>>> some comments from here:https://patchwork.ozlabs.org/cover/984763/
+>>>>>>>>>
+>>>>>>>>> Below is the updated device interface:
+>>>>>>>>>
+>>>>>>>>> Currently, there are two regions of this device: 1) CONFIG_REGION
+>>>>>>>>> (VFIO_VHOST_CONFIG_REGION_INDEX), which can be used to setup the
+>>>>>>>>> device; 2) NOTIFY_REGION (VFIO_VHOST_NOTIFY_REGION_INDEX), which
+>>>>>>>>> can be used to notify the device.
+>>>>>>>>>
+>>>>>>>>> 1. CONFIG_REGION
+>>>>>>>>>
+>>>>>>>>> The region described by CONFIG_REGION is the main control interface.
+>>>>>>>>> Messages will be written to or read from this region.
+>>>>>>>>>
+>>>>>>>>> The message type is determined by the `request` field in message
+>>>>>>>>> header. The message size is encoded in the message header too.
+>>>>>>>>> The message format looks like this:
+>>>>>>>>>
+>>>>>>>>> struct vhost_vfio_op {
+>>>>>>>>> 	__u64 request;
+>>>>>>>>> 	__u32 flags;
+>>>>>>>>> 	/* Flag values: */
+>>>>>>>>>      #define VHOST_VFIO_NEED_REPLY 0x1 /* Whether need reply */
+>>>>>>>>> 	__u32 size;
+>>>>>>>>> 	union {
+>>>>>>>>> 		__u64 u64;
+>>>>>>>>> 		struct vhost_vring_state state;
+>>>>>>>>> 		struct vhost_vring_addr addr;
+>>>>>>>>> 	} payload;
+>>>>>>>>> };
+>>>>>>>>>
+>>>>>>>>> The existing vhost-kernel ioctl cmds are reused as the message
+>>>>>>>>> requests in above structure.
+>>>>>>>> Still a comments like V1. What's the advantage of inventing a new protocol?
+>>>>>>> I'm trying to make it work in VFIO's way..
+>>>>>>>    
+>>>>>>>> I believe either of the following should be better:
+>>>>>>>>
+>>>>>>>> - using vhost ioctl,  we can start from SET_VRING_KICK/SET_VRING_CALL and
+>>>>>>>> extend it with e.g notify region. The advantages is that all exist userspace
+>>>>>>>> program could be reused without modification (or minimal modification). And
+>>>>>>>> vhost API hides lots of details that is not necessary to be understood by
+>>>>>>>> application (e.g in the case of container).
+>>>>>>> Do you mean reusing vhost's ioctl on VFIO device fd directly,
+>>>>>>> or introducing another mdev driver (i.e. vhost_mdev instead of
+>>>>>>> using the existing vfio_mdev) for mdev device?
+>>>>>> Can we simply add them into ioctl of mdev_parent_ops?
+>>>>> Right, either way, these ioctls have to be and just need to be
+>>>>> added in the ioctl of the mdev_parent_ops. But another thing we
+>>>>> also need to consider is that which file descriptor the userspace
+>>>>> will do the ioctl() on. So I'm wondering do you mean let the
+>>>>> userspace do the ioctl() on the VFIO device fd of the mdev
+>>>>> device?
+>>>>>    
+>>>> Yes.
+>>> Got it! I'm not sure what's Alex opinion on this. If we all
+>>> agree with this, I can do it in this way.
+>>>
+>>>> Is there any other way btw?
+>>> Just a quick thought.. Maybe totally a bad idea. I was thinking
+>>> whether it would be odd to do non-VFIO's ioctls on VFIO's device
+>>> fd. So I was wondering whether it's possible to allow binding
+>>> another mdev driver (e.g. vhost_mdev) to the supported mdev
+>>> devices. The new mdev driver, vhost_mdev, can provide similar
+>>> ways to let userspace open the mdev device and do the vhost ioctls
+>>> on it. To distinguish with the vfio_mdev compatible mdev devices,
+>>> the device API of the new vhost_mdev compatible mdev devices
+>>> might be e.g. "vhost-net" for net?
+>>>
+>>> So in VFIO case, the device will be for passthru directly. And
+>>> in VHOST case, the device can be used to accelerate the existing
+>>> virtualized devices.
+>>>
+>>> How do you think?
+>> VFIO really can't prevent vendor specific ioctls on the device file
+>> descriptor for mdevs, but a) we'd want to be sure the ioctl address
+>> space can't collide with ioctls we'd use for vfio defined purposes and
+>> b) maybe the VFIO user API isn't what you want in the first place if
+>> you intend to mostly/entirely ignore the defined ioctl set and replace
+>> them with your own.  In the case of the latter, you're also not getting
+>> the advantages of the existing VFIO userspace code, so why expose a
+>> VFIO device at all.
+> Yeah, I totally agree.
 
-> +    pasid = ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
-> +    if (pasid < 0) {
-> +        error_report("vfio_pci_device_request_pasid_alloc:"
-> +                     " request failed, contanier: %p", container);
 
-Can use __func__, also since we're going to dump the error after all,
-we can also include the errno (pasid) here which seems to be more
-helpful than the container pointer at least to me. :)
+I guess the original idea is to reuse the VFIO DMA/IOMMU API for this. 
+Then we have the chance to reuse vfio codes in qemu for dealing with e.g 
+vIOMMU.
 
-> +    }
-> +    rcu_read_unlock();
-> +    return pasid;
-> +}
-> +
-> +static int vfio_pci_device_request_pasid_free(PCIBus *bus,
-> +                                              int32_t devfn,
-> +                                              uint32_t pasid)
-> +{
-> +    PCIDevice *pdev = bus->devices[devfn];
-> +    VFIOPCIDevice *vdev = DO_UPCAST(VFIOPCIDevice, pdev, pdev);
-> +    VFIOContainer *container = vdev->vbasedev.group->container;
-> +    struct vfio_iommu_type1_pasid_request req;
-> +    unsigned long argsz;
-> +    int ret = 0;
-> +
-> +    argsz = sizeof(req);
-> +    req.argsz = argsz;
-> +    req.flag = VFIO_IOMMU_PASID_FREE;
-> +    req.pasid = pasid;
-> +
-> +    rcu_read_lock();
-> +    ret = ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
-> +    if (ret != 0) {
-> +        error_report("vfio_pci_device_request_pasid_free:"
-> +                     " request failed, contanier: %p", container);
-> +    }
-> +    rcu_read_unlock();
-> +    return ret;
-> +}
-> +
-> +static PCIPASIDOps vfio_pci_pasid_ops = {
-> +    .alloc_pasid = vfio_pci_device_request_pasid_alloc,
-> +    .free_pasid = vfio_pci_device_request_pasid_free,
-> +};
-> +
->  static void vfio_realize(PCIDevice *pdev, Error **errp)
->  {
->      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-> @@ -2991,6 +3050,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->      vfio_register_req_notifier(vdev);
->      vfio_setup_resetfn_quirk(vdev);
->  
-> +    pci_setup_pasid_ops(pdev, &vfio_pci_pasid_ops);
-> +
->      return;
->  
->  out_teardown:
-> -- 
-> 2.7.4
-> 
 
-Regards,
+>
+>> The mdev interface does provide a general interface for creating and
+>> managing virtual devices, vfio-mdev is just one driver on the mdev
+>> bus.  Parav (Mellanox) has been doing work on mdev-core to help clean
+>> out vfio-isms from the interface, aiui, with the intent of implementing
+>> another mdev bus driver for using the devices within the kernel.
+> Great to know this! I found below series after some searching:
+>
+> https://lkml.org/lkml/2019/3/8/821
+>
+> In above series, the new mlx5_core mdev driver will do the probe
+> by calling mlx5_get_core_dev() first on the parent device of the
+> mdev device. In vhost_mdev, maybe we can also keep track of all
+> the compatible mdev devices and use this info to do the probe.
 
--- 
-Peter Xu
+
+I don't get why this is needed. My understanding is if we want to go 
+this way, there're actually two parts. 1) Vhost mdev that implements the 
+device managements and vhost ioctl. 2) Vhost it self, which can accept 
+mdev fd as it backend through VHOST_NET_SET_BACKEND.
+
+
+> But we also need a way to allow vfio_mdev driver to distinguish
+> and reject the incompatible mdev devices.
+
+
+One issue for this series is that it doesn't consider DMA isolation at all.
+
+
+>
+>> It
+>> seems like this vhost-mdev driver might be similar, using mdev but not
+>> necessarily vfio-mdev to expose devices.  Thanks,
+> Yeah, I also think so!
+
+
+I've cced some driver developers for their inputs. I think we need a 
+sample parent drivers in the next version for us to understand the full 
+picture.
+
+
+Thanks
+
+
+>
+> Thanks!
+> Tiwei
+>
+>> Alex
