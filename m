@@ -2,110 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2902563485
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 12:49:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2ECCC634EA
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 13:29:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726486AbfGIKtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jul 2019 06:49:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60728 "EHLO mx1.redhat.com"
+        id S1726126AbfGIL26 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jul 2019 07:28:58 -0400
+Received: from mga11.intel.com ([192.55.52.93]:54993 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725947AbfGIKtd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jul 2019 06:49:33 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8AC7C369CC;
-        Tue,  9 Jul 2019 10:49:32 +0000 (UTC)
-Received: from gondolin (unknown [10.40.205.62])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2B8118441C;
-        Tue,  9 Jul 2019 10:49:23 +0000 (UTC)
-Date:   Tue, 9 Jul 2019 12:49:20 +0200
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, freude@linux.ibm.com, borntraeger@de.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, mjrosato@linux.ibm.com,
-        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
-        pmorel@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com
-Subject: Re: [PATCH v4 3/7] s390: zcrypt: driver callback to indicate
- resource in use
-Message-ID: <20190709124920.3a910dca.cohuck@redhat.com>
-In-Reply-To: <c771961d-f840-fe8a-09b7-a11b39a74d4c@linux.ibm.com>
-References: <1560454780-20359-1-git-send-email-akrowiak@linux.ibm.com>
-        <1560454780-20359-4-git-send-email-akrowiak@linux.ibm.com>
-        <20190618182558.7d7e025a.cohuck@redhat.com>
-        <2366c6b6-fd9e-0c32-0e9d-018cd601a0ad@linux.ibm.com>
-        <20190701212643.0dd7d4ab.cohuck@redhat.com>
-        <c771961d-f840-fe8a-09b7-a11b39a74d4c@linux.ibm.com>
-Organization: Red Hat GmbH
+        id S1726043AbfGIL26 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jul 2019 07:28:58 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jul 2019 04:28:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,470,1557212400"; 
+   d="scan'208";a="173539452"
+Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
+  by FMSMGA003.fm.intel.com with ESMTP; 09 Jul 2019 04:28:55 -0700
+Message-ID: <5D247BC2.70104@intel.com>
+Date:   Tue, 09 Jul 2019 19:34:26 +0800
+From:   Wei Wang <wei.w.wang@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+To:     Peter Zijlstra <peterz@infradead.org>
+CC:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com, ak@linux.intel.com, kan.liang@intel.com,
+        mingo@redhat.com, rkrcmar@redhat.com, like.xu@intel.com,
+        jannh@google.com, arei.gonglei@huawei.com, jmattson@google.com
+Subject: Re: [PATCH v7 08/12] KVM/x86/vPMU: Add APIs to support host save/restore
+ the guest lbr stack
+References: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com> <1562548999-37095-9-git-send-email-wei.w.wang@intel.com> <20190708144831.GN3402@hirez.programming.kicks-ass.net> <5D240435.2040801@intel.com> <20190709093917.GS3402@hirez.programming.kicks-ass.net>
+In-Reply-To: <20190709093917.GS3402@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Tue, 09 Jul 2019 10:49:32 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 8 Jul 2019 10:27:11 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+On 07/09/2019 05:39 PM, Peter Zijlstra wrote:
+> On Tue, Jul 09, 2019 at 11:04:21AM +0800, Wei Wang wrote:
+>> On 07/08/2019 10:48 PM, Peter Zijlstra wrote:
+>>> *WHY* does the host need to save/restore? Why not make VMENTER/VMEXIT do
+>>> this?
+>> Because the VMX transition is much more frequent than the vCPU switching.
+>> On SKL, saving 32 LBR entries could add 3000~4000 cycles overhead, this
+>> would be too large for the frequent VMX transitions.
+>>
+>> LBR state is saved when vCPU is scheduled out to ensure that this
+>> vCPU's LBR data doesn't get lost (as another vCPU or host thread that
+>> is scheduled in may use LBR)
+> But VMENTER/VMEXIT still have to enable/disable the LBR, right?
+> Otherwise the host will pollute LBR contents. And you then rely on this
+> 'fake' event to ensure the host doesn't use LBR when the VCPU is
+> running.
 
-> On 7/1/19 3:26 PM, Cornelia Huck wrote:
-> > On Wed, 19 Jun 2019 09:04:18 -0400
-> > Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+Yes, only the debugctl msr is save/restore on vmx tranisions.
 
-> >> Allow me to first address your fear that a bad actor can hog
-> >> resources that can't be removed by root. With this enhancement,
-> >> there is nothing preventing a root user from taking resources
-> >> from a matrix mdev, it simply forces him/her to follow the
-> >> proper procedure. The resources to be removed must first be
-> >> unassigned from the matrix mdev to which they are assigned.
-> >> The AP bus's /sys/bus/ap/apmask and /sys/bus/ap/aqmask
-> >> sysfs attributes can then be edited to transfer ownership
-> >> of the resources to zcrypt.  
-> > 
-> > What is the suggested procedure when root wants to unbind a queue
-> > device? Find the mdev using the queue (is that easy enough?), unassign
-> > it, then unbind? Failing to unbind is a bit unexpected; can we point
-> > the admin to the correct mdev from which the queue has to be removed
-> > first?  
-> 
-> The proper procedure is to first unassign the adapter, domain, or both
-> from the mdev to which the APQN is assigned. The difficulty in finding
-> the queue depends upon how many mdevs have been created. I would expect
-> that an admin would keep records of who owns what, but in the case he or
-> she doesn't, it would be a matter of printing out the matrix attribute
-> of each mdev until you find the mdev to which the APQN is assigned.
 
-Ok, so the information is basically available, if needed.
+>
+> But what about the counter scheduling rules;
 
-> The only means I know of for informing the admin to which mdev a given
-> APQN is assigned is to log the error when it occurs. 
+The counter is emulated independent of the lbr emulation.
 
-That might be helpful, if it's easy to do.
+Here is the background reason:
 
-> I think Matt is
-> also looking to provide query functions in the management tool on which
-> he is currently working.
+The direction we are going is the architectural emulation, where the 
+features
+are emulated based on the hardware behavior described in the spec. So 
+the lbr
+emulation path only offers the lbr feature to the guest (no counters 
+associated, as
+the lbr feature doesn't have a counter essentially).
 
-That also sounds helpful.
+If the above isn't clear, please see this example: the guest could run 
+any software
+to use the lbr feature (non-perf or non-linux, or even a testing kernel 
+module to try
+lbr for their own purpose), and it could choose to use a regular timer 
+to do sampling.
+If the lbr emulation takes a counter to generate a PMI to the guest to 
+do sampling,
+that pmi isn't expected from the guest perspective.
 
-(...)
+So the counter scheduling isn't considered by the lbr emulation here, it 
+is considered
+by the counter emulation. If the guest needs a counter, it configures 
+the related msr,
+which traps to KVM, and the counter emulation has it own emulation path
+(e.g. reprogram_gp_counter which is called when the guest writes to the 
+emulated
+eventsel msr).
 
-> >> * It forces the use of the proper procedure to change ownership of AP
-> >>     queues.  
-> > 
-> > This needs to be properly documented, and the admin needs to have a
-> > chance to find out why unbinding didn't work and what needs to be done
-> > (see my comments above).  
-> 
-> I will create a section in the vfio-ap.txt document that comes with this
-> patch set describing the proper procedure for unbinding queues. Of
-> course, we'll make sure the official IBM doc also more thoroughly
-> describes this.
 
-+1 for good documentation.
+> what happens when a CPU
+> event claims the LBR before the task event can claim it? CPU events have
+> precedence over task events.
 
-With that, I don't really object to this change.
+I think the precedence (cpu pined and task pined) is for the counter 
+multiplexing,
+right?
+
+For the lbr feature, could we thought of it as first come, first served?
+For example, if we have 2 host threads who want to use lbr at the same time,
+I think one of them would simply fail to use.
+
+So if guest first gets the lbr, host wouldn't take over unless some 
+userspace
+command (we added to QEMU) is executed to have the vCPU actively
+stop using lbr.
+
+
+>
+> I'm missing all these details in the Changelogs. Please describe the
+> whole setup and explain why this approach.
+
+OK, just shared some important background above.
+I'll see if any more important details missed.
+
+Best,
+Wei
