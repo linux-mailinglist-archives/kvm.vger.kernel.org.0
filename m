@@ -2,67 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C06D634F1
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 13:31:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CCEB6350F
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 13:39:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726449AbfGILb0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jul 2019 07:31:26 -0400
-Received: from mga02.intel.com ([134.134.136.20]:32010 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725989AbfGILb0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jul 2019 07:31:26 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jul 2019 04:31:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,470,1557212400"; 
-   d="scan'208";a="192656226"
-Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
-  by fmsmga002.fm.intel.com with ESMTP; 09 Jul 2019 04:31:23 -0700
-Message-ID: <5D247C55.3000700@intel.com>
-Date:   Tue, 09 Jul 2019 19:36:53 +0800
-From:   Wei Wang <wei.w.wang@intel.com>
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
-MIME-Version: 1.0
-To:     Peter Zijlstra <peterz@infradead.org>
-CC:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, ak@linux.intel.com, kan.liang@intel.com,
+        id S1726523AbfGILjs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jul 2019 07:39:48 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:54684 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726030AbfGILjs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jul 2019 07:39:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=yvuN7XriVhLzlpcSf3QVaG6soAikaUqnhDyVf0OF2tA=; b=fW+cgoqbOCQZ9QOR2gx285qFI
+        6mNy/k+o3AyaHPAribt0An3VQWnxKctGKqeBFtjGaXzpR5va4gyoXE+LPkfint+FybWKF5iyciTZW
+        5KDadFzerjay70s7FFFQfw15w4/R/o9Ee0SnORIL06dKDHeGHm5/YRFe+WY031YltCzVo3XfQsg7R
+        06ui9ykPLvMsXNtmpT/r6SotqBTaAwWYr6tmoL93tFVG4k7aBB37Qi0ELaEnrXmkIzhgCxdkMNaEN
+        y6e6/cBALtujliPuU8YHuOD6iBUhFnxfw0dXXiTjjlX1zh73FTKXN7+AJySovHA4uPN7JtMQHV5nm
+        GViR98BoQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hkoTI-0006c4-49; Tue, 09 Jul 2019 11:39:44 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 2B6F920120CB1; Tue,  9 Jul 2019 13:39:42 +0200 (CEST)
+Date:   Tue, 9 Jul 2019 13:39:42 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Andi Kleen <ak@linux.intel.com>
+Cc:     Wei Wang <wei.w.wang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, pbonzini@redhat.com, kan.liang@intel.com,
         mingo@redhat.com, rkrcmar@redhat.com, like.xu@intel.com,
         jannh@google.com, arei.gonglei@huawei.com, jmattson@google.com
-Subject: Re: [PATCH v7 07/12] perf/x86: no counter allocation support
-References: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com> <1562548999-37095-8-git-send-email-wei.w.wang@intel.com> <20190708142947.GM3402@hirez.programming.kicks-ass.net> <5D2402E6.7060104@intel.com> <20190709094305.GT3402@hirez.programming.kicks-ass.net>
-In-Reply-To: <20190709094305.GT3402@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v7 10/12] KVM/x86/lbr: lazy save the guest lbr stack
+Message-ID: <20190709113942.GV3402@hirez.programming.kicks-ass.net>
+References: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com>
+ <1562548999-37095-11-git-send-email-wei.w.wang@intel.com>
+ <20190708145326.GO3402@hirez.programming.kicks-ass.net>
+ <20190708151141.GL31027@tassilo.jf.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190708151141.GL31027@tassilo.jf.intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/09/2019 05:43 PM, Peter Zijlstra wrote:
-> That's almost a year ago; I really can't remember that and you didn't
-> put any of that in your Changelog to help me remember.
->
-> (also please use: https://lkml.kernel.org/r/$msgid style links)
+On Mon, Jul 08, 2019 at 08:11:41AM -0700, Andi Kleen wrote:
+> > I don't understand a word of that.
+> > 
+> > Who cares if the LBR MSRs are touched; the guest expects up-to-date
+> > values when it does reads them.
+> 
+> This is for only when the LBRs are disabled in the guest.
 
-OK, I'll put this link in the cover letter or commit log for a reminder.
-
->
->> In the previous version, we added a "no_counter" bit to perf_event_attr, and
->> that will be exposed to user ABI, which seems not good.
->> (https://lkml.org/lkml/2019/2/14/791)
->> So we wrap a new kernel API above to support this.
->>
->> Do you have a different suggestion to do this?
->> (exclude host/guest just clears the enable bit when on VM-exit/entry,
->> still consumes the counter)
-> Just add an argument to perf_event_create_kernel_counter() ?
-
-Yes. I didn't find a proper place to add this "no_counter" indicator, so 
-added a
-wrapper to avoid changing existing callers of 
-perf_event_create_kernel_counter.
-
-Best,
-Wei
+But your Changelog didn't clearly state that. It was an unreadable mess.
