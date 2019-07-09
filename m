@@ -2,159 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C83863518
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 13:43:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A46D63521
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 13:46:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726089AbfGILnX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jul 2019 07:43:23 -0400
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:39205 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726002AbfGILnW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jul 2019 07:43:22 -0400
-Received: by mail-ed1-f67.google.com with SMTP id m10so17453933edv.6
-        for <kvm@vger.kernel.org>; Tue, 09 Jul 2019 04:43:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-powerpc-org.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id;
-        bh=w6qkRdFWo1m+2kjAVkUW2xAjUrNP1RfMr/8PVdMgFZQ=;
-        b=Yb86hqxS083UxGLB2HtEiuIagXH8l1erkM6OdRVVR1whdjwSWq5J9k8I3aUIaICmid
-         Op81AX+HTh08KSF50g5bBeWjeJlF8YrnBxKuLDydX3Ix8XjtAmiJvN5PX++4liUvNWKk
-         nG+mQD7YgvQ9LHKn2n++Vnn0ljzOL3+bDY8iSPa9F7yzY5WfAlYha/MM9rhn2fnkOyXP
-         tk1OuZktVC2tCXCPq2hDzitNAn7cM5PZM6XjUZ7pU6oKgKeMo1bcfPjyFsQNZV1ZxCQ0
-         8SEVJcdjqsmqvDBJidYsKXLmahMqqRmAP+EQERdme/RzC81hHooXJbniI/mGeZZYnR9M
-         4QTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=w6qkRdFWo1m+2kjAVkUW2xAjUrNP1RfMr/8PVdMgFZQ=;
-        b=RAMFnfaA1mqYwOZ77CchQIPIP4pfYT9+qzxwDZmXaY4asL2CaLGDYicd48OiEL9lXU
-         /yAameSl8OD/hQpHbU+g2f2WXMbQj3hbGkE5tAjdJk/1Asrm2X/ybHtrvxLGQDrGhBHG
-         YrgxKLOYBdxKjU8SQ0uPa8/QkUA0OIJc4MJ4awIM6CeepblU+ugc2SZTBq0BvgQ3GN8i
-         kyebZ9bPYVy4ogVKlMmXyHcdSnxcRxDvj4PoZQQb5ylardeQOMkK57npLGeS8Y/Wq0uh
-         YS1o41e3rksAwqNzwqG5znXBk2rpr34u46qinEhpcQXuTVE/NAJRnO5tLuDgkMG9UFE3
-         deXA==
-X-Gm-Message-State: APjAAAXP1vNMcavl8ZlpTlPC3l4SAUzPF4ixGjqsbpG3lFrJ/p/q4Nex
-        Zpul+HItnh/ezRgjLEShhc2xuw==
-X-Google-Smtp-Source: APXvYqz19DyVmsh25IQV9BuwYu4QLIOLLb7y1C5AueJeXlPb0ih1z7kcomjwkNHJmLL575Q24+PlAg==
-X-Received: by 2002:a05:6402:6d0:: with SMTP id n16mr25037140edy.168.1562672600296;
-        Tue, 09 Jul 2019 04:43:20 -0700 (PDT)
-Received: from tegmen.arch.suse.de (nat.nue.novell.com. [195.135.221.2])
-        by smtp.gmail.com with ESMTPSA id 43sm6423325edz.87.2019.07.09.04.43.19
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 09 Jul 2019 04:43:19 -0700 (PDT)
-From:   Denis Kirjanov <kda@linux-powerpc.org>
-X-Google-Original-From: Denis Kirjanov <dkirjanov@suse.com>
-To:     mst@redhat.com, jasowang@redhat.com
-Cc:     kvm@vger.kernel.org, netdev@vger.kernel.org,
-        Denis Kirjanov <kda@linux-powerpc.org>
-Subject: [PATCH] vhost: fix null pointer dereference in vhost_del_umem_range
-Date:   Tue,  9 Jul 2019 13:42:51 +0200
-Message-Id: <20190709114251.24662-1-dkirjanov@suse.com>
-X-Mailer: git-send-email 2.12.3
+        id S1726380AbfGILqP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jul 2019 07:46:15 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:37700 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726010AbfGILqO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jul 2019 07:46:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=RhpUavX3vbcOLn7vixcej5cSL4YtkOwjsTEyylpANYk=; b=Rwzl/RiBE0JKBZle7CY/uKMh9
+        3rMg/EFkiJOgN7xmvsg60CfJr527j4CZPmkaYWQUwXyD/S4gQv5DBZ4HaUrNKzquxKbWHKkdEkNTG
+        I/KfWe7GeaJrlEiPibsqmgT30bYh7vVdVYfUQjVyPy9GSf/ge+0hfZJVrb+OhMYNgKL/QTcL+UqrX
+        Ut5DPG7WblBnaoYXLCt4l3uNkdsgz0A4JJUePbUsn1rMHInzZKepet0tBYw+eALEQAA6ZX62tGr8L
+        GNbk6/ozZS4sHc5fi2ppq0OeqaqTNt8iZBe1JXkVUSFGibMbdT6vgdiSPHpsXApESWmKC8NkMx/jq
+        kuIfY8YKA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hkoZI-0006My-2z; Tue, 09 Jul 2019 11:45:56 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id CD84020120CB1; Tue,  9 Jul 2019 13:45:54 +0200 (CEST)
+Date:   Tue, 9 Jul 2019 13:45:54 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Wei Wang <wei.w.wang@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com, ak@linux.intel.com, kan.liang@intel.com,
+        mingo@redhat.com, rkrcmar@redhat.com, like.xu@intel.com,
+        jannh@google.com, arei.gonglei@huawei.com, jmattson@google.com
+Subject: Re: [PATCH v7 08/12] KVM/x86/vPMU: Add APIs to support host
+ save/restore the guest lbr stack
+Message-ID: <20190709114554.GW3402@hirez.programming.kicks-ass.net>
+References: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com>
+ <1562548999-37095-9-git-send-email-wei.w.wang@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1562548999-37095-9-git-send-email-wei.w.wang@intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> UBSAN: Undefined behaviour in ../drivers/vhost/vhost.c:52:1
-> member access within null pointer of type 'struct rb_root'
-> CPU: 2 PID: 1450 Comm: syz-executor493 Not tainted
-> 4.12.14-525.g4d6309b-default #1 SLE15 (unreleased)
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-> 1.0.0-prebuilt.qemu-project.org 04/01/2014
-> Call Trace:
->  __dump_stack lib/dump_stack.c:16 [inline]
->  dump_stack+0xc6/0x159 lib/dump_stack.c:52
->  ubsan_epilogue+0xe/0x81 lib/ubsan.c:164
->  handle_missaligned_access lib/ubsan.c:299 [inline]
->  __ubsan_handle_type_mismatch+0x2ed/0x44e lib/ubsan.c:325
->  vhost_chr_write_iter+0x103e/0x1330 [vhost]
->  call_write_iter include/linux/fs.h:1764 [inline]
->  new_sync_write fs/read_write.c:497 [inline]
->  __vfs_write+0x67c/0x9b0 fs/read_write.c:510
->  vfs_write+0x1a2/0x610 fs/read_write.c:558
->  SYSC_write fs/read_write.c:605 [inline]
->  SyS_write+0xd8/0x1f0 fs/read_write.c:597
->  do_syscall_64+0x26b/0x6e0 arch/x86/entry/common.c:284
->  entry_SYSCALL_64_after_hwframe+0x3d/0xa2
-> RIP: 0033:0x7fdb7687a739
-> RSP: 002b:00007ffd48719f38 EFLAGS: 00000213 ORIG_RAX: 0000000000000001
-> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fdb7687a739
-> RDX: 0000000000000068 RSI: 0000000020000300 RDI: 0000000000000003
-> RBP: 00000000004006f0 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000213 R12: 00000000004004a0
-> R13: 00007ffd4871a020 R14: 0000000000000000 R15: 0000000000000000
-> ================================================================================
-> kasan: CONFIG_KASAN_INLINE enabled
-> kasan: GPF could be caused by NULL-ptr deref or user memory access
-> general protection fault: 0000 [#1] SMP KASAN PTI
-> Modules linked in: vhost_net tun vhost tap af_packet iscsi_ibft
-> iscsi_boot_sysfs bochs_drm ttm ppdev drm_kms_helper drm
-> drm_panel_orientation_quirks joydev e1000 syscopyarea sysfillrect
-> pcspkr sysimgblt fb_sys_fops i2c_piix4 parport_pc parport qemu_fw_cfg
-> button ext4 crc16 jbd2 mbcache sr_mod cdrom sd_mod ata_generic
-> ata_piix ahci libahci libata serio_raw floppy sg dm_multipath dm_mod
-> scsi_dh_rdac scsi_dh_emc scsi_dh_alua scsi_mod autofs4
-> Supported: No, Unreleased kernel
-> CPU: 2 PID: 1450 Comm: syz-executor493 Not tainted
-> 4.12.14-525.g4d6309b-default #1 SLE15 (unreleased)
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-> 1.0.0-prebuilt.qemu-project.org 04/01/2014
-> task: ffff88004b858040 task.stack: ffff88004a820000
-> RIP: 0010:vhost_chr_write_iter+0x525/0x1330 [vhost]
-> RSP: 0018:ffff88004a827a38 EFLAGS: 00010246
-> RAX: dffffc0000000000 RBX: 1ffff10009504f51 RCX: 0000000000000000
-> RDX: 0000000000000000 RSI: 0000000000000202 RDI: ffffed0009504f40
-> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-> R10: 1ffff10009504ec1 R11: 0000000000000000 R12: 0000000020000040
-> R13: dffffc0000000000 R14: ffff8800352f0000 R15: ffffed0006a5e005
-> FS:  00007fdb76f79740(0000) GS:ffff880060d00000(0000)
-> knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 000055b42161d980 CR3: 000000003422c000 CR4: 00000000000006e0
-> Call Trace:
->  call_write_iter include/linux/fs.h:1764 [inline]
->  new_sync_write fs/read_write.c:497 [inline]
->  __vfs_write+0x67c/0x9b0 fs/read_write.c:510
->  vfs_write+0x1a2/0x610 fs/read_write.c:558
->  SYSC_write fs/read_write.c:605 [inline]
->  SyS_write+0xd8/0x1f0 fs/read_write.c:597
->  do_syscall_64+0x26b/0x6e0 arch/x86/entry/common.c:284
->  entry_SYSCALL_64_after_hwframe+0x3d/0xa2
-> RIP: 0033:0x7fdb7687a739
-> RSP: 002b:00007ffd48719f38 EFLAGS: 00000213 ORIG_RAX: 0000000000000001
-> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fdb7687a739
-> RDX: 0000000000000068 RSI: 0000000020000300 RDI: 0000000000000003
-> RBP: 00000000004006f0 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000213 R12: 00000000004004a0
-> R13: 00007ffd4871a020 R14: 0000000000000000 R15: 0000000000000000
-> Code: fc ff df 80 3c 02 00 0f 85 3c 0b 00 00 49 8b 6e 60 48 85 ed 0f
-> 84 1c 0b 00 00 48 89 ea 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80>
-> 3c 02 00 0f 85 f4 0a 00 00 4c 8b 7d 00 4d 85 ff 0f 84 e7 06
-> RIP: vhost_chr_write_iter+0x525/0x1330 [vhost] RSP: ffff88004a827a38
-> ---[ end trace 49849730b5255f76 ]---
+On Mon, Jul 08, 2019 at 09:23:15AM +0800, Wei Wang wrote:
+> +int intel_pmu_enable_save_guest_lbr(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> +	struct perf_event *event;
+> +
+> +	/*
+> +	 * The main purpose of this perf event is to have the host perf core
+> +	 * help save/restore the guest lbr stack on vcpu switching. There is
+> +	 * no perf counters allocated for the event.
+> +	 *
+> +	 * About the attr:
+> +	 * exclude_guest: set to true to indicate that the event runs on the
+> +	 *                host only.
 
-Fixes: 6b1e6cc7855b ("vhost: new device IOTLB API")
+That's a lie; it _never_ runs. You specifically don't want the host to
+enable LBR so as not to corrupt the guest state.
 
-Signed-off-by: Denis Kirjanov <kda@linux-powerpc.org>
----
- drivers/vhost/vhost.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> +	 * pinned:        set to false, so that the FLEXIBLE events will not
+> +	 *                be rescheduled for this event which actually doesn't
+> +	 *                need a perf counter.
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index e995c12d8e24..026123a6fc7b 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -962,7 +962,8 @@ static void vhost_del_umem_range(struct vhost_umem *umem,
- 
- 	while ((node = vhost_umem_interval_tree_iter_first(&umem->umem_tree,
- 							   start, end)))
--		vhost_umem_free(umem, node);
-+		if (node)
-+			vhost_umem_free(umem, node);
- }
- 
- static void vhost_iotlb_notify_vq(struct vhost_dev *d,
--- 
-2.12.3
+Unparsable gibberish. Specifically by making it flexible it is
+susceptible to rotation and there's no guarantee it will actually get
+scheduled.
 
+> +	 * config:        Actually this field won't be used by the perf core
+> +	 *                as this event doesn't have a perf counter.
+> +	 * sample_period: Same as above.
+
+If it's unused; why do we need to set it at all?
+
+> +	 * sample_type:   tells the perf core that it is an lbr event.
+> +	 * branch_sample_type: tells the perf core that the lbr event works in
+> +	 *                the user callstack mode so that the lbr stack will be
+> +	 *                saved/restored on vCPU switching.
+
+Again; doesn't make sense. What does the user part have to do with
+save/restore? What happens when this vcpu thread drops to userspace for
+an assist?
+
+> +	 */
+> +	struct perf_event_attr attr = {
+> +		.type = PERF_TYPE_RAW,
+> +		.size = sizeof(attr),
+> +		.exclude_guest = true,
+> +		.pinned = false,
+> +		.config = 0,
+> +		.sample_period = 0,
+> +		.sample_type = PERF_SAMPLE_BRANCH_STACK,
+> +		.branch_sample_type = PERF_SAMPLE_BRANCH_CALL_STACK |
+> +				      PERF_SAMPLE_BRANCH_USER,
+> +	};
+> +
+> +	if (pmu->vcpu_lbr_event)
+> +		return 0;
+> +
+> +	event = perf_event_create(&attr, -1, current, NULL, NULL, false);
+> +	if (IS_ERR(event)) {
+> +		pr_err("%s: failed %ld\n", __func__, PTR_ERR(event));
+> +		return -ENOENT;
+> +	}
+> +	pmu->vcpu_lbr_event = event;
+> +
+> +	return 0;
+> +}
