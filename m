@@ -2,74 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id BE5AF62EAF
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 05:21:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C91F362FBE
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 06:47:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727376AbfGIDSk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Jul 2019 23:18:40 -0400
-Received: from mga06.intel.com ([134.134.136.31]:27127 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725886AbfGIDSj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Jul 2019 23:18:39 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jul 2019 20:18:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,469,1557212400"; 
-   d="scan'208";a="156048700"
-Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
-  by orsmga007.jf.intel.com with ESMTP; 08 Jul 2019 20:18:37 -0700
-Message-ID: <5D2408D7.3000002@intel.com>
-Date:   Tue, 09 Jul 2019 11:24:07 +0800
-From:   Wei Wang <wei.w.wang@intel.com>
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
+        id S1726055AbfGIErt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jul 2019 00:47:49 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:38569 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725832AbfGIErt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jul 2019 00:47:49 -0400
+Received: by mail-pl1-f195.google.com with SMTP id az7so1950366plb.5
+        for <kvm@vger.kernel.org>; Mon, 08 Jul 2019 21:47:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=QNbrzB+/bPBWg3QE0yjGSY8stZC5Z6uXlKMCTpdJeVg=;
+        b=PvsjoXv+O+clv6m03ym0T6rYe2SXkueGX2Q5RsZGF5rpNdcLm5q/0I+nefE839dX5f
+         P8d45ZSGIRsEVTrt8ijzIP4vmk2918M4532ja913PvhbbF8hXFouHIM6JtsmzdStMwlx
+         88S1vlE/EYT5eBXwWojioRJJx8v51N+s0kjAm14xCMNKiegot1W7l3cpITgbhCWbAd43
+         ibxu+jYYqgNKmXsc+S+6iVI75isatMwPuYDt9XPnBcr4CEMpqwthhjzELtmE5xA1TS4/
+         qsfzRmDJqWzlneLijvRZSthFC02iK9CPEGXp2H3KiOohnx6OliNQf2DRLiYjzEVjJHzQ
+         t6dw==
+X-Gm-Message-State: APjAAAUsq+p8dFAtFo8EzW+QaU/OQWiPe6HAr4elQGeFguHE2ES/01cG
+        z0dflGXWTEMGZJdpnu31WheyGA==
+X-Google-Smtp-Source: APXvYqyejTegq1bLYU9a0KpYiBvfYeKowVQ1I1tWM5iBqpvuejXSJdcQ31i84YJASz8aoU1UQHxxNw==
+X-Received: by 2002:a17:902:e210:: with SMTP id ce16mr29869188plb.335.1562647668752;
+        Mon, 08 Jul 2019 21:47:48 -0700 (PDT)
+Received: from xz-x1 ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id o24sm14302620pfp.135.2019.07.08.21.47.43
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 08 Jul 2019 21:47:48 -0700 (PDT)
+From:   Peter Xu <zhexu@redhat.com>
+X-Google-Original-From: Peter Xu <peterx@redhat.com>
+Date:   Tue, 9 Jul 2019 12:47:37 +0800
+To:     Liu Yi L <yi.l.liu@intel.com>
+Cc:     qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
+        alex.williamson@redhat.com, eric.auger@redhat.com,
+        david@gibson.dropbear.id.au, tianyu.lan@intel.com,
+        kevin.tian@intel.com, jun.j.tian@intel.com, yi.y.sun@intel.com,
+        kvm@vger.kernel.org, Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: Re: [RFC v1 09/18] intel_iommu: process pasid cache invalidation
+Message-ID: <20190709044737.GE5178@xz-x1>
+References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
+ <1562324511-2910-10-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-To:     Peter Zijlstra <peterz@infradead.org>
-CC:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, ak@linux.intel.com, kan.liang@intel.com,
-        mingo@redhat.com, rkrcmar@redhat.com, like.xu@intel.com,
-        jannh@google.com, arei.gonglei@huawei.com, jmattson@google.com
-Subject: Re: [PATCH v7 12/12] KVM/VMX/vPMU: support to report GLOBAL_STATUS_LBRS_FROZEN
-References: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com> <1562548999-37095-13-git-send-email-wei.w.wang@intel.com> <20190708150909.GP3402@hirez.programming.kicks-ass.net>
-In-Reply-To: <20190708150909.GP3402@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1562324511-2910-10-git-send-email-yi.l.liu@intel.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/08/2019 11:09 PM, Peter Zijlstra wrote:
-> On Mon, Jul 08, 2019 at 09:23:19AM +0800, Wei Wang wrote:
->> This patch enables the LBR related features in Arch v4 in advance,
->> though the current vPMU only has v2 support. Other arch v4 related
->> support will be enabled later in another series.
->>
->> Arch v4 supports streamlined Freeze_LBR_on_PMI. According to the SDM,
->> the LBR_FRZ bit is set to global status when debugctl.freeze_lbr_on_pmi
->> has been set and a PMI is generated. The CTR_FRZ bit is set when
->> debugctl.freeze_perfmon_on_pmi is set and a PMI is generated.
-> (that's still a misnomer; it is: freeze_perfmon_on_overflow)
+On Fri, Jul 05, 2019 at 07:01:42PM +0800, Liu Yi L wrote:
+> +static bool vtd_process_pasid_desc(IntelIOMMUState *s,
+> +                                   VTDInvDesc *inv_desc)
+> +{
+> +    if ((inv_desc->val[0] & VTD_INV_DESC_PASIDC_RSVD_VAL0) ||
+> +        (inv_desc->val[1] & VTD_INV_DESC_PASIDC_RSVD_VAL1) ||
+> +        (inv_desc->val[2] & VTD_INV_DESC_PASIDC_RSVD_VAL2) ||
+> +        (inv_desc->val[3] & VTD_INV_DESC_PASIDC_RSVD_VAL3)) {
+> +        trace_vtd_inv_desc("non-zero-field-in-pc_inv_desc",
+> +                            inv_desc->val[1], inv_desc->val[0]);
 
-OK. (but that was directly copied from the sdm 18.2.4.1)
+The first parameter of trace_vtd_inv_desc() should be the type.
 
+Can use error_report_once() here.
 
-> Why?
->
-> Who uses that v4 crud?
+> +        return false;
+> +    }
+> +
+> +    switch (inv_desc->val[0] & VTD_INV_DESC_PASIDC_G) {
+> +    case VTD_INV_DESC_PASIDC_DSI:
+> +        break;
+> +
+> +    case VTD_INV_DESC_PASIDC_PASID_SI:
+> +        break;
+> +
+> +    case VTD_INV_DESC_PASIDC_GLOBAL:
+> +        break;
+> +
+> +    default:
+> +        trace_vtd_inv_desc("invalid-inv-granu-in-pc_inv_desc",
+> +                            inv_desc->val[1], inv_desc->val[0]);
 
-I saw the native perf driver has been updated to v4.
-After the vPMU gets updated to v4, the guest perf would use that.
+Here too.
 
-If you prefer to hold on this patch until vPMU v4 support,
-we could do that as well.
+> +        return false;
+> +    }
+> +
+> +    return true;
+> +}
 
+Regards,
 
-> It's broken. It looses events between overflow
-> and PMI.
-
-Do you mean it's a v4 hardware issue?
-
-Best,
-Wei
+-- 
+Peter Xu
