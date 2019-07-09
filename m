@@ -2,152 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 876CF635B7
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 14:25:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D83F6360E
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 14:38:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726970AbfGIMZ5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jul 2019 08:25:57 -0400
-Received: from foss.arm.com ([217.140.110.172]:42868 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726967AbfGIMZ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jul 2019 08:25:57 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A8BE015BF;
-        Tue,  9 Jul 2019 05:25:56 -0700 (PDT)
-Received: from filthy-habits.cambridge.arm.com (unknown [10.1.197.61])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D264B3F59C;
-        Tue,  9 Jul 2019 05:25:54 -0700 (PDT)
-From:   Marc Zyngier <marc.zyngier@arm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Andrew Murray <andrew.murray@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry@arm.com>,
-        Steven Price <steven.price@arm.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 18/18] KVM: arm/arm64: Initialise host's MPIDRs by reading the actual register
-Date:   Tue,  9 Jul 2019 13:25:07 +0100
-Message-Id: <20190709122507.214494-19-marc.zyngier@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190709122507.214494-1-marc.zyngier@arm.com>
-References: <20190709122507.214494-1-marc.zyngier@arm.com>
+        id S1726591AbfGIMix (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jul 2019 08:38:53 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:38066 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726010AbfGIMiw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jul 2019 08:38:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=AkO0qGwBqpTh3ze3nd2E/zoDfg+sbnDSZsXsHUXKFtg=; b=OWdldj2rR1D83RUzoQFzQwo+N
+        SByCu3cdtGi001/bgVfqRlgTrBDcgrjzSQs/YLoiPSGYfq6krg67DuRugNqfrTEdFd6U+hcDSY3D3
+        y+rc4wioob7F3xhuP3+/xf5lSlr2i1HzOawA/XBf7xt/lUtwLxMRbeG35j7p8WFbHf2yoe/VVWAXi
+        9koVK59wRHHDlxBJCNajnyat0t7vtgSk7sAZHzB1Hghtk3IqSlhx1wakdBc8eFNFDFhzBh7r4KRwU
+        fRnHa79TK7gHM7zDvIvJ0PD0nOvVot3XTzfOBX8vlyaJL9vRgNjJw/SGEZnPqe6VxsyrtgfhCflaX
+        4QQy/+OeA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hkpOK-0006bA-Ic; Tue, 09 Jul 2019 12:38:40 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 6AA4720976D9C; Tue,  9 Jul 2019 14:38:38 +0200 (CEST)
+Date:   Tue, 9 Jul 2019 14:38:38 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Ankur Arora <ankur.a.arora@oracle.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        "Raslan, KarimAllah" <karahmed@amazon.de>,
+        "boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
+        "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
+        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kernellwp@gmail.com" <kernellwp@gmail.com>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>
+Subject: Re: cputime takes cstate into consideration
+Message-ID: <20190709123838.GA3402@hirez.programming.kicks-ass.net>
+References: <CANRm+Cyge6viybs63pt7W-cRdntx+wfyOq5EWE2qmEQ71SzMHg@mail.gmail.com>
+ <alpine.DEB.2.21.1906261211410.32342@nanos.tec.linutronix.de>
+ <20190626145413.GE6753@char.us.oracle.com>
+ <1561575536.25880.10.camel@amazon.de>
+ <alpine.DEB.2.21.1906262119430.32342@nanos.tec.linutronix.de>
+ <7f721d94-aa19-20a4-6930-9ed4d1cd4834@oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7f721d94-aa19-20a4-6930-9ed4d1cd4834@oracle.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As part of setting up the host context, we populate its
-MPIDR by using cpu_logical_map(). It turns out that contrary
-to arm64, cpu_logical_map() on 32bit ARM doesn't return the
-*full* MPIDR, but a truncated version.
+On Mon, Jul 08, 2019 at 07:00:08PM -0700, Ankur Arora wrote:
+> On 2019-06-26 12:23 p.m., Thomas Gleixner wrote:
+> > On Wed, 26 Jun 2019, Raslan, KarimAllah wrote:
+> > > On Wed, 2019-06-26 at 10:54 -0400, Konrad Rzeszutek Wilk wrote:
+> > > > There were some ideas that Ankur (CC-ed) mentioned to me of using the perf
+> > > > counters (in the host) to sample the guest and construct a better
+> > > > accounting idea of what the guest does. That way the dashboard
+> > > > from the host would not show 100% CPU utilization.
+> > > 
+> > > You can either use the UNHALTED cycles perf-counter or you can use MPERF/APERF
+> > > MSRs for that. (sorry I got distracted and forgot to send the patch)
+> > 
+> > Sure, but then you conflict with the other people who fight tooth and nail
+> > over every single performance counter.
+> How about using Intel PT PwrEvt extensions? This should allow us to
+> precisely track idle residency via just MWAIT and TSC packets. Should
+> be pretty cheap too. It's post Cascade Lake though.
 
-This leaves the host MPIDR slightly corrupted after the first
-run of a VM, since we won't correctly restore the MPIDR on
-exit. Oops.
+That would fully claim PT just for this stupid accounting thing and be
+completely Intel specific.
 
-Since we cannot trust cpu_logical_map(), let's adopt a different
-strategy. We move the initialization of the host CPU context as
-part of the per-CPU initialization (which, in retrospect, makes
-a lot of sense), and directly read the MPIDR from the HW. This
-is guaranteed to work on both arm and arm64.
-
-Reported-by: Andre Przywara <Andre.Przywara@arm.com>
-Tested-by: Andre Przywara <Andre.Przywara@arm.com>
-Fixes: 32f139551954 ("arm/arm64: KVM: Statically configure the host's view of MPIDR")
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/include/asm/kvm_host.h   | 6 ++----
- arch/arm64/include/asm/kvm_host.h | 7 +++----
- virt/kvm/arm/arm.c                | 3 ++-
- 3 files changed, 7 insertions(+), 9 deletions(-)
-
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index e74e8f408987..8a37c8e89777 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -15,7 +15,6 @@
- #include <asm/kvm_asm.h>
- #include <asm/kvm_mmio.h>
- #include <asm/fpstate.h>
--#include <asm/smp_plat.h>
- #include <kvm/arm_arch_timer.h>
- 
- #define __KVM_HAVE_ARCH_INTC_INITIALIZED
-@@ -147,11 +146,10 @@ struct kvm_host_data {
- 
- typedef struct kvm_host_data kvm_host_data_t;
- 
--static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt,
--					     int cpu)
-+static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
- {
- 	/* The host's MPIDR is immutable, so let's set it up at boot time */
--	cpu_ctxt->cp15[c0_MPIDR] = cpu_logical_map(cpu);
-+	cpu_ctxt->cp15[c0_MPIDR] = read_cpuid_mpidr();
- }
- 
- struct vcpu_reset_state {
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d9770daf3d7d..63a196c19fed 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -19,12 +19,12 @@
- #include <asm/arch_gicv3.h>
- #include <asm/barrier.h>
- #include <asm/cpufeature.h>
-+#include <asm/cputype.h>
- #include <asm/daifflags.h>
- #include <asm/fpsimd.h>
- #include <asm/kvm.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_mmio.h>
--#include <asm/smp_plat.h>
- #include <asm/thread_info.h>
- 
- #define __KVM_HAVE_ARCH_INTC_INITIALIZED
-@@ -484,11 +484,10 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
- 
- DECLARE_PER_CPU(kvm_host_data_t, kvm_host_data);
- 
--static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt,
--					     int cpu)
-+static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
- {
- 	/* The host's MPIDR is immutable, so let's set it up at boot time */
--	cpu_ctxt->sys_regs[MPIDR_EL1] = cpu_logical_map(cpu);
-+	cpu_ctxt->sys_regs[MPIDR_EL1] = read_cpuid_mpidr();
- }
- 
- void __kvm_enable_ssbs(void);
-diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-index bd5c55916d0d..f149c79fd6ef 100644
---- a/virt/kvm/arm/arm.c
-+++ b/virt/kvm/arm/arm.c
-@@ -1332,6 +1332,8 @@ static void cpu_hyp_reset(void)
- 
- static void cpu_hyp_reinit(void)
- {
-+	kvm_init_host_cpu_context(&this_cpu_ptr(&kvm_host_data)->host_ctxt);
-+
- 	cpu_hyp_reset();
- 
- 	if (is_kernel_in_hyp_mode())
-@@ -1569,7 +1571,6 @@ static int init_hyp_mode(void)
- 		kvm_host_data_t *cpu_data;
- 
- 		cpu_data = per_cpu_ptr(&kvm_host_data, cpu);
--		kvm_init_host_cpu_context(&cpu_data->host_ctxt, cpu);
- 		err = create_hyp_mappings(cpu_data, cpu_data + 1, PAGE_HYP);
- 
- 		if (err) {
--- 
-2.20.1
-
+Just stop this madness already.
