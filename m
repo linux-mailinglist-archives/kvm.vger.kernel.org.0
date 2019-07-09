@@ -2,124 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2ECCC634EA
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 13:29:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AC3563501
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2019 13:36:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726126AbfGIL26 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Jul 2019 07:28:58 -0400
-Received: from mga11.intel.com ([192.55.52.93]:54993 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726043AbfGIL26 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Jul 2019 07:28:58 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Jul 2019 04:28:57 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,470,1557212400"; 
-   d="scan'208";a="173539452"
-Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
-  by FMSMGA003.fm.intel.com with ESMTP; 09 Jul 2019 04:28:55 -0700
-Message-ID: <5D247BC2.70104@intel.com>
-Date:   Tue, 09 Jul 2019 19:34:26 +0800
-From:   Wei Wang <wei.w.wang@intel.com>
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
-MIME-Version: 1.0
-To:     Peter Zijlstra <peterz@infradead.org>
-CC:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        id S1726149AbfGILgR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Jul 2019 07:36:17 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:37636 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726010AbfGILgR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Jul 2019 07:36:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=YgDlKpLL6FoM72uVvrrMp8ibtwRuN9MgVyV7pwTQN3c=; b=GBiqo0TyUKJSuuY7YT2mSf4fg
+        v3K5XpTW/zK4A35ndTEZ0RiTIekR9RxOQ3nwmmvj4yQ3EhWh25sAQLuYUjpPjj5pJ1M1Nuz+Eu/DV
+        g5FA3lRH3aDZJCL6huP7BDAvSgoDG0/isxB1XP4V6dAuCzHdSftPD454vPbfLreJ8Uc59chyTzIZU
+        6xufJaUaRfSx9IuhG6LNon/sVT6r7oNBtFuXzPPtM2ecWf21JvEU/Jniz6bybZGlqCi5fbO21UrRc
+        BSdYmfRQo00AIA7AStFE7GPb3PLcycnj7y9edYURP7FLN6cVmuhelHc8GORFXboIdk0PM8BW2Jgcv
+        rn5+t9iqQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by merlin.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hkoPY-0006Ko-EK; Tue, 09 Jul 2019 11:35:52 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id A137E20120CB1; Tue,  9 Jul 2019 13:35:49 +0200 (CEST)
+Date:   Tue, 9 Jul 2019 13:35:49 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Wei Wang <wei.w.wang@intel.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         pbonzini@redhat.com, ak@linux.intel.com, kan.liang@intel.com,
         mingo@redhat.com, rkrcmar@redhat.com, like.xu@intel.com,
         jannh@google.com, arei.gonglei@huawei.com, jmattson@google.com
-Subject: Re: [PATCH v7 08/12] KVM/x86/vPMU: Add APIs to support host save/restore
- the guest lbr stack
-References: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com> <1562548999-37095-9-git-send-email-wei.w.wang@intel.com> <20190708144831.GN3402@hirez.programming.kicks-ass.net> <5D240435.2040801@intel.com> <20190709093917.GS3402@hirez.programming.kicks-ass.net>
-In-Reply-To: <20190709093917.GS3402@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v7 12/12] KVM/VMX/vPMU: support to report
+ GLOBAL_STATUS_LBRS_FROZEN
+Message-ID: <20190709113549.GU3402@hirez.programming.kicks-ass.net>
+References: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com>
+ <1562548999-37095-13-git-send-email-wei.w.wang@intel.com>
+ <20190708150909.GP3402@hirez.programming.kicks-ass.net>
+ <5D2408D7.3000002@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5D2408D7.3000002@intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/09/2019 05:39 PM, Peter Zijlstra wrote:
-> On Tue, Jul 09, 2019 at 11:04:21AM +0800, Wei Wang wrote:
->> On 07/08/2019 10:48 PM, Peter Zijlstra wrote:
->>> *WHY* does the host need to save/restore? Why not make VMENTER/VMEXIT do
->>> this?
->> Because the VMX transition is much more frequent than the vCPU switching.
->> On SKL, saving 32 LBR entries could add 3000~4000 cycles overhead, this
->> would be too large for the frequent VMX transitions.
->>
->> LBR state is saved when vCPU is scheduled out to ensure that this
->> vCPU's LBR data doesn't get lost (as another vCPU or host thread that
->> is scheduled in may use LBR)
-> But VMENTER/VMEXIT still have to enable/disable the LBR, right?
-> Otherwise the host will pollute LBR contents. And you then rely on this
-> 'fake' event to ensure the host doesn't use LBR when the VCPU is
-> running.
+On Tue, Jul 09, 2019 at 11:24:07AM +0800, Wei Wang wrote:
+> On 07/08/2019 11:09 PM, Peter Zijlstra wrote:
+> > On Mon, Jul 08, 2019 at 09:23:19AM +0800, Wei Wang wrote:
+> > > This patch enables the LBR related features in Arch v4 in advance,
+> > > though the current vPMU only has v2 support. Other arch v4 related
+> > > support will be enabled later in another series.
+> > > 
+> > > Arch v4 supports streamlined Freeze_LBR_on_PMI. According to the SDM,
+> > > the LBR_FRZ bit is set to global status when debugctl.freeze_lbr_on_pmi
+> > > has been set and a PMI is generated. The CTR_FRZ bit is set when
+> > > debugctl.freeze_perfmon_on_pmi is set and a PMI is generated.
+> > (that's still a misnomer; it is: freeze_perfmon_on_overflow)
+> 
+> OK. (but that was directly copied from the sdm 18.2.4.1)
 
-Yes, only the debugctl msr is save/restore on vmx tranisions.
+Yeah, I know. But that name doesn't correctly describe what it actually
+does. If it worked as named it would in fact be OK.
 
+> > Why?
+> > 
+> > Who uses that v4 crud?
+> 
+> I saw the native perf driver has been updated to v4.
 
->
-> But what about the counter scheduling rules;
+It's default disabled and I'm temped to simply remove it. See below.
 
-The counter is emulated independent of the lbr emulation.
+> After the vPMU gets updated to v4, the guest perf would use that.
+> 
+> If you prefer to hold on this patch until vPMU v4 support,
+> we could do that as well.
+> 
+> 
+> > It's broken. It looses events between overflow
+> > and PMI.
+> 
+> Do you mean it's a v4 hardware issue?
 
-Here is the background reason:
+Yeah; although I'm not sure if its an implementation or specification
+problem. But as it exists it is of very limited use.
 
-The direction we are going is the architectural emulation, where the 
-features
-are emulated based on the hardware behavior described in the spec. So 
-the lbr
-emulation path only offers the lbr feature to the guest (no counters 
-associated, as
-the lbr feature doesn't have a counter essentially).
+Fundamentally our events (with exception of event groups) are
+independent. Events should always count, except when the PMI is running
+-- so as to not include the measurement overhead in the measurement
+itself. But this (mis)feature stops the entire PMU as soon as a single
+counter overflows, inhibiting all other counters from running (as they
+should) until the PMI has happened and reset the state.
 
-If the above isn't clear, please see this example: the guest could run 
-any software
-to use the lbr feature (non-perf or non-linux, or even a testing kernel 
-module to try
-lbr for their own purpose), and it could choose to use a regular timer 
-to do sampling.
-If the lbr emulation takes a counter to generate a PMI to the guest to 
-do sampling,
-that pmi isn't expected from the guest perspective.
+(Note that, strictly speaking, we even expect the overflowing counter to
+continue counting until the PMI happens. Having an overflow should not
+mean we loose events. A sampling and !sampling event should produce the
+same event count.)
 
-So the counter scheduling isn't considered by the lbr emulation here, it 
-is considered
-by the counter emulation. If the guest needs a counter, it configures 
-the related msr,
-which traps to KVM, and the counter emulation has it own emulation path
-(e.g. reprogram_gp_counter which is called when the guest writes to the 
-emulated
-eventsel msr).
+So even when there's only a single event (group) scheduled, it isn't
+strictly right. And when there's multiple events scheduled it is
+definitely wrong.
 
-
-> what happens when a CPU
-> event claims the LBR before the task event can claim it? CPU events have
-> precedence over task events.
-
-I think the precedence (cpu pined and task pined) is for the counter 
-multiplexing,
-right?
-
-For the lbr feature, could we thought of it as first come, first served?
-For example, if we have 2 host threads who want to use lbr at the same time,
-I think one of them would simply fail to use.
-
-So if guest first gets the lbr, host wouldn't take over unless some 
-userspace
-command (we added to QEMU) is executed to have the vCPU actively
-stop using lbr.
-
-
->
-> I'm missing all these details in the Changelogs. Please describe the
-> whole setup and explain why this approach.
-
-OK, just shared some important background above.
-I'll see if any more important details missed.
-
-Best,
-Wei
+And while I understand the purpose of the current semantics; it makes a
+single event group sample count more coherent, the fact that is looses
+events just bugs me something fierce -- and as shown, it breaks tools.
