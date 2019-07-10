@@ -2,75 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B6B864443
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 11:18:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0F5D644DE
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 12:03:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727764AbfGJJSM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jul 2019 05:18:12 -0400
-Received: from mga04.intel.com ([192.55.52.120]:27551 "EHLO mga04.intel.com"
+        id S1727524AbfGJKDb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jul 2019 06:03:31 -0400
+Received: from foss.arm.com ([217.140.110.172]:58884 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727497AbfGJJSM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jul 2019 05:18:12 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Jul 2019 02:18:11 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,474,1557212400"; 
-   d="scan'208";a="173811519"
-Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
-  by FMSMGA003.fm.intel.com with ESMTP; 10 Jul 2019 02:18:09 -0700
-Message-ID: <5D25AE9C.8090404@intel.com>
-Date:   Wed, 10 Jul 2019 17:23:40 +0800
-From:   Wei Wang <wei.w.wang@intel.com>
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
+        id S1727522AbfGJKDb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jul 2019 06:03:31 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 081DD344;
+        Wed, 10 Jul 2019 03:03:31 -0700 (PDT)
+Received: from e121166-lin.cambridge.arm.com (unknown [10.1.196.255])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C23F63F246;
+        Wed, 10 Jul 2019 03:03:29 -0700 (PDT)
+Date:   Wed, 10 Jul 2019 11:03:24 +0100
+From:   Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+To:     linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Jonathan Derrick <jonathan.derrick@intel.com>
+Subject: VFIO/IOMMU/PCI Linux Plumbers 2019 MC - Call for Topics
+Message-ID: <20190710100324.GA1397@e121166-lin.cambridge.arm.com>
 MIME-Version: 1.0
-To:     Peter Zijlstra <peterz@infradead.org>
-CC:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, ak@linux.intel.com, kan.liang@intel.com,
-        mingo@redhat.com, rkrcmar@redhat.com, like.xu@intel.com,
-        jannh@google.com, arei.gonglei@huawei.com, jmattson@google.com
-Subject: Re: [PATCH v7 12/12] KVM/VMX/vPMU: support to report GLOBAL_STATUS_LBRS_FROZEN
-References: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com> <1562548999-37095-13-git-send-email-wei.w.wang@intel.com> <20190708150909.GP3402@hirez.programming.kicks-ass.net> <5D2408D7.3000002@intel.com> <20190709113549.GU3402@hirez.programming.kicks-ass.net>
-In-Reply-To: <20190709113549.GU3402@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/09/2019 07:35 PM, Peter Zijlstra wrote:
->
-> Yeah; although I'm not sure if its an implementation or specification
-> problem. But as it exists it is of very limited use.
->
-> Fundamentally our events (with exception of event groups) are
-> independent. Events should always count, except when the PMI is running
-> -- so as to not include the measurement overhead in the measurement
-> itself. But this (mis)feature stops the entire PMU as soon as a single
-> counter overflows, inhibiting all other counters from running (as they
-> should) until the PMI has happened and reset the state.
->
-> (Note that, strictly speaking, we even expect the overflowing counter to
-> continue counting until the PMI happens. Having an overflow should not
-> mean we loose events. A sampling and !sampling event should produce the
-> same event count.)
->
-> So even when there's only a single event (group) scheduled, it isn't
-> strictly right. And when there's multiple events scheduled it is
-> definitely wrong.
->
-> And while I understand the purpose of the current semantics; it makes a
-> single event group sample count more coherent, the fact that is looses
-> events just bugs me something fierce -- and as shown, it breaks tools.
+Hi,
 
-Thanks for sharing the finding.
-If I understand this correctly, you observed that counter getting freezed
-earlier than expected (expected to freeze at the time PMI gets generated).
+following the official LPC19 VFIO/IOMMU/PCI microconference acceptance
+notification:
 
-Have you talked to anyone for possible freeze adjustment from the hardware?
+https://www.linuxplumbersconf.org/blog/2019/vfio-iommu-pci-microconference-accepted-into-2019-linux-plumbers-conference/
 
-Best,
-Wei
+I am sending out a call for sessions proposals open to all developers
+interested/involved in Linux kernel VFIO/IOMMU/PCI development.
 
+The LPC19 blog page provides a list of topics that we put forward for
+the microconference submission:
+
+https://www.linuxplumbersconf.org/blog/2019/vfio-iommu-pci-microconference-accepted-into-2019-linux-plumbers-conference/
+
+The blog page is there to provide a list of topics that we considered key
+and it should not be considered final, actually it is a starting point to
+define a possible schedule structure.
+
+Session proposals for the LPC19 VFIO/IOMMU/PCI microconference are warmly
+encouraged and can be submitted here through the common Call for Proposals
+LPC19 web page (please choose VFIO/IOMMU/PCI MC topic in the "Track" submenu):
+
+https://www.linuxplumbersconf.org/event/4/abstracts/
+
+Anyone involved in VFIO/IOMMU/PCI kernel development, if you wish to add
+sessions and attend the microconference consider yourself welcome, for any
+questions just reply to this thread or drop me a line.
+
+Looking forward to meeting you all in Lisbon for this interesting track !
+
+Lorenzo
