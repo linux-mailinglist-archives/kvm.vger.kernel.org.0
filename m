@@ -2,326 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E5C56646F7
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 15:27:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A8A46476D
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 15:45:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727480AbfGJN1g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jul 2019 09:27:36 -0400
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:17929 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725994AbfGJN1g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jul 2019 09:27:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1562765255; x=1594301255;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=C2+YQiuoCjBnstmK/VhiivB1LX0/aC0xd7b/JjK3gww=;
-  b=qiiJ20smJAKtSKOzICpDyejzsaIoc60DFfea1oaK1LmBe+epWwb4Nnzb
-   avSKFXlS6ksfVjhao/npM4+xgo7IGBcqoBBD4DIWNWjnIvs9npAU6yszM
-   CARdswkB+GwYXUz9tMDy3AI2Rv2MV1UiRHvgzl+PGO3BqD4dvoMal1ZzE
-   o=;
-X-IronPort-AV: E=Sophos;i="5.62,474,1554768000"; 
-   d="scan'208";a="404349716"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1d-74cf8b49.us-east-1.amazon.com) ([10.124.125.6])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 10 Jul 2019 13:27:33 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
-        by email-inbound-relay-1d-74cf8b49.us-east-1.amazon.com (Postfix) with ESMTPS id 9B8D8C06D4;
-        Wed, 10 Jul 2019 13:27:33 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 10 Jul 2019 13:27:32 +0000
-Received: from u79c5a0a55de558.ant.amazon.com (10.43.162.144) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Wed, 10 Jul 2019 13:27:31 +0000
-From:   Alexander Graf <graf@amazon.com>
-To:     <kvm@vger.kernel.org>
-CC:     <kvmarm@lists.cs.columbia.edu>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>
-Subject: [PATCH kvm-unit-tests] arm: Add PL031 test
-Date:   Wed, 10 Jul 2019 15:27:24 +0200
-Message-ID: <20190710132724.28350-1-graf@amazon.com>
-X-Mailer: git-send-email 2.17.1
+        id S1727622AbfGJNpx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jul 2019 09:45:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59744 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726333AbfGJNpx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jul 2019 09:45:53 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 738FD30056BF;
+        Wed, 10 Jul 2019 13:45:52 +0000 (UTC)
+Received: from gondolin (dhcp-192-232.str.redhat.com [10.33.192.232])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 61CE55B810;
+        Wed, 10 Jul 2019 13:45:51 +0000 (UTC)
+Date:   Wed, 10 Jul 2019 15:45:49 +0200
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Farhan Ali <alifm@linux.ibm.com>
+Cc:     Halil Pasic <pasic@linux.ibm.com>, farman@linux.ibm.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC v2 4/5] vfio-ccw: Don't call cp_free if we are processing
+ a channel program
+Message-ID: <20190710154549.5c31cc0c.cohuck@redhat.com>
+In-Reply-To: <87f7a37f-cc34-36fb-3a33-309e33bbbdde@linux.ibm.com>
+References: <cover.1562616169.git.alifm@linux.ibm.com>
+        <1405df8415d3bff446c22753d0e9b91ff246eb0f.1562616169.git.alifm@linux.ibm.com>
+        <20190709121613.6a3554fa.cohuck@redhat.com>
+        <45ad7230-3674-2601-af5b-d9beef9312be@linux.ibm.com>
+        <20190709162142.789dd605.pasic@linux.ibm.com>
+        <87f7a37f-cc34-36fb-3a33-309e33bbbdde@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.43.162.144]
-X-ClientProxiedBy: EX13D17UWC004.ant.amazon.com (10.43.162.195) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Wed, 10 Jul 2019 13:45:52 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch adds a unit test for the PL031 RTC that is used in the virt machine.
-It just pokes basic functionality. I've mostly written it to familiarize myself
-with the device, but I suppose having the test around does not hurt, as it also
-exercises the GIC SPI interrupt path.
+On Tue, 9 Jul 2019 17:27:47 -0400
+Farhan Ali <alifm@linux.ibm.com> wrote:
 
-Signed-off-by: Alexander Graf <graf@amazon.com>
----
- arm/Makefile.common |   1 +
- arm/pl031.c         | 227 ++++++++++++++++++++++++++++++++++++++++++++
- lib/arm/asm/gic.h   |   1 +
- 3 files changed, 229 insertions(+)
- create mode 100644 arm/pl031.c
+> On 07/09/2019 10:21 AM, Halil Pasic wrote:
+> > On Tue, 9 Jul 2019 09:46:51 -0400
+> > Farhan Ali <alifm@linux.ibm.com> wrote:
+> >   
+> >>
+> >>
+> >> On 07/09/2019 06:16 AM, Cornelia Huck wrote:  
+> >>> On Mon,  8 Jul 2019 16:10:37 -0400
+> >>> Farhan Ali <alifm@linux.ibm.com> wrote:
+> >>>  
+> >>>> There is a small window where it's possible that we could be working
+> >>>> on an interrupt (queued in the workqueue) and setting up a channel
+> >>>> program (i.e allocating memory, pinning pages, translating address).
+> >>>> This can lead to allocating and freeing the channel program at the
+> >>>> same time and can cause memory corruption.
+> >>>>
+> >>>> Let's not call cp_free if we are currently processing a channel program.
+> >>>> The only way we know for sure that we don't have a thread setting
+> >>>> up a channel program is when the state is set to VFIO_CCW_STATE_CP_PENDING.  
+> >>>
+> >>> Can we pinpoint a commit that introduced this bug, or has it been there
+> >>> since the beginning?
+> >>>  
+> >>
+> >> I think the problem was always there.
+> >>  
+> > 
+> > I think it became relevant with the async stuff. Because after the async
+> > stuff was added we start getting solicited interrupts that are not about
+> > channel program is done. At least this is how I remember the discussion.
+> >   
+> >>>>
+> >>>> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> >>>> ---
+> >>>>    drivers/s390/cio/vfio_ccw_drv.c | 2 +-
+> >>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+> >>>>
+> >>>> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+> >>>> index 4e3a903..0357165 100644
+> >>>> --- a/drivers/s390/cio/vfio_ccw_drv.c
+> >>>> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> >>>> @@ -92,7 +92,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+> >>>>    		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
+> >>>>    	if (scsw_is_solicited(&irb->scsw)) {
+> >>>>    		cp_update_scsw(&private->cp, &irb->scsw);
+> >>>> -		if (is_final)
+> >>>> +		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING)  
+> > 
+> > Ain't private->state potentially used by multiple threads of execution?  
+> 
+> yes
+> 
+> One of the paths I can think of is a machine check from the host which 
+> will ultimately call vfio_ccw_sch_event callback which could set state 
+> to NOT_OPER or IDLE.
 
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index f0c4b5d..b8988f2 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -11,6 +11,7 @@ tests-common += $(TEST_DIR)/pmu.flat
- tests-common += $(TEST_DIR)/gic.flat
- tests-common += $(TEST_DIR)/psci.flat
- tests-common += $(TEST_DIR)/sieve.flat
-+tests-common += $(TEST_DIR)/pl031.flat
- 
- tests-all = $(tests-common) $(tests)
- all: directories $(tests-all)
-diff --git a/arm/pl031.c b/arm/pl031.c
-new file mode 100644
-index 0000000..a364a1a
---- /dev/null
-+++ b/arm/pl031.c
-@@ -0,0 +1,227 @@
-+/*
-+ * Verify PL031 functionality
-+ *
-+ * This test verifies whether the emulated PL031 behaves correctly.
-+ *
-+ * Copyright 2019 Amazon.com, Inc. or its affiliates.
-+ * Author: Alexander Graf <graf@amazon.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#include <libcflat.h>
-+#include <asm/processor.h>
-+#include <asm/io.h>
-+#include <asm/gic.h>
-+
-+static u32 cntfrq;
-+
-+#define PL031_BASE 0x09010000
-+#define PL031_IRQ 2
-+
-+struct pl031_regs {
-+	uint32_t dr;	/* Data Register */
-+	uint32_t mr;	/* Match Register */
-+	uint32_t lr;	/* Load Register */
-+	union {
-+		uint8_t cr;	/* Control Register */
-+		uint32_t cr32;
-+	};
-+	union {
-+		uint8_t imsc;	/* Interrupt Mask Set or Clear register */
-+		uint32_t imsc32;
-+	};
-+	union {
-+		uint8_t ris;	/* Raw Interrupt Status */
-+		uint32_t ris32;
-+	};
-+	union {
-+		uint8_t mis;	/* Masked Interrupt Status */
-+		uint32_t mis32;
-+	};
-+	union {
-+		uint8_t icr;	/* Interrupt Clear Register */
-+		uint32_t icr32;
-+	};
-+	uint32_t reserved[1008];
-+	uint32_t periph_id[4];
-+	uint32_t pcell_id[4];
-+};
-+
-+static struct pl031_regs *pl031 = (void*)PL031_BASE;
-+static void *gic_ispendr;
-+static void *gic_isenabler;
-+static bool irq_triggered;
-+
-+static int check_id(void)
-+{
-+	uint32_t id[] = { 0x31, 0x10, 0x14, 0x00, 0x0d, 0xf0, 0x05, 0xb1 };
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(id); i++)
-+		if (id[i] != readl(&pl031->periph_id[i]))
-+			return 1;
-+
-+	return 0;
-+}
-+
-+static int check_ro(void)
-+{
-+	uint32_t offs[] = { offsetof(struct pl031_regs, ris),
-+			    offsetof(struct pl031_regs, mis),
-+			    offsetof(struct pl031_regs, periph_id[0]),
-+			    offsetof(struct pl031_regs, periph_id[1]),
-+			    offsetof(struct pl031_regs, periph_id[2]),
-+			    offsetof(struct pl031_regs, periph_id[3]),
-+			    offsetof(struct pl031_regs, pcell_id[0]),
-+			    offsetof(struct pl031_regs, pcell_id[1]),
-+			    offsetof(struct pl031_regs, pcell_id[2]),
-+			    offsetof(struct pl031_regs, pcell_id[3]) };
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(offs); i++) {
-+		uint32_t before32;
-+		uint16_t before16;
-+		uint8_t before8;
-+		void *addr = (void*)pl031 + offs[i];
-+		uint32_t poison = 0xdeadbeefULL;
-+
-+		before8 = readb(addr);
-+		before16 = readw(addr);
-+		before32 = readl(addr);
-+
-+		writeb(poison, addr);
-+		writew(poison, addr);
-+		writel(poison, addr);
-+
-+		if (before8 != readb(addr))
-+			return 1;
-+		if (before16 != readw(addr))
-+			return 1;
-+		if (before32 != readl(addr))
-+			return 1;
-+	}
-+
-+	return 0;
-+}
-+
-+static int check_rtc_freq(void)
-+{
-+	uint32_t seconds_to_wait = 2;
-+	uint32_t before = readl(&pl031->dr);
-+	uint64_t before_tick = read_sysreg(cntpct_el0);
-+	uint64_t target_tick = before_tick + (cntfrq * seconds_to_wait);
-+
-+	/* Wait for 2 seconds */
-+	while (read_sysreg(cntpct_el0) < target_tick) ;
-+
-+	if (readl(&pl031->dr) != before + seconds_to_wait)
-+		return 1;
-+
-+	return 0;
-+}
-+
-+static bool gic_irq_pending(void)
-+{
-+	return readl(gic_ispendr + 4) & (1 << (SPI(PL031_IRQ) - 32));
-+}
-+
-+static void gic_irq_unmask(void)
-+{
-+	writel(1 << (SPI(PL031_IRQ) - 32), gic_isenabler + 4);
-+}
-+
-+static void irq_handler(struct pt_regs *regs)
-+{
-+	u32 irqstat = gic_read_iar();
-+	u32 irqnr = gic_iar_irqnr(irqstat);
-+
-+	if (irqnr != GICC_INT_SPURIOUS)
-+		gic_write_eoir(irqstat);
-+
-+	if (irqnr == SPI(PL031_IRQ)) {
-+		report("  RTC RIS == 1", readl(&pl031->ris) == 1);
-+		report("  RTC MIS == 1", readl(&pl031->mis) == 1);
-+
-+		/* Writing any value should clear IRQ status */
-+		writel(0x80000000ULL, &pl031->icr);
-+
-+		report("  RTC RIS == 0", readl(&pl031->ris) == 0);
-+		report("  RTC MIS == 0", readl(&pl031->mis) == 0);
-+		irq_triggered = true;
-+	} else {
-+		report_info("Unexpected interrupt: %d\n", irqnr);
-+		return;
-+	}
-+}
-+
-+static int check_rtc_irq(void)
-+{
-+	uint32_t seconds_to_wait = 1;
-+	uint32_t before = readl(&pl031->dr);
-+	uint64_t before_tick = read_sysreg(cntpct_el0);
-+	uint64_t target_tick = before_tick + (cntfrq * (seconds_to_wait + 1));
-+
-+	report_info("Checking IRQ trigger (MR)");
-+
-+	irq_triggered = false;
-+
-+	/* Fire IRQ in 1 second */
-+	writel(before + seconds_to_wait, &pl031->mr);
-+
-+	install_irq_handler(EL1H_IRQ, irq_handler);
-+
-+	/* Wait until 2 seconds are over */
-+	while (read_sysreg(cntpct_el0) < target_tick) ;
-+
-+	report("  RTC IRQ not delivered without mask", !gic_irq_pending());
-+
-+	/* Mask the IRQ so that it gets delivered */
-+	writel(1, &pl031->imsc);
-+	report("  RTC IRQ pending now", gic_irq_pending());
-+
-+	/* Enable retrieval of IRQ */
-+	gic_irq_unmask();
-+	local_irq_enable();
-+
-+	report("  IRQ triggered", irq_triggered);
-+	report("  RTC IRQ not pending anymore", !gic_irq_pending());
-+	if (!irq_triggered) {
-+		report_info("  RTC RIS: %x", readl(&pl031->ris));
-+		report_info("  RTC MIS: %x", readl(&pl031->mis));
-+		report_info("  RTC IMSC: %x", readl(&pl031->imsc));
-+		report_info("  GIC IRQs pending: %08x %08x", readl(gic_ispendr), readl(gic_ispendr + 4));
-+	}
-+
-+	local_irq_disable();
-+	return 0;
-+}
-+
-+static void rtc_irq_init(void)
-+{
-+	gic_enable_defaults();
-+
-+	switch (gic_version()) {
-+	case 2:
-+		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
-+		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
-+		break;
-+	case 3:
-+		gic_ispendr = gicv3_sgi_base() + GICD_ISPENDR;
-+		gic_isenabler = gicv3_sgi_base() + GICD_ISENABLER;
-+		break;
-+	}
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	cntfrq = get_cntfrq();
-+	rtc_irq_init();
-+
-+	report("Periph/PCell IDs match", !check_id());
-+	report("R/O fields are R/O", !check_ro());
-+	report("RTC ticks at 1HZ", !check_rtc_freq());
-+	report("RTC IRQ not pending yet", !gic_irq_pending());
-+	check_rtc_irq();
-+
-+	return report_summary();
-+}
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index f6dfb90..1fc10a0 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -41,6 +41,7 @@
- #include <asm/gic-v3.h>
- 
- #define PPI(irq)			((irq) + 16)
-+#define SPI(irq)			((irq) + GIC_FIRST_SPI)
- 
- #ifndef __ASSEMBLY__
- #include <asm/cpumask.h>
--- 
-2.17.1
+Now I went through the machine check rabbit hole because I thought
+freeing the cp in there might be a good idea, but it's not that easy
+(who'd have thought...)
+
+If I read the POP correctly, an IPI or IPR in the subchannel CRW will
+indicate that the subchannel has been restored to a state after an I/O
+reset; in particular, that means that the subchannel does not have any
+I/O pending. However, that does not seem to be the case e.g. for an IPM
+(the doc does not seem to be very clear on that, though.) We can't
+unconditionally do something, as we do not know what event we're being
+called for (please disregard the positively ancient "we're called for
+IPI" comment in css_process_crw(), I think I added that one in the
+Linux 2.4 or 2.5 timeframe...) tl;dr We can't rely on anything...
+
+> 
+> > Do we need to use atomic operations or external synchronization to avoid
+> > this being another gamble? Or am I missing something?  
+> 
+> I think we probably should think about atomic operations for 
+> synchronizing the state (and it could be a separate add on patch?).
+
++1 to thinking about some atomicity changes later.
+
+> 
+> But for preventing 2 threads from stomping on the cp the check should be 
+> enough, unless I am missing something?
+
+I think so. Plus, the patch is small enough that we can merge it right
+away, and figure out a more generic change later.
+
+> 
+> >   
+> >>>>    			cp_free(&private->cp);
+> >>>>    	}
+> >>>>    	mutex_lock(&private->io_mutex);  
+> >>>
+> >>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> >>>
+> >>>  
+> >> Thanks for reviewing.
+> >>
+> >> Thanks
+> >> Farhan  
+> > 
+> >   
 
