@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 00D2E64928
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 17:05:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A8ED64920
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 17:05:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728376AbfGJPEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jul 2019 11:04:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35800 "EHLO mail.kernel.org"
+        id S1728357AbfGJPEF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jul 2019 11:04:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36054 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727717AbfGJPDq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jul 2019 11:03:46 -0400
+        id S1728328AbfGJPD6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jul 2019 11:03:58 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DD3C821707;
-        Wed, 10 Jul 2019 15:03:44 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 63A6B214AF;
+        Wed, 10 Jul 2019 15:03:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1562771025;
-        bh=8xlGO/kuENqevMLtMZ8prLR9K6mPQ9PJfVJWiTfZcsc=;
+        s=default; t=1562771037;
+        bh=VJo6PCiUdFCgoao1ZcyIDX+DP+y9CInTMLCjljZzmtw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=E353ikLsR7TVsrH1L4LeSH1jkRiCxLBppB5xLg3jrXnF+OVEF1bUTB6rVbgwOQFco
-         gL8O+HV1srlZ87H6lmakRNyB6yuBdrK8DuCDD2RW+n4zySKT2vzTP1nLAtsf63XU8r
-         WFb/wC/9LeEMtuppekT9WEKM9xXZ8zVn5y1fHPRM=
+        b=vDFKrRnCNnNZP2HlNAJ3OZgSF+fWNF535loRSkG6htWnTqOMy6I4bfEl/xppuzMvb
+         Gv9byGJH45h5ECauf/YM0mDL0QK72sxXX7lpyWCcTUjRcOic/l9Znnv8d+MmDYcV1g
+         CJiu1jbcJocx7wm+1RrAedOPbuaChRE+ei1mnJ78=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         syzbot+c03f30b4f4c46bdf8575@syzkaller.appspotmail.com,
         Alexander Potapenko <glider@google.com>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 4/7] KVM: x86: degrade WARN to pr_warn_ratelimited
-Date:   Wed, 10 Jul 2019 11:03:32 -0400
-Message-Id: <20190710150337.7390-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 3/4] KVM: x86: degrade WARN to pr_warn_ratelimited
+Date:   Wed, 10 Jul 2019 11:03:48 -0400
+Message-Id: <20190710150350.7501-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190710150337.7390-1-sashal@kernel.org>
-References: <20190710150337.7390-1-sashal@kernel.org>
+In-Reply-To: <20190710150350.7501-1-sashal@kernel.org>
+References: <20190710150350.7501-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -61,10 +61,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 72efecc4288b..8b06700d1676 100644
+index 516d8b1562c8..d89000e48c34 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -1365,7 +1365,7 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
+@@ -1293,7 +1293,7 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
  			vcpu->arch.tsc_always_catchup = 1;
  			return 0;
  		} else {
@@ -73,7 +73,7 @@ index 72efecc4288b..8b06700d1676 100644
  			return -1;
  		}
  	}
-@@ -1375,8 +1375,8 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
+@@ -1303,8 +1303,8 @@ static int set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz, bool scale)
  				user_tsc_khz, tsc_khz);
  
  	if (ratio == 0 || ratio >= kvm_max_tsc_scaling_ratio) {
