@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B6E2564E3E
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 23:57:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39C5264F4E
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 01:40:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727248AbfGJV5J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jul 2019 17:57:09 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:34441 "EHLO
+        id S1727636AbfGJXkc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jul 2019 19:40:32 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:45429 "EHLO
         mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726245AbfGJV5I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jul 2019 17:57:08 -0400
-Received: by mail-io1-f66.google.com with SMTP id k8so8172242iot.1;
-        Wed, 10 Jul 2019 14:57:07 -0700 (PDT)
+        with ESMTP id S1727567AbfGJXkc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jul 2019 19:40:32 -0400
+Received: by mail-io1-f66.google.com with SMTP id g20so8499550ioc.12;
+        Wed, 10 Jul 2019 16:40:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2DXpX7J3HbCHtTb/QlhNzHfNQIwcitCaXZndyLAl7JY=;
-        b=dmjhIXhH5EgiSQu16xwMBVxMRhV/w8AObn/lnXwOIqgVlXeulQlyoiAkN/nZev1v6o
-         RRmeeTft1CbxBuD03xCwc9FBStEwpRNgrpJcrSbjZ8wI176yJN0EYtO+W+6KmnPr9O1v
-         DmW9RAx/J9/ydrRrWwcbfBu0tIZ7oeKBgsKqpUtGd0z29ACJgOtyZBNEcnYV91wLs2Fc
-         uXdfq88cLPTrAff7RTW1hdy6zaOojVmY3dW8pGLorNzy7C8813Rrea2L/KhzyNGbnh9Z
-         SAAFeCEuDF3i218jeTJZAWnzTJvzvinLRIt8XWj71Rrmd4NxWMnkFVGvq0MzPFqlc1Uo
-         7xcQ==
+         :cc:content-transfer-encoding;
+        bh=wxKiv4rFy3weWsxV35ltdDcGn7tGg2/QlaXNYuFYJk0=;
+        b=JyN5hXamy/0x3JsO9tfR5aSXYskUM4CkJ0BLJHO2vpwA/vMOeCuKPhzcBIpswwNmZl
+         Y8jqwAEOp4Q/TnL88nItc09Y0McvYl7s1YrKyQI01SMSpjXjQSfof+kc0eu2gD88dfee
+         A0tb8U9fnbr+9Lvccsd5RDo2uWGNZ6cfhS9UVvLxI3BTfhSV41tv+t/s/yvNgFaW3pg1
+         i/pibzReKs5HDZ0QBPuE6Rq+qrtuk6a7ab/lGhCn8h2oRGU+VA5xSK2cm/CfUQelndP4
+         3wgw5JEPIJvn9lqREpvyypUj8wXffYxmHFjGD2ZRV6JGAFEpc21X18rD6CrfqRoGhDjv
+         0JGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2DXpX7J3HbCHtTb/QlhNzHfNQIwcitCaXZndyLAl7JY=;
-        b=Wsm8yhkYMXDRfGSlAXCJF/AUqaWH/9k3oUqmGuABTlaQ4pBHXp/HVtfGUuI5kbGXwE
-         hZijBboQD//gkAl5CVCE3wCF8XXWv4dWhIndazBFVGT80gOuyUtFjQiEhZvGTgtzqjC5
-         d3SK9vm1EB6O2kWcpnc3j4nQ2QtYZDQDSruuEVG8x84HvvvQTz32LiS0cUqdtd6mfywa
-         1wmjpRhcTJRRuPcFbUu1Wkwhg1SSCytIBVWnGa6vrDnD+5TpwicEE63iVu5RLyaVDKaL
-         SmuoaXxqj1OtnosQHPLNjNcqFElUpwRaJB+zh/jvSDrGOXrqJ7EeK1e14RsBQYwW+YSX
-         MSkA==
-X-Gm-Message-State: APjAAAX+9bjikGScCURkbgDbYlh/g9EBXVj/Bypj2BTPeCgiw7vOn5FR
-        DHWdO31nAnyV3tLkTCpRaM+cERu3bmlLOgSlxcc=
-X-Google-Smtp-Source: APXvYqzRNxyz/xj2S6lFPADfKqVKGRqCS0g1lCPIanu9PbmBmhuHVPvb6bu0wTnVULKY/foZ0cdT5wOmPfLs7M/II1s=
-X-Received: by 2002:a6b:5106:: with SMTP id f6mr359718iob.15.1562795827030;
- Wed, 10 Jul 2019 14:57:07 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=wxKiv4rFy3weWsxV35ltdDcGn7tGg2/QlaXNYuFYJk0=;
+        b=eT3b3864nNVr9FJT9FvZa3qBbwHdUekYitlgAV6sjjwMuqNdLGnLrGhonjLrihSWrK
+         tKdVFy+iq1iOimTcYt0SucUrMP+JAv2tvmmtpJTNGQyEqm07V0K1tOXHI3pyiThZuBBj
+         S9V/4F89p4SrqtVHlyhrVneZcKTEIOcohwU1qUe9HM41RG6HnavsZyWj4oHf8iOSJUI6
+         0sGJzNQ9Lf42qe2HMESvasy0GEtDAbFqLCAm3cjlrI8WvCzfZ+GW06uadP7fqHRMwELh
+         E/U/X8Ga4zqGXBiTr+NyaxBGc9h11tJGksXPXJ5ZnVdKvxT7820vB7iSuz1Aqu4xBbl7
+         Xasg==
+X-Gm-Message-State: APjAAAV8jzl4gYniKWh4uMb8jZ4THEmv9lhFbyhK82vRQkE4BF3+fYAR
+        q9BeObiN31T1vvcjhQsriDxROQIVG3/q746+b3U=
+X-Google-Smtp-Source: APXvYqzHj2JjyCOrHiYjibDN0Mj9eKjyPdJ/EjcaZIR9tsviZGDtVimFBWopFxt/olMkBKQ/xZ1tE+XtzzLNYNW6YNY=
+X-Received: by 2002:a02:6d24:: with SMTP id m36mr915549jac.87.1562802030573;
+ Wed, 10 Jul 2019 16:40:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190710195158.19640-1-nitesh@redhat.com> <20190710195158.19640-2-nitesh@redhat.com>
-In-Reply-To: <20190710195158.19640-2-nitesh@redhat.com>
+References: <20190710195158.19640-1-nitesh@redhat.com>
+In-Reply-To: <20190710195158.19640-1-nitesh@redhat.com>
 From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Wed, 10 Jul 2019 14:56:55 -0700
-Message-ID: <CAKgT0Ue3mVZ_J0GgMUP4PBW4SUD1=L9ixD5nUZybw9_vmBAT0A@mail.gmail.com>
-Subject: Re: [RFC][Patch v11 1/2] mm: page_hinting: core infrastructure
+Date:   Wed, 10 Jul 2019 16:40:19 -0700
+Message-ID: <CAKgT0Uf3J17zNFc-pBKQjTthSa8GG=TrTwaL4+Ns=Q88sFpxLQ@mail.gmail.com>
+Subject: Re: [RFC][PATCH v11 0/2] mm: Support for page hinting
 To:     Nitesh Narayan Lal <nitesh@redhat.com>
 Cc:     kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -62,528 +62,259 @@ Cc:     kvm list <kvm@vger.kernel.org>,
         john.starks@microsoft.com, Dave Hansen <dave.hansen@intel.com>,
         Michal Hocko <mhocko@suse.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 10, 2019 at 12:52 PM Nitesh Narayan Lal <nitesh@redhat.com> wrote:
+On Wed, Jul 10, 2019 at 12:52 PM Nitesh Narayan Lal <nitesh@redhat.com> wro=
+te:
+
+The results up here were redundant with what is below so I am just
+dropping them. I would suggest only including one set of results in
+any future cover page as it is confusing to duplicate it like that.
+
+> This approach tracks all freed pages of the order MAX_ORDER - 2 in bitmap=
+s.
+> A new hook after buddy merging is used to set the bits in the bitmap.
+> Currently, the bits are only cleared when pages are hinted, not when page=
+s are
+> re-allocated.
 >
-> This patch introduces the core infrastructure for free page hinting in
-> virtual environments. It enables the kernel to track the free pages which
-> can be reported to its hypervisor so that the hypervisor could
-> free and reuse that memory as per its requirement.
+> Bitmaps are stored on a per-zone basis and are protected by the zone lock=
+. A
+> workqueue asynchronously processes the bitmaps as soon as a pre-defined m=
+emory
+> threshold is met, trying to isolate and report pages that are still free.
 >
-> While the pages are getting processed in the hypervisor (e.g.,
-> via MADV_FREE), the guest must not use them, otherwise, data loss
-> would be possible. To avoid such a situation, these pages are
-> temporarily removed from the buddy. The amount of pages removed
-> temporarily from the buddy is governed by the backend(virtio-balloon
-> in our case).
+> The isolated pages are reported via virtio-balloon, which is responsible =
+for
+> sending batched pages to the host synchronously. Once the hypervisor proc=
+essed
+> the hinting request, the isolated pages are returned back to the buddy.
 >
-> To efficiently identify free pages that can to be hinted to the
-> hypervisor, bitmaps in a coarse granularity are used. Only fairly big
-> chunks are reported to the hypervisor - especially, to not break up THP
-> in the hypervisor - "MAX_ORDER - 2" on x86, and to save space. The bits
-> in the bitmap are an indication whether a page *might* be free, not a
-> guarantee. A new hook after buddy merging sets the bits.
+> Changelog in v11:
+> * Added logic to take care of multiple NUMA nodes scenarios.
+> * Simplified the logic for reporting isolated pages to the host. (Eg. rep=
+laced
+> dynamically allocated arrays with static ones, introduced wait event inst=
+ead of
+> the loop in order to wait for a response from the host)
+> * Added a mutex to prevent race condition when page hinting is enabled by
+> multiple drivers.
+> * Simplified the logic responsible for decrementing free page counter for=
+ each
+> zone.
+> * Simplified code structuring/naming.
 >
-> Bitmaps are stored per zone, protected by the zone lock. A workqueue
-> asynchronously processes the bitmaps, trying to isolate and report pages
-> that are still free. The backend (virtio-balloon) is responsible for
-> reporting these batched pages to the host synchronously. Once reporting/
-> freeing is complete, isolated pages are returned back to the buddy.
+> Known work items for the future:
+> * Test device assigned guests to ensure that hinting doesn't break it.
+> * Follow up on VIRTIO_BALLOON_F_PAGE_POISON's device-side support.
+> * Decide between MADV_DONTNEED and MADV_FREE.
+> * Look into memory hotplug, more efficient locking, better naming convent=
+ions to
+> avoid confusion with VIRTIO_BALLOON_F_FREE_PAGE_HINT support.
+> * Come up with proper/traceable error-message/logs and look into other co=
+de
+> simplifications. (If necessary).
 >
-> There are still various things to look into (e.g., memory hotplug, more
-> efficient locking, possible races when disabling).
+> Benefit analysis:
+> 1. Number of 5GB guests (each touching 4GB memory) that can be launched w=
+ithout
+> swap usage on a system with 15GB:
+> unmodified kernel - 2, 3rd with 2.5GB
+> v11 page hinting - 6, 7th with 26MB
+> v1 bubble hinting - 6, 7th with 1.8GB
 >
-> Signed-off-by: Nitesh Narayan Lal <nitesh@redhat.com>
-> ---
->  include/linux/page_hinting.h |  45 +++++++
->  mm/Kconfig                   |   6 +
->  mm/Makefile                  |   1 +
->  mm/page_alloc.c              |  18 +--
->  mm/page_hinting.c            | 250 +++++++++++++++++++++++++++++++++++
->  5 files changed, 312 insertions(+), 8 deletions(-)
->  create mode 100644 include/linux/page_hinting.h
->  create mode 100644 mm/page_hinting.c
+> Conclusion - In this particular testcase on using v11 page hinting and
+> v1 bubble-hinting 4 more guests could be launched without swapping compar=
+ed
+> to an unmodified kernel.
+> For the 7th guest launch, v11 page hinting is slightly better than v1 Bub=
+ble
+> hinting as it touches lesser swap space.
+
+I'm confused by the comment. From what I can tell bubble hinting came
+up with 1.8GB of memory while page hinting only managed to achieve
+.026GB (Using the same units makes it easier to visualize the
+difference). Also your test says "can be launched without swap usage",
+yet you say the bubble hinting is touching swap which makes not sense
+to me.
+
+> Setup & procedure -
+> Total NUMA Node Memory ~ 15 GB (All guests are run on a single NUMA node)
+> Guest Memory =3D 5GB
+> Number of CPUs in the guest =3D 1
+> Host swap =3D 4GB
+> Workload =3D test allocation program that allocates 4GB memory, touches i=
+t via
+> memset and exits.
+> The first guest is launched and once its console is up, the test allocati=
+on
+> program is executed with 4 GB memory request (Due to this the guest occup=
+ies
+> almost 4-5 GB of memory in the host in a system without page hinting). On=
+ce
+> this program exits at that time another guest is launched in the host and=
+ the
+> same process is followed. It is continued until the swap is not used.
 >
-> diff --git a/include/linux/page_hinting.h b/include/linux/page_hinting.h
-> new file mode 100644
-> index 000000000000..4900feb796f9
-> --- /dev/null
-> +++ b/include/linux/page_hinting.h
-> @@ -0,0 +1,45 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _LINUX_PAGE_HINTING_H
-> +#define _LINUX_PAGE_HINTING_H
-> +
-> +/*
-> + * Minimum page order required for a page to be hinted to the host.
-> + */
-> +#define PAGE_HINTING_MIN_ORDER         (MAX_ORDER - 2)
-> +
-
-Why use (MAX_ORDER - 2)? Is this just because of the issues I pointed
-out earlier for is it due to something else? I'm just wondering if
-this will have an impact on architectures outside of x86 as I had
-chose pageblock_order which happened to be MAX_ORDER - 2 on x86, but I
-don't know that the impact of doing that is on other architectures
-versus the (MAX_ORDER - 2) approach you took here.
-
-> +/*
-> + * struct page_hinting_config: holds the information supplied by the balloon
-> + * device to page hinting.
-> + * @hint_pages:                Callback which reports the isolated pages
-> + *                     synchornously to the host.
-> + * @max_pages:         Maxmimum pages that are going to be hinted to the host
-> + *                     at a time of granularity >= PAGE_HINTING_MIN_ORDER.
-> + */
-> +struct page_hinting_config {
-> +       void (*hint_pages)(struct list_head *list);
-> +       int max_pages;
-> +};
-> +
-> +extern int __isolate_free_page(struct page *page, unsigned int order);
-> +extern void __free_one_page(struct page *page, unsigned long pfn,
-> +                           struct zone *zone, unsigned int order,
-> +                           int migratetype, bool hint);
-> +#ifdef CONFIG_PAGE_HINTING
-> +void page_hinting_enqueue(struct page *page, int order);
-> +int page_hinting_enable(const struct page_hinting_config *conf);
-> +void page_hinting_disable(void);
-> +#else
-> +static inline void page_hinting_enqueue(struct page *page, int order)
-> +{
-> +}
-> +
-> +static inline int page_hinting_enable(const struct page_hinting_config *conf)
-> +{
-> +       return -EOPNOTSUPP;
-> +}
-> +
-> +static inline void page_hinting_disable(void)
-> +{
-> +}
-> +#endif
-> +#endif /* _LINUX_PAGE_HINTING_H */
-> diff --git a/mm/Kconfig b/mm/Kconfig
-> index f0c76ba47695..e97fab429d9b 100644
-> --- a/mm/Kconfig
-> +++ b/mm/Kconfig
-> @@ -765,4 +765,10 @@ config GUP_BENCHMARK
->  config ARCH_HAS_PTE_SPECIAL
->         bool
+> 2. Memhog execution time (For 3 guests each of 6GB on a system with 15GB)=
+:
+> unmodified kernel - Guest1:21s, Guest2:27s, Guest3:2m37s swap used =3D 3.=
+7GB
+> v11 page hinting - Guest1:23s, Guest2:26s, Guest3:21s swap used =3D 0
+> v1 bubble hinting - Guest1:23, Guest2:11s, Guest3:26s swap used =3D 0
 >
-> +# PAGE_HINTING will allow the guest to report the free pages to the
-> +# host in fixed chunks as soon as the threshold is reached.
-> +config PAGE_HINTING
-> +       bool
-> +       def_bool n
-> +       depends on X86_64
->  endmenu
+> For this particular test-case in a guest which doesn't require swap acces=
+s
+> "memhog 6G" execution time lies within a range of 15-30s.
+> Conclusion -
+> In the above test case for an unmodified kernel on executing memhog in th=
+e
+> third guest execution time rises to above 2minutes due to swap access.
+> Using either page-hinting or bubble hinting brings this execution time to=
+ a
+> a normal range of 15-30s.
 
-If there are no issue with using the term "PAGE_HINTING" I guess I
-will update my patch set to use that term instead of aeration.
+So really this test doesn't add much in value. The whole reason why
+Guest3 runs so much slower is because it is going to swap. I initially
+did this to demonstrate a point, but now running this test doesn't
+prove much as it isn't really meant to be a performance test. It is
+essentially just a duplicate of the "how many guests can you run" test
+that is passing itself off as some sort of performance test.
 
-> diff --git a/mm/Makefile b/mm/Makefile
-> index ac5e5ba78874..73be49177656 100644
-> --- a/mm/Makefile
-> +++ b/mm/Makefile
-> @@ -94,6 +94,7 @@ obj-$(CONFIG_Z3FOLD)  += z3fold.o
->  obj-$(CONFIG_GENERIC_EARLY_IOREMAP) += early_ioremap.o
->  obj-$(CONFIG_CMA)      += cma.o
->  obj-$(CONFIG_MEMORY_BALLOON) += balloon_compaction.o
-> +obj-$(CONFIG_PAGE_HINTING) += page_hinting.o
->  obj-$(CONFIG_PAGE_EXTENSION) += page_ext.o
->  obj-$(CONFIG_CMA_DEBUGFS) += cma_debug.o
->  obj-$(CONFIG_USERFAULTFD) += userfaultfd.o
-> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-> index d66bc8abe0af..8a44338bd04e 100644
-> --- a/mm/page_alloc.c
-> +++ b/mm/page_alloc.c
-> @@ -69,6 +69,7 @@
->  #include <linux/lockdep.h>
->  #include <linux/nmi.h>
->  #include <linux/psi.h>
-> +#include <linux/page_hinting.h>
+We could probably just drop this from future version of this as long
+as we verify that the memory hinting is freeing most of the memory
+back and the guest is reporting a size less than the total guest
+memory size.
+
+> Setup & procedure -
+> Total NUMA Node Memory ~ 15 GB (All guests are run on a single NUMA node)
+> Guest Memory =3D 6GB
+> Number of CPUs in the guest =3D 4
+> Process =3D 3 Guests are launched and the =E2=80=98memhog 6G=E2=80=99 exe=
+cution time is monitored
+> one after the other in each of them.
+> Host swap =3D 4GB
 >
->  #include <asm/sections.h>
->  #include <asm/tlbflush.h>
-> @@ -874,10 +875,10 @@ compaction_capture(struct capture_control *capc, struct page *page,
->   * -- nyc
->   */
+> Performance Analysis:
+> 1. will-it-scale's page_faul1
+> Setup -
+> Guest Memory =3D 6GB
+> Number of cores =3D 24
 >
-> -static inline void __free_one_page(struct page *page,
-> +inline void __free_one_page(struct page *page,
->                 unsigned long pfn,
->                 struct zone *zone, unsigned int order,
-> -               int migratetype)
-> +               int migratetype, bool hint)
->  {
->         unsigned long combined_pfn;
->         unsigned long uninitialized_var(buddy_pfn);
-> @@ -980,7 +981,8 @@ static inline void __free_one_page(struct page *page,
->                                 migratetype);
->         else
->                 add_to_free_area(page, &zone->free_area[order], migratetype);
-> -
-> +       if (hint)
-> +               page_hinting_enqueue(page, order);
->  }
-
-I'm not sure I am a fan of the way the word "hint" is used here. At
-first I thought this was supposed to be !hint since I thought hint
-meant that it was a hinted page, not that we need to record that this
-page has been freed. Maybe "record" or "report" might be a better word
-to use here.
-
->  /*
-> @@ -1263,7 +1265,7 @@ static void free_pcppages_bulk(struct zone *zone, int count,
->                 if (unlikely(isolated_pageblocks))
->                         mt = get_pageblock_migratetype(page);
+> Unmodified kernel -
+> 0,0,100,0,100,0
+> 1,514453,95.84,519502,95.83,519502
+> 2,991485,91.67,932268,91.68,1039004
+> 3,1381237,87.36,1264214,87.64,1558506
+> 4,1789116,83.36,1597767,83.88,2078008
+> 5,2181552,79.20,1889489,80.08,2597510
+> 6,2452416,75.05,2001879,77.10,3117012
+> 7,2671047,70.90,2263866,73.22,3636514
+> 8,2930081,66.75,2333813,70.60,4156016
+> 9,3126431,62.60,2370108,68.28,4675518
+> 10,3211937,58.44,2454093,65.74,5195020
+> 11,3162172,54.32,2450822,63.21,5714522
+> 12,3154261,50.14,2272290,58.98,6234024
+> 13,3115174,46.02,2369679,57.74,6753526
+> 14,3150511,41.86,2470837,54.02,7273028
+> 15,3134158,37.71,2428129,51.98,7792530
+> 16,3143067,33.57,2340469,49.54,8312032
+> 17,3112457,29.43,2263627,44.81,8831534
+> 18,3089724,25.29,2181879,38.69,9351036
+> 19,3076878,21.15,2236505,40.01,9870538
+> 20,3091978,16.95,2266327,35.00,10390040
+> 21,3082927,12.84,2172578,28.12,10909542
+> 22,3055282,8.73,2176269,29.14,11429044
+> 23,3081144,4.56,2138442,24.87,11948546
+> 24,3075509,0.45,2173753,21.62,12468048
 >
-> -               __free_one_page(page, page_to_pfn(page), zone, 0, mt);
-> +               __free_one_page(page, page_to_pfn(page), zone, 0, mt, true);
->                 trace_mm_page_pcpu_drain(page, 0, mt);
->         }
->         spin_unlock(&zone->lock);
-> @@ -1272,14 +1274,14 @@ static void free_pcppages_bulk(struct zone *zone, int count,
->  static void free_one_page(struct zone *zone,
->                                 struct page *page, unsigned long pfn,
->                                 unsigned int order,
-> -                               int migratetype)
-> +                               int migratetype, bool hint)
->  {
->         spin_lock(&zone->lock);
->         if (unlikely(has_isolate_pageblock(zone) ||
->                 is_migrate_isolate(migratetype))) {
->                 migratetype = get_pfnblock_migratetype(page, pfn);
->         }
-> -       __free_one_page(page, pfn, zone, order, migratetype);
-> +       __free_one_page(page, pfn, zone, order, migratetype, hint);
->         spin_unlock(&zone->lock);
->  }
+> page hinting -
+> 0,0,100,0,100,0
+> 1,491683,95.83,494366,95.82,494366
+> 2,988415,91.67,919660,91.68,988732
+> 3,1344829,87.52,1244608,87.69,1483098
+> 4,1797933,83.37,1625797,83.70,1977464
+> 5,2179009,79.21,1881534,80.13,2471830
+> 6,2449858,75.07,2078137,76.82,2966196
+> 7,2732122,70.90,2178105,73.75,3460562
+> 8,2910965,66.75,2340901,70.28,3954928
+> 9,3006665,62.61,2353748,67.91,4449294
+> 10,3164752,58.46,2377936,65.08,4943660
+> 11,3234846,54.32,2510149,63.14,5438026
+> 12,3165477,50.17,2412007,59.91,5932392
+> 13,3141457,46.05,2421548,57.85,6426758
+> 14,3135839,41.90,2378021,53.81,6921124
+> 15,3109113,37.75,2269290,51.76,7415490
+> 16,3093613,33.62,2346185,48.73,7909856
+> 17,3086542,29.49,2352140,46.19,8404222
+> 18,3048991,25.36,2217144,41.52,8898588
+> 19,2965500,21.18,2313614,38.18,9392954
+> 20,2928977,17.05,2175316,35.67,9887320
+> 21,2896667,12.91,2141311,28.90,10381686
+> 22,3047782,8.76,2177664,28.24,10876052
+> 23,2994503,4.58,2160976,22.97,11370418
+> 24,3038762,0.47,2053533,22.39,11864784
 >
-> @@ -1369,7 +1371,7 @@ static void __free_pages_ok(struct page *page, unsigned int order)
->         migratetype = get_pfnblock_migratetype(page, pfn);
->         local_irq_save(flags);
->         __count_vm_events(PGFREE, 1 << order);
-> -       free_one_page(page_zone(page), page, pfn, order, migratetype);
-> +       free_one_page(page_zone(page), page, pfn, order, migratetype, true);
->         local_irq_restore(flags);
->  }
+> bubble-hinting v1 -
+> 0,0,100,0,100,0
+> 1,515272,95.83,492355,95.81,515272
+> 2,985903,91.66,919653,91.68,1030544
+> 3,1475300,87.51,1353723,87.65,1545816
+> 4,1783938,83.36,1586307,83.78,2061088
+> 5,2093307,79.20,1867395,79.95,2576360
+> 6,2441370,75.05,2055421,76.65,3091632
+> 7,2650471,70.89,2246014,72.93,3606904
+> 8,2926782,66.75,2333601,70.41,4122176
+> 9,3107617,62.60,2383112,68.46,4637448
+> 10,3192332,58.44,2441626,65.84,5152720
+> 11,3268043,54.32,2235964,62.92,5667992
+> 12,3191105,50.18,2449045,60.49,6183264
+> 13,3145317,46.05,2377317,57.80,6698536
+> 14,3161552,41.91,2395814,53.26,7213808
+> 15,3140443,37.77,2333200,51.42,7729080
+> 16,3130866,33.65,2150967,46.11,8244352
+> 17,3112894,29.52,2372068,45.93,8759624
+> 18,3078424,25.39,2336211,39.85,9274896
+> 19,3036457,21.27,2224821,35.25,9790168
+> 20,3046330,17.13,2199755,37.43,10305440
+> 21,2981130,12.98,2214862,28.67,10820712
+> 22,3017481,8.84,2195996,29.69,11335984
+> 23,2979906,4.68,2173395,25.90,11851256
+> 24,2971170,0.52,2134311,21.89,12366528
+
+Okay, so this doesn't match up with the results you gave me last time
+(https://lore.kernel.org/lkml/afac6f92-74f5-4580-0303-12b7374e5011@redhat.c=
+om/),
+and actually more closely matches what I was expecting to see. The
+bubble-hinting patches are performing within a few percent of what the
+baseline kernel was doing. I am assuming the results from before had
+some additional debugging enabled for the bubble-hinting test that
+wasn't enabled for the other ones.
+
+> Conclusion -
+> For an unmodified kernel, with every fresh boot, there is 3-4% delta obse=
+rved
+> in the results wrt the numbers mentioned above. For both bubble-hinting a=
+nd
+> page-hinting, there was no noticeable degradation observed other than the
+> expected variability mentioned earlier.
 >
-> @@ -2969,7 +2971,7 @@ static void free_unref_page_commit(struct page *page, unsigned long pfn)
->          */
->         if (migratetype >= MIGRATE_PCPTYPES) {
->                 if (unlikely(is_migrate_isolate(migratetype))) {
-> -                       free_one_page(zone, page, pfn, 0, migratetype);
-> +                       free_one_page(zone, page, pfn, 0, migratetype, true);
->                         return;
->                 }
->                 migratetype = MIGRATE_MOVABLE;
-> diff --git a/mm/page_hinting.c b/mm/page_hinting.c
-> new file mode 100644
-> index 000000000000..0bfa09f8c3ed
-> --- /dev/null
-> +++ b/mm/page_hinting.c
-> @@ -0,0 +1,250 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Page hinting core infrastructure to enable a VM to report free pages to its
-> + * hypervisor.
-> + *
-> + * Copyright Red Hat, Inc. 2019
-> + *
-> + * Author(s): Nitesh Narayan Lal <nitesh@redhat.com>
-> + */
-> +
-> +#include <linux/mm.h>
-> +#include <linux/slab.h>
-> +#include <linux/page_hinting.h>
-> +#include <linux/kvm_host.h>
-> +
-> +/*
-> + * struct zone_free_area: For a single zone across NUMA nodes, it holds the
-> + * bitmap pointer to track the free pages and other required parameters
-> + * used to recover these pages by scanning the bitmap.
-> + * @bitmap:            Pointer to the bitmap in PAGE_HINTING_MIN_ORDER
-> + *                     granularity.
-> + * @base_pfn:          Starting PFN value for the zone whose bitmap is stored.
-> + * @end_pfn:           Indicates the last PFN value for the zone.
-> + * @free_pages:                Tracks the number of free pages of granularity
-> + *                     PAGE_HINTING_MIN_ORDER.
-> + * @nbits:             Indicates the total size of the bitmap in bits allocated
-> + *                     at the time of initialization.
-> + */
-> +struct zone_free_area {
-> +       unsigned long *bitmap;
-> +       unsigned long base_pfn;
-> +       unsigned long end_pfn;
-> +       atomic_t free_pages;
-> +       unsigned long nbits;
-> +} free_area[MAX_NR_ZONES];
-> +
+> Page hinting vs bubble hinting:
+> From the benefits and performance perspective, both solutions look quite =
+similar
+> so far. However, unlike bubble-hinting which is more invasive, the overal=
+l core
+> mm changes required for page hinting are minimal.
+>
+> [1] https://lkml.org/lkml/2019/6/19/926
 
-You still haven't addressed the NUMA issue I pointed out with v10. You
-are only able to address the first set of zones with this setup. As
-such you can end up missing large sections of memory if it is split
-over multiple nodes.
-
-> +static void init_hinting_wq(struct work_struct *work);
-> +static DEFINE_MUTEX(page_hinting_init);
-> +const struct page_hinting_config *page_hitning_conf;
-> +struct work_struct hinting_work;
-> +atomic_t page_hinting_active;
-> +
-> +void free_area_cleanup(int nr_zones)
-> +{
-
-I'm not sure why you are passing nr_zones as an argument here. Won't
-this always be MAX_NR_ZONES?
-
-> +       int zone_idx;
-> +
-> +       for (zone_idx = 0; zone_idx < nr_zones; zone_idx++) {
-> +               bitmap_free(free_area[zone_idx].bitmap);
-> +               free_area[zone_idx].base_pfn = 0;
-> +               free_area[zone_idx].end_pfn = 0;
-> +               free_area[zone_idx].nbits = 0;
-> +               atomic_set(&free_area[zone_idx].free_pages, 0);
-> +       }
-> +}
-> +
-> +int page_hinting_enable(const struct page_hinting_config *conf)
-> +{
-> +       unsigned long bitmap_size = 0;
-> +       int zone_idx = 0, ret = -EBUSY;
-> +       struct zone *zone;
-> +
-> +       mutex_lock(&page_hinting_init);
-> +       if (!page_hitning_conf) {
-> +               for_each_populated_zone(zone) {
-
-So for_each_populated_zone will go through all of the NUMA nodes. So
-if I am not mistaken you will overwrite the free_area values of all
-the previous nodes with the last node in the system. So if we have a
-setup that has all the memory in the first node, and none in the
-second it would effectively disable free page hinting would it not?
-
-> +                       zone_idx = zone_idx(zone);
-> +#ifdef CONFIG_ZONE_DEVICE
-> +                       if (zone_idx == ZONE_DEVICE)
-> +                               continue;
-> +#endif
-> +                       spin_lock(&zone->lock);
-> +                       if (free_area[zone_idx].base_pfn) {
-> +                               free_area[zone_idx].base_pfn =
-> +                                       min(free_area[zone_idx].base_pfn,
-> +                                           zone->zone_start_pfn);
-> +                               free_area[zone_idx].end_pfn =
-> +                                       max(free_area[zone_idx].end_pfn,
-> +                                           zone->zone_start_pfn +
-> +                                           zone->spanned_pages);
-> +                       } else {
-> +                               free_area[zone_idx].base_pfn =
-> +                                       zone->zone_start_pfn;
-> +                               free_area[zone_idx].end_pfn =
-> +                                       zone->zone_start_pfn +
-> +                                       zone->spanned_pages;
-> +                       }
-> +                       spin_unlock(&zone->lock);
-> +               }
-> +
-> +               for (zone_idx = 0; zone_idx < MAX_NR_ZONES; zone_idx++) {
-> +                       unsigned long pages = free_area[zone_idx].end_pfn -
-> +                                       free_area[zone_idx].base_pfn;
-> +                       bitmap_size = (pages >> PAGE_HINTING_MIN_ORDER) + 1;
-> +                       if (!bitmap_size)
-> +                               continue;
-> +                       free_area[zone_idx].bitmap = bitmap_zalloc(bitmap_size,
-> +                                                                  GFP_KERNEL);
-> +                       if (!free_area[zone_idx].bitmap) {
-> +                               free_area_cleanup(zone_idx);
-> +                               mutex_unlock(&page_hinting_init);
-> +                               return -ENOMEM;
-> +                       }
-> +                       free_area[zone_idx].nbits = bitmap_size;
-> +               }
-
-So this is the bit that still needs to address hotplug right? I would
-imagine you need to reallocate this if the spanned_pages range changes
-correct?
-
-> +               page_hitning_conf = conf;
-> +               INIT_WORK(&hinting_work, init_hinting_wq);
-> +               ret = 0;
-> +       }
-> +       mutex_unlock(&page_hinting_init);
-> +       return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(page_hinting_enable);
-> +
-> +void page_hinting_disable(void)
-> +{
-> +       cancel_work_sync(&hinting_work);
-> +       page_hitning_conf = NULL;
-> +       free_area_cleanup(MAX_NR_ZONES);
-> +}
-> +EXPORT_SYMBOL_GPL(page_hinting_disable);
-> +
-> +static unsigned long pfn_to_bit(struct page *page, int zone_idx)
-> +{
-> +       unsigned long bitnr;
-> +
-> +       bitnr = (page_to_pfn(page) - free_area[zone_idx].base_pfn)
-> +                        >> PAGE_HINTING_MIN_ORDER;
-> +       return bitnr;
-> +}
-> +
-> +static void release_buddy_pages(struct list_head *pages)
-> +{
-> +       int mt = 0, zone_idx, order;
-> +       struct page *page, *next;
-> +       unsigned long bitnr;
-> +       struct zone *zone;
-> +
-> +       list_for_each_entry_safe(page, next, pages, lru) {
-> +               zone_idx = page_zonenum(page);
-> +               zone = page_zone(page);
-> +               bitnr = pfn_to_bit(page, zone_idx);
-> +               spin_lock(&zone->lock);
-> +               list_del(&page->lru);
-> +               order = page_private(page);
-> +               set_page_private(page, 0);
-> +               mt = get_pageblock_migratetype(page);
-> +               __free_one_page(page, page_to_pfn(page), zone,
-> +                               order, mt, false);
-> +               spin_unlock(&zone->lock);
-> +       }
-> +}
-> +
-> +static void bm_set_pfn(struct page *page)
-> +{
-> +       struct zone *zone = page_zone(page);
-> +       int zone_idx = page_zonenum(page);
-> +       unsigned long bitnr = 0;
-> +
-> +       lockdep_assert_held(&zone->lock);
-> +       bitnr = pfn_to_bit(page, zone_idx);
-> +       /*
-> +        * TODO: fix possible underflows.
-> +        */
-> +       if (free_area[zone_idx].bitmap &&
-> +           bitnr < free_area[zone_idx].nbits &&
-> +           !test_and_set_bit(bitnr, free_area[zone_idx].bitmap))
-> +               atomic_inc(&free_area[zone_idx].free_pages);
-> +}
-> +
-> +static void scan_zone_free_area(int zone_idx, int free_pages)
-> +{
-> +       int ret = 0, order, isolated_cnt = 0;
-> +       unsigned long set_bit, start = 0;
-> +       LIST_HEAD(isolated_pages);
-> +       struct page *page;
-> +       struct zone *zone;
-> +
-> +       for (;;) {
-> +               ret = 0;
-> +               set_bit = find_next_bit(free_area[zone_idx].bitmap,
-> +                                       free_area[zone_idx].nbits, start);
-> +               if (set_bit >= free_area[zone_idx].nbits)
-> +                       break;
-> +               page = pfn_to_online_page((set_bit << PAGE_HINTING_MIN_ORDER) +
-> +                               free_area[zone_idx].base_pfn);
-> +               if (!page)
-> +                       continue;
-> +               zone = page_zone(page);
-> +               spin_lock(&zone->lock);
-> +
-> +               if (PageBuddy(page) && page_private(page) >=
-> +                   PAGE_HINTING_MIN_ORDER) {
-> +                       order = page_private(page);
-> +                       ret = __isolate_free_page(page, order);
-> +               }
-> +               clear_bit(set_bit, free_area[zone_idx].bitmap);
-> +               atomic_dec(&free_area[zone_idx].free_pages);
-> +               spin_unlock(&zone->lock);
-> +               if (ret) {
-> +                       /*
-> +                        * restoring page order to use it while releasing
-> +                        * the pages back to the buddy.
-> +                        */
-> +                       set_page_private(page, order);
-> +                       list_add_tail(&page->lru, &isolated_pages);
-> +                       isolated_cnt++;
-> +                       if (isolated_cnt == page_hitning_conf->max_pages) {
-> +                               page_hitning_conf->hint_pages(&isolated_pages);
-> +                               release_buddy_pages(&isolated_pages);
-> +                               isolated_cnt = 0;
-> +                       }
-> +               }
-> +               start = set_bit + 1;
-> +       }
-> +       if (isolated_cnt) {
-> +               page_hitning_conf->hint_pages(&isolated_pages);
-> +               release_buddy_pages(&isolated_pages);
-> +       }
-> +}
-> +
-
-I really worry that this loop is going to become more expensive as the
-size of memory increases. For example if we hint on just 16 pages we
-would have to walk something like 4K bits, 512 longs, if a system had
-64G of memory. Have you considered testing with a larger memory
-footprint to see if it has an impact on performance?
-
-> +static void init_hinting_wq(struct work_struct *work)
-> +{
-> +       int zone_idx, free_pages;
-> +
-> +       atomic_set(&page_hinting_active, 1);
-> +       for (zone_idx = 0; zone_idx < MAX_NR_ZONES; zone_idx++) {
-> +               free_pages = atomic_read(&free_area[zone_idx].free_pages);
-> +               if (free_pages >= page_hitning_conf->max_pages)
-> +                       scan_zone_free_area(zone_idx, free_pages);
-> +       }
-> +       atomic_set(&page_hinting_active, 0);
-> +}
-> +
-> +void page_hinting_enqueue(struct page *page, int order)
-> +{
-> +       int zone_idx;
-> +
-> +       if (!page_hitning_conf || order < PAGE_HINTING_MIN_ORDER)
-> +               return;
-
-I would think it is going to be expensive to be jumping into this
-function for every freed page. You should probably have an inline
-taking care of the order check before you even get here since it would
-be faster that way.
-
-> +
-> +       bm_set_pfn(page);
-> +       if (atomic_read(&page_hinting_active))
-> +               return;
-
-So I would think this piece is racy. Specifically if you set a PFN
-that is somewhere below the PFN you are currently processing in your
-scan it is going to remain unset until you have another page freed
-after the scan is completed. I would worry you can end up with a batch
-free of memory resulting in a group of pages sitting at the start of
-your bitmap unhinted.
-
-In my patches I resolved this by looping through all of the zones,
-however your approach is missing the necessary pieces to make that
-safe as you could end up in a soft lockup with the scanning thread
-spinning on a noisy system.
-
-> +       zone_idx = zone_idx(page_zone(page));
-> +       if (atomic_read(&free_area[zone_idx].free_pages) >=
-> +                       page_hitning_conf->max_pages) {
-> +               int cpu = smp_processor_id();
-> +
-> +               queue_work_on(cpu, system_wq, &hinting_work);
-> +       }
-> +}
+So I think I called it out in the review of the patch but I think we
+may want to see what happens if we increase the size of the memory in
+the guest to something more like 64G or larger. My main concern is
+that as we increase the size of memory the walk through the bitmap is
+going to become more and more expensive and I am worried that at some
+point it will start impacting the results.
