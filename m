@@ -2,76 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 9488964B32
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 19:06:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C19664B94
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 19:41:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727431AbfGJRGg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jul 2019 13:06:36 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:53880 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727197AbfGJRGg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jul 2019 13:06:36 -0400
-Received: by mail-wm1-f65.google.com with SMTP id x15so3052135wmj.3
-        for <kvm@vger.kernel.org>; Wed, 10 Jul 2019 10:06:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=SuU894j2CqbQVv4bnyUW2+R4vG8fuhuKA/J00hF+rLg=;
-        b=MnPwFTn+EjwLkW8QzupbTtEhwTLORHwyO/T3JPWYO8TSAbNC3i+EAPHXMJF8HM5E2C
-         heYgHS+56aBfdXtYCoGX8aZyHqXyMWlh50VTCxikQDf4KFGLktVk4OC/7f1YC0nAxDQ8
-         TfwyAG6pzCnU8GPF0bitujp+F6femJQWBn/VxefInB8dgI7zo4tsO8Yau/RFwFEX6f5c
-         qpzlhZXE4ulAqhCGs2VD5+UQqqqJjWa/E9vdkULaVjb4gRJFu+lTBTEkiaJj+MU4gjbS
-         Jek11BxK3SVGCJ++0sgXKfvhKACKlAKKzX5cMrKGCqD9BjCv9io3zY1VctV+Mh58NbrY
-         keLg==
-X-Gm-Message-State: APjAAAXREc9NfbBI44X7DFB0mmBmrVakrpTK9SZWmttiLYntVy5r3IK0
-        0XlJ/G5MgYj+SuVve/XFIFMF3g==
-X-Google-Smtp-Source: APXvYqxb+rtpI9aVwVTc6cdO7+RFuhsGOwpHABF0Jid8dPtXLKobZgZewcHJIAdGJh1w9sh7/ty/zA==
-X-Received: by 2002:a1c:a01a:: with SMTP id j26mr6345399wme.112.1562778394142;
-        Wed, 10 Jul 2019 10:06:34 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab? ([2001:b07:6468:f312:d066:6881:ec69:75ab])
-        by smtp.gmail.com with ESMTPSA id b203sm3130748wmd.41.2019.07.10.10.06.33
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 10 Jul 2019 10:06:33 -0700 (PDT)
-Subject: Re: [PATCH kvm-unit-tests] arm: Add PL031 test
-To:     Andre Przywara <andre.przywara@arm.com>,
-        Alexander Graf <graf@amazon.com>
-Cc:     kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
-        kvmarm@lists.cs.columbia.edu
-References: <20190710132724.28350-1-graf@amazon.com>
- <20190710180235.25c54b84@donnerap.cambridge.arm.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <35e19306-d31b-187b-185d-e783f8d5a51a@redhat.com>
-Date:   Wed, 10 Jul 2019 19:06:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1728002AbfGJRlv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jul 2019 13:41:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43884 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727095AbfGJRlu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jul 2019 13:41:50 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B753130C34C0;
+        Wed, 10 Jul 2019 17:41:50 +0000 (UTC)
+Received: from gimli.home (ovpn-116-83.phx2.redhat.com [10.3.116.83])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9C84D60BFB;
+        Wed, 10 Jul 2019 17:41:48 +0000 (UTC)
+Subject: [PATCH v3] mdev: Send uevents around parent device registration
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     kwankhede@nvidia.com, alex.williamson@redhat.com, cohuck@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Wed, 10 Jul 2019 11:41:48 -0600
+Message-ID: <156278027422.16516.5157992389394627876.stgit@gimli.home>
+User-Agent: StGit/0.19-dirty
 MIME-Version: 1.0
-In-Reply-To: <20190710180235.25c54b84@donnerap.cambridge.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Wed, 10 Jul 2019 17:41:50 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/07/19 19:02, Andre Przywara wrote:
->> + * This test verifies whether the emulated PL031 behaves
->> correctly.
-> ^^^^^^^^
-> 
-> While I appreciate the effort and like the fact that this actually
-> triggers an SPI, I wonder if this actually belongs into
-> kvm-unit-tests. After all this just test a device purely emulated in
-> (QEMU) userland, so it's not really KVM related.
-> 
-> What is the general opinion on this? Don't we care about this
-> hair-splitting as long as it helps testing? Do we even want to extend
-> kvm-unit-tests coverage to more emulated devices, for instance
-> virtio?
+This allows udev to trigger rules when a parent device is registered
+or unregistered from mdev.
 
-I agree that it would belong more in qtest, but tests in not exactly the
-right place is better than no tests.
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
 
-Paolo
+v3: Add Connie's R-b
+    Add comment clarifying expected device requirements for unreg
+
+ drivers/vfio/mdev/mdev_core.c |    9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
+index ae23151442cb..23976db6c6c7 100644
+--- a/drivers/vfio/mdev/mdev_core.c
++++ b/drivers/vfio/mdev/mdev_core.c
+@@ -146,6 +146,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+ {
+ 	int ret;
+ 	struct mdev_parent *parent;
++	char *env_string = "MDEV_STATE=registered";
++	char *envp[] = { env_string, NULL };
+ 
+ 	/* check for mandatory ops */
+ 	if (!ops || !ops->create || !ops->remove || !ops->supported_type_groups)
+@@ -197,6 +199,8 @@ int mdev_register_device(struct device *dev, const struct mdev_parent_ops *ops)
+ 	mutex_unlock(&parent_list_lock);
+ 
+ 	dev_info(dev, "MDEV: Registered\n");
++	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
++
+ 	return 0;
+ 
+ add_dev_err:
+@@ -220,6 +224,8 @@ EXPORT_SYMBOL(mdev_register_device);
+ void mdev_unregister_device(struct device *dev)
+ {
+ 	struct mdev_parent *parent;
++	char *env_string = "MDEV_STATE=unregistered";
++	char *envp[] = { env_string, NULL };
+ 
+ 	mutex_lock(&parent_list_lock);
+ 	parent = __find_parent_device(dev);
+@@ -243,6 +249,9 @@ void mdev_unregister_device(struct device *dev)
+ 	up_write(&parent->unreg_sem);
+ 
+ 	mdev_put_parent(parent);
++
++	/* We still have the caller's reference to use for the uevent */
++	kobject_uevent_env(&dev->kobj, KOBJ_CHANGE, envp);
+ }
+ EXPORT_SYMBOL(mdev_unregister_device);
+ 
+
