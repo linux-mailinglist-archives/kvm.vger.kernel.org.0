@@ -2,95 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 377F56431F
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 09:51:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 734FF64327
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 09:56:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727407AbfGJHu6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jul 2019 03:50:58 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:45173 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726043AbfGJHu6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jul 2019 03:50:58 -0400
-Received: by mail-pg1-f193.google.com with SMTP id o13so806551pgp.12
-        for <kvm@vger.kernel.org>; Wed, 10 Jul 2019 00:50:58 -0700 (PDT)
+        id S1726920AbfGJH4M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jul 2019 03:56:12 -0400
+Received: from mail-vk1-f195.google.com ([209.85.221.195]:41895 "EHLO
+        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726257AbfGJH4L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jul 2019 03:56:11 -0400
+Received: by mail-vk1-f195.google.com with SMTP id u64so285657vku.8
+        for <kvm@vger.kernel.org>; Wed, 10 Jul 2019 00:56:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=RCpVeCE/4Pt0egKaRjLWSwkX7/NNLaFYtjzmc1Za6/E=;
-        b=T2hStThq0FgYyFRRjedpmgyn5E+TZAM84iHvjsi8QvDBFk0Q8Me6QhYCPGNbWqEfdy
-         u2rJ/LcoHIZ+4KxilotNFcZiL6DIhOw1A95YXKL/c2oqlyFjH7+e2on4hUq52k1hv26F
-         QAlG7glS93v9GSjlMtiTSwfg5B/7bXMOKENB227CIy8MRg824FHF1zvxr3jOjEfVoq4y
-         DITfnSSlvGpb0/zTX3EPhU8Gt63K/LV95bTrpD7hxQpsSCH1RxfLI7bFr6Hu48gcZQTy
-         Rywp8uW1f1ivdVCtNERrKQt9pLVDfiFKDd/o50AoyApeJYqD7IrD2mF/AVacoUyY9jYm
-         P9Dg==
+        d=linux-powerpc-org.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+         :cc;
+        bh=YoC+z2/b09WrXH4lRir7hNFDRJ8+7/oQYY2CuVHQx1Y=;
+        b=AWIpPHkq2+4lk5vaBQjk/aQmSEkXDJ2cFGgttIwHzX0Q+6RJ8CePT30S2PeOlx/mBn
+         Ioa4hiHVpqnIIzVRduL0zggZjzDKLUWGKW+8pi2+scTUbwJ23oB+5/By4fn8/LqrEt4q
+         xhuktd/lz60xlh8muMp/AeYgt46D46vXFRL0eFxZSOTR6hcfeA8UzzWXTYdWqD2Dm3hT
+         JXzD10UTXAmK60AODrEE9NZc6XeMSTcv5JAJ634ZFY5NVcfsvEZDVd/Fhc5hNJXcu++0
+         4SUwrmFD2gFkdjFExAlzXExId+0bbqxietdoUDYNTF/bYnoiqHz95YdkVfcwyd5IIzIN
+         4u2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=RCpVeCE/4Pt0egKaRjLWSwkX7/NNLaFYtjzmc1Za6/E=;
-        b=HdV2tMKNlay6yzXomgrosJmNa4ztFtr2xdzb21G6efVZWkay59jcVOfvj6gtynP46c
-         8dIh/2xr7WfdasJ6wGpDWY8pobWFZRZj5oS3ulPSVVloy0K5WuaT6xeoZHZJF4g2ofCV
-         Xs8FpiLra3zpoMAYoIZlcpr/PkKgA0T1WvZow/IRVzFKyvzrEMSnw8QzxrwASzdtzfkM
-         NaLBDDwWPTd2yM40HNOm8H7wSUXQdfFdKTFTdKP/nCKb8/kdmYSFJL27Xol/k+zAlmf/
-         FyLgg38Ky/+sIziXljZjepHaOS3uE625joolozE2jrbL3ur2CdCVsJnnLJh5+S3rLFzB
-         NvKw==
-X-Gm-Message-State: APjAAAVeKnb7YB1ufuJQaNtuDyNfVv3ti/Vj9fvplRZaVvmQn/eT9jiC
-        lBjnN2OW6S9gKARCN2fjsDlqls1gEyY=
-X-Google-Smtp-Source: APXvYqyhz2MmI/imwh9JuV0s5ORV8jPe9Asmu6yP3GXced+Otgzqw9r9su1YQIRIHXIgoymkjd+eKQ==
-X-Received: by 2002:a65:504c:: with SMTP id k12mr36003400pgo.252.1562745058006;
-        Wed, 10 Jul 2019 00:50:58 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id i124sm3098615pfe.61.2019.07.10.00.50.56
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Wed, 10 Jul 2019 00:50:57 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PATCH] target-i386: adds PV_SCHED_YIELD CPUID feature bit
-Date:   Wed, 10 Jul 2019 15:50:44 +0800
-Message-Id: <1562745044-7838-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+         :message-id:subject:to:cc;
+        bh=YoC+z2/b09WrXH4lRir7hNFDRJ8+7/oQYY2CuVHQx1Y=;
+        b=QK8DyG3QesqJgOAbBLLM7uOhxKW3yY2CjK92++/8C9LYzdi1CWBV7OinrhaLw5iCzW
+         WTs1blcUZBco0Nt0eBDEA5Pa0Ogw3xwQXJ1PhbI1oQx7CxiHpAUS5vgfOXlR4qntv2at
+         W6PMnX1zk5qnRFKtTW3AYNtt2zkPAqn1p92RzsXNplLj0kEwpeU6/UbRevqM0JfrT7xB
+         2sCVCXxadIgcIdog69qTMQILheUbwVttX5mLabsEmaJt9bqQg4WJTMD1LY1WOHcT+Sfa
+         EL1x5Qrqi2u+fOjdjoRWiSLCGbtfqVhD0IBN7xWSgLQn97+BY5/1xd5GwDEQbKyJRSXZ
+         8HCg==
+X-Gm-Message-State: APjAAAWAy3F1FK2GJrn5fk+doN5xOfOl5wLuwdWMYTCOTPGjZJaCOIua
+        U/Y2j1myqSPG57m+47TzoPb1tvsiDlg7eSFAQRSH1g==
+X-Google-Smtp-Source: APXvYqxPX8Eosf5p0y3g5oPXjM98amD+W/fUs4D8mD81YKm2jN6PRgwNAw7eUdOWD++bHUdDQdykb4w+C0dzlQn+6Gc=
+X-Received: by 2002:a1f:a887:: with SMTP id r129mr1194599vke.75.1562745370744;
+ Wed, 10 Jul 2019 00:56:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: by 2002:ab0:2616:0:0:0:0:0 with HTTP; Wed, 10 Jul 2019 00:56:10
+ -0700 (PDT)
+X-Originating-IP: [5.35.70.113]
+In-Reply-To: <20190709.125850.2133620086434576103.davem@davemloft.net>
+References: <20190709114251.24662-1-dkirjanov@suse.com> <20190709.125850.2133620086434576103.davem@davemloft.net>
+From:   Denis Kirjanov <kda@linux-powerpc.org>
+Date:   Wed, 10 Jul 2019 10:56:10 +0300
+Message-ID: <CAOJe8K2YWrZbHwX4FcKN4j0i=F3Lxmna6wvaZnDyqJe85w0Ykw@mail.gmail.com>
+Subject: Re: [PATCH] vhost: fix null pointer dereference in vhost_del_umem_range
+To:     David Miller <davem@davemloft.net>
+Cc:     mst@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On 7/9/19, David Miller <davem@davemloft.net> wrote:
+> From: Denis Kirjanov <kda@linux-powerpc.org>
+> Date: Tue,  9 Jul 2019 13:42:51 +0200
+>
+>> @@ -962,7 +962,8 @@ static void vhost_del_umem_range(struct vhost_umem
+>> *umem,
+>>
+>>  	while ((node = vhost_umem_interval_tree_iter_first(&umem->umem_tree,
+>>  							   start, end)))
+>> -		vhost_umem_free(umem, node);
+>> +		if (node)
+>> +			vhost_umem_free(umem, node);
+>
+> If 'node' is NULL we will not be in the body of the loop as per
+> the while() condition.
 
-Adds PV_SCHED_YIELD CPUID feature bit.
+The patch is incorrect, please ignore
 
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
-Note: kvm part is merged
-v1 -> v2:
- * use bit 13 instead of bit 12 since bit 12 has user now
-
- target/i386/cpu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 5f07d68..f4c4b6b 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -902,7 +902,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "kvmclock", "kvm-nopiodelay", "kvm-mmu", "kvmclock",
-             "kvm-asyncpf", "kvm-steal-time", "kvm-pv-eoi", "kvm-pv-unhalt",
-             NULL, "kvm-pv-tlb-flush", NULL, "kvm-pv-ipi",
--            NULL, NULL, NULL, NULL,
-+            NULL, "kvm-pv-sched-yield', NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             "kvmclock-stable-bit", NULL, NULL, NULL,
--- 
-2.7.4
-
+>
+> How did you test this?
+>
