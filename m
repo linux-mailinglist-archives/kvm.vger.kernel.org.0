@@ -2,74 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 281A66442F
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 11:13:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B6B864443
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 11:18:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727621AbfGJJNm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jul 2019 05:13:42 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:32903 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727541AbfGJJNm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jul 2019 05:13:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1562750021; x=1594286021;
-  h=from:to:cc:subject:date:message-id;
-  bh=Ba6zmy4mGWGl4ESd7RsEjdPzxqn1rF3/gl5upjYy9Go=;
-  b=aDBbtcHWrwMjOkjFj0DzsT7g0CBAdg2bdJb55ksLzr5jN3USNYIRWbAH
-   odKhd7iNl3Elo+sDBhlBtY30CizGK4lZSjvnvt/DaNUaK5LBG7zIbHFoO
-   DVnWJOoN6HnvHhi7+PnqV/aA+Grx//q3fGRn4uGLAox+L6Zp21dQNd5G+
-   Q=;
-X-IronPort-AV: E=Sophos;i="5.62,474,1554768000"; 
-   d="scan'208";a="810374755"
-Received: from sea3-co-svc-lb6-vlan3.sea.amazon.com (HELO email-inbound-relay-1d-2c665b5d.us-east-1.amazon.com) ([10.47.22.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 10 Jul 2019 09:13:38 +0000
-Received: from u54e1ad5160425a4b64ea.ant.amazon.com (iad7-ws-svc-lb50-vlan3.amazon.com [10.0.93.214])
-        by email-inbound-relay-1d-2c665b5d.us-east-1.amazon.com (Postfix) with ESMTPS id 8D0EEA1BE6;
-        Wed, 10 Jul 2019 09:13:36 +0000 (UTC)
-Received: from u54e1ad5160425a4b64ea.ant.amazon.com (localhost [127.0.0.1])
-        by u54e1ad5160425a4b64ea.ant.amazon.com (8.15.2/8.15.2/Debian-3) with ESMTP id x6A9DYlb013434;
-        Wed, 10 Jul 2019 11:13:34 +0200
-Received: (from karahmed@localhost)
-        by u54e1ad5160425a4b64ea.ant.amazon.com (8.15.2/8.15.2/Submit) id x6A9DYQh013432;
-        Wed, 10 Jul 2019 11:13:34 +0200
-From:   KarimAllah Ahmed <karahmed@amazon.de>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     KarimAllah Ahmed <karahmed@amazon.de>
-Subject: [PATCH] KVM: Properly check if "page" is valid in kvm_vcpu_unmap
-Date:   Wed, 10 Jul 2019 11:13:13 +0200
-Message-Id: <1562749993-12840-1-git-send-email-karahmed@amazon.de>
-X-Mailer: git-send-email 2.7.4
+        id S1727764AbfGJJSM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jul 2019 05:18:12 -0400
+Received: from mga04.intel.com ([192.55.52.120]:27551 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727497AbfGJJSM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jul 2019 05:18:12 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Jul 2019 02:18:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,474,1557212400"; 
+   d="scan'208";a="173811519"
+Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
+  by FMSMGA003.fm.intel.com with ESMTP; 10 Jul 2019 02:18:09 -0700
+Message-ID: <5D25AE9C.8090404@intel.com>
+Date:   Wed, 10 Jul 2019 17:23:40 +0800
+From:   Wei Wang <wei.w.wang@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
+MIME-Version: 1.0
+To:     Peter Zijlstra <peterz@infradead.org>
+CC:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com, ak@linux.intel.com, kan.liang@intel.com,
+        mingo@redhat.com, rkrcmar@redhat.com, like.xu@intel.com,
+        jannh@google.com, arei.gonglei@huawei.com, jmattson@google.com
+Subject: Re: [PATCH v7 12/12] KVM/VMX/vPMU: support to report GLOBAL_STATUS_LBRS_FROZEN
+References: <1562548999-37095-1-git-send-email-wei.w.wang@intel.com> <1562548999-37095-13-git-send-email-wei.w.wang@intel.com> <20190708150909.GP3402@hirez.programming.kicks-ass.net> <5D2408D7.3000002@intel.com> <20190709113549.GU3402@hirez.programming.kicks-ass.net>
+In-Reply-To: <20190709113549.GU3402@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The field "page" is initialized to KVM_UNMAPPED_PAGE when it is not used
-(i.e. when the memory lives outside kernel control). So this check will
-always end up using kunmap even for memremap regions.
+On 07/09/2019 07:35 PM, Peter Zijlstra wrote:
+>
+> Yeah; although I'm not sure if its an implementation or specification
+> problem. But as it exists it is of very limited use.
+>
+> Fundamentally our events (with exception of event groups) are
+> independent. Events should always count, except when the PMI is running
+> -- so as to not include the measurement overhead in the measurement
+> itself. But this (mis)feature stops the entire PMU as soon as a single
+> counter overflows, inhibiting all other counters from running (as they
+> should) until the PMI has happened and reset the state.
+>
+> (Note that, strictly speaking, we even expect the overflowing counter to
+> continue counting until the PMI happens. Having an overflow should not
+> mean we loose events. A sampling and !sampling event should produce the
+> same event count.)
+>
+> So even when there's only a single event (group) scheduled, it isn't
+> strictly right. And when there's multiple events scheduled it is
+> definitely wrong.
+>
+> And while I understand the purpose of the current semantics; it makes a
+> single event group sample count more coherent, the fact that is looses
+> events just bugs me something fierce -- and as shown, it breaks tools.
 
-Fixes: e45adf665a53 ("KVM: Introduce a new guest mapping API")
-Signed-off-by: KarimAllah Ahmed <karahmed@amazon.de>
----
- virt/kvm/kvm_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks for sharing the finding.
+If I understand this correctly, you observed that counter getting freezed
+earlier than expected (expected to freeze at the time PMI gets generated).
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 2f2d24a..e629766 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1790,7 +1790,7 @@ void kvm_vcpu_unmap(struct kvm_vcpu *vcpu, struct kvm_host_map *map,
- 	if (!map->hva)
- 		return;
- 
--	if (map->page)
-+	if (map->page != KVM_UNMAPPED_PAGE)
- 		kunmap(map->page);
- #ifdef CONFIG_HAS_IOMEM
- 	else
--- 
-2.7.4
+Have you talked to anyone for possible freeze adjustment from the hardware?
+
+Best,
+Wei
 
