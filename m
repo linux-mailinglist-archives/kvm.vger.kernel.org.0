@@ -2,112 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E35464877
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 16:35:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AC106487B
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 16:36:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726708AbfGJOfu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jul 2019 10:35:50 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:43976 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725956AbfGJOft (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jul 2019 10:35:49 -0400
-Received: by mail-wr1-f66.google.com with SMTP id p13so2714811wru.10
-        for <kvm@vger.kernel.org>; Wed, 10 Jul 2019 07:35:48 -0700 (PDT)
+        id S1727281AbfGJOga (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jul 2019 10:36:30 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39681 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727123AbfGJOga (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jul 2019 10:36:30 -0400
+Received: by mail-wr1-f67.google.com with SMTP id x4so2734473wrt.6
+        for <kvm@vger.kernel.org>; Wed, 10 Jul 2019 07:36:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=XY/huNJSOc9RlBKCSI76QiNmqWEotNY2J4pc+lZH72g=;
-        b=it7/qtqOQjrLEUM8uzD9CxMccMfKEo8SRb3/iNCI+xz9og3/+w3BpejunpTyKD96OL
-         VfH1lbxB11vjGL5iYr64kDqb928vjwc1OY0MVvdLcDqb2c9cIDACLYmKsMxHOOWxDWZy
-         iP+ImR6uXoFN5gksmjO9lwap1jRIzjQVPJBdZzdlw6bshgn9lSiWMf7NszIWFoR98gFz
-         uO8Id6xYuglbYtnLT4+Ia2CROWyIKsVn4DEGwkkSJwPlMgl1f3aeTwdCYW/7Uaru3pf8
-         OrE8iU6AAi0Hn0RWiTuMMdikn3fcbUl2aIZh2gQGRHlY0qIGOtH1imRiG8XGltnwuiMX
-         utIQ==
-X-Gm-Message-State: APjAAAUrRjZb8hdqsTKFpd+xGPH5nL8xM3BISL2B9mGhoCF61OXdImYH
-        yAmhlG1Wc3m0oBzGb+YjS1F/oQ==
-X-Google-Smtp-Source: APXvYqyavTo7feiFReWPnREPF1/cX2CQHt2acVT14H4swTlQJ71QpA9ou79SLx+7G9sTDJohM32KMg==
-X-Received: by 2002:adf:f904:: with SMTP id b4mr33101014wrr.291.1562769347490;
-        Wed, 10 Jul 2019 07:35:47 -0700 (PDT)
+        bh=jU1Lfk6OjWPt1W0Knkmr5mFgCh06/6H5avDsE2z0wQ8=;
+        b=bslVMy1fNcHZ7/tzBv6JNnPAQeat2KZPhcEsmITieimlqLPWzC0CTlAuIoOFlnvXQU
+         mZvIZ4vYBCi28JlkWfC0awwawf68cv6KJ71H1yrRy80iU53uch0FoEXKJBjEUEGjJp2N
+         bUkh22YLenbQb4xw3J5tqasS511GtnYUwgQAGRQCu58l7WxAAgmCBtXGB0Q/l3LGiqE2
+         BrqAi7OCWYIbmE4lcGN4lWapHyObvd9RpGHnmirIT5HfWnLszuKW/AGGpgRsIuquxsJX
+         CfNz8PMCFGecFIqUe3qfjshWbzaBcwxEdZq8n3gpQAnnBN1xM7nVRc7nUyJsaVDwjxhR
+         YFEw==
+X-Gm-Message-State: APjAAAXCHassZXRvUuIrpsRQZrB2pYymZLddlFILZTa5Kb/b5+nBaw72
+        UPotNZgY7WoJIcQVyafqFGnN/A==
+X-Google-Smtp-Source: APXvYqzQhyug9OgaM+b/ELg1LsI1mmSl1B6S4pe76D4zNtbEoUok90dLBWoYlbFq5Oq1Pc4htcSVPg==
+X-Received: by 2002:adf:80e6:: with SMTP id 93mr4732532wrl.298.1562769388205;
+        Wed, 10 Jul 2019 07:36:28 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab? ([2001:b07:6468:f312:d066:6881:ec69:75ab])
-        by smtp.gmail.com with ESMTPSA id a64sm6252795wmf.1.2019.07.10.07.35.46
+        by smtp.gmail.com with ESMTPSA id d10sm2943088wro.18.2019.07.10.07.36.27
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 10 Jul 2019 07:35:47 -0700 (PDT)
-Subject: Re: [PATCH 0/5] KVM: nVMX: Skip vmentry checks that are necessary
- only if VMCS12 is dirty
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm@vger.kernel.org, rkrcmar@redhat.com, jmattson@google.com
-References: <20190707071147.11651-1-krish.sadhukhan@oracle.com>
- <20190708181759.GB20791@linux.intel.com>
+        Wed, 10 Jul 2019 07:36:27 -0700 (PDT)
+Subject: Re: [PATCH v2] kvm: x86: Fix -Wmissing-prototypes warnings
+To:     Yi Wang <wang.yi59@zte.com.cn>
+Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
+        sean.j.christopherson@intel.com, up2wing@gmail.com,
+        wang.liang82@zte.com.cn
+References: <1562718243-46068-1-git-send-email-wang.yi59@zte.com.cn>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4a9a76e4-a40c-58a6-4768-1125f6193c81@redhat.com>
-Date:   Wed, 10 Jul 2019 16:35:46 +0200
+Message-ID: <26226194-e123-dd92-4b70-4d93390752d4@redhat.com>
+Date:   Wed, 10 Jul 2019 16:36:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190708181759.GB20791@linux.intel.com>
+In-Reply-To: <1562718243-46068-1-git-send-email-wang.yi59@zte.com.cn>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/07/19 20:17, Sean Christopherson wrote:
-> On Sun, Jul 07, 2019 at 03:11:42AM -0400, Krish Sadhukhan wrote:
->> The following functions,
->>
->> 	nested_vmx_check_controls
->> 	nested_vmx_check_host_state
->> 	nested_vmx_check_guest_state
->>
->> do a number of vmentry checks for VMCS12. However, not all of these checks need
->> to be executed on every vmentry. This patchset makes some of these vmentry
->> checks optional based on the state of VMCS12 in that if VMCS12 is dirty, only
->> then the checks will be executed. This will reduce performance impact on
->> vmentry of nested guests.
+On 10/07/19 02:24, Yi Wang wrote:
+> We get a warning when build kernel W=1:
 > 
-> All of these patches break vmx_set_nested_state(), which sets dirty_vmcs12
-> only after the aforementioned consistency checks pass.
+> arch/x86/kvm/../../../virt/kvm/eventfd.c:48:1: warning: no previous prototype for ‘kvm_arch_irqfd_allowed’ [-Wmissing-prototypes]
+>  kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
+>  ^
 > 
-> The new nomenclature for the dirty paths is "rare", not "full".
+> The reason is kvm_arch_irqfd_allowed() is declared in arch/x86/kvm/irq.h,
+> which is not included by eventfd.c. Considering kvm_arch_irqfd_allowed()
+> is a weakly defined function in eventfd.c, remove the declaration to
+> kvm_host.h can fix this.
 > 
-> In general, I dislike directly associating the consistency checks with
-> dirty_vmcs12.
+> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+> Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+> v2: add comments about the reason.
+> ---
+>  arch/x86/kvm/irq.h       | 1 -
+>  include/linux/kvm_host.h | 1 +
+>  2 files changed, 1 insertion(+), 1 deletion(-)
 > 
->   - It's difficult to assess the correctness of the resulting code, e.g.
->     changing CPU_BASED_VM_EXEC_CONTROL doesn't set dirty_vmcs12, which
->     calls into question any and all SECONDARY_VM_EXEC_CONTROL checks since
->     an L1 could toggle CPU_BASED_ACTIVATE_SECONDARY_CONTROLS.
+> diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
+> index d6519a3..7c6233d 100644
+> --- a/arch/x86/kvm/irq.h
+> +++ b/arch/x86/kvm/irq.h
+> @@ -102,7 +102,6 @@ static inline int irqchip_in_kernel(struct kvm *kvm)
+>  	return mode != KVM_IRQCHIP_NONE;
+>  }
+>  
+> -bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
+>  void kvm_inject_pending_timer_irqs(struct kvm_vcpu *vcpu);
+>  void kvm_inject_apic_timer_irqs(struct kvm_vcpu *vcpu);
+>  void kvm_apic_nmi_wd_deliver(struct kvm_vcpu *vcpu);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index d1ad38a..5f04005 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -990,6 +990,7 @@ void kvm_unregister_irq_ack_notifier(struct kvm *kvm,
+>  				   struct kvm_irq_ack_notifier *kian);
+>  int kvm_request_irq_source_id(struct kvm *kvm);
+>  void kvm_free_irq_source_id(struct kvm *kvm, int irq_source_id);
+> +bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
+>  
+>  /*
+>   * search_memslots() and __gfn_to_memslot() are here because they are
+> 
 
-Yes, CPU-based controls are tricky and should not be changed.  But I
-don't see a big issue apart from the CPU-based controls, and the other
-checks can also be quite expensive---and the point of dirty_vmcs12 and
-shadow VMCS is that we _can_ exclude them most of the time.
-
-This is all 5.4 material anyway, I'll do some testing of Krish's patches
-2-5.
-
-Thanks,
+Queued, thanks.
 
 Paolo
-
->   - We lose the existing organization of the consistency checks, e.g.
->     similar checks get arbitrarily split into separate flows based on
->     the rarity of the field changing.
-> 
->   - The performance gains are likely minimal since the majority of checks
->     can't be skipped due to the coarseness of dirty_vmcs12.
->
-> Rather than a quick and dirty (pun intended) change to use dirty_vmcs12,
-> I think we should have some amount of dedicated infrastructure for
-> optimizing consistency checks from the get go, e.g. perhaps something
-> similar to how eVMCS categorizes fields.  The initial usage could be very
-> coarse grained, e.g. based purely on dirty_vmcs12, but having the
-> infrastructure would make it easier to reason about the correctness of
-> the code.  Future patches could then refine the triggerring of checks to
-> achieve better optimization, e.g. skipping the vast majority of checks
-> when L1 is simply toggling CPU_BASED_VIRTUAL_INTR_PENDING.
