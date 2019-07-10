@@ -2,108 +2,320 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AC106487B
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 16:36:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0F3764882
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 16:37:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727281AbfGJOga (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jul 2019 10:36:30 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:39681 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727123AbfGJOga (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jul 2019 10:36:30 -0400
-Received: by mail-wr1-f67.google.com with SMTP id x4so2734473wrt.6
-        for <kvm@vger.kernel.org>; Wed, 10 Jul 2019 07:36:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jU1Lfk6OjWPt1W0Knkmr5mFgCh06/6H5avDsE2z0wQ8=;
-        b=bslVMy1fNcHZ7/tzBv6JNnPAQeat2KZPhcEsmITieimlqLPWzC0CTlAuIoOFlnvXQU
-         mZvIZ4vYBCi28JlkWfC0awwawf68cv6KJ71H1yrRy80iU53uch0FoEXKJBjEUEGjJp2N
-         bUkh22YLenbQb4xw3J5tqasS511GtnYUwgQAGRQCu58l7WxAAgmCBtXGB0Q/l3LGiqE2
-         BrqAi7OCWYIbmE4lcGN4lWapHyObvd9RpGHnmirIT5HfWnLszuKW/AGGpgRsIuquxsJX
-         CfNz8PMCFGecFIqUe3qfjshWbzaBcwxEdZq8n3gpQAnnBN1xM7nVRc7nUyJsaVDwjxhR
-         YFEw==
-X-Gm-Message-State: APjAAAXCHassZXRvUuIrpsRQZrB2pYymZLddlFILZTa5Kb/b5+nBaw72
-        UPotNZgY7WoJIcQVyafqFGnN/A==
-X-Google-Smtp-Source: APXvYqzQhyug9OgaM+b/ELg1LsI1mmSl1B6S4pe76D4zNtbEoUok90dLBWoYlbFq5Oq1Pc4htcSVPg==
-X-Received: by 2002:adf:80e6:: with SMTP id 93mr4732532wrl.298.1562769388205;
-        Wed, 10 Jul 2019 07:36:28 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab? ([2001:b07:6468:f312:d066:6881:ec69:75ab])
-        by smtp.gmail.com with ESMTPSA id d10sm2943088wro.18.2019.07.10.07.36.27
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 10 Jul 2019 07:36:27 -0700 (PDT)
-Subject: Re: [PATCH v2] kvm: x86: Fix -Wmissing-prototypes warnings
-To:     Yi Wang <wang.yi59@zte.com.cn>
-Cc:     rkrcmar@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, x86@kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, xue.zhihong@zte.com.cn,
-        sean.j.christopherson@intel.com, up2wing@gmail.com,
-        wang.liang82@zte.com.cn
-References: <1562718243-46068-1-git-send-email-wang.yi59@zte.com.cn>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <26226194-e123-dd92-4b70-4d93390752d4@redhat.com>
-Date:   Wed, 10 Jul 2019 16:36:26 +0200
+        id S1727611AbfGJOhV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jul 2019 10:37:21 -0400
+Received: from foss.arm.com ([217.140.110.172]:34672 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726380AbfGJOhV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jul 2019 10:37:21 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7250E2B;
+        Wed, 10 Jul 2019 07:37:20 -0700 (PDT)
+Received: from [10.1.196.217] (e121566-lin.cambridge.arm.com [10.1.196.217])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BB7823F71F;
+        Wed, 10 Jul 2019 07:37:19 -0700 (PDT)
+Subject: Re: [PATCH kvm-unit-tests] arm: Add PL031 test
+To:     Alexander Graf <graf@amazon.com>, kvm@vger.kernel.org
+Cc:     kvmarm@lists.cs.columbia.edu, Marc Zyngier <marc.zyngier@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20190710132724.28350-1-graf@amazon.com>
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <02d19c57-a9d1-bef8-8a57-e289156c9f8a@arm.com>
+Date:   Wed, 10 Jul 2019 15:37:18 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <1562718243-46068-1-git-send-email-wang.yi59@zte.com.cn>
+In-Reply-To: <20190710132724.28350-1-graf@amazon.com>
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/07/19 02:24, Yi Wang wrote:
-> We get a warning when build kernel W=1:
-> 
-> arch/x86/kvm/../../../virt/kvm/eventfd.c:48:1: warning: no previous prototype for ‘kvm_arch_irqfd_allowed’ [-Wmissing-prototypes]
->  kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
->  ^
-> 
-> The reason is kvm_arch_irqfd_allowed() is declared in arch/x86/kvm/irq.h,
-> which is not included by eventfd.c. Considering kvm_arch_irqfd_allowed()
-> is a weakly defined function in eventfd.c, remove the declaration to
-> kvm_host.h can fix this.
-> 
-> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
-> Reviewed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+On 7/10/19 2:27 PM, Alexander Graf wrote:
+> This patch adds a unit test for the PL031 RTC that is used in the virt machine.
+> It just pokes basic functionality. I've mostly written it to familiarize myself
+> with the device, but I suppose having the test around does not hurt, as it also
+> exercises the GIC SPI interrupt path.
+>
+> Signed-off-by: Alexander Graf <graf@amazon.com>
 > ---
-> v2: add comments about the reason.
-> ---
->  arch/x86/kvm/irq.h       | 1 -
->  include/linux/kvm_host.h | 1 +
->  2 files changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/irq.h b/arch/x86/kvm/irq.h
-> index d6519a3..7c6233d 100644
-> --- a/arch/x86/kvm/irq.h
-> +++ b/arch/x86/kvm/irq.h
-> @@ -102,7 +102,6 @@ static inline int irqchip_in_kernel(struct kvm *kvm)
->  	return mode != KVM_IRQCHIP_NONE;
->  }
+>  arm/Makefile.common |   1 +
+>  arm/pl031.c         | 227 ++++++++++++++++++++++++++++++++++++++++++++
+>  lib/arm/asm/gic.h   |   1 +
+>  3 files changed, 229 insertions(+)
+>  create mode 100644 arm/pl031.c
+>
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index f0c4b5d..b8988f2 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -11,6 +11,7 @@ tests-common += $(TEST_DIR)/pmu.flat
+>  tests-common += $(TEST_DIR)/gic.flat
+>  tests-common += $(TEST_DIR)/psci.flat
+>  tests-common += $(TEST_DIR)/sieve.flat
+> +tests-common += $(TEST_DIR)/pl031.flat
 >  
-> -bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
->  void kvm_inject_pending_timer_irqs(struct kvm_vcpu *vcpu);
->  void kvm_inject_apic_timer_irqs(struct kvm_vcpu *vcpu);
->  void kvm_apic_nmi_wd_deliver(struct kvm_vcpu *vcpu);
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index d1ad38a..5f04005 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -990,6 +990,7 @@ void kvm_unregister_irq_ack_notifier(struct kvm *kvm,
->  				   struct kvm_irq_ack_notifier *kian);
->  int kvm_request_irq_source_id(struct kvm *kvm);
->  void kvm_free_irq_source_id(struct kvm *kvm, int irq_source_id);
-> +bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args);
+>  tests-all = $(tests-common) $(tests)
+>  all: directories $(tests-all)
+> diff --git a/arm/pl031.c b/arm/pl031.c
+> new file mode 100644
+> index 0000000..a364a1a
+> --- /dev/null
+> +++ b/arm/pl031.c
+> @@ -0,0 +1,227 @@
+> +/*
+> + * Verify PL031 functionality
+> + *
+> + * This test verifies whether the emulated PL031 behaves correctly.
+> + *
+> + * Copyright 2019 Amazon.com, Inc. or its affiliates.
+> + * Author: Alexander Graf <graf@amazon.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#include <libcflat.h>
+> +#include <asm/processor.h>
+> +#include <asm/io.h>
+> +#include <asm/gic.h>
+> +
+> +static u32 cntfrq;
+> +
+> +#define PL031_BASE 0x09010000
+> +#define PL031_IRQ 2
+> +
+> +struct pl031_regs {
+> +	uint32_t dr;	/* Data Register */
+> +	uint32_t mr;	/* Match Register */
+> +	uint32_t lr;	/* Load Register */
+> +	union {
+> +		uint8_t cr;	/* Control Register */
+> +		uint32_t cr32;
+> +	};
+> +	union {
+> +		uint8_t imsc;	/* Interrupt Mask Set or Clear register */
+> +		uint32_t imsc32;
+> +	};
+> +	union {
+> +		uint8_t ris;	/* Raw Interrupt Status */
+> +		uint32_t ris32;
+> +	};
+> +	union {
+> +		uint8_t mis;	/* Masked Interrupt Status */
+> +		uint32_t mis32;
+> +	};
+> +	union {
+> +		uint8_t icr;	/* Interrupt Clear Register */
+> +		uint32_t icr32;
+> +	};
+> +	uint32_t reserved[1008];
+> +	uint32_t periph_id[4];
+> +	uint32_t pcell_id[4];
+> +};
+> +
+> +static struct pl031_regs *pl031 = (void*)PL031_BASE;
+> +static void *gic_ispendr;
+> +static void *gic_isenabler;
+> +static bool irq_triggered;
+> +
+> +static int check_id(void)
+> +{
+> +	uint32_t id[] = { 0x31, 0x10, 0x14, 0x00, 0x0d, 0xf0, 0x05, 0xb1 };
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(id); i++)
+> +		if (id[i] != readl(&pl031->periph_id[i]))
+> +			return 1;
+> +
+> +	return 0;
+> +}
+> +
+> +static int check_ro(void)
+> +{
+> +	uint32_t offs[] = { offsetof(struct pl031_regs, ris),
+> +			    offsetof(struct pl031_regs, mis),
+> +			    offsetof(struct pl031_regs, periph_id[0]),
+> +			    offsetof(struct pl031_regs, periph_id[1]),
+> +			    offsetof(struct pl031_regs, periph_id[2]),
+> +			    offsetof(struct pl031_regs, periph_id[3]),
+> +			    offsetof(struct pl031_regs, pcell_id[0]),
+> +			    offsetof(struct pl031_regs, pcell_id[1]),
+> +			    offsetof(struct pl031_regs, pcell_id[2]),
+> +			    offsetof(struct pl031_regs, pcell_id[3]) };
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(offs); i++) {
+> +		uint32_t before32;
+> +		uint16_t before16;
+> +		uint8_t before8;
+> +		void *addr = (void*)pl031 + offs[i];
+> +		uint32_t poison = 0xdeadbeefULL;
+> +
+> +		before8 = readb(addr);
+> +		before16 = readw(addr);
+> +		before32 = readl(addr);
+> +
+> +		writeb(poison, addr);
+> +		writew(poison, addr);
+> +		writel(poison, addr);
+> +
+> +		if (before8 != readb(addr))
+> +			return 1;
+> +		if (before16 != readw(addr))
+> +			return 1;
+> +		if (before32 != readl(addr))
+> +			return 1;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int check_rtc_freq(void)
+> +{
+> +	uint32_t seconds_to_wait = 2;
+> +	uint32_t before = readl(&pl031->dr);
+> +	uint64_t before_tick = read_sysreg(cntpct_el0);
+> +	uint64_t target_tick = before_tick + (cntfrq * seconds_to_wait);
+> +
+> +	/* Wait for 2 seconds */
+> +	while (read_sysreg(cntpct_el0) < target_tick) ;
+> +
+> +	if (readl(&pl031->dr) != before + seconds_to_wait)
+> +		return 1;
+> +
+> +	return 0;
+> +}
+> +
+> +static bool gic_irq_pending(void)
+> +{
+> +	return readl(gic_ispendr + 4) & (1 << (SPI(PL031_IRQ) - 32));
+> +}
+> +
+> +static void gic_irq_unmask(void)
+> +{
+> +	writel(1 << (SPI(PL031_IRQ) - 32), gic_isenabler + 4);
+> +}
+> +
+> +static void irq_handler(struct pt_regs *regs)
+> +{
+> +	u32 irqstat = gic_read_iar();
+> +	u32 irqnr = gic_iar_irqnr(irqstat);
+> +
+> +	if (irqnr != GICC_INT_SPURIOUS)
+> +		gic_write_eoir(irqstat);
+> +
+> +	if (irqnr == SPI(PL031_IRQ)) {
+> +		report("  RTC RIS == 1", readl(&pl031->ris) == 1);
+> +		report("  RTC MIS == 1", readl(&pl031->mis) == 1);
+> +
+> +		/* Writing any value should clear IRQ status */
+> +		writel(0x80000000ULL, &pl031->icr);
+> +
+> +		report("  RTC RIS == 0", readl(&pl031->ris) == 0);
+> +		report("  RTC MIS == 0", readl(&pl031->mis) == 0);
+> +		irq_triggered = true;
+> +	} else {
+> +		report_info("Unexpected interrupt: %d\n", irqnr);
+> +		return;
+> +	}
+> +}
+> +
+> +static int check_rtc_irq(void)
+> +{
+> +	uint32_t seconds_to_wait = 1;
+> +	uint32_t before = readl(&pl031->dr);
+> +	uint64_t before_tick = read_sysreg(cntpct_el0);
+> +	uint64_t target_tick = before_tick + (cntfrq * (seconds_to_wait + 1));
+> +
+> +	report_info("Checking IRQ trigger (MR)");
+> +
+> +	irq_triggered = false;
+> +
+> +	/* Fire IRQ in 1 second */
+> +	writel(before + seconds_to_wait, &pl031->mr);
+> +
+> +	install_irq_handler(EL1H_IRQ, irq_handler);
+> +
+> +	/* Wait until 2 seconds are over */
+> +	while (read_sysreg(cntpct_el0) < target_tick) ;
+> +
+> +	report("  RTC IRQ not delivered without mask", !gic_irq_pending());
+> +
+> +	/* Mask the IRQ so that it gets delivered */
+> +	writel(1, &pl031->imsc);
+> +	report("  RTC IRQ pending now", gic_irq_pending());
+> +
+> +	/* Enable retrieval of IRQ */
+> +	gic_irq_unmask();
+> +	local_irq_enable();
+> +
+> +	report("  IRQ triggered", irq_triggered);
+> +	report("  RTC IRQ not pending anymore", !gic_irq_pending());
+> +	if (!irq_triggered) {
+> +		report_info("  RTC RIS: %x", readl(&pl031->ris));
+> +		report_info("  RTC MIS: %x", readl(&pl031->mis));
+> +		report_info("  RTC IMSC: %x", readl(&pl031->imsc));
+> +		report_info("  GIC IRQs pending: %08x %08x", readl(gic_ispendr), readl(gic_ispendr + 4));
+> +	}
+> +
+> +	local_irq_disable();
+> +	return 0;
+> +}
+> +
+> +static void rtc_irq_init(void)
+> +{
+> +	gic_enable_defaults();
+> +
+> +	switch (gic_version()) {
+> +	case 2:
+> +		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
+> +		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
+> +		break;
+> +	case 3:
+> +		gic_ispendr = gicv3_sgi_base() + GICD_ISPENDR;
+> +		gic_isenabler = gicv3_sgi_base() + GICD_ISENABLER;
+> +		break;
+> +	}
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	cntfrq = get_cntfrq();
+> +	rtc_irq_init();
+
+The PL031 device might be generated by QEMU by default, but KVM-unit-tests can
+also be run under kvmtool, which doesn't include such a device.
+
+I suggest that you first check that the device is in the fdt, and skip the tests
+entirely if it's not present. There's an example in the timer.c test about how
+to find a device by using its compatible string. And as Marc suggested, you can
+also use the fdt to get the device properties.
+
+Thanks,
+Alex
+> +
+> +	report("Periph/PCell IDs match", !check_id());
+> +	report("R/O fields are R/O", !check_ro());
+> +	report("RTC ticks at 1HZ", !check_rtc_freq());
+> +	report("RTC IRQ not pending yet", !gic_irq_pending());
+> +	check_rtc_irq();
+> +
+> +	return report_summary();
+> +}
+> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+> index f6dfb90..1fc10a0 100644
+> --- a/lib/arm/asm/gic.h
+> +++ b/lib/arm/asm/gic.h
+> @@ -41,6 +41,7 @@
+>  #include <asm/gic-v3.h>
 >  
->  /*
->   * search_memslots() and __gfn_to_memslot() are here because they are
-> 
-
-Queued, thanks.
-
-Paolo
+>  #define PPI(irq)			((irq) + 16)
+> +#define SPI(irq)			((irq) + GIC_FIRST_SPI)
+>  
+>  #ifndef __ASSEMBLY__
+>  #include <asm/cpumask.h>
