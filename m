@@ -2,303 +2,326 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 04FEE646C7
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 15:07:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5C56646F7
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 15:27:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727509AbfGJNHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jul 2019 09:07:17 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:41938 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725956AbfGJNHR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jul 2019 09:07:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:
-        From:Date:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=BEmTw1xYLeDb4aFN510BtEneL4dVYdCC7N+w5y2xum0=; b=fKaP4JOmW5uy+DvX4ab7skrVh
-        e+T5TfS6+Nvk6VQjs7Bpwtdew1qGBGPSJ0ZA74fP2ApAd8bAEEaQxMsIWlj0NbT1c2DOptFkGvyDi
-        zwE5VJJDmQuN5uMV4z/Rv6K67nLvJXqJlQnCoUWWAfbut0gX2oG74hn1loWxz/imsS99LkYI8qz4z
-        39T/SEQcjhUP0ajstD6M1gRXE3FKG3tNr/Klpqd/L6bvtq4nest5sPFagf31wDQX4TMVS0EWL5OmA
-        upsH5hy2PkSNjEbrglQ4Rith1WChVclgbWH8VY6P+39NHW5nKfd8jN0B4+mYzS+mWNemDwK75qN1s
-        zFAzx8Eow==;
-Received: from 177.43.30.58.dynamic.adsl.gvt.net.br ([177.43.30.58] helo=coco.lan)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hlCJW-0004B3-Iw; Wed, 10 Jul 2019 13:07:14 +0000
-Date:   Wed, 10 Jul 2019 10:07:10 -0300
-From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-To:     Luke Nowakowski-Krijger <lnowakow@eng.ucsd.edu>
-Cc:     linux-kernel-mentees@lists.linuxfoundation.org,
-        pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net,
-        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] Documentation: kvm: Convert cpuid.txt to .rst
-Message-ID: <20190710100710.58443e79@coco.lan>
-In-Reply-To: <20190709200721.16991-2-lnowakow@neg.ucsd.edu>
-References: <20190709200721.16991-1-lnowakow@neg.ucsd.edu>
-        <20190709200721.16991-2-lnowakow@neg.ucsd.edu>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1727480AbfGJN1g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jul 2019 09:27:36 -0400
+Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:17929 "EHLO
+        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725994AbfGJN1g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jul 2019 09:27:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1562765255; x=1594301255;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=C2+YQiuoCjBnstmK/VhiivB1LX0/aC0xd7b/JjK3gww=;
+  b=qiiJ20smJAKtSKOzICpDyejzsaIoc60DFfea1oaK1LmBe+epWwb4Nnzb
+   avSKFXlS6ksfVjhao/npM4+xgo7IGBcqoBBD4DIWNWjnIvs9npAU6yszM
+   CARdswkB+GwYXUz9tMDy3AI2Rv2MV1UiRHvgzl+PGO3BqD4dvoMal1ZzE
+   o=;
+X-IronPort-AV: E=Sophos;i="5.62,474,1554768000"; 
+   d="scan'208";a="404349716"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-1d-74cf8b49.us-east-1.amazon.com) ([10.124.125.6])
+  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 10 Jul 2019 13:27:33 +0000
+Received: from EX13MTAUWC001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+        by email-inbound-relay-1d-74cf8b49.us-east-1.amazon.com (Postfix) with ESMTPS id 9B8D8C06D4;
+        Wed, 10 Jul 2019 13:27:33 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 10 Jul 2019 13:27:32 +0000
+Received: from u79c5a0a55de558.ant.amazon.com (10.43.162.144) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Wed, 10 Jul 2019 13:27:31 +0000
+From:   Alexander Graf <graf@amazon.com>
+To:     <kvm@vger.kernel.org>
+CC:     <kvmarm@lists.cs.columbia.edu>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>
+Subject: [PATCH kvm-unit-tests] arm: Add PL031 test
+Date:   Wed, 10 Jul 2019 15:27:24 +0200
+Message-ID: <20190710132724.28350-1-graf@amazon.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.43.162.144]
+X-ClientProxiedBy: EX13D17UWC004.ant.amazon.com (10.43.162.195) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Em Tue,  9 Jul 2019 13:07:19 -0700
-Luke Nowakowski-Krijger <lnowakow@eng.ucsd.edu> escreveu:
+This patch adds a unit test for the PL031 RTC that is used in the virt machine.
+It just pokes basic functionality. I've mostly written it to familiarize myself
+with the device, but I suppose having the test around does not hurt, as it also
+exercises the GIC SPI interrupt path.
 
-> From: Luke Nowakowski-Krijger <lnowakow@eng.ucsd.edu>
-> 
-> Convert cpuid.txt to .rst format to be parsable by sphinx.
-> 
-> Change format and spacing to make function definitions and return values
-> much more clear. Also added a table that is parsable by sphinx and makes
-> the information much more clean. Updated Author email to their new
-> active email address. Added license identifier with the consent of the
-> author. 
-> 
-> Signed-off-by: Luke Nowakowski-Krijger <lnowakow@eng.ucsd.edu>
-> ---
->  Changes since v2: 
->  + added updated Author email address
->  + changed table to simpler format
->  - removed function bolding from v1
->  Changes since v1:
->  + Converted doc to .rst format
->  
->  Documentation/virtual/kvm/cpuid.rst | 99 +++++++++++++++++++++++++++++
->  Documentation/virtual/kvm/cpuid.txt | 83 ------------------------
->  2 files changed, 99 insertions(+), 83 deletions(-)
->  create mode 100644 Documentation/virtual/kvm/cpuid.rst
->  delete mode 100644 Documentation/virtual/kvm/cpuid.txt
+Signed-off-by: Alexander Graf <graf@amazon.com>
+---
+ arm/Makefile.common |   1 +
+ arm/pl031.c         | 227 ++++++++++++++++++++++++++++++++++++++++++++
+ lib/arm/asm/gic.h   |   1 +
+ 3 files changed, 229 insertions(+)
+ create mode 100644 arm/pl031.c
 
-I strongly suggest to generate the diff with -M1, in order to show it
-as a diff, instead of create/delete.
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index f0c4b5d..b8988f2 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -11,6 +11,7 @@ tests-common += $(TEST_DIR)/pmu.flat
+ tests-common += $(TEST_DIR)/gic.flat
+ tests-common += $(TEST_DIR)/psci.flat
+ tests-common += $(TEST_DIR)/sieve.flat
++tests-common += $(TEST_DIR)/pl031.flat
+ 
+ tests-all = $(tests-common) $(tests)
+ all: directories $(tests-all)
+diff --git a/arm/pl031.c b/arm/pl031.c
+new file mode 100644
+index 0000000..a364a1a
+--- /dev/null
++++ b/arm/pl031.c
+@@ -0,0 +1,227 @@
++/*
++ * Verify PL031 functionality
++ *
++ * This test verifies whether the emulated PL031 behaves correctly.
++ *
++ * Copyright 2019 Amazon.com, Inc. or its affiliates.
++ * Author: Alexander Graf <graf@amazon.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.
++ */
++#include <libcflat.h>
++#include <asm/processor.h>
++#include <asm/io.h>
++#include <asm/gic.h>
++
++static u32 cntfrq;
++
++#define PL031_BASE 0x09010000
++#define PL031_IRQ 2
++
++struct pl031_regs {
++	uint32_t dr;	/* Data Register */
++	uint32_t mr;	/* Match Register */
++	uint32_t lr;	/* Load Register */
++	union {
++		uint8_t cr;	/* Control Register */
++		uint32_t cr32;
++	};
++	union {
++		uint8_t imsc;	/* Interrupt Mask Set or Clear register */
++		uint32_t imsc32;
++	};
++	union {
++		uint8_t ris;	/* Raw Interrupt Status */
++		uint32_t ris32;
++	};
++	union {
++		uint8_t mis;	/* Masked Interrupt Status */
++		uint32_t mis32;
++	};
++	union {
++		uint8_t icr;	/* Interrupt Clear Register */
++		uint32_t icr32;
++	};
++	uint32_t reserved[1008];
++	uint32_t periph_id[4];
++	uint32_t pcell_id[4];
++};
++
++static struct pl031_regs *pl031 = (void*)PL031_BASE;
++static void *gic_ispendr;
++static void *gic_isenabler;
++static bool irq_triggered;
++
++static int check_id(void)
++{
++	uint32_t id[] = { 0x31, 0x10, 0x14, 0x00, 0x0d, 0xf0, 0x05, 0xb1 };
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(id); i++)
++		if (id[i] != readl(&pl031->periph_id[i]))
++			return 1;
++
++	return 0;
++}
++
++static int check_ro(void)
++{
++	uint32_t offs[] = { offsetof(struct pl031_regs, ris),
++			    offsetof(struct pl031_regs, mis),
++			    offsetof(struct pl031_regs, periph_id[0]),
++			    offsetof(struct pl031_regs, periph_id[1]),
++			    offsetof(struct pl031_regs, periph_id[2]),
++			    offsetof(struct pl031_regs, periph_id[3]),
++			    offsetof(struct pl031_regs, pcell_id[0]),
++			    offsetof(struct pl031_regs, pcell_id[1]),
++			    offsetof(struct pl031_regs, pcell_id[2]),
++			    offsetof(struct pl031_regs, pcell_id[3]) };
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(offs); i++) {
++		uint32_t before32;
++		uint16_t before16;
++		uint8_t before8;
++		void *addr = (void*)pl031 + offs[i];
++		uint32_t poison = 0xdeadbeefULL;
++
++		before8 = readb(addr);
++		before16 = readw(addr);
++		before32 = readl(addr);
++
++		writeb(poison, addr);
++		writew(poison, addr);
++		writel(poison, addr);
++
++		if (before8 != readb(addr))
++			return 1;
++		if (before16 != readw(addr))
++			return 1;
++		if (before32 != readl(addr))
++			return 1;
++	}
++
++	return 0;
++}
++
++static int check_rtc_freq(void)
++{
++	uint32_t seconds_to_wait = 2;
++	uint32_t before = readl(&pl031->dr);
++	uint64_t before_tick = read_sysreg(cntpct_el0);
++	uint64_t target_tick = before_tick + (cntfrq * seconds_to_wait);
++
++	/* Wait for 2 seconds */
++	while (read_sysreg(cntpct_el0) < target_tick) ;
++
++	if (readl(&pl031->dr) != before + seconds_to_wait)
++		return 1;
++
++	return 0;
++}
++
++static bool gic_irq_pending(void)
++{
++	return readl(gic_ispendr + 4) & (1 << (SPI(PL031_IRQ) - 32));
++}
++
++static void gic_irq_unmask(void)
++{
++	writel(1 << (SPI(PL031_IRQ) - 32), gic_isenabler + 4);
++}
++
++static void irq_handler(struct pt_regs *regs)
++{
++	u32 irqstat = gic_read_iar();
++	u32 irqnr = gic_iar_irqnr(irqstat);
++
++	if (irqnr != GICC_INT_SPURIOUS)
++		gic_write_eoir(irqstat);
++
++	if (irqnr == SPI(PL031_IRQ)) {
++		report("  RTC RIS == 1", readl(&pl031->ris) == 1);
++		report("  RTC MIS == 1", readl(&pl031->mis) == 1);
++
++		/* Writing any value should clear IRQ status */
++		writel(0x80000000ULL, &pl031->icr);
++
++		report("  RTC RIS == 0", readl(&pl031->ris) == 0);
++		report("  RTC MIS == 0", readl(&pl031->mis) == 0);
++		irq_triggered = true;
++	} else {
++		report_info("Unexpected interrupt: %d\n", irqnr);
++		return;
++	}
++}
++
++static int check_rtc_irq(void)
++{
++	uint32_t seconds_to_wait = 1;
++	uint32_t before = readl(&pl031->dr);
++	uint64_t before_tick = read_sysreg(cntpct_el0);
++	uint64_t target_tick = before_tick + (cntfrq * (seconds_to_wait + 1));
++
++	report_info("Checking IRQ trigger (MR)");
++
++	irq_triggered = false;
++
++	/* Fire IRQ in 1 second */
++	writel(before + seconds_to_wait, &pl031->mr);
++
++	install_irq_handler(EL1H_IRQ, irq_handler);
++
++	/* Wait until 2 seconds are over */
++	while (read_sysreg(cntpct_el0) < target_tick) ;
++
++	report("  RTC IRQ not delivered without mask", !gic_irq_pending());
++
++	/* Mask the IRQ so that it gets delivered */
++	writel(1, &pl031->imsc);
++	report("  RTC IRQ pending now", gic_irq_pending());
++
++	/* Enable retrieval of IRQ */
++	gic_irq_unmask();
++	local_irq_enable();
++
++	report("  IRQ triggered", irq_triggered);
++	report("  RTC IRQ not pending anymore", !gic_irq_pending());
++	if (!irq_triggered) {
++		report_info("  RTC RIS: %x", readl(&pl031->ris));
++		report_info("  RTC MIS: %x", readl(&pl031->mis));
++		report_info("  RTC IMSC: %x", readl(&pl031->imsc));
++		report_info("  GIC IRQs pending: %08x %08x", readl(gic_ispendr), readl(gic_ispendr + 4));
++	}
++
++	local_irq_disable();
++	return 0;
++}
++
++static void rtc_irq_init(void)
++{
++	gic_enable_defaults();
++
++	switch (gic_version()) {
++	case 2:
++		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
++		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
++		break;
++	case 3:
++		gic_ispendr = gicv3_sgi_base() + GICD_ISPENDR;
++		gic_isenabler = gicv3_sgi_base() + GICD_ISENABLER;
++		break;
++	}
++}
++
++int main(int argc, char **argv)
++{
++	cntfrq = get_cntfrq();
++	rtc_irq_init();
++
++	report("Periph/PCell IDs match", !check_id());
++	report("R/O fields are R/O", !check_ro());
++	report("RTC ticks at 1HZ", !check_rtc_freq());
++	report("RTC IRQ not pending yet", !gic_irq_pending());
++	check_rtc_irq();
++
++	return report_summary();
++}
+diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+index f6dfb90..1fc10a0 100644
+--- a/lib/arm/asm/gic.h
++++ b/lib/arm/asm/gic.h
+@@ -41,6 +41,7 @@
+ #include <asm/gic-v3.h>
+ 
+ #define PPI(irq)			((irq) + 16)
++#define SPI(irq)			((irq) + GIC_FIRST_SPI)
+ 
+ #ifndef __ASSEMBLY__
+ #include <asm/cpumask.h>
+-- 
+2.17.1
 
-Btw, when applying on the top of linux-next, I got a merge conflict,
-probably due to this patch:
-
-	commit 9824c83f92bc8351dfb5c387436cc2816616fb4a
-	Author: Paolo Bonzini <pbonzini@redhat.com>
-	Date:   Tue Jul 2 18:57:29 2019 +0200
-
-	    Documentation: kvm: document CPUID bit for MSR_KVM_POLL_CONTROL
-
-which added a new flag (KVM_FEATURE_PV_POLL_CONTROL). There's also
-another patch adding KVM_FEATURE_PV_SCHED_YIELD flag.
-
-In order to check the results, I did already a rebase on the top a temp
-branch on my experimental tree:
-
-	https://git.linuxtv.org/mchehab/experimental.git/commit/?h=convert_rst_renames_next_v3&id=90330aba498e6d9d5258322d0006b3968e9a65a9
-
-(please notice that this is not the upstream docs branch, so you
-need to re-submit the patch to the ML)
-
-With the rebase, for this 3 patch series:
-
-Reviewed-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-
-> 
-> diff --git a/Documentation/virtual/kvm/cpuid.rst b/Documentation/virtual/kvm/cpuid.rst
-> new file mode 100644
-> index 000000000000..644c53687861
-> --- /dev/null
-> +++ b/Documentation/virtual/kvm/cpuid.rst
-> @@ -0,0 +1,99 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +==============
-> +KVM CPUID bits
-> +==============
-> +
-> +:Author: Glauber Costa <glommer@gmail.com>
-> +
-> +A guest running on a kvm host, can check some of its features using
-> +cpuid. This is not always guaranteed to work, since userspace can
-> +mask-out some, or even all KVM-related cpuid features before launching
-> +a guest.
-> +
-> +KVM cpuid functions are:
-> +
-> +function: KVM_CPUID_SIGNATURE (0x40000000)
-> +
-> +returns::
-> +
-> +   eax = 0x40000001
-> +   ebx = 0x4b4d564b
-> +   ecx = 0x564b4d56
-> +   edx = 0x4d
-> +
-> +Note that this value in ebx, ecx and edx corresponds to the string "KVMKVMKVM".
-> +The value in eax corresponds to the maximum cpuid function present in this leaf,
-> +and will be updated if more functions are added in the future.
-> +Note also that old hosts set eax value to 0x0. This should
-> +be interpreted as if the value was 0x40000001.
-> +This function queries the presence of KVM cpuid leafs.
-> +
-> +function: define KVM_CPUID_FEATURES (0x40000001)
-> +
-> +returns::
-> +
-> +          ebx, ecx
-> +          eax = an OR'ed group of (1 << flag)
-> +
-> +where ``flag`` is defined as below:
-> +
-> +================================= =========== ================================
-> +flag                              value       meaning
-> +================================= =========== ================================
-> +KVM_FEATURE_CLOCKSOURCE           0           kvmclock available at msrs
-> +                                              0x11 and 0x12
-> +
-> +KVM_FEATURE_NOP_IO_DELAY          1           not necessary to perform delays 
-> +                                              on PIO operations
-> +
-> +KVM_FEATURE_MMU_OP                2           deprecated
-> +
-> +KVM_FEATURE_CLOCKSOURCE2          3           kvmclock available at msrs
-> +
-> +                                              0x4b564d00 and 0x4b564d01
-> +KVM_FEATURE_ASYNC_PF              4           async pf can be enabled by
-> +                                              writing to msr 0x4b564d02
-> +
-> +KVM_FEATURE_STEAL_TIME            5           steal time can be enabled by
-> +                                              writing to msr 0x4b564d03
-> +
-> +KVM_FEATURE_PV_EOI                6           paravirtualized end of interrupt
-> +                                              handler can be enabled by
-> +                                              writing to msr 0x4b564d04
-> +
-> +KVM_FEATURE_PV_UNHAULT            7           guest checks this feature bit
-> +                                              before enabling paravirtualized
-> +                                              spinlock support
-> +
-> +KVM_FEATURE_PV_TLB_FLUSH          9           guest checks this feature bit
-> +                                              before enabling paravirtualized
-> +                                              tlb flush
-> +
-> +KVM_FEATURE_ASYNC_PF_VMEXIT       10          paravirtualized async PF VM EXIT
-> +                                              can be enabled by setting bit 2
-> +                                              when writing to msr 0x4b564d02
-> +
-> +KVM_FEATURE_PV_SEND_IPI           11          guest checks this feature bit
-> +                                              before enabling paravirtualized 
-> +                                              sebd IPIs
-> +
-> +KVM_FEATURE_CLOCSOURCE_STABLE_BIT 24          host will warn if no guest-side
-> +                                              per-cpu warps are expeced in
-> +                                              kvmclock
-> +================================= =========== ================================
-> +
-> +::
-> +
-> +      edx = an OR'ed group of (1 << flag)
-> +
-> +Where ``flag`` here is defined as below:
-> +
-> +================== ============ =================================
-> +flag               value        meaning
-> +================== ============ =================================
-> +KVM_HINTS_REALTIME 0            guest checks this feature bit to
-> +                                determine that vCPUs are never
-> +                                preempted for an unlimited time
-> +                                allowing optimizations
-> +================== ============ =================================
-> diff --git a/Documentation/virtual/kvm/cpuid.txt b/Documentation/virtual/kvm/cpuid.txt
-> deleted file mode 100644
-> index 97ca1940a0dc..000000000000
-> --- a/Documentation/virtual/kvm/cpuid.txt
-> +++ /dev/null
-> @@ -1,83 +0,0 @@
-> -KVM CPUID bits
-> -Glauber Costa <glommer@redhat.com>, Red Hat Inc, 2010
-> -=====================================================
-> -
-> -A guest running on a kvm host, can check some of its features using
-> -cpuid. This is not always guaranteed to work, since userspace can
-> -mask-out some, or even all KVM-related cpuid features before launching
-> -a guest.
-> -
-> -KVM cpuid functions are:
-> -
-> -function: KVM_CPUID_SIGNATURE (0x40000000)
-> -returns : eax = 0x40000001,
-> -          ebx = 0x4b4d564b,
-> -          ecx = 0x564b4d56,
-> -          edx = 0x4d.
-> -Note that this value in ebx, ecx and edx corresponds to the string "KVMKVMKVM".
-> -The value in eax corresponds to the maximum cpuid function present in this leaf,
-> -and will be updated if more functions are added in the future.
-> -Note also that old hosts set eax value to 0x0. This should
-> -be interpreted as if the value was 0x40000001.
-> -This function queries the presence of KVM cpuid leafs.
-> -
-> -
-> -function: define KVM_CPUID_FEATURES (0x40000001)
-> -returns : ebx, ecx
-> -          eax = an OR'ed group of (1 << flag), where each flags is:
-> -
-> -
-> -flag                               || value || meaning
-> -=============================================================================
-> -KVM_FEATURE_CLOCKSOURCE            ||     0 || kvmclock available at msrs
-> -                                   ||       || 0x11 and 0x12.
-> -------------------------------------------------------------------------------
-> -KVM_FEATURE_NOP_IO_DELAY           ||     1 || not necessary to perform delays
-> -                                   ||       || on PIO operations.
-> -------------------------------------------------------------------------------
-> -KVM_FEATURE_MMU_OP                 ||     2 || deprecated.
-> -------------------------------------------------------------------------------
-> -KVM_FEATURE_CLOCKSOURCE2           ||     3 || kvmclock available at msrs
-> -                                   ||       || 0x4b564d00 and 0x4b564d01
-> -------------------------------------------------------------------------------
-> -KVM_FEATURE_ASYNC_PF               ||     4 || async pf can be enabled by
-> -                                   ||       || writing to msr 0x4b564d02
-> -------------------------------------------------------------------------------
-> -KVM_FEATURE_STEAL_TIME             ||     5 || steal time can be enabled by
-> -                                   ||       || writing to msr 0x4b564d03.
-> -------------------------------------------------------------------------------
-> -KVM_FEATURE_PV_EOI                 ||     6 || paravirtualized end of interrupt
-> -                                   ||       || handler can be enabled by writing
-> -                                   ||       || to msr 0x4b564d04.
-> -------------------------------------------------------------------------------
-> -KVM_FEATURE_PV_UNHALT              ||     7 || guest checks this feature bit
-> -                                   ||       || before enabling paravirtualized
-> -                                   ||       || spinlock support.
-> -------------------------------------------------------------------------------
-> -KVM_FEATURE_PV_TLB_FLUSH           ||     9 || guest checks this feature bit
-> -                                   ||       || before enabling paravirtualized
-> -                                   ||       || tlb flush.
-> -------------------------------------------------------------------------------
-> -KVM_FEATURE_ASYNC_PF_VMEXIT        ||    10 || paravirtualized async PF VM exit
-> -                                   ||       || can be enabled by setting bit 2
-> -                                   ||       || when writing to msr 0x4b564d02
-> -------------------------------------------------------------------------------
-> -KVM_FEATURE_PV_SEND_IPI            ||    11 || guest checks this feature bit
-> -                                   ||       || before using paravirtualized
-> -                                   ||       || send IPIs.
-> -------------------------------------------------------------------------------
-> -KVM_FEATURE_CLOCKSOURCE_STABLE_BIT ||    24 || host will warn if no guest-side
-> -                                   ||       || per-cpu warps are expected in
-> -                                   ||       || kvmclock.
-> -------------------------------------------------------------------------------
-> -
-> -          edx = an OR'ed group of (1 << flag), where each flags is:
-> -
-> -
-> -flag                               || value || meaning
-> -==================================================================================
-> -KVM_HINTS_REALTIME                 ||     0 || guest checks this feature bit to
-> -                                   ||       || determine that vCPUs are never
-> -                                   ||       || preempted for an unlimited time,
-> -                                   ||       || allowing optimizations
-> -----------------------------------------------------------------------------------
-
-
-
-Thanks,
-Mauro
