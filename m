@@ -2,81 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 734FF64327
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 09:56:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 431EC6436E
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2019 10:16:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726920AbfGJH4M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jul 2019 03:56:12 -0400
-Received: from mail-vk1-f195.google.com ([209.85.221.195]:41895 "EHLO
-        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726257AbfGJH4L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jul 2019 03:56:11 -0400
-Received: by mail-vk1-f195.google.com with SMTP id u64so285657vku.8
-        for <kvm@vger.kernel.org>; Wed, 10 Jul 2019 00:56:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-powerpc-org.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-         :cc;
-        bh=YoC+z2/b09WrXH4lRir7hNFDRJ8+7/oQYY2CuVHQx1Y=;
-        b=AWIpPHkq2+4lk5vaBQjk/aQmSEkXDJ2cFGgttIwHzX0Q+6RJ8CePT30S2PeOlx/mBn
-         Ioa4hiHVpqnIIzVRduL0zggZjzDKLUWGKW+8pi2+scTUbwJ23oB+5/By4fn8/LqrEt4q
-         xhuktd/lz60xlh8muMp/AeYgt46D46vXFRL0eFxZSOTR6hcfeA8UzzWXTYdWqD2Dm3hT
-         JXzD10UTXAmK60AODrEE9NZc6XeMSTcv5JAJ634ZFY5NVcfsvEZDVd/Fhc5hNJXcu++0
-         4SUwrmFD2gFkdjFExAlzXExId+0bbqxietdoUDYNTF/bYnoiqHz95YdkVfcwyd5IIzIN
-         4u2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-         :message-id:subject:to:cc;
-        bh=YoC+z2/b09WrXH4lRir7hNFDRJ8+7/oQYY2CuVHQx1Y=;
-        b=QK8DyG3QesqJgOAbBLLM7uOhxKW3yY2CjK92++/8C9LYzdi1CWBV7OinrhaLw5iCzW
-         WTs1blcUZBco0Nt0eBDEA5Pa0Ogw3xwQXJ1PhbI1oQx7CxiHpAUS5vgfOXlR4qntv2at
-         W6PMnX1zk5qnRFKtTW3AYNtt2zkPAqn1p92RzsXNplLj0kEwpeU6/UbRevqM0JfrT7xB
-         2sCVCXxadIgcIdog69qTMQILheUbwVttX5mLabsEmaJt9bqQg4WJTMD1LY1WOHcT+Sfa
-         EL1x5Qrqi2u+fOjdjoRWiSLCGbtfqVhD0IBN7xWSgLQn97+BY5/1xd5GwDEQbKyJRSXZ
-         8HCg==
-X-Gm-Message-State: APjAAAWAy3F1FK2GJrn5fk+doN5xOfOl5wLuwdWMYTCOTPGjZJaCOIua
-        U/Y2j1myqSPG57m+47TzoPb1tvsiDlg7eSFAQRSH1g==
-X-Google-Smtp-Source: APXvYqxPX8Eosf5p0y3g5oPXjM98amD+W/fUs4D8mD81YKm2jN6PRgwNAw7eUdOWD++bHUdDQdykb4w+C0dzlQn+6Gc=
-X-Received: by 2002:a1f:a887:: with SMTP id r129mr1194599vke.75.1562745370744;
- Wed, 10 Jul 2019 00:56:10 -0700 (PDT)
+        id S1727545AbfGJIQh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jul 2019 04:16:37 -0400
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21423 "EHLO
+        sender-of-o52.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727541AbfGJIQh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jul 2019 04:16:37 -0400
+X-Greylist: delayed 902 seconds by postgrey-1.27 at vger.kernel.org; Wed, 10 Jul 2019 04:16:37 EDT
+ARC-Seal: i=1; a=rsa-sha256; t=1562745686; cv=none; 
+        d=zoho.com; s=zohoarc; 
+        b=QIjzXRc/Fyn3fjhCkRrKHbV7OpvAso+gWG3CI1trrJ+F68Y2f/UrK97G156R6Ob1kPgyLNo9tRIpvVMPWJ0GIhPGfL5NN+GpZD/oxbLDZR31jMxiD12owH3K19YvfxEEDt9aXsaQ2NMwWG7ez3YAJhdvCyW1/N5oAQFwSmBoi1Q=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com; s=zohoarc; 
+        t=1562745686; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results; 
+        bh=fQE1vMIVUHwWw+8vyChBuRhktnZTVWe/PYJOzdaqBjE=; 
+        b=U9OiPeio31FxF+zEj2CeWUOpPSHg6cJ52AxP922RlNHG1QSmWW8fJGy0gHytgV6txWozM8JSGVjwPvco8hrEeTEBl5d7ugDt890rdBzzpGFhlDNy/VrOksZeAVVNV6fmKgXc/2VxJOCzqM6qBvqyPsyW6VlDJmT4HFjj4B4KRMY=
+ARC-Authentication-Results: i=1; mx.zoho.com;
+        dkim=pass  header.i=patchew.org;
+        spf=pass  smtp.mailfrom=no-reply@patchew.org;
+        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
+        with SMTPS id 156274568614918.321931122812884; Wed, 10 Jul 2019 01:01:26 -0700 (PDT)
+Message-ID: <156274568499.3735.6585989280648335588@c4a48874b076>
+Subject: Re: [Qemu-devel] [PATCH] target-i386: adds PV_SCHED_YIELD CPUID feature bit
+In-Reply-To: <1562745044-7838-1-git-send-email-wanpengli@tencent.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Received: by 2002:ab0:2616:0:0:0:0:0 with HTTP; Wed, 10 Jul 2019 00:56:10
- -0700 (PDT)
-X-Originating-IP: [5.35.70.113]
-In-Reply-To: <20190709.125850.2133620086434576103.davem@davemloft.net>
-References: <20190709114251.24662-1-dkirjanov@suse.com> <20190709.125850.2133620086434576103.davem@davemloft.net>
-From:   Denis Kirjanov <kda@linux-powerpc.org>
-Date:   Wed, 10 Jul 2019 10:56:10 +0300
-Message-ID: <CAOJe8K2YWrZbHwX4FcKN4j0i=F3Lxmna6wvaZnDyqJe85w0Ykw@mail.gmail.com>
-Subject: Re: [PATCH] vhost: fix null pointer dereference in vhost_del_umem_range
-To:     David Miller <davem@davemloft.net>
-Cc:     mst@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From:   no-reply@patchew.org
+To:     kernellwp@gmail.com
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, pbonzini@redhat.com,
+        ehabkost@redhat.com, rkrcmar@redhat.com
+Date:   Wed, 10 Jul 2019 01:01:26 -0700 (PDT)
+X-ZohoMailClient: External
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/9/19, David Miller <davem@davemloft.net> wrote:
-> From: Denis Kirjanov <kda@linux-powerpc.org>
-> Date: Tue,  9 Jul 2019 13:42:51 +0200
->
->> @@ -962,7 +962,8 @@ static void vhost_del_umem_range(struct vhost_umem
->> *umem,
->>
->>  	while ((node = vhost_umem_interval_tree_iter_first(&umem->umem_tree,
->>  							   start, end)))
->> -		vhost_umem_free(umem, node);
->> +		if (node)
->> +			vhost_umem_free(umem, node);
->
-> If 'node' is NULL we will not be in the body of the loop as per
-> the while() condition.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTYyNzQ1MDQ0LTc4MzgtMS1n
+aXQtc2VuZC1lbWFpbC13YW5wZW5nbGlAdGVuY2VudC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMg
+ZmFpbGVkIHRoZSBhc2FuIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
+bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
+IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWZlZG9yYSBWPTEgTkVUV09S
+Sz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VUX0xJU1Q9eDg2XzY0
+LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAg
+ICB4ODZfNjQtc29mdG1tdS90cmFjZS9jb250cm9sLXRhcmdldC5vCiAgQ0MgICAgICB4ODZfNjQt
+c29mdG1tdS9nZGJzdHViLXhtbC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90cmFjZS9nZW5l
+cmF0ZWQtaGVscGVycy5vCi90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvaTM4Ni9jcHUuYzo5MDk6
+MTk6IGVycm9yOiBtaXNzaW5nIHRlcm1pbmF0aW5nICciJyBjaGFyYWN0ZXIgWy1XZXJyb3IsLVdp
+bnZhbGlkLXBwLXRva2VuXQogICAgICAgICAgICBOVUxMLCAia3ZtLXB2LXNjaGVkLXlpZWxkJywg
+TlVMTCwgTlVMTCwKICAgICAgICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0
+L2kzODYvY3B1LmM6OTA5OjE5OiBlcnJvcjogZXhwZWN0ZWQgZXhwcmVzc2lvbgoyIGVycm9ycyBn
+ZW5lcmF0ZWQuCm1ha2VbMV06ICoqKiBbL3RtcC9xZW11LXRlc3Qvc3JjL3J1bGVzLm1hazo2OTog
+dGFyZ2V0L2kzODYvY3B1Lm9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmlu
+aXNoZWQgam9icy4uLi4KCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRj
+aGV3Lm9yZy9sb2dzLzE1NjI3NDUwNDQtNzgzOC0xLWdpdC1zZW5kLWVtYWlsLXdhbnBlbmdsaUB0
+ZW5jZW50LmNvbS90ZXN0aW5nLmFzYW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
+IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
-The patch is incorrect, please ignore
-
->
-> How did you test this?
->
