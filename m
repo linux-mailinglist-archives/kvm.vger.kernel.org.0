@@ -2,72 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id A455965392
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 11:14:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BF906653A1
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 11:17:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728083AbfGKJOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 05:14:09 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:33409 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727967AbfGKJOJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 05:14:09 -0400
-Received: by mail-oi1-f193.google.com with SMTP id u15so3957700oiv.0
-        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 02:14:08 -0700 (PDT)
+        id S1728295AbfGKJRK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 05:17:10 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:37420 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727972AbfGKJRK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 05:17:10 -0400
+Received: by mail-ed1-f68.google.com with SMTP id w13so5055534eds.4
+        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 02:17:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MEZG43r6RWPqN4gSL/BMuAlx0Ls8cNhdW0tYLDnHU8A=;
-        b=Zv+KUbRkxwDNfleJFVK3oTMNs+Ze4+tknfaP0s/vKQbHstBLp8Kt9h2lUWkuBVeDZq
-         kqWrEo3Pw+hajDCbmhJixJFHWsKh3NJ1nfS0+yF9zZzZUT4isdT0hlyjtQsxfJ/FuCWF
-         vwzoxorUfH+yRc3JH3QpKUdQK85PlIWLSNGFYo10e8ZVK+DR0H110bcrtT9nCvUZ1K73
-         hfIWm6JqMhp5ehH6f38sqQdOP1kCGeqtdznLScxPNPEehUAEajUQ9tEFUL1GTrCobUkY
-         HTZjIcjL8eDVpj3zWKwVgDRZBGlehYIwYrO4jTY7ABzx6yfrUz1ZKCQ2LShDyWS+eKPg
-         oYsg==
+        d=gmail.com; s=20161025;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=fRFOinAO4N9dX5DotLS7iFbJrG8nFqN9gCj1vzfuoVs=;
+        b=SHHoYnLd4b9lfcodnEZ9G2rV3Lc1ssvm8G7OEa4Hu8N4l2xDjDIto6xYIXQg+M/pp+
+         BHaARRl0QSbFTFRUK6pVWdiOSVYmLkuZmY+OMxgCmfvozieHqWpr1ryKlp3qnSDTnsD4
+         I0PisHylruH/mqgAvCw9jMBGZjQH9OKV+qhUlLUiUNRisnco9NnwmAXWJ9JQSP1CH9/t
+         t+fJwsvRNKZ/wMt8YC0jlbh7XNPwyDt6kl5BtjaXnUNs2fGO2kkLpy4h58sI96Wo46hk
+         MiIq06eoYVnlzWI7JcySbfDbgqw68YJeCMyFXn/7Oc1fOplwnLht8Zon1zLsxv0lfSNT
+         r0xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MEZG43r6RWPqN4gSL/BMuAlx0Ls8cNhdW0tYLDnHU8A=;
-        b=d85EiDCsKf07IShdvfM3D2eOlnaYCNa72DjQNND5Cusfr81WoSYB+ALDNA8GtFo59H
-         QChPvv+osGBwlhHLpLDhGxUCvL3qUAlZ9uBr9Heq3oyXpyXwBbYNRVX7g7oYPi+PnX0K
-         y7hM4UB90S/hBWTgShKUD9fdY5Xu+dSyepuirMkQ1mh6EqAW1U5fgJXwS/toXTBmpVJ5
-         Tv9VHvHpFa6GrgIsX6fcZZ57lqHqDpATewJe8xGP008nY4ejP064BSQnbEf2bsX8C4/X
-         Cr7onBhhsUCoNU5jJR25cxrlEapm77qiS/8UXzuJNe0UgIVM7yrqudSEtN3tyUCp3K14
-         zJhA==
-X-Gm-Message-State: APjAAAVre6YYDhRdtSPAQqE0y7R9Z/pLkNNK5d6ZcbgyWrvpCtBrxqlV
-        6Ka/ICIOcNRvDzDiaF6xa4G+SASbmRVrgvPPDNyhIg==
-X-Google-Smtp-Source: APXvYqzQhZHQWC6BrWJ9rVgTKnyu2xj51GbJRtgxsikp+PgoFMpk/4509qrz9K6SAZJgfcpPiLZs6ARrqQFt119+joM=
-X-Received: by 2002:aca:6185:: with SMTP id v127mr1833969oib.163.1562836448490;
- Thu, 11 Jul 2019 02:14:08 -0700 (PDT)
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=fRFOinAO4N9dX5DotLS7iFbJrG8nFqN9gCj1vzfuoVs=;
+        b=fnhi7LDDDomKUpWdZB1n+1ChZLsIeyIsZ3S2VPCVmHeVo4ekY7pQfttF0lMpE+aAN9
+         a0PUj+35MIhHR6lb0euPgwkzB1ihV4/vXUElYp6hN5ufcaIsYKljDleFJP/Styus5bLk
+         twd9/qd6qouVgOrWLGtXKLDjIprB5/nXcZd5hLa7gxJvdtLYBt+tcqKIe8opzvC2AwuV
+         y0+Lwh0+9r245Y4JVu5PQIO78IcLehLVk9OL/phOMXHlg64Yii3J9TQGjR6pCFPKrGMS
+         t+LKcVxAAqZ8SFv7cXya283TRLdfBuRRdkNrE8a6YgP0DDsLq4S7Qp9AjJ+YfQ2hFwlk
+         33lg==
+X-Gm-Message-State: APjAAAW10VteH98W+2VNZINNiUfE1rOioQibG9iEdjUp3SbGse0AlKPj
+        1daipTvNzZFy+84/yUIgeCBIMPP6JoGrbaoA09g=
+X-Google-Smtp-Source: APXvYqy4/rms6fZZeiRhJHm3EmGMT+yKsNs+pKrQQhuDmtVyFSaJ6DQpvfcBXt/5xCnThIRIQhqpWWh0p6tv9L/PHBA=
+X-Received: by 2002:a17:906:802:: with SMTP id e2mr2184819ejd.59.1562836628433;
+ Thu, 11 Jul 2019 02:17:08 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190710132724.28350-1-graf@amazon.com> <CAFEAcA81mQ780H5EY8uV6AvbXzeZA60eCHoE_n9yzeZgw+ru4w@mail.gmail.com>
- <a29ea772-0565-98cb-61d8-3042b2df39b1@amazon.com>
-In-Reply-To: <a29ea772-0565-98cb-61d8-3042b2df39b1@amazon.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Thu, 11 Jul 2019 10:13:57 +0100
-Message-ID: <CAFEAcA_qRksJGiOZXFss+7Bcuwy97LydQXcw-R=LD7zBTmEm6g@mail.gmail.com>
-Subject: Re: [PATCH kvm-unit-tests] arm: Add PL031 test
-To:     Alexander Graf <graf@amazon.com>
-Cc:     kvm-devel <kvm@vger.kernel.org>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvmarm@lists.cs.columbia.edu
+Received: by 2002:a17:906:3107:0:0:0:0 with HTTP; Thu, 11 Jul 2019 02:17:07
+ -0700 (PDT)
+Reply-To: kone.compaore20@gmail.com
+From:   Kone Compaore <abbttnb001@gmail.com>
+Date:   Thu, 11 Jul 2019 02:17:07 -0700
+Message-ID: <CA+d4EbMeOeymP7u+=UOppyWYgbdYUWhBe2_=mwDiMoZ6pWHYAw@mail.gmail.com>
+Subject: Greetings from Kone
+To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 11 Jul 2019 at 10:11, Alexander Graf <graf@amazon.com> wrote:
-> On 11.07.19 10:51, Peter Maydell wrote:
-> > Have you tested this against a real hardware pl031?
+Greetings to you and your family.
 
-> Do you have any pointers to devices I might own that have one?
+My name is Mr. Kone Compaore, the director general with the bank,
+Africa Develop bank (ADB) Ouagadougou, Burkina Faso, in West Africa. I
+am contacting you to seek our honesty and sincere cooperation in
+confidential manner to transfer the sum of 10.5 (Ten million five
+hundred thousand Dollars) to your existing or new bank account.
 
-Heh, fair point. I'd expect to find one in most of the devboards
-Arm has shipped over the years, but I dunno if you'll find one
-anywhere else.
+This money belongs to one of our bank client, a Libyan oil exporter
+who was working with the former Libyan government; I learn t that he
+was killed by the revolutionary forces since October 2011. Our bank is
+planning to transfer this entire fund into the government public
+treasury as unclaimed fund if nobody comes to claim the money from our
+bank after four years without account activities .
 
-thanks
--- PMM
+We did not know each other before, but due to the fact that the
+deceased is a foreigner, the bank will welcome any claim from a
+foreigner without any suspect, that is why I decided to look for
+someone whim I can trust to come and claim the fund from our bank.
+
+I will endorse your name in the deceased client file here in my office
+which will indicate to that the deceased is your legal joint account
+business partner or family member next of kin to the deceased and
+officially the bank will transfer the fund to your bank account within
+seven working days in accordance to our banking inheritance rules and
+fund claim regulation.
+
+I will share 40% for you and 60% for me after the fund is transferred
+to your bank account, we need to act fast to complete this transaction
+within seven days. I will come to your country to collect my share
+after the fund is transferred to your bank account in your country. I
+hope that you will not disappoint me after the fund is transferred to
+your bank account in your country.
+
+Please I want you to send me your private phone number so that I can
+call you to discuss more details on how we can proceed on this project
+
+Waiting for your urgent response today
+Yours sincerely
+
+Kone Compaore
