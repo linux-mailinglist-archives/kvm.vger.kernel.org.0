@@ -2,478 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 14A66655E0
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 13:45:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B909655D8
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 13:38:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728240AbfGKLpN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 07:45:13 -0400
-Received: from mta01.hs-regensburg.de ([194.95.104.11]:52200 "EHLO
-        mta01.hs-regensburg.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728198AbfGKLpN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 07:45:13 -0400
-X-Greylist: delayed 471 seconds by postgrey-1.27 at vger.kernel.org; Thu, 11 Jul 2019 07:45:10 EDT
-Received: from E16S02.hs-regensburg.de (e16s02.hs-regensburg.de [IPv6:2001:638:a01:8013::92])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (Client CN "E16S02", Issuer "E16S02" (not verified))
-        by mta01.hs-regensburg.de (Postfix) with ESMTPS id 45kvDG0DYHzydg;
-        Thu, 11 Jul 2019 13:37:18 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oth-regensburg.de;
-        s=mta01-20160622; t=1562845038;
-        bh=PHzPda2qfxQgXmD2dLC3plw5/51jPDsSaJKzmi8JWDE=;
-        h=Subject:To:References:From:Date:In-Reply-To:From;
-        b=K5mV5ZaJ4CpkpJJzZEffh75ngVts6qV+NXTjOf6pp4QXOXuEbqQgAZBo1CfZCFyB3
-         f9HzaKtEDyJN+qShC/McppqiPwzeLl3iqZYLwcuZvSWdTj6F/He2hPIdEfxY0wjTiV
-         MlDeNkqVXyDDVodE9txf4sC08B0IxRrKVjjtastA/pv/a3Xmxpkuxu5rKj7c+TTbMr
-         dGIp0mvpZy6E9Mt0dKgVhi275z+PepGba9IFJCahsAbC5/vyy24R56gutWx3y1sq6S
-         Pprj4BV6iVtx4uAJm5VXZ04EOVAB1NvJCo6pDBBKnT2xkxkQWSYb3VLtGyUxb2wHFV
-         vVlMTHt3J6RjQ==
-Received: from [192.168.178.10] (194.95.106.138) by E16S02.hs-regensburg.de
- (2001:638:a01:8013::92) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Thu, 11 Jul
- 2019 13:37:17 +0200
-Subject: Re: KVM_SET_NESTED_STATE not yet stable
-To:     Jan Kiszka <jan.kiszka@siemens.com>,
-        "Raslan, KarimAllah" <karahmed@amazon.de>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "liran.alon@oracle.com" <liran.alon@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-References: <9eb4dd9f-65e5-627d-b288-e5fe8ade0963@siemens.com>
- <1562772280.18613.25.camel@amazon.de>
- <f1936ed9-e41b-4d36-50bb-3956434d993c@siemens.com>
- <cfd86643-dbac-3a69-9faf-03eaa8aee6a1@siemens.com>
-From:   Ralf Ramsauer <ralf.ramsauer@oth-regensburg.de>
+        id S1728422AbfGKLiA convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Thu, 11 Jul 2019 07:38:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33574 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728026AbfGKLiA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 07:38:00 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 93CBB3082135;
+        Thu, 11 Jul 2019 11:37:59 +0000 (UTC)
+Received: from [10.18.17.163] (dhcp-17-163.bos.redhat.com [10.18.17.163])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C59C194B3;
+        Thu, 11 Jul 2019 11:37:50 +0000 (UTC)
+Subject: Re: [RFC][PATCH v11 0/2] mm: Support for page hinting
+To:     Dave Hansen <dave.hansen@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        pbonzini@redhat.com, lcapitulino@redhat.com, pagupta@redhat.com,
+        wei.w.wang@intel.com, yang.zhang.wz@gmail.com, riel@surriel.com,
+        david@redhat.com, mst@redhat.com, dodgen@google.com,
+        konrad.wilk@oracle.com, dhildenb@redhat.com, aarcange@redhat.com,
+        alexander.duyck@gmail.com, john.starks@microsoft.com,
+        mhocko@suse.com
+References: <20190710195158.19640-1-nitesh@redhat.com>
+ <b6da49e4-5007-08f9-104a-aeca5dca4719@intel.com>
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <47e8c75d-f39a-89f8-940f-d05a9bc91899@oth-regensburg.de>
-Date:   Thu, 11 Jul 2019 13:37:17 +0200
+Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ VujM7c/b4pps
+Organization: Red Hat Inc,
+Message-ID: <f781e5db-cfed-6acf-c844-4825f2336567@redhat.com>
+Date:   Thu, 11 Jul 2019 07:37:49 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <cfd86643-dbac-3a69-9faf-03eaa8aee6a1@siemens.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: de-DE
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [194.95.106.138]
-X-ClientProxiedBy: E16S03.hs-regensburg.de (2001:638:a01:8013::93) To
- E16S02.hs-regensburg.de (2001:638:a01:8013::92)
+In-Reply-To: <b6da49e4-5007-08f9-104a-aeca5dca4719@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Thu, 11 Jul 2019 11:37:59 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
 
-On 7/10/19 10:31 PM, Jan Kiszka wrote:
-> On 10.07.19 18:05, Jan Kiszka wrote:
->> Hi KarimAllah,
+On 7/10/19 4:19 PM, Dave Hansen wrote:
+> On 7/10/19 12:51 PM, Nitesh Narayan Lal wrote:
+>> This patch series proposes an efficient mechanism for reporting free memory
+>> from a guest to its hypervisor. It especially enables guests with no page cache
+>> (e.g., nvdimm, virtio-pmem) or with small page caches (e.g., ram > disk) to
+>> rapidly hand back free memory to the hypervisor.
+>> This approach has a minimal impact on the existing core-mm infrastructure.
 >>
->> On 10.07.19 17:24, Raslan, KarimAllah wrote:
->>> On Mon, 2019-07-08 at 22:39 +0200, Jan Kiszka wrote:
->>>> Hi all,
->>>>
->>>> it seems the "new" KVM_SET_NESTED_STATE interface has some remaining
->>>> robustness issues.
->>>
->>> I would be very interested to learn about any more robustness issues that you 
->>> are seeing.
->>>
->>>> The most urgent one: With the help of latest QEMU
->>>> master that uses this interface, you can easily crash the host. You just
->>>> need to start qemu-system-x86 -enable-kvm in L1 and then hard-reset L1.
->>>> The host CPU that ran this will stall, the system will freeze soon.
->>>
->>> Just to confirm, you start an L2 guest using qemu inside an L1-guest and then 
->>> hard-reset the L1 guest?
->>
->> Exactly.
->>
->>>
->>> Are you running any special workload in L2 or L1 when you reset? Also how 
->>
->> Nope. It is a standard (though rather oldish) userland in L1, just running a
->> more recent kernel 5.2.
->>
->>> exactly are you doing this "hard reset"?
->>
->> system_reset from the monitor or "reset" from QEMU window menu.
+>> Measurement results (measurement details appended to this email):
+>> *Number of 5GB guests (each touching 4GB memory) that can be launched
+>> without swap usage on a system with 15GB:
+> This sounds like a reasonable measurement, but I think you're missing a
+> sentence or two explaining why this test was used.
+I will re-work the cover email to better communicate the numbers.
+>
+>> unmodified kernel - 2, 3rd with 2.5GB   
+> What does "3rd with 2.5GB" mean?  The third gets 2.5GB before failing an
+> allocation and crashing?
+It doesn't crash or fail. To complete the execution of the test
+application which allocates 4GB memory in the 3rd guest 2.5GB swap has
+been accessed.
+>
+>> v11 page hinting - 6, 7th with 26MB    
+>> v1 bubble hinting[1] - 6, 7th with 1.8GB (bubble hinting is another series
+>> proposed to solve the same problems)
+> Could you please make an effort to format things so that reviewers can
+> easily read them?  Aligning columns and using common units would be very
+> helpful, for instance:
+>
+>      unmodified kernel - 2, 3rd with 2.50 GB
+>       v11 page hinting - 6, 7th with 0.03 GB
+>   v1 bubble hinting[1] - 6, 7th with 1.80 GB
+>
+> See how you can scan that easily and compare between the rows?
+>
+> I think you did some analysis below.  But, that seems misplaced.  It's
+> better to include the conclusion here and the details to back it up
+> later.  As it stands, the cover letter just throws some data at a
+> reviewer and hopes they can make sense of it.
+I will improve this. Thanks.
+>
+>> *Memhog execution time (For 3 guests each of 6GB on a system with 15GB):
+>> unmodified kernel - Guest1:21s, Guest2:27s, Guest3:2m37s swap used = 3.7GB       
+>> v11 page hinting - Guest1:23s, Guest2:26s, Guest3:21s swap used = 0           
+>> v1 bubble hinting - Guest1:23, Guest2:11s, Guest3:26s swap used = 0           
+> Again, I'm finding myself having to reformat your data just so I can
+> make sense of it.  You also forgot the unit for Guest 1 in row 3.
+>
+>    unmodified - Guest1:21s, Guest2:27s, Guest3:2m37s swap used = 3.7GB
+>
+>   v11 hinting - Guest1:23s, Guest2:26s, Guest3:21s swap used = 0
+>   v1 bubble   - Guest1:23s, Guest2:11s, Guest3:26s swap used = 0
+>
+> So, what is this supposed to show?  What does it mean?  Why do the
+> numbers vary *so* much?
 
-While I'm not able to reproduce this behaviour on any of my machines
-(i7-4810MQ, i7-5600U, Xeon Gold 5118),
+Basically, the idea was to communicate that with hinting swap was not
+accessed and hence the time of execution is lower.
 
->>
->>>
->>> (sorry just tried this in my setup and I did not see any problem but my setup
->>>  is slightly different, so just ruling out obvious stuff).
->>>
->>
->> If it helps, I can share privately a guest image that was built via
->> https://github.com/siemens/jailhouse-images which exposes the reset issue after
->> starting Jailhouse (instead of qemu-system-x86_64 - though that should "work" as
->> well, just not tested yet). It's about 70M packed.
->>
->> Host-wise, 5.2.0 + QEMU master should do. I can also provide you the .config if
->> needed.
+But as you already mentioned next time around I will format this and add
+the conclusion along with these numbers.
+I agree with Alexander's comment that there is no point of having the
+same thing at two place.
 
-I can reproduce and confirm this issue. A system_reset of qemu after
-Jailhouse is enabled leads to the crash listed below, on all machines.
+-- 
+Thanks
+Nitesh
 
-On the Xeon Gold, e.g., Qemu reports:
-
-EAX=00000000 EBX=00000000 ECX=00000000 EDX=00000f61
-ESI=00000000 EDI=00000000 EBP=00000000 ESP=00000000
-EIP=0000fff0 EFL=00000246 [---Z-P-] CPL=0 II=0 A20=1 SMM=0 HLT=0
-ES =0000 00000000 0000ffff 00009300
-CS =f000 ffff0000 0000ffff 00a09b00
-SS =0000 00000000 0000ffff 00c09300
-DS =0000 00000000 0000ffff 00009300
-FS =0000 00000000 0000ffff 00009300
-GS =0000 00000000 0000ffff 00009300
-LDT=0000 00000000 0000ffff 00008200
-TR =0000 00000000 0000ffff 00008b00
-GDT=     00000000 0000ffff
-IDT=     00000000 0000ffff
-CR0=60000010 CR2=00000000 CR3=00000000 CR4=00000680
-DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000
-DR3=0000000000000000
-DR6=00000000ffff0ff0 DR7=0000000000000400
-EFER=0000000000000000
-Code=00 66 89 d8 66 e8 af a1 ff ff 66 83 c4 0c 66 5b 66 5e 66 c3 <ea> 5b
-e0 00 f0 30 36 2f 32 33 2f 39 39 00 fc 00 00 00 00 00 00 00 00 00 00 00
-00 00 00 00
-
-Kernel:
-[ 1868.804515] kvm: vmptrld           (null)/6b8640000000 failed
-[ 1868.804568] kvm: vmclear fail:           (null)/6b8640000000
-
-And the host freezes unrecoverably. Hosts use standard distro kernels
->= v5.0.
-
-  Ralf
-
->>
->>>>
->>>> I've also seen a pattern with my Jailhouse test VM where I seems to get
->>>> stuck in a loop between L1 and L2:
->>>>
->>>>  qemu-system-x86-6660  [007]   398.691401: kvm_nested_vmexit:    rip 7fa9ee5224e4 reason IO_INSTRUCTION info1 5658000b info2 0 int_info 0 int_info_err 0
->>>>  qemu-system-x86-6660  [007]   398.691402: kvm_fpu:              unload
->>>>  qemu-system-x86-6660  [007]   398.691403: kvm_userspace_exit:   reason KVM_EXIT_IO (2)
->>>>  qemu-system-x86-6660  [007]   398.691440: kvm_fpu:              load
->>>>  qemu-system-x86-6660  [007]   398.691441: kvm_pio:              pio_read at 0x5658 size 4 count 1 val 0x4 
->>>>  qemu-system-x86-6660  [007]   398.691443: kvm_mmu_get_page:     existing sp gfn 3a22e 1/4 q3 direct --x !pge !nxe root 6 sync
->>>>  qemu-system-x86-6660  [007]   398.691444: kvm_entry:            vcpu 3
->>>>  qemu-system-x86-6660  [007]   398.691475: kvm_exit:             reason IO_INSTRUCTION rip 0x7fa9ee5224e4 info 5658000b 0
->>>>  qemu-system-x86-6660  [007]   398.691476: kvm_nested_vmexit:    rip 7fa9ee5224e4 reason IO_INSTRUCTION info1 5658000b info2 0 int_info 0 int_info_err 0
->>>>  qemu-system-x86-6660  [007]   398.691477: kvm_fpu:              unload
->>>>  qemu-system-x86-6660  [007]   398.691478: kvm_userspace_exit:   reason KVM_EXIT_IO (2)
->>>>  qemu-system-x86-6660  [007]   398.691526: kvm_fpu:              load
->>>>  qemu-system-x86-6660  [007]   398.691527: kvm_pio:              pio_read at 0x5658 size 4 count 1 val 0x4 
->>>>  qemu-system-x86-6660  [007]   398.691529: kvm_mmu_get_page:     existing sp gfn 3a22e 1/4 q3 direct --x !pge !nxe root 6 sync
->>>>  qemu-system-x86-6660  [007]   398.691530: kvm_entry:            vcpu 3
->>>>  qemu-system-x86-6660  [007]   398.691533: kvm_exit:             reason IO_INSTRUCTION rip 0x7fa9ee5224e4 info 5658000b 0
->>>>  qemu-system-x86-6660  [007]   398.691534: kvm_nested_vmexit:    rip 7fa9ee5224e4 reason IO_INSTRUCTION info1 5658000b info2 0 int_info 0 int_info_err 0
->>>>
->>>> These issues disappear when going from ebbfef2f back to 6cfd7639 (both
->>>> with build fixes) in QEMU.
->>>
->>> This is the QEMU that you are using in L0 to launch an L1 guest, right? or are 
->>> you still referring to the QEMU mentioned above?
->>
->> This scenario is similar but still a bit different than the above. Yes, same L0
->> image and host QEMU here (and the traces were taken on the host, obviously), but
->> the workload is now as follows:
->>
->>  - boot L1 Linux
->>  - enable Jailhouse inside L1
->>  - move the mouse over the graphical desktop of L2, ie. the former L1
->>    Linux (Jailhouse is now L1)
->>  - the L1/L2 guests enter the loop above while trying to read from the
->>    vmmouse port
->>
->> Jan
->>
-> 
-> Ralf tried my case on some of his systems as well but he also didn't succeed in
-> reproducing. So we compared vmxcap lists because I'm starting to think it's
-> feature-related. There are some differences...
-> 
-> --- vmxcap.i7-5600u	2019-07-10 21:59:05.616547924 +0200
-> +++ vmxcap.jan	2019-07-10 21:58:23.135686409 +0200
-> @@ -1,6 +1,6 @@
->  Basic VMX Information
-> -  Hex: 0xda040000000012
-> -  Revision                                 18
-> +  Hex: 0xda040000000004
-> +  Revision                                 4
->    VMCS size                                1024
->    VMCS restricted to 32 bit addresses      no
->    Dual-monitor support                     yes
-> @@ -51,13 +51,13 @@
->    Enable INVPCID                           yes
->    Enable VM functions                      yes
->    VMCS shadowing                           yes
-> -  Enable ENCLS exiting                     no
-> +  Enable ENCLS exiting                     yes
->    RDSEED exiting                           yes
-> -  Enable PML                               no
-> +  Enable PML                               yes
->    EPT-violation #VE                        yes
-> -  Conceal non-root operation from PT       no
-> -  Enable XSAVES/XRSTORS                    no
-> -  Mode-based execute control (XS/XU)       no
-> +  Conceal non-root operation from PT       yes
-> +  Enable XSAVES/XRSTORS                    yes
-> +  Mode-based execute control (XS/XU)       yes
->    TSC scaling                              no
->  VM-Exit controls
->    Save debug controls                      default
-> @@ -69,8 +69,8 @@
->    Save IA32_EFER                           yes
->    Load IA32_EFER                           yes
->    Save VMX-preemption timer value          yes
-> -  Clear IA32_BNDCFGS                       no
-> -  Conceal VM exits from PT                 no
-> +  Clear IA32_BNDCFGS                       yes
-> +  Conceal VM exits from PT                 yes
->  VM-Entry controls
->    Load debug controls                      default
->    IA-32e mode guest                        yes
-> @@ -79,11 +79,11 @@
->    Load IA32_PERF_GLOBAL_CTRL               yes
->    Load IA32_PAT                            yes
->    Load IA32_EFER                           yes
-> -  Load IA32_BNDCFGS                        no
-> -  Conceal VM entries from PT               no
-> +  Load IA32_BNDCFGS                        yes
-> +  Conceal VM entries from PT               yes
->  Miscellaneous data
-> -  Hex: 0x300481e5
-> -  VMX-preemption timer scale (log2)        5
-> +  Hex: 0x7004c1e7
-> +  VMX-preemption timer scale (log2)        7
->    Store EFER.LMA into IA-32e mode guest control yes
->    HLT activity state                       yes
->    Shutdown activity state                  yes
-> @@ -93,10 +93,10 @@
->    MSR-load/store count recommendation      0
->    IA32_SMM_MONITOR_CTL[2] can be set to 1  yes
->    VMWRITE to VM-exit information fields    yes
-> -  Inject event with insn length=0          no
-> +  Inject event with insn length=0          yes
->    MSEG revision identifier                 0
->  VPID and EPT capabilities
-> -  Hex: 0xf0106334141
-> +  Hex: 0xf0106734141
->    Execute-only EPT translations            yes
->    Page-walk length 4                       yes
->    Paging-structure memory type UC          yes
-> 
-> And another machine that does not crash:
-> 
-> --- vmxcaps.e5-2683v4	2019-07-10 22:21:28.620329384 +0200
-> +++ vmxcap.jan	2019-07-10 21:58:23.135686409 +0200
-> @@ -1,6 +1,6 @@
->  Basic VMX Information
-> -  Hex: 0xda040000000012
-> -  Revision                                 18
-> +  Hex: 0xda040000000004
-> +  Revision                                 4
->    VMCS size                                1024
->    VMCS restricted to 32 bit addresses      no
->    Dual-monitor support                     yes
-> @@ -12,7 +12,7 @@
->    NMI exiting                              yes
->    Virtual NMIs                             yes
->    Activate VMX-preemption timer            yes
-> -  Process posted interrupts                yes
-> +  Process posted interrupts                no
->  primary processor-based controls
->    Interrupt window exiting                 yes
->    Use TSC offsetting                       yes
-> @@ -44,20 +44,20 @@
->    Enable VPID                              yes
->    WBINVD exiting                           yes
->    Unrestricted guest                       yes
-> -  APIC register emulation                  yes
-> -  Virtual interrupt delivery               yes
-> +  APIC register emulation                  no
-> +  Virtual interrupt delivery               no
->    PAUSE-loop exiting                       yes
->    RDRAND exiting                           yes
->    Enable INVPCID                           yes
->    Enable VM functions                      yes
->    VMCS shadowing                           yes
-> -  Enable ENCLS exiting                     no
-> +  Enable ENCLS exiting                     yes
->    RDSEED exiting                           yes
->    Enable PML                               yes
->    EPT-violation #VE                        yes
-> -  Conceal non-root operation from PT       no
-> -  Enable XSAVES/XRSTORS                    no
-> -  Mode-based execute control (XS/XU)       no
-> +  Conceal non-root operation from PT       yes
-> +  Enable XSAVES/XRSTORS                    yes
-> +  Mode-based execute control (XS/XU)       yes
->    TSC scaling                              no
->  VM-Exit controls
->    Save debug controls                      default
-> @@ -69,8 +69,8 @@
->    Save IA32_EFER                           yes
->    Load IA32_EFER                           yes
->    Save VMX-preemption timer value          yes
-> -  Clear IA32_BNDCFGS                       no
-> -  Conceal VM exits from PT                 no
-> +  Clear IA32_BNDCFGS                       yes
-> +  Conceal VM exits from PT                 yes
->  VM-Entry controls
->    Load debug controls                      default
->    IA-32e mode guest                        yes
-> @@ -79,11 +79,11 @@
->    Load IA32_PERF_GLOBAL_CTRL               yes
->    Load IA32_PAT                            yes
->    Load IA32_EFER                           yes
-> -  Load IA32_BNDCFGS                        no
-> -  Conceal VM entries from PT               no
-> +  Load IA32_BNDCFGS                        yes
-> +  Conceal VM entries from PT               yes
->  Miscellaneous data
-> -  Hex: 0x300481e5
-> -  VMX-preemption timer scale (log2)        5
-> +  Hex: 0x7004c1e7
-> +  VMX-preemption timer scale (log2)        7
->    Store EFER.LMA into IA-32e mode guest control yes
->    HLT activity state                       yes
->    Shutdown activity state                  yes
-> @@ -93,10 +93,10 @@
->    MSR-load/store count recommendation      0
->    IA32_SMM_MONITOR_CTL[2] can be set to 1  yes
->    VMWRITE to VM-exit information fields    yes
-> -  Inject event with insn length=0          no
-> +  Inject event with insn length=0          yes
->    MSEG revision identifier                 0
->  VPID and EPT capabilities
-> -  Hex: 0xf0106334141
-> +  Hex: 0xf0106734141
->    Execute-only EPT translations            yes
->    Page-walk length 4                       yes
->    Paging-structure memory type UC          yes
-> 
-> And on a Xeon D-1540, I'm not seeing a crash but a kvm entry failure when
-> resetting L1 while running Jailhouse:
-> 
-> KVM: entry failed, hardware error 0x7
-> EAX=00000000 EBX=00000000 ECX=00000000 EDX=00000f61
-> ESI=00000000 EDI=00000000 EBP=00000000 ESP=00000000
-> EIP=0000fff0 EFL=00000246 [---Z-P-] CPL=0 II=0 A20=1 SMM=0 HLT=0
-> ES =0000 00000000 0000ffff 00009300
-> CS =f000 ffff0000 0000ffff 00a09b00
-> SS =0000 00000000 0000ffff 00c09300
-> DS =0000 00000000 0000ffff 00009300
-> FS =0000 00000000 0000ffff 00009300
-> GS =0000 00000000 0000ffff 00009300
-> LDT=0000 00000000 0000ffff 00008200
-> TR =0000 00000000 0000ffff 00008b00
-> GDT=     00000000 0000ffff
-> IDT=     00000000 0000ffff
-> CR0=60000010 CR2=00000000 CR3=00000000 CR4=00000680
-> DR0=0000000000000000 DR1=0000000000000000 DR2=0000000000000000 DR3=0000000000000000
-> DR6=00000000ffff0ff0 DR7=0000000000000400
-> EFER=0000000000000000
-> Code=00 66 89 d8 66 e8 af a1 ff ff 66 83 c4 0c 66 5b 66 5e 66 c3 <ea> 5b e0 00
-> f0 30 36 2f 32 33 2f 39 39 00 fc 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> 
-> Here is the vmxcap diff:
-> 
-> --- xeon-d	2019-07-10 22:29:56.735374032 +0200
-> +++ i7-8850H	2019-07-10 22:29:31.747467248 +0200
-> @@ -1,6 +1,6 @@
->  Basic VMX Information
-> -  Hex: 0xda040000000012
-> -  Revision                                 18
-> +  Hex: 0xda040000000004
-> +  Revision                                 4
->    VMCS size                                1024
->    VMCS restricted to 32 bit addresses      no
->    Dual-monitor support                     yes
-> @@ -12,7 +12,7 @@ pin-based controls
->    NMI exiting                              yes
->    Virtual NMIs                             yes
->    Activate VMX-preemption timer            yes
-> -  Process posted interrupts                yes
-> +  Process posted interrupts                no
->  primary processor-based controls
->    Interrupt window exiting                 yes
->    Use TSC offsetting                       yes
-> @@ -44,20 +44,20 @@ secondary processor-based controls
->    Enable VPID                              yes
->    WBINVD exiting                           yes
->    Unrestricted guest                       yes
-> -  APIC register emulation                  yes
-> -  Virtual interrupt delivery               yes
-> +  APIC register emulation                  no
-> +  Virtual interrupt delivery               no
->    PAUSE-loop exiting                       yes
->    RDRAND exiting                           yes
->    Enable INVPCID                           yes
->    Enable VM functions                      yes
->    VMCS shadowing                           yes
-> -  Enable ENCLS exiting                     no
-> +  Enable ENCLS exiting                     yes
->    RDSEED exiting                           yes
->    Enable PML                               yes
->    EPT-violation #VE                        yes
-> -  Conceal non-root operation from PT       no
-> -  Enable XSAVES/XRSTORS                    no
-> -  Mode-based execute control (XS/XU)       no
-> +  Conceal non-root operation from PT       yes
-> +  Enable XSAVES/XRSTORS                    yes
-> +  Mode-based execute control (XS/XU)       yes
->    TSC scaling                              no
->  VM-Exit controls
->    Save debug controls                      default
-> @@ -69,8 +69,8 @@ VM-Exit controls
->    Save IA32_EFER                           yes
->    Load IA32_EFER                           yes
->    Save VMX-preemption timer value          yes
-> -  Clear IA32_BNDCFGS                       no
-> -  Conceal VM exits from PT                 no
-> +  Clear IA32_BNDCFGS                       yes
-> +  Conceal VM exits from PT                 yes
->  VM-Entry controls
->    Load debug controls                      default
->    IA-32e mode guest                        yes
-> @@ -79,11 +79,11 @@ VM-Entry controls
->    Load IA32_PERF_GLOBAL_CTRL               yes
->    Load IA32_PAT                            yes
->    Load IA32_EFER                           yes
-> -  Load IA32_BNDCFGS                        no
-> -  Conceal VM entries from PT               no
-> +  Load IA32_BNDCFGS                        yes
-> +  Conceal VM entries from PT               yes
->  Miscellaneous data
-> -  Hex: 0x300481e5
-> -  VMX-preemption timer scale (log2)        5
-> +  Hex: 0x7004c1e7
-> +  VMX-preemption timer scale (log2)        7
->    Store EFER.LMA into IA-32e mode guest control yes
->    HLT activity state                       yes
->    Shutdown activity state                  yes
-> @@ -93,10 +93,10 @@ Miscellaneous data
->    MSR-load/store count recommendation      0
->    IA32_SMM_MONITOR_CTL[2] can be set to 1  yes
->    VMWRITE to VM-exit information fields    yes
-> -  Inject event with insn length=0          no
-> +  Inject event with insn length=0          yes
->    MSEG revision identifier                 0
->  VPID and EPT capabilities
-> -  Hex: 0xf0106334141
-> +  Hex: 0xf0106734141
->    Execute-only EPT translations            yes
->    Page-walk length 4                       yes
->    Paging-structure memory type UC          yes
-> 
-> Maybe the KVM code does not take the latest VMX features into account when
-> importing a userspace nested state?
-> 
-> Jan
-> 
