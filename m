@@ -2,61 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 05160657FB
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 15:40:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0E0365809
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 15:45:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728715AbfGKNkX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 09:40:23 -0400
-Received: from mail-wr1-f41.google.com ([209.85.221.41]:37091 "EHLO
-        mail-wr1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728505AbfGKNkX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 09:40:23 -0400
-Received: by mail-wr1-f41.google.com with SMTP id n9so6370599wrr.4
-        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 06:40:22 -0700 (PDT)
+        id S1728301AbfGKNpQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 09:45:16 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:43753 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726012AbfGKNpQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 09:45:16 -0400
+Received: by mail-wr1-f67.google.com with SMTP id p13so6352739wru.10
+        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 06:45:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=FnSXGXReWdj1dwt4PqYkheiL50PJemd4VIlhtbzAQt8=;
-        b=T7hwRznGhogyo4K3RGwAAt6MNlh31i3gHIt3QCn6D3h37pN9Tr47UI3as6QLawbvRR
-         sFifKHuxULqbrSOqnONYbF57zqf7Wn4G4x0sd1yfImBE4FQkdMa8lkHswPXWFnxjKByx
-         j5m8yneWbEAgtdNBiN2gObEcsAFpRXlI733fTbGh5LkGpIZlMkAi9HQKLOMXXb188U04
-         KdrSg6MYqFfqiorzC4DISoeFtPivebi/9VyWd7GVEDF7zLUHNtQiBDa6CtK5ggyiLnc3
-         +PLWL8D0I9OmOl6N68lG0ee1zVZnBlS6hTIkd0ZXJfxLt/OPEX1QtOwTbXqbMcd1Iv4T
-         C6Rw==
-X-Gm-Message-State: APjAAAVVEkbTPfSQcocei/S1UQFaYwMB6x7E2o9PS0gXusDJo5QPylcO
-        pd9TMrC+b7CNSOO+vcAEVlmyFyvjwCJTJA==
-X-Google-Smtp-Source: APXvYqyShV9fbckDIWGQ0EkgfblduUbng9/MP66ZdhXZaEdrkN9dkmEju62XgU7X98NYyExpOgwWZA==
-X-Received: by 2002:adf:e843:: with SMTP id d3mr5517125wrn.249.1562852421455;
-        Thu, 11 Jul 2019 06:40:21 -0700 (PDT)
+        bh=tNB+Cdder5uir4F/Y1o1Nv0qZI/Q9BfOtg7q5GBmh1s=;
+        b=m/k+LZqBAnx3JnDKMTE9R0k1bls+wgLhV68GKnqA4zMp+IVhi6fcLHq4kCvMwfBGyJ
+         gi+j2ndM7RVF6BrUw+N6DLkRg0lwBwkqGB4/F+bAsNMkRImcgb0OWePL7YKnCwx33U1B
+         HkQeQAZ+F37g/wlT+fngD1j4AYexHe1jrbZJMgMOwZ5AzssBOQrBX7pBor5Mwc4L9XBP
+         ggW/kCquvR8nKUKYCk6vhTQb1Uy6/RcnzjeUVO7Z92zBdAQJUgUZzbaD8/nufYBtpr6t
+         4ECBN0RrMzgJ2VsZNU+fnDHP5+dG5YTTxZ1cD1zHfyMCBSISkGioMLJyrQJTVhczpTx9
+         6ecQ==
+X-Gm-Message-State: APjAAAVg4fkQpW1GnpqjIXLsuepsFeav48k0M1EPqWNYdOwnA8mh5MEO
+        VDt7mzusQ0j/Fdl2+FlqIRj1ndoVgOk=
+X-Google-Smtp-Source: APXvYqzFyb+Jy/hSvo8JhEg2qgu6yKRmj3xzahjZ/U2b9GBadqIjUPYWPxzHnqcBuew+Nte86S5XzA==
+X-Received: by 2002:a5d:55c2:: with SMTP id i2mr5297276wrw.96.1562852714320;
+        Thu, 11 Jul 2019 06:45:14 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab? ([2001:b07:6468:f312:d066:6881:ec69:75ab])
-        by smtp.gmail.com with ESMTPSA id e3sm5300954wrt.93.2019.07.11.06.40.19
+        by smtp.gmail.com with ESMTPSA id y18sm5636707wmi.23.2019.07.11.06.45.13
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 11 Jul 2019 06:40:20 -0700 (PDT)
-Subject: Re: [GIT PULL] KVM/arm updates for Linux 5.3
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Andrew Murray <andrew.murray@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry@arm.com>,
-        Steven Price <steven.price@arm.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-References: <20190709122507.214494-1-marc.zyngier@arm.com>
+        Thu, 11 Jul 2019 06:45:13 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 1/4] target/i386: kvm: Init nested-state for
+ VMX when vCPU expose VMX
+To:     Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
+Cc:     Joao Martins <joao.m.martins@oracle.com>, ehabkost@redhat.com,
+        kvm@vger.kernel.org
+References: <20190705210636.3095-1-liran.alon@oracle.com>
+ <20190705210636.3095-2-liran.alon@oracle.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <7f0bdfc0-d450-5466-ba0f-34c52d872e91@redhat.com>
-Date:   Thu, 11 Jul 2019 15:40:19 +0200
+Message-ID: <805d7eb5-e171-60bb-94c2-574180f5c44c@redhat.com>
+Date:   Thu, 11 Jul 2019 15:45:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190709122507.214494-1-marc.zyngier@arm.com>
+In-Reply-To: <20190705210636.3095-2-liran.alon@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -65,9 +56,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/07/19 14:24, Marc Zyngier wrote:
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-5.3
+On 05/07/19 23:06, Liran Alon wrote:
+> -        if (IS_INTEL_CPU(env)) {
+> +        if (cpu_has_vmx(env)) {
+>              struct kvm_vmx_nested_state_hdr *vmx_hdr =
+>                  &env->nested_state->hdr.vmx;
+>  
 
-Pulled, thanks!
+I am not sure this is enough, because kvm_get_nested_state and kvm_put_nested_state would run anyway later.  If we want to cull them completely for a non-VMX virtual machine, I'd do something like this:
+
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 5035092..73ab102 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1748,14 +1748,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     max_nested_state_len = kvm_max_nested_state_length();
+     if (max_nested_state_len > 0) {
+         assert(max_nested_state_len >= offsetof(struct kvm_nested_state, data));
+-        env->nested_state = g_malloc0(max_nested_state_len);
+ 
+-        env->nested_state->size = max_nested_state_len;
+-
+-        if (IS_INTEL_CPU(env)) {
++        if (cpu_has_vmx(env)) {
+             struct kvm_vmx_nested_state_hdr *vmx_hdr =
+                 &env->nested_state->hdr.vmx;
+ 
++            env->nested_state = g_malloc0(max_nested_state_len);
++            env->nested_state->size = max_nested_state_len;
+             env->nested_state->format = KVM_STATE_NESTED_FORMAT_VMX;
+             vmx_hdr->vmxon_pa = -1ull;
+             vmx_hdr->vmcs12_pa = -1ull;
+@@ -3682,7 +3681,7 @@ static int kvm_put_nested_state(X86CPU *cpu)
+     CPUX86State *env = &cpu->env;
+     int max_nested_state_len = kvm_max_nested_state_length();
+ 
+-    if (max_nested_state_len <= 0) {
++    if (!env->nested_state) {
+         return 0;
+     }
+ 
+@@ -3696,7 +3695,7 @@ static int kvm_get_nested_state(X86CPU *cpu)
+     int max_nested_state_len = kvm_max_nested_state_length();
+     int ret;
+ 
+-    if (max_nested_state_len <= 0) {
++    if (!env->nested_state) {
+         return 0;
+     }
+ 
+
+What do you think?  (As a side effect, this completely disables
+KVM_GET/SET_NESTED_STATE on SVM, which I think is safer since it
+will have to save at least the NPT root and the paging mode.  So we
+could remove vmstate_svm_nested_state as well).
 
 Paolo
