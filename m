@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C705E658D7
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 16:28:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4426658F7
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 16:29:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729082AbfGKO2q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 10:28:46 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:38288 "EHLO
+        id S1728808AbfGKO1y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 10:27:54 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:37316 "EHLO
         userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729074AbfGKO2q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 10:28:46 -0400
+        with ESMTP id S1728823AbfGKO1y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 10:27:54 -0400
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6BEOKHZ001595;
-        Thu, 11 Jul 2019 14:26:25 GMT
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6BEOAvB001518;
+        Thu, 11 Jul 2019 14:26:29 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=gDByh8p+inBGj8eNOkt+0s0ErRCor6nCeXzUp1uJmZ0=;
- b=uIvYew5i+/N3gKnyr4ociYqq+qt56BKvpfHx2yG6ELbiXTDFF1FnRFdNiTxKLqzKpugT
- 7rZFZ27tp3XeOzJIDBEQWKZlGMdD04zWtCMR9kz9rtKT/I1eEKjmUoR0EfXOS4LZP41X
- SaOmMD0h5rmiZKjuWODlCFnTwFv/w3OU84qMp7I8vBQjvkB4kLSw+vU/HUfR9FiS4qmM
- dt9lswqhmPEYZvrjigJDb4qNQfKlbGFfmUQluSi/uyNCjdt/jH+m3QqAeoRgbBE5SECi
- sbhB6HhXJDdRZ5C1Vh+uI9HzCIOa4DMf+C+kQvxHt3TG4Fqj9spPHDE/SpvfNokpoD2Z Tw== 
+ bh=Ag0k+tMlXoCUCjgmP3NxD1Cl4FnNgcaLg1SLsqSglmA=;
+ b=keVQsRLhZyNb/dFJnnzguyu+6Vl7qT1iW80eQJUi6p8HUYNezOn2M6QRB0NcNQhQI7JT
+ 5HACwzQ7vK/fKkmWqNIFxS0mv8uBEA1J5s9pHNXY/wHvMqw/x77ya8pCk5djXXg3w8tA
+ Y+DFHNzDwpT4d81yj2dhIMIFubn8ssOAMPMn8hTz8Cg2l5maUEKHDpqBF2nYVJbVIius
+ zq+q7wJ21XaxrzeREUMqbHN8popuelxmyOtwjWh5plKHWNmsE8C4KEMn9NIt7tf3KMir
+ nsOpTlKGCKH8e0WHGLCVGvgf9UFWaCxJYPAxRKOlsGhf5idexkvlsNaYd43tN8SZVOoQ SA== 
 Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
-        by userp2130.oracle.com with ESMTP id 2tjk2u0dyd-1
+        by userp2130.oracle.com with ESMTP id 2tjk2u0dyw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Jul 2019 14:26:25 +0000
+        Thu, 11 Jul 2019 14:26:28 +0000
 Received: from achartre-desktop.fr.oracle.com (dhcp-10-166-106-34.fr.oracle.com [10.166.106.34])
-        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x6BEPcu5021444;
-        Thu, 11 Jul 2019 14:26:21 GMT
+        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x6BEPcu6021444;
+        Thu, 11 Jul 2019 14:26:25 GMT
 From:   Alexandre Chartre <alexandre.chartre@oracle.com>
 To:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
@@ -38,16 +38,16 @@ To:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
 Cc:     konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
         liran.alon@oracle.com, jwadams@google.com, graf@amazon.de,
         rppt@linux.vnet.ibm.com, alexandre.chartre@oracle.com
-Subject: [RFC v2 12/26] mm/asi: Function to copy page-table entries for percpu buffer
-Date:   Thu, 11 Jul 2019 16:25:24 +0200
-Message-Id: <1562855138-19507-13-git-send-email-alexandre.chartre@oracle.com>
+Subject: [RFC v2 13/26] mm/asi: Add asi_remap() function
+Date:   Thu, 11 Jul 2019 16:25:25 +0200
+Message-Id: <1562855138-19507-14-git-send-email-alexandre.chartre@oracle.com>
 X-Mailer: git-send-email 1.7.1
 In-Reply-To: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
 References: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9314 signatures=668688
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
  suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=895 adultscore=0
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=832 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1907110162
 Sender: kvm-owner@vger.kernel.org
@@ -55,79 +55,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Provide functions to copy page-table entries from the kernel page-table
-to an ASI page-table for a percpu buffer. A percpu buffer have a different
-VA range for each cpu and all them have to be copied.
+Add a function to remap an already mapped buffer with a new address
+in an ASI page-table: the already mapped buffer is unmapped, and a
+new mapping is added for the specified new address.
+
+This is useful to track and remap a buffer which can be freed and
+then reallocated.
 
 Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
 ---
- arch/x86/include/asm/asi.h  |    6 ++++++
- arch/x86/mm/asi_pagetable.c |   38 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 44 insertions(+), 0 deletions(-)
+ arch/x86/include/asm/asi.h  |    1 +
+ arch/x86/mm/asi_pagetable.c |   25 +++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+), 0 deletions(-)
 
 diff --git a/arch/x86/include/asm/asi.h b/arch/x86/include/asm/asi.h
-index 919129f..912b6a7 100644
+index 912b6a7..cf5d198 100644
 --- a/arch/x86/include/asm/asi.h
 +++ b/arch/x86/include/asm/asi.h
-@@ -105,6 +105,12 @@ static inline int asi_map_module(struct asi *asi, char *module_name)
- 	return asi_map(asi, module->core_layout.base, module->core_layout.size);
- }
+@@ -84,6 +84,7 @@ extern int asi_map_range(struct asi *asi, void *ptr, size_t size,
+ 			 enum page_table_level level);
+ extern int asi_map(struct asi *asi, void *ptr, unsigned long size);
+ extern void asi_unmap(struct asi *asi, void *ptr);
++extern int asi_remap(struct asi *asi, void **mapping, void *ptr, size_t size);
  
-+#define	ASI_MAP_CPUVAR(asi, cpuvar)	\
-+	asi_map_percpu(asi, &cpuvar, sizeof(cpuvar))
-+
-+extern int asi_map_percpu(struct asi *asi, void *percpu_ptr, size_t size);
-+extern void asi_unmap_percpu(struct asi *asi, void *percpu_ptr);
-+
  /*
-  * Function to exit the current isolation. This is used to abort isolation
-  * when a task using isolation is scheduled out.
+  * Copy the memory mapping for the current module. This is defined as a
 diff --git a/arch/x86/mm/asi_pagetable.c b/arch/x86/mm/asi_pagetable.c
-index 7aee236..a4fe867 100644
+index a4fe867..1ff0c47 100644
 --- a/arch/x86/mm/asi_pagetable.c
 +++ b/arch/x86/mm/asi_pagetable.c
-@@ -804,3 +804,41 @@ void asi_unmap(struct asi *asi, void *ptr)
- 	spin_unlock_irqrestore(&asi->lock, flags);
+@@ -842,3 +842,28 @@ int asi_map_percpu(struct asi *asi, void *percpu_ptr, size_t size)
+ 	return 0;
  }
- EXPORT_SYMBOL(asi_unmap);
+ EXPORT_SYMBOL(asi_map_percpu);
 +
-+void asi_unmap_percpu(struct asi *asi, void *percpu_ptr)
++int asi_remap(struct asi *asi, void **current_ptrp, void *new_ptr, size_t size)
 +{
-+	void *ptr;
-+	int cpu;
++	void *current_ptr = *current_ptrp;
++	int err;
 +
-+	pr_debug("ASI %p: UNMAP PERCPU %px\n", asi, percpu_ptr);
-+	for_each_possible_cpu(cpu) {
-+		ptr = per_cpu_ptr(percpu_ptr, cpu);
-+		pr_debug("ASI %p: UNMAP PERCPU%d %px\n", asi, cpu, ptr);
-+		asi_unmap(asi, ptr);
++	if (current_ptr == new_ptr) {
++		/* no change, already mapped */
++		return 0;
 +	}
-+}
-+EXPORT_SYMBOL(asi_unmap_percpu);
 +
-+int asi_map_percpu(struct asi *asi, void *percpu_ptr, size_t size)
-+{
-+	int cpu, err;
-+	void *ptr;
-+
-+	pr_debug("ASI %p: MAP PERCPU %px\n", asi, percpu_ptr);
-+	for_each_possible_cpu(cpu) {
-+		ptr = per_cpu_ptr(percpu_ptr, cpu);
-+		pr_debug("ASI %p: MAP PERCPU%d %px\n", asi, cpu, ptr);
-+		err = asi_map(asi, ptr, size);
-+		if (err) {
-+			/*
-+			 * Need to unmap any percpu mapping which has
-+			 * succeeded before the failure.
-+			 */
-+			asi_unmap_percpu(asi, percpu_ptr);
-+			return err;
-+		}
++	if (current_ptr) {
++		asi_unmap(asi, current_ptr);
++		*current_ptrp = NULL;
 +	}
++
++	err = asi_map(asi, new_ptr, size);
++	if (err)
++		return err;
++
++	*current_ptrp = new_ptr;
 +
 +	return 0;
 +}
-+EXPORT_SYMBOL(asi_map_percpu);
++EXPORT_SYMBOL(asi_remap);
 -- 
 1.7.1
 
