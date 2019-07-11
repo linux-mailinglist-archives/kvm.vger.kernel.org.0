@@ -2,77 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B6592657C6
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 15:17:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E3308657DC
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 15:25:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728546AbfGKNRF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 09:17:05 -0400
-Received: from foss.arm.com ([217.140.110.172]:46022 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728219AbfGKNRF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 09:17:05 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 279D52B;
-        Thu, 11 Jul 2019 06:17:05 -0700 (PDT)
-Received: from [10.1.196.217] (e121566-lin.cambridge.arm.com [10.1.196.217])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4D6103F59C;
-        Thu, 11 Jul 2019 06:17:04 -0700 (PDT)
-Subject: Re: [PATCH 48/59] KVM: arm64: nv: Load timer before the GIC
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-49-marc.zyngier@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <ca6b0bf9-078f-fcc4-e689-46490153cc3f@arm.com>
-Date:   Thu, 11 Jul 2019 14:17:03 +0100
+        id S1728406AbfGKNZR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 09:25:17 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44969 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728161AbfGKNZQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 09:25:16 -0400
+Received: by mail-wr1-f68.google.com with SMTP id p17so6275926wrf.11
+        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 06:25:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=NiPzgCya2hoSH4eKrxi8qdW5Qk89gH2cnlBBWoaa/xg=;
+        b=hjUpgRxhJOZg5Nl7cpx6IDDqn1PHUiJIcVdu66kQtDcZSmk4QMIutRMV8IwdowyVz6
+         HbCSuCYsrX01SqbmIjr8qwn8jf0WNy0UqHXbJ4lC/pOlrOE9bwXitU5Waj4Q6uKzjZma
+         dpqhXuwTAQst5tZhAfqFaG5NDNF8kcTxsZ5P0hWqM67QZKS7XratjFHzbGNsfElyMGZa
+         mcvd/IwDrbccAjjPFu+AC79dpIXokveJabdVHLnK64GbcehGOI4TvzwfKbJKGAd+B1sX
+         TeQT9stPdpVxGv3ltfud4mE6JQzJD0ziqplUdmORCeSfuz/BaU408IowsigbA4f7slLK
+         0jXQ==
+X-Gm-Message-State: APjAAAWeipqMInACG12OQnG1tK7oLTsOdVYTDjRV/HiimV1RqomtQ+HU
+        uK9wJgxQcyVzWZWsdCn08Pm1NOGCSeY=
+X-Google-Smtp-Source: APXvYqxwk8GF3EpHoEhDlHvKnuLbWejXVJYdh2lNTENdeBRa32LLelWUbAycMad3uNrwe2Sr84lu1Q==
+X-Received: by 2002:adf:b1cb:: with SMTP id r11mr5074310wra.328.1562851514545;
+        Thu, 11 Jul 2019 06:25:14 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab? ([2001:b07:6468:f312:d066:6881:ec69:75ab])
+        by smtp.gmail.com with ESMTPSA id t1sm7823335wra.74.2019.07.11.06.25.13
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 11 Jul 2019 06:25:13 -0700 (PDT)
+Subject: Re: [PATCH v6 2/3] KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
+To:     Tao Xu <tao3.xu@intel.com>, rkrcmar@redhat.com, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        sean.j.christopherson@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        fenghua.yu@intel.com, xiaoyao.li@linux.intel.com,
+        jingqi.liu@intel.com
+References: <20190621055747.17060-1-tao3.xu@intel.com>
+ <20190621055747.17060-3-tao3.xu@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <43814a5e-12bf-ceb5-e4fb-12bbb32cd4cb@redhat.com>
+Date:   Thu, 11 Jul 2019 15:25:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190621093843.220980-49-marc.zyngier@arm.com>
+In-Reply-To: <20190621055747.17060-3-tao3.xu@intel.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/21/19 10:38 AM, Marc Zyngier wrote:
-> In order for vgic_v3_load_nested to be able to observe which
-> which timer interrupts have the HW bit set for the current
+On 21/06/19 07:57, Tao Xu wrote:
+> +	if (guest_cpuid_has(vcpu, X86_FEATURE_WAITPKG))
+> +		atomic_switch_umwait_control_msr(vmx);
+> +
 
-s/which which/which
+guest_cpuid_has is slow.  Please replace it with a test on
+secondary_exec_controls_get(vmx).
 
-> context, the timers must have been loaded in the new mode
-> and the right timer mapped to their corresponding HW IRQs.
->
-> At the moment, we load the GIC first, meaning that timer
-> interrupts injected to an L2 guest will never have the HW
-> HW bit set (we see the old configuration).
+Are you going to look into nested virtualization support?  This should
+include only 1) allowing setting the enable bit in secondary execution
+controls, and passing it through in prepare_vmcs02_early; 2) reflecting
+the vmexit in nested_vmx_exit_reflected.
 
-s/HW HW/HW
+Thanks,
 
-> Swapping the two loads solves this particular problem.
->
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  virt/kvm/arm/arm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/virt/kvm/arm/arm.c b/virt/kvm/arm/arm.c
-> index e8b584b79847..ca10a11e044e 100644
-> --- a/virt/kvm/arm/arm.c
-> +++ b/virt/kvm/arm/arm.c
-> @@ -361,8 +361,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	vcpu->arch.host_cpu_context = &cpu_data->host_ctxt;
->  
->  	kvm_arm_set_running_vcpu(vcpu);
-> -	kvm_vgic_load(vcpu);
->  	kvm_timer_vcpu_load(vcpu);
-> +	kvm_vgic_load(vcpu);
->  	kvm_vcpu_load_sysregs(vcpu);
->  	kvm_arch_vcpu_load_fp(vcpu);
->  	kvm_vcpu_pmu_restore_guest(vcpu);
+Paolo
