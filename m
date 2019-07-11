@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C95986560B
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 13:51:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8114B6560E
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 13:51:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728534AbfGKLvH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 07:51:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59276 "EHLO mx1.redhat.com"
+        id S1728550AbfGKLvN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 07:51:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59402 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728287AbfGKLvG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 07:51:06 -0400
+        id S1728287AbfGKLvN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 07:51:13 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 051B481F12;
-        Thu, 11 Jul 2019 11:51:06 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id E5CFC81DE0;
+        Thu, 11 Jul 2019 11:51:12 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-46.ams2.redhat.com [10.36.116.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7B39D600CD;
-        Thu, 11 Jul 2019 11:50:59 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 716CB6014E;
+        Thu, 11 Jul 2019 11:51:06 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
@@ -29,165 +29,123 @@ To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
 Cc:     kevin.tian@intel.com, ashok.raj@intel.com, marc.zyngier@arm.com,
         peter.maydell@linaro.org, vincent.stehle@arm.com,
         zhangfei.gao@gmail.com
-Subject: [PATCH v9 08/14] iommu/smmuv3: Introduce __arm_smmu_tlb_inv_asid/s1_range_nosync
-Date:   Thu, 11 Jul 2019 13:49:53 +0200
-Message-Id: <20190711114959.15675-9-eric.auger@redhat.com>
+Subject: [PATCH v9 09/14] iommu/smmuv3: Implement cache_invalidate
+Date:   Thu, 11 Jul 2019 13:49:54 +0200
+Message-Id: <20190711114959.15675-10-eric.auger@redhat.com>
 In-Reply-To: <20190711114959.15675-1-eric.auger@redhat.com>
 References: <20190711114959.15675-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Thu, 11 Jul 2019 11:51:06 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Thu, 11 Jul 2019 11:51:13 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce helpers to invalidate a given asid/vmid or invalidate
-address ranges associated to a given asid/vmid.
-
-S1 helpers will be used to invalidate stage 1 caches upon
-userspace request, in nested mode.
+Implement domain-selective and page-selective IOTLB invalidations.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
+v7 -> v8:
+- ASID based invalidation using iommu_inv_pasid_info
+- check ARCHID/PASID flags in addr based invalidation
+- use __arm_smmu_tlb_inv_context and __arm_smmu_tlb_inv_range_nosync
+
+v6 -> v7
+- check the uapi version
+
+v3 -> v4:
+- adapt to changes in the uapi
+- add support for leaf parameter
+- do not use arm_smmu_tlb_inv_range_nosync or arm_smmu_tlb_inv_context
+  anymore
+
+v2 -> v3:
+- replace __arm_smmu_tlb_sync by arm_smmu_cmdq_issue_sync
+
+v1 -> v2:
+- properly pass the asid
 ---
- drivers/iommu/arm-smmu-v3.c | 98 ++++++++++++++++++++++++++++---------
- 1 file changed, 74 insertions(+), 24 deletions(-)
+ drivers/iommu/arm-smmu-v3.c | 57 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
 diff --git a/drivers/iommu/arm-smmu-v3.c b/drivers/iommu/arm-smmu-v3.c
-index 8785f26e669c..8b3c35ea58b2 100644
+index 8b3c35ea58b2..9b4654e2f25c 100644
 --- a/drivers/iommu/arm-smmu-v3.c
 +++ b/drivers/iommu/arm-smmu-v3.c
-@@ -1611,20 +1611,15 @@ static void arm_smmu_tlb_sync(void *cookie)
- 	arm_smmu_cmdq_issue_sync(smmu_domain->smmu);
+@@ -2575,6 +2575,62 @@ static void arm_smmu_detach_pasid_table(struct iommu_domain *domain)
+ 	mutex_unlock(&smmu_domain->init_mutex);
  }
  
--static void arm_smmu_tlb_inv_context(void *cookie)
-+static void __arm_smmu_tlb_inv_asid(struct arm_smmu_domain *smmu_domain,
-+				    u16 vmid, u16 asid)
- {
--	struct arm_smmu_domain *smmu_domain = cookie;
- 	struct arm_smmu_device *smmu = smmu_domain->smmu;
--	struct arm_smmu_cmdq_ent cmd;
-+	struct arm_smmu_cmdq_ent cmd = {};
- 
--	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
--		cmd.opcode	= CMDQ_OP_TLBI_NH_ASID;
--		cmd.tlbi.asid	= smmu_domain->s1_cfg->cd.asid;
--		cmd.tlbi.vmid	= 0;
--	} else {
--		cmd.opcode	= CMDQ_OP_TLBI_S12_VMALL;
--		cmd.tlbi.vmid	= smmu_domain->s2_cfg->vmid;
--	}
-+	cmd.opcode	= CMDQ_OP_TLBI_NH_ASID;
-+	cmd.tlbi.vmid	= vmid;
-+	cmd.tlbi.asid	= asid;
- 
- 	/*
- 	 * NOTE: when io-pgtable is in non-strict mode, we may get here with
-@@ -1636,32 +1631,87 @@ static void arm_smmu_tlb_inv_context(void *cookie)
- 	arm_smmu_cmdq_issue_sync(smmu);
- }
- 
--static void arm_smmu_tlb_inv_range_nosync(unsigned long iova, size_t size,
--					  size_t granule, bool leaf, void *cookie)
-+static void __arm_smmu_tlb_inv_vmid(struct arm_smmu_domain *smmu_domain,
-+				    u16 vmid)
++static int
++arm_smmu_cache_invalidate(struct iommu_domain *domain, struct device *dev,
++			  struct iommu_cache_invalidate_info *inv_info)
 +{
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
 +	struct arm_smmu_device *smmu = smmu_domain->smmu;
-+	struct arm_smmu_cmdq_ent cmd = {};
 +
-+	cmd.opcode	= CMDQ_OP_TLBI_S12_VMALL;
-+	cmd.tlbi.vmid	= vmid;
++	if (smmu_domain->stage != ARM_SMMU_DOMAIN_NESTED)
++		return -EINVAL;
 +
-+	/* See DSB related comment in __arm_smmu_tlb_inv_asid */
-+	arm_smmu_cmdq_issue_cmd(smmu, &cmd);
-+	arm_smmu_cmdq_issue_sync(smmu);
-+}
++	if (!smmu)
++		return -EINVAL;
 +
-+static void arm_smmu_tlb_inv_context(void *cookie)
- {
- 	struct arm_smmu_domain *smmu_domain = cookie;
--	struct arm_smmu_device *smmu = smmu_domain->smmu;
--	struct arm_smmu_cmdq_ent cmd = {
--		.tlbi = {
--			.leaf	= leaf,
--			.addr	= iova,
--		},
--	};
- 
- 	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
--		cmd.opcode	= CMDQ_OP_TLBI_NH_VA;
--		cmd.tlbi.asid	= smmu_domain->s1_cfg->cd.asid;
-+		__arm_smmu_tlb_inv_asid(smmu_domain, 0,
-+					smmu_domain->s1_cfg->cd.asid);
- 	} else {
--		cmd.opcode	= CMDQ_OP_TLBI_S2_IPA;
--		cmd.tlbi.vmid	= smmu_domain->s2_cfg->vmid;
-+		__arm_smmu_tlb_inv_vmid(smmu_domain,
-+					smmu_domain->s2_cfg->vmid);
- 	}
-+}
- 
-+static void
-+__arm_smmu_tlb_inv_s1_range_nosync(struct arm_smmu_domain *smmu_domain,
-+				   u16 vmid, u16 asid, unsigned long iova,
-+				   size_t size, size_t granule, bool leaf)
-+{
-+	struct arm_smmu_device *smmu = smmu_domain->smmu;
-+	struct arm_smmu_cmdq_ent cmd = {};
++	if (inv_info->version != IOMMU_CACHE_INVALIDATE_INFO_VERSION_1)
++		return -EINVAL;
 +
-+	cmd.opcode	= CMDQ_OP_TLBI_NH_VA;
-+	cmd.tlbi.vmid	= vmid;
-+	cmd.tlbi.asid	= asid;
-+	cmd.tlbi.addr	= iova;
-+	cmd.tlbi.leaf	= leaf;
- 	do {
- 		arm_smmu_cmdq_issue_cmd(smmu, &cmd);
- 		cmd.tlbi.addr += granule;
- 	} while (size -= granule);
- }
- 
-+static void
-+__arm_smmu_tlb_inv_s2_range_nosync(struct arm_smmu_domain *smmu_domain,
-+				   u16 vmid, unsigned long iova, size_t size,
-+				   size_t granule, bool leaf)
-+{
-+	struct arm_smmu_device *smmu = smmu_domain->smmu;
-+	struct arm_smmu_cmdq_ent cmd = {};
++	if (inv_info->cache & IOMMU_CACHE_INV_TYPE_IOTLB) {
++		if (inv_info->granularity == IOMMU_INV_GRANU_PASID) {
++			struct iommu_inv_pasid_info *info =
++				&inv_info->pasid_info;
 +
-+	cmd.opcode	= CMDQ_OP_TLBI_S2_IPA;
-+	cmd.tlbi.vmid	= vmid;
-+	cmd.tlbi.addr	= iova;
-+	cmd.tlbi.leaf	= leaf;
-+	do {
-+		arm_smmu_cmdq_issue_cmd(smmu, &cmd);
-+		cmd.tlbi.addr += granule;
-+	} while (size -= granule);
-+}
++			if (!(info->flags & IOMMU_INV_PASID_FLAGS_ARCHID) ||
++			     (info->flags & IOMMU_INV_PASID_FLAGS_PASID))
++				return -EINVAL;
 +
-+static void arm_smmu_tlb_inv_range_nosync(unsigned long iova, size_t size,
-+					  size_t granule, bool leaf,
-+					  void *cookie)
-+{
-+	struct arm_smmu_domain *smmu_domain = cookie;
++			__arm_smmu_tlb_inv_asid(smmu_domain,
++						smmu_domain->s2_cfg->vmid,
++						info->archid);
 +
-+	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
-+		__arm_smmu_tlb_inv_s1_range_nosync(smmu_domain, 0,
-+						   smmu_domain->s1_cfg->cd.asid,
-+						   iova, size, granule, leaf);
-+	} else {
-+		__arm_smmu_tlb_inv_s2_range_nosync(smmu_domain,
-+						   smmu_domain->s2_cfg->vmid,
-+						   iova, size, granule, leaf);
++		} else if (inv_info->granularity == IOMMU_INV_GRANU_ADDR) {
++			struct iommu_inv_addr_info *info = &inv_info->addr_info;
++			size_t size = info->nb_granules * info->granule_size;
++			bool leaf = info->flags & IOMMU_INV_ADDR_FLAGS_LEAF;
++
++			if (!(info->flags & IOMMU_INV_ADDR_FLAGS_ARCHID) ||
++			     (info->flags & IOMMU_INV_ADDR_FLAGS_PASID))
++				return -EINVAL;
++
++			__arm_smmu_tlb_inv_s1_range_nosync(smmu_domain,
++							   smmu_domain->s2_cfg->vmid,
++							   info->archid,
++							   info->addr, size,
++							   info->granule_size,
++							   leaf);
++			arm_smmu_cmdq_issue_sync(smmu);
++		} else {
++			return -EINVAL;
++		}
 +	}
++	if (inv_info->cache & IOMMU_CACHE_INV_TYPE_PASID ||
++	    inv_info->cache & IOMMU_CACHE_INV_TYPE_DEV_IOTLB) {
++		return -ENOENT;
++	}
++	return 0;
 +}
 +
- static const struct iommu_gather_ops arm_smmu_gather_ops = {
- 	.tlb_flush_all	= arm_smmu_tlb_inv_context,
- 	.tlb_add_flush	= arm_smmu_tlb_inv_range_nosync,
+ static struct iommu_ops arm_smmu_ops = {
+ 	.capable		= arm_smmu_capable,
+ 	.domain_alloc		= arm_smmu_domain_alloc,
+@@ -2595,6 +2651,7 @@ static struct iommu_ops arm_smmu_ops = {
+ 	.put_resv_regions	= arm_smmu_put_resv_regions,
+ 	.attach_pasid_table	= arm_smmu_attach_pasid_table,
+ 	.detach_pasid_table	= arm_smmu_detach_pasid_table,
++	.cache_invalidate	= arm_smmu_cache_invalidate,
+ 	.pgsize_bitmap		= -1UL, /* Restricted during device attach */
+ };
+ 
 -- 
 2.20.1
 
