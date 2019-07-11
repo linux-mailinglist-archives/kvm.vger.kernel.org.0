@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C4F364FBF
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 03:04:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E2C5564FCE
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 03:13:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727796AbfGKBEB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jul 2019 21:04:01 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:36120 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726708AbfGKBEB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jul 2019 21:04:01 -0400
-Received: by mail-pl1-f195.google.com with SMTP id k8so2097142plt.3
-        for <kvm@vger.kernel.org>; Wed, 10 Jul 2019 18:04:00 -0700 (PDT)
+        id S1727594AbfGKBNT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jul 2019 21:13:19 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:37257 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726627AbfGKBNS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jul 2019 21:13:18 -0400
+Received: by mail-pf1-f196.google.com with SMTP id 19so1918396pfa.4
+        for <kvm@vger.kernel.org>; Wed, 10 Jul 2019 18:13:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:date:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=fD6QrnL9oHHFPFtLusHVcNMqwsdqi93+7m3pWRWe2s8=;
-        b=OmREyHE/vS8RACDp7nfPVFJxeMo6n+DhbQRwh/70hPM6ZhmkIsNdg6xYzjzLNcVmra
-         7Io9wc9iD2ymuSg/I6kkwUpB/wgZGNtPc9SJ9xjbQV2aV72iZ6zNAhBQtnen9ryhQS7c
-         b4Q4AihV7Pq18F3eHJZFnkCfnABIi724FZWb0XJ5KiatdQAeq13W3x2k4fVuG+fR0Ud1
-         jO1NdbxIsC3g2Hqfl24YMT3b+0Ca5GnxM1m9rHVZLGpHdfKBi6TDTbHeEmxo4cTt+dpl
-         fDwdazfazJt/NzEQGjSQNT9JRBjwqcuutdcFsK9em+6cOVHiAp5ssrRHw9cFDNqLuVFT
-         ebqA==
-X-Gm-Message-State: APjAAAW427WQjZZiOEMqTkHGHvF0W2Ssd95Ud3SghEUBo7BnebRGf2ae
-        UKlvF6gEWrExoTxMxUhnWNx7pw==
-X-Google-Smtp-Source: APXvYqyCzj3Ow36pVMoJgAeUfO45i99Sl9Gp3cv1U5/TSFiHBQCKnNYZufh1nW0FOEG9+pSu6ATocA==
-X-Received: by 2002:a17:902:76c7:: with SMTP id j7mr886064plt.247.1562807040379;
-        Wed, 10 Jul 2019 18:04:00 -0700 (PDT)
+        bh=RVtvtLW+hA55JDckJ1iLViBZ1ankqgmMr3VovL92Bc4=;
+        b=ommTR3wmF5ms6iGM5yq1rC7CW0jqLJugYi5jz2Y3bEi+IRq/6VGKn2J1IRcnoVOHAZ
+         3BgV67mm4SCO/N8vubdt3hfVET1e7+rNxvcqNdHE/EIk/toTV7vcPOBOkNSFuL1y9JHr
+         J7VGB2LyHLgkEbpP0/LbMWBAu3RHWeS+JEA8lJxze8Xg8qYSMVErCOBGoPhs1KPdj+1H
+         Wd+iphfmoYsmCR0LaFH05LIBWzkyXc6gP6aGlbUwtU6ZuNaorw8tUmTtpVPSe4s3Wbru
+         Jpb1rqm+3KO53O7LhcgpLPgFnJWaPoSG2vB4jVR2Qjypo6TfDBJ9eTMUFIzHUNvPCSh4
+         pPOw==
+X-Gm-Message-State: APjAAAXsLGsHaTz92lx8RAlBQROG2WhLK7ud3GCbYhQ2uCSL8ppDg1v4
+        sxr5sAgv0c+dUd0mbGojEn8pOA==
+X-Google-Smtp-Source: APXvYqxMrVVklNqbVKOTAv5bfnU/VrZIKRnGvwuMCvMVJRLDiPbKxiptG5r1+GRR16h0APaabi9Mew==
+X-Received: by 2002:a63:ad07:: with SMTP id g7mr1203863pgf.405.1562807598198;
+        Wed, 10 Jul 2019 18:13:18 -0700 (PDT)
 Received: from xz-x1 ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id 195sm4114394pfu.75.2019.07.10.18.03.54
+        by smtp.gmail.com with ESMTPSA id f14sm3326411pfn.53.2019.07.10.18.13.12
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 10 Jul 2019 18:03:58 -0700 (PDT)
+        Wed, 10 Jul 2019 18:13:16 -0700 (PDT)
 From:   Peter Xu <zhexu@redhat.com>
 X-Google-Original-From: Peter Xu <peterx@redhat.com>
-Date:   Thu, 11 Jul 2019 09:03:47 +0800
+Date:   Thu, 11 Jul 2019 09:13:05 +0800
 To:     "Liu, Yi L" <yi.l.liu@intel.com>
 Cc:     Peter Xu <zhexu@redhat.com>,
         "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
@@ -44,105 +44,90 @@ Cc:     Peter Xu <zhexu@redhat.com>,
         "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
         "eric.auger@redhat.com" <eric.auger@redhat.com>,
         "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "tianyu.lan@intel.com" <tianyu.lan@intel.com>,
         "Tian, Kevin" <kevin.tian@intel.com>,
         "Tian, Jun J" <jun.j.tian@intel.com>,
         "Sun, Yi Y" <yi.y.sun@intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         Jacob Pan <jacob.jun.pan@linux.intel.com>,
         Yi Sun <yi.y.sun@linux.intel.com>
-Subject: Re: [RFC v1 04/18] intel_iommu: add "sm_model" option
-Message-ID: <20190711010347.GI5178@xz-x1>
+Subject: Re: [RFC v1 06/18] intel_iommu: support virtual command emulation
+ and pasid request
+Message-ID: <20190711011305.GJ5178@xz-x1>
 References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
- <1562324511-2910-5-git-send-email-yi.l.liu@intel.com>
- <20190709021554.GB5178@xz-x1>
- <A2975661238FB949B60364EF0F2C257439F2A6D3@SHSMSX104.ccr.corp.intel.com>
+ <1562324511-2910-7-git-send-email-yi.l.liu@intel.com>
+ <20190709031902.GD5178@xz-x1>
+ <A2975661238FB949B60364EF0F2C257439F2A65F@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C257439F2A6D3@SHSMSX104.ccr.corp.intel.com>
+In-Reply-To: <A2975661238FB949B60364EF0F2C257439F2A65F@SHSMSX104.ccr.corp.intel.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 10, 2019 at 12:14:44PM +0000, Liu, Yi L wrote:
-> > From: Peter Xu [mailto:zhexu@redhat.com]
-> > Sent: Tuesday, July 9, 2019 10:16 AM
-> > To: Liu, Yi L <yi.l.liu@intel.com>
-> > Subject: Re: [RFC v1 04/18] intel_iommu: add "sm_model" option
+On Wed, Jul 10, 2019 at 11:51:17AM +0000, Liu, Yi L wrote:
+
+[...]
+
+> > > +        s->vcrsp = 1;
+> > > +        vtd_set_quad_raw(s, DMAR_VCRSP_REG,
+> > > +                         ((uint64_t) s->vcrsp));
 > > 
-> > On Fri, Jul 05, 2019 at 07:01:37PM +0800, Liu Yi L wrote:
-> > > Intel VT-d 3.0 introduces scalable mode, and it has a bunch of
-> > > capabilities related to scalable mode translation, thus there
-> > > are multiple combinations. While this vIOMMU implementation
-> > > wants simplify it for user by providing typical combinations.
-> > > User could config it by "sm_model" option. The usage is as
-> > > below:
-> > >
-> > > "-device intel-iommu,x-scalable-mode=on,sm_model=["legacy"|"scalable"]"
+> > Do we really need to emulate the "In Progress" like this?  The vcpu is
+> > blocked here after all, and AFAICT all the rest of vcpus should not
+> > access these registers because obviously these registers cannot be
+> > accessed concurrently...
+> 
+> Other vcpus should poll the IP bit before submitting vcmds. As IP bit
+> is set, other vcpus will not access these bits. but if not, they may submit
+> new vcmds, while we only have 1 response register, that is not we
+> support. That's why we need to set IP bit.
+
+I still don't think another CPU can use this register even if it
+polled with IP==0...  The reason is simply as you described - we only
+have one pair of VCMD/VRSPD registers so IMHO the guest IOMMU driver
+must have a lock (probably a mutex) to guarantee sequential access of
+these registers otherwise race can happen.
+
+> 
 > > 
-> > Is it a requirement to split into two parameters, instead of just
-> > exposing everything about scalable mode when x-scalable-mode is set?
+> > I think the IP bit is useful when some new vcmd would take plenty of
+> > time so that we can do the long vcmds in async way.  However here it
+> > seems not the case?
 > 
-> yes, it is. Scalable mode has multiple capabilities. And we want to support
-> the most typical combinations to simplify software. e.g. current scalable mode
-> vIOMMU exposes only 2nd level translation to guest, and guest IOVA support
-> is via shadowing guest 2nd level page table. We have plan to move IOVA from
-> 2nd level page table to 1st level page table, thus guest IOVA can be supported
-> with nested translation. And this also addresses the co-existence issue of guest
-> SVA and guest IOVA. So in future we will have scalable mode vIOMMU expose
-> 1st level translation only. To differentiate this config with current vIOMMU,
-> we need an extra option to control it. But yes, it is still scalable mode vIOMMU.
-> just has different capability exposed to guest.
+> no, so far, it is synchronize way. As mentioned above, IP bit is to ensure
+> only one vcmd is handled for a time. Other vcpus won't be able to submit
+> vcmds before IP is cleared.
 
-I see.  Thanks for explaining.
+[...]
 
-> 
-> BTW. do you know if I can add sub-options under "x-scalable-mode"? I think
-> that may demonstrate the dependency better.
-
-I'm not an expert of that, but I think at least we can make it a
-string parameter depends on what you prefer, then we can do
-"x-scalable-mode=legacy|modern".  Or keep this would be fine too.
-
-> 
+> > > @@ -192,6 +198,7 @@
+> > >  #define VTD_ECAP_SRS                (1ULL << 31)
+> > >  #define VTD_ECAP_PASID              (1ULL << 40)
+> > >  #define VTD_ECAP_SMTS               (1ULL << 43)
+> > > +#define VTD_ECAP_VCS                (1ULL << 44)
+> > >  #define VTD_ECAP_SLTS               (1ULL << 46)
+> > >  #define VTD_ECAP_FLTS               (1ULL << 47)
 > > >
-> > >  - "legacy": gives support for SL page table
-> > >  - "scalable": gives support for FL page table, pasid, virtual command
-> > >  - default to be "legacy" if "x-scalable-mode=on while no sm_model is
-> > >    configured
+> > > @@ -314,6 +321,29 @@ typedef enum VTDFaultReason {
 > > >
-> > > Cc: Kevin Tian <kevin.tian@intel.com>
-> > > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > Cc: Peter Xu <peterx@redhat.com>
-> > > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > > Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> > > ---
-> > >  hw/i386/intel_iommu.c          | 28 +++++++++++++++++++++++++++-
-> > >  hw/i386/intel_iommu_internal.h |  2 ++
-> > >  include/hw/i386/intel_iommu.h  |  1 +
-> > >  3 files changed, 30 insertions(+), 1 deletion(-)
+> > >  #define VTD_CONTEXT_CACHE_GEN_MAX       0xffffffffUL
 > > >
-> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > > index 44b1231..3160a05 100644
-> > > --- a/hw/i386/intel_iommu.c
-> > > +++ b/hw/i386/intel_iommu.c
-> > > @@ -3014,6 +3014,7 @@ static Property vtd_properties[] = {
-> > >      DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode,
-> > FALSE),
-> > >      DEFINE_PROP_BOOL("x-scalable-mode", IntelIOMMUState, scalable_mode,
-> > FALSE),
-> > >      DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
-> > > +    DEFINE_PROP_STRING("sm_model", IntelIOMMUState, sm_model),
+> > > +/* VCCAP_REG */
+> > > +#define VTD_VCCAP_PAS               (1UL << 0)
+> > > +#define VTD_MIN_HPASID              200
 > > 
-> > Can do 's/-/_/' to follow the rest if we need it.
+> > Comment this value a bit?
 > 
-> Do you mean sub-options after "x-scalable-mode"?
+> The basic idea is to let hypervisor to set a range for available PASIDs for
+> VMs. One of the reasons is PASID #0 is reserved by RID_PASID usage.
+> We have no idea how many reserved PASIDs in future, so here just a
+> evaluated value. Honestly, set it as "1" is enough at current stage.
 
-No, I only mean "sm-model". :)
+That'll be a very nice initial comment for that (I mean, put it into
+the patch, of course :).
 
 Regards,
 
