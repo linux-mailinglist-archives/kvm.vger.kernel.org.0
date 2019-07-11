@@ -2,134 +2,296 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E2C5564FCE
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 03:13:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F0E764FD8
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 03:25:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727594AbfGKBNT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jul 2019 21:13:19 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:37257 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726627AbfGKBNS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jul 2019 21:13:18 -0400
-Received: by mail-pf1-f196.google.com with SMTP id 19so1918396pfa.4
-        for <kvm@vger.kernel.org>; Wed, 10 Jul 2019 18:13:18 -0700 (PDT)
+        id S1727680AbfGKBZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Jul 2019 21:25:29 -0400
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:45513 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727463AbfGKBZ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Jul 2019 21:25:29 -0400
+Received: by mail-ed1-f67.google.com with SMTP id e2so3980383edi.12
+        for <kvm@vger.kernel.org>; Wed, 10 Jul 2019 18:25:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=TrD+b9KcyDXAn9XTri87X4ww/nyNvMC/tz+poqou13c=;
+        b=b7KeucFxiHjYP2FVwS6/1td8lEwc2IDxW/qZw2UV4o4/6s270GwKj/wpo4/r1JNnwl
+         Gk0zcggU/AFy9AhHic9QAvhBDIjiGHgdLpX6RW96EiBiI9cZ/uhZ00sZTkDKVlRqB6GH
+         wTl7oZ+oJ9P0OGUibmo3rPp1Y887B8o1GxVWjCCo5y+ZiAepQz/CJhTzGRJsH67Jbse+
+         vwAPcLCzyqHmSRQ9CG35nymSV3XSekzouXQFvK1sjhYJKgXPIMn1kt9U81P/pQdmR8qI
+         DAEMtTFcwKKhtDOnJ8FL4yGLwXD8STvPEWSYUgBlOxqOIw053QEaVdgQmNo0UMhng4Ay
+         f7Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=RVtvtLW+hA55JDckJ1iLViBZ1ankqgmMr3VovL92Bc4=;
-        b=ommTR3wmF5ms6iGM5yq1rC7CW0jqLJugYi5jz2Y3bEi+IRq/6VGKn2J1IRcnoVOHAZ
-         3BgV67mm4SCO/N8vubdt3hfVET1e7+rNxvcqNdHE/EIk/toTV7vcPOBOkNSFuL1y9JHr
-         J7VGB2LyHLgkEbpP0/LbMWBAu3RHWeS+JEA8lJxze8Xg8qYSMVErCOBGoPhs1KPdj+1H
-         Wd+iphfmoYsmCR0LaFH05LIBWzkyXc6gP6aGlbUwtU6ZuNaorw8tUmTtpVPSe4s3Wbru
-         Jpb1rqm+3KO53O7LhcgpLPgFnJWaPoSG2vB4jVR2Qjypo6TfDBJ9eTMUFIzHUNvPCSh4
-         pPOw==
-X-Gm-Message-State: APjAAAXsLGsHaTz92lx8RAlBQROG2WhLK7ud3GCbYhQ2uCSL8ppDg1v4
-        sxr5sAgv0c+dUd0mbGojEn8pOA==
-X-Google-Smtp-Source: APXvYqxMrVVklNqbVKOTAv5bfnU/VrZIKRnGvwuMCvMVJRLDiPbKxiptG5r1+GRR16h0APaabi9Mew==
-X-Received: by 2002:a63:ad07:: with SMTP id g7mr1203863pgf.405.1562807598198;
-        Wed, 10 Jul 2019 18:13:18 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id f14sm3326411pfn.53.2019.07.10.18.13.12
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 10 Jul 2019 18:13:16 -0700 (PDT)
-From:   Peter Xu <zhexu@redhat.com>
-X-Google-Original-From: Peter Xu <peterx@redhat.com>
-Date:   Thu, 11 Jul 2019 09:13:05 +0800
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     Peter Xu <zhexu@redhat.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Tian, Jun J" <jun.j.tian@intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Yi Sun <yi.y.sun@linux.intel.com>
-Subject: Re: [RFC v1 06/18] intel_iommu: support virtual command emulation
- and pasid request
-Message-ID: <20190711011305.GJ5178@xz-x1>
-References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
- <1562324511-2910-7-git-send-email-yi.l.liu@intel.com>
- <20190709031902.GD5178@xz-x1>
- <A2975661238FB949B60364EF0F2C257439F2A65F@SHSMSX104.ccr.corp.intel.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=TrD+b9KcyDXAn9XTri87X4ww/nyNvMC/tz+poqou13c=;
+        b=uH+ekDIRcgwvFZSblZdIIzwm8ItTPoy75p/feMM0GCdIF84quN/1RM4XZHUbqxfNAS
+         0+GRlJ56bVNFKfNNaMPRqlFNoC4iZGKRia1zU+u5udSP7RqoJg0RLCUILxJRxae8giOg
+         qRFImlM/DHkpUCBMM/hYgVM/qxz6Ypxmmge2zR4p1bu7p+ZAO0FL//d1pi68OnP7Bzfx
+         VySEaB+6ug5JabygtB9WQud4XMvX9k66BB6+mu3nhP9KSdW0n6XKRYwmBL1viWE2pWHQ
+         FjfUOsDcEFtxr4P3mr3Hu/gUctloAezfSsn2ybOPw38C5nsn4GajJhPyoLw41yWqZFi3
+         n7Jg==
+X-Gm-Message-State: APjAAAWRhnMZyPwYE68tOPfwrSGLtDGg9iZ5H2l1fIaXrWO9ZBL18zMY
+        r1KfBFGRI3mG3NtYAWGpbwYuTilwDDgqsE8JF0Qi8Q==
+X-Google-Smtp-Source: APXvYqy8HxLooNNckIHgDT11raVGawwoRblhEOxb5HkG1Ykl+pEoOU0HYMY4xR+iFSPe/HZr653nn9zLuX9hTeXTiRQ=
+X-Received: by 2002:a50:f4d8:: with SMTP id v24mr868769edm.166.1562808326390;
+ Wed, 10 Jul 2019 18:25:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C257439F2A65F@SHSMSX104.ccr.corp.intel.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+From:   Eric Hankland <ehankland@google.com>
+Date:   Wed, 10 Jul 2019 18:25:15 -0700
+Message-ID: <CAOyeoRUUK+T_71J=+zcToyL93LkpARpsuWSfZS7jbJq=wd1rQg@mail.gmail.com>
+Subject: [PATCH v2] KVM: x86: PMU Event Filter
+To:     Wei Wang <wei.w.wang@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com
+Cc:     linux-kernel@vger.kernel.org,
+        Stephane Eranian <eranian@google.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jul 10, 2019 at 11:51:17AM +0000, Liu, Yi L wrote:
+- Add a VM ioctl that can control which events the guest can monitor.
 
-[...]
+Signed-off-by: ehankland <ehankland@google.com>
+---
+Changes since v1:
+-Moved to a vm ioctl rather than a vcpu one
+-Changed from a whitelist to a configurable filter which can either be
+white or black
+-Only restrict GP counters since fixed counters require extra handling
+and they can be disabled by setting the guest cpuid (though only by
+setting the number - they can't be disabled individually)
+---
+ Documentation/virtual/kvm/api.txt | 25 +++++++++++++
+ arch/x86/include/asm/kvm_host.h   |  2 +
+ arch/x86/include/uapi/asm/kvm.h   | 10 +++++
+ arch/x86/kvm/pmu.c                | 61 +++++++++++++++++++++++++++++++
+ arch/x86/kvm/pmu.h                |  1 +
+ arch/x86/kvm/x86.c                |  6 +++
+ include/uapi/linux/kvm.h          |  3 ++
+ 7 files changed, 108 insertions(+)
 
-> > > +        s->vcrsp = 1;
-> > > +        vtd_set_quad_raw(s, DMAR_VCRSP_REG,
-> > > +                         ((uint64_t) s->vcrsp));
-> > 
-> > Do we really need to emulate the "In Progress" like this?  The vcpu is
-> > blocked here after all, and AFAICT all the rest of vcpus should not
-> > access these registers because obviously these registers cannot be
-> > accessed concurrently...
-> 
-> Other vcpus should poll the IP bit before submitting vcmds. As IP bit
-> is set, other vcpus will not access these bits. but if not, they may submit
-> new vcmds, while we only have 1 response register, that is not we
-> support. That's why we need to set IP bit.
+diff --git a/Documentation/virtual/kvm/api.txt
+b/Documentation/virtual/kvm/api.txt
+index 91fd86fcc49f..a9ee8da36595 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -4065,6 +4065,31 @@ KVM_ARM_VCPU_FINALIZE call.
+ See KVM_ARM_VCPU_INIT for details of vcpu features that require finalization
+ using this ioctl.
 
-I still don't think another CPU can use this register even if it
-polled with IP==0...  The reason is simply as you described - we only
-have one pair of VCMD/VRSPD registers so IMHO the guest IOMMU driver
-must have a lock (probably a mutex) to guarantee sequential access of
-these registers otherwise race can happen.
++4.120 KVM_SET_PMU_EVENT_FILTER
++
++Capability: KVM_CAP_PMU_EVENT_FILTER
++Architectures: x86
++Type: vm ioctl
++Parameters: struct kvm_pmu_event_filter (in)
++Returns: 0 on success, -1 on error
++
++struct kvm_pmu_event_filter {
++       __u32 type;
++       __u32 nevents;
++       __u64 events[0];
++};
++
++This ioctl restricts the set of PMU events that the guest can program to either
++a whitelist or a blacklist of events. The eventsel+umask of each event the
++guest attempts to program is compared against the events field to determine
++whether the guest should have access. This only affects general purpose
++counters; fixed purpose counters can be disabled by changing the perfmon
++CPUID leaf.
++
++Valid values for 'type':
++#define KVM_PMU_EVENT_WHITELIST 0
++#define KVM_PMU_EVENT_BLACKLIST 1
++
 
-> 
-> > 
-> > I think the IP bit is useful when some new vcmd would take plenty of
-> > time so that we can do the long vcmds in async way.  However here it
-> > seems not the case?
-> 
-> no, so far, it is synchronize way. As mentioned above, IP bit is to ensure
-> only one vcmd is handled for a time. Other vcpus won't be able to submit
-> vcmds before IP is cleared.
+ 5. The kvm_run structure
+ ------------------------
 
-[...]
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f46a12a5cf2e..34d017bd1d1b 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -933,6 +933,8 @@ struct kvm_arch {
 
-> > > @@ -192,6 +198,7 @@
-> > >  #define VTD_ECAP_SRS                (1ULL << 31)
-> > >  #define VTD_ECAP_PASID              (1ULL << 40)
-> > >  #define VTD_ECAP_SMTS               (1ULL << 43)
-> > > +#define VTD_ECAP_VCS                (1ULL << 44)
-> > >  #define VTD_ECAP_SLTS               (1ULL << 46)
-> > >  #define VTD_ECAP_FLTS               (1ULL << 47)
-> > >
-> > > @@ -314,6 +321,29 @@ typedef enum VTDFaultReason {
-> > >
-> > >  #define VTD_CONTEXT_CACHE_GEN_MAX       0xffffffffUL
-> > >
-> > > +/* VCCAP_REG */
-> > > +#define VTD_VCCAP_PAS               (1UL << 0)
-> > > +#define VTD_MIN_HPASID              200
-> > 
-> > Comment this value a bit?
-> 
-> The basic idea is to let hypervisor to set a range for available PASIDs for
-> VMs. One of the reasons is PASID #0 is reserved by RID_PASID usage.
-> We have no idea how many reserved PASIDs in future, so here just a
-> evaluated value. Honestly, set it as "1" is enough at current stage.
+        bool guest_can_read_msr_platform_info;
+        bool exception_payload_enabled;
++
++       struct kvm_pmu_event_filter *pmu_event_filter;
+ };
 
-That'll be a very nice initial comment for that (I mean, put it into
-the patch, of course :).
+ struct kvm_vm_stat {
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index f9b021e16ebc..4d2e905b7d79 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -422,4 +422,14 @@ struct kvm_nested_state {
+        __u8 data[0];
+ };
 
-Regards,
++/* for KVM_CAP_PMU_EVENT_FILTER */
++struct kvm_pmu_event_filter {
++       __u32 type;
++       __u32 nevents;
++       __u64 events[0];
++};
++
++#define KVM_PMU_EVENT_WHITELIST 0
++#define KVM_PMU_EVENT_BLACKLIST 1
++
+ #endif /* _ASM_X86_KVM_H */
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index dd745b58ffd8..d674b79ff8da 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -22,6 +22,9 @@
+ #include "lapic.h"
+ #include "pmu.h"
 
--- 
-Peter Xu
++/* This keeps the total size of the filter under 4k. */
++#define KVM_PMU_EVENT_FILTER_MAX_EVENTS 63
++
+ /* NOTE:
+  * - Each perf counter is defined as "struct kvm_pmc";
+  * - There are two types of perf counters: general purpose (gp) and fixed.
+@@ -144,6 +147,10 @@ void reprogram_gp_counter(struct kvm_pmc *pmc,
+u64 eventsel)
+ {
+        unsigned config, type = PERF_TYPE_RAW;
+        u8 event_select, unit_mask;
++       struct kvm_arch *arch = &pmc->vcpu->kvm->arch;
++       struct kvm_pmu_event_filter *filter;
++       int i;
++       bool allow_event = true;
+
+        if (eventsel & ARCH_PERFMON_EVENTSEL_PIN_CONTROL)
+                printk_once("kvm pmu: pin control bit is ignored\n");
+@@ -155,6 +162,24 @@ void reprogram_gp_counter(struct kvm_pmc *pmc,
+u64 eventsel)
+        if (!(eventsel & ARCH_PERFMON_EVENTSEL_ENABLE) || !pmc_is_enabled(pmc))
+                return;
+
++       rcu_read_lock();
++       filter = rcu_dereference(arch->pmu_event_filter);
++       if (filter) {
++               for (i = 0; i < filter->nevents; i++)
++                       if (filter->events[i] ==
++                           (eventsel & AMD64_RAW_EVENT_MASK_NB))
++                               break;
++               if (filter->type == KVM_PMU_EVENT_WHITELIST &&
++                   i == filter->nevents)
++                       allow_event = false;
++               if (filter->type == KVM_PMU_EVENT_BLACKLIST &&
++                   i < filter->nevents)
++                       allow_event = false;
++       }
++       rcu_read_unlock();
++       if (!allow_event)
++               return;
++
+        event_select = eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
+        unit_mask = (eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
+
+@@ -351,3 +376,39 @@ void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
+ {
+        kvm_pmu_reset(vcpu);
+ }
++
++int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
++{
++       struct kvm_pmu_event_filter tmp, *filter;
++       size_t size;
++       int r;
++
++       if (copy_from_user(&tmp, argp, sizeof(tmp)))
++               return -EFAULT;
++
++       if (tmp.nevents > KVM_PMU_EVENT_FILTER_MAX_EVENTS)
++               return -E2BIG;
++
++       size = sizeof(tmp) + sizeof(tmp.events[0]) * tmp.nevents;
++       filter = vmalloc(size);
++       if (!filter)
++               return -ENOMEM;
++
++       r = -EFAULT;
++       if (copy_from_user(filter, argp, size))
++               goto cleanup;
++
++       /* Ensure nevents can't be changed between the user copies. */
++       *filter = tmp;
++
++       mutex_lock(&kvm->lock);
++       rcu_swap_protected(kvm->arch.pmu_event_filter, filter,
++                          mutex_is_locked(&kvm->lock));
++       mutex_unlock(&kvm->lock);
++
++       synchronize_rcu();
++       r = 0;
++cleanup:
++       kvfree(filter);
++       return r;
++}
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 22dff661145a..58265f761c3b 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -118,6 +118,7 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu);
+ void kvm_pmu_reset(struct kvm_vcpu *vcpu);
+ void kvm_pmu_init(struct kvm_vcpu *vcpu);
+ void kvm_pmu_destroy(struct kvm_vcpu *vcpu);
++int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
+
+ bool is_vmware_backdoor_pmc(u32 pmc_idx);
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 2e302e977dac..9ddfc7193bc6 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3135,6 +3135,7 @@ int kvm_vm_ioctl_check_extension(struct kvm
+*kvm, long ext)
+        case KVM_CAP_GET_MSR_FEATURES:
+        case KVM_CAP_MSR_PLATFORM_INFO:
+        case KVM_CAP_EXCEPTION_PAYLOAD:
++       case KVM_CAP_PMU_EVENT_FILTER:
+                r = 1;
+                break;
+        case KVM_CAP_SYNC_REGS:
+@@ -4978,6 +4979,11 @@ long kvm_arch_vm_ioctl(struct file *filp,
+                r = kvm_vm_ioctl_hv_eventfd(kvm, &hvevfd);
+                break;
+        }
++       case KVM_SET_PMU_EVENT_FILTER: {
++               r = kvm_vm_ioctl_set_pmu_event_filter(kvm, argp);
++               break;
++
++       }
+        default:
+                r = -ENOTTY;
+        }
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index c2152f3dd02d..b18ff80e356a 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -995,6 +995,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_SVE 170
+ #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
+ #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
++#define KVM_CAP_PMU_EVENT_FILTER 173
+
+ #ifdef KVM_CAP_IRQ_ROUTING
+
+@@ -1329,6 +1330,8 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_PPC_GET_RMMU_INFO    _IOW(KVMIO,  0xb0, struct kvm_ppc_rmmu_info)
+ /* Available with KVM_CAP_PPC_GET_CPU_CHAR */
+ #define KVM_PPC_GET_CPU_CHAR     _IOR(KVMIO,  0xb1, struct kvm_ppc_cpu_char)
++/* Availabile with KVM_CAP_PMU_EVENT_FILTER */
++#define KVM_SET_PMU_EVENT_FILTER  _IOW(KVMIO, 0xb2, struct
+kvm_pmu_event_filter)
+
+ /* ioctl for vm fd */
+ #define KVM_CREATE_DEVICE        _IOWR(KVMIO,  0xe0, struct kvm_create_device)
