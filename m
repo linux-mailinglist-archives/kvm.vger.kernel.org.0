@@ -2,52 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C419657EB
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 15:36:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05160657FB
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 15:40:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728406AbfGKNff (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 09:35:35 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:35160 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726016AbfGKNfe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 09:35:34 -0400
-Received: by mail-wr1-f66.google.com with SMTP id y4so6364787wrm.2
-        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 06:35:33 -0700 (PDT)
+        id S1728715AbfGKNkX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 09:40:23 -0400
+Received: from mail-wr1-f41.google.com ([209.85.221.41]:37091 "EHLO
+        mail-wr1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728505AbfGKNkX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 09:40:23 -0400
+Received: by mail-wr1-f41.google.com with SMTP id n9so6370599wrr.4
+        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 06:40:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=pH6IES3/nGr4r5FV4z7rtiiDK0sH4ktfyPk5fhHI6mI=;
-        b=jRfmJy9uBGPjaqCwJ+K+wLapstFcqcHMBp29g8bhbOCwKsrn7HBDIye/hQ3Se4olhw
-         m3g+5sPu3bVi9LsuLUyNAZWHb3UQ2kTWMXwCh8N6uU2QY/7XQ1ISMFpvfqG/DGyFgL8P
-         ZZSFlSh+jI6mWaOTzjJrHSD8qCNFUU8U9EPiBCqoACIeTifvxltHjPaNbxSkdlYA0PZ1
-         cHjf+45OP7Yb0JnRKaIOVQkSIRu701IcSWg/h64pL/N9RreD3gmg1cqYPR2JbC4tSDjK
-         C3i2JXeASkELJu6eQQ6Kh3L6ttLUsJtSivq8ZBIaAqhhTaFG8FqO2nlo53yVJ8Z6vk1o
-         E+kg==
-X-Gm-Message-State: APjAAAVOBYN7eA5PV7ASxrEgCKq3EMB5lSH0yKTLl0tYuvOCT+SjWBjV
-        5RVD5tB3vlKTQbudutO69E8QYhS0IWY=
-X-Google-Smtp-Source: APXvYqzFBLJaR1P1/N+yre7g2V1AxgFlkIWWBpWilfQe9fFGL4T3KG/XXXsJKlKUMwTFvJCgFHx0IQ==
-X-Received: by 2002:a05:6000:1043:: with SMTP id c3mr5527822wrx.236.1562852132665;
-        Thu, 11 Jul 2019 06:35:32 -0700 (PDT)
+        bh=FnSXGXReWdj1dwt4PqYkheiL50PJemd4VIlhtbzAQt8=;
+        b=T7hwRznGhogyo4K3RGwAAt6MNlh31i3gHIt3QCn6D3h37pN9Tr47UI3as6QLawbvRR
+         sFifKHuxULqbrSOqnONYbF57zqf7Wn4G4x0sd1yfImBE4FQkdMa8lkHswPXWFnxjKByx
+         j5m8yneWbEAgtdNBiN2gObEcsAFpRXlI733fTbGh5LkGpIZlMkAi9HQKLOMXXb188U04
+         KdrSg6MYqFfqiorzC4DISoeFtPivebi/9VyWd7GVEDF7zLUHNtQiBDa6CtK5ggyiLnc3
+         +PLWL8D0I9OmOl6N68lG0ee1zVZnBlS6hTIkd0ZXJfxLt/OPEX1QtOwTbXqbMcd1Iv4T
+         C6Rw==
+X-Gm-Message-State: APjAAAVVEkbTPfSQcocei/S1UQFaYwMB6x7E2o9PS0gXusDJo5QPylcO
+        pd9TMrC+b7CNSOO+vcAEVlmyFyvjwCJTJA==
+X-Google-Smtp-Source: APXvYqyShV9fbckDIWGQ0EkgfblduUbng9/MP66ZdhXZaEdrkN9dkmEju62XgU7X98NYyExpOgwWZA==
+X-Received: by 2002:adf:e843:: with SMTP id d3mr5517125wrn.249.1562852421455;
+        Thu, 11 Jul 2019 06:40:21 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab? ([2001:b07:6468:f312:d066:6881:ec69:75ab])
-        by smtp.gmail.com with ESMTPSA id q18sm1999839wrw.36.2019.07.11.06.35.31
+        by smtp.gmail.com with ESMTPSA id e3sm5300954wrt.93.2019.07.11.06.40.19
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 11 Jul 2019 06:35:31 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 2/4] target/i386: kvm: Init nested-state for
- vCPU exposed with SVM
-To:     Liran Alon <liran.alon@oracle.com>, qemu-devel@nongnu.org
-Cc:     Joao Martins <joao.m.martins@oracle.com>, ehabkost@redhat.com,
-        kvm@vger.kernel.org
-References: <20190705210636.3095-1-liran.alon@oracle.com>
- <20190705210636.3095-3-liran.alon@oracle.com>
+        Thu, 11 Jul 2019 06:40:20 -0700 (PDT)
+Subject: Re: [GIT PULL] KVM/arm updates for Linux 5.3
+To:     Marc Zyngier <marc.zyngier@arm.com>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Cc:     Andre Przywara <andre.przywara@arm.com>,
+        Andrew Murray <andrew.murray@arm.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry@arm.com>,
+        Steven Price <steven.price@arm.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+References: <20190709122507.214494-1-marc.zyngier@arm.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e7b28be0-964a-755a-6349-02396887e7d9@redhat.com>
-Date:   Thu, 11 Jul 2019 15:35:31 +0200
+Openpgp: preference=signencrypt
+Message-ID: <7f0bdfc0-d450-5466-ba0f-34c52d872e91@redhat.com>
+Date:   Thu, 11 Jul 2019 15:40:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190705210636.3095-3-liran.alon@oracle.com>
+In-Reply-To: <20190709122507.214494-1-marc.zyngier@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -56,46 +65,9 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/07/19 23:06, Liran Alon wrote:
-> Reviewed-by: Joao Martins <joao.m.martins@oracle.com>
-> Signed-off-by: Liran Alon <liran.alon@oracle.com>
-> ---
->  target/i386/cpu.h | 5 +++++
->  target/i386/kvm.c | 2 ++
->  2 files changed, 7 insertions(+)
-> 
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 93345792f4cb..cdb0e43676a9 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1867,6 +1867,11 @@ static inline bool cpu_has_vmx(CPUX86State *env)
->      return env->features[FEAT_1_ECX] & CPUID_EXT_VMX;
->  }
->  
-> +static inline bool cpu_has_svm(CPUX86State *env)
-> +{
-> +    return env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_SVM;
-> +}
-> +
->  /* fpu_helper.c */
->  void update_fp_status(CPUX86State *env);
->  void update_mxcsr_status(CPUX86State *env);
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index b57f873ec9e8..4e2c8652168f 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1721,6 +1721,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
->              env->nested_state->format = KVM_STATE_NESTED_FORMAT_VMX;
->              vmx_hdr->vmxon_pa = -1ull;
->              vmx_hdr->vmcs12_pa = -1ull;
-> +        } else if (cpu_has_svm(env)) {
-> +            env->nested_state->format = KVM_STATE_NESTED_FORMAT_SVM;
->          }
->      }
->  
-> 
+On 09/07/19 14:24, Marc Zyngier wrote:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-5.3
 
-I'm not sure about it.  We have no idea what the format will be, so we
-shouldn't set the format carelessly.
+Pulled, thanks!
 
 Paolo
