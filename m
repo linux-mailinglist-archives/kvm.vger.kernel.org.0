@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B67E6658EA
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 16:29:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C45A658ED
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 16:29:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728984AbfGKO2Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 10:28:24 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:37832 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728926AbfGKO2T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 10:28:19 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6BEO90p001480;
-        Thu, 11 Jul 2019 14:26:38 GMT
+        id S1728835AbfGKO3Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 10:29:25 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:43852 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728778AbfGKO3Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 10:29:24 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6BEO75F013247;
+        Thu, 11 Jul 2019 14:26:41 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=k/9Fug63afNC647KTGwGwhcj7r27BkaO1PdUgfdBHl8=;
- b=5KLn6vAlS8mqB4CpSvgIU+Q+dh/FIPZ30597ShKunxhzPyWufNzv9Z2Cx08UVoBiEll/
- JBVMx/vKSYB0C0s+WVyLcIBN58ZXRTbwEhf/IwNYl7zZ7sSsGPjmF/6hyaDRwuF9hk/r
- Od3KI8aMoJde526KmMFcX2swAUblIJ6IEJr7eaGDmgCNG3lLZyVRqS3W4XYV29OC/ZVc
- 4mk68QurguhhWeX8FUCmmK47mMaaLROKzVLzTFajITGGIClxoo3c+fKTYG1lt2Dpitky
- k9uYwYmfAA4lryCWr9Zg3nU9L0blXjaO/G+ZtIQSyB+mD3low+GPiTf4kzuLZVh/PRPA cg== 
+ bh=DxKvEFI9OqvnwAFHfsS7VJpKVi8ynRLOZoMuRYswZIw=;
+ b=k3XXPihT1uvy+OLIiRmWMdfDXIT+WHMFAjj45U6uCpQ8rV2jfdSnRJmMQA1mV5ALTQyT
+ PERU4/YPhFf4ckQAGG2rOQDm5vbl52OROkwzviVZDqxaVQLQCpGKejd6n6Gi8g/OW973
+ b1WRq4uNsMv9cAwP/H6vRscq1e3iobbZ324Tq6PgoCdWFemJ/1YPJhNIMn+keJv5JOQh
+ Ff8q9kmaJ7pYkwC9amWnZvecFXs6OmpibtOtjhm23oXx9IX6dzIXv0YiCsY7b8cavCtn
+ S3SvjejyJfLMAMiB7WwpFazOkLIoHuippfiDTsTbnPYepjTPVENPQMOCjagrpefgERlp TA== 
 Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
-        by userp2130.oracle.com with ESMTP id 2tjk2u0e0w-1
+        by userp2120.oracle.com with ESMTP id 2tjm9r0brp-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Jul 2019 14:26:38 +0000
+        Thu, 11 Jul 2019 14:26:41 +0000
 Received: from achartre-desktop.fr.oracle.com (dhcp-10-166-106-34.fr.oracle.com [10.166.106.34])
-        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x6BEPcu9021444;
-        Thu, 11 Jul 2019 14:26:34 GMT
+        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x6BEPcuA021444;
+        Thu, 11 Jul 2019 14:26:37 GMT
 From:   Alexandre Chartre <alexandre.chartre@oracle.com>
 To:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
@@ -38,157 +38,162 @@ To:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
 Cc:     konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
         liran.alon@oracle.com, jwadams@google.com, graf@amazon.de,
         rppt@linux.vnet.ibm.com, alexandre.chartre@oracle.com
-Subject: [RFC v2 16/26] mm/asi: Option to map current task into ASI
-Date:   Thu, 11 Jul 2019 16:25:28 +0200
-Message-Id: <1562855138-19507-17-git-send-email-alexandre.chartre@oracle.com>
+Subject: [RFC v2 17/26] rcu: Move tree.h static forward declarations to tree.c
+Date:   Thu, 11 Jul 2019 16:25:29 +0200
+Message-Id: <1562855138-19507-18-git-send-email-alexandre.chartre@oracle.com>
 X-Mailer: git-send-email 1.7.1
 In-Reply-To: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
 References: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9314 signatures=668688
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
  suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=853
- adultscore=26 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1907110162
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907110162
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add an option to map the current task into an ASI page-table.
-The task is mapped when entering isolation and unmapped on
-abort/exit.
+tree.h has static forward declarations for inline function declared
+in tree_plugin.h and tree_stall.h. These forward declarations prevent
+including tree.h into a file different from tree.c
 
 Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
 ---
- arch/x86/include/asm/asi.h  |    2 ++
- arch/x86/mm/asi.c           |   25 +++++++++++++++++++++----
- arch/x86/mm/asi_pagetable.c |    4 ++--
- 3 files changed, 25 insertions(+), 6 deletions(-)
+ kernel/rcu/tree.c |   54 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ kernel/rcu/tree.h |   55 +----------------------------------------------------
+ 2 files changed, 55 insertions(+), 54 deletions(-)
 
-diff --git a/arch/x86/include/asm/asi.h b/arch/x86/include/asm/asi.h
-index 1ac8fd3..a277e43 100644
---- a/arch/x86/include/asm/asi.h
-+++ b/arch/x86/include/asm/asi.h
-@@ -17,6 +17,7 @@
-  */
- #define ASI_MAP_STACK_CANARY	0x01	/* map stack canary */
- #define ASI_MAP_CPU_PTR		0x02	/* for get_cpu_var()/this_cpu_ptr() */
-+#define ASI_MAP_CURRENT_TASK	0x04	/* map the current task */
+diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
+index 980ca3c..44dd3b4 100644
+--- a/kernel/rcu/tree.c
++++ b/kernel/rcu/tree.c
+@@ -55,6 +55,60 @@
+ #include "tree.h"
+ #include "rcu.h"
  
- enum page_table_level {
- 	PGT_LEVEL_PTE,
-@@ -31,6 +32,7 @@ enum page_table_level {
- struct asi {
- 	spinlock_t		lock;		/* protect all attributes */
- 	pgd_t			*pgd;		/* ASI page-table */
-+	int			mapping_flags;	/* map flags */
- 	struct list_head	mapping_list;	/* list of VA range mapping */
- 
- 	/*
-diff --git a/arch/x86/mm/asi.c b/arch/x86/mm/asi.c
-index f049438..acd1135 100644
---- a/arch/x86/mm/asi.c
-+++ b/arch/x86/mm/asi.c
-@@ -28,6 +28,7 @@ struct asi_map_option {
- struct asi_map_option asi_map_percpu_options[] = {
- 	{ ASI_MAP_STACK_CANARY, &fixed_percpu_data, sizeof(fixed_percpu_data) },
- 	{ ASI_MAP_CPU_PTR, &this_cpu_off, sizeof(this_cpu_off) },
-+	{ ASI_MAP_CURRENT_TASK, &current_task, sizeof(current_task) },
- };
- 
- static void asi_log_fault(struct asi *asi, struct pt_regs *regs,
-@@ -96,8 +97,9 @@ bool asi_fault(struct pt_regs *regs, unsigned long error_code,
- 	return true;
- }
- 
--static int asi_init_mapping(struct asi *asi, int flags)
-+static int asi_init_mapping(struct asi *asi)
- {
-+	int flags = asi->mapping_flags;
- 	struct asi_map_option *option;
- 	int i, err;
- 
-@@ -164,8 +166,9 @@ struct asi *asi_create(int map_flags)
- 	spin_lock_init(&asi->lock);
- 	spin_lock_init(&asi->fault_lock);
- 	asi_init_backend(asi);
-+	asi->mapping_flags = map_flags;
- 
--	err = asi_init_mapping(asi, map_flags);
-+	err = asi_init_mapping(asi);
- 	if (err)
- 		goto error;
- 
-@@ -248,6 +251,15 @@ int asi_enter(struct asi *asi)
- 		goto err_clear_asi;
- 
- 	/*
-+	 * Optionally, also map the current task.
-+	 */
-+	if (asi->mapping_flags & ASI_MAP_CURRENT_TASK) {
-+		err = asi_map(asi, current, sizeof(struct task_struct));
-+		if (err)
-+			goto err_unmap_stack;
-+	}
++/* Forward declarations for tree_plugin.h */
++static void rcu_bootup_announce(void);
++static void rcu_qs(void);
++static int rcu_preempt_blocked_readers_cgp(struct rcu_node *rnp);
++#ifdef CONFIG_HOTPLUG_CPU
++static bool rcu_preempt_has_tasks(struct rcu_node *rnp);
++#endif /* #ifdef CONFIG_HOTPLUG_CPU */
++static int rcu_print_task_exp_stall(struct rcu_node *rnp);
++static void rcu_preempt_check_blocked_tasks(struct rcu_node *rnp);
++static void rcu_flavor_sched_clock_irq(int user);
++static void dump_blkd_tasks(struct rcu_node *rnp, int ncheck);
++static void rcu_initiate_boost(struct rcu_node *rnp, unsigned long flags);
++static void rcu_preempt_boost_start_gp(struct rcu_node *rnp);
++static void invoke_rcu_callbacks_kthread(void);
++static bool rcu_is_callbacks_kthread(void);
++static void __init rcu_spawn_boost_kthreads(void);
++static void rcu_prepare_kthreads(int cpu);
++static void rcu_cleanup_after_idle(void);
++static void rcu_prepare_for_idle(void);
++static bool rcu_preempt_has_tasks(struct rcu_node *rnp);
++static bool rcu_preempt_need_deferred_qs(struct task_struct *t);
++static void rcu_preempt_deferred_qs(struct task_struct *t);
++static void zero_cpu_stall_ticks(struct rcu_data *rdp);
++static bool rcu_nocb_cpu_needs_barrier(int cpu);
++static struct swait_queue_head *rcu_nocb_gp_get(struct rcu_node *rnp);
++static void rcu_nocb_gp_cleanup(struct swait_queue_head *sq);
++static void rcu_init_one_nocb(struct rcu_node *rnp);
++static bool __call_rcu_nocb(struct rcu_data *rdp, struct rcu_head *rhp,
++			    bool lazy, unsigned long flags);
++static bool rcu_nocb_adopt_orphan_cbs(struct rcu_data *my_rdp,
++				      struct rcu_data *rdp,
++				      unsigned long flags);
++static int rcu_nocb_need_deferred_wakeup(struct rcu_data *rdp);
++static void do_nocb_deferred_wakeup(struct rcu_data *rdp);
++static void rcu_boot_init_nocb_percpu_data(struct rcu_data *rdp);
++static void rcu_spawn_cpu_nocb_kthread(int cpu);
++static void __init rcu_spawn_nocb_kthreads(void);
++#ifdef CONFIG_RCU_NOCB_CPU
++static void __init rcu_organize_nocb_kthreads(void);
++#endif /* #ifdef CONFIG_RCU_NOCB_CPU */
++static bool init_nocb_callback_list(struct rcu_data *rdp);
++static unsigned long rcu_get_n_cbs_nocb_cpu(struct rcu_data *rdp);
++static void rcu_bind_gp_kthread(void);
++static bool rcu_nohz_full_cpu(void);
++static void rcu_dynticks_task_enter(void);
++static void rcu_dynticks_task_exit(void);
 +
-+	/*
- 	 * Instructions ordering is important here because we should be
- 	 * able to deal with any interrupt/exception which will abort
- 	 * the isolation and restore CR3 to its original value:
-@@ -269,7 +281,7 @@ int asi_enter(struct asi *asi)
- 	if (!original_cr3) {
- 		WARN_ON(1);
- 		err = -EINVAL;
--		goto err_unmap_stack;
-+		goto err_unmap_task;
- 	}
- 	asi_session->original_cr3 = original_cr3;
++/* Forward declarations for tree_stall.h */
++static void record_gp_stall_check_time(void);
++static void rcu_iw_handler(struct irq_work *iwp);
++static void check_cpu_stall(struct rcu_data *rdp);
++static void rcu_check_gp_start_stall(struct rcu_node *rnp, struct rcu_data *rdp,
++				     const unsigned long gpssdelay);
++
+ #ifdef MODULE_PARAM_PREFIX
+ #undef MODULE_PARAM_PREFIX
+ #endif
+diff --git a/kernel/rcu/tree.h b/kernel/rcu/tree.h
+index e253d11..9790b58 100644
+--- a/kernel/rcu/tree.h
++++ b/kernel/rcu/tree.h
+@@ -392,58 +392,5 @@ struct rcu_state {
+ #endif /* #else #ifdef CONFIG_TRACING */
  
-@@ -286,6 +298,9 @@ int asi_enter(struct asi *asi)
- 
- 	return 0;
- 
-+err_unmap_task:
-+	if (asi->mapping_flags & ASI_MAP_CURRENT_TASK)
-+		asi_unmap(asi, current);
- err_unmap_stack:
- 	asi_unmap(asi, current->stack);
- err_clear_asi:
-@@ -345,8 +360,10 @@ void asi_exit(struct asi *asi)
- 	 */
- 	asi_session->abort_depth = 0;
- 
--	/* unmap stack */
-+	/* unmap stack and task */
- 	asi_unmap(asi, current->stack);
-+	if (asi->mapping_flags & ASI_MAP_CURRENT_TASK)
-+		asi_unmap(asi, current);
- }
- EXPORT_SYMBOL(asi_exit);
- 
-diff --git a/arch/x86/mm/asi_pagetable.c b/arch/x86/mm/asi_pagetable.c
-index bcc95f2..8076626 100644
---- a/arch/x86/mm/asi_pagetable.c
-+++ b/arch/x86/mm/asi_pagetable.c
-@@ -714,7 +714,7 @@ int asi_map_range(struct asi *asi, void *ptr, size_t size,
- 	 * Don't log info the current stack because it is mapped/unmapped
- 	 * everytime we enter/exit isolation.
- 	 */
--	if (ptr != current->stack) {
-+	if (ptr != current->stack && ptr != current) {
- 		pr_debug("ASI %p: MAP %px/%lx/%d -> %lx-%lx\n",
- 			 asi, ptr, size, level, map_addr, map_end);
- 		if (map_addr < addr)
-@@ -1001,7 +1001,7 @@ void asi_unmap(struct asi *asi, void *ptr)
- 	 * Don't log info the current stack because it is mapped/unmapped
- 	 * everytime we enter/exit isolation.
- 	 */
--	if (ptr != current->stack) {
-+	if (ptr != current->stack && ptr != current) {
- 		pr_debug("ASI %p: UNMAP %px/%lx/%d\n", asi, ptr,
- 			 range_mapping->size, range_mapping->level);
- 	}
+ int rcu_dynticks_snap(struct rcu_data *rdp);
+-
+-/* Forward declarations for tree_plugin.h */
+-static void rcu_bootup_announce(void);
+-static void rcu_qs(void);
+-static int rcu_preempt_blocked_readers_cgp(struct rcu_node *rnp);
+-#ifdef CONFIG_HOTPLUG_CPU
+-static bool rcu_preempt_has_tasks(struct rcu_node *rnp);
+-#endif /* #ifdef CONFIG_HOTPLUG_CPU */
+-static int rcu_print_task_exp_stall(struct rcu_node *rnp);
+-static void rcu_preempt_check_blocked_tasks(struct rcu_node *rnp);
+-static void rcu_flavor_sched_clock_irq(int user);
+ void call_rcu(struct rcu_head *head, rcu_callback_t func);
+-static void dump_blkd_tasks(struct rcu_node *rnp, int ncheck);
+-static void rcu_initiate_boost(struct rcu_node *rnp, unsigned long flags);
+-static void rcu_preempt_boost_start_gp(struct rcu_node *rnp);
+-static void invoke_rcu_callbacks_kthread(void);
+-static bool rcu_is_callbacks_kthread(void);
+-static void __init rcu_spawn_boost_kthreads(void);
+-static void rcu_prepare_kthreads(int cpu);
+-static void rcu_cleanup_after_idle(void);
+-static void rcu_prepare_for_idle(void);
+-static bool rcu_preempt_has_tasks(struct rcu_node *rnp);
+-static bool rcu_preempt_need_deferred_qs(struct task_struct *t);
+-static void rcu_preempt_deferred_qs(struct task_struct *t);
+-static void zero_cpu_stall_ticks(struct rcu_data *rdp);
+-static bool rcu_nocb_cpu_needs_barrier(int cpu);
+-static struct swait_queue_head *rcu_nocb_gp_get(struct rcu_node *rnp);
+-static void rcu_nocb_gp_cleanup(struct swait_queue_head *sq);
+-static void rcu_init_one_nocb(struct rcu_node *rnp);
+-static bool __call_rcu_nocb(struct rcu_data *rdp, struct rcu_head *rhp,
+-			    bool lazy, unsigned long flags);
+-static bool rcu_nocb_adopt_orphan_cbs(struct rcu_data *my_rdp,
+-				      struct rcu_data *rdp,
+-				      unsigned long flags);
+-static int rcu_nocb_need_deferred_wakeup(struct rcu_data *rdp);
+-static void do_nocb_deferred_wakeup(struct rcu_data *rdp);
+-static void rcu_boot_init_nocb_percpu_data(struct rcu_data *rdp);
+-static void rcu_spawn_cpu_nocb_kthread(int cpu);
+-static void __init rcu_spawn_nocb_kthreads(void);
+-#ifdef CONFIG_RCU_NOCB_CPU
+-static void __init rcu_organize_nocb_kthreads(void);
+-#endif /* #ifdef CONFIG_RCU_NOCB_CPU */
+-static bool init_nocb_callback_list(struct rcu_data *rdp);
+-static unsigned long rcu_get_n_cbs_nocb_cpu(struct rcu_data *rdp);
+-static void rcu_bind_gp_kthread(void);
+-static bool rcu_nohz_full_cpu(void);
+-static void rcu_dynticks_task_enter(void);
+-static void rcu_dynticks_task_exit(void);
+-
+-/* Forward declarations for tree_stall.h */
+-static void record_gp_stall_check_time(void);
+-static void rcu_iw_handler(struct irq_work *iwp);
+-static void check_cpu_stall(struct rcu_data *rdp);
+-static void rcu_check_gp_start_stall(struct rcu_node *rnp, struct rcu_data *rdp,
+-				     const unsigned long gpssdelay);
++
 -- 
 1.7.1
 
