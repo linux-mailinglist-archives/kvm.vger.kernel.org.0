@@ -2,157 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D48D465912
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 16:32:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6598D65922
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 16:37:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728616AbfGKOcO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 10:32:14 -0400
-Received: from relay2-d.mail.gandi.net ([217.70.183.194]:45803 "EHLO
-        relay2-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728045AbfGKOcO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 10:32:14 -0400
-X-Originating-IP: 92.137.69.152
-Received: from localhost (alyon-656-1-672-152.w92-137.abo.wanadoo.fr [92.137.69.152])
-        (Authenticated sender: gregory.clement@bootlin.com)
-        by relay2-d.mail.gandi.net (Postfix) with ESMTPSA id 094D24000B;
-        Thu, 11 Jul 2019 14:32:11 +0000 (UTC)
-From:   Gregory CLEMENT <gregory.clement@bootlin.com>
-To:     Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Antoine Tenart <antoine.tenart@bootlin.com>,
-        =?UTF-8?q?Miqu=C3=A8l=20Raynal?= <miquel.raynal@bootlin.com>,
-        Maxime Chevallier <maxime.chevallier@bootlin.com>,
-        Nadav Haklai <nadavh@marvell.com>,
-        Gregory CLEMENT <gregory.clement@bootlin.com>
-Subject: [PATCH] vfio: platform: reset: add support for XHCI reset hook
-Date:   Thu, 11 Jul 2019 16:31:59 +0200
-Message-Id: <20190711143159.21961-1-gregory.clement@bootlin.com>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1728627AbfGKOhM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 10:37:12 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:49214 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728481AbfGKOhM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 10:37:12 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6BEXPaO109047;
+        Thu, 11 Jul 2019 14:36:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=meQva7YGms0tG4Q6QMMUtuF4lVynQfHfO/MQm1qhbKo=;
+ b=bgaPR4zWJ3zc7EYKx49zn/FUF98Ysc6L1YzZgKVcc+TnCKSB6di8gQbEuY/O1GkpJ3zb
+ Ab01dc12eHizmfoLT1pbAxDZtb33Q4XT8EEAd9MHi88Hbh/AXEGAcX/lBLJ5BpSbh1Lh
+ e0uBF4KqigPPwy4Dws6ZMwNcsqLU7/rdcNewYhq+LMDJa8VGSM/CuW2+tSvp2FDyppcG
+ BEym+xSm7Os0i5tha9uf9kIpc39U4Hpux4EOCS3Lz6LsrcH6v6dRK2b72nIWOU/TKJ5W
+ Ktcy3KBckiKbWOYaoUSSjSo63XOpj6Lgp6rICFQ1G3Sbd8bKzC+o+8Y6Pe0St51G3QhL 2A== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2tjkkq0e9e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Jul 2019 14:36:22 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6BEWduD021651;
+        Thu, 11 Jul 2019 14:36:22 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 2tmmh46kt7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Jul 2019 14:36:22 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6BEaLPD027306;
+        Thu, 11 Jul 2019 14:36:21 GMT
+Received: from [192.168.14.112] (/109.66.236.176)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 11 Jul 2019 07:36:20 -0700
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [Qemu-devel] [PATCH 1/4] target/i386: kvm: Init nested-state for
+ VMX when vCPU expose VMX
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <805d7eb5-e171-60bb-94c2-574180f5c44c@redhat.com>
+Date:   Thu, 11 Jul 2019 17:36:17 +0300
+Cc:     qemu-devel@nongnu.org, Joao Martins <joao.m.martins@oracle.com>,
+        ehabkost@redhat.com, kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <901DE868-40A4-4668-8E10-D14B1E97BAE0@oracle.com>
+References: <20190705210636.3095-1-liran.alon@oracle.com>
+ <20190705210636.3095-2-liran.alon@oracle.com>
+ <805d7eb5-e171-60bb-94c2-574180f5c44c@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9314 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907110164
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9314 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907110164
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The VFIO reset hook is called every time a platform device is passed
-to a guest or removed from a guest.
 
-When the XHCI device is unbound from the host, the host driver
-disables the XHCI clocks/phys/regulators so when the device is passed
-to the guest it becomes dis-functional.
 
-This initial implementation uses the VFIO reset hook to enable the
-XHCI clocks/phys on behalf of the guest.
+> On 11 Jul 2019, at 16:45, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 05/07/19 23:06, Liran Alon wrote:
+>> -        if (IS_INTEL_CPU(env)) {
+>> +        if (cpu_has_vmx(env)) {
+>>             struct kvm_vmx_nested_state_hdr *vmx_hdr =3D
+>>                 &env->nested_state->hdr.vmx;
+>>=20
+>=20
+> I am not sure this is enough, because kvm_get_nested_state and =
+kvm_put_nested_state would run anyway later.  If we want to cull them =
+completely for a non-VMX virtual machine, I'd do something like this:
+>=20
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 5035092..73ab102 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -1748,14 +1748,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>     max_nested_state_len =3D kvm_max_nested_state_length();
+>     if (max_nested_state_len > 0) {
+>         assert(max_nested_state_len >=3D offsetof(struct =
+kvm_nested_state, data));
+> -        env->nested_state =3D g_malloc0(max_nested_state_len);
+>=20
+> -        env->nested_state->size =3D max_nested_state_len;
+> -
+> -        if (IS_INTEL_CPU(env)) {
+> +        if (cpu_has_vmx(env)) {
+>             struct kvm_vmx_nested_state_hdr *vmx_hdr =3D
+>                 &env->nested_state->hdr.vmx;
+>=20
+> +            env->nested_state =3D g_malloc0(max_nested_state_len);
+> +            env->nested_state->size =3D max_nested_state_len;
+>             env->nested_state->format =3D KVM_STATE_NESTED_FORMAT_VMX;
+>             vmx_hdr->vmxon_pa =3D -1ull;
+>             vmx_hdr->vmcs12_pa =3D -1ull;
+> @@ -3682,7 +3681,7 @@ static int kvm_put_nested_state(X86CPU *cpu)
+>     CPUX86State *env =3D &cpu->env;
+>     int max_nested_state_len =3D kvm_max_nested_state_length();
+>=20
+> -    if (max_nested_state_len <=3D 0) {
+> +    if (!env->nested_state) {
+>         return 0;
+>     }
+>=20
+> @@ -3696,7 +3695,7 @@ static int kvm_get_nested_state(X86CPU *cpu)
+>     int max_nested_state_len =3D kvm_max_nested_state_length();
+>     int ret;
+>=20
+> -    if (max_nested_state_len <=3D 0) {
+> +    if (!env->nested_state) {
+>         return 0;
+>     }
+>=20
+>=20
+> What do you think?  (As a side effect, this completely disables
+> KVM_GET/SET_NESTED_STATE on SVM, which I think is safer since it
+> will have to save at least the NPT root and the paging mode.  So we
+> could remove vmstate_svm_nested_state as well).
+>=20
+> Paolo
 
-Ported from Marvell LSP code originally written by Yehuda Yitschak
+I like your suggestion better than my commit. It is indeed more elegant =
+and correct. :)
+The code change above looks good to me as nested_state_needed() will =
+return false anyway if env->nested_state is false.
+Will you submit a new patch or should I?
 
-Signed-off-by: Gregory CLEMENT <gregory.clement@bootlin.com>
----
- drivers/vfio/platform/reset/Kconfig           |  8 +++
- drivers/vfio/platform/reset/Makefile          |  2 +
- .../vfio/platform/reset/vfio_platform_xhci.c  | 60 +++++++++++++++++++
- 3 files changed, 70 insertions(+)
- create mode 100644 drivers/vfio/platform/reset/vfio_platform_xhci.c
+-Liran
 
-diff --git a/drivers/vfio/platform/reset/Kconfig b/drivers/vfio/platform/reset/Kconfig
-index 392e3c09def0..14f620fd250d 100644
---- a/drivers/vfio/platform/reset/Kconfig
-+++ b/drivers/vfio/platform/reset/Kconfig
-@@ -22,3 +22,11 @@ config VFIO_PLATFORM_BCMFLEXRM_RESET
- 	  Enables the VFIO platform driver to handle reset for Broadcom FlexRM
- 
- 	  If you don't know what to do here, say N.
-+
-+config VFIO_PLATFORM_XHCI_RESET
-+	tristate "VFIO support for USB XHCI reset"
-+	depends on VFIO_PLATFORM
-+	help
-+	  Enables the VFIO platform driver to handle reset for USB XHCI
-+
-+	  If you don't know what to do here, say N.
-diff --git a/drivers/vfio/platform/reset/Makefile b/drivers/vfio/platform/reset/Makefile
-index 7294c5ea122e..d84c4d3dc041 100644
---- a/drivers/vfio/platform/reset/Makefile
-+++ b/drivers/vfio/platform/reset/Makefile
-@@ -1,7 +1,9 @@
- # SPDX-License-Identifier: GPL-2.0
- vfio-platform-calxedaxgmac-y := vfio_platform_calxedaxgmac.o
- vfio-platform-amdxgbe-y := vfio_platform_amdxgbe.o
-+vfio-platform-xhci-y := vfio_platform_xhci.o
- 
- obj-$(CONFIG_VFIO_PLATFORM_CALXEDAXGMAC_RESET) += vfio-platform-calxedaxgmac.o
- obj-$(CONFIG_VFIO_PLATFORM_AMDXGBE_RESET) += vfio-platform-amdxgbe.o
- obj-$(CONFIG_VFIO_PLATFORM_BCMFLEXRM_RESET) += vfio_platform_bcmflexrm.o
-+obj-$(CONFIG_VFIO_PLATFORM_XHCI_RESET) += vfio-platform-xhci.o
-diff --git a/drivers/vfio/platform/reset/vfio_platform_xhci.c b/drivers/vfio/platform/reset/vfio_platform_xhci.c
-new file mode 100644
-index 000000000000..7b75a04402ee
---- /dev/null
-+++ b/drivers/vfio/platform/reset/vfio_platform_xhci.c
-@@ -0,0 +1,60 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * VFIO platform driver specialized for XHCI reset
-+ *
-+ * Copyright 2016 Marvell Semiconductors, Inc.
-+ *
-+ */
-+
-+#include <linux/clk.h>
-+#include <linux/device.h>
-+#include <linux/init.h>
-+#include <linux/io.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/phy/phy.h>
-+#include <linux/usb/phy.h>
-+
-+#include "../vfio_platform_private.h"
-+
-+#define MAX_XHCI_CLOCKS		4
-+#define MAX_XHCI_PHYS		2
-+
-+int vfio_platform_xhci_reset(struct vfio_platform_device *vdev)
-+{
-+	struct device *dev = vdev->device;
-+	struct device_node *np = dev->of_node;
-+	struct usb_phy *usb_phy;
-+	struct clk *clk;
-+	int ret, i;
-+
-+	/*
-+	 * Compared to the native driver, no need to handle the
-+	 * deferred case, because the resources are already
-+	 * there
-+	 */
-+	for (i = 0; i < MAX_XHCI_CLOCKS; i++) {
-+		clk = of_clk_get(np, i);
-+		if (!IS_ERR(clk)) {
-+			ret = clk_prepare_enable(clk);
-+			if (ret)
-+				return -ENODEV;
-+		}
-+	}
-+
-+	usb_phy = devm_usb_get_phy_by_phandle(dev, "usb-phy", 0);
-+	if (!IS_ERR(usb_phy)) {
-+		ret = usb_phy_init(usb_phy);
-+		if (ret)
-+			return -ENODEV;
-+	}
-+
-+	return 0;
-+}
-+
-+module_vfio_reset_handler("generic-xhci", vfio_platform_xhci_reset);
-+
-+MODULE_AUTHOR("Yehuda Yitschak");
-+MODULE_DESCRIPTION("Reset support for XHCI vfio platform device");
-+MODULE_LICENSE("GPL");
--- 
-2.20.1
 
