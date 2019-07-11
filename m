@@ -2,174 +2,227 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A3AE65FE0
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 21:08:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DDC2066068
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 22:09:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728747AbfGKTIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 15:08:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50684 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728546AbfGKTIO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 15:08:14 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3E17130C0DE2;
-        Thu, 11 Jul 2019 19:08:13 +0000 (UTC)
-Received: from x1.home (ovpn-116-83.phx2.redhat.com [10.3.116.83])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B63B25C1B5;
-        Thu, 11 Jul 2019 19:08:12 +0000 (UTC)
-Date:   Thu, 11 Jul 2019 13:08:11 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "Sun, Yi Y" <yi.y.sun@intel.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
-Message-ID: <20190711130811.4e51437d@x1.home>
-In-Reply-To: <A2975661238FB949B60364EF0F2C257439F931F8@SHSMSX104.ccr.corp.intel.com>
-References: <1560000071-3543-1-git-send-email-yi.l.liu@intel.com>
-        <1560000071-3543-10-git-send-email-yi.l.liu@intel.com>
-        <20190619222647.72efc76a@x1.home>
-        <A2975661238FB949B60364EF0F2C257439F0164E@SHSMSX104.ccr.corp.intel.com>
-        <20190620150757.7b2fa405@x1.home>
-        <A2975661238FB949B60364EF0F2C257439F02663@SHSMSX104.ccr.corp.intel.com>
-        <20190621095740.41e6e98e@x1.home>
-        <A2975661238FB949B60364EF0F2C257439F05415@SHSMSX104.ccr.corp.intel.com>
-        <20190628090741.51e8d18e@x1.home>
-        <A2975661238FB949B60364EF0F2C257439F1E9EC@SHSMSX104.ccr.corp.intel.com>
-        <20190703112212.146ac71c@x1.home>
-        <A2975661238FB949B60364EF0F2C257439F1FF4E@SHSMSX104.ccr.corp.intel.com>
-        <20190705095520.548331c2@x1.home>
-        <A2975661238FB949B60364EF0F2C257439F931F8@SHSMSX104.ccr.corp.intel.com>
-Organization: Red Hat
+        id S1728674AbfGKUJ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 16:09:27 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53678 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726207AbfGKUJ1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Jul 2019 16:09:27 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6BK6nl4005034;
+        Thu, 11 Jul 2019 16:09:24 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tpat8avgd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Jul 2019 16:09:24 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x6BK4fq0025704;
+        Thu, 11 Jul 2019 20:09:23 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma01wdc.us.ibm.com with ESMTP id 2tjk96xd5h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Jul 2019 20:09:23 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6BK9NXQ49349066
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Jul 2019 20:09:23 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E939CAC059;
+        Thu, 11 Jul 2019 20:09:22 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C266FAC05B;
+        Thu, 11 Jul 2019 20:09:22 +0000 (GMT)
+Received: from [9.60.89.60] (unknown [9.60.89.60])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu, 11 Jul 2019 20:09:22 +0000 (GMT)
+Subject: Re: [RFC v2 4/5] vfio-ccw: Don't call cp_free if we are processing a
+ channel program
+To:     Halil Pasic <pasic@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <cover.1562616169.git.alifm@linux.ibm.com>
+ <1405df8415d3bff446c22753d0e9b91ff246eb0f.1562616169.git.alifm@linux.ibm.com>
+ <20190709121613.6a3554fa.cohuck@redhat.com>
+ <45ad7230-3674-2601-af5b-d9beef9312be@linux.ibm.com>
+ <20190709162142.789dd605.pasic@linux.ibm.com>
+ <87f7a37f-cc34-36fb-3a33-309e33bbbdde@linux.ibm.com>
+ <20190711165703.3a1a8462.pasic@linux.ibm.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Message-ID: <ed983668-44da-9e90-18b7-3f5d78164712@linux.ibm.com>
+Date:   Thu, 11 Jul 2019 16:09:22 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190711165703.3a1a8462.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Thu, 11 Jul 2019 19:08:13 +0000 (UTC)
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-11_05:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907110222
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 11 Jul 2019 12:27:26 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
 
-> Hi Alex,
-> 
-> > From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Behalf
-> > Of Alex Williamson
-> > Sent: Friday, July 5, 2019 11:55 PM
-> > To: Liu, Yi L <yi.l.liu@intel.com>
-> > Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver
-> > 
-> > On Thu, 4 Jul 2019 09:11:02 +0000
-> > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
-> >   
-> > > Hi Alex,
-> > >  
-> > > > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > > Sent: Thursday, July 4, 2019 1:22 AM
-> > > > To: Liu, Yi L <yi.l.liu@intel.com>
-> > > > Subject: Re: [PATCH v1 9/9] smaples: add vfio-mdev-pci driver  
-> [...]
-> > >  
-> > > > It's really unfortunate that we don't have the mdev inheriting the
-> > > > iommu group of the iommu_device so that userspace can really understand
-> > > > this relationship.  A separate group makes sense for the aux-domain
-> > > > case, and is (I guess) not a significant issue in the case of a
-> > > > singleton iommu_device group, but it's pretty awkward here.  Perhaps
-> > > > this is something we should correct in design of iommu backed mdevs.  
-> > >
-> > > Yeah, for aux-domain case, it is not significant issue as aux-domain essentially
-> > > means singleton iommu_devie group. And in early time, when designing the  
-> > support  
-> > > for wrap pci as a mdev, we also considered to let vfio-mdev-pci to reuse
-> > > iommu_device group. But this results in an iommu backed group includes mdev and
-> > > physical devices, which might also be strange. Do you think it is valuable to  
-> > reconsider  
-> > > it?  
-> > 
-> > From a group perspective, the cleanest solution would seem to be that
-> > IOMMU backed mdevs w/o aux domain support should inherit the IOMMU
-> > group of the iommu_device,  
-> 
-> A confirm here. Regards to inherit the IOMMU group of iommu_device, do
-> you mean mdev device should be added to the IOMMU group of iommu_device
-> or maintain a parent and inheritor relationship within vfio? I guess you mean the
-> later one? :-)
 
-I was thinking the former, I'm not sure what the latter implies.  There
-is no hierarchy within or between IOMMU groups, it's simply a set of
-devices.  Maybe what you're getting at is that vfio needs to understand
-that the mdev is a child of the endpoint device in its determination of
-whether the group is viable.  That's true, but we can also have IOMMU
-groups composed of SR-IOV VFs along with their parent PF if the root of
-the IOMMU group is (for example) a downstream switch port above the PF.
-So we can't simply look at the parent/child relationship within the
-group, we somehow need to know that the parent device sharing the IOMMU
-group is operating in host kernel space on behalf of the mdev.
- 
-> > but I think the barrier here is that we have
-> > a difficult time determining if the group is "viable" in that case.
-> > For example a group where one devices is bound to a native host driver
-> > and the other device bound to a vfio driver would typically be
-> > considered non-viable as it breaks the isolation guarantees.  However  
+On 7/11/19 10:57 AM, Halil Pasic wrote:
+> On Tue, 9 Jul 2019 17:27:47 -0400
+> Farhan Ali <alifm@linux.ibm.com> wrote:
 > 
-> yes, this is how vfio guarantee the isolation before allowing user to further
-> add a group to a vfio container and so on.
+>>
+>>
+>> On 07/09/2019 10:21 AM, Halil Pasic wrote:
+>>> On Tue, 9 Jul 2019 09:46:51 -0400
+>>> Farhan Ali <alifm@linux.ibm.com> wrote:
+>>>
+>>>>
+>>>>
+>>>> On 07/09/2019 06:16 AM, Cornelia Huck wrote:
+>>>>> On Mon,  8 Jul 2019 16:10:37 -0400
+>>>>> Farhan Ali <alifm@linux.ibm.com> wrote:
+>>>>>
+>>>>>> There is a small window where it's possible that we could be working
+>>>>>> on an interrupt (queued in the workqueue) and setting up a channel
+>>>>>> program (i.e allocating memory, pinning pages, translating address).
+>>>>>> This can lead to allocating and freeing the channel program at the
+>>>>>> same time and can cause memory corruption.
+>>>>>>
+>>>>>> Let's not call cp_free if we are currently processing a channel program.
+>>>>>> The only way we know for sure that we don't have a thread setting
+>>>>>> up a channel program is when the state is set to VFIO_CCW_STATE_CP_PENDING.
+>>>>>
+>>>>> Can we pinpoint a commit that introduced this bug, or has it been there
+>>>>> since the beginning?
+>>>>>
+>>>>
+>>>> I think the problem was always there.
+>>>>
+>>>
+>>> I think it became relevant with the async stuff. Because after the async
+>>> stuff was added we start getting solicited interrupts that are not about
+>>> channel program is done. At least this is how I remember the discussion.
+>>>
 > 
-> > I think in this configuration, the parent device is effectively
-> > participating in the isolation and "donating" its iommu group on behalf
-> > of the mdev device.  I don't think we can simultaneously use that iommu
-> > group for any other purpose.   
-> 
-> Agree. At least host cannot make use of the iommu group any more in such
-> configuration.
-> 
-> > I'm sure we could come up with a way for
-> > vifo-core to understand this relationship and add it to the white list,  
-> 
-> The configuration is host driver still exists while we want to let mdev device
-> to somehow "own" the iommu backed DMA isolation capability. So one possible
-> way may be calling vfio_add_group_dev() which will creates a vfio_device instance
-> for the iommu_device in vfio.c when creating a iommu backed mdev. Then the
-> iommu group is fairly viable.
+> You seem to have ignored this comment. 
 
-"fairly viable" ;)  It's a correct use of the term, it's a little funny
-though as "fairly" can also mean reasonably/sufficiently/adequately as
-well as I think the intended use here equivalent to justly. </tangent>
+I read both comments as being in agreement with one another.  The
+problem has always been there, but didn't mean anything until we had
+another mechanism (async) to drive additional interrupts.  Hence the v3
+patch including the async patch in a Fixes tag.
 
-That's an interesting idea to do an implicit vfio_add_group_dev() on
-the iommu_device in this case, if you've worked through how that could
-play out, it'd be interesting to see.
-
-> > I wonder though how confusing this might be to users who now understand
-> > the group/driver requirement to be "all endpoints bound to vfio
-> > drivers".  This might still be the best approach regardless of this.  
+BTW wasn't the cp->is_initialized
+> make 'Make it safe to call the cp accessors in any case, so we can call
+> them unconditionally.'?
 > 
-> Yes, another thing I'm considering is how to prevent such a host driver from
-> issuing DMA. If we finally get a device bound to vfio-pci and another device
-> wrapped as mdev and passthru them to VM, the host driver is still capable to
-> issue DMA. Though IOMMU can block some DMAs, but not all of them. If a
-> DMA issued by host driver happens to have mapping in IOMMU side, then
-> host is kind of doing things on behalf on VM. Though we may trust the host
-> driver, but it looks to be a little bit awkward to me. :-(
+> @Connie: Your opinion as the author of that patch and of the cited
+> sentence?
+> >>>>>>
+>>>>>> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+>>>>>> ---
+>>>>>>    drivers/s390/cio/vfio_ccw_drv.c | 2 +-
+>>>>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+>>>>>> index 4e3a903..0357165 100644
+>>>>>> --- a/drivers/s390/cio/vfio_ccw_drv.c
+>>>>>> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+>>>>>> @@ -92,7 +92,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+>>>>>>    		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
+>>>>>>    	if (scsw_is_solicited(&irb->scsw)) {
+>>>>>>    		cp_update_scsw(&private->cp, &irb->scsw);
+>>>>>> -		if (is_final)
+>>>>>> +		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING)
+>>>
+>>> Ain't private->state potentially used by multiple threads of execution?
+>>
+>> yes
+>>
+>> One of the paths I can think of is a machine check from the host which 
+>> will ultimately call vfio_ccw_sch_event callback which could set state 
+>> to NOT_OPER or IDLE.
+>>
+>>> Do we need to use atomic operations or external synchronization to avoid
+>>> this being another gamble? Or am I missing something?
+>>
+>> I think we probably should think about atomic operations for 
+>> synchronizing the state (and it could be a separate add on patch?).
+>>
+>> But for preventing 2 threads from stomping on the cp the check should be 
+>> enough, unless I am missing something?
+>>
+> 
+> Usually programming languages don't like incorrectly synchronized
+> programs. One tends to end up in undefined behavior land -- form language
+> perspective. That doesn't actually mean you are bound to see strange
+> stuff. With implementation spec + ABI spec + platform/architecture
+> spec one may end up with things being well defined. But it that is a much
+> deeper rabbit hole.
+> 
+> The nice thing about condition state == VFIO_CCW_STATE_CP_PENDING is
+> that it can tolerate stale state values. The bad case at hand
+> (you free but you should not) would be we see a stale
+> VFIO_CCW_STATE_CP_PENDING but we are actually
+> VFIO_CCW_STATE_CP_PROCESSING. That is pretty difficult to imagine
+> because one can enter VFIO_CCW_STATE_CP_PROCESSING only form
+> VFIO_CCW_STATE_CP_PENDING afair. 
 
-vfio is allocating an iommu domain and placing the iommu_device into
-that domain, the user therefore own the iova context for the parent
-device, how would that not manage all DMA?   The vendor driver could
-theoretically also manipulate mappings within that domain, but that
-driver is a host kernel driver and therefore essentially trusted like
-any other host kernel driver.  The only unique thing here is that it's
-part of a channel providing access for an untrusted user, so it needs
-to be particularly concerned with keeping that user access within
-bounds.  Thanks,
+I think you're backwards here.  The path is IDLE -> CP_PROCESSING ->
+(CP_PENDING | IDLE)
 
-Alex
+On s390x torn reads/writes (i.e.
+> observing something that ain't either the old nor the new value) on an
+> int shouldn't be a concern.
+> 
+> The other bad case (where you don't free albeit you should) looks a
+> bit trickier.
+
+I'm afraid I don't understand your intention with the above paragraphs.  :(
+
+> 
+> I'm not a fan of keeping races around without good reasons. And I don't
+> see good reasons here. I'm no fan of needlessly complicated solutions
+> either.
+> 
+> But seems, at least with my beliefs about races, I'm the oddball
+> here. 
+
+The "race" here is that we have one synchronous operation (SSCH) and two
+asynchronous operations (HSCH, CSCH), both of which interact with one
+another and generate interrupts that pass through this chunk of code.
+
+I have not fully considered this patch yet, but the race is a concern to
+all of us oddballs.  I have not chimed in any great detail because I
+only got through the first couple patches in v1 before going on holiday,
+and the discussions on v1/v2 are numerous.
+
+ - Eric
+
+> 
+> Regards,
+> Halil
+> 
+>>>
+>>>>>>    			cp_free(&private->cp);
+>>>>>>    	}
+>>>>>>    	mutex_lock(&private->io_mutex);
+>>>>>
+>>>>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>>>>>
+>>>>>
+>>>> Thanks for reviewing.
+>>>>
+>>>> Thanks
+>>>> Farhan
+>>>
+>>>
+> 
