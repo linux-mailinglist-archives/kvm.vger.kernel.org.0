@@ -2,156 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 44BB765708
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 14:35:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB1796571B
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 14:40:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726053AbfGKMfT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 08:35:19 -0400
-Received: from foss.arm.com ([217.140.110.172]:45676 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725971AbfGKMfT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 08:35:19 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 949D42B;
-        Thu, 11 Jul 2019 05:35:18 -0700 (PDT)
-Received: from [10.1.196.217] (e121566-lin.cambridge.arm.com [10.1.196.217])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF8463F59C;
-        Thu, 11 Jul 2019 05:35:17 -0700 (PDT)
-Subject: Re: [PATCH 55/59] arm64: KVM: nv: Add handling of EL2-specific timer
- registers
-To:     Marc Zyngier <marc.zyngier@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Dave Martin <Dave.Martin@arm.com>
-References: <20190621093843.220980-1-marc.zyngier@arm.com>
- <20190621093843.220980-56-marc.zyngier@arm.com>
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <819d7642-0911-9c3a-987e-d6f55d68703b@arm.com>
-Date:   Thu, 11 Jul 2019 13:35:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        id S1728369AbfGKMkC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 08:40:02 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:40208 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726016AbfGKMkC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 08:40:02 -0400
+Received: by mail-oi1-f196.google.com with SMTP id w196so4342046oie.7
+        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 05:40:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3Yt4EscGigEBnlnjY7wWgkB/ov60rXHSlmHTWLza6n4=;
+        b=uPjeCcZyt2xFKg2rAD3fkzlSCJR/DUfzg8UN7frwQfq/6628hhyOdtkgFGlnrlPdrt
+         ERiC/eSwlKnAuUDJp5O4YN5EXSBnqtEahX141CDob0ECQ3QRSaWjy4u1PZVICqjSCque
+         byOjTttw4zsDSxomIowXeUSOtA7fpRjD8etTHX670QMsP3pLR7J20R8Cilw6xHY+HyzT
+         EY3lv53l62ZtI4eHQhLmUGxZrh3W4Mo5V9Pf7Wi5kjjaSqFmsfKixxhX2sEFlJ0zk+mR
+         T9A6gX0B4mFmFe6CFf7GG5mscP5WS0kk3CJwtnJIDWUjpt7Bxm6Pzz6+CfPXQBnhQkX+
+         DfFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3Yt4EscGigEBnlnjY7wWgkB/ov60rXHSlmHTWLza6n4=;
+        b=E9vFx4CYkKamyFSf+YaBEQwtgnmdgpVp2dNgTZxXmJzAA3ZXOyNrsjRz2bt5CGHndY
+         eNejwToyXKzl/w1Ytp8VFGbY6U+ninM9hk+pe0EStnFZXqr1vBK7Y+SKcvQcKCJvRhG6
+         MJswUUxlUFrj5vSvvvvE3o0J393gDy8WD2mnhYW5/m+hcqwi4SEkZl0Jr4GayOpYP1Vp
+         1kwiLCjl4yE50BJi2pgecUpPnRDwfaKp6TEdlxkACme09U1Q8Y6YmcKA2uouSzr0ah4F
+         DLrirI1BWwgkqHV6VFvXsuX7Bu5CS8OUDehn9tXfdgMSx/SKCHjUpzVfo1D5q9XeZfXY
+         +6Zg==
+X-Gm-Message-State: APjAAAUEntrVDvAbHiwqSDiDn6pQ/8zo+eqDBjpAHlOK0gRfnNuAuh9m
+        bVTtx66cOiGv4Z+Z2xJnLHbicNWYXsWY8x7/nDhsIw==
+X-Google-Smtp-Source: APXvYqx88tSye8THszfgMMvEEcruY6rukK6VV++UTAkaz8tl3XLtSypsMIu65tZSvL5XnyBEfwT4Uo2D1KRoMzGoS+o=
+X-Received: by 2002:a05:6808:8c2:: with SMTP id k2mr2178732oij.98.1562848801716;
+ Thu, 11 Jul 2019 05:40:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190621093843.220980-56-marc.zyngier@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <20190711104412.31233-1-quintela@redhat.com>
+In-Reply-To: <20190711104412.31233-1-quintela@redhat.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Thu, 11 Jul 2019 13:39:50 +0100
+Message-ID: <CAFEAcA8uwgmV47Dt8e=ZRLzssXKWn+1DivDFEuN5s2+N1FJX3w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/19] Migration patches
+To:     Juan Quintela <quintela@redhat.com>
+Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 6/21/19 10:38 AM, Marc Zyngier wrote:
-
-> Add the required handling for EL2 and EL02 registers, as
-> well as EL1 registers used in the E2H context.
+On Thu, 11 Jul 2019 at 11:56, Juan Quintela <quintela@redhat.com> wrote:
 >
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 72 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 72 insertions(+)
+> The following changes since commit 6df2cdf44a82426f7a59dcb03f0dd2181ed7fdfa:
 >
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index ba3bcd29c02d..0bd6a66b621e 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1361,20 +1361,92 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->  
->  	switch (reg) {
->  	case SYS_CNTP_TVAL_EL0:
-> +		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-> +			tmr = TIMER_HPTIMER;
-> +		else
-> +			tmr = TIMER_PTIMER;
-> +		treg = TIMER_REG_TVAL;
-> +		break;
-> +
->  	case SYS_AARCH32_CNTP_TVAL:
-> +	case SYS_CNTP_TVAL_EL02:
->  		tmr = TIMER_PTIMER;
->  		treg = TIMER_REG_TVAL;
->  		break;
-> +
-> +	case SYS_CNTV_TVAL_EL02:
-> +		tmr = TIMER_VTIMER;
-> +		treg = TIMER_REG_TVAL;
-> +		break;
-> +
-> +	case SYS_CNTHP_TVAL_EL2:
-> +		tmr = TIMER_HPTIMER;
-> +		treg = TIMER_REG_TVAL;
-> +		break;
-> +
-> +	case SYS_CNTHV_TVAL_EL2:
-> +		tmr = TIMER_HVTIMER;
-> +		treg = TIMER_REG_TVAL;
-> +		break;
-> +
->  	case SYS_CNTP_CTL_EL0:
-> +		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-> +			tmr = TIMER_HPTIMER;
-> +		else
-> +			tmr = TIMER_PTIMER;
-> +		treg = TIMER_REG_CTL;
-> +		break;
-> +
->  	case SYS_AARCH32_CNTP_CTL:
-> +	case SYS_CNTP_CTL_EL02:
->  		tmr = TIMER_PTIMER;
->  		treg = TIMER_REG_CTL;
->  		break;
-> +
-> +	case SYS_CNTV_CTL_EL02:
-> +		tmr = TIMER_VTIMER;
-> +		treg = TIMER_REG_CTL;
-> +		break;
-> +
-> +	case SYS_CNTHP_CTL_EL2:
-> +		tmr = TIMER_HPTIMER;
-> +		treg = TIMER_REG_CTL;
-> +		break;
-> +
-> +	case SYS_CNTHV_CTL_EL2:
-> +		tmr = TIMER_HVTIMER;
-> +		treg = TIMER_REG_CTL;
-> +		break;
-> +		
->  	case SYS_CNTP_CVAL_EL0:
-> +		if (vcpu_mode_el2(vcpu) && vcpu_el2_e2h_is_set(vcpu))
-> +			tmr = TIMER_HPTIMER;
-> +		else
-> +			tmr = TIMER_PTIMER;
-> +		treg = TIMER_REG_CVAL;
-> +		break;
-> +
->  	case SYS_AARCH32_CNTP_CVAL:
-> +	case SYS_CNTP_CVAL_EL02:
->  		tmr = TIMER_PTIMER;
->  		treg = TIMER_REG_CVAL;
->  		break;
-> +
-> +	case SYS_CNTV_CVAL_EL02:
-> +		tmr = TIMER_VTIMER;
-> +		treg = TIMER_REG_CVAL;
-> +		break;
-> +
-> +	case SYS_CNTHP_CVAL_EL2:
-> +		tmr = TIMER_HPTIMER;
-> +		treg = TIMER_REG_CVAL;
-> +		break;
-> +
-> +	case SYS_CNTHV_CVAL_EL2:
-> +		tmr = TIMER_HVTIMER;
-> +		treg = TIMER_REG_CVAL;
-> +		break;
-> +
->  	case SYS_CNTVOFF_EL2:
->  		tmr = TIMER_VTIMER;
->  		treg = TIMER_REG_VOFF;
+>   Update version for v4.1.0-rc0 release (2019-07-09 17:21:53 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/juanquintela/qemu.git tags/migration-pull-request
+>
+> for you to fetch changes up to 0b47e79b3d04f500b6f3490628905ec5884133df:
+>
+>   migration: allow private destination ram with x-ignore-shared (2019-07-11 12:30:40 +0200)
+>
+> ----------------------------------------------------------------
+> Migration pull request
+>
+> ----------------------------------------------------------------
 
-Shouldn't we forward physical timer traps to the L1 guest hypervisor if
-__vcpu_sys_reg(vcpu, CNTHCTL_EL2.EL1PTEN) == 0 (trap access) and
-!vcpu_mode_el2(vcpu)? A regular (non-nested) non-vhe hypervisor can set that bit
-to emulate the physical timer. If I remember correctly, KVM with VHE used to do
-it too until some time ago.
+Hi; this fails "make check" on aarch32 host (possibly a general
+32-bit host issue, as this is the only 32-bit host I test on):
 
+MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+tests/test-bitmap -m=quick -k --tap < /dev/null |
+./scripts/tap-driver.pl --test-name="test-bitmap"
+**
+ERROR:/home/peter.maydell/qemu/tests/test-bitmap.c:39:check_bitmap_copy_with_offset:
+assertion failed (bmap1 == bmap2)
+Aborted
+ERROR - Bail out!
+ERROR:/home/peter.maydell/qemu/tests/test-bitmap.c:39:check_bitmap_copy_with_offset:
+assertion failed (bmap1 == bmap2)
+/home/peter.maydell/qemu/tests/Makefile.include:904: recipe for target
+'check-unit' failed
+
+thanks
+-- PMM
