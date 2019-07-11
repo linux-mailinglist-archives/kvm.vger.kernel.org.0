@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 77ED5658C1
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 16:27:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F0AAA658F4
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 16:29:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728812AbfGKO1t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 10:27:49 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:37146 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728809AbfGKO1r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 10:27:47 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6BEO9em001500;
-        Thu, 11 Jul 2019 14:26:32 GMT
+        id S1728830AbfGKO1y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 10:27:54 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:39580 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728809AbfGKO1x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 10:27:53 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6BEO7gP100410;
+        Thu, 11 Jul 2019 14:26:39 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=/snaNkVEEW4nTR1xAXfvlEoe9rj/2L0Z92puglvXclU=;
- b=DN3eG8DXxQ7ozWrPnuAeiliXI+C+IxsV4od5f1TGtSHKulg61bcs9xHwRh7Wbxnghz9I
- ThGtm4GjaEXofJ/g9FZ3+haVgxr28XtB+ucHwwPynqaJaB3a3cRcsSIJZKS7VGg7EiMw
- rNBOsKQ9GocLmZ4MB3gTzKkSMvJmagNALGBonkOZRxAN95EUC0/Wbwu+HXXfAxWl18C9
- GkNsUrqBGLn4Ir8iOvlMsFHQtMtfTKAD2WUAOBydyAaB9K/Tb/BB4EigTZEu+vozMNyu
- ysx0uiZcdvKRUDvzf4/aPdWlIS0c9udhkbyOJiJWUg4LAaH97xlf2yC2mUSNfBoqVSwX 4Q== 
+ bh=tktXu8oSlvrRNi4oCpkMHKHtnQ30RjQ+vGHk9xchmuI=;
+ b=Xw8imofO8fKNfBvyII53RRKIWPHJ/UdjgH1ZSaBocnV0EADrjb1GTZYN4HsE7xrVPRc/
+ TEHR2f4ozNEvHmT4xkzmrRWShe8NJkdGTGU5UyvTwwVLuobGplkQYt22venKGQfjZsCi
+ BuPNZ1Zy1I5Lm3q4cyPwf0rvVmiPcVoh9A/tJ1V5PFUsSDajeMDtZazluCVycnUMAv6u
+ /YyGN39NkO9rtwovlVRiIRORlVYEoHIigSvvQZaOjXC7B6+jVAU9bBj+zUDnf/Rei8Mf
+ yGpCGEFGnOwzX/ATnI3MWljtUlcXz+wMpxZcI3AhvYUC5PX/005SgrPaW6hQhMYqVhz6 ew== 
 Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
-        by userp2130.oracle.com with ESMTP id 2tjk2u0e09-1
+        by aserp2120.oracle.com with ESMTP id 2tjkkq0cat-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Jul 2019 14:26:32 +0000
+        Thu, 11 Jul 2019 14:26:39 +0000
 Received: from achartre-desktop.fr.oracle.com (dhcp-10-166-106-34.fr.oracle.com [10.166.106.34])
-        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x6BEPcu7021444;
-        Thu, 11 Jul 2019 14:26:28 GMT
+        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x6BEPcu8021444;
+        Thu, 11 Jul 2019 14:26:31 GMT
 From:   Alexandre Chartre <alexandre.chartre@oracle.com>
 To:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
@@ -38,16 +38,16 @@ To:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
 Cc:     konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
         liran.alon@oracle.com, jwadams@google.com, graf@amazon.de,
         rppt@linux.vnet.ibm.com, alexandre.chartre@oracle.com
-Subject: [RFC v2 14/26] mm/asi: Handle ASI mapped range leaks and overlaps
-Date:   Thu, 11 Jul 2019 16:25:26 +0200
-Message-Id: <1562855138-19507-15-git-send-email-alexandre.chartre@oracle.com>
+Subject: [RFC v2 15/26] mm/asi: Initialize the ASI page-table with core mappings
+Date:   Thu, 11 Jul 2019 16:25:27 +0200
+Message-Id: <1562855138-19507-16-git-send-email-alexandre.chartre@oracle.com>
 X-Mailer: git-send-email 1.7.1
 In-Reply-To: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
 References: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9314 signatures=668688
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
  suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=857 adultscore=0
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1907110162
 Sender: kvm-owner@vger.kernel.org
@@ -55,320 +55,239 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When mapping a buffer in an ASI page-table, data around the buffer can
-also be mapped if the entire buffer is not aligned with the page directory
-size used for the mapping. So, data can potentially leak into the ASI
-page-table. In such a case, print a warning that data are leaking.
+Core mappings are the minimal mappings we need to be able to
+enter isolation and handle an isolation abort or exit. This
+includes the kernel code, the GDT and the percpu ASI sessions.
+We also need a stack so we map the current stack when entering
+isolation and unmap it on exit/abort.
 
-Also data effectively mapped can overlap with an already mapped buffer.
-This is not an issue when mapping data but, when unmapping, make sure
-data from another buffer don't get unmapped as a side effect.
+Optionally, additional mappins can be added like the stack canary
+or the percpu offset to be able to use get_cpu_var()/this_cpu_ptr()
+when isolation is active.
 
 Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
 ---
- arch/x86/mm/asi_pagetable.c |  230 +++++++++++++++++++++++++++++++++++++++----
- 1 files changed, 212 insertions(+), 18 deletions(-)
+ arch/x86/include/asm/asi.h  |    9 ++++-
+ arch/x86/mm/asi.c           |   75 +++++++++++++++++++++++++++++++++++++++---
+ arch/x86/mm/asi_pagetable.c |   30 ++++++++++++----
+ 3 files changed, 99 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/mm/asi_pagetable.c b/arch/x86/mm/asi_pagetable.c
-index 1ff0c47..f1ee65b 100644
---- a/arch/x86/mm/asi_pagetable.c
-+++ b/arch/x86/mm/asi_pagetable.c
-@@ -9,6 +9,14 @@
+diff --git a/arch/x86/include/asm/asi.h b/arch/x86/include/asm/asi.h
+index cf5d198..1ac8fd3 100644
+--- a/arch/x86/include/asm/asi.h
++++ b/arch/x86/include/asm/asi.h
+@@ -11,6 +11,13 @@
+ #include <asm/pgtable.h>
+ #include <linux/xarray.h>
  
- #include <asm/asi.h>
++/*
++ * asi_create() map flags. Flags are used to map optional data
++ * when creating an ASI.
++ */
++#define ASI_MAP_STACK_CANARY	0x01	/* map stack canary */
++#define ASI_MAP_CPU_PTR		0x02	/* for get_cpu_var()/this_cpu_ptr() */
++
+ enum page_table_level {
+ 	PGT_LEVEL_PTE,
+ 	PGT_LEVEL_PMD,
+@@ -73,7 +80,7 @@ struct asi_session {
+ void asi_init_range_mapping(struct asi *asi);
+ void asi_fini_range_mapping(struct asi *asi);
  
-+static unsigned long page_directory_size[] = {
-+	[PGT_LEVEL_PTE] = PAGE_SIZE,
-+	[PGT_LEVEL_PMD] = PMD_SIZE,
-+	[PGT_LEVEL_PUD] = PUD_SIZE,
-+	[PGT_LEVEL_P4D] = P4D_SIZE,
-+	[PGT_LEVEL_PGD] = PGDIR_SIZE,
+-extern struct asi *asi_create(void);
++extern struct asi *asi_create(int map_flags);
+ extern void asi_destroy(struct asi *asi);
+ extern int asi_enter(struct asi *asi);
+ extern void asi_exit(struct asi *asi);
+diff --git a/arch/x86/mm/asi.c b/arch/x86/mm/asi.c
+index 25633a6..f049438 100644
+--- a/arch/x86/mm/asi.c
++++ b/arch/x86/mm/asi.c
+@@ -19,6 +19,17 @@
+ /* ASI sessions, one per cpu */
+ DEFINE_PER_CPU_PAGE_ALIGNED(struct asi_session, cpu_asi_session);
+ 
++struct asi_map_option {
++	int	flag;
++	void	*ptr;
++	size_t	size;
 +};
 +
- /*
-  * Structure to keep track of address ranges mapped into an ASI.
-  */
-@@ -17,8 +25,16 @@ struct asi_range_mapping {
- 	void *ptr;			/* range start address */
- 	size_t size;			/* range size */
- 	enum page_table_level level;	/* mapping level */
-+	int overlap;			/* overlap count */
- };
++struct asi_map_option asi_map_percpu_options[] = {
++	{ ASI_MAP_STACK_CANARY, &fixed_percpu_data, sizeof(fixed_percpu_data) },
++	{ ASI_MAP_CPU_PTR, &this_cpu_off, sizeof(this_cpu_off) },
++};
++
+ static void asi_log_fault(struct asi *asi, struct pt_regs *regs,
+ 			  unsigned long error_code, unsigned long address)
+ {
+@@ -85,16 +96,55 @@ bool asi_fault(struct pt_regs *regs, unsigned long error_code,
+ 	return true;
+ }
  
-+#define ASI_RANGE_MAP_ADDR(r)	\
-+	round_down((unsigned long)((r)->ptr), page_directory_size[(r)->level])
+-static int asi_init_mapping(struct asi *asi)
++static int asi_init_mapping(struct asi *asi, int flags)
+ {
++	struct asi_map_option *option;
++	int i, err;
 +
-+#define ASI_RANGE_MAP_END(r)	\
-+	round_up((unsigned long)((r)->ptr + (r)->size), \
-+		 page_directory_size[(r)->level])
++	/*
++	 * Map the kernel.
++	 *
++	 * XXX We should check if we can map only kernel text, i.e. map with
++	 * size = _etext - _text
++	 */
++	err = asi_map(asi, (void *)__START_KERNEL_map, KERNEL_IMAGE_SIZE);
++	if (err)
++		return err;
 +
- /*
-  * Get the pointer to the beginning of a page table directory from a page
-  * table directory entry.
-@@ -609,6 +625,71 @@ static int asi_copy_pgd_range(struct asi *asi,
+ 	/*
+-	 * TODO: Populate the ASI page-table with minimal mappings so
+-	 * that we can at least enter isolation and abort.
++	 * Map the cpu_entry_area because we need the GDT to be mapped.
++	 * Not sure we need anything else from cpu_entry_area.
+ 	 */
++	err = asi_map_range(asi, (void *)CPU_ENTRY_AREA_PER_CPU, P4D_SIZE,
++			    PGT_LEVEL_P4D);
++	if (err)
++		return err;
++
++	/*
++	 * Map the percpu ASI sessions. This is used by interrupt handlers
++	 * to figure out if we have entered isolation and switch back to
++	 * the kernel address space.
++	 */
++	err = ASI_MAP_CPUVAR(asi, cpu_asi_session);
++	if (err)
++		return err;
++
++	/*
++	 * Optional percpu mappings.
++	 */
++	for (i = 0; i < ARRAY_SIZE(asi_map_percpu_options); i++) {
++		option = &asi_map_percpu_options[i];
++		if (flags & option->flag) {
++			err = asi_map_percpu(asi, option->ptr, option->size);
++			if (err)
++				return err;
++		}
++	}
++
  	return 0;
  }
  
-+
-+/*
-+ * Map a VA range, taking into account any overlap with already mapped
-+ * VA ranges. On error, return < 0. Otherwise return the number of
-+ * ranges the specified range is overlapping with.
-+ */
-+static int asi_map_overlap(struct asi *asi, void *ptr, size_t size,
-+			   enum page_table_level level)
-+{
-+	unsigned long map_addr, map_end;
-+	unsigned long addr, end;
-+	struct asi_range_mapping *range;
-+	bool need_mapping;
-+	int err, overlap;
-+
-+	addr = (unsigned long)ptr;
-+	end = addr + (unsigned long)size;
-+	need_mapping = true;
-+	overlap = 0;
-+
-+	lockdep_assert_held(&asi->lock);
-+	list_for_each_entry(range, &asi->mapping_list, list) {
-+
-+		if (range->ptr == ptr && range->size == size) {
-+			/* we are mapping the same range again */
-+			pr_debug("ASI %p: MAP %px/%lx/%d already mapped\n",
-+				 asi, ptr, size, level);
-+			return -EBUSY;
-+		}
-+
-+		/* check overlap with mapped range */
-+		map_addr = ASI_RANGE_MAP_ADDR(range);
-+		map_end = ASI_RANGE_MAP_END(range);
-+		if (end <= map_addr || addr >= map_end) {
-+			/* no overlap, continue */
-+			continue;
-+		}
-+
-+		pr_debug("ASI %p: MAP %px/%lx/%d overlaps with %px/%lx/%d\n",
-+			 asi, ptr, size, level,
-+			 range->ptr, range->size, range->level);
-+		range->overlap++;
-+		overlap++;
-+
-+		/*
-+		 * Check if new range is included into an existing range.
-+		 * If so then the new range is already entirely mapped.
-+		 */
-+		if (addr >= map_addr && end <= map_end) {
-+			pr_debug("ASI %p: MAP %px/%lx/%d implicitly mapped\n",
-+				 asi, ptr, size, level);
-+			need_mapping = false;
-+		}
-+	}
-+
-+	if (need_mapping) {
-+		err = asi_copy_pgd_range(asi, asi->pgd, current->mm->pgd,
-+					 addr, end, level);
-+		if (err)
-+			return err;
-+	}
-+
-+	return overlap;
-+}
-+
- /*
-  * Copy page table entries from the current page table (i.e. from the
-  * kernel page table) to the specified ASI page-table. The level
-@@ -619,44 +700,53 @@ int asi_map_range(struct asi *asi, void *ptr, size_t size,
- 		  enum page_table_level level)
+-struct asi *asi_create(void)
++struct asi *asi_create(int map_flags)
  {
- 	struct asi_range_mapping *range_mapping;
-+	unsigned long page_dir_size = page_directory_size[level];
- 	unsigned long addr = (unsigned long)ptr;
- 	unsigned long end = addr + ((unsigned long)size);
-+	unsigned long map_addr, map_end;
- 	unsigned long flags;
--	int err;
-+	int err, overlap;
-+
-+	map_addr = round_down(addr, page_dir_size);
-+	map_end = round_up(end, page_dir_size);
+ 	struct page *page;
+ 	struct asi *asi;
+@@ -115,7 +165,7 @@ struct asi *asi_create(void)
+ 	spin_lock_init(&asi->fault_lock);
+ 	asi_init_backend(asi);
  
--	pr_debug("ASI %p: MAP %px/%lx/%d\n", asi, ptr, size, level);
-+	pr_debug("ASI %p: MAP %px/%lx/%d -> %lx-%lx\n", asi, ptr, size, level,
-+		 map_addr, map_end);
-+	if (map_addr < addr)
-+		pr_debug("ASI %p: MAP LEAK %lx-%lx\n", asi, map_addr, addr);
-+	if (map_end > end)
-+		pr_debug("ASI %p: MAP LEAK %lx-%lx\n", asi, end, map_end);
+-	err = asi_init_mapping(asi);
++	err = asi_init_mapping(asi, map_flags);
+ 	if (err)
+ 		goto error;
+ 
+@@ -159,6 +209,7 @@ int asi_enter(struct asi *asi)
+ 	struct asi *current_asi;
+ 	struct asi_session *asi_session;
+ 	unsigned long original_cr3;
++	int err;
+ 
+ 	state = this_cpu_read(cpu_asi_session.state);
+ 	/*
+@@ -190,6 +241,13 @@ int asi_enter(struct asi *asi)
+ 	WARN_ON(asi_session->abort_depth > 0);
+ 
+ 	/*
++	 * We need a stack to run with isolation, so map the current stack.
++	 */
++	err = asi_map(asi, current->stack, PAGE_SIZE << THREAD_SIZE_ORDER);
++	if (err)
++		goto err_clear_asi;
++
++	/*
+ 	 * Instructions ordering is important here because we should be
+ 	 * able to deal with any interrupt/exception which will abort
+ 	 * the isolation and restore CR3 to its original value:
+@@ -211,7 +269,7 @@ int asi_enter(struct asi *asi)
+ 	if (!original_cr3) {
+ 		WARN_ON(1);
+ 		err = -EINVAL;
+-		goto err_clear_asi;
++		goto err_unmap_stack;
+ 	}
+ 	asi_session->original_cr3 = original_cr3;
+ 
+@@ -228,6 +286,8 @@ int asi_enter(struct asi *asi)
+ 
+ 	return 0;
+ 
++err_unmap_stack:
++	asi_unmap(asi, current->stack);
+ err_clear_asi:
+ 	asi_session->asi = NULL;
+ 	asi_session->task = NULL;
+@@ -284,6 +344,9 @@ void asi_exit(struct asi *asi)
+ 	 * exit isolation before abort_depth reaches 0.
+ 	 */
+ 	asi_session->abort_depth = 0;
++
++	/* unmap stack */
++	asi_unmap(asi, current->stack);
+ }
+ EXPORT_SYMBOL(asi_exit);
+ 
+diff --git a/arch/x86/mm/asi_pagetable.c b/arch/x86/mm/asi_pagetable.c
+index f1ee65b..bcc95f2 100644
+--- a/arch/x86/mm/asi_pagetable.c
++++ b/arch/x86/mm/asi_pagetable.c
+@@ -710,12 +710,20 @@ int asi_map_range(struct asi *asi, void *ptr, size_t size,
+ 	map_addr = round_down(addr, page_dir_size);
+ 	map_end = round_up(end, page_dir_size);
+ 
+-	pr_debug("ASI %p: MAP %px/%lx/%d -> %lx-%lx\n", asi, ptr, size, level,
+-		 map_addr, map_end);
+-	if (map_addr < addr)
+-		pr_debug("ASI %p: MAP LEAK %lx-%lx\n", asi, map_addr, addr);
+-	if (map_end > end)
+-		pr_debug("ASI %p: MAP LEAK %lx-%lx\n", asi, end, map_end);
++	/*
++	 * Don't log info the current stack because it is mapped/unmapped
++	 * everytime we enter/exit isolation.
++	 */
++	if (ptr != current->stack) {
++		pr_debug("ASI %p: MAP %px/%lx/%d -> %lx-%lx\n",
++			 asi, ptr, size, level, map_addr, map_end);
++		if (map_addr < addr)
++			pr_debug("ASI %p: MAP LEAK %lx-%lx\n",
++				 asi, map_addr, addr);
++		if (map_end > end)
++			pr_debug("ASI %p: MAP LEAK %lx-%lx\n",
++				 asi, end, map_end);
++	}
  
  	spin_lock_irqsave(&asi->lock, flags);
  
--	/* check if the range is already mapped */
--	range_mapping = asi_get_range_mapping(asi, ptr);
--	if (range_mapping) {
--		pr_debug("ASI %p: MAP %px/%lx/%d already mapped\n",
--			 asi, ptr, size, level);
--		err = -EBUSY;
--		goto done;
-+	/*
-+	 * Map the new range with taking overlap with already mapped ranges
-+	 * into account.
-+	 */
-+	overlap = asi_map_overlap(asi, ptr, size, level);
-+	if (overlap < 0) {
-+		err = overlap;
-+		goto error;
- 	}
+@@ -989,8 +997,14 @@ void asi_unmap(struct asi *asi, void *ptr)
  
--	/* map new range */
-+	/* add new range */
- 	range_mapping = kmalloc(sizeof(*range_mapping), GFP_KERNEL);
- 	if (!range_mapping) {
- 		err = -ENOMEM;
--		goto done;
-+		goto error;
- 	}
- 
--	err = asi_copy_pgd_range(asi, asi->pgd, current->mm->pgd,
--				 addr, end, level);
--	if (err)
--		goto done;
--
- 	INIT_LIST_HEAD(&range_mapping->list);
- 	range_mapping->ptr = ptr;
- 	range_mapping->size = size;
- 	range_mapping->level = level;
-+	range_mapping->overlap = overlap;
- 	list_add(&range_mapping->list, &asi->mapping_list);
--done:
- 	spin_unlock_irqrestore(&asi->lock, flags);
-+	return 0;
- 
-+error:
-+	spin_unlock_irqrestore(&asi->lock, flags);
- 	return err;
- }
- EXPORT_SYMBOL(asi_map_range);
-@@ -776,6 +866,110 @@ static void asi_clear_pgd_range(struct asi *asi, pgd_t *pagetable,
- 	} while (pgd++, addr = next, addr < end);
- }
- 
-+
-+/*
-+ * Unmap a VA range, taking into account any overlap with other mapped
-+ * VA ranges. This unmaps the specified range then remap any range this
-+ * range was overlapping with.
-+ */
-+static void asi_unmap_overlap(struct asi *asi, struct asi_range_mapping *range)
-+{
-+	unsigned long map_addr, map_end;
-+	struct asi_range_mapping *r;
-+	unsigned long addr, end;
-+	unsigned long r_addr;
-+	bool need_unmapping;
-+	int err, overlap;
-+
-+	addr = (unsigned long)range->ptr;
-+	end = addr + (unsigned long)range->size;
-+	overlap = range->overlap;
-+	need_unmapping = true;
-+
-+	lockdep_assert_held(&asi->lock);
-+
-+	/*
-+	 * Adjust overlap information and check if range effectively needs
-+	 * to be unmapped.
-+	 */
-+	list_for_each_entry(r, &asi->mapping_list, list) {
-+
-+		if (!overlap) {
-+			/* no more overlap */
-+			break;
-+		}
-+
-+		WARN_ON(range->ptr == r->ptr && range->size == r->size);
-+
-+		/* check overlap with other range */
-+		map_addr = ASI_RANGE_MAP_ADDR(r);
-+		map_end = ASI_RANGE_MAP_END(r);
-+		if (end < map_addr || addr >= map_end) {
-+			/* no overlap, continue */
-+			continue;
-+		}
-+
-+		pr_debug("ASI %p: UNMAP %px/%lx/%d overlaps with %px/%lx/%d\n",
-+			 asi, range->ptr, range->size, range->level,
-+			 r->ptr, r->size, r->level);
-+		r->overlap--;
-+		overlap--;
-+
-+		/*
-+		 * Check if range is included into a remaining mapped range.
-+		 * If so then there's no need to unmap.
-+		 */
-+		if (map_addr <= addr && end <= map_end) {
-+			pr_debug("ASI %p: UNMAP %px/%lx/%d still mapped\n",
-+				 asi, range->ptr, range->size, range->level);
-+			need_unmapping = false;
-+		}
-+	}
-+
-+	WARN_ON(overlap);
-+
-+	if (need_unmapping) {
-+		asi_clear_pgd_range(asi, asi->pgd, addr, end, range->level);
-+
-+		/*
-+		 * Remap all range we overlap with as mapping clearing
-+		 * will have unmap the overlap.
-+		 */
-+		overlap = range->overlap;
-+		list_for_each_entry(r, &asi->mapping_list, list) {
-+			if (!overlap) {
-+				/* no more overlap */
-+				break;
-+			}
-+
-+			/* check overlap with other range */
-+			map_addr = ASI_RANGE_MAP_ADDR(r);
-+			map_end = ASI_RANGE_MAP_END(r);
-+			if (end < map_addr || addr >= map_end) {
-+				/* no overlap, continue */
-+				continue;
-+			}
-+			pr_debug("ASI %p: UNMAP %px/%lx/%d remaps %px/%lx/%d\n",
-+				 asi, range->ptr, range->size, range->level,
-+				 r->ptr, r->size, r->level);
-+			overlap--;
-+
-+			r_addr = (unsigned long)r->ptr;
-+			err = asi_copy_pgd_range(asi, asi->pgd,
-+						 current->mm->pgd,
-+						 r_addr, r_addr + r->size,
-+						 r->level);
-+			if (err) {
-+				pr_debug("ASI %p: UNMAP %px/%lx/%d remaps %px/%lx/%d error %d\n",
-+					 asi, range->ptr, range->size,
-+					 range->level,
-+					 r->ptr, r->size, r->level,
-+					 err);
-+			}
-+		}
-+	}
-+}
-+
- /*
-  * Clear page table entries in the specified ASI page-table.
-  */
-@@ -797,8 +991,8 @@ void asi_unmap(struct asi *asi, void *ptr)
+ 	addr = (unsigned long)range_mapping->ptr;
  	end = addr + range_mapping->size;
- 	pr_debug("ASI %p: UNMAP %px/%lx/%d\n", asi, ptr,
- 		 range_mapping->size, range_mapping->level);
--	asi_clear_pgd_range(asi, asi->pgd, addr, end, range_mapping->level);
+-	pr_debug("ASI %p: UNMAP %px/%lx/%d\n", asi, ptr,
+-		 range_mapping->size, range_mapping->level);
++	/*
++	 * Don't log info the current stack because it is mapped/unmapped
++	 * everytime we enter/exit isolation.
++	 */
++	if (ptr != current->stack) {
++		pr_debug("ASI %p: UNMAP %px/%lx/%d\n", asi, ptr,
++			 range_mapping->size, range_mapping->level);
++	}
  	list_del(&range_mapping->list);
-+	asi_unmap_overlap(asi, range_mapping);
+ 	asi_unmap_overlap(asi, range_mapping);
  	kfree(range_mapping);
- done:
- 	spin_unlock_irqrestore(&asi->lock, flags);
 -- 
 1.7.1
 
