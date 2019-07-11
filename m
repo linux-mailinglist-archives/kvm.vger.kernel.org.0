@@ -2,105 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C32956607B
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 22:18:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1DF3660A1
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 22:30:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729025AbfGKUR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 16:17:56 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63646 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726207AbfGKUR4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Jul 2019 16:17:56 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6BKHqbF045066
-        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 16:17:54 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2tpbfb17cp-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 16:17:53 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <kvm@vger.kernel.org> from <rppt@linux.ibm.com>;
-        Thu, 11 Jul 2019 21:17:21 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 11 Jul 2019 21:17:15 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6BKHErw49217562
+        id S1728757AbfGKUab (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 16:30:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9268 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728405AbfGKUab (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Jul 2019 16:30:31 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6BKQw4L140270;
+        Thu, 11 Jul 2019 16:30:29 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tp90uftte-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Jul 2019 16:30:28 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x6BKTnkw006727;
+        Thu, 11 Jul 2019 20:30:27 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma01dal.us.ibm.com with ESMTP id 2tjk97phqw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Jul 2019 20:30:27 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6BKURNk7995788
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Jul 2019 20:17:14 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4BFD152052;
-        Thu, 11 Jul 2019 20:17:14 +0000 (GMT)
-Received: from rapoport-lnx (unknown [9.148.204.152])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 2AD435205A;
-        Thu, 11 Jul 2019 20:17:09 +0000 (GMT)
-Date:   Thu, 11 Jul 2019 23:17:07 +0300
-From:   Mike Rapoport <rppt@linux.ibm.com>
-To:     Andi Kleen <andi@firstfloor.org>
-Cc:     Alexandre Chartre <alexandre.chartre@oracle.com>,
-        pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org,
-        kvm@vger.kernel.org, x86@kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, konrad.wilk@oracle.com,
-        jan.setjeeilers@oracle.com, liran.alon@oracle.com,
-        jwadams@google.com, graf@amazon.de, rppt@linux.vnet.ibm.com
-Subject: Re: [RFC v2 02/26] mm/asi: Abort isolation on interrupt, exception
- and context switch
-References: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
- <1562855138-19507-3-git-send-email-alexandre.chartre@oracle.com>
- <874l3sz5z4.fsf@firstfloor.org>
+        Thu, 11 Jul 2019 20:30:27 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0DB8EAC05F;
+        Thu, 11 Jul 2019 20:30:27 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C3EE8AC060;
+        Thu, 11 Jul 2019 20:30:26 +0000 (GMT)
+Received: from [9.60.89.60] (unknown [9.60.89.60])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Thu, 11 Jul 2019 20:30:26 +0000 (GMT)
+Subject: Re: [PATCH v3 1/5] vfio-ccw: Fix misleading comment when setting
+ orb.cmd.c64
+To:     Farhan Ali <alifm@linux.ibm.com>, cohuck@redhat.com,
+        pasic@linux.ibm.com
+Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org
+References: <cover.1562854091.git.alifm@linux.ibm.com>
+ <f68636106aef0faeb6ce9712584d102d1b315ff8.1562854091.git.alifm@linux.ibm.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Message-ID: <831c9495-78b7-b03c-1942-d16236d1e518@linux.ibm.com>
+Date:   Thu, 11 Jul 2019 16:30:26 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <874l3sz5z4.fsf@firstfloor.org>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <f68636106aef0faeb6ce9712584d102d1b315ff8.1562854091.git.alifm@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19071120-0012-0000-0000-00000331E9C1
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19071120-0013-0000-0000-0000216B57DD
-Message-Id: <20190711201706.GB20140@rapoport-lnx>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-11_05:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=956 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907110224
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907110226
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 11, 2019 at 01:11:43PM -0700, Andi Kleen wrote:
-> Alexandre Chartre <alexandre.chartre@oracle.com> writes:
-> >  	jmp	paranoid_exit
-> > @@ -1182,6 +1196,16 @@ ENTRY(paranoid_entry)
-> >  	xorl	%ebx, %ebx
-> >  
-> >  1:
-> > +#ifdef CONFIG_ADDRESS_SPACE_ISOLATION
-> > +	/*
-> > +	 * If address space isolation is active then abort it and return
-> > +	 * the original kernel CR3 in %r14.
-> > +	 */
-> > +	ASI_START_ABORT_ELSE_JUMP 2f
-> > +	movq	%rdi, %r14
-> > +	ret
-> > +2:
-> > +#endif
-> 
-> Unless I missed it you don't map the exception stacks into ASI, so it
-> has likely already triple faulted at this point.
 
-The exception stacks are in the CPU entry area, aren't they?
- 
-> -Andi
+
+On 7/11/19 10:28 AM, Farhan Ali wrote:
+> The comment is misleading because it tells us that
+> we should set orb.cmd.c64 before calling ccwchain_calc_length,
+> otherwise the function ccwchain_calc_length would return an
+> error. This is not completely accurate.
+> 
+> We want to allow an orb without cmd.c64, and this is fine
+> as long as the channel program does not use IDALs. But we do
+> want to reject any channel program that uses IDALs and does
+> not set the flag, which is what we do in ccwchain_calc_length.
+> 
+> After we have done the ccw processing, we need to set cmd.c64,
+> as we use IDALs for all translated channel programs.
+> 
+> Also for better code readability let's move the setting of
+> cmd.c64 within the non error path.
 > 
 
--- 
-Sincerely yours,
-Mike.
+Per Conny in v2:
 
+Fixes: fb9e7880af35 ("vfio: ccw: push down unsupported IDA check")
+
+> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
+
+> ---
+>  drivers/s390/cio/vfio_ccw_cp.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index d6a8dff..c969d48 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -645,14 +645,15 @@ int cp_init(struct channel_program *cp, struct device *mdev, union orb *orb)
+>  	if (ret)
+>  		cp_free(cp);
+>  
+> -	/* It is safe to force: if not set but idals used
+> -	 * ccwchain_calc_length returns an error.
+> -	 */
+> -	cp->orb.cmd.c64 = 1;
+> -
+> -	if (!ret)
+> +	if (!ret) {
+>  		cp->initialized = true;
+>  
+> +		/* It is safe to force: if it was not set but idals used
+> +		 * ccwchain_calc_length would have returned an error.
+> +		 */
+> +		cp->orb.cmd.c64 = 1;
+> +	}
+> +
+>  	return ret;
+>  }
+>  
+> 
