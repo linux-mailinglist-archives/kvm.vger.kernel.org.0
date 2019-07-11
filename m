@@ -2,24 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1943665A62
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 17:26:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E82D65AF1
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 17:50:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728906AbfGKPZ4 convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 11 Jul 2019 11:25:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46316 "EHLO mx1.redhat.com"
+        id S1728311AbfGKPuX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 11:50:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44612 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728271AbfGKPZ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 11:25:56 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        id S1726213AbfGKPuX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 11:50:23 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 82F77285AE;
-        Thu, 11 Jul 2019 15:25:55 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id C3BB5309265A;
+        Thu, 11 Jul 2019 15:50:22 +0000 (UTC)
 Received: from [10.18.17.163] (dhcp-17-163.bos.redhat.com [10.18.17.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A8CB860C05;
-        Thu, 11 Jul 2019 15:25:48 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 66F7F19C69;
+        Thu, 11 Jul 2019 15:50:08 +0000 (UTC)
 Subject: Re: [RFC][Patch v11 1/2] mm: page_hinting: core infrastructure
+From:   Nitesh Narayan Lal <nitesh@redhat.com>
 To:     Dave Hansen <dave.hansen@intel.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         pbonzini@redhat.com, lcapitulino@redhat.com, pagupta@redhat.com,
@@ -31,7 +32,7 @@ To:     Dave Hansen <dave.hansen@intel.com>, kvm@vger.kernel.org,
 References: <20190710195158.19640-1-nitesh@redhat.com>
  <20190710195158.19640-2-nitesh@redhat.com>
  <3f9a7e7b-c026-3530-e985-804fc7f1ec31@intel.com>
-From:   Nitesh Narayan Lal <nitesh@redhat.com>
+ <0b871cf1-e54f-f072-1eaf-511a03c2907f@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFl4pQoBEADT/nXR2JOfsCjDgYmE2qonSGjkM1g8S6p9UWD+bf7YEAYYYzZsLtbilFTe
@@ -77,75 +78,76 @@ Autocrypt: addr=nitesh@redhat.com; prefer-encrypt=mutual; keydata=
  NK9ZhT0+qkiN7npFLtNtbzwqaqceq3XhafmCiw8xrtzCnlB/C4SiBr/93Ip4kihXJ0EuHSLn
  VujM7c/b4pps
 Organization: Red Hat Inc,
-Message-ID: <0b871cf1-e54f-f072-1eaf-511a03c2907f@redhat.com>
-Date:   Thu, 11 Jul 2019 11:25:47 -0400
+Message-ID: <7b3047d7-a317-2187-21ff-3abbb5faf9ca@redhat.com>
+Date:   Thu, 11 Jul 2019 11:50:07 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <3f9a7e7b-c026-3530-e985-804fc7f1ec31@intel.com>
+In-Reply-To: <0b871cf1-e54f-f072-1eaf-511a03c2907f@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Thu, 11 Jul 2019 15:25:55 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Thu, 11 Jul 2019 15:50:23 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 7/10/19 4:45 PM, Dave Hansen wrote:
-> On 7/10/19 12:51 PM, Nitesh Narayan Lal wrote:
->> +struct zone_free_area {
->> +	unsigned long *bitmap;
->> +	unsigned long base_pfn;
->> +	unsigned long end_pfn;
->> +	atomic_t free_pages;
->> +	unsigned long nbits;
->> +} free_area[MAX_NR_ZONES];
-> Why do we need an extra data structure.  What's wrong with putting
-> per-zone data in ... 'struct zone'?
-Will it be acceptable to add fields in struct zone, when they will only
-be used by page hinting?
->   The cover letter claims that it
-> doesn't touch core-mm infrastructure, but if it depends on mechanisms
-> like this, I think that's a very bad thing.
->
-> To be honest, I'm not sure this series is worth reviewing at this point.
->  It's horribly lightly commented and full of kernel antipatterns lik
->
-> void func()
-> {
-> 	if () {
-> 		... indent entire logic
-> 		... of function
-> 	}
-> }
-I usually run checkpatch to detect such indentation issues. For the
-patches, I shared it didn't show me any issues.
->
-> It has big "TODO"s.  It's virtually comment-free.  I'm shocked it's at
-> the 11th version and still looking like this.
->
->> +
->> +		for (zone_idx = 0; zone_idx < MAX_NR_ZONES; zone_idx++) {
->> +			unsigned long pages = free_area[zone_idx].end_pfn -
->> +					free_area[zone_idx].base_pfn;
->> +			bitmap_size = (pages >> PAGE_HINTING_MIN_ORDER) + 1;
->> +			if (!bitmap_size)
->> +				continue;
->> +			free_area[zone_idx].bitmap = bitmap_zalloc(bitmap_size,
->> +								   GFP_KERNEL);
-> This doesn't support sparse zones.  We can have zones with massive
-> spanned page sizes, but very few present pages.  On those zones, this
-> will exhaust memory for no good reason.
->
-> Comparing this to Alex's patch set, it's of much lower quality and at a
-> much earlier stage of development.  The two sets are not really even
-> comparable right now.  This certainly doesn't sell me on (or even really
-> enumerate the deltas in) this approach vs. Alex's.
->
+On 7/11/19 11:25 AM, Nitesh Narayan Lal wrote:
+> On 7/10/19 4:45 PM, Dave Hansen wrote:
+>> On 7/10/19 12:51 PM, Nitesh Narayan Lal wrote:
+>>> +struct zone_free_area {
+>>> +	unsigned long *bitmap;
+>>> +	unsigned long base_pfn;
+>>> +	unsigned long end_pfn;
+>>> +	atomic_t free_pages;
+>>> +	unsigned long nbits;
+>>> +} free_area[MAX_NR_ZONES];
+>> Why do we need an extra data structure.  What's wrong with putting
+>> per-zone data in ... 'struct zone'?
+> Will it be acceptable to add fields in struct zone, when they will only
+> be used by page hinting?
+>>   The cover letter claims that it
+>> doesn't touch core-mm infrastructure, but if it depends on mechanisms
+>> like this, I think that's a very bad thing.
+>>
+>> To be honest, I'm not sure this series is worth reviewing at this point.
+>>  It's horribly lightly commented and full of kernel antipatterns lik
+>>
+>> void func()
+>> {
+>> 	if () {
+>> 		... indent entire logic
+>> 		... of function
+>> 	}
+>> }
+> I usually run checkpatch to detect such indentation issues. For the
+> patches, I shared it didn't show me any issues.
+My bad I think I jumped here, I saw what you are referring to here.
+I will fix these kind of things.
+>> It has big "TODO"s.  It's virtually comment-free.  I'm shocked it's at
+>> the 11th version and still looking like this.
+>>
+>>> +
+>>> +		for (zone_idx = 0; zone_idx < MAX_NR_ZONES; zone_idx++) {
+>>> +			unsigned long pages = free_area[zone_idx].end_pfn -
+>>> +					free_area[zone_idx].base_pfn;
+>>> +			bitmap_size = (pages >> PAGE_HINTING_MIN_ORDER) + 1;
+>>> +			if (!bitmap_size)
+>>> +				continue;
+>>> +			free_area[zone_idx].bitmap = bitmap_zalloc(bitmap_size,
+>>> +								   GFP_KERNEL);
+>> This doesn't support sparse zones.  We can have zones with massive
+>> spanned page sizes, but very few present pages.  On those zones, this
+>> will exhaust memory for no good reason.
+>>
+>> Comparing this to Alex's patch set, it's of much lower quality and at a
+>> much earlier stage of development.  The two sets are not really even
+>> comparable right now.  This certainly doesn't sell me on (or even really
+>> enumerate the deltas in) this approach vs. Alex's.
+>>
 -- 
 Thanks
 Nitesh
-
