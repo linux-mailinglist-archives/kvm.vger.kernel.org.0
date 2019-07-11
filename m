@@ -2,296 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F0E764FD8
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 03:25:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E933651CC
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 08:21:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727680AbfGKBZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Jul 2019 21:25:29 -0400
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:45513 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727463AbfGKBZ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Jul 2019 21:25:29 -0400
-Received: by mail-ed1-f67.google.com with SMTP id e2so3980383edi.12
-        for <kvm@vger.kernel.org>; Wed, 10 Jul 2019 18:25:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=TrD+b9KcyDXAn9XTri87X4ww/nyNvMC/tz+poqou13c=;
-        b=b7KeucFxiHjYP2FVwS6/1td8lEwc2IDxW/qZw2UV4o4/6s270GwKj/wpo4/r1JNnwl
-         Gk0zcggU/AFy9AhHic9QAvhBDIjiGHgdLpX6RW96EiBiI9cZ/uhZ00sZTkDKVlRqB6GH
-         wTl7oZ+oJ9P0OGUibmo3rPp1Y887B8o1GxVWjCCo5y+ZiAepQz/CJhTzGRJsH67Jbse+
-         vwAPcLCzyqHmSRQ9CG35nymSV3XSekzouXQFvK1sjhYJKgXPIMn1kt9U81P/pQdmR8qI
-         DAEMtTFcwKKhtDOnJ8FL4yGLwXD8STvPEWSYUgBlOxqOIw053QEaVdgQmNo0UMhng4Ay
-         f7Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=TrD+b9KcyDXAn9XTri87X4ww/nyNvMC/tz+poqou13c=;
-        b=uH+ekDIRcgwvFZSblZdIIzwm8ItTPoy75p/feMM0GCdIF84quN/1RM4XZHUbqxfNAS
-         0+GRlJ56bVNFKfNNaMPRqlFNoC4iZGKRia1zU+u5udSP7RqoJg0RLCUILxJRxae8giOg
-         qRFImlM/DHkpUCBMM/hYgVM/qxz6Ypxmmge2zR4p1bu7p+ZAO0FL//d1pi68OnP7Bzfx
-         VySEaB+6ug5JabygtB9WQud4XMvX9k66BB6+mu3nhP9KSdW0n6XKRYwmBL1viWE2pWHQ
-         FjfUOsDcEFtxr4P3mr3Hu/gUctloAezfSsn2ybOPw38C5nsn4GajJhPyoLw41yWqZFi3
-         n7Jg==
-X-Gm-Message-State: APjAAAWRhnMZyPwYE68tOPfwrSGLtDGg9iZ5H2l1fIaXrWO9ZBL18zMY
-        r1KfBFGRI3mG3NtYAWGpbwYuTilwDDgqsE8JF0Qi8Q==
-X-Google-Smtp-Source: APXvYqy8HxLooNNckIHgDT11raVGawwoRblhEOxb5HkG1Ykl+pEoOU0HYMY4xR+iFSPe/HZr653nn9zLuX9hTeXTiRQ=
-X-Received: by 2002:a50:f4d8:: with SMTP id v24mr868769edm.166.1562808326390;
- Wed, 10 Jul 2019 18:25:26 -0700 (PDT)
+        id S1727956AbfGKGV2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 02:21:28 -0400
+Received: from ozlabs.org ([203.11.71.1]:55691 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725963AbfGKGV1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 02:21:27 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 45kmCm5G01z9sNF; Thu, 11 Jul 2019 16:21:24 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1562826084;
+        bh=C09pNryVDcEasgvucopMJO755obTYZIg19F3P5zVW04=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=EA6kGwLjJnJNreSKh/a29tQPH00GLOZszZK1dmYlhGDeiEEOJ4ugAAfOJzKO4s6HD
+         3MNS4Bri3Si9Kl+/cuxG0FrI4oLMJPo+OS7T4Oo78BECDUVPD+A4tV2LUqueWuI6uP
+         JVU7H5e8hdg8r3Oviul3hBYblb5+SUy9GEWz3z08=
+Date:   Thu, 11 Jul 2019 13:51:51 +1000
+From:   "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     Peter Xu <zhexu@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>,
+        "Sun, Yi Y" <yi.y.sun@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: Re: [RFC v1 03/18] hw/pci: introduce PCIPASIDOps to PCIDevice
+Message-ID: <20190711035151.GG13271@umbus.fritz.box>
+References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
+ <1562324511-2910-4-git-send-email-yi.l.liu@intel.com>
+ <20190709021209.GA5178@xz-x1>
+ <A2975661238FB949B60364EF0F2C257439F2A5F2@SHSMSX104.ccr.corp.intel.com>
 MIME-Version: 1.0
-From:   Eric Hankland <ehankland@google.com>
-Date:   Wed, 10 Jul 2019 18:25:15 -0700
-Message-ID: <CAOyeoRUUK+T_71J=+zcToyL93LkpARpsuWSfZS7jbJq=wd1rQg@mail.gmail.com>
-Subject: [PATCH v2] KVM: x86: PMU Event Filter
-To:     Wei Wang <wei.w.wang@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com
-Cc:     linux-kernel@vger.kernel.org,
-        Stephane Eranian <eranian@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="1XWsVB21DFCvn2e8"
+Content-Disposition: inline
+In-Reply-To: <A2975661238FB949B60364EF0F2C257439F2A5F2@SHSMSX104.ccr.corp.intel.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-- Add a VM ioctl that can control which events the guest can monitor.
 
-Signed-off-by: ehankland <ehankland@google.com>
----
-Changes since v1:
--Moved to a vm ioctl rather than a vcpu one
--Changed from a whitelist to a configurable filter which can either be
-white or black
--Only restrict GP counters since fixed counters require extra handling
-and they can be disabled by setting the guest cpuid (though only by
-setting the number - they can't be disabled individually)
----
- Documentation/virtual/kvm/api.txt | 25 +++++++++++++
- arch/x86/include/asm/kvm_host.h   |  2 +
- arch/x86/include/uapi/asm/kvm.h   | 10 +++++
- arch/x86/kvm/pmu.c                | 61 +++++++++++++++++++++++++++++++
- arch/x86/kvm/pmu.h                |  1 +
- arch/x86/kvm/x86.c                |  6 +++
- include/uapi/linux/kvm.h          |  3 ++
- 7 files changed, 108 insertions(+)
+--1XWsVB21DFCvn2e8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/Documentation/virtual/kvm/api.txt
-b/Documentation/virtual/kvm/api.txt
-index 91fd86fcc49f..a9ee8da36595 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -4065,6 +4065,31 @@ KVM_ARM_VCPU_FINALIZE call.
- See KVM_ARM_VCPU_INIT for details of vcpu features that require finalization
- using this ioctl.
+On Wed, Jul 10, 2019 at 11:08:15AM +0000, Liu, Yi L wrote:
+> > From: Peter Xu [mailto:zhexu@redhat.com]
+> > Sent: Tuesday, July 9, 2019 10:12 AM
+> > To: Liu, Yi L <yi.l.liu@intel.com>
+> > Subject: Re: [RFC v1 03/18] hw/pci: introduce PCIPASIDOps to PCIDevice
+> >=20
+> > On Fri, Jul 05, 2019 at 07:01:36PM +0800, Liu Yi L wrote:
+> > > +void pci_setup_pasid_ops(PCIDevice *dev, PCIPASIDOps *ops)
+> > > +{
+> > > +    assert(ops && !dev->pasid_ops);
+> > > +    dev->pasid_ops =3D ops;
+> > > +}
+> > > +
+> > > +bool pci_device_is_ops_set(PCIBus *bus, int32_t devfn)
+> >=20
+> > Name should be "pci_device_is_pasid_ops_set".  Or maybe you can simply
+> > drop this function because as long as you check it in helper functions
+> > like [1] below always then it seems even unecessary.
+>=20
+> yes, the name should be "pci_device_is_pasid_ops_set". I noticed your
+> comments on the necessity in another, let's talk in that thread. :-)
+>=20
+> > > +{
+> > > +    PCIDevice *dev;
+> > > +
+> > > +    if (!bus) {
+> > > +        return false;
+> > > +    }
+> > > +
+> > > +    dev =3D bus->devices[devfn];
+> > > +    return !!(dev && dev->pasid_ops);
+> > > +}
+> > > +
+> > > +int pci_device_request_pasid_alloc(PCIBus *bus, int32_t devfn,
+> > > +                                   uint32_t min_pasid, uint32_t max_=
+pasid)
+> >=20
+> > From VT-d spec I see that the virtual command "allocate pasid" does
+> > not have bdf information so it's global, but here we've got bus/devfn.
+> > I'm curious is that reserved for ARM or some other arch?
+>=20
+> You are right. VT-d spec doesn=E2=80=99t have bdf info. But we need to pa=
+ss the
+> allocation request via vfio. So this function has bdf info. In vIOMMU sid=
+e,
+> it should select a vfio-pci device and invoke this callback when it wants=
+ to
+> request PASID alloc/free.
 
-+4.120 KVM_SET_PMU_EVENT_FILTER
-+
-+Capability: KVM_CAP_PMU_EVENT_FILTER
-+Architectures: x86
-+Type: vm ioctl
-+Parameters: struct kvm_pmu_event_filter (in)
-+Returns: 0 on success, -1 on error
-+
-+struct kvm_pmu_event_filter {
-+       __u32 type;
-+       __u32 nevents;
-+       __u64 events[0];
-+};
-+
-+This ioctl restricts the set of PMU events that the guest can program to either
-+a whitelist or a blacklist of events. The eventsel+umask of each event the
-+guest attempts to program is compared against the events field to determine
-+whether the guest should have access. This only affects general purpose
-+counters; fixed purpose counters can be disabled by changing the perfmon
-+CPUID leaf.
-+
-+Valid values for 'type':
-+#define KVM_PMU_EVENT_WHITELIST 0
-+#define KVM_PMU_EVENT_BLACKLIST 1
-+
+That doesn't seem conceptually right.  IIUC, the pasids "belong" to a
+sort of SVM context.  It seems to be the alloc should be on that
+object - and that object would already have some connection to any
+relevant vfio containers.  At the vfio level this seems like it should
+be a container operation rather than a device operation.
 
- 5. The kvm_run structure
- ------------------------
+> > > +{
+> > > +    PCIDevice *dev;
+> > > +
+> > > +    if (!bus) {
+> > > +        return -1;
+> > > +    }
+> > > +
+> > > +    dev =3D bus->devices[devfn];
+> > > +    if (dev && dev->pasid_ops && dev->pasid_ops->alloc_pasid) {
+> >=20
+> > [1]
+> >=20
+> > > +        return dev->pasid_ops->alloc_pasid(bus, devfn, min_pasid, ma=
+x_pasid);
+>=20
+> Thanks,
+> Yi Liu
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index f46a12a5cf2e..34d017bd1d1b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -933,6 +933,8 @@ struct kvm_arch {
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-        bool guest_can_read_msr_platform_info;
-        bool exception_payload_enabled;
-+
-+       struct kvm_pmu_event_filter *pmu_event_filter;
- };
+--1XWsVB21DFCvn2e8
+Content-Type: application/pgp-signature; name="signature.asc"
 
- struct kvm_vm_stat {
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index f9b021e16ebc..4d2e905b7d79 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -422,4 +422,14 @@ struct kvm_nested_state {
-        __u8 data[0];
- };
+-----BEGIN PGP SIGNATURE-----
 
-+/* for KVM_CAP_PMU_EVENT_FILTER */
-+struct kvm_pmu_event_filter {
-+       __u32 type;
-+       __u32 nevents;
-+       __u64 events[0];
-+};
-+
-+#define KVM_PMU_EVENT_WHITELIST 0
-+#define KVM_PMU_EVENT_BLACKLIST 1
-+
- #endif /* _ASM_X86_KVM_H */
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index dd745b58ffd8..d674b79ff8da 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -22,6 +22,9 @@
- #include "lapic.h"
- #include "pmu.h"
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0mslQACgkQbDjKyiDZ
+s5Ll4RAAsJu80EXwInQoQipnmogNk7gVlfZBJqyD+3Ib85mIrnfk2vTqhs+Z/Z0N
+ytVwIvKYcHGD12/A8dKCBoJ9Dyr6Xb1veSKSdpcpIePNqWamWs+m2qIrvbP94QCU
+OsLS1uwyAm12MB4/tINkCbcoLCXYTFolNOpS10Iy3WB1aARNI1C8h02UbWQfPgGS
+lyYEmdjZ178Yh08bR8UYnHQFju8qavJVDmXf9u7bLrmHwwaI8SehNWxV4YBIfgVK
+eJUE/2HL4QwNX4pZpu+gKohunNc4pv1ZgQ3t61zFz1TRMW/H1x9K8hIlTgEG83ta
+2qcH3eIdrTEaTDtEdjBETTEgAZ2Ig9XeopXb7/HgI1JT3Lpg9xW+fhKXPZp+6Az/
+XxPt4zaGZXt1P3QEYSfpTw/Vhk2+9Pna+Cj7WbTK+ahHbZBVRXUGRmRX+jHuPCz/
+1YyQuhl+5omobHhUmNpOVestYnWgheq2WACgLtA3Isyo35FmEgLv/nNCPz2CmaLV
++h3CWfXcyBUm03XegPAIJH2TxOumcmsZW9zFvjpjyucvPgb2IhCT5HaSv16nWwTM
+VRhL5eLeVRzfoXOS1hI99NsdVGeWP0Xtqj7aQdacMZUfysC9EJR4RzNwlGLyAT2s
+XzZ8M946yUCiRhziYCCZUVajA9fsvBxRJBCaFPnIXsnpbA1qV5M=
+=ete9
+-----END PGP SIGNATURE-----
 
-+/* This keeps the total size of the filter under 4k. */
-+#define KVM_PMU_EVENT_FILTER_MAX_EVENTS 63
-+
- /* NOTE:
-  * - Each perf counter is defined as "struct kvm_pmc";
-  * - There are two types of perf counters: general purpose (gp) and fixed.
-@@ -144,6 +147,10 @@ void reprogram_gp_counter(struct kvm_pmc *pmc,
-u64 eventsel)
- {
-        unsigned config, type = PERF_TYPE_RAW;
-        u8 event_select, unit_mask;
-+       struct kvm_arch *arch = &pmc->vcpu->kvm->arch;
-+       struct kvm_pmu_event_filter *filter;
-+       int i;
-+       bool allow_event = true;
-
-        if (eventsel & ARCH_PERFMON_EVENTSEL_PIN_CONTROL)
-                printk_once("kvm pmu: pin control bit is ignored\n");
-@@ -155,6 +162,24 @@ void reprogram_gp_counter(struct kvm_pmc *pmc,
-u64 eventsel)
-        if (!(eventsel & ARCH_PERFMON_EVENTSEL_ENABLE) || !pmc_is_enabled(pmc))
-                return;
-
-+       rcu_read_lock();
-+       filter = rcu_dereference(arch->pmu_event_filter);
-+       if (filter) {
-+               for (i = 0; i < filter->nevents; i++)
-+                       if (filter->events[i] ==
-+                           (eventsel & AMD64_RAW_EVENT_MASK_NB))
-+                               break;
-+               if (filter->type == KVM_PMU_EVENT_WHITELIST &&
-+                   i == filter->nevents)
-+                       allow_event = false;
-+               if (filter->type == KVM_PMU_EVENT_BLACKLIST &&
-+                   i < filter->nevents)
-+                       allow_event = false;
-+       }
-+       rcu_read_unlock();
-+       if (!allow_event)
-+               return;
-+
-        event_select = eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
-        unit_mask = (eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
-
-@@ -351,3 +376,39 @@ void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
- {
-        kvm_pmu_reset(vcpu);
- }
-+
-+int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
-+{
-+       struct kvm_pmu_event_filter tmp, *filter;
-+       size_t size;
-+       int r;
-+
-+       if (copy_from_user(&tmp, argp, sizeof(tmp)))
-+               return -EFAULT;
-+
-+       if (tmp.nevents > KVM_PMU_EVENT_FILTER_MAX_EVENTS)
-+               return -E2BIG;
-+
-+       size = sizeof(tmp) + sizeof(tmp.events[0]) * tmp.nevents;
-+       filter = vmalloc(size);
-+       if (!filter)
-+               return -ENOMEM;
-+
-+       r = -EFAULT;
-+       if (copy_from_user(filter, argp, size))
-+               goto cleanup;
-+
-+       /* Ensure nevents can't be changed between the user copies. */
-+       *filter = tmp;
-+
-+       mutex_lock(&kvm->lock);
-+       rcu_swap_protected(kvm->arch.pmu_event_filter, filter,
-+                          mutex_is_locked(&kvm->lock));
-+       mutex_unlock(&kvm->lock);
-+
-+       synchronize_rcu();
-+       r = 0;
-+cleanup:
-+       kvfree(filter);
-+       return r;
-+}
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 22dff661145a..58265f761c3b 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -118,6 +118,7 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu);
- void kvm_pmu_reset(struct kvm_vcpu *vcpu);
- void kvm_pmu_init(struct kvm_vcpu *vcpu);
- void kvm_pmu_destroy(struct kvm_vcpu *vcpu);
-+int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
-
- bool is_vmware_backdoor_pmc(u32 pmc_idx);
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2e302e977dac..9ddfc7193bc6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3135,6 +3135,7 @@ int kvm_vm_ioctl_check_extension(struct kvm
-*kvm, long ext)
-        case KVM_CAP_GET_MSR_FEATURES:
-        case KVM_CAP_MSR_PLATFORM_INFO:
-        case KVM_CAP_EXCEPTION_PAYLOAD:
-+       case KVM_CAP_PMU_EVENT_FILTER:
-                r = 1;
-                break;
-        case KVM_CAP_SYNC_REGS:
-@@ -4978,6 +4979,11 @@ long kvm_arch_vm_ioctl(struct file *filp,
-                r = kvm_vm_ioctl_hv_eventfd(kvm, &hvevfd);
-                break;
-        }
-+       case KVM_SET_PMU_EVENT_FILTER: {
-+               r = kvm_vm_ioctl_set_pmu_event_filter(kvm, argp);
-+               break;
-+
-+       }
-        default:
-                r = -ENOTTY;
-        }
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index c2152f3dd02d..b18ff80e356a 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -995,6 +995,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_SVE 170
- #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
- #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
-+#define KVM_CAP_PMU_EVENT_FILTER 173
-
- #ifdef KVM_CAP_IRQ_ROUTING
-
-@@ -1329,6 +1330,8 @@ struct kvm_s390_ucas_mapping {
- #define KVM_PPC_GET_RMMU_INFO    _IOW(KVMIO,  0xb0, struct kvm_ppc_rmmu_info)
- /* Available with KVM_CAP_PPC_GET_CPU_CHAR */
- #define KVM_PPC_GET_CPU_CHAR     _IOR(KVMIO,  0xb1, struct kvm_ppc_cpu_char)
-+/* Availabile with KVM_CAP_PMU_EVENT_FILTER */
-+#define KVM_SET_PMU_EVENT_FILTER  _IOW(KVMIO, 0xb2, struct
-kvm_pmu_event_filter)
-
- /* ioctl for vm fd */
- #define KVM_CREATE_DEVICE        _IOWR(KVMIO,  0xe0, struct kvm_create_device)
+--1XWsVB21DFCvn2e8--
