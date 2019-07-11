@@ -2,132 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 81E2B658F0
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 16:29:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96D7A658EC
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 16:29:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728789AbfGKO3g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 10:29:36 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:39164 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727612AbfGKO3g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 10:29:36 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6BEO8vQ001464;
-        Thu, 11 Jul 2019 14:27:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=p0TwseF6Rl2ptej9BTwWkpZCi9Mm6El6sXWBWxSv9Wc=;
- b=VxnBJQPSh0LmxFyWqVND6G3imbrgiNDc2XYktPKhPxTH7jeK12iQ07uhiR7KSkYssaXb
- Pv64TstUQ6TZGJ1PMaSuITPpNq63mpZXM6Iv7MEPC/m1XIUd6uAVwnuCuLzWwEkJpk+d
- bLhzpPXWzEGxFhxH1pYNQvLU4rahHXqpvu4/IcVK0tDJMHq3A7NSNALQrgdnEe+A5MWw
- HjWBvSrm/StSA0wUZr133cDwxkrZIL+2nTAatg2QWIUq+pis7baTZiMjbcwkfcdkdyAy
- 8SJFtfEFVLR+g5pFWeVErgqD0yalSI8+c1PK8OfF5ETzFY1qWu5XfRWDWSejjFNNjfXr 8Q== 
-Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
-        by userp2130.oracle.com with ESMTP id 2tjk2u0e5t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Jul 2019 14:27:15 +0000
-Received: from achartre-desktop.fr.oracle.com (dhcp-10-166-106-34.fr.oracle.com [10.166.106.34])
-        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x6BEPcuJ021444;
-        Thu, 11 Jul 2019 14:27:06 GMT
-From:   Alexandre Chartre <alexandre.chartre@oracle.com>
-To:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org,
-        kvm@vger.kernel.org, x86@kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Cc:     konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
-        liran.alon@oracle.com, jwadams@google.com, graf@amazon.de,
-        rppt@linux.vnet.ibm.com, alexandre.chartre@oracle.com
-Subject: [RFC v2 26/26] KVM: x86/asi: Map KVM memslots and IO buses into KVM ASI
-Date:   Thu, 11 Jul 2019 16:25:38 +0200
-Message-Id: <1562855138-19507-27-git-send-email-alexandre.chartre@oracle.com>
-X-Mailer: git-send-email 1.7.1
-In-Reply-To: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
-References: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9314 signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1907110162
+        id S1728612AbfGKO3L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 10:29:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50460 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729074AbfGKO3K (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Jul 2019 10:29:10 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6BESvGj057051
+        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 10:29:08 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2tp5y5b0j0-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 10:29:08 -0400
+Received: from localhost
+        by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <alifm@linux.ibm.com>;
+        Thu, 11 Jul 2019 15:28:59 +0100
+Received: from b01cxnp22033.gho.pok.ibm.com (9.57.198.23)
+        by e16.ny.us.ibm.com (146.89.104.203) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 11 Jul 2019 15:28:56 +0100
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6BEStD540501664
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Jul 2019 14:28:56 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E33CCAC060;
+        Thu, 11 Jul 2019 14:28:55 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 89B37AC05F;
+        Thu, 11 Jul 2019 14:28:55 +0000 (GMT)
+Received: from alifm-ThinkPad-T470p.ibm.com (unknown [9.85.180.152])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Thu, 11 Jul 2019 14:28:55 +0000 (GMT)
+From:   Farhan Ali <alifm@linux.ibm.com>
+To:     cohuck@redhat.com, farman@linux.ibm.com, pasic@linux.ibm.com
+Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        alifm@linux.ibm.com
+Subject: [PATCH v3 0/5] Some vfio-ccw fixes
+Date:   Thu, 11 Jul 2019 10:28:50 -0400
+X-Mailer: git-send-email 2.7.4
+X-TM-AS-GCONF: 00
+x-cbid: 19071114-0072-0000-0000-000004479795
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011408; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01230659; UDB=6.00648232; IPR=6.01011935;
+ MB=3.00027679; MTD=3.00000008; XFM=3.00000015; UTC=2019-07-11 14:28:57
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19071114-0073-0000-0000-00004CB7DC19
+Message-Id: <cover.1562854091.git.alifm@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-11_03:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=911 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907110163
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Map KVM memslots and IO buses into KVM ASI. Mapping is checking on each
-KVM ASI enter because they can change.
+Hi,
 
-Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
----
- arch/x86/kvm/x86.c       |   36 +++++++++++++++++++++++++++++++++++-
- include/linux/kvm_host.h |    2 ++
- 2 files changed, 37 insertions(+), 1 deletions(-)
+While trying to chase down the problem regarding the stacktraces,
+I have also found some minor problems in the code.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9458413..7c52827 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7748,11 +7748,45 @@ void __kvm_request_immediate_exit(struct kvm_vcpu *vcpu)
- 
- static void vcpu_isolation_enter(struct kvm_vcpu *vcpu)
- {
--	int err;
-+	struct kvm *kvm = vcpu->kvm;
-+	struct kvm_io_bus *bus;
-+	int i, err;
- 
- 	if (!vcpu->asi)
- 		return;
- 
-+	/*
-+	 * Check memslots and buses mapping as they tend to change.
-+	 */
-+	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-+		if (vcpu->asi_memslots[i] == kvm->memslots[i])
-+			continue;
-+		pr_debug("remapping kvm memslots[%d]: %px -> %px\n",
-+			 i, vcpu->asi_memslots[i], kvm->memslots[i]);
-+		err = asi_remap(vcpu->asi, &vcpu->asi_memslots[i],
-+				kvm->memslots[i], sizeof(struct kvm_memslots));
-+		if (err) {
-+			pr_debug("failed to map kvm memslots[%d]: error %d\n",
-+				 i, err);
-+		}
-+	}
-+
-+
-+	for (i = 0; i < KVM_NR_BUSES; i++) {
-+		bus = kvm->buses[i];
-+		if (bus == vcpu->asi_buses[i])
-+			continue;
-+		pr_debug("remapped kvm buses[%d]: %px -> %px\n",
-+			 i, vcpu->asi_buses[i], bus);
-+		err = asi_remap(vcpu->asi, &vcpu->asi_buses[i], bus,
-+				sizeof(*bus) + bus->dev_count *
-+				sizeof(struct kvm_io_range));
-+		if (err) {
-+			pr_debug("failed to map kvm buses[%d]: error %d\n",
-+				 i, err);
-+		}
-+	}
-+
- 	err = asi_enter(vcpu->asi);
- 	if (err)
- 		pr_debug("KVM isolation failed: error %d\n", err);
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 2a9d073..1f82de4 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -324,6 +324,8 @@ struct kvm_vcpu {
- 
- #ifdef CONFIG_ADDRESS_SPACE_ISOLATION
- 	struct asi *asi;
-+	void *asi_memslots[KVM_ADDRESS_SPACE_NUM];
-+	void *asi_buses[KVM_NR_BUSES];
- #endif
- };
- 
+Would appreciate any review or feedback regarding them.
+
+Thanks
+Farhan
+
+ChangeLog
+---------
+v2 -> v3
+   - Minor changes as suggested by Conny
+   - Add Conny's reviewed-by tags
+   - Add fixes tag for patch 4 and patch 5
+
+v1 -> v2
+   - Update docs for csch/hsch since we can support those
+     instructions now (patch 5)
+   - Fix the memory leak where we fail to free a ccwchain (patch 2)
+   - Add fixes tag where appropriate.
+   - Fix comment instead of the order when setting orb.cmd.c64 (patch 1)
+
+
+Farhan Ali (5):
+  vfio-ccw: Fix misleading comment when setting orb.cmd.c64
+  vfio-ccw: Fix memory leak and don't call cp_free in cp_init
+  vfio-ccw: Set pa_nr to 0 if memory allocation fails for pa_iova_pfn
+  vfio-ccw: Don't call cp_free if we are processing a channel program
+  vfio-ccw: Update documentation for csch/hsch
+
+ Documentation/s390/vfio-ccw.rst | 31 ++++++++++++++++++++++++++++---
+ drivers/s390/cio/vfio_ccw_cp.c  | 28 +++++++++++++++++-----------
+ drivers/s390/cio/vfio_ccw_drv.c |  2 +-
+ 3 files changed, 46 insertions(+), 15 deletions(-)
+
 -- 
-1.7.1
+2.7.4
 
