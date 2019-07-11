@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 454AD658FA
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 16:30:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 56B5B658E1
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2019 16:29:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728718AbfGKO1e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 10:27:34 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:41778 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728440AbfGKO1c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 10:27:32 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6BEO7tr013226;
-        Thu, 11 Jul 2019 14:26:10 GMT
+        id S1729000AbfGKO21 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 10:28:27 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:37906 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728969AbfGKO2Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 10:28:25 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6BEOMPI001606;
+        Thu, 11 Jul 2019 14:26:13 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=385wpu4NDusZzlrvO4wdMoGEKubdnUYw4N6zqr4muDU=;
- b=j/8IHCr9S0gUaWnFi3Upjzuz55gy9Ljh6nfaWePnOoytFJ9B7SnJKULz74C3ywY6RXqi
- e2nlqVa9W7MNYSdP2Vf2C/oYboYtNcwS8EW9VbU8cIsaN6Fl9HN5Irx/xBWUPbwuO3Rb
- pA8nC/jt3qZSlX5P9mWE6i1BavyZZ35GVGnmvivmjOvqS8a8/Z0v3tfm2TkPowKHagRD
- jG7N8dpzCgLK0VRzFa0NpGxGayMyo+vj0XV5/GWaoX6BlSffhi7TdWAzW0NBMvhvqMgW
- Mi7BkTLlSEZlEqWrGTNR/OK6j6uUWeCyQ/O4mFUX/8vA2YAylUPyhsIeKxT9HDn0UNu4 +A== 
+ bh=y9IAz60J7qXRlFN2NRsHUzd+qvZ9ZunbWoLTMdcwAx8=;
+ b=SmfOq+K7kq1i3rKVZwlHKx3Hxs01appLJg4uPnU/ZriVoOVHCERIDHALooM0c4fIGSBJ
+ 6sJUwYFar/i1eRJ0bDwA5eXmBBC3pkJst2pWeRiO5XvbO/TYtBqcsljdxwFDY+ygijHk
+ H0MYZu44ra2JBIbub0jXMvwYLNtqfrcVe7JBvlbVaiEu0d5hM3uanYLNWIvfENEj46Wm
+ gz3Qt8PeZrmim/eo4JN+pfX8fKIq4/XNikWq8u1EuUds0UNZgKC6NbZKX2Q0LuHEumqL
+ b5/SpV0/Ww9/ELn0rWmcvfcCc+XgXWqEmOxEsU2TT2yDZ4Zr37YzZrqonMAsPGVng5cD rQ== 
 Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
-        by userp2120.oracle.com with ESMTP id 2tjm9r0bn2-1
+        by userp2130.oracle.com with ESMTP id 2tjk2u0dx7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Jul 2019 14:26:09 +0000
+        Thu, 11 Jul 2019 14:26:12 +0000
 Received: from achartre-desktop.fr.oracle.com (dhcp-10-166-106-34.fr.oracle.com [10.166.106.34])
-        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x6BEPcu0021444;
-        Thu, 11 Jul 2019 14:26:06 GMT
+        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x6BEPcu1021444;
+        Thu, 11 Jul 2019 14:26:09 GMT
 From:   Alexandre Chartre <alexandre.chartre@oracle.com>
 To:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
@@ -38,16 +38,16 @@ To:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
 Cc:     konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
         liran.alon@oracle.com, jwadams@google.com, graf@amazon.de,
         rppt@linux.vnet.ibm.com, alexandre.chartre@oracle.com
-Subject: [RFC v2 07/26] mm/asi: Add ASI page-table entry set functions
-Date:   Thu, 11 Jul 2019 16:25:19 +0200
-Message-Id: <1562855138-19507-8-git-send-email-alexandre.chartre@oracle.com>
+Subject: [RFC v2 08/26] mm/asi: Functions to populate an ASI page-table from a VA range
+Date:   Thu, 11 Jul 2019 16:25:20 +0200
+Message-Id: <1562855138-19507-9-git-send-email-alexandre.chartre@oracle.com>
 X-Mailer: git-send-email 1.7.1
 In-Reply-To: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
 References: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9314 signatures=668688
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
  suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=917 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1907110162
 Sender: kvm-owner@vger.kernel.org
@@ -55,147 +55,249 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add wrappers around the page table entry (pgd/p4d/pud/pmd) set
-functions which check that an existing entry is not being
-overwritten.
+Provide functions to copy page-table entries from the kernel page-table
+to an ASI page-table for a specified VA range. These functions are based
+on the copy_pxx_range() functions defined in mm/memory.c. A difference
+is that a level parameter can be specified to indicate the page-table
+level (PGD, P4D, PUD PMD, PTE) at which the copy should be done. Also
+functions don't rely on mm or vma, and they don't alter the source
+page-table even if an entry is bad. Also the VA range start and size
+don't need to be page-aligned.
 
 Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
 ---
- arch/x86/mm/asi_pagetable.c |  124 +++++++++++++++++++++++++++++++++++++++++++
- 1 files changed, 124 insertions(+), 0 deletions(-)
+ arch/x86/include/asm/asi.h  |    4 +
+ arch/x86/mm/asi_pagetable.c |  205 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 209 insertions(+), 0 deletions(-)
 
+diff --git a/arch/x86/include/asm/asi.h b/arch/x86/include/asm/asi.h
+index 3d965e6..19656aa 100644
+--- a/arch/x86/include/asm/asi.h
++++ b/arch/x86/include/asm/asi.h
+@@ -76,6 +76,10 @@ struct asi_session {
+ extern bool asi_fault(struct pt_regs *regs, unsigned long error_code,
+ 		      unsigned long address);
+ 
++extern int asi_map_range(struct asi *asi, void *ptr, size_t size,
++			 enum page_table_level level);
++extern int asi_map(struct asi *asi, void *ptr, unsigned long size);
++
+ /*
+  * Function to exit the current isolation. This is used to abort isolation
+  * when a task using isolation is scheduled out.
 diff --git a/arch/x86/mm/asi_pagetable.c b/arch/x86/mm/asi_pagetable.c
-index 0fc6d59..e17af9e 100644
+index e17af9e..0169395 100644
 --- a/arch/x86/mm/asi_pagetable.c
 +++ b/arch/x86/mm/asi_pagetable.c
-@@ -270,3 +270,127 @@ static bool asi_valid_offset(struct asi *asi, void *offset)
+@@ -394,3 +394,208 @@ static int asi_set_pgd(struct asi *asi, pgd_t *pgd, pgd_t pgd_value)
  
- 	return p4d;
+ 	return 0;
  }
 +
++static int asi_copy_pte_range(struct asi *asi, pmd_t *dst_pmd, pmd_t *src_pmd,
++			      unsigned long addr, unsigned long end)
++{
++	pte_t *src_pte, *dst_pte;
++
++	dst_pte = asi_pte_alloc(asi, dst_pmd, addr);
++	if (IS_ERR(dst_pte))
++		return PTR_ERR(dst_pte);
++
++	addr &= PAGE_MASK;
++	src_pte = pte_offset_map(src_pmd, addr);
++
++	do {
++		asi_set_pte(asi, dst_pte, *src_pte);
++
++	} while (dst_pte++, src_pte++, addr += PAGE_SIZE, addr < end);
++
++	return 0;
++}
++
++static int asi_copy_pmd_range(struct asi *asi, pud_t *dst_pud, pud_t *src_pud,
++			      unsigned long addr, unsigned long end,
++			      enum page_table_level level)
++{
++	pmd_t *src_pmd, *dst_pmd;
++	unsigned long next;
++	int err;
++
++	dst_pmd = asi_pmd_alloc(asi, dst_pud, addr);
++	if (IS_ERR(dst_pmd))
++		return PTR_ERR(dst_pmd);
++
++	src_pmd = pmd_offset(src_pud, addr);
++
++	do {
++		next = pmd_addr_end(addr, end);
++		if (level == PGT_LEVEL_PMD || pmd_none(*src_pmd) ||
++		    pmd_trans_huge(*src_pmd) || pmd_devmap(*src_pmd)) {
++			err = asi_set_pmd(asi, dst_pmd, *src_pmd);
++			if (err)
++				return err;
++			continue;
++		}
++
++		if (!pmd_present(*src_pmd)) {
++			pr_warn("ASI %p: PMD not present for [%lx,%lx]\n",
++				asi, addr, next - 1);
++			pmd_clear(dst_pmd);
++			continue;
++		}
++
++		err = asi_copy_pte_range(asi, dst_pmd, src_pmd, addr, next);
++		if (err) {
++			pr_err("ASI %p: PMD error copying PTE addr=%lx next=%lx\n",
++			       asi, addr, next);
++			return err;
++		}
++
++	} while (dst_pmd++, src_pmd++, addr = next, addr < end);
++
++	return 0;
++}
++
++static int asi_copy_pud_range(struct asi *asi, p4d_t *dst_p4d, p4d_t *src_p4d,
++			      unsigned long addr, unsigned long end,
++			      enum page_table_level level)
++{
++	pud_t *src_pud, *dst_pud;
++	unsigned long next;
++	int err;
++
++	dst_pud = asi_pud_alloc(asi, dst_p4d, addr);
++	if (IS_ERR(dst_pud))
++		return PTR_ERR(dst_pud);
++
++	src_pud = pud_offset(src_p4d, addr);
++
++	do {
++		next = pud_addr_end(addr, end);
++		if (level == PGT_LEVEL_PUD || pud_none(*src_pud) ||
++		    pud_trans_huge(*src_pud) || pud_devmap(*src_pud)) {
++			err = asi_set_pud(asi, dst_pud, *src_pud);
++			if (err)
++				return err;
++			continue;
++		}
++
++		err = asi_copy_pmd_range(asi, dst_pud, src_pud, addr, next,
++					 level);
++		if (err) {
++			pr_err("ASI %p: PUD error copying PMD addr=%lx next=%lx\n",
++			       asi, addr, next);
++			return err;
++		}
++
++	} while (dst_pud++, src_pud++, addr = next, addr < end);
++
++	return 0;
++}
++
++static int asi_copy_p4d_range(struct asi *asi, pgd_t *dst_pgd, pgd_t *src_pgd,
++			      unsigned long addr, unsigned long end,
++			      enum page_table_level level)
++{
++	p4d_t *src_p4d, *dst_p4d;
++	unsigned long next;
++	int err;
++
++	dst_p4d = asi_p4d_alloc(asi, dst_pgd, addr);
++	if (IS_ERR(dst_p4d))
++		return PTR_ERR(dst_p4d);
++
++	src_p4d = p4d_offset(src_pgd, addr);
++
++	do {
++		next = p4d_addr_end(addr, end);
++		if (level == PGT_LEVEL_P4D || p4d_none(*src_p4d)) {
++			err = asi_set_p4d(asi, dst_p4d, *src_p4d);
++			if (err)
++				return err;
++			continue;
++		}
++
++		err = asi_copy_pud_range(asi, dst_p4d, src_p4d, addr, next,
++					 level);
++		if (err) {
++			pr_err("ASI %p: P4D error copying PUD addr=%lx next=%lx\n",
++			       asi, addr, next);
++			return err;
++		}
++
++	} while (dst_p4d++, src_p4d++, addr = next, addr < end);
++
++	return 0;
++}
++
++static int asi_copy_pgd_range(struct asi *asi,
++			      pgd_t *dst_pagetable, pgd_t *src_pagetable,
++			      unsigned long addr, unsigned long end,
++			      enum page_table_level level)
++{
++	pgd_t *src_pgd, *dst_pgd;
++	unsigned long next;
++	int err;
++
++	dst_pgd = pgd_offset_pgd(dst_pagetable, addr);
++	src_pgd = pgd_offset_pgd(src_pagetable, addr);
++
++	do {
++		next = pgd_addr_end(addr, end);
++		if (level == PGT_LEVEL_PGD || pgd_none(*src_pgd)) {
++			err = asi_set_pgd(asi, dst_pgd, *src_pgd);
++			if (err)
++				return err;
++			continue;
++		}
++
++		err = asi_copy_p4d_range(asi, dst_pgd, src_pgd, addr, next,
++					 level);
++		if (err) {
++			pr_err("ASI %p: PGD error copying P4D addr=%lx next=%lx\n",
++			       asi, addr, next);
++			return err;
++		}
++
++	} while (dst_pgd++, src_pgd++, addr = next, addr < end);
++
++	return 0;
++}
++
 +/*
-+ * asi_set_pXX() functions are equivalent to kernel set_pXX() functions
-+ * but, in addition, they ensure that they are not overwriting an already
-+ * existing reference in the page table. Otherwise an error is returned.
++ * Copy page table entries from the current page table (i.e. from the
++ * kernel page table) to the specified ASI page-table. The level
++ * parameter specifies the page-table level (PGD, P4D, PUD PMD, PTE)
++ * at which the copy should be done.
 + */
-+static int asi_set_pte(struct asi *asi, pte_t *pte, pte_t pte_value)
++int asi_map_range(struct asi *asi, void *ptr, size_t size,
++		  enum page_table_level level)
 +{
-+#ifdef DEBUG
-+	/*
-+	 * The pte pointer should come from asi_pte_alloc() or asi_pte_offset()
-+	 * both of which check if the pointer is in the kernel isolation page
-+	 * table. So this is a paranoid check to ensure the pointer is really
-+	 * in the kernel page table.
-+	 */
-+	if (!asi_valid_offset(asi, pte)) {
-+		pr_err("ASI %p: PTE %px not found\n", asi, pte);
-+		return -EINVAL;
-+	}
-+#endif
-+	set_pte(pte, pte_value);
++	unsigned long addr = (unsigned long)ptr;
++	unsigned long end = addr + ((unsigned long)size);
++	unsigned long flags;
++	int err;
 +
-+	return 0;
++	pr_debug("ASI %p: MAP %px/%lx/%d\n", asi, ptr, size, level);
++
++	spin_lock_irqsave(&asi->lock, flags);
++	err = asi_copy_pgd_range(asi, asi->pgd, current->mm->pgd,
++				 addr, end, level);
++	spin_unlock_irqrestore(&asi->lock, flags);
++
++	return err;
 +}
++EXPORT_SYMBOL(asi_map_range);
 +
-+static int asi_set_pmd(struct asi *asi, pmd_t *pmd, pmd_t pmd_value)
++/*
++ * Copy page-table PTE entries from the current page-table to the
++ * specified ASI page-table.
++ */
++int asi_map(struct asi *asi, void *ptr, unsigned long size)
 +{
-+#ifdef DEBUG
-+	/*
-+	 * The pmd pointer should come from asi_pmd_alloc() or asi_pmd_offset()
-+	 * both of which check if the pointer is in the kernel isolation page
-+	 * table. So this is a paranoid check to ensure the pointer is really
-+	 * in the kernel page table.
-+	 */
-+	if (!asi_valid_offset(asi, pmd)) {
-+		pr_err("ASI %p: PMD %px not found\n", asi, pmd);
-+		return -EINVAL;
-+	}
-+#endif
-+	if (pmd_val(*pmd) == pmd_val(pmd_value))
-+		return 0;
-+
-+	if (!pmd_none(*pmd)) {
-+		pr_err("ASI %p: PMD %px overwriting %lx with %lx\n",
-+		       asi, pmd, pmd_val(*pmd), pmd_val(pmd_value));
-+		return -EBUSY;
-+	}
-+
-+	set_pmd(pmd, pmd_value);
-+
-+	return 0;
++	return asi_map_range(asi, ptr, size, PGT_LEVEL_PTE);
 +}
-+
-+static int asi_set_pud(struct asi *asi, pud_t *pud, pud_t pud_value)
-+{
-+#ifdef DEBUG
-+	/*
-+	 * The pud pointer should come from asi_pud_alloc() or asi_pud_offset()
-+	 * both of which check if the pointer is in the kernel isolation page
-+	 * table. So this is a paranoid check to ensure the pointer is really
-+	 * in the kernel page table.
-+	 */
-+	if (!asi_valid_offset(asi, pud)) {
-+		pr_err("ASI %p: PUD %px not found\n", asi, pud);
-+		return -EINVAL;
-+	}
-+#endif
-+	if (pud_val(*pud) == pud_val(pud_value))
-+		return 0;
-+
-+	if (!pud_none(*pud)) {
-+		pr_err("ASI %p: PUD %px overwriting %lx with %lx\n",
-+		       asi, pud, pud_val(*pud), pud_val(pud_value));
-+		return -EBUSY;
-+	}
-+
-+	set_pud(pud, pud_value);
-+
-+	return 0;
-+}
-+
-+static int asi_set_p4d(struct asi *asi, p4d_t *p4d, p4d_t p4d_value)
-+{
-+#ifdef DEBUG
-+	/*
-+	 * The p4d pointer should come from asi_p4d_alloc() or asi_p4d_offset()
-+	 * both of which check if the pointer is in the kernel isolation page
-+	 * table. So this is a paranoid check to ensure the pointer is really
-+	 * in the kernel page table.
-+	 */
-+	if (!asi_valid_offset(asi, p4d)) {
-+		pr_err("ASI %p: P4D %px not found\n", asi, p4d);
-+		return -EINVAL;
-+	}
-+#endif
-+	if (p4d_val(*p4d) == p4d_val(p4d_value))
-+		return 0;
-+
-+	if (!p4d_none(*p4d)) {
-+		pr_err("ASI %p: P4D %px overwriting %lx with %lx\n",
-+		       asi, p4d, p4d_val(*p4d), p4d_val(p4d_value));
-+		return -EBUSY;
-+	}
-+
-+	set_p4d(p4d, p4d_value);
-+
-+	return 0;
-+}
-+
-+static int asi_set_pgd(struct asi *asi, pgd_t *pgd, pgd_t pgd_value)
-+{
-+	if (pgd_val(*pgd) == pgd_val(pgd_value))
-+		return 0;
-+
-+	if (!pgd_none(*pgd)) {
-+		pr_err("ASI %p: PGD %px overwriting %lx with %lx\n",
-+		       asi, pgd, pgd_val(*pgd), pgd_val(pgd_value));
-+		return -EBUSY;
-+	}
-+
-+	set_pgd(pgd, pgd_value);
-+
-+	return 0;
-+}
++EXPORT_SYMBOL(asi_map);
 -- 
 1.7.1
 
