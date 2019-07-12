@@ -2,74 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DFD267482
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 19:45:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED72267490
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 19:46:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727401AbfGLRo7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Jul 2019 13:44:59 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:35103 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727028AbfGLRo7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Jul 2019 13:44:59 -0400
-Received: by mail-wr1-f66.google.com with SMTP id y4so10824037wrm.2;
-        Fri, 12 Jul 2019 10:44:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=lHUKPh97ovneR+jDvYGIi2nNeLvm3FEJyqMoQsO3Cw8=;
-        b=QCGUlMqK5B1quSCyGoAcIkiOgg388g7Xls60Fqvq4ZpodWBQxwUoFPlvE33KbN47lj
-         B9LpGCdbIDsiKme2dxcVxhmWO1rhaAkIYanx5X7FynPmshJg7ey1svufsGYSrEWELbzL
-         P+jn4+eEcQo6588FehkRMIV6YVWfnVmTuIwmacXYWLV3GezbW3qCeK0DJb1bb3S6Lnrj
-         psG+mI6PR+cl5hSQo1kgW+o26sR+eRoovKl88jbNkYH2uB5qT89oRkfGWikS3uxDd9Qe
-         E28x1azhylqQ7v/2r3vReiX0PZZbSwmmGPJK+YfH0E1aBngKVJP4gWrbGKGXBvTKAkYD
-         YxcA==
+        id S1727512AbfGLRqA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jul 2019 13:46:00 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:43115 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727261AbfGLRp7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jul 2019 13:45:59 -0400
+Received: by mail-wr1-f67.google.com with SMTP id p13so10770858wru.10
+        for <kvm@vger.kernel.org>; Fri, 12 Jul 2019 10:45:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=lHUKPh97ovneR+jDvYGIi2nNeLvm3FEJyqMoQsO3Cw8=;
-        b=f9VzFiGZ/cX9nyyNa6zTlPqFcG1EWTzyKA//5ve/XCpEh5fEqnWGCsCohOO4dcTESM
-         rBeJodTRXCqu5ekiyrq7h+gwQaDkAQDXnq/bnC17Ctpm+e2wPDvlvNAVl8VT6f2qEDbd
-         meg4WUtjAIs4/ndXJoQ0nSDFIUFACKuyqQAvkDbjgNshVjPUlOU/j1oIMrHPjqoKXIQ8
-         jTluH6/HQMHzOypzHPWCTkkjftd+45XmPZhTR3HDwK0E/ZIrKJ8fOR0VqHoUUoKyQgJE
-         1Y5JM0puPTJbk8ZU84vXyoria+FGcBlDmI/RhKfqi3Iw1OTpo7Mgqb1ebxqzPz/CRGj0
-         QQLA==
-X-Gm-Message-State: APjAAAWoaDvz8d9Lh/y1c0FR+In+cpnz4VlLNf+Ju3l25G1/ot37PqB2
-        rFFhtiMAdmcx6QCu1GVJItk=
-X-Google-Smtp-Source: APXvYqy4KqpsDEOZJLk74bD59Jir3YB8IxQwIxc2RMK8xRXK5QNzAgrcRcH00VOIA9PzEKl403m2Bw==
-X-Received: by 2002:adf:f6cb:: with SMTP id y11mr13510997wrp.245.1562953497008;
-        Fri, 12 Jul 2019 10:44:57 -0700 (PDT)
-Received: from archlinux-threadripper ([2a01:4f8:222:2f1b::2])
-        by smtp.gmail.com with ESMTPSA id v18sm10522732wrs.80.2019.07.12.10.44.56
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Fri, 12 Jul 2019 10:44:56 -0700 (PDT)
-Date:   Fri, 12 Jul 2019 10:44:54 -0700
-From:   Nathan Chancellor <natechancellor@gmail.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5AAY/XLB5sNM5xu1cxB6MBuk0Q+am8e86PPXt5EsGZI=;
+        b=PXh/7B7OFm4Vs7npD7cPcryfOTaRhVc07U5vTQ5yDlYo+r5FIES14RcFfCjO4B4e9z
+         OYnzXyz/LJ3vNRRrXedlQjb736P6HQ73DShVSgmvspihDPH1c1IKimtZ1vJRPssZtEqr
+         3xkDnTGbA6TRToqKg3N0SzY1x1Ejlf+L0BgQ/eUX6l4CodzmBPh4iEXYGNQ0PbixHIjb
+         bzbP/T3N69CNgmO3eS/tEOnOrf4AyUc7C8vYvyaoaTqbPvytv6QVl0KIfT8Wtp+IEClD
+         6NLPNQ10FQy0Ji/qSJxFz2Wg7jRPB3pP/m9rYzDisLyWe8sSw/nYVfprAqRBH3AS467y
+         F2Dg==
+X-Gm-Message-State: APjAAAXstrcHICOjXVbTro6msILde1KlcsncwzH2WHTPnyntXOhtp63o
+        5QcVO3/AuVUMCM+LfBdBPphKhQ==
+X-Google-Smtp-Source: APXvYqztfm0GMtUN0DWOYu24qfN1n1ZjFz8nEz/A1BvDT3bf6OdkVwRupsDeRYQC+wLyk5PLJd+Npg==
+X-Received: by 2002:adf:a299:: with SMTP id s25mr5567669wra.74.1562953557279;
+        Fri, 12 Jul 2019 10:45:57 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab? ([2001:b07:6468:f312:d066:6881:ec69:75ab])
+        by smtp.gmail.com with ESMTPSA id y1sm7470474wma.32.2019.07.12.10.45.56
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Fri, 12 Jul 2019 10:45:56 -0700 (PDT)
+Subject: Re: [PATCH] [v3] x86: kvm: avoid -Wsometimes-uninitized warning
+To:     Arnd Bergmann <arnd@arndb.de>,
+        =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        x86@kernel.org
+Cc:     "H. Peter Anvin" <hpa@zytor.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Roman Kagan <rkagan@virtuozzo.com>,
         Liran Alon <liran.alon@oracle.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: Re: [PATCH] [v3] x86: kvm: avoid -Wsometimes-uninitized warning
-Message-ID: <20190712174454.GA3845@archlinux-threadripper>
 References: <20190712141322.1073650-1-arnd@arndb.de>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <e85f877e-7c1c-7c9d-40c0-b41ac0fc68d6@redhat.com>
+Date:   Fri, 12 Jul 2019 19:45:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20190712141322.1073650-1-arnd@arndb.de>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 12, 2019 at 04:13:09PM +0200, Arnd Bergmann wrote:
+On 12/07/19 16:13, Arnd Bergmann wrote:
 > Clang notices a code path in which some variables are never
 > initialized, but fails to figure out that this can never happen
 > on i386 because is_64_bit_mode() always returns false.
@@ -93,5 +86,60 @@ On Fri, Jul 12, 2019 at 04:13:09PM +0200, Arnd Bergmann wrote:
 > Flip the condition around to avoid the conditional execution on i386.
 > 
 > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> v3: reword commit log, simplify patch again
+> v2: make the change inside of is_64_bit_mode().
+> ---
+>  arch/x86/kvm/hyperv.c | 20 +++++++++-----------
+>  1 file changed, 9 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index a39e38f13029..c10a8b10b203 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1594,7 +1594,7 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 param, ingpa, outgpa, ret = HV_STATUS_SUCCESS;
+>  	uint16_t code, rep_idx, rep_cnt;
+> -	bool fast, longmode, rep;
+> +	bool fast, rep;
+>  
+>  	/*
+>  	 * hypercall generates UD from non zero cpl and real mode
+> @@ -1605,9 +1605,14 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+>  		return 1;
+>  	}
+>  
+> -	longmode = is_64_bit_mode(vcpu);
+> -
+> -	if (!longmode) {
+> +#ifdef CONFIG_X86_64
+> +	if (is_64_bit_mode(vcpu)) {
+> +		param = kvm_rcx_read(vcpu);
+> +		ingpa = kvm_rdx_read(vcpu);
+> +		outgpa = kvm_r8_read(vcpu);
+> +	} else
+> +#endif
+> +	{
+>  		param = ((u64)kvm_rdx_read(vcpu) << 32) |
+>  			(kvm_rax_read(vcpu) & 0xffffffff);
+>  		ingpa = ((u64)kvm_rbx_read(vcpu) << 32) |
+> @@ -1615,13 +1620,6 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+>  		outgpa = ((u64)kvm_rdi_read(vcpu) << 32) |
+>  			(kvm_rsi_read(vcpu) & 0xffffffff);
+>  	}
+> -#ifdef CONFIG_X86_64
+> -	else {
+> -		param = kvm_rcx_read(vcpu);
+> -		ingpa = kvm_rdx_read(vcpu);
+> -		outgpa = kvm_r8_read(vcpu);
+> -	}
+> -#endif
+>  
+>  	code = param & 0xffff;
+>  	fast = !!(param & HV_HYPERCALL_FAST_BIT);
+> 
 
-Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+Queued, thanks.
+
+Paolo
