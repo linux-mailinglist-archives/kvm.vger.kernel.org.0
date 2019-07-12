@@ -2,81 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C5E2866BBF
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 13:45:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3999E66C00
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 14:03:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726700AbfGLLpK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Jul 2019 07:45:10 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:55464 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726250AbfGLLpK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Jul 2019 07:45:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=7WheT2sFPbpAYUphDY20RcxiluEPP2yGBWlv6nqCcpo=; b=THypPdhej8/b1YWUg1gyexApx
-        27rbpPcSBzGOOshG/kAYscKus1Ew/eOU5gf9H9brrUNp/PL/1yAXw/FRqTM9KeGIFKW0sT6VvmMfK
-        dxA2HakjTPM7ZH5hjJb9dFsW475nPrHOSuB4zbm2t4DTMfP0ymwVL8uXw/pmmGlO/LSMZiZrYLz+E
-        Uhd/JjQBAgym+6ZFFGwIegs47sVyGzYM7riZt8FU2L+e5mHTfJxzE1sYtiCrqPj9r9w/Hg2Z6pbks
-        RYpGUb6epfiraNJqrQNpNOUonB1BaYJTo9nW9B3w6Bfs1yQ5z+bsLC0Td5ReYT0TnhNrB6jvGZx3z
-        OGOpmAd7Q==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hltz2-0005PZ-N5; Fri, 12 Jul 2019 11:45:00 +0000
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id C66F4209772E7; Fri, 12 Jul 2019 13:44:58 +0200 (CEST)
-Date:   Fri, 12 Jul 2019 13:44:58 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Alexandre Chartre <alexandre.chartre@oracle.com>
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        dave.hansen@linux.intel.com, luto@kernel.org, kvm@vger.kernel.org,
+        id S1727072AbfGLMD3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jul 2019 08:03:29 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:44902 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726928AbfGLMD2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jul 2019 08:03:28 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6CBwsI5088850;
+        Fri, 12 Jul 2019 12:01:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=UvA9Jh+08UHDvAGbwH3rBrV64pox2kQExiFizxg0YeE=;
+ b=5ejc6Na9HF23eUHz+BoYzKJNXXd5vAuVzCPuho38k/IyFL2csYS3SnWEb0UPapmo3HIU
+ FOyNU6a1xSXya3VSdARvmmJgK1gVPPhnhBeYTTY1XqSVE5wPiZz7Vxi3BILLWQfRD/uk
+ pLnasU/FZ9+nUE9wrA2dDC9QvY/wHPA0f16WZM4KL+KUBsfjC8k4Tj0708t/dquhPxOj
+ okn7O5zqJaxn2XSMGdjKjtmnVvSosskbXQlfvyI1JTpXGnfmZrmDSca/+jGntCvFNtOg
+ D/fz27Rhl3WQqSev+OZcy4Ux7WTKtZkORZlyxZRANEuwnmxRdbZEpYG7GlnbyHSFAURi Hg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 2tjkkq56p0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Jul 2019 12:01:54 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6CBvj2w033926;
+        Fri, 12 Jul 2019 12:01:54 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 2tn1j23x9m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Jul 2019 12:01:53 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6CC1mo3030245;
+        Fri, 12 Jul 2019 12:01:48 GMT
+Received: from [10.166.106.34] (/10.166.106.34)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 12 Jul 2019 04:56:48 -0700
+Subject: Re: [RFC v2 00/27] Kernel Address Space Isolation
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@intel.com>
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, mingo@redhat.com,
+        bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
+        luto@kernel.org, peterz@infradead.org, kvm@vger.kernel.org,
         x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
         konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
         liran.alon@oracle.com, jwadams@google.com, graf@amazon.de,
-        rppt@linux.vnet.ibm.com, Paul Turner <pjt@google.com>
-Subject: Re: [RFC v2 00/27] Kernel Address Space Isolation
-Message-ID: <20190712114458.GU3402@hirez.programming.kicks-ass.net>
+        rppt@linux.vnet.ibm.com
 References: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
+ <5cab2a0e-1034-8748-fcbe-a17cf4fa2cd4@intel.com>
+ <alpine.DEB.2.21.1907120911160.11639@nanos.tec.linutronix.de>
+From:   Alexandre Chartre <alexandre.chartre@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <61d5851e-a8bf-e25c-e673-b71c8b83042c@oracle.com>
+Date:   Fri, 12 Jul 2019 13:56:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <alpine.DEB.2.21.1907120911160.11639@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9315 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907120131
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9315 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907120131
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 11, 2019 at 04:25:12PM +0200, Alexandre Chartre wrote:
-> Kernel Address Space Isolation aims to use address spaces to isolate some
-> parts of the kernel (for example KVM) to prevent leaking sensitive data
-> between hyper-threads under speculative execution attacks. You can refer
-> to the first version of this RFC for more context:
+
+On 7/12/19 12:44 PM, Thomas Gleixner wrote:
+> On Thu, 11 Jul 2019, Dave Hansen wrote:
 > 
->    https://lkml.org/lkml/2019/5/13/515
+>> On 7/11/19 7:25 AM, Alexandre Chartre wrote:
+>>> - Kernel code mapped to the ASI page-table has been reduced to:
+>>>    . the entire kernel (I still need to test with only the kernel text)
+>>>    . the cpu entry area (because we need the GDT to be mapped)
+>>>    . the cpu ASI session (for managing ASI)
+>>>    . the current stack
+>>>
+>>> - Optionally, an ASI can request the following kernel mapping to be added:
+>>>    . the stack canary
+>>>    . the cpu offsets (this_cpu_off)
+>>>    . the current task
+>>>    . RCU data (rcu_data)
+>>>    . CPU HW events (cpu_hw_events).
+>>
+>> I don't see the per-cpu areas in here.  But, the ASI macros in
+>> entry_64.S (and asi_start_abort()) use per-cpu data.
+>>
+>> Also, this stuff seems to do naughty stuff (calling C code, touching
+>> per-cpu data) before the PTI CR3 writes have been done.  But, I don't
+>> see anything excluding PTI and this code from coexisting.
+> 
+> That ASI thing is just PTI on steroids.
+> 
+> So why do we need two versions of the same thing? That's absolutely bonkers
+> and will just introduce subtle bugs and conflicting decisions all over the
+> place.
+> 
+> The need for ASI is very tightly coupled to the need for PTI and there is
+> absolutely no point in keeping them separate.
+>
+> The only difference vs. interrupts and exceptions is that the PTI logic
+> cares whether they enter from user or from kernel space while ASI only
+> cares about the kernel entry.
 
-No, no, no!
+I think that's precisely what makes ASI and PTI different and independent.
+PTI is just about switching between userland and kernel page-tables, while
+ASI is about switching page-table inside the kernel. You can have ASI without
+having PTI. You can also use ASI for kernel threads so for code that won't
+be triggered from userland and so which won't involve PTI.
 
-That is the crux of this entire series; you're not punting on explaining
-exactly why we want to go dig through 26 patches of gunk.
+> But most exceptions/interrupts transitions do not require to be handled at
+> the entry code level because on VMEXIT the exit reason clearly tells
+> whether a switch to the kernel CR3 is necessary or not. So this has to be
+> handled at the VMM level already in a very clean and simple way.
+> 
+> I'm not a virt wizard, but according to code inspection and instrumentation
+> even the NMI on the host is actually reinjected manually into the host via
+> 'int $2' after the VMEXIT and for MCE it looks like manual handling as
+> well. So why do we need to sprinkle that muck all over the entry code?
+> 
+>  From a semantical perspective VMENTER/VMEXIT are very similar to the return
+> to user / enter to user mechanics. Just that the transition happens in the
+> VMM code and not at the regular user/kernel transition points.
 
-You get to exactly explain what (your definition of) sensitive data is,
-and which speculative scenarios and how this approach mitigates them.
+VMExit returns to the kernel, and ASI is used to run the VMExit handler with
+a limited kernel address space instead of using the full kernel address space.
+Change in entry code is required to handle any interrupt/exception which
+can happen while running code with ASI (like KVM VMExit handler).
 
-And included in that is a high level overview of the whole thing.
+Note that KVM is an example of an ASI consumer, but ASI is generic and can be
+used to run (mostly) any kernel code if you want to run code with a reduced
+kernel address space.
 
-On the one hand you've made this implementation for KVM, while on the
-other hand you're saying it is generic but then fail to describe any
-!KVM user.
+> So why do you want ot treat that differently? There is absolutely zero
+> reason to do so. And there is no reason to create a pointlessly different
+> version of PTI which introduces yet another variant of a restricted page
+> table instead of just reusing and extending what's there already.
+> 
 
-AFAIK all speculative fails this is relevant to are now public, so
-excruciating horrible details are fine and required.
+As I've tried to explain, to me PTI and ASI are different and independent.
+PTI manages switching between userland and kernel page-table, and ASI manages
+switching between kernel and a reduced-kernel page-table.
 
-AFAIK2 this is all because of MDS but it also helps with v1.
 
-AFAIK3 this wants/needs to be combined with core-scheduling to be
-useful, but not a single mention of that is anywhere.
+Thanks,
+
+alex.
