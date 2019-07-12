@@ -2,103 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4AC1166470
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 04:28:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9567664B3
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 04:54:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728931AbfGLC2r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 22:28:47 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:42493 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728932AbfGLC2r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 22:28:47 -0400
-Received: by mail-pg1-f196.google.com with SMTP id t132so3808721pgb.9
-        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 19:28:46 -0700 (PDT)
+        id S1729174AbfGLCyr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 22:54:47 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:37510 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729051AbfGLCyq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 22:54:46 -0400
+Received: by mail-pl1-f195.google.com with SMTP id b3so4035821plr.4;
+        Thu, 11 Jul 2019 19:54:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=64j1duN8Q6Xd7kRV0ySvGXg0eZ22bwDTxpKrN9mAXSY=;
+        b=AHe1Evh3+uUAWpOBVIXpYTAk/unMWsGn2D3MEAxP2tnBXX6PS4AqyxdsOm1CxGackm
+         WsYGT4J7LyN+CgbltLSBBsW6rfAVbVlxjUt3xVay86baYmxOwtQ105Bs4I8hlyVn9t+g
+         TIlPy9ajseDKUaNuAhdFg9zZ753Vz2K2/8BgzRCQcG0YfFNe6NjWMIbvh3SP1/yAyxVD
+         dtQIlV6lleTl9NWXT2GryG/2bPhXPEKx+i4xCrB0NrXdM5w6Cn71i9bhmu6SII91upEz
+         /YNvQ2aGc8yA+RooKxBhZtzNzzSAoGzzAwArDTJbRNkG3V6eTp6+/xdV2PEDMp7/A/Wi
+         gQEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=cFN7IARNf/dh9h3GTyQlVk7K9Z+EtPM855+7HZjT3Oc=;
-        b=OLKvXfdw9tSqtmd+pQljPQr9CKk43E0zGGXRRKMgJz1e3wK/0VrtXAD4rCU08oye8P
-         j67zzzp/V49nUdnQqjJc+MN7I6Ag3KXVEqizi0ncf0Yz9DZXOuRRnVKv9NXN29Qynnkf
-         5yuC0btwfalLvPpU27znD+M2wpdUsjq3zzsdP02BMFpKscxOLSM+R+EHInGMX0jppOEt
-         pf75Idjz2aLMAQJyjMQaLs5+0NcA4dxjfHeOMm/kSo9Wdt8Jk5XuadY1QMa6kVcB2mvT
-         tleIyGL2GY9ApL75o8suJTKyeLAoP+bdG21w9uNXsOPxWqG0vYD31nDKWT61qZB42/Vo
-         4NtA==
-X-Gm-Message-State: APjAAAVQnOZV0T09cuDc8wOOjoxI5bN0j3O1REOFB0k7M9KxsXA5yIKc
-        Wd3KxjGB2YHQ6KOSnkmHkuDxtmpbZgOlWw==
-X-Google-Smtp-Source: APXvYqygaxpxWjhPdVksaAv3LG4n8/WiRRkQJp+HSmKUI14J8m8IDfn2bajnPkr84EDoIssyPfMPCA==
-X-Received: by 2002:a65:4841:: with SMTP id i1mr7833657pgs.316.1562898526157;
-        Thu, 11 Jul 2019 19:28:46 -0700 (PDT)
-Received: from xz-x1.redhat.com ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id f15sm7389259pje.17.2019.07.11.19.28.43
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 11 Jul 2019 19:28:45 -0700 (PDT)
-From:   Peter Xu <zhexu@redhat.com>
-X-Google-Original-From: Peter Xu <peterx@redhat.com>
-To:     kvm@vger.kernel.org
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=64j1duN8Q6Xd7kRV0ySvGXg0eZ22bwDTxpKrN9mAXSY=;
+        b=AucxCgqlGhMOCt3iaFdChUDmi073Vw3DrGGuuv1qvrk4y0Vop8y4nFF09QqPsRaQaZ
+         p81D/naSu3FOF6wSOVgEyYl11riFPD/ZUl0BXQM49V1gvsE+a5+iSQ8cvuIbMeqEtqU7
+         q8c3duHK+ocFtfsvGrNscsbwLcwPMxFOt2jRchWYRrmfzKy64r1BTLkbqAIwt6zY28QC
+         tSLlT1yfTEyXILwIKoZYmhERA4JmbSK0cJQcEGI4P58z4BLR0m3Vq7/6wDuOy0Lie3Qy
+         qBC6AvXthiJrnxu0uVY8d0Vr6OCelS5Sl/QnJZfud6QRFeoGCxMhtY21iOJBeBaY1Asu
+         SVKg==
+X-Gm-Message-State: APjAAAURNOl2qUCH42aGerzJGnxgp+4auTpWtFCTe9VJZvKEViPdoaDD
+        oFCObuDDkYAKKc3Cg/Ookos6COKGrw8=
+X-Google-Smtp-Source: APXvYqxi8dhpdclONkq7oo/LRkDbRkz37L73HpER/lr6g5PmDj65DBKzvhdvjrat/RYt6oo+85/N7A==
+X-Received: by 2002:a17:902:b608:: with SMTP id b8mr8579220pls.303.1562900085859;
+        Thu, 11 Jul 2019 19:54:45 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+        by smtp.googlemail.com with ESMTPSA id n26sm7786630pfa.83.2019.07.11.19.54.43
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Thu, 11 Jul 2019 19:54:45 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Luiz Capitulino <lcapitulino@redhat.com>, peterx@redhat.com,
-        Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [kvm-unit-tests PATCH v2 3/3] tscdeadline_latency: Stop timer when reach max loop
-Date:   Fri, 12 Jul 2019 10:28:25 +0800
-Message-Id: <20190712022825.1366-4-peterx@redhat.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190712022825.1366-1-peterx@redhat.com>
-References: <20190712022825.1366-1-peterx@redhat.com>
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+Subject: [PATCH 1/2] KVM: LAPIC: Add pv ipi tracepoint
+Date:   Fri, 12 Jul 2019 10:54:39 +0800
+Message-Id: <1562900080-20798-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This fixes another possible hang of this test when delay is configured
-too small (e.g., 2000) so that the IRQ handler will trigger forever.
+From: Wanpeng Li <wanpengli@tencent.com>
 
-Let's stop the timer if we've collected enough data so that the
-program can quit always.
+Add pv ipi tracepoint.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
 ---
- x86/tscdeadline_latency.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ arch/x86/kvm/lapic.c |  2 ++
+ arch/x86/kvm/trace.h | 25 +++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/x86/tscdeadline_latency.c b/x86/tscdeadline_latency.c
-index 0a3532d..a63f98b 100644
---- a/x86/tscdeadline_latency.c
-+++ b/x86/tscdeadline_latency.c
-@@ -50,18 +50,24 @@ int breakmax = 0;
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 3201d91..72c2a1e 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -568,6 +568,8 @@ int kvm_pv_send_ipi(struct kvm *kvm, unsigned long ipi_bitmap_low,
+ 	int cluster_size = op_64_bit ? 64 : 32;
+ 	int count = 0;
  
- static void tsc_deadline_timer_isr(isr_regs_t *regs)
- {
--    u64 now = rdtsc();
-+    u64 now = rdtsc(), delay;
-     ++tdt_count;
- 
--    if (table_idx < TABLE_SIZE && tdt_count > 1)
--        table[table_idx++] = now - exptime;
-+    if (tdt_count == 1)
-+        /* Skip the 1st IRQ */
-+        goto setup_next;
- 
--    if (breakmax && tdt_count > 1 && (now - exptime) > breakmax) {
--        hitmax = 1;
-+    table[table_idx++] = delay = now - exptime;
++	trace_kvm_pv_send_ipi(irq.vector, min, ipi_bitmap_low, ipi_bitmap_high);
 +
-+    /* Stop if either we finished collection or hit max */
-+    if ((breakmax && delay > breakmax) || table_idx >= TABLE_SIZE) {
-+        if (breakmax)
-+            hitmax = 1;
-         apic_write(APIC_EOI, 0);
-         return;
-     }
+ 	irq.vector = icr & APIC_VECTOR_MASK;
+ 	irq.delivery_mode = icr & APIC_MODE_MASK;
+ 	irq.level = (icr & APIC_INT_ASSERT) != 0;
+diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+index b5c831e..ce6ee34 100644
+--- a/arch/x86/kvm/trace.h
++++ b/arch/x86/kvm/trace.h
+@@ -1462,6 +1462,31 @@ TRACE_EVENT(kvm_hv_send_ipi_ex,
+ 		  __entry->vector, __entry->format,
+ 		  __entry->valid_bank_mask)
+ );
++
++/*
++ * Tracepoints for kvm_pv_send_ipi.
++ */
++TRACE_EVENT(kvm_pv_send_ipi,
++	TP_PROTO(u32 vector, u32 min, unsigned long ipi_bitmap_low, unsigned long ipi_bitmap_high),
++	TP_ARGS(vector, min, ipi_bitmap_low, ipi_bitmap_high),
++
++	TP_STRUCT__entry(
++		__field(u32, vector)
++		__field(u32, min)
++		__field(unsigned long, ipi_bitmap_low)
++		__field(unsigned long, ipi_bitmap_high)
++	),
++
++	TP_fast_assign(
++		__entry->vector = vector;
++		__entry->min = min;
++		__entry->ipi_bitmap_low = ipi_bitmap_low;
++		__entry->ipi_bitmap_high = ipi_bitmap_high;
++	),
++
++	TP_printk("vector %d min 0x%x ipi_bitmap_low 0x%lx ipi_bitmap_high 0x%lx",
++		  __entry->vector, __entry->min, __entry->ipi_bitmap_low, __entry->ipi_bitmap_high)
++);
+ #endif /* _TRACE_KVM_H */
  
-+setup_next:
-     exptime = now+delta;
-     wrmsr(MSR_IA32_TSCDEADLINE, now+delta);
-     apic_write(APIC_EOI, 0);
+ #undef TRACE_INCLUDE_PATH
 -- 
-2.21.0
+2.7.4
 
