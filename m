@@ -2,111 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id DEB0D67357
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 18:34:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6102667374
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 18:39:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727015AbfGLQeG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Jul 2019 12:34:06 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:35584 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726449AbfGLQeF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Jul 2019 12:34:05 -0400
-Received: by mail-ot1-f68.google.com with SMTP id j19so10058565otq.2
-        for <kvm@vger.kernel.org>; Fri, 12 Jul 2019 09:34:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8M9k3vaoESH9FTV02BiV6DPoDuMicpuNdRGJ4JunVi0=;
-        b=VRH0PzxukwZZ+q7SG4lesnPsEkQYk3CxXfe3harpH8lzCZeXV4gpRliZeLYOdw+y28
-         Z8Gua50+IjaG8uj2/pLHEnhV9e3p6nx40gaM/MrFsZiyLuwQmJlAdOLzDyMpLpaOx5ao
-         ZpXO0NWHcVj7dNxXrERHhuAPH6syIYeBFyWhnO+GC8JFsynMwVIWMxMkktdWGfEYekGM
-         eLfaaOEYa3l8kovhYifwOmZ6pEXu4I7wEUUx5HIfSWpEw8/dSa1iNgctZAkVxjUeTCh2
-         cYVhchpkObSqe+ZwpY/ncQ3sqRBRVoipy+b2RMrg53EDCnNqPcu+kVVCVkZR5COIpF5k
-         y7uA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8M9k3vaoESH9FTV02BiV6DPoDuMicpuNdRGJ4JunVi0=;
-        b=Y+Lsnt5gZv+ge2BaSlR2DsX7p0vIFnUFWnJV7VWZ4RhAbzxLD8Qr1TTkjbL2kFYmMv
-         /0QodyoAYV4Uk8v63b8LAGzmRlKsND08Ap7KgjF45Id4cThKeHqMtmSEvffqEICA1KgF
-         TvE8HowE5MfcnYQRKJlGJyWffCBmV9STJ7C7DTPS2t/51bRH4rc5kRH/O22YZ2SCF821
-         IFWGZXzfOOkwsFOxg19zzPedBaiBhtqymPN+qks4s6UgxwofaNcT7iPH57uZbccmmuBT
-         6/0Hng+HGi8WfVbMtqGIFXgliz50kWsEvuP+60qcapDIJbSax1b041ExPkx5eqxtz6BS
-         jV2w==
-X-Gm-Message-State: APjAAAV99XjmAjx+yK/7jjL1OVTlAcvQQtQQ2eTrdhOoX1jXBntBWgI4
-        NwYRoMw7BZU1wctTM489b/v26NANDwS+ULQhpLhcxQ==
-X-Google-Smtp-Source: APXvYqylwE8qWDgRFiXH/TgR4x9jB931lqPFqDQHpf/AJqOkaw45guOK47bJolGjBLdqpPmh1AtBjSlVnMIlz4mVlfI=
-X-Received: by 2002:a9d:711e:: with SMTP id n30mr8725936otj.97.1562949245064;
- Fri, 12 Jul 2019 09:34:05 -0700 (PDT)
+        id S1727114AbfGLQjj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jul 2019 12:39:39 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:54954 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726449AbfGLQjj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jul 2019 12:39:39 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6CGYu5W044476;
+        Fri, 12 Jul 2019 16:37:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=nyEsN/LT+qLQeAhJSw73nRDEiezb1wkuHqJmYoNu09Q=;
+ b=udzUsKOCDBkPUmzOUDtUv3Rsrc9AjAPNDVOQAGhzxJz8cM/ac3qhx5la2ks5/yVkRxcN
+ jeJuWWO1mCOVL7CdwMw1K5mrevYgdJ0U1KqrVJXYcGhsGKBybJTzoG1DmqR/AtKpiRUG
+ /6cdcqaH7+uwyAS/A20qc+5Japv6c6FQGyZeWGHfpCZ0Cd11Z2ykMLdZrqwzh23px5JK
+ zjP8561g4U1GdrrdSfcmHkKZXMW8rHVjPA3kl5NBx2d98FCqPiLcAhEa4FB571m6F2RM
+ dyIFcDD4kndhbBovZteDlGSGO/H8G0eogKOqieLEXrwfqHR56AX8ZGkcAyv5JsZwO7iB hA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 2tjm9r6n6w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Jul 2019 16:37:56 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6CGHoBM082891;
+        Fri, 12 Jul 2019 16:37:56 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 2tn1j288h9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Jul 2019 16:37:55 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6CGbqMp028681;
+        Fri, 12 Jul 2019 16:37:52 GMT
+Received: from [10.166.106.34] (/10.166.106.34)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 12 Jul 2019 09:37:51 -0700
+Subject: Re: [RFC v2 00/27] Kernel Address Space Isolation
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     Dave Hansen <dave.hansen@intel.com>, pbonzini@redhat.com,
+        rkrcmar@redhat.com, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        dave.hansen@linux.intel.com, luto@kernel.org, kvm@vger.kernel.org,
+        x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
+        liran.alon@oracle.com, jwadams@google.com, graf@amazon.de,
+        rppt@linux.vnet.ibm.com, Paul Turner <pjt@google.com>
+References: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
+ <5cab2a0e-1034-8748-fcbe-a17cf4fa2cd4@intel.com>
+ <alpine.DEB.2.21.1907120911160.11639@nanos.tec.linutronix.de>
+ <61d5851e-a8bf-e25c-e673-b71c8b83042c@oracle.com>
+ <20190712125059.GP3419@hirez.programming.kicks-ass.net>
+ <alpine.DEB.2.21.1907121459180.1788@nanos.tec.linutronix.de>
+From:   Alexandre Chartre <alexandre.chartre@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <3ca70237-bf8e-57d9-bed5-bc2329d17177@oracle.com>
+Date:   Fri, 12 Jul 2019 18:37:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-References: <20190712143207.4214-1-quintela@redhat.com>
-In-Reply-To: <20190712143207.4214-1-quintela@redhat.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Fri, 12 Jul 2019 17:33:54 +0100
-Message-ID: <CAFEAcA-ydNS072OH7CyGNq2+sESgonW-8QSJdNYJq6zW-rYjUQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/19] Migration patches
-To:     Juan Quintela <quintela@redhat.com>
-Cc:     QEMU Developers <qemu-devel@nongnu.org>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <alpine.DEB.2.21.1907121459180.1788@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9316 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907120170
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9316 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907120171
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 12 Jul 2019 at 15:32, Juan Quintela <quintela@redhat.com> wrote:
->
-> The following changes since commit a2a9d4adabe340617a24eb73a8b2a116d28a6b38:
->
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.1-20190712' into staging (2019-07-12 11:06:48 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/juanquintela/qemu.git tags/migration-pull-request
->
-> for you to fetch changes up to a48ad5602f496236b4e1955d9e2e8228a7d0ad56:
->
->   migration: allow private destination ram with x-ignore-shared (2019-07-12 16:25:59 +0200)
->
-> ----------------------------------------------------------------
-> Migration pull request
->
-> Fix the issues with the previous pull request and 32 bits.
->
-> Please apply.
->
-
-Still fails on aarch32 host, I'm afraid:
-
-MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
-QTEST_QEMU_BINARY=aarch64-softmmu/qemu-system-aarch64
-QTEST_QEMU_IMG=qemu-img tests/migration-test -m=quick -k --tap <
-/dev/null | ./scripts/tap-driver.pl --test-name="migration-test"
-PASS 1 migration-test /aarch64/migration/deprecated
-PASS 2 migration-test /aarch64/migration/bad_dest
-PASS 3 migration-test /aarch64/migration/fd_proto
-PASS 4 migration-test /aarch64/migration/postcopy/unix
-PASS 5 migration-test /aarch64/migration/postcopy/recovery
-PASS 6 migration-test /aarch64/migration/precopy/unix
-PASS 7 migration-test /aarch64/migration/precopy/tcp
-PASS 8 migration-test /aarch64/migration/xbzrle/unix
-malloc(): memory corruption
-Broken pipe
-qemu-system-aarch64: load of migration failed: Invalid argument
-/home/peter.maydell/qemu/tests/libqtest.c:137: kill_qemu() tried to
-terminate QEMU process but encountered exit status 1
-Aborted
-ERROR - too few tests run (expected 9, got 8)
-/home/peter.maydell/qemu/tests/Makefile.include:899: recipe for target
-'check-qtest-aarch64' failed
 
 
-thanks
--- PMM
+On 7/12/19 5:16 PM, Thomas Gleixner wrote:
+> On Fri, 12 Jul 2019, Peter Zijlstra wrote:
+>> On Fri, Jul 12, 2019 at 01:56:44PM +0200, Alexandre Chartre wrote:
+>>
+>>> I think that's precisely what makes ASI and PTI different and independent.
+>>> PTI is just about switching between userland and kernel page-tables, while
+>>> ASI is about switching page-table inside the kernel. You can have ASI without
+>>> having PTI. You can also use ASI for kernel threads so for code that won't
+>>> be triggered from userland and so which won't involve PTI.
+>>
+>> PTI is not mapping         kernel space to avoid             speculation crap (meltdown).
+>> ASI is not mapping part of kernel space to avoid (different) speculation crap (MDS).
+>>
+>> See how very similar they are?
+>>
+>> Furthermore, to recover SMT for userspace (under MDS) we not only need
+>> core-scheduling but core-scheduling per address space. And ASI was
+>> specifically designed to help mitigate the trainwreck just described.
+>>
+>> By explicitly exposing (hopefully harmless) part of the kernel to MDS,
+>> we reduce the part that needs core-scheduling and thus reduce the rate
+>> the SMT siblngs need to sync up/schedule.
+>>
+>> But looking at it that way, it makes no sense to retain 3 address
+>> spaces, namely:
+>>
+>>    user / kernel exposed / kernel private.
+>>
+>> Specifically, it makes no sense to expose part of the kernel through MDS
+>> but not through Meltdow. Therefore we can merge the user and kernel
+>> exposed address spaces.
+>>
+>> And then we've fully replaced PTI.
+>>
+>> So no, they're not orthogonal.
+> 
+> Right. If we decide to expose more parts of the kernel mappings then that's
+> just adding more stuff to the existing user (PTI) map mechanics.
+  
+
+If we expose more parts of the kernel mapping by adding them to the existing
+user (PTI) map, then we only control the mapping of kernel sensitive data but
+we don't control user mapping (with ASI, we exclude all user mappings).
+
+How would you control the mapping of userland sensitive data and exclude them
+from the user map? Would you have the application explicitly identify sensitive
+data (like Andy suggested with a /dev/xpfo device)?
+
+Thanks,
+
+alex.
+
+
+> As a consequence the CR3 switching points become different or can be
+> consolidated and that can be handled right at those switching points
+> depending on static keys or alternatives as we do today with PTI and other
+> mitigations.
+> 
+> All of that can do without that obscure "state machine" which is solely
+> there to duct-tape the complete lack of design. The same applies to that
+> mapping thing. Just mapping randomly selected parts by sticking them into
+> an array is a non-maintainable approach. This needs proper separation of
+> text and data sections, so violations of the mapping constraints can be
+> statically analyzed. Depending solely on the page fault at run time for
+> analysis is just bound to lead to hard to diagnose failures in the field.
+> 
+> TBH we all know already that this can be done and that this will solve some
+> of the issues caused by the speculation mess, so just writing some hastily
+> cobbled together POC code which explodes just by looking at it, does not
+> lead to anything else than time waste on all ends.
+> 
+> This first needs a clear definition of protection scope. That scope clearly
+> defines the required mappings and consequently the transition requirements
+> which provide the necessary transition points for flipping CR3.
+> 
+> If we have agreed on that, then we can think about the implementation
+> details.
+> 
+> Thanks,
+> 
+> 	tglx
+> 
