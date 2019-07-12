@@ -2,127 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 358776708A
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 15:51:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EBA867086
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 15:51:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727363AbfGLNvY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Jul 2019 09:51:24 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:60572 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726266AbfGLNvX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Jul 2019 09:51:23 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6CDibWT175649;
-        Fri, 12 Jul 2019 13:47:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=2TNZ9h7pACCt3IUFNoHpTzTBPzs/ZEZEH8ovFfWNlCs=;
- b=GzivNqdLQWmLHwFSLtjBb5hgZ/6skpeLOc/wyZdgE7AQoBQBV9MoaP8HCyn0Wi7hbumt
- JxH7WeiTo51RSzWzU44B3FLonPUKH5xqpqIgC3wlJWl4XaHeWPGOTGtIjnYFlni6afKf
- myQRwBz8e/4VStXUb0QFP0APmdAMZuVnNoW5LjzXQD4TRRL4ZzwgdV7uCgxx8bii1rp0
- 92yUiuBi3HqHraJcXxhPoXwK9Cq7ry0+yksAJSa6GrD2vE6xfGbrPYlLMIlEvnnCyrBH
- A5XhGaFnpC0uPUql8SL+zUGGqo6SEEhI1vUaL2dKvqd7iWj9wy+otuieM78IwgJklx1p cw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 2tjkkq5pv4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 12 Jul 2019 13:47:52 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6CDlS8M011118;
-        Fri, 12 Jul 2019 13:47:51 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 2tmwgysgmr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 12 Jul 2019 13:47:51 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6CDloOS026847;
-        Fri, 12 Jul 2019 13:47:50 GMT
-Received: from [10.166.106.34] (/10.166.106.34)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 12 Jul 2019 06:46:30 -0700
+        id S1727608AbfGLNvE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jul 2019 09:51:04 -0400
+Received: from mga07.intel.com ([134.134.136.100]:42897 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726907AbfGLNvE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jul 2019 09:51:04 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Jul 2019 06:51:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,482,1557212400"; 
+   d="scan'208";a="166683426"
+Received: from smatond1-mobl1.amr.corp.intel.com (HELO [10.252.143.186]) ([10.252.143.186])
+  by fmsmga008.fm.intel.com with ESMTP; 12 Jul 2019 06:51:02 -0700
 Subject: Re: [RFC v2 00/27] Kernel Address Space Isolation
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
+To:     Alexandre Chartre <alexandre.chartre@oracle.com>,
+        pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        dave.hansen@linux.intel.com, luto@kernel.org, kvm@vger.kernel.org,
-        x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-        konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
+        dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org,
+        kvm@vger.kernel.org, x86@kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Cc:     konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
         liran.alon@oracle.com, jwadams@google.com, graf@amazon.de,
-        rppt@linux.vnet.ibm.com, Paul Turner <pjt@google.com>
+        rppt@linux.vnet.ibm.com
 References: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
- <20190712114458.GU3402@hirez.programming.kicks-ass.net>
- <1f97f1d9-d209-f2ab-406d-fac765006f91@oracle.com>
- <20190712123653.GO3419@hirez.programming.kicks-ass.net>
- <b1b7f85f-dac3-80a3-c05c-160f58716ce8@oracle.com>
- <20190712130720.GQ3419@hirez.programming.kicks-ass.net>
-From:   Alexandre Chartre <alexandre.chartre@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <8b84ac05-f639-b708-0f7f-810935b323e8@oracle.com>
-Date:   Fri, 12 Jul 2019 15:46:19 +0200
+ <5cab2a0e-1034-8748-fcbe-a17cf4fa2cd4@intel.com>
+ <2791712a-9f7b-18bc-e686-653181461428@oracle.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+Message-ID: <dbbf6b05-14b6-d184-76f2-8d4da80cec75@intel.com>
+Date:   Fri, 12 Jul 2019 06:51:02 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190712130720.GQ3419@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <2791712a-9f7b-18bc-e686-653181461428@oracle.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9315 signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1907120149
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9315 signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1907120148
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 7/12/19 3:07 PM, Peter Zijlstra wrote:
-> On Fri, Jul 12, 2019 at 02:47:23PM +0200, Alexandre Chartre wrote:
->> On 7/12/19 2:36 PM, Peter Zijlstra wrote:
->>> On Fri, Jul 12, 2019 at 02:17:20PM +0200, Alexandre Chartre wrote:
->>>> On 7/12/19 1:44 PM, Peter Zijlstra wrote:
->>>
->>>>> AFAIK3 this wants/needs to be combined with core-scheduling to be
->>>>> useful, but not a single mention of that is anywhere.
->>>>
->>>> No. This is actually an alternative to core-scheduling. Eventually, ASI
->>>> will kick all sibling hyperthreads when exiting isolation and it needs to
->>>> run with the full kernel page-table (note that's currently not in these
->>>> patches).
->>>>
->>>> So ASI can be seen as an optimization to disabling hyperthreading: instead
->>>> of just disabling hyperthreading you run with ASI, and when ASI can't preserve
->>>> isolation you will basically run with a single thread.
->>>
->>> You can't do that without much of the scheduler changes present in the
->>> core-scheduling patches.
->>>
->>
->> We hope we can do that without the whole core-scheduling mechanism. The idea
->> is to send an IPI to all sibling hyperthreads. This IPI will interrupt these
->> sibling hyperthreads and have them wait for a condition that will allow them
->> to resume execution (for example when re-entering isolation). We are
->> investigating this in parallel to ASI.
+On 7/12/19 1:09 AM, Alexandre Chartre wrote:
+> On 7/12/19 12:38 AM, Dave Hansen wrote:
+>> I don't see the per-cpu areas in here.  But, the ASI macros in
+>> entry_64.S (and asi_start_abort()) use per-cpu data.
 > 
-> You cannot wait from IPI context, so you have to go somewhere else to
-> wait.
-> 
-> Also, consider what happens when the task that entered isolation decides
-> to schedule out / gets migrated.
-> 
-> I think you'll quickly find yourself back at core-scheduling.
-> 
+> We don't map all per-cpu areas, but only the per-cpu variables we need. ASI
+> code uses the per-cpu cpu_asi_session variable which is mapped when an ASI
+> is created (see patch 15/26):
 
-I haven't looked at details about what has been done so far. Hopefully, we
-can do something not too complex, or reuse a (small) part of co-scheduling.
+No fair!  I had per-cpu variables just for PTI at some point and had to
+give them up! ;)
 
-Thanks for pointing this out.
+> +    /*
+> +     * Map the percpu ASI sessions. This is used by interrupt handlers
+> +     * to figure out if we have entered isolation and switch back to
+> +     * the kernel address space.
+> +     */
+> +    err = ASI_MAP_CPUVAR(asi, cpu_asi_session);
+> +    if (err)
+> +        return err;
+> 
+> 
+>> Also, this stuff seems to do naughty stuff (calling C code, touching
+>> per-cpu data) before the PTI CR3 writes have been done.  But, I don't
+>> see anything excluding PTI and this code from coexisting.
+> 
+> My understanding is that PTI CR3 writes only happens when switching to/from
+> userland. While ASI enter/exit/abort happens while we are already in the
+> kernel,
+> so asi_start_abort() is not called when coming from userland and so not
+> interacting with PTI.
 
-alex.
+OK, that makes sense.  You only need to call C code when interrupted
+from something in the kernel (deeper than the entry code), and those
+were already running kernel C code anyway.
+
+If this continues to live in the entry code, I think you have a good
+clue where to start commenting.
+
+BTW, the PTI CR3 writes are not *strictly* about the interrupt coming
+from user vs. kernel.  It's tricky because there's a window both in the
+entry and exit code where you are in the kernel but have a userspace CR3
+value.  You end up needing a CR3 write when you have a userspace CR3
+value when the interrupt occurred, not only when you interrupt userspace
+itself.
