@@ -2,92 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4315B66FCF
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 15:14:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2661F66FF7
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 15:24:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727336AbfGLNON (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Jul 2019 09:14:13 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42042 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726449AbfGLNON (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Jul 2019 09:14:13 -0400
-Received: by mail-wr1-f65.google.com with SMTP id j8so5857277wrj.9
-        for <kvm@vger.kernel.org>; Fri, 12 Jul 2019 06:14:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=VfT/FB70SYUZvSibHy6qxOxJHNCuzEaHFG9lYiqHVks=;
-        b=NUgSq4lFWAPZiPVCyyfH9Dl9Y8BL0qsegYvGVEXDNlLXb0IqJ6HQhvbKEbiju3ahP9
-         AjXAyCNM7zB1UmFgU8pHO8OSzDXyEceGAu3iXdUaeZSwhAQndvekQs5wwKpoTPEk84Rq
-         3HSPT2tSUy85ZeK8h3JkJIUdWEbGRXtyCmPhcH8PHGHVqSM1sVevQw8jRODBaR/XnmtR
-         sUTL9O2hfBQcRSG0UHLh0eh1/znO6ATP+5hPrUD2J+631XeC98o6v+5agm3/0jgwZzEF
-         usMlCtFIxS35zrliMvhS798Us173rFwJC0HZYD2n7PhfPTxlQ8XJJWvEUES9YLNXdmbV
-         Fkfw==
-X-Gm-Message-State: APjAAAVIiJnQUtUgi//z2F4cyxMVoENa9G5XpBxxnXqxu4VN0rgJiztI
-        qpDtwaSP+27KceEq5FBY9Frs3A==
-X-Google-Smtp-Source: APXvYqxnCJN8ifBfaBldPbdVFdYWJmrV4AScCeUD8wYtYP4cKMb0VPikXLVesfil1bA6/91dAetwrw==
-X-Received: by 2002:a5d:564e:: with SMTP id j14mr11365756wrw.1.1562937251761;
-        Fri, 12 Jul 2019 06:14:11 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:d066:6881:ec69:75ab? ([2001:b07:6468:f312:d066:6881:ec69:75ab])
-        by smtp.gmail.com with ESMTPSA id b2sm10615526wrp.72.2019.07.12.06.14.10
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 12 Jul 2019 06:14:11 -0700 (PDT)
-Subject: Re: [PATCH 1/2] x86: kvm: avoid -Wsometimes-uninitized warning
-To:     Arnd Bergmann <arnd@arndb.de>, Roman Kagan <rkagan@virtuozzo.com>
-Cc:     =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "clang-built-linux@googlegroups.com" 
-        <clang-built-linux@googlegroups.com>
-References: <20190712091239.716978-1-arnd@arndb.de>
- <20190712120249.GA27820@rkaganb.sw.ru>
- <CAK8P3a3+QSRQkitXiDFLYvyYvOS+Q4sXb=xA_XPeX2O2zQ5kgw@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <b7da5e91-f23c-9f5d-2c61-07e7fc7af9b1@redhat.com>
-Date:   Fri, 12 Jul 2019 15:14:08 +0200
+        id S1727741AbfGLNX7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jul 2019 09:23:59 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22208 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726318AbfGLNX7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Jul 2019 09:23:59 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6CDDZLt031341
+        for <kvm@vger.kernel.org>; Fri, 12 Jul 2019 09:23:58 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tprnbekuv-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 12 Jul 2019 09:23:58 -0400
+Received: from localhost
+        by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <kvm@vger.kernel.org> from <farman@linux.ibm.com>;
+        Fri, 12 Jul 2019 14:23:56 +0100
+Received: from b01cxnp22033.gho.pok.ibm.com (9.57.198.23)
+        by e11.ny.us.ibm.com (146.89.104.198) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 12 Jul 2019 14:23:54 +0100
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6CDNrEj50201004
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Jul 2019 13:23:53 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8AA6128059;
+        Fri, 12 Jul 2019 13:23:53 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3CEBE28058;
+        Fri, 12 Jul 2019 13:23:53 +0000 (GMT)
+Received: from [9.85.144.233] (unknown [9.85.144.233])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Fri, 12 Jul 2019 13:23:53 +0000 (GMT)
+Subject: Re: [PATCH v3 4/5] vfio-ccw: Don't call cp_free if we are processing
+ a channel program
+To:     Farhan Ali <alifm@linux.ibm.com>, cohuck@redhat.com,
+        pasic@linux.ibm.com
+Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org
+References: <cover.1562854091.git.alifm@linux.ibm.com>
+ <62e87bf67b38dc8d5760586e7c96d400db854ebe.1562854091.git.alifm@linux.ibm.com>
+From:   Eric Farman <farman@linux.ibm.com>
+Date:   Fri, 12 Jul 2019 09:19:38 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a3+QSRQkitXiDFLYvyYvOS+Q4sXb=xA_XPeX2O2zQ5kgw@mail.gmail.com>
+In-Reply-To: <62e87bf67b38dc8d5760586e7c96d400db854ebe.1562854091.git.alifm@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19071213-2213-0000-0000-000003ADA721
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011415; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01231109; UDB=6.00648508; IPR=6.01012394;
+ MB=3.00027691; MTD=3.00000008; XFM=3.00000015; UTC=2019-07-12 13:23:56
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19071213-2214-0000-0000-00005F34800E
+Message-Id: <32c1c941-2971-f956-c532-b606336ea74b@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-12_04:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907120144
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/07/19 15:02, Arnd Bergmann wrote:
-> I think what happens here is that clang does not treat the return
-> code of track the return code of is_64_bit_mode() as a constant
-> expression, and therefore assumes that the if() condition
-> may or may not be true, for the purpose of determining whether
-> the variable is used without an inialization. This would hold even
-> if it later eliminates the code leading up to the if() in an optimization
-> stage. IS_ENABLED(CONFIG_X86_64) however is a constant
-> expression, so with the patch, it understands this.
+
+
+On 7/11/19 10:28 AM, Farhan Ali wrote:
+> There is a small window where it's possible that we could be working
+> on an interrupt (queued in the workqueue) and setting up a channel
+> program (i.e allocating memory, pinning pages, translating address).
+> This can lead to allocating and freeing the channel program at the
+> same time and can cause memory corruption.
 > 
-> In contrast, gcc seems to perform all the inlining first, and
-> then see if some variable is used uninitialized in the final code.
-> This gives additional information to the compiler, but makes the
-> outcome less predictable since it depends on optimization flags
-> and architecture specific behavior.
+> Let's not call cp_free if we are currently processing a channel program.
+> The only way we know for sure that we don't have a thread setting
+> up a channel program is when the state is set to VFIO_CCW_STATE_CP_PENDING.>
+> Fixes: d5afd5d135c8 ("vfio-ccw: add handling for async channel instructions")
+> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
+I think this seems like a reasonable fix.
+
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
+
+> ---
+>  drivers/s390/cio/vfio_ccw_drv.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Both approaches have their own sets of false positive and false
-> negative warnings.
+> diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
+> index 4e3a903..0357165 100644
+> --- a/drivers/s390/cio/vfio_ccw_drv.c
+> +++ b/drivers/s390/cio/vfio_ccw_drv.c
+> @@ -92,7 +92,7 @@ static void vfio_ccw_sch_io_todo(struct work_struct *work)
+>  		     (SCSW_ACTL_DEVACT | SCSW_ACTL_SCHACT));
+>  	if (scsw_is_solicited(&irb->scsw)) {
+>  		cp_update_scsw(&private->cp, &irb->scsw);
+> -		if (is_final)
+> +		if (is_final && private->state == VFIO_CCW_STATE_CP_PENDING)
+>  			cp_free(&private->cp);
+>  	}
+>  	mutex_lock(&private->io_mutex);
+> 
 
-True, on the other hand constant returns are not really rocket science. :)
-
-Maybe change is_long_mode to a macro if !CONFIG_X86_64?  That would be
-better if clang likes it.
-
-Paolo
