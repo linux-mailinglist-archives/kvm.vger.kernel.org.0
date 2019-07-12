@@ -2,220 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AB24C664E8
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 05:22:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5409866768
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 09:03:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729372AbfGLDWE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 23:22:04 -0400
-Received: from mga17.intel.com ([192.55.52.151]:2084 "EHLO mga17.intel.com"
+        id S1726127AbfGLHDk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jul 2019 03:03:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55902 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728796AbfGLDWE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 23:22:04 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Jul 2019 20:22:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,480,1557212400"; 
-   d="scan'208";a="174337093"
-Received: from unknown (HELO [10.239.13.7]) ([10.239.13.7])
-  by FMSMGA003.fm.intel.com with ESMTP; 11 Jul 2019 20:22:02 -0700
-Message-ID: <5D27FE26.1050002@intel.com>
-Date:   Fri, 12 Jul 2019 11:27:34 +0800
-From:   Wei Wang <wei.w.wang@intel.com>
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:31.0) Gecko/20100101 Thunderbird/31.7.0
+        id S1725866AbfGLHDk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jul 2019 03:03:40 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E93A485543;
+        Fri, 12 Jul 2019 07:03:39 +0000 (UTC)
+Received: from [10.36.116.46] (ovpn-116-46.ams2.redhat.com [10.36.116.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4939E5DDDC;
+        Fri, 12 Jul 2019 07:03:35 +0000 (UTC)
+From:   Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH] vfio: platform: reset: add support for XHCI reset hook
+To:     Gregory CLEMENT <gregory.clement@bootlin.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        =?UTF-8?Q?Miqu=c3=a8l_Raynal?= <miquel.raynal@bootlin.com>,
+        Maxime Chevallier <maxime.chevallier@bootlin.com>,
+        Nadav Haklai <nadavh@marvell.com>
+References: <20190711143159.21961-1-gregory.clement@bootlin.com>
+Message-ID: <c152f211-0757-521e-64ea-543f6c89d9b2@redhat.com>
+Date:   Fri, 12 Jul 2019 09:03:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-To:     Eric Hankland <ehankland@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com
-CC:     linux-kernel@vger.kernel.org,
-        Stephane Eranian <eranian@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: x86: PMU Event Filter
-References: <CAOyeoRUUK+T_71J=+zcToyL93LkpARpsuWSfZS7jbJq=wd1rQg@mail.gmail.com>
-In-Reply-To: <CAOyeoRUUK+T_71J=+zcToyL93LkpARpsuWSfZS7jbJq=wd1rQg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190711143159.21961-1-gregory.clement@bootlin.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 12 Jul 2019 07:03:40 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07/11/2019 09:25 AM, Eric Hankland wrote:
-> - Add a VM ioctl that can control which events the guest can monitor.
->
-> Signed-off-by: ehankland<ehankland@google.com>
+Hi Gregory,
+
+On 7/11/19 4:31 PM, Gregory CLEMENT wrote:
+> The VFIO reset hook is called every time a platform device is passed
+> to a guest or removed from a guest.
+> 
+> When the XHCI device is unbound from the host, the host driver
+> disables the XHCI clocks/phys/regulators so when the device is passed
+> to the guest it becomes dis-functional.
+> 
+> This initial implementation uses the VFIO reset hook to enable the
+> XHCI clocks/phys on behalf of the guest.
+
+the platform reset module must also make sure there are no more DMA
+requests and interrupts that can be sent by the device anymore.
+> 
+> Ported from Marvell LSP code originally written by Yehuda Yitschak
+> 
+> Signed-off-by: Gregory CLEMENT <gregory.clement@bootlin.com>
 > ---
-> Changes since v1:
-> -Moved to a vm ioctl rather than a vcpu one
-> -Changed from a whitelist to a configurable filter which can either be
-> white or black
-> -Only restrict GP counters since fixed counters require extra handling
-> and they can be disabled by setting the guest cpuid (though only by
-> setting the number - they can't be disabled individually)
-
-I think just disabling guest cpuid might not be enough, since guest
-could write to the msr without checking the cpuid.
-
-Why not just add a bitmap for fixed counter?
-e.g. fixed_counter_reject_bitmap
-
-At the beginning of reprogram_fixed_counter, we could add the check:
-
-if (test_bit(idx, &kvm->arch.fixed_counter_reject_bitmap))
-     return -EACCES;
-
-(Please test with your old guest and see if they have issues if we 
-inject #GP when
-they try to set the fixed_ctrl msr. If there is, we could drop -EACCESS 
-above)
-
-The bitmap could be set at kvm_vm_ioctl_set_pmu_event_filter.
-
-> +/* for KVM_CAP_PMU_EVENT_FILTER */
-> +struct kvm_pmu_event_filter {
-> +       __u32 type;
-> +       __u32 nevents;
-> +       __u64 events[0];
-> +};
+>  drivers/vfio/platform/reset/Kconfig           |  8 +++
+>  drivers/vfio/platform/reset/Makefile          |  2 +
+>  .../vfio/platform/reset/vfio_platform_xhci.c  | 60 +++++++++++++++++++
+>  3 files changed, 70 insertions(+)
+>  create mode 100644 drivers/vfio/platform/reset/vfio_platform_xhci.c
+> 
+> diff --git a/drivers/vfio/platform/reset/Kconfig b/drivers/vfio/platform/reset/Kconfig
+> index 392e3c09def0..14f620fd250d 100644
+> --- a/drivers/vfio/platform/reset/Kconfig
+> +++ b/drivers/vfio/platform/reset/Kconfig
+> @@ -22,3 +22,11 @@ config VFIO_PLATFORM_BCMFLEXRM_RESET
+>  	  Enables the VFIO platform driver to handle reset for Broadcom FlexRM
+>  
+>  	  If you don't know what to do here, say N.
 > +
-> +#define KVM_PMU_EVENT_WHITELIST 0
-> +#define KVM_PMU_EVENT_BLACKLIST 1
-
-I think it would be better to add more, please see below:
-
-enum kvm_pmu_action_type {
-     KVM_PMU_EVENT_ACTION_NONE = 0,
-     KVM_PMU_EVENT_ACTION_ACCEPT = 1,
-     KVM_PMU_EVENT_ACTION_REJECT = 2,
-     KVM_PMU_EVENT_ACTION_MAX
-};
-
-and do a check in kvm_vm_ioctl_set_pmu_event_filter()
-     if (filter->action >= KVM_PMU_EVENT_ACTION_MAX)
-         return -EINVAL;
-
-This is for detecting the case that we add a new action in
-userspace, while the kvm hasn't been updated to support that.
-
-KVM_PMU_EVENT_ACTION_NONE is for userspace to remove
-the filter after they set it.
-
-
+> +config VFIO_PLATFORM_XHCI_RESET
+> +	tristate "VFIO support for USB XHCI reset"
+> +	depends on VFIO_PLATFORM
+> +	help
+> +	  Enables the VFIO platform driver to handle reset for USB XHCI
 > +
->   #endif /* _ASM_X86_KVM_H */
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index dd745b58ffd8..d674b79ff8da 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -22,6 +22,9 @@
->   #include "lapic.h"
->   #include "pmu.h"
->
-> +/* This keeps the total size of the filter under 4k. */
-> +#define KVM_PMU_EVENT_FILTER_MAX_EVENTS 63
+> +	  If you don't know what to do here, say N.
+> diff --git a/drivers/vfio/platform/reset/Makefile b/drivers/vfio/platform/reset/Makefile
+> index 7294c5ea122e..d84c4d3dc041 100644
+> --- a/drivers/vfio/platform/reset/Makefile
+> +++ b/drivers/vfio/platform/reset/Makefile
+> @@ -1,7 +1,9 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>  vfio-platform-calxedaxgmac-y := vfio_platform_calxedaxgmac.o
+>  vfio-platform-amdxgbe-y := vfio_platform_amdxgbe.o
+> +vfio-platform-xhci-y := vfio_platform_xhci.o
+>  
+>  obj-$(CONFIG_VFIO_PLATFORM_CALXEDAXGMAC_RESET) += vfio-platform-calxedaxgmac.o
+>  obj-$(CONFIG_VFIO_PLATFORM_AMDXGBE_RESET) += vfio-platform-amdxgbe.o
+>  obj-$(CONFIG_VFIO_PLATFORM_BCMFLEXRM_RESET) += vfio_platform_bcmflexrm.o
+> +obj-$(CONFIG_VFIO_PLATFORM_XHCI_RESET) += vfio-platform-xhci.o
+> diff --git a/drivers/vfio/platform/reset/vfio_platform_xhci.c b/drivers/vfio/platform/reset/vfio_platform_xhci.c
+> new file mode 100644
+> index 000000000000..7b75a04402ee
+> --- /dev/null
+> +++ b/drivers/vfio/platform/reset/vfio_platform_xhci.c
+> @@ -0,0 +1,60 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * VFIO platform driver specialized for XHCI reset
+> + *
+> + * Copyright 2016 Marvell Semiconductors, Inc.
+> + *
+> + */
 > +
-
-Why is this limit needed?
-
->   /* NOTE:
->    * - Each perf counter is defined as "struct kvm_pmc";
->    * - There are two types of perf counters: general purpose (gp) and fixed.
-> @@ -144,6 +147,10 @@ void reprogram_gp_counter(struct kvm_pmc *pmc,
-> u64 eventsel)
->   {
->          unsigned config, type = PERF_TYPE_RAW;
->          u8 event_select, unit_mask;
-> +       struct kvm_arch *arch = &pmc->vcpu->kvm->arch;
-> +       struct kvm_pmu_event_filter *filter;
-> +       int i;
-> +       bool allow_event = true;
->
->          if (eventsel & ARCH_PERFMON_EVENTSEL_PIN_CONTROL)
->                  printk_once("kvm pmu: pin control bit is ignored\n");
-> @@ -155,6 +162,24 @@ void reprogram_gp_counter(struct kvm_pmc *pmc,
-> u64 eventsel)
->          if (!(eventsel & ARCH_PERFMON_EVENTSEL_ENABLE) || !pmc_is_enabled(pmc))
->                  return;
->
-> +       rcu_read_lock();
-> +       filter = rcu_dereference(arch->pmu_event_filter);
-> +       if (filter) {
-> +               for (i = 0; i < filter->nevents; i++)
-> +                       if (filter->events[i] ==
-> +                           (eventsel & AMD64_RAW_EVENT_MASK_NB))
-> +                               break;
-> +               if (filter->type == KVM_PMU_EVENT_WHITELIST &&
-> +                   i == filter->nevents)
-> +                       allow_event = false;
-> +               if (filter->type == KVM_PMU_EVENT_BLACKLIST &&
-> +                   i < filter->nevents)
-> +                       allow_event = false;
-> +       }
-> +       rcu_read_unlock();
-> +       if (!allow_event)
-> +               return;
+> +#include <linux/clk.h>
+> +#include <linux/device.h>
+> +#include <linux/init.h>
+> +#include <linux/io.h>
+> +#include <linux/kernel.h>
+io, init, kernel should be removable (noticed init and kernel.h also are
+in other reset modules though)
+> +#include <linux/module.h>
+> +#include <linux/of.h>
+> +#include <linux/phy/phy.h>
+> +#include <linux/usb/phy.h>
 > +
-
-I think it looks tidier to wrap the changes above into a function:
-
-     if (kvm_pmu_filter_event(kvm, eventsel & AMD64_RAW_EVENT_MASK_NB))
-         return;
-
->          event_select = eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
->          unit_mask = (eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
->
-> @@ -351,3 +376,39 @@ void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
->   {
->          kvm_pmu_reset(vcpu);
->   }
+> +#include "../vfio_platform_private.h"
 > +
-> +int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
+> +#define MAX_XHCI_CLOCKS		4
+Where does this number come from?
+
+From Documentation/devicetree/bindings/usb/usb-xhci.txt I understand
+there are max 2 clocks, "core" and "reg" (I don't have any specific
+knowledge on the device though).
+
+> +#define MAX_XHCI_PHYS		2
+not used
+> +
+> +int vfio_platform_xhci_reset(struct vfio_platform_device *vdev)
 > +{
-> +       struct kvm_pmu_event_filter tmp, *filter;
-> +       size_t size;
-> +       int r;
+> +	struct device *dev = vdev->device;
+> +	struct device_node *np = dev->of_node;
+> +	struct usb_phy *usb_phy;
+> +	struct clk *clk;
+> +	int ret, i;
 > +
-> +       if (copy_from_user(&tmp, argp, sizeof(tmp)))
-> +               return -EFAULT;
+> +	/*
+> +	 * Compared to the native driver, no need to handle the
+> +	 * deferred case, because the resources are already
+> +	 * there
+> +	 */
+> +	for (i = 0; i < MAX_XHCI_CLOCKS; i++) {
+> +		clk = of_clk_get(np, i);
+> +		if (!IS_ERR(clk)) {
+> +			ret = clk_prepare_enable(clk);
+> +			if (ret)
+> +				return -ENODEV;
+return ret?
+> +		}
+> +	}
 > +
-> +       if (tmp.nevents > KVM_PMU_EVENT_FILTER_MAX_EVENTS)
-> +               return -E2BIG;
+> +	usb_phy = devm_usb_get_phy_by_phandle(dev, "usb-phy", 0);
+> +	if (!IS_ERR(usb_phy)) {
+> +		ret = usb_phy_init(usb_phy);
+> +		if (ret)
+> +			return -ENODEV;
+return ret?
+> +	}
+
 > +
-> +       size = sizeof(tmp) + sizeof(tmp.events[0]) * tmp.nevents;
-> +       filter = vmalloc(size);
-> +       if (!filter)
-> +               return -ENOMEM;
+> +	return 0;
+> +}
 > +
-> +       r = -EFAULT;
-> +       if (copy_from_user(filter, argp, size))
-
-Though the above functions correctly, I would just move "r = -EFAULT" here
-to have it executed conditionally.
-
-
-> +               goto cleanup;
+> +module_vfio_reset_handler("generic-xhci", vfio_platform_xhci_reset);
 > +
-> +       /* Ensure nevents can't be changed between the user copies. */
-> +       *filter = tmp;
-> +
-> +       mutex_lock(&kvm->lock);
-> +       rcu_swap_protected(kvm->arch.pmu_event_filter, filter,
-> +                          mutex_is_locked(&kvm->lock));
-> +       mutex_unlock(&kvm->lock);
-> +
-> +       synchronize_rcu();
-> +       r = 0;
-> +cleanup:
-> +       kvfree(filter);
+> +MODULE_AUTHOR("Yehuda Yitschak");
+> +MODULE_DESCRIPTION("Reset support for XHCI vfio platform device");
+> +MODULE_LICENSE("GPL");
+> 
+Thanks
 
-Probably better to have it conditionally?
-
-if (filter) {
-     synchronize_srcu();
-     kfree(filter)
-}
-
-
-You may want to factor it out, so that kvm_pmu_destroy could reuse.
-
-Best,
-Wei
+Eric
