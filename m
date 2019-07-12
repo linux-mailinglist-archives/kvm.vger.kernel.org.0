@@ -2,189 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 43D4266BFC
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 14:03:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96D9D66CAF
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 14:22:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727019AbfGLMDI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Jul 2019 08:03:08 -0400
-Received: from mail-mr2fra01hn0201.outbound.protection.outlook.com ([52.101.140.201]:24702
-        "EHLO FRA01-MR2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726250AbfGLMDI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Jul 2019 08:03:08 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PYOP42WAQOCgeWncfJNjk+S8eHm4Eqk3wr5bM8vM9GHQHTiKj3r6/0a/XmEf/8fRVEJMbYM6FNQW314agkbIg/DQ2yczTZVLYdbJ/NQEL4Nzo/Vi+gPsI0LAmIliDhfRSbkahlc8lCqDdddIqPmf/tY0NmaY9NhMxJExVqQyfSMIaC05q317DuwmGhImyfMluWODcYrHOitzziR3eepHahU/LXbpGA1BFD/kf8Q7XFP5kk5c2v2oqTkKl2zMJc9zG5gVOdQ4zXaMVGMEw/zBNPvMPm9Fuc5mN6aSWYzsRCMzwNDS2gEPaAW7P3CrJdkUc5zlgb3hQOdnbKMoqRmtfw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xmY1mv+dHio+3MItvVkGF63PN/fcqxkb5pNdFzFKjac=;
- b=czxS7fCTdDOlpy9l0YOEt9h8lu3fGGlAeR+bLiGbAiDlBOjE4s7P/UnSaFvE8e3t170sQYQNg+6WdaS62kx8xZ88THO65JOaWt9+idChWAdYlcSj26Ugkz8f516DJ5pJzLlb93CPo/f2uiTPlGCk3b/is8IvKjbsQXMg7IMeBQRFYNgbZ4o2hwD3/P6XBCDuqZQZREyHem1xFOLAptpiP1wUukmdcYGGbTgTc57HM0eEuc5hrclhQyN9x98QAjj5LppwirEFYU4KefAmadKWCWgy4jeqLSvZFgm8bcBjblyJ1ajPrIFUSemah6c6avfV0UGV7ZEFGoyVWWv9Ua2MGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=virtuozzo.com;dmarc=pass action=none
- header.from=virtuozzo.com;dkim=pass header.d=virtuozzo.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xmY1mv+dHio+3MItvVkGF63PN/fcqxkb5pNdFzFKjac=;
- b=KyuZc7NBMvmQS5vZOcfALTf/7XSwD8Fq/cYwLb0LjBEJlcv/K+igDUEiher2oy+BZGYh3emhIHF83rLUcE8xUTPZVaweBEF/BUJGzomsEFx3RYakPLWezJLdNF9Aft4uch/o7nrhsfNHtTTas8/0AFJYV+WsG2bNM6VrwiePsz0=
-Received: from PR2PR08MB4649.eurprd08.prod.outlook.com (52.133.107.81) by
- PR2PR08MB4876.eurprd08.prod.outlook.com (52.133.109.212) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2073.10; Fri, 12 Jul 2019 12:02:53 +0000
-Received: from PR2PR08MB4649.eurprd08.prod.outlook.com
- ([fe80::bd59:a723:4d09:9e88]) by PR2PR08MB4649.eurprd08.prod.outlook.com
- ([fe80::bd59:a723:4d09:9e88%7]) with mapi id 15.20.2052.020; Fri, 12 Jul 2019
- 12:02:53 +0000
-From:   Roman Kagan <rkagan@virtuozzo.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?iso-8859-2?Q?Radim_Kr=E8m=E1=F8?= <rkrcmar@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "clang-built-linux@googlegroups.com" 
-        <clang-built-linux@googlegroups.com>
-Subject: Re: [PATCH 1/2] x86: kvm: avoid -Wsometimes-uninitized warning
-Thread-Topic: [PATCH 1/2] x86: kvm: avoid -Wsometimes-uninitized warning
-Thread-Index: AQHVOJH6diSyEW2P2EODPrXdUKWMMKbG4k+A
-Date:   Fri, 12 Jul 2019 12:02:53 +0000
-Message-ID: <20190712120249.GA27820@rkaganb.sw.ru>
-References: <20190712091239.716978-1-arnd@arndb.de>
-In-Reply-To: <20190712091239.716978-1-arnd@arndb.de>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mutt/1.12.0 (2019-05-25)
-mail-followup-to: =?iso-8859-2?Q?Roman_Kagan_<rkagan@virtuozzo.com>,=09Arnd_Bergmann_<arnd@?=
- =?iso-8859-2?Q?arndb.de>,_Paolo_Bonzini_<pbonzini@redhat.com>,=09Radim_Kr?=
- =?iso-8859-2?Q?=E8m=E1=F8_<rkrcmar@redhat.com>,=09Thomas_Gleixner_<tglx@l?=
- =?iso-8859-2?Q?inutronix.de>,=09Ingo_Molnar_<mingo@redhat.com>,_Borislav_?=
- =?iso-8859-2?Q?Petkov_<bp@alien8.de>,=09x86@kernel.org,_"H._Peter_Anvin"_?=
- =?iso-8859-2?Q?<hpa@zytor.com>,=09Vitaly_Kuznetsov_<vkuznets@redhat.com>,?=
- =?iso-8859-2?Q?=09Liran_Alon_<liran.alon@oracle.com>,_kvm@vger.kernel.org?=
- =?iso-8859-2?Q?,=09linux-kernel@vger.kernel.org,_clang-built-linux@google?=
- =?iso-8859-2?Q?groups.com?=
-x-originating-ip: [185.231.240.5]
-x-clientproxiedby: HE1P18901CA0008.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:3:8b::18) To PR2PR08MB4649.eurprd08.prod.outlook.com
- (2603:10a6:101:18::17)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=rkagan@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5e546975-b305-4ea4-d086-08d706c0de75
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:PR2PR08MB4876;
-x-ms-traffictypediagnostic: PR2PR08MB4876:|PR2PR08MB4876:
-x-microsoft-antispam-prvs: <PR2PR08MB4876A9811F5F39F7C0D5020AC9F20@PR2PR08MB4876.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 00963989E5
-x-forefront-antispam-report: SFV:SPM;SFS:(10019020)(396003)(39850400004)(366004)(376002)(346002)(136003)(52314003)(189003)(199004)(11346002)(1076003)(8936002)(86362001)(446003)(26005)(66476007)(66446008)(64756008)(66556008)(305945005)(66946007)(7416002)(6506007)(386003)(6486002)(229853002)(53936002)(68736007)(7736002)(5660300002)(486006)(8676002)(81156014)(81166006)(476003)(33656002)(6116002)(36756003)(6436002)(54906003)(99286004)(52116002)(71200400001)(6916009)(71190400001)(14454004)(256004)(14444005)(76176011)(316002)(3846002)(478600001)(9686003)(6246003)(102836004)(58126008)(186003)(66066001)(2906002)(4326008)(6512007)(25786009)(30126002);DIR:OUT;SFP:1501;SCL:5;SRVR:PR2PR08MB4876;H:PR2PR08MB4649.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: aZEEVmJq9Ai+pTBpi0Z64R1J46fPFywjKn+Rny4npfJf93oQbVKE3MXqS0YWWmugIRSK0oTQd0QCF1yim3Fil1s6u2E97gWk/91eEPugOVaprimjDFJUqGSLGT+Yo/4R0iqFBOlMzBr8hL65OX4dsLC7vJ0l1LmnHU7moJzGyAXCUyk0eBLlPp7B3c2VrhVs7VJhWFQbpRaIxUAxRC1/VhpZbqO/E9xQNEZbKAuAdCsEHiBjj0kMb+3wFL4aifiITFpwg7Aq9KHjoOQ6ksmcoRVTZj85MBQp1vAQYKHPTMbD5VfEOirEEGH/7tpmD3yAGNLVUcGV0mSgA2LaPsc6/dyf4zzCRbFrUhP7SMSSupCenEwr1eWxrhOawMDUzqb7Tk56mEkxxJz6kbKeN04rOJSiGUVShWntTdVVkNjLQlxfRlFfjvZYdXxilzYjGZUymdIjEr3QuZnkooKQgdT1gkcZNIYbOIbBrkwMxEfWKj3pYqvdPfeWO/08qk1QVcHT
-Content-Type: text/plain; charset="iso-8859-2"
-Content-ID: <87266A893EA54040A4AA25B17E388B6A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        id S1727322AbfGLMWU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jul 2019 08:22:20 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:60876 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727074AbfGLMVV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jul 2019 08:21:21 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6CC90Xl012611;
+        Fri, 12 Jul 2019 12:18:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=tHy9732h8J88hlJcyQvuajeYi/Ef6ybEFYf/oRMEAZk=;
+ b=CnC3slv8NBqzLVrf761MKmmJDfer7dKnuBEhQa/FXBbm2ow7JK23L0vk/WZwnvkokWMY
+ y7IFxlUnVNzQKNe4p+wmxcSzG5SegxPMg9NcgXCCP3pDFFXZkzx3fc+qToYydvHE9SCN
+ D2VNz+65cWxxvv46Qv72qUR6O+mtixOx4/eZrTpPz4BIfrqs2KsN0OY93rF2Onbwdv3R
+ mFf1I53WjD3Zzr+o0h6RVM/7Mqhm2JZm/L6cXriU/ge5HTHpasP5ibAgh91+08zMQYZJ
+ 7Nb7JwQ5zG6C15DKK651VACg8j9DiArepwlkSyS76+xjwbCQ0ylHhsNxBlGDkFgi7q45 qA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 2tjm9r59gw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Jul 2019 12:18:36 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6CC88Cl186642;
+        Fri, 12 Jul 2019 12:18:36 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2tmwgyr9wd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Jul 2019 12:18:35 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6CCIXEh014480;
+        Fri, 12 Jul 2019 12:18:33 GMT
+Received: from [10.166.106.34] (/10.166.106.34)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 12 Jul 2019 12:17:24 +0000
+Subject: Re: [RFC v2 00/27] Kernel Address Space Isolation
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        dave.hansen@linux.intel.com, luto@kernel.org, kvm@vger.kernel.org,
+        x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
+        liran.alon@oracle.com, jwadams@google.com, graf@amazon.de,
+        rppt@linux.vnet.ibm.com, Paul Turner <pjt@google.com>
+References: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
+ <20190712114458.GU3402@hirez.programming.kicks-ass.net>
+From:   Alexandre Chartre <alexandre.chartre@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <1f97f1d9-d209-f2ab-406d-fac765006f91@oracle.com>
+Date:   Fri, 12 Jul 2019 14:17:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5e546975-b305-4ea4-d086-08d706c0de75
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jul 2019 12:02:53.4013
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rkagan@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR2PR08MB4876
+In-Reply-To: <20190712114458.GU3402@hirez.programming.kicks-ass.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9315 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907120133
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9315 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907120133
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 12, 2019 at 11:12:29AM +0200, Arnd Bergmann wrote:
-> clang points out that running a 64-bit guest on a 32-bit host
-> would lead to uninitialized variables:
->=20
-> arch/x86/kvm/hyperv.c:1610:6: error: variable 'ingpa' is used uninitializ=
-ed whenever 'if' condition is false [-Werror,-Wsometimes-uninitialized]
->         if (!longmode) {
->             ^~~~~~~~~
-> arch/x86/kvm/hyperv.c:1632:55: note: uninitialized use occurs here
->         trace_kvm_hv_hypercall(code, fast, rep_cnt, rep_idx, ingpa, outgp=
-a);
->                                                              ^~~~~
-> arch/x86/kvm/hyperv.c:1610:2: note: remove the 'if' if its condition is a=
-lways true
->         if (!longmode) {
->         ^~~~~~~~~~~~~~~
-> arch/x86/kvm/hyperv.c:1595:18: note: initialize the variable 'ingpa' to s=
-ilence this warning
->         u64 param, ingpa, outgpa, ret =3D HV_STATUS_SUCCESS;
->                         ^
->                          =3D 0
-> arch/x86/kvm/hyperv.c:1610:6: error: variable 'outgpa' is used uninitiali=
-zed whenever 'if' condition is false [-Werror,-Wsometimes-uninitialized]
-> arch/x86/kvm/hyperv.c:1610:6: error: variable 'param' is used uninitializ=
-ed whenever 'if' condition is false [-Werror,-Wsometimes-uninitialized]
->=20
-> Since that combination is not supported anyway, change the condition
-> to tell the compiler how the code is actually executed.
 
-Hmm, the compiler *is* told all it needs:
+On 7/12/19 1:44 PM, Peter Zijlstra wrote:
+> On Thu, Jul 11, 2019 at 04:25:12PM +0200, Alexandre Chartre wrote:
+>> Kernel Address Space Isolation aims to use address spaces to isolate some
+>> parts of the kernel (for example KVM) to prevent leaking sensitive data
+>> between hyper-threads under speculative execution attacks. You can refer
+>> to the first version of this RFC for more context:
+>>
+>>     https://lkml.org/lkml/2019/5/13/515
+> 
+> No, no, no!
+> 
+> That is the crux of this entire series; you're not punting on explaining
+> exactly why we want to go dig through 26 patches of gunk.
+> 
+> You get to exactly explain what (your definition of) sensitive data is,
+> and which speculative scenarios and how this approach mitigates them.
+> 
+> And included in that is a high level overview of the whole thing.
+> 
 
+Ok, I will rework the explanation. Sorry about that.
 
-arch/x86/kvm/x86.h:
-...
-static inline int is_long_mode(struct kvm_vcpu *vcpu)
-{
-#ifdef CONFIG_X86_64
-	return vcpu->arch.efer & EFER_LMA;
-#else
-	return 0;
-#endif
-}
+> On the one hand you've made this implementation for KVM, while on the
+> other hand you're saying it is generic but then fail to describe any
+> !KVM user.
+> 
+> AFAIK all speculative fails this is relevant to are now public, so
+> excruciating horrible details are fine and required.
 
-static inline bool is_64_bit_mode(struct kvm_vcpu *vcpu)
-{
-	int cs_db, cs_l;
+Ok.
 
-	if (!is_long_mode(vcpu))
-		return false;
-	kvm_x86_ops->get_cs_db_l_bits(vcpu, &cs_db, &cs_l);
-	return cs_l;
-}
-...
+> AFAIK2 this is all because of MDS but it also helps with v1.
 
-so in !CONFIG_X86_64 case is_64_bit_mode() unconditionally returns
-false, and the branch setting the values of the variables is always
-taken.
+Yes, mostly MDS and also L1TF.
 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  arch/x86/kvm/hyperv.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index a39e38f13029..950436c502ba 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -1607,7 +1607,7 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
-> =20
->  	longmode =3D is_64_bit_mode(vcpu);
-> =20
-> -	if (!longmode) {
-> +	if (!IS_ENABLED(CONFIG_X86_64) || !longmode) {
->  		param =3D ((u64)kvm_rdx_read(vcpu) << 32) |
->  			(kvm_rax_read(vcpu) & 0xffffffff);
->  		ingpa =3D ((u64)kvm_rbx_read(vcpu) << 32) |
+> AFAIK3 this wants/needs to be combined with core-scheduling to be
+> useful, but not a single mention of that is anywhere.
 
-So this is rather a workaround for the compiler giving false positive.
-I suggest to at least rephrase the log message to inidcate this.
+No. This is actually an alternative to core-scheduling. Eventually, ASI
+will kick all sibling hyperthreads when exiting isolation and it needs to
+run with the full kernel page-table (note that's currently not in these
+patches).
 
-Roman.
+So ASI can be seen as an optimization to disabling hyperthreading: instead
+of just disabling hyperthreading you run with ASI, and when ASI can't preserve
+isolation you will basically run with a single thread.
+
+I will add all that to the explanation.
+
+Thanks,
+
+alex.
