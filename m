@@ -2,37 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EBA867086
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 15:51:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5AF06709B
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 15:54:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727608AbfGLNvE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Jul 2019 09:51:04 -0400
-Received: from mga07.intel.com ([134.134.136.100]:42897 "EHLO mga07.intel.com"
+        id S1727850AbfGLNy0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jul 2019 09:54:26 -0400
+Received: from mga17.intel.com ([192.55.52.151]:38140 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726907AbfGLNvE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Jul 2019 09:51:04 -0400
+        id S1726977AbfGLNyZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jul 2019 09:54:25 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Jul 2019 06:51:03 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Jul 2019 06:54:24 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.63,482,1557212400"; 
-   d="scan'208";a="166683426"
+   d="scan'208";a="166683884"
 Received: from smatond1-mobl1.amr.corp.intel.com (HELO [10.252.143.186]) ([10.252.143.186])
-  by fmsmga008.fm.intel.com with ESMTP; 12 Jul 2019 06:51:02 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 12 Jul 2019 06:54:22 -0700
 Subject: Re: [RFC v2 00/27] Kernel Address Space Isolation
-To:     Alexandre Chartre <alexandre.chartre@oracle.com>,
-        pbonzini@redhat.com, rkrcmar@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org,
-        kvm@vger.kernel.org, x86@kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Cc:     konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Alexandre Chartre <alexandre.chartre@oracle.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>, pbonzini@redhat.com,
+        rkrcmar@redhat.com, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        dave.hansen@linux.intel.com, luto@kernel.org, kvm@vger.kernel.org,
+        x86@kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+        konrad.wilk@oracle.com, jan.setjeeilers@oracle.com,
         liran.alon@oracle.com, jwadams@google.com, graf@amazon.de,
-        rppt@linux.vnet.ibm.com
+        rppt@linux.vnet.ibm.com, Paul Turner <pjt@google.com>
 References: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
  <5cab2a0e-1034-8748-fcbe-a17cf4fa2cd4@intel.com>
- <2791712a-9f7b-18bc-e686-653181461428@oracle.com>
+ <alpine.DEB.2.21.1907120911160.11639@nanos.tec.linutronix.de>
+ <61d5851e-a8bf-e25c-e673-b71c8b83042c@oracle.com>
+ <20190712125059.GP3419@hirez.programming.kicks-ass.net>
 From:   Dave Hansen <dave.hansen@intel.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -78,12 +80,12 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-Message-ID: <dbbf6b05-14b6-d184-76f2-8d4da80cec75@intel.com>
-Date:   Fri, 12 Jul 2019 06:51:02 -0700
+Message-ID: <3626998c-509f-b434-1f66-9db2c09c47d4@intel.com>
+Date:   Fri, 12 Jul 2019 06:54:22 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <2791712a-9f7b-18bc-e686-653181461428@oracle.com>
+In-Reply-To: <20190712125059.GP3419@hirez.programming.kicks-ass.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -92,48 +94,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/12/19 1:09 AM, Alexandre Chartre wrote:
-> On 7/12/19 12:38 AM, Dave Hansen wrote:
->> I don't see the per-cpu areas in here.  But, the ASI macros in
->> entry_64.S (and asi_start_abort()) use per-cpu data.
+On 7/12/19 5:50 AM, Peter Zijlstra wrote:
+> PTI is not mapping         kernel space to avoid             speculation crap (meltdown).
+> ASI is not mapping part of kernel space to avoid (different) speculation crap (MDS).
 > 
-> We don't map all per-cpu areas, but only the per-cpu variables we need. ASI
-> code uses the per-cpu cpu_asi_session variable which is mapped when an ASI
-> is created (see patch 15/26):
+> See how very similar they are?
 
-No fair!  I had per-cpu variables just for PTI at some point and had to
-give them up! ;)
+That's an interesting point.
 
-> +    /*
-> +     * Map the percpu ASI sessions. This is used by interrupt handlers
-> +     * to figure out if we have entered isolation and switch back to
-> +     * the kernel address space.
-> +     */
-> +    err = ASI_MAP_CPUVAR(asi, cpu_asi_session);
-> +    if (err)
-> +        return err;
+I'd add that PTI maps a part of kernel space that partially overlaps
+with what ASI wants.
+
+> But looking at it that way, it makes no sense to retain 3 address
+> spaces, namely:
 > 
+>   user / kernel exposed / kernel private.
 > 
->> Also, this stuff seems to do naughty stuff (calling C code, touching
->> per-cpu data) before the PTI CR3 writes have been done.  But, I don't
->> see anything excluding PTI and this code from coexisting.
+> Specifically, it makes no sense to expose part of the kernel through MDS
+> but not through Meltdown. Therefore we can merge the user and kernel
+> exposed address spaces.
 > 
-> My understanding is that PTI CR3 writes only happens when switching to/from
-> userland. While ASI enter/exit/abort happens while we are already in the
-> kernel,
-> so asi_start_abort() is not called when coming from userland and so not
-> interacting with PTI.
+> And then we've fully replaced PTI.
 
-OK, that makes sense.  You only need to call C code when interrupted
-from something in the kernel (deeper than the entry code), and those
-were already running kernel C code anyway.
+So, in one address space (PTI/user or ASI), we say, "screw it" and all
+the data mapped is exposed to speculation attacks.  We have to be very
+careful about what we map and expose here.
 
-If this continues to live in the entry code, I think you have a good
-clue where to start commenting.
+The other (full kernel) address space we are more careful about what we
+*do* instead of what we map.  We map everything but have to add
+mitigations to ensure that we don't leak anything back to the exposed
+address space.
 
-BTW, the PTI CR3 writes are not *strictly* about the interrupt coming
-from user vs. kernel.  It's tricky because there's a window both in the
-entry and exit code where you are in the kernel but have a userspace CR3
-value.  You end up needing a CR3 write when you have a userspace CR3
-value when the interrupt occurred, not only when you interrupt userspace
-itself.
+So, maybe we're not replacing PTI as much as we're growing PTI so that
+we can run more kernel code with the (now inappropriately named) user
+page tables.
