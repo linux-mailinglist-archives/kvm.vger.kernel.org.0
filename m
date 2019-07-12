@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 305076677E
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 09:10:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C046B6678D
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 09:15:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726112AbfGLHKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Jul 2019 03:10:50 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:45667 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726047AbfGLHKu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Jul 2019 03:10:50 -0400
-Received: by mail-pf1-f195.google.com with SMTP id r1so3886649pfq.12;
-        Fri, 12 Jul 2019 00:10:49 -0700 (PDT)
+        id S1726100AbfGLHPg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jul 2019 03:15:36 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:38831 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725877AbfGLHPf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jul 2019 03:15:35 -0400
+Received: by mail-pg1-f195.google.com with SMTP id z75so4124779pgz.5;
+        Fri, 12 Jul 2019 00:15:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=plx8G9KjIRkO9jPdKCCYg4fdY7Z/wFDK5+GicbywqU8=;
-        b=eoWYo0hwuPniPy1VQBdQ+esk2rfgoQqZxdec/tuhyo13Bm3GDQFWP8eUxDLKDMqEXk
-         eEoYaXYid8+336ZrFQ9T0t0F1vDYeTW79FtsT4RidrDDiju9ZSDWTGtyxhl8aAy0a9oJ
-         iFWQYSkqXVAj2E+Nq5ssax5DLG0iwCLPlIQ+QXrzuQHGyUptSGT+bExBt8dsYLmJE6bB
-         D2GNe8/eZrV0KpS0xchW6BZHQQpL6Vp0RhPJ6wAYrxzLw4UOp1luCJh89rm7Vmo7XKXY
-         nxybTgZYbQ5xk+/I4HW2fTDLWdMMghBMO69b8DITOKpcSRxp+cE2iyPc5/EWBBqJXfDn
-         35NA==
+        b=VFej0D2SY2b0aJzuxn4i5qL4rCyfbMzLnd4yft2sxUqn7/W2P89+AJGX+FnPJnvsT0
+         irWkaWdDMW44DbJLfgBR5O9nXuorUvZ6Ww6B1FPbwW9+iTf++esQLhqzCcfx/wtKT+9U
+         zR7ZitX0lkbLSuxkeDbruoHLg7luCGcjO2ZcxWHCSCjsb0nHYZ1fp6507EjC4sknX/Xr
+         HtF8HpTBgGvApSGSVe8JopMZx7aVXAT6+EbPjo0cQYnnYL63O9jWXvCHiCW7Do5SRHno
+         iu6Syf+q87bnUAFEh4iL0PSZwYEGjFP416k/Cvr5uhN6X5hMhFh5VHRjiKFESfK8nPi8
+         ozlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=plx8G9KjIRkO9jPdKCCYg4fdY7Z/wFDK5+GicbywqU8=;
-        b=ic7XD/Wvfcdy7IyIOzWV00Kt6QDKkoZjkiDhkk/c91a262J5QQDSXtu4P6SFWia0Vd
-         uBdLy/TUAXmNNYTZUcPPxfpUp81pnIby507Z6W7m/4VdhQXMX1dEZiptNhuV4m104PIG
-         NXPGVNnxwCIKauAeXIytidEFoHQkLOeCmjyVDtMO2eQEkBRw2D8DSLmupc28auZOf4LE
-         flDYPBJzCrtR4ir2W/02zZFEZKPkdWQRP3w+RQ/FrttO+1guY4ykoR3C04Xm/wqL8PS1
-         QPgDyCWQnvJ4ACVSJzgcJ6ItI5lrUv1wk4+lU2pOp/P4wPdGYdnlov3fNGnCKxXbqMG6
-         FDpw==
-X-Gm-Message-State: APjAAAWcQOwFaxikw6Xs7dKtPeTy0L6mk0KVnYCVHt8pa+gHE9GSU4Rg
-        KdlCXdw44P9KRJ+Bz0tPMZbJPB397Cw=
-X-Google-Smtp-Source: APXvYqwqCicJgoVrmn8Lv6Ihd+dTRDGGFX+wlE/r5njF16gZBRJ55NKVTuxi8l7mTOQJZwssSzi7wQ==
-X-Received: by 2002:a65:4786:: with SMTP id e6mr8830844pgs.448.1562915449408;
-        Fri, 12 Jul 2019 00:10:49 -0700 (PDT)
+        b=epqhc3WF3YRUD/dwrJBsUBJALbfuE8xfp6JgvfNZeEh5K+WR++ODFcWyIxGgSjSZWm
+         mp6eJUTMmV4m5vdi2UFacRbXVbMGdEDFt55IDGPSZjDjrxJePa17s4Wg8hhXfil+Ivyi
+         uFYOXryNQCpIZvUqLeWR3d5gEAK49YgZ9lwcigoXtbper+EI1zqXnL/M46xYUxGV+XZV
+         qfTJNnpCbUSw8QSA7GxCODKQYOFNlX4NOVKwft0hgxTO9ekjjxPkV2C9WuTEKWtEyA+a
+         NkjXxzcmxvbEOUl9oQpL/JHIr6iQuVMB9qQdXbwWTT7nlTWVMjAzITgS5t1VJFwubiTN
+         UloA==
+X-Gm-Message-State: APjAAAX8apj7vPOJPG8rpvcgZzs+jPm7FlsFOaZ2XXpIp172cg8KH84Y
+        XMPK3D5i5QcBTJSSrJuraVAo2n/sHz8=
+X-Google-Smtp-Source: APXvYqzFAKB2xsc1Z5Am6M03j3zFHDBf7PUfG1clved6rBmUAlipS3m6vkYlbCwEd15othE1pQ+XCQ==
+X-Received: by 2002:a63:61c6:: with SMTP id v189mr3550132pgb.36.1562915734841;
+        Fri, 12 Jul 2019 00:15:34 -0700 (PDT)
 Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id b29sm14507006pfr.159.2019.07.12.00.10.47
+        by smtp.googlemail.com with ESMTPSA id 135sm7412600pfb.137.2019.07.12.00.15.33
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Fri, 12 Jul 2019 00:10:48 -0700 (PDT)
+        Fri, 12 Jul 2019 00:15:34 -0700 (PDT)
 From:   Wanpeng Li <kernellwp@gmail.com>
 X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH] KVM: Boosting vCPUs that are delivering interrupts
-Date:   Fri, 12 Jul 2019 15:10:35 +0800
-Message-Id: <1562915435-8818-1-git-send-email-wanpengli@tencent.com>
+Subject: [PATCH RESEND] KVM: Boosting vCPUs that are delivering interrupts
+Date:   Fri, 12 Jul 2019 15:15:30 +0800
+Message-Id: <1562915730-9490-1-git-send-email-wanpengli@tencent.com>
 X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -84,12 +84,12 @@ one running ebizzy -M, the other running 'stress --cpu 2':
 w/ boosting + w/o pv sched yield(vanilla)   
 
             vanilla     boosting   improved 
-   			 1570         4000       55%
+              1570         4000       55%
 
 w/ boosting + w/ pv sched yield(vanilla)
 
-			vanilla     boosting   improved 
-             1844         5157       79%   
+            vanilla     boosting   improved 
+              1844         5157       79%   
 
 w/o boosting, perf top in VM:
 
