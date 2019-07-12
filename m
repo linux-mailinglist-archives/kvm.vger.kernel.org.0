@@ -2,185 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 5409866768
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 09:03:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 305076677E
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 09:10:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726127AbfGLHDk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Jul 2019 03:03:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55902 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725866AbfGLHDk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Jul 2019 03:03:40 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E93A485543;
-        Fri, 12 Jul 2019 07:03:39 +0000 (UTC)
-Received: from [10.36.116.46] (ovpn-116-46.ams2.redhat.com [10.36.116.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4939E5DDDC;
-        Fri, 12 Jul 2019 07:03:35 +0000 (UTC)
-From:   Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH] vfio: platform: reset: add support for XHCI reset hook
-To:     Gregory CLEMENT <gregory.clement@bootlin.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Antoine Tenart <antoine.tenart@bootlin.com>,
-        =?UTF-8?Q?Miqu=c3=a8l_Raynal?= <miquel.raynal@bootlin.com>,
-        Maxime Chevallier <maxime.chevallier@bootlin.com>,
-        Nadav Haklai <nadavh@marvell.com>
-References: <20190711143159.21961-1-gregory.clement@bootlin.com>
-Message-ID: <c152f211-0757-521e-64ea-543f6c89d9b2@redhat.com>
-Date:   Fri, 12 Jul 2019 09:03:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1726112AbfGLHKu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jul 2019 03:10:50 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:45667 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726047AbfGLHKu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jul 2019 03:10:50 -0400
+Received: by mail-pf1-f195.google.com with SMTP id r1so3886649pfq.12;
+        Fri, 12 Jul 2019 00:10:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=plx8G9KjIRkO9jPdKCCYg4fdY7Z/wFDK5+GicbywqU8=;
+        b=eoWYo0hwuPniPy1VQBdQ+esk2rfgoQqZxdec/tuhyo13Bm3GDQFWP8eUxDLKDMqEXk
+         eEoYaXYid8+336ZrFQ9T0t0F1vDYeTW79FtsT4RidrDDiju9ZSDWTGtyxhl8aAy0a9oJ
+         iFWQYSkqXVAj2E+Nq5ssax5DLG0iwCLPlIQ+QXrzuQHGyUptSGT+bExBt8dsYLmJE6bB
+         D2GNe8/eZrV0KpS0xchW6BZHQQpL6Vp0RhPJ6wAYrxzLw4UOp1luCJh89rm7Vmo7XKXY
+         nxybTgZYbQ5xk+/I4HW2fTDLWdMMghBMO69b8DITOKpcSRxp+cE2iyPc5/EWBBqJXfDn
+         35NA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=plx8G9KjIRkO9jPdKCCYg4fdY7Z/wFDK5+GicbywqU8=;
+        b=ic7XD/Wvfcdy7IyIOzWV00Kt6QDKkoZjkiDhkk/c91a262J5QQDSXtu4P6SFWia0Vd
+         uBdLy/TUAXmNNYTZUcPPxfpUp81pnIby507Z6W7m/4VdhQXMX1dEZiptNhuV4m104PIG
+         NXPGVNnxwCIKauAeXIytidEFoHQkLOeCmjyVDtMO2eQEkBRw2D8DSLmupc28auZOf4LE
+         flDYPBJzCrtR4ir2W/02zZFEZKPkdWQRP3w+RQ/FrttO+1guY4ykoR3C04Xm/wqL8PS1
+         QPgDyCWQnvJ4ACVSJzgcJ6ItI5lrUv1wk4+lU2pOp/P4wPdGYdnlov3fNGnCKxXbqMG6
+         FDpw==
+X-Gm-Message-State: APjAAAWcQOwFaxikw6Xs7dKtPeTy0L6mk0KVnYCVHt8pa+gHE9GSU4Rg
+        KdlCXdw44P9KRJ+Bz0tPMZbJPB397Cw=
+X-Google-Smtp-Source: APXvYqwqCicJgoVrmn8Lv6Ihd+dTRDGGFX+wlE/r5njF16gZBRJ55NKVTuxi8l7mTOQJZwssSzi7wQ==
+X-Received: by 2002:a65:4786:: with SMTP id e6mr8830844pgs.448.1562915449408;
+        Fri, 12 Jul 2019 00:10:49 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+        by smtp.googlemail.com with ESMTPSA id b29sm14507006pfr.159.2019.07.12.00.10.47
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Fri, 12 Jul 2019 00:10:48 -0700 (PDT)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: [PATCH] KVM: Boosting vCPUs that are delivering interrupts
+Date:   Fri, 12 Jul 2019 15:10:35 +0800
+Message-Id: <1562915435-8818-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-In-Reply-To: <20190711143159.21961-1-gregory.clement@bootlin.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Fri, 12 Jul 2019 07:03:40 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Gregory,
+From: Wanpeng Li <wanpengli@tencent.com>
 
-On 7/11/19 4:31 PM, Gregory CLEMENT wrote:
-> The VFIO reset hook is called every time a platform device is passed
-> to a guest or removed from a guest.
-> 
-> When the XHCI device is unbound from the host, the host driver
-> disables the XHCI clocks/phys/regulators so when the device is passed
-> to the guest it becomes dis-functional.
-> 
-> This initial implementation uses the VFIO reset hook to enable the
-> XHCI clocks/phys on behalf of the guest.
+Inspired by commit 9cac38dd5d (KVM/s390: Set preempted flag during vcpu wakeup 
+and interrupt delivery), except the lock holder, we want to also boost vCPUs 
+that are delivering interrupts. Actually most smp_call_function_many calls are 
+synchronous ipi calls, the ipi target vCPUs are also good yield candidates. 
+This patch sets preempted flag during wakeup and interrupt delivery time.
 
-the platform reset module must also make sure there are no more DMA
-requests and interrupts that can be sent by the device anymore.
-> 
-> Ported from Marvell LSP code originally written by Yehuda Yitschak
-> 
-> Signed-off-by: Gregory CLEMENT <gregory.clement@bootlin.com>
-> ---
->  drivers/vfio/platform/reset/Kconfig           |  8 +++
->  drivers/vfio/platform/reset/Makefile          |  2 +
->  .../vfio/platform/reset/vfio_platform_xhci.c  | 60 +++++++++++++++++++
->  3 files changed, 70 insertions(+)
->  create mode 100644 drivers/vfio/platform/reset/vfio_platform_xhci.c
-> 
-> diff --git a/drivers/vfio/platform/reset/Kconfig b/drivers/vfio/platform/reset/Kconfig
-> index 392e3c09def0..14f620fd250d 100644
-> --- a/drivers/vfio/platform/reset/Kconfig
-> +++ b/drivers/vfio/platform/reset/Kconfig
-> @@ -22,3 +22,11 @@ config VFIO_PLATFORM_BCMFLEXRM_RESET
->  	  Enables the VFIO platform driver to handle reset for Broadcom FlexRM
->  
->  	  If you don't know what to do here, say N.
-> +
-> +config VFIO_PLATFORM_XHCI_RESET
-> +	tristate "VFIO support for USB XHCI reset"
-> +	depends on VFIO_PLATFORM
-> +	help
-> +	  Enables the VFIO platform driver to handle reset for USB XHCI
-> +
-> +	  If you don't know what to do here, say N.
-> diff --git a/drivers/vfio/platform/reset/Makefile b/drivers/vfio/platform/reset/Makefile
-> index 7294c5ea122e..d84c4d3dc041 100644
-> --- a/drivers/vfio/platform/reset/Makefile
-> +++ b/drivers/vfio/platform/reset/Makefile
-> @@ -1,7 +1,9 @@
->  # SPDX-License-Identifier: GPL-2.0
->  vfio-platform-calxedaxgmac-y := vfio_platform_calxedaxgmac.o
->  vfio-platform-amdxgbe-y := vfio_platform_amdxgbe.o
-> +vfio-platform-xhci-y := vfio_platform_xhci.o
->  
->  obj-$(CONFIG_VFIO_PLATFORM_CALXEDAXGMAC_RESET) += vfio-platform-calxedaxgmac.o
->  obj-$(CONFIG_VFIO_PLATFORM_AMDXGBE_RESET) += vfio-platform-amdxgbe.o
->  obj-$(CONFIG_VFIO_PLATFORM_BCMFLEXRM_RESET) += vfio_platform_bcmflexrm.o
-> +obj-$(CONFIG_VFIO_PLATFORM_XHCI_RESET) += vfio-platform-xhci.o
-> diff --git a/drivers/vfio/platform/reset/vfio_platform_xhci.c b/drivers/vfio/platform/reset/vfio_platform_xhci.c
-> new file mode 100644
-> index 000000000000..7b75a04402ee
-> --- /dev/null
-> +++ b/drivers/vfio/platform/reset/vfio_platform_xhci.c
-> @@ -0,0 +1,60 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * VFIO platform driver specialized for XHCI reset
-> + *
-> + * Copyright 2016 Marvell Semiconductors, Inc.
-> + *
-> + */
-> +
-> +#include <linux/clk.h>
-> +#include <linux/device.h>
-> +#include <linux/init.h>
-> +#include <linux/io.h>
-> +#include <linux/kernel.h>
-io, init, kernel should be removable (noticed init and kernel.h also are
-in other reset modules though)
-> +#include <linux/module.h>
-> +#include <linux/of.h>
-> +#include <linux/phy/phy.h>
-> +#include <linux/usb/phy.h>
-> +
-> +#include "../vfio_platform_private.h"
-> +
-> +#define MAX_XHCI_CLOCKS		4
-Where does this number come from?
+Testing on 80 HT 2 socket Xeon Skylake server, with 80 vCPUs VM 80GB RAM:
+ebizzy -M
 
-From Documentation/devicetree/bindings/usb/usb-xhci.txt I understand
-there are max 2 clocks, "core" and "reg" (I don't have any specific
-knowledge on the device though).
+            vanilla     boosting    improved
+1VM          23000       21232        -9%                      
+2VM           2800        8000       180%
+3VM           1800        3100        72%
 
-> +#define MAX_XHCI_PHYS		2
-not used
-> +
-> +int vfio_platform_xhci_reset(struct vfio_platform_device *vdev)
-> +{
-> +	struct device *dev = vdev->device;
-> +	struct device_node *np = dev->of_node;
-> +	struct usb_phy *usb_phy;
-> +	struct clk *clk;
-> +	int ret, i;
-> +
-> +	/*
-> +	 * Compared to the native driver, no need to handle the
-> +	 * deferred case, because the resources are already
-> +	 * there
-> +	 */
-> +	for (i = 0; i < MAX_XHCI_CLOCKS; i++) {
-> +		clk = of_clk_get(np, i);
-> +		if (!IS_ERR(clk)) {
-> +			ret = clk_prepare_enable(clk);
-> +			if (ret)
-> +				return -ENODEV;
-return ret?
-> +		}
-> +	}
-> +
-> +	usb_phy = devm_usb_get_phy_by_phandle(dev, "usb-phy", 0);
-> +	if (!IS_ERR(usb_phy)) {
-> +		ret = usb_phy_init(usb_phy);
-> +		if (ret)
-> +			return -ENODEV;
-return ret?
-> +	}
+Testing on my Haswell desktop 8 HT, with 8 vCPUs VM 8GB RAM, two VMs, 
+one running ebizzy -M, the other running 'stress --cpu 2':
 
-> +
-> +	return 0;
-> +}
-> +
-> +module_vfio_reset_handler("generic-xhci", vfio_platform_xhci_reset);
-> +
-> +MODULE_AUTHOR("Yehuda Yitschak");
-> +MODULE_DESCRIPTION("Reset support for XHCI vfio platform device");
-> +MODULE_LICENSE("GPL");
-> 
-Thanks
+w/ boosting + w/o pv sched yield(vanilla)   
 
-Eric
+            vanilla     boosting   improved 
+   			 1570         4000       55%
+
+w/ boosting + w/ pv sched yield(vanilla)
+
+			vanilla     boosting   improved 
+             1844         5157       79%   
+
+w/o boosting, perf top in VM:
+
+ 72.33%  [kernel]       [k] smp_call_function_many
+  4.22%  [kernel]       [k] call_function_i
+  3.71%  [kernel]       [k] async_page_fault
+
+w/ boosting, perf top in VM:
+
+ 38.43%  [kernel]       [k] smp_call_function_many
+  6.31%  [kernel]       [k] async_page_fault
+  6.13%  libc-2.23.so   [.] __memcpy_avx_unaligned
+  4.88%  [kernel]       [k] call_function_interrupt
+
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ virt/kvm/kvm_main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index b4ab59d..2c46705 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2404,8 +2404,10 @@ void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
+ 	int me;
+ 	int cpu = vcpu->cpu;
+ 
+-	if (kvm_vcpu_wake_up(vcpu))
++	if (kvm_vcpu_wake_up(vcpu)) {
++		vcpu->preempted = true;
+ 		return;
++	}
+ 
+ 	me = get_cpu();
+ 	if (cpu != me && (unsigned)cpu < nr_cpu_ids && cpu_online(cpu))
+-- 
+2.7.4
+
