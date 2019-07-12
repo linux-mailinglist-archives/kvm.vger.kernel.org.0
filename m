@@ -2,72 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id E971567241
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 17:23:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DEAE5672C8
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 17:52:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726984AbfGLPXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Jul 2019 11:23:55 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:44219 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726318AbfGLPXz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Jul 2019 11:23:55 -0400
-Received: from [5.158.153.52] (helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1hlxOi-0003SX-Ud; Fri, 12 Jul 2019 17:23:45 +0200
-Date:   Fri, 12 Jul 2019 17:23:44 +0200 (CEST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Alexandre Chartre <alexandre.chartre@oracle.com>
-cc:     Dave Hansen <dave.hansen@intel.com>, pbonzini@redhat.com,
-        rkrcmar@redhat.com, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org,
-        kvm@vger.kernel.org, x86@kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, konrad.wilk@oracle.com,
-        jan.setjeeilers@oracle.com, liran.alon@oracle.com,
-        jwadams@google.com, graf@amazon.de, rppt@linux.vnet.ibm.com
-Subject: Re: [RFC v2 00/27] Kernel Address Space Isolation
-In-Reply-To: <bfd62213-c7c0-4a90-b377-0de7d9557c4c@oracle.com>
-Message-ID: <alpine.DEB.2.21.1907121719290.1788@nanos.tec.linutronix.de>
-References: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com> <5cab2a0e-1034-8748-fcbe-a17cf4fa2cd4@intel.com> <2791712a-9f7b-18bc-e686-653181461428@oracle.com> <dbbf6b05-14b6-d184-76f2-8d4da80cec75@intel.com>
- <bfd62213-c7c0-4a90-b377-0de7d9557c4c@oracle.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        id S1727077AbfGLPwD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jul 2019 11:52:03 -0400
+Received: from mga07.intel.com ([134.134.136.100]:50651 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726907AbfGLPwD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jul 2019 11:52:03 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Jul 2019 08:52:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,483,1557212400"; 
+   d="scan'208";a="177539011"
+Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.165])
+  by orsmga002.jf.intel.com with ESMTP; 12 Jul 2019 08:52:02 -0700
+Date:   Fri, 12 Jul 2019 08:52:02 -0700
+From:   Sean Christopherson <sean.j.christopherson@intel.com>
+To:     Tao Xu <tao3.xu@intel.com>
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        fenghua.yu@intel.com, xiaoyao.li@linux.intel.com,
+        jingqi.liu@intel.com
+Subject: Re: [PATCH v7 2/3] KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
+Message-ID: <20190712155202.GC29659@linux.intel.com>
+References: <20190712082907.29137-1-tao3.xu@intel.com>
+ <20190712082907.29137-3-tao3.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190712082907.29137-3-tao3.xu@intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 12 Jul 2019, Alexandre Chartre wrote:
-> On 7/12/19 3:51 PM, Dave Hansen wrote:
-> > BTW, the PTI CR3 writes are not *strictly* about the interrupt coming
-> > from user vs. kernel.  It's tricky because there's a window both in the
-> > entry and exit code where you are in the kernel but have a userspace CR3
-> > value.  You end up needing a CR3 write when you have a userspace CR3
-> > value when the interrupt occurred, not only when you interrupt userspace
-> > itself.
-> > 
-> 
-> Right. ASI is simpler because it comes from the kernel and return to the
-> kernel. There's just a small window (on entry) where we have the ASI CR3
-> but we quickly switch to the full kernel CR3.
+On Fri, Jul 12, 2019 at 04:29:06PM +0800, Tao Xu wrote:
+> diff --git a/arch/x86/kernel/cpu/umwait.c b/arch/x86/kernel/cpu/umwait.c
+> index 6a204e7336c1..631152a67c6e 100644
+> --- a/arch/x86/kernel/cpu/umwait.c
+> +++ b/arch/x86/kernel/cpu/umwait.c
+> @@ -15,7 +15,8 @@
+>   * Cache IA32_UMWAIT_CONTROL MSR. This is a systemwide control. By default,
+>   * umwait max time is 100000 in TSC-quanta and C0.2 is enabled
+>   */
+> -static u32 umwait_control_cached = UMWAIT_CTRL_VAL(100000, UMWAIT_C02_ENABLE);
+> +u32 umwait_control_cached = UMWAIT_CTRL_VAL(100000, UMWAIT_C02_ENABLE);
+> +EXPORT_SYMBOL_GPL(umwait_control_cached);
 
-That's wrong in several aspects.
+It'd probably be better to add an accessor to expose umwait_control_cached
+given that umwait.c is using {READ,WRITE}_ONCE() and there shouldn't be a
+need to write it outside of umwait.c.
 
-   1) You are looking at it purely from the VMM perspective, which is bogus
-      as you already said, that this can/should be used to be extended to
-      other scenarios (including kvm ioctl or such).
+>  /*
+>   * Serialize access to umwait_control_cached and IA32_UMWAIT_CONTROL MSR in
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index f411c9ae5589..0787f140d155 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1676,6 +1676,12 @@ static int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  #endif
+>  	case MSR_EFER:
+>  		return kvm_get_msr_common(vcpu, msr_info);
+> +	case MSR_IA32_UMWAIT_CONTROL:
+> +		if (!msr_info->host_initiated && !vmx_has_waitpkg(vmx))
+> +			return 1;
+> +
+> +		msr_info->data = vmx->msr_ia32_umwait_control;
+> +		break;
+>  	case MSR_IA32_SPEC_CTRL:
+>  		if (!msr_info->host_initiated &&
+>  		    !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
+> @@ -1838,6 +1844,16 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  			return 1;
+>  		vmcs_write64(GUEST_BNDCFGS, data);
+>  		break;
+> +	case MSR_IA32_UMWAIT_CONTROL:
+> +		if (!msr_info->host_initiated && !vmx_has_waitpkg(vmx))
+> +			return 1;
+> +
+> +		/* The reserved bit IA32_UMWAIT_CONTROL[1] should be zero */
+> +		if (data & BIT_ULL(1))
+> +			return 1;
+> +
+> +		vmx->msr_ia32_umwait_control = data;
 
-      So no, it's not just coming from kernel space and returning to it.
+The SDM only defines bits 31:0, and the kernel uses a u32 to cache its
+value.  I assume bits 63:32 are reserved?  I'm guessing we also need an
+SDM update...
 
-      If that'd be true then the entry code could just stay as is because
-      you can handle _ALL_ of that very trivial in the atomic VMM
-      enter/exit code.
-
-   2) It does not matter how small that window is. If there is a window
-      then this needs to be covered, no matter what.
-
-Thanks,
-
-	tglx
+> +		break;
+>  	case MSR_IA32_SPEC_CTRL:
+>  		if (!msr_info->host_initiated &&
+>  		    !guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL))
+> @@ -4139,6 +4155,8 @@ static void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  	vmx->rmode.vm86_active = 0;
+>  	vmx->spec_ctrl = 0;
+>  
+> +	vmx->msr_ia32_umwait_control = 0;
+> +
+>  	vcpu->arch.microcode_version = 0x100000000ULL;
+>  	vmx->vcpu.arch.regs[VCPU_REGS_RDX] = get_rdx_init_val();
+>  	kvm_set_cr8(vcpu, 0);
+> @@ -6352,6 +6370,19 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
+>  					msrs[i].host, false);
+>  }
+>  
