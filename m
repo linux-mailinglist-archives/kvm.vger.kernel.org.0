@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 22F076646C
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 04:28:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 529CD6646E
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 04:28:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728780AbfGLC2h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Jul 2019 22:28:37 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:45927 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728737AbfGLC2h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Jul 2019 22:28:37 -0400
-Received: by mail-pl1-f193.google.com with SMTP id y8so3990669plr.12
-        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 19:28:37 -0700 (PDT)
+        id S1728885AbfGLC2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Jul 2019 22:28:41 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:43113 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728890AbfGLC2k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Jul 2019 22:28:40 -0400
+Received: by mail-pl1-f196.google.com with SMTP id cl9so3985459plb.10
+        for <kvm@vger.kernel.org>; Thu, 11 Jul 2019 19:28:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=txM7NRAPhKKOhPah/KvbJzpjgw2fG+quBcemGqRzwNM=;
-        b=geDC67YVyOOwLtMBUDitaOv3vTDzDZkQkikYEUWxtMsno2FM7S3xHRCHxQfboCDHdk
-         4BQra2iSZD8Q+atIV2SGnEn30YuBsRZn38RMeny2+gJQQQbXHY94fFF3FwhK7FkN55Pa
-         hP4Zpu1sHmFLxSTAENl/VfQq9TfmdDBgCqhAq2SCRww2wLZxEYZ5YYgUrVUHf4IEHo6y
-         b8wFVU2w4w8d4fLkLVf5cjxsoMpJ4/Nz2zS4UMrDVDzLKkgavSu2xlodd+/pFv+ATrt+
-         A9H48LVaiI565NoTvY/W3Z/AhHTMerdCBCC6+UMnk3+qYVey/TCt8cRJcl/DDSwXecRB
-         BF0g==
-X-Gm-Message-State: APjAAAXOQX1LeWdixyijy3hX/fhrqQ+kXMbh3x9LS4OLwE6aV7Sysmgn
-        ZURbXQfkNkfTlwWGBsVFQ72aUSTmhQkTog==
-X-Google-Smtp-Source: APXvYqziN1QMo38n+tDNuOyYGcrDVuVJpxys7+4CoQrKQ9kAsgbv5CYuv9TZm1KtmD6GypM0G6mH4w==
-X-Received: by 2002:a17:902:8a94:: with SMTP id p20mr8325453plo.312.1562898516530;
-        Thu, 11 Jul 2019 19:28:36 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=4Shs1mPjCZ9q2Cf9BC1SlIhJhmVvlv0+gzbQGhV8nv4=;
+        b=Gci8ZBBYe+iWxKvaGLrUKLQhe9scq2Yq1PFwqfJIRZShtOqiJiZLFibetNwDDFi3OR
+         7u73wCTdQP+1kdEHptrBn+CRRCDXZnwMPpTInediebbZPm03sCMMn3O+3Mw0hiWVlb0R
+         6E0PmlQdQpGxrq5unZwMkjVgcv/0T4eJGfNVZgdUw5CgI+/DPFXEHpBE4TRrWfbR9PAK
+         5wOHqMQX+8E1dw6rQ7iYfB9NRbnyNMalv5myiy4i9BXElu6EsEIhEldmEleIkcq8v0ju
+         F2pHP/tGrc89T07ONGysrwUN27I/Q3YWeJbhdjFpyzK3WVu1pkROsccKFtUceGkaNQ1w
+         /pOw==
+X-Gm-Message-State: APjAAAV3RyGlaR6mQSo8GL4yTHKzQTPr63esQ5+ZKqQAaYAqDLbr9q7h
+        P+fmlISnWiH/89X8yEIbJhQPwBZMF+EtQA==
+X-Google-Smtp-Source: APXvYqwhA4da0Y/lhyRt4NCloh5qj6TBSTxTIpUqG9pc2JP32ljyo5Q4NDS6hKe1Zbb85KlCL0/0qw==
+X-Received: by 2002:a17:902:2be6:: with SMTP id l93mr8488822plb.0.1562898519799;
+        Thu, 11 Jul 2019 19:28:39 -0700 (PDT)
 Received: from xz-x1.redhat.com ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id f15sm7389259pje.17.2019.07.11.19.28.33
+        by smtp.gmail.com with ESMTPSA id f15sm7389259pje.17.2019.07.11.19.28.36
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 11 Jul 2019 19:28:35 -0700 (PDT)
+        Thu, 11 Jul 2019 19:28:39 -0700 (PDT)
 From:   Peter Xu <zhexu@redhat.com>
 X-Google-Original-From: Peter Xu <peterx@redhat.com>
 To:     kvm@vger.kernel.org
@@ -41,10 +41,12 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Luiz Capitulino <lcapitulino@redhat.com>, peterx@redhat.com,
         Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [kvm-unit-tests PATCH v2 0/3] tscdeadline_latency: Some fixes of hangs
-Date:   Fri, 12 Jul 2019 10:28:22 +0800
-Message-Id: <20190712022825.1366-1-peterx@redhat.com>
+Subject: [kvm-unit-tests PATCH v2 1/3] tscdeadline_latency: Check condition first before loop
+Date:   Fri, 12 Jul 2019 10:28:23 +0800
+Message-Id: <20190712022825.1366-2-peterx@redhat.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190712022825.1366-1-peterx@redhat.com>
+References: <20190712022825.1366-1-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
@@ -52,21 +54,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The previous version only contain patch 1 but when at it I noticed
-more ways to hang it... so let's fix them all up...
+This patch fixes a tscdeadline_latency hang when specifying a very
+small breakmax value.  It's easily reproduced on my host when set
+breakmax to e.g. 10 TSC clocks.
 
-v2:
-- use safe_halt() as suggested [Sean]
-- added two more patches
+The problem is test_tsc_deadline_timer() can be very slow because
+we've got printf() in there.  So when reach the main loop we might
+have already triggered the IRQ handler for multiple times and we might
+have triggered the hitmax condition which will turn IRQ off.  Then
+with no IRQ that first HLT instruction can last forever.
 
-Peter Xu (3):
-  tscdeadline_latency: Check condition first before loop
-  tscdeadline_latency: Limit size
-  tscdeadline_latency: Stop timer when reach max loop
+Fix this by don't enable irq and use safe_halt() as suggested by Sean
+Christopherson.
 
- x86/tscdeadline_latency.c | 27 +++++++++++++++++----------
- 1 file changed, 17 insertions(+), 10 deletions(-)
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ x86/tscdeadline_latency.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
+diff --git a/x86/tscdeadline_latency.c b/x86/tscdeadline_latency.c
+index 0617a1b..3ad2950 100644
+--- a/x86/tscdeadline_latency.c
++++ b/x86/tscdeadline_latency.c
+@@ -70,8 +70,6 @@ static void tsc_deadline_timer_isr(isr_regs_t *regs)
+ static void start_tsc_deadline_timer(void)
+ {
+     handle_irq(TSC_DEADLINE_TIMER_VECTOR, tsc_deadline_timer_isr);
+-    irq_enable();
+-
+     wrmsr(MSR_IA32_TSCDEADLINE, rdmsr(MSR_IA32_TSC)+delta);
+     asm volatile ("nop");
+ }
+@@ -116,10 +114,9 @@ int main(int argc, char **argv)
+     breakmax = argc <= 3 ? 0 : atol(argv[3]);
+     printf("breakmax=%d\n", breakmax);
+     test_tsc_deadline_timer();
+-    irq_enable();
+ 
+     do {
+-        asm volatile("hlt");
++        safe_halt();
+     } while (!hitmax && table_idx < size);
+ 
+     for (i = 0; i < table_idx; i++) {
 -- 
 2.21.0
 
