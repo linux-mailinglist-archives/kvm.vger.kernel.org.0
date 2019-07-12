@@ -2,115 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D676967173
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 16:33:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 39E8567175
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2019 16:33:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727505AbfGLOdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Jul 2019 10:33:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42506 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727538AbfGLOdB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Jul 2019 10:33:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 672F34E908;
-        Fri, 12 Jul 2019 14:33:00 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.36.118.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E7EA608C2;
-        Fri, 12 Jul 2019 14:32:57 +0000 (UTC)
-From:   Juan Quintela <quintela@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Laurent Vivier <lvivier@redhat.com>,
-        Richard Henderson <rth@twiddle.net>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Peng Tao <tao.peng@linux.alibaba.com>,
-        Yury Kotov <yury-kotov@yandex-team.ru>,
-        Jiangshan Lai <laijs@hyper.sh>, Xu Wang <xu@hyper.sh>
-Subject: [PULL 19/19] migration: allow private destination ram with x-ignore-shared
-Date:   Fri, 12 Jul 2019 16:32:07 +0200
-Message-Id: <20190712143207.4214-20-quintela@redhat.com>
-In-Reply-To: <20190712143207.4214-1-quintela@redhat.com>
-References: <20190712143207.4214-1-quintela@redhat.com>
+        id S1727512AbfGLOdN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Jul 2019 10:33:13 -0400
+Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21951 "EHLO
+        sender4-of-o59.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727253AbfGLOdN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Jul 2019 10:33:13 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1562941982; cv=none; 
+        d=zoho.com; s=zohoarc; 
+        b=H56kezIrRS0z7qNZzWUukuSsMYploqnWyyw1oXQqTW6stIBqcbNsADbXzPLAw1QorEnxOhUxGXLuFfHlLhoPUVLC97Dz3qDBGZxcUGyIyEfxmqFKnOonpLlmGBJ/xb/o9n+487SqoBRCRZNo/fm4OKX94kBgcQeVmdNeBPHQ8go=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com; s=zohoarc; 
+        t=1562941982; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results; 
+        bh=MhM5avbUwvAWT/wgrBEnTu/0s235pwoC69x2lKbbnfk=; 
+        b=Z1Vf1i5Gp7rQveYlkin6BNHkS/m5/5AZJ8/qW0/V7x9i7XBz3j2WEdHAjo1CJCP3VAMM7XuSNEfdovDTZHVOhsMr1IxIR/vwezUj6e0VPCnvYmBYH/1n6zzDV1/aUQP+HPCqoMP/cgDyN6fWaZh/RBnnROUsSUXsgyjnFFBt9UI=
+ARC-Authentication-Results: i=1; mx.zoho.com;
+        dkim=pass  header.i=patchew.org;
+        spf=pass  smtp.mailfrom=no-reply@patchew.org;
+        dmarc=pass header.from=<no-reply@patchew.org> header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by mx.zohomail.com
+        with SMTPS id 1562941981285341.95373745103177; Fri, 12 Jul 2019 07:33:01 -0700 (PDT)
+Message-ID: <156294197990.12463.16232422939322749551@c4a48874b076>
+Subject: Re: [Qemu-devel] [PULL 00/19] Migration patches
+In-Reply-To: <20190711104412.31233-1-quintela@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Fri, 12 Jul 2019 14:33:00 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From:   no-reply@patchew.org
+To:     quintela@redhat.com
+Cc:     qemu-devel@nongnu.org, lvivier@redhat.com, thuth@redhat.com,
+        kvm@vger.kernel.org, quintela@redhat.com, dgilbert@redhat.com,
+        pbonzini@redhat.com, rth@twiddle.net
+Date:   Fri, 12 Jul 2019 07:33:01 -0700 (PDT)
+X-ZohoMailClient: External
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Peng Tao <tao.peng@linux.alibaba.com>
-
-By removing the share ram check, qemu is able to migrate
-to private destination ram when x-ignore-shared capability
-is on. Then we can create multiple destination VMs based
-on the same source VM.
-
-This changes the x-ignore-shared migration capability to
-work similar to Lai's original bypass-shared-memory
-work(https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg00003.html)
-which enables kata containers (https://katacontainers.io)
-to implement the VM templating feature.
-
-An example usage in kata containers(https://katacontainers.io):
-1. Start the source VM:
-   qemu-system-x86 -m 2G \
-     -object memory-backend-file,id=mem0,size=2G,share=on,mem-path=/tmpfs/template-memory \
-     -numa node,memdev=mem0
-2. Stop the template VM, set migration x-ignore-shared capability,
-   migrate "exec:cat>/tmpfs/state", quit it
-3. Start target VM:
-   qemu-system-x86 -m 2G \
-     -object memory-backend-file,id=mem0,size=2G,share=off,mem-path=/tmpfs/template-memory \
-     -numa node,memdev=mem0 \
-     -incoming defer
-4. connect to target VM qmp, set migration x-ignore-shared capability,
-migrate_incoming "exec:cat /tmpfs/state"
-5. create more target VMs repeating 3 and 4
-
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Yury Kotov <yury-kotov@yandex-team.ru>
-Cc: Jiangshan Lai <laijs@hyper.sh>
-Cc: Xu Wang <xu@hyper.sh>
-Signed-off-by: Peng Tao <tao.peng@linux.alibaba.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <1560494113-1141-1-git-send-email-tao.peng@linux.alibaba.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/ram.c | 7 -------
- 1 file changed, 7 deletions(-)
-
-diff --git a/migration/ram.c b/migration/ram.c
-index 8a6ad61d3d..8622b4dc49 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -3426,7 +3426,6 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
-         }
-         if (migrate_ignore_shared()) {
-             qemu_put_be64(f, block->mr->addr);
--            qemu_put_byte(f, ramblock_is_ignored(block) ? 1 : 0);
-         }
-     }
- 
-@@ -4393,12 +4392,6 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-                     }
-                     if (migrate_ignore_shared()) {
-                         hwaddr addr = qemu_get_be64(f);
--                        bool ignored = qemu_get_byte(f);
--                        if (ignored != ramblock_is_ignored(block)) {
--                            error_report("RAM block %s should %s be migrated",
--                                         id, ignored ? "" : "not");
--                            ret = -EINVAL;
--                        }
-                         if (ramblock_is_ignored(block) &&
-                             block->mr->addr != addr) {
-                             error_report("Mismatched GPAs for block %s "
--- 
-2.21.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcxMTEwNDQxMi4zMTIz
+My0xLXF1aW50ZWxhQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKCk1lc3NhZ2UtaWQ6IDIwMTkwNzExMTA0NDEyLjMxMjMzLTEtcXVpbnRlbGFA
+cmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzE5
+XSBNaWdyYXRpb24gcGF0Y2hlcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
+aApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBU
+cnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRz
+L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
+ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMjA5YzI4NCBtaWdyYXRpb246IGFsbG93
+IHByaXZhdGUgZGVzdGluYXRpb24gcmFtIHdpdGggeC1pZ25vcmUtc2hhcmVkCmMwMDhkZTMgbWln
+cmF0aW9uOiBTcGxpdCBsb2dfY2xlYXIoKSBpbnRvIHNtYWxsZXIgY2h1bmtzCjFiOThiOTYga3Zt
+OiBTdXBwb3J0IEtWTV9DTEVBUl9ESVJUWV9MT0cKNjg1MGMzNCBrdm06IEludHJvZHVjZSBzbG90
+cyBsb2NrIGZvciBtZW1vcnkgbGlzdGVuZXIKNzg3YTNlOSBrdm06IFBlcnNpc3RlbnQgcGVyIGt2
+bXNsb3QgZGlydHkgYml0bWFwCjE4ZmI2MzEga3ZtOiBVcGRhdGUgY29tbWVudHMgZm9yIHN5bmNf
+ZGlydHlfYml0bWFwCjg2ZDk1ZTYgbWVtb3J5OiBJbnRyb2R1Y2UgbWVtb3J5IGxpc3RlbmVyIGhv
+b2sgbG9nX2NsZWFyKCkKZDEwNjNmMSBtZW1vcnk6IFBhc3MgbXIgaW50byBzbmFwc2hvdF9hbmRf
+Y2xlYXJfZGlydHkKM2ZhZmJkYSBiaXRtYXA6IEFkZCBiaXRtYXBfY29weV93aXRoX3tzcmN8ZHN0
+fV9vZmZzZXQoKQo3OGM2NDNmIG1lbW9yeTogRG9uJ3Qgc2V0IG1pZ3JhdGlvbiBiaXRtYXAgd2hl
+biB3aXRob3V0IG1pZ3JhdGlvbgpjNWJhYzZkIG1pZ3JhdGlvbjogTm8gbmVlZCB0byB0YWtlIHJj
+dSBkdXJpbmcgc3luY19kaXJ0eV9iaXRtYXAKZWE0NDVlMiBtaWdyYXRpb2luL3JhbS5jOiByZXNl
+dCBjb21wbGV0ZV9yb3VuZCB3aGVuIHdlIGdldHMgYSBxdWV1ZWQgcGFnZQplOGU1ZTkxIG1pZ3Jh
+dGlvbi9tdWx0aWZkOiBzeW5jIHBhY2tldF9udW0gYWZ0ZXIgYWxsIHRocmVhZCBhcmUgZG9uZQpl
+NWM2MmJhIGN1dGlsczogcmVtb3ZlIG9uZSB1bm5lY2Vzc2FyeSBwb2ludGVyIG9wZXJhdGlvbgo1
+OTE0YzgzIG1pZ3JhdGlvbi94YnpybGU6IHVwZGF0ZSBjYWNoZSBhbmQgY3VycmVudF9kYXRhIGlu
+IG9uZSBwbGFjZQo0MDQ2NTZhIG1pZ3JhdGlvbi9tdWx0aWZkOiBjYWxsIG11bHRpZmRfc2VuZF9z
+eW5jX21haW4gd2hlbiBzZW5kaW5nIFJBTV9TQVZFX0ZMQUdfRU9TCmZkNTIyZjYgbWlncmF0aW9u
+LXRlc3Q6IEFkZCBtaWdyYXRpb24gbXVsdGlmZCB0ZXN0CjQxMGE0MmIgbWlncmF0aW9uLXRlc3Q6
+IHJlbmFtZSBwYXJhbWV0ZXIgdG8gcGFyYW1ldGVyX2ludApjNGM5MjFhIG1pZ3JhdGlvbjogZml4
+IG11bHRpZmRfcmVjdiBldmVudCB0eXBvCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzE5IENoZWNr
+aW5nIGNvbW1pdCBjNGM5MjFhZTQzOGQgKG1pZ3JhdGlvbjogZml4IG11bHRpZmRfcmVjdiBldmVu
+dCB0eXBvKQoyLzE5IENoZWNraW5nIGNvbW1pdCA0MTBhNDJiMDc3OWYgKG1pZ3JhdGlvbi10ZXN0
+OiByZW5hbWUgcGFyYW1ldGVyIHRvIHBhcmFtZXRlcl9pbnQpCjMvMTkgQ2hlY2tpbmcgY29tbWl0
+IGZkNTIyZjYyMmJmNyAobWlncmF0aW9uLXRlc3Q6IEFkZCBtaWdyYXRpb24gbXVsdGlmZCB0ZXN0
+KQo0LzE5IENoZWNraW5nIGNvbW1pdCA0MDQ2NTZhMmIwMjkgKG1pZ3JhdGlvbi9tdWx0aWZkOiBj
+YWxsIG11bHRpZmRfc2VuZF9zeW5jX21haW4gd2hlbiBzZW5kaW5nIFJBTV9TQVZFX0ZMQUdfRU9T
+KQo1LzE5IENoZWNraW5nIGNvbW1pdCA1OTE0YzgzNTI3MGMgKG1pZ3JhdGlvbi94YnpybGU6IHVw
+ZGF0ZSBjYWNoZSBhbmQgY3VycmVudF9kYXRhIGluIG9uZSBwbGFjZSkKNi8xOSBDaGVja2luZyBj
+b21taXQgZTVjNjJiYTg5ZDYwIChjdXRpbHM6IHJlbW92ZSBvbmUgdW5uZWNlc3NhcnkgcG9pbnRl
+ciBvcGVyYXRpb24pCjcvMTkgQ2hlY2tpbmcgY29tbWl0IGU4ZTVlOTE2MjZkMiAobWlncmF0aW9u
+L211bHRpZmQ6IHN5bmMgcGFja2V0X251bSBhZnRlciBhbGwgdGhyZWFkIGFyZSBkb25lKQo4LzE5
+IENoZWNraW5nIGNvbW1pdCBlYTQ0NWUyNTMzNjQgKG1pZ3JhdGlvaW4vcmFtLmM6IHJlc2V0IGNv
+bXBsZXRlX3JvdW5kIHdoZW4gd2UgZ2V0cyBhIHF1ZXVlZCBwYWdlKQo5LzE5IENoZWNraW5nIGNv
+bW1pdCBjNWJhYzZkZWIzNjMgKG1pZ3JhdGlvbjogTm8gbmVlZCB0byB0YWtlIHJjdSBkdXJpbmcg
+c3luY19kaXJ0eV9iaXRtYXApCjEwLzE5IENoZWNraW5nIGNvbW1pdCA3OGM2NDNmOGM3ODUgKG1l
+bW9yeTogRG9uJ3Qgc2V0IG1pZ3JhdGlvbiBiaXRtYXAgd2hlbiB3aXRob3V0IG1pZ3JhdGlvbikK
+MTEvMTkgQ2hlY2tpbmcgY29tbWl0IDNmYWZiZGE1YWZhNSAoYml0bWFwOiBBZGQgYml0bWFwX2Nv
+cHlfd2l0aF97c3JjfGRzdH1fb2Zmc2V0KCkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxl
+dGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzY3OiAKbmV3IGZp
+bGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTkzIGxpbmVzIGNo
+ZWNrZWQKClBhdGNoIDExLzE5IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEyLzE5IENoZWNr
+aW5nIGNvbW1pdCBkMTA2M2YxNDYxZTIgKG1lbW9yeTogUGFzcyBtciBpbnRvIHNuYXBzaG90X2Fu
+ZF9jbGVhcl9kaXJ0eSkKMTMvMTkgQ2hlY2tpbmcgY29tbWl0IDg2ZDk1ZTZjZTAwMCAobWVtb3J5
+OiBJbnRyb2R1Y2UgbWVtb3J5IGxpc3RlbmVyIGhvb2sgbG9nX2NsZWFyKCkpCjE0LzE5IENoZWNr
+aW5nIGNvbW1pdCAxOGZiNjMxMzgyOTUgKGt2bTogVXBkYXRlIGNvbW1lbnRzIGZvciBzeW5jX2Rp
+cnR5X2JpdG1hcCkKMTUvMTkgQ2hlY2tpbmcgY29tbWl0IDc4N2EzZTkxZGJlNyAoa3ZtOiBQZXJz
+aXN0ZW50IHBlciBrdm1zbG90IGRpcnR5IGJpdG1hcCkKMTYvMTkgQ2hlY2tpbmcgY29tbWl0IDY4
+NTBjMzQ5NTgwMiAoa3ZtOiBJbnRyb2R1Y2Ugc2xvdHMgbG9jayBmb3IgbWVtb3J5IGxpc3RlbmVy
+KQoxNy8xOSBDaGVja2luZyBjb21taXQgMWI5OGI5NjZlYzMxIChrdm06IFN1cHBvcnQgS1ZNX0NM
+RUFSX0RJUlRZX0xPRykKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIwMTogRklM
+RTogYWNjZWwva3ZtL2t2bS1hbGwuYzoxMDU0OgorICAgIEtWTU1lbW9yeUxpc3RlbmVyICprbWwg
+PSBjb250YWluZXJfb2YobGlzdGVuZXIsIEtWTU1lbW9yeUxpc3RlbmVyLCBsaXN0ZW5lcik7Cgp0
+b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDIxNyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNy8x
+OSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxOC8xOSBDaGVja2luZyBjb21taXQgYzAwOGRl
+MzUxM2FjIChtaWdyYXRpb246IFNwbGl0IGxvZ19jbGVhcigpIGludG8gc21hbGxlciBjaHVua3Mp
+CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5F
+UlMgbmVlZCB1cGRhdGluZz8KIzM4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiB0cmFp
+bGluZyB3aGl0ZXNwYWNlCiM0ODogRklMRTogaW5jbHVkZS9leGVjL21lbW9yeS5oLnJlajo2Ogor
+ICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM2NzA6IEZJTEU6IG1lbW9yeS5jLnJlajo2
+OgorICQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM1NzY1OiBGSUxFOiBtaWdyYXRpb24v
+cmFtLmMucmVqOjQ6CisgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzU3NzI6IEZJTEU6
+IG1pZ3JhdGlvbi9yYW0uYy5yZWo6MTE6CisgJAoKdG90YWw6IDQgZXJyb3JzLCAxIHdhcm5pbmdz
+LCA2MDAwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE4LzE5IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCgoxOS8xOSBDaGVja2luZyBjb21taXQgMjA5YzI4NDVkYjk1IChtaWdyYXRpb246IGFsbG93
+IHByaXZhdGUgZGVzdGluYXRpb24gcmFtIHdpdGggeC1pZ25vcmUtc2hhcmVkKQo9PT0gT1VUUFVU
+IEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9n
+IGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDcxMTEwNDQxMi4z
+MTIzMy0xLXF1aW50ZWxhQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3Nh
+Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczov
+L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
+bEByZWRoYXQuY29t
 
