@@ -2,50 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FB81679B7
-	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2019 12:37:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17BF267A6D
+	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2019 16:23:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727538AbfGMKhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 13 Jul 2019 06:37:55 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:36372 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727489AbfGMKhy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 13 Jul 2019 06:37:54 -0400
-Received: by mail-wr1-f67.google.com with SMTP id n4so12356619wrs.3
-        for <kvm@vger.kernel.org>; Sat, 13 Jul 2019 03:37:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=RIERtSWLuUXYtMroEl+mS0+iuLoYEFR1Z90hq7V+lMw=;
-        b=O786nEPnfrdRzm157+fvHuts5cr9a3ZlgnxOFz7oOpPZAITwHpmsxjSeze2kvcDeDq
-         gUX1S3PpEUT2mvGoo0cCcwwEc7Y/6jiI3s5RJoZ3QBex4Uq+RE5Z+y5MLXaFgvQXSWep
-         uBKL2xOXmi6NVsT+jhgijT6ybzMG+jfYJCxTIwqpqGfWxIg/JPjVuDqbQ634qD7cF4RE
-         n9rqlntgOAL5VfooD8TorfMXd34j69Dws6jRCRkGiCnk1GHzjEGb3rKAj+LeUp31VTZi
-         iJJc1az9dWcElKY58aG/75FLS8aTVKQGxG15ilOU9xdhNsYITwbOMsfyLEFsTAinvCNM
-         t/gQ==
-X-Gm-Message-State: APjAAAUvyI41nfnuxiM9ATM1CkbhyROqjk+R4YWc+phZOtXYaBWN0D2y
-        tjnL/ZwFx8QULBHiPphU2YnpLXc/rEY=
-X-Google-Smtp-Source: APXvYqwu8+C8A/lDArwKIf94RhR02N1s5AVEtyGqiXPcTEQ7+mjaL0gQcpS8sfYAIu9u8uHS3EzxEQ==
-X-Received: by 2002:adf:ba85:: with SMTP id p5mr17109473wrg.146.1563014272538;
-        Sat, 13 Jul 2019 03:37:52 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c1b9:e491:30e8:c02? ([2001:b07:6468:f312:c1b9:e491:30e8:c02])
-        by smtp.gmail.com with ESMTPSA id e6sm11836504wrw.23.2019.07.13.03.37.50
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Sat, 13 Jul 2019 03:37:51 -0700 (PDT)
-Subject: Re: [PATCH v1] KVM: x86: expose AVX512_BF16 feature to guest
-To:     Jing Liu <jing2.liu@linux.intel.com>, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org
-References: <1562824197-13658-1-git-send-email-jing2.liu@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <305e2a40-93a3-23ed-71a2-d3f2541e837a@redhat.com>
-Date:   Sat, 13 Jul 2019 12:37:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+        id S1727706AbfGMOXD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 13 Jul 2019 10:23:03 -0400
+Received: from mga11.intel.com ([192.55.52.93]:20899 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727504AbfGMOXD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 13 Jul 2019 10:23:03 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Jul 2019 07:23:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,486,1557212400"; 
+   d="scan'208";a="174701302"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.255.30.205]) ([10.255.30.205])
+  by FMSMGA003.fm.intel.com with ESMTP; 13 Jul 2019 07:23:00 -0700
+Subject: Re: [PATCH v7 3/3] KVM: vmx: handle vm-exit for UMWAIT and TPAUSE
+To:     Sean Christopherson <sean.j.christopherson@intel.com>
+Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        fenghua.yu@intel.com, xiaoyao.li@linux.intel.com,
+        jingqi.liu@intel.com
+References: <20190712082907.29137-1-tao3.xu@intel.com>
+ <20190712082907.29137-4-tao3.xu@intel.com>
+ <20190712160352.GD29659@linux.intel.com>
+From:   Tao Xu <tao3.xu@intel.com>
+Message-ID: <babf6abf-3e03-1e33-8dd9-ee847957be6f@intel.com>
+Date:   Sat, 13 Jul 2019 22:22:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <1562824197-13658-1-git-send-email-jing2.liu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190712160352.GD29659@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -53,59 +45,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/07/19 07:49, Jing Liu wrote:
-> AVX512 BFLOAT16 instructions support 16-bit BFLOAT16 floating-point
-> format (BF16) for deep learning optimization.
+On 7/13/2019 12:03 AM, Sean Christopherson wrote:
+> On Fri, Jul 12, 2019 at 04:29:07PM +0800, Tao Xu wrote:
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -5213,6 +5213,9 @@ bool nested_vmx_exit_reflected(struct kvm_vcpu *vcpu, u32 exit_reason)
+>>   	case EXIT_REASON_ENCLS:
+>>   		/* SGX is never exposed to L1 */
+>>   		return false;
+>> +	case EXIT_REASON_UMWAIT: case EXIT_REASON_TPAUSE:
 > 
-> Intel adds AVX512 BFLOAT16 feature in CooperLake, which is CPUID.7.1.EAX[5].
+> Grouped case statements are usually stacked vertically, e.g.:
 > 
-> Detailed information of the CPUID bit can be found here,
-> https://software.intel.com/sites/default/files/managed/c5/15/\
-> architecture-instruction-set-extensions-programming-reference.pdf.
-> 
-> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
-> ---
-> 
-> This patch depends on kernel patch https://lkml.org/lkml/2019/6/19/912
-> and Paolo's patch set https://lkml.org/lkml/2019/7/4/468.
-> 
->  arch/x86/kvm/cpuid.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 8fc6039..0c125dd 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -358,9 +358,13 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
->  		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
->  		F(MD_CLEAR);
->  
-> +	/* cpuid 7.1.eax */
-> +	const u32 kvm_cpuid_7_1_eax_x86_features =
-> +		F(AVX512_BF16);
-> +
->  	switch (index) {
->  	case 0:
-> -		entry->eax = 0;
-> +		entry->eax = min(entry->eax, 1);
->  		entry->ebx &= kvm_cpuid_7_0_ebx_x86_features;
->  		cpuid_mask(&entry->ebx, CPUID_7_0_EBX);
->  		/* TSC_ADJUST is emulated */
-> @@ -384,6 +388,12 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
->  		 */
->  		entry->edx |= F(ARCH_CAPABILITIES);
->  		break;
-> +	case 1:
-> +		entry->eax &= kvm_cpuid_7_1_eax_x86_features;
-> +		entry->ebx = 0;
-> +		entry->ecx = 0;
-> +		entry->edx = 0;
-> +		break;
->  	default:
->  		WARN_ON_ONCE(1);
->  		entry->eax = 0;
-> 
+> 	case EXIT_REASON_UMWAIT:
+> 	case EXIT_REASON_TPAUSE:
+>Ok, thank you for your suggestion.
 
-Queued, thanks.
+>> +		return nested_cpu_has2(vmcs12,
+>> +			SECONDARY_EXEC_ENABLE_USR_WAIT_PAUSE);
+>>   	default:
+>>   		return true;
+>>   	}
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 0787f140d155..e026b1313dc3 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -5349,6 +5349,20 @@ static int handle_monitor(struct kvm_vcpu *vcpu)
+>>   	return handle_nop(vcpu);
+>>   }
+>>   
+>> +static int handle_umwait(struct kvm_vcpu *vcpu)
+>> +{
+>> +	kvm_skip_emulated_instruction(vcpu);
+>> +	WARN(1, "this should never happen\n");
+> 
+> Blech.  I'm guessing this code was copy-pasted from handle_xsaves() and
+> handle_xrstors().  The blurb of "this should never happen" isn't very
+> helpful, e.g. the WARN itself makes it pretty obvious that we don't expect
+> to reach this point.  WARN_ONCE would also be preferable, no need to spam
+> the log in the event things go completely haywire.
+> 
+> Rather than propagate ugly code, what about defining a common helper, e.g.
+> 
+> static int handle_unexpected_vmexit(struct kvm_vcpu *vcpu)
+> {
+> 	kvm_skip_emulated_instruction(vcpu);
+> 	WARN_ONCE(1, "Unexpected VM-Exit = 0x%x", vmcs_read32(VM_EXIT_REASON));
+> 	return 1;
+> }
+> 
+> ...
+> {
+> 	[EXIT_REASON_XSAVES]                  = handle_unexpected_vmexit,
+> 	[EXIT_REASON_XRSTORS]                 = handle_unexpected_vmexit,
+> 
+> 	[EXIT_REASON_UMWAIT]                  = handle_unexpected_vmexit,
+> 	[EXIT_REASON_TPAUSE]                  = handle_unexpected_vmexit,
+> 
+> }
+> 
+Thank you Sean, I will do this in next version of patch.
 
-Paolo
+>> +	return 1;
+>> +}
+>> +
+>> +static int handle_tpause(struct kvm_vcpu *vcpu)
+>> +{
+>> +	kvm_skip_emulated_instruction(vcpu);
+>> +	WARN(1, "this should never happen\n");
+>> +	return 1;
+>> +}
+>> +
+>>   static int handle_invpcid(struct kvm_vcpu *vcpu)
+>>   {
+>>   	u32 vmx_instruction_info;
+>> @@ -5559,6 +5573,8 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+>>   	[EXIT_REASON_VMFUNC]		      = handle_vmx_instruction,
+>>   	[EXIT_REASON_PREEMPTION_TIMER]	      = handle_preemption_timer,
+>>   	[EXIT_REASON_ENCLS]		      = handle_encls,
+>> +	[EXIT_REASON_UMWAIT]                  = handle_umwait,
+>> +	[EXIT_REASON_TPAUSE]                  = handle_tpause,
+>>   };
+>>   
+>>   static const int kvm_vmx_max_exit_handlers =
+>> -- 
+>> 2.20.1
+>>
+
