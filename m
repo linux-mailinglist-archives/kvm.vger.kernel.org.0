@@ -2,97 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 60D6D67F8A
-	for <lists+kvm@lfdr.de>; Sun, 14 Jul 2019 17:08:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C88D67FC2
+	for <lists+kvm@lfdr.de>; Sun, 14 Jul 2019 17:21:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728562AbfGNPGa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 Jul 2019 11:06:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56566 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728396AbfGNPG3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 14 Jul 2019 11:06:29 -0400
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 45C612183E
-        for <kvm@vger.kernel.org>; Sun, 14 Jul 2019 15:06:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563116788;
-        bh=9v0TSmLCn8TjvoXn1mqXdhjjoJsiEcxlv4LvLVZbR0I=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=v0TmOJxy83Vs7zwskqPZknhJBHliByWQ9slt88eUlJmFucrdhem7QgBNJjIHsEncL
-         7r1MjLILZtAzjraM7v/6sOCnRImcX93hQrOaGfUCyDDn0RQY7log3hDh3/ibKrYXJj
-         SPkMGaiBSRrNaF/5iAD/xywYdZdj9CsvNJiGqkvg=
-Received: by mail-wm1-f52.google.com with SMTP id g67so8673576wme.1
-        for <kvm@vger.kernel.org>; Sun, 14 Jul 2019 08:06:28 -0700 (PDT)
-X-Gm-Message-State: APjAAAWzsBCzG7S/NHOMVcLQqmuVk1+O7BnBeGQq7ZTd8cOThHobnWGO
-        TVTbE5cmQZZ8R2tk6Gvmpy3ORgtzrTtB/XcLMIH8ZQ==
-X-Google-Smtp-Source: APXvYqxduSTS2xAezjNhiFs/zv4vEOdtjl3od0VTpH2E1vVYA88Q+UFag4kZUKep/WXl0oYayxVpidWQx6QWYEWJtLo=
-X-Received: by 2002:a1c:9a53:: with SMTP id c80mr18654369wme.173.1563116786554;
- Sun, 14 Jul 2019 08:06:26 -0700 (PDT)
+        id S1728346AbfGNPVJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 Jul 2019 11:21:09 -0400
+Received: from out4437.biz.mail.alibaba.com ([47.88.44.37]:40350 "EHLO
+        out4437.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726403AbfGNPVJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 14 Jul 2019 11:21:09 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=alex.shi@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0TWrpoRa_1563117663;
+Received: from IT-FVFX43SYHV2H.lan(mailfrom:alex.shi@linux.alibaba.com fp:SMTPD_---0TWrpoRa_1563117663)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Sun, 14 Jul 2019 23:21:03 +0800
+Subject: Re: [PATCH 01/12] Documentation: move architectures together
+To:     Jonathan Corbet <corbet@lwn.net>
+Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-omap@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org, linux-ia64@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-sh@vger.kernel.org
+References: <20190712022018.27989-1-alex.shi@linux.alibaba.com>
+ <20190712113427.62fa7ffc@lwn.net>
+From:   Alex Shi <alex.shi@linux.alibaba.com>
+Message-ID: <36c522c5-975e-e38e-daad-0f3d9f93b186@linux.alibaba.com>
+Date:   Sun, 14 Jul 2019 23:21:03 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.7.2
 MIME-Version: 1.0
-References: <1562855138-19507-1-git-send-email-alexandre.chartre@oracle.com>
- <5cab2a0e-1034-8748-fcbe-a17cf4fa2cd4@intel.com> <alpine.DEB.2.21.1907120911160.11639@nanos.tec.linutronix.de>
- <61d5851e-a8bf-e25c-e673-b71c8b83042c@oracle.com> <20190712125059.GP3419@hirez.programming.kicks-ass.net>
- <alpine.DEB.2.21.1907121459180.1788@nanos.tec.linutronix.de>
- <3ca70237-bf8e-57d9-bed5-bc2329d17177@oracle.com> <20190712190620.GX3419@hirez.programming.kicks-ass.net>
-In-Reply-To: <20190712190620.GX3419@hirez.programming.kicks-ass.net>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Sun, 14 Jul 2019 08:06:12 -0700
-X-Gmail-Original-Message-ID: <CALCETrWcnJhtUsJ2nrwAqqgdbRrZG6FNLKY_T-WTETL6-B-C1g@mail.gmail.com>
-Message-ID: <CALCETrWcnJhtUsJ2nrwAqqgdbRrZG6FNLKY_T-WTETL6-B-C1g@mail.gmail.com>
-Subject: Re: [RFC v2 00/27] Kernel Address Space Isolation
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Alexandre Chartre <alexandre.chartre@oracle.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Radim Krcmar <rkrcmar@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andrew Lutomirski <luto@kernel.org>,
-        kvm list <kvm@vger.kernel.org>, X86 ML <x86@kernel.org>,
-        Linux-MM <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        jan.setjeeilers@oracle.com, Liran Alon <liran.alon@oracle.com>,
-        Jonathan Adams <jwadams@google.com>,
-        Alexander Graf <graf@amazon.de>,
-        Mike Rapoport <rppt@linux.vnet.ibm.com>,
-        Paul Turner <pjt@google.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190712113427.62fa7ffc@lwn.net>
+Content-Type: text/plain; charset=gbk
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 12, 2019 at 12:06 PM Peter Zijlstra <peterz@infradead.org> wrote:
->
-> On Fri, Jul 12, 2019 at 06:37:47PM +0200, Alexandre Chartre wrote:
-> > On 7/12/19 5:16 PM, Thomas Gleixner wrote:
->
-> > > Right. If we decide to expose more parts of the kernel mappings then that's
-> > > just adding more stuff to the existing user (PTI) map mechanics.
-> >
-> > If we expose more parts of the kernel mapping by adding them to the existing
-> > user (PTI) map, then we only control the mapping of kernel sensitive data but
-> > we don't control user mapping (with ASI, we exclude all user mappings).
-> >
-> > How would you control the mapping of userland sensitive data and exclude them
-> > from the user map? Would you have the application explicitly identify sensitive
-> > data (like Andy suggested with a /dev/xpfo device)?
->
-> To what purpose do you want to exclude userspace from the kernel
-> mapping; that is, what are you mitigating against with that?
+Hi Jon,
 
-Mutually distrusting user/guest tenants.  Imagine an attack against a
-VM hosting provider (GCE, for example).  If the overall system is
-well-designed, the host kernel won't possess secrets that are
-important to the overall hosting network.  The interesting secrets are
-in the memory of other tenants running under the same host.  So, if we
-can mostly or completely avoid mapping one tenant's memory in the
-host, we reduce the amount of valuable information that could leak via
-a speculation (or wild read) attack to another tenant.
+Thanks for quick response!
 
-The practicality of such a scheme is obviously an open question.
+ÔÚ 2019/7/13 ÉÏÎç1:34, Jonathan Corbet Ð´µÀ:
+> On Fri, 12 Jul 2019 10:20:07 +0800
+> Alex Shi <alex.shi@linux.alibaba.com> wrote:
+> 
+>> There are many different archs in Documentation/ dir, it's better to
+>> move them together in 'Documentation/arch' which follows from kernel source.
+> 
+> So this seems certain to collide badly with Mauro's RST-conversion monster
+> patch set.
+
+I don't mean that, sorry, and we can figure out if both of them are worthy to be picked up.
+
+> 
+> More to the point, though...if we are going to thrash up things this
+> badly, we want to be sure that we're doing it right so we don't end up
+> renaming everything again.  Grouping stuff into a new arch/ subdirectory
+> adds a bit of order, but it doesn't do much toward trying to organize our
+> documentation for its readers, and it doesn't help us to modernize the
+> docs and get rid of the old, useless stuff.  A quick check shows that many
+> of these files have seen no changes other than typo fixes since the
+> beginning of the Git era.
+
+Right, there is some docs which need to be update or even drop, and a reorder would be a timing to push each of arch maintainer to do something, isn't it? Anyway, reordering  documents like kernel source dir could be one of choices. :)
+
+> 
+> So, in my mind, this needs some thought.  Maybe we want a
+> Documentation/arch in the end, but I'm not convinced that we should just
+> create it and fill it with a snow shovel.  This might be a good thing to
+> discuss at the kernel summit in September.
+
+Thanks for considering, anyway, it could be a good start to get hands dirty whether the arch dir is needed. 
+
+Thanks
+Alex
