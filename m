@@ -2,79 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B95668FF9
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 16:18:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 051D969093
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 16:23:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389678AbfGOOSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 10:18:09 -0400
-Received: from mail-ot1-f45.google.com ([209.85.210.45]:34960 "EHLO
-        mail-ot1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389291AbfGOOSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:18:09 -0400
-Received: by mail-ot1-f45.google.com with SMTP id j19so17157464otq.2
-        for <kvm@vger.kernel.org>; Mon, 15 Jul 2019 07:18:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=tLWQ9uN1hSLQn5cwzga0bawG7w0phykdKc+H8Eq7ClQ=;
-        b=hJaSbIIHncdTxuDlGqZvrwmS3KOZO4+dO8qeCmVkCQJVmTXd1hJyOLZ4AkiiBxOreS
-         eruUJTzcAz+CtDZllF8I2JZG+gsy4eYHMJ5hQO7c+rsBGmTW+QuP9f0gYiJWMfXGtdwx
-         JiTfRVZR/YurlGSmYKGy9G23UiSXy4oVzRoJimM5p5H+hqTxoOSKHCJYTodri1ffj2jQ
-         DcQxfjJxDWDjDs1SpNPThEYiFcm5apyJMTu0PQVDrdcfiBqcWG8dZJKgD1/j++wESxaz
-         dJopXlyzRyYXcZKtpJPSZZcEIErvzvPlKjYEqwSrxZkNI59gfhxa9bg0107knaFWnTEx
-         MFTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=tLWQ9uN1hSLQn5cwzga0bawG7w0phykdKc+H8Eq7ClQ=;
-        b=fheuJbbvSS857dchNg9G8ML/mSmonCYAZBajNmZmC3dgLrjbK8oEJ/7u+Ca+x3w7GE
-         h4io/TzFVJKGfhv5A2qPGlrKJtEyIexQKcsonRcb2XC8UAZBD7VkkRMbxe22U36yHzrL
-         Wg7U3sJ07kUGgHuoj1theT8idj+4gom7Nl9n2xI39P/T6eHmxOHomuxTPKcwGMqP17rT
-         Y77BW8CHqwnXI2rJVmcHostYz7H/ULtjyFcF3FtWkYEV/2T1Kdsu0cBjhPBAWGm8cdkO
-         hfTvLKOzjcU8hpJdhD9z9VxTy62/fx6QFERFMPGJrh5Bk6DgS/drFzCjGlpupRZSKT2l
-         VNOQ==
-X-Gm-Message-State: APjAAAUAc9m8ZWePt36kAc2kaxHnMC4KtFo3VDkbTgVInnsbPTLWL8qM
-        Qm5Nqd9NRi0d6WNUeUidD6QkswT3uRKb6dl9qfepWg==
-X-Google-Smtp-Source: APXvYqzWTHQAEim1DQq3KGPCl3sARZsaOEU15mjTM3NwYxhYPfWqCFD1g1Dm9FgbnWQXqvGTVOdY1D4YnwwSCCecvj4=
-X-Received: by 2002:a05:6830:1653:: with SMTP id h19mr13034551otr.232.1563200288309;
- Mon, 15 Jul 2019 07:18:08 -0700 (PDT)
+        id S2390659AbfGOOWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 10:22:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52048 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390619AbfGOOWq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:22:46 -0400
+Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3FA8A2184E;
+        Mon, 15 Jul 2019 14:22:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1563200565;
+        bh=3naJwCoZa8U1fnAU2ndnwcAG/epwsikMi3505JUZVV8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=rh7AIdSwPhTm0xzmkndySVeaHA/5g85v0DBZoGwbLuoAh+0UML/B7/AkKR05oETsM
+         qjYRwBnbKBQrcpgc6DPim2bHIRJfBUPy8oPF427QTYWUW6bvUE40q2uQyITclN2bdK
+         7FK06otblGb9T7WdTooefkzlP8qMZioJ3TfgjzH8=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 079/158] vhost_net: disable zerocopy by default
+Date:   Mon, 15 Jul 2019 10:16:50 -0400
+Message-Id: <20190715141809.8445-79-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190715141809.8445-1-sashal@kernel.org>
+References: <20190715141809.8445-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <20190712143207.4214-1-quintela@redhat.com> <CAFEAcA-ydNS072OH7CyGNq2+sESgonW-8QSJdNYJq6zW-rYjUQ@mail.gmail.com>
- <CAFEAcA9ncjtGdc8CZOJBDBRtzEU8oL7YicVg5PtyiiO2O4z51w@mail.gmail.com> <20190715140441.GJ30298@redhat.com>
-In-Reply-To: <20190715140441.GJ30298@redhat.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Mon, 15 Jul 2019 15:17:57 +0100
-Message-ID: <CAFEAcA9kreC_VRddsC0WRuuCw2R3ohER0_+vaf_PeG43XPzYWw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/19] Migration patches
-To:     =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc:     Juan Quintela <quintela@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Thomas Huth <thuth@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
-        QEMU Developers <qemu-devel@nongnu.org>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 15 Jul 2019 at 15:04, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
- wrote:
->     MultiFDInit_t msg =3D {0};
->
-> should fix it.
+From: Jason Wang <jasowang@redhat.com>
 
-A minor nit, but "=3D {}" is our standard struct-zero-initializer
-so we should prefer that, I think. (I know it is not the C-spec
-recommended version but some C compilers incorrectly warn about
-"=3D {0}" whereas no compiler we care about warns about the
-gnu-extension "=3D {}".)
+[ Upstream commit 098eadce3c622c07b328d0a43dda379b38cf7c5e ]
 
-thanks
--- PMM
+Vhost_net was known to suffer from HOL[1] issues which is not easy to
+fix. Several downstream disable the feature by default. What's more,
+the datapath was split and datacopy path got the support of batching
+and XDP support recently which makes it faster than zerocopy part for
+small packets transmission.
+
+It looks to me that disable zerocopy by default is more
+appropriate. It cold be enabled by default again in the future if we
+fix the above issues.
+
+[1] https://patchwork.kernel.org/patch/3787671/
+
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/vhost/net.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index 39155d7cc894..ae704658b528 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -36,7 +36,7 @@
+ 
+ #include "vhost.h"
+ 
+-static int experimental_zcopytx = 1;
++static int experimental_zcopytx = 0;
+ module_param(experimental_zcopytx, int, 0444);
+ MODULE_PARM_DESC(experimental_zcopytx, "Enable Zero Copy TX;"
+ 		                       " 1 -Enable; 0 - Disable");
+-- 
+2.20.1
+
