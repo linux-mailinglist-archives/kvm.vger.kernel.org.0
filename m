@@ -2,112 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 1790B6820F
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 03:29:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D003F6824A
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 04:37:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728996AbfGOB2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 Jul 2019 21:28:55 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:39735 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727006AbfGOB2y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 14 Jul 2019 21:28:54 -0400
-Received: by mail-pg1-f195.google.com with SMTP id u17so6899652pgi.6;
-        Sun, 14 Jul 2019 18:28:54 -0700 (PDT)
+        id S1728982AbfGOCeE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 Jul 2019 22:34:04 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:36089 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728932AbfGOCeD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 14 Jul 2019 22:34:03 -0400
+Received: by mail-pg1-f196.google.com with SMTP id l21so6961645pgm.3
+        for <kvm@vger.kernel.org>; Sun, 14 Jul 2019 19:34:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=J0uuieNJWIEqFucVVL6HHob/1V+xJ9X3pNwzM9VDJZ0=;
-        b=i8NhfdRWTkmqEfZfCzU6oPHv7PGnVKfRg+X/b4xOt2S5SqMQ29UUIxVI2TlfpZu76f
-         vOMoGM8eRo5AZgdPp1J8r7HMj+Ge6VoyzIGyVqiLtccwhIPCJtjH3W22rdKgjWO05S1I
-         6T4XK6CF/169lYtJ41je6yOzqDUa7h/d2x5ZXm5s3J1Cimo6rI0gqMUFMdQ4A4CjH9PH
-         fD3f404sOpFSlsFAw8Zy16LwPNz0YiT6YEDkvLqggQWB4gV5G7imDyKMkEqArivlODTP
-         myfYxTKqPpkNZJPpbxYBKSW7rj7EZwTGw3oA0F6AzUBMzL6XYWKsEwYEDYUjlom36WEz
-         Ic0w==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=j1D3jAEemUPemgo3Jj5nb6GS6101sWhcpLMgfsoNq8g=;
+        b=QrISUnxCSscxlNiF2KqrOgYSELv84+I/OVPUsZDhEuEi4r7R8YUKcUPEfdayuPSfK0
+         wrQ3Q089jqbmouyR+NoH07yfRGBgepPs66CHFe5siqBvErBCrBMbICucDPWVzgWos38b
+         Wf2Rms1UOmhDfsHeziRBcVVeqhPowRnyQF6ZIirk9sqy61+7brb3XjH5WSXDOqEwMkq3
+         q0U1QstYRjrFeTUkIvslQ7dopjLzTMUk5/MTR7wo3HmTm88DIkL2jdeSCkahHTIsS0XU
+         2mC5wBJ5eaM50hskzzZTjH7Ed3Xloa++ONtGgIN+sj2f13lAUYZHfj/Zj0wydtFoffX+
+         bJXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=J0uuieNJWIEqFucVVL6HHob/1V+xJ9X3pNwzM9VDJZ0=;
-        b=epmZ7ifMZkqDnVEAACgqjajXxSJ+o7nI8qSui8svCaP3xutXRVJ6dSgSI+Lar85YP7
-         wFsIHnzyVpNXFV7Xxf34t9GrWF8dEo4ydj7PvQnqQrZgN22mfIT5Udi4u1AjB1STcB0d
-         OYyZ7/IVoksMFjDCREeirYrKy/PO3kgfYBxVZ1QilQKQ44+7DtTCF4+5fA6nJhYfCvWA
-         nyrfkozFzxSEriClLflkoCh/Zht6XhAX/SLo5TMsZPgPnIMCP1LBerCfkPAmguA32ch7
-         +8eoIhzon7Ltl6XQYajjcuPNExS1rga8PYVslQNLcgRxZ5JGM1KeuJ0g7IoE1g4E8eqh
-         V/Vw==
-X-Gm-Message-State: APjAAAVZH6NnUGC6uttueW5m0Qv1YbNt6cJMzhrlmgwdoVKxDOk1qGzi
-        aWuDuarRosbJJjxyzDQB734pBB2Za98=
-X-Google-Smtp-Source: APXvYqxs3OG0BKcfq0rH3+05QtGWcstr5HpP1eAAxWdX97TW47eRmkiqekNJ2fdh2UAMVwsZROCxIw==
-X-Received: by 2002:a17:90a:2247:: with SMTP id c65mr25371401pje.24.1563154133835;
-        Sun, 14 Jul 2019 18:28:53 -0700 (PDT)
-Received: from localhost.localdomain ([203.205.141.123])
-        by smtp.googlemail.com with ESMTPSA id o14sm15386915pjp.29.2019.07.14.18.28.51
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Sun, 14 Jul 2019 18:28:53 -0700 (PDT)
-From:   Wanpeng Li <kernellwp@gmail.com>
-X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PATCH RESEND] i386/kvm: support guest access CORE cstate
-Date:   Mon, 15 Jul 2019 09:28:44 +0800
-Message-Id: <1563154124-18579-1-git-send-email-wanpengli@tencent.com>
-X-Mailer: git-send-email 2.7.4
+        bh=j1D3jAEemUPemgo3Jj5nb6GS6101sWhcpLMgfsoNq8g=;
+        b=SU0DTfK1m/Azg205PLBhi8gX9H2E+iL8/Cs5UEtdIZW/l0ssItrgHvrDF9a15AnhOM
+         6MtPBwWgS5ReVLfENzg8TkEvErrSMPJ9abhGJ9tfIcLT1RNbZTJ6HI4kwoRPec4OMT1g
+         QYXYNgM/7qvoqStxoZHzbONQlXMfQihII46ttb+3fng6T80L7fejD+7uNUUoQnMDLE8x
+         qL6AJWfJrME+qfbx1BOAwOXeC/0tnCTEIpzZQXabX5syWnnHIrN8GRJuoAdpl4yRGZbk
+         xGpIQe+znDJcqG75T1NIs+wEmonlxxMwewnmZYtQoztDSV64iT6KxVhE6HNRVPIdJJNy
+         aVdw==
+X-Gm-Message-State: APjAAAVT0lay8hkNCtwZXnKm6bitNjHwMsTPfWadYgdjxskhYsusHOFa
+        YN7qpw34KtmJiykmpevNWp4=
+X-Google-Smtp-Source: APXvYqwy96VWEm0MA4ILQTD2TtjFzmkAMeu1HQIcFyR05bl5hBBOCB7OmlKryt9SnBNgiGdMCiKl3g==
+X-Received: by 2002:a63:7a01:: with SMTP id v1mr25024594pgc.310.1563158042768;
+        Sun, 14 Jul 2019 19:34:02 -0700 (PDT)
+Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
+        by smtp.gmail.com with ESMTPSA id d129sm16418490pfc.168.2019.07.14.19.33.58
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 14 Jul 2019 19:34:01 -0700 (PDT)
+Subject: Re: [PATCH] mm/gup: Use put_user_page*() instead of put_page*()
+To:     Bharath Vedartham <linux.bhar@gmail.com>,
+        akpm@linux-foundation.org, ira.weiny@intel.com, jhubbard@nvidia.com
+Cc:     Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Dimitri Sivanich <sivanich@sgi.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jakub Kicinski <jakub.kicinski@netronome.com>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Enrico Weigelt <info@metux.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Matt Sickler <Matt.Sickler@daktronics.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Keith Busch <keith.busch@intel.com>,
+        YueHaibing <yuehaibing@huawei.com>, linux-media@vger.kernel.org,
+        linux-kernel@vger.kernel.org, devel@driverdev.osuosl.org,
+        kvm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        netdev@vger.kernel.org, bpf@vger.kernel.org,
+        xdp-newbies@vger.kernel.org
+References: <1563131456-11488-1-git-send-email-linux.bhar@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <018ee3d1-e2f0-ca12-9f63-945056c09985@kernel.dk>
+Date:   Sun, 14 Jul 2019 20:33:57 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1563131456-11488-1-git-send-email-linux.bhar@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wanpeng Li <wanpengli@tencent.com>
+On 7/14/19 1:08 PM, Bharath Vedartham wrote:
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> index 4ef62a4..b4a4549 100644
+> --- a/fs/io_uring.c
+> +++ b/fs/io_uring.c
+> @@ -2694,10 +2694,9 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
+>   			 * if we did partial map, or found file backed vmas,
+>   			 * release any pages we did get
+>   			 */
+> -			if (pret > 0) {
+> -				for (j = 0; j < pret; j++)
+> -					put_page(pages[j]);
+> -			}
+> +			if (pret > 0)
+> +				put_user_pages(pages, pret);
+> +
+>   			if (ctx->account_mem)
+>   				io_unaccount_mem(ctx->user, nr_pages);
+>   			kvfree(imu->bvec);
 
-Allow guest reads CORE cstate when exposing host CPU power management capabilities 
-to the guest. PKG cstate is restricted to avoid a guest to get the whole package 
-information in multi-tenant scenario.
+You handled just the failure case of the buffer registration, but not
+the actual free in io_sqe_buffer_unregister().
 
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- linux-headers/linux/kvm.h | 4 +++-
- target/i386/kvm.c         | 3 ++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index b53ee59..d648fde 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -696,9 +696,11 @@ struct kvm_ioeventfd {
- #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
- #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
- #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
-+#define KVM_X86_DISABLE_EXITS_CSTATE         (1 << 3)
- #define KVM_X86_DISABLE_VALID_EXITS          (KVM_X86_DISABLE_EXITS_MWAIT | \
-                                               KVM_X86_DISABLE_EXITS_HLT | \
--                                              KVM_X86_DISABLE_EXITS_PAUSE)
-+                                              KVM_X86_DISABLE_EXITS_PAUSE | \
-+                                              KVM_X86_DISABLE_EXITS_CSTATE)
- 
- /* for KVM_ENABLE_CAP */
- struct kvm_enable_cap {
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 3b29ce5..49a0cc1 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1645,7 +1645,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         if (disable_exits) {
-             disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
-                               KVM_X86_DISABLE_EXITS_HLT |
--                              KVM_X86_DISABLE_EXITS_PAUSE);
-+                              KVM_X86_DISABLE_EXITS_PAUSE |
-+                              KVM_X86_DISABLE_EXITS_CSTATE);
-         }
- 
-         ret = kvm_vm_enable_cap(s, KVM_CAP_X86_DISABLE_EXITS, 0,
 -- 
-2.7.4
+Jens Axboe
 
