@@ -2,90 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id D003F6824A
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 04:37:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7C8568253
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 04:46:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728982AbfGOCeE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 Jul 2019 22:34:04 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:36089 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728932AbfGOCeD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 14 Jul 2019 22:34:03 -0400
-Received: by mail-pg1-f196.google.com with SMTP id l21so6961645pgm.3
-        for <kvm@vger.kernel.org>; Sun, 14 Jul 2019 19:34:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=j1D3jAEemUPemgo3Jj5nb6GS6101sWhcpLMgfsoNq8g=;
-        b=QrISUnxCSscxlNiF2KqrOgYSELv84+I/OVPUsZDhEuEi4r7R8YUKcUPEfdayuPSfK0
-         wrQ3Q089jqbmouyR+NoH07yfRGBgepPs66CHFe5siqBvErBCrBMbICucDPWVzgWos38b
-         Wf2Rms1UOmhDfsHeziRBcVVeqhPowRnyQF6ZIirk9sqy61+7brb3XjH5WSXDOqEwMkq3
-         q0U1QstYRjrFeTUkIvslQ7dopjLzTMUk5/MTR7wo3HmTm88DIkL2jdeSCkahHTIsS0XU
-         2mC5wBJ5eaM50hskzzZTjH7Ed3Xloa++ONtGgIN+sj2f13lAUYZHfj/Zj0wydtFoffX+
-         bJXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=j1D3jAEemUPemgo3Jj5nb6GS6101sWhcpLMgfsoNq8g=;
-        b=SU0DTfK1m/Azg205PLBhi8gX9H2E+iL8/Cs5UEtdIZW/l0ssItrgHvrDF9a15AnhOM
-         6MtPBwWgS5ReVLfENzg8TkEvErrSMPJ9abhGJ9tfIcLT1RNbZTJ6HI4kwoRPec4OMT1g
-         QYXYNgM/7qvoqStxoZHzbONQlXMfQihII46ttb+3fng6T80L7fejD+7uNUUoQnMDLE8x
-         qL6AJWfJrME+qfbx1BOAwOXeC/0tnCTEIpzZQXabX5syWnnHIrN8GRJuoAdpl4yRGZbk
-         xGpIQe+znDJcqG75T1NIs+wEmonlxxMwewnmZYtQoztDSV64iT6KxVhE6HNRVPIdJJNy
-         aVdw==
-X-Gm-Message-State: APjAAAVT0lay8hkNCtwZXnKm6bitNjHwMsTPfWadYgdjxskhYsusHOFa
-        YN7qpw34KtmJiykmpevNWp4=
-X-Google-Smtp-Source: APXvYqwy96VWEm0MA4ILQTD2TtjFzmkAMeu1HQIcFyR05bl5hBBOCB7OmlKryt9SnBNgiGdMCiKl3g==
-X-Received: by 2002:a63:7a01:: with SMTP id v1mr25024594pgc.310.1563158042768;
-        Sun, 14 Jul 2019 19:34:02 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.164.166.static.utbb.net. [66.29.164.166])
-        by smtp.gmail.com with ESMTPSA id d129sm16418490pfc.168.2019.07.14.19.33.58
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 14 Jul 2019 19:34:01 -0700 (PDT)
-Subject: Re: [PATCH] mm/gup: Use put_user_page*() instead of put_page*()
-To:     Bharath Vedartham <linux.bhar@gmail.com>,
-        akpm@linux-foundation.org, ira.weiny@intel.com, jhubbard@nvidia.com
-Cc:     Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dimitri Sivanich <sivanich@sgi.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jakub Kicinski <jakub.kicinski@netronome.com>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Enrico Weigelt <info@metux.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Matt Sickler <Matt.Sickler@daktronics.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Keith Busch <keith.busch@intel.com>,
-        YueHaibing <yuehaibing@huawei.com>, linux-media@vger.kernel.org,
-        linux-kernel@vger.kernel.org, devel@driverdev.osuosl.org,
-        kvm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        xdp-newbies@vger.kernel.org
-References: <1563131456-11488-1-git-send-email-linux.bhar@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <018ee3d1-e2f0-ca12-9f63-945056c09985@kernel.dk>
-Date:   Sun, 14 Jul 2019 20:33:57 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+        id S1727865AbfGOCqg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 Jul 2019 22:46:36 -0400
+Received: from mga18.intel.com ([134.134.136.126]:8339 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726025AbfGOCqf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 14 Jul 2019 22:46:35 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Jul 2019 19:46:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,492,1557212400"; 
+   d="scan'208";a="160960032"
+Received: from liujing-mobl.ccr.corp.intel.com (HELO [10.238.128.226]) ([10.238.128.226])
+  by orsmga008.jf.intel.com with ESMTP; 14 Jul 2019 19:46:33 -0700
+Subject: Re: [PATCH v1] KVM: x86: expose AVX512_BF16 feature to guest
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org
+References: <1562824197-13658-1-git-send-email-jing2.liu@linux.intel.com>
+ <305e2a40-93a3-23ed-71a2-d3f2541e837a@redhat.com>
+From:   Jing Liu <jing2.liu@linux.intel.com>
+Message-ID: <9a9226bb-8050-e650-a8e5-0030cdd6862d@linux.intel.com>
+Date:   Mon, 15 Jul 2019 10:46:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <1563131456-11488-1-git-send-email-linux.bhar@gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <305e2a40-93a3-23ed-71a2-d3f2541e837a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
@@ -93,29 +40,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/14/19 1:08 PM, Bharath Vedartham wrote:
-> diff --git a/fs/io_uring.c b/fs/io_uring.c
-> index 4ef62a4..b4a4549 100644
-> --- a/fs/io_uring.c
-> +++ b/fs/io_uring.c
-> @@ -2694,10 +2694,9 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
->   			 * if we did partial map, or found file backed vmas,
->   			 * release any pages we did get
->   			 */
-> -			if (pret > 0) {
-> -				for (j = 0; j < pret; j++)
-> -					put_page(pages[j]);
-> -			}
-> +			if (pret > 0)
-> +				put_user_pages(pages, pret);
-> +
->   			if (ctx->account_mem)
->   				io_unaccount_mem(ctx->user, nr_pages);
->   			kvfree(imu->bvec);
+Hi Paolo,
+Thanks for your reviewing! There also has Qemu patch sent here,
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg630359.html
 
-You handled just the failure case of the buffer registration, but not
-the actual free in io_sqe_buffer_unregister().
+Could you please review that? Thanks very much!
 
--- 
-Jens Axboe
+Jing
 
+
+On 7/13/2019 6:37 PM, Paolo Bonzini wrote:
+> On 11/07/19 07:49, Jing Liu wrote:
+>> AVX512 BFLOAT16 instructions support 16-bit BFLOAT16 floating-point
+>> format (BF16) for deep learning optimization.
+>>
+>> Intel adds AVX512 BFLOAT16 feature in CooperLake, which is CPUID.7.1.EAX[5].
+>>
+>> Detailed information of the CPUID bit can be found here,
+>> https://software.intel.com/sites/default/files/managed/c5/15/\
+>> architecture-instruction-set-extensions-programming-reference.pdf.
+>>
+>> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+>> ---
+>>
+>> This patch depends on kernel patch https://lkml.org/lkml/2019/6/19/912
+>> and Paolo's patch set https://lkml.org/lkml/2019/7/4/468.
+>>
+>>   arch/x86/kvm/cpuid.c | 12 +++++++++++-
+>>   1 file changed, 11 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>> index 8fc6039..0c125dd 100644
+>> --- a/arch/x86/kvm/cpuid.c
+>> +++ b/arch/x86/kvm/cpuid.c
+>> @@ -358,9 +358,13 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
+>>   		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
+>>   		F(MD_CLEAR);
+>>   
+>> +	/* cpuid 7.1.eax */
+>> +	const u32 kvm_cpuid_7_1_eax_x86_features =
+>> +		F(AVX512_BF16);
+>> +
+>>   	switch (index) {
+>>   	case 0:
+>> -		entry->eax = 0;
+>> +		entry->eax = min(entry->eax, 1);
+>>   		entry->ebx &= kvm_cpuid_7_0_ebx_x86_features;
+>>   		cpuid_mask(&entry->ebx, CPUID_7_0_EBX);
+>>   		/* TSC_ADJUST is emulated */
+>> @@ -384,6 +388,12 @@ static inline void do_cpuid_7_mask(struct kvm_cpuid_entry2 *entry, int index)
+>>   		 */
+>>   		entry->edx |= F(ARCH_CAPABILITIES);
+>>   		break;
+>> +	case 1:
+>> +		entry->eax &= kvm_cpuid_7_1_eax_x86_features;
+>> +		entry->ebx = 0;
+>> +		entry->ecx = 0;
+>> +		entry->edx = 0;
+>> +		break;
+>>   	default:
+>>   		WARN_ON_ONCE(1);
+>>   		entry->eax = 0;
+>>
+> 
+> Queued, thanks.
+> 
+> Paolo
+> 
