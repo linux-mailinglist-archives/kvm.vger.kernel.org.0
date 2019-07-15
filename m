@@ -2,108 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B55669A88
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 20:08:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 501B969A95
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 20:10:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729467AbfGOSIh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 14:08:37 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:38548 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729366AbfGOSIg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 14:08:36 -0400
-Received: by mail-pg1-f196.google.com with SMTP id z75so8089745pgz.5
-        for <kvm@vger.kernel.org>; Mon, 15 Jul 2019 11:08:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=SblXFu065uxzPZrmS6N9sHY8CMtn3pra44rW+mH9DGs=;
-        b=UTc+eboihpsI2f3zznc+QpmHto7rPTXeUlUyY1B06IqvsTUE56EKtIFGKPZgggOUcS
-         Ts1Stcl5aJn/Hr/cooaKOuMzocNIaP2q162wIsqYnDEK/9mVyFommuc7jT6iM9M6PeLH
-         JLlzBIfBILqpD0VxSeeqr1LsWAuZc46R4VUNNnlZ0/N5d46lRnljMhk7b2cMs2UJap4q
-         IShHHiMzM5KFohCzd1x3CDL5L3MXM6WH8x/LxdiJrT6XhUErJDQudf8sa6GcrmEIPRb7
-         lRqbbopwHRdX9eU04IfqPKRP7cLlc9v6VF/HZq1jvqv2cb0cgkEFX+gC8/eca79UEeQs
-         pvNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=SblXFu065uxzPZrmS6N9sHY8CMtn3pra44rW+mH9DGs=;
-        b=ApNoATzkYC8/QxV4tC5y8ZH50cXIBhH5qtRgRWJ2ylOnMxM1Ha+gBiVFX6yCiaVVZy
-         hJ/b8Ym4oFf4JzaGzvZ9MVBaVvhcXb3OCJAysMy+Ct65f2Z6Xsdd/D912eaqLcu0HhLu
-         IGnpTkO/z0n9ngXvn0AwLVxDl4+DiDE84hN/PdVhPjBIR5ODVi4VXQfMbyMZ5UtmeWtr
-         DE9jDPM8xeDsz2eq944974SV7qOPeKBVR451CoEOqTuCbHA2bM623f4arQpNW/XcMFjD
-         Ro9gj6GtQMLgy8geqn6J2E0jCulTdhE0M7bdWJg9Q/jyH+/TVPVwCy0QWAE8L62iHaG4
-         QYsQ==
-X-Gm-Message-State: APjAAAUnU1l6qMF+4PV0SSo8SpjL7cr1hZ5gjcLnje42ANNL4oPH2OUB
-        wEaDx9GVZw6JAqv4BP9NuSQ=
-X-Google-Smtp-Source: APXvYqzEYXGxMTs1cPTJcPIgQp36uOEehN1YOl6RxjsNavafle3T43FUXCk9gSq5A6AVcgMb+1/4vg==
-X-Received: by 2002:a17:90a:3247:: with SMTP id k65mr30574984pjb.49.1563214115552;
-        Mon, 15 Jul 2019 11:08:35 -0700 (PDT)
-Received: from [10.2.189.129] ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id s24sm18974218pfh.133.2019.07.15.11.08.33
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 15 Jul 2019 11:08:34 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [kvm-unit-tests PATCH 3/3] x86: Support environments without
- test-devices
-From:   Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20190715154812.mlw4toyzkpwsfrfm@kamzik.brq.redhat.com>
-Date:   Mon, 15 Jul 2019 11:08:33 -0700
-Cc:     kvm list <kvm@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <FFD1C3FC-C442-4953-AFA6-0FFADDEA8351@gmail.com>
-References: <20190628203019.3220-1-nadav.amit@gmail.com>
- <20190628203019.3220-4-nadav.amit@gmail.com>
- <20190715154812.mlw4toyzkpwsfrfm@kamzik.brq.redhat.com>
-To:     Andrew Jones <drjones@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        id S1730439AbfGOSKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 14:10:24 -0400
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:18288 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729135AbfGOSKX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 14:10:23 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5d2cc18d0000>; Mon, 15 Jul 2019 11:10:22 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Mon, 15 Jul 2019 11:10:22 -0700
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Mon, 15 Jul 2019 11:10:22 -0700
+Received: from [10.110.48.28] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 15 Jul
+ 2019 18:10:21 +0000
+Subject: Re: [PATCH] mm/gup: Use put_user_page*() instead of put_page*()
+To:     Bharath Vedartham <linux.bhar@gmail.com>
+CC:     <akpm@linux-foundation.org>, <ira.weiny@intel.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Dimitri Sivanich <sivanich@sgi.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn.topel@intel.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jakub Kicinski <jakub.kicinski@netronome.com>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Enrico Weigelt <info@metux.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Matt Sickler <Matt.Sickler@daktronics.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Keith Busch <keith.busch@intel.com>,
+        YueHaibing <yuehaibing@huawei.com>,
+        <linux-media@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <devel@driverdev.osuosl.org>, <kvm@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-mm@kvack.org>, <netdev@vger.kernel.org>,
+        <bpf@vger.kernel.org>, <xdp-newbies@vger.kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+References: <1563131456-11488-1-git-send-email-linux.bhar@gmail.com>
+ <deea584f-2da2-8e1f-5a07-e97bf32c63bb@nvidia.com>
+ <20190715065654.GA3716@bharath12345-Inspiron-5559>
+X-Nvconfidentiality: public
+From:   John Hubbard <jhubbard@nvidia.com>
+Message-ID: <1aeb21d9-6dc6-c7d2-58b6-279b1dfc523b@nvidia.com>
+Date:   Mon, 15 Jul 2019 11:10:20 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
+MIME-Version: 1.0
+In-Reply-To: <20190715065654.GA3716@bharath12345-Inspiron-5559>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL104.nvidia.com (172.18.146.11) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1563214222; bh=6wwgTZKS6jiJbEQByxUeIS9VuTtgekUJNWGw3cfIDgA=;
+        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=Ok4pi/aW8U3yjBXqydhqyft24fqK5kLZb9vqN2v2ZscUA+LO0TUEntZeQFXwWM9mI
+         LSrTQjPbgBURTVuTHsTSQsCgjCENvKuaFyzKLw2XoaWgUj+WvDafd8mw0VAnM6FcQ+
+         +2MQLOvD9ImnAuT4gp9Ms08kG21euR6h30TCsuEWJ6lWOGD9RwjSXqHq846/IAB2oQ
+         2xzmb3rUlMkYnUIwMFCjvBWCfVAdsKWykA4pdAEfJW4vFSKPaT2m4A9YAlaep+ltqs
+         dnlEdJPni78MkMkdBjFMKskTkkSUDUGV5x/f03KwhrKwKXSc4NX56A3yXabbvoTqDL
+         9Z2efhUFKhX1Q==
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> On Jul 15, 2019, at 8:48 AM, Andrew Jones <drjones@redhat.com> wrote:
->=20
-> On Fri, Jun 28, 2019 at 01:30:19PM -0700, Nadav Amit wrote:
->> Enable to run the tests when test-device is not present (e.g.,
->> bare-metal). Users can provide the number of CPUs and ram size =
-through
->> kernel parameters.
->=20
-> Can you provide multiboot a pointer to an initrd (text file) with
-> environment variables listed instead? Because this works
->=20
-> $ cat x86/params.c=20
-> #include <libcflat.h>
-> int main(void)
-> {
->    printf("nr_cpus=3D%ld\n", atol(getenv("NR_CPUS")));
->    printf("memsize=3D%ld\n", atol(getenv("MEMSIZE")));
->    return 0;
-> }
->=20
-> $ cat params.initrd=20
-> NR_CPUS=3D2
-> MEMSIZE=3D256
->=20
-> $ qemu-system-x86_64 -nodefaults -device pc-testdev -device =
-isa-debug-exit,iobase=3D0xf4,iosize=3D0x4 -vnc none -serial stdio =
--device pci-testdev -machine accel=3Dkvm -kernel x86/params.flat -initrd =
-params.initrd
-> enabling apic
-> enabling apic
-> nr_cpus=3D2
-> memsize=3D256
->=20
->=20
-> This works because setup_multiboot() looks for an initrd, and then,
-> if present, it gets interpreted as a list of environment variables
-> which become the unit tests **envp.
+On 7/14/19 11:56 PM, Bharath Vedartham wrote:
+> On Sun, Jul 14, 2019 at 04:33:42PM -0700, John Hubbard wrote:
+>> On 7/14/19 12:08 PM, Bharath Vedartham wrote:
+[...]
+>> 1. Pull down https://github.com/johnhubbard/linux/commits/gup_dma_core
+>> and find missing conversions: look for any additional missing 
+>> get_user_pages/put_page conversions. You've already found a couple missing 
+>> ones. I haven't re-run a search in a long time, so there's probably even more.
+>> 	a) And find more, after I rebase to 5.3-rc1: people probably are adding
+>> 	get_user_pages() calls as we speak. :)
+> Shouldn't this be documented then? I don't see any docs for using
+> put_user_page*() in v5.2.1 in the memory management API section?
 
-Looks like a nice solution, but Paolo preferred to see if this =
-information
-can be extracted from e810 and ACPI MADT. Paolo?=
+Yes, it needs documentation. My first try (which is still in the above git
+repo) was reviewed and found badly wanting, so I'm going to rewrite it. Meanwhile,
+I agree that an interim note would be helpful, let me put something together.
+
+[...]
+>>     https://github.com/johnhubbard/linux/commits/gup_dma_core
+>>
+>>     a) gets rebased often, and
+>>
+>>     b) has a bunch of commits (iov_iter and related) that conflict
+>>        with the latest linux.git,
+>>
+>>     c) has some bugs in the bio area, that I'm fixing, so I don't trust
+>>        that's it's safely runnable, for a few more days.
+> I assume your repo contains only work related to fixing gup issues and
+> not the main repo for gup development? i.e where gup changes are merged?
+
+Correct, this is just a private tree, not a maintainer tree. But I'll try to
+keep the gup_dma_core branch something that is usable by others, during the
+transition over to put_user_page(), because the page-tracking patches are the
+main way to test any put_user_page() conversions.
+
+As Ira said, we're using linux-mm as the real (maintainer) tree.
+
+
+thanks,
+-- 
+John Hubbard
+NVIDIA
