@@ -2,330 +2,384 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id C58DD69910
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 18:30:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED0366993F
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 18:42:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730942AbfGOQ36 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 12:29:58 -0400
-Received: from mga07.intel.com ([134.134.136.100]:10999 "EHLO mga07.intel.com"
+        id S1731483AbfGOQmk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 12:42:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44110 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729533AbfGOQ35 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 12:29:57 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Jul 2019 09:29:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,493,1557212400"; 
-   d="scan'208";a="157860430"
-Received: from iweiny-desk2.sc.intel.com ([10.3.52.157])
-  by orsmga007.jf.intel.com with ESMTP; 15 Jul 2019 09:29:53 -0700
-Date:   Mon, 15 Jul 2019 09:29:53 -0700
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     Bharath Vedartham <linux.bhar@gmail.com>
-Cc:     John Hubbard <jhubbard@nvidia.com>, akpm@linux-foundation.org,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Dimitri Sivanich <sivanich@sgi.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        =?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn.topel@intel.com>,
-        Magnus Karlsson <magnus.karlsson@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jakub Kicinski <jakub.kicinski@netronome.com>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Enrico Weigelt <info@metux.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Matt Sickler <Matt.Sickler@daktronics.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Keith Busch <keith.busch@intel.com>,
-        YueHaibing <yuehaibing@huawei.com>, linux-media@vger.kernel.org,
-        linux-kernel@vger.kernel.org, devel@driverdev.osuosl.org,
-        kvm@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        xdp-newbies@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH] mm/gup: Use put_user_page*() instead of put_page*()
-Message-ID: <20190715162952.GA7953@iweiny-DESK2.sc.intel.com>
-References: <1563131456-11488-1-git-send-email-linux.bhar@gmail.com>
- <deea584f-2da2-8e1f-5a07-e97bf32c63bb@nvidia.com>
- <20190715065654.GA3716@bharath12345-Inspiron-5559>
+        id S1730503AbfGOQmk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 12:42:40 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 90FFE59467;
+        Mon, 15 Jul 2019 16:42:39 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CC7B01001DDA;
+        Mon, 15 Jul 2019 16:42:37 +0000 (UTC)
+Date:   Mon, 15 Jul 2019 18:42:35 +0200
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alexander Graf <graf@amazon.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH kvm-unit-tests v2] arm: Add PL031 test
+Message-ID: <20190715164235.z2xar7nqi5guqfuf@kamzik.brq.redhat.com>
+References: <20190712091938.492-1-graf@amazon.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190715065654.GA3716@bharath12345-Inspiron-5559>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+In-Reply-To: <20190712091938.492-1-graf@amazon.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Mon, 15 Jul 2019 16:42:39 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 15, 2019 at 12:26:54PM +0530, Bharath Vedartham wrote:
-> On Sun, Jul 14, 2019 at 04:33:42PM -0700, John Hubbard wrote:
-> > On 7/14/19 12:08 PM, Bharath Vedartham wrote:
-> > > This patch converts all call sites of get_user_pages
-> > > to use put_user_page*() instead of put_page*() functions to
-> > > release reference to gup pinned pages.
-> Hi John, 
-> > Hi Bharath,
-> > 
-> > Thanks for jumping in to help, and welcome to the party!
-> > 
-> > You've caught everyone in the middle of a merge window, btw.  As a
-> > result, I'm busy rebasing and reworking the get_user_pages call sites, 
-> > and gup tracking, in the wake of some semi-traumatic changes to bio 
-> > and gup and such. I plan to re-post right after 5.3-rc1 shows up, from 
-> > here:
-> > 
-> >     https://github.com/johnhubbard/linux/commits/gup_dma_core
-> > 
-> > ...which you'll find already covers the changes you've posted, except for:
-> > 
-> >     drivers/misc/sgi-gru/grufault.c
-> >     drivers/staging/kpc2000/kpc_dma/fileops.c
-> > 
-> > ...and this one, which is undergoing to larger local changes, due to
-> > bvec, so let's leave it out of the choices:
-> > 
-> >     fs/io_uring.c
-> > 
-> > Therefore, until -rc1, if you'd like to help, I'd recommend one or more
-> > of the following ideas:
-> > 
-> > 1. Pull down https://github.com/johnhubbard/linux/commits/gup_dma_core
-> > and find missing conversions: look for any additional missing 
-> > get_user_pages/put_page conversions. You've already found a couple missing 
-> > ones. I haven't re-run a search in a long time, so there's probably even more.
-> > 	a) And find more, after I rebase to 5.3-rc1: people probably are adding
-> > 	get_user_pages() calls as we speak. :)
-> Shouldn't this be documented then? I don't see any docs for using
-> put_user_page*() in v5.2.1 in the memory management API section?
-> > 2. Patches: Focus on just one subsystem at a time, and perfect the patch for
-> > it. For example, I think this the staging driver would be perfect to start with:
-> > 
-> >     drivers/staging/kpc2000/kpc_dma/fileops.c
-> > 
-> > 	a) verify that you've really, corrected converted the whole
-> > 	driver. (Hint: I think you might be overlooking a put_page call.)
-> Yup. I did see that! Will fix it!
-> > 	b) Attempt to test it if you can (I'm being hypocritical in
-> > 	the extreme here, but one of my problems is that testing
-> > 	has been light, so any help is very valuable). qemu...?
-> > 	OTOH, maybe even qemu cannot easily test a kpc2000, but
-> > 	perhaps `git blame` and talking to the authors would help
-> > 	figure out a way to validate the changes.
-> Great! I ll do that, I ll mail the patch authors and ask them for help
-> in testing. 
-> > 	Thinking about whether you can run a test that would prove or
-> > 	disprove my claim in (a), above, could be useful in coming up
-> > 	with tests to run.
+On Fri, Jul 12, 2019 at 11:19:38AM +0200, Alexander Graf wrote:
+> This patch adds a unit test for the PL031 RTC that is used in the virt machine.
+> It just pokes basic functionality. I've mostly written it to familiarize myself
+> with the device, but I suppose having the test around does not hurt, as it also
+> exercises the GIC SPI interrupt path.
 > 
-> > In other words, a few very high quality conversions (even just one) that
-> > we can really put our faith in, is what I value most here. Tested patches
-> > are awesome.
-> I understand that! 
-> > 3. Once I re-post, turn on the new CONFIG_DEBUG_GET_USER_PAGES_REFERENCES
-> > and run things such as xfstest/fstest. (Again, doing so would be going
-> > further than I have yet--very helpful). Help clarify what conversions have
-> > actually been tested and work, and which ones remain unvalidated.
-> > Other: Please note that this:
-> Yup will do that.
-> >     https://github.com/johnhubbard/linux/commits/gup_dma_core
-> > 
-> >     a) gets rebased often, and
-> > 
-> >     b) has a bunch of commits (iov_iter and related) that conflict
-> >        with the latest linux.git,
-> > 
-> >     c) has some bugs in the bio area, that I'm fixing, so I don't trust
-> >        that's it's safely runnable, for a few more days.
-> I assume your repo contains only work related to fixing gup issues and
-> not the main repo for gup development? i.e where gup changes are merged?
+> Signed-off-by: Alexander Graf <graf@amazon.com>
+> 
+> ---
+> 
+> v1 -> v2:
+> 
+>   - Use FDT to find base, irq and existence
+>   - Put isb after timer read
+>   - Use dist_base for gicv3
+> ---
+>  arm/Makefile.common |   1 +
+>  arm/pl031.c         | 265 ++++++++++++++++++++++++++++++++++++++++++++
+>  lib/arm/asm/gic.h   |   1 +
+>  3 files changed, 267 insertions(+)
+>  create mode 100644 arm/pl031.c
+> 
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index f0c4b5d..b8988f2 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -11,6 +11,7 @@ tests-common += $(TEST_DIR)/pmu.flat
+>  tests-common += $(TEST_DIR)/gic.flat
+>  tests-common += $(TEST_DIR)/psci.flat
+>  tests-common += $(TEST_DIR)/sieve.flat
+> +tests-common += $(TEST_DIR)/pl031.flat
 
-We have been using Andrews tree for merging.
+Makefile.common is for both arm32 and arm64, but this code is only
+compilable on arm64. As there's no reason for it to be arm64 only,
+then ideally we'd modify the code to allow compiling and running
+on both, but otherwise we need to move this to Makefile.arm64.
 
-> Also are release_pages and put_user_pages interchangable? 
+>  
+>  tests-all = $(tests-common) $(tests)
+>  all: directories $(tests-all)
+> diff --git a/arm/pl031.c b/arm/pl031.c
+> new file mode 100644
+> index 0000000..d975937
+> --- /dev/null
+> +++ b/arm/pl031.c
+> @@ -0,0 +1,265 @@
+> +/*
+> + * Verify PL031 functionality
+> + *
+> + * This test verifies whether the emulated PL031 behaves correctly.
+> + *
+> + * Copyright 2019 Amazon.com, Inc. or its affiliates.
+> + * Author: Alexander Graf <graf@amazon.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#include <libcflat.h>
+> +#include <devicetree.h>
+> +#include <asm/processor.h>
+> +#include <asm/io.h>
+> +#include <asm/gic.h>
+> +
+> +struct pl031_regs {
+> +	uint32_t dr;	/* Data Register */
+> +	uint32_t mr;	/* Match Register */
+> +	uint32_t lr;	/* Load Register */
+> +	union {
+> +		uint8_t cr;	/* Control Register */
+> +		uint32_t cr32;
+> +	};
+> +	union {
+> +		uint8_t imsc;	/* Interrupt Mask Set or Clear register */
+> +		uint32_t imsc32;
+> +	};
+> +	union {
+> +		uint8_t ris;	/* Raw Interrupt Status */
+> +		uint32_t ris32;
+> +	};
+> +	union {
+> +		uint8_t mis;	/* Masked Interrupt Status */
+> +		uint32_t mis32;
+> +	};
+> +	union {
+> +		uint8_t icr;	/* Interrupt Clear Register */
+> +		uint32_t icr32;
+> +	};
+> +	uint32_t reserved[1008];
+> +	uint32_t periph_id[4];
+> +	uint32_t pcell_id[4];
+> +};
+> +
+> +static u32 cntfrq;
+> +static struct pl031_regs *pl031;
+> +static int pl031_irq;
+> +static void *gic_ispendr;
+> +static void *gic_isenabler;
+> +static bool irq_triggered;
+> +
+> +static uint64_t read_timer(void)
+> +{
+> +	uint64_t r = read_sysreg(cntpct_el0);
+> +	isb();
+> +
+> +	return r;
+> +}
+> +
+> +static int check_id(void)
+> +{
+> +	uint32_t id[] = { 0x31, 0x10, 0x14, 0x00, 0x0d, 0xf0, 0x05, 0xb1 };
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(id); i++)
+> +		if (id[i] != readl(&pl031->periph_id[i]))
+> +			return 1;
+> +
+> +	return 0;
+> +}
+> +
+> +static int check_ro(void)
+> +{
+> +	uint32_t offs[] = { offsetof(struct pl031_regs, ris),
+> +			    offsetof(struct pl031_regs, mis),
+> +			    offsetof(struct pl031_regs, periph_id[0]),
+> +			    offsetof(struct pl031_regs, periph_id[1]),
+> +			    offsetof(struct pl031_regs, periph_id[2]),
+> +			    offsetof(struct pl031_regs, periph_id[3]),
+> +			    offsetof(struct pl031_regs, pcell_id[0]),
+> +			    offsetof(struct pl031_regs, pcell_id[1]),
+> +			    offsetof(struct pl031_regs, pcell_id[2]),
+> +			    offsetof(struct pl031_regs, pcell_id[3]) };
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(offs); i++) {
+> +		uint32_t before32;
+> +		uint16_t before16;
+> +		uint8_t before8;
+> +		void *addr = (void*)pl031 + offs[i];
+> +		uint32_t poison = 0xdeadbeefULL;
+> +
+> +		before8 = readb(addr);
+> +		before16 = readw(addr);
+> +		before32 = readl(addr);
+> +
+> +		writeb(poison, addr);
+> +		writew(poison, addr);
+> +		writel(poison, addr);
+> +
+> +		if (before8 != readb(addr))
+> +			return 1;
+> +		if (before16 != readw(addr))
+> +			return 1;
+> +		if (before32 != readl(addr))
+> +			return 1;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int check_rtc_freq(void)
+> +{
+> +	uint32_t seconds_to_wait = 2;
+> +	uint32_t before = readl(&pl031->dr);
+> +	uint64_t before_tick = read_timer();
+> +	uint64_t target_tick = before_tick + (cntfrq * seconds_to_wait);
+> +
+> +	/* Wait for 2 seconds */
+> +	while (read_timer() < target_tick) ;
+> +
+> +	if (readl(&pl031->dr) != before + seconds_to_wait)
+> +		return 1;
+> +
+> +	return 0;
+> +}
+> +
+> +static bool gic_irq_pending(void)
+> +{
+> +	uint32_t offset = (pl031_irq / 32) * 4;
+> +
+> +	return readl(gic_ispendr + offset) & (1 << (pl031_irq & 31));
+> +}
+> +
+> +static void gic_irq_unmask(void)
+> +{
+> +	uint32_t offset = (pl031_irq / 32) * 4;
+> +
+> +	writel(1 << (pl031_irq & 31), gic_isenabler + offset);
+> +}
+> +
+> +static void irq_handler(struct pt_regs *regs)
+> +{
+> +	u32 irqstat = gic_read_iar();
+> +	u32 irqnr = gic_iar_irqnr(irqstat);
+> +
+> +	gic_write_eoir(irqstat);
+> +
+> +	if (irqnr == pl031_irq) {
+> +		report("  RTC RIS == 1", readl(&pl031->ris) == 1);
+> +		report("  RTC MIS == 1", readl(&pl031->mis) == 1);
+> +
+> +		/* Writing any value should clear IRQ status */
+> +		writel(0x80000000ULL, &pl031->icr);
+> +
+> +		report("  RTC RIS == 0", readl(&pl031->ris) == 0);
+> +		report("  RTC MIS == 0", readl(&pl031->mis) == 0);
+> +		irq_triggered = true;
+> +	} else {
+> +		report_info("Unexpected interrupt: %d\n", irqnr);
+> +		return;
+> +	}
+> +}
+> +
+> +static int check_rtc_irq(void)
+> +{
+> +	uint32_t seconds_to_wait = 1;
+> +	uint32_t before = readl(&pl031->dr);
+> +	uint64_t before_tick = read_timer();
+> +	uint64_t target_tick = before_tick + (cntfrq * (seconds_to_wait + 1));
+> +
+> +	report_info("Checking IRQ trigger (MR)");
+> +
+> +	irq_triggered = false;
+> +
+> +	/* Fire IRQ in 1 second */
+> +	writel(before + seconds_to_wait, &pl031->mr);
+> +
+> +	install_irq_handler(EL1H_IRQ, irq_handler);
+> +
+> +	/* Wait until 2 seconds are over */
+> +	while (read_timer() < target_tick) ;
+> +
+> +	report("  RTC IRQ not delivered without mask", !gic_irq_pending());
+> +
+> +	/* Mask the IRQ so that it gets delivered */
+> +	writel(1, &pl031->imsc);
+> +	report("  RTC IRQ pending now", gic_irq_pending());
+> +
+> +	/* Enable retrieval of IRQ */
+> +	gic_irq_unmask();
+> +	local_irq_enable();
+> +
+> +	report("  IRQ triggered", irq_triggered);
+> +	report("  RTC IRQ not pending anymore", !gic_irq_pending());
+> +	if (!irq_triggered) {
+> +		report_info("  RTC RIS: %x", readl(&pl031->ris));
+> +		report_info("  RTC MIS: %x", readl(&pl031->mis));
+> +		report_info("  RTC IMSC: %x", readl(&pl031->imsc));
+> +		report_info("  GIC IRQs pending: %08x %08x", readl(gic_ispendr), readl(gic_ispendr + 4));
+> +	}
+> +
+> +	local_irq_disable();
+> +	return 0;
+> +}
+> +
+> +static void rtc_irq_init(void)
+> +{
+> +	gic_enable_defaults();
+> +
+> +	switch (gic_version()) {
+> +	case 2:
+> +		gic_ispendr = gicv2_dist_base() + GICD_ISPENDR;
+> +		gic_isenabler = gicv2_dist_base() + GICD_ISENABLER;
+> +		break;
+> +	case 3:
+> +		gic_ispendr = gicv3_dist_base() + GICD_ISPENDR;
+> +		gic_isenabler = gicv3_dist_base() + GICD_ISENABLER;
+> +		break;
+> +	}
+> +}
+> +
+> +static int rtc_fdt_init(void)
+> +{
+> +	const struct fdt_property *prop;
+> +	const void *fdt = dt_fdt();
+> +	int node, len;
+> +	u32 *data;
+> +
+> +	node = fdt_node_offset_by_compatible(fdt, -1, "arm,pl031");
+> +	if (node < 0)
+> +		return -1;
+> +
+> +	prop = fdt_get_property(fdt, node, "interrupts", &len);
+> +	assert(prop && len == (3 * sizeof(u32)));
+> +	data = (u32 *)prop->data;
+> +	assert(data[0] == 0); /* SPI */
+> +	pl031_irq = SPI(fdt32_to_cpu(data[1]));
 
-Conceptually yes.  But release_pages is more efficient.  There was some
-discussion around this starting here:
+Nit: Ideally we'd add some more devicetree API to get interrupts. With
+that, and the existing devicetree API, we could remove all low-level fdt
+related code in this function.
 
-https://lore.kernel.org/lkml/20190523172852.GA27175@iweiny-DESK2.sc.intel.com/
+> +
+> +	prop = fdt_get_property(fdt, node, "reg", &len);
+> +	assert(prop && len == (2 * sizeof(u64)));
+> +	data = (u32 *)prop->data;
+> +	pl031 = (void*)((ulong)fdt32_to_cpu(data[0]) << 32 | fdt32_to_cpu(data[1]));
 
-And a resulting bug fix.
+This works because we currently ID map all the physical memory. I usually
+try to remember to use an ioremap in these cases anyway though.
 
-https://lkml.org/lkml/2019/6/21/95
+> +
+> +	return 0;
+> +}
+> +
+> +int main(int argc, char **argv)
+> +{
+> +	cntfrq = get_cntfrq();
+> +	rtc_irq_init();
+> +	if (rtc_fdt_init()) {
+> +		report_skip("Skipping PL031 tests. No device present.");
+> +		return 0;
+> +	}
+> +
+> +	report("Periph/PCell IDs match", !check_id());
+> +	report("R/O fields are R/O", !check_ro());
+> +	report("RTC ticks at 1HZ", !check_rtc_freq());
+> +	report("RTC IRQ not pending yet", !gic_irq_pending());
+> +	check_rtc_irq();
+> +
+> +	return report_summary();
+> +}
+> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+> index f6dfb90..1fc10a0 100644
+> --- a/lib/arm/asm/gic.h
+> +++ b/lib/arm/asm/gic.h
+> @@ -41,6 +41,7 @@
+>  #include <asm/gic-v3.h>
+>  
+>  #define PPI(irq)			((irq) + 16)
+> +#define SPI(irq)			((irq) + GIC_FIRST_SPI)
+>  
+>  #ifndef __ASSEMBLY__
+>  #include <asm/cpumask.h>
+> -- 
+> 2.17.1
+>
 
-Ira
+I only reviewed with respect to the framework, but other than couple
+things I pointed out it looks good to me.
 
-> > One note below, for the future:
-> > 
-> > > 
-> > > This is a bunch of trivial conversions which is a part of an effort
-> > > by John Hubbard to solve issues with gup pinned pages and 
-> > > filesystem writeback.
-> > > 
-> > > The issue is more clearly described in John Hubbard's patch[1] where
-> > > put_user_page*() functions are introduced.
-> > > 
-> > > Currently put_user_page*() simply does put_page but future implementations
-> > > look to change that once treewide change of put_page callsites to 
-> > > put_user_page*() is finished.
-> > > 
-> > > The lwn article describing the issue with gup pinned pages and filesystem 
-> > > writeback [2].
-> > > 
-> > > This patch has been tested by building and booting the kernel as I don't
-> > > have the required hardware to test the device drivers.
-> > > 
-> > > I did not modify gpu/drm drivers which use release_pages instead of
-> > > put_page() to release reference of gup pinned pages as I am not clear
-> > > whether release_pages and put_page are interchangable. 
-> > > 
-> > > [1] https://lkml.org/lkml/2019/3/26/1396
-> > 
-> > When referring to patches in a commit description, please use the 
-> > commit hash, not an external link. See Submitting Patches [1] for details.
-> > 
-> > Also, once you figure out the right maintainers and other involved people,
-> > putting Cc: in the commit description is common practice, too.
-> > 
-> > [1] https://www.kernel.org/doc/html/latest/process/submitting-patches.html
-> Will work on that! Thanks!
-> > thanks,
-> > -- 
-> > John Hubbard
-> > NVIDIA
-> > 
-> > > 
-> > > [2] https://lwn.net/Articles/784574/
-> > > 
-> > > Signed-off-by: Bharath Vedartham <linux.bhar@gmail.com>
-> > > ---
-> > >  drivers/media/v4l2-core/videobuf-dma-sg.c | 3 +--
-> > >  drivers/misc/sgi-gru/grufault.c           | 2 +-
-> > >  drivers/staging/kpc2000/kpc_dma/fileops.c | 4 +---
-> > >  drivers/vfio/vfio_iommu_type1.c           | 2 +-
-> > >  fs/io_uring.c                             | 7 +++----
-> > >  mm/gup_benchmark.c                        | 6 +-----
-> > >  net/xdp/xdp_umem.c                        | 7 +------
-> > >  7 files changed, 9 insertions(+), 22 deletions(-)
-> > > 
-> > > diff --git a/drivers/media/v4l2-core/videobuf-dma-sg.c b/drivers/media/v4l2-core/videobuf-dma-sg.c
-> > > index 66a6c6c..d6eeb43 100644
-> > > --- a/drivers/media/v4l2-core/videobuf-dma-sg.c
-> > > +++ b/drivers/media/v4l2-core/videobuf-dma-sg.c
-> > > @@ -349,8 +349,7 @@ int videobuf_dma_free(struct videobuf_dmabuf *dma)
-> > >  	BUG_ON(dma->sglen);
-> > >  
-> > >  	if (dma->pages) {
-> > > -		for (i = 0; i < dma->nr_pages; i++)
-> > > -			put_page(dma->pages[i]);
-> > > +		put_user_pages(dma->pages, dma->nr_pages);
-> > >  		kfree(dma->pages);
-> > >  		dma->pages = NULL;
-> > >  	}
-> > > diff --git a/drivers/misc/sgi-gru/grufault.c b/drivers/misc/sgi-gru/grufault.c
-> > > index 4b713a8..61b3447 100644
-> > > --- a/drivers/misc/sgi-gru/grufault.c
-> > > +++ b/drivers/misc/sgi-gru/grufault.c
-> > > @@ -188,7 +188,7 @@ static int non_atomic_pte_lookup(struct vm_area_struct *vma,
-> > >  	if (get_user_pages(vaddr, 1, write ? FOLL_WRITE : 0, &page, NULL) <= 0)
-> > >  		return -EFAULT;
-> > >  	*paddr = page_to_phys(page);
-> > > -	put_page(page);
-> > > +	put_user_page(page);
-> > >  	return 0;
-> > >  }
-> > >  
-> > > diff --git a/drivers/staging/kpc2000/kpc_dma/fileops.c b/drivers/staging/kpc2000/kpc_dma/fileops.c
-> > > index 6166587..26dceed 100644
-> > > --- a/drivers/staging/kpc2000/kpc_dma/fileops.c
-> > > +++ b/drivers/staging/kpc2000/kpc_dma/fileops.c
-> > > @@ -198,9 +198,7 @@ int  kpc_dma_transfer(struct dev_private_data *priv, struct kiocb *kcb, unsigned
-> > >  	sg_free_table(&acd->sgt);
-> > >   err_dma_map_sg:
-> > >   err_alloc_sg_table:
-> > > -	for (i = 0 ; i < acd->page_count ; i++){
-> > > -		put_page(acd->user_pages[i]);
-> > > -	}
-> > > +	put_user_pages(acd->user_pages, acd->page_count);
-> > >   err_get_user_pages:
-> > >  	kfree(acd->user_pages);
-> > >   err_alloc_userpages:
-> > > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> > > index add34ad..c491524 100644
-> > > --- a/drivers/vfio/vfio_iommu_type1.c
-> > > +++ b/drivers/vfio/vfio_iommu_type1.c
-> > > @@ -369,7 +369,7 @@ static int vaddr_get_pfn(struct mm_struct *mm, unsigned long vaddr,
-> > >  		 */
-> > >  		if (ret > 0 && vma_is_fsdax(vmas[0])) {
-> > >  			ret = -EOPNOTSUPP;
-> > > -			put_page(page[0]);
-> > > +			put_user_page(page[0]);
-> > >  		}
-> > >  	}
-> > >  	up_read(&mm->mmap_sem);
-> > > diff --git a/fs/io_uring.c b/fs/io_uring.c
-> > > index 4ef62a4..b4a4549 100644
-> > > --- a/fs/io_uring.c
-> > > +++ b/fs/io_uring.c
-> > > @@ -2694,10 +2694,9 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
-> > >  			 * if we did partial map, or found file backed vmas,
-> > >  			 * release any pages we did get
-> > >  			 */
-> > > -			if (pret > 0) {
-> > > -				for (j = 0; j < pret; j++)
-> > > -					put_page(pages[j]);
-> > > -			}
-> > > +			if (pret > 0)
-> > > +				put_user_pages(pages, pret);
-> > > +
-> > >  			if (ctx->account_mem)
-> > >  				io_unaccount_mem(ctx->user, nr_pages);
-> > >  			kvfree(imu->bvec);
-> > > diff --git a/mm/gup_benchmark.c b/mm/gup_benchmark.c
-> > > index 7dd602d..15fc7a2 100644
-> > > --- a/mm/gup_benchmark.c
-> > > +++ b/mm/gup_benchmark.c
-> > > @@ -76,11 +76,7 @@ static int __gup_benchmark_ioctl(unsigned int cmd,
-> > >  	gup->size = addr - gup->addr;
-> > >  
-> > >  	start_time = ktime_get();
-> > > -	for (i = 0; i < nr_pages; i++) {
-> > > -		if (!pages[i])
-> > > -			break;
-> > > -		put_page(pages[i]);
-> > > -	}
-> > > +	put_user_pages(pages, nr_pages);
-> > >  	end_time = ktime_get();
-> > >  	gup->put_delta_usec = ktime_us_delta(end_time, start_time);
-> > >  
-> > > diff --git a/net/xdp/xdp_umem.c b/net/xdp/xdp_umem.c
-> > > index 9c6de4f..6103e19 100644
-> > > --- a/net/xdp/xdp_umem.c
-> > > +++ b/net/xdp/xdp_umem.c
-> > > @@ -173,12 +173,7 @@ static void xdp_umem_unpin_pages(struct xdp_umem *umem)
-> > >  {
-> > >  	unsigned int i;
-> > >  
-> > > -	for (i = 0; i < umem->npgs; i++) {
-> > > -		struct page *page = umem->pgs[i];
-> > > -
-> > > -		set_page_dirty_lock(page);
-> > > -		put_page(page);
-> > > -	}
-> > > +	put_user_pages_dirty_lock(umem->pgs, umem->npgs);
-> > >  
-> > >  	kfree(umem->pgs);
-> > >  	umem->pgs = NULL;
-> > > 
+Thanks,
+drew
