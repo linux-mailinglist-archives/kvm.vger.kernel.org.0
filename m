@@ -2,93 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B4A946988C
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 17:48:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37496698BB
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 18:00:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730787AbfGOPsQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 11:48:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36818 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730257AbfGOPsP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 11:48:15 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 68D4A308330D;
-        Mon, 15 Jul 2019 15:48:15 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9456A5C21A;
-        Mon, 15 Jul 2019 15:48:14 +0000 (UTC)
-Date:   Mon, 15 Jul 2019 17:48:12 +0200
-From:   Andrew Jones <drjones@redhat.com>
-To:     Nadav Amit <nadav.amit@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH 3/3] x86: Support environments without
- test-devices
-Message-ID: <20190715154812.mlw4toyzkpwsfrfm@kamzik.brq.redhat.com>
-References: <20190628203019.3220-1-nadav.amit@gmail.com>
- <20190628203019.3220-4-nadav.amit@gmail.com>
+        id S1731131AbfGOQAR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 12:00:17 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:40521 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730931AbfGOQAR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 12:00:17 -0400
+Received: by mail-pf1-f195.google.com with SMTP id p184so7618513pfp.7
+        for <kvm@vger.kernel.org>; Mon, 15 Jul 2019 09:00:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1pf3WGwA9D7m+i0fi13et95NxKX1fwC73+4IJDRPguM=;
+        b=CUwZ43K9ybSDvf08eErRqtarzGQdiyDymnpU0KIK2JQh0T9Sup32mLmqjhs/VSqLrM
+         MYwEWnD1tZLcOi15wredI/8U9xLO31vPqZvI1nsgvE8QGayvfGS4zJ8DFpd8xTqTB2Uu
+         X0XI38pv45yv7xUlijhdFuvP2joPIHdZCt3wPU6yGKh7zI1+RsRJeph15u1MMAsHXsmU
+         N/CNSsdTxOBDr+vJzIQZq74ITN4H5tRoqeyXjfz14O98vHdJyS9nZdunI9ZY16WRAzUr
+         aDjqrcEfrIeCTuDiF5a0mq44jqMLnJJxVYJo2ivJup10466XLsZAPQUB28/H/OHw+0N1
+         yN/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1pf3WGwA9D7m+i0fi13et95NxKX1fwC73+4IJDRPguM=;
+        b=CtpUuNwJMaafCfXiTvrh4fVoukSxXGTmRKpTkAs2Z9OjbOQLOMAjab2xA4H3ewYdoB
+         dfFywLTnE6qzTizXIYf3XL21agvOr2bgT8no6Zi9Nd6CgxxV8YVB9yS0vc9QPbDoH9ny
+         nsnXiS21PiOhrFssVLI6Ju9cOyuN+dOQuQqxCi8IVfhYfsr69+qXwyVttdqsgXpoxjr+
+         bEbPhszBmm5iWtdBRBUYK0XoSGVb1TxYs1wUTTVxEdmKuPDNSWJ6xFrSj+je/8jas3SZ
+         0uNZKNPJU++Xvg8lnRV2WVHJMT0ZTSUOqT9Aa30+0xL4Pf7Ap5D1KkKTvrgWpFeRcljG
+         8XSA==
+X-Gm-Message-State: APjAAAUkx4G13UYbB9C8FbK8Q1Vgtn7P3lHNVeYcV1aWnMasda2U28FE
+        Dbv0OHzpcWgUE+Gk89koaUimqekVefEzqOtrtvGeTg==
+X-Google-Smtp-Source: APXvYqxUxnVJIFmSjF/fduDJIdHHtTu2E7rs0M1v5DQsmsjwZzuX9klo19X53kLCG4pNPCe3wIEdLnHCwqNb7FnoP6U=
+X-Received: by 2002:a17:90a:a116:: with SMTP id s22mr29852919pjp.47.1563206415768;
+ Mon, 15 Jul 2019 09:00:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190628203019.3220-4-nadav.amit@gmail.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Mon, 15 Jul 2019 15:48:15 +0000 (UTC)
+References: <cover.1561386715.git.andreyknvl@google.com> <41e0a911e4e4d533486a1468114e6878e21f9f84.1561386715.git.andreyknvl@google.com>
+ <20190624175009.GM29120@arrakis.emea.arm.com>
+In-Reply-To: <20190624175009.GM29120@arrakis.emea.arm.com>
+From:   Andrey Konovalov <andreyknvl@google.com>
+Date:   Mon, 15 Jul 2019 18:00:04 +0200
+Message-ID: <CAAeHK+x2TL057Fr0K7FZBTYgeEPVU3cC6scEeiSYk-Jkb3xgfg@mail.gmail.com>
+Subject: Re: [PATCH v18 07/15] fs/namespace: untag user pointers in copy_mount_options
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        kvm@vger.kernel.org,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Will Deacon <will.deacon@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Felix Kuehling <Felix.Kuehling@amd.com>,
+        Alexander Deucher <Alexander.Deucher@amd.com>,
+        Christian Koenig <Christian.Koenig@amd.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Dave Martin <Dave.Martin@arm.com>,
+        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Kostya Serebryany <kcc@google.com>,
+        Evgeniy Stepanov <eugenis@google.com>,
+        Lee Smith <Lee.Smith@arm.com>,
+        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
+        Jacob Bramley <Jacob.Bramley@arm.com>,
+        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Kevin Brodsky <kevin.brodsky@arm.com>,
+        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jun 28, 2019 at 01:30:19PM -0700, Nadav Amit wrote:
-> Enable to run the tests when test-device is not present (e.g.,
-> bare-metal). Users can provide the number of CPUs and ram size through
-> kernel parameters.
+On Mon, Jun 24, 2019 at 7:50 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
+>
+> On Mon, Jun 24, 2019 at 04:32:52PM +0200, Andrey Konovalov wrote:
+> > This patch is a part of a series that extends kernel ABI to allow to pass
+> > tagged user pointers (with the top byte set to something else other than
+> > 0x00) as syscall arguments.
+> >
+> > In copy_mount_options a user address is being subtracted from TASK_SIZE.
+> > If the address is lower than TASK_SIZE, the size is calculated to not
+> > allow the exact_copy_from_user() call to cross TASK_SIZE boundary.
+> > However if the address is tagged, then the size will be calculated
+> > incorrectly.
+> >
+> > Untag the address before subtracting.
+> >
+> > Reviewed-by: Khalid Aziz <khalid.aziz@oracle.com>
+> > Reviewed-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
+> > Reviewed-by: Kees Cook <keescook@chromium.org>
+> > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+> > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
+> > ---
+> >  fs/namespace.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/fs/namespace.c b/fs/namespace.c
+> > index 7660c2749c96..ec78f7223917 100644
+> > --- a/fs/namespace.c
+> > +++ b/fs/namespace.c
+> > @@ -2994,7 +2994,7 @@ void *copy_mount_options(const void __user * data)
+> >        * the remainder of the page.
+> >        */
+> >       /* copy_from_user cannot cross TASK_SIZE ! */
+> > -     size = TASK_SIZE - (unsigned long)data;
+> > +     size = TASK_SIZE - (unsigned long)untagged_addr(data);
+> >       if (size > PAGE_SIZE)
+> >               size = PAGE_SIZE;
+>
+> I think this patch needs an ack from Al Viro (cc'ed).
+>
+> --
+> Catalin
 
-Can you provide multiboot a pointer to an initrd (text file) with
-environment variables listed instead? Because this works
+Hi Al,
 
-$ cat x86/params.c 
-#include <libcflat.h>
-int main(void)
-{
-    printf("nr_cpus=%ld\n", atol(getenv("NR_CPUS")));
-    printf("memsize=%ld\n", atol(getenv("MEMSIZE")));
-    return 0;
-}
+Could you take a look and give your acked-by?
 
-$ cat params.initrd 
-NR_CPUS=2
-MEMSIZE=256
-
-$ qemu-system-x86_64 -nodefaults -device pc-testdev -device isa-debug-exit,iobase=0xf4,iosize=0x4 -vnc none -serial stdio -device pci-testdev -machine accel=kvm -kernel x86/params.flat -initrd params.initrd
-enabling apic
-enabling apic
-nr_cpus=2
-memsize=256
-
-
-This works because setup_multiboot() looks for an initrd, and then,
-if present, it gets interpreted as a list of environment variables
-which become the unit tests **envp.
-
-Thanks,
-drew
-
-> 
-> On Ubuntu, for example, the tests can be run by copying a test to the
-> boot directory (/boot) and adding a menuentry to grub (editing
-> /etc/grub.d/40_custom):
-> 
->   menuentry 'idt_test' {
-> 	set root='ROOT'
-> 	multiboot BOOT_RELATIVE/idt_test.flat ignore nb_cpus=48 \
-> 		ram_size=4294967296 no-test-device
->   }
-> 
-> Replace ROOT with `grub-probe --target=bios_hints /boot` and
-> BOOT_RELATIVE with `grub-mkrelpath /boot`, and run update-grub.
-> 
-> Note that the first kernel parameter is ignored for compatibility with
-> test executions through QEMU.
-> 
+Thanks!
