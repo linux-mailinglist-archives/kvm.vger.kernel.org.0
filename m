@@ -2,68 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FD1A69ACA
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 20:28:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 547F269AE7
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 20:32:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729635AbfGOS2w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 14:28:52 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:39280 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729441AbfGOS2w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 14:28:52 -0400
-Received: by mail-wm1-f68.google.com with SMTP id u25so5817284wmc.4
-        for <kvm@vger.kernel.org>; Mon, 15 Jul 2019 11:28:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=uw98xrMIhtv6b4xV/oWmb7W00RrBRhQXYLpADwO7gr4=;
-        b=If4dKjVCgK9Bu58HV1FvlH5sgobug4OkaHYFuPjg+T5ZAQt2ss/m8XX4bDc/Psce6G
-         7Rjfsr58l7IoohITo+uoQ2Ny7cAwlSBc3Z2HhCjuo6h/t1UbeuusDMn5SAKO8lh5ry/b
-         jltyh6eNtu8QDPXa154qtYgst5o//6aR6wH33fmfyZPfCeqi1mxGaO8F9E8ABUQJcP5h
-         7QTHScivQscVf+cz6k3aXNSagX0vSHFYVpLLsV7HgVq9eweFc9r+cCRai2SnVP6BpRO2
-         YsTdTyFNNyHldogrWsiyFDd9oJvnK3sHSI2yam3ZH95yjI32IyrBFknaoDBs8OI05x+V
-         68yQ==
-X-Gm-Message-State: APjAAAUYBePrFQ8cek5rZIoFAVaLINeYlkKfFF40QnI+XmAI90rPi76g
-        8LhiwWXts/qz3qJD00Y+zmILE/UJAKw=
-X-Google-Smtp-Source: APXvYqy17OQNVkssISf4mPDFAKxNlj95Br4uYgLVDh+e2hgMbrh7RKrU6HA3FFmpMysZQ1BgWpJc4A==
-X-Received: by 2002:a1c:6504:: with SMTP id z4mr25147426wmb.172.1563215330368;
-        Mon, 15 Jul 2019 11:28:50 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:b159:8d52:3041:ae0d? ([2001:b07:6468:f312:b159:8d52:3041:ae0d])
-        by smtp.gmail.com with ESMTPSA id e5sm18505873wro.41.2019.07.15.11.28.49
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 15 Jul 2019 11:28:49 -0700 (PDT)
+        id S1729534AbfGOSbY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 14:31:24 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:34972 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729277AbfGOSbY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 14:31:24 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6FIT6fA062087;
+        Mon, 15 Jul 2019 18:30:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2018-07-02; bh=hopLuf5BdO4Hp4VyyoYHpaylCZN2F3fSGEY9jDvuJts=;
+ b=JVdI472Z/iRpilgLDIk8Pc4VQhFU0unpgTbJMwZiCHxL6OaeVI/tcAgkemsQvBOhThJi
+ B78JN/BQtKsreFgn/eKR9TalT2oVK4hTGgajWPPWFYS29NPjDlnlJh9icMCe1liGgOBV
+ QO1nkHYvgcVZ731PX6Kr/NAOQ2MnafEGDT4Qr0iaIWviPdhR3wT2e1nck4k3V6WbyWfZ
+ dbdCFwpbPdK9r9pRWjw0z03C/NLwLTBxZbGonDtY0FmamNP4WWvXJg5ZCACmBI/0fdI8
+ 1J/qerjwXv9g0I6iQCUGdKGYIVMmyK1xR+YD2+lTvgqGsSnzfL1pHxg6OWxDm7UoL8G3 Eg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 2tq78pg6g9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 15 Jul 2019 18:30:53 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6FIS1jk056761;
+        Mon, 15 Jul 2019 18:30:52 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 2tq4dtff8r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 15 Jul 2019 18:30:52 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6FIUpgh004797;
+        Mon, 15 Jul 2019 18:30:51 GMT
+Received: from [10.30.3.6] (/213.57.127.2)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 15 Jul 2019 11:30:51 -0700
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
 Subject: Re: [PATCH] KVM: nVMX: Ignore segment base for VMX memory operand
  when segment not FS or GS
-To:     Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Liran Alon <liran.alon@oracle.com>, max@m00nbsd.net,
+From:   Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <801988b0-b5c0-011e-5775-cb9e22f5d5c2@redhat.com>
+Date:   Mon, 15 Jul 2019 21:30:48 +0300
+Cc:     Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, max@m00nbsd.net,
         Joao Martins <joao.m.martins@oracle.com>, rkrcmar@redhat.com,
         kvm@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <C000BFA0-5FE2-4AD4-B3F5-079AFE3005A2@oracle.com>
 References: <20190715154744.36134-1-liran.alon@oracle.com>
  <87r26rw9lv.fsf@vitty.brq.redhat.com> <20190715172139.GB789@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <801988b0-b5c0-011e-5775-cb9e22f5d5c2@redhat.com>
-Date:   Mon, 15 Jul 2019 20:28:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <20190715172139.GB789@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+ <801988b0-b5c0-011e-5775-cb9e22f5d5c2@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9319 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907150212
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9319 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907150212
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 15/07/19 19:21, Sean Christopherson wrote:
->>> +		if ((seg_reg != VCPU_SREG_FS) && (seg_reg != VCPU_SREG_GS))
-> I'm pretty sure the internal parantheses are unnecessary.
-> 
 
-Indeed, that's so Pascal! :)  I'll apply Vitaly's suggestion and queue it.
 
-Paolo
+> On 15 Jul 2019, at 21:28, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 15/07/19 19:21, Sean Christopherson wrote:
+>>>> +		if ((seg_reg !=3D VCPU_SREG_FS) && (seg_reg !=3D =
+VCPU_SREG_GS))
+>> I'm pretty sure the internal parantheses are unnecessary.
+>>=20
+>=20
+> Indeed, that's so Pascal! :)  I'll apply Vitaly's suggestion and queue =
+it.
+>=20
+> Paolo
+
+I like parentheses as it makes ordering of expression a no-brainer. But =
+that=E2=80=99s just a matter of taste I guess.
+I don=E2=80=99t mind you will change it according to given suggestions. =
+:)
+
+-Liran=
