@@ -2,81 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B6365697E9
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 17:14:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B9B2697A6
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 17:12:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731795AbfGOPOG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 11:14:06 -0400
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:41305 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731600AbfGONsy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 09:48:54 -0400
-Received: by mail-oi1-f194.google.com with SMTP id g7so12660599oia.8
-        for <kvm@vger.kernel.org>; Mon, 15 Jul 2019 06:48:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=KhkyjNmkbBt2TNHskueMzItP+CrD8zBwY2BmKGOgg24=;
-        b=lmI7jgqwe/klpYvHZkRxhikM1BoM6wJfMh+JrykXLTcrQbog2aDqRwp25mzdsRqDig
-         qEAagZuqq1sGl+epF5tcN+vcB+pIyfRLI269AvgeAsIOu+4UvMu76dVtldMfmQBgVoMo
-         +vOXZq1n8y/eh70MGI83416zfyEhbBvY8cZii5YzXTapEakgID/bS3K/zM8jh5AzTPeS
-         bPlYnbBpPe7UuYYfE/h7djLWag761E1+LpGxPrSUrxycnfkKP0eZ4tPqhL/sK4vAGqrF
-         b5Td2iJ2+OhsIb4sjS/XYvJLQuMXNaLqohdbIRIoaidrSpkESo0eM7hEOkpMyYevJwpg
-         grQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KhkyjNmkbBt2TNHskueMzItP+CrD8zBwY2BmKGOgg24=;
-        b=BZCgFTAqUyg1vn3rfL8z2p9Isk12pfAUWEH2mqvKTkXB3ZUT60bov5Dy2hQrmGI/zs
-         TMqyK0OW0j2YrkNLy6rbVHjorBHljpvnf2J6MgNwH4ON1CFDgmN2tAXmnL2LlpucECOD
-         ev9BdVKiKNJP13YZM+B3hTAecqcbAhe623L/VcgPK9/daNZ9ewZAYRvCXC5Y0EWPv/nC
-         kEZu0TFEA3cAda+9gfuJlK7zrLc9z3sa2/B8p2u58KVqqfh7QFwD/lDcHQblEpdp7afE
-         7dciYnw6nM1xWBBO6rFjoVm8J0mZUzUhEwhjf5wSGM5SZFXJaTyfg+1kqQJP8uTSMg/F
-         Y2Lw==
-X-Gm-Message-State: APjAAAUAhgO7lrKsSSOStU9eeYpcxWxz2VRr+bOhFV0+KOslz6pwFmkP
-        b/ypHfVe4dpPV5FBQwAPBSAxZSYKlHh/YHk2Qw8tmA==
-X-Google-Smtp-Source: APXvYqxeCSv7UUCXqxX+f+jUbGXXh8dmymO3S+I1HW0faMk34f4/TcgmuVMDIIt3tGibA09eGd/lfrl/Am80fyL7O5Y=
-X-Received: by 2002:aca:ac48:: with SMTP id v69mr12743117oie.48.1563198533124;
- Mon, 15 Jul 2019 06:48:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190712143207.4214-1-quintela@redhat.com> <CAFEAcA-ydNS072OH7CyGNq2+sESgonW-8QSJdNYJq6zW-rYjUQ@mail.gmail.com>
- <CAFEAcA9ncjtGdc8CZOJBDBRtzEU8oL7YicVg5PtyiiO2O4z51w@mail.gmail.com> <87zhlf76pk.fsf@trasno.org>
-In-Reply-To: <87zhlf76pk.fsf@trasno.org>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Mon, 15 Jul 2019 14:48:42 +0100
-Message-ID: <CAFEAcA_9tVQht7bp9_yrFEhQ74ye6LBNjEYK_nftCWsKMrOohw@mail.gmail.com>
-Subject: Re: [PULL 00/19] Migration patches
-To:     Juan Quintela <quintela@redhat.com>
-Cc:     QEMU Developers <qemu-devel@nongnu.org>,
-        Laurent Vivier <lvivier@redhat.com>,
+        id S1731388AbfGONwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 09:52:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32856 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730490AbfGONwU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 09:52:20 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3A78C307CDF2;
+        Mon, 15 Jul 2019 13:52:20 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.36.118.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F34F95B681;
+        Mon, 15 Jul 2019 13:52:07 +0000 (UTC)
+From:   Juan Quintela <quintela@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Juan Quintela <quintela@redhat.com>,
         Thomas Huth <thuth@redhat.com>,
-        kvm-devel <kvm@vger.kernel.org>,
+        Richard Henderson <rth@twiddle.net>,
+        Laurent Vivier <lvivier@redhat.com>,
         "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <rth@twiddle.net>
-Content-Type: text/plain; charset="UTF-8"
+        Peter Xu <peterx@redhat.com>
+Subject: [PULL 08/21] migration: No need to take rcu during sync_dirty_bitmap
+Date:   Mon, 15 Jul 2019 15:51:12 +0200
+Message-Id: <20190715135125.17770-9-quintela@redhat.com>
+In-Reply-To: <20190715135125.17770-1-quintela@redhat.com>
+References: <20190715135125.17770-1-quintela@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Mon, 15 Jul 2019 13:52:20 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 15 Jul 2019 at 14:44, Juan Quintela <quintela@redhat.com> wrote:
->
-> Peter Maydell <peter.maydell@linaro.org> wrote:
-> > On Fri, 12 Jul 2019 at 17:33, Peter Maydell <peter.maydell@linaro.org> wrote:
-> >> Still fails on aarch32 host, I'm afraid:
->
-> Hi
->
-> dropping the multifd test patch from now.  For "some" reason, having a
-> packed struct and 32bits is getting ugly, not sure yet _why_.
+From: Peter Xu <peterx@redhat.com>
 
-IMHO 'packed' structs are usually a bad idea. They have a bunch
-of behaviours you may not be expecting (for instance they're
-also not naturally aligned, and arrays of them won't be the
-size you expect).
+cpu_physical_memory_sync_dirty_bitmap() has one RAMBlock* as
+parameter, which means that it must be with RCU read lock held
+already.  Taking it again inside seems redundant.  Removing it.
+Instead comment on the functions about the RCU read lock.
 
-thanks
--- PMM
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20190603065056.25211-2-peterx@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ include/exec/ram_addr.h | 5 +----
+ migration/ram.c         | 1 +
+ 2 files changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index f96777bb99..44dcc98de6 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -409,6 +409,7 @@ static inline void cpu_physical_memory_clear_dirty_range(ram_addr_t start,
+ }
+ 
+ 
++/* Called with RCU critical section */
+ static inline
+ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+                                                ram_addr_t start,
+@@ -432,8 +433,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+                                         DIRTY_MEMORY_BLOCK_SIZE);
+         unsigned long page = BIT_WORD(start >> TARGET_PAGE_BITS);
+ 
+-        rcu_read_lock();
+-
+         src = atomic_rcu_read(
+                 &ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION])->blocks;
+ 
+@@ -453,8 +452,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+                 idx++;
+             }
+         }
+-
+-        rcu_read_unlock();
+     } else {
+         ram_addr_t offset = rb->offset;
+ 
+diff --git a/migration/ram.c b/migration/ram.c
+index 89eec7ee9d..48969db84b 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1674,6 +1674,7 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
+     return ret;
+ }
+ 
++/* Called with RCU critical section */
+ static void migration_bitmap_sync_range(RAMState *rs, RAMBlock *rb,
+                                         ram_addr_t length)
+ {
+-- 
+2.21.0
+
