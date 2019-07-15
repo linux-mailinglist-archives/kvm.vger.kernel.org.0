@@ -2,86 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 051D969093
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 16:23:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 985D269056
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 16:21:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390659AbfGOOWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 10:22:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52048 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390619AbfGOOWq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:22:46 -0400
-Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3FA8A2184E;
-        Mon, 15 Jul 2019 14:22:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563200565;
-        bh=3naJwCoZa8U1fnAU2ndnwcAG/epwsikMi3505JUZVV8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rh7AIdSwPhTm0xzmkndySVeaHA/5g85v0DBZoGwbLuoAh+0UML/B7/AkKR05oETsM
-         qjYRwBnbKBQrcpgc6DPim2bHIRJfBUPy8oPF427QTYWUW6bvUE40q2uQyITclN2bdK
-         7FK06otblGb9T7WdTooefkzlP8qMZioJ3TfgjzH8=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 079/158] vhost_net: disable zerocopy by default
-Date:   Mon, 15 Jul 2019 10:16:50 -0400
-Message-Id: <20190715141809.8445-79-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190715141809.8445-1-sashal@kernel.org>
-References: <20190715141809.8445-1-sashal@kernel.org>
+        id S2390455AbfGOOUt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 10:20:49 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:36524 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389923AbfGOOUq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:20:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=XUMcM3p/qnvRPDxgVJtrMmN7KVyZqOJ6ChxzB0K7L+E=; b=a7EL+xYRoAG37/eyYpwGYpZho
+        X7xg/QFkqobtLjv+zUNje5j3qcSas8r+c/uuytTwNDDt8etaTc9B8RRZN45reaq1MMwWgD73kwo9x
+        5S4s4Q9GPr5lbHkGGv8FDt6whpwQdwGQUGRPdSlH3oWXGN1CfAMb/H2AuH+U/+0zNxJ607SVUHc4R
+        qOw6M5r/HqzmTTSMAZmYAcPLRnS9k7W2bRZJp9j9Raqei3J2Q7KMkTX94IvYyHWxGerXDKmkmnaAs
+        5BRSpmrcK35SIn47cqUOrlyiTgLoKe3sCplTY/OiU7NcyJDV8OH2AR4KBsV9axGdp62KUvbba2t+Q
+        BmhXSjJXg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.92 #3 (Red Hat Linux))
+        id 1hn1qP-0004du-5m; Mon, 15 Jul 2019 14:20:45 +0000
+Date:   Mon, 15 Jul 2019 07:20:45 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 1/1] s390/protvirt: restore force_dma_unencrypted()
+Message-ID: <20190715142045.GA908@infradead.org>
+References: <20190715131719.100650-1-pasic@linux.ibm.com>
+ <20190715132027.GA18357@infradead.org>
+ <7e393b48-4165-e1d4-0450-e52dd914a3cd@amd.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7e393b48-4165-e1d4-0450-e52dd914a3cd@amd.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jason Wang <jasowang@redhat.com>
+Ok,
 
-[ Upstream commit 098eadce3c622c07b328d0a43dda379b38cf7c5e ]
+I've folded the minimal s390 fix in, please both double check that this
+is ok as the minimally invasive fix:
 
-Vhost_net was known to suffer from HOL[1] issues which is not easy to
-fix. Several downstream disable the feature by default. What's more,
-the datapath was split and datacopy path got the support of batching
-and XDP support recently which makes it faster than zerocopy part for
-small packets transmission.
+http://git.infradead.org/users/hch/dma-mapping.git/commitdiff/7bb9bbcee8845af663a7a60df9e2cc24422b3de5
 
-It looks to me that disable zerocopy by default is more
-appropriate. It cold be enabled by default again in the future if we
-fix the above issues.
-
-[1] https://patchwork.kernel.org/patch/3787671/
-
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/vhost/net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 39155d7cc894..ae704658b528 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -36,7 +36,7 @@
- 
- #include "vhost.h"
- 
--static int experimental_zcopytx = 1;
-+static int experimental_zcopytx = 0;
- module_param(experimental_zcopytx, int, 0444);
- MODULE_PARM_DESC(experimental_zcopytx, "Enable Zero Copy TX;"
- 		                       " 1 -Enable; 0 - Disable");
--- 
-2.20.1
-
+The s390 fix to clean up sev_active can then go into the series that
+Thiago is working on.
