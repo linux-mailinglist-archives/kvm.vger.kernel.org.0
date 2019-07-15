@@ -2,136 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 3028E69A72
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 20:05:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B55669A88
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 20:08:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729307AbfGOSFN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 14:05:13 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:35338 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730192AbfGOSFN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 14:05:13 -0400
-Received: by mail-qt1-f195.google.com with SMTP id d23so16622159qto.2
-        for <kvm@vger.kernel.org>; Mon, 15 Jul 2019 11:05:12 -0700 (PDT)
+        id S1729467AbfGOSIh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 14:08:37 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:38548 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729366AbfGOSIg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 14:08:36 -0400
+Received: by mail-pg1-f196.google.com with SMTP id z75so8089745pgz.5
+        for <kvm@vger.kernel.org>; Mon, 15 Jul 2019 11:08:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=oQ4K7j9A7KZ0nbwdC0yOxg3aR/aRtjl8qzNQbwacYqI=;
-        b=PwR1EtCrURwrbo7TpqHuOvhX3LIycbjKkBb4iZ6+YCuC60ErzFmtlkMrRo9GfbX0ep
-         bOPWg9HzO0UREAz1sjKJFk3TljxpYwzvCkuA0H8lubNfJCvY2ASmYBnxIKBySJaciMh9
-         IWCtA6vd68VwBDPGY07TF40sWdRGtt46+KtuhJCf3Dkv+hk0kDlTClc7v0FgkXnm9Td6
-         i1yxqpRiKWqC8epriEnPtS7rhozNGFmNJhWNANw7o2ytOh0Tu6qDWMUojtH/q6UpZnph
-         8NNcHVz4Emezex9wQTSbQUH4N9LwFgHNyRTzxKvxiscGagPT01BlLq6kMX4xBhj5skGH
-         0P7g==
+        d=gmail.com; s=20161025;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=SblXFu065uxzPZrmS6N9sHY8CMtn3pra44rW+mH9DGs=;
+        b=UTc+eboihpsI2f3zznc+QpmHto7rPTXeUlUyY1B06IqvsTUE56EKtIFGKPZgggOUcS
+         Ts1Stcl5aJn/Hr/cooaKOuMzocNIaP2q162wIsqYnDEK/9mVyFommuc7jT6iM9M6PeLH
+         JLlzBIfBILqpD0VxSeeqr1LsWAuZc46R4VUNNnlZ0/N5d46lRnljMhk7b2cMs2UJap4q
+         IShHHiMzM5KFohCzd1x3CDL5L3MXM6WH8x/LxdiJrT6XhUErJDQudf8sa6GcrmEIPRb7
+         lRqbbopwHRdX9eU04IfqPKRP7cLlc9v6VF/HZq1jvqv2cb0cgkEFX+gC8/eca79UEeQs
+         pvNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=oQ4K7j9A7KZ0nbwdC0yOxg3aR/aRtjl8qzNQbwacYqI=;
-        b=oXfRdJX2zqjoepCnZJi7UPVAmsrj+5dOzI6JF02MjaFTLPR30QmlaG/aMGzLk+JwhE
-         BjS8ztF+YiuBtbj+pLeL2lrteZoItOLLOjZWL3MqvLTB4WtCjNrmLnWiMdzqC0EgdYzM
-         EbKOMgkf1A4AH7UwxNVigk8fDh8gb+BytkRfJ4fb2VhaiLp54C6YmaNSxOlRuG10aEz6
-         f7dyGLfyoe3cDjOHbbKn5lQ7NSuT4hs1jKtKo1qiwkJ759DcB0BMKj6plVjV5cKalwEG
-         Tz5ImqLu0LCePBDupzJurnw9M2iSF9H6GzDGRSu05UpD66OD4dpdYVl8khPDvhK1La3B
-         EZ7A==
-X-Gm-Message-State: APjAAAUqnuXJdlvctbXBQ4Lo6NdDFpYTEV7VfTXhSON8el9yaYw21MFz
-        SCCuTDRKlcCDZ9+cUPYr77UE9A==
-X-Google-Smtp-Source: APXvYqzV3YFI+MpwRBSBS9L25rk8A7XfyA1gAg9YfhwBzidc1Vfy+exQVLzBpqEA6++D83b7IWLy1g==
-X-Received: by 2002:a05:6214:3a5:: with SMTP id m5mr19973542qvy.7.1563213911969;
-        Mon, 15 Jul 2019 11:05:11 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-156-34-55-100.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.34.55.100])
-        by smtp.gmail.com with ESMTPSA id l80sm8277974qke.24.2019.07.15.11.05.11
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 15 Jul 2019 11:05:11 -0700 (PDT)
-Received: from jgg by mlx.ziepe.ca with local (Exim 4.90_1)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1hn5La-0001zV-SL; Mon, 15 Jul 2019 15:05:10 -0300
-Date:   Mon, 15 Jul 2019 15:05:10 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Andrey Konovalov <andreyknvl@google.com>
-Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        kvm@vger.kernel.org,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Alexander Deucher <Alexander.Deucher@amd.com>,
-        Christian Koenig <Christian.Koenig@amd.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-        Dave Martin <Dave.Martin@arm.com>,
-        Khalid Aziz <khalid.aziz@oracle.com>, enh <enh@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Kostya Serebryany <kcc@google.com>,
-        Evgeniy Stepanov <eugenis@google.com>,
-        Lee Smith <Lee.Smith@arm.com>,
-        Ramana Radhakrishnan <Ramana.Radhakrishnan@arm.com>,
-        Jacob Bramley <Jacob.Bramley@arm.com>,
-        Ruben Ayrapetyan <Ruben.Ayrapetyan@arm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Kevin Brodsky <kevin.brodsky@arm.com>,
-        Szabolcs Nagy <Szabolcs.Nagy@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v18 11/15] IB/mlx4: untag user pointers in
- mlx4_get_umem_mr
-Message-ID: <20190715180510.GC4970@ziepe.ca>
-References: <cover.1561386715.git.andreyknvl@google.com>
- <ea0ff94ef2b8af12ea6c222c5ebd970e0849b6dd.1561386715.git.andreyknvl@google.com>
- <20190624174015.GL29120@arrakis.emea.arm.com>
- <CAAeHK+y8vE=G_odK6KH=H064nSQcVgkQkNwb2zQD9swXxKSyUQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeHK+y8vE=G_odK6KH=H064nSQcVgkQkNwb2zQD9swXxKSyUQ@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=SblXFu065uxzPZrmS6N9sHY8CMtn3pra44rW+mH9DGs=;
+        b=ApNoATzkYC8/QxV4tC5y8ZH50cXIBhH5qtRgRWJ2ylOnMxM1Ha+gBiVFX6yCiaVVZy
+         hJ/b8Ym4oFf4JzaGzvZ9MVBaVvhcXb3OCJAysMy+Ct65f2Z6Xsdd/D912eaqLcu0HhLu
+         IGnpTkO/z0n9ngXvn0AwLVxDl4+DiDE84hN/PdVhPjBIR5ODVi4VXQfMbyMZ5UtmeWtr
+         DE9jDPM8xeDsz2eq944974SV7qOPeKBVR451CoEOqTuCbHA2bM623f4arQpNW/XcMFjD
+         Ro9gj6GtQMLgy8geqn6J2E0jCulTdhE0M7bdWJg9Q/jyH+/TVPVwCy0QWAE8L62iHaG4
+         QYsQ==
+X-Gm-Message-State: APjAAAUnU1l6qMF+4PV0SSo8SpjL7cr1hZ5gjcLnje42ANNL4oPH2OUB
+        wEaDx9GVZw6JAqv4BP9NuSQ=
+X-Google-Smtp-Source: APXvYqzEYXGxMTs1cPTJcPIgQp36uOEehN1YOl6RxjsNavafle3T43FUXCk9gSq5A6AVcgMb+1/4vg==
+X-Received: by 2002:a17:90a:3247:: with SMTP id k65mr30574984pjb.49.1563214115552;
+        Mon, 15 Jul 2019 11:08:35 -0700 (PDT)
+Received: from [10.2.189.129] ([66.170.99.2])
+        by smtp.gmail.com with ESMTPSA id s24sm18974218pfh.133.2019.07.15.11.08.33
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 15 Jul 2019 11:08:34 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [kvm-unit-tests PATCH 3/3] x86: Support environments without
+ test-devices
+From:   Nadav Amit <nadav.amit@gmail.com>
+In-Reply-To: <20190715154812.mlw4toyzkpwsfrfm@kamzik.brq.redhat.com>
+Date:   Mon, 15 Jul 2019 11:08:33 -0700
+Cc:     kvm list <kvm@vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <FFD1C3FC-C442-4953-AFA6-0FFADDEA8351@gmail.com>
+References: <20190628203019.3220-1-nadav.amit@gmail.com>
+ <20190628203019.3220-4-nadav.amit@gmail.com>
+ <20190715154812.mlw4toyzkpwsfrfm@kamzik.brq.redhat.com>
+To:     Andrew Jones <drjones@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 15, 2019 at 06:01:29PM +0200, Andrey Konovalov wrote:
-> On Mon, Jun 24, 2019 at 7:40 PM Catalin Marinas <catalin.marinas@arm.com> wrote:
-> >
-> > On Mon, Jun 24, 2019 at 04:32:56PM +0200, Andrey Konovalov wrote:
-> > > This patch is a part of a series that extends kernel ABI to allow to pass
-> > > tagged user pointers (with the top byte set to something else other than
-> > > 0x00) as syscall arguments.
-> > >
-> > > mlx4_get_umem_mr() uses provided user pointers for vma lookups, which can
-> > > only by done with untagged pointers.
-> > >
-> > > Untag user pointers in this function.
-> > >
-> > > Signed-off-by: Andrey Konovalov <andreyknvl@google.com>
-> > >  drivers/infiniband/hw/mlx4/mr.c | 7 ++++---
-> > >  1 file changed, 4 insertions(+), 3 deletions(-)
-> >
-> > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-> >
-> > This patch also needs an ack from the infiniband maintainers (Jason).
-> 
-> Hi Jason,
-> 
-> Could you take a look and give your acked-by?
+> On Jul 15, 2019, at 8:48 AM, Andrew Jones <drjones@redhat.com> wrote:
+>=20
+> On Fri, Jun 28, 2019 at 01:30:19PM -0700, Nadav Amit wrote:
+>> Enable to run the tests when test-device is not present (e.g.,
+>> bare-metal). Users can provide the number of CPUs and ram size =
+through
+>> kernel parameters.
+>=20
+> Can you provide multiboot a pointer to an initrd (text file) with
+> environment variables listed instead? Because this works
+>=20
+> $ cat x86/params.c=20
+> #include <libcflat.h>
+> int main(void)
+> {
+>    printf("nr_cpus=3D%ld\n", atol(getenv("NR_CPUS")));
+>    printf("memsize=3D%ld\n", atol(getenv("MEMSIZE")));
+>    return 0;
+> }
+>=20
+> $ cat params.initrd=20
+> NR_CPUS=3D2
+> MEMSIZE=3D256
+>=20
+> $ qemu-system-x86_64 -nodefaults -device pc-testdev -device =
+isa-debug-exit,iobase=3D0xf4,iosize=3D0x4 -vnc none -serial stdio =
+-device pci-testdev -machine accel=3Dkvm -kernel x86/params.flat -initrd =
+params.initrd
+> enabling apic
+> enabling apic
+> nr_cpus=3D2
+> memsize=3D256
+>=20
+>=20
+> This works because setup_multiboot() looks for an initrd, and then,
+> if present, it gets interpreted as a list of environment variables
+> which become the unit tests **envp.
 
-Oh, I think I did this a long time ago. Still looks OK. You will send
-it?
-
-Reviewed-by: Jason Gunthorpe <jgg@mellanox.com>
-
-Jason
+Looks like a nice solution, but Paolo preferred to see if this =
+information
+can be extracted from e810 and ACPI MADT. Paolo?=
