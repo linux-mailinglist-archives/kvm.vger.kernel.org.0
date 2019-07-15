@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 16EA3697AA
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 17:12:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C4A86979A
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 17:12:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732201AbfGONwc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 09:52:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33008 "EHLO mx1.redhat.com"
+        id S1732266AbfGONwv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 09:52:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34508 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731831AbfGONwb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 09:52:31 -0400
+        id S1732259AbfGONwu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 09:52:50 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D7C8F3086246;
-        Mon, 15 Jul 2019 13:52:30 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1DA67368E6;
+        Mon, 15 Jul 2019 13:52:50 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.36.118.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EA9DA5B697;
-        Mon, 15 Jul 2019 13:52:25 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4D08B5B681;
+        Mon, 15 Jul 2019 13:52:47 +0000 (UTC)
 From:   Juan Quintela <quintela@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
@@ -28,15 +28,15 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         Laurent Vivier <lvivier@redhat.com>,
         "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
         Peter Xu <peterx@redhat.com>
-Subject: [PULL 10/21] bitmap: Add bitmap_copy_with_{src|dst}_offset()
-Date:   Mon, 15 Jul 2019 15:51:14 +0200
-Message-Id: <20190715135125.17770-11-quintela@redhat.com>
+Subject: [PULL 14/21] kvm: Persistent per kvmslot dirty bitmap
+Date:   Mon, 15 Jul 2019 15:51:18 +0200
+Message-Id: <20190715135125.17770-15-quintela@redhat.com>
 In-Reply-To: <20190715135125.17770-1-quintela@redhat.com>
 References: <20190715135125.17770-1-quintela@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Mon, 15 Jul 2019 13:52:30 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Mon, 15 Jul 2019 13:52:50 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -44,246 +44,76 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Peter Xu <peterx@redhat.com>
 
-These helpers copy the source bitmap to destination bitmap with a
-shift either on the src or dst bitmap.
+When synchronizing dirty bitmap from kernel KVM we do it in a
+per-kvmslot fashion and we allocate the userspace bitmap for each of
+the ioctl.  This patch instead make the bitmap cache be persistent
+then we don't need to g_malloc0() every time.
 
-Meanwhile, we never have bitmap tests but we should.
-
-This patch also introduces the initial test cases for utils/bitmap.c
-but it only tests the newly introduced functions.
+More importantly, the cached per-kvmslot dirty bitmap will be further
+used when we want to add support for the KVM_CLEAR_DIRTY_LOG and this
+cached bitmap will be used to guarantee we won't clear any unknown
+dirty bits otherwise that can be a severe data loss issue for
+migration code.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
-Message-Id: <20190603065056.25211-5-peterx@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20190603065056.25211-9-peterx@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-
 ---
+ accel/kvm/kvm-all.c      | 10 +++++++---
+ include/sysemu/kvm_int.h |  2 ++
+ 2 files changed, 9 insertions(+), 3 deletions(-)
 
-Bitmap test used sizeof(unsigned long) instead of BITS_PER_LONG.
----
- include/qemu/bitmap.h  |  9 +++++
- tests/Makefile.include |  2 +
- tests/test-bitmap.c    | 72 +++++++++++++++++++++++++++++++++++
- util/bitmap.c          | 85 ++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 168 insertions(+)
- create mode 100644 tests/test-bitmap.c
-
-diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
-index 5c313346b9..82a1d2f41f 100644
---- a/include/qemu/bitmap.h
-+++ b/include/qemu/bitmap.h
-@@ -41,6 +41,10 @@
-  * bitmap_find_next_zero_area(buf, len, pos, n, mask)	Find bit free area
-  * bitmap_to_le(dst, src, nbits)      Convert bitmap to little endian
-  * bitmap_from_le(dst, src, nbits)    Convert bitmap from little endian
-+ * bitmap_copy_with_src_offset(dst, src, offset, nbits)
-+ *                                    *dst = *src (with an offset into src)
-+ * bitmap_copy_with_dst_offset(dst, src, offset, nbits)
-+ *                                    *dst = *src (with an offset into dst)
-  */
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index a3df19da56..23ace52b9e 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -516,17 +516,19 @@ static int kvm_physical_sync_dirty_bitmap(KVMMemoryListener *kml,
+          */
+         size = ALIGN(((mem->memory_size) >> TARGET_PAGE_BITS),
+                      /*HOST_LONG_BITS*/ 64) / 8;
+-        d.dirty_bitmap = g_malloc0(size);
++        if (!mem->dirty_bmap) {
++            /* Allocate on the first log_sync, once and for all */
++            mem->dirty_bmap = g_malloc0(size);
++        }
  
- /*
-@@ -271,4 +275,9 @@ void bitmap_to_le(unsigned long *dst, const unsigned long *src,
- void bitmap_from_le(unsigned long *dst, const unsigned long *src,
-                     long nbits);
++        d.dirty_bitmap = mem->dirty_bmap;
+         d.slot = mem->slot | (kml->as_id << 16);
+         if (kvm_vm_ioctl(s, KVM_GET_DIRTY_LOG, &d) == -1) {
+             DPRINTF("ioctl failed %d\n", errno);
+-            g_free(d.dirty_bitmap);
+             return -1;
+         }
  
-+void bitmap_copy_with_src_offset(unsigned long *dst, const unsigned long *src,
-+                                 unsigned long offset, unsigned long nbits);
-+void bitmap_copy_with_dst_offset(unsigned long *dst, const unsigned long *src,
-+                                 unsigned long shift, unsigned long nbits);
-+
- #endif /* BITMAP_H */
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index a983dd32da..fd7fdb8658 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -65,6 +65,7 @@ check-unit-y += tests/test-opts-visitor$(EXESUF)
- check-unit-$(CONFIG_BLOCK) += tests/test-coroutine$(EXESUF)
- check-unit-y += tests/test-visitor-serialization$(EXESUF)
- check-unit-y += tests/test-iov$(EXESUF)
-+check-unit-y += tests/test-bitmap$(EXESUF)
- check-unit-$(CONFIG_BLOCK) += tests/test-aio$(EXESUF)
- check-unit-$(CONFIG_BLOCK) += tests/test-aio-multithread$(EXESUF)
- check-unit-$(CONFIG_BLOCK) += tests/test-throttle$(EXESUF)
-@@ -538,6 +539,7 @@ tests/test-image-locking$(EXESUF): tests/test-image-locking.o $(test-block-obj-y
- tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
- tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
- tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
-+tests/test-bitmap$(EXESUF): tests/test-bitmap.o $(test-util-obj-y)
- tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
- tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o migration/page_cache.o $(test-util-obj-y)
- tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o $(test-util-obj-y)
-diff --git a/tests/test-bitmap.c b/tests/test-bitmap.c
-new file mode 100644
-index 0000000000..cb7c5e462d
---- /dev/null
-+++ b/tests/test-bitmap.c
-@@ -0,0 +1,72 @@
-+/*
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ *
-+ * Bitmap.c unit-tests.
-+ *
-+ * Copyright (C) 2019, Red Hat, Inc.
-+ *
-+ * Author: Peter Xu <peterx@redhat.com>
-+ */
-+
-+#include <stdlib.h>
-+#include "qemu/osdep.h"
-+#include "qemu/bitmap.h"
-+
-+#define BMAP_SIZE  1024
-+
-+static void check_bitmap_copy_with_offset(void)
-+{
-+    unsigned long *bmap1, *bmap2, *bmap3, total;
-+
-+    bmap1 = bitmap_new(BMAP_SIZE);
-+    bmap2 = bitmap_new(BMAP_SIZE);
-+    bmap3 = bitmap_new(BMAP_SIZE);
-+
-+    bmap1[0] = random();
-+    bmap1[1] = random();
-+    bmap1[2] = random();
-+    bmap1[3] = random();
-+    total = BITS_PER_LONG * 4;
-+
-+    /* Shift 115 bits into bmap2 */
-+    bitmap_copy_with_dst_offset(bmap2, bmap1, 115, total);
-+    /* Shift another 85 bits into bmap3 */
-+    bitmap_copy_with_dst_offset(bmap3, bmap2, 85, total + 115);
-+    /* Shift back 200 bits back */
-+    bitmap_copy_with_src_offset(bmap2, bmap3, 200, total);
-+
-+    g_assert_cmpmem(bmap1, total / BITS_PER_LONG,
-+                    bmap2, total / BITS_PER_LONG);
-+
-+    bitmap_clear(bmap1, 0, BMAP_SIZE);
-+    /* Set bits in bmap1 are 100-245 */
-+    bitmap_set(bmap1, 100, 145);
-+
-+    /* Set bits in bmap2 are 60-205 */
-+    bitmap_copy_with_src_offset(bmap2, bmap1, 40, 250);
-+    g_assert_cmpint(find_first_bit(bmap2, 60), ==, 60);
-+    g_assert_cmpint(find_next_zero_bit(bmap2, 205, 60), ==, 205);
-+    g_assert(test_bit(205, bmap2) == 0);
-+
-+    /* Set bits in bmap3 are 135-280 */
-+    bitmap_copy_with_dst_offset(bmap3, bmap1, 35, 250);
-+    g_assert_cmpint(find_first_bit(bmap3, 135), ==, 135);
-+    g_assert_cmpint(find_next_zero_bit(bmap3, 280, 135), ==, 280);
-+    g_assert(test_bit(280, bmap3) == 0);
-+
-+    g_free(bmap1);
-+    g_free(bmap2);
-+    g_free(bmap3);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
-+
-+    g_test_add_func("/bitmap/bitmap_copy_with_offset",
-+                    check_bitmap_copy_with_offset);
-+
-+    g_test_run();
-+
-+    return 0;
-+}
-diff --git a/util/bitmap.c b/util/bitmap.c
-index cb618c65a5..1753ff7f5b 100644
---- a/util/bitmap.c
-+++ b/util/bitmap.c
-@@ -402,3 +402,88 @@ void bitmap_to_le(unsigned long *dst, const unsigned long *src,
- {
-     bitmap_to_from_le(dst, src, nbits);
- }
-+
-+/*
-+ * Copy "src" bitmap with a positive offset and put it into the "dst"
-+ * bitmap.  The caller needs to make sure the bitmap size of "src"
-+ * is bigger than (shift + nbits).
-+ */
-+void bitmap_copy_with_src_offset(unsigned long *dst, const unsigned long *src,
-+                                 unsigned long shift, unsigned long nbits)
-+{
-+    unsigned long left_mask, right_mask, last_mask;
-+
-+    /* Proper shift src pointer to the first word to copy from */
-+    src += BIT_WORD(shift);
-+    shift %= BITS_PER_LONG;
-+
-+    if (!shift) {
-+        /* Fast path */
-+        bitmap_copy(dst, src, nbits);
-+        return;
-+    }
-+
-+    right_mask = (1ul << shift) - 1;
-+    left_mask = ~right_mask;
-+
-+    while (nbits >= BITS_PER_LONG) {
-+        *dst = (*src & left_mask) >> shift;
-+        *dst |= (src[1] & right_mask) << (BITS_PER_LONG - shift);
-+        dst++;
-+        src++;
-+        nbits -= BITS_PER_LONG;
-+    }
-+
-+    if (nbits > BITS_PER_LONG - shift) {
-+        *dst = (*src & left_mask) >> shift;
-+        nbits -= BITS_PER_LONG - shift;
-+        last_mask = (1ul << nbits) - 1;
-+        *dst |= (src[1] & last_mask) << (BITS_PER_LONG - shift);
-+    } else if (nbits) {
-+        last_mask = (1ul << nbits) - 1;
-+        *dst = (*src >> shift) & last_mask;
-+    }
-+}
-+
-+/*
-+ * Copy "src" bitmap into the "dst" bitmap with an offset in the
-+ * "dst".  The caller needs to make sure the bitmap size of "dst" is
-+ * bigger than (shift + nbits).
-+ */
-+void bitmap_copy_with_dst_offset(unsigned long *dst, const unsigned long *src,
-+                                 unsigned long shift, unsigned long nbits)
-+{
-+    unsigned long left_mask, right_mask, last_mask;
-+
-+    /* Proper shift dst pointer to the first word to copy from */
-+    dst += BIT_WORD(shift);
-+    shift %= BITS_PER_LONG;
-+
-+    if (!shift) {
-+        /* Fast path */
-+        bitmap_copy(dst, src, nbits);
-+        return;
-+    }
-+
-+    right_mask = (1ul << (BITS_PER_LONG - shift)) - 1;
-+    left_mask = ~right_mask;
-+
-+    *dst &= (1ul << shift) - 1;
-+    while (nbits >= BITS_PER_LONG) {
-+        *dst |= (*src & right_mask) << shift;
-+        dst[1] = (*src & left_mask) >> (BITS_PER_LONG - shift);
-+        dst++;
-+        src++;
-+        nbits -= BITS_PER_LONG;
-+    }
-+
-+    if (nbits > BITS_PER_LONG - shift) {
-+        *dst |= (*src & right_mask) << shift;
-+        nbits -= BITS_PER_LONG - shift;
-+        last_mask = ((1ul << nbits) - 1) << (BITS_PER_LONG - shift);
-+        dst[1] = (*src & last_mask) >> (BITS_PER_LONG - shift);
-+    } else if (nbits) {
-+        last_mask = (1ul << nbits) - 1;
-+        *dst |= (*src & last_mask) << shift;
-+    }
-+}
+         kvm_get_dirty_pages_log_range(section, d.dirty_bitmap);
+-        g_free(d.dirty_bitmap);
+     }
+ 
+     return 0;
+@@ -801,6 +803,8 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+         }
+ 
+         /* unregister the slot */
++        g_free(mem->dirty_bmap);
++        mem->dirty_bmap = NULL;
+         mem->memory_size = 0;
+         mem->flags = 0;
+         err = kvm_set_user_memory_region(kml, mem, false);
+diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+index f838412491..687a2ee423 100644
+--- a/include/sysemu/kvm_int.h
++++ b/include/sysemu/kvm_int.h
+@@ -21,6 +21,8 @@ typedef struct KVMSlot
+     int slot;
+     int flags;
+     int old_flags;
++    /* Dirty bitmap cache for the slot */
++    unsigned long *dirty_bmap;
+ } KVMSlot;
+ 
+ typedef struct KVMMemoryListener {
 -- 
 2.21.0
 
