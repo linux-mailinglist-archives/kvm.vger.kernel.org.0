@@ -2,93 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id B895B69572
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 16:58:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 76CA169620
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 17:03:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391514AbfGOO57 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 10:57:59 -0400
-Received: from mga05.intel.com ([192.55.52.43]:65131 "EHLO mga05.intel.com"
+        id S1731708AbfGOOK4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 10:10:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38972 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391468AbfGOO55 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:57:57 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Jul 2019 07:57:56 -0700
-X-IronPort-AV: E=Sophos;i="5.63,493,1557212400"; 
-   d="scan'208";a="342406193"
-Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Jul 2019 07:57:56 -0700
-Message-ID: <5efe30658033c1b22a36438758236d4f4aa8c345.camel@linux.intel.com>
-Subject: Re: [PATCH v1 0/6] mm / virtio: Provide support for paravirtual
- waste page treatment
-From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
-To:     David Hildenbrand <david@redhat.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>
-Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yang Zhang <yang.zhang.wz@gmail.com>, pagupta@redhat.com,
-        Rik van Riel <riel@surriel.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        lcapitulino@redhat.com, wei.w.wang@intel.com,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, dan.j.williams@intel.com
-Date:   Mon, 15 Jul 2019 07:57:56 -0700
-In-Reply-To: <91a0d964-7fb7-f25e-bf2b-6a7531b96afd@redhat.com>
-References: <20190619222922.1231.27432.stgit@localhost.localdomain>
-         <ff133df4-6291-bece-3d8d-dc3f12f398cf@redhat.com>
-         <8fea71ba-2464-ead8-3802-2241805283cc@intel.com>
-         <CAKgT0UdAj4Kq8qHKkaiB3z08gCQh-jovNpos45VcGHa_v5aFGg@mail.gmail.com>
-         <bc4bb663-585b-bee0-1310-b149382047d0@intel.com>
-         <91a0d964-7fb7-f25e-bf2b-6a7531b96afd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
+        id S2388922AbfGOOKu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:10:50 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 96B5F30C257C;
+        Mon, 15 Jul 2019 14:10:50 +0000 (UTC)
+Received: from redhat.com (ovpn-117-250.ams2.redhat.com [10.36.117.250])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EEDC1001B02;
+        Mon, 15 Jul 2019 14:10:50 +0000 (UTC)
+From:   Juan Quintela <quintela@redhat.com>
+To:     Peter Maydell <peter.maydell@linaro.org>
+Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+Subject: Re: [PULL 00/19] Migration patches
+In-Reply-To: <CAFEAcA_9tVQht7bp9_yrFEhQ74ye6LBNjEYK_nftCWsKMrOohw@mail.gmail.com>
+        (Peter Maydell's message of "Mon, 15 Jul 2019 14:48:42 +0100")
+References: <20190712143207.4214-1-quintela@redhat.com>
+        <CAFEAcA-ydNS072OH7CyGNq2+sESgonW-8QSJdNYJq6zW-rYjUQ@mail.gmail.com>
+        <CAFEAcA9ncjtGdc8CZOJBDBRtzEU8oL7YicVg5PtyiiO2O4z51w@mail.gmail.com>
+        <87zhlf76pk.fsf@trasno.org>
+        <CAFEAcA_9tVQht7bp9_yrFEhQ74ye6LBNjEYK_nftCWsKMrOohw@mail.gmail.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Reply-To: quintela@redhat.com
+Date:   Mon, 15 Jul 2019 16:10:44 +0200
+Message-ID: <87pnmb75i3.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Mon, 15 Jul 2019 14:10:50 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2019-07-15 at 11:41 +0200, David Hildenbrand wrote:
-> On 25.06.19 20:22, Dave Hansen wrote:
-> > On 6/25/19 10:00 AM, Alexander Duyck wrote:
-> > > Basically what we are doing is inflating the memory size we can report
-> > > by inserting voids into the free memory areas. In my mind that matches
-> > > up very well with what "aeration" is. It is similar to balloon in
-> > > functionality, however instead of inflating the balloon we are
-> > > inflating the free_list for higher order free areas by creating voids
-> > > where the madvised pages were.
-> > 
-> > OK, then call it "free page auto ballooning" or "auto ballooning" or
-> > "allocator ballooning".  s390 calls them "unused pages".
-> > 
-> > Any of those things are clearer and more meaningful than "page aeration"
-> > to me.
-> > 
-> 
-> Alex, if you want to generalize the approach, and not call it "hinting",
-> what about something similar to "page recycling".
-> 
-> Would also fit the "waste" example and would be clearer - at least to
-> me. Well, "bubble" does not apply anymore ...
-> 
+Peter Maydell <peter.maydell@linaro.org> wrote:
+> On Mon, 15 Jul 2019 at 14:44, Juan Quintela <quintela@redhat.com> wrote:
+>>
+>> Peter Maydell <peter.maydell@linaro.org> wrote:
+>> > On Fri, 12 Jul 2019 at 17:33, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> >> Still fails on aarch32 host, I'm afraid:
+>>
+>> Hi
+>>
+>> dropping the multifd test patch from now.  For "some" reason, having a
+>> packed struct and 32bits is getting ugly, not sure yet _why_.
+>
+> IMHO 'packed' structs are usually a bad idea. They have a bunch
+> of behaviours you may not be expecting (for instance they're
+> also not naturally aligned, and arrays of them won't be the
+> size you expect).
 
-I am fine with "page hinting". I have already gone through and started the
-rename. The problem with "page recycling" is that is actually pretty
-similar to the name we had in the networking space for how the NICs will
-recycle the Rx buffers.
+I can't get everything happy O:-)
+For the multifd initial packet, I used to have that I wrote the fields
+by hand.  Then danp asked that I used a packed struct, and converted the
+values inside it.  So ..... Imposible to have everybody happy.
 
-For now I am going through and replacing instances of Aerated with Hinted,
-and aeration with page_hinting. I should have a new patch set ready in a
-couple days assuming no unforeseen issues.
+Anyways, the struct is packed, both sides are i386 32bits, and it should
+be exactly the same, but it appears that there is where your valgrind
+problems appear.  Still investigating _where_ the problem is.  What is
+even weirder is that there is no error at all on 64bits.
 
-Thanks.
+Thanks, Juan.
 
-- Alex
-
+PS.  BTW, did you launched by hand the guests with valgrind, or there is
+     a trick that I am missing for launching a qtest with valgrind?
