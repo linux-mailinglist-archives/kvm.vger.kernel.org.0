@@ -2,73 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 720E468FC2
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 16:17:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B95668FF9
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 16:18:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389340AbfGOOQj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 10:16:39 -0400
-Received: from mga07.intel.com ([134.134.136.100]:1226 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731676AbfGOOQh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:16:37 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Jul 2019 07:16:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.63,493,1557212400"; 
-   d="scan'208";a="167347987"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.165])
-  by fmsmga008.fm.intel.com with ESMTP; 15 Jul 2019 07:16:36 -0700
-Date:   Mon, 15 Jul 2019 07:16:36 -0700
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Tao Xu <tao3.xu@intel.com>
-Cc:     pbonzini@redhat.com, rkrcmar@redhat.com, corbet@lwn.net,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        fenghua.yu@intel.com, xiaoyao.li@linux.intel.com,
-        jingqi.liu@intel.com
-Subject: Re: [PATCH v7 2/3] KVM: vmx: Emulate MSR IA32_UMWAIT_CONTROL
-Message-ID: <20190715141636.GB442@linux.intel.com>
-References: <20190712082907.29137-1-tao3.xu@intel.com>
- <20190712082907.29137-3-tao3.xu@intel.com>
- <20190712155202.GC29659@linux.intel.com>
- <8ed3cec5-8ba9-b2ed-f0e4-eefb0a988bc8@intel.com>
+        id S2389678AbfGOOSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 10:18:09 -0400
+Received: from mail-ot1-f45.google.com ([209.85.210.45]:34960 "EHLO
+        mail-ot1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389291AbfGOOSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:18:09 -0400
+Received: by mail-ot1-f45.google.com with SMTP id j19so17157464otq.2
+        for <kvm@vger.kernel.org>; Mon, 15 Jul 2019 07:18:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=tLWQ9uN1hSLQn5cwzga0bawG7w0phykdKc+H8Eq7ClQ=;
+        b=hJaSbIIHncdTxuDlGqZvrwmS3KOZO4+dO8qeCmVkCQJVmTXd1hJyOLZ4AkiiBxOreS
+         eruUJTzcAz+CtDZllF8I2JZG+gsy4eYHMJ5hQO7c+rsBGmTW+QuP9f0gYiJWMfXGtdwx
+         JiTfRVZR/YurlGSmYKGy9G23UiSXy4oVzRoJimM5p5H+hqTxoOSKHCJYTodri1ffj2jQ
+         DcQxfjJxDWDjDs1SpNPThEYiFcm5apyJMTu0PQVDrdcfiBqcWG8dZJKgD1/j++wESxaz
+         dJopXlyzRyYXcZKtpJPSZZcEIErvzvPlKjYEqwSrxZkNI59gfhxa9bg0107knaFWnTEx
+         MFTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=tLWQ9uN1hSLQn5cwzga0bawG7w0phykdKc+H8Eq7ClQ=;
+        b=fheuJbbvSS857dchNg9G8ML/mSmonCYAZBajNmZmC3dgLrjbK8oEJ/7u+Ca+x3w7GE
+         h4io/TzFVJKGfhv5A2qPGlrKJtEyIexQKcsonRcb2XC8UAZBD7VkkRMbxe22U36yHzrL
+         Wg7U3sJ07kUGgHuoj1theT8idj+4gom7Nl9n2xI39P/T6eHmxOHomuxTPKcwGMqP17rT
+         Y77BW8CHqwnXI2rJVmcHostYz7H/ULtjyFcF3FtWkYEV/2T1Kdsu0cBjhPBAWGm8cdkO
+         hfTvLKOzjcU8hpJdhD9z9VxTy62/fx6QFERFMPGJrh5Bk6DgS/drFzCjGlpupRZSKT2l
+         VNOQ==
+X-Gm-Message-State: APjAAAUAc9m8ZWePt36kAc2kaxHnMC4KtFo3VDkbTgVInnsbPTLWL8qM
+        Qm5Nqd9NRi0d6WNUeUidD6QkswT3uRKb6dl9qfepWg==
+X-Google-Smtp-Source: APXvYqzWTHQAEim1DQq3KGPCl3sARZsaOEU15mjTM3NwYxhYPfWqCFD1g1Dm9FgbnWQXqvGTVOdY1D4YnwwSCCecvj4=
+X-Received: by 2002:a05:6830:1653:: with SMTP id h19mr13034551otr.232.1563200288309;
+ Mon, 15 Jul 2019 07:18:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8ed3cec5-8ba9-b2ed-f0e4-eefb0a988bc8@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20190712143207.4214-1-quintela@redhat.com> <CAFEAcA-ydNS072OH7CyGNq2+sESgonW-8QSJdNYJq6zW-rYjUQ@mail.gmail.com>
+ <CAFEAcA9ncjtGdc8CZOJBDBRtzEU8oL7YicVg5PtyiiO2O4z51w@mail.gmail.com> <20190715140441.GJ30298@redhat.com>
+In-Reply-To: <20190715140441.GJ30298@redhat.com>
+From:   Peter Maydell <peter.maydell@linaro.org>
+Date:   Mon, 15 Jul 2019 15:17:57 +0100
+Message-ID: <CAFEAcA9kreC_VRddsC0WRuuCw2R3ohER0_+vaf_PeG43XPzYWw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL 00/19] Migration patches
+To:     =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc:     Juan Quintela <quintela@redhat.com>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Thomas Huth <thuth@redhat.com>,
+        kvm-devel <kvm@vger.kernel.org>,
+        QEMU Developers <qemu-devel@nongnu.org>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <rth@twiddle.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jul 15, 2019 at 09:22:14AM +0800, Tao Xu wrote:
-> On 7/12/2019 11:52 PM, Sean Christopherson wrote:
-> >The SDM only defines bits 31:0, and the kernel uses a u32 to cache its
-> >value.  I assume bits 63:32 are reserved?  I'm guessing we also need an
-> >SDM update...
-> >
-> 
-> The SDM define IA32_UMWAIT_CONTROL is a 32bit MSR. So need me to set 63:32
-> reserved?
+On Mon, 15 Jul 2019 at 15:04, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+>     MultiFDInit_t msg =3D {0};
+>
+> should fix it.
 
-Huh, I didn't realize the SDM allows 32 bit MSRs, I assumed all bits
-needed to be explicitly defined even if the underlying implementation only
-tracked 32 bits.
+A minor nit, but "=3D {}" is our standard struct-zero-initializer
+so we should prefer that, I think. (I know it is not the C-spec
+recommended version but some C compilers incorrectly warn about
+"=3D {0}" whereas no compiler we care about warns about the
+gnu-extension "=3D {}".)
 
-RDMSR:
-
-  If fewer than 64 bits are implemented in the MSR being read, the values
-  return in EDX:EAX in unimplemented bit locations are undefined.
-
-WRMSR:
-
-  Undefined or reserved bits in an MSR should be set to values previously
-  read.
-
-From KVM's perspective, bits 63:32 should be treated as reserved-to-zero.
-This also means that struct vcpu_vmx can track a u32 instead of a u64
-for msr_ia32_umwait_control.
+thanks
+-- PMM
