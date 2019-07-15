@@ -2,86 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F367469427
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 16:50:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B895B69572
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 16:58:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390636AbfGOOrf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 10:47:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42380 "EHLO mail.kernel.org"
+        id S2391514AbfGOO57 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 10:57:59 -0400
+Received: from mga05.intel.com ([192.55.52.43]:65131 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405195AbfGOOre (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:47:34 -0400
-Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6F8D621530;
-        Mon, 15 Jul 2019 14:47:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563202053;
-        bh=rU3Ez2wWMrrE/iar+jy6anGCgLmCwgHT+Bint4y05vo=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OVyJ3iXksY9MVgxHgc0hcVaBiwsCjF5g0imSXYrjQubrpe79iNi2OV5WJxf6RBBrn
-         PVch88OIUWEnKOssvz57aiaCWzAMv8Dql3R5EnLPlbDsx22yVyZeYW1Hu44+JtEz3p
-         iQIUdcvXoNg/ubbq3ehj2SLY29A9AkTU8gJzEowo=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 33/53] vhost_net: disable zerocopy by default
-Date:   Mon, 15 Jul 2019 10:45:15 -0400
-Message-Id: <20190715144535.11636-33-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190715144535.11636-1-sashal@kernel.org>
-References: <20190715144535.11636-1-sashal@kernel.org>
+        id S2391468AbfGOO55 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:57:57 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Jul 2019 07:57:56 -0700
+X-IronPort-AV: E=Sophos;i="5.63,493,1557212400"; 
+   d="scan'208";a="342406193"
+Received: from ahduyck-desk1.jf.intel.com ([10.7.198.76])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Jul 2019 07:57:56 -0700
+Message-ID: <5efe30658033c1b22a36438758236d4f4aa8c345.camel@linux.intel.com>
+Subject: Re: [PATCH v1 0/6] mm / virtio: Provide support for paravirtual
+ waste page treatment
+From:   Alexander Duyck <alexander.h.duyck@linux.intel.com>
+To:     David Hildenbrand <david@redhat.com>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>
+Cc:     Nitesh Narayan Lal <nitesh@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yang Zhang <yang.zhang.wz@gmail.com>, pagupta@redhat.com,
+        Rik van Riel <riel@surriel.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        lcapitulino@redhat.com, wei.w.wang@intel.com,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, dan.j.williams@intel.com
+Date:   Mon, 15 Jul 2019 07:57:56 -0700
+In-Reply-To: <91a0d964-7fb7-f25e-bf2b-6a7531b96afd@redhat.com>
+References: <20190619222922.1231.27432.stgit@localhost.localdomain>
+         <ff133df4-6291-bece-3d8d-dc3f12f398cf@redhat.com>
+         <8fea71ba-2464-ead8-3802-2241805283cc@intel.com>
+         <CAKgT0UdAj4Kq8qHKkaiB3z08gCQh-jovNpos45VcGHa_v5aFGg@mail.gmail.com>
+         <bc4bb663-585b-bee0-1310-b149382047d0@intel.com>
+         <91a0d964-7fb7-f25e-bf2b-6a7531b96afd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jason Wang <jasowang@redhat.com>
+On Mon, 2019-07-15 at 11:41 +0200, David Hildenbrand wrote:
+> On 25.06.19 20:22, Dave Hansen wrote:
+> > On 6/25/19 10:00 AM, Alexander Duyck wrote:
+> > > Basically what we are doing is inflating the memory size we can report
+> > > by inserting voids into the free memory areas. In my mind that matches
+> > > up very well with what "aeration" is. It is similar to balloon in
+> > > functionality, however instead of inflating the balloon we are
+> > > inflating the free_list for higher order free areas by creating voids
+> > > where the madvised pages were.
+> > 
+> > OK, then call it "free page auto ballooning" or "auto ballooning" or
+> > "allocator ballooning".  s390 calls them "unused pages".
+> > 
+> > Any of those things are clearer and more meaningful than "page aeration"
+> > to me.
+> > 
+> 
+> Alex, if you want to generalize the approach, and not call it "hinting",
+> what about something similar to "page recycling".
+> 
+> Would also fit the "waste" example and would be clearer - at least to
+> me. Well, "bubble" does not apply anymore ...
+> 
 
-[ Upstream commit 098eadce3c622c07b328d0a43dda379b38cf7c5e ]
+I am fine with "page hinting". I have already gone through and started the
+rename. The problem with "page recycling" is that is actually pretty
+similar to the name we had in the networking space for how the NICs will
+recycle the Rx buffers.
 
-Vhost_net was known to suffer from HOL[1] issues which is not easy to
-fix. Several downstream disable the feature by default. What's more,
-the datapath was split and datacopy path got the support of batching
-and XDP support recently which makes it faster than zerocopy part for
-small packets transmission.
+For now I am going through and replacing instances of Aerated with Hinted,
+and aeration with page_hinting. I should have a new patch set ready in a
+couple days assuming no unforeseen issues.
 
-It looks to me that disable zerocopy by default is more
-appropriate. It cold be enabled by default again in the future if we
-fix the above issues.
+Thanks.
 
-[1] https://patchwork.kernel.org/patch/3787671/
-
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/vhost/net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 645b2197930e..f46317135224 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -30,7 +30,7 @@
- 
- #include "vhost.h"
- 
--static int experimental_zcopytx = 1;
-+static int experimental_zcopytx = 0;
- module_param(experimental_zcopytx, int, 0444);
- MODULE_PARM_DESC(experimental_zcopytx, "Enable Zero Copy TX;"
- 		                       " 1 -Enable; 0 - Disable");
--- 
-2.20.1
+- Alex
 
