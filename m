@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 82CEE691D0
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 16:32:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A14E16933A
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 16:43:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403988AbfGOOcB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 10:32:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46580 "EHLO mail.kernel.org"
+        id S2404213AbfGOOjR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 10:39:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38578 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391810AbfGOOcA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:32:00 -0400
+        id S2391901AbfGOOjQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:39:16 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 83EDF21849;
-        Mon, 15 Jul 2019 14:31:56 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7188A2086C;
+        Mon, 15 Jul 2019 14:39:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563201119;
-        bh=EtiFc2T+Mq1gjzX5kCGjj/L1KO5/UuT62CT4bPQlvu8=;
+        s=default; t=1563201555;
+        bh=FSZoq9WrIW60R8uTCwm1dsGcg3a3pKKxZCGZIwUgr7E=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Wu1tY5TTMunFKA5odcXMPT8v7xculkcTFW1fD+Zs7G1L7VJsB1GA59SIpLNh9rp/X
-         hwtedRwJKebkn+9MuN1Mk2MkvQuq0O+ik6gumqe5sLdm7WovPIGtEAw/W1Y9OumCtA
-         XAISXhB4ujiECTvsQyM+6MwfIUsVqLv6IPQ7fuBk=
+        b=LL1unzeYM9KVRkaJcDd/Co61vjByfDxzd/4O4kTth3nYe7Pm41b/CoYEqKT4QygAD
+         jySGWVNy46OVejwDCME/pYC6FhXN0FSV1yT0L1hZpfSrPVhS/x96GXWsuR5ph0l5EV
+         d3aKto+D+heEIToiC/Y20yPhnd1HGKXH6slFO65M=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Jason Wang <jasowang@redhat.com>,
@@ -30,12 +30,12 @@ Cc:     Jason Wang <jasowang@redhat.com>,
         "David S . Miller" <davem@davemloft.net>,
         Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 056/105] vhost_net: disable zerocopy by default
-Date:   Mon, 15 Jul 2019 10:27:50 -0400
-Message-Id: <20190715142839.9896-56-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 41/73] vhost_net: disable zerocopy by default
+Date:   Mon, 15 Jul 2019 10:35:57 -0400
+Message-Id: <20190715143629.10893-41-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190715142839.9896-1-sashal@kernel.org>
-References: <20190715142839.9896-1-sashal@kernel.org>
+In-Reply-To: <20190715143629.10893-1-sashal@kernel.org>
+References: <20190715143629.10893-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -70,10 +70,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index b40e8ded49c6..4d11152e60c1 100644
+index 681d0eade82f..75e1089dfb01 100644
 --- a/drivers/vhost/net.c
 +++ b/drivers/vhost/net.c
-@@ -35,7 +35,7 @@
+@@ -30,7 +30,7 @@
  
  #include "vhost.h"
  
