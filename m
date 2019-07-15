@@ -2,23 +2,23 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id AF2F66864D
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 11:26:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 46FCC68663
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 11:33:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729580AbfGOJ02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 05:26:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58356 "EHLO mx1.redhat.com"
+        id S1729648AbfGOJdP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 05:33:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59654 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729487AbfGOJ02 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 05:26:28 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        id S1729514AbfGOJdP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 05:33:15 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 36EF687629;
-        Mon, 15 Jul 2019 09:26:27 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7342B3084248;
+        Mon, 15 Jul 2019 09:33:14 +0000 (UTC)
 Received: from [10.36.117.137] (ovpn-117-137.ams2.redhat.com [10.36.117.137])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C63F245D3;
-        Mon, 15 Jul 2019 09:26:14 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E5745C231;
+        Mon, 15 Jul 2019 09:33:01 +0000 (UTC)
 Subject: Re: [RFC][Patch v11 1/2] mm: page_hinting: core infrastructure
 To:     Dave Hansen <dave.hansen@intel.com>,
         Nitesh Narayan Lal <nitesh@redhat.com>, kvm@vger.kernel.org,
@@ -31,7 +31,7 @@ To:     Dave Hansen <dave.hansen@intel.com>,
         mhocko@suse.com
 References: <20190710195158.19640-1-nitesh@redhat.com>
  <20190710195158.19640-2-nitesh@redhat.com>
- <3f9a7e7b-c026-3530-e985-804fc7f1ec31@intel.com>
+ <f9bca947-f88e-51a7-fdaf-4403fda1b783@intel.com>
 From:   David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -78,119 +78,79 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <0a89271f-c80b-9314-f6bb-8fdf0d714431@redhat.com>
-Date:   Mon, 15 Jul 2019 11:26:13 +0200
+Message-ID: <46336efb-3243-0083-1d20-7e8578131679@redhat.com>
+Date:   Mon, 15 Jul 2019 11:33:01 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <3f9a7e7b-c026-3530-e985-804fc7f1ec31@intel.com>
+In-Reply-To: <f9bca947-f88e-51a7-fdaf-4403fda1b783@intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Mon, 15 Jul 2019 09:26:27 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Mon, 15 Jul 2019 09:33:14 +0000 (UTC)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10.07.19 22:45, Dave Hansen wrote:
+On 11.07.19 20:21, Dave Hansen wrote:
 > On 7/10/19 12:51 PM, Nitesh Narayan Lal wrote:
->> +struct zone_free_area {
->> +	unsigned long *bitmap;
->> +	unsigned long base_pfn;
->> +	unsigned long end_pfn;
->> +	atomic_t free_pages;
->> +	unsigned long nbits;
->> +} free_area[MAX_NR_ZONES];
-> 
-> Why do we need an extra data structure.  What's wrong with putting
-> per-zone data in ... 'struct zone'?  The cover letter claims that it
-> doesn't touch core-mm infrastructure, but if it depends on mechanisms
-> like this, I think that's a very bad thing.
-> 
-> To be honest, I'm not sure this series is worth reviewing at this point.
->  It's horribly lightly commented and full of kernel antipatterns lik
-> 
-> void func()
-> {
-> 	if () {
-> 		... indent entire logic
-> 		... of function
-> 	}
-> }
-
-"full of". Hmm.
-
-> 
-> It has big "TODO"s.  It's virtually comment-free.  I'm shocked it's at
-> the 11th version and still looking like this.
-> 
+>> +static void bm_set_pfn(struct page *page)
+>> +{
+>> +	struct zone *zone = page_zone(page);
+>> +	int zone_idx = page_zonenum(page);
+>> +	unsigned long bitnr = 0;
 >> +
->> +		for (zone_idx = 0; zone_idx < MAX_NR_ZONES; zone_idx++) {
->> +			unsigned long pages = free_area[zone_idx].end_pfn -
->> +					free_area[zone_idx].base_pfn;
->> +			bitmap_size = (pages >> PAGE_HINTING_MIN_ORDER) + 1;
->> +			if (!bitmap_size)
->> +				continue;
->> +			free_area[zone_idx].bitmap = bitmap_zalloc(bitmap_size,
->> +								   GFP_KERNEL);
+>> +	lockdep_assert_held(&zone->lock);
+>> +	bitnr = pfn_to_bit(page, zone_idx);
+>> +	/*
+>> +	 * TODO: fix possible underflows.
+>> +	 */
+>> +	if (free_area[zone_idx].bitmap &&
+>> +	    bitnr < free_area[zone_idx].nbits &&
+>> +	    !test_and_set_bit(bitnr, free_area[zone_idx].bitmap))
+>> +		atomic_inc(&free_area[zone_idx].free_pages);
+>> +}
 > 
-> This doesn't support sparse zones.  We can have zones with massive
-> spanned page sizes, but very few present pages.  On those zones, this
-> will exhaust memory for no good reason.
-
-Yes, AFAIKS, sparse zones are problematic when we have NORMAL/MOVABLE mixed.
-
-1 bit for 2MB, 1 byte for 16MB, 64 bytes for 1GB
-
-IOW, this isn't optimal but only really problematic for big systems /
-very huge sparse zones.
-
+> Let's say I have two NUMA nodes, each with ZONE_NORMAL and ZONE_MOVABLE
+> and each zone with 1GB of memory:
 > 
-> Comparing this to Alex's patch set, it's of much lower quality and at a
-> much earlier stage of development.  The two sets are not really even
-> comparable right now.  This certainly doesn't sell me on (or even really
+> Node:         0        1
+> NORMAL   0->1GB   2->3GB
+> MOVABLE  1->2GB   3->4GB
+> 
+> This code will allocate two bitmaps.  The ZONE_NORMAL bitmap will
+> represent data from 0->3GB and the ZONE_MOVABLE bitmap will represent
+> data from 1->4GB.  That's the result of this code:
+> 
+>> +			if (free_area[zone_idx].base_pfn) {
+>> +				free_area[zone_idx].base_pfn =
+>> +					min(free_area[zone_idx].base_pfn,
+>> +					    zone->zone_start_pfn);
+>> +				free_area[zone_idx].end_pfn =
+>> +					max(free_area[zone_idx].end_pfn,
+>> +					    zone->zone_start_pfn +
+>> +					    zone->spanned_pages);
+> 
+> But that means that both bitmaps will have space for PFNs in the other
+> zone type, which is completely bogus.  This is fundamental because the
+> data structures are incorrectly built per zone *type* instead of per zone.
+> 
 
-To be honest, I find this statement quite harsh. Nitesh's hard work in
-the previous RFC's and many discussions with Alex essentially resulted
-in the two approaches we have right now. Alex's approach would not look
-the way it looks today without Nitesh's RFCs.
+I don't think it's incorrect, it's just not optimal in all scenarios.
+E.g., in you example, this approach would "waste" 2 * 1GB of tracking
+data for the wholes (2* 64bytes when using 1 bit for 2MB).
 
-So much to that.
+FWIW, this is not a numa-specific thingy. We can have sparse zones
+easily on single-numa systems.
 
-> enumerate the deltas in) this approach vs. Alex's.
+Node:                 0
+NORMAL   0->1GB, 2->3GB
+MOVABLE  1->2GB, 3->4GB
 
-I am aware that memory hotplug is not properly supported yet (future
-work). Sparse zones work but eventually waste a handful of pages (!) -
-future work. Anything else you are aware of that is missing?
-
-My opinion:
-
-1. Alex' solution is clearly beneficial, as we don't need to manage/scan
-a bitmap. *however* we were concerned right from the beginning if
-core-buddy modifications will be accepted upstream for a purely
-virtualization-specific (as of now!) feature. If we can get it upstream,
-perfect. Back when we discussed the idea with Alex I was skeptical - I
-was expecting way more core modifications.
-
-2. We were looking for an alternative solution that doesn't require to
-modify the buddy. We have that now - yes, some things have to be worked
-out and cleaned up, not arguing against that. A cleaned-up version of
-this RFC with some fixes and enhancements should be ready to be used in
-*many* (not all) setups. Which is perfectly fine.
-
-So in summary, I think we should try our best to get Alex's series into
-shape and accepted upstream. However, if we get upstream resistance or
-it will take ages to get it in, I think we can start with this series
-here (which requires no major buddy modifications as of now) and the
-slowly see if we can convert it into Alex approach.
-
-The important part for me is that the core<->driver interface and the
-virtio interface is in a clean shape, so we can essentially swap out the
-implementation specific parts in the core.
-
-Cheers.
+So tracking it per zones instead instead of zone type is only one part
+of the story.
 
 -- 
 
