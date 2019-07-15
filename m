@@ -2,148 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B18968367
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 08:07:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAC4D68386
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 08:25:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729078AbfGOGHF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 02:07:05 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:34138 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726075AbfGOGHF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 02:07:05 -0400
-Received: by mail-ot1-f66.google.com with SMTP id n5so15780453otk.1;
-        Sun, 14 Jul 2019 23:07:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=e/V3fOKAqFz7F8UXbx8aEY6Mof27QH3jzM2T/OFVXo4=;
-        b=cNP6KnN2CVYzZklUDMO268TTsTR3Oo0Izc/87Xvc6415jKGeT+RGKSYpKnMoMl8t+7
-         kMO7Q+ieZfcTwDV5VCWKZ4SShAqu2x7CWJ8LY/kNEdTr2IVrcXtRlgVCF/xPFOQdsPLX
-         j55LJQ0HcEaUs7QG/gzdU/FquOnnCYW9W8yNcB3H8i6Gtuf/RNBXk1IkzXnHTKRNBJbL
-         lWI4M3PNZD0TvYHvgyrJYivgHfJVdG+f82WsL8GjLhPJDdJ0ndWaFm6kG1kqtqPc3yMF
-         2H+P8E1LRjvuED4LNqSWdOUZflu+Xn43uhi1wpa9MjMAYbuePi4AN//6XbfITpZfKdUd
-         +Dvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=e/V3fOKAqFz7F8UXbx8aEY6Mof27QH3jzM2T/OFVXo4=;
-        b=PIWAt6siy4sZHfm7Zltivy+pqd9REN7MPOCBw9ek/xUWQXVBQIQ1MV1DCAUxYnfqen
-         4HGe+wJg7qQSgVjB0R/WiliPnVPQEA/TDk/an8P83Qn506EdRHx8ts8T61P6/7WRb8nF
-         EDxscQ4pxiiiG3x3Fnx7ly/VGqY93yXRt3hYewqQvqO0a6DVYpPX1Wy8ZrRHv2nmxXuD
-         elhWpH+rE3fr17PQr1ho93tmVBC+4IsGySjQlV5RAtDYmyXyJo/tJ3CbyaTfeICT7V02
-         6IF86pwZOm5VhKngGVaEL9TZvhs8TohyU0TKv2iuX/7HhnLIgZ814dkdw6T5TkD83MR8
-         QN/A==
-X-Gm-Message-State: APjAAAWk+tfIESKiLxmJvV3xpXNmCypcWGHDBiBXJp4bv4WmdvGwKkoZ
-        ga8i2k0phviQwU+d7bySmDch+Fj3XdpzhdsIjclFHBF29T8=
-X-Google-Smtp-Source: APXvYqzApiSqvTXuZTSRWeHV9EozVFnTRZ81DrkcKPtu4rWfAj+PD4gqULP0rPXSOydUG70DXUf2COjPa1j7OqQImiQ=
-X-Received: by 2002:a9d:4590:: with SMTP id x16mr17332980ote.254.1563170824512;
- Sun, 14 Jul 2019 23:07:04 -0700 (PDT)
+        id S1726975AbfGOGZJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 02:25:09 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:50575 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726579AbfGOGZJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 02:25:09 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+        id 45nD6B4Bc6z9sP0; Mon, 15 Jul 2019 16:25:06 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=gibson.dropbear.id.au; s=201602; t=1563171906;
+        bh=MMDinOD+wXlv4awyV674igDfgFgonl4wftkkwcmlRFU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=PL+hSpKR28IrMGvUCzlZKT6tRFajGAuminDj1Jm7BPtEZ/M8Kx61FZXXaiCcnlqWz
+         3HV/g9lGIU/EFd0k133XAF0Pp2GzrAUZHdR7lNhlxu/WINieGx1FGK6iW9VVEF+MP1
+         cfQgTD1C14v31DIHiDqbDqlxsbPpCvwEfR3vZaWM=
+Date:   Mon, 15 Jul 2019 12:55:19 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Liu Yi L <yi.l.liu@intel.com>
+Cc:     qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com,
+        alex.williamson@redhat.com, peterx@redhat.com,
+        eric.auger@redhat.com, tianyu.lan@intel.com, kevin.tian@intel.com,
+        jun.j.tian@intel.com, yi.y.sun@intel.com, kvm@vger.kernel.org,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Yi Sun <yi.y.sun@linux.intel.com>
+Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
+Message-ID: <20190715025519.GE3440@umbus.fritz.box>
+References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
+ <1562324511-2910-6-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-References: <1562824197-13658-1-git-send-email-jing2.liu@linux.intel.com> <305e2a40-93a3-23ed-71a2-d3f2541e837a@redhat.com>
-In-Reply-To: <305e2a40-93a3-23ed-71a2-d3f2541e837a@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Mon, 15 Jul 2019 14:06:56 +0800
-Message-ID: <CANRm+CzOp6orH+7sqCQjLuxsYRccfq7H-o4QBcgxGfT-=RaJ-w@mail.gmail.com>
-Subject: Re: [PATCH v1] KVM: x86: expose AVX512_BF16 feature to guest
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jing Liu <jing2.liu@linux.intel.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="h56sxpGKRmy85csR"
+Content-Disposition: inline
+In-Reply-To: <1562324511-2910-6-git-send-email-yi.l.liu@intel.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 13 Jul 2019 at 18:40, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 11/07/19 07:49, Jing Liu wrote:
-> > AVX512 BFLOAT16 instructions support 16-bit BFLOAT16 floating-point
-> > format (BF16) for deep learning optimization.
-> >
-> > Intel adds AVX512 BFLOAT16 feature in CooperLake, which is CPUID.7.1.EA=
-X[5].
-> >
-> > Detailed information of the CPUID bit can be found here,
-> > https://software.intel.com/sites/default/files/managed/c5/15/\
-> > architecture-instruction-set-extensions-programming-reference.pdf.
-> >
-> > Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
-> > ---
-> >
-> > This patch depends on kernel patch https://lkml.org/lkml/2019/6/19/912
-> > and Paolo's patch set https://lkml.org/lkml/2019/7/4/468.
-> >
-> >  arch/x86/kvm/cpuid.c | 12 +++++++++++-
-> >  1 file changed, 11 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index 8fc6039..0c125dd 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -358,9 +358,13 @@ static inline void do_cpuid_7_mask(struct kvm_cpui=
-d_entry2 *entry, int index)
-> >               F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP)=
- |
-> >               F(MD_CLEAR);
-> >
-> > +     /* cpuid 7.1.eax */
-> > +     const u32 kvm_cpuid_7_1_eax_x86_features =3D
-> > +             F(AVX512_BF16);
-> > +
-> >       switch (index) {
-> >       case 0:
-> > -             entry->eax =3D 0;
-> > +             entry->eax =3D min(entry->eax, 1);
-> >               entry->ebx &=3D kvm_cpuid_7_0_ebx_x86_features;
-> >               cpuid_mask(&entry->ebx, CPUID_7_0_EBX);
-> >               /* TSC_ADJUST is emulated */
-> > @@ -384,6 +388,12 @@ static inline void do_cpuid_7_mask(struct kvm_cpui=
-d_entry2 *entry, int index)
-> >                */
-> >               entry->edx |=3D F(ARCH_CAPABILITIES);
-> >               break;
-> > +     case 1:
-> > +             entry->eax &=3D kvm_cpuid_7_1_eax_x86_features;
-> > +             entry->ebx =3D 0;
-> > +             entry->ecx =3D 0;
-> > +             entry->edx =3D 0;
-> > +             break;
-> >       default:
-> >               WARN_ON_ONCE(1);
-> >               entry->eax =3D 0;
-> >
->
-> Queued, thanks.
 
-I see this in kvm/queue:
+--h56sxpGKRmy85csR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-In file included from ./include/linux/list.h:9:0,
-                 from ./include/linux/preempt.h:11,
-                 from ./include/linux/hardirq.h:5,
-                 from ./include/linux/kvm_host.h:7,
-                 from /home/kernel/data/kvm/arch/x86/kvm//cpuid.c:12:
-/home/kernel/data/kvm/arch/x86/kvm//cpuid.c: In function =E2=80=98do_cpuid_=
-7_mask=E2=80=99:
-./include/linux/kernel.h:819:29: warning: comparison of distinct
-pointer types lacks a cast
-   (!!(sizeof((typeof(x) *)1 =3D=3D (typeof(y) *)1)))
-                             ^
-./include/linux/kernel.h:833:4: note: in expansion of macro =E2=80=98__type=
-check=E2=80=99
-   (__typecheck(x, y) && __no_side_effects(x, y))
-    ^
-./include/linux/kernel.h:843:24: note: in expansion of macro =E2=80=98__saf=
-e_cmp=E2=80=99
-  __builtin_choose_expr(__safe_cmp(x, y), \
-                        ^
-./include/linux/kernel.h:852:19: note: in expansion of macro =E2=80=98__car=
-eful_cmp=E2=80=99
- #define min(x, y) __careful_cmp(x, y, <)
-                   ^
-/home/kernel/data/kvm/arch/x86/kvm//cpuid.c:377:16: note: in expansion
-of macro =E2=80=98min=E2=80=99
-   entry->eax =3D min(entry->eax, 1);
-                ^
+On Fri, Jul 05, 2019 at 07:01:38PM +0800, Liu Yi L wrote:
+> This patch adds vfio implementation PCIPASIDOps.alloc_pasid/free_pasid().
+> These two functions are used to propagate guest pasid allocation and
+> free requests to host via vfio container ioctl.
+
+As I said in an earlier comment, I think doing this on the device is
+conceptually incorrect.  I think we need an explcit notion of an SVM
+context (i.e. the namespace in which all the PASIDs live) - which will
+IIUC usually be shared amongst multiple devices.  The create and free
+PASID requests should be on that object.
+
+>=20
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> ---
+>  hw/vfio/pci.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 61 insertions(+)
+>=20
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index ce3fe96..ab184ad 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -2690,6 +2690,65 @@ static void vfio_unregister_req_notifier(VFIOPCIDe=
+vice *vdev)
+>      vdev->req_enabled =3D false;
+>  }
+> =20
+> +static int vfio_pci_device_request_pasid_alloc(PCIBus *bus,
+> +                                               int32_t devfn,
+> +                                               uint32_t min_pasid,
+> +                                               uint32_t max_pasid)
+> +{
+> +    PCIDevice *pdev =3D bus->devices[devfn];
+> +    VFIOPCIDevice *vdev =3D DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+> +    VFIOContainer *container =3D vdev->vbasedev.group->container;
+> +    struct vfio_iommu_type1_pasid_request req;
+> +    unsigned long argsz;
+> +    int pasid;
+> +
+> +    argsz =3D sizeof(req);
+> +    req.argsz =3D argsz;
+> +    req.flag =3D VFIO_IOMMU_PASID_ALLOC;
+> +    req.min_pasid =3D min_pasid;
+> +    req.max_pasid =3D max_pasid;
+> +
+> +    rcu_read_lock();
+> +    pasid =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
+> +    if (pasid < 0) {
+> +        error_report("vfio_pci_device_request_pasid_alloc:"
+> +                     " request failed, contanier: %p", container);
+> +    }
+> +    rcu_read_unlock();
+> +    return pasid;
+> +}
+> +
+> +static int vfio_pci_device_request_pasid_free(PCIBus *bus,
+> +                                              int32_t devfn,
+> +                                              uint32_t pasid)
+> +{
+> +    PCIDevice *pdev =3D bus->devices[devfn];
+> +    VFIOPCIDevice *vdev =3D DO_UPCAST(VFIOPCIDevice, pdev, pdev);
+> +    VFIOContainer *container =3D vdev->vbasedev.group->container;
+> +    struct vfio_iommu_type1_pasid_request req;
+> +    unsigned long argsz;
+> +    int ret =3D 0;
+> +
+> +    argsz =3D sizeof(req);
+> +    req.argsz =3D argsz;
+> +    req.flag =3D VFIO_IOMMU_PASID_FREE;
+> +    req.pasid =3D pasid;
+> +
+> +    rcu_read_lock();
+> +    ret =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
+> +    if (ret !=3D 0) {
+> +        error_report("vfio_pci_device_request_pasid_free:"
+> +                     " request failed, contanier: %p", container);
+> +    }
+> +    rcu_read_unlock();
+> +    return ret;
+> +}
+> +
+> +static PCIPASIDOps vfio_pci_pasid_ops =3D {
+> +    .alloc_pasid =3D vfio_pci_device_request_pasid_alloc,
+> +    .free_pasid =3D vfio_pci_device_request_pasid_free,
+> +};
+> +
+>  static void vfio_realize(PCIDevice *pdev, Error **errp)
+>  {
+>      VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
+> @@ -2991,6 +3050,8 @@ static void vfio_realize(PCIDevice *pdev, Error **e=
+rrp)
+>      vfio_register_req_notifier(vdev);
+>      vfio_setup_resetfn_quirk(vdev);
+> =20
+> +    pci_setup_pasid_ops(pdev, &vfio_pci_pasid_ops);
+> +
+>      return;
+> =20
+>  out_teardown:
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--h56sxpGKRmy85csR
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0r6xQACgkQbDjKyiDZ
+s5J4Eg//aM7TV3CkLDHJtnRYwSfA06xJ1K3BJ78h1scn8zlw7J0CCcwYYK6FuVvT
+SXFXQP9dlyKMaRvieS1SfV+LjQ+lCToDJSllg1Wq0CYSTwnpKjCefPIP8O3sQ+DF
+Jda+AC3BAfldLrgyN9I7lUXgrIFrP77uMR2ciobnyb4516ZLy4DQ2GYOeBggDDwW
+QRZWgNSuvEBob8MFuIg7sTKTz63+N/hL83Jjy27BERVHaNQqDU0XPnOGBBBOmd16
+Dn5DGR6HBBeVgOjyOr+8u/lByufe0j4pmhl8bS0wCmAtS4JfCfqxhNEiOhV5QCBA
+UxRtzLxKfAbUnAfQMRc79hAJGM2DiChIlLVycRF9OxsD/dmYe2O8GOR337BIe7fv
+oYORbuIomOsU0clA/8nisIQKftkoJcK3AO4CIc1ShQcMKa2j0f9Y2c5WH1BC3TX8
+67MDlK7hBgRS/gbydog4ZuyUzMSr9bas2+L9CNXG0j1wN2ckFoK9MYSgsRmMSZDJ
+BPBLEiYPnlYgU85wlCHTNWxDv0XQ1bHIq0pl3Rxh0Zubrobj3j/FSA1DVWb0NXLP
+/p8qBE2ZOj952LRcYUOLFWMgRZyOf30Zlrs+KwKSdjDrZbso9j60m7wRTspsGY4x
+LuIU0Jb0Df/F8T6lsYSdtlZfcGt689JLR2v+hrg2kpXScz9TDWA=
+=i1pv
+-----END PGP SIGNATURE-----
+
+--h56sxpGKRmy85csR--
