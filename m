@@ -2,66 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.lfdr.de (Postfix) with ESMTP id F2BE1687A0
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 13:03:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE4D2687D7
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2019 13:05:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729834AbfGOLB7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Jul 2019 07:01:59 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:35791 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729837AbfGOLB6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Jul 2019 07:01:58 -0400
-Received: by mail-pf1-f196.google.com with SMTP id u14so7264757pfn.2
-        for <kvm@vger.kernel.org>; Mon, 15 Jul 2019 04:01:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=at1U0zLzNGQlxAxn9clrRSHSPpGB2zlKGmciYViXmzQ=;
-        b=iEFjKzh7IIhWdXQEC1d4h6UBzPuafjioOStwaU+J89+SRtRNS9O6uUg2XbL30GHBYX
-         Jcu+xI2cpZGP24ZdbtAKlhiQcRSeqhHb6tnU6p5Vm5Gk0LFABdQTmHLKQvaBur4EMI+w
-         UJLFeb2UcowaRJWF9BATjoSfelvodCTvn+TOY1jh9WW6ki3oU2DCvUmLCJcdDmfO36q0
-         K+X88Cee3RjakE1DAPOwXRl8lPrQes0gMD4PvDaQ/k9q4I17qAntjDDtdK4Y6uhsYjvO
-         IVQYT4rK9DUx5cNjmYJu2yKe9lJMqw+l0VvL6AS1YKLi2JV7RChmlp8nma1WtznA1rQ4
-         lPPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=at1U0zLzNGQlxAxn9clrRSHSPpGB2zlKGmciYViXmzQ=;
-        b=DhDF9FjSqFfiird8EKeIZG42CGvHaG44Znt1i3WED8LsFl1sR0NFnrgSnXZKune687
-         rVCq3Hq5MzhaHVfjbdunq0DNqT8cdhMW6BKPQjnLsJpKC3yr/rECb8HUW+ha0yZrzdW7
-         qUb8mbocuDma5IuEYubwMQU6j9lHMsp1xuT0NFld5YKLsyzlJ9qF8oc3f1tluOQ6r7qK
-         8lUiCZzvRtahnxJwl9jhosUSd7+6GeGj75Dz++tRyxcu3RKOiohE9rOnjHnOHWc3zcxG
-         Hr+JjyYNyLinme/im+q7VHuyPidlRD3ztYVrEHv2dRYUKpbUuGHkUHb4F1KgQeGIFktx
-         eF7A==
-X-Gm-Message-State: APjAAAVEanWCO4SBKJ4Ywgkhs0GJamiBu64Y20ptwD9EKHsCMRi/N3T7
-        ygDKu597cTiNl0/ViyaMstOsw9Dvw97QnyQfITM=
-X-Google-Smtp-Source: APXvYqw4j8zzS79dm+J5jH55NeMb6SStfBugKoaq0IxiYIGpwaFSs6Cdw04PscJT2IAItDz5hDOA9OSU7JucsXuotVE=
-X-Received: by 2002:a63:58c:: with SMTP id 134mr27463223pgf.106.1563188517736;
- Mon, 15 Jul 2019 04:01:57 -0700 (PDT)
+        id S1729939AbfGOLFU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Jul 2019 07:05:20 -0400
+Received: from mga18.intel.com ([134.134.136.126]:64019 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729755AbfGOLFU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Jul 2019 07:05:20 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Jul 2019 04:05:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,493,1557212400"; 
+   d="scan'208";a="194476127"
+Received: from liujing-mobl.ccr.corp.intel.com (HELO [10.238.128.226]) ([10.238.128.226])
+  by fmsmga002.fm.intel.com with ESMTP; 15 Jul 2019 04:05:18 -0700
+Subject: Re: [PATCH v1] KVM: x86: expose AVX512_BF16 feature to guest
+To:     Wanpeng Li <kernellwp@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+References: <1562824197-13658-1-git-send-email-jing2.liu@linux.intel.com>
+ <305e2a40-93a3-23ed-71a2-d3f2541e837a@redhat.com>
+ <CANRm+CzOp6orH+7sqCQjLuxsYRccfq7H-o4QBcgxGfT-=RaJ-w@mail.gmail.com>
+From:   Jing Liu <jing2.liu@linux.intel.com>
+Message-ID: <332e8951-e6bb-8394-490d-26c8154712b9@linux.intel.com>
+Date:   Mon, 15 Jul 2019 19:05:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Received: by 2002:a17:90a:b78d:0:0:0:0 with HTTP; Mon, 15 Jul 2019 04:01:57
- -0700 (PDT)
-From:   Donald Douglas <ddouglasng@gmail.com>
-Date:   Mon, 15 Jul 2019 04:01:57 -0700
-Message-ID: <CALVR28HHW97PbQ2qBZA6+Zm_uLA7f7T4z2jdvSiowb3fkCmp9g@mail.gmail.com>
-Subject: Kindly Respond
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CANRm+CzOp6orH+7sqCQjLuxsYRccfq7H-o4QBcgxGfT-=RaJ-w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: kvm-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
-I am Barr Fredrick Mbogo a business consultant i have a lucrative
-business to discuss with you from the Eastern part of Africa Uganda to
-be precise aimed at agreed percentage upon your acceptance of my hand
-in business and friendship. Kindly respond to me if you are interested
-to partner with me for an update. Very important.
 
-Yours Sincerely,
-Donald Douglas,
-For,
-Barr Frederick Mbogo
-Legal Consultant.
-Reply to: barrfredmbogo@consultant.com
+
+On 7/15/2019 2:06 PM, Wanpeng Li wrote:
+> On Sat, 13 Jul 2019 at 18:40, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 11/07/19 07:49, Jing Liu wrote:
+>>> AVX512 BFLOAT16 instructions support 16-bit BFLOAT16 floating-point
+>>> format (BF16) for deep learning optimization.
+>>>
+>>> Intel adds AVX512 BFLOAT16 feature in CooperLake, which is CPUID.7.1.EAX[5].
+>>>
+>>> Detailed information of the CPUID bit can be found here,
+>>> https://software.intel.com/sites/default/files/managed/c5/15/\
+>>> architecture-instruction-set-extensions-programming-reference.pdf.
+>>>
+>>> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+>>> ---
+>>>
+[...]
+> /home/kernel/data/kvm/arch/x86/kvm//cpuid.c: In function ‘do_cpuid_7_mask’:
+> ./include/linux/kernel.h:819:29: warning: comparison of distinct
+> pointer types lacks a cast
+>     (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
+>                               ^
+> ./include/linux/kernel.h:833:4: note: in expansion of macro ‘__typecheck’
+>     (__typecheck(x, y) && __no_side_effects(x, y))
+>      ^
+> ./include/linux/kernel.h:843:24: note: in expansion of macro ‘__safe_cmp’
+>    __builtin_choose_expr(__safe_cmp(x, y), \
+>                          ^
+> ./include/linux/kernel.h:852:19: note: in expansion of macro ‘__careful_cmp’
+>   #define min(x, y) __careful_cmp(x, y, <)
+>                     ^
+> /home/kernel/data/kvm/arch/x86/kvm//cpuid.c:377:16: note: in expansion
+> of macro ‘min’
+>     entry->eax = min(entry->eax, 1);
+>                  ^
+> 
+Thanks for the information.
+
+This warning would be fixed by changing to
+entry->eax = min(entry->eax, (u32)1);
+
+@Paolo, sorry for trouble. Would you mind if I re-send?
+
+Jing
+
